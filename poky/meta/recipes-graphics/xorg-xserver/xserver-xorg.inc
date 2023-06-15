@@ -28,6 +28,8 @@ CVE_CHECK_IGNORE += "CVE-2011-4613"
 # impossible or difficult to exploit. There is currently no upstream patch
 # available for this flaw.
 CVE_CHECK_IGNORE += "CVE-2020-25697"
+# This is specific to XQuartz, which is the macOS X server port
+CVE_CHECK_IGNORE += "CVE-2022-3553"
 
 S = "${WORKDIR}/${XORG_PN}-${PV}"
 
@@ -80,9 +82,9 @@ PACKAGES =+ "${PN}-sdl \
 SUMMARY:xf86-video-modesetting = "X.Org X server -- modesetting display driver"
 INSANE_SKIP:${MLPREFIX}xf86-video-modesetting = "xorg-driver-abi"
 
-XSERVER_RRECOMMENDS = "xkeyboard-config rgb xserver-xf86-config xkbcomp xf86-input-libinput"
-RRECOMMENDS:${PN} += "${XSERVER_RRECOMMENDS}"
-RRECOMMENDS:${PN}-xwayland += "${XSERVER_RRECOMMENDS}"
+XSERVER_RDEPENDS = "xkeyboard-config rgb xserver-xf86-config xkbcomp xf86-input-libinput"
+RDEPENDS:${PN} += "${XSERVER_RDEPENDS}"
+RDEPENDS:${PN}-xwayland += "${XSERVER_RDEPENDS}"
 RDEPENDS:${PN}-xvfb += "xkeyboard-config"
 RDEPENDS:${PN}-module-exa = "${PN} (= ${EXTENDPKGV})"
 

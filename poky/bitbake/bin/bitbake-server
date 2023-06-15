@@ -12,8 +12,9 @@ warnings.simplefilter("default")
 import logging
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
 
-if sys.getfilesystemencoding() != "utf-8":
-    sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\nPython can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
+import bb
+
+bb.utils.check_system_locale()
 
 # Users shouldn't be running this code directly
 if len(sys.argv) != 10 or not sys.argv[1].startswith("decafbad"):

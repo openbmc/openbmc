@@ -98,7 +98,7 @@ TESTIMAGELOCK:qemuall = ""
 
 TESTIMAGE_DUMP_DIR ?= "${LOG_DIR}/runtime-hostdump/"
 
-TESTIMAGE_UPDATE_VARS ?= "DL_DIR WORKDIR DEPLOY_DIR"
+TESTIMAGE_UPDATE_VARS ?= "DL_DIR WORKDIR DEPLOY_DIR_IMAGE IMAGE_LINK_NAME"
 
 testimage_dump_target () {
     top -bn1
@@ -236,7 +236,7 @@ def testimage_main(d):
         with open(tdname, "r") as f:
             td = json.load(f)
     except FileNotFoundError as err:
-        bb.fatal('File %s not found (%s).\nHave you built the image with INHERIT += "testimage" in the conf/local.conf?' % (tdname, err))
+        bb.fatal('File %s not found (%s).\nHave you built the image with IMAGE_CLASSES += "testimage" in the conf/local.conf?' % (tdname, err))
 
     # Some variables need to be updates (mostly paths) with the
     # ones of the current environment because some tests require them.

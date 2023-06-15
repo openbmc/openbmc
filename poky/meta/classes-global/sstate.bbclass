@@ -365,8 +365,9 @@ def sstate_installpkg(ss, d):
     d.setVar("SSTATE_CURRTASK", ss['task'])
     sstatefetch = d.getVar('SSTATE_PKGNAME')
     sstatepkg = d.getVar('SSTATE_PKG')
+    verify_sig = bb.utils.to_boolean(d.getVar("SSTATE_VERIFY_SIG"), False)
 
-    if not os.path.exists(sstatepkg):
+    if not os.path.exists(sstatepkg) or (verify_sig and not os.path.exists(sstatepkg + '.sig')):
         pstaging_fetch(sstatefetch, d)
 
     if not os.path.isfile(sstatepkg):
@@ -377,7 +378,7 @@ def sstate_installpkg(ss, d):
 
     d.setVar('SSTATE_INSTDIR', sstateinst)
 
-    if bb.utils.to_boolean(d.getVar("SSTATE_VERIFY_SIG"), False):
+    if verify_sig:
         if not os.path.isfile(sstatepkg + '.sig'):
             bb.warn("No signature file for sstate package %s, skipping acceleration..." % sstatepkg)
             return False
@@ -1097,7 +1098,7 @@ def setscene_depvalid(task, taskdependees, notneeded, d, log=None):
 
     logit("Considering setscene task: %s" % (str(taskdependees[task])), log)
 
-    directtasks = ["do_populate_lic", "do_deploy_source_date_epoch", "do_shared_workdir", "do_stash_locale", "do_gcc_stash_builddir", "do_create_spdx"]
+    directtasks = ["do_populate_lic", "do_deploy_source_date_epoch", "do_shared_workdir", "do_stash_locale", "do_gcc_stash_builddir", "do_create_spdx", "do_deploy_archives"]
 
     def isNativeCross(x):
         return x.endswith("-native") or "-cross-" in x or "-crosssdk" in x or x.endswith("-cross")

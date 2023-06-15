@@ -298,7 +298,7 @@ do_uboot_generate_rsa_keys() {
 				"${UBOOT_FIT_SIGN_NUMBITS}"
 
 			echo "Generating certificate for signing U-Boot fitImage"
-			openssl req ${FIT_KEY_REQ_ARGS} "${UBOOT_FIT_KEY_SIGN_PKCS}" \
+			openssl req ${UBOOT_FIT_KEY_REQ_ARGS} "${UBOOT_FIT_KEY_SIGN_PKCS}" \
 				-key "${SPL_SIGN_KEYDIR}/${SPL_SIGN_KEYNAME}".key \
 				-out "${SPL_SIGN_KEYDIR}/${SPL_SIGN_KEYNAME}".crt
 		fi

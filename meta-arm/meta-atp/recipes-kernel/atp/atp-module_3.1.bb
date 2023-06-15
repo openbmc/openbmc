@@ -1,3 +1,4 @@
+COMPATIBLE_MACHINE = "gem5-atp-arm64"
 require recipes-devtools/atp/atp-source_3.1.inc
 inherit module
 

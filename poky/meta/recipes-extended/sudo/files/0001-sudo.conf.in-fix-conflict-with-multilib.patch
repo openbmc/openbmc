@@ -1,4 +1,7 @@
-sudo.conf.in: fix conflict with multilib
+From 6e835350b7413210c410d3578cfab804186b7a4f Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Tue, 17 Nov 2020 11:13:40 +0800
+Subject: [PATCH] sudo.conf.in: fix conflict with multilib
 
 When pass ${libdir} to --libexecdir of sudo, it fails to install sudo
 and lib32-sudo at same time:
@@ -12,12 +15,13 @@ Update the comments in sudo.conf.in to avoid the conflict.
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
 Upstream-Status: Inappropriate [OE configuration specific]
+
 ---
  examples/sudo.conf.in | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/examples/sudo.conf.in b/examples/sudo.conf.in
-index 6535d3a..50afc8f 100644
+index 2187457..0908d24 100644
 --- a/examples/sudo.conf.in
 +++ b/examples/sudo.conf.in
 @@ -4,7 +4,7 @@
@@ -33,8 +37,8 @@ index 6535d3a..50afc8f 100644
  # The compiled-in value is usually sufficient and should only be changed
  # if you rename or move the sudo_intercept.so file.
  #
--#Path intercept @plugindir@/sudo_intercept.so
-+#Path intercept $plugindir/sudo_intercept.so
+-#Path intercept @intercept_file@
++#Path intercept $intercept_file
  
  #
  # Sudo noexec:
@@ -42,8 +46,8 @@ index 6535d3a..50afc8f 100644
  # The compiled-in value is usually sufficient and should only be changed
  # if you rename or move the sudo_noexec.so file.
  #
--#Path noexec @plugindir@/sudo_noexec.so
-+#Path noexec $plugindir/sudo_noexec.so
+-#Path noexec @noexec_file@
++#Path noexec $noexec_file
  
  #
  # Sudo plugin directory:
@@ -55,7 +59,4 @@ index 6535d3a..50afc8f 100644
 +#Path plugin_dir $plugindir
  
  #
- # Sudo developer mode:
---
-2.17.1
-
+ # Core dumps:

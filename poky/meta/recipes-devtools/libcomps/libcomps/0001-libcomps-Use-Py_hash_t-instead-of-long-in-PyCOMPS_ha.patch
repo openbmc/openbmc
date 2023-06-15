@@ -1,0 +1,66 @@
+From 26a9647c832de15248ee649e5b77075521f3d4f0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Mar 2023 08:37:35 -0800
+Subject: [PATCH] libcomps: Use Py_hash_t instead of long in PyCOMPS_hash()
+
+This function is used as a hashfunc callback in
+_typeobject defined python3.11/cpython/object.h
+compilers detect the protype mismatch for function pointers
+with clang16+
+
+Fixes
+libcomps/src/python/src/pycomps_sequence.c:667:5: error: incompatible function pointer types initializing 'hashfunc' (aka 'int (*)(struct _object *)') with an expression of type 'long (*)(PyObject *)' (aka 'long (*)(struct _object *)') [-Wincompatible-function-pointer-types]
+    &PyCOMPS_hash,             /*tp_hash */
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libcomps/pull/101]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libcomps/src/python/src/pycomps_hash.c  | 4 ++--
+ libcomps/src/python/src/pycomps_hash.h  | 2 +-
+ libcomps/src/python/src/pycomps_utils.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/libcomps/src/python/src/pycomps_hash.c b/libcomps/src/python/src/pycomps_hash.c
+index 474afd5..4577769 100644
+--- a/libcomps/src/python/src/pycomps_hash.c
++++ b/libcomps/src/python/src/pycomps_hash.c
+@@ -20,9 +20,9 @@
+ #include "pycomps_hash.h"
+ #include "pycomps_utils.h"
+ 
+-long PyCOMPS_hash(PyObject *self) {
++Py_hash_t PyCOMPS_hash(PyObject *self) {
+     char *cstr = NULL;
+-    long crc;
++    Py_hash_t crc;
+ 
+     cstr = comps_object_tostr(((PyCompsObject*)self)->c_obj);
+     crc = crc32(0, cstr, strlen(cstr));
+diff --git a/libcomps/src/python/src/pycomps_hash.h b/libcomps/src/python/src/pycomps_hash.h
+index b664cae..54e08d9 100644
+--- a/libcomps/src/python/src/pycomps_hash.h
++++ b/libcomps/src/python/src/pycomps_hash.h
+@@ -26,6 +26,6 @@
+ #include "pycomps_utils.h"
+ 
+ 
+-long PyCOMPS_hash(PyObject *self);
++Py_hash_t PyCOMPS_hash(PyObject *self);
+ 
+ #endif
+diff --git a/libcomps/src/python/src/pycomps_utils.h b/libcomps/src/python/src/pycomps_utils.h
+index ba9bc2f..b34e4dc 100644
+--- a/libcomps/src/python/src/pycomps_utils.h
++++ b/libcomps/src/python/src/pycomps_utils.h
+@@ -137,7 +137,7 @@ COMPS_Object* __pycomps_bytes_in(PyObject *pobj);
+ PyObject* __pycomps_str_out(COMPS_Object *obj);
+ PyObject *str_to_unicode(void* str);
+ 
+-long PyCOMPS_hash(PyObject *self);
++Py_hash_t PyCOMPS_hash(PyObject *self);
+ 
+ PyObject* PyCOMPSSeq_extra_get(PyObject *self, PyObject *key);
+ 
+-- 
+2.39.2
+

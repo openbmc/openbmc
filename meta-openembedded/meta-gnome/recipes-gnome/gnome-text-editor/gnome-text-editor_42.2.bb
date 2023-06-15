@@ -10,6 +10,7 @@ DEPENDS = " \
     gtk4 \
     gtksourceview5 \
     enchant2 \
+    libpcre \
 "
 
 GTKIC_VERSION = "4"

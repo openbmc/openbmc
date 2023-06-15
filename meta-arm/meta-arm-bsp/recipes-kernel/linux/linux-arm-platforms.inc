@@ -36,7 +36,6 @@ SRC_URI:append:corstone500 = " \
 # Corstone1000 KMACHINE
 #
 FILESEXTRAPATHS:prepend:corstone1000 := "${ARMBSPFILESPATHS}"
-FILESEXTRAPATHS:prepend:corstone1000 := "${ARMFILESPATHS}"
 COMPATIBLE_MACHINE:corstone1000 = "${MACHINE}"
 KCONFIG_MODE:corstone1000 = "--alldefconfig"
 KMACHINE:corstone1000 = "corstone1000"
@@ -70,6 +69,7 @@ KERNEL_FEATURES:corstone1000 = ""
 COMPATIBLE_MACHINE:fvp-base = "fvp-base"
 KMACHINE:fvp-base = "fvp"
 FILESEXTRAPATHS:prepend:fvp-base := "${ARMBSPFILESPATHS}"
+SRC_URI:append:fvp-base = " file://0001-arm64-dts-fvp-Enable-virtio-rng-support.patch"
 
 #
 # FVP BASE ARM32 KMACHINE
@@ -100,6 +100,13 @@ COMPATIBLE_MACHINE:juno = "juno"
 KBUILD_DEFCONFIG:juno = "defconfig"
 KCONFIG_MODE:juno = "--alldefconfig"
 FILESEXTRAPATHS:prepend:juno := "${ARMBSPFILESPATHS}"
+SRC_URI:append:juno = " \
+    file://0001-arm64-dts-juno-Add-thermal-critical-trip-points.patch \
+    file://0002-arm64-dts-Update-cache-properties-for-Arm-Ltd-platfo.patch \
+    file://0003-arm64-dts-fvp-Add-SPE-to-Foundation-FVP.patch \
+    file://0004-arm64-dts-fvp-Add-information-about-L1-and-L2-caches.patch \
+    file://0005-ARM-dts-vexpress-align-LED-node-names-with-dtschema.patch \
+    "
 
 #
 # Musca B1/S2 can't run Linux
@@ -115,7 +122,6 @@ COMPATIBLE_MACHINE:n1sdp = "n1sdp"
 KBUILD_DEFCONFIG:n1sdp = "defconfig"
 KCONFIG_MODE:n1sdp = "--alldefconfig"
 FILESEXTRAPATHS:prepend:n1sdp := "${ARMBSPFILESPATHS}"
-FILESEXTRAPATHS:prepend:n1sdp := "${ARMFILESPATHS}"
 SRC_URI:append:n1sdp = " \
     file://0001-iommu-arm-smmu-v3-workaround-for-ATC_INV_SIZE_ALL-in.patch \
     file://0002-n1sdp-pci_quirk-add-acs-override-for-PCI-devices.patch \

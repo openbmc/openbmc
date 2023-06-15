@@ -5,7 +5,7 @@ distro: poky-tiny
 
 defaults:
   repos:
-    refspec: master
+    refspec: langdale
 
 repos:
   meta-arm:
@@ -16,7 +16,6 @@ repos:
 
   poky:
     url: https://git.yoctoproject.org/git/poky
-    refspec: master
     layers:
       meta:
       meta-poky:
@@ -24,7 +23,6 @@ repos:
 
   meta-openembedded:
     url: https://git.openembedded.org/meta-openembedded
-    refspec: master
     layers:
       meta-oe:
       meta-python:

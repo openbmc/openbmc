@@ -12,6 +12,14 @@ SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
            file://0001-fix-the-FPE-in-tiffcrop-415-427-and-428.patch \
            file://CVE-2022-34526.patch \
            file://CVE-2022-2953.patch \
+           file://CVE-2022-3970.patch \
+           file://0001-Revised-handling-of-TIFFTAG_INKNAMES-and-related-TIF.patch \
+           file://0001-tiffcrop-S-option-Make-decision-simpler.patch \
+           file://0001-tiffcrop-disable-incompatibility-of-Z-X-Y-z-options-.patch \
+           file://0001-tiffcrop-subroutines-require-a-larger-buffer-fixes-2.patch \
+           file://CVE-2022-48281.patch \
+           file://CVE-2023-0800_0801_0802_0803_0804.patch \
+           file://CVE-2023-0795_0796_0797_0798_0799.patch \
            "
 
 SRC_URI[sha256sum] = "917223b37538959aca3b790d2d73aa6e626b688e02dcda272aec24c2f498abed"
@@ -25,7 +33,6 @@ CVE_CHECK_IGNORE += "CVE-2015-7313"
 # These issues only affect libtiff post-4.3.0 but before 4.4.0,
 # caused by 3079627e and fixed by b4e79bfa.
 CVE_CHECK_IGNORE += "CVE-2022-1622 CVE-2022-1623"
-
 # Issue is in jbig which we don't enable
 CVE_CHECK_IGNORE += "CVE-2022-1210"
 
@@ -41,6 +48,7 @@ PACKAGECONFIG[jbig] = "--enable-jbig,--disable-jbig,jbig,"
 PACKAGECONFIG[jpeg] = "--enable-jpeg,--disable-jpeg,jpeg,"
 PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib,"
 PACKAGECONFIG[lzma] = "--enable-lzma,--disable-lzma,xz,"
+PACKAGECONFIG[webp] = "--enable-webp,--disable-webp,libwebp,"
 
 # Convert single-strip uncompressed images to multiple strips of specified
 # size (default: 8192) to reduce memory usage

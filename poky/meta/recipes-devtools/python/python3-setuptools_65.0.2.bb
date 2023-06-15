@@ -9,7 +9,9 @@ inherit pypi python_setuptools_build_meta
 SRC_URI:append:class-native = " file://0001-conditionally-do-not-fetch-code-by-easy_install.patch"
 
 SRC_URI += "file://0001-change-shebang-to-python3.patch \
-            file://0001-_distutils-sysconfig.py-make-it-possible-to-substite.patch"
+            file://0001-_distutils-sysconfig.py-make-it-possible-to-substite.patch \
+            file://0001-Limit-the-amount-of-whitespace-to-search-backtrack.-.patch \
+"
 
 SRC_URI[sha256sum] = "101bf15ca723beef42c8db91a761f3748d4d697e17fae904db60c0b619d8d094"
 

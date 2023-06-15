@@ -11,6 +11,7 @@ SRC_URI:append = " \
     file://0002-plat-n1sdp-add-N1SDP-platform-support.patch \
     file://0003-HACK-disable-instruction-cache-and-data-cache.patch \
     file://0004-Handle-logging-syscall.patch \
+    file://0005-plat-n1sdp-register-DRAM1-to-optee-os.patch \
     "
 
 EXTRA_OEMAKE += " CFG_TEE_CORE_LOG_LEVEL=4"

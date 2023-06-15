@@ -308,6 +308,13 @@ do_install() {
     # external modules can be built
     touch -r $kerneldir/build/Makefile $kerneldir/build/include/generated/uapi/linux/version.h
 
+    # This fixes a warning that the compilers don't match when building a module
+    # Change: CONFIG_CC_VERSION_TEXT="x86_64-poky-linux-gcc (GCC) 12.2.0" to "gcc (GCC) 12.2.0"
+    #         #define CONFIG_CC_VERSION_TEXT "x86_64-poky-linux-gcc (GCC) 12.2.0" to "gcc (GCC) 12.2.0"
+    sed -i 's/CONFIG_CC_VERSION_TEXT=".*\(gcc.*\)"/CONFIG_CC_VERSION_TEXT="\1"/' "$kerneldir/build/.config"
+    sed -i 's/#define CONFIG_CC_VERSION_TEXT ".*\(gcc.*\)"/#define CONFIG_CC_VERSION_TEXT "\1"/' $kerneldir/build/include/generated/autoconf.h
+    sed -i 's/CONFIG_CC_VERSION_TEXT=".*\(gcc.*\)"/CONFIG_CC_VERSION_TEXT="\1"/' $kerneldir/build/include/config/auto.conf
+
     # make sure these are at least as old as the .config, or rebuilds will trigger
     touch -r $kerneldir/build/.config $kerneldir/build/include/generated/autoconf.h 2>/dev/null || :
     touch -r $kerneldir/build/.config $kerneldir/build/include/config/auto.conf* 2>/dev/null || :

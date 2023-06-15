@@ -26,6 +26,7 @@ RDEPENDS:${PN} += " \
     python3-dbus \
     python3-pygobject \
     python3-terminal \
+    python3-fcntl \
     packagegroup-tools-bluetooth \
 "
 

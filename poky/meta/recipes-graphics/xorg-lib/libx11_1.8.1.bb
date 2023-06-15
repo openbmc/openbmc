@@ -15,6 +15,7 @@ PE = "1"
 SRC_URI = "${XORG_MIRROR}/individual/lib/${XORG_PN}-${PV}.tar.xz"
 
 SRC_URI += "file://disable_tests.patch \
+            file://0001-fix-a-memory-leak-in-XRegisterIMInstantiateCallback.patch \
            "
 SRC_URI[sha256sum] = "1bc41aa1bbe01401f330d76dfa19f386b79c51881c7bbfee9eb4e27f22f2d9f7"
 

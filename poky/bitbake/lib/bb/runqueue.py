@@ -2489,17 +2489,6 @@ class RunQueueExecute:
                 self.sq_buildable.remove(tid)
             if tid in self.sq_running:
                 self.sq_running.remove(tid)
-            harddepfail = False
-            for t in self.sqdata.sq_harddeps:
-                if tid in self.sqdata.sq_harddeps[t] and t in self.scenequeue_notcovered:
-                    harddepfail = True
-                    break
-            if not harddepfail and self.sqdata.sq_revdeps[tid].issubset(self.scenequeue_covered | self.scenequeue_notcovered):
-                if tid not in self.sq_buildable:
-                    self.sq_buildable.add(tid)
-            if not self.sqdata.sq_revdeps[tid]:
-                self.sq_buildable.add(tid)
-
             if tid in self.sqdata.outrightfail:
                 self.sqdata.outrightfail.remove(tid)
             if tid in self.scenequeue_notcovered:
@@ -2518,21 +2507,36 @@ class RunQueueExecute:
             if tid in self.build_stamps:
                 del self.build_stamps[tid]
 
-            update_tasks.append((tid, harddepfail, tid in self.sqdata.valid))
+            update_tasks.append(tid)
 
-        if update_tasks:
+        update_tasks2 = []
+        for tid in update_tasks:
+            harddepfail = False
+            for t in self.sqdata.sq_harddeps:
+                if tid in self.sqdata.sq_harddeps[t] and t in self.scenequeue_notcovered:
+                    harddepfail = True
+                    break
+            if not harddepfail and self.sqdata.sq_revdeps[tid].issubset(self.scenequeue_covered | self.scenequeue_notcovered):
+                if tid not in self.sq_buildable:
+                    self.sq_buildable.add(tid)
+            if not self.sqdata.sq_revdeps[tid]:
+                self.sq_buildable.add(tid)
+
+            update_tasks2.append((tid, harddepfail, tid in self.sqdata.valid))
+
+        if update_tasks2:
             self.sqdone = False
             for mc in sorted(self.sqdata.multiconfigs):
-                for tid in sorted([t[0] for t in update_tasks]):
+                for tid in sorted([t[0] for t in update_tasks2]):
                     if mc_from_tid(tid) != mc:
                         continue
                     h = pending_hash_index(tid, self.rqdata)
                     if h in self.sqdata.hashes and tid != self.sqdata.hashes[h]:
                         self.sq_deferred[tid] = self.sqdata.hashes[h]
                         bb.note("Deferring %s after %s" % (tid, self.sqdata.hashes[h]))
-            update_scenequeue_data([t[0] for t in update_tasks], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=False)
+            update_scenequeue_data([t[0] for t in update_tasks2], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=False)
 
-        for (tid, harddepfail, origvalid) in update_tasks:
+        for (tid, harddepfail, origvalid) in update_tasks2:
             if tid in self.sqdata.valid and not origvalid:
                 hashequiv_logger.verbose("Setscene task %s became valid" % tid)
             if harddepfail:

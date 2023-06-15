@@ -70,24 +70,14 @@ do_configure () {
     elif [ $arch = "aarch64" ]; then
         arch="arm64"
     fi
-    
-    # For ARM32 with hardware floating point using clang and musl, we need to
-    # specify -mfloat-abi=hard to make the ABI settings of the linker and the
-    # compiler match. The linker would use hardware float ABI. The compiler does
-    # not. As a result we need to force the compiler to do so by adding
-    # -mfloat-abi=hard to compilation flags.
-    FLOAT_ABI=""
-    if [[ "${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'true', 'false', d)}" == "true" ]]; then
-      FLOAT_ABI="-mfloat-abi=hard"
-    fi
 
     ARGS=$ARGS" target_os=\"linux\""
     ARGS=$ARGS" target_cpu=\"$arch\""
-    ARGS=$ARGS" target_cc=\"$CC_BIN ${FLOAT_ABI}\""
-    ARGS=$ARGS" target_cxx=\"$CXX_BIN -std=c++11 ${FLOAT_ABI}\""
+    ARGS=$ARGS" target_cc=\"$CC_BIN ${TUNE_CCARGS}\""
+    ARGS=$ARGS" target_cxx=\"$CXX_BIN -std=c++11 ${TUNE_CCARGS}\""
     ARGS=$ARGS" target_strip=\"$STRIP_BIN\"" #
     ARGS=$ARGS" target_sysroot=\"${RECIPE_SYSROOT}\""
-    ARGS=$ARGS" target_linker=\"$CC_BIN ${FLOAT_ABI} ${LDFLAGS}\""
+    ARGS=$ARGS" target_linker=\"$CC_BIN ${TUNE_CCARGS} ${LDFLAGS}\""
     ARGS=$ARGS" target_ar=\"$AR\""
     ARGS="'$ARGS'"
     cmd="tools/gn gen --args=$ARGS ${B}"
@@ -100,7 +90,6 @@ do_configure () {
     # Eliminate a few incompatible build flags
     REPLACES="s/-Wl,--icf=all//g"
     REPLACES=$REPLACES";s/-Werror//g"
-    REPLACES=$REPLACES";s/-mfpu=neon//g"
     REPLACES=$REPLACES";s/-fcolor-diagnostics//g"
     REPLACES=$REPLACES";s/=format-security//g"
     REPLACES=$REPLACES";s/-fdiagnostics-show-template-tree//g"
@@ -111,12 +100,12 @@ do_configure () {
 
     # If using the clang toolchain: use the clang host-side binaries built by Bitbake
     if [ "${TOOLCHAIN}" = "clang" ]; then
-        BB_CLANGXX="${BUILD_CXX} ${BUILD_LDFLAGS} ${FLOAT_ABI}"
-        BB_CLANG="${BUILD_CC} ${FLOAT_ABI}"
+        BB_CLANGXX="${BUILD_CXX} ${BUILD_LDFLAGS}"
+        BB_CLANG="${BUILD_CC}"
         BB_LLVM_OBJCOPY="${RECIPE_SYSROOT_NATIVE}/usr/bin/llvm-objcopy"
         
-        HOST_CLANGXX="${STAGING_DIR_NATIVE}/usr/bin/clang++ -stdlib=libc++ -rtlib=libgcc -unwindlib=libgcc ${FLOAT_ABI}"
-        HOST_CLANG="${STAGING_DIR_NATIVE}/usr/bin/clang ${FLOAT_ABI}"
+        HOST_CLANGXX="${STAGING_DIR_NATIVE}/usr/bin/clang++ -stdlib=libc++ -rtlib=libgcc -unwindlib=libgcc"
+        HOST_CLANG="${STAGING_DIR_NATIVE}/usr/bin/clang"
         HOST_LLVM_OBJCOPY="${STAGING_DIR_NATIVE}/usr/bin/llvm-objcopy"
 
         cd gcc_like_host

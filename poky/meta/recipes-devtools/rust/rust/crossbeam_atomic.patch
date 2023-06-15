@@ -14,7 +14,7 @@ Someone with more rust knowledge could split up the triplets in no_atmoics.rs
 and compare against the architecture/processor, or replace -unknown with a glob
 to create a patch that upstream might accept.
 
-Upstream-Status: Inappropriate [OE Specific tweak  but could be rewritten]
+Upstream-Status: Submitted [https://github.com/crossbeam-rs/crossbeam/pull/922]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Index: rustc-1.63.0-src/vendor/crossbeam-utils/build.rs

@@ -114,7 +114,7 @@ def llvm_features_from_target_fpu(d):
     # TARGET_FPU can be hard or soft. +soft-float tell llvm to use soft float
     # ABI. There is no option for hard.
 
-    fpu = d.getVar('TARGET_FPU', True)
+    fpu = d.getVar('TARGET_FPU')
     return ["+soft-float"] if fpu == "soft" else []
 
 def llvm_features(d):
@@ -231,19 +231,19 @@ TARGET_POINTER_WIDTH[powerpc64le] = "64"
 TARGET_C_INT_WIDTH[powerpc64le] = "64"
 MAX_ATOMIC_WIDTH[powerpc64le] = "64"
 
-## riscv32-unknown-linux-{gnu, musl}
-DATA_LAYOUT[riscv32] = "e-m:e-p:32:32-i64:64-n32-S128"
-TARGET_ENDIAN[riscv32] = "little"
-TARGET_POINTER_WIDTH[riscv32] = "32"
-TARGET_C_INT_WIDTH[riscv32] = "32"
-MAX_ATOMIC_WIDTH[riscv32] = "32"
+## riscv32gc-unknown-linux-{gnu, musl}
+DATA_LAYOUT[riscv32gc] = "e-m:e-p:32:32-i64:64-n32-S128"
+TARGET_ENDIAN[riscv32gc] = "little"
+TARGET_POINTER_WIDTH[riscv32gc] = "32"
+TARGET_C_INT_WIDTH[riscv32gc] = "32"
+MAX_ATOMIC_WIDTH[riscv32gc] = "32"
 
-## riscv64-unknown-linux-{gnu, musl}
-DATA_LAYOUT[riscv64] = "e-m:e-p:64:64-i64:64-i128:128-n64-S128"
-TARGET_ENDIAN[riscv64] = "little"
-TARGET_POINTER_WIDTH[riscv64] = "64"
-TARGET_C_INT_WIDTH[riscv64] = "64"
-MAX_ATOMIC_WIDTH[riscv64] = "64"
+## riscv64gc-unknown-linux-{gnu, musl}
+DATA_LAYOUT[riscv64gc] = "e-m:e-p:64:64-i64:64-i128:128-n64-S128"
+TARGET_ENDIAN[riscv64gc] = "little"
+TARGET_POINTER_WIDTH[riscv64gc] = "64"
+TARGET_C_INT_WIDTH[riscv64gc] = "64"
+MAX_ATOMIC_WIDTH[riscv64gc] = "64"
 
 # Convert a normal arch (HOST_ARCH, TARGET_ARCH, BUILD_ARCH, etc) to something
 # rust's internals won't choke on.
@@ -258,8 +258,20 @@ def arch_to_rust_target_arch(arch):
         return "arm"
     elif arch == "powerpc64le":
         return "powerpc64"
+    elif arch == "riscv32gc":
+        return "riscv32"
+    elif arch == "riscv64gc":
+        return "riscv64"
     else:
         return arch
+
+# Convert a rust target string to a llvm-compatible triplet
+def rust_sys_to_llvm_target(sys):
+    if sys.startswith('riscv32gc-'):
+        return sys.replace('riscv32gc-', 'riscv32-', 1)
+    if sys.startswith('riscv64gc-'):
+        return sys.replace('riscv64gc-', 'riscv64-', 1)
+    return sys
 
 # generates our target CPU value
 def llvm_cpu(d):
@@ -334,7 +346,7 @@ def rust_gen_target(d, thing, wd, arch):
 
     # build tspec
     tspec = {}
-    tspec['llvm-target'] = rustsys
+    tspec['llvm-target'] = rust_sys_to_llvm_target(rustsys)
     tspec['data-layout'] = d.getVarFlag('DATA_LAYOUT', arch_abi)
     if tspec['data-layout'] is None:
         bb.fatal("No rust target defined for %s" % arch_abi)
@@ -389,3 +401,19 @@ python do_rust_gen_targets () {
 addtask rust_gen_targets after do_patch before do_compile
 do_rust_gen_targets[dirs] += "${RUST_TARGETS_DIR}"
 
+# For building target C dependecies use only compiler parameters defined in OE
+# and ignore the CC crate defaults which conflicts with OE ones in some cases.
+# https://github.com/rust-lang/cc-rs#external-configuration-via-environment-variables
+# Some CC crate compiler flags are still required.
+# We apply them conditionally in rust wrappers.
+
+CRATE_CC_FLAGS:class-native = ""
+CRATE_CC_FLAGS:class-nativesdk = ""
+CRATE_CC_FLAGS:class-target = " -ffunction-sections -fdata-sections -fPIC"
+
+do_compile:prepend:class-target() {
+    export CRATE_CC_NO_DEFAULTS=1
+}
+do_install:prepend:class-target() {
+    export CRATE_CC_NO_DEFAULTS=1
+}

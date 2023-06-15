@@ -1,0 +1,29 @@
+From b443c8efd563dc372c60e7ad9f52aeddf7c13706 Mon Sep 17 00:00:00 2001
+From: Anton Antonov <Anton.Antonov@arm.com>
+Date: Mon, 7 Nov 2022 11:37:51 +0000
+Subject: [PATCH] arm64: dts: fvp: Enable virtio-rng support
+
+The virtio-rng is available from FVP_Base_RevC-2xAEMvA version 11.17.
+Enable it since Yocto includes a recipe for a newer FVP version.
+
+Upstream-Status: Inappropriate [Yocto specific]
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+---
+ arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi b/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi
+index ec2d5280a30b..acafdcbf1063 100644
+--- a/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi
++++ b/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi
+@@ -26,7 +26,6 @@ virtio@200000 {
+ 					compatible = "virtio,mmio";
+ 					reg = <0x200000 0x200>;
+ 					interrupts = <46>;
+-					status = "disabled";
+ 				};
+ 			};
+ 		};
+-- 
+2.25.1
+

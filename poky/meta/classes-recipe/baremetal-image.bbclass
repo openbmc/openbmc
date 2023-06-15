@@ -15,15 +15,6 @@
 #
 # See meta-skeleton for a working example.
 
-## Emulate image.bbclass
-# Handle inherits of any of the image classes we need
-IMAGE_CLASSES ??= ""
-IMGCLASSES = " ${IMAGE_CLASSES}"
-inherit ${IMGCLASSES}
-# Set defaults to satisfy IMAGE_FEATURES check
-IMAGE_FEATURES ?= ""
-IMAGE_FEATURES[type] = "list"
-IMAGE_FEATURES[validitems] += ""
 
 # Toolchain should be baremetal or newlib based.
 # TCLIBC="baremetal" or TCLIBC="newlib"
@@ -108,6 +99,17 @@ QB_OPT_APPEND:append:qemuriscv32 = " -bios none"
 # starts at 0x80000000 on RISC-V 64
 # Keep RISC-V 32 using -mcmodel=medlow (symbols lie between -2GB:2GB)
 CFLAGS:append:qemuriscv64 = " -mcmodel=medany"
+
+
+## Emulate image.bbclass
+# Handle inherits of any of the image classes we need
+IMAGE_CLASSES ??= ""
+IMGCLASSES = " ${IMAGE_CLASSES}"
+inherit ${IMGCLASSES}
+# Set defaults to satisfy IMAGE_FEATURES check
+IMAGE_FEATURES ?= ""
+IMAGE_FEATURES[type] = "list"
+IMAGE_FEATURES[validitems] += ""
 
 
 # This next part is necessary to trick the build system into thinking

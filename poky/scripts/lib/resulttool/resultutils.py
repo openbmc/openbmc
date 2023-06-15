@@ -142,7 +142,7 @@ def generic_get_log(sectionname, results, section):
     return decode_log(ptest['log'])
 
 def ptestresult_get_log(results, section):
-    return generic_get_log('ptestresuls.sections', results, section)
+    return generic_get_log('ptestresult.sections', results, section)
 
 def generic_get_rawlogs(sectname, results):
     if sectname not in results:

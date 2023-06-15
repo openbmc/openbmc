@@ -1,0 +1,44 @@
+From bd325061dc9585886f7e60e58d9fc0c8b37e71db Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Wed, 9 Nov 2022 11:18:36 -0500
+Subject: [PATCH] deploy: Don't rebuild selinux policy on first deployment
+
+Basically, it should not be necessary - the policy should be
+up-to-date.  We don't want to force on continual policy rebuilds.
+
+Even trying to run bwrap when we're *not* in a booted
+root can cause failures in nested containerization scenarios.
+
+Closes: https://github.com/ostreedev/ostree/issues/2758
+
+Upstream-Status: Backport
+[https://github.com/ostreedev/ostree/commit/bd325061dc9585886f7e60e58d9fc0c8b37e71db]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/libostree/ostree-sysroot-deploy.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/libostree/ostree-sysroot-deploy.c b/src/libostree/ostree-sysroot-deploy.c
+index f27ae0e1..26b07080 100644
+--- a/src/libostree/ostree-sysroot-deploy.c
++++ b/src/libostree/ostree-sysroot-deploy.c
+@@ -2987,12 +2987,12 @@ sysroot_finalize_deployment (OstreeSysroot     *self,
+       if (!merge_configuration_from (self, merge_deployment, deployment, deployment_dfd,
+                                      cancellable, error))
+         return FALSE;
+-    }
+ 
+ #ifdef HAVE_SELINUX
+-  if (!sysroot_finalize_selinux_policy(deployment_dfd, error))
+-    return FALSE;
++      if (!sysroot_finalize_selinux_policy (deployment_dfd, error))
++        return FALSE;
+ #endif /* HAVE_SELINUX */
++    }
+ 
+   const char *osdeploypath = glnx_strjoina ("ostree/deploy/", ostree_deployment_get_osname (deployment));
+   glnx_autofd int os_deploy_dfd = -1;
+-- 
+2.25.1
+

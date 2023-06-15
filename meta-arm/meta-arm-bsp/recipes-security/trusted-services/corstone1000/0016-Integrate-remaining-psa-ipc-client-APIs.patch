@@ -1,7 +1,7 @@
-From c54afe45c1be25c4819b0f762cf03a24e6343ce5 Mon Sep 17 00:00:00 2001
+From 551d8722769fa2f2d2ac74adcb289333a9b03598 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Sun, 13 Feb 2022 09:49:51 +0000
-Subject: [PATCH 16/19] Integrate remaining psa-ipc client APIs.
+Subject: [PATCH 16/20] Integrate remaining psa-ipc client APIs.
 
 Upstream-Status: Pending
 Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
@@ -490,5 +490,5 @@ index e16f6e5450af..cc9279ee79f2 100644
  }
  #endif
 -- 
-2.38.0
+2.38.1
 

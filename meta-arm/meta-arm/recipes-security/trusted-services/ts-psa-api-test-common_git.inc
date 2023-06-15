@@ -18,11 +18,9 @@ EXTRA_OECMAKE += "\
                   -DPSA_ARCH_TESTS_SOURCE_DIR=${WORKDIR}/git/psatest \
                  "
 
-# TS ships patches that need to be applied to psa-arch-tests
+# TS check if there are patches to apply to psa-arch-tests, if so apply them
 apply_ts_patch() {
-    for p in ${S}/external/psa_arch_tests/*.patch; do
-        patch -p1 -d ${WORKDIR}/git/psatest < ${p}
-    done
+    find ${S}/external/psa_arch_tests -type f -name '*.patch' -exec patch -p1 -d ${WORKDIR}/git/psatest -i {} \;
 }
 do_patch[postfuncs] += "apply_ts_patch"
 

@@ -224,7 +224,7 @@ class RootfsPlugin(SourcePlugin):
             if part.update_fstab_in_rootfs and part.has_fstab and not part.no_fstab_update:
                 fstab_path = os.path.join(new_rootfs, "etc/fstab")
                 # Assume that fstab should always be owned by root with fixed permissions
-                install_cmd = "install -m 0644 %s %s" % (part.updated_fstab_path, fstab_path)
+                install_cmd = "install -m 0644 -p %s %s" % (part.updated_fstab_path, fstab_path)
                 if new_pseudo:
                     pseudo = cls.__get_pseudo(native_sysroot, new_rootfs, new_pseudo)
                 else:

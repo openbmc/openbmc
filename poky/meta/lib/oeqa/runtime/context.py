@@ -67,11 +67,11 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
                 % self.default_target_type)
         runtime_group.add_argument('--target-ip', action='store',
                 default=self.default_target_ip,
-                help="IP address of device under test, default: %s" \
+                help="IP address and optionally ssh port (default 22) of device under test, for example '192.168.0.7:22'. Default: %s" \
                 % self.default_target_ip)
         runtime_group.add_argument('--server-ip', action='store',
                 default=self.default_target_ip,
-                help="IP address of device under test, default: %s" \
+                help="IP address of the test host from test target machine, default: %s" \
                 % self.default_server_ip)
 
         runtime_group.add_argument('--host-dumper-dir', action='store',

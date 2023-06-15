@@ -1,0 +1,78 @@
+From 6c3ac20477a4bac643088f24df3c042e627fafa9 Mon Sep 17 00:00:00 2001
+From: Guillaume Burel <guillaume.burel@stormshield.eu>
+Date: Fri, 3 Jan 2020 11:25:54 +0100
+Subject: [PATCH] Using native binaries
+
+Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
+---
+ node.gyp                 | 2 ++
+ tools/v8_gypfiles/v8.gyp | 5 +++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/node.gyp b/node.gyp
+index 24505da7ba..7d41bd52db 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -319,6 +319,7 @@
+               'action_name': 'run_mkcodecache',
+               'process_outputs_as_sources': 1,
+               'inputs': [
++                '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+                 '<(mkcodecache_exec)',
+               ],
+               'outputs': [
+@@ -366,6 +367,7 @@
+                   'action_name': 'node_mksnapshot',
+                   'process_outputs_as_sources': 1,
+                   'inputs': [
++                    '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+                     '<(node_mksnapshot_exec)',
+                   ],
+                   'outputs': [
+diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
+index ed042f8829..371b8e02c2 100644
+--- a/tools/v8_gypfiles/v8.gyp
++++ b/tools/v8_gypfiles/v8.gyp
+@@ -68,6 +68,7 @@
+         {
+           'action_name': 'run_torque_action',
+           'inputs': [  # Order matters.
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
+             '<@(torque_files)',
+           ],
+@@ -99,6 +100,7 @@
+             '<@(torque_outputs_inc)',
+           ],
+           'action': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
+             '-o', '<(SHARED_INTERMEDIATE_DIR)/torque-generated',
+             '-v8-root', '<(V8_ROOT)',
+@@ -211,6 +213,7 @@
+         {
+           'action_name': 'generate_bytecode_builtins_list_action',
+           'inputs': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)bytecode_builtins_list_generator<(EXECUTABLE_SUFFIX)',
+           ],
+           'outputs': [
+@@ -395,6 +398,7 @@
+             ],
+           },
+           'inputs': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(mksnapshot_exec)',
+           ],
+           'outputs': [
+@@ -1513,6 +1517,7 @@
+         {
+           'action_name': 'run_gen-regexp-special-case_action',
+           'inputs': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)gen-regexp-special-case<(EXECUTABLE_SUFFIX)',
+           ],
+           'outputs': [
+-- 
+2.34.1
+

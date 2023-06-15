@@ -161,7 +161,7 @@ python native_virtclass_handler () {
                 newdeps.append(dep.replace(pn, bpn) + "-native")
             else:
                 newdeps.append(dep)
-        d.setVar(varname, " ".join(newdeps), parsing=True)
+        d.setVar(varname, " ".join(newdeps))
 
     map_dependencies("DEPENDS", e.data, selfref=False)
     for pkg in e.data.getVar("PACKAGES", False).split():

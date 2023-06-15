@@ -1,0 +1,32 @@
+From fc28149b6b198042c8d29e0931415adad7ed3231 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Thu, 16 Mar 2023 08:03:47 +0000
+Subject: [PATCH] Fix install conflict when enable multilib.
+
+Automake defines pythondir in terms of libdir (rather than hardcode 'lib' or query it from python as automake upstream does)
+https://git.yoctoproject.org/poky/tree/meta/recipes-devtools/automake/automake/0001-automake-Update-for-python.m4-to-respect-libdir.patch
+
+So libdir needs to be defined when pythondir is defined.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 8b57a83..580f5bc 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,6 @@
+ SUBDIRS = src xcbgen
+ 
+-pkgconfigdir = $(datarootdir)/pkgconfig
++pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = xcb-proto.pc
+ 
+ EXTRA_DIST=doc xcb-proto.pc.in autogen.sh README.md
+-- 
+2.34.1
+

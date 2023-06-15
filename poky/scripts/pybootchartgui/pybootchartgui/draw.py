@@ -356,6 +356,12 @@ def extents(options, xscale, trace):
             h += 30 + bar_h
         if trace.disk_stats:
             h += 30 + bar_h
+        if trace.cpu_pressure:
+            h += 30 + bar_h
+        if trace.io_pressure:
+            h += 30 + bar_h
+        if trace.mem_pressure:
+            h += 30 + bar_h
         if trace.monitor_disk:
             h += 30 + bar_h
         if trace.mem_stats:

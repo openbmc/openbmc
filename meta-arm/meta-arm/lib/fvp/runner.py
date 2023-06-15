@@ -1,7 +1,7 @@
-import asyncio
 import re
 import subprocess
 import os
+import shlex
 import shutil
 import sys
 
@@ -44,50 +44,70 @@ def check_telnet():
     if not bool(shutil.which("telnet")):
         raise RuntimeError("Cannot find telnet, this is needed to connect to the FVP.")
 
+
+class ConsolePortParser:
+    def __init__(self, lines):
+        self._lines = lines
+        self._console_ports = {}
+
+    def parse_port(self, console):
+        if console in self._console_ports:
+            return self._console_ports[console]
+
+        while True:
+            try:
+                line = next(self._lines).strip().decode(errors='ignore')
+                m = re.match(r"^(\S+): Listening for serial connection on port (\d+)$", line)
+                if m:
+                    matched_console = m.group(1)
+                    matched_port = int(m.group(2))
+                    if matched_console == console:
+                        return matched_port
+                    else:
+                        self._console_ports[matched_console] = matched_port
+            except StopIteration:
+                # self._lines might be a growing log file
+                pass
+
+
+# This function is backported from Python 3.8. Remove it and replace call sites
+# with shlex.join once OE-core support for earlier Python versions is dropped.
+def shlex_join(split_command):
+    """Return a shell-escaped string from *split_command*."""
+    return ' '.join(shlex.quote(arg) for arg in split_command)
+
+
 class FVPRunner:
     def __init__(self, logger):
-        self._terminal_ports = {}
-        self._line_callbacks = []
         self._logger = logger
         self._fvp_process = None
         self._telnets = []
         self._pexpects = []
 
-    def add_line_callback(self, callback):
-        self._line_callbacks.append(callback)
-
-    async def start(self, config, extra_args=[], terminal_choice="none"):
+    def start(self, config, extra_args=[], terminal_choice="none", stdout=subprocess.PIPE):
         cli = cli_from_config(config, terminal_choice)
         cli += extra_args
 
         # Pass through environment variables needed for GUI applications, such
         # as xterm, to work.
         env = config['env']
-        for name in ('DISPLAY', 'WAYLAND_DISPLAY'):
+        for name in ('DISPLAY', 'WAYLAND_DISPLAY', 'XAUTHORITY'):
             if name in os.environ:
                 env[name] = os.environ[name]
 
-        self._logger.debug(f"Constructed FVP call: {cli}")
-        self._fvp_process = await asyncio.create_subprocess_exec(
-            *cli,
-            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        self._logger.debug(f"Constructed FVP call: {shlex_join(cli)}")
+        self._fvp_process = subprocess.Popen(
+            cli,
+            stdin=subprocess.DEVNULL, stdout=stdout, stderr=subprocess.STDOUT,
             env=env)
 
-        def detect_terminals(line):
-            m = re.match(r"^(\S+): Listening for serial connection on port (\d+)$", line)
-            if m:
-                terminal = m.group(1)
-                port = int(m.group(2))
-                self._terminal_ports[terminal] = port
-        self.add_line_callback(detect_terminals)
-
-    async def stop(self):
+    def stop(self):
         if self._fvp_process:
             self._logger.debug(f"Terminating FVP PID {self._fvp_process.pid}")
             try:
                 self._fvp_process.terminate()
-                await asyncio.wait_for(self._fvp_process.wait(), 10.0)
-            except asyncio.TimeoutError:
+                self._fvp_process.wait(10.0)
+            except subprocess.TimeoutExpired:
                 self._logger.debug(f"Killing FVP PID {self._fvp_process.pid}")
                 self._fvp_process.kill()
             except ProcessLookupError:
@@ -96,8 +116,8 @@ class FVPRunner:
         for telnet in self._telnets:
             try:
                 telnet.terminate()
-                await asyncio.wait_for(telnet.wait(), 10.0)
-            except asyncio.TimeoutError:
+                telnet.wait(10.0)
+            except subprocess.TimeoutExpired:
                 telnet.kill()
             except ProcessLookupError:
                 pass
@@ -117,34 +137,21 @@ class FVPRunner:
         else:
             return 0
 
-    async def run(self, until=None):
-        if until and until():
-            return
+    def wait(self, timeout):
+        self._fvp_process.wait(timeout)
 
-        async for line in self._fvp_process.stdout:
-            line = line.strip().decode("utf-8", errors="replace")
-            for callback in self._line_callbacks:
-                callback(line)
-            if until and until():
-                return
+    @property
+    def stdout(self):
+        return self._fvp_process.stdout
 
-    async def _get_terminal_port(self, terminal, timeout):
-        def terminal_exists():
-            return terminal in self._terminal_ports
-        await asyncio.wait_for(self.run(terminal_exists), timeout)
-        return self._terminal_ports[terminal]
-
-    async def create_telnet(self, terminal, timeout=15.0):
+    def create_telnet(self, port):
         check_telnet()
-        port = await self._get_terminal_port(terminal, timeout)
-        telnet = await asyncio.create_subprocess_exec("telnet", "localhost", str(port), stdin=sys.stdin, stdout=sys.stdout)
+        telnet = subprocess.Popen(["telnet", "localhost", str(port)], stdin=sys.stdin, stdout=sys.stdout)
         self._telnets.append(telnet)
         return telnet
 
-    async def create_pexpect(self, terminal, timeout=15.0, **kwargs):
-        check_telnet()
+    def create_pexpect(self, port, **kwargs):
         import pexpect
-        port = await self._get_terminal_port(terminal, timeout)
         instance = pexpect.spawn(f"telnet localhost {port}", **kwargs)
         self._pexpects.append(instance)
         return instance

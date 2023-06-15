@@ -10,6 +10,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6ee0f16281694fb6aa689cca1e0fb3da \
 
 SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/${BPN}-${PV}.tar.xz \
            file://0001-fix-signedness-of-char-in-tests.patch \
+           file://CVE-2023-25193-pre1.patch \
+           file://CVE-2023-25193.patch \
            "
 SRC_URI[sha256sum] = "2edb95db668781aaa8d60959d21be2ff80085f31b12053cdd660d9a50ce84f05"
 
@@ -32,9 +34,9 @@ PACKAGES =+ "${PN}-icu ${PN}-icu-dev ${PN}-subset"
 LEAD_SONAME = "libharfbuzz.so"
 
 do_install:append() {
-    # If no tools are installed due to PACKAGECONFIG then this directory is
-    #still installed, so remove it to stop packaging wanings.
-    rmdir --ignore-fail-on-non-empty ${D}${bindir}
+    # If no tools are installed due to PACKAGECONFIG then this directory might
+    # still be installed, so remove it to stop packaging warnings.
+    [ ! -d ${D}${bindir} ] || rmdir --ignore-fail-on-non-empty ${D}${bindir}
 }
 
 FILES:${PN}-icu = "${libdir}/libharfbuzz-icu.so.*"

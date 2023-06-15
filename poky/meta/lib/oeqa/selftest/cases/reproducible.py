@@ -292,9 +292,13 @@ class ReproducibleTests(OESelftestTestCase):
                         self.copy_file(d.reference, '/'.join([save_dir, 'packages-excluded', strip_topdir(d.reference)]))
                         self.copy_file(d.test, '/'.join([save_dir, 'packages-excluded', strip_topdir(d.test)]))
 
-                if result.missing or result.different:
-                    fails.append("The following %s packages are missing or different and not in exclusion list: %s" %
-                            (c, '\n'.join(r.test for r in (result.missing + result.different))))
+                if result.different:
+                    fails.append("The following %s packages are different and not in exclusion list:\n%s" %
+                            (c, '\n'.join(r.test for r in (result.different))))
+
+                if result.missing and len(self.sstate_targets) == 0:
+                    fails.append("The following %s packages are missing and not in exclusion list:\n%s" %
+                            (c, '\n'.join(r.test for r in (result.missing))))
 
         # Clean up empty directories
         if self.save_results:

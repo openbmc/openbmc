@@ -1508,6 +1508,18 @@ system and gives an overview of their function and contents.
 
          CVE_PRODUCT = "vendor:package"
 
+   :term:`CVE_VERSION`
+      In a recipe, defines the version used to match the recipe version
+      against the version in the `NIST CVE database <https://nvd.nist.gov/>`__
+      when usign :ref:`cve-check <ref-classes-cve-check>`.
+
+      The default is ${:term:`PV`} but if recipes use custom version numbers
+      which do not map to upstream software component release versions and the versions
+      used in the CVE database, then this variable can be used to set the
+      version number for :ref:`cve-check <ref-classes-cve-check>`. Example::
+
+          CVE_VERSION = "2.39"
+
    :term:`CVSDIR`
       The directory in which files checked out under the CVS system are
       stored.
@@ -1832,9 +1844,9 @@ system and gives an overview of their function and contents.
       variable.
 
    :term:`DEV_PKG_DEPENDENCY`
-      Provides an easy way for recipes to disable or adjust the runtime
-      dependency (:term:`RDEPENDS`) of the ``${PN}-dev`` package on the main
-      (``${PN}``) package, particularly where the main package may be empty.
+      Provides an easy way for recipes to disable or adjust the runtime recommendation
+      (:term:`RRECOMMENDS`) of the ``${PN}-dev`` package on the main
+      (``${PN}``) package.
 
    :term:`DISABLE_STATIC`
       Used in order to disable static linking by default (in order to save
@@ -7278,6 +7290,88 @@ system and gives an overview of their function and contents.
 
          You can specify only a single URL in :term:`SOURCE_MIRROR_URL`.
 
+   :term:`SPDX_ARCHIVE_PACKAGED`
+      This option allows to add to :term:`SPDX` output compressed archives
+      of the files in the generated target packages.
+
+      Such archives are available in
+      ``tmp/deploy/spdx/MACHINE/packages/packagename.tar.zst``
+      under the :term:`Build Directory`.
+
+      Enable this option as follows::
+
+         SPDX_ARCHIVE_PACKAGED = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling this
+      option multiplied the size of the ``tmp/deploy/spdx`` directory by a
+      factor of 13 (+1.6 GiB for this image), compared to just using the
+      :ref:`create-spdx <ref-classes-create-spdx>` class with no option.
+
+      Note that this option doesn't increase the size of :term:`SPDX`
+      files in ``tmp/deploy/images/MACHINE``.
+
+   :term:`SPDX_ARCHIVE_SOURCES`
+      This option allows to add to :term:`SPDX` output compressed archives
+      of the sources for packages installed on the target. It currently
+      only works when :term:`SPDX_INCLUDE_SOURCES` is set.
+
+      This is one way of fulfilling "source code access" license
+      requirements.
+
+      Such source archives are available in
+      ``tmp/deploy/spdx/MACHINE/recipes/recipe-packagename.tar.zst``
+      under the :term:`Build Directory`.
+
+      Enable this option as follows::
+
+         SPDX_INCLUDE_SOURCES = "1"
+         SPDX_ARCHIVE_SOURCES = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling
+      these options multiplied the size of the ``tmp/deploy/spdx``
+      directory by a factor of 11 (+1.4 GiB for this image),
+      compared to just using the :ref:`create-spdx <ref-classes-create-spdx>`
+      class with no option.
+
+      Note that using this option only marginally increases the size
+      of the :term:`SPDX` output in ``tmp/deploy/images/MACHINE/``
+      (+ 0.07\% with the tested image), compared to just enabling
+      :term:`SPDX_INCLUDE_SOURCES`.
+
+   :term:`SPDX_INCLUDE_SOURCES`
+      This option allows to add a description of the source files used to build
+      the host tools and the target packages, to the ``spdx.json`` files in
+      ``tmp/deploy/spdx/MACHINE/recipes/`` under the :term:`Build Directory`.
+      As a consequence, the ``spdx.json`` files under the ``by-namespace`` and
+      ``packages`` subdirectories in ``tmp/deploy/spdx/MACHINE`` are also
+      modified to include references to such source file descriptions.
+
+      Enable this option as follows::
+
+         SPDX_INCLUDE_SOURCES = "1"
+
+      According to our tests on release 4.1 "langdale", building
+      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling
+      this option multiplied the total size of the ``tmp/deploy/spdx``
+      directory by a factor of 3  (+291 MiB for this image),
+      and the size of the ``IMAGE-MACHINE.spdx.tar.zst`` in
+      ``tmp/deploy/images/MACHINE`` by a factor of 130 (+15 MiB for this
+      image), compared to just using the
+      :ref:`create-spdx <ref-classes-create-spdx>` class with no option.
+
+   :term:`SPDX_PRETTY`
+      This option makes the SPDX output more human-readable, using
+      identation and newlines, instead of the default output in a
+      single line::
+
+         SPDX_PRETTY = "1"
+
+      The generated SPDX files are approximately 20% bigger, but
+      this option is recommended if you want to inspect the SPDX
+      output files with a text editor.
+
    :term:`SPDXLICENSEMAP`
       Maps commonly used license names to their SPDX counterparts found in
       ``meta/files/common-licenses/``. For the default :term:`SPDXLICENSEMAP`
@@ -7451,7 +7545,7 @@ system and gives an overview of their function and contents.
 
       ``SSTATE_EXCLUDEDEPS_SYSROOT`` is evaluated as two regular
       expressions of recipe and dependency to ignore. An example
-      is the rule in :oe_git:`meta/conf/layer.conf </meta/conf/layer.conf>`::
+      is the rule in :oe_git:`meta/conf/layer.conf </openembedded-core/tree/meta/conf/layer.conf>`::
 
          # Nothing needs to depend on libc-initial
          # base-passwd/shadow-sysroot don't need their dependencies

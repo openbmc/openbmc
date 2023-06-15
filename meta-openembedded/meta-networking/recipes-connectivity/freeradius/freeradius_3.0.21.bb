@@ -33,6 +33,8 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.0.x;lfs=0
     file://radiusd-volatiles.conf \
     file://check-openssl-cmds-in-script-bootstrap.patch \
     file://0001-version.c-don-t-print-build-flags.patch \
+    file://CVE-2022-41860.patch \
+    file://CVE-2022-41861.patch \
 "
 
 raddbdir="${sysconfdir}/${MLPREFIX}raddb"
@@ -199,7 +201,37 @@ pkg_postinst:${PN} () {
         # Fix ownership for /etc/raddb/*, /var/lib/radiusd
         chown -R radiusd:radiusd ${raddbdir}
         chown -R radiusd:radiusd ${localstatedir}/lib/radiusd
+
+        # for radiusd.service with multilib
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+            install -d ${sysconfdir}/sysconfig
+            echo "MLPREFIX=${MLPREFIX}" > ${sysconfdir}/sysconfig/radiusd
+        fi
+    else
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+            install -d $D${sysconfdir}/sysconfig
+            echo "MLPREFIX=${MLPREFIX}" > $D${sysconfdir}/sysconfig/radiusd
+        fi
     fi
+}
+
+pkg_postrm:${PN} () {
+    # only try to remove ${sysconfdir}/sysconfig/radiusd for systemd
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
+        exit 0
+    fi
+
+    if [ -d ${sysconfdir}/raddb ]; then
+        exit 0
+    fi
+    for variant in ${MULTILIB_GLOBAL_VARIANTS}; do
+        if [ -d ${sysconfdir}/${variant}-raddb ]; then
+            exit 0
+        fi
+    done
+
+    rm -f ${sysconfdir}/sysconfig/radiusd
+    rmdir --ignore-fail-on-non-empty ${sysconfdir}/sysconfig
 }
 
 # We really need the symlink :(

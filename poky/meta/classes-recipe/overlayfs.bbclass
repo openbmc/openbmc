@@ -102,7 +102,11 @@ python do_create_overlayfs_units() {
     overlayMountPoints = d.getVarFlags("OVERLAYFS_MOUNT_POINT")
     for mountPoint in overlayMountPoints:
         bb.debug(1, "Process variable flag %s" % mountPoint)
-        for lower in d.getVarFlag('OVERLAYFS_WRITABLE_PATHS', mountPoint).split():
+        lowerList = d.getVarFlag('OVERLAYFS_WRITABLE_PATHS', mountPoint)
+        if not lowerList:
+            bb.note("No mount points defined for %s flag, skipping" % (mountPoint))
+            continue
+        for lower in lowerList.split():
             bb.debug(1, "Prepare mount unit for %s with data mount point %s" %
                      (lower, d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint)))
             prepareUnits(d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint), lower)

@@ -139,7 +139,7 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
             # /usr/local/bin/ccache/gcc -> /usr/bin/ccache, then which(gcc)
             # would return /usr/local/bin/ccache/gcc, but what we need is
             # /usr/bin/gcc, this code can check and fix that.
-            if "ccache" in srctool:
+            if os.path.islink(srctool) and os.path.basename(os.readlink(srctool)) == 'ccache':
                 srctool = bb.utils.which(path, tool, executable=True, direction=1)
             if srctool:
                 os.symlink(srctool, desttool)

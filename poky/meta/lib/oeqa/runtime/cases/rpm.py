@@ -51,21 +51,20 @@ class RpmBasicTest(OERuntimeTestCase):
             msg = 'status: %s. Cannot run rpm -qa: %s' % (status, output)
             self.assertEqual(status, 0, msg=msg)
 
-        def check_no_process_for_user(u):
-            _, output = self.target.run(self.tc.target_cmds['ps'])
-            if u + ' ' in output:
-                return False
-            else:
-                return True
+        def wait_for_no_process_for_user(u, timeout = 120):
+            timeout_at = time.time() + timeout
+            while time.time() < timeout_at:
+                _, output = self.target.run(self.tc.target_cmds['ps'])
+                if u + ' ' not in output:
+                    return
+                time.sleep(1)
+            user_pss = [ps for ps in output.split("\n") if u + ' ' in ps]
+            msg = "There're %s 's process(es) still running: %s".format(u, "\n".join(user_pss))
+            assertTrue(True, msg=msg)
 
         def unset_up_test_user(u):
             # ensure no test1 process in running
-            timeout = time.time() + 30
-            while time.time() < timeout:
-                if check_no_process_for_user(u):
-                    break
-                else:
-                    time.sleep(1)
+            wait_for_no_process_for_user(u)
             status, output = self.target.run('userdel -r %s' % u)
             msg = 'Failed to erase user: %s' % output
             self.assertTrue(status == 0, msg=msg)

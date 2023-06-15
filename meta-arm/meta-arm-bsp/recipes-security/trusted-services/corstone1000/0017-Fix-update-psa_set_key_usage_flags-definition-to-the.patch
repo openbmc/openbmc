@@ -1,7 +1,7 @@
-From b1ff44c650ae82f364a2f74059eeb280996dc4f8 Mon Sep 17 00:00:00 2001
+From 5a5e162e17c9decb04b3b2905a0fb604e8f06e91 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Mon, 14 Feb 2022 17:52:00 +0000
-Subject: [PATCH 17/19] Fix : update psa_set_key_usage_flags definition to the
+Subject: [PATCH 17/20] Fix : update psa_set_key_usage_flags definition to the
  latest from the tf-m
 
 Upstream-Status: Pending
@@ -36,5 +36,5 @@ index 1bc55e375eea..b4a7ed4b39d3 100644
  }
  
 -- 
-2.38.0
+2.38.1
 

@@ -21,7 +21,7 @@ index bb42bbe..aa5a2de 100644
  	/* Arbitrary. Was sb->st_size, but that breaks .gz etc */
  	size_t len = (64*1024*1024 - 4096);
  
-+	if (strstr(fname, ".debug") == NULL)
++	if (strstr(fname, ".debug") != NULL)
 +		return TRUE;
 +
  	if (strrstr(fname, ".ko") == NULL)

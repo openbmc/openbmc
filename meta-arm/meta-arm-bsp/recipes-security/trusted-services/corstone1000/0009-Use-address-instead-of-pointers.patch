@@ -1,7 +1,7 @@
-From ee767c1ae857cfcc8b4bb520b2558091e253cf94 Mon Sep 17 00:00:00 2001
+From a6fba503ffddae004e23b32559212e749e8586f6 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Sun, 12 Dec 2021 10:57:17 +0000
-Subject: [PATCH 09/19] Use address instead of pointers
+Subject: [PATCH 09/20] Use address instead of pointers
 
 Since secure enclave is 32bit and we 64bit there is an issue
 in the protocol communication design that force us to handle
@@ -164,5 +164,5 @@ index a1f369db253e..bda442a61d5c 100644
  
  	(void)client_id;
 -- 
-2.38.0
+2.38.1
 

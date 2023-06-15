@@ -15,7 +15,7 @@ doesn't work:
 
 So replace "perl -w" with "use warnings" to make it work.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [by email to g.branden.robinson@gmail.com]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 

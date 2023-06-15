@@ -1,4 +1,4 @@
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [upstream does not support installed tests]
 
 Index: unix/Makefile.in
 ===================================================================

@@ -86,16 +86,26 @@ class OESelftestTestContext(OETestContext):
         oe.path.copytree(builddir + "/cache", newbuilddir + "/cache")
         oe.path.copytree(selftestdir, newselftestdir)
 
+        subprocess.check_output("git init; git add *; git commit -a -m 'initial'", cwd=newselftestdir, shell=True)
+
+        # Tried to used bitbake-layers add/remove but it requires recipe parsing and hence is too slow
+        subprocess.check_output("sed %s/conf/bblayers.conf -i -e 's#%s#%s#g'" % (newbuilddir, selftestdir, newselftestdir), cwd=newbuilddir, shell=True)
+
+        # Relative paths in BBLAYERS only works when the new build dir share the same ascending node
+        if self.newbuilddir:
+            bblayers = subprocess.check_output("bitbake-getvar --value BBLAYERS | tail -1", cwd=builddir, shell=True, text=True)
+            if '..' in bblayers:
+                bblayers_abspath = [os.path.abspath(path) for path in bblayers.split()]
+                with open("%s/conf/bblayers.conf" % newbuilddir, "a") as f:
+                    newbblayers = "# new bblayers to be used by selftest in the new build dir '%s'\n" % newbuilddir
+                    newbblayers += 'BBLAYERS = "%s"\n' % ' '.join(bblayers_abspath)
+                    f.write(newbblayers)
+
         for e in os.environ:
             if builddir + "/" in os.environ[e]:
                 os.environ[e] = os.environ[e].replace(builddir + "/", newbuilddir + "/")
             if os.environ[e].endswith(builddir):
                 os.environ[e] = os.environ[e].replace(builddir, newbuilddir)
-
-        subprocess.check_output("git init; git add *; git commit -a -m 'initial'", cwd=newselftestdir, shell=True)
-
-        # Tried to used bitbake-layers add/remove but it requires recipe parsing and hence is too slow
-        subprocess.check_output("sed %s/conf/bblayers.conf -i -e 's#%s#%s#g'" % (newbuilddir, selftestdir, newselftestdir), cwd=newbuilddir, shell=True)
 
         os.chdir(newbuilddir)
 

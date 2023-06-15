@@ -20,7 +20,7 @@ LIC_FILES_CHKSUM = "file://nss/COPYING;md5=3b1e88e1b9c0b5a4b2881d46cce06a18 \
 
 VERSION_DIR = "${@d.getVar('BP').upper().replace('-', '_').replace('.', '_') + '_RTM'}"
 
-SRC_URI = "http://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/${VERSION_DIR}/src/${BP}.tar.gz \
+SRC_URI = "http://ftp.mozilla.org/pub/security/nss/releases/${VERSION_DIR}/src/${BP}.tar.gz \
            file://nss.pc.in \
            file://0001-nss-fix-support-cross-compiling.patch \
            file://nss-no-rpath-for-cross-compiling.patch \
@@ -280,5 +280,11 @@ RDEPENDS:${PN}-smime = "perl"
 
 BBCLASSEXTEND = "native nativesdk"
 
+CVE_PRODUCT += "network_security_services"
+
 # CVE-2006-5201 affects only Sun Solaris
 CVE_CHECK_IGNORE += "CVE-2006-5201"
+
+# CVES CVE-2017-11695 CVE-2017-11696 CVE-2017-11697 CVE-2017-11698 only affect
+# the legacy db (libnssdbm), only compiled with --enable-legacy-db.
+CVE_CHECK_IGNORE += "CVE-2017-11695 CVE-2017-11696 CVE-2017-11697 CVE-2017-11698"

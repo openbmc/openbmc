@@ -12,10 +12,15 @@ GEM5_BUILD_VARIANT ?= "opt"
 # What gem5 binary are we building
 GEM5_BUILD_CONFIGS ?= "build/X86/gem5.{GEM5_BUILD_VARIANT}"
 
+# Extra directories with sources for gem5 build. Intended to be used from
+# machine configuration files, to add out-of-tree gem5 models of their
+# hardware components.
+GEM5_EXTRAS ?= ""
+
 # Scons build arguments
 GEM5_SCONS_ARGS ?= "CC=${BUILD_CC} CXX=${BUILD_CXX} \
     AS=${BUILD_AS} AR=${BUILD_AR} ${GEM5_BUILD_CONFIGS} \
-    PYTHON_CONFIG=python3-config"
+    PYTHON_CONFIG=python3-config EXTRAS=${GEM5_EXTRAS}"
 
 # Default profile to run
 GEM5_RUN_PROFILE ?= "configs/example/fs.py"

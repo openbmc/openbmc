@@ -73,6 +73,9 @@ FIT_CONF_PREFIX[doc] = "Prefix to use for FIT configuration node name"
 
 FIT_SUPPORTED_INITRAMFS_FSTYPES ?= "cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.zst cpio.gz ext2.gz cpio"
 
+# Allow user to select the default DTB for FIT image when multiple dtb's exists.
+FIT_CONF_DEFAULT_DTB ?= ""
+
 # Keys used to sign individually image nodes.
 # The keys to sign image nodes must be different from those used to sign
 # configuration nodes, otherwise the "required" property, from
@@ -375,6 +378,7 @@ fitimage_emit_section_config() {
 	bootscr_line=""
 	setup_line=""
 	default_line=""
+	default_dtb_image="${FIT_CONF_DEFAULT_DTB}"
 
 	# conf node name is selected based on dtb ID if it is present,
 	# otherwise its selected based on kernel ID
@@ -417,7 +421,17 @@ fitimage_emit_section_config() {
 		# default node is selected based on dtb ID if it is present,
 		# otherwise its selected based on kernel ID
 		if [ -n "$dtb_image" ]; then
-			default_line="default = \"${FIT_CONF_PREFIX}$dtb_image\";"
+		        # Select default node as user specified dtb when
+		        # multiple dtb exists.
+		        if [ -n "$default_dtb_image" ]; then
+			        if [ -s "${EXTERNAL_KERNEL_DEVICETREE}/$default_dtb_image" ]; then
+			                default_line="default = \"${FIT_CONF_PREFIX}$default_dtb_image\";"
+			        else
+			                bbwarn "Couldn't find a valid user specified dtb in ${EXTERNAL_KERNEL_DEVICETREE}/$default_dtb_image"
+			        fi
+		        else
+			        default_line="default = \"${FIT_CONF_PREFIX}$dtb_image\";"
+		        fi
 		else
 			default_line="default = \"${FIT_CONF_PREFIX}$kernel_id\";"
 		fi
@@ -496,7 +510,7 @@ fitimage_assemble() {
 	ramdiskcount=$3
 	setupcount=""
 	bootscr_id=""
-	rm -f $1 arch/${ARCH}/boot/$2
+	rm -f $1 ${KERNEL_OUTPUT_DIR}/$2
 
 	if [ -n "${UBOOT_SIGN_IMG_KEYNAME}" -a "${UBOOT_SIGN_KEYNAME}" = "${UBOOT_SIGN_IMG_KEYNAME}" ]; then
 		bbfatal "Keys used to sign images and configuration nodes must be different."
@@ -529,9 +543,9 @@ fitimage_assemble() {
 				continue
 			fi
 
-			DTB_PATH="arch/${ARCH}/boot/dts/$DTB"
+			DTB_PATH="${KERNEL_OUTPUT_DIR}/dts/$DTB"
 			if [ ! -e "$DTB_PATH" ]; then
-				DTB_PATH="arch/${ARCH}/boot/$DTB"
+				DTB_PATH="${KERNEL_OUTPUT_DIR}/$DTB"
 			fi
 
 			DTB=$(echo "$DTB" | tr '/' '_')
@@ -546,10 +560,11 @@ fitimage_assemble() {
 
 	if [ -n "${EXTERNAL_KERNEL_DEVICETREE}" ]; then
 		dtbcount=1
-		for DTB in $(find "${EXTERNAL_KERNEL_DEVICETREE}" \( -name '*.dtb' -o -name '*.dtbo' \) -printf '%P\n' | sort); do
+		for DTB in $(find "${EXTERNAL_KERNEL_DEVICETREE}" -name '*.dtb' -printf '%P\n' | sort) \
+		$(find "${EXTERNAL_KERNEL_DEVICETREE}" -name '*.dtbo' -printf '%P\n' | sort); do
 			DTB=$(echo "$DTB" | tr '/' '_')
 
-			# Skip DTB if we've picked it up previously
+			# Skip DTB/DTBO if we've picked it up previously
 			echo "$DTBS" | tr ' ' '\n' | grep -xq "$DTB" && continue
 
 			DTBS="$DTBS $DTB"
@@ -574,9 +589,9 @@ fitimage_assemble() {
 	#
 	# Step 4: Prepare a setup section. (For x86)
 	#
-	if [ -e arch/${ARCH}/boot/setup.bin ]; then
+	if [ -e ${KERNEL_OUTPUT_DIR}/setup.bin ]; then
 		setupcount=1
-		fitimage_emit_section_setup $1 $setupcount arch/${ARCH}/boot/setup.bin
+		fitimage_emit_section_setup $1 $setupcount ${KERNEL_OUTPUT_DIR}/setup.bin
 	fi
 
 	#
@@ -650,7 +665,7 @@ fitimage_assemble() {
 	${UBOOT_MKIMAGE} \
 		${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
 		-f $1 \
-		arch/${ARCH}/boot/$2
+		${KERNEL_OUTPUT_DIR}/$2
 
 	#
 	# Step 8: Sign the image and add public key to U-Boot dtb
@@ -667,7 +682,7 @@ fitimage_assemble() {
 			${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
 			-F -k "${UBOOT_SIGN_KEYDIR}" \
 			$add_key_to_u_boot \
-			-r arch/${ARCH}/boot/$2 \
+			-r ${KERNEL_OUTPUT_DIR}/$2 \
 			${UBOOT_MKIMAGE_SIGN_ARGS}
 	fi
 }
@@ -770,7 +785,7 @@ kernel_do_deploy:append() {
 
 			if [ "${INITRAMFS_IMAGE_BUNDLE}" != "1" ]; then
 				bbnote "Copying fitImage-${INITRAMFS_IMAGE} file..."
-				install -m 0644 ${B}/arch/${ARCH}/boot/fitImage-${INITRAMFS_IMAGE} "$deployDir/fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}${KERNEL_FIT_BIN_EXT}"
+				install -m 0644 ${B}/${KERNEL_OUTPUT_DIR}/fitImage-${INITRAMFS_IMAGE} "$deployDir/fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}${KERNEL_FIT_BIN_EXT}"
 				if [ -n "${KERNEL_FIT_LINK_NAME}" ] ; then
 					ln -snf fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}${KERNEL_FIT_BIN_EXT} "$deployDir/fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_LINK_NAME}"
 				fi

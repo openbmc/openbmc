@@ -6,7 +6,9 @@ DEPENDS = "glib-2.0 libxmlb json-glib libjcat gcab vala-native"
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.xz \
            file://c54ae9c524998e449b822feb465a0c90317cd735.patch \
-           file://run-ptest"
+           file://run-ptest \
+           file://CVE-2022-3287.patch \
+           "
 SRC_URI[sha256sum] = "adfa07434cdc29ec41c40fef460e8d970963fe0c7e849dec7f3932adb161f886"
 
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
@@ -83,7 +85,7 @@ PACKAGECONFIG[plugin_emmc] = "-Dplugin_emmc=true,-Dplugin_emmc=false"
 PACKAGECONFIG[plugin_ep963x] = "-Dplugin_ep963x=true,-Dplugin_ep963x=false"
 PACKAGECONFIG[plugin_fastboot] = "-Dplugin_fastboot=true,-Dplugin_fastboot=false"
 PACKAGECONFIG[plugin_flashrom] = "-Dplugin_flashrom=true,-Dplugin_flashrom=false,flashrom"
-PACKAGECONFIG[plugin_gpio] = "-Dplugin_gpio=true,-Dplugin_gpio"
+PACKAGECONFIG[plugin_gpio] = "-Dplugin_gpio=true,-Dplugin_gpio=false"
 PACKAGECONFIG[plugin_intel_spi] = "-Dplugin_intel_spi=true -Dlzma=true,-Dplugin_intel_spi=false -Dlzma=false,xz"
 PACKAGECONFIG[plugin_logitech_bulkcontroller] = "-Dplugin_logitech_bulkcontroller=true,-Dplugin_logitech_bulkcontroller=false,protobuf-c-native protobuf-c"
 PACKAGECONFIG[plugin_modem_manager] = "-Dplugin_modem_manager=true,-Dplugin_modem_manager=false,libqmi modemmanager"

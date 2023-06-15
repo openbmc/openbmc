@@ -25,8 +25,7 @@ except RuntimeError as exc:
 from bb import cookerdata
 from bb.main import bitbake_main, BitBakeConfigParameters, BBMainException
 
-if sys.getfilesystemencoding() != "utf-8":
-    sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\nPython can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
+bb.utils.check_system_locale()
 
 __version__ = "2.2.0"
 

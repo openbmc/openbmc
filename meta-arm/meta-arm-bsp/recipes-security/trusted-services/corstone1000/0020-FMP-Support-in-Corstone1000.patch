@@ -1,7 +1,7 @@
-From 6430bf31a25a1ef67e9141f85dbd070feb0d1a1e Mon Sep 17 00:00:00 2001
+From 70cf374fb55f2d62ecbe28049253df33b42b6749 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Fri, 8 Jul 2022 09:48:06 +0100
-Subject: [PATCH] FMP Support in Corstone1000.
+Subject: [PATCH 20/20] FMP Support in Corstone1000.
 
 The FMP support is used by u-boot to pupolate ESRT information
 for the kernel.
@@ -11,6 +11,7 @@ The solution is platform specific and needs to be revisted.
 Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
 
 Upstream-Status: Inappropriate [The solution is platform specific and needs to be revisted]
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  .../provider/capsule_update_provider.c        |   5 +
  .../capsule_update/provider/component.cmake   |   1 +
@@ -21,7 +22,7 @@ Upstream-Status: Inappropriate [The solution is platform specific and needs to b
  create mode 100644 components/service/capsule_update/provider/corstone1000_fmp_service.h
 
 diff --git a/components/service/capsule_update/provider/capsule_update_provider.c b/components/service/capsule_update/provider/capsule_update_provider.c
-index 9bbd7abc..871d6bcf 100644
+index e133753f8560..991a2235cd73 100644
 --- a/components/service/capsule_update/provider/capsule_update_provider.c
 +++ b/components/service/capsule_update/provider/capsule_update_provider.c
 @@ -11,6 +11,7 @@
@@ -58,7 +59,7 @@ index 9bbd7abc..871d6bcf 100644
  		default:
  			EMSG("%s unsupported opcode", __func__);
 diff --git a/components/service/capsule_update/provider/component.cmake b/components/service/capsule_update/provider/component.cmake
-index 1d412eb2..6b060149 100644
+index 1d412eb234d9..6b0601494938 100644
 --- a/components/service/capsule_update/provider/component.cmake
 +++ b/components/service/capsule_update/provider/component.cmake
 @@ -10,4 +10,5 @@ endif()
@@ -69,7 +70,7 @@ index 1d412eb2..6b060149 100644
  	)
 diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.c b/components/service/capsule_update/provider/corstone1000_fmp_service.c
 new file mode 100644
-index 00000000..6a7a47a7
+index 000000000000..6a7a47a7ed99
 --- /dev/null
 +++ b/components/service/capsule_update/provider/corstone1000_fmp_service.c
 @@ -0,0 +1,307 @@
@@ -382,7 +383,7 @@ index 00000000..6a7a47a7
 +}
 diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.h b/components/service/capsule_update/provider/corstone1000_fmp_service.h
 new file mode 100644
-index 00000000..95fba2a0
+index 000000000000..95fba2a04d5c
 --- /dev/null
 +++ b/components/service/capsule_update/provider/corstone1000_fmp_service.h
 @@ -0,0 +1,26 @@
@@ -413,5 +414,5 @@ index 00000000..95fba2a0
 +
 +#endif /* CORSTONE1000_FMP_SERVICE_H */
 -- 
-2.17.1
+2.38.1
 

@@ -8,7 +8,8 @@ LICENSE = "BSD-3-Clause & Apache-2.0"
 LIC_FILES_CHKSUM = "file://license.md;md5=e44b2531cd6ffe9dece394dbe988d9a0 \
                     file://cmsis/LICENSE.txt;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-SRC_URI = "gitsm://git.gitlab.arm.com/arm-reference-solutions/corstone1000/external_system/rtx.git;protocol=https;branch=master"
+SRC_URI = "gitsm://git.gitlab.arm.com/arm-reference-solutions/corstone1000/external_system/rtx.git;protocol=https;branch=master \
+           file://race.patch"
 SRCREV = "8c9dca74b104ff6c9722fb0738ba93dd3719c080"
 PV .= "+git${SRCPV}"
 

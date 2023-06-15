@@ -16,6 +16,7 @@ class LayerType(Enum):
     BSP = 0
     DISTRO = 1
     SOFTWARE = 2
+    CORE = 3
     ERROR_NO_LAYER_CONF = 98
     ERROR_BSP_DISTRO = 99
 
@@ -106,7 +107,13 @@ def _detect_layer(layer_path):
         if distros:
             is_distro = True
 
-    if is_bsp and is_distro:
+    layer['collections'] = _get_layer_collections(layer['path'])
+
+    if layer_name == "meta" and "core" in layer['collections']:
+        layer['type'] = LayerType.CORE
+        layer['conf']['machines'] = machines
+        layer['conf']['distros'] = distros
+    elif is_bsp and is_distro:
         layer['type'] = LayerType.ERROR_BSP_DISTRO
     elif is_bsp:
         layer['type'] = LayerType.BSP
@@ -116,8 +123,6 @@ def _detect_layer(layer_path):
         layer['conf']['distros'] = distros
     else:
         layer['type'] = LayerType.SOFTWARE
-
-    layer['collections'] = _get_layer_collections(layer['path'])
 
     return layer
 

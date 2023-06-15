@@ -28,6 +28,7 @@ import datetime
 import pickle
 import traceback
 import gc
+import stat
 import bb.server.xmlrpcserver
 from bb import daemonize
 from multiprocessing import queues
@@ -64,6 +65,9 @@ class ProcessServer():
         self.bitbake_lock_name = lockname
         self.sock = sock
         self.sockname = sockname
+        # It is possible the directory may be renamed. Cache the inode of the socket file
+        # so we can tell if things changed.
+        self.sockinode = os.stat(self.sockname)[stat.ST_INO]
 
         self.server_timeout = server_timeout
         self.timeout = self.server_timeout
@@ -246,10 +250,16 @@ class ProcessServer():
 
         serverlog("Exiting")
         # Remove the socket file so we don't get any more connections to avoid races
+        # The build directory could have been renamed so if the file isn't the one we created
+        # we shouldn't delete it.
         try:
-            os.unlink(self.sockname)
-        except:
-            pass
+            sockinode = os.stat(self.sockname)[stat.ST_INO]
+            if sockinode == self.sockinode:
+                os.unlink(self.sockname)
+            else:
+                serverlog("bitbake.sock inode mismatch (%s vs %s), not deleting." % (sockinode, self.sockinode))
+        except Exception as err:
+            serverlog("Removing socket file '%s' failed (%s)" % (self.sockname, err))
         self.sock.close()
 
         try:
@@ -532,6 +542,7 @@ def execServer(lockfd, readypipeinfd, lockname, sockname, server_timeout, xmlrpc
 
         # Create server control socket
         if os.path.exists(sockname):
+            serverlog("WARNING: removing existing socket file '%s'" % sockname)
             os.unlink(sockname)
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

@@ -5,8 +5,8 @@ SECTION = "network"
 LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=87964579b2a8ece4bc6744d2dc9a8b04"
 
-SRCREV = "fe19892a8168bf19d81e3bc4ee319bf7f9f058f5"
-PV = "20220725"
+SRCREV = "22a5de3ef637990ce03141f786fbdb327e9c5a3f"
+PV = "20221107"
 PE = "1"
 
 SRC_URI = "git://gitlab.gnome.org/GNOME/mobile-broadband-provider-info.git;protocol=https;branch=main"

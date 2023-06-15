@@ -179,3 +179,42 @@ def update_symlinks(target_path, link_path):
         if os.path.exists(os.path.realpath(link_path)):
             os.remove(link_path)
         os.symlink(os.path.basename(target_path), link_path)
+
+
+def convert_cve_version(version):
+    """
+    This function converts from CVE format to Yocto version format.
+    eg 8.3_p1 -> 8.3p1, 6.2_rc1 -> 6.2-rc1
+
+    Unless it is redefined using CVE_VERSION in the recipe,
+    cve_check uses the version in the name of the recipe (${PV})
+    to check vulnerabilities against a CVE in the database downloaded from NVD.
+
+    When the version has an update, i.e.
+    "p1" in OpenSSH 8.3p1,
+    "-rc1" in linux kernel 6.2-rc1,
+    the database stores the version as version_update (8.3_p1, 6.2_rc1).
+    Therefore, we must transform this version before comparing to the
+    recipe version.
+
+    In this case, the parameter of the function is 8.3_p1.
+    If the version uses the Release Candidate format, "rc",
+    this function replaces the '_' by '-'.
+    If the version uses the Update format, "p",
+    this function removes the '_' completely.
+    """
+    import re
+
+    matches = re.match('^([0-9.]+)_((p|rc)[0-9]+)$', version)
+
+    if not matches:
+        return version
+
+    version = matches.group(1)
+    update = matches.group(2)
+
+    if matches.group(3) == "rc":
+        return version + '-' + update
+
+    return version + update
+

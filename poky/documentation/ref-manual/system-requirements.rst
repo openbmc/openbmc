@@ -47,13 +47,21 @@ distributions:
 
 -  Fedora 35
 
+-  Fedora 36
+
 -  AlmaLinux 8.5
+
+-  AlmaLinux 8.7
+
+-  AlmaLinux 9.1
 
 -  Debian GNU/Linux 10.x (Buster)
 
 -  Debian GNU/Linux 11.x (Bullseye)
 
 -  OpenSUSE Leap 15.3
+
+-  OpenSUSE Leap 15.4
 
 .. note::
 

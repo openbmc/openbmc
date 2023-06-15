@@ -21,7 +21,7 @@ inherit cmake pkgconfig
 
 PACKAGECONFIG[python3] = ",,python3-core,python3-core"
 
-EXTRA_OECMAKE = "-D__LIB=lib -DCMAKE_BUILD_TYPE=Release -DLIBBPF_EMBEDDED=OFF"
+EXTRA_OECMAKE = "-D__LIB=${@os.path.relpath(d.getVar('libdir'), d.getVar('prefix') + '/')} -DCMAKE_BUILD_TYPE=Release -DLIBBPF_EMBEDDED=OFF"
 
 FILES:${PN} =  "${bindir}/pahole \
 		${libdir}/libdwarves.so* \

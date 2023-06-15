@@ -13,6 +13,7 @@ import errno
 import logging
 import bb
 import bb.msg
+import locale
 import multiprocessing
 import fcntl
 import importlib
@@ -608,6 +609,21 @@ def preserved_envvars():
     ]
     return v + preserved_envvars_exported()
 
+def check_system_locale():
+    """Make sure the required system locale are available and configured"""
+    default_locale = locale.getlocale(locale.LC_CTYPE)
+
+    try:
+        locale.setlocale(locale.LC_CTYPE, ("en_US", "UTF-8"))
+    except:
+        sys.exit("Please make sure locale 'en_US.UTF-8' is available on your system")
+    else:
+        locale.setlocale(locale.LC_CTYPE, default_locale)
+
+    if sys.getfilesystemencoding() != "utf-8":
+        sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\n"
+                 "Python can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
+
 def filter_environment(good_vars):
     """
     Create a pristine environment for bitbake. This will remove variables that
@@ -991,6 +1007,9 @@ def to_boolean(string, default=None):
     """
     if not string:
         return default
+
+    if isinstance(string, int):
+        return string != 0
 
     normalized = string.lower()
     if normalized in ("y", "yes", "1", "true"):
@@ -1680,23 +1699,20 @@ def disable_network(uid=None, gid=None):
 
 def export_proxies(d):
     """ export common proxies variables from datastore to environment """
-    import os
 
     variables = ['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY',
                     'ftp_proxy', 'FTP_PROXY', 'no_proxy', 'NO_PROXY',
-                    'GIT_PROXY_COMMAND']
-    exported = False
+                    'GIT_PROXY_COMMAND', 'SSL_CERT_FILE', 'SSL_CERT_DIR']
 
-    for v in variables:
-        if v in os.environ.keys():
-            exported = True
-        else:
-            v_proxy = d.getVar(v)
-            if v_proxy is not None:
-                os.environ[v] = v_proxy
-                exported = True
+    origenv = d.getVar("BB_ORIGENV")
 
-    return exported
+    for name in variables:
+        value = d.getVar(name)
+        if not value and origenv:
+            value = origenv.getVar(name)
+        if value:
+            os.environ[name] = value
+
 
 
 def load_plugins(logger, plugins, pluginpath):

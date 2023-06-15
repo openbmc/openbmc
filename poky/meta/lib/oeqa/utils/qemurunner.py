@@ -198,7 +198,7 @@ class QemuRunner:
         qmp_file = "." + next(tempfile._get_candidate_names())
         qmp_param = ' -S -qmp unix:./%s,server,wait' % (qmp_file)
         qmp_port = self.tmpdir + "/" + qmp_file
-        # Create a second socket connection for debugging use, 
+        # Create a second socket connection for debugging use,
         # note this will NOT cause qemu to block waiting for the connection
         qmp_file2 = "." + next(tempfile._get_candidate_names())
         qmp_param += ' -qmp unix:./%s,server,nowait' % (qmp_file2)
@@ -346,6 +346,8 @@ class QemuRunner:
                     return False
 
             try:
+                # set timeout value for all QMP calls
+                self.qmp.settimeout(self.runqemutime)
                 self.qmp.connect()
                 connect_time = time.time()
                 self.logger.info("QMP connected to QEMU at %s and took %s seconds" %
@@ -463,6 +465,8 @@ class QemuRunner:
                     socklist.remove(self.server_socket)
                     self.logger.debug("Connection from %s:%s" % addr)
                 else:
+                    # try to avoid reading only a single character at a time
+                    time.sleep(0.1)
                     data = data + sock.recv(1024)
                     if data:
                         bootlog += data
@@ -507,7 +511,7 @@ class QemuRunner:
             (status, output) = self.run_serial(self.boot_patterns['send_login_user'], raw=True, timeout=120)
             if re.search(self.boot_patterns['search_login_succeeded'], output):
                 self.logged = True
-                self.logger.debug("Logged as root in serial console")
+                self.logger.debug("Logged in as %s in serial console" % self.boot_patterns['send_login_user'].replace("\n", ""))
                 if netconf:
                     # configure guest networking
                     cmd = "ifconfig eth0 %s netmask %s up\n" % (self.ip, self.netmask)
@@ -518,7 +522,7 @@ class QemuRunner:
                         self.logger.debug("Couldn't configure guest networking")
             else:
                 self.logger.warning("Couldn't login into serial console"
-                            " as root using blank password")
+                            " as %s using blank password" % self.boot_patterns['send_login_user'].replace("\n", ""))
                 self.logger.warning("The output:\n%s" % output)
         except:
             self.logger.warning("Serial console failed while trying to login")
@@ -538,10 +542,13 @@ class QemuRunner:
                 except OSError as e:
                     if e.errno != errno.ESRCH:
                         raise
-            endtime = time.time() + self.runqemutime
-            while self.runqemu.poll() is None and time.time() < endtime:
-                time.sleep(1)
-            if self.runqemu.poll() is None:
+            try:
+                outs, errs = self.runqemu.communicate(timeout = self.runqemutime)
+                if outs:
+                    self.logger.info("Output from runqemu:\n%s", outs.decode("utf-8"))
+                if errs:
+                    self.logger.info("Stderr from runqemu:\n%s", errs.decode("utf-8"))
+            except TimeoutExpired:
                 self.logger.debug("Sending SIGKILL to runqemu")
                 os.killpg(os.getpgid(self.runqemu.pid), signal.SIGKILL)
             if not self.runqemu.stdout.closed:
@@ -618,6 +625,7 @@ class QemuRunner:
 
     def run_monitor(self, command, args=None, timeout=60):
         if hasattr(self, 'qmp') and self.qmp:
+            self.qmp.settimeout(timeout)
             if args is not None:
                 return self.qmp.cmd(command, args)
             else:
@@ -645,6 +653,8 @@ class QemuRunner:
             except InterruptedError:
                 continue
             if sread:
+                # try to avoid reading single character at a time
+                time.sleep(0.1)
                 answer = self.server_socket.recv(1024)
                 if answer:
                     data += answer.decode('utf-8')

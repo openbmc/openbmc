@@ -157,11 +157,7 @@ UBI_VOLTYPE ?= "dynamic"
 UBI_IMGTYPE ?= "ubifs"
 
 write_ubi_config() {
-	if [ -z "$1" ]; then
-		local vname=""
-	else
-		local vname="_$1"
-	fi
+	local vname="$1"
 
 	cat <<EOF > ubinize${vname}-${IMAGE_NAME}.cfg
 [ubifs]
@@ -183,7 +179,12 @@ multiubi_mkfs() {
             bbfatal "MKUBIFS_ARGS and UBINIZE_ARGS have to be set, see http://www.linux-mtd.infradead.org/faq/ubifs.html for details"
         fi
 
-	write_ubi_config "$3"
+	if [ -z "$3" ]; then
+		local vname=""
+	else
+		local vname="_$3"
+	fi
+	write_ubi_config "${vname}"
 
 	if [ -n "$vname" ]; then
 		mkfs.ubifs -r ${IMAGE_ROOTFS} -o ${IMGDEPLOYDIR}/${IMAGE_NAME}${vname}${IMAGE_NAME_SUFFIX}.ubifs ${mkubifs_args}
@@ -208,7 +209,10 @@ multiubi_mkfs() {
 	fi
 }
 
+MULTIUBI_ARGS = "MKUBIFS_ARGS UBINIZE_ARGS"
+
 IMAGE_CMD:multiubi () {
+	${@' '.join(['%s_%s="%s";' % (arg, name, d.getVar('%s_%s' % (arg, name))) for arg in d.getVar('MULTIUBI_ARGS').split() for name in d.getVar('MULTIUBI_BUILD').split()])}
 	# Split MKUBIFS_ARGS_<name> and UBINIZE_ARGS_<name>
 	for name in ${MULTIUBI_BUILD}; do
 		eval local mkubifs_args=\"\$MKUBIFS_ARGS_${name}\"

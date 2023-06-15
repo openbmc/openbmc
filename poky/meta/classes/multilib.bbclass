@@ -51,6 +51,7 @@ python multilib_virtclass_handler () {
         e.data.setVar("RECIPE_SYSROOT", "${WORKDIR}/recipe-sysroot")
         e.data.setVar("STAGING_DIR_TARGET", "${WORKDIR}/recipe-sysroot")
         e.data.setVar("STAGING_DIR_HOST", "${WORKDIR}/recipe-sysroot")
+        e.data.setVar("RECIPE_SYSROOT_MANIFEST_SUBDIR", "nativesdk-" + variant)
         e.data.setVar("MLPREFIX", variant + "-")
         override = ":virtclass-multilib-" + variant
         e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)

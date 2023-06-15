@@ -7,6 +7,7 @@ Upstream-Status: Pending
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
 ---
  test/regress  |  6 +++---
  test/regress2 | 11 +++++------
@@ -20,7 +21,7 @@ index 2ce1705..d086a47 100755
  	if [ $numnodes -lt 2 ] ; then
  	    echo "need at least two nodes with at least $NEEDPAGES each of"
  	    echo "free memory for mempolicy regression tests"
-+	    echo "FAIL: numa regress"
++	    echo "SKIP: numa regress"
 	    exit 77  # Skip test
  	fi
  }

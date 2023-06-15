@@ -65,7 +65,7 @@ index bfa0d54753a..0d61a3209ec 100644
        info.path = NULL;
        info.len = info.alloc = 0;
 -      tmppath = concat (ld_sysroot, prefix, "/etc/ld.so.conf",
-+      tmppath = concat (ld_sysconfdir, "/etc/ld.so.conf",
++      tmppath = concat (ld_sysconfdir, "/ld.so.conf",
  			(const char *) NULL);
        if (!ldelf_parse_ld_so_conf (&info, tmppath))
  	{

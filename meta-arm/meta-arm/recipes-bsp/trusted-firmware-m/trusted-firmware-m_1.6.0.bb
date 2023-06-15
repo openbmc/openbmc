@@ -16,20 +16,19 @@ LIC_FILES_CHKSUM = "file://license.rst;md5=07f368487da347f3c7bd0fc3085f3afa \
                     file://../mcuboot/LICENSE;md5=b6ee33f1d12a5e6ee3de1e82fb51eeb8"
 
 SRC_URI  = "git://git.trustedfirmware.org/TF-M/trusted-firmware-m.git;protocol=https;branch=${SRCBRANCH_tfm};name=tfm;destsuffix=git/tfm \
-            git://git.trustedfirmware.org/TF-M/tf-m-tests.git;protocol=https;branch=${SRCBRANCH_tfm-tests};name=tfm-tests;destsuffix=git/tf-m-tests \
+            git://git.trustedfirmware.org/TF-M/tf-m-tests.git;protocol=https;nobranch=1;name=tfm-tests;destsuffix=git/tf-m-tests \
             git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=${SRCBRANCH_mbedtls};name=mbedtls;destsuffix=git/mbedtls \
             git://github.com/mcu-tools/mcuboot.git;protocol=https;branch=${SRCBRANCH_mcuboot};name=mcuboot;destsuffix=git/mcuboot \
             "
 
 # The required dependencies are documented in tf-m/config/config_default.cmake
 # TF-Mv1.6.0
-SRCBRANCH_tfm ?= "release/1.6.x"
+SRCBRANCH_tfm ?= "master"
 SRCREV_tfm = "7387d88158701a3c51ad51c90a05326ee12847a8"
 # mbedtls-3.1.0
 SRCBRANCH_mbedtls ?= "master"
 SRCREV_mbedtls = "d65aeb37349ad1a50e0f6c9b694d4b5290d60e49"
 # TF-Mv1.6.0
-SRCBRANCH_tfm-tests ?= "release/1.6.x"
 SRCREV_tfm-tests = "723905d46019596f3f2df66d79b5d6bff6f3f213"
 # v1.9.0
 SRCBRANCH_mcuboot ?= "main"
@@ -108,10 +107,9 @@ export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
 
 # TF-M ships patches that it needs applied to mbedcrypto, so apply them
 # as part of do_patch.
-apply_local_patches() {
-    cat ${S}/lib/ext/mbedcrypto/*.patch | patch -p1 -d ${S}/../mbedtls
-}
-do_patch[postfuncs] += "apply_local_patches"
+LOCAL_SRC_PATCHES_INPUT_DIR = "${S}/lib/ext/mbedcrypto"
+LOCAL_SRC_PATCHES_DEST_DIR = "${S}/../mbedtls"
+inherit apply_local_src_patches
 
 do_configure[cleandirs] = "${B}"
 do_configure() {

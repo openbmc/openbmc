@@ -6,7 +6,7 @@ machine: fvp-baser-aemv8r64
 
 defaults:
   repos:
-    refspec: master
+    refspec: langdale
 
 repos:
   meta-arm:

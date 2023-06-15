@@ -1,4 +1,4 @@
-From 501a6b55853af549fae72723e74271f2a4ec7cf6 Mon Sep 17 00:00:00 2001
+From 000f1500b693a84880d2da49b77b1113f98dde35 Mon Sep 17 00:00:00 2001
 From: Brett Warren <brett.warren@arm.com>
 Date: Fri, 27 Nov 2020 15:28:42 +0000
 Subject: [PATCH] arm/sysv: reverted clang VFP mitigation
@@ -11,8 +11,9 @@ https://github.com/libffi/libffi/issues/607. Now that
 clang supports the LDC and SDC instructions, this mitigation
 has been reverted.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/libffi/libffi/pull/747]
 Signed-off-by: Brett Warren <brett.warren@arm.com>
+
 ---
  src/arm/sysv.S | 33 ---------------------------------
  1 file changed, 33 deletions(-)
@@ -99,6 +100,3 @@ index fb36213..e4272a1 100644
  	b	call_epilogue
  E(ARM_TYPE_INT64)
  	ldr	r1, [r2, #4]
--- 
-2.25.1
-

@@ -296,11 +296,11 @@ Here are the image features available for all images:
    forced in ``/etc/passwd`` and ``/etc/shadow`` if such files exist.
 
    .. note::
-       ``empty-root-passwd`` doesn't set an empty root password by itself.
+       ``empty-root-password`` doesn't set an empty root password by itself.
        You get an initial empty root password thanks to the
        :oe_git:`base-passwd </openembedded-core/tree/meta/recipes-core/base-passwd/>`
        and :oe_git:`shadow </openembedded-core/tree/meta/recipes-extended/shadow/>`
-       recipes, and the presence of ``empty-root-passwd`` or ``debug-tweaks``
+       recipes, and the presence of ``empty-root-password`` or ``debug-tweaks``
        just disables the mechanism which forces an non-empty password for the
        root user.
 

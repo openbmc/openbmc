@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = " \
 DEPENDS = "python3 glib-2.0 pango giflib tiff libxml2 jpeg libtool uthash gettext-native libspiro"
 DEPENDS:append:class-target = " libxi"
 
-inherit cmake pkgconfig python3native features_check gettext gtk-icon-cache mime mime-xdg
+inherit cmake pkgconfig python3native python3targetconfig features_check gettext gtk-icon-cache mime mime-xdg
 
 REQUIRED_DISTRO_FEATURES:append:class-target = " x11"
 

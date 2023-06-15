@@ -332,19 +332,19 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         data = self.basehash[tid]
         for dep in self.runtaskdeps[tid]:
-            data = data + self.get_unihash(dep)
+            data += self.get_unihash(dep)
 
         for (f, cs) in self.file_checksum_values[tid]:
             if cs:
                 if "/./" in f:
-                    data = data + "./" + f.split("/./")[1]
-                data = data + cs
+                    data += "./" + f.split("/./")[1]
+                data += cs
 
         if tid in self.taints:
             if self.taints[tid].startswith("nostamp:"):
-                data = data + self.taints[tid][8:]
+                data += self.taints[tid][8:]
             else:
-                data = data + self.taints[tid]
+                data += self.taints[tid]
 
         h = hashlib.sha256(data.encode("utf-8")).hexdigest()
         self.taskhash[tid] = h

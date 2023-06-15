@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: MIT
 #
 
+import os
 import re
-import tempfile
 import time
 import oe.types
 from oeqa.core.decorator import OETestTag
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import bitbake, runqemu, get_bb_var, runCmd
+from oeqa.utils.commands import bitbake, runqemu, get_bb_var
 
 @OETestTag("runqemu")
 class RunqemuTests(OESelftestTestCase):
@@ -57,14 +57,16 @@ SYSLINUX_TIMEOUT = "10"
         cmd = "%s %s ext4" % (self.cmd_common, self.machine)
         with runqemu(self.recipe, ssh=False, launch_cmd=cmd) as qemu:
             with open(qemu.qemurunnerlog) as f:
-                self.assertIn('rootfs.ext4', f.read(), "Failed: %s" % cmd)
+                regexp = r'\nROOTFS: .*\.ext4]\n'
+                self.assertRegex(f.read(), regexp, "Failed to find '%s' in '%s' after running '%s'" % (regexp, qemu.qemurunnerlog, cmd))
 
     def test_boot_machine_iso(self):
         """Test runqemu machine iso"""
         cmd = "%s %s iso" % (self.cmd_common, self.machine)
         with runqemu(self.recipe, ssh=False, launch_cmd=cmd) as qemu:
             with open(qemu.qemurunnerlog) as f:
-                self.assertIn('media=cdrom', f.read(), "Failed: %s" % cmd)
+                text_in = 'media=cdrom'
+                self.assertIn(text_in, f.read(), "Failed to find '%s' in '%s' after running '%s'" % (text_in, qemu.qemurunnerlog, cmd))
 
     def test_boot_recipe_image(self):
         """Test runqemu recipe-image"""
@@ -79,14 +81,16 @@ SYSLINUX_TIMEOUT = "10"
         cmd = "%s %s wic.vmdk" % (self.cmd_common, self.recipe)
         with runqemu(self.recipe, ssh=False, launch_cmd=cmd) as qemu:
             with open(qemu.qemurunnerlog) as f:
-                self.assertIn('format=vmdk', f.read(), "Failed: %s" % cmd)
+                text_in = 'format=vmdk'
+                self.assertIn(text_in, f.read(), "Failed to find '%s' in '%s' after running '%s'" % (text_in, qemu.qemurunnerlog, cmd))
 
     def test_boot_recipe_image_vdi(self):
         """Test runqemu recipe-image vdi"""
         cmd = "%s %s wic.vdi" % (self.cmd_common, self.recipe)
         with runqemu(self.recipe, ssh=False, launch_cmd=cmd) as qemu:
             with open(qemu.qemurunnerlog) as f:
-                self.assertIn('format=vdi', f.read(), "Failed: %s" % cmd)
+                text_in = 'format=vdi'
+                self.assertIn(text_in, f.read(), "Failed to find '%s' in '%s' after running '%s'" % (text_in, qemu.qemurunnerlog, cmd))
 
     def test_boot_deploy(self):
         """Test runqemu deploy_dir_image"""

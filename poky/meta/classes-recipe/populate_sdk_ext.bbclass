@@ -120,7 +120,7 @@ python write_host_sdk_ext_manifest () {
                 f.write("%s %s %s\n" % (info[1], info[2], info[3]))
 }
 
-SDK_POSTPROCESS_COMMAND:append:task-populate-sdk-ext = "write_target_sdk_ext_manifest; write_host_sdk_ext_manifest; "    
+SDK_POSTPROCESS_COMMAND:append:task-populate-sdk-ext = " write_target_sdk_ext_manifest; write_host_sdk_ext_manifest; "    
 
 SDK_TITLE:task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} Extensible SDK"
 
@@ -720,7 +720,7 @@ sdk_ext_postinst() {
 
 	# A bit of another hack, but we need this in the path only for devtool
 	# so put it at the end of $PATH.
-	echo "export PATH=$target_sdk_dir/sysroots/${SDK_SYS}${bindir_nativesdk}:\$PATH" >> $env_setup_script
+	echo "export PATH=\"$target_sdk_dir/sysroots/${SDK_SYS}${bindir_nativesdk}:\$PATH\"" >> $env_setup_script
 
 	echo "printf 'SDK environment now set up; additionally you may now run devtool to perform development tasks.\nRun devtool --help for further details.\n'" >> $env_setup_script
 

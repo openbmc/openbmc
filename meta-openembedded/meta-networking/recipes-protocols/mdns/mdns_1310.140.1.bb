@@ -2,28 +2,31 @@ SUMMARY = "Publishes & browses available services on a link according to the Zer
 DESCRIPTION = "Bonjour, also known as zero-configuration networking, enables automatic discovery of computers, devices, and services on IP networks."
 HOMEPAGE = "http://developer.apple.com/networking/bonjour/"
 LICENSE = "Apache-2.0 & BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://../LICENSE;md5=31c50371921e0fb731003bbc665f29bf"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=31c50371921e0fb731003bbc665f29bf"
 
 DEPENDS:append:libc-musl = " musl-nscd"
 
 RPROVIDES:${PN} += "libdns_sd.so"
 
-SRC_URI = "https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-${PV}.tar.gz \
+# matches annotated tag mDNSResponder-1310.140.1
+SRCREV = "1d1de95b98fba2077d34c9d78b839a96aa0e1c77"
+BRANCH = "rel/mDNSResponder-1310"
+SRC_URI = "git://github.com/apple-oss-distributions/mDNSResponder;protocol=https;branch=${BRANCH} \
            file://mdns.service \
-           file://0001-mdns-include-stddef.h-for-NULL.patch;patchdir=.. \
-           file://0002-mdns-cross-compilation-fixes-for-bitbake.patch;patchdir=.. \
-           file://0001-Create-subroutine-for-cleaning-recent-interfaces.patch;patchdir=.. \
-           file://0002-Create-subroutine-for-tearing-down-an-interface.patch;patchdir=.. \
-           file://0003-Track-interface-socket-family.patch;patchdir=.. \
-           file://0004-Use-list-for-changed-interfaces.patch;patchdir=.. \
-           file://0006-Remove-unneeded-function.patch;patchdir=.. \
-           file://0008-Mark-deleted-interfaces-as-being-changed.patch;patchdir=.. \
-           file://0009-Fix-possible-NULL-dereference.patch;patchdir=.. \
-           file://0010-Handle-errors-from-socket-calls.patch;patchdir=.. \
-           file://0011-Change-a-dynamic-allocation-to-file-scope-variable.patch;patchdir=.. \
-           file://0001-dns-sd-Include-missing-headers.patch;patchdir=.. \
+           file://0001-mdns-include-stddef.h-for-NULL.patch \
+           file://0002-mdns-cross-compilation-fixes-for-bitbake.patch \
+           file://0001-Create-subroutine-for-cleaning-recent-interfaces.patch \
+           file://0002-Create-subroutine-for-tearing-down-an-interface.patch \
+           file://0003-Track-interface-socket-family.patch \
+           file://0004-Use-list-for-changed-interfaces.patch \
+           file://0006-Remove-unneeded-function.patch \
+           file://0008-Mark-deleted-interfaces-as-being-changed.patch \
+           file://0009-Fix-possible-NULL-dereference.patch \
+           file://0010-Handle-errors-from-socket-calls.patch \
+           file://0011-Change-a-dynamic-allocation-to-file-scope-variable.patch \
+           file://0001-dns-sd-Include-missing-headers.patch \
+           file://0006-make-Add-top-level-Makefile.patch \
            "
-SRC_URI[sha256sum] = "040f6495c18b9f0557bcf9e00cbcfc82b03405f5ba6963dc147730ca0ca90d6f"
 
 CVE_PRODUCT = "apple:mdnsresponder"
 
@@ -42,13 +45,22 @@ CVE_CHECK_IGNORE += "CVE-2007-0613"
 
 PARALLEL_MAKE = ""
 
-S = "${WORKDIR}/mDNSResponder-${PV}/mDNSPosix"
+# We install a stub Makefile in the top directory so that the various checks
+# in base.bbclass pass their tests for a Makefile, this ensures (that amongst
+# other things) the sstate checks will clean the build directory when the
+# task hashes changes.
+#
+# We can't use the approach of setting ${S} to mDNSPosix as we need
+# DEBUG_PREFIX_MAP to cover files which come from the Clients directory too.
+S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE += "os=linux DEBUG=0 'CC=${CC}' 'LD=${CCLD} ${LDFLAGS}'"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_install () {
+    cd mDNSPosix
+
     install -d ${D}${sbindir}
     install -m 0755 build/prod/mdnsd ${D}${sbindir}
 

@@ -422,6 +422,12 @@ documentation to a BitBake variable as follows::
 
    CACHE[doc] = "The directory holding the cache of the metadata."
 
+.. note::
+
+   Variable flag names starting with an underscore (``_``) character
+   are allowed but are ignored by ``d.getVarFlags("VAR")``
+   in Python code. Such flag names are used internally by BitBake.
+
 Inline Python Variable Expansion
 --------------------------------
 

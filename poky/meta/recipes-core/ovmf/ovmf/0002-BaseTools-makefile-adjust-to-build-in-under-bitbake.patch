@@ -6,8 +6,13 @@ Subject: [PATCH 2/6] BaseTools: makefile: adjust to build in under bitbake
 Prepend the build flags with those of bitbake. This is to build
 using the bitbake native sysroot include and library directories.
 
+Note from Alex: this is not appropriate for upstream submission as
+the recipe already does lots of similar in-place fixups elsewhere, so
+this patch shold be converted to follow that pattern. We're not going
+to fight against how upstream wants to configure the build.
+
 Signed-off-by: Ricardo Neri <ricardo.neri@linux.intel.com>
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [needs to be converted to in-recipe fixups]
 ---
  BaseTools/Source/C/Makefiles/header.makefile | 17 +++++++++--------
  1 file changed, 9 insertions(+), 8 deletions(-)

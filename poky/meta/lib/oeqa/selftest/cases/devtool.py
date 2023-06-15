@@ -276,6 +276,7 @@ class DevtoolBase(DevtoolTestCase):
         cls.sstate_conf  = 'SSTATE_DIR = "%s"\n' % cls.devtool_sstate
         cls.sstate_conf += ('SSTATE_MIRRORS += "file://.* file:///%s/PATH"\n'
                             % cls.original_sstate)
+        cls.sstate_conf += ('BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"\n')
 
     @classmethod
     def tearDownClass(cls):
@@ -954,7 +955,7 @@ class DevtoolUpdateTests(DevtoolBase):
 
     def test_devtool_update_recipe_git(self):
         # Check preconditions
-        testrecipe = 'mtd-utils'
+        testrecipe = 'mtd-utils-selftest'
         bb_vars = get_bb_vars(['FILE', 'SRC_URI'], testrecipe)
         recipefile = bb_vars['FILE']
         src_uri = bb_vars['SRC_URI']
@@ -1075,7 +1076,7 @@ class DevtoolUpdateTests(DevtoolBase):
 
     def test_devtool_update_recipe_append_git(self):
         # Check preconditions
-        testrecipe = 'mtd-utils'
+        testrecipe = 'mtd-utils-selftest'
         bb_vars = get_bb_vars(['FILE', 'SRC_URI'], testrecipe)
         recipefile = bb_vars['FILE']
         src_uri = bb_vars['SRC_URI']

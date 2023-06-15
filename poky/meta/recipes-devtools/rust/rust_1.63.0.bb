@@ -57,7 +57,6 @@ rust_do_install:class-nativesdk() {
 }
 
 EXTRA_TOOLS ?= "cargo-clippy clippy-driver rustfmt"
-EXTRA_TOOLS:remove:riscv32 = "rustfmt"
 rust_do_install:class-target() {
     export PSEUDO_UNLOAD=1
     rust_runx install

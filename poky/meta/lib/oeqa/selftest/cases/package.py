@@ -89,6 +89,13 @@ class VersionOrdering(OESelftestTestCase):
             self.assertEqual(status - 100, sort, "%s %s (%d) failed" % (ver1, ver2, sort))
 
 class PackageTests(OESelftestTestCase):
+    # Verify that a recipe cannot rename a package into an existing one
+    def test_package_name_conflict(self):
+        res = bitbake("packagenameconflict", ignore_status=True)
+        self.assertNotEqual(res.status, 0)
+        err = "package name already exists"
+        self.assertTrue(err in res.output)
+
     # Verify that a recipe which sets up hardlink files has those preserved into split packages
     # Also test file sparseness is preserved
     def test_preserve_sparse_hardlinks(self):

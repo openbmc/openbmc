@@ -40,7 +40,11 @@ def unitFileList(d):
             bb.fatal("Missing required mount point for OVERLAYFS_MOUNT_POINT[%s] in your MACHINE configuration" % mountPoint)
 
     for mountPoint in overlayMountPoints:
-        for path in d.getVarFlag('OVERLAYFS_WRITABLE_PATHS', mountPoint).split():
+        mountPointList = d.getVarFlag('OVERLAYFS_WRITABLE_PATHS', mountPoint)
+        if not mountPointList:
+            bb.debug(1, "No mount points defined for %s flag, don't add to file list", mountPoint)
+            continue
+        for path in mountPointList.split():
             fileList.append(mountUnitName(path))
             fileList.append(helperUnitName(path))
 

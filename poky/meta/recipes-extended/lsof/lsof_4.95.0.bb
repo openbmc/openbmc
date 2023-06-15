@@ -19,6 +19,15 @@ SRCREV = "67d8c828e7bdc01ba93f8ff79765dd424da0c9d7"
 
 S = "${WORKDIR}/git"
 
+
+inherit update-alternatives
+
+ALTERNATIVE:${PN} = "lsof"
+ALTERNATIVE_LINK_NAME[lsof] = "${sbindir}/lsof"
+# Make our priority higher than busybox
+ALTERNATIVE_PRIORITY = "100"
+
+
 export LSOF_INCLUDE = "${STAGING_INCDIR}"
 
 do_configure () {

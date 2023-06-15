@@ -4,7 +4,7 @@
 SUMMARY = "Gstreamer editing services"
 HOMEPAGE = "http://cgit.freedesktop.org/gstreamer/gst-editing-services/"
 
-LICENSE = "GPL-2.0-on-later & LGPL-2.1-or-later"
+LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6762ed442b3822387a51c92d928ead0d \
                     file://COPYING.LIB;md5=6762ed442b3822387a51c92d928ead0d"
 

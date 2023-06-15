@@ -21,7 +21,6 @@ SPDX_TOOL_VERSION ??= "1.0"
 SPDXRUNTIMEDEPLOY = "${SPDXDIR}/runtime-deploy"
 
 SPDX_INCLUDE_SOURCES ??= "0"
-SPDX_INCLUDE_PACKAGED ??= "0"
 SPDX_ARCHIVE_SOURCES ??= "0"
 SPDX_ARCHIVE_PACKAGED ??= "0"
 
@@ -431,7 +430,6 @@ python do_create_spdx() {
 
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     spdx_workdir = Path(d.getVar("SPDXWORK"))
-    include_packaged = d.getVar("SPDX_INCLUDE_PACKAGED") == "1"
     include_sources = d.getVar("SPDX_INCLUDE_SOURCES") == "1"
     archive_sources = d.getVar("SPDX_ARCHIVE_SOURCES") == "1"
     archive_packaged = d.getVar("SPDX_ARCHIVE_PACKAGED") == "1"
@@ -459,6 +457,7 @@ python do_create_spdx() {
 
     for s in d.getVar('SRC_URI').split():
         if not s.startswith("file://"):
+            s = s.split(';')[0]
             recipe.downloadLocation = s
             break
     else:
@@ -796,6 +795,7 @@ def spdx_get_src(d):
             bb.build.exec_func('do_unpack', d)
         # Copy source of kernel to spdx_workdir
         if is_work_shared_spdx(d):
+            share_src = d.getVar('WORKDIR')
             d.setVar('WORKDIR', spdx_workdir)
             d.setVar('STAGING_DIR_NATIVE', spdx_sysroot_native)
             src_dir = spdx_workdir + "/" + d.getVar('PN')+ "-" + d.getVar('PV') + "-" + d.getVar('PR')
@@ -803,8 +803,8 @@ def spdx_get_src(d):
             if bb.data.inherits_class('kernel',d):
                 share_src = d.getVar('STAGING_KERNEL_DIR')
             cmd_copy_share = "cp -rf " + share_src + "/* " + src_dir + "/"
-            cmd_copy_kernel_result = os.popen(cmd_copy_share).read()
-            bb.note("cmd_copy_kernel_result = " + cmd_copy_kernel_result)
+            cmd_copy_shared_res = os.popen(cmd_copy_share).read()
+            bb.note("cmd_copy_shared_result = " + cmd_copy_shared_res)
 
             git_path = src_dir + "/.git"
             if os.path.exists(git_path):

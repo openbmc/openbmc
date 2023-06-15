@@ -373,8 +373,26 @@ support.
 ``create-spdx.bbclass``
 =======================
 
-The :ref:`create-spdx <ref-classes-create-spdx>` class provides support for automatically creating
-SPDX SBoM documents based upon image and SDK contents.
+The :ref:`create-spdx <ref-classes-create-spdx>` class provides support for
+automatically creating :term:`SPDX` :term:`SBOM` documents based upon image
+and SDK contents.
+
+This class is meant to be inherited globally from a configuration file::
+
+   INHERIT += "create-spdx"
+
+The toplevel :term:`SPDX` output file is generated in JSON format as a
+``IMAGE-MACHINE.spdx.json`` file in ``tmp/deploy/images/MACHINE/`` inside the
+:term:`Build Directory`. There are other related files in the same directory,
+as well as in ``tmp/deploy/spdx``.
+
+The exact behaviour of this class, and the amount of output can be controlled
+by the :term:`SPDX_PRETTY`, :term:`SPDX_ARCHIVE_PACKAGED`,
+:term:`SPDX_ARCHIVE_SOURCES` and :term:`SPDX_INCLUDE_SOURCES` variables.
+
+See the description of these variables and the
+":ref:`dev-manual/common-tasks:creating a software bill of materials`"
+section in the Yocto Project Development Manual for more details.
 
 .. _ref-classes-cross:
 
@@ -412,13 +430,61 @@ discussion on these cross-compilation tools.
 =====================
 
 The :ref:`cve-check <ref-classes-cve-check>` class looks for known CVEs (Common Vulnerabilities
-and Exposures) while building an image. This class is meant to be
+and Exposures) while building with BitBake. This class is meant to be
 inherited globally from a configuration file::
 
    INHERIT += "cve-check"
 
+To filter out obsolete CVE database entries which are known not to impact software from Poky and OE-Core,
+add following line to the build configuration file::
+
+   include cve-extra-exclusions.inc
+
 You can also look for vulnerabilities in specific packages by passing
-``-c cve_check`` to BitBake. You will find details in the
+``-c cve_check`` to BitBake.
+
+After building the software with Bitbake, CVE check output reports are available in ``tmp/deploy/cve``
+and image specific summaries in ``tmp/deploy/images/*.cve`` or ``tmp/deploy/images/*.json`` files.
+
+When building, the CVE checker will emit build time warnings for any detected
+issues which are in the state ``Unpatched``, meaning that CVE issue seems to affect the software component
+and version being compiled and no patches to address the issue are applied. Other states
+for detected CVE issues are: ``Patched`` meaning that a patch to address the issue is already
+applied, and ``Ignored`` meaning that the issue can be ignored.
+
+The ``Patched`` state of a CVE issue is detected from patch files with the format
+``CVE-ID.patch``, e.g. ``CVE-2019-20633.patch``, in the :term:`SRC_URI` and using
+CVE metadata of format ``CVE: CVE-ID`` in the commit message of the patch file.
+
+If the recipe lists the ``CVE-ID`` in :term:`CVE_CHECK_IGNORE` variable, then the CVE state is reported
+as ``Ignored``. Multiple CVEs can be listed separated by spaces. Example::
+
+   CVE_CHECK_IGNORE += "CVE-2020-29509 CVE-2020-29511"
+
+If CVE check reports that a recipe contains false positives or false negatives, these may be
+fixed in recipes by adjusting the CVE product name using :term:`CVE_PRODUCT` and :term:`CVE_VERSION` variables.
+:term:`CVE_PRODUCT` defaults to the plain recipe name :term:`BPN` which can be adjusted to one or more CVE
+database vendor and product pairs using the syntax::
+
+   CVE_PRODUCT = "flex_project:flex"
+
+where ``flex_project`` is the CVE database vendor name and ``flex`` is the product name. Similarly
+if the default recipe version :term:`PV` does not match the version numbers of the software component
+in upstream releases or the CVE database, then the :term:`CVE_VERSION` variable can be used to set the
+CVE database compatible version number, for example::
+
+   CVE_VERSION = "2.39"
+
+Any bugs or missing or incomplete information in the CVE database entries should be fixed in the CVE database
+via the `NVD feedback form <https://nvd.nist.gov/info/contact-form>`__.
+
+Users should note that security is a process, not a product, and thus also CVE checking, analyzing results,
+patching and updating the software should be done as a regular process. The data and assumptions
+required for CVE checker to reliably detect issues are frequently broken in various ways.
+These can only be detected by reviewing the details of the issues and iterating over the generated reports,
+and following what happens in other Linux distributions and in the greater open source community.
+
+You will find some more details in the
 ":ref:`dev-manual/common-tasks:checking for vulnerabilities`"
 section in the Development Tasks Manual.
 

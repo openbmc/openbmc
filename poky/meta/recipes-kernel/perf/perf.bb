@@ -356,6 +356,16 @@ FILES:${PN}-python = " \
                        "
 FILES:${PN}-perl = "${libexecdir}/perf-core/scripts/perl"
 
-
-INHIBIT_PACKAGE_DEBUG_SPLIT="1"
 DEBUG_OPTIMIZATION:append = " -Wno-error=maybe-uninitialized"
+
+PACKAGESPLITFUNCS =+ "perf_fix_sources"
+
+perf_fix_sources () {
+	for f in util/parse-events-flex.h util/parse-events-flex.c util/pmu-flex.c \
+			util/expr-flex.h util/expr-flex.c; do
+		f=${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/$f
+		if [ -e $f ]; then
+			sed -i -e 's#${S}/##g' $f
+		fi
+	done
+}

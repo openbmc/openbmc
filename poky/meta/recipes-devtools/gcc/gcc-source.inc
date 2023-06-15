@@ -17,6 +17,13 @@ STAMPCLEAN = "${STAMPS_DIR}/work-shared/gcc-${PV}-*"
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = ""
 PACKAGES = ""
+TARGET_ARCH = "allarch"
+TARGET_AS_ARCH = "none"
+TARGET_CC_ARCH = "none"
+TARGET_LD_ARCH = "none"
+TARGET_OS = "linux"
+baselib = "lib"
+PACKAGE_ARCH = "all"
 
 B = "${WORKDIR}/build"
 
@@ -25,8 +32,6 @@ python do_preconfigure () {
     import subprocess
     cmd = d.expand('cd ${S} && PATH=${PATH} gnu-configize')
     subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-    # See 0044-gengtypes.patch, we need to regenerate this file
-    bb.utils.remove(d.expand("${S}/gcc/gengtype-lex.c"))
     cmd = d.expand("sed -i 's/BUILD_INFO=info/BUILD_INFO=/' ${S}/gcc/configure")
     subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
 

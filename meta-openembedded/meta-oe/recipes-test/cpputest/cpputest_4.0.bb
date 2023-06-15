@@ -18,4 +18,6 @@ EXTRA_OECMAKE = "-DLONGLONG=ON \
                  -DEXTENSIONS=OFF \
                  "
 
+DEV_PKG_DEPENDENCY = ""
+
 FILES:${PN}-dev += "${libdir}/CppUTest/cmake/*"

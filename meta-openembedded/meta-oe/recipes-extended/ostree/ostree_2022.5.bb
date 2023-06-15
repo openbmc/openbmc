@@ -22,6 +22,7 @@ SRC_URI = " \
     file://0001-Remove-unused-linux-fs.h-includes.patch \
     file://0001-libostree-Remove-including-sys-mount.h.patch \
     file://0001-s390x-se-luks-gencpio-There-is-no-bashism.patch \
+    file://0001-deploy-Don-t-rebuild-selinux-policy-on-first-deploym.patch \
     file://run-ptest \
 "
 SRCREV = "15740d042c9c5258a1c082b5e228cf6f115edbb0"

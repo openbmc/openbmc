@@ -8,11 +8,8 @@
 # This module is mainly used by scripts/oe-selftest and modules under meta/oeqa/selftest
 # It provides a class and methods for running commands on the host in a convienent way for tests.
 
-
-
 import os
 import sys
-import signal
 import subprocess
 import threading
 import time
@@ -21,6 +18,7 @@ from oeqa.utils import CommandError
 from oeqa.utils import ftools
 import re
 import contextlib
+import errno
 # Export test doesn't require bb
 try:
     import bb
@@ -85,7 +83,7 @@ class Command(object):
             except OSError as ex:
                 # It's not an error when the command does not consume all
                 # of our data. subprocess.communicate() also ignores that.
-                if ex.errno != EPIPE:
+                if ex.errno != errno.EPIPE:
                     raise
 
         # We write in a separate thread because then we can read
