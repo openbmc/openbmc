@@ -91,9 +91,9 @@ check_keys() {
     fi
 }
 
-# Sign images for secure os be enabled
+# Sign images for secure os be enabled and TIP mode only
 do_sign_binary() {
-    if [ "${SECURED_IMAGE}" != "True" ]; then
+    if [ "${SECURED_IMAGE}" != "True" -o "${TIP_IMAGE}" != "True" ]; then
        return
     fi
     checked=`check_keys`
