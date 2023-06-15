@@ -26,6 +26,7 @@ SRC_URI = "http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${PV}.tar
            file://add-test-support-for-busybox.patch \
            file://f107467179428a0e3ea9e4aa9738ac12ff02822d.patch \
            file://0001-Default-to-not-using-sandbox-when-cross-compiling.patch \
+           file://7280401bdd77ca54be6867a154cc01e0d72612e0.patch \
            "
 SRC_URI[sha256sum] = "fd497654b7ab1686dac672fb83dfb4ba4096e8b5ffcdaccd262380ae58bec5e7"
 

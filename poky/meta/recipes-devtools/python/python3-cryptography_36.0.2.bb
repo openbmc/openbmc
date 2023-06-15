@@ -17,6 +17,7 @@ SRC_URI += " \
     file://0001-Cargo.toml-specify-pem-version.patch \
     file://0002-Cargo.toml-edition-2018-2021.patch \
     file://fix-leak-metric.patch \
+    file://CVE-2023-23931.patch \
 "
 
 inherit pypi python_setuptools3_rust

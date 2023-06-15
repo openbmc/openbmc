@@ -10,6 +10,7 @@ SRC_URI += "file://0001-setup.py-link-in-sysroot-not-in-host-directories.patch \
            file://cross-compile-platform.patch \
            file://avoid-host-contamination.patch \
            file://0001-setup.py-address-openssl-3.x-build-issue.patch \
+           file://CVE-2020-25657.patch \
            "
 SRC_URI[sha256sum] = "99f2260a30901c949a8dc6d5f82cd5312ffb8abc92e76633baf231bbbcb2decb"
 

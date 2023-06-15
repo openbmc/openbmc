@@ -262,7 +262,7 @@ def files_from_filevars(filevars):
             f = '.' + f
         if not f.startswith("./"):
             f = './' + f
-        globbed = glob.glob(f)
+        globbed = glob.glob(f, recursive=True)
         if globbed:
             if [ f ] != globbed:
                 files += globbed

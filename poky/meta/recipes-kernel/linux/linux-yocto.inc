@@ -69,3 +69,6 @@ do_devshell:prepend() {
     d.setVarFlag("PKG_CONFIG_SYSROOT_DIR", "unexport", "1")
     d.appendVar("OE_TERMINAL_EXPORTS", " PKG_CONFIG_DIR PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_DIR")
 }
+
+# CVE exclusion
+include recipes-kernel/linux/cve-exclusion.inc

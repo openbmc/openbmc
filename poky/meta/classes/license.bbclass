@@ -223,7 +223,7 @@ def find_license_files(d):
         bb.fatal('%s: %s' % (d.getVar('PF'), exc))
     except SyntaxError:
         oe.qa.handle_error("license-syntax",
-            "%s: Failed to parse it's LICENSE field." % (d.getVar('PF')), d)
+            "%s: Failed to parse LICENSE: %s" % (d.getVar('PF'), d.getVar('LICENSE')), d)
     # Add files from LIC_FILES_CHKSUM to list of license files
     lic_chksum_paths = defaultdict(OrderedDict)
     for path, data in sorted(lic_chksums.items()):

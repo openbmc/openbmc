@@ -16,6 +16,8 @@ PKGV = "${GITPKGVTAG}"
 SRCREV = "658a72980f6e93241d927c46cfa664bf2547b8b1"
 SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=stable-2.0;protocol=https \
     file://winpr-makecert-Build-with-install-RPATH.patch \
+    file://CVE-2022-39316.patch \
+    file://CVE-2022-39318-39319.patch \
 "
 
 S = "${WORKDIR}/git"

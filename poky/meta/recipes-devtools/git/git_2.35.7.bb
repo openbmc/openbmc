@@ -10,6 +10,8 @@ PROVIDES:append:class-native = " git-replacement-native"
 SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
            file://fixsort.patch \
            file://0001-config.mak.uname-do-not-force-RHEL-7-specific-build-.patch \
+           file://CVE-2023-29007.patch \
+           file://CVE-2023-25652.patch \
            "
 
 S = "${WORKDIR}/git-${PV}"
@@ -35,6 +37,8 @@ CVE_CHECK_IGNORE += "CVE-2022-24975"
 CVE_CHECK_IGNORE += "CVE-2022-41953"
 # specific to Git for Windows
 CVE_CHECK_IGNORE += "CVE-2023-22743"
+# This is specific to Git-for-Windows
+CVE_CHECK_IGNORE += "CVE-2023-25815"
 
 PACKAGECONFIG ??= "expat curl"
 PACKAGECONFIG[cvsserver] = ""
