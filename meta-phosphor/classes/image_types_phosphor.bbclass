@@ -356,7 +356,7 @@ do_generate_static[depends] += " \
 make_signatures() {
     signing_key="${SIGNING_KEY}"
 
-    if [ "${INSECURE_KEY}" == "True" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
+    if [ "${INSECURE_KEY}" = "True" ] && [ -n "${SIGNING_PUBLIC_KEY}" ]; then
         echo "Using SIGNING_PUBLIC_KEY"
         signing_key=""
     fi
