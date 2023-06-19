@@ -1,0 +1,173 @@
+[
+  {
+    "Desc": {
+      "Name": "total_power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "BCM0_Input_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "BCM1_Input_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "BCM2_Input_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "BCM3_Input_Power",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3)"
+  },
+  {
+    "Desc": {
+      "Name": "QSFP1 Temperature",
+      "SensorType": "temperature"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "T0",
+          "Desc": {
+            "Name": "QSFP1_TEMP",
+            "SensorType": "temperature"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(T0, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "QSFP2 Temperature",
+      "SensorType": "temperature"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "T0",
+          "Desc": {
+            "Name": "QSFP2_TEMP",
+            "SensorType": "temperature"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(T0, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "QSFP3 Temperature",
+      "SensorType": "temperature"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "T0",
+          "Desc": {
+            "Name": "QSFP3_TEMP",
+            "SensorType": "temperature"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(T0, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "QSFP4 Temperature",
+      "SensorType": "temperature"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "T0",
+          "Desc": {
+            "Name": "QSFP4_TEMP",
+            "SensorType": "temperature"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(T0, 0)"
+  }
+]

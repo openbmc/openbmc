@@ -34,6 +34,7 @@ RDEPENDS:${PN}-chassis += " \
     phosphor-host-postd \
     phosphor-state-manager-chassis \
     phosphor-hwmon \
+    phosphor-virtual-sensor \
     "
 
 SUMMARY:${PN}-flash = "IBM Flash"
