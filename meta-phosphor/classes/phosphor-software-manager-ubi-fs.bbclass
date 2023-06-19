@@ -27,7 +27,6 @@ SYSTEMD_SERVICE:phosphor-software-manager-updater-ubi += " \
 BMC_RW_MTD ??= "bmc"
 BMC_RO_MTD ??= "bmc"
 BMC_KERNEL_MTD ??= "bmc"
-FLASH_SIZE ?= "32768"
 DISTROOVERRIDES .= ":flash-${FLASH_SIZE}"
 BMC_RW_SIZE ??= "0x600000"
 BMC_RW_SIZE:flash-131072 = "0x2000000"
