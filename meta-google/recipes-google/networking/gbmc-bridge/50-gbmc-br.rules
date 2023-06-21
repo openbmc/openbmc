@@ -12,8 +12,8 @@ table inet filter {
   chain gbmc_br_input {
     type filter hook input priority 0; policy drop;
     iifname != gbmcbr accept
+    mark 0xff drop
     ct state established accept
-    jump gbmc_br_redir_input
     jump gbmc_br_int_input
     jump gbmc_br_pub_input
     reject
@@ -35,3 +35,4 @@ table inet filter {
     ip6 nexthdr icmpv6 accept
   }
 }
+

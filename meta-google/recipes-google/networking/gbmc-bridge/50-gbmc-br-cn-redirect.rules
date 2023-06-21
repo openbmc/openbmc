@@ -22,9 +22,3 @@ table inet raw {
         tcp sport 10168 tcp sport set 10166 notrack
     }
 }
-
-table inet filter {
-    chain gbmc_br_redir_input {
-        mark 0xff drop
-    }
-}
