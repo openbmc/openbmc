@@ -1,0 +1,262 @@
+From 066f647fbec1f3177d673d157b18ff0c0f517627 Mon Sep 17 00:00:00 2001
+From: Alex Schendel <alex.schendel@intel.com>
+Date: Fri, 9 Jun 2023 16:35:24 -0700
+Subject: [PATCH] Fru: Fix edit field not checking area existence
+
+The current implementation of ipmitool fru edit does not perform proper
+checks when attempting to resize the FRU. This results in undesireable
+changes to the FRU in several instances:
+1. If the FRU is shrinking and a FRU area does not exist (offset 0),
+ipmitool may attempt to shift it forwards (decrementing the offset).
+This results in a wraparound to 0xFF, leaving an erroneous field offset.
+2. If the areas are not in the exact order given as an example in the
+FRU spec, ipmitool may shift the wrong fields, which would cause data
+loss. (the FRU spec does not specify a required order for FRU fields)
+3. If the FRU is being enlarged after a fru field edit, the FRU size is
+not properly modified before writing the FRU, so the end of the FRU
+becomes truncated, resulting in data loss.
+
+This commit addresses these three issues by:
+1. Confirming that a area's does not have an offset of 0x00 before
+attempting to shift it.
+2. Ensuring that the area's offset is after the area that was modified
+before attempting to shift it.
+3. Properly edit the size of the FRU before the FRU is written.
+
+Tested:
+Shrinking a FRU was tested with and without the change:
+New Header without change:
+01 00 00 01 0a ff 00 f5
+               ^^
+Note that the Multi Record area now has an offset of 0xFF.
+
+New Header with change:
+01 00 00 01 0a 00 00 f4
+               ^^
+Note that the Multi Record area retains its offset of 0x00.
+
+This change also includes printouts specifying what offsets are found
+and when they are being shifted, as well as data being erased if the FRU
+is being shrunk:
+Offset: 0
+Offset: 0
+Offset: 8
+Offset: 88 moving by -8 bytes.
+Offset: 0
+Erasing leftover data from 200 to 208
+
+After shrinking the FRU, the FRU was reverted to its original state with
+the fix in place:
+01 00 00 01 0b 00 00 f3
+            ^^
+This resulted in only the product area offset being updated as expected.
+Offset: 0
+Offset: 0
+Offset: 8
+Offset: 80 moving by 8 bytes.
+Offset: 0
+
+The implementation of IPMI FRU write used in these tests errors out
+without writing the FRU if a checksum fails to pass, so without this
+fix, it was impossible to enlarge the FRU. This is because without the
+change, the last 8 bytes of the FRU would be truncated which would
+result in the checksum of the final FRU area being lost which would thus
+trigger this FRU write failure.
+
+Signed-off-by: Alex Schendel <alex.schendel@intel.com>
+---
+ include/ipmitool/ipmi_fru.h |   3 +-
+ lib/ipmi_fru.c              | 143 +++++++++++++++++++++++-------------
+ 2 files changed, 93 insertions(+), 53 deletions(-)
+
+diff --git a/include/ipmitool/ipmi_fru.h b/include/ipmitool/ipmi_fru.h
+index 4d4d6c6..e7e8876 100644
+--- a/include/ipmitool/ipmi_fru.h
++++ b/include/ipmitool/ipmi_fru.h
+@@ -46,6 +46,7 @@
+ #define GET_FRU_INFO		0x10
+ #define GET_FRU_DATA		0x11
+ #define SET_FRU_DATA		0x12
++#define FRU_AREA_COUNT		5
+ 
+ enum {
+ 	FRU_CHASSIS_PARTNO,
+@@ -82,7 +83,7 @@ struct fru_header {
+ 			uint8_t product;
+ 			uint8_t multi;
+ 		} offset;
+-		uint8_t offsets[5];
++		uint8_t offsets[FRU_AREA_COUNT];
+ 	};
+ 	uint8_t pad;
+ 	uint8_t checksum;
+diff --git a/lib/ipmi_fru.c b/lib/ipmi_fru.c
+index 3d1d8a1..2687635 100644
+--- a/lib/ipmi_fru.c
++++ b/lib/ipmi_fru.c
+@@ -5044,43 +5044,91 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
+ 		#endif
+ 
+ 		/* Must move sections */
+-		/* Section that can be modified are as follow
+-			Chassis
+-			Board
+-			product */
+-
+-		/* Chassis type field */
+-		if (f_type == 'c' )
++		/* IPMI FRU Spec does not specify the order of areas in the FRU.
++		 * Therefore, we must check each section's current offset in order to determine
++		 * which areas much be adjusted.
++		 */
++		
++		/* The Internal Use Area does not require the area length be provided, so we must
++		 * work to calculate the length.
++		 */
++		bool internal_move = false;
++		uint8_t nearest_area = fru.size;
++		uint8_t last_area = 0x00;
++		uint32_t end_of_fru;
++		if (header.offset.internal != 0 && header.offset.internal > header_offset)
+ 		{
+-			printf("Moving Section Chassis, from %i to %i\n",
+-						((header.offset.board) * 8),
+-						((header.offset.board + change_size_by_8) * 8)
+-					);
+-			memcpy(
+-						(fru_data_new + ((header.offset.board + change_size_by_8) * 8)),
+-						(fru_data_old + (header.offset.board) * 8),
+-						board_len
+-					);
+-			header.offset.board   += change_size_by_8;
++			internal_move = true;
+ 		}
+-		/* Board type field */
+-		if ((f_type == 'c' ) || (f_type == 'b' ))
++		/* Check Chassis, Board, Product, and Multirecord Area offsets to see if they need
++		 * to be moved.
++		 */
++		for (int i = 0; i < FRU_AREA_COUNT; i++)
+ 		{
+-			printf("Moving Section Product, from %i to %i\n",
+-						((header.offset.product) * 8),
+-						((header.offset.product + change_size_by_8) * 8)
+-					);
+-			memcpy(
+-						(fru_data_new + ((header.offset.product + change_size_by_8) * 8)),
+-						(fru_data_old + (header.offset.product) * 8),
+-						product_len
+-					);
+-			header.offset.product += change_size_by_8;
++			#ifdef DBG_RESIZE_FRU
++			printf("Offset: %i", header.offsets[i] * 8);
++			#endif
++			/* Offset of zero means area does not exist.
++			 * Internal Use Area must be handled separately
++			 */
++			if (header.offsets[i] <= 0 || header.offsets[i] == header.offset.internal)
++			{
++#ifdef DBG_RESIZE_FRU
++				printf("\n");
++#endif
++				continue;
++			}
++			/* Internal Use Area length will be calculated by finding the closest area
++			 * following it.
++			 */
++			if (internal_move && header.offsets[i] > header.offset.internal &&
++				header.offsets[i] < nearest_area)
++			{
++				nearest_area = header.offsets[i];
++			}
++			if (last_area < header.offsets[i])
++			{
++				last_area = header.offsets[i];
++				end_of_fru = (header.offsets[i] + *(fru_data_old + (header.offsets[i] * 8) + 1)) * 8;
++				if (header.offsets[i] == header.offset.multi)
++				{
++					end_of_fru = (header.offsets[i] + *(fru_data_old + (header.offsets[i] * 8) + 1)) * 8;
++				}
++			}
++			if ((header.offsets[i] * 8) > header_offset)
++			{
++#ifdef DBG_RESIZE_FRU
++				printf(" moving by %i bytes.", change_size_by_8 * 8);
++#endif
++				uint32_t length = *(fru_data_old + (header.offsets[i] * 8) + 1) * 8;
++				/* MultiRecord Area length is third byte rather than second. */
++				if(header.offsets[i] == header.offset.multi)
++				{
++					length = *(fru_data_old + (header.offsets[i] * 8) + 2) * 8;
++				}
++				memcpy(
++					(fru_data_new + ((header.offsets[i] + change_size_by_8) * 8)),
++					(fru_data_old + (header.offsets[i]) * 8),
++					length
++				);
++				header.offsets[i] += change_size_by_8;
++			}
++#ifdef DBG_RESIZE_FRU
++			printf("\n");
++#endif
+ 		}
+-
+-		if ((f_type == 'c' ) || (f_type == 'b' ) || (f_type == 'p' )) {
+-			printf("Change multi offset from %d to %d\n", header.offset.multi, header.offset.multi + change_size_by_8);
+-			header.offset.multi += change_size_by_8;
++		if (internal_move)
++		{
++			/* If the internal area is the final area in the FRU, then the only bearing
++			 * we have for the length of the FRU is the size of the FRU.
++			 */
++			uint32_t length = nearest_area - header.offset.internal;
++			memcpy(
++				(fru_data_new + ((header.offset.internal + change_size_by_8) * 8)),
++				(fru_data_old + (header.offset.internal) * 8),
++				length
++			);
++			header.offset.internal += change_size_by_8;
+ 		}
+ 
+ 		/* Adjust length of the section */
+@@ -5110,27 +5158,18 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
+ 			memcpy(fru_data_new, pfru_header, sizeof(struct fru_header));
+ 		}
+ 
+-		/* Move remaining sections in 1 copy */
+-		printf("Moving Remaining Bytes (Multi-Rec , etc..), from %i to %i\n",
+-					remaining_offset,
+-					((header.offset.product) * 8) + product_len_new
+-				);
+-		if(((header.offset.product * 8) + product_len_new - remaining_offset) < 0)
+-		{
+-			memcpy(
+-						fru_data_new + (header.offset.product * 8) + product_len_new,
+-						fru_data_old + remaining_offset,
+-						fru.size - remaining_offset
+-					);
+-		}
+-		else
++		/* If FRU has shrunk in size, zero-out any leftover data */
++		if (change_size_by_8 < 0)
+ 		{
+-			memcpy(
+-						fru_data_new + (header.offset.product * 8) + product_len_new,
+-						fru_data_old + remaining_offset,
+-						fru.size - ((header.offset.product * 8) + product_len_new)
+-					);
++			end_of_fru += change_size_by_8 * 8;
++			int length_of_erase = change_size_by_8 * -1 * 8;
++#ifdef DBG_RESIZE_FRU
++			printf("Erasing leftover data from %i to %i\n", end_of_fru, end_of_fru + length_of_erase);
++#endif
++			memset(fru_data_new + end_of_fru, 0, length_of_erase);
+ 		}
++		/* Step 7 assumes fru.size is the size of the new FRU. */
++		fru.size += (change_size_by_8 * 8);
+ 	}
+ 
+ 	/* Update only if it's fits padding length as defined in the spec, otherwise, it's an internal
+-- 
+2.25.1
+

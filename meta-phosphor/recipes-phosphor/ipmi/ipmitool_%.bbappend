@@ -5,6 +5,12 @@ SRCREV = "c3939dac2c060651361fc71516806f9ab8c38901"
 PV = "1.8.18+git${SRCPV}"
 
 SRC_URI = "git://github.com/ipmitool/ipmitool.git;protocol=https;branch=master"
+
+# Temporary patch for https://codeberg.org/IPMITool/ipmitool/pulls/1
+SRC_URI += " \
+    file://0001-Fru-Fix-edit-field-not-checking-area-existence.patch \
+"
+
 # TODO: when a new company joins the OpenBMC project by signing
 #       a CLA, if they have an enterprise number on file with the
 #       IANA, the versioned file, $PWD/ipmitool/enterprise-numbers
