@@ -67,14 +67,6 @@ function get_gpio_ctrl() {
     echo "$GPIO_NUM" > /sys/class/gpio/unexport
 }
 
-# rst_bios_spi
-# Resets BIOS SPI EEPROM
-rst_bios_spi() {
-  echo "Reset BIOS SPI EEPROM"
-  set_gpio_ctrl RST_BIOS_EEPROM0_N 0
-  sleep 1
-  set_gpio_ctrl RST_BIOS_EEPROM0_N 1
-}
 
 function Does_File_Exist() {
   local FILE=$1
@@ -137,8 +129,6 @@ I2C_FANCTRL=(35 2c)
 I2C_BMC_PWRSEQ=(48 59)
 I2C_MB_PWRSEQ=(40 40)
 I2C_CPU_EEPROM=(19 50)
-I2C_STBUCK=(33 74)
-I2C_HOTSWAP_CTRL=(25 1f)
 
 # File Path Definition
 # File path used to prevent hotswapping
