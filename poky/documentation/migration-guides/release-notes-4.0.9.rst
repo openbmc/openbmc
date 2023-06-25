@@ -54,7 +54,7 @@ Fixes in Yocto-4.0.9
 -  gcc-shared-source: do not use ${S}/.. in deploy_source_date_epoch
 -  glibc: Add missing binutils dependency
 -  image_types: fix multiubi var init
--  iso-codes: upgrade to  4.13.0
+-  iso-codes: upgrade to 4.13.0
 -  json-c: Add ptest for json-c
 -  kernel-yocto: fix kernel-meta data detection
 -  lib/buildstats: handle tasks that never finished

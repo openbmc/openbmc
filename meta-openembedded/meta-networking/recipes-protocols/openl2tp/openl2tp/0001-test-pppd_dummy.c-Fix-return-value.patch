@@ -9,6 +9,8 @@ declaration
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  test/pppd_dummy.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 

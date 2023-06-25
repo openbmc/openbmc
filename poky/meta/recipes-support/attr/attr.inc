@@ -22,7 +22,7 @@ inherit ptest update-alternatives autotools gettext
 
 PACKAGES =+ "lib${BPN}"
 
-FILES:lib${BPN} = "${libdir}/lib*${SOLIBS}"
+FILES:lib${BPN} = "${libdir}/lib*${SOLIBS} ${sysconfdir}"
 
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE:${PN} = "setfattr"

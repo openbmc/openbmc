@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -rupN libspatialite-5.0.1/spatialite.pc.in libspatialite-5.0.1-new/spatialite.pc.in
 --- libspatialite-5.0.1/spatialite.pc.in	2021-02-07 16:53:46.000000000 +0100
 +++ libspatialite-5.0.1-new/spatialite.pc.in	2021-02-10 09:54:09.647552994 +0100

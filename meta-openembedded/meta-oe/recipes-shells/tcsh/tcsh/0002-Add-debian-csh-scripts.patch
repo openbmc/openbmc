@@ -5,6 +5,8 @@ Subject: [PATCH 2/2] Add debian csh scripts
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  csh.cshrc  | 15 +++++++++++++++
  csh.login  |  8 ++++++++
  csh.logout |  1 +

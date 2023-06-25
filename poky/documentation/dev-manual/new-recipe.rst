@@ -1603,7 +1603,7 @@ in the BitBake User Manual.
    space. Also, the operator is applied after all the ``+=``, and ``=+``
    operators have been applied and after all ``=`` assignments have
    occurred. This means that if ``:append`` is used in a recipe, it can
-   only be overridden by another layer using the  special ``:remove``
+   only be overridden by another layer using the special ``:remove``
    operator, which in turn will prevent further layers from adding it back.
 
    The following example shows the space being explicitly added to the

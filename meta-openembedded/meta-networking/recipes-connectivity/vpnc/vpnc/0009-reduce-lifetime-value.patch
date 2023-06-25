@@ -12,6 +12,8 @@ don't.
 Reducing the lifetime from its current value to 28800 (exactly 8 hours)
 causes it to start working with fortigate devices.
 ---
+Upstream-Status: Pending
+
  vpnc.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

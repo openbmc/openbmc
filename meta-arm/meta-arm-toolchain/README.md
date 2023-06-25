@@ -1,25 +1,10 @@
 meta-arm-toolchain Yocto Layer
 ==============================
 
-This layer contains recipes for GNU Arm toolchains which could either be built
-from source or pre-built toolchain binaries.
+This layer contains recipes for the prebuilt GNU Arm toolchains.
 
 Information regarding contributing, reporting bugs, etc can be found in the
 top-level meta-arm readme file.
-
-Source Arm toolchain for Linux development
-------------------------------------------
-
-Recipes for GNU Arm toolchain built from source are provided under
-``recipes-devtools/gcc/``. In order to use Arm toolchain instead of OE core
-toolchain, one just needs to override ``GCCVERSION`` in corresponding distro
-conf file.
-
--  Eg. to use GNU Arm toolchain version ``9.2``
-   GCCVERSION = "arm-9.2"
-
-Pre-built Arm toolchain for Linux development
----------------------------------------------
 
 Recipes for pre-built GNU Arm toolchain for Linux development are provided under
 ``recipes-devtools/external-arm-toolchain/``.

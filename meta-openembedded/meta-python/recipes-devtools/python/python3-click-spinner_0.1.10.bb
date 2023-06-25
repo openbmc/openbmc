@@ -7,3 +7,5 @@ SRC_URI[md5sum] = "ab68ed404401421819c81cc6c0677a87"
 SRC_URI[sha256sum] = "87eacf9d7298973a25d7615ef57d4782aebf913a532bba4b28a37e366e975daf"
 
 inherit pypi setuptools3
+
+RDEPENDS:${PN} += "python3-json"

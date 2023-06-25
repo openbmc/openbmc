@@ -1,7 +1,7 @@
-From 9fe30f542939824f731fda3991a1d4f66fbf3b4b Mon Sep 17 00:00:00 2001
+From 1dcebf6f57e3490f7b3e2464b4114b993dd70c7c Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 4 Aug 2022 16:46:47 +0100
-Subject: [PATCH 02/27] lib: uuid: introduce uuid_str_to_le_bin function
+Subject: [PATCH 02/42] lib: uuid: introduce uuid_str_to_le_bin function
 
 convert UUID string to little endian binary data
 
@@ -42,7 +42,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  2 files changed, 54 insertions(+)
 
 diff --git a/include/uuid.h b/include/uuid.h
-index 4a4883d3b5b6..293a8eb0a579 100644
+index 4a4883d3b5..293a8eb0a5 100644
 --- a/include/uuid.h
 +++ b/include/uuid.h
 @@ -2,6 +2,8 @@
@@ -66,7 +66,7 @@ index 4a4883d3b5b6..293a8eb0a579 100644
 +
  #endif
 diff --git a/lib/uuid.c b/lib/uuid.c
-index 465e1ac38f57..d29f561a70df 100644
+index 465e1ac38f..d29f561a70 100644
 --- a/lib/uuid.c
 +++ b/lib/uuid.c
 @@ -1,6 +1,8 @@
@@ -130,5 +130,5 @@ index 465e1ac38f57..d29f561a70df 100644
   * uuid_bin_to_str() - convert big endian binary data to string UUID or GUID.
   *
 -- 
-2.39.1
+2.25.1
 

@@ -5,6 +5,8 @@ Subject: [PATCH] usl_timer: Check for return value of write() API
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  usl/usl_timer.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -Naur octave-4.4.1.orig/configure.ac octave-4.4.1/configure.ac
 --- octave-4.4.1.orig/configure.ac	2019-02-23 10:46:24.287240571 +0000
 +++ octave-4.4.1/configure.ac	2019-02-23 10:46:42.255249333 +0000

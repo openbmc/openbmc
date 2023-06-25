@@ -1,7 +1,7 @@
-From c9503083c042e453be3178a79ba3ff81e8d7ca17 Mon Sep 17 00:00:00 2001
+From 155f20028ad5f3ba5d2362ec48abb7804eaade00 Mon Sep 17 00:00:00 2001
 From: Jon Mason <jon.mason@arm.com>
 Date: Wed, 30 Nov 2022 18:59:59 +0000
-Subject: [PATCH 21/27] corstone1000: add compressed kernel support
+Subject: [PATCH 21/42] corstone1000: add compressed kernel support
 
 The corstone1000 kernel has become too large to fit in the available
 storage.  Swtiching to a compressed kernel avoids the problem, but
@@ -17,7 +17,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index f7c276a10a6e..1179bf5f3bfd 100644
+index f7c276a10a..1179bf5f3b 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -15,7 +15,7 @@ CONFIG_FIT=y
@@ -30,5 +30,5 @@ index f7c276a10a6e..1179bf5f3bfd 100644
  CONFIG_LOGLEVEL=7
  # CONFIG_DISPLAY_CPUINFO is not set
 -- 
-2.39.1
+2.25.1
 

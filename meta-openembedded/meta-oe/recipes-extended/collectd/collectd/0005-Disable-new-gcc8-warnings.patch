@@ -9,6 +9,8 @@ already in place
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  src/libcollectdclient/network_parse.c | 7 +++++++
  src/write_sensu.c                     | 7 +++++++
  2 files changed, 14 insertions(+)

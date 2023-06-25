@@ -1,5 +1,5 @@
-# Add an extra DISTRO_FEATURE
-DISTRO_FEATURES:append = " pam"
+# Add extra DISTRO_FEATUREs
+DISTRO_FEATURES:append = " pam usrmerge"
 
 # Use the LTSI Kernel
 PREFERRED_VERSION_linux-yocto = "6.1%"

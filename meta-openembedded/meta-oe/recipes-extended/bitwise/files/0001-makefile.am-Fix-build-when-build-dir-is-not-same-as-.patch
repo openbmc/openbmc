@@ -8,6 +8,8 @@ This ensures right include paths are added to compiler
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

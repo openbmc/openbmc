@@ -8,6 +8,8 @@ reproducible and contaminates it with host builder paths. Instead
 make it take CMAKE_DEBUG_SRCDIR that can be set to a known
 reproducible value
 ---
+Upstream-Status: Pending
+
  include/fluent-bit/flb_info.h.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

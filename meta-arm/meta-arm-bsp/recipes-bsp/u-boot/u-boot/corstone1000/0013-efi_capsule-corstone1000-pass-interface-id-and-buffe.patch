@@ -1,7 +1,7 @@
-From 8727a1b34fb500ca5cce6fc1c30a1d73bf23aaba Mon Sep 17 00:00:00 2001
+From baa961b6050508710e1c6b572f2e93ac5c488201 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 10 Dec 2021 20:03:35 +0000
-Subject: [PATCH 13/27] efi_capsule: corstone1000: pass interface id and buffer
+Subject: [PATCH 13/42] efi_capsule: corstone1000: pass interface id and buffer
  event id using register w4
 
 Initially the interface/event IDs are passed to the SP using register
@@ -23,7 +23,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  2 files changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
-index cd30499e3c9c..e4c7bcb96f27 100644
+index cd30499e3c..e4c7bcb96f 100644
 --- a/include/configs/corstone1000.h
 +++ b/include/configs/corstone1000.h
 @@ -24,6 +24,12 @@
@@ -40,7 +40,7 @@ index cd30499e3c9c..e4c7bcb96f27 100644
  #define CORSTONE1000_CAPSULE_BUFFER_SIZE	(8192) /* 32 MB */
  
 diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
-index 9e8ddaac7f03..bd4cc8d27285 100644
+index 9e8ddaac7f..bd4cc8d272 100644
 --- a/lib/efi_loader/efi_capsule.c
 +++ b/lib/efi_loader/efi_capsule.c
 @@ -29,6 +29,8 @@
@@ -70,5 +70,5 @@ index 9e8ddaac7f03..bd4cc8d27285 100644
  	return ffa_bus_ops_get()->sync_send_receive(NULL, CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
  }
 -- 
-2.39.1
+2.25.1
 

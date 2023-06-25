@@ -14,4 +14,9 @@ S = "${WORKDIR}/git"
 inherit setuptools3
 PIP_INSTALL_PACKAGE = "configshell_fb"
 
-RDEPENDS:${PN} += "python3-modules python3-fcntl python3-six"
+RDEPENDS:${PN} += " \
+    python3-fcntl \
+    python3-modules \
+    python3-pyparsing \
+    python3-six \
+"

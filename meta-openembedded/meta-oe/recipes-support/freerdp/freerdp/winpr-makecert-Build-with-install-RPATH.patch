@@ -9,6 +9,8 @@ Update it for 2.0.0.
 Signed-off-by: Manuel Bachmann <manuel.bachmann@iot.bzh>
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  winpr/tools/makecert-cli/CMakeLists.txt | 3 +++
  1 file changed, 3 insertions(+)
 

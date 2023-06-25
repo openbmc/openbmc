@@ -8,6 +8,8 @@ __sync* builtins are not implemented atleast for 64bit values
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  .../range/range_tree/lib/portability/toku_atomic.h   | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 

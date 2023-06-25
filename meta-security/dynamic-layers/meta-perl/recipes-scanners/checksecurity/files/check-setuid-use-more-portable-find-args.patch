@@ -3,6 +3,7 @@ From: Christopher Larson <chris_larson@mentor.com>
 Date: Wed, 5 Sep 2018 23:21:43 +0500
 Subject: [PATCH] check-setuid: use more portable find args
 
+Upstream-Status: Pending
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
 ---
  plugins/check-setuid | 6 +++---

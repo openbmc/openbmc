@@ -70,7 +70,7 @@ class Sdk(object, metaclass=ABCMeta):
         #FIXME: using umbrella exc catching because bb.utils method raises it
         except Exception as e:
             bb.debug(1, "printing the stack trace\n %s" %traceback.format_exc())
-            bb.error("unable to place %s in final SDK location" % sourcefile)
+            bb.fatal("unable to place %s in final SDK location" % sourcefile)
 
     def mkdirhier(self, dirpath):
         try:

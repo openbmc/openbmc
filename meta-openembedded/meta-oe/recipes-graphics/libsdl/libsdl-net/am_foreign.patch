@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -Nurd SDL_net-1.2.8/Makefile.am SDL_net-1.2.8/Makefile.am
 --- SDL_net-1.2.8/Makefile.am	2012-01-15 18:20:10.000000000 +0200
 +++ SDL_net-1.2.8/Makefile.am	2014-08-01 21:18:52.720815807 +0300

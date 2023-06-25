@@ -13,6 +13,8 @@ Link: https://lore.kernel.org/all/20230113173033.4380-1-palmer@rivosinc.com/
 Cc: linux-hardening@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
+Upstream-Status: Pending
+
  scripts/gcc-plugins/gcc-common.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

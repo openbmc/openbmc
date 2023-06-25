@@ -47,6 +47,8 @@ in upstream.
 
 Signed-off-by: Seiichi Ishitsuka <ishitsuka.sc@ncos.nec.co.jp>
 ---
+Upstream-Status: Pending
+
  telnetd/ext.h      |  1 +
  telnetd/sys_term.c | 17 ++++++++++++++++-
  telnetd/telnetd.c  |  2 +-

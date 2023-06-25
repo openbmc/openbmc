@@ -7,3 +7,11 @@ SRC_URI[md5sum] = "7dd2f1830737dc142aa199f77dacf32e"
 SRC_URI[sha256sum] = "e471f251b94e8cadf6e4214f0f3b7b36678848aaa8c51cd5638ab23ecb716f75"
 
 inherit pypi setuptools3
+
+RDEPENDS:${PN} += " \
+    python3-fann2 \
+    python3-json \
+    python3-multiprocessing \
+    python3-padaos \
+    python3-xxhash \
+"

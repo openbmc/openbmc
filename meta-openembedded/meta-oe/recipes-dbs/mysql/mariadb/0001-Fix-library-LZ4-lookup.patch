@@ -6,6 +6,8 @@ Subject: [PATCH] Fix library LZ4 lookup.
 Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
+Upstream-Status: Pending
+
  cmake/FindLZ4.cmake | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)
 

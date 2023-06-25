@@ -7,6 +7,8 @@ This helps in compiling with non-gcc compilers
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile.ffmpeg | 22 ++++++++++++++--------
  1 file changed, 14 insertions(+), 8 deletions(-)
 

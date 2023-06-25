@@ -5,6 +5,8 @@ Subject: [PATCH] bcm43xx: The UART speed must be reset after the firmware
  download
 
 ---
+Upstream-Status: Pending
+
  tools/hciattach_bcm43xx.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 

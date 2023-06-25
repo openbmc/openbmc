@@ -9,6 +9,8 @@ This was removed after a discussion on IRC with the weston guys
 
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
+Upstream-Status: Pending
+
  interface/vmcs_host/vc_vchi_dispmanx.c | 1 -
  1 file changed, 1 deletion(-)
 

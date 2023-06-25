@@ -11,4 +11,7 @@ PYPI_PACKAGE = "Flask-Mail"
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} = "${PYTHON_PN}-flask"
+RDEPENDS:${PN} = " \
+    python3-blinker \
+    python3-flask \
+"

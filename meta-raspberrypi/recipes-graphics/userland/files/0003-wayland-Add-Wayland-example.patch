@@ -4,6 +4,8 @@ Date: Tue, 1 Oct 2013 13:19:20 +0200
 Subject: [PATCH] wayland: Add Wayland example
 
 ---
+Upstream-Status: Pending
+
  .../linux/apps/hello_pi/CMakeLists.txt        |   1 +
  .../linux/apps/hello_pi/Makefile              |   2 +
  .../hello_pi/hello_wayland/CMakeLists.txt     |   8 +

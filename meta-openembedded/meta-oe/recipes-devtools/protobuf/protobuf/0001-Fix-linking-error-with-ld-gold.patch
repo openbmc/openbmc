@@ -21,6 +21,8 @@ N/A
               protobuf-3.11.4
 
 ---
+Upstream-Status: Pending
+
  src/libprotobuf-lite.map | 2 ++
  src/libprotobuf.map      | 2 ++
  src/libprotoc.map        | 2 ++

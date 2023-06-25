@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 install binaries from builddir not srcdir.
 
 Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>

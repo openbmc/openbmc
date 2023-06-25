@@ -20,6 +20,8 @@ Compiling this on FreeBSD with CLang fails due to:
 1 error generated.
 ```
 ---
+Upstream-Status: Pending
+
  thirdparty/rocksdb/util/channel.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

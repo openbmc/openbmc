@@ -13,6 +13,8 @@ ioctl is not supported by the filesystem.
 
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
+Upstream-Status: Pending
+
  src/evmctl.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
@@ -30,6 +32,8 @@ index 6d2bb67..c35a28c 100644
  			int fd = open(file, 0);
  
 ---
+Upstream-Status: Pending
+
 2.39.2
 
 

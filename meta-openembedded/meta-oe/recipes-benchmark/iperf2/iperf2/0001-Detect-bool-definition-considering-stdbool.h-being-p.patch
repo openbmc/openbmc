@@ -13,6 +13,8 @@ template <>          struct __libcpp_is_integral<int>                : public tr
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  m4/dast.m4 | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 

@@ -7,11 +7,9 @@ SECTION = "base"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-PV = "4.5.1"
-SRCREV = "afdd63fc386919b4aa40d573b0a6069414d14317"
-SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https;branch=master \
-           file://0001-install-manpages.sh-do-not-write-original-timestamps.patch \
-           "
+PV = "4.6.1"
+SRCREV = "d8cb82d9840330f9344ec37b992595b5d7b44184"
+SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https;branch=v6.1.1"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
 S = "${WORKDIR}/git"

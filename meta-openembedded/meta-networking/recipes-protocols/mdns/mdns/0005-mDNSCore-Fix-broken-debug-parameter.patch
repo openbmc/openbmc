@@ -5,6 +5,8 @@ Subject: [PATCH 5/6] mDNSCore: Fix broken debug parameter
 
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 ---
+Upstream-Status: Pending
+
  mDNSCore/mDNS.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

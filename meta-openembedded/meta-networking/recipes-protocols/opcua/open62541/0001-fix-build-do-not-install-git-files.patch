@@ -5,6 +5,8 @@ Subject: [PATCH] fix(build): do not install git files
 
 Signed-off-by: Vyacheslav Yurkov <v.yurkov@precitec.de>
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt | 1 +
  1 file changed, 1 insertion(+)
 

@@ -5,6 +5,8 @@ Subject: [PATCH 5/5] check for libexecinfo during configure
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  configure.ac | 6 ++++++
  1 file changed, 6 insertions(+)
 

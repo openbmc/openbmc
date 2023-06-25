@@ -6,6 +6,8 @@ Subject: [PATCH] Use standard int64_t instead of __int64_t for mingw cross
 
 Signed-off-by: Joachim Nilsson <troglobit@gmail.com>
 ---
+Upstream-Status: Pending
+
  include/libnet/libnet-structures.h | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

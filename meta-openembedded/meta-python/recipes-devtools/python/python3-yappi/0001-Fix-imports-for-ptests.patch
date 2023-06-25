@@ -5,6 +5,8 @@ Subject: [PATCH] Fix imports for tests
 
 Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
 ---
+Upstream-Status: Pending
+
  tests/test_asyncio.py              | 2 +-
  tests/test_asyncio_context_vars.py | 2 +-
  tests/test_functionality.py        | 2 +-

@@ -29,6 +29,7 @@ do_configure() {
 	for t in prepare scripts_basic scripts; do
 		oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
 		AR="${KERNEL_AR}" OBJCOPY="${KERNEL_OBJCOPY}" \
+		STRIP="${KERNEL_STRIP}" \
 		-C ${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} $t
 	done
 }

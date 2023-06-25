@@ -7,6 +7,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -23,6 +24,11 @@ int main(int argc, char** argv) {
     if (var && var[0] != '\0') {
         execvp(var, argv);
         return 1;
+    }
+
+    if (argc == 2 && strcmp(argv[1], "--help") == 0) {
+        fprintf(stderr, "Helper function to find and exec qemu-bridge-helper. Set QEMU_BRIDGE_HELPER to override default search path\n");
+        return 0;
     }
 
     try_program("/usr/libexec/qemu-bridge-helper", argv);

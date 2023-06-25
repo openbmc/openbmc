@@ -7,6 +7,8 @@ Fixes build with hardening flags
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  rpcgen/rpc_hout.c   | 2 +-
  rpcgen/rpc_tblout.c | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)

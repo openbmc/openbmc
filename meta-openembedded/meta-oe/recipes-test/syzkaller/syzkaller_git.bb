@@ -8,8 +8,9 @@ GO_IMPORT = "github.com/google/syzkaller"
 
 SRC_URI = "git://${GO_IMPORT};protocol=https;destsuffix=${BPN}-${PV}/src/${GO_IMPORT};branch=master \
            file://0001-sys-targets-targets.go-allow-users-to-override-hardc.patch;patchdir=src/${GO_IMPORT} \
+           file://0001-executor-Include-missing-linux-falloc.h.patch;patchdir=src/${GO_IMPORT} \
            "
-SRCREV = "67cb024cd1a3c95e311263a5c95e957f9abfd8ca"
+SRCREV = "6d01f20890edf11b99bb54573025b11c1acd2d52"
 
 COMPATIBLE_HOST = "(x86_64|i.86|arm|aarch64).*-linux"
 
@@ -23,7 +24,7 @@ export TARGETOS = '${GOOS}'
 export TARGETARCH = '${GOARCH}'
 export TARGETVMARCH = '${GOARCH}'
 
-CGO_ENABLED = "0"
+CGO_ENABLED = "1"
 
 DEPENDS:class-native += "qemu-system-native"
 

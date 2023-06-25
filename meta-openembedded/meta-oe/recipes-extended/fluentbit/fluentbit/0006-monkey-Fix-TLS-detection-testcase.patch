@@ -13,6 +13,8 @@ error: call to undeclared function '__tls_get_addr'; ISO C99 and later do not su
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/monkey/CMakeLists.txt | 2 ++
  1 file changed, 2 insertions(+)
 

@@ -7,6 +7,8 @@ musl does not have this API
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  utils/wvcrash.cc | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

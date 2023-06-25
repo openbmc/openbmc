@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 
 http://cvs.fedoraproject.org/viewvc/devel/libwmf/libwmf-0.2.8.4-useafterfree.patch?view=log
 Resolves: CVE-2009-1364

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: ecryptfs-utils-111/src/utils/mount.ecryptfs_private.c
 ===================================================================
 --- ecryptfs-utils-111.orig/src/utils/mount.ecryptfs_private.c

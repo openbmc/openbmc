@@ -13,9 +13,13 @@ SRC_URI[sha256sum] = "5bf004ceffccae881213fb722f34517166b84a34919b92ffc14d1dbd05
 
 inherit pypi setuptools3 ptest
 
+RDEPENDS:${PN} += " \
+    python3-requests \
+    python3-unittest \
+"
+
 RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-requests \
 "
 
 do_install_ptest() {

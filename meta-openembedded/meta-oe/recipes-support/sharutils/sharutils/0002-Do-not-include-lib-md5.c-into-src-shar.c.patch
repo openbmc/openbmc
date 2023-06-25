@@ -20,6 +20,8 @@ shar.o:shar.c:(.text+0x28): first defined here
 Signed-off-by: Petr PÃ­saÅ™ <address@hidden>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/shar.c | 1 -
  1 file changed, 1 deletion(-)
 

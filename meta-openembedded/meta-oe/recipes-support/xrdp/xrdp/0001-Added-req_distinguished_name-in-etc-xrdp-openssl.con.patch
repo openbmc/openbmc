@@ -6,6 +6,8 @@ Subject: [PATCH] Added  req_distinguished_name in /etc/xrdp/openssl.conf,
 
 Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  keygen/openssl.conf | 8 ++++++++
  1 file changed, 8 insertions(+)
 

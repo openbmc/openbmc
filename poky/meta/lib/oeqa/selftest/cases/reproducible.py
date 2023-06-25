@@ -128,15 +128,23 @@ class DiffoscopeTests(OESelftestTestCase):
 class ReproducibleTests(OESelftestTestCase):
     # Test the reproducibility of whatever is built between sstate_targets and targets
 
-    package_classes = ['deb', 'ipk', 'rpm']
+    package_classes = get_bb_var("OEQA_REPRODUCIBLE_TEST_PACKAGE")
+    if package_classes:
+        package_classes = package_classes.split()
+    else:
+        package_classes = ['deb', 'ipk', 'rpm']
 
     # Maximum report size, in bytes
     max_report_size = 250 * 1024 * 1024
 
     # targets are the things we want to test the reproducibility of
-    targets = ['core-image-minimal', 'core-image-sato', 'core-image-full-cmdline', 'core-image-weston', 'world']
+    targets = get_bb_var("OEQA_REPRODUCIBLE_TEST_TARGET")
+    if targets:
+        targets = targets.split()
+    else:
+        targets = ['core-image-minimal', 'core-image-sato', 'core-image-full-cmdline', 'core-image-weston', 'world']
     # sstate targets are things to pull from sstate to potentially cut build/debugging time
-    sstate_targets = []
+    sstate_targets = (get_bb_var("OEQA_REPRODUCIBLE_TEST_SSTATE_TARGETS") or "").split()
     save_results = False
     if 'OEQA_DEBUGGING_SAVED_OUTPUT' in os.environ:
         save_results = os.environ['OEQA_DEBUGGING_SAVED_OUTPUT']

@@ -6,6 +6,8 @@ Organization: O.S. Systems Software LTDA.
 
 Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
 ---
+Upstream-Status: Pending
+
  src/ethtool-local.h | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

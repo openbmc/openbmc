@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Dont assume errno type
 
 --- ez-ipupdate-3.0.11b7/cache_file.c.orig	2014-07-02 14:01:07.126029412 -0600

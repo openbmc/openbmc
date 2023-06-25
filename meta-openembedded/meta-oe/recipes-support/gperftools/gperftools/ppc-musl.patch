@@ -4,6 +4,8 @@ Date: Sat, 13 Mar 2021 00:42:25 -0800
 Subject: [PATCH] Compatibility fixes for musl.
 
 ---
+Upstream-Status: Pending
+
  m4/pc_from_ucontext.m4             | 4 +++-
  src/getpc.h                        | 3 +++
  src/stacktrace_powerpc-linux-inl.h | 8 ++++++--

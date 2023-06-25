@@ -3,6 +3,8 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 13 Feb 2016 11:42:29 -0800
 
 ---
+Upstream-Status: Pending
+
  omx/gstomxvideodec.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

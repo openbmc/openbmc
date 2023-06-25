@@ -1,5 +1,7 @@
 reproducibility fixed path to posixshell
 ---
+Upstream-Status: Pending
+
  sntp/libopts/m4/libopts.m4 | 7 -------
  1 file changed, 7 deletions(-)
 

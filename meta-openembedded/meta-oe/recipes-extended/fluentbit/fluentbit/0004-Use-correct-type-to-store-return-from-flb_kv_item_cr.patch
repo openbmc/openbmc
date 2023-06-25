@@ -8,6 +8,8 @@ error: incompatible pointer to integer conversion assigning to 'int' from 'struc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  plugins/out_stackdriver/stackdriver_conf.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

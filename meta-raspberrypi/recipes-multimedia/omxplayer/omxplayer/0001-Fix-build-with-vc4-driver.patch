@@ -5,6 +5,8 @@ Subject: [PATCH] Fix build with vc4 driver
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  SubtitleRenderer.cpp | 7 ++++++-
  SubtitleRenderer.h   | 1 +
  2 files changed, 7 insertions(+), 1 deletion(-)

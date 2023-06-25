@@ -4,6 +4,8 @@ Date: Mon, 12 Jan 2015 11:52:35 +0800
 Subject: [PATCH] crash: add new recipe
 
 ---
+Upstream-Status: Pending
+
  Makefile | 1 +
  1 file changed, 1 insertion(+)
 

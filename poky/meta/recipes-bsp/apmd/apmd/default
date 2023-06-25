@@ -1,8 +1,0 @@
-#
-# Default for /etc/init.d/apmd
-#
-
-# As apmd can be called with arguments, we use the following variable
-# to store them, e.g., APMD="-w 5 -p 2".
-# See the manual page apmd(8) for details.
-APMD="--proxy-timeout 30"

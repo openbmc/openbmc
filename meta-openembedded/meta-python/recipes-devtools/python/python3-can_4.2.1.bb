@@ -9,19 +9,21 @@ PYPI_PACKAGE="python-can"
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-aenum \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-codecs \
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-fcntl \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-misc \
-    ${PYTHON_PN}-netserver \
-    ${PYTHON_PN}-sqlite3 \
-    ${PYTHON_PN}-wrapt \
-    ${PYTHON_PN}-pkg-resources \
-    ${PYTHON_PN}-typing-extensions \
+RDEPENDS:${PN} += " \
+    python3-aenum \
+    python3-asyncio \
+    python3-codecs \
+    python3-compression \
+    python3-ctypes \
+    python3-fcntl \
+    python3-json \
+    python3-logging \
+    python3-misc \
+    python3-netserver \
+    python3-pkg-resources \
+    python3-sqlite3 \
+    python3-typing-extensions \
+    python3-wrapt \
 "
 
 BBCLASSEXTEND = "native nativesdk"

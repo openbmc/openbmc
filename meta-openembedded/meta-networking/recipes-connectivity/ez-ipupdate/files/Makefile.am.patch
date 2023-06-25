@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Remove EXTRASRC and EXTRAOBJ from obj list
 
 --- ez-ipupdate-3.0.11b7/Makefile.am.orig	2014-07-02 13:47:50.758034983 -0600

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- configure.ac.old	2005-06-03 12:53:28.000000000 +0200
 +++ configure.ac	2005-06-03 12:54:29.000000000 +0200
 @@ -25,9 +25,9 @@

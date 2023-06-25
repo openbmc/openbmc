@@ -1,0 +1,47 @@
+From dfebda98ce08d0cab411521ab3d9e832ed1b4608 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 15 Jun 2023 16:51:49 +0100
+Subject: [PATCH] corstone1000: fix compilation warnings in
+ fwu_plat_get_bootidx()
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+---
+ board/armltd/corstone1000/corstone1000.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
+index db508ac3cb..2e1ace5d04 100644
+--- a/board/armltd/corstone1000/corstone1000.c
++++ b/board/armltd/corstone1000/corstone1000.c
+@@ -9,6 +9,7 @@
+ #include <common.h>
+ #include <dm.h>
+ #include <env.h>
++#include <fwu.h>
+ #include <netdev.h>
+ #include <nvmxip.h>
+ #include <part.h>
+@@ -116,7 +117,7 @@ int dram_init_banksize(void)
+ 	return 0;
+ }
+ 
+-void fwu_plat_get_bootidx(int *boot_idx)
++void fwu_plat_get_bootidx(uint *boot_idx)
+ {
+ 	int ret;
+ 
+@@ -127,9 +128,7 @@ void fwu_plat_get_bootidx(int *boot_idx)
+ 	 */
+ 	ret = fwu_get_active_index(boot_idx);
+ 	if (ret < 0)
+-		log_err("corstone1000: failed to read active index\n");
+-
+-	return ret;
++		log_err("corstone1000: failed to read active index err %d\n", ret);
+ }
+ 
+ int board_late_init(void)
+-- 
+2.25.1
+

@@ -10,3 +10,8 @@ PYPI_PACKAGE = "dbus_next"
 inherit pypi setuptools3
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS:${PN} += " \
+    python3-asyncio \
+    python3-xml \
+"

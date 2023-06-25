@@ -1469,6 +1469,7 @@ class DevtoolUpdateTests(DevtoolBase):
     def test_devtool_finish_modify_git_subdir(self):
         # Check preconditions
         testrecipe = 'dos2unix'
+        self.append_config('ERROR_QA:remove:pn-dos2unix = "patch-status"\n')
         bb_vars = get_bb_vars(['SRC_URI', 'S', 'WORKDIR', 'FILE'], testrecipe)
         self.assertIn('git://', bb_vars['SRC_URI'], 'This test expects the %s recipe to be a git recipe' % testrecipe)
         workdir_git = '%s/git/' % bb_vars['WORKDIR']

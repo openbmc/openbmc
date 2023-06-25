@@ -12,6 +12,7 @@ SRC_URI = "http://fwts.ubuntu.com/release/fwts-V${PV}.tar.gz;subdir=${BP} \
            file://0005-Undefine-PAGE_SIZE.patch \
            file://0006-use-intptr_t-to-fix-pointer-to-int-cast-issues.patch \
            file://0001-libfwtsiasl-Disable-parallel-builds-of-lex-bison-fil.patch \
+           file://0001-Makefile.am-Add-missing-link-with-zlib.patch \
            "
 SRC_URI[sha256sum] = "4af4e1e0f1ae9313297af722d744ba47a81c81bc5bdeab3f4f40837a39e4b808"
 

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Make install rules use DESTDIR.
 Split installation of the utilitity from the global install.
 

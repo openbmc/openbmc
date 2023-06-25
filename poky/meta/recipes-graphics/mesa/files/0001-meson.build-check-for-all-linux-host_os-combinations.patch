@@ -1,4 +1,4 @@
-From 3b4d6b89f644b43e507c08181fef06db4326f9da Mon Sep 17 00:00:00 2001
+From b251af67df5a6840d2e9cc06edae2c387f8778f1 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair@alistair23.me>
 Date: Thu, 14 Nov 2019 13:04:49 -0800
 Subject: [PATCH] meson.build: check for all linux host_os combinations
@@ -20,19 +20,19 @@ Signed-off-by: Alistair Francis <alistair@alistair23.me>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 172c64a..9b5294c 100644
+index 22385d8..15f48a6 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -173,7 +173,7 @@ with_any_opengl = with_opengl or with_gles1 or with_gles2
+@@ -121,7 +121,7 @@ with_any_opengl = with_opengl or with_gles1 or with_gles2
  # Only build shared_glapi if at least one OpenGL API is enabled
  with_shared_glapi = with_shared_glapi and with_any_opengl
  
 -system_has_kms_drm = ['openbsd', 'netbsd', 'freebsd', 'gnu/kfreebsd', 'dragonfly', 'linux', 'sunos', 'android'].contains(host_machine.system())
 +system_has_kms_drm = ['openbsd', 'netbsd', 'freebsd', 'gnu/kfreebsd', 'dragonfly', 'linux', 'sunos', 'android'].contains(host_machine.system()) or host_machine.system().startswith('linux')
  
- with_freedreno_kgsl = get_option('freedreno-kgsl')
- if with_freedreno_kgsl
-@@ -1076,7 +1076,7 @@ if cc.has_function('reallocarray')
+ gallium_drivers = get_option('gallium-drivers')
+ if gallium_drivers.contains('auto')
+@@ -909,7 +909,7 @@ if cc.has_function('fmemopen')
  endif
  
  # TODO: this is very incomplete

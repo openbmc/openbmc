@@ -8,6 +8,8 @@ No GNU_HASH in the elf binary
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

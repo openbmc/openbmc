@@ -10,6 +10,8 @@ the non-PIC version in the current directory.  This ensures that both non-PIC
 and PIC versions are available in the correct locations.
 
 ---
+Upstream-Status: Pending
+
  lib/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

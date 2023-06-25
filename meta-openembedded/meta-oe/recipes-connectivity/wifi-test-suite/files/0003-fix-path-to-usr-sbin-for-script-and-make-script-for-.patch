@@ -6,6 +6,8 @@ Subject: [PATCH 3/3] fix path to /usr/sbin for script and make script for
 
 Signed-off-by: Ankit Navik <ankit.tarot@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/wfa_cs.c           | 4 ++--
  scripts/dev_send_frame | 2 +-
  scripts/sta_reset_parm | 2 +-

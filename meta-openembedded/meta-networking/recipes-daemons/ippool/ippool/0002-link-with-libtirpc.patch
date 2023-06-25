@@ -7,6 +7,8 @@ musl needs it
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

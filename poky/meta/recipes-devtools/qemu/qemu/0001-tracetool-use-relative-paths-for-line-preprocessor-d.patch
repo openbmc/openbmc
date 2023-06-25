@@ -8,7 +8,7 @@ The event filename is an absolute path. Convert it to a relative path when
 writing '#line' directives, to preserve reproducibility of the generated
 output when different base paths are used.
 
-Upstream-Status: Pending
+Upstream-Status: Accepted [https://gitlab.com/qemu-project/qemu/-/commit/9d672e290475001fcecdcc9dc79ad088ff89d17f]
 
 ---
  scripts/tracetool/backend/ftrace.py | 4 +++-

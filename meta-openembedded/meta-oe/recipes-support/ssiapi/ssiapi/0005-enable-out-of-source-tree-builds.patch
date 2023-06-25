@@ -5,6 +5,8 @@ Subject: [PATCH] enable out of source tree builds
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/efi/Makefile.am      |  2 +-
  lib/engine/Makefile.am   |  2 +-
  lib/orom/Makefile.am     |  2 +-

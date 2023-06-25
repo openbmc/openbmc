@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Dont strip during install let the packaging handle it
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>

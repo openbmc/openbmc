@@ -5,6 +5,8 @@ Subject: [PATCH] Do not set PYTHON_INSTALL_DIR by running python.
 
 Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

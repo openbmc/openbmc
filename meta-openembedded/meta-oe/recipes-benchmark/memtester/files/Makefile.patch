@@ -5,6 +5,8 @@ Subject: [PATCH] memtester: Added patch to Makefile to change no-longer-supporte
 
 Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
 ---
+Upstream-Status: Pending
+
  Makefile |    4 ++--
  1 files changed, 2 insertions(+), 2 deletions(-)
 

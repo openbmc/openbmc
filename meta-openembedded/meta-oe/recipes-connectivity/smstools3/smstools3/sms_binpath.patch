@@ -3,6 +3,8 @@ From: Kai Ulrich <kaiu@gmx.de>
 Date: Wed, 18 Mar 2015 11:20:53 +0100
 
 ---
+Upstream-Status: Pending
+
  scripts/sms3 | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

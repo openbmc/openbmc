@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/pyproject.toml	2023-04-19 19:04:47.159474100 -0300
 +++ b/pyproject.toml	2023-05-04 08:08:12.289941765 -0300
 @@ -31,15 +31,15 @@

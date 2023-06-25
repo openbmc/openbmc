@@ -10,6 +10,8 @@ config.c:146:25: error: use of undeclared identifier 'CEOT'
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  config.c | 1 +
  1 file changed, 1 insertion(+)
 

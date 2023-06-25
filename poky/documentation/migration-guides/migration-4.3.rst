@@ -26,6 +26,16 @@ no longer the default supported configuration. This setting does not affect whic
 kernel versions SDKs will run against and does not affect which versions of the kernel
 can be used to run builds.
 
+Layername override implications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Code can now know which layer a recipe is coming from through the newly added
+:term:`FILE_LAYERNAME` variable and the ``layer-<layername> override``. This is being used
+for enabling QA checks on a per layer basis. For existing code this has the
+side effect that the QA checks will apply to things being bbappended to recipes
+from other layers. Those other layers would need to have patch upstream status
+entries for patches being bbappended for example.
+
 .. _migration-4.3-supported-distributions:
 
 Supported distributions
@@ -44,6 +54,13 @@ Go language changes
 
 -  Support for the Glide package manager has been removed, as ``go mod``
    has become the standard.
+
+Systemd changes
+~~~~~~~~~~~~~~~
+
+Upstream systemd is now more strict on filesystem layout and the ``usrmerge``
+feature is therefore required alongside systemd. The Poky test configurations
+have been updated accordingly for systemd.
 
 .. _migration-4.3-recipe-changes:
 

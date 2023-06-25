@@ -7,6 +7,8 @@ Origins from buildroot
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/ext/gl_oes_egl_image_client.c | 1 -
  1 file changed, 1 deletion(-)
 

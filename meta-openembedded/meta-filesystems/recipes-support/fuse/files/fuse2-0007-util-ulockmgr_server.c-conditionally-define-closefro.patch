@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 From: Sam James <sam@gentoo.org>
 Date: Sat, 24 Jul 2021 22:02:45 +0100
 Subject: [PATCH] util/ulockmgr_server.c: conditionally define closefrom (fix

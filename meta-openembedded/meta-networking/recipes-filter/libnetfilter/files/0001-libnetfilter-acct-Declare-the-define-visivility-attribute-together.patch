@@ -10,6 +10,8 @@ fail to link due to these missing symbols
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  doxygen.cfg.in          |  2 +-
  src/internal.h          |  5 ++---
  src/libnetfilter_acct.c | 41 ++++++++++++++---------------------------

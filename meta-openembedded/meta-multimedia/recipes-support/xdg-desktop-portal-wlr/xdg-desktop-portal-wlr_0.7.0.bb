@@ -16,7 +16,8 @@ DEPENDS = " \
 inherit meson pkgconfig features_check
 REQUIRED_DISTRO_FEATURES = "opengl wayland"
 
-SRC_URI = "git://github.com/emersion/xdg-desktop-portal-wlr.git;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/emersion/xdg-desktop-portal-wlr.git;protocol=https;nobranch=1 \
+           file://0001-screencast-Fix-build-with-older-mesa.patch"
 
 S = "${WORKDIR}/git"
 SRCREV = "776113a4f014639c29d8de8fcb513493ef7b491f"

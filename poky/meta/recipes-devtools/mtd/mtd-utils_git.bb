@@ -55,6 +55,14 @@ ALTERNATIVE_LINK_NAME[flashcp] = "${sbindir}/flashcp"
 
 do_install () {
 	oe_runmake install DESTDIR=${D} SBINDIR=${sbindir} MANDIR=${mandir} INCLUDEDIR=${includedir}
+	install -d ${D}${includedir}/mtd
+	install -d ${D}${libdir}
+	install -m 0644 ${S}/include/libubi.h ${D}${includedir}
+	install -m 0644 ${S}/include/libmtd.h ${D}${includedir}
+	install -m 0644 ${S}/include/libscan.h ${D}${includedir}
+	install -m 0644 ${S}/include/libubigen.h ${D}${includedir}
+	oe_libinstall -a libubi ${D}${libdir}/
+	oe_libinstall -a libmtd ${D}${libdir}/
 }
 
 PACKAGES =+ "mtd-utils-misc mtd-utils-tests"

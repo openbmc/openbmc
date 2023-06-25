@@ -6,6 +6,8 @@ Subject: [PATCH] lat_http.c: Add printf format
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  src/lat_http.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

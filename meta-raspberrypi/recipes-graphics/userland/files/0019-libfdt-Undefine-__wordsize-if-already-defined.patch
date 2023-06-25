@@ -8,6 +8,8 @@ for multiple versions of glibc even ones which does not have this define
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  opensrc/helpers/libfdt/libfdt_env.h | 4 ++++
  1 file changed, 4 insertions(+)
 

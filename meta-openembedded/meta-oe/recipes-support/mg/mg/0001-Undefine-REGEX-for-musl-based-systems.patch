@@ -5,6 +5,8 @@ Subject: [PATCH] Undefine REGEX for musl based systems
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  GNUmakefile | 1 -
  Makefile    | 2 +-
  2 files changed, 1 insertion(+), 2 deletions(-)

@@ -4,8 +4,12 @@ Description: adb: Make compatible with openssl 1.1
 Author: Chirayu Desai <chirayudesai1@gmail.com
 Last-Update: 2016-11-10
 ---
+Upstream-Status: Pending
+
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 ---
+Upstream-Status: Pending
+
  system/core/adb/adb_auth_host.c |    5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 

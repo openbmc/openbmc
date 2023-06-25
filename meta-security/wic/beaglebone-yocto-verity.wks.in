@@ -3,6 +3,7 @@
 # Copyright (C) 2020 BayLibre SAS
 # Author: Bartosz Golaszewski <bgolaszewski@baylibre.com>
 #
+# short-description: Create a u-SD image for beaglebone-black with dm-verity
 # A dm-verity variant of the regular wks for beaglebone black. We need to fetch
 # the partition images from the DEPLOY_DIR_IMAGE as the rootfs source plugin will
 # not recreate the exact block device corresponding with the hash tree. We must

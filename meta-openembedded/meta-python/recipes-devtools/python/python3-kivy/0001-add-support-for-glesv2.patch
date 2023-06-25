@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/setup.py
 +++ b/setup.py
 @@ -695,7 +695,18 @@ def determine_gl_flags():

@@ -11,6 +11,8 @@ cd dlt-daemon-2.18.9/obj-x86_64-linux-gnu/tests && /usr/bin/cmake -E cmake_link_
 /usr/bin/c++ -g -O2 -ffile-prefix-map=dlt-daemon-2.18.9=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -isystem /include -std=gnu++0x -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -rdynamic CMakeFiles/gtest_dlt_daemon_gateway.dir/gtest_dlt_daemon_gateway.cpp.o CMakeFiles/gtest_dlt_daemon_gateway.dir/__/systemd/3rdparty/sd-daemon.c.o -o gtest_dlt_daemon_gateway  -Wl,-rpath,dlt-daemon-2.18.9/obj-x86_64-linux-gnu/src/daemon ../src/daemon/libdlt_daemon.so /usr/lib/x86_64-linux-gnu/libgtest.a /usr/lib/x86_64-linux-gnu/libgtest_main.a -lrt /usr/lib/x86_64-linux-gnu/libgtest.a
 /usr/bin/ld: ../src/daemon/libdlt_daemon.so: undefined reference to `sd_listen_fds_with_names'
 ---
+Upstream-Status: Pending
+
  tests/CMakeLists.txt | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 

@@ -9,6 +9,8 @@ otherwise fall back to the default behaviour.
 Signed-off-by: Jelle van der Waa <jelle@vdwaa.nl>
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

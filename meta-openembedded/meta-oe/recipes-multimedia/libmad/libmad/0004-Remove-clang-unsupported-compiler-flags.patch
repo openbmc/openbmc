@@ -4,6 +4,8 @@ Date: Tue, 16 Sep 2014 12:28:47 +0300
 Subject: [PATCH 4/4] Remove clang unsupported compiler flags
 
 ---
+Upstream-Status: Pending
+
  configure.ac | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 

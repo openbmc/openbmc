@@ -8,6 +8,8 @@ system header.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  dmalloc.h.3 | 3 +++
  1 file changed, 3 insertions(+)
 

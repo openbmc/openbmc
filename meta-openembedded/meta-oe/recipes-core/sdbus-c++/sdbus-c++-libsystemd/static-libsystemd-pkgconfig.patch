@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/src/libsystemd/libsystemd.pc.in
 +++ b/src/libsystemd/libsystemd.pc.in
 @@ -16,5 +16,5 @@ Name: systemd

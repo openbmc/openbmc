@@ -5,6 +5,8 @@ Subject: [PATCH 2/5] Makefile : modify compile parameters
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

@@ -20,6 +20,8 @@ for @-substitutions.
 
 Signed-off-by: Romain Naour <romain.naour@gmail.com>
 ---
+Upstream-Status: Pending
+
  jitter/bin/jitter-config.in | 6 +-----
  1 file changed, 1 insertion(+), 5 deletions(-)
 

@@ -3,6 +3,8 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Mar 2019 00:22:40 -0700
 
 ---
+Upstream-Status: Pending
+
  kexec/kexec.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

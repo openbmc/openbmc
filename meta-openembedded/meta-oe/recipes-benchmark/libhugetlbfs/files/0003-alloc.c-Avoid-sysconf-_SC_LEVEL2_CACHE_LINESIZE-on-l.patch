@@ -8,6 +8,8 @@ musl does not have it
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  alloc.c | 15 ++++++++++++++-
  1 file changed, 14 insertions(+), 1 deletion(-)
 

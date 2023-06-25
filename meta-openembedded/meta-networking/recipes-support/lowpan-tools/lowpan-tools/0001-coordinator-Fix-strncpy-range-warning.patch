@@ -8,6 +8,8 @@ error: 'strncpy' specified bound 4096 equals destination size [-Werror=stringop-
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/coordinator.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 

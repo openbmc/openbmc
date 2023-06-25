@@ -5,6 +5,8 @@ Subject: [PATCH] Fix build on big endian architectures
 
 Signed-off-by: Primoz Fiser <primoz.fiser@norik.com>
 ---
+Upstream-Status: Pending
+
  Common/DtaEndianFixup.h | 13 +++++++------
  1 file changed, 7 insertions(+), 6 deletions(-)
 

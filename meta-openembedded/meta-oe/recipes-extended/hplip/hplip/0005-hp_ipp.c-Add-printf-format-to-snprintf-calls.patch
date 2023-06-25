@@ -7,6 +7,8 @@ Avoid -Wformat warnings
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  protocol/hp_ipp.c | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)
 

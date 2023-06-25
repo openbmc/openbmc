@@ -18,6 +18,10 @@ SRC_URI[sha256sum] = "64ac4614db292ae8c5aa26de0295bf1623dbb3985054cb656c55e67431
 
 UPSTREAM_CHECK_URI = "http://downloads.webmproject.org/releases/webp/index.html"
 
+SRC_URI += " \
+    file://CVE-2023-1999.patch \
+"
+
 EXTRA_OECONF = " \
     --disable-wic \
     --enable-libwebpmux \

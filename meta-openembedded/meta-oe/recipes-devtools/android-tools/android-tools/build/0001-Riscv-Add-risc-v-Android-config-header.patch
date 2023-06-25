@@ -4,6 +4,8 @@ Date: Mon, 20 Apr 2020 15:32:40 +0800
 Subject: [PATCH 1/1] Riscv: Add risc-v Android config header
 
 ---
+Upstream-Status: Pending
+
  .../arch/linux-riscv64/AndroidConfig.h        | 340 ++++++++++++++++++
  1 file changed, 340 insertions(+)
  create mode 100644 core/combo/include/arch/linux-riscv64/AndroidConfig.h

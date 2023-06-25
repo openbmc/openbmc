@@ -9,6 +9,8 @@ error: use of undeclared identifier 'PATH_MAX'
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  memstat.c | 1 +
  1 file changed, 1 insertion(+)
 

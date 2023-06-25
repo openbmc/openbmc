@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- enca-1.19/Makefile.am.orig	2006-06-29 15:34:55.000000000 +0100
 +++ enca-1.19/Makefile.am	2006-06-29 15:35:20.000000000 +0100
 @@ -1,7 +1,7 @@

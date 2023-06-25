@@ -5,6 +5,8 @@ Subject: [PATCH 2/4] cli: include fcntl.h for O_CREAT define
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  cli/cli_readline.c | 1 +
  1 file changed, 1 insertion(+)
 

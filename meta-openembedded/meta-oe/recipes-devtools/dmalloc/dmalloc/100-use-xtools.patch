@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 This patch makes configure use the cross ld and ar rather than the native tools.
 
 It was build up by Yann E. MORIN <yann.morin.1998@anciens.enib.fr> from some

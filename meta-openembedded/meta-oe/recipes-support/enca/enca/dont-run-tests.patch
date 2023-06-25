@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: enca-1.9/Makefile.am
 ===================================================================
 --- enca-1.9.orig/Makefile.am	2005-11-24 11:21:32.000000000 +0100

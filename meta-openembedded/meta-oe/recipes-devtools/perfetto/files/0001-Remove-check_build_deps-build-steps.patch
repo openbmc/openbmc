@@ -12,6 +12,8 @@ rather than the Bitbake-generated one.
 
 Signed-off-by: Sui Chen <suichen6@gmail.com>
 ---
+Upstream-Status: Pending
+
  gn/BUILD.gn                  |  1 -
  gn/standalone/BUILD.gn       | 12 ++++++------
  gn/standalone/BUILDCONFIG.gn |  5 +++--

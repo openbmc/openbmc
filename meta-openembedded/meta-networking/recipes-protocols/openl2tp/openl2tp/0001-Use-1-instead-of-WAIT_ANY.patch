@@ -8,6 +8,8 @@ e.g. musl do not define this.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  usl/usl_pid.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

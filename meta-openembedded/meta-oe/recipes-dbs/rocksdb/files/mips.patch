@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 implement timer implementation for mips platform
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>

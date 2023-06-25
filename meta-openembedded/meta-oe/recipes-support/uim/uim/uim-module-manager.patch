@@ -3,6 +3,8 @@ From: Bian Naimeng <biannm@cn.fujitsu.com>
 Date: Fri, 26 Jun 2015 12:57:48 +0900
 
 ---
+Upstream-Status: Pending
+
  scm/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

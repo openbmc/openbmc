@@ -32,12 +32,15 @@ EXTRA_OECMAKE += "\
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 "
 
-PACKAGECONFIG ?= "encryption-mbedtls pubsub pubsub-eth"
+PACKAGECONFIG ?= "encryption-mbedtls pubsub pubsub-eth subscriptions subscriptions-events"
 PACKAGECONFIG[amalgamation] = "-DUA_ENABLE_AMALGAMATION=ON, -DUA_ENABLE_AMALGAMATION=OFF"
 PACKAGECONFIG[encryption-mbedtls] = "-DUA_ENABLE_ENCRYPTION=MBEDTLS, , mbedtls, , , encryption-openssl"
 PACKAGECONFIG[encryption-openssl] = "-DUA_ENABLE_ENCRYPTION=OPENSSL, , openssl, , , encryption-mbedtls"
+PACKAGECONFIG[multithreading] = "-DUA_MULTITHREADING=100, -DUA_MULTITHREADING=0"
 PACKAGECONFIG[pubsub] = "-DUA_ENABLE_PUBSUB=ON, -DUA_ENABLE_PUBSUB=OFF"
 PACKAGECONFIG[pubsub-eth] = "-DUA_ENABLE_PUBSUB_ETH_UADP=ON, -DUA_ENABLE_PUBSUB_ETH_UADP=OFF"
+PACKAGECONFIG[subscriptions] = "-DUA_ENABLE_SUBSCRIPTIONS=ON, -DUA_ENABLE_SUBSCRIPTIONS=OFF"
+PACKAGECONFIG[subscriptions-events] = "-DUA_ENABLE_SUBSCRIPTIONS_EVENTS=ON, -DUA_ENABLE_SUBSCRIPTIONS_EVENTS=OFF"
 PACKAGECONFIG[werror] = "-DUA_FORCE_WERROR=ON, -DUA_FORCE_WERROR=OFF"
 
 do_configure:prepend:toolchain-clang:riscv64() {

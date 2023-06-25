@@ -5,6 +5,8 @@ Subject: [PATCH] man file mailstat.1 from debian
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  debian/mailstat.1 | 40 ++++++++++++++++++++++++++++++++++++++++
  1 file changed, 40 insertions(+)
  create mode 100644 debian/mailstat.1

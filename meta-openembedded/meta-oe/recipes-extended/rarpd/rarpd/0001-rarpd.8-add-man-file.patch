@@ -5,6 +5,8 @@ Subject: [PATCH 1/5] rarpd.8 : add man file
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  rarpd.8 | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 69 insertions(+)
  create mode 100644 rarpd.8

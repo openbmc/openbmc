@@ -5,6 +5,8 @@ Subject: [PATCH] usr/Makefile: apply LDFLAGS to all executables
 
 Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
 ---
+Upstream-Status: Pending
+
  usr/Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

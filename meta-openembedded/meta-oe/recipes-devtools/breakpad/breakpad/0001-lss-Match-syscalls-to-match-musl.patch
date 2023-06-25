@@ -5,6 +5,8 @@ Subject: [PATCH] lss: Match syscalls to match musl
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  linux_syscall_support.h | 3 +++
  1 file changed, 3 insertions(+)
 

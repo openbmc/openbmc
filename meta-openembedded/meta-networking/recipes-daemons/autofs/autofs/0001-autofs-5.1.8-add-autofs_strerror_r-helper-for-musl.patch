@@ -11,6 +11,8 @@ Signed-off-by: Fabian Groffen <grobian@gentoo.org>
 Signed-off-by: Ian Kent <raven@themaw.net>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  include/automount.h |  5 +++++
  lib/log.c           | 10 ++++++++++
  2 files changed, 15 insertions(+)

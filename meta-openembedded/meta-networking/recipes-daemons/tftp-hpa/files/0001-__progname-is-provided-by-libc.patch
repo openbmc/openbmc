@@ -12,6 +12,8 @@ global symbols and work around Debian bug #519006 (Closes: #564052).
 Signed-off-by: Ron Lee <ron@debian.org>
 Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
 ---
+Upstream-Status: Pending
+
  tftpd/tftpd.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 

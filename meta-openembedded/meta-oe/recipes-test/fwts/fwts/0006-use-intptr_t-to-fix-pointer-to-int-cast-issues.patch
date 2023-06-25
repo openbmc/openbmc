@@ -9,6 +9,8 @@ will yield the original pointer value
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/lib/src/fwts_acpi_tables.c | 4 ++--
  src/lib/src/fwts_mmap.c        | 2 +-
  src/lib/src/fwts_smbios.c      | 2 +-

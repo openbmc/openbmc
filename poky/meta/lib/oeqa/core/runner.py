@@ -229,6 +229,10 @@ class OETestResult(_TestResult):
         # Override as we unexpected successes aren't failures for us
         return (len(self.failures) == len(self.errors) == 0)
 
+    def hasAnyFailingTest(self):
+        # Account for expected failures
+        return not self.wasSuccessful() or len(self.expectedFailures)
+
 class OEListTestsResult(object):
     def wasSuccessful(self):
         return True

@@ -4,6 +4,8 @@ Date: Thu, 13 Feb 2014 07:03:26 -0500
 Subject: Add CMake support.
 
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt | 44 ++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 44 insertions(+)
  create mode 100644 CMakeLists.txt

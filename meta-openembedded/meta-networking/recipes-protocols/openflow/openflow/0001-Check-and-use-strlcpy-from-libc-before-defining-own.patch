@@ -9,6 +9,8 @@ failures.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  configure.ac | 2 +-
  lib/util.c   | 2 ++
  lib/util.h   | 1 +

@@ -10,6 +10,8 @@ Fix
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/client/linux/crash_generation/crash_generation_server.cc | 10 ++++++++++
  1 file changed, 10 insertions(+)
 

@@ -4,6 +4,8 @@ Date: Wed, 12 Dec 2007 13:44:15 +0000
 Subject: [PATCH] error.h: '#include <errno.h>' instead of 'extern int errno;'
 
 ---
+Upstream-Status: Pending
+
  daemontools-0.76/src/error.h |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 

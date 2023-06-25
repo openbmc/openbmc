@@ -8,3 +8,8 @@ SRC_URI[sha256sum] = "a933e3bb13da54383f9e8f35dc4f9cb9eb9b3b78c6b36f311254d6d0d9
 
 PYPI_PACKAGE = "idna-ssl"
 inherit pypi
+
+RDEPENDS:${PN} += " \
+    python3-idna \
+    python3-io \
+"

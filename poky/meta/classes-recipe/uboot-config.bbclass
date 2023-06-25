@@ -140,4 +140,10 @@ python () {
 
             if not found:
                 raise bb.parse.SkipRecipe("The selected UBOOT_CONFIG key %s has no match in %s." % (ubootconfig, ubootconfigflags.keys()))
+
+            if len(ubootconfig) == 1:
+                d.setVar('KCONFIG_CONFIG_ROOTDIR', os.path.join(d.getVar("B"), d.getVar("UBOOT_MACHINE").strip()))
+            else:
+                # Disable menuconfig for multiple configs
+                d.setVar('KCONFIG_CONFIG_ENABLE_MENUCONFIG', "false")
 }

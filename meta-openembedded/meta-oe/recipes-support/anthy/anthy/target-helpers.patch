@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -Nurp anthy-9100h.org/calctrans/Makefile.am anthy-9100h/calctrans/Makefile.am
 --- anthy-9100h.org/calctrans/Makefile.am	2007-10-27 23:02:59.000000000 +0900
 +++ anthy-9100h/calctrans/Makefile.am	2014-11-11 17:14:42.152999991 +0900

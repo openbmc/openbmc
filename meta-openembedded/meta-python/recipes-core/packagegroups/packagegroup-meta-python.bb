@@ -137,7 +137,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-flask-nav \
     python3-flask-pymongo \
     python3-flask-restful \
-    python3-flask-script \
     python3-flask-sijax \
     python3-flask-socketio \
     python3-flask-sqlalchemy \

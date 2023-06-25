@@ -1,7 +1,7 @@
-From 34f363f9d1c13abecd06ec37567704d0dfc05e77 Mon Sep 17 00:00:00 2001
+From f924535544515cdb350b2979b8c413cf221124b6 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Wed, 30 Nov 2022 19:11:43 +0000
-Subject: [PATCH 24/27] arm/corstone1000: esrt support
+Subject: [PATCH 24/42] arm/corstone1000: esrt support
 
 The implementation is platform specific and would require
 change in future.
@@ -20,7 +20,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  3 files changed, 143 insertions(+), 9 deletions(-)
 
 diff --git a/include/efi_api.h b/include/efi_api.h
-index 9bd70b0f18ce..23e427236a8f 100644
+index 9bd70b0f18..23e427236a 100644
 --- a/include/efi_api.h
 +++ b/include/efi_api.h
 @@ -2030,7 +2030,7 @@ struct efi_firmware_image_descriptor {
@@ -33,7 +33,7 @@ index 9bd70b0f18ce..23e427236a8f 100644
  struct efi_firmware_management_protocol {
  	efi_status_t (EFIAPI *get_image_info)(
 diff --git a/lib/efi_loader/efi_firmware.c b/lib/efi_loader/efi_firmware.c
-index c883e2ff0aa9..c6ab6e2182dd 100644
+index c883e2ff0a..c6ab6e2182 100644
 --- a/lib/efi_loader/efi_firmware.c
 +++ b/lib/efi_loader/efi_firmware.c
 @@ -15,6 +15,7 @@
@@ -186,7 +186,7 @@ index c883e2ff0aa9..c6ab6e2182dd 100644
  	.set_image = efi_firmware_fit_set_image,
  	.check_image = efi_firmware_check_image_unsupported,
 diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
-index 89f988b09c44..08c742edbd12 100644
+index 89f988b09c..08c742edbd 100644
 --- a/lib/efi_loader/efi_setup.c
 +++ b/lib/efi_loader/efi_setup.c
 @@ -167,14 +167,6 @@ static efi_status_t efi_init_capsule(void)
@@ -221,5 +221,5 @@ index 89f988b09c44..08c742edbd12 100644
  	ret = efi_init_variables();
  	if (ret != EFI_SUCCESS)
 -- 
-2.39.1
+2.25.1
 

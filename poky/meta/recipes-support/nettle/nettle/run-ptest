@@ -6,31 +6,35 @@ failed=0
 all=0
 
 for f in *-test; do
-    if [ "$f" = "sha1-huge-test" ] ; then
-        echo "SKIP: $f (skipped for ludicrous run time)"
-        continue
-    fi
-
-    "./$f"
-    case "$?" in
-        0)
-            echo "PASS: $f"
-            all=$((all + 1))
+    case "$f" in
+        "sha1-huge-test")
+            echo "SKIP: $f (long run time)"
             ;;
-        77)
-            echo "SKIP: $f"
+        "symbols-test")
+            echo "SKIP: $f (needs static libraries)"
             ;;
         *)
-            echo "FAIL: $f"
-            failed=$((failed + 1))
-            all=$((all + 1))
+            "./$f"
+            case "$?" in
+                0)
+                    echo "PASS: $f"
+                    all=$((all + 1))
+                    ;;
+                77)
+                    echo "SKIP: $f"
+                    ;;
+                *)
+                    echo "FAIL: $f"
+                    failed=$((failed + 1))
+                    all=$((all + 1))
+                    ;;
+            esac
             ;;
     esac
 done
 
 if [ "$failed" -eq 0 ] ; then
-  echo "All $all tests passed"
+    echo "All $all tests passed"
 else
-  echo "$failed of $all tests failed"
+    echo "$failed of $all tests failed"
 fi
-

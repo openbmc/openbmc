@@ -11,6 +11,8 @@ error: use of undeclared identifier 'canonicalize_file_name'
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/engine/filesystem.cpp | 2 +-
  tools/ssieventmonitor.cpp | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)

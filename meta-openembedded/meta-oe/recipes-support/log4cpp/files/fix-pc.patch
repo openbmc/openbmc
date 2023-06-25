@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -Nurd ./log4cpp.orig/configure.in ./log4cpp/configure.in
 --- ./log4cpp.orig/configure.in	2009-09-07 16:57:46.000000000 -0400
 +++ ./log4cpp/configure.in	2016-02-23 12:57:11.567240018 -0500

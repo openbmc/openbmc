@@ -5,6 +5,8 @@ Subject: [PATCH] Proper macro path generation.
 
 Signed-off-by: iddinev <xidinev@gmail.com>
 ---
+Upstream-Status: Pending
+
  libutempter/iface.c | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)
 

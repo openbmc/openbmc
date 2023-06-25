@@ -30,6 +30,8 @@ issue is addressed
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt         |  4 ++--
  glib/CMakeLists.txt    |  4 ++--
  qt5/src/CMakeLists.txt |  4 ++--

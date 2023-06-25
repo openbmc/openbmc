@@ -7,6 +7,8 @@ This patch adds provisions in userland to
 let apps callers set the next rendereing dispmanx resource.
 It's useful for implementing, say, a buffer carousel.
 ---
+Upstream-Status: Pending
+
  interface/khronos/common/khrn_client_rpc.h |  2 ++
  interface/khronos/common/khrn_int_ids.h    |  2 ++
  interface/khronos/egl/egl_client.c         | 30 +++++++++++++++++++---

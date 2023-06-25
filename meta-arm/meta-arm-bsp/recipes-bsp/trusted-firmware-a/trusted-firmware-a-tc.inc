@@ -1,22 +1,9 @@
 # TC0 specific TFA configuration
 
-# Intermediate SHA with 2.7 baseline version
-SRCREV_tfa = "e95abc4c01822ef43e9e874d63d6596dc0b57279"
-PV = "2.7+git${SRCPV}"
-
 DEPENDS += "scp-firmware util-linux-native gptfdisk-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/tc:"
 SRC_URI:append = " \
-    file://0001-plat-tc-Increase-maximum-BL2-size.patch \
-    file://0002-Makefile-add-trusty_sp_fw_config-build-option.patch \
-    file://0003-fix-plat-arm-increase-sp-max-image-size.patch \
-    file://0004-fix-plat-tc-increase-tc_tzc_dram1_size.patch \
-    file://0005-feat-plat-tc-add-spmc-manifest-with-trusty-sp.patch \
-    file://0006-feat-plat-tc-update-dts-with-trusty-compatible-strin.patch \
-    file://0007-feat-arm-tc-Update-trusty-load-address-in-dts-files.patch \
-    file://0008-feat-plat-tc-add-firmware-update-secure-partition.patch \
-    file://0009-feat-plat-tc-reserve-4-MB-for-stmm-communication-use.patch \
     file://generate_metadata.py \
     "
 

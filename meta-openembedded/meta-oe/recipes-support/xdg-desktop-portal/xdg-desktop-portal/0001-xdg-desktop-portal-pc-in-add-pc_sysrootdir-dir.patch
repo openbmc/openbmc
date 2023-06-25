@@ -4,6 +4,8 @@ Date: Mon, 12 Dec 2022 18:40:31 +0100
 Subject: [PATCH] xdg-desktop-portal.pc.in: add pc_sysrootdir dir
 
 ---
+Upstream-Status: Pending
+
  xdg-desktop-portal.pc.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

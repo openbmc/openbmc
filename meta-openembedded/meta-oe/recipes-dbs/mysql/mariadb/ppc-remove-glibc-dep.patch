@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Remove glibc specific function dependencies
 
 Sourced from: https://git.alpinelinux.org/aports/tree/main/mariadb/ppc-remove-glibc-dep.patch

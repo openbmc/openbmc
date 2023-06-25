@@ -920,9 +920,9 @@ overview of their function and contents.
       section.
 
    :term:`BBPATH`
-      Used by BitBake to locate class (``.bbclass``) and configuration
-      (``.conf``) files. This variable is analogous to the ``PATH``
-      variable.
+      A colon-separated list used by BitBake to locate class (``.bbclass``)
+      and configuration (``.conf``) files. This variable is analogous to the
+      ``PATH`` variable.
 
       If you run BitBake from a directory outside of the build directory,
       you must be sure to set :term:`BBPATH` to point to the build directory.
@@ -1072,6 +1072,11 @@ overview of their function and contents.
       environment variable. The value is a colon-separated list of
       directories that are searched left-to-right in order.
 
+   :term:`FILE_LAYERNAME`
+      During parsing and task execution, this is set to the name of the
+      layer containing the recipe file. Code can use this to identify which
+      layer a recipe is from.
+
    :term:`GITDIR`
       The directory in which a local copy of a Git repository is stored
       when it is cloned.
@@ -1165,8 +1170,8 @@ overview of their function and contents.
       order.
 
    :term:`OVERRIDES`
-      BitBake uses :term:`OVERRIDES` to control what variables are overridden
-      after BitBake parses recipes and configuration files.
+      A colon-separated list that BitBake uses to control what variables are
+      overridden after BitBake parses recipes and configuration files.
 
       Following is a simple example that uses an overrides list based on
       machine architectures: OVERRIDES = "arm:x86:mips:powerpc" You can

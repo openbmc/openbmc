@@ -9,6 +9,8 @@ libgxim/gximprotocol10.c:2076:66: error: format string is not a string literal (
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  libgxim/gximprotocol10.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

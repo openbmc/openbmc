@@ -19,6 +19,8 @@ vc_vchi_dispmanx.h
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  .gitignore                                    |   1 +
  CMakeLists.txt                                |  11 +
  README.md                                     |   4 +

@@ -9,6 +9,8 @@ the dependencies.
 
 Signed-off-by: Bartosz Golaszewski <brgl@bgdev.pl>
 ---
+Upstream-Status: Pending
+
  setup.py | 2 --
  1 file changed, 2 deletions(-)
 

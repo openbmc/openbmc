@@ -8,6 +8,8 @@ libdir.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
+Upstream-Status: Pending
+
  etc/Makefile.am | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

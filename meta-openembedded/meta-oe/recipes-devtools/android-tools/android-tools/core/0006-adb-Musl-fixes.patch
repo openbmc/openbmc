@@ -9,6 +9,8 @@ Do not redefine close() and lseek()
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  adb/adb.h                    |  2 ++
  adb/disable_verity_service.c | 13 ++++++++-----
  adb/framebuffer_service.c    |  7 ++++---

@@ -7,6 +7,8 @@ Subject: [PATCH] Mandir and perl install dir were overwritten with faulty
 
 Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
 ---
+Upstream-Status: Pending
+
  Makefile.pl |   12 +++++++-----
  1 file changed, 7 insertions(+), 5 deletions(-)
 

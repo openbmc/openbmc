@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/storage/connect/os.h
 +++ b/storage/connect/os.h
 @@ -2,13 +2,15 @@

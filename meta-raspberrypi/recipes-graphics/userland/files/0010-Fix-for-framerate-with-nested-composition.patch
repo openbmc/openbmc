@@ -7,6 +7,8 @@ frame rate appears irregular and lower than expected when using nested compositi
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/egl/egl_client.c | 8 ++++++++
  1 file changed, 8 insertions(+)
 

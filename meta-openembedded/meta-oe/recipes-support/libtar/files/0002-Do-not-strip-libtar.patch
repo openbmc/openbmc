@@ -4,6 +4,8 @@ Date: Wed, 2 Nov 2016 05:43:43 -0400
 Subject: [PATCH] Do not strip libtar.
 
 ---
+Upstream-Status: Pending
+
  libtar/Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

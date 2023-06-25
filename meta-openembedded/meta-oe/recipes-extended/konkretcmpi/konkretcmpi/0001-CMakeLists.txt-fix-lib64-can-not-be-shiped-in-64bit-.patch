@@ -5,6 +5,8 @@ Subject: [PATCH] CMakeLists.txt: fix lib64 can not be shiped in 64bit target
 
 Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt | 7 -------
  1 file changed, 7 deletions(-)
 

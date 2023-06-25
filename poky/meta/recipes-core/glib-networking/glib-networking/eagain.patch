@@ -21,7 +21,7 @@ Index: glib-networking-2.74.0/tls/tests/connection.c
                                     MIN (TEST_DATA_LENGTH / 2, TEST_DATA_LENGTH - test->nread),
                                     NULL, &error);
 +
-+      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_BUSY))
++      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
 +          continue;
 +
        g_assert_no_error (error);

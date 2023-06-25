@@ -6,6 +6,8 @@ Subject: [PATCH] xserver-common: add support for gta04 alias OpenPhoenux
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  X11/xserver-common | 8 ++++++++
  1 file changed, 8 insertions(+)
 

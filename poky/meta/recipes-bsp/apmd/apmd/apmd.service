@@ -1,7 +1,0 @@
-[Unit]
-Description=Advanced Power Management daemon
-After=remote-fs.target
-
-[Service]
-EnvironmentFile=-@SYSCONFDIR@/default/apmd
-ExecStart=@SBINDIR@/apmd -P @SYSCONFDIR@/apm/apmd_proxy $APMD

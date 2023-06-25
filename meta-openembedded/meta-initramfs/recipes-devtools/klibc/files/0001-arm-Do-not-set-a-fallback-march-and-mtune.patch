@@ -11,6 +11,8 @@ which is a bit harder in OE
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  usr/klibc/arch/arm/MCONFIG | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

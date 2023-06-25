@@ -4,6 +4,8 @@ Date: Tue, 16 Feb 2016 16:40:46 +0000
 Subject: [PATCH] bcm43xx: Add bcm43xx-3wire variant
 
 ---
+Upstream-Status: Pending
+
  tools/hciattach.c | 3 +++
  1 file changed, 3 insertions(+)
 

@@ -52,7 +52,6 @@ qemux86:
   extends: .base
   script:
   - kas shell kas/$CI_JOB_NAME.yml  -c "bitbake -k security-build-image integrity-image-minimal"
-  - kas build --target security-build-image kas/$CI_JOB_NAME-comp.yml
   - kas build --target harden-image-minimal kas/$CI_JOB_NAME-harden.yml
 
 qemux86-musl:

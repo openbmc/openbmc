@@ -1,0 +1,34 @@
+From 1fc88332f7e906294fd889287b9e84cefc7f1586 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 12 Jun 2023 10:40:07 -0700
+Subject: [PATCH] fs: Add libuuid to linker flags for libparted-fs-resize
+ library
+
+This library uses uuid_generate function which comes from libuuid and
+hence it should be mentioned on linker cmdline
+
+fixes
+| aarch64-yoe-linux-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: uuid_generate
+| >>> referenced by /mnt/b/yoe/master/build/tmp/work/cortexa72-cortexa53-crypto-yoe-linux/fatresize/1.1.0-r0/recipe-sysroot/usr/lib/libparted-fs-resize.so
+
+Upstream-Status: Submitted [https://alioth-lists.debian.net/pipermail/parted-devel/2023-June/005873.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libparted/fs/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libparted/fs/Makefile.am b/libparted/fs/Makefile.am
+index 2f345f3..a8970eb 100644
+--- a/libparted/fs/Makefile.am
++++ b/libparted/fs/Makefile.am
+@@ -75,6 +75,7 @@ libparted_fs_resize_la_LDFLAGS =		\
+ EXTRA_DIST += fsresize.sym
+ libparted_fs_resize_la_DEPENDENCIES = $(sym_file)
+ 
++libparted_fs_resize_la_LIBADD   = $(UUID_LIBS)
+ libparted_fs_resize_la_SOURCES = \
+   r/filesys.c			\
+   r/fat/bootsector.c		\
+-- 
+2.41.0
+

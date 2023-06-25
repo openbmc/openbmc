@@ -8,7 +8,7 @@ compilation is failing and is complaining because the variable is
 undefined
 
 Signed-off-by: Vasileios Anagnostopoulos <anagnwstopoulos@hotmail.com>
-Upstream status: Submitted [https://github.com/chriskohlhoff/asio/pull/1294]
+Upstream-Status: Submitted [https://github.com/chriskohlhoff/asio/pull/1294]
 ---
  asio/Makefile.am | 1 +
  1 file changed, 1 insertion(+)

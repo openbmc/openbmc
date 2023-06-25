@@ -80,6 +80,9 @@ AS[unexport] = "1"
 CC[unexport] = "1"
 LD[unexport] = "1"
 
+# remove once arm-none-eabi-gcc updates to 13 or newer like poky
+DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
+
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
 # right path until this is relocated automatically.
 export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"

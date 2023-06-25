@@ -5,6 +5,8 @@ Subject: [PATCH 1/6] Add correct printf qualifier for off_t
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/bios/ebda_region/ebda_region.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 

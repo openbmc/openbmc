@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: SDL_image-1.2.12/configure.in
 ===================================================================
 --- SDL_image-1.2.12.orig/configure.in	2012-01-21 01:51:33.000000000 +0000

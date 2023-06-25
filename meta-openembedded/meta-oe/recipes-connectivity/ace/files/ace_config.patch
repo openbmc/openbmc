@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -ruN ACE_wrappers1/ace/config.h ACE_wrappers/ace/config.h
 --- ACE_wrappers1/ace/config.h	1970-01-01 02:00:00.000000000 +0200
 +++ ACE_wrappers/ace/config.h	2019-01-10 13:36:52.698012477 +0200

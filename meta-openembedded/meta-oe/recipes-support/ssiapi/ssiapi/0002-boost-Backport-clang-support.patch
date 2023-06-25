@@ -7,6 +7,8 @@ backport headers from boost 1.59
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/boost/config/compiler/clang.hpp           | 272 +++++++++
  lib/boost/config/stdlib/libcpp.hpp            |  80 +++
  lib/boost/cstdint.hpp                         | 542 ++++++++++++++++++

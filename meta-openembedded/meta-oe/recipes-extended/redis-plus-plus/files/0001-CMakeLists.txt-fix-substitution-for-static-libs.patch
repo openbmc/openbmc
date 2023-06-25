@@ -17,14 +17,14 @@ Upstream-Status: Submitted [https://github.com/sewenew/redis-plus-plus/issues/48
 
 Signed-off-by: Peter Bergin <peter.bergin@windriver.com>
 ---
- CMakeLists.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 69794d9..08c265d 100644
+index 23a1840..5478271 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -160,13 +160,12 @@ if(REDIS_PLUS_PLUS_BUILD_STATIC)
+@@ -184,13 +184,13 @@ if(REDIS_PLUS_PLUS_BUILD_STATIC)
      set(REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC ${REDIS_PLUS_PLUS_HIREDIS_LIBS})
  
      if (TARGET hiredis::hiredis_static)
@@ -32,11 +32,11 @@ index 69794d9..08c265d 100644
 +      string(REPLACE "hiredis::hiredis;" "hiredis::hiredis_static;" REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC
          "${REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC}")
      endif()
--
+ 
      if (TARGET hiredis::hiredis_ssl_static)
        # If SSL is not enabled, this line will have no effect
--      string(REPLACE "hiredis::hiredis_ssl" "hiredis::hiredis_ssl_static" REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC
-+      string(REPLACE "hiredis::hiredis_ssl;" "hiredis::hiredis_ssl_static;" REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC
+-      string(REPLACE "hiredis::hiredis_static_ssl" "hiredis::hiredis_ssl_static" REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC
++      string(REPLACE "hiredis::hiredis_static_ssl;" "hiredis::hiredis_ssl_static;" REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC
          "${REDIS_PLUS_PLUS_HIREDIS_LIBS_STATIC}")
      endif()
  

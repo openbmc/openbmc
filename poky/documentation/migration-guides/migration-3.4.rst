@@ -197,7 +197,7 @@ Package/recipe splitting
   then you may now need to add it explicitly.
 
 - The ``rpm`` package no longer has ``rpm-build`` in its :term:`RRECOMMENDS`;
-  if by chance  you still need rpm package building functionality in
+  if by chance you still need rpm package building functionality in
   your image and you have not already done so then you should add
   ``rpm-build`` to your image explicitly.
 

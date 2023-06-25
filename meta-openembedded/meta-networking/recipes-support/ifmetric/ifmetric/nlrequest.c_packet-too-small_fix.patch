@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Fix "NETLINK: Packet too small or truncated!" error.
 Author: Benedek László <benedekl@gmail.com>
 Bug-Debian: http://bugs.debian.org/514197

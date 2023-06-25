@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 multi-line ACLOCAL_AMFLAGS isn't supported by autoreconf.
 It will cause configure error as follow.
 

@@ -4,6 +4,8 @@ Date: Wed, 21 Oct 2020 15:27:07 -0600
 Subject: [PATCH] Add version information to libmetis
 
 ---
+Upstream-Status: Pending
+
  metis-5.1.0/Makefile                | 8 ++++----
  metis-5.1.0/libmetis/CMakeLists.txt | 1 +
  2 files changed, 5 insertions(+), 4 deletions(-)

@@ -10,6 +10,8 @@ Sourced from void linux
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Xu Huan <xuhuan.fnst@fujitsu.com>
 ---
+Upstream-Status: Pending
+
  absl/base/internal/unscaledcycleclock.cc    | 4 ++--
  absl/base/internal/unscaledcycleclock.h     | 3 ++-
  absl/debugging/internal/examine_stack.cc    | 8 +++++++-

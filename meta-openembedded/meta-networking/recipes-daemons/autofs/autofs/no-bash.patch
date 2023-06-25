@@ -3,6 +3,8 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 5 Jan 2013 19:53:10 -0800
 
 ---
+Upstream-Status: Pending
+
  samples/auto.net | 2 +-
  samples/auto.smb | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)

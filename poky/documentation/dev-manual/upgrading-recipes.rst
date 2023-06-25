@@ -73,7 +73,7 @@ The following steps describe how to set up the AUH utility:
    onto your development host. The following command uses Git to create
    a local copy of the repository on your system::
 
-      $ git clone  git://git.yoctoproject.org/auto-upgrade-helper
+      $ git clone git://git.yoctoproject.org/auto-upgrade-helper
       Cloning into 'auto-upgrade-helper'... remote: Counting objects: 768, done.
       remote: Compressing objects: 100% (300/300), done.
       remote: Total 768 (delta 499), reused 703 (delta 434)

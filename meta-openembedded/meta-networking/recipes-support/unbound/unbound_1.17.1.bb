@@ -16,7 +16,7 @@ SRCREV = "90831af981221bbce1cd7b15055562336760e484"
 
 inherit autotools pkgconfig systemd update-rc.d
 
-DEPENDS = "openssl libevent libtool-native bison-native expat"
+DEPENDS = "openssl libtool-native bison-native expat"
 RDEPENDS:${PN} = "bash openssl-bin daemonize"
 
 S = "${WORKDIR}/git"
@@ -28,6 +28,7 @@ EXTRA_OECONF = "--with-libexpat=${STAGING_EXECPREFIXDIR} \
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[dnscrypt] = "--enable-dnscrypt, --disable-dnscrypt, libsodium"
 PACKAGECONFIG[systemd] = "--enable-systemd,--disable-systemd,systemd"
+PACKAGECONFIG[libevent] = "--with-libevent=${STAGING_EXECPREFIXDIR},,libevent"
 
 do_configure:append() {
 	sed -i -e 's#${RECIPE_SYSROOT}##g' ${B}/config.h

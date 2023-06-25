@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- mdadm.d/mdadm-1.3.0/mdadm.h.org	2017-06-20 00:35:55.366978372 -0700
 +++ mdadm.d/mdadm-1.3.0/mdadm.h	2017-06-20 00:36:41.244363348 -0700
 @@ -29,8 +29,9 @@

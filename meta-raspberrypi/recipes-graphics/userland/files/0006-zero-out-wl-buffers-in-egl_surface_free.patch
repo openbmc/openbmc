@@ -7,6 +7,8 @@ origins from buildroot
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/egl/egl_client_surface.c | 2 ++
  1 file changed, 2 insertions(+)
 

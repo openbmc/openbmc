@@ -12,6 +12,8 @@ where this option is absent
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

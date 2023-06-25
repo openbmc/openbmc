@@ -11,6 +11,8 @@ Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
 update to version 4.10.5, and switch to python3
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
+Upstream-Status: Pending
+
  buildtools/wafsamba/samba_bundled.py | 27 +++++++++++++++++++--------
  1 file changed, 19 insertions(+), 8 deletions(-)
 

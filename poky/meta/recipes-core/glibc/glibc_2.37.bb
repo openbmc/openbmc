@@ -103,10 +103,12 @@ do_configure () {
 # version check and doesn't really help with anything
         (cd ${S} && gnu-configize) || die "failure in running gnu-configize"
         find ${S} -name "configure" | xargs touch
-        CPPFLAGS="" oe_runconf
+        CPPFLAGS="" LD="${HOST_PREFIX}ld.bfd ${TOOLCHAIN_OPTIONS}" oe_runconf
 }
 
 LDFLAGS += "-fuse-ld=bfd"
+CC += "-fuse-ld=bfd"
+
 do_compile () {
 	base_do_compile
 	echo "Adjust ldd script"

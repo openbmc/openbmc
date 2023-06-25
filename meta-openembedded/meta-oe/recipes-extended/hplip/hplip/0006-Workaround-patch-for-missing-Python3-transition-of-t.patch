@@ -9,6 +9,8 @@ Subject: Workaround patch for missing Python3 transition of the old
  proper solution in the next upstream release of HPLIP (see LP: #1275353)
 
 ---
+Upstream-Status: Pending
+
  pcard/pcardext/pcardext.c | 59 +++++++++++++++++++++++++++++++++++++----------
  pcard/photocard.py        |  2 +-
  unload.py                 |  5 ++++

@@ -5,6 +5,8 @@ Subject: [PATCH 2/2] fileio: Define DEFFILEMODE if platform is missing
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  fileio.c | 4 ++++
  1 file changed, 4 insertions(+)
 

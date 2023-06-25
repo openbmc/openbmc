@@ -17,6 +17,8 @@ make[2]: ***
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/vcos/pthreads/CMakeLists.txt | 8 ++++++++
  interface/vmcs_host/CMakeLists.txt     | 8 --------
  interface/vmcs_host/vc_vchi_dispmanx.h | 2 +-

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/src/meson.build	2023-01-24 09:22:59.874074134 +0100
 +++ b/src/meson.build	2023-01-24 09:27:00.494627305 +0100
 @@ -73,12 +73,12 @@

@@ -18,6 +18,8 @@ Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 ---
+Upstream-Status: Pending
+
  src/Fl_Preferences.cxx | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

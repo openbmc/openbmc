@@ -5,6 +5,8 @@ Subject: [PATCH 7/8] add error() API when error.h is not on platform
 
 sign-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  sysdep.c | 24 ++++++++++++++++++++++++
  sysdep.h |  2 ++
  2 files changed, 26 insertions(+)

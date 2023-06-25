@@ -5,6 +5,8 @@ Subject: [PATCH 3/8] error.h is specific to glibc on linux
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  sysdep.h | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 

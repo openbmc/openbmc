@@ -4,6 +4,8 @@ Date: Mon, 17 Oct 2022 19:20:53 +0200
 Subject: [PATCH] meson: add PC file for lib_perfetto
 
 ---
+Upstream-Status: Pending
+
  meson.build | 12 ++++++++++--
  1 file changed, 10 insertions(+), 2 deletions(-)
 

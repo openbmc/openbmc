@@ -32,9 +32,14 @@ CROSS_CURSES_INC = '-DCURSES_LOC="<curses.h>"'
 TERMINFO = "${STAGING_DATADIR_NATIVE}/terminfo"
 
 KCONFIG_CONFIG_COMMAND ??= "menuconfig"
+KCONFIG_CONFIG_ENABLE_MENUCONFIG ??= "true"
 KCONFIG_CONFIG_ROOTDIR ??= "${B}"
 python do_menuconfig() {
     import shutil
+
+    if not bb.utils.to_boolean(d.getVar("KCONFIG_CONFIG_ENABLE_MENUCONFIG")):
+        bb.fatal("do_menuconfig is disabled, please check KCONFIG_CONFIG_ENABLE_MENUCONFIG variable.")
+        return
 
     config = os.path.join(d.getVar('KCONFIG_CONFIG_ROOTDIR'), ".config")
     configorig = os.path.join(d.getVar('KCONFIG_CONFIG_ROOTDIR'), ".config.orig")

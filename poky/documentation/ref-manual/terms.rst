@@ -224,7 +224,7 @@ universal, the list includes them just in case:
       having to duplicate accessed file contents in the file cache in RAM,
       as for any block device.
 
-      .. note:
+      .. note::
 
          As far as bootloaders are concerned, :term:`Initramfs` and "initrd"
          images are still copied to RAM in the same way. That's why most
@@ -235,7 +235,7 @@ universal, the list includes them just in case:
 
       -  For booting the same kernel binary on multiple systems requiring
          different device drivers. The :term:`Initramfs` image is then customized
-	 for each type of system, to include the specific  kernel modules
+	 for each type of system, to include the specific kernel modules
          necessary to access the final root filesystem. This technique
 	 is used on all GNU / Linux distributions for desktops and servers.
 
@@ -475,11 +475,11 @@ universal, the list includes them just in case:
      section in the Yocto Project Overview and Concepts Manual.
 
    :term:`SPDX`
-      This term means *Software Package Data Exchange*, and is used as a open
+      This term means *Software Package Data Exchange*, and is used as an open
       standard for providing a *Software Bill of Materials* (:term:`SBOM`).
       This standard is developed through a `Linux Foundation project
       <https://spdx.dev/>`__ and is used by the OpenEmbedded Build System to
-      provide an :term:`SBOM` associated to each a software image.
+      provide an :term:`SBOM` associated to each software image.
 
       For details, see Wikipedia's :wikipedia:`SPDX page <Software_Package_Data_Exchange>`
       and the ":ref:`dev-manual/sbom:creating a software bill of materials`"

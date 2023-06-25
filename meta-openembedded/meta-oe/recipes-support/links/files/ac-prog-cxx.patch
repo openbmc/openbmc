@@ -3,6 +3,8 @@ From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Mon, 30 Jul 2012 23:52:49 +0200
 
 ---
+Upstream-Status: Pending
+
  configure.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

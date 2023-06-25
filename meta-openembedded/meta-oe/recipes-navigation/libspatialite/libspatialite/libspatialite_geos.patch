@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -rupN --no-dereference libspatialite-5.0.1/configure.ac libspatialite-5.0.1-new/configure.ac
 --- libspatialite-5.0.1/configure.ac	2021-03-08 08:57:19.015858195 +0100
 +++ libspatialite-5.0.1-new/configure.ac	2021-03-08 08:57:19.017858195 +0100

@@ -8,6 +8,8 @@ Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
 update patch to 8.0.12
 Signed-off-by: Claude Bing <cbing@cybernetics.com>
 ---
+Upstream-Status: Pending
+
  pear/Makefile.frag | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

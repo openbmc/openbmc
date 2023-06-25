@@ -8,6 +8,8 @@ to keep track of what platforms has it.
 
 Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
 ---
+Upstream-Status: Pending
+
  open-vm-tools/configure.ac           | 1 +
  open-vm-tools/lib/include/hgfsUtil.h | 8 +-------
  2 files changed, 2 insertions(+), 7 deletions(-)

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Fix LOCK_THREADS in settings.dist
  This patch takes into account that if --enable-threads is used, LOCK_THREADS
  doesn't get updated

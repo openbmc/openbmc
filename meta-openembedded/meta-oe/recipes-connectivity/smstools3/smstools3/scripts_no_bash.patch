@@ -3,6 +3,8 @@ From: Bill Randle <bill.randle@gmail.com>
 Date: Sun, 31 Dec 2017 09:08:23 -0800
 
 ---
+Upstream-Status: Pending
+
  scripts/sendsms     | 2 +-
  scripts/sms2html    | 2 +-
  scripts/sms2unicode | 2 +-

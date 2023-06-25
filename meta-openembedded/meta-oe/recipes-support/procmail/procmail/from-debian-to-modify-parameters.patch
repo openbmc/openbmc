@@ -5,6 +5,8 @@ Subject: [PATCH 3/3] From debian to modify parameters
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  Makefile | 16 ++++++++--------
  config.h | 13 +++++++------
  2 files changed, 15 insertions(+), 14 deletions(-)

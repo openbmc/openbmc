@@ -12,6 +12,8 @@ tinet/if_ether.h:101:8: error: redefinition of 'struct ethhdr'
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  teamd/teamd_runner_lacp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

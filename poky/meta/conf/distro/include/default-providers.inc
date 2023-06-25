@@ -24,7 +24,6 @@ PREFERRED_PROVIDER_virtual/make-native ?= "make-native"
 # Default virtual runtime providers
 #
 VIRTUAL-RUNTIME_update-alternatives ?= "update-alternatives-opkg"
-VIRTUAL-RUNTIME_apm ?= "apm"
 VIRTUAL-RUNTIME_alsa-state ?= "alsa-state"
 VIRTUAL-RUNTIME_getopt ?= "util-linux-getopt"
 VIRTUAL-RUNTIME_base-utils ?= "busybox"

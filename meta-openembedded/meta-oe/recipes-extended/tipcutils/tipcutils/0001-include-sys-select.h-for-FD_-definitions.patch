@@ -5,6 +5,8 @@ Subject: [PATCH 1/2] include sys/select.h for FD_* definitions
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  demos/inventory_sim/inventory_sim.c | 1 +
  1 file changed, 1 insertion(+)
 

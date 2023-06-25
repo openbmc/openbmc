@@ -1,0 +1,43 @@
+From 7c998657c1787fcad8f0a502063adff71d78a140 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 12 Jun 2023 09:37:10 -0700
+Subject: [PATCH] testsuite: Add tmp-orc.c for missing
+ _orc_code_orc_deinterleave2_s16
+
+Fixes
+| aarch64-yoe-linux-ld.lld: error: undefined symbol: _orc_code_orc_deinterleave2_s16
+| >>> referenced by schroorc.h:1312 (../schroedinger/schroorc.h:1312)
+| >>>               wavelet_max_gain.o:(iwt_ref)
+| >>> referenced by schroorc.h:1312 (../schroedinger/schroorc.h:1312)
+| >>>               wavelet_max_gain.o:(iwt_ref)
+|
+| aarch64-yoe-linux-ld.lld: error: undefined symbol: _orc_code_orc_interleave2_s16
+| >>> referenced by wavelet_max_gain.c:281 (/usr/src/debug/schroedinger/1.0.11-r0/testsuite/wavelet_max_gain.c:281)
+| >>>               wavelet_max_gain.o:(iiwt_ref)
+| >>> referenced by wavelet_max_gain.c:281 (/usr/src/debug/schroedinger/1.0.11-r0/testsuite/wavelet_max_gain.c:281)
+| >>>               wavelet_max_gain.o:(iiwt_ref)
+| clang-16: error: linker command failed with exit code 1 (use -v to see invocation)
+| make[3]: *** [Makefile:1147: wavelet_max_gain] Error 1
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ testsuite/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/testsuite/Makefile.am b/testsuite/Makefile.am
+index 6ee1130..762ecf2 100644
+--- a/testsuite/Makefile.am
++++ b/testsuite/Makefile.am
+@@ -100,6 +100,7 @@ wavelet_2d_SOURCES = wavelet_2d.c
+ nodist_wavelet_2d_SOURCES = $(top_srcdir)/schroedinger/tmp-orc.c
+ 
+ wavelet_max_gain_SOURCES = wavelet_max_gain.c
++nodist_wavelet_max_gain_SOURCES = $(top_srcdir)/schroedinger/tmp-orc.c
+ 
+ wavelet_noise_2d_SOURCES = wavelet_noise_2d.c
+ 
+-- 
+2.41.0
+

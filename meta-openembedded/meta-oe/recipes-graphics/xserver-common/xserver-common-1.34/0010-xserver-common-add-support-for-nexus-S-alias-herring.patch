@@ -6,6 +6,8 @@ Subject: [PATCH] xserver-common: add support for nexus S alias herring
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  X11/xserver-common | 3 +++
  1 file changed, 3 insertions(+)
 

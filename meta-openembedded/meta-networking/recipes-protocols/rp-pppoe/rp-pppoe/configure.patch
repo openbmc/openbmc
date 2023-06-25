@@ -3,6 +3,8 @@ From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Fri, 18 Jul 2014 08:25:16 +0000
 
 ---
+Upstream-Status: Pending
+
  configure.in | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

@@ -12,6 +12,8 @@ to infer that these structs should be defined in linux/in.h
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  usr/include/net/if.h     | 11 +++++++++++
  usr/include/netinet/in.h | 36 ++++++++++++++++++++++++++++++++++++
  2 files changed, 47 insertions(+)

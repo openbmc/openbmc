@@ -600,12 +600,12 @@ The :ref:`ref-tasks-compile` task will compile two kinds of files:
 - Device tree overlays, detected from the presence of the ``/plugin/;``
   string in the file contents.
 
-This class behaves in a similar way as the :ref:`ref-classes-kernel-devicetree`
-class, also deploying output files into ``/boot/devicetree``. However, this
-class stores the deployed device tree binaries into the ``devicetree``
-subdirectory. This avoids clashes with the :ref:`ref-classes-kernel-devicetree`
-output. Additionally, the device trees are populated into the sysroot for
-access via the sysroot from within other recipes.
+This class deploys the generated device tree binaries into
+``${``\ :term:`DEPLOY_DIR_IMAGE`\ ``}/devicetree/``.  This is similar to
+what the :ref:`ref-classes-kernel-devicetree` class does, with the added
+``devicetree`` subdirectory to avoid name clashes. Additionally, the device
+trees are populated into the sysroot for access via the sysroot from within
+other recipes.
 
 By default, all device tree sources located in :term:`DT_FILES_PATH` directory
 are compiled. To select only particular sources, set :term:`DT_FILES` to

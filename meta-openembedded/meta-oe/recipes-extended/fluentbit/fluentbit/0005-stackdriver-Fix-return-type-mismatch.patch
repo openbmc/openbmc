@@ -10,6 +10,8 @@ error: incompatible integer to pointer conversion returning 'int' from a functio
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  plugins/out_stackdriver/stackdriver.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

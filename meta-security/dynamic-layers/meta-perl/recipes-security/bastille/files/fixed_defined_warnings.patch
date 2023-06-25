@@ -11,7 +11,7 @@ in Bastille.
 Fixed also some warnings regarding defined statements
 in API.pm.
 
-Upstream Status: Inappropriate [No upstream maintenance]
+Upstream-Status: Inappropriate [No upstream maintenance]
 
 Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
 

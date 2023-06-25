@@ -8,6 +8,8 @@ Fixes cross compilation QA errors e.g.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/konkret/CMakeLists.txt | 1 -
  src/program/CMakeLists.txt | 1 -
  2 files changed, 2 deletions(-)

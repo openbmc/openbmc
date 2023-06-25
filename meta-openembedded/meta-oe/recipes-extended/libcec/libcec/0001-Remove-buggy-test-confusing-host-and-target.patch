@@ -4,6 +4,8 @@ Date: Mon, 7 Sep 2020 18:17:21 +0200
 Subject: [PATCH] Remove buggy test confusing host and target
 
 ---
+Upstream-Status: Pending
+
  src/libcec/cmake/CheckPlatformSupport.cmake | 8 --------
  1 file changed, 8 deletions(-)
 

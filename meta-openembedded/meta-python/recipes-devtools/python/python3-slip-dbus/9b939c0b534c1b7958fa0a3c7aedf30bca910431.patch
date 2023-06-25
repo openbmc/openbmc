@@ -9,6 +9,8 @@ the collections module in Python 3.10.
 https://docs.python.org/3.10/whatsnew/changelog.html#python-3-10-0-alpha-5
 https://bugs.python.org/issue37324
 ---
+Upstream-Status: Pending
+
  slip/dbus/polkit.py   | 6 +++---
  slip/util/hookable.py | 6 +++---
  2 files changed, 6 insertions(+), 6 deletions(-)

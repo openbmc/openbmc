@@ -7,7 +7,7 @@ fatal() {
 }
 
 pkg="$1"
-[ -n "$pkg" -a -e "$pkg" ] ||
+[ -n "$pkg" ] && [ -e "$pkg" ] ||
 	fatal "No package supplied"
 
 _dd() {
@@ -16,14 +16,23 @@ _dd() {
 }
 
 calcsize() {
+
+	case "$(_dd $1 bs=4 count=1 | tr -d '\0')" in
+		"$(printf '\216\255\350')"*) ;; # '\x8e\xad\xe8'
+		*) fatal "File doesn't look like rpm: $pkg" ;;
+	esac
+
 	offset=$(($1 + 8))
 
 	local i b b0 b1 b2 b3 b4 b5 b6 b7
 
 	i=0
 	while [ $i -lt 8 ]; do
- 		b=$(_dd $(($offset + $i)) bs=1 count=1; echo X)
- 		b=${b%X}
+		# add . to not loose \n
+		# strip \0 as it gets dropped with warning otherwise
+		b="$(_dd $(($offset + $i)) bs=1 count=1 | tr -d '\0' ; echo .)"
+		b=${b%.}    # strip . again
+
 		[ -z "$b" ] &&
 			b="0" ||
 			b="$(exec printf '%u\n' "'$b")"
@@ -35,7 +44,7 @@ calcsize() {
 	offset=$(($offset + $rsize))
 }
 
-case "$(_dd 0 bs=8 count=1)" in
+case "$(_dd 0 bs=4 count=1 | tr -d '\0')" in
 	"$(printf '\355\253\356\333')"*) ;; # '\xed\xab\xee\xdb'
 	*) fatal "File doesn't look like rpm: $pkg" ;;
 esac
@@ -46,10 +55,11 @@ sigsize=$rsize
 calcsize $(($offset + (8 - ($sigsize % 8)) % 8))
 hdrsize=$rsize
 
-case "$(_dd $offset bs=3 count=1)" in
-	"$(printf '\102\132')"*) _dd $offset | bzip2 -d ;; # '\x42\x5a'
-	"$(printf '\037\213')"*) _dd $offset | gunzip  ;; # '\x1f\x8b'
-	"$(printf '\375\067')"*) _dd $offset | xzcat   ;; # '\xfd\x37'
-	"$(printf '\135\000')"*) _dd $offset | unlzma  ;; # '\x5d\x00'
-	*) fatal "Unrecognized rpm file: $pkg" ;;
+case "$(_dd $offset bs=2 count=1 | tr -d '\0')" in
+	"$(printf '\102\132')") _dd $offset | bunzip2 ;; # '\x42\x5a'
+	"$(printf '\037\213')") _dd $offset | gunzip  ;; # '\x1f\x8b'
+	"$(printf '\375\067')") _dd $offset | xzcat   ;; # '\xfd\x37'
+	"$(printf '\135')") _dd $offset | unlzma      ;; # '\x5d\x00'
+	"$(printf '\050\265')") _dd $offset | unzstd  ;; # '\x28\xb5'
+	*) fatal "Unrecognized payload compression format in rpm file: $pkg" ;;
 esac

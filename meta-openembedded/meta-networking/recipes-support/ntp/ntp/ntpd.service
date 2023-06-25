@@ -3,9 +3,8 @@ Description=Network Time Service
 After=network.target
 
 [Service]
-Type=forking
-PIDFile=/run/ntpd.pid
-ExecStart=/usr/sbin/ntpd -u ntp:ntp -p /run/ntpd.pid -g
+Type=simple
+ExecStart=/usr/sbin/ntpd -u ntp:ntp -n -g
 
 [Install]
 WantedBy=multi-user.target

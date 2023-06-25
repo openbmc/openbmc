@@ -3,6 +3,8 @@ From: Paul Eggleton <paul.eggleton@linux.intel.com>
 Date: Mon, 22 Apr 2013 16:28:16 +0000
 
 ---
+Upstream-Status: Pending
+
  configure.ac | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 

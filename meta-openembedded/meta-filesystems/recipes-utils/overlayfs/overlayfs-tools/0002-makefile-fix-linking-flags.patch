@@ -8,6 +8,8 @@ https://www.gnu.org/software/make/manual/html_node/Catalogue-of-Rules.html
 
 Signed-off-by: Vyacheslav Yurkov <Vyacheslav.Yurkov@bruker.com>
 ---
+Upstream-Status: Pending
+
  makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

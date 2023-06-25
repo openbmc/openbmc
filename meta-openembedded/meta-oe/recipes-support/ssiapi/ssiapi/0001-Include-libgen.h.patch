@@ -9,6 +9,8 @@ would be upstreams choice to make
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  tools/ssieventmonitor.cpp | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 

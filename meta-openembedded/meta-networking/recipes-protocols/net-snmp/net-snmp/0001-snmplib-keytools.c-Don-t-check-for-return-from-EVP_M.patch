@@ -13,6 +13,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 
 ---
+Upstream-Status: Pending
+
  snmplib/keytools.c | 5 +----
  1 file changed, 1 insertion(+), 4 deletions(-)
 

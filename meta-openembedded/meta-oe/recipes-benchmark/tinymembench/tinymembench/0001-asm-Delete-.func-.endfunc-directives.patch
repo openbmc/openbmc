@@ -9,6 +9,8 @@ and rightly so.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  aarch64-asm.S | 14 +-------------
  arm-neon.S    | 24 ------------------------
  mips-32.S     |  5 ++---

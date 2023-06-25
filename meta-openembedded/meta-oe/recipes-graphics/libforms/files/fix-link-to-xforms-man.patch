@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -Naur xforms-1.2.3.orig/lib/Makefile.am xforms-1.2.3/lib/Makefile.am
 --- xforms-1.2.3.orig/lib/Makefile.am	2019-02-24 12:53:58.340678373 +0000
 +++ xforms-1.2.3/lib/Makefile.am	2019-02-24 12:54:33.096674102 +0000

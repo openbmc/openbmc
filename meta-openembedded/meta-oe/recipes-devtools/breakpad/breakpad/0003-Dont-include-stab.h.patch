@@ -5,6 +5,8 @@ Subject: [PATCH 3/5] Dont include stab.h
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/common/stabs_reader.cc          |  1 -
  src/common/stabs_reader.h           | 12 +++++++++++-
  src/common/stabs_reader_unittest.cc |  1 -

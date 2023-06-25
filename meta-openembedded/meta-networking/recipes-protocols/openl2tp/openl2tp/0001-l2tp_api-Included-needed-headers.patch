@@ -7,6 +7,8 @@ These are flagged by musl
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  l2tp_api.c | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)
 

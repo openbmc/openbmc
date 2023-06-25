@@ -1,0 +1,28 @@
+From f4f75ce9218b469d91b536218de3323977edc529 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 13 Jun 2023 15:10:33 +0200
+Subject: [PATCH] testcases/kernel/syscalls/fcntl: define _LARGEFILE64_SOURCE
+
+This is required for off64_t to be available on musl systems.
+
+Upstream-Status: Submitted [https://github.com/linux-test-project/ltp/pull/1047]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ testcases/kernel/syscalls/fcntl/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testcases/kernel/syscalls/fcntl/Makefile b/testcases/kernel/syscalls/fcntl/Makefile
+index df663a50a..aac774111 100644
+--- a/testcases/kernel/syscalls/fcntl/Makefile
++++ b/testcases/kernel/syscalls/fcntl/Makefile
+@@ -17,6 +17,6 @@ include $(abs_srcdir)/../utils/newer_64.mk
+ 
+ %_64: CPPFLAGS += -D_FILE_OFFSET_BITS=64
+ 
+-CPPFLAGS		+= -D_GNU_SOURCE
++CPPFLAGS		+= -D_GNU_SOURCE -D_LARGEFILE64_SOURCE
+ 
+ include $(top_srcdir)/include/mk/generic_leaf_target.mk
+-- 
+2.30.2
+

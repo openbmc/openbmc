@@ -6,6 +6,8 @@ Subject: [PATCH] shm.c: Mark glibc specific changes so
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  shm.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 

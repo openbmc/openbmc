@@ -10,6 +10,8 @@ error: taking the absolute value of unsigned type 'unsigned long' has no effect 
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  cli/cli_lib.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 

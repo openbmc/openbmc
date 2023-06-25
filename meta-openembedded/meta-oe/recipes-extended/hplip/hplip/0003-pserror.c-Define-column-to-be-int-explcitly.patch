@@ -5,6 +5,8 @@ Subject: [PATCH 3/4] pserror.c: Define column to be int explcitly
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  prnt/hpps/pserror.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

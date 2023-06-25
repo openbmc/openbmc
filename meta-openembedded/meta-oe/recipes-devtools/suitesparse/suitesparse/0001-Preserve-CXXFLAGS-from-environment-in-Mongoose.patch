@@ -8,6 +8,8 @@ build process, instead of overwriting them. This is useful in a cross
 compile context where the CXXFLAGS variable might contain necessary
 flags for cross compiling.
 ---
+Upstream-Status: Pending
+
  Mongoose/CMakeLists.txt | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

@@ -8,3 +8,8 @@ PYPI_PACKAGE = "custom_inherit"
 SRC_URI[sha256sum] = "a0d104847b4cc1ae24e00061fc2e11da8766b019bf4c8c753822347366c8c49f"
 
 inherit pypi setuptools3
+
+RDEPENDS:${PN} += " \
+    python3-json \
+    python3-stringold \
+"

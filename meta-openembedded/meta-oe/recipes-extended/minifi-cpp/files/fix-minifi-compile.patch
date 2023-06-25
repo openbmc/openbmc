@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -urN -x .git orig/CMakeLists.txt patched/CMakeLists.txt
 --- orig/CMakeLists.txt	2020-08-07 21:58:34.656773928 +0900
 +++ patched/CMakeLists.txt	2020-08-10 15:08:31.800278357 +0900

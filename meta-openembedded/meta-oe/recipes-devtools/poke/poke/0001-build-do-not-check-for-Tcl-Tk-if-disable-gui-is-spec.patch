@@ -12,6 +12,8 @@ Subject: [PATCH] build: do not check for Tcl/Tk if --disable-gui is specified
 [Romain: remove Changelog entry]
 Signed-off-by: Romain Naour <romain.naour@gmail.com>
 ---
+Upstream-Status: Pending
+
  configure.ac | 9 ++++++---
  1 file changed, 6 insertions(+), 3 deletions(-)
 

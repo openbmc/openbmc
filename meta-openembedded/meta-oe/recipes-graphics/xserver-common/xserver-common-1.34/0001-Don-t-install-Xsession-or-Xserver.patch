@@ -10,6 +10,8 @@ be used as before.
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 
 ---
+Upstream-Status: Pending
+
  Makefile | 2 --
  1 file changed, 2 deletions(-)
 

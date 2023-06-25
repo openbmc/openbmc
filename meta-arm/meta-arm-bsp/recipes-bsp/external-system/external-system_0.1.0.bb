@@ -21,6 +21,9 @@ PRODUCT = "corstone-1000"
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
+# remove once arm-none-eabi-gcc updates to 13 or newer like poky
+DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
+
 LDFLAGS[unexport] = "1"
 
 do_compile() {

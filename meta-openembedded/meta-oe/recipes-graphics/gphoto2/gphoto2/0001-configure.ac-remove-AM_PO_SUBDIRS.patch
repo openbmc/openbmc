@@ -6,6 +6,8 @@ Subject: [PATCH] configure.ac remove AM_PO_SUBDIRS
 This is done twice together with oe autotools.bbclass.
 
 ---
+Upstream-Status: Pending
+
  configure.ac | 1 -
  1 file changed, 1 deletion(-)
 

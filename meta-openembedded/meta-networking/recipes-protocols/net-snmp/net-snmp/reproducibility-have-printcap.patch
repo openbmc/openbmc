@@ -9,6 +9,8 @@ ac_cv_file__etc_printcap instead. When cross-compiling, this variable should be
 set in the environment to "yes" or "no" as appropriate for the target platform.
 
 ---
+Upstream-Status: Pending
+
  configure.d/config_os_misc4 | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

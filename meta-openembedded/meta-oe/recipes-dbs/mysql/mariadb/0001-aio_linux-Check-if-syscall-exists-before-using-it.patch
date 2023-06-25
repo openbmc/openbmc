@@ -13,6 +13,8 @@ tpool/aio_linux.cc:63:20: error: '__NR_io_getevents' was not declared in this sc
 Upstream-Staus: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  tpool/aio_linux.cc | 4 ++++
  1 file changed, 4 insertions(+)
 

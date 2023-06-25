@@ -12,6 +12,8 @@ about why and setting the need for -ldb incorrectly.
 Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
 
 ---
+Upstream-Status: Pending
+
  configure.ac | 10 ++++++++++
  1 file changed, 10 insertions(+)
 

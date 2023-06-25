@@ -5,6 +5,8 @@ Subject: [PATCH 1/5] Check for limits.h during configure
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  configure.ac | 2 ++
  1 file changed, 2 insertions(+)
 

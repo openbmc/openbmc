@@ -3,6 +3,8 @@ From: Denis 'GNUtoo' Carikli <GNUtoo@no-log.org>
 Date: Wed, 17 Oct 2012 20:51:51 +0200
 
 ---
+Upstream-Status: Pending
+
  configure.in | 2 ++
  1 file changed, 2 insertions(+)
 

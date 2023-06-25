@@ -5,6 +5,8 @@ Fix the compile error:
 
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  xrdp/Makefile.am | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

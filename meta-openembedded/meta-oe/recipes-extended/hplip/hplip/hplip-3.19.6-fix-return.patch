@@ -4,6 +4,8 @@ Date: Wed, 14 Aug 2019 15:47:38 -0700
 Subject: [PATCH] Fixing invalid return in void function
 
 ---
+Upstream-Status: Pending
+
  prnt/hpps/hppsfilter.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

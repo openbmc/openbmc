@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 libssl is required by wsman_client_transport if ENABLE_EVENTING_SUPPORT enabled.
 
 Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>

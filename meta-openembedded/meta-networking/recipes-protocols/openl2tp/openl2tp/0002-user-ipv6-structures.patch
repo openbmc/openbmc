@@ -8,6 +8,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Update for ipv6 address compare
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
+Upstream-Status: Pending
+
  l2tp_api.c | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 

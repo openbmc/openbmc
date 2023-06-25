@@ -13,6 +13,8 @@ ng: "__bitwise" redefined
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  kexec/arch/arm64/crashdump-arm64.c | 3 +++
  1 file changed, 3 insertions(+)
 

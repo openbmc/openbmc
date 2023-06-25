@@ -82,6 +82,6 @@ FILES:${PN} = "${bindir} ${sbindir} ${prefix}/etc/rc.d \
 
 COMPATIBLE_HOST:riscv32 = "null"
 COMPATIBLE_HOST:riscv64 = "null"
-OMPATIBLE_HOST:libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"
 
 RDEPENDS:${PN} = "libpcap"

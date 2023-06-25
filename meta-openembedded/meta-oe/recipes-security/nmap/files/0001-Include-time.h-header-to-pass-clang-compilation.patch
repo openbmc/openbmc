@@ -4,6 +4,8 @@ Date: Fri, 20 Sep 2019 15:02:45 -0400
 Subject: [PATCH] Include time.h header to pass clang compilation
 
 ---
+Upstream-Status: Pending
+
  nmap_error.cc       | 11 +----------
  nping/EchoServer.cc |  1 +
  osscan2.cc          |  1 +

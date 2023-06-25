@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/third_party/openthread/repo/src/cli/cli.cpp
 +++ b/third_party/openthread/repo/src/cli/cli.cpp
 @@ -1785,6 +1785,7 @@ template <> otError Interpreter::Process

@@ -21,6 +21,7 @@ SRC_URI = "git://github.com/apple-oss-distributions/mDNSResponder;protocol=https
            file://0006-Handle-noisy-netlink-sockets.patch \
            file://0007-Mark-deleted-interfaces-as-being-changed.patch \
            file://0008-Handle-errors-from-socket-calls.patch \
+           file://0009-remove-unneeded-headers.patch \
            file://mdns.service \
            "
 SRCREV = "8769ab51605e465425d33d757f602ce5905ca639"

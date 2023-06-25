@@ -8,6 +8,8 @@ bitbake build errors related to already-stripped.
 
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
+Upstream-Status: Pending
+
  setup.py | 8 +-------
  1 file changed, 1 insertion(+), 7 deletions(-)
 

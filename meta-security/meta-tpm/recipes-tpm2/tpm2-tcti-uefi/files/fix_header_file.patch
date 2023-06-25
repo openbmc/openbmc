@@ -4,7 +4,7 @@ Error building for i386 target in cross env
 
 ARCH is host arch, not target arch
 
-Upstream-Status: Submitted 
+Upstream-Status: Submitted
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 Index: git/src/uefi-types.h

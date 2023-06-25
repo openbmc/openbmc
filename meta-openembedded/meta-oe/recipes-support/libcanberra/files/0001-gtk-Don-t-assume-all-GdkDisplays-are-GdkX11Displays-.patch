@@ -5,6 +5,8 @@ Subject: [PATCH] gtk: Don't assume all GdkDisplays are GdkX11Displays:
  broadway/wayland
 
 ---
+Upstream-Status: Pending
+
  src/canberra-gtk-module.c | 15 +++++++++++++++
  src/canberra-gtk.c        |  5 +++++
  2 files changed, 20 insertions(+)

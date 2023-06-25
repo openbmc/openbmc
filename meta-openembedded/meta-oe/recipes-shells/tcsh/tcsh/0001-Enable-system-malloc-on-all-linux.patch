@@ -9,6 +9,8 @@ as well. So switch to using system malloc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  config_f.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

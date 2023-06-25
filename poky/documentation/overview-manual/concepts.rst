@@ -1989,7 +1989,7 @@ variables:
 -  :term:`BB_HASHSERVE_UPSTREAM`, when ``BB_HASHSERVE = "auto"``,
    allowing to connect the local server to an upstream one.
 
--  :term:`bitbake:BB_SIGNATURE_HANDLER`, which must be set  to ``OEEquivHash``.
+-  :term:`bitbake:BB_SIGNATURE_HANDLER`, which must be set to ``OEEquivHash``.
 
 Therefore, the default configuration in Poky corresponds to the
 below settings::

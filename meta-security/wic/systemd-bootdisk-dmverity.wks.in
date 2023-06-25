@@ -1,3 +1,4 @@
+# short-description:  Create an EFI disk image with systemd-boot and dm-verity
 # A dm-verity variant of the regular wks for IA machines. We need to fetch
 # the partition images from the IMGDEPLOYDIR as the rootfs source plugin will
 # not recreate the exact block device corresponding with the hash tree. We must

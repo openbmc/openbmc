@@ -2,15 +2,15 @@ commit a932b03b65edeb02ccad2fce06bfa68a8f2fbb04
 Author: Aws Ismail <aws.ismail@windriver.com>
 Date:   Thu Jan 10 16:29:05 2013 -0500
 
-    Set the PID Lock path for samhain.pid
+Set the PID Lock path for samhain.pid
     
-    The explicit path for samhain.pid inorder
-    for samhain to work properly after it initial
-    database build.
+The explicit path for samhain.pid inorder
+for samhain to work properly after it initial
+database build.
     
-    Upstream-Status: Inappropriate [configuration]
+Upstream-Status: Inappropriate [configuration]
 
-    Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
 
 diff --git a/samhainrc.linux b/samhainrc.linux
 index 10a8176..a7b06e6 100644

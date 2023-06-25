@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=25a3927bff3ee4f5b21bcb0ed3fcd6bb"
 
 SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https;branch=main"
 
-PV = "2.14.0"
-SRCREV = "ee80309bc766d781a144e6879419b29f444d94eb"
+PV = "2.15.0"
+SRCREV = "bfde7f2d04fbb22e26c9eb843e4ccc478762dd8d"
 
 S = "${WORKDIR}/git"
 

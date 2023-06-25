@@ -5,6 +5,8 @@ Subject: [PATCH] correct the location of unistd.h
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  os-daq-modules/daq_ipfw.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

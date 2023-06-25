@@ -3,6 +3,8 @@ From: Herrie <github.com@herrie.org>
 Date: Mon, 24 Jul 2017 21:30:16 +0200
 
 ---
+Upstream-Status: Pending
+
  libpurple/protocols/irc/irc.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -urN orig/thirdparty/rocksdb/CMakeLists.txt patched/thirdparty/rocksdb/CMakeLists.txt
 --- orig/thirdparty/rocksdb/CMakeLists.txt	2020-07-28 11:39:40.254677515 +0900
 +++ patched/thirdparty/rocksdb/CMakeLists.txt	2020-07-28 11:51:11.898676054 +0900

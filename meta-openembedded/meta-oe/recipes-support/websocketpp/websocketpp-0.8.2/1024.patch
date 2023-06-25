@@ -6,6 +6,8 @@ Subject: [PATCH] SCons 4.2.0 no longer has env_cpp11.has_key() Check env_cpp11
 
 This fixes https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1003022
 ---
+Upstream-Status: Pending
+
  examples/broadcast_server/SConscript    | 2 +-
  examples/debug_client/SConscript        | 2 +-
  examples/debug_server/SConscript        | 2 +-

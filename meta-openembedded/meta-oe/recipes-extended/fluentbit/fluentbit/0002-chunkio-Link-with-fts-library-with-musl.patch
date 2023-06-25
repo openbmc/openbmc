@@ -8,6 +8,8 @@ cio_utils.c:(.text+0x64): undefined reference to `fts_read'
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/chunkio/src/CMakeLists.txt | 1 +
  1 file changed, 1 insertion(+)
 

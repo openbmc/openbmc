@@ -5,6 +5,8 @@ Subject: [PATCH 2/3] From debian to fix man file
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  man/procmail.man   | 24 +++++++++++++++++-------
  man/procmailrc.man |  2 +-
  2 files changed, 18 insertions(+), 8 deletions(-)

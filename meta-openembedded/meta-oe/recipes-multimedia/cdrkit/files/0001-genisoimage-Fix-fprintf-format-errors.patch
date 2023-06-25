@@ -5,6 +5,8 @@ Subject: [PATCH] genisoimage: Fix fprintf format errors
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  genisoimage/genisoimage.c | 4 ++--
  genisoimage/tree.c        | 2 +-
  2 files changed, 3 insertions(+), 3 deletions(-)

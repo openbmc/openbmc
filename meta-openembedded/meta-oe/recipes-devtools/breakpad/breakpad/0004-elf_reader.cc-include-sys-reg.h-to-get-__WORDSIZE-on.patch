@@ -6,6 +6,8 @@ Subject: [PATCH 4/5] elf_reader.cc: include <sys/reg.h> to get __WORDSIZE on
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/common/dwarf/elf_reader.cc | 1 +
  1 file changed, 1 insertion(+)
 

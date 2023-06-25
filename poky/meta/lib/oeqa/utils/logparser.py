@@ -77,7 +77,10 @@ class PtestParser(object):
                 for t in test_regex:
                     result = test_regex[t].search(line)
                     if result:
-                        self.results[current_section['name']][result.group(1).strip()] = t
+                        try:
+                            self.results[current_section['name']][result.group(1).strip()] = t
+                        except KeyError:
+                            bb.warn("Result with no section: %s - %s" % (t, result.group(1).strip()))
 
         # Python performance for repeatedly joining long strings is poor, do it all at once at the end.
         # For 2.1 million lines in a log this reduces 18 hours to 12s.

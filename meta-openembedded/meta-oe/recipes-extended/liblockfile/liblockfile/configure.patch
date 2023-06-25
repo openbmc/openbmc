@@ -5,6 +5,8 @@ Subject: [PATCH] Update patch for 1.17
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
+Upstream-Status: Pending
+
  configure.ac | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 

@@ -8,6 +8,8 @@ Plus improve 'hello' copying in lmbench script.
 
 Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
+Upstream-Status: Pending
+
  scripts/lmbench | 18 +++++++++---------
  1 file changed, 9 insertions(+), 9 deletions(-)
 

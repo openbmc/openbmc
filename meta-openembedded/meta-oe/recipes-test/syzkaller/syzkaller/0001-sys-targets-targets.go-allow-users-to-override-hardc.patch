@@ -18,11 +18,9 @@ Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
  sys/targets/targets.go | 19 +++++++++++--------
  1 file changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/sys/targets/targets.go b/sys/targets/targets.go
-index f3be708f3..19a8bb681 100644
 --- a/sys/targets/targets.go
 +++ b/sys/targets/targets.go
-@@ -258,7 +258,6 @@ var List = map[string]map[string]*Target{
+@@ -262,7 +262,6 @@ var List = map[string]map[string]*Target
  			PtrSize:          4,
  			PageSize:         4 << 10,
  			LittleEndian:     true,
@@ -30,7 +28,7 @@ index f3be708f3..19a8bb681 100644
  			Triple:           "arm-linux-gnueabi",
  			KernelArch:       "arm",
  			KernelHeaderArch: "arm",
-@@ -670,12 +669,16 @@ func initTarget(target *Target, OS, arch string) {
+@@ -700,12 +699,16 @@ func initTarget(target *Target, OS, arch
  	for i := range target.CFlags {
  		target.replaceSourceDir(&target.CFlags[i], sourceDir)
  	}
@@ -53,15 +51,12 @@ index f3be708f3..19a8bb681 100644
  	}
  	if target.CCompiler == "" {
  		target.setCompiler(useClang)
-@@ -803,7 +806,7 @@ func (target *Target) lazyInit() {
+@@ -839,7 +842,7 @@ func (target *Target) lazyInit() {
  	// On CI we want to fail loudly if cross-compilation breaks.
  	// Also fail if SOURCEDIR_GOOS is set b/c in that case user probably assumes it will work.
- 	if (target.OS != runtime.GOOS || !runningOnCI) && os.Getenv("SOURCEDIR_"+strings.ToUpper(target.OS)) == "" {
+ 	if (target.OS != runtime.GOOS || !runningOnCI) && getSourceDir(target) == "" {
 -		if _, err := exec.LookPath(target.CCompiler); err != nil {
 +		if _, err := exec.LookPath(strings.Fields(target.CCompiler)[0]); err != nil {
  			target.BrokenCompiler = fmt.Sprintf("%v is missing (%v)", target.CCompiler, err)
  			return
  		}
--- 
-2.25.1
-

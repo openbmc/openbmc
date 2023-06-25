@@ -10,6 +10,8 @@ https://gitlab.freedesktop.org/libdecor/libdecor/-/issues/47
 https://gitlab.freedesktop.org/libdecor/libdecor/-/issues/44
 
 ---
+Upstream-Status: Pending
+
  src/plugins/gtk/libdecor-gtk.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

@@ -6,6 +6,8 @@ Subject: [PATCH 3/5] wvtask: Check for HAVE_LIBC_STACK_END only on glibc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  utils/wvtask.cc | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

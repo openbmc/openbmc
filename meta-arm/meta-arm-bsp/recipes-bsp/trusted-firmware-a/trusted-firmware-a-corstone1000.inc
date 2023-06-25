@@ -9,6 +9,10 @@ SRC_URI:append = " \
     file://0002-feat-corstone1000-bl2-loads-fip-based-on-metadata.patch \
     "
 
+#Sets TF-A version to 2.8.0
+SRCREV_tfa = "9881bb93a3bc0a3ea37e9f093e09ab4b360a9e48"
+PV = "2.8.0"
+
 TFA_DEBUG = "1"
 TFA_UBOOT ?= "1"
 TFA_MBEDTLS = "1"

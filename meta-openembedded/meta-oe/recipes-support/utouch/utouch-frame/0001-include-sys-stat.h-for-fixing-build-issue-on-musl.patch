@@ -9,6 +9,8 @@ error: field has incomplete
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  tools/utouch-frame-test-mtdev.c | 1 +
  1 file changed, 1 insertion(+)
 

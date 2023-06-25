@@ -12,6 +12,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 update patch to version 5.1.5
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
+Upstream-Status: Pending
+
  daemon/lookup.c        | 6 +++---
  modules/lookup_multi.c | 2 +-
  2 files changed, 4 insertions(+), 4 deletions(-)

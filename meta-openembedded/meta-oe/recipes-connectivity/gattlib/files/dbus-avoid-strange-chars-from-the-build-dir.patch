@@ -14,6 +14,8 @@ the normal include guards and request "#pragma once" instead.
 
 Signed-off-by: Peter Rosin <peda@axentia.se>
 ---
+Upstream-Status: Pending
+
  dbus/CMakeLists.txt | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 

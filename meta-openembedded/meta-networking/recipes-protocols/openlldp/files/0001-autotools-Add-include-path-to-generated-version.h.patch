@@ -10,6 +10,8 @@ dir. Include the path to it in AM_CPPFLAGS.
 Signed-off-by: Jonathan Richardson <jonathan.richardson@broadcom.com>
 
 ---
+Upstream-Status: Pending
+
  Makefile.am | 3 +++
  1 file changed, 3 insertions(+)
 

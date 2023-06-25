@@ -5,6 +5,8 @@ Subject: [PATCH] Fix cmake find boost with version >= 1.71
 
 For some reasons "system;thread;random;unit_test_framework" was seen as a single module, because of the quotes.
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

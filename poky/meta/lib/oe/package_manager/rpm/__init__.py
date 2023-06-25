@@ -386,11 +386,12 @@ class RpmPM(PackageManager):
             self.save_rpmpostinst(pkg)
 
     def extract(self, pkg):
-        output = self._invoke_dnf(["repoquery", "--queryformat", "%{location}", pkg])
+        output = self._invoke_dnf(["repoquery", "--location", pkg])
         pkg_name = output.splitlines()[-1]
         if not pkg_name.endswith(".rpm"):
             bb.fatal("dnf could not find package %s in repository: %s" %(pkg, output))
-        pkg_path = oe.path.join(self.rpm_repo_dir, pkg_name)
+        # Strip file: prefix
+        pkg_path = pkg_name[5:]
 
         cpio_cmd = bb.utils.which(os.getenv("PATH"), "cpio")
         rpm2cpio_cmd = bb.utils.which(os.getenv("PATH"), "rpm2cpio")

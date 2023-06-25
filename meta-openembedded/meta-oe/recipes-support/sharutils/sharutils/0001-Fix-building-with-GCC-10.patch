@@ -21,6 +21,8 @@ declarations.
 Signed-off-by: Petr PÃ­saÅ™ <address@hidden>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/shar-opts.h     | 2 +-
  src/shar-std.def    | 2 +-
  src/unshar-opts.h   | 2 +-

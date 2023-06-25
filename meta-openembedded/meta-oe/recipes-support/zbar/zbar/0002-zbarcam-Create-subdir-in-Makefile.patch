@@ -20,6 +20,8 @@ make: *** [Makefile:2438: zbarcam/moc_zbarcam_qt.h] Error 1
 
 Signed-off-by: Daniel Gomez <dagmcr@gmail.com>
 ---
+Upstream-Status: Pending
+
  zbarcam/Makefile.am.inc | 1 +
  1 file changed, 1 insertion(+)
 

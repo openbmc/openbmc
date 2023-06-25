@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Correct typo: s/ommited/omitted/
 Author: Michael Shuler <michael@pbandjelly.org>
 Index: ifmetric/man/ifmetric.8

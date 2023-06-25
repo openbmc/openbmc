@@ -21,6 +21,8 @@ Yacc.
 Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  addrdb/coord-config-parse.y | 4 ++++
  1 file changed, 4 insertions(+)
 

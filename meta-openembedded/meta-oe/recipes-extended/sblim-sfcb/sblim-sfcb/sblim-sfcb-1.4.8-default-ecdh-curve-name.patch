@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -up sblim-sfcb-1.4.8/control.c.orig sblim-sfcb-1.4.8/control.c
 --- sblim-sfcb-1.4.8/control.c.orig	2014-03-27 00:46:28.000000000 +0100
 +++ sblim-sfcb-1.4.8/control.c	2014-05-15 12:31:38.304169409 +0200

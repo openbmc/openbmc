@@ -7,6 +7,8 @@ Fix LIBS
 
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
+Upstream-Status: Pending
+
  config.mk | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

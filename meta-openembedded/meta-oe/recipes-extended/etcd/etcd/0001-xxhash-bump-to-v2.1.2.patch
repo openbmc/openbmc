@@ -18,6 +18,8 @@ the etcd v3.5 release tag.
 
 Signed-off-by: Andrew Geissler <geissonator@yahoo.com>
 ---
+Upstream-Status: Pending
+
  client/v3/go.mod | 2 +-
  client/v3/go.sum | 2 ++
  etcdctl/go.mod   | 2 +-

@@ -5,6 +5,8 @@ Subject: [PATCH 5/5] ethernet.c : remove it
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  ethernet.c | 224 -------------------------------------------------------------
  1 file changed, 224 deletions(-)
  delete mode 100644 ethernet.c

@@ -8,6 +8,8 @@ unlike glibc where it is bundled in
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  configure.ac | 2 ++
  1 file changed, 2 insertions(+)
 

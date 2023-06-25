@@ -6,6 +6,8 @@ Subject: [PATCH] configure: Disable format-overflow if supported by gcc
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  Makefile.am                 |  6 +--
  configure.ac                |  2 +
  m4/ax_check_compile_flag.m4 | 74 +++++++++++++++++++++++++++++++++++++

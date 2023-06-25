@@ -7,6 +7,8 @@ link with shared zlib
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile.unx | 18 ++++++++----------
  1 file changed, 8 insertions(+), 10 deletions(-)
 

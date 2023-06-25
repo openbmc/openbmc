@@ -1,0 +1,33 @@
+From 1d7e71e72c597ffcc19c04373a477d1fbd3ad955 Mon Sep 17 00:00:00 2001
+From: Beniamin Sandu <beniaminsandu@gmail.com>
+Date: Thu, 15 Jun 2023 17:02:58 +0000
+Subject: [PATCH] remove unneeded headers
+
+From a quick look, these seem to not be needed and having them
+breaks the build with mbedtls 3.x. Without them it builds fine
+on both 2.x and 3.x versions.
+
+Upstream-Status: Pending
+
+Signed-off-by: Beniamin Sandu <beniaminsandu@gmail.com>
+---
+ mDNSPosix/mbedtls.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/mDNSPosix/mbedtls.c b/mDNSPosix/mbedtls.c
+index a73681b..ab8f8c7 100644
+--- a/mDNSPosix/mbedtls.c
++++ b/mDNSPosix/mbedtls.c
+@@ -38,10 +38,8 @@
+ #include <mbedtls/sha256.h>
+ #include <mbedtls/base64.h>
+
+-#include <mbedtls/certs.h>
+ #include <mbedtls/x509.h>
+ #include <mbedtls/ssl.h>
+-#include <mbedtls/config.h>
+
+ // Posix TLS server context
+ struct TLSContext_struct {
+--
+2.34.1

@@ -8,6 +8,8 @@ https://stackoverflow.com/questions/1242904/finding-python-site-packages-directo
 
 Signed-off-by: Romain Naour <romain.naour@smile.fr>
 ---
+Upstream-Status: Pending
+
  pyiec61850/CMakeLists.txt | 11 ++---------
  1 file changed, 2 insertions(+), 9 deletions(-)
 

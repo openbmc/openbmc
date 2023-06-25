@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 http://cvs.fedoraproject.org/viewvc/devel/libwmf/libwmf-0.2.8.4-intoverflow.patch?view=log
 
 CVE-2006-3376 libwmf integer overflow

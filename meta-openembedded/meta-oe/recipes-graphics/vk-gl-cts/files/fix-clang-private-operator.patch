@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/external/glslang/src/glslang/Include/PoolAlloc.h
 +++ b/external/glslang/src/glslang/Include/PoolAlloc.h
 @@ -240,8 +240,9 @@ protected:

@@ -8,6 +8,8 @@ warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  wvrules.mk | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

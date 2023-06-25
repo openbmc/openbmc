@@ -5,6 +5,8 @@ Subject: [PATCH 3/5] rarpd.c : bug fix
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  rarpd.c | 98 +++++++++++++++++++++++++++++++++++++----------------------------
  1 file changed, 56 insertions(+), 42 deletions(-)
 

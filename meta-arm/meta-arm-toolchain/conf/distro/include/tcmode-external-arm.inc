@@ -4,6 +4,9 @@
 
 EXTERNAL_TOOLCHAIN ?= "/usr/local/arm-binary-toolchain/${TARGET_ARCH}"
 
+# oe-core passes this by default because it assumes GCC 13. This can be removed when Arm GCC is 13.1+.
+DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
+
 TOOLCHAIN_PATH_ADD = "${EXTERNAL_TOOLCHAIN}/bin:"
 PATH =. "${TOOLCHAIN_PATH_ADD}"
 
@@ -78,6 +81,9 @@ python toolchain_metadata_setup () {
     external_toolchain = l.getVar('EXTERNAL_TOOLCHAIN', True)
     if not external_toolchain or external_toolchain == 'UNDEFINED':
         bb.fatal("Error: EXTERNAL_TOOLCHAIN must be set to the path to your arm toolchain")
+
+    if not os.path.isabs(external_toolchain):
+        bb.fatal("Error: EXTERNAL_TOOLCHAIN path '%s' must be absolute path" % external_toolchain)
 
     if not os.path.exists(external_toolchain):
         bb.fatal("Error: EXTERNAL_TOOLCHAIN path '%s' does not exist" % external_toolchain)

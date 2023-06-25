@@ -10,6 +10,8 @@ availability first
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/efi/efi.h           | 4 ++--
  lib/engine/pragma.h     | 4 ++--
  lib/log/log.h           | 4 ++--

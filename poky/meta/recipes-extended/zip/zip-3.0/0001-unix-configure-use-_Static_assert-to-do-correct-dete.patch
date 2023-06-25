@@ -1,0 +1,96 @@
+From 9916fc6f1f93f3e092e3c6937c30dc8137c26d34 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 15 Jun 2023 18:31:26 +0800
+Subject: [PATCH] unix/configure: use _Static_assert to do correct detection
+
+We're doing cross compilation, running a cross-compiled problem
+on host to detemine feature is not correct. Use _Static_assert
+to do the detection correctly.
+
+Upstream-Status: Inactive-Upstream
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ unix/configure | 42 ++++++++++++------------------------------
+ 1 file changed, 12 insertions(+), 30 deletions(-)
+
+diff --git a/unix/configure b/unix/configure
+index f2b3d02..f917086 100644
+--- a/unix/configure
++++ b/unix/configure
+@@ -361,6 +361,10 @@ cat > conftest.c << _EOF_
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include <stdio.h>
++
++_Static_assert(sizeof((struct stat){0}.st_uid) == 2, "sizeof st_uid is not 16 bit");
++_Static_assert(sizeof((struct stat){0}.st_gid) == 2, "sizeof st_gid is not 16 bit");
++
+ int main()
+ {
+   struct stat s;
+@@ -385,21 +389,7 @@ if [ $? -ne 0 ]; then
+   echo -- UID/GID test failed on compile - disabling old 16-bit UID/GID support
+   CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+ else
+-# run it
+-  ./conftest
+-  r=$?
+-  if [ $r -eq 1 ]; then
+-    echo -- UID not 2 bytes - disabling old 16-bit UID/GID support
+-    CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+-  elif [ $r -eq 2 ]; then
+-    echo -- GID not 2 bytes - disabling old 16-bit UID/GID support
+-    CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+-  elif [ $r -eq 3 ]; then
+-    echo -- 16-bit UIDs and GIDs - keeping old 16-bit UID/GID support
+-  else
+-    echo -- test failed - conftest returned $r - disabling old 16-bit UID/GID support
+-    CFLAGS="${CFLAGS} -DUIDGID_NOT_16BIT"
+-  fi
++  echo -- 16-bit UIDs and GIDs - keeping old 16-bit UID/GID support
+ fi
+ 
+ 
+@@ -417,6 +407,10 @@ cat > conftest.c << _EOF_
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include <stdio.h>
++
++_Static_assert(sizeof(off_t) < 8, "sizeof off_t < 8 failed");
++_Static_assert(sizeof((struct stat){0}.st_size) < 8, "sizeof st_size < 8 failed");
++
+ int main()
+ {
+   off_t offset;
+@@ -436,24 +430,12 @@ _EOF_
+ # compile it
+ $CC -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+-  echo -- no Large File Support
++  echo -- yes we have Large File Support!
++  CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT"
+ else
+-# run it
+-  ./conftest
+-  r=$?
+-  if [ $r -eq 1 ]; then
+-    echo -- no Large File Support - no 64-bit off_t
+-  elif [ $r -eq 2 ]; then
+-    echo -- no Large File Support - no 64-bit stat
+-  elif [ $r -eq 3 ]; then
+-    echo -- yes we have Large File Support!
+-    CFLAGS="${CFLAGS} -DLARGE_FILE_SUPPORT"
+-  else
+-    echo -- no Large File Support - conftest returned $r
+-  fi
++  echo -- no Large File Support
+ fi
+ 
+-
+ # Check for wide char for Unicode support
+ # Added 11/24/2005 EG
+ 
+-- 
+2.34.1
+

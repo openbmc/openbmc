@@ -3,6 +3,8 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 5 Jan 2013 19:53:10 -0800
 
 ---
+Upstream-Status: Pending
+
  aclocal.m4   | 2 ++
  configure.in | 8 ++++++--
  2 files changed, 8 insertions(+), 2 deletions(-)

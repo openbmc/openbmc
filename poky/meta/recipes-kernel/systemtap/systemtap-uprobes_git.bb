@@ -22,11 +22,13 @@ do_compile() {
 		unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS CC LD CPP
 		oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
 			   AR="${KERNEL_AR}" OBJCOPY="${KERNEL_OBJCOPY}" \
+			   STRIP="${KERNEL_STRIP}" \
 			   -C ${STAGING_KERNEL_DIR} scripts
 		oe_runmake KDIR=${STAGING_KERNEL_DIR}   \
 			   M="${S}/runtime/uprobes/" \
 			   CC="${KERNEL_CC}" LD="${KERNEL_LD}" \
 			   AR="${KERNEL_AR}" OBJCOPY="${KERNEL_OBJCOPY}" \
+			   STRIP="${KERNEL_STRIP}" \
 			   -C "${S}/runtime/uprobes/"
 	fi
 }

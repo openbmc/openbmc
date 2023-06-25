@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Check for argp_parse in libargp and then in libc before using internal version
 
 Index: wvstreams-4.6.1/configure.ac

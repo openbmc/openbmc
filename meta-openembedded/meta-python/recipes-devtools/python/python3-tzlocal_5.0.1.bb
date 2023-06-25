@@ -7,7 +7,8 @@ SRC_URI[sha256sum] = "46eb99ad4bdb71f3f72b7d24f4267753e240944ecfc16f25d2719ba898
 
 inherit pypi python_setuptools_build_meta
 
-RDEPENDS:${PN} += "\
-	${PYTHON_PN}-pytz-deprecation-shim \
-        ${PYTHON_PN}-datetime \
+RDEPENDS:${PN} += " \
+    python3-datetime \
+    python3-logging \
+    python3-pytz-deprecation-shim \
 "

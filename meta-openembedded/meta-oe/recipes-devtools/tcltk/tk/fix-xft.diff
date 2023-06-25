@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- /tmp/configure.in	2010-05-19 13:29:03.000000000 +0200
 +++ unix/configure.in	2010-05-19 13:42:05.000000000 +0200
 @@ -526,13 +526,9 @@

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -r -c -N ../mcpp-2.7.2-old/noconfig/vc2010.dif ./noconfig/vc2010.dif
 *** ../mcpp-2.7.2-old/noconfig/vc2010.dif	Wed Dec 31 20:30:00 1969
 --- ./noconfig/vc2010.dif	Fri May 14 12:47:22 2010

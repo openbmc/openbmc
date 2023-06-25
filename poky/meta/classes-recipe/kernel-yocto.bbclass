@@ -455,7 +455,7 @@ do_kernel_configme() {
 		bbfatal_log "Could not find configuration queue (${meta_dir}/config.queue)"
 	fi
 
-	CFLAGS="${CFLAGS} ${TOOLCHAIN_OPTIONS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}" CC="${KERNEL_CC}" LD="${KERNEL_LD}" OBJCOPY="${KERNEL_OBJCOPY}" ARCH=${ARCH} merge_config.sh -O ${B} ${config_flags} ${configs} > ${meta_dir}/cfg/merge_config_build.log 2>&1
+	CFLAGS="${CFLAGS} ${TOOLCHAIN_OPTIONS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}" CC="${KERNEL_CC}" LD="${KERNEL_LD}" OBJCOPY="${KERNEL_OBJCOPY}" STRIP="${KERNEL_STRIP}" ARCH=${ARCH} merge_config.sh -O ${B} ${config_flags} ${configs} > ${meta_dir}/cfg/merge_config_build.log 2>&1
 	if [ $? -ne 0 -o ! -f ${B}/.config ]; then
 		bberror "Could not generate a .config for ${KMACHINE}-${LINUX_KERNEL_TYPE}"
 		if [ ${KCONF_AUDIT_LEVEL} -gt 1 ]; then
@@ -490,6 +490,7 @@ python do_config_analysis() {
     env['LD'] = d.getVar('KERNEL_LD')
     env['CC'] = d.getVar('KERNEL_CC')
     env['OBJCOPY'] = d.getVar('KERNEL_OBJCOPY')
+    env['STRIP'] = d.getVar('KERNEL_STRIP')
     env['ARCH'] = d.getVar('ARCH')
     env['srctree'] = s
 
@@ -552,6 +553,7 @@ python do_kernel_configcheck() {
     env['LD'] = d.getVar('KERNEL_LD')
     env['CC'] = d.getVar('KERNEL_CC')
     env['OBJCOPY'] = d.getVar('KERNEL_OBJCOPY')
+    env['STRIP'] = d.getVar('KERNEL_STRIP')
     env['ARCH'] = d.getVar('ARCH')
     env['srctree'] = s
 

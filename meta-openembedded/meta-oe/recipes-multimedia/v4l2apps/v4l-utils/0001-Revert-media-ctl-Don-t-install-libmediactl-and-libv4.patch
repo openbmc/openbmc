@@ -13,6 +13,8 @@ Conflicts:
 	utils/media-ctl/Makefile.am
 
 ---
+Upstream-Status: Pending
+
  utils/media-ctl/Makefile.am | 10 +++-------
  1 file changed, 3 insertions(+), 7 deletions(-)
 

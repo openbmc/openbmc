@@ -1,7 +1,7 @@
-From fcc5de7e0e618fa4ec82d37f5f0687af837e6f54 Mon Sep 17 00:00:00 2001
+From 3664fe7503cbc4348bbd7bcb8fbf7e1db332ac5d Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 6 Jun 2022 17:26:06 +0100
-Subject: [PATCH 07/27] arm_ffa: introduce Sandbox test cases for UCLASS_FFA
+Subject: [PATCH 07/42] arm_ffa: introduce Sandbox test cases for UCLASS_FFA
 
 Add functional test cases for the FF-A core driver
 
@@ -38,7 +38,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  create mode 100644 test/dm/ffa.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 297d165f8401..c1d3d4ae1c56 100644
+index 297d165f84..c1d3d4ae1c 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -272,6 +272,7 @@ F:	doc/arch/arm64.ffa.rst
@@ -50,7 +50,7 @@ index 297d165f8401..c1d3d4ae1c56 100644
  ARM FREESCALE IMX
  M:	Stefano Babic <sbabic@denx.de>
 diff --git a/test/dm/Makefile b/test/dm/Makefile
-index 7a79b6e1a25d..85e99e1c120e 100644
+index 7a79b6e1a2..85e99e1c12 100644
 --- a/test/dm/Makefile
 +++ b/test/dm/Makefile
 @@ -1,6 +1,7 @@
@@ -71,7 +71,7 @@ index 7a79b6e1a25d..85e99e1c120e 100644
  obj-y += regmap.o
 diff --git a/test/dm/ffa.c b/test/dm/ffa.c
 new file mode 100644
-index 000000000000..128d8626a761
+index 0000000000..128d8626a7
 --- /dev/null
 +++ b/test/dm/ffa.c
 @@ -0,0 +1,392 @@
@@ -468,5 +468,5 @@ index 000000000000..128d8626a761
 +
 +DM_TEST(dm_test_ffa_nack, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
 -- 
-2.39.1
+2.25.1
 

@@ -1,8 +1,7 @@
 #!/bin/bash
 #
 # QEMU network configuration script to bring down tap devices. This
-# utility needs to be run as root, and will use the tunctl binary
-# from the native sysroot. 
+# utility needs to be run as root, and will use the ip utility
 #
 # If you find yourself calling this script a lot, you can add the
 # the following to your /etc/sudoers file to be able to run this
@@ -33,22 +32,19 @@ fi
 TAP=$1
 STAGING_BINDIR_NATIVE=$2
 
-TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
-if [ ! -e "$TUNCTL" ]; then
-	echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
+if !ip tuntap del $TAP mode tap 2>/dev/null; then
+	echo "Error: Unable to run up tuntap del"
 	exit 1
 fi
 
-$TUNCTL -d $TAP
-
-IFCONFIG=`which ip 2> /dev/null`
-if [ "x$IFCONFIG" = "x" ]; then
+IPTOOL=`which ip 2> /dev/null`
+if [ "x$IPTOOL" = "x" ]; then
 	# better than nothing...
-	IFCONFIG=/sbin/ip
+	IPTOOL=/sbin/ip
 fi
-if [ -x "$IFCONFIG" ]; then
-	if `$IFCONFIG link show $TAP > /dev/null 2>&1`; then
-		$IFCONFIG link del $TAP
+if [ -x "$IPTOOL" ]; then
+	if `$IPTOOL link show $TAP > /dev/null 2>&1`; then
+		$IPTOOL link del $TAP
 	fi
 fi
 # cleanup the remaining iptables rules

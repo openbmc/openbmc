@@ -7,6 +7,8 @@ Fixes build with hardening flags
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  telnet/utilities.cc | 6 +++---
  telnetd/utility.c   | 6 +++---
  2 files changed, 6 insertions(+), 6 deletions(-)

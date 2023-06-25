@@ -8,6 +8,8 @@ error: duplicate 'const' declaration specifier [-Werror,-Wduplicate-decl-specifi
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  dict.h    | 2 +-
  library.c | 2 +-
  vect.h    | 2 +-

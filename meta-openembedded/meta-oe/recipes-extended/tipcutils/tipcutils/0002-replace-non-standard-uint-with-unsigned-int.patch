@@ -7,6 +7,8 @@ make it portable on musl
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  demos/benchmark/client_tipc.c       | 34 +++++++++++++++++-----------------
  demos/benchmark/common_tipc.h       |  2 +-
  demos/benchmark/server_tipc.c       | 10 +++++-----

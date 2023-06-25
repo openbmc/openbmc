@@ -1,6 +1,6 @@
 not run test on host, since we are doing cross-compile
 
-Upstream-status: Inappropriate [cross compile specific]
+Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 ---

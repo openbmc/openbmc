@@ -9,6 +9,8 @@ to link in librirpc, make room for those changes to take effect
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  scripts/build |  2 +-
  src/Makefile  | 14 +++++++-------
  2 files changed, 8 insertions(+), 8 deletions(-)

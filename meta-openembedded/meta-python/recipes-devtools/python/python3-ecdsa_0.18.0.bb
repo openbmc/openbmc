@@ -13,3 +13,7 @@ inherit pypi setuptools3 python3native
 RDEPENDS:${PN} += "python3-six python3-gmpy2 python3-pbr"
 
 BBCLASSEXTEND = "native nativesdk"
+
+do_install:append() {
+    rm ${D}${PYTHON_SITEPACKAGES_DIR}/ecdsa/test_*.py
+}

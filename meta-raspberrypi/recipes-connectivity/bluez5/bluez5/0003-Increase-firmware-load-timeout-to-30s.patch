@@ -4,6 +4,8 @@ Date: Wed, 20 Jan 2016 16:00:37 +0000
 Subject: [PATCH] Increase firmware load timeout to 30s
 
 ---
+Upstream-Status: Pending
+
  tools/hciattach.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

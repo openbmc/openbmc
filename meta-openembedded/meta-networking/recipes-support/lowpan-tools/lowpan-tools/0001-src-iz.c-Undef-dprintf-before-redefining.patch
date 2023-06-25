@@ -7,6 +7,8 @@ Clang is picky and warns about macros redefinition
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/iz.c | 1 +
  1 file changed, 1 insertion(+)
 

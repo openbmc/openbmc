@@ -5,6 +5,8 @@ Subject: [PATCH] Makefile: proper location of LDFLAGS
 
 Signed-off-by: Vyacheslav Yurkov <Vyacheslav.Yurkov@bruker.com>
 ---
+Upstream-Status: Pending
+
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

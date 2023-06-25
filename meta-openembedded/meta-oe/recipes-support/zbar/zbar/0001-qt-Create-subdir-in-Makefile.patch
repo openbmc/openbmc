@@ -17,6 +17,8 @@ make: *** [Makefile:2459: qt/moc_QZBar.cpp] Error 1
 
 Signed-off-by: Daniel Gomez <dagmcr@gmail.com>
 ---
+Upstream-Status: Pending
+
  qt/Makefile.am.inc | 1 +
  1 file changed, 1 insertion(+)
 

@@ -10,6 +10,8 @@ cmake version 3.12 or higher
 
 Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
 ---
+Upstream-Status: Pending
+
  src/CMakeLists.txt | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
 

@@ -5,6 +5,8 @@ Subject: [PATCH 2/2] timing.c: Fix format-security errors
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/timing.c | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

@@ -10,6 +10,8 @@ cli_lib.c:427:20: error: expression which evaluates to zero treated as a null po
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  cli/cli_lib.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

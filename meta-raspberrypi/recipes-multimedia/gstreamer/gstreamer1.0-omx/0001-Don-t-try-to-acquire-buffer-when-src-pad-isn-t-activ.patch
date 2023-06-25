@@ -27,6 +27,8 @@ arrive:
   gst_omx_component_wait_message()
 
 ---
+Upstream-Status: Pending
+
  omx/gstomxvideodec.c | 5 +++++
  1 file changed, 5 insertions(+)
 

@@ -4,6 +4,8 @@ Date: Wed, 29 Mar 2017 23:09:47 -0700
 Subject: [PATCH 6/8] sysdep: Add header include sequence to adjust for musl
 
 ---
+Upstream-Status: Pending
+
  sysdep.h | 10 +++++++---
  1 file changed, 7 insertions(+), 3 deletions(-)
 

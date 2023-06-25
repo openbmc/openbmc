@@ -5,6 +5,8 @@ Subject: [PATCH 2/2] execinfo: Fix compiler errors found with newer gcc/clang
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  execinfo.c | 19 +++++++++++--------
  1 file changed, 11 insertions(+), 8 deletions(-)
 

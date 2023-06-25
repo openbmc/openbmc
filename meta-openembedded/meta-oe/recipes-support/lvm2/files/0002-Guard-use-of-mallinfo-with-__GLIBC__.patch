@@ -9,6 +9,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Dengke Du <dengke.du@windriver.com>
 
 ---
+Upstream-Status: Pending
+
  lib/mm/memlock.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

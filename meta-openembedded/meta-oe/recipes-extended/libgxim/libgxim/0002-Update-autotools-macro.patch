@@ -4,6 +4,8 @@ Date: Wed, 22 Jan 2014 18:59:32 +0900
 Subject: [PATCH 2/3] Update autotools macro
 
 ---
+Upstream-Status: Pending
+
  configure.ac | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 

@@ -14,6 +14,8 @@ http://sources.debian.net/src/gtkperf/0.40%2Bds-2/debian/patches/01-include_stdl
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/main.c | 1 +
  1 file changed, 1 insertion(+)
 

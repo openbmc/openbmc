@@ -29,6 +29,8 @@ Signed-off-by: Mauro Salvini <m.salvini@koansoftware.com>
 Cc: C?dric Schieli <cschieli@gmail.com>
 Cc: Matthias Brugger <mbrugger@suse.com>
 ---
+Upstream-Status: Pending
+
  board/raspberrypi/rpi/rpi.c | 3 ---
  1 file changed, 3 deletions(-)
 

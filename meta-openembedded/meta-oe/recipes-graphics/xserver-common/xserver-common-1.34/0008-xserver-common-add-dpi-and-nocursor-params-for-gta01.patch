@@ -7,6 +7,8 @@ Subject: [PATCH] xserver-common: add dpi and nocursor params for gta01 and
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  X11/xserver-common | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 

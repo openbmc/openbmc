@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -ru hddtemp-0.3-beta15.orig/configure.in hddtemp-0.3-beta15/configure.in
 --- hddtemp-0.3-beta15.orig/configure.in	2005-10-17 20:14:19.000000000 +0100
 +++ hddtemp-0.3-beta15/configure.in	2008-06-27 00:00:46.000000000 +0100

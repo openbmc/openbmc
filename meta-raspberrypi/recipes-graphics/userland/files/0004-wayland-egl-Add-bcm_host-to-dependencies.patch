@@ -9,6 +9,8 @@ lets add the dependency on bcm_host module which should do it
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/wayland-egl/wayland-egl.pc.in | 1 +
  1 file changed, 1 insertion(+)
 

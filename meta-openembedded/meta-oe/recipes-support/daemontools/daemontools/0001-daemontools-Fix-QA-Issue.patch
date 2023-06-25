@@ -9,6 +9,8 @@ ERROR: daemontools-0.76-r0 do_package_qa: QA Issue: No GNU_HASH in the elf binar
 
 Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  src/conf-ld | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

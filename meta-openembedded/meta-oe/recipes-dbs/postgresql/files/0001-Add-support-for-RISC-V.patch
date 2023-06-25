@@ -6,6 +6,8 @@ Subject: [PATCH] Add support for RISC-V.
 The architecture is sufficiently similar to aarch64 that simply
 extending the existing aarch64 macro works.
 ---
+Upstream-Status: Pending
+
  src/include/storage/s_lock.h | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

@@ -12,6 +12,8 @@ SRCREV = "864fac79116870df1ab7aa21e639578807e41e75"
 
 S = "${WORKDIR}/git"
 
+LD = "${HOST_PREFIX}ld.bfd${TOOLCHAIN_OPTIONS} ${HOST_LD_ARCH}"
+
 inherit autotools-brokensep
 
 COMPATIBLE_HOST = "(x86_64.*|aarch64.*|arm.*|powerpc)-linux"

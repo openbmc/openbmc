@@ -1,6 +1,7 @@
 isic: add with-libnet remove libnet test
 
-Inappropriate - builds fine on non-oe systems. We need to exlude
+Upstream-Status: Inappropriate [embedded specific]
+builds fine on non-oe systems. We need to exlude
 cross compile libnet test. Pass in the location for libnet.a. Path
 did not support mulitlib either.
 

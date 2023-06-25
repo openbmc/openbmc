@@ -1,7 +1,7 @@
-From 03f0a1ac1450223ff2aa9be116e918230371048e Mon Sep 17 00:00:00 2001
+From d8f79ab37bae283599e40018055ff9d5648fb647 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 17 Dec 2021 19:50:25 +0000
-Subject: [PATCH 17/27] efi_firmware: add get_image_info for corstone1000
+Subject: [PATCH 17/42] efi_firmware: add get_image_info for corstone1000
 
 This change is to populate get_image_info which eventually
 will be populated in ESRT table
@@ -14,7 +14,7 @@ Upstream-Status: Pending [Not submitted to upstream yet]
  1 file changed, 71 insertions(+), 1 deletion(-)
 
 diff --git a/lib/efi_loader/efi_firmware.c b/lib/efi_loader/efi_firmware.c
-index 93e2b01c07a6..0a38a96351ff 100644
+index 93e2b01c07..0a38a96351 100644
 --- a/lib/efi_loader/efi_firmware.c
 +++ b/lib/efi_loader/efi_firmware.c
 @@ -18,11 +18,69 @@
@@ -119,5 +119,5 @@ index 93e2b01c07a6..0a38a96351ff 100644
  			     NULL, NULL))
  		return EFI_EXIT(EFI_DEVICE_ERROR);
 -- 
-2.39.1
+2.25.1
 

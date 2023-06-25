@@ -1,0 +1,156 @@
+From 116aead44e01e046f83931574980991df66f69c3 Mon Sep 17 00:00:00 2001
+From: Rico Tzschichholz <ricotz@ubuntu.com>
+Date: Fri, 14 Apr 2023 09:42:23 +0200
+Subject: [PATCH] vala-unit: Fix non-null build with newer vala
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/geary/-/commit/10f9c133a2ad515127d65f3bba13a0d91b75f4af]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../vala-unit/src/collection-assertions.vala   | 12 ++++++------
+ subprojects/vala-unit/src/mock-object.vala     |  6 +++---
+ subprojects/vala-unit/src/test-assertions.vala | 18 +++++++++---------
+ 3 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/subprojects/vala-unit/src/collection-assertions.vala b/subprojects/vala-unit/src/collection-assertions.vala
+index 3b34acda..29223a0d 100644
+--- a/subprojects/vala-unit/src/collection-assertions.vala
++++ b/subprojects/vala-unit/src/collection-assertions.vala
+@@ -256,7 +256,7 @@ internal class ValaUnit.ArrayCollectionAssertion<E> : GLib.Object,
+ 
+     public CollectionAssertions<E> contains(E expected)
+         throws GLib.Error {
+-        E boxed_expected = box_value(expected);
++        E? boxed_expected = box_value(expected);
+         bool found = false;
+         for (int i = 0; i < this.actual.length; i++) {
+             try {
+@@ -281,7 +281,7 @@ internal class ValaUnit.ArrayCollectionAssertion<E> : GLib.Object,
+ 
+     public CollectionAssertions<E> not_contains(E expected)
+         throws GLib.Error {
+-        E boxed_expected = box_value(expected);
++        E? boxed_expected = box_value(expected);
+         for (int i = 0; i < this.actual.length; i++) {
+             try {
+                 assert_equal(box_value(this.actual[i]), boxed_expected);
+@@ -312,8 +312,8 @@ internal class ValaUnit.ArrayCollectionAssertion<E> : GLib.Object,
+                 this.context
+             );
+         }
+-        E boxed_actual = box_value(this.actual[index]);
+-        E boxed_expected = box_value(expected);
++        E? boxed_actual = box_value(this.actual[index]);
++        E? boxed_expected = box_value(expected);
+         try {
+             assert_equal(boxed_actual, boxed_expected);
+         } catch (TestError.FAILED err) {
+@@ -453,8 +453,8 @@ internal class ValaUnit.GeeCollectionAssertion<E> :
+         for (int i = 0; i <= index; i++) {
+             iterator.next();
+         }
+-        E boxed_actual = box_value(iterator.get());
+-        E boxed_expected = box_value(expected);
++        E? boxed_actual = box_value(iterator.get());
++        E? boxed_expected = box_value(expected);
+         try {
+             assert_equal(boxed_actual, boxed_expected);
+         } catch (TestError.FAILED err) {
+diff --git a/subprojects/vala-unit/src/mock-object.vala b/subprojects/vala-unit/src/mock-object.vala
+index 766777a4..eb086e10 100644
+--- a/subprojects/vala-unit/src/mock-object.vala
++++ b/subprojects/vala-unit/src/mock-object.vala
+@@ -138,7 +138,7 @@ public interface ValaUnit.MockObject : GLib.Object, TestAssertions {
+         throws GLib.Error {
+         assert_false(this.expected.is_empty, "Unexpected call: %s".printf(name));
+ 
+-        ExpectedCall expected = this.expected.poll();
++        ExpectedCall expected = (!) this.expected.poll();
+         assert_equal(name, expected.name, "Unexpected call");
+         if (expected.expected_args != null) {
+             assert_args(args, expected.expected_args, "Call %s".printf(name));
+@@ -229,7 +229,7 @@ public interface ValaUnit.MockObject : GLib.Object, TestAssertions {
+                                           R default_return)
+         throws GLib.Error {
+         check_for_exception(expected);
+-        R? return_object = default_return;
++        R return_object = default_return;
+         if (expected.return_object != null) {
+             return_object = (R) expected.return_object;
+         }
+@@ -243,7 +243,7 @@ public interface ValaUnit.MockObject : GLib.Object, TestAssertions {
+         if (expected.return_object == null) {
+             throw default_error;
+         }
+-        return expected.return_object;
++        return (!) expected.return_object;
+     }
+ 
+     private inline void check_for_exception(ExpectedCall expected)
+diff --git a/subprojects/vala-unit/src/test-assertions.vala b/subprojects/vala-unit/src/test-assertions.vala
+index 784dd9fd..e61fdf82 100644
+--- a/subprojects/vala-unit/src/test-assertions.vala
++++ b/subprojects/vala-unit/src/test-assertions.vala
+@@ -21,8 +21,8 @@ namespace ValaUnit {
+ 
+     }
+ 
+-    internal inline void assert_equal<T>(T actual,
+-                                         T expected,
++    internal inline void assert_equal<T>(T? actual,
++                                         T? expected,
+                                          string? context = null)
+         throws TestError {
+         if ((actual == null && expected != null) ||
+@@ -107,9 +107,9 @@ namespace ValaUnit {
+      *
+      * This will only work when the values are not already boxed.
+      */
+-    internal T box_value<T>(T value) {
++    internal T? box_value<T>(T value) {
+         var type = typeof(T);
+-        T boxed = value;
++        T? boxed = value;
+ 
+         if (type == typeof(int) || type.is_enum()) {
+             int actual = (int) value;
+@@ -133,7 +133,7 @@ namespace ValaUnit {
+         return boxed;
+     }
+ 
+-    internal string to_display_string<T>(T value) {
++    internal string to_display_string<T>(T? value) {
+         var type = typeof(T);
+         var display = "";
+ 
+@@ -191,8 +191,8 @@ namespace ValaUnit {
+         );
+     }
+ 
+-    private void assert_equal_enum<T>(T actual,
+-                                      T expected,
++    private void assert_equal_enum<T>(T? actual,
++                                      T? expected,
+                                       string? context)
+         throws TestError {
+         int actual_val = (int) ((int?) actual);
+@@ -342,7 +342,7 @@ public interface ValaUnit.TestAssertions : GLib.Object {
+ 
+ 
+     /** Asserts a value is null */
+-    public void assert_non_null<T>(T actual, string? context = null)
++    public void assert_non_null<T>(T? actual, string? context = null)
+         throws TestError {
+         if (actual == null) {
+             ValaUnit.assert(
+@@ -353,7 +353,7 @@ public interface ValaUnit.TestAssertions : GLib.Object {
+     }
+ 
+     /** Asserts a value is null */
+-    public void assert_is_null<T>(T actual, string? context = null)
++    public void assert_is_null<T>(T? actual, string? context = null)
+         throws TestError {
+         if (actual != null) {
+             ValaUnit.assert(
+-- 
+2.41.0
+

@@ -4,10 +4,10 @@ DESCRIPTION = "These are introductory examples to showcase the use of QEMU to ru
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=39346640a23c701e4f459e05f56f4449"
 
-SRCREV = "22016ecbb9fb6c5f3a7a06698aea7ff8a701c166"
+SRCREV = "ea7f59b02467ed1fb36c3b4c6d5cabe702df26ec"
 PV = "0.1+git${SRCPV}"
 
-SRC_URI = "git://github.com/aehs29/baremetal-helloqemu.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/ahcbb6/baremetal-helloqemu.git;protocol=https;branch=master"
 UPSTREAM_VERSION_UNKNOWN="1"
 
 S = "${WORKDIR}/git"

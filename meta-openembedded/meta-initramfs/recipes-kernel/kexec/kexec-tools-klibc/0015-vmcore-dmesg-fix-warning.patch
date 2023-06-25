@@ -8,6 +8,8 @@ Subject: [PATCH] vmcore-dmesg: fix warning
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  vmcore-dmesg/vmcore-dmesg.c | 3 +++
  1 file changed, 3 insertions(+)
 

@@ -14,4 +14,10 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-RDEPENDS:${PN} += "python3-core"
+RDEPENDS:${PN} += " \
+    python3-compression \
+    python3-logging \
+    python3-netserver \
+    python3-setuptools \
+    python3-stringold \
+"

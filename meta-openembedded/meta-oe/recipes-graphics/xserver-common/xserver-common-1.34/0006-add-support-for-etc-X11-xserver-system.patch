@@ -6,6 +6,8 @@ Subject: [PATCH] add support for /etc/X11/xserver-system
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  X11/xserver-common | 5 +++++
  1 file changed, 5 insertions(+)
 

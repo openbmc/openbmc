@@ -123,8 +123,8 @@ class OEGitproxyTests(OEScriptTests):
 class OeRunNativeTest(OESelftestTestCase):
     def test_oe_run_native(self):
         bitbake("qemu-helper-native -c addto_recipe_sysroot")
-        result = runCmd("oe-run-native qemu-helper-native tunctl -h")
-        self.assertIn("Delete: tunctl -d device-name [-f tun-clone-device]", result.output)
+        result = runCmd("oe-run-native qemu-helper-native qemu-oe-bridge-helper --help")
+        self.assertIn("Helper function to find and exec qemu-bridge-helper", result.output)
 
 class OEListPackageconfigTests(OEScriptTests):
     #oe-core.scripts.List_all_the_PACKAGECONFIG's_flags

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: wvstreams-4.6.1/ipstreams/wvunixdgsocket.cc
 ===================================================================
 --- wvstreams-4.6.1.orig/ipstreams/wvunixdgsocket.cc	2011-05-20 00:02:38.391136584 +0200

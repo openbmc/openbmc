@@ -1,0 +1,455 @@
+From c7567aaf75a66e204d492a8f6e2a3b4bfb8a7e45 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Fri, 14 Apr 2023 13:23:25 +0100
+Subject: [PATCH 27/42] drivers/mtd/nvmxip: introduce NVM XIP block storage
+ emulation
+
+add block storage emulation for NVM XIP flash devices
+
+Some paltforms such as Corstone-1000 need to see NVM XIP raw flash
+as a block storage device with read only capability.
+
+Here NVM flash devices are devices with addressable
+memory (e.g: QSPI NOR flash).
+
+The implementation is generic and can be used by different platforms.
+
+Two drivers are provided as follows.
+
+  nvmxip-blk :
+
+    a generic block driver allowing to read from the XIP flash
+
+  nvmxip Uclass driver :
+
+        When a device is described in the DT and associated with
+        UCLASS_NVMXIP, the Uclass creates a block device and binds it with
+	 the nvmxip-blk.
+
+Platforms can use multiple NVM XIP devices at the same time by defining a
+DT node for each one of them.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Backport [https://github.com/u-boot/u-boot/commit/c9c2c95d4cd27fe0cd41fe13a863899d268f973c]
+---
+ MAINTAINERS                         |   6 ++
+ doc/develop/driver-model/index.rst  |   1 +
+ doc/develop/driver-model/nvmxip.rst |  48 +++++++++++
+ drivers/block/blk-uclass.c          |   1 +
+ drivers/mtd/Kconfig                 |   2 +
+ drivers/mtd/Makefile                |   1 +
+ drivers/mtd/nvmxip/Kconfig          |  13 +++
+ drivers/mtd/nvmxip/Makefile         |   7 ++
+ drivers/mtd/nvmxip/nvmxip-uclass.c  |  67 ++++++++++++++++
+ drivers/mtd/nvmxip/nvmxip.c         | 119 ++++++++++++++++++++++++++++
+ drivers/mtd/nvmxip/nvmxip.h         |  32 ++++++++
+ include/dm/uclass-id.h              |   1 +
+ 12 files changed, 298 insertions(+)
+ create mode 100644 doc/develop/driver-model/nvmxip.rst
+ create mode 100644 drivers/mtd/nvmxip/Kconfig
+ create mode 100644 drivers/mtd/nvmxip/Makefile
+ create mode 100644 drivers/mtd/nvmxip/nvmxip-uclass.c
+ create mode 100644 drivers/mtd/nvmxip/nvmxip.c
+ create mode 100644 drivers/mtd/nvmxip/nvmxip.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a2f60a3b93..1dbfab5f43 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1202,6 +1202,12 @@ F:	cmd/nvme.c
+ F:	include/nvme.h
+ F:	doc/develop/driver-model/nvme.rst
+ 
++NVMXIP
++M:	Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++S:	Maintained
++F:	doc/develop/driver-model/nvmxip.rst
++F:	drivers/mtd/nvmxip/
++
+ NVMEM
+ M:	Sean Anderson <seanga2@gmail.com>
+ S:	Maintained
+diff --git a/doc/develop/driver-model/index.rst b/doc/develop/driver-model/index.rst
+index 7366ef818c..8e12bbd936 100644
+--- a/doc/develop/driver-model/index.rst
++++ b/doc/develop/driver-model/index.rst
+@@ -20,6 +20,7 @@ subsystems
+    livetree
+    migration
+    nvme
++   nvmxip
+    of-plat
+    pci-info
+    pmic-framework
+diff --git a/doc/develop/driver-model/nvmxip.rst b/doc/develop/driver-model/nvmxip.rst
+new file mode 100644
+index 0000000000..fe087b13d2
+--- /dev/null
++++ b/doc/develop/driver-model/nvmxip.rst
+@@ -0,0 +1,48 @@
++.. SPDX-License-Identifier: GPL-2.0+
++
++NVM XIP Block Storage Emulation Driver
++=======================================
++
++Summary
++-------
++
++Non-Volatile Memory devices with addressable memory (e.g: QSPI NOR flash) could
++be used for block storage needs (e.g: parsing a GPT layout in a raw QSPI NOR flash).
++
++The NVMXIP Uclass provides this functionality and can be used for any 64-bit platform.
++
++The NVMXIP Uclass provides the following drivers:
++
++      nvmxip-blk block driver:
++
++        A generic block driver allowing to read from the XIP flash.
++	The driver belongs to UCLASS_BLK.
++	The driver implemented by drivers/mtd/nvmxip/nvmxip.c
++
++      nvmxip Uclass driver:
++
++        When a device is described in the DT and associated with UCLASS_NVMXIP,
++        the Uclass creates a block device and binds it with the nvmxip-blk.
++	The Uclass driver implemented by drivers/mtd/nvmxip/nvmxip-uclass.c
++
++    The implementation is generic and can be used by different platforms.
++
++Supported hardware
++--------------------------------
++
++Any 64-bit plaform.
++
++Configuration
++----------------------
++
++config NVMXIP
++	  This option allows the emulation of a block storage device
++	  on top of a direct access non volatile memory XIP flash devices.
++	  This support provides the read operation.
++	  This option provides the block storage driver nvmxip-blk which
++	  handles the read operation. This driver is HW agnostic and can support
++	  multiple flash devices at the same time.
++
++Contributors
++------------
++   * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+diff --git a/drivers/block/blk-uclass.c b/drivers/block/blk-uclass.c
+index c69fc4d518..e8ab576c32 100644
+--- a/drivers/block/blk-uclass.c
++++ b/drivers/block/blk-uclass.c
+@@ -28,6 +28,7 @@ static struct {
+ 	{ UCLASS_AHCI, "sata" },
+ 	{ UCLASS_HOST, "host" },
+ 	{ UCLASS_NVME, "nvme" },
++	{ UCLASS_NVMXIP, "nvmxip" },
+ 	{ UCLASS_EFI_MEDIA, "efi" },
+ 	{ UCLASS_EFI_LOADER, "efiloader" },
+ 	{ UCLASS_VIRTIO, "virtio" },
+diff --git a/drivers/mtd/Kconfig b/drivers/mtd/Kconfig
+index fcdb450f77..0537ac64e3 100644
+--- a/drivers/mtd/Kconfig
++++ b/drivers/mtd/Kconfig
+@@ -224,4 +224,6 @@ source "drivers/mtd/spi/Kconfig"
+ 
+ source "drivers/mtd/ubi/Kconfig"
+ 
++source "drivers/mtd/nvmxip/Kconfig"
++
+ endmenu
+diff --git a/drivers/mtd/Makefile b/drivers/mtd/Makefile
+index 3a78590aaa..c638980ea2 100644
+--- a/drivers/mtd/Makefile
++++ b/drivers/mtd/Makefile
+@@ -25,6 +25,7 @@ obj-y += nand/
+ obj-y += onenand/
+ obj-y += spi/
+ obj-$(CONFIG_MTD_UBI) += ubi/
++obj-$(CONFIG_NVMXIP) += nvmxip/
+ 
+ #SPL/TPL build
+ else
+diff --git a/drivers/mtd/nvmxip/Kconfig b/drivers/mtd/nvmxip/Kconfig
+new file mode 100644
+index 0000000000..ef53fc3c79
+--- /dev/null
++++ b/drivers/mtd/nvmxip/Kconfig
+@@ -0,0 +1,13 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# Copyright 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++# Authors:
++#   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++
++config NVMXIP
++	bool "NVM XIP devices support"
++	select BLK
++	help
++	  This option allows the emulation of a block storage device
++	  on top of a direct access non volatile memory XIP flash devices.
++	  This support provides the read operation.
+diff --git a/drivers/mtd/nvmxip/Makefile b/drivers/mtd/nvmxip/Makefile
+new file mode 100644
+index 0000000000..07890982c7
+--- /dev/null
++++ b/drivers/mtd/nvmxip/Makefile
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# Copyright 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++# Authors:
++#   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++
++obj-y += nvmxip-uclass.o nvmxip.o
+diff --git a/drivers/mtd/nvmxip/nvmxip-uclass.c b/drivers/mtd/nvmxip/nvmxip-uclass.c
+new file mode 100644
+index 0000000000..9f96041e3d
+--- /dev/null
++++ b/drivers/mtd/nvmxip/nvmxip-uclass.c
+@@ -0,0 +1,67 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ * Authors:
++ *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include <common.h>
++#include <dm.h>
++#include <log.h>
++#include <linux/bitops.h>
++#include "nvmxip.h"
++
++/* LBA Macros */
++
++#define DEFAULT_LBA_SHIFT 10 /* 1024 bytes per block */
++#define DEFAULT_LBA_COUNT 1024 /* block count */
++
++#define DEFAULT_LBA_SZ BIT(DEFAULT_LBA_SHIFT)
++
++/**
++ * nvmxip_post_bind() - post binding treatments
++ * @dev:	the NVMXIP device
++ *
++ * Create and probe a child block device.
++ *
++ * Return:
++ *
++ * 0 on success. Otherwise, failure
++ */
++static int nvmxip_post_bind(struct udevice *udev)
++{
++	int ret;
++	struct udevice *bdev = NULL;
++	char bdev_name[NVMXIP_BLKDEV_NAME_SZ + 1];
++	int devnum;
++
++	devnum = uclass_id_count(UCLASS_NVMXIP);
++	snprintf(bdev_name, NVMXIP_BLKDEV_NAME_SZ, "blk#%d", devnum);
++
++	ret = blk_create_devicef(udev, NVMXIP_BLKDRV_NAME, bdev_name, UCLASS_NVMXIP,
++				 devnum, DEFAULT_LBA_SZ,
++				 DEFAULT_LBA_COUNT, &bdev);
++	if (ret) {
++		log_err("[%s]: failure during creation of the block device %s, error %d\n",
++			udev->name, bdev_name, ret);
++		return ret;
++	}
++
++	ret = blk_probe_or_unbind(bdev);
++	if (ret) {
++		log_err("[%s]: failure during probing the block device %s, error %d\n",
++			udev->name, bdev_name, ret);
++		return ret;
++	}
++
++	log_info("[%s]: the block device %s ready for use\n", udev->name, bdev_name);
++
++	return 0;
++}
++
++UCLASS_DRIVER(nvmxip) = {
++	.name	   = "nvmxip",
++	.id	   = UCLASS_NVMXIP,
++	.post_bind = nvmxip_post_bind,
++};
+diff --git a/drivers/mtd/nvmxip/nvmxip.c b/drivers/mtd/nvmxip/nvmxip.c
+new file mode 100644
+index 0000000000..a359e3b482
+--- /dev/null
++++ b/drivers/mtd/nvmxip/nvmxip.c
+@@ -0,0 +1,119 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ * Authors:
++ *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#include <common.h>
++#include <dm.h>
++#include <log.h>
++#include <mapmem.h>
++#include <asm/io.h>
++#include <linux/bitops.h>
++#include <linux/errno.h>
++#include "nvmxip.h"
++
++/**
++ * nvmxip_mmio_rawread() - read from the XIP flash
++ * @address:	address of the data
++ * @value:	pointer to where storing the value read
++ *
++ * Read raw data from the XIP flash.
++ *
++ * Return:
++ *
++ * Always return 0.
++ */
++static int nvmxip_mmio_rawread(const phys_addr_t address, u64 *value)
++{
++	*value = readq(address);
++	return 0;
++}
++
++/**
++ * nvmxip_blk_read() - block device read operation
++ * @dev:	the block device
++ * @blknr:	first block number to read from
++ * @blkcnt:	number of blocks to read
++ * @buffer:	destination buffer
++ *
++ * Read data from the block storage device.
++ *
++ * Return:
++ *
++ * number of blocks read on success. Otherwise, failure
++ */
++static ulong nvmxip_blk_read(struct udevice *dev, lbaint_t blknr, lbaint_t blkcnt, void *buffer)
++{
++	struct nvmxip_plat *plat = dev_get_plat(dev->parent);
++	struct blk_desc *desc = dev_get_uclass_plat(dev);
++	/* number of the u64 words to read */
++	u32 qwords = (blkcnt * desc->blksz) / sizeof(u64);
++	/* physical address of the first block to read */
++	phys_addr_t blkaddr = plat->phys_base + blknr * desc->blksz;
++	u64 *virt_blkaddr;
++	u64 *pdst = buffer;
++	uint qdata_idx;
++
++	if (!pdst)
++		return -EINVAL;
++
++	log_debug("[%s]: reading from blknr: %lu , blkcnt: %lu\n", dev->name, blknr, blkcnt);
++
++	virt_blkaddr = map_sysmem(blkaddr, 0);
++
++	/* assumption: the data is virtually contiguous */
++
++	for (qdata_idx = 0 ; qdata_idx < qwords ; qdata_idx++)
++		nvmxip_mmio_rawread((phys_addr_t)(virt_blkaddr + qdata_idx), pdst++);
++
++	log_debug("[%s]:     src[0]: 0x%llx , dst[0]: 0x%llx , src[-1]: 0x%llx , dst[-1]: 0x%llx\n",
++		  dev->name,
++		  *virt_blkaddr,
++		  *(u64 *)buffer,
++		  *(u64 *)((u8 *)virt_blkaddr + desc->blksz * blkcnt - sizeof(u64)),
++		  *(u64 *)((u8 *)buffer + desc->blksz * blkcnt - sizeof(u64)));
++
++	unmap_sysmem(virt_blkaddr);
++
++	return blkcnt;
++}
++
++/**
++ * nvmxip_blk_probe() - block storage device probe
++ * @dev:	the block storage device
++ *
++ * Initialize the block storage descriptor.
++ *
++ * Return:
++ *
++ * Always return 0.
++ */
++static int nvmxip_blk_probe(struct udevice *dev)
++{
++	struct nvmxip_plat *plat = dev_get_plat(dev->parent);
++	struct blk_desc *desc = dev_get_uclass_plat(dev);
++
++	desc->lba = plat->lba;
++	desc->log2blksz = plat->lba_shift;
++	desc->blksz = BIT(plat->lba_shift);
++	desc->bdev = dev;
++
++	log_debug("[%s]: block storage layout\n    lbas: %lu , log2blksz: %d, blksz: %lu\n",
++		  dev->name, desc->lba, desc->log2blksz, desc->blksz);
++
++	return 0;
++}
++
++static const struct blk_ops nvmxip_blk_ops = {
++	.read	= nvmxip_blk_read,
++};
++
++U_BOOT_DRIVER(nvmxip_blk) = {
++	.name	= NVMXIP_BLKDRV_NAME,
++	.id	= UCLASS_BLK,
++	.probe	= nvmxip_blk_probe,
++	.ops	= &nvmxip_blk_ops,
++};
+diff --git a/drivers/mtd/nvmxip/nvmxip.h b/drivers/mtd/nvmxip/nvmxip.h
+new file mode 100644
+index 0000000000..f4ef37725d
+--- /dev/null
++++ b/drivers/mtd/nvmxip/nvmxip.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ * Authors:
++ *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ */
++
++#ifndef __DRIVER_NVMXIP_H__
++#define __DRIVER_NVMXIP_H__
++
++#include <blk.h>
++
++#define NVMXIP_BLKDRV_NAME    "nvmxip-blk"
++#define NVMXIP_BLKDEV_NAME_SZ 20
++
++/**
++ * struct nvmxip_plat - the NVMXIP driver plat
++ *
++ * @phys_base:	NVM XIP device base address
++ * @lba_shift:	block size shift count
++ * @lba:	number of blocks
++ *
++ * The NVMXIP information read from the DT.
++ */
++struct nvmxip_plat {
++	phys_addr_t phys_base;
++	u32 lba_shift;
++	lbaint_t lba;
++};
++
++#endif /* __DRIVER_NVMXIP_H__ */
+diff --git a/include/dm/uclass-id.h b/include/dm/uclass-id.h
+index fa08a66ac8..f3564a49d9 100644
+--- a/include/dm/uclass-id.h
++++ b/include/dm/uclass-id.h
+@@ -92,6 +92,7 @@ enum uclass_id {
+ 	UCLASS_NOP,		/* No-op devices */
+ 	UCLASS_NORTHBRIDGE,	/* Intel Northbridge / SDRAM controller */
+ 	UCLASS_NVME,		/* NVM Express device */
++	UCLASS_NVMXIP,		/* NVM XIP devices */
+ 	UCLASS_P2SB,		/* (x86) Primary-to-Sideband Bus */
+ 	UCLASS_PANEL,		/* Display panel, such as an LCD */
+ 	UCLASS_PANEL_BACKLIGHT,	/* Backlight controller for panel */
+-- 
+2.25.1
+

@@ -209,12 +209,12 @@ Following is the complete "Hello World" example.
 
     .. note::
 
-       Without a value for PN , the variables STAMP , T , and B , prevent more
-       than one recipe from working. You can fix this by either setting PN to
+       Without a value for :term:`PN`, the variables :term:`STAMP`, :term:`T`, and :term:`B`, prevent more
+       than one recipe from working. You can fix this by either setting :term:`PN` to
        have a value similar to what OpenEmbedded and BitBake use in the default
-       bitbake.conf file (see previous example). Or, by manually updating each
-       recipe to set PN . You will also need to include PN as part of the STAMP
-       , T , and B variable definitions in the local.conf file.
+       ``bitbake.conf`` file (see previous example). Or, by manually updating each
+       recipe to set :term:`PN`. You will also need to include :term:`PN` as part of the :term:`STAMP`,
+       :term:`T`, and :term:`B` variable definitions in the ``local.conf`` file.
 
     The ``TMPDIR`` variable establishes a directory that BitBake uses
     for build output and intermediate files other than the cached
@@ -319,9 +319,9 @@ Following is the complete "Hello World" example.
 
     .. note::
 
-       We are setting both LAYERSERIES_CORENAMES and LAYERSERIES_COMPAT in this particular case, because we
+       We are setting both ``LAYERSERIES_CORENAMES`` and :term:`LAYERSERIES_COMPAT` in this particular case, because we
        are using bitbake without OpenEmbedded.
-       You should usually just use LAYERSERIES_COMPAT to specify the OE-Core versions for which your layer
+       You should usually just use :term:`LAYERSERIES_COMPAT` to specify the OE-Core versions for which your layer
        is compatible, and add the meta-openembedded layer to your project.
 
     You need to create the recipe file next. Inside your layer at the

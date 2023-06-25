@@ -9,6 +9,8 @@ to compile when using musl libc.
 Signed-off-by: Jonathan Richardson <jonathan.richardson@broadcom.com>
 
 ---
+Upstream-Status: Pending
+
  include/clif.h | 1 +
  1 file changed, 1 insertion(+)
 

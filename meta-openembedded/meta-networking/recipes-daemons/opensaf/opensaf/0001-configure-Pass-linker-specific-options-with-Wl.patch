@@ -9,6 +9,8 @@ and we can use non-gcc compilers
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

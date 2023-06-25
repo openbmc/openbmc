@@ -12,6 +12,8 @@ modified for backporting to android-tools_5.1.1.r37.
 Signed-off-by: Macpaul Lin <macpaul.lin@mediatek.com>
 Signed-off-by: Jiacheng Liu <jiacheng.liu@mediatek.com>
 ---
+Upstream-Status: Pending
+
  adb/usb_linux_client.c | 275 +++++++++++++++++++++++++++++++----------
  1 file changed, 207 insertions(+), 68 deletions(-)
 

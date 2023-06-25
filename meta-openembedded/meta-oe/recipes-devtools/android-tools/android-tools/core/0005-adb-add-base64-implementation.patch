@@ -7,6 +7,8 @@ musl needs it
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  adb/adb_auth_client.c |   2 +-
  adb/base64.c          | 315 ++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 316 insertions(+), 1 deletion(-)

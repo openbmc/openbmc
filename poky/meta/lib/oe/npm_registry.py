@@ -11,7 +11,7 @@ import subprocess
 _ALWAYS_SAFE = frozenset('ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                          'abcdefghijklmnopqrstuvwxyz'
                          '0123456789'
-                         '_.-~')
+                         '_.-~()')
 
 MISSING_OK = object()
 

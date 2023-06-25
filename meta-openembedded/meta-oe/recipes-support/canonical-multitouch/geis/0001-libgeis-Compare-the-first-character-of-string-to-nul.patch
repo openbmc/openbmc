@@ -13,6 +13,8 @@ fixes
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  libgeis/geis_v1.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

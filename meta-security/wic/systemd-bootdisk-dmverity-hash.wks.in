@@ -1,0 +1,18 @@
+# short-description:  Create an EFI disk image with systemd-boot and separate hash dm-verity
+# A dm-verity variant of the regular wks for IA machines. We need to fetch
+# the partition images from the IMGDEPLOYDIR as the rootfs source plugin will
+# not recreate the exact block device corresponding with the hash tree. We must
+# not alter the label or any other setting on the image.
+# Based on OE-core's systemd-bootdisk.wks and meta-security's beaglebone-yocto-verity.wks.in file
+#
+# This .wks only works with the dm-verity-img class and separate hash data. (DM_VERITY_SEPARATE_HASH)
+
+part /boot --source bootimg-efi --sourceparams="loader=systemd-boot,initrd=microcode.cpio" --ondisk sda --label msdos --active --align 1024 --use-uuid
+
+# include the root+hash part with the dynamic hash/UUIDs from the build.
+include ${STAGING_VERITY_DIR}/${IMAGE_BASENAME}.${DM_VERITY_IMAGE_TYPE}.wks.in
+
+# add "console=ttyS0,115200" or whatever you need to the --append="..."
+bootloader --ptable gpt --timeout=5 --append="root=/dev/mapper/rootfs"
+
+part swap --ondisk sda --size 44 --label swap1 --fstype=swap --use-uuid

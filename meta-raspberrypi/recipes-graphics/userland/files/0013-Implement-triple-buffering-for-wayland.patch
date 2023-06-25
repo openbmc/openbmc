@@ -12,6 +12,8 @@ to two vertical intervals
 Signed-off-by: Jeff Wannamaker <jeff_wannamaker@cable.comcast.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/egl/egl_client.c         |  3 ++-
  interface/khronos/egl/egl_client_surface.c |  8 ++++++++
  interface/khronos/egl/egl_client_surface.h | 11 +++++++++++

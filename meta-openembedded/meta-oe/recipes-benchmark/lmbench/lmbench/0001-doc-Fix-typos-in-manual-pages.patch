@@ -5,6 +5,8 @@ Subject: [PATCH] doc: Fix typos in manual pages
 
 Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
+Upstream-Status: Pending
+
  doc/bw_mem.8     | 2 +-
  doc/lat_fcntl.8  | 2 +-
  doc/lat_fifo.8   | 2 +-

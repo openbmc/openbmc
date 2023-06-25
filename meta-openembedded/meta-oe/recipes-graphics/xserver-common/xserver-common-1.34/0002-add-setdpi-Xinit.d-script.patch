@@ -6,6 +6,8 @@ Subject: [PATCH] add setdpi Xinit.d script
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  X11/Xinit.d/50setdpi | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 92 insertions(+)
  create mode 100644 X11/Xinit.d/50setdpi

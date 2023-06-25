@@ -8,6 +8,8 @@ makedev macro is defined in sys/sysmacros.h
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  uml_net/ethertap.c | 1 +
  uml_net/host.c     | 1 +
  2 files changed, 2 insertions(+)

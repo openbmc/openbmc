@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- geis-2.2.17/libgeis/geis_subscription.c.orig	2016-06-17 12:04:21.062938443 -0400
 +++ geis-2.2.17/libgeis/geis_subscription.c	2016-06-17 12:05:02.934939172 -0400
 @@ -237,9 +237,10 @@

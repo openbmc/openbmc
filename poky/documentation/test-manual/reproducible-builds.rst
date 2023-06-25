@@ -103,10 +103,12 @@ run::
    oe-selftest -r reproducible.ReproducibleTests.test_reproducible_builds
 
 This defaults to including a ``world`` build so, if other layers are added, it would
-also run the tests for recipes in the additional layers. The first build will be
-run using :ref:`Shared State <overview-manual/concepts:Shared State>` if
+also run the tests for recipes in the additional layers. Different build targets
+can be defined using the :term:`OEQA_REPRODUCIBLE_TEST_TARGET` variable in ``local.conf``.
+The first build will be run using :ref:`Shared State <overview-manual/concepts:Shared State>` if
 available, the second build explicitly disables
-:ref:`Shared State <overview-manual/concepts:Shared State>` and builds on the
+:ref:`Shared State <overview-manual/concepts:Shared State>` except for recipes defined in
+the :term:`OEQA_REPRODUCIBLE_TEST_SSTATE_TARGETS` variable, and builds on the
 specific host the build is running on. This means we can test reproducibility
 builds between different host distributions over time on the Autobuilder.
 

@@ -8,6 +8,8 @@ teamnl.c:160:2: error: unknown type name 'fd_set'; did you mean 'fpos_t'?
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  utils/teamnl.c | 1 +
  1 file changed, 1 insertion(+)
 

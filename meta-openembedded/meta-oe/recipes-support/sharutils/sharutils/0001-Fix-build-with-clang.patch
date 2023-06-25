@@ -8,6 +8,8 @@ whereas it does support format attribute, we hard code it
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/shar-opts.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

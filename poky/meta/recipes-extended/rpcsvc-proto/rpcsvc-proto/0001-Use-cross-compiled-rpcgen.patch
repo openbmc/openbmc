@@ -10,14 +10,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  rpcsvc/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: git/rpcsvc/Makefile.am
-===================================================================
---- git.orig/rpcsvc/Makefile.am
-+++ git/rpcsvc/Makefile.am
-@@ -12,5 +12,5 @@ nodist_rpcsvc_HEADERS = klm_prot.h nlm_p
+--- a/rpcsvc/Makefile.am
++++ b/rpcsvc/Makefile.am
+@@ -12,4 +12,4 @@ nodist_rpcsvc_HEADERS = klm_prot.h nlm_p
  	nfs_prot.h rquota.h sm_inter.h
  
- %.h: %.x
+ .x.h:
 -	$(top_builddir)/rpcgen/rpcgen -h -o $@ $<
 +	rpcgen -h -o $@ $<
- 

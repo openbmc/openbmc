@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Changes for building shared libraries
  This patch includes changes for building shared libraries with PIC object
  files and the correct soname and libname.

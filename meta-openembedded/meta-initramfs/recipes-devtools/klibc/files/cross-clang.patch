@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/scripts/Kbuild.klibc
 +++ b/scripts/Kbuild.klibc
 @@ -113,10 +113,8 @@ KLIBCCPPFLAGS    := -nostdinc -iwithpref

@@ -8,6 +8,8 @@ Fixes build with musl
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  src/pppoe.h | 4 ----
  1 file changed, 4 deletions(-)
 

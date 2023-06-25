@@ -5,6 +5,8 @@ Subject: [PATCH] vm: add some funtions to support musl libc
 
 Signed-off-by: Hongzhi.Song <hongzhi.song@windriver.com>
 ---
+Upstream-Status: Pending
+
  tools/testing/selftests/vm/userfaultfd.c | 298 +++++++++++++++++++++++++++++++
  1 file changed, 298 insertions(+)
 

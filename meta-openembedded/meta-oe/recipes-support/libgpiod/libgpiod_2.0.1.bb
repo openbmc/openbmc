@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = " \
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-2.x:"
 
+SRC_URI += "file://gpio-tools-test-bats-modify.patch"
+
 SRC_URI[sha256sum] = "b5367d28d045b36007a4ffd42cceda4c358737ef4f2ce22b0c1d05ec57a38392"
 
 # Enable all project features for ptest

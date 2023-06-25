@@ -16,6 +16,8 @@ Signed-off-by: Konstantin Kuzov <master.nosferatu@gmail.com>
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  kexec/arch/mips/include/arch/options.h |  4 +-
  kexec/arch/mips/kexec-elf-mips.c       | 58 ++++++++++++++------------
  kexec/arch/mips/kexec-mips.c           |  4 ++

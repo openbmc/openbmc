@@ -16,6 +16,8 @@ to a hard coded path that couldn't be changed.
 
 Signed-off-by: Jonathan Richardson <jonathan.richardson@broadcom.com>
 ---
+Upstream-Status: Pending
+
  Makefile.am  | 3 ++-
  configure.ac | 9 +++++++++
  2 files changed, 11 insertions(+), 1 deletion(-)

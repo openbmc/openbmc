@@ -8,6 +8,8 @@ This patch come straight from the Buildroot source tree.
 Signed-off-by: Bernd Kuhls <berndkuhls@hotmail.com>
 Signed-off-by: Maxime Hadjinlian <maxime.hadjinlian@gmail.com>
 ---
+Upstream-Status: Pending
+
  m4/libiconv.m4 | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

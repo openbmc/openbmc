@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: git/include/tpm_tspi.h
 ===================================================================
 --- git.orig/include/tpm_tspi.h

@@ -19,6 +19,8 @@ Fixes:
 
 Signed-off-by: Jens Rehsack <sno@netbsd.org>
 ---
+Upstream-Status: Pending
+
  test/test_x509.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/configure.ac
 +++ b/configure.ac
 @@ -71,7 +71,7 @@

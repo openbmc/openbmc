@@ -24,6 +24,8 @@ Signed-off-by: Petr Lautrbach <plautrba@redhat.com>
 Acked-by: Stephen Smalley <sds@tycho.nsa.gov>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/procattr.c | 14 +++++++++++++-
  1 file changed, 13 insertions(+), 1 deletion(-)
 

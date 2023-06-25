@@ -15,6 +15,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Dengke Du <dengke.du@windriver.com>
 
 ---
+Upstream-Status: Pending
+
  lib/log/log.c      | 6 ++++++
  tools/lvmcmdline.c | 6 +++---
  2 files changed, 9 insertions(+), 3 deletions(-)

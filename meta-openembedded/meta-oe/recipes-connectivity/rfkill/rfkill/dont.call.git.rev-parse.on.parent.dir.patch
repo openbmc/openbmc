@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 When WORKDIR is included in some other git checkout, version.sh calls git rev-parse
 and it returns some description from that upper git checkout even when rfkill is
 being built from release tarball.

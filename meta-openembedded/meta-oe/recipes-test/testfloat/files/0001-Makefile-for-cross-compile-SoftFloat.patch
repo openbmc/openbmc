@@ -9,6 +9,8 @@ from Fabio Berton <fabio.berton@ossystems.com.br>.
 
 Signed-off-by: Zong Li <zongbox@gmail.com>
 ---
+Upstream-Status: Pending
+
  SoftFloat-3e/build/Linux-Cross-Compile/Makefile   | 325 ++++++++++++++++++++++
  SoftFloat-3e/build/Linux-Cross-Compile/platform.h |  52 ++++
  2 files changed, 377 insertions(+)

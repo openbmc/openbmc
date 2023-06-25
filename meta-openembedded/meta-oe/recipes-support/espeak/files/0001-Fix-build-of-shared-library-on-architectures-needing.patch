@@ -10,6 +10,8 @@ patch doesn't affect such architectures.
 
 Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 ---
+Upstream-Status: Pending
+
  src/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

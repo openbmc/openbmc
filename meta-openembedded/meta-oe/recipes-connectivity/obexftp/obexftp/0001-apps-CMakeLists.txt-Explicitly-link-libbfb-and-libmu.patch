@@ -9,6 +9,8 @@ they are required to be added to link line explicitly.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  apps/CMakeLists.txt | 13 +++++++++++--
  1 file changed, 11 insertions(+), 2 deletions(-)
 

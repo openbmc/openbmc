@@ -12,6 +12,8 @@ Use $(DESTDIR) as installation prefix for
 
 Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile.am | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)
 

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/Makefile
 +++ b/Makefile
 @@ -40,7 +40,8 @@ NPERSHELF=16

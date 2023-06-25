@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: wvstreams-4.6/crypto/wvx509.cc
 ===================================================================
 --- wvstreams-4.6.orig/crypto/wvx509.cc	2009-07-29 11:58:16.000000000 -0400

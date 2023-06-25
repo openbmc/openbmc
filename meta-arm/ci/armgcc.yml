@@ -1,6 +1,0 @@
-header:
-  version: 11
-
-local_conf_header:
-  cc: |
-    GCCVERSION = "arm-12.2"

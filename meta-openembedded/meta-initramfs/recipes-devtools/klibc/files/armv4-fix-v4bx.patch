@@ -9,6 +9,8 @@ which is "" in case of armv5 or thumbs.
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  usr/klibc/arch/arm/MCONFIG | 1 +
  1 file changed, 1 insertion(+)
 

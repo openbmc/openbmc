@@ -11,6 +11,8 @@ https://github.com/voidlinux/void-packages/blob/master/srcpkgs/dracut/patches/mu
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/install/util.h | 3 +++
  1 file changed, 3 insertions(+)
 

@@ -7,6 +7,8 @@ http://data.gpo.zugaina.org/musl/net-fs/samba/files/samba-4.2.7-pam.patch
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  source3/wscript | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 

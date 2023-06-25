@@ -33,6 +33,7 @@ RDEPENDS:${PN} = "coreutils gnupg net-tools perl perl-module-data-dumper \
                   perl-module-lib perl-module-posix perl-module-term-ansicolor \
                   perl-module-time-localtime pinentry perl-module-pod-usage \
                   perl-module-pod-text perl-module-file-glob \
+                  perl-module-cwd perl-module-encode perl-module-encode-encoding \
                  "
 
 RDEPENDS:${PN}:class-native = "coreutils net-tools perl perl-module-data-dumper \

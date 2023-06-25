@@ -5,6 +5,8 @@ Subject: [PATCH] drbdmon: add LDFLAGS when linking
 
 Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
 ---
+Upstream-Status: Pending
+
  user/drbdmon/Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

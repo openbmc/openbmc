@@ -8,6 +8,8 @@ which OE uses to pass tweaks
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile            | 10 ++++------
  extensions/Makefile |  4 ++++
  2 files changed, 8 insertions(+), 6 deletions(-)

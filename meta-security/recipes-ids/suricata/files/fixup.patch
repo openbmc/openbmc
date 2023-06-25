@@ -1,6 +1,6 @@
 Skip pkg Makefile from using its own rust steps
 
-Upstream-Status: OE Specific
+Upstream-Status: Inappropriate [OE Specific]
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 

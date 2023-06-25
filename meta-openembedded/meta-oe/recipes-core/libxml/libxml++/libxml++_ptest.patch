@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -40,5 +40,8 @@ EXTRA_DIST = \

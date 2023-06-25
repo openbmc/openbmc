@@ -22,6 +22,8 @@ to fix :
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  kexec/Makefile       |  2 +-
  kexec/if_nameindex.c | 64 ++++++++++++++++++++++++++++++++++++++++++++
  kexec/if_nameindex.h | 15 +++++++++++

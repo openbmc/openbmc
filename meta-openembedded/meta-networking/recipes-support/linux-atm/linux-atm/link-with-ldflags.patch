@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 LDFLAGS_FOR_BUILD should be required when doing link for qgen.
 
 Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>

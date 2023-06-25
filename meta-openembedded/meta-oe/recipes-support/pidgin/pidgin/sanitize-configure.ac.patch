@@ -3,6 +3,8 @@ From: Herrie <github.com@herrie.org>
 Date: Mon, 24 Jul 2017 21:30:16 +0200
 
 ---
+Upstream-Status: Pending
+
  configure.ac | 10 +---------
  1 file changed, 1 insertion(+), 9 deletions(-)
 

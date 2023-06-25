@@ -11,6 +11,8 @@ Signed-off-by: Yu Ke <ke.yu@intel.com>
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  COPYING | 339 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 339 insertions(+)
  create mode 100644 COPYING

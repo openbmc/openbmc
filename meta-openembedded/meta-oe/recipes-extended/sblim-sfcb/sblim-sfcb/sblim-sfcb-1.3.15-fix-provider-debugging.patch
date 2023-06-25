@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -up sblim-sfcb-1.4.5/providerDrv.c.orig sblim-sfcb-1.4.5/providerDrv.c
 --- sblim-sfcb-1.4.5/providerDrv.c.orig	2013-09-04 12:59:22.140813239 +0200
 +++ sblim-sfcb-1.4.5/providerDrv.c	2013-09-04 12:59:40.511870274 +0200

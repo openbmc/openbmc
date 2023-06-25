@@ -10,6 +10,8 @@ usl_fd.c:284:10: error: comparison of unsigned expression < 0 is always false [-
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  usl/usl_fd.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

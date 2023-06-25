@@ -55,4 +55,6 @@ PACKAGECONFIG[vapi] = "-Dvapi=enabled,-Dvapi=disabled"
 EXTRA_OEMESON = "-Dpie=true"
 EXTRA_OEMESON:append:libc-musl = " -Dcoroutine=libucontext"
 
+LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -Wl,--undefined-version', '', d)}"
+
 FILES:${PN} += "${datadir}"

@@ -13,6 +13,8 @@ via embedded composition e.g. westeros
 Signed-off-by: Jeff Wannamaker <jeff_wannamaker@cable.comcast.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/common/khrn_client.c |  2 +-
  interface/khronos/common/khrn_client.h | 11 +++++-
  interface/khronos/ext/egl_wayland.c    | 50 ++++++++++++++++++++++----

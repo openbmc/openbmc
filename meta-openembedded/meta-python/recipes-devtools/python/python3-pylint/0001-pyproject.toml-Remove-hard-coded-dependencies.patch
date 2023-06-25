@@ -5,6 +5,8 @@ Subject: [PATCH] pyproject.toml: Remove hard-coded dependencies
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
+Upstream-Status: Pending
+
  pyproject.toml | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

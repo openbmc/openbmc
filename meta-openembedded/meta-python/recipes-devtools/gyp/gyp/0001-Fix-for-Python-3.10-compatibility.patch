@@ -7,6 +7,8 @@ The collections.abc module replaces collections for Python 3.10
 
 Signed-off-by: Kurt Kiefer <kurt.kiefer@arthrex.com>
 ---
+Upstream-Status: Pending
+
  pylib/gyp/common.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

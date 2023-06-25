@@ -10,7 +10,7 @@ inherit autotools pkgconfig python3native python3targetconfig
 
 PV = "2.3.0"
 
-SRCREV = "72480212cd8ec0ab8d0b5064df52c146cac603b4"
+SRCREV = "b8fcc89b74c9128a13b07cc15a0ce25dca0cd97e"
 SRC_URI = "git://github.com/libimobiledevice/libplist;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"

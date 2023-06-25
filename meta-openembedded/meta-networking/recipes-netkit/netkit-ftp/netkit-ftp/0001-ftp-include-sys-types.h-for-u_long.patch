@@ -10,6 +10,8 @@ ftp.c:1091:2: error: unknown type name 'u_long'; did you mean 'long'?
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  ftp/ftp.c | 1 +
  1 file changed, 1 insertion(+)
 

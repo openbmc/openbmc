@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/configure.in
 +++ b/configure.in
 @@ -254,7 +254,6 @@ if test "$class_driver" = "yes"; then

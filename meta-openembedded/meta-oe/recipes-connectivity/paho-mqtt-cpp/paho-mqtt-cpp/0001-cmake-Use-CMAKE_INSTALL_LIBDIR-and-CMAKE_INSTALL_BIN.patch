@@ -7,6 +7,8 @@ This ensures the install paths are not hardcoded.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  cmake/CMakeLists.txt       | 4 ++--
  src/samples/CMakeLists.txt | 4 ++--
  2 files changed, 4 insertions(+), 4 deletions(-)

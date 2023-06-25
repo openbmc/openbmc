@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7a7126e068206290f3fe9f8d6c713ea6"
 SRC_URI[sha256sum] = "bea3816e1d54f4e33aac78d2031a0b0ed2f95e69db85b45d51f17df97071da69"
 
 SRC_URI += "\
-        file://run-ptest \
+    file://run-ptest \
 "
 
 inherit pypi python_setuptools_build_meta ptest
@@ -13,11 +13,15 @@ inherit pypi python_setuptools_build_meta ptest
 DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} += " \
-        ${PYTHON_PN}-appdirs \
+    python3-appdirs \
+    python3-crypt \
+    python3-io \
+    python3-numbers \
+    python3-shell \
 "
 RDEPENDS:${PN}-ptest += " \
-        ${PYTHON_PN}-pytest \
-        ${PYTHON_PN}-unittest-automake-output \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 BBCLASSEXTEND = "nativesdk native"

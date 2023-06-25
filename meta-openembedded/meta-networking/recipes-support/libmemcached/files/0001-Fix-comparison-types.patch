@@ -8,6 +8,8 @@ error: comparison between pointer and integer ('char *' and 'int')
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  clients/memflush.cc | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

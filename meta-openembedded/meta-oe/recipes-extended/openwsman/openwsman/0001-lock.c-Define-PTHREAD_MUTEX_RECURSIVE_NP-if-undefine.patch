@@ -8,6 +8,8 @@ checking for OS
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/lib/u/lock.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

@@ -11,6 +11,8 @@ Missing data type is defined in <sys/types.h>.
 
 Signed-off-by: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
 ---
+Upstream-Status: Pending
+
  src/netinfo.c | 1 +
  1 file changed, 1 insertion(+)
 

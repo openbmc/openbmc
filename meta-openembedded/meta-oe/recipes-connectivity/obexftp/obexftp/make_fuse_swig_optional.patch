@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: obexftp-0.24.2-Source/CMakeLists.txt
 ===================================================================
 --- obexftp-0.24.2-Source.orig/CMakeLists.txt

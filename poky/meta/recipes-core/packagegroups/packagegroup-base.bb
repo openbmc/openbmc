@@ -16,7 +16,6 @@ PACKAGES = ' \
             \
             ${@bb.utils.contains("MACHINE_FEATURES", "acpi", "packagegroup-base-acpi", "",d)} \
             ${@bb.utils.contains("MACHINE_FEATURES", "alsa", "packagegroup-base-alsa", "", d)} \
-            ${@bb.utils.contains("MACHINE_FEATURES", "apm", "packagegroup-base-apm", "", d)} \
             ${@bb.utils.contains("MACHINE_FEATURES", "ext2", "packagegroup-base-ext2", "", d)} \
             ${@bb.utils.contains("MACHINE_FEATURES", "vfat", "packagegroup-base-vfat", "", d)} \
             ${@bb.utils.contains("MACHINE_FEATURES", "keyboard", "packagegroup-base-keyboard", "", d)} \
@@ -52,7 +51,6 @@ RDEPENDS:packagegroup-base = "\
     packagegroup-machine-base \
     \
     module-init-tools \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'apm', 'packagegroup-base-apm', '',d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'acpi', 'packagegroup-base-acpi', '',d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'keyboard', 'packagegroup-base-keyboard', '',d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'phone', 'packagegroup-base-phone', '',d)} \
@@ -148,11 +146,6 @@ RDEPENDS:packagegroup-base-pci = "\
 SUMMARY:packagegroup-base-acpi = "ACPI support"
 RDEPENDS:packagegroup-base-acpi = "\
     acpid"
-
-SUMMARY:packagegroup-base-apm = "APM support"
-RDEPENDS:packagegroup-base-apm = "\
-    ${VIRTUAL-RUNTIME_apm} \
-    apmd"
 
 SUMMARY:packagegroup-base-ext2 = "ext2 filesystem support"
 RDEPENDS:packagegroup-base-ext2 = "\

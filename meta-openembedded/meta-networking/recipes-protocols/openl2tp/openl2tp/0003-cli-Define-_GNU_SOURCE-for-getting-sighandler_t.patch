@@ -5,6 +5,8 @@ Subject: [PATCH 3/4] cli: Define _GNU_SOURCE for getting sighandler_t
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  cli/cli_readline.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

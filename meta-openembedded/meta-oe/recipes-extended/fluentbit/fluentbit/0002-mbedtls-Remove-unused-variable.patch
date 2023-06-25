@@ -8,6 +8,8 @@ library/bignum.c:1395:29: error: variable 't' set but not used [-Werror,-Wunused
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/mbedtls-2.28.0/library/bignum.c | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 

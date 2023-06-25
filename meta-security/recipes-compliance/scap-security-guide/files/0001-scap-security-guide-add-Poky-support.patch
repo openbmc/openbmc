@@ -1,0 +1,91 @@
+From 23a224203a73688567f500380644e5cf30c8ed99 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Thu, 22 Jun 2023 06:19:26 -0400
+Subject: [PATCH] scap-security-guide: add Poky support
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ products/openembedded/product.yml             |  7 +++-
+ .../openembedded/transforms/constants.xslt    |  4 +--
+ shared/checks/oval/installed_OS_is_poky.xml   | 33 +++++++++++++++++++
+ 3 files changed, 41 insertions(+), 3 deletions(-)
+ create mode 100644 shared/checks/oval/installed_OS_is_poky.xml
+
+diff --git a/products/openembedded/product.yml b/products/openembedded/product.yml
+index 9f2f12d737..a495e197c0 100644
+--- a/products/openembedded/product.yml
++++ b/products/openembedded/product.yml
+@@ -14,6 +14,11 @@ init_system: "systemd"
+ cpes_root: "../../shared/applicability"
+ cpes:
+   - openembedded:
+-      name: "cpe:/o:openembedded"
++      name: "cpe:/o:openembedded:nodistro:"
+       title: "OpenEmbedded nodistro"
+       check_id: installed_OS_is_openembedded
++
++  - poky:
++      name: "cpe:/o:openembedded:poky:"
++      title: "OpenEmbedded Poky reference distribution"
++      check_id: installed_OS_is_poky
+diff --git a/products/openembedded/transforms/constants.xslt b/products/openembedded/transforms/constants.xslt
+index 85e812a7c1..8901def2f9 100644
+--- a/products/openembedded/transforms/constants.xslt
++++ b/products/openembedded/transforms/constants.xslt
+@@ -2,8 +2,8 @@
+ 
+ <xsl:include href="../../../shared/transforms/shared_constants.xslt"/>
+ 
+-<xsl:variable name="product_long_name">OpenEmbedded nodistro</xsl:variable>
+-<xsl:variable name="product_short_name">OE nodistro</xsl:variable>
++<xsl:variable name="product_long_name">OpenEmbedded based distribution</xsl:variable>
++<xsl:variable name="product_short_name">OE distros</xsl:variable>
+ <xsl:variable name="product_stig_id_name">empty</xsl:variable>
+ <xsl:variable name="prod_type">openembedded</xsl:variable>
+ 
+diff --git a/shared/checks/oval/installed_OS_is_poky.xml b/shared/checks/oval/installed_OS_is_poky.xml
+new file mode 100644
+index 0000000000..9c41acd786
+--- /dev/null
++++ b/shared/checks/oval/installed_OS_is_poky.xml
+@@ -0,0 +1,33 @@
++<def-group>
++  <definition class="inventory" id="installed_OS_is_poky" version="1">
++    <metadata>
++      <title>Poky</title>
++      <affected family="unix">
++        <platform>multi_platform_all</platform>
++      </affected>
++      <description>The operating system installed is a Poky referenece based System</description>
++    </metadata>
++    <criteria comment="System is Poky reference distribution" operator="AND">
++      <extend_definition comment="Installed OS is part of the Unix family" definition_ref="installed_OS_is_part_of_Unix_family" />
++      <criterion comment="Poky based distro" test_ref="test_os_release_poky" />
++      <criterion comment="Poky referenece distribution is installed" test_ref="test_poky" />
++    </criteria>
++  </definition>
++
++  <unix:file_test check="all" check_existence="all_exist" comment="/etc/os-release exists" id="test_os_release_poky" version="1">
++    <unix:object object_ref="obj_os_release_poky" />
++  </unix:file_test>
++  <unix:file_object comment="check /etc/os-release file" id="obj_os_release_poky" version="1">
++    <unix:filepath>/etc/os-release</unix:filepath>
++  </unix:file_object>
++
++  <ind:textfilecontent54_test check="all" check_existence="at_least_one_exists" comment="Check OpenEmbedded" id="test_poky" version="1">
++    <ind:object object_ref="obj_poky" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="obj_poky" version="1" comment="Check Poky">
++    <ind:filepath>/etc/os-release</ind:filepath>
++    <ind:pattern operation="pattern match">^ID=poky$</ind:pattern>
++    <ind:instance datatype="int">1</ind:instance>
++  </ind:textfilecontent54_object>
++
++</def-group>
+-- 
+2.34.1
+

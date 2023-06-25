@@ -4,6 +4,8 @@ Date: Mon, 3 Feb 2020 03:25:57 +0000
 Subject: [PATCH 2/3] Remove maes option from cross-compilation
 
 ---
+Upstream-Status: Pending
+
  absl/copts/GENERATED_AbseilCopts.cmake | 4 ----
  absl/copts/GENERATED_copts.bzl         | 4 ----
  2 files changed, 8 deletions(-)

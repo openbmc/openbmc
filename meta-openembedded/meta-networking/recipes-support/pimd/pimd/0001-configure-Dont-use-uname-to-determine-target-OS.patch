@@ -7,6 +7,8 @@ Helps with cross-compiling
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  configure | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

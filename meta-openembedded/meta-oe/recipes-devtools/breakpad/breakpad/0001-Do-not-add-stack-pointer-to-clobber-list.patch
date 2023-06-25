@@ -13,6 +13,8 @@ so it should not cause change in behavior.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  linux_syscall_support.h | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 

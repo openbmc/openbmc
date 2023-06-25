@@ -14,6 +14,8 @@ Upstrem-Status: Pending
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 ---
+Upstream-Status: Pending
+
  libaudiofile/modules/SimpleModule.h | 2 +-
  test/FloatToInt.cpp                 | 2 +-
  test/IntToFloat.cpp                 | 2 +-

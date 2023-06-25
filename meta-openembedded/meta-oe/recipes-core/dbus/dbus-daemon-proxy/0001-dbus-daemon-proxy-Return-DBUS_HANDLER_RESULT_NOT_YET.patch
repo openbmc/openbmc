@@ -9,6 +9,8 @@ not be handled here
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  dbus-daemon-proxy.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

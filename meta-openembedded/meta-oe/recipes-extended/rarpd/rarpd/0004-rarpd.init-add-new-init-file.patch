@@ -5,6 +5,8 @@ Subject: [PATCH 4/5] rarpd.init : add new init file
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  rarpd.init | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 96 insertions(+)
  create mode 100644 rarpd.init

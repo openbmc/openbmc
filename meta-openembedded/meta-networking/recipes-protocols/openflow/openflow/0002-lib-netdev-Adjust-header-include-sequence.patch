@@ -10,6 +10,8 @@ about double definition in libc headers
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/netdev.c | 11 +++++------
  1 file changed, 5 insertions(+), 6 deletions(-)
 

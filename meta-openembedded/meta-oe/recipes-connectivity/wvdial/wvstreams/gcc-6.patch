@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Fix compilation with gcc-6
 Author: Gert Wollny <gw.fossdev@gmail.com>
 Last-Updated: 2016-07-26

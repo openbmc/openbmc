@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -urN -x .git orig/cmake/LibreSSL.cmake patched/cmake/LibreSSL.cmake
 --- orig/cmake/LibreSSL.cmake	2020-08-07 21:58:34.660773928 +0900
 +++ patched/cmake/LibreSSL.cmake	2020-08-07 22:51:18.620767245 +0900

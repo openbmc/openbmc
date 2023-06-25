@@ -9,6 +9,8 @@ them here
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  include/automount.h | 8 ++++++++
  include/nsswitch.h  | 3 +++
  2 files changed, 11 insertions(+)

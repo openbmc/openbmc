@@ -8,6 +8,8 @@ check for existence instead.
 
 Signed-off-by: Jiaqing Zhao <jiaqing.zhao@linux.intel.com>
 ---
+Upstream-Status: Pending
+
  configure.ac | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 

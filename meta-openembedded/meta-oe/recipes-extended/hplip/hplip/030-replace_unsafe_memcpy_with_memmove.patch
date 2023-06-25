@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 https://bugs.launchpad.net/hplip/+bug/1672256
 
 memcpy should never be used with overlapping memory regions

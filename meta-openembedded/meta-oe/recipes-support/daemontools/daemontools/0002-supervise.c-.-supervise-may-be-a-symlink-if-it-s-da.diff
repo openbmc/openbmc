@@ -4,6 +4,8 @@ Date: Sun, 24 Feb 2008 10:54:26 +0000
 Subject: [PATCH] supervise.c: ./supervise may be a symlink, if it's dangling, create link target
 
 ---
+Upstream-Status: Pending
+
  daemontools-0.76/src/supervise.c |   17 ++++++++++++++++-
  1 files changed, 16 insertions(+), 1 deletions(-)
 

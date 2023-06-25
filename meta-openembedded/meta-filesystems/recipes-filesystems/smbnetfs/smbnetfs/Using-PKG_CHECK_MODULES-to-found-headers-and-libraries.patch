@@ -6,6 +6,8 @@ Subject: [PATCH] Using PKG_CHECK_MODULES to found headers and libraries of
 
 Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  configure.in    | 5 +++++
  src/Makefile.am | 3 +++
  2 files changed, 8 insertions(+)

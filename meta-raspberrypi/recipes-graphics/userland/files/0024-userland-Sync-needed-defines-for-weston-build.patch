@@ -8,6 +8,8 @@ therefore import needed defines and typedefs from latest mesa
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/include/EGL/eglext.h | 14 ++++++++++++++
  1 file changed, 14 insertions(+)
 

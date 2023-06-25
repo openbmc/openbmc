@@ -7,6 +7,8 @@ Without this commit the decoder streaming thread stops without ever attending
 the drain request, leaving the decoder input thread waiting forever.
 
 ---
+Upstream-Status: Pending
+
  omx/gstomx.c | 7 +++++++
  1 file changed, 7 insertions(+)
 

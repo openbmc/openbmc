@@ -5,7 +5,7 @@ stuck in the generated Makefile with our cross tools.  In this case, linking is
 done via the compiler rather than the linker directly so pass in CC not LD
 here.
 
-Signed-Off-By: Tom Rini <trini@konsulko.com>
+Signed-off-by: Tom Rini <trini@konsulko.com>
 
 --- a/libraries/libapparmor/swig/perl/Makefile.am.orig	2017-06-13 19:04:43.296676212 -0400
 +++ b/libraries/libapparmor/swig/perl/Makefile.am	2017-06-13 19:05:03.488676693 -0400

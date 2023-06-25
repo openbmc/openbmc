@@ -6,7 +6,7 @@ Subject: [PATCH] configure.ac: stop inserting host directories into compile
 
 Do not insert /usr/lib and /usr/lib64 into library search path.
 
-Upstream-Status: OE specific
+Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Dmitry Eremin-Solenikov <dmitry_eremin-solenikov@mentor.com>
 ---
  configure.ac | 2 +-

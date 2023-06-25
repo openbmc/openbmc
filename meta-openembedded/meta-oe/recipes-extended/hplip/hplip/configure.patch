@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/configure.in
 +++ b/configure.in
 @@ -30,7 +30,7 @@

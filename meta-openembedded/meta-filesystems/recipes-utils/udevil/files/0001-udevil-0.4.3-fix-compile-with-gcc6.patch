@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Fix compilation with GCC6
 
 --- a/src/device-info.c	2013-12-09 14:59:27.000000000 +0100

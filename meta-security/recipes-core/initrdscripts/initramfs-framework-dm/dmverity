@@ -8,13 +8,42 @@ dmverity_run() {
     DATA_SIZE="__not_set__"
     DATA_BLOCK_SIZE="__not_set__"
     ROOT_HASH="__not_set__"
+    SEPARATE_HASH="__not_set__"
 
     . /usr/share/misc/dm-verity.env
 
     C=0
     delay=${bootparam_rootdelay:-1}
     timeout=${bootparam_roottimeout:-5}
-    RDEV="$(realpath /dev/disk/by-partuuid/${bootparam_root#PARTUUID=})"
+
+    # we know exactly what we are looking for; don't need the wide hunt below
+    if [ "${SEPARATE_HASH}" -eq "1" ]; then
+        while [ ! -b "/dev/disk/by-partuuid/${ROOT_UUID}" ]; do
+            if [ $(( $C * $delay )) -gt $timeout ]; then
+                fatal "Root device (data) resolution failed"
+                exit 1
+            fi
+            debug "Sleeping for $delay second(s) to wait for root data to settle..."
+            sleep $delay
+            C=$(( $C + 1 ))
+        done
+
+        veritysetup \
+            --data-block-size=${DATA_BLOCK_SIZE} \
+            create rootfs \
+            /dev/disk/by-partuuid/${ROOT_UUID} \
+            /dev/disk/by-partuuid/${RHASH_UUID} \
+            ${ROOT_HASH}
+
+            mount \
+                 -o ro \
+                /dev/mapper/rootfs \
+                ${ROOTFS_DIR} || exit 2
+
+	    return
+    fi
+
+    RDEV="$(realpath /dev/disk/by-partuuid/${bootparam_root#PARTUUID=} 2>/dev/null)"
     while [ ! -b "${RDEV}" ]; do
         if [ $(( $C * $delay )) -gt $timeout ]; then
             fatal "Root device resolution failed"
@@ -23,22 +52,22 @@ dmverity_run() {
 
         case "${bootparam_root}" in
             ID=*)
-                RDEV="$(realpath /dev/disk/by-id/${bootparam_root#ID=})"
+                RDEV="$(realpath /dev/disk/by-id/${bootparam_root#ID=} 2>/dev/null)"
                 ;;
             LABEL=*)
-                RDEV="$(realpath /dev/disk/by-label/${bootparam_root#LABEL=})"
+                RDEV="$(realpath /dev/disk/by-label/${bootparam_root#LABEL=} 2>/dev/null)"
                 ;;
             PARTLABEL=*)
-                RDEV="$(realpath /dev/disk/by-partlabel/${bootparam_root#PARTLABEL=})"
+                RDEV="$(realpath /dev/disk/by-partlabel/${bootparam_root#PARTLABEL=} 2>/dev/null)"
                 ;;
             PARTUUID=*)
-                RDEV="$(realpath /dev/disk/by-partuuid/${bootparam_root#PARTUUID=})"
+                RDEV="$(realpath /dev/disk/by-partuuid/${bootparam_root#PARTUUID=} 2>/dev/null)"
                 ;;
             PATH=*)
-                RDEV="$(realpath /dev/disk/by-path/${bootparam_root#PATH=})"
+                RDEV="$(realpath /dev/disk/by-path/${bootparam_root#PATH=} 2>/dev/null)"
                 ;;
             UUID=*)
-                RDEV="$(realpath /dev/disk/by-uuid/${bootparam_root#UUID=})"
+                RDEV="$(realpath /dev/disk/by-uuid/${bootparam_root#UUID=} 2>/dev/null)"
                 ;;
             *)
                 RDEV="${bootparam_root}"

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 make sure it can be compiled for cross target
 
 1. never try to compile target binary by native gcc

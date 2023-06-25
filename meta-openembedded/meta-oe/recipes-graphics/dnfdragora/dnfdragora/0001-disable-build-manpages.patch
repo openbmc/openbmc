@@ -5,6 +5,8 @@ Subject: [PATCH] disable build manpages.
 
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt | 1 -
  1 file changed, 1 deletion(-)
 

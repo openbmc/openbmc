@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -up sblim-sfcb-1.4.6/Makefile.in.orig sblim-sfcb-1.4.6/Makefile.in
 --- sblim-sfcb-1.4.6/Makefile.in.orig	2013-10-07 10:43:34.783228137 +0200
 +++ sblim-sfcb-1.4.6/Makefile.in	2013-10-07 10:44:30.178533289 +0200

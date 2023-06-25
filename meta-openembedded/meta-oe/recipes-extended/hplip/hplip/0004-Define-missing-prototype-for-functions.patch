@@ -5,6 +5,8 @@ Subject: [PATCH 4/4] Define missing prototype for functions
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  prnt/cupsext/cupsext.c | 1 +
  protocol/hp_ipp.c      | 4 ++--
  2 files changed, 3 insertions(+), 2 deletions(-)

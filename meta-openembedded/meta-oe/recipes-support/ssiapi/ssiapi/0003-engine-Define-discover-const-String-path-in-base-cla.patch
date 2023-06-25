@@ -11,6 +11,8 @@ Remove ununsed orom_vmd
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/engine/storage_object.h | 3 +++
  lib/engine/vmd_raid_info.h  | 2 --
  2 files changed, 3 insertions(+), 2 deletions(-)

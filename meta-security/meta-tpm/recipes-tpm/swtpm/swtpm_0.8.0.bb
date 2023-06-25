@@ -36,7 +36,7 @@ EXTRA_OECONF += "--with-tss-user=${TSS_USER} --with-tss-group=${TSS_GROUP}"
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM:${PN} = "--system ${TSS_USER}"
-USERADD_PARAM:${PN} = "--system -g ${TSS_GROUP} --home-dir  \
+USERADD_PARAM:${PN} = "--system -g ${TSS_GROUP} --home-dir / \
     --no-create-home  --shell /bin/false ${BPN}"
 
 

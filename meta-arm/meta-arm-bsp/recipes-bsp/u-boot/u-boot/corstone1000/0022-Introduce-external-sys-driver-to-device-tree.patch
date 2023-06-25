@@ -1,7 +1,7 @@
-From 2229a66346fb16f092d79fc2e9756ec34ff041a4 Mon Sep 17 00:00:00 2001
+From 984c431cd594c112d71ea1378bc1ac3b72806baa Mon Sep 17 00:00:00 2001
 From: Emekcan <emekcan.aras@arm.com>
 Date: Wed, 30 Nov 2022 19:02:26 +0000
-Subject: [PATCH 22/27] Introduce external sys driver to device-tree
+Subject: [PATCH 22/42] Introduce external sys driver to device-tree
 
 It adds external sys driver binding to u-boot
 device tree.
@@ -14,7 +14,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  1 file changed, 7 insertions(+)
 
 diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
-index 4e46826f883a..2c7185e1391a 100644
+index 4e46826f88..2c7185e139 100644
 --- a/arch/arm/dts/corstone1000.dtsi
 +++ b/arch/arm/dts/corstone1000.dtsi
 @@ -160,5 +160,12 @@
@@ -31,5 +31,5 @@ index 4e46826f883a..2c7185e1391a 100644
  	};
  };
 -- 
-2.39.1
+2.25.1
 

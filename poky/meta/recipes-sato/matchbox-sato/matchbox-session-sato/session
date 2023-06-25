@@ -22,7 +22,6 @@ matchbox-desktop &
 START_APPLETS=showdesktop,windowselector
 END_APPLETS=$KEYBOARD_APPLET,systray,startup-notify,notify
 END_APPLETS=battery,$END_APPLETS # feature-acpi
-END_APPLETS=battery,$END_APPLETS # feature-apm
 END_APPLETS=clock,$END_APPLETS
 END_APPLETS=openmoko-panel-gsm,$END_APPLETS # feature-phone
 

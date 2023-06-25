@@ -5,8 +5,7 @@ Subject: [PATCH 04/10] avoid host contamination
 
 Remove hardcode path refer to host to avoid host contamination.
 
-Upstream-Status: Inappropriate [embedded specific]
-
+Upstream-Status: Pending
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
 Rebase to 9.23

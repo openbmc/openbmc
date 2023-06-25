@@ -3,6 +3,8 @@ From: Benjamin Gaignard <benjamin.gaignard@linaro.org>
 Date: Thu, 20 Apr 2017 14:25:18 +0200
 
 ---
+Upstream-Status: Pending
+
  Makefile.am  |  1 -
  configure.ac | 17 -----------------
  2 files changed, 18 deletions(-)

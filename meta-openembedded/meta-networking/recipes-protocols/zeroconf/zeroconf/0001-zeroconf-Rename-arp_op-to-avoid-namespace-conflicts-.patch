@@ -12,6 +12,8 @@ and causes the conflict
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  zeroconf.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 

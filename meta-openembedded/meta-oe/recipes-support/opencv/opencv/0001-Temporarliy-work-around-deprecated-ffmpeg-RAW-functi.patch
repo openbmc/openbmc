@@ -7,6 +7,8 @@ Subject: [PATCH] Temporarliy work around deprecated ffmpeg RAW function
 Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
 
 ---
+Upstream-Status: Pending
+
  modules/videoio/src/cap_ffmpeg_impl.hpp | 8 ++++++++
  1 file changed, 8 insertions(+)
 

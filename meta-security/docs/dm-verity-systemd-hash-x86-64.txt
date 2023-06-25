@@ -1,0 +1,43 @@
+dm-verity and x86-64 and systemd - separate hash device
+-------------------------------------------------------
+
+Everything said in "dm-verity-systemd-x86-64.txt" applies here.
+However booting under QEMU is not tested - only on real hardware.
+So for your MACHINE you need to choose "genericx86-64".
+
+Also, you'll need to point at the hash specific WKS file:
+
+WKS_FILES += " systemd-bootdisk-dmverity-hash.wks.in"
+
+The fundamental difference is to use a separate device/partition for
+storage of the hash data -- instead of "hiding" it beyond the filesystem
+in what is essentially a 5-10% oversized partition.  This takes any manual
+math calculations of size/offset out of the picture, and uses the kernel's
+natural behaviour of compartmentalizing devices to ensure they are separate.
+
+The example hash.wks file added here essentially adds a hash-only partition
+directly after the filesystem partition.  So the filesystem partition is
+no longer "oversized" and no offsets are needed/used.
+
+Since we are now using multiple partitions, we make a better effort to use
+accepted GPT partition types and UUIDs based on the roothash.  This means
+easier sysadmin level use/debugging based on cfdisk output etc.
+
+Generating the separate root hash image is driven off enabling this:
+   DM_VERITY_SEPARATE_HASH = "1"
+
+Two other variables control the GPT UUIDs - set to x86-64 defaults:
+
+   DM_VERITY_ROOT_GUID ?= "4f68bce3-e8cd-4db1-96e7-fbcaf984b709"
+   DM_VERITY_RHASH_GUID ?= "2c7357ed-ebd2-46d9-aec1-23d437ec2bf5"
+
+See: https://uapi-group.org/specifications/specs/discoverable_partitions_specification/
+
+Finally, the UUIDs (not the "partition types" above) are based off of
+the root node hash value as per the systemd "autodetect" proposed standard.
+These will obviously change with every update/rebuild of the root image.
+
+While not strictly coupled to any functionality at this point in time, it
+does aid in easier debugging, and puts us in alignment with using systemd
+inside the initramfs to replace manual veritysetup like configuration we
+currently do in the initramfs today, should we decide to do so later on.

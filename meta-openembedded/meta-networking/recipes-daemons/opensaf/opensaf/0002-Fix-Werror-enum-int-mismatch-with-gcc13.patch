@@ -5,6 +5,8 @@ Subject: [PATCH 2/2] Fix -Werror=enum-int-mismatch with gcc13
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/evt/agent/eda_hdl.h | 5 +++--
  src/evt/evtd/eds_mds.h  | 3 +--
  src/smf/smfnd/smfnd.h   | 8 ++++----

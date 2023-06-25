@@ -8,6 +8,8 @@ otherwise the generate file will be stripped
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 
 ---
+Upstream-Status: Pending
+
  Makefile.rules | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

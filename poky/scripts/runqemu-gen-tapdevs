@@ -1,53 +1,58 @@
 #!/bin/bash
 #
 # Create a "bank" of tap network devices that can be used by the
-# runqemu script. This script needs to be run as root, and will
-# use the tunctl binary from the build system sysroot. Note: many Linux 
-# distros these days still use an older version of tunctl which does not
-# support the group permissions option, hence the need to use the build
-# system provided version.
+# runqemu script. This script needs to be run as root
 #
 # Copyright (C) 2010 Intel Corp.
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-uid=`id -u`
 gid=`id -g`
-if [ -n "$SUDO_UID" ]; then
-    uid=$SUDO_UID
-fi
 if [ -n "$SUDO_GID" ]; then
     gid=$SUDO_GID
 fi
 
 usage() {
-	echo "Usage: sudo $0 <uid> <gid> <num> <staging_bindir_native>"
-	echo "Where <uid> is the numeric user id the tap devices will be owned by"
+	echo "Usage: sudo $0 <gid> <num>"
 	echo "Where <gid> is the numeric group id the tap devices will be owned by"
 	echo "<num> is the number of tap devices to create (0 to remove all)"
-	echo "<native-sysroot-basedir> is the path to the build system's native sysroot"
 	echo "For example:"
 	echo "$ bitbake qemu-helper-native"
-	echo "$ sudo $0 $uid $gid 4 tmp/sysroots-components/x86_64/qemu-helper-native/usr/bin"
+	echo "$ sudo $0 $gid 4"
 	echo ""
 	exit 1
 }
 
-if [ $# -ne 4 ]; then
+# Allow passing 4 arguments for backward compatibility with warning
+if [ $# -gt 4 ]; then
+	echo "Error: Incorrect number of arguments"
+	usage
+fi
+if [ $# -gt 3 ]; then
+	echo "Warning: Ignoring the <native-sysroot-basedir> parameter. It is no longer needed."
+fi
+if [ $# -gt 2 ]; then
+	echo "Warning: Ignoring the <uid> parameter. It is no longer needed."
+	GID=$2
+	COUNT=$3
+elif [ $# -eq 2 ]; then
+	GID=$1
+	COUNT=$2
+else
 	echo "Error: Incorrect number of arguments"
 	usage
 fi
 
-TUID=$1
-GID=$2
-COUNT=$3
-STAGING_BINDIR_NATIVE=$4
 
-TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
-if [[ ! -x "$TUNCTL" || -d "$TUNCTL" ]]; then
-	echo "Error: $TUNCTL is not an executable"
-	usage
+if [ -z "$OE_TAP_NAME" ]; then
+	OE_TAP_NAME=tap
+fi
+
+# check if COUNT is a number and >= 0
+if ! [ $COUNT -ge 0 ]; then
+	echo "Error: Incorrect count: $COUNT"
+	exit 1
 fi
 
 if [ $EUID -ne 0 ]; then
@@ -62,48 +67,41 @@ if [ ! -x "$RUNQEMU_IFUP" ]; then
 	exit 1
 fi
 
-IFCONFIG=`which ip 2> /dev/null`
-if [ -z "$IFCONFIG" ]; then
-	# Is it ever anywhere else?
-	IFCONFIG=/sbin/ip
-fi
-if [ ! -x "$IFCONFIG" ]; then
-       echo "$IFCONFIG cannot be executed"
-       exit 1
-fi
-
-if [ $COUNT -ge 0 ]; then
-	# Ensure we start with a clean slate
-	for tap in `$IFCONFIG link | grep tap | awk '{ print \$2 }' | sed s/://`; do
-		echo "Note: Destroying pre-existing tap interface $tap..."
-		$TUNCTL -d $tap
-	done
-	rm -f /etc/runqemu-nosudo
+if interfaces=`ip tuntap list` 2>/dev/null; then
+	interfaces=`echo "$interfaces" |cut -f1 -d: |grep -E "^$OE_TAP_NAME.*"`
 else
-	echo "Error: Incorrect count: $COUNT"
+	echo "Failed to call 'ip tuntap list'" >&2
 	exit 1
 fi
 
-if [ $COUNT -gt 0 ]; then
-	echo "Creating $COUNT tap devices for UID: $TUID GID: $GID..."
-	for ((index=0; index < $COUNT; index++)); do
-		echo "Creating tap$index"
-		ifup=`$RUNQEMU_IFUP $TUID $GID $STAGING_BINDIR_NATIVE 2>&1`
-		if [ $? -ne 0 ]; then
-			echo "Error running tunctl: $ifup"
-			exit 1
-		fi
-	done
+# Ensure we start with a clean slate
+for tap in $interfaces; do
+	echo "Note: Destroying pre-existing tap interface $tap..."
+	ip tuntap del $tap mode tap
+done
+rm -f /etc/runqemu-nosudo
 
-	echo "Note: For systems running NetworkManager, it's recommended"
-	echo "Note: that the tap devices be set as unmanaged in the"
-	echo "Note: NetworkManager.conf file. Add the following lines to"
-	echo "Note: /etc/NetworkManager/NetworkManager.conf"
-	echo "[keyfile]"
-	echo "unmanaged-devices=interface-name:tap*"
-
-	# The runqemu script will check for this file, and if it exists,
-	# will use the existing bank of tap devices without creating
-	# additional ones via sudo.
-	touch /etc/runqemu-nosudo
+if [ $COUNT -eq 0 ]; then
+	exit 0
 fi
+
+echo "Creating $COUNT tap devices for GID: $GID..."
+for ((index=0; index < $COUNT; index++)); do
+	echo "Creating $OE_TAP_NAME$index"
+	if ! ifup=`$RUNQEMU_IFUP $GID 2>&1`; then
+		echo "Error bringing up interface: $ifup"
+		exit 1
+	fi
+done
+
+echo "Note: For systems running NetworkManager, it's recommended"
+echo "Note: that the tap devices be set as unmanaged in the"
+echo "Note: NetworkManager.conf file. Add the following lines to"
+echo "Note: /etc/NetworkManager/NetworkManager.conf"
+echo "[keyfile]"
+echo "unmanaged-devices=interface-name:$OE_TAP_NAME*"
+
+# The runqemu script will check for this file, and if it exists,
+# will use the existing bank of tap devices without creating
+# additional ones via sudo.
+touch /etc/runqemu-nosudo

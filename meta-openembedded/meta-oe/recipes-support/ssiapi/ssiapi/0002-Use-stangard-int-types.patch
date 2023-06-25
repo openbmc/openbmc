@@ -10,6 +10,8 @@ error: unknown type name '__uint8_t'
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/engine/end_device.cpp | 13 +++++++------
  1 file changed, 7 insertions(+), 6 deletions(-)
 

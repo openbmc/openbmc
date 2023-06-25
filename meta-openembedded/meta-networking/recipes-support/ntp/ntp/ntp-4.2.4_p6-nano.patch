@@ -3,6 +3,8 @@ From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Wed, 12 Jan 2011 21:38:46 +0100
 
 ---
+Upstream-Status: Pending
+
  include/ntp_syscall.h | 8 ++++++++
  1 file changed, 8 insertions(+)
 

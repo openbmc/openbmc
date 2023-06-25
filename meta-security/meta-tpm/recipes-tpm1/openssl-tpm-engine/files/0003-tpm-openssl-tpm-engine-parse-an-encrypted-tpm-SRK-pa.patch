@@ -17,6 +17,8 @@ export TPM_SRK_ENC_PW=xxxxxxxx
 
 Signed-off-by: Meng Li <Meng.Li@windriver.com>
 ---
+Upstream-Status: Pending
+
  e_tpm.c     | 157 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
  e_tpm.h     |   4 ++
  e_tpm_err.c |   4 ++

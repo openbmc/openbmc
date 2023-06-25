@@ -9,6 +9,8 @@ Imported from Alpine: https://git.alpinelinux.org/aports/tree/community/gsoap/mu
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  gsoap/stdsoap2.c   |  6 ++----
  gsoap/stdsoap2.cpp | 10 ++--------
  2 files changed, 4 insertions(+), 12 deletions(-)

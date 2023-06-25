@@ -23,6 +23,8 @@ Refit patch of open-vm-tools/lib/nicInfo/nicInfoPosix.c
 Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
 Signed-off-by: Randy MacLeod <randy.macleod@windriver.com>
 ---
+Upstream-Status: Pending
+
  open-vm-tools/configure.ac               |  4 ++++
  open-vm-tools/lib/misc/idLinux.c         | 30 +++++++++++-------------
  open-vm-tools/lib/nicInfo/nicInfoPosix.c |  6 ++++-

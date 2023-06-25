@@ -33,6 +33,8 @@ core2-64-oe-linux/sysdig/0.27.1-r0/recipe-sysroot-native=  -Wl,-z,relro,-z,now  
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  include/grpcpp/impl/codegen/sync.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

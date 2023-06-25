@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 --- a/framework/delibs/dethread/CMakeLists.txt
 +++ b/framework/delibs/dethread/CMakeLists.txt
 @@ -42,6 +42,7 @@ if (DE_OS_IS_UNIX)

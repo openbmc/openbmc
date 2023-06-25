@@ -7,6 +7,8 @@ for supported archs only (matched in kexec-tools)
 
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 ---
+Upstream-Status: Pending
+
  usr/klibc/SYSCALLS.def | 1 +
  1 file changed, 1 insertion(+)
 

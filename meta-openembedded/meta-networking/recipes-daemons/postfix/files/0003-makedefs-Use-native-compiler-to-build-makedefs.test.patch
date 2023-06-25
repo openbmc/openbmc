@@ -7,6 +7,8 @@ Its a binary used during build
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  makedefs | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 

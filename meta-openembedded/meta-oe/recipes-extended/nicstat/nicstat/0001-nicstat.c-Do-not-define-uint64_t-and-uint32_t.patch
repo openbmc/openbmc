@@ -8,6 +8,8 @@ Use the defines from platform
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  nicstat.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 

@@ -5,6 +5,8 @@ Subject: [PATCH] contrib: add yocto compatible init script
 
 Signed-off-by: Beniamin Sandu <beniaminsandu@gmail.com>
 ---
+Upstream-Status: Pending
+
  contrib/unbound.init | 20 ++++++++++----------
  1 file changed, 10 insertions(+), 10 deletions(-)
 

@@ -12,6 +12,7 @@ SRC_URI = "https://launchpad.net/debian/+archive/primary/+files/${BPN}_${PV}.tar
            file://0004-Add-an-input-group-for-the-dev-input-devices.patch \
            file://0005-Add-kvm-group.patch \
            file://0006-Make-it-possible-to-configure-whether-to-use-SELinux.patch \
+           file://0007-Add-wheel-group.patch \
            "
 
 SRC_URI[sha256sum] = "6ff369be59d586ba63c0c5fcb00f75f9953fe49db88bc6c6428f2c92866f79af"

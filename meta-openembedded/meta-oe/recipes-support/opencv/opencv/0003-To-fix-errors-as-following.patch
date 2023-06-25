@@ -15,6 +15,8 @@ ts module.
 Signed-off-by: Ismo Puustinen <ismo.puustinen@intel.com>
 
 ---
+Upstream-Status: Pending
+
  modules/ts/include/opencv2/ts.hpp          | 4 ++--
  modules/ts/include/opencv2/ts/ocl_test.hpp | 2 +-
  modules/ts/include/opencv2/ts/ts_ext.hpp   | 2 +-

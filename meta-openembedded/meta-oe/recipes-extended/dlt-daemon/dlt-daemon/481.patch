@@ -24,6 +24,8 @@ In file included from /usr/include/string.h:535,
                  from dlt-daemon-2.18.9/tests/gtest_dlt_daemon_multiple_files_logging.cpp:27:
 In function ‘strncpy’,
 ---
+Upstream-Status: Pending
+
  tests/gtest_dlt_daemon_multiple_files_logging.cpp | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

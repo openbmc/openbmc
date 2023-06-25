@@ -9,6 +9,8 @@ all libc e.g. musl
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  modules/lookup_multi.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Debian forbids calls to external websites.
 
 Author: Gianfranco Costamagna <locutus@debian.org>

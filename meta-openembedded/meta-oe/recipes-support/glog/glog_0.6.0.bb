@@ -37,3 +37,5 @@ do_configure:append() {
         sed -i 's/'$(echo ${WORKDIR} | sed 's_/_\\/_g')'/../g' ${B}/config.h
     fi
 }
+
+FILES:${PN}-dev += "${datadir}/${BPN}/cmake"

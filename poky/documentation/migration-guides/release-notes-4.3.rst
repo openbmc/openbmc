@@ -17,6 +17,18 @@ New Features / Enhancements in 4.3
 
    -  :term:`KERNEL_DTBVENDORED`: whether to keep vendor subdirectories.
 
+   -  :term:`FILE_LAYERNAME`: bitbake now sets this to the name of the layer containing the recipe
+
+- Layername functionality available through overrides
+
+  Code can now know which layer a recipe is coming from through the newly added :term:`FILE_LAYERNAME`
+  variable. This has been added as an override of the form ``layer-<layername>``. In particular,
+  this means QA checks can now be layer specific, for example::
+
+    ERROR_QA:layer-core:append = " patch-status"
+
+  which will enable the ``patch-status`` QA check for the core layer.
+
 -  Architecture-specific enhancements:
 
 -  Kernel-related enhancements:
@@ -58,6 +70,15 @@ New Features / Enhancements in 4.3
 -  Packaging changes:
 
 -  Prominent documentation updates:
+
+   -  Long due documentation for the :ref:`ref-classes-devicetree` class.
+
+   -  New :ref:`summary about available init systems
+      <dev-manual/init-manager:summary>`.
+
+   -  New documentation for the :ref:`ref-classes-uboot-sign` class and
+      its variables and for the :ref:`ref-classes-kernel-devicetree` class
+      variables.
 
 -  Miscellaneous changes:
 

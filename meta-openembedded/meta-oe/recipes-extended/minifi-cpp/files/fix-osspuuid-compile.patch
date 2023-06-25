@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -urN -x .git orig/cmake/BundledOSSPUUID.cmake patched/cmake/BundledOSSPUUID.cmake
 --- orig/cmake/BundledOSSPUUID.cmake	2020-08-07 21:58:34.660773928 +0900
 +++ patched/cmake/BundledOSSPUUID.cmake	2020-08-07 22:05:57.404772993 +0900

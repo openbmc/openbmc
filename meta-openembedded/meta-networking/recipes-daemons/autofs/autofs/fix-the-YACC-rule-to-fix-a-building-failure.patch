@@ -19,6 +19,8 @@ This lead to a race when compile amd_tok.o, the header file maybe rewritten.
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 
 ---
+Upstream-Status: Pending
+
  lib/Makefile     | 6 ++++--
  modules/Makefile | 3 ++-
  2 files changed, 6 insertions(+), 3 deletions(-)

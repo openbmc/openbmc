@@ -7,6 +7,8 @@ Files should be unlinked after all users exit.
 
 Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
+Upstream-Status: Pending
+
  src/lat_fifo.c | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 

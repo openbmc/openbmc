@@ -11,6 +11,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Update for 2.22.
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  tests/hugetests.h | 1 +
  1 file changed, 1 insertion(+)
 

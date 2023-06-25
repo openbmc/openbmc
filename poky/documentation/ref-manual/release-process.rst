@@ -122,7 +122,7 @@ of stable and :term:`LTS` releases.
 
    In some circumstances, a layer can be created by the community in order to
    add a specific feature or support a new version of some package for an :term:`LTS`
-   release.  This is called a :term:`Mixin` layer. These are thin and specific
+   release. This is called a :term:`Mixin` layer. These are thin and specific
    purpose layers which can be stacked with an :term:`LTS` release to "mix" a specific
    feature into that build. These are created on an as-needed basis and
    maintained by the people who need them.

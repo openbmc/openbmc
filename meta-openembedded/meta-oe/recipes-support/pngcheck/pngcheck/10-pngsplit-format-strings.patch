@@ -2,6 +2,8 @@ From: Jari Aalto <jari.aalto@cante.net>
 Subject: Correct fomat strings fro hardened build flags
 
 ---
+Upstream-Status: Pending
+
  gpl/pngsplit.c |   10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 

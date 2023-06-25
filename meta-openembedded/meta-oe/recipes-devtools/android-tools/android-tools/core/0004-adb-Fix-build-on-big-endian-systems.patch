@@ -18,6 +18,8 @@ them to be used when initializing structures.
 
 Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 ---
+Upstream-Status: Pending
+
  adb/usb_linux_client.c | 11 +++++++++--
  1 file changed, 9 insertions(+), 2 deletions(-)
 

@@ -1015,17 +1015,14 @@ to your build configuration.
             else:
                 self.nfs_server = '192.168.7.@GATEWAY@'
 
-        # Figure out a new nfs_instance to allow multiple qemus running.
-        ps = subprocess.check_output(("ps", "auxww")).decode('utf-8')
-        pattern = '/bin/unfsd .* -i .*\.pid -e .*/exports([0-9]+) '
-        all_instances = re.findall(pattern, ps, re.M)
-        if all_instances:
-            all_instances.sort(key=int)
-            self.nfs_instance = int(all_instances.pop()) + 1
+        nfsd_port = 3048 + self.nfs_instance
+        lockdir = "/tmp/qemu-port-locks"
+        self.make_lock_dir(lockdir)
+        while not self.check_free_port('localhost', nfsd_port, lockdir):
+            self.nfs_instance += 1
+            nfsd_port += 1
 
-        nfsd_port = 3049 + 2 * self.nfs_instance
-        mountd_port = 3048 + 2 * self.nfs_instance
-
+        mountd_port = nfsd_port
         # Export vars for runqemu-export-rootfs
         export_dict = {
             'NFS_INSTANCE': self.nfs_instance,
@@ -1087,6 +1084,17 @@ to your build configuration.
         self.set('NETWORK_CMD', '-netdev bridge,br=%s,id=net0,helper=%s -device virtio-net-pci,netdev=net0 ' % (
             self.net_bridge, os.path.join(self.bindir_native, 'qemu-oe-bridge-helper')))
 
+    def make_lock_dir(self, lockdir):
+        if not os.path.exists(lockdir):
+            # There might be a race issue when multi runqemu processess are
+            # running at the same time.
+            try:
+                os.mkdir(lockdir)
+                os.chmod(lockdir, 0o777)
+            except FileExistsError:
+                pass
+        return
+
     def setup_slirp(self):
         """Setup user networking"""
 
@@ -1105,14 +1113,7 @@ to your build configuration.
         mac = 2
 
         lockdir = "/tmp/qemu-port-locks"
-        if not os.path.exists(lockdir):
-            # There might be a race issue when multi runqemu processess are
-            # running at the same time.
-            try:
-                os.mkdir(lockdir)
-                os.chmod(lockdir, 0o777)
-            except FileExistsError:
-                pass
+        self.make_lock_dir(lockdir)
 
         # Find a free port to avoid conflicts
         for p in ports[:]:
@@ -1152,20 +1153,17 @@ to your build configuration.
             logger.error("ip: %s" % ip)
             raise OEPathError("runqemu-ifup, runqemu-ifdown or ip not found")
 
-        if not os.path.exists(lockdir):
-            # There might be a race issue when multi runqemu processess are
-            # running at the same time.
-            try:
-                os.mkdir(lockdir)
-                os.chmod(lockdir, 0o777)
-            except FileExistsError:
-                pass
+        self.make_lock_dir(lockdir)
 
         cmd = (ip, 'link')
         logger.debug('Running %s...' % str(cmd))
         ip_link = subprocess.check_output(cmd).decode('utf-8')
         # Matches line like: 6: tap0: <foo>
-        possibles = re.findall('^[0-9]+: +(tap[0-9]+): <.*', ip_link, re.M)
+        oe_tap_name = 'tap'
+        if 'OE_TAP_NAME' in os.environ:
+            oe_tap_name = os.environ['OE_TAP_NAME']
+        tap_re = '^[0-9]+: +(' + oe_tap_name + '[0-9]+): <.*'
+        possibles = re.findall(tap_re, ip_link, re.M)
         tap = ""
         for p in possibles:
             lockfile = os.path.join(lockdir, p)
@@ -1188,7 +1186,7 @@ to your build configuration.
             gid = os.getgid()
             uid = os.getuid()
             logger.info("Setting up tap interface under sudo")
-            cmd = ('sudo', self.qemuifup, str(uid), str(gid), self.bindir_native)
+            cmd = ('sudo', self.qemuifup, str(uid), str(gid))
             try:
                 tap = subprocess.check_output(cmd).decode('utf-8').strip()
             except subprocess.CalledProcessError as e:
@@ -1204,7 +1202,7 @@ to your build configuration.
             logger.error("Failed to setup tap device. Run runqemu-gen-tapdevs to manually create.")
             sys.exit(1)
         self.tap = tap
-        tapnum = int(tap[3:])
+        tapnum = int(tap[len(oe_tap_name):])
         gateway = tapnum * 2 + 1
         client = gateway + 1
         if self.fstype == 'nfs':
@@ -1603,13 +1601,13 @@ to your build configuration.
             logger.debug('Running %s' % str(cmd))
             subprocess.check_call(cmd)
         self.release_taplock()
-        self.release_portlock()
 
         if self.nfs_running:
             logger.info("Shutting down the userspace NFS server...")
             cmd = ("runqemu-export-rootfs", "stop", self.rootfs)
             logger.debug('Running %s' % str(cmd))
             subprocess.check_call(cmd)
+        self.release_portlock()
 
         if self.saved_stty:
             subprocess.check_call(("stty", self.saved_stty))

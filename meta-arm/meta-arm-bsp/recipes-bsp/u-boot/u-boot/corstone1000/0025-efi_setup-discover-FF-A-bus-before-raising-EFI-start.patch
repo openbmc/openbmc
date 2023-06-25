@@ -1,7 +1,7 @@
-From 61f17cf403e2c1108b76556c879aa21945b31dcb Mon Sep 17 00:00:00 2001
+From 1f165f5b6e7d82611b55260b7254fee5fbebe539 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Wed, 30 Nov 2022 19:14:52 +0000
-Subject: [PATCH 25/27] efi_setup: discover FF-A bus before raising EFI started
+Subject: [PATCH 25/42] efi_setup: discover FF-A bus before raising EFI started
  event
 
 add FF-A discovery to efi_corstone1000_uboot_efi_started_event()
@@ -14,7 +14,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
-index 08c742edbd12..65bd626e49b4 100644
+index 08c742edbd..65bd626e49 100644
 --- a/lib/efi_loader/efi_setup.c
 +++ b/lib/efi_loader/efi_setup.c
 @@ -142,9 +142,16 @@ static efi_status_t efi_init_secure_boot(void)
@@ -47,5 +47,5 @@ index 08c742edbd12..65bd626e49b4 100644
  
  	/* Initialize variable services */
 -- 
-2.39.1
+2.25.1
 

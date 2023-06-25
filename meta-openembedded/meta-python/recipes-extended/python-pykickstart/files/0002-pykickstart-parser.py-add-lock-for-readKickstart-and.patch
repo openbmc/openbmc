@@ -11,6 +11,8 @@ Subject: [PATCH 2/4] pykickstart/parser.py: add lock for readKickstart and
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
+Upstream-Status: Pending
+
  pykickstart/load.py   |  2 +-
  pykickstart/parser.py | 18 ++++++++++++++++++
  2 files changed, 19 insertions(+), 1 deletion(-)

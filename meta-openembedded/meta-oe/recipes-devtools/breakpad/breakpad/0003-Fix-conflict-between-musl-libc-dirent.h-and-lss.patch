@@ -6,6 +6,8 @@ Subject: [PATCH 3/3] Fix conflict between musl libc <dirent.h> and lss
 Include <dirent.h> late to avoid the macro getdents64 in musl
 libc's <dirent.h> to conflict with linux_sycall_support.h.
 ---
+Upstream-Status: Pending
+
  src/client/linux/crash_generation/crash_generation_server.cc | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 

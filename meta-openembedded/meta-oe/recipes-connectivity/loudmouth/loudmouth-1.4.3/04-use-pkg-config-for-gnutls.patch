@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: use pkg-config to detect gnutls
 Debian: http://bugs.debian.org/529835
 Origin: http://groups.google.com/group/loudmouth-dev/browse_thread/thread/3f78255837048daf#

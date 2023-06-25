@@ -33,6 +33,8 @@ FILES:${PN}-dev = " \
 	${libdir}/libctf-nobfd.so \
 	${libdir}/libopcodes.so"
 
+FILES:${PN}-staticdev += "${libdir}/gprofng/*.a"
+
 # Rather than duplicating multiple entries for these, make one
 # list and reuse it.
 

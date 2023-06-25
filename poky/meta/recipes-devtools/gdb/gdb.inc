@@ -13,10 +13,8 @@ SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
            file://0006-resolve-restrict-keyword-conflict.patch \
            file://0007-Fix-invalid-sigprocmask-call.patch \
            file://0008-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch \
-           file://0009-gdbserver-linux-low.cc-Fix-a-typo-in-ternary-operato.patch \
            file://add-missing-ldflags.patch \
-           file://0001-aarch64-Check-for-valid-inferior-thread-regcache-bef.patch \
            "
-SRC_URI[sha256sum] = "115ad5c18d69a6be2ab15882d365dda2a2211c14f480b3502c6eba576e2e95a0"
+SRC_URI[sha256sum] = "fd5bebb7be1833abdb6e023c2f498a354498281df9d05523d8915babeb893f0a"
 
 TOOLCHAIN = "gcc"

@@ -10,6 +10,8 @@ friendly it makes sense to avoid glibc-specific code.
 Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
 Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
 ---
+Upstream-Status: Pending
+
  mkemlog.c | 29 ++++++++++++++---------------
  1 file changed, 14 insertions(+), 15 deletions(-)
 

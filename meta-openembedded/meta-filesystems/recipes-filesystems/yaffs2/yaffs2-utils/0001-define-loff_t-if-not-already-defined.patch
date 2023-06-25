@@ -7,6 +7,8 @@ Helps to build with musl
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  yaffs_guts.h | 4 ++++
  1 file changed, 4 insertions(+)
 

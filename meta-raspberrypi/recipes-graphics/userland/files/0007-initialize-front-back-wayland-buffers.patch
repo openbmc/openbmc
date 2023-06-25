@@ -7,6 +7,8 @@ origins from metrological wayland support
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/egl/egl_client_surface.c | 3 +++
  1 file changed, 3 insertions(+)
 

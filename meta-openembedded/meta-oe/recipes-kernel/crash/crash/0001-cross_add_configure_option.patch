@@ -5,6 +5,8 @@ Subject: [PATCH] cross_add_configure_option
 
 
 ---
+Upstream-Status: Pending
+
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 

@@ -20,7 +20,7 @@ REQUIRED_DISTRO_FEATURES = "opengl x11"
 
 S = "${WORKDIR}/xforms-${PV}"
 
-DEPENDS = "libxpm jpeg libx11 mesa"
+DEPENDS = "libxpm jpeg libx11 virtual/libgl"
 RDEPENDS:${PN} = "bash"
 
 EXTRA_OECONF = "--with-extra-inc=${S}/lib" 

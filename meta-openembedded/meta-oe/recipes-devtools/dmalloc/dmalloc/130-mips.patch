@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Patch to correctly handle the MIPS case.
 
 It was build up by Yann E. MORIN <yann.morin.1998@anciens.enib.fr> from some

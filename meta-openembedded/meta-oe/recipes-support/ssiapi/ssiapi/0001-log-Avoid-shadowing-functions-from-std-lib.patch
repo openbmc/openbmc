@@ -5,6 +5,8 @@ Subject: [PATCH 1/4] log: Avoid shadowing functions from std lib
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  lib/log/log.c | 2 +-
  lib/log/log.h | 8 ++++----
  2 files changed, 5 insertions(+), 5 deletions(-)

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Add patch by Ondrej Sury to migrate to libjpeg-turbo (Closes: #763263)
 
 Index: fbida-2.10/jpeg/62/jpegcomp.h

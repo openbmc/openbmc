@@ -8,6 +8,8 @@ The CF3_WITH_LIBRARY and AC_CHECK_HEADERS were moved to outside of the check for
 Ticket: CFE-4023
 Changelog: title
 ---
+Upstream-Status: Pending
+
  configure.ac          | 21 +++++++++++----------
  libntech/configure.ac | 21 +++++++++++----------
  2 files changed, 22 insertions(+), 20 deletions(-)

@@ -6,11 +6,17 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d"
 
 SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main \
            file://0001-Replace-lstat64-stat64-functions-on-linux.patch"
-SRCREV = "edf6ef4b06b42c58292faea78498aff76bdf68ed"
+SRCREV = "4bd1a77e67958fb7f6739bd4542641646f264e5d"
 PV = "0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
+
+# Work around this fatal warning:
+# ../git/src/gn/desc_builder.cc: In member function 'base::Value {anonymous}::BaseDescBuilder::ToBaseValue(const Scope*)':
+# ../git/src/gn/desc_builder.cc:179:21: error: redundant move in return statement [-Werror=redundant-move]
+#   179 |     return std::move(res);
+CFLAGS:append = " -Wno-redundant-move"
 
 # Map from our _OS strings to the GN's platform values.
 def gn_platform(variable, d):

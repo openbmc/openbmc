@@ -4,6 +4,8 @@ Date: Mon, 30 Oct 2017 21:05:46 +0100
 Subject: [PATCH] adb: Allow adbd to be ran as root
 
 ---
+Upstream-Status: Pending
+
  adb/adb.c | 1 +
  1 file changed, 1 insertion(+)
 

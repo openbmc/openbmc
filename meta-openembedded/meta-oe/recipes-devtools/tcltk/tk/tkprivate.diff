@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Patch by Chris Waters sets path which are normally point to a directory
 with Tk sources to a subdirectory of /usr/include/tcl8.4 (debian/rules
 puts private Tk headers there).

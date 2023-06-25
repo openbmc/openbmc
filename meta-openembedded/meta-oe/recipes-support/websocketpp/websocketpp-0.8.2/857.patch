@@ -8,6 +8,8 @@ Subject: [PATCH] Update SConstruct with new Python3 syntax: - new raise
 This should fix FTBFS against new scons 3.1.2
 https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=947584
 ---
+Upstream-Status: Pending
+
  SConstruct | 45 +++++++++++++++++++++++----------------------
  1 file changed, 23 insertions(+), 22 deletions(-)
 

@@ -8,3 +8,5 @@ inherit pypi setuptools3
 PYPI_PACKAGE = "colorlog"
 
 SRC_URI[sha256sum] = "bd94bd21c1e13fac7bd3153f4bc3a7dc0eb0974b8bc2fdf1a989e474f6e582e5"
+
+RDEPENDS:${PN} += "python3-logging"

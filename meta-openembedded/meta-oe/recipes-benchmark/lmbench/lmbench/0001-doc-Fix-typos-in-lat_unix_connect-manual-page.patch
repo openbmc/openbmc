@@ -5,6 +5,8 @@ Subject: [PATCH 1/2] doc: Fix typos in lat_unix_connect manual page
 
 Signed-off-by: Yanfei Xu <yanfei.xu@windriver.com>
 ---
+Upstream-Status: Pending
+
  doc/lat_unix_connect.8 | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 

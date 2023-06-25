@@ -12,6 +12,8 @@ warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
 Uptream-Status: Submitted [https://github.com/stedolan/jq/pull/2480]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/builtin.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

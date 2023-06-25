@@ -6,6 +6,8 @@ Subject: [PATCH] arm- backport from oe-core
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  kexec/arch/arm/crashdump-arm.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 

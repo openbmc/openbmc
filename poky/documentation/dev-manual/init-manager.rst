@@ -53,7 +53,7 @@ The ":ref:`device-manager`" chapter has more details about device managers.
 Using SysVinit with udev
 =========================
 
-SysVinit with  the udev device manager corresponds to the
+SysVinit with the udev device manager corresponds to the
 default setting in Poky. This corresponds to setting::
 
    INIT_MANAGER = "sysvinit"

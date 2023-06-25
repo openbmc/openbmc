@@ -1,0 +1,39 @@
+From 121ef5253a49065dea6a89536ca7bd3dabd40e25 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 19 Jun 2023 17:10:09 +0200
+Subject: [PATCH] pzstd: use c++14 without conditions
+
+Doing this check with a direct c++ snippet is prone to portability problems:
+
+- \043 is not portable between shells: dash expands it to #,
+bash does not;
+
+- using # directly works with make 4.3 but does not with make 4.2.
+
+Let's just use the c++ version that covers both the code and the gtest.
+
+Upstream-Status: Submitted [https://github.com/facebook/zstd/pull/3682]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+---
+ contrib/pzstd/Makefile | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/contrib/pzstd/Makefile b/contrib/pzstd/Makefile
+index e62f8e87..58fb82a1 100644
+--- a/contrib/pzstd/Makefile
++++ b/contrib/pzstd/Makefile
+@@ -37,11 +37,8 @@ CFLAGS   += -Wno-deprecated-declarations
+ PZSTD_INC  = -I$(ZSTDDIR) -I$(ZSTDDIR)/common -I$(PROGDIR) -I.
+ GTEST_INC  = -isystem googletest/googletest/include
+ 
+-# If default C++ version is older than C++11, explicitly set C++11, which is the
+-# minimum required by the code.
+-ifeq ($(shell echo "\043if __cplusplus < 201103L\n\043error\n\043endif" | $(CXX) -x c++ -Werror -c - -o /dev/null 2>/dev/null && echo 1 || echo 0),0)
+-PZSTD_CXX_STD := -std=c++11
+-endif
++# Set the minimum required by gtest
++PZSTD_CXX_STD := -std=c++14
+ 
+ PZSTD_CPPFLAGS  = $(PZSTD_INC)
+ PZSTD_CCXXFLAGS =

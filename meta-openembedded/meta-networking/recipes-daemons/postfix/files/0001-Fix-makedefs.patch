@@ -11,7 +11,7 @@ for Linux2 and Linux3 systems.
   native build, search host library path for nsl and resolv library
   which comes from libc
 
-Upstreamstatus: Inappropriate [embedded specific]
+Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
 ---

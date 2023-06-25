@@ -26,7 +26,6 @@ do_configure () {
             unset j
         done
         unset i
-        DEVTOOL_DISABLE_MENUCONFIG=true
     else
         if [ -n "${UBOOT_MACHINE}" ]; then
             oe_runmake -C ${S} O=${B} ${UBOOT_MACHINE}

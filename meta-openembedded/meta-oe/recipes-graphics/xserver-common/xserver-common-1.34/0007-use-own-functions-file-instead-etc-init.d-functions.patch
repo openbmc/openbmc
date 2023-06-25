@@ -8,6 +8,8 @@ Subject: [PATCH] use own functions file instead /etc/init.d/functions
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  Makefile             |  1 +
  X11/Xinit.d/11zaurus |  2 +-
  X11/Xinit.d/12keymap |  2 +-

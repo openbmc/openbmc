@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Index: xfsprogs-4.14.0/include/builddefs.in
 ===================================================================
 --- xfsprogs-4.14.0.orig/include/builddefs.in

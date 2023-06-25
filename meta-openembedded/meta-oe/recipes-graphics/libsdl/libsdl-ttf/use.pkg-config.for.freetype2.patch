@@ -8,6 +8,8 @@ commit 5870bd272b0b077d0826fb900b251884c1c05061
     binconfig-disabled: Add class and use
 
 ---
+Upstream-Status: Pending
+
  configure.in | 38 +++++---------------------------------
  1 file changed, 5 insertions(+), 33 deletions(-)
 

@@ -7,6 +7,8 @@ Courtesy: Zan Dobersek
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interface/khronos/ext/egl_wayland.c | 42 +++++++++++++++++++++++++++++
  interface/wayland/dispmanx.xml      | 10 +++++++
  2 files changed, 52 insertions(+)

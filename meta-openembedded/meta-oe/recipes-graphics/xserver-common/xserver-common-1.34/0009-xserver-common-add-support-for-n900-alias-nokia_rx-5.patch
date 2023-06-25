@@ -6,6 +6,8 @@ Subject: [PATCH] xserver-common: add support for n900 alias nokia_rx-51_board
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  X11/xserver-common | 7 +++++++
  1 file changed, 7 insertions(+)
 

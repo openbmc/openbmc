@@ -8,6 +8,8 @@ Fixes QA errors about GNU_HASH
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  mib-modules/Makefile | 10 +++++-----
  tools/Makefile       |  2 +-
  2 files changed, 6 insertions(+), 6 deletions(-)

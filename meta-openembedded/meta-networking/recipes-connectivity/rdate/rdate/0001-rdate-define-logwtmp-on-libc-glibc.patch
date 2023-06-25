@@ -5,6 +5,8 @@ Subject: [PATCH] rdate: define logwtmp on libc != glibc
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  src/rdate.c | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
 

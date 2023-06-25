@@ -13,9 +13,10 @@ DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} += "\
     ${PYTHON_PN}-dbus \
-    ${PYTHON_PN}-pygobject \
     ${PYTHON_PN}-unittest \
     ${PYTHON_PN}-xml \
     "
+
+RRECOMMENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'gobject-introspection-data', '${MLPREFIX}${PYTHON_PN}-pygobject', '', d)}"
 
 BBCLASSEXTEND = "native"

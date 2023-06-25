@@ -9,6 +9,8 @@ error: 'UINT16_MAX' undeclared (first use in this function)
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  interopServerProvider.c | 1 +
  1 file changed, 1 insertion(+)
 

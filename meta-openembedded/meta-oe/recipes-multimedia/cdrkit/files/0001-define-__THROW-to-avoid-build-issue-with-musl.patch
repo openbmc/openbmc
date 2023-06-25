@@ -8,6 +8,8 @@ http://autobuild.buildroot.net/results/d27/d2781e70b04a207e2e9397d888032294c7285
 
 Signed-off-by: Romain Naour <romain.naour@openwide.fr>
 ---
+Upstream-Status: Pending
+
  genisoimage/sha256.h | 4 ++++
  genisoimage/sha512.h | 4 ++++
  2 files changed, 8 insertions(+)

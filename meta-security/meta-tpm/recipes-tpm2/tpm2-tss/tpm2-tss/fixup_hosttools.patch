@@ -2,7 +2,7 @@ revert configure: add checks for all tools used by make install
 
 Not appropriate for cross build env.
 
-Upstream-Status: OE [inappropriate]
+Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
 Index: tpm2-tss-4.0.1/configure.ac

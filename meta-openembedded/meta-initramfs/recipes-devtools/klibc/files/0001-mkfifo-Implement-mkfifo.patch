@@ -6,6 +6,8 @@ Subject: [PATCH] mkfifo: Implement mkfifo
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  usr/utils/mkfifo.c | 5 +++++
  1 file changed, 5 insertions(+)
 

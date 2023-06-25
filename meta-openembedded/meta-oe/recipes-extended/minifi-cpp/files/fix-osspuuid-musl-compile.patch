@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff -urN -x .git orig/thirdparty/ossp-uuid/ossp-uuid-musl-compile-fix.patch patched/thirdparty/ossp-uuid/ossp-uuid-musl-compile-fix.patch
 --- orig/thirdparty/ossp-uuid/ossp-uuid-musl-compile-fix.patch	1970-01-01 09:00:00.000000000 +0900
 +++ patched/thirdparty/ossp-uuid/ossp-uuid-musl-compile-fix.patch	2020-08-07 11:22:49.344854508 +0900

@@ -13,113 +13,56 @@ SECTION = "console/utils"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f98ffa763e50cded76f49bce73aade16"
 
-DEPENDS = "ghostscript-native tiff jpeg fontconfig cups libpng"
-DEPENDS:class-native = "libpng-native"
+DEPENDS = "tiff jpeg fontconfig cups libpng freetype zlib"
 
 UPSTREAM_CHECK_URI = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
 
-# As of ghostscript 9.54.0 the jpeg issue in the CVE is present in the gs jpeg sources
-# however we use an external jpeg which doesn't have the issue.
+# We use a system libjpeg-turbo which has this fix
 CVE_CHECK_IGNORE += "CVE-2013-6629"
 
 def gs_verdir(v):
     return "".join(v.split("."))
 
 
-SRC_URI_BASE = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${@gs_verdir("${PV}")}/${BPN}-${PV}.tar.gz \
-                file://ghostscript-9.15-parallel-make.patch \
-                file://ghostscript-9.16-Werror-return-type.patch \
-                file://do-not-check-local-libpng-source.patch \
-                file://avoid-host-contamination.patch \
-                file://mkdir-p.patch \
+SRC_URI = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${@gs_verdir("${PV}")}/${BPN}-${PV}.tar.gz \
+           file://ghostscript-9.16-Werror-return-type.patch \
+           file://avoid-host-contamination.patch \
 "
-
-SRC_URI = "${SRC_URI_BASE} \
-           file://cups-no-gcrypt.patch \
-           "
-
-SRC_URI:class-native = "${SRC_URI_BASE} \
-                        file://ghostscript-9.21-native-fix-disable-system-libtiff.patch \
-                        file://base-genht.c-add-a-preprocessor-define-to-allow-fope.patch \
-                        "
 
 SRC_URI[sha256sum] = "4df18a808cd4369f25e02dbcec2f133cb6d674627b2c6b1502020e58d43e32ce"
 
-# Put something like
-#
-#   PACKAGECONFIG:append:pn-ghostscript = " x11"
-#
-# in local.conf to enable building with X11.  Be careful.  The order
-# of the overrides matters!
-#
-#PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}"
-PACKAGECONFIG:class-native = ""
-
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[gtk] = "--enable-gtk,--disable-gtk,gtk+3"
+PACKAGECONFIG[libidn] = "--with-libidn,--without-libidn,libidn"
+PACKAGECONFIG[libpaper] = "--with-libpaper,--without-libpaper,libpaper"
 PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR}, \
-                      --without-x, virtual/libx11 libxext libxt gtk+3\
-                      "
+                      --without-x, virtual/libx11 libxext libxt"
 
-EXTRA_OECONF = "--without-libpaper --with-system-libtiff --with-jbig2dec \
+EXTRA_OECONF = "--with-jbig2dec \
                 --with-fontpath=${datadir}/fonts \
-                --without-libidn --with-cups-serverbin=${exec_prefix}/lib/cups \
-                --with-cups-datadir=${datadir}/cups \
                 CUPSCONFIG="${STAGING_BINDIR_CROSS}/cups-config" \
+                PKGCONFIG=pkg-config \
                 "
 
 EXTRA_OECONF:append:mipsarcho32 = " --with-large_color_index=0"
 
-# Explicity disable libtiff, fontconfig,
-# freetype, cups for ghostscript-native
-EXTRA_OECONF:class-native = "--without-x --with-system-libtiff=no \
-                             --without-libpaper \
-                             --with-fontpath=${datadir}/fonts \
-                             --without-libidn --disable-fontconfig \
-                             --enable-freetype --disable-cups "
+# Uses autoconf but not automake, can't do out-of-tree
+inherit autotools-brokensep pkgconfig
 
-# This has been fixed upstream but for now we need to subvert the check for time.h
-# http://bugs.ghostscript.com/show_bug.cgi?id=692443
-# http://bugs.ghostscript.com/show_bug.cgi?id=692426
-CFLAGS += "-DHAVE_SYS_TIME_H=1"
-BUILD_CFLAGS += "-DHAVE_SYS_TIME_H=1"
-
-inherit autotools-brokensep
-
-do_configure:prepend:class-target () {
-        rm -rf ${S}/jpeg/
+# Prune the source tree of libraries that we're using our packaging of, so that
+# ghostscript can't link to them. Can't prune zlib as that's needed for the
+# native tools.
+prune_sources() {
+    rm -rf ${S}/jpeg/ ${S}/libpng/ ${S}/tiff/ ${S}/expat/ ${S}/freetype/ ${S}/cups/lib
 }
-
-do_configure:append () {
-	# copy tools from the native ghostscript build
-	if [ "${PN}" != "ghostscript-native" ]; then
-		mkdir -p obj/aux soobj
-		for i in genarch genconf mkromfs echogs gendev genht packps; do
-			cp ${STAGING_BINDIR_NATIVE}/ghostscript-${PV}/$i obj/aux/$i
-		done
-	fi
-}
+do_unpack[postfuncs] += "prune_sources"
 
 do_install:append () {
     mkdir -p ${D}${datadir}/ghostscript/${PV}/
     cp -r ${S}/Resource ${D}${datadir}/ghostscript/${PV}/
     cp -r ${S}/iccprofiles ${D}${datadir}/ghostscript/${PV}/
 }
-
-do_compile:class-native () {
-    mkdir -p obj
-    for i in genarch genconf mkromfs echogs gendev genht packps; do
-        oe_runmake obj/aux/$i
-    done
-}
-
-do_install:class-native () {
-    install -d ${D}${bindir}/ghostscript-${PV}
-    for i in genarch genconf mkromfs echogs gendev genht packps; do
-        install -m 755 obj/aux/$i ${D}${bindir}/ghostscript-${PV}/$i
-    done
-}
-
-BBCLASSEXTEND = "native"
 
 # ghostscript does not supports "arc"
 COMPATIBLE_HOST = "^(?!arc).*"

@@ -1,10 +1,7 @@
 #!/bin/bash
 #
 # QEMU network interface configuration script. This utility needs to
-# be run as root, and will use the tunctl binary from a native sysroot.
-# Note: many Linux distros these days still use an older version of
-# tunctl which does not support the group permissions option, hence
-# the need to use build system's version.
+# be run as root, and will use the ip utility
 #
 # If you find yourself calling this script a lot, you can add the
 # the following to your /etc/sudoers file to be able to run this
@@ -24,7 +21,7 @@
 #
 
 usage() {
-	echo "sudo $(basename $0) <uid> <gid> <native-sysroot-basedir>"
+	echo "sudo $(basename $0) <gid>"
 }
 
 if [ $EUID -ne 0 ]; then
@@ -32,41 +29,43 @@ if [ $EUID -ne 0 ]; then
 	exit 1
 fi
 
-if [ $# -ne 3 ]; then
+if [ $# -eq 2 ]; then
+	echo "Warning: uid parameter is ignored. It is no longer needed."
+	GROUP="$2"
+elif [ $# -eq 1 ]; then
+	GROUP="$1"
+else
 	usage
 	exit 1
 fi
 
-USERID="-u $1"
-GROUP="-g $2"
-STAGING_BINDIR_NATIVE=$3
 
-TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
-if [ ! -x "$TUNCTL" ]; then
-       echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
+if [ -z "$OE_TAP_NAME" ]; then
+	OE_TAP_NAME=tap
+fi
+
+if taps=$(ip tuntap list 2>/dev/null); then
+	tap_no_last=$(echo "$taps" |cut -f 1 -d ":" |grep -E "^$OE_TAP_NAME.*" |sed "s/$OE_TAP_NAME//g" | sort -rn | head -n 1)
+	if [ -z "$tap_no_last" ]; then
+		tap_no=0
+	else
+		tap_no=$(("$tap_no_last" + 1))
+	fi
+	ip tuntap add "$OE_TAP_NAME$tap_no" mode tap group "$GROUP" && TAP=$OE_TAP_NAME$tap_no
+fi
+
+if [ -z "$TAP" ]; then
+	echo "Error: Unable to find a tap device to use"
 	exit 1
 fi
 
-TAP=`$TUNCTL -b $GROUP 2>&1`
-STATUS=$?
-if [ $STATUS -ne 0 ]; then
-# If tunctl -g fails, try using tunctl -u, for older host kernels 
-# which do not support the TUNSETGROUP ioctl
-	TAP=`$TUNCTL -b $USERID 2>&1`
-	STATUS=$?
-	if [ $STATUS -ne 0 ]; then
-		echo "tunctl failed:"
-		exit 1
-	fi
-fi
-
-IFCONFIG=`which ip 2> /dev/null`
-if [ "x$IFCONFIG" = "x" ]; then
+IPTOOL=`which ip 2> /dev/null`
+if [ "x$IPTOOL" = "x" ]; then
 	# better than nothing...
-	IFCONFIG=/sbin/ip
+	IPTOOL=/sbin/ip
 fi
-if [ ! -x "$IFCONFIG" ]; then
-	echo "$IFCONFIG cannot be executed"
+if [ ! -x "$IPTOOL" ]; then
+	echo "$IPTOOL cannot be executed"
 	exit 1
 fi
 
@@ -79,22 +78,22 @@ if [ ! -x "$IPTABLES" ]; then
 	exit 1
 fi
 
-n=$[ (`echo $TAP | sed 's/tap//'` * 2) + 1 ]
-$IFCONFIG addr add 192.168.7.$n/32 broadcast 192.168.7.255 dev $TAP
+n=$[ (`echo $TAP | sed "s/$OE_TAP_NAME//"` * 2) + 1 ]
+$IPTOOL addr add 192.168.7.$n/32 broadcast 192.168.7.255 dev $TAP
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
     echo "Failed to set up IP addressing on $TAP"
     exit 1
 fi
-$IFCONFIG link set dev $TAP up
+$IPTOOL link set dev $TAP up
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
     echo "Failed to bring up $TAP"
     exit 1
 fi
 
-dest=$[ (`echo $TAP | sed 's/tap//'` * 2) + 2 ]
-$IFCONFIG route add to 192.168.7.$dest dev $TAP
+dest=$[ (`echo $TAP | sed "s/$OE_TAP_NAME//"` * 2) + 2 ]
+$IPTOOL route add to 192.168.7.$dest dev $TAP
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
     echo "Failed to add route to 192.168.7.$dest using $TAP"

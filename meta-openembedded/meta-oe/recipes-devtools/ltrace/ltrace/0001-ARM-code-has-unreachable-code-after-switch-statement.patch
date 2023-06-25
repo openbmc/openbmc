@@ -11,6 +11,8 @@ sysdeps/linux-gnu/arm/trace.c:173:33: error: statement will never be executed [-
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  sysdeps/linux-gnu/arm/trace.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 

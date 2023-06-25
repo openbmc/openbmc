@@ -6,6 +6,8 @@ Subject: [PATCH] Upstream: not yet
 Fix configure to accept "--prefix=" (a blank prefix).
 
 ---
+Upstream-Status: Pending
+
  build/make/configure.sh | 20 ++++++++++++++++----
  1 file changed, 16 insertions(+), 4 deletions(-)
 

@@ -5,6 +5,8 @@ Subject: [PATCH 1/8] search for log-help in build dir
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  makeman.pl | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

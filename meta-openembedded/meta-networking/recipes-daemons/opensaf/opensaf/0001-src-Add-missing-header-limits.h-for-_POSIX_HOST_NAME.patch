@@ -9,6 +9,8 @@ Do not use the deprecated headers under include/sys
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  src/base/os_defs.h        | 5 +++--
  src/mds/mds_dt_tcp.c      | 1 -
  src/mds/mds_dt_tcp_disc.h | 2 +-

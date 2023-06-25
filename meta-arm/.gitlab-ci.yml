@@ -64,7 +64,7 @@ stages:
     - ./ci/check-warnings $KAS_WORK_DIR/build/warnings.log
   artifacts:
     name: "logs"
-    when: on_failure
+    when: always
     paths:
       - $CI_PROJECT_DIR/work/build/tmp/work*/**/temp/log.do_*.*
       - $CI_PROJECT_DIR/work/build/tmp/work*/**/testimage/*
@@ -85,7 +85,7 @@ update-repos:
 # Available options for building are
 #  DISTRO: [poky, poky-tiny]
 #  KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
-#  TOOLCHAINS: [gcc, clang, armgcc, external-gccarm]
+#  TOOLCHAINS: [gcc, clang, external-gccarm]
 #  TCLIBC: [glibc, musl]
 #  FIRMWARE: [u-boot, edk2]
 #  TS: [none, trusted-services]
@@ -149,8 +149,7 @@ n1sdp:
   extends: .build
   parallel:
     matrix:
-      - TOOLCHAINS: [gcc, armgcc]
-        TS: [none, n1sdp-ts]
+      - TS: [none, n1sdp-ts]
 
 qemu-generic-arm64:
   extends: .build
@@ -283,6 +282,7 @@ documentation:
     - |
       sudo pip3 install -r meta-arm-bsp/documentation/requirements.txt
       for CONF in meta-*/documentation/*/conf.py ; do
+        echo Building $CONF...
         SOURCE_DIR=$(dirname $CONF)
         MACHINE=$(basename $SOURCE_DIR)
         sphinx-build -vW $SOURCE_DIR build-docs/$MACHINE

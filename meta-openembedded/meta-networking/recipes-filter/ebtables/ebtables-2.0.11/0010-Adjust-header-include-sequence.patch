@@ -8,6 +8,8 @@ This fixes the build with musl
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  extensions/ebt_among.c    | 2 +-
  extensions/ebt_arpreply.c | 2 +-
  extensions/ebt_nat.c      | 2 +-

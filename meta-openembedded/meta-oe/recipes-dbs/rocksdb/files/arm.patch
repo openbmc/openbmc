@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 implement timer for arm >= v6
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>

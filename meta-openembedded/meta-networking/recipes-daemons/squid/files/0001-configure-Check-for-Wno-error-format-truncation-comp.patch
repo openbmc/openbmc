@@ -11,6 +11,8 @@ client.c:834:23: error: '%s' directive output may be truncated writing up to 102
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
+Upstream-Status: Pending
+
  acinclude/ax_check_compile_flag.m4 | 74 ++++++++++++++++++++++++++++++++++++++
  configure.ac                       |  2 ++
  2 files changed, 76 insertions(+)

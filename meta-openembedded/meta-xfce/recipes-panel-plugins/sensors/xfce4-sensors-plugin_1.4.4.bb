@@ -13,6 +13,8 @@ EXTRA_OECONF = " \
     --disable-xnvctrl \
 "
 
+LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -fuse-ld=bfd', '', d)}"
+
 do_configure:prepend() {
     sed -i 's:LIBSENSORS_CFLAGS=.*:LIBSENSORS_CFLAGS=-I${STAGING_INCDIR}:g' ${S}/configure.ac
 }

@@ -4,6 +4,8 @@ Date: Wed, 13 Jun 2018 18:22:22 +0000
 Subject: [PATCH] openmaxil: add pkg-config file
 
 ---
+Upstream-Status: Pending
+
  CMakeLists.txt            |  2 +-
  pkgconfig/openmaxil.pc.in | 10 ++++++++++
  2 files changed, 11 insertions(+), 1 deletion(-)

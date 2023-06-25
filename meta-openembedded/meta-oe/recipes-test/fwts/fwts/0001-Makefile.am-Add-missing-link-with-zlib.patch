@@ -1,0 +1,43 @@
+From dd97e711b13af6f770db27abec316d5c9271c777 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 12 Jun 2023 10:25:55 -0700
+Subject: [PATCH] Makefile.am: Add missing link with zlib
+
+It uses functions e.g. gzopen/gzclone/gzgets which are provided by zlib
+therefore add it to linker flags.
+
+Fixes
+| aarch64-yoe-linux-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: gzgets
+| >>> referenced by ../src/lib/src/.libs/libfwts.so
+|
+| aarch64-yoe-linux-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: gzopen
+| >>> referenced by ../src/lib/src/.libs/libfwts.so
+|
+| aarch64-yoe-linux-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: gzclose
+| >>> referenced by ../src/lib/src/.libs/libfwts.so
+| clang-16: error: linker command failed with exit code 1 (use -v to see invocation)
+| make[3]: *** [Makefile:2301: fwts] Error 1
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/src/Makefile.am b/src/lib/src/Makefile.am
+index 76c48d4..45eea88 100644
+--- a/src/lib/src/Makefile.am
++++ b/src/lib/src/Makefile.am
+@@ -30,7 +30,7 @@ pkglib_LTLIBRARIES = libfwts.la
+ libfwts_la_LDFLAGS = -version-info 1:0:0
+ 
+ libfwts_la_LIBADD = 				\
+-	-lm -lpthread -lbsd				\
++	-lm -lpthread -lbsd -lz				\
+ 	@GIO_LIBS@					\
+ 	@GLIB_LIBS@
+ 
+-- 
+2.41.0
+

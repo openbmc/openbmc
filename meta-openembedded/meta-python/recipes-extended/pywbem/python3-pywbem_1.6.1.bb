@@ -21,26 +21,28 @@ SRC_URI[sha256sum] = "abdbd6ce08b6c597cdd6c7730e6b49a842d913f2f6b3cc62b585c58ec3
 inherit pypi setuptools3 update-alternatives
 
 DEPENDS += " \
-    ${PYTHON_PN}-ply-native \
-    ${PYTHON_PN}-pyyaml-native \
-    ${PYTHON_PN}-six-native \
-    ${PYTHON_PN}-wheel-native \
+    python3-ply-native \
+    python3-pyyaml-native \
+    python3-six-native \
+    python3-wheel-native \
 "
 
-RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-ply \
-    ${PYTHON_PN}-pyyaml \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-stringold \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-unixadmin \
-    ${PYTHON_PN}-xml \
-    ${PYTHON_PN}-nocasedict \
-    ${PYTHON_PN}-nocaselist \
-    ${PYTHON_PN}-yamlloader \
+RDEPENDS:${PN} += "\
+    python3-datetime \
+    python3-io \
+    python3-logging \
+    python3-netclient \
+    python3-nocasedict \
+    python3-nocaselist \
+    python3-ply \
+    python3-pyyaml \
+    python3-requests \
+    python3-six \
+    python3-stringold \
+    python3-threading \
+    python3-unixadmin \
+    python3-xml \
+    python3-yamlloader \
 "
 
 ALTERNATIVE:${PN} = "mof_compiler"

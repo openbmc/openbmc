@@ -8,6 +8,8 @@ Makefile.am: required file `./README' not found
 
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 

@@ -5,6 +5,8 @@ Subject: [PATCH] config.ml: make compatible with webkitgtk 2.34.0
 
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
+Upstream-Status: Pending
+
  config.mk | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 

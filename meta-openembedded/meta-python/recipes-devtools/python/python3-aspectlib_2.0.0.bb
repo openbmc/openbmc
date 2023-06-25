@@ -27,6 +27,9 @@ RDEPENDS:${PN}-ptest += "\
     python3-unittest-automake-output \
 "
 
-RDEPENDS:${PN} += "python3-core python3-fields"
+RDEPENDS:${PN} += " \
+    python3-fields \
+    python3-logging \
+"
 
 BBCLASSEXTEND = "native nativesdk"

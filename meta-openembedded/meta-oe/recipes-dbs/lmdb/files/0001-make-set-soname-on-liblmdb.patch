@@ -4,6 +4,8 @@ Date: Thu, 25 Aug 2022 17:22:20 -0400
 Subject: [PATCH] make: set soname on liblmdb
 
 ---
+Upstream-Status: Pending
+
  libraries/liblmdb/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

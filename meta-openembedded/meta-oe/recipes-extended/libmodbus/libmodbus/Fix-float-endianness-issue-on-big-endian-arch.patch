@@ -9,6 +9,8 @@ This patch was modified from rm5248 [1]
 [1] https://github.com/synexxus/libmodbus/commit/a511768e7fe7ec52d7bae1d9ae04e33f87a59627
 
 ---
+Upstream-Status: Pending
+
  src/modbus-data.c        | 110 ++++++++++++++++++++++++++++++++++++++---------
  tests/unit-test-client.c |  22 ++++++----
  tests/unit-test.h.in     |  41 ++++++++++++++++--

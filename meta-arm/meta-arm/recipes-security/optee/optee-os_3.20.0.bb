@@ -12,4 +12,3 @@ SRC_URI:append = " \
     file://0007-core-spmc-handle-non-secure-interrupts.patch \
     file://0008-core-spmc-configure-SP-s-NS-interrupt-action-based-o.patch \
    "
-EXTRA_OEMAKE += " CFG_MAP_EXT_DT_SECURE=y"

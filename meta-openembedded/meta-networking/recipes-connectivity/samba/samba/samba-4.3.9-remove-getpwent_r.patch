@@ -9,6 +9,8 @@ http://data.gpo.zugaina.org/musl/net-fs/samba/files/samba-4.3.9-remove-getpwent_
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  source4/torture/local/nss_tests.c | 13 ++++++++-----
  1 file changed, 8 insertions(+), 5 deletions(-)
 

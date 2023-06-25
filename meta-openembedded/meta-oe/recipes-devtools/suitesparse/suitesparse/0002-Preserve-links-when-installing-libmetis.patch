@@ -4,6 +4,8 @@ Date: Wed, 21 Oct 2020 15:26:52 -0600
 Subject: [PATCH] Preserve links when installing libmetis
 
 ---
+Upstream-Status: Pending
+
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

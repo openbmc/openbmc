@@ -7,6 +7,8 @@ Imported from Gentoo
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  Makefile         | 15 +++++++++++++--
  wvrules-posix.mk |  7 +++++--
  2 files changed, 18 insertions(+), 4 deletions(-)

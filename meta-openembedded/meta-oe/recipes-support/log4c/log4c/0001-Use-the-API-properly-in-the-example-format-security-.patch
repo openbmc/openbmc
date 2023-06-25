@@ -5,6 +5,8 @@ Subject: [PATCH] Use the API properly in the example (format security error
  fixed).
 
 ---
+Upstream-Status: Pending
+
  examples/helloworld1/mylog.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

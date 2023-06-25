@@ -11,6 +11,8 @@ error: '__builtin___snprintf_chk' output truncated before the last format charac
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  addrdb/addrdb.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

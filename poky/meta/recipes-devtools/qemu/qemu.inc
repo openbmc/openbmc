@@ -230,6 +230,28 @@ INSANE_SKIP:${PN} = "arch"
 
 FILES:${PN} += "${datadir}/icons"
 
+# For user who want to install all arch packages
+PACKAGES =+ "${PN}-system-all ${PN}-user-all"
+
+ALLOW_EMPTY:${PN}-system-all = "1"
+ALLOW_EMPTY:${PN}-user-all = "1"
+
+PACKAGESPLITFUNCS =+ "split_qemu_packages"
+
+python split_qemu_packages () {
+    archdir = d.expand('${bindir}/')
+    syspackages = do_split_packages(d, archdir, r'^qemu-system-(.*)$', '${PN}-system-%s', 'QEMU full system emulation binaries(%s)' , prepend=True)
+    if syspackages:
+        d.setVar('RDEPENDS:' + d.getVar('PN') + '-system-all', ' '.join(syspackages))
+
+    userpackages = do_split_packages(d, archdir, r'^qemu-((?!system|edid|ga|img|io|nbd|pr-helper|storage-daemon).*)$', '${PN}-user-%s', 'QEMU full user emulation binaries(%s)' , prepend=True)
+    if userpackages:
+        d.setVar('RDEPENDS:' + d.getVar('PN') + '-user-all', ' '.join(userpackages))
+    mipspackage = d.getVar('PN') + "-user-mips"
+    if mipspackage in ' '.join(userpackages):
+        d.appendVar('RDEPENDS:' + mipspackage, ' ' + d.getVar("MLPREFIX") + 'bash')
+}
+
 # Put the guest agent in a separate package
 PACKAGES =+ "${PN}-guest-agent"
 SUMMARY:${PN}-guest-agent = "QEMU guest agent"

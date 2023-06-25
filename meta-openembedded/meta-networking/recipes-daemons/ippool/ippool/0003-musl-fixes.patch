@@ -5,6 +5,8 @@ Subject: [PATCH 3/3] musl fixes
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  cli/cli_readline.c |   7 +-
  ippool_api.c       |   9 ++-
  net/ppp_defs.h     | 194 +++++++++++++++++++++++++++++++++++++++++++++++++++++

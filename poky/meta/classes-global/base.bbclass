@@ -520,7 +520,7 @@ python () {
                 message = "Has a restricted license '%s' which is not listed in your LICENSE_FLAGS_ACCEPTED." % unmatched
                 details = d.getVarFlag("LICENSE_FLAGS_DETAILS", unmatched)
                 if details:
-                    message += " For further details, see %s." % details
+                    message += details
             bb.debug(1, "Skipping %s: %s" % (pn, message))
             raise bb.parse.SkipRecipe(message)
 

@@ -5,6 +5,8 @@ Subject: [PATCH] rfkill makefile: don't use -t, the OE install wrapper dislikes 
 
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
 ---
+Upstream-Status: Pending
+
  Makefile |    4 ++--
  1 files changed, 2 insertions(+), 2 deletions(-)
 

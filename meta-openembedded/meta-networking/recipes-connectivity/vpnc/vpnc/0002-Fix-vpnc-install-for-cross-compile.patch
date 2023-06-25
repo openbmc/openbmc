@@ -4,6 +4,8 @@ Date: Sun, 2 Dec 2012 02:16:54 +0100
 Subject: [PATCH 2/8] Fix vpnc install for cross compile
 
 ---
+Upstream-Status: Pending
+
  Makefile | 22 +++++++++++-----------
  1 file changed, 11 insertions(+), 11 deletions(-)
 
