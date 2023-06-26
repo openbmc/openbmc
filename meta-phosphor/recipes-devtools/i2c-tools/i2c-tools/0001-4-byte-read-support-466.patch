@@ -1,7 +1,9 @@
-From 1a0c89e6cd3fec862718d48e9b94275a0dc6e52f Mon Sep 17 00:00:00 2001
+From e12074b4d195188a9fc2dc46858c70cd2e80c5da Mon Sep 17 00:00:00 2001
 From: Sergey Solomin <sergey.solomin@us.ibm.com>
 Date: Tue, 6 Sep 2016 15:36:43 -0500
 Subject: [PATCH] 4 byte read support 466
+
+Upstream-Status: Pending
 
 ---
  tools/i2cdump.c | 34 ++++++++++++++++++++++++++++++++++
@@ -88,5 +90,5 @@ index b638c3d..6af44a8 100644
  	if (bank && size != I2C_SMBUS_BLOCK_DATA) {
  		res = i2c_smbus_read_byte_data(file, bankreg);
 -- 
-2.31.1
+2.39.3
 
