@@ -18,4 +18,6 @@ ExecStart=/bin/rm -f /run/openbmc/host@%i-request
 ExecStart=/bin/rm -f /run/openbmc/mpreboot@%i
 
 [Install]
-WantedBy=obmc-host-stop@%i.target
+# Installation of templated services occur in bitbake recipes
+# Leave it commented out here for documentation purposes
+#WantedBy=obmc-host-stop@%i.target

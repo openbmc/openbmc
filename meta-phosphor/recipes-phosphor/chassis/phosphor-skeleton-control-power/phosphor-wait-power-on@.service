@@ -18,4 +18,6 @@ SyslogIdentifier=pgood_wait
 TimeoutSec=30
 
 [Install]
-WantedBy=obmc-host-start@%i.target
+# Installation of templated services occur in bitbake recipes
+# Leave it commented out here for documentation purposes
+#WantedBy=obmc-host-start@%i.target
