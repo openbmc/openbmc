@@ -1,0 +1,1 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
