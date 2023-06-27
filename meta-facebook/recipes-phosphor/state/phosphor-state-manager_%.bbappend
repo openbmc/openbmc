@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/${MACHINE}:"
 
 HOST_DEFAULT_TARGETS:append = " \
     obmc-host-shutdown@{}.target.wants/host-poweroff@{}.service \
@@ -55,6 +55,6 @@ do_install:append:greatlakes() {
     install -m 0777 ${WORKDIR}/power-ctrl-init ${D}${libexecdir}/${PN}/
 }
 
-FILES:${PN} += " /lib/systemd/system/*.service"
+FILES:${PN} += " ${systemd_system_unitdir}/*.service"
 
 SYSTEMD_SERVICE:${PN}-bmc:append:greatlakes = "power-ctrl-init.service"
