@@ -1,1 +1,1 @@
-PACKAGECONFIG:append = "oem-ibm"
+PACKAGECONFIG:append = " oem-ibm"
