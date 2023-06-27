@@ -13,10 +13,6 @@ S = "${WORKDIR}/git"
 
 inherit meson pkgconfig systemd
 
-def get_service(d):
-    return " ".join(["xyz.openbmc_project.State.Boot.PostCode@{}.service".format(x) for x in d.getVar('OBMC_HOST_INSTANCES').split()])
-
-SYSTEMD_SERVICE:${PN} = "${@get_service(d)}"
 DEPENDS += " \
     sdbusplus \
     phosphor-dbus-interfaces \
@@ -25,3 +21,22 @@ DEPENDS += " \
     "
 FILES:${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode@.service"
 FILES:${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode.service"
+
+pkg_postinst:${PN}:append() {
+    mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.Boot.PostCode@${i}.service"
+        TARGET="..//xyz.openbmc_project.State.Boot.PostCode@.service"
+        ln -s $TARGET $LINK
+    done
+}
+
+pkg_prerm:${PN}:append() {
+    for i in ${OBMC_HOST_INSTANCES};
+    do
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.Boot.PostCode@${i}.service"
+        rm $LINK
+    done
+}
+
