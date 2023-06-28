@@ -20,5 +20,8 @@ inherit pkgconfig
 
 RPROVIDES:${PN} += "virtual-obmc-host-ctl"
 
-FMT = "org.openbmc.control.Host@{0}.service"
-DBUS_SERVICE:${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
+DBUS_SERVICE:${PN} += "org.openbmc.control.Host@.service"
+OBMC_CONTROL_INST = "org.openbmc.control.Host@{0}.service"
+OBMC_CONTROL_SVC = "org.openbmc.control.Host@.service"
+OBMC_CONTROL_FMT = "../${OBMC_CONTROL_SVC}:multi-user.target.wants/${OBMC_CONTROL_INST}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'OBMC_CONTROL_FMT', 'OBMC_HOST_INSTANCES')}"
