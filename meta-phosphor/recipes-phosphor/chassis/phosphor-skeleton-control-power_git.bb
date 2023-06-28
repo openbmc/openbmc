@@ -11,8 +11,11 @@ DEPENDS += "libmapper systemd"
 
 SKELETON_DIR = "op-pwrctl"
 
-OBMC_CONTROL_POWER_FMT ?= "org.openbmc.control.Power@{0}.service"
-DBUS_SERVICE:${PN} += "${@compose_list(d, 'OBMC_CONTROL_POWER_FMT', 'OBMC_POWER_INSTANCES')}"
+DBUS_SERVICE:${PN} += "org.openbmc.control.Power@.service"
+OBMC_CONTROL_INST = "org.openbmc.control.Power@{0}.service"
+OBMC_CONTROL_SVC = "org.openbmc.control.Power@.service"
+OBMC_CONTROL_FMT = "../${OBMC_CONTROL_SVC}:multi-user.target.wants/${OBMC_CONTROL_INST}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'OBMC_CONTROL_FMT', 'OBMC_POWER_INSTANCES')}"
 
 SYSTEMD_SERVICE:${PN} += " \
         phosphor-wait-power-on@.service \
