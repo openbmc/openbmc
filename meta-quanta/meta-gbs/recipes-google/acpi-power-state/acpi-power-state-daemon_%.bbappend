@@ -18,7 +18,6 @@ CHASSIS_INSTANCE="0"
 SYSTEMD_SERVICE:${PN}:append:gbs = " \
     gbs-host-s0-set-failsafe.service \
     gbs-host-s5-set-failsafe.service \
-    gbs-host-set-boot-failsafe@${CHASSIS_INSTANCE}.service \
     gbs-check-host-state.service \
     gbs-host-ready.target \
     "
@@ -40,4 +39,21 @@ do_install:append:gbs() {
     install -m 0644 ${WORKDIR}/gbs-host-set-boot-failsafe@.service ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/gbs-check-host-state.service ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/gbs-host-ready.target ${D}${systemd_system_unitdir}
+}
+
+pkg_postinst:${PN}:append() {
+    mkdir -p $D$systemd_system_unitdir/gbs-host-ready.target.wants
+    for i in ${OBMC_CHASSIS_INSTANCES};
+    do
+        LINK="$D$systemd_system_unitdir/gbs-host-ready.target.wants/gbs-host-set-boot-failsafe@${i}.service"
+        TARGET="../gbs-host-set-boot-failsafe@.service"
+        ln -s $TARGET $LINK
+    done
+}
+pkg_prerm:${PN}:append() {
+    for i in ${OBMC_CHASSIS_INSTANCES};
+    do
+        LINK="$D$systemd_system_unitdir/gbs-host-ready.target.wants/gbs-host-set-boot-failsafe@${i}.service"
+        rm $LINK
+    done
 }
