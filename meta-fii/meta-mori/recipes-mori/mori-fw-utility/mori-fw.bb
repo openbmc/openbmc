@@ -1,36 +1,30 @@
 SUMMARY = "Phosphor OpenBMC mori Firmware Upgrade Command"
 DESCRIPTION = "Phosphor OpenBMC mori Firmware Upgrade Comman Daemon"
-
-PR = "r1"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
-
-inherit systemd
-inherit obmc-phosphor-systemd
-
-DEPENDS += "systemd"
-DEPENDS += "phosphor-ipmi-flash"
-RDEPENDS:${PN} += "libsystemd"
-RDEPENDS:${PN} += "bash"
+DEPENDS:append = " systemd phosphor-ipmi-flash"
+PR = "r1"
 
 SRC_URI = " \
     file://mori-fw.sh \
     file://mori-fw-ver.service \
     file://mori-fw-ver.sh \
     file://mori-lib.sh \
-    "
+"
 
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN} = " \
-    mori-fw-ver.service \
-    "
+SYSTEMD_SERVICE:${PN} = "mori-fw-ver.service"
+
+inherit systemd obmc-phosphor-systemd
 
 do_install () {
     install -d ${D}${sbindir}
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${WORKDIR}/mori-fw.sh ${D}${sbindir}/mori-fw.sh
-    install -m 0755 ${WORKDIR}/mori-fw-ver.sh ${D}${libexecdir}/${PN}/mori-fw-ver.sh
+    install -m 0755 ${WORKDIR}/mori-fw-ver.sh \
+        ${D}${libexecdir}/${PN}/mori-fw-ver.sh
     install -m 0755 ${WORKDIR}/mori-lib.sh ${D}${libexecdir}/${PN}/mori-lib.sh
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/mori-fw-ver.service ${D}${systemd_system_unitdir}
 }
+
+RDEPENDS:${PN}:append = " libsystemd bash"
