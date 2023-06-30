@@ -37,7 +37,7 @@ SYSTEMD_PACKAGES = "${PN}-discover \
 
 PACKAGECONFIG ??= "no-warm-reboot \
                    only-run-apr-on-power-loss \
-                   only-boot-when-bmc-ready"
+                   only-allow-boot-when-bmc-ready"
 
 # Disable warm reboots of host
 PACKAGECONFIG[no-warm-reboot] = "-Dwarm-reboot=disabled,-Dwarm-reboot=enabled"
@@ -46,7 +46,7 @@ PACKAGECONFIG[no-warm-reboot] = "-Dwarm-reboot=disabled,-Dwarm-reboot=enabled"
 PACKAGECONFIG[only-run-apr-on-power-loss] = "-Donly-run-apr-on-power-loss=true,-Donly-run-apr-on-power-loss=false"
 
 # Only allow boot operations when BMC is in Ready state
-PACKAGECONFIG[only-boot-when-bmc-ready] = "-Donly-allow-boot-when-bmc-ready=true,-Donly-allow-boot-when-bmc-ready=false"
+PACKAGECONFIG[only-allow-boot-when-bmc-ready] = "-Donly-allow-boot-when-bmc-ready=true,-Donly-allow-boot-when-bmc-ready=false"
 
 # The host-check function will check if the host is running
 # after a BMC reset.
