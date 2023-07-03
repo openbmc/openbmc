@@ -40,6 +40,7 @@ SUMMARY:${PN}-flash = "IBM Flash"
 RDEPENDS:${PN}-flash = " \
     phosphor-software-manager \
     phosphor-ipmi-flash \
+    zram \
     "
 
 SUMMARY:${PN}-fans = "IBM fan"
