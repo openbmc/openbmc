@@ -8,16 +8,11 @@ SRC_URI += " \
 
 SYSTEMD_SERVICE:${PN}-monitor += " \
                                   ampere-host-shutdown-ack@.service \
-                                  ampere_overtemp@.service \
-                                  ampere_hightemp_start@.service \
-                                  ampere_hightemp_stop@.service \
                                  "
 
 FILES:${PN}-monitor += " \
                         ${datadir}/${PN}/phosphor-multi-gpio-monitor.json \
                        "
-
-SYSTEMD_LINK:${PN}-monitor:append = " ../phosphor-multi-gpio-monitor.service:multi-user.target.requires/phosphor-multi-gpio-monitor.service"
 
 do_install:append() {
     install -d ${D}${bindir}

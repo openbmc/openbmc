@@ -13,10 +13,6 @@ SRC_URI += " \
            "
 
 SYSTEMD_SERVICE:${PN}-monitor += " \
-                                  ampere-host-shutdown-ack@.service \
-                                  ampere_overtemp@.service \
-                                  ampere_hightemp_start@.service \
-                                  ampere_hightemp_stop@.service \
                                   ampere_scp_failover.service \
                                   psu_hotswap_reset@.service \
                                  "
@@ -26,8 +22,6 @@ FILES:${PN}-monitor += " \
                         /usr/sbin/ampere_scp_failover.sh \
                         /usr/sbin/ampere_psu_reset_hotswap.sh \
                        "
-
-SYSTEMD_LINK:${PN}-monitor:append = " ../phosphor-multi-gpio-monitor.service:multi-user.target.requires/phosphor-multi-gpio-monitor.service"
 
 do_install:append() {
     install -d ${D}${sbindir}
