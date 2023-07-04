@@ -9,7 +9,7 @@ LIBPLDM_ABI_TESTING = "deprecated,stable,testing"
 PACKAGECONFIG[abi-testing] = "-Dabi=${LIBPLDM_ABI_TESTING},-Dabi=${LIBPLDM_ABI_STABLE},,"
 PACKAGECONFIG[oem-ibm] = "-Doem-ibm=enabled,-Doem-ibm=disabled,,"
 
-PV = "0.1.0+git${SRCPV}"
+PV = "git${SRCPV}"
 PR = "r1"
 SRC_URI = "git://github.com/openbmc/libpldm;branch=main;protocol=https"
 
