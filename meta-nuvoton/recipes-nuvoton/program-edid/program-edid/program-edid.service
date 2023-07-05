@@ -1,0 +1,12 @@
+[Unit]
+Description=Program edid service
+
+[Service]
+Restart=no
+Type=oneshot
+ExecStart=/usr/bin/program-edid.sh ${{SOURCE}} ${{TARGET}}
+SyslogIdentifier=program-edid
+EnvironmentFile=/etc/default/obmc/edid/program_edid
+
+[Install]
+WantedBy=multi-user.target

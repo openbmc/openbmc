@@ -1,0 +1,198 @@
+{
+    "Base": {
+        "Basic Display": {
+            "Aspect ratio (landscape)": null,
+            "Aspect ratio (portrait)": null,
+            "Color Bit Depth": null,
+            "Continuous frequency supported": false,
+            "DPM active-off supported": true,
+            "DPM standby supported": true,
+            "DPM suspend supported": true,
+            "Digital Video Interface Standard Support": null,
+            "Display color type": "RGB 4:4:4 + YCrCb 4:4:4",
+            "Display gamma": 2.2,
+            "Maximum dimensions (cm)": {
+                "x": 52,
+                "y": 33
+            },
+            "Preferred timing includes native timing pixel format and refresh rate": true,
+            "Video input type": "Digital",
+            "sRGB Standard is default colour space": false
+        },
+        "Chromaticity": {
+            "Blue": {
+                "x": 147,
+                "y": 77
+            },
+            "Green": {
+                "x": 302,
+                "y": 622
+            },
+            "Red": {
+                "x": 669,
+                "y": 345
+            },
+            "White": {
+                "x": 321,
+                "y": 337
+            }
+        },
+        "Descriptors": [
+            {
+                "Addressable": {
+                    "x": 1920,
+                    "y": 1200
+                },
+                "Blanking": {
+                    "x": 160,
+                    "y": 35
+                },
+                "Border": {
+                    "x": 0,
+                    "y": 0
+                },
+                "Front porch": {
+                    "x": 48,
+                    "y": 3
+                },
+                "Image size (mm)": {
+                    "x": 519,
+                    "y": 324
+                },
+                "Interlace": false,
+                "Pixel clock (MHz)": 154.0,
+                "Stereo viewing": "No stereo",
+                "Sync pulse": {
+                    "x": 32,
+                    "y": 6
+                },
+                "Sync type": {
+                    "Horizontal sync (outside of V-sync)": "Positive",
+                    "Type": "Digital Separate Sync",
+                    "Vertical sync": "Positive"
+                },
+                "Type": "Detailed Timing Descriptor"
+            },
+            {
+                "Addressable": {
+                    "x": 640,
+                    "y": 350
+                },
+                "Blanking": {
+                    "x": 160,
+                    "y": 99
+                },
+                "Border": {
+                    "x": 0,
+                    "y": 0
+                },
+                "Front porch": {
+                    "x": 16,
+                    "y": 37
+                },
+                "Image size (mm)": {
+                    "x": 376,
+                    "y": 301
+                },
+                "Interlace": false,
+                "Pixel clock (MHz)": 25.17,
+                "Stereo viewing": "No stereo",
+                "Sync pulse": {
+                    "x": 96,
+                    "y": 2
+                },
+                "Sync type": {
+                    "Horizontal sync (outside of V-sync)": "Positive",
+                    "Type": "Digital Separate Sync",
+                    "Vertical sync": "Negative"
+                },
+                "Type": "Detailed Timing Descriptor"
+            },
+            {
+                "Horizontal rate (kHz)": {
+                    "Maximum": 83,
+                    "Minimum": 30
+                },
+                "Pixel clock (MHz)": 170,
+                "Subtype": "Default GTF supported",
+                "Type": "Display Range Limits Descriptor",
+                "Vertical rate (Hz)": {
+                    "Maximum": 76,
+                    "Minimum": 56
+                }
+            },
+            {
+                "Data string": "BenQ 241W",
+                "Type": "Display Product Name"
+            }
+        ],
+        "Established Timing": {
+            "1024x768 @ 60 Hz": true,
+            "1024x768 @ 72 Hz": true,
+            "1024x768 @ 75 Hz": true,
+            "1024x768 @ 87 Hz, interlaced (1024x768i)": false,
+            "1152x870 @ 75 Hz (Apple Macintosh II)": true,
+            "1280x1024 @ 75 Hz": true,
+            "640x480 @ 60 Hz": true,
+            "640x480 @ 67 Hz": true,
+            "640x480 @ 72 Hz": true,
+            "640x480 @ 75 Hz": true,
+            "720x400 @ 70 Hz": true,
+            "720x400 @ 88 Hz": false,
+            "800x600 @ 56 Hz": false,
+            "800x600 @ 60 Hz": true,
+            "800x600 @ 72 Hz": true,
+            "800x600 @ 75 Hz": true,
+            "832x624 @ 75 Hz": true,
+            "Manufacturer specific display mode 1": false,
+            "Manufacturer specific display mode 2": false,
+            "Manufacturer specific display mode 3": false,
+            "Manufacturer specific display mode 4": false,
+            "Manufacturer specific display mode 5": false,
+            "Manufacturer specific display mode 6": false,
+            "Manufacturer specific display mode 7": false
+        },
+        "Manufacturer Info": {
+            "ID Product Code": 30427,
+            "Manufacturer ID": "BNQ",
+            "Model year": null,
+            "Serial number": 4538,
+            "Week of manufacture": 3,
+            "Year of manufacture": 2007
+        },
+        "Standard Timing": [
+            {
+                "Frequency": 75,
+                "Ratio": "4:3",
+                "X resolution": 1152
+            },
+            {
+                "Frequency": 76,
+                "Ratio": "5:4",
+                "X resolution": 1280
+            },
+            {
+                "Frequency": 60,
+                "Ratio": "5:4",
+                "X resolution": 1280
+            },
+            {
+                "Frequency": 72,
+                "Ratio": "5:4",
+                "X resolution": 1280
+            },
+            {
+                "Frequency": 60,
+                "Ratio": "4:3",
+                "X resolution": 1600
+            },
+            {
+                "Frequency": 60,
+                "Ratio": "16:10",
+                "X resolution": 1680
+            }
+        ]
+    },
+    "Extensions": [],
+    "Version": "1.3"
+}
