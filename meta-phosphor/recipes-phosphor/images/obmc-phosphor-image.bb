@@ -30,7 +30,6 @@ IMAGE_FEATURES += " \
         obmc-leds \
         obmc-logging-mgmt \
         obmc-remote-logging-mgmt \
-        obmc-rng \
         obmc-net-ipmi \
         obmc-sensors \
         obmc-software \

@@ -138,11 +138,6 @@ RDEPENDS:${PN}-remote-logging = " \
         phosphor-rsyslog-config \
         "
 
-SUMMARY:${PN}-rng = "Random Number Generator support"
-RDEPENDS:${PN}-rng = " \
-        rng-tools \
-        "
-
 SUMMARY:${PN}-sensors = "Sensor applications"
 RDEPENDS:${PN}-sensors = " \
         ${VIRTUAL-RUNTIME_obmc-sensors-hwmon} \

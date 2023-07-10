@@ -23,7 +23,6 @@
 # - obmc-leds                         - OpenBMC LED support
 # - obmc-logging-mgmt                 - OpenBMC logging management
 # - obmc-remote-logging-mgmt          - OpenBMC remote logging management
-# - obmc-rng                          - OpenBMC random number generator
 # - obmc-sensors                      - OpenBMC sensor support
 # - obmc-settings-mgmt                - OpenBMC settings management
 # - obmc-software                     - OpenBMC software management
@@ -56,7 +55,6 @@ FEATURE_PACKAGES_obmc-inventory ?= "packagegroup-obmc-apps-inventory"
 FEATURE_PACKAGES_obmc-leds ?= "packagegroup-obmc-apps-leds"
 FEATURE_PACKAGES_obmc-logging-mgmt ?= "packagegroup-obmc-apps-logging"
 FEATURE_PACKAGES_obmc-remote-logging-mgmt ?= "packagegroup-obmc-apps-remote-logging"
-FEATURE_PACKAGES_obmc-rng ?= "packagegroup-obmc-apps-rng"
 FEATURE_PACKAGES_obmc-net-ipmi ?= "phosphor-ipmi-net"
 FEATURE_PACKAGES_obmc-sensors ?= "packagegroup-obmc-apps-sensors"
 FEATURE_PACKAGES_obmc-software ?= "packagegroup-obmc-apps-software"
