@@ -130,3 +130,5 @@ power_off
 # shellcheck disable=SC2046 # Intended splitting of OPTIONS
 gpioset $(gpiofind FM_FLASH_SEC_OVRD)=0
 
+# Delete cached bios version file if it exist.
+rm /var/cache/bios_version || true
