@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2046
 
 do_fru_upgrade() {
 	FRU_DEVICE="/sys/bus/i2c/devices/3-0050/eeprom"
@@ -54,23 +55,20 @@ do_smpmpro_upgrade() {
 	fi
 
 	if [[ $SECPRO == 1 ]]; then
-		# 3 is S0_SPECIAL_BOOT
-		gpioset 0 3=1
-		# 66 is S1_SPECIAL_BOOT
-		gpioset 0 66=1
+		gpioset $(gpiofind host0-special-boot)=1
+		gpioset $(gpiofind s1-special-boot)=1
 	fi
 
 	# Switch EEPROM control to BMC AST2500 I2C
-	# 226 is BMC_GPIOAC2_SPI0_PROGRAM_SEL
-	gpioset 0 226=0
+	gpioset $(gpiofind spi0-program-sel)=0
 
 	# 08 is BMC_GPIOB0_I2C_BACKUP_SEL
 	if [[ $DEV_SEL == 1 ]]; then
 		echo "Run update primary Boot EEPROM"
-		gpioset 0 8=1       # Main EEPROM
+		gpioset $(gpiofind i2c-backup-sel)=1       # Main EEPROM
 	elif [[ $DEV_SEL == 2 ]]; then
 		echo "Run update secondary Boot EEPROM"
-		gpioset 0 8=0       # Second EEPROM
+		gpioset $(gpiofind i2c-backup-sel)=0       # Second EEPROM
 	else
 		echo "Please choose Main (1) or Second EEPROM (2)"
 		exit 0
@@ -81,18 +79,15 @@ do_smpmpro_upgrade() {
 
 	# Switch EEPROM control to Host
 	# 08 is BMC_GPIOB0_I2C_BACKUP_SEL
-	gpioset 0 8=1
-	# 226 is BMC_GPIOAC2_SPI0_PROGRAM_SEL
-	gpioset 0 226=1
+	gpioset $(gpiofind i2c-backup-sel)=1
+	gpioset $(gpiofind spi0-program-sel)=1
 
 	# Deassert SECPRO GPIO PINs
-        if [[ $SECPRO == 1 ]]; then
-                echo "De-asserting special GPIO PINs"
-                # 3 is S0_SPECIAL_BOOT
-                gpioset 0 3=0
-                # 66 is S1_SPECIAL_BOOT
-                gpioset 0 66=0
-        fi
+	if [[ $SECPRO == 1 ]]; then
+		echo "De-asserting special GPIO PINs"
+		gpioset $(gpiofind host0-special-boot)=0
+		gpioset $(gpiofind s1-special-boot)=0
+	fi
 
 	if [ "$chassisstate" == 'On' ];
 	then

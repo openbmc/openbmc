@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# shellcheck disable=SC2046
 
 do_flash () {
 	# Check the PNOR partition available
@@ -93,19 +94,19 @@ fi
 
 # Switch the host SPI bus to BMC"
 echo "--- Switch the host SPI bus to BMC."
-if ! gpioset 0 226=0; then
+if ! gpioset $(gpiofind spi0-program-sel)=0; then
 	echo "ERROR: Switch the host SPI bus to BMC. Please check gpio state"
 	exit 1
 fi
 
 # Switch the host SPI bus (between primary and secondary)
-# 227 is BMC_SPI0_BACKUP_SEL
+# 227 is spi0-backup-sel
 if [[ $DEV_SEL == 1 ]]; then
 	echo "Run update primary Host SPI-NOR"
-	gpioset 0 227=0       # Primary SPI
+	gpioset $(gpiofind spi0-backup-sel)=0       # Primary SPI
 elif [[ $DEV_SEL == 2 ]]; then
 	echo "Run update secondary Host SPI-NOR"
-	gpioset 0 227=1       # Second SPI
+	gpioset $(gpiofind spi0-backup-sel)=1       # Second SPI
 else
 	echo "Please choose primary SPI (1) or second SPI (2)"
 	exit 0
@@ -116,7 +117,7 @@ do_flash
 
 # Switch the host SPI bus to HOST."
 echo "--- Switch the host SPI bus to HOST."
-if ! gpioset 0 226=1; then
+if ! gpioset $(gpiofind spi0-program-sel)=1; then
 	echo "ERROR: Switch the host SPI bus to HOST. Please check gpio state"
 	exit 1
 fi

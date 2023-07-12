@@ -18,37 +18,51 @@
 # Usage: ampere_uartmux_ctrl.sh <CPU UART port number> <UARTx_MODE>
 #        <UARTx_MODE> of 1 sets CPU To HDR_CONN
 #        <UARTx_MODE> of 2 sets BMC to CPU (eg dropbear ssh server on port 2200)
-
-# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-lib.sh
-source /usr/sbin/gpio-lib.sh
+# shellcheck disable=SC2046
 
 if [ $# -lt 2 ]; then
 	exit 1
 fi
 
 case "$1" in
-	1) GPIO_UARTx_MODE0=56
+	1) GPIO_UARTx_MODE0="uart1-mode0"
+		GPIO_UARTx_MODE1="uart1-mode1"
 	;;
-	2) GPIO_UARTx_MODE0=57
+	2) GPIO_UARTx_MODE0="uart2-mode0"
+		GPIO_UARTx_MODE1="uart2-mode1"
 	;;
-	3) GPIO_UARTx_MODE0=58
+	3) GPIO_UARTx_MODE0="uart3-mode0"
+		GPIO_UARTx_MODE1="uart3-mode1"
 	;;
-	4) GPIO_UARTx_MODE0=59
+	4) GPIO_UARTx_MODE0="uart4-mode0"
+		GPIO_UARTx_MODE1="uart4-mode1"
 	;;
 	*) echo "Invalid UART port selection"
-	   exit 1
+		exit 1
 	;;
 esac
 
 echo "Ampere UART MUX CTRL UART port $1 to mode $2"
 
 case "$2" in
-	1) gpio_configure_output "${GPIO_UARTx_MODE0}" 0
-	   exit 0
-	;;
-	2) gpio_configure_output "${GPIO_UARTx_MODE0}" 1
-	   exit 0
-	;;
+	1)
+		if gpiofind "$GPIO_UARTx_MODE0"; then
+			gpioset $(gpiofind "$GPIO_UARTx_MODE0")=1
+		fi
+		if gpiofind "$GPIO_UARTx_MODE1"; then
+			gpioset $(gpiofind "$GPIO_UARTx_MODE1")=0
+		fi
+		exit 0
+		;;
+	2)
+		if gpiofind "$GPIO_UARTx_MODE0"; then
+			gpioset $(gpiofind "$GPIO_UARTx_MODE0")=0
+		fi
+		if gpiofind "$GPIO_UARTx_MODE1"; then
+			gpioset $(gpiofind "$GPIO_UARTx_MODE1")=1
+		fi
+		exit 0
+		;;
 	*) echo "Invalid UART mode selection"
 	   exit 1
 	;;

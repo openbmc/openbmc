@@ -64,7 +64,7 @@ check_psu_failed() {
 	local psu0_value
 	local psu1_value
 
-	psu0_presence=$(gpioget $(gpiofind PSU1_PRESENT))
+	psu0_presence=$(gpioget $(gpiofind presence-ps0))
 	psu0_failed="true"
 	if [ "$psu0_presence" == "0" ]; then
 		# PSU0 presence, monitor the PSUs using pmbus, check the STATUS_WORD
@@ -75,7 +75,7 @@ check_psu_failed() {
 		fi
 	fi
 
-	psu1_presence=$(gpioget $(gpiofind PSU2_PRESENT))
+	psu1_presence=$(gpioget $(gpiofind presence-ps1))
 	psu1_failed="true"
 	if [ "$psu1_presence" == "0" ]; then
 		# PSU1 presence, monitor the PSUs using pmbus, check the STATUS_WORD

@@ -1,51 +1,51 @@
 #!/bin/bash
 
-# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-lib.sh
-source /usr/sbin/gpio-lib.sh
-# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-defs.sh
-source /usr/sbin/gpio-defs.sh
+# shellcheck disable=SC2046
+# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-platform-init/mtjade_platform_gpios_init.sh
+source /usr/sbin/platform_gpios_init.sh
 source /usr/sbin/ampere_uart_console_setup.sh
 
-# Configure to boot from MAIN SPI-HOST
-gpio_configure_output "$SPI0_BACKUP_SEL" 0
-
-gpio_configure_input "$S0_I2C9_ALERT_L"
-gpio_configure_input "$S1_I2C9_ALERT_L"
-gpio_configure_input "$GPIO_BMC_VGA_FRONT_PRES_L"
-gpio_configure_input "$GPIO_S0_VRHOT_L"
-gpio_configure_input "$GPIO_S1_VRHOT_L"
-gpio_configure_output "$BMC_VGA_SEL" 1
+#pre platform init function. implemented in platform_gpios_init.sh
+pre-platform-init
 
 # =======================================================
-# Below GPIOs are controlled by other services so just
-# initialize in A/C power only.
+# Setting default value for device sel and mux
 bootstatus=$(cat /sys/class/watchdog/watchdog0/bootstatus)
 if [ "$bootstatus" == '32' ]; then
-	gpio_configure_output "$BMC_GPIOR2_EXT_HIGHTEMP_L" 1
-	gpio_configure_output "$GPIO_BMC_VR_PMBUS_SEL_L" 1
-	gpio_configure_output "$GPIO_BMC_I2C6_RESET_L" 1
-
-	# Initialize OCP register
-	gpio_configure_output "$OCP_MAIN_PWREN" 0
-
-	# Configure SPI-NOR/EEPROM switching
-	gpio_configure_output "$SPI0_PROGRAM_SEL" 0
-	gpio_configure_output "$BMC_I2C_BACKUP_SEL" 1
-	gpio_configure_output "$SPI0_BACKUP_SEL" 0
-
-	# Initialize BMC_SYS_PSON_L, SHD_REQ_L, BMC_SYSRESET_L
-	gpio_configure_output "$SYS_PSON_L" 1
-	gpio_configure_output "$S0_SHD_REQ_L" 1
-	gpio_configure_output "$S0_SYSRESET_L" 1
-	gpio_configure_output "$S1_SYSRESET_L" 1
-
-	# RTC Lock, SPECIAL_BOOT
-	gpio_configure_output "$RTC_LOCK" 0
-	gpio_configure_output "$S0_SPECIAL_BOOT" 0
-	gpio_configure_output "$S1_SPECIAL_BOOT" 0
+    echo "CONFIGURE: gpio pins to output high after AC power"
+    for gpioName in "${output_high_gpios_in_ac[@]}"; do
+        gpioset $(gpiofind "$gpioName")=1
+    done
+    echo "CONFIGURE: gpio pins to output low after AC power"
+    for gpioName in "${output_low_gpios_in_ac[@]}"; do
+        gpioset $(gpiofind "$gpioName")=0
+    done
+    echo "CONFIGURE: gpio pins to input after AC power"
+    for gpioName in "${input_gpios_in_ac[@]}"; do
+        gpioget $(gpiofind "$gpioName")
+    done
 fi
 
-gpio_configure_output "$BMC_READY" 1
+# =======================================================
+# Setting default value for others gpio pins
+echo "CONFIGURE: gpio pins to output high"
+for gpioName in "${output_high_gpios_in_bmc_reboot[@]}"; do
+    gpioset $(gpiofind "$gpioName")=1
+done
+echo "CONFIGURE: gpio pins to output low"
+for gpioName in "${output_low_gpios_in_bmc_reboot[@]}"; do
+    gpioset $(gpiofind "$gpioName")=0
+done
+echo "CONFIGURE: gpio pins to input"
+for gpioName in "${input_gpios_in_bmc_reboot[@]}"; do
+    gpioget $(gpiofind "$gpioName")
+done
+
 # =======================================================
 # Setting uart muxes to BMC as default
 uart_console_setup
+
+#post platform init function. implemented in platform_gpios_init.sh
+post-platform-init
+
+exit 0

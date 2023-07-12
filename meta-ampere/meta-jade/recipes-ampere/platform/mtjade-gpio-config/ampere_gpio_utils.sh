@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-lib.sh
-source /usr/sbin/gpio-defs.sh
-# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-utils/gpio-defs.sh
-source /usr/sbin/gpio-lib.sh
+# shellcheck disable=SC2046
 
 function usage() {
 	echo "usage: ampere_gpio_utils.sh [power] [on|off]";
@@ -15,12 +12,12 @@ set_gpio_power_off() {
 
 set_gpio_power_on() {
 	echo "Setting GPIO before Power on"
-	val=$(gpio_get_val "$S0_CPU_FW_BOOT_OK")
+	val=$(gpioget $(gpiofind host0-ready))
 	if [ "$val" == 1 ]; then
 		exit
 	fi
-	gpio_configure_output "$SPI0_PROGRAM_SEL" 1
-	gpio_configure_output "$SPI0_BACKUP_SEL" 0
+	gpioset $(gpiofind spi0-program-sel)=1
+	gpioset $(gpiofind spi0-backup-sel)=0
 }
 
 if [ $# -lt 2 ]; then
