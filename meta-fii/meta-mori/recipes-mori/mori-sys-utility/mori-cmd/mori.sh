@@ -257,6 +257,15 @@ function ledtoggle() {
     esac
 }
 
+function usblist() {
+  for i in {5..9}
+  do
+    cmd=$(devmem 0xf083"${i}"154)
+    printf "udc%d : 0xF083%d154-" "${i}" "${i}"
+    echo "$cmd"
+  done
+}
+
 function rtcctrl() {
   case $1 in
     lock)
@@ -304,6 +313,9 @@ case $1 in
     ;;
   uart)
     uartmux "$2"
+    ;;
+  usb)
+    usblist
     ;;
   led)
     ledtoggle "$2" "$3"
