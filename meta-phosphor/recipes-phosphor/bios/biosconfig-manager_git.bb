@@ -13,7 +13,7 @@ DEPENDS = " boost \
             sdbusplus \
             systemd \
             nlohmann-json "
-SRCREV = "f19e2713e5394eec42a2b8dfdd57abe4376ea186"
+SRCREV = "9ace6ac55b6cad569ddf8bf02edc1504ddf7677f"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
