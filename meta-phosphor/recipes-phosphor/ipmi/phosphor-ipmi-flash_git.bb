@@ -9,7 +9,6 @@ DEPENDS += " \
   sdbusplus \
   systemd \
   ipmi-blob-tool \
-  function2 \
 "
 SRCREV = "8c31624dfc9599a3df663394a2faeedba3f0e397"
 PACKAGECONFIG ?= "cleanup-delete"
