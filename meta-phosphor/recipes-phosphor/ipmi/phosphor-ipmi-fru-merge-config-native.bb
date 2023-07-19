@@ -6,8 +6,6 @@ fru-gen parser parses the merged config file and generates cpp file"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS += "virtual/phosphor-ipmi-fru-read-inventory"
-DEPENDS += "virtual/phosphor-ipmi-fru-read-bmc-inventory"
-DEPENDS += "virtual/phosphor-ipmi-fru-read-not-sent-by-host-inventory"
 PROVIDES += "virtual/phosphor-ipmi-fru-merge-config"
 PR = "r1"
 
@@ -18,6 +16,5 @@ do_install:append() {
   SRC=${config_datadir}
   DEST=${D}${config_datadir}
   install -d ${DEST}
-  cat ${SRC}/config.yaml ${SRC}/bmc-fru-config.yaml > ${DEST}/fru_config.yaml
-  cat ${SRC}/fru-config-not-sent-by-host.yaml >> ${DEST}/fru_config.yaml
+  cat ${SRC}/config.yaml > ${DEST}/fru_config.yaml
 }
