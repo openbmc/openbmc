@@ -4,9 +4,7 @@ FILESEXTRAPATHS:prepend:bletchley := "${THISDIR}/${PN}:"
 
 DEPENDS:append:bletchley = " bletchley-yaml-config"
 
-EXTRA_OECONF:bletchley = " \
-    YAML_GEN=${STAGING_DIR_HOST}${datadir}/bletchley-yaml-config/ipmi-fru-read.yaml \
-    "
+IPMI_FRU_YAML:bletchley = "${STAGING_DIR_HOST}${datadir}/bletchley-yaml-config/ipmi-fru-read.yaml"
 
 EEPROM_NAMES = "bmc"
 

@@ -7,10 +7,9 @@ FILESEXTRAPATHS:prepend:ncplite := "${THISDIR}/${PN}:"
 SRC_URI:append:ncplite = " file://ncplite-obmc-read-eeprom@.service \
                          "
 
-EXTRA_OECONF:ncplite = " \
-    YAML_GEN=${STAGING_DIR_HOST}${datadir}/ncplite-yaml-config/ipmi-fru-read.yaml \
-    PROP_YAML=${STAGING_DIR_HOST}${datadir}/ncplite-yaml-config/ipmi-extra-properties.yaml \
-    "
+
+IPMI_FRU_YAML:ncplite="${STAGING_DIR_HOST}${datadir}/ncplite-yaml-config/ipmi-fru-read.yaml"
+IPMI_FRU_PROP_YAML:ncplite="${STAGING_DIR_HOST}${datadir}/ncplite-yaml-config/ipmi-extra-properties.yaml"
 
 EEPROM_NAMES = "motherboard psu1 psu0"
 

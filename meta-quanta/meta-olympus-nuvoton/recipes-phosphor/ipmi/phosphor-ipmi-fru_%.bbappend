@@ -4,10 +4,10 @@ FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
 
 DEPENDS:append:olympus-nuvoton = " olympus-nuvoton-yaml-config"
 
-EXTRA_OECONF:olympus-nuvoton = " \
-    YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-fru-read.yaml \
-    PROP_YAML=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-extra-properties.yaml \
-    "
+EXTRA_OECONF:olympus-nuvoton = ""
+
+IPMI_FRU_YAML:olympus-nuvoton="${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-fru-read.yaml"
+IPMI_FRU_PROP_YAML:olympus-nuvoton="${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-extra-properties.yaml"
 
 EEPROM_NAMES = "motherboard bmc"
 
