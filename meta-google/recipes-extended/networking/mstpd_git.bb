@@ -13,7 +13,7 @@ SRC_URI += "file://mstpd.service"
 inherit autotools pkgconfig systemd
 
 PACKAGES =+ "${PN}-mstpd"
-FILES:${PN}-mstpd = "${sbindir}/mstpd ${sbindir}/mstpctl /sbin/bridge-stp"
+FILES:${PN}-mstpd = "${sbindir}/mstpd ${sbindir}/mstpctl ${sbindir}/bridge-stp"
 
 SYSTEMD_PACKAGES = "${PN}-mstpd"
 SYSTEMD_SERVICE:${PN}-mstpd = "mstpd.service"
@@ -22,8 +22,8 @@ do_install:append() {
   rm -rf ${D}${libexecdir} ${D}${libdir}/NetworkManager
   rmdir ${D}${libdir} || true
 
-  install -d -m 0755 ${D}/sbin
-  install -m 0755 ${WORKDIR}/bridge-stp ${D}/sbin
+  install -d -m 0755 ${D}/${sbindir}
+  install -m 0755 ${WORKDIR}/bridge-stp ${D}/${sbindir}
 
   install -d -m 0755 ${D}${systemd_system_unitdir}
   install -m 0644 ${WORKDIR}/mstpd.service ${D}${systemd_system_unitdir}/
