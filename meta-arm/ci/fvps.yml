@@ -1,7 +1,7 @@
 # Simple target to build the FVPs that are publically available
 
 header:
-  version: 11
+  version: 14
   includes:
     - ci/base.yml
 

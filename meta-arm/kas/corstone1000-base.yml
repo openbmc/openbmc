@@ -16,6 +16,7 @@ repos:
 
   poky:
     url: https://git.yoctoproject.org/git/poky
+    refspec: 31dd418207f6c95ef0aad589cd03cd2a4c9a8bf2
     layers:
       meta:
       meta-poky:
@@ -23,6 +24,7 @@ repos:
 
   meta-openembedded:
     url: https://git.openembedded.org/meta-openembedded
+    refspec: 5a01ab461c9bcabcbb2298236602373948f8f073
     layers:
       meta-oe:
       meta-python:

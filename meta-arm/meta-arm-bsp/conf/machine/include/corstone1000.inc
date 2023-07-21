@@ -57,6 +57,7 @@ INITRAMFS_IMAGE_BUNDLE ?= "1"
 
 #telling the build system which image is responsible of the generation of the initramfs rootfs
 INITRAMFS_IMAGE = "corstone1000-initramfs-image"
+IMAGE_NAME_SUFFIX = ""
 
 # add FF-A support in the kernel
 MACHINE_FEATURES += "arm-ffa"

@@ -1,9 +1,8 @@
 header:
-  version: 11
+  version: 14
   includes:
     - ci/meta-openembedded.yml
 
 repos:
   meta-virtualization:
     url: git://git.yoctoproject.org/meta-virtualization
-    refspec: master

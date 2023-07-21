@@ -24,6 +24,8 @@ MACHINE_EXTRA_RRECOMMENDS += "ssh-pregen-hostkeys"
 
 TEST_TARGET = "OEFVPTarget"
 TEST_TARGET_IP = "127.0.0.1:8022"
+TEST_SUITES:append = " fvp_boot fvp_devices"
+TEST_FVP_DEVICES ?= "rtc watchdog networking virtiorng cpu_hotplug"
 
 FVP_PROVIDER ?= "fvp-base-a-aem-native"
 FVP_EXE ?= "FVP_Base_RevC-2xAEMvA"
@@ -35,7 +37,7 @@ FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] = "8022=22"
 FVP_CONFIG[cache_state_modelled] ?= "0"
 FVP_CONFIG[bp.secureflashloader.fname] ?= "bl1-fvp.bin"
 FVP_CONFIG[bp.flashloader0.fname] ?= "fip-fvp.bin"
-FVP_CONFIG[bp.virtioblockdevice.image_path] ?= "${IMAGE_NAME}.rootfs.wic"
+FVP_CONFIG[bp.virtioblockdevice.image_path] ?= "${IMAGE_NAME}.wic"
 # Set the baseline to ARMv8.4, as the default is 8.0.
 FVP_CONFIG[cluster0.has_arm_v8-4] = "1"
 FVP_CONFIG[cluster1.has_arm_v8-4] = "1"

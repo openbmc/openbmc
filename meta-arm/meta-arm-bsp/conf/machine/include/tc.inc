@@ -25,6 +25,7 @@ KERNEL_CLASSES = " kernel-fitimage "
 
 IMAGE_FSTYPES += "cpio.gz"
 INITRAMFS_IMAGE ?= "core-image-minimal"
+IMAGE_NAME_SUFFIX = ""
 
 SERIAL_CONSOLES = "115200;ttyAMA0"
 

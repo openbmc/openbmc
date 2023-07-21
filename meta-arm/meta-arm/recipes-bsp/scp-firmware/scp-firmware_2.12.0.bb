@@ -7,16 +7,16 @@ LIC_FILES_CHKSUM = "file://license.md;beginline=5;md5=9db9e3d2fb8d9300a6c3d15101
                     file://contrib/cmsis/git/LICENSE.txt;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 SRC_URI_SCP_FIRMWARE ?= "gitsm://github.com/ARM-software/SCP-firmware.git;protocol=https"
-SRC_URI = "${SRC_URI_SCP_FIRMWARE};branch=${SRCBRANCH}"
-SRCBRANCH = "master"
+SRC_URI = "${SRC_URI_SCP_FIRMWARE};branch=${SRCBRANCH} \
+           file://optee-private-includes.patch"
 
+SRCBRANCH = "master"
 SRCREV  = "0c7236b1851d90124210a0414fd982dc55322c7c"
 
 PROVIDES += "virtual/control-processor-firmware"
 
 CMAKE_BUILD_TYPE    ?= "RelWithDebInfo"
-SCP_PLATFORM        ?= "invalid"
-SCP_COMPILER        ?= "arm-none-eabi"
+SCP_PLATFORM        ?= "${MACHINE}"
 SCP_LOG_LEVEL       ?= "WARN"
 SCP_PLATFORM_FEATURE_SET ?= "0"
 
@@ -53,12 +53,14 @@ EXTRA_OECMAKE = "-D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                  -D SCP_LOG_LEVEL=${SCP_LOG_LEVEL} \
                  -D SCP_PLATFORM_FEATURE_SET=${SCP_PLATFORM_FEATURE_SET} \
                  -D DISABLE_CPPCHECK=1 \
+                 -D SCP_TOOLCHAIN=GNU \
                 "
 
 do_configure() {
     for FW in ${FW_TARGETS}; do
         for TYPE in ${FW_INSTALL}; do
-            cmake -GNinja ${EXTRA_OECMAKE} -S ${S} -B "${B}/${TYPE}/${FW}" -D SCP_FIRMWARE_SOURCE_DIR="${SCP_PLATFORM}/${FW}_${TYPE}"
+            bbnote Configuring ${SCP_PLATFORM}/${FW}_${TYPE}...
+            cmake -GNinja ${EXTRA_OECMAKE} -S ${S} -B "${B}/${TYPE}/${FW}" -D SCP_FIRMWARE_SOURCE_DIR:PATH="${SCP_PLATFORM}/${FW}_${TYPE}"
         done
     done
 }
@@ -68,6 +70,7 @@ do_configure[cleandirs] += "${B}"
 do_compile() {
     for FW in ${FW_TARGETS}; do
         for TYPE in ${FW_INSTALL}; do
+            bbnote Building ${SCP_PLATFORM}/${FW}_${TYPE}...
             VERBOSE=1 cmake --build ${B}/${TYPE}/${FW} --target all
         done
     done

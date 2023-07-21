@@ -1,0 +1,24 @@
+Hack to work around musl compile error:
+ In file included from optee-test/3.17.0-r0/recipe-sysroot/usr/include/sys/stat.h:23,
+                  from optee-test/3.17.0-r0/git/host/xtest/regression_1000.c:25:
+ optee-test/3.17.0-r0/recipe-sysroot/usr/include/bits/stat.h:17:26: error: expected identifier or '(' before '[' token
+    17 |         unsigned __unused[2];
+       |                          ^
+
+stat.h is not needed, since it is not being used in this file.  So removing it.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+
+diff --git a/host/xtest/regression_1000.c b/host/xtest/regression_1000.c
+index 4264884..7f1baca 100644
+--- a/host/xtest/regression_1000.c
++++ b/host/xtest/regression_1000.c
+@@ -22,7 +22,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <sys/stat.h>
+ #include <sys/types.h>
+ #include <ta_arm_bti.h>
+ #include <ta_concurrent.h>

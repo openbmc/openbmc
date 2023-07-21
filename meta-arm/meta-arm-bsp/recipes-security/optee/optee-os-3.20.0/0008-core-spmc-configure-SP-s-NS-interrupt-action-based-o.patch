@@ -1,0 +1,148 @@
+From e7835c526aabd8e5b6db335619a0d86165c587ed Mon Sep 17 00:00:00 2001
+From: Imre Kis <imre.kis@arm.com>
+Date: Tue, 25 Apr 2023 14:19:14 +0200
+Subject: [PATCH] core: spmc: configure SP's NS interrupt action based on the
+ manifest
+
+Used mandatory ns-interrupts-action SP manifest property to configure
+signaled or queued non-secure interrupt handling.
+
+Upstream-Status: Submitted [https://github.com/OP-TEE/optee_os/pull/6002]
+
+Signed-off-by: Imre Kis <imre.kis@arm.com>
+Change-Id: I843e69e5dbb9613ecd8b95654e8ca1730a594ca6
+---
+ .../arm/include/kernel/secure_partition.h     |  2 +
+ core/arch/arm/kernel/secure_partition.c       | 66 +++++++++++++++++--
+ 2 files changed, 63 insertions(+), 5 deletions(-)
+
+diff --git a/core/arch/arm/include/kernel/secure_partition.h b/core/arch/arm/include/kernel/secure_partition.h
+index 24b0a8cc07d2..51f6b697e5eb 100644
+--- a/core/arch/arm/include/kernel/secure_partition.h
++++ b/core/arch/arm/include/kernel/secure_partition.h
+@@ -43,6 +43,8 @@ struct sp_session {
+ 	unsigned int spinlock;
+ 	const void *fdt;
+ 	bool is_initialized;
++	uint32_t ns_interrupts_action;
++	uint32_t ns_interrupts_action_inherited;
+ 	TAILQ_ENTRY(sp_session) link;
+ };
+ 
+diff --git a/core/arch/arm/kernel/secure_partition.c b/core/arch/arm/kernel/secure_partition.c
+index 740be6d22e47..b644e1c72e6a 100644
+--- a/core/arch/arm/kernel/secure_partition.c
++++ b/core/arch/arm/kernel/secure_partition.c
+@@ -46,6 +46,10 @@
+ 					 SP_MANIFEST_ATTR_WRITE | \
+ 					 SP_MANIFEST_ATTR_EXEC)
+ 
++#define SP_MANIFEST_NS_INT_QUEUED	(0x0)
++#define SP_MANIFEST_NS_INT_MANAGED_EXIT	(0x1)
++#define SP_MANIFEST_NS_INT_SIGNALED	(0x2)
++
+ #define SP_PKG_HEADER_MAGIC (0x474b5053)
+ #define SP_PKG_HEADER_VERSION_V1 (0x1)
+ #define SP_PKG_HEADER_VERSION_V2 (0x2)
+@@ -907,6 +911,30 @@ static TEE_Result sp_init_uuid(const TEE_UUID *uuid, const void * const fdt)
+ 		return res;
+ 	DMSG("endpoint is 0x%"PRIx16, sess->endpoint_id);
+ 
++	res = sp_dt_get_u32(fdt, 0, "ns-interrupts-action",
++			    &sess->ns_interrupts_action);
++
++	if (res) {
++		EMSG("Mandatory property is missing: ns-interrupts-action");
++		return res;
++	}
++
++	switch (sess->ns_interrupts_action) {
++	case SP_MANIFEST_NS_INT_QUEUED:
++	case SP_MANIFEST_NS_INT_SIGNALED:
++		/* OK */
++		break;
++
++	case SP_MANIFEST_NS_INT_MANAGED_EXIT:
++		EMSG("Managed exit is not implemented");
++		return TEE_ERROR_NOT_IMPLEMENTED;
++
++	default:
++		EMSG("Invalid ns-interrupts-action value: %d",
++		     sess->ns_interrupts_action);
++		return TEE_ERROR_BAD_PARAMETERS;
++	}
++
+ 	return TEE_SUCCESS;
+ }
+ 
+@@ -989,17 +1017,45 @@ TEE_Result sp_enter(struct thread_smc_args *args, struct sp_session *sp)
+ 	return res;
+ }
+ 
++/*
++ * According to FF-A v1.1 section 8.3.1.4 if a caller requires less permissive
++ * active on NS interrupt than the callee, the callee must inherit the caller's
++ * configuration.
++ * Each SP's own NS action setting is stored in ns_interrupts_action. The
++ * effective action will be MIN([self action], [caller's action]) which is
++ * stored in the ns_interrupts_action_inherited field.
++ */
++static void sp_cpsr_configure_foreing_interrupts(struct sp_session *s,
++						 struct ts_session *caller,
++						 uint64_t *cpsr)
++{
++	if (caller) {
++		struct sp_session *caller_sp = to_sp_session(caller);
++
++		s->ns_interrupts_action_inherited =
++			MIN(caller_sp->ns_interrupts_action_inherited,
++			    s->ns_interrupts_action);
++	} else {
++		s->ns_interrupts_action_inherited = s->ns_interrupts_action;
++	}
++
++	if (s->ns_interrupts_action_inherited == SP_MANIFEST_NS_INT_QUEUED)
++		*cpsr |= (THREAD_EXCP_FOREIGN_INTR << ARM32_CPSR_F_SHIFT);
++	else
++		*cpsr &= ~(THREAD_EXCP_FOREIGN_INTR << ARM32_CPSR_F_SHIFT);
++}
++
+ static TEE_Result sp_enter_invoke_cmd(struct ts_session *s,
+ 				      uint32_t cmd __unused)
+ {
+ 	struct sp_ctx *ctx = to_sp_ctx(s->ctx);
+ 	TEE_Result res = TEE_SUCCESS;
+ 	uint32_t exceptions = 0;
+-	uint64_t cpsr = 0;
+ 	struct sp_session *sp_s = to_sp_session(s);
+ 	struct ts_session *sess = NULL;
+ 	struct thread_ctx_regs *sp_regs = NULL;
+ 	uint32_t thread_id = THREAD_ID_INVALID;
++	struct ts_session *caller = NULL;
+ 	uint32_t rpc_target_info = 0;
+ 	uint32_t panicked = false;
+ 	uint32_t panic_code = 0;
+@@ -1009,11 +1065,12 @@ static TEE_Result sp_enter_invoke_cmd(struct ts_session *s,
+ 	sp_regs = &ctx->sp_regs;
+ 	ts_push_current_session(s);
+ 
+-	cpsr = sp_regs->cpsr;
+-	sp_regs->cpsr = read_daif() & (SPSR_64_DAIF_MASK << SPSR_64_DAIF_SHIFT);
+-
+ 	exceptions = thread_mask_exceptions(THREAD_EXCP_ALL);
+ 
++	/* Enable/disable foreign interrupts in CPSR/SPSR */
++	caller = ts_get_calling_session();
++	sp_cpsr_configure_foreing_interrupts(sp_s, caller, &sp_regs->cpsr);
++
+ 	/*
+ 	 * Store endpoint ID and thread ID in rpc_target_info. This will be used
+ 	 * as w1 in FFA_INTERRUPT in case of a NWd interrupt.
+@@ -1026,7 +1083,6 @@ static TEE_Result sp_enter_invoke_cmd(struct ts_session *s,
+ 
+ 	__thread_enter_user_mode(sp_regs, &panicked, &panic_code);
+ 
+-	sp_regs->cpsr = cpsr;
+ 	/* Restore rpc_target_info */
+ 	thread_get_tsd()->rpc_target_info = rpc_target_info;
+ 

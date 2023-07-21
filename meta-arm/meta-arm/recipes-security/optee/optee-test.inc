@@ -6,6 +6,7 @@ LICENSE = "BSD-2-Clause & GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=daa2bcccc666345ab8940aab1315a4fa"
 
 inherit python3native ptest
+inherit deploy
 require optee.inc
 
 DEPENDS = "optee-client optee-os-tadevkit python3-cryptography-native"
@@ -42,6 +43,13 @@ do_install () {
     mkdir -p ${D}${libdir}/tee-supplicant/plugins
     install -D -p -m0444 ${B}/supp_plugin/*.plugin ${D}${libdir}/tee-supplicant/plugins/
 }
+
+do_deploy () {
+    install -d ${DEPLOYDIR}/${MLPREFIX}optee/ta
+    install -m 644 ${B}/ta/*/*.elf ${DEPLOYDIR}/${MLPREFIX}optee/ta
+}
+
+addtask deploy before do_build after do_install
 
 FILES:${PN} += "${nonarch_base_libdir}/optee_armtz/ \
                 ${libdir}/tee-supplicant/plugins/ \

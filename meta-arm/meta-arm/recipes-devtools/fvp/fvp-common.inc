@@ -1,11 +1,19 @@
 HOMEPAGE = "https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms"
 
-# FVP has an End User License Agreement. Add Arm-FVP-EULA to your
-# LICENSE_FLAGS_ACCEPTED if you agree to these terms.
 LICENSE_FLAGS = "Arm-FVP-EULA"
-LICENSE_FLAGS_DETAILS[Arm-FVP-EULA] = "https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula"
-
 LICENSE = "Proprietary & Apache-2.0 & Python-2.0 & GPL-3.0-with-GCC-exception & Zlib & NCSA & LGPL-2.0-or-later & MIT & BSD-3-Clause"
+
+# FVP has an End User License Agreement. Add Arm-FVP-EULA to
+# LICENSE_FLAGS_ACCEPTED if the EULA has been accepted, so it can
+# be later checked if the user accepted the EULA or not and if
+# not display a message to the user requesting them to do so.
+LICENSE_FLAGS_ACCEPTED:append = " ${@oe.utils.vartrue('ARM_FVP_EULA_ACCEPT', 'Arm-FVP-EULA', '', d)}"
+
+LICENSE_FLAGS_DETAILS[Arm-FVP-EULA] = " \
+Accept the END USER LICENSE AGREEMENT FOR ARM SOFTWARE DEVELOPMENT TOOLS. \
+Please refer to 'https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula'\
+${@bb.utils.contains('BB_ENV_PASSTHROUGH_ADDITIONS', 'ARM_FVP_EULA_ACCEPT', ' and export ARM_FVP_EULA_ACCEPT to 1', '', d)}.\
+"
 
 COMPATIBLE_HOST = "x86_64.*-linux"
 

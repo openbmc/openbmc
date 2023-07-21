@@ -7,7 +7,7 @@ Adds external system driver to control it
 from user-space. It provides run and reset
 functionality at the moment.
 
-Upstream-Status: Pending[Not submitted to upstream yet]
+Upstream-Status: Pending [Not submitted to upstream yet]
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---

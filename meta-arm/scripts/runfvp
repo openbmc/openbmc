@@ -14,7 +14,7 @@ logger = logging.getLogger("RunFVP")
 libdir = pathlib.Path(__file__).parents[1] / "meta-arm" / "lib"
 sys.path.insert(0, str(libdir))
 
-from fvp import terminal, runner
+from fvp import conffile, terminal, runner
 
 def parse_args(arguments):
     import argparse

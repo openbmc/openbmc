@@ -1,5 +1,7 @@
 header:
   version: 11
+  includes:
+    - kas/fvp-eula.yml
 
 distro: poky-tiny
 
@@ -38,7 +40,6 @@ local_conf_header:
     PACKAGECONFIG:append:pn-perf = " coresight"
   fvp-config: |
     IMAGE_CLASSES:append = " ${@bb.utils.contains('BUILD_ARCH', 'x86_64', 'fvpboot', '', d)}"
-    LICENSE_FLAGS_ACCEPTED:append = " Arm-FVP-EULA"
 
 machine: corstone500
 

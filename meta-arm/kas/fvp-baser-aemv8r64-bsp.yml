@@ -1,5 +1,7 @@
 header:
   version: 9
+  includes:
+    - kas/fvp-eula.yml
 
 distro: poky
 machine: fvp-baser-aemv8r64
@@ -24,9 +26,6 @@ repos:
       meta:
       meta-poky:
 
-env:
-  FVP_BASE_R_ARM_EULA_ACCEPT: "False"
-
 local_conf_header:
   base: |
     CONF_VERSION = "2"
@@ -34,7 +33,6 @@ local_conf_header:
     PACKAGECONFIG:remove:pn-qemu-system-native = "gtk+ sdl"
     EXTRA_IMAGE_FEATURES:append = " debug-tweaks ssh-server-openssh"
     CORE_IMAGE_EXTRA_INSTALL:append = " ssh-pregen-hostkeys"
-    LICENSE_FLAGS_ACCEPTED:append = " ${@oe.utils.vartrue('FVP_BASE_R_ARM_EULA_ACCEPT', 'Arm-FVP-EULA', '', d)}"
     IMAGE_CLASSES:append = " testimage"
 
 target:

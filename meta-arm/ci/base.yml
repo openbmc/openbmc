@@ -1,11 +1,11 @@
 header:
-  version: 11
+  version: 14
 
 distro: poky
 
 defaults:
   repos:
-    refspec: mickledore
+    branch: master
 
 repos:
   meta-arm:

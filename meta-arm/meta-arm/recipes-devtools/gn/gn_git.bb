@@ -16,7 +16,7 @@ B = "${WORKDIR}/build"
 # ../git/src/gn/desc_builder.cc: In member function 'base::Value {anonymous}::BaseDescBuilder::ToBaseValue(const Scope*)':
 # ../git/src/gn/desc_builder.cc:179:21: error: redundant move in return statement [-Werror=redundant-move]
 #   179 |     return std::move(res);
-CFLAGS:append = " -Wno-redundant-move"
+CXXFLAGS += "-Wno-error=redundant-move"
 
 # Map from our _OS strings to the GN's platform values.
 def gn_platform(variable, d):

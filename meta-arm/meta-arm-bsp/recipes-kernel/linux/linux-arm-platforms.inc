@@ -76,8 +76,6 @@ SRC_URI:append:fvp-baser-aemv8r64 = " file://fvp-baser-aemv8r64.dts;subdir=git/a
 # Juno KMACHINE
 #
 COMPATIBLE_MACHINE:juno = "juno"
-#KBUILD_DEFCONFIG:juno = "defconfig"
-#KCONFIG_MODE:juno = "--alldefconfig"
 FILESEXTRAPATHS:prepend:juno := "${ARMBSPFILESPATHS}"
 SRC_URI:append:juno = " \
     file://0001-arm64-dts-Update-cache-properties-for-Arm-Ltd-platfo.patch \

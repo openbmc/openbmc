@@ -110,7 +110,7 @@ the EULA at
 https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula
 by setting the following environment variable:
 
-    FVP_BASE_R_ARM_EULA_ACCEPT="True"
+    ARM_FVP_EULA_ACCEPT="True"
 
 **Note:** The host machine should have at least 50 GBytes of free disk space
 for the next steps to work correctly.
@@ -134,13 +134,13 @@ Fetch the meta-arm repository into a build directory:
 Building with the standard Linux kernel:
 
     cd ~/fvp-baser-aemv8r64-build
-    export FVP_BASE_R_ARM_EULA_ACCEPT="True"
+    export ARM_FVP_EULA_ACCEPT="True"
     kas build meta-arm/kas/fvp-baser-aemv8r64-bsp.yml
 
 Building with the Real-Time Linux kernel (PREEMPT\_RT):
 
     cd ~/fvp-baser-aemv8r64-build
-    export FVP_BASE_R_ARM_EULA_ACCEPT="True"
+    export ARM_FVP_EULA_ACCEPT="True"
     kas build meta-arm/kas/fvp-baser-aemv8r64-rt-bsp.yml
 
 ### Run
