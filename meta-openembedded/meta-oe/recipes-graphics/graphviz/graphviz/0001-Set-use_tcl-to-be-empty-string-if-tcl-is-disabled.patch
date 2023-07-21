@@ -11,7 +11,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1540,7 +1540,7 @@ AC_ARG_ENABLE(tcl,
+@@ -1225,7 +1225,7 @@ AC_ARG_ENABLE(tcl,
    [], [enable_tcl=yes])
  
  if test "x$enable_tcl" != "xyes"; then
@@ -22,12 +22,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  if test "x$use_tcl" = "x"; then
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -19,7 +19,7 @@ pkginclude_HEADERS = $(top_builddir)/gra
- man_MANS = graphviz.7
+@@ -11,7 +11,7 @@ pkginclude_HEADERS = $(top_builddir)/gra
+ dist_man_MANS = graphviz.7
  
  # $(subdirs) contains the list from: AC_CONFIG_SUBDIRS
--SUBDIRS = $(subdirs) lib plugin cmd tclpkg doc contrib share graphs rtest tests
-+SUBDIRS = $(subdirs) lib plugin cmd doc contrib share graphs rtest tests
+-SUBDIRS = $(subdirs) lib plugin cmd tclpkg doc contrib share graphs tests
++SUBDIRS = $(subdirs) lib plugin cmd doc contrib share graphs tests
  
  .PHONY: doxygen
  doxygen:

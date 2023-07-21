@@ -1,0 +1,303 @@
+From 00ace1392f5bd289239b755458dcdeeed69af1da Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@strace.io>
+Date: Mon, 26 Jun 2023 10:00:00 +0000
+Subject: [PATCH] tests: avoid accept() libc function when tracing accept()
+ syscall
+
+The libc function is allowed to implement accept() using accept4()
+syscall, so migrate to accept4() those tests that trace accept() syscall
+but do not test accept() specifically, and change the test of accept()
+syscall to invoke either __NR_accept or __NR_socketcall(SYS_ACCEPT)
+directly.
+
+* tests/accept_compat.h: Remove.
+* tests/Makefile.am (EXTRA_DIST): Remove accept_compat.h.
+* tests/accept.c [TEST_SYSCALL_NAME]: Do not invoke accept(),
+call __NR_accept or __NR_socketcall if available, or skip the test.
+* tests/net-y-unix.c: Do not include "accept_compat.h".
+(main): Invoke accept4() instead of accept().
+* tests/net-yy-inet.c: Likewise.
+* tests/net-yy-unix.c: Likewise.
+
+Resolves: https://github.com/strace/strace/issues/260
+
+Upstream-Status: Backport
+---
+ tests/Makefile.am     |  1 -
+ tests/accept.c        | 36 ++++++++++++++++++++----------------
+ tests/accept_compat.h | 32 --------------------------------
+ tests/net-y-unix.c    | 16 ++++++++--------
+ tests/net-yy-inet.c   | 12 ++++++------
+ tests/net-yy-unix.c   | 16 ++++++++--------
+ 6 files changed, 42 insertions(+), 71 deletions(-)
+ delete mode 100644 tests/accept_compat.h
+
+Index: strace-6.3/tests/Makefile.am
+===================================================================
+--- strace-6.3.orig/tests/Makefile.am
++++ strace-6.3/tests/Makefile.am
+@@ -776,7 +776,6 @@ check_DATA = \
+ 	# end of check_DATA
+ 
+ EXTRA_DIST = \
+-	accept_compat.h \
+ 	attach-p-cmd.h \
+ 	clock_adjtime-common.c \
+ 	clock_xettime-common.c \
+Index: strace-6.3/tests/accept.c
+===================================================================
+--- strace-6.3.orig/tests/accept.c
++++ strace-6.3/tests/accept.c
+@@ -9,38 +9,36 @@
+  */
+ 
+ #include "tests.h"
+-
++#include "scno.h"
+ #include <unistd.h>
+ 
+-#include "scno.h"
++#ifndef TEST_SYSCALL_NAME
+ 
+-#if defined __NR_accept
++# if defined __NR_accept || defined __NR_socketcall
+ 
+-# ifndef TEST_SYSCALL_NAME
+ #  define TEST_SYSCALL_NAME do_accept
+-
+-#  ifndef TEST_SYSCALL_STR
+-#   define TEST_SYSCALL_STR "accept"
+-#  endif
++#  define TEST_SYSCALL_STR "accept"
+ 
+ static int
+ do_accept(int sockfd, void *addr, void *addrlen)
+ {
++#  ifdef __NR_accept
+ 	return syscall(__NR_accept, sockfd, addr, addrlen);
++#  else /* __NR_socketcall */
++	const long args[] = { sockfd, (long) addr, (long) addrlen };
++	return syscall(__NR_socketcall, 5, args);
++#  endif
+ }
+-# endif /* !TEST_SYSCALL_NAME */
+ 
+-#else /* !__NR_accept */
++# endif /* __NR_accept || __NR_socketcall */
+ 
+-# ifndef TEST_SYSCALL_NAME
+-#  define TEST_SYSCALL_NAME accept
+-# endif
++#endif /* !TEST_SYSCALL_NAME */
+ 
+-#endif /* __NR_accept */
++#ifdef TEST_SYSCALL_NAME
+ 
+-#define TEST_SYSCALL_PREPARE connect_un()
++# define TEST_SYSCALL_PREPARE connect_un()
+ static void connect_un(void);
+-#include "sockname.c"
++# include "sockname.c"
+ 
+ static void
+ connect_un(void)
+@@ -90,3 +88,9 @@ main(void)
+ 	puts("+++ exited with 0 +++");
+ 	return 0;
+ }
++
++#else
++
++SKIP_MAIN_UNDEFINED("__NR_accept || __NR_socketcall")
++
++#endif
+Index: strace-6.3/tests/accept_compat.h
+===================================================================
+--- strace-6.3.orig/tests/accept_compat.h
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+- * Copyright (c) 2018-2019 The strace developers.
+- * All rights reserved.
+- *
+- * SPDX-License-Identifier: GPL-2.0-or-later
+- */
+-
+-#ifndef _STRACE_TESTS_ACCEPT_COMPAT_H_
+-# define _STRACE_TESTS_ACCEPT_COMPAT_H_
+-
+-# include <unistd.h>
+-# include <sys/socket.h>
+-# include "scno.h"
+-
+-# if defined __NR_socketcall && defined __sparc__
+-/*
+- * Work around the fact that
+- * - glibc >= 2.26 uses accept4 syscall to implement accept() call on sparc;
+- * - accept syscall had not been wired up on sparc until v4.4-rc8~4^2~1.
+- */
+-static inline int
+-do_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+-{
+-	const long args[] = { sockfd, (long) addr, (long) addrlen };
+-
+-	return syscall(__NR_socketcall, 5, args);
+-}
+-# else
+-#  define do_accept accept
+-# endif
+-
+-#endif /* !_STRACE_TESTS_ACCEPT_COMPAT_H_ */
+Index: strace-6.3/tests/net-y-unix.c
+===================================================================
+--- strace-6.3.orig/tests/net-y-unix.c
++++ strace-6.3/tests/net-y-unix.c
+@@ -10,6 +10,7 @@
+ 
+ #include "tests.h"
+ #include <assert.h>
++#include <fcntl.h>
+ #include <stddef.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -18,8 +19,6 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
+-#include "accept_compat.h"
+-
+ #define TEST_SOCKET "net-y-unix.socket"
+ 
+ int
+@@ -88,12 +87,12 @@ main(void)
+ 	struct sockaddr * const accept_sa = tail_alloc(sizeof(addr));
+ 	memset(accept_sa, 0, sizeof(addr));
+ 	*len = sizeof(addr);
+-	int accept_fd = do_accept(listen_fd, accept_sa, len);
++	int accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
+ 	if (accept_fd < 0)
+ 		perror_msg_and_fail("accept");
+ 	unsigned long accept_inode = inode_of_sockfd(accept_fd);
+-	printf("accept(%d<socket:[%lu]>, {sa_family=AF_UNIX}"
+-	       ", [%d => %d]) = %d<socket:[%lu]>\n",
++	printf("accept4(%d<socket:[%lu]>, {sa_family=AF_UNIX}"
++	       ", [%d => %d], SOCK_CLOEXEC) = %d<socket:[%lu]>\n",
+ 	       listen_fd, listen_inode,
+ 	       (int) sizeof(addr), (int) *len,
+ 	       accept_fd, accept_inode);
+@@ -160,14 +159,15 @@ main(void)
+ 
+ 	memset(accept_sa, 0, sizeof(addr));
+ 	*len = sizeof(addr);
+-	accept_fd = do_accept(listen_fd, accept_sa, len);
++	accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
+ 	if (accept_fd < 0)
+ 		perror_msg_and_fail("accept");
+ 	accept_inode = inode_of_sockfd(accept_fd);
+ 	const char * const sun_path1 =
+ 		((struct sockaddr_un *) accept_sa)->sun_path + 1;
+-	printf("accept(%d<socket:[%lu]>, {sa_family=AF_UNIX"
+-	       ", sun_path=@\"%s\"}, [%d => %d]) = %d<socket:[%lu]>\n",
++	printf("accept4(%d<socket:[%lu]>, {sa_family=AF_UNIX"
++	       ", sun_path=@\"%s\"}, [%d => %d], SOCK_CLOEXEC)"
++	       " = %d<socket:[%lu]>\n",
+ 	       listen_fd, listen_inode, sun_path1,
+ 	       (int) sizeof(addr), (int) *len,
+ 	       accept_fd, accept_inode);
+Index: strace-6.3/tests/net-yy-inet.c
+===================================================================
+--- strace-6.3.orig/tests/net-yy-inet.c
++++ strace-6.3/tests/net-yy-inet.c
+@@ -10,6 +10,7 @@
+ 
+ #include "tests.h"
+ #include <assert.h>
++#include <fcntl.h>
+ #include <stddef.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -19,8 +20,6 @@
+ #include <netinet/tcp.h>
+ #include <arpa/inet.h>
+ 
+-#include "accept_compat.h"
+-
+ #ifndef ADDR_FAMILY
+ # define ADDR_FAMILY_FIELD sin_family
+ # define ADDR_FAMILY AF_INET
+@@ -104,14 +103,15 @@ main(void)
+ 	struct sockaddr * const accept_sa = tail_alloc(sizeof(addr));
+ 	memset(accept_sa, 0, sizeof(addr));
+ 	*len = sizeof(addr);
+-	const int accept_fd = do_accept(listen_fd, accept_sa, len);
++	const int accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
+ 	if (accept_fd < 0)
+ 		perror_msg_and_fail("accept");
+ 	const unsigned int connect_port =
+ 		ntohs(((struct SOCKADDR_TYPE *) accept_sa)->INPORT);
+-	printf("accept(%d<" TCP_STR ":[" LOOPBACK ":%u]>, {sa_family=" AF_STR
+-	       ", " INPORT_STR "=htons(%u), " INADDR_STR SA_FIELDS "}"
+-	       ", [%u]) = %d<" TCP_STR ":[" LOOPBACK ":%u->" LOOPBACK ":%u]>\n",
++	printf("accept4(%d<" TCP_STR ":[" LOOPBACK ":%u]>, {sa_family=" AF_STR
++	       ", " INPORT_STR "=htons(%u), " INADDR_STR SA_FIELDS "}, [%u]"
++	       ", SOCK_CLOEXEC) = %d<" TCP_STR ":[" LOOPBACK ":%u->" LOOPBACK
++	       ":%u]>\n",
+ 	       listen_fd, listen_port, connect_port, (unsigned) *len,
+ 	       accept_fd, listen_port, connect_port);
+ 
+Index: strace-6.3/tests/net-yy-unix.c
+===================================================================
+--- strace-6.3.orig/tests/net-yy-unix.c
++++ strace-6.3/tests/net-yy-unix.c
+@@ -10,6 +10,7 @@
+ 
+ #include "tests.h"
+ #include <assert.h>
++#include <fcntl.h>
+ #include <stddef.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -22,8 +23,6 @@
+ # include "xmalloc.h"
+ #endif
+ 
+-#include "accept_compat.h"
+-
+ #define TEST_SOCKET "net-yy-unix.socket"
+ 
+ int
+@@ -112,12 +111,12 @@ main(void)
+ 	struct sockaddr * const accept_sa = tail_alloc(sizeof(addr));
+ 	memset(accept_sa, 0, sizeof(addr));
+ 	*len = sizeof(addr);
+-	int accept_fd = do_accept(listen_fd, accept_sa, len);
++	int accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
+ 	if (accept_fd < 0)
+ 		perror_msg_and_fail("accept");
+ 	unsigned long accept_inode = inode_of_sockfd(accept_fd);
+-	printf("accept(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX}"
+-	       ", [%d => %d]) = %d<%s:[%lu->%lu,\"%s\"]>\n",
++	printf("accept4(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX}"
++	       ", [%d => %d], SOCK_CLOEXEC) = %d<%s:[%lu->%lu,\"%s\"]>\n",
+ 	       listen_fd, sock_proto_name, listen_inode, TEST_SOCKET,
+ 	       (int) sizeof(addr), (int) *len,
+ 	       accept_fd, sock_proto_name, accept_inode, connect_inode,
+@@ -191,14 +190,15 @@ main(void)
+ 
+ 	memset(accept_sa, 0, sizeof(addr));
+ 	*len = sizeof(addr);
+-	accept_fd = do_accept(listen_fd, accept_sa, len);
++	accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
+ 	if (accept_fd < 0)
+ 		perror_msg_and_fail("accept");
+ 	accept_inode = inode_of_sockfd(accept_fd);
+ 	const char * const sun_path1 =
+ 		((struct sockaddr_un *) accept_sa)->sun_path + 1;
+-	printf("accept(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
+-	       ", sun_path=@\"%s\"}, [%d => %d]) = %d<%s:[%lu->%lu,\"%s\"]>\n",
++	printf("accept4(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
++	       ", sun_path=@\"%s\"}, [%d => %d], SOCK_CLOEXEC)"
++	       " = %d<%s:[%lu->%lu,\"%s\"]>\n",
+ 	       listen_fd, sock_proto_name, listen_inode, TEST_SOCKET,
+ 	       sun_path1, (int) sizeof(addr), (int) *len,
+ 	       accept_fd, sock_proto_name, accept_inode, connect_inode,

@@ -11,6 +11,7 @@ EXTRA_OECONF += "LIBS=-ltirpc CPPFLAGS=-I${STAGING_INCDIR}/tirpc"
 SRC_URI = "http://www.netfilter.org/projects/conntrack-tools/files/conntrack-tools-${PV}.tar.bz2 \
     file://conntrack-failover \
     file://init \
+    file://conntrackd.service \
 "
 SRC_URI[sha256sum] = "099debcf57e81690ced57f516b493588a73518f48c14d656f823b29b4fc24b5d"
 
@@ -25,6 +26,10 @@ PACKAGECONFIG[systemd] = "--enable-systemd,--disable-systemd,systemd"
 
 INITSCRIPT_NAME = "conntrackd"
 
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "conntrackd.service"
+SYSTEMD_AUTO_ENABLE = "disable"
+
 do_install:append() {
 	install -d ${D}/${sysconfdir}/conntrackd
 	install -d ${D}/${sysconfdir}/init.d
@@ -37,6 +42,11 @@ do_install:append() {
 	sed -i 's!/etc/!${sysconfdir}/!g' ${D}/${sysconfdir}/init.d/conntrack-failover ${D}/${sysconfdir}/init.d/conntrackd
 	sed -i 's!/var/!${localstatedir}/!g' ${D}/${sysconfdir}/init.d/conntrack-failover ${D}/${sysconfdir}/init.d/conntrackd ${D}/${sysconfdir}/conntrackd/conntrackd.conf.sample
 	sed -i 's!^export PATH=.*!export PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}/${sysconfdir}/init.d/conntrackd
+
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+		install -d ${D}/${systemd_system_unitdir}
+		install -m 644 ${WORKDIR}/conntrackd.service ${D}/${systemd_system_unitdir}
+	fi
 }
 
 # fix error message: Do not forget that you need *root* or CAP_NET_ADMIN capabilities ;-)
@@ -44,3 +54,7 @@ pkg_postinst:${PN} () {
 	setcap cap_net_admin+ep "$D/${sbindir}/conntrack"
 }
 PACKAGE_WRITE_DEPS += "libcap-native"
+
+RRECOMMENDS:${PN} = "kernel-module-nf-conntrack kernel-module-nfnetlink \
+                     kernel-module-nf-conntrack-netlink \
+                    "

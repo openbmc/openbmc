@@ -22,12 +22,12 @@ BUILD_CFLAGS += "-Wno-error=stringop-overflow"
 SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0001-ovmf-update-path-to-native-BaseTools.patch \
            file://0002-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
-           file://0005-debug-prefix-map.patch \
-           file://0006-reproducible.patch \
+           file://0003-debug-prefix-map.patch \
+           file://0004-reproducible.patch \
            "
 
-PV = "edk2-stable202302"
-SRCREV = "f80f052277c88a67c55e107b550f504eeea947d3"
+PV = "edk2-stable202305"
+SRCREV = "ba91d0292e593df8528b66f99c1b0b14fadc8e16"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy

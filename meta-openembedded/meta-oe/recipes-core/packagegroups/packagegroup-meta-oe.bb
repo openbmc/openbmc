@@ -569,7 +569,6 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     xclock \
     xfontsel \
     xkbprint \
-    xsetmode \
     xlsatoms \
     xlsclients \
     xlsfonts \
@@ -595,9 +594,7 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     font-cursor-misc \
     font-misc-misc \
     xorg-fonts-100dpi \
-    liblbxutil \
     libxaw6 \
-    libxkbui \
     libxpresent \
     xcb-util-cursor \
     xserver-common \

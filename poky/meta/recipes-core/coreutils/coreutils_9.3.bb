@@ -23,8 +23,8 @@ SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.xz \
 SRC_URI[sha256sum] = "adbcfcfe899235b71e8768dcf07cd532520b7f54f9a8064843f8d199a904bbaa"
 
 # http://git.savannah.gnu.org/cgit/coreutils.git/commit/?id=v8.27-101-gf5d7c0842
-# runcon is not really a sandbox command, use `runcon ... setsid ...` to avoid this particular issue.
-CVE_CHECK_IGNORE += "CVE-2016-2781"
+# 
+CVE_STATUS[CVE-2016-2781] = "disputed: runcon is not really a sandbox command, use `runcon ... setsid ...` to avoid this particular issue."
 
 EXTRA_OECONF:class-target = "--enable-install-program=arch,hostname --libexecdir=${libdir}"
 EXTRA_OECONF:class-nativesdk = "--enable-install-program=arch,hostname"

@@ -1,4 +1,4 @@
-From 027229d25392b22d7280c0abbc3efde4f467d167 Mon Sep 17 00:00:00 2001
+From f31395c931bc633206eccfcfaaaa5d15021a3e86 Mon Sep 17 00:00:00 2001
 From: Peiran Hong <peiran.hong@windriver.com>
 Date: Thu, 5 Sep 2019 15:42:22 -0400
 Subject: [PATCH] Skip strip-trailing-cr test case
@@ -12,23 +12,18 @@ Upstream-Status: Inappropriate [embedded specific]
 Signed-off-by: Peiran Hong <peiran.hong@windriver.com>
 
 ---
- tests/Makefile.am | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index d98df82..757ea52 100644
+index 79bacfb..4adb4d7 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -21,9 +21,11 @@ TESTS = \
+@@ -22,7 +22,6 @@ TESTS = \
    stdin \
    strcoll-0-names \
    filename-quoting \
 -  strip-trailing-cr \
    timezone \
-   colors
-+# Skipping this test since it requires valgrind
-+# and thus is too heavy for diffutils package
-+# strip-trailing-cr
- 
- XFAIL_TESTS = large-subopt
- 
+   colors \
+   y2038-vs-32bit

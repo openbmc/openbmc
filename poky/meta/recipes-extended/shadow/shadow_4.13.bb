@@ -6,9 +6,6 @@ BUILD_LDFLAGS:append:class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'p
 
 BBCLASSEXTEND = "native nativesdk"
 
-# Severity is low and marked as closed and won't fix.
 # https://bugzilla.redhat.com/show_bug.cgi?id=884658
-CVE_CHECK_IGNORE += "CVE-2013-4235"
-
-# This is an issue for a different shadow
-CVE_CHECK_IGNORE += "CVE-2016-15024"
+CVE_STATUS[CVE-2013-4235] = "upstream-wontfix: Severity is low and marked as closed and won't fix."
+CVE_STATUS[CVE-2016-15024] = "cpe-incorrect: This is an issue for a different shadow"

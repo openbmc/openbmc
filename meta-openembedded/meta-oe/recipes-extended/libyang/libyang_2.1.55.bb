@@ -16,7 +16,7 @@ SRC_URI = "git://github.com/CESNET/libyang.git;branch=master;protocol=https \
 S = "${WORKDIR}/git"
 
 # Main dependencies
-inherit cmake pkgconfig lib_package ptest
+inherit cmake pkgconfig lib_package ptest multilib_header
 DEPENDS = "libpcre2"
 DEPENDS += "${@bb.utils.contains('PTEST_ENABLED', '1', 'cmocka', '', d)}"
 
@@ -28,6 +28,10 @@ do_compile:prepend () {
         sed -i -e 's|${S}|${PTEST_PATH}|g' ${B}/tests/tests_config.h
         sed -i -e 's|${B}|${PTEST_PATH}|g' ${B}/tests/tests_config.h
     fi
+}
+
+do_install:append () {
+        oe_multilib_header  libyang/config.h
 }
 
 do_install_ptest () {

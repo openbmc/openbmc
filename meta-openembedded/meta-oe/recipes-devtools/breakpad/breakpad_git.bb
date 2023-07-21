@@ -6,11 +6,12 @@ SUMMARY = "An open-source multi-platform crash reporting system"
 DESCRIPTION = "Breakpad is a library and tool suite that allows you to distribute an application to users with compiler-provided debugging information removed, record crashes in compact \"minidump\" files, send them back to your server, and produce C and C++ stack traces from these minidumps. "
 HOMEPAGE = "https://code.google.com/p/google-breakpad/"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=8bb274ebd1901085fd71a8d8afe8831b"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=07aeb530115539d62cacf9942fa60cac"
 SECTION = "libs"
 
 inherit autotools
 
+DEPENDS += "zlib"
 DEPENDS:append:libc-musl = " libucontext"
 
 BBCLASSEXTEND = "native"
@@ -21,11 +22,11 @@ PV = "1.0"
 
 SRCREV_FORMAT = "breakpad_gtest_protobuf_lss_gyp"
 
-SRCREV_breakpad = "8b22babdf894e5aa98b2dbbe103f7e3856a71944"
+SRCREV_breakpad = "7a1a190f4f68e8a3e06788498f50a4d5520a69f3"
 #v1.10.0
-SRCREV_gtest = "4fe018038f87675c083d0cfb6a6b57c274fb1753"
+SRCREV_gtest = "e2239ee6043f73722e7aa812a459f54a28552929"
 SRCREV_protobuf = "cb6dd4ef5f82e41e06179dcd57d3b1d9246ad6ac"
-SRCREV_lss = "fd00dbbd0c06a309c657d89e9430143b179ff6db"
+SRCREV_lss = "9719c1e1e676814c456b55f5f070eabad6709d31"
 SRCREV_gyp = "324dd166b7c0b39d513026fa52d6280ac6d56770"
 
 SRC_URI = "git://github.com/google/breakpad;name=breakpad;branch=main;protocol=https \
@@ -40,11 +41,8 @@ SRC_URI = "git://github.com/google/breakpad;name=breakpad;branch=main;protocol=h
            file://0004-elf_reader.cc-include-sys-reg.h-to-get-__WORDSIZE-on.patch \
            file://mcontext.patch \
            file://0001-Remove-HAVE_GETCONTEXT-check-to-add-local-implementa.patch \
-           file://0001-exception_handler.cc-Match-the-types-for-SIGSTKSZ.patch \
-           file://0001-mainline-version-gcc-13-cannot-use-uintptr_t-via-inc.patch \
            file://0001-lss-Match-syscalls-to-match-musl.patch;patchdir=src/third_party/lss \
            file://mips_asm_sgidefs.patch;patchdir=src/third_party/lss \
-           file://0001-Do-not-add-stack-pointer-to-clobber-list.patch;patchdir=src/third_party/lss \
 "
 S = "${WORKDIR}/git"
 

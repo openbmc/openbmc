@@ -39,6 +39,7 @@ SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.18.x;protoc
            file://0001-configure.ac-add-linux-gnux32-variant-to-triplet-han.patch \
            file://0001-python-Use-Py_hash_t-instead-of-long-in-hdr_hash.patch \
            file://fix-declaration.patch \
+           file://ea3187cfcf9cac87e5bc5e7db79b0338da9e355e.patch \
            "
 
 PE = "1"

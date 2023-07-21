@@ -130,6 +130,13 @@ def get_patched_cves(d):
         if not fname_match and not text_match:
             bb.debug(2, "Patch %s doesn't solve CVEs" % patch_file)
 
+    # Search for additional patched CVEs
+    for cve in (d.getVarFlags("CVE_STATUS") or {}):
+        decoded_status, _, _ = decode_cve_status(d, cve)
+        if decoded_status == "Patched":
+            bb.debug(2, "CVE %s is additionally patched" % cve)
+            patched_cves.add(cve)
+
     return patched_cves
 
 
@@ -218,3 +225,21 @@ def convert_cve_version(version):
 
     return version + update
 
+def decode_cve_status(d, cve):
+    """
+    Convert CVE_STATUS into status, detail and description.
+    """
+    status = d.getVarFlag("CVE_STATUS", cve)
+    if status is None:
+        return ("", "", "")
+
+    status_split = status.split(':', 1)
+    detail = status_split[0]
+    description = status_split[1].strip() if (len(status_split) > 1) else ""
+
+    status_mapping = d.getVarFlag("CVE_CHECK_STATUSMAP", detail)
+    if status_mapping is None:
+        bb.warn('Invalid detail %s for CVE_STATUS[%s] = "%s", fallback to Unpatched' % (detail, cve, status))
+        status_mapping = "Unpatched"
+
+    return (status_mapping, detail, description)

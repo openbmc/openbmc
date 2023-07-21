@@ -24,7 +24,8 @@ def skipIfNoNetwork():
     return lambda f: f
 
 class TestTimeout(Exception):
-    pass
+    # Indicate to pytest that this is not a test suite
+    __test__ = False
 
 class Timeout():
 
@@ -428,9 +429,15 @@ class FetcherTest(unittest.TestCase):
         # a common setup is to use other default
         # branch than master.
         self.git(['checkout', '-b', 'master'], cwd=cwd)
-        if not self.git(['config', 'user.email'], cwd=cwd):
+
+        try:
+            self.git(['config', 'user.email'], cwd=cwd)
+        except bb.process.ExecutionError:
             self.git(['config', 'user.email', 'you@example.com'], cwd=cwd)
-        if not self.git(['config', 'user.name'], cwd=cwd):
+
+        try:
+            self.git(['config', 'user.name'], cwd=cwd)
+        except bb.process.ExecutionError:
             self.git(['config', 'user.name', 'Your Name'], cwd=cwd)
 
 class MirrorUriTest(FetcherTest):
@@ -2485,7 +2492,7 @@ class CrateTest(FetcherTest):
         uris = self.d.getVar('SRC_URI').split()
 
         fetcher = bb.fetch2.Fetch(uris, self.d)
-        with self.assertRaisesRegexp(bb.fetch2.FetchError, "Fetcher failure for URL"):
+        with self.assertRaisesRegex(bb.fetch2.FetchError, "Fetcher failure for URL"):
             fetcher.download()
 
 class NPMTest(FetcherTest):
@@ -3037,7 +3044,7 @@ class FetchPremirroronlyLocalTest(FetcherTest):
         self.mirrorname = "git2_git.fake.repo.bitbake.tar.gz"
         recipeurl = "git:/git.fake.repo/bitbake"
         os.makedirs(self.gitdir)
-        self.git("init", self.gitdir)
+        self.git_init(cwd=self.gitdir)
         for i in range(0):
             self.git_new_commit()
         bb.process.run('tar -czvf {} .'.format(os.path.join(self.mirrordir, self.mirrorname)), cwd =  self.gitdir)
@@ -3176,7 +3183,7 @@ class FetchPremirroronlyBrokenTarball(FetcherTest):
         import sys
         self.d.setVar("SRCREV", "0"*40)
         fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
-        with self.assertRaises(bb.fetch2.FetchError):
+        with self.assertRaises(bb.fetch2.FetchError), self.assertLogs() as logs:
             fetcher.download()
-        stdout = sys.stdout.getvalue()
-        self.assertFalse(" not a git repository (or any parent up to mount point /)" in stdout)
+        output = "".join(logs.output)
+        self.assertFalse(" not a git repository (or any parent up to mount point /)" in output)

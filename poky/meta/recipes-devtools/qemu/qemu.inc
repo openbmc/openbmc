@@ -30,30 +30,24 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0001-tracetool-use-relative-paths-for-line-preprocessor-d.patch \
            file://qemu-guest-agent.init \
            file://qemu-guest-agent.udev \
-           file://ppc.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-SRC_URI[sha256sum] = "bb60f0341531181d6cc3969dd19a013d0427a87f918193970d9adb91131e56d0"
+SRC_URI[sha256sum] = "ecf4d32cbef9d397bfc8cc50e4d1e92a1b30253bf32e8ee73c7a8dcf9a232b09"
 
 SRC_URI:append:class-target = " file://cross.patch"
 SRC_URI:append:class-nativesdk = " file://cross.patch"
 
-# Applies against virglrender < 0.6.0 and not qemu itself
-CVE_CHECK_IGNORE += "CVE-2017-5957"
+CVE_STATUS[CVE-2017-5957] = "cpe-incorrect: Applies against virglrender < 0.6.0 and not qemu itself"
 
-# The VNC server can expose host files uder some circumstances. We don't
-# enable it by default.
-CVE_CHECK_IGNORE += "CVE-2007-0998"
+CVE_STATUS[CVE-2007-0998] = "not-applicable-config: The VNC server can expose host files uder some circumstances. We don't enable it by default."
 
-# 'The issues identified by this CVE were determined to not constitute a vulnerability.'
 # https://bugzilla.redhat.com/show_bug.cgi?id=1609015#c11
-CVE_CHECK_IGNORE += "CVE-2018-18438"
+CVE_STATUS[CVE-2018-18438] = "disputed: The issues identified by this CVE were determined to not constitute a vulnerability."
 
 # As per https://nvd.nist.gov/vuln/detail/CVE-2023-0664
 # https://bugzilla.redhat.com/show_bug.cgi?id=2167423
-# this bug related to windows specific.
-CVE_CHECK_IGNORE += "CVE-2023-0664"
+CVE_STATUS[CVE-2023-0664] = "not-applicable-platform: Issue only applies on Windows"
 
 COMPATIBLE_HOST:mipsarchn32 = "null"
 COMPATIBLE_HOST:mipsarchn64 = "null"
@@ -215,7 +209,7 @@ PACKAGECONFIG[seccomp] = "--enable-seccomp,--disable-seccomp,libseccomp"
 # libnfs is currently provided by meta-kodi
 PACKAGECONFIG[libnfs] = "--enable-libnfs,--disable-libnfs,libnfs"
 PACKAGECONFIG[pmem] = "--enable-libpmem,--disable-libpmem,pmdk"
-PACKAGECONFIG[pulsedio] = "--enable-pa,--disable-pa,pulseaudio"
+PACKAGECONFIG[pulseaudio] = "--enable-pa,--disable-pa,pulseaudio"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux"
 PACKAGECONFIG[bpf] = "--enable-bpf,--disable-bpf,libbpf"
 PACKAGECONFIG[capstone] = "--enable-capstone,--disable-capstone"
@@ -235,6 +229,8 @@ PACKAGES =+ "${PN}-system-all ${PN}-user-all"
 
 ALLOW_EMPTY:${PN}-system-all = "1"
 ALLOW_EMPTY:${PN}-user-all = "1"
+
+PACKAGES_DYNAMIC += "^${PN}-user-.*  ^${PN}-system-.*"
 
 PACKAGESPLITFUNCS =+ "split_qemu_packages"
 

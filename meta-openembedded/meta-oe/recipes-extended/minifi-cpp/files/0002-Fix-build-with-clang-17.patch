@@ -1,0 +1,37 @@
+From a784973e500753747992a51dc0fb1caabbbb03be Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 6 Jul 2023 17:52:38 -0700
+Subject: [PATCH 2/2] Fix build with clang 17
+
+Part of https://github.com/jarro2783/cxxopts/commit/513afbc6dcfe2952cb2ffab0dae2415b11bba2d0
+
+Upstream-Status: Backport [https://github.com/jarro2783/cxxopts/commit/513afbc6dcfe2952cb2ffab0dae2415b11bba2d0]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ thirdparty/cxxopts/include/cxxopts.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/thirdparty/cxxopts/include/cxxopts.hpp b/thirdparty/cxxopts/include/cxxopts.hpp
+index e87416f1..bd2d81cf 100644
+--- a/thirdparty/cxxopts/include/cxxopts.hpp
++++ b/thirdparty/cxxopts/include/cxxopts.hpp
+@@ -468,14 +468,14 @@ namespace cxxopts
+         {
+           if (negative)
+           {
+-            if (u > static_cast<U>(-std::numeric_limits<T>::min()))
++            if (u > static_cast<U>((std::numeric_limits<T>::min)()))
+             {
+               throw argument_incorrect_type(text);
+             }
+           }
+           else
+           {
+-            if (u > static_cast<U>(std::numeric_limits<T>::max()))
++            if (u > static_cast<U>((std::numeric_limits<T>::max)()))
+             {
+               throw argument_incorrect_type(text);
+             }
+-- 
+2.41.0
+

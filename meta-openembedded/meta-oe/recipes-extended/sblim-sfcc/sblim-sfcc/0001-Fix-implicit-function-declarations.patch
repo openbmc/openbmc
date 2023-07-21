@@ -1,0 +1,80 @@
+From 1e1ed4d58909360997648ca9524ab16441f5474b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 6 Jul 2023 10:15:41 -0700
+Subject: [PATCH] Fix implicit function declarations
+
+Clang 17+ has been finding these errors since its enforcing C99
+more than other compilers
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ TEST/v2test_ec.c              | 1 +
+ TEST/v2test_ein.c             | 1 +
+ backend/cimxml/cimXmlParser.c | 2 +-
+ backend/cimxml/grammar.c      | 2 ++
+ backend/cimxml/grammar.h      | 1 +
+ 5 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/TEST/v2test_ec.c b/TEST/v2test_ec.c
+index ad34dcc..940ca57 100644
+--- a/TEST/v2test_ec.c
++++ b/TEST/v2test_ec.c
+@@ -4,6 +4,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include "cmcimacs.h"
++#include "show.h"
+ 
+ extern char *value2Chars(CMPIType type, CMPIValue * value);
+ /*
+diff --git a/TEST/v2test_ein.c b/TEST/v2test_ein.c
+index c1b4692..ede95c1 100644
+--- a/TEST/v2test_ein.c
++++ b/TEST/v2test_ein.c
+@@ -4,6 +4,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include "cmcimacs.h"
++#include "show.h"
+ 
+ extern char *value2Chars(CMPIType type, CMPIValue * value);
+ void showProperty( CMPIData , char * );
+diff --git a/backend/cimxml/cimXmlParser.c b/backend/cimxml/cimXmlParser.c
+index d1ab86e..14f5f5c 100644
+--- a/backend/cimxml/cimXmlParser.c
++++ b/backend/cimxml/cimXmlParser.c
+@@ -1350,7 +1350,7 @@ ResponseHdr scanCimXmlResponse(const char *xmlData, CMPIObjectPath *cop)
+ 
+    control.heap = parser_heap_init();
+ 
+-   control.respHdr.rc = startParsing(&control);
++   startParsing(&control);
+ 
+    parser_heap_term(control.heap);
+ 
+diff --git a/backend/cimxml/grammar.c b/backend/cimxml/grammar.c
+index 6a0a969..522ca9e 100644
+--- a/backend/cimxml/grammar.c
++++ b/backend/cimxml/grammar.c
+@@ -23,6 +23,8 @@
+ #include "sfcUtil/utilft.h"
+ #include "parserUtil.h"
+ 
++extern CMPIType guessType(char *val);
++extern void setClassMethods(CMPIConstClass *cls, XtokMethods *ms);
+ 
+ static int ct = 0;
+ static int dontLex = 0;
+diff --git a/backend/cimxml/grammar.h b/backend/cimxml/grammar.h
+index 00d364f..bafdd42 100644
+--- a/backend/cimxml/grammar.h
++++ b/backend/cimxml/grammar.h
+@@ -79,3 +79,4 @@ static void valueRefArray(ParserControl *parm, parseUnion *stateUnion);
+ static void valueReference(ParserControl *parm, parseUnion *stateUnion);
+ static void valueReferenceData(ParserControl *parm, parseUnion *stateUnion);
+ 
++void startParsing(ParserControl *parm);
+-- 
+2.41.0
+

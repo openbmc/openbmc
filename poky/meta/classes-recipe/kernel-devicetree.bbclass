@@ -100,28 +100,36 @@ do_deploy:append() {
 		if "${@'false' if oe.types.boolean(d.getVar('KERNEL_DTBVENDORED')) else 'true'}"; then
 			dtb=$dtb_base_name.$dtb_ext
 		fi
-		install -m 0644 ${D}/${KERNEL_DTBDEST}/$dtb $deployDir/$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext
-		if [ "${KERNEL_IMAGETYPE_SYMLINK}" = "1" ] ; then
-			ln -sf $dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext $deployDir/$dtb_base_name.$dtb_ext
+		install -m 0644 ${D}/${KERNEL_DTBDEST}/$dtb $deployDir/$dtb_base_name.$dtb_ext
+		if [ -n "${KERNEL_DTB_NAME}" ] ; then
+			ln -sf $dtb_base_name.$dtb_ext $deployDir/$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext
 		fi
 		if [ -n "${KERNEL_DTB_LINK_NAME}" ] ; then
-			ln -sf $dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext $deployDir/$dtb_base_name-${KERNEL_DTB_LINK_NAME}.$dtb_ext
+			ln -sf $dtb_base_name.$dtb_ext $deployDir/$dtb_base_name-${KERNEL_DTB_LINK_NAME}.$dtb_ext
 		fi
 		for type in ${KERNEL_IMAGETYPE_FOR_MAKE}; do
 			if [ "$type" = "zImage" ] && [ "${KERNEL_DEVICETREE_BUNDLE}" = "1" ]; then
 				cat ${D}/${KERNEL_IMAGEDEST}/$type \
-					$deployDir/$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext \
-					> $deployDir/$type-$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT}
+					$deployDir/$dtb_base_name.$dtb_ext \
+					> $deployDir/$type-$dtb_base_name.$dtb_ext${KERNEL_DTB_BIN_EXT}
+				if [ -n "${KERNEL_DTB_NAME}" ]; then
+					ln -sf $type-$dtb_base_name.$dtb_ext${KERNEL_DTB_BIN_EXT} \
+						$deployDir/$type-$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT}
+				fi
 				if [ -n "${KERNEL_DTB_LINK_NAME}" ]; then
-					ln -sf $type-$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT} \
+					ln -sf $type-$dtb_base_name.$dtb_ext${KERNEL_DTB_BIN_EXT} \
 						$deployDir/$type-$dtb_base_name-${KERNEL_DTB_LINK_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT}
 				fi
 				if [ -e "${KERNEL_OUTPUT_DIR}/${type}.initramfs" ]; then
 					cat ${KERNEL_OUTPUT_DIR}/${type}.initramfs \
-						$deployDir/$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext \
-						>  $deployDir/${type}-${INITRAMFS_NAME}-$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT}
+						$deployDir/$dtb_base_name.$dtb_ext \
+						>  $deployDir/${type}-${INITRAMFS_NAME}-$dtb_base_name.$dtb_ext${KERNEL_DTB_BIN_EXT}
+					if [ -n "${KERNEL_DTB_NAME}" ]; then
+						ln -sf ${type}-${INITRAMFS_NAME}-$dtb_base_name.$dtb_ext${KERNEL_DTB_BIN_EXT} \
+							$deployDir/${type}-${INITRAMFS_NAME}-$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT}
+					fi
 					if [ -n "${KERNEL_DTB_LINK_NAME}" ]; then
-						ln -sf ${type}-${INITRAMFS_NAME}-$dtb_base_name-${KERNEL_DTB_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT} \
+						ln -sf ${type}-${INITRAMFS_NAME}-$dtb_base_name.$dtb_ext${KERNEL_DTB_BIN_EXT} \
 							$deployDir/${type}-${INITRAMFS_NAME}-$dtb_base_name-${KERNEL_DTB_LINK_NAME}.$dtb_ext${KERNEL_DTB_BIN_EXT}
 					fi
 				fi

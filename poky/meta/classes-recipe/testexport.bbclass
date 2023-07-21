@@ -61,16 +61,12 @@ def testexport_main(d):
         d.getVar("TEST_TARGET"), None, d.getVar("TEST_TARGET_IP"),
         d.getVar("TEST_SERVER_IP"))
 
-    host_dumper = OERuntimeTestContextExecutor.getHostDumper(
-        d.getVar("testimage_dump_host"), d.getVar("TESTIMAGE_DUMP_DIR"))
-
     image_manifest = "%s.manifest" % image_name
     image_packages = OERuntimeTestContextExecutor.readPackagesManifest(image_manifest)
 
     extract_dir = d.getVar("TEST_EXTRACTED_DIR")
 
-    tc = OERuntimeTestContext(td, logger, target, host_dumper,
-                              image_packages, extract_dir)
+    tc = OERuntimeTestContext(td, logger, target, image_packages, extract_dir)
 
     copy_needed_files(d, tc)
 

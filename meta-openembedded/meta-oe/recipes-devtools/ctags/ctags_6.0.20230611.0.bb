@@ -32,3 +32,5 @@ PACKAGECONFIG[json] = "--enable-json,--disable-json,jansson"
 PACKAGECONFIG[seccomp] = "--enable-seccomp,--disable-seccomp,libseccomp"
 PACKAGECONFIG[yaml] = "--enable-yaml,--disable-yaml,libyaml"
 PACKAGECONFIG[manpages] = ",,python3-docutils-native"
+
+BBCLASSEXTEND = "native"

@@ -28,7 +28,7 @@ class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
             features.append('TOOLCHAIN_TEST_HOST_USER = "root"')
             features.append('TOOLCHAIN_TEST_HOST_PORT = "22"')
             # force single threaded test execution
-            features.append('EGLIBCPARALLELISM_task-check:pn-glibc-testsuite = "PARALLELMFLAGS="-j1""')
+            features.append('EGLIBCPARALLELISM:task-check:pn-glibc-testsuite = "PARALLELMFLAGS="-j1""')
         self.write_config("\n".join(features))
 
         bitbake("glibc-testsuite -c check")

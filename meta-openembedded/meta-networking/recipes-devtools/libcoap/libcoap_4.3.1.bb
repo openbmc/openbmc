@@ -16,6 +16,8 @@ S = "${WORKDIR}/git"
 
 inherit autotools manpages pkgconfig ptest
 
+DEPENDS += "ctags-native"
+
 PACKAGECONFIG ?= "\
     async openssl tcp \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)} \
@@ -41,6 +43,10 @@ python () {
 }
 
 export SGML_CATALOG_FILES="file://${STAGING_ETCDIR_NATIVE}/xml/catalog"
+
+do_compile:prepend() {
+    oe_runmake update-map-file
+}
 
 do_install_ptest () {
 	install -d ${D}${PTEST_PATH}

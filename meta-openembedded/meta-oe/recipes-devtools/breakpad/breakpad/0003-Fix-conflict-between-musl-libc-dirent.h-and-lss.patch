@@ -11,19 +11,17 @@ Upstream-Status: Pending
  src/client/linux/crash_generation/crash_generation_server.cc | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/client/linux/crash_generation/crash_generation_server.cc b/src/client/linux/crash_generation/crash_generation_server.cc
-index 26c50a5c..2596afde 100644
 --- a/src/client/linux/crash_generation/crash_generation_server.cc
 +++ b/src/client/linux/crash_generation/crash_generation_server.cc
-@@ -28,7 +28,6 @@
- // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@@ -31,7 +31,6 @@
+ #endif
  
  #include <assert.h>
 -#include <dirent.h>
  #include <fcntl.h>
  #include <limits.h>
  #include <poll.h>
-@@ -49,6 +48,8 @@
+@@ -52,6 +51,8 @@
  #include "common/linux/guid_creator.h"
  #include "common/linux/safe_readlink.h"
  
@@ -32,6 +30,3 @@ index 26c50a5c..2596afde 100644
  static const char kCommandQuit = 'x';
  
  namespace google_breakpad {
--- 
-2.14.1
-

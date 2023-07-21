@@ -92,7 +92,7 @@ The following recipes do not have a DESCRIPTION. Please add an entry for DESCRIP
 
         def is_maintainer_exception(entry):
             exceptions = ["musl", "newlib", "linux-yocto", "linux-dummy", "mesa-gl", "libgfortran", "libx11-compose-data",
-                          "cve-update-db-native","cve-update-nvd2-native",]
+                          "cve-update-nvd2-native",]
             for i in exceptions:
                  if i in entry:
                      return True

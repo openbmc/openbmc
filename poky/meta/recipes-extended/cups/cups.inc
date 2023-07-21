@@ -15,19 +15,15 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/cups-${PV}-source.tar.gz \
            file://0004-cups-fix-multilib-install-file-conflicts.patch \
            file://volatiles.99_cups \
            file://cups-volatiles.conf \
-           file://CVE-2023-32324.patch \
            "
 
 GITHUB_BASE_URI = "https://github.com/OpenPrinting/cups/releases"
 
-# Issue only applies to MacOS
-CVE_CHECK_IGNORE += "CVE-2008-1033"
-# Issue affects pdfdistiller plugin used with but not part of cups
-CVE_CHECK_IGNORE += "CVE-2009-0032"
-# This is an Ubuntu only issue.
-CVE_CHECK_IGNORE += "CVE-2018-6553"
-# This is fixed in 2.4.2 but the cve-check class still reports it
-CVE_CHECK_IGNORE += "CVE-2022-26691"
+CVE_STATUS[CVE-2008-1033] = "not-applicable-platform: Issue only applies to MacOS"
+CVE_STATUS[CVE-2009-0032] = "cpe-incorrect: Issue affects pdfdistiller plugin used with but not part of cups"
+CVE_STATUS[CVE-2018-6553] = "not-applicable-platform: This is an Ubuntu only issue"
+CVE_STATUS[CVE-2022-26691] = "fixed-version: This is fixed in 2.4.2 but the cve-check class still reports it"
+CVE_STATUS[CVE-2021-25317] = "not-applicable-config: This concerns /var/log/cups having lp ownership, our /var/log/cups is root:root, so this doesn't apply."
 
 LEAD_SONAME = "libcupsdriver.so"
 
@@ -115,7 +111,3 @@ SYSROOT_PREPROCESS_FUNCS += "cups_sysroot_preprocess"
 cups_sysroot_preprocess () {
 	sed -i ${SYSROOT_DESTDIR}${bindir_crossscripts}/cups-config -e 's:cups_datadir=.*:cups_datadir=${datadir}/cups:' -e 's:cups_serverbin=.*:cups_serverbin=${libexecdir}/cups:'
 }
-
-# -25317 concerns /var/log/cups having lp ownership.  Our /var/log/cups is
-# root:root, so this doesn't apply.
-CVE_CHECK_IGNORE += "CVE-2021-25317"

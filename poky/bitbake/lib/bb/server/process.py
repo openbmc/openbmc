@@ -502,7 +502,7 @@ class ServerCommunicator():
     def runCommand(self, command):
         self.connection.send(command)
         if not self.recv.poll(30):
-            logger.info("No reply from server in 30s")
+            logger.info("No reply from server in 30s (for command %s)" % command[0])
             if not self.recv.poll(30):
                 raise ProcessTimeout("Timeout while waiting for a reply from the bitbake server (60s)")
         ret, exc = self.recv.get()

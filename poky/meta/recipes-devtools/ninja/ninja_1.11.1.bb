@@ -30,5 +30,4 @@ do_install() {
 
 BBCLASSEXTEND = "native nativesdk"
 
-# This is a different Ninja
-CVE_CHECK_IGNORE += "CVE-2021-4336"
+CVE_STATUS[CVE-2021-4336] = "cpe-incorrect: This is a different Ninja"

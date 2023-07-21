@@ -16,7 +16,7 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF += " \
     ${@bb.utils.contains('TARGET_FPU', 'soft', '--with-softfloat', '', d)} \
-    --disable-python \
+    --disable-python --disable-old-symbols \
 "
 
 PACKAGES =+ "alsa-server alsa-conf libatopology"

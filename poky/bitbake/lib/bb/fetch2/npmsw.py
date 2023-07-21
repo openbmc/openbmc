@@ -41,8 +41,9 @@ def foreach_dependencies(shrinkwrap, callback=None, dev=False):
         with:
             name = the package name (string)
             params = the package parameters (dictionary)
-            deptree = the package dependency tree (array of strings)
+            destdir = the destination of the package (string)
     """
+    # For handling old style dependencies entries in shinkwrap files
     def _walk_deps(deps, deptree):
         for name in deps:
             subtree = [*deptree, name]
@@ -52,9 +53,22 @@ def foreach_dependencies(shrinkwrap, callback=None, dev=False):
                     continue
                 elif deps[name].get("bundled", False):
                     continue
-                callback(name, deps[name], subtree)
+                destsubdirs = [os.path.join("node_modules", dep) for dep in subtree]
+                destsuffix = os.path.join(*destsubdirs)
+                callback(name, deps[name], destsuffix)
 
-    _walk_deps(shrinkwrap.get("dependencies", {}), [])
+    # packages entry means new style shrinkwrap file, else use dependencies
+    packages = shrinkwrap.get("packages", None)
+    if packages is not None:
+        for package in packages:
+            if package != "":
+                name = package.split('node_modules/')[-1]
+                package_infos = packages.get(package, {})
+                if dev == False and package_infos.get("dev", False):
+                    continue
+                callback(name, package_infos, package)
+    else:
+        _walk_deps(shrinkwrap.get("dependencies", {}), [])
 
 class NpmShrinkWrap(FetchMethod):
     """Class to fetch all package from a shrinkwrap file"""
@@ -75,12 +89,10 @@ class NpmShrinkWrap(FetchMethod):
         # Resolve the dependencies
         ud.deps = []
 
-        def _resolve_dependency(name, params, deptree):
+        def _resolve_dependency(name, params, destsuffix):
             url = None
             localpath = None
             extrapaths = []
-            destsubdirs = [os.path.join("node_modules", dep) for dep in deptree]
-            destsuffix = os.path.join(*destsubdirs)
             unpack = True
 
             integrity = params.get("integrity", None)

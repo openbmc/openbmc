@@ -33,6 +33,8 @@ KERNEL_CLASSES = " kernel-fitimage "
 # RAM disk variables including load address and entrypoint for kernel and RAM disk
 IMAGE_FSTYPES += "cpio.gz"
 INITRAMFS_IMAGE = "core-image-minimal"
+# core-image-minimal is used as initramfs here, drop the rootfs suffix
+IMAGE_NAME_SUFFIX:pn-core-image-minimal = ""
 UBOOT_RD_LOADADDRESS = "0x88000000"
 UBOOT_RD_ENTRYPOINT = "0x88000000"
 UBOOT_LOADADDRESS = "0x80080000"

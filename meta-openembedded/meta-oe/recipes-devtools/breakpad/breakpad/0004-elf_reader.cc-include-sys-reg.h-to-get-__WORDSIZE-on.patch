@@ -13,8 +13,8 @@ Upstream-Status: Pending
 
 --- a/src/common/dwarf/elf_reader.cc
 +++ b/src/common/dwarf/elf_reader.cc
-@@ -30,12 +30,16 @@
- #define _GNU_SOURCE  // needed for pread()
+@@ -34,12 +34,16 @@
+ #include <config.h>  // Must come first
  #endif
  
 +#include <config.h>
@@ -32,8 +32,8 @@ Upstream-Status: Pending
  #include <algorithm>
 --- a/configure.ac
 +++ b/configure.ac
-@@ -72,7 +72,7 @@ AC_ARG_ENABLE(m32,
- AC_HEADER_STDC
+@@ -61,7 +61,7 @@ fi
+ 
  AC_SYS_LARGEFILE
  AX_PTHREAD
 -AC_CHECK_HEADERS([a.out.h stab.h sys/mman.h sys/random.h])

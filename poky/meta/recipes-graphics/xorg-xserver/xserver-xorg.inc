@@ -20,16 +20,15 @@ SRC_URI = "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${PV}.tar.xz"
 UPSTREAM_CHECK_REGEX = "xorg-server-(?P<pver>\d+(\.(?!99)\d+)+)\.tar"
 
 CVE_PRODUCT = "xorg-server x_server"
-# This is specific to Debian's xserver-wrapper.c
-CVE_CHECK_IGNORE += "CVE-2011-4613"
-# As per upstream, exploiting this flaw is non-trivial and it requires exact
-# timing on the behalf of the attacker. Many graphical applications exit if their
-# connection to the X server is lost, so a typical desktop session is either
-# impossible or difficult to exploit. There is currently no upstream patch
-# available for this flaw.
-CVE_CHECK_IGNORE += "CVE-2020-25697"
-# This is specific to XQuartz, which is the macOS X server port
-CVE_CHECK_IGNORE += "CVE-2022-3553"
+
+CVE_STATUS[CVE-2011-4613] = "not-applicable-platform: This is specific to Debian's xserver-wrapper.c"
+CVE_STATUS[CVE-2020-25697] = "upstream-wontfix: \
+As per upstream, exploiting this flaw is non-trivial and it requires exact \
+timing on the behalf of the attacker. Many graphical applications exit if their \
+connection to the X server is lost, so a typical desktop session is either \
+impossible or difficult to exploit. There is currently no upstream patch \
+available for this flaw."
+CVE_STATUS[CVE-2022-3553] = "cpe-incorrect: This is specific to XQuartz, which is the macOS X server port"
 
 S = "${WORKDIR}/${XORG_PN}-${PV}"
 

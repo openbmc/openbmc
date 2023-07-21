@@ -26,10 +26,10 @@ SRC_URI[sha256sum] = "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c4
 
 GITHUB_BASE_URI = "https://github.com/westes/flex/releases"
 
-# Disputed - yes there is stack exhaustion but no bug and it is building the
-# parser, not running it, effectively similar to a compiler ICE. Upstream no plans to address
 # https://github.com/westes/flex/issues/414
-CVE_CHECK_IGNORE += "CVE-2019-6293"
+CVE_STATUS[CVE-2019-6293] = "upstream-wontfix: \
+there is stack exhaustion but no bug and it is building the \
+parser, not running it, effectively similar to a compiler ICE. Upstream no plans to address this."
 
 inherit autotools gettext texinfo ptest github-releases
 

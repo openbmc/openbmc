@@ -4,18 +4,19 @@ require glibc-version.inc
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010022
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010023
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010024
-# Upstream glibc maintainers dispute there is any issue and have no plans to address it further.
-# "this is being treated as a non-security bug and no real threat."
-CVE_CHECK_IGNORE += "CVE-2019-1010022 CVE-2019-1010023 CVE-2019-1010024"
+CVE_STATUS_GROUPS = "CVE_STATUS_RECIPE"
+CVE_STATUS_RECIPE = "CVE-2019-1010022 CVE-2019-1010023 CVE-2019-1010024"
+CVE_STATUS_RECIPE[status] = "disputed: \
+Upstream glibc maintainers dispute there is any issue and have no plans to address it further. \
+this is being treated as a non-security bug and no real threat."
 
 # glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2019-1010025
-# Allows for ASLR bypass so can bypass some hardening, not an exploit in itself, may allow
-# easier access for another. "ASLR bypass itself is not a vulnerability."
 # Potential patch at https://sourceware.org/bugzilla/show_bug.cgi?id=22853
-CVE_CHECK_IGNORE += "CVE-2019-1010025"
+CVE_STATUS[CVE-2019-1010025] = "disputed: \
+Allows for ASLR bypass so can bypass some hardening, not an exploit in itself, may allow \
+easier access for another. 'ASLR bypass itself is not a vulnerability.'"
 
-# This is integrated into the 2.37 branch as of 07b9521fc6
-CVE_CHECK_IGNORE += "CVE-2023-25139"
+CVE_STATUS[CVE-2023-25139] = "cpe-stable-backport: This is integrated into the 2.37 branch as of 07b9521fc6"
 
 DEPENDS += "gperf-native bison-native"
 

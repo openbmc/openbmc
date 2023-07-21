@@ -1,0 +1,31 @@
+From 17490e264e627ead81bf5840c8797de968485943 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 3 Jul 2023 11:25:26 -0700
+Subject: [PATCH] fbida: Include missing <sys/types.h>
+
+Fixes build on musl
+../git/gfx.h:43:5: error: unknown type name 'dev_t'; did you mean 'div_t'?
+    dev_t devnum;
+    ^~~~~
+    div_t
+TOPDIR/build/tmp/work/cortexa57-yoe-linux-musl/fbida/2.14+gitAUTOINC+eb769e3d7f-r0/recipe-sysroot/usr/include/stdlib.h:64:35: note: 'div_t' declared here
+typedef struct { int quot, rem; } div_t;
+                                  ^
+1 error generated
+
+Upstream-Status: Submitted [https://github.com/kraxel/fbida/pull/3]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gfx.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/gfx.h
++++ b/gfx.h
+@@ -1,5 +1,6 @@
+ #include <stdbool.h>
+ #include <inttypes.h>
++#include <sys/types.h>
+ 
+ #include <pixman.h>
+ #include <cairo.h>

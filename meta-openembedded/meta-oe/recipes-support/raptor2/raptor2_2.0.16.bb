@@ -11,6 +11,7 @@ DEPENDS = "libxml2 libxslt curl yajl"
 
 SRC_URI = " \
     http://download.librdf.org/source/${BPN}-${PV}.tar.gz \
+    file://0001-Remove-the-access-to-entities-checked-private-symbol.patch \
 "
 SRC_URI[sha256sum] = "089db78d7ac982354bdbf39d973baf09581e6904ac4c92a98c5caadb3de44680"
 

@@ -1,0 +1,51 @@
+From ea3187cfcf9cac87e5bc5e7db79b0338da9e355e Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Mon, 26 Jun 2023 12:45:09 +0300
+Subject: [PATCH] Don't muck with per-process global sqlite configuration from
+ the db backend
+
+sqlite3_config() affects all in-process uses of sqlite. librpm being a
+low-level library, it has no business whatsoever making such decisions
+for the applications running on top of it. Besides that, the callback can
+easily end up pointing to an already closed database, causing an
+innocent API user to crash in librpm on an entirely unrelated error on
+some other database. "Oops."
+
+The sqlite API doesn't seem to provide any per-db or non-global context
+for logging errors, thus we can only remove the call and let sqlite output
+errors the way it pleases (print through stderr, presumably).
+
+Thanks to Jan Palus for spotting and reporting!
+
+Upstream-Status: Backport [https://github.com/rpm-software-management/rpm/commit/ea3187cfcf9cac87e5bc5e7db79b0338da9e355e]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ lib/backend/sqlite.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/lib/backend/sqlite.c b/lib/backend/sqlite.c
+index 5a029d575a..b612732267 100644
+--- a/lib/backend/sqlite.c
++++ b/lib/backend/sqlite.c
+@@ -44,13 +44,6 @@ static void rpm_match3(sqlite3_context *sctx, int argc, sqlite3_value **argv)
+     sqlite3_result_int(sctx, match);
+ }
+ 
+-static void errCb(void *data, int err, const char *msg)
+-{
+-    rpmdb rdb = data;
+-    rpmlog(RPMLOG_WARNING, "%s: %s: %s\n",
+-		rdb->db_descr, sqlite3_errstr(err), msg);
+-}
+-
+ static int dbiCursorReset(dbiCursor dbc)
+ {
+     if (dbc->stmt) {
+@@ -170,7 +163,6 @@ static int sqlite_init(rpmdb rdb, const char * dbhome)
+ 	 * the "database is locked" errors at every cost
+ 	 */
+ 	sqlite3_busy_timeout(sdb, 10000);
+-	sqlite3_config(SQLITE_CONFIG_LOG, errCb, rdb);
+ 
+ 	sqlexec(sdb, "PRAGMA secure_delete = OFF");
+ 	sqlexec(sdb, "PRAGMA case_sensitive_like = ON");

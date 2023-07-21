@@ -8,5 +8,7 @@ DEPENDS = "gupnp"
 
 inherit meson pkgconfig gobject-introspection vala
 
-SRC_URI = "${GNOME_MIRROR}/${BPN}/0.14/${BPN}-${PV}.tar.xz"
+SRC_URI = "${GNOME_MIRROR}/${BPN}/0.14/${BPN}-${PV}.tar.xz \
+           file://0001-all-Drop-xmlRecoverMemory.patch \
+          "
 SRC_URI[sha256sum] = "20aed546fc882e78a3f186a0c8bce5c841cc3a44b7ea528298fbdc82596fb156"

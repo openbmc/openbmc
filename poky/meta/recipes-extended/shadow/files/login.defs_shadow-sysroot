@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: BSD-3-Clause OR Artistic-1.0
 #
 # /etc/login.defs - Configuration control definitions for the shadow package.
 #

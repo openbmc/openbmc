@@ -37,7 +37,7 @@ APPEND:append = '${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", " ro
 ROOTFS_POSTPROCESS_COMMAND += "write_image_test_data; "
 
 # Write manifest
-IMAGE_MANIFEST = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.manifest"
+IMAGE_MANIFEST = "${IMGDEPLOYDIR}/${IMAGE_NAME}.manifest"
 ROOTFS_POSTUNINSTALL_COMMAND =+ "write_image_manifest ; "
 # Set default postinst log file
 POSTINST_LOGFILE ?= "${localstatedir}/log/postinstall.log"

@@ -1,0 +1,31 @@
+From 5a0799d0bacc0cf93e15febdac7d8c50b21e7234 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2023 13:13:12 -0700
+Subject: [PATCH] Disable annobin plugin
+
+OE gcc does not build this plugin, moreover there are non gcc compilers
+which can be used with OE as well e.g. clang which might not have it
+either
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dlm_controld/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dlm_controld/Makefile b/dlm_controld/Makefile
+index 8802d88..0380ec9 100644
+--- a/dlm_controld/Makefile
++++ b/dlm_controld/Makefile
+@@ -47,7 +47,7 @@ CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
+ 
+ BIN_CFLAGS += $(CFLAGS) -fPIE -DPIE
+ BIN_CFLAGS += -I../include -I../libdlm
+-LIB_CFLAGS += $(CFLAGS) -fPIC -fplugin=annobin
++LIB_CFLAGS += $(CFLAGS) -fPIC
+ 
+ BIN_LDFLAGS += $(LDFLAGS) -Wl,-z,relro -Wl,-z,now -pie
+ BIN_LDFLAGS += -lpthread -lrt -lcpg -lcmap -lcfg -lquorum -luuid
+-- 
+2.41.0
+

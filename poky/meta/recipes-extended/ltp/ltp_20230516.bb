@@ -93,6 +93,7 @@ RDEPENDS:${PN} = "\
     e2fsprogs-mke2fs \
     expect \
     file \
+    findutils \
     gawk \
     gdb \
     gzip \

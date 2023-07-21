@@ -14,8 +14,7 @@ UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/libtirpc/files/libtirpc/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)/"
 SRC_URI[sha256sum] = "6474e98851d9f6f33871957ddee9714fdcd9d8a5ee9abb5a98d63ea2e60e12f3"
 
-# Was fixed in 1.3.3rc1 so not present in 1.3.3
-CVE_CHECK_IGNORE += "CVE-2021-46828"
+CVE_STATUS[CVE-2021-46828] = "fixed-version: fixed in 1.3.3rc1 so not present in 1.3.3"
 
 inherit autotools pkgconfig
 

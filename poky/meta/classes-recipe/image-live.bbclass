@@ -260,6 +260,5 @@ python do_bootimg() {
     bb.build.exec_func('create_symlinks', d)
 }
 do_bootimg[subimages] = "hddimg iso"
-do_bootimg[imgsuffix] = "."
 
 addtask bootimg before do_image_complete after do_rootfs

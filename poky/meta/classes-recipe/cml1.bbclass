@@ -109,3 +109,9 @@ python do_diffconfig() {
 do_diffconfig[nostamp] = "1"
 do_diffconfig[dirs] = "${KCONFIG_CONFIG_ROOTDIR}"
 addtask diffconfig
+
+do_showconfig() {
+    bbplain "Config file written to ${KCONFIG_CONFIG_ROOTDIR}/.config"
+}
+do_showconfig[nostamp] = "1"
+addtask showconfig after do_configure

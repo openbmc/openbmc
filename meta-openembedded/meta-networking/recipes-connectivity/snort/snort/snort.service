@@ -1,0 +1,12 @@
+[Unit]
+Description=Snort NIDS Daemon
+After=syslog.target network.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/snort
+ExecStartPre=/bin/mkdir -p /var/log/snort
+ExecStart=/usr/bin/snort -q -c /etc/snort/snort.conf -l /var/log/snort -i $INTERFACES
+
+[Install]
+WantedBy=multi-user.target

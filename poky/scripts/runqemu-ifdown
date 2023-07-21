@@ -16,7 +16,7 @@
 #
 
 usage() {
-	echo "sudo $(basename $0) <tap-dev> <native-sysroot-basedir>"
+	echo "sudo $(basename $0) <tap-dev>"
 }
 
 if [ $EUID -ne 0 ]; then
@@ -24,15 +24,19 @@ if [ $EUID -ne 0 ]; then
 	exit 1
 fi
 
-if [ $# -ne 2 ]; then
+if [ $# -gt 2 ] || [ $# -lt 1 ]; then
 	usage
 	exit 1
 fi
 
-TAP=$1
-STAGING_BINDIR_NATIVE=$2
+# backward compatibility
+if [ $# -eq 2 ] ; then
+	echo "Warning: native-sysroot-basedir parameter is ignored. It is no longer needed." >&2
+fi
 
-if !ip tuntap del $TAP mode tap 2>/dev/null; then
+TAP=$1
+
+if ! ip tuntap del $TAP mode tap 2>/dev/null; then
 	echo "Error: Unable to run up tuntap del"
 	exit 1
 fi
@@ -56,8 +60,13 @@ if [ ! -x "$IPTABLES" ]; then
 	echo "$IPTABLES cannot be executed"
 	exit 1
 fi
-n=$[ (`echo $TAP | sed 's/tap//'` * 2) + 1 ]
-dest=$[ (`echo $TAP | sed 's/tap//'` * 2) + 2 ]
+
+if [ -z "$OE_TAP_NAME" ]; then
+	OE_TAP_NAME=tap
+fi
+
+n=$[ (`echo $TAP | sed "s/$OE_TAP_NAME//"` * 2) + 1 ]
+dest=$[ (`echo $TAP | sed "s/$OE_TAP_NAME//"` * 2) + 2 ]
 $IPTABLES -D POSTROUTING -t nat -j MASQUERADE -s 192.168.7.$n/32
 $IPTABLES -D POSTROUTING -t nat -j MASQUERADE -s 192.168.7.$dest/32
 true

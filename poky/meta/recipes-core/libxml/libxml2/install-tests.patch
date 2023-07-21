@@ -1,19 +1,19 @@
+From 3fc716357ce1372d9418dc86f24315b34d9808de Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Mon, 5 Dec 2022 17:02:32 +0000
+Subject: [PATCH] add yocto-specific install-ptest target
+
 Add a target to install the test suite.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
-
-From c7809dc6947324ea506a0c2bf132ecd37156f211 Mon Sep 17 00:00:00 2001
-From: Ross Burton <ross.burton@arm.com>
-Date: Mon, 5 Dec 2022 17:02:32 +0000
-Subject: [PATCH] add yocto-specific install-ptest target
 
 ---
  Makefile.am | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 316109b1..15e100be 100644
+index 5bc4018..57d27af 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -26,6 +26,16 @@ check_PROGRAMS = \
@@ -32,7 +32,4 @@ index 316109b1..15e100be 100644
 +
  bin_PROGRAMS = xmllint xmlcatalog
  
- nodist_bin_SCRIPTS = xml2-config
--- 
-2.34.1
-
+ bin_SCRIPTS = xml2-config

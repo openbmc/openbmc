@@ -3,16 +3,14 @@ map the mcontext_t structure for musl
 Upstream-Status: Inappropriate [need to consider Android]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-Index: git/src/client/linux/minidump_writer/linux_core_dumper.cc
-===================================================================
---- git.orig/src/client/linux/minidump_writer/linux_core_dumper.cc
-+++ git/src/client/linux/minidump_writer/linux_core_dumper.cc
-@@ -196,7 +196,7 @@ bool LinuxCoreDumper::EnumerateThreads()
+--- a/src/client/linux/minidump_writer/linux_core_dumper.cc
++++ b/src/client/linux/minidump_writer/linux_core_dumper.cc
+@@ -214,7 +214,7 @@ bool LinuxCoreDumper::EnumerateThreads()
          info.tgid = status->pr_pgrp;
          info.ppid = status->pr_ppid;
  #if defined(__mips__)
--#if defined(__ANDROID__)
-+#if defined(__ANDROID__) || !defined(__GLIBC__)
+-# if defined(__ANDROID__)
++# if defined(__ANDROID__) || !defined(__GLIBC__)
          for (int i = EF_R0; i <= EF_R31; i++)
            info.mcontext.gregs[i - EF_R0] = status->pr_reg[i];
- #else  // __ANDROID__
+ # else  // __ANDROID__

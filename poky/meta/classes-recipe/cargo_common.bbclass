@@ -149,6 +149,10 @@ python cargo_common_do_patch_paths() {
 }
 do_configure[postfuncs] += "cargo_common_do_patch_paths"
 
+do_compile:prepend () {
+        oe_cargo_fix_env
+}
+
 oe_cargo_fix_env () {
 	export CC="${RUST_TARGET_CC}"
 	export CXX="${RUST_TARGET_CXX}"
@@ -170,3 +174,15 @@ oe_cargo_fix_env () {
 EXTRA_OECARGO_PATHS ??= ""
 
 EXPORT_FUNCTIONS do_configure
+
+# The culprit for this setting is the libc crate,
+# which as of Jun 2023 calls directly into 32 bit time functions in glibc,
+# bypassing all of glibc provisions to choose the right Y2038-safe functions. As
+# rust components statically link with that crate, pretty much everything
+# is affected, and so there's no point trying to have recipe-specific
+# INSANE_SKIP entries.
+#
+# Upstream ticket and PR:
+# https://github.com/rust-lang/libc/issues/3223
+# https://github.com/rust-lang/libc/pull/3175
+INSANE_SKIP:append = " 32bit-time"

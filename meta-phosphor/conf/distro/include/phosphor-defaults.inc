@@ -147,9 +147,6 @@ VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
 # Set security headers on builds
 require conf/distro/include/security_flags.inc
 
-# Enable 64-bit time_t
-require conf/distro/include/time64.inc
-
 # obmc-libobmc-intf doesn't compile with security flags enabled
 SECURITY_CFLAGS:pn-obmc-libobmc-intf = ""
 

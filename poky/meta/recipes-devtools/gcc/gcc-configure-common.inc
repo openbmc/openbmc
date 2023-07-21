@@ -40,7 +40,6 @@ EXTRA_OECONF = "\
     ${@get_gcc_mips_plt_setting(bb, d)} \
     ${@get_gcc_ppc_plt_settings(bb, d)} \
     ${@get_gcc_multiarch_setting(bb, d)} \
-	--enable-standard-branch-protection \
 "
 
 # glibc version is a minimum controlling whether features are enabled. 

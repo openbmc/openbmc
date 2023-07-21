@@ -186,14 +186,16 @@ deltask ${EMPTYVAR}
 """
     def test_parse_addtask_deltask(self):
         import sys
-        f = self.parsehelper(self.addtask_deltask)
-        d = bb.parse.handle(f.name, self.d)['']
 
-        stdout = sys.stdout.getvalue()
-        self.assertTrue("addtask contained multiple 'before' keywords" in stdout)
-        self.assertTrue("addtask contained multiple 'after' keywords" in stdout)
-        self.assertTrue('addtask ignored: " do_patch"' in stdout)
-        #self.assertTrue('dependent task do_foo for do_patch does not exist' in stdout)
+        with self.assertLogs() as logs:
+            f = self.parsehelper(self.addtask_deltask)
+            d = bb.parse.handle(f.name, self.d)['']
+
+        output = "".join(logs.output)
+        self.assertTrue("addtask contained multiple 'before' keywords" in output)
+        self.assertTrue("addtask contained multiple 'after' keywords" in output)
+        self.assertTrue('addtask ignored: " do_patch"' in output)
+        #self.assertTrue('dependent task do_foo for do_patch does not exist' in output)
 
     broken_multiline_comment = """
 # First line of comment \\

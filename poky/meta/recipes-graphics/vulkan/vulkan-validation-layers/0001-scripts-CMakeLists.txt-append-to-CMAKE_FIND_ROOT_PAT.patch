@@ -1,0 +1,28 @@
+From ea7b9e6fc0b3f45d6032ce624bed85bbde5ec0bf Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 21 Jun 2023 20:03:03 +0200
+Subject: [PATCH] scripts/CMakeLists.txt: append to CMAKE_FIND_ROOT_PATH
+ instead of replacing it
+
+Resetting CMAKE_FIND_ROOT_PATH in particular breaks builds in Yocto
+(which is a major cross compiling framework).
+
+Upstream-Status: Backport [https://github.com/KhronosGroup/Vulkan-ValidationLayers/commit/e1b11dc7856765cf45a283ac805ea5066c81cd9b]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ scripts/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/CMakeLists.txt b/scripts/CMakeLists.txt
+index 94c8528c8..cd86c54eb 100644
+--- a/scripts/CMakeLists.txt
++++ b/scripts/CMakeLists.txt
+@@ -124,7 +124,7 @@ if (MIMALLOC_INSTALL_DIR)
+ endif()
+ 
+ if (CMAKE_CROSSCOMPILING)
+-    set(CMAKE_FIND_ROOT_PATH ${CMAKE_PREFIX_PATH} PARENT_SCOPE)
++    set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CMAKE_PREFIX_PATH} PARENT_SCOPE)
+ else()
+     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} PARENT_SCOPE)
+ endif()

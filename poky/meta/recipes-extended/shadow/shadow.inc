@@ -65,13 +65,10 @@ PAM_PLUGINS = "libpam-runtime \
                pam-plugin-env \
                pam-plugin-group \
                pam-plugin-limits \
-               pam-plugin-lastlog \
                pam-plugin-motd \
                pam-plugin-mail \
                pam-plugin-shells \
                pam-plugin-rootok"
-
-PAM_PLUGINS:remove:libc-musl = "pam-plugin-lastlog"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'xattr', 'attr', '', d)}"

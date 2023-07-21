@@ -12,7 +12,7 @@ Upstream-Status: Pending
 
 --- a/linux_syscall_support.h
 +++ b/linux_syscall_support.h
-@@ -816,6 +816,9 @@ struct kernel_statfs {
+@@ -1006,6 +1006,9 @@ struct kernel_statx {
  #define FUTEX_TRYLOCK_PI_PRIVATE  (FUTEX_TRYLOCK_PI | FUTEX_PRIVATE_FLAG)
  #endif
  
@@ -22,17 +22,17 @@ Upstream-Status: Pending
  
  #if defined(__x86_64__)
  #ifndef ARCH_SET_GS
-@@ -947,6 +950,7 @@ struct kernel_statfs {
- #ifndef __NR_fallocate
- #define __NR_fallocate          324
+@@ -1140,6 +1143,7 @@ struct kernel_statx {
+ #ifndef __NR_getrandom
+ #define __NR_getrandom          355
  #endif
 +
  /* End of i386 definitions                                                   */
  #elif defined(__ARM_ARCH_3__) || defined(__ARM_EABI__)
  #ifndef __NR_setresuid
-@@ -1239,6 +1243,12 @@ struct kernel_statfs {
- #ifndef __NR_fallocate
- #define __NR_fallocate          285
+@@ -1448,6 +1452,12 @@ struct kernel_statx {
+ #ifndef __NR_getrandom
+ #define __NR_getrandom          318
  #endif
 +#ifndef __NR_pread
 +#define __NR_pread __NR_pread64
@@ -43,9 +43,9 @@ Upstream-Status: Pending
  /* End of x86-64 definitions                                                 */
  #elif defined(__mips__)
  #if _MIPS_SIM == _MIPS_SIM_ABI32
-@@ -1418,6 +1428,12 @@ struct kernel_statfs {
- #ifndef __NR_ioprio_get
- #define __NR_ioprio_get         (__NR_Linux + 274)
+@@ -1633,6 +1643,12 @@ struct kernel_statx {
+ #ifndef __NR_getrandom
+ #define __NR_getrandom          (__NR_Linux + 313)
  #endif
 +
 +#undef __NR_pread

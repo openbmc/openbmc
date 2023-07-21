@@ -16,8 +16,7 @@ SRC_URI[sha256sum] = "145a340fd9d55f0b84779a44a12d5f79d77c99663967f8cfa168d7905c
 
 inherit autotools gettext texinfo ptest
 
-# Issue applies to use of cpio in SUSE/OBS, doesn't apply to us
-CVE_CHECK_IGNORE += "CVE-2010-4226"
+CVE_STATUS[CVE-2010-4226] = "not-applicable-platform: Issue applies to use of cpio in SUSE/OBS"
 
 EXTRA_OECONF += "DEFAULT_RMT_DIR=${sbindir}"
 
@@ -66,7 +65,7 @@ do_install_ptest_base:append() {
 
 # The tests need to run as a non-root user, so pull in the ptest user
 DEPENDS:append:class-target = "${@bb.utils.contains('PTEST_ENABLED', '1', ' ptest-runner', '', d)}"
-PACKAGE_WRITE_DEPS += "ptest-runner"
+PACKAGE_WRITE_DEPS:append:class-target = " ${MLPREFIX}ptest-runner"
 
 RDEPENDS:${PN}-ptest += "ptest-runner"
 

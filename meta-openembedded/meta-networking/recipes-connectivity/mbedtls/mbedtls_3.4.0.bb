@@ -25,8 +25,9 @@ SECTION = "libs"
 S = "${WORKDIR}/git"
 SRCREV = "1873d3bfc2da771672bd8e7e8f41f57e0af77f33"
 SRC_URI = "git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=master \
-           file://run-ptest \
-          "
+	file://0001-aesce-do-not-specify-an-arch-version-when-enabling-c.patch \
+	file://0002-aesce-use-correct-target-attribute-when-building-wit.patch \
+	file://run-ptest"
 
 inherit cmake update-alternatives ptest
 
@@ -40,9 +41,6 @@ PACKAGECONFIG[psa] = ""
 PACKAGECONFIG[tests] = "-DENABLE_TESTING=ON,-DENABLE_TESTING=OFF"
 
 EXTRA_OECMAKE = "-DLIB_INSTALL_DIR:STRING=${libdir}"
-
-# Needs crypto instructions on aarch64
-TUNE_CCARGS_MARCH_OPTS:append:aarch64 = "${@bb.utils.contains('TUNE_FEATURES', 'crypto', '', '+crypto', d)}"
 
 # For now the only way to enable PSA is to explicitly pass a -D via CFLAGS
 CFLAGS:append = "${@bb.utils.contains('PACKAGECONFIG', 'psa', ' -DMBEDTLS_USE_PSA_CRYPTO', '', d)}"

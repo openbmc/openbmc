@@ -32,8 +32,7 @@ GITHUB_BASE_URI = "https://github.com/lathiat/avahi/releases/"
 SRC_URI[md5sum] = "229c6aa30674fc43c202b22c5f8c2be7"
 SRC_URI[sha256sum] = "060309d7a333d38d951bc27598c677af1796934dbd98e1024e7ad8de798fedda"
 
-# Issue only affects Debian/SUSE, not us
-CVE_CHECK_IGNORE += "CVE-2021-26720"
+CVE_STATUS[CVE-2021-26720] = "not-applicable-platform: Issue only affects Debian/SUSE"
 
 DEPENDS = "expat libcap libdaemon glib-2.0 glib-2.0-native"
 

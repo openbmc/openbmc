@@ -1666,6 +1666,7 @@ class BBCooker:
             self.updateCacheSync()
 
         if self.state != state.parsing and not self.parsecache_valid:
+            bb.server.process.serverlog("Parsing started")
             self.setupParserWatcher()
 
             bb.parse.siggen.reset(self.data)

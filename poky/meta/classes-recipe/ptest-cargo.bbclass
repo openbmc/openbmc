@@ -23,13 +23,13 @@ python do_compile_ptest_cargo() {
     bb.note(f"Building tests with cargo ({cmd})")
 
     try:
-        proc = subprocess.Popen(cmd, shell=True, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        proc = subprocess.Popen(cmd, shell=True, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     except subprocess.CalledProcessError as e:
         bb.fatal(f"Cannot build test with cargo: {e}")
 
     lines = []
     for line in proc.stdout:
-        data = line.decode('utf-8').strip('\n')
+        data = line.strip('\n')
         lines.append(data)
         bb.note(data)
     proc.communicate()
@@ -50,7 +50,7 @@ python do_compile_ptest_cargo() {
                 current_manifest_path = os.path.normpath(data['manifest_path'])
                 project_manifest_path = os.path.normpath(manifest_path)
                 if current_manifest_path == project_manifest_path:
-                    if data['target']['test'] or data['target']['doctest'] and data['executable']:
+                    if (data['target']['test'] or data['target']['doctest']) and data['executable']:
                         test_bins.append(data['executable'])
             except KeyError as e:
                 # skip lines that do not meet the requirements

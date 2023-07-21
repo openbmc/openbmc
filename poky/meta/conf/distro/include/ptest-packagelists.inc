@@ -99,6 +99,7 @@ PTESTS_SLOW = "\
     libgcrypt \
     libmodule-build-perl \
     lttng-tools \
+    mdadm \
     openssh \
     openssl \
     parted \
@@ -122,7 +123,6 @@ PTESTS_PROBLEMS:append:x86 = " valgrind"
 #    rt-tests \ # Needs to be checked whether it runs at all
 #    bash \ # Test outcomes are non-deterministic by design
 #    ifupdown \ # Tested separately in lib/oeqa/selftest/cases/imagefeatures.py
-#    mdadm \ # Tests rely on non-deterministic sleep() amounts
 #    libinput \ # Tests need an unloaded system to be reliable
 #    libpam \ # Needs pam DISTRO_FEATURE
 #    numactl \ # qemu not (yet) configured for numa; all tests are skipped
@@ -134,7 +134,6 @@ PTESTS_PROBLEMS = "\
     rt-tests \
     bash \
     ifupdown \
-    mdadm \
     libinput \
     libpam \
     libseccomp \

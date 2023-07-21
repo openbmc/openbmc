@@ -65,29 +65,34 @@ class LtpTest(LtpTestBase):
     ltp_groups += ltp_fs
 
     def runltp(self, ltp_group):
-            cmd = '/opt/ltp/runltp -f %s -p -q -r /opt/ltp -l /opt/ltp/results/%s -I 1 -d /opt/ltp' % (ltp_group, ltp_group)
+            # LTP appends to log files, so ensure we start with a clean log
+            self.target.deleteFiles("/opt/ltp/results/", ltp_group)
+
+            cmd = '/opt/ltp/runltp -f %s -q -r /opt/ltp -l /opt/ltp/results/%s -I 1 -d /opt/ltp' % (ltp_group, ltp_group)
+
             starttime = time.time()
             (status, output) = self.target.run(cmd)
             endtime = time.time()
 
+            # Write the console log to disk for convenience
             with open(os.path.join(self.ltptest_log_dir, "%s-raw.log" % ltp_group), 'w') as f:
                 f.write(output)
 
+            # Also put the console log into the test result JSON
             self.extras['ltpresult.rawlogs']['log'] = self.extras['ltpresult.rawlogs']['log'] + output
 
-            # copy nice log from DUT
-            dst = os.path.join(self.ltptest_log_dir, "%s" %  ltp_group )
+            # Copy the machine-readable test results locally so we can parse it
+            dst = os.path.join(self.ltptest_log_dir, ltp_group)
             remote_src = "/opt/ltp/results/%s" % ltp_group 
             (status, output) = self.target.copyFrom(remote_src, dst, True)
-            msg = 'File could not be copied. Output: %s' % output
             if status:
+                msg = 'File could not be copied. Output: %s' % output
                 self.target.logger.warning(msg)
 
             parser = LtpParser()
             results, sections  = parser.parse(dst)
 
-            runtime = int(endtime-starttime)
-            sections['duration'] = runtime
+            sections['duration'] = int(endtime-starttime)
             self.sections[ltp_group] =  sections
 
             failed_tests = {}

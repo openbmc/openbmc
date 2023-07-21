@@ -1,0 +1,29 @@
+Initial support for kernel 6.4
+https://www.virtualbox.org/changeset/99666/vbox
+
+Upstream-Status: Backport [https://gitweb.gentoo.org/repo/gentoo.git/tree/app-emulation/virtualbox-guest-additions/files/virtualbox-guest-additions-7.0.8-kernel-6.4-patch-1.patch]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+
+--- a/src/VBox/Additions/linux/sharedfolders/regops.c
++++ b/src/VBox/Additions/linux/sharedfolders/regops.c
+@@ -75,4 +75,11 @@
+ #if RTLNX_VER_MAX(2,5,12)
+ # define PageUptodate(a_pPage) Page_Uptodate(a_pPage)
++#endif
++
++/** Starting from 6.4.0, iter_iov() macro should be used in order to access to iov field.  */
++#if RTLNX_VER_MIN(6,4,0)
++# define VBOX_ITER_IOV(_iter) iter_iov(_iter)
++#else
++# define VBOX_ITER_IOV(_iter) iter->iov
+ #endif
+ 
+@@ -2400,5 +2407,5 @@
+     if (iter_is_iovec(iter) || (VBSF_GET_ITER_TYPE(iter) & ITER_KVEC)) {
+ # endif
+-        const struct iovec *pCurIov    = iter->iov;
++        const struct iovec *pCurIov    = VBOX_ITER_IOV(iter);
+         size_t              cLeft      = iter->nr_segs;
+         size_t              cPagesSpan = 0;
+

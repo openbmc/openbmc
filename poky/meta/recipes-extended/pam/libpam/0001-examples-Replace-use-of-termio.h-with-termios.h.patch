@@ -1,0 +1,39 @@
+From 9b96fcfa5748934b8b6a4db4ee25a5e3165905c0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 Jul 2023 07:48:17 -0700
+Subject: [PATCH] examples: Replace use of termio.h with termios.h
+
+Fixes build with musl and makes it portable
+
+Upstream-Status: Backport [https://github.com/linux-pam/linux-pam/commit/5374f677e4cae669eb9accf2449178b602e8a40a]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ examples/tty_conv.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/examples/tty_conv.c b/examples/tty_conv.c
+index 23f0684..db22500 100644
+--- a/examples/tty_conv.c
++++ b/examples/tty_conv.c
+@@ -6,7 +6,8 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <unistd.h>
+-#include <termio.h>
++#include <termios.h>
++#include <sys/ioctl.h>
+ #include <security/pam_appl.h>
+ 
+ /***************************************
+@@ -16,7 +17,7 @@
+  ***************************************/
+ static void echoOff(int fd, int off)
+ {
+-    struct termio tty;
++    struct termios tty;
+     if (ioctl(fd, TCGETA, &tty) < 0)
+     {
+         fprintf(stderr, "TCGETA failed: %s\n", strerror(errno));
+-- 
+2.41.0
+

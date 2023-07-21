@@ -1,0 +1,44 @@
+From d99f71a4a52da7582d5e26992a1ab303b280d28a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Jun 2023 03:23:12 -0700
+Subject: [PATCH] Drop xmlRecoverMemory
+
+newer libxml has deprecated xmlRecoverMemory therefore replace it with xmlReadMemory
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gupnp/-/commit/80e68995b745a5900eaaa1d0c424d3a9d354e42d]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gupnp-didl-lite-parser.c    | 2 +-
+ gupnp-feature-list-parser.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gupnp-didl-lite-parser.c b/gupnp-didl-lite-parser.c
+index 3a5727f..840d718 100644
+--- a/libgupnp-av/gupnp-didl-lite-parser.c
++++ b/libgupnp-av/gupnp-didl-lite-parser.c
+@@ -230,7 +230,7 @@ gupnp_didl_lite_parser_parse_didl_recursive (GUPnPDIDLLiteParser *parser,
+         GUPnPAVXMLDoc *xml_doc = NULL;
+         gboolean       result;
+ 
+-        doc = xmlRecoverMemory (didl, strlen (didl));
++        doc = xmlReadMemory (didl, strlen (didl), NULL, NULL, XML_PARSE_NONET | XML_PARSE_RECOVER);
+         if (doc == NULL) {
+                 g_set_error (error,
+                              G_MARKUP_ERROR,
+diff --git a/gupnp-feature-list-parser.c b/gupnp-feature-list-parser.c
+index 16208b5..f804fe7 100644
+--- a/libgupnp-av/gupnp-feature-list-parser.c
++++ b/libgupnp-av/gupnp-feature-list-parser.c
+@@ -114,7 +114,7 @@ gupnp_feature_list_parser_parse_text
+         xmlNode      *element;
+         GList        *feature_list = NULL;
+ 
+-        doc = xmlRecoverMemory (text, strlen (text));
++        doc = xmlReadMemory (text, strlen (text), NULL, NULL, XML_PARSE_NONET | XML_PARSE_RECOVER);
+         if (doc == NULL) {
+                 g_set_error (error,
+                              G_MARKUP_ERROR,
+-- 
+2.41.0
+

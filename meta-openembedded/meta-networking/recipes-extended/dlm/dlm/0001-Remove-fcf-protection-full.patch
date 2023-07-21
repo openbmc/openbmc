@@ -1,0 +1,64 @@
+From e4ae70ae71f88d48cf1ab63810c9f7b4177af3a5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 15 Jul 2023 19:05:54 -0700
+Subject: [PATCH] Remove -fcf-protection=full
+
+This option is not available on all architectures e.g. RISC-V
+Fixes
+| cc1: error: '-fcf-protection=full' is not supported for this target
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dlm_controld/Makefile | 1 -
+ dlm_tool/Makefile     | 1 -
+ fence/Makefile        | 1 -
+ libdlm/Makefile       | 4 ++--
+ 4 files changed, 2 insertions(+), 5 deletions(-)
+
+--- a/dlm_controld/Makefile
++++ b/dlm_controld/Makefile
+@@ -43,7 +43,7 @@ CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
+ 	-Wno-sign-compare -Wno-unused-parameter -Wp,-D_FORTIFY_SOURCE=2 \
+ 	-fexceptions -fasynchronous-unwind-tables -fdiagnostics-show-option \
+ 	-Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong \
+-	-fstack-clash-protection -fcf-protection=full
++	-fstack-clash-protection
+ 
+ BIN_CFLAGS += $(CFLAGS) -fPIE -DPIE
+ BIN_CFLAGS += -I../include -I../libdlm
+--- a/dlm_tool/Makefile
++++ b/dlm_tool/Makefile
+@@ -15,7 +15,7 @@ CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
+ 	-Wno-sign-compare -Wno-unused-parameter -Wp,-D_FORTIFY_SOURCE=2 \
+ 	-fexceptions -fasynchronous-unwind-tables -fdiagnostics-show-option \
+ 	-Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong \
+-	-fstack-clash-protection -fcf-protection=full
++	-fstack-clash-protection
+ 
+ CFLAGS += -fPIE -DPIE
+ CFLAGS += -I../include -I../libdlm -I../dlm_controld
+--- a/fence/Makefile
++++ b/fence/Makefile
+@@ -15,7 +15,7 @@ CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
+ 	-Wno-sign-compare -Wno-unused-parameter -Wp,-D_FORTIFY_SOURCE=2 \
+ 	-fexceptions -fasynchronous-unwind-tables -fdiagnostics-show-option \
+ 	-Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong \
+-	-fstack-clash-protection -fcf-protection=full
++	-fstack-clash-protection
+ 
+ CFLAGS += -fPIE -DPIE
+ CFLAGS += -I../include
+--- a/libdlm/Makefile
++++ b/libdlm/Makefile
+@@ -80,8 +80,8 @@ CFLAGS += -D_GNU_SOURCE -O2 -ggdb \
+ 	-fdiagnostics-show-option \
+ 	-fPIC
+ 
+-LIB_CFLAGS += $(CFLAGS) -D_REENTRANT -fcf-protection=full
+-LLT_CFLAGS += $(CFLAGS) -fcf-protection=full
++LIB_CFLAGS += $(CFLAGS) -D_REENTRANT
++LLT_CFLAGS += $(CFLAGS)
+ 
+ LIB_LDFLAGS += $(LDFLAGS) -lpthread -Wl,-z,now
+ LLT_LDFLAGS += $(LDFLAGS) -Wl,-z,now

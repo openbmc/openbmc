@@ -34,7 +34,14 @@ SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 CFLAGS += "-D_GNU_SOURCE -fcommon"
 LDFLAGS:append = " -pthread"
 
-EXTRA_OECONF = "--enable-paranoia \
+BIND_EXTRA_CONFIG = "\
+        --build=${BUILD_SYS} \
+        --host=${HOST_SYS} \
+        --target=${TARGET_SYS} \
+"
+
+EXTRA_OECONF = "--with-bind-extra-config="${BIND_EXTRA_CONFIG}" \
+                --enable-paranoia \
                 --disable-static \
                 --enable-libtool \
                 --with-randomdev=/dev/random \

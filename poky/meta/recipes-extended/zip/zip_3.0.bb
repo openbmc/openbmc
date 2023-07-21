@@ -26,11 +26,8 @@ UPSTREAM_VERSION_UNKNOWN = "1"
 SRC_URI[md5sum] = "7b74551e63f8ee6aab6fbc86676c0d37"
 SRC_URI[sha256sum] = "f0e8bb1f9b7eb0b01285495a2699df3a4b766784c1765a8f1aeedf63c0806369"
 
-# Disputed and also Debian doesn't consider a vulnerability
-CVE_CHECK_IGNORE += "CVE-2018-13410"
-
-# Not for zip but for smart contract implementation for it
-CVE_CHECK_IGNORE += "CVE-2018-13684"
+CVE_STATUS[CVE-2018-13410] = "disputed: Disputed and also Debian doesn't consider a vulnerability"
+CVE_STATUS[CVE-2018-13684] = "cpe-incorrect: Not for zip but for smart contract implementation for it"
 
 # zip.inc sets CFLAGS, but what Makefile actually uses is
 # CFLAGS_NOOPT.  It will also force -O3 optimization, overriding

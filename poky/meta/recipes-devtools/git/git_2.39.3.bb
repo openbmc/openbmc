@@ -27,13 +27,6 @@ LIC_FILES_CHKSUM = "\
 
 CVE_PRODUCT = "git-scm:git"
 
-# This is about a manpage not mentioning --mirror may "leak" information
-# in mirrored git repos. Most OE users wouldn't build the docs and
-# we don't see this as a major issue for our general users/usecases.
-CVE_CHECK_IGNORE += "CVE-2022-24975"
-# This is specific to Git-for-Windows
-CVE_CHECK_IGNORE += "CVE-2022-41953"
-
 PACKAGECONFIG ??= "expat curl"
 PACKAGECONFIG[cvsserver] = ""
 PACKAGECONFIG[svn] = ""

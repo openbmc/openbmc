@@ -1,0 +1,36 @@
+From c123980d6bf1bc2bf93ee0dd0d7f8fee3d4ddc96 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 Jul 2023 08:45:14 -0700
+Subject: [PATCH] htop: Change dependency order of header and sourcefiles
+
+Fixes build race
+| pcp/Platform.h:29:10: fatal error: DiskIOMeter.h: No such file or directory
+|    29 | #include "DiskIOMeter.h"
+|       |          ^~~~~~~~~~~~~~~
+| compilation terminated.
+| make[3]: *** [<builtin>: pcp-htop.o] Error 1
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/pcp/htop/GNUmakefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/pcp/htop/GNUmakefile b/src/pcp/htop/GNUmakefile
+index 6b7c0c5..5153c63 100644
+--- a/src/pcp/htop/GNUmakefile
++++ b/src/pcp/htop/GNUmakefile
+@@ -186,8 +186,8 @@ CFGMETERS = $(patsubst %,pcp/meters/%,$(METERS))
+ CFGCOLUMNS = $(patsubst %,pcp/columns/%,$(COLUMNS))
+ 
+ CFGXFILES = $(CFGMETERS) $(CFGCOLUMNS)
+-TOPXFILES = $(TOPCFILES) $(TOPHFILES) $(DOCFILES)
+-SUBXFILES = $(SUBCFILES) $(SUBHFILES)
++TOPXFILES = $(TOPHFILES) $(TOPCFILES) $(DOCFILES)
++SUBXFILES = $(SUBHFILES) $(SUBCFILES)
+ CFILES = $(TOPCFILES) $(SUBCFILES)
+ HFILES = $(TOPHFILES) $(SUBHFILES)
+ LDIRT = $(TOPXFILES) $(SUBXFILES) $(CFGXFILES) \
+-- 
+2.41.0
+

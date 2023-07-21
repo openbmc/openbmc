@@ -1,0 +1,35 @@
+From 85eefb65eb632d827e17a72518dd289dcd721084 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 2 Jul 2023 19:29:55 -0700
+Subject: [PATCH] libswscale/riscv: Fix syntax of vsetvli
+
+Add missing operand which clang complains about but gcc assumes it to be
+'m1' if not specifiied.
+
+Fixes building with clang
+| src/libswscale/riscv/rgb2rgb_rvv.S:88:25: error: operand must be e[8|16|32|64|128|256|512|1024],m[1|2|4|8|f2|f4|f8],[ta|tu],[ma|mu]
+|         vsetvli t4, t3, e8, ta, ma
+|                         ^
+
+Upstream-Status: Submitted [https://ffmpeg.org/pipermail/ffmpeg-devel/2023-July/311514.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libswscale/riscv/rgb2rgb_rvv.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libswscale/riscv/rgb2rgb_rvv.S b/libswscale/riscv/rgb2rgb_rvv.S
+index 5626d90..bbdfdbe 100644
+--- a/libswscale/riscv/rgb2rgb_rvv.S
++++ b/libswscale/riscv/rgb2rgb_rvv.S
+@@ -85,7 +85,7 @@ func ff_interleave_bytes_rvv, zve32x
+         mv      t3, a3
+         addi    a4, a4, -1
+ 2:
+-        vsetvli    t4, t3, e8, ta, ma
++        vsetvli    t4, t3, e8, m1, ta, ma
+         sub        t3, t3, t4
+         vle8.v     v8, (t0)
+         add        t0, t4, t0
+-- 
+2.41.0
+

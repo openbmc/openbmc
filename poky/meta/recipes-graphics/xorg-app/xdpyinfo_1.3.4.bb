@@ -9,7 +9,7 @@ clients and the server, and the different types of screens and visuals \
 that are available."
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=f3d09e6b9e203a1af489e16c708f4fb3"
-DEPENDS += "libxtst libxext libxxf86vm libxi libxrender libxinerama libdmx libxau libxcomposite"
+DEPENDS += "libxtst libxext libxxf86vm libxi libxrender libxinerama libxau libxcomposite"
 PE = "1"
 
 SRC_URI += "file://disable-xkb.patch"

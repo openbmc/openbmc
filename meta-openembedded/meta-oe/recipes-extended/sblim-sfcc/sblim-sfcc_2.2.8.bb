@@ -4,7 +4,7 @@ HOMEPAGE = "http://www.sblim.org"
 
 SRC_URI = "http://netcologne.dl.sourceforge.net/project/sblim/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-cimxml-Include-sys-select.h-for-fd_set.patch \
-           file://0001-Fix-function-declararions.patch \
+           file://0001-Fix-implicit-function-declarations.patch \
            "
 
 SRC_URI[md5sum] = "0bac0dec19f17ec065b6c332a56d7bae"

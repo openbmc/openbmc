@@ -1,0 +1,43 @@
+Initial support for kernel 6.4
+https://www.virtualbox.org/changeset/99667/vbox
+
+
+Upstream-Status: Backport [https://gitweb.gentoo.org/repo/gentoo.git/tree/app-emulation/virtualbox-guest-additions/files/virtualbox-guest-additions-7.0.8-kernel-6.4-patch-2.patch]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+
+--- a/src/VBox/Additions/linux/sharedfolders/regops.c
++++ b/src/VBox/Additions/linux/sharedfolders/regops.c
+@@ -77,11 +77,4 @@
+ #endif
+ 
+-/** Starting from 6.4.0, iter_iov() macro should be used in order to access to iov field.  */
+-#if RTLNX_VER_MIN(6,4,0)
+-# define VBOX_ITER_IOV(_iter) iter_iov(_iter)
+-#else
+-# define VBOX_ITER_IOV(_iter) iter->iov
+-#endif
+-
+ 
+ /*********************************************************************************************************************************
+@@ -94,4 +87,12 @@
+ #else
+ # define VBSF_GET_ITER_TYPE(a_pIter) ((a_pIter)->type)
++#endif
++
++/** Starting from 6.4.0, iter_iov() macro should be used in order to access to iov field
++ * of struct iov_iter. */
++#if RTLNX_VER_MIN(6,4,0)
++# define VBSF_GET_ITER_IOV(_iter) iter_iov(_iter)
++#else
++# define VBSF_GET_ITER_IOV(_iter) iter->iov
+ #endif
+ 
+@@ -2407,5 +2408,5 @@
+     if (iter_is_iovec(iter) || (VBSF_GET_ITER_TYPE(iter) & ITER_KVEC)) {
+ # endif
+-        const struct iovec *pCurIov    = VBOX_ITER_IOV(iter);
++        const struct iovec *pCurIov    = VBSF_GET_ITER_IOV(iter);
+         size_t              cLeft      = iter->nr_segs;
+         size_t              cPagesSpan = 0;
+

@@ -14,11 +14,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  configure.ac | 20 ++++++++++----------
  1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 5d24714..4e2d8ec 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -913,7 +913,7 @@ AC_DEFUN([PCP_CHECK_PYTHON_HEADER],
+@@ -907,7 +907,7 @@ AC_DEFUN([PCP_CHECK_PYTHON_HEADER],
    [ PY_MAJOR="$1"
      PY_MINOR="$2"
      PY_VERSION="python$PY_MAJOR.$PY_MINOR"
@@ -27,7 +25,7 @@ index 5d24714..4e2d8ec 100644
      saved_CFLAGS="$CFLAGS"
      saved_CPPFLAGS="$CPPFLAGS"
      CFLAGS="$CFLAGS $PY_INCLUDE_DIRS"
-@@ -1524,7 +1524,7 @@ AC_SUBST(qmake)
+@@ -1603,7 +1603,7 @@ AC_SUBST(qmake)
  
  enable_qt3d=false
  AS_IF([test "x$do_qt3d" != "xno"], [
@@ -36,45 +34,7 @@ index 5d24714..4e2d8ec 100644
      then
  	enable_qt3d=$enable_qt
      elif test x"$do_qt3d" = x"yes"
-@@ -3810,13 +3810,13 @@ then
- 
-     saved_CFLAGS="$CFLAGS"
-     saved_CPPFLAGS="$CPPFLAGS"
--    NSS_INC_DIRS="-I/usr/include/nss -I/usr/include/nss3"
--    NSPR_INC_DIRS="-I/usr/include/nspr -I/usr/include/nspr4"
-+    NSS_INC_DIRS="-I${STAGING_INCDIR}/nss -I${STAGING_INCDIR}/nss3"
-+    NSPR_INC_DIRS="-I${STAGING_INCDIR}/nspr -I${STAGING_INCDIR}/nspr4"
-     CFLAGS="$CFLAGS $NSS_INC_DIRS $NSPR_INC_DIRS"
-     CPPFLAGS="$CPPFLAGS $NSS_INC_DIRS $NSPR_INC_DIRS"
- 
--    AC_CHECK_HEADERS([nss/nss.h], [NSSCFLAGS=-I/usr/include/nss], [
--	AC_CHECK_HEADERS([nss3/nss.h], [NSSCFLAGS=-I/usr/include/nss3], [
-+    AC_CHECK_HEADERS([nss/nss.h], [NSSCFLAGS=-I${STAGING_INCDIR}/nss], [
-+	AC_CHECK_HEADERS([nss3/nss.h], [NSSCFLAGS=-I${STAGING_INCDIR}/nss3], [
- 	    enable_secure=false
- 	    if test "$do_secure" = "yes"
- 	    then
-@@ -3826,8 +3826,8 @@ then
-     ])
-     AC_SUBST(NSSCFLAGS)
- 
--    AC_CHECK_HEADERS([nspr/nspr.h], [NSPRCFLAGS=-I/usr/include/nspr], [
--	AC_CHECK_HEADERS([nspr4/nspr.h], [NSPRCFLAGS=-I/usr/include/nspr4], [
-+    AC_CHECK_HEADERS([nspr/nspr.h], [NSPRCFLAGS=-I${STAGING_INCDIR}/nspr], [
-+	AC_CHECK_HEADERS([nspr4/nspr.h], [NSPRCFLAGS=-I${STAGING_INCDIR}/nspr4], [
- 	    enable_secure=false
- 	    if test "$do_secure" = "yes"
- 	    then
-@@ -3837,7 +3837,7 @@ then
-     ])
-     AC_SUBST(NSPRCFLAGS)
- 
--    AC_CHECK_HEADERS([sasl/sasl.h], [SASLCFLAGS=-I/usr/include/sasl], [
-+    AC_CHECK_HEADERS([sasl/sasl.h], [SASLCFLAGS=-I${STAGING_INCDIR}/sasl], [
- 	enable_secure=false
- 	if test "$do_secure" = "yes"
- 	then
-@@ -3938,7 +3938,7 @@ AC_SUBST(enable_decompression)
+@@ -3699,7 +3699,7 @@ AC_SUBST(enable_decompression)
  AC_SUBST(enable_lzma)
  
  dnl check for array sessions
@@ -83,6 +43,3 @@ index 5d24714..4e2d8ec 100644
  then
      pcp_mpi_dirs=libpcp_mpi\ libpcp_mpiread
  else
--- 
-2.35.1
-

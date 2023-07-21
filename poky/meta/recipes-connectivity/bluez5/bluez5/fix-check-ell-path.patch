@@ -1,0 +1,39 @@
+Upstream-Status: Submitted [https://marc.info/?l=linux-bluetooth&m=168818474411163&w=2]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+From linux-bluetooth  Sat Jul 01 04:12:52 2023
+From: Rudi Heitbaum <rudi () heitbaum ! com>
+Date: Sat, 01 Jul 2023 04:12:52 +0000
+To: linux-bluetooth
+Subject: [PATCH] configure: Fix check ell path for cross compiling
+Message-Id: <20230701041252.139338-1-rudi () heitbaum ! com>
+X-MARC-Message: https://marc.info/?l=linux-bluetooth&m=168818474411163
+
+Use of AC_CHECK_FILE prevents cross compilation.
+Instead use test to support cross compiling.
+
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+---
+ configure.ac | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index eff297960..bc7edfcd3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -298,9 +298,10 @@ if (test "${enable_external_ell}" = "yes"); then
+ 	AC_SUBST(ELL_LIBS)
+ fi
+ if (test "${enable_external_ell}" != "yes"); then
+-	AC_CHECK_FILE(${srcdir}/ell/ell.h, dummy=yes,
+-			AC_CHECK_FILE(${srcdir}/../ell/ell/ell.h, dummy=yes,
+-				AC_MSG_ERROR(ELL source is required or use --enable-external-ell)))
++	if (test ! -f ${srcdir}/ell/ell.h) &&
++			(test ! -f ${srcdir}/../ell/ell/ell.h); then
++				AC_MSG_ERROR(ELL source is required or use --enable-external-ell)
++	fi
+ fi
+ AM_CONDITIONAL(EXTERNAL_ELL, test "${enable_external_ell}" = "yes" ||
+ 				(test "${enable_btpclient}" != "yes" &&
+-- 
+2.34.1

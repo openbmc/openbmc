@@ -1,0 +1,28 @@
+From cd65e3d9256a4f6eb7906a9f10678c29a4ffef2f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 26 Jun 2023 14:30:02 +0200
+Subject: [PATCH] Source/JavaScriptCore/CMakeLists.txt: ensure reproducibility
+ of __TIMESTAMP__
+
+__TIMESTAMP__ refers to mtime of the file that contains it, which is unstable
+and breaks binary reproducibility when the file is generated at build time. To ensure
+this does not happen, mtime should be set from the original file.
+
+Upstream-Status: Submitted [https://github.com/WebKit/WebKit/pull/15293]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Source/JavaScriptCore/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/JavaScriptCore/CMakeLists.txt b/Source/JavaScriptCore/CMakeLists.txt
+index 43dc22ff..c2e3b1cd 100644
+--- a/Source/JavaScriptCore/CMakeLists.txt
++++ b/Source/JavaScriptCore/CMakeLists.txt
+@@ -159,6 +159,7 @@ add_custom_command(
+     OUTPUT ${JavaScriptCore_DERIVED_SOURCES_DIR}/JSCBytecodeCacheVersion.cpp
+     MAIN_DEPENDENCY ${JAVASCRIPTCORE_DIR}/runtime/JSCBytecodeCacheVersion.cpp.in
+     COMMAND ${PERL_EXECUTABLE} -pe s/CACHED_TYPES_CKSUM/__TIMESTAMP__/ ${JAVASCRIPTCORE_DIR}/runtime/JSCBytecodeCacheVersion.cpp.in > ${JavaScriptCore_DERIVED_SOURCES_DIR}/JSCBytecodeCacheVersion.cpp
++    COMMAND touch -r ${JAVASCRIPTCORE_DIR}/runtime/JSCBytecodeCacheVersion.cpp.in ${JavaScriptCore_DERIVED_SOURCES_DIR}/JSCBytecodeCacheVersion.cpp
+             VERBATIM
+ )
+ 

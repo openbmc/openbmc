@@ -30,7 +30,7 @@ if [ $EUID -ne 0 ]; then
 fi
 
 if [ $# -eq 2 ]; then
-	echo "Warning: uid parameter is ignored. It is no longer needed."
+	echo "Warning: uid parameter is ignored. It is no longer needed." >&2
 	GROUP="$2"
 elif [ $# -eq 1 ]; then
 	GROUP="$1"

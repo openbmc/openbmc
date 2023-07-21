@@ -32,6 +32,12 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-tests-fix-raid0-tests-for-0.90-metadata.patch \
            file://0001-tests-00readonly-Run-udevadm-settle-before-setting-r.patch \
            file://0001-tests-04update-metadata-avoid-passing-chunk-size-to.patch \
+           file://0001-DDF-Cleanup-validate_geometry_ddf_container.patch \
+           file://0002-DDF-Fix-NULL-pointer-dereference-in-validate_geometr.patch \
+           file://0003-mdadm-Grow-Fix-use-after-close-bug-by-closing-after-.patch \
+           file://0004-monitor-Avoid-segfault-when-calling-NULL-get_bad_blo.patch \
+           file://0005-mdadm-test-Mark-and-ignore-broken-test-failures.patch \
+           file://0006-tests-Add-broken-files-for-all-broken-tests.patch \
            "
 
 SRC_URI[sha256sum] = "461c215670864bb74a4d1a3620684aa2b2f8296dffa06743f26dda5557acf01d"
@@ -101,10 +107,9 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN} += "bash"
-RDEPENDS:${PN}-ptest += "bash e2fsprogs-mke2fs"
+RDEPENDS:${PN}-ptest += "bash e2fsprogs-mke2fs util-linux-lsblk util-linux-losetup strace"
 RRECOMMENDS:${PN}-ptest += " \
     coreutils \
-    util-linux \
     kernel-module-loop \
     kernel-module-linear \
     kernel-module-raid0 \

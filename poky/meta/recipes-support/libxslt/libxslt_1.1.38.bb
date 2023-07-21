@@ -19,9 +19,7 @@ SRC_URI[sha256sum] = "1f32450425819a09acaff2ab7a5a7f8a2ec7956e505d7beeb45e843d0e
 
 UPSTREAM_CHECK_REGEX = "libxslt-(?P<pver>\d+(\.\d+)+)\.tar"
 
-# We have libxml2 2.9.14 and we don't link statically with it anyway
-# so this isn't an issue.
-CVE_CHECK_IGNORE += "CVE-2022-29824"
+CVE_STATUS[CVE-2022-29824] = "not-applicable-config: Static linking to libxml2 is not enabled."
 
 S = "${WORKDIR}/libxslt-${PV}"
 

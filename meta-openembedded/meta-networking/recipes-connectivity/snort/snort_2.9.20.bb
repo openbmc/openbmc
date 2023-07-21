@@ -8,6 +8,8 @@ DEPENDS = "xz libpcap libpcre daq libdnet util-linux daq-native libtirpc bison-n
 
 SRC_URI = "https://www.snort.org/downloads/archive/snort/${BP}.tar.gz \
     file://snort.init \
+    file://snort.service \
+    file://snort.default \
     file://volatiles.99_snort \
     file://0001-libpcap-search-sysroot-for-headers.patch \
     file://fix-host-contamination-when-enable-static-daq.patch \
@@ -19,10 +21,14 @@ SRC_URI[sha256sum] = "29400e13f53b1831e0b8b10ec1224a1cbaa6dc1533a5322a20dd80bb84
 UPSTREAM_CHECK_URI = "https://www.snort.org/downloads"
 UPSTREAM_CHECK_REGEX = "snort-(?P<pver>\d+(\.\d+)+)\.tar"
 
-inherit autotools gettext update-rc.d pkgconfig
+inherit autotools gettext update-rc.d pkgconfig systemd
 
 INITSCRIPT_NAME = "snort"
 INITSCRIPT_PARAMS = "defaults"
+
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "snort.service"
+SYSTEMD_AUTO_ENABLE = "disable"
 
 EXTRA_OECONF = " \
     --enable-gre \
@@ -69,8 +75,17 @@ do_install:append() {
            ${D}${sysconfdir}/snort/snort.conf
 
     cp ${S}/preproc_rules/*.rules ${D}${sysconfdir}/snort/preproc_rules/
-    install -m 755 ${WORKDIR}/snort.init ${D}${sysconfdir}/init.d/snort
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+        install -m 755 ${WORKDIR}/snort.init ${D}${sysconfdir}/init.d/snort
+    fi
 
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}/${systemd_system_unitdir}
+        install -m 644 ${WORKDIR}/snort.service ${D}/${systemd_system_unitdir}
+        # Install default environment file
+        install -d ${D}/${sysconfdir}/default
+        install -m 0644 ${WORKDIR}/snort.default ${D}${sysconfdir}/default/snort
+    fi
     install -d ${D}${sysconfdir}/default/volatiles
     install -m 0644 ${WORKDIR}/volatiles.99_snort ${D}${sysconfdir}/default/volatiles/99_snort
 
@@ -87,6 +102,7 @@ FILES:${PN} += " \
     ${libdir}/snort_dynamicengine/*.so.* \
     ${libdir}/snort_dynamicpreprocessor/*.so.* \
     ${libdir}/snort_dynamicrules/*.so.* \
+    ${systemd_system_unitdir}/snort.service \
 "
 FILES:${PN}-dbg += " \
     ${libdir}/snort_dynamicengine/.debug \

@@ -2,7 +2,7 @@
 
 ptestdir=$(dirname "$(readlink -f "$0")")
 cd tests
-for test in simple mansyntax.sh ssh2.sh
+for test in mansyntax.sh test_simple test_sshd.test
 do
 	./../test-driver --test-name $test --log-file ../$test.log --trs-file ../$test.trs --color-tests no --enable-hard-errors yes --expect-failure no -- ./$test
 done

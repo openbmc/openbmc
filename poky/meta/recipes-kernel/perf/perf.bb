@@ -383,7 +383,7 @@ PACKAGESPLITFUNCS =+ "perf_fix_sources"
 
 perf_fix_sources () {
 	for f in util/parse-events-flex.h util/parse-events-flex.c util/pmu-flex.c \
-			util/expr-flex.h util/expr-flex.c; do
+			util/pmu-flex.h util/expr-flex.h util/expr-flex.c; do
 		f=${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/$f
 		if [ -e $f ]; then
 			sed -i -e 's#${S}/##g' $f

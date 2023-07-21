@@ -11,30 +11,15 @@ SRCREV = "adf2c4490e17a1b9ec1902cc412a24b3b8235c8e"
 EXTRA_OEMAKE = "DESTDIR=${D}"
 
 PACKAGECONFIG ??= "drm"
-PACKAGECONFIG[drm] = ",,libdrm"
-PACKAGECONFIG[fbdev] = ",,"
-PACKAGECONFIG[sdl] = ",,virtual/libsdl2"
-LVGL_CONFIG_USE_DRM = "${@bb.utils.contains('PACKAGECONFIG', 'drm', '1', '0', d)}"
-LVGL_CONFIG_DRM_CARD ?= "/dev/dri/card0"
-LVGL_CONFIG_USE_FBDEV = "${@bb.utils.contains('PACKAGECONFIG', 'fbdev', '1', '0', d)}"
-LVGL_CONFIG_USE_SDL = "${@bb.utils.contains('PACKAGECONFIG', 'sdl', '1', '0', d)}"
+require lv-drivers.inc
 
 inherit cmake
 
 S = "${WORKDIR}/git"
 
-EXTRA_OECMAKE += "-Dinstall:BOOL=ON -DLIB_INSTALL_DIR=${baselib}"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/libdrm"
 
 do_configure:prepend() {
-	sed -i -e "s|\(^#  define USE_FBDEV \).*|#  define USE_FBDEV ${LVGL_CONFIG_USE_FBDEV}|g" \
-		-e "s|\(^#  define USE_DRM \).*|#  define USE_DRM ${LVGL_CONFIG_USE_DRM}|g" \
-		-e "s|\(^#  define DRM_CARD \).*|#  define DRM_CARD \"${LVGL_CONFIG_DRM_CARD}\"|g" \
-		-e "s|\(^# define USE_SDL \).*|#  define USE_SDL ${LVGL_CONFIG_USE_SDL}|g" \
-		-e "s|\(^#  define USE_SDL_GPU \).*|#  define USE_SDL_GPU 1|g" \
-		-e "s|\(^#  define SDL_DOUBLE_BUFFERED \).*|#  define SDL_DOUBLE_BUFFERED 1|g" \
-	"${S}/lv_drv_conf.h"
-
 	if [ "${LVGL_CONFIG_USE_DRM}" -eq 1 ] ; then
 		# Add libdrm build dependency
 		sed -i '/^target_link_libraries/ s@lvgl::drivers@& drm@' "${S}/CMakeLists.txt"

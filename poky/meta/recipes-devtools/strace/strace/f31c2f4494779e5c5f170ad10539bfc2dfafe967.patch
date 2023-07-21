@@ -1,0 +1,50 @@
+From f31c2f4494779e5c5f170ad10539bfc2dfafe967 Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@strace.io>
+Date: Sat, 24 Jun 2023 08:00:00 +0000
+Subject: [PATCH] tests: update sockopt-sol_netlink test
+
+Update sockopt-sol_netlink test that started to fail, likely
+due to recent linux kernel commit f4e4534850a9 ("net/netlink: fix
+NETLINK_LIST_MEMBERSHIPS length report").
+
+* tests/sockopt-sol_netlink.c (main): Always print changing optlen value
+on exiting syscall.
+
+Reported-by: Alexander Gordeev <agordeev@linux.ibm.com>
+---
+ tests/sockopt-sol_netlink.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+Upstream-Status: Backport
+
+diff --git a/tests/sockopt-sol_netlink.c b/tests/sockopt-sol_netlink.c
+index 82b98adc23..1c33219ac5 100644
+--- a/tests/sockopt-sol_netlink.c
++++ b/tests/sockopt-sol_netlink.c
+@@ -94,7 +94,10 @@ main(void)
+ 			printf("%p", val);
+ 		else
+ 			printf("[%d]", *val);
+-		printf(", [%d]) = %s\n", *len, errstr);
++		printf(", [%d", (int) sizeof(*val));
++		if ((int) sizeof(*val) != *len)
++			printf(" => %d", *len);
++		printf("]) = %s\n", errstr);
+ 
+ 		/* optlen larger than necessary - shortened */
+ 		*len = sizeof(*val) + 1;
+@@ -150,8 +153,12 @@ main(void)
+ 		/* optval EFAULT - print address */
+ 		*len = sizeof(*val);
+ 		get_sockopt(fd, names[i].val, efault, len);
+-		printf("getsockopt(%d, SOL_NETLINK, %s, %p, [%d]) = %s\n",
+-		       fd, names[i].str, efault, *len, errstr);
++		printf("getsockopt(%d, SOL_NETLINK, %s, %p",
++		       fd, names[i].str, efault);
++		printf(", [%d", (int) sizeof(*val));
++		if ((int) sizeof(*val) != *len)
++			printf(" => %d", *len);
++		printf("]) = %s\n", errstr);
+ 
+ 		/* optlen EFAULT - print address */
+ 		get_sockopt(fd, names[i].val, val, len + 1);

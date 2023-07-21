@@ -1,0 +1,91 @@
+From 289105253fbf342fd22cbcde2ccc1127f732ab09 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Jul 2023 14:21:17 -0700
+Subject: [PATCH] Replace LFS functions
+
+The original functions are able to consume 64bit off_t now a days
+therefore *64 equivalents can be replaced, as a side it fixes build with
+musl.
+
+Upstream-Status: Submitted [https://github.com/jthornber/thin-provisioning-tools/pull/267]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/file_utils.rs     | 10 +++++-----
+ src/io_engine/base.rs |  4 ++--
+ src/thin/trim.rs      |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/file_utils.rs b/src/file_utils.rs
+index 0ca3c0f..d2b3ee9 100644
+--- a/src/file_utils.rs
++++ b/src/file_utils.rs
+@@ -11,18 +11,18 @@ fn test_bit(mode: u32, flag: u32) -> bool {
+     (mode & libc::S_IFMT) == flag
+ }
+ 
+-fn is_file_or_blk_(info: &libc::stat64) -> bool {
++fn is_file_or_blk_(info: &libc::stat) -> bool {
+     test_bit(info.st_mode, libc::S_IFBLK) || test_bit(info.st_mode, libc::S_IFREG)
+ }
+ 
+ // wrapper of libc::stat64
+-fn libc_stat64(path: &Path) -> io::Result<libc::stat64> {
++fn libc_stat64(path: &Path) -> io::Result<libc::stat> {
+     let c_path = std::ffi::CString::new(path.as_os_str().as_bytes())
+         .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e.to_string()))?;
+ 
+     unsafe {
+-        let mut st: libc::stat64 = std::mem::zeroed();
+-        let r = libc::stat64(c_path.as_ptr(), &mut st);
++        let mut st: libc::stat = std::mem::zeroed();
++        let r = libc::stat(c_path.as_ptr(), &mut st);
+         if r == 0 {
+             Ok(st)
+         } else {
+@@ -56,7 +56,7 @@ fn get_device_size<P: AsRef<Path>>(path: P) -> io::Result<u64> {
+     let fd = file.as_raw_fd();
+     let mut cap = 0u64;
+     unsafe {
+-        if libc::ioctl(fd, BLKGETSIZE64 as libc::c_ulong, &mut cap) == 0 {
++        if libc::ioctl(fd, BLKGETSIZE64 as libc::c_int, &mut cap) == 0 {
+             Ok(cap)
+         } else {
+             Err(io::Error::last_os_error())
+diff --git a/src/io_engine/base.rs b/src/io_engine/base.rs
+index 725ebf7..db6209f 100644
+--- a/src/io_engine/base.rs
++++ b/src/io_engine/base.rs
+@@ -115,7 +115,7 @@ pub trait VectoredIo {
+ 
+ fn read_vectored_at(file: &File, bufs: &mut [libc::iovec], pos: u64) -> io::Result<usize> {
+     let ptr = bufs.as_ptr();
+-    let ret = match unsafe { libc::preadv64(file.as_raw_fd(), ptr, bufs.len() as i32, pos as i64) }
++    let ret = match unsafe { libc::preadv(file.as_raw_fd(), ptr, bufs.len() as i32, pos as i64) }
+     {
+         -1 => return Err(io::Error::last_os_error()),
+         n => n,
+@@ -125,7 +125,7 @@ fn read_vectored_at(file: &File, bufs: &mut [libc::iovec], pos: u64) -> io::Resu
+ 
+ fn write_vectored_at(file: &File, bufs: &[libc::iovec], pos: u64) -> io::Result<usize> {
+     let ptr = bufs.as_ptr();
+-    let ret = match unsafe { libc::pwritev64(file.as_raw_fd(), ptr, bufs.len() as i32, pos as i64) }
++    let ret = match unsafe { libc::pwritev(file.as_raw_fd(), ptr, bufs.len() as i32, pos as i64) }
+     {
+         -1 => return Err(io::Error::last_os_error()),
+         n => n,
+diff --git a/src/thin/trim.rs b/src/thin/trim.rs
+index 3d938ca..91a53dd 100644
+--- a/src/thin/trim.rs
++++ b/src/thin/trim.rs
+@@ -135,7 +135,7 @@ impl<'a> Iterator for RangeIterator<'a> {
+ const BLKDISCARD: u32 = 0x1277;
+ fn ioctl_blkdiscard(fd: i32, range: &[u64; 2]) -> std::io::Result<()> {
+     unsafe {
+-        if libc::ioctl(fd, BLKDISCARD as libc::c_ulong, range) == 0 {
++        if libc::ioctl(fd, BLKDISCARD as libc::c_int, range) == 0 {
+             Ok(())
+         } else {
+             Err(std::io::Error::last_os_error())
+-- 
+2.41.0
+

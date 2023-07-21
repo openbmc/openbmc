@@ -480,14 +480,14 @@ python () {
                     if subimage not in subimages:
                         subimages.append(subimage)
                     if type not in alltypes:
-                        rm_tmp_images.add(localdata.expand("${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"))
+                        rm_tmp_images.add(localdata.expand("${IMAGE_NAME}.${type}"))
 
         for bt in basetypes[t]:
             gen_conversion_cmds(bt)
 
         localdata.setVar('type', realt)
         if t not in alltypes:
-            rm_tmp_images.add(localdata.expand("${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"))
+            rm_tmp_images.add(localdata.expand("${IMAGE_NAME}.${type}"))
         else:
             subimages.append(realt)
 
@@ -594,13 +594,12 @@ python create_symlinks() {
     manifest_name = d.getVar('IMAGE_MANIFEST')
     taskname = d.getVar("BB_CURRENTTASK")
     subimages = (d.getVarFlag("do_" + taskname, 'subimages', False) or "").split()
-    imgsuffix = d.getVarFlag("do_" + taskname, 'imgsuffix') or d.expand("${IMAGE_NAME_SUFFIX}.")
 
     if not link_name:
         return
     for type in subimages:
         dst = os.path.join(deploy_dir, link_name + "." + type)
-        src = img_name + imgsuffix + type
+        src = img_name + "." + type
         if os.path.exists(os.path.join(deploy_dir, src)):
             bb.note("Creating symlink: %s -> %s" % (dst, src))
             if os.path.islink(dst):

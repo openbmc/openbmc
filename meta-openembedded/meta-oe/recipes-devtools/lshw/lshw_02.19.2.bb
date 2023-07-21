@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64|riscv64).*-linux"
 
 PV .= "+git${SRCPV}"
-SRCREV = "42fef565731411a784101de614a54bff79d1858e"
+SRCREV = "b4e067307906ec6f277cce5c8a882f5edd03cbbc"
 SRC_URI = " \
     git://github.com/lyonel/lshw.git;protocol=https;branch=master \
     file://0001-disable-docbook2man.patch \

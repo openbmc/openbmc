@@ -28,11 +28,13 @@ DEPENDS = " \
     json-glib \
     libarchive \
     libcap \
+    libxml2 \
     libxslt-native \
     ostree \
     polkit \
     python3-pyparsing-native \
     xmlto-native \
+    zstd \
 "
 
 RDEPENDS:${PN} = " \
@@ -40,17 +42,20 @@ RDEPENDS:${PN} = " \
     ca-certificates \
     dconf \
     flatpak-xdg-utils \
+    xdg-dbus-proxy \
 "
+
+EXTRA_OEMESON += "-Dsystem_dbus_proxy=${bindir}/xdg-dbus-proxy -Dsystem_bubblewrap=${bindir}/bwrap"
 
 GIR_MESON_OPTION = ""
 
-PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false,xauth"
+PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false,xauth socat-native"
 PACKAGECONFIG[xauth] = "-Dxauth=enabled,-Dxauth=disabled,xauth"
 PACKAGECONFIG[seccomp] = "-Dseccomp=enabled,-Dseccomp=disabled,libseccomp"
 
 PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xauth', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'security', 'seccomp', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'seccomp', 'seccomp', '', d)} \
 "
 
 FILES:${PN} += "${libdir} ${datadir}"

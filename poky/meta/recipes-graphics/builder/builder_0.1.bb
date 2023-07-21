@@ -29,5 +29,4 @@ do_install () {
 	chown  builder.builder ${D}${sysconfdir}/mini_x/session.d/builder_session.sh
 }
 
-# -4178 is an unrelated 'builder'
-CVE_CHECK_IGNORE = "CVE-2008-4178"
+CVE_STATUS[CVE-2008-4178] = "cpe-incorrect: This CVE is for an unrelated builder"

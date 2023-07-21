@@ -25,6 +25,8 @@ PACKAGECONFIG[krb5] = "--with-krb5=yes,--with-krb5=no,krb5"
 PACKAGECONFIG[telepathy] = "--enable-telepathy=yes,--enable-telepathy=no,telepathy-glib"
 #PACKAGECONFIG[gssapi_only] = "--enable-gssapi-only=yes,--enable-gssapi-only=no,krb5"
 PACKAGECONFIG[debug] = "--enable-debug=yes,--enable-debug=no,valgrind"
+# disable Werror by default, useful for dev mode
+PACKAGECONFIG[quality] = "--enable-quality-check=yes,--enable-quality-check=no,"
 
 FILES:${PN}-dev += " \
     ${libdir}/purple-2/*.la \

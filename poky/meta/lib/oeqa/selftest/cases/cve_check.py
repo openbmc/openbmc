@@ -207,18 +207,34 @@ CVE_CHECK_REPORT_PATCHED = "1"
             self.assertEqual(len(report["package"]), 1)
             package = report["package"][0]
             self.assertEqual(package["name"], "logrotate")
-            found_cves = { issue["id"]: issue["status"] for issue in package["issue"]}
+            found_cves = {}
+            for issue in package["issue"]:
+                found_cves[issue["id"]] = {
+                    "status" : issue["status"],
+                    "detail" : issue["detail"] if "detail" in issue else "",
+                    "description" : issue["description"] if "description" in issue else ""
+                }
             # m4 CVE should not be in logrotate
             self.assertNotIn("CVE-2008-1687", found_cves)
             # logrotate has both Patched and Ignored CVEs
             self.assertIn("CVE-2011-1098", found_cves)
-            self.assertEqual(found_cves["CVE-2011-1098"], "Patched")
+            self.assertEqual(found_cves["CVE-2011-1098"]["status"], "Patched")
+            self.assertEqual(len(found_cves["CVE-2011-1098"]["detail"]), 0)
+            self.assertEqual(len(found_cves["CVE-2011-1098"]["description"]), 0)
+            detail = "not-applicable-platform"
+            description = "CVE is debian, gentoo or SUSE specific on the way logrotate was installed/used"
             self.assertIn("CVE-2011-1548", found_cves)
-            self.assertEqual(found_cves["CVE-2011-1548"], "Ignored")
+            self.assertEqual(found_cves["CVE-2011-1548"]["status"], "Ignored")
+            self.assertEqual(found_cves["CVE-2011-1548"]["detail"], detail)
+            self.assertEqual(found_cves["CVE-2011-1548"]["description"], description)
             self.assertIn("CVE-2011-1549", found_cves)
-            self.assertEqual(found_cves["CVE-2011-1549"], "Ignored")
+            self.assertEqual(found_cves["CVE-2011-1549"]["status"], "Ignored")
+            self.assertEqual(found_cves["CVE-2011-1549"]["detail"], detail)
+            self.assertEqual(found_cves["CVE-2011-1549"]["description"], description)
             self.assertIn("CVE-2011-1550", found_cves)
-            self.assertEqual(found_cves["CVE-2011-1550"], "Ignored")
+            self.assertEqual(found_cves["CVE-2011-1550"]["status"], "Ignored")
+            self.assertEqual(found_cves["CVE-2011-1550"]["detail"], detail)
+            self.assertEqual(found_cves["CVE-2011-1550"]["description"], description)
 
         self.assertExists(summary_json)
         check_m4_json(summary_json)

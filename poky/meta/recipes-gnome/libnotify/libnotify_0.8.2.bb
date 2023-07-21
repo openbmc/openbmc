@@ -33,4 +33,4 @@ RCONFLICTS:${PN} += "libnotify3"
 RREPLACES:${PN} += "libnotify3"
 
 # -7381 is specific to the NodeJS bindings
-CVE_CHECK_IGNORE += "CVE-2013-7381"
+CVE_STATUS[CVE-2013-7381] = "cpe-incorrect: The issue is specific to the NodeJS bindings"

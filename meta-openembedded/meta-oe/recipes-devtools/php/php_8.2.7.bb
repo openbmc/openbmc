@@ -42,7 +42,7 @@ CVE_CHECK_IGNORE += "\
     CVE-2007-4596 \
 "
 
-inherit autotools pkgconfig python3native gettext
+inherit autotools pkgconfig python3native gettext multilib_header multilib_script
 
 # phpize is not scanned for absolute paths by default (but php-config is).
 #
@@ -208,6 +208,14 @@ do_install:append:class-target() {
             > ${D}${sysconfdir}/php/apache2-php${PHP_MAJOR_VERSION}/php.ini
         rm -f ${D}${sysconfdir}/apache2/httpd.conf*
     fi
+}
+
+MULTILIB_SCRIPTS += "${PN}:${bindir}/php-config \
+                     ${PN}:${bindir}/phpize \
+"
+
+do_install:append () {
+        oe_multilib_header php/main/build-defs.h php/main/php_config.h
 }
 
 SYSROOT_PREPROCESS_FUNCS += "php_sysroot_preprocess"

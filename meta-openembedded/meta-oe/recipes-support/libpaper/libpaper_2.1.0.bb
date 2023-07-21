@@ -6,6 +6,4 @@ SRC_URI[sha256sum] = "474e9575e1235a0d8e3661f072de0193bab6ea1023363772f698a2cc39
 
 inherit perlnative autotools
 
-EXTRA_AUTORECONF += "--install"
-
 BBCLASSEXTEND = "native"

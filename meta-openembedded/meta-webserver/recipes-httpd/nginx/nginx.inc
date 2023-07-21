@@ -45,6 +45,7 @@ PACKAGECONFIG[ssl] = "--with-http_ssl_module,,openssl"
 PACKAGECONFIG[http-auth-request] = "--with-http_auth_request_module,,"
 PACKAGECONFIG[ipv6] = "--with-ipv6,,"
 PACKAGECONFIG[webdav] = "--with-http_dav_module,,"
+PACKAGECONFIG[stream] = "--with-stream,,"
 
 do_configure () {
     if [ "${SITEINFO_BITS}" = "64" ]; then

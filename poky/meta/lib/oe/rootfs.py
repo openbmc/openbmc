@@ -106,7 +106,7 @@ class Rootfs(object, metaclass=ABCMeta):
     def _cleanup(self):
         pass
 
-    def _setup_dbg_rootfs(self, dirs):
+    def _setup_dbg_rootfs(self, package_paths):
         gen_debugfs = self.d.getVar('IMAGE_GEN_DEBUGFS') or '0'
         if gen_debugfs != '1':
            return
@@ -122,11 +122,12 @@ class Rootfs(object, metaclass=ABCMeta):
         bb.utils.mkdirhier(self.image_rootfs)
 
         bb.note("  Copying back package database...")
-        for dir in dirs:
-            if not os.path.isdir(self.image_rootfs + '-orig' + dir):
-                continue
-            bb.utils.mkdirhier(self.image_rootfs + os.path.dirname(dir))
-            shutil.copytree(self.image_rootfs + '-orig' + dir, self.image_rootfs + dir, symlinks=True)
+        for path in package_paths:
+            bb.utils.mkdirhier(self.image_rootfs + os.path.dirname(path))
+            if os.path.isdir(self.image_rootfs + '-orig' + path):
+                shutil.copytree(self.image_rootfs + '-orig' + path, self.image_rootfs + path, symlinks=True)
+            elif os.path.isfile(self.image_rootfs + '-orig' + path):
+                shutil.copyfile(self.image_rootfs + '-orig' + path, self.image_rootfs + path)
 
         # Copy files located in /usr/lib/debug or /usr/src/debug
         for dir in ["/usr/lib/debug", "/usr/src/debug"]:
@@ -161,6 +162,13 @@ class Rootfs(object, metaclass=ABCMeta):
         if extra_debug_pkgs:
             bb.note("  Install extra debug packages...")
             self.pm.install(extra_debug_pkgs.split(), True)
+
+        bb.note("  Removing package database...")
+        for path in package_paths:
+            if os.path.isdir(self.image_rootfs + path):
+                shutil.rmtree(self.image_rootfs + path)
+            elif os.path.isfile(self.image_rootfs + path):
+                os.remove(self.image_rootfs + path)
 
         bb.note("  Rename debug rootfs...")
         try:

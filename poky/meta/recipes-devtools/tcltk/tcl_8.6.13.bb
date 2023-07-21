@@ -29,10 +29,6 @@ SRC_URI[sha256sum] = "c61f0d6699e2bc7691f119b41963aaa8dc980f23532c4e937739832a5f
 
 SRC_URI:class-native = "${BASE_SRC_URI}"
 
-# Upstream don't believe this is an exploitable issue
-# https://core.tcl-lang.org/tcl/info/7079e4f91601e9c7
-CVE_CHECK_IGNORE += "CVE-2021-35331"
-
 UPSTREAM_CHECK_URI = "https://www.tcl.tk/software/tcltk/download.html"
 UPSTREAM_CHECK_REGEX = "tcl(?P<pver>\d+(\.\d+)+)-src"
 

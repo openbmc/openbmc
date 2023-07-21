@@ -29,11 +29,9 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  src/python/grpcio/commands.py |  5 ++++-
  2 files changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/setup.py b/setup.py
-index 3a50c97..bb2386d 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -205,8 +205,11 @@ def check_linker_need_libatomic():
+@@ -206,8 +206,11 @@ def check_linker_need_libatomic():
      """Test if linker on system needs libatomic."""
      code_test = (b'#include <atomic>\n' +
                   b'int main() { return std::atomic<int64_t>{}; }')
@@ -47,7 +45,7 @@ index 3a50c97..bb2386d 100644
                                  stdin=PIPE,
                                  stdout=PIPE,
                                  stderr=PIPE)
-@@ -215,8 +218,8 @@ def check_linker_need_libatomic():
+@@ -216,8 +219,8 @@ def check_linker_need_libatomic():
          return False
      # Double-check to see if -latomic actually can solve the problem.
      # https://github.com/grpc/grpc/issues/22491
@@ -58,15 +56,14 @@ index 3a50c97..bb2386d 100644
                                  stdin=PIPE,
                                  stdout=PIPE,
                                  stderr=PIPE)
-diff --git a/src/python/grpcio/commands.py b/src/python/grpcio/commands.py
-index d93b6c7..a8c4a51 100644
 --- a/src/python/grpcio/commands.py
 +++ b/src/python/grpcio/commands.py
-@@ -228,7 +228,10 @@ class BuildExt(build_ext.build_ext):
+@@ -228,8 +228,10 @@ class BuildExt(build_ext.build_ext):
              """
              try:
                  # TODO(lidiz) Remove the generated a.out for success tests.
--                cc_test = subprocess.Popen(['cc', '-x', 'c', '-std=c++14', '-'],
+-                cc = os.environ.get('CC', 'cc')
+-                cc_test = subprocess.Popen([cc, '-x', 'c', '-std=c++14', '-'],
 +                cc_test, cc_args = os.environ.get('CC').split(' ', 1) or 'gcc'
 +                if not cc_args:
 +                    cc_args = "-g"
@@ -74,6 +71,3 @@ index d93b6c7..a8c4a51 100644
                                             stdin=subprocess.PIPE,
                                             stdout=subprocess.PIPE,
                                             stderr=subprocess.PIPE)
--- 
-2.25.1
-

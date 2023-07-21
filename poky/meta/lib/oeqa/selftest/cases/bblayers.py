@@ -85,8 +85,9 @@ class BitbakeLayers(OESelftestTestCase):
         result = runCmd('bitbake-layers show-recipes -i image')
         self.assertIn('core-image-minimal', result.output)
         self.assertNotIn('mtd-utils:', result.output)
-        result = runCmd('bitbake-layers show-recipes -i cmake,pkgconfig')
+        result = runCmd('bitbake-layers show-recipes -i meson,pkgconfig')
         self.assertIn('libproxy:', result.output)
+        result = runCmd('bitbake-layers show-recipes -i cmake,pkgconfig')
         self.assertNotIn('mtd-utils:', result.output) # doesn't inherit either
         self.assertNotIn('wget:', result.output) # doesn't inherit cmake
         self.assertNotIn('waffle:', result.output) # doesn't inherit pkgconfig

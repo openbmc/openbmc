@@ -1,7 +1,7 @@
-From 19d4c7f9812062a683b3ba60b35aac0461190456 Mon Sep 17 00:00:00 2001
+From 7675a67b8bb207de38ff5a9dc416e8b1028eb8ce Mon Sep 17 00:00:00 2001
 From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
 Date: Fri, 26 Jul 2019 17:34:26 -0400
-Subject: [PATCH 2/6] BaseTools: makefile: adjust to build in under bitbake
+Subject: [PATCH 2/4] BaseTools: makefile: adjust to build in under bitbake
 
 Prepend the build flags with those of bitbake. This is to build
 using the bitbake native sysroot include and library directories.
@@ -14,58 +14,56 @@ to fight against how upstream wants to configure the build.
 Signed-off-by: Ricardo Neri <ricardo.neri@linux.intel.com>
 Upstream-Status: Inappropriate [needs to be converted to in-recipe fixups]
 ---
- BaseTools/Source/C/Makefiles/header.makefile | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ BaseTools/Source/C/Makefiles/header.makefile | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/BaseTools/Source/C/Makefiles/header.makefile b/BaseTools/Source/C/Makefiles/header.makefile
-index 0df728f327..1299d47c87 100644
+index 1bf003523b..28757aed63 100644
 --- a/BaseTools/Source/C/Makefiles/header.makefile
 +++ b/BaseTools/Source/C/Makefiles/header.makefile
-@@ -75,35 +75,36 @@ $(error Bad HOST_ARCH)
+@@ -82,35 +82,34 @@ $(error Bad HOST_ARCH)
  endif
  
  INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE)
--BUILD_CPPFLAGS = $(INCLUDE)
-+BUILD_CPPFLAGS += $(INCLUDE)
+-CPPFLAGS = $(INCLUDE)
++CPPFLAGS += $(INCLUDE)
  
  # keep EXTRA_OPTFLAGS last
  BUILD_OPTFLAGS = -O2 $(EXTRA_OPTFLAGS)
  
  ifeq ($(DARWIN),Darwin)
  # assume clang or clang compatible flags on OS X
--BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
-+BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
+-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
++CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
  -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
  else
- ifeq ($(CXX), llvm)
--BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
-+BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
+ ifneq ($(CLANG),)
+-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
++CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
  -fno-delete-null-pointer-checks -Wall -Werror \
  -Wno-deprecated-declarations -Wno-self-assign \
  -Wno-unused-result -nostdlib -g
  else
--BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
-+BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
+-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
++CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
  -fno-delete-null-pointer-checks -Wall -Werror \
  -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict \
  -Wno-unused-result -nostdlib -g
  endif
  endif
- ifeq ($(CXX), llvm)
--BUILD_LFLAGS =
--BUILD_CXXFLAGS = -Wno-deprecated-register -Wno-unused-result
-+BUILD_LFLAGS = $(LDFLAGS)
-+BUILD_CXXFLAGS += -Wno-deprecated-register -Wno-unused-result
+ ifneq ($(CLANG),)
+-LDFLAGS =
+-CXXFLAGS = -Wno-deprecated-register -Wno-unused-result -std=c++14
++CXXFLAGS += -Wno-deprecated-register -Wno-unused-result -std=c++14
  else
--BUILD_LFLAGS =
--BUILD_CXXFLAGS = -Wno-unused-result
-+BUILD_LFLAGS = $(LDFLAGS)
-+BUILD_CXXFLAGS += -Wno-unused-result
+-LDFLAGS =
+-CXXFLAGS = -Wno-unused-result
++CXXFLAGS += -Wno-unused-result
  endif
 +
  ifeq ($(HOST_ARCH), IA32)
  #
  # Snow Leopard  is a 32-bit and 64-bit environment. uname -m returns i386, but gcc defaults
 -- 
-2.32.0
+2.30.2
 

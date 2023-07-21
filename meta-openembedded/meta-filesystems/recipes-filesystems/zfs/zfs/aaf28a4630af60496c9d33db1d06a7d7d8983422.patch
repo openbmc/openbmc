@@ -54,14 +54,3 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  endif
  
  # Suppress unused-value warnings in sparc64 architecture headers
---- a/META
-+++ b/META
-@@ -1,7 +1,7 @@
- Meta:          1
- Name:          zfs
- Branch:        1.0
--Version:       2.1.99
-+Version:       2.1.11
- Release:       1
- Release-Tags:  relext
- License:       CDDL

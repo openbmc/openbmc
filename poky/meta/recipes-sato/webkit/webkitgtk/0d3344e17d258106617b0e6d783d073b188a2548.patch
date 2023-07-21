@@ -1,8 +1,8 @@
-From 0d3344e17d258106617b0e6d783d073b188a2548 Mon Sep 17 00:00:00 2001
+From 647c93de99a0f71f478d76a4cc7714eba7ba1447 Mon Sep 17 00:00:00 2001
 From: Adrian Perez de Castro <aperez@igalia.com>
 Date: Thu, 2 Jun 2022 11:19:06 +0300
-Subject: [PATCH] [ARM][NEON] FELightningNEON.cpp fails to build, NEON fast
- path seems unused https://bugs.webkit.org/show_bug.cgi?id=241182
+Subject: [PATCH] FELightningNEON.cpp fails to build, NEON fast path seems
+ unused https://bugs.webkit.org/show_bug.cgi?id=241182
 
 Reviewed by NOBODY (OOPS!).
 
@@ -30,19 +30,21 @@ left for a follow-up fix.
 * Source/WebCore/platform/graphics/filters/PointLightSource.h:
 * Source/WebCore/platform/graphics/filters/SpotLightSource.h:
 * Source/WebCore/platform/graphics/filters/software/FELightingSoftwareApplier.h:
----
+
 Upstream-Status: Submitted [https://github.com/WebKit/WebKit/pull/1233]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
+---
  .../cpu/arm/filters/FELightingNEON.cpp        |  4 +-
- .../graphics/cpu/arm/filters/FELightingNEON.h | 54 +++++++++----------
+ .../graphics/cpu/arm/filters/FELightingNEON.h | 52 +++++++++----------
  .../graphics/filters/DistantLightSource.h     |  4 ++
  .../platform/graphics/filters/FELighting.h    |  7 ---
  .../graphics/filters/PointLightSource.h       |  4 ++
  .../graphics/filters/SpotLightSource.h        |  4 ++
  .../software/FELightingSoftwareApplier.h      | 16 ++++++
- 7 files changed, 57 insertions(+), 36 deletions(-)
+ 7 files changed, 56 insertions(+), 35 deletions(-)
 
+diff --git a/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.cpp b/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.cpp
+index f6ff8c20..42a97ffc 100644
 --- a/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.cpp
 +++ b/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.cpp
 @@ -49,7 +49,7 @@ short* feLightingConstantsForNeon()
@@ -63,6 +65,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  {
      // Calling a powf function from the assembly code would require to save
      // and reload a lot of NEON registers. Since the base is in range [0..1]
+diff --git a/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h b/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h
+index b17c603d..e4629cda 100644
 --- a/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h
 +++ b/Source/WebCore/platform/graphics/cpu/arm/filters/FELightingNEON.h
 @@ -24,14 +24,15 @@
@@ -104,7 +108,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
          0,
          0,
          0,
-@@ -111,23 +112,23 @@ inline void FELighting::platformApplyNeo
+@@ -111,23 +112,23 @@ inline void FELighting::platformApplyNeon(const LightingData& data, const LightS
      // Set light source arguments.
      floatArguments.constOne = 1;
  
@@ -133,7 +137,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
          floatArguments.lightX = spotLightSource.position().x();
          floatArguments.lightY = spotLightSource.position().y();
          floatArguments.lightZ = spotLightSource.position().z();
-@@ -145,7 +146,7 @@ inline void FELighting::platformApplyNeo
+@@ -145,7 +146,7 @@ inline void FELighting::platformApplyNeon(const LightingData& data, const LightS
          if (spotLightSource.specularExponent() == 1)
              neonData.flags |= FLAG_CONE_EXPONENT_IS_1;
      } else {
@@ -142,7 +146,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
          floatArguments.lightX = paintingData.initialLightingData.lightVector.x();
          floatArguments.lightY = paintingData.initialLightingData.lightVector.y();
          floatArguments.lightZ = paintingData.initialLightingData.lightVector.z();
-@@ -155,38 +156,39 @@ inline void FELighting::platformApplyNeo
+@@ -155,38 +156,39 @@ inline void FELighting::platformApplyNeon(const LightingData& data, const LightS
      // Set lighting arguments.
      floatArguments.surfaceScale = data.surfaceScale;
      floatArguments.minusSurfaceScaleDividedByFour = -data.surfaceScale / 4;
@@ -192,16 +196,18 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
              }
              parallelJobs.execute();
              return;
-@@ -199,5 +201,3 @@ inline void FELighting::platformApplyNeo
+@@ -199,5 +201,3 @@ inline void FELighting::platformApplyNeon(const LightingData& data, const LightS
  } // namespace WebCore
  
  #endif // CPU(ARM_NEON) && COMPILER(GCC_COMPATIBLE)
 -
 -#endif // FELightingNEON_h
+diff --git a/Source/WebCore/platform/graphics/filters/DistantLightSource.h b/Source/WebCore/platform/graphics/filters/DistantLightSource.h
+index 70c6512f..b032c82e 100644
 --- a/Source/WebCore/platform/graphics/filters/DistantLightSource.h
 +++ b/Source/WebCore/platform/graphics/filters/DistantLightSource.h
-@@ -25,6 +25,10 @@
- #include "LightSource.h"
+@@ -26,6 +26,10 @@
+ #include <wtf/ArgumentCoder.h>
  #include <wtf/Ref.h>
  
 +namespace WTF {
@@ -211,6 +217,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  namespace WebCore {
  
  class DistantLightSource : public LightSource {
+diff --git a/Source/WebCore/platform/graphics/filters/FELighting.h b/Source/WebCore/platform/graphics/filters/FELighting.h
+index 53beb596..e78a9354 100644
 --- a/Source/WebCore/platform/graphics/filters/FELighting.h
 +++ b/Source/WebCore/platform/graphics/filters/FELighting.h
 @@ -35,8 +35,6 @@
@@ -222,7 +230,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  class FELighting : public FilterEffect {
  public:
      const Color& lightingColor() const { return m_lightingColor; }
-@@ -67,11 +65,6 @@ protected:
+@@ -64,11 +62,6 @@ protected:
  
      std::unique_ptr<FilterEffectApplier> createSoftwareApplier() const override;
  
@@ -234,6 +242,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
      Color m_lightingColor;
      float m_surfaceScale;
      float m_diffuseConstant;
+diff --git a/Source/WebCore/platform/graphics/filters/PointLightSource.h b/Source/WebCore/platform/graphics/filters/PointLightSource.h
+index 3a5723f0..675d63f5 100644
 --- a/Source/WebCore/platform/graphics/filters/PointLightSource.h
 +++ b/Source/WebCore/platform/graphics/filters/PointLightSource.h
 @@ -26,6 +26,10 @@
@@ -247,6 +257,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  namespace WebCore {
  
  class PointLightSource : public LightSource {
+diff --git a/Source/WebCore/platform/graphics/filters/SpotLightSource.h b/Source/WebCore/platform/graphics/filters/SpotLightSource.h
+index 684626f7..dea58389 100644
 --- a/Source/WebCore/platform/graphics/filters/SpotLightSource.h
 +++ b/Source/WebCore/platform/graphics/filters/SpotLightSource.h
 @@ -26,6 +26,10 @@
@@ -260,6 +272,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  namespace WebCore {
  
  class SpotLightSource : public LightSource {
+diff --git a/Source/WebCore/platform/graphics/filters/software/FELightingSoftwareApplier.h b/Source/WebCore/platform/graphics/filters/software/FELightingSoftwareApplier.h
+index c974d921..e2896660 100644
 --- a/Source/WebCore/platform/graphics/filters/software/FELightingSoftwareApplier.h
 +++ b/Source/WebCore/platform/graphics/filters/software/FELightingSoftwareApplier.h
 @@ -36,6 +36,7 @@

@@ -45,8 +45,7 @@ it has so many corner cases. The datastore has many tests too. Testing with the 
 recommended before submitting patches, particularly to the fetcher and datastore. We also
 appreciate new test cases and may require them for more obscure issues.
 
-To run the tests "zstd" and "git" must be installed. Git must be correctly configured, in
-particular the user.email and user.name values must be set.
+To run the tests "zstd" and "git" must be installed.
 
 The assumption is made that this testsuite is run from an initialized OpenEmbedded build
 environment (i.e. `source oe-init-build-env` is used). If this is not the case, run the
@@ -54,3 +53,8 @@ testsuite as follows:
 
     export PATH=$(pwd)/bin:$PATH
     bin/bitbake-selftest
+
+The testsuite can alternatively be executed using pytest, e.g. obtained from PyPI (in this
+case, the PATH is configured automatically):
+
+    pytest

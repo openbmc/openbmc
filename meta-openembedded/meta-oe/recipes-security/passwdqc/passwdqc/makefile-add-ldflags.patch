@@ -3,10 +3,15 @@ Add LDFLAGS variable to Makefile so that extra linker flags can be sent via this
 Upstream-Status: Pending
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ Makefile | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 404f036..a9b18f0 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -68,18 +68,17 @@ XGETTEXT = xgettext
+@@ -75,13 +75,12 @@ XGETTEXT = xgettext
  XGETTEXT_OPTS = --keyword=_ --keyword=P2_:1,1 --keyword=P3_:1,2 --language=C --add-comments
  MSGMERGE = msgmerge
  
@@ -21,9 +26,15 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  	-Wl,--soname,$(SHARED_LIB),--version-script,$(MAP_LIB)
  LDFLAGS_lib_SUN = $(LDFLAGS_shared_SUN)
  LDFLAGS_lib_HP = $(LDFLAGS_shared_HP)
+@@ -90,7 +89,7 @@ LDFLAGS_lib_CYGWIN = $(LDFLAGS_shared) \
+ 	-Wl,--export-all-symbols \
+ 	-Wl,--enable-auto-import
  LDFLAGS_pam = $(LDFLAGS_shared)
 -LDFLAGS_pam_LINUX = $(LDFLAGS_shared_LINUX) \
 +LDFLAGS_pam_LINUX = $(LDFLAGS) $(LDFLAGS_shared_LINUX) \
  	-Wl,--version-script,$(MAP_PAM)
  LDFLAGS_pam_SUN = $(LDFLAGS_shared_SUN)
  LDFLAGS_pam_HP = $(LDFLAGS_shared_HP)
+-- 
+2.34.1
+

@@ -834,6 +834,3 @@ pkg_postinst:udev-hwdb () {
 pkg_prerm:udev-hwdb () {
 	rm -f $D${sysconfdir}/udev/hwdb.bin
 }
-
-# This was also fixed in 252.4 with 9b75a3d0
-CVE_CHECK_IGNORE += "CVE-2022-4415"

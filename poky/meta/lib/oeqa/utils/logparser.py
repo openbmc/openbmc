@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-import sys
+import enum
 import os
 import re
 
@@ -106,30 +106,48 @@ class PtestParser(object):
                     f.write(status + ": " + test_name + "\n")
 
 
-# ltp log parsing
-class LtpParser(object):
-    def __init__(self):
-        self.results = {}
-        self.section = {'duration': "", 'log': ""}
-
+class LtpParser:
+    """
+    Parse the machine-readable LTP log output into a ptest-friendly data structure.
+    """
     def parse(self, logfile):
-        test_regex = {}
-        test_regex['PASSED'] = re.compile(r"PASS")
-        test_regex['FAILED'] = re.compile(r"FAIL")
-        test_regex['SKIPPED'] = re.compile(r"SKIP")
+        results = {}
+        # Aaccumulate the duration here but as the log rounds quick tests down
+        # to 0 seconds this is very much a lower bound. The caller can replace
+        # the value.
+        section = {"duration": 0, "log": ""}
 
-        with open(logfile, errors='replace') as f:
+        class LtpExitCode(enum.IntEnum):
+            # Exit codes as defined in ltp/include/tst_res_flags.h
+            TPASS = 0  # Test passed flag
+            TFAIL = 1  # Test failed flag
+            TBROK = 2  # Test broken flag
+            TWARN = 4  # Test warning flag
+            TINFO = 16 # Test information flag
+            TCONF = 32 # Test not appropriate for configuration flag
+
+        with open(logfile, errors="replace") as f:
+            # Lines look like this:
+            # tag=cfs_bandwidth01 stime=1689762564 dur=0 exit=exited stat=32 core=no cu=0 cs=0
             for line in f:
-                for t in test_regex:
-                    result = test_regex[t].search(line)
-                    if result:
-                        self.results[line.split()[0].strip()] = t
+                if not line.startswith("tag="):
+                    continue
 
-        for test in self.results:
-            result = self.results[test]
-            self.section['log'] = self.section['log'] + ("%s: %s\n" % (result.strip()[:-2], test.strip()))
+                values = dict(s.split("=") for s in line.strip().split())
 
-        return self.results, self.section
+                section["duration"] += int(values["dur"])
+                exitcode = int(values["stat"])
+                if values["exit"] == "exited" and exitcode == LtpExitCode.TCONF:
+                    # Exited normally with the "invalid configuration" code
+                    results[values["tag"]] = "SKIPPED"
+                elif exitcode == LtpExitCode.TPASS:
+                    # Successful exit
+                    results[values["tag"]] = "PASSED"
+                else:
+                    # Other exit
+                    results[values["tag"]] = "FAILED"
+
+        return results, section
 
 
 # ltp Compliance log parsing

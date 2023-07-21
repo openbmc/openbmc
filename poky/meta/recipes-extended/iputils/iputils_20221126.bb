@@ -17,9 +17,8 @@ S = "${WORKDIR}/git"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>20\d+)"
 
-# Fixed in 2000-10-10, but the versioning of iputils
-# breaks the version order.
-CVE_CHECK_IGNORE += "CVE-2000-1213 CVE-2000-1214"
+CVE_STATUS[CVE-2000-1213] = "fixed-version: Fixed in 2000-10-10, but the versioning of iputils breaks the version order."
+CVE_STATUS[CVE-2000-1214] = "fixed-version: Fixed in 2000-10-10, but the versioning of iputils breaks the version order."
 
 PACKAGECONFIG ??= "libcap"
 PACKAGECONFIG[libcap] = "-DUSE_CAP=true, -DUSE_CAP=false -DNO_SETCAP_OR_SUID=true, libcap libcap-native"

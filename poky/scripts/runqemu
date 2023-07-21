@@ -648,10 +648,10 @@ to your build configuration.
                         elif fsflag == 'kernel-in-fs':
                             wic_fs = False
                         else:
-                            logger.warn('Unknown flag "%s:%s" in QB_FSINFO', fstype, fsflag)
+                            logger.warning('Unknown flag "%s:%s" in QB_FSINFO', fstype, fsflag)
                             continue
                     else:
-                        logger.warn('QB_FSINFO is not supported for image type "%s"', fstype)
+                        logger.warning('QB_FSINFO is not supported for image type "%s"', fstype)
                         continue
 
                     if fstype in self.fsinfo:
@@ -1186,7 +1186,7 @@ to your build configuration.
             gid = os.getgid()
             uid = os.getuid()
             logger.info("Setting up tap interface under sudo")
-            cmd = ('sudo', self.qemuifup, str(uid), str(gid))
+            cmd = ('sudo', self.qemuifup, str(gid))
             try:
                 tap = subprocess.check_output(cmd).decode('utf-8').strip()
             except subprocess.CalledProcessError as e:
@@ -1597,7 +1597,7 @@ to your build configuration.
             uptime_seconds = f.readline().split()[0]
         logger.info('Host uptime: %s\n' % uptime_seconds)
         if self.cleantap:
-            cmd = ('sudo', self.qemuifdown, self.tap, self.bindir_native)
+            cmd = ('sudo', self.qemuifdown, self.tap)
             logger.debug('Running %s' % str(cmd))
             subprocess.check_call(cmd)
         self.release_taplock()

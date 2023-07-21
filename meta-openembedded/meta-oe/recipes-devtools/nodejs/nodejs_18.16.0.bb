@@ -79,9 +79,9 @@ PACKAGECONFIG[zlib] = "--shared-zlib,,zlib"
 # and we need to use the right flags during host compile,
 # too.
 EXTRA_OEMAKE = "\
-    CC.host='${CC}' \
+    CC.host='${CC} -pie -fPIE' \
     CFLAGS.host='${CPPFLAGS} ${CFLAGS}' \
-    CXX.host='${CXX}' \
+    CXX.host='${CXX} -pie -fPIE' \
     CXXFLAGS.host='${CPPFLAGS} ${CXXFLAGS}' \
     LDFLAGS.host='${LDFLAGS}' \
     AR.host='${AR}' \

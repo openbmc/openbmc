@@ -18,7 +18,7 @@ SRC_URI[sha256sum] = "ccdd64ec3c381d3c3ed0e99d2e70d1f62988c7763de89ca7bdffafa5ea
 
 GITHUB_BASE_URI = "https://github.com/eudev-project/eudev/releases"
 
-inherit autotools update-rc.d qemu pkgconfig features_check manpages github-releases
+inherit autotools update-rc.d qemu pkgconfig features_check manpages github-releases useradd
 
 CONFLICT_DISTRO_FEATURES = "systemd"
 
@@ -85,3 +85,6 @@ pkg_postinst:${PN}-hwdb () {
 pkg_prerm:${PN}-hwdb () {
 	rm -f $D${sysconfdir}/udev/hwdb.bin
 }
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "-r sgx"

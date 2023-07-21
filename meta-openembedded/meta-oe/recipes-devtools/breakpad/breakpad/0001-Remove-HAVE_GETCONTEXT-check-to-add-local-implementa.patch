@@ -12,11 +12,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  Makefile.am | 12 ------------
  1 file changed, 12 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index ee7454e4..69700192 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -187,10 +187,6 @@ src_client_linux_libbreakpad_client_a_SOURCES = \
+@@ -529,10 +529,6 @@ src_client_linux_libbreakpad_client_a_SO
  	src/common/linux/linux_libc_support.cc \
  	src/common/linux/memory_mapped_file.cc \
  	src/common/linux/safe_readlink.cc
@@ -24,10 +22,10 @@ index ee7454e4..69700192 100644
 -src_client_linux_libbreakpad_client_a_SOURCES += \
 -	src/common/linux/breakpad_getcontext.S
 -endif
- endif LINUX_HOST
  
- if !DISABLE_PROCESSOR
-@@ -508,10 +504,6 @@ src_client_linux_linux_client_unittest_shlib_SOURCES = \
+ # Client tests
+ src_client_linux_linux_dumper_unittest_helper_SOURCES = \
+@@ -580,10 +576,6 @@ src_client_linux_linux_client_unittest_s
  	src/processor/minidump.cc \
  	src/processor/pathname_stripper.cc \
  	src/processor/proc_maps_linux.cc
@@ -38,7 +36,7 @@ index ee7454e4..69700192 100644
  
  src_client_linux_linux_client_unittest_shlib_CPPFLAGS = \
  	$(AM_CPPFLAGS) $(TEST_CFLAGS)
-@@ -541,10 +533,6 @@ src_client_linux_linux_client_unittest_shlib_LDADD = \
+@@ -613,10 +605,6 @@ src_client_linux_linux_client_unittest_s
  	src/common/string_conversion.o \
  	$(TEST_LIBS) \
  	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
@@ -49,6 +47,3 @@ index ee7454e4..69700192 100644
  if ANDROID_HOST
  src_client_linux_linux_client_unittest_shlib_LDFLAGS += \
  	-llog -lm
--- 
-2.30.2
-
