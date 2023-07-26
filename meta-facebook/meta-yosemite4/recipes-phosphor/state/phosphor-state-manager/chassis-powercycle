@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# shellcheck disable=SC2120
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$MEDUSA_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
+
+#IO 0:7 input port for showing slot 1:8 power status
+#IO 8:16 output port for controlling slot 1:8 power status
+CHASSIS_ID=$1
+IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
+IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
+
+chassis-power-cycle()
+{
+    CHASSIS_ID=$1
+
+    if [ "$CHASSIS_ID" -le 8  ]
+    then
+        chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+        if [ "$chassis_status" == "$STATE_ON" ]
+        then
+            if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
+            then
+                echo "Failed to set slot$1 power off"
+            fi
+            sleep 10
+        fi
+        if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
+        then
+            echo "Failed to set slot$1 power on"
+        fi
+        sleep 2
+
+        # Check chassis status after doing 12V cycle
+        chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+        if [ "$chassis_status" == "$STATE_ON" ]
+        then
+            busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
+            exit 0;
+        else
+            busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
+            exit 0;
+        fi
+    fi
+
+    echo "Invalid slot id"
+    exit 1;
+}
+
+if [ "$1" == 0 ]
+then
+    # TODO: SLED cycle
+    echo "SLED-cycle is not support for now"
+else
+    echo "Starting slot$1 cycle"
+    chassis-power-cycle "$1"
+fi

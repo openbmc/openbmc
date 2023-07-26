@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+# TODO: host power cycle
+echo "Host power cycle is not support for now"

@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# shellcheck disable=SC2120
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$MEDUSA_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
+
+#IO 0:7 input port for showing slot 1:8 power status
+#IO 8:16 output port for controlling slot 1:8 power status
+CHASSIS_ID=$1
+IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
+IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
+
+# Server 12v power off
+chassis-power-off()
+{
+        if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
+        then
+                echo "Failed to set slot$1 power off"
+        fi
+        sleep 1
+
+        # Check chassis status after doing 12V off
+        chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+        if [ "$chassis_status" == "$STATE_OFF" ]
+        then
+                busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
+                echo "Chassis is power off"
+        else
+                busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
+                echo "Chassis is power on"
+                exit 0;
+        fi
+}
+
+chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL $IO_EXP_SLOT_PWR_STATUS")
+if [ "$chassis_status" == "$STATE_ON" ]
+then
+        chassis-power-off
+        exit 0;
+else
+        echo "Chassis is already off"
+        exit 0;
+fi
