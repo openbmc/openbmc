@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor Host Console SSH socket for Slot8
+Wants=obmc-console@ttyS8.service
+
+[Service]
+ExecStartPre=/usr/bin/select-uart-mux slot8 host
+ExecStart=/usr/sbin/dropbear -i -r /etc/dropbear/dropbear_rsa_host_key -c "/usr/bin/obmc-console-client -i host7" $DROPBEAR_EXTRA_ARGS
+SyslogIdentifier=console-client-ttyS8
+ExecReload=/bin/kill -HUP $MAINPID
+StandardInput=socket
+KillMode=process

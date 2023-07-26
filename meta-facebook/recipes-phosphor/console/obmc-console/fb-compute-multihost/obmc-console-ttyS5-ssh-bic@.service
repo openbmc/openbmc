@@ -1,0 +1,11 @@
+[Unit]
+Description=Phosphor BIC Console SSH socket for Slot5
+Wants=obmc-console@ttyS5.service
+
+[Service]
+ExecStartPre=/usr/bin/select-uart-mux slot5 bic
+ExecStart=/usr/sbin/dropbear -i -r /etc/dropbear/dropbear_rsa_host_key -c "/usr/bin/obmc-console-client -i host4" $DROPBEAR_EXTRA_ARGS
+SyslogIdentifier=console-client-ttyS5
+ExecReload=/bin/kill -HUP $MAINPID
+StandardInput=socket
+KillMode=process
