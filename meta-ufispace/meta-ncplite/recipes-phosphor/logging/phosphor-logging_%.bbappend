@@ -1,1 +1,1 @@
-EXTRA_OEMESON:append = " -Derror_info_cap=256"
+ERR_INFO_CAP = "256"
