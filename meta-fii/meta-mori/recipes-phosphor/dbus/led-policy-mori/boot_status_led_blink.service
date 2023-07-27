@@ -1,0 +1,8 @@
+[Unit]
+Description=Mori boot status led blink service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "busctl set-property xyz.openbmc_project.LED.GroupManager /xyz/openbmc_project/led/groups/boot_status_inactive xyz.openbmc_project.Led.Group Asserted b true && \
+busctl set-property xyz.openbmc_project.LED.GroupManager /xyz/openbmc_project/led/groups/boot_status_bootcomplete xyz.openbmc_project.Led.Group Asserted b false"
+SyslogIdentifier=phosphor-dbus-monitor

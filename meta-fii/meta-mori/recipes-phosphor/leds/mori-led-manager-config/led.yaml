@@ -8,6 +8,6 @@ boot_status_inactive:
         DutyOn: 50
         Period: 1000
 
-boot_status_standby:
+boot_status_bootcomplete:
     boot_status_led:
         Action: 'On'

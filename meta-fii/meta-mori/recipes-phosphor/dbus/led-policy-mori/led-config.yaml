@@ -1,0 +1,153 @@
+- name: OS state path group
+  class: group
+  group: path
+  members:
+      - meta: PATH
+        path: /xyz/openbmc_project/state/host0
+
+- name: Chassis power state path group
+  class: group
+  group: path
+  members:
+      - meta: PATH
+        path: /xyz/openbmc_project/state/chassis0
+
+- name: OS state property group
+  class: group
+  group: property
+  type: string
+  members:
+      - interface: xyz.openbmc_project.State.OperatingSystem.Status
+        meta: PROPERTY
+        property: OperatingSystemState
+
+- name: Chassis power state property group
+  class: group
+  group: property
+  type: string
+  members:
+      - interface: xyz.openbmc_project.State.Chassis
+        meta: PROPERTY
+        property: CurrentPowerState
+
+- name: watch OS state
+  class: watch
+  watch: property
+  paths: OS state path group
+  properties: OS state property group
+  callback: OS state callback group
+  ignore_start_callback: true
+
+- name: watch power state
+  class: watch
+  watch: property
+  paths: Chassis power state path group
+  properties: Chassis power state property group
+  callback: Chassis power state callback group
+  ignore_start_callback: true
+
+- name: OS BootComplete condition
+  class: condition
+  condition: count
+  paths: OS state path group
+  properties: OS state property group
+  callback: turn on boot status led callback
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.BootComplete"
+
+- name: OS Inactive condition
+  class: condition
+  condition: count
+  paths: OS state path group
+  properties: OS state property group
+  callback: blink boot status led callback
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Inactive"
+
+- name: OS state callback group
+  class: callback
+  callback: group
+  members:
+      - OS BootComplete condition
+      - OS Inactive condition
+      - OS journal callback
+
+- name: Chassis power on condition
+  class: condition
+  condition: count
+  paths: Chassis power state path group
+  properties: Chassis power state property group
+  callback: OS Inactive condition
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: "xyz.openbmc_project.State.Chassis.PowerState.On"
+
+- name: Chassis power off condition
+  class: condition
+  condition: count
+  paths: Chassis power state path group
+  properties: Chassis power state property group
+  callback: turn off boot status led callback
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: "xyz.openbmc_project.State.Chassis.PowerState.Off"
+
+- name: Chassis power state callback group
+  class: callback
+  callback: group
+  members:
+      - Chassis power on condition
+      - Chassis power off condition
+
+- name: turn on boot status led callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: boot_status_led_on.service
+        type: string
+      - value: replace
+        type: string
+
+- name: turn off boot status led callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: boot_status_led_off.service
+        type: string
+      - value: replace
+        type: string
+
+- name: blink boot status led callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: boot_status_led_blink.service
+        type: string
+      - value: replace
+        type: string
+
+- name: OS journal callback
+  class: callback
+  callback: journal
+  paths: OS state path group
+  properties: OS state property group
+  severity: INFO
+  message: OS state change received!
