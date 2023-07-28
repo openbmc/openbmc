@@ -19,6 +19,8 @@ S = "${WORKDIR}/git"
 inherit meson pkgconfig python3native
 inherit obmc-phosphor-dbus-service
 
+EXTRA_OEMESON = " -Dtests=disabled"
+
 RDEPENDS:${PN} += "phosphor-settings-manager"
 RDEPENDS:${PN} += "phosphor-network"
 RDEPENDS:${PN} += "phosphor-objmgr"
