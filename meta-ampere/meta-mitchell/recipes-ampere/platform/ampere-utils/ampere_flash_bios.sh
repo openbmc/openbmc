@@ -51,7 +51,10 @@ do_flash () {
 
 
 if [ $# -eq 0 ]; then
-	echo "Usage: $(basename "$0") <UEFI/EDKII image file>"
+	echo "Usage: $(basename "$0") <UEFI/EDKII image file> <DEV_SEL> [SPECIAL_BOOT]"
+	echo "Where:"
+	echo "    DEV_SEL 1 is Primary SPI (by default), 2 is Second SPI"
+	echo "    SPECIAL_BOOT: Optional, input '1' to enter & flash SPECIAL_BOOT mode. Default: 0"
 	exit 0
 fi
 
@@ -67,6 +70,12 @@ else
        DEV_SEL="$2"
 fi
 
+SPECIAL_BOOT=0
+if [[ "$3" == "1" ]]; then
+	SPECIAL_BOOT=1
+fi
+
+echo "SPECIAL_BOOT mode: $SPECIAL_BOOT"
 # Turn off the Host if it is currently ON
 chassisstate=$(obmcutil chassisstate | awk -F. '{print $NF}')
 echo "--- Current Chassis State: $chassisstate"
@@ -104,8 +113,19 @@ else
 	exit 0
 fi
 
+# Restrict to flash Second Host SPI-NOR in case of SPECIAL_BOOT
+if [ $SPECIAL_BOOT == 1 ] && [ "$DEV_SEL" == 2 ]; then
+	echo "Not allow to flash the Second Host SPI-NOR with SPECIAL_BOOT image"
+	exit
+fi
+
 # Flash the firmware
 do_flash
+
+# Assert SPECIAL_BOOT GPIO PIN
+if [[ $SPECIAL_BOOT == 1 ]]; then
+	gpioset $(gpiofind host0-special-boot)=1
+fi
 
 # Switch the SPI bus to the primary spi device
 echo "Switch to the Primary Host SPI-NOR"
@@ -118,9 +138,25 @@ if ! gpioset $(gpiofind spi0-program-sel)=0; then
 	exit 1
 fi
 
-if [ "$chassisstate" == 'On' ];
+if [ "$chassisstate" == 'On' ] || [ $SPECIAL_BOOT == 1 ];
 then
 	sleep 5
 	echo "Turn on the Host"
 	obmcutil poweron
+fi
+
+# Deassert SPECIAL_BOOT GPIO PIN if it is being asserted
+if [[ $SPECIAL_BOOT == 1 ]]; then
+	# Time out checking for Host ON is 60s
+	cnt=12
+	while [ "$cnt" -gt 0 ];
+	do
+		cnt=$((cnt - 1))
+		if systemctl status obmc-host-already-on@0.target | grep "Active: active"; then
+			echo "Deassert SPECIAL_BOOT GPIO PIN if it is being asserted."
+			gpioset $(gpiofind host0-special-boot)=0
+			exit 0
+		fi
+		sleep 5
+	done
 fi
