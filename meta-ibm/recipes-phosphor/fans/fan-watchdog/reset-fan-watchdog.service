@@ -8,4 +8,5 @@ Conflicts=obmc-chassis-poweroff@0.target
 Type=oneshot
 RemainAfterExit=yes
 EnvironmentFile={envfiledir}/obmc/fan-watchdog/reset-fan-watchdog.conf
-ExecStart=/usr/bin/phosphor-gpio-util -p ${{GPIO_PATH}} -g ${{GPIO}} -a ${{ACTION}} -d ${{DELAY}}
+ExecStart=/usr/bin/gpioset --mode=time -u ${{DELAY}} ${{GPIO_PATH}} ${{GPIO}}=0
+ExecStart=/usr/bin/gpioset --mode=time -u ${{DELAY}} ${{GPIO_PATH}} ${{GPIO}}=1
