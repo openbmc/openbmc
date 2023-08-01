@@ -30,9 +30,11 @@ python do_pad_binary() {
     TIP_IMAGE = d.getVar('TIP_IMAGE', True)
     def Pad_bin_file_inplace(inF, align):
         padding_size = 0
-        padding_size_end = 0
 
         F_size = os.path.getsize(inF)
+
+        if ((F_size % align) == 0):
+            return
 
         padding_size = align - (F_size % align)
 
