@@ -39,7 +39,7 @@ inherit phosphor-logging
 inherit phosphor-dbus-yaml
 
 def get_info_cap(d):
-    flash_size = int(d.getVar('FLASH_SIZE'))
+    flash_size = int(d.getVar('FLASH_SIZE') or 0)
     if flash_size <= 32768:
         return "10"
     elif flash_size <= 65536:
