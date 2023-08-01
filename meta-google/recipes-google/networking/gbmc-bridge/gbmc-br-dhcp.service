@@ -7,6 +7,7 @@ StartLimitBurst=3
 [Service]
 Restart=on-failure
 RestartSec=5
+ExecCondition=/bin/bash -c "! /bin/systemctl is-active -q dhcp-done@*"
 ExecStart=/usr/bin/udhcpc6 -f -q -O fqdn -O bootfile_url -O bootfile_param -i gbmcbr -s /usr/libexec/gbmc-br-dhcp.sh
 
 [Install]
