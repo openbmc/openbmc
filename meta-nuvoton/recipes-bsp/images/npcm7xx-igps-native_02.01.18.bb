@@ -8,8 +8,8 @@ SRC_URI = " \
     git://github.com/Nuvoton-Israel/igps;branch=master;protocol=https \
     file://0001-Adjust-paths-for-use-with-Bitbake.patch \
 "
-# tag IGPS_02.01.12
-SRCREV = "2fb1a3b0d61164ed1157e27889a4ec2292cbc760"
+# tag IGPS_02.01.18
+SRCREV = "e0fc2ba58d561220a957bc06aefe1ac7f6e96126"
 
 S = "${WORKDIR}/git"
 
