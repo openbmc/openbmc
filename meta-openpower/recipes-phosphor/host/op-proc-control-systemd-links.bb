@@ -24,6 +24,10 @@ pkg_postinst:${PN}() {
 	TARGET="../op-stop-instructions@.service"
 	ln -s $TARGET $LINK
 
+	LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/op-clear-sys-dump-active@0.service"
+	TARGET="../op-clear-sys-dump-active@.service"
+	ln -s $TARGET $LINK
+
 	LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/op-stop-instructions@0.service"
 	TARGET="../op-stop-instructions@.service"
 	ln -s $TARGET $LINK
