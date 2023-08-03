@@ -218,7 +218,7 @@ python do_merge_bootloaders() {
 }
 
 do_pad_binary[depends] += " \
-    npcm8xx-tip-fw:do_deploy \
+    ${@'npcm8xx-tip-fw:do_deploy' if d.getVar('TIP_IMAGE', True) == 'True' else ''} \
     npcm8xx-bootblock:do_deploy \
     u-boot-nuvoton:do_deploy \
     trusted-firmware-a:do_deploy \
