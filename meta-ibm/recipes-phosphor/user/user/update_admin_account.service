@@ -1,0 +1,11 @@
+[Unit]
+Description=Update admin user home directory
+Before=xyz.openbmc_project.User.Manager.service
+
+[Service]
+ExecStart={bindir}/update_admin_account.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+RequiredBy=xyz.openbmc_project.User.Manager.service

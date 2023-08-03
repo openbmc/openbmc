@@ -52,7 +52,7 @@ IBM_EXTRA_USERS_PARAMS += " \
 
 # Add the "admin" account.
 IBM_EXTRA_USERS_PARAMS += " \
-  useradd -M -d / --groups priv-admin,redfish,web -s /sbin/nologin admin; \
+  useradd --groups priv-admin,redfish,web -s /sbin/nologin admin; \
   usermod -p ${DEFAULT_OPENBMC_PASSWORD} admin; \
   "
 
