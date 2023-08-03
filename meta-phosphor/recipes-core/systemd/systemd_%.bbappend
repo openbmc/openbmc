@@ -1,4 +1,3 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 PACKAGECONFIG = "\
         coredump \
         hostnamed \
@@ -13,8 +12,6 @@ PACKAGECONFIG = "\
         timesyncd \
         zstd \
         "
-
-SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 
 EXTRA_OEMESON:append = " -Ddns-servers=''"
 
