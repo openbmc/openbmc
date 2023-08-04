@@ -92,6 +92,8 @@ VERSION_PURPOSE ?= "xyz.openbmc_project.Software.Version.VersionPurpose.BMC"
 
 UBOOT_SUFFIX ?= "bin"
 
+IMAGE_NAME_SUFFIX=""
+
 python() {
     # Compute rwfs LEB count and LEB size.
     page_size = d.getVar('FLASH_PAGE_SIZE', True)

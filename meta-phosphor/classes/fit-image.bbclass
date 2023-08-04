@@ -2,8 +2,8 @@ inherit uboot-config
 
 CONVERSIONTYPES += "fitImage"
 
-CONVERSION_CMD:fitImage = "run_assemble_fitimage ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"
-INITRAMFS_IMAGE="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.cpio.${INITRAMFS_CTYPE}"
+CONVERSION_CMD:fitImage = "run_assemble_fitimage ${IMAGE_NAME}.${type}"
+INITRAMFS_IMAGE="${IMAGE_NAME}.cpio.${INITRAMFS_CTYPE}"
 KERNEL_OUTPUT_DIR="${DEPLOY_DIR_IMAGE}"
 
 do_image_cpio[depends] += "virtual/kernel:do_deploy"
