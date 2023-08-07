@@ -34,7 +34,7 @@ PACKAGECONFIG[update-functional-on-fail] = "-Dupdate-functional-on-fail=enabled,
 PACKAGECONFIG[libuserlayer] = "-Dlibuserlayer=enabled,-Dlibuserlayer=disabled"
 PACKAGECONFIG[sensors-cache] = "-Dsensors-cache=enabled,-Dsensors-cache=disabled"
 PACKAGECONFIG[entity-manager-decorators] = "-Dentity-manager-decorators=enabled,-Dentity-manager-decorators=disabled"
-
+PACKAGECONFIG[dynamic-storages-only] = "-Ddynamic-storages-only=enabled,-Ddynamic-storages-only=disabled"
 
 DEPENDS += "nlohmann-json"
 DEPENDS += "openssl"
