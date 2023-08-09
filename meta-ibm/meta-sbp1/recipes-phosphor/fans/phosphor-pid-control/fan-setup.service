@@ -1,0 +1,26 @@
+[Unit]
+Description=Configure fan PWM controllers
+
+[Service]
+Type=oneshot
+# Unmask Channel 1 faults and mask Channel 2 faults
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x03 0x55; done'
+# Set temperature limits:40C (ALERT)
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x08 0x28; done'
+# Set temperature limits: 60C (OT)
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x0a 0x3c; done'
+# Set temperature limits: 50C (THERM)
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x0c 0x32; done'
+# Set PWM Mode and set RPM range to 16000
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x10 0x83; done'
+# Enable Minimum Fan Speed
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x11 0x01; done'
+# Disable Fan Spin-up and THERM-full-speed enable & Set Fan PWM frequency to 25kHz
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x13 0x83; done'
+# Set Max Tachometer Count to 255
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x22 0xff; done'
+# Set Pulses per revolution to 2 & Fan Min Tach Count to 0
+ExecStart=/bin/sh -c 'for ADDR in $(ls /sys/bus/i2c/drivers/max6639/|grep 2e); do i2cset -f -y $${ADDR/-00/ 0x} 0x24 0x40; done'
+
+[Install]
+WantedBy=basic.target
