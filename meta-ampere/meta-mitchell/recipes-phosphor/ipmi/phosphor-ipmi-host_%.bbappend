@@ -1,5 +1,6 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
+PACKAGECONFIG:append = " dynamic-storages-only"
 DEPENDS:append = " mtmitchell-yaml-config"
 
 EXTRA_OEMESON = " \
