@@ -1,6 +1,6 @@
 OVERRIDES .= ":vegman"
 KMACHINE = "aspeed"
-KERNEL_DEVICETREE = "${KMACHINE}-bmc-${MACHINE}.dtb"
+KERNEL_DEVICETREE = "aspeed/${KMACHINE}-bmc-${MACHINE}.dtb"
 UBOOT_MACHINE = "evb-ast2500_defconfig"
 UBOOT_DEVICETREE = "ast2500-evb"
 
