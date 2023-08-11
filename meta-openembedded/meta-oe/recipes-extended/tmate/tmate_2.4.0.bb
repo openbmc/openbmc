@@ -1,6 +1,5 @@
 SUMMARY = "Instant terminal sharing"
 DESCRIPTION = "Tmate is a fork of tmux. It provides an instant pairing solution."
-AUTHOR = "Marius Kriegerowski <marius.kriegerowski@gmail.com>"
 HOMEPAGE = "https://tmate.io/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f7d9aab84ec6567139a4755c48d147fb"

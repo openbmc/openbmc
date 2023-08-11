@@ -6,7 +6,7 @@ ACPI meant to be directly integrated into the host OS as a kernel-resident \
 subsystem, and a small set of tools to assist in developing and debugging \
 ACPI tables."
 
-HOMEPAGE = "http://www.acpica.org/"
+HOMEPAGE = "https://www.intel.com/content/www/us/en/developer/topic-technology/open/acpica/overview.html"
 SECTION = "console/tools"
 
 LICENSE = "Intel | BSD-3-Clause | GPL-2.0-only"
@@ -16,10 +16,11 @@ COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
 
 DEPENDS = "m4-native flex-native bison-native"
 
-SRC_URI = "https://acpica.org/sites/acpica/files/acpica-unix-${PV}.tar.gz"
+SRC_URI = "https://downloadmirror.intel.com/783534/acpica-unix-${PV}.tar.gz"
 SRC_URI[sha256sum] = "86876a745e3d224dcfd222ed3de465b47559e85811df2db9820ef09a9dff5cce"
 
-UPSTREAM_CHECK_URI = "https://acpica.org/downloads"
+UPSTREAM_CHECK_URI = "https://www.intel.com/content/www/us/en/download/776303/acpi-component-architecture-downloads-unix-format-source-code-and-build-environment-with-an-intel-license.html"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 S = "${WORKDIR}/acpica-unix-${PV}"
 

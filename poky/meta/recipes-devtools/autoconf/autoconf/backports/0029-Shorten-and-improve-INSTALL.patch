@@ -1,0 +1,366 @@
+From d8ca8b323873e5cd9d969a062f70b31db450ba53 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Sat, 24 Jun 2023 14:39:34 -0700
+Subject: [PATCH 29/29] Shorten and improve INSTALL
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Rewrite install.texi so that INSTALL is shorter and hopefully
+more useful for new installers.
+* doc/install.texi: When not building the Autoconf manual, put
+copyright notice at the end, and omit external references as they
+do not work in INSTALL.
+Avoid long URLs as they do not work well in INSTALL or
+in info files.  Be more consistent (though not entirely
+consistent) about “system” vs “architecture”.
+(System Types, Building for a different system type)
+(Troubleshooting the Build Type): Coalesce into a single section
+and rewrite for clarity and brevity.  Mention build-aux.  Do not
+mention --target here as it’s too rare to make the cut.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ doc/install.texi | 224 +++++++++++++++++------------------------------
+ 1 file changed, 82 insertions(+), 142 deletions(-)
+
+diff --git a/doc/install.texi b/doc/install.texi
+index a3ef17828..6c3a9c21c 100644
+--- a/doc/install.texi
++++ b/doc/install.texi
+@@ -2,23 +2,13 @@
+ @c the INSTALL file.
+ 
+ @ifclear autoconf
+-
+ @unnumbered Installation Instructions
+-
+-Copyright @copyright{} 1994--1996, 1999--2002, 2004--2017, 2020--2023
+-Free Software Foundation, Inc.
+-
+-Copying and distribution of this file, with or without modification, are
+-permitted in any medium without royalty provided the copyright notice
+-and this notice are preserved.  This file is offered as-is, without
+-warranty of any kind.
+-
+ @end ifclear
+ 
+ @node Basic Installation
+ @section Basic Installation
+ 
+-Briefly, the following shell commands:
++The following shell commands:
+ 
+ @example
+ test -f configure || ./bootstrap
+@@ -41,8 +31,13 @@ of the features documented below.  The lack of an optional feature in a
+ given package is not necessarily a bug.
+ @end ifclear
+ More recommendations for GNU packages can be found in
++@ifset autoconf
+ @ref{Makefile Conventions, , Makefile Conventions, standards,
+ GNU Coding Standards}.
++@end ifset
++@ifclear autoconf
++the GNU Coding Standards.
++@end ifclear
+ 
+ If the @command{bootstrap} shell script exists, it attempts to build the
+ @command{configure} shell script and related files, perhaps by
+@@ -61,8 +56,8 @@ those values to create a @file{Makefile} in each directory of the
+ package.  It may also create one or more @file{.h} files containing
+ system-dependent definitions.  Finally, it creates a shell script
+ @file{config.status} that you can run in the future to recreate the
+-current configuration, and a file @file{config.log} containing compiler
+-output (useful mainly for debugging @command{configure}).
++current configuration, and a file @file{config.log} containing
++output useful for debugging @command{configure}.
+ 
+ It can also use an optional file (typically called @file{config.cache}
+ and enabled with @option{--cache-file=config.cache} or simply
+@@ -77,10 +72,9 @@ they can be considered for the next release.  If you are using the
+ cache, and at some point @file{config.cache} contains results you don't
+ want to keep, you may remove or edit it.
+ 
+-The file @file{configure.ac} (or @file{configure.in}) is used to create
+-@file{configure} by a program called @command{autoconf}.  You need
+-@file{configure.ac} if you want to change it or regenerate
+-@file{configure} using a newer version of @command{autoconf}.
++The @command{autoconf} program generates @file{configure} from the file
++@file{configure.ac}.  Normally you should edit @file{configure.ac}
++instead of editing @file{configure} directly.
+ 
+ The simplest way to compile this package is:
+ 
+@@ -95,8 +89,7 @@ You may need special developer tools and network access to bootstrap.
+ 
+ @item
+ Type @samp{./configure} to configure the package for your system.
+-
+-Running @command{configure} might take a while.  While running, it prints some
++This might take a while.  While running, @command{configure} prints
+ messages telling which features it is checking for.
+ 
+ @item
+@@ -125,21 +118,11 @@ code directory by typing @samp{make clean}.  To also remove the files
+ that @command{configure} created (so you can compile the package for a
+ different kind of computer), type @samp{make distclean}.  There is also
+ a @samp{make maintainer-clean} target, but that is intended mainly for
+-the package's developers.  If you use it, you may have to get all sorts
+-of other programs in order to regenerate files that came with the
+-distribution.
++the package's developers.  If you use it, you may have to bootstrap again.
+ 
+ @item
+-Often, you can also type @samp{make uninstall} to remove the installed
+-files again.  In practice, not all packages have tested that
+-uninstallation works correctly, even though it is required by the
+-GNU Coding Standards.
+-
+-@item
+-Some packages, particularly those that use Automake, provide @samp{make
+-distcheck}, which can by used by developers to test that all other
+-targets like @samp{make install} and @samp{make uninstall} work
+-correctly.  This target is generally not run by end users.
++If the package follows the GNU Coding Standards,
++you can type @samp{make uninstall} to remove the installed files.
+ @end enumerate
+ 
+ @node Compilers and Options
+@@ -158,21 +141,17 @@ Here is an example:
+ @end example
+ 
+ See
+-@ref{Defining Variables} and
++@ref{Defining Variables}
+ @ifset autoconf
+-@ref{Preset Output Variables}
++and @ref{Preset Output Variables}
+ @end ifset
+-@ifclear autoconf
+-@ref{Preset Output Variables,,, autoconf, Autoconf}
+-@c (@url{https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.71/html_node/Preset-Output-Variables.html})
+-@end ifclear
+ for more details.
+ 
+ @node Multiple Architectures
+ @section Compiling For Multiple Architectures
+ 
+ You can compile the package for more than one kind of computer at the
+-same time, by placing the object files for each architecture in their
++same time, by placing the object files for each system in their
+ own directory.  To do this, you can use GNU @command{make}.
+ @command{cd} to the directory where you want the object files and
+ executables to go and run the @command{configure} script.
+@@ -182,9 +161,9 @@ known as a @dfn{VPATH} build.
+ 
+ With a non-GNU @command{make},
+ it is safer to compile the package for one
+-architecture at a time in the source code directory.  After you have
+-installed the package for one architecture, use @samp{make distclean}
+-before reconfiguring for another architecture.
++system at a time in the source code directory.  After you have
++installed the package for one system, use @samp{make distclean}
++before reconfiguring for another system.
+ 
+ Some platforms, notably macOS, support ``fat'' or ``universal'' binaries,
+ where a single binary can execute on different architectures.
+@@ -274,117 +253,65 @@ which can be overridden with @code{make V=0}.
+ @node System Types
+ @section Specifying a System Type
+ 
+-The following sections go into details regarding situations where you
+-may have to specify a system type, either through the option
+-@option{--host=@var{type}}, or through the option
+-@option{--build=@var{type}}, or -- in the case of compilers -- through
+-@option{--target=@var{type}}.
+-
+-A system type @var{type} can either be a short name like @samp{mingw64},
+-or a canonical name like @samp{x86_64-pc-linux-gnu} which has the form:
+-
+-@example
+-@var{cpu}-@var{company}-@var{system}
+-@end example
+-
+-@noindent
+-where @var{system} can have one of these forms:
++By default @command{configure} builds for the current system.
++To create binaries that can run on a different system type,
++specify a @option{--host=@var{type}} option along with compiler
++variables that specify how to generate object code for @var{type}.
++For example, to create binaries intended to run on a 64-bit ARM
++processor:
+ 
+ @example
+-@var{os}
+-@var{kernel}-@var{os}
++./configure --host=aarch64-linux-gnu \
++   CC=aarch64-linux-gnu-gcc \
++   CXX=aarch64-linux-gnu-g++
+ @end example
+ 
+ @noindent
+-See the file @file{config.sub} for the possible values of each field.
+-If @file{config.sub} isn't included in this package, then this package
+-doesn't need to know any machine type.
+-
+-The file @file{config.sub} is a program that validates and canonicalizes
+-a system type.
+-It can do canonicalization, as in
++If done on a machine that can execute these binaries
++(e.g., via @command{qemu-aarch64}, @env{$QEMU_LD_PREFIX}, and Linux's
++@code{binfmt_misc} capability), the build behaves like a native build.
++Otherwise it is a cross-build: @code{configure}
++will make cross-compilation guesses instead of running test programs,
++and @code{make check} will not work.
++
++A system type can either be a short name like @samp{mingw64},
++or a canonical name like @samp{x86_64-pc-linux-gnu}.
++Canonical names have the form @var{cpu}-@var{company}-@var{system}
++where @var{system} is either @var{os} or @var{kernel}-@var{os}.
++To canonicalize and validate a system type,
++you can run the command @file{config.sub},
++which is often squirreled away in a subdirectory like @file{build-aux}.
++For example:
+ 
+ @example
+-$ sh config.sub x86_64-linux
+-x86_64-pc-linux-gnu
+-$ sh config.sub arm64-linux
++$ build-aux/config.sub arm64-linux
+ aarch64-unknown-linux-gnu
++$ build-aux/config.sub riscv-lnx
++Invalid configuration 'riscv-lnx': OS 'lnx' not recognized
+ @end example
+ 
+ @noindent
+-It also validates the parts.  For example, this interaction tells you
+-that ``crusoe'' is not a valid cpu architecture name:
+-
+-@example
+-$ sh config.sub crusoe-linux
+-Invalid configuration `crusoe-linux': machine `crusoe-unknown' not recognized
+-@end example
+-
+-@node Building for a different system type
+-@section Creating binaries for a different system type
+-
+-When you want to create binaries that will run on a different machine
+-type than the one you are building on, you need to specify both
+-@itemize @bullet
+-@item
+-a @option{--host=@var{type}} option, specifying the machine type on
+-which the binaries shall run,
+-@item
+-compiler variables (@code{CC} for the C compiler, @code{CXX} for the C++
+-compiler, and so on), pointing to compilers that generate object code
+-for that machine type.
+-@end itemize
+-
+-For example, to create binaries intended to run on a 64-bit ARM
+-processor:
+-@example
+-./configure --host=aarch64-linux-gnu \
+-            CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+-@end example
+-
+-If you do this on a machine that can execute such binaries (e.g.@: by
+-virtue of the @code{qemu-aarch64} program, system libraries for that
+-architecture under @code{$QEMU_LD_PREFIX}, and a Linux
+-@code{binfmt_misc} configuration), the build behaves like a native
+-build.
+-If not, the build is a cross-build, in the sense that @code{configure}
+-will make cross-compilation guesses instead of running test programs,
+-and ``make check'' will not work.
+-
+-@node Troubleshooting the Build Type
+-@section Fixing a ``cannot guess build type'' error
+-
+-In rare cases, it may happen that @code{configure} fails with the error
+-message ``cannot guess build type''.
+-This error means that the files @file{config.guess} and
+-@file{config.sub} don't recognize the type of the system on which you
+-are building.
+-In this case, first fetch the newest versions of these files, from
+-@url{https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess}
+-and
+-@url{https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub},
+-respectively, and use these as drop-in replacement for the files
+-@file{config.guess} and @file{config.sub} that were shipped with this
+-package.
+-
+-If this resolves the problem, feel free to report the solution to the
+-maintainers of this package.
+-
+-Otherwise, it means that your system is not yet supported by
+-@file{config.guess} and @file{config.sub}.
+-As a workaround, you can use a configure option
+-@option{--build=@var{type}}, where @var{type} comes closest to your
+-system type.
+-Also, you're welcome to file a report to
++You can look at the @file{config.sub} file to see which types are recognized.
++If the file is absent, this package does not need the system type.
++
++If @command{configure} fails with the diagnostic ``cannot guess build type''.
++@file{config.sub} did not recognize your system's type.
++In this case, first fetch the newest versions of these files
++from the @url{https://savannah.gnu.org/projects/config, GNU config package}.
++If that fixes things, please report it to the
++maintainers of the package containing @command{configure}.
++Otherwise, you can try the configure option
++@option{--build=@var{type}} where @var{type} comes close to your
++system type; also, please report the problem to
+ @email{config-patches@@gnu.org}.
+ 
+-@node Configuring a Compiler
+-@section Configuration options specific to a compiler
+-
+-If you are building a compiler, and this compiler should generate code
+-for a system type that is different from the one on which the compiler
+-binaries shall run on, use the option @option{--target=@var{type}} to
+-select the type of system for which the compiler should produce code.
++For more details about configuring system types, see
++@ifset autoconf
++@ref{Manual Configuration}.
++@end ifset
++@ifclear autoconf
++the Autoconf documentation.
++@end ifclear
+ 
+ @node Sharing Defaults
+ @section Sharing Defaults
+@@ -469,8 +396,8 @@ for more details, including other options available for fine-tuning
+ the installation locations.
+ 
+ @item --host=@var{type}
+-Build binaries for architecture @var{type}.  @ref{System Types} and
+-@ref{Building for a different system type} for more details.
++Build binaries for system @var{type}.
++@xref{System Types}.
+ 
+ @item --enable-@var{feature}
+ @itemx --disable-@var{feature}
+@@ -497,6 +424,19 @@ Run the configure checks, but stop before creating any output files.
+ and accepts some other, less widely useful, options.
+ Run @samp{configure --help} for more details.
+ 
++@ifclear autoconf
++@node Copyright notice
++@section Copyright notice
++
++Copyright @copyright{} 1994--1996, 1999--2002, 2004--2017, 2020--2023
++Free Software Foundation, Inc.
++
++Copying and distribution of this file, with or without modification, are
++permitted in any medium without royalty provided the copyright notice
++and this notice are preserved.  This file is offered as-is, without
++warranty of any kind.
++@end ifclear
++
+ @c Local Variables:
+ @c fill-column: 72
+ @c ispell-local-dictionary: "american"
+-- 
+2.41.0
+

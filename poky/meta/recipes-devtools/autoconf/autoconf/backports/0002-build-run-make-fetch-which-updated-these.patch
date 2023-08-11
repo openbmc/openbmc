@@ -1,0 +1,123 @@
+From e2220ed33e69d8bc6504e3f6279894afe33a99a5 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Wed, 29 Mar 2023 12:59:09 -0700
+Subject: [PATCH 02/29] build: run "make fetch", which updated these:
+
+* build-aux/texinfo.tex: Update from texinfo.
+* lib/Autom4te/FileUtils.pm: Update from automake.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ build-aux/texinfo.tex     | 50 +++++++++++++++++++++------------------
+ lib/Autom4te/FileUtils.pm |  5 +++-
+ 2 files changed, 31 insertions(+), 24 deletions(-)
+
+diff --git a/build-aux/texinfo.tex b/build-aux/texinfo.tex
+index d25161109..55a002d27 100644
+--- a/build-aux/texinfo.tex
++++ b/build-aux/texinfo.tex
+@@ -3,7 +3,7 @@
+ % Load plain if necessary, i.e., if running under initex.
+ \expandafter\ifx\csname fmtname\endcsname\relax\input plain\fi
+ %
+-\def\texinfoversion{2023-03-21.06}
++\def\texinfoversion{2023-03-27.21}
+ %
+ % Copyright 1985, 1986, 1988, 1990-2023 Free Software Foundation, Inc.
+ %
+@@ -1102,27 +1102,33 @@ where each line of input produces a line of output.}
+ 
+ % Output page labels information.
+ % See PDF reference v.1.7 p.594, section 8.3.1.
++% Page label ranges must be increasing.
+ \ifpdf
+ \def\pagelabels{%
+   \def\title{0 << /P (T-) /S /D >>}%
+-  \edef\roman{\the\romancount << /S /r >>}%
+-  \edef\arabic{\the\arabiccount << /S /D >>}%
+   %
+-  % Page label ranges must be increasing.  Remove any duplicates.
+-  % (There is a slight chance of this being wrong if e.g. there is
+-  % a @contents but no @titlepage, etc.)
+-  %
+-  \ifnum\romancount=0 \def\roman{}\fi
+-  \ifnum\arabiccount=0 \def\title{}%
+-  \else
+-    \ifnum\romancount=\arabiccount \def\roman{}\fi
+-  \fi
+-  %
+-  \ifnum\romancount<\arabiccount
+-    \pdfcatalog{/PageLabels << /Nums [\title \roman \arabic ] >> }\relax
++  % support @contents at very end of document
++  \ifnum\contentsendcount=\pagecount
++    \ifnum\arabiccount<\romancount
++      \pdfcatalog{/PageLabels << /Nums
++                  [\title
++                   \the\arabiccount << /S /D >>
++                   \the\romancount << /S /r >>
++                  ] >> }\relax
++    \fi
++  % no contents in document
++  \else\ifnum\contentsendcount=0
++    \pdfcatalog{/PageLabels << /Nums
++                [\title
++                 \the\arabiccount << /S /D >>
++                ] >> }\relax
+   \else
+-    \pdfcatalog{/PageLabels << /Nums [\title \arabic \roman ] >> }\relax
+-  \fi
++    \pdfcatalog{/PageLabels << /Nums
++                [\title
++                 \the\romancount << /S /r >>
++                 \the\contentsendcount << /S /D >>
++                ] >> }\relax
++  \fi\fi
+ }
+ \else
+   \let\pagelabels\relax
+@@ -1131,6 +1137,8 @@ where each line of input produces a line of output.}
+ \newcount\pagecount \pagecount=0
+ \newcount\romancount \romancount=0
+ \newcount\arabiccount \arabiccount=0
++\newcount\contentsendcount \contentsendcount=0
++
+ \ifpdf
+   \let\ptxadvancepageno\advancepageno
+   \def\advancepageno{%
+@@ -6809,12 +6817,8 @@ might help (with 'rm \jobname.?? \jobname.??s')%
+ % Get ready to use Arabic numerals again
+ \def\contentsendroman{%
+   \lastnegativepageno = \pageno
+-  \global\pageno = \savepageno
+-  %
+-  % If \romancount > \arabiccount, the contents are at the end of the
+-  % document.  Otherwise, advance where the Arabic numerals start for
+-  % the page numbers.
+-  \ifnum\romancount>\arabiccount\else\global\arabiccount=\pagecount\fi
++  \global\pageno=1
++  \contentsendcount = \pagecount
+ }
+ 
+ % Typeset the label for a chapter or appendix for the short contents.
+diff --git a/lib/Autom4te/FileUtils.pm b/lib/Autom4te/FileUtils.pm
+index ab58b9de4..2468fe6d8 100644
+--- a/lib/Autom4te/FileUtils.pm
++++ b/lib/Autom4te/FileUtils.pm
+@@ -39,9 +39,12 @@ use strict;
+ use warnings FATAL => 'all';
+ 
+ use Exporter;
+-use Time::HiRes qw(stat);
+ use IO::File;
+ 
++# use sub-second resolution timestamps if available,
++# carry on with one-second resolution timestamps if that is all we have
++BEGIN { eval { require Time::HiRes; import Time::HiRes qw(stat) } }
++
+ use Autom4te::Channels;
+ use Autom4te::ChannelDefs;
+ 
+-- 
+2.41.0
+

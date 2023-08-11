@@ -8,6 +8,7 @@ SRC_URI = "git://github.com/rpm-software-management/createrepo_c;branch=master;p
            file://0001-Do-not-set-PYTHON_INSTALL_DIR-by-running-python.patch \
            file://0001-include-rpm-rpmstring.h.patch \
            file://0001-src-cmd_parser.c-add-a-missing-parameter-name.patch \
+           file://time64fix.patch \
            "
 
 SRCREV = "0652d7303ce236e596c83c29ccc9bee7868fce6e"

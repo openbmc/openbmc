@@ -11,17 +11,49 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=a32c99f24d097c72d1857e533b55642b"
 #FORTRAN:forcevariable = ",fortran"
 #RUNTIMETARGET:append:pn-gcc-runtime = " libquadmath"
 
-DEPENDS = "libgfortran"
+DEPENDS = "libgfortran \
+           ${@bb.utils.contains('PTEST_ENABLED', '1', 'rsync-native', '', d)} \
+          "
+RDEPENDS:${PN}-ptest += "cmake"
 
 SRCREV = "32b062a33352e05771dcc01b981ebe961bf2e42f"
-SRC_URI = "git://github.com/Reference-LAPACK/lapack.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/Reference-LAPACK/lapack.git;protocol=https;branch=master \
+           ${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d)} \
+          "
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[lapacke] = "-DLAPACKE=ON,-DLAPACKE=OFF"
 
-EXTRA_OECMAKE = " -DBUILD_SHARED_LIBS=ON "
+EXTRA_OECMAKE = " -DBUILD_SHARED_LIBS=ON \
+                  ${@bb.utils.contains('PTEST_ENABLED', '1', ' -DBUILD_TESTING=ON', '', d)} \
+                "
 OECMAKE_GENERATOR = "Unix Makefiles"
 
-inherit cmake pkgconfig
+inherit cmake pkgconfig ptest
 EXCLUDE_FROM_WORLD = "1"
+
+do_install_ptest () {
+    rsync -a ${B}/TESTING ${D}${PTEST_PATH} \
+          --exclude CMakeFiles \
+          --exclude cmake_install.cmake \
+          --exclude Makefile
+    rsync -a ${B}/BLAS ${D}${PTEST_PATH} \
+          --exclude CMakeFiles \
+          --exclude cmake_install.cmake \
+          --exclude Makefile
+    rsync -a ${B}/LAPACKE ${D}${PTEST_PATH} \
+          --exclude CMakeFiles \
+          --exclude cmake_install.cmake \
+          --exclude Makefile
+    cp -r ${B}/bin ${D}${PTEST_PATH}
+    cp -r ${B}/lapack_testing.py ${D}${PTEST_PATH}
+    cp ${B}/CTestTestfile.cmake ${D}${PTEST_PATH}
+    cp ${S}/TESTING/*.in ${S}/TESTING/runtest.cmake ${D}${PTEST_PATH}/TESTING
+    cp ${S}/BLAS/TESTING/*.in ${D}${PTEST_PATH}/BLAS/TESTING
+    sed -i -e 's#${B}#${PTEST_PATH}#g' `find ${D}${PTEST_PATH} -name CTestTestfile.cmake`
+    sed -i -e 's#${S}#${PTEST_PATH}#g' `find ${D}${PTEST_PATH} -name CTestTestfile.cmake`
+    sed -i -e 's#${RECIPE_SYSROOT_NATIVE}##g' `find ${D}${PTEST_PATH} -name CTestTestfile.cmake`
+    sed -i -e 's#${PYTHON}#/usr/bin/python3#g' `find ${D}${PTEST_PATH} -name CTestTestfile.cmake`
+    sed -i -e 's#${WORKDIR}##g' `find ${D}${PTEST_PATH} -name CTestTestfile.cmake`
+}

@@ -83,7 +83,6 @@
 
 SUMMARY = "Booting sequence and CPU,I/O usage monitor"
 DESCRIPTION = "Monitors where the system spends its time at start, creating a graph of all processes, disk utilization, and wait time."
-AUTHOR = "Wonhong Kwon <wonhong.kwon@lge.com>"
 HOMEPAGE = "https://github.com/mmeeks/bootchart"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=44ac4678311254db62edf8fd39cb8124"

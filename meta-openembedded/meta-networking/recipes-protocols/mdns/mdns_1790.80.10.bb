@@ -46,18 +46,16 @@ PACKAGECONFIG[tls] = ",tls=no,mbedtls"
 
 CVE_PRODUCT = "apple:mdnsresponder"
 
-# CVE-2007-0613 is not applicable as it only affects Apple products
-# i.e. ichat,mdnsresponder, instant message framework and MacOS.
-# Also, https://www.exploit-db.com/exploits/3230 shows the part of code
-# affected by CVE-2007-0613 which is not preset in upstream source code.
-# Hence, CVE-2007-0613 does not affect other Yocto implementations and
-# is not reported for other distros can be marked whitelisted.
-# Links:
-# https://vulmon.com/vulnerabilitydetails?qid=CVE-2007-0613
-# https://www.incibe-cert.es/en/early-warning/vulnerabilities/cve-2007-0613
-# https://security-tracker.debian.org/tracker/CVE-2007-0613
-# https://vulmon.com/vulnerabilitydetails?qid=CVE-2007-0613
-CVE_CHECK_IGNORE += "CVE-2007-0613"
+CVE_STATUS[CVE-2007-0613] = "not-applicable-platform: Issue affects Apple products \
+i.e. ichat,mdnsresponder, instant message framework and MacOS. Also, \
+https://www.exploit-db.com/exploits/3230 shows the part of code \
+affected by CVE-2007-0613 which is not preset in upstream source code. \
+Hence, CVE-2007-0613 does not affect other Yocto implementations and \
+is not reported for other distros can be marked whitelisted. \
+Links: https://vulmon.com/vulnerabilitydetails?qid=CVE-2007-0613 \
+https://www.incibe-cert.es/en/early-warning/vulnerabilities/cve-2007-0613 \
+https://security-tracker.debian.org/tracker/CVE-2007-0613 \
+https://vulmon.com/vulnerabilitydetails?qid=CVE-2007-0613"
 
 PARALLEL_MAKE = ""
 

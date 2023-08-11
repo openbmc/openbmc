@@ -1,0 +1,328 @@
+From b5891a57b586ef6ff78bb752d62915b78cd58d7e Mon Sep 17 00:00:00 2001
+From: Zack Weinberg <zackw@panix.com>
+Date: Sun, 2 Apr 2023 15:07:58 -0400
+Subject: [PATCH 12/29] Overhaul AC_TYPE_GETGROUPS and AC_FUNC_GETGROUPS.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+AC_TYPE_GETGROUPS is the last remaining use of AC_EGREP_HEADER in
+stock Autoconf macros.  It uses it only when cross compiling, as a
+fallback from an AC_RUN_IFELSE check, testing for a bug in system
+headers from the late 1980s or early 1990s, where gid_t *existed*
+but the second argument to getgroups needed to be an array of int,
+and this didn’t cause a compile error (i.e. the system headers
+declare getgroups with no prototype or an incorrect prototype).
+AC_FUNC_GETGROUPS also uses AC_RUN_IFELSE to test for obscure
+problems specific to long-obsolete Unixes.
+
+The downsides of AC_RUN_IFELSE and AC_EGREP_HEADER seem more severe
+than the chances of someone compiling a current-generation program,
+that uses getgroups, on an OS old enough to have one of the really
+nasty bugs.  Accordingly, this patch changes AC_FUNC_GETGROUPS to use
+a host_os-based *blacklist* both in native and cross compilation.
+This is limited to the two host_os values for which either our old
+code, or Gnulib, documented a serious bug: ultrix* and nextstep*.
+Currently it does not try to pin down the exact version ranges subject
+to the bugs — that would require research by someone with access to
+the full history of these OSes.
+
+An incorrect guess by this blacklist can be overridden by setting
+ac_cv_func_getgroups_works in config.site.  AC_TYPE_GETGROUPS, for its
+part, now does a series of regular old AC_COMPILE_IFELSE checks to
+probe the prototype of getgroups, and considers that good enough.
+
+While I was in there I noticed that AC_FUNC_GETGROUPS does not
+AC_SUBST a documented output variable, and that the name of this
+variable is misspelled in the manual.
+
+* lib/autoconf/functions.m4 (AC_FUNC_GETGROUPS): Use AC_SEARCH_LIBS
+  to probe for getgroups.  Use an AC_CANONICAL_HOST-based blacklist
+  for bug detection, not AC_RUN_IFELSE.  AC_SUBST the GETGROUPS_LIB
+  output variable.
+* lib/autoconf/types.m4 (AC_TYPE_GETGROUPS): Check only the prototype
+  of getgroups, using AC_COMPILE_IFELSE; do not use either AC_RUN_IFELSE
+  or AC_EGREP_HEADER.
+* doc/autoconf.texi: Update to match. Correct misspelling of
+  GETGROUPS_LIB.
+* tests.local.at (_AT_CHECK_ENV): Allow GETGROUPS_LIB output variable.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ NEWS                      | 11 +++++
+ doc/autoconf.texi         | 25 ++++++----
+ lib/autoconf/functions.m4 | 61 ++++++++++++------------
+ lib/autoconf/types.m4     | 97 ++++++++++++++++++++++++---------------
+ tests/local.at            |  2 +-
+ 5 files changed, 120 insertions(+), 76 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index 53c57ff59..8e4ecc1bf 100644
+--- a/NEWS
++++ b/NEWS
+@@ -38,6 +38,17 @@ GNU Autoconf NEWS - User visible changes.
+   This matters only for uses that, contrary to the documentation
+   and despite warnings, use m4_divert with numbered diversions.
+ 
++*** AC_FUNC_GETGROUPS and AC_TYPE_GETGROUPS no longer run test programs.
++  These macros were testing for OS bugs that we believe are at least
++  twenty years in the past.  Most operating systems are now trusted to
++  provide an accurate prototype for getgroups in unistd.h, and to
++  implement it as specified in POSIX.
++
++  AC_FUNC_GETGROUPS still includes a short blacklist of OSes with
++  known, severe bugs in getgroups.  It can be overridden using
++  config.site.  If you encounter a mistake in this blacklist
++  please report it to bug-autoconf.
++
+ ** New features
+ 
+ *** New macro AC_SYS_YEAR2038.
+diff --git a/doc/autoconf.texi b/doc/autoconf.texi
+index 037c8055f..5d5f613e6 100644
+--- a/doc/autoconf.texi
++++ b/doc/autoconf.texi
+@@ -5257,17 +5257,26 @@ and also contains workarounds for other portability problems of
+ @defmac AC_FUNC_GETGROUPS
+ @acindex{FUNC_GETGROUPS}
+ @cvindex HAVE_GETGROUPS
+-@ovindex GETGROUPS_LIBS
++@ovindex GETGROUPS_LIB
+ @c @fuindex getgroups
+ @prindex @code{getgroups}
+ @caindex func_getgroups_works
+-If the @code{getgroups} function is available and works,
+-define @code{HAVE_GETGROUPS}.  Set @code{GETGROUPS_LIBS} to any libraries
+-needed to get that function.  This macro runs @code{AC_TYPE_GETGROUPS}.
+-
+-This macro is obsolescent. New programs need not use this macro.  But
+-they may want to use the Gnulib module @code{getgroups}, which provides
+-workarounds to other portability problems of this function.
++Perform all the checks performed by @code{AC_TYPE_GETGROUPS}
++(@pxref{AC_TYPE_GETGROUPS}).
++Then, if the @code{getgroups} function is available
++and known to work correctly, define @code{HAVE_GETGROUPS}.
++Set the output variable @code{GETGROUPS_LIB} to any libraries
++needed to get that function.
++
++This macro relies on a list of systems with known, serious bugs in
++@code{getgroups}.  If this list mis-identifies your system's
++@code{getgroups} as buggy, or as not buggy, you can override it by
++setting the cache variable @code{ac_cv_func_getgroups_works} in a
++@file{config.site} file (@pxref{Site Defaults}).  Please also report the
++error to @email{bug-autoconf@@gnu.org, the Autoconf Bugs mailing list}.
++
++The Gnulib module @code{getgroups} provides workarounds for additional,
++less severe portability problems with this function.
+ @end defmac
+ 
+ @anchor{AC_FUNC_GETLOADAVG}
+diff --git a/lib/autoconf/functions.m4 b/lib/autoconf/functions.m4
+index 655d6ba8f..74512e97d 100644
+--- a/lib/autoconf/functions.m4
++++ b/lib/autoconf/functions.m4
+@@ -698,47 +698,46 @@ AS_IF([test "$ac_cv_func_fseeko_ftello" = "need _LARGEFILE_SOURCE"],
+ # When cross-compiling, assume getgroups is broken.
+ AN_FUNCTION([getgroups], [AC_FUNC_GETGROUPS])
+ AC_DEFUN([AC_FUNC_GETGROUPS],
+-[AC_REQUIRE([AC_TYPE_GETGROUPS])dnl
+-AC_REQUIRE([AC_TYPE_SIZE_T])dnl
+-AC_REQUIRE([AC_CANONICAL_HOST])dnl for cross-compiles
+-AC_CHECK_FUNC(getgroups)
++[AC_REQUIRE([AC_CANONICAL_HOST])dnl
++AC_REQUIRE([AC_TYPE_GETGROUPS])dnl
+ 
+-# If we don't yet have getgroups, see if it's in -lbsd.
++# On older systems getgroups might be in -lbsd.
+ # This is reported to be necessary on an ITOS 3000WS running SEIUX 3.1.
+ ac_save_LIBS=$LIBS
+-if test $ac_cv_func_getgroups = no; then
+-  AC_CHECK_LIB(bsd, getgroups, [GETGROUPS_LIB=-lbsd])
+-fi
+-
+-# Run the program to test the functionality of the system-supplied
+-# getgroups function only if there is such a function.
++LIBS=
++GETGROUPS_LIB=
++AC_SEARCH_LIBS([getgroups], [bsd],
++  [test "$ac_res" = "none required" || GETGROUPS_LIB="$ac_res"
++   ac_cv_func_getgroups=yes],
++  [ac_cv_func_getgroups=no])
++LIBS=$ac_save_LIBS
++AC_SUBST([GETGROUPS_LIB])
++
++# Known severe bugs in getgroups on particular systems.
++#  - On Ultrix 4.3 and NextSTEP 3.2, getgroups (0, 0) is reported to
++#    fail, rather than returning the number of supplementary groups as
++#    it ought to.  We do not know the exact range of releases affected
++#    in either case.
++# We currently reject all versions of the systems with known bugs, and
++# no other systems.  Please send corrections to bug-autoconf@gnu.org.
+ if test $ac_cv_func_getgroups = yes; then
++  # This AC_CACHE_CHECK exists so that one may override an incorrect
++  # guess by setting ac_cv_func_getgroups_works in a config.site file.
+   AC_CACHE_CHECK([for working getgroups], ac_cv_func_getgroups_works,
+-   [AC_RUN_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT],
+-      [[/* On Ultrix 4.3, getgroups (0, 0) always fails.  */
+-       return getgroups (0, 0) == -1;]])],
+-		  [ac_cv_func_getgroups_works=yes],
+-		  [ac_cv_func_getgroups_works=no],
+-		  [case "$host_os" in # ((
+-			     # Guess yes on glibc systems.
+-		     *-gnu*) ac_cv_func_getgroups_works="guessing yes" ;;
+-			     # If we don't know, assume the worst.
+-		     *)      ac_cv_func_getgroups_works="guessing no" ;;
+-		   esac])
+-   ])
++   [AS_CASE([$host_os],
++     [ultrix* | nextstep*],
++      [ac_cv_func_getgroups_works=no # getgroups(0,0) fails
++],
++      [ac_cv_func_getgroups_works=yes])])
+ else
+   ac_cv_func_getgroups_works=no
+ fi
+-case "$ac_cv_func_getgroups_works" in
+-  *yes)
+-    AC_DEFINE(HAVE_GETGROUPS, 1,
+-	      [Define to 1 if your system has a working 'getgroups' function.])
+-    ;;
+-esac
+-LIBS=$ac_save_LIBS
++if test $ac_cv_func_getgroups_works = yes; then
++  AC_DEFINE(HAVE_GETGROUPS, 1,
++            [Define to 1 if your system has a working 'getgroups' function.])
++fi
+ ])# AC_FUNC_GETGROUPS
+ 
+-
+ # _AC_LIBOBJ_GETLOADAVG
+ # ---------------------
+ # Set up the AC_LIBOBJ replacement of 'getloadavg'.
+diff --git a/lib/autoconf/types.m4 b/lib/autoconf/types.m4
+index ef2456135..af3872b2f 100644
+--- a/lib/autoconf/types.m4
++++ b/lib/autoconf/types.m4
+@@ -258,44 +258,69 @@ AN_IDENTIFIER([ptrdiff_t], [AC_CHECK_TYPES])
+ # AC_TYPE_GETGROUPS
+ # -----------------
+ AC_DEFUN([AC_TYPE_GETGROUPS],
++dnl We now unconditionally assume that if <unistd.h> has a prototype for
++dnl getgroups, it is accurate; and that if <unistd.h> does _not_ declare
++dnl getgroups with a prototype, the second argument is an array of int.
++dnl (Older versions of Autoconf made these assumptions only when cross
++dnl compiling.)  See AC_FUNC_GETGROUPS, over in functions.m4, for why
++dnl this uses AC_COMPILE_IFELSE rather than AC_LINK_IFELSE.
+ [AC_REQUIRE([AC_TYPE_UID_T])dnl
+-AC_CACHE_CHECK(type of array argument to getgroups, ac_cv_type_getgroups,
+-[AC_RUN_IFELSE([AC_LANG_SOURCE(
+-[[/* Thanks to Mike Rendell for this test.  */
+-]AC_INCLUDES_DEFAULT[
+-#define NGID 256
+-#undef MAX
+-#define MAX(x, y) ((x) > (y) ? (x) : (y))
+-
+-int
+-main (void)
+-{
+-  gid_t gidset[NGID];
+-  int i, n;
+-  union { gid_t gval; long int lval; }  val;
+-
+-  val.lval = -1;
+-  for (i = 0; i < NGID; i++)
+-    gidset[i] = val.gval;
+-  n = getgroups (sizeof (gidset) / MAX (sizeof (int), sizeof (gid_t)) - 1,
+-		 gidset);
+-  /* Exit non-zero if getgroups seems to require an array of ints.  This
+-     happens when gid_t is short int but getgroups modifies an array
+-     of ints.  */
+-  return n > 0 && gidset[n] != val.gval;
+-}]])],
+-	       [ac_cv_type_getgroups=gid_t],
+-	       [ac_cv_type_getgroups=int],
+-	       [ac_cv_type_getgroups=cross])
+-if test $ac_cv_type_getgroups = cross; then
+-  dnl When we can't run the test program (we are cross compiling), presume
+-  dnl that <unistd.h> has either an accurate prototype for getgroups or none.
+-  dnl Old systems without prototypes probably use int.
+-  AC_EGREP_HEADER([getgroups.*int.*gid_t], unistd.h,
+-		  ac_cv_type_getgroups=gid_t, ac_cv_type_getgroups=int)
+-fi])
++AC_CACHE_CHECK([type of array argument to getgroups], ac_cv_type_getgroups,
++[# If AC_TYPE_UID_T says there isn't any gid_t typedef, then we can skip
++# everything below.
++AS_IF([test $ac_cv_type_gid_t = no],
++  [ac_cv_type_getgroups=int],
++  [# Test programs below rely on strict type checking of extern declarations:
++  # 'extern int getgroups(int, int *); extern int getgroups(int, pid_t *);'
++  # is valid in C89 if and only if pid_t is a typedef for int.  Unlike
++  # anything involving either an assignment or a function call, compilers
++  # tend to make this kind of type mismatch a hard error, not just an
++  # "incompatible pointer types" warning.
++  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
++[AC_INCLUDES_DEFAULT
++[extern int getgroups(int, gid_t *);]],
++[[return !(getgroups(0, 0) >= 0);]])],
++    [ac_getgroups_gidarray=yes],
++    [ac_getgroups_gidarray=no])
++  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
++[AC_INCLUDES_DEFAULT
++[extern int getgroups(int, int *);]],
++[[return !(getgroups(0, 0) >= 0);]])],
++    [ac_getgroups_intarray=yes],
++    [ac_getgroups_intarray=no])
++
++  AS_CASE([int:$ac_getgroups_intarray,gid:$ac_getgroups_gidarray],
++    [int:yes,gid:no], [ac_cv_type_getgroups=int],
++    [int:no,gid:yes], [ac_cv_type_getgroups=gid_t],
++    [int:yes,gid:yes], [
++      # Both programs compiled - this means *either* that getgroups
++      # was declared with no prototype, in which case we should use int,
++      # or that it was declared prototyped but gid_t is a typedef for int,
++      # in which case we should use gid_t.  Distinguish the two cases
++      # by testing if the compiler catches a blatantly incorrect function
++      # signature for getgroups.
++      AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
++[AC_INCLUDES_DEFAULT
++[extern int getgroups(int, float);]],
++[[return !(getgroups(0, 0) >= 0);]])], [
++        # Compiler did not catch incorrect argument list;
++        # getgroups is unprototyped.
++        ac_cv_type_getgroups=int
++      ], [
++        # Compiler caught incorrect argument list;
++        # gid_t is a typedef for int.
++        ac_cv_type_getgroups=gid_t
++      ])
++    ], [
++      # Both programs failed to compile - this probably means getgroups
++      # wasn't declared at all.  Use 'int', as this is probably a very
++      # old system where the type _would have been_ int.
++      ac_cv_type_getgroups=int
++    ])
++  ])
++])dnl AC_CACHE_CHECK
+ AC_DEFINE_UNQUOTED(GETGROUPS_T, $ac_cv_type_getgroups,
+-		   [Define to the type of elements in the array set by
++		   [Define to the type of elements in the array argument to
+ 		    'getgroups'. Usually this is either 'int' or 'gid_t'.])
+ ])# AC_TYPE_GETGROUPS
+ 
+diff --git a/tests/local.at b/tests/local.at
+index 64a9fb264..db49f84a9 100644
+--- a/tests/local.at
++++ b/tests/local.at
+@@ -401,7 +401,7 @@ if test -f state-env.before && test -f state-env.after; then
+       [interpval|PATH_SEPARATOR],
+       [GFC|F77_DUMMY_MAIN|f77_(case|underscore)],
+       [FC(_DUMMY_MAIN|FLAGS|LIBS|FLAGS_[fF]|_MODEXT|_MODINC|_MODOUT|_DEFINE)?],
+-      [ALLOCA|GETLOADAVG_LIBS|KMEM_GROUP|NEED_SETGID|POW_LIB],
++      [ALLOCA|GETGROUPS_LIB|GETLOADAVG_LIBS|KMEM_GROUP|NEED_SETGID|POW_LIB],
+       [AWK|LEX|LEXLIB|LEX_OUTPUT_ROOT|LN_S|M4|MKDIR_P|AR|RANLIB|SET_MAKE|YACC],
+       [EGREP_TRADITIONAL],
+       [GREP|[EF]GREP|SED],
+-- 
+2.41.0
+

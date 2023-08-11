@@ -1,0 +1,318 @@
+Backport patch to fix interpreter of sss_analyze.
+
+Upstream-Status: Backport [https://github.com/SSSD/sssd/commit/ed3726c]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+From ed3726c37fe07aab788404bfa2f9003db15f4210 Mon Sep 17 00:00:00 2001
+From: roy214 <abroy@redhat.com>
+Date: Tue, 25 Apr 2023 20:01:24 +0530
+Subject: [PATCH] sssctl: add error analyzer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Also removing unused variable and import.
+
+Reviewed-by: Justin Stephenson <jstephen@redhat.com>
+Reviewed-by: Tomáš Halman <thalman@redhat.com>
+---
+ src/tools/analyzer/Makefile.am        |  2 +
+ src/tools/analyzer/modules/error.py   | 61 +++++++++++++++++++++++++++
+ src/tools/analyzer/modules/request.py | 54 +++++-------------------
+ src/tools/analyzer/sss_analyze        |  2 +-
+ src/tools/analyzer/sss_analyze.py     |  3 ++
+ src/tools/analyzer/util.py            | 44 +++++++++++++++++++
+ 6 files changed, 121 insertions(+), 45 deletions(-)
+ create mode 100644 src/tools/analyzer/modules/error.py
+ create mode 100644 src/tools/analyzer/util.py
+
+diff --git a/src/tools/analyzer/Makefile.am b/src/tools/analyzer/Makefile.am
+index b40043d043..7692af8528 100644
+--- a/src/tools/analyzer/Makefile.am
++++ b/src/tools/analyzer/Makefile.am
+@@ -13,10 +13,12 @@ dist_pkgpython_DATA = \
+     source_reader.py \
+     parser.py \
+     sss_analyze.py \
++    util.py \
+     $(NULL)
+ 
+ modulesdir = $(pkgpythondir)/modules
+ dist_modules_DATA = \
+     modules/__init__.py \
+     modules/request.py \
++    modules/error.py \
+     $(NULL)
+diff --git a/src/tools/analyzer/modules/error.py b/src/tools/analyzer/modules/error.py
+new file mode 100644
+index 0000000000..71173670c5
+--- /dev/null
++++ b/src/tools/analyzer/modules/error.py
+@@ -0,0 +1,61 @@
++from sssd import util
++from sssd.parser import SubparsersAction
++from sssd import sss_analyze
++
++class ErrorAnalyzer:
++    """
++    An error analyzer module, list if there is any error reported by sssd_be
++    """
++    module_parser = None
++    print_opts = []
++
++    def print_module_help(self, args):
++        """
++        Print the module parser help output
++
++        Args:
++            args (Namespace): argparse parsed arguments
++        """
++        self.module_parser.print_help()
++
++    def setup_args(self, parser_grp, cli):
++        """
++        Setup module parser, subcommands, and options
++
++        Args:
++            parser_grp (argparse.Action): Parser group to nest
++               module and subcommands under
++        """
++        desc = "Analyze error check module"
++        self.module_parser = parser_grp.add_parser('error',
++                                                   description=desc,
++                                                   help='Error checker')
++
++        subparser = self.module_parser.add_subparsers(title=None,
++                                                      dest='subparser',
++                                                      action=SubparsersAction,
++                                                      metavar='COMMANDS')
++
++        subcmd_grp = subparser.add_parser_group('Operation Modes')
++        cli.add_subcommand(subcmd_grp, 'list', 'Print error messages found in backend',
++                           self.print_error, self.print_opts)
++
++        self.module_parser.set_defaults(func=self.print_module_help)
++
++        return self.module_parser
++
++    def print_error(self, args):
++        err = 0
++        utl = util.Utils()
++        source = utl.load(args)
++        component = source.Component.BE
++        source.set_component(component, False)
++        patterns = ['sdap_async_sys_connect request failed', 'terminated by own WATCHDOG',
++            'ldap_sasl_interactive_bind_s failed', 'Communication with KDC timed out', 'SSSD is offline', 'Backend is offline',
++            'tsig verify failure', 'ldap_install_tls failed', 's2n exop request failed']
++        for line in utl.matched_line(source, patterns):
++            err +=1
++            print(line)
++        if err > 0:
++            print("For possible solutions please refer to https://sssd.io/troubleshooting/errors.html")
++        return
+diff --git a/src/tools/analyzer/modules/request.py b/src/tools/analyzer/modules/request.py
+index d661dddb84..e4d5f060c7 100644
+--- a/src/tools/analyzer/modules/request.py
++++ b/src/tools/analyzer/modules/request.py
+@@ -1,6 +1,6 @@
+ import re
+ import logging
+-
++from sssd import util
+ from sssd.parser import SubparsersAction
+ from sssd.parser import Option
+ 
+@@ -38,7 +38,6 @@ def print_module_help(self, args):
+     def setup_args(self, parser_grp, cli):
+         """
+         Setup module parser, subcommands, and options
+-
+         Args:
+             parser_grp (argparse.Action): Parser group to nest
+                module and subcommands under
+@@ -63,42 +62,6 @@ def setup_args(self, parser_grp, cli):
+ 
+         return self.module_parser
+ 
+-    def load(self, args):
+-        """
+-        Load the appropriate source reader.
+-
+-        Args:
+-            args (Namespace): argparse parsed arguments
+-
+-        Returns:
+-            Instantiated source object
+-        """
+-        if args.source == "journald":
+-            from sssd.source_journald import Journald
+-            source = Journald()
+-        else:
+-            from sssd.source_files import Files
+-            source = Files(args.logdir)
+-        return source
+-
+-    def matched_line(self, source, patterns):
+-        """
+-        Yield lines which match any number of patterns (OR) in
+-        provided patterns list.
+-
+-        Args:
+-            source (Reader): source Reader object
+-        Yields:
+-            lines matching the provided pattern(s)
+-        """
+-        for line in source:
+-            for pattern in patterns:
+-                re_obj = re.compile(pattern)
+-                if re_obj.search(line):
+-                    if line.startswith('   *  '):
+-                        continue
+-                    yield line
+-
+     def get_linked_ids(self, source, pattern, regex):
+         """
+         Retrieve list of associated REQ_TRACE ids. Filter
+@@ -114,8 +77,9 @@ def get_linked_ids(self, source, pattern, regex):
+         Returns:
+             List of linked ids discovered
+         """
++        utl = util.Utils()
+         linked_ids = []
+-        for match in self.matched_line(source, pattern):
++        for match in utl.matched_line(source, pattern):
+             id_re = re.compile(regex)
+             match = id_re.search(match)
+             if match:
+@@ -250,7 +214,8 @@ def list_requests(self, args):
+         Args:
+             args (Namespace):  populated argparse namespace
+         """
+-        source = self.load(args)
++        utl = util.Utils()
++        source = utl.load(args)
+         component = source.Component.NSS
+         resp = "nss"
+         # Log messages matching the following regex patterns contain
+@@ -266,7 +231,7 @@ def list_requests(self, args):
+         if args.verbose:
+             self.print_formatted_verbose(source)
+         else:
+-            for line in self.matched_line(source, patterns):
++            for line in utl.matched_line(source, patterns):
+                 if type(source).__name__ == 'Journald':
+                     print(line)
+                 else:
+@@ -279,7 +244,8 @@ def track_request(self, args):
+         Args:
+             args (Namespace):  populated argparse namespace
+         """
+-        source = self.load(args)
++        utl = util.Utils()
++        source = utl.load(args)
+         cid = args.cid
+         resp_results = False
+         be_results = False
+@@ -294,7 +260,7 @@ def track_request(self, args):
+         logger.info(f"******** Checking {resp} responder for Client ID"
+                     f" {cid} *******")
+         source.set_component(component, args.child)
+-        for match in self.matched_line(source, pattern):
++        for match in utl.matched_line(source, pattern):
+             resp_results = self.consume_line(match, source, args.merge)
+ 
+         logger.info(f"********* Checking Backend for Client ID {cid} ********")
+@@ -307,7 +273,7 @@ def track_request(self, args):
+         pattern.clear()
+         [pattern.append(f'\\{id}') for id in be_ids]
+ 
+-        for match in self.matched_line(source, pattern):
++        for match in utl.matched_line(source, pattern):
+             be_results = self.consume_line(match, source, args.merge)
+ 
+         if args.merge:
+diff --git a/src/tools/analyzer/sss_analyze b/src/tools/analyzer/sss_analyze
+index 3f1beaf38b..6d4b5b30c6 100755
+--- a/src/tools/analyzer/sss_analyze
++++ b/src/tools/analyzer/sss_analyze
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ from sssd import sss_analyze
+ 
+diff --git a/src/tools/analyzer/sss_analyze.py b/src/tools/analyzer/sss_analyze.py
+index 18b998f380..dafc84fc03 100644
+--- a/src/tools/analyzer/sss_analyze.py
++++ b/src/tools/analyzer/sss_analyze.py
+@@ -1,6 +1,7 @@
+ import argparse
+ 
+ from sssd.modules import request
++from sssd.modules import error
+ from sssd.parser import SubparsersAction
+ 
+ 
+@@ -55,9 +56,11 @@ def load_modules(self, parser, parser_grp):
+         """
+         # Currently only the 'request' module exists
+         req = request.RequestAnalyzer()
++        err = error.ErrorAnalyzer()
+         cli = Analyzer()
+ 
+         req.setup_args(parser_grp, cli)
++        err.setup_args(parser_grp, cli)
+ 
+     def setup_args(self):
+         """
+diff --git a/src/tools/analyzer/util.py b/src/tools/analyzer/util.py
+new file mode 100644
+index 0000000000..2a8d153a71
+--- /dev/null
++++ b/src/tools/analyzer/util.py
+@@ -0,0 +1,44 @@
++import re
++import logging
++
++from sssd.source_files import Files
++from sssd.source_journald import Journald
++
++logger = logging.getLogger()
++
++
++class Utils:
++
++    def load(self, args):
++        """
++        Load the appropriate source reader.
++
++        Args:
++            args (Namespace): argparse parsed arguments
++
++        Returns:
++            Instantiated source object
++        """
++        if args.source == "journald":
++            source = Journald()
++        else:
++            source = Files(args.logdir)
++        return source
++
++    def matched_line(self, source, patterns):
++        """
++        Yield lines which match any number of patterns (OR) in
++        provided patterns list.
++
++        Args:
++            source (Reader): source Reader object
++        Yields:
++            lines matching the provided pattern(s)
++        """
++        for line in source:
++            for pattern in patterns:
++                re_obj = re.compile(pattern)
++                if re_obj.search(line):
++                    if line.startswith('   *  '):
++                        continue
++                    yield line

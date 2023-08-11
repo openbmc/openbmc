@@ -5,7 +5,7 @@ SECTION = "x11/graphics"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2a6f86d002ae9ae1eb1ccc466289f146"
 
-DEPENDS = "webkitgtk gtk+3 glib-2.0 gcr3"
+DEPENDS = "webkitgtk3 gtk+3 glib-2.0 gcr3"
 
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 

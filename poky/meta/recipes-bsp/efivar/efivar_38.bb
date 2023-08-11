@@ -19,10 +19,6 @@ inherit pkgconfig
 
 export CCLD_FOR_BUILD = "${BUILD_CCLD}"
 
-# Upstream uses --add-needed in gcc.specs which gold doesn't support, so
-# enforce BFD.
-LDFLAGS += "-fuse-ld=bfd"
-
 do_compile() {
     oe_runmake ERRORS= HOST_CFLAGS="${BUILD_CFLAGS}" HOST_LDFLAGS="${BUILD_LDFLAGS}"
 }

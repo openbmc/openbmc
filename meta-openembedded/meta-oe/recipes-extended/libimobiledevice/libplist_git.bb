@@ -15,7 +15,9 @@ SRC_URI = "git://github.com/libimobiledevice/libplist;protocol=https;branch=mast
 
 S = "${WORKDIR}/git"
 
-CVE_CHECK_IGNORE += "\
+CVE_STATUS_GROUPS += "CVE_STATUS_LIBLIST"
+CVE_STATUS_LIBLIST[status] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
+CVE_STATUS_LIBLIST = " \
     CVE-2017-5834 \
     CVE-2017-5835 \
     CVE-2017-5836 \

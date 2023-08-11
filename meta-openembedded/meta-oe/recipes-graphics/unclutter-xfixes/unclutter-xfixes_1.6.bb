@@ -1,6 +1,5 @@
 SUMMARY = "Remove idle cursor image from screen."
 DESCRIPTION = "This is a rewrite of the popular tool unclutter, but using the x11-xfixes extension."
-AUTHOR = "Ingo Bürk"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b25d2c4cca175f44120d1b8e67cb358d"

@@ -16,7 +16,6 @@ image starts at fip partition + fip signature area size.
 Upstream-Status: Pending
 Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
 
-%% original patch: 0002-feat-corstone1000-bl2-loads-fip-based-on-metadata.patch
 ---
  bl2/bl2_main.c                                |  4 +++
  .../corstone1000/common/corstone1000_plat.c   | 32 ++++++-------------

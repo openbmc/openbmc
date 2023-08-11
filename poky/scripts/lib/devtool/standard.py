@@ -567,6 +567,8 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
         logger.debug('writing append file %s' % appendfile)
         with open(appendfile, 'a') as f:
             f.write('###--- _extract_source\n')
+            f.write('deltask do_recipe_qa\n')
+            f.write('deltask do_recipe_qa_setscene\n')
             f.write('ERROR_QA:remove = "patch-fuzz"\n')
             f.write('DEVTOOL_TEMPDIR = "%s"\n' % tempdir)
             f.write('DEVTOOL_DEVBRANCH = "%s"\n' % devbranch)

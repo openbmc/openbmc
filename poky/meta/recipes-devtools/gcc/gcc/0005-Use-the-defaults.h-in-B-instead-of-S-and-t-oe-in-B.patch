@@ -1,4 +1,4 @@
-From 6cce395992a1b573e6795fdad2f9086db921e924 Mon Sep 17 00:00:00 2001
+From 2cedf13819c0cc929660072d8a972f5e422f9701 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:17:25 +0400
 Subject: [PATCH] Use the defaults.h in ${B} instead of ${S}, and t-oe in ${B}
@@ -26,7 +26,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  4 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index ad9a5d94cd0..fe636af3f63 100644
+index 775aaa1b3c4..04f28984b34 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
 @@ -561,7 +561,7 @@ TARGET_SYSTEM_ROOT = @TARGET_SYSTEM_ROOT@

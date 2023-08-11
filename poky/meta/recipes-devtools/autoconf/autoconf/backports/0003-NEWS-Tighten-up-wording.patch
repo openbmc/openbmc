@@ -1,0 +1,29 @@
+From e05aa447945c0d72ad924fd89a28830cf1a0f8d3 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Fri, 31 Mar 2023 10:37:57 -0700
+Subject: [PATCH 03/29] * NEWS: Tighten up wording.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ NEWS | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index d64648c6f..884e46f45 100644
+--- a/NEWS
++++ b/NEWS
+@@ -5,9 +5,7 @@ GNU Autoconf NEWS - User visible changes.
+ ** Backward incompatibilities
+ 
+ *** AC_CHECK_FUNC and similar macros now use function prototypes.
+-  AC_CHECK_FUNC and and similar macros now use C declarations with
+-  function prototypes, a feature introduced in C89.  The new approach
+-  should work better with C23, which removed the non-prototyped K&R
++  This should work better with C23, which removed the non-prototyped K&R
+   style that AC_CHECK_FUNC previously used.  However, this change
+   means Autoconf no longer supports pre-1989 C compilers, as they do
+   not support function prototypes.
+-- 
+2.41.0
+

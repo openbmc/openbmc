@@ -1,6 +1,5 @@
 SUMMARY = "Python wrapper for Linux fanotify."
 HOMEPAGE = "https://github.com/baskiton/pyfanotify"
-AUTHOR = "Alexander Baskikh"
 SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=636a36c9df04efcfacf839b8866d9a37"

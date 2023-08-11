@@ -89,7 +89,7 @@ diff --git a/src/core/execute.c b/src/core/execute.c
 index 8ef76de9ab..ea1c203e43 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -6034,9 +6034,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+@@ -6667,9 +6667,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
          for (unsigned i = 0; i < RLIM_NLIMITS; i++)
                  if (c->rlimit[i]) {
                          fprintf(f, "%sLimit%s: " RLIM_FMT "\n",

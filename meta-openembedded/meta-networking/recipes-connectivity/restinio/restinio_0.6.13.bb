@@ -2,7 +2,6 @@ SUMMARY = "Header-only C++14 library that gives you an embedded HTTP server"
 DESCRIPTION = "Cross-platform, efficient, customizable, and robust \
                asynchronous HTTP/WebSocket server C++14 library with the \
                right balance between performance and ease of use"
-AUTHOR = "Stefan Wiehler <stefan.wiehler@missinglinkelectronics.com>"
 HOMEPAGE = "https://stiffstream.com/en/products/restinio.html"
 SECTION = "libs"
 LICENSE = "BSD-3-Clause"

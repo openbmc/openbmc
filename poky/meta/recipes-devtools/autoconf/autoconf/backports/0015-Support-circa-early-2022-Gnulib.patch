@@ -1,0 +1,32 @@
+From 1982523c6f052a2b361035a9d5d9737510ed0738 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Mon, 3 Apr 2023 09:12:40 -0700
+Subject: [PATCH 15/29] Support circa early 2022 Gnulib
+
+Problem reported by Frederic Berat in:
+https://lists.gnu.org/r/bug-rcs/2023-04/msg00001.html
+* lib/autoconf/specific.m4 (_AC_SYS_LARGEFILE_TEST_INCLUDES):
+Bring back for compatibility with post-2.71, pre-2.73 Gnulib.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/specific.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/autoconf/specific.m4 b/lib/autoconf/specific.m4
+index a2dc5d488..5dc006959 100644
+--- a/lib/autoconf/specific.m4
++++ b/lib/autoconf/specific.m4
+@@ -277,6 +277,8 @@ m4_define([_AC_SYS_LARGEFILE_TEST_CODE],
+ 		       && LARGE_OFF_T % 2147483647 == 1)
+ 		      ? 1 : -1]];[]dnl
+ ])
++# Defined by Autoconf 2.71 and circa 2022 Gnulib unwisely depended on it.
++m4_define([_AC_SYS_LARGEFILE_TEST_INCLUDES], [_AC_SYS_LARGEFILE_TEST_CODE])
+ 
+ # _AC_SYS_LARGEFILE_OPTIONS
+ # -------------------------
+-- 
+2.41.0
+

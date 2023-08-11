@@ -9,7 +9,6 @@ Subject: [PATCH] Handle logging syscall
 Signed-off-by: Balint Dobszay <balint.dobszay@arm.com>
 Change-Id: Ib8151cc9c66aea8bcc8fe8b1ecdc3f9f9c5f14e4
 
-%% original patch: 0004-Handle-logging-syscall.patch
 
 diff --git a/core/arch/arm/kernel/spmc_sp_handler.c b/core/arch/arm/kernel/spmc_sp_handler.c
 index e0fa0aa6..c7a45387 100644

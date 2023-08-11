@@ -40,7 +40,7 @@ set cpo&vim
 
 let s:maxoff = 50	" maximum number of lines to look backwards for ()
 
-function GetPythonIndent(lnum)
+function! GetBBPythonIndent(lnum)
 
   " If this line is explicitly joined: If the previous line was also joined,
   " line it up with that one, otherwise add two 'shiftwidth'
@@ -257,7 +257,7 @@ let b:did_indent = 1
 setlocal indentkeys+=0\"
 
 
-function BitbakeIndent(lnum)
+function! BitbakeIndent(lnum)
     if !has('syntax_items')
         return -1
     endif
@@ -315,7 +315,7 @@ function BitbakeIndent(lnum)
     endif
 
     if index(["bbPyDefRegion", "bbPyFuncRegion"], name) != -1
-        let ret = GetPythonIndent(a:lnum)
+        let ret = GetBBPythonIndent(a:lnum)
         " Should normally always be indented by at least one shiftwidth; but allow
         " return of -1 (defer to autoindent) or -2 (force indent to 0)
         if ret == 0

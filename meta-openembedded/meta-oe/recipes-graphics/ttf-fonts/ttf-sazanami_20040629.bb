@@ -3,7 +3,6 @@ require ttf.inc
 SUMMARY = "Sazanami Gothic/Mincho Japanese TrueType fonts"
 SUMMARY:ttf-sazanami-gothic = "Sazanami Gothic Japanese TrueType font"
 SUMMARY:ttf-sazanami-mincho = "Sazanami Mincho Japanese TrueType font"
-AUTHOR = "Electronic Font Open Laboratory (/efont/)"
 HOMEPAGE = "http://sourceforge.jp/projects/efont/"
 LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://README;md5=97d739900be6e852830f55aa3c07d4a0"

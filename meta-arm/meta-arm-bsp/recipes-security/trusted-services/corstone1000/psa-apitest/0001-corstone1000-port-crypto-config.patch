@@ -9,7 +9,6 @@ Subject: [PATCH] corstone1000: port crypto config
 
 Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
 
-%% original patch: 0002-corstone1000-port-crypto-config.patch
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---

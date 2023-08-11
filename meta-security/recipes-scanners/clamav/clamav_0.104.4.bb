@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING.txt;beginline=2;endline=3;md5=f7029fbbc5898b2
 # July 30th, 2022
 SRCREV = "563ba93052f3b7b46fb8725a65ee6299a9c332cf"
 
-SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=rel/0.104;protocol=https \
+SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/0.104;protocol=https \
     file://clamd.conf \
     file://freshclam.conf \
     file://volatiles.03_clamav \

@@ -61,6 +61,7 @@ do_install:append () {
 }
 
 USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "--system nogroup"
 USERADD_PARAM:${PN} = "--system --home ${localstatedir}/run/radvd/ -M -g nogroup radvd"
 
 pkg_postinst:${PN} () {

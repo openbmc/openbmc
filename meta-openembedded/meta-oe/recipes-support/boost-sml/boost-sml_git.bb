@@ -1,6 +1,5 @@
 SUMMARY = "[Boost::ext].SML (State Machine Language)"
 DESCRIPTION = "Your scalable C++14 one header only State Machine Library with no dependencies"
-AUTHOR = "Krzysztof Jusiak"
 HOMEPAGE = "https://github.com/boost-ext/sml"
 BUGTRACKER = "https://github.com/boost-ext/sml/issues"
 SECTION = "libs"

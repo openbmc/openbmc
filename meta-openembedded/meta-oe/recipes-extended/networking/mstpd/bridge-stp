@@ -1,0 +1,18 @@
+#!/bin/sh
+if [ "$#" -lt 2 ]; then
+  echo "Missing args: bridge-stp <bridge> <start|stop>" >&2
+  exit 1
+fi
+case "$2" in
+  start)
+    /usr/sbin/mstpctl addbridge "$1"
+    exit
+    ;;
+  stop)
+    /usr/sbin/mstpctl delbridge "$1"
+    exit
+    ;;
+  *)
+    echo "Invalid operation: $2" >&2
+    exit 1
+esac

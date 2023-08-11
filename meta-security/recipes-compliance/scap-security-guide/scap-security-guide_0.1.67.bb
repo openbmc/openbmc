@@ -6,12 +6,12 @@ HOME_URL = "https://www.open-scap.org/security-policies/scap-security-guide/"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9bfa86579213cb4c6adaffface6b2820"
 LICENSE = "BSD-3-Clause"
 
-SRCREV = "dad85502ce8da722a6afc391346c41cee61e90a9"
+SRCREV = "3a1012bc9ec2b01b3b71c6feefd3cff0f52bd64d"
 SRC_URI = "git://github.com/ComplianceAsCode/content.git;branch=master;protocol=https \
-           file://0001-scap-security-guide-add-openembedded.patch \
-           file://0001-standard.profile-expand-checks.patch \
-           file://0001-scap-security-guide-add-Poky-support.patch \
            file://run_eval.sh \
+           file://run-ptest \
+           file://0001-scap-security-guide-add-openembedded-distro-support.patch \
+           file://0002-scap-security-guide-Add-Poky-support.patch \
            "
 
 
@@ -20,7 +20,7 @@ DEPENDS = "openscap-native python3-pyyaml-native python3-jinja2-native libxml2-n
 S = "${WORKDIR}/git"
 B = "${S}/build"
 
-inherit cmake pkgconfig python3native python3targetconfig
+inherit cmake pkgconfig python3native python3targetconfig ptest
 
 OECMAKE_GENERATOR = "Unix Makefiles"
 
@@ -38,8 +38,52 @@ do_install:append() {
     install  ${WORKDIR}/run_eval.sh ${D}${datadir}/openscap/.
 }
 
+do_compile_ptest() {
+    cd ${S}/build
+    cmake ../
+    make 
+}
+
+do_install_ptest() {
+
+    # remove host & work dir from tests
+    for x in $(find ${S}/build -type f) ;
+    do
+       sed -e 's#${HOSTTOOLS_DIR}/##g' \
+           -e 's#${RECIPE_SYSROOT_NATIVE}##g' \
+           -e 's#${WORKDIR}#${PTEST_PATH}#g' \
+           -e 's#/.*/xmllint#/usr/bin/xmllint#g' \
+           -e 's#/.*/oscap#/usr/bin/oscap#g' \
+           -e 's#/python3-native##g' \
+           -i ${x}
+    done
+
+    for x in $(find ${S}/build-scripts -type f) ;
+    do
+       sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' ${x}
+    done
+
+    for x in $(find ${S}/tests -type f) ;
+    do
+       sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' ${x}
+    done
+
+    for x in $(find ${S}/utils -type f) ;
+    do
+       sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' ${x}
+    done
+
+    PDIRS="apple_os build controls products shared components applications linux_os ocp-resources tests utils ssg build-scripts"
+    t=${D}/${PTEST_PATH}/git
+    for d in ${PDIRS}; do
+        install -d ${t}/$d
+        cp -fr ${S}/$d/* ${t}/$d/.
+    done
+}
+
 FILES:${PN} += "${datadir}/xml ${datadir}/openscap"
 
 RDEPENDS:${PN} = "openscap"
+RDEPENDS:${PN}-ptest = "cmake grep sed bash git python3 python3-modules python3-mypy python3-pyyaml python3-yamlpath python3-xmldiff python3-json2html python3-pandas python3-openpyxl python3-pytest libxml2-utils libxslt-bin"
 
 COMPATIBLE_HOST:libc-musl = "null"

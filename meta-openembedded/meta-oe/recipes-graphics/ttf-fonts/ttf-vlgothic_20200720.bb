@@ -1,7 +1,6 @@
 require ttf.inc
 
 SUMMARY = "Japanese TrueType fonts from Vine Linux"
-AUTHOR = "Contributor: noonov <noonov@gmail.com>"
 HOMEPAGE = "http://vlgothic.dicey.org/"
 
 LICENSE = "ttf-mplus & BSD-3-Clause"

@@ -7,7 +7,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PR = "r19"
 
-inherit systemd
+inherit systemd features_check
+REQUIRED_DISTRO_FEATURES += "usrmerge"
 SYSTEMD_SERVICE:${PN} = ""
 
 ALLOW_EMPTY:${PN} = "1"

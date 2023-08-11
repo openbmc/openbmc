@@ -225,13 +225,15 @@ class NpmShrinkWrap(FetchMethod):
     @staticmethod
     def _foreach_proxy_method(ud, handle):
         returns = []
-        for proxy_url in ud.proxy.urls:
-            proxy_ud = ud.proxy.ud[proxy_url]
-            proxy_d = ud.proxy.d
-            proxy_ud.setup_localpath(proxy_d)
-            lf = lockfile(proxy_ud.lockfile)
-            returns.append(handle(proxy_ud.method, proxy_ud, proxy_d))
-            unlockfile(lf)
+        #Check if there are dependencies before try to fetch them
+        if len(ud.deps) > 0:
+            for proxy_url in ud.proxy.urls:
+                proxy_ud = ud.proxy.ud[proxy_url]
+                proxy_d = ud.proxy.d
+                proxy_ud.setup_localpath(proxy_d)
+                lf = lockfile(proxy_ud.lockfile)
+                returns.append(handle(proxy_ud.method, proxy_ud, proxy_d))
+                unlockfile(lf)
         return returns
 
     def verify_donestamp(self, ud, d):

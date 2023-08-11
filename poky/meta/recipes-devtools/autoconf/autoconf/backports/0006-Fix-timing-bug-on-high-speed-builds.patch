@@ -1,0 +1,75 @@
+From 713d9822bbfb2923115065efaefed34a0113f8a1 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Sat, 1 Apr 2023 16:44:03 -0700
+Subject: [PATCH 06/29] Fix timing bug on high-speed builds
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Problem reported by Bogdan via Jacob Bachmeyer in:
+https://lists.gnu.org/r/autoconf/2023-04/msg00002.html
+* bin/autom4te.in: If a file timestamp equals a dependency’s
+timestamp, consider the file to be out of date.  Although this may
+result in extra work, it fixes some rare timing bugs.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ bin/autom4te.in | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/bin/autom4te.in b/bin/autom4te.in
+index 4b61f0a82..71d7e6a62 100644
+--- a/bin/autom4te.in
++++ b/bin/autom4te.in
+@@ -910,10 +910,8 @@ sub up_to_date ($)
+   return 0
+     if ! -f $tfile || ! -f $ofile;
+ 
+-  # The youngest of the cache files must be older than the oldest of
++  # The younger of the cache files must be older than the oldest of
+   # the dependencies.
+-  # FIXME: These timestamps have only 1-second resolution.
+-  # Time::HiRes fixes this, but assumes Perl 5.8 or later.
+   my $tmtime = mtime ($tfile);
+   my $omtime = mtime ($ofile);
+   my ($file, $mtime) = ($tmtime < $omtime
+@@ -926,7 +924,7 @@ sub up_to_date ($)
+   # We depend at least upon the arguments.
+   foreach my $dep (@ARGV)
+     {
+-      if ($mtime < mtime ($dep))
++      if ($mtime <= mtime ($dep))
+ 	{
+ 	  verb "up_to_date ($file): outdated: $dep";
+ 	  return 0;
+@@ -949,7 +947,7 @@ sub up_to_date ($)
+       # timestamp of that missing file was newer).
+       return 0
+ 	if ! $dep;
+-      if ($mtime < mtime ($dep))
++      if ($mtime <= mtime ($dep))
+ 	{
+ 	  verb "up_to_date ($file): outdated: $dep";
+ 	  return 0;
+@@ -1038,7 +1036,7 @@ $icache_file = new Autom4te::XFile $icache, O_RDWR|O_CREAT;
+ $icache_file->lock (LOCK_EX)
+   if ($flock_implemented eq "yes");
+ 
+-# Read the cache index if available and older than autom4te itself.
++# Read the cache index if available and younger than autom4te itself.
+ # If autom4te is younger, then some structures such as C4che might
+ # have changed, which would corrupt its processing.
+ Autom4te::C4che->load ($icache_file)
+@@ -1105,7 +1103,7 @@ else
+     # Actual M4 expansion, if the user wants it, or if $output is old
+     # (STDOUT is pretty old).
+     handle_output ($req, $output)
+-      if $force || mtime ($output) < mtime ($ocache . $req->id);
++      if $force || mtime ($output) <= mtime ($ocache . $req->id);
+   }
+ 
+ # If we ran up to here, the cache is valid.
+-- 
+2.41.0
+

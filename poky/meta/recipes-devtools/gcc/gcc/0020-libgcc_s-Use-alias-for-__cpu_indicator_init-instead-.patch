@@ -1,4 +1,4 @@
-From d8b6f60d1206a67c640096bac3b348828914163c Mon Sep 17 00:00:00 2001
+From 8c4c59521720f8c1b1e38e38896b47fcb1bf00ac Mon Sep 17 00:00:00 2001
 From: Szabolcs Nagy <nsz@port70.net>
 Date: Sat, 24 Oct 2015 20:09:53 +0000
 Subject: [PATCH] libgcc_s: Use alias for __cpu_indicator_init instead of
@@ -29,7 +29,7 @@ gcc/Changelog:
 	* config/i386/i386-expand.c (ix86_expand_builtin): Make __builtin_cpu_init
 	call __cpu_indicator_init_local instead of __cpu_indicator_init.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2023-February/612559.html]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

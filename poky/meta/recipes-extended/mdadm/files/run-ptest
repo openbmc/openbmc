@@ -1,7 +1,10 @@
 #!/bin/sh
 
-mkdir -p /mdadm-testing-dir
-# make the test continue to execute even one fail
-dir=. ./test --keep-going --disable-integrity --skip-broken
+logdir=$PWD/logs
+targetdir=/mdadm-testing-dir
 
-rm -rf /mdadm-testing-dir/*
+rm -rf $targetdir $logdir
+mkdir -p $targetdir $logdir
+
+# make the test continue to execute even one fail
+./test --keep-going --disable-integrity --skip-broken --save-logs --logdir=$logdir

@@ -1,0 +1,84 @@
+From a7dc6d83c7d12b8409c512c3c10ad29f01e6c164 Mon Sep 17 00:00:00 2001
+From: Zack Weinberg <zackw@panix.com>
+Date: Sun, 2 Apr 2023 21:54:31 -0400
+Subject: [PATCH 13/29] Fold AC_C_STRINGIZE into AC_PROG_CC.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Another of the last few uses of AC_EGREP_CPP is to check for the ISO C
+“stringification” operator.  As this is a feature of C89, let’s fold
+the test into the extensive C89 tests we already have, and make
+AC_C_STRINGIZE just lean on AC_PROG_CC, in the same way
+AC_C_PROTOTYPES does.
+
+* lib/autoconf/c.m4 (_AC_C_C89_TEST_GLOBALS): Add test of preprocessor
+  stringification and token pasting.
+  (AC_C_STRINGIZE): Just check ac_prog_cc_stdc.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/c.m4 | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
+
+diff --git a/lib/autoconf/c.m4 b/lib/autoconf/c.m4
+index 33648b5b9..c8c6a665c 100644
+--- a/lib/autoconf/c.m4
++++ b/lib/autoconf/c.m4
+@@ -1143,6 +1143,21 @@ static char *f (char * (*g) (char **, int), char **p, ...)
+   return s;
+ }
+ 
++/* C89 style stringification. */
++#define noexpand_stringify(a) #a
++const char *stringified = noexpand_stringify(arbitrary+token=sequence);
++
++/* C89 style token pasting.  Exercises some of the corner cases that
++   e.g. old MSVC gets wrong, but not very hard. */
++#define noexpand_concat(a,b) a##b
++#define expand_concat(a,b) noexpand_concat(a,b)
++extern int vA;
++extern int vbee;
++#define aye A
++#define bee B
++int *pvA = &expand_concat(v,aye);
++int *pvbee = &noexpand_concat(v,bee);
++
+ /* OSF 4.0 Compaq cc is some sort of almost-ANSI by default.  It has
+    function prototypes and stuff, but not \xHH hex character constants.
+    These do not provoke an error unfortunately, instead are silently treated
+@@ -2112,16 +2127,10 @@ fi
+ # --------------
+ # Checks if '#' can be used to glue strings together at the CPP level.
+ # Defines HAVE_STRINGIZE if positive.
++# Obsolete - new code should assume C89 compliance.
+ AC_DEFUN([AC_C_STRINGIZE],
+-[AC_CACHE_CHECK([for preprocessor stringizing operator],
+-		[ac_cv_c_stringize],
+-[AC_EGREP_CPP([@%:@teststring],
+-	      [@%:@define x(y) #y
+-
+-char *s = x(teststring);],
+-	      [ac_cv_c_stringize=no],
+-	      [ac_cv_c_stringize=yes])])
+-if test $ac_cv_c_stringize = yes; then
++[AC_REQUIRE([AC_PROG_CC])
++if test "$ac_prog_cc_stdc" != no; then
+   AC_DEFINE(HAVE_STRINGIZE, 1,
+ 	    [Define to 1 if cpp supports the ANSI @%:@ stringizing operator.])
+ fi
+@@ -2130,8 +2139,8 @@ fi
+ 
+ # AC_C_PROTOTYPES
+ # ---------------
+-# Check if the C compiler supports prototypes, included if it needs
+-# options.
++# Check if the C compiler supports prototypes.
++# Obsolete - new code should assume C89 compliance.
+ AC_DEFUN([AC_C_PROTOTYPES],
+ [AC_REQUIRE([AC_PROG_CC])dnl
+ if test "$ac_prog_cc_stdc" != no; then
+-- 
+2.41.0
+

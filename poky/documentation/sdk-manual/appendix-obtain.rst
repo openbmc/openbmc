@@ -140,9 +140,10 @@ build the SDK installer. Follow these steps:
       message similar to the following::
 
          The extensible SDK can currently only be built for the same
-         architecture as the machine being built on --- :term:`SDK_ARCH`
-         is set to ``i686`` (likely via setting :term:`SDKMACHINE`) which is
-         different from the architecture of the build machine (``x86_64``).
+         architecture as the machine being built on - SDK_ARCH
+         is set to i686 (likely via setting SDKMACHINE) which is
+         different from the architecture of the build machine (x86_64).
+         Unable to continue.
 
 
 #. *Build the SDK Installer:* To build the SDK installer for a standard

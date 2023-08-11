@@ -1,6 +1,5 @@
 SUMMARY = "Count blank lines, comment lines, and physical lines of source code \
 in many programming languages."
-AUTHOR = "Al Danial"
 
 LICENSE="GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2c1c00f9d3ed9e24fa69b932b7e7aff2"

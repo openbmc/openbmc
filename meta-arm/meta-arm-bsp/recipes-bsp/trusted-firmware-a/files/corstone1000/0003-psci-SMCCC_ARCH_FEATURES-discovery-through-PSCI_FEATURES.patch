@@ -1,0 +1,29 @@
+From 16937460429d6bcd502b21c20d16222541ed8d48 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 6 Mar 2023 15:57:59 +0000
+Subject: [PATCH] psci: SMCCC_ARCH_FEATURES discovery through PSCI_FEATURES
+
+allow normal world use PSCI_FEATURES to discover SMCCC_ARCH_FEATURES
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Inappropriate [A U-Boot patch will be released to fix an issue in the PSCI driver]
+---
+ lib/psci/psci_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/psci/psci_main.c b/lib/psci/psci_main.c
+index a631f3ffbf..cc8904b006 100644
+--- a/lib/psci/psci_main.c
++++ b/lib/psci/psci_main.c
+@@ -337,7 +337,7 @@ int psci_features(unsigned int psci_fid)
+ {
+ 	unsigned int local_caps = psci_caps;
+ 
+-	if (psci_fid == SMCCC_VERSION)
++	if (psci_fid == SMCCC_VERSION || psci_fid == SMCCC_ARCH_FEATURES)
+ 		return PSCI_E_SUCCESS;
+ 
+ 	/* Check if it is a 64 bit function */
+-- 
+2.25.1
+

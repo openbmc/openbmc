@@ -1,5 +1,4 @@
 SUMMARY = "C library for encoding data in a QR Code symbol"
-AUTHOR = "Kentaro Fukuchi"
 HOMEPAGE = "http://fukuchi.org/works/qrencode/"
 SECTION = "libs"
 LICENSE = "LGPL-2.1-only"

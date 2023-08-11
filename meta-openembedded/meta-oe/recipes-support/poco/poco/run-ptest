@@ -3,6 +3,6 @@ while read runner; do
   oldpath=`pwd` >/dev/null
   cd bin
   echo Testing $runner
-  ./$runner-testrunner -all
+  ./$runner -ignore $oldpath/cppignore.lnx -all
   cd $oldpath >/dev/null
 done < testrunners

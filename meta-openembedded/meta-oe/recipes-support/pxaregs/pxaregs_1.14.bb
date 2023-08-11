@@ -1,7 +1,6 @@
 SUMMARY = "Tool to display and modify PXA registers at runtime"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://pxaregs.c;endline=12;md5=668d061b7637acc68cb8071c9be372e6"
-AUTHOR = "Holger Schurig <hs4233@mail.mn-solutions.de>"
 HOMEPAGE = "http://www.mn-logistik.de/unsupported/pxa250/"
 
 SRC_URI = "file://pxaregs.c \

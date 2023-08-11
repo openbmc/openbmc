@@ -2,7 +2,6 @@ SUMMARY = "Dispatcher service for systemd-networkd connection status changes"
 DESCRIPTION = "This daemon is similar to NetworkManager-dispatcher, but is much \
 more limited in the types of events it supports due to the limited nature of \
 systemd-networkd(8)."
-AUTHOR = "Clayton Craft and others"
 
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=84dcc94da3adb52b53ae4fa38fe49e5d"

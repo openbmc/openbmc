@@ -6,7 +6,6 @@ DESCRIPTION = "This is a parser for HTTP messages written in C. It parses \
               interrupted at anytime. Depending on your architecture, it \
               only requires about 40 bytes of data per message stream (in a \
               web server that is per connection)."
-AUTHOR = "Stefan Wiehler <stefan.wiehler@missinglinkelectronics.com>"
 HOMEPAGE = "https://github.com/nodejs/http-parser"
 SECTION = "libs"
 LICENSE = "MIT"

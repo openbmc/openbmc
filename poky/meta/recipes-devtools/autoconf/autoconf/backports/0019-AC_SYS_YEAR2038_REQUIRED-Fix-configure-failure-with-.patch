@@ -1,0 +1,48 @@
+From 2277f2c15744ad1cc5cd1ecc50a43108e50530a2 Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Wed, 19 Apr 2023 14:17:24 -0700
+Subject: [PATCH 19/29] AC_SYS_YEAR2038_REQUIRED: Fix configure failure with
+ MSVC.
+
+* lib/autoconf/specific.m4 (_AC_SYS_LARGEFILE_PROBE): Distinguish the results
+"support not detected" and "supported through gnulib". If the result is
+"supported through gnulib", don't fail.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/specific.m4 | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/lib/autoconf/specific.m4 b/lib/autoconf/specific.m4
+index 3bf1a0ed1..f411695fe 100644
+--- a/lib/autoconf/specific.m4
++++ b/lib/autoconf/specific.m4
+@@ -323,11 +323,24 @@ AC_DEFUN([_AC_SYS_LARGEFILE_PROBE],
+     test $ac_opt_found = no || break
+   done
+   CC="$ac_save_CC"
++  dnl Gnulib implements large file support for native Windows, based on the
++  dnl variables WINDOWS_64_BIT_OFF_T, WINDOWS_64_BIT_ST_SIZE.
++  m4_ifdef([gl_LARGEFILE], [
++    AC_REQUIRE([AC_CANONICAL_HOST])
++    if test $ac_opt_found != yes; then
++      AS_CASE([$host_os],
++        [mingw*],
++          [ac_cv_sys_largefile_opts="supported through gnulib"
++           ac_opt_found=yes]
++      )
++    fi
++  ])
+   test $ac_opt_found = yes || ac_cv_sys_largefile_opts="support not detected"])
+ 
+ ac_have_largefile=yes
+ AS_CASE([$ac_cv_sys_largefile_opts],
+   ["none needed"], [],
++  ["supported through gnulib"], [],
+   ["support not detected"],
+     [ac_have_largefile=no
+      AS_IF([test $ac_largefile_required,$ac_year2038_required != no,no],
+-- 
+2.41.0
+

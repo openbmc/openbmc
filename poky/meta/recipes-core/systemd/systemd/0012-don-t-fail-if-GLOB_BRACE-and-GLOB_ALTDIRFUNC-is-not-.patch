@@ -130,7 +130,7 @@ index 458aed7054..2cf24b38c0 100644
  /* This reads all files listed in /etc/tmpfiles.d/?*.conf and creates
   * them in the file system. This is intended to be used to create
   * properly owned directories beneath /tmp, /var/tmp, /run, which are
-@@ -2194,7 +2200,9 @@ finish:
+@@ -2355,7 +2361,9 @@ finish:
  
  static int glob_item(Item *i, action_t action) {
          _cleanup_globfree_ glob_t g = {
@@ -140,7 +140,7 @@ index 458aed7054..2cf24b38c0 100644
          };
          int r = 0, k;
  
-@@ -2214,7 +2222,9 @@ static int glob_item(Item *i, action_t action) {
+@@ -2375,7 +2383,9 @@ static int glob_item(Item *i, action_t action) {
  
  static int glob_item_recursively(Item *i, fdaction_t action) {
          _cleanup_globfree_ glob_t g = {

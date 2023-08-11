@@ -1,7 +1,8 @@
-From 0058f8a2233d9e96e39d09f4d994da3c96f9e030 Mon Sep 17 00:00:00 2001
+From 7e095089452b6e895ec40981752e9f902f0ad889 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:41:45 +0000
-Subject: [PATCH] Search target sysroot gcc version specific dirs with multilib.
+Subject: [PATCH] Search target sysroot gcc version specific dirs with
+ multilib.
 
 We install the gcc libraries (such as crtbegin.p) into
 <sysroot><libdir>/<target-sys>/5.2.0/

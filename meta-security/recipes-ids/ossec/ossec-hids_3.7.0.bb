@@ -17,10 +17,18 @@ inherit autotools-brokensep  useradd
 
 S = "${WORKDIR}/git"
 
+
+OSSEC_DIR="/var/ossec"
 OSSEC_UID ?= "ossec"
 OSSEC_RUID ?= "ossecr"
 OSSEC_GID ?= "ossec"
 OSSEC_EMAIL ?= "ossecm"
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "--system ${OSSEC_UID}"
+USERADD_PARAM:${PN} = "--system -g ${OSSEC_GID} --home-dir  \
+                       ${OSSEC_DIR} --no-create-home  \
+                       --shell /sbin/nologin ${BPN}"
 
 do_configure[noexec] = "1"
 
@@ -45,78 +53,75 @@ do_install(){
 }
 
 pkg_postinst_ontarget:${PN} () {
-    DIR="/var/ossec"
-
-    usermod -g ossec -G ossec -a root
 
     # Default for all directories
-    chmod -R 550 ${DIR}
-    chown -R root:${OSSEC_GID} ${DIR}
+    chmod -R 550 ${OSSEC_DIR}
+    chown -R root:${OSSEC_GID} ${OSSEC_DIR}
 
     # To the ossec queue (default for agentd to read)
-    chown -R ${OSSEC_UUID}:${OSSEC_GID} ${DIR}/queue/ossec
-    chmod -R 770 ${DIR}/queue/ossec
+    chown -R ${OSSEC_UUID}:${OSSEC_GID} ${OSSEC_DIR}/queue/ossec
+    chmod -R 770 ${OSSEC_DIR}/queue/ossec
 
     # For the logging user
-    chown -R ${OSSEC_UUID}:${OSSEC_GID} ${DIR}/logs
-    chmod -R 750 ${DIR}/logs
-    chmod -R 775 ${DIR}/queue/rids
-    touch ${DIR}/logs/ossec.log
-    chown ${OSSEC_UUID}:${OSSEC_GID} ${DIR}/logs/ossec.log
-    chmod 664 ${DIR}/logs/ossec.log
+    chown -R ${OSSEC_UUID}:${OSSEC_GID} ${OSSEC_DIR}/logs
+    chmod -R 750 ${OSSEC_DIR}/logs
+    chmod -R 775 ${OSSEC_DIR}/queue/rids
+    touch ${OSSEC_DIR}/logs/ossec.log
+    chown ${OSSEC_UUID}:${OSSEC_GID} ${OSSEC_DIR}/logs/ossec.log
+    chmod 664 ${OSSEC_DIR}/logs/ossec.log
 
-    chown -R ${OSSEC_UUID}:${OSSEC_GID} ${DIR}/queue/diff
-    chmod -R 750 ${DIR}/queue/diff
-        chmod 740 ${DIR}/queue/diff/* > /dev/null 2>&1 || true
+    chown -R ${OSSEC_UUID}:${OSSEC_GID} ${OSSEC_DIR}/queue/diff
+    chmod -R 750 ${OSSEC_DIR}/queue/diff
+    chmod 740 ${OSSEC_DIR}/queue/diff/* > /dev/null 2>&1 || true
 
 	# For the etc dir
-	chmod 550 ${DIR}/etc
-	chown -R root:${OSSEC_GID} ${DIR}/etc
+	chmod 550 ${OSSEC_DIR}/etc
+	chown -R root:${OSSEC_GID} ${OSSEC_DIR}/etc
 	if [ -f /etc/localtime ]; then
-	    cp -pL /etc/localtime ${DIR}/etc/;
-	    chmod 555 ${DIR}/etc/localtime
-	    chown root:${OSSEC_GID} ${DIR}/etc/localtime
+	    cp -pL /etc/localtime ${OSSEC_DIR}/etc/;
+	    chmod 555 ${OSSEC_DIR}/etc/localtime
+	    chown root:${OSSEC_GID} ${OSSEC_DIR}/etc/localtime
 	fi
 
 	if [ -f /etc/TIMEZONE ]; then
-	    cp -p /etc/TIMEZONE ${DIR}/etc/;
-	    chmod 555 ${DIR}/etc/TIMEZONE
+	    cp -p /etc/TIMEZONE ${OSSEC_DIR}/etc/;
+	    chmod 555 ${OSSEC_DIR}/etc/TIMEZONE
 	fi
 
 	# More files
-	chown root:${OSSEC_GID} ${DIR}/etc/internal_options.conf
-	chown root:${OSSEC_GID} ${DIR}/etc/local_internal_options.conf >/dev/null 2>&1 || true
-	chown root:${OSSEC_GID} ${DIR}/etc/client.keys >/dev/null 2>&1 || true
-	chown root:${OSSEC_GID} ${DIR}/agentless/*
-	chown ${OSSEC_UUID}:${OSSEC_GID} ${DIR}/.ssh
-	chown root:${OSSEC_GID} ${DIR}/etc/shared/*
+	chown root:${OSSEC_GID} ${OSSEC_DIR}/etc/internal_options.conf
+	chown root:${OSSEC_GID} ${OSSEC_DIR}/etc/local_internal_options.conf >/dev/null 2>&1 || true
+	chown root:${OSSEC_GID} ${OSSEC_DIR}/etc/client.keys >/dev/null 2>&1 || true
+	chown root:${OSSEC_GID} ${OSSEC_DIR}/agentless/*
+	chown ${OSSEC_UUID}:${OSSEC_GID} ${OSSEC_DIR}/.ssh
+	chown root:${OSSEC_GID} ${OSSEC_DIR}/etc/shared/*
 
-	chmod 550 ${DIR}/etc
-	chmod 440 ${DIR}/etc/internal_options.conf
-	chmod 660 ${DIR}/etc/local_internal_options.conf >/dev/null 2>&1 || true
-	chmod 440 ${DIR}/etc/client.keys >/dev/null 2>&1 || true
-	chmod 550 ${DIR}/agentless/*
-	chmod 700 ${DIR}/.ssh
-	chmod 770 ${DIR}/etc/shared
-	chmod 660 ${DIR}/etc/shared/*
+	chmod 550 ${OSSEC_DIR}/etc
+	chmod 440 ${OSSEC_DIR}/etc/internal_options.conf
+	chmod 660 ${OSSEC_DIR}/etc/local_internal_options.conf >/dev/null 2>&1 || true
+	chmod 440 ${OSSEC_DIR}/etc/client.keys >/dev/null 2>&1 || true
+	chmod 550 ${OSSEC_DIR}/agentless/*
+	chmod 700 ${OSSEC_DIR}/.ssh
+	chmod 770 ${OSSEC_DIR}/etc/shared
+	chmod 660 ${OSSEC_DIR}/etc/shared/*
 
 	# For the /var/run
-	chmod 770 ${DIR}/var/run
-	chown root:${OSSEC_GID} ${DIR}/var/run
+	chmod 770 ${OSSEC_DIR}/var/run
+	chown root:${OSSEC_GID} ${OSSEC_DIR}/var/run
 
 	# For util.sh 
-	chown root:${OSSEC_GID} ${DIR}/bin/util.sh
-	chmod +x ${DIR}/bin/util.sh
+	chown root:${OSSEC_GID} ${OSSEC_DIR}/bin/util.sh
+	chmod +x ${OSSEC_DIR}/bin/util.sh
 
 	# For binaries and active response
-        chmod 755 ${DIR}/active-response/bin/*
-        chown root:${OSSEC_GID} ${DIR}/active-response/bin/*
-        chown root:${OSSEC_GID} ${DIR}/bin/*
-        chmod 550 ${DIR}/bin/*
+        chmod 755 ${OSSEC_DIR}/active-response/bin/*
+        chown root:${OSSEC_GID} ${OSSEC_DIR}/active-response/bin/*
+        chown root:${OSSEC_GID} ${OSSEC_DIR}/bin/*
+        chmod 550 ${OSSEC_DIR}/bin/*
 
 	# For ossec.conf
-        chown root:${OSSEC_GID} ${DIR}/etc/ossec.conf
-        chmod 660 ${DIR}/etc/ossec.conf
+        chown root:${OSSEC_GID} ${OSSEC_DIR}/etc/ossec.conf
+        chmod 660 ${OSSEC_DIR}/etc/ossec.conf
 
 	# Debconf
 	. /usr/share/debconf/confmodule
@@ -126,23 +131,23 @@ pkg_postinst_ontarget:${PN} () {
 	db_get ossec-hids-agent/server-ip
 	SERVER_IP=$RET
 
-	sed -i "s/<server-ip>[^<]\+<\/server-ip>/<server-ip>${SERVER_IP}<\/server-ip>/" ${DIR}/etc/ossec.conf
+	sed -i "s/<server-ip>[^<]\+<\/server-ip>/<server-ip>${SERVER_IP}<\/server-ip>/" ${OSSEC_DIR}/etc/ossec.conf
 	db_stop
 
         # ossec-init.conf
-        if [ -e ${DIR}/etc/ossec-init.conf ] && [ -d /etc/ ]; then
+        if [ -e ${OSSEC_DIR}/etc/ossec-init.conf ] && [ -d /etc/ ]; then
             if [ -e /etc/ossec-init.conf ]; then
                 rm -f /etc/ossec-init.conf
             fi
-            ln -s ${DIR}/etc/ossec-init.conf /etc/ossec-init.conf
+            ln -s ${OSSEC_DIR}/etc/ossec-init.conf /etc/ossec-init.conf
         fi
 
         # init.d/ossec file
-        if [ -x ${DIR}/etc/init.d/ossec ] && [ -d /etc/init.d/ ]; then
+        if [ -x ${OSSEC_DIR}/etc/init.d/ossec ] && [ -d /etc/init.d/ ]; then
             if [ -e /etc/init.d/ossec ]; then
                 rm -f /etc/init.d/ossec
             fi
-            ln -s ${DIR}/etc/init.d/ossec /etc/init.d/ossec
+            ln -s ${OSSEC_DIR}/etc/init.d/ossec /etc/init.d/ossec
         fi
 
 	# Service

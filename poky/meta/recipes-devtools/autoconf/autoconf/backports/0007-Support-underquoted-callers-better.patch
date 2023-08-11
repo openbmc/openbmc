@@ -1,0 +1,57 @@
+From 794182506c3c5814d48b2fc4d832770f608ce0ef Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Sat, 1 Apr 2023 20:25:13 -0700
+Subject: [PATCH 07/29] Support underquoted callers better
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Problem reported bh Khem Raj for mcpp 2.7.2 (2008) in:
+https://lists.gnu.org/r/autoconf/2023-04/msg00001.html
+* lib/autoconf/programs.m4 (_AC_PATH_PROG_FLAVOR_GNU):
+Add two ‘@%:@(’s to cater to underquoted callers.
+* lib/m4sugar/m4sh.m4 (_AS_PATH_WALK): Use quadrigraph instead of
+‘#’, for underquoted callers.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/programs.m4 | 5 +++--
+ lib/m4sugar/m4sh.m4      | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/lib/autoconf/programs.m4 b/lib/autoconf/programs.m4
+index 62ba6b8b6..d06d18c44 100644
+--- a/lib/autoconf/programs.m4
++++ b/lib/autoconf/programs.m4
+@@ -543,11 +543,12 @@ dnl   # for best performing tool in a list breaks down.
+ # ----------------------------------------------------------------
+ m4_define([_AC_PATH_PROG_FLAVOR_GNU],
+ [# Check for GNU $1
+-case `"$1" --version 2>&1` in
++case `"$1" --version 2>&1` in @%:@(
+ *GNU*)
+   $2;;
+ m4_ifval([$3],
+-[*)
++[@%:@(
++*)
+   $3;;
+ ])esac
+ ])# _AC_PATH_PROG_FLAVOR_GNU
+diff --git a/lib/m4sugar/m4sh.m4 b/lib/m4sugar/m4sh.m4
+index ab5ca7db7..368487fa0 100644
+--- a/lib/m4sugar/m4sh.m4
++++ b/lib/m4sugar/m4sh.m4
+@@ -1389,7 +1389,7 @@ m4_if([$1], m4_translit([[$1]], [:;]),
+ for as_dir in $as_dummy])
+ do
+   IFS=$as_save_IFS
+-  case $as_dir in #(((
++  case $as_dir in @%:@(((
+     '') as_dir=./ ;;
+     */) ;;
+     *) as_dir=$as_dir/ ;;
+-- 
+2.41.0
+

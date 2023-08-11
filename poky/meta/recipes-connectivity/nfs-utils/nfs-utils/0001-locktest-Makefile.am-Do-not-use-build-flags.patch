@@ -1,0 +1,36 @@
+From 9efa7a0d37665d9bb0f46d2407883a5ab42c2b84 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 24 Jul 2023 20:39:16 -0700
+Subject: [PATCH] locktest: Makefile.am: Do not use build flags
+
+Using CFLAGS_FOR_BUILD etc. here means it is using wrong flags
+when thse flags are speficied different than target flags which
+is common when cross-building. It can pass wrong paths to linker
+and it would find incompatible libraries during link since they
+are from host system and target maybe not same as build host.
+
+Fixes subtle errors like
+| aarch64-yoe-linux-ld.lld: error: /mnt/b/yoe/master/build/tmp/work/cortexa72-cortexa53-crypto-yoe-linux/nfs-utils/2.6.3-r0/recipe-sysroot-native/usr/lib/libsqlite3.so is incompatible with elf64-littleaarch64
+
+Upstream-Status: Submitted [https://marc.info/?l=linux-nfs&m=169025681008001&w=2]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/locktest/Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tools/locktest/Makefile.am b/tools/locktest/Makefile.am
+index e8914655..2fd36971 100644
+--- a/tools/locktest/Makefile.am
++++ b/tools/locktest/Makefile.am
+@@ -2,8 +2,5 @@
+ 
+ noinst_PROGRAMS = testlk
+ testlk_SOURCES = testlk.c
+-testlk_CFLAGS=$(CFLAGS_FOR_BUILD)
+-testlk_CPPFLAGS=$(CPPFLAGS_FOR_BUILD)
+-testlk_LDFLAGS=$(LDFLAGS_FOR_BUILD)
+ 
+ MAINTAINERCLEANFILES = Makefile.in
+-- 
+2.41.0
+

@@ -1,4 +1,5 @@
 # Simple initramfs image artifact generation for tiny images.
+SUMMARY = "Tiny image capable of booting a device."
 DESCRIPTION = "Tiny image capable of booting a device. The kernel includes \
 the Minimal RAM-based Initial Root Filesystem (initramfs), which finds the \
 first 'init' program more efficiently. core-image-tiny-initramfs doesn't \

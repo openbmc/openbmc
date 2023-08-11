@@ -28,11 +28,10 @@ export pcmciaconfdir = "${sysconfdir}/pcmcia"
 export udevdir = "`pkg-config --variable=udevdir udev`"
 export udevrulesdir = "`pkg-config --variable=udevdir udev`/rules.d"
 export UDEV = "1"
-LD = "${CC}"
 CFLAGS =+ "-I${S}/src"
 CFLAGS =+ "-DPCMCIAUTILS_VERSION=\\"${PV}\\""
 
-EXTRA_OEMAKE = "-e 'STRIP=echo' 'LIB_OBJS=-lc -lsysfs' 'LEX=flex'"
+EXTRA_OEMAKE = "-e 'STRIP=echo' 'LIB_OBJS=-lc -lsysfs' 'LEX=flex' 'LD=${CC}'"
 
 do_install () {
 	oe_runmake 'DESTDIR=${D}' install

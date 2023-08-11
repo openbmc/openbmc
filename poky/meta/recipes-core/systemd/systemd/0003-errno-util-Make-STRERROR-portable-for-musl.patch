@@ -11,8 +11,8 @@ Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- src/basic/errno-util.h | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ src/basic/errno-util.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/basic/errno-util.h b/src/basic/errno-util.h
 index 091f99c590..eb5c1f9961 100644
@@ -23,9 +23,8 @@ index 091f99c590..eb5c1f9961 100644
   *
   * Note that we use the GNU variant of strerror_r() here. */
 -#define STRERROR(errnum) strerror_r(abs(errnum), (char[ERRNO_BUF_LEN]){}, ERRNO_BUF_LEN)
--
 +static inline const char * STRERROR(int errnum);
-+
+ 
 +static inline const char * STRERROR(int errnum) {
 +#ifdef __GLIBC__
 +        return strerror_r(abs(errnum), (char[ERRNO_BUF_LEN]){}, ERRNO_BUF_LEN);

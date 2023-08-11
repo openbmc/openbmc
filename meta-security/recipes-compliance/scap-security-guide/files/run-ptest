@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export PYTHONPATH="/usr/lib/scap-security-guide/ptest/git:$PYTHONPATH"
+
+cd git/build
+
+ctest --output-on-failure -E unique-stigids

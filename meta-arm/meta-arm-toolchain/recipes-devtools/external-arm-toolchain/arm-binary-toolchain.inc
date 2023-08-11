@@ -5,11 +5,11 @@ FILES:${PN} = "${libexecdir} ${bindir}"
 BINNAME = "${@d.getVar("BPN").strip("gcc-")}"
 
 do_install() {
-    install -d ${D}${bindir} ${D}${libexecdir}/${BPN}/
-    cp -r ${S}/. ${D}${libexecdir}/${BPN}
+    install -d ${D}${bindir} ${D}${libexecdir}/${BP}/
+    cp -r ${S}/. ${D}${libexecdir}/${BP}
 
     # Symlink all executables into bindir
-    for f in ${D}${libexecdir}/${BPN}/bin/*; do
+    for f in ${D}${libexecdir}/${BP}/bin/*; do
         ln -rs $f ${D}${bindir}/$(basename $f)
     done
 }

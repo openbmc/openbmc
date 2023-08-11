@@ -96,21 +96,20 @@ While stable releases are supported for a duration of seven months,
 some specific ones are now supported for a longer period by the Yocto
 Project, and are called Long Term Support (:term:`LTS`) releases.
 
-This started with version 3.1 ("Dunfell"), released in April 2020, that
-the project committed to supporting until the next :term:`LTS` release was out.
-This next :term:`LTS` release, version 4.0 ("Kirkstone"), was released in May 2022
-and offered with two years of support too.
-
-However, as an experiment, support for "Dunfell" was extended to four years, until
-April 2024, therefore offering more stability to projects and leaving more time
-to upgrade to the latest :term:`LTS` release. The project hasn't made any commitment to
-extending "Kirkstone" support too, as this will also depend on available funding
-for such an effort.
-
 When significant issues are found, :term:`LTS` releases allow to publish
 fixes not only for the current stable release, but also to the
 :term:`LTS` releases that are still supported. Older stable releases which
 have reached their End of Life (EOL) won't receive such updates.
+
+This started with version 3.1 ("Dunfell"), released in April 2020, which
+the project initially committed to supporting for two years, but this duration
+was later extended to four years. Similarly, the following :term:`LTS` release,
+version 4.0 ("Kirkstone"), was released two years later in May 2022 and the
+project committed to supporting it for four years too.
+
+Therefore, a new :term:`LTS` release is made every two years and is supported
+for four years. This offers more stability to project users and leaves more
+time to upgrade to the following :term:`LTS` release.
 
 See :yocto_wiki:`/Stable_Release_and_LTS` for details about the management
 of stable and :term:`LTS` releases.

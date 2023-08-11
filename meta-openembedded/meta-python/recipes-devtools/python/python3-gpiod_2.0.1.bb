@@ -1,5 +1,4 @@
 SUMMARY = "Python bindings for libgpiod."
-AUTHOR = "Bartosz Golaszewski <brgl@bgdev.pl>"
 
 LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later & CC-BY-SA-4.0"
 # The actual license files live in the upstream libgpiod from which the pypi

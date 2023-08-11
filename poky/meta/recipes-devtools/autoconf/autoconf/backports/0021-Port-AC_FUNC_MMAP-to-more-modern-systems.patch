@@ -1,0 +1,98 @@
+From 028526149ee804617a302ccef22cc6adbda681b0 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Wed, 10 May 2023 17:20:49 -0700
+Subject: [PATCH 21/29] Port AC_FUNC_MMAP to more-modern systems
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* lib/autoconf/functions.m4 (AC_FUNC_MMAP): Don’t call
+getpagesize, as it’s tricky to configure, modern POSIX doesn’t
+require it, and calling it without including <unistd.h> provokes a
+compile-time error on modern systems.  Instead, rework the test
+to not need getpagesize.  Add a FIXME comment for unnecessary
+tests; I don't want to remove them now as we're too close to
+a release.  Remove long-obsolete comment about GNU grep.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/functions.m4 | 44 +++++----------------------------------
+ 1 file changed, 5 insertions(+), 39 deletions(-)
+
+diff --git a/lib/autoconf/functions.m4 b/lib/autoconf/functions.m4
+index 499e4c024..5a0f01856 100644
+--- a/lib/autoconf/functions.m4
++++ b/lib/autoconf/functions.m4
+@@ -1283,6 +1283,7 @@ AU_ALIAS([AM_FUNC_MKTIME], [AC_FUNC_MKTIME])
+ AN_FUNCTION([mmap], [AC_FUNC_MMAP])
+ AC_DEFUN([AC_FUNC_MMAP],
+ [AC_REQUIRE([AC_CANONICAL_HOST])dnl for cross-compiles
++dnl FIXME: Remove the unnecessary checks for unistd.h, sys/param.h, getpagesize.
+ AC_CHECK_HEADERS_ONCE([unistd.h sys/param.h])
+ AC_CHECK_FUNCS_ONCE([getpagesize])
+ AC_CACHE_CHECK([for working mmap], [ac_cv_func_mmap_fixed_mapped],
+@@ -1305,48 +1306,11 @@ AC_CACHE_CHECK([for working mmap], [ac_cv_func_mmap_fixed_mapped],
+    VM page cache was not coherent with the file system buffer cache
+    like early versions of FreeBSD and possibly contemporary NetBSD.)
+    For shared mappings, we should conversely verify that changes get
+-   propagated back to all the places they're supposed to be.
+-
+-   Grep wants private fixed already mapped.
+-   The main things grep needs to know about mmap are:
+-   * does it exist and is it safe to write into the mmap'd area
+-   * how to use it (BSD variants)  */
++   propagated back to all the places they're supposed to be.  */
+ 
+ #include <fcntl.h>
+ #include <sys/mman.h>
+ 
+-/* This mess was copied from the GNU getpagesize.h.  */
+-#ifndef HAVE_GETPAGESIZE
+-# ifdef _SC_PAGESIZE
+-#  define getpagesize() sysconf(_SC_PAGESIZE)
+-# else /* no _SC_PAGESIZE */
+-#  ifdef HAVE_SYS_PARAM_H
+-#   include <sys/param.h>
+-#   ifdef EXEC_PAGESIZE
+-#    define getpagesize() EXEC_PAGESIZE
+-#   else /* no EXEC_PAGESIZE */
+-#    ifdef NBPG
+-#     define getpagesize() NBPG * CLSIZE
+-#     ifndef CLSIZE
+-#      define CLSIZE 1
+-#     endif /* no CLSIZE */
+-#    else /* no NBPG */
+-#     ifdef NBPC
+-#      define getpagesize() NBPC
+-#     else /* no NBPC */
+-#      ifdef PAGESIZE
+-#       define getpagesize() PAGESIZE
+-#      endif /* PAGESIZE */
+-#     endif /* no NBPC */
+-#    endif /* no NBPG */
+-#   endif /* no EXEC_PAGESIZE */
+-#  else /* no HAVE_SYS_PARAM_H */
+-#   define getpagesize() 8192	/* punt totally */
+-#  endif /* no HAVE_SYS_PARAM_H */
+-# endif /* no _SC_PAGESIZE */
+-
+-#endif /* no HAVE_GETPAGESIZE */
+-
+ int
+ main (void)
+ {
+@@ -1355,7 +1319,9 @@ main (void)
+   int i, pagesize;
+   int fd, fd2;
+ 
+-  pagesize = getpagesize ();
++  /* The "page size" need not equal the system page size,
++     and need not even be a power of 2.  */
++  pagesize = 8192;
+ 
+   /* First, make a file with some known garbage in it. */
+   data = (char *) malloc (pagesize);
+-- 
+2.41.0
+

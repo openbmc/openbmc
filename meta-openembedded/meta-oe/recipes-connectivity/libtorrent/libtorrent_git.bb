@@ -9,9 +9,7 @@ DEPENDS = "zlib libsigc++-2.0 openssl cppunit"
 SRC_URI = "git://github.com/rakshasa/libtorrent;branch=master;protocol=https"
 SRCREV = "e60f222241319aaae482789517ad00ae9344bd13"
 
-CVE_CHECK_IGNORE += "\
-    CVE-2009-1760 \
-"
+CVE_STATUS[CVE-2009-1760] = "backported-patch: patched in our product"
 
 PV = "0.13.8+git${SRCPV}"
 

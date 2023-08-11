@@ -1,0 +1,270 @@
+From a7421b411b4359b97528c8f4e9dd8abe82235813 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Tue, 20 Jun 2023 13:23:19 -0700
+Subject: [PATCH 26/29] Modernize INSTALL
+
+Problem reported for gettext bootstrap by Julien Palard in:
+https://savannah.gnu.org/bugs/?62196
+* doc/install.texi: Give a brief info as to how to bootstrap,
+on packages built from Git rather from a distribution tarball.
+Remove aging details about c99, macOS, X, HP-UX, OSF/1, Solaris,
+Haiku, sun4.  Improve documentation for enable/disable and
+with/without options.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ doc/install.texi | 157 +++++++++++++++++++++--------------------------
+ 1 file changed, 70 insertions(+), 87 deletions(-)
+
+diff --git a/doc/install.texi b/doc/install.texi
+index e06689613..cec245fd0 100644
+--- a/doc/install.texi
++++ b/doc/install.texi
+@@ -18,9 +18,21 @@ warranty of any kind.
+ @node Basic Installation
+ @section Basic Installation
+ 
+-Briefly, the shell command
+-@samp{./configure@tie{}&& make@tie{}&& make@tie{}install}
+-should configure, build, and install this package.  The following
++Briefly, the following shell commands:
++
++@example
++test -f configure || ./bootstrap
++./configure
++make
++make install
++@end example
++
++@noindent
++should configure, build, and install this package.
++The @command{./bootstrap} line is intended for developers;
++you can omit it when building from a distribution tarball.
++
++The following
+ more-detailed instructions are generic; see the @file{README} file for
+ instructions specific to this package.
+ @ifclear autoconf
+@@ -32,6 +44,17 @@ More recommendations for GNU packages can be found in
+ @ref{Makefile Conventions, , Makefile Conventions, standards,
+ GNU Coding Standards}.
+ 
++If the @command{bootstrap} shell script exists, it attempts to build the
++@command{configure} shell script and related files, perhaps by
++downloading other software components from the network, and by using
++developer tools that are less commonly installed.  Because the output of
++@command{bootstrap} is system-independent, it is normally run by a
++package developer so that its output can be put into the distribution
++tarball and ordinary builders and users need not run @command{bootstrap}.
++Some packages have commands like @command{./autopull.sh} and
++@command {./autogen.sh} that you can run instead of @command{./bootstrap},
++for more fine-grained control over bootstrapping.
++
+ The @command{configure} shell script attempts to guess correct values
+ for various system-dependent variables used during compilation.  It uses
+ those values to create a @file{Makefile} in each directory of the
+@@ -63,8 +86,15 @@ The simplest way to compile this package is:
+ 
+ @enumerate
+ @item
+-@command{cd} to the directory containing the package's source code and type
+-@samp{./configure} to configure the package for your system.
++@command{cd} to the directory containing the package's source code.
++
++@item
++If this is a developer checkout and file @samp{configure} does not yet exist,
++type @samp{./bootstrap} to create it.
++You may need special developer tools and network access to bootstrap.
++
++@item
++Type @samp{./configure} to configure the package for your system.
+ 
+ Running @command{configure} might take a while.  While running, it prints some
+ messages telling which features it is checking for.
+@@ -124,7 +154,7 @@ parameters by setting variables in the command line or in the environment.
+ Here is an example:
+ 
+ @example
+-./configure CC=c99 CFLAGS=-g LIBS=-lposix
++./configure CC=gcc CFLAGS=-g LIBS=-lposix
+ @end example
+ 
+ @xref{Defining Variables}, for more details.
+@@ -148,21 +178,10 @@ architecture at a time in the source code directory.  After you have
+ installed the package for one architecture, use @samp{make distclean}
+ before reconfiguring for another architecture.
+ 
+-On MacOS X 10.5 and later systems, you can create libraries and
+-executables that work on multiple system types---known as @dfn{fat} or
+-@dfn{universal} binaries---by specifying multiple @option{-arch} options
+-to the compiler but only a single @option{-arch} option to the
+-preprocessor.  Like this:
+-
+-@example
+-./configure CC="gcc -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
+-            CXX="g++ -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
+-            CPP="gcc -E" CXXCPP="g++ -E"
+-@end example
+-
+-This is not guaranteed to produce working output in all cases, you may
+-have to build one architecture at a time and combine the results
+-using the @command{lipo} tool if you have problems.
++Some platforms, notably macOS, support ``fat'' or ``universal'' binaries,
++where a single binary can execute on different architectures.
++On these platforms you can configure and compile just once,
++with options specific to that platform.
+ 
+ @node Installation Names
+ @section Installation Names
+@@ -227,20 +246,16 @@ an extra prefix or suffix on their names by giving @command{configure}
+ the option @option{--program-prefix=@var{PREFIX}} or
+ @option{--program-suffix=@var{SUFFIX}}.
+ 
+-Some packages pay attention to @option{--enable-@var{feature}} options
++Some packages pay attention to @option{--enable-@var{feature}}
++and @option{--disable-@var{feature}} options
+ to @command{configure}, where @var{feature} indicates an optional part
+ of the package.  They may also pay attention to
+-@option{--with-@var{package}} options, where @var{package} is something
+-like @samp{gnu-as} or @samp{x} (for the X Window System).  The
+-@file{README} should mention any @option{--enable-} and @option{--with-}
++@option{--with-@var{package}} and @option{--without-@var{package}} options,
++where @var{package} is something like @samp{gnu-ld}.
++@samp{./configure --help} should mention the
++@option{--enable-...} and @option{--with-...}
+ options that the package recognizes.
+ 
+-For packages that use the X Window System, @command{configure} can
+-usually find the X include and library files automatically, but if it
+-doesn't, you can use the @command{configure} options
+-@option{--x-includes=@var{dir}} and @option{--x-libraries=@var{dir}} to
+-specify their locations.
+-
+ Some packages offer the ability to configure how verbose the execution
+ of @command{make} will be.  For these packages, running
+ @samp{./configure --enable-silent-rules} sets the default to minimal
+@@ -248,53 +263,6 @@ output, which can be overridden with @code{make V=1}; while running
+ @samp{./configure --disable-silent-rules} sets the default to verbose,
+ which can be overridden with @code{make V=0}.
+ 
+-@node Particular Systems
+-@section Particular systems
+-
+-On HP-UX, the default C compiler is not ANSI C compatible.  If GNU CC is
+-not installed, it is recommended to use the following options in order to
+-use an ANSI C compiler:
+-
+-@example
+-./configure CC="cc -Ae -D_XOPEN_SOURCE=500"
+-@end example
+-
+-@noindent
+-and if that doesn't work, install pre-built binaries of GCC for HP-UX.
+-
+-HP-UX @command{make} updates targets which have the same timestamps as
+-their prerequisites, which makes it generally unusable when shipped
+-generated files such as @command{configure} are involved.  Use GNU
+-@command{make} instead.
+-
+-On OSF/1 a.k.a.@: Tru64, some versions of the default C compiler cannot
+-parse its @code{<wchar.h>} header file.  The option @option{-nodtk} can be
+-used as a workaround.  If GNU CC is not installed, it is therefore
+-recommended to try
+-
+-@example
+-./configure CC="cc"
+-@end example
+-
+-@noindent
+-and if that doesn't work, try
+-
+-@example
+-./configure CC="cc -nodtk"
+-@end example
+-
+-On Solaris, don't put @code{/usr/ucb} early in your @env{PATH}.  This
+-directory contains several dysfunctional programs; working variants
+-of these programs are available in @code{/usr/bin}.  So, if you need
+-@code{/usr/ucb} in your @env{PATH}, put it @emph{after} @code{/usr/bin}.
+-
+-On Haiku, software installed for all users goes in @file{/boot/common},
+-not @file{/usr/local}.  It is recommended to use the following options:
+-
+-@example
+-./configure --prefix=/boot/common
+-@end example
+-
+ @node System Type
+ @section Specifying the System Type
+ 
+@@ -304,7 +272,8 @@ will run on.  Usually, assuming the package is built to be run on the
+ @emph{same} architectures, @command{configure} can figure that out, but
+ if it prints a message saying it cannot guess the machine type, give it
+ the @option{--build=@var{type}} option.  @var{type} can either be a
+-short name for the system type, such as @samp{sun4}, or a canonical name
++short name like @samp{mingw64} for the system type, or a canonical name
++like @samp{x86_64-pc-linux-gnu}
+ which has the form:
+ 
+ @example
+@@ -319,6 +288,7 @@ where @var{system} can have one of these forms:
+ @var{kernel}-@var{os}
+ @end example
+ 
++@noindent
+ See the file @file{config.sub} for the possible values of each field.
+ If @file{config.sub} isn't included in this package, then this package
+ doesn't need to know the machine type.
+@@ -405,13 +375,6 @@ traditionally @file{config.cache}.  @var{file} defaults to
+ @itemx -C
+ Alias for @option{--cache-file=config.cache}.
+ 
+-@item --quiet
+-@itemx --silent
+-@itemx -q
+-Do not print messages saying which checks are being made.  To suppress
+-all normal output, redirect it to @file{/dev/null} (any error messages
+-will still be shown).
+-
+ @item --srcdir=@var{dir}
+ Look for the package's source code in directory @var{dir}.  Usually
+ @command{configure} can determine that directory automatically.
+@@ -421,13 +384,33 @@ Use @var{dir} as the installation prefix.  @ref{Installation Names}
+ for more details, including other options available for fine-tuning
+ the installation locations.
+ 
++@item --build=@var{type}
++Build for architecture @var{type}.  @ref{Specifying the System Type}
++for more details, including other system type options.
++
++@item --enable-@var{feature}
++@itemx --disable-@var{feature}
++Enable or disable the optional @var{feature}.  @xref{Optional Features}.
++
++@item --with-@var{package}
++@itemx --without-@var{package}
++Use or omit @var{package} when building.  @xref{Optional Features}.
++
++@item --quiet
++@itemx --silent
++@itemx -q
++Do not print messages saying which checks are being made.  To suppress
++all normal output, redirect it to @file{/dev/null} (any error messages
++will still be shown).
++
+ @item --no-create
+ @itemx -n
+ Run the configure checks, but stop before creating any output files.
+ @end table
+ 
+ @noindent
+-@command{configure} also accepts some other, not widely useful, options.
++@command{configure} also recognizes several environment variables,
++and accepts some other, less widely useful, options.
+ Run @samp{configure --help} for more details.
+ 
+ @c Local Variables:
+-- 
+2.41.0
+

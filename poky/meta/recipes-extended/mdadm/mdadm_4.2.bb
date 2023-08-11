@@ -107,7 +107,14 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN} += "bash"
-RDEPENDS:${PN}-ptest += "bash e2fsprogs-mke2fs util-linux-lsblk util-linux-losetup strace"
+RDEPENDS:${PN}-ptest += " \
+    bash \
+    e2fsprogs-mke2fs \
+    util-linux-lsblk \
+    util-linux-losetup \
+    util-linux-blockdev \
+    strace \
+"
 RRECOMMENDS:${PN}-ptest += " \
     coreutils \
     kernel-module-loop \

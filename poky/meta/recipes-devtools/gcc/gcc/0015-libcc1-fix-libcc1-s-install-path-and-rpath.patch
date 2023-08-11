@@ -1,4 +1,4 @@
-From 7776c630e2560bacff7d1e9b04e7916ed4c05d00 Mon Sep 17 00:00:00 2001
+From 5de63874335c1c673dd132f6aca00dc13f1eac51 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Sun, 5 Jul 2015 20:25:18 -0700
 Subject: [PATCH] libcc1: fix libcc1's install path and rpath

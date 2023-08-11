@@ -21,8 +21,7 @@ USERADD_PARAM:${PN} = "--system -g privacyidea -o -r -d /opt/${BPN}  \
 
 FILES:${PN} += " ${prefix}/etc/privacyidea/* ${prefix}/lib/privacyidea/*"
 
-RDEPENDS:${PN} += " bash perl freeradius-mysql freeradius-utils"
-
+RDEPENDS:${PN} = " bash perl freeradius-mysql freeradius-utils"
 RDEPENDS:${PN} += "python3 python3-alembic python3-babel python3-bcrypt"
 RDEPENDS:${PN} += "python3-beautifulsoup4 python3-cbor2 python3-certifi python3-cffi python3-chardet"
 RDEPENDS:${PN} += "python3-click python3-configobj python3-croniter python3-cryptography python3-defusedxml"
@@ -34,5 +33,5 @@ RDEPENDS:${PN} += "python3-markupsafe python3-netaddr python3-oauth2client pytho
 RDEPENDS:${PN} += "python3-pyasn1 python3-pyasn1-modules python3-pycparser python3-pyjwt python3-pymysql"
 RDEPENDS:${PN} += "python3-pyopenssl python3-pyrad python3-dateutil python3-editor python3-gnupg"
 RDEPENDS:${PN} += "python3-pytz python3-pyyaml python3-qrcode python3-redis python3-requests python3-rsa"
-RDEPENDS:${PN} += "python3-six python3-smpplib python3-soupsieve python3-soupsieve "
-RDEPENDS:${PN} += "python3-sqlalchemy python3-sqlsoup python3-urllib3 python3-werkzeug"
+RDEPENDS:${PN} += "python3-smpplib python3-soupsieve python3-segno python3-importlib-metadata"
+RDEPENDS:${PN} += "python3-sqlalchemy python3-urllib3 python3-werkzeug"

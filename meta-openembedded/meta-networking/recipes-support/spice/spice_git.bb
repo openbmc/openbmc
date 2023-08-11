@@ -30,11 +30,7 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-CVE_CHECK_IGNORE += "\
-    CVE-2016-0749 \
-    CVE-2016-2150 \
-    CVE-2018-10893 \
-"
+CVE_STATUS[CVE-2018-10893] = "fixed-version: patched already, caused by inaccurate CPE in the NVD database."
 
 inherit autotools gettext python3native python3-dir pkgconfig
 

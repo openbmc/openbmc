@@ -14,3 +14,5 @@ SRC_URI = "git://git.netfilter.org/libnetfilter_queue;branch=master \
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
+
+BBCLASSEXTEND = "native"

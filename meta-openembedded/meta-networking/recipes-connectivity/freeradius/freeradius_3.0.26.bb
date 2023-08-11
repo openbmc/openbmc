@@ -43,10 +43,8 @@ SRCREV = "d956f683d37ea40e7977cc5907361f3e6988a439"
 
 UPSTREAM_CHECK_GITTAGREGEX = "release_(?P<pver>\d+(\_\d+)+)"
 
-CVE_CHECK_IGNORE = "\
-    CVE-2002-0318 \
-    CVE-2011-4966 \
-"
+CVE_STATUS[CVE-2002-0318] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
+CVE_STATUS[CVE-2011-4966] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 
 PARALLEL_MAKE = ""
 

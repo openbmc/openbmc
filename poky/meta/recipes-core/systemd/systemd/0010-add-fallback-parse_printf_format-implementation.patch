@@ -23,7 +23,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 
 --- a/meson.build
 +++ b/meson.build
-@@ -755,6 +755,7 @@ endif
+@@ -781,6 +781,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -33,7 +33,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
                    'valgrind/memcheck.h',
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -173,6 +173,11 @@ endforeach
+@@ -179,6 +179,11 @@ endforeach
  
  basic_sources += generated_gperf_headers
  
@@ -407,7 +407,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  #include <stddef.h>
  #include <sys/un.h>
  #include <unistd.h>
-@@ -25,6 +24,7 @@
+@@ -27,6 +26,7 @@
  #include "stdio-util.h"
  #include "string-util.h"
  #include "tmpfile-util.h"

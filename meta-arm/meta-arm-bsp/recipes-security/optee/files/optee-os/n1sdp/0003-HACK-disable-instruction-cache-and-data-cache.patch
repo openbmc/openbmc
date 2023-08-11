@@ -12,7 +12,6 @@ and D cache until a proper fix is found.
 
 Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
 
-%% original patch: 0003-HACK-disable-instruction-cache-and-data-cache.patch
 
 diff --git a/core/arch/arm/kernel/entry_a64.S b/core/arch/arm/kernel/entry_a64.S
 index 875b6e69..594d6928 100644

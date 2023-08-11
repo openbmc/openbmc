@@ -1,6 +1,5 @@
 SUMMARY = "Yet Another Dialog"
 DESCRIPTION = "Program allowing you to display GTK+ dialog boxes from command line or shell scripts."
-AUTHOR = "Victor Ananjevsky"
 
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"

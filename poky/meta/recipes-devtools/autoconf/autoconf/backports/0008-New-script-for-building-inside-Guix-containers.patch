@@ -1,0 +1,54 @@
+From 8babe5f2ccb73cc574933743b381557a4db02424 Mon Sep 17 00:00:00 2001
+From: Zack Weinberg <zackw@panix.com>
+Date: Thu, 30 Mar 2023 10:50:36 -0400
+Subject: [PATCH 08/29] New script for building inside Guix containers.
+
+build-aux/test-build-guix, goes with the top level manifest.scm.
+See the top of the file for usage instructions.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ build-aux/test-build-guix | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+ create mode 100755 build-aux/test-build-guix
+
+diff --git a/build-aux/test-build-guix b/build-aux/test-build-guix
+new file mode 100755
+index 000000000..4470af9b7
+--- /dev/null
++++ b/build-aux/test-build-guix
+@@ -0,0 +1,30 @@
++#! /bin/sh
++
++# From a pristine Git checkout, run
++#  guix shell --container --manifest=manifest.scm -- build-aux/test-build-guix
++# to perform a complete bootstrap and test build of Autoconf.
++
++set -ex
++
++# Guix bug? /bin/sh is usually *not* the shell specified in the manifest.
++SHELL="$(command -v sh)"
++export SHELL
++if [ "$(realpath /bin/sh)" != "$(realpath "$SHELL")" ]; then
++    (
++        cd /bin
++        rm sh
++        ln -s "$SHELL" sh
++    )
++    exec "$SHELL" "$0" "$@"
++fi
++
++./bootstrap
++if [ -d _build ]; then
++    rm -rf _build/*
++else
++    mkdir _build
++fi
++cd _build
++../configure
++make all info pdf dvi
++make distcheck
+-- 
+2.41.0
+

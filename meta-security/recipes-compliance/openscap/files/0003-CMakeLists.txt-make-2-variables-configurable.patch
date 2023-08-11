@@ -1,0 +1,37 @@
+From f99c3f1f516a84d33794f8e3da59adea1a12ef54 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Tue, 20 Jun 2023 22:42:51 +0800
+Subject: [PATCH] CMakeLists.txt: make 2 variables configurable
+
+Variables PREFERRED_PYTHON_PATH and PYTHON3_PATH are set with
+${PYTHON_EXECUTABLE}. For cross compile, ${PYTHON_EXECUTABLE} may point
+to other path rather than standard dir such as /usr/bin. Then the
+generated library file contains such path which should NOT. Update to
+make variables PREFERRED_PYTHON_PATH and PYTHON3_PATH configurable to
+avoid such issue.
+
+Upstream-Status: Submitted [https://github.com/OpenSCAP/openscap/pull/1990]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5db014e77..74628cdd4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -125,8 +125,8 @@ endif()
+ find_package(PythonInterp 3)
+ find_package(PythonLibs 3)
+ 
+-set(PREFERRED_PYTHON_PATH "${PYTHON_EXECUTABLE}")
+-set(PYTHON3_PATH "${PYTHON_EXECUTABLE}")
++set(PREFERRED_PYTHON_PATH "${PYTHON_EXECUTABLE}" CACHE PATH "Path to preferred Python")
++set(PYTHON3_PATH "${PYTHON_EXECUTABLE}" CACHE PATH "Path to Python3")
+ 
+ find_package(RPM)
+ if(RPM_FOUND)
+-- 
+2.34.1
+

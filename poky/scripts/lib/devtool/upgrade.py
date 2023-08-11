@@ -35,6 +35,8 @@ def _get_srctree(tmpdir):
     dirs = scriptutils.filter_src_subdirs(tmpdir)
     if len(dirs) == 1:
         srctree = os.path.join(tmpdir, dirs[0])
+    else:
+        raise DevtoolError("Cannot determine where the source tree is after unpacking in {}: {}".format(tmpdir,dirs))
     return srctree
 
 def _copy_source_code(orig, dest):

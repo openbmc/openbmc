@@ -253,6 +253,9 @@ def SSHCall(command, logger, timeout=None, **opts):
                 except InterruptedError:
                     logger.debug('InterruptedError')
                     continue
+                except BlockingIOError:
+                    logger.debug('BlockingIOError')
+                    continue
 
             process.stdout.close()
 
@@ -270,6 +273,7 @@ def SSHCall(command, logger, timeout=None, **opts):
                             " running time: %d seconds." % (timeout, endtime))
                 logger.debug('Received data from SSH call:\n%s ' % lastline)
                 output += lastline
+                process.wait()
 
         else:
             output_raw = process.communicate()[0]
@@ -287,6 +291,7 @@ def SSHCall(command, logger, timeout=None, **opts):
                 except OSError:
                     logger.debug('OSError')
                     pass
+                process.wait()
 
     options = {
         "stdout": subprocess.PIPE,
@@ -313,6 +318,8 @@ def SSHCall(command, logger, timeout=None, **opts):
         # whilst running and ensure we don't leave a process behind.
         if process.poll() is None:
             process.kill()
+        if process.returncode == None:
+            process.wait()
         logger.debug('Something went wrong, killing SSH process')
         raise
 

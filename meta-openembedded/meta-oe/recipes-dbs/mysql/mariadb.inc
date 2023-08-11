@@ -25,7 +25,7 @@ SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://0001-Add-missing-includes-cstdint-and-cstdio.patch \
           "
 SRC_URI:append:libc-musl = " file://ppc-remove-glibc-dep.patch"
-SRC_URI[sha256sum] = "1c89dee0caed0f68bc2a1d203eb98a123150e6a179f6ee0f1fc0ba3f08dc71dc"
+SRC_URI[sha256sum] = "ce8dac125568cc5f40da74c17212767c92d8faed81066580b526a485a591127d"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
@@ -110,6 +110,11 @@ OECMAKE_GENERATOR = "Unix Makefiles"
 ARM_INSTRUCTION_SET:armv4 = "arm"
 ARM_INSTRUCTION_SET:armv5 = "arm"
 
+do_compile:prepend:class-target () {
+    # remove the buildpath
+    sed -i -e "s:CMAKE_SYSROOT:CMAKE_SYSROOT_PLACE_HOLDER:g" ${S}/libmariadb/mariadb_config/mariadb_config.c.in
+}
+
 do_configure:append() {
     # handle distros with different values of ${libexecdir}
     libexecdir2=`echo ${libexecdir} | sed -e 's+/usr/++g'`
@@ -140,6 +145,7 @@ do_compile:prepend:class-target () {
             echo "#endif" >>${B}/include/openssl/kssl.h
         fi
     fi
+    install -D ${RECIPE_SYSROOT_NATIVE}/usr/bin/uca-dump ${B}/strings/uca-dump
 }
 
 SYSROOT_PREPROCESS_FUNCS += "mariadb_sysroot_preprocess"

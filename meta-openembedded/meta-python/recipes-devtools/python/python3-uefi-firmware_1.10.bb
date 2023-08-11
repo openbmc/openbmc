@@ -4,7 +4,6 @@ UEFI firmware parser is a simple module and set of scripts for parsing, \
 extracting, and recreating UEFI firmware volumes. This includes parsing \
 modules for BIOS, OptionROM, Intel ME and other formats too."
 HOMEPAGE = "https://github.com/theopolis/uefi-firmware-parser"
-AUTHOR = "Teddy Reed <teddy@prosauce.org>"
 LICENSE = "BSD-2-Clause & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://setup.py;md5=90fa5bae1547550f1c1993f651eda955"
 

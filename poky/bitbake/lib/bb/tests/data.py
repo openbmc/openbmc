@@ -77,6 +77,18 @@ class DataExpansions(unittest.TestCase):
         val = self.d.expand("${@d.getVar('foo') + ' ${bar}'}")
         self.assertEqual(str(val), "value_of_foo value_of_bar")
 
+    def test_python_snippet_function_reference(self):
+        self.d.setVar("TESTVAL", "testvalue")
+        self.d.setVar("testfunc", 'd.getVar("TESTVAL")')
+        context = bb.utils.get_context()
+        context["testfunc"] = lambda d: d.getVar("TESTVAL")
+        val = self.d.expand("${@testfunc(d)}")
+        self.assertEqual(str(val), "testvalue")
+
+    def test_python_snippet_builtin_metadata(self):
+        self.d.setVar("eval", "INVALID")
+        self.d.expand("${@eval('3')}")
+
     def test_python_unexpanded(self):
         self.d.setVar("bar", "${unsetvar}")
         val = self.d.expand("${@d.getVar('foo') + ' ${bar}'}")

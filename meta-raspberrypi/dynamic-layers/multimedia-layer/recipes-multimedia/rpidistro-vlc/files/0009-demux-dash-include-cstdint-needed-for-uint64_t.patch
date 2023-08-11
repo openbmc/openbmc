@@ -1,0 +1,30 @@
+From 6fca76ebd76bf8fce9b111e31bda64015cdc770f Mon Sep 17 00:00:00 2001
+From: Johannes Kauffmann <johanneskauffmann@hotmail.com>
+Date: Mon, 11 Jul 2022 19:35:57 +0000
+Subject: [PATCH] demux: dash: include cstdint, needed for uint64_t
+
+Fixes #27077.
+
+Upstream-Status: Backport
+
+https://github.com/videolan/vlc/commit/6fca76ebd76bf8fce9b111e31bda64015cdc770f
+
+---
+ modules/demux/dash/mpd/TemplatedUri.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules/demux/dash/mpd/TemplatedUri.hpp b/modules/demux/dash/mpd/TemplatedUri.hpp
+index 1eeb70cbb6..7f7264a9c8 100644
+--- a/modules/demux/dash/mpd/TemplatedUri.hpp
++++ b/modules/demux/dash/mpd/TemplatedUri.hpp
+@@ -21,6 +21,7 @@
+ #ifndef TEMPLATEDURI_HPP
+ #define TEMPLATEDURI_HPP
+ 
++#include <cstdint>
+ #include <string>
+ 
+ namespace dash
+-- 
+2.34.1
+

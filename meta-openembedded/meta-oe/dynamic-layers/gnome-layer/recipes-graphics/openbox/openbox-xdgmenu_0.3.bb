@@ -1,5 +1,4 @@
 SUMMARY = "Openbox configuration tool"
-AUTHOR = "Siegfried Gevatter"
 HOMEPAGE = "https://launchpad.net/openbox-xdgmenu/"
 SECTION = "x11/wm"
 LICENSE = "GPL-3.0-or-later"

@@ -1,6 +1,5 @@
 SUMMARY = "Specifications for callback functions passed in to an API"
 HOMEPAGE = "https://github.com/takluyver/backcall"
-AUTHOR = "Thomas Kluyver <thomas@kluyver.me.uk>"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=40e56b724d016484a7f790ec826d3ffc"
 

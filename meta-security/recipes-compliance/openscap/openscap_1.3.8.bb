@@ -12,6 +12,7 @@ DEPENDS:class-native = "pkgconfig-native swig-native curl-native libxml2-native 
 #Jun 22th, 2023
 SRCREV = "a81c66d9bc36612dd1ca83a8c959a59e172eb4b9"
 SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=maint-1.3;protocol=https \
+           file://0003-CMakeLists.txt-make-2-variables-configurable.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -35,7 +36,9 @@ EXTRA_OECMAKE += "-DENABLE_PROBES_LINUX=ON -DENABLE_PROBES_UNIX=ON \
                   -DENABLE_PROBES_WINDOWS=OFF -DENABLE_VALGRIND=OFF \
                   -DENABLE_SCE=ON -DENABLE_MITRE=OFF -DENABLE_TESTS=OFF \
                   -DCMAKE_SKIP_INSTALL_RPATH=ON -DCMAKE_SKIP_RPATH=ON \
-                 "
+                  -DPREFERRED_PYTHON_PATH=${bindir}/python3 \
+                  -DPYTHON3_PATH=${bindir}/python3 \
+                  "
 
 STAGING_OSCAP_DIR = "${TMPDIR}/work-shared/${MACHINE}/oscap-source"
 STAGING_OSCAP_BUILDDIR = "${TMPDIR}/work-shared/openscap/oscap-build-artifacts"

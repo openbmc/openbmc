@@ -1,5 +1,4 @@
 SUMMARY = "Makes working with XML feel like you are working with JSON"
-AUTHOR = "Martin Blech"
 HOMEPAGE = "https://github.com/martinblech/xmltodict"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=01441d50dc74476db58a41ac10cb9fa2"

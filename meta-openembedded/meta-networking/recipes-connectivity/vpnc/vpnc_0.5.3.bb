@@ -1,6 +1,5 @@
 SUMMARY = "A client for the Cisco3000 VPN Concentrator"
 HOMEPAGE = "http://www.unix-ag.uni-kl.de/~massar/vpnc/"
-AUTHOR = "Maurice Massar vpnc@unix-ag.uni-kl.de"
 SECTION = "net"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=173b74cb8ac640a9992c03f3bce22a33"

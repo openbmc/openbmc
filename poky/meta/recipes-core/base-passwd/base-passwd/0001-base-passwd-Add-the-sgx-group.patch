@@ -1,0 +1,30 @@
+From 9e57771d138ac423d5139b984b8c869122ce4976 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alexk@zuma.ai>
+Date: Fri, 28 Jul 2023 10:28:57 +0100
+Subject: [PATCH] base-passwd: Add the sgx group
+
+To avoid errors from eudev/udev we need an sgx group, but if we add it
+via groupadd that causes shadow login to be brought into an image, which
+causes images which have CONFIG_MULTIUSER unset to fail with `setgid:
+Function not implemented` as shadow's login doesn't implement the
+heuristics which busybox has to handle this kernel configuration.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ group.master | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/group.master b/group.master
+index d34d2b832d43..e54fd1d2c6dc 100644
+--- a/group.master
++++ b/group.master
+@@ -34,6 +34,7 @@ video:*:44:
+ sasl:*:45:
+ plugdev:*:46:
+ kvm:*:47:
++sgx:*:48:
+ staff:*:50:
+ games:*:60:
+ shutdown:*:70:

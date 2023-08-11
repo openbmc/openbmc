@@ -1,6 +1,5 @@
 SUMMARY = "A Python Parser"
 HOMEPAGE = "https://github.com/davidhalter/parso"
-AUTHOR = "David Halter <davidhalter88@gmail.com>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=cbaa2675b2424d771451332a7a69503f"
 

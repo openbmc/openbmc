@@ -1,5 +1,4 @@
 DESCRIPTION = "Ceres Solver is an open source C++ library for modeling and solving large, complicated optimization problems."
-AUTHOR = "Sameer Agarwal and Keir Mierle and Others"
 HOMEPAGE = "http://ceres-solver.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=bb761279816b72be19d7ce646e4e2a14"

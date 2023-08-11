@@ -19,7 +19,7 @@ DEPENDS += " \
     libxslt \
     sqlite3 \
     libhandy \
-    webkitgtk \
+    webkitgtk3 \
     yelp-xsl \
 "
 PACKAGECONFIG_SOUP ?= "soup3"

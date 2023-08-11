@@ -1,5 +1,4 @@
 DESCRIPTION = "USB Device Firmware Upgrade utility"
-AUTHOR = "Harald Welte <laforge@openmoko.org>"
 HOMEPAGE = "http://dfu-util.sourceforge.net"
 SECTION = "devel"
 LICENSE = "GPL-2.0-only"

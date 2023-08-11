@@ -1,4 +1,4 @@
-From 37c7471aa476dfc591a7123e39e38ef8b049f5c0 Mon Sep 17 00:00:00 2001
+From 4b0efc18e0d91967a3db11d9ef0595a5a76ad67a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:30:32 +0400
 Subject: [PATCH] gcc: armv4: pass fix-v4bx to linker to support EABI.

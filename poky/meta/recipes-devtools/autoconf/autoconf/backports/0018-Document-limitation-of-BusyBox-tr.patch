@@ -1,0 +1,45 @@
+From e704a13c9644f4f4b9a9dd4e215ee7a1707f5850 Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Fri, 3 Mar 2023 14:32:13 +0100
+Subject: [PATCH 18/29] Document limitation of BusyBox tr.
+
+BusyBox 1.35.0 tr, which is shipped with Alpine Linux 3.17, does not support
+the POSIX [x*n] syntax.
+
+* doc/autoconf.texi (Limitations of Usual Tools): Document limitation of 'tr'
+from BusyBox.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ doc/autoconf.texi | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/doc/autoconf.texi b/doc/autoconf.texi
+index 5d5f613e6..b3c708e87 100644
+--- a/doc/autoconf.texi
++++ b/doc/autoconf.texi
+@@ -20368,6 +20368,20 @@ $ @kbd{echo abc | coreutils/tr bc d}
+ add
+ @end example
+ 
++On platforms with the BusyBox tools, @command{tr} does not support the
++@code{[@var{x}*@var{n}]} option syntax.
++
++@example
++$ @kbd{echo abc | tr 'abcd' '[A*4]'}
++[A*
++$ @kbd{echo abc | coreutils/tr 'abcd' '[A*4]'}
++AAA
++$ @kbd{echo xyz | tr 'a-z' '[A*]'}
++]]]
++$ @kbd{echo xyz | coreutils/tr 'a-z' '[A*]'}
++AAA
++@end example
++
+ Posix requires @command{tr} to operate on binary files.  But at least
+ Solaris @command{/usr/ucb/tr} and @command{/usr/bin/tr} silently discard
+ @code{NUL} in the input prior to doing any translation.  When using
+-- 
+2.41.0
+

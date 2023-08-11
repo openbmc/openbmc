@@ -3,7 +3,6 @@ DESCRIPTION = "GNU gettext is a set of tools that provides a framework to help o
 These tools include a set of conventions about how programs should be written to support message catalogs, a directory and file \
 naming organization for the message catalogs themselves, a runtime library supporting the retrieval of translated messages, and \
 a few stand-alone programs to massage in various ways the sets of translatable and already translated strings."
-HOMEPAGE = "http://www.gnu.org/software/gettext/gettext.html"
 SECTION = "libs"
 LICENSE = "GPL-3.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
@@ -22,15 +21,17 @@ DEPENDS:class-native = "gettext-minimal-native"
 PROVIDES = "virtual/libintl virtual/gettext"
 PROVIDES:class-native = "virtual/gettext-native"
 RCONFLICTS:${PN} = "proxy-libintl"
-SRC_URI = "${GNU_MIRROR}/gettext/gettext-${PV}.tar.gz \
+
+require gettext-sources.inc
+SRC_URI += " \
            file://parallel.patch \
            file://use-pkgconfig.patch \
            file://run-ptest \
            file://serial-tests-config.patch \
            file://0001-tests-autopoint-3-unset-MAKEFLAGS.patch \
            file://0001-init-env.in-do-not-add-C-CXX-parameters.patch \
+           file://autoconf-2.73.patch \
            "
-SRC_URI[sha256sum] = "e8c3650e1d8cee875c4f355642382c1df83058bd5a11ee8555c0cf276d646d45"
 
 inherit autotools texinfo pkgconfig ptest
 

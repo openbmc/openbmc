@@ -2,7 +2,6 @@ SUMMARY = "Framebuffer image and doc viewer tools"
 DESCRIPTION = "The fbida project contains a few applications for viewing and editing images, \
                with the main focus being photos."
 HOMEPAGE = "https://www.kraxel.org/blog/linux/fbida/"
-AUTHOR = "Gerd Hoffmann"
 SECTION = "utils"
 
 LICENSE = "GPL-2.0-only"

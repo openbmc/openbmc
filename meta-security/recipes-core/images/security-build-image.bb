@@ -18,3 +18,8 @@ inherit core-image
 export IMAGE_BASENAME = "security-build-image"
 
 IMAGE_ROOTFS_EXTRA_SPACE = "5242880"
+
+QB_KERNEL_CMDLINE_APPEND = " ${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', 'apparmor=1 security=apparmor', '', d)}"
+
+# We need more mem to run many apps in this layer
+QB_MEM = "-m 2048"

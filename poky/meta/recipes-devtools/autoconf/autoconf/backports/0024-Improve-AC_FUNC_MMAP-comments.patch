@@ -1,0 +1,29 @@
+From 8e7281d7bebb5e389befe6e9a5afbb7b2ae13ae0 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Wed, 17 May 2023 11:50:27 -0700
+Subject: [PATCH 24/29] Improve AC_FUNC_MMAP comments
+
+* lib/autoconf/functions.m4 (AC_FUNC_MMAP): Add comment.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/functions.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/autoconf/functions.m4 b/lib/autoconf/functions.m4
+index 3d6e4aca8..54d04cc38 100644
+--- a/lib/autoconf/functions.m4
++++ b/lib/autoconf/functions.m4
+@@ -1311,6 +1311,8 @@ AC_CACHE_CHECK([for working mmap], [ac_cv_func_mmap_fixed_mapped],
+ #include <sys/mman.h>
+ 
+ #ifndef getpagesize
++/* Prefer sysconf to the legacy getpagesize function, as getpagesize has
++   been removed from POSIX and is limited to page sizes that fit in 'int'.  */
+ # ifdef _SC_PAGESIZE
+ #  define getpagesize() sysconf (_SC_PAGESIZE)
+ # elif defined _SC_PAGE_SIZE
+-- 
+2.41.0
+

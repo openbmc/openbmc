@@ -1,0 +1,116 @@
+From e25dfa75e18295d28de67747b4ff9d65f65c4f06 Mon Sep 17 00:00:00 2001
+From: Zack Weinberg <zackw@panix.com>
+Date: Sun, 2 Apr 2023 22:17:55 -0400
+Subject: [PATCH 14/29] Remove the last few internal uses of AC_EGREP_CPP.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Most of the remaining uses were converted to AC_COMPILE_IFELSE.
+The use in AC_FUNC_LOADAVG becomes an AC_PREPROC_IFELSE because
+we can’t be sure getloadavg.c can be _compiled_ at this point in
+the build.  The use in AC_C_VARARRAYS could be either _PREPROC_ or
+_COMPILE_; we use _COMPILE_ because, _PREPROC_ is never used, then
+we don’t have to do the “checking how to run the C preprocessor” test.
+
+* lib/autoconf/c.m4 (AC_C_VARARRAYS): Use AC_COMPILE_IFELSE instead of
+  AC_EGREP_CPP.
+* lib/autoconf/headers.m4 (_AC_HEADER_TIOCGWINSZ_IN_TERMIOS_H)
+  (_AC_HEADER_TIOCGWINSZ_IN_SYS_IOCTL_H): Likewise.
+* lib/autoconf/functions.m4 (AC_FUNC_GETLOADAVG): Use AC_PREPROC_IFELSE
+  instead of AC_EGREP_CPP.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/c.m4         |  8 ++++----
+ lib/autoconf/functions.m4 | 10 +++++-----
+ lib/autoconf/headers.m4   | 24 ++++++++++--------------
+ 3 files changed, 19 insertions(+), 23 deletions(-)
+
+diff --git a/lib/autoconf/c.m4 b/lib/autoconf/c.m4
+index c8c6a665c..b8350c339 100644
+--- a/lib/autoconf/c.m4
++++ b/lib/autoconf/c.m4
+@@ -2197,11 +2197,11 @@ AC_DEFUN([AC_C_VARARRAYS],
+ [
+   AC_CACHE_CHECK([for variable-length arrays],
+     ac_cv_c_vararrays,
+-    [AC_EGREP_CPP([defined],
+-       [#ifdef __STDC_NO_VLA__
+-	defined
++    [AC_COMPILE_IFELSE([AC_LANG_SOURCE(
++[[	#ifndef __STDC_NO_VLA__
++	#error __STDC_NO_VLA__ not defined
+ 	#endif
+-       ],
++]])],
+        [ac_cv_c_vararrays='no: __STDC_NO_VLA__ is defined'],
+        [AC_COMPILE_IFELSE(
+ 	  [AC_LANG_PROGRAM(
+diff --git a/lib/autoconf/functions.m4 b/lib/autoconf/functions.m4
+index 74512e97d..499e4c024 100644
+--- a/lib/autoconf/functions.m4
++++ b/lib/autoconf/functions.m4
+@@ -842,11 +842,11 @@ AC_CHECK_FUNCS(getloadavg, [],
+ # Some definitions of getloadavg require that the program be installed setgid.
+ AC_CACHE_CHECK(whether getloadavg requires setgid,
+ 	       ac_cv_func_getloadavg_setgid,
+-[AC_EGREP_CPP([Yowza Am I SETGID yet],
+-[#include "$srcdir/$ac_config_libobj_dir/getloadavg.c"
+-#ifdef LDAV_PRIVILEGED
+-Yowza Am I SETGID yet
+-@%:@endif],
++[AC_PREPROC_IFELSE([AC_LANG_SOURCE(
++[[#include "$srcdir/$ac_config_libobj_dir/getloadavg.c"
++#ifndef LDAV_PRIVILEGED
++#error setgid not needed
++@%:@endif]])],
+ 	      ac_cv_func_getloadavg_setgid=yes,
+ 	      ac_cv_func_getloadavg_setgid=no)])
+ if test $ac_cv_func_getloadavg_setgid = yes; then
+diff --git a/lib/autoconf/headers.m4 b/lib/autoconf/headers.m4
+index 7f70e8fd4..19c124cc3 100644
+--- a/lib/autoconf/headers.m4
++++ b/lib/autoconf/headers.m4
+@@ -721,13 +721,11 @@ you to include it and time.h simultaneously.])
+ m4_define([_AC_HEADER_TIOCGWINSZ_IN_TERMIOS_H],
+ [AC_CACHE_CHECK([whether termios.h defines TIOCGWINSZ],
+ 		ac_cv_sys_tiocgwinsz_in_termios_h,
+-[AC_EGREP_CPP([yes],
+-	      [#include <sys/types.h>
+-#include <termios.h>
+-#ifdef TIOCGWINSZ
+-  yes
+-#endif
+-],
++[AC_COMPILE_IFELSE([AC_LANG_SOURCE(
++[AC_INCLUDES_DEFAULT
++[#include <termios.h>
++const int tiocgwinsz = TIOCGWINSZ;
++]])],
+ 		ac_cv_sys_tiocgwinsz_in_termios_h=yes,
+ 		ac_cv_sys_tiocgwinsz_in_termios_h=no)])
+ ])# _AC_HEADER_TIOCGWINSZ_IN_TERMIOS_H
+@@ -738,13 +736,11 @@ m4_define([_AC_HEADER_TIOCGWINSZ_IN_TERMIOS_H],
+ m4_define([_AC_HEADER_TIOCGWINSZ_IN_SYS_IOCTL],
+ [AC_CACHE_CHECK([whether sys/ioctl.h defines TIOCGWINSZ],
+ 		ac_cv_sys_tiocgwinsz_in_sys_ioctl_h,
+-[AC_EGREP_CPP([yes],
+-	      [#include <sys/types.h>
+-#include <sys/ioctl.h>
+-#ifdef TIOCGWINSZ
+-  yes
+-#endif
+-],
++[AC_COMPILE_IFELSE([AC_LANG_SOURCE(
++[AC_INCLUDES_DEFAULT
++[#include <sys/ioctl.h>
++const int tiocgwinsz = TIOCGWINSZ;
++]])],
+ 		ac_cv_sys_tiocgwinsz_in_sys_ioctl_h=yes,
+ 		ac_cv_sys_tiocgwinsz_in_sys_ioctl_h=no)])
+ ])# _AC_HEADER_TIOCGWINSZ_IN_SYS_IOCTL
+-- 
+2.41.0
+

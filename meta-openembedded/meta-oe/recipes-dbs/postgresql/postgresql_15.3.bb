@@ -13,6 +13,4 @@ SRC_URI += "\
 
 SRC_URI[sha256sum] = "ffc7d4891f00ffbf5c3f4eab7fbbced8460b8c0ee63c5a5167133b9e6599d932"
 
-CVE_CHECK_IGNORE += "\
-   CVE-2017-8806 \
-"
+CVE_STATUS[CVE-2017-8806] = "not-applicable-config: Ddoesn't apply to out configuration of postgresql so we can safely ignore it."

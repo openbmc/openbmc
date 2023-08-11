@@ -58,7 +58,7 @@ elif targettype == "ssh":
     user = os.environ.get("SSH_HOST_USER", None)
     port = os.environ.get("SSH_HOST_PORT", None)
 
-    command = ["ssh", "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no"]
+    command = ["ssh", "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", "-o", "LogLevel=quiet"]
     if port:
         command += ["-p", str(port)]
     if not host:

@@ -17,6 +17,7 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 [rebased for systemd 244]
 [Rebased for v247]
 Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
+[Rebased for v254]
 ---
  meson.build                                |  1 +
  src/backlight/backlight.c                  |  1 +
@@ -74,7 +75,7 @@ diff --git a/meson.build b/meson.build
 index fb96143c37..739b2f7f72 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -574,6 +574,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
+@@ -595,6 +595,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
  endforeach
  
  foreach ident : [
@@ -98,7 +99,7 @@ diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
 index feda596939..11b4375ed5 100644
 --- a/src/basic/cgroup-util.c
 +++ b/src/basic/cgroup-util.c
-@@ -37,6 +37,7 @@
+@@ -38,6 +38,7 @@
  #include "unit-name.h"
  #include "user-util.h"
  #include "xattr-util.h"
@@ -122,14 +123,14 @@ diff --git a/src/basic/log.c b/src/basic/log.c
 index fc5793139e..515218fca8 100644
 --- a/src/basic/log.c
 +++ b/src/basic/log.c
-@@ -39,6 +39,7 @@
+@@ -40,6 +40,7 @@
  #include "terminal-util.h"
  #include "time-util.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
  
  #define SNDBUF_SIZE (8*1024*1024)
- #define IOVEC_MAX 128U
+ #define IOVEC_MAX 256U
 diff --git a/src/basic/missing_stdlib.h b/src/basic/missing_stdlib.h
 index 8c76f93eb2..9068bfb4f0 100644
 --- a/src/basic/missing_stdlib.h
@@ -166,7 +167,7 @@ diff --git a/src/basic/mountpoint-util.c b/src/basic/mountpoint-util.c
 index bc74fbef8f..cdb609bb84 100644
 --- a/src/basic/mountpoint-util.c
 +++ b/src/basic/mountpoint-util.c
-@@ -13,6 +13,7 @@
+@@ -18,6 +18,7 @@
  #include "missing_stat.h"
  #include "missing_syscall.h"
  #include "mkdir.h"
@@ -214,14 +215,14 @@ diff --git a/src/basic/proc-cmdline.c b/src/basic/proc-cmdline.c
 index eea70d8606..ae3abd8402 100644
 --- a/src/basic/proc-cmdline.c
 +++ b/src/basic/proc-cmdline.c
-@@ -15,6 +15,7 @@
- #include "special.h"
+@@ -16,6 +16,7 @@
  #include "string-util.h"
+ #include "strv.h"
  #include "virt.h"
 +#include "missing_stdlib.h"
  
- int proc_cmdline(char **ret) {
-         const char *e;
+ int proc_cmdline_filter_pid1_args(char **argv, char ***ret) {
+         enum {
 diff --git a/src/basic/procfs-util.c b/src/basic/procfs-util.c
 index bcba5a5208..64a95dd866 100644
 --- a/src/basic/procfs-util.c
@@ -238,7 +239,7 @@ diff --git a/src/basic/time-util.c b/src/basic/time-util.c
 index b700f364ef..48a26bcec9 100644
 --- a/src/basic/time-util.c
 +++ b/src/basic/time-util.c
-@@ -26,6 +26,7 @@
+@@ -27,6 +27,7 @@
  #include "string-util.h"
  #include "strv.h"
  #include "time-util.h"
@@ -262,7 +263,7 @@ diff --git a/src/core/dbus-cgroup.c b/src/core/dbus-cgroup.c
 index b5484eda78..54ed62c790 100644
 --- a/src/core/dbus-cgroup.c
 +++ b/src/core/dbus-cgroup.c
-@@ -21,6 +21,7 @@
+@@ -23,6 +23,7 @@
  #include "parse-util.h"
  #include "path-util.h"
  #include "percent-util.h"
@@ -274,7 +275,7 @@ diff --git a/src/core/dbus-execute.c b/src/core/dbus-execute.c
 index f514b8fd12..4febd0d496 100644
 --- a/src/core/dbus-execute.c
 +++ b/src/core/dbus-execute.c
-@@ -45,6 +45,7 @@
+@@ -48,6 +48,7 @@
  #include "unit-printf.h"
  #include "user-util.h"
  #include "utf8.h"
@@ -298,7 +299,7 @@ diff --git a/src/core/execute.c b/src/core/execute.c
 index 853e87450f..8ef76de9ab 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -105,6 +105,7 @@
+@@ -113,6 +113,7 @@
  #include "unit-serialize.h"
  #include "user-util.h"
  #include "utmp-wtmp.h"
@@ -310,9 +311,9 @@ diff --git a/src/core/kmod-setup.c b/src/core/kmod-setup.c
 index e843743777..e149807492 100644
 --- a/src/core/kmod-setup.c
 +++ b/src/core/kmod-setup.c
-@@ -12,6 +12,7 @@
- #include "recurse-dir.h"
+@@ -13,6 +13,7 @@
  #include "string-util.h"
+ #include "strv.h"
  #include "virt.h"
 +#include "missing_stdlib.h"
  
@@ -322,7 +323,7 @@ diff --git a/src/core/service.c b/src/core/service.c
 index 9ad3c3d995..b112d64919 100644
 --- a/src/core/service.c
 +++ b/src/core/service.c
-@@ -42,6 +42,7 @@
+@@ -45,6 +45,7 @@
  #include "unit-name.h"
  #include "unit.h"
  #include "utf8.h"
@@ -346,7 +347,7 @@ diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-g
 index efc553b698..acea922311 100644
 --- a/src/fstab-generator/fstab-generator.c
 +++ b/src/fstab-generator/fstab-generator.c
-@@ -33,6 +33,7 @@
+@@ -37,6 +37,7 @@
  #include "unit-name.h"
  #include "virt.h"
  #include "volatile-util.h"
@@ -358,7 +359,7 @@ diff --git a/src/journal-remote/journal-remote-main.c b/src/journal-remote/journ
 index 7df264fb53..9463a0e9fb 100644
 --- a/src/journal-remote/journal-remote-main.c
 +++ b/src/journal-remote/journal-remote-main.c
-@@ -25,6 +25,7 @@
+@@ -26,6 +26,7 @@
  #include "stat-util.h"
  #include "string-table.h"
  #include "strv.h"
@@ -370,7 +371,7 @@ diff --git a/src/journal/journalctl.c b/src/journal/journalctl.c
 index da0fac548e..c1c043e0e0 100644
 --- a/src/journal/journalctl.c
 +++ b/src/journal/journalctl.c
-@@ -72,6 +72,7 @@
+@@ -77,6 +77,7 @@
  #include "unit-name.h"
  #include "user-util.h"
  #include "varlink.h"
@@ -406,7 +407,7 @@ diff --git a/src/libsystemd/sd-bus/bus-socket.c b/src/libsystemd/sd-bus/bus-sock
 index 64037e4fe0..9b9ce0aaa9 100644
 --- a/src/libsystemd/sd-bus/bus-socket.c
 +++ b/src/libsystemd/sd-bus/bus-socket.c
-@@ -27,6 +27,7 @@
+@@ -28,6 +28,7 @@
  #include "string-util.h"
  #include "user-util.h"
  #include "utf8.h"
@@ -418,7 +419,7 @@ diff --git a/src/libsystemd/sd-bus/sd-bus.c b/src/libsystemd/sd-bus/sd-bus.c
 index f6a5e4aa06..b36faa79a3 100644
 --- a/src/libsystemd/sd-bus/sd-bus.c
 +++ b/src/libsystemd/sd-bus/sd-bus.c
-@@ -44,6 +44,7 @@
+@@ -46,6 +46,7 @@
  #include "string-util.h"
  #include "strv.h"
  #include "user-util.h"
@@ -442,10 +443,10 @@ diff --git a/src/libsystemd/sd-journal/sd-journal.c b/src/libsystemd/sd-journal/
 index 9947947ef2..8dc6f93159 100644
 --- a/src/libsystemd/sd-journal/sd-journal.c
 +++ b/src/libsystemd/sd-journal/sd-journal.c
-@@ -41,6 +41,7 @@
- #include "string-util.h"
+@@ -44,6 +44,7 @@
  #include "strv.h"
  #include "syslog-util.h"
+ #include "uid-alloc-range.h"
 +#include "missing_stdlib.h"
  
  #define JOURNAL_FILES_RECHECK_USEC (2 * USEC_PER_SEC)
@@ -454,7 +455,7 @@ diff --git a/src/login/pam_systemd.c b/src/login/pam_systemd.c
 index ba2fca32c6..e1f9caa13b 100644
 --- a/src/login/pam_systemd.c
 +++ b/src/login/pam_systemd.c
-@@ -32,6 +32,7 @@
+@@ -34,6 +34,7 @@
  #include "locale-util.h"
  #include "login-util.h"
  #include "macro.h"
@@ -466,7 +467,7 @@ diff --git a/src/network/generator/network-generator.c b/src/network/generator/n
 index 1090934bfc..69a77f66e2 100644
 --- a/src/network/generator/network-generator.c
 +++ b/src/network/generator/network-generator.c
-@@ -13,6 +13,7 @@
+@@ -14,6 +14,7 @@
  #include "string-table.h"
  #include "string-util.h"
  #include "strv.h"
@@ -502,7 +503,7 @@ diff --git a/src/portable/portable.c b/src/portable/portable.c
 index 7811833fac..c6414da91c 100644
 --- a/src/portable/portable.c
 +++ b/src/portable/portable.c
-@@ -39,6 +39,7 @@
+@@ -40,6 +40,7 @@
  #include "strv.h"
  #include "tmpfile-util.h"
  #include "user-util.h"
@@ -550,7 +551,7 @@ diff --git a/src/shared/bus-unit-util.c b/src/shared/bus-unit-util.c
 index 1e95e36678..640ee031d5 100644
 --- a/src/shared/bus-unit-util.c
 +++ b/src/shared/bus-unit-util.c
-@@ -50,6 +50,7 @@
+@@ -51,6 +51,7 @@
  #include "unit-def.h"
  #include "user-util.h"
  #include "utf8.h"
@@ -562,7 +563,7 @@ diff --git a/src/shared/bus-util.c b/src/shared/bus-util.c
 index d09ec5148d..f38a8f7cc1 100644
 --- a/src/shared/bus-util.c
 +++ b/src/shared/bus-util.c
-@@ -21,6 +21,7 @@
+@@ -24,6 +24,7 @@
  #include "path-util.h"
  #include "socket-util.h"
  #include "stdio-util.h"
@@ -586,9 +587,9 @@ diff --git a/src/shared/journal-importer.c b/src/shared/journal-importer.c
 index d9eabec886..534c6cf7e3 100644
 --- a/src/shared/journal-importer.c
 +++ b/src/shared/journal-importer.c
-@@ -15,6 +15,7 @@
- #include "parse-util.h"
+@@ -16,6 +16,7 @@
  #include "string-util.h"
+ #include "strv.h"
  #include "unaligned.h"
 +#include "missing_stdlib.h"
  
@@ -622,7 +623,7 @@ diff --git a/src/socket-proxy/socket-proxyd.c b/src/socket-proxy/socket-proxyd.c
 index 821049e667..08a5bdae3d 100644
 --- a/src/socket-proxy/socket-proxyd.c
 +++ b/src/socket-proxy/socket-proxyd.c
-@@ -26,6 +26,7 @@
+@@ -27,6 +27,7 @@
  #include "set.h"
  #include "socket-util.h"
  #include "string-util.h"
@@ -646,7 +647,7 @@ diff --git a/src/udev/udev-builtin-path_id.c b/src/udev/udev-builtin-path_id.c
 index 8e4d57ee72..6b4555b4d5 100644
 --- a/src/udev/udev-builtin-path_id.c
 +++ b/src/udev/udev-builtin-path_id.c
-@@ -22,6 +22,7 @@
+@@ -24,6 +24,7 @@
  #include "sysexits.h"
  #include "udev-builtin.h"
  #include "udev-util.h"
@@ -670,13 +671,13 @@ diff --git a/src/udev/udev-rules.c b/src/udev/udev-rules.c
 index 5bd09a64d1..0ce79f815c 100644
 --- a/src/udev/udev-rules.c
 +++ b/src/udev/udev-rules.c
-@@ -34,6 +34,7 @@
+@@ -35,6 +35,7 @@
  #include "udev-util.h"
  #include "user-util.h"
  #include "virt.h"
 +#include "missing_stdlib.h"
  
- #define RULES_DIRS (const char* const*) CONF_PATHS_STRV("udev/rules.d")
+ #define RULES_DIRS ((const char* const*) CONF_PATHS_STRV("udev/rules.d"))
  
 -- 
 2.39.2

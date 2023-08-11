@@ -1,0 +1,180 @@
+From daaca7f74f94d6a7a51d571156d5fbaba5ef9a87 Mon Sep 17 00:00:00 2001
+From: Zack Weinberg <zackw@panix.com>
+Date: Sun, 2 Apr 2023 21:03:30 -0400
+Subject: [PATCH 11/29] Make AC_PROG_GCC_TRADITIONAL a compatibility alias for
+ AC_PROG_CC.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This macro is one of the last remaining internal uses of AC_EGREP_CPP.
+It has only ever done anything useful with GCC, and GCC dropped
+support for ‘traditional’ compilation in version 3.3 (released 2003)
+so I do not think it is worth trying to preserve.
+
+* lib/autoconf/c.m4 (AC_PROG_GCC_TRADITIONAL): Make into a
+  compatibility alias for AC_PROG_CC, similar to AC_PROG_CC_STDC.
+* lib/autoconf/general.m4 (AC_EGREP_CPP): Remove stale comment.
+* doc/autoconf.texi, NEWS: Document this change.
+* tests/mktests.pl: Exclude AC_PROG_GCC_TRADITIONAL from
+  autoupdate tests.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ NEWS                    |  7 +++++++
+ doc/autoconf.texi       | 29 ++++++++++++++---------------
+ lib/autoconf/c.m4       | 30 ++++++------------------------
+ lib/autoconf/general.m4 |  2 --
+ tests/mktests.pl        |  2 +-
+ 5 files changed, 28 insertions(+), 42 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index 6a106f155..53c57ff59 100644
+--- a/NEWS
++++ b/NEWS
+@@ -81,6 +81,13 @@ GNU Autoconf NEWS - User visible changes.
+   with plain apostrophes instead of the older GNU style `like this'
+   with grave accent and apostrophe.
+ 
++*** AC_PROG_GCC_TRADITIONAL no longer does anything.
++
++  This macro has had no useful effect since GCC dropped support for
++  traditional-mode compilation in version 3.3 (released in 2003), and
++  the systems that needed it are also long obsolete.  It is now a
++  compatibility synonym for AC_PROG_CC.
++
+ ** Notable bug fixes
+ 
+ *** Autoconf caches now use finer-grained timestamps.
+diff --git a/doc/autoconf.texi b/doc/autoconf.texi
+index 8db64d8bb..037c8055f 100644
+--- a/doc/autoconf.texi
++++ b/doc/autoconf.texi
+@@ -7764,20 +7764,6 @@ This macro is obsolescent, as current C compilers support prototypes.
+ New programs need not use this macro.
+ @end defmac
+ 
+-@anchor{AC_PROG_GCC_TRADITIONAL}
+-@defmac AC_PROG_GCC_TRADITIONAL
+-@acindex{PROG_GCC_TRADITIONAL}
+-@ovindex CC
+-Add @option{-traditional} to output variable @code{CC} if using a
+-GNU C compiler and @code{ioctl} does not work properly without
+-@option{-traditional}.  That usually happens when the fixed header files
+-have not been installed on an old system.
+-
+-This macro is obsolescent, since current versions of the GNU C
+-compiler fix the header files automatically when installed.
+-@end defmac
+-
+-
+ @node C++ Compiler
+ @subsection C++ Compiler Characteristics
+ 
+@@ -23986,7 +23972,8 @@ These days portable programs should use @code{waitpid}, not
+ 
+ @defmac AC_GCC_TRADITIONAL
+ @acindex{GCC_TRADITIONAL}
+-Replaced by @code{AC_PROG_GCC_TRADITIONAL} (@pxref{AC_PROG_GCC_TRADITIONAL}).
++Replaced by @code{AC_PROG_GCC_TRADITIONAL} (@pxref{AC_PROG_GCC_TRADITIONAL}),
++which is itself obsolete.
+ @end defmac
+ 
+ @defmac AC_GETGROUPS_T
+@@ -24369,6 +24356,18 @@ Now done by @code{AC_PROG_CC} (@pxref{AC_PROG_CC}).
+ Now done by @code{AC_PROG_CC} (@pxref{AC_PROG_CC}).
+ @end defmac
+ 
++@anchor{AC_PROG_GCC_TRADITIONAL}
++@defmac AC_PROG_GCC_TRADITIONAL
++@acindex{PROG_GCC_TRADITIONAL}
++Used to put GCC into ``traditional'' (pre-ISO C) compilation mode,
++on systems with headers that did not work correctly with a
++standard-compliant compiler.  GCC has not supported traditional
++compilation in many years, and all of the systems that required this are
++long obsolete themselves.  This macro is now a compatibility synonym for
++@code{AC_PROG_CC} (@pxref{AC_PROG_CC}).
++
++@end defmac
++
+ @defmac AC_PROGRAMS_CHECK
+ @acindex{PROGRAMS_CHECK}
+ Replaced by @code{AC_CHECK_PROGS} (@pxref{AC_CHECK_PROGS}).
+diff --git a/lib/autoconf/c.m4 b/lib/autoconf/c.m4
+index fef6c516d..33648b5b9 100644
+--- a/lib/autoconf/c.m4
++++ b/lib/autoconf/c.m4
+@@ -551,30 +551,6 @@ fi[]dnl
+ ])# _AC_PROG_CC_G
+ 
+ 
+-# AC_PROG_GCC_TRADITIONAL
+-# -----------------------
+-AC_DEFUN([AC_PROG_GCC_TRADITIONAL],
+-[AC_REQUIRE([AC_PROG_CC])dnl
+-if test $ac_cv_c_compiler_gnu = yes; then
+-    AC_CACHE_CHECK(whether $CC needs -traditional,
+-      ac_cv_prog_gcc_traditional,
+-[  ac_pattern="Autoconf.*'x'"
+-  AC_EGREP_CPP($ac_pattern, [#include <sgtty.h>
+-Autoconf TIOCGETP],
+-  ac_cv_prog_gcc_traditional=yes, ac_cv_prog_gcc_traditional=no)
+-
+-  if test $ac_cv_prog_gcc_traditional = no; then
+-    AC_EGREP_CPP($ac_pattern, [#include <termio.h>
+-Autoconf TCGETA],
+-    ac_cv_prog_gcc_traditional=yes)
+-  fi])
+-  if test $ac_cv_prog_gcc_traditional = yes; then
+-    CC="$CC -traditional"
+-  fi
+-fi
+-])# AC_PROG_GCC_TRADITIONAL
+-
+-
+ # AC_PROG_CC_C_O
+ # --------------
+ AC_DEFUN([AC_PROG_CC_C_O],
+@@ -1675,6 +1651,12 @@ AU_DEFUN([AC_PROG_CC_STDC],
+   [$0 is obsolete; use AC_PROG_CC]
+ )
+ 
++# AC_PROG_GCC_TRADITIONAL
++# -----------------------
++AU_DEFUN([AC_PROG_GCC_TRADITIONAL],
++  [AC_REQUIRE([AC_PROG_CC])],
++  [$0 is obsolete; use AC_PROG_CC]
++)
+ 
+ # AC_C_BACKSLASH_A
+ # ----------------
+diff --git a/lib/autoconf/general.m4 b/lib/autoconf/general.m4
+index ecda0a51c..47d896d54 100644
+--- a/lib/autoconf/general.m4
++++ b/lib/autoconf/general.m4
+@@ -2766,8 +2766,6 @@ AU_DEFUN([AC_TRY_CPP],
+ # AC_EGREP_CPP(PATTERN, PROGRAM,
+ #              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+ # ------------------------------------------------------
+-# Because this macro is used by AC_PROG_GCC_TRADITIONAL, which must
+-# come early, it is not included in AC_BEFORE checks.
+ AC_DEFUN([AC_EGREP_CPP],
+ [AC_LANG_PREPROC_REQUIRE()dnl
+ AC_REQUIRE([_AC_PROG_EGREP_TRADITIONAL])dnl
+diff --git a/tests/mktests.pl b/tests/mktests.pl
+index effed0bca..81f63586c 100644
+--- a/tests/mktests.pl
++++ b/tests/mktests.pl
+@@ -112,7 +112,7 @@ my @ac_exclude_list = (
+ # Check all AU_DEFUN'ed macros with AT_CHECK_AU_MACRO, except these.
+ my @au_exclude_list = (
+   # Empty.
+-  qr/^AC_(C_CROSS|PROG_CC_(C[89]9|STDC))$/,
++  qr/^AC_(C_CROSS|PROG_(CC_(C[89]9|STDC)|GCC_TRADITIONAL))$/,
+ 
+   # Use AC_REQUIRE.
+   qr/^AC_(CYGWIN|MINGW32|EMXOS2)$/,
+-- 
+2.41.0
+

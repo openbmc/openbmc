@@ -65,9 +65,7 @@ RDEPENDS:${PN} = "findutils cpio util-linux-blkid util-linux-getopt util-linux b
 # This could be optimized a bit, but let's avoid non-booting systems :)
 RRECOMMENDS:${PN} = " \
                      kernel-modules \
-                     busybox \
                      coreutils \
                     "
 
-# CVE-2010-4176 affects only Fedora
-CVE_CHECK_IGNORE += "CVE-2010-4176"
+CVE_STATUS[CVE-2010-4176] = "not-applicable-platform: Applies only to Fedora"

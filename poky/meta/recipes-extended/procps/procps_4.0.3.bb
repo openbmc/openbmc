@@ -15,6 +15,7 @@ inherit autotools gettext pkgconfig update-alternatives
 SRC_URI = "git://gitlab.com/procps-ng/procps.git;protocol=https;branch=master \
            file://sysctl.conf \
            file://0001-src-w.c-use-utmp.h-only.patch \
+           file://0001-po-fr.po-address-failures-with-gettext-0.22.patch \
            "
 SRCREV = "806eb270f217ff7e1e745c7bda2b002b5be74be4"
 

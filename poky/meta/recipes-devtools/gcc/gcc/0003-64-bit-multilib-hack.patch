@@ -1,4 +1,4 @@
-From 86664e09670efa5a8662ef59590e01707f8e0cc3 Mon Sep 17 00:00:00 2001
+From febfac59d0e8a864370d0b4018b4e497ceec156d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:10:06 +0400
 Subject: [PATCH] 64-bit multilib hack

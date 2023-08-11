@@ -1,0 +1,24 @@
+From 04ce07d289e8cec75223349e9ebf7e69126fc04d Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Wed, 18 Jan 2023 15:13:37 -0500
+Subject: [PATCH] arm/trusted-firmware-m: disable fatal warnings
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Inappropriate
+
+---
+ toolchain_GNUARM.cmake | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/toolchain_GNUARM.cmake b/toolchain_GNUARM.cmake
+index 7989718515..a5939323d6 100644
+--- a/toolchain_GNUARM.cmake
++++ b/toolchain_GNUARM.cmake
+@@ -71,7 +71,6 @@ macro(tfm_toolchain_reset_linker_flags)
+         --entry=Reset_Handler
+         -specs=nano.specs
+         LINKER:-check-sections
+-        LINKER:-fatal-warnings
+         LINKER:--gc-sections
+         LINKER:--no-wchar-size-warning
+         ${MEMORY_USAGE_FLAG}

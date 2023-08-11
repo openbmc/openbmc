@@ -26,12 +26,11 @@ SRC_URI = "http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-${PV}.tar.g
 
 SRC_URI[sha256sum] = "103dd272e6a66c5b8df07dce5e9a02555fcd6f1397bdfb782237328e89d3a866"
 
-# CVE-2016-9312 is only for windows.
-# CVE-2019-11331 is inherent to RFC 5905 and cannot be fixed without breaking compatibility
-# The other CVEs are not correctly identified because cve-check
-# is not able to check the version correctly (it only checks for 4.2.8 omitting p15 that makes the difference)
-CVE_CHECK_IGNORE += "\
-    CVE-2016-9312 \
+CVE_STATUS[CVE-2016-9312] = "not-applicable-platform: Issue only applies on Windows"
+CVE_STATUS[CVE-2019-11331] = "upstream-wontfix: inherent to RFC 5905 and cannot be fixed without breaking compatibility"
+CVE_STATUS_GROUPS += "CVE_STATUS_NTP"
+CVE_STATUS_NTP[status] = "fixed-version: Yocto CVE check can not handle 'p' in ntp version"
+CVE_STATUS_NTP = " \
     CVE-2015-5146 \
     CVE-2015-5300 \
     CVE-2015-7975 \
@@ -51,7 +50,6 @@ CVE_CHECK_IGNORE += "\
     CVE-2016-7433 \
     CVE-2016-9310 \
     CVE-2016-9311 \
-    CVE-2019-11331 \
 "
 
 

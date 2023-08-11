@@ -1,0 +1,121 @@
+From a1e82aff0fd842b0f09e2cd166560dfda725ba13 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Sun, 9 Apr 2023 11:41:57 -0700
+Subject: [PATCH 16/29] Improve year2038, largefile option processing
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* lib/autoconf/specific.m4 (_AC_SYS_YEAR2038_PROBE)
+(_AC_SYS_YEAR2038_ENABLE, _AC_SYS_YEAR2038_OPT_IN)
+(AC_SYS_YEAR2038, _AC_SYS_LARGEFILE_PROBE)
+(_AC_SYS_LARGEFILE_ENABLE): Do not use enable_largefile to record
+whether largefile is required, as ‘./configure
+--disable-largefile’ sets enable_largefile=no even if largefile is
+required and this disables largefile.  Instead, use a separate
+shell variable ac_largefile_required and test it as well.
+Similarly for enable_year2038.
+(_AC_SYS_LARGEFILE_ENABLE): Omit --disable-largefile help string
+if year2038 is required, since largefile is a prereq for year2038.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/specific.m4 | 35 ++++++++++++++++++++++-------------
+ 1 file changed, 22 insertions(+), 13 deletions(-)
+
+diff --git a/lib/autoconf/specific.m4 b/lib/autoconf/specific.m4
+index 5dc006959..1a3f4a65c 100644
+--- a/lib/autoconf/specific.m4
++++ b/lib/autoconf/specific.m4
+@@ -155,10 +155,10 @@ AS_CASE([$ac_cv_sys_year2038_opts],
+   ["none needed"], [],
+   ["support not detected"],
+     [ac_have_year2038=no
+-     AS_CASE([$enable_year2038],
+-      [required],
++     AS_CASE([$ac_year2038_required,$enable_year2038],
++      [yes,*],
+         [AC_MSG_FAILURE([support for timestamps after Jan 2038 is required])],
+-      [yes],
++      [*,yes],
+         [# If we're not cross compiling and 'touch' works with a large
+         # timestamp, then we can presume the system supports wider time_t
+         # *somehow* and we just weren't able to detect it.  One common
+@@ -209,10 +209,12 @@ AS_CASE([$ac_cv_sys_year2038_opts],
+ m4_define([_AC_SYS_YEAR2038_ENABLE],
+ [m4_divert_text([DEFAULTS],
+   m4_provide_if([AC_SYS_YEAR2038_REQUIRED],
+-    [enable_year2038=required],
++    [ac_year2038_required=yes],
++    [ac_year2038_required=no]))dnl
++m4_divert_text([DEFAULTS],
+   m4_provide_if([AC_SYS_YEAR2038],
+     [enable_year2038=yes],
+-    [enable_year2038=no])))]dnl
++    [enable_year2038=no]))]dnl
+ [m4_provide_if([AC_SYS_YEAR2038_REQUIRED], [],
+ [AC_ARG_ENABLE([year2038],
+   m4_provide_if([AC_SYS_YEAR2038],
+@@ -231,7 +233,8 @@ m4_define([_AC_SYS_YEAR2038_ENABLE],
+ # documented macro.
+ AC_DEFUN([_AC_SYS_YEAR2038_OPT_IN],
+ [m4_provide_if([_AC_SYS_YEAR2038_PROBE], [], [dnl
+-  AS_IF([test "$enable_year2038" != no], [_AC_SYS_YEAR2038_PROBE])
++  AS_IF([test "$ac_year2038_required,$enable_year2038" != no,no],
++    [_AC_SYS_YEAR2038_PROBE])
+   AC_CONFIG_COMMANDS_PRE([_AC_SYS_YEAR2038_ENABLE])
+ ])])
+ 
+@@ -244,7 +247,8 @@ AC_DEFUN([AC_SYS_YEAR2038],
+ [m4_provide_if([AC_SYS_LARGEFILE_REQUIRED], [],
+   [AC_REQUIRE([AC_SYS_LARGEFILE])])]dnl
+ [m4_provide_if([_AC_SYS_YEAR2038_PROBE], [], [dnl
+-  AS_IF([test "$enable_year2038" != no], [_AC_SYS_YEAR2038_PROBE])
++  AS_IF([test "$ac_year2038_required,$enable_year2038" != no,no],
++    [_AC_SYS_YEAR2038_PROBE])
+   AC_CONFIG_COMMANDS_PRE([_AC_SYS_YEAR2038_ENABLE])
+ ])])
+ 
+@@ -326,7 +330,7 @@ AS_CASE([$ac_cv_sys_largefile_opts],
+   ["none needed"], [],
+   ["support not detected"],
+     [ac_have_largefile=no
+-     AS_IF([test $enable_largefile = required],
++     AS_IF([test $ac_largefile_required,$ac_year2038_required != no,no],
+        [AC_MSG_FAILURE([support for large files is required])])],
+ 
+   ["-D_FILE_OFFSET_BITS=64"],
+@@ -358,11 +362,15 @@ _AC_SYS_YEAR2038_OPT_IN
+ m4_define([_AC_SYS_LARGEFILE_ENABLE],
+ [m4_divert_text([DEFAULTS],
+   m4_provide_if([AC_SYS_LARGEFILE_REQUIRED],
+-    [enable_largefile=required],
+-    [enable_largefile=yes]))]dnl
++    [ac_largefile_required=yes],
++    [ac_largefile_required=no]))dnl
++m4_divert_text([DEFAULTS],
++  [enable_largefile=yes])]dnl
+ [m4_provide_if([AC_SYS_LARGEFILE_REQUIRED], [],
+-[AC_ARG_ENABLE([largefile],
+-  [AS_HELP_STRING([--disable-largefile], [omit support for large files])])])])
++   [m4_provide_if([AC_SYS_YEAR2038_REQUIRED], [],
++      [AC_ARG_ENABLE([largefile],
++         [AS_HELP_STRING([--disable-largefile],
++	    [omit support for large files])])])])])
+ 
+ # AC_SYS_LARGEFILE
+ # ----------------
+@@ -377,7 +385,8 @@ m4_define([_AC_SYS_LARGEFILE_ENABLE],
+ # large files; see also AC_SYS_LARGEFILE_REQUIRED.
+ AC_DEFUN([AC_SYS_LARGEFILE],
+ [m4_provide_if([_AC_SYS_LARGEFILE_PROBE], [], [dnl
+-  AS_IF([test "$enable_largefile" != no], [_AC_SYS_LARGEFILE_PROBE])
++  AS_IF([test "$ac_largefile_required,$enable_largefile,$ac_year2038_required" != no,no,no],
++    [_AC_SYS_LARGEFILE_PROBE])
+   AC_CONFIG_COMMANDS_PRE([_AC_SYS_LARGEFILE_ENABLE])
+ ])])
+ 
+-- 
+2.41.0
+

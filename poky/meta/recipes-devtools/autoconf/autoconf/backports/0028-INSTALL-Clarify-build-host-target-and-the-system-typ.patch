@@ -1,0 +1,224 @@
+From 328f9b88ef896e8e31818c50d9ec2ade5c892ea4 Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Fri, 23 Jun 2023 17:37:35 +0200
+Subject: [PATCH 28/29] INSTALL: Clarify --build, --host, --target, and the
+ system types.
+
+* doc/install.texi (Compilers and Options): Add another reference.
+(System Types): Renamed from System Type. Explain how to canonicalize
+and how to validate a system type. Don't explain --build, --host,
+--target here.
+(Building for a different system type): New section.
+(Troubleshooting the Build Type): New section.
+(Configuring a Compiler): New section.
+(configure Invocation): Mention the --host option, not the --build
+option, since --build is so rarely needed.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ doc/autoconf.texi |   6 +--
+ doc/install.texi  | 132 +++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 111 insertions(+), 27 deletions(-)
+
+diff --git a/doc/autoconf.texi b/doc/autoconf.texi
+index 7817fc1b5..043f7fb21 100644
+--- a/doc/autoconf.texi
++++ b/doc/autoconf.texi
+@@ -604,7 +604,7 @@ Running @command{configure} Scripts
+ * Multiple Architectures::      Compiling for multiple architectures at once
+ * Installation Names::          Installing in different directories
+ * Optional Features::           Selecting optional features
+-* System Type::                 Specifying the system type
++* System Types::                Specifying a system type
+ * Sharing Defaults::            Setting site-wide defaults for @command{configure}
+ * Defining Variables::          Specifying the compiler etc.
+ * configure Invocation::        Changing how @command{configure} runs
+@@ -22383,7 +22383,7 @@ system it's running on.  To do so it runs a script called
+ command or symbols predefined by the C preprocessor.
+ 
+ Alternately, the user can specify the system type with command line
+-arguments to @command{configure} (@pxref{System Type}.  Doing so is
++arguments to @command{configure} (@pxref{System Types}.  Doing so is
+ necessary when
+ cross-compiling.  In the most complex case of cross-compiling, three
+ system types are involved.  The options to specify them are:
+@@ -23303,7 +23303,7 @@ may use comes with Autoconf.
+ * Multiple Architectures::      Compiling for multiple architectures at once
+ * Installation Names::          Installing in different directories
+ * Optional Features::           Selecting optional features
+-* System Type::                 Specifying the system type
++* System Types::                Specifying a system type
+ * Sharing Defaults::            Setting site-wide defaults for @command{configure}
+ * Defining Variables::          Specifying the compiler etc.
+ * configure Invocation::        Changing how @command{configure} runs
+diff --git a/doc/install.texi b/doc/install.texi
+index 6d9788fa9..a3ef17828 100644
+--- a/doc/install.texi
++++ b/doc/install.texi
+@@ -157,8 +157,16 @@ Here is an example:
+ ./configure CC=gcc CFLAGS=-g LIBS=-lposix
+ @end example
+ 
+-@xref{Defining Variables}, for more details.
+-
++See
++@ref{Defining Variables} and
++@ifset autoconf
++@ref{Preset Output Variables}
++@end ifset
++@ifclear autoconf
++@ref{Preset Output Variables,,, autoconf, Autoconf}
++@c (@url{https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.71/html_node/Preset-Output-Variables.html})
++@end ifclear
++for more details.
+ 
+ @node Multiple Architectures
+ @section Compiling For Multiple Architectures
+@@ -263,18 +271,17 @@ output, which can be overridden with @code{make V=1}; while running
+ @samp{./configure --disable-silent-rules} sets the default to verbose,
+ which can be overridden with @code{make V=0}.
+ 
+-@node System Type
+-@section Specifying the System Type
++@node System Types
++@section Specifying a System Type
+ 
+-There may be some features @command{configure} cannot figure out
+-automatically, but needs to determine by the type of machine the package
+-will run on.  Usually, assuming the package is built to be run on the
+-@emph{same} architectures, @command{configure} can figure that out, but
+-if it prints a message saying it cannot guess the machine type, give it
+-the @option{--build=@var{type}} option.  @var{type} can either be a
+-short name like @samp{mingw64} for the system type, or a canonical name
+-like @samp{x86_64-pc-linux-gnu}
+-which has the form:
++The following sections go into details regarding situations where you
++may have to specify a system type, either through the option
++@option{--host=@var{type}}, or through the option
++@option{--build=@var{type}}, or -- in the case of compilers -- through
++@option{--target=@var{type}}.
++
++A system type @var{type} can either be a short name like @samp{mingw64},
++or a canonical name like @samp{x86_64-pc-linux-gnu} which has the form:
+ 
+ @example
+ @var{cpu}-@var{company}-@var{system}
+@@ -291,16 +298,93 @@ where @var{system} can have one of these forms:
+ @noindent
+ See the file @file{config.sub} for the possible values of each field.
+ If @file{config.sub} isn't included in this package, then this package
+-doesn't need to know the machine type.
++doesn't need to know any machine type.
++
++The file @file{config.sub} is a program that validates and canonicalizes
++a system type.
++It can do canonicalization, as in
++
++@example
++$ sh config.sub x86_64-linux
++x86_64-pc-linux-gnu
++$ sh config.sub arm64-linux
++aarch64-unknown-linux-gnu
++@end example
++
++@noindent
++It also validates the parts.  For example, this interaction tells you
++that ``crusoe'' is not a valid cpu architecture name:
+ 
+-If you are @emph{building} compiler tools for cross-compiling, you
+-should use the option @option{--target=@var{type}} to select the type of
+-system they will produce code for.
++@example
++$ sh config.sub crusoe-linux
++Invalid configuration `crusoe-linux': machine `crusoe-unknown' not recognized
++@end example
++
++@node Building for a different system type
++@section Creating binaries for a different system type
++
++When you want to create binaries that will run on a different machine
++type than the one you are building on, you need to specify both
++@itemize @bullet
++@item
++a @option{--host=@var{type}} option, specifying the machine type on
++which the binaries shall run,
++@item
++compiler variables (@code{CC} for the C compiler, @code{CXX} for the C++
++compiler, and so on), pointing to compilers that generate object code
++for that machine type.
++@end itemize
++
++For example, to create binaries intended to run on a 64-bit ARM
++processor:
++@example
++./configure --host=aarch64-linux-gnu \
++            CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
++@end example
+ 
+-If you want to @emph{use} a cross compiler, that generates code for a
+-platform different from the build platform, you should specify the
+-@dfn{host} platform (i.e., that on which the generated programs will
+-eventually be run) with @option{--host=@var{type}}.
++If you do this on a machine that can execute such binaries (e.g.@: by
++virtue of the @code{qemu-aarch64} program, system libraries for that
++architecture under @code{$QEMU_LD_PREFIX}, and a Linux
++@code{binfmt_misc} configuration), the build behaves like a native
++build.
++If not, the build is a cross-build, in the sense that @code{configure}
++will make cross-compilation guesses instead of running test programs,
++and ``make check'' will not work.
++
++@node Troubleshooting the Build Type
++@section Fixing a ``cannot guess build type'' error
++
++In rare cases, it may happen that @code{configure} fails with the error
++message ``cannot guess build type''.
++This error means that the files @file{config.guess} and
++@file{config.sub} don't recognize the type of the system on which you
++are building.
++In this case, first fetch the newest versions of these files, from
++@url{https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess}
++and
++@url{https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub},
++respectively, and use these as drop-in replacement for the files
++@file{config.guess} and @file{config.sub} that were shipped with this
++package.
++
++If this resolves the problem, feel free to report the solution to the
++maintainers of this package.
++
++Otherwise, it means that your system is not yet supported by
++@file{config.guess} and @file{config.sub}.
++As a workaround, you can use a configure option
++@option{--build=@var{type}}, where @var{type} comes closest to your
++system type.
++Also, you're welcome to file a report to
++@email{config-patches@@gnu.org}.
++
++@node Configuring a Compiler
++@section Configuration options specific to a compiler
++
++If you are building a compiler, and this compiler should generate code
++for a system type that is different from the one on which the compiler
++binaries shall run on, use the option @option{--target=@var{type}} to
++select the type of system for which the compiler should produce code.
+ 
+ @node Sharing Defaults
+ @section Sharing Defaults
+@@ -384,9 +468,9 @@ Use @var{dir} as the installation prefix.  @ref{Installation Names}
+ for more details, including other options available for fine-tuning
+ the installation locations.
+ 
+-@item --build=@var{type}
+-Build for architecture @var{type}.  @ref{System Type}.
+-for more details, including other system type options.
++@item --host=@var{type}
++Build binaries for architecture @var{type}.  @ref{System Types} and
++@ref{Building for a different system type} for more details.
+ 
+ @item --enable-@var{feature}
+ @itemx --disable-@var{feature}
+-- 
+2.41.0
+

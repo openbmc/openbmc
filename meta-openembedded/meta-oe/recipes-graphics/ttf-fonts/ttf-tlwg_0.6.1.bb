@@ -1,7 +1,6 @@
 require ttf.inc
 
 SUMMARY = "Thai Linux Working Group Fonts"
-AUTHOR = "Thai Linux Working Group"
 HOMEPAGE = "http://linux.thai.net/projects/fonts-tlwg"
 LICENSE = "GPL-2.0-only & TLWG"
 LIC_FILES_CHKSUM = "file://../fonts-tlwg-${PV}/COPYING;md5=3d20cd7eadf4afd5460c0adb32e387fd"

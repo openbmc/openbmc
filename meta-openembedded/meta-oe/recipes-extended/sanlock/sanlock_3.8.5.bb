@@ -21,9 +21,7 @@ SRCREV = "b820c63093c4ae85d7da4f719cf3026d7fca5d09"
 
 S = "${WORKDIR}/git"
 
-CVE_CHECK_IGNORE += "\
-    CVE-2012-5638 \
-"
+CVE_STATUS[CVE-2012-5638] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 
 DEPENDS = "libaio util-linux"
 

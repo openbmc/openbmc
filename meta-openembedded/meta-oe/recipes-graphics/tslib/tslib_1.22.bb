@@ -5,7 +5,6 @@ Tslib is generally used on embedded devices to provide a common user \
 space interface to touchscreen functionality."
 HOMEPAGE = "http://tslib.org/"
 
-AUTHOR = "Martin Kepplinger <martink@posteo.de>"
 SECTION = "base"
 LICENSE = "LGPL-2.0-or-later & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "\

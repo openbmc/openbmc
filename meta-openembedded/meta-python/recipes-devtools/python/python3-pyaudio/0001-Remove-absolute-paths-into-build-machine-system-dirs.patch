@@ -1,0 +1,28 @@
+From d94518b558c1812aecb87d8ef19d75c2df1b98a5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 26 Jul 2023 19:54:19 -0700
+Subject: [PATCH] Remove absolute paths into build machine system dirs
+
+This ensures that it does not add /usr/include and /usr/local/include/
+into cflags
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ setup.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+--- a/setup.py
++++ b/setup.py
+@@ -111,11 +111,6 @@ def setup_extension():
+         # the standard portaudio cmake settings. For details, see:
+         # https://devblogs.microsoft.com/cppblog/vcpkg-updates-static-linking-is-now-available/
+         extra_compile_args += ["/MT"]
+-    else:
+-        # GNU/Linux and other posix-like OSes will dynamically link to
+-        # portaudio, installed by the package manager.
+-        include_dirs += ['/usr/local/include', '/usr/include']
+-        external_libraries_path += ['/usr/local/lib', '/usr/lib']
+ 
+     return Extension(
+         'pyaudio._portaudio',

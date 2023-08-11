@@ -1,0 +1,42 @@
+From 1198329b922f3cdddc3e87a7c81d7730b646c088 Mon Sep 17 00:00:00 2001
+From: Yuta Hayama <hayama@lineo.co.jp>
+Date: Fri, 28 Jul 2023 16:22:31 +0900
+Subject: [PATCH] align startOffset with p_align instead of pagesize for
+ compatibility
+
+According to the ELF specification, the alignment of loadable process segments
+should satisfy (p_vaddr mod pagesize) == (p_offset mod pagesize). However,
+glibc earlier than 2.35 incorrectly requires that the LOAD segment be (p_vaddr
+mod p_align) == (p_offset mod p_align), and will output the error message
+"ELF load command address/offset not properly aligned" if this is not met.
+
+Since there are many systems that use glibc earlier than 2.35, it is preferable
+that newly added LOAD segments satisfy (p_vaddr mod p_align) == (p_offset mod
+p_align) for compatibility.
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/NixOS/patchelf/pull/510]
+
+ src/patchelf.cc | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index 82b4b46..6edb81a 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -843,7 +843,13 @@ void ElfFile<ElfFileParamNames>::rewriteSectionsLibrary()
+         neededSpace += headerTableSpace;
+     debug("needed space is %d\n", neededSpace);
+ 
+-    Elf_Off startOffset = roundUp(fileContents->size(), getPageSize());
++    /* glibc earlier than 2.35 requires that the LOAD segment satisfies
++       (p_vaddr mod p_align) == (p_offset mod p_align).
++       The ELF specification requires that loadable process segments satisfy
++       (p_vaddr mod pagesize) == (p_offset mod pagesize), so glibc is probably
++       wrong, but here startOffset is calculated according to p_align for
++       compatibility. */
++    Elf_Off startOffset = roundUp(fileContents->size(), alignStartPage);
+ 
+     // In older version of binutils (2.30), readelf would check if the dynamic
+     // section segment is strictly smaller than the file (and not same size).

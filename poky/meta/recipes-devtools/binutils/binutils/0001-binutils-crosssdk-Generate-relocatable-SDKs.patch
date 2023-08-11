@@ -1,4 +1,4 @@
-From 4bdab425bdd7dc52c95bfd62e035c1b9abe9595e Mon Sep 17 00:00:00 2001
+From 95e23fba624c90d0e62c1adaf2bcc4f3cd3175c0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:58:54 +0000
 Subject: [PATCH] binutils-crosssdk: Generate relocatable SDKs
@@ -21,10 +21,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/gold/layout.cc b/gold/layout.cc
-index 899d4af0707..7c31b1bef6e 100644
+index b94855f8662..51f2d74d79d 100644
 --- a/gold/layout.cc
 +++ b/gold/layout.cc
-@@ -5083,7 +5083,7 @@ Layout::create_interp(const Target* target)
+@@ -5102,7 +5102,7 @@ Layout::create_interp(const Target* target)
        gold_assert(interp != NULL);
      }
  
@@ -59,7 +59,7 @@ index 382bd07ffe2..9fbd0c4cb8a 100755
  DATA_ALIGNMENT=${DATA_ALIGNMENT_}
  RELOCATING=" "
 diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
-index 5d3b0d31b1b..2163909cd56 100644
+index 1e3c5aa8504..b8d1977b3f0 100644
 --- a/ld/scripttempl/elf.sc
 +++ b/ld/scripttempl/elf.sc
 @@ -148,8 +148,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then

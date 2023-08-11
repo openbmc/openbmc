@@ -1,6 +1,5 @@
 SUMMARY = "Tiny 'shelve'-like database with concurrency support"
 HOMEPAGE = "https://github.com/pickleshare/pickleshare"
-AUTHOR = "Ville Vainio <vivainio@gmail.com>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=905c08218089ffebea3a64c82fc4d7d0"
 

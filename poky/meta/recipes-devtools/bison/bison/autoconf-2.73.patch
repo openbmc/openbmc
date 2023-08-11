@@ -1,0 +1,24 @@
+The gnulib largefile macro needs updating to work with autoconf 2.73. Rather
+than the full code:
+
+https://git.savannah.gnu.org/cgit/gnulib.git/commit/m4/largefile.m4?id=f91f633858cf132e50924224c50d6264a92caabb
+
+Just tweak the exiting code to work with 2.73. The next bison upgrade should
+update to new gnulib
+
+Upstream-Status: Inappropriate
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: findutils-4.9.0/gl/m4/largefile.m4
+===================================================================
+--- findutils-4.9.0.orig/m4/largefile.m4
++++ findutils-4.9.0/m4/largefile.m4
+@@ -26,7 +26,7 @@ AC_DEFUN([gl_SET_LARGEFILE_SOURCE],
+ # with _TIME_BITS.  Also, work around a problem in autoconf <= 2.69:
+ # AC_SYS_LARGEFILE does not configure for large inodes on Mac OS X 10.5,
+ # or configures them incorrectly in some cases.
+-m4_version_prereq([2.70], [], [
++m4_version_prereq([2.73], [], [
+ 
+ # _AC_SYS_LARGEFILE_TEST_INCLUDES
+ # -------------------------------

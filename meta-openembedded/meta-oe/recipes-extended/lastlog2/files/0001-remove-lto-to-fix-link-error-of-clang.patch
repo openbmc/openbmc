@@ -1,0 +1,31 @@
+From 692523d2f8bf0ce893a781761154db4277f0fceb Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Wed, 19 Jul 2023 07:11:15 +0000
+Subject: remove lto to fix link error of clang
+
+error message:
+| tests/tst-y2038-64bit-time_t.p/tst-y2038-64bit-time_t.c.o: file not recognized: file format not recognized
+| clang-16: error: linker command failed with exit code 1 (use -v to see invocation)
+
+Upstream-Status: Pending
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ meson.build | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index c521577..13d993b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -26,7 +26,6 @@ add_project_arguments(['-D_GNU_SOURCE=1',
+                        '-DPROJECT_VERSION="@0@"'.format(meson.project_version()) ], language : 'c')
+ 
+ possible_cc_flags = [
+-                  '-flto=auto',
+                   '-ffat-lto-objects',
+ 		  '-fstack-protector-strong',
+ 		  '-funwind-tables',
+-- 
+2.34.1
+

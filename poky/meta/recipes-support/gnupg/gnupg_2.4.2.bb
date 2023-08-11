@@ -33,6 +33,8 @@ EXTRA_OECONF = "--disable-ldap \
 		--with-mailprog=${sbindir}/sendmail \
 		--enable-gpg-is-gpg2 \
                "
+# yat2m can be found from recipe-sysroot-native non-deterministically with different versioning otherwise
+CACHED_CONFIGUREVARS += "ac_cv_path_YAT2M=./yat2m"
 
 # A minimal package containing just enough to run gpg+gpgagent (E.g. use gpgme in opkg)
 PACKAGES =+ "${PN}-gpg"

@@ -20,7 +20,7 @@ SRC_URI[archive.sha256sum] = "c15582301ed90b9d42ce521dbccf99a989f22f12041bdd5279
 SRC_URI += "file://0001-Harcode-shebang-to-avoid-pointing-to-build-system-s-.patch"
 
 PACKAGECONFIG ?= "webkitgtk"
-PACKAGECONFIG[webkitgtk] = "-Dwebkitgtk=true,-Dwebkitgtk=false,webkitgtk"
+PACKAGECONFIG[webkitgtk] = "-Dwebkitgtk=true,-Dwebkitgtk=false,webkitgtk3"
 
 PACKAGES =+ "${PN}-gdialog"
 FILES:${PN}-gdialog = "${bindir}/gdialog"

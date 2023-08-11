@@ -2,7 +2,6 @@
 
 SUMMARY = "Mimetic Library for multi-part parsing"
 DESCRIPTION = "Email library (MIME) written in C++ designed to be easy to use and integrate but yet fast and efficient."
-AUTHOR = "Stefano Barbato <stefano@codesink.org>"
 HOMEPAGE = "http://www.codesink.org/mimetic_mime_library.html"
 BUGTRACKER = "https://github.com/LadislavSopko/mimetic/issues"
 

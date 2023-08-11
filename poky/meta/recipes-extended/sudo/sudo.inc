@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=5100e20d35f9015f9eef6bdb27ba194f \
                     file://plugins/sudoers/redblack.c;beginline=1;endline=46;md5=03e35317699ba00b496251e0dfe9f109 \
                     file://lib/util/reallocarray.c;beginline=3;endline=15;md5=397dd45c7683e90b9f8bf24638cf03bf \
                     file://lib/util/fnmatch.c;beginline=3;endline=27;md5=004d7d2866ba1f5b41174906849d2e0f \
-                    file://lib/util/getcwd.c;beginline=2;endline=27;md5=50f8d9667750e18dea4e84a935c12009 \
                     file://lib/util/glob.c;beginline=2;endline=31;md5=2852f68687544e3eb8a0a61665506f0e \
                     file://lib/util/snprintf.c;beginline=3;endline=33;md5=b70df6179969e38fcf68da91b53b8029 \
                     file://include/sudo_queue.h;beginline=2;endline=27;md5=ad578e9664d17a010b63e4bc0576ee8d \
@@ -31,12 +30,12 @@ EXTRA_OECONF = "--with-editor=${base_bindir}/vi --with-env-editor"
 EXTRA_OECONF:append:libc-musl = " --disable-hardening "
 
 do_compile:prepend () {
-       # Remove build host references from sudo_usage.h
+       # Remove build host references from config.h
        sed -i  \
            -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
            -e 's,--build=${BUILD_SYS},,g' \
            -e 's,--host=${HOST_SYS},,g' \
-           ${B}/src/sudo_usage.h
+           ${B}/config.h
 }
 
 # Explicitly create ${localstatedir}/lib before do_install to ensure

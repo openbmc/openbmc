@@ -28,21 +28,13 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-libtool \
     nativesdk-pkgconfig \
     nativesdk-glibc-utils \
-    nativesdk-glibc-gconv-ibm850 \
-    nativesdk-glibc-gconv-iso8859-1 \
-    nativesdk-glibc-gconv-utf-16 \
-    nativesdk-glibc-gconv-cp1250 \
-    nativesdk-glibc-gconv-cp1251 \
-    nativesdk-glibc-gconv-cp1252 \
-    nativesdk-glibc-gconv-euc-jp \
-    nativesdk-glibc-gconv-libjis \
+    nativesdk-glibc-gconvs \
     nativesdk-libxcrypt-dev \
     nativesdk-parted \
     nativesdk-dosfstools \
     nativesdk-gptfdisk \
     "
-# gconv-cp1250, cp1251 and euc-jp needed for iconv to work in vim builds
-# also copied list from uninative
+# gconvs needed for iconv to work in vim builds
 
 TOOLCHAIN_OUTPUTNAME = "${SDK_ARCH}-buildtools-extended-nativesdk-standalone-${DISTRO_VERSION}"
 

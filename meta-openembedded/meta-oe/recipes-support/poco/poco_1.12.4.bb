@@ -72,17 +72,14 @@ python populate_packages:prepend () {
     poco_libdir = d.expand('${libdir}')
     pn = d.getVar("PN")
     packages = []
-    testrunners = []
 
     def hook(f, pkg, file_regex, output_pattern, modulename):
         packages.append(pkg)
-        testrunners.append(modulename)
 
     do_split_packages(d, poco_libdir, r'^libPoco(.*)\.so\..*$',
                     'poco-%s', 'Poco %s component', extra_depends='', prepend=True, hook=hook)
 
     d.setVar("RRECOMMENDS:%s" % pn, " ".join(packages))
-    d.setVar("POCO_TESTRUNNERS", "\n".join(testrunners))
 }
 
 do_install_ptest () {
@@ -90,7 +87,11 @@ do_install_ptest () {
        cp -f ${B}/lib/libCppUnit.so* ${D}${libdir}
        cp -rf ${B}/*/testsuite/data ${D}${PTEST_PATH}/bin/
        find "${D}${PTEST_PATH}" -executable -exec chrpath -d {} \;
-       echo "${POCO_TESTRUNNERS}" > "${D}${PTEST_PATH}/testrunners"
+       rm -f ${D}${PTEST_PATH}/testrunners
+       for f in ${D}${PTEST_PATH}/bin/*-testrunner; do
+            echo `basename $f` >> ${D}${PTEST_PATH}/testrunners
+       done
+       install -Dm 0644 ${S}/cppignore.lnx ${D}${PTEST_PATH}/cppignore.lnx
 }
 
 PACKAGES_DYNAMIC = "poco-.*"

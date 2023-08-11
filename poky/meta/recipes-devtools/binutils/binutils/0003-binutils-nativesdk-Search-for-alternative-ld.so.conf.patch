@@ -1,4 +1,4 @@
-From 70da8b91026c5381d430194910fc15e3b6c5ec7f Mon Sep 17 00:00:00 2001
+From c00ead7264dc1335cb43222cb742b95614666be8 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 19 Feb 2020 09:51:16 -0800
 Subject: [PATCH] binutils-nativesdk: Search for alternative ld.so.conf in SDK
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  5 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index b3195b4be68..fc6460317a7 100644
+index c3adbb0ccad..ce0f7e7f85d 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -42,7 +42,8 @@ ZLIBINC = @zlibinc@
@@ -43,7 +43,7 @@ index b3195b4be68..fc6460317a7 100644
  NO_WERROR = @NO_WERROR@
  AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index fe422569228..4a4c851b44a 100644
+index d1a56026437..9d86aed12c6 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
 @@ -566,7 +566,8 @@ ZLIB = @zlibdir@ -lz
@@ -57,7 +57,7 @@ index fe422569228..4a4c851b44a 100644
  AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
  
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index eff6693e052..95787012b89 100644
+index f9a6819366f..1519f8ac4e5 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
 @@ -936,7 +936,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
@@ -65,15 +65,15 @@ index eff6693e052..95787012b89 100644
        info.path = NULL;
        info.len = info.alloc = 0;
 -      tmppath = concat (ld_sysroot, prefix, "/etc/ld.so.conf",
-+      tmppath = concat (ld_sysconfdir, "/etc/ld.so.conf",
++      tmppath = concat (ld_sysconfdir, "/ld.so.conf",
  			(const char *) NULL);
        if (!ldelf_parse_ld_so_conf (&info, tmppath))
  	{
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 9290a189b0d..ceaca2d85d0 100644
+index 06ac2c64fa8..5c38e8cd313 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -70,6 +70,7 @@ char *program_name;
+@@ -69,6 +69,7 @@ char *program_name;
  
  /* The prefix for system library directories.  */
  const char *ld_sysroot;

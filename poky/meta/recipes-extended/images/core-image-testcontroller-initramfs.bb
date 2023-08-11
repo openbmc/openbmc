@@ -1,4 +1,4 @@
-DESCRIPTION = "Small image capable of booting a device with custom install scripts, \
+SUMMARY = "Small image capable of booting a device with custom install scripts, \
 adding a second rootfs, used for testing."
 
 # use -testfs live-install scripts

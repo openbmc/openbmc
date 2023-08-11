@@ -9,7 +9,6 @@ SRCREV = "cdf8d38acca87e871c3a488fd07f1e4779590f8e"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8ce0a84e5276f01364119c873b712c4f"
-AUTHOR = "Philippe Coval <philippe.coval.ext@huawei.com>"
 
 DEPENDS += "lvgl"
 DEPENDS += "lv-drivers"

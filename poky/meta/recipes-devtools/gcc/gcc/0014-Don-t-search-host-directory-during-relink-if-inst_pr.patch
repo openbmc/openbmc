@@ -1,4 +1,4 @@
-From e0775b77b8d10066e27ab89d15441b39024a29fd Mon Sep 17 00:00:00 2001
+From 793201cebfeb129f6f263e64310b30a0ffa48895 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 3 Mar 2015 08:21:19 +0000
 Subject: [PATCH] Don't search host directory during "relink" if $inst_prefix

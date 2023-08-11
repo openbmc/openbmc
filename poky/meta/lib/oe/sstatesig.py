@@ -215,6 +215,9 @@ class SignatureGeneratorOEBasicHashMixIn(object):
     def dump_lockedsigs(self, sigfile, taskfilter=None):
         types = {}
         for tid in self.runtaskdeps:
+            # Bitbake changed this to a tuple in newer versions
+            if isinstance(tid, tuple):
+                tid = tid[1]
             if taskfilter:
                 if not tid in taskfilter:
                     continue
@@ -321,11 +324,12 @@ def find_siginfo(pn, taskname, taskhashlist, d):
     if not taskname:
         # We have to derive pn and taskname
         key = pn
-        splitit = key.split('.bb:')
-        taskname = splitit[1]
-        pn = os.path.basename(splitit[0]).split('_')[0]
-        if key.startswith('virtual:native:'):
-            pn = pn + '-native'
+        if key.startswith("mc:"):
+           # mc:<mc>:<pn>:<task>
+           _, _, pn, taskname = key.split(':', 3)
+        else:
+           # <pn>:<task>
+           pn, taskname = key.split(':', 1)
 
     hashfiles = {}
     filedates = {}

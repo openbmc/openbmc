@@ -4,7 +4,7 @@
 require musl.inc
 inherit linuxloader
 
-SRCREV = "718f363bc2067b6487900eddc9180c84e7739f80"
+SRCREV = "83b858f83b658bd34eca5d8ad4d145f673ae7e5e"
 
 BASEVER = "1.2.4"
 
@@ -12,10 +12,12 @@ PV = "${BASEVER}+git${SRCPV}"
 
 # mirror is at git://github.com/kraj/musl.git
 
-SRC_URI = "git://git.musl-libc.org/git/musl;branch=master;protocol=https \
+SRC_URI = "git://git.musl-libc.org/git/musl.git;branch=master;protocol=https \
            file://0001-Make-dynamic-linker-a-relative-symlink-to-libc.patch \
            file://0002-ldso-Use-syslibdir-and-libdir-as-default-pathes-to-l.patch \
           "
+
+MIRRORS += "git://git.musl-libc.org/git/musl.git git://github.com/kraj/musl.git"
 
 S = "${WORKDIR}/git"
 

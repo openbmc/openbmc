@@ -20,4 +20,8 @@ RDEPENDS:packagegroup-security-tpm2 = " \
     libtss2 \
     tpm2-abrmd \
     tpm2-pkcs11 \
+    tpm2-openssl \
+    tpm2-tss-engine \
+    tpm2-tss-engine-engines \
+    python3-tpm2-pytss \
     "

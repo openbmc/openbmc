@@ -1,0 +1,10 @@
+[Unit]
+Description=Multiple Spanning Tree Protocol Daemon
+Before=network-pre.target
+Wants=network-pre.target
+[Service]
+Restart=always
+Type=simple
+ExecStart=/usr/sbin/mstpd -d -v 2
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,36 @@
+From 5ffc09fca39de051537fbebd7c6c33d5255a520f Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Mon, 27 Mar 2023 18:10:36 -0700
+Subject: [PATCH 01/29] mention prototypes more prominently in NEWS
+
+* NEWS: Mention the function prototype issue early.
+(From a suggestion by Zack Weinberg.)
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ NEWS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/NEWS b/NEWS
+index cf01ee210..d64648c6f 100644
+--- a/NEWS
++++ b/NEWS
+@@ -4,6 +4,14 @@ GNU Autoconf NEWS - User visible changes.
+ 
+ ** Backward incompatibilities
+ 
++*** AC_CHECK_FUNC and similar macros now use function prototypes.
++  AC_CHECK_FUNC and and similar macros now use C declarations with
++  function prototypes, a feature introduced in C89.  The new approach
++  should work better with C23, which removed the non-prototyped K&R
++  style that AC_CHECK_FUNC previously used.  However, this change
++  means Autoconf no longer supports pre-1989 C compilers, as they do
++  not support function prototypes.
++
+ *** Autoconf now requires perl 5.10 (2007) or later.
+   Generated 'configure' scripts continue to run without perl.
+ 
+-- 
+2.41.0
+

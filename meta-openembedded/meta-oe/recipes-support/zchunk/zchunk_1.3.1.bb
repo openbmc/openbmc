@@ -1,5 +1,4 @@
 DESCRIPTION = "A file format designed for highly efficient deltas while maintaining good compression"
-AUTHOR = "Jonathan Dieter"
 
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=daf6e68539f564601a5a5869c31e5242"

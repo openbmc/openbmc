@@ -1,0 +1,82 @@
+From 232cab527897bcdf4d55492d41af73d31905bda5 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Fri, 31 Mar 2023 10:46:20 -0700
+Subject: [PATCH 04/29] Cater to programs misusing AC_EGREP_HEADER
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Problem reported by Frederic Berat in:
+https://lists.gnu.org/archive/html/autoconf/2022-11/msg00127.html
+* lib/autoconf/programs.m4 (AC_PROG_EGREP): Also set
+EGREP_TRADITIONAL and ac_cv_path_EGREP_TRADITIONAL.
+* tests/c.at (AC_PROG_EGREP and AC_EGREP_HEADER):
+New test, taken from Frederic Berat’s email in:
+https://lists.gnu.org/r/autoconf/2023-03/msg00043.html
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/programs.m4 | 10 ++++++++++
+ tests/c.at               | 24 ++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
+
+diff --git a/lib/autoconf/programs.m4 b/lib/autoconf/programs.m4
+index 1b7460c85..62ba6b8b6 100644
+--- a/lib/autoconf/programs.m4
++++ b/lib/autoconf/programs.m4
+@@ -371,6 +371,16 @@ AC_CACHE_CHECK([for egrep], ac_cv_path_EGREP,
+    fi])
+  EGREP="$ac_cv_path_EGREP"
+  AC_SUBST([EGREP])
++ dnl
++ dnl Also set EGREP_TRADITIONAL even though unnecessary here,
++ dnl for wrong but too-common code with the following pattern:
++ dnl   AC_PROG_EGREP
++ dnl   if false; then
++ dnl      AC_EGREP_HEADER([printf], [stdio.h], [has_printf=yes])
++ dnl   fi
++ dnl   AC_EGREP_HEADER([malloc], [stdlib.h], [has_malloc=yes])
++ EGREP_TRADITIONAL=$EGREP
++ ac_cv_path_EGREP_TRADITIONAL=$EGREP
+ ])# AC_PROG_EGREP
+ 
+ # _AC_PROG_EGREP_TRADITIONAL
+diff --git a/tests/c.at b/tests/c.at
+index c37f43b10..fad54760f 100644
+--- a/tests/c.at
++++ b/tests/c.at
+@@ -232,6 +232,30 @@ AT_CHECK_DEFINES(
+ AT_CLEANUP
+ 
+ 
++## ----------------------------------- ##
++## AC_PROG_EGREP and AC_EGREP_HEADER.  ##
++## ----------------------------------- ##
++
++AT_SETUP([AC_PROG_EGREP and AC_EGREP_HEADER])
++
++_AT_CHECK_AC_MACRO(
++[[AC_PROG_CPP
++  AC_PROG_EGREP
++
++  # Although this code is incorrect (it should use AS_IF),
++  # it follows a too-common real world pattern.
++  # For now, test for it; we may remove this test later.
++  if false; then
++    AC_EGREP_HEADER([^], [limits.h])
++  fi
++
++  AC_EGREP_HEADER([$], [limits.h], [],
++    [AC_MSG_ERROR([[egrep-related macros do not tolerate misuse of 'if']])])
++]])
++
++AT_CLEANUP
++
++
+ ## ------------------------------------ ##
+ ## AC_NO_EXECUTABLES (working linker).  ##
+ ## ------------------------------------ ##
+-- 
+2.41.0
+

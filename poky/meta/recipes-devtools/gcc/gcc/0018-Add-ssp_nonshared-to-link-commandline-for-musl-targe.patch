@@ -1,4 +1,4 @@
-From 0a194b74f0f171b46527ff447c27fbf32406333d Mon Sep 17 00:00:00 2001
+From bf92b290556b7050df0a001cc7ae43cf79990456 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 27 Jun 2017 18:10:54 -0700
 Subject: [PATCH] Add ssp_nonshared to link commandline for musl targets
@@ -13,7 +13,7 @@ are already present in libc_nonshared library therefore
 we do not need any library helper on glibc based systems
 but musl needs the libssp_noshared from gcc
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2023-April/615317.html]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

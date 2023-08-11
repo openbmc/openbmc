@@ -143,6 +143,7 @@ FILES:python3-pygps = "${PYTHON_SITEPACKAGES_DIR}/* ${libdir}/gps/*.py ${libdir}
 RDEPENDS:python3-pygps = " \
     python3-core \
     python3-io \
+    python3-pyserial \
     python3-threading \
     python3-terminal \
     gpsd \

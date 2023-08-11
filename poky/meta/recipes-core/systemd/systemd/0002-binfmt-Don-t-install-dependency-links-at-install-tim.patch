@@ -19,40 +19,36 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [rebased for systemd 243]
 Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 ---
- units/meson.build                       | 6 ++----
+ units/meson.build                       | 2 --
  units/proc-sys-fs-binfmt_misc.automount | 3 +++
  units/systemd-binfmt.service.in         | 4 ++++
- 3 files changed, 9 insertions(+), 4 deletions(-)
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/units/meson.build b/units/meson.build
 index c7939a10f8..219570ab19 100644
 --- a/units/meson.build
 +++ b/units/meson.build
-@@ -62,8 +62,7 @@ units = [
-         ['poweroff.target',                     '',
-          (with_runlevels ? 'runlevel0.target' : '')],
-         ['printer.target',                      ''],
--        ['proc-sys-fs-binfmt_misc.automount',   'ENABLE_BINFMT',
--         'sysinit.target.wants/'],
-+        ['proc-sys-fs-binfmt_misc.automount',   'ENABLE_BINFMT'],
-         ['proc-sys-fs-binfmt_misc.mount',       'ENABLE_BINFMT'],
-         ['reboot.target',                       '',
-          'ctrl-alt-del.target' + (with_runlevels ? ' runlevel6.target' : '')],
-@@ -185,8 +184,7 @@ in_units = [
-         ['rescue.service',                       ''],
-         ['serial-getty@.service',                ''],
-         ['systemd-backlight@.service',           'ENABLE_BACKLIGHT'],
--        ['systemd-binfmt.service',               'ENABLE_BINFMT',
--         'sysinit.target.wants/'],
-+        ['systemd-binfmt.service',               'ENABLE_BINFMT'],
-         ['systemd-bless-boot.service',           'HAVE_GNU_EFI HAVE_BLKID'],
-         ['systemd-boot-check-no-failures.service', ''],
-         ['systemd-coredump@.service',            'ENABLE_COREDUMP'],
+@@ -149,7 +149,6 @@ units = [
+         {
+           'file' : 'proc-sys-fs-binfmt_misc.automount',
+           'conditions' : ['ENABLE_BINFMT'],
+-          'symlinks' : ['sysinit.target.wants/'],
+         },
+         {
+           'file' : 'proc-sys-fs-binfmt_misc.mount',
+@@ -246,7 +245,6 @@ units = [
+         {
+           'file' : 'systemd-binfmt.service.in',
+           'conditions' : ['ENABLE_BINFMT'],
+-          'symlinks' : ['sysinit.target.wants/'],
+         },
+         {
+           'file' : 'systemd-bless-boot.service.in',
 diff --git a/units/proc-sys-fs-binfmt_misc.automount b/units/proc-sys-fs-binfmt_misc.automount
 index 6b1bbdc91e..5ec5b8670a 100644
 --- a/units/proc-sys-fs-binfmt_misc.automount
 +++ b/units/proc-sys-fs-binfmt_misc.automount
-@@ -19,3 +19,6 @@ ConditionPathIsReadWrite=/proc/sys/
+@@ -22,3 +22,6 @@ Before=shutdown.target
  
  [Automount]
  Where=/proc/sys/fs/binfmt_misc

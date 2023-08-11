@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 import os
+import time
 from oeqa.core.decorator import OETestTag
 from oeqa.core.case import OEPTestResultTestCase
 from oeqa.selftest.case import OESelftestTestCase
@@ -43,7 +44,12 @@ class GccSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
         self.write_config("\n".join(features))
 
         recipe = "gcc-runtime"
+
+        start_time = time.time()
+
         bitbake("{} -c check".format(recipe))
+
+        end_time = time.time()
 
         bb_vars = get_bb_vars(["B", "TARGET_SYS"], recipe)
         builddir, target_sys = bb_vars["B"], bb_vars["TARGET_SYS"]
@@ -58,7 +64,7 @@ class GccSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
 
             ptestsuite = "gcc-{}".format(suite) if suite != "gcc" else suite
             ptestsuite = ptestsuite + "-user" if ssh is None else ptestsuite
-            self.ptest_section(ptestsuite, logfile = logpath)
+            self.ptest_section(ptestsuite, duration = int(end_time - start_time), logfile = logpath)
             with open(sumspath, "r") as f:
                 for test, result in parse_values(f):
                     self.ptest_result(ptestsuite, test, result)

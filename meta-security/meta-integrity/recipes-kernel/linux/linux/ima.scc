@@ -1,4 +1,0 @@
-define KFEATURE_DESCRIPTION "Enable IMA"
-
-kconf non-hardware ima.cfg
-

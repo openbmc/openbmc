@@ -2,7 +2,6 @@ SUMMARY = "Terminus fonts packages (console and X11)"
 DESCRIPTION = "Terminus Font is a clean, fixed width bitmap font, designed for \
                long (8 and more hours per day) work with computers."
 HOMEPAGE = "http://terminus-font.sourceforge.net/"
-AUTHOR = "Dimitar Zhekov"
 SECTION = "fonts"
 
 LICENSE = "OFL-1.1"

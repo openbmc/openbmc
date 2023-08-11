@@ -123,6 +123,12 @@ class GitSM(Git):
             url += ";name=%s" % module
             url += ";subpath=%s" % module
             url += ";nobranch=1"
+            # Note that adding "user=" here to give credentials to the
+            # submodule is not supported. Since using SRC_URI to give git://
+            # URL a password is not supported, one have to use one of the
+            # recommended way (eg. ~/.netrc or SSH config) which does specify
+            # the user (See comment in git.py).
+            # So, we will not take patches adding "user=" support here.
 
             ld = d.createCopy()
             # Not necessary to set SRC_URI, since we're passing the URI to

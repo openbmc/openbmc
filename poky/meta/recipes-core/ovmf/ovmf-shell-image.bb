@@ -1,4 +1,4 @@
-DESCRIPTION = "boot image with UEFI shell and tools"
+SUMMARY = "boot image with UEFI shell and tools"
 COMPATIBLE_HOST:class-target='(i.86|x86_64).*'
 
 # For this image recipe, only the wic format with a

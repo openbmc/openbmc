@@ -1,5 +1,4 @@
 SUMMARY = "A native Python implementation of the DBus protocol for Twisted applications."
-AUTHOR = "Tom Cocagne"
 HOMEPAGE = "https://pypi.org/project/txdbus/"
 SECTION = "devel/python"
 LICENSE = "MIT"

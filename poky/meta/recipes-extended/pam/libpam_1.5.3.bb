@@ -169,7 +169,7 @@ pkg_postinst:${PN}() {
 }
 
 inherit features_check
-REQUIRED_DISTRO_FEATURES = "pam"
+ANY_OF_DISTRO_FEATURES = "pam systemd"
 
 BBCLASSEXTEND = "nativesdk native"
 

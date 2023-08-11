@@ -691,3 +691,86 @@ TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
         self.maxDiff = None
         self.assertCountEqual(files1, files2)
 
+class SStateFindSiginfo(SStateBase):
+    def test_sstate_compare_sigfiles_and_find_siginfo(self):
+        """
+        Test the functionality of the find_siginfo: basic function and callback in compare_sigfiles
+        """
+        self.write_config("""
+TMPDIR = \"${TOPDIR}/tmp-sstates-findsiginfo\"
+TCLIBCAPPEND = \"\"
+MACHINE = \"qemux86-64\"
+require conf/multilib.conf
+MULTILIBS = "multilib:lib32"
+DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
+BB_SIGNATURE_HANDLER = "OEBasicHash"
+""")
+        self.track_for_cleanup(self.topdir + "/tmp-sstates-findsiginfo")
+
+        pns = ["binutils", "binutils-native", "lib32-binutils"]
+        target_configs = [
+"""
+TMPVAL1 = "tmpval1"
+TMPVAL2 = "tmpval2"
+do_tmptask1() {
+    echo ${TMPVAL1}
+}
+do_tmptask2() {
+    echo ${TMPVAL2}
+}
+addtask do_tmptask1
+addtask tmptask2 before do_tmptask1
+""",
+"""
+TMPVAL3 = "tmpval3"
+TMPVAL4 = "tmpval4"
+do_tmptask1() {
+    echo ${TMPVAL3}
+}
+do_tmptask2() {
+    echo ${TMPVAL4}
+}
+addtask do_tmptask1
+addtask tmptask2 before do_tmptask1
+"""
+        ]
+
+        for target_config in target_configs:
+            self.write_recipeinc("binutils", target_config)
+            for pn in pns:
+                bitbake("%s -c do_tmptask1 -S none" % pn)
+            self.delete_recipeinc("binutils")
+
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=True)
+
+            def find_siginfo(pn, taskname, sigs=None):
+                result = None
+                tinfoil.set_event_mask(["bb.event.FindSigInfoResult",
+                                "bb.command.CommandCompleted"])
+                ret = tinfoil.run_command("findSigInfo", pn, taskname, sigs)
+                if ret:
+                    while True:
+                        event = tinfoil.wait_event(1)
+                        if event:
+                            if isinstance(event, bb.command.CommandCompleted):
+                                break
+                            elif isinstance(event, bb.event.FindSigInfoResult):
+                                result = event.result
+                return result
+
+            def recursecb(key, hash1, hash2):
+                nonlocal recursecb_count
+                recursecb_count += 1
+                hashes = [hash1, hash2]
+                hashfiles = find_siginfo(key, None, hashes)
+                self.assertCountEqual(hashes, hashfiles)
+                bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb)
+
+            for pn in pns:
+                recursecb_count = 0
+                filedates = find_siginfo(pn, "do_tmptask1")
+                self.assertGreaterEqual(len(filedates), 2)
+                latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-2:]
+                bb.siggen.compare_sigfiles(latestfiles[-2], latestfiles[-1], recursecb)
+                self.assertEqual(recursecb_count,1)

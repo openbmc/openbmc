@@ -1,6 +1,5 @@
 DESCRIPTION = "A utility belt for advanced users of python-requests."
 HOMEPAGE = "https://toolbelt.readthedocs.org"
-AUTHOR = "Ian Cordasco, Cory Benfield"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=6f14302a4b4099009ab38b4dde5f1075"

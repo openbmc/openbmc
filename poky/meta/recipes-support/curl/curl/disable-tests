@@ -18,6 +18,8 @@
 1165
 # This CRL test is looking for src files
 1185
+# This test is scanning the source tree
+1222
 # These CRL tests need --libcurl option to be enabled
 1400
 1401

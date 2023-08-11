@@ -10,7 +10,6 @@ names.\
 Optionally it instantiates those classes for you."
 SECTION = "libs"
 
-AUTHOR = "Simon Wistow <simon@thegestalt.org>"
 HOMEPAGE = "https://github.com/simonwistow/Module-Pluggable"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"

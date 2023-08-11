@@ -1,0 +1,33 @@
+Add additional check on GST_GL_HAVE_PLATFORM_GLX before using gst_gl_display_x11_new_with_display
+
+This ensures that there is a compile time check for glx support in gstreamer as
+runtime check is not enough because gst_gl_display_x11_new_with_display() API comes from
+gst/gl/x11/gstgldisplay_x11.h which is only included when GST_GL_HAVE_PLATFORM_GLX is defined
+therefore make this check consistent to fix build with some platforms which use pvr gl drivers
+where this problem appear at compile time.
+
+
+/mnt/b/yoe/master/build/tmp/work/riscv64-yoe-linux/webkitgtk/2.40.2-r0/webkitgtk-2.40.2/Source/WebCore/platform/graphics/gstreamer/PlatformDisplayGStreamer.cpp:68:31: error: use of undeclared identifier 'gst_gl_display_x11_new_with_display'; did you mean 'gst_gl_display_egl_new_with_egl_display'?
+   68 |         return GST_GL_DISPLAY(gst_gl_display_x11_new_with_display(downcast<PlatformDisplayX11>(sharedDisplay).native()));
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                               gst_gl_display_egl_new_with_egl_display
+
+This issue is 2.40 specific since GLX support is removed [1] from trunk upstream, therefore
+this patch wont be needed when upgrading to 2.42+
+
+[1] https://github.com/WebKit/WebKit/commit/320560f9e53ddcd53954059bd005e0c75eb91abf
+
+Upstream-Status: Inappropriate [GLX support is gone in 2.41+]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/Source/WebCore/platform/graphics/gstreamer/PlatformDisplayGStreamer.cpp	2023-02-20 01:22:18.917743700 -0800
++++ b/Source/WebCore/platform/graphics/gstreamer/PlatformDisplayGStreamer.cpp	2023-07-08 08:45:09.739177065 -0700
+@@ -63,7 +63,7 @@
+     if (glPlatform == GST_GL_PLATFORM_EGL)
+         return GST_GL_DISPLAY(gst_gl_display_egl_new_with_egl_display(sharedDisplay.eglDisplay()));
+ #endif
+-#if USE(GLX)
++#if USE(GLX) && GST_GL_HAVE_PLATFORM_GLX
+     if (is<PlatformDisplayX11>(sharedDisplay) && glPlatform == GST_GL_PLATFORM_GLX)
+         return GST_GL_DISPLAY(gst_gl_display_x11_new_with_display(downcast<PlatformDisplayX11>(sharedDisplay).native()));
+ #endif

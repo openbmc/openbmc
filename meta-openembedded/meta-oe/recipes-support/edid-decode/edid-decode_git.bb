@@ -1,6 +1,5 @@
 SUMMARY = "Decode EDID data in human-readable format"
 DESCRIPTION = "edid-decode decodes EDID monitor description data in human-readable format."
-AUTHOR = "Hans Verkuil <hverkuil-cisco@xs4all.nl>"
 HOMEPAGE = "https://hverkuil.home.xs4all.nl/edid-decode/edid-decode.html"
 
 SECTION = "console/utils"

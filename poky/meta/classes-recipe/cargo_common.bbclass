@@ -117,6 +117,8 @@ cargo_common_do_configure () {
 }
 
 python cargo_common_do_patch_paths() {
+    import shutil
+
     cargo_config = os.path.join(d.getVar("CARGO_HOME"), "config")
     if not os.path.exists(cargo_config):
         return
@@ -146,6 +148,45 @@ python cargo_common_do_patch_paths() {
             print('\n[patch."%s"]' % k, file=config)
             for name in v:
                 print(name, file=config)
+
+    if not patches:
+        return
+
+    # Cargo.lock file is needed for to be sure that artifacts
+    # downloaded by the fetch steps are those expected by the
+    # project and that the possible patches are correctly applied.
+    # Moreover since we do not want any modification
+    # of this file (for reproducibility purpose), we prevent it by
+    # using --frozen flag (in CARGO_BUILD_FLAGS) and raise a clear error
+    # here is better than letting cargo tell (in case the file is missing)
+    # "Cargo.lock should be modified but --frozen was given"
+
+    manifest_path = d.getVar("MANIFEST_PATH", True)
+    lockfile = os.path.join(os.path.dirname(manifest_path), "Cargo.lock")
+    if not os.path.exists(lockfile):
+        bb.fatal(f"{lockfile} file doesn't exist")
+
+    # There are patched files and so Cargo.lock should be modified but we use
+    # --frozen so let's handle that modifications here.
+    #
+    # Note that a "better" (more elegant ?) would have been to use cargo update for
+    # patched packages:
+    #  cargo update --offline -p package_1 -p package_2
+    # But this is not possible since it requires that cargo local git db
+    # to be populated and this is not the case as we fetch git repo ourself.
+
+    lockfile_orig = lockfile + ".orig"
+    if not os.path.exists(lockfile_orig):
+        shutil.copy(lockfile, lockfile_orig)
+
+    newlines = []
+    with open(lockfile_orig, "r") as f:
+        for line in f.readlines():
+            if not line.startswith("source = \"git"):
+                newlines.append(line)
+
+    with open(lockfile, "w") as f:
+        f.writelines(newlines)
 }
 do_configure[postfuncs] += "cargo_common_do_patch_paths"
 

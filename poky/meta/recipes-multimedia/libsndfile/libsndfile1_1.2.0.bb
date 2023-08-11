@@ -3,7 +3,6 @@ DESCRIPTION = "Library for reading and writing files containing sampled \
 sound (such as MS Windows WAV and the Apple/SGI AIFF format) through \
 one standard library interface."
 HOMEPAGE = "https://libsndfile.github.io/libsndfile/"
-AUTHOR = "Erik de Castro Lopo"
 DEPENDS = "flac libogg libvorbis"
 SECTION = "libs/multimedia"
 LICENSE = "LGPL-2.1-only"

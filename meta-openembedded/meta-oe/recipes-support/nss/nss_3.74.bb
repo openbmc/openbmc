@@ -283,12 +283,8 @@ BBCLASSEXTEND = "native nativesdk"
 
 CVE_PRODUCT += "network_security_services"
 
-# CVE-2006-5201 affects only Sun Solaris
-CVE_CHECK_IGNORE += "CVE-2006-5201"
+CVE_STATUS_GROUPS += "CVE_STATUS_NSS"
+CVE_STATUS_NSS[status] = "not-applicable-config: This only affect the legacy db (libnssdbm), only compiled with --enable-legacy-db"
+CVE_STATUS_NSS = "CVE-2017-11695 CVE-2017-11696 CVE-2017-11697 CVE-2017-11698"
 
-# CVES CVE-2017-11695 CVE-2017-11696 CVE-2017-11697 CVE-2017-11698 only affect
-# the legacy db (libnssdbm), only compiled with --enable-legacy-db.
-CVE_CHECK_IGNORE += "CVE-2017-11695 CVE-2017-11696 CVE-2017-11697 CVE-2017-11698"
-
-# vulnerability was introduced in 3.77 and fixed in 3.87
-CVE_CHECK_IGNORE += "CVE-2022-3479"
+CVE_STATUS[CVE-2022-3479] = "not-applicable-config: vulnerability was introduced in 3.77 and fixed in 3.87"

@@ -613,7 +613,7 @@ def get_conffiles(pkg, d):
         conf_list[i] = conf_list[i][1:]
 
     os.chdir(cwd)
-    return conf_list
+    return sorted(conf_list)
 
 def legitimize_package_name(s):
     """

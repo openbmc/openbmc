@@ -22,9 +22,7 @@ SRC_URI[sha256sum] = "53e15a2b5c1bc80161d42e9f69792a3fa18332b7b771910131004eb520
 
 S = "${WORKDIR}/imap-${PV}"
 
-CVE_CHECK_IGNORE += "\
-    CVE-2005-0198 \
-"
+CVE_STATUS[CVE-2005-0198] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[pam] = ",,libpam"

@@ -1,5 +1,4 @@
 SUMMARY = "Reboot the device to a specific mode."
-AUTHOR = "Daniele Debernardi <drebrez@gmail.com>"
 
 LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=84dcc94da3adb52b53ae4fa38fe49e5d"

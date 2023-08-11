@@ -1,6 +1,5 @@
 DESCRIPTION = "The tools for verifying whether a certificate is valid for the intended purposes."
 HOMEPAGE = "https://pypi.org/project/service-identity"
-AUTHOR = "Hynek Schlawack"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8a0f079f4e6a215d6bd6f9d97cab4d5f"

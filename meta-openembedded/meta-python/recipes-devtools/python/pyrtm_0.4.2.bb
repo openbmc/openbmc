@@ -1,5 +1,4 @@
 SUMMARY = "Python interface for Remember The Milk API"
-AUTHOR = "Sridhar Ratnakumar / srid"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=a53cbc7cb75660694e138ba973c148df"
 

@@ -10,8 +10,9 @@ DEPENDS = "virtual/libgles3 virtual/libgles2 virtual/egl libdrm virtual/libgbm"
 
 LIC_FILES_CHKSUM = "file://kmscube.c;beginline=1;endline=23;md5=8b309d4ee67b7315ff7381270dd631fb"
 
-SRCREV = "cf4ec7f35521eb54d72ce0c92ce65b2249171cbd"
+SRCREV = "53ea71efe63470cf698726d983e9da5748a754a1"
 SRC_URI = "git://gitlab.freedesktop.org/mesa/kmscube;branch=master;protocol=https"
+
 UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"

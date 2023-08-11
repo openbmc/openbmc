@@ -7,7 +7,6 @@ These addresses are allocated from the 169.254.0.0/16 address range and \
 are normally attached to each Ethernet device in your computer. \
 Addresses are assigned randomly by each host and, in case of collision, \
 both hosts (are supposed to) renumber."
-AUTHOR = "Anand Kumria <wildfire@progsoc.uts.edu.au>"
 HOMEPAGE = "http://www.progsoc.org/~wildfire/zeroconf/"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4325afd396febcb659c36b49533135d4 \

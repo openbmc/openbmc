@@ -1,6 +1,5 @@
 SUMMARY = "Filesystem and Disk Benchmarking Tool"
 HOMEPAGE = "http://www.iozone.org/"
-AUTHOR = "Don Capps <don.capps2@verizon.net>, William D. Norcott <wnorcott@us.oracle.com>"
 SECTION = "console/tests"
 LICENSE = "iozone3"
 LIC_FILES_CHKSUM = "file://iozone.c;beginline=37;endline=48;md5=7331260091868dcad0f9edea735b5f4b \

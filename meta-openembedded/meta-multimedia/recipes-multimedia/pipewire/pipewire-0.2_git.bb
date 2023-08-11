@@ -1,5 +1,4 @@
 SUMMARY = "Multimedia processing server for Linux"
-AUTHOR = "Wim Taymans <wtaymans@redhat.com>"
 HOMEPAGE = "https://pipewire.org"
 SECTION = "multimedia"
 LICENSE = "LGPL-2.1-only"

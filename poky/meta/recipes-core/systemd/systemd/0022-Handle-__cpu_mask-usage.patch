@@ -46,8 +46,8 @@ index 6cf92bffde..937d26ca55 100644
 -#include <sched.h>
  #include <stdio.h>
  #include <string.h>
- #include <sys/types.h>
-@@ -10,6 +9,7 @@
+ #include <sys/resource.h>
+@@ -11,6 +10,7 @@
  #include <float.h>
  
  #include "time-util.h"

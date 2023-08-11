@@ -1,0 +1,35 @@
+From 0748658414dd02cec0219841a86c4e7b99bfc171 Mon Sep 17 00:00:00 2001
+From: Emekcan <emekcan.aras@arm.com>
+Date: Wed, 30 Nov 2022 19:02:26 +0000
+Subject: [PATCH 19/33] Introduce external sys driver to device-tree
+
+It adds external sys driver binding to u-boot
+device tree.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ arch/arm/dts/corstone1000.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
+index 533dfdf8e1..a834d38454 100644
+--- a/arch/arm/dts/corstone1000.dtsi
++++ b/arch/arm/dts/corstone1000.dtsi
+@@ -167,5 +167,12 @@
+ 			secure-status = "okay";     /* secure-world-only */
+ 			status = "disabled";
+ 		};
++
++		extsys0: extsys@1A010310 {
++			compatible = "arm,extsys_ctrl";
++			reg = <0x1A010310 0x4>,
++			      <0x1A010314 0X4>;
++			reg-names = "rstreg", "streg";
++		};
+ 	};
+ };
+-- 
+2.25.1
+

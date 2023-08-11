@@ -1,0 +1,58 @@
+From eaea61e4485cdecf989fa777ff4e166c945a6eea Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Tue, 20 Jun 2023 13:39:15 -0700
+Subject: [PATCH 27/29] doc: fix broken cross-refs
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ doc/autoconf.texi | 5 +----
+ doc/install.texi  | 2 +-
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/doc/autoconf.texi b/doc/autoconf.texi
+index 0f3047b31..7817fc1b5 100644
+--- a/doc/autoconf.texi
++++ b/doc/autoconf.texi
+@@ -604,7 +604,6 @@ Running @command{configure} Scripts
+ * Multiple Architectures::      Compiling for multiple architectures at once
+ * Installation Names::          Installing in different directories
+ * Optional Features::           Selecting optional features
+-* Particular Systems::          Particular systems
+ * System Type::                 Specifying the system type
+ * Sharing Defaults::            Setting site-wide defaults for @command{configure}
+ * Defining Variables::          Specifying the compiler etc.
+@@ -23304,7 +23303,6 @@ may use comes with Autoconf.
+ * Multiple Architectures::      Compiling for multiple architectures at once
+ * Installation Names::          Installing in different directories
+ * Optional Features::           Selecting optional features
+-* Particular Systems::          Particular systems
+ * System Type::                 Specifying the system type
+ * Sharing Defaults::            Setting site-wide defaults for @command{configure}
+ * Defining Variables::          Specifying the compiler etc.
+@@ -26990,8 +26988,7 @@ for simple differences.
+ @item
+ Most tests which produce their result in a substituted variable allow to
+ override the test by setting the variable on the @command{configure}
+-command line (@pxref{Compilers and Options}, @pxref{Defining Variables},
+-@pxref{Particular Systems}).
++command line (@pxref{Compilers and Options}, @pxref{Defining Variables}).
+ 
+ @item
+ Many tests store their result in a cache variable (@pxref{Caching
+diff --git a/doc/install.texi b/doc/install.texi
+index cec245fd0..6d9788fa9 100644
+--- a/doc/install.texi
++++ b/doc/install.texi
+@@ -385,7 +385,7 @@ for more details, including other options available for fine-tuning
+ the installation locations.
+ 
+ @item --build=@var{type}
+-Build for architecture @var{type}.  @ref{Specifying the System Type}
++Build for architecture @var{type}.  @ref{System Type}.
+ for more details, including other system type options.
+ 
+ @item --enable-@var{feature}
+-- 
+2.41.0
+

@@ -19,6 +19,7 @@ SRC_URI = "git://github.com/COVESA/${BPN}.git;protocol=https;branch=master \
            file://0004-Modify-systemd-config-directory.patch \
            file://481.patch \
            file://482.patch \
+           file://504.patch \
            "
 SRCREV = "9a2312d3512a27620d41b9a325338b6e7b3d42de"
 

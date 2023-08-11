@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=f9ce51a65dd738dc1ae631d8b21c40e0"
 
 PARALLEL_MAKE = ""
 
-DEPENDS = "libpcap libpcre libdnet bison-native"
+DEPENDS = "libpcap libpcre libdnet bison-native libnetfilter-queue"
 
 SRC_URI = "http://fossies.org/linux/misc/daq-${PV}.tar.gz \
            file://disable-run-test-program-while-cross-compiling.patch \
@@ -19,7 +19,7 @@ SRC_URI[sha256sum] = "bdc4e5a24d1ea492c39ee213a63c55466a2e8114b6a9abed609927ae13
 #
 # never look to /usr/local lib while cross compiling
 
-EXTRA_OECONF = "--disable-nfq-module --disable-ipq-module --includedir=${includedir} \
+EXTRA_OECONF = "--enable-nfq-module --disable-ipq-module --includedir=${includedir} \
     --with-libpcap-includes=${STAGING_INCDIR} --with-dnet-includes=${STAGING_LIBDIR}"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"

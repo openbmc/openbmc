@@ -1,5 +1,4 @@
 SUMMARY = "C library and tools for interacting with the linux GPIO character device"
-AUTHOR = "Bartosz Golaszewski <brgl@bgdev.pl>"
 RECIPE_MAINTAINER = "Bartosz Golaszewski <brgl@bgdev.pl>"
 
 inherit autotools pkgconfig ptest

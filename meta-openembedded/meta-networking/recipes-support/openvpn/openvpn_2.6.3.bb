@@ -16,8 +16,7 @@ UPSTREAM_CHECK_URI = "https://openvpn.net/community-downloads"
 
 SRC_URI[sha256sum] = "13b207a376d8880507c74ff78aabc3778a9da47c89f1e247dcee3c7237138ff6"
 
-# CVE-2020-7224 and CVE-2020-27569 are for Aviatrix OpenVPN client, not for openvpn.
-CVE_CHECK_IGNORE += "CVE-2020-7224 CVE-2020-27569"
+CVE_STATUS[CVE-2020-27569] = "not-applicable-config: Applies only Aviatrix OpenVPN client, not openvpn"
 
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME:${PN} = "openvpn"

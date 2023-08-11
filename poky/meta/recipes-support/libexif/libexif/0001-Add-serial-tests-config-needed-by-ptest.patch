@@ -1,0 +1,26 @@
+From 1ee7217c8ae724d793f9a9876c3608057a2ccbf8 Mon Sep 17 00:00:00 2001
+From: Julien Stephan <jstephan@baylibre.com>
+Date: Tue, 11 Jul 2023 16:07:54 +0200
+Subject: [PATCH] Add serial-tests config needed by ptest
+
+Add serial-tests support, ptest needs it.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Julien Stephan <jstephan@baylibre.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index cd48047..5413907 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -16,6 +16,7 @@ AM_INIT_AUTOMAKE([
+   dist-zip
+   check-news
+   subdir-objects
++  serial-tests
+ ])
+ AM_MAINTAINER_MODE
+ 

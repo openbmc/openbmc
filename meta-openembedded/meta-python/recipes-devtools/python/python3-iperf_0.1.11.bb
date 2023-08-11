@@ -1,6 +1,5 @@
 SUMMARY = "Python wrapper around iperf3"
 HOMEPAGE = "https://github.com/thiezn/iperf3-python"
-AUTHOR = "Mathijs Mortimer <mathijs@mortimer.nl>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f7d0900b3d30647cdda002c9549ca40f"
 

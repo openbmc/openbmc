@@ -1,0 +1,26 @@
+To work with autoconf 2.73, tweak the macro ordering in configure.in.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: apr-1.7.2/configure.in
+===================================================================
+--- apr-1.7.2.orig/configure.in
++++ apr-1.7.2/configure.in
+@@ -430,6 +430,8 @@ if test "$host" = "i586-pc-beos"; then
+   ) dnl
+ fi
+ 
++APR_CHECK_DEFINE(LOCK_EX, sys/file.h)
++
+ # this is the place to put specific options for platform/compiler
+ # combinations
+ case "$host:$CC" in
+@@ -2384,7 +2386,6 @@ AC_MSG_RESULT([$msg])
+ AC_SUBST(have_union_semun)
+ 
+ dnl Checks for libraries.
+-APR_CHECK_DEFINE(LOCK_EX, sys/file.h)
+ APR_CHECK_DEFINE(F_SETLK, fcntl.h)
+ APR_CHECK_DEFINE(SEM_UNDO, sys/sem.h)
+ 

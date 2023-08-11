@@ -1,5 +1,4 @@
 SUMMARY = "This is a filesystem client based on the SSH File Transfer Protocol using FUSE"
-AUTHOR = "Miklos Szeredi <miklos@szeredi.hu>"
 HOMEPAGE = "https://github.com/libfuse/sshfs"
 SECTION = "console/network"
 LICENSE = "GPL-2.0-only"

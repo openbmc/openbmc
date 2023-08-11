@@ -1,7 +1,5 @@
 SUMMARY = "Random number generator daemon"
 DESCRIPTION = "Check and feed random data from hardware device to kernel"
-AUTHOR = "Philipp Rumpf, Jeff Garzik <jgarzik@pobox.com>, \
-          Henrique de Moraes Holschuh <hmh@debian.org>"
 HOMEPAGE = "https://github.com/nhorman/rng-tools"
 BUGTRACKER = "https://github.com/nhorman/rng-tools/issues"
 LICENSE = "GPL-2.0-only"

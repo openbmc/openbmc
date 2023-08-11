@@ -1,4 +1,4 @@
-From 7912f5a918e612950feb04d845934f26160e85da Mon Sep 17 00:00:00 2001
+From 5564cdf1433255a00acb427fb5b0656b772b2651 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:39:01 +0000
 Subject: [PATCH] don't let the distro compiler point to the wrong installation

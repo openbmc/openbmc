@@ -1,4 +1,4 @@
-From 93ad7cf3ff92771451c2994cab45e34a0c8574a0 Mon Sep 17 00:00:00 2001
+From 531b9df680c4380797e8e7705a8e7f8ed17ebe68 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 10:25:11 +0000
 Subject: [PATCH] Ensure target gcc headers can be included
@@ -13,7 +13,7 @@ command line in order to resolve this.
 
 Extend target gcc headers search to musl too
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
@@ -25,7 +25,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  4 files changed, 22 insertions(+)
 
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index fe636af3f63..065ce7e9a5b 100644
+index 04f28984b34..8ef996c0f4d 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
 @@ -640,6 +640,7 @@ libexecdir = @libexecdir@

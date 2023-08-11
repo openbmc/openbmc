@@ -13,10 +13,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e870c934e2c3d6ccf085fd7cf0a1e2e2"
 
 SRC_URI = "git://gitosis.stanford.edu/openflow.git;protocol=git;branch=master"
 
-CVE_CHECK_IGNORE = "\
-    CVE-2015-1611 \
-    CVE-2015-1612 \
-"
+CVE_STATUS[CVE-2015-1611] = "not-applicable-config: Not referred to our implementation of openflow"
+CVE_STATUS[CVE-2015-1612] = "not-applicable-config: Not referred to our implementation of openflow"
+CVE_STATUS[CVE-2018-1078] = "cpe-incorrect: This CVE is not for this product but cve-check assumes it is \
+because two CPE collides when checking the NVD database"
 
 DEPENDS = "virtual/libc"
 
@@ -58,7 +58,3 @@ do_install:append() {
 }
 
 FILES:${PN} += "${nonarch_libdir}/tmpfiles.d"
-
-# This CVE is not for this product but cve-check assumes it is
-# because two CPE collides when checking the NVD database
-CVE_CHECK_IGNORE = "CVE-2018-1078"

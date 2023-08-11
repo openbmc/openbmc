@@ -1,6 +1,5 @@
 DESCRIPTION = "A utility provides a fake certificate authority (CA)"
 HOMEPAGE = "https://pypi.org/project/trustme"
-AUTHOR = "Nathaniel J. Smith"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d5a7af1a4b73e57431e25d15a2da745a"

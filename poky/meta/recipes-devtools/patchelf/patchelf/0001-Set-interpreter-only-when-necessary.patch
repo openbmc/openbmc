@@ -1,0 +1,31 @@
+From f5df94952e87eaa390e5c845bc48fdb3dbc31cc2 Mon Sep 17 00:00:00 2001
+From: Yuta Hayama <hayama@lineo.co.jp>
+Date: Fri, 21 Jul 2023 10:47:02 +0900
+Subject: [PATCH] Set interpreter only when necessary
+
+If the given interpreter is already set, nothing needs to be done.
+As with modifySoname(), it skips unnecessary processing.
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/NixOS/patchelf/pull/508]
+
+ src/patchelf.cc | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index 86429c4..e562c49 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -1460,6 +1460,11 @@ void ElfFile<ElfFileParamNames>::modifySoname(sonameMode op, const std::string &
+ template<ElfFileParams>
+ void ElfFile<ElfFileParamNames>::setInterpreter(const std::string & newInterpreter)
+ {
++    if (getInterpreter() == newInterpreter) {
++        debug("given interpreter is already set\n");
++        return;
++    }
++
+     std::string & section = replaceSection(".interp", newInterpreter.size() + 1);
+     setSubstr(section, 0, newInterpreter + '\0');
+     changed = true;

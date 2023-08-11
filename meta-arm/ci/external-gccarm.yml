@@ -6,3 +6,6 @@ local_conf_header:
     SKIP_RECIPE[gcc-cross-arm] = "Using external toolchain"
     TCMODE = "external-arm"
     EXTERNAL_TOOLCHAIN = "${TOPDIR}/toolchains/${TARGET_ARCH}"
+    # Temporary workaround for a number binaries in the toolchains that are using 32bit timer API
+    # This must be done here instead of the recipe because of all the libraries in the toolchain have the issue
+    INSANE_SKIP:append = " 32bit-time"

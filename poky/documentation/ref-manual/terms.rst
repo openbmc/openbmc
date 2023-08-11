@@ -276,7 +276,7 @@ universal, the list includes them just in case:
    :term:`LTS`
       This term means "Long Term Support", and in the context of the Yocto
       Project, it corresponds to selected stable releases for which bug and
-      security fixes are provided for at least two years. See
+      security fixes are provided for at least four years. See
       the :ref:`ref-long-term-support-releases` section for details.
 
    :term:`Metadata`

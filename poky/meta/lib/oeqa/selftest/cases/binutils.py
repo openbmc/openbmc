@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 import os
+import time
 from oeqa.core.decorator import OETestTag
 from oeqa.core.case import OEPTestResultTestCase
 from oeqa.selftest.case import OESelftestTestCase
@@ -36,7 +37,11 @@ class BinutilsCrossSelfTest(OESelftestTestCase, OEPTestResultTestCase):
         bb_vars = get_bb_vars(["B", "TARGET_SYS", "T"], recipe)
         builddir, target_sys, tdir = bb_vars["B"], bb_vars["TARGET_SYS"], bb_vars["T"]
 
+        start_time = time.time()
+
         bitbake("{0} -c check".format(recipe))
+
+        end_time = time.time()
 
         sumspath = os.path.join(builddir, suite, "{0}.sum".format(suite))
         if not os.path.exists(sumspath):
@@ -44,7 +49,7 @@ class BinutilsCrossSelfTest(OESelftestTestCase, OEPTestResultTestCase):
         logpath = os.path.splitext(sumspath)[0] + ".log"
 
         ptestsuite = "binutils-{}".format(suite) if suite != "binutils" else suite
-        self.ptest_section(ptestsuite, logfile = logpath)
+        self.ptest_section(ptestsuite, duration = int(end_time - start_time), logfile = logpath)
         with open(sumspath, "r") as f:
             for test, result in parse_values(f):
                 self.ptest_result(ptestsuite, test, result)

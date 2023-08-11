@@ -5,6 +5,7 @@ require gzip.inc
 LICENSE = "GPL-3.0-or-later"
 
 SRC_URI = "${GNU_MIRROR}/gzip/${BP}.tar.gz \
+           file://autoconf-2.73.patch \
            file://run-ptest \
           "
 SRC_URI:append:class-target = " file://wrong-path-fix.patch"

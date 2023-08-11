@@ -16,7 +16,10 @@ BitBake build tools.
 #
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
-import copy, re, sys, traceback
+import builtins
+import copy
+import re
+import sys
 from collections.abc import MutableMapping
 import logging
 import hashlib
@@ -150,19 +153,21 @@ class VariableParse:
             value = utils.better_eval(codeobj, DataContext(self.d), {'d' : self.d})
             return str(value)
 
-
 class DataContext(dict):
+    excluded = set([i for i in dir(builtins) if not i.startswith('_')] + ['oe'])
+
     def __init__(self, metadata, **kwargs):
         self.metadata = metadata
         dict.__init__(self, **kwargs)
         self['d'] = metadata
+        self.context = set(bb.utils.get_context())
 
     def __missing__(self, key):
-        # Skip commonly accessed invalid variables
-        if key in ['bb', 'oe', 'int', 'bool', 'time', 'str', 'os']:
+        if key in self.excluded or key in self.context:
             raise KeyError(key)
+
         value = self.metadata.getVar(key)
-        if value is None or self.metadata.getVarFlag(key, 'func', False):
+        if value is None:
             raise KeyError(key)
         else:
             return value

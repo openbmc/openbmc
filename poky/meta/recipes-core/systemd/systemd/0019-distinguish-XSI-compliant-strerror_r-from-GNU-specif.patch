@@ -58,7 +58,7 @@ diff --git a/src/libsystemd/sd-journal/journal-send.c b/src/libsystemd/sd-journa
 index 136ebcb153..8a75ba4ecd 100644
 --- a/src/libsystemd/sd-journal/journal-send.c
 +++ b/src/libsystemd/sd-journal/journal-send.c
-@@ -381,7 +381,12 @@ static int fill_iovec_perror_and_send(const char *message, int skip, struct iove
+@@ -360,7 +360,12 @@ static int fill_iovec_perror_and_send(const char *message, int skip, struct iove
                  char* j;
  
                  errno = 0;

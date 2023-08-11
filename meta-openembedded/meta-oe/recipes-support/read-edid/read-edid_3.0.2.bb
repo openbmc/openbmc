@@ -3,7 +3,6 @@ DESCRIPTION = "read-edid is a set of two tools - get-edid, which gets the raw \
                EDID information from the monitor, and parse-edid, which turns \
 	       the raw binary information into a xorg.conf-compatible monitor \
 	       section."
-AUTHOR = "Stefan Wiehler <stefan.wiehler@missinglinkelectronics.com>"
 HOMEPAGE = "http://www.polypux.org/projects/read-edid/"
 SECTION = "console/utils"
 LICENSE = "read-edid"

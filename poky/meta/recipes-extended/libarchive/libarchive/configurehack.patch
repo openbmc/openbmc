@@ -1,0 +1,49 @@
+To work with autoconf 2.73, tweak the macro ordering in configure.in.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: libarchive-3.6.2/configure.ac
+===================================================================
+--- libarchive-3.6.2.orig/configure.ac
++++ libarchive-3.6.2/configure.ac
+@@ -357,6 +357,19 @@ if test "x$with_bz2lib" != "xno"; then
+   esac
+ fi
+ 
++# Checks for typedefs, structures, and compiler characteristics.
++AC_C_CONST
++# la_TYPE_UID_T defaults to "int", which is incorrect for MinGW
++# and MSVC. Use a customized version.
++la_TYPE_UID_T
++AC_TYPE_MODE_T
++# AC_TYPE_OFF_T defaults to "long", which limits us to 4GB files on
++# most systems... default to "long long" instead.
++AC_CHECK_TYPE(off_t, [long long])
++AC_TYPE_SIZE_T
++AC_CHECK_TYPE(id_t, [unsigned long])
++AC_CHECK_TYPE(uintptr_t, [unsigned int])
++
+ AC_ARG_WITH([libb2],
+   AS_HELP_STRING([--without-libb2], [Don't build support for BLAKE2 through libb2]))
+ 
+@@ -558,19 +571,6 @@ LDFLAGS=$save_LDFLAGS
+ 
+ AC_SUBST(GC_SECTIONS)
+ 
+-# Checks for typedefs, structures, and compiler characteristics.
+-AC_C_CONST
+-# la_TYPE_UID_T defaults to "int", which is incorrect for MinGW
+-# and MSVC. Use a customized version.
+-la_TYPE_UID_T
+-AC_TYPE_MODE_T
+-# AC_TYPE_OFF_T defaults to "long", which limits us to 4GB files on
+-# most systems... default to "long long" instead.
+-AC_CHECK_TYPE(off_t, [long long])
+-AC_TYPE_SIZE_T
+-AC_CHECK_TYPE(id_t, [unsigned long])
+-AC_CHECK_TYPE(uintptr_t, [unsigned int])
+-
+ # Check for tm_gmtoff in struct tm
+ AC_CHECK_MEMBERS([struct tm.tm_gmtoff, struct tm.__tm_gmtoff],,,
+ [

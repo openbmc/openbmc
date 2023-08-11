@@ -1,4 +1,4 @@
-From 2a1336d2e2ba08747acd7368264fc5813a37b049 Mon Sep 17 00:00:00 2001
+From 6fbf920ccde6efc2d0caafde996d9e5738a1ba37 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 28 Oct 2021 11:33:40 +0100
 Subject: [PATCH] Pass CXXFLAGS_FOR_BUILD in a couple of places to avoid these
@@ -13,7 +13,7 @@ ChangeLog:
     * Makefile.in: Regenerate.
     * Makefile.tpl: Add missing CXXFLAGS_FOR_BUILD overrides
 
-Upstream-Status: Pending [should be submittable]
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2023-February/612560.html]
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>

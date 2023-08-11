@@ -8,7 +8,6 @@ DESCRIPTION = "The \"Encode\" module provides the interfaces between \
 Perl's strings and the rest of the system.  Perl strings are sequences \
 of characters."
 
-AUTHOR = "Dan Kogai <dankogai+cpan@gmail.com>"
 HOMEPAGE = "https://metacpan.org/release/Encode"
 SECTION = "lib"
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"

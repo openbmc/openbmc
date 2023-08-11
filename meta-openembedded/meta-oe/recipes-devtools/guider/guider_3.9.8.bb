@@ -1,7 +1,6 @@
 SUMMARY = "performance analyzer"
 HOMEPAGE = "https://github.com/iipeace/guider"
 BUGTRACKER = "https://github.com/iipeace/guider/issues"
-AUTHOR = "Peace Lee <ipeace5@gmail.com>"
 
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2c1c00f9d3ed9e24fa69b932b7e7aff2"

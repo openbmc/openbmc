@@ -13,6 +13,7 @@ PTESTS_FAST_META_PERL = "\
     libextutils-config-perl \
     libhtml-tagset-perl \
     libmozilla-ca-perl \
+    libmodule-build-tiny-perl \
     libstrictures-perl \
     libterm-readkey-perl \
     libtest-nowarnings-perl \

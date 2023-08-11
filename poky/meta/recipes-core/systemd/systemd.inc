@@ -14,10 +14,10 @@ LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL2;md5=751419260aa954499f7abaabaa882bbe \
                     file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c"
 
-SRCREV = "ed18c2ab79e8b94182d5dcf31d58457763f3e3e1"
-SRCBRANCH = "v253-stable"
+SRCREV = "994c7978608a0bd9b317f4f74ff266dd50a3e74e"
+SRCBRANCH = "v254-stable"
 SRC_URI = "git://github.com/systemd/systemd-stable.git;protocol=https;branch=${SRCBRANCH} \
-           file://0026-src-boot-efi-efi-string.c-define-wchar_t-from-__WCHA.patch \
+           file://0001-elf2efi-Fix-header-size-calculation.patch \
            "
 
 S = "${WORKDIR}/git"

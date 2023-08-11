@@ -427,6 +427,9 @@ fitimage_emit_section_config() {
 		dtb_image_sect=$dtb_image
 	fi
 
+	dtb_path="${EXTERNAL_KERNEL_DEVICETREE}/${dtb_image_sect}"
+	compatible_line="compatible = \"$(fdtget "$dtb_path" / compatible | sed 's/ /", "/g')\";"
+
 	dtb_image=$(echo $dtb_image | tr '/' '_')
 	dtb_image_sect=$(echo "${dtb_image_sect}" | tr '/' '_')
 
@@ -487,6 +490,7 @@ fitimage_emit_section_config() {
                 $default_line
                 $conf_node {
                         description = "$default_flag $conf_desc";
+                        $compatible_line
                         $kernel_line
                         $fdt_line
                         $ramdisk_line

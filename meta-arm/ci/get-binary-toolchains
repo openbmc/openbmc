@@ -5,9 +5,10 @@ BASENAME=arm-gnu-toolchain
 VER=${VER:-12.2.rel1}
 HOST_ARCH=${HOST_ARCH:-$(uname -m)}
 
-DOWNLOAD_DIR=$1
-TOOLCHAIN_DIR=$2
-TOOLCHAIN_LINK_DIR=$3
+# Use the standard kas container locations if nothing is passed into the script
+DOWNLOAD_DIR="${1:-/builds/persist/downloads/}"
+TOOLCHAIN_DIR="${2:-/builds/persist//toolchains/}"
+TOOLCHAIN_LINK_DIR="${3:-build/toolchains/}"
 
 # These should be already created by .gitlab-ci.yml, but do here if run outside of that env
 mkdir -p $DOWNLOAD_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR

@@ -1,0 +1,32 @@
+From 299ad5766921d593e11a42a8e4dec55b4b350876 Mon Sep 17 00:00:00 2001
+From: Yuta Hayama <hayama@lineo.co.jp>
+Date: Mon, 31 Jul 2023 11:58:49 +0900
+Subject: [PATCH] make LOAD segment extensions based on p_align instead of
+ pagesize
+
+Since the p_align of the LOAD segment is no longer pagesize, the actual p_align
+value is used to calculate for the LOAD segment extension.
+
+If calculated with pagesize, new LOAD segment may be added even though the
+existing LOAD segment can be extended.
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/NixOS/patchelf/pull/510]
+
+ src/patchelf.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/patchelf.cc b/src/patchelf.cc
+index 6edb81a..86429c4 100644
+--- a/src/patchelf.cc
++++ b/src/patchelf.cc
+@@ -885,7 +885,7 @@ void ElfFile<ElfFileParamNames>::rewriteSectionsLibrary()
+         rdi(lastSeg.p_type) == PT_LOAD &&
+         rdi(lastSeg.p_flags) == (PF_R | PF_W) &&
+         rdi(lastSeg.p_align) == alignStartPage) {
+-        auto segEnd = roundUp(rdi(lastSeg.p_offset) + rdi(lastSeg.p_memsz), getPageSize());
++        auto segEnd = roundUp(rdi(lastSeg.p_offset) + rdi(lastSeg.p_memsz), alignStartPage);
+         if (segEnd == startOffset) {
+             auto newSz = startOffset + neededSpace - rdi(lastSeg.p_offset);
+             wri(lastSeg.p_filesz, wri(lastSeg.p_memsz, newSz));

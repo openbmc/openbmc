@@ -277,6 +277,6 @@ def filter_src_subdirs(pth):
     Used by devtool and recipetool.
     """
     dirlist = os.listdir(pth)
-    filterout = ['git.indirectionsymlink', 'source-date-epoch']
+    filterout = ['git.indirectionsymlink', 'source-date-epoch', 'sstate-install-recipe_qa']
     dirlist = [x for x in dirlist if x not in filterout]
     return dirlist

@@ -1,0 +1,71 @@
+From 09101da4efaa5584b7f3f3f3bfa5dbb4d1e26948 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 24 Jul 2023 22:09:21 -0700
+Subject: [PATCH] Link with libm for floor() function
+
+LLD linker finds this missing symbol
+
+arm-yoe-linux-gnueabi-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: floor
+>>> referenced by src/lib/libwsman.so.1.0.0
+
+Upstream-Status: Submitted [https://github.com/Openwsman/openwsman/pull/195]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt         | 10 ++++++++++
+ configure.ac           |  3 ++-
+ src/lib/CMakeLists.txt |  4 ++++
+ 3 files changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6e54c66b..507ee633 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -297,6 +297,16 @@ ELSE(HAVE_LIBDL)
+  SET(HAVE_LIBDL 0)
+ ENDIF(HAVE_LIBDL)
+ 
++# m
++
++FIND_LIBRARY( HAVE_LIBM "m" )
++IF(HAVE_LIBM)
++ SET(M_LIBRARIES ${HAVE_LIBM})
++ SET(HAVE_LIBM 1)
++ELSE(HAVE_LIBM)
++ SET(HAVE_LIBM 0)
++ENDIF(HAVE_LIBM)
++
+ # crypt
+ 
+ FIND_LIBRARY( HAVE_LIBCRYPT "crypt" )
+diff --git a/configure.ac b/configure.ac
+index 125564da..010fa0b6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -128,7 +128,8 @@ daemon  \
+ va_copy \
+ memmove \
+ bcopy \
+-gmtime_r
++gmtime_r \
++floor
+ )
+ AC_CHECK_FUNC(socket, , AC_CHECK_LIB(socket, socket))
+ AC_CHECK_FUNC(gethostbyname, , AC_CHECK_LIB(nsl, gethostbyname))
+diff --git a/src/lib/CMakeLists.txt b/src/lib/CMakeLists.txt
+index 5c51781f..496fd672 100644
+--- a/src/lib/CMakeLists.txt
++++ b/src/lib/CMakeLists.txt
+@@ -36,6 +36,10 @@ if( HAVE_LIBDL )
+ TARGET_LINK_LIBRARIES(wsman ${DL_LIBRARIES})
+ endif( HAVE_LIBDL )
+ 
++if( HAVE_LIBM )
++TARGET_LINK_LIBRARIES(wsman ${M_LIBRARIES})
++endif( HAVE_LIBM )
++
+ IF( ENABLE_EVENTING_SUPPORT )
+ TARGET_LINK_LIBRARIES( wsman ${WSMAN_CLIENT_PKG} )
+ ENDIF( ENABLE_EVENTING_SUPPORT )
+-- 
+2.41.0
+

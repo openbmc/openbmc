@@ -1,0 +1,55 @@
+From 15936ae7cdfd6814654eff367b5cfb2565ea6af8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 31 Jul 2023 15:23:38 -0700
+Subject: [PATCH] gprofng: Fix build with 64bit file offset on 32bit machines
+
+gprofng/ChangeLog
+2023-07-31  Khem Raj <raj.khem@gmail.com>
+
+* libcollector/iotrace.c: Define open64, fgetpos64, and fsetpos64
+  only when __USE_LARGEFILE64 and __USE_FILE_OFFSET64 are not
+  defined.
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/binutils/2023-July/128741.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gprofng/libcollector/iotrace.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/gprofng/libcollector/iotrace.c b/gprofng/libcollector/iotrace.c
+index c0ea7497b09..81c844048d9 100644
+--- a/gprofng/libcollector/iotrace.c
++++ b/gprofng/libcollector/iotrace.c
+@@ -1030,8 +1030,9 @@ gprofng_open64 (int(real_open64) (const char *, int, ...),
+   }
+ 
+ DCL_FUNC_VER (DCL_OPEN64, open64_2_2, open64@GLIBC_2.2)
++#if !defined(__USE_LARGEFILE64)
+ DCL_OPEN64 (open64)
+-
++#endif
+ 
+ #define F_ERROR_ARG     0
+ #define F_INT_ARG       1
+@@ -2989,8 +2990,9 @@ DCL_FUNC_VER (DCL_FGETPOS64, fgetpos64_2_17, fgetpos64@GLIBC_2.17)
+ DCL_FUNC_VER (DCL_FGETPOS64, fgetpos64_2_2_5, fgetpos64@GLIBC_2.2.5)
+ DCL_FUNC_VER (DCL_FGETPOS64, fgetpos64_2_2, fgetpos64@GLIBC_2.2)
+ DCL_FUNC_VER (DCL_FGETPOS64, fgetpos64_2_1, fgetpos64@GLIBC_2.1)
++#if !defined(__USE_LARGEFILE64)
+ DCL_FGETPOS64 (fgetpos64)
+-
++#endif
+ /*------------------------------------------------------------- fsetpos */
+ static int
+ gprofng_fsetpos (int(real_fsetpos) (FILE *, const fpos_t *),
+@@ -3087,8 +3089,9 @@ DCL_FUNC_VER (DCL_FSETPOS64, fsetpos64_2_17, fsetpos64@GLIBC_2.17)
+ DCL_FUNC_VER (DCL_FSETPOS64, fsetpos64_2_2_5, fsetpos64@GLIBC_2.2.5)
+ DCL_FUNC_VER (DCL_FSETPOS64, fsetpos64_2_2, fsetpos64@GLIBC_2.2)
+ DCL_FUNC_VER (DCL_FSETPOS64, fsetpos64_2_1, fsetpos64@GLIBC_2.1)
++#if !defined(__USE_LARGEFILE64)
+ DCL_FSETPOS64 (fsetpos64)
+-
++#endif
+ /*------------------------------------------------------------- fsync */
+ int
+ fsync (int fildes)

@@ -1,5 +1,4 @@
 # general
 ac_cv_sizeof_long_double=${ac_cv_sizeof_long_double=16}
 ac_cv_sizeof_dev_t=${ac_cv_sizeof_dev_t=8}
-ac_cv_sys_file_offset_bits=${ac_cv_sys_file_offset_bits=64}
 ac_cv_alignof_double=8

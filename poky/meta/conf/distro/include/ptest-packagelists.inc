@@ -75,6 +75,7 @@ PTESTS_FAST = "\
     slang \
     wayland \
     zlib \
+    libexif \
 "
 PTESTS_FAST:append:libc-glibc = " glibc-tests"
 PTESTS_PROBLEMS:remove:libc-glibc = "glibc-tests"

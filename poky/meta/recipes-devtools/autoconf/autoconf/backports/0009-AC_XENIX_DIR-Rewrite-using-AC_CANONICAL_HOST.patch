@@ -1,0 +1,82 @@
+From dcf9bb7e3b12f3bd74edff60e80b53e668159579 Mon Sep 17 00:00:00 2001
+From: Zack Weinberg <zackw@panix.com>
+Date: Sun, 2 Apr 2023 10:27:08 -0400
+Subject: [PATCH 09/29] AC_XENIX_DIR: Rewrite using AC_CANONICAL_HOST.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+AC_XENIX_DIR is an obsolete macro, defined as AC_HEADER_DIRENT plus
+code to make absolutely sure configure scripts that depended on a
+shell variable internal to the original (2.13 era) definition of
+AC_XENIX_DIR are not broken by autoupdate.  (That variable had the
+temptingly public-sounding name “XENIX.”)  This compatibility code
+uses AC_EGREP_CPP, which is itself discouraged for use in new
+configure scripts.
+
+(N.B. codesearch.debian.net does not find any uses whatsoever of
+this macro, nor any code in an .ac or .m4 file that depends on the
+XENIX variable.)
+
+Change the compatibility code to use AC_CANONICAL_HOST instead,
+and clarify which pieces of the code inserted by autoupdate are
+probably still necessary.
+
+* lib/autoconf/specific.m4 (AC_XENIX_DIR): Set XENIX variable
+  based on value of host_os. Clarify what manual cleanup is
+  recommended after autoupdate replaces this obsolete macro.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/specific.m4 | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/lib/autoconf/specific.m4 b/lib/autoconf/specific.m4
+index 1b3ee661b..a2dc5d488 100644
+--- a/lib/autoconf/specific.m4
++++ b/lib/autoconf/specific.m4
+@@ -754,9 +754,9 @@ dnl it should only be defined when necessary.
+ ## Checks for UNIX variants.  ##
+ ## -------------------------- ##
+ 
+-
+-# These are kludges which should be replaced by a single POSIX check.
+-# They aren't cached, to discourage their use.
++# These macros are all obsolete, from the early days of Autoconf,
++# before the invention of AC_CANONICAL_SYSTEM.  Autoupdate will
++# replace each with inline code for a more modern feature check.
+ 
+ # AC_AIX
+ # ------
+@@ -776,19 +776,15 @@ AU_DEFUN([AC_ISC_POSIX], [AC_SEARCH_LIBS([strerror], [cposix])])
+ # AC_XENIX_DIR
+ # ------------
+ AU_DEFUN([AC_XENIX_DIR],
+-[AC_MSG_CHECKING([for Xenix])
+-AC_EGREP_CPP([yes],
+-[#if defined M_XENIX && ! defined M_UNIX
+-  yes
+-@%:@endif],
+-	     [AC_MSG_RESULT([yes]); XENIX=yes],
+-	     [AC_MSG_RESULT([no]); XENIX=])
+-
+-AC_HEADER_DIRENT[]dnl
++[AC_HEADER_DIRENT
++# Autoupdate added the next two lines to ensure that your configure
++# script's behavior did not change.  They are safe to remove unless
++# you have code that depends on the XENIX shell variable.
++AC_CANONICAL_HOST
++AS_CASE([$host_os], [xenix*], [XENIX=yes], [XENIX=no])
++# End of code added by autoupdate
+ ],
+-[You shouldn't need to depend upon XENIX.  Remove the
+-'AC_MSG_CHECKING', 'AC_EGREP_CPP', and this warning if this part
+-of the test is useless.])
++[Check for code depending on the XENIX shell variable.])
+ 
+ 
+ # AC_DYNIX_SEQ
+-- 
+2.41.0
+

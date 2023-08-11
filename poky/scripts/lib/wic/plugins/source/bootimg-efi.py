@@ -332,15 +332,6 @@ class BootimgEFIPlugin(SourcePlugin):
                         shutil.copyfileobj(in_file, initrd)
                 initrd.close()
 
-                dtb = source_params.get('dtb')
-                if dtb:
-                    if ';' in dtb:
-                        raise WicError("Only one DTB supported, exiting")
-                    dtb_params = '--add-section .dtb=%s/%s --change-section-vma .dtb=0x40000' % \
-                        (deploy_dir, dtb)
-                else:
-                    dtb_params = ''
-
                 # Searched by systemd-boot:
                 # https://systemd.io/BOOT_LOADER_SPECIFICATION/#type-2-efi-unified-kernel-images
                 install_cmd = "install -d %s/EFI/Linux" % hdddir
@@ -349,20 +340,64 @@ class BootimgEFIPlugin(SourcePlugin):
                 staging_dir_host = get_bitbake_var("STAGING_DIR_HOST")
                 target_sys = get_bitbake_var("TARGET_SYS")
 
+                objdump_cmd = "%s-objdump" % target_sys
+                objdump_cmd += " -p %s" % efi_stub
+                objdump_cmd += " | awk '{ if ($1 == \"SectionAlignment\"){print $2} }'"
+
+                ret, align_str = exec_native_cmd(objdump_cmd, native_sysroot)
+                align = int(align_str, 16)
+
+                objdump_cmd = "%s-objdump" % target_sys
+                objdump_cmd += " -h %s | tail -2" % efi_stub
+                ret, output = exec_native_cmd(objdump_cmd, native_sysroot)
+
+                offset = int(output.split()[2], 16) + int(output.split()[3], 16)
+
+                osrel_off = offset + align - offset % align
+                osrel_path = "%s/usr/lib/os-release" % staging_dir_host
+                osrel_sz = os.stat(osrel_path).st_size
+
+                cmdline_off = osrel_off + osrel_sz
+                cmdline_off = cmdline_off + align - cmdline_off % align
+                cmdline_sz = os.stat(cmdline.name).st_size
+
+                dtb_off = cmdline_off + cmdline_sz
+                dtb_off = dtb_off + align - dtb_off % align
+
+                dtb = source_params.get('dtb')
+                if dtb:
+                    if ';' in dtb:
+                        raise WicError("Only one DTB supported, exiting")
+                    dtb_path = "%s/%s" % (deploy_dir, dtb)
+                    dtb_params = '--add-section .dtb=%s --change-section-vma .dtb=0x%x' % \
+                            (dtb_path, dtb_off)
+                    linux_off = dtb_off + os.stat(dtb_path).st_size
+                    linux_off = linux_off + align - linux_off % align
+                else:
+                    dtb_params = ''
+                    linux_off = dtb_off
+
+                linux_path = "%s/%s" % (staging_kernel_dir, kernel)
+                linux_sz = os.stat(linux_path).st_size
+
+                initrd_off = linux_off + linux_sz
+                initrd_off = initrd_off + align - initrd_off % align
+
                 # https://www.freedesktop.org/software/systemd/man/systemd-stub.html
                 objcopy_cmd = "%s-objcopy" % target_sys
                 objcopy_cmd += " --enable-deterministic-archives"
                 objcopy_cmd += " --preserve-dates"
-                objcopy_cmd += " --add-section .osrel=%s/usr/lib/os-release" % staging_dir_host
-                objcopy_cmd += " --change-section-vma .osrel=0x20000"
+                objcopy_cmd += " --add-section .osrel=%s" % osrel_path
+                objcopy_cmd += " --change-section-vma .osrel=0x%x" % osrel_off
                 objcopy_cmd += " --add-section .cmdline=%s" % cmdline.name
-                objcopy_cmd += " --change-section-vma .cmdline=0x30000"
+                objcopy_cmd += " --change-section-vma .cmdline=0x%x" % cmdline_off
                 objcopy_cmd += dtb_params
-                objcopy_cmd += " --add-section .linux=%s/%s" % (staging_kernel_dir, kernel)
-                objcopy_cmd += " --change-section-vma .linux=0x2000000"
+                objcopy_cmd += " --add-section .linux=%s" % linux_path
+                objcopy_cmd += " --change-section-vma .linux=0x%x" % linux_off
                 objcopy_cmd += " --add-section .initrd=%s" % initrd.name
-                objcopy_cmd += " --change-section-vma .initrd=0x3000000"
+                objcopy_cmd += " --change-section-vma .initrd=0x%x" % initrd_off
                 objcopy_cmd += " %s %s/EFI/Linux/linux.efi" % (efi_stub, hdddir)
+
                 exec_native_cmd(objcopy_cmd, native_sysroot)
         else:
             install_cmd = "install -m 0644 %s/%s %s/%s" % \

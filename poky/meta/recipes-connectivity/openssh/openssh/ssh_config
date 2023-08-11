@@ -19,11 +19,9 @@
 
 Include /etc/ssh/ssh_config.d/*.conf
 
-Host *
-  ForwardAgent yes
-  ForwardX11 yes
-#   RhostsRSAAuthentication no
-#   RSAAuthentication yes
+# Host *
+#   ForwardAgent no
+#   ForwardX11 no
 #   PasswordAuthentication yes
 #   HostbasedAuthentication no
 #   GSSAPIAuthentication no

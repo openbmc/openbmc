@@ -1,5 +1,4 @@
 DESCRIPTION = "Ultralightweight JSON parser in ANSI C"
-AUTHOR = "Dave Gamble"
 HOMEPAGE = "https://github.com/DaveGamble/cJSON"
 SECTION = "libs"
 LICENSE = "MIT"

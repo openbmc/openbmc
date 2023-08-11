@@ -1,0 +1,41 @@
+From b13f04c0c685b6d2474aa7d97e191531f327bc45 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Thu, 20 Jul 2023 14:32:23 -0400
+Subject: [PATCH] bridge/mdb.c: include limits.h
+
+Upstream-Status: Submitted
+(https://lore.kernel.org/netdev/20230720203726.2316251-1-tgamblin@baylibre.com/)
+
+While building iproute2 6.4.0 with musl using Yocto Project, errors such
+as the following were encountered:
+
+| mdb.c: In function 'mdb_parse_vni':
+| mdb.c:666:47: error: 'ULONG_MAX' undeclared (first use in this function)
+|   666 |         if ((endptr && *endptr) || vni_num == ULONG_MAX)
+|       |                                               ^~~~~~~~~
+| mdb.c:666:47: note: 'ULONG_MAX' is defined in header '<limits.h>'; did you forget to '#include <limits.h>'?
+
+Include limits.h in bridge/mdb.c to fix this issue. This change is based
+on one in Alpine Linux, but the author there had no plans to submit:
+https://git.alpinelinux.org/aports/commit/main/iproute2/include.patch?id=bd46efb8a8da54948639cebcfa5b37bd608f1069
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ bridge/mdb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bridge/mdb.c b/bridge/mdb.c
+index fbb4f704..18793458 100644
+--- a/bridge/mdb.c
++++ b/bridge/mdb.c
+@@ -15,6 +15,7 @@
+ #include <string.h>
+ #include <arpa/inet.h>
+ #include <netdb.h>
++#include <limits.h>
+ 
+ #include "libnetlink.h"
+ #include "utils.h"
+-- 
+2.41.0
+

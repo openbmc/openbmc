@@ -1,4 +1,4 @@
-From e09aa9c3565585390328dd514cc286c20b74e76a Mon Sep 17 00:00:00 2001
+From 52676b5934ba127c3af39fc484c8236c8fa60b96 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 8 Mar 2021 16:04:20 -0800
 Subject: [PATCH] gcc: poison-system-directories
@@ -11,7 +11,7 @@ aborted.
 Instead, we add the two missing items to the current scan.  If the user
 wants this to be a failure, they can add "-Werror=poison-system-directories".
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [OE configuration]
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
@@ -132,7 +132,7 @@ index 09082e8ccae..6cd01a8966b 100644
  AC_SUBST(subdirs)
  AC_SUBST(srcdir)
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index c9482886c5a..f302c637908 100644
+index de40f62e219..d6f203c8b71 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
 @@ -384,6 +384,7 @@ Objective-C and Objective-C++ Dialects}.
@@ -143,7 +143,7 @@ index c9482886c5a..f302c637908 100644
  -Wno-pragmas  -Wno-prio-ctor-dtor  -Wredundant-decls
  -Wrestrict  -Wno-return-local-addr  -Wreturn-type
  -Wno-scalar-storage-order  -Wsequence-point
-@@ -8422,6 +8423,14 @@ made up of data only and thus requires no special treatment.  But, for
+@@ -8426,6 +8427,14 @@ made up of data only and thus requires no special treatment.  But, for
  most targets, it is made up of code and thus requires the stack to be
  made executable in order for the program to work properly.
  

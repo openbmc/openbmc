@@ -1,4 +1,4 @@
-From e8e8a0ab572cfceb9758f99599c0db4c962e49c0 Mon Sep 17 00:00:00 2001
+From 39ab6fe76f2788b2c989d29c9016f1fe53cb736e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 09:39:38 +0000
 Subject: [PATCH] Avoid using libdir from .la which usually points to a host

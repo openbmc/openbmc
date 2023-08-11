@@ -1,5 +1,4 @@
 SUMMARY = "Terminal based 'The Matrix' screen implementation"
-AUTHOR = "Abishek V Ashok"
 
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"

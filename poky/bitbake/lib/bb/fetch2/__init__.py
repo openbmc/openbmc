@@ -388,7 +388,7 @@ def decodeurl(url):
             if s:
                 if not '=' in s:
                     raise MalformedUrl(url, "The URL: '%s' is invalid: parameter %s does not specify a value (missing '=')" % (url, s))
-                s1, s2 = s.split('=')
+                s1, s2 = s.split('=', 1)
                 p[s1] = s2
 
     return type, host, urllib.parse.unquote(path), user, pswd, p
@@ -1402,6 +1402,9 @@ class FetchMethod(object):
         Is localpath something that can be represented by a checksum?
         """
 
+        # We cannot compute checksums for None
+        if urldata.localpath is None:
+            return False
         # We cannot compute checksums for directories
         if os.path.isdir(urldata.localpath):
             return False

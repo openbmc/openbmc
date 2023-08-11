@@ -1253,8 +1253,7 @@ In the following example, ``lz4`` is a makefile-based package::
 
    S = "${WORKDIR}/git"
 
-   # Fixed in r118, which is larger than the current version.
-   CVE_CHECK_IGNORE += "CVE-2014-4715"
+   CVE_STATUS[CVE-2014-4715] = "fixed-version: Fixed in r118, which is larger than the current version"
 
    EXTRA_OEMAKE = "PREFIX=${prefix} CC='${CC}' CFLAGS='${CFLAGS}' DESTDIR=${D} LIBDIR=${libdir} INCLUDEDIR=${includedir} BUILD_STATIC=no"
 

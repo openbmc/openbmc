@@ -25,11 +25,9 @@ do_install() {
 
 RRECOMMENDS:${PN} += "kernel-module-emlog"
 
-# The NVD database doesn't have a CPE for this product,
-# the name of this product is exactly the same as github.com/emlog/emlog
-# but it's not related in any way. The following CVEs are from that project
-# so they can be safely ignored
-CVE_CHECK_IGNORE += "\
+CVE_STATUS_GROUPS += "CVE_STATUS_EMLOG"
+CVE_STATUS_EMLOG[status] = "fixed-version: The name of this product is exactly the same as github.com/emlog/emlog. CVE can be safely ignored."
+CVE_STATUS_EMLOG = " \
     CVE-2019-16868 \
     CVE-2019-17073 \
     CVE-2021-44584 \

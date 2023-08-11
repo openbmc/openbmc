@@ -1,0 +1,30 @@
+From 0cc3c4ca8e6c550bf590ae45a916982b6ec50203 Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Fri, 14 Apr 2023 16:18:35 +0200
+Subject: [PATCH 17/29] AC_SYS_YEAR2038: Fix configure failure on 32-bit mingw.
+
+* lib/autoconf/specific.m4 (_AC_SYS_YEAR2038_PROBE): Use the same option
+spelling as in _AC_SYS_YEAR2038_OPTIONS.
+
+Upstream-Status: Backport
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/specific.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/autoconf/specific.m4 b/lib/autoconf/specific.m4
+index 1a3f4a65c..3bf1a0ed1 100644
+--- a/lib/autoconf/specific.m4
++++ b/lib/autoconf/specific.m4
+@@ -182,7 +182,7 @@ AS_CASE([$ac_cv_sys_year2038_opts],
+     [AC_DEFINE([_TIME_BITS], [64],
+       [Number of bits in time_t, on hosts where this is settable.])],
+ 
+-  ["-D__MINGW_USE_VC2005_COMPAT=1"],
++  ["-D__MINGW_USE_VC2005_COMPAT"],
+     [AC_DEFINE([__MINGW_USE_VC2005_COMPAT], [1],
+       [Define to 1 on platforms where this makes time_t a 64-bit type.])],
+ 
+-- 
+2.41.0
+

@@ -1,4 +1,4 @@
-DESCRIPTION = "A test controller image to be deployed on a target useful for testing other images using the OEQA runtime tests"
+SUMMARY = "A test controller image to be deployed on a target useful for testing other images using the OEQA runtime tests"
 
 IMAGE_FEATURES += "ssh-server-openssh package-management"
 

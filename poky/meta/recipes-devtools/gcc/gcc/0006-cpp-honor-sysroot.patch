@@ -1,4 +1,4 @@
-From 223ff12852a8c8974f6e542ee3a8b276639d2452 Mon Sep 17 00:00:00 2001
+From f0b4d02a3a3dca1d67fd7add15ed63c2cd572bb9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:22:00 +0400
 Subject: [PATCH] cpp: honor sysroot.
@@ -17,7 +17,7 @@ The fix below adds %I to the cpp-output spec macro so the default substitutions 
 
 RP 2012/04/13
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

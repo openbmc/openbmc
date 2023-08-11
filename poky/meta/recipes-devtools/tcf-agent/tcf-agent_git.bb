@@ -6,8 +6,8 @@ BUGTRACKER = "https://bugs.eclipse.org/bugs/"
 LICENSE = "EPL-1.0 | EDL-1.0"
 LIC_FILES_CHKSUM = "file://edl-v10.html;md5=522a390a83dc186513f0500543ad3679"
 
-SRCREV = "4a2c4baaccbc8c29ce0297705de9a4e096d57ce5"
-PV = "1.7.0+git${SRCPV}"
+SRCREV = "1f11747e83ebf4f53e8d17f430136f92ec378709"
+PV = "1.8.0+git${SRCPV}"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 SRC_URI = "git://git.eclipse.org/r/tcf/org.eclipse.tcf.agent.git;protocol=https;branch=master \

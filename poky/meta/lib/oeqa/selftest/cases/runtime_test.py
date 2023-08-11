@@ -294,7 +294,7 @@ class Postinst(OESelftestTestCase):
                 features += 'IMAGE_FEATURES += "package-management empty-root-password"\n'
                 features += 'PACKAGE_CLASSES = "%s"\n' % classes
                 if init_manager == "systemd":
-                    features += 'DISTRO_FEATURES:append = " systemd"\n'
+                    features += 'DISTRO_FEATURES:append = " systemd usrmerge"\n'
                     features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
                     features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"\n'
                     features += 'VIRTUAL-RUNTIME_initscripts = ""\n'
