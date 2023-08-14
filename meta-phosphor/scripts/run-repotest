@@ -34,6 +34,7 @@ git ls-files -- \
 #
 # https://github.com/openbmc/docs/blob/master/meta-layer-guidelines.md
 echo "\
+meta-aspeed/recipes-aspeed/python/socsec/0001-otptool-Define-value_start-in-rev_id-path.patch
 meta-aspeed/recipes-bsp/u-boot/files/default-gcc.patch
 meta-bytedance/meta-g220a/recipes-kernel/linux/linux-aspeed/0005-ARM-dts-aspeed-Enable-g220a-uart-route.patch
 meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed-sdk/0001-board-aspeed-Add-Mux-for-yosemitev2.patch

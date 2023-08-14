@@ -1,0 +1,25 @@
+From 680d5795bbd4e268c978d638a903fb3809e4b5c9 Mon Sep 17 00:00:00 2001
+From: Andrew Jeffery <andrew@aj.id.au>
+Date: Mon, 14 Aug 2023 12:33:04 +0930
+Subject: [PATCH] otptool: Define value_start in `rev_id` path
+
+See https://github.com/AspeedTech-BMC/socsec/pull/18
+
+Upstream-Status: Accepted
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ socsec/otptool.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/socsec/otptool.py b/socsec/otptool.py
+index efeab96dbd96..97da143723dd 100755
+--- a/socsec/otptool.py
++++ b/socsec/otptool.py
+@@ -1039,6 +1039,7 @@ class OTP(object):
+                 bit_offset = info['bit_offset']
+                 offset = dw_offset*32 + bit_offset
+                 bit_length = info['bit_length']
++                value_start = info['value_start']
+                 offset_value = int(value, 16) - value_start
+ 
+                 if offset_value < 0 or offset_value > bit_length:
