@@ -69,7 +69,6 @@
         "Extra Data Write Protection Region Size":      "0x0",
         "Erase signature data after secure boot check": false,
         "Erase RSA public key after secure boot check": false,
-        "Keys Retire ID":                               0,
         "User define data: random number low":          "0x0",
         "User define data: random number high":         "0x0",
         "Manifest ID":                                  "0x0",
