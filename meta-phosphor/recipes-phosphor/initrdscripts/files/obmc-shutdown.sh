@@ -65,7 +65,8 @@ then
 			if test -n "$wdrst"
 			then
 				echo "Resetting watchdog timeouts to $wdrst"
-				watchdog "$wdrst" -F /dev/watchdog &
+				# shellcheck disable=SC2086
+				watchdog $wdrst -F /dev/watchdog &
 				sleep 1
 				# Kill the watchdog daemon, setting a timeout
 				# for the remaining shutdown work
