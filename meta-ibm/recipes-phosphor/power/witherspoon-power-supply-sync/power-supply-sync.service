@@ -5,9 +5,13 @@ After=obmc-power-start-pre@0.target
 Wants=obmc-chassis-poweron@0.target
 Before=obmc-chassis-poweron@0.target
 ConditionPathExists=!/run/openbmc/chassis@0-on
+Conflicts=obmc-chassis-poweroff@0.target
 
 [Service]
-ExecStart=/usr/bin/phosphor-gpio-util --gpio=105 --path=/dev/gpiochip0 --delay=5 --action=low_high
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/gpioset -m time -u 5000 /dev/gpiochip0 105=0
+ExecStart=/usr/bin/gpioset /dev/gpiochip0 105=1
 
 [Install]
 #RequiredBy=obmc-chassis-poweron@0.target
