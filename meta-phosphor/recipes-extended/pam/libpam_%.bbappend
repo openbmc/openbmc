@@ -5,6 +5,7 @@ SRC_URI += " file://pam.d/common-password \
              file://pam.d/common-auth \
              file://pam.d/common-session \
              file://faillock.conf \
+             file://pwhistory.conf \
              file://convert-pam-configs.service \
              file://convert-pam-configs.sh \
             "
@@ -25,6 +26,7 @@ do_install:append() {
 
     install -d ${D}/etc/security
     install -m 0644 ${WORKDIR}/faillock.conf ${D}/etc/security
+    install -m 0644 ${WORKDIR}/pwhistory.conf ${D}/etc/security
 
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/convert-pam-configs.sh ${D}${bindir}

@@ -21,6 +21,19 @@ then
     echo "# This file was converted by $0" >>${PAM_CONF_DIR}/common-password
 fi
 
+#   Update pwhistory to use the conf file and handle the remember parameter
+pam_pwhistory=$(grep "^password.*pam_pwhistory.so.*remember" ${PAM_CONF_DIR}/common-password)
+if [ -n "${pam_pwhistory}" ]
+then
+    echo "Changing ${PAM_CONF_DIR}/common-password pam_pwhistory.so to use pwhistory.conf" >&2
+    remember=$(echo "${pam_pwhistory}" | sed -e "s/.*remember=\([[:alnum:]]*\).*/\1/")
+    echo "  Converting parameter remember=${remember} to ${SECURITY_CONF_DIR}/pwhistory.conf remember" >&2
+    sed -i.bak -e "s/^remember=.*/remember=$remember/" ${SECURITY_CONF_DIR}/pwhistory.conf
+    pwhistory='password        [success=ok ignore=ignore default=die]  pam_pwhistory.so debug use_authtok'
+    sed -i.bak -e "s/^password.*pam_pwhistory.so.*/$pwhistory/" ${PAM_CONF_DIR}/common-password
+    echo "# This file was converted by $0" >>${PAM_CONF_DIR}/common-password
+fi
+
 # Handle common-auth:
 #   Change tally2 to faillock and handle the deny & unlock_time parameters
 pam_tally2=$(grep "^auth.*pam_tally2.so" ${PAM_CONF_DIR}/common-auth)
