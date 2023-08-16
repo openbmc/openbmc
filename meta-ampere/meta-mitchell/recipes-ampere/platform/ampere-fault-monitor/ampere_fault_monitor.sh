@@ -2,7 +2,7 @@
 # This script monitors fan, over-temperature, PSU, CPU/SCP failure and update fault LED status
 
 # shellcheck disable=SC2004
-# shellcheck source=/dev/null
+# shellcheck source=meta-ampere/meta-mitchell/recipes-ampere/platform/ampere-platform-init/gpio-lib.sh
 source /usr/sbin/gpio-lib.sh
 
 # common variables

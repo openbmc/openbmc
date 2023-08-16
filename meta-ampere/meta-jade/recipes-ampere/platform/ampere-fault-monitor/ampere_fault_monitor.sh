@@ -4,7 +4,6 @@
 
 # shellcheck disable=SC2004
 # shellcheck disable=SC2046
-# shellcheck source=/dev/null
 
 # common variables
 	warning_fault_flag='/tmp/fault_warning'
