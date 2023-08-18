@@ -1,8 +1,18 @@
 #!/bin/bash
 
+# shellcheck disable=SC2120
+
 # Provide source directive to shellcheck.
 # shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
-# TODO: host power reset
-echo "Host power reset is not support for now"
+# TODO: check power status before do power reset
+# Set state effecter state: Entity ID 0x0000 for host power control, 0x4 for power reset
+GETEID=$(busctl call "$MCTP_BUS_NAME" "$MCTP_OBJ_PATH" "$MCTP_INTF_NAME" LearnEndpoint say "mctpi2c$(($1-1))" 1 0x20)
+EID=$(echo "$GETEID" | awk '{print $2}')
+if ! pldmtool raw -m "$EID" -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x04
+then
+    echo "Failed to set host$1 power reset"
+else
+    echo "Host is power reset"
+fi
