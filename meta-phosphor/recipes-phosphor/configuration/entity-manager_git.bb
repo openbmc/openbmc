@@ -10,7 +10,7 @@ DEPENDS = "boost \
            valijson \
            ${PYTHON_PN}-jsonschema-native \
 "
-SRCREV = "169eec2d8370acdcf8d22404280f06bfc291cd77"
+SRCREV = "2b3ed30ca3b3f2299abf0627f01559dafaa4f269"
 PACKAGECONFIG ??= "ipmi-fru"
 PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
 PV = "0.1+git${SRCPV}"
