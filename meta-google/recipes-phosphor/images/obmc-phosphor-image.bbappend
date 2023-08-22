@@ -5,7 +5,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " phosphor-ipmi-ethstats"
 OBMC_IMAGE_EXTRA_INSTALL:append = " phosphor-ipmi-flash"
 OBMC_IMAGE_EXTRA_INSTALL:append = \
   '${@bb.utils.contains_any("MACHINE_FEATURES", "glome", \
-  " glome-config glome-login", "", d)}'
+  " glome-login", "", d)}'
 
 # Google BMC (gBMC) specific installs
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " iproute2 iproute2-ss"
