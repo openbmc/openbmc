@@ -3,10 +3,10 @@
 export STATE_OFF=0
 export STATE_ON=1
 export STATE_UNKNOWN=-1
-export MANAGEMENT_BOARD_IO_EXP_BUS_NUM="12"
-export MEDUSA_IO_EXP_BUS_NUM="11"
-export IO_EXP_SLOT_PWR_CTRL_ADDR="22"
-export IO_EXP_SLED_PWR_CTRL_ADDR="22"
+export MANAGEMENT_BOARD_IO_EXP_BUS_NUM="13"
+export SPIDER_BOARD_IO_EXP_BUS_NUM="28"
+export IO_EXP_SLOT_PWR_CTRL_ADDR="21"
+export IO_EXP_SLED_PWR_CTRL_ADDR="21"
 export CHASSIS_BUS_NAME="xyz.openbmc_project.State.Chassis"
 export CHASSIS_OBJ_PATH="/xyz/openbmc_project/state/chassis"
 export CHASSIS_INTF_NAME="xyz.openbmc_project.State.Chassis"
