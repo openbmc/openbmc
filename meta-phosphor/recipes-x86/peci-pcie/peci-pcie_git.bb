@@ -7,11 +7,14 @@ DEPENDS = "boost sdbusplus libpeci"
 SRCREV = "3570b9ea5ff109a6e000d16a2d34b974fcf6c335"
 PV = "0.1+git${SRCPV}"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[wait-for-os-standby] = "-Dwait-for-os-standby=enabled,-Dwait-for-os-standby=disabled"
+PACKAGECONFIG[use-rdendpointcfg] = "-Duse-rdendpointcfg=enabled,-Duse-rdendpointcfg=disabled"
+
 SRC_URI = "git://github.com/openbmc/peci-pcie;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.PCIe.service"
 
-inherit cmake pkgconfig systemd
+inherit meson pkgconfig systemd
 
-EXTRA_OECMAKE = "-DYOCTO=1"
