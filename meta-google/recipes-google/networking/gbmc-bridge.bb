@@ -97,7 +97,8 @@ do_install() {
 
   if [ ! -z "${GBMC_BR_MAC_ADDR}" ]; then
     sfx='${@mac_to_eui64(GBMC_BR_MAC_ADDR)}'
-    addr="Address=${GBMC_ULA_PREFIX}:$sfx/64\nAddress=fe80::$sfx/64"
+    addr="[Address]\nAddress=${GBMC_ULA_PREFIX}:$sfx/64\nPreferredLifetime=0\n"
+    addr+="[Address]\nAddress=fe80::$sfx/64\nPreferredLifetime=0"
     sed -i "s,@ADDR@,$addr," ${WORKDIR}/-bmc-gbmcbr.network.in
   else
     sed -i '/@ADDR@/d' ${WORKDIR}/-bmc-gbmcbr.network.in

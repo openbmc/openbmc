@@ -1,13 +1,13 @@
 [Match]
 Name=gbmcbr
 [Network]
-@ADDR@
 DHCP=false
 IPv6AcceptRA=true
 LLMNR=true
 MulticastDNS=true
 LinkLocalAddressing=ipv6
 IPv6PrefixDelegation=yes
+@ADDR@
 [IPv6AcceptRA]
 DHCPv6Client=false
 RouteMetric=1056
