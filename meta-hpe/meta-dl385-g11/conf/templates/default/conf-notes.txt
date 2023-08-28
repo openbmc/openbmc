@@ -1,0 +1,6 @@
+### Shell environment set up for builds. ###
+Configuration for Hewlett Packard Enterprise Proliant DL385-G11
+- AMD Based Proliant Architecture
+
+Common targets are:
+    obmc-phosphor-image
