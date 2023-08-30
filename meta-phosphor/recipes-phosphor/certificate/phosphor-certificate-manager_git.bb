@@ -11,11 +11,11 @@ DEPENDS = " \
         sdbusplus \
         sdeventplus \
         "
-SRCREV = "2e8ef4ce43975acfec7720683b8c7d721926c398"
-PACKAGECONFIG ??= "bmcweb-cert nslcd-authority-cert"
+SRCREV = "2e8fa88e24d83a061bd7a40b6c222956b85c640a"
+PACKAGECONFIG ??= "bmcweb-cert authority-cert"
 PACKAGECONFIG[ibm-hypervisor-cert] = "-Dca-cert-extension=enabled,-Dca-cert-extension=disabled"
 PACKAGECONFIG[bmcweb-cert] = "-Dconfig-bmcweb=enabled,-Dconfig-bmcweb=disabled"
-PACKAGECONFIG[nslcd-authority-cert] = "-Dconfig-nslcd=enabled,-Dconfig-nslcd=disabled"
+PACKAGECONFIG[authority-cert] = "-Dconfig-authority=enabled,-Dconfig-authority=disabled"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
@@ -26,7 +26,7 @@ SYSTEMD_SERVICE:${PN} = "phosphor-certificate-manager@.service"
 SYSTEMD_SERVICE:${PN} = " \
         phosphor-certificate-manager@.service \
         ${@bb.utils.contains('PACKAGECONFIG', 'ibm-hypervisor-cert', 'bmc-vmi-ca-manager.service', '', d)} \
-        ${@bb.utils.contains('PACKAGECONFIG', 'nslcd-authority-cert', 'phosphor-certificate-manager@authority.service', '', d)} \
+        ${@bb.utils.contains('PACKAGECONFIG', 'authority-cert', 'phosphor-certificate-manager@authority.service', '', d)} \
         ${@bb.utils.contains('PACKAGECONFIG', 'bmcweb', 'phosphor-certificate-manager@bmcweb.service', '', d)} \
         "
 
