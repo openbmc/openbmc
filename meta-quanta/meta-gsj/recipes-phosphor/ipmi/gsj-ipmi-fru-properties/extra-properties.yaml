@@ -1,7 +1,0 @@
-/system/chassis/bmc:
-  xyz.openbmc_project.Inventory.Item:
-    Present: 'true'
-
-/system/chassis/hsbp:
-  xyz.openbmc_project.Inventory.Item:
-    Present: 'true'
