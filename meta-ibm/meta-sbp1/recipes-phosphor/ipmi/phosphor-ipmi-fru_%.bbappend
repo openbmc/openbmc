@@ -4,10 +4,8 @@ FILESEXTRAPATHS:prepend:sbp1 := "${THISDIR}/${PN}:"
 
 DEPENDS:append:sbp1 = " sbp1-yaml-config"
 
-EXTRA_OECONF:sbp1 = " \
-    YAML_GEN=${STAGING_DIR_HOST}${datadir}/sbp1-yaml-config/ipmi-fru-read.yaml \
-    PROP_YAML=${STAGING_DIR_HOST}${datadir}/sbp1-yaml-config/ipmi-extra-properties.yaml \
-    "
+IPMI_FRU_YAML:sbp1="${STAGING_DIR_HOST}${datadir}/sbp1-yaml-config/ipmi-fru-read.yaml"
+IPMI_FRU_PROP_YAML:sbp1="${STAGING_DIR_HOST}${datadir}/sbp1-yaml-config/ipmi-extra-properties.yaml"
 
 EEPROM_NAMES = "motherboard"
 
