@@ -1,0 +1,10 @@
+[
+  {
+    "Name": "psu2",
+    "LineName": "PSU2_INST",
+    "EventMon": "BOTH",
+    "TargetRising": "psu2up.service",
+    "TargetFalling": "psu2down.service",
+    "Continue": true
+  }
+]
