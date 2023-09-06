@@ -180,7 +180,7 @@ read_bytes() {
   else
     echo "Reading $file at $offset for $size" >&2
     dd if="$file" bs=1 count="$size" skip="$offset" 2>/dev/null | \
-      hexdump -v -e '1/1 "%d "'
+      hexdump -v -e '1/1 "%u "'
   fi
 }
 
