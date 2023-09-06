@@ -1,0 +1,10 @@
+[
+	{ 
+		"Name": "PowerGoodUp",
+		"LineName": "PSU1_INST",
+		"EventMon": "BOTH",
+		"TargetRising" : "psu1up.service",
+		"TargetFalling" : "psu1down.service",
+		"Continue": true 
+	}
+]

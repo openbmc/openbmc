@@ -1,0 +1,8 @@
+[Unit]
+Description=HPE DL360 PSU2 Manager
+
+[Service]
+ExecStart=/usr/bin/psus-manager.sh 2 down
+
+[Install]
+# WantedBy=multi-user.target

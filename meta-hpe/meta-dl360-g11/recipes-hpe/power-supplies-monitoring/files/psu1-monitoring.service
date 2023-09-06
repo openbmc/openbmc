@@ -1,0 +1,11 @@
+[Unit]
+Description=DL360 power supply 1 monitoring
+After=dbus.service
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=startMonitoring1.sh
+
+[Install]
+WantedBy=multi-user.target
