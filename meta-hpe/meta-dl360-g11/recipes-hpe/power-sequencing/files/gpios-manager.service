@@ -1,0 +1,13 @@
+[Unit]
+Description=HPE virtualnic configuration
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/etc/virtualnic/virtualnic start
+ExecStop=/etc/virtualnic/virtualnic stop
+
+[Install]
+WantedBy=multi-user.target

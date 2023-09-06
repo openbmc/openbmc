@@ -1,0 +1,8 @@
+[Unit]
+Description=HPE DL360 Power Button
+
+[Service]
+ExecStart=/usr/bin/power-button.sh pressed
+
+[Install]
+# WantedBy=multi-user.target

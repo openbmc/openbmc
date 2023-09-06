@@ -1,0 +1,8 @@
+[Unit]
+Description=HPE DL360 PowerOK
+
+[Service]
+ExecStart=/usr/bin/gpios-manager.sh down
+
+[Install]
+# WantedBy=multi-user.target

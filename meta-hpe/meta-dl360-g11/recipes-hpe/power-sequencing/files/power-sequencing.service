@@ -1,0 +1,12 @@
+[Unit]
+Description=DL360 power sequencing manager
+#After=dbus.service
+After=xyz.openbmc_project.Chassis.Control.Power@0.service
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/startMonitoring.sh
+
+[Install]
+WantedBy=multi-user.target

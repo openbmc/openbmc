@@ -1,8 +1,0 @@
-[Unit]
-Description=HPE RL300 Power Button Release
-
-[Service]
-ExecStart=/usr/bin/power-button released
-
-[Install]
-# WantedBy=multi-user.target

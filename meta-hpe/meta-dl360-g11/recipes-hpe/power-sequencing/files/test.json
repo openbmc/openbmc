@@ -1,0 +1,10 @@
+[ 
+	{ 
+		"Name": "PowerGoodUp",
+		"LineName": "PS_PWROK",
+		"EventMon": "BOTH",
+		"TargetRising" : "gpiosup.service",
+		"TargetFalling" : "gpiosdown.service",
+		"Continue": true
+	}
+]
