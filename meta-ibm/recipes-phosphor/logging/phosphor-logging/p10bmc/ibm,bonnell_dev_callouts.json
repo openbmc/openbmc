@@ -1,12 +1,34 @@
 {
    "FSI":{
       "0":{
-         "Callouts":[],
+         "Callouts":[
+            {
+               "LocationCode":"P0-C5",
+               "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+               "Priority":"H"
+            },
+            {
+               "LocationCode":"P0",
+               "Name":"/sys-0/node-0/pennybacker-0/bmc-0",
+               "Priority":"L"
+            }
+         ],
          "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
          "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
       },
       "0-0":{
-         "Callouts":[],
+         "Callouts":[
+            {
+               "LocationCode":"P0-C5",
+               "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+               "Priority":"H"
+            },
+            {
+               "LocationCode":"P0",
+               "Name":"/sys-0/node-0/pennybacker-0",
+               "Priority":"L"
+            }
+         ],
          "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-1",
          "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
       }
@@ -123,6 +145,11 @@
             "24":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C6",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-0/dimm-0",
                      "Priority":"H"
@@ -130,11 +157,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -145,6 +167,11 @@
             "80":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C6",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-0/dimm-0",
                      "Priority":"H"
@@ -152,11 +179,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -169,6 +191,11 @@
             "24":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C7",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-1/dimm-0",
                      "Priority":"H"
@@ -176,11 +203,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -191,6 +213,11 @@
             "80":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C7",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-1/dimm-0",
                      "Priority":"H"
@@ -198,11 +225,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -287,6 +309,11 @@
             "24":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C9",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-3/dimm-0",
                      "Priority":"H"
@@ -294,11 +321,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -309,6 +331,11 @@
             "80":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C9",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-3/dimm-0",
                      "Priority":"H"
@@ -316,11 +343,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -333,6 +355,11 @@
             "24":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C8",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-2/dimm-0",
                      "Priority":"H"
@@ -340,11 +367,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -355,6 +377,11 @@
             "80":{
                "Callouts":[
                   {
+                     "LocationCode":"P0-C5",
+                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
+                     "Priority":"H"
+                  },
+                  {
                      "LocationCode":"P0-C8",
                      "Name":"/sys-0/node-0/pennybacker-0/dimm_connector-2/dimm-0",
                      "Priority":"H"
@@ -362,11 +389,6 @@
                   {
                      "LocationCode":"P0",
                      "Name":"/sys-0/node-0/pennybacker-0",
-                     "Priority":"L"
-                  },
-                  {
-                     "LocationCode":"P0-C5",
-                     "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0",
                      "Priority":"L"
                   }
                ],
@@ -401,54 +423,164 @@
    "FSI-SPI":{
       "0":{
          "0":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0/bmc-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p0-sbe-p",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "1":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0/bmc-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p0-sbe-b",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "2":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0/bmc-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p0-mvpd",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "3":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0/bmc-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p0-meas",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "4":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0/bmc-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/TPM_NPCT750AAC-0",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "6":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0/bmc-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/bonnell_apss-0",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          }
       },
       "0-0":{
          "0":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p1-sbe-p",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "1":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p1-sbe-b",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "2":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p1-mvpd",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "3":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0-C5",
+                  "Name":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/power10-0",
+                  "Priority":"H"
+               },
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0",
+                  "Priority":"L"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/proc_socket-0/godel-0/p1-meas",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          }
@@ -1009,13 +1141,25 @@
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "81":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0",
+                  "Priority":"H"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/IR35221_VDN_VCS-1",
             "HexAddress":"0x51",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
          },
          "82":{
-            "Callouts":[],
+            "Callouts":[
+               {
+                  "LocationCode":"P0",
+                  "Name":"/sys-0/node-0/pennybacker-0",
+                  "Priority":"H"
+               }
+            ],
             "Dest":"/sys-0/node-0/pennybacker-0/IR35221_VPCIE_VIO-2",
             "HexAddress":"0x52",
             "Source":"/sys-0/node-0/pennybacker-0/bmc-0"
