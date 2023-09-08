@@ -290,24 +290,6 @@
                 {
                     "types":
                     {
-                        "rType": "chassis",
-                        "fType": "input_history"
-                    },
-                    "paths":
-                    [
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply0_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply0_input_power/maximum",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply1_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply1_input_power/maximum",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply2_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply2_input_power/maximum",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply3_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply3_input_power/maximum"
-                    ]
-                },
-                {
-                    "types":
-                    {
                         "rType": "inventory",
                         "fType": "assembly"
                     },
@@ -421,18 +403,6 @@
                 {
                     "types":
                     {
-                        "rType": "inventory",
-                        "fType": "input_history"
-                    },
-                    "paths":
-                    [
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply0_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply0_input_power/maximum"
-                    ]
-                },
-                {
-                    "types":
-                    {
                         "rType": "fault_identified_by",
                         "fType": "fault_identifying"
                     },
@@ -484,18 +454,6 @@
                         "/xyz/openbmc_project/sensors/temperature/ps1_temp0",
                         "/xyz/openbmc_project/sensors/temperature/ps1_temp1",
                         "/xyz/openbmc_project/sensors/temperature/ps1_temp2"
-                    ]
-                },
-                {
-                    "types":
-                    {
-                        "rType": "inventory",
-                        "fType": "input_history"
-                    },
-                    "paths":
-                    [
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply1_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply1_input_power/maximum"
                     ]
                 },
                 {
@@ -557,18 +515,6 @@
                 {
                     "types":
                     {
-                        "rType": "inventory",
-                        "fType": "input_history"
-                    },
-                    "paths":
-                    [
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply2_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply2_input_power/maximum"
-                    ]
-                },
-                {
-                    "types":
-                    {
                         "rType": "fault_identified_by",
                         "fType": "fault_identifying"
                     },
@@ -620,18 +566,6 @@
                         "/xyz/openbmc_project/sensors/temperature/ps3_temp0",
                         "/xyz/openbmc_project/sensors/temperature/ps3_temp1",
                         "/xyz/openbmc_project/sensors/temperature/ps3_temp2"
-                    ]
-                },
-                {
-                    "types":
-                    {
-                        "rType": "inventory",
-                        "fType": "input_history"
-                    },
-                    "paths":
-                    [
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply3_input_power/average",
-                        "/org/open_power/sensors/aggregation/per_30s/powersupply3_input_power/maximum"
                     ]
                 },
                 {
