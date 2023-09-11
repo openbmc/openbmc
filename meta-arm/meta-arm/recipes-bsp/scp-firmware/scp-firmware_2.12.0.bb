@@ -8,7 +8,8 @@ LIC_FILES_CHKSUM = "file://license.md;beginline=5;md5=9db9e3d2fb8d9300a6c3d15101
 
 SRC_URI_SCP_FIRMWARE ?= "gitsm://github.com/ARM-software/SCP-firmware.git;protocol=https"
 SRC_URI = "${SRC_URI_SCP_FIRMWARE};branch=${SRCBRANCH} \
-           file://optee-private-includes.patch"
+           file://0001-OPTEE-Private-Includes.patch \
+          "
 
 SRCBRANCH = "master"
 SRCREV  = "0c7236b1851d90124210a0414fd982dc55322c7c"

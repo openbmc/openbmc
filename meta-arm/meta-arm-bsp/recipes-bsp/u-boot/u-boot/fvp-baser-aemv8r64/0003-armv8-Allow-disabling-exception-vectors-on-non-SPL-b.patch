@@ -1,8 +1,7 @@
-From 07cc3e4af3def76d92faf39712d4fd8717b21d2b Mon Sep 17 00:00:00 2001
+From ffb0f72a67926c3053308cf03420bc0c36675d42 Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Fri, 10 Dec 2021 11:41:19 +0000
-Subject: [PATCH 3/9] armv8: Allow disabling exception vectors on non-SPL
- builds
+Subject: [PATCH] armv8: Allow disabling exception vectors on non-SPL builds
 
 On the BASER_FVP, U-Boot shares EL2 with another bootloader, so we do
 not wish to overide the exception vector, but we are also not using an
@@ -19,6 +18,7 @@ Upstream-Status: Inappropriate [other]
   Implementation pending further discussion
 Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
 Change-Id: I0cf0fc6d7ef4d45791411cf1f67c65e198cc8b2b
+
 ---
  arch/arm/cpu/armv8/Kconfig        | 10 ++++++++--
  arch/arm/cpu/armv8/Makefile       |  6 ++----
@@ -72,7 +72,7 @@ index 2e4bf9e038..001a31cae7 100644
  endif
  obj-y	+= tlb.o
 diff --git a/arch/arm/cpu/armv8/start.S b/arch/arm/cpu/armv8/start.S
-index 28f0df13f0..f831e77af3 100644
+index f3ea858577..7fad901336 100644
 --- a/arch/arm/cpu/armv8/start.S
 +++ b/arch/arm/cpu/armv8/start.S
 @@ -104,7 +104,7 @@ pie_skip_reloc:
@@ -102,6 +102,3 @@ index 495eb1dee3..683d983c36 100644
  # CONFIG_MMC is not set
  CONFIG_VIRTIO_MMIO=y
 +CONFIG_ARMV8_EXCEPTION_VECTORS=n
--- 
-2.25.1
-

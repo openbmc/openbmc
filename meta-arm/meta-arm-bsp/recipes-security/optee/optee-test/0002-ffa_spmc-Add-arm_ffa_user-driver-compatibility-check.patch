@@ -1,0 +1,160 @@
+From 717ff43f0d58e5f5a87893bd0cf3274a1e0164dc Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Fri, 3 Mar 2023 12:25:58 +0100
+Subject: [PATCH] ffa_spmc: Add arm_ffa_user driver compatibility check
+
+Check the version of the arm_ffa_user Kernel Driver and fail with a
+meaningful message if incompatible driver is detected.
+
+Upstream-Status: Backport
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+---
+ host/xtest/ffa_spmc_1000.c | 68 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 61 insertions(+), 7 deletions(-)
+
+diff --git a/host/xtest/ffa_spmc_1000.c b/host/xtest/ffa_spmc_1000.c
+index 15f4a468a775..1839d03f29be 100644
+--- a/host/xtest/ffa_spmc_1000.c
++++ b/host/xtest/ffa_spmc_1000.c
+@@ -1,11 +1,12 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+ /*
+- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+  */
+ #include <fcntl.h>
+ #include <ffa.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <errno.h>
+ #include <sys/ioctl.h>
+ #include <unistd.h>
+ #include "include/uapi/linux/arm_ffa_user.h"
+@@ -17,6 +18,10 @@
+ #define INCORRECT_ENDPOINT_ID 0xffff
+ #define NORMAL_WORLD_ENDPOINT_ID	0
+ 
++#define FFA_USER_REQ_VER_MAJOR 5
++#define FFA_USER_REQ_VER_MINOR 0
++#define FFA_USER_REQ_VER_PATCH 1
++
+ /* Get the 32 least significant bits of a handle.*/
+ #define MEM_SHARE_HANDLE_LOW(x) ((x) & 0xffffffff)
+ /* Get the 32 most significant bits of a handle.*/
+@@ -62,6 +67,50 @@ static struct ffa_ioctl_ep_desc test_endpoint3 = {
+ 	.uuid_ptr = (uint64_t)test_endpoint3_uuid,
+ };
+ 
++static bool check_ffa_user_version(void)
++{
++	FILE *f = NULL;
++	int ver_major = -1;
++	int ver_minor = -1;
++	int ver_patch = -1;
++	int scan_cnt = 0;
++
++	f = fopen("/sys/module/arm_ffa_user/version", "r");
++	if (f) {
++		scan_cnt = fscanf(f, "%d.%d.%d",
++				  &ver_major, &ver_minor, &ver_patch);
++		fclose(f);
++		if (scan_cnt != 3) {
++			printf("error: failed to parse arm_ffa_user version\n");
++			return false;
++		}
++	} else {
++		printf("error: failed to read arm_ffa_user module info - %s\n",
++		       strerror(errno));
++		return false;
++	}
++
++	if (ver_major != FFA_USER_REQ_VER_MAJOR)
++		goto err;
++
++	if (ver_minor < FFA_USER_REQ_VER_MINOR)
++		goto err;
++
++	if (ver_minor == FFA_USER_REQ_VER_MINOR)
++		if (ver_patch < FFA_USER_REQ_VER_PATCH)
++			goto err;
++
++	return true;
++
++err:
++	printf("error: Incompatible arm_ffa_user driver detected.");
++	printf("Found v%d.%d.%d wanted >= v%d.%d.%d)\n",
++	       ver_major, ver_minor, ver_patch, FFA_USER_REQ_VER_MAJOR,
++		   FFA_USER_REQ_VER_MINOR, FFA_USER_REQ_VER_PATCH);
++
++	return false;
++}
++
+ static void close_debugfs(void)
+ {
+ 	int err = 0;
+@@ -76,6 +125,9 @@ static void close_debugfs(void)
+ 
+ static bool init_sp_xtest(ADBG_Case_t *c)
+ {
++	if (!check_ffa_user_version())
++		return false;
++
+ 	if (ffa_fd < 0) {
+ 		ffa_fd = open(FFA_DRIVER_FS_PATH, O_RDWR);
+ 		if (ffa_fd < 0) {
+@@ -83,6 +135,7 @@ static bool init_sp_xtest(ADBG_Case_t *c)
+ 			return false;
+ 		}
+ 	}
++
+ 	return true;
+ }
+ 
+@@ -99,7 +152,7 @@ static uint16_t get_endpoint_id(uint64_t endp)
+ 	struct ffa_ioctl_ep_desc sid = { .uuid_ptr = endp };
+ 
+ 	/* Get ID of destination SP based on UUID */
+-	if(ioctl(ffa_fd, FFA_IOC_GET_PART_ID, &sid))
++	if (ioctl(ffa_fd, FFA_IOC_GET_PART_ID, &sid))
+ 		return INCORRECT_ENDPOINT_ID;
+ 
+ 	return sid.id;
+@@ -213,14 +266,15 @@ static int set_up_mem(struct ffa_ioctl_ep_desc *endp,
+ 	rc = share_mem(endpoint, handle);
+ 	ADBG_EXPECT_COMPARE_SIGNED(c, rc, ==, 0);
+ 
+-	if (!ADBG_EXPECT_TRUE(c, handle != NULL))
+-	     return TEEC_ERROR_GENERIC;
++	if (!ADBG_EXPECT_NOT_NULL(c, handle))
++		return TEEC_ERROR_GENERIC;
+ 
+ 	/* SP will retrieve the memory region. */
+ 	memset(args, 0, sizeof(*args));
+ 	args->dst_id = endpoint;
+ 	args->args[MEM_SHARE_HANDLE_LOW_INDEX] = MEM_SHARE_HANDLE_LOW(*handle);
+-	args->args[MEM_SHARE_HANDLE_HIGH_INDEX] = MEM_SHARE_HANDLE_HIGH(*handle);
++	args->args[MEM_SHARE_HANDLE_HIGH_INDEX] =
++		MEM_SHARE_HANDLE_HIGH(*handle);
+ 	args->args[MEM_SHARE_HANDLE_ENDPOINT_INDEX] = NORMAL_WORLD_ENDPOINT_ID;
+ 
+ 	rc = start_sp_test(endpoint, EP_RETRIEVE, args);
+@@ -254,7 +308,7 @@ static void xtest_ffa_spmc_test_1002(ADBG_Case_t *c)
+ 	rc = start_sp_test(endpoint1_id, EP_TEST_SP, &args);
+ 	ADBG_EXPECT_COMPARE_SIGNED(c, rc, ==, 0);
+ 	if (!ADBG_EXPECT_COMPARE_UNSIGNED(c, args.args[0], ==, SPMC_TEST_OK))
+-	     goto out;
++		goto out;
+ 
+ 	/* Set up memory and have the SP retrieve it. */
+ 	Do_ADBG_BeginSubCase(c, "Test memory set-up");
+@@ -469,7 +523,7 @@ static void xtest_ffa_spmc_test_1005(ADBG_Case_t *c)
+ 	memset(&args, 0, sizeof(args));
+ 	args.args[1] = endpoint2;
+ 	args.args[2] = endpoint3;
+-	rc = start_sp_test(endpoint1, EP_SP_MEM_SHARING_MULTI,&args);
++	rc = start_sp_test(endpoint1, EP_SP_MEM_SHARING_MULTI, &args);
+ 	ADBG_EXPECT_COMPARE_SIGNED(c, rc, ==, 0);
+ 	ADBG_EXPECT_COMPARE_UNSIGNED(c, args.args[0], ==, SPMC_TEST_OK);
+ 

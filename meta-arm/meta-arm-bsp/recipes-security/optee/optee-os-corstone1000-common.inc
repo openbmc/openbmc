@@ -1,9 +1,3 @@
-SRC_URI:remove = " \
-                  file://0003-core-link-add-no-warn-rwx-segments.patch \
-                  file://0007-core-spmc-handle-non-secure-interrupts.patch \
-                  file://0008-core-spmc-configure-SP-s-NS-interrupt-action-based-o.patch \
-                 "
-
 COMPATIBLE_MACHINE = "corstone1000"
 
 OPTEEMACHINE = "corstone1000"

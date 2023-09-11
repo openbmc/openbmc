@@ -1,4 +1,4 @@
-From 360aa32846a97e775750e06865d462c6258179fa Mon Sep 17 00:00:00 2001
+From fa7ab9b40babee29d2aadb267dfce7a96f8989d4 Mon Sep 17 00:00:00 2001
 From: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
 Date: Mon, 9 Jan 2023 13:59:06 +0000
 Subject: [PATCH] feat(corstone1000): bl2 loads fip based on metadata
@@ -15,7 +15,6 @@ image starts at fip partition + fip signature area size.
 
 Upstream-Status: Pending
 Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
-
 ---
  bl2/bl2_main.c                                |  4 +++
  .../corstone1000/common/corstone1000_plat.c   | 32 ++++++-------------
@@ -25,10 +24,10 @@ Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
  5 files changed, 24 insertions(+), 32 deletions(-)
 
 diff --git a/bl2/bl2_main.c b/bl2/bl2_main.c
-index 5da803795..f25dc3029 100644
+index ce83692e0ebc..1a9febc007b2 100644
 --- a/bl2/bl2_main.c
 +++ b/bl2/bl2_main.c
-@@ -86,6 +86,10 @@ void bl2_main(void)
+@@ -87,6 +87,10 @@ void bl2_main(void)
  	/* Perform remaining generic architectural setup in S-EL1 */
  	bl2_arch_setup();
  
@@ -40,7 +39,7 @@ index 5da803795..f25dc3029 100644
  	fwu_init();
  #endif /* PSA_FWU_SUPPORT */
 diff --git a/plat/arm/board/corstone1000/common/corstone1000_plat.c b/plat/arm/board/corstone1000/common/corstone1000_plat.c
-index 0235f8b84..7f9708a82 100644
+index 0235f8b8474c..7f9708a82489 100644
 --- a/plat/arm/board/corstone1000/common/corstone1000_plat.c
 +++ b/plat/arm/board/corstone1000/common/corstone1000_plat.c
 @@ -33,36 +33,17 @@ const mmap_region_t plat_arm_mmap[] = {
@@ -98,7 +97,7 @@ index 0235f8b84..7f9708a82 100644
   * is no power control present
   */
 diff --git a/plat/arm/board/corstone1000/common/include/platform_def.h b/plat/arm/board/corstone1000/common/include/platform_def.h
-index 584d485f3..0bfab05a4 100644
+index 584d485f3ea7..0bfab05a482b 100644
 --- a/plat/arm/board/corstone1000/common/include/platform_def.h
 +++ b/plat/arm/board/corstone1000/common/include/platform_def.h
 @@ -173,16 +173,16 @@
@@ -125,10 +124,10 @@ index 584d485f3..0bfab05a4 100644
  /*
   * Some data must be aligned on the biggest cache line size in the platform.
 diff --git a/tools/cert_create/Makefile b/tools/cert_create/Makefile
-index ca548b836..32b5486a0 100644
+index 042e844626bd..45b76a022f91 100644
 --- a/tools/cert_create/Makefile
 +++ b/tools/cert_create/Makefile
-@@ -69,8 +69,8 @@ INC_DIR += -I ./include -I ${PLAT_INCLUDE} -I ${OPENSSL_DIR}/include
+@@ -78,8 +78,8 @@ INC_DIR += -I ./include -I ${PLAT_INCLUDE} -I ${OPENSSL_DIR}/include
  # directory. However, for a local build of OpenSSL, the built binaries are
  # located under the main project directory (i.e.: ${OPENSSL_DIR}, not
  # ${OPENSSL_DIR}/lib/).
@@ -140,10 +139,10 @@ index ca548b836..32b5486a0 100644
  HOSTCC ?= gcc
  
 diff --git a/tools/fiptool/Makefile b/tools/fiptool/Makefile
-index e6aeba95b..7c047479e 100644
+index 2ebee33931ba..dcfd314bee89 100644
 --- a/tools/fiptool/Makefile
 +++ b/tools/fiptool/Makefile
-@@ -29,7 +29,7 @@ endif
+@@ -39,7 +39,7 @@ HOSTCCFLAGS += -DUSING_OPENSSL3=$(USING_OPENSSL3)
  # directory. However, for a local build of OpenSSL, the built binaries are
  # located under the main project directory (i.e.: ${OPENSSL_DIR}, not
  # ${OPENSSL_DIR}/lib/).
@@ -152,7 +151,7 @@ index e6aeba95b..7c047479e 100644
  
  ifeq (${V},0)
    Q := @
-@@ -37,7 +37,7 @@ else
+@@ -47,7 +47,7 @@ else
    Q :=
  endif
  
@@ -161,6 +160,3 @@ index e6aeba95b..7c047479e 100644
  
  HOSTCC ?= gcc
  
--- 
-2.25.1
-

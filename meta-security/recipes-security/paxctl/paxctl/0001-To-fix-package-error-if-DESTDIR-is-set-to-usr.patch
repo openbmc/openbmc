@@ -1,0 +1,26 @@
+From 824c5d7b96aeef1b4e182f657ac002bed6e14cd5 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Thu, 31 Aug 2023 08:20:56 +0000
+Subject: [PATCH] To fix package error if DESTDIR is set to /usr.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 0d7bc0c..46fd664 100644
+--- a/Makefile
++++ b/Makefile
+@@ -19,7 +19,7 @@ $(PROG).o: $(PROG).c $(PROG).h $(PROG)-elf.c
+
+ install: $(PROG)
+ #	$(MKDIR) $(DESTDIR)/sbin $(DESTDIR)$(MANDIR)
+-	$(INSTALL) -D --owner 0 --group 0 --mode a=rx $(PROG) $(DESTDIR)/sbin/$(PROG)
++	$(INSTALL) -D --owner 0 --group 0 --mode a=rx $(PROG) $(DESTDIR)/usr/sbin/$(PROG)
+	$(INSTALL) -D --owner 0 --group 0 --mode a=r $(PROG).1 $(DESTDIR)/$(MANDIR)/$(PROG).1
+
+ clean:
+--
+2.34.1

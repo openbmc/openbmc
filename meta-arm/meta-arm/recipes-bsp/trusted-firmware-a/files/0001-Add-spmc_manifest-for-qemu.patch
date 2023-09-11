@@ -1,0 +1,64 @@
+From 56874ab381b0f0beade2d200147245e157b4aff6 Mon Sep 17 00:00:00 2001
+From: Gyorgy Szing <Gyorgy.Szing@arm.com>
+Date: Mon, 13 Mar 2023 21:15:59 +0100
+Subject: [PATCH] Add spmc_manifest for qemu
+
+This version only supports embedded packaging.
+
+Upstream-Status: Inappropriate [other]
+  - The SPMC manifest is integration specific and should live at an
+    integration spcific place. The manifest file is processed by TF-A
+    and I am adding the patch to TF-A to keep things simple.
+
+Signed-off-by: Gyorgy Szing <Gyorgy.Szing@arm.com>
+---
+ plat/qemu/fdts/optee_spmc_manifest.dts | 40 ++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+ create mode 100644 plat/qemu/fdts/optee_spmc_manifest.dts
+
+diff --git a/plat/qemu/fdts/optee_spmc_manifest.dts b/plat/qemu/fdts/optee_spmc_manifest.dts
+new file mode 100644
+index 000000000000..ae2ae3d951de
+--- /dev/null
++++ b/plat/qemu/fdts/optee_spmc_manifest.dts
+@@ -0,0 +1,40 @@
++/* SPDX-License-Identifier: BSD-3-Clause */
++/*
++ * Copyright (c) 2023, Arm Limited. All rights reserved.
++ */
++
++/dts-v1/;
++
++/ {
++	compatible = "arm,ffa-core-manifest-1.0";
++	#address-cells = <2>;
++	#size-cells = <1>;
++
++	attribute {
++		spmc_id = <0x8000>;
++		maj_ver = <0x1>;
++		min_ver = <0x0>;
++		exec_state = <0x0>;
++		load_address = <0x0 0x0e100000>;
++		entrypoint = <0x0 0x0e100000>;
++		binary_size = <0x80000>;
++	};
++
++/*
++ * This file will be preprocessed by TF-A's build system. If Measured Boot is
++ * enabled in TF-A's config, the build system will add the MEASURED_BOOT=1 macro
++ * to the preprocessor arguments.
++ */
++#if MEASURED_BOOT
++	tpm_event_log {
++		compatible = "arm,tpm_event_log";
++		tpm_event_log_addr = <0x0 0x0>;
++		tpm_event_log_size = <0x0>;
++	};
++#endif
++
++/* If the ARM_BL2_SP_LIST_DTS is defined, SPs should be loaded from FIP */
++#ifdef ARM_BL2_SP_LIST_DTS
++	#error "FIP SP load addresses configuration is missing.
++#endif
++};

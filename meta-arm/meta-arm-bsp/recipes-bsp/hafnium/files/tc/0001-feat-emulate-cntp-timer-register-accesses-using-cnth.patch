@@ -1,4 +1,4 @@
-From f526797b83113cc64e3e658c22d8a5d269896a2a Mon Sep 17 00:00:00 2001
+From 3bc797e097ef2b29acf36560e4d2bfeec31f8d81 Mon Sep 17 00:00:00 2001
 From: Ben Horgan <ben.horgan@arm.com>
 Date: Fri, 4 Mar 2022 16:48:14 +0000
 Subject: [PATCH] feat: emulate cntp timer register accesses using cnthps
@@ -19,7 +19,7 @@ Change-Id: I67508203273baf3bd8e6be2d99717028db945715
  create mode 100644 src/arch/aarch64/hypervisor/timer_el1.h
 
 diff --git a/Makefile b/Makefile
-index 95cab9a5..21cca938 100644
+index 95cab9a56bfd..21cca938531d 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -60,7 +60,8 @@ CHECKPATCH := $(CURDIR)/third_party/linux/scripts/checkpatch.pl \
@@ -33,7 +33,7 @@ index 95cab9a5..21cca938 100644
  OUT ?= out/$(PROJECT)
  OUT_DIR = out/$(PROJECT)
 diff --git a/src/arch/aarch64/hypervisor/BUILD.gn b/src/arch/aarch64/hypervisor/BUILD.gn
-index 6068d1e8..de1a414d 100644
+index 6068d1e8f075..de1a414dac68 100644
 --- a/src/arch/aarch64/hypervisor/BUILD.gn
 +++ b/src/arch/aarch64/hypervisor/BUILD.gn
 @@ -45,6 +45,7 @@ source_set("hypervisor") {
@@ -45,7 +45,7 @@ index 6068d1e8..de1a414d 100644
    ]
  
 diff --git a/src/arch/aarch64/hypervisor/cpu.c b/src/arch/aarch64/hypervisor/cpu.c
-index bcf5ffce..d2df77d8 100644
+index 5e025b596674..edd5df134cfc 100644
 --- a/src/arch/aarch64/hypervisor/cpu.c
 +++ b/src/arch/aarch64/hypervisor/cpu.c
 @@ -98,13 +98,20 @@ void arch_regs_reset(struct vcpu *vcpu)
@@ -72,7 +72,7 @@ index bcf5ffce..d2df77d8 100644
  	}
  
 diff --git a/src/arch/aarch64/hypervisor/handler.c b/src/arch/aarch64/hypervisor/handler.c
-index 4bd8a3b4..4c1b6e48 100644
+index 3422ff7b8265..c495df40f3f5 100644
 --- a/src/arch/aarch64/hypervisor/handler.c
 +++ b/src/arch/aarch64/hypervisor/handler.c
 @@ -34,6 +34,7 @@
@@ -83,8 +83,8 @@ index 4bd8a3b4..4c1b6e48 100644
  
  /**
   * Hypervisor Fault Address Register Non-Secure.
-@@ -1277,6 +1278,11 @@ void handle_system_register_access(uintreg_t esr_el2)
- 			inject_el1_unknown_exception(vcpu, esr_el2);
+@@ -1295,6 +1296,11 @@ void handle_system_register_access(uintreg_t esr_el2)
+ 			inject_el1_sysreg_trap_exception(vcpu, esr_el2);
  			return;
  		}
 +	} else if (timer_el1_is_register_access(esr_el2)) {
@@ -93,11 +93,11 @@ index 4bd8a3b4..4c1b6e48 100644
 +			return;
 +		}
  	} else {
- 		inject_el1_unknown_exception(vcpu, esr_el2);
+ 		inject_el1_sysreg_trap_exception(vcpu, esr_el2);
  		return;
 diff --git a/src/arch/aarch64/hypervisor/timer_el1.c b/src/arch/aarch64/hypervisor/timer_el1.c
 new file mode 100644
-index 00000000..c30e5543
+index 000000000000..c30e5543f436
 --- /dev/null
 +++ b/src/arch/aarch64/hypervisor/timer_el1.c
 @@ -0,0 +1,104 @@
@@ -207,7 +207,7 @@ index 00000000..c30e5543
 +}
 diff --git a/src/arch/aarch64/hypervisor/timer_el1.h b/src/arch/aarch64/hypervisor/timer_el1.h
 new file mode 100644
-index 00000000..04a43b6c
+index 000000000000..04a43b6ca335
 --- /dev/null
 +++ b/src/arch/aarch64/hypervisor/timer_el1.h
 @@ -0,0 +1,20 @@
@@ -232,10 +232,10 @@ index 00000000..04a43b6c
 +bool timer_el1_process_access(struct vcpu *vcpu, ffa_vm_id_t vm_id,
 +			      uintreg_t esr);
 diff --git a/src/arch/aarch64/msr.h b/src/arch/aarch64/msr.h
-index cd6778b4..55e78330 100644
+index 6edc39f2af48..bf1a66d1d4c5 100644
 --- a/src/arch/aarch64/msr.h
 +++ b/src/arch/aarch64/msr.h
-@@ -126,3 +126,11 @@
+@@ -131,3 +131,11 @@
  #define MSR_ELR_EL12 S3_5_C4_C0_1
  
  #endif
@@ -247,4 +247,3 @@ index cd6778b4..55e78330 100644
 +#define MSR_CNTHPS_CTL_EL2 S3_4_C14_C5_1
 +#define MSR_CNTHPS_CVAL_EL2 S3_4_C14_C5_2
 +#define MSR_CNTHPS_TVAL_EL2 S3_4_C14_C5_0
-

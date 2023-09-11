@@ -1,7 +1,7 @@
-From 181f5efb401ffaa5ab0898b07a976796f75e502a Mon Sep 17 00:00:00 2001
+From 5b42322cb57692dbea7d2c39fd8769b6f0f6b7af Mon Sep 17 00:00:00 2001
 From: Qi Feng <qi.feng@arm.com>
 Date: Tue, 26 Jul 2022 18:13:23 +0800
-Subject: [PATCH 2/9] vexpress64: add MPU memory map for the BASER_FVP
+Subject: [PATCH] vexpress64: add MPU memory map for the BASER_FVP
 
 The previous patch added support for initializing an Armv8 MPU. There is only an
 MPU at S-EL2 on the BASER_FVP, so add a platform-specific MPU memory map.
@@ -12,6 +12,7 @@ Upstream-Status: Inappropriate [other]
   Implementation pending further discussion
 Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
 Signed-off-by: Qi Feng <qi.feng@arm.com>
+
 ---
  board/armltd/vexpress64/vexpress64.c | 22 ++++++++++++++++++++++
  1 file changed, 22 insertions(+)
@@ -56,6 +57,3 @@ index af326dc6f4..2310d18eb7 100644
  static struct mm_region vexpress64_mem_map[] = {
  	{
  		.virt = V2M_PA_BASE,
--- 
-2.25.1
-

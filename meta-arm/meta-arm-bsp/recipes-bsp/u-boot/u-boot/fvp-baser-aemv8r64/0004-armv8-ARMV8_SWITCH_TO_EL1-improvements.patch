@@ -1,7 +1,7 @@
-From 30405f59881c73946b6b0ffdbf25804f9fbf1585 Mon Sep 17 00:00:00 2001
+From 14e204ffca5870d6bfd238627937a2028c88589d Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Wed, 14 Jul 2021 12:44:27 +0100
-Subject: [PATCH 4/9] armv8: ARMV8_SWITCH_TO_EL1 improvements
+Subject: [PATCH] armv8: ARMV8_SWITCH_TO_EL1 improvements
 
 Convert CONFIG_ARMV8_SWITCH_TO_EL1 to a Kconfig variable.
 
@@ -16,6 +16,7 @@ Upstream-Status: Inappropriate [other]
   Implementation pending further discussion
 Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
 Change-Id: If98478148d6d8d1f732acac5439276700614815f
+
 ---
  arch/arm/cpu/armv8/exception_level.c | 21 ++++++++++++++--
  arch/arm/lib/bootm.c                 | 36 ++++++++++++++++------------
@@ -66,7 +67,7 @@ index b11936548f..4aad1550f4 100644
  	}
  }
 diff --git a/arch/arm/lib/bootm.c b/arch/arm/lib/bootm.c
-index 9f086f3b90..b044aeca88 100644
+index e414ef8267..9a86c17d2a 100644
 --- a/arch/arm/lib/bootm.c
 +++ b/arch/arm/lib/bootm.c
 @@ -270,7 +270,6 @@ __weak void update_os_arch_secondary_cores(uint8_t os_arch)
@@ -84,8 +85,8 @@ index 9f086f3b90..b044aeca88 100644
 -#endif
  
  /* Subcommand: GO */
- static void boot_jump_linux(bootm_headers_t *images, int flag)
-@@ -312,21 +310,29 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
+ static void boot_jump_linux(struct bootm_headers *images, int flag)
+@@ -312,21 +310,29 @@ static void boot_jump_linux(struct bootm_headers *images, int flag)
  
  		update_os_arch_secondary_cores(images->os.arch);
  
@@ -137,6 +138,3 @@ index 683d983c36..6044f82b00 100644
  CONFIG_VIRTIO_MMIO=y
  CONFIG_ARMV8_EXCEPTION_VECTORS=n
 +CONFIG_ARMV8_SWITCH_TO_EL1=y
--- 
-2.25.1
-

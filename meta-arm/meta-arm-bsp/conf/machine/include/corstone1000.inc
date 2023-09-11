@@ -5,6 +5,8 @@ MACHINEOVERRIDES =. "corstone1000:"
 # TF-A
 TFA_PLATFORM = "corstone1000"
 EXTRA_IMAGEDEPENDS += "trusted-firmware-a"
+PREFERRED_VERSION_trusted-firmware-a ?= "2.9.%"
+PREFERRED_VERSION_tf-a-tests ?= "2.8.%"
 
 TFA_BL2_BINARY = "bl2-corstone1000.bin"
 TFA_FIP_BINARY = "fip-corstone1000.bin"
@@ -34,8 +36,8 @@ UBOOT_ARCH = "arm"
 UBOOT_EXTLINUX = "0"
 
 #optee
-PREFERRED_VERSION_optee-os ?= "3.20.%"
-PREFERRED_VERSION_optee-client ?= "3.18.%"
+PREFERRED_VERSION_optee-os ?= "3.22%"
+PREFERRED_VERSION_optee-client ?= "3.22%"
 EXTRA_IMAGEDEPENDS += "optee-os"
 OPTEE_ARCH = "arm64"
 OPTEE_BINARY = "tee-pager_v2.bin"

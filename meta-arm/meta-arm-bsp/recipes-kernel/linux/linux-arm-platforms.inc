@@ -20,13 +20,6 @@ SRC_URI:append:n1sdp = " ${SRC_URI_KMETA}"
 SRCREV:arm-platforms-kmeta = "6147e82375aa9df8f2a162d42ea6406c79c854c5"
 
 #
-# Corstone-500 KMACHINE
-#
-COMPATIBLE_MACHINE:corstone500 = "corstone500"
-KBUILD_DEFCONFIG:corstone500  = "multi_v7_defconfig"
-KCONFIG_MODE:corstone500 = "--alldefconfig"
-
-#
 # Corstone1000 KMACHINE
 #
 FILESEXTRAPATHS:prepend:corstone1000 := "${ARMBSPFILESPATHS}"
@@ -77,12 +70,6 @@ SRC_URI:append:fvp-baser-aemv8r64 = " file://fvp-baser-aemv8r64.dts;subdir=git/a
 #
 COMPATIBLE_MACHINE:juno = "juno"
 FILESEXTRAPATHS:prepend:juno := "${ARMBSPFILESPATHS}"
-SRC_URI:append:juno = " \
-    file://0001-arm64-dts-Update-cache-properties-for-Arm-Ltd-platfo.patch \
-    file://0002-arm64-dts-fvp-Add-SPE-to-Foundation-FVP.patch \
-    file://0003-arm64-dts-fvp-Add-information-about-L1-and-L2-caches.patch \
-    file://0004-ARM-dts-vexpress-align-LED-node-names-with-dtschema.patch \
-    "
 
 #
 # Musca B1/S2 can't run Linux

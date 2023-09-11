@@ -1,0 +1,34 @@
+From 53642dc98630b9c725977ab935c5bdd9c401e1aa Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Sat, 15 Jul 2023 15:08:43 -0400
+Subject: [PATCH] xtest: regression_1000: remove unneeded stat.h include
+
+Hack to work around musl compile error:
+ In file included from optee-test/3.17.0-r0/recipe-sysroot/usr/include/sys/stat.h:23,
+                  from optee-test/3.17.0-r0/git/host/xtest/regression_1000.c:25:
+ optee-test/3.17.0-r0/recipe-sysroot/usr/include/bits/stat.h:17:26: error: expected identifier or '(' before '[' token
+    17 |         unsigned __unused[2];
+       |                          ^
+
+stat.h is not needed, since it is not being used in this file.  So removing it.
+
+Upstream-Status: Backport
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Reviewed-by: Jerome Forissier <jerome.forissier@linaro.org>
+Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+---
+ host/xtest/regression_1000.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/host/xtest/regression_1000.c b/host/xtest/regression_1000.c
+index de32c4184fd8..25b4721cdc45 100644
+--- a/host/xtest/regression_1000.c
++++ b/host/xtest/regression_1000.c
+@@ -22,7 +22,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <sys/stat.h>
+ #include <sys/types.h>
+ #include <ta_arm_bti.h>
+ #include <ta_concurrent.h>

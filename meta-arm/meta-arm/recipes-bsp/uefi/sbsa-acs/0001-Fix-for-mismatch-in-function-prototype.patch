@@ -1,0 +1,31 @@
+From 42cc39fdea21177e82b6cec138c06726242673f7 Mon Sep 17 00:00:00 2001
+From: Srikar Josyula <srikar.josyula@arm.com>
+Date: Tue, 25 Jul 2023 12:55:04 +0530
+Subject: [PATCH] Fix for mismatch in function prototype
+
+ - Mismatch between function prototype and definition
+   causing build failure with GCC 13.1.1
+ - Fixed the function prototype for val_get_exerciser_err_info
+
+Signed-off-by: Srikar Josyula <srikar.josyula@arm.com>
+
+Upstream-Status: Backport
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+
+---
+ val/include/sbsa_avs_exerciser.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/val/include/sbsa_avs_exerciser.h b/val/include/sbsa_avs_exerciser.h
+index 4b2c62b089f5..7c0e3d0fb58f 100644
+--- a/val/include/sbsa_avs_exerciser.h
++++ b/val/include/sbsa_avs_exerciser.h
+@@ -118,7 +118,7 @@ uint32_t val_exerciser_ops(EXERCISER_OPS ops, uint64_t param, uint32_t instance)
+ uint32_t val_exerciser_get_data(EXERCISER_DATA_TYPE type, exerciser_data_t *data, uint32_t instance);
+ uint32_t val_exerciser_execute_tests(uint32_t level);
+ uint32_t val_exerciser_get_bdf(uint32_t instance);
+-uint32_t val_get_exerciser_err_info(uint32_t type);
++uint32_t val_get_exerciser_err_info(EXERCISER_ERROR_CODE type);
+ 
+ uint32_t e001_entry(void);
+ uint32_t e002_entry(void);

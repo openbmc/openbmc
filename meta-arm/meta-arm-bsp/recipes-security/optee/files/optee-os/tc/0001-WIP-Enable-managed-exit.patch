@@ -1,7 +1,7 @@
-From 34db1357ab3192f18629ceadf4ea33b948513fec Mon Sep 17 00:00:00 2001
+From f449f6fdcbd987e18a26f0daeccfa447fe76821a Mon Sep 17 00:00:00 2001
 From: Olivier Deprez <olivier.deprez@arm.com>
 Date: Mon, 16 Nov 2020 10:14:02 +0100
-Subject: [PATCH 1/2] WIP: Enable managed exit
+Subject: [PATCH] WIP: Enable managed exit
 
 This change declares OP-TEE SP as supporting managed exit in response to
 a NS interrupt triggering while the SWd runs.
@@ -23,6 +23,7 @@ Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
 
 Upstream-Status: Pending [Not submitted to upstream yet]
 Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
+
 ---
  core/arch/arm/kernel/boot.c                          | 12 ++++++++++++
  core/arch/arm/kernel/thread_a64.S                    | 11 ++++++++++-
@@ -31,10 +32,10 @@ Signed-off-by: Arunachalam Ganapathy <arunachalam.ganapathy@arm.com>
  4 files changed, 34 insertions(+), 1 deletion(-)
 
 diff --git a/core/arch/arm/kernel/boot.c b/core/arch/arm/kernel/boot.c
-index f173384d..466c042e 100644
+index dd34173e8..7d2ac74e8 100644
 --- a/core/arch/arm/kernel/boot.c
 +++ b/core/arch/arm/kernel/boot.c
-@@ -1350,6 +1350,18 @@ static void init_secondary_helper(unsigned long nsec_entry)
+@@ -1424,6 +1424,18 @@ static void init_secondary_helper(unsigned long nsec_entry)
  	init_vfp_sec();
  	init_vfp_nsec();
  
@@ -54,10 +55,10 @@ index f173384d..466c042e 100644
  }
  
 diff --git a/core/arch/arm/kernel/thread_a64.S b/core/arch/arm/kernel/thread_a64.S
-index d6baee4d..1b0c8f37 100644
+index 4fa97de24..4facc7631 100644
 --- a/core/arch/arm/kernel/thread_a64.S
 +++ b/core/arch/arm/kernel/thread_a64.S
-@@ -1087,6 +1087,14 @@ END_FUNC el0_sync_abort
+@@ -1162,6 +1162,14 @@ END_FUNC el0_sync_abort
  	bl	dcache_op_louis
  	ic	iallu
  #endif
@@ -72,7 +73,7 @@ index d6baee4d..1b0c8f37 100644
  	/*
  	 * Mark current thread as suspended
  	 */
-@@ -1204,8 +1212,9 @@ LOCAL_FUNC elx_irq , :
+@@ -1318,8 +1326,9 @@ LOCAL_FUNC elx_irq , :
  #endif
  END_FUNC elx_irq
  
@@ -84,10 +85,10 @@ index d6baee4d..1b0c8f37 100644
  #else
  	native_intr_handler	fiq
 diff --git a/core/arch/arm/kernel/thread_spmc.c b/core/arch/arm/kernel/thread_spmc.c
-index ea9e8f03..15577e7e 100644
+index 3b4ac0b4e..8f7c18dfa 100644
 --- a/core/arch/arm/kernel/thread_spmc.c
 +++ b/core/arch/arm/kernel/thread_spmc.c
-@@ -1518,6 +1518,17 @@ static TEE_Result spmc_init(void)
+@@ -1517,6 +1517,17 @@ static TEE_Result spmc_init(void)
  	my_endpoint_id = spmc_get_id();
  	DMSG("My endpoint ID %#x", my_endpoint_id);
  
@@ -106,7 +107,7 @@ index ea9e8f03..15577e7e 100644
  }
  #endif /* !defined(CFG_CORE_SEL1_SPMC) */
 diff --git a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
-index 0bfe33f3..00cfa5b2 100644
+index 3ebbaddc8..56e69f372 100644
 --- a/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
 +++ b/core/arch/arm/plat-totalcompute/fdts/optee_sp_manifest.dts
 @@ -24,6 +24,7 @@
@@ -117,6 +118,3 @@ index 0bfe33f3..00cfa5b2 100644
  
  	device-regions {
  		compatible = "arm,ffa-manifest-device-regions";
--- 
-2.34.1
-

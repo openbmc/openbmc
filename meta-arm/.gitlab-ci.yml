@@ -104,14 +104,6 @@ update-repos:
 #  VIRT: [none, xen]
 #  TESTING: testimage
 
-corstone500:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: testimage
-  tags:
-    - x86_64
-
 corstone1000-fvp:
   extends: .build
   parallel:
@@ -162,6 +154,7 @@ n1sdp:
   parallel:
     matrix:
       - TS: [none, n1sdp-ts]
+      - OPTEE: [none, n1sdp-optee]
 
 qemu-generic-arm64:
   extends: .build

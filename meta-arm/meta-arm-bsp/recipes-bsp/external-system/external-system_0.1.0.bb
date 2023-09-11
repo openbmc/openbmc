@@ -9,11 +9,12 @@ LIC_FILES_CHKSUM = "file://license.md;md5=e44b2531cd6ffe9dece394dbe988d9a0 \
                     file://cmsis/LICENSE.txt;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 SRC_URI = "gitsm://git.gitlab.arm.com/arm-reference-solutions/corstone1000/external_system/rtx.git;protocol=https;branch=master \
-           file://race.patch"
+           file://0001-tools-gen_module_code-atomically-rewrite-the-generat.patch"
 SRCREV = "8c9dca74b104ff6c9722fb0738ba93dd3719c080"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 COMPATIBLE_MACHINE = "(corstone1000)"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # PRODUCT is passed to the Makefile to specify the platform to be used.
 PRODUCT = "corstone-1000"

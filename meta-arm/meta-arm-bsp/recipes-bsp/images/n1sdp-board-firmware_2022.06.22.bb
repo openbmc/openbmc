@@ -14,7 +14,7 @@ COMPATIBLE_MACHINE = "n1sdp"
 SRC_URI = "git://git.gitlab.arm.com/arm-reference-solutions/board-firmware.git;protocol=https;branch=n1sdp"
 
 SRCREV = "70ba494265eee76747faff38264860c19e214540"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 S = "${WORKDIR}/git"
 

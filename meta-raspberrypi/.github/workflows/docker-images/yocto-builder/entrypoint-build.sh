@@ -42,7 +42,9 @@ printf "\n# ------ ci ------\n" >> conf/local.conf
 cat <<EOCONF >>conf/local.conf
 BB_NUMBER_THREADS = "6"
 PARALLEL_MAKE = "-j 6"
-DISTRO_FEATURES:append = " systemd"
+# unmerged-usr is deprecated
+# https://lore.kernel.org/all/3f2f03085301d22854e5429019fb010f27d98bc7.camel@linuxfoundation.org/t/
+DISTRO_FEATURES:append = " systemd usrmerge"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 DISTRO_FEATURES_BACKFILL_CONSIDERED:append = " sysvinit"
 VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"

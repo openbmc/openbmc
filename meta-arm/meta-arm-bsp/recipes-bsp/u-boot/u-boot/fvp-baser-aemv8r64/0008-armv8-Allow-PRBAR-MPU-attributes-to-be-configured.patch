@@ -1,7 +1,7 @@
-From 01490ab8deb0f0b61eeb55a02ee5ea430cfe7eee Mon Sep 17 00:00:00 2001
+From 665ab8253a0e3e17db54a1682bbee0f5659939a2 Mon Sep 17 00:00:00 2001
 From: Peter Hoyes <Peter.Hoyes@arm.com>
 Date: Wed, 18 May 2022 15:24:19 +0100
-Subject: [PATCH 8/9] armv8: Allow PRBAR MPU attributes to be configured
+Subject: [PATCH] armv8: Allow PRBAR MPU attributes to be configured
 
 In a previous patch, support was added to initialize an S-EL2 MPU on
 armv8r64 machines. This implementation allowed the PRLAR attribute
@@ -21,6 +21,7 @@ Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
 Upstream-Status: Inappropriate [other]
   Implementation pending further discussion
 Change-Id: I6b72aead91ad12412262aa32c61a53e12eab3984
+
 ---
  arch/arm/cpu/armv8/cache_v8.c        | 12 ++++++++----
  arch/arm/include/asm/armv8/mpu.h     |  3 ++-
@@ -28,7 +29,7 @@ Change-Id: I6b72aead91ad12412262aa32c61a53e12eab3984
  3 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm/cpu/armv8/cache_v8.c b/arch/arm/cpu/armv8/cache_v8.c
-index 798aed8058..e336339281 100644
+index 8611a35eb3..f7de952187 100644
 --- a/arch/arm/cpu/armv8/cache_v8.c
 +++ b/arch/arm/cpu/armv8/cache_v8.c
 @@ -390,7 +390,9 @@ static void mpu_clear_regions(void)
@@ -100,6 +101,3 @@ index 2310d18eb7..531fa4d618 100644
  	}, {
  		/* List terminator */
  		0,
--- 
-2.25.1
-
