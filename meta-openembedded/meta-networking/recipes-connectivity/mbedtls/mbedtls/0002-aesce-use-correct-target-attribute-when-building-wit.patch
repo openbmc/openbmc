@@ -9,7 +9,7 @@ the needed instructions instead of the broad crypto feature.
 
 E.g.: https://github.com/llvm/llvm-project/issues/61645
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://github.com/Mbed-TLS/mbedtls/commit/aa4f6219014d863bed51453e5261178adc66be34]
 
 Signed-off-by: Beniamin Sandu <beniaminsandu@gmail.com>
 ---

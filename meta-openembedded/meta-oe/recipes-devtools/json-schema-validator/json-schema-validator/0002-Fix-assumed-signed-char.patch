@@ -1,0 +1,71 @@
+From 2065015da40cf79dd8ec9e3f186538e17c3b592f Mon Sep 17 00:00:00 2001
+From: Robert Joslyn <robert.joslyn@redrectangle.org>
+Date: Wed, 30 Nov 2022 13:07:29 -0800
+Subject: [PATCH 2/3] Fix assumed signed char
+
+The code assumes that char is signed, but whether char is signed or
+unsigned is implementation defined. On some architectures like PowerPC,
+GCC treats char as unsigned resulting in compile errors:
+
+	smtp-address-validator.cpp:213:1: error: narrowing conversion of '-32' from 'int' to 'char' [-Wnarrowing]
+
+Fix this by specifying signed char.
+
+Upstream-Status: Accepted [https://github.com/pboettch/json-schema-validator/commit/491ac44026e08f31790f5cacffa62e168bb35e32]
+
+Signed-off-by: Parian Golchin <Parian.Golchin@iris-sensing.com>
+---
+ src/smtp-address-validator.cpp | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/smtp-address-validator.cpp b/src/smtp-address-validator.cpp
+index a63ead0..3903b51 100644
+--- a/src/smtp-address-validator.cpp
++++ b/src/smtp-address-validator.cpp
+@@ -63,7 +63,7 @@ static const short _address_key_offsets[] = {
+ 	1363, 1365, 1367, 1368, 1370, 1388, 0
+ };
+ 
+-static const char _address_trans_keys[] = {
++static const signed char _address_trans_keys[] = {
+ 	-32, -19, -16, -12, 34, 45, 61, 63,
+ 	-62, -33, -31, -17, -15, -13, 33, 39,
+ 	42, 43, 47, 57, 65, 90, 94, 126,
+@@ -711,7 +711,7 @@ bool is_address(const char* p, const char* pe)
+ 	{
+ 		int _klen;
+ 		unsigned int _trans = 0;
+-		const char * _keys;
++		const signed char * _keys;
+ 		const signed char * _acts;
+ 		unsigned int _nacts;
+ 		_resume: {}
+@@ -728,9 +728,9 @@ bool is_address(const char* p, const char* pe)
+ 			
+ 			_klen = (int)_address_single_lengths[cs];
+ 			if ( _klen > 0 ) {
+-				const char *_lower = _keys;
+-				const char *_upper = _keys + _klen - 1;
+-				const char *_mid;
++				const signed char *_lower = _keys;
++				const signed char *_upper = _keys + _klen - 1;
++				const signed char *_mid;
+ 				while ( 1 ) {
+ 					if ( _upper < _lower ) {
+ 						_keys += _klen;
+@@ -752,9 +752,9 @@ bool is_address(const char* p, const char* pe)
+ 			
+ 			_klen = (int)_address_range_lengths[cs];
+ 			if ( _klen > 0 ) {
+-				const char *_lower = _keys;
+-				const char *_upper = _keys + (_klen<<1) - 2;
+-				const char *_mid;
++				const signed char *_lower = _keys;
++				const signed char *_upper = _keys + (_klen<<1) - 2;
++				const signed char *_mid;
+ 				while ( 1 ) {
+ 					if ( _upper < _lower ) {
+ 						_trans += (unsigned int)_klen;
+-- 
+2.25.1
+

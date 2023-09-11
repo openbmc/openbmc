@@ -1,0 +1,28 @@
+From 123b5a4c5e09f4262d4545a0bc5edb01a19b6b76 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 21 Aug 2023 10:06:55 +0200
+Subject: [PATCH] meson.build: allow crosscompiling gir
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 39b739e..46f2252 100644
+--- a/meson.build
++++ b/meson.build
+@@ -29,7 +29,7 @@ libosinfo_pkgconfdir = join_paths(libosinfo_libdir, 'pkgconfig')
+ 
+ # gobject introspection
+ gir = find_program('g-ir-scanner', required: get_option('enable-introspection'))
+-enable_introspection = gir.found() and not meson.is_cross_build()
++enable_introspection = gir.found()
+ 
+ # vala
+ vapi_opt = get_option('enable-vala')
+-- 
+2.41.0
+

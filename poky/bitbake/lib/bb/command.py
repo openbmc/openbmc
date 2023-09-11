@@ -65,7 +65,7 @@ class Command:
         command = commandline.pop(0)
 
         # Ensure cooker is ready for commands
-        if command != "updateConfig" and command != "setFeatures":
+        if command not in ["updateConfig", "setFeatures", "ping"]:
             try:
                 self.cooker.init_configdata()
                 if not self.remotedatastores:
@@ -85,7 +85,8 @@ class Command:
                 if not hasattr(command_method, 'readonly') or not getattr(command_method, 'readonly'):
                     return None, "Not able to execute not readonly commands in readonly mode"
             try:
-                self.cooker.process_inotify_updates_apply()
+                if command != "ping":
+                    self.cooker.process_inotify_updates_apply()
                 if getattr(command_method, 'needconfig', True):
                     self.cooker.updateCacheSync()
                 result = command_method(self, commandline)
@@ -169,6 +170,8 @@ class CommandsSync:
         Allow a UI to check the server is still alive
         """
         return "Still alive!"
+    ping.needconfig = False
+    ping.readonly = True
 
     def stateShutdown(self, command, params):
         """

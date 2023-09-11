@@ -1,0 +1,29 @@
+From 46490e95151d415cd22f02565e530eb5efcef680 Mon Sep 17 00:00:00 2001
+From: Asger Hautop Drewsen <asger@princh.com>
+Date: Mon, 9 Aug 2021 14:25:08 +0200
+Subject: [PATCH] Fix avahi-browse: Invalid service type
+
+Invalid service types will stop the browse from completing, or
+in simple terms "my washing machine stops me from printing".
+
+Upstream-Status: Submitted [https://github.com/lathiat/avahi/pull/472]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ avahi-core/browse-service.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/avahi-core/browse-service.c b/avahi-core/browse-service.c
+index 63e0275a..ac3d2ecb 100644
+--- a/avahi-core/browse-service.c
++++ b/avahi-core/browse-service.c
+@@ -103,7 +103,9 @@ AvahiSServiceBrowser *avahi_s_service_browser_prepare(
+     AVAHI_CHECK_VALIDITY_RETURN_NULL(server, AVAHI_PROTO_VALID(protocol), AVAHI_ERR_INVALID_PROTOCOL);
+     AVAHI_CHECK_VALIDITY_RETURN_NULL(server, !domain || avahi_is_valid_domain_name(domain), AVAHI_ERR_INVALID_DOMAIN_NAME);
+     AVAHI_CHECK_VALIDITY_RETURN_NULL(server, AVAHI_FLAGS_VALID(flags, AVAHI_LOOKUP_USE_WIDE_AREA|AVAHI_LOOKUP_USE_MULTICAST), AVAHI_ERR_INVALID_FLAGS);
+-    AVAHI_CHECK_VALIDITY_RETURN_NULL(server, avahi_is_valid_service_type_generic(service_type), AVAHI_ERR_INVALID_SERVICE_TYPE);
++
++    if (!avahi_is_valid_service_type_generic(service_type))
++        service_type = "_invalid._tcp";
+ 
+     if (!domain)
+         domain = server->domain_name;

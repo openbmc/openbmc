@@ -1746,7 +1746,6 @@ class BuildInfoHelper(object):
 
         buildname = self.server.runCommand(['getVariable', 'BUILDNAME'])[0]
         machine = self.server.runCommand(['getVariable', 'MACHINE'])[0]
-        image_name = self.server.runCommand(['getVariable', 'IMAGE_NAME'])[0]
 
         # location of the manifest files for this build;
         # note that this file is only produced if an image is produced
@@ -1766,6 +1765,18 @@ class BuildInfoHelper(object):
 
         # filter out anything which isn't an image target
         image_targets = [target for target in targets if target.is_image]
+
+        if len(image_targets) > 0:
+            #if there are image targets retrieve image_name
+            image_name = self.server.runCommand(['getVariable', 'IMAGE_NAME'])[0]
+            if not image_name:
+                #When build target is an image and image_name is not found as an environment variable
+                logger.info("IMAGE_NAME not found, extracting from bitbake command")
+                cmd = self.server.runCommand(['getVariable','BB_CMDLINE'])[0]
+                #filter out tokens that are command line options
+                cmd = [token for token in cmd if not token.startswith('-')]
+                image_name = cmd[1].split(':', 1)[0] # remove everything after : in image name
+                logger.info("IMAGE_NAME found as : %s " % image_name)
 
         for image_target in image_targets:
             # this is set to True if we find at least one file relating to

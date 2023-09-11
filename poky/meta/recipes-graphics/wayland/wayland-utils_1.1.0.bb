@@ -19,3 +19,6 @@ UPSTREAM_CHECK_URI = "https://wayland.freedesktop.org/releases.html"
 inherit meson pkgconfig
 
 DEPENDS += "wayland wayland-native wayland-protocols"
+
+PACKAGECONFIG ??= "drm"
+PACKAGECONFIG[drm] = "-Ddrm=enabled,-Ddrm=disabled,libdrm"

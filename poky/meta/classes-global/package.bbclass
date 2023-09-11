@@ -315,13 +315,21 @@ python package_get_auto_pr() {
 # Package functions suitable for inclusion in PACKAGEFUNCS
 #
 
-python package_convert_pr_autoinc() {
+python package_setup_pkgv() {
     pkgv = d.getVar("PKGV")
+    # Expand SRCPV into PKGV if not present
+    srcpv = bb.fetch.get_pkgv_string(d)
+    if srcpv and "+" in pkgv:
+        d.appendVar("PKGV", srcpv)
+        pkgv = d.getVar("PKGV")
 
     # Adjust pkgv as necessary...
     if 'AUTOINC' in pkgv:
         d.setVar("PKGV", pkgv.replace("AUTOINC", "${PRSERV_PV_AUTOINC}"))
+}
 
+
+python package_convert_pr_autoinc() {
     # Change PRSERV_PV_AUTOINC and EXTENDPRAUTO usage to special values
     d.setVar('PRSERV_PV_AUTOINC', '@PRSERV_PV_AUTOINC@')
     d.setVar('EXTENDPRAUTO', '@EXTENDPRAUTO@')
@@ -494,6 +502,7 @@ python do_package () {
         oe.qa.handle_error("var-undefined", msg, d)
         return
 
+    bb.build.exec_func("package_setup_pkgv", d)
     bb.build.exec_func("package_convert_pr_autoinc", d)
 
     # Check for conflict between renamed packages and existing ones
@@ -577,6 +586,7 @@ addtask do_package_setscene
 # Copy from PKGDESTWORK to tempdirectory as tempdirectory can be cleaned at both
 # do_package_setscene and do_packagedata_setscene leading to races
 python do_packagedata () {
+    bb.build.exec_func("package_setup_pkgv", d)
     bb.build.exec_func("package_get_auto_pr", d)
 
     src = d.expand("${PKGDESTWORK}")

@@ -1,0 +1,29 @@
+From 35939115142db6cd366ab11b29692a0179338ddf Mon Sep 17 00:00:00 2001
+From: Parian Golchin <Parian.Golchin@iris-sensing.com>
+Date: Fri, 18 Aug 2023 15:54:25 +0200
+Subject: [PATCH 1/3] Set Json_validator Install off if it finds it via linking
+
+Upstream-Status: Inappropriate [newer version of cmake in main branch]
+
+Signed-off-by: Parian Golchin <Parian.Golchin@iris-sensing.com>
+---
+ CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f636734..9e4587f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -55,6 +55,9 @@ option(JSON_VALIDATOR_BUILD_EXAMPLES "Build examples" ${JSON_VALIDATOR_IS_TOP_LE
+ 
+ if(NOT TARGET nlohmann_json::nlohmann_json)
+     find_package(nlohmann_json REQUIRED)
++else()
++    message(STATUS "Found nlohmann_json::nlohmann_json-target - linking with it")
++    set(JSON_VALIDATOR_INSTALL OFF)
+ endif()
+ 
+ target_link_libraries(
+-- 
+2.25.1
+

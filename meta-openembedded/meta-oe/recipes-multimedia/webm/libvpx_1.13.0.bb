@@ -26,7 +26,7 @@ export LD = "${CC}"
 
 VPXTARGET:armv5te = "armv5te-linux-gcc"
 VPXTARGET:armv6 = "armv6-linux-gcc"
-VPXTARGET:armv7a = "armv7-linux-gcc"
+VPXTARGET:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon","armv7-linux-gcc","generic-gnu",d)}"
 VPXTARGET ?= "generic-gnu"
 
 CONFIGUREOPTS = " \

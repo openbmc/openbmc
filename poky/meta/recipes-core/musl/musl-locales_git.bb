@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=cf5713fba707073020b1db2acaa73e78 \
 
 SRC_URI = "git://git.adelielinux.org/adelie/musl-locales;protocol=https;branch=main"
 
-PV = "1.0+git${SRCPV}"
+PV = "1.0+git"
 SRCREV = "5663f5bfd30bf9e1e0ba3fc5fe2da6725969f30e"
 
 S = "${WORKDIR}/git"

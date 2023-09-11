@@ -3,9 +3,9 @@
 # clock.test needs a timezone to be set
 export TZ="Europe/London"
 export TCL_LIBRARY=library
-
+SKIPPED_TESTS=
 for i in `ls tests/*.test | awk -F/ '{print $2}'`; do
-    ./tcltest tests/all.tcl -file $i >$i.log 2>&1
+    ./tcltest tests/all.tcl -file $i -skip "$SKIPPED_TESTS" >$i.log 2>&1
     grep -q -F -e "Files with failing tests:" -e "Test files exiting with errors:" $i.log
     if [ $? -eq 0 ]; then
         echo "FAIL: $i"

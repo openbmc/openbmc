@@ -14,7 +14,7 @@ SRC_URI = "git://github.com/intel/${BPN};branch=main;protocol=https"
 SRCREV = "c0673962a8ec1624b5189dc1d24f33fe4f06785a"
 S = "${WORKDIR}/git"
 BASEVER = "3.6"
-PV = "${BASEVER}+git${SRCPV}"
+PV = "${BASEVER}+git"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 

@@ -12,7 +12,7 @@ DEPENDS = "libbsd libpcre zlib libcap libusb squashfs-tools p7zip libselinux goo
 SRCREV_core = "abfd66fafcbb691d7860df059f1df1c9b1ef29da"
 
 SRC_URI = " \
-    git://salsa.debian.org/android-tools-team/android-platform-tools;name=core;protocol=https;nobranch=1 \
+    git://salsa.debian.org/android-tools-team/android-platform-tools;name=core;protocol=https;branch=master \
 "
 
 # Patches copied from android-platform-tools/debian/patches

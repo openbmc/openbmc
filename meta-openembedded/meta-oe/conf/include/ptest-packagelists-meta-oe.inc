@@ -20,6 +20,7 @@ PTESTS_FAST_META_OE = "\
     libee \
     libio-pty-perl \
     libmanette \
+    librelp \
     libssh \
     libtinyxml2 \
     libxml++-5.0 \

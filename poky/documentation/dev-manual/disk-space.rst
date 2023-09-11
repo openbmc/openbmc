@@ -27,19 +27,35 @@ Purging Duplicate Shared State Cache Files
 ==========================================
 
 After multiple build iterations, the Shared State (sstate) cache can contain
-duplicate cache files for a given package, while only the most recent one
-is likely to be reusable. The following command purges all but the
-newest sstate cache file for each package::
+duplicate cache files for a given package, consuming a substantial amount of
+disk space. However, only the most recent cache files are likeky to be reusable.
+
+The following command is a quick way to purge all the cache files which
+haven't been used for a least a specified number of days::
+
+   find build/sstate-cache -type f -mtime +$DAYS -delete
+
+The above command relies on the fact that BitBake touches the sstate cache
+files as it accesses them, when it has write access to the cache.
+
+You could use ``-atime`` instead of ``-mtime`` if the partition isn't mounted
+with the ``noatime`` option for a read only cache.
+
+For more advanced needs, OpenEmbedded-Core also offers a more elaborate
+command. It has the ability to purge all but the newest cache files on each
+architecture, and also to remove files that it considers unreachable by
+exploring a set of build configurations. However, this command
+requires a full build environment to be available and doesn't work well
+covering multiple releases. It won't work either on limited environments
+such as BSD based NAS::
 
    sstate-cache-management.sh --remove-duplicated --cache-dir=build/sstate-cache
 
 This command will ask you to confirm the deletions it identifies.
+Run ``sstate-cache-management.sh`` for more details about this script.
 
 .. note::
 
-   The duplicated sstate cache files of one package must have the same
-   architecture, which means that sstate cache files with multiple
-   architectures are not considered as duplicate.
-
-Run ``sstate-cache-management.sh`` for more details about this script.
-
+   As this command is much more cautious and selective, removing only cache files,
+   it will execute much slower than the simple ``find`` command described above.
+   Therefore, it may not be your best option to trim huge cache directories.

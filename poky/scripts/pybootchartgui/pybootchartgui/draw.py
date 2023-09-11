@@ -659,12 +659,21 @@ def render_processes_chart(ctx, options, trace, curr_y, width, h, sec_w):
             x = chart_rect[0] + (start - offset) * sec_w
             w = elapsed_time * sec_w
 
+            def set_alfa(color, alfa):
+                clist = list(color)
+                clist[-1] = alfa
+                return tuple(clist)
+
             #print("proc at %s %s %s %s" % (x, y, w, proc_h))
             col = None
             if task == "do_compile":
                 col = TASK_COLOR_COMPILE
+            elif "do_compile" in task:
+                col = set_alfa(TASK_COLOR_COMPILE, 0.25)
             elif task == "do_configure":
                 col = TASK_COLOR_CONFIGURE
+            elif "do_configure" in task:
+                col = set_alfa(TASK_COLOR_CONFIGURE, 0.25)
             elif task == "do_install":
                 col = TASK_COLOR_INSTALL
             elif task == "do_populate_sysroot":

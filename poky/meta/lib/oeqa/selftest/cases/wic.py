@@ -731,6 +731,23 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
         size = os.path.getsize(wicout[0])
         self.assertTrue(size > extraspace)
 
+    def test_no_table(self):
+        """Test --no-table wks option."""
+        wks_file = 'temp.wks'
+
+        # Absolute argument.
+        with open(wks_file, 'w') as wks:
+            wks.write("part testspace --no-table --fixed-size 16k --offset 4080k")
+        runCmd("wic create %s --image-name core-image-minimal -o %s" % (wks_file, self.resultdir))
+
+        wicout = glob(os.path.join(self.resultdir, "*.*"))
+
+        self.assertEqual(1, len(wicout))
+        size = os.path.getsize(wicout[0])
+        self.assertEqual(size, 4 * 1024 * 1024)
+
+        os.remove(wks_file)
+
 class Wic2(WicTestCase):
 
     def test_bmap_short(self):

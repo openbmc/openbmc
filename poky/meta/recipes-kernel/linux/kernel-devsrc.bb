@@ -318,6 +318,15 @@ do_install() {
 	    cp -a --parents arch/mips/kernel/syscalls/*.tbl $kerneldir/build 2>/dev/null || :
 	    cp -a --parents arch/mips/tools/elf-entry.c $kerneldir/build 2>/dev/null || :
 	fi
+	
+	if [ "${ARCH}" = "loongarch" ]; then
+	    cp -a --parents arch/loongarch/kernel/asm-offsets.c $kerneldir/build
+	    cp -a --parents Kbuild $kerneldir/build
+	    cp -a --parents arch/loongarch/vdso/*.S $kerneldir/build 2>/dev/null || :
+	    cp -a --parents arch/loongarch/vdso/*gettimeofday.* $kerneldir/build 2>/dev/null || :
+	    cp -a --parents arch/loongarch/vdso/*getcpu.* $kerneldir/build 2>/dev/null || :
+	    cp -a --parents arch/loongarch/vdso/gen_vdso*_offsets.sh $kerneldir/build/ 2>/dev/null || :
+	fi
 
         # required to build scripts/selinux/genheaders/genheaders
         cp -a --parents security/selinux/include/* $kerneldir/build/

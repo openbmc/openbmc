@@ -9,7 +9,7 @@ systemd/0007-check-for-missing-canonicalize_file_name.patch
 Based on work by: Khem Raj <raj.khem@gmail.com>
 
 Signed-off-by: Tim Orling <timothy.t.orling@linux.intel.com>
-Upstream-Status: Submitted [https://github.com/systemd/systemd-bootchart/pull/47]
+Upstream-Status: Denied [https://github.com/systemd/systemd-bootchart/pull/47]
 ---
 
  src/path-util.c | 2 +-

@@ -5,6 +5,7 @@ require core-image-minimal.bb
 require conf/distro/include/ptest-packagelists.inc
 
 DESCRIPTION += "Also including the ${MCNAME} ptest package."
+SUMMARY ?= "${MCNAME} ptest image."
 HOMEPAGE = "https://www.yoctoproject.org/"
 
 PTESTS = "${PTESTS_SLOW} ${PTESTS_FAST}"

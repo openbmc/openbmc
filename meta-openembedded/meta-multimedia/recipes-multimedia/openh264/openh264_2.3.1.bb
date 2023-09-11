@@ -16,6 +16,7 @@ SRCREV = "0a48f4d2e9be2abb4fb01b4c3be83cf44ce91a6e"
 BRANCH = "openh264v${PV}"
 SRC_URI = "git://github.com/cisco/openh264.git;protocol=https;branch=${BRANCH} \
            file://0001-Makefile-Use-cp-options-to-preserve-file-mode.patch \
+           file://0002-Makefile-add-possibility-to-disable-NEON-extension.patch \
            "
 
 COMPATIBLE_MACHINE:armv7a = "(.*)"
@@ -35,6 +36,9 @@ EXTRA_OEMAKE:mips = "ARCH=mips"
 EXTRA_OEMAKE:mips64 = "ARCH=mips64"
 EXTRA_OEMAKE:riscv64 = "ARCH=riscv64"
 
+EXTRA_OEMAKE:append:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon",""," USE_NEON=No",d)}"
+EXTRA_OEMAKE:append:armv7ve = "${@bb.utils.contains("TUNE_FEATURES","neon",""," USE_NEON=No",d)}"
+
 EXTRA_OEMAKE:append = " ENABLEPIC=Yes"
 do_configure() {
     :
@@ -45,7 +49,7 @@ do_compile() {
 }
 
 do_install() {
-    oe_runmake install DESTDIR=${D} PREFIX=${prefix}
+    oe_runmake install DESTDIR=${D} PREFIX=${prefix} LIBDIR_NAME=${baselib} SHAREDLIB_DIR=${libdir}
 }
 
 CLEANBROKEN = "1"

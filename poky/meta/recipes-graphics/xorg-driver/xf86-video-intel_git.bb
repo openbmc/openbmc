@@ -10,7 +10,7 @@ Infrastructure (DRI)."
 LIC_FILES_CHKSUM = "file://COPYING;md5=8730ad58d11c7bbad9a7066d69f7808e"
 
 SRCREV = "31486f40f8e8f8923ca0799aea84b58799754564"
-PV = "2.99.917+git${SRCPV}"
+PV = "2.99.917+git"
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://anongit.freedesktop.org/git/xorg/driver/xf86-video-intel;protocol=https;branch=master"

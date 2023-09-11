@@ -47,6 +47,8 @@ python check_prepare() {
         content.append(d.expand('set CC "${TARGET_PREFIX}gcc --sysroot=${STAGING_DIR_TARGET} ${TUNE_CCARGS}"'))
         content.append(d.expand('set CXX "${TARGET_PREFIX}g++ --sysroot=${STAGING_DIR_TARGET} ${TUNE_CCARGS}"'))
         content.append(d.expand('set CFLAGS_FOR_TARGET "--sysroot=${STAGING_DIR_TARGET} ${TUNE_CCARGS}"'))
+        content.append(d.expand('set LD "${TARGET_PREFIX}ld ${TUNE_LDARGS}"'))
+        content.append(d.expand('set LDFLAGS_FOR_TARGET "${TUNE_LDARGS}"'))
 
         if suite == "ld" and d.getVar("TUNE_ARCH") == "mips64":
             # oe patches binutils to have the default mips64 abi as 64bit, but

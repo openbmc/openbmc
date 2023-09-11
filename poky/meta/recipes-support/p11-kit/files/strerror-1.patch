@@ -1,0 +1,76 @@
+From 3ba2c55dfdc8ff20de369f07f6c57d08718d3add Mon Sep 17 00:00:00 2001
+From: Adam Sampson <ats@offog.org>
+Date: Sun, 2 Jul 2023 15:22:49 +0100
+Subject: [PATCH] Check for GNU strerror_r using the compiler only
+
+The new test that was added to distinguish GNU/XSI strerror_r ran a
+compiled program, which doesn't work when cross-compiling. The only
+difference at compile time is that the GNU version returns char * and
+the XSI version returns int, so detect it by compiling a program that
+dereferences the return value.
+
+Signed-off-by: Adam Sampson <ats@offog.org>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ configure.ac | 19 +++++++------------
+ meson.build  | 10 +++++-----
+ 2 files changed, 12 insertions(+), 17 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 40f5a583..29890622 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -146,19 +146,14 @@ if test "$os_unix" = "yes"; then
+ 
+ 	AC_CHECK_FUNC(
+ 		[strerror_r],
+-		[AC_RUN_IFELSE(
+-			[AC_LANG_SOURCE([[
+-				#include <errno.h>
+-				#include <string.h>
+-
+-				int main (void)
+-				{
+-					char buf[32];
+-					return strerror_r (EINVAL, buf, 32);
+-				}
+-			]])],
+-                        [AC_DEFINE([HAVE_XSI_STRERROR_R], 1, [Whether XSI-compliant strerror_r() is available])],
++		[AC_COMPILE_IFELSE(
++			[AC_LANG_PROGRAM([[#include <errno.h>
++					   #include <string.h>]],
++					 [[/* GNU strerror_r returns char *, XSI returns int */
++					    char buf[32];
++					    return *strerror_r (EINVAL, buf, 32);]])],
+ 			[AC_DEFINE([HAVE_GNU_STRERROR_R], 1, [Whether GNU-specific strerror_r() is available])],
++                        [AC_DEFINE([HAVE_XSI_STRERROR_R], 1, [Whether XSI-compliant strerror_r() is available])],
+ 			[])],
+ 		[])
+ 
+diff --git a/meson.build b/meson.build
+index 0f8c8da0..4cc3f89a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -306,15 +306,15 @@ if cc.has_function('strerror_r', prefix: '#include <string.h>')
+ 
+ int main (void)
+ {
++    /* GNU strerror_r returns char *, XSI returns int */
+     char buf[32];
+-    return strerror_r (EINVAL, buf, 32);
++    return *strerror_r (EINVAL, buf, 32);
+ }
+ '''
+-  strerror_r_check = cc.run(strerror_r_code, name : 'strerror_r check')
+-  if strerror_r_check.returncode() == 0
+-    conf.set('HAVE_XSI_STRERROR_R', 1)
+-  else
++  if cc.compiles(strerror_r_code, name : 'GNU strerror_r check')
+     conf.set('HAVE_GNU_STRERROR_R', 1)
++  else
++    conf.set('HAVE_XSI_STRERROR_R', 1)
+   endif
+ endif
+ 

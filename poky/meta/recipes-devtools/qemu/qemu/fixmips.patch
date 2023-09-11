@@ -1,0 +1,18 @@
+Patch to fix mips boot hangs where virtio appears broken. Patch under discussion upstream. 
+Regression is introduced by other fixes to 8.1.0 to get x86 boots working.
+
+Upstream-Status: Pending [https://lore.kernel.org/qemu-devel/6c956b90-5a13-db96-9c02-9834a512fe6f@linaro.org/]
+
+Index: qemu-8.1.0/softmmu/physmem.c
+===================================================================
+--- qemu-8.1.0.orig/softmmu/physmem.c
++++ qemu-8.1.0/softmmu/physmem.c
+@@ -2517,7 +2517,7 @@ static void tcg_commit(MemoryListener *l
+      * That said, the listener is also called during realize, before
+      * all of the tcg machinery for run-on is initialized: thus halt_cond.
+      */
+-    if (cpu->halt_cond) {
++    if (cpu->halt_cond && !qemu_cpu_is_self(cpu)) {
+         async_run_on_cpu(cpu, tcg_commit_cpu, RUN_ON_CPU_HOST_PTR(cpuas));
+     } else {
+         tcg_commit_cpu(cpu, RUN_ON_CPU_HOST_PTR(cpuas));

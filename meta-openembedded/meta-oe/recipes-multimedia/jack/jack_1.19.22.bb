@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = " \
     file://common/jack/jack.h;beginline=1;endline=19;md5=6b736ed6b810592b135480a5e853392e \
 "
 
-DEPENDS = "libsamplerate0 libsndfile1 readline"
+DEPENDS = "libsamplerate0 libsndfile1"
 
 SRC_URI = "git://github.com/jackaudio/jack2.git;branch=master;protocol=https"
 SRCREV = "4f58969432339a250ce87fe855fb962c67d00ddb"

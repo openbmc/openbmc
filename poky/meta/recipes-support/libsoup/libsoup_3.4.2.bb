@@ -24,11 +24,24 @@ inherit meson gettext pkgconfig upstream-version-is-even gobject-introspection g
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
 
-# libsoup-gnome is entirely deprecated and just stubs in 2.42 onwards. Disable by default.
 PACKAGECONFIG ??= ""
+PACKAGECONFIG[brotli] = "-Dbrotli=enabled,-Dbrotli=disabled,brotli"
 PACKAGECONFIG[gssapi] = "-Dgssapi=enabled,-Dgssapi=disabled,krb5"
+PACKAGECONFIG[ntlm] = "-Dntlm=enabled,-Dntlm=disabled"
+PACKAGECONFIG[sysprof] = "-Dsysprof=enabled,-Dsysprof=disabled,sysprof"
 
-EXTRA_OEMESON:append = " -Dvapi=disabled -Dtls_check=false"
+# Tell libsoup where the target ntlm_auth is installed
+do_write_config:append:class-target() {
+    cat >${WORKDIR}/soup.cross <<EOF
+[binaries]
+ntlm_auth = '${bindir}/ntlm_auth'
+EOF
+}
+EXTRA_OEMESON += "--cross-file ${WORKDIR}/soup.cross"
+
+EXTRA_OEMESON += "-Dvapi=disabled -Dtls_check=false"
+# Disable the test suites
+EXTRA_OEMESON += "-Dtests=false -Dautobahn=disabled -Dpkcs11_tests=disabled"
 
 GIDOCGEN_MESON_OPTION = 'docs'
 GIDOCGEN_MESON_ENABLE_FLAG = 'enabled'

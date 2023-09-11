@@ -12,7 +12,9 @@ PROVIDES = "udev"
 SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
            file://init \
            file://local.rules \
-"
+           file://0001-Export-dummies-for.patch \
+           file://0002-Bump-udev-version-to-251.patch \
+           "
 
 SRC_URI[sha256sum] = "ccdd64ec3c381d3c3ed0e99d2e70d1f62988c7763de89ca7bdffafa5eacb9ad8"
 

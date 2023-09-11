@@ -36,20 +36,9 @@ if [ "$1" = '--help' -o "$1" = '-h' -o $# -ne 1 ] ; then
 fi
 
 # Global vars
-BITBAKE_E=""
 set_oe_native_sysroot(){
-    echo "Running bitbake -e $1"
-    BITBAKE_E="`bitbake -e $1`"
-    OECORE_NATIVE_SYSROOT=`echo "$BITBAKE_E" | grep ^STAGING_DIR_NATIVE= | cut -d '"' -f2`
-
-    if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then
-        # This indicates that there was an error running bitbake -e that
-        # the user needs to be informed of
-        echo "There was an error running bitbake to determine STAGING_DIR_NATIVE"
-        echo "Here is the output from bitbake -e $1"
-        echo $BITBAKE_E
-        exit 1
-    fi
+    echo "Getting sysroot..."
+    OECORE_NATIVE_SYSROOT=$(bitbake-getvar -r $1 --value STAGING_DIR_NATIVE)
 }
 
 if [ "x$OECORE_NATIVE_SYSROOT" = "x" ]; then

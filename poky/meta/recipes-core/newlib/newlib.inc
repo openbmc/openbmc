@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = " \
 		"
 
 BASEVER = "4.3.0"
-PV = "${BASEVER}+git${SRCPV}"
+PV = "${BASEVER}+git"
 SRC_URI = "git://sourceware.org/git/newlib-cygwin.git;protocol=https;branch=main"
 SRCREV="9e09d6ed83cce4777a5950412647ccc603040409"
 

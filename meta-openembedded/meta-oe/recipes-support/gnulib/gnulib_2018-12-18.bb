@@ -13,7 +13,7 @@ LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=56a22a6e5bcce45e2c8ac184f81412b5"
 SRCREV = "0d6e3307bbdb8df4d56043d5f373eeeffe4cbef3"
 
-SRC_URI = "git://git.savannah.gnu.org/git/gnulib.git;branch=master \
+SRC_URI = "git://git.savannah.gnu.org/git/gnulib.git;branch=master;protocol=https \
 "
 
 S = "${WORKDIR}/git"

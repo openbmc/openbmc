@@ -1,0 +1,41 @@
+From 3ee6967689b3da30cc4551885d8bcdd44a7a9b52 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Aug 2023 21:16:55 -0700
+Subject: [PATCH] linker-scripts: Do not export _IO_stdin_used
+
+This is glibc specific and it is not needed with musl.
+See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=835550
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ linker-script-binary.ver               | 1 -
+ tools/create-exports-NetworkManager.sh | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/linker-script-binary.ver b/linker-script-binary.ver
+index a2780c0..f030d35 100644
+--- a/linker-script-binary.ver
++++ b/linker-script-binary.ver
+@@ -1,6 +1,5 @@
+ {
+ global:
+-	_IO_stdin_used;
+ local:
+ 	*;
+ };
+diff --git a/tools/create-exports-NetworkManager.sh b/tools/create-exports-NetworkManager.sh
+index ef4b381..60865ad 100755
+--- a/tools/create-exports-NetworkManager.sh
++++ b/tools/create-exports-NetworkManager.sh
+@@ -54,7 +54,6 @@ get_symbols_nm () {
+ 
+ get_symbols_explicit() {
+     cat <<EOF | _sort
+-_IO_stdin_used
+ EOF
+ }
+ 
+-- 
+2.42.0
+

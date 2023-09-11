@@ -51,10 +51,14 @@ python check_prepare() {
         # enable all valid instructions, since the test suite itself does not
         # limit itself to the target cpu options.
         #   - valid for x86*, powerpc, arm, arm64
-        if qemu_binary.lstrip("qemu-") in ["x86_64", "i386", "arm", "aarch64"]:
+        if qemu_binary.endswith(("x86_64", "i386", "arm", "aarch64")):
             args += ["-cpu", "max"]
-        elif qemu_binary.lstrip("qemu-") in ["ppc"]:
-            args += d.getVar("QEMU_EXTRAOPTIONS_%s" % d.getVar('PACKAGE_ARCH')).split()
+        elif qemu_binary.endswith(("ppc", "mips", "mips64")):
+            extra = d.getVar("QEMU_EXTRAOPTIONS_%s" % d.getVar('PACKAGE_ARCH'))
+            if extra:
+                args += extra.split()
+        # For mips64 we could set a maximal CPU (e.g. Loongson-3A4000) however they either have MSA
+        # or Loongson-MMI vector extensions, not both and qemu lacks complete support for MMI
         sysroot = d.getVar("RECIPE_SYSROOT")
         args += ["-L", sysroot]
         # lib paths are static here instead of using $libdir since this is used by a -cross recipe

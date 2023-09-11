@@ -25,12 +25,24 @@ UPSTREAM_CHECK_REGEX = "libsoup-(?P<pver>2(\.(?!99)\d+)+)\.tar"
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
 
-# libsoup-gnome is entirely deprecated and just stubs in 2.42 onwards. Disable by default.
 PACKAGECONFIG ??= ""
+PACKAGECONFIG[brotli] = "-Dbrotli=enabled,-Dbrotli=disabled,brotli"
+# libsoup-gnome is entirely deprecated and just stubs in 2.42 onwards
 PACKAGECONFIG[gnome] = "-Dgnome=true,-Dgnome=false"
 PACKAGECONFIG[gssapi] = "-Dgssapi=enabled,-Dgssapi=disabled,krb5"
+PACKAGECONFIG[ntlm] = "-Dntlm=enabled,-Dntlm=disabled"
+PACKAGECONFIG[sysprof] = "-Dsysprof=enabled,-Dsysprof=disabled,sysprof"
 
-EXTRA_OEMESON:append = " -Dvapi=disabled -Dtls_check=false"
+# Tell libsoup where the target ntlm_auth is installed
+do_write_config:append:class-target() {
+    cat >${WORKDIR}/soup.cross <<EOF
+[binaries]
+ntlm_auth = '${bindir}/ntlm_auth'
+EOF
+}
+EXTRA_OEMESON += "--cross-file ${WORKDIR}/soup.cross"
+
+EXTRA_OEMESON += "-Dvapi=disabled -Dtls_check=false"
 
 GTKDOC_MESON_OPTION = "gtk_doc"
 

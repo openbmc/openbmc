@@ -690,7 +690,7 @@ def create_recipe(args):
             srcpvprefix = 'svnr'
         else:
             srcpvprefix = scheme
-        lines_before.append('PV = "%s+%s${SRCPV}"' % (realpv or '1.0', srcpvprefix))
+        lines_before.append('PV = "%s+%s"' % (realpv or '1.0', srcpvprefix))
         pv_srcpv = True
         if not args.autorev and srcrev == '${AUTOREV}':
             if os.path.exists(os.path.join(srctree, '.git')):

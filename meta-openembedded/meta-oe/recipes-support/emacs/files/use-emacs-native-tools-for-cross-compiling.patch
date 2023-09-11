@@ -1,0 +1,106 @@
+Upstream-Status: Inappropriate  [OE-Specific]
+
+When building emacs, it builds some tools for the HOST
+that are then used to build for target, such as
+make-fingerprint and make-docfile and bootstrap-emacs,
+this needs to be adapted to be used by bitbake, otherwise
+the compiled executables arent compatible with the HOST.
+
+We also need to be able to use emacs env variables to
+control how bootstrap-emacs is used when cross-compiling.
+
+Use the above mentioned tools provided by the native
+version of the recipe instead.
+
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandro@enedino.org>
+
+Index: emacs-29.1/src/Makefile.in
+===================================================================
+--- emacs-29.1.orig/src/Makefile.in
++++ emacs-29.1/src/Makefile.in
+@@ -1,3 +1,4 @@
++
+ ### @configure_input@
+ 
+ # Copyright (C) 1985, 1987-1988, 1993-1995, 1999-2023 Free Software
+@@ -508,7 +509,7 @@ ifeq ($(CHECK_STRUCTS),true)
+ pdumper.o: dmpstruct.h
+ endif
+ dmpstruct.h: $(srcdir)/dmpstruct.awk
+-dmpstruct.h: $(libsrc)/make-fingerprint$(EXEEXT) $(dmpstruct_headers)
++dmpstruct.h:  $(dmpstruct_headers)
+ 	$(AM_V_GEN)POSIXLY_CORRECT=1 awk -f $(srcdir)/dmpstruct.awk \
+ 		$(dmpstruct_headers) > $@
+ 
+@@ -610,8 +611,7 @@ SYSTEM_TYPE = @SYSTEM_TYPE@
+ ## Strictly speaking, emacs does not depend directly on all of $lisp,
+ ## since not all pieces are used on all platforms.  But DOC depends
+ ## on all of $lisp, and emacs depends on DOC, so it is ok to use $lisp here.
+-emacs$(EXEEXT): temacs$(EXEEXT) \
+-                lisp.mk $(etc)/DOC $(lisp) \
++emacs$(EXEEXT): lisp.mk $(etc)/DOC $(lisp) \
+                 $(lispsource)/international/charprop.el ${charsets}
+ ifeq ($(SYSTEM_TYPE),cygwin)
+ 	find ${top_builddir} -name '*.eln' | rebase -v -O -T -
+@@ -654,7 +654,7 @@ endif
+ $(etc)/DOC: $(libsrc)/make-docfile$(EXEEXT) $(doc_obj)
+ 	$(AM_V_GEN)$(MKDIR_P) $(etc)
+ 	$(AM_V_at)rm -f $(etc)/DOC
+-	$(AM_V_at)$(libsrc)/make-docfile -d $(srcdir) \
++	make-docfile -d $(srcdir) \
+ 	  $(SOME_MACHINE_OBJECTS) $(doc_obj) > $(etc)/DOC
+ 
+ $(libsrc)/make-docfile$(EXEEXT) $(libsrc)/make-fingerprint$(EXEEXT): \
+@@ -671,7 +671,7 @@ buildobj.h: Makefile
+ GLOBAL_SOURCES = $(base_obj:.o=.c) $(NS_OBJC_OBJ:.o=.m)
+ 
+ gl-stamp: $(libsrc)/make-docfile$(EXEEXT) $(GLOBAL_SOURCES)
+-	$(AM_V_GLOBALS)$(libsrc)/make-docfile -d $(srcdir) -g $(doc_obj) > globals.tmp
++	make-docfile -d $(srcdir) -g $(doc_obj) > globals.tmp
+ 	$(AM_V_at)$(top_srcdir)/build-aux/move-if-change globals.tmp globals.h
+ 	$(AM_V_at)echo timestamp > $@
+ 
+@@ -685,7 +685,7 @@ $(LIBEGNU_ARCHIVE): $(config_h)
+ 	$(MAKE) -C $(dir $@) all
+ 
+ ifeq ($(HAVE_PDUMPER),yes)
+-MAKE_PDUMPER_FINGERPRINT = $(libsrc)/make-fingerprint$(EXEEXT)
++MAKE_PDUMPER_FINGERPRINT = make-fingerprint
+ else
+ MAKE_PDUMPER_FINGERPRINT =
+ endif
+Index: emacs-29.1/lisp/Makefile.in
+===================================================================
+--- emacs-29.1.orig/lisp/Makefile.in
++++ emacs-29.1/lisp/Makefile.in
+@@ -53,7 +53,7 @@ FIND_DELETE = @FIND_DELETE@
+ # We never change directory before running Emacs, so a relative file
+ # name is fine, and makes life easier.  If we need to change
+ # directory, we can use emacs --chdir.
+-EMACS = ../src/emacs${EXEEXT}
++EMACS = bootstrap-emacs
+ 
+ # Command line flags for Emacs.
+ 
+@@ -109,7 +109,7 @@ MAIN_FIRST = ./emacs-lisp/eieio.el ./ema
+   ./org/oc.el ./org/ol.el ./emacs-lisp/cl-lib.el
+ 
+ # Prevent any settings in the user environment causing problems.
+-unexport EMACSDATA EMACSDOC EMACSLOADPATH EMACSPATH
++unexport EMACSDOC EMACSPATH
+ 
+ # The actual Emacs command run in the targets below.
+ emacs = '$(EMACS)' $(EMACSOPT)
+Index: emacs-29.1/Makefile.in
+===================================================================
+--- emacs-29.1.orig/Makefile.in
++++ emacs-29.1/Makefile.in
+@@ -328,7 +328,7 @@ GLIB_COMPILE_SCHEMAS = glib-compile-sche
+ TRANSFORM = @program_transform_name@
+ 
+ # Prevent any settings in the user environment causing problems.
+-unexport EMACSDATA EMACSDOC EMACSLOADPATH EMACSPATH
++unexport  EMACSDOC EMACSPATH
+ 
+ # What emacs should be called when installed.
+ EMACS_NAME = `echo emacs | sed '$(TRANSFORM)'`

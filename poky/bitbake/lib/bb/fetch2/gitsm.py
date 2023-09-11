@@ -123,6 +123,7 @@ class GitSM(Git):
             url += ";name=%s" % module
             url += ";subpath=%s" % module
             url += ";nobranch=1"
+            url += ";lfs=%s" % self._need_lfs(ud)
             # Note that adding "user=" here to give credentials to the
             # submodule is not supported. Since using SRC_URI to give git://
             # URL a password is not supported, one have to use one of the
@@ -242,10 +243,12 @@ class GitSM(Git):
         ret = self.process_submodules(ud, ud.destdir, unpack_submodules, d)
 
         if not ud.bareclone and ret:
-            # All submodules should already be downloaded and configured in the tree.  This simply sets
-            # up the configuration and checks out the files.  The main project config should remain
-            # unmodified, and no download from the internet should occur.
-            runfetchcmd("%s submodule update --recursive --no-fetch" % (ud.basecmd), d, quiet=True, workdir=ud.destdir)
+            # All submodules should already be downloaded and configured in the tree.  This simply
+            # sets up the configuration and checks out the files.  The main project config should
+            # remain unmodified, and no download from the internet should occur. As such, lfs smudge
+            # should also be skipped as these files were already smudged in the fetch stage if lfs
+            # was enabled.
+            runfetchcmd("GIT_LFS_SKIP_SMUDGE=1 %s submodule update --recursive --no-fetch" % (ud.basecmd), d, quiet=True, workdir=ud.destdir)
 
     def implicit_urldata(self, ud, d):
         import shutil, subprocess, tempfile

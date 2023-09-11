@@ -1,4 +1,4 @@
-From 30d209d26918e48e34f34658923c42f269d27ee1 Mon Sep 17 00:00:00 2001
+From 4a1bff4c1e34ad9b596a7ba44ab61f4c9d00097b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sun, 29 Aug 2021 20:49:16 +0800
 Subject: [PATCH] fix create thread failed in unprivileged process [BZ #28287]
@@ -72,13 +72,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/sysdeps/unix/sysv/linux/clone-internal.c b/sysdeps/unix/sysv/linux/clone-internal.c
-index a8611772a2..c75b063370 100644
+index 790739cfce..8d24d04917 100644
 --- a/sysdeps/unix/sysv/linux/clone-internal.c
 +++ b/sysdeps/unix/sysv/linux/clone-internal.c
-@@ -52,7 +52,7 @@ __clone_internal (struct clone_args *cl_args,
-   /* Try clone3 first.  */
+@@ -106,7 +106,7 @@ __clone_internal (struct clone_args *cl_args,
+ #ifdef HAVE_CLONE3_WRAPPER
    int saved_errno = errno;
-   ret = __clone3 (cl_args, sizeof (*cl_args), func, arg);
+   int ret = __clone3_internal (cl_args, func, arg);
 -  if (ret != -1 || errno != ENOSYS)
 +  if (ret != -1 || (errno != ENOSYS && errno != EPERM))
      return ret;

@@ -15,6 +15,8 @@ SRCREV = "89d1692fd8fe91a679bb943d377bfbd709b52c23"
 SRCREV_freetype = "6fc77cee03e078e97afcee0c0e06a2d3274b9a29"
 SRCREV_harfbuzz = "43931e3e596c04044861770b831c8f9452e2d3b0"
 
+SRCREV_FORMAT .= "_freetype_harfbuzz"
+
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig features_check

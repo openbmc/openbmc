@@ -1,0 +1,3 @@
+#! /bin/sh
+
+./runtest -l /usr/bin/less -t lesstest -O d lt/*

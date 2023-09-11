@@ -1,0 +1,41 @@
+From 5c32487a9c127f37141488d416cdb5d5bec6aca1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 19 Aug 2023 10:24:40 -0700
+Subject: [PATCH] tests: Include missing sys/time.h
+
+This is found when building for musl C library systems where sys/time.h
+is not included indirectly and select() and timeval structs are used
+
+Fixes
+
+../../git/tests/receive.c:64:17: error: variable has incomplete type 'struct timeval'
+   64 |         struct timeval tvSelectTimeout;
+      |                        ^
+../../git/tests/receive.c:64:9: note: forward declaration of 'struct timeval'
+   64 |         struct timeval tvSelectTimeout;
+      |                ^
+../../git/tests/receive.c:67:2: error: call to undeclared function 'select'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   67 |         select(0, NULL, NULL, NULL, &tvSelectTimeout);
+      |         ^
+
+Upstream-Status: Submitted [https://github.com/rsyslog/librelp/pull/261]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/receive.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/receive.c b/tests/receive.c
+index f376cb4..e20861e 100644
+--- a/tests/receive.c
++++ b/tests/receive.c
+@@ -33,6 +33,7 @@
+ #include <limits.h>
+ #include <errno.h>
+ #include <signal.h>
++#include <sys/time.h>
+ #include "librelp.h"
+ 
+ #define TRY(f) { const int TRY_r = f; if(TRY_r != RELP_RET_OK) { \
+-- 
+2.41.0
+

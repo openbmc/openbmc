@@ -234,9 +234,10 @@ class diskMonitor:
                 freeInode = st.f_favail
 
                 if minInode and freeInode < minInode:
-                    # Some filesystems use dynamic inodes so can't run out
-                    # (e.g. btrfs). This is reported by the inode count being 0.
-                    if st.f_files == 0:
+                    # Some filesystems use dynamic inodes so can't run out.
+                    # This is reported by the inode count being 0 (btrfs) or the free
+                    # inode count being -1 (cephfs).
+                    if st.f_files == 0 or st.f_favail == -1:
                         self.devDict[k][2] = None
                         continue
                     # Always show warning, the self.checked would always be False if the action is WARN

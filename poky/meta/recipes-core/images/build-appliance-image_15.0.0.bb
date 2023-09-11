@@ -26,7 +26,7 @@ inherit core-image setuptools3 features_check
 
 REQUIRED_DISTRO_FEATURES += "xattr"
 
-SRCREV ?= "02d38e9ce479262d848c4f873ee1e57141eb7eea"
+SRCREV ?= "71faadedb96a15a0748552b00dec032649adb71f"
 SRC_URI = "git://git.yoctoproject.org/poky;branch=master \
            file://Yocto_Build_Appliance.vmx \
            file://Yocto_Build_Appliance.vmxf \
@@ -117,7 +117,7 @@ fakeroot do_tweak_image () {
 	ln -rs ${IMAGE_ROOTFS}/lib ${IMAGE_ROOTFS}/lib64
 }
 
-IMAGE_PREPROCESS_COMMAND += "do_populate_poky_src; do_tweak_image; "
+IMAGE_PREPROCESS_COMMAND += "do_populate_poky_src do_tweak_image"
 # For pip usage above
 do_image[network] = "1"
 

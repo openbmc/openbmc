@@ -1,0 +1,49 @@
+From 2a7e26510cf9276b7e640ca8282cc1c5e46075d0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Aug 2023 11:59:40 -0700
+Subject: [PATCH] tests: Fix callback prototype
+
+clang errors about it
+
+| ../../git/tests/receive.c:71:34: error: a function declaration without a prototype is deprecated in all versions of C [-Werror,-Wstrict-prototypes]
+|    71 | hdlr_enable(int sig, void (*hdlr)())
+|       |                                  ^
+|       |                                   void
+| 1 error generated.
+
+Upstream-Status: Submitted [https://github.com/rsyslog/librelp/pull/260]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/receive.c | 2 +-
+ tests/send.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/receive.c b/tests/receive.c
+index f376cb4..c12e911 100644
+--- a/tests/receive.c
++++ b/tests/receive.c
+@@ -68,7 +68,7 @@ doSleep(int iSeconds, const int iuSeconds)
+ }
+ 
+ static void
+-hdlr_enable(int sig, void (*hdlr)())
++hdlr_enable(int sig, void (*hdlr)(const int))
+ {
+ 	struct sigaction sigAct;
+ 	memset(&sigAct, 0, sizeof (sigAct));
+diff --git a/tests/send.c b/tests/send.c
+index d7e90f0..1b1df4f 100644
+--- a/tests/send.c
++++ b/tests/send.c
+@@ -57,7 +57,7 @@ struct usrdata { /* used for testing user pointer pass-back */
+ struct usrdata *userdata = NULL;
+ 
+ static void
+-hdlr_enable(int sig, void (*hdlr)())
++hdlr_enable(int sig, void (*hdlr)(const int))
+ {
+ 	struct sigaction sigAct;
+ 	memset(&sigAct, 0, sizeof (sigAct));
+-- 
+2.41.0
+

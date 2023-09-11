@@ -152,12 +152,12 @@ python write_host_sdk_manifest () {
         output.write(format_pkg_list(pkgs, 'ver'))
 }
 
-POPULATE_SDK_POST_TARGET_COMMAND:append = " write_sdk_test_data ; "
-POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk  = " write_target_sdk_manifest; sdk_prune_dirs; "
-POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " write_host_sdk_manifest; "
+POPULATE_SDK_POST_TARGET_COMMAND:append = " write_sdk_test_data"
+POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk  = " write_target_sdk_manifest sdk_prune_dirs"
+POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " write_host_sdk_manifest"
 
-SDK_PACKAGING_COMMAND = "${@'${SDK_PACKAGING_FUNC};' if '${SDK_PACKAGING_FUNC}' else ''}"
-SDK_POSTPROCESS_COMMAND = " create_sdk_files; check_sdk_sysroots; archive_sdk; ${SDK_PACKAGING_COMMAND} "
+SDK_PACKAGING_COMMAND = "${@'${SDK_PACKAGING_FUNC}' if '${SDK_PACKAGING_FUNC}' else ''}"
+SDK_POSTPROCESS_COMMAND = "create_sdk_files check_sdk_sysroots archive_sdk ${SDK_PACKAGING_COMMAND}"
 
 def populate_sdk_common(d):
     from oe.sdk import populate_sdk
@@ -372,8 +372,7 @@ do_populate_sdk[vardeps] += "${@sdk_variables(d)}"
 python () {
     variables = sdk_command_variables(d)
     for var in variables:
-        if d.getVar(var, False):
-            d.setVarFlag(var, 'func', '1')
+        d.setVarFlag(var, 'vardeps', d.getVar(var))
 }
 
 do_populate_sdk[file-checksums] += "${TOOLCHAIN_SHAR_REL_TMPL}:True \

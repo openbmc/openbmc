@@ -1,7 +1,8 @@
 require binutils.inc
 require binutils-${PV}.inc
 
-DEPENDS += "zlib"
+# perl-native for pod2man for man page generation
+DEPENDS += "zlib perl-native"
 
 EXTRA_OECONF += "--with-sysroot=/ \
                 --enable-install-libbfd \

@@ -930,12 +930,12 @@ spdx_get_src[vardepsexclude] += "STAGING_KERNEL_DIR"
 do_rootfs[recrdeptask] += "do_create_spdx do_create_runtime_spdx"
 do_rootfs[cleandirs] += "${SPDXIMAGEWORK}"
 
-ROOTFS_POSTUNINSTALL_COMMAND =+ "image_combine_spdx ; "
+ROOTFS_POSTUNINSTALL_COMMAND =+ "image_combine_spdx"
 
 do_populate_sdk[recrdeptask] += "do_create_spdx do_create_runtime_spdx"
 do_populate_sdk[cleandirs] += "${SPDXSDKWORK}"
-POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " sdk_host_combine_spdx; "
-POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk = " sdk_target_combine_spdx; "
+POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " sdk_host_combine_spdx"
+POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk = " sdk_target_combine_spdx"
 
 python image_combine_spdx() {
     import os

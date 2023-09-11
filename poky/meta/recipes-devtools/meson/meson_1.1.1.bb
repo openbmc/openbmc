@@ -30,7 +30,7 @@ do_install:append () {
 	# Upstream is discussing ways to solve the issue properly, until then let's
 	# just not install the problematic files.
 	# More info: http://benno.id.au/blog/2013/01/15/python-determinism
-	rm ${D}${libdir}/python*/site-packages/mesonbuild/dependencies/__pycache__/mpi.cpython*
+	rm -f ${D}${libdir}/python*/site-packages/mesonbuild/dependencies/__pycache__/mpi.cpython*
 }
 
 BBCLASSEXTEND = "native nativesdk"

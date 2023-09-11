@@ -76,6 +76,6 @@ python buildinfo_sdk () {
     bb.build.exec_func("buildinfo", d)
 }
 
-IMAGE_PREPROCESS_COMMAND += "buildinfo_image;"
-POPULATE_SDK_PRE_TARGET_COMMAND += "buildinfo_sdk;"
+IMAGE_PREPROCESS_COMMAND += "buildinfo_image"
+POPULATE_SDK_PRE_TARGET_COMMAND += "buildinfo_sdk"
 

@@ -36,3 +36,5 @@ python populate_packages:prepend () {
 RDEPENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libx11-locale', 'libx11-compose-data', d)}"
 
 BBCLASSEXTEND += "native"
+
+CVE_PRODUCT += "xkbcommon:libxkbcommon"

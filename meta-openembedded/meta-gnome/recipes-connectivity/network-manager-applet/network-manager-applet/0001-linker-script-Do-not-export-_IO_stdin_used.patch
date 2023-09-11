@@ -1,0 +1,30 @@
+From e09ba80e342b3b24bb2a46e11dae1c30cc61c75c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 3 Sep 2023 08:48:42 -0700
+Subject: [PATCH] linker-script: Do not export _IO_stdin_used
+
+This is glibc specific toolhain issue, it should have been handled in
+toolchain instead of exposing to applications. This was done to fix
+
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=835550
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ linker-script-binary.ver | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/linker-script-binary.ver b/linker-script-binary.ver
+index a2780c0..f030d35 100644
+--- a/linker-script-binary.ver
++++ b/linker-script-binary.ver
+@@ -1,6 +1,5 @@
+ {
+ global:
+-	_IO_stdin_used;
+ local:
+ 	*;
+ };
+-- 
+2.42.0
+

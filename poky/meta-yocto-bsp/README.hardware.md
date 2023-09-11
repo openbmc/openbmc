@@ -33,10 +33,19 @@ The following boards are supported by the meta-yocto-bsp layer:
 For more information see the board's section below. The appropriate MACHINE
 variable value corresponding to the board is given in brackets.
 
-Reference Board Maintenance
-===========================
+Reference Board Maintenance and Contributions
+=============================================
 
-Send pull requests, patches, comments or questions about meta-yocto-bsps to poky@lists.yoctoproject.org
+Please refer to our contributor guide here: https://docs.yoctoproject.org/dev/contributor-guide/
+for full details on how to submit changes.
+
+As a quick guide, patches should be sent to poky@lists.yoctoproject.org
+The git command to do that would be:
+ 
+     git send-email -M -1 --to poky@lists.yoctoproject.org
+
+Send pull requests, patches, comments or questions about meta-yocto-bsp to 
+poky@lists.yoctoproject.org
 
 Maintainers: Kevin Hao <kexin.hao@windriver.com>
              Bruce Ashfield <bruce.ashfield@gmail.com>

@@ -1,0 +1,20 @@
+Upstream-Status: Inappropriate [workaround, would need a real fix for upstream]
+
+Index: qemu-8.1.0/configure
+===================================================================
+--- qemu-8.1.0.orig/configure
++++ qemu-8.1.0/configure
+@@ -1032,12 +1032,7 @@ then
+     exit 1
+ fi
+ 
+-# At this point, we expect Meson to be installed and available.
+-# We expect mkvenv or pip to have created pyvenv/bin/meson for us.
+-# We ignore PATH completely here: we want to use the venv's Meson
+-# *exclusively*.
+-
+-meson="$(cd pyvenv/bin; pwd)/meson"
++meson=`which meson`
+ 
+ # Conditionally ensure Sphinx is installed.
+ 

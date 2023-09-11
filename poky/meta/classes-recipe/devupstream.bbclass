@@ -46,7 +46,7 @@ python devupstream_virtclass_handler () {
     pv = d.getVar("PV")
     proto_marker = "+" + uri.scheme
     if proto_marker not in pv and not d.getVar("PV:class-devupstream"):
-        d.setVar("PV", pv + proto_marker + "${SRCPV}")
+        d.setVar("PV", pv + proto_marker)
 
     if variant == "native":
         pn = d.getVar("PN")

@@ -35,4 +35,6 @@ RDEPENDS:${PN}-ptest += " \
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}/tests
     cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    sed -e  "s|'test_unit|'tests/test_unit|g" -i  ${D}${PTEST_PATH}/tests/test_unit/test_nlmsg/test_marshal.py \
+    ${D}${PTEST_PATH}/tests/test_unit/test_iproute_match/test_match.py
 }

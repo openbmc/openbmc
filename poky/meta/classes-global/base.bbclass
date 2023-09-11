@@ -126,11 +126,18 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
     if notfound and fatal:
         bb.fatal("The following required tools (as specified by HOSTTOOLS) appear to be unavailable in PATH, please install them in order to proceed:\n  %s" % " ".join(notfound))
 
+# We can't use vardepvalue against do_fetch directly since that would overwrite
+# the other task dependencies so we use an indirect function.
+python fetcher_hashes_dummyfunc() {
+    return
+}
+fetcher_hashes_dummyfunc[vardepvalue] = "${@bb.fetch.get_hashvalue(d)}"
+
 addtask fetch
 do_fetch[dirs] = "${DL_DIR}"
 do_fetch[file-checksums] = "${@bb.fetch.get_checksum_file_list(d)}"
 do_fetch[file-checksums] += " ${@get_lic_checksum_file_list(d)}"
-do_fetch[vardeps] += "SRCREV"
+do_fetch[prefuncs] += "fetcher_hashes_dummyfunc"
 do_fetch[network] = "1"
 python base_do_fetch() {
 
@@ -606,7 +613,6 @@ python () {
                     bb.debug(1, "Skipping recipe %s because of incompatible license(s): %s" % (pn, ' '.join(incompatible_lic)))
                     raise bb.parse.SkipRecipe("it has incompatible license(s): %s" % ' '.join(incompatible_lic))
 
-    needsrcrev = False
     srcuri = d.getVar('SRC_URI')
     for uri_string in srcuri.split():
         uri = bb.fetch.URI(uri_string)
@@ -619,23 +625,16 @@ python () {
 
         # Svn packages should DEPEND on subversion-native
         if uri.scheme == "svn":
-            needsrcrev = True
             d.appendVarFlag('do_fetch', 'depends', ' subversion-native:do_populate_sysroot')
 
         # Git packages should DEPEND on git-native
         elif uri.scheme in ("git", "gitsm"):
-            needsrcrev = True
             d.appendVarFlag('do_fetch', 'depends', ' git-native:do_populate_sysroot')
 
         # Mercurial packages should DEPEND on mercurial-native
         elif uri.scheme == "hg":
-            needsrcrev = True
             d.appendVar("EXTRANATIVEPATH", ' python3-native ')
             d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot')
-
-        # Perforce packages support SRCREV = "${AUTOREV}"
-        elif uri.scheme == "p4":
-            needsrcrev = True
 
         # OSC packages should DEPEND on osc-native
         elif uri.scheme == "osc":
@@ -645,7 +644,6 @@ python () {
             d.appendVarFlag('do_fetch', 'depends', ' nodejs-native:do_populate_sysroot')
 
         elif uri.scheme == "repo":
-            needsrcrev = True
             d.appendVarFlag('do_fetch', 'depends', ' repo-native:do_populate_sysroot')
 
         # *.lz4 should DEPEND on lz4-native for unpacking
@@ -675,21 +673,6 @@ python () {
         # *.deb should DEPEND on xz-native for unpacking
         elif path.endswith('.deb'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
-
-    if needsrcrev:
-        d.setVar("SRCPV", "${@bb.fetch2.get_srcrev(d)}")
-
-        # Gather all named SRCREVs to add to the sstate hash calculation
-        # This anonymous python snippet is called multiple times so we
-        # need to be careful to not double up the appends here and cause
-        # the base hash to mismatch the task hash
-        for uri in srcuri.split():
-            parm = bb.fetch.decodeurl(uri)[5]
-            uri_names = parm.get("name", "").split(",")
-            for uri_name in filter(None, uri_names):
-                srcrev_name = "SRCREV_{}".format(uri_name)
-                if srcrev_name not in (d.getVarFlag("do_fetch", "vardeps") or "").split():
-                    d.appendVarFlag("do_fetch", "vardeps", " {}".format(srcrev_name))
 
     set_packagetriplet(d)
 

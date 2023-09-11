@@ -273,12 +273,12 @@ loading modules needed to locate and mount the final root filesystem.
 
 Follow these steps to create an :term:`Initramfs` image:
 
-#. *Create the :term:`Initramfs` Image Recipe:* You can reference the
+#. *Create the Initramfs Image Recipe:* You can reference the
    ``core-image-minimal-initramfs.bb`` recipe found in the
    ``meta/recipes-core`` directory of the :term:`Source Directory`
    as an example from which to work.
 
-#. *Decide if You Need to Bundle the :term:`Initramfs` Image Into the Kernel
+#. *Decide if You Need to Bundle the Initramfs Image Into the Kernel
    Image:* If you want the :term:`Initramfs` image that is built to be bundled
    in with the kernel image, set the :term:`INITRAMFS_IMAGE_BUNDLE`
    variable to ``"1"`` in your ``local.conf`` configuration file and set the

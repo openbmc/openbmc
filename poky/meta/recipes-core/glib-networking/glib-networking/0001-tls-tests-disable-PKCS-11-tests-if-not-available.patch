@@ -1,0 +1,113 @@
+From 04728a5b73e870b4695c5e7ba42fa41c00471944 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 12 May 2023 20:19:35 +0100
+Subject: [PATCH] tls/tests: disable PKCS#11 tests if not available
+
+GnuTLS can be built without PKCS#11, which means the symbols
+gnutls_pkcs11_init and gnutls_pkcs11_add_provider are not part of the
+library.
+
+If these symbols don't exist in GnuTLS then we can't add a mock pkcs#11
+provider for testing, and several tests which need the mock provider
+will fail.
+
+Solve this by checking for the symbols at build time and disabling the
+provider and tests which need it.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ meson.build             |  4 ++++
+ tls/tests/certificate.c | 11 +++++++----
+ tls/tests/connection.c  |  4 +++-
+ 3 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 0fa9027..d2a023a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -84,6 +84,10 @@ gnutls_dep = dependency('gnutls', version: '>= 3.7.4', required: get_option('gnu
+ 
+ if gnutls_dep.found()
+   backends += ['gnutls']
++  # test-specific, maybe move to tls/tests
++  if cc.has_function('gnutls_pkcs11_init', prefix: '#include <gnutls/pkcs11.h>', dependencies: gnutls_dep)
++    config_h.set10('HAVE_GNUTLS_PKCS11', true)
++  endif
+ endif
+ 
+ # *** Checks for OpenSSL    ***
+diff --git a/tls/tests/certificate.c b/tls/tests/certificate.c
+index e820ba1..dd2412b 100644
+--- a/tls/tests/certificate.c
++++ b/tls/tests/certificate.c
+@@ -24,6 +24,7 @@
+  * Author: Stef Walter <stefw@collabora.co.uk>
+  */
+ 
++#include "config.h"
+ #include "certificate.h"
+ 
+ #include <gio/gio.h>
+@@ -911,7 +912,7 @@ int
+ main (int   argc,
+       char *argv[])
+ {
+-#ifdef BACKEND_IS_GNUTLS
++#if defined(BACKEND_IS_GNUTLS) && HAVE_GNUTLS_PKCS11
+   char *module_path;
+ #endif
+ 
+@@ -921,7 +922,7 @@ main (int   argc,
+   g_setenv ("GIO_USE_TLS", BACKEND, TRUE);
+   g_assert_cmpint (g_ascii_strcasecmp (G_OBJECT_TYPE_NAME (g_tls_backend_get_default ()), "GTlsBackend" BACKEND), ==, 0);
+ 
+-#ifdef BACKEND_IS_GNUTLS
++#if defined(BACKEND_IS_GNUTLS) && HAVE_GNUTLS_PKCS11
+   module_path = g_test_build_filename (G_TEST_BUILT, "mock-pkcs11.so", NULL);
+   g_assert_true (g_file_test (module_path, G_FILE_TEST_EXISTS));
+ 
+@@ -942,12 +943,14 @@ main (int   argc,
+               setup_certificate, test_create_certificate_with_issuer, teardown_certificate);
+   g_test_add ("/tls/" BACKEND "/certificate/create-with-garbage-input", TestCertificate, NULL,
+               setup_certificate, test_create_certificate_with_garbage_input, teardown_certificate);
+-  g_test_add ("/tls/" BACKEND "/certificate/pkcs11", TestCertificate, NULL,
+-              setup_certificate, test_create_certificate_pkcs11, teardown_certificate);
+   g_test_add ("/tls/" BACKEND "/certificate/private-key", TestCertificate, NULL,
+               setup_certificate, test_private_key, teardown_certificate);
++#if HAVE_GNUTLS_PKCS11
++  g_test_add ("/tls/" BACKEND "/certificate/pkcs11", TestCertificate, NULL,
++              setup_certificate, test_create_certificate_pkcs11, teardown_certificate);
+   g_test_add ("/tls/" BACKEND "/certificate/private-key-pkcs11", TestCertificate, NULL,
+               setup_certificate, test_private_key_pkcs11, teardown_certificate);
++#endif
+ 
+   g_test_add_func ("/tls/" BACKEND "/certificate/create-chain", test_create_certificate_chain);
+   g_test_add_func ("/tls/" BACKEND "/certificate/create-no-chain", test_create_certificate_no_chain);
+diff --git a/tls/tests/connection.c b/tls/tests/connection.c
+index 17efe1b..62a7fbb 100644
+--- a/tls/tests/connection.c
++++ b/tls/tests/connection.c
+@@ -3376,7 +3376,7 @@ main (int   argc,
+ 
+   g_assert_true (g_ascii_strcasecmp (G_OBJECT_TYPE_NAME (g_tls_backend_get_default ()), "GTlsBackend" BACKEND) == 0);
+ 
+-#ifdef BACKEND_IS_GNUTLS
++#if defined(BACKEND_IS_GNUTLS) && HAVE_GNUTLS_PKCS11
+   module_path = g_test_build_filename (G_TEST_BUILT, "mock-pkcs11.so", NULL);
+   g_assert_true (g_file_test (module_path, G_FILE_TEST_EXISTS));
+ 
+@@ -3438,8 +3438,10 @@ main (int   argc,
+               setup_connection, test_client_auth_request_fail, teardown_connection);
+   g_test_add ("/tls/" BACKEND "/connection/client-auth-request-none", TestConnection, NULL,
+               setup_connection, test_client_auth_request_none, teardown_connection);
++#if HAVE_GNUTLS_PKCS11
+   g_test_add ("/tls/" BACKEND "/connection/client-auth-pkcs11", TestConnection, NULL,
+               setup_connection, test_client_auth_pkcs11_connection, teardown_connection);
++#endif
+   g_test_add ("/tls/" BACKEND "/connection/no-database", TestConnection, NULL,
+               setup_connection, test_connection_no_database, teardown_connection);
+   g_test_add ("/tls/" BACKEND "/connection/failed", TestConnection, NULL,
+-- 
+2.34.1
+

@@ -13,20 +13,21 @@ LDFLAGS:prepend = "${@ " ".join(d.getVar('LD').split()[1:])} "
 EFI_LD = "bfd"
 LDFLAGS:append = " -fuse-ld=${EFI_LD}"
 
-do_write_config[vardeps] += "CC OBJCOPY EFI_LD"
+do_write_config[vardeps] += "EFI_LD"
 do_write_config:append() {
     cat >${WORKDIR}/meson-${PN}.cross <<EOF
 [binaries]
-c = ${@meson_array('CC', d)}
-objcopy = ${@meson_array('OBJCOPY', d)}
 c_ld = ${@meson_array('EFI_LD', d)}
 EOF
 }
 
+MESON_CROSS_FILE:append = " --cross-file ${WORKDIR}/meson-${PN}.cross"
+
+MESON_TARGET = "systemd-boot"
+
 EXTRA_OEMESON += "-Defi=true \
                   -Dbootloader=true \
                   -Dman=false \
-                  --cross-file ${WORKDIR}/meson-${PN}.cross \
                   "
 
 # install to the image as boot*.efi if its the EFI_PROVIDER,
@@ -46,15 +47,10 @@ FILES:${PN} = "${EFI_FILES_PATH}/${SYSTEMD_BOOT_IMAGE}"
 
 RDEPENDS:${PN} += "virtual-systemd-bootconf"
 
-# Imported from the old gummiboot recipe
-TUNE_CCARGS:remove = "-mfpmath=sse"
+CFLAGS:append:libc-musl = " -D__DEFINED_wchar_t"
 
 COMPATIBLE_HOST = "(aarch64.*|arm.*|x86_64.*|i.86.*)-linux"
 COMPATIBLE_HOST:x86-x32 = "null"
-
-do_compile() {
-	ninja systemd-boot
-}
 
 do_install() {
 	install -d ${D}${EFI_FILES_PATH}

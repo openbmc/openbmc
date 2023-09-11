@@ -12,7 +12,7 @@ SRC_URI = "http://nice.freedesktop.org/releases/libnice-${PV}.tar.gz \
            file://0001-agent-meson-Replace-filename-with-basename.patch"
 SRC_URI[sha256sum] = "72e73a2acf20f59093e21d5601606e405873503eb35f346fa621de23e99b3b39"
 
-DEPENDS = "glib-2.0 gnutls"
+DEPENDS = "glib-2.0 gnutls ${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'graphviz-native', '', d)}"
 
 PACKAGECONFIG[gupnp] = "-Dgupnp=enabled,-Dgupnp=disabled,gupnp"
 PACKAGECONFIG[gstreamer] = "-Dgstreamer=enabled,-Dgstreamer=disabled,gstreamer1.0"

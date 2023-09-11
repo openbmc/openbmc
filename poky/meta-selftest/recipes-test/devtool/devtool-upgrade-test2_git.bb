@@ -8,7 +8,7 @@ DEPENDS = "dbus"
 
 # Note: this is intentionally not the latest version in the original .bb
 SRCREV = "1a3e1343761b30750bed70e0fd688f6d3c7b3717"
-PV = "0.1+git${SRCPV}"
+PV = "0.1+git"
 PR = "r2"
 
 SRC_URI = "git://git.yoctoproject.org/dbus-wait;branch=master"

@@ -4,7 +4,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7ae2be7fb1637141840314b51970a9f7"
 
 SRC_URI = " \
     git://gitlab.freedesktop.org/libdecor/libdecor.git;protocol=https;branch=master \
-    file://0001-libdecor-gtk.c-dont-skip-for-conflicting-symbols.patch \
 "
 
 DEPENDS = " \
@@ -16,7 +15,7 @@ DEPENDS = " \
 "
 
 S = "${WORKDIR}/git"
-SRCREV = "a254d0c2ff0cbfcf0bbf14cc67cc403640880c01"
+SRCREV = "0d63d125f899dbb1b932468f2f3b911f9c121e58"
 
 PACKAGECONFIG ?= "dbus ${@bb.utils.filter('DISTRO_FEATURES', 'gtk+3', d)}"
 

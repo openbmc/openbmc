@@ -1,4 +1,4 @@
-From e789c1a0c9de5928a3b49f5b9d81b63636f5c7bb Mon Sep 17 00:00:00 2001
+From c25d460a2f00e9af25087d40447fe1a81c89710c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sun, 27 May 2007 21:04:11 +0000
 Subject: [PATCH] perl: 5.8.7 -> 5.8.8 (from OE)
@@ -20,38 +20,38 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/configpm b/configpm
-index 94a4778..99b20c9 100755
+index 07219d8..01a23fa 100755
 --- a/configpm
 +++ b/configpm
-@@ -687,7 +687,7 @@ sub FETCH {
-     my($self, $key) = @_;
- 
-     # check for cached value (which may be undef so we use exists not defined)
--    return exists $self->{$key} ? $self->{$key} : $self->fetch_string($key);
-+    return $self->fetch_string($key);
- }
- 
+@@ -718,7 +718,7 @@ $config_txt .= uncomment <<'ENDOFEND';
+ #        my($self, $key) = @_;
+ #
+ #        # check for cached value (which may be undef so we use exists not defined)
+-#        return exists $self->{$key} ? $self->{$key} : $self->fetch_string($key);
++#        return $self->fetch_string($key);
+ #    }
+ #
  ENDOFEND
-@@ -845,7 +845,21 @@ $config_txt .= sprintf <<'ENDOFTIE', $fast_config;
- sub DESTROY { }
- 
- sub AUTOLOAD {
--    require 'Config_heavy.pl';
-+    my $cfgfile = 'Config_heavy.pl';
-+    if (defined $ENV{PERLCONFIGTARGET} and $ENV{PERLCONFIGTARGET} eq "yes")
-+    {
-+        $cfgfile = 'Config_heavy-target.pl';
-+    }
-+    if (defined $ENV{PERL_ARCHLIB})
-+    {
-+        push @INC, $ENV{PERL_ARCHLIB};
-+        require $cfgfile;
-+        pop @INC;
-+    }
-+    else
-+    {
-+        require $cfgfile;
-+    }
-     goto \&launcher unless $Config::AUTOLOAD =~ /launcher$/;
-     die "&Config::AUTOLOAD failed on $Config::AUTOLOAD";
- }
+@@ -876,7 +876,21 @@ $config_txt .= sprintf uncomment <<'ENDOFTIE', $fast_config;
+ #    sub DESTROY { }
+ #
+ #    sub AUTOLOAD {
+-#        require 'Config_heavy.pl';
++#        my $cfgfile = 'Config_heavy.pl';
++#        if (defined $ENV{PERLCONFIGTARGET} and $ENV{PERLCONFIGTARGET} eq "yes")
++#        {
++#            $cfgfile = 'Config_heavy-target.pl';
++#        }
++#        if (defined $ENV{PERL_ARCHLIB})
++#        {
++#            push @INC, $ENV{PERL_ARCHLIB};
++#            require $cfgfile;
++#            pop @INC;
++#        }
++#        else
++#        {
++#            require $cfgfile;
++#        }
+ #        goto \&launcher unless $Config::AUTOLOAD =~ /launcher$/;
+ #        die "&Config::AUTOLOAD failed on $Config::AUTOLOAD";
+ #    }

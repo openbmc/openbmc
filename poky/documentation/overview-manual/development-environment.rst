@@ -232,8 +232,8 @@ and so forth.
 
    For information on finding out who is responsible for (maintains) a
    particular area of code in the Yocto Project, see the
-   ":ref:`dev-manual/changes:submitting a change to the yocto project`"
-   section of the Yocto Project Development Tasks Manual.
+   ":doc:`../contributor-guide/identify-component`"
+   section of the Yocto Project and OpenEmbedded Contributor Guide.
 
 The Yocto Project ``poky`` Git repository also has an upstream
 contribution Git repository named ``poky-contrib``. You can see all the
@@ -264,8 +264,8 @@ push them into the "contrib" area and subsequently request that the
 maintainer include them into an upstream branch. This process is called
 "submitting a patch" or "submitting a change." For information on
 submitting patches and changes, see the
-":ref:`dev-manual/changes:submitting a change to the yocto project`"
-section in the Yocto Project Development Tasks Manual.
+":doc:`../contributor-guide/submit-changes`" section in the Yocto Project
+and OpenEmbedded Contributor Guide.
 
 In summary, there is a single point of entry for changes into the
 development branch of the Git repository, which is controlled by the
@@ -328,11 +328,10 @@ Book <https://book.git-scm.com>`__.
    software on which to develop. The Yocto Project has two scripts named
    ``create-pull-request`` and ``send-pull-request`` that ship with the
    release to facilitate this workflow. You can find these scripts in
-   the ``scripts`` folder of the
-   :term:`Source Directory`. For information
+   the ``scripts`` folder of the :term:`Source Directory`. For information
    on how to use these scripts, see the
-   ":ref:`dev-manual/changes:using scripts to push a change upstream and request a pull`"
-   section in the Yocto Project Development Tasks Manual.
+   ":ref:`contributor-guide/submit-changes:using scripts to push a change upstream and request a pull`"
+   section in the Yocto Project and OpenEmbedded Contributor Guide.
 
 -  *Patch Workflow:* This workflow allows you to notify the maintainer
    through an email that you have a change (or patch) you would like
@@ -340,8 +339,8 @@ Book <https://book.git-scm.com>`__.
    this type of change, you format the patch and then send the email
    using the Git commands ``git format-patch`` and ``git send-email``.
    For information on how to use these scripts, see the
-   ":ref:`dev-manual/changes:submitting a change to the yocto project`"
-   section in the Yocto Project Development Tasks Manual.
+   ":doc:`../contributor-guide/submit-changes`" section in the Yocto Project
+   and OpenEmbedded Contributor Guide.
 
 Git
 ===

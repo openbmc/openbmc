@@ -8,9 +8,10 @@
 # seems to be a successor to gtk-doc:
 # https://gitlab.gnome.org/GNOME/gi-docgen
 
-# This variable is set to True if api-documentation and
-# gobject-introspection-data are in DISTRO_FEATURES, False otherwise.
-GIDOCGEN_ENABLED ?= "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation gobject-introspection-data', 'True', 'False', d)}"
+# True if api-documentation and gobject-introspection-data are in DISTRO_FEATURES,
+# and qemu-user is in MACHINE_FEATURES, False otherwise.
+GIDOCGEN_ENABLED ?= "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation gobject-introspection-data', \
+                      bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'True', 'False', d), 'False', d)}"
 
 # When building native recipes, disable gi-docgen, as it is not necessary,
 # pulls in additional dependencies, and makes build times longer

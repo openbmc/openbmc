@@ -1,0 +1,53 @@
+From 2e871d6d6d13955ff363ff756adfdd257e72e9e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 10 Aug 2023 23:58:43 -0700
+Subject: [PATCH] Fix warnings found by clang compiler
+
+Fix diagnostics found with -Wdeprecated-non-prototype using clang
+compiler
+
+e.g.
+| ../git/src/server.c:108:35: error: passing arguments to a function without a prototype is deprecated in all versions of C and is not supported in C2x [-Werror,-Wdeprecated-non-prototype]  |   108 |   if (backend->input_backend->move(x, y, event) < 0) {                                                                                                                              |       |                                   ^
+
+Upstream-Status: Submitted [https://gitlab.com/CodethinkLabs/qad/qad/-/merge_requests/33]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/backend.h                 | 8 ++++----
+ src/backends/input/input_common.h | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/include/backend.h b/include/backend.h
+index 8f4c7c1..4bfe510 100644
+--- a/include/backend.h
++++ b/include/backend.h
+@@ -41,10 +41,10 @@ typedef struct qad_screen_buffer_s {
+ } qad_screen_buffer_t;
+ 
+ typedef struct qad_backend_input_s {
+-  int (*move)();
+-  int (*button)();
+-  int (*touch)();
+-  int (*swipe)();
++  int (*move)(int, int, int);
++  int (*button)(int, int);
++  int (*touch)(int, int, int, int);
++  int (*swipe)(int, int, int, int, int, int);
+   void *data;
+ } qad_backend_input_t;
+ 
+diff --git a/src/backends/input/input_common.h b/src/backends/input/input_common.h
+index 8e099a5..f2ea73f 100644
+--- a/src/backends/input/input_common.h
++++ b/src/backends/input/input_common.h
+@@ -28,7 +28,7 @@
+ #define BTN_DOWN 1
+ #define BTN_UP 0
+ 
+-qad_backend_input_t *create_input_backend();
++qad_backend_input_t *create_input_backend(char input_type[]);
+ 
+ // int move(int x, int y, int event);
+ 
+-- 
+2.41.0
+

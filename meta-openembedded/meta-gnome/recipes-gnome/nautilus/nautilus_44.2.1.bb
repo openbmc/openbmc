@@ -21,7 +21,7 @@ DEPENDS = " \
     tracker \
 "
 
-inherit gnomebase gsettings gobject-introspection gtk-doc gettext features_check mime-xdg gtk-icon-cache
+inherit gnomebase gsettings gobject-introspection gi-docgen gettext features_check mime-xdg gtk-icon-cache
 
 def gnome_verdir(v):
     return oe.utils.trim_version(v, 1)
@@ -30,6 +30,10 @@ SRC_URI += "file://0001-Replace-filename-with-basename.patch"
 SRC_URI[archive.sha256sum] = "d9c62f024727f7a76fc6a5da788a2b0247df01a71c2a601143c62aac0ff41e4c"
 
 REQUIRED_DISTRO_FEATURES = "x11 opengl gobject-introspection-data"
+
+GIDOCGEN_MESON_OPTION = "docs"
+GIDOCGEN_MESON_ENABLE_FLAG = 'true'
+GIDOCGEN_MESON_DISABLE_FLAG = 'false'
 
 EXTRA_OEMESON += " \
     -Dtests=none \

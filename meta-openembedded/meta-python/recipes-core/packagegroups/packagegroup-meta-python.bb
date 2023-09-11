@@ -437,7 +437,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-txaio \
     python3-txdbus \
     python3-txws \
-    python3-typed-ast \
     python3-typeguard \
     python3-tzlocal \
     python3-u-msgpack-python \

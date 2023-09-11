@@ -34,7 +34,7 @@
 ROOTFS_DEBUG_FILES ?= ""
 ROOTFS_DEBUG_FILES[doc] = "Lists additional files or directories to be installed with 'cp -a' in the format 'source1 target1;source2 target2;...'"
 
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_debug_files;"
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_debug_files"
 rootfs_debug_files () {
    #!/bin/sh -e
    echo "${ROOTFS_DEBUG_FILES}" | sed -e 's/;/\n/g' | while read source target mode; do

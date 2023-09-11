@@ -1,0 +1,82 @@
+From 5f8c78362b3b1e06f5adff2d4b140509c4799894 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 3 Sep 2023 12:31:59 +0200
+Subject: [PATCH] configure.ac: unify search dirs for pcap and add lib32
+
+* add lib32 because when building lib32-tcpreplay it's
+  impossible to set --with-libpcap so that it would find
+  both include files as well as the library in lib32 directory
+
+* maybe it would be beneficial to split --with-libpcap
+  into --with-libpcap-includedir --with-libpcap-libdir as this
+  already searches in the --with-libpcap value with and
+  without any "lib" prefix, but include files always expect
+  "include" dir there
+
+* most of this code was added in:
+  https://github.com/appneta/tcpreplay/commit/202b8e82f9fd3c84ce5804577caeb36a33baabe7#diff-49473dca262eeab3b4a43002adb08b4db31020d190caaad1594b47f1d5daa810R570
+
+* then search for
+  ${host_cpu} lib/${host_cpu} (without -${host_os} suffix)
+  and ${build_arch}-${host_os} lib/${build_arch}-${host_os}
+  was added, but only for search of dynamic library in:
+  https://github.com/appneta/tcpreplay/commit/c3d5236563985a99f8bb02c3f1bd6950e3929047
+
+* ${build_arch}-${host_os} lib/${build_arch}-${host_os}
+  was later replaced with:
+  lib/${MULTIARCH} ${MULTIARCH}
+  and it was added to static library search as well
+
+  but for dynamic library it was searching in reversed order:
+  ${MULTIARCH} lib/${MULTIARCH}
+  https://github.com/appneta/tcpreplay/commit/ed9e3a818bde04813144014561e62f018c9eb85f
+
+  I don't think this reversed order was intentional, just unify all 4 cases
+  to use the same directories in the same order
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Upstream-Status: Submitted [https://github.com/appneta/tcpreplay/pull/819]
+---
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 387219de..26ba31a5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -671,7 +671,7 @@ AC_ARG_WITH(libpcap,
+         LPCAPINCDIR=${testdir}
+         if test $dynamic_link = yes; then
+             for ext in .dylib .so .tbd ; do
+-                for dir in . lib lib64 lib/${host_cpu}-${host_os} ${host_cpu}-${host_os} lib/${MULTIARCH} ${MULTIARCH}; do
++                for dir in . lib lib64 lib32 lib/${host_cpu}-${host_os} ${host_cpu}-${host_os} lib/${MULTIARCH} ${MULTIARCH}; do
+                     sharefile=$(ls ${testdir}/$dir/libpcap${ext}* 2> /dev/null | sort | head -n1)
+                     if test -n "${sharefile}"; then
+                         LPCAP_LD_LIBRARY_PATH="$(dirname ${sharefile})"
+@@ -690,7 +690,7 @@ AC_ARG_WITH(libpcap,
+             dnl If dynamic library not found, try static
+             dnl
+             for ext in ${libext} .a .A.tbd ; do
+-                for dir in . lib lib64 lib/${host_cpu}-${host_os} ${host_cpu}-${host_os} lib/${MULTIARCH} ${MULTIARCH}; do
++                for dir in . lib lib64 lib32 lib/${host_cpu}-${host_os} ${host_cpu}-${host_os} lib/${MULTIARCH} ${MULTIARCH}; do
+                     staticfile=$(ls ${testdir}/$dir/libpcap${ext} 2> /dev/null | sort | head -n1)
+                     if test -n "${staticfile}"; then
+                         LPCAPLIB="${staticfile}"
+@@ -771,7 +771,7 @@ AC_ARG_WITH(libpcap,
+                 LPCAPINCDIR="${testdir}/include"
+                 if test $dynamic_link = yes; then
+                     for ext in .dylib .so .tbd; do
+-                        for dir in . lib lib64 ${host_cpu} lib/${host_cpu} ${host_cpu}-${host_os} lib/${host_cpu}-${host_os} ${MULTIARCH} lib/${MULTIARCH}; do
++                        for dir in . lib lib64 lib32 lib/${host_cpu}-${host_os} ${host_cpu}-${host_os} lib/${MULTIARCH} ${MULTIARCH}; do
+                             sharefile=$(ls "${testdir}/$dir/libpcap${ext}" 2> /dev/null | sort | head -n1)
+                             if test -n "${sharefile}"; then
+                                 LPCAPLIB="-L$(dirname ${sharefile}) -lpcap"
+@@ -790,7 +790,7 @@ AC_ARG_WITH(libpcap,
+                     dnl If dynamic library not found, try static
+                     dnl
+                     for ext in ${libext} .a .A.tbd ; do
+-                        for dir in . lib lib64 lib/${host_cpu}-${host_os} ${host_cpu}-${host_os} lib/${MULTIARCH} ${MULTIARCH}; do
++                        for dir in . lib lib64 lib32 lib/${host_cpu}-${host_os} ${host_cpu}-${host_os} lib/${MULTIARCH} ${MULTIARCH}; do
+                             staticfile=$(ls "${testdir}/$dir/libpcap${ext}" 2> /dev/null | sort | head -n1)
+                             if test -n "${staticfile}"; then
+                                 LPCAPLIB="${staticfile}"

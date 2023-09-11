@@ -6,13 +6,15 @@ DESCRIPTION = "MinIO Client (mc) provides a modern alternative to \
                cloud storage service (AWS Signature v2 and v4). \
 "
 
-SRC_URI = "git://github.com/minio/mc;nobranch=1;name=mc;protocol=https \
+SRC_URI = "git://github.com/minio/mc;branch=master;name=mc;protocol=https \
            file://modules.txt \
           "
 
 include src_uri.inc
 
 SRCREV_mc = "01b87ecc02ffad47dfe13c2154ac31db3e3115df"
+
+SRCREV_FORMAT .= "_mc"
 
 GO_IMPORT = "import"
 

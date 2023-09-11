@@ -34,19 +34,8 @@ For information about OpenEmbedded, see the
 Contribution Guidelines
 -----------------------
 
-The project works using a mailing list patch submission process. Patches
-should be sent to the mailing list for the repository the components
-originate from (see below). Throughout the Yocto Project, the README
-files in the component in question should detail where to send patches,
-who the maintainers are and where bugs should be reported.
-
-A guide to submitting patches to OpenEmbedded is available at:
-
-<https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded>
-
-There is good documentation on how to write/format patches at:
-
-<https://www.openembedded.org/wiki/Commit_Patch_Message_Guidelines>
+Please refer to our contributor guide here: https://docs.yoctoproject.org/dev/contributor-guide/
+for full details on how to submit changes.
 
 Where to Send Patches
 ---------------------

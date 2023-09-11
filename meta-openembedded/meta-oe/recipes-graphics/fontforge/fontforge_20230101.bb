@@ -19,6 +19,7 @@ SRC_URI = "git://github.com/${BPN}/${BPN}.git;branch=master;protocol=https \
            file://0001-include-sys-select-on-non-glibc-platforms.patch \
            file://0001-fontforgeexe-Use-env-to-find-fontforge.patch \
            file://0001-cmake-Use-alternate-way-to-detect-libm.patch \
+           file://0001-Fix-Translations-containing-invalid-directives-hs.patch \
 "
 S = "${WORKDIR}/git"
 

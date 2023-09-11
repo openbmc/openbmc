@@ -32,12 +32,12 @@ fi
 # We potentially have code that doesn't parse correctly with older versions 
 # of Python, and rather than fixing that and being eternally vigilant for 
 # any other new feature use, just check the version here.
-py_v35_check=$(python3 -c 'import sys; print(sys.version_info >= (3,5,0))')
-if [ "$py_v35_check" != "True" ]; then
-    echo >&2 "BitBake requires Python 3.5.0 or later as 'python3 (scripts/install-buildtools can be used if needed)'"
+py_v38_check=$(python3 -c 'import sys; print(sys.version_info >= (3,8,0))')
+if [ "$py_v38_check" != "True" ]; then
+    echo >&2 "BitBake requires Python 3.8.0 or later as 'python3' (scripts/install-buildtools can be used if needed)"
     return 1
 fi
-unset py_v35_check
+unset py_v38_check
 
 if [ -z "$BDIR" ]; then
     if [ -z "$1" ]; then

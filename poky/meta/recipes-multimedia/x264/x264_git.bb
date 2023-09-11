@@ -16,7 +16,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 SRCREV = "baee400fa9ced6f5481a728138fed6e867b0ff7f"
 
-PV = "r3039+git${SRCPV}"
+PV = "r3039+git"
 
 S = "${WORKDIR}/git"
 

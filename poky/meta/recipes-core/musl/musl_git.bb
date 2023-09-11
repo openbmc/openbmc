@@ -8,7 +8,7 @@ SRCREV = "83b858f83b658bd34eca5d8ad4d145f673ae7e5e"
 
 BASEVER = "1.2.4"
 
-PV = "${BASEVER}+git${SRCPV}"
+PV = "${BASEVER}+git"
 
 # mirror is at git://github.com/kraj/musl.git
 

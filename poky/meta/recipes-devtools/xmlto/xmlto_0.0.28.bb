@@ -11,7 +11,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 SRC_URI = "git://pagure.io/xmlto.git;protocol=https;branch=master"
 S = "${WORKDIR}/git"
 
-PV .= "+0.0.29+git${SRCPV}"
+PV .= "+0.0.29+git"
 
 inherit autotools
 

@@ -120,7 +120,7 @@ python write_host_sdk_ext_manifest () {
                 f.write("%s %s %s\n" % (info[1], info[2], info[3]))
 }
 
-SDK_POSTPROCESS_COMMAND:append:task-populate-sdk-ext = " write_target_sdk_ext_manifest; write_host_sdk_ext_manifest; "    
+SDK_POSTPROCESS_COMMAND:append:task-populate-sdk-ext = " write_target_sdk_ext_manifest write_host_sdk_ext_manifest"    
 
 SDK_TITLE:task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} Extensible SDK"
 
@@ -743,7 +743,7 @@ sdk_ext_postinst() {
 
 SDK_POST_INSTALL_COMMAND:task-populate-sdk-ext = "${sdk_ext_postinst}"
 
-SDK_POSTPROCESS_COMMAND:prepend:task-populate-sdk-ext = "copy_buildsystem; install_tools; "
+SDK_POSTPROCESS_COMMAND:prepend:task-populate-sdk-ext = "copy_buildsystem install_tools "
 
 SDK_INSTALL_TARGETS = ""
 fakeroot python do_populate_sdk_ext() {

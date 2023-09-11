@@ -13,7 +13,7 @@ SRCREV = "7182e603357250952aa24d90f6d89345f93da7ce"
 SRC_URI = "git://git.yoctoproject.org/${BPN};branch=master;protocol=https \
            file://no-handed.patch"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
-PV = "0.2+git${SRCPV}"
+PV = "0.2+git"
 
 S = "${WORKDIR}/git"
 

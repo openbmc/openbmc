@@ -15,7 +15,8 @@ DEPENDS += "ncurses flex-native gperf-native bison-native"
 RDEPENDS:${PN} += "python3 bash"
 SRC_URI = "git://gitlab.com/ymorin/kconfig-frontends.git;protocol=https;branch=4.11.x \
 	   file://0001-Makefile-ensure-frontends-exits-before-writing-into-.patch \
-           file://0001-Switch-utils-kconfig-diff-to-use-Python-3.patch"
+           file://0001-Switch-utils-kconfig-diff-to-use-Python-3.patch \
+           file://0001-Avoid-using-hard-coded-usr-include-paths.patch"
 
 SRCREV = "f22fce3a308be1c7790ebefc6bbedb33c5f7c86a"
 

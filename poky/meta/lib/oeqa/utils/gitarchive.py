@@ -100,9 +100,44 @@ def git_commit_data(repo, data_dir, branch, message, exclude, notes, log):
         if os.path.exists(tmp_index):
             os.unlink(tmp_index)
 
+def get_tags(repo, log, pattern=None, url=None):
+    """ Fetch remote tags from current repository
+
+    A pattern can be provided to filter returned tags list
+    An URL can be provided if local repository has no valid remote configured
+    """
+
+    base_cmd = ['ls-remote', '--refs', '--tags', '-q']
+    cmd = base_cmd.copy()
+
+    # First try to fetch tags from repository configured remote
+    cmd.append('origin')
+    if pattern:
+        cmd.append(pattern)
+    try:
+        tags_refs = repo.run_cmd(cmd)
+        tags = ["".join(d.split()[1].split('/', 2)[2:]) for d in tags_refs.splitlines()]
+    except GitError as e:
+        # If it fails, retry with repository url if one is provided
+        if url:
+            log.info("No remote repository configured, use provided url")
+            cmd = base_cmd.copy()
+            cmd.append(url)
+            if pattern:
+                cmd.append(pattern)
+            tags_refs = repo.run_cmd(cmd)
+            tags = ["".join(d.split()[1].split('/', 2)[2:]) for d in tags_refs.splitlines()]
+        else:
+            log.info("Read local tags only, some remote tags may be missed")
+            cmd = ["tag"]
+            if pattern:
+                cmd += ["-l", pattern]
+            tags = repo.run_cmd(cmd).splitlines()
+
+    return tags
 
 def expand_tag_strings(repo, name_pattern, msg_subj_pattern, msg_body_pattern,
-                       keywords):
+                       url, log, keywords):
     """Generate tag name and message, with support for running id number"""
     keyws = keywords.copy()
     # Tag number is handled specially: if not defined, we autoincrement it
@@ -116,7 +151,7 @@ def expand_tag_strings(repo, name_pattern, msg_subj_pattern, msg_body_pattern,
         tag_re = tag_re.format(tag_number='(?P<tag_number>[0-9]{1,5})')
 
         keyws['tag_number'] = 0
-        for existing_tag in repo.run_cmd('tag').splitlines():
+        for existing_tag in get_tags(repo, log, url=url):
             match = re.match(tag_re, existing_tag)
 
             if match and int(match.group('tag_number')) >= keyws['tag_number']:
@@ -143,7 +178,8 @@ def gitarchive(data_dir, git_dir, no_create, bare, commit_msg_subject, commit_ms
     if not no_tag and tagname:
         tag_name, tag_msg = expand_tag_strings(data_repo, tagname,
                                                tag_msg_subject,
-                                               tag_msg_body, keywords)
+                                               tag_msg_body,
+                                               push, log, keywords)
 
     # Commit data
     commit = git_commit_data(data_repo, data_dir, branch_name,
@@ -181,7 +217,7 @@ def get_test_runs(log, repo, tag_name, **kwargs):
 
     # Get a list of all matching tags
     tag_pattern = tag_name.format(**str_fields)
-    tags = repo.run_cmd(['tag', '-l', tag_pattern]).splitlines()
+    tags = get_tags(repo, log, pattern=tag_pattern)
     log.debug("Found %d tags matching pattern '%s'", len(tags), tag_pattern)
 
     # Parse undefined fields from tag names

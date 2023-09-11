@@ -22,7 +22,7 @@ DEPENDS = " \
 
 RRECOMMENDS:${PN}  = "gnuchess"
 
-SRC_URI = "git://github.com/GNOME/gnome-chess.git;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/GNOME/gnome-chess.git;protocol=https;branch=master"
 
 inherit meson pkgconfig gobject-introspection gtk-icon-cache vala features_check mime-xdg gsettings
 

@@ -20,7 +20,9 @@ RDEPENDS:${PN} += " \
     python3-logging \
     python3-misc \
     python3-netserver \
+    python3-packaging \
     python3-pkg-resources \
+    python3-setuptools \
     python3-sqlite3 \
     python3-typing-extensions \
     python3-wrapt \

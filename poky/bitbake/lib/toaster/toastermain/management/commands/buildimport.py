@@ -545,7 +545,7 @@ class Command(BaseCommand):
             # Find the directory's release, and promote to default_release if local paths
             release = self.find_import_release(layers_list,lv_dict,default_release)
             # create project, SANITY: reuse any project of same name
-            project = Project.objects.create_project(project_name,release,project)
+            project = Project.objects.create_project(project_name,release,project, imported=True)
             # Apply any new layers or variables
             self.apply_conf_variables(project,layers_list,lv_dict,release)
             # WORKAROUND: since we now derive the release, redirect 'newproject_specific' to 'project_specific'

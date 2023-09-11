@@ -56,7 +56,7 @@ RDEPENDS:${PN} = "${@["", "busybox-inittab"][(d.getVar('VIRTUAL-RUNTIME_init_man
 inherit cml1 systemd update-rc.d ptest
 
 # busybox's unzip test case needs zip command, which busybox itself does not provide
-RDEPENDS:${PN}-ptest = "zip coreutils"
+RDEPENDS:${PN}-ptest = "zip"
 
 # internal helper
 def busybox_cfg(feature, tokens, cnf, rem):

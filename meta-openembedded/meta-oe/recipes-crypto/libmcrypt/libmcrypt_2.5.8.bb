@@ -12,7 +12,7 @@ SRC_URI[sha256sum] = "e4eb6c074bbab168ac47b947c195ff8cef9d51a211cdd18ca9c9ef34d2
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/mcrypt/files/Libmcrypt/"
 UPSTREAM_CHECK_REGEX = "Libmcrypt/(?P<pver>\d+(\.\d+)+)/"
 
-inherit autotools-brokensep gettext binconfig
+inherit autotools-brokensep gettext binconfig multilib_script
 
 CFLAGS += "-Wno-error=implicit-int"
 
@@ -28,3 +28,5 @@ do_configure() {
 }
 
 CLEANBROKEN = "1"
+
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/libmcrypt-config"

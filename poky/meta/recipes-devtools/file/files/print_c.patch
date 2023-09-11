@@ -1,0 +1,27 @@
+From e329257b8e22362b62e6c930447ef6feadd63f32 Mon Sep 17 00:00:00 2001
+From: Joe Slater <joe.slater@windriver.com>
+Date: Mon, 7 Aug 2023 22:37:19 +0000
+Subject: [PATCH] print.c: initialize timezone data for localtime_r()
+
+The man page for localtime() points out that while it acts
+like tzset() has been called, localtime_r() might not.  We
+have a local version of localtime_r() that avoids this, but
+we do not compile it.
+
+Upstream-Status: Submitted [file@astron.com]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+---
+ src/print.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- git.orig/src/print.c
++++ git/src/print.c
+@@ -289,6 +289,7 @@ file_fmtdatetime(char *buf, size_t bsize
+ 		goto out;
+ 
+ 	if (flags & FILE_T_LOCAL) {
++		tzset();
+ 		tm = localtime_r(&t, &tmz);
+ 	} else {
+ 		tm = gmtime_r(&t, &tmz);

@@ -78,8 +78,8 @@ do_package_write_ipk[depends] += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlib
 do_package_write_deb[depends] += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlibs:do_packagedata"
 do_package_write_rpm[depends] += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlibs:do_packagedata"
 
-# Only x86, powerpc, sparc, s390, arm, and aarch64 are supported
-COMPATIBLE_HOST = '(x86_64|i.86|powerpc|sparc|s390|arm|aarch64).*-linux'
+# Only x86, powerpc, sparc, s390, arm, aarch64 and loongarch64 are supported
+COMPATIBLE_HOST = '(x86_64|i.86|powerpc|sparc|s390|arm|aarch64|loongarch64).*-linux'
 # musl is currently broken entirely
 COMPATIBLE_HOST:libc-musl = 'null'
 

@@ -64,7 +64,7 @@ LINUX_VERSION_EXTENSION:append = "-custom"
 # tag: v4.2 64291f7db5bd8150a74ad2036f1037e6a0428df2
 SRCREV_machine="64291f7db5bd8150a74ad2036f1037e6a0428df2"
 
-PV = "${LINUX_VERSION}+git${SRCPV}"
+PV = "${LINUX_VERSION}+git"
 
 # Override COMPATIBLE_MACHINE to include your machine in a copy of this recipe
 # file. Leaving it empty here ensures an early explicit build failure.

@@ -39,6 +39,9 @@ SRCREV_libcxx = "f8571eaba606bde2eb8cd34b30104ca33e7c207e"
 SRCREV_libcxxabi = "8dd405113a4f3694e910b79785dd7fb7535a888a"
 SRCREV_libunwind = "aabcd8753678f1536e15eb6385a948470debdae4"
 SRCREV_zlib = "5c85a2da4c13eda07f69d81a1579a5afddd35f59"
+
+SRCREV_FORMAT .="_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib"
+
 SRC_URI[gn.sha256sum] = "f706aaa0676e3e22f5fc9ca482295d7caee8535d1869f99efa2358177b64f5cd"
 
 require perfetto.inc

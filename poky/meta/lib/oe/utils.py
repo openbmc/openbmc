@@ -258,11 +258,11 @@ def execute_pre_post_process(d, cmds):
     if cmds is None:
         return
 
-    for cmd in cmds.strip().split(';'):
-        cmd = cmd.strip()
-        if cmd != '':
-            bb.note("Executing %s ..." % cmd)
-            bb.build.exec_func(cmd, d)
+    cmds = cmds.replace(";", " ")
+
+    for cmd in cmds.split():
+        bb.note("Executing %s ..." % cmd)
+        bb.build.exec_func(cmd, d)
 
 # For each item in items, call the function 'target' with item as the first 
 # argument, extraargs as the other arguments and handle any exceptions in the

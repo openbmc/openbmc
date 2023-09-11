@@ -18,15 +18,18 @@ Bitbake requires Python version 3.8 or newer.
 Contributing
 ------------
 
-Please refer to
-https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
-for guidelines on how to submit patches, just note that the latter documentation is intended
-for OpenEmbedded (and its core) not bitbake patches (bitbake-devel@lists.openembedded.org)
-but in general main guidelines apply. Once the commit(s) have been created, the way to send
-the patch is through git-send-email. For example, to send the last commit (HEAD) on current
-branch, type:
+Please refer to our contributor guide here: https://docs.yoctoproject.org/dev/contributor-guide/
+for full details on how to submit changes.
+
+As a quick guide, patches should be sent to bitbake-devel@lists.openembedded.org
+The git command to do that would be:
 
     git send-email -M -1 --to bitbake-devel@lists.openembedded.org
+
+If you're sending a patch related to the BitBake manual, make sure you copy
+the Yocto Project documentation mailing list:
+
+    git send-email -M -1 --to bitbake-devel@lists.openembedded.org --cc docs@lists.yoctoproject.org
 
 Mailing list:
 

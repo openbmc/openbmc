@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+set -e
+set -o pipefail
+
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+cd ${SCRIPTPATH}
+useradd tester  || echo "user already exists"
+su tester -c "make -C tests -k check-TESTS"
+userdel tester

@@ -1,0 +1,28 @@
+From c19d1f4a7e44e071df3a2612ae2eb20c84e831a6 Mon Sep 17 00:00:00 2001
+From: Emmanuele Bassi <ebassi@gnome.org>
+Date: Thu, 10 Aug 2023 12:44:49 +0100
+Subject: [PATCH] build: Allow host builds when cross-compiling
+
+Environments that set up execution wrappers when cross-compiling should
+be allowed to run code. We only fall back on external properties if we
+really can't run any native code on the host machine.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 48f22d7..7dcb9e6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -270,7 +270,7 @@ int main() {
+  return 0;
+ }
+ '''
+-if meson.is_cross_build()
++if not meson.can_run_host_binaries()
+   ieee754_float_div = meson.get_external_property('ieee754_float_div', cc.get_id() in ['gcc', 'clang'])
+   message('Cross-building, assuming IEEE 754 division:', ieee754_float_div)
+ else

@@ -184,4 +184,4 @@ do_install:class-nativesdk() {
 }
 BBCLASSEXTEND = "native nativesdk"
 
-CVE_PRODUCT += "d-bus_project:d-bus"
+CVE_PRODUCT += "d-bus_project:d-bus freedesktop:dbus freedesktop:libdbus"

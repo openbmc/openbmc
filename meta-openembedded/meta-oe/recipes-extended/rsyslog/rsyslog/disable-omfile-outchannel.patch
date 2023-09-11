@@ -1,0 +1,23 @@
+tests: Skip omfile-outchannel test as it fails on musl
+
+scanf error in index i=5559
+sequence error detected in rstb_168227_f19f3b245QVE.out.log
+number of lines in file: 5559 rstb_168227_f19f3b245QVE.out.log
+
+Patch is also applied in void linux
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/tests/omfile-outchannel.sh	2021-03-09 05:51:07.000000000 -0600
++++ b/tests/omfile-outchannel.sh	2022-05-26 15:55:23.358520256 -0500
+@@ -1,5 +1,9 @@
+ #!/bin/bash
+ # addd 2018-08-02 by RGerhards, released under ASL 2.0
++
++# This test fails for x86_64-musl, under GitHub's CI/CD. Disable for now.
++exit 77
++
+ . ${srcdir:=.}/diag.sh init
+ export NUMMESSAGES=10000
+ echo "ls -l $RSYSLOG_DYNNAME*

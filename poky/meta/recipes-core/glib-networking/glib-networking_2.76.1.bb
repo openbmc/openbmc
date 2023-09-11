@@ -16,7 +16,9 @@ DEPENDS = "glib-2.0-native glib-2.0"
 
 SRC_URI[archive.sha256sum] = "5c698a9994dde51efdfb1026a56698a221d6250e89dc50ebcddda7b81480a42b"
 
-PACKAGECONFIG ??= "openssl environment ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
+# Upstream note that for the openssl backend, half the tests where this backend don't return
+# the expected error code or don't work as expected so default to gnutls
+PACKAGECONFIG ??= "gnutls environment ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
 
 PACKAGECONFIG[gnutls] = "-Dgnutls=enabled,-Dgnutls=disabled,gnutls"
 PACKAGECONFIG[openssl] = "-Dopenssl=enabled,-Dopenssl=disabled,openssl"
@@ -30,6 +32,7 @@ inherit gnomebase gettext upstream-version-is-even gio-module-cache ptest-gnome
 
 SRC_URI += "file://run-ptest"
 SRC_URI += "file://eagain.patch"
+SRC_URI += "file://0001-tls-tests-disable-PKCS-11-tests-if-not-available.patch"
 
 FILES:${PN} += "\
                 ${libdir}/gio/modules/libgio*.so \

@@ -547,7 +547,10 @@ class GitApplyTree(PatchTree):
         reporoot = (runcmd("git rev-parse --show-toplevel".split(), self.dir) or '').strip()
         if not reporoot:
             raise Exception("Cannot get repository root for directory %s" % self.dir)
-        hooks_dir = os.path.join(reporoot, '.git', 'hooks')
+        gitdir = (runcmd("git rev-parse --absolute-git-dir".split(), self.dir) or '').strip()
+        if not gitdir:
+            raise Exception("Cannot get gitdir for directory %s" % self.dir)
+        hooks_dir = os.path.join(gitdir, 'hooks')
         hooks_dir_backup = hooks_dir + '.devtool-orig'
         if os.path.lexists(hooks_dir_backup):
             raise Exception("Git hooks backup directory already exists: %s" % hooks_dir_backup)

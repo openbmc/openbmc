@@ -476,6 +476,14 @@ Here are some example URLs::
    easy to share metadata without removing passwords. SSH keys, ``~/.netrc``
    and ``~/.ssh/config`` files can be used as alternatives.
 
+Using tags with the git fetcher may cause surprising behaviour. Bitbake needs to
+resolve the tag to a specific revision and to do that, it has to connect to and use
+the upstream repository. This is because the revision the tags point at can change and
+we've seen cases of this happening in well known public repositories. This can mean
+many more network connections than expected and recipes may be reparsed at every build.
+Source mirrors will also be bypassed as the upstream repository is the only source
+of truth to resolve the revision accurately. For these reasons, whilst the fetcher
+can support tags, we recommend being specific about revisions in recipes.
 
 .. _gitsm-fetcher:
 
@@ -688,6 +696,41 @@ Here is an example URL::
 
 It can also be used when setting mirrors definitions using the :term:`PREMIRRORS` variable.
 
+.. _gcp-fetcher:
+
+GCP Fetcher (``gs://``)
+--------------------------
+
+This submodule fetches data from a
+`Google Cloud Storage Bucket <https://cloud.google.com/storage/docs/buckets>`__.
+It uses the `Google Cloud Storage Python Client <https://cloud.google.com/python/docs/reference/storage/latest>`__
+to check the status of objects in the bucket and download them.
+The use of the Python client makes it substantially faster than using command
+line tools such as gsutil.
+
+The fetcher requires the Google Cloud Storage Python Client to be installed, along
+with the gsutil tool.
+
+The fetcher requires that the machine has valid credentials for accessing the
+chosen bucket. Instructions for authentication can be found in the
+`Google Cloud documentation <https://cloud.google.com/docs/authentication/provide-credentials-adc#local-dev>`__.
+
+If it used from the OpenEmbedded build system, the fetcher can be used for
+fetching sstate artifacts from a GCS bucket by specifying the
+``SSTATE_MIRRORS`` variable as shown below::
+
+   SSTATE_MIRRORS ?= "\
+       file://.* gs://<bucket name>/PATH \
+   "
+
+The fetcher can also be used in recipes::
+
+   SRC_URI = "gs://<bucket name>/<foo_container>/<bar_file>"
+
+However, the checksum of the file should be also be provided::
+
+   SRC_URI[sha256sum] = "<sha256 string>"
+
 .. _crate-fetcher:
 
 Crate Fetcher (``crate://``)
@@ -790,6 +833,8 @@ Fetch submodules also exist for the following:
 -  Mercurial (``hg://``)
 
 -  OSC (``osc://``)
+
+-  S3 (``s3://``)
 
 -  Secure FTP (``sftp://``)
 

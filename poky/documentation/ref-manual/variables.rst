@@ -192,10 +192,6 @@ system and gives an overview of their function and contents.
 
          ASSUME_SHLIBS = "libEGL.so.1:libegl-implementation"
 
-   :term:`AUTHOR`
-      The email address used to contact the original author or authors in
-      order to send patches and forward bugs.
-
    :term:`AUTO_LIBNAME_PKGS`
       When the :ref:`ref-classes-debian` class is inherited,
       which is the default behavior, :term:`AUTO_LIBNAME_PKGS` specifies which

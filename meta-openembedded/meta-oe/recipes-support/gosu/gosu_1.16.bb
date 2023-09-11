@@ -11,6 +11,9 @@ SRC_URI = "git://${GO_IMPORT}.git;branch=master;protocol=https \
 SRCREV = "0e7347714352cd7f2e5edc9d2cf838d9934e6036"
 #v1.1.0
 SRCREV_runc = "067aaf8548d78269dcb2c13b856775e27c410f9c"
+
+SRCREV_FORMAT .= "_runc"
+
 inherit go
 
 CGO_ENABLED = "1"

@@ -1,0 +1,23 @@
+From 7a66d4fe8aac8c8697c3cecb0c189e22524fbc98 Mon Sep 17 00:00:00 2001
+From: Boian Bonev <bbonev@ipacct.com>
+Date: Fri, 11 Aug 2023 22:08:27 +0000
+Subject: [PATCH] Bump udev version to 251
+
+Upstream-Status: Submitted [https://github.com/eudev-project/eudev/pull/253]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3e31b0e..069fdfb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,6 +1,6 @@
+ AC_PREREQ([2.68])
+ AC_INIT([eudev],[3.2.12],[https://github.com/gentoo/eudev/issues])
+-AC_SUBST(UDEV_VERSION, 243)
++AC_SUBST(UDEV_VERSION, 251)
+ AC_CONFIG_SRCDIR([src/udev/udevd.c])
+ 
+ AC_USE_SYSTEM_EXTENSIONS

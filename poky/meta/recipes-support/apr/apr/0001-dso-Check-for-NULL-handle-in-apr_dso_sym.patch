@@ -1,0 +1,37 @@
+From a25be1aaa92a6d2e7f4cc3fdfbb92e5a10b63035 Mon Sep 17 00:00:00 2001
+From: Greg Beard <gmbeard@googlemail.com>
+Date: Sat, 25 Mar 2023 08:31:36 +0000
+Subject: [PATCH] dso: Check for NULL handle in apr_dso_sym
+
+Upstream-Status: Backport [https://github.com/apache/apr/pull/40/commits/0efce00093b1ba405d91c7f0eab9755c8527eead]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ dso/unix/dso.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/dso/unix/dso.c b/dso/unix/dso.c
+index fdd56f1..583d5de 100644
+--- a/dso/unix/dso.c
++++ b/dso/unix/dso.c
+@@ -173,6 +173,18 @@ APR_DECLARE(apr_status_t) apr_dso_sym(apr_dso_handle_sym_t *ressym,
+                                       apr_dso_handle_t *handle, 
+                                       const char *symname)
+ {
++    /* This is necessary for `testdso.c`. For some reason, musl
++     * builds fail the `test_unload_library` test if the below
++     * check isn't in place. `test_unload_library` unloads the
++     * library and then immediately calls this function. Maybe
++     * musl's `dlsym()` assumes the handle is never NULL and
++     * some UB is being invoked here...
++     */
++    if (handle->handle == NULL) {
++        handle->errormsg = "library not loaded";
++        return APR_ESYMNOTFOUND;
++    }
++
+ #if defined(DSO_USE_SHL)
+     void *symaddr = NULL;
+     int status;
+-- 
+2.42.0
+

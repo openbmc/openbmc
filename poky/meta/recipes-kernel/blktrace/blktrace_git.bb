@@ -12,7 +12,7 @@ DEPENDS = "libaio"
 
 SRCREV = "366d30b9cdb20345c5d064af850d686da79b89eb"
 
-PV = "1.3.0+git${SRCPV}"
+PV = "1.3.0+git"
 
 SRC_URI = "git://git.kernel.dk/blktrace.git;branch=master;protocol=https"
 

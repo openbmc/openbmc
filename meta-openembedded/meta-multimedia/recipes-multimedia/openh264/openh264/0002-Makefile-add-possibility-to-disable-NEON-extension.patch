@@ -1,0 +1,103 @@
+From bc3a3baeaccfe9c1286848b348baf92dfbd05346 Mon Sep 17 00:00:00 2001
+From: Benjamin Bara <benjamin.bara@skidata.com>
+Date: Thu, 31 Aug 2023 09:27:31 +0200
+Subject: [PATCH 2/2] Makefile: add possibility to disable NEON extension
+
+README states that the NEON extension is optional. However, currently it
+cannot be turned off, therefore add an option to disable it.
+
+Upstream-Status: Submitted [https://github.com/cisco/openh264/pull/3679]
+Signed-off-by: Benjamin Bara <benjamin.bara@skidata.com>
+---
+ Makefile                   |  1 +
+ build/arch.mk              |  4 ++++
+ build/msvc-common.mk       | 10 ++++++++--
+ build/platform-mingw_nt.mk |  5 ++++-
+ 4 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index baed53a7..cc22c4aa 100644
+--- a/Makefile
++++ b/Makefile
+@@ -35,6 +35,7 @@ CCASFLAGS=$(CFLAGS)
+ STATIC_LDFLAGS=-lstdc++
+ STRIP ?= strip
+ USE_STACK_PROTECTOR = Yes
++USE_NEON=Yes
+ 
+ SHAREDLIB_MAJORVERSION=7
+ FULL_VERSION := 2.3.1
+diff --git a/build/arch.mk b/build/arch.mk
+index 4e1538c4..fd6a81e4 100644
+--- a/build/arch.mk
++++ b/build/arch.mk
+@@ -17,18 +17,22 @@ ifneq ($(filter-out arm64 arm64e, $(filter arm%, $(ARCH))),)
+ ifeq ($(USE_ASM), Yes)
+ ASM_ARCH = arm
+ ASMFLAGS += -I$(SRC_PATH)codec/common/arm/
++ifeq ($(USE_NEON), Yes)
+ CFLAGS += -DHAVE_NEON
+ endif
+ endif
++endif
+ 
+ #for arm64
+ ifneq ($(filter arm64 aarch64 arm64e, $(ARCH)),)
+ ifeq ($(USE_ASM), Yes)
+ ASM_ARCH = arm64
+ ASMFLAGS += -I$(SRC_PATH)codec/common/arm64/
++ifeq ($(USE_NEON), Yes)
+ CFLAGS += -DHAVE_NEON_AARCH64
+ endif
+ endif
++endif
+ 
+ #for mips
+ ifneq ($(filter mips mips64, $(ARCH)),)
+diff --git a/build/msvc-common.mk b/build/msvc-common.mk
+index 5891ea4e..5a1e2582 100644
+--- a/build/msvc-common.mk
++++ b/build/msvc-common.mk
+@@ -10,7 +10,10 @@ else
+ endif
+ ifeq ($(ASM_ARCH), arm)
+ CCAS = gas-preprocessor.pl -as-type armasm -force-thumb -- armasm
+-CCASFLAGS = -nologo -DHAVE_NEON -ignore 4509
++CCASFLAGS = -nologo -ignore 4509
++ifeq ($(USE_NEON), Yes)
++CCASFLAGS += -DHAVE_NEON
++endif
+ endif
+ 
+ CC=cl
+@@ -20,7 +23,10 @@ CXX_O=-Fo$@
+ 
+ ifeq ($(ASM_ARCH), arm64)
+ CCAS = clang-cl
+-CCASFLAGS = -nologo -DHAVE_NEON_AARCH64 --target=arm64-windows
++CCASFLAGS = -nologo --target=arm64-windows
++ifeq ($(USE_NEON), Yes)
++CCASFLAGS += -DHAVE_NEON_AARCH64
++endif
+ endif
+ 
+ 
+diff --git a/build/platform-mingw_nt.mk b/build/platform-mingw_nt.mk
+index b7a5495d..d73e362a 100644
+--- a/build/platform-mingw_nt.mk
++++ b/build/platform-mingw_nt.mk
+@@ -17,7 +17,10 @@ endif
+ endif
+ ifeq ($(ASM_ARCH), arm)
+ CCAS = gas-preprocessor.pl -as-type clang -force-thumb -- $(CC)
+-CCASFLAGS = -DHAVE_NEON -mimplicit-it=always
++CCASFLAGS = -mimplicit-it=always
++ifeq ($(USE_NEON), Yes)
++CCASFLAGS += -DHAVE_NEON
++endif
+ endif
+ EXEEXT = .exe
+ 
+-- 
+2.34.1
+

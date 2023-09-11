@@ -131,6 +131,15 @@ IMAGE_CMD:erofs = "mkfs.erofs ${EXTRA_IMAGECMD} ${IMGDEPLOYDIR}/${IMAGE_NAME}.er
 IMAGE_CMD:erofs-lz4 = "mkfs.erofs -zlz4 ${EXTRA_IMAGECMD} ${IMGDEPLOYDIR}/${IMAGE_NAME}.erofs-lz4 ${IMAGE_ROOTFS}"
 IMAGE_CMD:erofs-lz4hc = "mkfs.erofs -zlz4hc ${EXTRA_IMAGECMD} ${IMGDEPLOYDIR}/${IMAGE_NAME}.erofs-lz4hc ${IMAGE_ROOTFS}"
 
+# Note that vfat can't handle all types of files that a real linux file system
+# can (e.g. device files, symlinks, etc.) and therefore it not suitable for all
+# use cases
+oe_mkvfatfs () {
+    mkfs.vfat $@ -C ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.vfat ${ROOTFS_SIZE}
+    mcopy -i "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.vfat" -vsmpQ ${IMAGE_ROOTFS}/* ::/
+}
+
+IMAGE_CMD:vfat = "oe_mkvfatfs ${EXTRA_IMAGECMD}"
 
 IMAGE_CMD_TAR ?= "tar"
 # ignore return code 1 "file changed as we read it" as other tasks(e.g. do_image_wic) may be hardlinking rootfs
@@ -266,6 +275,10 @@ EXTRA_IMAGECMD:ext4 ?= "-i 4096"
 EXTRA_IMAGECMD:btrfs ?= "-n 4096 --shrink"
 EXTRA_IMAGECMD:f2fs ?= ""
 
+# If a specific FAT size is needed, set it here (e.g. "-F 32"/"-F 16"/"-F 12")
+# otherwise mkfs.vfat will automatically pick one.
+EXTRA_IMAGECMD:vfat ?= ""
+
 do_image_cpio[depends] += "cpio-native:do_populate_sysroot"
 do_image_jffs2[depends] += "mtd-utils-native:do_populate_sysroot"
 do_image_cramfs[depends] += "util-linux-native:do_populate_sysroot"
@@ -285,6 +298,7 @@ do_image_f2fs[depends] += "f2fs-tools-native:do_populate_sysroot"
 do_image_erofs[depends] += "erofs-utils-native:do_populate_sysroot"
 do_image_erofs_lz4[depends] += "erofs-utils-native:do_populate_sysroot"
 do_image_erofs_lz4hc[depends] += "erofs-utils-native:do_populate_sysroot"
+do_image_vfat[depends] += "dosfstools-native:do_populate_sysroot mtools-native:do_populate_sysroot"
 
 # This variable is available to request which values are suitable for IMAGE_FSTYPES
 IMAGE_TYPES = " \
@@ -294,6 +308,7 @@ IMAGE_TYPES = " \
     ext3 ext3.gz \
     ext4 ext4.gz \
     btrfs \
+    vfat \
     squashfs squashfs-xz squashfs-lzo squashfs-lz4 squashfs-zst \
     ubi ubifs multiubi \
     tar tar.gz tar.bz2 tar.xz tar.lz4 tar.zst \

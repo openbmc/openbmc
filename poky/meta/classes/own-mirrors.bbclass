@@ -18,4 +18,5 @@ ftp://.*/.*     ${SOURCE_MIRROR_URL} \
 npm://.*/?.*    ${SOURCE_MIRROR_URL} \
 s3://.*/.*      ${SOURCE_MIRROR_URL} \
 crate://.*/.*   ${SOURCE_MIRROR_URL} \
+gs://.*/.*      ${SOURCE_MIRROR_URL} \
 "

@@ -18,7 +18,7 @@ diff --git a/systemd/dlt-adaptor-udp.service.cmake b/systemd/dlt-adaptor-udp.ser
 index 8dac1f2..ecf9f9e 100644
 --- a/systemd/dlt-adaptor-udp.service.cmake
 +++ b/systemd/dlt-adaptor-udp.service.cmake
-@@ -21,9 +21,8 @@ Wants=dlt.service
+@@ -19,9 +19,8 @@ Wants=dlt.service
  
  [Service]
  Type=simple
@@ -51,7 +51,7 @@ index b665742..35009b0 100644
  [Service]
  Type=simple
 -User=@DLT_USER@
- ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-example-user "Hallo from GENIVI DLT example user application"
+ ExecStart=@CMAKE_INSTALL_PREFIX@/bin/dlt-example-user "Hallo from COVESA DLT example user application"
 -LimitCORE=infinity
 \ No newline at end of file
 +LimitCORE=infinity
@@ -59,7 +59,7 @@ diff --git a/systemd/dlt-receive.service.cmake b/systemd/dlt-receive.service.cma
 index c07d447..8f88f00 100644
 --- a/systemd/dlt-receive.service.cmake
 +++ b/systemd/dlt-receive.service.cmake
-@@ -22,6 +22,5 @@ Wants=dlt.service
+@@ -20,6 +20,5 @@ Wants=dlt.service
  
  [Service]
  Type=simple
@@ -72,7 +72,7 @@ diff --git a/systemd/dlt-system.service.cmake b/systemd/dlt-system.service.cmake
 index 0e91f42..1a5b913 100755
 --- a/systemd/dlt-system.service.cmake
 +++ b/systemd/dlt-system.service.cmake
-@@ -22,7 +22,6 @@ Wants=dlt.service
+@@ -20,7 +20,6 @@ Wants=dlt.service
  
  [Service]
  Type=simple
@@ -84,7 +84,7 @@ diff --git a/systemd/dlt.service.cmake b/systemd/dlt.service.cmake
 index 0b3ee2c..e4753a2 100755
 --- a/systemd/dlt.service.cmake
 +++ b/systemd/dlt.service.cmake
-@@ -21,7 +21,6 @@ Documentation=man:dlt-daemon(1) man:dlt.conf(5)
+@@ -19,7 +19,6 @@ Documentation=man:dlt-daemon(1) man:dlt.conf(5)
  
  [Service]
  Type=simple

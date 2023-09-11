@@ -13,22 +13,18 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0c7051aef9219dc7237f206c5c4179a7"
 
 SRC_URI[sha256sum] = "1789d6b1b1a57dfe2a7ab7b533ee9f5dfd9cbf5b59bb1bb3c2612ed08d0f68b2"
 SRC_URI = "${GNU_MIRROR}/inetutils/inetutils-${PV}.tar.xz \
-           file://inetutils-1.8-0001-printf-parse-pull-in-features.h-for-__GLIBC__.patch \
-           file://inetutils-1.8-0003-wchar.patch \
-           file://rexec.xinetd.inetutils  \
+           file://rexec.xinetd.inetutils \
            file://rlogin.xinetd.inetutils \
            file://rsh.xinetd.inetutils \
            file://telnet.xinetd.inetutils \
            file://tftpd.xinetd.inetutils \
-           file://inetutils-1.9-PATH_PROCNET_DEV.patch \
-           file://inetutils-only-check-pam_appl.h-when-pam-enabled.patch \
-"
+           file://0001-CVE-2023-40303-ftpd-rcp-rlogin-rsh-rshd-uucpd-fix-ch.patch \
+           file://0002-CVE-2023-40303-Indent-changes-in-previous-commit.patch \
+           "
 
 inherit autotools gettext update-alternatives texinfo
 
 acpaths = "-I ./m4"
-
-SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', '', 'file://fix-disable-ipv6.patch', d)}"
 
 PACKAGECONFIG ??= "ftp uucpd \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} \
@@ -41,21 +37,33 @@ PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6 gl_cv_socket_ipv6=no,"
 PACKAGECONFIG[ping6] = "--enable-ping6,--disable-ping6,"
 
 EXTRA_OECONF = "--with-ncurses-include-dir=${STAGING_INCDIR} \
-        inetutils_cv_path_login=${base_bindir}/login \
         --with-libreadline-prefix=${STAGING_LIBDIR} \
         --enable-rpath=no \
-"
+        --with-path-login=${base_bindir}/login \
+        --with-path-cp=${base_bindir}/cp \
+        --with-path-uucico=${libexecdir}/uuico \
+        --with-path-procnet-dev=/proc/net/dev \
+        "
+
+EXTRA_OECONF:append:libc-musl = " --with-path-utmpx=/dev/null/utmpx --with-path-wtmpx=/dev/null/wtmpx"
 
 # These are horrible for security, disable them
 EXTRA_OECONF:append = " --disable-rsh --disable-rshd --disable-rcp \
         --disable-rlogin --disable-rlogind --disable-rexec --disable-rexecd"
 
+# The configure script guesses many paths in cross builds, check for this happening
+do_configure_cross_check() {
+    if grep "may be incorrect because of cross-compilation" ${B}/config.log; then
+        bberror Default path values used, these must be set explicitly
+    fi
+}
+do_configure[postfuncs] += "do_configure_cross_check"
+
+# The --with-path options are not actually options, so this check needs to be silenced
+ERROR_QA:remove = "unknown-configure-option"
+
 do_configure:prepend () {
     export HELP2MAN='true'
-    cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${S}/build-aux/config.rpath
-    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}
-    install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}
-    rm -f ${S}/glob/configure*
 }
 
 do_install:append () {

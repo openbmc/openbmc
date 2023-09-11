@@ -1,0 +1,41 @@
+From fa49c29942763285c51b7d2dea417d9f51e4961f Mon Sep 17 00:00:00 2001
+From: Sven Fink <sven.fink@wipotec.com>
+Date: Fri, 13 Jan 2023 09:15:42 +0100
+Subject: [PATCH 3/3] For root value, use empty pointer
+
+Upstream-Status: Accepted [https://github.com/pboettch/json-schema-validator/commit/59c9d6200bf3cd54b4fc717ec1660c91eddb4d1a]
+
+Signed-off-by: Parian Golchin <Parian.Golchin@iris-sensing.com>
+---
+ src/json-validator.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/json-validator.cpp b/src/json-validator.cpp
+index 7f34553..3c73d98 100644
+--- a/src/json-validator.cpp
++++ b/src/json-validator.cpp
+@@ -553,6 +553,9 @@ class type_schema : public schema
+ 					else_->validate(ptr, instance, patch, e);
+ 			}
+ 		}
++		if (instance.is_null()) {
++			patch.add(nlohmann::json::json_pointer{}, default_value_);
++		}
+ 	}
+ 
+ protected:
+@@ -1134,6 +1137,11 @@ public:
+ 			propertyNames_ = schema::make(attr.value(), root, {"propertyNames"}, uris);
+ 			sch.erase(attr);
+ 		}
++
++		attr = sch.find("default");
++		if (attr != sch.end()) {
++			set_default_value(*attr);
++		}
+ 	}
+ };
+ 
+-- 
+2.25.1
+

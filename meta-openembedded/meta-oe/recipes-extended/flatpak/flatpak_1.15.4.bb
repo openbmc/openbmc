@@ -4,7 +4,7 @@ LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI = " \
-    gitsm://github.com/flatpak/flatpak;protocol=https;nobranch=1 \
+    gitsm://github.com/flatpak/flatpak;protocol=https;branch=main \
     file://0001-flatpak-pc-add-pc_sysrootdir.patch \
 "
 
@@ -12,7 +12,7 @@ SRCREV = "e936e3100d406c50ba49f3ad6a0ecae455345ec0"
 
 S = "${WORKDIR}/git"
 
-inherit meson pkgconfig gettext systemd gobject-introspection python3native useradd mime features_check
+inherit meson pkgconfig gettext systemd gtk-doc gobject-introspection python3native useradd mime features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 
@@ -48,6 +48,9 @@ RDEPENDS:${PN} = " \
 EXTRA_OEMESON += "-Dsystem_dbus_proxy=${bindir}/xdg-dbus-proxy -Dsystem_bubblewrap=${bindir}/bwrap"
 
 GIR_MESON_OPTION = ""
+GTKDOC_MESON_OPTION = 'gtkdoc'
+GTKDOC_MESON_ENABLE_FLAG = 'enabled'
+GTKDOC_MESON_DISABLE_FLAG = 'disabled'
 
 PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false,xauth socat-native"
 PACKAGECONFIG[xauth] = "-Dxauth=enabled,-Dxauth=disabled,xauth"

@@ -38,6 +38,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0004-monitor-Avoid-segfault-when-calling-NULL-get_bad_blo.patch \
            file://0005-mdadm-test-Mark-and-ignore-broken-test-failures.patch \
            file://0006-tests-Add-broken-files-for-all-broken-tests.patch \
+           file://0001-tests-add-.broken-files-for-04update-uuid-and-07reve.patch \
            "
 
 SRC_URI[sha256sum] = "461c215670864bb74a4d1a3620684aa2b2f8296dffa06743f26dda5557acf01d"
@@ -104,6 +105,11 @@ do_install_ptest() {
 	do
 		install -D -m 755 $prg ${D}${PTEST_PATH}/
 	done
+
+	# Disable tests causing intermittent autobuilder failures
+	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/19raid6check.broken
+	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/20raid5journal.broken
+	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/21raid5cache.broken
 }
 
 RDEPENDS:${PN} += "bash"
@@ -126,3 +132,10 @@ RRECOMMENDS:${PN}-ptest += " \
 "
 
 FILES:${PN} += "${systemd_unitdir}/*"
+
+# strace is not yet ported to rv32
+RDEPENDS:${PN}-ptest:remove:riscv32 = "strace"
+do_install_ptest:append:riscv32 () {
+    echo "disabled, no strace" > ${D}${PTEST_PATH}/tests/07revert-grow.broken
+    echo "disabled, no strace" > ${D}${PTEST_PATH}/tests/07revert-inplace.broken
+}

@@ -300,7 +300,8 @@ def sdk_install(args, config, basepath, workspace):
             return 2
 
         try:
-            exec_build_env_command(config.init_path, basepath, 'bitbake build-sysroots', watch=True)
+            exec_build_env_command(config.init_path, basepath, 'bitbake build-sysroots -c build_native_sysroot', watch=True)
+            exec_build_env_command(config.init_path, basepath, 'bitbake build-sysroots -c build_target_sysroot', watch=True)
         except bb.process.ExecutionError as e:
             raise DevtoolError('Failed to bitbake build-sysroots:\n%s' % (str(e)))
 

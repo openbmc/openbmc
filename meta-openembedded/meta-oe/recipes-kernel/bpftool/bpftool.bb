@@ -18,6 +18,7 @@ EXTRA_OEMAKE = "\
     LD="${LD}" \
     AR=${AR} \
     ARCH=${ARCH} \
+    bash_compdir=${prefix}/share/bash-completion \
 "
 
 SECURITY_CFLAGS = ""
@@ -42,3 +43,7 @@ python do_package:prepend() {
 }
 
 B = "${WORKDIR}/${BPN}-${PV}"
+
+FILES:${PN} += "${exec_prefix}/sbin/*"
+
+BBCLASSEXTEND = "native nativesdk"

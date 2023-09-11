@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=6231efa4dd4811e62407314d90a57573"
 
 DEPENDS += " \
     lz4 \
-    ${PYTHON_PN}-setuptools-scm-native \
-    ${PYTHON_PN}-pkgconfig-native \
+    python3-setuptools-scm-native \
+    python3-pkgconfig-native \
 "
 
 SRC_URI += "file://run-ptest"
@@ -15,7 +15,14 @@ SRC_URI[sha256sum] = "e1431d84a9cfb23e6773e72078ce8e65cad6745816d4cbf9ae67da5ea4
 
 inherit pkgconfig pypi python_setuptools_build_meta ptest
 
-RDEPENDS:${PN}-ptest += "${PYTHON_PN}-pytest ${PYTHON_PN}-multiprocessing ${PYTHON_PN}-psutil"
+RDEPENDS:${PN}-ptest += "\
+    python3-coverage \
+    python3-pytest \
+    python3-pytest-cov \
+    python3-pytest-runner \
+    python3-multiprocessing \
+    python3-psutil \
+"
 
 do_install_ptest() {
     cp -rf ${S}/tests/ ${D}${PTEST_PATH}/

@@ -277,13 +277,13 @@ The following changes have occurred:
    See the ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:removal (override style syntax)`"
    section in the BitBake User Manual for a detailed example.
 
-.. _migration-2.6-systemd-configuration-now-split-out-to-system-conf:
+.. _migration-2.6-systemd-configuration-now-split-out-to-systemd-conf:
 
 ``systemd`` Configuration is Now Split Into ``systemd-conf``
 ------------------------------------------------------------
 
 The configuration for the ``systemd`` recipe has been moved into a
-``system-conf`` recipe. Moving this configuration to a separate recipe
+``systemd-conf`` recipe. Moving this configuration to a separate recipe
 avoids the ``systemd`` recipe from becoming machine-specific for cases
 where machine-specific configurations need to be applied (e.g. for
 ``qemu*`` machines).

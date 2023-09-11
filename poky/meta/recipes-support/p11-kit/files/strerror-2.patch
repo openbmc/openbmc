@@ -1,0 +1,30 @@
+From 7aa6251bf4ce36d027d53c9c96bb05f90ef7eb5b Mon Sep 17 00:00:00 2001
+From: Adam Sampson <ats@offog.org>
+Date: Sun, 2 Jul 2023 15:44:06 +0100
+Subject: [PATCH] Define _GNU_SOURCE when testing for strerror_r
+
+The Meson check for GNU/XSI strerror_r didn't inherit the project
+options that include _GNU_SOURCE (unlike the autoconf version), so the
+result didn't match how the code that uses it will be compiled. Add
+_GNU_SOURCE explicitly as with the following checks.
+
+Signed-off-by: Adam Sampson <ats@offog.org>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index 4cc3f89a..9a72e148 100644
+--- a/meson.build
++++ b/meson.build
+@@ -301,6 +301,7 @@ endforeach
+ 
+ if cc.has_function('strerror_r', prefix: '#include <string.h>')
+   strerror_r_code = '''
++#define _GNU_SOURCE
+ #include <errno.h>
+ #include <string.h>
+ 

@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=41f7469eaacac62c67d5664fff2c062d"
 
 inherit cargo cargo-update-recipe-crates
 
-SRC_URI += "git://github.com/uutils/coreutils.git;protocol=https;nobranch=1"
+SRC_URI += "git://github.com/uutils/coreutils.git;protocol=https;branch=main"
 
 # musl not supported because the libc crate does not support functions like "endutxent" at the moment,
 # so src/uucore/src/lib/features.rs disables utmpx when targetting musl.

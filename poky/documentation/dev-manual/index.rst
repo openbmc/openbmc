@@ -4,8 +4,6 @@
 Yocto Project Development Tasks Manual
 ======================================
 
-|
-
 .. toctree::
    :caption: Table of Contents
    :numbered:
@@ -43,7 +41,6 @@ Yocto Project Development Tasks Manual
    build-quality
    runtime-testing
    debugging
-   changes
    licenses
    vulnerabilities
    sbom

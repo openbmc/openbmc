@@ -188,11 +188,12 @@ class KickStart():
         part.add_argument('--uuid')
         part.add_argument('--fsuuid')
         part.add_argument('--no-fstab-update', action='store_true')
+        part.add_argument('--mbr', action='store_true')
 
         bootloader = subparsers.add_parser('bootloader')
         bootloader.add_argument('--append')
         bootloader.add_argument('--configfile')
-        bootloader.add_argument('--ptable', choices=('msdos', 'gpt'),
+        bootloader.add_argument('--ptable', choices=('msdos', 'gpt', 'gpt-hybrid'),
                                 default='msdos')
         bootloader.add_argument('--timeout', type=int)
         bootloader.add_argument('--source')

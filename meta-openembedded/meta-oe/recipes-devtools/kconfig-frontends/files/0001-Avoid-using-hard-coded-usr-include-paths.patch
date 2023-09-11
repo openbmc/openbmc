@@ -1,0 +1,33 @@
+From 2bd01e844096ab4ecaaab8eccfbfdc721a136d01 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Tue, 22 Aug 2023 12:28:01 -0600
+Subject: [PATCH] Avoid using hard coded /usr/include paths
+
+The system could end up using an include path that points to the host
+system instead of the sysroot.  Force the system to use the sysroot.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ configure.ac | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 150bc50..4dc684f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -344,10 +344,6 @@ AS_IF(
+     [test "$need_panel_menu" = "yes" -o "$need_panel_menu" = "auto"],
+     [AC_SUBST([ncurses_nconf_CPPFLAGS])
+      AC_SUBST([ncurses_panel_menu_LIBS])
+-     AS_CASE(
+-        [$CURSES_LOC],
+-        [ncursesw/*],[ncurses_nconf_CPPFLAGS="-I/usr/include/ncursesw"],
+-        [ncurses/*],[ncurses_nconf_CPPFLAGS="-I/usr/include/ncurses"])
+      LIBS_old="$LIBS"
+      LIBS=
+      AC_SEARCH_LIBS(
+-- 
+2.34.1
+

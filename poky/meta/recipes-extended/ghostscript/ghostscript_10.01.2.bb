@@ -26,6 +26,7 @@ SRC_URI = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/downlo
            file://ghostscript-9.16-Werror-return-type.patch \
            file://avoid-host-contamination.patch \
            file://0001-Bug-706897-Copy-pcx-buffer-overrun-fix-from-devices-.patch \
+           file://configure.ac-add-option-to-explicitly-disable-neon.patch \
 "
 
 SRC_URI[sha256sum] = "a4cd61a07fec161bee35da0211a5e5cde8ff8a0aaf942fc0176715e499d21661"
@@ -44,6 +45,9 @@ EXTRA_OECONF = "--with-jbig2dec \
                 "
 
 EXTRA_OECONF:append:mipsarcho32 = " --with-large_color_index=0"
+
+EXTRA_OECONF:append:armv7a = "${@bb.utils.contains('TUNE_FEATURES','neon','',' --disable-neon',d)}"
+EXTRA_OECONF:append:armv7ve = "${@bb.utils.contains('TUNE_FEATURES','neon','',' --disable-neon',d)}"
 
 # Uses autoconf but not automake, can't do out-of-tree
 inherit autotools-brokensep pkgconfig

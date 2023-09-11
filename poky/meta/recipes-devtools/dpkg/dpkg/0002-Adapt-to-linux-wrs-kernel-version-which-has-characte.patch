@@ -13,14 +13,14 @@ Upstream-Status: Inappropriate [embedded specific]
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/lib/dpkg/parsehelp.c b/lib/dpkg/parsehelp.c
-index 453077fd9..f42ea2882 100644
+index 63a36f55c..81901bd5a 100644
 --- a/lib/dpkg/parsehelp.c
 +++ b/lib/dpkg/parsehelp.c
-@@ -243,14 +243,12 @@ parseversion(struct dpkg_version *rversion, const char *string,
+@@ -275,14 +275,12 @@ parseversion(struct dpkg_version *rversion, const char *string,
    ptr = rversion->version;
    if (!*ptr)
      return dpkg_put_error(err, _("version number is empty"));
--  if (*ptr && !c_isdigit(*ptr++))
+-  if (!c_isdigit(*ptr++))
 -    return dpkg_put_warn(err, _("version number does not start with digit"));
    for (; *ptr; ptr++) {
 -    if (!c_isdigit(*ptr) && !c_isalpha(*ptr) && strchr(".-+~:", *ptr) == NULL)
@@ -32,7 +32,6 @@ index 453077fd9..f42ea2882 100644
 +    if (!c_isdigit(*ptr) && !c_isalpha(*ptr) && strchr(".-+~_", *ptr) == NULL)
        return dpkg_put_warn(err, _("invalid character in revision number"));
    }
- 
 
 -- 
 2.11.0

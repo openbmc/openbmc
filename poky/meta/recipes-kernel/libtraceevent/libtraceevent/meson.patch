@@ -1,0 +1,74 @@
+Fixes for the Meson build of libtraceevent:
+
+- Make the plugin directory the same as the Makefiles
+- Install the plugins as modules not static and versioned shared libraries
+- Add an option to disable building the documentation (needs asciidoc and xmlto)
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/meson.build b/meson.build
+index b61c873..4bba4d8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -25,7 +25,7 @@ htmldir = join_paths(prefixdir, get_option('htmldir'))
+ libdir = join_paths(prefixdir, get_option('libdir'))
+ plugindir = get_option('plugindir')
+ if plugindir == ''
+-    plugindir = join_paths(libdir, 'libtraceevent/plugins')
++    plugindir = join_paths(libdir, 'traceevent/plugins')
+ endif
+ 
+ add_project_arguments(
+@@ -45,10 +45,13 @@ if cunit_dep.found()
+     subdir('utest')
+ endif
+ subdir('samples')
+-subdir('Documentation')
+ 
+-custom_target(
+-    'docs',
+-    output: 'docs',
+-    depends: [html, man],
+-    command: ['echo'])
++if get_option('docs')
++    subdir('Documentation')
++
++    custom_target(
++        'docs',
++        output: 'docs',
++        depends: [html, man],
++        command: ['echo'])
++endif
+diff --git a/meson_options.txt b/meson_options.txt
+index b2294f6..0611216 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -4,6 +4,10 @@
+ 
+ option('plugindir', type : 'string',
+        description : 'set the plugin dir')
++
++option('docs', type : 'boolean', value: true,
++       description : 'build documentation')
++
+ option('htmldir', type : 'string', value : 'share/doc/libtraceevent-doc',
+        description : 'directory for HTML documentation')
+ option('asciidoctor', type : 'boolean', value: false,
+diff --git a/plugins/meson.build b/plugins/meson.build
+index 74ad664..4919be4 100644
+--- a/plugins/meson.build
++++ b/plugins/meson.build
+@@ -19,11 +19,10 @@ plugins = [
+ 
+ pdeps = []
+ foreach plugin : plugins
+-    pdeps += library(
++    pdeps += shared_module(
+         plugin.replace('.c', ''),
+         plugin,
+         name_prefix: '',
+-        version: library_version,
+         dependencies: [libtraceevent_dep],
+         include_directories: [incdir],
+         install: true,

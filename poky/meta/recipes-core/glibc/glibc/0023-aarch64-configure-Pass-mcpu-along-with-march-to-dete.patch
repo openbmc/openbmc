@@ -1,0 +1,56 @@
+From d836f008a96aa9b2e88c7b394bfc110542e57176 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 4 Aug 2023 09:34:50 -0700
+Subject: [PATCH] aarch64/configure: Pass -mcpu along with -march to detect sve
+ support
+
+SVE support logic in configure is rightly passing -march=<arch>+sve to
+compiler to override whatever user might have passed via environment,
+however GCC does not do as intended when -mcpu is part of environment
+compiler flags, then it overrides the -march computed from -mcpu and
+igonores other -march values so this test fails for lot of aarch64
+machines which pass -mcpu that does not support sve. This is seemingly a
+bug in GCC [1], until that is fixed we preempt -mcpu along with -march
+in the configure test itself. It does not change functionality and yet
+lets us through the GCC inconsistency.
+
+[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110901
+
+Upstream-Status: Inappropriate [Workaround for a GCC issue]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/aarch64/configure    | 2 +-
+ sysdeps/aarch64/configure.ac | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeps/aarch64/configure b/sysdeps/aarch64/configure
+index 5e91fab023..39dddc66d4 100644
+--- a/sysdeps/aarch64/configure
++++ b/sysdeps/aarch64/configure
+@@ -327,7 +327,7 @@ else $as_nop
+   cat > conftest.s <<\EOF
+         ptrue p0.b
+ EOF
+-if { ac_try='${CC-cc} -c -march=armv8.2-a+sve conftest.s 1>&5'
++if { ac_try='${CC-cc} -c -mcpu=generic+sve -march=armv8.2-a+sve conftest.s 1>&5'
+   { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+   (eval $ac_try) 2>&5
+   ac_status=$?
+diff --git a/sysdeps/aarch64/configure.ac b/sysdeps/aarch64/configure.ac
+index 8a708f2ef4..b6a146d2be 100644
+--- a/sysdeps/aarch64/configure.ac
++++ b/sysdeps/aarch64/configure.ac
+@@ -92,7 +92,7 @@ AC_CACHE_CHECK([for SVE support in assembler], [libc_cv_aarch64_sve_asm], [dnl
+ cat > conftest.s <<\EOF
+         ptrue p0.b
+ EOF
+-if AC_TRY_COMMAND(${CC-cc} -c -march=armv8.2-a+sve conftest.s 1>&AS_MESSAGE_LOG_FD); then
++if AC_TRY_COMMAND(${CC-cc} -c -mcpu=generic+sve -march=armv8.2-a+sve conftest.s 1>&AS_MESSAGE_LOG_FD); then
+   libc_cv_aarch64_sve_asm=yes
+ else
+   libc_cv_aarch64_sve_asm=no
+-- 
+2.41.0
+

@@ -18,12 +18,12 @@ inherit cmake
 # Incompatible with archs other than armv7, armv7ve and aarch64
 COMPATIBLE_MACHINE = "(^$)"
 COMPATIBLE_MACHINE:aarch64 = "(.*)"
-COMPATIBLE_MACHINE:armv7a = "(.*)"
-COMPATIBLE_MACHINE:armv7ve = "(.*)"
+COMPATIBLE_MACHINE:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon","(.*)","(^$)",d)}"
+COMPATIBLE_MACHINE:armv7ve = "${@bb.utils.contains("TUNE_FEATURES","neon","(.*)","(^$)",d)}"
 NE10_TARGET_ARCH = ""
 NE10_TARGET_ARCH:aarch64 = "aarch64"
-NE10_TARGET_ARCH:armv7a = "armv7"
-NE10_TARGET_ARCH:armv7ve = "armv7"
+NE10_TARGET_ARCH:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon","armv7","",d)}"
+NE10_TARGET_ARCH:armv7ve = "${@bb.utils.contains("TUNE_FEATURES","neon","armv7","",d)}"
 
 EXTRA_OECMAKE = '-DGNULINUX_PLATFORM=ON -DNE10_BUILD_SHARED=ON -DNE10_LINUX_TARGET_ARCH="${NE10_TARGET_ARCH}"'
 

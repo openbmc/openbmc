@@ -188,7 +188,6 @@ class SStateBase(OESelftestTestCase):
 class SStateTests(SStateBase):
     def test_autorev_sstate_works(self):
         # Test that a git repository which changes is correctly handled by SRCREV = ${AUTOREV}
-        # when PV does not contain SRCPV
 
         tempdir = tempfile.mkdtemp(prefix='sstate_autorev')
         tempdldir = tempfile.mkdtemp(prefix='sstate_autorev_dldir')

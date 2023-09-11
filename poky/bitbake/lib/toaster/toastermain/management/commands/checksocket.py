@@ -13,7 +13,7 @@ import errno
 import socket
 
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 DEFAULT_ADDRPORT = "0.0.0.0:8000"
 
@@ -51,7 +51,7 @@ class Command(BaseCommand):
             if hasattr(err, 'errno') and err.errno in errors:
                 errtext = errors[err.errno]
             else:
-                errtext = force_text(err)
+                errtext = force_str(err)
             raise CommandError(errtext)
 
         self.stdout.write("OK")

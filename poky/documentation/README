@@ -34,16 +34,18 @@ Manual Organization
 
 Here the folders corresponding to individual manuals:
 
+* brief-yoctoprojectqs - Yocto Project Quick Start
 * overview-manual      - Yocto Project Overview and Concepts Manual
-* sdk-manual           - Yocto Project Software Development Kit (SDK) Developer's Guide.
+* contributor-guide    - Yocto Project and OpenEmbedded Contributor Guide
+* ref-manual           - Yocto Project Reference Manual
 * bsp-guide            - Yocto Project Board Support Package (BSP) Developer's Guide
 * dev-manual           - Yocto Project Development Tasks Manual
 * kernel-dev           - Yocto Project Linux Kernel Development Manual
-* ref-manual           - Yocto Project Reference Manual
-* brief-yoctoprojectqs - Yocto Project Quick Start
 * profile-manual       - Yocto Project Profiling and Tracing Manual
+* sdk-manual           - Yocto Project Software Development Kit (SDK) Developer's Guide.
 * toaster-manual       - Toaster User Manual
 * test-manual          - Yocto Project Test Environment Manual
+* migration-guides     - Yocto Project Release and Migration Notes
 
 Each folder is self-contained regarding content and figures.
 

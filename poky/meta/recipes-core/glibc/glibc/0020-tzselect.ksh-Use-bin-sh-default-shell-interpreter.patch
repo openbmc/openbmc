@@ -1,4 +1,4 @@
-From d8c8500b619231c23ef6a151821555786c0d2966 Mon Sep 17 00:00:00 2001
+From 7274541782927394852712ba0c8dfd67bd9b8b5b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 15 Dec 2021 21:47:53 -0800
 Subject: [PATCH] tzselect.ksh: Use /bin/sh default shell interpreter

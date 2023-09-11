@@ -1,0 +1,43 @@
+From e4ea64134cfe3763332c16dcac52dd894b935880 Mon Sep 17 00:00:00 2001
+From: Daniel Lenski <dlenski@gmail.com>
+Date: Tue, 22 Aug 2023 12:02:19 -0700
+Subject: [PATCH] Shim for renaming of GNUTLS_NO_EXTENSIONS in GnuTLS v3.8.1
+
+The constant `GNUTLS_NO_EXTENSIONS` was renamed in
+https://gitlab.com/gnutls/gnutls/-/commit/a7c4a04e (released in v3.8.1), and
+then a backwards-compatibility shim was belatedly added in
+https://gitlab.com/gnutls/gnutls/-/commit/abfa8634, which has not yet been
+released.
+
+We need to re-add the constant ourselves in order to build correctly with
+GnuTLS v3.8.1.  This should fix
+https://gitlab.com/openconnect/openconnect/-/issues/650.
+
+Upstream-Status: Backport [https://git.infradead.org/users/dwmw2/openconnect.git/commit/7512698217c4104aade7a2df669a20de68f3bb8c]
+Signed-off-by: Daniel Lenski <dlenski@gmail.com>
+---
+ gnutls-dtls.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/gnutls-dtls.c b/gnutls-dtls.c
+index 3fd78e95..50a4bb4e 100644
+--- a/gnutls-dtls.c
++++ b/gnutls-dtls.c
+@@ -39,6 +39,14 @@
+ # define GNUTLS_CIPHER_CHACHA20_POLY1305 23
+ #endif
+ 
++#if GNUTLS_VERSION_NUMBER >= 0x030801 && !defined(GNUTLS_NO_EXTENSIONS)
++/* XX: GNUTLS_NO_EXTENSIONS was renamed in GnuTLS v3.8.1. A
++ * backwards-compatibility shim was added in a subsequent commit, but
++ * not yet released.
++ */
++# define GNUTLS_NO_EXTENSIONS GNUTLS_NO_DEFAULT_EXTENSIONS
++#endif
++
+ /* sets the DTLS MTU and returns the actual tunnel MTU */
+ unsigned dtls_set_mtu(struct openconnect_info *vpninfo, unsigned mtu)
+ {
+-- 
+2.42.0
+

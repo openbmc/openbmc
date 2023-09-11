@@ -18,7 +18,7 @@ inherit gettext autotools pkgconfig gsettings features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 
-SRC_URI = "git://github.com/flatpak/xdg-desktop-portal-gtk.git;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/flatpak/xdg-desktop-portal-gtk.git;protocol=https;branch=main"
 
 S = "${WORKDIR}/git"
 SRCREV = "952005f6a7850a247d286f14838202f506b402b7"

@@ -136,7 +136,14 @@ RPROVIDES:${PN}-utils = "${PN}-bin"
 RREPLACES:${PN}-utils = "${PN}-bin"
 RCONFLICTS:${PN}-utils = "${PN}-bin"
 # ntpdc and ntpq were split out of ntp-utils
-RDEPENDS:${PN}-utils = "ntpdc ntpq"
+RDEPENDS:${PN}-utils = "ntpdc ntpq \
+                        perl-module-lib \
+                        perl-module-exporter \
+                        perl-module-carp \
+                        perl-module-version \
+                        perl-module-socket \
+                        perl-module-getopt-long \
+                       "
 
 SYSTEMD_PACKAGES = "${PN} sntp"
 SYSTEMD_SERVICE:${PN} = "ntpd.service"

@@ -55,27 +55,47 @@ as much RAM and as many CPU cores as possible.
 Supported Linux Distributions
 =============================
 
-Currently, the Yocto Project is supported on the following distributions:
-
--  Ubuntu 18.04 (LTS)
+Currently, the &DISTRO; release ("&DISTRO_NAME;") of the Yocto Project is
+supported on the following distributions:
 
 -  Ubuntu 20.04 (LTS)
 
 -  Ubuntu 22.04 (LTS)
 
--  Fedora 36
-
 -  Fedora 37
 
--  AlmaLinux 8.7
+-  Fedora 38
 
--  AlmaLinux 9.1
+-  CentOS Stream 8
 
--  Debian GNU/Linux 11.x (Bullseye)
+-  Debian GNU/Linux 11 (Bullseye)
+
+-  Debian GNU/Linux 12 (Bookworm)
+
+-  OpenSUSE Leap 15.4
+
+-  AlmaLinux 8.8
+
+-  AlmaLinux 9.2
+
+The following distribution versions are still tested (being listed
+in :term:`SANITY_TESTED_DISTROS`), even though the organizations
+publishing them no longer make updates publicly available:
+
+-  Ubuntu 18.04 (LTS)
+
+-  Ubuntu 22.10
 
 -  OpenSUSE Leap 15.3
 
--  OpenSUSE Leap 15.4
+Note that the Yocto Project doesn't have access to private updates
+that some of these versions may have. Therefore, our testing has
+limited value if you have access to such updates.
+
+Finally, here are the distribution versions which were previously
+tested on former revisions of "&DISTRO_NAME;", but no longer are:
+
+*This list is currently empty*
 
 .. note::
 
@@ -114,9 +134,8 @@ Currently, the Yocto Project is supported on the following distributions:
       interested in hearing about your experience. For information on
       how to submit a bug, see the Yocto Project
       :yocto_wiki:`Bugzilla wiki page </Bugzilla_Configuration_and_Bug_Tracking>`
-      and the ":ref:`dev-manual/changes:submitting a defect against the yocto project`"
-      section in the Yocto Project Development Tasks Manual.
-
+      and the ":doc:`../contributor-guide/report-defect`"
+      section in the Yocto Project and OpenEmbedded Contributor Guide.
 
 Required Packages for the Build Host
 ====================================

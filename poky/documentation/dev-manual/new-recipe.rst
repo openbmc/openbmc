@@ -432,56 +432,10 @@ named the same as the base name of the recipe
 Licensing
 =========
 
-Your recipe needs to have both the
-:term:`LICENSE` and
-:term:`LIC_FILES_CHKSUM`
-variables:
-
--  :term:`LICENSE`: This variable specifies the license for the software.
-   If you do not know the license under which the software you are
-   building is distributed, you should go to the source code and look
-   for that information. Typical files containing this information
-   include ``COPYING``, :term:`LICENSE`, and ``README`` files. You could
-   also find the information near the top of a source file. For example,
-   given a piece of software licensed under the GNU General Public
-   License version 2, you would set :term:`LICENSE` as follows::
-
-      LICENSE = "GPL-2.0-only"
-
-   The licenses you specify within :term:`LICENSE` can have any name as long
-   as you do not use spaces, since spaces are used as separators between
-   license names. For standard licenses, use the names of the files in
-   ``meta/files/common-licenses/`` or the :term:`SPDXLICENSEMAP` flag names
-   defined in ``meta/conf/licenses.conf``.
-
--  :term:`LIC_FILES_CHKSUM`: The OpenEmbedded build system uses this
-   variable to make sure the license text has not changed. If it has,
-   the build produces an error and it affords you the chance to figure
-   it out and correct the problem.
-
-   You need to specify all applicable licensing files for the software.
-   At the end of the configuration step, the build process will compare
-   the checksums of the files to be sure the text has not changed. Any
-   differences result in an error with the message containing the
-   current checksum. For more explanation and examples of how to set the
-   :term:`LIC_FILES_CHKSUM` variable, see the
-   ":ref:`dev-manual/licenses:tracking license changes`" section.
-
-   To determine the correct checksum string, you can list the
-   appropriate files in the :term:`LIC_FILES_CHKSUM` variable with incorrect
-   md5 strings, attempt to build the software, and then note the
-   resulting error messages that will report the correct md5 strings.
-   See the ":ref:`dev-manual/new-recipe:fetching code`" section for
-   additional information.
-
-   Here is an example that assumes the software has a ``COPYING`` file::
-
-      LIC_FILES_CHKSUM = "file://COPYING;md5=xxx"
-
-   When you try to build the
-   software, the build system will produce an error and give you the
-   correct string that you can substitute into the recipe file for a
-   subsequent build.
+Your recipe needs to define variables related to the license
+under whith the software is distributed. See the
+:ref:`contributor-guide/recipe-style-guide:recipe license fields`
+section in the Contributor Guide for details.
 
 Dependencies
 ============

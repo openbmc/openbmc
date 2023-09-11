@@ -21,7 +21,7 @@ inherit meson pkgconfig gsettings features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 
-SRC_URI = "git://gitlab.gnome.org/GNOME/xdg-desktop-portal-gnome.git;protocol=https;nobranch=1"
+SRC_URI = "git://gitlab.gnome.org/GNOME/xdg-desktop-portal-gnome.git;protocol=https;branch=main"
 
 S = "${WORKDIR}/git"
 SRCREV = "89203bf3522556965fc225782d1a635afdac611e"

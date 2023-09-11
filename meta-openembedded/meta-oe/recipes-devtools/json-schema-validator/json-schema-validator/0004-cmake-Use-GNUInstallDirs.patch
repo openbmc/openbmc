@@ -1,0 +1,43 @@
+From a42d374aa260caec5f683c75d0db322811e51ab9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 19 Mar 2022 22:40:49 -0700
+Subject: [PATCH] cmake: Use GNUInstallDirs
+
+This helps it make it platform independent, some platforms e.g.
+ppc64/linux use /usr/lib64 for system libraries
+
+Upstream-Status: Submitted [https://github.com/pboettch/json-schema-validator/pull/197]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9e4587f..3eff234 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -93,11 +93,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+     endif()
+ endif()
+ 
++include(GNUInstallDirs)
++
+ if(JSON_VALIDATOR_INSTALL)
+     install(TARGETS nlohmann_json_schema_validator
+             EXPORT ${PROJECT_NAME}Targets
+-            LIBRARY DESTINATION lib
+-            ARCHIVE DESTINATION lib
++            LIBRARY DESTINATION ${LIBDIR}
++            ARCHIVE DESTINATION ${LIBDIR}
+             RUNTIME DESTINATION bin)
+ 
+     install(FILES src/nlohmann/json-schema.hpp
+@@ -129,7 +131,7 @@ endif()
+ 
+ if(JSON_VALIDATOR_INSTALL)
+     # Set the install path to the cmake config files (Relative, so install works correctly under Hunter as well)
+-    set(INSTALL_CMAKE_DIR "lib/cmake/${PROJECT_NAME}")
++    set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+     set(INSTALL_CMAKEDIR_ROOT share/cmake)
+ 
+     # Install Targets

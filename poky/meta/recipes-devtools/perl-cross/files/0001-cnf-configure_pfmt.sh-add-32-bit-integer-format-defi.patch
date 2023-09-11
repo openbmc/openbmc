@@ -1,0 +1,28 @@
+From 920abf3dc39c851a655b719622c76a6f0dc9981d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 5 Sep 2023 19:47:33 +0200
+Subject: [PATCH] cnf/configure_pfmt.sh: add 32 bit integer format definitions
+
+These started to matter in perl 5.38 where they are used to print
+line numbers.
+
+Upstream-Status: Submitted [https://github.com/arsv/perl-cross/pull/143]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ cnf/configure_pfmt.sh | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/cnf/configure_pfmt.sh b/cnf/configure_pfmt.sh
+index 8f93da1..7bb4b6f 100644
+--- a/cnf/configure_pfmt.sh
++++ b/cnf/configure_pfmt.sh
+@@ -52,3 +52,9 @@ else
+ 	define uvxformat '"lx"'
+ 	define uvXUformat '"lX"'
+ fi
++
++define i32dformat 'PRId32'
++define u32uformat 'PRIu32'
++define u32oformat 'PRIo32'
++define u32xformat 'PRIx32'
++define u32XUformat 'PRIX32'

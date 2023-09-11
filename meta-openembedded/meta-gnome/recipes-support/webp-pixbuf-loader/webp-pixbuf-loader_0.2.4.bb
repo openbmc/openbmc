@@ -12,7 +12,7 @@ inherit meson pkgconfig
 
 EXTRA_OEMESON = "-Dupdate_cache=true"
 
-SRC_URI = "git://github.com/aruiz/webp-pixbuf-loader.git;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/aruiz/webp-pixbuf-loader.git;protocol=https;branch=mainline"
 
 S = "${WORKDIR}/git"
 SRCREV = "a35014104a226265e44fe30fcdb4df9305af3466"

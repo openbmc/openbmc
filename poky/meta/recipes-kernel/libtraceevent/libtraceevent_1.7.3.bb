@@ -10,17 +10,13 @@ SECTION = "libs"
 
 SRCREV = "dd148189b74da3e2f45c7e536319fec97cb71213"
 SRC_URI = "git://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git;branch=${BPN};protocol=https \
-           file://0001-makefile-Do-not-preserve-ownership-in-cp-command.patch"
+           file://meson.patch"
 
 S = "${WORKDIR}/git"
 
-export EXTRA_CFLAGS = "${CFLAGS}"
+inherit meson pkgconfig
 
-inherit pkgconfig
-
-do_install() {
-    oe_runmake install DESTDIR=${D} pkgconfig_dir=${libdir}/pkgconfig
-}
+EXTRA_OEMESON = "-Ddocs=false"
 
 PACKAGES += "${PN}-plugins"
 

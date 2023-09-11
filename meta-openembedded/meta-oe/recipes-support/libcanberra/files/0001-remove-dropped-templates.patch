@@ -1,0 +1,65 @@
+From dfd3ef4caac300f517f8eeb378f0b0f9ba6a9b06 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 15 Aug 2023 15:41:03 +0200
+Subject: [PATCH] remove dropped gtkdoc templates
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Pending
+---
+--- a/gtkdoc/gtk-doc.make	2011-08-25 23:20:22.000000000 +0200
++++ b/gtkdoc/gtk-doc.make	2023-08-15 18:08:02.430729073 +0200
+@@ -33,9 +33,9 @@
+ 	$(HTML_IMAGES)			\
+ 	$(SETUP_FILES)
+ 
+-DOC_STAMPS=setup-build.stamp scan-build.stamp tmpl-build.stamp sgml-build.stamp \
++DOC_STAMPS=setup-build.stamp scan-build.stamp sgml-build.stamp \
+ 	html-build.stamp pdf-build.stamp \
+-	tmpl.stamp sgml.stamp html.stamp pdf.stamp
++	sgml.stamp html.stamp pdf.stamp
+ 
+ SCANOBJ_FILES = 		 \
+ 	$(DOC_MODULE).args 	 \
+@@ -120,27 +120,12 @@
+ $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES) $(DOC_MODULE)-sections.txt $(DOC_MODULE)-overrides.txt: scan-build.stamp
+ 	@true
+ 
+-#### templates ####
+-
+-tmpl-build.stamp: setup-build.stamp $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES) $(DOC_MODULE)-sections.txt $(DOC_MODULE)-overrides.txt
+-	@echo '  DOC   Rebuilding template files'
+-	@gtkdoc-mktmpl --module=$(DOC_MODULE) $(MKTMPL_OPTIONS)
+-	@if test "$(abs_srcdir)" != "$(abs_builddir)" ; then \
+-	  if test -w $(abs_srcdir) ; then \
+-	    cp -rp $(abs_builddir)/tmpl $(abs_srcdir)/; \
+-	  fi \
+-	fi
+-	@touch tmpl-build.stamp
+-
+-tmpl.stamp: tmpl-build.stamp
+-	@true
+-
+ $(srcdir)/tmpl/*.sgml:
+ 	@true
+ 
+ #### xml ####
+ 
+-sgml-build.stamp: tmpl.stamp $(DOC_MODULE)-sections.txt $(srcdir)/tmpl/*.sgml $(expand_content_files)
++sgml-build.stamp: $(DOC_MODULE)-sections.txt $(srcdir)/tmpl/*.sgml $(expand_content_files)
+ 	@echo '  DOC   Building XML'
+ 	@-chmod -R u+w $(srcdir)
+ 	@_source_dir='' ; \
+ --- a/gtkdoc/Makefile.am	2009-01-21 21:52:46.000000000 +0100
++++ b/gtkdoc/Makefile.am	2023-08-15 17:41:59.002498772 +0200
+@@ -31,10 +31,6 @@
+ # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
+ MKDB_OPTIONS=--sgml-mode --output-format=xml
+ 
+-# Extra options to supply to gtkdoc-mktmpl
+-# e.g. MKTMPL_OPTIONS=--only-section-tmpl
+-MKTMPL_OPTIONS=
+-
+ # Extra options to supply to gtkdoc-fixref. Not normally needed.
+ # e.g. FIXXREF_OPTIONS=--extra-dir=../gdk-pixbuf/html --extra-dir=../gdk/html
+ FIXXREF_OPTIONS=

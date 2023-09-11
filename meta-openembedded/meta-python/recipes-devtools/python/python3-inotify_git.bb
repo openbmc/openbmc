@@ -7,6 +7,7 @@ SRC_URI[sha256sum] = "974a623a338482b62e16d4eb705fb863ed33ec178680fc3e96ccdf0df6
 
 SRC_URI = " \
     git://github.com/dsoprea/pyinotify.git;branch=master;protocol=https \
+    file://new-test-inotify.patch \
     file://run-ptest \
 "
 

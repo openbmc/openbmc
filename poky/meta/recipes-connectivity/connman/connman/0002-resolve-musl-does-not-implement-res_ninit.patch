@@ -18,14 +18,6 @@ diff --git a/gweb/gresolv.c b/gweb/gresolv.c
 index 954e7cf..2a9bc51 100644
 --- a/gweb/gresolv.c
 +++ b/gweb/gresolv.c
-@@ -36,6 +36,7 @@
- #include <arpa/inet.h>
- #include <arpa/nameser.h>
- #include <net/if.h>
-+#include <ctype.h>
- 
- #include "gresolv.h"
- 
 @@ -878,8 +879,6 @@ GResolv *g_resolv_new(int index)
  	resolv->index = index;
  	resolv->nameserver_list = NULL;

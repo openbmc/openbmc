@@ -925,8 +925,8 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     libmicrohttpd \
     yaml-cpp \
 "
-RDEPENDS:packagegroup-meta-oe-support:append:armv7a = " ne10"
-RDEPENDS:packagegroup-meta-oe-support:append:armv7ve = " ne10"
+RDEPENDS:packagegroup-meta-oe-support:append:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon"," ne10","",d)}"
+RDEPENDS:packagegroup-meta-oe-support:append:armv7ve = "${@bb.utils.contains("TUNE_FEATURES","neon"," ne10","",d)}"
 RDEPENDS:packagegroup-meta-oe-support:append:aarch64 = " ne10"
 RDEPENDS:packagegroup-meta-oe-support:append:x86 = " mcelog mce-inject mce-test vboxguestdrivers"
 RDEPENDS:packagegroup-meta-oe-support:append:x86-64 = " mcelog mce-inject mce-test vboxguestdrivers"

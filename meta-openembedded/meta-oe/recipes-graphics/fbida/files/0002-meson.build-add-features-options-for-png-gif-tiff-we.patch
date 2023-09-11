@@ -3,7 +3,7 @@ From: "Meyer, Wolfgang" <Wolfgang.Meyer@gossenmetrawatt.com>
 Date: Fri, 16 Sep 2022 16:25:38 +0200
 Subject: [PATCH] meson.build: add features options for png, gif, tiff, webp, and motif
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/kraxel/fbida/pull/4]
 Signed-off-by: "Meyer, Wolfgang" <Wolfgang.Meyer@gossenmetrawatt.com>
 ---
  meson.build       | 41 +++++++++++++++++++++++++++--------------

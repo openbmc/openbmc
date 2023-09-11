@@ -7,6 +7,8 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gobject-introspection gtk-doc
 
+SRC_URI += "file://float-div.patch"
+
 SRC_URI[archive.sha256sum] = "a37bb0e78a419dcbeaa9c7027bcff52f5ec2367c25ec859da31dfde2928f279a"
 
 # Disable neon support by default on ARM-32 platforms because of the

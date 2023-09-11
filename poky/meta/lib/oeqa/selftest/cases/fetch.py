@@ -103,7 +103,7 @@ class Dependencies(OESelftestTestCase):
 
             r = """
             LICENSE="CLOSED"
-            SRC_URI="git://example.com/repo;branch=master"
+            SRC_URI="git://example.com/repo;branch=master;rev=ffffffffffffffffffffffffffffffffffffffff"
             """
             f = self.write_recipe(textwrap.dedent(r), tempdir)
             d = tinfoil.parse_recipe_file(f)

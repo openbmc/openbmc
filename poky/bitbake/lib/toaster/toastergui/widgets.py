@@ -7,6 +7,7 @@
 #
 
 from django.views.generic import View, TemplateView
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.shortcuts import HttpResponse
 from django.core.cache import cache
@@ -63,8 +64,8 @@ class ToasterTable(TemplateView):
         self.default_orderby = ""
 
     # prevent HTTP caching of table data
-    @cache_control(must_revalidate=True,
-                   max_age=0, no_store=True, no_cache=True)
+    @method_decorator(cache_control(must_revalidate=True,
+                   max_age=0, no_store=True, no_cache=True))
     def dispatch(self, *args, **kwargs):
         return super(ToasterTable, self).dispatch(*args, **kwargs)
 

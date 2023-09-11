@@ -13,7 +13,7 @@ SRC_URI = "git://git.adelielinux.org/adelie/gcompat.git;protocol=https;branch=cu
 SRC_URI:append:powerpc = "\
            file://0001-make-Static-PIE-does-not-work-on-musl-ppc.patch \
            "
-PV = "1.0.0+1.1+git${SRCPV}"
+PV = "1.0.0+1.1+git"
 SRCREV = "c6921a1aa454bb87671f9bd1ecfe47d80d1620aa"
 
 S = "${WORKDIR}/git"

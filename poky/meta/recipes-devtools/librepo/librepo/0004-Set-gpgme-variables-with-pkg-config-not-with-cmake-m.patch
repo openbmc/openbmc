@@ -12,16 +12,19 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a45d5c4..40249e6 100644
+index cd975a8..713cc87 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -32,7 +32,8 @@ PKG_CHECK_MODULES(GLIB2 glib-2.0 REQUIRED)
- PKG_SEARCH_MODULE(LIBCRYPTO REQUIRED libcrypto openssl)
- PKG_CHECK_MODULES(LIBXML2 libxml-2.0 REQUIRED)
+@@ -35,7 +35,8 @@ PKG_CHECK_MODULES(LIBXML2 libxml-2.0 REQUIRED)
  FIND_PACKAGE(CURL 7.52.0 REQUIRED)
--FIND_PACKAGE(Gpgme REQUIRED)
-+PKG_CHECK_MODULES(GPGME gpgme REQUIRED)
-+set(GPGME_VANILLA_LIBRARIES ${GPGME_LIBRARIES})
  
- 
- IF (WITH_ZCHUNK)
+ IF (USE_GPGME)
+-    FIND_PACKAGE(Gpgme REQUIRED)
++    PKG_CHECK_MODULES(GPGME gpgme REQUIRED)
++    set(GPGME_VANILLA_LIBRARIES ${GPGME_LIBRARIES})
+ ELSE (USE_GPGME)
+     PKG_CHECK_MODULES(RPM REQUIRED rpm>=4.18.0)
+ ENDIF (USE_GPGME)
+-- 
+2.34.1
+

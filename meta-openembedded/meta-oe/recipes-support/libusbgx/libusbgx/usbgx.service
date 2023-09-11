@@ -4,7 +4,7 @@ Requires=sys-kernel-config.mount
 After=sys-kernel-config.mount
 
 [Service]
-Type=simple
+Type=oneshot
 ExecStart=/usr/bin/gadget-start
 
 [Install]

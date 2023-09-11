@@ -1342,7 +1342,6 @@ python do_qa_patch() {
     import re
     from oe import patch
 
-    coremeta_path = os.path.join(d.getVar('COREBASE'), 'meta', '')
     for url in patch.src_patches(d):
         (_, _, fullpath, _, _, _) = bb.fetch.decodeurl(url)
 

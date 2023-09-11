@@ -261,10 +261,6 @@ class SignatureGeneratorBasic(SignatureGenerator):
             bb.warn("Error during finalise of %s" % mcfn)
             raise
 
-        #Slow but can be useful for debugging mismatched basehashes
-        #for task in self.taskdeps[mcfn]:
-        #    self.dump_sigtask(mcfn, task, d.getVar("STAMP"), False)
-
         basehashes = {}
         for task in taskdeps:
             basehashes[task] = self.basehash[mcfn + ":" + task]
@@ -273,6 +269,11 @@ class SignatureGeneratorBasic(SignatureGenerator):
         d.setVar("__siggen_gendeps", gendeps)
         d.setVar("__siggen_varvals", lookupcache)
         d.setVar("__siggen_taskdeps", taskdeps)
+
+        #Slow but can be useful for debugging mismatched basehashes
+        #self.setup_datacache_from_datastore(mcfn, d)
+        #for task in taskdeps:
+        #    self.dump_sigtask(mcfn, task, d.getVar("STAMP"), False)
 
     def setup_datacache_from_datastore(self, mcfn, d):
         super().setup_datacache_from_datastore(mcfn, d)
@@ -360,7 +361,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
         for dep in sorted(self.runtaskdeps[tid]):
             data += self.get_unihash(dep[1])
 
-        for (f, cs) in self.file_checksum_values[tid]:
+        for (f, cs) in sorted(self.file_checksum_values[tid], key=clean_checksum_file_path):
             if cs:
                 if "/./" in f:
                     data += "./" + f.split("/./")[1]
@@ -418,14 +419,14 @@ class SignatureGeneratorBasic(SignatureGenerator):
         data['varvals'][task] = self.datacaches[mc].siggen_varvals[mcfn][task]
         for dep in self.datacaches[mc].siggen_taskdeps[mcfn][task]:
             if dep in self.basehash_ignore_vars:
-               continue
+                continue
             data['gendeps'][dep] = self.datacaches[mc].siggen_gendeps[mcfn][dep]
             data['varvals'][dep] = self.datacaches[mc].siggen_varvals[mcfn][dep]
 
         if runtime and tid in self.taskhash:
             data['runtaskdeps'] = [dep[0] for dep in sorted(self.runtaskdeps[tid])]
             data['file_checksum_values'] = []
-            for f,cs in self.file_checksum_values[tid]:
+            for f,cs in sorted(self.file_checksum_values[tid], key=clean_checksum_file_path):
                 if "/./" in f:
                     data['file_checksum_values'].append(("./" + f.split("/./")[1], cs))
                 else:
@@ -743,6 +744,12 @@ class SignatureGeneratorTestEquivHash(SignatureGeneratorUniHashMixIn, SignatureG
         super().init_rundepcheck(data)
         self.server = data.getVar('BB_HASHSERVE')
         self.method = "sstate_output_hash"
+
+def clean_checksum_file_path(file_checksum_tuple):
+    f, cs = file_checksum_tuple
+    if "/./" in f:
+        return "./" + f.split("/./")[1]
+    return f
 
 def dump_this_task(outfile, d):
     import bb.parse

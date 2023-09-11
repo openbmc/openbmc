@@ -8,7 +8,7 @@ DEPENDS = "gtk+3"
 GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
 
-inherit gnomebase gobject-introspection gtk-doc gtk-icon-cache features_check
+inherit gnomebase gobject-introspection gi-docgen gtk-icon-cache features_check
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 # FIXME: When upgrading to libpeas 2, g-i is no longer needed.

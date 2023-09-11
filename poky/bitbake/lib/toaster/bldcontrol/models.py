@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 from django.db import models
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from orm.models import Project, Build, Layer_Version
 
 import logging
@@ -124,7 +124,7 @@ class BuildRequest(models.Model):
         return self.brvariable_set.get(name="MACHINE").value
 
     def __str__(self):
-        return force_text('%s %s' % (self.project, self.get_state_display()))
+        return force_str('%s %s' % (self.project, self.get_state_display()))
 
 # These tables specify the settings for running an actual build.
 # They MUST be kept in sync with the tables in orm.models.Project*

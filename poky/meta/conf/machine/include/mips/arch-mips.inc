@@ -26,6 +26,8 @@ MACHINE_FEATURES_BACKFILL_CONSIDERED:append = " ${@bb.utils.contains('TUNE_FEATU
 TUNEVALID[n64] = "MIPS64 n64 ABI"
 TUNECONFLICTS[n64] = "o32 n32"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'n64', ' -mabi=64', '', d)}"
+LD64ARG = "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', '-m elf64btsmip', '-m elf64ltsmip', d)}"
+TUNE_LDARGS += "${@bb.utils.contains('TUNE_FEATURES', 'n64', '${LD64ARG}', '', d)}"
 
 # Floating point
 TUNEVALID[fpu-hard] = "Use hardware FPU"

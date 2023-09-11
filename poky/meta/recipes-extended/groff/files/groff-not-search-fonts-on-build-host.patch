@@ -1,7 +1,7 @@
-From 75761ae7adc88412de4379d1cf5484b055cd5f18 Mon Sep 17 00:00:00 2001
+From eb16276c3e2e34aa2e57f6a0e68554657b90cd28 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sat, 11 May 2019 17:06:29 +0800
-Subject: [PATCH 2/2] groff searchs fonts which are provided by ghostscript on
+Subject: [PATCH] groff searchs fonts which are provided by ghostscript on
  build host. It causes non-determinism issue. So not search font dirs on host.
 
 Upstream-Status: Inappropriate [cross build specific]
@@ -10,23 +10,30 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
 Rebase to 1.22.4
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
- font/devpdf/Foundry.in | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ font/devpdf/Foundry.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/font/devpdf/Foundry.in b/font/devpdf/Foundry.in
-index 93e9b66..235b23b 100644
+index e5aba65..5441734 100644
 --- a/font/devpdf/Foundry.in
 +++ b/font/devpdf/Foundry.in
-@@ -65,7 +65,7 @@ ZD|Y||||Dingbats!d050000l.pfb
- #======================================================================
+@@ -20,7 +20,7 @@
  
- #Foundry|Name|Searchpath
--foundry|U|(gs):@urwfontsdir@ :/usr/share/fonts/type1/gsfonts :/opt/local/share/fonts/urw-fonts # the URW fonts delivered with ghostscript (may be different)
-+foundry|U|(gs) # the URW fonts delivered with ghostscript (may be different)
- #Define Flags for afmtodit
+ #=======================================================================
+ #Foundry|Name|Search path
+-foundry||@urwfontsdir@:(gs):/usr/share/fonts/type1/gsfonts:/usr/share/fonts/default/Type1:/usr/share/fonts/default/Type1/adobestd35:/usr/share/fonts/type1/urw-base35:/opt/local/share/fonts/urw-fonts:/usr/local/share/fonts/ghostscript
++foundry||(gs)
  
- r=-i 0 -m
--- 
-2.7.4
-
+ # Enable the font description files for grops (generated from Adobe
+ # foundry font files) to be used with gropdf.  afmtodit must not be
+@@ -72,7 +72,7 @@ EURO|N||||*../devps/freeeuro.pfa
+ # URW fonts are typically shipped with Ghostscript, but can be replaced.
+ 
+ #Foundry|Name|Search path
+-foundry|U|@urwfontsdir@:/usr/share/fonts/type1/gsfonts:/usr/share/fonts/default/Type1:/usr/share/fonts/default/Type1/adobestd35:/usr/share/fonts/type1/urw-base35:/opt/local/share/fonts/urw-fonts:/usr/local/share/fonts/ghostscript:(gs)
++foundry|U|(gs)
+ 
+ # Define flags for afmtodit.
+ 

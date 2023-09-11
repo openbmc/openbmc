@@ -28,6 +28,7 @@ Upstream-Status: Inappropriate [OE-Specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Elvis Dowson <elvis.dowson@gmail.com>
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+Signed-off-by: Zang Ruochen <zangruochen@loongson.cn>
 ---
  gcc/config/aarch64/t-aarch64-linux |  8 ++++----
  gcc/config/arc/t-multilib-linux    |  4 ++--
@@ -35,7 +36,8 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
  gcc/config/mips/t-linux64          | 28 ++--------------------------
  gcc/config/riscv/t-linux           |  4 ++--
  gcc/config/rs6000/t-linux64        |  5 ++---
- 6 files changed, 14 insertions(+), 41 deletions(-)
+ gcc/config/loongarch/t-linux       | 34 ++++++++++++++++++----------------
+ 7 files changed, 32 insertions(+), 57 deletions(-)
 
 diff --git a/gcc/config/aarch64/t-aarch64-linux b/gcc/config/aarch64/t-aarch64-linux
 index 57bf4100fcd..aaef5da8059 100644
@@ -147,3 +149,53 @@ index 01a94242308..1429eceaebf 100644
  
  rs6000-linux.o: $(srcdir)/config/rs6000/rs6000-linux.cc
  	$(COMPILE) $<
+diff --git a/gcc/config/loongarch/t-linux b/gcc/config/loongarch/t-linux
+index e40da1792..0c7ec9f8a 100644
+--- a/gcc/config/loongarch/t-linux
++++ b/gcc/config/loongarch/t-linux
+@@ -18,7 +18,9 @@
+
+ # Multilib
+ MULTILIB_OPTIONS = mabi=lp64d/mabi=lp64f/mabi=lp64s
+-MULTILIB_DIRNAMES = base/lp64d base/lp64f base/lp64s
++#MULTILIB_DIRNAMES = base/lp64d base/lp64f base/lp64s
++MULTILIB_DIRNAMES = . . .
++MULTILIB_OSDIRNAMES = ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir))
+
+ # The GCC driver always gets all abi-related options on the command line.
+ # (see loongarch-driver.c:driver_get_normalized_m_opts)
+@@ -36,18 +38,18 @@ else
+ endif
+
+ # Don't define MULTILIB_OSDIRNAMES if multilib is disabled.
+-ifeq ($(filter LA_DISABLE_MULTILIB,$(tm_defines)),)
+-
+-    MULTILIB_OSDIRNAMES = \
+-      mabi.lp64d=../lib64$\
+-      $(call if_multiarch,:loongarch64-linux-gnu)
+-
+-    MULTILIB_OSDIRNAMES += \
+-      mabi.lp64f=../lib64/f32$\
+-      $(call if_multiarch,:loongarch64-linux-gnuf32)
+-
+-    MULTILIB_OSDIRNAMES += \
+-      mabi.lp64s=../lib64/sf$\
+-      $(call if_multiarch,:loongarch64-linux-gnusf)
+-
+-endif
++#ifeq ($(filter LA_DISABLE_MULTILIB,$(tm_defines)),)
++#
++#    MULTILIB_OSDIRNAMES = \
++#      mabi.lp64d=../lib64$\
++#      $(call if_multiarch,:loongarch64-linux-gnu)
++#
++#    MULTILIB_OSDIRNAMES += \
++#      mabi.lp64f=../lib64/f32$\
++#      $(call if_multiarch,:loongarch64-linux-gnuf32)
++#
++#    MULTILIB_OSDIRNAMES += \
++#      mabi.lp64s=../lib64/sf$\
++#      $(call if_multiarch,:loongarch64-linux-gnusf)
++#
++#endif
+

@@ -7,7 +7,7 @@ GNOMEBASEBUILDCLASS = "meson"
 GNOMEBN = "libgweather"
 S = "${WORKDIR}/${GNOMEBN}-${PV}"
 
-inherit gnomebase gsettings gobject-introspection gettext gtk-doc vala features_check
+inherit gnomebase gsettings gobject-introspection gettext gi-docgen vala features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 

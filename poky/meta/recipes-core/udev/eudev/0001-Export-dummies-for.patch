@@ -1,0 +1,82 @@
+From 45634cc0f09ea354be7efce2ae3d3fa8ffc181ec Mon Sep 17 00:00:00 2001
+From: Boian Bonev <bbonev@ipacct.com>
+Date: Fri, 11 Aug 2023 23:14:02 +0000
+Subject: [PATCH] Export dummies for
+
+ - udev_device_has_current_tag
+ - udev_device_get_current_tags_list_entry
+
+since the current eudev device database does not support the concept of
+current tags
+
+Upstream-Status: Submitted [https://github.com/eudev-project/eudev/pull/253]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/libudev/libudev-device.c | 11 +++++++++++
+ src/libudev/libudev.h        |  2 ++
+ src/libudev/libudev.sym      |  6 ++++++
+ 3 files changed, 19 insertions(+)
+
+diff --git a/src/libudev/libudev-device.c b/src/libudev/libudev-device.c
+index ac67ce8..7d7a662 100644
+--- a/src/libudev/libudev-device.c
++++ b/src/libudev/libudev-device.c
+@@ -1819,6 +1819,12 @@ _public_ struct udev_list_entry *udev_device_get_tags_list_entry(struct udev_dev
+         return udev_list_get_entry(&udev_device->tags_list);
+ }
+ 
++_public_ struct udev_list_entry *udev_device_get_current_tags_list_entry(struct udev_device *udev_device)
++{
++        // TODO: eudev database does not support current tags
++        return udev_device_get_tags_list_entry(udev_device);
++}
++
+ /**
+  * udev_device_has_tag:
+  * @udev_device: udev device
+@@ -1842,6 +1848,11 @@ _public_ int udev_device_has_tag(struct udev_device *udev_device, const char *ta
+         return false;
+ }
+ 
++_public_ int udev_device_has_current_tag(struct udev_device *udev_device, const char *tag) {
++        // TODO: eudev database does not support current tags
++        return udev_device_has_tag(udev_device, tag);
++}
++
+ #define ENVP_SIZE                        128
+ #define MONITOR_BUF_SIZE                4096
+ static int update_envp_monitor_buf(struct udev_device *udev_device)
+diff --git a/src/libudev/libudev.h b/src/libudev/libudev.h
+index 8491d2b..0202964 100644
+--- a/src/libudev/libudev.h
++++ b/src/libudev/libudev.h
+@@ -100,6 +100,7 @@ int udev_device_get_is_initialized(struct udev_device *udev_device);
+ struct udev_list_entry *udev_device_get_devlinks_list_entry(struct udev_device *udev_device);
+ struct udev_list_entry *udev_device_get_properties_list_entry(struct udev_device *udev_device);
+ struct udev_list_entry *udev_device_get_tags_list_entry(struct udev_device *udev_device);
++struct udev_list_entry *udev_device_get_current_tags_list_entry(struct udev_device *udev_device);
+ struct udev_list_entry *udev_device_get_sysattr_list_entry(struct udev_device *udev_device);
+ const char *udev_device_get_property_value(struct udev_device *udev_device, const char *key);
+ const char *udev_device_get_driver(struct udev_device *udev_device);
+@@ -110,6 +111,7 @@ unsigned long long int udev_device_get_usec_since_initialized(struct udev_device
+ const char *udev_device_get_sysattr_value(struct udev_device *udev_device, const char *sysattr);
+ int udev_device_set_sysattr_value(struct udev_device *udev_device, const char *sysattr, char *value);
+ int udev_device_has_tag(struct udev_device *udev_device, const char *tag);
++int udev_device_has_current_tag(struct udev_device *udev_device, const char *tag);
+ 
+ /*
+  * udev_monitor
+diff --git a/src/libudev/libudev.sym b/src/libudev/libudev.sym
+index 76726fc..d56c2ae 100644
+--- a/src/libudev/libudev.sym
++++ b/src/libudev/libudev.sym
+@@ -118,3 +118,9 @@ global:
+         udev_queue_flush;
+         udev_queue_get_fd;
+ } LIBUDEV_199;
++
++LIBUDEV_247 {
++global:
++        udev_device_has_current_tag;
++        udev_device_get_current_tags_list_entry;
++} LIBUDEV_215;
