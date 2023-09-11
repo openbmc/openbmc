@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d"
 SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main \
            file://0001-Replace-lstat64-stat64-functions-on-linux.patch"
 SRCREV = "4bd1a77e67958fb7f6739bd4542641646f264e5d"
-PV = "0+git${SRCPV}"
+PV = "0+git"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"

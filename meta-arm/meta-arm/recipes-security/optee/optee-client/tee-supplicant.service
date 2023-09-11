@@ -1,5 +1,6 @@
 [Unit]
 Description=TEE Supplicant
+ConditionPathExistsGlob=/dev/teepriv[0-9]*
 
 [Service]
 User=root

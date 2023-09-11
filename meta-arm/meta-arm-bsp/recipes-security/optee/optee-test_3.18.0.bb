@@ -1,7 +1,7 @@
 require recipes-security/optee/optee-test.inc
 
 SRC_URI += " \
-    file://musl-workaround.patch \
+    file://0001-xtest-regression_1000-remove-unneeded-stat.h-include.patch \
    "
 SRCREV = "da5282a011b40621a2cf7a296c11a35c833ed91b"
 

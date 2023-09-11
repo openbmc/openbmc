@@ -11,6 +11,8 @@ DEPENDS = "alsa-lib libpcre virtual/egl boost freetype dbus openssl libssh virtu
 
 PR = "r6"
 
+SRCREV_FORMAT = "_ffmpeg"
+
 SRCREV_default = "1f1d0ccd65d3a1caa86dc79d2863a8f067c8e3f8"
 
 # omxplayer builds its own copy of ffmpeg from source instead of using the

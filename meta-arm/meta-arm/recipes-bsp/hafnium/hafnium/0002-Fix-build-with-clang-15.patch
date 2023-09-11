@@ -1,0 +1,101 @@
+From 960d022fa69568752a58b6f5d78e9759b54cff68 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 22 Sep 2022 19:13:49 -0700
+Subject: [PATCH] Fix build with clang-15
+
+Clang-15 warns about prototypes a bit harder
+Remove unused variable suites_in_image
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/hftest/common.c                                         | 2 --
+ test/vmapi/arch/aarch64/gicv3/inc/gicv3.h                    | 2 +-
+ test/vmapi/arch/aarch64/gicv3/timer_secondary.c              | 2 +-
+ test/vmapi/el0_partitions/services/interruptible.c           | 2 +-
+ test/vmapi/el0_partitions/services/interruptible_echo.c      | 2 +-
+ test/vmapi/primary_with_secondaries/services/interruptible.c | 2 +-
+ 6 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/test/hftest/common.c b/test/hftest/common.c
+index 344ff2452c36..175230a7cfa7 100644
+--- a/test/hftest/common.c
++++ b/test/hftest/common.c
+@@ -67,7 +67,6 @@ void hftest_json(void)
+ {
+ 	const char *suite = NULL;
+ 	size_t i;
+-	size_t suites_in_image = 0;
+ 	size_t tests_in_suite = 0;
+ 
+ 	HFTEST_LOG("{");
+@@ -81,7 +80,6 @@ void hftest_json(void)
+ 				HFTEST_LOG("    },");
+ 			}
+ 			/* Move onto new suite. */
+-			++suites_in_image;
+ 			suite = test->suite;
+ 			tests_in_suite = 0;
+ 			HFTEST_LOG("    {");
+diff --git a/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h b/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h
+index 28bf29d412f4..dede047a381a 100644
+--- a/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h
++++ b/test/vmapi/arch/aarch64/gicv3/inc/gicv3.h
+@@ -30,4 +30,4 @@ extern void *recv_buffer;
+ 
+ extern volatile uint32_t last_interrupt_id;
+ 
+-void gicv3_system_setup();
++void gicv3_system_setup(void);
+diff --git a/test/vmapi/arch/aarch64/gicv3/timer_secondary.c b/test/vmapi/arch/aarch64/gicv3/timer_secondary.c
+index 0ac07f4411df..6264a5864721 100644
+--- a/test/vmapi/arch/aarch64/gicv3/timer_secondary.c
++++ b/test/vmapi/arch/aarch64/gicv3/timer_secondary.c
+@@ -55,7 +55,7 @@ TEAR_DOWN(timer_secondary_ffa)
+ 	EXPECT_FFA_ERROR(ffa_rx_release(), FFA_DENIED);
+ }
+ 
+-static void timer_busywait_secondary()
++static void timer_busywait_secondary(void)
+ {
+ 	const char message[] = "loop 0099999";
+ 	const char expected_response[] = "Got IRQ 03.";
+diff --git a/test/vmapi/el0_partitions/services/interruptible.c b/test/vmapi/el0_partitions/services/interruptible.c
+index 85c97dc7a857..80fc61b2e5a9 100644
+--- a/test/vmapi/el0_partitions/services/interruptible.c
++++ b/test/vmapi/el0_partitions/services/interruptible.c
+@@ -44,7 +44,7 @@ static void irq(void)
+  * Try to receive a message from the mailbox, blocking if necessary, and
+  * retrying if interrupted.
+  */
+-static struct ffa_value mailbox_receive_retry()
++static struct ffa_value mailbox_receive_retry(void)
+ {
+ 	struct ffa_value received;
+ 
+diff --git a/test/vmapi/el0_partitions/services/interruptible_echo.c b/test/vmapi/el0_partitions/services/interruptible_echo.c
+index 958d75090cce..55511d6a2bce 100644
+--- a/test/vmapi/el0_partitions/services/interruptible_echo.c
++++ b/test/vmapi/el0_partitions/services/interruptible_echo.c
+@@ -33,7 +33,7 @@ static void irq(void)
+  * Try to receive a message from the mailbox, blocking if necessary, and
+  * retrying if interrupted.
+  */
+-static struct ffa_value mailbox_receive_retry()
++static struct ffa_value mailbox_receive_retry(void)
+ {
+ 	struct ffa_value received;
+ 
+diff --git a/test/vmapi/primary_with_secondaries/services/interruptible.c b/test/vmapi/primary_with_secondaries/services/interruptible.c
+index 594f28ac8bc8..3888bf8b0b6e 100644
+--- a/test/vmapi/primary_with_secondaries/services/interruptible.c
++++ b/test/vmapi/primary_with_secondaries/services/interruptible.c
+@@ -41,7 +41,7 @@ static void irq(void)
+  * Try to receive a message from the mailbox, blocking if necessary, and
+  * retrying if interrupted.
+  */
+-struct ffa_value mailbox_receive_retry()
++struct ffa_value mailbox_receive_retry(void)
+ {
+ 	struct ffa_value received;
+ 

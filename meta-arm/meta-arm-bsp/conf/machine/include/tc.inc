@@ -14,9 +14,9 @@ UBOOT_ENTRYPOINT = "0x80080000"
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
 
 # OP-TEE
-PREFERRED_VERSION_optee-os ?= "3.18%"
-PREFERRED_VERSION_optee-client ?= "3.18%"
-PREFERRED_VERSION_optee-test ?= "3.18%"
+PREFERRED_VERSION_optee-os ?= "3.20%"
+PREFERRED_VERSION_optee-client ?= "3.20%"
+PREFERRED_VERSION_optee-test ?= "3.20%"
 
 # Cannot use the default zImage on arm64
 KERNEL_IMAGETYPE = "Image"
@@ -30,6 +30,7 @@ IMAGE_NAME_SUFFIX = ""
 SERIAL_CONSOLES = "115200;ttyAMA0"
 
 EXTRA_IMAGEDEPENDS += "trusted-firmware-a optee-os"
+PREFERRED_VERSION_trusted-firmware-a ?= "2.8.%"
 # FIXME - there is signed image dependency/race with testimage.
 # This should be fixed in oe-core
 TESTIMAGEDEPENDS:append = " virtual/kernel:do_deploy"

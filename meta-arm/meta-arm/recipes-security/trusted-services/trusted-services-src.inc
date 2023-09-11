@@ -12,11 +12,11 @@ SRC_URI:append = "\
 "
 
 #Latest on 2023 April 28
-SRCREV="08b3d39471f4914186bd23793dc920e83b0e3197"
+SRCREV_trusted-services = "08b3d39471f4914186bd23793dc920e83b0e3197"
 LIC_FILES_CHKSUM = "file://${S}/license.rst;md5=ea160bac7f690a069c608516b17997f4"
 
 S = "${WORKDIR}/git/trusted-services"
-PV ?= "0.0+git${SRCPV}"
+PV ?= "0.0+git"
 
 # DTC, tag "v1.6.1"
 SRC_URI += "git://github.com/dgibson/dtc;name=dtc;protocol=https;branch=main;destsuffix=git/dtc"
@@ -57,6 +57,8 @@ LIC_FILES_CHKSUM += "file://../libmetal/LICENSE.md;md5=fe0b8a4beea8f0813b606d15a
 SRC_URI += "git://github.com/OpenAMP/open-amp.git;name=openamp;protocol=https;branch=main;destsuffix=git/openamp"
 SRCREV_openamp = "347397decaa43372fc4d00f965640ebde042966d"
 LIC_FILES_CHKSUM += "file://../openamp/LICENSE.md;md5=a8d8cf662ef6bf9936a1e1413585ecbf"
+
+SRCREV_FORMAT = "trusted-services_dtc_mbedtls_nanopb_qcbor_tcose_cpputest_libmetal_openamp"
 
 # TS ships patches for external dependencies that needs to be applied
 apply_ts_patches() {

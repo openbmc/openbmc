@@ -1,0 +1,31 @@
+From 7f51fa5f848b77b5aadfc553e1aeca52f4bcc5a1 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Tue, 22 Aug 2023 17:18:26 +0100
+Subject: [PATCH] platform: corstone1000: change ns-interrupt-action 
+
+Changes ns-interrupt-action for corstone1000. The interrupts are queued as 
+in the previous optee release. Currently, enabling preemption (settig this field
+to 2) will halt psa-test from linux-userspace in corstone1000.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../config/corstone1000-opteesp/default_se-proxy.dts.in         | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/deployments/se-proxy/config/corstone1000-opteesp/default_se-proxy.dts.in b/deployments/se-proxy/config/corstone1000-opteesp/default_se-proxy.dts.in
+index cc42929d..839f7464 100644
+--- a/deployments/se-proxy/config/corstone1000-opteesp/default_se-proxy.dts.in
++++ b/deployments/se-proxy/config/corstone1000-opteesp/default_se-proxy.dts.in
+@@ -16,7 +16,7 @@
+ 	execution-state = <0>; /* AArch64 */
+ 	xlat-granule = <0>; /* 4KiB */
+ 	messaging-method = <3>; /* Direct messaging only */
+-	ns-interrupts-action = <2>; /* Non-secure interrupts are signaled */
++	ns-interrupts-action = <0>; /* Non-secure interrupts are signaled */
+ 	elf-format = <1>;
+ 
+ 	device-regions {
+-- 
+2.17.1
+

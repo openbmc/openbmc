@@ -3,6 +3,9 @@ header:
   includes:
     - kas/fvp-eula.yml
 
+env:
+  DISPLAY: ""
+
 distro: poky
 machine: fvp-baser-aemv8r64
 

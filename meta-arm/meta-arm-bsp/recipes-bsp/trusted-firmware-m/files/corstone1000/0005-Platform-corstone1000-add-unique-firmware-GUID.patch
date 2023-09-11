@@ -1,0 +1,35 @@
+From 3004fda909079ebebd62c495a4e49e64d6c8a85f Mon Sep 17 00:00:00 2001
+From: Anusmita Dutta Mazumder <anusmita.duttamazumder@arm.com>
+Date: Tue, 8 Aug 2023 10:58:01 +0000
+Subject: [PATCH] Platform corstone1000 add unique firmware GUID
+
+Add unique Corstone-1000 firmware GUID
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Anusmita Dutta Mazumder <anusmita.duttamazumder@arm.com>
+---
+ .../target/arm/corstone1000/fw_update_agent/fwu_agent.c   | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index f564f2902c..9c31aeee9d 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -113,10 +113,10 @@ enum fwu_agent_state_t {
+ };
+ 
+ struct efi_guid full_capsule_image_guid = {
+-    .time_low = 0xe2bb9c06,
+-    .time_mid = 0x70e9,
+-    .time_hi_and_version = 0x4b14,
+-    .clock_seq_and_node = {0x97, 0xa3, 0x5a, 0x79, 0x13, 0x17, 0x6e, 0x3f}
++    .time_low = 0x989f3a4e,
++    .time_mid = 0x46e0,
++    .time_hi_and_version = 0x4cd0,
++    .clock_seq_and_node = {0x98, 0x77, 0xa2, 0x5c, 0x70, 0xc0, 0x13, 0x29}
+ };
+ 
+ 
+-- 
+2.38.1
+

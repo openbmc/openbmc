@@ -1,0 +1,28 @@
+From 33078d8ef143e8c79f06399de46dd26e1d53a220 Mon Sep 17 00:00:00 2001
+From: Gauri Sahnan <Gauri.Sahnan@arm.com>
+Date: Tue, 8 Aug 2023 17:16:51 +0100
+Subject: fix(corstone1000): add cpuhelpers to makefile
+
+Adds cpu_helpers.S to the Makefile to align with the changes in new
+trusted-firmware-a version.
+
+Signed-off-by: Gauri Sahnan <Gauri.Sahnan@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ plat/arm/board/corstone1000/platform.mk | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plat/arm/board/corstone1000/platform.mk b/plat/arm/board/corstone1000/platform.mk
+index 3edffe087..079e9d6c1 100644
+--- a/plat/arm/board/corstone1000/platform.mk
++++ b/plat/arm/board/corstone1000/platform.mk
+@@ -43,6 +43,7 @@ BL2_SOURCES		+=	plat/arm/board/corstone1000/common/corstone1000_security.c		\
+ 				plat/arm/board/corstone1000/common/corstone1000_err.c		\
+ 				plat/arm/board/corstone1000/common/corstone1000_trusted_boot.c	\
+ 				lib/utils/mem_region.c					\
++				lib/cpus/aarch64/cpu_helpers.S \
+ 				plat/arm/board/corstone1000/common/corstone1000_helpers.S		\
+ 				plat/arm/board/corstone1000/common/corstone1000_plat.c		\
+ 				plat/arm/board/corstone1000/common/corstone1000_bl2_mem_params_desc.c \
+-- 
+2.25.1

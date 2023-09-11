@@ -9,6 +9,7 @@ SRC_URI:append:corstone1000  = " \
     file://0005-plat-corstone1000-add-compile-definitions-for-ECP_DP.patch;patchdir=../trusted-services \
     file://0006-plat-corstone1000-Use-the-stateless-platform-service.patch;patchdir=../trusted-services \
     file://0007-plat-corstone1000-Initialize-capsule-update-provider.patch;patchdir=../trusted-services \
+    file://0008-plat-corstone1000-change-ns-interrupt-action.patch;patchdir=../trusted-services \
     "
 
 

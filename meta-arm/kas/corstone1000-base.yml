@@ -1,6 +1,9 @@
 header:
   version: 11
 
+env:
+  DISPLAY: ""
+
 distro: poky-tiny
 
 defaults:
