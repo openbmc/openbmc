@@ -1,6 +1,13 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 #
+# Corstone-500 MACHINE
+#
+SRC_URI:append:corstone500 = " \
+                   file://0001-armv7-adding-generic-timer-access-through-MMIO.patch \
+                   file://0002-board-arm-add-corstone500-board.patch"
+
+#
 # Corstone1000 64-bit machines
 #
 DEPENDS:append:corstone1000 = " gnutls-native"
@@ -43,8 +50,7 @@ SRC_URI:append:corstone1000 = " \
 	file://0030-corstone1000-boot-index-from-active.patch			  \
 	file://0031-corstone1000-enable-PSCI-reset.patch			  \
 	file://0032-Enable-EFI-set-get-time-services.patch			  \
-	file://0033-corstone1000-detect-inflated-kernel-size.patch			  \
-	file://0034-corstone1000-ESRT-add-unique-firmware-GUID.patch		\
+	file://0033-Increase-the-unzipped-Kernel-size.patch			  \
         "
 
 #

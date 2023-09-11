@@ -1,16 +1,6 @@
 # TC0 specific configuration
 
-# Total Compute (tc) specific configuration for optee-os and optee-os-tadevkit
-
-FILESEXTRAPATHS:prepend := "${THISDIR}/files/optee-os/tc:"
-SRC_URI:append:tc = " file://sp_layout.json \
-    file://0001-WIP-Enable-managed-exit.patch \
-    file://0002-plat-totalcompute-fix-TZDRAM-start-and-size.patch \
-    "
-
-COMPATIBLE_MACHINE = "(tc?)"
-
-OPTEEMACHINE:tc1 = "totalcompute-tc1"
+require optee-os-generic-tc.inc
 
 # Enable optee memory layout and boot logs
 EXTRA_OEMAKE += " CFG_TEE_CORE_LOG_LEVEL=3"

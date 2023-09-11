@@ -1,0 +1,138 @@
+From dc250cab31c6611cc7fa76bc8b2027dbd56dd65d Mon Sep 17 00:00:00 2001
+From: Pierre Gondois <pierre.gondois@arm.com>
+Date: Mon, 7 Nov 2022 16:56:58 +0100
+Subject: [PATCH] arm64: dts: Update cache properties for Arm Ltd platforms
+
+The DeviceTree Specification v0.3 specifies that the cache node
+"compatible" and "cache-level" properties are required.
+
+Cf. s3.8 Multi-level and Shared Cache Nodes
+The 'cache-unified' property should be present if one of the properties
+for unified cache is present ('cache-size', ...).
+
+Update the relevant device trees nodes accordingly.
+
+Signed-off-by: Pierre Gondois <pierre.gondois@arm.com>
+Link: https://lore.kernel.org/r/20221107155825.1644604-6-pierre.gondois@arm.com
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Backport
+---
+ arch/arm64/boot/dts/arm/corstone1000.dtsi            | 1 +
+ arch/arm64/boot/dts/arm/foundation-v8.dtsi           | 1 +
+ arch/arm64/boot/dts/arm/juno-r1.dts                  | 2 ++
+ arch/arm64/boot/dts/arm/juno-r2.dts                  | 2 ++
+ arch/arm64/boot/dts/arm/juno.dts                     | 2 ++
+ arch/arm64/boot/dts/arm/rtsm_ve-aemv8a.dts           | 1 +
+ arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts | 1 +
+ 7 files changed, 10 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/arm/corstone1000.dtsi b/arch/arm64/boot/dts/arm/corstone1000.dtsi
+index 4e46826f883a..21f1f952e985 100644
+--- a/arch/arm64/boot/dts/arm/corstone1000.dtsi
++++ b/arch/arm64/boot/dts/arm/corstone1000.dtsi
+@@ -53,6 +53,7 @@ gic: interrupt-controller@1c000000 {
+ 
+ 	L2_0: l2-cache0 {
+ 		compatible = "cache";
++		cache-unified;
+ 		cache-level = <2>;
+ 		cache-size = <0x80000>;
+ 		cache-line-size = <64>;
+diff --git a/arch/arm64/boot/dts/arm/foundation-v8.dtsi b/arch/arm64/boot/dts/arm/foundation-v8.dtsi
+index 83e3e7e3984f..c8bd23b1a7ba 100644
+--- a/arch/arm64/boot/dts/arm/foundation-v8.dtsi
++++ b/arch/arm64/boot/dts/arm/foundation-v8.dtsi
+@@ -58,6 +58,7 @@ cpu3: cpu@3 {
+ 
+ 		L2_0: l2-cache0 {
+ 			compatible = "cache";
++			cache-level = <2>;
+ 		};
+ 	};
+ 
+diff --git a/arch/arm64/boot/dts/arm/juno-r1.dts b/arch/arm64/boot/dts/arm/juno-r1.dts
+index 6451c62146fd..1d90eeebb37d 100644
+--- a/arch/arm64/boot/dts/arm/juno-r1.dts
++++ b/arch/arm64/boot/dts/arm/juno-r1.dts
+@@ -189,6 +189,7 @@ A53_3: cpu@103 {
+ 
+ 		A57_L2: l2-cache0 {
+ 			compatible = "cache";
++			cache-unified;
+ 			cache-size = <0x200000>;
+ 			cache-line-size = <64>;
+ 			cache-sets = <2048>;
+@@ -197,6 +198,7 @@ A57_L2: l2-cache0 {
+ 
+ 		A53_L2: l2-cache1 {
+ 			compatible = "cache";
++			cache-unified;
+ 			cache-size = <0x100000>;
+ 			cache-line-size = <64>;
+ 			cache-sets = <1024>;
+diff --git a/arch/arm64/boot/dts/arm/juno-r2.dts b/arch/arm64/boot/dts/arm/juno-r2.dts
+index 438cd1ff4bd0..d2ada69b0a43 100644
+--- a/arch/arm64/boot/dts/arm/juno-r2.dts
++++ b/arch/arm64/boot/dts/arm/juno-r2.dts
+@@ -195,6 +195,7 @@ A53_3: cpu@103 {
+ 
+ 		A72_L2: l2-cache0 {
+ 			compatible = "cache";
++			cache-unified;
+ 			cache-size = <0x200000>;
+ 			cache-line-size = <64>;
+ 			cache-sets = <2048>;
+@@ -203,6 +204,7 @@ A72_L2: l2-cache0 {
+ 
+ 		A53_L2: l2-cache1 {
+ 			compatible = "cache";
++			cache-unified;
+ 			cache-size = <0x100000>;
+ 			cache-line-size = <64>;
+ 			cache-sets = <1024>;
+diff --git a/arch/arm64/boot/dts/arm/juno.dts b/arch/arm64/boot/dts/arm/juno.dts
+index cf4a58211399..5e48a01a5b9f 100644
+--- a/arch/arm64/boot/dts/arm/juno.dts
++++ b/arch/arm64/boot/dts/arm/juno.dts
+@@ -194,6 +194,7 @@ A53_3: cpu@103 {
+ 
+ 		A57_L2: l2-cache0 {
+ 			compatible = "cache";
++			cache-unified;
+ 			cache-size = <0x200000>;
+ 			cache-line-size = <64>;
+ 			cache-sets = <2048>;
+@@ -202,6 +203,7 @@ A57_L2: l2-cache0 {
+ 
+ 		A53_L2: l2-cache1 {
+ 			compatible = "cache";
++			cache-unified;
+ 			cache-size = <0x100000>;
+ 			cache-line-size = <64>;
+ 			cache-sets = <1024>;
+diff --git a/arch/arm64/boot/dts/arm/rtsm_ve-aemv8a.dts b/arch/arm64/boot/dts/arm/rtsm_ve-aemv8a.dts
+index 258991ad7cc0..ef68f5aae7dd 100644
+--- a/arch/arm64/boot/dts/arm/rtsm_ve-aemv8a.dts
++++ b/arch/arm64/boot/dts/arm/rtsm_ve-aemv8a.dts
+@@ -71,6 +71,7 @@ cpu@3 {
+ 
+ 		L2_0: l2-cache0 {
+ 			compatible = "cache";
++			cache-level = <2>;
+ 		};
+ 	};
+ 
+diff --git a/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts b/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts
+index 5b6d9d8e934d..796cd7d02eb5 100644
+--- a/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts
++++ b/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts
+@@ -57,6 +57,7 @@ cpu@1 {
+ 
+ 		L2_0: l2-cache0 {
+ 			compatible = "cache";
++			cache-level = <2>;
+ 		};
+ 	};
+ 

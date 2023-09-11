@@ -23,7 +23,7 @@ do_make(){
 }
 
 do_install(){
-    oe_runmake INSTALLDIR=${D}  USRLIBDIR=${libdir} SBINDIR=${sbindir} install
+    oe_runmake INSTALLDIR=${D}  USRLIBDIR=${libdir} install
 }
 
 PACKAGE="${PN} ${PN}-dbg ${PN}-doc"

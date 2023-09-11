@@ -9,7 +9,7 @@ SRCREV = "d3b1a15d18542b2086e72bfdc3fc43f454772a3b"
 # boot-wrapper doesn't make releases
 UPSTREAM_CHECK_COMMITS = "1"
 
-PV = "0+git"
+PV = "git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

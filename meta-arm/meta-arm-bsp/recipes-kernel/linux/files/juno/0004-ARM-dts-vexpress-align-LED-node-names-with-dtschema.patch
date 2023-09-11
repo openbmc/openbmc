@@ -1,0 +1,81 @@
+From 4edb625e2256d5761312110e34cbc0164915d772 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Date: Fri, 25 Nov 2022 15:41:12 +0100
+Subject: [PATCH] ARM: dts: vexpress: align LED node names with dtschema
+
+The node names should be generic and DT schema expects certain pattern.
+
+  vexpress-v2p-ca9.dtb: leds: 'user1', 'user2', 'user3', 'user4', 'user5', 'user6', 'user7', 'user8' do not match any of the regexes: '(^led-[0-9a-f]$|led)', 'pinctrl-[0-9]+'
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Link: https://lore.kernel.org/r/20221125144112.476817-1-krzysztof.kozlowski@linaro.org
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Backport
+---
+ arch/arm/boot/dts/vexpress-v2m.dtsi | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/boot/dts/vexpress-v2m.dtsi b/arch/arm/boot/dts/vexpress-v2m.dtsi
+index f434fe5cf4a1..def538ce8769 100644
+--- a/arch/arm/boot/dts/vexpress-v2m.dtsi
++++ b/arch/arm/boot/dts/vexpress-v2m.dtsi
+@@ -383,49 +383,49 @@ v2m_refclk32khz: refclk32khz {
+ 			leds {
+ 				compatible = "gpio-leds";
+ 
+-				user1 {
++				led-user1 {
+ 					label = "v2m:green:user1";
+ 					gpios = <&v2m_led_gpios 0 0>;
+ 					linux,default-trigger = "heartbeat";
+ 				};
+ 
+-				user2 {
++				led-user2 {
+ 					label = "v2m:green:user2";
+ 					gpios = <&v2m_led_gpios 1 0>;
+ 					linux,default-trigger = "mmc0";
+ 				};
+ 
+-				user3 {
++				led-user3 {
+ 					label = "v2m:green:user3";
+ 					gpios = <&v2m_led_gpios 2 0>;
+ 					linux,default-trigger = "cpu0";
+ 				};
+ 
+-				user4 {
++				led-user4 {
+ 					label = "v2m:green:user4";
+ 					gpios = <&v2m_led_gpios 3 0>;
+ 					linux,default-trigger = "cpu1";
+ 				};
+ 
+-				user5 {
++				led-user5 {
+ 					label = "v2m:green:user5";
+ 					gpios = <&v2m_led_gpios 4 0>;
+ 					linux,default-trigger = "cpu2";
+ 				};
+ 
+-				user6 {
++				led-user6 {
+ 					label = "v2m:green:user6";
+ 					gpios = <&v2m_led_gpios 5 0>;
+ 					linux,default-trigger = "cpu3";
+ 				};
+ 
+-				user7 {
++				led-user7 {
+ 					label = "v2m:green:user7";
+ 					gpios = <&v2m_led_gpios 6 0>;
+ 					linux,default-trigger = "cpu4";
+ 				};
+ 
+-				user8 {
++				led-user8 {
+ 					label = "v2m:green:user8";
+ 					gpios = <&v2m_led_gpios 7 0>;
+ 					linux,default-trigger = "cpu5";

@@ -1,0 +1,139 @@
+From 2bb9fb8414b8ad35ed5fc6c91a34c21cef285a01 Mon Sep 17 00:00:00 2001
+From: Rui Miguel Silva <rui.silva@linaro.org>
+Date: Wed, 18 Dec 2019 21:52:34 +0000
+Subject: [PATCH 1/2] armv7: adding generic timer access through MMIO
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+
+This driver enables the ARMv7 generic timer.
+
+The access to the timer registers is through memory mapping (MMIO).
+
+This driver can be used by u-boot to access to the timer through MMIO
+when arch_timer is not available in the core (access using system
+instructions not possible), for example, in case of Cortex-A5.
+
+This driver configures and enables the generic timer at
+the u-boot initcall level (timer_init) before u-boot relocation.
+
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+
+
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+---
+ arch/arm/cpu/armv7/Makefile     |  1 +
+ arch/arm/cpu/armv7/mmio_timer.c | 75 +++++++++++++++++++++++++++++++++
+ scripts/config_whitelist.txt    |  1 +
+ 3 files changed, 77 insertions(+)
+ create mode 100644 arch/arm/cpu/armv7/mmio_timer.c
+
+diff --git a/arch/arm/cpu/armv7/Makefile b/arch/arm/cpu/armv7/Makefile
+index bfbd85ae64ef..1a0a24e53110 100644
+--- a/arch/arm/cpu/armv7/Makefile
++++ b/arch/arm/cpu/armv7/Makefile
+@@ -28,6 +28,7 @@ obj-$(CONFIG_ARMV7_PSCI)	+= psci.o psci-common.o
+ obj-$(CONFIG_IPROC) += iproc-common/
+ obj-$(CONFIG_KONA) += kona-common/
+ obj-$(CONFIG_SYS_ARCH_TIMER) += arch_timer.o
++obj-$(CONFIG_SYS_MMIO_TIMER) += mmio_timer.o
+ 
+ ifneq (,$(filter s5pc1xx exynos,$(SOC)))
+ obj-y += s5p-common/
+diff --git a/arch/arm/cpu/armv7/mmio_timer.c b/arch/arm/cpu/armv7/mmio_timer.c
+new file mode 100644
+index 000000000000..edd806e06e42
+--- /dev/null
++++ b/arch/arm/cpu/armv7/mmio_timer.c
+@@ -0,0 +1,75 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (c) 2019, Arm Limited. All rights reserved.
++ *
++ */
++
++#include <common.h>
++#include <asm/io.h>
++#include <div64.h>
++#include <bootstage.h>
++#include <asm/global_data.h>
++
++DECLARE_GLOBAL_DATA_PTR;
++
++#define CNTCTLBASE    0x1a020000UL
++#define CNTREADBASE   0x1a030000UL
++#define CNTEN         (1 << 0)
++#define CNTFCREQ      (1 << 8)
++
++static inline uint32_t mmio_read32(uintptr_t addr)
++{
++	return *(volatile uint32_t*)addr;
++}
++
++static inline void mmio_write32(uintptr_t addr, uint32_t data)
++{
++	*(volatile uint32_t*)addr = data;
++}
++
++int timer_init(void)
++{
++	/* calculate the frequency in ms */
++	gd->arch.timer_rate_hz = COUNTER_FREQUENCY / CONFIG_SYS_HZ;
++
++	/* configure CNTFID0 register: set the base frequency */
++	mmio_write32(CNTCTLBASE + 0x20, COUNTER_FREQUENCY);
++
++	/*
++	 * configure CNTCR register:
++	 *    enable the generic counter and;
++	 *    select the first frequency entry
++	 */
++	mmio_write32(CNTCTLBASE, CNTFCREQ | CNTEN);
++
++	return 0;
++}
++
++unsigned long long get_ticks(void)
++{
++	return (((u64)(mmio_read32(CNTREADBASE + 0x4)) << 32) |
++		mmio_read32(CNTREADBASE));
++}
++
++ulong get_timer(ulong base)
++{
++	return lldiv(get_ticks(), gd->arch.timer_rate_hz) - base;
++}
++
++void __udelay(unsigned long usec)
++{
++	unsigned long endtime;
++
++	endtime = lldiv((unsigned long long)usec * gd->arch.timer_rate_hz,
++			1000UL);
++
++	endtime += get_ticks();
++
++	while (get_ticks() < endtime)
++		;
++}
++
++ulong get_tbclk(void)
++{
++	return gd->arch.timer_rate_hz;
++}
+diff --git a/scripts/config_whitelist.txt b/scripts/config_whitelist.txt
+index ea71f9d23449..1496d9b88233 100644
+--- a/scripts/config_whitelist.txt
++++ b/scripts/config_whitelist.txt
+@@ -610,6 +610,7 @@ CONFIG_SYS_MMC_U_BOOT_DST
+ CONFIG_SYS_MMC_U_BOOT_OFFS
+ CONFIG_SYS_MMC_U_BOOT_SIZE
+ CONFIG_SYS_MMC_U_BOOT_START
++CONFIG_SYS_MMIO_TIMER
+ CONFIG_SYS_MOR_VAL
+ CONFIG_SYS_MRAM_BASE
+ CONFIG_SYS_NAND_AMASK
+-- 
+2.39.1
+

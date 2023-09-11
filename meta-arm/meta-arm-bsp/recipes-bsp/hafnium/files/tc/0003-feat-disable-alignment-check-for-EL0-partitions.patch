@@ -1,0 +1,318 @@
+From 1c4d28493faed6cf189c75fa91d19131e6a34e04 Mon Sep 17 00:00:00 2001
+From: Olivier Deprez <olivier.deprez@arm.com>
+Date: Mon, 8 Aug 2022 19:14:23 +0200
+Subject: [PATCH] feat: disable alignment check for EL0 partitions
+
+Relax hw alignment check specifically for (S-)EL0 partitions when
+Hafnium runs with VHE enabled. EL1 partitions have a specific control
+for EL1 and EL0 with respect to alignment check.
+Create a hyp_state structure (from already defined flying registers)
+within the vCPU context to hold the Hypervisor EL2 static configuration
+applied when a vCPU runs. This state is switched back and forth when
+running the Hypervisor or the VM.
+Add SCTLR_EL2 to this context. An EL0 partition context is initialized
+with SCTLR_EL2.A=0 such that alignment check is disabled when EL0 runs
+in the EL2&0 translation regime. SCTLR_EL2.A is set back when returning
+to the Hypervisor such that Hypervisor execution runs with aligment
+check enabled at EL2.
+Remove HCR_EL2 saving from vCPU exit path provided this register state
+is static and doesn't change while a vCPU runs.
+The rationale for such change is to permit running upstream SW stacks
+such as the EDKII/StandaloneMm [1] for which default build assumes
+unaligned accesses are permitted. Similar query exists for running
+Trusted Services on top of Hafnium [2].
+
+[1] https://github.com/tianocore/edk2/tree/master/StandaloneMmPkg
+[2] https://trusted-services.readthedocs.io/en/integration/
+
+Signed-off-by: Olivier Deprez <olivier.deprez@arm.com>
+Change-Id: I2906f4c712425fcfb31adbf89e2e3b9ca293f181
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/hafnium/hafnium/+/16195]
+---
+ src/arch/aarch64/hypervisor/cpu.c        |  9 ++++---
+ src/arch/aarch64/hypervisor/exceptions.S | 32 ++++++++++++++++--------
+ src/arch/aarch64/hypervisor/feature_id.c |  6 ++---
+ src/arch/aarch64/hypervisor/handler.c    | 18 +++++++------
+ src/arch/aarch64/inc/hf/arch/types.h     |  9 +++++--
+ src/arch/aarch64/mm.c                    |  2 +-
+ src/arch/aarch64/sysregs.c               | 11 ++++++--
+ src/arch/aarch64/sysregs.h               |  2 +-
+ 8 files changed, 59 insertions(+), 30 deletions(-)
+
+diff --git a/src/arch/aarch64/hypervisor/cpu.c b/src/arch/aarch64/hypervisor/cpu.c
+index d2df77d8..a000159b 100644
+--- a/src/arch/aarch64/hypervisor/cpu.c
++++ b/src/arch/aarch64/hypervisor/cpu.c
+@@ -115,7 +115,9 @@ void arch_regs_reset(struct vcpu *vcpu)
+ 		}
+ 	}
+ 
+-	r->hcr_el2 = get_hcr_el2_value(vm_id, vcpu->vm->el0_partition);
++	r->hyp_state.hcr_el2 =
++		get_hcr_el2_value(vm_id, vcpu->vm->el0_partition);
++	r->hyp_state.sctlr_el2 = get_sctlr_el2_value(vcpu->vm->el0_partition);
+ 	r->lazy.cnthctl_el2 = cnthctl;
+ 	if (vcpu->vm->el0_partition) {
+ 		CHECK(has_vhe_support());
+@@ -125,10 +127,11 @@ void arch_regs_reset(struct vcpu *vcpu)
+ 		 * are ignored and treated as 0. There is no need to mask the
+ 		 * VMID (used as asid) to only 8 bits.
+ 		 */
+-		r->ttbr0_el2 = pa_addr(table) | ((uint64_t)vm_id << 48);
++		r->hyp_state.ttbr0_el2 =
++			pa_addr(table) | ((uint64_t)vm_id << 48);
+ 		r->spsr = PSR_PE_MODE_EL0T;
+ 	} else {
+-		r->ttbr0_el2 = read_msr(ttbr0_el2);
++		r->hyp_state.ttbr0_el2 = read_msr(ttbr0_el2);
+ 		r->lazy.vtcr_el2 = arch_mm_get_vtcr_el2();
+ 		r->lazy.vttbr_el2 = pa_addr(table) | ((uint64_t)vm_id << 48);
+ #if SECURE_WORLD == 1
+diff --git a/src/arch/aarch64/hypervisor/exceptions.S b/src/arch/aarch64/hypervisor/exceptions.S
+index 539e196d..d3732f86 100644
+--- a/src/arch/aarch64/hypervisor/exceptions.S
++++ b/src/arch/aarch64/hypervisor/exceptions.S
+@@ -20,6 +20,9 @@
+ #define ID_AA64PFR0_SVE_SHIFT (32)
+ #define ID_AA64PFR0_SVE_LENGTH (4)
+ 
++#define SCTLR_EL2_A_SHIFT	(1)
++#define HCR_EL2_TGE_SHIFT	(27)
++
+ /**
+  * Saves the volatile registers into the register buffer of the current vCPU.
+  */
+@@ -51,8 +54,6 @@
+ 	mrs x1, elr_el2
+ 	mrs x2, spsr_el2
+ 	stp x1, x2, [x18, #VCPU_REGS + 8 * 31]
+-	mrs x1, hcr_el2
+-	str x1, [x18, #VCPU_REGS + 8 * 33]
+ .endm
+ 
+ /**
+@@ -871,12 +872,13 @@ vcpu_restore_volatile_and_run:
+ 	msr elr_el2, x1
+ 	msr spsr_el2, x2
+ 
+-	ldr x1, [x0, #VCPU_REGS + 8 * 33]
++	ldp x1, x2, [x0, #VCPU_REGS + 8 * 33]
+ 	msr hcr_el2, x1
++	msr ttbr0_el2, x2
+ 	isb
+ 
+-	ldr x1, [x0, #VCPU_REGS + 8 * 34]
+-	msr ttbr0_el2, x1
++	ldr x1, [x0, #VCPU_REGS + 8 * 35]
++	msr sctlr_el2, x1
+ 	isb
+ 
+ 	/* Restore x0..x3, which we have used as scratch before. */
+@@ -886,15 +888,17 @@ vcpu_restore_volatile_and_run:
+ 
+ #if ENABLE_VHE
+ enable_vhe_tge:
++	mrs x0, id_aa64mmfr1_el1
++	tst x0, #0xf00
++	b.eq 1f
++
+ 	/**
+ 	 * Switch to host mode ({E2H, TGE} = {1,1}) when VHE is enabled.
+ 	 * Note that E2H is always set when VHE is enabled.
+ 	 */
+-	mrs x0, id_aa64mmfr1_el1
+-	tst x0, #0xf00
+-	b.eq 1f
+-	orr x1, x1, #(1 << 27)
+-	msr hcr_el2, x1
++	mrs x0, hcr_el2
++	orr x0, x0, #(1 << HCR_EL2_TGE_SHIFT)
++	msr hcr_el2, x0
+ 	isb
+ 
+ 	/**
+@@ -905,6 +909,14 @@ enable_vhe_tge:
+ 	ldr x0, [x0]
+ 	msr ttbr0_el2, x0
+ 	isb
++
++	/**
++	 * Enable alignment check while Hypervisor runs.
++	 */
++	mrs x0, sctlr_el2
++	orr x0, x0, #(1 << SCTLR_EL2_A_SHIFT)
++	msr sctlr_el2, x0
++	isb
+ 1:
+ 	ret
+ #endif
+diff --git a/src/arch/aarch64/hypervisor/feature_id.c b/src/arch/aarch64/hypervisor/feature_id.c
+index ed3bf8f1..57f32627 100644
+--- a/src/arch/aarch64/hypervisor/feature_id.c
++++ b/src/arch/aarch64/hypervisor/feature_id.c
+@@ -175,7 +175,7 @@ void feature_set_traps(struct vm *vm, struct arch_regs *regs)
+ 		~(ID_AA64MMFR1_EL1_VH_MASK << ID_AA64MMFR1_EL1_VH_SHIFT);
+ 
+ 	if (features & HF_FEATURE_RAS) {
+-		regs->hcr_el2 |= HCR_EL2_TERR;
++		regs->hyp_state.hcr_el2 |= HCR_EL2_TERR;
+ 		vm->arch.tid3_masks.id_aa64mmfr1_el1 &=
+ 			~ID_AA64MMFR1_EL1_SPEC_SEI;
+ 		vm->arch.tid3_masks.id_aa64pfr0_el1 &= ~ID_AA64PFR0_EL1_RAS;
+@@ -221,14 +221,14 @@ void feature_set_traps(struct vm *vm, struct arch_regs *regs)
+ 	}
+ 
+ 	if (features & HF_FEATURE_LOR) {
+-		regs->hcr_el2 |= HCR_EL2_TLOR;
++		regs->hyp_state.hcr_el2 |= HCR_EL2_TLOR;
+ 
+ 		vm->arch.tid3_masks.id_aa64mmfr1_el1 &= ~ID_AA64MMFR1_EL1_LO;
+ 	}
+ 
+ 	if (features & HF_FEATURE_PAUTH) {
+ 		/* APK and API bits *enable* trapping when cleared. */
+-		regs->hcr_el2 &= ~(HCR_EL2_APK | HCR_EL2_API);
++		regs->hyp_state.hcr_el2 &= ~(HCR_EL2_APK | HCR_EL2_API);
+ 
+ 		vm->arch.tid3_masks.id_aa64isar1_el1 &= ~ID_AA64ISAR1_EL1_GPI;
+ 		vm->arch.tid3_masks.id_aa64isar1_el1 &= ~ID_AA64ISAR1_EL1_GPA;
+diff --git a/src/arch/aarch64/hypervisor/handler.c b/src/arch/aarch64/hypervisor/handler.c
+index cd5146bd..8a3d6289 100644
+--- a/src/arch/aarch64/hypervisor/handler.c
++++ b/src/arch/aarch64/hypervisor/handler.c
+@@ -272,9 +272,9 @@ noreturn void sync_current_exception_noreturn(uintreg_t elr, uintreg_t spsr)
+ static void set_virtual_irq(struct arch_regs *r, bool enable)
+ {
+ 	if (enable) {
+-		r->hcr_el2 |= HCR_EL2_VI;
++		r->hyp_state.hcr_el2 |= HCR_EL2_VI;
+ 	} else {
+-		r->hcr_el2 &= ~HCR_EL2_VI;
++		r->hyp_state.hcr_el2 &= ~HCR_EL2_VI;
+ 	}
+ }
+ 
+@@ -283,14 +283,15 @@ static void set_virtual_irq(struct arch_regs *r, bool enable)
+  */
+ static void set_virtual_irq_current(bool enable)
+ {
+-	uintreg_t hcr_el2 = current()->regs.hcr_el2;
++	struct vcpu *vcpu = current();
++	uintreg_t hcr_el2 = vcpu->regs.hyp_state.hcr_el2;
+ 
+ 	if (enable) {
+ 		hcr_el2 |= HCR_EL2_VI;
+ 	} else {
+ 		hcr_el2 &= ~HCR_EL2_VI;
+ 	}
+-	current()->regs.hcr_el2 = hcr_el2;
++	vcpu->regs.hyp_state.hcr_el2 = hcr_el2;
+ }
+ 
+ /**
+@@ -300,9 +301,9 @@ static void set_virtual_irq_current(bool enable)
+ static void set_virtual_fiq(struct arch_regs *r, bool enable)
+ {
+ 	if (enable) {
+-		r->hcr_el2 |= HCR_EL2_VF;
++		r->hyp_state.hcr_el2 |= HCR_EL2_VF;
+ 	} else {
+-		r->hcr_el2 &= ~HCR_EL2_VF;
++		r->hyp_state.hcr_el2 &= ~HCR_EL2_VF;
+ 	}
+ }
+ 
+@@ -311,14 +312,15 @@ static void set_virtual_fiq(struct arch_regs *r, bool enable)
+  */
+ static void set_virtual_fiq_current(bool enable)
+ {
+-	uintreg_t hcr_el2 = current()->regs.hcr_el2;
++	struct vcpu *vcpu = current();
++	uintreg_t hcr_el2 = vcpu->regs.hyp_state.hcr_el2;
+ 
+ 	if (enable) {
+ 		hcr_el2 |= HCR_EL2_VF;
+ 	} else {
+ 		hcr_el2 &= ~HCR_EL2_VF;
+ 	}
+-	current()->regs.hcr_el2 = hcr_el2;
++	vcpu->regs.hyp_state.hcr_el2 = hcr_el2;
+ }
+ 
+ #if SECURE_WORLD == 1
+diff --git a/src/arch/aarch64/inc/hf/arch/types.h b/src/arch/aarch64/inc/hf/arch/types.h
+index 6379d73e..6b8b24f1 100644
+--- a/src/arch/aarch64/inc/hf/arch/types.h
++++ b/src/arch/aarch64/inc/hf/arch/types.h
+@@ -79,8 +79,13 @@ struct arch_regs {
+ 	uintreg_t r[NUM_GP_REGS];
+ 	uintreg_t pc;
+ 	uintreg_t spsr;
+-	uintreg_t hcr_el2;
+-	uintreg_t ttbr0_el2;
++
++	/* Hypervisor configuration while a vCPU runs. */
++	struct {
++		uintreg_t hcr_el2;
++		uintreg_t ttbr0_el2;
++		uintreg_t sctlr_el2;
++	} hyp_state;
+ 
+ 	/*
+ 	 * System registers.
+diff --git a/src/arch/aarch64/mm.c b/src/arch/aarch64/mm.c
+index 8ee65ca0..487ae353 100644
+--- a/src/arch/aarch64/mm.c
++++ b/src/arch/aarch64/mm.c
+@@ -886,7 +886,7 @@ bool arch_mm_init(paddr_t table)
+ #endif
+ 				    (0xff << (8 * STAGE1_NORMALINDX)),
+ 
+-		.sctlr_el2 = get_sctlr_el2_value(),
++		.sctlr_el2 = get_sctlr_el2_value(false),
+ 		.vstcr_el2 = (1U << 31) |	    /* RES1. */
+ 			     (0 << 30) |	    /* SA. */
+ 			     (0 << 29) |	    /* SW. */
+diff --git a/src/arch/aarch64/sysregs.c b/src/arch/aarch64/sysregs.c
+index e8c154b1..087ba4ed 100644
+--- a/src/arch/aarch64/sysregs.c
++++ b/src/arch/aarch64/sysregs.c
+@@ -159,7 +159,7 @@ uintreg_t get_cptr_el2_value(void)
+ /**
+  * Returns the value for SCTLR_EL2 for the CPU.
+  */
+-uintreg_t get_sctlr_el2_value(void)
++uintreg_t get_sctlr_el2_value(bool is_el0_partition)
+ {
+ 	uintreg_t sctlr_el2_value = 0;
+ 
+@@ -173,7 +173,14 @@ uintreg_t get_sctlr_el2_value(void)
+ 
+ 	/* MMU-related bits. */
+ 	sctlr_el2_value |= SCTLR_EL2_M;
+-	sctlr_el2_value |= SCTLR_EL2_A;
++
++	/*
++	 * Alignment check enabled, but in the case of an EL0 partition
++	 * with VHE enabled.
++	 */
++	if (!(has_vhe_support() && is_el0_partition)) {
++		sctlr_el2_value |= SCTLR_EL2_A;
++	}
+ 	sctlr_el2_value |= SCTLR_EL2_C;
+ 	sctlr_el2_value |= SCTLR_EL2_SA;
+ 	sctlr_el2_value |= SCTLR_EL2_I;
+diff --git a/src/arch/aarch64/sysregs.h b/src/arch/aarch64/sysregs.h
+index babd2375..6fdab58e 100644
+--- a/src/arch/aarch64/sysregs.h
++++ b/src/arch/aarch64/sysregs.h
+@@ -668,7 +668,7 @@ uintreg_t get_mdcr_el2_value(void);
+ 
+ uintreg_t get_cptr_el2_value(void);
+ 
+-uintreg_t get_sctlr_el2_value(void);
++uintreg_t get_sctlr_el2_value(bool is_el0_partition);
+ 
+ /**
+  * Branch Target Identification mechanism support in AArch64 state.
+

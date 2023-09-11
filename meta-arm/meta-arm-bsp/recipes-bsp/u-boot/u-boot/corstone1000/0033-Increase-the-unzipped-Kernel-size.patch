@@ -1,0 +1,29 @@
+From df23489adcba1cdcbcb4fefbed0896fc1f408700 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Wed, 2 Aug 2023 17:07:05 +0100
+Subject: [PATCH] Increase the unzipped Kernel size
+
+Increases the unzipped kernel size for corstone1000.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+---
+ configs/corstone1000_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index a0af413de8..54a5bca354 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -15,7 +15,7 @@ CONFIG_DISTRO_DEFAULTS=y
+ CONFIG_BOOTDELAY=3
+ CONFIG_USE_BOOTARGS=y
+ CONFIG_BOOTARGS="console=ttyAMA0 loglevel=9 ip=dhcp earlyprintk"
+-CONFIG_BOOTCOMMAND="echo Loading kernel from $kernel_addr to memory ... ; unzip $kernel_addr 0x90000000; loadm 0x90000000 $kernel_addr_r 0xf00000; usb start; usb reset; run distro_bootcmd; bootefi $kernel_addr_r $fdtcontroladdr;"
++CONFIG_BOOTCOMMAND="echo Loading kernel from $kernel_addr to memory ... ; unzip $kernel_addr 0x90000000; loadm 0x90000000 $kernel_addr_r 0xfb0000; usb start; usb reset; run distro_bootcmd; bootefi $kernel_addr_r $fdtcontroladdr;"
+ CONFIG_CONSOLE_RECORD=y
+ CONFIG_LOGLEVEL=7
+ # CONFIG_DISPLAY_CPUINFO is not set
+-- 
+2.17.1
+

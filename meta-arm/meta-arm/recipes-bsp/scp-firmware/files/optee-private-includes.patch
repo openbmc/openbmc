@@ -1,0 +1,34 @@
+Change the optee module includes to be private instead of public, so they don't get used
+in every build, which can result in compile failures as /core/include/ doesn't exit.
+
+For some reason this behaviour isn't deterministic, a ticket has been filed with upstream.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/module/optee/console/CMakeLists.txt b/module/optee/console/CMakeLists.txt
+index aebb7cc79..942aa98c8 100644
+--- a/module/optee/console/CMakeLists.txt
++++ b/module/optee/console/CMakeLists.txt
+@@ -14,7 +14,7 @@ target_include_directories(${SCP_MODULE_TARGET}
+ # Those includes are needed for mutex definitnion that is used in optee_smt
+ # notification
+ target_include_directories(${SCP_MODULE_TARGET}
+-                           PUBLIC "${SCP_OPTEE_DIR}/core/arch/arm/include/"
++                           PRIVATE "${SCP_OPTEE_DIR}/core/arch/arm/include/"
+                                   "${SCP_OPTEE_DIR}/core/include/"
+                                   "${SCP_OPTEE_DIR}/lib/libutils/ext/include/"
+                                   "${SCP_OPTEE_DIR}/lib/libutee/include/")
+diff --git a/module/optee/mbx/CMakeLists.txt b/module/optee/mbx/CMakeLists.txt
+index 305fa42b7..783a7970c 100644
+--- a/module/optee/mbx/CMakeLists.txt
++++ b/module/optee/mbx/CMakeLists.txt
+@@ -15,7 +15,7 @@ target_include_directories(${SCP_MODULE_TARGET}
+ # Those includes are needed for mutex defifitnion that is used in optee_smt
+ # notification
+ target_include_directories(${SCP_MODULE_TARGET}
+-                           PUBLIC "${SCP_OPTEE_DIR}/core/include/"
++                           PRIVATE "${SCP_OPTEE_DIR}/core/include/"
+                                   "${SCP_OPTEE_DIR}/lib/libutils/ext/include/"
+                                   "${SCP_OPTEE_DIR}/lib/libutee/include/")
+ 

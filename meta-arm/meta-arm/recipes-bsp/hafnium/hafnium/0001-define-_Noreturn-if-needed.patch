@@ -1,0 +1,33 @@
+From 3da6c62e6f56facf9c6a8d7d46fa9509e76f482e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 19 Apr 2022 22:32:56 -0700
+Subject: [PATCH] define _Noreturn if needed
+
+The new _Noreturn function specifier is not recognized by the parser and shows as a syntax error:
+
+Fixes
+../git/inc/hf/panic.h:13:1: error: '_Noreturn' is a C11 extension [-Werror,-Wc11-extensions]
+noreturn void panic(const char *fmt, ...);
+^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ inc/hf/panic.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/inc/hf/panic.h b/inc/hf/panic.h
+index ec864e4f..588f1193 100644
+--- a/inc/hf/panic.h
++++ b/inc/hf/panic.h
+@@ -10,4 +10,8 @@
+ 
+ #include <stdnoreturn.h>
+ 
++#ifndef _Noreturn
++#define _Noreturn __attribute__ ((noreturn))
++#endif
++
+ noreturn void panic(const char *fmt, ...);
+
