@@ -1,0 +1,3 @@
+To Build:
+
+  bitbake obmc-phosphor-image
