@@ -541,6 +541,11 @@ fitimage_assemble() {
                 continue
             fi
 
+            # For non-vendored DTBs, we need to strip off the vendor path.
+            if "${@'false' if oe.types.boolean(d.getVar('KERNEL_DTBVENDORED')) else 'true'}"; then
+                DTB=`basename $DTB`
+            fi
+
             DTB_PATH="${KERNEL_OUTPUT_DIR}/dts/$DTB"
             if [ ! -e "$DTB_PATH" ]; then
                 DTB_PATH="${KERNEL_OUTPUT_DIR}/$DTB"
