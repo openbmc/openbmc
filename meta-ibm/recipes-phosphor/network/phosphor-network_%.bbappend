@@ -36,7 +36,7 @@ PACKAGECONFIG:append:p10bmc = " hyp-nw-config"
 
 install_network_configuration(){
     install -d ${D}${datadir}/network/
-    install -m 0644 ${WORKDIR}/inventory-object-map.json ${D}${datadir}/network/config.json
+    install -m 0644 ${WORKDIR}/ibm-basic-eth-map.json ${D}${datadir}/network/config.json
 }
 
 do_install:append() {
@@ -45,17 +45,32 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/ncsi-wait-and-set-speed ${D}${libexecdir}
 }
 
-SRC_URI:append:p10bmc = " file://inventory-object-map.json"
+SRC_URI:append:p10bmc = " file://ibm-basic-eth-map.json"
 do_install:append:p10bmc(){
     install_network_configuration
 }
 
-SRC_URI:append:ibm-ac-server = " file://inventory-object-map.json"
+SRC_URI:append:ibm-ac-server = " file://ibm-basic-eth-map.json"
 do_install:append:ibm-ac-server() {
     install_network_configuration
 }
 
-SRC_URI:append:witherspoon-tacoma = " file://inventory-object-map.json"
+SRC_URI:append:witherspoon-tacoma = " file://ibm-basic-eth-map.json"
 do_install:append:witherspoon-tacoma(){
+    install_network_configuration
+}
+
+SRC_URI:append:genesis3 = " file://ibm-basic-eth-map.json"
+do_install:append:genesis3(){
+    install_network_configuration
+}
+
+SRC_URI:append:sbp1 = " file://ibm-basic-eth-map.json"
+do_install:append:sbp1(){
+    install_network_configuration
+}
+
+SRC_URI:append:system1 = " file://ibm-basic-eth-map.json"
+do_install:append:system1(){
     install_network_configuration
 }
