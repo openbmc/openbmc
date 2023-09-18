@@ -5,7 +5,7 @@ SYSTEMD_SERVICE:${PN} = "psu2-monitoring.service psu1-monitoring.service psu2up.
 SRC_URI:append = " file://psu2-monitoring.service file://psu1-monitoring.service file://psus-manager.sh file://psu2up.service file://psu2down.service file://psu1down.service file://psu1up.service file://psu2.json file://psu1.json file://startMonitoring1.sh file://startMonitoring2.sh"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE;md5=89aea4e17d99a7cacdbeed46a0096b10"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 IMAGE_INSTALL += "power-supplies-monitoring "

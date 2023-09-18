@@ -5,7 +5,7 @@ SYSTEMD_SERVICE:${PN} = "monitor-ipmi-power-transition.service power-sequencing.
 SRC_URI:append = " file://monitor-ipmi-power-transition.service file://ipmi-power-button-monitoring.sh file://rl300Start.sh file://power-sequencing.service file://gpiosdown.service file://gpiosup.service file://gpios-manager.sh file://test.json file://powerbuttonreleased.service file://powerbuttonpressed.service file://power-button.sh file://startMonitoring.sh"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE;md5=89aea4e17d99a7cacdbeed46a0096b10"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 IMAGE_INSTALL += "power-sequencing "
