@@ -2725,6 +2725,18 @@
                     [
                         "/xyz/openbmc_project/led/groups/dasd_pyramid0_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connected_to",
+                        "fType": "connecting"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector4",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector5"
+                    ]
                 }
             ]
         },
@@ -2752,6 +2764,18 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/dasd_pyramid1_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connected_to",
+                        "fType": "connecting"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/dp1_connector4",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/dp1_connector5"
                     ]
                 }
             ]
