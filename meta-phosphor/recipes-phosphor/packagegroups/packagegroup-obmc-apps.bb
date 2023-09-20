@@ -32,6 +32,7 @@ PACKAGES = " \
         ${PN}-user-mgmt \
         ${PN}-user-mgmt-ldap \
         ${PN}-dmtf-pmci \
+        ${PN}-webui \
         "
 
 SUMMARY:${PN}-bmc-state-mgmt = "BMC state management"
@@ -206,4 +207,9 @@ RDEPENDS:${PN}-user-mgmt-ldap = " \
 SUMMARY:${PN}-dmtf-pmci = "DMTF PMCI Protocol Implementations"
 RDEPENDS:${PN}-dmtf-pmci = " \
         ${@bb.utils.contains('DISTRO_FEATURES', 'mctp', 'mctp', '', d)} \
+        "
+
+SUMMARY:${PN}-webui = "Web User Interface support"
+RDEPENDS:${PN}-webui = " \
+        webui-vue \
         "

@@ -31,6 +31,7 @@
 # - obmc-telemetry                    - OpenBMC telemetry solution
 # - obmc-user-mgmt                    - OpenBMC user management
 # - obmc-user-mgmt-ldap               - OpenBMC LDAP users
+# - obmc-webui                        - OpenBMC Web User Interface
 
 inherit core-image
 inherit obmc-phosphor-utils
@@ -67,6 +68,13 @@ FEATURE_PACKAGES_obmc-telemetry ?= "packagegroup-obmc-apps-telemetry"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "packagegroup-obmc-apps-user-mgmt"
 FEATURE_PACKAGES_obmc-user-mgmt-ldap ?= "packagegroup-obmc-apps-user-mgmt-ldap"
 FEATURE_PACKAGES_obmc-dmtf-pmci ?= "packagegroup-obmc-apps-dmtf-pmci"
+
+# Note that the webui is not included by default in OpenBMC
+# images due to its non-standard build process. It utilizes
+# npm during the build, resulting in an inability to build
+# this package offline and making the software bill of materials
+# incorrect.
+FEATURE_PACKAGES_obmc-webui ?= "packagegroup-obmc-apps-webui"
 
 # FIXME: phosphor-net-ipmi depends on phosphor-ipmi-host !?!? and
 # cannot be built on core-qemu machines because of the dependency
