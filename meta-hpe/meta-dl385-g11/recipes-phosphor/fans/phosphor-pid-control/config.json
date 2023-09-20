@@ -1,0 +1,181 @@
+{
+  "sensors": [
+    {
+      "name": "Fan1",
+      "type": "fan",
+      "readPath": "/sys/class/hwmon/hwmon0/pwm0",
+      "writePath": "/sys/class/hwmon/hwmon0/pwm0",
+      "min": 0,
+      "max": 255
+    },
+    {
+      "name": "Fan2",
+      "type": "fan",
+      "readPath": "/sys/class/hwmon/hwmon0/pwm1",
+      "writePath": "/sys/class/hwmon/hwmon0/pwm1",
+      "min": 0,
+      "max": 255
+    },
+    {
+      "name": "Fan3",
+      "type": "fan",
+      "readPath": "/sys/class/hwmon/hwmon0/pwm2",
+      "writePath": "/sys/class/hwmon/hwmon0/pwm2",
+      "min": 0,
+      "max": 255
+    },
+    {
+      "name": "Fan4",
+      "type": "fan",
+      "readPath": "/sys/class/hwmon/hwmon0/pwm3",
+      "writePath": "/sys/class/hwmon/hwmon0/pwm3",
+      "min": 0,
+      "max": 255
+    },
+    {
+      "name": "Fan5",
+      "type": "fan",
+      "readPath": "/sys/class/hwmon/hwmon0/pwm4",
+      "writePath": "/sys/class/hwmon/hwmon0/pwm4",
+      "min": 0,
+      "max": 255
+    },
+    {
+      "name": "Fan6",
+      "type": "fan",
+      "readPath": "/sys/class/hwmon/hwmon0/pwm6",
+      "writePath": "/sys/class/hwmon/hwmon0/pwm6",
+      "min": 0,
+      "max": 255
+    },
+    {
+      "name": "GXP_Temp",
+      "type": "temp",
+      "readPath": "/xyz/openbmc_project/sensors/temperature/GXP_Temp",
+      "timeout": 0
+    },
+    {
+      "name": "CPU_1",
+      "type": "temp",
+      "readPath": "/xyz/openbmc_project/sensors/temperature/CPU_1",
+      "ignoreDbusMinMax": true,
+      "timeout": 0,
+      "unavailableAsFailed": true
+    },
+    {
+      "name": "CPU_2",
+      "type": "temp",
+      "readPath": "/xyz/openbmc_project/sensors/temperature/CPU_2",
+      "ignoreDbusMinMax": true,
+      "timeout": 0,
+      "unavailableAsFailed": false
+    }
+  ],
+  "zones": [
+    {
+      "id": 1,
+      "minThermalOutput": 0.0,
+      "failsafePercent": 90.0,
+      "pids": [
+        {
+          "name": "Fan1-6",
+          "type": "fan",
+          "inputs": ["Fan1", "Fan2", "Fan3", "Fan4", "Fan5", "Fan6"],
+          "setpoint": 128.0,
+          "pid": {
+            "samplePeriod": 0.1,
+            "proportionalCoeff": 10.0,
+            "integralCoeff": 2.0,
+            "feedFwdOffsetCoeff": 0.0,
+            "feedFwdGainCoeff": 0.0,
+            "integralLimit_min": 0.0,
+            "integralLimit_max": 0.0,
+            "outLim_min": 0.0,
+            "outLim_max": 100.0,
+            "slewNeg": -5.0,
+            "slewPos": 5.0
+          }
+        },
+        {
+          "name": "temppid0",
+          "type": "temp",
+          "inputs": ["GXP_Temp"],
+          "setpoint": 43,
+          "pid": {
+            "samplePeriod": 1,
+            "proportionalCoeff": -60.0,
+            "integralCoeff": -2.0,
+            "feedFwdOffsetCoeff": 0.0,
+            "feedFwdGainCoeff": 0.0,
+            "integralLimit_min": 0,
+            "integralLimit_max": 0,
+            "outLim_min": 0,
+            "outLim_max": 255,
+            "slewNeg": -10.0,
+            "slewPos": 10.0
+          }
+        },
+        {
+          "name": "temp1",
+          "type": "stepwise",
+          "inputs": ["CPU_1"],
+          "setpoint": 30.0,
+          "pid": {
+            "samplePeriod": 0.1,
+            "positiveHysteresis": 1.0,
+            "negativeHysteresis": 1.0,
+            "isCeiling": false,
+            "reading": {
+              "0": 35,
+              "1": 45,
+              "2": 55,
+              "3": 65,
+              "4": 75,
+              "5": 85,
+              "6": 95
+            },
+            "output": {
+              "0": 25,
+              "1": 50,
+              "2": 75,
+              "3": 100,
+              "4": 150,
+              "5": 200,
+              "6": 255
+            }
+          }
+        },
+        {
+          "name": "temp2",
+          "type": "stepwise",
+          "inputs": ["CPU_2"],
+          "setpoint": 30.0,
+          "pid": {
+            "samplePeriod": 0.1,
+            "positiveHysteresis": 1.0,
+            "negativeHysteresis": 1.0,
+            "isCeiling": false,
+            "reading": {
+              "0": 35,
+              "1": 45,
+              "2": 55,
+              "3": 65,
+              "4": 75,
+              "5": 85,
+              "6": 95
+            },
+            "output": {
+              "0": 25,
+              "1": 50,
+              "2": 75,
+              "3": 100,
+              "4": 150,
+              "5": 200,
+              "6": 255
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
