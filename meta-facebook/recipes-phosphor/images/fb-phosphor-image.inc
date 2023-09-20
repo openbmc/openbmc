@@ -20,7 +20,11 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
     tmux \
     wget \
     "
-OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " emmc-init"
+OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " \
+    emmc-init \
+    mmc-utils \
+    util-linux-blkdiscard \
+    "
 
 IMAGE_LINGUAS="en-us"
 
