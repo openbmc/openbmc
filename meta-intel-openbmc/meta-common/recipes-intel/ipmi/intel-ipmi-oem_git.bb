@@ -12,9 +12,7 @@ PV = "0.1+git${SRCPV}"
 
 DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd phosphor-dbus-interfaces libgpiod libtinyxml2"
 
-inherit cmake obmc-phosphor-ipmiprovider-symlink pkgconfig
-
-EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
+inherit meson obmc-phosphor-ipmiprovider-symlink pkgconfig
 
 LIBRARY_NAMES = "libzinteloemcmds.so"
 
