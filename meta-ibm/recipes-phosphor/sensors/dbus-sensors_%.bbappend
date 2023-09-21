@@ -12,6 +12,7 @@ PACKAGECONFIG:sbp1 = " \
     fansensor \
     psusensor \
     intelcpusensor \
+    ipmbsensor \
     adcsensor \
     nvmesensor \
     "
