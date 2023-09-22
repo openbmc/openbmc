@@ -1,0 +1,39 @@
+#!/bin/bash -e
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
+# set initial value for GPIO output pins
+set_gpio EN_P5V_USB_CPLD_R    1
+set_gpio EN_NIC0_POWER_BMC_R  1
+set_gpio EN_NIC1_POWER_BMC_R  1
+set_gpio EN_NIC2_POWER_BMC_R  1
+set_gpio EN_NIC3_POWER_BMC_R  1
+set_gpio FM_BMC_RTCRST_R      0
+set_gpio RST_USB_HUB_R_N      1
+set_gpio FM_BMC_READY_R2      1
+set_gpio SPI_LOCK_REQ_BMC_N   1
+set_gpio EN_P3V_BAT_SCALED_R  0
+
+set_gpio P48V_OCP_GPIO1       0
+set_gpio P48V_OCP_GPIO2       0
+set_gpio P48V_OCP_GPIO3       0
+set_gpio RST_MUX_R_N          1
+set_gpio RST_LED_CONTROL_FAN_BOARD_0_N 1
+set_gpio RST_LED_CONTROL_FAN_BOARD_1_N 1
+set_gpio RST_IOEXP_FAN_BOARD_0_N       1
+set_gpio RST_IOEXP_FAN_BOARD_1_N       1
+set_gpio EN_P48V_AUX_0        1
+set_gpio EN_P48V_AUX_1        1
+set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
+set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
+set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
+set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
+set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+
+set_gpio NIC0_MAIN_PWR_EN 1
+set_gpio NIC1_MAIN_PWR_EN 1
+set_gpio NIC2_MAIN_PWR_EN 1
+set_gpio NIC3_MAIN_PWR_EN 1
+
+exit 0
