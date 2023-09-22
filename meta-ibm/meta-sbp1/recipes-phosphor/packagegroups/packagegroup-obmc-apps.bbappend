@@ -8,7 +8,6 @@ RDEPENDS:${PN}-extras:append = " \
 
 RDEPENDS:${PN}-devtools:append = " \
     entity-manager \
-    webui-vue \
     ethtool \
     net-tools \
     lmsensors-sensors \
