@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SYSTEMD_SERVICE:${PN}:append:p10bmc = " obmc-led-set-all-groups-asserted@.service obmc-led-create-virtual-leds@.service"
+SYSTEMD_SERVICE:${PN}:append:p10bmc = " obmc-led-create-virtual-leds@.service"
 
 # Copies config file having arguments for led-set-all-groups-asserted.sh
 SYSTEMD_ENVIRONMENT_FILE:${PN}:append:p10bmc =" obmc/led/set-all/groups/config"
@@ -17,18 +17,6 @@ pkg_postinst:${PN}:p10bmc () {
 
     # Needed this to run as part of BMC boot
     mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
-    LINK="$D$systemd_system_unitdir/multi-user.target.wants/obmc-led-set-all-groups-asserted@false.service"
-    TARGET="../obmc-led-set-all-groups-asserted@.service"
-    ln -s $TARGET $LINK
-
-    # Needed this to run as part of Power On
-    mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants
-    LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/obmc-led-set-all-groups-asserted@false.service"
-    TARGET="../obmc-led-set-all-groups-asserted@.service"
-    ln -s $TARGET $LINK
-
-    # Needed this to run as part of BMC boot
-    mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
     LINK_FAULT="$D$systemd_system_unitdir/multi-user.target.wants/obmc-led-create-virtual-leds@sys-class-leds-virtual-enc-fault.service"
     TARGET_FAULT="../obmc-led-create-virtual-leds@.service"
     ln -s $TARGET_FAULT $LINK_FAULT
@@ -41,12 +29,6 @@ pkg_postinst:${PN}:p10bmc () {
 }
 
 pkg_prerm:${PN}:p10bmc () {
-
-    LINK="$D$systemd_system_unitdir/multi-user.target.wants/obmc-led-set-all-groups-asserted@false.service"
-    rm $LINK
-
-    LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/obmc-led-set-all-groups-asserted@false.service"
-    rm $LINK
 
     LINK_FAULT="$D$systemd_system_unitdir/multi-user.target.wants/obmc-led-create-virtual-leds@sys-class-leds-virtual-enc-fault.service"
     rm $LINK_FAULT
