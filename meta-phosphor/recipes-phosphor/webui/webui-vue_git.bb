@@ -21,6 +21,8 @@ S = "${WORKDIR}/git"
 
 inherit allarch
 
+RDEPENDS:${PN}:append = " bmcweb"
+
 EXTRA_OENPM ?= ""
 
 export CXX = "${BUILD_CXX}"
