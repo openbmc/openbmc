@@ -1,2 +1,2 @@
-# Enable threshold, pulse, and watchdog monitoring; enable clear SEL method
-PACKAGECONFIG:append:kudo = " log-threshold log-pulse log-watchdog clears-sel"
+# Enable threshold, pulse, and watchdog monitoring
+PACKAGECONFIG:append:kudo = " log-threshold log-pulse log-watchdog "
