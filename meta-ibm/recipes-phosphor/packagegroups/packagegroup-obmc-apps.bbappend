@@ -34,6 +34,7 @@ RDEPENDS:${PN}-extras:append:ibm-ac-server = " ${POWER_SERVICE_PACKAGES_AC_SERVE
 RDEPENDS:${PN}-extras:append:p10bmc = " ${POWER_SERVICE_PACKAGES_P10} webui-vue dbus-sensors phosphor-virtual-sensor"
 RDEPENDS:${PN}-extras:append:p10bmc = " pldm openpower-hw-diags srvcfg-manager biosconfig-manager phosphor-post-code-manager phosphor-host-postd debug-trigger libmctp"
 RDEPENDS:${PN}-extras:append:witherspoon-tacoma = " pldm srvcfg-manager webui-vue biosconfig-manager phosphor-post-code-manager phosphor-host-postd kexec-tools makedumpfile kdump vmcore-dmesg debug-trigger"
+RDEPENDS:${PN}-extras:append:sbp1 = " phosphor-ipmi-ipmb "
 
 RDEPENDS:${PN}-extras:remove:p10bmc = "obmc-ikvm liberation-fonts uart-render-controller"
 RDEPENDS:${PN}-host-state-mgmt:remove:p10bmc = "checkstop-monitor"
