@@ -1,0 +1,2 @@
+SYSFS_PATH=/sys/bus/i2c/drivers/at24/0-0050/eeprom
+FRUID=0
