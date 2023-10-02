@@ -16,3 +16,5 @@ SUMMARY:${PN}-chassis = "OpenPOWER Chassis"
 RDEPENDS:${PN}-chassis = " \
         phosphor-skeleton-control-power \
 "
+
+RDEPENDS:${PN}-inventory:append = " entity-manager"
