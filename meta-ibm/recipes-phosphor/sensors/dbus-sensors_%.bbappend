@@ -19,3 +19,7 @@ PACKAGECONFIG:sbp1 = " \
     adcsensor \
     nvmesensor \
     "
+
+PACKAGECONFIG:system1 = " \
+    adcsensor \
+    "
