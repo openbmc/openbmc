@@ -36,7 +36,7 @@ index e0db651..de137fa 100644
 -check-TESTS: $(TESTS)
 +AM_RECURSIVE_TARGETS += buildtest runtest
 +
-+buildtest-TESTS: $(TESTS)
++buildtest-TESTS: $(TESTS) $(check_PROGRAMS)
 +
 +check-TESTS: buildtest-TESTS
 +	$(MAKE) $(AM_MAKEFLAGS) runtest-TESTS

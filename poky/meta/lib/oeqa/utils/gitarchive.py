@@ -116,7 +116,8 @@ def expand_tag_strings(repo, name_pattern, msg_subj_pattern, msg_body_pattern,
         tag_re = tag_re.format(tag_number='(?P<tag_number>[0-9]{1,5})')
 
         keyws['tag_number'] = 0
-        for existing_tag in repo.run_cmd('tag').splitlines():
+        tags_refs = repo.run_cmd(['ls-remote', '--refs', '--tags', '-q'])
+        for existing_tag in ["".join(d.split()[1].split('/', 2)[2:]) for d in tags_refs.splitlines()]:
             match = re.match(tag_re, existing_tag)
 
             if match and int(match.group('tag_number')) >= keyws['tag_number']:
@@ -181,7 +182,8 @@ def get_test_runs(log, repo, tag_name, **kwargs):
 
     # Get a list of all matching tags
     tag_pattern = tag_name.format(**str_fields)
-    tags = repo.run_cmd(['tag', '-l', tag_pattern]).splitlines()
+    revs = repo.run_cmd(['ls-remote', '--refs', '--tags', 'origin', '-q', tag_pattern]).splitlines()
+    tags = ["".join(d.split()[1].split('/', 2)[2:]) for d in revs]
     log.debug("Found %d tags matching pattern '%s'", len(tags), tag_pattern)
 
     # Parse undefined fields from tag names

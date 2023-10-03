@@ -22,7 +22,7 @@ supported_fstypes = ['ext3', 'ext4', 'cpio.gz', 'wic']
 class OEQemuTarget(OESSHTarget):
     def __init__(self, logger, server_ip, timeout=300, user='root',
             port=None, machine='', rootfs='', kernel='', kvm=False, slirp=False,
-            dump_dir='', dump_host_cmds='', display='', bootlog='',
+            dump_dir='', display='', bootlog='',
             tmpdir='', dir_image='', boottime=60, serial_ports=2,
             boot_patterns = defaultdict(str), ovmf=False, tmpfsdir=None, **kwargs):
 
@@ -44,8 +44,7 @@ class OEQemuTarget(OESSHTarget):
         self.runner = QemuRunner(machine=machine, rootfs=rootfs, tmpdir=tmpdir,
                                  deploy_dir_image=dir_image, display=display,
                                  logfile=bootlog, boottime=boottime,
-                                 use_kvm=kvm, use_slirp=slirp, dump_dir=dump_dir,
-                                 dump_host_cmds=dump_host_cmds, logger=logger,
+                                 use_kvm=kvm, use_slirp=slirp, dump_dir=dump_dir, logger=logger,
                                  serial_ports=serial_ports, boot_patterns = boot_patterns, 
                                  use_ovmf=ovmf, tmpfsdir=tmpfsdir)
         dump_monitor_cmds = kwargs.get("testimage_dump_monitor")

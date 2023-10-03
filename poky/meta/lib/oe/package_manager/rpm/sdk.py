@@ -112,5 +112,6 @@ class PkgSdk(Sdk):
         for f in glob.glob(os.path.join(self.sdk_output, "etc", "rpm*")):
             self.movefile(f, native_sysconf_dir)
         for f in glob.glob(os.path.join(self.sdk_output, "etc", "dnf", "*")):
-            self.movefile(f, native_sysconf_dir)
+            self.mkdirhier(native_sysconf_dir + "/dnf")
+            self.movefile(f, native_sysconf_dir + "/dnf")
         self.remove(os.path.join(self.sdk_output, "etc"), True)

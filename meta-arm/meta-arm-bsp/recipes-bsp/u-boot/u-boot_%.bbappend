@@ -51,15 +51,16 @@ SRC_URI:append:corstone1000 = " \
         file://0031-corstone1000-add-NVM-XIP-QSPI-device-tree-node.patch		  \ 
         file://0032-sandbox64-add-a-test-case-for-UCLASS_NVMXIP.patch			  \ 
         file://0033-corstone1000-add-fwu-metadata-store-info.patch			  \ 
-        file://0034-efi_boottime-allow-to-reset-a-path-after-boot.patch			  \ 
-        file://0035-fwu_metadata-make-sure-structures-are-packed.patch			  \ 
-        file://0036-corstone1000-add-boot-index.patch					  \ 
-        file://0037-corstone1000-adjust-boot-bank-and-kernel-location.patch		  \ 
-        file://0038-corstone1000-add-nvmxip-fwu-mdata-and-gpt-options.patch		  \ 
-        file://0039-nvmxip-move-header-to-include.patch					  \ 
-        file://0040-corstone1000-set-kernel_addr-based-on-boot_idx.patch		  \ 
-        file://0041-corstone1000-boot-index-from-active.patch				  \ 
-        file://0042-corstone1000-enable-PSCI-reset.patch				  \ 
+        file://0034-fwu_metadata-make-sure-structures-are-packed.patch			  \ 
+        file://0035-corstone1000-add-boot-index.patch					  \ 
+        file://0036-corstone1000-adjust-boot-bank-and-kernel-location.patch		  \ 
+        file://0037-corstone1000-add-nvmxip-fwu-mdata-and-gpt-options.patch		  \ 
+        file://0038-nvmxip-move-header-to-include.patch					  \ 
+        file://0039-corstone1000-set-kernel_addr-based-on-boot_idx.patch		  \ 
+        file://0040-corstone1000-boot-index-from-active.patch				  \ 
+        file://0041-corstone1000-enable-PSCI-reset.patch				  \
+        file://0042-Enable-EFI-set-get-time-services.patch                                \
+        file://0043-corstone1000-fix-compilation-warnings-in-fwu_plat_get_bootidx.patch   \ 
         "
 
 #

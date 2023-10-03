@@ -2423,20 +2423,21 @@ tracer writes to, blktrace provides a way to trace without perturbing
 the traced device at all by providing native support for sending all
 trace data over the network.
 
-To have blktrace operate in this mode, start blktrace on the target
-system being traced with the -l option, along with the device to trace::
+To have blktrace operate in this mode, start blktrace in server mode on the
+host system, which is going to store the captured data::
 
-   root@crownbay:~# blktrace -l /dev/sdc
+   $ blktrace -l
    server: waiting for connections...
 
-On the host system, use the -h option to connect to the target system,
-also passing it the device to trace::
+On the target system that is going to be traced, start blktrace in client
+mode with the -h option to connect to the host system, also passing it the
+device to trace::
 
-   $ blktrace -d /dev/sdc -h 192.168.1.43
+   root@crownbay:~# blktrace -d /dev/sdc -h 192.168.1.43
    blktrace: connecting to 192.168.1.43
    blktrace: connected!
 
-On the target system, you should see this::
+On the host system, you should see this::
 
    server: connection from 192.168.1.43
 
@@ -2446,7 +2447,7 @@ In another shell, execute a workload you want to trace. ::
    Connecting to downloads.yoctoproject.org (140.211.169.59:80)
    linux-2.6.19.2.tar.b 100% \|*******************************\| 41727k 0:00:00 ETA
 
-When it's done, do a Ctrl-C on the host system to stop the
+When it's done, do a Ctrl-C on the target system to stop the
 trace::
 
    ^C=== sdc ===
@@ -2454,7 +2455,7 @@ trace::
     CPU  1:                 4109 events,      193 KiB data
     Total:                 11800 events (dropped 0),      554 KiB data
 
-On the target system, you should also see a trace summary for the trace
+On the host system, you should also see a trace summary for the trace
 just ended::
 
    server: end of run for 192.168.1.43:sdc

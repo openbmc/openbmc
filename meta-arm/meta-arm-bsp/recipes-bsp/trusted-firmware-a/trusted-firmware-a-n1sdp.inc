@@ -9,6 +9,12 @@ TFA_MBEDTLS        = "1"
 TFA_UBOOT          = "0"
 TFA_UEFI           = "1"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/files/n1sdp:"
+
+SRC_URI:append = " \ 
+    file://0001-Reserve-OP-TEE-memory-from-nwd.patch \
+    "
+
 TFA_ROT_KEY= "plat/arm/board/common/rotpk/arm_rotprivk_rsa.pem"
 
 # Enabling Secure-EL1 Payload Dispatcher (SPD)

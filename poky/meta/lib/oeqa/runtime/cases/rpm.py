@@ -59,8 +59,8 @@ class RpmBasicTest(OERuntimeTestCase):
                     return
                 time.sleep(1)
             user_pss = [ps for ps in output.split("\n") if u + ' ' in ps]
-            msg = "There're %s 's process(es) still running: %s".format(u, "\n".join(user_pss))
-            assertTrue(True, msg=msg)
+            msg = "User %s has processes still running: %s" % (u, "\n".join(user_pss))
+            self.fail(msg=msg)
 
         def unset_up_test_user(u):
             # ensure no test1 process in running

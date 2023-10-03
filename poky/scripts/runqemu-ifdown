@@ -33,13 +33,15 @@ fi
 TAP=$1
 STAGING_BINDIR_NATIVE=$2
 
-TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
-if [ ! -e "$TUNCTL" ]; then
-	echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
-	exit 1
-fi
+if !ip tuntap del $TAP mode tap 2>/dev/null; then
+	TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
+	if [ ! -e "$TUNCTL" ]; then
+		echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
+		exit 1
+	fi
 
-$TUNCTL -d $TAP
+	$TUNCTL -d $TAP
+fi
 
 IFCONFIG=`which ip 2> /dev/null`
 if [ "x$IFCONFIG" = "x" ]; then

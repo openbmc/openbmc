@@ -24,7 +24,7 @@ LIC_FILES_CHKSUM = "\
 file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 EXTRA_OECONF = "--enable-debug --disable-static --disable-rebuilds --enable-compile-warnings=minimum"
-DEPENDS += "gtk+ glib-2.0 glib-2.0-native ruby-native intltool-native gnome-common-native"
+DEPENDS += "gtk+ glib-2.0 glib-2.0-native ruby-native intltool-native gnome-common-native autoconf-archive-native"
 
 inherit features_check autotools pkgconfig gettext
 

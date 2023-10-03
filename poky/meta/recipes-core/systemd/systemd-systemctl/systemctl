@@ -201,13 +201,8 @@ class SystemdUnit():
         target = ROOT / location.relative_to(self.root)
         try:
             for dependent in config.get('Install', prop):
-                # determine whether or not dependent is a template with an actual
-                # instance (i.e. a '@%i')
-                dependent_is_template = re.match(r"[^@]+@(?P<instance>[^\.]*)\.", dependent)
-                if dependent_is_template:
-                    # if so, replace with the actual instance to achieve
-                    # svc-wants@a.service.wants/svc-wanted-by@a.service
-                    dependent = re.sub(dependent_is_template.group('instance'), instance, dependent, 1)
+                # expand any %i to instance (ignoring escape sequence %%)
+                dependent = re.sub("([^%](%%)*)%i", "\\g<1>{}".format(instance), dependent)
                 wants = systemdir / "{}.{}".format(dependent, dirstem) / service
                 add_link(wants, target)
 

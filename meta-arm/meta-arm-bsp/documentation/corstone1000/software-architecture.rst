@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022, Arm Limited.
+ # Copyright (c) 2022-2023, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -9,16 +9,16 @@ Software architecture
 
 
 *****************
-ARM corstone1000
+Arm Corstone-1000
 *****************
 
-ARM corstone1000 is a reference solution for IoT devices. It is part of
+Arm Corstone-1000 is a reference solution for IoT devices. It is part of
 Total Solution for IoT which consists of hardware and software reference
 implementation.
 
-Corstone1000 software plus hardware reference solution is PSA Level-2 ready
+Corstone-1000 software plus hardware reference solution is PSA Level-2 ready
 certified (`PSA L2 Ready`_) as well as System Ready IR certified(`SRIR cert`_).
-More information on the corstone1000 subsystem product and design can be
+More information on the Corstone-1000 subsystem product and design can be
 found at:
 `Arm corstone1000 Software`_ and `Arm corstone1000 Technical Overview`_.
 
@@ -31,12 +31,12 @@ present in the user-guide document.
 Design Overview
 ***************
 
-The software architecture of corstone1000 platform is a reference
+The software architecture of Corstone-1000 platform is a reference
 implementation of Platform Security Architecture (`PSA`_) which provides
 framework to build secure IoT devices.
 
 The base system architecture of the platform is created from three
-different tyes of systems: Secure Enclave, Host and External System.
+different types of systems: Secure Enclave, Host and External System.
 Each subsystem provides different functionality to overall SoC.
 
 
@@ -50,9 +50,9 @@ cryptographic functions. It is based on an Cortex-M0+ processor,
 CC312 Cryptographic Accelerator and peripherals, such as watchdog and
 secure flash. Software running on the Secure Enclave is isolated via
 hardware for enhanced security. Communication with the Secure Encalve
-is achieved using Message Hnadling Units (MHUs) and shared memory.
-On system power on, the Secure Enclaves boots first. Its software
-comprises of two boot loading stages, both based on mcuboot, and
+is achieved using Message Handling Units (MHUs) and shared memory.
+On system power on, the Secure Enclave boots first. Its software
+comprises of a  ROM code (TF-M BL1), Mcuboot BL2, and
 TrustedFirmware-M(`TF-M`_) as runtime software. The software design on 
 Secure Enclave follows Firmware Framework for M class
 processor (`FF-M`_) specification.
@@ -66,7 +66,7 @@ The boot process follows Trusted Boot Base Requirement (`TBBR`_).
 The Host Subsystem is taken out of reset by the Secure Enclave system
 during its final stages of the initialization. The Host subsystem runs
 FF-A Secure Partitions(based on `Trusted Services`_) and OPTEE-OS
-(`OPTEE-OS`_) in the secure world, and u-boot(`u-boot repo`_) and
+(`OPTEE-OS`_) in the secure world, and U-Boot(`U-Boot repo`_) and
 linux (`linux repo`_) in the non-secure world. The communication between
 non-secure and the secure world is performed via FF-A messages.
 
@@ -75,7 +75,7 @@ functionality. The system is based on Cortex-M3 and run RTX RTOS.
 Communictaion between external system and Host(cortex-A35) is performed
 using MHU as transport mechanism and rpmsg messaging system.
 
-Overall, the corstone1000 architecture is designed to cover a range
+Overall, the Corstone-1000 architecture is designed to cover a range
 of Power, Performance, and Area (PPA) applications, and enable extension
 for use-case specific applications, for example, sensors, cloud
 connectivitiy, and edge computing.
@@ -85,13 +85,13 @@ Secure Boot Chain
 *****************
 
 For the security of a device, it is essential that only authorized
-software should run on the device. The corstone1000 boot uses a
+software should run on the device. The Corstone-1000 boot uses a
 Secure Boot Chain process where an already authenticated image verifies
 and loads the following software in the chain. For the boot chain
 process to work, the start of the chain should be trusted, forming the
 Root of Trust (RoT) of the device. The RoT of the device is immutable in
 nature and encoded into the device by the device owner before it
-is deployed into the field. In Corstone1000, the BL1 image of the secure
+is deployed into the field. In Corstone-1000, the BL1 image of the secure
 enclave and content of the CC312 OTP (One Time Programmable) memory
 forms the RoT. The BL1 image exists in ROM (Read Only Memory).
 
@@ -99,18 +99,20 @@ forms the RoT. The BL1 image exists in ROM (Read Only Memory).
    :width: 870
    :alt: SecureBootChain
 
-It is a lengthy chain to boot the software on corstone1000. On power on,
+It is a lengthy chain to boot the software on Corstone-1000. On power on,
 the secure enclave starts executing BL1 code from the ROM which is the RoT
 of the device. Authentication of an image involves the steps listed below:
 
 - Load image from flash to dynamic RAM.
-- The public key present in the image header is validated by comparing with the hash. Depending on the image, the hash of the public key is either stored in the OTP or part of the software which is being already verfied in the previous stages.
+- The public key present in the image header is validated by comparing with the hash.
+  Depending on the image, the hash of the public key is either stored in the OTP or part
+  of the software which is being already verified in the previous stages.
 - The image is validated using the public key.
 
 In the secure enclave, BL1 authenticates the BL2 and passes the execution
-control. BL2 authenticates the initial boot loader of the host (Host BL2)
+control. BL2 authenticates the initial boot loader of the host (Host TF-A BL2)
 and TF-M. The execution control is now passed to TF-M. TF-M being the run
-time executable of secure enclaves initializes itself and, in the end,
+time executable of secure enclave which initializes itself and, at the end,
 brings the host CPU out of rest. The host follows the boot standard defined
 in the `TBBR`_ to authenticate the secure and non-secure software.
 
@@ -118,10 +120,10 @@ in the `TBBR`_ to authenticate the secure and non-secure software.
 Secure Services
 ***************
 
-corstone1000 is unique in providing a secure environment to run a secure
-workload. The platform has Trustzone technology in the Host subsystem but
+Corstone-1000 is unique in providing a secure environment to run a secure
+workload. The platform has TrustZone technology in the Host subsystem but
 it also has hardware isolated secure enclave environment to run such secure
-workloads. In corstone1000, known Secure Services such as Crypto, Protected
+workloads. In Corstone-1000, known Secure Services such as Crypto, Protected
 Storage, Internal Trusted Storage and Attestation are available via PSA
 Functional APIs in TF-M. There is no difference for a user communicating to
 these services which are running on a secure enclave instead of the
@@ -137,7 +139,7 @@ flow path for such calls.
 The SE Proxy SP (Secure Enclave Proxy Secure Partition) is a proxy partition
 managed by OPTEE which forwards such calls to the secure enclave. The
 solution relies on OpenAMP which uses shared memory and MHU interrupts as
-a doorbell for communication between two cores. corstone1000 implements
+a doorbell for communication between two cores. Corstone-1000 implements
 isolation level 2. Cortex-M0+ MPU (Memory Protection Unit) is used to implement
 isolation level 2.
 
@@ -147,7 +149,7 @@ lower latency vs higher security. Services running on a secure enclave are
 secure by real hardware isolation but have a higher latency path. In the
 second scenario, the services running on the secure world of the host
 subsystem have lower latency but virtual hardware isolation created by
-Trustzone technology.
+TrustZone technology.
 
 
 **********************
@@ -156,14 +158,14 @@ Secure Firmware Update
 
 Apart from always booting the authorized images, it is also essential that
 the device only accepts the authorized images in the firmware update
-process. corstone1000 supports OTA (Over the Air) firmware updates and
+process. Corstone-1000 supports OTA (Over the Air) firmware updates and
 follows Platform Security Firmware Update sepcification (`FWU`_).
 
 As standardized into `FWU`_, the external flash is divided into two
 banks of which one bank has currently running images and the other bank is
 used for staging new images.  There are four updatable units, i.e. Secure
 Enclave's BL2 and TF-M, and Host's FIP (Firmware Image Package) and Kernel
-Image. The new images are accepted in the form of a UEFI capsule.
+Image (the initramfs bundle). The new images are accepted in the form of a UEFI capsule.
 
 
 .. image:: images/ExternalFlash.png
@@ -194,13 +196,13 @@ guarantee the availability of the device.
 
 
 ******************************
-UEFI Runtime Support in u-boot
+UEFI Runtime Support in U-Boot
 ******************************
 
 Implementation of UEFI boottime and runtime APIs require variable storage.
-In corstone1000, these UEFI variables are stored in the Protected Storage
+In Corstone-1000, these UEFI variables are stored in the Protected Storage
 service. The below diagram presents the data flow to store UEFI variables.
-The u-boot implementation of the UEFI subsystem uses the FF-A driver to
+The U-Boot implementation of the UEFI subsystem uses the U-Boot FF-A driver to
 communicate with the SMM Service in the secure world. The backend of the
 SMM service uses the proxy PS from the SE Proxy SP. From there on, the PS
 calls are forwarded to the secure enclave as explained above.
@@ -215,11 +217,12 @@ calls are forwarded to the secure enclave as explained above.
 References
 ***************
 `ARM corstone1000 Search`_
+
 `Arm security features`_
 
 --------------
 
-*Copyright (c) 2022, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2023, Arm Limited. All rights reserved.*
 
 .. _Arm corstone1000 Technical Overview: https://developer.arm.com/documentation/102360/0000
 .. _Arm corstone1000 Software: https://developer.arm.com/Tools%20and%20Software/Corstone-1000%20Software
@@ -236,4 +239,4 @@ References
 .. _TBBR: https://developer.arm.com/documentation/den0006/latest
 .. _TF-M: https://www.trustedfirmware.org/projects/tf-m/
 .. _Trusted Services: https://www.trustedfirmware.org/projects/trusted-services/
-.. _u-boot repo: https://github.com/u-boot/u-boot.git
+.. _U-Boot repo: https://github.com/u-boot/u-boot.git

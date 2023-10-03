@@ -43,7 +43,6 @@ Yocto Project Development Tasks Manual
    build-quality
    runtime-testing
    debugging
-   changes
    licenses
    vulnerabilities
    sbom

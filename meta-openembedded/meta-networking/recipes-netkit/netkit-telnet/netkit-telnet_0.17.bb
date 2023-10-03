@@ -16,6 +16,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/n/netkit-telnet/netkit-telnet_${PV}.orig.tar.gz
            file://0001-telnetd-utility.c-Fix-buffer-overflow-in-netoprintf.patch \
            file://0001-utility-Include-time.h-form-time-and-strftime-protot.patch \
            file://0001-Drop-using-register-keyword.patch \
+           file://CVE-2022-39028.patch \
            "
 
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/n/netkit-telnet/"

@@ -8,9 +8,11 @@ inherit image_types
 SPARSE_BLOCK_SIZE ??= "4096"
 
 CONVERSIONTYPES += "sparse"
-CONVERSION_CMD:sparse() {
-    INPUT="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"
-    truncate --no-create --size=%${SPARSE_BLOCK_SIZE} "$INPUT"
-    img2simg -s "$INPUT" "$INPUT.sparse" ${SPARSE_BLOCK_SIZE}
-}
+
+CONVERSION_CMD:sparse = " \
+    INPUT="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"; \
+    truncate --no-create --size=%${SPARSE_BLOCK_SIZE} "$INPUT"; \
+    img2simg -s "$INPUT" "$INPUT.sparse" ${SPARSE_BLOCK_SIZE}; \
+ "
+
 CONVERSION_DEPENDS_sparse = "android-tools-native"

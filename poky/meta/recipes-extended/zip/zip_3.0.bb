@@ -19,6 +19,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.
            file://0001-configure-Use-CFLAGS-and-LDFLAGS-when-doing-link-tes.patch \
            file://0001-configure-Specify-correct-function-signatures-and-de.patch \
            file://0002-unix.c-Do-not-redefine-DIR-as-FILE.patch \
+           file://0001-unix-configure-use-_Static_assert-to-do-correct-dete.patch \
            "
 UPSTREAM_VERSION_UNKNOWN = "1"
 
@@ -30,9 +31,6 @@ CVE_CHECK_IGNORE += "CVE-2018-13410"
 
 # Not for zip but for smart contract implementation for it
 CVE_CHECK_IGNORE += "CVE-2018-13684"
-
-# Enable largefile support
-CFLAGS += "-DLARGE_FILE_SUPPORT"
 
 # zip.inc sets CFLAGS, but what Makefile actually uses is
 # CFLAGS_NOOPT.  It will also force -O3 optimization, overriding

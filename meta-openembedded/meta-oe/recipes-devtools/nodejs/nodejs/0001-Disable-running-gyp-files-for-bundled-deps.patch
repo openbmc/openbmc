@@ -29,10 +29,13 @@ python prune_sources() {
 }
 do_unpack[postfuncs] += "prune_sources"
 
+Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
 ---
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/Makefile b/Makefile
+index 0be0659d..3c442014 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -169,7 +169,7 @@ with-code-cache test-code-cache:
@@ -41,6 +44,8 @@ do_unpack[postfuncs] += "prune_sources"
  out/Makefile: config.gypi common.gypi node.gyp \
 -	deps/uv/uv.gyp deps/llhttp/llhttp.gyp deps/zlib/zlib.gyp \
 +	deps/llhttp/llhttp.gyp \
- 	deps/simdutf/simdutf.gyp \
+	deps/simdutf/simdutf.gyp deps/ada/ada.gyp \
  	tools/v8_gypfiles/toolchain.gypi tools/v8_gypfiles/features.gypi \
  	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
+--
+2.40.0

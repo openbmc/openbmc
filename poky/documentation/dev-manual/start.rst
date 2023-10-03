@@ -246,14 +246,13 @@ particular working environment and set of practices.
     -  The Yocto Project community encourages you to send patches to the
        project to fix bugs or add features. If you do submit patches,
        follow the project commit guidelines for writing good commit
-       messages. See the
-       ":ref:`dev-manual/changes:submitting a change to the yocto project`"
-       section.
+       messages. See the ":doc:`../contributor-guide/submit-changes`"
+       section in the Yocto Project and OpenEmbedded Contributor Guide.
 
     -  Send changes to the core sooner than later as others are likely
        to run into the same issues. For some guidance on mailing lists
-       to use, see the list in the
-       ":ref:`dev-manual/changes:submitting a change to the yocto project`"
+       to use, see the lists in the
+       ":ref:`contributor-guide/submit-changes:finding a suitable mailing list`"
        section. For a description
        of the available mailing lists, see the ":ref:`resources-mailinglist`" section in
        the Yocto Project Reference Manual.

@@ -15,8 +15,9 @@ SRC_URI = "git://github.com/rpm-software-management/dnf.git;branch=master;protoc
            file://0029-Do-not-set-PYTHON_INSTALL_DIR-by-running-python.patch \
            file://0030-Run-python-scripts-using-env.patch \
            file://0001-set-python-path-for-completion_helper.patch \
-           file://0001-dnf-write-the-log-lock-to-root.patch \
            "
+
+SRC_URI:append:class-native = "file://0001-dnf-write-the-log-lock-to-root.patch"
 
 SRCREV = "e50875b3f5790f70720bdb670e1dd2bf4d828744"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"

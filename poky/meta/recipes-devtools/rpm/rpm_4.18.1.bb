@@ -134,8 +134,8 @@ do_install:append:class-target() {
 do_install:append:class-nativesdk() {
     rm -rf ${D}${SDKPATHNATIVE}/var
     # Ensure find-debuginfo is located correctly inside SDK
-    mkdir -p ${D}${SDKPATHNATIVE}/etc/rpm
-    echo "%__find_debuginfo   ${SDKPATHNATIVE}/usr/bin/find-debuginfo" >> ${D}${SDKPATHNATIVE}/etc/rpm/macros
+    mkdir -p ${D}${libdir}/rpm
+    echo "%__find_debuginfo   ${SDKPATHNATIVE}/usr/bin/find-debuginfo" >> ${D}${libdir}/rpm/macros
 }
 
 do_install:append () {
@@ -173,7 +173,6 @@ FILES:${PN}-build = "\
     ${libdir}/rpm/macros.p* \
     ${libdir}/rpm/fileattrs/* \
 "
-FILES:${PN}-build:append:class-nativesdk = " ${SDKPATHNATIVE}/etc/rpm/macros"
 
 FILES:${PN}-sign = "\
     ${bindir}/rpmsign \

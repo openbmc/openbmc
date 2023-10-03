@@ -98,9 +98,17 @@ EOM
     SHOWYPDOC=yes
 fi
 
+if [ -z "$OECORENOTESCONF" ]; then
+    OECORENOTESCONF="$OEROOT/meta/conf/templates/default/conf-notes.txt"
+fi
+if [ ! -r "$BUILDDIR/conf/conf-notes.txt" ]; then
+    [ ! -r "$OECORENOTESCONF" ] || cp "$OECORENOTESCONF" "$BUILDDIR/conf/conf-notes.txt"
+fi
+
 # Prevent disturbing a new GIT clone in same console
 unset OECORELOCALCONF
 unset OECORELAYERCONF
+unset OECORENOTESCONF
 
 # Ending the first-time run message. Show the YP Documentation banner.
 if [ -n "$SHOWYPDOC" ]; then
@@ -116,11 +124,7 @@ EOM
 #    unset SHOWYPDOC
 fi
 
-if [ -z "$OECORENOTESCONF" ]; then
-    OECORENOTESCONF="$OEROOT/meta/conf/templates/default/conf-notes.txt"
-fi
-[ ! -r "$OECORENOTESCONF" ] || cat "$OECORENOTESCONF"
-unset OECORENOTESCONF
+[ ! -r "$BUILDDIR/conf/conf-notes.txt" ] || cat "$BUILDDIR/conf/conf-notes.txt"
 
 if [ ! -f "$BUILDDIR/conf/templateconf.cfg" ]; then
     echo "$ORG_TEMPLATECONF" >"$BUILDDIR/conf/templateconf.cfg"

@@ -1,0 +1,72 @@
+glibc 2.38 would include  __isoc23_strtol and similar symbols. This is trggerd by
+_GNU_SOURCE but we have to set that for other definitions. Therefore play with defines
+to turn this off within pseudo_wrappers.c. Elsewhere we can switch to _DEFAULT_SOURCE
+rather than _GNU_SOURCE.
+
+Upstream-Status: Pending
+
+Index: git/pseudo_wrappers.c
+===================================================================
+--- git.orig/pseudo_wrappers.c
++++ git/pseudo_wrappers.c
+@@ -6,6 +6,15 @@
+  * SPDX-License-Identifier: LGPL-2.1-only
+  *
+  */
++/* glibc 2.38 would include  __isoc23_strtol and similar symbols. This is trggerd by
++ * _GNU_SOURCE but we have to set that for other definitions. Therefore play with defines
++ * to turn this off.
++ */
++#include <features.h>
++#undef __GLIBC_USE_ISOC2X
++#undef __GLIBC_USE_C2X_STRTOL
++#define __GLIBC_USE_C2X_STRTOL 0
++
+ #include <assert.h>
+ #include <stdlib.h>
+ #include <limits.h>
+Index: git/pseudo_util.c
+===================================================================
+--- git.orig/pseudo_util.c
++++ git/pseudo_util.c
+@@ -8,6 +8,14 @@
+  */
+ /* we need access to RTLD_NEXT for a horrible workaround */
+ #define _GNU_SOURCE
++/* glibc 2.38 would include  __isoc23_strtol and similar symbols. This is trggerd by
++ * _GNU_SOURCE but we have to set that for other definitions. Therefore play with defines
++ * to turn this off.
++ */
++#include <features.h>
++#undef __GLIBC_USE_ISOC2X
++#undef __GLIBC_USE_C2X_STRTOL
++#define __GLIBC_USE_C2X_STRTOL 0
+ 
+ #include <ctype.h>
+ #include <errno.h>
+Index: git/pseudolog.c
+===================================================================
+--- git.orig/pseudolog.c
++++ git/pseudolog.c
+@@ -8,7 +8,7 @@
+  */
+ /* We need _XOPEN_SOURCE for strptime(), but if we define that,
+  * we then don't get S_IFSOCK... _GNU_SOURCE turns on everything. */
+-#define _GNU_SOURCE
++#define _DEFAULT_SOURCE
+ 
+ #include <ctype.h>
+ #include <limits.h>
+Index: git/pseudo_client.c
+===================================================================
+--- git.orig/pseudo_client.c
++++ git/pseudo_client.c
+@@ -6,7 +6,7 @@
+  * SPDX-License-Identifier: LGPL-2.1-only
+  *
+  */
+-#define _GNU_SOURCE
++#define _DEFAULT_SOURCE
+ 
+ #include <stdio.h>
+ #include <signal.h>

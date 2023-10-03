@@ -15,13 +15,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0daaf958d5531ab86169ec6e275e1517"
 SECTION = "libs"
 DEPENDS += "rpcsvc-proto-native"
 
-PV = "1.4.3"
+PV = "1.4.4"
 
-SRCREV = "71e0a12c04d130a78674ac6309eefffa6ecee612"
+SRCREV = "c65926005e50da02a4da3e26abc42eded36cd19d"
 
 SRC_URI = "git://github.com/thkukuk/${BPN};branch=master;protocol=https \
            file://0001-Use-cross-compiled-rpcgen.patch \
-           file://0001-Use-AC_SYS_LARGEFILE-macro-to-control-largefile-supp.patch \
            "
 
 S = "${WORKDIR}/git"

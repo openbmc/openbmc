@@ -1629,7 +1629,7 @@ def _update_recipe_patch(recipename, workspace, srctree, rd, appendlayerdir, wil
     else:
         patchdir_params = {'patchdir': relpatchdir}
 
-    def srcuri_entry(fname):
+    def srcuri_entry(basepath):
         if patchdir_params:
             paramstr = ';' + ';'.join('%s=%s' % (k,v) for k,v in patchdir_params.items())
         else:

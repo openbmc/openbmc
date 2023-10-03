@@ -18,11 +18,18 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep ptest
+inherit ptest
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 
-do_install:append() {
+EXTRA_OEMAKE += "CFLAGS='${CFLAGS}'"
+
+do_compile() {
+    oe_runmake
+}
+
+do_install() {
+    oe_runmake install DESTDIR=${D}
     install -d ${D}${sysconfdir}/cron.hourly
     install -m 0755 ${S}/mcelog.cron ${D}${sysconfdir}/cron.hourly/
     sed -i 's/bash/sh/' ${D}${sysconfdir}/cron.hourly/mcelog.cron

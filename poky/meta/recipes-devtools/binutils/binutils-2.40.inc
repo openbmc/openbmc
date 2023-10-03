@@ -18,7 +18,7 @@ SRCBRANCH ?= "binutils-2_40-branch"
 
 UPSTREAM_CHECK_GITTAGREGEX = "binutils-(?P<pver>\d+_(\d_?)*)"
 
-SRCREV ?= "4671be001eb5a899ecac3e2686a92934000f8262"
+SRCREV ?= "391fd4d9ee5d2b78244cbcd57fc405738359b70b"
 BINUTILS_GIT_URI ?= "git://sourceware.org/git/binutils-gdb.git;branch=${SRCBRANCH};protocol=https"
 SRC_URI = "\
      ${BINUTILS_GIT_URI} \
@@ -34,5 +34,7 @@ SRC_URI = "\
      file://0013-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch \
      file://0015-Remove-duplicate-pe-dll.o-entry-deom-targ_extra_ofil.patch \
      file://0016-CVE-2023-25586.patch \
+     file://0001-Fix-an-illegal-memory-access-when-an-accessing-a-zer.patch \
+     file://0017-CVE-2023-39128.patch \
 "
 S  = "${WORKDIR}/git"

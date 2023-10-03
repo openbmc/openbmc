@@ -22,7 +22,7 @@ issues may be impacting Poky and OE-Core. It is up to the maintainers, users,
 contributors and anyone interested in the issues to investigate and possibly fix them by
 updating software components to newer versions or by applying patches to address them.
 It is recommended to work with Poky and OE-Core upstream maintainers and submit
-patches to fix them, see ":ref:`dev-manual/changes:submitting a change to the yocto project`" for details.
+patches to fix them, see ":doc:`../contributor-guide/submit-changes`" for details.
 
 Vulnerability check at build time
 =================================

@@ -1,0 +1,103 @@
+From 5cbf901b5c3b6a7d1d0ed91b6df4194bb6d25a40 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 15 Jun 2023 07:14:17 -0700
+Subject: [PATCH] unix/configure: fix detection for cross compilation
+
+We're doing cross compilation, running a cross-compiled problem
+on host to detemine feature is not correct. So we change runtime
+check into compile-time check to detect the features.
+
+Upstream-Status: Inactive-Upstream
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ unix/configure | 44 +++++++++++++++-----------------------------
+ 1 file changed, 15 insertions(+), 29 deletions(-)
+
+diff --git a/unix/configure b/unix/configure
+index 8fd82dd..68dee98 100755
+--- a/unix/configure
++++ b/unix/configure
+@@ -259,6 +259,10 @@ cat > conftest.c << _EOF_
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include <stdio.h>
++
++_Static_assert(sizeof(off_t) < 8, "sizeof off_t < 8 failed");
++_Static_assert(sizeof((struct stat){0}.st_size) < 8, "sizeof st_size < 8 failed");
++
+ int main()
+ {
+   off_t offset;
+@@ -278,21 +282,10 @@ _EOF_
+ # compile it
+ $CC $CFLAGS $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null
+ if [ $? -ne 0 ]; then
+-  echo -- no Large File Support
++  echo -- yes we have Large File Support!
++  CFLAGSR="${CFLAGSR} -DLARGE_FILE_SUPPORT"
+ else
+-# run it
+-  ./conftest
+-  r=$?
+-  if [ $r -eq 1 ]; then
+-    echo -- no Large File Support - no 64-bit off_t
+-  elif [ $r -eq 2 ]; then
+-    echo -- no Large File Support - no 64-bit stat
+-  elif [ $r -eq 3 ]; then
+-    echo -- yes we have Large File Support!
+-    CFLAGSR="${CFLAGSR} -DLARGE_FILE_SUPPORT"
+-  else
+-    echo -- no Large File Support - conftest returned $r
+-  fi
++  echo -- no Large File Support
+ fi
+ 
+ # Added 11/24/2005 EG
+@@ -302,6 +295,11 @@ cat > conftest.c << _EOF_
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <wchar.h>
++
++#ifndef __STDC_ISO_10646__
++#error "__STDC_ISO_10646__ not defined
++#endif
++
+ int main()
+ {
+   size_t wsize;
+@@ -327,19 +325,8 @@ if [ $? -ne 0 ]; then
+   echo "-- no Unicode (wchar_t) support"
+ else
+ # have wide char support
+-# run it
+-  ./conftest
+-  r=$?
+-  if [ $r -eq 0 ]; then
+-    echo -- no Unicode wchar_t support - wchar_t allocation error
+-  elif [ $r -eq 1 ]; then
+-    echo -- no Unicode support - wchar_t encoding unspecified
+-  elif [ $r -eq 2 ]; then
+-    echo -- have wchar_t with known UCS encoding - enabling Unicode support!
+-    CFLAGSR="${CFLAGSR} -DUNICODE_SUPPORT -DUNICODE_WCHAR"
+-  else
+-    echo "-- no Unicode (wchar_t) support - conftest returned $r"
+-  fi
++  echo -- have wchar_t with known UCS encoding - enabling Unicode support!
++  CFLAGSR="${CFLAGSR} -DUNICODE_SUPPORT -DUNICODE_WCHAR"
+ fi
+ 
+ echo "Check for setlocale support (needed for UNICODE Native check)"
+@@ -418,8 +405,7 @@ temp_link="link_$$"
+   echo "int main() { lchmod(\"${temp_file}\", 0666); }" \
+ ) > conftest.c
+ ln -s "${temp_link}" "${temp_file}" && \
+- $CC $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null 2>/dev/null && \
+- ./conftest
++ $CC -Werror=implicit-function-declaration $BFLAG $LDFLAGS -o conftest conftest.c >/dev/null
+ [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_LCHMOD"
+ rm -f "${temp_file}"
+ 
+-- 
+2.34.1
+

@@ -12,10 +12,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 
 DEPENDS = "glib-2.0"
 
-SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/${BP}.tar.xz"
-SRC_URI[sha256sum] = "69b5856e9ea42c38ac77e6b8c92ffc86a71d341fef74e77bef85f9cc6c47a4b1"
+SRC_URI = "git://github.com/libproxy/libproxy;protocol=https;branch=main"
+SRCREV = "caccaf28e3df6ea612d2d4b39f781c4324019fdb"
+S = "${WORKDIR}/git"
 
-inherit cmake pkgconfig github-releases
+inherit cmake pkgconfig
 
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gnome', '', d)} gnome3"
 PACKAGECONFIG[gnome] = "-DWITH_GNOME=yes,-DWITH_GNOME=no,gconf"

@@ -37,22 +37,22 @@ PACKAGES_DYNAMIC = "^locale-base-.* \
 # Create a glibc-binaries package
 ALLOW_EMPTY:${BPN}-binaries = "1"
 PACKAGES += "${BPN}-binaries"
-RRECOMMENDS:${BPN}-binaries =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-binary") != -1])}"
+RRECOMMENDS:${BPN}-binaries =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-binary-") != -1])}"
 
 # Create a glibc-charmaps package
 ALLOW_EMPTY:${BPN}-charmaps = "1"
 PACKAGES += "${BPN}-charmaps"
-RRECOMMENDS:${BPN}-charmaps =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-charmap") != -1])}"
+RRECOMMENDS:${BPN}-charmaps =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-charmap-") != -1])}"
 
 # Create a glibc-gconvs package
 ALLOW_EMPTY:${BPN}-gconvs = "1"
 PACKAGES += "${BPN}-gconvs"
-RRECOMMENDS:${BPN}-gconvs =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-gconv") != -1])}"
+RRECOMMENDS:${BPN}-gconvs =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-gconv-") != -1])}"
 
 # Create a glibc-localedatas package
 ALLOW_EMPTY:${BPN}-localedatas = "1"
 PACKAGES += "${BPN}-localedatas"
-RRECOMMENDS:${BPN}-localedatas =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-localedata") != -1])}"
+RRECOMMENDS:${BPN}-localedatas =  "${@" ".join([p for p in d.getVar('PACKAGES').split() if p.find("glibc-localedata-") != -1])}"
 
 DESCRIPTION:localedef = "glibc: compile locale definition files"
 

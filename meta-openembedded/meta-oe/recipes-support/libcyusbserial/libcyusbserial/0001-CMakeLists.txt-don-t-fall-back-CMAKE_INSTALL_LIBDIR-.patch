@@ -1,0 +1,43 @@
+From 655c5c32b37a2bea12389ed69c0869215fcf5abe Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 3 Sep 2023 11:22:35 +0200
+Subject: [PATCH] CMakeLists.txt: don't fall back CMAKE_INSTALL_LIBDIR to lib
+
+* testing ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} existence
+  doesn't really work in cross compilation and on some hosts was causing:
+
+  ERROR: QA Issue: libcyusbserial: Files/directories were installed but not shipped in any package:
+    /usr/lib/libcyusbserial.so.1
+    /usr/lib/libcyusbserial.so
+  Please set FILES such that these items are packaged. Alternatively if they are unneeded, avoid installing them or delete them within do_install.
+  libcyusbserial: 2 installed and not shipped files. [installed-vs-shipped]
+
+  with multilib using /usr/lib32 or /usr/lib64 when the same didn't
+  exist on host.
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ lib/CMakeLists.txt | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index 2b031cb..53a7263 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -6,15 +6,6 @@ if (NOT CMAKE_INSTALL_LIBDIR)
+ include(GNUInstallDirs)
+ endif (NOT CMAKE_INSTALL_LIBDIR)
+ 
+-# Fall back to just "lib" if the item provided by GNUInstallDirs doesn't exist
+-# For example, on Ubuntu 13.10 with CMake 2.8.11.2,
+-# /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} doesn't exist.
+-if (NOT EXISTS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+-    message(STATUS "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR} does not exist. Defaulting libcyusbserial install location to ${CMAKE_INSTALL_PREFIX}/lib.")
+-        set(CMAKE_INSTALL_LIBDIR lib)
+-endif()
+-
+-
+ ################################################################################
+ # Include paths
+ ################################################################################

@@ -7,6 +7,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=36a13c90514e2899f1eba7f41c3ee592"
 inherit setuptools3
 SRC_URI[sha256sum] = "b3ed06a9e8ac9a9aae5a6f5dbe78a8a58655d17b43b93c078f094ddc476ae297"
 
+SRC_URI += "file://CVE-2022-40896-0001.patch \
+            file://CVE-2022-40896-0002.patch \
+           "
+
 DEPENDS += "\
             ${PYTHON_PN} \
             "

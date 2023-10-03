@@ -5,6 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=34400b68072d710fecd0a2940a0d1658"
 
 SRC_URI[sha256sum] = "98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf"
 
+SRC_URI += " file://CVE-2023-32681.patch"
+
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \

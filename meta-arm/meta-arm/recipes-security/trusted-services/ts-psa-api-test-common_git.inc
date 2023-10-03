@@ -4,6 +4,8 @@ TS_ENV = "arm-linux"
 
 require trusted-services.inc
 
+DEPENDS        += "python3-jsonschema-native python3-jinja2-native"
+
 DEPENDS        += "libts"
 RDEPENDS:${PN} += "libts"
 
@@ -11,7 +13,7 @@ SRC_URI += "git://github.com/ARM-software/psa-arch-tests.git;name=psatest;protoc
             file://0001-Pass-Yocto-build-settings-to-psa-arch-tests-native.patch;patchdir=../psatest \
            "
 
-SRCREV_psatest = "451aa087a40d02c7d04778235014c5619d126471"
+SRCREV_psatest = "38cb53a4d9e292435ddf7899960b15af62decfbe"
 LIC_FILES_CHKSUM += "file://../psatest/LICENSE.md;md5=2a944942e1496af1886903d274dedb13"
 
 EXTRA_OECMAKE += "\

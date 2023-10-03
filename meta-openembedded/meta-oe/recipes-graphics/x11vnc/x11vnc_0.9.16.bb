@@ -12,6 +12,7 @@ PV .= "+git${SRCPV}"
 
 SRC_URI = "git://github.com/LibVNC/x11vnc;branch=master;protocol=https \
            file://starting-fix.patch \
+           file://CVE-2020-29074.patch \
            "
 S = "${WORKDIR}/git"
 

@@ -21,7 +21,7 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig cmake features_check python3native qemu
 
-ANY_OF_DISTRO_FEATURES += "opengl wayland"
+ANY_OF_DISTRO_FEATURES += "opengl vulkan"
 
 DEPENDS += "python3-lxml-native libpng zlib virtual/libgles2 qemu-native"
 
@@ -72,9 +72,9 @@ python __anonymous() {
     distrofeatures = (d.getVar("DISTRO_FEATURES") or "")
     if not bb.utils.contains_any("PACKAGECONFIG", ["surfaceless", "wayland", "x11_egl", "x11_glx", "x11_egl_glx"], True, False, d):
         if "wayland" in distrofeatures:
-            d.appendVar("DEPENDS", " wayland-native wayland wayland-protocols")
+            d.appendVar("DEPENDS", " wayland-native ${MLPREFIX}wayland ${MLPREFIX}wayland-protocols")
         if "x11" in distrofeatures:
-            d.appendVar("DEPENDS", " virtual/libx11 virtual/egl ")
+            d.appendVar("DEPENDS", " virtual/${MLPREFIX}libx11 virtual/${MLPREFIX}egl ")
 }
 
 CTSDIR = "/usr/lib/${BPN}"

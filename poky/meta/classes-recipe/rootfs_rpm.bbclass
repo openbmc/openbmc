@@ -20,11 +20,9 @@ IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("PACKAGE_INSTALL", "dnf"
 # Dnf is python based, so be sure python3-native is available to us.
 EXTRANATIVEPATH += "python3-native"
 
-# opkg is needed for update-alternatives
 RPMROOTFSDEPENDS = "rpm-native:do_populate_sysroot \
     dnf-native:do_populate_sysroot \
-    createrepo-c-native:do_populate_sysroot \
-    opkg-native:do_populate_sysroot"
+    createrepo-c-native:do_populate_sysroot"
 
 do_rootfs[depends] += "${RPMROOTFSDEPENDS}"
 do_populate_sdk[depends] += "${RPMROOTFSDEPENDS}"

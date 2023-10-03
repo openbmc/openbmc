@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022, Arm Limited.
+ # Copyright (c) 2022-2023, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -19,6 +19,28 @@ intended for safety-critical applications. Should Your Software or Your Hardware
 prove defective, you assume the entire cost of all necessary servicing, repair
 or correction.
 
+***********************
+Release notes - 2023.06
+***********************
+
+Known Issues or Limitations
+---------------------------
+ - FPGA supports Linux distro install and boot through installer. However, FVP only supports openSUSE raw image installation and boot.
+ - Due to the performance uplimit of MPS3 FPGA and FVP, some Linux distros like Fedora Rawhide can not boot on Corstone-1000 (i.e. user may experience timeouts or boot hang).
+ - PSA Crypto tests (psa-crypto-api-test command) take 30 minutes to complete for FVP and 1 hour for MPS3.
+ - Corstone-1000 SoC on FVP doesn't have a secure debug peripheral. It does on the MPS3 .
+ - The following limitations listed in the previous release are still applicable:
+
+   - UEFI Compliant - Boot from network protocols must be implemented -- FAILURE
+
+   - Known limitations regarding ACS tests - see previous release's notes.
+
+Platform Support
+-----------------
+ - This software release is tested on Corstone-1000 FPGA version AN550_v2
+   https://developer.arm.com/downloads/-/download-fpga-images
+ - This software release is tested on Corstone-1000 Fast Model platform (FVP) version 11.19_21
+   https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
 
 **************************
 Release notes - 2022.11.23
@@ -174,4 +196,4 @@ For all security issues, contact Arm by email at arm-security@arm.com.
 
 --------------
 
-*Copyright (c) 2022, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2023, Arm Limited. All rights reserved.*

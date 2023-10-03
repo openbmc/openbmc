@@ -133,7 +133,7 @@ class Partition():
             self.update_fstab_in_rootfs = True
 
         if not self.source:
-            if self.fstype == "none":
+            if self.fstype == "none" or self.no_table:
                 return
             if not self.size and not self.fixed_size:
                 raise WicError("The %s partition has a size of zero. Please "

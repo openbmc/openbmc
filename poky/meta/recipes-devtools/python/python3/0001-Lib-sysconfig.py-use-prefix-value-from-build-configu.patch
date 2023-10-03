@@ -1,4 +1,4 @@
-From cab8b8b1390165a93dfb27c48c1cc4c3e4280dfd Mon Sep 17 00:00:00 2001
+From 512c617bd00b74b30a80dd56a12391de46e2b6cf Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 10 Sep 2021 12:28:31 +0200
 Subject: [PATCH] Lib/sysconfig.py: use prefix value from build configuration

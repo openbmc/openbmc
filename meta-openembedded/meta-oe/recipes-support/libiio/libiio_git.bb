@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING.txt;md5=7c13b3376cea0ce68d2d2da0a1b3a72c"
 SRCREV = "92d6a35f3d8d721cda7d6fe664b435311dd368b4"
 PV = "0.23"
 
-SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https;branch=master \
+SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https;branch=main \
            file://0001-CMake-Move-include-CheckCSourceCompiles-before-its-m.patch \
 "
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"

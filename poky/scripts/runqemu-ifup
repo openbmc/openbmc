@@ -41,22 +41,29 @@ USERID="-u $1"
 GROUP="-g $2"
 STAGING_BINDIR_NATIVE=$3
 
-TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
-if [ ! -x "$TUNCTL" ]; then
-       echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
-	exit 1
+if taps=$(ip tuntap list 2>/dev/null); then
+	tap_no=$(( $(echo "$taps" |sort -r |sed 's/^tap//; s/:.*//; q') + 1 ))
+	ip tuntap add tap$tap_no mode tap group $2 && TAP=tap$tap_no
 fi
 
-TAP=`$TUNCTL -b $GROUP 2>&1`
-STATUS=$?
-if [ $STATUS -ne 0 ]; then
-# If tunctl -g fails, try using tunctl -u, for older host kernels 
-# which do not support the TUNSETGROUP ioctl
-	TAP=`$TUNCTL -b $USERID 2>&1`
+if [ -z $TAP ]; then
+	TUNCTL=$STAGING_BINDIR_NATIVE/tunctl
+	if [ ! -x "$TUNCTL" ]; then
+		echo "Error: Unable to find tunctl binary in '$STAGING_BINDIR_NATIVE', please bitbake qemu-helper-native"
+		exit 1
+	fi
+
+	TAP=`$TUNCTL -b $GROUP 2>&1`
 	STATUS=$?
 	if [ $STATUS -ne 0 ]; then
-		echo "tunctl failed:"
-		exit 1
+	# If tunctl -g fails, try using tunctl -u, for older host kernels
+	# which do not support the TUNSETGROUP ioctl
+		TAP=`$TUNCTL -b $USERID 2>&1`
+		STATUS=$?
+		if [ $STATUS -ne 0 ]; then
+			echo "tunctl failed:"
+			exit 1
+		fi
 	fi
 fi
 

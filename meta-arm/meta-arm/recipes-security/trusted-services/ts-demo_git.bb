@@ -6,6 +6,7 @@ TS_ENV = "arm-linux"
 
 require trusted-services.inc
 
+DEPENDS        += "python3-jsonschema-native python3-jinja2-native"
 DEPENDS        += "libts"
 RDEPENDS:${PN} += "libts"
 

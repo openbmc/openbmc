@@ -276,7 +276,7 @@ universal, the list includes them just in case:
    :term:`LTS`
       This term means "Long Term Support", and in the context of the Yocto
       Project, it corresponds to selected stable releases for which bug and
-      security fixes are provided for at least two years. See
+      security fixes are provided for at least four years. See
       the :ref:`ref-long-term-support-releases` section for details.
 
    :term:`Metadata`
@@ -475,11 +475,11 @@ universal, the list includes them just in case:
      section in the Yocto Project Overview and Concepts Manual.
 
    :term:`SPDX`
-      This term means *Software Package Data Exchange*, and is used as a open
+      This term means *Software Package Data Exchange*, and is used as an open
       standard for providing a *Software Bill of Materials* (:term:`SBOM`).
       This standard is developed through a `Linux Foundation project
       <https://spdx.dev/>`__ and is used by the OpenEmbedded Build System to
-      provide an :term:`SBOM` associated to each a software image.
+      provide an :term:`SBOM` associated to each software image.
 
       For details, see Wikipedia's :wikipedia:`SPDX page <Software_Package_Data_Exchange>`
       and the ":ref:`dev-manual/sbom:creating a software bill of materials`"

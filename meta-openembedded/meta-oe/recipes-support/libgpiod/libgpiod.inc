@@ -38,7 +38,7 @@ FILES:${PN}-ptest += " \
 FILES:libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
 
 RRECOMMENDS:${PN}-ptest += "coreutils"
-RDEPENDS:${PN}-ptest += "bats"
+RDEPENDS:${PN}-ptest += "${@bb.utils.contains('PTEST_ENABLED', '1', 'bats', '', d)}"
 
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}/tests/

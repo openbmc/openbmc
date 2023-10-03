@@ -42,6 +42,11 @@ do_install () {
 	install -m 0644 ifup.8 ${D}${mandir}/man8
 	install -m 0644 interfaces.5 ${D}${mandir}/man5
 	cd ${D}${mandir}/man8 && ln -s ifup.8 ifdown.8
+
+	install -d ${D}${sysconfdir}/network/if-pre-up.d
+	install -d ${D}${sysconfdir}/network/if-up.d
+	install -d ${D}${sysconfdir}/network/if-down.d
+	install -d ${D}${sysconfdir}/network/if-post-down.d
 }
 
 do_install_ptest () {

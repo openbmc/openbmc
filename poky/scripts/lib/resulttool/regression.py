@@ -178,6 +178,8 @@ def compare_result(logger, base_name, target_name, base_result, target_result):
     base_result = base_result.get('result')
     target_result = target_result.get('result')
     result = {}
+    new_tests = 0
+
     if base_result and target_result:
         for k in base_result:
             base_testcase = base_result[k]
@@ -189,6 +191,13 @@ def compare_result(logger, base_name, target_name, base_result, target_result):
                     result[k] = {'base': base_status, 'target': target_status}
             else:
                 logger.error('Failed to retrieved base test case status: %s' % k)
+
+        # Also count new tests that were not present in base results: it
+        # could be newly added tests, but it could also highlights some tests
+        # renames or fixed faulty ptests
+        for k in target_result:
+            if k not in base_result:
+                new_tests += 1
     if result:
         new_pass_count = sum(test['target'] is not None and test['target'].startswith("PASS") for test in result.values())
         # Print a regression report only if at least one test has a regression status (FAIL, SKIPPED, absent...)
@@ -200,10 +209,13 @@ def compare_result(logger, base_name, target_name, base_result, target_result):
             if new_pass_count > 0:
                 resultstring += f'    Additionally, {new_pass_count} previously failing test(s) is/are now passing\n'
         else:
-            resultstring = "Improvement: %s\n             %s\n             (+%d test(s) passing)" % (base_name, target_name, new_pass_count)
+            resultstring = "Improvement: %s\n             %s\n             (+%d test(s) passing)\n" % (base_name, target_name, new_pass_count)
             result = None
     else:
-        resultstring = "Match:       %s\n             %s" % (base_name, target_name)
+        resultstring = "Match:       %s\n             %s\n" % (base_name, target_name)
+
+    if new_tests > 0:
+        resultstring += f'    Additionally, {new_tests} new test(s) is/are present\n'
     return result, resultstring
 
 def get_results(logger, source):

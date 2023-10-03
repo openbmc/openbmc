@@ -10,6 +10,10 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git;b
            file://0001-configure-use-AC_SYS_LARGEFILE.patch \
            file://0002-erofs-replace-l-stat64-by-equivalent-l-stat.patch \
            file://0003-internal.h-Make-LFS-mandatory-for-all-usecases.patch \
+           file://CVE-2023-33551.patch \
+           file://CVE-2023-33552-1.patch \
+           file://CVE-2023-33552-2.patch \
+           file://CVE-2023-33552-3.patch \	
            "
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>(\d+(\.\d+)+))"

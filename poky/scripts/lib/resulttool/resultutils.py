@@ -58,7 +58,11 @@ def append_resultsdata(results, f, configmap=store_map, configvars=extra_configv
             testseries = posixpath.basename(posixpath.dirname(url.path))
         else:
             with open(f, "r") as filedata:
-                data = json.load(filedata)
+                try:
+                    data = json.load(filedata)
+                except json.decoder.JSONDecodeError:
+                    print("Cannot decode {}. Possible corruption. Skipping.".format(f))
+                    data = ""
             testseries = os.path.basename(os.path.dirname(f))
     else:
         data = f

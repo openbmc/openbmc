@@ -470,7 +470,10 @@ def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencie
     # Detect bitbake -b usage
     nodeps = d.getVar("BB_LIMITEDDEPS") or False
     if nodeps or not filterbydependencies:
-        oe.path.symlink(deploydir, subrepo_dir, True)
+        for arch in d.getVar("ALL_MULTILIB_PACKAGE_ARCHS").split() + d.getVar("ALL_MULTILIB_PACKAGE_ARCHS").replace("-", "_").split():
+            target = os.path.join(deploydir + "/" + arch)
+            if os.path.exists(target):
+                oe.path.symlink(target, subrepo_dir + "/" + arch, True)
         return
 
     start = None

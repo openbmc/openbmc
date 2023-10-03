@@ -17,8 +17,8 @@ do_install:append() {
     dtc -I dts -O dtb -o ${D}${TS_INSTALL}/manifest/${SP_UUID}.dtb ${SP_DTS_FILE}
 
     # We do not need libs and headers
-    rm -r --one-file-system ${D}${TS_INSTALL}/lib
-    rm -r --one-file-system ${D}${TS_INSTALL}/include
+    rm -rf --one-file-system ${D}${TS_INSTALL}/lib
+    rm -rf --one-file-system ${D}${TS_INSTALL}/include
 }
 
 # Use Yocto debug prefix maps for compiling assembler.

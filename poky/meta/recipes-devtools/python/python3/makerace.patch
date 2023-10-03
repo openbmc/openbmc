@@ -1,4 +1,4 @@
-From 4f52aaf2a548b3356c6f1369c62b11335dc27464 Mon Sep 17 00:00:00 2001
+From dde5cb74f55b6dd39d25cff639d16940d9dad505 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 13 Jul 2021 23:19:29 +0100
 Subject: [PATCH] python3: Fix make race
@@ -18,11 +18,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 7558f0c..8cec819 100644
+index c6d7e85..205af6c 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2005,7 +2005,7 @@ TESTSUBDIRS=	ctypes/test \
- 		unittest/test unittest/test/testmock
+@@ -2045,7 +2045,7 @@ TESTSUBDIRS=	ctypes/test \
+ 		unittest/test/testmock
  
  TEST_MODULES=@TEST_MODULES@
 -libinstall:	all $(srcdir)/Modules/xxmodule.c

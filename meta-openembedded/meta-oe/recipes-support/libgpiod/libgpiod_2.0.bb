@@ -11,6 +11,8 @@ SRC_URI[sha256sum] = "f74cbf82038b3cb98ebeb25bce55ee2553be28194002d2a9889b9268cc
 
 S = "${WORKDIR}/libgpiod-2.0"
 
+SRC_URI += "file://gpio-tools-test-bats-modify.patch"
+
 # We must enable gpioset-interactive for all gpio-tools tests to pass
 PACKAGECONFIG[tests] = "--enable-tests --enable-gpioset-interactive,--disable-tests,kmod util-linux glib-2.0 catch2 libedit"
 PACKAGECONFIG[gpioset-interactive] = "--enable-gpioset-interactive,--disable-gpioset-interactive,libedit"

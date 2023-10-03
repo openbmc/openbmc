@@ -14,7 +14,7 @@ missing sorting of the list used to generate it. Add such a sort.
 Also ensure the generated unidata.c file is deterministic by sorting the
 keys of the dict.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/grub-devel/2023-06/index.html]
 Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
 ---

@@ -11,14 +11,23 @@ inherit autotools gettext pkgconfig python3native features_check
 
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
-DEPENDS = "cups glib-2.0 libusb xmlto-native intltool-native desktop-file-utils-native"
+DEPENDS = "cups glib-2.0 libusb xmlto-native desktop-file-utils-native autoconf-archive-native"
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
-PACKAGECONFIG[systemd] = ",,systemd"
+PACKAGECONFIG[systemd] = ",--without-systemdsystemunitdir,systemd"
 
 do_configure:prepend() {
     # This file is not provided if fetching from git but required for configure
     touch ${S}/ChangeLog
+}
+
+do_install:append() {
+    for f in __init__.cpython-311.pyc cupshelpers.cpython-311.pyc \
+        config.cpython-311.pyc ppds.cpython-311.pyc \
+        installdriver.cpython-311.pyc openprinting.cpython-311.pyc \
+        xmldriverprefs.cpython-311.pyc; do
+        rm -rf ${D}${PYTHON_SITEPACKAGES_DIR}/cupshelpers/__pycache__/$f
+    done
 }
 
 FILES:${PN} += "${libdir} ${datadir}"

@@ -6,10 +6,6 @@ This repository contains the Arm layers for OpenEmbedded.
 
   This layer contains general recipes for the Arm architecture, such as firmware, FVPs, and Arm-specific integration.
 
-* meta-arm-autonomy
-
-  This layer is the distribution for a reference stack for autonomous systems.
-
 * meta-arm-bsp
 
   This layer contains machines for Arm reference platforms, for example FVP Base, N1SDP, and Juno.

@@ -1991,11 +1991,19 @@ class RunQueueExecute:
                 self.setbuildable(revdep)
                 logger.debug("Marking task %s as buildable", revdep)
 
-        for t in self.sq_deferred.copy():
+        found = None
+        for t in sorted(self.sq_deferred.copy()):
             if self.sq_deferred[t] == task:
-                logger.debug2("Deferred task %s now buildable" % t)
-                del self.sq_deferred[t]
-                update_scenequeue_data([t], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=False)
+                # Allow the next deferred task to run. Any other deferred tasks should be deferred after that task.
+                # We shouldn't allow all to run at once as it is prone to races.
+                if not found:
+                    bb.note("Deferred task %s now buildable" % t)
+                    del self.sq_deferred[t]
+                    update_scenequeue_data([t], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=False)
+                    found = t
+                else:
+                    bb.note("Deferring %s after %s" % (t, found))
+                    self.sq_deferred[t] = found
 
     def task_complete(self, task):
         self.stats.taskCompleted()

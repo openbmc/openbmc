@@ -879,8 +879,7 @@ The build should work without issue.
 As with all solved problems, if they originated upstream, you need to
 submit the fix for the recipe in OE-Core and upstream so that the
 problem is taken care of at its source. See the
-":ref:`dev-manual/changes:submitting a change to the yocto project`"
-section for more information.
+":doc:`../contributor-guide/submit-changes`" section for more information.
 
 Debugging With the GNU Project Debugger (GDB) Remotely
 ======================================================
@@ -1236,9 +1235,7 @@ Here are some other tips that you might find useful:
    :yocto_bugs:`Bugzilla <>`. For information on
    how to submit a bug against the Yocto Project, see the Yocto Project
    Bugzilla :yocto_wiki:`wiki page </Bugzilla_Configuration_and_Bug_Tracking>`
-   and the
-   ":ref:`dev-manual/changes:submitting a defect against the yocto project`"
-   section.
+   and the ":doc:`../contributor-guide/report-defect`" section.
 
    .. note::
 

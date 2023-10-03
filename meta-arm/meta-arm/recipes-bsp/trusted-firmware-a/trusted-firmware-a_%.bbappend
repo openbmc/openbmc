@@ -47,7 +47,10 @@ EXTRA_OEMAKE:append:arm:qemuall = " \
     BL32_RAM_LOCATION=tdram \
     AARCH32_SP=optee \
     "
-
+# When using OP-TEE SPMC specify the SPMC manifest file.
+EXTRA_OEMAKE:append:qemuarm64-secureboot = "${@bb.utils.contains('MACHINE_FEATURES', 'arm-ffa', \
+    'QEMU_TOS_FW_CONFIG_DTS=${S}/plat/qemu/fdts/optee_spmc_manifest.dts', '', d)}"
+     
 do_compile:append:qemuarm64-secureboot() {
     # Create a secure flash image for booting AArch64 Qemu. See:
     # https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git/tree/docs/plat/qemu.rst

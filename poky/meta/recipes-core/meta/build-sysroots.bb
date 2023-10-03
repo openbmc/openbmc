@@ -1,5 +1,6 @@
-INHIBIT_DEFAULT_DEPS = "1"
 LICENSE = "MIT"
+SUMMARY = "Build old style sysroot based on everything in the components directory that matches the current MACHINE"
+INHIBIT_DEFAULT_DEPS = "1"
 
 STANDALONE_SYSROOT = "${STAGING_DIR}/${MACHINE}"
 STANDALONE_SYSROOT_NATIVE = "${STAGING_DIR}/${BUILD_ARCH}"
@@ -16,6 +17,10 @@ deltask configure
 deltask compile
 deltask install
 deltask populate_sysroot
+deltask create_spdx
+deltask collect_spdx_deps
+deltask create_runtime_spdx
+deltask recipe_qa
 
 python do_build_native_sysroot () {
     targetsysroot = d.getVar("STANDALONE_SYSROOT")

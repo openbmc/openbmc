@@ -8,6 +8,7 @@ DEPENDS = "ncurses util-linux virtual/libiconv"
 
 SRC_URI = "${GNU_MIRROR}/parted/parted-${PV}.tar.xz \
            file://fix-doc-mandir.patch \
+           file://0001-fs-Add-libuuid-to-linker-flags-for-libparted-fs-resi.patch \
            file://run-ptest \
            "
 

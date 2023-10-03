@@ -23,8 +23,7 @@ The Yocto Project gladly accepts contributions. You can submit changes
 to the project either by creating and sending pull requests, or by
 submitting patches through email. For information on how to do both as
 well as information on how to identify the maintainer for each area of
-code, see the ":ref:`dev-manual/changes:submitting a change to the yocto project`" section in the
-Yocto Project Development Tasks Manual.
+code, see the :doc:`../contributor-guide/index`.
 
 .. _resources-bugtracker:
 
@@ -46,8 +45,8 @@ your expectations).
 For a general procedure and guidelines on how to use Bugzilla to submit a bug
 against the Yocto Project, see the following:
 
--  The ":ref:`dev-manual/changes:submitting a defect against the yocto project`"
-   section in the Yocto Project Development Tasks Manual.
+-  The ":doc:`../contributor-guide/report-defect`"
+   section in the Yocto Project and OpenEmbedded Contributor Guide.
 
 -  The Yocto Project :yocto_wiki:`Bugzilla wiki page </Bugzilla_Configuration_and_Bug_Tracking>`
 
