@@ -7,9 +7,10 @@ DEPENDS += "autoconf-archive-native \
             systemd \
            "
 SRCREV = "955d140e3caafb8a082a094d4fb6ebd2e3d7782a"
-PACKAGECONFIG ??= "udev"
+PACKAGECONFIG ??= "udev ssh"
 PACKAGECONFIG[udev] = "-Dudev=enabled,-Dudev=disabled,udev"
 PACKAGECONFIG[concurrent-servers] = "-Dconcurrent-servers=true,-Dconcurrent-servers=false,"
+PACKAGECONFIG[ssh] = "-Dssh=enabled,-Dssh=disabled"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
@@ -18,10 +19,14 @@ SRC_URI += "file://${BPN}.conf"
 SRC_URI += "file://dropbear.env"
 
 S = "${WORKDIR}/git"
-SYSTEMD_SERVICE:${PN} += "obmc-console-ssh@.service \
-                obmc-console-ssh.socket \
-                obmc-console@.service \
-                "
+SYSTEMD_SERVICE:${PN} += " obmc-console@.service"
+
+# Include ssh service if `ssh` is in PACKAGECONFIG.
+# Only install the ssh socket if we are not enabling
+#   `concurrent-servers` in PACKAGECONFIG.
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'ssh', 'obmc-console-ssh@.service', '', d)}"
+SSH_SYSTEMD_SOCKET = "${@bb.utils.contains('PACKAGECONFIG', 'ssh', 'obmc-console-ssh.socket', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'concurrent-servers', '', '${SSH_SYSTEMD_SOCKET}', d)}"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-discovery-service
