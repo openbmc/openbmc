@@ -97,9 +97,8 @@ def package_qa_check_shebang_size(path, name, d, elf, messages):
         return
 
     if stanza.startswith(b'#!'):
-        #Shebang not found
         try:
-            stanza = stanza.decode("utf-8")
+            stanza.decode("utf-8")
         except UnicodeDecodeError:
             #If it is not a text file, it is not a script
             return

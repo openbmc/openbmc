@@ -7,14 +7,13 @@ LICENSE = "MIT & LGPL-2.0-or-later & GPL-3.0-only & GPL-2.0-or-later & BSD-3-Cla
 LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 
 SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=main \
-           file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0002-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
            file://0003-tests-util-piglit-shader.c-do-not-hardcode-build-pat.patch \
            file://0001-tests-Fix-narrowing-errors-seen-with-clang.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "5036601c43fff63f7be5cd8ad7b319a5c1f6652c"
+SRCREV = "71c21b1157c4f9a96453bdfcb9f4dda091360afd"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr"
 

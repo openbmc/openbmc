@@ -1,0 +1,51 @@
+From c75965053124149381ada3c394da74be078076cf Mon Sep 17 00:00:00 2001
+From: "G. Branden Robinson" <g.branden.robinson@gmail.com>
+Date: Sat, 16 Sep 2023 16:28:00 -0500
+Subject: [PATCH] [build]: Fix Savannah #64681 (webpage.ps deps).
+
+* doc/doc.am (doc/webpage.ps, doc/webpage.html): Update and parallelize
+  target dependencies.  Resolve race by requiring "grn" and "soelim" to
+  be built first.  Also add dependency on `$(TMAC_PACKAGE_MS)`.
+
+Fixes <https://savannah.gnu.org/bugs/?64681>.  Thanks to Alexander
+Kanavin for the report.
+
+ANNOUNCE: Acknowledge Alexander.
+
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ doc/doc.am | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/doc/doc.am b/doc/doc.am
+index cddc51907..d3c9ab6b7 100644
+--- a/doc/doc.am
++++ b/doc/doc.am
+@@ -346,6 +346,9 @@ doc/pic.ps: $(doc_srcdir)/pic.ms eqn pic tbl
+ 	$(GROFF_V)$(MKDIR_P) `dirname $@` \
+ 	&& $(DOC_GROFF) -pet -Tps -ms $(doc_srcdir)/pic.ms >$@
+ 
++# groff(1)'s `-I` implies `-g` and `-s`, so we must depend on grn and
++# soelim even though the document doesn't require them.
++doc/webpage.ps: grn soelim
+ doc/webpage.ps: $(DOC_GNU_EPS) tmac/www.tmac tbl
+ doc/webpage.ps: $(doc_srcdir)/webpage.ms
+ 	$(GROFF_V)$(MKDIR_P) `dirname $@` \
+@@ -365,11 +368,12 @@ doc/pic.html: $(doc_srcdir)/pic.ms
+ 	&& $(DOC_GROFF) -pet -P-Ipic -P-Dimg -P-jpic -Thtml -ms \
+ 	  $(doc_srcdir)/pic.ms > pic.html
+ 
+-doc/webpage.html: tbl
+-doc/webpage.html: tmac/www.tmac
+-doc/webpage.html: $(DOC_GNU_EPS)
++# groff(1)'s `-I` implies `-g` and `-s`, so we must depend on grn and
++# soelim even though the document doesn't require them.
++doc/webpage.html: grn soelim
++doc/webpage.html: $(DOC_GNU_EPS) tmac/www.tmac tbl
+ doc/webpage.html: $(doc_srcdir)/groff.css
+-doc/webpage.html: $(doc_srcdir)/webpage.ms
++doc/webpage.html: $(doc_srcdir)/webpage.ms $(TMAC_PACKAGE_MS)
+ 	$(GROFF_V)$(MKDIR_P) $(doc_builddir) \
+ 	&& cd $(doc_builddir) \
+ 	&& $(DOC_GROFF) -t -I $(doc_srcdir) -P-jwebpage -P-nrb \

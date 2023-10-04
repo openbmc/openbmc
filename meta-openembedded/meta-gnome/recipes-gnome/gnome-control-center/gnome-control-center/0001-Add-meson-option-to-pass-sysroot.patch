@@ -19,7 +19,7 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/meson_options.txt b/meson_options.txt
-index dbca723..af0f871 100644
+index 8ee7b6e0e..7e6adc668 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -1,3 +1,4 @@
@@ -28,28 +28,28 @@ index dbca723..af0f871 100644
  option('ibus', type: 'boolean', value: true, description: 'build with IBus support')
  option('privileged_group', type: 'string', value: 'wheel', description: 'name of group that has elevated permissions')
 diff --git a/panels/background/meson.build b/panels/background/meson.build
-index 69af0cfea..6edcaa5ff 100644
+index 9bf543538..97f1e0117 100644
 --- a/panels/background/meson.build
 +++ b/panels/background/meson.build
 @@ -19,7 +19,7 @@ common_sources = []
  
  enums = 'gdesktop-enums-types'
  enums_header = files(
--  gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
-+  get_option('oe_sysroot') + gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
+-  gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
++  get_option('oe_sysroot') + gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
    'cc-background-item.h'
  )
  
 diff --git a/panels/datetime/meson.build b/panels/datetime/meson.build
-index 3b6f5e197..30b207882 100644
+index 8cb3b63f0..8c5a45e7c 100644
 --- a/panels/datetime/meson.build
 +++ b/panels/datetime/meson.build
-@@ -45,7 +45,7 @@ sources = files(
+@@ -37,7 +37,7 @@ sources = files(
  
  enums = 'gdesktop-enums-types'
  enums_header = files(
--  gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
-+  get_option('oe_sysroot') + gsettings_desktop_dep.get_pkgconfig_variable('prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
+-  gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
++  get_option('oe_sysroot') + gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
    'cc-datetime-panel.h'
  )
  

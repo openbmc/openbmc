@@ -7,6 +7,8 @@ It depends on the native arch's word size.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+
+Upstream-Status: Pending
 ---
  src/mongo/util/stacktrace_posix.cpp | 9 +++++++++
  1 file changed, 9 insertions(+)

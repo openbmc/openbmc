@@ -236,8 +236,11 @@ INHERIT:remove = \"report-error\"
         result = bitbake('selftest-ed', ignore_status=True)
         self.assertEqual(result.status, 0, "Bitbake failed, exit code %s, output %s" % (result.status, result.output))
         lic_dir = get_bb_var('LICENSE_DIRECTORY')
-        self.assertFalse(os.path.isfile(os.path.join(lic_dir, 'selftest-ed/generic_GPL-3.0-or-later')))
-        self.assertTrue(os.path.isfile(os.path.join(lic_dir, 'selftest-ed/generic_GPL-2.0-or-later')))
+        arch = get_bb_var('SSTATE_PKGARCH')
+        filename = os.path.join(lic_dir, arch, 'selftest-ed', 'generic_GPL-3.0-or-later')
+        self.assertFalse(os.path.isfile(filename), msg="License file %s exists and shouldn't" % filename)
+        filename = os.path.join(lic_dir, arch, 'selftest-ed', 'generic_GPL-2.0-or-later')
+        self.assertTrue(os.path.isfile(filename), msg="License file %s doesn't exist" % filename)
 
     def test_setscene_only(self):
         """ Bitbake option to restore from sstate only within a build (i.e. execute no real tasks, only setscene)"""

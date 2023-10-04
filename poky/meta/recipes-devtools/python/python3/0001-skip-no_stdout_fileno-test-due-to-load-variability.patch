@@ -1,0 +1,32 @@
+From 564d8f117fec7e573cbc10323655acefb12d143f Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 15 Sep 2023 08:48:33 -0400
+Subject: [PATCH] skip no_stdout_fileno test due to load variability
+
+Skip test_input_no_stdout_fileno so that it doesn't fail on systems
+under heavy load.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+[YOCTO #15210]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ Lib/test/test_builtin.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/test/test_builtin.py b/Lib/test/test_builtin.py
+index 9078c409cc..615955c057 100644
+--- a/Lib/test/test_builtin.py
++++ b/Lib/test/test_builtin.py
+@@ -2247,6 +2247,7 @@ def test_input_tty_non_ascii_unicode_errors(self):
+         # Check stdin/stdout error handler is used when invoking PyOS_Readline()
+         self.check_input_tty("prompté", b"quux\xe9", "ascii")
+ 
++    @unittest.skip("Test may fail under heavy load")
+     def test_input_no_stdout_fileno(self):
+         # Issue #24402: If stdin is the original terminal but stdout.fileno()
+         # fails, do not use the original stdout file descriptor
+-- 
+2.41.0
+

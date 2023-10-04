@@ -38,16 +38,34 @@ def get_sdk_spdxid(sdk):
     return "SPDXRef-SDK-%s" % sdk
 
 
-def doc_path_by_namespace(spdx_deploy, doc_namespace):
-    return spdx_deploy / "by-namespace" / doc_namespace.replace("/", "_")
+def _doc_path_by_namespace(spdx_deploy, arch, doc_namespace):
+    return spdx_deploy / "by-namespace" / arch / doc_namespace.replace("/", "_")
 
 
-def doc_path_by_hashfn(spdx_deploy, doc_name, hashfn):
-    return spdx_deploy / "by-hash" / hashfn.split()[1] / (doc_name + ".spdx.json")
+def doc_find_by_namespace(spdx_deploy, search_arches, doc_namespace):
+    for pkgarch in search_arches:
+        p = _doc_path_by_namespace(spdx_deploy, pkgarch, doc_namespace)
+        if os.path.exists(p):
+            return p
+    return None
+
+
+def _doc_path_by_hashfn(spdx_deploy, arch, doc_name, hashfn):
+    return (
+        spdx_deploy / "by-hash" / arch / hashfn.split()[1] / (doc_name + ".spdx.json")
+    )
+
+
+def doc_find_by_hashfn(spdx_deploy, search_arches, doc_name, hashfn):
+    for pkgarch in search_arches:
+        p = _doc_path_by_hashfn(spdx_deploy, pkgarch, doc_name, hashfn)
+        if os.path.exists(p):
+            return p
+    return None
 
 
 def doc_path(spdx_deploy, doc_name, arch, subdir):
-    return spdx_deploy / arch/ subdir / (doc_name + ".spdx.json")
+    return spdx_deploy / arch / subdir / (doc_name + ".spdx.json")
 
 
 def write_doc(d, spdx_doc, arch, subdir, spdx_deploy=None, indent=None):
@@ -61,11 +79,13 @@ def write_doc(d, spdx_doc, arch, subdir, spdx_deploy=None, indent=None):
     with dest.open("wb") as f:
         doc_sha1 = spdx_doc.to_json(f, sort_keys=True, indent=indent)
 
-    l = doc_path_by_namespace(spdx_deploy, spdx_doc.documentNamespace)
+    l = _doc_path_by_namespace(spdx_deploy, arch, spdx_doc.documentNamespace)
     l.parent.mkdir(exist_ok=True, parents=True)
     l.symlink_to(os.path.relpath(dest, l.parent))
 
-    l = doc_path_by_hashfn(spdx_deploy, spdx_doc.name, d.getVar("BB_HASHFILENAME"))
+    l = _doc_path_by_hashfn(
+        spdx_deploy, arch, spdx_doc.name, d.getVar("BB_HASHFILENAME")
+    )
     l.parent.mkdir(exist_ok=True, parents=True)
     l.symlink_to(os.path.relpath(dest, l.parent))
 

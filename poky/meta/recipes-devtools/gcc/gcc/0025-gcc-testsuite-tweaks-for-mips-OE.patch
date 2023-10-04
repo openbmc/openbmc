@@ -1,0 +1,233 @@
+From f12acc6a383546d48da3bdfb2f25ca2adb7976d7 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Sun, 13 Aug 2023 10:24:05 +0100
+Subject: [PATCH] gcc testsuite tweaks for mips/OE
+
+Disable loongson-mmi runtine, qemu doesn't appear to fully support them even if some
+of the instruction decoding is there.
+
+Also disable MSA mips runtime extensions. For some reason qemu appears to accept the test
+code when it shouldn't. Our selected MIPS cpu for QEMU doesn't support them.
+
+MIPS is unusual in the gcc testsuite as it uses EFFECTIVE_TARGETS and loops
+multiple times through the vector testsuite. In the case of the two above, we can
+compile/link them but not run them. Even with the runtime disabled, if the code
+marks it as a runtime test, it will elevate itself to that. Setting the default
+target to compile therefore isn't enough.
+
+Therefore add code to downgrade runtime tests to link tests if the hardware
+support isn't there to run them. This avoids thousands of test failures. To do
+this we have to hook downgrade code into the main test runner.
+
+Enable that downgrading for other cases where hardware to run vector extensions is
+unavailable to remove test failures on other architectures too.
+
+Also, for gcc.target tests, add checks on wheter loongson or msa code can
+be run before trying that, allowing downgrading of tests there to work too.
+
+Upstream-Status: Pending
+[Parts of the patch may be able to be split off and acceptable to upstream with
+discussion. Need to investigate why qemu-user passes the 'bad' instructions']
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ gcc/testsuite/gcc.target/mips/mips.exp | 16 +++++++++
+ gcc/testsuite/lib/gcc-dg.exp           | 11 +++++++
+ gcc/testsuite/lib/target-supports.exp  | 45 ++++++++------------------
+ 3 files changed, 41 insertions(+), 31 deletions(-)
+
+diff --git a/gcc/testsuite/gcc.target/mips/mips.exp b/gcc/testsuite/gcc.target/mips/mips.exp
+index 15d574202d3..2cef9709774 100644
+--- a/gcc/testsuite/gcc.target/mips/mips.exp
++++ b/gcc/testsuite/gcc.target/mips/mips.exp
+@@ -709,7 +709,23 @@ proc mips_first_unsupported_option { upstatus } {
+     global mips_option_tests
+     upvar $upstatus status
+ 
++    if { [mips_have_test_option_p status "-mmsa"] } {
++        verbose -log "Found -mmsa"
++	if { ![check_mips_msa_hw_available] } {
++	    verbose -log "No MSA avail"
++	    return "-mmsa"
++	}
++    }
++    if { [mips_have_test_option_p status "-mloongson-mmi"] } {
++        verbose -log "Found -mloonson-mmi"
++        if { ![check_mips_loongson_mmi_hw_available] } {
++	    verbose -log "No MMI avail"
++   	    return "-mloonson-mmi"
++	}
++    }
++
+     foreach { option code } [array get mips_option_tests] {
++
+ 	if { [mips_have_test_option_p status $option] } {
+ 	    regsub -all "\n" $code "\\n\\\n" asm
+ 	    # Use check_runtime from target-supports.exp, which caches
+diff --git a/gcc/testsuite/lib/gcc-dg.exp b/gcc/testsuite/lib/gcc-dg.exp
+index 9d79b9402e9..e0e5cbb1af8 100644
+--- a/gcc/testsuite/lib/gcc-dg.exp
++++ b/gcc/testsuite/lib/gcc-dg.exp
+@@ -240,9 +240,20 @@ proc schedule-cleanups { opts } {
+ 
+ proc gcc-dg-test-1 { target_compile prog do_what extra_tool_flags } {
+     # Set up the compiler flags, based on what we're going to do.
++    global do-what-limit
+ 
+     set options [list]
+ 
++    if [info exists do-what-limit] then {
++        # Demote run tests to $do-what-limit if set
++	switch $do_what {
++	    run {
++    	        set do_what $do-what-limit
++  		set dg-do-what $do-what-limit
++	    }
++        }
++    }
++
+     switch $do_what {
+ 	"preprocess" {
+ 	    set compile_type "preprocess"
+diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
+index 40f71e9ed8b..10e267fa16d 100644
+--- a/gcc/testsuite/lib/target-supports.exp
++++ b/gcc/testsuite/lib/target-supports.exp
+@@ -2155,14 +2155,7 @@ proc check_mips_loongson_mmi_hw_available { } {
+ 	if { !([istarget mips*-*-*]) } {
+ 	    expr 0
+ 	} else {
+-	    check_runtime_nocache mips_loongson_mmi_hw_available {
+-	      #include <loongson-mmiintrin.h>
+-	      int main()
+-	      {
+-		asm volatile ("paddw $f2,$f4,$f6");
+-		return 0;
+-	      }
+-	    } "-mloongson-mmi"
++	    expr 0
+ 	}
+     }]
+ }
+@@ -2176,29 +2169,7 @@ proc check_mips_msa_hw_available { } {
+     if { !([istarget mips*-*-*]) } {
+       expr 0
+     } else {
+-      check_runtime_nocache mips_msa_hw_available {
+-	#if !defined(__mips_msa)
+-	#error "MSA NOT AVAIL"
+-	#else
+-	#if !(((__mips == 64) || (__mips == 32)) && (__mips_isa_rev >= 2))
+-	#error "MSA NOT AVAIL FOR ISA REV < 2"
+-	#endif
+-	#if !defined(__mips_hard_float)
+-	#error "MSA HARD_FLOAT REQUIRED"
+-	#endif
+-	#if __mips_fpr != 64
+-	#error "MSA 64-bit FPR REQUIRED"
+-	#endif
+-	#include <msa.h>
+-
+-	int main()
+-	{
+-	  v8i16 v = __builtin_msa_ldi_h (0);
+-	  v[0] = 0;
+-	  return v[0];
+-	}
+-	#endif
+-      } "-mmsa"
++      expr 0
+     }
+   }]
+ }
+@@ -9187,6 +9158,7 @@ proc is-effective-target-keyword { arg } {
+ 
+ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
+     global dg-do-what-default
++    global do-what-limit
+     global EFFECTIVE_TARGETS
+     global et_index
+ 
+@@ -9194,6 +9166,7 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
+ 	foreach target $EFFECTIVE_TARGETS {
+ 	    set target_flags $flags
+ 	    set dg-do-what-default compile
++            set do-what-limit link
+ 	    set et_index [lsearch -exact $EFFECTIVE_TARGETS $target]
+ 	    if { [info procs add_options_for_${target}] != [list] } {
+ 		set target_flags [add_options_for_${target} "$flags"]
+@@ -9201,8 +9174,10 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
+ 	    if { [info procs check_effective_target_${target}_runtime]
+ 		 != [list] && [check_effective_target_${target}_runtime] } {
+ 		set dg-do-what-default run
++		set do-what-limit run
+ 	    }
+ 	    $runtest $testcases $target_flags ${default-extra-flags}
++	    unset do-what-limit
+ 	}
+     } else {
+ 	set et_index 0
+@@ -10789,6 +10764,7 @@ proc check_effective_target_sigsetjmp {} {
+ proc check_vect_support_and_set_flags { } {
+     global DEFAULT_VECTCFLAGS
+     global dg-do-what-default
++    global do-what-limit
+     global EFFECTIVE_TARGETS
+ 
+     if  [istarget powerpc-*paired*]  {
+@@ -10797,6 +10773,7 @@ proc check_vect_support_and_set_flags { } {
+             set dg-do-what-default run
+         } else {
+             set dg-do-what-default compile
++            set do-what-limit link
+         }
+     } elseif [istarget powerpc*-*-*] {
+         # Skip targets not supporting -maltivec.
+@@ -10821,6 +10798,7 @@ proc check_vect_support_and_set_flags { } {
+                 lappend DEFAULT_VECTCFLAGS "-mcpu=970"
+             }
+             set dg-do-what-default compile
++            set do-what-limit link
+         }
+     } elseif { [istarget i?86-*-*] || [istarget x86_64-*-*] } {
+         lappend DEFAULT_VECTCFLAGS "-msse2"
+@@ -10828,6 +10806,7 @@ proc check_vect_support_and_set_flags { } {
+             set dg-do-what-default run
+         } else {
+             set dg-do-what-default compile
++            set do-what-limit link
+         }
+     } elseif { [istarget mips*-*-*]
+ 	       && [check_effective_target_nomips16] } {
+@@ -10847,6 +10826,7 @@ proc check_vect_support_and_set_flags { } {
+             set dg-do-what-default run
+         } else {
+             set dg-do-what-default compile
++            set do-what-limit link
+         }
+     } elseif [istarget alpha*-*-*] {
+         # Alpha's vectorization capabilities are extremely limited.
+@@ -10860,6 +10840,7 @@ proc check_vect_support_and_set_flags { } {
+             set dg-do-what-default run
+         } else {
+             set dg-do-what-default compile
++            set do-what-limit link
+         }
+     } elseif [istarget ia64-*-*] {
+         set dg-do-what-default run
+@@ -10873,6 +10854,7 @@ proc check_vect_support_and_set_flags { } {
+             set dg-do-what-default run
+         } else {
+             set dg-do-what-default compile
++            set do-what-limit link
+         }
+     } elseif [istarget aarch64*-*-*] {
+         set dg-do-what-default run
+@@ -10897,6 +10879,7 @@ proc check_vect_support_and_set_flags { } {
+         } else {
+ 	    lappend DEFAULT_VECTCFLAGS "-march=z14" "-mzarch"
+             set dg-do-what-default compile
++            set do-what-limit link
+         }
+     } elseif [istarget amdgcn-*-*] {
+         set dg-do-what-default run

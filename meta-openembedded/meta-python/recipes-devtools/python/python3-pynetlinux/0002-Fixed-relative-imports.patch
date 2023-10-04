@@ -6,7 +6,7 @@ Subject: [PATCH] Fixed relative imports
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
 ---
-Upstream-Status: Accepted
+Upstream-Status: Backport [https://github.com/rlisagor/pynetlinux/commit/afb778669efbc658a29e6bdb1c4834fee42931aa]
 
  pynetlinux/__init__.py | 8 ++++----
  pynetlinux/brctl.py    | 2 +-

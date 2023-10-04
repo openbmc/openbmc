@@ -9,6 +9,7 @@ inherit meson pkgconfig vala gobject-introspection
 
 SRC_URI = "${GNOME_MIRROR}/${BPN}/1.4/${BPN}-${PV}.tar.xz \
     file://0001-all-Drop-xmlRecoverMemory.patch \
+    file://0001-build-properly-spell-provide-in-.wrap-files.patch \
 "
 SRC_URI[sha256sum] = "899196b5e66f03b8e25f046a7a658cd2a6851becb83f2d55345ab3281655dc0c"
 

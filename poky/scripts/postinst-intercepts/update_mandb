@@ -9,6 +9,8 @@ set -eu
 CONFIG=$(mktemp --tmpdir update-mandb.XXXXX)
 sed "s:\(\s\)/:\1$D/:g" $D${sysconfdir}/man_db.conf > $CONFIG
 
+mkdir -p $D${localstatedir}/cache/man/
+
 PSEUDO_UNLOAD=1 ${binprefix}qemuwrapper -L $D $D${bindir}/mandb --config-file $CONFIG --create
 
 rm -f $CONFIG

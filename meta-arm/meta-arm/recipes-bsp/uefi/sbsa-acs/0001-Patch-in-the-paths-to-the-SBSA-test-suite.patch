@@ -1,17 +1,16 @@
-From 97eb384fcc66326f93813ff14b998bb7336a4422 Mon Sep 17 00:00:00 2001
+From 3a164d9f17591a545d1eafa629b486d4a1563722 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Thu, 16 Feb 2023 21:53:25 +0000
 Subject: [PATCH] Patch in the paths to the SBSA test suite
 
 Upstream-Status: Inappropriate (required action)
 Signed-off-by: Ross Burton <ross.burton@arm.com>
-
 ---
  ShellPkg/ShellPkg.dsc | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/ShellPkg/ShellPkg.dsc b/ShellPkg/ShellPkg.dsc
-index dd0d88603f..7367c052fc 100644
+index dd0d88603f11..91710c0795dc 100644
 --- a/ShellPkg/ShellPkg.dsc
 +++ b/ShellPkg/ShellPkg.dsc
 @@ -23,6 +23,8 @@

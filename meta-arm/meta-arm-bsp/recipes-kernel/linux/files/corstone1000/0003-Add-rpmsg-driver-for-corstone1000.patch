@@ -1,7 +1,7 @@
-From 9fb971c23d423f593620ed82fb69a7e2cd35986a Mon Sep 17 00:00:00 2001
+From a834f4e143ff647e7677dc60ab57ee5883f3ac8f Mon Sep 17 00:00:00 2001
 From: Emekcan <emekcan.aras@arm.com>
 Date: Wed, 17 Aug 2022 14:21:42 +0100
-Subject: [PATCH 3/6] Add rpmsg driver for corstone1000
+Subject: [PATCH] Add rpmsg driver for corstone1000
 
 Adds rpmsg driver to communicate with external
 system in corstone1000 platform.
@@ -216,6 +216,3 @@ index 000000000000..4a80102669f6
 +MODULE_LICENSE("GPL v2");
 +MODULE_DESCRIPTION("ARM RPMSG Driver");
 +MODULE_AUTHOR("Tushar Khandelwal <tushar.khandelwal@arm.com>");
--- 
-2.39.0
-

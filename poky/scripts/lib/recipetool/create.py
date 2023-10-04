@@ -901,6 +901,7 @@ def create_recipe(args):
                 f.write('%s\n' % line)
                 lastline = line
         log_info_cond('Recipe %s has been created; further editing may be required to make it fully functional' % outfile, args.devtool)
+        tinfoil.modified_files()
 
     if tempsrc:
         if args.keep_temp:

@@ -4,11 +4,13 @@ DefaultDependencies=no
 Conflicts=umount.target
 Requires=nss-lookup.target rpcbind.service
 After=network.target nss-lookup.target rpcbind.service
+ConditionPathExists=@SYSCONFDIR@/exports
 
 [Service]
 EnvironmentFile=-@SYSCONFDIR@/nfs-utils.conf
 ExecStart=@SBINDIR@/rpc.statd -F $STATD_OPTS
 LimitNOFILE=@HIGH_RLIMIT_NOFILE@
+StateDirectory=nfs
 
 [Install]
 WantedBy=multi-user.target

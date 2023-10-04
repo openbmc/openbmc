@@ -63,7 +63,12 @@ class PkgSdk(Sdk):
 
         self.target_pm.install_complementary(self.d.getVar('SDKIMAGE_INSTALL_COMPLEMENTARY'))
 
+        env_bkp = os.environ.copy()
+        os.environ['PATH'] = self.d.expand("${COREBASE}/scripts/nativesdk-intercept") + \
+                             os.pathsep + os.environ["PATH"]
+
         self.target_pm.run_intercepts(populate_sdk='target')
+        os.environ.update(env_bkp)
 
         execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_POST_TARGET_COMMAND"))
 

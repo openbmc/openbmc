@@ -9,8 +9,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
 SECTION = "base"
 
-DEPENDS = "btrfs-tools"
-
 SRC_URI = "git://github.com/kdave/${BPN};branch=master;protocol=https \
     file://0001-change-sysconfig-path-to-etc-default.patch \
     file://0002-add-WantedBy-directive-to-btrfsmaintenance-refresh.s.patch \
@@ -20,11 +18,9 @@ SRCREV = "be42cb6267055d125994abd6927cf3a26deab74c"
 UPSTREAM_CHECK_URI = "https://github.com/kdave/${BPN}/tags"
 UPSTREAM_CHECK_REGEX = "${BPN}/releases/tag/v(?P<pver>\d+(?:\.\d+)*)"
 
-RDEPENDS:${PN} = "bash"
+RDEPENDS:${PN} = "bash btrfs-tools"
 
-S="${WORKDIR}/git"
-
-inherit allarch
+S = "${WORKDIR}/git"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

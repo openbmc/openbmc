@@ -300,6 +300,7 @@ def appendfile(args):
                     perms = '0755'
             install = {args.newfile: (args.targetpath, perms)}
         oe.recipeutils.bbappend_recipe(rd, args.destlayer, {args.newfile: sourcepath}, install, wildcardver=args.wildcard_version, machine=args.machine)
+        tinfoil.modified_files()
         return 0
     else:
         if alternative_pns:
@@ -355,7 +356,7 @@ def appendsrc(args, files, rd, extralines=None):
         copyfiles[newfile] = srcfile
 
     oe.recipeutils.bbappend_recipe(rd, args.destlayer, copyfiles, None, wildcardver=args.wildcard_version, machine=args.machine, extralines=extralines)
-
+    tinfoil.modified_files()
 
 def appendsrcfiles(parser, args):
     recipedata = _parse_recipe(args.recipe, tinfoil)

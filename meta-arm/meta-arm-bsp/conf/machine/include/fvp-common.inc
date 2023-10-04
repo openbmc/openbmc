@@ -23,7 +23,7 @@ EXTRA_IMAGEDEPENDS += "trusted-firmware-a"
 MACHINE_EXTRA_RRECOMMENDS += "ssh-pregen-hostkeys"
 
 TEST_TARGET = "OEFVPTarget"
-TEST_TARGET_IP = "127.0.0.1:8022"
+TEST_TARGET_IP = "127.0.0.1:2222"
 TEST_SUITES:append = " fvp_boot fvp_devices"
 TEST_FVP_DEVICES ?= "rtc watchdog networking virtiorng cpu_hotplug"
 
@@ -32,8 +32,8 @@ FVP_EXE ?= "FVP_Base_RevC-2xAEMvA"
 FVP_CONFIG[bp.ve_sysregs.exit_on_shutdown] ?= "1"
 FVP_CONFIG[bp.virtio_net.enabled] ?= "1"
 FVP_CONFIG[bp.virtio_net.hostbridge.userNetworking] ?= "1"
-# Tell testimage to connect to localhost:8022, and forward that to SSH in the FVP.
-FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] = "8022=22"
+# Tell testimage to connect to localhost:2222, and forward that to SSH in the FVP.
+FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] = "2222=22"
 FVP_CONFIG[cache_state_modelled] ?= "0"
 FVP_CONFIG[bp.secureflashloader.fname] ?= "bl1-fvp.bin"
 FVP_CONFIG[bp.flashloader0.fname] ?= "fip-fvp.bin"

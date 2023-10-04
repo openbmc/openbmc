@@ -4,17 +4,12 @@
 # SPDX-License-Identifier: MIT
 #
 
+import collections
 import os
 
-from subprocess import check_output
 from shutil import rmtree
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.data import skipIfDataVar
-from oeqa.runtime.decorator.package import OEHasPackage
-
-#in the future these lists could be moved outside of module
-errors = ["error", "cannot", "can\'t", "failed"]
 
 common_errors = [
     "(WW) warning, (EE) error, (NI) not implemented, (??) unknown.",
@@ -69,10 +64,8 @@ common_errors = [
     "xf86OpenConsole: Switching VT failed",
     "Failed to read LoaderConfigTimeoutOneShot variable, ignoring: Operation not supported",
     "Failed to read LoaderEntryOneShot variable, ignoring: Operation not supported",
+    "invalid BAR (can't size)",
     ]
-
-video_related = [
-]
 
 x86_common = [
     '[drm:psb_do_init] *ERROR* Debug is',
@@ -105,16 +98,13 @@ ignore_errors = {
     'default' : common_errors,
     'qemux86' : [
         'Failed to access perfctr msr (MSR',
-        'pci 0000:00:00.0: [Firmware Bug]: reg 0x..: invalid BAR (can\'t size)',
         ] + qemux86_common,
     'qemux86-64' : qemux86_common,
     'qemumips' : [
         'Failed to load module "glx"',
-        'pci 0000:00:00.0: [Firmware Bug]: reg 0x..: invalid BAR (can\'t size)',
         'cacheinfo: Failed to find cpu0 device node',
         ] + common_errors,
     'qemumips64' : [
-        'pci 0000:00:00.0: [Firmware Bug]: reg 0x..: invalid BAR (can\'t size)',
         'cacheinfo: Failed to find cpu0 device node',
          ] + common_errors,
     'qemuppc' : [
@@ -206,17 +196,19 @@ ignore_errors = {
         ] + common_errors,
 }
 
-log_locations = ["/var/log/","/var/log/dmesg", "/tmp/dmesg_output.log"]
-
 class ParseLogsTest(OERuntimeTestCase):
+
+    # Which log files should be collected
+    log_locations = ["/var/log/", "/var/log/dmesg", "/tmp/dmesg_output.log"]
+
+    # The keywords that identify error messages in the log files
+    errors = ["error", "cannot", "can't", "failed"]
 
     @classmethod
     def setUpClass(cls):
-        cls.errors = errors
-
         # When systemd is enabled we need to notice errors on
         # circular dependencies in units.
-        if 'systemd' in cls.td.get('DISTRO_FEATURES', ''):
+        if 'systemd' in cls.td.get('DISTRO_FEATURES'):
             cls.errors.extend([
                 'Found ordering cycle on',
                 'Breaking ordering cycle by deleting job',
@@ -224,48 +216,13 @@ class ParseLogsTest(OERuntimeTestCase):
                 'Ordering cycle found, skipping',
                 ])
 
-        cls.ignore_errors = ignore_errors
-        cls.log_locations = log_locations
-        cls.msg = ''
-        is_lsb, _ = cls.tc.target.run("which LSB_Test.sh")
-        if is_lsb == 0:
-            for machine in cls.ignore_errors:
-                cls.ignore_errors[machine] = cls.ignore_errors[machine] \
-                                             + video_related
+        cls.errors = [s.casefold() for s in cls.errors]
 
-    def getMachine(self):
-        return self.td.get('MACHINE', '')
-
-    def getWorkdir(self):
-        return self.td.get('WORKDIR', '')
-
-    # Get some information on the CPU of the machine to display at the
-    # beginning of the output. This info might be useful in some cases.
-    def getHardwareInfo(self):
-        hwi = ""
-        cmd = ('cat /proc/cpuinfo | grep "model name" | head -n1 | '
-               " awk 'BEGIN{FS=\":\"}{print $2}'")
-        _, cpu_name = self.target.run(cmd)
-
-        cmd = ('cat /proc/cpuinfo | grep "cpu cores" | head -n1 | '
-               "awk {'print $4'}")
-        _, cpu_physical_cores = self.target.run(cmd)
-
-        cmd = 'cat /proc/cpuinfo | grep "processor" | wc -l'
-        _, cpu_logical_cores = self.target.run(cmd)
-
-        _, cpu_arch = self.target.run('uname -m')
-
-        hwi += 'Machine information: \n'
-        hwi += '*******************************\n'
-        hwi += 'Machine name: ' + self.getMachine() + '\n'
-        hwi += 'CPU: ' + str(cpu_name) + '\n'
-        hwi += 'Arch: ' + str(cpu_arch)+ '\n'
-        hwi += 'Physical cores: ' + str(cpu_physical_cores) + '\n'
-        hwi += 'Logical cores: ' + str(cpu_logical_cores) + '\n'
-        hwi += '*******************************\n'
-
-        return hwi
+        try:
+            cls.ignore_errors = [s.casefold() for s in ignore_errors[cls.td.get('MACHINE')]]
+        except KeyError:
+            cls.logger.info('No ignore list found for this machine, using default')
+            cls.ignore_errors = [s.casefold() for s in ignore_errors['default']]
 
     # Go through the log locations provided and if it's a folder
     # create a list with all the .log files in it, if it's a file
@@ -273,23 +230,23 @@ class ParseLogsTest(OERuntimeTestCase):
     def getLogList(self, log_locations):
         logs = []
         for location in log_locations:
-            status, _ = self.target.run('test -f ' + str(location))
+            status, _ = self.target.run('test -f %s' % location)
             if status == 0:
-                logs.append(str(location))
+                logs.append(location)
             else:
-                status, _ = self.target.run('test -d ' + str(location))
+                status, _ = self.target.run('test -d %s' % location)
                 if status == 0:
-                    cmd = 'find ' + str(location) + '/*.log -maxdepth 1 -type f'
+                    cmd = 'find %s -name \\*.log -maxdepth 1 -type f' % location
                     status, output = self.target.run(cmd)
                     if status == 0:
                         output = output.splitlines()
                         for logfile in output:
-                            logs.append(os.path.join(location, str(logfile)))
+                            logs.append(os.path.join(location, logfile))
         return logs
 
     # Copy the log files to be parsed locally
     def transfer_logs(self, log_list):
-        workdir = self.getWorkdir()
+        workdir = self.td.get('WORKDIR')
         self.target_logs = workdir + '/' + 'target_logs'
         target_logs = self.target_logs
         if os.path.exists(target_logs):
@@ -306,65 +263,55 @@ class ParseLogsTest(OERuntimeTestCase):
         logs = [f for f in dir_files if os.path.isfile(f)]
         return logs
 
-    # Build the grep command to be used with filters and exclusions
-    def build_grepcmd(self, errors, ignore_errors, log):
-        grepcmd = 'grep '
-        grepcmd += '-Ei "'
-        for error in errors:
-            grepcmd += r'\<' + error + r'\>' + '|'
-        grepcmd = grepcmd[:-1]
-        grepcmd += '" ' + str(log) + " | grep -Eiv \'"
+    def get_context(self, lines, index, before=6, after=3):
+        """
+        Given a set of lines and the index of the line that is important, return
+        a number of lines surrounding that line.
+        """
+        last = len(lines)
 
-        try:
-            errorlist = ignore_errors[self.getMachine()]
-        except KeyError:
-            self.msg += 'No ignore list found for this machine, using default\n'
-            errorlist = ignore_errors['default']
+        start = index - before
+        end = index + after + 1
 
-        for ignore_error in errorlist:
-            ignore_error = ignore_error.replace('(', r'\(')
-            ignore_error = ignore_error.replace(')', r'\)')
-            ignore_error = ignore_error.replace("'", '.')
-            ignore_error = ignore_error.replace('?', r'\?')
-            ignore_error = ignore_error.replace('[', r'\[')
-            ignore_error = ignore_error.replace(']', r'\]')
-            ignore_error = ignore_error.replace('*', r'\*')
-            ignore_error = ignore_error.replace('0-9', '[0-9]')
-            grepcmd += ignore_error + '|'
-        grepcmd = grepcmd[:-1]
-        grepcmd += "\'"
+        if start < 0:
+            end -= start
+            start = 0
+        if end > last:
+            start -= end - last
+            end = last
 
-        return grepcmd
+        return lines[start:end]
 
-    # Grep only the errors so that their context could be collected.
-    # Default context is 10 lines before and after the error itself
-    def parse_logs(self, errors, ignore_errors, logs,
-                   lines_before = 10, lines_after = 10):
-        results = {}
-        rez = []
-        grep_output = ''
+    def test_get_context(self):
+        """
+        A test case for the test case.
+        """
+        lines = list(range(0,10))
+        self.assertEqual(self.get_context(lines, 0, 2, 1), [0, 1, 2, 3])
+        self.assertEqual(self.get_context(lines, 5, 2, 1), [3, 4, 5, 6])
+        self.assertEqual(self.get_context(lines, 9, 2, 1), [6, 7, 8, 9])
+
+    def parse_logs(self, logs, lines_before=10, lines_after=10):
+        """
+        Search the log files @logs looking for error lines (marked by
+        @self.errors), ignoring anything listed in @self.ignore_errors.
+
+        Returns a dictionary of log filenames to a dictionary of error lines to
+        the error context (controlled by @lines_before and @lines_after).
+        """
+        results = collections.defaultdict(dict)
 
         for log in logs:
-            result = None
-            thegrep = self.build_grepcmd(errors, ignore_errors, log)
+            with open(log) as f:
+                lines = f.readlines()
 
-            try:
-                result = check_output(thegrep, shell=True).decode('utf-8')
-            except:
-                pass
+            for i, line in enumerate(lines):
+                line = line.strip()
+                line_lower = line.casefold()
 
-            if result is not None:
-                results[log] = {}
-                rez = result.splitlines()
-
-                for xrez in rez:
-                    try:
-                        cmd = ['grep', '-F', xrez, '-B', str(lines_before)]
-                        cmd += ['-A', str(lines_after), log]
-                        grep_output = check_output(cmd).decode('utf-8')
-                    except:
-                        pass
-                    results[log][xrez]=grep_output
+                if any(keyword in line_lower for keyword in self.errors):
+                    if not any(ignore in line_lower for ignore in self.ignore_errors):
+                        results[log][line] = "".join(self.get_context(lines, i, lines_before, lines_after))
 
         return results
 
@@ -377,17 +324,18 @@ class ParseLogsTest(OERuntimeTestCase):
     def test_parselogs(self):
         self.write_dmesg()
         log_list = self.get_local_log_list(self.log_locations)
-        result = self.parse_logs(self.errors, self.ignore_errors, log_list)
-        print(self.getHardwareInfo())
+        result = self.parse_logs(log_list)
+
         errcount = 0
+        self.msg = ""
         for log in result:
             self.msg += 'Log: ' + log + '\n'
             self.msg += '-----------------------\n'
             for error in result[log]:
                 errcount += 1
-                self.msg += 'Central error: ' + str(error) + '\n'
+                self.msg += 'Central error: ' + error + '\n'
                 self.msg +=  '***********************\n'
-                self.msg +=  result[str(log)][str(error)] + '\n'
+                self.msg +=  result[log][error] + '\n'
                 self.msg +=  '***********************\n'
         self.msg += '%s errors found in logs.' % errcount
         self.assertEqual(errcount, 0, msg=self.msg)

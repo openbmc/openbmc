@@ -1,7 +1,7 @@
-From 590bf152e18b3cf7166c7accfc32ed3b2d07bf09 Mon Sep 17 00:00:00 2001
+From a8c295e1ff1d2b1032cc7495f212c56ba9f3e874 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Tue, 27 Sep 2022 10:07:21 +0100
-Subject: [PATCH 5/6] rpmsg: arm: update chrdev to ctrldev registration
+Subject: [PATCH] rpmsg: arm: update chrdev to ctrldev registration
 
 Since "rpmsg: Update rpmsg_chrdev_register_device function",
 there was a replacement of the chrdev driver to ctrldev
@@ -26,6 +26,3 @@ index 5c0dcc8e353d..90bc8df90885 100644
  }
  
  static const struct of_device_id client_of_match[] = {
--- 
-2.39.0
-

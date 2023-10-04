@@ -9,7 +9,7 @@ easiest way to dynamically check for that is looking for
 
 Upstream-Status: Inappropriate [oe-specific]
 
-Signed-off-by: Tim Orling <timothy.t.orlign@intel.com>
+Signed-off-by: Tim Orling <timothy.t.orling@intel.com>
 
 ---
  Lib/ctypes/test/test_find.py | 2 ++

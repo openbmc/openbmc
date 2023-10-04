@@ -1,0 +1,11 @@
+header:
+  version: 14
+
+repos:
+  meta-secure-core:
+    url: https://github.com/Wind-River/meta-secure-core.git
+    layers:
+      meta:
+      meta-signing-key:
+      meta-efi-secure-boot:
+      

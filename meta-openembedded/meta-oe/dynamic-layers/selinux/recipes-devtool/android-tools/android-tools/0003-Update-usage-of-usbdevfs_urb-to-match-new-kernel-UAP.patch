@@ -37,6 +37,8 @@ Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
 Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
 
 ---
+Upstream-Status: Pending
+
  system/core/adb/client/usb_linux.cpp | 24 ++++++++++++++----------
  1 file changed, 14 insertions(+), 10 deletions(-)
 

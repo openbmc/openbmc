@@ -28,7 +28,6 @@ INHIBIT_DEFAULT_DEPS = "1"
 
 COMPATIBLE_HOST = ".*-linux"
 
-PR = "r1"
 
 SRC_URI = "file://COPYING.GPL"
 S = "${WORKDIR}"

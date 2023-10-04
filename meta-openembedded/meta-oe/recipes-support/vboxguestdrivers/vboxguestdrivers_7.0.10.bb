@@ -13,6 +13,7 @@ VBOX_NAME = "VirtualBox-${PV}"
 
 SRC_URI = "http://download.virtualbox.org/virtualbox/${PV}/${VBOX_NAME}.tar.bz2 \
     file://Makefile.utils \
+    file://0001-vbox_fb-fix-kernel-v6.5-build.patch \
 "
 
 SRC_URI[sha256sum] = "0b1e6d8b7f87d017c7fae37f80586acff04f799ffc1d51e995954d6415dee371"

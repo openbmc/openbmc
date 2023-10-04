@@ -429,6 +429,7 @@ def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, srcsubdir_old, src
         newvalues["LIC_FILES_CHKSUM"] = newlicchksum
         _add_license_diff_to_recipe(fullpath, license_diff)
 
+    tinfoil.modified_files()
     try:
         rd = tinfoil.parse_recipe_file(fullpath, False)
     except bb.tinfoil.TinfoilCommandFailed as e:

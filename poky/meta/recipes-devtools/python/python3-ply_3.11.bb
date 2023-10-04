@@ -15,4 +15,4 @@ RDEPENDS:${PN}:class-target += "\
     ${PYTHON_PN}-shell \
 "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

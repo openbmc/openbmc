@@ -1,0 +1,32 @@
+From c5cfb8aa591afd5ad3aedc58fe7f410e89013605 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Fri, 22 Sep 2023 22:59:59 +0000
+Subject: [PATCH] Backport patch from firefox bugzilla to fix compile error for
+ qemuarm with some armv7ve tunes such as 'armv7vethf' and 'armv7vet-vfpv3d16':
+
+| /path/to/build/tmp/work/armv7vet2hf-vfp-poky-linux-gnueabi/mozjs-102/102.5.0-r0/build/js/src/jit/AtomicOperationsGenerated.h:240:17:
+  error: 'asm' operand has impossible constraints
+|  240 |                 asm volatile (
+|      |                 ^~~
+
+Upstream-Status: Submitted [https://bugzilla.mozilla.org/show_bug.cgi?id=1761665]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ js/src/jit/GenerateAtomicOperations.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/src/jit/GenerateAtomicOperations.py b/js/src/jit/GenerateAtomicOperations.py
+index 24b5a191cf..e41948c5af 100644
+--- a/js/src/jit/GenerateAtomicOperations.py
++++ b/js/src/jit/GenerateAtomicOperations.py
+@@ -860,7 +860,7 @@ def generate_atomics_header(c_out):
+ 
+         # Work around a GCC issue on 32-bit x86 by adding MOZ_NEVER_INLINE.
+         # See bug 1756347.
+-        if is_gcc and cpu_arch == "x86":
++        if is_gcc and cpu_arch in ("x86", "arm"):
+             contents = contents.replace("INLINE_ATTR", "MOZ_NEVER_INLINE inline")
+         else:
+             contents = contents.replace("INLINE_ATTR", "inline")

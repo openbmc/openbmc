@@ -373,19 +373,16 @@ class Git(FetchMethod):
             try:
                 # Since clones can be bare, use --absolute-git-dir instead of --show-toplevel
                 output = runfetchcmd("LANG=C %s rev-parse --absolute-git-dir" % ud.basecmd, d, workdir=ud.clonedir)
+                toplevel = output.rstrip()
 
-                toplevel = os.path.abspath(output.rstrip())
-                abs_clonedir = os.path.abspath(ud.clonedir).rstrip('/')
-                # The top level Git directory must either be the clone directory
-                # or a child of the clone directory. Any ancestor directory of
-                # the clone directory is not valid as the Git directory (and
-                # probably belongs to some other unrelated repository), so a
-                # clone is required
-                if os.path.commonprefix([abs_clonedir, toplevel]) != abs_clonedir:
-                    logger.warning("Top level directory '%s' doesn't match expected '%s'. Re-cloning", toplevel, ud.clonedir)
+                if not bb.utils.path_is_descendant(toplevel, ud.clonedir):
+                    logger.warning("Top level directory '%s' is not a descendant of '%s'. Re-cloning", toplevel, ud.clonedir)
                     needs_clone = True
             except bb.fetch2.FetchError as e:
                 logger.warning("Unable to get top level for %s (not a git directory?): %s", ud.clonedir, e)
+                needs_clone = True
+            except FileNotFoundError as e:
+                logger.warning("%s", e)
                 needs_clone = True
 
             if needs_clone:

@@ -23,6 +23,7 @@ IMAGE_OVERHEAD_FACTOR = "1.0"
 IMAGE_ROOTFS_EXTRA_SPACE = "324288"
 # If a particular ptest needs more space, it can be customized:
 #IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-<pn> = "1024288"
+IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-poco = "1024288"
 
 # ptests need more memory than standard to avoid the OOM killer
 QB_MEM = "-m 1024"

@@ -1,0 +1,60 @@
+From d6aff068170e56e6773feba42a463dd8c50bc4ff Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 24 Oct 2021 22:32:50 -0700
+Subject: [PATCH] Add RISCV32 support
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ build/moz.configure/init.configure                             | 3 +++
+ python/mozbuild/mozbuild/configure/constants.py                | 2 ++
+ .../mozbuild/test/configure/test_toolchain_configure.py        | 1 +
+ 3 files changed, 6 insertions(+)
+
+diff --git a/build/moz.configure/init.configure b/build/moz.configure/init.configure
+index 53bbc4203f..2ac40d3d39 100644
+--- a/build/moz.configure/init.configure
++++ b/build/moz.configure/init.configure
+@@ -584,6 +584,9 @@ def split_triplet(triplet, allow_wasi=False):
+     elif cpu.startswith("aarch64"):
+         canonical_cpu = "aarch64"
+         endianness = "little"
++    elif cpu in ("riscv32", "riscv32gc"):
++        canonical_cpu = "riscv32"
++        endianness = "little"
+     elif cpu in ("riscv64", "riscv64gc"):
+         canonical_cpu = "riscv64"
+         endianness = "little"
+diff --git a/python/mozbuild/mozbuild/configure/constants.py b/python/mozbuild/mozbuild/configure/constants.py
+index a36152651d..a6050be5d8 100644
+--- a/python/mozbuild/mozbuild/configure/constants.py
++++ b/python/mozbuild/mozbuild/configure/constants.py
+@@ -51,6 +51,7 @@ CPU_bitness = {
+     "mips64": 64,
+     "ppc": 32,
+     "ppc64": 64,
++    'riscv32': 32,
+     "riscv64": 64,
+     "s390": 32,
+     "s390x": 64,
+@@ -98,6 +99,7 @@ CPU_preprocessor_checks = OrderedDict(
+         ("m68k", "__m68k__"),
+         ("mips64", "__mips64"),
+         ("mips32", "__mips__"),
++        ("riscv32", "__riscv && __riscv_xlen == 32"),
+         ("riscv64", "__riscv && __riscv_xlen == 64"),
+         ("loongarch64", "__loongarch64"),
+         ("sh4", "__sh__"),
+diff --git a/python/mozbuild/mozbuild/test/configure/test_toolchain_configure.py b/python/mozbuild/mozbuild/test/configure/test_toolchain_configure.py
+index c6af3d99d4..7ef02e1a85 100644
+--- a/python/mozbuild/mozbuild/test/configure/test_toolchain_configure.py
++++ b/python/mozbuild/mozbuild/test/configure/test_toolchain_configure.py
+@@ -1325,6 +1325,7 @@ class LinuxCrossCompileToolchainTest(BaseToolchainTest):
+         "m68k-unknown-linux-gnu": big_endian + {"__m68k__": 1},
+         "mips64-unknown-linux-gnuabi64": big_endian + {"__mips64": 1, "__mips__": 1},
+         "mips-unknown-linux-gnu": big_endian + {"__mips__": 1},
++        "riscv32-unknown-linux-gnu": little_endian + {"__riscv": 1, "__riscv_xlen": 32},
+         "riscv64-unknown-linux-gnu": little_endian + {"__riscv": 1, "__riscv_xlen": 64},
+         "sh4-unknown-linux-gnu": little_endian + {"__sh__": 1},
+     }

@@ -1,0 +1,32 @@
+From d6ee50f581b43b16733b8731369b071d609d5048 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Thu, 31 Aug 2023 10:51:54 +0100
+Subject: [PATCH] Handle logging syscall
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status:  Inappropriate [Other]
+---
+ core/arch/arm/kernel/spmc_sp_handler.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/core/arch/arm/kernel/spmc_sp_handler.c b/core/arch/arm/kernel/spmc_sp_handler.c
+index 1f218a0df..0676e8898 100644
+--- a/core/arch/arm/kernel/spmc_sp_handler.c
++++ b/core/arch/arm/kernel/spmc_sp_handler.c
+@@ -1276,7 +1276,12 @@ void spmc_sp_msg_handler(struct thread_smc_args *args,
+ 			handle_console_log(args);
+ 			sp_enter(args, caller_sp);
+ 			break;
+-
++		case 0xdeadbeef:
++			ts_push_current_session(&caller_sp->ts_sess);
++			IMSG("%s", (char *)args->a1);
++			ts_pop_current_session();
++			sp_enter(args, caller_sp);
++			break;
+ 		default:
+ 			EMSG("Unhandled FFA function ID %#"PRIx32,
+ 			     (uint32_t)args->a0);
+-- 
+2.17.1
+

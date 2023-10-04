@@ -1,5 +1,4 @@
 SUMMARY = "Merge machine and distro options to create a basic machine task/package"
-PR = "r83"
 
 #
 # packages which content depend on MACHINE_FEATURES need to be MACHINE_ARCH
@@ -130,7 +129,6 @@ RRECOMMENDS:packagegroup-distro-base = "${DISTRO_EXTRA_RRECOMMENDS}"
 #
 # packages added by machine config
 #
-SUMMARY:packagegroup-machine-base = "${MACHINE} extras"
 SUMMARY:packagegroup-machine-base = "Extra packages required to fully support ${MACHINE} hardware"
 RDEPENDS:packagegroup-machine-base = "${MACHINE_EXTRA_RDEPENDS}"
 RRECOMMENDS:packagegroup-machine-base = "${MACHINE_EXTRA_RRECOMMENDS}"

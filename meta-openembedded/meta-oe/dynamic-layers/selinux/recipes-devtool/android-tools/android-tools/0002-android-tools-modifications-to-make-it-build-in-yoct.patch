@@ -13,6 +13,8 @@ Subject: [PATCH] android-tools: modifications to make it build in yocto
 Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
 
 ---
+Upstream-Status: Pending
+
  debian/external/boringssl/libcrypto.mk         |  1 +
  debian/system/core/append2simg.mk              |  2 +-
  debian/system/core/fastboot.mk                 |  2 +-

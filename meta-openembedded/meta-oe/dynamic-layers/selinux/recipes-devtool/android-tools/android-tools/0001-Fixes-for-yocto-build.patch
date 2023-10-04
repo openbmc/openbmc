@@ -8,6 +8,8 @@ Signed-off-by: JJ Robertson <jrobertson@snapchat.com>
 Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
 
 ---
+Upstream-Status: Pending
+
  system/core/adb/daemon/file_sync_service.cpp | 4 ++--
  system/core/adb/daemon/framebuffer_service.h | 2 --
  system/core/adb/daemon/main.cpp              | 5 +++--

@@ -5,7 +5,6 @@ SECTION = "console/utils"
 
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://version.h;beginline=1;endline=6;md5=2e7c59cb9e57e356ae81f50f4e4dfd99"
-PR = "r3"
 
 DEPENDS += "groff-native"
 

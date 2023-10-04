@@ -1,4 +1,4 @@
-From 858daa5047b00e7d5aa795302a9fad5504c8f0b9 Mon Sep 17 00:00:00 2001
+From 5a4271456104bdf027644c81c3a208cde5cf522e Mon Sep 17 00:00:00 2001
 From: Tim Orling <tim.orling@konsulko.com>
 Date: Thu, 17 Nov 2022 16:33:20 -0800
 Subject: [PATCH] Skip TODO test cases that fail
@@ -47,19 +47,19 @@ index c6ce79c..5e62ad5 100644
  {
      my $str = "http://foo/\xE9";
 diff --git a/t/iri.t b/t/iri.t
-index 2eb64b2..9c663c9 100644
+index cf983d6..884b36e 100644
 --- a/t/iri.t
 +++ b/t/iri.t
 @@ -6,7 +6,7 @@ use Test::More;
  use Config qw( %Config );
  
  if (defined $Config{useperlio}) {
--    plan tests=>26;
-+    plan tests=>24;
+-    plan tests=>30;
++    plan tests=>28;
  } else {
-     plan skip_all=>'this perl doesn\'t support PerlIO layers';
+     plan skip_all=>"this perl doesn't support PerlIO layers";
  }
-@@ -60,17 +60,17 @@ is $u->as_iri, "http://➡.ws/";
+@@ -67,17 +67,17 @@ is $u->as_iri, "http://➡.ws/";
  # draft-duerst-iri-bis.txt examples (section 3.7.1):
  is(URI->new("http://www.example.org/D%C3%BCrst")->as_iri, "http://www.example.org/D\xFCrst");
  is(URI->new("http://www.example.org/D%FCrst")->as_iri, "http://www.example.org/D%FCrst");

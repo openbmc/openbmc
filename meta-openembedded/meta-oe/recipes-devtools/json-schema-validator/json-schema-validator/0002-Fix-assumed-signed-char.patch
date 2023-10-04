@@ -11,7 +11,7 @@ GCC treats char as unsigned resulting in compile errors:
 
 Fix this by specifying signed char.
 
-Upstream-Status: Accepted [https://github.com/pboettch/json-schema-validator/commit/491ac44026e08f31790f5cacffa62e168bb35e32]
+Upstream-Status: Backport [https://github.com/pboettch/json-schema-validator/commit/491ac44026e08f31790f5cacffa62e168bb35e32]
 
 Signed-off-by: Parian Golchin <Parian.Golchin@iris-sensing.com>
 ---

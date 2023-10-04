@@ -26,6 +26,7 @@ SRC_URI = "http://www.libsdl.org/release/SDL-${PV}.tar.gz \
            file://CVE-2019-7638.patch \
            file://CVE-2019-7576.patch \
            file://CVE-2019-13616.patch \
+           file://CVE-2022-34568.patch \
           "
 
 UPSTREAM_CHECK_REGEX = "SDL-(?P<pver>\d+(\.\d+)+)\.tar"

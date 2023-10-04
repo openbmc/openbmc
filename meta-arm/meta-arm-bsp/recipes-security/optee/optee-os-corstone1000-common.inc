@@ -1,3 +1,8 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/files/optee-os/corstone1000:"
+SRC_URI:append = " \
+                  file://0001-Handle-logging-syscall.patch \
+		  "
+
 COMPATIBLE_MACHINE = "corstone1000"
 
 OPTEEMACHINE = "corstone1000"

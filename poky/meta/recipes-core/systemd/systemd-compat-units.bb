@@ -2,7 +2,6 @@ SUMMARY = "Enhances systemd compatilibity with existing SysVinit scripts"
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/systemd"
 LICENSE = "MIT"
 
-PR = "r29"
 
 PACKAGE_WRITE_DEPS += "systemd-systemctl-native"
 

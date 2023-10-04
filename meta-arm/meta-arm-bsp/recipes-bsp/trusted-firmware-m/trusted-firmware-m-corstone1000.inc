@@ -33,6 +33,7 @@ SRC_URI:append:corstone1000 = " \
     file://0003-Platform-Corstone1000-Calculate-the-new-CRC32-value-.patch \
     file://0004-arm-trusted-firmware-m-disable-fatal-warnings.patch \
     file://0005-Platform-corstone1000-add-unique-firmware-GUID.patch \
+    file://0006-Platform-Corstone1000-Enable-Signed-Capsule.patch \
     "
 
 # TF-M ships patches for external dependencies that needs to be applied

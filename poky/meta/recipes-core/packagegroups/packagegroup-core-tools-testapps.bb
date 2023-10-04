@@ -4,7 +4,6 @@
 
 SUMMARY = "Testing tools/applications"
 
-PR = "r2"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

@@ -256,6 +256,31 @@ class DevtoolTestCase(OESelftestTestCase):
         if remaining_removelines:
             self.fail('Expected removed lines not found: %s' % remaining_removelines)
 
+    def _check_runqemu_prerequisites(self):
+        """Check runqemu is available
+
+        Whilst some tests would seemingly be better placed as a runtime test,
+        unfortunately the runtime tests run under bitbake and you can't run
+        devtool within bitbake (since devtool needs to run bitbake itself).
+        Additionally we are testing build-time functionality as well, so
+        really this has to be done as an oe-selftest test.
+        """
+        machine = get_bb_var('MACHINE')
+        if not machine.startswith('qemu'):
+            self.skipTest('This test only works with qemu machines')
+        if not os.path.exists('/etc/runqemu-nosudo'):
+            self.skipTest('You must set up tap devices with scripts/runqemu-gen-tapdevs before running this test')
+        result = runCmd('PATH="$PATH:/sbin:/usr/sbin" ip tuntap show', ignore_status=True)
+        if result.status != 0:
+            result = runCmd('PATH="$PATH:/sbin:/usr/sbin" ifconfig -a', ignore_status=True)
+            if result.status != 0:
+                self.skipTest('Failed to determine if tap devices exist with ifconfig or ip: %s' % result.output)
+        for line in result.output.splitlines():
+            if line.startswith('tap'):
+                break
+        else:
+            self.skipTest('No tap devices found - you must set up tap devices with scripts/runqemu-gen-tapdevs before running this test')
+
     def _test_devtool_add_git_url(self, git_url, version, pn, resulting_src_uri):
         self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
@@ -1616,28 +1641,7 @@ class DevtoolExtractTests(DevtoolBase):
 
     @OETestTag("runqemu")
     def test_devtool_deploy_target(self):
-        # NOTE: Whilst this test would seemingly be better placed as a runtime test,
-        # unfortunately the runtime tests run under bitbake and you can't run
-        # devtool within bitbake (since devtool needs to run bitbake itself).
-        # Additionally we are testing build-time functionality as well, so
-        # really this has to be done as an oe-selftest test.
-        #
-        # Check preconditions
-        machine = get_bb_var('MACHINE')
-        if not machine.startswith('qemu'):
-            self.skipTest('This test only works with qemu machines')
-        if not os.path.exists('/etc/runqemu-nosudo'):
-            self.skipTest('You must set up tap devices with scripts/runqemu-gen-tapdevs before running this test')
-        result = runCmd('PATH="$PATH:/sbin:/usr/sbin" ip tuntap show', ignore_status=True)
-        if result.status != 0:
-            result = runCmd('PATH="$PATH:/sbin:/usr/sbin" ifconfig -a', ignore_status=True)
-            if result.status != 0:
-                self.skipTest('Failed to determine if tap devices exist with ifconfig or ip: %s' % result.output)
-        for line in result.output.splitlines():
-            if line.startswith('tap'):
-                break
-        else:
-            self.skipTest('No tap devices found - you must set up tap devices with scripts/runqemu-gen-tapdevs before running this test')
+        self._check_runqemu_prerequisites()
         self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         # Definitions
         testrecipe = 'mdadm'

@@ -32,6 +32,13 @@ repos:
       meta-oe:
       meta-python:
 
+  meta-secure-core:
+    url: https://github.com/wind-river/meta-secure-core.git
+    layers:
+      meta:
+      meta-signing-key:
+      meta-efi-secure-boot:
+
 local_conf_header:
   base: |
     CONF_VERSION = "2"

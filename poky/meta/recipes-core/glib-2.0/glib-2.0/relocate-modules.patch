@@ -1,4 +1,4 @@
-From 38e401969a2ff8269919cbeacec733a67f041735 Mon Sep 17 00:00:00 2001
+From b90d13900dd2777c2ab90c5b0be1a872c10a17da Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Fri, 11 Mar 2016 15:35:55 +0000
 Subject: [PATCH] glib-2.0: relocate the GIO module directory for native builds
@@ -13,25 +13,28 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Port patch to 2.48
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
 ---
- gio/giomodule.c | 5 -----
- 1 file changed, 5 deletions(-)
+ gio/giomodule.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
 diff --git a/gio/giomodule.c b/gio/giomodule.c
-index 11ce7d8..cc27ecd 100644
+index 17fabe6..8021208 100644
 --- a/gio/giomodule.c
 +++ b/gio/giomodule.c
-@@ -1271,9 +1271,6 @@ get_gio_module_dir (void)
+@@ -1271,11 +1271,6 @@ get_gio_module_dir (void)
        g_free (install_dir);
  #else
        module_dir = g_strdup (GIO_MODULE_DIR);
 -#ifdef __APPLE__
 -#include "TargetConditionals.h"
--#if TARGET_OS_OSX
+-/* Only auto-relocate on macOS, not watchOS etc; older macOS SDKs only define TARGET_OS_MAC */
+-#if (defined (TARGET_OS_OSX) && TARGET_OS_OSX) || \
+-     (!defined (TARGET_OS_OSX) && defined (TARGET_OS_MAC) && TARGET_OS_MAC)
  #include <dlfcn.h>
        {
          g_autofree gchar *path = NULL;
-@@ -1292,8 +1289,6 @@ get_gio_module_dir (void)
+@@ -1294,8 +1289,6 @@ get_gio_module_dir (void)
                }
            }
        }
@@ -40,6 +43,3 @@ index 11ce7d8..cc27ecd 100644
  #endif
      }
  
--- 
-2.30.2
-

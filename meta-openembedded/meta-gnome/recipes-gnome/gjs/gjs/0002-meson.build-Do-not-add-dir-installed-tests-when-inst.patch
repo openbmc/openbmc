@@ -1,7 +1,12 @@
-From 2b8aa1ea4a4d1836164c934b1ab2556a32cb5af7 Mon Sep 17 00:00:00 2001
+From e6889d60891383ce6aa66aa3db30255af58bcf3c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Wed, 27 Oct 2021 20:04:02 +0200
 Subject: [PATCH] meson.build: Do not add dir installed-tests when
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
  installed_tests is false
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,17 +15,18 @@ Content-Transfer-Encoding: 8bit
 Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/690]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  meson.build | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index f5b91e0..3110530 100644
+index 86239a4..11c04e2 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -680,7 +680,9 @@ if not get_option('skip_gtk_tests')
-     have_gtk4 = dependency('gtk4', required: false).found()
- endif
+@@ -681,7 +681,9 @@ endif
+ 
+ ### Tests and test setups ######################################################
  
 -subdir('installed-tests')
 +if get_option('installed_tests')

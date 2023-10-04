@@ -38,7 +38,8 @@ EXTRA_OEMAKE:append = " \
                         NR_OF_IMAGES_IN_FW_BANK=4 \
                         COT=tbbr \
                         ARM_ROTPK_LOCATION=devel_rsa  \
+                        ERRATA_A35_855472=1 \
                         ROT_KEY=plat/arm/board/common/rotpk/arm_rotprivk_rsa.pem \
-                        BL32=${RECIPE_SYSROOT}/lib/firmware/tee-pager_v2.bin \
+                        BL32=${RECIPE_SYSROOT}/${nonarch_base_libdir}/firmware/tee-pager_v2.bin \
                         LOG_LEVEL=50 \
                         "

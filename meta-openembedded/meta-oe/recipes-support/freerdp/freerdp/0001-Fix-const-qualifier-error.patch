@@ -1,0 +1,57 @@
+From 761b4df04a141cc8c9507c741e4046c6c6b00491 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Mon, 11 Sep 2023 09:00:39 +0000
+Subject: [PATCH] Fix const qualifier error
+
+Fixes clang error
+error: incompatible function pointer types assigning to 'OBJECT_NEW_FN' (aka 'void *(*)(void *)') from 'void *(const void *)' [-Wincompatible-function-pointer-types]
+|         obj->fnObjectNew = uwac_event_clone;
+|                          ^ ~~~~~~~~~~~~~~~~
+
+https://github.com/FreeRDP/FreeRDP/commit/6e3c00725aae99d03a0baa65430eceddebd9dee8
+Upstream-Status: Backport
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ libfreerdp/codec/rfx.c            | 4 ++--
+ winpr/include/winpr/collections.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libfreerdp/codec/rfx.c b/libfreerdp/codec/rfx.c
+index ccbc5af..eec7365 100644
+--- a/libfreerdp/codec/rfx.c
++++ b/libfreerdp/codec/rfx.c
+@@ -153,7 +153,7 @@ static void rfx_tile_init(void* obj)
+ 	}
+ }
+ 
+-static void* rfx_decoder_tile_new(void* val)
++static void* rfx_decoder_tile_new(const void* val)
+ {
+ 	RFX_TILE* tile = NULL;
+ 	WINPR_UNUSED(val);
+@@ -184,7 +184,7 @@ static void rfx_decoder_tile_free(void* obj)
+ 	}
+ }
+ 
+-static void* rfx_encoder_tile_new(void* val)
++static void* rfx_encoder_tile_new(const void* val)
+ {
+ 	WINPR_UNUSED(val);
+ 	return calloc(1, sizeof(RFX_TILE));
+diff --git a/winpr/include/winpr/collections.h b/winpr/include/winpr/collections.h
+index 807f011..b8c8d9d 100644
+--- a/winpr/include/winpr/collections.h
++++ b/winpr/include/winpr/collections.h
+@@ -36,7 +36,7 @@ extern "C"
+ {
+ #endif
+ 
+-	typedef void* (*OBJECT_NEW_FN)(void* val);
++	typedef void* (*OBJECT_NEW_FN)(const void* val);
+ 	typedef void (*OBJECT_INIT_FN)(void* obj);
+ 	typedef void (*OBJECT_UNINIT_FN)(void* obj);
+ 	typedef void (*OBJECT_FREE_FN)(void* obj);
+-- 
+2.34.1
+

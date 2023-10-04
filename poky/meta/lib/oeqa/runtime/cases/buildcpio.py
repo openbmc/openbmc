@@ -14,7 +14,7 @@ class BuildCpioTest(OERuntimeTestCase):
 
     @classmethod
     def setUpClass(cls):
-        uri = 'https://downloads.yoctoproject.org/mirror/sources/cpio-2.13.tar.gz'
+        uri = 'https://downloads.yoctoproject.org/mirror/sources/cpio-2.14.tar.gz'
         cls.project = TargetBuildProject(cls.tc.target,
                                          uri,
                                          dl_dir = cls.tc.td['DL_DIR'])

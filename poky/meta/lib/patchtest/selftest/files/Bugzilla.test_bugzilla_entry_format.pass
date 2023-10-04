@@ -1,0 +1,25 @@
+From fdfd605e565d874502522c4b70b786c8c5aa0bad Mon Sep 17 00:00:00 2001
+From: name@somedomain.com <email@address.com>
+Date: Fri, 17 Feb 2017 16:29:21 -0600
+Subject: [PATCH] README: adds 'foo' to the header
+
+This test patch adds 'foo' to the header
+
+[YOCTO #1234]
+
+Signed-off-by: Daniela Plascencia <daniela.plascencia@linux.intel.com>
+---
+ README | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/README b/README
+index 521916cd4f..cdf29dcea3 100644
+--- a/README
++++ b/README
+@@ -1,3 +1,4 @@
++**** FOO ****
+ OpenEmbedded-Core
+ =================
+
+--
+2.11.0

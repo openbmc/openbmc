@@ -9,6 +9,8 @@ SRC_URI = "https://www.jwz.org/${BPN}/${BP}.tar.gz \
     file://0002-build-Do-not-build-po-files.patch \
     file://0001-configure-Ignore-CONF_STATUS-for-gtk-and-openGL-need.patch \
 "
+MIRRORS += "https://www.jwz.org/${BPN} https://ftp.osuosl.org/pub/blfs/conglomeration/${BPN}"
+
 SRC_URI[sha256sum] = "787014b29f0c5793ecc2d93e1109a049ff48ab0c29b851dab34f683ceef6b152"
 
 DEPENDS = "intltool-native libx11 libxext libxt libxft libxi glib-2.0-native bc-native libpam jpeg"

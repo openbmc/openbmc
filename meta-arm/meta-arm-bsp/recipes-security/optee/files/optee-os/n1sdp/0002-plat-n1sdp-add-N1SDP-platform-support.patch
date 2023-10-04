@@ -1,14 +1,15 @@
-Upstream-Status: Pending [Not submitted to upstream yet]
-Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
-
-From 22ba7c7789082dbc179921962cdcadece4499c89 Mon Sep 17 00:00:00 2001
+From 33d86d23bcf2bbcb191e33e3130c3429650b9204 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Thu, 30 Jun 2022 18:36:26 +0100
 Subject: [PATCH] plat-n1sdp: add N1SDP platform support
 
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+
 These changes are to add N1SDP platform to optee-os
 
 Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Mariam Elshakfy <mariam.elshakfy@arm.com>
 
 diff --git a/core/arch/arm/plat-n1sdp/conf.mk b/core/arch/arm/plat-n1sdp/conf.mk
 new file mode 100644
@@ -59,10 +60,10 @@ index 00000000..06b4975a
 +$(call force,CFG_CORE_ARM64_PA_BITS,36)
 diff --git a/core/arch/arm/plat-n1sdp/main.c b/core/arch/arm/plat-n1sdp/main.c
 new file mode 100644
-index 00000000..cfb7f19b
+index 00000000..39360711
 --- /dev/null
 +++ b/core/arch/arm/plat-n1sdp/main.c
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,53 @@
 +// SPDX-License-Identifier: BSD-2-Clause
 +/*
 + * Copyright (c) 2022, Arm Limited.
@@ -72,8 +73,6 @@ index 00000000..cfb7f19b
 +#include <console.h>
 +#include <drivers/gic.h>
 +#include <drivers/pl011.h>
-+#include <drivers/tpm2_mmio.h>
-+#include <drivers/tpm2_ptp_fifo.h>
 +#include <drivers/tzc400.h>
 +#include <initcall.h>
 +#include <keep.h>
@@ -92,7 +91,6 @@ index 00000000..cfb7f19b
 +#include <string.h>
 +#include <trace.h>
 +
-+static struct gic_data gic_data __nex_bss;
 +static struct pl011_data console_data __nex_bss;
 +
 +register_phys_mem_pgdir(MEM_AREA_IO_SEC, CONSOLE_UART_BASE, PL011_REG_SIZE);
@@ -105,19 +103,12 @@ index 00000000..cfb7f19b
 +
 +void main_init_gic(void)
 +{
-+	gic_init_base_addr(&gic_data, GICC_BASE,
-+			   GICD_BASE);
-+	itr_init(&gic_data.chip);
++	gic_init(GICC_BASE, GICD_BASE);
 +}
 +
 +void main_secondary_init_gic(void)
 +{
-+	gic_cpu_init(&gic_data);
-+}
-+
-+void itr_core_handler(void)
-+{
-+	gic_it_handle(&gic_data);
++	gic_cpu_init();
 +}
 +
 +void console_init(void)
@@ -230,4 +221,3 @@ index 00000000..a0b49da1
 +srcs-y	+= n1sdp_core_pos.S
 -- 
 2.17.1
-

@@ -1,6 +1,6 @@
 From dc3652c0abcdf8573fd044907b19d8eda7ca1124 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Wed, 20 Oct 2021 12:49:58 -0700
+Date: Mon, 3 Jul 2023 12:33:16 +0000
 Subject: [PATCH] [liftoff] Correct function signatures
 
 Fixes builds on mips where clang reports an error
@@ -13,16 +13,15 @@ Upstream-Status: Submitted [https://chromium-review.googlesource.com/c/v8/v8/+/3
 Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
 ---
  deps/v8/src/wasm/baseline/liftoff-assembler.h               | 6 +++---
- deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h     | 2 +-
  deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h | 2 +-
- .../src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h   | 2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
+ deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/deps/v8/src/wasm/baseline/liftoff-assembler.h b/deps/v8/src/wasm/baseline/liftoff-assembler.h
-index 22c7f73a..db4cb168 100644
+index aef63c64..f2a11b01 100644
 --- a/deps/v8/src/wasm/baseline/liftoff-assembler.h
 +++ b/deps/v8/src/wasm/baseline/liftoff-assembler.h
-@@ -646,7 +646,7 @@ class LiftoffAssembler : public TurboAssembler {
+@@ -717,7 +717,7 @@ class LiftoffAssembler : public MacroAssembler {
    void FinishCall(const ValueKindSig*, compiler::CallDescriptor*);
  
    // Move {src} into {dst}. {src} and {dst} must be different.
@@ -31,7 +30,7 @@ index 22c7f73a..db4cb168 100644
  
    // Parallel register move: For a list of tuples <dst, src, kind>, move the
    // {src} register of kind {kind} into {dst}. If {src} equals {dst}, ignore
-@@ -795,8 +795,8 @@ class LiftoffAssembler : public TurboAssembler {
+@@ -884,8 +884,8 @@ class LiftoffAssembler : public MacroAssembler {
    inline void MoveStackValue(uint32_t dst_offset, uint32_t src_offset,
                               ValueKind);
  
@@ -42,24 +41,11 @@ index 22c7f73a..db4cb168 100644
  
    inline void Spill(int offset, LiftoffRegister, ValueKind);
    inline void Spill(int offset, WasmValue);
-diff --git a/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h b/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
-index c76fd2f4..0fffe231 100644
---- a/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
-+++ b/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
-@@ -661,7 +661,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
-     pinned = pinned | LiftoffRegList{dst_op.rm(), src};
-     LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
-     // Save original value.
--    Move(tmp, src, type.value_type());
-+    Move(tmp, src, type.value_type().kind());
- 
-     src = tmp;
-     pinned.set(tmp);
 diff --git a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
-index 36413545..48207337 100644
+index 96cba24c..53e1842d 100644
 --- a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
 +++ b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
-@@ -593,7 +593,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
+@@ -592,7 +592,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
      pinned.set(dst_op.rm());
      LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
      // Save original value.
@@ -68,11 +54,11 @@ index 36413545..48207337 100644
  
      src = tmp;
      pinned.set(tmp);
-diff --git a/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h b/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
-index 642a7d2a..56ffcc2a 100644
---- a/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
-+++ b/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
-@@ -589,7 +589,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
+diff --git a/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h b/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h
+index 1d6ae09e..397e82b2 100644
+--- a/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h
++++ b/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h
+@@ -286,7 +286,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
      pinned.set(dst_op.rm());
      LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
      // Save original value.
@@ -82,4 +68,4 @@ index 642a7d2a..56ffcc2a 100644
      src = tmp;
      pinned.set(tmp);
 --
-2.34.1
+2.40.0

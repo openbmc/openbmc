@@ -54,6 +54,7 @@ COMPATIBLE_HOST:linux-muslx32 = "null"
 COMPATIBLE_HOST:powerpc = "null"
 COMPATIBLE_HOST:powerpc64 = "null"
 COMPATIBLE_HOST:mipsarchn32 = "null"
+COMPATIBLE_HOST:riscv32 = "null"
 
 ARM_INSTRUCTION_SET:armv4 = "arm"
 ARM_INSTRUCTION_SET:armv5 = "arm"

@@ -1,0 +1,80 @@
+From e5acd475f796420b4887969f2b0057dbf67979b3 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 18 Sep 2023 02:47:55 +0200
+Subject: [PATCH] tracker: fix reproducibility issue
+
+Tracker's design seems to be strictly for non-cross builds and leaks buildpaths into the
+binaries at various places. Avoid this to improve binary reproducibility.
+
+todo: Some of these paths may need to be adjusted to make the test environment work
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build                       | 6 +++---
+ src/libtracker-common/meson.build | 4 ++--
+ src/libtracker-sparql/meson.build | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 8442a216f..82844d7fd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -348,7 +348,7 @@ have_rtld_noload = cc.has_header_symbol('dlfcn.h', 'RTLD_NOLOAD')
+ conf.set('HAVE_RTLD_NOLOAD', have_rtld_noload)
+ 
+ # Config that goes in some other generated files (.desktop, .service, etc)
+-conf.set('abs_top_builddir', meson.current_build_dir())
++conf.set('abs_top_builddir', '/usr/src/debug/tracker')
+ conf.set('libexecdir', join_paths(get_option('prefix'), get_option('libexecdir')))
+ 
+ configure_file(input: 'config.h.meson.in',
+@@ -388,8 +388,8 @@ subdir('docs')
+ subdir('utils')
+ 
+ test_c_args = tracker_c_args + [
+-    '-DTOP_BUILDDIR="@0@"'.format(build_root),
+-    '-DTOP_SRCDIR="@0@"'.format(source_root),
++    '-DTOP_BUILDDIR="@0@/"'.format('/usr/src/debug/tracker'),
++    '-DTOP_SRCDIR="@0@/"'.format('/usr/src/debug/tracker'),
+ ]
+ 
+ tracker_uninstalled_cli_dir = join_paths(meson.current_build_dir(), 'src', 'tracker')
+diff --git a/src/libtracker-common/meson.build b/src/libtracker-common/meson.build
+index 9355d1c0d..cdbc05f28 100644
+--- a/src/libtracker-common/meson.build
++++ b/src/libtracker-common/meson.build
+@@ -51,10 +51,10 @@ libtracker_common = static_library('tracker-common',
+   dependencies: [tracker_common_dependencies, gmodule],
+   c_args: [
+     '-DPRIVATE_LIBDIR="@0@"'.format(tracker_internal_libs_dir),
+-    '-DBUILD_LIBDIR="@0@"'.format(meson.current_build_dir()),
++    '-DBUILD_LIBDIR="@0@"'.format('/usr/src/debug/tracker'),
+     # Global build root is required to detect noinst situations (tests/introspection),
+     # event when built as a subproject
+-    '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
++    '-DBUILDROOT="@0@"'.format('/usr/src/debug/tracker'),
+   ] + tracker_c_args,
+   include_directories: [configinc, srcinc],
+   gnu_symbol_visibility: 'hidden',
+diff --git a/src/libtracker-sparql/meson.build b/src/libtracker-sparql/meson.build
+index 36288f5c3..61086a697 100644
+--- a/src/libtracker-sparql/meson.build
++++ b/src/libtracker-sparql/meson.build
+@@ -96,10 +96,10 @@ libtracker_sparql_private = static_library('tracker-sparql-private',
+     c_args: [
+ 	'-include', 'libtracker-sparql/tracker-private.h',
+         '-DPRIVATE_LIBDIR="@0@"'.format(tracker_internal_libs_dir),
+-        '-DBUILD_LIBDIR="@0@"'.format(meson.current_build_dir()),
++        '-DBUILD_LIBDIR="@0@"'.format('/usr/src/debug/tracker'),
+         # Global build root is required to detect noinst situations (tests/introspection),
+         # event when built as a subproject
+-        '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
++        '-DBUILDROOT="@0@"'.format('/usr/src/debug/tracker'),
+     ] + tracker_c_args,
+ 
+     dependencies: [libtracker_sparql_dependencies, gvdb_dep],
+-- 
+2.41.0
+

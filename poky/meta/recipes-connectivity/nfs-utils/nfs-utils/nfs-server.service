@@ -18,6 +18,7 @@ ExecStopPost=@SBINDIR@/exportfs -au
 ExecStopPost=@SBINDIR@/exportfs -f
 ExecReload=@SBINDIR@/exportfs -r
 RemainAfterExit=yes
+StateDirectory=nfs
 
 [Install]
 WantedBy=multi-user.target

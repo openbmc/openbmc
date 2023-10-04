@@ -54,6 +54,7 @@ FILES:${PN} = "${libdir}/lib*${SOLIBS} \
                ${libdir}/gio \
                ${libexecdir}/*gio-querymodules \
                ${libexecdir}/*gio-launch-desktop \
+               ${datadir}/glib-2.0/dtds \
                ${datadir}/glib-2.0/schemas"
 
 FILES:${PN}-utils += "${bindir}/glib-genmarshal \
@@ -133,7 +134,13 @@ do_install:append:class-target () {
         # https://gitlab.gnome.org/GNOME/glib/-/issues/2810
         rm -f ${D}${datadir}/installed-tests/glib/thread-pool-slow.test
 }
-
+do_install:append:class-target:libc-musl () {
+        # Remove failing tests on musl libc systems, this helps set baseline for musl testing
+        # they remain to be rootcaused and fixed but marked known failures here.
+        for t in convert.test collate.test gdatetime.test date.test converter-stream.test option-context.test; do
+                rm -rf ${D}${datadir}/installed-tests/glib/$t
+        done
+}
 # As we do not build python3 for windows, makes no sense to ship the script that's using it
 do_install:append:mingw32() {
         rm -f ${D}${bindir}/gtester-report
@@ -170,6 +177,12 @@ RDEPENDS:${PN}-ptest += "\
             python3-modules \
             ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'python3-dbusmock', '', d)} \
             ${PN}-codegen \
+            locale-base-de-de \
+            locale-base-es-es \
+            locale-base-en-gb \
+            locale-base-en-us \
+            locale-base-fr-fr \
+            locale-base-ru-ru \
            "
 
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\
@@ -184,18 +197,12 @@ RDEPENDS:${PN}-ptest:append:libc-glibc = "\
             glibc-gconv-iso8859-15 \
             glibc-charmap-invariant \
             glibc-localedata-translit-cjk-variants \
-            locale-base-tr-tr \
             locale-base-lt-lt \
             locale-base-ja-jp.euc-jp \
             locale-base-fa-ir \
-            locale-base-ru-ru \
-            locale-base-de-de \
             locale-base-hr-hr \
             locale-base-el-gr \
-            locale-base-fr-fr \
-            locale-base-es-es \
-            locale-base-en-gb \
-            locale-base-en-us \
             locale-base-pl-pl \
             locale-base-pl-pl.iso-8859-2 \
+            locale-base-tr-tr \
            "

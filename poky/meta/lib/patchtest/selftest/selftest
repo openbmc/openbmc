@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+
+# Test every patch from files folder and output error on failure
+#
+# Copyright (C) 2016 Intel Corporation
+#
+# SPDX-License-Identifier: GPL-2.0
+
+import os
+import subprocess
+import sys
+
+currentdir = os.path.dirname(os.path.abspath(__file__))
+patchesdir = os.path.join(currentdir, 'files')
+topdir     = os.path.dirname(currentdir)
+parentdir  = os.path.dirname(topdir)
+
+# path to the repo root
+repodir = os.path.dirname(os.path.dirname(parentdir))
+
+def print_results(passcount, skipcount, failcount, xpasscount, xfailcount, errorcount):
+    total = passcount + skipcount + failcount + xpasscount + xfailcount + errorcount
+    print("============================================================================")
+    print("Testsuite summary for %s" % os.path.basename(topdir))
+    print("============================================================================")
+    print("# TOTAL: %s" % str(total))
+    print("# XPASS: %s" % str(xpasscount))
+    print("# XFAIL: %s" % str(xfailcount))
+    print("# PASS: %s" % str(passcount))
+    print("# FAIL: %s" % str(failcount))
+    print("# SKIP: %s" % str(skipcount))
+    print("# ERROR: %s" % str(errorcount))
+    print("============================================================================")
+
+# Once the tests are in oe-core, we can remove the testdir param and use os.path.dirname to get relative paths
+def test(root, patch):
+    res = True
+    patchpath = os.path.abspath(os.path.join(root, patch))
+    
+    cmd     = 'patchtest %s %s/tests --patch %s' % (repodir, topdir, patchpath)
+    results = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+
+    return results
+
+if __name__ == '__main__':
+    passcount = 0
+    failcount = 0
+    skipcount = 0
+    xpasscount = 0
+    xfailcount = 0
+    errorcount = 0
+
+    results = None
+        
+    for root, dirs, patches in os.walk(patchesdir):
+        for patch in patches:
+            results = test(root, patch)
+
+            a = patch.split('.')
+            klass, testname = a[0], a[1]
+            expected_result = a[-1]
+            testid          = ".%s.%s" % (klass,testname)
+
+            for resultline in results.splitlines():
+                if testid in resultline:
+                    result, _ = resultline.split(' ', 1)
+
+                    if expected_result.upper() == "FAIL" and result.upper() == "FAIL":
+                        xfailcount = xfailcount + 1
+                        print("XFAIL: %s (file: %s)" % (testid.strip("."), os.path.basename(patch)))
+                    elif expected_result.upper() == "PASS" and result.upper() == "PASS":
+                        xpasscount = xpasscount + 1
+                        print("XPASS: %s (file: %s)" % (testid.strip("."), os.path.basename(patch)))
+                    else:
+                        print("%s: %s (%s)" % (result.upper(), testid.strip("."), os.path.basename(patch)))
+                        if result.upper() == "PASS":
+                            passcount = passcount + 1
+                        elif result.upper() == "FAIL":
+                            failcount = failcount + 1
+                        elif result.upper() == "SKIP":
+                            skipcount = skipcount + 1
+                        else:
+                            print("Bad result on test %s against %s" % (testid.strip("."), os.path.basename(patch)))
+                            errorcount = errorcount + 1
+                    break
+            else:
+                print ("No test for=%s" % patch)
+
+    print_results(passcount, skipcount, failcount, xpasscount, xfailcount, errorcount)

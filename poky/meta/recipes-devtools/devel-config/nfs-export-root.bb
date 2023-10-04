@@ -3,7 +3,6 @@ DESCRIPTION = "Enables NFS access from any host to the entire filesystem (for de
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-PR = "r1"
 
 SRC_URI = "file://exports"
 

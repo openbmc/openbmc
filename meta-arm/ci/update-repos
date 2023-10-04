@@ -32,6 +32,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     base_repodir = pathlib.Path(os.environ["KAS_REPO_REF_DIR"])
+    failed = False
 
     for repo in repositories:
         repodir = base_repodir / repo_shortname(repo)
@@ -41,8 +42,15 @@ if __name__ == "__main__":
             shutil.rmtree(repodir, ignore_errors=True)
 
         if repodir.exists():
-            print("Updating %s..." % repo)
-            subprocess.run(["git", "-C", repodir, "-c", "gc.autoDetach=false", "fetch"], check=True)
+            try:
+                print("Updating %s..." % repo)
+                subprocess.run(["git", "-C", repodir, "-c", "gc.autoDetach=false", "fetch"], check=True)
+            except subprocess.CalledProcessError as e:
+                print(e)
+                failed = True
         else:
             print("Cloning %s..." % repo)
             subprocess.run(["git", "clone", "--bare", repo, repodir], check=True)
+
+    if failed:
+        sys.exit(128)

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# test case test-connect is excluded. Becasue this test case need following steps before running.
+# Without these steps, test case test-connect will fail.
+# 1. Disable 'skip-networking' in /etc/my.cnf
+#    $ sed -i '/skip-networking/s/^/#/g' /etc/my.cnf
+# 2. Restart mysqld.service
+#    $ systemctl restart mysqld
+# 3. Set password for MySQL user "root"
+#    $ mysql -u root
+#    MariaDB [(none)]> SET PASSWORD FOR "root"@"localhost" = PASSWORD("myReallyStrongPwd");
+#    MariaDB [(none)]> FLUSH PRIVILEGES;
+
+# If test-connect is included, please uncomment these lines.
+#export MASTER_MYPORT=3306
+#export MYSQL_TEST_HOST=127.0.0.1
+#export MYSQL_TEST_USER=root
+#export MYSQL_TEST_PASSWD=myReallyStrongPwd
+
+ctest --force-new-ctest-process -E test-connect | sed -u 's/\*\*\*/   /g' | awk '/Test +#/{gsub(/Passed/,"PASS"); gsub(/Failed/,"FAIL"); gsub(/Skipped/,"SKIP"); print $6": "$4; fflush();}'

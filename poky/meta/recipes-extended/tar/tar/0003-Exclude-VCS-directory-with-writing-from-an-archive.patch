@@ -1,0 +1,112 @@
+From 4f814e0e4c673f86dc65a557f7e55f6b5efd1529 Mon Sep 17 00:00:00 2001
+From: Anton Makrushin <makrusan@gmail.com>
+Date: Mon, 20 Mar 2023 20:05:42 +0530
+Subject: Exclude VCS directory with writing from an archive
+
+See https://savannah.gnu.org/bugs/?62859
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/tar.git/commit/?id=4f814e0e4c673f86dc65a557f7e55f6b5efd1529]
+
+Signed-off-by: Qiu Tingting <qiutt@fujitsu.com>
+
+---
+ tests/exclude18.at | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 87 insertions(+)
+ create mode 100644 tests/exclude18.at
+
+diff --git a/tests/exclude18.at b/tests/exclude18.at
+new file mode 100644
+index 0000000..64aaa52
+--- /dev/null
++++ b/tests/exclude18.at
+@@ -0,0 +1,87 @@
++# Process this file with autom4te to create testsuite. -*- Autotest -*-
++
++# Test suite for GNU tar.
++# Copyright 2004-2023 Free Software Foundation, Inc.
++
++# This file is part of GNU tar.
++
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Test --exclude-vcs option with subcommands: EXTRACT, LIST, DIFF.
++# Check VCS directory with files, and empty.
++#
++# Ref: https://savannah.gnu.org/bugs/?62859
++# Wed 03 Aug 2022 04:06:28 PM UTC, original submission:  Quote
++# Mohamed Akram <mohdakram>
++# > The --exclude-vcs flag seems to exclude .gitignore but not .git when
++# extracting.
++
++AT_SETUP([--exclude-vcs extract list compare])
++AT_KEYWORDS([exclude-vcs extract list compare exclude18])
++
++AT_TAR_CHECK([
++AT_SORT_PREREQ
++mkdir gitrepo
++cd gitrepo
++
++# Make an empty VCS directory:
++mkdir .svn
++
++# Make a VCS directory with a file:
++mkdir .git
++touch .git/_A
++
++# Make a VCS file:
++touch .gitignore
++
++# Make non-VCS files:
++touch .git_B
++touch _C
++
++# Create an archive, include VCS:
++cd ..
++tar -cf gitrepo.tar gitrepo
++rm -r gitrepo
++
++echo Extract:
++tar -xvf gitrepo.tar --exclude-vcs | sort
++
++echo
++echo List:
++tar -tf gitrepo.tar --exclude-vcs | sort
++
++echo
++echo Diff:
++tar -dvf gitrepo.tar --exclude-vcs gitrepo | sort
++
++],
++[0],
++[Extract:
++gitrepo/
++gitrepo/.git_B
++gitrepo/_C
++
++List:
++gitrepo/
++gitrepo/.git_B
++gitrepo/_C
++
++Diff:
++gitrepo/
++gitrepo/.git_B
++gitrepo/_C
++],
++[])
++
++AT_CLEANUP
+-- 
+cgit v1.1
+

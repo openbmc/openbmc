@@ -1,0 +1,46 @@
+From 5326969acc0c7e9e3cabca202154e4120c0d2c2f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 26 Sep 2023 14:52:11 -0700
+Subject: [PATCH] Move cr_compress_groupfile outside WITH_LIBMODULEMD
+
+This function is used in code which is not conditional under WITH_LIBMODULEMD
+therefore the declaration should also match its definition scope
+
+Fixes build issues flagged by clang
+
+src/createrepo_c.c:850:16: error: incompatible integer to pointer conversion initializing 'gchar *' (aka 'char *') with an
+ expression of type 'int' [-Wint-conversion]
+|   850 |         gchar *compressed_path = cr_compress_groupfile(cmd_options->groupfile_fullpath, tmp_out_repo, compression);
+|       |                ^                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/createrepo_c/pull/387]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/metadata_internal.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/metadata_internal.h b/src/metadata_internal.h
+index 8ba0576..ecfbac2 100644
+--- a/src/metadata_internal.h
++++ b/src/metadata_internal.h
+@@ -52,14 +52,14 @@ cr_metadata_load_modulemd(ModulemdModuleIndex **moduleindex,
+  * @param dest_dir      Path to directory where the compressed groupfile should be stored.
+  * @return              Path to the new compressed groupfile. Has to be freed by the caller.
+  */
++
++#endif /* WITH_LIBMODULEMD */
++
+ gchar *
+ cr_compress_groupfile(const char *groupfile,
+                       const char *dest_dir,
+                       cr_CompressionType compression);
+ 
+-
+-#endif /* WITH_LIBMODULEMD */
+-
+ #ifdef __cplusplus
+ }
+ #endif
+-- 
+2.42.0
+

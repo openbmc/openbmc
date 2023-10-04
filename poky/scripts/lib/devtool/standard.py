@@ -587,6 +587,7 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
         preservestampfile = os.path.join(sstate_manifests, 'preserve-stamps')
         with open(preservestampfile, 'w') as f:
             f.write(d.getVar('STAMP'))
+        tinfoil.modified_files()
         try:
             if is_kernel_yocto:
                 # We need to generate the kernel config

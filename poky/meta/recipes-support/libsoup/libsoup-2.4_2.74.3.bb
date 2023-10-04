@@ -40,7 +40,7 @@ do_write_config:append:class-target() {
 ntlm_auth = '${bindir}/ntlm_auth'
 EOF
 }
-EXTRA_OEMESON += "--cross-file ${WORKDIR}/soup.cross"
+EXTRA_OEMESON:append:class-target = " --cross-file ${WORKDIR}/soup.cross"
 
 EXTRA_OEMESON += "-Dvapi=disabled -Dtls_check=false"
 

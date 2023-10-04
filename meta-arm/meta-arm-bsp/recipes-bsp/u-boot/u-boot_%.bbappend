@@ -3,7 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 #
 # Corstone1000 64-bit machines
 #
-DEPENDS:append:corstone1000 = " gnutls-native"
+DEPENDS:append:corstone1000 = " gnutls-native openssl-native efitools-native"
 CORSTONE1000_DEVICE_TREE:corstone1000-mps3 = "corstone1000-mps3"
 CORSTONE1000_DEVICE_TREE:corstone1000-fvp = "corstone1000-fvp"
 EXTRA_OEMAKE:append:corstone1000 = ' DEVICE_TREE=${CORSTONE1000_DEVICE_TREE}'
@@ -45,7 +45,23 @@ SRC_URI:append:corstone1000 = " \
 	file://0032-Enable-EFI-set-get-time-services.patch			  \
 	file://0033-corstone1000-detect-inflated-kernel-size.patch			  \
 	file://0034-corstone1000-ESRT-add-unique-firmware-GUID.patch		\
+	file://0035-dt-Provide-a-way-to-remove-non-compliant-nodes-and-p.patch \
+	file://0036-bootefi-Call-the-EVT_FT_FIXUP-event-handler.patch \
+	file://0037-corstone1000-purge-U-Boot-specific-DT-nodes.patch \
+	file://0038-corstone1000-add-signature-device-tree-overlay.patch	  \
+	file://0039-corstone1000-enable-authenticated-capsule-config.patch	  \
+	file://0040-corstone1000-introduce-EFI-authenticated-capsule-upd.patch	  \
         "
+
+do_configure:append:corstone1000(){
+    openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=CRT/ -keyout ${B}/CRT.key -out ${B}/CRT.crt -nodes -days 365
+    cert-to-efi-sig-list ${B}/CRT.crt ${B}/corstone1000_defconfig/CRT.esl
+}
+
+do_install:append:corstone1000() {
+   install -D -p -m 0644 ${B}/CRT.crt ${DEPLOY_DIR_IMAGE}/corstone1000_capsule_cert.crt
+   install -D -p -m 0644 ${B}/CRT.key ${DEPLOY_DIR_IMAGE}/corstone1000_capsule_key.key
+}
 
 #
 # FVP BASE
@@ -53,23 +69,6 @@ SRC_URI:append:corstone1000 = " \
 SRC_URI:append:fvp-base = " file://bootargs.cfg \
 	file://0001-Revert-vexpress64-pick-DRAM-size-from-DT.patch \
 	"
-
-#
-# FVP BASER
-#
-SRC_URI:append:fvp-baser-aemv8r64 = " \
-    file://0001-armv8-Add-ARMv8-MPU-configuration-logic.patch \
-    file://0002-vexpress64-add-MPU-memory-map-for-the-BASER_FVP.patch \
-    file://0003-armv8-Allow-disabling-exception-vectors-on-non-SPL-b.patch \
-    file://0004-armv8-ARMV8_SWITCH_TO_EL1-improvements.patch \
-    file://0005-armv8-Make-disabling-HVC-configurable-when-switching.patch \
-    file://0006-vexpress64-Do-not-set-COUNTER_FREQUENCY.patch \
-    file://0007-vexpress64-Enable-LIBFDT_OVERLAY-in-the-vexpress_aem.patch \
-    file://0008-armv8-Allow-PRBAR-MPU-attributes-to-be-configured.patch \
-    file://0009-armv8-Enable-icache-when-switching-exception-levels-.patch \
-    "
-
-
 #
 # Juno Machines
 #

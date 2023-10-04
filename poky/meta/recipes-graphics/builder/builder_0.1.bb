@@ -1,7 +1,6 @@
 SUMMARY = "New user to do specific job"
 DESCRIPTION = "This recipe create a new user named ${PN}, who is used for specific jobs like building. The task can be auto started via mini X"
 SECTION = "x11"
-PR = "r6"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://builder_session.sh;endline=5;md5=84796c3c41785d86100fdabcbdade00e"
 

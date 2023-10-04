@@ -6,7 +6,6 @@ SECTION = "console/utils"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=04d43c5d70b496c032308106e26ae17d"
 
-PR = "r2"
 
 S = "${WORKDIR}/zip30"
 

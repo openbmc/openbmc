@@ -1,0 +1,95 @@
+From b6ad4b7086a6487b36d626248322f4c9d5bf420a Mon Sep 17 00:00:00 2001
+From: "thomas.georgec" <thomas.georgec@lge.com>
+Date: Sun, 12 Mar 2023 14:28:50 +0530
+Subject: [PATCH] Fix return-type errors
+
+Fix "control reaches end of non-void function" in code when -Werror=return-type
+is used.
+
+  webrtc-audio-processing-1.3/webrtc/modules/audio_processing/agc2/adaptive_mode_level_estimator.cc: In function 'float webrtc::{anonymous}::GetLevel(const webrtc::VadLevelAnalyzer::Result&, LevelEstimatorType)':
+  webrtc-audio-processing-1.3/webrtc/modules/audio_processing/agc2/adaptive_mode_level_estimator.cc:45:1: error: control reaches end of non-void function [-Werror=return-type]
+     45 | }
+        | ^
+  webrtc-audio-processing-1.3/webrtc/modules/audio_processing/audio_processing_impl.cc: In function 'webrtc::GainControl::Mode webrtc::{anonymous}::Agc1ConfigModeToInterfaceMode(webrtc::AudioProcessing::Config::GainController1::Mode)':
+  webrtc-audio-processing-1.3/webrtc/modules/audio_processing/audio_processing_impl.cc:117:1: error: control reaches end of non-void function [-Werror=return-type]
+    117 | }
+        | ^
+  webrtc-audio-processing-1.3/webrtc/modules/audio_processing/audio_processing_impl.cc: In lambda function:
+  webrtc-audio-processing-1.3/webrtc/modules/audio_processing/audio_processing_impl.cc:1853:13: error: control reaches end of non-void function  -Werror=return-type]
+   1853 |             default:
+        |             ^~~~~~~
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/pulseaudio/webrtc-audio-processing/-/merge_requests/28]
+
+ .../audio_processing/agc2/adaptive_mode_level_estimator.cc  | 2 ++
+ webrtc/modules/audio_processing/audio_processing_impl.cc    | 3 +++
+ webrtc/modules/audio_processing/include/audio_processing.cc | 6 ++++++
+ 3 files changed, 11 insertions(+)
+
+diff --git a/webrtc/modules/audio_processing/agc2/adaptive_mode_level_estimator.cc b/webrtc/modules/audio_processing/agc2/adaptive_mode_level_estimator.cc
+index f09f63b..9cdf6ca 100644
+--- a/webrtc/modules/audio_processing/agc2/adaptive_mode_level_estimator.cc
++++ b/webrtc/modules/audio_processing/agc2/adaptive_mode_level_estimator.cc
+@@ -42,6 +42,8 @@ float GetLevel(const VadLevelAnalyzer::Result& vad_level,
+       return vad_level.peak_dbfs;
+       break;
+   }
++  RTC_NOTREACHED();
++  __builtin_unreachable ();
+ }
+ 
+ }  // namespace
+diff --git a/webrtc/modules/audio_processing/audio_processing_impl.cc b/webrtc/modules/audio_processing/audio_processing_impl.cc
+index 67208df..3b8262a 100644
+--- a/webrtc/modules/audio_processing/audio_processing_impl.cc
++++ b/webrtc/modules/audio_processing/audio_processing_impl.cc
+@@ -114,6 +114,8 @@ GainControl::Mode Agc1ConfigModeToInterfaceMode(
+     case Agc1Config::kFixedDigital:
+       return GainControl::kFixedDigital;
+   }
++  RTC_NOTREACHED();
++  __builtin_unreachable ();
+ }
+ 
+ // Maximum lengths that frame of samples being passed from the render side to
+@@ -1852,6 +1854,7 @@ void AudioProcessingImpl::InitializeNoiseSuppressor() {
+               return NsConfig::SuppressionLevel::k21dB;
+             default:
+               RTC_NOTREACHED();
++              __builtin_unreachable ();
+           }
+         };
+ 
+diff --git a/webrtc/modules/audio_processing/include/audio_processing.cc b/webrtc/modules/audio_processing/include/audio_processing.cc
+index 8854415..cc8752b 100644
+--- a/webrtc/modules/audio_processing/include/audio_processing.cc
++++ b/webrtc/modules/audio_processing/include/audio_processing.cc
+@@ -28,6 +28,8 @@ std::string NoiseSuppressionLevelToString(
+     case AudioProcessing::Config::NoiseSuppression::Level::kVeryHigh:
+       return "VeryHigh";
+   }
++  RTC_NOTREACHED();
++  __builtin_unreachable ();
+ }
+ 
+ std::string GainController1ModeToString(
+@@ -40,6 +42,8 @@ std::string GainController1ModeToString(
+     case AudioProcessing::Config::GainController1::Mode::kFixedDigital:
+       return "FixedDigital";
+   }
++  RTC_NOTREACHED();
++  __builtin_unreachable ();
+ }
+ 
+ std::string GainController2LevelEstimatorToString(
+@@ -50,6 +54,8 @@ std::string GainController2LevelEstimatorToString(
+     case AudioProcessing::Config::GainController2::LevelEstimator::kPeak:
+       return "Peak";
+   }
++  RTC_NOTREACHED();
++  __builtin_unreachable ();
+ }
+ 
+ int GetDefaultMaxInternalRate() {

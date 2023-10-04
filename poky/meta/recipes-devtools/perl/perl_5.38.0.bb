@@ -38,8 +38,10 @@ DEPENDS += "make-native"
 PERL_LIB_VER = "${@'.'.join(d.getVar('PV').split('.')[0:2])}.0"
 
 PACKAGECONFIG ??= "gdbm"
+PACKAGECONFIG:append:libc-musl = " anylocale"
 PACKAGECONFIG[bdb] = ",-Ui_db,db"
 PACKAGECONFIG[gdbm] = ",-Ui_gdbm,gdbm"
+PACKAGECONFIG[anylocale] = "-Dd_setlocale_accepts_any_locale_name=define,,"
 
 # Don't generate comments in enc2xs output files. They are not reproducible
 export ENC2XS_NO_COMMENTS = "1"
@@ -56,6 +58,7 @@ do_configure:prepend() {
 do_configure:class-target() {
     ./configure --prefix=${prefix} --libdir=${libdir} \
     --target=${TARGET_SYS} \
+    -Duse64bitint \
     -Duseshrplib \
     -Dusethreads \
     -Dsoname=libperl.so.5 \

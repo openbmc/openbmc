@@ -1,0 +1,36 @@
+From 79bf322768990b28c29a9d907edcca52ff48e0b8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 26 Jul 2023 23:21:10 +0400
+Subject: meson: do not rely on an exe wrapper
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Upstream-Status: Backport [https://github.com/ximion/appstream/commit/79bf322768990b28c29a9d907edcca52ff48e0b8]
+---
+ data/meson.build | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/data/meson.build b/data/meson.build
+index aea0cb25..ec0e434f 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -7,6 +7,13 @@ install_data('its/metainfo.its',
+ install_data('its/metainfo.loc',
+               install_dir: join_paths(get_option('datadir'), 'gettext', 'its'))
+ 
++# Do not rely on an exe wrapper for rel-info, use the system one in that case
++if meson.is_cross_build()
++    dependency('appstream', version: '>=' + as_version, native: true,
++               not_found_message: 'Native appstream required for cross-building')
++    ascli_exe = find_program('appstreamcli')
++endif
++
+ # NOTE: We do not translate the release notes on purpose here.
+ # If you do want to give translators a chance to translate them,
+ # ascli news-to-metainfo needs to produce a temporary file to translate
+-- 
+2.41.0
+

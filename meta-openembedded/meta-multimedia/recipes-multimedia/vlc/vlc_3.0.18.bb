@@ -23,6 +23,7 @@ SRC_URI = "git://github.com/videolan/vlc.git;protocol=https;branch=3.0.x \
            file://0004-Use-packageconfig-to-detect-mmal-support.patch \
            file://0005-ioctl-does-not-have-same-signature-between-glibc-and.patch \
            file://0006-configure-Disable-incompatible-function-pointer-type.patch \
+           file://0001-po-Fix-invalid-.oc-translation-format-string.patch \
 "
 SRCREV = "e9eceaed4d838dbd84638bfb2e4bdd08294163b1"
 S = "${WORKDIR}/git"

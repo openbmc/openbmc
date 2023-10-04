@@ -9,6 +9,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append = "\
 	file://0001-Limit-nanopb-build-to-single-process.patch \
+	file://0001-LazyFetch-allow-setting-the-cmake-generator.patch \
+	file://nanopb-upgrade.patch \
 "
 
 #Latest on 2023 April 28
@@ -28,9 +30,9 @@ SRC_URI += "git://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;bra
 SRCREV_mbedtls = "8c89224991adff88d53cd380f42a2baa36f91454"
 LIC_FILES_CHKSUM += "file://../mbedtls/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-# Nanopb, tag "nanopb-0.4.2"
+# Nanopb, tag "nanopb-0.4.7" plus some further fixes
 SRC_URI += "git://github.com/nanopb/nanopb.git;name=nanopb;protocol=https;branch=master;destsuffix=git/nanopb"
-SRCREV_nanopb = "df0e92f474f9cca704fe2b31483f0b4d1b1715a4"
+SRCREV_nanopb = "dbbf5d8992295aae669b8071eadad02f87d5faf0"
 LIC_FILES_CHKSUM += "file://../nanopb/LICENSE.txt;md5=9db4b73a55a3994384112efcdb37c01f"
 
 # qcbor, tag "v1.0.0"
@@ -60,16 +62,17 @@ LIC_FILES_CHKSUM += "file://../openamp/LICENSE.md;md5=a8d8cf662ef6bf9936a1e14135
 
 SRCREV_FORMAT = "trusted-services_dtc_mbedtls_nanopb_qcbor_tcose_cpputest_libmetal_openamp"
 
-# TS ships patches for external dependencies that needs to be applied
-apply_ts_patches() {
-    ( cd ${WORKDIR}/git/qcbor;    git stash; git branch -f bf_am; git am ${S}/external/qcbor/*.patch; git reset bf_am )
-    ( cd ${WORKDIR}/git/tcose;    git stash; git branch -f bf_am; git am ${S}/external/t_cose/*.patch; git reset bf_am )
-    ( cd ${WORKDIR}/git/mbedtls;  git stash; git branch -f bf_am; git am ${S}/external/MbedTLS/*.patch; git reset bf_am )
-    ( cd ${WORKDIR}/git/cpputest; git stash; git apply ${S}/external/CppUTest/*.patch )
-    ( cd ${WORKDIR}/git/dtc;      git stash; git apply ${S}/external/libfdt/*.patch )
-    ( cd ${WORKDIR}/git/nanopb;   git stash; git apply ${S}/external/nanopb/*.patch )
+inherit apply_local_src_patches
+LOCAL_SRC_PATCHES_INPUT_DIR = "N/A"
+
+do_apply_local_src_patches() {
+    apply_local_src_patches ${S}/external/qcbor ${WORKDIR}/git/qcbor
+    apply_local_src_patches ${S}/external/t_cose ${WORKDIR}/git/tcose
+    apply_local_src_patches ${S}/external/MbedTLS ${WORKDIR}/git/mbedtls
+    apply_local_src_patches ${S}/external/CppUTest ${WORKDIR}/git/cpputest
+    apply_local_src_patches ${S}/external/libfdt ${WORKDIR}/git/dtc
+    apply_local_src_patches ${S}/external/nanopb ${WORKDIR}/git/nanopb
 }
-do_patch[postfuncs] += "apply_ts_patches"
 
 # Paths to dependencies required by some TS SPs/tools
 EXTRA_OECMAKE += "-DDTC_SOURCE_DIR=${WORKDIR}/git/dtc \

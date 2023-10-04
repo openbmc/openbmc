@@ -325,11 +325,11 @@ class Tinfoil:
         self.recipes_parsed = False
         self.quiet = 0
         self.oldhandlers = self.logger.handlers[:]
+        self.localhandlers = []
         if setup_logging:
             # This is the *client-side* logger, nothing to do with
             # logging messages from the server
             bb.msg.logger_create('BitBake', output)
-            self.localhandlers = []
             for handler in self.logger.handlers:
                 if handler not in self.oldhandlers:
                     self.localhandlers.append(handler)
@@ -448,6 +448,12 @@ class Tinfoil:
         config_params = TinfoilConfigParameters(config_only=False, quiet=self.quiet)
         self.run_actions(config_params)
         self.recipes_parsed = True
+
+    def modified_files(self):
+        """
+        Notify the server it needs to revalidate it's caches since the client has modified files
+        """
+        self.run_command("revalidateCaches")
 
     def run_command(self, command, *params, handle_events=True):
         """

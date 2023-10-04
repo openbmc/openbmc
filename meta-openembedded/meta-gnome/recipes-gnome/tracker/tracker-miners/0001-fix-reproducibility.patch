@@ -1,0 +1,108 @@
+From 2bbd07843e8ec34311cafab35f21b40c86e0dd7f Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 12 Sep 2023 17:00:41 +0200
+Subject: [PATCH] meson: fix reproducibility
+
+Tracker's design seems to be strictly for non-cross builds and leaks buildpaths into the
+binaries at various places. Avoid this to improve binary reproducibility.
+
+todo: Some of these paths may need to be adjusted to make the test environment work
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build                        | 20 ++++++++++----------
+ src/tracker-extract/meson.build    |  2 +-
+ tests/tracker-miner-fs/meson.build |  2 +-
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 935584185..aa6126081 100644
+--- a/meson.build
++++ b/meson.build
+@@ -380,7 +380,7 @@ conf.set('PACKAGE_VERSION', '"@0@"'.format(meson.project_version()))
+ conf.set('TRACKER_VERSION', '"@0@"'.format(meson.project_version()))
+ 
+ # Config that goes in some other generated files (.desktop, .pc, etc)
+-conf.set('abs_top_builddir', meson.current_build_dir())
++conf.set('abs_top_builddir', '')
+ conf.set('exec_prefix', get_option('prefix'))
+ conf.set('bindir', join_paths(get_option('prefix'), get_option('bindir')))
+ conf.set('datadir', datadir)
+@@ -409,7 +409,7 @@ tracker_c_args = [
+ configinc = include_directories('./')
+ srcinc = include_directories('src/')
+ 
+-build_root = meson.current_build_dir()
++build_root = ''
+ 
+ # We use tracker-miners-3.0 rather than tracker3-miners inside the lib64
+ # directory, following the existing convention in that directory.
+@@ -421,10 +421,10 @@ tracker_writeback_modules_dir = join_paths(get_option('prefix'), get_option('lib
+ tracker_extract_rules_dir = join_paths(get_option('prefix'), get_option('datadir'), tracker_versioned_name, 'extract-rules')
+ tracker_miner_services_dir = join_paths(get_option('prefix'), get_option('datadir'), tracker_versioned_name, 'miners')
+ 
+-tracker_uninstalled_cli_subcommands_dir = meson.current_build_dir() / 'src' / 'tracker' / 'subcommands'
+-tracker_uninstalled_extract_rules_dir = join_paths(meson.current_build_dir(), 'src', 'tracker-extract', 'uninstalled-rules')
+-tracker_uninstalled_writeback_modules_dir = join_paths(meson.current_build_dir(), 'src', 'tracker-writeback')
+-uninstalled_tracker_extract_path = join_paths(meson.current_build_dir(), 'src', 'tracker-extract', 'tracker-extract-3')
++tracker_uninstalled_cli_subcommands_dir = '/usr/src/debug/tracker/src/tracker/subcommands'
++tracker_uninstalled_extract_rules_dir = join_paths('usr', 'src', 'debug', 'tracker', 'src', 'tracker-extract', 'uninstalled-rules')
++tracker_uninstalled_writeback_modules_dir = join_paths('usr', 'src', 'debug', 'tracker', 'src', 'tracker-writeback')
++uninstalled_tracker_extract_path = join_paths('usr', 'src', 'debug', 'tracker', 'src', 'tracker-extract', 'tracker-extract-3')
+ 
+ gsettings_schema_dir = join_paths(get_option('prefix'), get_option('datadir'), 'glib-2.0', 'schemas')
+ po_dir = join_paths(meson.current_source_dir(), 'po')
+@@ -438,8 +438,8 @@ subdir('data')
+ subdir('docs')
+ 
+ test_c_args = tracker_c_args + [
+-  '-DTOP_BUILDDIR="@0@/"'.format(meson.build_root()),
+-  '-DTOP_SRCDIR="@0@/"'.format(meson.source_root()),
++  '-DTOP_BUILDDIR="@0@/"'.format(''),
++  '-DTOP_SRCDIR="@0@/"'.format('/usr/src/debug/tracker'),
+ ]
+ 
+ if get_option('tests_tap_protocol')
+@@ -454,9 +454,9 @@ run_uninstalled_conf = configuration_data()
+ run_uninstalled_conf.set('tracker_sparql_uninstalled_dir', tracker_sparql_uninstalled_dir)
+ run_uninstalled_conf.set('tracker_uninstalled_cli_dir', tracker_uninstalled_cli_dir)
+ run_uninstalled_conf.set('tracker_uninstalled_cli_subcommands_dir', tracker_uninstalled_cli_subcommands_dir)
+-run_uninstalled_conf.set('tracker_uninstalled_domain_rule', meson.current_build_dir() / 'tests' / 'functional-tests' / 'config' / 'test-domain.rule')
++run_uninstalled_conf.set('tracker_uninstalled_domain_rule', '/usr/src/debug/tracker/tests/functional-tests/config/test-domain.rule')
+ run_uninstalled_conf.set('tracker_uninstalled_extract_rules_dir', tracker_uninstalled_extract_rules_dir)
+-run_uninstalled_conf.set('tracker_uninstalled_extractors_dir', meson.current_build_dir() / 'src' / 'tracker-extract')
++run_uninstalled_conf.set('tracker_uninstalled_extractors_dir', '/usr/src/debug/tracker/src/tracker-extract')
+ run_uninstalled_conf.set('tracker_uninstalled_miner_services_dir', tracker_uninstalled_miner_services_dir)
+ run_uninstalled_conf.set('tracker_uninstalled_testutils_dir', tracker_uninstalled_testutils_dir)
+ run_uninstalled_conf.set('tracker_uninstalled_writeback_modules_dir', tracker_uninstalled_writeback_modules_dir)
+diff --git a/src/tracker-extract/meson.build b/src/tracker-extract/meson.build
+index 4aaad5c41..d17cce221 100644
+--- a/src/tracker-extract/meson.build
++++ b/src/tracker-extract/meson.build
+@@ -159,7 +159,7 @@ endif
+ executable('tracker-extract-@0@'.format(tracker_api_major),
+   tracker_extract_sources,
+   # Manually add the root dir to work around https://github.com/mesonbuild/meson/issues/1387
+-  c_args: tracker_c_args + ['-I' + meson.build_root()],
++  c_args: tracker_c_args,
+   export_dynamic: true,
+   dependencies: tracker_extract_dependencies,
+   install: true,
+diff --git a/tests/tracker-miner-fs/meson.build b/tests/tracker-miner-fs/meson.build
+index e131b85ad..59e509fa6 100644
+--- a/tests/tracker-miner-fs/meson.build
++++ b/tests/tracker-miner-fs/meson.build
+@@ -19,7 +19,7 @@ libtracker_miner_test_c_args = [
+ ]
+ 
+ libtracker_miner_test_environment = environment()
+-libtracker_miner_test_environment.set('GSETTINGS_SCHEMA_DIR', join_paths(meson.build_root(), 'data'))
++libtracker_miner_test_environment.set('GSETTINGS_SCHEMA_DIR', '/usr/src/debug/tracker-miners/data')
+ 
+ libtracker_miner_test_deps = [tracker_miners_common_dep, tracker_miner_dep, tracker_sparql]
+ 
+-- 
+2.41.0
+

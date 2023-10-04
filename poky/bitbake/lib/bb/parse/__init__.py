@@ -60,6 +60,14 @@ def cached_mtime_noerror(f):
             return 0
     return __mtime_cache[f]
 
+def check_mtime(f, mtime):
+    try:
+        current_mtime = os.stat(f)[stat.ST_MTIME]
+        __mtime_cache[f] = current_mtime
+    except OSError:
+        current_mtime = 0
+    return current_mtime == mtime
+
 def update_mtime(f):
     try:
         __mtime_cache[f] = os.stat(f)[stat.ST_MTIME]

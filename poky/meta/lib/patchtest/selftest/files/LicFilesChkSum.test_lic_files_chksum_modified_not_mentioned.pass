@@ -1,0 +1,39 @@
+From f89919ea86d38404dd621521680a0162367bb965 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Wed, 6 Sep 2023 09:09:27 -0400
+Subject: [PATCH] selftest-hello: update LIC_FILES_CHKSUM
+
+License-Update: Fix checksum
+
+This test should pass the
+test_metadata_lic_files_chksum.LicFilesChkSum.test_lic_files_chksum_modified_not_mentioned
+test.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ .../recipes-test/selftest-hello/selftest-hello_1.0.bb         | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+index 547587bef4..65dda40aba 100644
+--- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+@@ -1,7 +1,7 @@
+ DESCRIPTION = "Simple helloworld application -- selftest variant"
+ SECTION = "examples"
+ LICENSE = "MIT"
+-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
++LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f303"
+ 
+ SRC_URI = "file://helloworld.c"
+ 
+@@ -16,4 +16,4 @@ do_install() {
+ 	install -m 0755 helloworld ${D}${bindir}
+ }
+ 
+-BBCLASSEXTEND = "native nativesdk"
+\ No newline at end of file
++BBCLASSEXTEND = "native nativesdk"
+-- 
+2.41.0
+

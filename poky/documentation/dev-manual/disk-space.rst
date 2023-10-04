@@ -23,12 +23,12 @@ final disk usage of 22 Gbytes instead of &MIN_DISK_SPACE; Gbytes. However,
 &MIN_DISK_SPACE_RM_WORK; Gbytes of initial free disk space are still needed to
 create temporary files before they can be deleted.
 
-Purging Duplicate Shared State Cache Files
-==========================================
+Purging Obsolete Shared State Cache Files
+=========================================
 
 After multiple build iterations, the Shared State (sstate) cache can contain
-duplicate cache files for a given package, consuming a substantial amount of
-disk space. However, only the most recent cache files are likeky to be reusable.
+multiple cache files for a given package, consuming a substantial amount of
+disk space. However, only the most recent ones are likely to be reused.
 
 The following command is a quick way to purge all the cache files which
 haven't been used for a least a specified number of days::

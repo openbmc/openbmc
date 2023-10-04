@@ -285,8 +285,10 @@ def get_bb_vars(variables=None, target=None, postconfig=None):
 def get_bb_var(var, target=None, postconfig=None):
     return get_bb_vars([var], target, postconfig)[var]
 
-def get_test_layer():
-    layers = get_bb_var("BBLAYERS").split()
+def get_test_layer(bblayers=None):
+    if bblayers is None:
+        bblayers = get_bb_var("BBLAYERS")
+    layers = bblayers.split()
     testlayer = None
     for l in layers:
         if '~' in l:

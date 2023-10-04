@@ -1,0 +1,31 @@
+From d8a8a9affd5726827ef3995652248595b4a8c87e Mon Sep 17 00:00:00 2001
+From: Michael Opdenacker <michael.opdenacker@bootlin.com>
+Date: Tue, 19 Sep 2023 11:27:46 +0200
+Subject: [PATCH] topology.c: include locale.h
+
+To fix an issue compiling with the musl C library:
+topology.c: error: 'LC_ALL' undeclared
+
+https://github.com/alsa-project/alsa-utils/issues/239
+
+Upstream-Status: Backport [https://github.com/alsa-project/alsa-utils/commit/8c229270f6bae83b705a03714c46067a7aa57b02]
+Signed-off-by: Michael Opdenacker <michael.opdenacker@bootlin.com>
+---
+ topology/topology.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/topology/topology.c b/topology/topology.c
+index 1840ffe..5d03a8b 100644
+--- a/topology/topology.c
++++ b/topology/topology.c
+@@ -32,6 +32,7 @@
+ #include <sys/stat.h>
+ #include <getopt.h>
+ #include <assert.h>
++#include <locale.h>
+ 
+ #include <alsa/asoundlib.h>
+ #include <alsa/topology.h>
+-- 
+2.34.1
+

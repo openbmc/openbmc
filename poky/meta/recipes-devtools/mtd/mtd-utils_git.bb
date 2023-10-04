@@ -11,9 +11,9 @@ inherit autotools pkgconfig update-alternatives
 DEPENDS = "zlib e2fsprogs util-linux"
 RDEPENDS:mtd-utils-tests += "bash"
 
-PV = "2.1.5"
+PV = "2.1.6"
 
-SRCREV = "3f3b4cc6c3120107e7aaa21c6415772a255ac49c"
+SRCREV = "219e741f40f4801bae263e0b581b64888d887b4a"
 SRC_URI = "git://git.infradead.org/mtd-utils.git;branch=master"
 
 S = "${WORKDIR}/git"

@@ -857,6 +857,14 @@ class FindSigInfoResult(Event):
         Event.__init__(self)
         self.result = result
 
+class GetTaskSignatureResult(Event):
+    """
+    Event to return results from GetTaskSignatures command
+    """
+    def __init__(self, sig):
+        Event.__init__(self)
+        self.sig = sig
+
 class ParseError(Event):
     """
     Event to indicate parse failed

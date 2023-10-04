@@ -8,9 +8,9 @@ meta-arm provides the OEFVPTarget which must be set up in the machine configurat
 ```
 TEST_TARGET = "OEFVPTarget"
 TEST_SERVER_IP = "127.0.0.1"
-TEST_TARGET_IP = "127.0.0.1:8022"
+TEST_TARGET_IP = "127.0.0.1:2222"
 IMAGE_FEATURES:append = " ssh-server-dropbear"
-FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] ?= "8022=22"
+FVP_CONFIG[bp.virtio_net.hostbridge.userNetPorts] ?= "2222=22"
 FVP_CONSOLES[default] = "terminal_0"
 FVP_CONSOLES[tf-a] = "s_terminal_0"
 ```

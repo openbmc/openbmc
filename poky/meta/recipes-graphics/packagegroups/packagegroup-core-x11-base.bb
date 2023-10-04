@@ -1,6 +1,5 @@
 SUMMARY = "Basic X11 session"
 DESCRIPTION = "Packages required to set up a basic working X11 session"
-PR = "r1"
 
 inherit packagegroup features_check
 # rdepends on matchbox-wm

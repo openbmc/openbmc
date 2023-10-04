@@ -1,0 +1,38 @@
+From b172ebe7e709b10338c1b260310dacc15c557cff Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 22 Sep 2023 15:37:29 +0200
+Subject: [PATCH] Fix build on 32bit
+
+* fixes:
+  src/mongo/util/net/http_client_curl.cpp: In function 'size_t mongo::{anonymous}::ReadMemoryCallback(char*, size_t, size_t, void*)':
+  src/mongo/util/net/http_client_curl.cpp:172:21: error: no matching function for call to 'min(size_t, long unsigned int)'
+    172 |             std::min(size * nitems, static_cast<unsigned long>(bufReader->remaining()));
+        |             ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* reported in:
+  https://jira.mongodb.org/browse/SERVER-73007
+  but will probably get closed like:
+  mongodb/0001-Fix-type-mismatch-on-32bit-arches.patch
+  submitted in:
+  https://jira.mongodb.org/browse/SERVER-74633
+  as they don't support 32bit builds
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+Upstream-Status: Pending
+---
+ src/mongo/util/net/http_client_curl.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mongo/util/net/http_client_curl.cpp b/src/mongo/util/net/http_client_curl.cpp
+index 57290d0f8ed..f251fe2a550 100644
+--- a/src/mongo/util/net/http_client_curl.cpp
++++ b/src/mongo/util/net/http_client_curl.cpp
+@@ -169,7 +169,7 @@ size_t ReadMemoryCallback(char* buffer, size_t size, size_t nitems, void* instre
+ 
+     if (bufReader->remaining() > 0) {
+         size_t readSize =
+-            std::min(size * nitems, static_cast<unsigned long>(bufReader->remaining()));
++            std::min(size * nitems, static_cast<size_t>(bufReader->remaining()));
+         auto buf = bufReader->readBytes(readSize);
+         memcpy(buffer, buf.rawData(), readSize);
+         ret = readSize;

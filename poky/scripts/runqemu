@@ -1467,6 +1467,19 @@ to your build configuration.
             for entry in self.get('SERIAL_CONSOLES').split(' '):
                 self.kernel_cmdline_script += ' console=%s' %entry.split(';')[1]
 
+        # We always wants ttyS0 and ttyS1 in qemu machines (see SERIAL_CONSOLES).
+        # If no serial or serialtcp options were specified, only ttyS0 is created
+        # and sysvinit shows an error trying to enable ttyS1:
+        #     INIT: Id "S1" respawning too fast: disabled for 5 minutes
+        serial_num = len(re.findall("-serial", self.qemu_opt))
+
+        # Assume if the user passed serial options, they know what they want
+        # and pad to two devices
+        if serial_num == 1:
+            self.qemu_opt += " -serial null"
+        elif serial_num >= 2:
+            return
+
         if self.serialstdio == True or self.nographic == True:
             self.qemu_opt += " -serial mon:stdio"
         else:
@@ -1478,10 +1491,6 @@ to your build configuration.
 
                 self.qemu_opt += " %s" % self.get("QB_SERIAL_OPT")
 
-        # We always wants ttyS0 and ttyS1 in qemu machines (see SERIAL_CONSOLES).
-        # If no serial or serialtcp options were specified, only ttyS0 is created
-        # and sysvinit shows an error trying to enable ttyS1:
-        #     INIT: Id "S1" respawning too fast: disabled for 5 minutes
         serial_num = len(re.findall("-serial", self.qemu_opt))
         if serial_num < 2:
             self.qemu_opt += " -serial null"

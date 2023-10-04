@@ -5,6 +5,8 @@ Subject: [PATCH 05/10] Add alises for arm64 which is same as aarch64
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+
+Upstream-Status: Pending
 ---
  SConstruct                                      | 1 +
  src/third_party/IntelRDFPMathLib20U1/SConscript | 2 +-

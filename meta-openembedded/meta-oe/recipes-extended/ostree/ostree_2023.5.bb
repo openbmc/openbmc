@@ -28,6 +28,8 @@ S = "${WORKDIR}/libostree-${PV}"
 
 inherit autotools bash-completion gobject-introspection github-releases gtk-doc manpages pkgconfig ptest-gnome systemd
 
+COMPATIBLE_HOST:riscv32 = "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'null', 'riscv32', d)}"
+
 UNKNOWN_CONFIGURE_OPT_IGNORE = "--disable-introspection --enable-introspection"
 
 # Workaround compile failure:

@@ -36,18 +36,16 @@ class BuildhistoryDiffTests(BuildhistoryBase):
         if expected_endlines:
             self.fail('Missing expected line endings:\n  %s' % '\n  '.join(expected_endlines))
 
-class OEScriptTests(OESelftestTestCase):
-    scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
-
 @unittest.skipUnless(importlib.util.find_spec("cairo"), "Python cairo module is not present")
-class OEPybootchartguyTests(OEScriptTests):
+class OEPybootchartguyTests(OESelftestTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(OEScriptTests, cls).setUpClass()
+        super().setUpClass()
         bitbake("core-image-minimal -c rootfs -f")
         cls.tmpdir = get_bb_var('TMPDIR')
         cls.buildstats = cls.tmpdir + "/buildstats/" + sorted(os.listdir(cls.tmpdir + "/buildstats"))[-1]
+        cls.scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
 
     def test_pybootchartguy_help(self):
         runCmd('%s/pybootchartgui/pybootchartgui.py  --help' % self.scripts_dir)
@@ -65,7 +63,12 @@ class OEPybootchartguyTests(OEScriptTests):
         self.assertTrue(os.path.exists(self.tmpdir + "/charts.pdf"))
 
 
-class OEGitproxyTests(OEScriptTests):
+class OEGitproxyTests(OESelftestTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
 
     def test_oegitproxy_help(self):
         try:
@@ -126,7 +129,13 @@ class OeRunNativeTest(OESelftestTestCase):
         result = runCmd("oe-run-native qemu-helper-native qemu-oe-bridge-helper --help")
         self.assertIn("Helper function to find and exec qemu-bridge-helper", result.output)
 
-class OEListPackageconfigTests(OEScriptTests):
+class OEListPackageconfigTests(OESelftestTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.scripts_dir = os.path.join(get_bb_var('COREBASE'), 'scripts')
+
     #oe-core.scripts.List_all_the_PACKAGECONFIG's_flags
     def check_endlines(self, results,  expected_endlines): 
         for line in results.output.splitlines():

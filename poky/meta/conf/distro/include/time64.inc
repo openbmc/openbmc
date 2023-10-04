@@ -19,7 +19,7 @@ TARGET_CC_ARCH:append:powerpc = "${@bb.utils.contains('TUNE_FEATURES', 'm32', '$
 TARGET_CC_ARCH:append:x86 = "${@bb.utils.contains('TUNE_FEATURES', 'm32', '${GLIBC_64BIT_TIME_FLAGS}', '', d)}"
 
 GLIBC_64BIT_TIME_FLAGS:pn-glibc = ""
-GLIBC_64BIT_TIME_FLAGS:pn-glibc-tests = ""
+GLIBC_64BIT_TIME_FLAGS:pn-glibc-y2038-tests = ""
 GLIBC_64BIT_TIME_FLAGS:pn-glibc-testsuite = ""
 # pipewire-v4l2 explicitly sets _FILE_OFFSET_BITS=32 to get access to
 # both 32 and 64 bit file APIs.  But it does not handle the time side?
@@ -32,13 +32,11 @@ GLIBC_64BIT_TIME_FLAGS:pn-pulseaudio = ""
 # Undefines _FILE_OFFSET_BITS on purpose in
 # libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
 GLIBC_64BIT_TIME_FLAGS:pn-gcc-sanitizers = ""
-# https://github.com/strace/strace/issues/250
-GLIBC_64BIT_TIME_FLAGS:pn-strace = ""
 
 # Caused by the flags exceptions above
 INSANE_SKIP:append:pn-gcc-sanitizers = " 32bit-time"
 INSANE_SKIP:append:pn-glibc = " 32bit-time"
-INSANE_SKIP:append:pn-glibc-tests = " 32bit-time"
+INSANE_SKIP:append:pn-glibc-y2038-tests = " 32bit-time"
 INSANE_SKIP:append:pn-pulseaudio = " 32bit-time"
 
 # Strace has tests that call 32 bit API directly, which is fair enough, e.g.

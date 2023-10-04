@@ -1,9 +1,10 @@
-image: ghcr.io/siemens/kas/kas:3.3
+image: ${MIRROR_GHCR}/siemens/kas/kas:4.0
 
 variables:
   CPU_REQUEST: ""
   DEFAULT_TAG: ""
   CACHE_DIR: $CI_BUILDS_DIR/persist
+  MIRROR_GHCR: ghcr.io
   # These are needed as the k8s executor doesn't respect the container entrypoint
   # by default
   FF_KUBERNETES_HONOR_ENTRYPOINT: 1
@@ -76,6 +77,8 @@ stages:
 update-repos:
   extends: .setup
   stage: prep
+  allow_failure:
+    exit_codes: 128
   script:
     - |
       flock --verbose --timeout 60 $KAS_REPO_REF_DIR ./ci/update-repos
@@ -121,14 +124,6 @@ fvp-base:
     matrix:
       - TESTING: testimage
       - FIRMWARE: edk2
-
-fvp-baser-aemv8r64:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: testimage
-  tags:
-    - x86_64
 
 fvps:
   extends: .build
@@ -285,7 +280,14 @@ documentation:
   extends: .setup
   script:
     - |
-      sudo pip3 install -r meta-arm-bsp/documentation/requirements.txt
+      # This can be removed when the kas container has python3-venv installed
+      sudo apt-get update && sudo apt-get install --yes python3-venv
+
+      python3 -m venv venv
+      . ./venv/bin/activate
+
+      pip3 install -r meta-arm-bsp/documentation/requirements.txt
+
       for CONF in meta-*/documentation/*/conf.py ; do
         echo Building $CONF...
         SOURCE_DIR=$(dirname $CONF)

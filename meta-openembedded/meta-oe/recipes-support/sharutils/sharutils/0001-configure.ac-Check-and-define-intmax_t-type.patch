@@ -1,0 +1,32 @@
+From ea6f7a4c22f1b6f28cf426566cccd65eb9a0e9de Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 10 Sep 2023 13:52:31 -0700
+Subject: [PATCH] configure.ac: Check and define intmax_t type
+
+If stdint.h or inttypes.h defines the type intmax_t, define HAVE_INTMAX_T.
+Otherwise, define intmax_t to the widest signed integer type.
+
+intmax_t is defined in lib/system.h if system is not providing it but it
+needs to be checked by configure for existence first.
+
+Upstream-Status: Submitted [https://savannah.gnu.org/bugs/index.php?64653]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 1242cb7..2ccaac9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -72,6 +72,7 @@ AC_HEADER_STAT
+ AC_HEADER_STDC
+ AC_STRUCT_TIMEZONE
+ AC_TYPE_SIZE_T
++AC_TYPE_INTMAX_T
+ AC_CHECK_FUNCS([fchmod isascii strchr])
+ AC_FUNC_CLOSEDIR_VOID
+ AC_FUNC_FSEEKO
+-- 
+2.42.0
+

@@ -1,4 +1,4 @@
-From fbb181d25ad85778add7ed45b6aaf114e02d0f79 Mon Sep 17 00:00:00 2001
+From 0b8eceb9161711003cd25ab400cadde7c1601733 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:24:50 +0200
 Subject: [PATCH] Set libsolv variables with pkg-config (cmake's own module
@@ -13,13 +13,13 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 405dc4e8..53837448 100644
+index 6444c374..e99b28d0 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -52,7 +52,8 @@ endif()
+@@ -51,7 +51,8 @@ endif()
+ 
  
  # build dependencies
- find_package(Gpgme REQUIRED)
 -find_package(LibSolv 0.7.21 REQUIRED COMPONENTS ext)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})

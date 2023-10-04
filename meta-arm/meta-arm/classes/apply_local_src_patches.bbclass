@@ -17,8 +17,8 @@ python() {
 
 apply_local_src_patches() {
 
-    input_dir="${LOCAL_SRC_PATCHES_INPUT_DIR}"
-    dest_dir="${LOCAL_SRC_PATCHES_DEST_DIR}"
+    input_dir="$1"
+    dest_dir="$2"
 
     if [ ! -d "$input_dir" ] ; then
         bbfatal "LOCAL_SRC_PATCHES_INPUT_DIR=$input_dir not found."
@@ -32,6 +32,7 @@ apply_local_src_patches() {
     export QUILT_PATCHES=./patches-extra
     mkdir -p patches-extra
 
+    bbdebug 1 "Looking for patches in $input_dir"
     for patch in $(find $input_dir -type f -name *.patch -or -name *.diff | sort)
     do
         patch_basename=`basename $patch`
@@ -45,4 +46,8 @@ apply_local_src_patches() {
         fi
     done
 }
-do_patch[postfuncs] += "apply_local_src_patches"
+
+do_apply_local_src_patches() {
+    apply_local_src_patches "${LOCAL_SRC_PATCHES_INPUT_DIR}" "${LOCAL_SRC_PATCHES_DEST_DIR}"
+}
+do_patch[postfuncs] += "do_apply_local_src_patches"

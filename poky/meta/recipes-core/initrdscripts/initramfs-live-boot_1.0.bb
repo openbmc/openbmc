@@ -5,7 +5,6 @@ DEPENDS = "virtual/kernel"
 RDEPENDS:${PN} = "udev udev-extraconf"
 SRC_URI = "file://init-live.sh"
 
-PR = "r12"
 
 S = "${WORKDIR}"
 

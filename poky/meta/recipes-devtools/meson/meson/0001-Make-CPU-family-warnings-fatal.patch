@@ -1,4 +1,4 @@
-From 6c4eef1d92e9e42fdbc888365cab3c95fb33c605 Mon Sep 17 00:00:00 2001
+From fcd3260c03f313676720e6219c5953d412fb0a2c Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 3 Jul 2018 13:59:09 +0100
 Subject: [PATCH] Make CPU family warnings fatal
@@ -7,15 +7,15 @@ Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 ---
- mesonbuild/envconfig.py   | 2 +-
- mesonbuild/environment.py | 4 +---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ mesonbuild/envconfig.py   | 4 ++--
+ mesonbuild/environment.py | 6 ++----
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-Index: meson-0.60.2/mesonbuild/envconfig.py
-===================================================================
---- meson-0.60.2.orig/mesonbuild/envconfig.py
-+++ meson-0.60.2/mesonbuild/envconfig.py
-@@ -266,8 +266,8 @@ class MachineInfo(HoldableObject):
+diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
+index 7e0c567..a180065 100644
+--- a/mesonbuild/envconfig.py
++++ b/mesonbuild/envconfig.py
+@@ -284,8 +284,8 @@ class MachineInfo(HoldableObject):
                  'but is missing {}.'.format(minimum_literal - set(literal)))
  
          cpu_family = literal['cpu_family']
@@ -26,13 +26,13 @@ Index: meson-0.60.2/mesonbuild/envconfig.py
  
          endian = literal['endian']
          if endian not in ('little', 'big'):
-Index: meson-0.60.2/mesonbuild/environment.py
-===================================================================
---- meson-0.60.2.orig/mesonbuild/environment.py
-+++ meson-0.60.2/mesonbuild/environment.py
-@@ -354,10 +354,8 @@ def detect_cpu_family(compilers: Compile
-         if any_compiler_has_define(compilers, '__64BIT__'):
-             trial = 'ppc64'
+diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
+index e212c7a..9d2bff3 100644
+--- a/mesonbuild/environment.py
++++ b/mesonbuild/environment.py
+@@ -345,10 +345,8 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
+         if compilers and not any_compiler_has_define(compilers, '__mips64'):
+             trial = 'mips'
  
 -    if trial not in known_cpu_families:
 -        mlog.warning(f'Unknown CPU family {trial!r}, please report this at '

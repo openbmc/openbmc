@@ -874,6 +874,7 @@ FETCH_EXPORT_VARS = ['HOME', 'PATH',
                      'AWS_SECRET_ACCESS_KEY',
                      'AWS_DEFAULT_REGION',
                      'GIT_CACHE_PATH',
+                     'REMOTE_CONTAINERS_IPC',
                      'SSL_CERT_DIR']
 
 def get_fetcher_environment(d):

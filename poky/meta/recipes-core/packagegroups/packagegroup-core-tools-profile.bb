@@ -4,7 +4,6 @@
 
 SUMMARY = "Profiling tools"
 
-PR = "r3"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

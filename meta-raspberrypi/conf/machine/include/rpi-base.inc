@@ -149,6 +149,7 @@ IMAGE_BOOT_FILES ?= "${BOOTFILES_DIR_NAME}/* \
                  ${RPI_EXTRA_IMAGE_BOOT_FILES} \
                  "
 do_image_wic[depends] += " \
+    virtual/kernel:do_deploy \
     rpi-bootfiles:do_deploy \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
     "

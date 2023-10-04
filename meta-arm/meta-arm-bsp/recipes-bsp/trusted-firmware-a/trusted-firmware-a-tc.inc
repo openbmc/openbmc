@@ -27,7 +27,7 @@ EXTRA_OEMAKE += "TARGET_PLATFORM=${TFA_TARGET_PLATFORM}"
 # Set optee as SP. Set spmc manifest and sp layout file to optee
 DEPENDS += "optee-os"
 
-TFA_SP_LAYOUT_FILE = "${RECIPE_SYSROOT}/lib/firmware/sp_layout.json"
+TFA_SP_LAYOUT_FILE = "${RECIPE_SYSROOT}/${nonarch_base_libdir}/firmware/sp_layout.json"
 TFA_ARM_SPMC_MANIFEST_DTS = "plat/arm/board/tc/fdts/tc_spmc_optee_sp_manifest.dts"
 
 EXTRA_OEMAKE += "SCP_BL2=${RECIPE_SYSROOT}/firmware/scp_ramfw.bin"

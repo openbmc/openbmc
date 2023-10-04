@@ -1,0 +1,35 @@
+From 4ab06b5f81455249cd5e89d2cce9863803b5ecb5 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 8 Sep 2023 14:41:00 -0400
+Subject: [PATCH] selftest-hello: remove helloworld.c
+
+This should fail the test_src_uri_left_files selftest.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ .../recipes-test/selftest-hello/selftest-hello_1.0.bb         | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+index 547587bef4..f6817f05bc 100644
+--- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+@@ -3,8 +3,6 @@ SECTION = "examples"
+ LICENSE = "MIT"
+ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+ 
+-SRC_URI = "file://helloworld.c"
+-
+ S = "${WORKDIR}"
+ 
+ do_compile() {
+@@ -16,4 +14,4 @@ do_install() {
+ 	install -m 0755 helloworld ${D}${bindir}
+ }
+ 
+-BBCLASSEXTEND = "native nativesdk"
+\ No newline at end of file
++BBCLASSEXTEND = "native nativesdk"
+-- 
+2.41.0
+

@@ -1,0 +1,28 @@
+From 7abb3840ac2870fcfc174fbbd81c4209c838e1a9 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 18 Sep 2023 22:22:17 +0200
+Subject: [PATCH] meson.build: add a hack for cross-compiling
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate [cross-compile specific]
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 760613a..d339d26 100644
+--- a/meson.build
++++ b/meson.build
+@@ -168,7 +168,7 @@ pkgconfig.generate(
+     'prefix': get_option('prefix'),
+     'datarootdir': dataroot_dir,
+     'datadir': '${prefix}/@0@'.format(get_option('datadir')),
+-    'interfaces_dir': '${datadir}/dbus-1/interfaces/',
++    'interfaces_dir': '${pc_sysrootdir}${datadir}/dbus-1/interfaces/',
+   },
+ )
+ 
+-- 
+2.41.0
+

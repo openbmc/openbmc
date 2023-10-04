@@ -35,6 +35,8 @@ SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git;branch=master;protocol=ht
             file://0001-Do-not-use-LFS64-functions-on-linux-musl.patch \
             file://0001-Fix-the-constness-issues-around-autovector-iterator_.patch \
             file://0002-Fix-build-with-clang-17.patch \
+            file://0001-CMakeLists.txt-Pass-the-OPENSSLDIR.patch \
+            file://0001-BundledOSSPUUID.cmake-Pass-CFLAGS-to-compiler.patch \
             file://minifi.service \
             file://systemd-volatile.conf \
             file://sysvinit-volatile.conf \
@@ -65,7 +67,10 @@ EXTRA_OECMAKE += " \
     -DDISABLE_PYTHON_SCRIPTING=ON \
     -DFLEX_TARGET_ARG_COMPILE_FLAGS='--noline' \
     -DBISON_TARGET_ARG_COMPILE_FLAGS='--no-lines --file-prefix-map=${S}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}' \
+    -DOPENSSLDIR=${sysconfdir}/libressl \
     "
+
+CFLAGS:append = " -fPIC"
 EXTRA_OECMAKE:append:toolchain-clang = " -DCMAKE_RANLIB=${STAGING_BINDIR_TOOLCHAIN}/${TARGET_PREFIX}llvm-ranlib"
 LDFLAGS:append:toolchain-clang = " -fuse-ld=lld"
 

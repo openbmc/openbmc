@@ -1,0 +1,102 @@
+From fa0988fd876400dc1bb451fffc4b167265b40d25 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Thu, 14 Sep 2023 12:14:28 +0100
+Subject: [PATCH] Platform: Corstone1000: Enable Signed Capsule
+
+Enables signed capsule update and adjusts the necessary structs (fmp_payload_header
+, image_auth, etc.) to comply with the new capsule generation tool (mkeficapsule).
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../fw_update_agent/uefi_capsule_parser.c     | 25 +++++++++++--------
+ .../fw_update_agent/uefi_capsule_parser.h     |  2 ++
+ 2 files changed, 17 insertions(+), 10 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c
+index b72ff1eb91..c706c040ac 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c
+@@ -102,11 +102,9 @@ enum uefi_capsule_error_t uefi_capsule_retrieve_images(void* capsule_ptr,
+     }
+ 
+     capsule_header = (efi_capsule_header_t*)ptr;
+-    ptr += sizeof(efi_capsule_header_t) + sizeof(uint32_t);
++    ptr += sizeof(efi_capsule_header_t);
+     fmp_capsule_header = (efi_firmware_management_capsule_header_t*)ptr;
+ 
+-    fmp_payload_header = fmp_capsule_header + sizeof(*fmp_capsule_header);
+-
+     total_size = capsule_header->capsule_image_size;
+     image_count = fmp_capsule_header->payload_item_count;
+     images_info->nr_image = image_count;
+@@ -119,22 +117,20 @@ enum uefi_capsule_error_t uefi_capsule_retrieve_images(void* capsule_ptr,
+     }
+ 
+     for (int i = 0; i < image_count; i++) {
+-
+         image_header = (efi_firmware_management_capsule_image_header_t*)(ptr +
+                                 fmp_capsule_header->item_offset_list[i]);
+ 
+         images_info->size[i] = image_header->update_image_size;
+-        images_info->version[i] = fmp_payload_header->fw_version;
+-        FWU_LOG_MSG("%s: image %i version = %u\n\r", __func__, i,
+-                                images_info->version[i]);
++
+ #ifdef AUTHENTICATED_CAPSULE
+         image_auth = (efi_firmware_image_authentication_t*)(
+                         (char*)image_header +
+                         sizeof (efi_firmware_management_capsule_image_header_t)
+                      );
+         auth_size = sizeof(uint64_t) /* monotonic_count */  +
+-                    image_auth->auth_info.hdr.dwLength /* WIN_CERTIFICATE + cert_data */ +
+-                    sizeof(struct efi_guid) /* cert_type */;
++                    image_auth->auth_info.hdr.dwLength/* WIN_CERTIFICATE + cert_data + cert_type */;
++
++        fmp_payload_header = (fmp_payload_header_t*)((char*)image_auth + auth_size);
+ 
+         FWU_LOG_MSG("%s: auth size = %u\n\r", __func__, auth_size);
+ 
+@@ -143,16 +139,25 @@ enum uefi_capsule_error_t uefi_capsule_retrieve_images(void* capsule_ptr,
+         images_info->image[i] = (
+                 (char*)image_header +
+                 sizeof(efi_firmware_management_capsule_image_header_t) +
+-                auth_size);
++                auth_size +
++                sizeof(*fmp_payload_header));
+ #else
+         images_info->image[i] = (
+                 (char*)image_header +
+                 sizeof(efi_firmware_management_capsule_image_header_t) +
+                 sizeof(*fmp_payload_header));
++
++        fmp_payload_header = (fmp_payload_header_t*)((char*)image_header +
++                sizeof(efi_firmware_management_capsule_image_header_t));
++
+ #endif
+         memcpy(&images_info->guid[i], &(image_header->update_image_type_id),
+                                                         sizeof(struct efi_guid));
+ 
++        images_info->version[i] = fmp_payload_header->fw_version;
++        FWU_LOG_MSG("%s: image %i version = %d\n\r", __func__, i,
++                                images_info->version[i]);
++
+         FWU_LOG_MSG("%s: image %d at %p, size=%u\n\r", __func__, i,
+                         images_info->image[i], images_info->size[i]);
+ 
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.h b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.h
+index a890a709e9..a31cd8a3a0 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.h
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.h
+@@ -12,6 +12,8 @@
+ #include "fip_parser/external/uuid.h"
+ #include "flash_layout.h"
+ 
++#define AUTHENTICATED_CAPSULE 1
++
+ enum uefi_capsule_error_t {
+     UEFI_CAPSULE_PARSER_SUCCESS = 0,
+     UEFI_CAPSULE_PARSER_ERROR = (-1)
+-- 
+2.17.1
+

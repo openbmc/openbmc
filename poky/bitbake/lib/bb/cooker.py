@@ -22,7 +22,6 @@ from bb import utils, data, parse, event, cache, providers, taskdata, runqueue, 
 import queue
 import signal
 import prserv.serv
-import pyinotify
 import json
 import pickle
 import codecs
@@ -173,17 +172,9 @@ class BBCooker:
             self.waitIdle = server.wait_for_idle
 
         bb.debug(1, "BBCooker starting %s" % time.time())
-        sys.stdout.flush()
 
-        self.configwatcher = None
-        self.confignotifier = None
-
-        self.watchmask = pyinotify.IN_CLOSE_WRITE | pyinotify.IN_CREATE | pyinotify.IN_DELETE | \
-                         pyinotify.IN_DELETE_SELF | pyinotify.IN_MODIFY | pyinotify.IN_MOVE_SELF | \
-                         pyinotify.IN_MOVED_FROM | pyinotify.IN_MOVED_TO
-
-        self.watcher = None
-        self.notifier = None
+        self.configwatched = {}
+        self.parsewatched = {}
 
         # If being called by something like tinfoil, we need to clean cached data
         # which may now be invalid
@@ -193,8 +184,6 @@ class BBCooker:
         self.ui_cmdline = None
         self.hashserv = None
         self.hashservaddr = None
-
-        self.inotify_modified_files = []
 
         # TOSTOP must not be set or our children will hang when they output
         try:
@@ -219,52 +208,12 @@ class BBCooker:
         signal.signal(signal.SIGHUP, self.sigterm_exception)
 
         bb.debug(1, "BBCooker startup complete %s" % time.time())
-        sys.stdout.flush()
-
-        self.inotify_threadlock = threading.Lock()
 
     def init_configdata(self):
         if not hasattr(self, "data"):
             self.initConfigurationData()
             bb.debug(1, "BBCooker parsed base configuration %s" % time.time())
-            sys.stdout.flush()
             self.handlePRServ()
-
-    def setupConfigWatcher(self):
-        with bb.utils.lock_timeout(self.inotify_threadlock):
-            if self.configwatcher:
-                self.configwatcher.close()
-                self.confignotifier = None
-                self.configwatcher = None
-            self.configwatcher = pyinotify.WatchManager()
-            self.configwatcher.bbseen = set()
-            self.configwatcher.bbwatchedfiles = set()
-            self.confignotifier = pyinotify.Notifier(self.configwatcher, self.config_notifications)
-
-    def setupParserWatcher(self):
-        with bb.utils.lock_timeout(self.inotify_threadlock):
-            if self.watcher:
-                self.watcher.close()
-                self.notifier = None
-                self.watcher = None
-            self.watcher = pyinotify.WatchManager()
-            self.watcher.bbseen = set()
-            self.watcher.bbwatchedfiles = set()
-            self.notifier = pyinotify.Notifier(self.watcher, self.notifications)
-
-    def process_inotify_updates(self):
-        with bb.utils.lock_timeout(self.inotify_threadlock):
-            for n in [self.confignotifier, self.notifier]:
-                if n and n.check_events(timeout=0):
-                    # read notified events and enqueue them
-                    n.read_events()
-
-    def process_inotify_updates_apply(self):
-        with bb.utils.lock_timeout(self.inotify_threadlock):
-            for n in [self.confignotifier, self.notifier]:
-                if n and n.check_events(timeout=0):
-                    n.read_events()
-                    n.process_events()
 
     def _baseconfig_set(self, value):
         if value and not self.baseconfig_valid:
@@ -280,88 +229,16 @@ class BBCooker:
             bb.server.process.serverlog("Parse cache invalidated")
         self.parsecache_valid = value
 
-    def config_notifications(self, event):
-        if event.maskname == "IN_Q_OVERFLOW":
-            bb.warn("inotify event queue overflowed, invalidating caches.")
-            self._parsecache_set(False)
-            self._baseconfig_set(False)
-            bb.parse.clear_cache()
-            return
-        if not event.pathname in self.configwatcher.bbwatchedfiles:
-            return
-        if "IN_ISDIR" in event.maskname:
-            if "IN_CREATE" in event.maskname or "IN_DELETE" in event.maskname:
-                if event.pathname in self.configwatcher.bbseen:
-                    self.configwatcher.bbseen.remove(event.pathname)
-                # Could remove all entries starting with the directory but for now...
-                bb.parse.clear_cache()
-        if not event.pathname in self.inotify_modified_files:
-            self.inotify_modified_files.append(event.pathname)
-        self._baseconfig_set(False)
+    def add_filewatch(self, deps, configwatcher=False):
+        if configwatcher:
+            watcher = self.configwatched
+        else:
+            watcher = self.parsewatched
 
-    def notifications(self, event):
-        if event.maskname == "IN_Q_OVERFLOW":
-            bb.warn("inotify event queue overflowed, invalidating caches.")
-            self._parsecache_set(False)
-            bb.parse.clear_cache()
-            return
-        if event.pathname.endswith("bitbake-cookerdaemon.log") \
-                or event.pathname.endswith("bitbake.lock"):
-            return
-        if "IN_ISDIR" in event.maskname:
-            if "IN_CREATE" in event.maskname or "IN_DELETE" in event.maskname:
-                if event.pathname in self.watcher.bbseen:
-                    self.watcher.bbseen.remove(event.pathname)
-                # Could remove all entries starting with the directory but for now...
-                bb.parse.clear_cache()
-        if not event.pathname in self.inotify_modified_files:
-            self.inotify_modified_files.append(event.pathname)
-        self._parsecache_set(False)
-
-    def add_filewatch(self, deps, watcher=None, dirs=False):
-        if not watcher:
-            watcher = self.watcher
         for i in deps:
-            watcher.bbwatchedfiles.add(i[0])
-            if dirs:
-                f = i[0]
-            else:
-                f = os.path.dirname(i[0])
-            if f in watcher.bbseen:
-                continue
-            watcher.bbseen.add(f)
-            watchtarget = None
-            while True:
-                # We try and add watches for files that don't exist but if they did, would influence
-                # the parser. The parent directory of these files may not exist, in which case we need
-                # to watch any parent that does exist for changes.
-                try:
-                    watcher.add_watch(f, self.watchmask, quiet=False)
-                    if watchtarget:
-                        watcher.bbwatchedfiles.add(watchtarget)
-                    break
-                except pyinotify.WatchManagerError as e:
-                    if 'ENOENT' in str(e):
-                        watchtarget = f
-                        f = os.path.dirname(f)
-                        if f in watcher.bbseen:
-                            break
-                        watcher.bbseen.add(f)
-                        continue
-                    if 'ENOSPC' in str(e):
-                        providerlog.error("No space left on device or exceeds fs.inotify.max_user_watches?")
-                        providerlog.error("To check max_user_watches: sysctl -n fs.inotify.max_user_watches.")
-                        providerlog.error("To modify max_user_watches: sysctl -n -w fs.inotify.max_user_watches=<value>.")
-                        providerlog.error("Root privilege is required to modify max_user_watches.")
-                    raise
-
-    def handle_inotify_updates(self):
-        # reload files for which we got notifications
-        for p in self.inotify_modified_files:
-            bb.parse.update_cache(p)
-            if p in bb.parse.BBHandler.cached_statements:
-                del bb.parse.BBHandler.cached_statements[p]
-        self.inotify_modified_files = []
+            f = i[0]
+            mtime = i[1]
+            watcher[f] = mtime
 
     def sigterm_exception(self, signum, stackframe):
         if signum == signal.SIGTERM:
@@ -392,8 +269,7 @@ class BBCooker:
             if mod not in self.orig_sysmodules:
                 del sys.modules[mod]
 
-        self.handle_inotify_updates()
-        self.setupConfigWatcher()
+        self.configwatched = {}
 
         # Need to preserve BB_CONSOLELOG over resets
         consolelog = None
@@ -436,7 +312,7 @@ class BBCooker:
             self.disableDataTracking()
 
         for mc in self.databuilder.mcdata.values():
-            self.add_filewatch(mc.getVar("__base_depends", False), self.configwatcher)
+            self.add_filewatch(mc.getVar("__base_depends", False), configwatcher=True)
 
         self._baseconfig_set(True)
         self._parsecache_set(False)
@@ -485,6 +361,29 @@ class BBCooker:
         self.configuration.tracking = False
         if hasattr(self, "data"):
             self.data.disableTracking()
+
+    def revalidateCaches(self):
+        bb.parse.clear_cache()
+
+        clean = True
+        for f in self.configwatched:
+            if not bb.parse.check_mtime(f, self.configwatched[f]):
+                bb.server.process.serverlog("Found %s changed, invalid cache" % f)
+                self._baseconfig_set(False)
+                self._parsecache_set(False)
+                clean = False
+                break
+
+        if clean:
+            for f in self.parsewatched:
+                if not bb.parse.check_mtime(f, self.parsewatched[f]):
+                    bb.server.process.serverlog("Found %s changed, invalid cache" % f)
+                    self._parsecache_set(False)
+                    clean = False
+                    break
+
+        if not clean:
+            bb.parse.BBHandler.cached_statements = {}
 
     def parseConfiguration(self):
         self.updateCacheSync()
@@ -566,6 +465,7 @@ class BBCooker:
         # Now update all the variables not in the datastore to match
         self.configuration.env = environment
 
+        self.revalidateCaches()
         if not clean:
             logger.debug("Base environment change, triggering reparse")
             self.reset()
@@ -1542,6 +1442,37 @@ class BBCooker:
 
         self.idleCallBackRegister(buildFileIdle, rq)
 
+    def getTaskSignatures(self, target, tasks):
+        sig = []
+        getAllTaskSignatures = False
+
+        if not tasks:
+            tasks = ["do_build"]
+            getAllTaskSignatures = True
+
+        for task in tasks:
+            taskdata, runlist = self.buildTaskData(target, task, self.configuration.halt)
+            rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)
+            rq.rqdata.prepare()
+
+            for l in runlist:
+                mc, pn, taskname, fn = l
+
+                taskdep = rq.rqdata.dataCaches[mc].task_deps[fn]
+                for t in taskdep['tasks']:
+                    if t in taskdep['nostamp'] or "setscene" in t:
+                        continue
+                    tid = bb.runqueue.build_tid(mc, fn, t)
+
+                    if t in task or getAllTaskSignatures:
+                        try:
+                            rq.rqdata.prepare_task_hash(tid)
+                            sig.append([pn, t, rq.rqdata.get_task_unihash(tid)])
+                        except KeyError:
+                            sig.append(self.getTaskSignatures(target, [t])[0])
+
+        return sig
+
     def buildTargets(self, targets, task):
         """
         Attempt to build the targets specified
@@ -1644,8 +1575,6 @@ class BBCooker:
         if self.state == state.running:
             return
 
-        self.handle_inotify_updates()
-
         if not self.baseconfig_valid:
             logger.debug("Reloading base configuration data")
             self.initConfigurationData()
@@ -1667,7 +1596,7 @@ class BBCooker:
 
         if self.state != state.parsing and not self.parsecache_valid:
             bb.server.process.serverlog("Parsing started")
-            self.setupParserWatcher()
+            self.parsewatched = {}
 
             bb.parse.siggen.reset(self.data)
             self.parseConfiguration ()
@@ -1692,9 +1621,9 @@ class BBCooker:
                 total_masked += masked
                 searchdirs |= set(search)
 
-            # Add inotify watches for directories searched for bb/bbappend files
+            # Add mtimes for directories searched for bb/bbappend files
             for dirent in searchdirs:
-                self.add_filewatch([[dirent]], dirs=True)
+                self.add_filewatch([(dirent, bb.parse.cached_mtime_noerror(dirent))])
 
             self.parser = CookerParser(self, mcfilelist, total_masked)
             self._parsecache_set(True)
@@ -1881,7 +1810,7 @@ class CookerCollectFiles(object):
             collectlog.error("no recipe files to build, check your BBPATH and BBFILES?")
             bb.event.fire(CookerExit(), eventdata)
 
-        # We need to track where we look so that we can add inotify watches. There
+        # We need to track where we look so that we can know when the cache is invalid. There
         # is no nice way to do this, this is horrid. We intercept the os.listdir()
         # (or os.scandir() for python 3.6+) calls while we run glob().
         origlistdir = os.listdir

@@ -1,0 +1,31 @@
+From f21e9f13beb57a1e0666edf9693d7c83f2189897 Mon Sep 17 00:00:00 2001
+From: "G. Branden Robinson" <g.branden.robinson@gmail.com>
+Date: Fri, 22 Sep 2023 01:27:57 -0500
+Subject: [PATCH] [build]: meintro_fr.ps depends on tbl.
+
+* doc/doc.am (doc/meintro_fr.ps): Depend on tbl, resolving race in
+  sufficiently parallelized builds.  Overlooked in commit 92349ae223,
+  2022-05-30.
+
+Fixes <https://savannah.gnu.org/bugs/?64695>.  Thanks to Alexander
+Kanavin for the report.
+
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ doc/doc.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/doc.am b/doc/doc.am
+index d3c9ab6b7..0f95c7774 100644
+--- a/doc/doc.am
++++ b/doc/doc.am
+@@ -334,7 +334,7 @@ SUFFIXES += .me.in .me
+ 
+ # Use '-K utf8', not '-k', in case 'configure' didn't find uchardet.
+ # The French translation uses tbl; its English counterpart does not.
+-doc/meintro_fr.ps: doc/meintro_fr.me preconv
++doc/meintro_fr.ps: doc/meintro_fr.me preconv tbl
+ 	$(GROFF_V)$(MKDIR_P) `dirname $@` \
+ 	&& $(DOC_GROFF) -K utf8 -t -Tps -me -mfr $< >$@
+ 

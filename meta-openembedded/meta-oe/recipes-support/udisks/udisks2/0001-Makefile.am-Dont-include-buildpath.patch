@@ -1,0 +1,47 @@
+From b1b58f122a3e05b5689358fdd3203ba110cca567 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sun, 24 Sep 2023 22:20:42 +0200
+Subject: [PATCH] Reproducibility fix
+
+This fixes:
+WARNING: udisks2-2.10.1-r0 do_package_qa: QA Issue: File /usr/lib/udisks2/modules/libudisks2_btrfs.so in package udisks2 contains reference to TMPDIR
+File /usr/lib/udisks2/modules/libudisks2_lvm2.so in package udisks2 contains reference to TMPDIR
+File /usr/libexec/udisks2/udisksd in package udisks2 contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ modules/lvm2/Makefile.am | 2 +-
+ src/Makefile.am          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/lvm2/Makefile.am b/modules/lvm2/Makefile.am
+index 67b8aa6b3..e4ae462e7 100644
+--- a/modules/lvm2/Makefile.am
++++ b/modules/lvm2/Makefile.am
+@@ -16,7 +16,7 @@ CPPFLAGS =                                                                     \
+ 	-DLVM_HELPER_DIR=\""$(prefix)/lib/udisks2/"\"                          \
+ 	-D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT                                \
+ 	-DUDISKS_COMPILATION                                                   \
+-	-DBUILD_DIR=\"$(abs_top_builddir)/\"                                   \
++	-DBUILD_DIR=\"/usr/src/\"                                              \
+ 	$(POLKIT_GOBJECT_1_CFLAGS)                                             \
+ 	$(GLIB_CFLAGS)                                                         \
+ 	$(GIO_CFLAGS)                                                          \
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 5a174d1ab..0da3a497b 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -20,7 +20,7 @@ CPPFLAGS =                                                                     \
+ 	-DUDISKS_MODULE_DIR=\"$(libdir)/udisks2/modules\"                      \
+ 	-D_POSIX_PTHREAD_SEMANTICS -D_REENTRANT                                \
+ 	-DUDISKS_COMPILATION                                                   \
+-	-DBUILD_DIR=\"$(abs_top_builddir)/\"                                   \
++	-DBUILD_DIR=\"/usr/src/\"                                              \
+ 	$(POLKIT_GOBJECT_1_CFLAGS)                                             \
+ 	$(GUDEV_CFLAGS)                                                        \
+ 	$(GLIB_CFLAGS)                                                         \
+-- 
+2.42.0
+

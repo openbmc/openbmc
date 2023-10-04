@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Author: Kai-Chung Yan <seamlikok@gmail.com>
 Last-Update: 2016-08-24
 Description: Manual definition of struct user_pt_regs

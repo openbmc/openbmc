@@ -1,0 +1,53 @@
+From 66430e7c6fbd5187b66560909a510e136fed91c0 Mon Sep 17 00:00:00 2001
+From: Daniela Plascencia <daniela.plascencia@linux.intel.com>
+Date: Thu, 23 Feb 2017 10:34:27 -0600
+Subject: [PATCH] meta: adding hello-yocto recipe
+
+This is a sample recipe
+
+Signed-off-by: Daniela Plascencia <daniela.plascencia@linux.intel.com>
+---
+ .../hello-world/hello-world/hello_world.c      |  5 +++++
+ .../hello-world/hello-world_1.0.bb             | 18 ++++++++++++++++++
+ 2 files changed, 23 insertions(+)
+ create mode 100644 meta/recipes-devtools/hello-world/hello-world/hello_world.c
+ create mode 100644 meta/recipes-devtools/hello-world/hello-world_1.0.bb
+
+diff --git a/meta/recipes-devtools/hello-world/hello-world/hello_world.c b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
+new file mode 100644
+index 0000000000..0d59f57d4c
+--- /dev/null
++++ b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
+@@ -0,0 +1,5 @@
++#include <stdio.h>
++
++int main(){
++    printf("Hello World\n");
++}
+diff --git a/meta/recipes-devtools/hello-world/hello-world_1.0.bb b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
+new file mode 100644
+index 0000000000..3c990c108a
+--- /dev/null
++++ b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
+@@ -0,0 +1,18 @@
++SUMMARY = "This is a sample summary"
++DESCRIPTION = "This is a sample description"
++HOMEPAGE = "https://sample.com/this-is-a-sample"
++LICENSE = "MIT"
++
++SRC_URI += "file://hello_world.c"
++
++SRC_URI[md5sum] = "4ee21e9dcc9b5b6012c23038734e1632"
++SRC_URI[sha256sum] = "edef2bbde0fbf0d88232782a0eded323f483a0519d6fde9a3b1809056fd35f3e"
++
++do_compile(){
++    ${CC} -o hello_world ../hello_world.c
++}
++
++do_install(){
++    install -d ${D}${bindir}
++    install -m +x hello_world ${D}${bindir}/hello_world
++}
+-- 
+2.41.0
+

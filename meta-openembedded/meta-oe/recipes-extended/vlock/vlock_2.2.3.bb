@@ -37,13 +37,13 @@ do_configure () {
         VLOCK_GROUP=root \
         ROOT_GROUP=root \
         CC="${CC}" \
-        CFLAGS="${CFLAGS}" \
         LDFLAGS="${LDFLAGS}" \
         --prefix=${prefix} \
         --libdir=${libdir} \
         --mandir=${mandir} \
         --with-modules="all.so new.so nosysrq.so ttyblank.so vesablank.so" \
         --disable-root-password --enable-debug --disable-fail-count \
+        EXTRA_CFLAGS="${CFLAGS}" \
         ${PACKAGECONFIG_CONFARGS}
 }
 

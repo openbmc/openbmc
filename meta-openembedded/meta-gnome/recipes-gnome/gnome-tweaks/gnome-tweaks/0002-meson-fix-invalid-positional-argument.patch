@@ -3,7 +3,7 @@ From: Mae Dartmann <hello@maedartmann.name>
 Date: Wed, 16 Feb 2022 06:08:41 +0000
 Subject: [PATCH] meson: fix invalid positional argument
 
-Upstream-Status: Accepted [https://gitlab.gnome.org/GNOME/gnome-tweaks/-/commit/dc9701e18775c01d0b69fabaa350147f70096da8]
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gnome-tweaks/-/commit/dc9701e18775c01d0b69fabaa350147f70096da8]
 ---
  data/meson.build | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

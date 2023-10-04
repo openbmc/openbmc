@@ -3,7 +3,6 @@
 #
 
 SUMMARY = "Software development tools"
-PR = "r9"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

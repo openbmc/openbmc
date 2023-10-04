@@ -5,6 +5,8 @@ Subject: [PATCH 03/10] Use __GLIBC__ to control use of gnu_get_libc_version
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+
+Upstream-Status: Pending
 ---
  src/mongo/util/processinfo_linux.cpp | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

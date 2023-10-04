@@ -5,7 +5,6 @@ build system cannot obtain from other sources such as the kernel."
 SECTION = "base"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
-PR = "r45"
 
 SRC_URI = "file://config file://machconfig"
 S = "${WORKDIR}"

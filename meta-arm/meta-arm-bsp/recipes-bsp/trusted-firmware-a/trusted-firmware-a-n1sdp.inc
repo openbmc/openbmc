@@ -36,6 +36,6 @@ EXTRA_OEMAKE:append = "\
 		    CREATE_KEYS=1 \
 		    ARM_ROTPK_LOCATION="devel_rsa" \
 		    ROT_KEY="${TFA_ROT_KEY}" \
-		    BL32=${RECIPE_SYSROOT}/lib/firmware/tee-pager_v2.bin \
+		    BL32=${RECIPE_SYSROOT}/${nonarch_base_libdir}/firmware/tee-pager_v2.bin \
 		    BL33=${RECIPE_SYSROOT}/firmware/uefi.bin \
 		    "

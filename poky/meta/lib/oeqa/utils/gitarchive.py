@@ -255,7 +255,15 @@ def get_test_revs(log, repo, tag_name, **kwargs):
         if not commit in revs:
             revs[commit] = TestedRev(commit, commit_num, [tag])
         else:
-            assert commit_num == revs[commit].commit_number, "Commit numbers do not match"
+            if commit_num != revs[commit].commit_number:
+                # Historically we have incorrect commit counts of '1' in the repo so fix these up
+                if int(revs[commit].commit_number) < 5:
+                    tags = revs[commit].tags
+                    revs[commit] = TestedRev(commit, commit_num, [tags])
+                elif int(commit_num) < 5:
+                    pass
+                else:
+                    sys.exit("Commit numbers for commit %s don't match (%s vs %s)" % (commit, commit_num, revs[commit].commit_number))
             revs[commit].tags.append(tag)
 
     # Return in sorted table

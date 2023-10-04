@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://debuginfod/debuginfod-client.c;endline=28;md5=f0a7c3170776866ee94e8f9225a6ad79 \
                     "
 DEPENDS = "zlib virtual/libintl"
-DEPENDS:append:libc-musl = " argp-standalone fts musl-obstack "
+DEPENDS:append:libc-musl = " argp-standalone fts musl-legacy-error musl-obstack"
 # The Debian patches below are from:
 # http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.176-1.debian.tar.xz
 SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
@@ -24,13 +24,15 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            "
 SRC_URI:append:libc-musl = " \
            file://0003-musl-utils.patch \
-           file://0015-config-eu.am-do-not-use-Werror.patch \
            "
 SRC_URI[sha256sum] = "39bd8f1a338e2b7cd4abc3ff11a0eddc6e690f69578a57478d8179b4148708c8"
 
 inherit autotools gettext ptest pkgconfig
 
 EXTRA_OECONF = "--program-prefix=eu-"
+
+# Only used at runtime for make check but we want deterministic makefiles for ptest so hardcode
+CACHED_CONFIGUREVARS += "ac_cv_prog_HAVE_BUNZIP2=yes"
 
 BUILD_CFLAGS += "-Wno-error=stringop-overflow"
 

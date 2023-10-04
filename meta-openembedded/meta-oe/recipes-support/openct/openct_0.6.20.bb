@@ -1,4 +1,4 @@
-Summanry = "Middleware framework for smart card terminals"
+SUMMARY = "Middleware framework for smart card terminals"
 HOMEPAGE = "https://github.com/OpenSC/openct/wiki"
 DESCRIPTION = " \
 OpenCT implements drivers for several smart card readers. \

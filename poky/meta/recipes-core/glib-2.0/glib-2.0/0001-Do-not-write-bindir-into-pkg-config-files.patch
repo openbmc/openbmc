@@ -1,4 +1,4 @@
-From 4a41bf7b050168726cc4fad4c1c72fc7c18ab779 Mon Sep 17 00:00:00 2001
+From 9ec4eedeb3f67db0bff09f5d859318d05ff47964 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 15 Feb 2019 11:17:27 +0100
 Subject: [PATCH] Do not write $bindir into pkg-config files
@@ -16,46 +16,46 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/gio/meson.build b/gio/meson.build
-index 36b5bad..137e75a 100644
+index a320c0f..86ce7c4 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -862,14 +862,14 @@ pkg.generate(libgio,
-                'schemasdir=' + join_paths('${datadir}', schemas_subdir),
-                'bindir=' + join_paths('${prefix}', get_option('bindir')),
-                'giomoduledir=' + pkgconfig_giomodulesdir,
--               'gio=' + join_paths('${bindir}', 'gio'),
--               'gio_querymodules=@0@'.format(pkgconfig_multiarch_bindir / 'gio-querymodules'),
--               'glib_compile_schemas=@0@'.format(pkgconfig_multiarch_bindir / 'glib-compile-schemas'),
--               'glib_compile_resources=' + join_paths('${bindir}', 'glib-compile-resources'),
--               'gdbus=' + join_paths('${bindir}', 'gdbus'),
--               'gdbus_codegen=' + join_paths('${bindir}', 'gdbus-codegen'),
--               'gresource=' + join_paths('${bindir}', 'gresource'),
--               'gsettings=' + join_paths('${bindir}', 'gsettings')],
-+               'gio=gio',
-+               'gio_querymodules=gio-querymodules',
-+               'glib_compile_schemas=glib-compile-schemas',
-+               'glib_compile_resources=glib-compile-resources',
-+               'gdbus=gdbus',
-+               'gdbus_codegen=gdbus-codegen',
-+               'gresource=gresource',
-+               'gsettings=gsettings'],
+@@ -884,14 +884,14 @@ pkg.generate(libgio,
+     'dtdsdir=' + '${datadir}' / dtds_subdir,
+     'bindir=' + '${prefix}' / get_option('bindir'),
+     'giomoduledir=' + pkgconfig_giomodulesdir,
+-    'gio=' + '${bindir}' / 'gio',
+-    'gio_querymodules=' + pkgconfig_multiarch_bindir / 'gio-querymodules',
+-    'glib_compile_schemas=' + pkgconfig_multiarch_bindir / 'glib-compile-schemas',
+-    'glib_compile_resources=' + '${bindir}' / 'glib-compile-resources',
+-    'gdbus=' + '${bindir}' /'gdbus',
+-    'gdbus_codegen=' + '${bindir}' / 'gdbus-codegen',
+-    'gresource=' + '${bindir}' / 'gresource',
+-    'gsettings=' + '${bindir}' / 'gsettings',
++    'gio=gio',
++    'gio_querymodules=gio-querymodules',
++    'glib_compile_schemas=glib-compile-schemas',
++    'glib_compile_resources=glib-compile-resources',
++    'gdbus=gdbus',
++    'gdbus_codegen=gdbus-codegen',
++    'gresource=gresource',
++    'gsettings=gsettings',
+   ],
    version : glib_version,
    install_dir : glib_pkgconfigreldir,
-   filebase : 'gio-2.0',
 diff --git a/glib/meson.build b/glib/meson.build
-index c365901..c3d6601 100644
+index c26a35e..1d8ca6b 100644
 --- a/glib/meson.build
 +++ b/glib/meson.build
-@@ -397,9 +397,9 @@ pkg.generate(libglib,
-   subdirs : ['glib-2.0'],
-   extra_cflags : ['-I${libdir}/glib-2.0/include'] + win32_cflags,
-   variables : ['bindir=' + join_paths('${prefix}', get_option('bindir')),
--               'glib_genmarshal=' + join_paths('${bindir}', 'glib-genmarshal'),
--               'gobject_query=' + join_paths('${bindir}', 'gobject-query'),
--               'glib_mkenums=' + join_paths('${bindir}', 'glib-mkenums')],
-+               'glib_genmarshal=glib-genmarshal',
-+               'gobject_query=gobject-query',
-+               'glib_mkenums=glib-mkenums'],
-   version : glib_version,
-   install_dir : glib_pkgconfigreldir,
-   filebase : 'glib-2.0',
+@@ -447,9 +447,9 @@ pkg.generate(libglib,
+   variables : [
+     'bindir=' + '${prefix}' / get_option('bindir'),
+     'datadir=' + '${prefix}' / get_option('datadir'),
+-    'glib_genmarshal=' + '${bindir}' / 'glib-genmarshal',
+-    'gobject_query=' + '${bindir}' / 'gobject-query',
+-    'glib_mkenums=' + '${bindir}' / 'glib-mkenums',
++    'glib_genmarshal=glib-genmarshal',
++    'gobject_query=gobject-query',
++    'glib_mkenums=glib-mkenums',
+     'glib_valgrind_suppressions=' + '${datadir}' /
+       valgrind_suppression_file_install_subdir /
+       fs.name(valgrind_suppression_file),

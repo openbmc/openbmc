@@ -1,8 +1,0 @@
-header:
-  version: 9
-  includes:
-    - kas/fvp-baser-aemv8r64-bsp.yml
-
-local_conf_header:
-  base-rt: |
-    PREFERRED_PROVIDER_virtual/kernel = "linux-yocto-rt"

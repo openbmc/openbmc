@@ -1,4 +1,4 @@
-From 8ce56a02fd722833931d356c372d374845f4c626 Mon Sep 17 00:00:00 2001
+From 6c403e3ccaae3bb3fd9d0ad220ed8ea98b2b1354 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 7 Apr 2021 00:16:07 -0700
 Subject: [PATCH] Enforce using good old BFD linker
@@ -12,18 +12,17 @@ collect2: error: ld returned 1 exit status
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  BaseTools/Conf/tools_def.template | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
-index 503a6687c1..5cbc5c92a5 100755
+index 1bf62362b611..2b41be8d5a44 100755
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
-@@ -746,7 +746,7 @@ DEFINE GCC_ARM_CC_XIPFLAGS         = -mno-unaligned-access
- DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18
+@@ -747,7 +747,7 @@ DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-
  DEFINE GCC_AARCH64_CC_XIPFLAGS     = -mstrict-align -mgeneral-regs-only
+ DEFINE GCC_RISCV64_CC_XIPFLAGS     = -mstrict-align -mgeneral-regs-only
  DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
 -DEFINE GCC_DLINK2_FLAGS_COMMON     = -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds
 +DEFINE GCC_DLINK2_FLAGS_COMMON     = -fuse-ld=bfd -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds

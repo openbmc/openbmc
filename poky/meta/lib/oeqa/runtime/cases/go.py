@@ -18,4 +18,4 @@ class GoHelloworldTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg=msg)
 
         msg = 'Incorrect output: %s' % output
-        self.assertEqual(output, "Hello, Go examples!", msg=msg)
+        self.assertEqual(output, "Hello, world!", msg=msg)

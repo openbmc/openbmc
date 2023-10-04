@@ -43,7 +43,8 @@ def currenttime():
 
 def serverlog(msg):
     print(str(os.getpid()) + " " +  currenttime() + " " + msg)
-    sys.stdout.flush()
+    #Seems a flush here triggers filesytem sync like behaviour and long hangs in the server
+    #sys.stdout.flush()
 
 #
 # When we have lockfile issues, try and find infomation about which process is
@@ -410,12 +411,6 @@ class ProcessServer():
             nextsleep = 0.1
             fds = []
 
-            try:
-                self.cooker.process_inotify_updates()
-            except Exception as exc:
-                serverlog("Exception %s in inofify updates broke the idle_thread, exiting" % traceback.format_exc())
-                self.quit = True
-
             with bb.utils.lock_timeout(self._idlefuncsLock):
                 items = list(self._idlefuns.items())
 
@@ -625,7 +620,7 @@ class BitBakeServer(object):
         os.set_inheritable(self.bitbake_lock.fileno(), True)
         os.set_inheritable(self.readypipein, True)
         serverscript = os.path.realpath(os.path.dirname(__file__) + "/../../../bin/bitbake-server")
-        os.execl(sys.executable, "bitbake-server", serverscript, "decafbad", str(self.bitbake_lock.fileno()), str(self.readypipein), self.logfile, self.bitbake_lock.name, self.sockname,  str(self.server_timeout or 0), str(int(self.profile)), str(self.xmlrpcinterface[0]), str(self.xmlrpcinterface[1]))
+        os.execl(sys.executable, sys.executable, serverscript, "decafbad", str(self.bitbake_lock.fileno()), str(self.readypipein), self.logfile, self.bitbake_lock.name, self.sockname,  str(self.server_timeout or 0), str(int(self.profile)), str(self.xmlrpcinterface[0]), str(self.xmlrpcinterface[1]))
 
 def execServer(lockfd, readypipeinfd, lockname, sockname, server_timeout, xmlrpcinterface, profile):
 

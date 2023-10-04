@@ -729,7 +729,7 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
         wicout = glob(os.path.join(self.resultdir, "wictestdisk-*.direct"))
         self.assertEqual(1, len(wicout))
         size = os.path.getsize(wicout[0])
-        self.assertTrue(size > extraspace)
+        self.assertTrue(size > extraspace, msg="Extra space not present (%s vs %s)" % (size, extraspace))
 
     def test_no_table(self):
         """Test --no-table wks option."""
@@ -773,7 +773,7 @@ class Wic2(WicTestCase):
         basename = bb_vars['IMAGE_BASENAME']
         self.assertEqual(basename, image)
         path = os.path.join(imgdatadir, basename) + '.env'
-        self.assertTrue(os.path.isfile(path))
+        self.assertTrue(os.path.isfile(path), msg="File %s wasn't generated as expected" % path)
 
         wicvars = set(bb_vars['WICVARS'].split())
         # filter out optional variables
@@ -786,7 +786,7 @@ class Wic2(WicTestCase):
             # test if variables used by wic present in the .env file
             for var in wicvars:
                 self.assertTrue(var in content, "%s is not in .env file" % var)
-                self.assertTrue(content[var])
+                self.assertTrue(content[var], "%s doesn't have a value (%s)" % (var, content[var]))
 
     def test_image_vars_dir_short(self):
         """Test image vars directory selection -v option"""
@@ -833,8 +833,8 @@ class Wic2(WicTestCase):
         # pointing to existing files
         for suffix in ('wic', 'manifest'):
             path = prefix + suffix
-            self.assertTrue(os.path.islink(path))
-            self.assertTrue(os.path.isfile(os.path.realpath(path)))
+            self.assertTrue(os.path.islink(path), msg="Link %s wasn't generated as expected" % path)
+            self.assertTrue(os.path.isfile(os.path.realpath(path)), msg="File linked to by %s wasn't generated as expected" % path)
 
     # TODO this should work on aarch64
     @skipIfNotArch(['i586', 'i686', 'x86_64'])
@@ -1104,7 +1104,7 @@ class Wic2(WicTestCase):
         self.remove_config(config)
         bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
         image_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], '%s.wic' % bb_vars['IMAGE_LINK_NAME'])
-        self.assertTrue(os.path.exists(image_path))
+        self.assertTrue(os.path.exists(image_path), msg="Image file %s wasn't generated as expected" % image_path)
 
         sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
 
@@ -1345,11 +1345,11 @@ class Wic2(WicTestCase):
             orig_sizes = [int(line.split()[3]) for line in orig.output.split('\n')[1:]]
             exp_sizes = [int(line.split()[3]) for line in exp.output.split('\n')[1:]]
             self.assertEqual(orig_sizes[0], exp_sizes[0]) # first partition is not resized
-            self.assertTrue(orig_sizes[1] < exp_sizes[1])
+            self.assertTrue(orig_sizes[1] < exp_sizes[1], msg="Parition size wasn't enlarged (%s vs %s)" % (orig_sizes[1], exp_sizes[1]))
 
             # Check if all free space is partitioned
             result = runCmd("%s/usr/sbin/sfdisk -F %s" % (sysroot, new_image_path))
-            self.assertTrue("0 B, 0 bytes, 0 sectors" in result.output)
+            self.assertIn("0 B, 0 bytes, 0 sectors", result.output)
 
             os.rename(image_path, image_path + '.bak')
             os.rename(new_image_path, image_path)
@@ -1433,7 +1433,7 @@ class ModifyTests(WicTestCase):
             # check if file is there
             result = runCmd("wic ls %s:1/ -n %s" % (images[0], sysroot))
             self.assertEqual(7, len(result.output.split('\n')))
-            self.assertTrue(os.path.basename(testfile.name) in result.output)
+            self.assertIn(os.path.basename(testfile.name), result.output)
 
             # prepare directory
             testdir = os.path.join(self.resultdir, 'wic-test-cp-dir')
@@ -1447,13 +1447,13 @@ class ModifyTests(WicTestCase):
             # check if directory is there
             result = runCmd("wic ls %s:1/ -n %s" % (images[0], sysroot))
             self.assertEqual(8, len(result.output.split('\n')))
-            self.assertTrue(os.path.basename(testdir) in result.output)
+            self.assertIn(os.path.basename(testdir), result.output)
 
             # copy the file from the partition and check if it success
             dest = '%s-cp' % testfile.name
             runCmd("wic cp %s:1/%s %s -n %s" % (images[0],
                     os.path.basename(testfile.name), dest, sysroot))
-            self.assertTrue(os.path.exists(dest))
+            self.assertTrue(os.path.exists(dest), msg="File %s wasn't generated as expected" % dest)
 
 
     def test_wic_rm(self):
@@ -1497,7 +1497,7 @@ class ModifyTests(WicTestCase):
         # list directory content of the second ext4 partition
         result = runCmd("wic ls %s:2/ -n %s" % (images[0], sysroot))
         self.assertTrue(set(['bin', 'home', 'proc', 'usr', 'var', 'dev', 'lib', 'sbin']).issubset(
-                            set(line.split()[-1] for line in result.output.split('\n') if line)))
+                            set(line.split()[-1] for line in result.output.split('\n') if line)), msg="Expected directories not present %s" % result.output)
 
     def test_wic_cp_ext(self):
         """Test copy files and directories to the ext partition."""
@@ -1512,7 +1512,7 @@ class ModifyTests(WicTestCase):
         # list directory content of the ext4 partition
         result = runCmd("wic ls %s:2/ -n %s" % (images[0], sysroot))
         dirs = set(line.split()[-1] for line in result.output.split('\n') if line)
-        self.assertTrue(set(['bin', 'home', 'proc', 'usr', 'var', 'dev', 'lib', 'sbin']).issubset(dirs))
+        self.assertTrue(set(['bin', 'home', 'proc', 'usr', 'var', 'dev', 'lib', 'sbin']).issubset(dirs), msg="Expected directories not present %s" % dirs)
 
         with NamedTemporaryFile("w", suffix=".wic-cp") as testfile:
             testfile.write("test")
@@ -1527,12 +1527,12 @@ class ModifyTests(WicTestCase):
 
             # check if the file to copy is in the partition
             result = runCmd("wic ls %s:2/etc/ -n %s" % (images[0], sysroot))
-            self.assertTrue('fstab' in [line.split()[-1] for line in result.output.split('\n') if line])
+            self.assertIn('fstab', [line.split()[-1] for line in result.output.split('\n') if line])
 
             # copy file from the partition, replace the temporary file content with it and
             # check for the file size to validate the copy
             runCmd("wic cp %s:2/etc/fstab %s -n %s" % (images[0], testfile.name, sysroot))
-            self.assertTrue(os.stat(testfile.name).st_size > 0)
+            self.assertTrue(os.stat(testfile.name).st_size > 0, msg="Filesize not as expected %s" % os.stat(testfile.name).st_size)
 
 
     def test_wic_rm_ext(self):
@@ -1547,18 +1547,18 @@ class ModifyTests(WicTestCase):
 
         # list directory content of the /etc directory on ext4 partition
         result = runCmd("wic ls %s:2/etc/ -n %s" % (images[0], sysroot))
-        self.assertTrue('fstab' in [line.split()[-1] for line in result.output.split('\n') if line])
+        self.assertIn('fstab', [line.split()[-1] for line in result.output.split('\n') if line])
 
         # remove file
         runCmd("wic rm %s:2/etc/fstab -n %s" % (images[0], sysroot))
 
         # check if it's removed
         result = runCmd("wic ls %s:2/etc/ -n %s" % (images[0], sysroot))
-        self.assertTrue('fstab' not in [line.split()[-1] for line in result.output.split('\n') if line])
+        self.assertNotIn('fstab', [line.split()[-1] for line in result.output.split('\n') if line])
 
         # remove non-empty directory
         runCmd("wic rm -r %s:2/etc/ -n %s" % (images[0], sysroot))
 
         # check if it's removed
         result = runCmd("wic ls %s:2/ -n %s" % (images[0], sysroot))
-        self.assertTrue('etc' not in [line.split()[-1] for line in result.output.split('\n') if line])
+        self.assertNotIn('etc', [line.split()[-1] for line in result.output.split('\n') if line])

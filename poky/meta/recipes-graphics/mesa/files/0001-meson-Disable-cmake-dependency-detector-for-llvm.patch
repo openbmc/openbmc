@@ -1,0 +1,42 @@
+From 00d41cd5aa3f4b494dc276c9b4ccdc096310c91f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 28 Sep 2023 15:34:22 -0700
+Subject: [PATCH] meson: use llvm-config instead of cmake to fix linking errors with meson 1.2.1
+
+meson dependency auto dependency detection uses cmake and then
+config-tool to process dependencies, in mesa the logic to detect llvm is
+using auto detection which means if it finds cmake then it will try to
+use cmake method. Cmake method works ok except a case when llvm-dev
+package is installed on the build host then it generates its own
+native.meson file and ignores OE supplied meson.native file which has
+correct llvm-config tool specified which is pointing to llvm-config from
+native sysroot. The generated meson.native file points to one found in
+/usr/bin and there onwards detector finds native install of llvm and
+configures that into building native mesa package.
+
+Since cmake detector does not always work, disable it by default and use
+config-tool which works in all cases. This is suggested in below issues
+too
+
+A similar issue is open in meson upstream [1] and mesa [2]
+
+[1] https://github.com/mesonbuild/meson/issues/10483
+[2] https://gitlab.freedesktop.org/mesa/mesa/-/issues/6738
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/25438]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/meson.build
++++ b/meson.build
+@@ -1659,6 +1659,7 @@ with_llvm = false
+ if _llvm.allowed()
+   dep_llvm = dependency(
+     'llvm',
++    method : host_machine.system() == 'windows' ? 'auto' : 'config-tool',
+     version : _llvm_version,
+     modules : llvm_modules,
+     optional_modules : llvm_optional_modules,

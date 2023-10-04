@@ -6,6 +6,8 @@ Subject: [PATCH 01/10] Tell scons to use build settings from environment
 
 Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
 Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+
+Upstream-Status: Pending
 ---
  SConstruct | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)

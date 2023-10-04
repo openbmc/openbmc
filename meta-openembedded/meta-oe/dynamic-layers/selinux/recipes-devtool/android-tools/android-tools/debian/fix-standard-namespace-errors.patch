@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Add missing 'std::' scope identifiers.
 Forwarded: not-needed
 --- a/system/core/libunwindstack/include/unwindstack/DwarfMemory.h

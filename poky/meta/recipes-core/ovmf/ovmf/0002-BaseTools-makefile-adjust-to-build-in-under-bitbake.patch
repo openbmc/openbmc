@@ -1,7 +1,7 @@
-From 7675a67b8bb207de38ff5a9dc416e8b1028eb8ce Mon Sep 17 00:00:00 2001
+From ac9df4fb92965f1f95a5bdbde5f2f86d0c569711 Mon Sep 17 00:00:00 2001
 From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
 Date: Fri, 26 Jul 2019 17:34:26 -0400
-Subject: [PATCH 2/4] BaseTools: makefile: adjust to build in under bitbake
+Subject: [PATCH] BaseTools: makefile: adjust to build in under bitbake
 
 Prepend the build flags with those of bitbake. This is to build
 using the bitbake native sysroot include and library directories.
@@ -18,13 +18,13 @@ Upstream-Status: Inappropriate [needs to be converted to in-recipe fixups]
  1 file changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/BaseTools/Source/C/Makefiles/header.makefile b/BaseTools/Source/C/Makefiles/header.makefile
-index 1bf003523b..28757aed63 100644
+index d369908a09..22c670f316 100644
 --- a/BaseTools/Source/C/Makefiles/header.makefile
 +++ b/BaseTools/Source/C/Makefiles/header.makefile
-@@ -82,35 +82,34 @@ $(error Bad HOST_ARCH)
- endif
+@@ -85,35 +85,34 @@ endif
  
  INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE)
+ INCLUDE += -I $(EDK2_PATH)/MdePkg/Include
 -CPPFLAGS = $(INCLUDE)
 +CPPFLAGS += $(INCLUDE)
  

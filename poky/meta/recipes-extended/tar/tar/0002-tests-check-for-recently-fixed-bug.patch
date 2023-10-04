@@ -1,0 +1,60 @@
+From 0f0722df45ec520d0dac7c9ad7e69165e9140931 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Fri, 7 Oct 2022 15:22:07 -0700
+Subject: tests: check for recently-fixed bug
+
+* tests/exclude17.at: New file.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/tar.git/commit/?id=0f0722df45ec520d0dac7c9ad7e69165e9140931]
+
+Signed-off-by: Qiu Tingting <qiutt@fujitsu.com>
+
+---
+ tests/exclude17.at | 35 +++++++++++++++++++++++++++++++++++
+ 1 files changed, 35 insertions(+)
+ create mode 100644 tests/exclude17.at
+
+diff --git a/tests/exclude17.at b/tests/exclude17.at
+new file mode 100644
+index 0000000..4162b2b
+--- /dev/null
++++ b/tests/exclude17.at
+@@ -0,0 +1,35 @@
++# Process this file with autom4te to create testsuite. -*- Autotest -*-
++#
++# Test suite for GNU tar.
++# Copyright 2013-2022 Free Software Foundation, Inc.
++
++# This file is part of GNU tar.
++
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++AT_SETUP([--exclude-vcs-ignores memory allocation])
++AT_KEYWORDS([exclude exclude17])
++
++AT_TAR_CHECK([
++mkdir dir
++cd dir
++echo '*.o' >.cvsignore
++tar -cf - --exclude-vcs-ignores . | tar -tf -
++],
++[0],
++[./
++./.cvsignore
++])
++
++AT_CLEANUP
+-- 
+cgit v1.1
+

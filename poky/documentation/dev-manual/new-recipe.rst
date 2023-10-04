@@ -1036,13 +1036,14 @@ build system and package managers, so the resulting packages will not
 correctly trigger an upgrade.
 
 In order to ensure the versions compare properly, the recommended
-convention is to set :term:`PV` within the
-recipe to "previous_version+current_version". You can use an additional
-variable so that you can use the current version elsewhere. Here is an
-example::
+convention is to use a tilde (``~``) character as follows::
 
-   REALPV = "0.8.16-rc1"
-   PV = "0.8.15+${REALPV}"
+  PV = 0.8.16~rc1
+
+This way ``0.8.16~rc1`` sorts before ``0.8.16``. See the
+":ref:`contributor-guide/recipe-style-guide:version policy`" section in the
+Yocto Project and OpenEmbedded Contributor Guide for more details about
+versioning code corresponding to a pre-release or to a specific Git commit.
 
 Post-Installation Scripts
 =========================
@@ -1394,9 +1395,9 @@ doing the following:
 Following Recipe Style Guidelines
 =================================
 
-When writing recipes, it is good to conform to existing style
-guidelines. The :oe_wiki:`OpenEmbedded Styleguide </Styleguide>` wiki page
-provides rough guidelines for preferred recipe style.
+When writing recipes, it is good to conform to existing style guidelines.
+See the ":doc:`../contributor-guide/recipe-style-guide`" in the Yocto Project
+and OpenEmbedded Contributor Guide for reference.
 
 It is common for existing recipes to deviate a bit from this style.
 However, aiming for at least a consistent style is a good idea. Some

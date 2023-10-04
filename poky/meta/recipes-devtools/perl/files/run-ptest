@@ -1,2 +1,2 @@
 #!/bin/sh
-cd t && PERL_BUILD_PACKAGING=1 ./TEST | sed -u -e 's|\(.*\) .* ok$|PASS: \1|' -e 's|\(.*\) .* skipped|SKIP: \1|' -e 's|\(.*\) \.\(.*\)|FAIL: \1|'
+{ cd t && PERL_BUILD_PACKAGING=1 ./TEST || echo "FAIL: perl" ; } | sed -u -e 's|\(.*\) .* ok$|PASS: \1|' -e 's|\(.*\) .* skipped|SKIP: \1|' -e 's|\(.*\) \.\(.*\)|FAIL: \1|'

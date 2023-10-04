@@ -1,0 +1,33 @@
+This regex decides whether to use O3 opimisation on numpy or not.
+
+It includes "od", which happens to be a substring of "reproducible"
+but not "qemux86-world". 
+
+The regex will run against all compiler options including things like:
+
+-fmacro-prefix-map=/XXX/build/tmp/work/core2-64-poky-linux/python3-numpy/1.26.0/numpy-1.26.0=/usr/src/debug/python3-numpy/1.26.0-r0
+
+i.e. including build paths.
+
+Reduce the regex to something deterministic for our builds, assuming
+nobody builds in /home/debug:full/
+
+The autobuilder race depended upon whether qemux86-world or the
+reproducible target ran first and won the race to populate sstate.
+
+Upstream-Status: Inappropriate [upstream have dropped distutils and switched to meson]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: numpy-1.26.0/numpy/distutils/ccompiler_opt.py
+===================================================================
+--- numpy-1.26.0.orig/numpy/distutils/ccompiler_opt.py
++++ numpy-1.26.0/numpy/distutils/ccompiler_opt.py
+@@ -990,7 +990,7 @@ class _CCompiler:
+             ("cc_is_nocc",     "", ""),
+         )
+         detect_args = (
+-           ("cc_has_debug",  ".*(O0|Od|ggdb|coverage|debug:full).*", ""),
++           ("cc_has_debug",  ".*debug:full.*", ""),
+            ("cc_has_native",
+                 ".*(-march=native|-xHost|/QxHost|-mcpu=a64fx).*", ""),
+            # in case if the class run with -DNPY_DISABLE_OPTIMIZATION

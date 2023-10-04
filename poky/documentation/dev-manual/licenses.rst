@@ -123,6 +123,13 @@ name and version (after variable expansion)::
 
    LICENSE_FLAGS = "license_${PN}_${PV}"
 
+It is possible to give more details about a specific license
+using flags on the :term:`LICENSE_FLAGS_DETAILS` variable::
+
+   LICENSE_FLAGS_DETAILS[my-eula-license] = "For further details, see https://example.com/eula."
+
+If set, this will be displayed to the user if the license hasn't been accepted.
+
 In order for a component restricted by a
 :term:`LICENSE_FLAGS` definition to be enabled and included in an image, it
 needs to have a matching entry in the global
@@ -298,19 +305,34 @@ There are other requirements beyond the scope of these three and the
 methods described in this section (e.g. the mechanism through which
 source code is distributed).
 
-As different organizations have different methods of complying with open
-source licensing, this section is not meant to imply that there is only
-one single way to meet your compliance obligations, but rather to
-describe one method of achieving compliance. The remainder of this
-section describes methods supported to meet the previously mentioned
-three requirements. Once you take steps to meet these requirements, and
-prior to releasing images, sources, and the build system, you should
-audit all artifacts to ensure completeness.
+As different organizations have different ways of releasing software,
+there can be multiple ways of meeting license obligations. At
+least, we describe here two methods for achieving compliance:
+
+-  The first method is to use OpenEmbedded's ability to provide
+   the source code, provide a list of licenses, as well as
+   compilation scripts and source code modifications.
+
+   The remainder of this section describes supported methods to meet
+   the previously mentioned three requirements.
+
+-  The second method is to generate a *Software Bill of Materials*
+   (:term:`SBoM`), as described in the ":doc:`/dev-manual/sbom`" section.
+   Not only do you generate :term:`SPDX` output which can be used meet
+   license compliance requirements (except for sharing the build system
+   and layers sources for the time being), but this output also includes
+   component version and patch information which can be used
+   for vulnerability assessment.
+
+Whatever method you choose, prior to releasing images, sources,
+and the build system, you should audit all artifacts to ensure
+completeness.
 
 .. note::
 
    The Yocto Project generates a license manifest during image creation
-   that is located in ``${DEPLOY_DIR}/licenses/``\ `image_name`\ ``-``\ `datestamp`
+   that is located in
+   ``${DEPLOY_DIR}/licenses/<image-name>-<machine>.rootfs-<datestamp>/``
    to assist with any audits.
 
 Providing the Source Code
@@ -428,7 +450,7 @@ with source as defined by the GPL and other open source licenses.
 Providing Compilation Scripts and Source Code Modifications
 -----------------------------------------------------------
 
-At this point, we have addressed all we need to prior to generating the
+At this point, we have addressed all we need prior to generating the
 image. The next two requirements are addressed during the final
 packaging of the release.
 

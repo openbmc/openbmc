@@ -31,6 +31,7 @@ EXTRA_OECONF += "\
 PACKAGECONFIG ?= "\
     openssl \
     ${@bb.utils.filter('DISTRO_FEATURES', 'polkit', d)} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'seccomp', d)} \
     ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
 "
 

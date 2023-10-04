@@ -7,7 +7,7 @@ Date:   Tue Dec 27 17:40:17 2022 +0530
     Login timed out message prints only first few bytes when write is immediately followed by exit.
     Calling exit from new handler provides enough time to display full message.
 
-Upstream-Status: Accepted [https://github.com/shadow-maint/shadow/commit/670cae834827a8f794e6f7464fa57790d911b63c]
+Upstream-Status: Backport [https://github.com/shadow-maint/shadow/commit/670cae834827a8f794e6f7464fa57790d911b63c]
 
 diff --git a/src/login.c b/src/login.c
 index 116e2cb3..c55f4de0 100644

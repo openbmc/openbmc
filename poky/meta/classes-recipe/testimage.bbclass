@@ -322,7 +322,7 @@ def testimage_main(d):
     ovmf = d.getVar("QEMU_USE_OVMF")
 
     slirp = False
-    if d.getVar("QEMU_USE_SLIRP"):
+    if bb.utils.contains('TEST_RUNQEMUPARAMS', 'slirp', True, False, d):
         slirp = True
 
     # TODO: We use the current implementation of qemu runner because of
@@ -369,10 +369,21 @@ def testimage_main(d):
     # runtime use network for download projects for build
     export_proxies(d)
 
+    if slirp:
+        # Default to 127.0.0.1 and let the runner identify the port forwarding
+        # (as OEQemuTarget does), but allow overriding.
+        target_ip = d.getVar("TEST_TARGET_IP") or "127.0.0.1"
+        # Default to 10.0.2.2 as this is the IP that the guest has with the
+        # default qemu slirp networking configuration, but allow overriding.
+        server_ip = d.getVar("TEST_SERVER_IP") or "10.0.2.2"
+    else:
+        target_ip = d.getVar("TEST_TARGET_IP")
+        server_ip = d.getVar("TEST_SERVER_IP")
+
     # the robot dance
     target = OERuntimeTestContextExecutor.getTarget(
-        d.getVar("TEST_TARGET"), logger, d.getVar("TEST_TARGET_IP"),
-        d.getVar("TEST_SERVER_IP"), **target_kwargs)
+        d.getVar("TEST_TARGET"), logger, target_ip,
+        server_ip, **target_kwargs)
 
     # test context
     tc = OERuntimeTestContext(td, logger, target, image_packages, extract_dir)

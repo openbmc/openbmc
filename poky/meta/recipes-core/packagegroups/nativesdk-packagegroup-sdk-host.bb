@@ -3,7 +3,6 @@
 #
 
 SUMMARY = "Host packages for the standalone SDK or external toolchain"
-PR = "r12"
 
 inherit packagegroup nativesdk
 

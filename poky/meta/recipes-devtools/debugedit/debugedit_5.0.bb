@@ -11,8 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 
 SRC_URI = "https://sourceware.org/ftp/debugedit/${PV}/debugedit-${PV}.tar.xz"
 
-SRC_URI:append:libc-musl = " \
-           file://0001-tools-Add-error.h-for-non-glibc-case.patch \
+SRC_URI:append:libc-musl = "\
            file://0002-sepdebugcrcfix.c-do-not-use-64bit-variants.patch \
            file://0003-Makefile.am-do-not-update-manual.patch \
            "
@@ -20,6 +19,7 @@ SRC_URI:append:libc-musl = " \
 SRC_URI[sha256sum] = "e9ecd7d350bebae1f178ce6776ca19a648b6fe8fa22f5b3044b38d7899aa553e"
 
 DEPENDS = "elfutils"
+DEPENDS:append:libc-musl = " musl-legacy-error"
 
 inherit pkgconfig autotools
 

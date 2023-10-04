@@ -55,7 +55,7 @@ The name of the FVP binary itself, for example `fvp-base` uses `FVP_Base_RevC-2x
 
 The name of the recipe that provides the FVP executable set in `FVP_EXE`, for example `fvp-base` uses `fvp-base-a-aem-native`.  This *must* be a `-native` recipe as the binary will be executed on the build host.
 
-There are recipes for common FVPs in meta-arm already, and writing new recipes is trivial.  For FVPs which are free to download `fvp-base-a-aem.bb` is a good example. Some FVPs must be downloaded separately as they need an account on Arm's website, `fvp-base-r-aem.bb` is a good example of those.
+There are recipes for common FVPs in meta-arm already, and writing new recipes is trivial.  For FVPs which are free to download `fvp-base-a-aem.bb` is a good example. Some FVPs must be downloaded separately as they need an account on Arm's website.
 
 If `FVP_PROVIDER` is not set then it is assumed that `FVP_EXE` is installed on the host already.
 

@@ -28,7 +28,6 @@ SRC_URI[md5sum] = "2b31c78f087f99179feb357da312d7ec"
 SRC_URI[sha256sum] = "4441a5d593f85bb6e8d578cf6653fb4ec30f9e8f4a2315a3d8f2d0a8b3fadf94"
 
 # remove at next version upgrade or when output changes
-PR = "r1"
 
 RECIPE_NO_UPDATE_REASON = "6.04-pre3 is broken"
 UPSTREAM_CHECK_URI = "https://www.zytor.com/pub/syslinux/"

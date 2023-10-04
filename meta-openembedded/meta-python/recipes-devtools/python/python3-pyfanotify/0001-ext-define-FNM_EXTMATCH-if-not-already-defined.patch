@@ -13,11 +13,11 @@ Upstream-Status: Inappropriate
  1 file changed, 3 insertions(+)
 
 diff --git a/src/ext.c b/src/ext.c
-index 2ba9a14..98ffc20 100644
+index e0bbe21..7d979d3 100644
 --- a/src/ext.c
 +++ b/src/ext.c
-@@ -18,6 +18,9 @@
- #include <sys/un.h>
+@@ -19,6 +19,9 @@
+ #include <sys/vfs.h>
  #include <unistd.h>
  
 +#ifndef FNM_EXTMATCH
@@ -27,5 +27,5 @@ index 2ba9a14..98ffc20 100644
  PyDoc_STRVAR(ext__doc__,
  "Wrapper for fanotify.\n"
 -- 
-2.32.0
+2.34.1
 

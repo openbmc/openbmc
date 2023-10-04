@@ -1,0 +1,32 @@
+From 1fbb446d1849b1208012cbdae5d85d228cdbe4a6 Mon Sep 17 00:00:00 2001
+From: First Last <first.last@example.com>
+Date: Tue, 29 Aug 2023 13:32:24 -0400
+Subject: [PATCH] selftest-hello: add a summary
+
+This patch should fail the selftests because the author address is from the
+invalid "example.com".
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ .../recipes-test/selftest-hello/selftest-hello_1.0.bb          | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+index 547587bef4..491f0a3df7 100644
+--- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+@@ -1,3 +1,4 @@
++SUMMARY = "A cool sample"
+ DESCRIPTION = "Simple helloworld application -- selftest variant"
+ SECTION = "examples"
+ LICENSE = "MIT"
+@@ -16,4 +17,4 @@ do_install() {
+ 	install -m 0755 helloworld ${D}${bindir}
+ }
+ 
+-BBCLASSEXTEND = "native nativesdk"
+\ No newline at end of file
++BBCLASSEXTEND = "native nativesdk"
+-- 
+2.41.0
+

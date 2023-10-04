@@ -23,8 +23,6 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  src/test/test-sizeof.c    | 2 +-
  2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/cpu-set-util.h b/src/shared/cpu-set-util.h
-index 3c63a58826..4c2d4347fc 100644
 --- a/src/shared/cpu-set-util.h
 +++ b/src/shared/cpu-set-util.h
 @@ -6,6 +6,8 @@
@@ -36,8 +34,6 @@ index 3c63a58826..4c2d4347fc 100644
  /* This wraps the libc interface with a variable to keep the allocated size. */
  typedef struct CPUSet {
          cpu_set_t *set;
-diff --git a/src/test/test-sizeof.c b/src/test/test-sizeof.c
-index 6cf92bffde..937d26ca55 100644
 --- a/src/test/test-sizeof.c
 +++ b/src/test/test-sizeof.c
 @@ -1,6 +1,5 @@
@@ -47,7 +43,7 @@ index 6cf92bffde..937d26ca55 100644
  #include <stdio.h>
  #include <string.h>
  #include <sys/resource.h>
-@@ -11,6 +10,7 @@
+@@ -12,6 +11,7 @@
  #include <float.h>
  
  #include "time-util.h"
@@ -55,6 +51,3 @@ index 6cf92bffde..937d26ca55 100644
  
  /* Print information about various types. Useful when diagnosing
   * gcc diagnostics on an unfamiliar architecture. */
--- 
-2.39.2
-

@@ -4,7 +4,6 @@
 
 SUMMARY = "Self-hosting"
 DESCRIPTION = "Packages required to run the build system"
-PR = "r13"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
 

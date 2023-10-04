@@ -1,4 +1,4 @@
-From 865762e0a767a121206d818bdd58301afbf30104 Mon Sep 17 00:00:00 2001
+From c8e9776abc3dfd3f2411797a90a03e7fa16263ef Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 23 Jun 2023 01:20:38 -0700
 Subject: [PATCH] gallium: Fix build with llvm 17
@@ -10,11 +10,9 @@ so add conditions to exclude them for llvm >= 17
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/23827]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- src/gallium/auxiliary/gallivm/lp_bld_init.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ src/gallium/auxiliary/gallivm/lp_bld_init.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/gallium/auxiliary/gallivm/lp_bld_init.c b/src/gallium/auxiliary/gallivm/lp_bld_init.c
-index 24d0823..3d4573e 100644
 --- a/src/gallium/auxiliary/gallivm/lp_bld_init.c
 +++ b/src/gallium/auxiliary/gallivm/lp_bld_init.c
 @@ -42,8 +42,10 @@
@@ -29,6 +27,14 @@ index 24d0823..3d4573e 100644
  #include <llvm-c/Transforms/Utils.h>
  #endif
  #include <llvm-c/BitWriter.h>
--- 
-2.41.0
-
+@@ -53,8 +55,10 @@
+ #if LLVM_VERSION_MAJOR <= 8 && (DETECT_ARCH_AARCH64 || DETECT_ARCH_ARM || DETECT_ARCH_S390 || DETECT_ARCH_MIPS64)
+ #include <llvm-c/Transforms/IPO.h>
+ #endif
++#if LLVM_VERSION_MAJOR < 17
+ #include <llvm-c/Transforms/Coroutines.h>
+ #endif
++#endif
+ 
+ unsigned gallivm_perf = 0;
+ 

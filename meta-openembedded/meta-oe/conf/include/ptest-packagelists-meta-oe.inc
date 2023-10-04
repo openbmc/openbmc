@@ -24,7 +24,6 @@ PTESTS_FAST_META_OE = "\
     libssh \
     libtinyxml2 \
     libxml++-5.0 \
-    libxmlb \
     libyang \
     lmdb \
     minicoredumper \
@@ -49,6 +48,7 @@ PTESTS_SLOW_META_OE = "\
     fftw \
     libusb-compat \
     rsyslog \
+    mariadb \
 "
 
 PTESTS_PROBLEMS_META_OE ="\

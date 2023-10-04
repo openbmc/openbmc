@@ -3,7 +3,7 @@ HOMEPAGE = "https://trusted-services.readthedocs.io/en/latest/index.html"
 
 LICENSE = "Apache-2.0 & BSD-3-Clause & Zlib"
 
-inherit python3native cmake
+inherit python3native cmake pkgconfig
 
 COMPATIBLE_HOST = "aarch64.*-linux"
 COMPATIBLE_MACHINE ?= "invalid"

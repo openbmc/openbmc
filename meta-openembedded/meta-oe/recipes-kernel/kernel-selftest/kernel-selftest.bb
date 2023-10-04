@@ -74,7 +74,7 @@ do_compile() {
 either install it and add it to HOSTTOOLS, or add clang-native from meta-clang to dependency"
     fi
     fi
-
+    oe_runmake -C ${S} headers
     for i in ${TEST_LIST}
     do
         oe_runmake -C ${S}/tools/testing/selftests/${i}

@@ -1,8 +1,21 @@
 #!/bin/sh
+export POCO_BASE=/usr/lib/poco/ptest
+export LD_LIBRARY_PATH=${POCO_BASE}/bin:${LD_LIBRARY_PATH}
+i=0
 while read runner; do
   oldpath=`pwd` >/dev/null
   cd bin
   echo Testing $runner
   ./$runner -ignore $oldpath/cppignore.lnx -all
+  export res$((i++))=$?
   cd $oldpath >/dev/null
+done < testrunners
+i=0
+while read runner; do
+  eval assign=\$res$((i++))
+  if [ $assign -ne 0 ]; then
+    echo "FAIL: $runner"
+  else
+    echo "PASS: $runner"
+  fi
 done < testrunners

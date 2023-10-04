@@ -10,7 +10,8 @@ class DnfSelftest(DnfTest):
         import tempfile
         cls.temp_dir = tempfile.TemporaryDirectory(prefix="oeqa-remotefeeds-")
         cls.repo_server = HTTPService(os.path.join(cls.tc.td['WORKDIR'], 'oe-rootfs-repo'),
-                                      cls.tc.target.server_ip)
+                                      '0.0.0.0', port=cls.tc.target.server_port,
+                                      logger=cls.tc.logger)
         cls.repo_server.start()
 
     @classmethod

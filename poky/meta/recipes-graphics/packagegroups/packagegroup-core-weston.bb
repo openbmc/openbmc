@@ -1,6 +1,5 @@
 SUMMARY = "Basic Weston compositor setup"
 DESCRIPTION = "Packages required to set up a basic working Weston session"
-PR = "r1"
 
 inherit packagegroup features_check
 

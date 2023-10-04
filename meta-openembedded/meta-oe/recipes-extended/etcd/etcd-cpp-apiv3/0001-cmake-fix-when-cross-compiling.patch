@@ -1,0 +1,68 @@
+From cb79329010d73e36ce64830914005f1c17f8f53c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Cl=C3=A9ment=20P=C3=A9ron?= <peron.clem@gmail.com>
+Date: Sat, 23 Sep 2023 11:32:18 +0200
+Subject: [PATCH] cmake: fix when cross compiling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In order to generate protobuf files CMake need to use the protoc
+and grpc-cpp-plugin compiled for the host architecture.
+
+Unfortunately, the protoc and grpc-cpp-plugin in the gRPC CMake
+configuration file are the one for the target architecture.
+
+Fix this by properly finding the correct executable when
+CMake is cross compiling.
+
+Signed-off-by: Clément Péron <peron.clem@gmail.com>
+---
+Upstream-Status: Pending
+
+ CMakeLists.txt | 28 ++++++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5aa1310..80ebad2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -120,10 +120,34 @@ if(Protobuf_PROTOC_EXECUTABLE)
+     endif()
+ endif()
+ 
++# When cross compiling we look for the native protoc compiler
++# overwrite protobuf::protoc with the proper protoc
++if(CMAKE_CROSSCOMPILING)
++    find_program(Protobuf_PROTOC_EXECUTABLE REQUIRED NAMES protoc)
++    if(NOT TARGET protobuf::protoc)
++        add_executable(protobuf::protoc IMPORTED)
++    endif()
++    set_target_properties(protobuf::protoc PROPERTIES
++        IMPORTED_LOCATION "${Protobuf_PROTOC_EXECUTABLE}")
++endif()
++
+ find_package(gRPC QUIET)
+-if(gRPC_FOUND AND TARGET gRPC::grpc AND TARGET gRPC::grpc_cpp_plugin)
++if(gRPC_FOUND AND TARGET gRPC::grpc)
++    # When cross compiling we look for the native grpc_cpp_plugin
++    if(CMAKE_CROSSCOMPILING)
++        find_program(GRPC_CPP_PLUGIN REQUIRED NAMES grpc_cpp_plugin)
++        if(NOT TARGET gRPC::grpc_cpp_plugin)
++            add_executable(gRPC::grpc_cpp_plugin IMPORTED)
++        endif()
++        set_target_properties(gRPC::grpc_cpp_plugin PROPERTIES
++                IMPORTED_LOCATION "${GRPC_CPP_PLUGIN}")
++    elseif(TARGET gRPC::grpc_cpp_plugin)
++        get_target_property(GRPC_CPP_PLUGIN gRPC::grpc_cpp_plugin LOCATION)
++    else()
++        message(FATAL_ERROR "Found gRPC but no gRPC CPP plugin defined")
++    endif()
++
+     set(GRPC_LIBRARIES gRPC::gpr gRPC::grpc gRPC::grpc++)
+-    get_target_property(GRPC_CPP_PLUGIN gRPC::grpc_cpp_plugin LOCATION)
+     get_target_property(GRPC_INCLUDE_DIR gRPC::grpc INTERFACE_INCLUDE_DIRECTORIES)
+ else()
+     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGRPC.cmake)
+-- 
+2.39.3 (Apple Git-145)
+

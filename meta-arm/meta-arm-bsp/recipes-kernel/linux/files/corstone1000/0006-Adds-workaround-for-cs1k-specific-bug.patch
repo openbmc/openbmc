@@ -1,7 +1,7 @@
-From 00851c43f4d00e7451550660ab652e9ac9128e02 Mon Sep 17 00:00:00 2001
+From 555ac46f6f5157741a6fd8f21f74beb1340ed941 Mon Sep 17 00:00:00 2001
 From: Emekcan <emekcan.aras@arm.com>
 Date: Thu, 13 Oct 2022 20:53:42 +0100
-Subject: [PATCH 6/6] Adds workaround for cs1k specific bug
+Subject: [PATCH] Adds workaround for cs1k specific bug
 
 Adds a temporary workaround to solve a possible
 race-conditioning issue in the tee driver
@@ -15,7 +15,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/firmware/arm_ffa/driver.c b/drivers/firmware/arm_ffa/driver.c
-index d5e86ef40b89..cbb944f63321 100644
+index 2109cd178ff7..c15b3a83c720 100644
 --- a/drivers/firmware/arm_ffa/driver.c
 +++ b/drivers/firmware/arm_ffa/driver.c
 @@ -32,6 +32,7 @@
@@ -26,7 +26,7 @@ index d5e86ef40b89..cbb944f63321 100644
  
  #include "common.h"
  
-@@ -362,7 +363,7 @@ static int ffa_msg_send_direct_req(u16 src_id, u16 dst_id, bool mode_32bit,
+@@ -282,7 +283,7 @@ static int ffa_msg_send_direct_req(u16 src_id, u16 dst_id, bool mode_32bit,
  {
  	u32 req_id, resp_id, src_dst_ids = PACK_TARGET_INFO(src_id, dst_id);
  	ffa_value_t ret;
@@ -35,6 +35,3 @@ index d5e86ef40b89..cbb944f63321 100644
  	if (mode_32bit) {
  		req_id = FFA_MSG_SEND_DIRECT_REQ;
  		resp_id = FFA_MSG_SEND_DIRECT_RESP;
--- 
-2.39.0
-

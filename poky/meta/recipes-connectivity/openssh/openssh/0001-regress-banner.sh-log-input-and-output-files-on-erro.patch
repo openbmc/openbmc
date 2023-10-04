@@ -1,0 +1,61 @@
+From f5a4dacc987ca548fc86577c2dba121c86da3c34 Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@linaro.org>
+Date: Mon, 11 Sep 2023 09:55:21 +0100
+Subject: [PATCH] regress/banner.sh: log input and output files on error
+
+Some test environments like yocto with qemu are seeing these
+tests failing. There may be additional error messages in the
+stderr of ssh cloent command. busybox cmp shows this error when
+first input file has less new line characters then second
+input file:
+
+cmp: EOF on /usr/lib/openssh/ptest/regress/banner.in
+
+Logging the full banner.out will show what other error messages
+are captured in addition of the expected banner.
+
+Full log of a failing banner test runs is:
+
+run test banner.sh ...
+test banner: missing banner file
+test banner: size 0
+cmp: EOF on /usr/lib/openssh/ptest/regress/banner.in
+banner size 0 mismatch
+test banner: size 10
+test banner: size 100
+cmp: EOF on /usr/lib/openssh/ptest/regress/banner.in
+banner size 100 mismatch
+test banner: size 1000
+test banner: size 10000
+test banner: size 100000
+test banner: suppress banner (-q)
+FAIL:  banner
+return value: 1
+
+See: https://bugzilla.yoctoproject.org/show_bug.cgi?id=15178
+
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+---
+ regress/banner.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+Upstream-Status: Denied [https://github.com/openssh/openssh-portable/pull/437]
+
+diff --git a/regress/banner.sh b/regress/banner.sh
+index a84feb5a..de84957a 100644
+--- a/regress/banner.sh
++++ b/regress/banner.sh
+@@ -32,7 +32,9 @@ for s in 0 10 100 1000 10000 100000 ; do
+ 	verbose "test $tid: size $s"
+ 	( ${SSH} -F $OBJ/ssh_proxy otherhost true 2>$OBJ/banner.out && \
+ 		cmp $OBJ/banner.in $OBJ/banner.out ) || \
+-		fail "banner size $s mismatch"
++		( verbose "Contents of $OBJ/banner.in:"; cat $OBJ/banner.in; \
++		  verbose "Contents of $OBJ/banner.out:"; cat $OBJ/banner.out; \
++		  fail "banner size $s mismatch" )
+ done
+ 
+ trace "test suppress banner (-q)"
+-- 
+2.34.1
+

@@ -13,8 +13,6 @@ SRCREV = "a290f2dbb813ce12ba407962655a5d8b57322221"
 
 S = "${WORKDIR}/git"
 
-inherit allarch
-
 RRECOMMENDS:${PN} = "libgpiod-tools"
 
 do_install () {

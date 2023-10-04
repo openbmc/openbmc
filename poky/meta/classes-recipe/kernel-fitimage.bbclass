@@ -599,6 +599,11 @@ fitimage_assemble() {
 				DTB_PATH="${KERNEL_OUTPUT_DIR}/$DTB"
 			fi
 
+		        # Strip off the path component from the filename
+			if "${@'false' if oe.types.boolean(d.getVar('KERNEL_DTBVENDORED')) else 'true'}"; then
+			    DTB=`basename $DTB`
+			fi
+
 			# Set the default dtb image if it exists in the devicetree.
 			if [ ${FIT_CONF_DEFAULT_DTB} = $DTB ];then
 				default_dtb_image=$(echo "$DTB" | tr '/' '_')

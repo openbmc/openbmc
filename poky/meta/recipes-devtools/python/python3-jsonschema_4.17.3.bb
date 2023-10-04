@@ -1,5 +1,5 @@
 SUMMARY = "An implementation of JSON Schema validation for Python"
-HOMEPAGE = "https://github.com/Julian/jsonschema"
+HOMEPAGE = "https://github.com/python-jsonschema/jsonschema"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7a60a81c146ec25599a3e1dabb8610a8 \
                     file://json/LICENSE;md5=9d4de43111d33570c8fe49b4cb0e01af"

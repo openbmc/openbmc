@@ -1,0 +1,46 @@
+From e29da5faa74409be394caa09d9f3b7b60f8592b9 Mon Sep 17 00:00:00 2001
+From: Daniela Plascencia <daniela.plascencia@linux.intel.com>
+Date: Thu, 23 Feb 2017 10:34:27 -0600
+Subject: [PATCH] meta: adding hello-yocto recipe
+
+This is a sample recipe
+
+Signed-off-by: Daniela Plascencia <daniela.plascencia@linux.intel.com>
+---
+ meta/recipes-devtools/hello-world/hello-world/hello_world.c |  5 +++++
+ meta/recipes-devtools/hello-world/hello-world_1.0.bb        | 12 ++++++++++++
+ 2 files changed, 17 insertions(+)
+ create mode 100644 meta/recipes-devtools/hello-world/hello-world/hello_world.c
+ create mode 100644 meta/recipes-devtools/hello-world/hello-world_1.0.bb
+
+diff --git a/meta/recipes-devtools/hello-world/hello-world/hello_world.c b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
+new file mode 100644
+index 0000000000..0d59f57d4c
+--- /dev/null
++++ b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
+@@ -0,0 +1,5 @@
++#include <stdio.h>
++
++int main(){
++    printf("Hello World\n");
++}
+diff --git a/meta/recipes-devtools/hello-world/hello-world_1.0.bb b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
+new file mode 100644
+index 0000000000..c4e1359217
+--- /dev/null
++++ b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
+@@ -0,0 +1,12 @@
++LICENSE = "CLOSED"
++
++SRC_URI += "file://hello_world.c"
++
++do_compile(){
++    ${CC} -o hello_world ../hello_world.c
++}
++
++do_install(){
++    install -d ${D}${bindir}
++    install -m +x hello_world ${D}${bindir}/hello_world
++}
+--
+2.11.0

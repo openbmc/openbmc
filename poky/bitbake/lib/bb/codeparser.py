@@ -82,7 +82,7 @@ def add_module_functions(fn, functions, namespace):
                 execs.remove(e)
                 execs.add(namespace + "." + e)
         modulecode_deps[name] = [parser.references.copy(), execs, parser.var_execs.copy(), parser.contains.copy()]
-        #bb.warn("%s: %s\nRefs:%s Execs: %s %s %s" % (name, src, parser.references, parser.execs, parser.var_execs, parser.contains))
+        #bb.warn("%s: %s\nRefs:%s Execs: %s %s %s" % (name, fn, parser.references, parser.execs, parser.var_execs, parser.contains))
 
 def update_module_dependencies(d):
     for mod in modulecode_deps:

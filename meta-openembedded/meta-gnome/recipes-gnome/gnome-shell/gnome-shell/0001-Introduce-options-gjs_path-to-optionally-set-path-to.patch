@@ -1,7 +1,12 @@
-From 9f11c9e53d91b23113202b40500540242bcabdb0 Mon Sep 17 00:00:00 2001
+From b2710a880b366201f07752e87d35bb52ea69cbbe Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Thu, 28 Oct 2021 18:57:24 +0200
 Subject: [PATCH] Introduce options 'gjs_path' to optionally set path to gjs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -38,10 +43,10 @@ index 48b7f89..700b590 100644
  
    configure_file(
 diff --git a/meson.build b/meson.build
-index 252fb1e..250f722 100644
+index 70ba711..f0ab158 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -125,7 +125,11 @@ endif
+@@ -135,7 +135,11 @@ endif
  
  mutter_typelibdir = mutter_dep.get_variable('typelibdir')
  python = find_program('python3')
@@ -55,12 +60,12 @@ index 252fb1e..250f722 100644
  cc = meson.get_compiler('c')
  
 diff --git a/meson_options.txt b/meson_options.txt
-index 46ca8e7..3e9a31f 100644
+index 6e83d92..1bf0ecb 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -45,3 +45,9 @@ option('soup2',
-   value: false,
-   description: 'Use Soup 2.4 instead of Soup 3. Must be in sync with libgweather'
+@@ -45,3 +45,9 @@ option('systemd',
+   value: true,
+   description: 'Enable systemd integration'
  )
 +
 +option('gjs_path',
@@ -69,7 +74,7 @@ index 46ca8e7..3e9a31f 100644
 +  description: 'Instead of searching gjs executable, configure path'
 +)
 diff --git a/subprojects/extensions-app/js/meson.build b/subprojects/extensions-app/js/meson.build
-index ce2a776..8f7bba4 100644
+index c9a67f8..91ae887 100644
 --- a/subprojects/extensions-app/js/meson.build
 +++ b/subprojects/extensions-app/js/meson.build
 @@ -9,7 +9,7 @@ endif
@@ -82,7 +87,7 @@ index ce2a776..8f7bba4 100644
  configure_file(
    input: prgname + '.in',
 diff --git a/subprojects/extensions-app/meson.build b/subprojects/extensions-app/meson.build
-index 66a39e9..331dc1d 100644
+index 6c9639e..3fe1ce0 100644
 --- a/subprojects/extensions-app/meson.build
 +++ b/subprojects/extensions-app/meson.build
 @@ -46,7 +46,12 @@ localedir = join_paths(datadir, 'locale')

@@ -6,11 +6,10 @@ HOME_URL = "https://www.open-scap.org/security-policies/scap-security-guide/"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9bfa86579213cb4c6adaffface6b2820"
 LICENSE = "BSD-3-Clause"
 
-SRCREV = "d09e81ae00509a9be4b01359166cfbece06e47f4"
+SRCREV = "da283b9a360f2f42ad642c0c9b08b061501bc667"
 SRC_URI = "git://github.com/ComplianceAsCode/content.git;branch=master;protocol=https \
            file://run_eval.sh \
            file://run-ptest \
-           file://0002-scap-security-guide-Add-Poky-support.patch \
            "
 
 

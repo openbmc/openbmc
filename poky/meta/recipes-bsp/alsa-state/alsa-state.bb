@@ -14,7 +14,6 @@ LIC_FILES_CHKSUM = " \
     file://alsa-state-init;beginline=3;endline=4;md5=3ff7ecbf534d7d503941abe8e268ef50 \
 "
 PV = "0.2.0"
-PR = "r5"
 
 SRC_URI = "\
   file://asound.conf \

@@ -112,7 +112,7 @@ class BootimgPartitionPlugin(SourcePlugin):
                 # Use a custom configuration for extlinux.conf
                 extlinux_conf = custom_cfg
                 logger.debug("Using custom configuration file "
-                             "%s for extlinux.cfg", configfile)
+                             "%s for extlinux.conf", configfile)
             else:
                 raise WicError("configfile is specified but failed to "
                                "get it from %s." % configfile)

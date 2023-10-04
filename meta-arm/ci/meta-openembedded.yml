@@ -9,3 +9,4 @@ repos:
       meta-networking:
       meta-oe:
       meta-python:
+      meta-perl:

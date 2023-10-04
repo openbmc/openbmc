@@ -1,0 +1,41 @@
+From 55208224f492af0ad929555ffc9b95ff1d301c5f Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Thu, 17 Aug 2023 15:02:38 -0400
+Subject: [PATCH] python3-dtc: upgrade 1.6.1 -> 1.7.0
+
+Changelog: https://kernel.googlesource.com/pub/scm/utils/dtc/dtc/+log/039a99414e778332d8f9c04cbd3072e1dcc62798
+
+Remove custom PV from the recipe since the relevant functionality is in
+1.7.0:
+
+[tgamblin@megalith dtc]$ git tag --contains c001fc01a43e7a06447c06ea3d50bd60641322b8
+v1.7.0
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ .../python/{python3-dtc_1.6.1.bb => python3-dtc_1.7.0.bb}      | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+ rename meta/recipes-devtools/python/{python3-dtc_1.6.1.bb => python3-dtc_1.7.0.bb} (92%)
+
+diff --git a/meta/recipes-devtools/python/python3-dtc_1.6.1.bb b/meta/recipes-devtools/python/python3-dtc_1.7.0.bb
+similarity index 92%
+rename from meta/recipes-devtools/python/python3-dtc_1.6.1.bb
+rename to meta/recipes-devtools/python/python3-dtc_1.7.0.bb
+index 95ab0be474..85e48d4694 100644
+--- a/meta/recipes-devtools/python/python3-dtc_1.6.1.bb
++++ b/meta/recipes-devtools/python/python3-dtc_1.7.0.bb
+@@ -14,9 +14,8 @@ UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
+ 
+ LIC_FILES_CHKSUM = "file://pylibfdt/libfdt.i;beginline=1;endline=6;md5=afda088c974174a29108c8d80b5dce90"
+ 
+-SRCREV = "c001fc01a43e7a06447c06ea3d50bd60641322b8"
++SRCREV = "039a99414e778332d8f9c04cbd3072e1dcc62798"
+ 
+-PV = "1.6.1+git"
+ S = "${WORKDIR}/git"
+ 
+ PYPA_WHEEL = "${S}/dist/libfdt-1.6.2*.whl"
+-- 
+2.41.0
+

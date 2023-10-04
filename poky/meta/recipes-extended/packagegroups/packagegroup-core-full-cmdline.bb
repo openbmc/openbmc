@@ -4,7 +4,6 @@
 
 SUMMARY = "Standard full-featured Linux system"
 DESCRIPTION = "Package group bringing in packages needed for a more traditional full-featured Linux system"
-PR = "r6"
 
 inherit packagegroup
 

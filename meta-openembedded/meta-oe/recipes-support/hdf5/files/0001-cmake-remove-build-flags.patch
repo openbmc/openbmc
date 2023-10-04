@@ -1,58 +1,96 @@
-From 39572baac462f16b39dc385751d5c642646718d3 Mon Sep 17 00:00:00 2001
+From 4fa437782261c0da785d4574ad3a03700f624e66 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
-Date: Wed, 4 Aug 2021 17:05:10 +0800
+Date: Tue, 19 Sep 2023 02:56:09 +0000
 Subject: [PATCH] cmake: remove build flags
 
-Remove the build flags to improve reproducibility.
+Don't generate the build host related info and reemove the build flags
+to improve reproducibility.
 
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
- config/cmake/libh5cc.in                |  2 +-
- config/cmake/libhdf5.settings.cmake.in | 12 ++++++------
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ config/cmake/libhdf5.settings.cmake.in | 18 +++++++++---------
+ src/H5make_libsettings.c               | 17 -----------------
+ 2 files changed, 9 insertions(+), 26 deletions(-)
 
---- a/config/cmake/libh5cc.in
-+++ b/config/cmake/libh5cc.in
-@@ -44,7 +44,7 @@ for arg in $@ ; do
-       exit $status
-       ;;
-     *)
--      @_PKG_CONFIG_COMPILER@ $@ `pkg-config --define-variable=prefix=$dir --cflags --libs @_PKG_CONFIG_LIBNAME@`
-+      `pkg-config --define-variable=prefix=$dir --cflags --libs @_PKG_CONFIG_LIBNAME@-@_PKG_CONFIG_VERSION@` $@
-       status=$?
-       exit $status
-       ;;
+diff --git a/config/cmake/libhdf5.settings.cmake.in b/config/cmake/libhdf5.settings.cmake.in
+index f60f0de..f4433c0 100644
 --- a/config/cmake/libhdf5.settings.cmake.in
 +++ b/config/cmake/libhdf5.settings.cmake.in
-@@ -27,14 +27,14 @@ Linking Options:
+@@ -23,23 +23,23 @@ Linking Options:
+ ----------------
+                       Libraries: @BUILD_NAME_EXT@
+   Statically Linked Executables: @BUILD_STATIC_EXECS@
+-                        LDFLAGS: @CMAKE_SHARED_LINKER_FLAGS@
++                        LDFLAGS:
                       H5_LDFLAGS: @H5_LDFLAGS@
                       AM_LDFLAGS: @AM_LDFLAGS@
                  Extra libraries: @LINK_LIBS@
 -                       Archiver: @CMAKE_AR@
+-                       AR_FLAGS: 
 -                         Ranlib: @CMAKE_RANLIB@
 +                       Archiver:
++                       AR_FLAGS:
 +                         Ranlib:
  
  Languages:
  ----------
                                C: YES
 -                     C Compiler: @CMAKE_C_COMPILER@ @CMAKE_C_COMPILER_VERSION@
--                       CPPFLAGS: @CPPFLAGS@
 +                     C Compiler:
-+                       CPPFLAGS:
+                        CPPFLAGS: @CPPFLAGS@
                      H5_CPPFLAGS: @H5_CPPFLAGS@
                      AM_CPPFLAGS: @AM_CPPFLAGS@
-                          CFLAGS: @CMAKE_C_FLAGS@
-@@ -53,8 +53,8 @@ Languages:
- @BUILD_FORTRAN_CONDITIONAL_TRUE@               Module Directory: @CMAKE_Fortran_MODULE_DIRECTORY@
+-                         CFLAGS: @CMAKE_C_FLAGS@
+-                      H5_CFLAGS: @HDF5_CMAKE_C_FLAGS@
++                         CFLAGS:
++                      H5_CFLAGS:
+                       AM_CFLAGS: @AM_CFLAGS@
+                Shared C Library: @H5_ENABLE_SHARED_LIB@
+                Static C Library: @H5_ENABLE_STATIC_LIB@
+@@ -51,11 +51,11 @@ Languages:
+                AM Fortran Flags: @AM_FCFLAGS@
+          Shared Fortran Library: @H5_ENABLE_SHARED_LIB@
+          Static Fortran Library: @H5_ENABLE_STATIC_LIB@
+-               Module Directory: @CMAKE_Fortran_MODULE_DIRECTORY@
++               Module Directory:
  
                              C++: @HDF5_BUILD_CPP_LIB@
--@BUILD_CXX_CONDITIONAL_TRUE@                   C++ Compiler: @CMAKE_CXX_COMPILER@ @CMAKE_CXX_COMPILER_VERSION@
--@BUILD_CXX_CONDITIONAL_TRUE@                      C++ Flags: @CMAKE_CXX_FLAGS@
-+@BUILD_CXX_CONDITIONAL_TRUE@                   C++ Compiler:
-+@BUILD_CXX_CONDITIONAL_TRUE@                      C++ Flags:
- @BUILD_CXX_CONDITIONAL_TRUE@                   H5 C++ Flags: @HDF5_CMAKE_CXX_FLAGS@
- @BUILD_CXX_CONDITIONAL_TRUE@                   AM C++ Flags: @AM_CXXFLAGS@
- @BUILD_CXX_CONDITIONAL_TRUE@             Shared C++ Library: @H5_ENABLE_SHARED_LIB@
+                    C++ Compiler: @CMAKE_CXX_COMPILER@ @CMAKE_CXX_COMPILER_VERSION@
+-                      C++ Flags: @CMAKE_CXX_FLAGS@
++                      C++ Flags:
+                    H5 C++ Flags: @HDF5_CMAKE_CXX_FLAGS@
+                    AM C++ Flags: @AM_CXXFLAGS@
+              Shared C++ Library: @H5_ENABLE_SHARED_LIB@
+diff --git a/src/H5make_libsettings.c b/src/H5make_libsettings.c
+index 2661288..7c0f84f 100644
+--- a/src/H5make_libsettings.c
++++ b/src/H5make_libsettings.c
+@@ -205,23 +205,6 @@ information about the library build configuration\n";
+     fprintf(rawoutstream, "/* Generated automatically by H5make_libsettings -- do not edit */\n\n\n");
+     fputs(FileHeader, rawoutstream); /*the copyright notice--see top of this file */
+ 
+-    fprintf(rawoutstream, " *\n * Created:\t\t%s %2d, %4d\n", month_name[tm->tm_mon], tm->tm_mday,
+-            1900 + tm->tm_year);
+-    if (pwd || real_name[0] || host_name[0]) {
+-        fprintf(rawoutstream, " *\t\t\t");
+-        if (real_name[0])
+-            fprintf(rawoutstream, "%s <", real_name);
+-#ifdef H5_HAVE_GETPWUID
+-        if (pwd)
+-            fputs(pwd->pw_name, rawoutstream);
+-#endif
+-        if (host_name[0])
+-            fprintf(rawoutstream, "@%s", host_name);
+-        if (real_name[0])
+-            fprintf(rawoutstream, ">");
+-        fputc('\n', rawoutstream);
+-    }
+-
+     fprintf(rawoutstream, " *\n * Purpose:\t\t");
+ 
+     for (s = purpose; *s; s++) {
+-- 
+2.35.5
+

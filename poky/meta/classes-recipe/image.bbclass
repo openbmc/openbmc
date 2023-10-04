@@ -96,6 +96,7 @@ USE_DEPMOD ?= "1"
 PID = "${@os.getpid()}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+SSTATE_ARCHS_TUNEPKG = "${@all_multilib_tune_values(d, 'TUNE_PKGARCH')}"
 
 LDCONFIGDEPEND ?= "ldconfig-native:do_populate_sysroot"
 LDCONFIGDEPEND:libc-musl = ""

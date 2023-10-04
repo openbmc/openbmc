@@ -21,6 +21,7 @@
 # This test is scanning the source tree
 1222
 # These CRL tests need --libcurl option to be enabled
+1279
 1400
 1401
 1402

@@ -6,7 +6,7 @@ Subject: [PATCH] test: retriable tests are marked failed only when all
 
 Fixes: #1193
 
-Upstream-Status: Accepted
+Upstream-Status: Backport [https://github.com/libevent/libevent/commit/3daebf308a01b4b2d3fb867be3d6631f7b5a2dbb]
 
 Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
 ---

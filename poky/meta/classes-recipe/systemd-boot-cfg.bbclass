@@ -35,7 +35,7 @@ python build_efi_cfg() {
         bb.fatal('Unable to open %s' % cfile)
 
     cfgfile.write('# Automatically created by OE\n')
-    cfgfile.write('default %s\n' % (labels.split()[0]))
+    cfgfile.write('default %s.conf\n' % (labels.split()[0]))
     timeout = d.getVar('SYSTEMD_BOOT_TIMEOUT')
     if timeout:
         cfgfile.write('timeout %s\n' % timeout)

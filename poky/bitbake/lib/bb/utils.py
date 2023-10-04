@@ -1828,6 +1828,29 @@ def mkstemp(suffix=None, prefix=None, dir=None, text=False):
         prefix = tempfile.gettempprefix() + entropy
     return tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir, text=text)
 
+def path_is_descendant(descendant, ancestor):
+    """
+    Returns True if the path `descendant` is a descendant of `ancestor`
+    (including being equivalent to `ancestor` itself). Otherwise returns False.
+    Correctly accounts for symlinks, bind mounts, etc. by using
+    os.path.samestat() to compare paths
+
+    May raise any exception that os.stat() raises
+    """
+
+    ancestor_stat = os.stat(ancestor)
+
+    # Recurse up each directory component of the descendant to see if it is
+    # equivalent to the ancestor
+    check_dir = os.path.abspath(descendant).rstrip("/")
+    while check_dir:
+        check_stat = os.stat(check_dir)
+        if os.path.samestat(check_stat, ancestor_stat):
+            return True
+        check_dir = os.path.dirname(check_dir).rstrip("/")
+
+    return False
+
 # If we don't have a timeout of some kind and a process/thread exits badly (for example
 # OOM killed) and held a lock, we'd just hang in the lock futex forever. It is better
 # we exit at some point than hang. 5 minutes with no progress means we're probably deadlocked.

@@ -1,0 +1,31 @@
+From 0c5735a0a02e15c3eae94d25fb8756285d121ddb Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 15 Sep 2023 10:59:05 +0800
+Subject: [PATCH] CMakeLists.txt: Pass the OPENSSLDIR
+
+Fixes:
+  WARNING: minifi-cpp-0.7.0-r0 do_package_qa: QA Issue: File /usr/bin/minificontroller in package minifi-cpp contains reference to TMPDIR
+  File /usr/bin/minifi in package minifi-cpp contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 215a4ef4..6fe8101f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -75,6 +75,7 @@ set(PASSTHROUGH_CMAKE_ARGS -DANDROID_ABI=${ANDROID_ABI}
+                            -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}
+                            -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}
+                            -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
++                           -DOPENSSLDIR=${OPENSSLDIR}
+ 						   ${OPENSSL_PASSTHROUGH}
+                            -G${CMAKE_GENERATOR})
+ 
+-- 
+2.25.1
+

@@ -50,12 +50,14 @@ class ActionPlugin(LayerPlugin):
 
         try:
             notadded, _ = bb.utils.edit_bblayers_conf(bblayers_conf, layerdirs, None)
+            self.tinfoil.modified_files()
             if not (args.force or notadded):
                 try:
                     self.tinfoil.run_command('parseConfiguration')
                 except (bb.tinfoil.TinfoilUIException, bb.BBHandledException):
                     # Restore the back up copy of bblayers.conf
                     shutil.copy2(backup, bblayers_conf)
+                    self.tinfoil.modified_files()
                     bb.fatal("Parse failure with the specified layer added, exiting.")
                 else:
                     for item in notadded:
@@ -81,6 +83,7 @@ class ActionPlugin(LayerPlugin):
                 layerdir = os.path.abspath(item)
             layerdirs.append(layerdir)
         (_, notremoved) = bb.utils.edit_bblayers_conf(bblayers_conf, None, layerdirs)
+        self.tinfoil.modified_files()
         if notremoved:
             for item in notremoved:
                 sys.stderr.write("No layers matching %s found in BBLAYERS\n" % item)
@@ -239,6 +242,9 @@ build results (as the layer priority order has effectively changed).
                                     break
                             if not entry_found:
                                 logger.warning("File %s does not match the flattened layer's BBFILES setting, you may need to edit conf/layer.conf or move the file elsewhere" % f1full)
+
+        self.tinfoil.modified_files()
+
 
     def get_file_layer(self, filename):
         layerdir = self.get_file_layerdir(filename)

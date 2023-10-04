@@ -468,7 +468,6 @@ RDEPENDS:packagegroup-meta-oe-gnome ="\
     pyxdg \
     vte9 \
     gnome-theme-adwaita \
-    libxmlb \
 "
 
 RDEPENDS:packagegroup-meta-oe-graphics ="\

@@ -5,6 +5,8 @@ Last-Update: 2019-01-05
 Origin: https://bugs.debian.org/945646
 
 ---
+Upstream-Status: Pending
+
 Index: android-platform-tools/system/core/libsparse/simg_dump.py
 ===================================================================
 --- android-platform-tools.orig/system/core/libsparse/simg_dump.py

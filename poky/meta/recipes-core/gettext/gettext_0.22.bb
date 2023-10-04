@@ -182,7 +182,7 @@ do_install_ptest() {
     fi
 }
 
-RDEPENDS:${PN}-ptest += "make xz bash"
+RDEPENDS:${PN}-ptest += "make xz bash gawk autoconf locale-base-de-de locale-base-fr-fr"
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\
     glibc-gconv-big5 \
     glibc-charmap-big5 \
@@ -202,8 +202,6 @@ RDEPENDS:${PN}-ptest:append:libc-glibc = "\
     glibc-charmap-euc-jp \
     glibc-gconv-gb18030 \
     glibc-charmap-gb18030 \
-    locale-base-de-de \
-    locale-base-fr-fr \
 "
 
 RRECOMMENDS:${PN}-ptest:append:libc-glibc = "\

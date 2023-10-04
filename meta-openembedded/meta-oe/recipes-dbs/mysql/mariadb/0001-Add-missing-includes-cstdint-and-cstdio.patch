@@ -15,7 +15,8 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h   | 1 +
  .../rocksdb/rocksdb/table/block_based/data_block_hash_index.h    | 1 +
  storage/rocksdb/rocksdb/util/slice.cc                            | 1 +
- 4 files changed, 4 insertions(+)
+ storage/rocksdb/rocksdb/util/string_util.h                       | 1 +
+ 5 files changed, 5 insertions(+)
 
 diff --git a/storage/rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h b/storage/rocksdb/rocksdb/db/compaction/compaction_iteration_stats.h
 index 963c1d8e..73487edd 100644
@@ -65,6 +66,19 @@ index 6db11cc9..c26b6a21 100644
  #include "rocksdb/slice_transform.h"
  #include "rocksdb/slice.h"
  #include "util/string_util.h"
+
+diff --git a/util/string_util.h b/util/string_util.h
+index 55d106fff02..11178fd1d7b 100644
+--- a/storage/rocksdb/rocksdb/util/string_util.h
++++ b/storage/rocksdb/rocksdb/util/string_util.h
+@@ -6,6 +6,7 @@
+
+ #pragma once
+
++#include <cstdint>
+ #include <sstream>
+ #include <string>
+ #include <unordered_map>
 -- 
 2.25.1
 

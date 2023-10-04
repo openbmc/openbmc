@@ -4,6 +4,7 @@ header:
     - ci/base.yml
     - ci/meta-openembedded.yml
     - ci/poky-tiny.yml
+    - ci/meta-secure-core.yml
 
 local_conf_header:
     extrapackages: |

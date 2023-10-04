@@ -12,6 +12,8 @@ SRCREV = "5a8a5866a847561566499847d46a97c612b4e6dd"
 
 S = "${WORKDIR}/git"
 
+CVE_CHECK_SKIP_RECIPE = "${PN}"
+
 inherit cmake pkgconfig meson features_check
 
 FILES:${PN} += "${datadir}/dbus-1/* \

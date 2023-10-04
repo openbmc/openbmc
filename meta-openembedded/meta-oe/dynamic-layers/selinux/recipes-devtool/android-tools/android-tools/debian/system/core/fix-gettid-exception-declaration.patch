@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: get libcutils building
 Forwarded: not-needed
 --- a/system/core/libcutils/include/cutils/threads.h

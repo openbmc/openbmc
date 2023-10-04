@@ -7,7 +7,7 @@ This bites during cross compiling where the target is different than
 build host and build host might be ubuntu but that does not matter in
 cross compilation case. This fails builds when usrmerge feature is used
 
-Upstream-Status: Inappropriates [ Cross-compile specific ]
+Upstream-Status: Inappropriate [ Cross-compile specific ]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  configure.ac | 2 +-

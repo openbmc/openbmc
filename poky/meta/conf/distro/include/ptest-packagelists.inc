@@ -47,6 +47,7 @@ PTESTS_FAST = "\
     libxml-sax-base-perl \
     libxml-simple-perl \
     libxml2 \
+    libxmlb \
     logrotate \
     lua \
     lzo \
@@ -77,8 +78,8 @@ PTESTS_FAST = "\
     zlib \
     libexif \
 "
-PTESTS_FAST:append:libc-glibc = " glibc-tests"
-PTESTS_PROBLEMS:remove:libc-glibc = "glibc-tests"
+PTESTS_FAST:append:libc-glibc = " glibc-y2038-tests"
+PTESTS_PROBLEMS:remove:libc-glibc = "glibc-y2038-tests"
 PTESTS_FAST:remove:mips64 = "qemu"
 PTESTS_PROBLEMS:append:mips64 = " qemu"
 PTESTS_FAST:remove:riscv32 = "qemu"
@@ -108,7 +109,10 @@ PTESTS_SLOW = "\
     perl \
     python3-cryptography \
     python3 \
+    python3-click \
+    python3-xmltodict \
     strace \
+    tar \
     tcl \
     util-linux \
     valgrind \
@@ -140,5 +144,6 @@ PTESTS_PROBLEMS = "\
     libpam \
     libseccomp \
     numactl \
+    python3-license-expression \
     python3-numpy \
 "

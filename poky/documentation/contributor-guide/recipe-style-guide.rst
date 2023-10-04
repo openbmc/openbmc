@@ -7,17 +7,18 @@ Recipe Naming Conventions
 =========================
 
 In general, most recipes should follow the naming convention
-``recipes-category/package/packagename_version.bb``. Recipes for related
-projects may share the same package directory. ``packagename``, ``category``,
-and ``package`` may contain hyphens, but hyphens are not allowed in ``version``.
+``recipes-category/recipename/recipename_version.bb``. Recipes for related
+projects may share the same recipe directory. ``recipename`` and ``category``
+may contain hyphens, but hyphens are not allowed in ``version``.
 
 If the recipe is tracking a Git revision that does not correspond to a released
-version of the software, ``version`` may be ``git`` (e.g. ``packagename_git.bb``)
+version of the software, ``version`` may be ``git`` (e.g. ``recipename_git.bb``)
+and the recipe would set :term:`PV`.
 
 Version Policy
 ==============
 
-Our versions follow the form ``<package epoch>:<package version>-<package revision>``
+Our versions follow the form ``<epoch>:<version>-<revision>``
 or in BitBake variable terms ${:term:`PE`}:${:term:`PV`}-${:term:`PR`}. We
 generally follow the `Debian <https://www.debian.org/doc/debian-policy/ch-controlfields.html#version>`__
 version policy which defines these terms.
@@ -26,7 +27,7 @@ In most cases the version :term:`PV` will be set automatically from the recipe
 file name. It is recommended to use released versions of software as these are
 revisions that upstream are expecting people to use.
 
-Package versions should always compare and sort correctly so that upgrades work
+Recipe versions should always compare and sort correctly so that upgrades work
 as expected. With conventional versions such as ``1.4`` upgrading ``to 1.5``
 this happens naturally, but some versions don't sort. For example,
 ``1.5 Release Candidate 2`` could be written as ``1.5rc2`` but this sorts after
@@ -62,7 +63,7 @@ Version Number Changes
 
 The :term:`PR` variable is used to indicate different revisions of a recipe
 that reference the same upstream source version. It can be used to force a
-new version of a package to be installed onto a device from a package feed.
+new version of a recipe to be installed onto a device from a package feed.
 These once had to be set manually but in most cases these can now be set and
 incremented automatically by a PR Server connected with a package feed.
 
@@ -255,3 +256,144 @@ Tips and Guidelines for Writing Recipes
 -  Use :term:`BBCLASSEXTEND` instead of creating separate recipes such as ``-native``
    and ``-nativesdk`` ones, whenever possible. This avoids having to maintain multiple
    recipe files at the same time.
+
+-  Recipes should have tasks which are idempotent, i.e. that executing a given task
+   multiple times shouldn't change the end result. The build environment is built upon
+   this assumption and breaking it can cause obscure build failures.
+
+-  For idempotence when modifying files in tasks, it is usually best to:
+
+   - copy a file ``X`` to ``X.orig`` (only if it doesn't exist already)
+   - then, copy ``X.orig`` back to ``X``,
+   - and, finally, modify ``X``.
+
+   This ensures if rerun the task always has the same end result and the
+   original file can be preserved to reuse. It also guards against an
+   interrupted build corrupting the file.
+
+Patch Upstream Status
+=====================
+
+In order to keep track of patches applied by recipes and ultimately reduce the
+number of patches that need maintaining, the OpenEmbedded build system
+requires information about the upstream status of each patch.
+
+In its description, each patch should provide detailed information about the
+bug that it addresses, such as the URL in a bug tracking system and links
+to relevant mailing list archives.
+
+Then, you should also add an ``Upstream-Status:`` tag containing one of the
+following status strings:
+
+``Pending``
+   No determination has been made yet, or patch has not yet been submitted to
+   upstream.
+
+   Keep in mind that every patch submitted upstream reduces the maintainance
+   burden in OpenEmbedded and Yocto Project in the long run, so this patch
+   status should only be used in exceptional cases if there are genuine
+   obstacles to submitting a patch upstream; the reason for that should be
+   included in the patch.
+
+``Submitted [where]``
+   Submitted to upstream, waiting for approval. Optionally include where
+   it was submitted, such as the author, mailing list, etc.
+
+``Backport [version]``
+   Accepted upstream and included in the next release, or backported from newer
+   upstream version, because we are at a fixed version.
+   Include upstream version info (e.g. commit ID or next expected version).
+
+``Denied``
+   Not accepted by upstream, include reason in patch.
+
+``Inactive-Upstream [lastcommit: when (and/or) lastrelease: when]``
+   The upstream is no longer available. This typically means a defunct project
+   where no activity has happened for a long time --- measured in years. To make
+   that judgement, it is recommended to look at not only when the last release
+   happened, but also when the last commit happened, and whether newly made bug
+   reports and merge requests since that time receive no reaction. It is also
+   recommended to add to the patch description any relevant links where the
+   inactivity can be clearly seen.
+
+``Inappropriate [reason]``
+   The patch is not appropriate for upstream, include a brief reason on the
+   same line enclosed with ``[]``. In the past, there were several different
+   reasons not to submit patches upstream, but we have to consider that every
+   non-upstreamed patch means a maintainance burden for recipe maintainers.
+   Currently, the only reasons to mark patches as inappropriate for upstream
+   submission are:
+
+   -  ``oe specific``: the issue is specific to how OpenEmbedded performs builds
+      or sets things up at runtime, and can be resolved only with a patch that
+      is not however relevant or appropriate for general upstream submission.
+   -  ``upstream ticket <link>``: the issue is not specific to Open-Embedded
+      and should be fixed upstream, but the patch in its current form is not
+      suitable for merging upstream, and the author lacks sufficient expertise
+      to develop a proper patch. Instead the issue is handled via a bug report
+      (include link).
+
+Of course, if another person later takes care of submitting this patch upstream,
+the status should be changed to ``Submitted [where]``, and an additional
+``Signed-off-by:`` line should be added to the patch by the person claiming
+responsibility for upstreaming.
+
+Examples
+--------
+
+Here's an example of a patch that has been submitted upstream::
+
+   rpm: Adjusted the foo setting in bar
+
+   [RPM Ticket #65] -- http://rpm5.org/cvs/tktview?tn=65,5
+
+   The foo setting in bar was decreased from X to X-50% in order to
+   ensure we don't exhaust all system memory with foobar threads.
+
+   Upstream-Status: Submitted [rpm5-devel@rpm5.org]
+
+   Signed-off-by: Joe Developer <joe.developer@example.com>
+
+A future update can change the value to ``Backport`` or ``Denied`` as
+appropriate.
+
+Another example of a patch that is specific to OpenEmbedded::
+
+   Do not treat warnings as errors
+
+   There are additional warnings found with musl which are
+   treated as errors and fails the build, we have more combinations
+   than upstream supports to handle.
+
+   Upstream-Status: Inappropriate [oe specific]
+
+Here's a patch that has been backported from an upstream commit::
+
+   include missing sys/file.h for LOCK_EX
+
+   Upstream-Status: Backport [https://github.com/systemd/systemd/commit/ac8db36cbc26694ee94beecc8dca208ec4b5fd45]
+
+CVE patches
+===========
+
+In order to have a better control of vulnerabilities, patches that fix CVEs must
+contain a ``CVE:`` tag. This tag list all CVEs fixed by the patch. If more than
+one CVE is fixed, separate them using spaces.
+
+CVE Examples
+------------
+
+This should be the header of patch that fixes :cve:`2015-8370` in GRUB2::
+
+   grub2: Fix CVE-2015-8370
+
+   [No upstream tracking] -- https://bugzilla.redhat.com/show_bug.cgi?id=1286966
+
+   Back to 28; Grub2 Authentication
+
+   Two functions suffer from integer underflow fault; the grub_username_get() and grub_password_get()located in
+   grub-core/normal/auth.c and lib/crypto.c respectively. This can be exploited to obtain a Grub rescue shell.
+
+   Upstream-Status: Backport [http://git.savannah.gnu.org/cgit/grub.git/commit/?id=451d80e52d851432e109771bb8febafca7a5f1f2]
+   CVE: CVE-2015-8370
+   Signed-off-by: Joe Developer <joe.developer@example.com>

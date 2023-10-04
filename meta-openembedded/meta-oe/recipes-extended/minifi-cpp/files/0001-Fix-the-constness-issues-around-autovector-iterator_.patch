@@ -19,6 +19,8 @@ Pulled By: ltamasi
 
 fbshipit-source-id: 04e82d73bc0c67fb0ded018383af8dfc332050cc
 ---
+Upstream-Status: Pending
+
  thirdparty/rocksdb/util/autovector.h | 15 ++++-----------
  1 file changed, 4 insertions(+), 11 deletions(-)
 

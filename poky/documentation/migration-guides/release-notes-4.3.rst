@@ -10,6 +10,8 @@ New Features / Enhancements in 4.3
 
 -  New variables:
 
+   -  :term:`FILE_LAYERNAME`: bitbake now sets this to the name of the layer containing the recipe
+
    -  :term:`FIT_ADDRESS_CELLS` and :term:`UBOOT_FIT_ADDRESS_CELLS`.
       See details below.
 
@@ -17,7 +19,8 @@ New Features / Enhancements in 4.3
 
    -  :term:`KERNEL_DTBVENDORED`: whether to keep vendor subdirectories.
 
-   -  :term:`FILE_LAYERNAME`: bitbake now sets this to the name of the layer containing the recipe
+   -  :term:`LICENSE_FLAGS_DETAILS`: add extra details about a recipe license
+      in case it is not allowed by :term:`LICENSE_FLAGS_ACCEPTED`.
 
 - Layername functionality available through overrides
 

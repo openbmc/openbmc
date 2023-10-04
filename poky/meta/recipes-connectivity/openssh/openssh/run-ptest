@@ -4,6 +4,20 @@ export TEST_SHELL=sh
 export SKIP_UNIT=1
 
 cd regress
+
+# copied from openssh-portable/.github/run_test.sh
+output_failed_logs() {
+    for i in failed*.log; do
+        if [ -f "$i" ]; then
+            echo -------------------------------------------------------------------------
+            echo LOGFILE $i
+            cat $i
+            echo -------------------------------------------------------------------------
+        fi
+    done
+}
+trap output_failed_logs 0
+
 sed -i "/\t\tagent-ptrace /d" Makefile
 make -k BUILDDIR=`pwd`/.. .OBJDIR=`pwd` .CURDIR=`pwd` SUDO="sudo" tests \
         | sed -u -e 's/^skipped/SKIP: /g' -e 's/^ok /PASS: /g' -e 's/^failed/FAIL: /g'

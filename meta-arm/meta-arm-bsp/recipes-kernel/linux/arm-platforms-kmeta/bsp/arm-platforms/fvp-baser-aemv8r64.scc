@@ -1,4 +1,0 @@
-kconf hardware arm64.cfg
-kconf hardware fvp-common-peripherals.cfg
-include cfg/virtio.scc
-include virtio-9p.scc

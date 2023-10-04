@@ -1,0 +1,228 @@
+From 39849e9d91f477d3fb839f93cd0815d0cb3273e9 Mon Sep 17 00:00:00 2001
+From: Paul Eggert <eggert@cs.ucla.edu>
+Date: Tue, 18 Jul 2023 09:15:03 -0700
+Subject: tests: fix TESTSUITE_AT
+
+Problem reported by Lukas Javorsky <ljavorsk@redhat.com> in:
+https://lists.gnu.org/r/bug-tar/2023-07/msg00002.html
+* tests/Makefile.am (TESTSUITE_AT): Add exclude17.at, exclude18.at.
+Remove compress.m4; all uses changed.  Add a comment saying how
+to rederive this.  Sort.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/tar.git/commit/?id=39849e9d91f477d3fb839f93cd0815d0cb3273e9]
+---
+ tests/Makefile.am | 93 ++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 48 insertions(+), 45 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 4a8f501..1884b72 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -45,21 +45,24 @@ $(srcdir)/package.m4: $(top_srcdir)/configure.ac
+ ## Test suite.  ##
+ ## ------------ ##
+ 
++# You can generate the body of this macro with the following shell command:
++# LC_ALL=C ls *.at */*.at | sed -e 's/^/ /' -e '$!s/$/\\/'
+ TESTSUITE_AT = \
+- testsuite.at\
+- compress.m4\
+  T-cd.at\
+  T-dir00.at\
+  T-dir01.at\
+  T-empty.at\
++ T-mult.at\
++ T-nest.at\
++ T-nonl.at\
+  T-null.at\
+  T-null2.at\
+  T-rec.at\
+  T-recurse.at\
+  T-zfile.at\
+- T-nonl.at\
+- T-mult.at\
+- T-nest.at\
++ acls01.at\
++ acls02.at\
++ acls03.at\
+  add-file.at\
+  append.at\
+  append01.at\
+@@ -68,14 +71,15 @@ TESTSUITE_AT = \
+  append04.at\
+  append05.at\
+  backup01.at\
+- chtype.at\
+- comprec.at\
+- comperr.at\
++ capabs_raw01.at\
+  checkpoint/defaults.at\
+- checkpoint/interval.at\
+- checkpoint/dot.at\
+  checkpoint/dot-compat.at\
+  checkpoint/dot-int.at\
++ checkpoint/dot.at\
++ checkpoint/interval.at\
++ chtype.at\
++ comperr.at\
++ comprec.at\
+  delete01.at\
+  delete02.at\
+  delete03.at\
+@@ -83,6 +87,8 @@ TESTSUITE_AT = \
+  delete05.at\
+  delete06.at\
+  difflink.at\
++ dirrem01.at\
++ dirrem02.at\
+  exclude.at\
+  exclude01.at\
+  exclude02.at\
+@@ -100,6 +106,8 @@ TESTSUITE_AT = \
+  exclude14.at\
+  exclude15.at\
+  exclude16.at\
++ exclude17.at\
++ exclude18.at\
+  extrac01.at\
+  extrac02.at\
+  extrac03.at\
+@@ -127,11 +135,9 @@ TESTSUITE_AT = \
+  extrac25.at\
+  filerem01.at\
+  filerem02.at\
+- dirrem01.at\
+- dirrem02.at\
+- gzip.at\
+  grow.at\
+- incremental.at\
++ gzip.at\
++ ignfail.at\
+  incr01.at\
+  incr02.at\
+  incr03.at\
+@@ -143,8 +149,8 @@ TESTSUITE_AT = \
+  incr09.at\
+  incr10.at\
+  incr11.at\
++ incremental.at\
+  indexfile.at\
+- ignfail.at\
+  label01.at\
+  label02.at\
+  label03.at\
+@@ -188,22 +194,16 @@ TESTSUITE_AT = \
+  opcomp04.at\
+  opcomp05.at\
+  opcomp06.at\
+- positional01.at\
+- positional02.at\
+- positional03.at\
+  options.at\
+  options02.at\
+  options03.at\
+  owner.at\
+  pipe.at\
+- recurse.at\
++ positional01.at\
++ positional02.at\
++ positional03.at\
+  recurs02.at\
+- rename01.at\
+- rename02.at\
+- rename03.at\
+- rename04.at\
+- rename05.at\
+- rename06.at\
++ recurse.at\
+  remfiles01.at\
+  remfiles02.at\
+  remfiles03.at\
+@@ -226,11 +226,19 @@ TESTSUITE_AT = \
+  remfiles09b.at\
+  remfiles09c.at\
+  remfiles10.at\
++ rename01.at\
++ rename02.at\
++ rename03.at\
++ rename04.at\
++ rename05.at\
++ rename06.at\
+  same-order01.at\
+  same-order02.at\
++ selacl01.at\
++ selnx01.at\
+  shortfile.at\
+- shortupd.at\
+  shortrec.at\
++ shortupd.at\
+  sigpipe.at\
+  sparse01.at\
+  sparse02.at\
+@@ -247,6 +255,13 @@ TESTSUITE_AT = \
+  sptrcreat.at\
+  sptrdiff00.at\
+  sptrdiff01.at\
++ star/gtarfail.at\
++ star/gtarfail2.at\
++ star/multi-fail.at\
++ star/pax-big-10g.at\
++ star/ustar-big-2g.at\
++ star/ustar-big-8g.at\
++ testsuite.at\
+  time01.at\
+  time02.at\
+  truncate.at\
+@@ -255,21 +270,11 @@ TESTSUITE_AT = \
+  update02.at\
+  update03.at\
+  update04.at\
+- volsize.at\
+- volume.at\
+  verbose.at\
+  verify.at\
+  version.at\
+- xform-h.at\
+- xform01.at\
+- xform02.at\
+- xform03.at\
+- star/gtarfail.at\
+- star/gtarfail2.at\
+- star/multi-fail.at\
+- star/ustar-big-2g.at\
+- star/ustar-big-8g.at\
+- star/pax-big-10g.at\
++ volsize.at\
++ volume.at\
+  xattr01.at\
+  xattr02.at\
+  xattr03.at\
+@@ -278,12 +283,10 @@ TESTSUITE_AT = \
+  xattr06.at\
+  xattr07.at\
+  xattr08.at\
+- acls01.at\
+- acls02.at\
+- acls03.at\
+- selnx01.at\
+- selacl01.at\
+- capabs_raw01.at
++ xform-h.at\
++ xform01.at\
++ xform02.at\
++ xform03.at
+ 
+ distclean-local:
+ 	-rm -rf download
+@@ -291,7 +294,7 @@ distclean-local:
+ TESTSUITE = $(srcdir)/testsuite
+ 
+ AUTOTEST = $(AUTOM4TE) --language=autotest
+-$(TESTSUITE): package.m4 $(TESTSUITE_AT)
++$(TESTSUITE): compress.m4 package.m4 $(TESTSUITE_AT)
+ 	$(AUTOTEST) -I $(srcdir) testsuite.at -o $@.tmp
+ 	mv $@.tmp $@
+ 
+-- 
+cgit v1.1
+

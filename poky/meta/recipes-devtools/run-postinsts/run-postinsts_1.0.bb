@@ -1,7 +1,6 @@
 SUMMARY = "Runs postinstall scripts on first boot of the target device"
 DESCRIPTION = "${SUMMARY}"
 SECTION = "devel"
-PR = "r10"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 

@@ -5,6 +5,8 @@ Subject: [PATCH] don't fail if GLOB_BRACE is not defined
 
 Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
 ---
+Upstream-Status: Pending
+
  src/util.c | 6 ++++++
  1 file changed, 6 insertions(+)
 

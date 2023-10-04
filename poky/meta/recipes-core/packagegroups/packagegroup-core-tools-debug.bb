@@ -8,7 +8,6 @@ PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
 inherit packagegroup
 
-PR = "r3"
 
 MTRACE = ""
 MTRACE:libc-glibc = "libc-mtrace"

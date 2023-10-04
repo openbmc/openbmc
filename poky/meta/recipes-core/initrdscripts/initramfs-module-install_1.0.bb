@@ -9,7 +9,6 @@ COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|loongarch64.*)-(linux.*|free
 COMPATIBLE_HOST:armv7a = 'null'
 COMPATIBLE_HOST:armv7ve = 'null'
 
-PR = "r1"
 
 SRC_URI = "file://init-install.sh"
 

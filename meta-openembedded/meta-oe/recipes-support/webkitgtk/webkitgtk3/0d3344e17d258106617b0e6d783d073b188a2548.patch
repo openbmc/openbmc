@@ -1,7 +1,8 @@
-From 647c93de99a0f71f478d76a4cc7714eba7ba1447 Mon Sep 17 00:00:00 2001
+From e3c12b38037b4bb3053c440e4bd22c36c1dc576b Mon Sep 17 00:00:00 2001
 From: Adrian Perez de Castro <aperez@igalia.com>
 Date: Thu, 2 Jun 2022 11:19:06 +0300
 Subject: [PATCH] FELightningNEON.cpp fails to build, NEON fast path seems
+
  unused https://bugs.webkit.org/show_bug.cgi?id=241182
 
 Reviewed by NOBODY (OOPS!).
@@ -33,6 +34,7 @@ left for a follow-up fix.
 
 Upstream-Status: Submitted [https://github.com/WebKit/WebKit/pull/1233]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  .../cpu/arm/filters/FELightingNEON.cpp        |  4 +-
  .../graphics/cpu/arm/filters/FELightingNEON.h | 52 +++++++++----------
@@ -203,7 +205,7 @@ index b17c603d..e4629cda 100644
 -
 -#endif // FELightingNEON_h
 diff --git a/Source/WebCore/platform/graphics/filters/DistantLightSource.h b/Source/WebCore/platform/graphics/filters/DistantLightSource.h
-index 70c6512f..b032c82e 100644
+index 70f583b3..7d5d27e5 100644
 --- a/Source/WebCore/platform/graphics/filters/DistantLightSource.h
 +++ b/Source/WebCore/platform/graphics/filters/DistantLightSource.h
 @@ -26,6 +26,10 @@
@@ -218,7 +220,7 @@ index 70c6512f..b032c82e 100644
  
  class DistantLightSource : public LightSource {
 diff --git a/Source/WebCore/platform/graphics/filters/FELighting.h b/Source/WebCore/platform/graphics/filters/FELighting.h
-index 53beb596..e78a9354 100644
+index 179edf6d..694d712d 100644
 --- a/Source/WebCore/platform/graphics/filters/FELighting.h
 +++ b/Source/WebCore/platform/graphics/filters/FELighting.h
 @@ -35,8 +35,6 @@
@@ -229,8 +231,8 @@ index 53beb596..e78a9354 100644
 -
  class FELighting : public FilterEffect {
  public:
-     const Color& lightingColor() const { return m_lightingColor; }
-@@ -64,11 +62,6 @@ protected:
+     bool operator==(const FELighting&) const;
+@@ -68,11 +66,6 @@ protected:
  
      std::unique_ptr<FilterEffectApplier> createSoftwareApplier() const override;
  
@@ -243,7 +245,7 @@ index 53beb596..e78a9354 100644
      float m_surfaceScale;
      float m_diffuseConstant;
 diff --git a/Source/WebCore/platform/graphics/filters/PointLightSource.h b/Source/WebCore/platform/graphics/filters/PointLightSource.h
-index 3a5723f0..675d63f5 100644
+index a8cfdab8..34f867bb 100644
 --- a/Source/WebCore/platform/graphics/filters/PointLightSource.h
 +++ b/Source/WebCore/platform/graphics/filters/PointLightSource.h
 @@ -26,6 +26,10 @@
@@ -258,7 +260,7 @@ index 3a5723f0..675d63f5 100644
  
  class PointLightSource : public LightSource {
 diff --git a/Source/WebCore/platform/graphics/filters/SpotLightSource.h b/Source/WebCore/platform/graphics/filters/SpotLightSource.h
-index 684626f7..dea58389 100644
+index 6404467a..5cac38f2 100644
 --- a/Source/WebCore/platform/graphics/filters/SpotLightSource.h
 +++ b/Source/WebCore/platform/graphics/filters/SpotLightSource.h
 @@ -26,6 +26,10 @@

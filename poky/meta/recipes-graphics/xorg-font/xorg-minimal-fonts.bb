@@ -13,7 +13,6 @@ SRC_URI = "file://misc"
 SOURCE_DATE_EPOCH = "1613559011"
 
 PE = "1"
-PR = "r4"
 
 inherit allarch features_check
 

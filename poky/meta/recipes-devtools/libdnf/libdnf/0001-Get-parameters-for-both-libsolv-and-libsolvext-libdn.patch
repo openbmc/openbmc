@@ -1,4 +1,4 @@
-From 9294cd19e5e3121fb8d37b44ee82dd7c4b3ab2c7 Mon Sep 17 00:00:00 2001
+From b87ae6860ea44996b677ad1c4a9793720b77c67c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 7 Feb 2017 12:16:03 +0200
 Subject: [PATCH] Get parameters for both libsolv and libsolvext (libdnf is
@@ -13,15 +13,15 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b722d4fb..ce88b9e3 100644
+index e99b28d0..548a9137 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -52,7 +52,7 @@ endif()
+@@ -51,7 +51,7 @@ endif()
+ 
  
  # build dependencies
- find_package(Gpgme REQUIRED)
 -PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv libsolvext)
  set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
-
+ 
  

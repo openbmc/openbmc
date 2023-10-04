@@ -1,0 +1,35 @@
+From dc208bafc57c1ccaa0ca260f99c8b4c976271ebc Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sat, 16 Sep 2023 14:02:57 +0200
+Subject: [PATCH] xb-self-test.c: hardcode G_TEST_SRCDIR
+
+This avoids:
+ libxmlb-0.3.14-r0 do_package_qa: QA Issue: File
+ /usr/libexec/installed-tests/libxmlb/xb-self-test in package libxmlb-ptest
+ contains reference to TMPDIR [buildpaths]
+
+and also fixes the runtime for the ptest.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ src/xb-self-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/xb-self-test.c b/src/xb-self-test.c
+index 47d9728..8b3dd0e 100644
+--- a/src/xb-self-test.c
++++ b/src/xb-self-test.c
+@@ -2870,7 +2870,7 @@ xb_speed_func(void)
+ int
+ main(int argc, char **argv)
+ {
+-	g_setenv("G_TEST_SRCDIR", SRCDIR, FALSE);
++	g_setenv("G_TEST_SRCDIR", "/usr/libexec/installed-tests/libxmlb", FALSE);
+ 
+ 	g_test_init(&argc, &argv, NULL);
+ 
+-- 
+2.41.0
+

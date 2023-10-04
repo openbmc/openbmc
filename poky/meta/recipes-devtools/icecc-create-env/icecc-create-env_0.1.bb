@@ -7,7 +7,6 @@ SECTION = "base"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://icecc-create-env;beginline=2;endline=5;md5=ae1df3d6a058bfda40b66094c5f6065f"
 
-PR = "r2"
 
 DEPENDS = ""
 INHIBIT_DEFAULT_DEPS = "1"

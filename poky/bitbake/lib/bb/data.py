@@ -285,6 +285,7 @@ def build_dependencies(key, keys, mod_funcs, shelldeps, varflagsexcl, ignored_va
             value += "\n_remove of %s" % r
             deps |= r2.references
             deps = deps | (keys & r2.execs)
+            value = handle_contains(value, r2.contains, exclusions, d)
         return value
 
     deps = set()

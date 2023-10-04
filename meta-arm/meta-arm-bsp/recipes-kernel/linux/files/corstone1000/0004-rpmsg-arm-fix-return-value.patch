@@ -1,7 +1,7 @@
-From ce77351c8ae6b04070135fdaedaad337bb0b4ef5 Mon Sep 17 00:00:00 2001
+From c1ffd793062a13afdcc07d4bc1a8007188bfca5f Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Tue, 27 Sep 2022 10:05:27 +0100
-Subject: [PATCH 4/6] rpmsg: arm: fix return value
+Subject: [PATCH] rpmsg: arm: fix return value
 
 The creation of and endpoint returns a pointer, fix the return
 value to the right type.
@@ -28,6 +28,3 @@ index 4a80102669f6..5c0dcc8e353d 100644
  	}
  
  	return &channel->ept;
--- 
-2.39.0
-

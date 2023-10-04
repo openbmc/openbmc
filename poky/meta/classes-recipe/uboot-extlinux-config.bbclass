@@ -6,6 +6,8 @@
 #
 # External variables:
 #
+# UBOOT_EXTLINUX                   - Set to "1" to enable generation
+#                                    of extlinux.conf using this class.
 # UBOOT_EXTLINUX_CONSOLE           - Set to "console=ttyX" to change kernel boot
 #                                    default console.
 # UBOOT_EXTLINUX_LABELS            - A list of targets for the automatic config.
@@ -20,7 +22,8 @@
 # UBOOT_EXTLINUX_TIMEOUT           - Timeout before DEFAULT selection is made.
 #                                    Measured in 1/10 of a second.
 # UBOOT_EXTLINUX_DEFAULT_LABEL     - Target to be selected by default after
-#                                    the timeout period
+#                                    the timeout period.
+# UBOOT_EXTLINUX_CONFIG            - Output file.
 #
 # If there's only one label system will boot automatically and menu won't be
 # created. If you want to use more than one labels, e.g linux and alternate,

@@ -35,8 +35,7 @@ PACKAGECONFIG ??= "readline ${@bb.utils.filter('DISTRO_FEATURES', 'debuginfod', 
 PACKAGECONFIG[readline] = "--with-system-readline,--without-system-readline,readline"
 PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,python3,python3-codecs"
 PACKAGECONFIG[babeltrace] = "--with-babeltrace,--without-babeltrace,babeltrace"
-# ncurses is already a hard DEPENDS, but would be added here if it weren't
-PACKAGECONFIG[tui] = "--enable-tui,--disable-tui"
+PACKAGECONFIG[tui] = "--enable-tui,--disable-tui,,ncurses-terminfo-base"
 PACKAGECONFIG[xz] = "--with-lzma --with-liblzma-prefix=${STAGING_DIR_HOST},--without-lzma,xz"
 PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, elfutils"
 

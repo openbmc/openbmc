@@ -1,4 +1,4 @@
-From fa47185d9c8150a0dcb0ea12b92fcf139edbef35 Mon Sep 17 00:00:00 2001
+From 95cacf345eaec898a47486fc0d33382f303275aa Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Wed, 27 Oct 2021 20:18:47 +0200
 Subject: [PATCH] Support cross builds a bit better
@@ -12,15 +12,16 @@ Content-Transfer-Encoding: 8bit
 Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/690]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  meson.build | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 136e812..f5b91e0 100644
+index 961660f..86239a4 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -252,6 +252,7 @@ release builds of SpiderMonkey. Try configuring SpiderMonkey with
+@@ -255,6 +255,7 @@ release builds of SpiderMonkey. Try configuring SpiderMonkey with
  --disable-debug.''')
  endif
  
@@ -28,7 +29,7 @@ index 136e812..f5b91e0 100644
  # Check if a minimal SpiderMonkey program compiles, links, and runs. If not,
  # it's most likely the case that SpiderMonkey was configured incorrectly, for
  # example by building mozglue as a shared library.
-@@ -282,6 +283,7 @@ elif minimal_program.returncode() != 0
+@@ -285,6 +286,7 @@ elif minimal_program.returncode() != 0
  failed to execute. Most likely you should build it with a different
  configuration.''' + recommended_configuration)
  endif
@@ -36,7 +37,7 @@ index 136e812..f5b91e0 100644
  
  have_printf_alternative_int = cc.compiles('''
  #include <stdio.h>
-@@ -682,7 +684,7 @@ subdir('installed-tests')
+@@ -683,7 +685,7 @@ subdir('installed-tests')
  
  # Note: The test program in test/ needs to be ported
  #       to Windows before we can build it on Windows.

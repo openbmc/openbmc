@@ -25,10 +25,9 @@ NO_GENERIC_LICENSE[Firmware-cypress-rpidistro] = "LICENCE.cypress-rpidistro"
 
 SRC_URI = " \
     git://github.com/RPi-Distro/bluez-firmware;branch=master;protocol=https \
-    file://31ad68831357d2019624004f1f0846475671088f.patch \
 "
-SRCREV = "e7fd166981ab4bb9a36c2d1500205a078a35714d"
-PV = "1.2-4+rpt8"
+SRCREV = "9556b08ace2a1735127894642cc8ea6529c04c90"
+PV = "1.2-4+rpt10"
 
 S = "${WORKDIR}/git"
 

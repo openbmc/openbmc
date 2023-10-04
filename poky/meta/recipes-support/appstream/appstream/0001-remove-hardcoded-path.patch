@@ -1,0 +1,31 @@
+From 6ab00a4279823829a9b82dc9e4d055da4de88c6e Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 12 Dec 2022 15:42:42 +0100
+Subject: [PATCH] remove hardcoded path
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Dont include hardcoded path. This fixes:
+| cc1: error: include location "/usr/include" is unsafe for cross-compilation [-Werror=poison-system-directories]
+
+Upstream-Status: Inappropriate [oe-specific]
+---
+ meson.build       | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index fd0e3373..2f273ada 100644
+--- a/meson.build
++++ b/meson.build
+@@ -124,7 +124,7 @@ if get_option ('gir')
+     dependency('gobject-introspection-1.0', version: '>=1.56')
+ endif
+ 
+-stemmer_inc_dirs = include_directories(['/usr/include'])
++stemmer_inc_dirs = include_directories([''])
+ if get_option('stemming')
+     stemmer_lib = cc.find_library('stemmer', required: true)
+     if not cc.has_header('libstemmer.h')
+-- 
+2.34.1
+

@@ -1,0 +1,38 @@
+From 95b0405338440cf5cd6d4b2b5c66cda8bf381b28 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 15 Sep 2023 00:18:18 -0700
+Subject: [PATCH] lscpu: Use 4K buffer size instead of BUFSIZ
+
+Some lines in /proc/cpuinfo can be large e.g. flags and can then
+truncate them in displaying them
+
+BUFSIZ can vary quite a bit  e.g. glibc/linux systems its 8192
+but on musl/linux and OSX its 1024, on mingW it is 256, some tests e.g.
+x86_64-64cpu-linux6.2.tar.gz has added really long line for cpu flags
+line which is greater than 1024 characters and hence this test fails
+on musl because lscpu -s reports truncated string
+
+Upstream-Status: Submitted [https://github.com/util-linux/util-linux/pull/2492]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sys-utils/lscpu-cputype.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/sys-utils/lscpu-cputype.c b/sys-utils/lscpu-cputype.c
+index 3fd5f7a3c..c8f72ab8a 100644
+--- a/sys-utils/lscpu-cputype.c
++++ b/sys-utils/lscpu-cputype.c
+@@ -462,7 +462,9 @@ static int cpuinfo_parse_cache(struct lscpu_cxt *cxt, int keynum, char *data)
+ int lscpu_read_cpuinfo(struct lscpu_cxt *cxt)
+ {
+ 	FILE *fp;
+-	char buf[BUFSIZ];
++	/* Used to be BUFSIZ which is small on some platforms e.g, musl,
++	 * therefore hardcode to 4K */
++	char buf[4096];
+ 	size_t i;
+ 	struct lscpu_cputype *ct;
+ 	struct cpuinfo_parser _pr = { .cxt = cxt }, *pr = &_pr;
+-- 
+2.42.0
+

@@ -26,26 +26,35 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--flag', help='Specify a variable flag to query (with --value)', default=None)
     parser.add_argument('--value', help='Only report the value, no history and no variable name', action="store_true")
     parser.add_argument('-q', '--quiet', help='Silence bitbake server logging', action="store_true")
+    parser.add_argument('--ignore-undefined', help='Suppress any errors related to undefined variables', action="store_true")
     args = parser.parse_args()
 
-    if args.unexpand and not args.value:
-        print("--unexpand only makes sense with --value")
-        sys.exit(1)
+    if not args.value:
+        if args.unexpand:
+            sys.exit("--unexpand only makes sense with --value")
 
-    if args.flag and not args.value:
-        print("--flag only makes sense with --value")
-        sys.exit(1)
+        if args.flag:
+            sys.exit("--flag only makes sense with --value")
 
-    with bb.tinfoil.Tinfoil(tracking=True, setup_logging=not args.quiet) as tinfoil:
+    quiet = args.quiet or args.value
+    with bb.tinfoil.Tinfoil(tracking=True, setup_logging=not quiet) as tinfoil:
         if args.recipe:
-            tinfoil.prepare(quiet=2)
+            tinfoil.prepare(quiet=3 if quiet else 2)
             d = tinfoil.parse_recipe(args.recipe)
         else:
             tinfoil.prepare(quiet=2, config_only=True)
             d = tinfoil.config_data
+
+        value = None
         if args.flag:
-            print(str(d.getVarFlag(args.variable, args.flag, expand=(not args.unexpand))))
-        elif args.value:
-            print(str(d.getVar(args.variable, expand=(not args.unexpand))))
+            value = d.getVarFlag(args.variable, args.flag, expand=not args.unexpand)
+            if value is None and not args.ignore_undefined:
+                sys.exit(f"The flag '{args.flag}' is not defined for variable '{args.variable}'")
+        else:
+            value = d.getVar(args.variable, expand=not args.unexpand)
+            if value is None and not args.ignore_undefined:
+                sys.exit(f"The variable '{args.variable}' is not defined")
+        if args.value:
+            print(str(value if value is not None else ""))
         else:
             bb.data.emit_var(args.variable, d=d, all=True)

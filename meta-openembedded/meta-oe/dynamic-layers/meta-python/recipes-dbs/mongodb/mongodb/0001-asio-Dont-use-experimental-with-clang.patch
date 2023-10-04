@@ -5,6 +5,8 @@ Subject: [PATCH 10/10] asio: Dont use experimental with clang
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+
+Upstream-Status: Pending
 ---
  src/third_party/asio-master/asio/include/asio/detail/string_view.hpp | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

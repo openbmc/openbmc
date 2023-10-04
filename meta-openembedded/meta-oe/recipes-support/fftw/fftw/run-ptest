@@ -10,21 +10,18 @@ cd ../fftwl
 /usr/bin/perl -w ./check.pl  -r -c=30 -v `pwd`/benchl
 fftwl_result=$?
 
-echo -n "fftw  test result:"
 if [ $fftw_result  = "0" ]; then
-	echo PASSED
+	echo "PASS: fftw"
 else
-	echo FAILED
+	echo "FAIL: fftw"
 fi
-echo -n "fftwf test result:"
 if [ $fftwf_result = "0" ]; then
-	echo PASSED
+	echo "PASS: fftwf"
 else
-	echo FAILED
+	echo "FAIL: fftwf"
 fi
-echo -n "fftwl test result:"
 if [ $fftwl_result = "0" ]; then
-	echo PASSED
+	echo "PASS: fftwl"
 else
-	echo FAILED
+	echo "FAIL: fftwl"
 fi

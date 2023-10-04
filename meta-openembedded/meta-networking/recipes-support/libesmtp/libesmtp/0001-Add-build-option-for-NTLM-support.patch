@@ -11,7 +11,7 @@ disabled by default.
 Like 1.0.6, it will check openssl MD4 algorithm support as MD4 is
 insecure and modern systems may drop MD4 support.
 
-Upstream-Status: Accepted [https://github.com/libesmtp/libESMTP/commit/1c304e7886a08fb56485e41614ff3f8685afb59d]
+Upstream-Status: Backport [https://github.com/libesmtp/libESMTP/commit/1c304e7886a08fb56485e41614ff3f8685afb59d]
 Signed-off-by: Jiaqing Zhao <jiaqing.zhao@intel.com>
 ---
  meson.build       | 13 ++++++++++---
