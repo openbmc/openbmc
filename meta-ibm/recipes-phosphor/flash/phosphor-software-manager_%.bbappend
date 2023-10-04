@@ -20,6 +20,7 @@ PACKAGECONFIG:append:p10bmc = " usb_code_update"
 
 # Enable Side Switch Boot
 PACKAGECONFIG:append:p10bmc = " side_switch_on_boot"
+PACKAGECONFIG:append:system1 = " side_switch_on_boot"
 
 # Enable sync of persistent files to the alternate BMC chip
 PACKAGECONFIG:append:sbp1 = " sync_bmc_files static-dual-image"
