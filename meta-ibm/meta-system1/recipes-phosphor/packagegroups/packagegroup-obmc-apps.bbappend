@@ -10,10 +10,9 @@ PROVIDES += " \
 RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 RPROVIDES:${PN}-chassis += "virtual-obmc-chassis-mgmt"
 
-# TODO - use skeleton power implementation until full power
-# code for system1 can be brought in
 SUMMARY:${PN}-chassis = "OpenPOWER Chassis"
 RDEPENDS:${PN}-chassis = " \
+        phosphor-power-control \
         phosphor-skeleton-control-power \
 "
 

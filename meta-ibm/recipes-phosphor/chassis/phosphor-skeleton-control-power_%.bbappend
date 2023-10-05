@@ -4,3 +4,4 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 # control application. That image will use the power control application
 # included in the phosphor-power repository.
 OBMC_CONTROL_POWER_FMT:p10bmc = ""
+OBMC_CONTROL_POWER_FMT:system1 = ""
