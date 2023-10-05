@@ -2,8 +2,8 @@
 
 # Configure GPIO as output and set its value
 AST2600_GPIO_BASE=(
-    816
-    780
+    512
+    720
 )
 
 function gpio_configure_output() {

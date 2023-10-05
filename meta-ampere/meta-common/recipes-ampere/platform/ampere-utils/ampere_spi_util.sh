@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # shellcheck disable=SC2046
-# shellcheck source=meta-ampere/meta-mitchell/recipes-ampere/platform/ampere-platform-init/gpio-lib.sh
-source /usr/sbin/gpio-lib.sh
 
 spi_address="1e630000.spi"
 spi_bind="/sys/bus/platform/drivers/spi-aspeed-smc/bind"
@@ -21,7 +19,7 @@ bind_aspeed_smc_driver() {
 	fi
 
 	# BMC access SPI-NOR resource
-	gpio_name_set spi0-program-sel 1
+	gpioset $(gpiofind spi0-program-sel)=1
 	sleep 0.1
 	echo "Bind the ASpeed SMC driver"
 	echo "${spi_address}" > "${spi_bind}"  2>/dev/null
@@ -33,7 +31,7 @@ bind_aspeed_smc_driver() {
 		echo "${spi_address}" > "${spi_bind}"
 	fi
 	# BMC release SPI-NOR resource
-	gpio_name_set spi0-program-sel 0
+	gpioset $(gpiofind spi0-program-sel)=0
 	return 0
 }
 
@@ -65,15 +63,15 @@ unbind_aspeed_smc_driver() {
 	if [ -n "$HOST_MTD" ]; then
 		# If the HNOR partition is available, then unbind driver
 		# BMC access SPI-NOR resource
-		gpio_name_set spi0-program-sel 1
+		gpioset $(gpiofind spi0-program-sel)=1
 		sleep 0.1
 		echo "Unbind the ASpeed SMC driver"
 		echo "${spi_address}" > "${spi_unbind}"
 	fi
 	# BMC release SPI-NOR resource
-	gpio_name_set spi0-program-sel 0
+	gpioset $(gpiofind spi0-program-sel)=0
 	# Deassert BMC access SPI-NOR pin
-	gpio_name_set spi-nor-access 0
+	gpioset $(gpiofind spi-nor-access)=0
 	sleep 0.5
 	return 0
 }
@@ -130,7 +128,7 @@ start_handshake_spi() {
 	cnt=10
 	while [ $cnt -gt 0 ]
 	do
-		spinor_access=$(gpio_name_get soc-spi-nor-access)
+		spinor_access=$(gpioget $(gpiofind soc-spi-nor-access))
 		if [ "$spinor_access" == "1" ]; then
 			sleep 1
 			cnt=$((cnt - 1))
@@ -146,9 +144,9 @@ start_handshake_spi() {
 	echo "Start handshake SPI-NOR"
 	# Grant BMC access SPI-NOR. The process call the scripts should only
 	# claim the bus for only maximum period 500ms.
-	gpio_name_set spi-nor-access 1
+	gpioset $(gpiofind spi-nor-access)=1
 	# Switch the Host SPI-NOR to BMC
-	gpio_name_set spi0-program-sel 1
+	gpioset $(gpiofind spi0-program-sel)=1
 }
 
 stop_handshake_spi() {
@@ -162,9 +160,9 @@ stop_handshake_spi() {
 	fi
 	echo "Stop handshake SPI-NOR"
 	# Switch the Host SPI-NOR to HOST
-	gpio_name_set spi0-program-sel 0
+	gpioset $(gpiofind spi0-program-sel)=0
 	# Deassert BMC access SPI-NOR pin
-	gpio_name_set spi-nor-access 0
+	gpioset $(gpiofind spi-nor-access)=0
 }
 
 

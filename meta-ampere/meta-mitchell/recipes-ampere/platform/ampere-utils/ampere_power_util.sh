@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# shellcheck source=meta-ampere/meta-mitchell/recipes-ampere/platform/ampere-platform-init/gpio-lib.sh
-source /usr/sbin/gpio-lib.sh
+# shellcheck disable=SC2046
 
 # Usage of this utility
 function usage() {
@@ -31,9 +30,9 @@ shutdown_ack() {
 soft_off() {
 	# Trigger shutdown_req
 	touch /run/openbmc/host@0-softpoweroff
-	gpio_name_set host0-shd-req-n 0
+	gpioset $(gpiofind host0-shd-req-n)=0
 	sleep 0.05
-	gpio_name_set host0-shd-req-n 1
+	gpioset $(gpiofind host0-shd-req-n)=1
 
 	# Wait for shutdown_ack from the host in 30 seconds
 	cnt=30
@@ -79,9 +78,9 @@ force_reset() {
 	fi
 	rm -f /run/openbmc/host@0-on
 	echo "Triggering sysreset pin"
-	gpio_name_set host0-sysreset-n 0
+	gpioset $(gpiofind host0-sysreset-n)=0
 	sleep 1
-	gpio_name_set host0-sysreset-n 1
+	gpioset $(gpiofind host0-sysreset-n)=1
 }
 
 host_reboot_wa() {

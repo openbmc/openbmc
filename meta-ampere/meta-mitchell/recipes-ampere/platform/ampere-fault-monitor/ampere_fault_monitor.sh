@@ -1,9 +1,7 @@
 #!/bin/bash
 # This script monitors fan, over-temperature, PSU, CPU/SCP failure and update fault LED status
 
-# shellcheck disable=SC2004
-# shellcheck source=meta-ampere/meta-mitchell/recipes-ampere/platform/ampere-platform-init/gpio-lib.sh
-source /usr/sbin/gpio-lib.sh
+# shellcheck disable=SC2046
 
 # common variables
 	on=1
@@ -112,23 +110,23 @@ check_psu_failed() {
 	local psu0_value
 	local psu1_value
 
-	psu0_presence=$(gpio_name_get presence-ps0)
+	psu0_presence=$(gpioget $(gpiofind presence-ps0))
 	psu0_failed="true"
 	if [ "$psu0_presence" == "0" ]; then
 		# PSU0 presence, monitor the PSUs using pmbus, check the STATUS_WORD
 		psu0_value=$(i2cget -f -y $psu_bus $psu0_addr $status_word_cmd w)
-		psu0_bit_fault=$(($psu0_value & $psu_fault_bitmask))
+		psu0_bit_fault=$((psu0_value & psu_fault_bitmask))
 		if [ "$psu0_bit_fault" == "0" ]; then
 			psu0_failed="false"
 		fi
 	fi
 
-	psu1_presence=$(gpio_name_get presence-ps1)
+	psu1_presence=$(gpioget $(gpiofind presence-ps1))
 	psu1_failed="true"
 	if [ "$psu1_presence" == "0" ]; then
 		# PSU1 presence, monitor the PSUs using pmbus, check the STATUS_WORD
 		psu1_value=$(i2cget -f -y $psu_bus $psu1_addr $status_word_cmd w)
-		psu1_bit_fault=$(($psu1_value & $psu_fault_bitmask))
+		psu1_bit_fault=$((psu1_value & psu_fault_bitmask))
 		if [ "$psu1_bit_fault" == "0" ]; then
 			psu1_failed="false"
 		fi
@@ -189,9 +187,9 @@ check_fault() {
 control_sys_fault_led() {
 	# Turn on/off the System Fault Led
 	if [ "$fault" == "true" ]; then
-		gpio_name_set led-fault $on
+		gpioset $(gpiofind led-fault)=1
 	else
-		gpio_name_set led-fault $off
+		gpioset $(gpiofind led-fault)=0
 	fi
 }
 

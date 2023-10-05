@@ -6,8 +6,7 @@ GPIO_CHIP0_IDX=0
 GPIO_CHIP1_IDX=1
 
 # Base of GPIO chip in /sys/class/gpio
-GPIO_CHIP0_BASE=792
-GPIO_CHIP1_BASE=780
+GPIO_CHIP0_BASE=512
 
 ### Power control configuration
 # Power control gpios
