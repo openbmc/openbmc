@@ -1,5 +1,6 @@
 [Unit]
 Description = Ampere Platform Initialization
+Before=org.openbmc.control.Power@0.service
 
 [Service]
 Restart=no
@@ -8,4 +9,4 @@ Type=oneshot
 ExecStart=/usr/sbin/ampere_platform_init.sh
 
 [Install]
-WantedBy=sysinit.target
+WantedBy=multi-user.target
