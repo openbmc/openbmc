@@ -200,9 +200,9 @@ RDEPENDS:${PN}-user-mgmt-ldap = " \
         "
 
 SUMMARY:${PN}-dmtf-pmci = "DMTF PMCI Protocol Implementations"
-RDEPENDS:${PN}-dmtf-pmci = " \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'mctp', 'mctp', '', d)} \
-        "
+RDEPENDS:${PN}-dmtf-pmci = ""
+RDEPENDS:${PN}-dmtf-pmci:append:df-pldm = " pldm"
+RDEPENDS:${PN}-dmtf-pmci:append:df-mctp = " mctp"
 
 SUMMARY:${PN}-webui = "Web User Interface support"
 RDEPENDS:${PN}-webui = "webui-vue"
