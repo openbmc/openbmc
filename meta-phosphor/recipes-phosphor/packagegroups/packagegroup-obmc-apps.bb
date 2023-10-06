@@ -210,6 +210,5 @@ RDEPENDS:${PN}-dmtf-pmci = " \
         "
 
 SUMMARY:${PN}-webui = "Web User Interface support"
-RDEPENDS:${PN}-webui = " \
-        webui-vue \
-        "
+RDEPENDS:${PN}-webui = "webui-vue"
+RDEPENDS:${PN}-webui:df-phosphor-no-webui = ""
