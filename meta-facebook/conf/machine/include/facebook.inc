@@ -1,5 +1,7 @@
 DISTROOVERRIDES .= ":facebook"
 
+require conf/distro/include/phosphor-no-webui.inc
+
 MACHINE_FEATURES += "\
         obmc-bmc-state-mgmt \
         obmc-phosphor-fan-mgmt \
