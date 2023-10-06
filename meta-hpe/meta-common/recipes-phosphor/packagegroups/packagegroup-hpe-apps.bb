@@ -41,7 +41,6 @@ RDEPENDS:${PN}-flash = " \
 SUMMARY:${PN}-system = "HPE System"
 RDEPENDS:${PN}-system = " \
         bmcweb \
-        webui-vue \
         phosphor-ipmi-ipmb \
         dbus-sensors \
         host-ehci-owner-reset \

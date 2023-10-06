@@ -39,7 +39,6 @@ RDEPENDS:${PN}-flash = " \
 
 SUMMARY:${PN}-system = "Ufispace System"
 RDEPENDS:${PN}-system = " \
-    webui-vue \
     phosphor-sel-logger \
     phosphor-state-manager \
     usb-network \

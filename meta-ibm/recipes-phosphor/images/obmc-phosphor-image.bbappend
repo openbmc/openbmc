@@ -4,12 +4,10 @@ OBMC_IMAGE_EXTRA_INSTALL:append:p10bmc = " mboxd"
 OBMC_IMAGE_EXTRA_INSTALL:append:p10bmc-distributed = " etcd"
 
 IMAGE_FEATURES:append = " obmc-dbus-monitor"
-IMAGE_FEATURES:append = " obmc-webui"
 
 # remove so things fit in available flash space
 IMAGE_FEATURES:remove:witherspoon = "obmc-user-mgmt-ldap"
 IMAGE_FEATURES:remove:witherspoon = "obmc-telemetry"
-IMAGE_FEATURES:remove:witherspoon = "obmc-webui"
 
 # Generic IPMI FRU vpd collection not needed on p10bmc
 IMAGE_FEATURES:remove:p10bmc = "obmc-fru-ipmi"

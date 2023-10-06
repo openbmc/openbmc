@@ -37,7 +37,6 @@ RDEPENDS:${PN}-flash = " \
 
 SUMMARY:${PN}-system = "EVB NPCM845 System"
 RDEPENDS:${PN}-system = " \
-        webui-vue \
         obmc-ikvm \
         iperf3 \
         nmon \

@@ -41,6 +41,5 @@ RDEPENDS:${PN}-system = " \
         bmcweb \
         entity-manager \
         dbus-sensors \
-        webui-vue \
         ipmitool \
         "

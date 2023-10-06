@@ -28,7 +28,6 @@ RDEPENDS:${PN}-fans = " \
 
 SUMMARY:${PN}-system = "OLYMPUS NUVOTON System"
 RDEPENDS:${PN}-system = " \
-        webui-vue \
         obmc-ikvm \
         obmc-console \
         dhcpcd \

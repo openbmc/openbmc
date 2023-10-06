@@ -38,5 +38,4 @@ RDEPENDS:${PN}-system = " \
         entity-manager \
         dbus-sensors \
         bmcweb \
-        webui-vue \
         "

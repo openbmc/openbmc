@@ -22,6 +22,5 @@ RDEPENDS:${PN}-extras:append:fp5280g2 = " \
                                           srvcfg-manager \
                                           phosphor-sel-logger \
                                           tzdata-core \
-                                          webui-vue \
                                          "
 

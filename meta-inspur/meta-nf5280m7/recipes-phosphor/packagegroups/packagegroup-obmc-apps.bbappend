@@ -37,6 +37,5 @@ RDEPENDS:${PN}-flash = " \
 SUMMARY:${PN}-system = "Inspur System"
 RDEPENDS:${PN}-system = " \
         entity-manager \
-        webui-vue \
         ipmitool \
         "
