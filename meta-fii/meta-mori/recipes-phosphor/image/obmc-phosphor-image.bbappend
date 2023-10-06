@@ -18,11 +18,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mori = " bash"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " i2c-tools"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " libgpiod-tools"
 
-# Required for obmc-bmcweb
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " bmcweb"
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-certificate-manager"
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-user-manager"
-
 # Required for the front port. Part of obmc-console
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " obmc-console"
 
