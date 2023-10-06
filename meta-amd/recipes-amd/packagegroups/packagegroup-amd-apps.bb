@@ -40,7 +40,6 @@ RDEPENDS:${PN}-flash = " \
 SUMMARY:${PN}-system = "AMD System"
 RDEPENDS:${PN}-system = " \
         amd-fpga \
-        bmcweb \
         dbus-sensors \
         entity-manager \
         ipmitool \
