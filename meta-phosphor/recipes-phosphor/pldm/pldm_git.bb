@@ -1,3 +1,9 @@
+HOMEPAGE = "https://github.com/openbmc/pldm"
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
+SRC_URI = "git://github.com/openbmc/pldm;branch=master;protocol=https"
+SRCREV = "d310f8213a41b29c8e36e67c1a9570b72deaa958"
+
 SUMMARY = "PLDM Stack"
 DESCRIPTION = "Implementation of the PLDM specifications"
 DEPENDS += "function2"
@@ -40,5 +46,3 @@ pkg_postinst:${PN} () {
     TARGET="../pldmSoftPowerOff.service"
     ln -s $TARGET $LINK
 }
-
-require pldm.inc
