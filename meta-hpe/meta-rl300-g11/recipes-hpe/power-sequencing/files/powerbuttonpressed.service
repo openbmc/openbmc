@@ -1,0 +1,8 @@
+[Unit]
+Description=HPE RL300 Power Button
+
+[Service]
+ExecStart=/usr/bin/power-button pressed
+
+[Install]
+# WantedBy=multi-user.target
