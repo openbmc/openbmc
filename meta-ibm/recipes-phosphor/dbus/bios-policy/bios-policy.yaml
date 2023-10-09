@@ -1,0 +1,56 @@
+- name: chassis state
+  description: >
+    'The machine has a single chassis to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: CHASSISSTATE
+      path: /xyz/openbmc_project/state/chassis0
+
+- name: chassis powered
+  description: >
+    'Monitor the chassis power state.'
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Chassis
+      meta: CHASSIS_STATE
+      property: CurrentPowerState
+
+- name: watch chassis state
+  description: >
+    'Trigger logic on chassis power state changes.'
+  class: watch
+  watch: property
+  paths: chassis state
+  properties: chassis powered
+  callback: check power
+
+- name: check power
+  description: >
+    'If the chassis has power, check for bios version.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check bios version
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check bios version
+  description: >
+    'Fetch the bios version from MTD device.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: bios-version.service
+      type: string
+    - value: replace
+      type: string
