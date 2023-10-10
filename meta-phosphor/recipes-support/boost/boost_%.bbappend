@@ -10,7 +10,7 @@ PACKAGECONFIG:openbmc-phosphor:class-target = ""
 #
 #https://github.com/openbmc/docs/blob/master/cpp-style-and-conventions.md#boost
 #
-BOOST_LIBS:openbmc-phosphor:class-target = "chrono thread context coroutine"
+BOOST_LIBS:openbmc-phosphor:class-target = "chrono thread context coroutine url"
 
 BOOST_LIBS:openbmc-phosphor:class-target:append:df-etcd = " \
              random system filesystem atomic date_time regex"
