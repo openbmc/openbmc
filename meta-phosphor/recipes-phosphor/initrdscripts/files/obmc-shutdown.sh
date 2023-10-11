@@ -19,12 +19,14 @@ fi
 rmdir /oldroot 2>/dev/null
 
 # Move /oldroot/run to /mnt in case it has the underlying rofs loop mounted.
-# Ordered before /oldroot the overlay is unmounted before the loop mount
+# Reverse sort order will ensure the overlay is unmounted before the loop mount
 mkdir -p /mnt
 mount --move /oldroot/run /mnt
 
+# Unmount paths with /oldroot /mnt under / and those ending with ro or rw
+# Use . to match any single character because busybox awk doesn't handle [/]
 set -x
-awk '/oldroot|mnt/ { print $2 }' < /proc/mounts | sort -r | while IFS= read -r f
+awk '$2 ~ /^.oldroot|^.mnt|.r[ow]$/ { print $2 }' < /proc/mounts | sort -r | while IFS= read -r f
 do
 	umount "$f"
 done
