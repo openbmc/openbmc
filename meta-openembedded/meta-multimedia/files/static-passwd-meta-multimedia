@@ -1,0 +1,2 @@
+pipewire:x:660:660::/:/bin/nologin
+mpd:x:665:665::/:/bin/nologin

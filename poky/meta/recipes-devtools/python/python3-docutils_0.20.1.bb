@@ -8,4 +8,13 @@ SRC_URI[sha256sum] = "f08a4e276c3a1583a86dce3e34aba3fe04d02bba2dd51ed16106244e8a
 
 inherit pypi setuptools3
 
+do_install:append() {
+    for f in rst2html rst2html4 rst2html5 rst2latex rst2man \
+	           rst2odt rst2odt_prepstyles rst2pseudoxml rst2s5 rst2xetex rst2xml \
+	           rstpep2html
+    do
+        mv ${D}${bindir}/$f.py ${D}${bindir}/$f;
+    done
+}
+
 BBCLASSEXTEND = "native nativesdk"

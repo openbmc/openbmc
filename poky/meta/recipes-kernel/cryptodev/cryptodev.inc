@@ -10,7 +10,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/cryptodev-linux/cryptodev-linux;branch=master;protocol=https \
            "
-SRCREV = "795f5fda1485d447cdbad342e8304be317d4f7e8"
+SRCREV = "bb8bc7cf60d2c0b097c8b3b0e807f805b577a53f"
+PV = "1.13+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

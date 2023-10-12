@@ -156,7 +156,7 @@ EOF
 
 addtask generate_toolchain_file after do_patch before do_configure
 
-CONFIGURE_FILES = "CMakeLists.txt"
+CONFIGURE_FILES = "CMakeLists.txt *.cmake"
 
 do_configure[cleandirs] = "${@d.getVar('B') if d.getVar('S') != d.getVar('B') else ''}"
 

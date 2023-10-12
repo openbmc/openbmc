@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from tests.browser.selenium_helpers import SeleniumTestCase
 from orm.models import BitbakeVersion, Release, Project, Build
+from selenium.webdriver.common.by import By
 
 class TestToasterTableUI(SeleniumTestCase):
     """
@@ -33,7 +34,7 @@ class TestToasterTableUI(SeleniumTestCase):
         table: WebElement for a ToasterTable
         """
         selector = 'thead a.sorted'
-        heading = table.find_element_by_css_selector(selector)
+        heading = table.find_element(By.CSS_SELECTOR, selector)
         return heading.get_attribute('innerHTML').strip()
 
     def _get_datetime_from_cell(self, row, selector):
@@ -45,7 +46,7 @@ class TestToasterTableUI(SeleniumTestCase):
         selector: CSS selector to use to find the cell containing the date time
         string
         """
-        cell = row.find_element_by_css_selector(selector)
+        cell = row.find_element(By.CSS_SELECTOR, selector)
         cell_text = cell.get_attribute('innerHTML').strip()
         return datetime.strptime(cell_text, '%d/%m/%y %H:%M')
 
@@ -105,7 +106,7 @@ class TestToasterTableUI(SeleniumTestCase):
         self.click('#checkbox-started_on')
 
         # sort by started_on column
-        links = table.find_elements_by_css_selector('th.started_on a')
+        links = table.find_elements(By.CSS_SELECTOR, 'th.started_on a')
         for link in links:
             if link.get_attribute('innerHTML').strip() == 'Started on':
                 link.click()

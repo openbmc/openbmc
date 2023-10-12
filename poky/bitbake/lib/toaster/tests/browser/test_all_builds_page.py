@@ -7,13 +7,15 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import re
+import re, time
 
 from django.urls import reverse
 from django.utils import timezone
 from tests.browser.selenium_helpers import SeleniumTestCase
 
 from orm.models import BitbakeVersion, Release, Project, Build, Target
+
+from selenium.webdriver.common.by import By
 
 
 class TestAllBuildsPage(SeleniumTestCase):
@@ -91,7 +93,7 @@ class TestAllBuildsPage(SeleniumTestCase):
         found_row = None
         for row in rows:
 
-            outcome_links = row.find_elements_by_css_selector(selector)
+            outcome_links = row.find_elements(By.CSS_SELECTOR, selector)
             if len(outcome_links) == 1:
                 found_row = row
                 break
@@ -131,17 +133,19 @@ class TestAllBuildsPage(SeleniumTestCase):
         url = reverse('all-builds')
         self.get(url)
 
+        # should see a rebuild button for non-command-line builds
+        selector = 'div[data-latest-build-result="%s"] .rebuild-btn' % build1.id
+        time.sleep(2)
+        run_again_button = self.find_all(selector)
+        self.assertEqual(len(run_again_button), 1,
+                         'should see a rebuild button for non-cli builds')
+
         # shouldn't see a rebuild button for command-line builds
         selector = 'div[data-latest-build-result="%s"] .rebuild-btn' % default_build.id
         run_again_button = self.find_all(selector)
         self.assertEqual(len(run_again_button), 0,
                          'should not see a rebuild button for cli builds')
 
-        # should see a rebuild button for non-command-line builds
-        selector = 'div[data-latest-build-result="%s"] .rebuild-btn' % build1.id
-        run_again_button = self.find_all(selector)
-        self.assertEqual(len(run_again_button), 1,
-                         'should see a rebuild button for non-cli builds')
 
     def test_tooltips_on_project_name(self):
         """
@@ -198,24 +202,24 @@ class TestAllBuildsPage(SeleniumTestCase):
 
         # test recent builds area for successful build
         element = self._get_build_time_element(build1)
-        links = element.find_elements_by_css_selector('a')
+        links = element.find_elements(By.CSS_SELECTOR, 'a')
         msg = 'should be a link on the build time for a successful recent build'
         self.assertEquals(len(links), 1, msg)
 
         # test recent builds area for failed build
         element = self._get_build_time_element(build2)
-        links = element.find_elements_by_css_selector('a')
+        links = element.find_elements(By.CSS_SELECTOR, 'a')
         msg = 'should not be a link on the build time for a failed recent build'
         self.assertEquals(len(links), 0, msg)
 
         # test the time column for successful build
         build1_row = self._get_row_for_build(build1)
-        links = build1_row.find_elements_by_css_selector('td.time a')
+        links = build1_row.find_elements(By.CSS_SELECTOR, 'td.time a')
         msg = 'should be a link on the build time for a successful build'
         self.assertEquals(len(links), 1, msg)
 
         # test the time column for failed build
         build2_row = self._get_row_for_build(build2)
-        links = build2_row.find_elements_by_css_selector('td.time a')
+        links = build2_row.find_elements(By.CSS_SELECTOR, 'td.time a')
         msg = 'should not be a link on the build time for a failed build'
         self.assertEquals(len(links), 0, msg)

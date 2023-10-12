@@ -57,8 +57,7 @@ while true ; do
     esac
 done
 
-HOST_KEYS=$(sed -n 's/^[ \t]*HostKey[ \t]\+\(.*\)/\1/p' "${sshd_config}")
-[ -z "${HOST_KEYS}" ] && HOST_KEYS="$SYSCONFDIR/ssh_host_rsa_key $SYSCONFDIR/ssh_host_ecdsa_key $SYSCONFDIR/ssh_host_ed25519_key"
+HOST_KEYS=$(sshd -G -f "${sshd_config}" | grep -i '^hostkey ' | cut -f2 -d' ')
 
 for key in ${HOST_KEYS} ; do
     [ -f $key ] && continue

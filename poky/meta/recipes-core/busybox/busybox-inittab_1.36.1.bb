@@ -15,14 +15,17 @@ do_compile() {
 do_install() {
 	install -d ${D}${sysconfdir}
 	install -D -m 0644 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab
-	tmp="${SERIAL_CONSOLES}"
-	[ -n "$tmp" ] && echo >> ${D}${sysconfdir}/inittab
-	for i in $tmp
-	do
-		j=`echo ${i} | sed s/\;/\ /g`
-		id=`echo ${i} | sed -e 's/^.*;//' -e 's/;.*//'`
-		echo "$id::respawn:${base_sbindir}/getty ${j}" >> ${D}${sysconfdir}/inittab
-	done
+
+    CONSOLES="${SERIAL_CONSOLES}"
+    for s in $CONSOLES
+    do
+        speed=$(echo $s | cut -d\; -f 1)
+        device=$(echo $s | cut -d\; -f 2)
+        label=$(echo $device | sed -e 's/tty//' | tail --bytes=5)
+
+        echo "::respawn:${sbindir}/ttyrun $device ${base_sbindir}/getty $speed $device" >> ${D}${sysconfdir}/inittab
+    done
+
 	if [ "${USE_VT}" = "1" ]; then
 		cat <<EOF >>${D}${sysconfdir}/inittab
 # ${base_sbindir}/getty invocations for the runlevels.
@@ -45,32 +48,6 @@ EOF
 
 }
 
-pkg_postinst:${PN} () {
-# run this on host and on target
-if [ "${SERIAL_CONSOLES_CHECK}" = "" ]; then
-       exit 0
-fi
-}
-
-pkg_postinst_ontarget:${PN} () {
-# run this on the target
-if [ -e /proc/consoles ]; then
-        tmp="${SERIAL_CONSOLES_CHECK}"
-        for i in $tmp
-        do
-                j=`echo ${i} | sed -e s/^.*\;//g -e s/\:.*//g`
-                k=`echo ${i} | sed s/^.*\://g`
-                if [ -z "`grep ${j} /proc/consoles`" ]; then
-                        if [ -z "${k}" ] || [ -z "`grep ${k} /proc/consoles`" ] || [ ! -e /dev/${j} ]; then
-                                sed -i -e /^.*${j}\ /d -e /^.*${j}$/d /etc/inittab
-                        fi
-                fi
-        done
-        kill -HUP 1
-else
-        exit 1
-fi
-}
 
 # SERIAL_CONSOLES is generally defined by the MACHINE .conf.
 # Set PACKAGE_ARCH appropriately.
@@ -79,6 +56,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILES:${PN} = "${sysconfdir}/inittab"
 CONFFILES:${PN} = "${sysconfdir}/inittab"
 
+RDEPENDS:${PN} = "ttyrun"
 RCONFLICTS:${PN} = "sysvinit-inittab"
 
 USE_VT ?= "1"

@@ -224,6 +224,12 @@ signing_import_install() {
 }
 
 signing_prepare() {
+    export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
+    export OPENSSL_ENGINES="${STAGING_LIBDIR_NATIVE}/engines-3"
+    export OPENSSL_CONF="${STAGING_LIBDIR_NATIVE}/ssl-3/openssl.cnf"
+    export SSL_CERT_DIR="${STAGING_LIBDIR_NATIVE}/ssl-3/certs"
+    export SSL_CERT_FILE="${STAGING_LIBDIR_NATIVE}/ssl-3/cert.pem"
+
     if [ -f ${OPENSSL_CONF} ]; then
         echo "Using '${OPENSSL_CONF}' for OpenSSL configuration"
     else
@@ -308,9 +314,3 @@ signing_get_module() {
 python () {
     signing_class_prepare(d)
 }
-
-export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
-export OPENSSL_ENGINES="${STAGING_LIBDIR_NATIVE}/engines-3"
-export OPENSSL_CONF="${STAGING_LIBDIR_NATIVE}/ssl-3/openssl.cnf"
-export SSL_CERT_DIR="${STAGING_LIBDIR_NATIVE}/ssl-3/certs"
-export SSL_CERT_FILE="${STAGING_LIBDIR_NATIVE}/ssl-3/cert.pem"

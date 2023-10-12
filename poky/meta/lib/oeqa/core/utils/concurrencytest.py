@@ -264,7 +264,7 @@ def fork_for_tests(concurrency_num, suite):
             ourpid = os.getpid()
             try:
                 newbuilddir = None
-                stream = os.fdopen(c2pwrite, 'wb', 1)
+                stream = os.fdopen(c2pwrite, 'wb')
                 os.close(c2pread)
 
                 (builddir, newbuilddir) = suite.setupfunc("-st-" + str(ourpid), selftestdir, process_suite)
@@ -309,7 +309,7 @@ def fork_for_tests(concurrency_num, suite):
             os._exit(0)
         else:
             os.close(c2pwrite)
-            stream = os.fdopen(c2pread, 'rb', 1)
+            stream = os.fdopen(c2pread, 'rb')
             # Collect stdout/stderr into an io buffer
             output = io.BytesIO()
             testserver = ProtocolTestCase(stream, passthrough=output)

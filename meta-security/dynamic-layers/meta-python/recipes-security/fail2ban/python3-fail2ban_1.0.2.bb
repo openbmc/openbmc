@@ -20,6 +20,9 @@ SRC_URI = "git://github.com/fail2ban/fail2ban.git;branch=master;protocol=https \
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
 inherit update-rc.d ptest setuptools3_legacy
+inherit systemd
+
+SYSTEMD_SERVICE:${PN} = "fail2ban.service"
 
 S = "${WORKDIR}/git"
 
@@ -38,6 +41,12 @@ do_install:append () {
     install -d ${D}/${sysconfdir}/fail2ban
     install -d ${D}/${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/initd ${D}${sysconfdir}/init.d/fail2ban-server
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${systemd_system_unitdir}
+        install -m 0644 ${B}/fail2ban.service ${D}${systemd_system_unitdir}
+    fi
+
     chown -R root:root ${D}/${bindir}
     rm -rf ${D}/run
 }
@@ -57,6 +66,10 @@ INITSCRIPT_PARAMS = "defaults 25"
 
 INSANE_SKIP:${PN}:append = "already-stripped"
 
-RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog} iptables sqlite3 python3-core python3-pyinotify"
+RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog} iptables python3-core python3-pyinotify"
+RDEPENDS:${PN} += "python3-sqlite3"
 RDEPENDS:${PN} += " python3-logging python3-fcntl python3-json"
 RDEPENDS:${PN}-ptest = "python3-core python3-io python3-modules python3-fail2ban"
+
+RRECOMMENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'python3-systemd', '', d)}"
+RRECOMMENDS:${PN} += "python3-distutils"

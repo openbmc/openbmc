@@ -66,11 +66,11 @@ index 2f2860a..8cc6166 100644
  
  // Note that flags consulted by other parts of the code
 diff --git a/src/cmd/go/internal/work/exec.go b/src/cmd/go/internal/work/exec.go
-index 7e4fcb3..d83b31b 100644
+index 62e1774..cde867b 100644
 --- a/src/cmd/go/internal/work/exec.go
 +++ b/src/cmd/go/internal/work/exec.go
-@@ -527,6 +527,23 @@ func (b *Builder) build(ctx context.Context, a *Action) (err error) {
- 		return errors.New("binary-only packages are no longer supported")
+@@ -546,6 +546,23 @@ func (b *Builder) build(ctx context.Context, a *Action) (err error) {
+ 		return errors.New("cannot compile Go " + p.Module.GoVersion + " code")
  	}
  
 +	if goRootPrecious && (a.Package.Standard || a.Package.Goroot) {
@@ -93,7 +93,7 @@ index 7e4fcb3..d83b31b 100644
  	if err := b.Mkdir(a.Objdir); err != nil {
  		return err
  	}
-@@ -1624,6 +1641,14 @@ func (b *Builder) linkShared(ctx context.Context, a *Action) (err error) {
+@@ -1643,6 +1660,14 @@ func (b *Builder) linkShared(ctx context.Context, a *Action) (err error) {
  		return err
  	}
  

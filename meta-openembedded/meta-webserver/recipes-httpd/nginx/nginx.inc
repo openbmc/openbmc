@@ -22,6 +22,7 @@ SRC_URI = " \
     file://nginx-volatile.conf \
     file://nginx.service \
     file://nginx-fix-pidfile.patch \
+    file://0001-configure-libxslt-conf.patch \
 "
 
 inherit siteinfo update-rc.d useradd systemd
@@ -46,6 +47,8 @@ PACKAGECONFIG[http-auth-request] = "--with-http_auth_request_module,,"
 PACKAGECONFIG[ipv6] = "--with-ipv6,,"
 PACKAGECONFIG[webdav] = "--with-http_dav_module,,"
 PACKAGECONFIG[stream] = "--with-stream,,"
+
+PACKAGECONFIG[xslt] = "--with-http_xslt_module,,libxslt"
 
 do_configure () {
     if [ "${SITEINFO_BITS}" = "64" ]; then

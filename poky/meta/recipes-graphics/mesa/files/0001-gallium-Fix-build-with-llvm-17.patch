@@ -1,4 +1,4 @@
-From c8e9776abc3dfd3f2411797a90a03e7fa16263ef Mon Sep 17 00:00:00 2001
+From 6d07f6aa7f92f40d78a2db645f16f0f3e7d3c2e8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 23 Jun 2023 01:20:38 -0700
 Subject: [PATCH] gallium: Fix build with llvm 17
@@ -9,16 +9,19 @@ so add conditions to exclude them for llvm >= 17
 
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/23827]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
- src/gallium/auxiliary/gallivm/lp_bld_init.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
+---
+ src/gallium/auxiliary/gallivm/lp_bld_init.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/gallium/auxiliary/gallivm/lp_bld_init.c b/src/gallium/auxiliary/gallivm/lp_bld_init.c
+index cd2108f..b1a4d03 100644
 --- a/src/gallium/auxiliary/gallivm/lp_bld_init.c
 +++ b/src/gallium/auxiliary/gallivm/lp_bld_init.c
-@@ -42,8 +42,10 @@
- 
- #include <llvm/Config/llvm-config.h>
- #include <llvm-c/Analysis.h>
+@@ -46,15 +46,19 @@
+ #if GALLIVM_USE_NEW_PASS == 1
+ #include <llvm-c/Transforms/PassBuilder.h>
+ #elif GALLIVM_HAVE_CORO == 1
 +#if LLVM_VERSION_MAJOR < 17
  #include <llvm-c/Transforms/Scalar.h>
 -#if LLVM_VERSION_MAJOR >= 7
@@ -26,8 +29,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +#if LLVM_VERSION_MAJOR >= 7 && LLVM_VERSION_MAJOR < 17
  #include <llvm-c/Transforms/Utils.h>
  #endif
- #include <llvm-c/BitWriter.h>
-@@ -53,8 +55,10 @@
  #if LLVM_VERSION_MAJOR <= 8 && (DETECT_ARCH_AARCH64 || DETECT_ARCH_ARM || DETECT_ARCH_S390 || DETECT_ARCH_MIPS64)
  #include <llvm-c/Transforms/IPO.h>
  #endif

@@ -11,6 +11,7 @@ from django.urls import reverse
 from tests.browser.selenium_helpers import SeleniumTestCase
 
 from orm.models import BitbakeVersion, Release, Project, ProjectVariable
+from selenium.webdriver.common.by import By
 
 class TestProjectConfigsPage(SeleniumTestCase):
     """ Test data at /project/X/builds is displayed correctly """
@@ -66,7 +67,7 @@ class TestProjectConfigsPage(SeleniumTestCase):
 
         self.enter_text('#new-imagefs_types', imagefs_type)
 
-        checkboxes = self.driver.find_elements_by_xpath("//input[@class='fs-checkbox-fstypes']")
+        checkboxes = self.driver.find_elements(By.XPATH, "//input[@class='fs-checkbox-fstypes']")
 
         for checkbox in checkboxes:
             if checkbox.get_attribute("value") == "btrfs":
@@ -95,7 +96,7 @@ class TestProjectConfigsPage(SeleniumTestCase):
         for checkbox in checkboxes:
             if checkbox.get_attribute("value") == "cpio":
                checkbox.click()
-               element = self.driver.find_element_by_id('new-imagefs_types')
+               element = self.driver.find_element(By.ID, 'new-imagefs_types')
 
                self.wait_until_visible('#new-imagefs_types')
 
@@ -129,7 +130,7 @@ class TestProjectConfigsPage(SeleniumTestCase):
         self.assertTrue((self.INVALID_PATH_START_TEXT in element.text), msg)
 
         # downloads dir path has a space
-        self.driver.find_element_by_id('new-dl_dir').clear()
+        self.driver.find_element(By.ID, 'new-dl_dir').clear()
         self.enter_text('#new-dl_dir', '/foo/bar a')
 
         element = self.wait_until_visible('#hintError-dl_dir')
@@ -137,7 +138,7 @@ class TestProjectConfigsPage(SeleniumTestCase):
         self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
         # downloads dir path starts with ${...} but has a space
-        self.driver.find_element_by_id('new-dl_dir').clear()
+        self.driver.find_element(By.ID,'new-dl_dir').clear()
         self.enter_text('#new-dl_dir', '${TOPDIR}/down foo')
 
         element = self.wait_until_visible('#hintError-dl_dir')
@@ -145,18 +146,18 @@ class TestProjectConfigsPage(SeleniumTestCase):
         self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
         # downloads dir path starts with /
-        self.driver.find_element_by_id('new-dl_dir').clear()
+        self.driver.find_element(By.ID,'new-dl_dir').clear()
         self.enter_text('#new-dl_dir', '/bar/foo')
 
-        hidden_element = self.driver.find_element_by_id('hintError-dl_dir')
+        hidden_element = self.driver.find_element(By.ID,'hintError-dl_dir')
         self.assertEqual(hidden_element.is_displayed(), False,
             'downloads directory path valid but treated as invalid')
 
         # downloads dir path starts with ${...}
-        self.driver.find_element_by_id('new-dl_dir').clear()
+        self.driver.find_element(By.ID,'new-dl_dir').clear()
         self.enter_text('#new-dl_dir', '${TOPDIR}/down')
 
-        hidden_element = self.driver.find_element_by_id('hintError-dl_dir')
+        hidden_element = self.driver.find_element(By.ID,'hintError-dl_dir')
         self.assertEqual(hidden_element.is_displayed(), False,
             'downloads directory path valid but treated as invalid')
 
@@ -184,7 +185,7 @@ class TestProjectConfigsPage(SeleniumTestCase):
         self.assertTrue((self.INVALID_PATH_START_TEXT in element.text), msg)
 
         # path has a space
-        self.driver.find_element_by_id('new-sstate_dir').clear()
+        self.driver.find_element(By.ID, 'new-sstate_dir').clear()
         self.enter_text('#new-sstate_dir', '/foo/bar a')
 
         element = self.wait_until_visible('#hintError-sstate_dir')
@@ -192,7 +193,7 @@ class TestProjectConfigsPage(SeleniumTestCase):
         self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
         # path starts with ${...} but has a space
-        self.driver.find_element_by_id('new-sstate_dir').clear()
+        self.driver.find_element(By.ID,'new-sstate_dir').clear()
         self.enter_text('#new-sstate_dir', '${TOPDIR}/down foo')
 
         element = self.wait_until_visible('#hintError-sstate_dir')
@@ -200,18 +201,18 @@ class TestProjectConfigsPage(SeleniumTestCase):
         self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
         # path starts with /
-        self.driver.find_element_by_id('new-sstate_dir').clear()
+        self.driver.find_element(By.ID,'new-sstate_dir').clear()
         self.enter_text('#new-sstate_dir', '/bar/foo')
 
-        hidden_element = self.driver.find_element_by_id('hintError-sstate_dir')
+        hidden_element = self.driver.find_element(By.ID, 'hintError-sstate_dir')
         self.assertEqual(hidden_element.is_displayed(), False,
             'sstate directory path valid but treated as invalid')
 
         # paths starts with ${...}
-        self.driver.find_element_by_id('new-sstate_dir').clear()
+        self.driver.find_element(By.ID, 'new-sstate_dir').clear()
         self.enter_text('#new-sstate_dir', '${TOPDIR}/down')
 
-        hidden_element = self.driver.find_element_by_id('hintError-sstate_dir')
+        hidden_element = self.driver.find_element(By.ID, 'hintError-sstate_dir')
         self.assertEqual(hidden_element.is_displayed(), False,
             'sstate directory path valid but treated as invalid')
 

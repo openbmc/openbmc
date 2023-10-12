@@ -1,0 +1,58 @@
+From 671e0d091b40ef7deb4a9d43e0dbed2a44edbec8 Mon Sep 17 00:00:00 2001
+From: Matthew Fernandez <matthew.fernandez@gmail.com>
+Date: Sat, 9 Sep 2023 01:03:04 -0700
+Subject: [PATCH] Autotools: fix: do not put '$prefix' based paths in
+ compilation flags
+
+This was causing problems with cross-compilation with a dedicated sysroot,
+because compilation would incorrectly use headers and libraries from the
+`--prefix` path. The `--prefix` path is meant to indicate a target path to
+install to, not a path from which to source dependent libraries.
+
+Gitlab: fixes #2442
+Reported-by: Daniel Klauer
+Suggested-by: Daniel Klauer
+
+Upstream-Status: Backport [https://gitlab.com/graphviz/graphviz/-/commit/012d250a903e13114bce3ba40995fb957fed7848]
+Signed-off-by: Daniel Klauer <daniel.klauer@gin.de>
+---
+ CHANGELOG.md | 3 +++
+ configure.ac | 8 --------
+ 2 files changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index b9b7e8e08..3a15fd256 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -39,6 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
+   longer fails due to missing PHP files. #2388
+ - Syntax for a loop in `gvmap.sh` has been corrected. This was a regression in
+   Graphviz 2.50.0. #2404
++- The Autotools build system no longer uses headers and libraries from the
++  `--prefix` path given on the command line. This previously caused
++  cross-compilation to incorrectly pick up host headers and libraries. #2442
+ 
+ ## [8.0.5] – 2023-04-30
+ 
+diff --git a/configure.ac b/configure.ac
+index 573a3ee5d..7d53346de 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -190,14 +190,6 @@ if test "x${prefix}" = "xNONE"; then
+ 	AC_SUBST([prefix])
+ fi
+ 
+-# automatically check for other dependencies in $prefix first
+-if test "x${prefix}" != "x/usr"; then
+-	CPPFLAGS="$CPPFLAGS -I${prefix}/include"
+-	LDFLAGS="$LDFLAGS -L${prefix}/lib"
+-	PKG_CONFIG_PATH="$prefix/lib/pkgconfig$PATHSEPARATOR$PKG_CONFIG_PATH"
+-	export PKG_CONFIG_PATH
+-fi
+-
+ dnl -----------------------------------
+ # Static/Shared binaries
+ 
+-- 
+2.34.1
+

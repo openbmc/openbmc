@@ -15,6 +15,7 @@ DEPENDS = "expat libffi wayland-native"
 SRC_URI = "https://gitlab.freedesktop.org/wayland/wayland/-/releases/${PV}/downloads/${BPN}-${PV}.tar.xz \
            file://run-ptest \
            file://0001-build-Fix-strndup-detection-on-MinGW.patch \
+           file://0002-Consider-pkgconfig-sysroot-for-pkgdatadir.patch \
            "
 SRC_URI[sha256sum] = "1540af1ea698a471c2d8e9d288332c7e0fd360c8f1d12936ebb7e7cbc2425842"
 

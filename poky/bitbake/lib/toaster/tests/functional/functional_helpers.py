@@ -16,6 +16,9 @@ import re
 
 from tests.browser.selenium_helpers_base import SeleniumTestCaseBase
 from tests.builds.buildtest import load_build_environment
+from bldcontrol.models import BuildEnvironment
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 
 logger = logging.getLogger("toaster")
 
@@ -30,6 +33,8 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
             raise RuntimeError("Please initialise django with the tests settings:  " \
                 "DJANGO_SETTINGS_MODULE='toastermain.settings_test'")
 
+        if BuildEnvironment.objects.count() == 0:
+            BuildEnvironment.objects.create(betype=BuildEnvironment.TYPE_LOCAL)
         load_build_environment()
 
         # start toaster
@@ -74,8 +79,8 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
         """
         try:
             table_element = self.get_table_element(table_id)
-            element = table_element.find_element_by_link_text(link_text)
-        except self.NoSuchElementException:
+            element = table_element.find_element(By.LINK_TEXT, link_text)
+        except NoSuchElementException:
             print('no element found')
             raise
         return element
@@ -85,8 +90,8 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
 #return whole-table element
             element_xpath = "//*[@id='" + table_id + "']"
             try:
-                element = self.driver.find_element_by_xpath(element_xpath)
-            except self.NoSuchElementException:
+                element = self.driver.find_element(By.XPATH, element_xpath)
+            except NoSuchElementException:
                 raise
             return element
         row = coordinate[0]
@@ -95,8 +100,8 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
 #return whole-row element
             element_xpath = "//*[@id='" + table_id + "']/tbody/tr[" + str(row) + "]"
             try:
-                element = self.driver.find_element_by_xpath(element_xpath)
-            except self.NoSuchElementException:
+                element = self.driver.find_element(By.XPATH, element_xpath)
+            except NoSuchElementException:
                 return False
             return element
 #now we are looking for an element with specified X and Y
@@ -104,7 +109,7 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
 
         element_xpath = "//*[@id='" + table_id + "']/tbody/tr[" + str(row) + "]/td[" + str(column) + "]"
         try:
-            element = self.driver.find_element_by_xpath(element_xpath)
-        except self.NoSuchElementException:
+            element = self.driver.find_element(By.XPATH, element_xpath)
+        except NoSuchElementException:
             return False
         return element

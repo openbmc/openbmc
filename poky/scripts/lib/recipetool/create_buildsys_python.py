@@ -10,7 +10,7 @@ import codecs
 import collections
 import setuptools.command.build_py
 import email
-import imp
+import importlib
 import glob
 import itertools
 import logging
@@ -561,7 +561,6 @@ class PythonRecipeHandler(RecipeHandler):
         return deps
 
     def parse_pkgdata_for_python_packages(self):
-        suffixes = [t[0] for t in imp.get_suffixes()]
         pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR')
 
         ldata = tinfoil.config_data.createCopy()
@@ -585,7 +584,7 @@ class PythonRecipeHandler(RecipeHandler):
                     continue
 
             for fn in files_info:
-                for suffix in suffixes:
+                for suffix in importlib.machinery.all_suffixes():
                     if fn.endswith(suffix):
                         break
                 else:

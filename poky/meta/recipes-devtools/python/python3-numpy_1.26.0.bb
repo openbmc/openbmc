@@ -30,15 +30,6 @@ do_compile:prepend() {
     export NPY_DISABLE_SVML=1
 }
 
-# Unfortunately the following pyc files are non-deterministc due to 'frozenset'
-# being written without strict ordering, even with PYTHONHASHSEED = 0
-# Upstream is discussing ways to solve the issue properly, until then let's
-# just not install the problematic files.
-# More info: http://benno.id.au/blog/2013/01/15/python-determinism
-do_install:append() {
-	rm ${D}${PYTHON_SITEPACKAGES_DIR}/numpy/typing/tests/data/pass/__pycache__/literal.cpython*
-}
-
 FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/numpy/core/lib/*.a ${PYTHON_SITEPACKAGES_DIR}/numpy/random/lib/*.a"
 
 # install what is needed for numpy.test()

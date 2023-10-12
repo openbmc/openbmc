@@ -20,13 +20,13 @@ import os
 import subprocess
 
 def _is_repo_git_repo(repodir):
-    git_dir = os.path.join(repodir, ".git")
-    if not os.access(git_dir, os.R_OK):
-        return False
     try:
-        return subprocess.check_output("git -C %s rev-parse --is-inside-git-dir" % git_dir, shell=True, stderr=subprocess.DEVNULL)
+        curr_toplevel = subprocess.check_output("git -C %s rev-parse --show-toplevel" % repodir, shell=True, stderr=subprocess.DEVNULL)
+        if curr_toplevel.strip().decode("utf-8") == repodir:
+            return True
     except subprocess.CalledProcessError:
-        return False
+        pass
+    return False
 
 def _is_repo_at_rev(repodir, rev):
     try:

@@ -44,7 +44,7 @@ index 66ef5ce..fb7448a 100644
  		// Should not happen - b.CFlags was given an empty package.
  		fmt.Fprintf(os.Stderr, "go: invalid cflags: %v\n", err)
 diff --git a/src/cmd/go/internal/work/exec.go b/src/cmd/go/internal/work/exec.go
-index d6fa847..7e4fcb3 100644
+index 67d1193..62e1774 100644
 --- a/src/cmd/go/internal/work/exec.go
 +++ b/src/cmd/go/internal/work/exec.go
 @@ -223,6 +223,8 @@ func (b *Builder) Do(ctx context.Context, root *Action) {
@@ -103,7 +103,7 @@ index d6fa847..7e4fcb3 100644
  	}
  
  	// Configuration specific to compiler toolchain.
-@@ -2970,8 +2972,25 @@ func envList(key, def string) []string {
+@@ -2989,8 +2991,25 @@ func envList(key, def string) []string {
  	return args
  }
  
@@ -130,7 +130,7 @@ index d6fa847..7e4fcb3 100644
  	if cppflags, err = buildFlags("CPPFLAGS", "", p.CgoCPPFLAGS, checkCompilerFlags); err != nil {
  		return
  	}
-@@ -2987,6 +3006,13 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
+@@ -3006,6 +3025,13 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
  	if ldflags, err = buildFlags("LDFLAGS", defaultCFlags, p.CgoLDFLAGS, checkLinkerFlags); err != nil {
  		return
  	}
@@ -144,7 +144,7 @@ index d6fa847..7e4fcb3 100644
  
  	return
  }
-@@ -3002,7 +3028,7 @@ var cgoRe = lazyregexp.New(`[/\\:]`)
+@@ -3021,7 +3047,7 @@ var cgoRe = lazyregexp.New(`[/\\:]`)
  
  func (b *Builder) cgo(a *Action, cgoExe, objdir string, pcCFLAGS, pcLDFLAGS, cgofiles, gccfiles, gxxfiles, mfiles, ffiles []string) (outGo, outObj []string, err error) {
  	p := a.Package
@@ -153,7 +153,7 @@ index d6fa847..7e4fcb3 100644
  	if err != nil {
  		return nil, nil, err
  	}
-@@ -3510,7 +3536,7 @@ func (b *Builder) swigIntSize(objdir string) (intsize string, err error) {
+@@ -3577,7 +3603,7 @@ func (b *Builder) swigIntSize(objdir string) (intsize string, err error) {
  
  // Run SWIG on one SWIG input file.
  func (b *Builder) swigOne(a *Action, p *load.Package, file, objdir string, pcCFLAGS []string, cxx bool, intgosize string) (outGo, outC string, err error) {

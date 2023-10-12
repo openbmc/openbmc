@@ -6,6 +6,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
+from bldcontrol.models import BuildEnvironment
 
 from django.urls import reverse
 from tests.browser.selenium_helpers import SeleniumTestCase
@@ -18,6 +19,9 @@ class TestNewCustomImagePage(SeleniumTestCase):
     CUSTOM_IMAGE_NAME = 'roopa-doopa'
 
     def setUp(self):
+        BuildEnvironment.objects.get_or_create(
+            betype=BuildEnvironment.TYPE_LOCAL,
+        )
         release = Release.objects.create(
             name='baz',
             bitbake_version=BitbakeVersion.objects.create(name='v1')

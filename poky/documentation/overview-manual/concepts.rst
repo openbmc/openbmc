@@ -1963,6 +1963,15 @@ task output from the Shared State cache.
    the stability of the task's output hash. Therefore, the effectiveness
    of Hash Equivalence strongly depends on it.
 
+   Recipes that are not reproducible may have undesired behavior if hash
+   equivalence is enabled, since the non-reproducible diverging output maybe be
+   remapped to an older sstate object in the cache by the server. If a recipe
+   is non-reproducible in trivial ways, such as different timestamps, this is
+   likely not a problem. However recipes that have more dramatic changes (such
+   as completely different file names) will likely outright fail since the
+   downstream sstate objects are not actually equivalent to what was just
+   built.
+
 This applies to multiple scenarios:
 
 -  A "trivial" change to a recipe that doesn't impact its generated output,

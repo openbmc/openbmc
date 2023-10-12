@@ -810,6 +810,7 @@ RECIPE_MAINTAINER:pn-texinfo-dummy-native = "Anuj Mittal <anuj.mittal@intel.com>
 RECIPE_MAINTAINER:pn-tiff = "Alexander Kanavin <alex.kanavin@gmail.com>"
 RECIPE_MAINTAINER:pn-time = "Robert Yang <liezhi.yang@windriver.com>"
 RECIPE_MAINTAINER:pn-ttf-bitstream-vera = "Anuj Mittal <anuj.mittal@intel.com>"
+RECIPE_MAINTAINER:pn-ttyrun = "Ross Burton <ross.burton@arm.com>"
 RECIPE_MAINTAINER:pn-tzcode-native = "Unassigned <unassigned@yoctoproject.org>"
 RECIPE_MAINTAINER:pn-tzdata = "Unassigned <unassigned@yoctoproject.org>"
 RECIPE_MAINTAINER:pn-u-boot = "Marek Vasut <marek.vasut@gmail.com>"

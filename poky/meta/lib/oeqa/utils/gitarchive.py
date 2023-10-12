@@ -113,7 +113,7 @@ def get_tags(repo, log, pattern=None, url=None):
     # First try to fetch tags from repository configured remote
     cmd.append('origin')
     if pattern:
-        cmd.append(pattern)
+        cmd.append("refs/tags/"+pattern)
     try:
         tags_refs = repo.run_cmd(cmd)
         tags = ["".join(d.split()[1].split('/', 2)[2:]) for d in tags_refs.splitlines()]
@@ -235,6 +235,8 @@ def get_test_runs(log, repo, tag_name, **kwargs):
     revs = []
     for tag in tags:
         m = tag_re.match(tag)
+        if not m:
+            continue
         groups = m.groupdict()
         revs.append([groups[f] for f in undef_fields] + [tag])
 

@@ -1,0 +1,11 @@
+redis:x:600:600::/:/bin/nologin
+xrdp:x:601:601::/:/bin/nologin
+sanlock:x:602:602::/:/bin/nologin
+mysql:x:603:603::/:/bin/nologin
+postgres:x:604:604::/:/bin/nologin
+zabbix:x:605:605::/:/bin/nologin
+cyrus:x:606:nogroup::/:/bin/nologin
+pcp:x:620:nogroup::/:/bin/nologin
+pcpqa:x:621:nogroup::/:/bin/nologin
+influxdb:x:622:nogroup::/:/bin/nologin
+mongodb:x:623:nogroup::/:/bin/nologin

@@ -83,10 +83,10 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
             {"get": {"taskhash": taskhash, "method": method, "all": all_properties}}
         )
 
-    async def get_outhash(self, method, outhash, taskhash):
+    async def get_outhash(self, method, outhash, taskhash, with_unihash=True):
         await self._set_mode(self.MODE_NORMAL)
         return await self.send_message(
-            {"get-outhash": {"outhash": outhash, "taskhash": taskhash, "method": method}}
+            {"get-outhash": {"outhash": outhash, "taskhash": taskhash, "method": method, "with_unihash": with_unihash}}
         )
 
     async def get_stats(self):
@@ -100,6 +100,14 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
     async def backfill_wait(self):
         await self._set_mode(self.MODE_NORMAL)
         return (await self.send_message({"backfill-wait": None}))["tasks"]
+
+    async def remove(self, where):
+        await self._set_mode(self.MODE_NORMAL)
+        return await self.send_message({"remove": {"where": where}})
+
+    async def clean_unused(self, max_age):
+        await self._set_mode(self.MODE_NORMAL)
+        return await self.send_message({"clean-unused": {"max_age_seconds": max_age}})
 
 
 class Client(bb.asyncrpc.Client):
@@ -115,6 +123,8 @@ class Client(bb.asyncrpc.Client):
             "get_stats",
             "reset_stats",
             "backfill_wait",
+            "remove",
+            "clean_unused",
         )
 
     def _get_async_client(self):

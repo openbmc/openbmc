@@ -684,11 +684,13 @@ class CleanTarballTest(FetcherTest):
         archive = tarfile.open(os.path.join(self.dldir, self.recipe_tarball))
         self.assertNotEqual(len(archive.members), 0)
         for member in archive.members:
-            self.assertEqual(member.uname, 'oe')
-            self.assertEqual(member.uid, 0)
-            self.assertEqual(member.gname, 'oe')
-            self.assertEqual(member.gid, 0)
-            self.assertEqual(member.mtime, mtime)
+            if member.name == ".":
+                continue
+            self.assertEqual(member.uname, 'oe', "user name for %s differs" % member.name)
+            self.assertEqual(member.uid, 0, "uid for %s differs" % member.name)
+            self.assertEqual(member.gname, 'oe', "group name for %s differs" % member.name)
+            self.assertEqual(member.gid, 0, "gid for %s differs" % member.name)
+            self.assertEqual(member.mtime, mtime, "mtime for %s differs" % member.name)
 
 
 class FetcherLocalTest(FetcherTest):

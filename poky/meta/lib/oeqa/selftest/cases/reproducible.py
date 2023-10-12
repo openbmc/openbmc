@@ -16,8 +16,6 @@ import os
 import datetime
 
 exclude_packages = [
-	'rust',
-	'rust-dbg'
 	]
 
 def is_excluded(package):

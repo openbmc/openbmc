@@ -229,7 +229,7 @@ The final thing you need to do when setting :term:`TEST_TARGET` to
    statements in your ``local.conf`` file::
 
       IMAGE_FSTYPES += "tar.gz"
-      INHERIT += "testimage"
+      IMAGE_CLASSES += "testimage"
       TEST_TARGET = "SystemdbootTarget"
       TEST_TARGET_IP = "192.168.2.3"
 
@@ -335,7 +335,7 @@ You can start the tests automatically or manually:
    inherit the :ref:`ref-classes-testimage` class by editing your
    ``local.conf`` file::
 
-      INHERIT += "testimage"
+      IMAGE_CLASSES += "testimage"
 
    Next, use BitBake to run the tests::
 

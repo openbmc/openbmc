@@ -18,7 +18,8 @@ CVE_STATUS[CVE-2021-46828] = "fixed-version: fixed in 1.3.3rc1 so not present in
 
 inherit autotools pkgconfig
 
-EXTRA_OECONF = "--disable-gssapi"
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[gssapi] = "--enable-gssapi,--disable-gssapi,krb5"
 
 do_install:append() {
 	test -e ${D}${sysconfdir}/netconfig && chown root:root ${D}${sysconfdir}/netconfig

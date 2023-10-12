@@ -842,11 +842,11 @@ to your build configuration.
             if self.get('QB_TCPSERIAL_OPT'):
                 self.qemu_opt_script += ' ' + self.get('QB_TCPSERIAL_OPT').replace('@PORT@', port)
             else:
-                self.qemu_opt_script += ' -serial tcp:127.0.0.1:%s' % port
+                self.qemu_opt_script += ' -serial tcp:127.0.0.1:%s,nodelay=on' % port
 
             if len(ports) > 1:
                 for port in ports[1:]:
-                    self.qemu_opt_script += ' -serial tcp:127.0.0.1:%s' % port
+                    self.qemu_opt_script += ' -serial tcp:127.0.0.1:%s,nodelay=on' % port
 
     def check_and_set(self):
         """Check configs sanity and set when needed"""

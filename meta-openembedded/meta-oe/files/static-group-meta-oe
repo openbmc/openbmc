@@ -1,0 +1,8 @@
+redis:x:600:
+xrdp:x:601:
+sanlock:x:602:
+mysql:x:603:
+postgres:x:604:
+zabbix:x:605:
+mail:x:606:
+nogroup:x:607:

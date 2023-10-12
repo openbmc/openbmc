@@ -48,6 +48,8 @@ PACKAGECONFIG[wayland] = "-Dwayland=true, -Dwayland=false, wayland"
 
 EXTRA_OEMESON += "-Doe_sysroot=${STAGING_DIR_HOST}"
 
+export XDG_DATA_DIRS = "${STAGING_DATADIR}"
+
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 polkitd"
 

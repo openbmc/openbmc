@@ -12,7 +12,7 @@ SRC_URI = "git://github.com/libbpf/libbpf.git;protocol=https;branch=master"
 SRCREV = "fbd60dbff51c870f5e80a17c4f2fd639eb80af90"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-COMPATIBLE_HOST = "(x86_64|i.86|aarch64|riscv64|powerpc64).*-linux"
+COMPATIBLE_HOST = "(x86_64|i.86|arm|aarch64|riscv64|powerpc|powerpc64|mips64).*-linux"
 
 S = "${WORKDIR}/git/src"
 

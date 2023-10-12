@@ -18,10 +18,10 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/src/cmd/link/internal/ld/lib.go b/src/cmd/link/internal/ld/lib.go
-index c073017..e60d39a 100644
+index 03b9f11..e91c92f 100644
 --- a/src/cmd/link/internal/ld/lib.go
 +++ b/src/cmd/link/internal/ld/lib.go
-@@ -1491,6 +1491,7 @@ func (ctxt *Link) hostlink() {
+@@ -1504,6 +1504,7 @@ func (ctxt *Link) hostlink() {
  				argv = append(argv, "-Wl,-z,relro")
  			}
  			argv = append(argv, "-shared")
@@ -29,7 +29,7 @@ index c073017..e60d39a 100644
  			if ctxt.HeadType == objabi.Hwindows {
  				argv = addASLRargs(argv, *flagAslr)
  			} else {
-@@ -1506,6 +1507,7 @@ func (ctxt *Link) hostlink() {
+@@ -1519,6 +1520,7 @@ func (ctxt *Link) hostlink() {
  			argv = append(argv, "-Wl,-z,relro")
  		}
  		argv = append(argv, "-shared")
@@ -37,7 +37,7 @@ index c073017..e60d39a 100644
  	case BuildModePlugin:
  		if ctxt.HeadType == objabi.Hdarwin {
  			argv = append(argv, "-dynamiclib")
-@@ -1514,6 +1516,7 @@ func (ctxt *Link) hostlink() {
+@@ -1527,6 +1529,7 @@ func (ctxt *Link) hostlink() {
  				argv = append(argv, "-Wl,-z,relro")
  			}
  			argv = append(argv, "-shared")

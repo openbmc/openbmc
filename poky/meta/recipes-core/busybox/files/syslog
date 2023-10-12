@@ -10,6 +10,8 @@
 
 set -e
 
+PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+
 if [ -f /etc/syslog-startup.conf ]; then
 	. /etc/syslog-startup.conf
 	LOG_LOCAL=0

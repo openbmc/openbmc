@@ -117,7 +117,7 @@ The following steps describe how to set up the AUH utility:
       class, which is optional, you need to have the following set in
       your ``conf/local.conf`` file::
 
-         INHERIT += "testimage"
+         IMAGE_CLASSES += "testimage"
 
       .. note::
 

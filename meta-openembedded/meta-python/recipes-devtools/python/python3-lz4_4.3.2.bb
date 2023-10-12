@@ -22,6 +22,7 @@ RDEPENDS:${PN}-ptest += "\
     python3-pytest-runner \
     python3-multiprocessing \
     python3-psutil \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

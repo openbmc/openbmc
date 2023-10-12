@@ -252,6 +252,8 @@ def srctree_configure_hash_files(d):
     Get the list of files that should trigger do_configure to re-execute,
     based on the value of CONFIGURE_FILES
     """
+    import fnmatch
+
     in_files = (d.getVar('CONFIGURE_FILES') or '').split()
     out_items = []
     search_files = []
@@ -263,8 +265,8 @@ def srctree_configure_hash_files(d):
     if search_files:
         s_dir = d.getVar('EXTERNALSRC')
         for root, _, files in os.walk(s_dir):
-            for f in files:
-                if f in search_files:
+            for p in search_files:
+                for f in fnmatch.filter(files, p):
                     out_items.append('%s:True' % os.path.join(root, f))
     return ' '.join(out_items)
 

@@ -9,14 +9,32 @@ SRCREV = "e1b41f64df1705770b7b70d7221a4812909c1d0f"
 
 S = "${WORKDIR}/git"
 
-inherit setuptools3
+# Inheriting ptest provides functionality for packaging and installing runtime tests for this recipe
+inherit setuptools3 ptest
 
 SETUPTOOLS_BUILD_ARGS += " --rj-include-dir=${RECIPE_SYSROOT}${includedir}"
+
+# run-ptest is a shell script that starts the test suite
+SRC_URI += " \
+    file://run-ptest \
+"
 
 DEPENDS += " \
     rapidjson \
 "
 
+# Adding required python package for the ptest (pytest and pytest->automake report translation)
+RDEPENDS:${PN}-ptest += " \
+    ${PYTHON_PN}-pytest \
+    ${PYTHON_PN}-unittest-automake-output \
+"
+
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-core \
 "
+
+# Installing the test suite on the target
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+}

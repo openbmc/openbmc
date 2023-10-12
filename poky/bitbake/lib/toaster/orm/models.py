@@ -1733,7 +1733,7 @@ class CustomImageRecipe(Recipe):
         packages_conf += "\""
 
         base_recipe_path = self.get_base_recipe_file()
-        if base_recipe_path:
+        if base_recipe_path and os.path.isfile(base_recipe_path):
             base_recipe = open(base_recipe_path, 'r').read()
         else:
             # Pass back None to trigger error message to user

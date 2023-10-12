@@ -14,8 +14,11 @@ import subprocess
 import toastermain
 from django.views.decorators.csrf import csrf_exempt
 
+from toastermain.logs import log_view_mixin
+
 
 @csrf_exempt
+@log_view_mixin
 def eventfile(request):
     """ Receives a file by POST, and runs toaster-eventreply on this file """
     if request.method != "POST":

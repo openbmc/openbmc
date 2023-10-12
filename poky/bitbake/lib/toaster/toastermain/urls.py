@@ -28,6 +28,8 @@ urlpatterns = [
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
 
+    url(r'^logs/', include('log_viewer.urls')),
+
     # This is here to maintain backward compatibility and will be deprecated
     # in the future.
     url(r'^orm/eventfile$', bldcollector.views.eventfile),

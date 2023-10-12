@@ -26,6 +26,7 @@ class BuildCoreImageMinimal(BuildTest):
 
     def setUp(self):
         self.completed_build = self.build("core-image-minimal")
+        self.built = self.target_already_built("core-image-minimal")
 
     # Check if build name is unique - tc_id=795
     def test_Build_Unique_Name(self):

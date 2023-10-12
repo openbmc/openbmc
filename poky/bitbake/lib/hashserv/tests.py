@@ -84,6 +84,7 @@ class HashEquivalenceCommonTests(object):
 
         result = self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
         self.assertEqual(result['unihash'], unihash, 'Server returned bad unihash')
+        return taskhash, outhash, unihash
 
     def test_create_equivalent(self):
         # Tests that a second reported task with the same outhash will be
@@ -124,6 +125,57 @@ class HashEquivalenceCommonTests(object):
         self.client.report_unihash(taskhash, self.METHOD, outhash3, unihash3)
 
         self.assertClientGetHash(self.client, taskhash, unihash)
+
+    def test_remove_taskhash(self):
+        taskhash, outhash, unihash = self.test_create_hash()
+        result = self.client.remove({"taskhash": taskhash})
+        self.assertGreater(result["count"], 0)
+        self.assertClientGetHash(self.client, taskhash, None)
+
+        result_outhash = self.client.get_outhash(self.METHOD, outhash, taskhash)
+        self.assertIsNone(result_outhash)
+
+    def test_remove_unihash(self):
+        taskhash, outhash, unihash = self.test_create_hash()
+        result = self.client.remove({"unihash": unihash})
+        self.assertGreater(result["count"], 0)
+        self.assertClientGetHash(self.client, taskhash, None)
+
+    def test_remove_outhash(self):
+        taskhash, outhash, unihash = self.test_create_hash()
+        result = self.client.remove({"outhash": outhash})
+        self.assertGreater(result["count"], 0)
+
+        result_outhash = self.client.get_outhash(self.METHOD, outhash, taskhash)
+        self.assertIsNone(result_outhash)
+
+    def test_remove_method(self):
+        taskhash, outhash, unihash = self.test_create_hash()
+        result = self.client.remove({"method": self.METHOD})
+        self.assertGreater(result["count"], 0)
+        self.assertClientGetHash(self.client, taskhash, None)
+
+        result_outhash = self.client.get_outhash(self.METHOD, outhash, taskhash)
+        self.assertIsNone(result_outhash)
+
+    def test_clean_unused(self):
+        taskhash, outhash, unihash = self.test_create_hash()
+
+        # Clean the database, which should not remove anything because all hashes an in-use
+        result = self.client.clean_unused(0)
+        self.assertEqual(result["count"], 0)
+        self.assertClientGetHash(self.client, taskhash, unihash)
+
+        # Remove the unihash. The row in the outhash table should still be present
+        self.client.remove({"unihash": unihash})
+        result_outhash = self.client.get_outhash(self.METHOD, outhash, taskhash, False)
+        self.assertIsNotNone(result_outhash)
+
+        # Now clean with no minimum age which will remove the outhash
+        result = self.client.clean_unused(0)
+        self.assertEqual(result["count"], 1)
+        result_outhash = self.client.get_outhash(self.METHOD, outhash, taskhash, False)
+        self.assertIsNone(result_outhash)
 
     def test_huge_message(self):
         # Simple test that hashes can be created

@@ -1,0 +1,14 @@
+ftp:x:630:
+dovecot:x:631:
+dovenull:x:632:
+postfix:x:633:
+postdrop:x:634:
+vmail:x:635:
+rasvd:x:636:
+frr:x:637:
+frrvty:x:638:
+nogroup:x:639:
+ftp:x:640:
+rwhod:x:641:
+lldpd:x:642:
+opensaf:x:643:

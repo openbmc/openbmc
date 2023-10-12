@@ -1,11 +1,7 @@
 #!/bin/sh
-export PATH=$PATH:/usr/kernel-selftest/bpf
-
-# test_align
-test_align | grep "12 pass" &> /dev/null
+/usr/kernel-selftest/run_kselftest.sh -s
 if [ $? == 0 ]; then
-    echo "[PASS]: test_align"
+    echo "PASS: kernel-selftest"
 else
-    echo "[FAIL]: test_align"
+    echo "[FAIL]: kernel-selftest"
 fi
-

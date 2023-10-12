@@ -107,6 +107,13 @@ QB_ROOTFS_EXTRA_OPT ?= ""
 QB_GRAPHICS ?= ""
 QB_NFSROOTFS_EXTRA_OPT ?= ""
 
+# With 6.5+ (specifically, if DMA_BOUNCE_UNALIGNED_KMALLOC is set) the SW IO TLB
+# is used, and it defaults to 64MB. This is too much when there's only 256MB of
+# RAM, so request 0 slabs and lets the kernel round up to the appropriate minimum
+# (1MB, typically). In virtual hardware there's very little need for these bounce
+# buffers, so the 64MB would be mostly wasted.
+QB_KERNEL_CMDLINE_APPEND:append = " swiotlb=0"
+
 # This should be kept align with ROOT_VM
 QB_DRIVE_TYPE ?= "/dev/sd"
 

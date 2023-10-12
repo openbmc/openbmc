@@ -1118,7 +1118,7 @@ COMMAND:
 TOPIC:
     overview  - Presents an overall overview of Wic
     plugins   - Presents an overview and API for Wic plugins
-    kickstart - Presents a Wic kicstart file reference
+    kickstart - Presents a Wic kickstart file reference
 
 
 Examples:

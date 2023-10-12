@@ -50,8 +50,6 @@ class ImageOptionsTests(OESelftestTestCase):
             loglines = "".join(f.readlines())
         self.assertIn("ccache", loglines, msg="No match for ccache in %s log.do_compile. For further details: %s" % (recipe , log_compile))
 
-    # https://bugzilla.yoctoproject.org/show_bug.cgi?id=14962
-    @skipIfMachine("qemuarm64", "fails on qemuarm64 (uses SERIAL_CONSOLES_CHECK)")
     def test_read_only_image(self):
         distro_features = get_bb_var('DISTRO_FEATURES')
         if not ('x11' in distro_features and 'opengl' in distro_features):

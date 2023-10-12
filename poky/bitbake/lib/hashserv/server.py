@@ -4,7 +4,7 @@
 #
 
 from contextlib import closing, contextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 import enum
 import asyncio
 import logging
@@ -186,6 +186,8 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
                 'report-equiv': self.handle_equivreport,
                 'reset-stats': self.handle_reset_stats,
                 'backfill-wait': self.handle_backfill_wait,
+                'remove': self.handle_remove,
+                'clean-unused': self.handle_clean_unused,
             })
 
     def validate_proto_version(self):
@@ -269,27 +271,42 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
         method = request['method']
         outhash = request['outhash']
         taskhash = request['taskhash']
+        with_unihash = request.get("with_unihash", True)
 
         with closing(self.db.cursor()) as cursor:
-            d = await self.get_outhash(cursor, method, outhash, taskhash)
+            d = await self.get_outhash(cursor, method, outhash, taskhash, with_unihash)
 
         self.write_message(d)
 
-    async def get_outhash(self, cursor, method, outhash, taskhash):
+    async def get_outhash(self, cursor, method, outhash, taskhash, with_unihash=True):
         d = None
-        cursor.execute(
-            '''
-            SELECT *, unihashes_v2.unihash AS unihash FROM outhashes_v2
-            INNER JOIN unihashes_v2 ON unihashes_v2.method=outhashes_v2.method AND unihashes_v2.taskhash=outhashes_v2.taskhash
-            WHERE outhashes_v2.method=:method AND outhashes_v2.outhash=:outhash
-            ORDER BY outhashes_v2.created ASC
-            LIMIT 1
-            ''',
-            {
-                'method': method,
-                'outhash': outhash,
-            }
-        )
+        if with_unihash:
+            cursor.execute(
+                '''
+                SELECT *, unihashes_v2.unihash AS unihash FROM outhashes_v2
+                INNER JOIN unihashes_v2 ON unihashes_v2.method=outhashes_v2.method AND unihashes_v2.taskhash=outhashes_v2.taskhash
+                WHERE outhashes_v2.method=:method AND outhashes_v2.outhash=:outhash
+                ORDER BY outhashes_v2.created ASC
+                LIMIT 1
+                ''',
+                {
+                    'method': method,
+                    'outhash': outhash,
+                }
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT * FROM outhashes_v2
+                WHERE outhashes_v2.method=:method AND outhashes_v2.outhash=:outhash
+                ORDER BY outhashes_v2.created ASC
+                LIMIT 1
+                """,
+                {
+                    'method': method,
+                    'outhash': outhash,
+                }
+            )
         row = cursor.fetchone()
 
         if row is not None:
@@ -498,6 +515,50 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
         }
         await self.backfill_queue.join()
         self.write_message(d)
+
+    async def handle_remove(self, request):
+        condition = request["where"]
+        if not isinstance(condition, dict):
+            raise TypeError("Bad condition type %s" % type(condition))
+
+        def do_remove(columns, table_name, cursor):
+            nonlocal condition
+            where = {}
+            for c in columns:
+                if c in condition and condition[c] is not None:
+                    where[c] = condition[c]
+
+            if where:
+                query = ('DELETE FROM %s WHERE ' % table_name) + ' AND '.join("%s=:%s" % (k, k) for k in where.keys())
+                cursor.execute(query, where)
+                return cursor.rowcount
+
+            return 0
+
+        count = 0
+        with closing(self.db.cursor()) as cursor:
+            count += do_remove(OUTHASH_TABLE_COLUMNS, "outhashes_v2", cursor)
+            count += do_remove(UNIHASH_TABLE_COLUMNS, "unihashes_v2", cursor)
+            self.db.commit()
+
+        self.write_message({"count": count})
+
+    async def handle_clean_unused(self, request):
+        max_age = request["max_age_seconds"]
+        with closing(self.db.cursor()) as cursor:
+            cursor.execute(
+                """
+                DELETE FROM outhashes_v2 WHERE created<:oldest AND NOT EXISTS (
+                    SELECT unihashes_v2.id FROM unihashes_v2 WHERE unihashes_v2.method=outhashes_v2.method AND unihashes_v2.taskhash=outhashes_v2.taskhash LIMIT 1
+                )
+                """,
+                {
+                    "oldest": datetime.now() - timedelta(seconds=-max_age)
+                }
+            )
+            count = cursor.rowcount
+
+        self.write_message({"count": count})
 
     def query_equivalent(self, cursor, method, taskhash):
         # This is part of the inner loop and must be as fast as possible
