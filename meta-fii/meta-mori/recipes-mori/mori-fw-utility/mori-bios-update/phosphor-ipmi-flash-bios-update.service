@@ -2,5 +2,5 @@
 Description=Phosphor-ipmi-flash update BIOS firmware service
 
 [Service]
-ExecStart=mori-fw.sh bios /run/initramfs/bios-image
+ExecStart=/usr/bin/mori-fw.sh bios /run/initramfs/bios-image
 Type=oneshot

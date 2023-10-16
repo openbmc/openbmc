@@ -2,7 +2,7 @@
 Description=Phosphor-ipmi-flash update BMC CPLD firmware service
 
 [Service]
-ExecStart=mori-fw.sh bmccpld /run/initramfs/bmc-cpld.svf
+ExecStart=/usr/bin/mori-fw.sh bmccpld /run/initramfs/bmc-cpld.svf
 Type=oneshot
 
 [Install]

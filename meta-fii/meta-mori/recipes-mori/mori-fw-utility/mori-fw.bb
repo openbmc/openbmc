@@ -17,9 +17,9 @@ SYSTEMD_SERVICE:${PN} = "mori-fw-ver.service"
 inherit systemd obmc-phosphor-systemd
 
 do_install () {
-    install -d ${D}${sbindir}
+    install -d ${D}${bindir}
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/mori-fw.sh ${D}${sbindir}/mori-fw.sh
+    install -m 0755 ${WORKDIR}/mori-fw.sh ${D}${bindir}/mori-fw.sh
     install -m 0755 ${WORKDIR}/mori-fw-ver.sh \
         ${D}${libexecdir}/${PN}/mori-fw-ver.sh
     install -m 0755 ${WORKDIR}/mori-lib.sh ${D}${libexecdir}/${PN}/mori-lib.sh
