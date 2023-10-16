@@ -64,3 +64,4 @@ do_install:append:witherspoon-tacoma() {
 }
 
 SRC_URI:append:sbp1 = " file://server.ttyVUART0.conf"
+SRC_URI:append:system1 = " file://server.ttyVUART0.conf"
