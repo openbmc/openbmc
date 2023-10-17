@@ -90,19 +90,4 @@ DEPENDS:remove:class-nativesdk = " \
         "
 RDEPENDS:${PN}:remove:class-nativesdk = "phosphor-state-manager-obmc-targets"
 
-# Provide a means to enable/disable install_error_yaml feature
-PACKAGECONFIG ??= "install_error_yaml"
-PACKAGECONFIG[install_error_yaml] = "\
-        -Dinstall-error-yaml=enabled,\
-        -Dinstall-error-yaml=disabled,\
-        ,\
-        "
-
-# Enable install_error_yaml during native and native SDK build
-PACKAGECONFIG:add:class-native = "install_error_yaml"
-PACKAGECONFIG:add:class-nativesdk = "install_error_yaml"
-
-# Disable install_error_yaml during target build
-PACKAGECONFIG:remove:class-target = "install_error_yaml"
-
 BBCLASSEXTEND += "native nativesdk"
