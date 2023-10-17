@@ -1,0 +1,10 @@
+[Unit]
+Before=systemd-network.service
+After=gbmc-ncsi-old.service
+
+[Service]
+Type=oneshot
+ExecStart=find /etc/systemd/network -mindepth 1 ! -name 00-bmc-@NCSI_IF@.network -exec rm -vrf {} \; -prune
+
+[Install]
+WantedBy=multi-user.target
