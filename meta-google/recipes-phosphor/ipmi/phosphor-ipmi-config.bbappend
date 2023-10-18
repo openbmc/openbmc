@@ -8,6 +8,7 @@ SRC_URI:append:gbmc = " \
 DEPENDS:append:gbmc = " jq-native"
 
 GBMCBR_IPMI_CHANNEL ?= "11"
+GBMC_NCSI_IPMI_CHANNEL ??= "1"
 
 ENTITY_MAPPING ?= "default"
 
@@ -43,7 +44,7 @@ do_install:append:gbmc() {
   fi
   gbmc_add_channel ${GBMCBR_IPMI_CHANNEL} gbmcbr
   if [ -n "${GBMC_NCSI_IF_NAME}" ]; then
-    gbmc_add_channel 1 ${GBMC_NCSI_IF_NAME}
+    gbmc_add_channel ${GBMC_NCSI_IPMI_CHANNEL} ${GBMC_NCSI_IF_NAME}
   fi
 
   # Set entity-map.json to empty json for gBMC by default.
