@@ -1,0 +1,12 @@
+[
+    {
+        "Name": "BTN_BMC_R2_N",
+        "ChipId": "0",
+        "GpioNum": 121,
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING": ["set-button-sled.service"]
+        },
+        "Continue": true
+    }
+]
