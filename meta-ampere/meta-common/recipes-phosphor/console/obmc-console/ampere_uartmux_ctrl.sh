@@ -1,7 +1,13 @@
 #!/bin/bash
 #
-# shellcheck disable=SC2046
+# Ampere Computing LLC: UART MUX/DEMUX for CPU0 UART0,1,4 and CPU1 UART1
+# Usage: ampere_uartmux_ctrl.sh <CPU UART port number> <UARTx_MODE>
+#        <UARTx_MODE> of 1 sets CPU To HDR_CONN
+#        <UARTx_MODE> of 2 sets BMC to CPU (eg dropbear ssh server on port 2200)
+#
 # This can be called to set uart mux manually
+
+# shellcheck disable=SC2046
 
 if [ $# -lt 2 ]; then
 	exit 1

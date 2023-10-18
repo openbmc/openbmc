@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# shellcheck source=meta-ampere/meta-jade/recipes-ampere/platform/ampere-platform-init/ampere_uart_console_setup.sh
-source /usr/sbin/ampere_uart_console_setup.sh
-
 function pre-platform-init() {
     echo "Do pre platform init"
 }
