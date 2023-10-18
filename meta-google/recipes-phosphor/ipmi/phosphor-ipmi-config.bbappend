@@ -42,6 +42,9 @@ do_install:append:gbmc() {
     exit 1
   fi
   gbmc_add_channel ${GBMCBR_IPMI_CHANNEL} gbmcbr
+  if [ -n "${GBMC_NCSI_IF_NAME}" ]; then
+    gbmc_add_channel 1 ${GBMC_NCSI_IF_NAME}
+  fi
 
   # Set entity-map.json to empty json for gBMC by default.
   # Each system will override it if needed.
