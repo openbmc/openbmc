@@ -9,6 +9,9 @@ DEPENDS:append:gbmc = " jq-native"
 
 GBMCBR_IPMI_CHANNEL ?= "11"
 GBMC_NCSI_IPMI_CHANNEL ??= "1"
+# Only used for extra channels, GBMCBR and NCSI are autopopulated
+# Format looks like "<channel>|<intf> <channel2>|<intf2>", Ex. "2|eth0 3|back"
+GBMC_IPMI_CHANNEL_MAP ??= ""
 
 ENTITY_MAPPING ?= "default"
 
@@ -46,6 +49,15 @@ do_install:append:gbmc() {
   if [ -n "${GBMC_NCSI_IF_NAME}" ]; then
     gbmc_add_channel ${GBMC_NCSI_IPMI_CHANNEL} ${GBMC_NCSI_IF_NAME}
   fi
+  map="${GBMC_IPMI_CHANNEL_MAP}"
+  # Split the map over the space separated entries
+  for entry in $map; do
+    OLDIFS="$IFS"
+    # Split the entry over the `|` separator
+    IFS='|'
+    gbmc_add_channel $entry
+    IFS="$OLDIFS"
+  done
 
   # Set entity-map.json to empty json for gBMC by default.
   # Each system will override it if needed.
