@@ -22,6 +22,7 @@ SYSTEMD_PACKAGES = "${GPIO_PACKAGES}"
 SYSTEMD_SERVICE:${PN}-monitor += "phosphor-multi-gpio-monitor.service"
 SYSTEMD_SERVICE:${PN}-monitor += "phosphor-gpio-monitor@.service"
 SYSTEMD_SERVICE:${PN}-presence += "phosphor-gpio-presence@.service"
+SYSTEMD_SERVICE:${PN}-presence += "phosphor-multi-gpio-presence.service"
 S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
@@ -34,6 +35,7 @@ FILES:${PN}-monitor += "${bindir}/phosphor-multi-gpio-monitor"
 FILES:${PN}-monitor += "${bindir}/phosphor-gpio-util"
 FILES:${PN}-monitor += "${nonarch_base_libdir}/udev/rules.d/99-gpio-keys.rules"
 FILES:${PN}-presence += "${bindir}/phosphor-gpio-presence"
+FILES:${PN}-presence += "${bindir}/phosphor-multi-gpio-presence"
 
 ALLOW_EMPTY:${PN} = "1"
 
