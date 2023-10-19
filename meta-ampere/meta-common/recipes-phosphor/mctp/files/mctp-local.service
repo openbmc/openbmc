@@ -1,0 +1,14 @@
+[Unit]
+Description=MCTP configuration for i2c bus 3
+After=mctpd.service
+BindTo=mctpd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mctp link set mctpi2c3 up
+ExecStart=/usr/bin/mctp addr add 8 dev mctpi2c3
+ExecStart=/usr/bin/mctp neigh add 8 dev mctpi2c3 lladdr 0x10
+RemainAfterExit=true
+
+[Install]
+WantedBy=mctpd.service
