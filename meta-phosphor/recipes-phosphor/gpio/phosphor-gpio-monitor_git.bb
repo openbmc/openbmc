@@ -17,6 +17,7 @@ PV = "1.0+git${SRCPV}"
 PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-gpio-monitor;branch=master;protocol=https"
+SRC_URI += " file://phosphor-multi-gpio-presence.json"
 
 SYSTEMD_PACKAGES = "${GPIO_PACKAGES}"
 SYSTEMD_SERVICE:${PN}-monitor += "phosphor-multi-gpio-monitor.service"
@@ -36,6 +37,7 @@ FILES:${PN}-monitor += "${bindir}/phosphor-gpio-util"
 FILES:${PN}-monitor += "${nonarch_base_libdir}/udev/rules.d/99-gpio-keys.rules"
 FILES:${PN}-presence += "${bindir}/phosphor-gpio-presence"
 FILES:${PN}-presence += "${bindir}/phosphor-multi-gpio-presence"
+FILES:${PN}-presence += "${datadir}/${PN}/phosphor-multi-gpio-presence.json"
 
 ALLOW_EMPTY:${PN} = "1"
 
@@ -44,3 +46,8 @@ GPIO_PACKAGES = " \
         ${PN}-presence \
 "
 PACKAGE_BEFORE_PN += "${GPIO_PACKAGES}"
+
+do_install:append() {
+    install -d ${D}${datadir}/phosphor-gpio-monitor/
+    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
+}
