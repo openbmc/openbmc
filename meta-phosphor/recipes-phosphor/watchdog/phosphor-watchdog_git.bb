@@ -17,7 +17,7 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "systemd"
 
 SRC_URI = "git://github.com/openbmc/phosphor-watchdog;branch=master;protocol=https"
-SRCREV = "6072942ee9b13e441f2dc34ce7e93465248e30be"
+SRCREV = "5c423703431b83520d5c7f05f479a244bc3590af"
 S = "${WORKDIR}/git"
 
 EXTRA_OEMESON = " \
