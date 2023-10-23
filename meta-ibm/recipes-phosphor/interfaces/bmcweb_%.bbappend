@@ -19,6 +19,10 @@ EXTRA_OEMESON:append:witherspoon-tacoma = " \
     -Dvm-websocket=disabled \
 "
 
+EXTRA_OEMESON:append:system1 = " \
+     -Dhttp-body-limit=400 \
+"
+
 inherit obmc-phosphor-discovery-service
 
 REGISTERED_SERVICES:${PN} += "obmc_redfish:tcp:443:"
