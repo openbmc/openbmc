@@ -1,4 +1,8 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+# Disable obmc-console ssh ports.
+PACKAGECONFIG:remove = "ssh"
+
 OBMC_CONSOLE_HOST_TTY = "ttyS2"
 OBMC_CONSOLE_TTYS:fb-compute-multihost = "ttyS0 ttyS1 ttyS2 ttyS3"
 
