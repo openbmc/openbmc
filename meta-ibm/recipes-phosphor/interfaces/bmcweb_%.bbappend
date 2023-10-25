@@ -21,6 +21,7 @@ EXTRA_OEMESON:append:witherspoon-tacoma = " \
 
 EXTRA_OEMESON:append:system1 = " \
      -Dhttp-body-limit=400 \
+     -Dredfish-dbus-log=enabled \
 "
 
 inherit obmc-phosphor-discovery-service
