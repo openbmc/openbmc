@@ -1,17 +1,14 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
+require conf/recipes/fb-consoles.inc
+
 # Disable obmc-console ssh ports.
 PACKAGECONFIG:remove = "ssh"
 
-OBMC_CONSOLE_HOST_TTY = "ttyS2"
-OBMC_CONSOLE_TTYS = "${@' '.join(['ttyS{}'.format(i) for i in range(int(d.getVar('OBMC_CONSOLE_INST_CNT', True)) + 1) if 'ttyS{}'.format(i) != d.getVar('OBMC_BMC_TTY', True)])}"
 OBMC_BMC_TTY = "ttyS4"
+SERVER_CONFS = "${@ ' '.join([ f'file://server.{i}.conf' for i in d.getVar('OBMC_CONSOLE_TTYS', True).split() ])}"
 
-OBMC_CONSOLE_INST = "${@d.getVar('OBMC_HOST_INSTANCES', True)}"
-OBMC_CONSOLE_INST_CNT = "${@sum([1 for item in d.getVar('OBMC_CONSOLE_INST', True).split() if item.isdigit()])}"
-SERVER_CONFS = "${@' '.join(['file://server.ttyS{}.conf'.format(i) for i in range(int(d.getVar('OBMC_CONSOLE_INST_CNT', True)) + 1) if 'ttyS{}'.format(i) != d.getVar('OBMC_BMC_TTY', True)])}"
-
-SRC_URI:append:fb-compute-singlehost = " file://server.ttyS2.conf"
+SRC_URI:append:fb-compute-singlehost = " ${SERVER_CONFS}"
 
 SRC_URI:append:fb-compute-multihost = " ${SERVER_CONFS} \
                                         file://client.2200.conf \
