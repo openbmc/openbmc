@@ -1,4 +1,4 @@
-From 255b93dfe8adcbf286c94706906aa8fdc60d388b Mon Sep 17 00:00:00 2001
+From 13d0b106e6512dd984bbec6e8b450731989d0618 Mon Sep 17 00:00:00 2001
 From: Alex Schendel <alex.schendel@intel.com>
 Date: Fri, 9 Jun 2023 16:35:24 -0700
 Subject: [PATCH] Fru: Fix edit field not checking area existence
@@ -66,15 +66,15 @@ trigger this FRU write failure.
 Signed-off-by: Alex Schendel <alex.schendel@intel.com>
 Signed-off-by: Zhikui Ren <zhikui.ren@intel.com>
 ---
- include/ipmitool/ipmi_fru.h |   3 +-
+ include/ipmitool/ipmi_fru.h |   1 +
  lib/ipmi_fru.c              | 170 +++++++++++++++++++++++-------------
- 2 files changed, 111 insertions(+), 62 deletions(-)
+ 2 files changed, 110 insertions(+), 61 deletions(-)
 
 diff --git a/include/ipmitool/ipmi_fru.h b/include/ipmitool/ipmi_fru.h
-index b17870c..549915d 100644
+index c6b3a54..13f2958 100644
 --- a/include/ipmitool/ipmi_fru.h
 +++ b/include/ipmitool/ipmi_fru.h
-@@ -47,6 +47,7 @@
+@@ -46,6 +46,7 @@
  #define GET_FRU_INFO		0x10
  #define GET_FRU_DATA		0x11
  #define SET_FRU_DATA		0x12
@@ -82,20 +82,11 @@ index b17870c..549915d 100644
  
  enum {
  	FRU_CHASSIS_PARTNO,
-@@ -83,7 +84,7 @@ struct fru_header {
- 			uint8_t product;
- 			uint8_t multi;
- 		} offset;
--		uint8_t offsets[5];
-+		uint8_t offsets[FRU_AREA_COUNT];
- 	};
- 	uint8_t pad;
- 	uint8_t checksum;
 diff --git a/lib/ipmi_fru.c b/lib/ipmi_fru.c
-index 4a5018d..f776642 100644
+index 4d1dbbb..effc1a8 100644
 --- a/lib/ipmi_fru.c
 +++ b/lib/ipmi_fru.c
-@@ -130,7 +130,8 @@ static int ipmi_fru_set_field_string(struct ipmi_intf * intf, unsigned
+@@ -131,7 +131,8 @@ static int ipmi_fru_set_field_string(struct ipmi_intf * intf, unsigned
  static int
  ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
  											struct fru_info fru, struct fru_header header,
@@ -105,7 +96,7 @@ index 4a5018d..f776642 100644
  
  static void
  fru_area_print_multirec_bloc(struct ipmi_intf * intf, struct fru_info * fru,
-@@ -4835,12 +4836,19 @@ f_type, uint8_t f_index, char *f_string)
+@@ -4997,12 +4998,19 @@ f_type, uint8_t f_index, char *f_string)
  			rc = -1;
  			goto ipmi_fru_set_field_string_out;
  		}
@@ -131,7 +122,7 @@ index 4a5018d..f776642 100644
  		{
  			rc = -1;
  			goto ipmi_fru_set_field_string_out;
-@@ -4886,7 +4894,8 @@ ipmi_fru_set_field_string_out:
+@@ -5048,7 +5056,8 @@ ipmi_fru_set_field_string_out:
  static int
  ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
  											struct fru_info fru, struct fru_header header,
@@ -141,7 +132,7 @@ index 4a5018d..f776642 100644
  {
  	int i = 0;
  	uint8_t *fru_data_old = NULL;
-@@ -4903,7 +4912,7 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
+@@ -5065,7 +5074,7 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
  
  	fru_data_old = calloc( fru.size, sizeof(uint8_t) );
  
@@ -150,7 +141,7 @@ index 4a5018d..f776642 100644
  
  	if (!fru_data_old || !fru_data_new) {
  		printf("Out of memory!\n");
-@@ -5043,43 +5052,91 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
+@@ -5205,43 +5214,91 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
  		#endif
  
  		/* Must move sections */
@@ -275,7 +266,7 @@ index 4a5018d..f776642 100644
  		}
  
  		/* Adjust length of the section */
-@@ -5109,27 +5166,18 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
+@@ -5271,27 +5328,18 @@ ipmi_fru_set_field_string_rebuild(struct ipmi_intf * intf, uint8_t fruId,
  			memcpy(fru_data_new, pfru_header, sizeof(struct fru_header));
  		}
  
@@ -314,5 +305,5 @@ index 4a5018d..f776642 100644
  
  	/* Update only if it's fits padding length as defined in the spec, otherwise, it's an internal
 -- 
-2.25.1
+2.41.0
 
