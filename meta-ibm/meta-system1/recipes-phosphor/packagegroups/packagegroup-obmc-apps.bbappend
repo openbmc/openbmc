@@ -15,6 +15,7 @@ RDEPENDS:${PN}-chassis = " \
         obmc-phosphor-buttons-signals \
         obmc-phosphor-buttons-handler \
         phosphor-power-control \
+        phosphor-power-psu-monitor \
         phosphor-skeleton-control-power \
 "
 
