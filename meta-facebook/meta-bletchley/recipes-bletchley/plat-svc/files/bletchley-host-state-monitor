@@ -11,8 +11,9 @@ SWITCH_MDIO_BUS="1e650000.mdio-1"
 declare -a PORT_NUM_MAP=(10 3 2 1 7 6 5)
 
 declare -a HOST_PREVIOUS_STATE=("" "" "" "" "" "" "")
+declare -a HOST_NEW_STATE_TEMP=("" "" "" "" "" "" "")
 declare -a HOST_STATE_CHANGE_CHECK=(0 0 0 0 0 0 0)
-HOST_STATE_CHANGE_CHECH_CNT=5
+HOST_STATE_CHANGE_CHECH_CNT=8
 
 declare -A HOST_ACPI_ST_MAP
 HOST_ACPI_ST_MAP["UNKNOW"]="Unknow"
@@ -99,10 +100,10 @@ update_sled_led_state()
     local HOST_STATE=$2
     case "$HOST_STATE" in
         ON|SLEEP)
-            systemctl start obmc-led-group-start@sled"$i"_good.service
+            systemctl start obmc-led-group-start@sled"$HOST_ID"_good.service
             ;;
         AC_OFF|OFF)
-            systemctl start obmc-led-group-stop@sled"$i"_good.service
+            systemctl start obmc-led-group-stop@sled"$HOST_ID"_good.service
             ;;
         *)
             ;;
@@ -143,18 +144,29 @@ do
         fi
 
         if [ "$HOST_STATE" = "${HOST_PREVIOUS_STATE[$i]}" ]; then
+            if [ "${HOST_STATE_CHANGE_CHECK[$i]}" -lt "$HOST_STATE_CHANGE_CHECH_CNT" ]; then
+                echo "SLED$i: detected state recover (previous:${HOST_PREVIOUS_STATE[$i]}, current:$HOST_STATE)"
+            fi
             HOST_STATE_CHANGE_CHECK[i]="$HOST_STATE_CHANGE_CHECH_CNT"
-        elif [ "${HOST_STATE_CHANGE_CHECK[$i]}" -gt "0" ]; then
-            echo "SLED$i: detected state changed (previous:${HOST_PREVIOUS_STATE[$i]}, current:$HOST_STATE), check count: ${HOST_STATE_CHANGE_CHECK[$i]}"
-            HOST_STATE_CHANGE_CHECK[i]=$((HOST_STATE_CHANGE_CHECK[i]-1))
+            HOST_NEW_STATE_TEMP[i]="$HOST_STATE"
         else
-            echo "SLED$i: detected state changed, update host state to $HOST_STATE"
-            update_host_acpi_power_state "$i" "${HOST_ACPI_ST_MAP[$HOST_STATE]}"
-            update_host_state "$i" "${HOST_STATE_MAP[$HOST_STATE]}"
-            update_chassis_power_state "$i" "${CHASSIS_PWR_STATE_MAP[$HOST_STATE]}"
-            update_sled_led_state "$i" "$HOST_STATE"
-            HOST_STATE_CHANGE_CHECK[i]="$HOST_STATE_CHANGE_CHECH_CNT"
-            HOST_PREVIOUS_STATE[i]="$HOST_STATE"
+            if [ "$HOST_STATE" != "${HOST_NEW_STATE_TEMP[$i]}" ]; then
+                HOST_STATE_CHANGE_CHECK[i]="$HOST_STATE_CHANGE_CHECH_CNT"
+            fi
+
+            if [ "${HOST_STATE_CHANGE_CHECK[$i]}" -gt "0" ]; then
+                echo "SLED$i: detected state changed (previous:${HOST_PREVIOUS_STATE[$i]}, current:$HOST_STATE), check count: ${HOST_STATE_CHANGE_CHECK[$i]}"
+                HOST_STATE_CHANGE_CHECK[i]=$((HOST_STATE_CHANGE_CHECK[i]-1))
+            else
+                echo "SLED$i: detected state changed, update host state to $HOST_STATE"
+                update_host_acpi_power_state "$i" "${HOST_ACPI_ST_MAP[$HOST_STATE]}"
+                update_host_state "$i" "${HOST_STATE_MAP[$HOST_STATE]}"
+                update_chassis_power_state "$i" "${CHASSIS_PWR_STATE_MAP[$HOST_STATE]}"
+                update_sled_led_state "$i" "$HOST_STATE"
+                HOST_STATE_CHANGE_CHECK[i]="$HOST_STATE_CHANGE_CHECH_CNT"
+                HOST_PREVIOUS_STATE[i]="$HOST_STATE"
+            fi
+            HOST_NEW_STATE_TEMP[i]="$HOST_STATE"
         fi
     done
     sleep 1
