@@ -8,7 +8,8 @@ Conflicts=chassis-poweroff@%i.service
 Type=oneshot
 ExecStart=/usr/sbin/power-ctrl sled%i ac-on
 SyslogIdentifier=power-ctrl
-ExecStartPost=/bin/systemctl restart phosphor-discover-system-state@%i.service
+ExecStartPost=/bin/systemctl start phosphor-discover-system-state@%i.service
+StartLimitBurst=0
 
 [Install]
 WantedBy=multi-user.target

@@ -1,9 +1,11 @@
 [Unit]
 Description=Turn off AC at Sled%i
 Conflicts=chassis-poweron@%i.service
+Conflicts=phosphor-discover-system-state@%i.service
 After=host-poweroff@%i.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/sbin/power-ctrl sled%i ac-off
 SyslogIdentifier=power-ctrl
+StartLimitBurst=0
