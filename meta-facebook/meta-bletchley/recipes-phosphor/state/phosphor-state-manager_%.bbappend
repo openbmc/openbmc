@@ -31,6 +31,8 @@ FILES:${PN}:append:bletchley = " ${libexecdir}/${PN}"
 BLETCHLEY_SYS_ST_INIT_CONF_FMT = "bletchley-system-state-init.conf:phosphor-discover-system-state@{0}.service.d/bletchley-system-state-init.conf"
 SYSTEMD_OVERRIDE:${PN}-discover:bletchley += "${@compose_list_zip(d, 'BLETCHLEY_SYS_ST_INIT_CONF_FMT', 'OBMC_HOST_INSTANCES')}"
 
+PACKAGECONFIG:remove:bletchley = "only-run-apr-on-power-loss"
+
 #======================
 # Workaround for bletchley
 #======================
