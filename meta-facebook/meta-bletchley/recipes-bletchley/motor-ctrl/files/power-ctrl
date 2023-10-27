@@ -367,6 +367,7 @@ function do_action_ac_on()
     local SLED_NUM=$1
     echo "sled${SLED_NUM}: turn on AC"
     set_gpio "power-host${SLED_NUM}" 1
+    sleep 3 # Newer versions of the managed system needs 3 second delay
     echo "$ACTION_AC_ON" > "/tmp/sled${SLED_NUM}-last-action"
 }
 
@@ -454,6 +455,9 @@ function host_state_on_action_handler()
         "$ACTION_CYCLE")
             do_action_cycle "$SLED_NUM"
             ;;
+        "$ACTION_ON")
+            echo "already on"
+            ;;
         *)
             echo "Invalid action ($ACTION) for current host state (On)"
             return 1
@@ -512,6 +516,9 @@ function host_state_off_action_handler()
             ;;
         "$ACTION_CYCLE")
             do_action_cycle "$SLED_NUM"
+            ;;
+        "$ACTION_OFF")
+            echo "already off"
             ;;
         *)
             echo "Invalid action ($ACTION) for current host state (Off)"
