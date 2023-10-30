@@ -1,6 +1,6 @@
 require mdio-tools.inc
 
-DEPENDS += "libmnl"
+DEPENDS += "virtual/kernel libmnl"
 
 S = "${WORKDIR}/git"
 
