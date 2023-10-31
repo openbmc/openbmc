@@ -1,1 +1,302 @@
-[]
+[
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD0_48V_FAN0_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_FAN0_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD0_48V_FAN1_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_FAN1_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD0_48V_FAN2_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_FAN2_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD0_48V_FAN3_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_FAN3_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD0_48V_FAN4_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_FAN4_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD0_48V_FAN5_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD0_ADC_48V_FAN5_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD1_48V_FAN0_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_FAN0_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD1_48V_FAN1_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_FAN1_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD1_48V_FAN2_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_FAN2_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD1_48V_FAN3_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_FAN3_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD1_48V_FAN4_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_FAN4_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "Virtual_FANBOARD1_48V_FAN5_PWR_W",
+      "SensorType": "power"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "fan_vol",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_AUX_VOLT_V",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "fan_curr",
+          "Desc": {
+            "Name": "FANBOARD1_ADC_48V_FAN5_CURR_A",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "fan_vol * fan_curr"
+  }
+]
