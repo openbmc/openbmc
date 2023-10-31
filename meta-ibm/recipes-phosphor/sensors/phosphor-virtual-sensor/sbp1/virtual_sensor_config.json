@@ -169,5 +169,273 @@
       ]
     },
     "Expression": "ifNan(T0, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU0_Input_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU0_Output_Power",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / 0.9, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU0_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU0_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "V0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU0_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / (V0 * 0.9), 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU1_Input_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU1_Output_Power",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / 0.9, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU1_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU1_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "V0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU1_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / (V0 * 0.9), 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU2_Input_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU2_Output_Power",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / 0.9, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU2_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU2_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "V0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU2_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / (V0 * 0.9), 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU3_Input_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU3_Output_Power",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / 0.9, 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCCD_HV_CPU3_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU3_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "V0",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU3_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "ifNan(P0 / (V0 * 0.9), 0)"
   }
 ]
