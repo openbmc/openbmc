@@ -4,6 +4,11 @@ EXTRA_OEMESON:append = " \
                          -Dwarm-reboot=enabled \
                        "
 
+HOST_DEFAULT_TARGETS:remove:yosemite4 = " \
+    obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.target \
+    obmc-host-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
+    "
+
 CHASSIS_DEFAULT_TARGETS:remove:yosemite4 = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
