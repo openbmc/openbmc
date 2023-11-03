@@ -19,6 +19,8 @@ PACKAGECONFIG[use-yaml] = "-Duse-json=disabled,,virtual/${PN}-config-native,,,us
 PACKAGECONFIG[use-lamp-test] = "-Duse-lamp-test=enabled, -Duse-lamp-test=disabled"
 PACKAGECONFIG[monitor-operational-status] = "-Dmonitor-operational-status=enabled, \
                                              -Dmonitor-operational-status=disabled"
+PACKAGECONFIG[persistent-led-asserted] = "-Dpersistent-led-asserted=enabled, \
+                                          -Dpersistent-led-asserted=disabled"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
