@@ -28,7 +28,6 @@ RDEPENDS:${PN}-chassis = " \
         ampere-utils \
         ampere-usbnet \
         ampere-ipmi-oem \
-        ampere-mac-update \
         ampere-driver-binder \
         "
 
