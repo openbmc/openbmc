@@ -31,6 +31,7 @@ OPTEE_ALIGN ?= "4096"
 UBOOT_ALIGN ?= "4096"
 ALIGN_END ?= "4096"
 PAD_ALIGN ?= "32"
+SA_ALIGN ?= "524288"
 
 SOC_FAMILY = "npcm8xx"
 include conf/machine/include/soc-family.inc
@@ -57,3 +58,5 @@ OPTEEMACHINE ?= "nuvoton"
 SECURED_IMAGE ?= "True"
 
 TIP_IMAGE ?= "True"
+
+SA_TIP_IMAGE ?= "False"
