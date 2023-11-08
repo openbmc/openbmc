@@ -7,10 +7,12 @@ KMT_TIPFW_BB_BINARY = "Kmt_TipFw_BootBlock.bin"
 KMT_TIPFW_BB_BL31_BINARY = "Kmt_TipFw_BootBlock_BL31.bin"
 KMT_TIPFW_BB_BL31_TEE_BINARY = "Kmt_TipFw_BootBlock_BL31_Tee.bin"
 KMT_TIPFW_BB_UBOOT_BINARY = "u-boot.bin.merged"
+SA_KMT_TIPFW_BINARY := "SA_Kmt_TipFwL0.bin"
 
 BB_BL31_BINARY = "BootBlock_BL31_no_tip.bin"
 BB_BL31_TEE_BINARY = "BootBlock_BL31_Tee_no_tip.bin"
-BB_BL31_TEE_UBOOT_BINARY = "u-boot.bin.merged"
+BB_BL31_TEE_UBOOT_BINARY = "BootBlock_BL31_Tee_Uboot_no_tip.bin"
+BB_BL31_TEE_UBOOT_SA_BINARY = "BootBlock_BL31_Tee_Uboot_no_tip_SA.bin"
 
 FULL_SUFFIX = "full"
 MERGED_SUFFIX = "merged"
@@ -157,6 +159,7 @@ do_sign_binary() {
 
 python do_merge_bootloaders() {
     TIP_IMAGE = d.getVar('TIP_IMAGE', True)
+    SA_TIP_IMAGE = d.getVar('SA_TIP_IMAGE', True)
     def Merge_bin_files_and_pad(inF1, inF2, outF, align, align_end):
         padding_size = 0
         padding_size_end = 0
@@ -217,10 +220,22 @@ python do_merge_bootloaders() {
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('UBOOT_HEADER_BINARY',True)),
         os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BB_BL31_TEE_UBOOT_BINARY',True)),
         int(d.getVar('UBOOT_ALIGN', True)), int(d.getVar('ALIGN_END', True)))
+
+        if SA_TIP_IMAGE == "True":
+            Merge_bin_files_and_pad(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BB_BL31_TEE_UBOOT_BINARY',True)),
+            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('SA_KMT_TIPFW_BINARY',True)),
+            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BB_BL31_TEE_UBOOT_SA_BINARY',True)),
+            int(d.getVar('SA_ALIGN', True)), int(d.getVar('ALIGN_END', True)))
+
+            os.rename(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BB_BL31_TEE_UBOOT_SA_BINARY',True)),
+            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_UBOOT_BINARY',True)))
+        else:
+            os.rename(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('BB_BL31_TEE_UBOOT_BINARY',True)),
+            os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True), '%s' % d.getVar('KMT_TIPFW_BB_UBOOT_BINARY',True)))
 }
 
 do_pad_binary[depends] += " \
-    ${@'npcm8xx-tip-fw:do_deploy' if d.getVar('TIP_IMAGE', True) == 'True' else ''} \
+    ${@'npcm8xx-tip-fw:do_deploy' if d.getVar('TIP_IMAGE', True) == 'True' or d.getVar('SA_TIP_IMAGE', True) == 'True' else ''} \
     npcm8xx-bootblock:do_deploy \
     u-boot-nuvoton:do_deploy \
     trusted-firmware-a:do_deploy \
