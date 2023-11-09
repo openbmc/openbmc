@@ -25,12 +25,11 @@ mount --move /oldroot/run /mnt
 
 # Unmount paths with /oldroot /mnt under / and those ending with ro or rw
 # Use . to match any single character because busybox awk doesn't handle [/]
-set -x
 awk '$2 ~ /^.oldroot|^.mnt|.r[ow]$/ { print $2 }' < /proc/mounts | sort -r | while IFS= read -r f
 do
+	echo "Unmounting $f"
 	umount "$f"
 done
-set +x
 
 update=/run/initramfs/update
 image=/run/initramfs/image-
