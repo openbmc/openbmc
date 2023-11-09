@@ -13,15 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-override=/run/systemd/system/gbmc-ncsi-dhcrelay.service.d/10-nosp.conf
-mkdir -p "$(dirname "$override")"
-echo '[Service]' >"$override"
-echo 'ExecStart=' >>"$override"
-# Remove the source relay port from the relay, bringing it back to run on
-# the default port 547. Our relays don't support the source port option needed
-# to run on 3967 for our legacy NICs.
-grep '^ExecStart=' /lib/systemd/system/gbmc-ncsi-dhcrelay.service | \
-  sed 's, -rp 3967,,' >>"$override"
+HAS_DHCRELAY='@GBMC_NCSI_DHCP_RELAY@'
+
+if [ "$HAS_DHCRELAY" = 1 ]; then
+  override=/run/systemd/system/gbmc-ncsi-dhcrelay.service.d/10-nosp.conf
+  mkdir -p "$(dirname "$override")"
+  echo '[Service]' >"$override"
+  echo 'ExecStart=' >>"$override"
+  # Remove the source relay port from the relay, bringing it back to run on
+  # the default port 547. Our relays don't support the source port option needed
+  # to run on 3967 for our legacy NICs.
+  grep '^ExecStart=' /lib/systemd/system/gbmc-ncsi-dhcrelay.service | \
+    sed 's, -rp 3967,,' >>"$override"
+fi
 
 override=/run/systemd/system/gbmc-br-dhcp.service.d/10-direct.conf
 mkdir -p "$(dirname "$override")"
@@ -33,8 +37,10 @@ grep '^ExecStart=' /lib/systemd/system/gbmc-br-dhcp.service | \
   sed 's, -i gbmcbr, -i @NCSI_IF@,' >>"$override"
 
 systemctl daemon-reload
-systemctl reset-failed gbmc-ncsi-dhcrelay
-systemctl restart --no-block gbmc-ncsi-dhcrelay
+if [ "$HAS_DHCRELAY" = 1 ]; then
+  systemctl reset-failed gbmc-ncsi-dhcrelay
+  systemctl restart --no-block gbmc-ncsi-dhcrelay
+fi
 systemctl reset-failed gbmc-br-dhcp
 systemctl restart --no-block gbmc-br-dhcp
 
