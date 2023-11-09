@@ -3,6 +3,16 @@ RDEPENDS:${PN}-extras:append = " \
                                 phosphor-virtual-sensor \
                                 phosphor-misc-usb-ctrl \
                                 phosphor-gpio-monitor-monitor \
+                                phosphor-skeleton-control-power \
+                                phosphor-hostlogger \
+                                phosphor-sel-logger \
+                                phosphor-logging \
+                                phosphor-post-code-manager \
+                                phosphor-host-postd \
+                                phosphor-software-manager \
+                                obmc-phosphor-buttons-signals \
+                                obmc-phosphor-buttons-handler \
+                                smbios-mdr \
                                "
 
 RDEPENDS:${PN}-inventory:append = " \
@@ -12,4 +22,3 @@ RDEPENDS:${PN}-inventory:append = " \
 
 RDEPENDS:${PN}-extras:remove = " phosphor-hwmon"
 VIRTUAL-RUNTIME_obmc-sensors-hwmon ?= "dbus-sensors"
-RDEPENDS:${PN}-extras:append = " phosphor-virtual-sensor"
