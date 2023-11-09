@@ -38,7 +38,7 @@ table inet filter {
     }
     chain ncsi_dhcp_input {
         type filter hook input priority 0; policy drop;
-        iifname != ncsigbmc accept
+        iifname != gbmcncsidhcp accept
         ip6 nexthdr icmpv6 accept
         udp dport 547 accept
     }
