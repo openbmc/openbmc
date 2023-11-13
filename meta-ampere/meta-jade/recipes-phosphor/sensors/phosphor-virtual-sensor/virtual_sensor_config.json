@@ -2,6 +2,13 @@
     {
         "Desc":
         {
+            "Config": "D-Bus",
+            "Type": "Maximum"
+        }
+    },
+    {
+        "Desc":
+        {
             "Name": "total_power",
             "SensorType": "power"
         },
@@ -43,14 +50,18 @@
                 }
             ]
         },
-        "Expression": "((P0 == P0) ? P0 : 0) + ((P1 == P1) ? P1 : 0)"
+        "Expression": "sumIgnoreNaN(P0, P1)"
     },
     {
-        "Desc":{
-            "Name":"nvme_bp_max",
-            "SensorType":"temperature"
+        "Desc": {
+            "Name": "S1_CPU_Pwr",
+            "SensorType": "power"
         },
-       "Associations":
+        "Threshold" :
+        {
+            "CriticalHigh": 500
+        },
+        "Associations":
         [
             [
                 "chassis",
@@ -63,186 +74,36 @@
                 "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
             ]
         ],
-        "Params":{
+        "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "n0",
+                    "ParamName": "P1",
                     "Desc": {
-                        "Name": "nvme0",
-                        "SensorType": "temperature"
+                        "Name": "S1_Core_VRD_Pwr",
+                        "SensorType": "power"
                     }
                 },
                 {
-                    "ParamName": "n1",
+                    "ParamName": "P2",
                     "Desc": {
-                        "Name": "nvme1",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n2",
-                    "Desc": {
-                        "Name": "nvme2",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n3",
-                    "Desc": {
-                        "Name": "nvme3",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n4",
-                    "Desc": {
-                        "Name": "nvme4",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n5",
-                    "Desc": {
-                        "Name": "nvme5",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n6",
-                    "Desc": {
-                        "Name": "nvme6",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n7",
-                    "Desc": {
-                        "Name": "nvme7",
-                        "SensorType": "temperature"
-                    }
-                },
-                                {
-                    "ParamName": "n8",
-                    "Desc": {
-                        "Name": "nvme8",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n9",
-                    "Desc": {
-                        "Name": "nvme9",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n10",
-                    "Desc": {
-                        "Name": "nvme10",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n11",
-                    "Desc": {
-                        "Name": "nvme11",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n12",
-                    "Desc": {
-                        "Name": "nvme12",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n13",
-                    "Desc": {
-                        "Name": "nvme13",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n14",
-                    "Desc": {
-                        "Name": "nvme14",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n15",
-                    "Desc": {
-                        "Name": "nvme15",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n16",
-                    "Desc": {
-                        "Name": "nvme16",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n17",
-                    "Desc": {
-                        "Name": "nvme17",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n18",
-                    "Desc": {
-                        "Name": "nvme18",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n19",
-                    "Desc": {
-                        "Name": "nvme19",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n20",
-                    "Desc": {
-                        "Name": "nvme20",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n21",
-                    "Desc": {
-                        "Name": "nvme21",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n22",
-                    "Desc": {
-                        "Name": "nvme22",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
-                    "ParamName": "n23",
-                    "Desc": {
-                        "Name": "nvme23",
-                        "SensorType": "temperature"
+                        "Name": "S1_SOC_VRD_Pwr",
+                        "SensorType": "power"
                     }
                 }
             ]
         },
-        "Expression": "max((n0 == n0) ? n0 : 0,(n1 == n1) ? n1 : 0,(n2 == n2) ? n2 : 0,(n3 == n3) ? n3 : 0,(n4 == n4) ? n4 : 0,(n5 == n5) ? n5 : 0,(n6 == n6) ? n6 : 0,(n7 == n7) ? n7 : 0,(n8 == n8) ? n8 : 0,(n9 == n9) ? n9 : 0,(n10 == n10) ? n10 : 0,(n11 == n11) ? n11 : 0,(n12 == n12) ? n12 : 0,(n13 == n13) ? n13 : 0,(n14 == n14) ? n14 : 0,(n15 == n15) ? n15 : 0,(n16 == n16) ? n16 : 0,(n17 == n17) ? n17 : 0,(n18 == n18) ? n18 : 0,(n19 == n19) ? n19 : 0,(n20 == n20) ? n20 : 0,(n21 == n21) ? n21 : 0,(n22 == n22) ? n22 : 0,(n23 == n23) ? n23 : 0)"
+        "Expression": "sumIgnoreNaN(P1, P2)"
     },
     {
-        "Desc":{
-            "Name":"nvme_m2_max",
-            "SensorType":"temperature"
+        "Desc": {
+            "Name": "S0_CPU_Pwr",
+            "SensorType": "power"
         },
-	"Associations":
+        "Threshold" :
+        {
+            "CriticalHigh": 500
+        },
+        "Associations":
         [
             [
                 "chassis",
@@ -255,25 +116,101 @@
                 "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
             ]
         ],
-        "Params":{
+        "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "n24",
+                    "ParamName": "P1",
                     "Desc": {
-                        "Name": "nvme24",
-                        "SensorType": "temperature"
+                        "Name": "S0_Core_VRD_Pwr",
+                        "SensorType": "power"
                     }
                 },
                 {
-                    "ParamName": "n25",
+                    "ParamName": "P2",
                     "Desc": {
-                        "Name": "nvme25",
-                        "SensorType": "temperature"
+                        "Name": "S0_SOC_VRD_Pwr",
+                        "SensorType": "power"
                     }
                 }
             ]
         },
-        "Expression": "max((n24 == n24) ? n24 : 0,(n25 == n25) ? n25 : 0)"
+        "Expression": "sumIgnoreNaN(P1, P2)"
+    },
+    {
+        "Desc": {
+            "Name": "S0_MEM_Pwr",
+            "SensorType": "power"
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "S0_DIMM_VR1_Pwr",
+                        "SensorType": "power"
+		    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc": {
+                        "Name": "S0_DIMM_VR2_Pwr",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "sumIgnoreNaN(P1, P2)"
+    },
+    {
+        "Desc": {
+            "Name": "S1_MEM_Pwr",
+            "SensorType": "power"
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "S1_DIMM_VR1_Pwr",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc": {
+                        "Name": "S1_DIMM_VR2_Pwr",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "sumIgnoreNaN(P1, P2)"
     }
 ]
 
