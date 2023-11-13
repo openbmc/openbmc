@@ -1,0 +1,10 @@
+[Unit]
+Description = Ampere MCTP-PLDM I2C binding
+After=obmc-host-already-on@0.target
+BindTo=obmc-host-already-on@0.target
+
+[Service]
+Restart=always
+RemainAfterExit=true
+ExecStart=/bin/sh -c "/usr/sbin/ampere_mctp_i2c_binding.sh add_endpoints"
+ExecStop=/bin/sh -c "/usr/sbin/ampere_mctp_i2c_binding.sh remove_endpoints"

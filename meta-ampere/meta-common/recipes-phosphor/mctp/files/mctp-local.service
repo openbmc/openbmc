@@ -7,7 +7,7 @@ BindTo=mctpd.service
 Type=oneshot
 ExecStart=/usr/bin/mctp link set mctpi2c3 up
 ExecStart=/usr/bin/mctp addr add 8 dev mctpi2c3
-ExecStart=/usr/bin/mctp neigh add 8 dev mctpi2c3 lladdr 0x10
+ExecStart=/usr/bin/busctl set-property au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpi2c3 au.com.codeconstruct.MCTP.Interface1 Role s BusOwner
 RemainAfterExit=true
 
 [Install]
