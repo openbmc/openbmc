@@ -30,8 +30,6 @@ RDEPENDS:${PN}-chassis = " \
         ampere-ipmi-oem \
         ampere-mac-update \
         ampere-driver-binder \
-        phosphor-post-code-manager \
-        phosphor-host-postd \
         "
 
 SUMMARY:${PN}-system = "Ampere System"
