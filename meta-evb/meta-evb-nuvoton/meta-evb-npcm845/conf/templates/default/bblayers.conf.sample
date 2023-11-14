@@ -14,6 +14,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-arm/meta-arm \
   ##OEROOT##/meta-arm/meta-arm-toolchain \
   ##OEROOT##/meta-nuvoton \
+  ##OEROOT##/meta-nuvoton/meta-evb-npcm845 \
   ##OEROOT##/meta-evb \
   ##OEROOT##/meta-evb/meta-evb-nuvoton \
   ##OEROOT##/meta-evb/meta-evb-nuvoton/meta-evb-npcm845 \
