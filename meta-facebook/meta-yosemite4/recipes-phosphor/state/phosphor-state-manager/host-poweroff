@@ -8,8 +8,7 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 
 # TODO: check power status before do power off
 # Set state effecter state: Entity ID 0x0000 for host power control, 0x2 for power off
-GETEID=$(busctl call "$MCTP_BUS_NAME" "$MCTP_OBJ_PATH" "$MCTP_INTF_NAME" LearnEndpoint say "mctpi2c$(($1-1))" 1 0x20)
-EID=$(echo "$GETEID" | awk '{print $2}')
+EID=$(($1*10))
 if ! pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x02 -m "$EID"
 then
     echo "Failed to set host$1 power off"
