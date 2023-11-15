@@ -12,13 +12,6 @@ inherit meson \
 
 require ${BPN}.inc
 
-SRC_URI += "file://occ-active.sh"
-do_install:append() {
-        install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/occ-active.sh \
-            ${D}${bindir}/occ-active.sh
-}
-
 DBUS_SERVICE:${PN} += "org.open_power.OCC.Control.service"
 SYSTEMD_SERVICE:${PN} += "op-occ-enable@.service"
 SYSTEMD_SERVICE:${PN} += "op-occ-disable@.service"
