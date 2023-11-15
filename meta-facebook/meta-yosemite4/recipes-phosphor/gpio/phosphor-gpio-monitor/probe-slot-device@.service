@@ -1,0 +1,8 @@
+[Unit]
+Description=Probe Device For Slot%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/probe-slot-device %i
+SyslogIdentifier=probe-slot-device%i
+

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+HOST_BUS=$(($1 - 1))
+HOST_VIRTUAL_BUS=$(($1 + 15))
+# probe server board cpld I/O expander
+echo $HOST_BUS-0020 > /sys/bus/i2c/drivers/pca953x/bind
+echo $HOST_BUS-0021 > /sys/bus/i2c/drivers/pca953x/bind
+echo $HOST_BUS-0022 > /sys/bus/i2c/drivers/pca953x/bind
+echo $HOST_BUS-0023 > /sys/bus/i2c/drivers/pca953x/bind
+# probe server board I/O expander and eeprom behind i2c-mux
+echo $HOST_VIRTUAL_BUS-0049 > /sys/bus/i2c/drivers/pca953x/bind
+echo $HOST_VIRTUAL_BUS-0050 > /sys/bus/i2c/drivers/at24/bind
+echo $HOST_VIRTUAL_BUS-0051 > /sys/bus/i2c/drivers/at24/bind
+echo $HOST_VIRTUAL_BUS-0054 > /sys/bus/i2c/drivers/at24/bind
