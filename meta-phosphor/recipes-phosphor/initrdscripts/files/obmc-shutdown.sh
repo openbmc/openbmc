@@ -101,5 +101,5 @@ fi
 
 echo "Execute ${1-reboot} -f if all unmounted ok, or exec /init"
 
-export PS1=shutdown-sh#\
+export PS1="shutdown-sh# "
 exec /bin/sh

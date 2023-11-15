@@ -156,7 +156,7 @@ When finished exec new init or cleanup and run reboot -f.
 
 Warning: No job control!  Shell exit will panic the system!
 HERE
-		export PS1=init#\
+		export PS1="init# "
 		exec /bin/sh
 	fi
 }
