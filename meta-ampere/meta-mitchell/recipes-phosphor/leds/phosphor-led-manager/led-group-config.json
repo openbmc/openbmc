@@ -1,0 +1,48 @@
+{
+	"leds": [
+		{
+			"group": "bmc_booted",
+			"members": [
+			]
+		},
+		{
+			"group": "power_on",
+			"members": [
+			]
+		},
+		{
+			"group": "systemFault",
+			"members": [
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 0,
+					"Priority": "Blink"
+				}
+			]
+		},
+		{
+			"group": "enclosure_identify",
+			"members": [
+				{
+					"Name": "identify",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
+		},
+		{
+			"group": "enclosure_identify_blink",
+			"members": [
+				{
+					"Name": "identify",
+					"Action": "Blink",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
+		}
+	]
+}
