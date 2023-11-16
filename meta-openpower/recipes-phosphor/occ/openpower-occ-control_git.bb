@@ -22,7 +22,6 @@ DEPENDS += " \
         ${PYTHON_PN}-sdbus++-native \
         phosphor-logging \
         phosphor-dbus-interfaces \
-        autoconf-archive-native \
         systemd \
         ${PYTHON_PN}-native \
         ${PYTHON_PN}-pyyaml-native \
