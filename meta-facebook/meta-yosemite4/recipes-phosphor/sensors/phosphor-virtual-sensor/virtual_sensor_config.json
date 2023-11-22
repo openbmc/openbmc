@@ -298,5 +298,101 @@
       ]
     },
     "Expression": "fan_vol * fan_curr"
+  },
+  {
+    "Desc": {
+      "Name": "SYSTEM_AIRFLOW",
+      "SensorType": "airflow"
+    },
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "FANBOARD0_FAN0_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "FANBOARD0_FAN1_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "FANBOARD0_FAN2_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "FANBOARD0_FAN3_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P5",
+          "Desc": {
+            "Name": "FANBOARD0_FAN4_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P6",
+          "Desc": {
+            "Name": "FANBOARD0_FAN5_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P7",
+          "Desc": {
+            "Name": "FANBOARD1_FAN0_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P8",
+          "Desc": {
+            "Name": "FANBOARD1_FAN1_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P9",
+          "Desc": {
+            "Name": "FANBOARD1_FAN2_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P10",
+          "Desc": {
+            "Name": "FANBOARD1_FAN3_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P11",
+          "Desc": {
+            "Name": "FANBOARD1_FAN4_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        },
+        {
+          "ParamName": "P12",
+          "Desc": {
+            "Name": "FANBOARD1_FAN5_TACH_IL",
+            "SensorType": "fan_tach"
+          }
+        }
+      ]
+    },
+    "Expression": "(((P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12) / 12) * 0.0687) - 8.0087"
   }
 ]
+
