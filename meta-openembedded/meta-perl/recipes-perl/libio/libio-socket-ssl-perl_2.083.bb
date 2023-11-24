@@ -38,7 +38,7 @@ do_install:append () {
 }
 
 RDEPENDS:${PN}-ptest += "\
-    libnet-idn-encode \
+    libnet-libidn-perl \
     liburi-perl \
     perl-module-file-glob \
     perl-module-findbin \

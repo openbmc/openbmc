@@ -9,7 +9,6 @@ SRC_URI = "https://archive.mozilla.org/pub/firefox/releases/${PV}esr/source/fire
            file://0003-rust.configure-do-not-try-to-find-a-suitable-upstrea.patch \
            file://0004-use-asm-sgidefs.h.patch \
            file://fix-musl-build.patch \
-           file://0001-build-do-not-use-autoconf-s-config.sub-to-canonicali.patch \
            file://riscv32.patch \
            file://0001-util.configure-fix-one-occasionally-reproduced-confi.patch \
            file://0001-rewrite-cargo-host-linker-in-python3.patch  \
@@ -66,13 +65,12 @@ do_install() {
 
 inherit multilib_script multilib_header
 
-MAJ_VER = "${@oe.utils.trim_version("${PV}", 1)}"
-MULTILIB_SCRIPTS += "${PN}-dev:${bindir}/js${MAJ_VER}-config"
+MULTILIB_SCRIPTS += " ${PN}-dev:${bindir}/js102-config"
 
 do_install:append() {
-    oe_multilib_header mozjs-${MAJ_VER}/js-config.h
+    oe_multilib_header mozjs-115/js-config.h
     sed -e 's@${STAGING_DIR_HOST}@@g' \
-        -i ${D}${bindir}/js${MAJ_VER}-config
+        -i ${D}${bindir}/js115-config
     rm -f ${D}${libdir}/libjs_static.ajs
 }
 

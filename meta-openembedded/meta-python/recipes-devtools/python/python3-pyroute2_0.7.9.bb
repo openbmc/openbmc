@@ -30,7 +30,6 @@ SRC_URI += " \
 RDEPENDS:${PN}-ptest += " \
     python3-pytest \
     python3-fcntl \
-    python3-sqlite3 \
 "
 
 do_install_ptest() {

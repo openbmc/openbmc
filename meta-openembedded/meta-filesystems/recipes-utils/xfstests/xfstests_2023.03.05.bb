@@ -28,7 +28,7 @@ RDEPENDS:${PN} += "\
     e2fsprogs-resize2fs \
     libaio \
     libcap-bin \
-    overlayfs-tools \
+    overlayfs-progs \
     perl \
     python3 \
     python3-core \

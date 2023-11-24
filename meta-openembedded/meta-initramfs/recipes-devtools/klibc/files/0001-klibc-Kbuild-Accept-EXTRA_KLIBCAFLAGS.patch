@@ -14,8 +14,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/usr/klibc/Kbuild
 +++ b/usr/klibc/Kbuild
-@@ -190,7 +190,8 @@ $(SOHASH): $(SOLIB) $(SOLIB).hash
- targets += shared-stub.o
+@@ -183,7 +183,8 @@ $(SOHASH): $(SOLIB) $(SOLIB).hash
+ targets += interp.o
  
  quiet_cmd_interp = BUILD   $@
 -      cmd_interp = $(KLIBCCC) $(klibccflags) -D__ASSEMBLY__     \
@@ -23,4 +23,4 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +                             -D__ASSEMBLY__     \
                               -DLIBDIR=\"$(SHLIBDIR)\"         \
  			     -DSOHASH=\"$(SOLIBHASH)\" \
- 			     -c -o $@ $<
+                              $(KLIBCSTACKFLAGS) \

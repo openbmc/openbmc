@@ -50,12 +50,10 @@ PTESTS_SLOW_META_OE = "\
     rsyslog \
     mariadb \
 "
-PTESTS_SLOW_META_OE:append:x86 = " kernel-selftest"
-PTESTS_SLOW_META_OE:append:x86-64 = " kernel-selftest"
-PTESTS_SLOW_META_OE:remove:libc-musl = "kernel-selftest"
 
 PTESTS_PROBLEMS_META_OE ="\
     jemalloc \
+    kernel-selftest \
     keyutils \
     libdbi-perl \
     libgpiod \

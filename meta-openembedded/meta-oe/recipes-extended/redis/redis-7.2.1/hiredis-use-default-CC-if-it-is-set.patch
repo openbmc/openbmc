@@ -18,8 +18,6 @@ Reworked for 6.0.4
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 
 ---
-Upstream-Status: Pending
-
  deps/hiredis/Makefile | 2 --
  1 file changed, 2 deletions(-)
 

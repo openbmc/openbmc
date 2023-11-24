@@ -1,5 +1,3 @@
-Upstream-Status: Pending
-
 Description: Bring Clang's _Nonnull keyword to GCC
 Author: Kai-Chung Yan
 Forwarded: not-needed

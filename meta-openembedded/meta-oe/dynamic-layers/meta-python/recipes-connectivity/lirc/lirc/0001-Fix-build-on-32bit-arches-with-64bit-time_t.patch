@@ -10,8 +10,6 @@ input.h [1]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
  plugins/devinput.c | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
