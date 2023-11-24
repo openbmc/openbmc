@@ -12,7 +12,7 @@ https://git.openembedded.org/meta-openembedded/commit/?id=feeb172d1a8bf010490d22
 
 Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
 ---
- node.gyp                 | 1 +
+ node.gyp                 | 3 +
  tools/v8_gypfiles/v8.gyp | 5 +++++
  2 files changed, 6 insertions(+)
 
@@ -28,6 +28,23 @@ index e8e1d9f9..e60ccc10 100644
                      '<(node_mksnapshot_exec)',
                      '<(node_snapshot_main)',
                    ],
+@@ -935,6 +935,7 @@
+           'action_name': 'node_js2c',
+           'process_outputs_as_sources': 1,
+           'inputs': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(node_js2c_exec)',
+             '<@(library_files)',
+             '<@(deps_files)',
+@@ -944,6 +945,7 @@
+             '<(SHARED_INTERMEDIATE_DIR)/node_javascript.cc',
+           ],
+           'action': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(node_js2c_exec)',
+             '<@(_outputs)',
+             'lib',
+
 diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
 index 42e26cd9..bc721991 100644
 --- a/tools/v8_gypfiles/v8.gyp

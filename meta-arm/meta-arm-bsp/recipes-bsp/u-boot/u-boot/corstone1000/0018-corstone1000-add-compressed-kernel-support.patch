@@ -1,7 +1,7 @@
-From a5879f1e7d91fc31058ba75b499d77cab080d611 Mon Sep 17 00:00:00 2001
+From b5cfd8ab77e7f305b170a8cd25575e8cc08babc5 Mon Sep 17 00:00:00 2001
 From: Jon Mason <jon.mason@arm.com>
 Date: Wed, 30 Nov 2022 18:59:59 +0000
-Subject: [PATCH 18/33] corstone1000: add compressed kernel support
+Subject: [PATCH 18/38] corstone1000: add compressed kernel support
 
 The corstone1000 kernel has become too large to fit in the available
 storage.  Swtiching to a compressed kernel avoids the problem, but

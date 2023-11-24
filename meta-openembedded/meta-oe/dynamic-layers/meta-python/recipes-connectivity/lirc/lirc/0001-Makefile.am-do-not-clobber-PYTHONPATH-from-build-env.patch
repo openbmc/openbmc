@@ -8,6 +8,8 @@ and so lirc's variable has to be named something else.
 
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
+Upstream-Status: Pending
+
  Makefile.am       | 2 +-
  pylint.mak        | 2 +-
  tools/Makefile.am | 2 +-

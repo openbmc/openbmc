@@ -207,10 +207,11 @@ if __name__ == "__main__":
     args.add_argument("-v", "--verbose", action="store_true", help="show per-patch results")
     args.add_argument("-g", "--histogram", action="store_true", help="show patch histogram")
     args.add_argument("-j", "--json", help="update JSON")
+    args.add_argument("-p", "--pattern", nargs=1, action="extend", default=["recipes-*/**/*.patch", "recipes-*/**/*.diff"], help="pattern to search recipes patch")
     args.add_argument("directory", help="directory to scan")
     args = args.parse_args()
 
-    patches = subprocess.check_output(("git", "-C", args.directory, "ls-files", "recipes-*/**/*.patch", "recipes-*/**/*.diff")).decode("utf-8").split()
+    patches = subprocess.check_output(("git", "-C", args.directory, "ls-files") + tuple(args.pattern)).decode("utf-8").split()
     results = patchreview(args.directory, patches)
     analyse(results, want_blame=args.blame, verbose=args.verbose)
 

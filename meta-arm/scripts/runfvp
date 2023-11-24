@@ -79,7 +79,7 @@ def start_fvp(args, fvpconf, extra_args):
                 print(line.strip().decode(errors='ignore'))
 
     finally:
-        fvp.stop()
+        return fvp.stop()
 
 
 def runfvp(cli_args):
@@ -88,7 +88,7 @@ def runfvp(cli_args):
         config_file = args.config
     else:
         config_file = conffile.find(args.config)
-    start_fvp(args, config_file, extra_args)
+    return start_fvp(args, config_file, extra_args)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,49 @@
+From 3ab73b453016d91b9f942a7c12173854135530a4 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Wed, 23 Aug 2023 21:17:17 +0100
+Subject: [PATCH] virtio: rng: Workaround for FVP returning zero-size buffer
+
+The FVP virtio-rng device is observed to always 8 fewer bytes of random
+data than requested. When 8 of fewer bytes are requested, the FVP
+returns 0 bytes. This causes U-Boot to hang upon attempting to fill the
+last 8 bytes of the input buffer.
+
+The virtio spec states than entropy devices must always return at least
+1 byte of random data.
+
+To workaround this, always request exactly 16 bytes from the virtio
+device, discarding any unused data.
+
+Upstream-Status: Inappropriate [Temporary workaround]
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+---
+ drivers/virtio/virtio_rng.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/virtio/virtio_rng.c b/drivers/virtio/virtio_rng.c
+index b85545c2ee5..1e4fc342406 100644
+--- a/drivers/virtio/virtio_rng.c
++++ b/drivers/virtio/virtio_rng.c
+@@ -29,7 +29,7 @@ static int virtio_rng_read(struct udevice *dev, void *data, size_t len)
+
+ 	while (len) {
+ 		sg.addr = buf;
+-		sg.length = min(len, sizeof(buf));
++		sg.length = sizeof(buf);
+ 		sgs[0] = &sg;
+
+ 		ret = virtqueue_add(priv->rng_vq, sgs, 0, 1);
+@@ -44,8 +44,8 @@ static int virtio_rng_read(struct udevice *dev, void *data, size_t len)
+ 		if (rsize > sg.length)
+ 			return -EIO;
+
+-		memcpy(ptr, buf, rsize);
+-		len -= rsize;
++		memcpy(ptr, buf, min(len, (size_t)rsize));
++		len -= min(len, (size_t)rsize);
+ 		ptr += rsize;
+ 	}
+
+--
+2.34.1
+

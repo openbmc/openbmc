@@ -9,10 +9,11 @@ This commit adds functionality to save the TOS_FW_CONFIG too, so we can
 retrieve it later. This is necessary for the CFG_CORE_SEL1_SPMC use
 case, because the SPMC manifest is passed in this DT.
 
-Upstream-Status: Accepted
-
 Reviewed-by: Jens Wiklander <jens.wiklander@linaro.org>
 Signed-off-by: Balint Dobszay <balint.dobszay@arm.com>
+
+Upstream-Status: Backport [809fa817ae6331d98b55f7afaa3c20f8407822e4]
+Signed-off-by: Gyorgy Szing <Gyorgy.Szing@arm.com>
 ---
  core/arch/arm/kernel/boot.c               | 60 ++++++++++++++++++++++-
  core/arch/arm/kernel/entry_a32.S          |  3 +-

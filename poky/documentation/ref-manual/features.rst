@@ -52,8 +52,6 @@ Project metadata:
 
 -  *alsa:* Hardware has ALSA audio drivers
 
--  *apm:* Hardware uses APM (or APM emulation)
-
 -  *bluetooth:* Hardware has integrated BT
 
 -  *efi:* Support for booting through EFI
@@ -224,6 +222,10 @@ metadata, as extra layers can define their own:
    replacement of for ``init`` with parallel starting of services,
    reduced shell overhead, and other features. This ``init`` manager is
    used by many distributions.
+
+-  *systemd-resolved:* Include support and use ``systemd-resolved`` as the
+   main DNS name resolver in ``glibc`` Name Service Switch. This is a DNS
+   resolver daemon from ``systemd``.
 
 -  *usbgadget:* Include USB Gadget Device support (for USB
    networking/serial/storage).

@@ -4,7 +4,7 @@ Date: Thu, 31 Aug 2023 10:51:54 +0100
 Subject: [PATCH] Handle logging syscall
 
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
-Upstream-Status:  Inappropriate [Other]
+Upstream-Status: Pending [upstreamed differently in 280b6a3]
 ---
  core/arch/arm/kernel/spmc_sp_handler.c | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)

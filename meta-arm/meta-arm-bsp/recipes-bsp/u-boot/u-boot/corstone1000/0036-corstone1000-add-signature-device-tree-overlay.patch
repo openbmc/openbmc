@@ -1,0 +1,31 @@
+From b6e69bd68c1e0171aa2acb78bec54da02defe129 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Wed, 13 Sep 2023 13:20:15 +0100
+Subject: [PATCH 36/38] corstone1000: add signature device tree overlay
+
+Adds signature device tree overlay.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ arch/arm/dts/corstone1000.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
+index 1e0ec075e4..077673dd44 100644
+--- a/arch/arm/dts/corstone1000.dtsi
++++ b/arch/arm/dts/corstone1000.dtsi
+@@ -111,6 +111,10 @@
+ 		fwu-mdata-store = <&nvmxip>;
+ 	};
+ 
++	signature {
++		capsule-key = /incbin/("../../../CRT.esl");
++	};
++
+ 	soc {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+-- 
+2.25.1
+

@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+# ex:ts=4:sw=4:sts=4:et
+# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
+#
+# patchtest: execute all unittest test cases discovered for a single patch
+# Note that this script is currently under development and has been
+# hard-coded with default values for testing purposes. This script
+# should not be used without changing the default recipient, at minimum.
+#
+# Copyright (C) 2023 BayLibre Inc.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+# 
+
+import argparse
+import boto3
+import configparser
+import mailbox
+import os
+import re
+import sys
+
+greeting = """Thank you for your submission. Patchtest identified one
+or more issues with the patch. Please see the log below for
+more information:\n\n---\n"""
+
+suggestions = """\n---\n\nPlease address the issues identified and
+submit a new revision of the patch, or alternatively, reply to this
+email with an explanation of why the patch should be accepted. If you
+believe these results are due to an error in patchtest, please submit a
+bug at https://bugzilla.yoctoproject.org/ (use the 'Patchtest' category
+under 'Yocto Project Subprojects'). For more information on specific
+failures, see: https://wiki.yoctoproject.org/wiki/Patchtest. Thank
+you!"""
+
+parser = argparse.ArgumentParser(description="Send patchtest results to a submitter for a given patch")
+parser.add_argument("-p", "--patch", dest="patch", required=True, help="The patch file to summarize")
+args = parser.parse_args()
+
+if not os.path.exists(args.patch):
+    print(f"Patch '{args.patch}' not found - did you provide the right path?")
+    sys.exit(1)
+elif not os.path.exists(args.patch + ".testresult"):
+    print(f"Found patch '{args.patch}' but '{args.patch}.testresult' was not present. Have you run patchtest on the patch?")
+    sys.exit(1)
+
+result_file = args.patch + ".testresult"
+result_basename = os.path.basename(args.patch)
+testresult = None
+
+with open(result_file, "r") as f:
+    testresult = f.read()
+
+# we know these patch files will only contain a single patch, so only
+# worry about the first element for getting the subject
+mbox = mailbox.mbox(args.patch)
+mbox_subject = mbox[0]['subject']
+subject_line = f"Patchtest results for {mbox_subject}"
+
+# extract the submitter email address and use it as the reply address
+# for the results
+reply_address = mbox[0]['from']
+
+# extract the message ID and use that as the in-reply-to address
+in_reply_to = re.findall("<(.*)>", mbox[0]['Message-ID'])[0]
+
+# the address the results email is sent from
+from_address = "patchtest@automation.yoctoproject.org"
+
+# mailing list to CC
+cc_address = "openembedded-core@lists.openembedded.org"
+
+if "FAIL" in testresult:
+    reply_contents = None
+    if len(max(open(result_file, 'r'), key=len)) > 220:
+        warning = "Tests failed for the patch, but the results log could not be processed due to excessive result line length."
+        reply_contents = greeting + warning + suggestions
+    else:
+        reply_contents = greeting + testresult + suggestions
+
+    ses_client = boto3.client('ses', region_name='us-west-2')
+    raw_data = 'From: ' + from_address + '\nTo: ' + reply_address + \
+        '\nCC: ' + cc_address + '\nSubject:' + subject_line + \
+        '\nIn-Reply-To:' + in_reply_to + \
+        '\nMIME-Version: 1.0" + \
+        "\nContent-type: Multipart/Mixed;boundary="NextPart"\n\n--NextPart\nContent-Type: text/plain\n\n' + \
+        reply_contents + '\n\n--NextPart'
+    response = ses_client.send_raw_email(
+        Source="patchtest@automation.yoctoproject.org",
+        RawMessage={
+            "Data": raw_data,
+        },
+    )
+
+else:
+    print(f"No failures identified for {args.patch}.")

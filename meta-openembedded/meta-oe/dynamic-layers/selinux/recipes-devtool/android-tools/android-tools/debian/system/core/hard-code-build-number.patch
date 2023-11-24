@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: just hard code rather than deal with circular deps
 Forwarded: not-needed
 --- a/system/core/adb/adb.cpp

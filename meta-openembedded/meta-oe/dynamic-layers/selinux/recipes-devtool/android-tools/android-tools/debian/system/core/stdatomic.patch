@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Fix incompatibility between <stdatomic.h> and <atomic>
  This 2 headers combined will cause errors for both GCC and Clang. This patch
  makes sure only one of them is present at any time.

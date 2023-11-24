@@ -139,6 +139,7 @@ def harvest_data(machines, recipes):
 
 # TODO can this be inferred from the list of recipes in the layer
 recipes = ("virtual/kernel",
+           "sbsa-acs",
            "scp-firmware",
            "trusted-firmware-a",
            "trusted-firmware-m",

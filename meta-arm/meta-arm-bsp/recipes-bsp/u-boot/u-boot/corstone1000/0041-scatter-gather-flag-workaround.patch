@@ -1,0 +1,39 @@
+From abc3b43996198012498abe5777cfeedde4538a90 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Mon, 6 Nov 2023 14:52:05 +0000
+Subject: [PATCH] workaround for scatter gather flag check for corstone1000
+
+This workaround passes 1 as scatter_gather_list value to pass the NULL checks
+for scatter_gather_list while CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag is set
+(which is introduced lately to align with UEFI specs). Since these flag checks
+are not implemented in u-boot properly and corstone1000 does not support
+scatter_gather_list during capsule update, this patch will skip the check only
+for on-disk capsule update.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Inappropriate [Redesign of Capsule update interface is required]
+---
+ lib/efi_loader/efi_capsule.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index a7d70acf2a..efbedce460 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -1530,8 +1530,11 @@ efi_status_t efi_launch_capsules(void)
+		ret = efi_capsule_read_file(files[i], &capsule);
+		if (ret == EFI_SUCCESS) {
+			#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
+-			/* capsule update only supports 1 image and no scatter gather list for corstone1000 */
+-			efi_update_capsule(&capsule, 1, 0);
++			/* capsule update only supports 1 image and use of scatter_gather_list
++			 * is not implemented for corstone1000 passing 1 to pass
++			 * the NULL flag checks. This should will be fixed with
++			 * new capsule update design*/
++			ret = efi_update_capsule(&capsule, 1, 1);
+			#elif
+			ret = efi_capsule_update_firmware(capsule);
+			#endif
+--
+2.25.1
+

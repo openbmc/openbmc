@@ -360,7 +360,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-python-vlc \
     python3-pytoml \
     python3-pytun \
-    python3-pytz-deprecation-shim \
     python3-pyudev \
     python3-pyusb \
     python3-pywbem \

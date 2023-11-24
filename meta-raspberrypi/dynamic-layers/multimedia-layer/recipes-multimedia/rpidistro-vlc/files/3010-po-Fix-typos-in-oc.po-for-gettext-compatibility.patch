@@ -1,0 +1,59 @@
+From 4caba7560aec54f6d944accd1a8d216e8d9b1d92 Mon Sep 17 00:00:00 2001
+From: Vincent Davis Jr <vince@underview.tech>
+Date: Tue, 14 Nov 2023 20:17:11 -0500
+Subject: [PATCH] po: Fix typos in oc.po for gettext compatibility
+
+Upstream-Status: Inappropriate
+
+Ws moved upstream, but upstream patch couldn't be applied.
+
+https://code.videolan.org/videolan/vlc/-/commit/9d67e20c2edd25251b46d1780a7973b44ac5e5ba
+
+gettext-0.22 became stricter and started to validate format strings. Fix
+the typos.
+
+Bug: https://bugs.gentoo.org/909015
+
+Signed-off-by: Vincent Davis Jr <vince@underview.tech>
+---
+ po/oc.po | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/po/oc.po b/po/oc.po
+index 86f2ed8a1..ce68c581f 100644
+--- a/po/oc.po
++++ b/po/oc.po
+@@ -5298,18 +5298,18 @@ msgstr "Comanda+"
+ #: src/misc/update.c:482
+ #, c-format
+ msgid "%.1f GiB"
+-msgstr "%.lf Gio"
++msgstr "%.1f Gio"
+ 
+ #: src/misc/update.c:484
+ #, c-format
+ msgid "%.1f MiB"
+-msgstr "%.lf Mio"
++msgstr "%.1f Mio"
+ 
+ #: src/misc/update.c:486 modules/gui/macosx/VLCPlaylistInfo.m:138
+ #: modules/gui/macosx/VLCPlaylistInfo.m:140
+ #, c-format
+ msgid "%.1f KiB"
+-msgstr "%.lf Kio"
++msgstr "%.1f Kio"
+ 
+ #: src/misc/update.c:488
+ #, c-format
+@@ -33071,7 +33071,7 @@ msgstr "Lista del gestionari de mèdias"
+ 
+ #, fuzzy
+ #~ msgid "%.1f kB"
+-#~ msgstr "%.lf Gio"
++#~ msgstr "%.1f Gio"
+ 
+ #, fuzzy
+ #~ msgid "Speed"
+-- 
+2.34.1
+

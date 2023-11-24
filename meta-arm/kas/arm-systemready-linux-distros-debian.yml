@@ -1,0 +1,7 @@
+header:
+  version: 13
+  includes:
+    - kas/arm-systemready-firmware.yml
+
+target:
+  - arm-systemready-linux-distros-debian

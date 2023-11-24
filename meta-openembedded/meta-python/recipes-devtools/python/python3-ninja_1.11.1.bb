@@ -22,4 +22,3 @@ RDEPENDS:${PN} = " \
     python3-ninja-syntax \
 "
 
-BBCLASSEXTEND = "native nativesdk"

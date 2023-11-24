@@ -10,6 +10,10 @@ PYPI_PACKAGE = "PyNaCl"
 
 inherit pypi python_setuptools_build_meta
 
+# in meta-virtualization layer
+#
+RCONFLICTS:${PN} = "python3-nacl"
+
 DEPENDS += "\
     ${PYTHON_PN}-cffi-native \
     libsodium \

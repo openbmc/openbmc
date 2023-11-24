@@ -5,7 +5,7 @@ Subject: [PATCH] fix(build): do not install git files
 
 Signed-off-by: Vyacheslav Yurkov <v.yurkov@precitec.de>
 ---
-Upstream-Status: Pending
+Upstream-Status: Backport [https://github.com/open62541/open62541/commit/a0328d4cb527f9778a262fc4a6b42bfbdffc38e9]
 
  CMakeLists.txt | 1 +
  1 file changed, 1 insertion(+)

@@ -12,6 +12,8 @@ Upsteam-Status: Pending
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
+Upstream-Status: Pending
+
  cmake/BundledOSSPUUID.cmake | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

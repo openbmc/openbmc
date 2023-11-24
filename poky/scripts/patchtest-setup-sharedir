@@ -1,0 +1,83 @@
+#!/bin/bash -e
+#
+# patchtest-setup-sharedir: Setup a directory for storing mboxes and
+# repositories to be shared with the guest machine, including updates to
+# the repos if the directory already exists
+#
+# Copyright (C) 2023 BayLibre Inc.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+# poky repository
+POKY_REPO="https://git.yoctoproject.org/poky"
+
+# patchtest repository
+PATCHTEST_REPO="https://git.yoctoproject.org/patchtest"
+
+# the name of the directory
+SHAREDIR="patchtest_share"
+
+help()
+{
+    echo "Usage: patchtest-setup-sharedir [ -d | --directory SHAREDIR ]
+        [ -p | --patchtest PATCHTEST_REPO ]
+        [ -y | --poky POKY_REPO ]"
+    exit 2
+}
+
+while [ "$1" != "" ]; do
+    case $1 in
+    -d|--directory)
+        SHAREDIR=$2
+        shift 2
+        ;;
+    -p|--patchtest)
+        PATCHTEST_REPO=$2
+        shift 2
+        ;;
+    -y|--poky)
+        POKY_REPO=$2
+        shift 2
+        ;;
+    -h|--help)
+        help
+        ;;
+    *)
+        echo "Unknown option $1"
+        help
+        ;;
+    esac
+done
+
+# define MBOX_DIR where the patch series will be stored by
+# get-latest-series
+MBOX_DIR="${SHAREDIR}/mboxes"
+
+# Create SHAREDIR if it doesn't exist
+if [ ! -d "$SHAREDIR" ]; then
+    mkdir -p "${SHAREDIR}"
+    echo "Created ${SHAREDIR}"
+fi
+
+# Create the mboxes directory if it doesn't exist
+if [ ! -d "$MBOX_DIR" ]; then
+    mkdir -p "${MBOX_DIR}"
+    echo "Created ${MBOX_DIR}"
+fi
+
+# clone poky if it's not already present; otherwise, update it
+if [ ! -d "$POKY_REPO" ]; then
+    BASENAME=$(basename ${POKY_REPO})
+    git clone "${POKY_REPO}" "${SHAREDIR}/${BASENAME}"
+else
+    (cd "${SHAREDIR}/$BASENAME" && git pull)
+fi
+
+# clone patchtest if it's not already present; otherwise, update it
+if [ ! -d "$PATCHTEST_REPO" ]; then
+    BASENAME=$(basename ${PATCHTEST_REPO})
+    git clone "${PATCHTEST_REPO}" "${SHAREDIR}/${BASENAME}"
+else
+    (cd "${SHAREDIR}/$BASENAME" && git pull)
+fi

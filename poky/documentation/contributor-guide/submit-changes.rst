@@ -279,6 +279,46 @@ Here is the general procedure on how to create patches to be sent through email:
    If necessary, rework your commits as described in
    ":ref:`contributor-guide/submit-changes:taking patch review into account`".
 
+Validating Patches with Patchtest
+=================================
+
+``patchtest`` is available in ``openembedded-core`` as a tool for making
+sure that your patches are well-formatted and contain important info for
+maintenance purposes, such as ``Signed-off-by`` and ``Upstream-Status``
+tags. Currently, it only supports testing patches for
+``openembedded-core`` branches. To setup, perform the following::
+
+    pip install -r meta/lib/patchtest/requirements.txt
+    source oe-init-build-env
+    bitbake-layers add-layer ../meta-selftest
+
+Once these steps are complete and you have generated your patch files,
+you can run ``patchtest`` like so::
+
+    patchtest --patch <patch_name>
+
+Alternatively, if you want ``patchtest`` to iterate over and test
+multiple patches stored in a directory, you can use::
+
+    patchtest --directory <directory_name>
+
+By default, ``patchtest`` uses its own modules' file paths to determine what
+repository and test suite to check patches against. If you wish to test
+patches against a repository other than ``openembedded-core`` and/or use
+a different set of tests, you can use the ``--repodir`` and ``--testdir``
+flags::
+
+    patchtest --patch <patch_name> --repodir <path/to/repo> --testdir <path/to/testdir>
+
+Finally, note that ``patchtest`` is designed to test patches in a standalone
+way, so if your patches are meant to apply on top of changes made by
+previous patches in a series, it is possible that ``patchtest`` will report
+false failures regarding the "merge on head" test.
+
+Using ``patchtest`` in this manner provides a final check for the overall
+quality of your changes before they are submitted for review by the
+maintainers.
+
 Sending the Patches via Email
 =============================
 

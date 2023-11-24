@@ -1,0 +1,38 @@
+From 41efa2f0cf08c91ff935bbb2d16ab233df7f5811 Mon Sep 17 00:00:00 2001
+From: Venture Research <tech@ventureresearch.com>
+Date: Fri, 8 Feb 2013 17:39:52 -0600
+Subject: [PATCH] hiredis: use default CC if it is set
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Instead of trying to automagically figure out CC, which breaks with OE
+as CC has spaces in it, just skip it if one was already passed in.
+
+Signed-off-by: Venture Research <tech@ventureresearch.com>
+
+Update to work with 4.0.8
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+
+Reworked for 6.0.4
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
+---
+Upstream-Status: Pending
+
+ deps/hiredis/Makefile | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/deps/hiredis/Makefile b/deps/hiredis/Makefile
+index bd2106b..9ce768d 100644
+--- a/deps/hiredis/Makefile
++++ b/deps/hiredis/Makefile
+@@ -36,8 +36,6 @@ endef
+ export REDIS_TEST_CONFIG
+ 
+ # Fallback to gcc when $CC is not in $PATH.
+-CC:=$(shell sh -c 'type $${CC%% *} >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+-CXX:=$(shell sh -c 'type $${CXX%% *} >/dev/null 2>/dev/null && echo $(CXX) || echo g++')
+ OPTIMIZATION?=-O3
+ WARNINGS=-Wall -Wextra -Werror -Wstrict-prototypes -Wwrite-strings -Wno-missing-field-initializers
+ DEBUG_FLAGS?= -g -ggdb

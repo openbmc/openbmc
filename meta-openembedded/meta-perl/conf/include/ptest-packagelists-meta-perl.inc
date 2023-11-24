@@ -17,6 +17,7 @@ PTESTS_FAST_META_PERL = "\
     libstrictures-perl \
     libterm-readkey-perl \
     libtest-nowarnings-perl \
+    libtext-diff-perl \
 "
 
 PTESTS_SLOW_META_PERL = "\

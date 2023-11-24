@@ -1,7 +1,7 @@
-From 68248cd3cc95e0480ee2cbc3ebaba51967889199 Mon Sep 17 00:00:00 2001
+From 94e6c1dee044b3573991e48449de9144cfe3c0f3 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Sat, 11 Dec 2021 13:23:55 +0000
-Subject: [PATCH 13/33] efi_loader: corstone1000: remove guid check from
+Subject: [PATCH 13/38] efi_loader: corstone1000: remove guid check from
  corstone1000 config option
 
 Use generic fmp guid and no separte check is required for

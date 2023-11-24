@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Turn #error into exceptions
  So the library can be built on non-Linux platforms too, although can't
  guarauntee its functionality regarding that piece of code.

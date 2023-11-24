@@ -1,0 +1,11 @@
+[Unit]
+Description=Precision Time Protocol (PTP) service for %I
+Documentation=man:ptp4l
+After=sys-subsystem-net-devices-%i.device
+
+[Service]
+Type=simple
+ExecStart=@SBINDIR@/ptp4l -f @SYSCONFDIR@/linuxptp/ptp4l.conf -i %I
+
+[Install]
+WantedBy=multi-user.target

@@ -1,4 +1,4 @@
-From 4f1ab5944c1042a141a2ce16ec8bf1d12749e41a Mon Sep 17 00:00:00 2001
+From 745294ffa9bb9296eb4250f24dd0ae8115fadd7a Mon Sep 17 00:00:00 2001
 From: Jon Mason <jon.mason@arm.com>
 Date: Thu, 27 Oct 2022 20:10:09 +0000
 Subject: [PATCH] work around visibility issue
@@ -16,7 +16,7 @@ Signed-off-by: Jon Mason <jon.mason@arm.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/BUILD.gn b/BUILD.gn
-index f55560c..d60c3e3 100644
+index f55560c540de..d60c3e37135b 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
 @@ -5,7 +5,6 @@

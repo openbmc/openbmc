@@ -17,5 +17,3 @@ RDEPENDS:${PN} += "\
         python3-six \
         python3-stevedore \
         "
-
-BBCLASSEXTEND = "native"

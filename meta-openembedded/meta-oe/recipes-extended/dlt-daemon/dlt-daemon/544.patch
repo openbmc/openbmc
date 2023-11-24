@@ -1,0 +1,80 @@
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/544]
+
+From 8121a979026d5fcb05bd4e5d3a0647f321b56106 Mon Sep 17 00:00:00 2001
+From: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Date: Thu, 28 Sep 2023 12:54:23 +0200
+Subject: [PATCH] Add common dlt_cdh_cpuinfo.c to unblock build on non amd64
+ and i386 arcs
+
+---
+ src/core_dump_handler/dlt_cdh.h         |  2 ++
+ src/core_dump_handler/dlt_cdh_cpuinfo.c | 33 +++++++++++++++++++++++++
+ src/core_dump_handler/dlt_cdh_crashid.c |  2 +-
+ 3 files changed, 36 insertions(+), 1 deletion(-)
+ create mode 100644 src/core_dump_handler/dlt_cdh_cpuinfo.c
+
+diff --git a/src/core_dump_handler/dlt_cdh.h b/src/core_dump_handler/dlt_cdh.h
+index d572ecf3..8608c6c4 100644
+--- a/src/core_dump_handler/dlt_cdh.h
++++ b/src/core_dump_handler/dlt_cdh.h
+@@ -55,6 +55,8 @@ typedef struct
+     uint64_t pc;
+     uint64_t ip;
+     uint64_t lr;
++    uint64_t sp;
++    uint64_t fp;
+ 
+ } cdh_registers_t;
+ 
+diff --git a/src/core_dump_handler/dlt_cdh_cpuinfo.c b/src/core_dump_handler/dlt_cdh_cpuinfo.c
+new file mode 100644
+index 00000000..03509fda
+--- /dev/null
++++ b/src/core_dump_handler/dlt_cdh_cpuinfo.c
+@@ -0,0 +1,33 @@
++/*
++ * SPDX license identifier: MPL-2.0
++ *
++ * Copyright (C) 2011-2015, BMW AG
++ *
++ * This file is part of COVESA Project DLT - Diagnostic Log and Trace.
++ *
++ * This Source Code Form is subject to the terms of the
++ * Mozilla Public License (MPL), v. 2.0.
++ * If a copy of the MPL was not distributed with this file,
++ * You can obtain one at http://mozilla.org/MPL/2.0/.
++ *
++ * For further information see http://www.covesa.org/.
++ */
++
++/*!
++ * \author Gianfranco Costamagna <locutusofborg@debian.org>
++ *
++ * \copyright Copyright © 2011-2015 BMW AG. \n
++ * License MPL-2.0: Mozilla Public License version 2.0 http://mozilla.org/MPL/2.0/.
++ *
++ * \file dlt_cdh_cpuinfo.c
++ */
++
++#include "dlt_cdh_cpuinfo.h"
++
++void get_registers(prstatus_t *prstatus, cdh_registers_t *registers)
++{
++/*    struct user_regs_struct *ptr_reg = (struct user_regs_struct *)prstatus->pr_reg;
++
++    registers->pc = ptr_reg->pc;*/ /* [REG_PROC_COUNTER]; */
++
++}
+diff --git a/src/core_dump_handler/dlt_cdh_crashid.c b/src/core_dump_handler/dlt_cdh_crashid.c
+index bca44e0e..8dd98d70 100644
+--- a/src/core_dump_handler/dlt_cdh_crashid.c
++++ b/src/core_dump_handler/dlt_cdh_crashid.c
+@@ -30,7 +30,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <errno.h>
+-#include <asm/prctl.h>
++#include <sys/prctl.h>
+ #include <inttypes.h>
+ 
+ #include "dlt_cdh.h"

@@ -1,0 +1,33 @@
+From e5057a10641a7c84186bcbbcd12ee904300ebc53 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Fri, 13 Oct 2023 15:19:32 +0100
+Subject: [PATCH] Enables on-disk capsule update feature
+
+Enables on-disk capsule update feature for corstone1000.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Inappropriate [Redesign of Capsule update interface is required]
+---
+ lib/efi_loader/efi_capsule.c | 5 ++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index e1c78d8c1c..63e4c06e58 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -1499,7 +1499,12 @@ efi_status_t efi_launch_capsules(void)
+			index = 0;
+		ret = efi_capsule_read_file(files[i], &capsule);
+		if (ret == EFI_SUCCESS) {
++			#if IS_ENABLED(CONFIG_TARGET_CORSTONE1000)
++			/* capsule update only supports 1 image and no scatter gather list for corstone1000 */
++			efi_update_capsule(&capsule, 1, 0);
++			#elif
+			ret = efi_capsule_update_firmware(capsule);
++			#endif
+			if (ret != EFI_SUCCESS) {
+				log_err("Applying capsule %ls failed.\n",
+					files[i]);
+--
+2.25.1
+

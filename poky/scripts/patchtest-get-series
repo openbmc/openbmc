@@ -1,0 +1,115 @@
+#!/bin/bash -e
+#
+# get-latest-series: Download latest patch series from Patchwork
+#
+# Copyright (C) 2023 BayLibre Inc.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+# the interval into the past which we want to check for new series, in minutes
+INTERVAL_MINUTES=30
+
+# Maximum number of series to retrieve. the Patchwork API can support up to 250
+# at once
+SERIES_LIMIT=250
+
+# Location to save patches
+DOWNLOAD_PATH="."
+
+# Name of the file to use/check as a log of previously-tested series IDs
+SERIES_TEST_LOG=".series_test.log"
+
+# Patchwork project to pull series patches from
+PROJECT="oe-core"
+
+# The Patchwork server to pull from
+SERVER="https://patchwork.yoctoproject.org/api/1.2/"
+
+help()
+{
+    echo "Usage: get-latest-series [ -i | --interval MINUTES ]
+        [ -d | --directory DIRECTORY ]
+        [ -l | --limit COUNT ]
+        [ -h | --help ]
+        [ -t | --tested-series LOGFILE]
+        [ -p | --project PROJECT ]
+        [ -s | --server SERVER ]"
+    exit 2
+}
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -i|--interval)
+        INTERVAL_MINUTES=$2
+        shift 2
+        ;;
+    -l|--limit)
+        SERIES_LIMIT=$2
+        shift 2
+        ;;
+    -d|--directory)
+        DOWNLOAD_PATH=$2
+        shift 2
+        ;;
+    -p|--project)
+        PROJECT=$2
+        shift 2
+        ;;
+    -s|--server)
+        SERVER=$2
+        shift 2
+        ;;
+    -t|--tested-series)
+        SERIES_TEST_LOG=$2
+        shift 2
+        ;;
+    -h|--help)
+            help
+        ;;
+    *)
+        echo "Unknown option $1"
+        help
+        ;;
+    esac
+done
+
+# The time this script is running at
+START_TIME=$(date --date "now" +"%Y-%m-%dT%H:%M:%S")
+
+# the corresponding timestamp we want to check against for new patch series
+SERIES_CHECK_LIMIT=$(date --date "now - ${INTERVAL_MINUTES} minutes" +"%Y-%m-%dT%H:%M:%S")
+
+echo "Start time is $START_TIME"
+echo "Series check limit is $SERIES_CHECK_LIMIT"
+
+# Create DOWNLOAD_PATH if it doesn't exist
+if [ ! -d "$DOWNLOAD_PATH" ]; then
+    mkdir "${DOWNLOAD_PATH}"
+fi
+
+# Create SERIES_TEST_LOG if it doesn't exist
+if [ ! -f "$SERIES_TEST_LOG" ]; then
+    touch "${SERIES_TEST_LOG}"
+fi
+
+# Retrieve a list of series IDs from the 'git-pw series list' output. The API
+# supports a maximum of 250 results, so make sure we allow that when required
+SERIES_LIST=$(git-pw --project "${PROJECT}" --server "${SERVER}" series list --since "${SERIES_CHECK_LIMIT}" --limit "${SERIES_LIMIT}" | awk '{print $2}' | xargs | sed -e 's/[^0-9 ]//g')
+
+if [ -z "$SERIES_LIST" ]; then
+    echo "No new series for project ${PROJECT} since ${SERIES_CHECK_LIMIT}"
+    exit 0
+fi
+
+# Check each series ID
+for SERIES in $SERIES_LIST; do
+    # Download the series only if it's not found in the SERIES_TEST_LOG
+    if ! grep -w --quiet "${SERIES}" "${SERIES_TEST_LOG}"; then
+        echo "Downloading $SERIES..."
+        git-pw series download --separate "${SERIES}" "${DOWNLOAD_PATH}"
+        echo "${SERIES}" >> "${SERIES_TEST_LOG}"
+    else
+        echo "Already tested ${SERIES}. Skipping..."
+    fi
+done

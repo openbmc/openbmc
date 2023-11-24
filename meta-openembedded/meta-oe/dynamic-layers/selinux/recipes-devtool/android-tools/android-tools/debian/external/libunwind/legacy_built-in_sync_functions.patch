@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Replace the legacy __sync built-in functions with __atomic ones
  libunwind uses the built-in __sync_* functions which are deprecated by GCC and
  should be replaced by __atomic_* ones. See the official manuals [1].

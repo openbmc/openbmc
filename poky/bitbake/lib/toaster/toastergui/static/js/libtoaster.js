@@ -657,7 +657,7 @@ $(document).ready(function() {
     hljs.initHighlightingOnLoad();
 
     // Prevent invalid links from jumping page scroll
-    $('a[href=#]').click(function() {
+    $('a[href="#"]').click(function() {
         return false;
     });
 

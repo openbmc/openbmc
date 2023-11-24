@@ -12,7 +12,7 @@ update since the tfm bl1 does not sync metadata and nv counters in OTP during
 the boot anymore.
 
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/24104/7]
 
 ---
  .../arm/corstone1000/fw_update_agent/fwu_agent.c       | 10 +++++++---

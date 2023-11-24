@@ -24,6 +24,8 @@ Signed-off-by: Lifang Xia <lifang_xia@linux.alibaba.com>
 Signed-off-by: Mao Han <han_mao@linux.alibaba.com>
 Change-Id: Ib21ddf23cc83f332af202df7bffcaceec16063e0
 ---
+Upstream-Status: Pending
+
  system/core/libunwindstack/Android.bp              |   1 +
  system/core/libunwindstack/Elf.cpp                 |   2 +
  system/core/libunwindstack/Regs.cpp                |  10 ++

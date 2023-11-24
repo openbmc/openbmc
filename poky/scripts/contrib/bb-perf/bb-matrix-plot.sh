@@ -16,8 +16,8 @@
 
 # Setup the defaults
 DATFILE="bb-matrix.dat"
-XLABEL="BB_NUMBER_THREADS"
-YLABEL="PARALLEL_MAKE"
+XLABEL="BB\\\\_NUMBER\\\\_THREADS"
+YLABEL="PARALLEL\\\\_MAKE"
 FIELD=3
 DEF_TITLE="Elapsed Time (seconds)"
 PM3D_FRAGMENT="unset surface; set pm3d at s hidden3d 100"

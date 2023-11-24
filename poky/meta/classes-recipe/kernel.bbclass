@@ -336,7 +336,7 @@ kernel_do_transform_bundled_initramfs() {
 do_transform_bundled_initramfs[dirs] = "${B}"
 
 python do_package:prepend () {
-    os.environ['STRIP'] = d.getVar('KERNEL_STRIP')
+    d.setVar('STRIP',  d.getVar('KERNEL_STRIP').strip())
 }
 
 python do_devshell:prepend () {

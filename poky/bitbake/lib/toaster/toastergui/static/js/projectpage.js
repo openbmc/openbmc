@@ -61,7 +61,7 @@ function projectPageInit(ctx) {
         distroChangeInput.val(urlParams.setDistro);
         distroChangeBtn.click();
     } else {
-      updateDistroName(prjInfo.distro.name);
+      updateDistroName(prjInfo.distro?.name);
     }
 
    /* Now we're really ready show the page */

@@ -9,7 +9,7 @@ inherit python3native ptest
 inherit deploy
 require optee.inc
 
-DEPENDS = "optee-client optee-os-tadevkit python3-cryptography-native"
+DEPENDS = "optee-client optee-os-tadevkit python3-cryptography-native openssl"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git;branch=master;protocol=https \
            file://run-ptest \
@@ -19,10 +19,13 @@ S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 EXTRA_OEMAKE += "TA_DEV_KIT_DIR=${TA_DEV_KIT_DIR} \
+                 OPTEE_OPENSSL_EXPORT=${STAGING_INCDIR} \
                  CROSS_COMPILE_HOST=${HOST_PREFIX} \
                  CROSS_COMPILE_TA=${HOST_PREFIX} \
                  O=${B} \
                "
+
+CFLAGS += "-Wno-error=deprecated-declarations"
 
 do_compile() {
     cd ${S}

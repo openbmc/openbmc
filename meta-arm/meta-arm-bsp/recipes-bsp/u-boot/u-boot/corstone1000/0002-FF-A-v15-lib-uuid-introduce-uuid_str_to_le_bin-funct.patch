@@ -1,7 +1,7 @@
-From 43137871fcc46513eea1480cd78ad091763578f0 Mon Sep 17 00:00:00 2001
+From faa2a74ce8cc9497c551b1bee6beed5c2c2f2dee Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 4 Aug 2022 16:46:47 +0100
-Subject: [PATCH 02/33] FF-A v15: lib: uuid: introduce uuid_str_to_le_bin
+Subject: [PATCH 02/38] FF-A v15: lib: uuid: introduce uuid_str_to_le_bin
  function
 
 convert UUID string to little endian binary data

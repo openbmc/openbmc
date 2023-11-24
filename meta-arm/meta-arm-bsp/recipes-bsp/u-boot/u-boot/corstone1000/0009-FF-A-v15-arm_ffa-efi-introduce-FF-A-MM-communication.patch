@@ -1,7 +1,7 @@
-From 342844c2a5ad6beb127e1e8e52b311df77cff472 Mon Sep 17 00:00:00 2001
+From 02e38e24676d48d8a792ab6631a903ae1faa6271 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 15 Aug 2022 15:12:49 +0100
-Subject: [PATCH 09/33] FF-A v15: arm_ffa: efi: introduce FF-A MM communication
+Subject: [PATCH 09/38] FF-A v15: arm_ffa: efi: introduce FF-A MM communication
 
 Add MM communication support using FF-A transport
 

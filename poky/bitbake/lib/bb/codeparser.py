@@ -255,8 +255,8 @@ class PythonParser():
     def visit_Call(self, node):
         name = self.called_node_name(node.func)
         if name and (name.endswith(self.getvars) or name.endswith(self.getvarflags) or name in self.containsfuncs or name in self.containsanyfuncs):
-            if isinstance(node.args[0], ast.Str):
-                varname = node.args[0].s
+            if isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+                varname = node.args[0].value
                 if name in self.containsfuncs and isinstance(node.args[1], ast.Str):
                     if varname not in self.contains:
                         self.contains[varname] = set()

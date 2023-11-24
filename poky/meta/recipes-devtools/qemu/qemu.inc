@@ -56,6 +56,9 @@ CVE_STATUS[CVE-2018-18438] = "disputed: The issues identified by this CVE were d
 # https://bugzilla.redhat.com/show_bug.cgi?id=2167423
 CVE_STATUS[CVE-2023-0664] = "not-applicable-platform: Issue only applies on Windows"
 
+# As per https://bugzilla.redhat.com/show_bug.cgi?id=2203387
+CVE_STATUS[CVE-2023-2680] = "not-applicable-platform: RHEL specific issue."
+
 COMPATIBLE_HOST:mipsarchn32 = "null"
 COMPATIBLE_HOST:mipsarchn64 = "null"
 COMPATIBLE_HOST:riscv32 = "null"

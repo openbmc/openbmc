@@ -1,7 +1,7 @@
-From 4f104ef6804ffd6483d166840d113630be85edb0 Mon Sep 17 00:00:00 2001
+From 8b24115d3b41af53602bfc80bea7e134dc0edefb Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 17 Jul 2023 15:18:58 +0100
-Subject: [PATCH 06/33] FF-A v15: arm_ffa: introduce sandbox FF-A support
+Subject: [PATCH 06/38] FF-A v15: arm_ffa: introduce sandbox FF-A support
 
 Emulate Secure World's FF-A ABIs and allow testing U-Boot FF-A support
 

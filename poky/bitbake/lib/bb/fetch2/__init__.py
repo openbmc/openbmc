@@ -1579,6 +1579,7 @@ class FetchMethod(object):
             unpackdir = rootdir
 
         if not unpack or not cmd:
+            urldata.unpack_tracer.unpack("file-copy", unpackdir)
             # If file == dest, then avoid any copies, as we already put the file into dest!
             dest = os.path.join(unpackdir, os.path.basename(file))
             if file != dest and not (os.path.exists(dest) and os.path.samefile(file, dest)):
@@ -1593,6 +1594,8 @@ class FetchMethod(object):
                         destdir = urlpath.rsplit("/", 1)[0] + '/'
                         bb.utils.mkdirhier("%s/%s" % (unpackdir, destdir))
                 cmd = 'cp -fpPRH "%s" "%s"' % (file, destdir)
+        else:
+            urldata.unpack_tracer.unpack("archive-extract", unpackdir)
 
         if not cmd:
             return
@@ -1684,6 +1687,55 @@ class FetchMethod(object):
         """
         return []
 
+
+class DummyUnpackTracer(object):
+    """
+    Abstract API definition for a class that traces unpacked source files back
+    to their respective upstream SRC_URI entries, for software composition
+    analysis, license compliance and detailed SBOM generation purposes.
+    User may load their own unpack tracer class (instead of the dummy
+    one) by setting the BB_UNPACK_TRACER_CLASS config parameter.
+    """
+    def start(self, unpackdir, urldata_dict, d):
+        """
+        Start tracing the core Fetch.unpack process, using an index to map
+        unpacked files to each SRC_URI entry.
+        This method is called by Fetch.unpack and it may receive nested calls by
+        gitsm and npmsw fetchers, that expand SRC_URI entries by adding implicit
+        URLs and by recursively calling Fetch.unpack from new (nested) Fetch
+        instances.
+        """
+        return
+    def start_url(self, url):
+        """Start tracing url unpack process.
+        This method is called by Fetch.unpack before the fetcher-specific unpack
+        method starts, and it may receive nested calls by gitsm and npmsw
+        fetchers.
+        """
+        return
+    def unpack(self, unpack_type, destdir):
+        """
+        Set unpack_type and destdir for current url.
+        This method is called by the fetcher-specific unpack method after url
+        tracing started.
+        """
+        return
+    def finish_url(self, url):
+        """Finish tracing url unpack process and update the file index.
+        This method is called by Fetch.unpack after the fetcher-specific unpack
+        method finished its job, and it may receive nested calls by gitsm
+        and npmsw fetchers.
+        """
+        return
+    def complete(self):
+        """
+        Finish tracing the Fetch.unpack process, and check if all nested
+        Fecth.unpack calls (if any) have been completed; if so, save collected
+        metadata.
+        """
+        return
+
+
 class Fetch(object):
     def __init__(self, urls, d, cache = True, localonly = False, connection_cache = None):
         if localonly and cache:
@@ -1704,10 +1756,30 @@ class Fetch(object):
         if key in urldata_cache:
             self.ud = urldata_cache[key]
 
+        # the unpack_tracer object needs to be made available to possible nested
+        # Fetch instances (when those are created by gitsm and npmsw fetchers)
+        # so we set it as a global variable
+        global unpack_tracer
+        try:
+            unpack_tracer
+        except NameError:
+            class_path = d.getVar("BB_UNPACK_TRACER_CLASS")
+            if class_path:
+                # use user-defined unpack tracer class
+                import importlib
+                module_name, _, class_name = class_path.rpartition(".")
+                module = importlib.import_module(module_name)
+                class_ = getattr(module, class_name)
+                unpack_tracer = class_()
+            else:
+                # fall back to the dummy/abstract class
+                unpack_tracer = DummyUnpackTracer()
+
         for url in urls:
             if url not in self.ud:
                 try:
                     self.ud[url] = FetchData(url, d, localonly)
+                    self.ud[url].unpack_tracer = unpack_tracer
                 except NonLocalMethod:
                     if localonly:
                         self.ud[url] = None
@@ -1883,6 +1955,8 @@ class Fetch(object):
         if not urls:
             urls = self.urls
 
+        unpack_tracer.start(root, self.ud, self.d)
+
         for u in urls:
             ud = self.ud[u]
             ud.setup_localpath(self.d)
@@ -1890,10 +1964,14 @@ class Fetch(object):
             if ud.lockfile:
                 lf = bb.utils.lockfile(ud.lockfile)
 
+            unpack_tracer.start_url(u)
             ud.method.unpack(ud, root, self.d)
+            unpack_tracer.finish_url(u)
 
             if ud.lockfile:
                 bb.utils.unlockfile(lf)
+
+        unpack_tracer.complete()
 
     def clean(self, urls=None):
         """

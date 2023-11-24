@@ -7,7 +7,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import re
+import re, time
+from django.urls import reverse
 from tests.functional.functional_helpers import SeleniumFunctionalTestCase
 from orm.models import Project
 from selenium.webdriver.common.by import By
@@ -17,11 +18,11 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
 #   testcase (1514)
     def test_create_slenium_project(self):
         project_name = 'selenium-project'
-        self.get('')
-        self.driver.find_element(By.LINK_TEXT, "To start building, create your first Toaster project").click()
+        self.get(reverse('newproject'))
         self.driver.find_element(By.ID, "new-project-name").send_keys(project_name)
         self.driver.find_element(By.ID, 'projectversion').click()
         self.driver.find_element(By.ID, "create-project-button").click()
+        time.sleep(2)
         element = self.wait_until_visible('#project-created-notification')
         self.assertTrue(self.element_exists('#project-created-notification'),'Project creation notification not shown')
         self.assertTrue(project_name in element.text,
@@ -31,15 +32,18 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
 
  #  testcase (1515)
     def test_verify_left_bar_menu(self):
-        self.get('')
+        self.get(reverse('all-projects'))
         self.wait_until_visible('#projectstable')
         self.find_element_by_link_text_in_table('projectstable', 'selenium-project').click()
+        time.sleep(2)
         self.assertTrue(self.element_exists('#config-nav'),'Configuration Tab does not exist')
         project_URL=self.get_URL()
         self.driver.find_element(By.XPATH, '//a[@href="'+project_URL+'"]').click()
+        time.sleep(2)
 
         try:
             self.driver.find_element(By.XPATH, "//*[@id='config-nav']/ul/li/a[@href="+'"'+project_URL+'customimages/"'+"]").click()
+            time.sleep(2)
             self.assertTrue(re.search("Custom images",self.driver.find_element(By.XPATH, "//div[@class='col-md-10']").text),'Custom images information is not loading properly')
         except:
             self.fail(msg='No Custom images tab available')
@@ -78,14 +82,16 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
     def test_review_configuration_information(self):
         self.get('')
         self.driver.find_element(By.XPATH, "//div[@id='global-nav']/ul/li/a[@href="+'"'+'/toastergui/projects/'+'"'+"]").click()
+        time.sleep(2)
         self.wait_until_visible('#projectstable')
         self.find_element_by_link_text_in_table('projectstable', 'selenium-project').click()
         project_URL=self.get_URL()
-
+        time.sleep(2)
         try:
            self.assertTrue(self.element_exists('#machine-section'),'Machine section for the project configuration page does not exist')
            self.assertTrue(re.search("qemux86",self.driver.find_element(By.XPATH, "//span[@id='project-machine-name']").text),'The machine type is not assigned')
            self.driver.find_element(By.XPATH, "//span[@id='change-machine-toggle']").click()
+           time.sleep(2)
            self.wait_until_visible('#select-machine-form')
            self.wait_until_visible('#cancel-machine-change')
            self.driver.find_element(By.XPATH, "//form[@id='select-machine-form']/a[@id='cancel-machine-change']").click()
@@ -123,13 +129,16 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
     def test_verify_machine_information(self):
         self.get('')
         self.driver.find_element(By.XPATH, "//div[@id='global-nav']/ul/li/a[@href="+'"'+'/toastergui/projects/'+'"'+"]").click()
+        time.sleep(2)
         self.wait_until_visible('#projectstable')
         self.find_element_by_link_text_in_table('projectstable', 'selenium-project').click()
+        time.sleep(2)
 
         try:
             self.assertTrue(self.element_exists('#machine-section'),'Machine section for the project configuration page does not exist')
             self.assertTrue(re.search("qemux86",self.driver.find_element(By.ID, "project-machine-name").text),'The machine type is not assigned')
             self.driver.find_element(By.ID, "change-machine-toggle").click()
+            time.sleep(2)
             self.wait_until_visible('#select-machine-form')
             self.wait_until_visible('#cancel-machine-change')
             self.driver.find_element(By.ID, "cancel-machine-change").click()
@@ -140,14 +149,15 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
     def test_verify_most_built_recipes_information(self):
         self.get('')
         self.driver.find_element(By.XPATH, "//div[@id='global-nav']/ul/li/a[@href="+'"'+'/toastergui/projects/'+'"'+"]").click()
-
+        time.sleep(2)
         self.wait_until_visible('#projectstable')
         self.find_element_by_link_text_in_table('projectstable', 'selenium-project').click()
         project_URL=self.get_URL()
-
+        time.sleep(2)
         try:
             self.assertTrue(re.search("You haven't built any recipes yet",self.driver.find_element(By.ID, "no-most-built").text),'Default message of no builds is not present')
             self.driver.find_element(By.XPATH, "//div[@id='no-most-built']/p/a[@href="+'"'+project_URL+'images/"'+"]").click()
+            time.sleep(2)
             self.assertTrue(re.search("Compatible image recipes",self.driver.find_element(By.XPATH, "//div[@class='col-md-10']").text),'The Choose a recipe to build link  is not working  properly')
         except:
             self.fail(msg='No Most built information in project detail page')
@@ -156,8 +166,10 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
     def test_verify_project_release_information(self):
         self.get('')
         self.driver.find_element(By.XPATH, "//div[@id='global-nav']/ul/li/a[@href="+'"'+'/toastergui/projects/'+'"'+"]").click()
+        time.sleep(2)
         self.wait_until_visible('#projectstable')
         self.find_element_by_link_text_in_table('projectstable', 'selenium-project').click()
+        time.sleep(2)
 
         try:
             self.assertTrue(re.search("Yocto Project master",self.driver.find_element(By.ID, "project-release-title").text),'The project release is not defined')
@@ -171,12 +183,12 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
         self.wait_until_visible('#projectstable')
         self.find_element_by_link_text_in_table('projectstable', 'selenium-project').click()
         project_URL=self.get_URL()
-
+        time.sleep(2)
         try:
            self.driver.find_element(By.XPATH, "//div[@id='layer-container']")
            self.assertTrue(re.search("3",self.driver.find_element(By.ID, "project-layers-count").text),'There should be 3 layers listed in the layer count')
            layer_list = self.driver.find_element(By.ID, "layers-in-project-list")
-           layers = layer_list.find_element(By.TAG_NAME, "li")
+           layers = layer_list.find_elements(By.TAG_NAME, "li")
 
            for layer in layers:
                if re.match ("openembedded-core",layer.text):
@@ -199,10 +211,11 @@ class FuntionalTestBasic(SeleniumFunctionalTestCase):
     def test_verify_project_detail_links(self):
         self.get('')
         self.driver.find_element(By.XPATH, "//div[@id='global-nav']/ul/li/a[@href="+'"'+'/toastergui/projects/'+'"'+"]").click()
+        time.sleep(2)
         self.wait_until_visible('#projectstable')
         self.find_element_by_link_text_in_table('projectstable', 'selenium-project').click()
         project_URL=self.get_URL()
-
+        time.sleep(2)
         self.driver.find_element(By.XPATH, "//div[@id='project-topbar']/ul[@class='nav nav-tabs']/li[@id='topbar-configuration-tab']/a[@href="+'"'+project_URL+'"'+"]").click()
         self.assertTrue(re.search("Configuration",self.driver.find_element(By.XPATH, "//div[@id='project-topbar']/ul[@class='nav nav-tabs']/li[@id='topbar-configuration-tab']/a[@href="+'"'+project_URL+'"'+"]").text), 'Configuration tab in project topbar is misspelled')
 

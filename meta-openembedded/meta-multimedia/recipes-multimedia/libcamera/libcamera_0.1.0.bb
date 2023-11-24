@@ -50,8 +50,11 @@ do_install:append() {
     chrpath -d ${D}${libexecdir}/libcamera/v4l2-compat.so
 }
 
-addtask do_recalculate_ipa_signatures_package after do_package before do_packagedata
-do_recalculate_ipa_signatures_package() {
+do_package:append() {
+    bb.build.exec_func("do_package_recalculate_ipa_signatures", d)
+}
+
+do_package_recalculate_ipa_signatures() {
     local modules
     for module in $(find ${PKGD}/usr/lib/libcamera -name "*.so.sign"); do
         module="${module%.sign}"

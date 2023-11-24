@@ -29,10 +29,13 @@ PTESTS_FAST_META_PYTHON = "\
     python3-prettytable \
     python3-pylint \
     python3-ptyprocess \
+    python3-py-cpuinfo \
     python3-pyasn1-modules \
     python3-pyroute2 \
     python3-pyserial \
+    python3-pytest-mock \
     python3-pytoml \
+    python3-rapidjson \
     python3-requests-file \
     python3-requests-toolbelt \
     python3-semver \
@@ -70,9 +73,7 @@ PTESTS_PROBLEMS_META_PYTHON ="\
     python3-parse \
     python3-pillow \
     python3-pint \
-    python3-py-cpuinfo \
     python3-pytest-lazy-fixture \
-    python3-pytest-mock \
     python3-pyzmq \
     python3-scrypt \
     python3-service-identity \

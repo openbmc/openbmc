@@ -19,5 +19,3 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-txaio \
     ${PYTHON_PN}-six \
 "
-
-BBCLASSEXTEND = "native nativesdk"

@@ -17,4 +17,4 @@ RDEPENDS:${PN} += "\
     python3-threading \
 "
 
-BBCLASSEXTEND = "native nativesdk"
+BBCLASSEXTEND = "native"

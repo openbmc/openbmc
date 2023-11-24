@@ -30,8 +30,6 @@ EXTRA_OECONF:class-native += " --with-pdftops=pdftops \
                                     --disable-ldap \
                                     --with-png --without-jpeg --without-tiff"
 
-BBCLASSEXTEND = "native"
-
 PACKAGECONFIG[jpeg] = "--with-jpeg,--without-jpeg,jpeg"
 PACKAGECONFIG[png] = "--with-png,--without-png,libpng"
 PACKAGECONFIG[tiff] = "--with-tiff,--without-tiff,tiff"

@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 Description: Defer packaging fastdeploy with adb for 29.x.x tags.
 Forwarded: not-needed
 --- a/system/core/adb/client/commandline.cpp

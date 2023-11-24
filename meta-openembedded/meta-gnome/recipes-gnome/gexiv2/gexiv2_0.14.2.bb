@@ -25,3 +25,11 @@ src_package_preprocess () {
         sed -i -e "s,${B}/../${BPN}-${PV}/${BPN}/,,g" \
             ${B}/gexiv2/gexiv2-enums.cpp
 }
+
+do_install:append() {
+        # gexiv2 harcodes usr/lib as install path, so this corrects it to actual libdir
+        if [ "${prefix}/lib" != "${libdir}" ]; then
+            mv ${D}/${prefix}/lib/* ${D}/${libdir}/
+            rm -rf ${D}/${prefix}/lib
+        fi
+}

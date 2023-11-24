@@ -1,0 +1,25 @@
+From 7a4515a356a3d5eb2af1f602c77a42a544e71efa Mon Sep 17 00:00:00 2001
+From: Jan Beich <jbeich@FreeBSD.org>
+Date: Sun, 9 Jul 2023 03:30:47 +0000
+Subject: [PATCH] build: properly spell [provide] in *.wrap files
+
+meson.build:1:0: ERROR: Unexpected "[provides]" section, did you mean "[provide]"?
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gupnp/-/commit/884639bd29323cbb8fbd36bc69d08097a2ae2cd1]
+---
+ subprojects/gssdp-1.2.wrap | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/subprojects/gssdp-1.2.wrap b/subprojects/gssdp-1.2.wrap
+index 469c75d..466b83b 100644
+--- a/subprojects/gssdp-1.2.wrap
++++ b/subprojects/gssdp-1.2.wrap
+@@ -3,6 +3,6 @@ url = https://gitlab.gnome.org/GNOME/gssdp.git
+ revision = gssdp-1.4
+ depth = 1
+  
+-[provides]
++[provide]
+ dependency_name = gssdp-1.2
+ 

@@ -7,7 +7,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Upstream-Status: Accepted
+Upstream-Status: Backport
 Signed-off-by: Eivind Næss <eivnaes@yahoo.com>
 ---
  Makefile.am                                   |  5 +-

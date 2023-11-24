@@ -589,6 +589,8 @@ class Git(FetchMethod):
         destdir = ud.destdir = os.path.join(destdir, destsuffix)
         if os.path.exists(destdir):
             bb.utils.prunedir(destdir)
+        if not ud.bareclone:
+            ud.unpack_tracer.unpack("git", destdir)
 
         need_lfs = self._need_lfs(ud)
 

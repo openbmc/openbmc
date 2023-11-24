@@ -1,0 +1,227 @@
+From e3e0465a25f9b1607b2e5ed42afb7b556aa8b9bc Mon Sep 17 00:00:00 2001
+From: Debbie Martin <Debbie.Martin@arm.com>
+Date: Wed, 4 Oct 2023 18:40:18 +0100
+Subject: [PATCH] [PATCH] check-sr-results: Change the expected SR result
+ config
+
+Update the check-sr-results.yaml and format-sr-results.yaml files for the
+Systemready IR suite. These changes are required because of the
+following known differences of fvp-base outputs to those expected by the
+SystemReady scripts.
+
+Changes to check-sr-results.yaml:
+  1. acs-console.log:
+      a. must-have-esp: EFI partition/variable persistence not supported due to
+         FVP reset.
+      b. warn-once-if-contains "-dirty": BL1, BL2, and BL31 have dirty versions.
+      c. must-contain "efi: ESRT=0x" and "'esrt: Reserving ESRT space from 0x'":
+         Capsule updates are not supported.
+      d. error-if-contains: "No EFI system partition" and "Failed to persist
+         EFI variables": EFI partition/variable persistence not supported due to
+         FVP reset.
+  2. acs_results/result.md:
+      a. must-contain "Failure: |0|": Capsule and EFI partition failures make
+         the total 20.
+  3. acs_results/CapsuleApp_ESRT_table_info.log:
+      a. capsuleapp-esrt: Capsule updates are not supported.
+      b. must-contain "'EFI_SYSTEM_RESOURCE_TABLE:'" and
+         "EFI_SYSTEM_RESOURCE_ENTRY": EFI partition/variable persistence not
+         supported due to FVP reset.
+      c. must-contain "FwClass": Capsule updates are not supported.
+      d. error-if-contains "ESRT - Not Found": Capsule updates are not
+         supported.
+  4. acs_results/CapsuleApp_FMP_protocol_info.log:
+      a. warn-if-contains "Aborted test": Capsule updates are not supported.
+         This patch also adds must-contain for the specific totals of the test
+         categories due to allowing the "Aborted test" string.
+  5. acs_results/linux_dump/firmware/efi/esrt:
+      a. Remove whole directory because capsule updates are not supported.
+  6. acs_results/uefi/temp:
+      a. Set min-entries to 0: this defaults to 1 despite the directory being
+         optional, so errors if a directory is empty.
+  7. acs_results/uefi_dump:
+      a. min-entries is 13: change this to 11 due to smbiosview.log being
+         optional and the change to make map.log optional.
+  8. acs_results/uefi_dump/dh.log:
+      a. must-contain "EFISystemPartition": EFI partition/variable persistence
+         not supported due to FVP reset.
+      b. must-contain "FirmwareManagement": Capsule updates are not supported.
+  9. acs_results/uefi_dump/map.log:
+      a. Make optional because it isn't populated for IR.
+  10. fw:
+      a. Make optional because capsule updates are not supported.
+  11. os-logs:
+      a. Make optional because distro installation isn't done as part of ACS.
+
+Changes to format-sr-results.yaml:
+  1. Remove the SIE section (not supported on fvp-base and, if present, causes
+     format-sr-results.py to error).
+
+Upstream-Status: Inappropriate
+Signed-off-by: Debbie Martin <Debbie.Martin@arm.com>
+---
+ check-sr-results.yaml  | 34 ++++++++++++++--------------------
+ format-sr-results.yaml | 15 ---------------
+ 2 files changed, 14 insertions(+), 35 deletions(-)
+
+diff --git a/check-sr-results.yaml b/check-sr-results.yaml
+index a4235de..555fb71 100644
+--- a/check-sr-results.yaml
++++ b/check-sr-results.yaml
+@@ -10,7 +10,6 @@ check-sr-results-configuration:
+ # The following tree applies to all ACS-IR 2.0 versions.
+ tree:
+   - file: acs-console.log
+-    must-have-esp:
+     must-contain:
+       - Booting `bbr/bsa'
+       - Press any key to stop the EFI SCT running
+@@ -24,8 +23,6 @@ tree:
+       - 'EFI stub: Booting Linux Kernel...'
+       - 'EFI stub: Using DTB from configuration table'
+       - Linux version
+-      - 'efi: ESRT=0x'
+-      - 'esrt: Reserving ESRT space from 0x'
+       - systemd
+       - Executing FWTS for EBBR
+       - 'Test: UEFI'
+@@ -36,13 +33,9 @@ tree:
+       - ACS run is completed
+       - Please press <Enter> to continue ...
+     warn-once-if-contains:
+-      - -dirty
+       - 'EFI stub: ERROR:'
+       - 'FIRMWARE BUG:'
+       - OVERLAP DETECTED
+-    error-if-contains:
+-      - No EFI system partition
+-      - Failed to persist EFI variables
+   - dir: acs_results
+     min-entries: 8  # Allow missing result.md
+     max-entries: 9
+@@ -53,7 +46,7 @@ tree:
+         must-contain:
+           - SCT Summary
+           - Dropped:|0|
+-          - Failure:|0|
++          - Failure:|20|
+           - Warning:|0|
+           - Dropped by group
+           - Failure by group
+@@ -64,16 +57,11 @@ tree:
+         max-entries: 2
+         tree:
+           - file: CapsuleApp_ESRT_table_info.log
+-            capsuleapp-esrt:
+             must-contain:
+               - ESRT TABLE
+-              - 'EFI_SYSTEM_RESOURCE_TABLE:'
+-              - EFI_SYSTEM_RESOURCE_ENTRY
+-              - FwClass
+             error-if-contains:
+               - FwResourceCount    - 0x0
+               - FwResourceCountMax - 0x0
+-              - ESRT - Not Found
+           - file: CapsuleApp_FMP_protocol_info.log
+             must-contain:
+               - FMP DATA
+@@ -95,9 +83,14 @@ tree:
+               - 'Medium failures: NONE'
+               - 'Low failures: NONE'
+               - 'Other failures: NONE'
++              - 'dt_base        |    3|     |     |     |     |     |'
++              - 'esrt           |     |     |    2|     |     |     |'
++              - 'uefibootpath   |     |     |     |     |     |     |'
++              - 'uefirtmisc     |    1|     |     |     |    8|     |'
++              - 'uefirttime     |    4|     |     |     |   35|     |'
++              - 'uefirtvariable |    2|     |     |     |   10|     |'
++              - 'uefivarinfo    |     |     |     |     |    1|     |'
+               - 'Total:'
+-            warn-if-contains:
+-              - Aborted test
+             error-if-contains:
+               - FAILED
+               - This is an invalid entry.
+@@ -180,6 +173,7 @@ tree:
+                     tree:
+                       - file: OsIndicationsSupported-*
+                   - dir: esrt
++                    optional:
+                     tree:
+                       - dir: entries
+                         tree:
+@@ -314,8 +308,9 @@ tree:
+               - BSA tests complete. Reset the system.
+           - dir: temp   # This sometimes remains; ignore it
+             optional:
++            min-entries: 0
+       - dir: uefi_dump
+-        min-entries: 13
++        min-entries: 11
+         max-entries: 13
+         tree:
+           - file: bcfg.log
+@@ -331,8 +326,6 @@ tree:
+             must-contain:
+               - Handle dump
+               - DevicePath
+-              - EFISystemPartition
+-              - FirmwareManagement
+               - SimpleTextOut
+           - file: dmem.log
+             must-contain:
+@@ -355,6 +348,7 @@ tree:
+               - DRIVER NAME
+           - file: ifconfig.log
+           - file: map.log
++            optional:
+             must-contain:
+               - Mapping table
+               - /HD(1,GPT,
+@@ -392,7 +386,7 @@ tree:
+   - dir: docs
+     optional:
+   - dir: fw
+-    min-entries: 3
++    optional:
+     tree:
+       - file: u-boot-sniff.log
+         must-contain:
+@@ -500,7 +494,7 @@ tree:
+   - dir: manual-results
+     optional:
+   - dir: os-logs
+-    min-entries: 2
++    optional:
+     tree:
+       - file: 'OS-image-download-links.txt'
+         optional:
+diff --git a/format-sr-results.yaml b/format-sr-results.yaml
+index dd34cd6..20b69de 100644
+--- a/format-sr-results.yaml
++++ b/format-sr-results.yaml
+@@ -47,21 +47,6 @@ subs:
+         extract:
+           filename: "acs_results/linux_dump/firmware/devicetree/base/psci/\
+             compatible"
+-  - heading: BBSR Compliance
+-    paragraph: TBD
+-    subs:
+-      - heading: SIE SCT
+-        extract:
+-          filename: acs_results/SIE/result.md
+-          find: '# SCT Summary'
+-          first-line: 4
+-          last-line:
+-        paragraph: TBD
+-      - heading: SIE FWTS
+-        extract:
+-          filename: acs_results/SIE/fwts/FWTSResults.log
+-          find: Test Failure Summary
+-        paragraph: TBD
+   - heading: BSA Compliance (informative)
+     paragraph: TBD
+     subs:
+--
+2.25.1
+

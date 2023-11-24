@@ -129,31 +129,97 @@ NVD about CVE entries can be provided through the `NVD contact form <https://nvd
 Fixing vulnerabilities in recipes
 =================================
 
-If a CVE security issue impacts a software component, it can be fixed by updating to a newer
-version of the software component, by applying a patch or by marking it as patched via
-:term:`CVE_STATUS` variable flag. For Poky and OE-Core master branches, updating
-to a newer software component release with fixes is the best option, but patches can be applied
-if releases are not yet available.
+Suppose a CVE security issue impacts a software component. In that case, it can
+be fixed by updating to a newer version, by applying a patch, or by marking it
+as patched via :term:`CVE_STATUS` variable flag. For Poky and OE-Core master
+branches, updating to a more recent software component release with fixes is
+the best option, but patches can be applied if releases are not yet available.
 
-For stable branches, it is preferred to apply patches for the issues. For some software
-components minor version updates can also be applied if they are backwards compatible.
+For stable branches, we want to avoid API (Application Programming Interface)
+or ABI (Application Binary Interface) breakages. When submitting an update,
+a minor version update of a component is preferred if the version is
+backward-compatible. Many software components have backward-compatible stable
+versions, with a notable example of the Linux kernel. However, if the new
+version does or likely might introduce incompatibilities, extracting and
+backporting patches is preferred.
 
 Here is an example of fixing CVE security issues with patch files,
-an example from the :oe_layerindex:`ffmpeg recipe</layerindex/recipe/47350>`::
+an example from the :oe_layerindex:`ffmpeg recipe for dunfell </layerindex/recipe/122174>`::
 
    SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
+              file://mips64_cpu_detection.patch \
+              file://CVE-2020-12284.patch \
               file://0001-libavutil-include-assembly-with-full-path-from-sourc.patch \
-              file://fix-CVE-2020-20446.patch \
-              file://fix-CVE-2020-20453.patch \
-              file://fix-CVE-2020-22015.patch \
-              file://fix-CVE-2020-22021.patch \
-              file://fix-CVE-2020-22033-CVE-2020-22019.patch \
-              file://fix-CVE-2021-33815.patch \
+              file://CVE-2021-3566.patch \
+              file://CVE-2021-38291.patch \
+              file://CVE-2022-1475.patch \
+              file://CVE-2022-3109.patch \
+              file://CVE-2022-3341.patch \
+              file://CVE-2022-48434.patch \
+          "
 
-A good practice is to include the CVE identifier in both the patch file name
-and inside the patch file commit message using the format::
+The recipe has both generic and security-related fixes. The CVE patch files are named
+according to the CVE they fix.
 
-   CVE: CVE-2020-22033
+When preparing the patch file, take the original patch from the upstream repository.
+Do not use patches from different distributions, except if it is the only available source.
+
+Modify the patch adding OE-related metadata. We will follow the example of the
+``CVE-2022-3341.patch``.
+
+The original `commit message <https://github.com/FFmpeg/FFmpeg/commit/9cf652cef49d74afe3d454f27d49eb1a1394951e.patch/>`__
+is::
+
+   From 9cf652cef49d74afe3d454f27d49eb1a1394951e Mon Sep 17 00:00:00 2001
+   From: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+   Date: Wed, 23 Feb 2022 10:31:59 +0800
+   Subject: [PATCH] avformat/nutdec: Add check for avformat_new_stream
+
+   Check for failure of avformat_new_stream() and propagate
+   the error code.
+
+   Signed-off-by: Michael Niedermayer <michael@niedermayer.cc>
+   ---
+    libavformat/nutdec.c | 16 ++++++++++++----
+    1 file changed, 12 insertions(+), 4 deletions(-)
+
+
+For the correct operations of the ``cve-check``, it requires the CVE
+identification in a ``CVE:`` tag of the patch file commit message using
+the format::
+
+   CVE: CVE-2022-3341
+
+It is also recommended to add the ``Upstream-Status:`` tag with a link
+to the original patch and sign-off by people working on the backport.
+If there are any modifications to the original patch, note them in
+the ``Comments:`` tag.
+
+With the additional information, the header of the patch file in OE-core becomes::
+
+   From 9cf652cef49d74afe3d454f27d49eb1a1394951e Mon Sep 17 00:00:00 2001
+   From: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+   Date: Wed, 23 Feb 2022 10:31:59 +0800
+   Subject: [PATCH] avformat/nutdec: Add check for avformat_new_stream
+
+   Check for failure of avformat_new_stream() and propagate
+   the error code.
+
+   Signed-off-by: Michael Niedermayer <michael@niedermayer.cc>
+
+   CVE: CVE-2022-3341
+
+   Upstream-Status: Backport [https://github.com/FFmpeg/FFmpeg/commit/9cf652cef49d74afe3d454f27d49eb1a1394951e]
+
+   Comments: Refreshed Hunk
+   Signed-off-by: Narpat Mali <narpat.mali@windriver.com>
+   Signed-off-by: Bhabu Bindu <bhabu.bindu@kpit.com>
+   ---
+    libavformat/nutdec.c | 16 ++++++++++++----
+    1 file changed, 12 insertions(+), 4 deletions(-)
+
+A good practice is to include the CVE identifier in the patch file name, the patch file
+commit message and optionally in the recipe commit message.
 
 CVE checker will then capture this information and change the CVE status to ``Patched``
 in the generated reports.
@@ -161,8 +227,16 @@ in the generated reports.
 If analysis shows that the CVE issue does not impact the recipe due to configuration, platform,
 version or other reasons, the CVE can be marked as ``Ignored`` by using
 the :term:`CVE_STATUS` variable flag with appropriate reason which is mapped to ``Ignored``.
-As mentioned previously, if data in the CVE database is wrong, it is recommend to fix those
-issues in the CVE database directly.
+The entry should have the format like::
+
+   CVE_STATUS[CVE-2016-10642] = "cpe-incorrect: This is specific to the npm package that installs cmake, so isn't relevant to OpenEmbedded"
+
+As mentioned previously, if data in the CVE database is wrong, it is recommended
+to fix those issues in the CVE database (NVD in the case of OE-core and Poky)
+directly.
+
+Note that if there are many CVEs with the same status and reason, those can be
+shared by using the :term:`CVE_STATUS_GROUPS` variable.
 
 Recipes can be completely skipped by CVE check by including the recipe name in
 the :term:`CVE_CHECK_SKIP_RECIPE` variable.

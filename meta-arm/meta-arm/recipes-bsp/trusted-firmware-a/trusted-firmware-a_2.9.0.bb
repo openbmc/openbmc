@@ -10,8 +10,8 @@ SRC_URI:append:qemuarm64-secureboot = " \
 
 LIC_FILES_CHKSUM += "file://docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde"
 
-# mbed TLS v2.28.4
-SRC_URI_MBEDTLS = "git://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;destsuffix=git/mbedtls;branch=mbedtls-2.28"
-SRCREV_mbedtls = "aeb97a18913a86f051afab11b2c92c6be0c2eb83"
+# mbedtls-3.4.0
+SRC_URI_MBEDTLS = "git://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;destsuffix=git/mbedtls;branch=master"
+SRCREV_mbedtls = "1873d3bfc2da771672bd8e7e8f41f57e0af77f33"
 
 LIC_FILES_CHKSUM_MBEDTLS = "file://mbedtls/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"

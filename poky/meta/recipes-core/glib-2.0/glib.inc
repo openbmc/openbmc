@@ -57,11 +57,6 @@ FILES:${PN} = "${libdir}/lib*${SOLIBS} \
                ${datadir}/glib-2.0/dtds \
                ${datadir}/glib-2.0/schemas"
 
-FILES:${PN}-utils += "${bindir}/glib-genmarshal \
-                      ${bindir}/glib-gettextize \
-                      ${bindir}/glib-mkenums \
-                      ${bindir}/glib-compile-resources"
-
 FILES:${PN}-dev += "${libdir}/glib-2.0/include \
                     ${libdir}/gio/modules/lib*${SOLIBSDEV} \
                     ${libdir}/gio/modules/*.la \

@@ -9,6 +9,9 @@ inherit pypi python_setuptools_build_meta
 
 DEPENDS += "${PYTHON_PN}-hatch-vcs-native"
 
+UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/PyHamcrest/"
+UPSTREAM_CHECK_REGEX = "/PyHamcrest/(?P<pver>(\d+[\.\-_]*)+)"
+
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-numbers \

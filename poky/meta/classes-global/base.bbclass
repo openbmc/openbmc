@@ -634,7 +634,7 @@ python () {
         # Mercurial packages should DEPEND on mercurial-native
         elif uri.scheme == "hg":
             d.appendVar("EXTRANATIVEPATH", ' python3-native ')
-            d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot')
+            d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot ca-certificates-native:do_populate_sysroot')
 
         # OSC packages should DEPEND on osc-native
         elif uri.scheme == "osc":

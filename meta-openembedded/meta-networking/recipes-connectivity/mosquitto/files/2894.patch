@@ -1,0 +1,25 @@
+From: Joachim Zobel <jz-2017@heute-morgen.de>
+Date: Wed, 13 Sep 2023 09:55:34 +0200
+Subject: [PATCH] Link correctly with shared websockets library if needed see:
+ https://github.com/eclipse/mosquitto/pull/2751
+
+Patch contributed by Joachim Zobel <jz-2017@heute-morgen.de> and  Daniel Engberg <daniel.engberg.lists@pyret.net>
+---
+Upstream-Status: Pending
+
+ src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 9380a04..dce8313 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -200,7 +200,7 @@ if (WITH_WEBSOCKETS)
+ 			link_directories(${mosquitto_SOURCE_DIR})
+ 		endif (WIN32)
+ 	else (STATIC_WEBSOCKETS)
+-		set (MOSQ_LIBS ${MOSQ_LIBS} websockets)
++		set (MOSQ_LIBS ${MOSQ_LIBS} websockets_shared)
+ 	endif (STATIC_WEBSOCKETS)
+ endif (WITH_WEBSOCKETS)
+ 

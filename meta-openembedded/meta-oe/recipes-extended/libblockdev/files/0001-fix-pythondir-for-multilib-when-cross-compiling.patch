@@ -1,0 +1,32 @@
+From 297abed277ce3aa0cf12adbfda3c8581afdba850 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Sun, 8 Oct 2023 19:30:29 -0700
+Subject: [PATCH] fix pythondir for multilib when cross compiling
+
+In case of cross compiling + multilib, the 'shell python3' line is
+not likely to give out correct result. Make use of pythondir instead.
+
+This patch is related to meta/recipes-devtools/automake/automake/0001-automake-Update-for-python.m4-to-respect-libdir.patch
+in oe-core, so this one is marked as oe specific.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/python/gi/overrides/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/python/gi/overrides/Makefile.am b/src/python/gi/overrides/Makefile.am
+index 5e8e75f7..7c30601c 100644
+--- a/src/python/gi/overrides/Makefile.am
++++ b/src/python/gi/overrides/Makefile.am
+@@ -1,5 +1,5 @@
+ if WITH_PYTHON3
+-py3libdir = $(shell python3 -c "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '${exec_prefix}'}))")
++py3libdir = $(pythondir)
+ py3overridesdir = $(py3libdir)/gi/overrides
+ dist_py3overrides_DATA = BlockDev.py
+ endif
+-- 
+2.42.0
+

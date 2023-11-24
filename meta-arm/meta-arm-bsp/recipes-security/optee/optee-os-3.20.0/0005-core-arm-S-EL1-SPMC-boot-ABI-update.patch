@@ -20,10 +20,11 @@ change in TF-A ("feat(qemu): update abi between spmd and spmc") [2].
     file. Used by Trusted OS (BL32), that is, OP-TEE in this case
 Link: [2] https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git/commit/?id=25ae7ad1878244f78206cc7c91f7bdbd267331a1
 
-Upstream-Status: Accepted
-
 Acked-by: Etienne Carriere <etienne.carriere@linaro.org>
 Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+Upstream-Status: Backport [f1f431c7a92671b4fa397976d381cc5ad8adacc4]
+Signed-off-by: Gyorgy Szing <Gyorgy.Szing@arm.com>
 ---
  core/arch/arm/kernel/boot.c      |  8 +++++++-
  core/arch/arm/kernel/entry_a64.S | 17 ++++++++---------

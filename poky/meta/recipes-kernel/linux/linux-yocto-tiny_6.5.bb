@@ -8,7 +8,7 @@ require recipes-kernel/linux/linux-yocto.inc
 # CVE exclusions
 include recipes-kernel/linux/cve-exclusion_6.5.inc
 
-LINUX_VERSION ?= "6.5.5"
+LINUX_VERSION ?= "6.5.7"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "${@bb.utils.contains('ARCH', 'x86', 'elfutils-native', '', d)}"
@@ -17,8 +17,8 @@ DEPENDS += "openssl-native util-linux-native"
 KMETA = "kernel-meta"
 KCONF_BSP_AUDIT_LEVEL = "2"
 
-SRCREV_machine ?= "49e3d8448aeaecd8e2bb6b481f26b76514dbe0f5"
-SRCREV_meta ?= "06cf3d8830fda41ff271eec7da6e3c8425df790f"
+SRCREV_machine ?= "dfe7f47645429e162819c3d5690d8f5052f5b5a3"
+SRCREV_meta ?= "9af846da534077c91e3c42242fceba7aef8dd784"
 
 PV = "${LINUX_VERSION}+git"
 
@@ -30,4 +30,4 @@ COMPATIBLE_MACHINE = "^(qemux86|qemux86-64|qemuarm64|qemuarm|qemuarmv5)$"
 # Functionality flags
 KERNEL_FEATURES = ""
 
-KERNEL_DEVICETREE:qemuarmv5 = "versatile-pb.dtb"
+KERNEL_DEVICETREE:qemuarmv5 = "arm/versatile-pb.dtb"

@@ -16,8 +16,8 @@ Upstream-Status: Pending
 
 --- a/usr/klibc/arch/arm/MCONFIG
 +++ b/usr/klibc/arch/arm/MCONFIG
-@@ -27,6 +27,7 @@ else
- KLIBCSHAREDFLAGS = $(LD_IMAGE_BASE_OPT) 0x01800000
+@@ -23,6 +23,7 @@ else
+ # Extra linkflags when building the shared version of the library
  ifeq ($(CONFIG_AEABI),y)
  KLIBCREQFLAGS += -mabi=aapcs-linux -mno-thumb-interwork
 +KLIBCLDFLAGS += $(FIX_ARMV4_EABI_BX)

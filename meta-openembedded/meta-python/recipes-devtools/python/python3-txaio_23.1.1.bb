@@ -10,5 +10,3 @@ inherit pypi setuptools3
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-twisted \
 "
-
-BBCLASSEXTEND = "native nativesdk"

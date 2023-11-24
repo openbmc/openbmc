@@ -789,6 +789,17 @@ Errors and Warnings
     use a relative path rather than an absolute one, or to pick up the path from
     runtime configuration or environment variables.
 
+.. _qa-check-unimplemented-ptest:
+
+- ``<tool> tests detected [unimplemented-ptest]``
+
+    This check will detect if the source of the package contains some
+    upstream-provided tests and, if so, that ptests are implemented for this
+    recipe.  See the ":ref:`dev-manual/packages:testing packages with ptest`"
+    section in the Yocto Project Development Tasks Manual. See also the
+    ":ref:`ref-classes-ptest`" section.
+
+
 
 Configuring and Disabling QA Checks
 ===================================

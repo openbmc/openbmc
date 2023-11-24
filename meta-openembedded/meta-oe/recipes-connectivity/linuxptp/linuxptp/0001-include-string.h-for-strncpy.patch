@@ -1,4 +1,4 @@
-From d49b4fb8063ecd89617587e5ea566cc9da9393ef Mon Sep 17 00:00:00 2001
+From ecfc8e287eb6811e42c4e2800a913822f554d7c8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 31 Aug 2022 19:09:18 -0700
 Subject: [PATCH] include string.h for strncpy()
@@ -6,12 +6,13 @@ Subject: [PATCH] include string.h for strncpy()
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  interface.c | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/interface.c b/interface.c
-index 65bdff0..5228db9 100644
+index 29229ad..9a83c36 100644
 --- a/interface.c
 +++ b/interface.c
 @@ -5,6 +5,7 @@
@@ -22,6 +23,3 @@ index 65bdff0..5228db9 100644
  #include "interface.h"
  
  struct interface {
--- 
-2.37.3
-

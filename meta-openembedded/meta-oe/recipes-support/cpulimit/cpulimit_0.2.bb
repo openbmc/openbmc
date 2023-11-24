@@ -1,4 +1,5 @@
 SUMMARY = "cpulimit is a tool which limits the CPU usage of a process"
+DESCRIPTION = "cpulimit is a simple program that attempts to limit the CPU usage of a process (expressed in percentage, not in CPU time). This is useful to control batch jobs, when you don't want them to eat too much CPU. It does not act on the nice value or other priority stuff, but on the real CPU usage. Besides it is able to adapt itself to the overall system load, dynamically and quickly."
 HOMEPAGE = "http://cpulimit.sourceforge.net"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86c1c0d961a437e529db93aa3bb32dc4"

@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2016 Intel Corporation
 #
-# SPDX-License-Identifier: GPL-2.0
+# SPDX-License-Identifier: GPL-2.0-only
 
 import os
 import subprocess
@@ -18,14 +18,15 @@ parentdir  = os.path.dirname(topdir)
 # path to the repo root
 repodir = os.path.dirname(os.path.dirname(parentdir))
 
-def print_results(passcount, skipcount, failcount, xpasscount, xfailcount, errorcount):
-    total = passcount + skipcount + failcount + xpasscount + xfailcount + errorcount
+def print_results(passcount, failcount, skipcount, xpasscount, xfailcount, xskipcount, errorcount):
+    total = passcount + skipcount + failcount + xpasscount + xfailcount + xskipcount + errorcount
     print("============================================================================")
     print("Testsuite summary for %s" % os.path.basename(topdir))
     print("============================================================================")
     print("# TOTAL: %s" % str(total))
     print("# XPASS: %s" % str(xpasscount))
     print("# XFAIL: %s" % str(xfailcount))
+    print("# XSKIP: %s" % str(xskipcount))
     print("# PASS: %s" % str(passcount))
     print("# FAIL: %s" % str(failcount))
     print("# SKIP: %s" % str(skipcount))
@@ -37,7 +38,7 @@ def test(root, patch):
     res = True
     patchpath = os.path.abspath(os.path.join(root, patch))
     
-    cmd     = 'patchtest %s %s/tests --patch %s' % (repodir, topdir, patchpath)
+    cmd     = 'patchtest --repodir %s --testdir %s/tests --patch %s' % (repodir, topdir, patchpath)
     results = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
 
     return results
@@ -48,6 +49,7 @@ if __name__ == '__main__':
     skipcount = 0
     xpasscount = 0
     xfailcount = 0
+    xskipcount = 0
     errorcount = 0
 
     results = None
@@ -63,7 +65,7 @@ if __name__ == '__main__':
 
             for resultline in results.splitlines():
                 if testid in resultline:
-                    result, _ = resultline.split(' ', 1)
+                    result, _ = resultline.split(':', 1)
 
                     if expected_result.upper() == "FAIL" and result.upper() == "FAIL":
                         xfailcount = xfailcount + 1
@@ -71,6 +73,9 @@ if __name__ == '__main__':
                     elif expected_result.upper() == "PASS" and result.upper() == "PASS":
                         xpasscount = xpasscount + 1
                         print("XPASS: %s (file: %s)" % (testid.strip("."), os.path.basename(patch)))
+                    elif expected_result.upper() == "SKIP" and result.upper() == "SKIP":
+                        xskipcount = xskipcount + 1
+                        print("XSKIP: %s (file: %s)" % (testid.strip("."), os.path.basename(patch)))
                     else:
                         print("%s: %s (%s)" % (result.upper(), testid.strip("."), os.path.basename(patch)))
                         if result.upper() == "PASS":
@@ -86,4 +91,4 @@ if __name__ == '__main__':
             else:
                 print ("No test for=%s" % patch)
 
-    print_results(passcount, skipcount, failcount, xpasscount, xfailcount, errorcount)
+    print_results(passcount, failcount, skipcount, xpasscount, xfailcount, xskipcount, errorcount)

@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = " \
 SRC_URI = " \
     git://github.com/pytest-dev/pytest-mock;branch=main;protocol=https \
     file://run-ptest \
+    file://0001-test_pytest_mock-skip-args-introspection-tests.patch \
 "
 
 SRCREV ?= "d3e73f2e93f7b93eba0a36e17e43bafd969da4fe"
@@ -21,6 +22,7 @@ DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 RDEPENDS:${PN} += " \
     python3-asyncio \
     python3-pytest \
+    python3-pytest-asyncio \
     python3-unittest \
 "
 

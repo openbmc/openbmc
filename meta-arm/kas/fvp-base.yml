@@ -1,0 +1,43 @@
+header:
+  version: 13
+  includes:
+    - kas/fvp-eula.yml
+
+env:
+  DISPLAY:
+  WAYLAND_DISPLAY:
+  XAUTHORITY:
+
+
+distro: poky
+machine: fvp-base
+
+defaults:
+  repos:
+    refspec: master
+
+repos:
+  meta-arm:
+    layers:
+      meta-arm:
+      meta-arm-bsp:
+      meta-arm-toolchain:
+
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    path: layers/poky
+    layers:
+      meta:
+      meta-poky:
+
+local_conf_header:
+  base: |
+    CONF_VERSION = "2"
+    PACKAGE_CLASSES = "package_ipk"
+    PACKAGECONFIG:remove:pn-qemu-system-native = "gtk+ sdl"
+    EXTRA_IMAGE_FEATURES:append = " debug-tweaks ssh-server-openssh"
+    CORE_IMAGE_EXTRA_INSTALL:append = " ssh-pregen-hostkeys"
+    IMAGE_CLASSES:append = " testimage fvpboot"
+
+target:
+  - core-image-minimal

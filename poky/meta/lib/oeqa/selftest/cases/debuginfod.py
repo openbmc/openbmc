@@ -6,7 +6,11 @@
 import os
 import socketserver
 import subprocess
+import time
+import urllib
+import pathlib
 
+from oeqa.core.decorator import OETestTag
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_var, runqemu
 
@@ -21,39 +25,54 @@ class Debuginfod(OESelftestTestCase):
         Request the metrics endpoint periodically and wait for there to be no
         busy scanning threads.
 
-        Returns True if debuginfod is ready, False if we timed out
+        Returns if debuginfod is ready, raises an exception if not within the
+        timeout.
         """
-        import time, urllib
 
-        # Wait a minute
-        countdown = 6
-        delay = 10
+        # Wait two minutes
+        countdown = 24
+        delay = 5
+        latest = None
 
         while countdown:
+            self.logger.info("waiting...")
             time.sleep(delay)
+
+            self.logger.info("polling server")
+            if self.debuginfod.poll():
+                self.logger.info("server dead")
+                self.debuginfod.communicate()
+                self.fail("debuginfod terminated unexpectedly")
+            self.logger.info("server alive")
+
             try:
-                with urllib.request.urlopen("http://localhost:%d/metrics" % port) as f:
-                    lines = f.read().decode("ascii").splitlines()
-                    if "thread_busy{role=\"scan\"} 0" in lines:
-                        return True
+                with urllib.request.urlopen("http://localhost:%d/metrics" % port, timeout=10) as f:
+                    for line in f.read().decode("ascii").splitlines():
+                        key, value = line.rsplit(" ", 1)
+                        if key == "thread_busy{role=\"scan\"}":
+                            latest = int(value)
+                            self.logger.info("Waiting for %d scan jobs to finish" % latest)
+                            if latest == 0:
+                                return
             except urllib.error.URLError as e:
+                # TODO: how to catch just timeouts?
                 self.logger.error(e)
+
             countdown -= 1
-        return False
 
+        raise TimeoutError("Cannot connect debuginfod, still %d scan jobs running" % latest)
 
-    def test_debuginfod(self):
-        self.write_config(
-            """
-DISTRO_FEATURES:append = " debuginfod"
-CORE_IMAGE_EXTRA_INSTALL += "elfutils"
-        """
-        )
-        bitbake("core-image-minimal elfutils-native:do_addto_recipe_sysroot")
+    def start_debuginfod(self):
+        # We assume that the caller has already bitbake'd elfutils-native:do_addto_recipe_sysroot
 
-        native_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "elfutils-native")
+        # Save some useful paths for later
+        native_sysroot = pathlib.Path(get_bb_var("RECIPE_SYSROOT_NATIVE", "elfutils-native"))
+        native_bindir = native_sysroot / "usr" / "bin"
+        self.debuginfod = native_bindir / "debuginfod"
+        self.debuginfod_find = native_bindir / "debuginfod-find"
+
         cmd = [
-            os.path.join(native_sysroot, "usr", "bin", "debuginfod"),
+            self.debuginfod,
             "--verbose",
             # In-memory database, this is a one-shot test
             "--database=:memory:",
@@ -76,31 +95,64 @@ CORE_IMAGE_EXTRA_INSTALL += "elfutils"
         else:
             self.fail("Unknown package class %s" % format)
 
-        # Find a free port
+        # Find a free port. Racey but the window is small.
         with socketserver.TCPServer(("localhost", 0), None) as s:
-            port = s.server_address[1]
-            cmd.append("--port=%d" % port)
+            self.port = s.server_address[1]
+            cmd.append("--port=%d" % self.port)
+
+        self.logger.info(f"Starting server {cmd}")
+        self.debuginfod = subprocess.Popen(cmd, env={})
+        self.wait_for_debuginfod(self.port)
+
+
+    def test_debuginfod_native(self):
+        """
+        Test debuginfod outside of qemu, by building a package and looking up a
+        binary's debuginfo using elfutils-native.
+        """
+
+        self.write_config("""
+TMPDIR = "${TOPDIR}/tmp-debuginfod"
+DISTRO_FEATURES:append = " debuginfod"
+""")
+        bitbake("elfutils-native:do_addto_recipe_sysroot xz xz:do_package")
 
         try:
-            # Remove DEBUGINFOD_URLS from the environment so we don't try
-            # looking in the distro debuginfod
-            env = os.environ.copy()
-            if "DEBUGINFOD_URLS" in env:
-                del env["DEBUGINFOD_URLS"]
+            self.start_debuginfod()
 
-            self.logger.info(f"Starting server {cmd}")
-            debuginfod = subprocess.Popen(cmd, env=env)
+            env = os.environ.copy()
+            env["DEBUGINFOD_URLS"] = "http://localhost:%d/" % self.port
+
+            pkgs = pathlib.Path(get_bb_var("PKGDEST", "xz"))
+            cmd = (self.debuginfod_find, "debuginfo", pkgs / "xz" / "usr" / "bin" / "xz.xz")
+            self.logger.info(f"Starting client {cmd}")
+            output = subprocess.check_output(cmd, env=env, text=True)
+            # This should be more comprehensive
+            self.assertIn("/.cache/debuginfod_client/", output)
+        finally:
+            self.debuginfod.kill()
+
+    @OETestTag("runqemu")
+    def test_debuginfod_qemu(self):
+        """
+        Test debuginfod-find inside a qemu, talking to a debuginfod on the host.
+        """
+
+        self.write_config("""
+TMPDIR = "${TOPDIR}/tmp-debuginfod"
+DISTRO_FEATURES:append = " debuginfod"
+CORE_IMAGE_EXTRA_INSTALL += "elfutils xz"
+        """)
+        bitbake("core-image-minimal elfutils-native:do_addto_recipe_sysroot")
+
+        try:
+            self.start_debuginfod()
 
             with runqemu("core-image-minimal", runqemuparams="nographic") as qemu:
-                self.assertTrue(self.wait_for_debuginfod(port))
-
-                cmd = (
-                    "DEBUGINFOD_URLS=http://%s:%d/ debuginfod-find debuginfo /usr/bin/debuginfod"
-                    % (qemu.server_ip, port)
-                )
+                cmd = "DEBUGINFOD_URLS=http://%s:%d/ debuginfod-find debuginfo /usr/bin/xz" % (qemu.server_ip, self.port)
                 self.logger.info(f"Starting client {cmd}")
                 status, output = qemu.run_serial(cmd)
                 # This should be more comprehensive
                 self.assertIn("/.cache/debuginfod_client/", output)
         finally:
-            debuginfod.kill()
+            self.debuginfod.kill()

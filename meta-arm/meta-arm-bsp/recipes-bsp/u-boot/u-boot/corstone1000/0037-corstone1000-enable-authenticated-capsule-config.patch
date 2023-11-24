@@ -1,0 +1,28 @@
+From 6a4d38a82755a8946ff8b79440550cae8032abed Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Wed, 13 Sep 2023 13:52:02 +0100
+Subject: [PATCH 37/38] corstone1000: enable authenticated capsule config
+
+Enables authenticated capsule update config for corstone1000.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ configs/corstone1000_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index 5b0b2ac3bf..2de3f5d7b3 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -70,6 +70,7 @@ CONFIG_FWU_MDATA=y
+ CONFIG_FWU_MDATA_GPT_BLK=y
+ CONFIG_SYSRESET=y
+ CONFIG_EFI_CAPSULE_ON_DISK=y
++CONFIG_EFI_CAPSULE_AUTHENTICATE=y
+ CONFIG_EFI_IGNORE_OSINDICATIONS=y
+ CONFIG_FWU_MULTI_BANK_UPDATE=y
+ # CONFIG_TOOLS_MKEFICAPSULE is not set
+-- 
+2.25.1
+

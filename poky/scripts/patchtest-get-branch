@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+
+# Get target branch from the corresponding mbox
+#
+# NOTE: this script was based on patches coming to the openembedded-core
+# where target branch is defined inside brackets as subject prefix
+# i.e. [master], [rocko], etc.
+#
+# Copyright (C) 2016 Intel Corporation
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+import mailbox
+import argparse
+import re
+import git
+
+re_prefix = re.compile("(\[.*\])", re.DOTALL)
+
+def get_branch(filepath_repo, filepath_mbox, default_branch):
+    branch = None
+
+    # get all remotes branches
+    gitbranches = git.Git(filepath_repo).branch('-a').splitlines()
+
+    # from gitbranches, just get the names
+    branches = [b.split('/')[-1] for b in gitbranches]
+
+    subject = ' '.join(mailbox.mbox(filepath_mbox)[0]['subject'].splitlines())
+
+    # we expect that patches will have somewhere between one and three
+    # consecutive sets of square brackets with tokens inside, e.g.:
+    # 1. [PATCH]
+    # 2. [OE-core][PATCH]
+    # 3. [OE-core][kirkstone][PATCH]
+    # Some of them may also be part of a series, in which case the PATCH
+    # token will be formatted like:
+    # [PATCH 1/4]
+    # or they will be revisions to previous patches, where it will be:
+    # [PATCH v2]
+    # Or they may contain both:
+    # [PATCH v2 3/4]
+    # In any case, we want mprefix to contain all of these tokens so
+    # that we can search for branch names within them. 
+    mprefix = re.findall(r'\[.*?\]', subject)
+    found_branch = None
+    if mprefix:
+        # Iterate over the tokens and compare against the branch list to
+        # figure out which one the patch is targeting
+        for token in mprefix:
+             stripped = token.lower().strip('[]')
+             if default_branch in stripped:
+                 found_branch = default_branch
+                 break
+             else:
+                 for branch in branches:
+                     # ignore branches named "core"
+                     if branch != "core" and stripped.rfind(branch) != -1:
+                         found_branch = token.split(' ')[0].strip('[]')
+                         break
+
+    # if there's no mprefix content or no known branches were found in
+    # the tokens, assume the target is master
+    if found_branch is None:
+        found_branch = "master"
+
+    return (subject, found_branch)
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('repo', metavar='REPO', help='Main repository')
+    parser.add_argument('mbox', metavar='MBOX', help='mbox filename')
+    parser.add_argument('--default-branch', metavar='DEFAULT_BRANCH', default='master', help='Use this branch if no one is found')
+    parser.add_argument('--separator', '-s', metavar='SEPARATOR', default=' ', help='Char separator for output data')
+    args = parser.parse_args()
+
+    subject, branch = get_branch(args.repo, args.mbox, args.default_branch)
+    print("branch: %s" % branch)
+

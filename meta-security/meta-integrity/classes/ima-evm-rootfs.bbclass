@@ -89,6 +89,18 @@ ima_evm_sign_rootfs () {
         bbnote "IMA/EVM: Signing IMA policy with key ${IMA_EVM_PRIVKEY}"
         evmctl sign --imasig ${evmctl_param} --portable -a sha256 --key "${IMA_EVM_PRIVKEY}" "${IMAGE_ROOTFS}/etc/ima/ima-policy"
     fi
+
+    # Optionally write the file names and ima and evm signatures into files
+    if [ "${IMA_FILE_SIGNATURES_FILE}" ]; then
+        getfattr -R -m security.ima --e hex --dump ./ 2>/dev/null | \
+          sed -n -e 's|# file: |/|p' -e 's|security.ima=|ima:|p' | \
+          sed '$!N;s/\n/ /' > ./${IMA_FILE_SIGNATURES_FILE}
+    fi
+    if [ "${EVM_FILE_SIGNATURES_FILE}" ]; then
+        getfattr -R -m security.evm --e hex --dump ./ 2>/dev/null | \
+          sed -n -e 's|# file: |/|p' -e 's|security.evm=|evm:|p' | \
+          sed '$!N;s/\n/ /' > ./${EVM_FILE_SIGNATURES_FILE}
+    fi
 }
 
 # Signing must run as late as possible in the do_rootfs task.

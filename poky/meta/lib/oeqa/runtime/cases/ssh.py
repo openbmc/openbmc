@@ -13,6 +13,9 @@ class SSHTest(OERuntimeTestCase):
     @OETestDepends(['ping.PingTest.test_ping'])
     @OEHasPackage(['dropbear', 'openssh-sshd'])
     def test_ssh(self):
+        (status, output) = self.target.run('sleep 20', timeout=2)
+        msg='run() timed out but return code was zero.'
+        self.assertNotEqual(status, 0, msg=msg)
         (status, output) = self.target.run('uname -a')
         self.assertEqual(status, 0, msg='SSH Test failed: %s' % output)
         (status, output) = self.target.run('cat /etc/controllerimage')

@@ -1,0 +1,43 @@
+From 1ccdb7513a7a0f24b8ce3b6766e52e690874bc64 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Oct 2023 19:08:12 -0700
+Subject: [PATCH] Fix printing 64-bit integer types
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ db/db_impl.cc     | 5 +++--
+ db/version_edit.h | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+--- a/db/db_impl.cc
++++ b/db/db_impl.cc
+@@ -5,6 +5,7 @@
+ #include "db/db_impl.h"
+ 
+ #include <algorithm>
++#include <cinttypes>
+ #include <atomic>
+ #include <cstdint>
+ #include <cstdio>
+@@ -520,8 +521,8 @@ Status DBImpl::WriteLevel0Table(MemTable
+     mutex_.Lock();
+   }
+ 
+-  Log(options_.info_log, "Level-0 table #%llu: %lld bytes %s",
+-      (unsigned long long)meta.number, (unsigned long long)meta.file_size,
++  Log(options_.info_log, "Level-0 table #%" PRIu64 " : %" PRIu64 " bytes %s",
++      meta.number, meta.file_size,
+       s.ToString().c_str());
+   delete iter;
+   pending_outputs_.erase(meta.number);
+--- a/db/version_edit.h
++++ b/db/version_edit.h
+@@ -5,6 +5,7 @@
+ #ifndef STORAGE_LEVELDB_DB_VERSION_EDIT_H_
+ #define STORAGE_LEVELDB_DB_VERSION_EDIT_H_
+ 
++#include <cstdint>
+ #include <set>
+ #include <utility>
+ #include <vector>

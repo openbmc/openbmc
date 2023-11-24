@@ -7,7 +7,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2ef696d66c156139232201f223c22592"
 
 SRC_URI= "git://git.linuxtv.org/edid-decode.git;protocol=https;branch=master"
-SRCREV = "e052f5f9fdf74ca11aa1a8edfa62eff8d0aa3d0d"
+SRCREV = "5920bf2a756b2f748c49ff6a08b9f421026473c5"
 PV = "0.0+git${SRCPV}"
 S = "${WORKDIR}/git"
 

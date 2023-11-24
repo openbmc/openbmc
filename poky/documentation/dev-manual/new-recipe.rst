@@ -409,8 +409,8 @@ Patching Code
 
 Sometimes it is necessary to patch code after it has been fetched. Any
 files mentioned in :term:`SRC_URI` whose names end in ``.patch`` or
-``.diff`` or compressed versions of these suffixes (e.g. ``diff.gz`` are
-treated as patches. The
+``.diff`` or compressed versions of these suffixes (e.g. ``diff.gz``,
+``patch.bz2``, etc.) are treated as patches. The
 :ref:`ref-tasks-patch` task
 automatically applies these patches.
 

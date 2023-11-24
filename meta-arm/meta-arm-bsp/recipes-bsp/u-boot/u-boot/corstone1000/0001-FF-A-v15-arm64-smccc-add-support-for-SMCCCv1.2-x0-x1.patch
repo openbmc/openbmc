@@ -1,7 +1,7 @@
-From b79722ade56bd49cf9e7d9b47b6256599c8cdb36 Mon Sep 17 00:00:00 2001
+From 6b7a5bff8d68b191569557b6444e2c5061af8074 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Fri, 29 Jul 2022 13:06:19 +0100
-Subject: [PATCH 01/33] FF-A v15: arm64: smccc: add support for SMCCCv1.2
+Subject: [PATCH 01/38] FF-A v15: arm64: smccc: add support for SMCCCv1.2
  x0-x17 registers
 
 add support for x0-x17 registers used by the SMC calls

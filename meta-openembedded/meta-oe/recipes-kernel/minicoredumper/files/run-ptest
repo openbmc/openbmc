@@ -6,7 +6,7 @@ echo expecting Segmentation fault with core dump ...
 minicoredumper_demo 6 & sleep 3 && minicoredumper_demo
 
 if ls /var/crash/ | grep minicoredumper; then
-	echo SUCCESS
+	echo "PASS: minicoredumper"
 else
-	echo FAIL
+	echo "FAIL: minicoredumper"
 fi

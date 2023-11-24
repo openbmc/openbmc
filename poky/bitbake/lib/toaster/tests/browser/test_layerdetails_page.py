@@ -97,6 +97,8 @@ class TestLayerDetailsPage(SeleniumTestCase):
                             "Expecting any of \"%s\"but got \"%s\"" %
                             (self.initial_values, value))
 
+            # Make sure the input visible beofre sending keys
+            self.wait_until_visible("#layer-git input[type=text]")
             inputs.send_keys("-edited")
 
         # Save the new values

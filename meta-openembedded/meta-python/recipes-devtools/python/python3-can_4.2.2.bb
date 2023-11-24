@@ -27,5 +27,3 @@ RDEPENDS:${PN} += " \
     python3-typing-extensions \
     python3-wrapt \
 "
-
-BBCLASSEXTEND = "native nativesdk"

@@ -3,7 +3,7 @@ HOMEPAGE = "https://ldb.samba.org"
 SECTION = "libs"
 LICENSE = "LGPL-3.0-or-later & LGPL-2.1-or-later & GPL-3.0-or-later"
 
-DEPENDS += "libtdb libtalloc libtevent popt"
+DEPENDS += "libtdb libtalloc libtevent popt cmocka"
 RDEPENDS:pyldb += "python3"
 
 export PYTHONHASHSEED="1"
@@ -12,9 +12,8 @@ SRC_URI = "http://samba.org/ftp/ldb/ldb-${PV}.tar.gz \
            file://0001-do-not-import-target-module-while-cross-compile.patch \
            file://0002-ldb-Add-configure-options-for-packages.patch \
            file://0003-Fix-pyext_PATTERN-for-cross-compilation.patch \
+           file://run-ptest \
           "
-
-SRC_URI:append:libc-musl = " file://cmocka-fix-musl-libc-conflicting-types-error.patch"
 
 PACKAGECONFIG ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)} \
@@ -37,7 +36,7 @@ LIC_FILES_CHKSUM = "file://pyldb.h;endline=24;md5=dfbd238cecad76957f7f860fbe9ada
 
 SRC_URI[sha256sum] = "26ee72d647854e662d99643eb2b2d341655abf31f4990838d6650fb5cf9209c8"
 
-inherit pkgconfig waf-samba
+inherit pkgconfig waf-samba ptest
 
 S = "${WORKDIR}/ldb-${PV}"
 
@@ -47,7 +46,7 @@ export WAF_NO_PREFORK="yes"
 
 EXTRA_OECONF += "--disable-rpath \
                  --disable-rpath-install \
-                 --bundled-libraries=cmocka \
+                 --bundled-libraries=NONE \
                  --builtin-libraries=replace \
                  --with-modulesdir=${libdir}/ldb/modules \
                  --with-privatelibdir=${libdir}/ldb \
@@ -80,4 +79,9 @@ export BINDIR = "${bindir}"
 do_configure:prepend() {
     # For a clean rebuild
     rm -fr bin/
+}
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+    install -m 0755 ${B}/bin/test_ldb_* ${D}${PTEST_PATH}/tests/
 }

@@ -21,6 +21,8 @@ Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
 
 ---
+Upstream-Status: Pending
+
  system/core/adb/daemon/usb_ffs.cpp | 11 +++++++++--
  1 file changed, 9 insertions(+), 2 deletions(-)
 

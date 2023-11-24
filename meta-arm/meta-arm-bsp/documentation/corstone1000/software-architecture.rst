@@ -72,8 +72,10 @@ non-secure and the secure world is performed via FF-A messages.
 
 An external system is intended to implement use-case specific
 functionality. The system is based on Cortex-M3 and run RTX RTOS.
-Communictaion between external system and Host(cortex-A35) is performed
-using MHU as transport mechanism and rpmsg messaging system.
+Communication between the external system and Host (Cortex-A35) is performed
+using MHU as transport mechanism and rpmsg messaging system (the external system
+support in Linux is disabled in this release. More info about this change can be found in the
+release-notes).
 
 Overall, the Corstone-1000 architecture is designed to cover a range
 of Power, Performance, and Area (PPA) applications, and enable extension
@@ -157,9 +159,9 @@ Secure Firmware Update
 **********************
 
 Apart from always booting the authorized images, it is also essential that
-the device only accepts the authorized images in the firmware update
+the device only accepts the authorized (signed) images in the firmware update
 process. Corstone-1000 supports OTA (Over the Air) firmware updates and
-follows Platform Security Firmware Update sepcification (`FWU`_).
+follows Platform Security Firmware Update specification (`FWU`_).
 
 As standardized into `FWU`_, the external flash is divided into two
 banks of which one bank has currently running images and the other bank is
@@ -172,7 +174,10 @@ Image (the initramfs bundle). The new images are accepted in the form of a UEFI 
    :width: 690
    :alt: ExternalFlash
 
-
+When Firmware update is triggered, u-boot verifies the capsule by checking the
+capsule signature, version number and size. Then it signals the Secure Enclave
+that can start writing UEFI capsule into the flash. Once this operation finishes
+,Secure Enclave resets the entire system.
 The Metadata Block in the flash has the below firmware update state machine.
 TF-M runs an OTA service that is responsible for accepting and updating the
 images in the flash. The communication between the UEFI Capsule update

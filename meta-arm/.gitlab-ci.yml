@@ -112,11 +112,13 @@ corstone1000-fvp:
   parallel:
     matrix:
       - TESTING: [testimage, tftf]
-  tags:
-    - x86_64
 
 corstone1000-mps3:
   extends: .build
+  parallel:
+    matrix:
+      - TESTING: [none, tftf]
+
 
 fvp-base:
   extends: .build
@@ -148,8 +150,7 @@ n1sdp:
   extends: .build
   parallel:
     matrix:
-      - TS: [none, n1sdp-ts]
-      - OPTEE: [none, n1sdp-optee]
+      - TESTING: [none, n1sdp-ts, n1sdp-optee, tftf]
 
 qemu-generic-arm64:
   extends: .build
@@ -234,7 +235,7 @@ selftest:
   extends: .setup
   script:
     - KASFILES=./ci/qemuarm64.yml:./ci/selftest.yml:lockfile.yml
-    - kas shell --update --force-checkout $KASFILES -c 'oe-selftest --num-processes 1 --run-tests runfvp'
+    - kas shell --update --force-checkout $KASFILES -c 'oe-selftest --num-processes 2 --select-tag meta-arm --run-all-tests'
 
 # Validate layers are Yocto Project Compatible
 check-layers:
@@ -254,7 +255,7 @@ pending-updates:
   script:
     - rm -fr update-report
     # This configuration has all of the layers we need enabled
-    - kas shell --update --force-checkout ci/qemuarm64.yml:ci/meta-openembedded.yml:lockfile.yml --command \
+    - kas shell --update --force-checkout ci/qemuarm64.yml:ci/meta-openembedded.yml:ci/meta-secure-core.yml:lockfile.yml --command \
       "$CI_PROJECT_DIR/scripts/machine-summary.py -t report -o $CI_PROJECT_DIR/update-report $($CI_PROJECT_DIR/ci/listmachines.py meta-arm meta-arm-bsp)"
   # Do this on x86 whilst the compilers are x86-only
   tags:

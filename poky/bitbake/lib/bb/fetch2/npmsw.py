@@ -191,7 +191,9 @@ class NpmShrinkWrap(FetchMethod):
             else:
                 raise ParameterError("Unsupported dependency: %s" % name, ud.url)
 
+            # name is needed by unpack tracer for module mapping
             ud.deps.append({
+                "name": name,
                 "url": url,
                 "localpath": localpath,
                 "extrapaths": extrapaths,
@@ -270,6 +272,7 @@ class NpmShrinkWrap(FetchMethod):
         destsuffix = ud.parm.get("destsuffix")
         if destsuffix:
             destdir = os.path.join(rootdir, destsuffix)
+        ud.unpack_tracer.unpack("npm-shrinkwrap", destdir)
 
         bb.utils.mkdirhier(destdir)
         bb.utils.copyfile(ud.shrinkwrap_file,

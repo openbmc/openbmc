@@ -1,5 +1,5 @@
 header:
-  version: 11
+  version: 14
   includes:
     - kas/corstone1000-base.yml
     - kas/fvp-eula.yml
@@ -10,7 +10,7 @@ local_conf_header:
     fvp-config: |
         # Remove Dropbear SSH as it will not fit into the corstone1000 image.
         IMAGE_FEATURES:remove = " ssh-server-dropbear"
-        INHERIT = " ${@bb.utils.contains('BUILD_ARCH', 'x86_64', 'fvpboot', '', d)}"
+        INHERIT += "fvpboot"
 
 target:
   - corstone1000-image

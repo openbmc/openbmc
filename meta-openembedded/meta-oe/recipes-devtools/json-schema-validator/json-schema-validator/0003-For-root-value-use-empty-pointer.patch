@@ -3,7 +3,7 @@ From: Sven Fink <sven.fink@wipotec.com>
 Date: Fri, 13 Jan 2023 09:15:42 +0100
 Subject: [PATCH 3/3] For root value, use empty pointer
 
-Upstream-Status: Accepted [https://github.com/pboettch/json-schema-validator/commit/59c9d6200bf3cd54b4fc717ec1660c91eddb4d1a]
+Upstream-Status: Backport [https://github.com/pboettch/json-schema-validator/commit/59c9d6200bf3cd54b4fc717ec1660c91eddb4d1a]
 
 Signed-off-by: Parian Golchin <Parian.Golchin@iris-sensing.com>
 ---

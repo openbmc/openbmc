@@ -1,0 +1,38 @@
+From 1cc54320306e07c1fc0eed98e7fbcbb07a2f3b28 Mon Sep 17 00:00:00 2001
+From: Stefan Agner <stefan@agner.ch>
+Date: Fri, 23 Jun 2023 10:10:00 +0200
+Subject: [PATCH] Handle interface without `ifa_addr`
+
+It seems that certain interface types may have `ifa_addr` set to null.
+Handle this case gracefully.
+
+Upstream-Status: Submitted [https://github.com/apple-oss-distributions/mDNSResponder/pull/2/commits/11b410d4d683c90e693c40315997bb3e8ec90e9a]
+
+Signed-off-by: Stefan Agner <stefan@agner.ch>
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ mDNSPosix/mDNSPosix.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
+index d7f31cc4d5cf..f10301253f58 100644
+--- a/mDNSPosix/mDNSPosix.c
++++ b/mDNSPosix/mDNSPosix.c
+@@ -1895,6 +1895,7 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+ 	    continue;
+ 
+         if ((ifa_loop4 == NULL) &&
++            ((*ifi)->ifa_addr != NULL) &&
+             ((*ifi)->ifa_addr->sa_family == AF_INET) &&
+             ((*ifi)->ifa_flags & IFF_UP) &&
+             ((*ifi)->ifa_flags & IFF_LOOPBACK))
+@@ -1903,7 +1904,8 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+             continue;
+         }
+ 
+-        if (     (((*ifi)->ifa_addr->sa_family == AF_INET)
++        if (     ((*ifi)->ifa_addr != NULL) &&
++                 (((*ifi)->ifa_addr->sa_family == AF_INET)
+ #if HAVE_IPV6
+                   || ((*ifi)->ifa_addr->sa_family == AF_INET6)
+ #endif

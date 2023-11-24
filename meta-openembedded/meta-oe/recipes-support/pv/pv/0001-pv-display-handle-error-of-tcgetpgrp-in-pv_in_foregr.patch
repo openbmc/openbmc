@@ -15,6 +15,8 @@ correctly and pv_in_foreground() returns also true in that case.
 
 Signed-off-by: Michael Weiß <michael.weiss@aisec.fraunhofer.de>
 ---
+Upstream-Status: Pending
+
  src/pv/display.c | 4 ++++
  1 file changed, 4 insertions(+)
 
