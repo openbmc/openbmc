@@ -14,7 +14,6 @@ RCONFLICTS:${PN} = "systemd (<= 220)"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
-GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase gobject-introspection gtk-doc
 
 GIR_MESON_ENABLE_FLAG = 'enabled'

@@ -6,11 +6,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f546ed4f47e9d4c1fe954ecc9d3ef4f3"
 
 SRC_URI = " \
     git://github.com/raspberrypi/rpi-eeprom.git;protocol=https;branch=master \
-    file://0001-Fix-rpi-eeprom-update-when-using-busybox-find.patch \
 "
 
-SRCREV = "6e79e995bbc75c5fdd5305bd7fe029758cfade2f"
-PV = "v2022.12.07-138a1"
+SRCREV = "f13b5789f56f65112e2b8aa58be43ebfcbedfe1d"
+PV = "v2023.10.18-2712"
 
 S = "${WORKDIR}/git"
 
@@ -35,16 +34,15 @@ do_install() {
     install -m 0755 ${S}/rpi-eeprom-digest ${D}${bindir}
 
     # copy firmware files
-    install -d ${D}${base_libdir}/firmware/raspberrypi/bootloader/critical
-    install -d ${D}${base_libdir}/firmware/raspberrypi/bootloader/stable
-    install -d ${D}${base_libdir}/firmware/raspberrypi/bootloader/beta
+    install -d ${D}${base_libdir}/firmware/raspberrypi/bootloader/default
+    install -d ${D}${base_libdir}/firmware/raspberrypi/bootloader/latest
 
-    install -m 644 ${S}/firmware/critical/* ${D}${base_libdir}/firmware/raspberrypi/bootloader/critical
-    install -m 644 ${S}/firmware/stable/* ${D}${base_libdir}/firmware/raspberrypi/bootloader/stable
-    install -m 644 ${S}/firmware/beta/* ${D}${base_libdir}/firmware/raspberrypi/bootloader/beta
+    install -m 644 ${S}/firmware-2711/default/* ${D}${base_libdir}/firmware/raspberrypi/bootloader/default
+    install -m 644 ${S}/firmware-2711/latest/* ${D}${base_libdir}/firmware/raspberrypi/bootloader/latest
 
-    ln -s critical ${D}${base_libdir}/firmware/raspberrypi/bootloader/default
-    ln -s stable ${D}${base_libdir}/firmware/raspberrypi/bootloader/latest
+    ln -s default ${D}${base_libdir}/firmware/raspberrypi/bootloader/critical
+    ln -s latest ${D}${base_libdir}/firmware/raspberrypi/bootloader/stable
+    ln -s latest ${D}${base_libdir}/firmware/raspberrypi/bootloader/beta
 
     # copy default config
     install -d ${D}${sysconfdir}/default

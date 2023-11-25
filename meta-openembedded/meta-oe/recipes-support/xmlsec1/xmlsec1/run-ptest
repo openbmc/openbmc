@@ -34,8 +34,8 @@ check_return verify-single-key
 
 echo "---------------------------------------------------"
 echo "Verifying a signature with keys manager..."
-./verify2 sign1-res.xml rsapub.pem
-./verify2 sign2-res.xml rsapub.pem
+./verify2 sign1-res.xml rsakey.pem
+./verify2 sign2-res.xml rsakey.pem
 check_return verify-keys-manager
 
 echo "---------------------------------------------------"

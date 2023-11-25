@@ -10,11 +10,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSCore/mDNS.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mDNSCore/mDNS.c b/mDNSCore/mDNS.c
-index eecd7daa724e..1e843c081938 100644
---- a/mDNSCore/mDNS.c
-+++ b/mDNSCore/mDNS.c
-@@ -10210,7 +10210,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastAnswers(mDNS *const m, const DNSMessage *
+Index: mDNSResponder/mDNSCore/mDNS.c
+===================================================================
+--- mDNSResponder.orig/mDNSCore/mDNS.c
++++ mDNSResponder/mDNSCore/mDNS.c
+@@ -10231,7 +10231,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastA
  #else
                              const DNSServRef dnsserv = qptr->qDNSServer;
  #endif

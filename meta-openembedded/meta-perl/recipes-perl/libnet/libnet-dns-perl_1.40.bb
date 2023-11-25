@@ -62,4 +62,3 @@ python __anonymous () {
                                    d.getVar('TCLIBC'))
 }
 
-BBCLASSEXTEND = "native"

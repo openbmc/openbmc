@@ -14,6 +14,8 @@ import sys
 import threading
 import time
 import warnings
+import netrc
+import json
 warnings.simplefilter("default")
 
 try:
@@ -36,9 +38,17 @@ except ImportError:
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib'))
 
 import hashserv
+import bb.asyncrpc
 
 DEFAULT_ADDRESS = 'unix://./hashserve.sock'
 METHOD = 'stress.test.method'
+
+def print_user(u):
+    print(f"Username:    {u['username']}")
+    if "permissions" in u:
+        print("Permissions: " + " ".join(u["permissions"]))
+    if "token" in u:
+        print(f"Token:       {u['token']}")
 
 
 def main():
@@ -47,7 +57,7 @@ def main():
             s = client.reset_stats()
         else:
             s = client.get_stats()
-        pprint.pprint(s)
+        print(json.dumps(s, sort_keys=True, indent=4))
         return 0
 
     def handle_stress(args, client):
@@ -56,25 +66,24 @@ def main():
             nonlocal missed_hashes
             nonlocal max_time
 
-            client = hashserv.create_client(args.address)
+            with hashserv.create_client(args.address) as client:
+                for i in range(args.requests):
+                    taskhash = hashlib.sha256()
+                    taskhash.update(args.taskhash_seed.encode('utf-8'))
+                    taskhash.update(str(i).encode('utf-8'))
 
-            for i in range(args.requests):
-                taskhash = hashlib.sha256()
-                taskhash.update(args.taskhash_seed.encode('utf-8'))
-                taskhash.update(str(i).encode('utf-8'))
+                    start_time = time.perf_counter()
+                    l = client.get_unihash(METHOD, taskhash.hexdigest())
+                    elapsed = time.perf_counter() - start_time
 
-                start_time = time.perf_counter()
-                l = client.get_unihash(METHOD, taskhash.hexdigest())
-                elapsed = time.perf_counter() - start_time
+                    with lock:
+                        if l:
+                            found_hashes += 1
+                        else:
+                            missed_hashes += 1
 
-                with lock:
-                    if l:
-                        found_hashes += 1
-                    else:
-                        missed_hashes += 1
-
-                    max_time = max(elapsed, max_time)
-                    pbar.update()
+                        max_time = max(elapsed, max_time)
+                        pbar.update()
 
         max_time = 0
         found_hashes = 0
@@ -126,9 +135,57 @@ def main():
         print("Removed %d rows" % (result["count"]))
         return 0
 
+    def handle_refresh_token(args, client):
+        r = client.refresh_token(args.username)
+        print_user(r)
+
+    def handle_set_user_permissions(args, client):
+        r = client.set_user_perms(args.username, args.permissions)
+        print_user(r)
+
+    def handle_get_user(args, client):
+        r = client.get_user(args.username)
+        print_user(r)
+
+    def handle_get_all_users(args, client):
+        users = client.get_all_users()
+        print("{username:20}| {permissions}".format(username="Username", permissions="Permissions"))
+        print(("-" * 20) + "+" + ("-" * 20))
+        for u in users:
+            print("{username:20}| {permissions}".format(username=u["username"], permissions=" ".join(u["permissions"])))
+
+    def handle_new_user(args, client):
+        r = client.new_user(args.username, args.permissions)
+        print_user(r)
+
+    def handle_delete_user(args, client):
+        r = client.delete_user(args.username)
+        print_user(r)
+
+    def handle_get_db_usage(args, client):
+        usage = client.get_db_usage()
+        print(usage)
+        tables = sorted(usage.keys())
+        print("{name:20}| {rows:20}".format(name="Table name", rows="Rows"))
+        print(("-" * 20) + "+" + ("-" * 20))
+        for t in tables:
+            print("{name:20}| {rows:<20}".format(name=t, rows=usage[t]["rows"]))
+        print()
+
+        total_rows = sum(t["rows"] for t in usage.values())
+        print(f"Total rows: {total_rows}")
+
+    def handle_get_db_query_columns(args, client):
+        columns = client.get_db_query_columns()
+        print("\n".join(sorted(columns)))
+
     parser = argparse.ArgumentParser(description='Hash Equivalence Client')
     parser.add_argument('--address', default=DEFAULT_ADDRESS, help='Server address (default "%(default)s")')
     parser.add_argument('--log', default='WARNING', help='Set logging level')
+    parser.add_argument('--login', '-l', metavar="USERNAME", help="Authenticate as USERNAME")
+    parser.add_argument('--password', '-p', metavar="TOKEN", help="Authenticate using token TOKEN")
+    parser.add_argument('--become', '-b', metavar="USERNAME", help="Impersonate user USERNAME (if allowed) when performing actions")
+    parser.add_argument('--no-netrc', '-n', action="store_false", dest="netrc", help="Do not use .netrc")
 
     subparsers = parser.add_subparsers()
 
@@ -159,6 +216,37 @@ def main():
     clean_unused_parser.add_argument("max_age", metavar="SECONDS", type=int, help="Remove unused entries older than SECONDS old")
     clean_unused_parser.set_defaults(func=handle_clean_unused)
 
+    refresh_token_parser = subparsers.add_parser('refresh-token', help="Refresh auth token")
+    refresh_token_parser.add_argument("--username", "-u", help="Refresh the token for another user (if authorized)")
+    refresh_token_parser.set_defaults(func=handle_refresh_token)
+
+    set_user_perms_parser = subparsers.add_parser('set-user-perms', help="Set new permissions for user")
+    set_user_perms_parser.add_argument("--username", "-u", help="Username", required=True)
+    set_user_perms_parser.add_argument("permissions", metavar="PERM", nargs="*", default=[], help="New permissions")
+    set_user_perms_parser.set_defaults(func=handle_set_user_permissions)
+
+    get_user_parser = subparsers.add_parser('get-user', help="Get user")
+    get_user_parser.add_argument("--username", "-u", help="Username")
+    get_user_parser.set_defaults(func=handle_get_user)
+
+    get_all_users_parser = subparsers.add_parser('get-all-users', help="List all users")
+    get_all_users_parser.set_defaults(func=handle_get_all_users)
+
+    new_user_parser = subparsers.add_parser('new-user', help="Create new user")
+    new_user_parser.add_argument("--username", "-u", help="Username", required=True)
+    new_user_parser.add_argument("permissions", metavar="PERM", nargs="*", default=[], help="New permissions")
+    new_user_parser.set_defaults(func=handle_new_user)
+
+    delete_user_parser = subparsers.add_parser('delete-user', help="Delete user")
+    delete_user_parser.add_argument("--username", "-u", help="Username", required=True)
+    delete_user_parser.set_defaults(func=handle_delete_user)
+
+    db_usage_parser = subparsers.add_parser('get-db-usage', help="Database Usage")
+    db_usage_parser.set_defaults(func=handle_get_db_usage)
+
+    db_query_columns_parser = subparsers.add_parser('get-db-query-columns', help="Show columns that can be used in database queries")
+    db_query_columns_parser.set_defaults(func=handle_get_db_query_columns)
+
     args = parser.parse_args()
 
     logger = logging.getLogger('hashserv')
@@ -172,11 +260,28 @@ def main():
     console.setLevel(level)
     logger.addHandler(console)
 
+    login = args.login
+    password = args.password
+
+    if login is None and args.netrc:
+        try:
+            n = netrc.netrc()
+            auth = n.authenticators(args.address)
+            if auth is not None:
+                login, _, password = auth
+        except FileNotFoundError:
+            pass
+
     func = getattr(args, 'func', None)
     if func:
-        client = hashserv.create_client(args.address)
-
-        return func(args, client)
+        try:
+            with hashserv.create_client(args.address, login, password) as client:
+                if args.become:
+                    client.become_user(args.become)
+                return func(args, client)
+        except bb.asyncrpc.InvokeError as e:
+            print(f"ERROR: {e}")
+            return 1
 
     return 0
 

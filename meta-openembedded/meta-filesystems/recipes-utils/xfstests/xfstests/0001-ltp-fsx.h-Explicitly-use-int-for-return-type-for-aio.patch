@@ -1,0 +1,30 @@
+From 0927d0def968ea7e19905c7e39182f65961c11cf Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 5 Nov 2023 01:17:52 -0700
+Subject: [PATCH] ltp/fsx.h: Explicitly use int for return type for aio_rw()
+
+Fixes build with clang-17+
+error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+
+Upstream-Status: Submitted [https://marc.info/?l=fstests&m=169917222008646&w=2]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ltp/fsx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ltp/fsx.c b/ltp/fsx.c
+index ee4b8fe4..c0aec23f 100644
+--- a/ltp/fsx.c
++++ b/ltp/fsx.c
+@@ -2581,7 +2581,7 @@ out_error:
+ 	return -1;
+ }
+ #else
+-aio_rw(int rw, int fd, char *buf, unsigned len, unsigned offset)
++int aio_rw(int rw, int fd, char *buf, unsigned len, unsigned offset)
+ {
+ 	fprintf(stderr, "io_rw: need AIO support!\n");
+ 	exit(111);
+-- 
+2.42.1
+

@@ -88,26 +88,14 @@ particular working environment and set of practices.
        For information about BitBake, see the
        :doc:`bitbake:index`.
 
-    It is relatively easy to set up Git services and create
-    infrastructure like :yocto_git:`/`, which is based on
-    server software called ``gitolite`` with ``cgit`` being used to
-    generate the web interface that lets you view the repositories. The
-    ``gitolite`` software identifies users using SSH keys and allows
+    It is relatively easy to set up Git services and create infrastructure like
+    :yocto_git:`/`, which is based on server software called
+    `Gitolite <https://gitolite.com>`__
+    with `cgit <https://git.zx2c4.com/cgit/about/>`__ being used to
+    generate the web interface that lets you view the repositories.
+    ``gitolite`` identifies users using SSH keys and allows
     branch-based access controls to repositories that you can control as
     little or as much as necessary.
-
-    .. note::
-
-       The setup of these services is beyond the scope of this manual.
-       However, here are sites describing how to perform setup:
-
-       -  `Gitolite <https://gitolite.com>`__: Information for
-          ``gitolite``.
-
-       -  `Interfaces, frontends, and
-          tools <https://git.wiki.kernel.org/index.php/Interfaces,_frontends,_and_tools>`__:
-          Documentation on how to create interfaces and frontends for
-          Git.
 
 #.  *Set up the Application Development Machines:* As mentioned earlier,
     application developers are creating applications on top of existing

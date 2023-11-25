@@ -11,10 +11,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  mDNSPosix/nss_mdns.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/mDNSPosix/nss_mdns.c b/mDNSPosix/nss_mdns.c
-index afadb3c6c33b..84c312759463 100644
---- a/mDNSPosix/nss_mdns.c
-+++ b/mDNSPosix/nss_mdns.c
+Index: mDNSResponder/mDNSPosix/nss_mdns.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/nss_mdns.c
++++ mDNSResponder/mDNSPosix/nss_mdns.c
 @@ -89,6 +89,9 @@
  
  #include <dns_sd.h>
@@ -25,6 +25,3 @@ index afadb3c6c33b..84c312759463 100644
  
  //----------
  // Public functions
--- 
-2.35.1
-

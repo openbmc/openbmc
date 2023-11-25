@@ -1,0 +1,141 @@
+From 1bc0dec3f54e67fa4767d0096ab377e900d5146f Mon Sep 17 00:00:00 2001
+From: Vincent Fu <vincent.fu@samsung.com>
+Date: Tue, 23 Aug 2022 12:38:51 -0400
+Subject: [PATCH] Revert "Fix multithread issues when operating on a single
+ shared file"
+
+This reverts commit acbda87c34c743ff2d9e125d9539bcfbbf49eb75.
+
+This commit introduced a lot of unintended consequences for
+create_serialize=0. The aim of the commit can be accomplished with a
+combination of filesize and io_size.
+
+Fixes: https://github.com/axboe/fio/issues/1442
+Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
+---
+ backend.c   | 19 +------------------
+ file.h      |  1 -
+ filesetup.c | 46 ++--------------------------------------------
+ 3 files changed, 3 insertions(+), 63 deletions(-)
+
+diff --git a/backend.c b/backend.c
+index 3a99850d..e5bb4e25 100644
+--- a/backend.c
++++ b/backend.c
+@@ -2314,25 +2314,8 @@ static void run_threads(struct sk_out *sk_out)
+ 	for_each_td(td, i) {
+ 		print_status_init(td->thread_number - 1);
+ 
+-		if (!td->o.create_serialize) {
+-			/*
+-			 *  When operating on a single rile in parallel,
+-			 *  perform single-threaded early setup so that
+-			 *  when setup_files() does not run into issues
+-			 *  later.
+-			*/
+-			if (!i && td->o.nr_files==1) {
+-				if (setup_shared_file(td)) {
+-					exit_value++;
+-					if (td->error)
+-						log_err("fio: pid=%d, err=%d/%s\n",
+-							(int) td->pid, td->error, td->verror);
+-					td_set_runstate(td, TD_REAPED);
+-					todo--;
+-				}
+-			}
++		if (!td->o.create_serialize)
+ 			continue;
+-		}
+ 
+ 		if (fio_verify_load_state(td))
+ 			goto reap;
+diff --git a/file.h b/file.h
+index e646cf22..da1b8947 100644
+--- a/file.h
++++ b/file.h
+@@ -201,7 +201,6 @@ struct thread_data;
+ extern void close_files(struct thread_data *);
+ extern void close_and_free_files(struct thread_data *);
+ extern uint64_t get_start_offset(struct thread_data *, struct fio_file *);
+-extern int __must_check setup_shared_file(struct thread_data *);
+ extern int __must_check setup_files(struct thread_data *);
+ extern int __must_check file_invalidate_cache(struct thread_data *, struct fio_file *);
+ #ifdef __cplusplus
+diff --git a/filesetup.c b/filesetup.c
+index 144a0572..1d3cc5ad 100644
+--- a/filesetup.c
++++ b/filesetup.c
+@@ -143,7 +143,7 @@ static int extend_file(struct thread_data *td, struct fio_file *f)
+ 	if (unlink_file || new_layout) {
+ 		int ret;
+ 
+-		dprint(FD_FILE, "layout %d unlink %d %s\n", new_layout, unlink_file, f->file_name);
++		dprint(FD_FILE, "layout unlink %s\n", f->file_name);
+ 
+ 		ret = td_io_unlink_file(td, f);
+ 		if (ret != 0 && ret != ENOENT) {
+@@ -198,9 +198,6 @@ static int extend_file(struct thread_data *td, struct fio_file *f)
+ 		}
+ 	}
+ 
+-
+-	dprint(FD_FILE, "fill file %s, size %llu\n", f->file_name, (unsigned long long) f->real_file_size);
+-
+ 	left = f->real_file_size;
+ 	bs = td->o.max_bs[DDIR_WRITE];
+ 	if (bs > left)
+@@ -1081,45 +1078,6 @@ static bool create_work_dirs(struct thread_data *td, const char *fname)
+ 	return true;
+ }
+ 
+-int setup_shared_file(struct thread_data *td)
+-{
+-	struct fio_file *f;
+-	uint64_t file_size;
+-	int err = 0;
+-
+-	if (td->o.nr_files > 1) {
+-		log_err("fio: shared file setup called for multiple files\n");
+-		return -1;
+-	}
+-
+-	get_file_sizes(td);
+-
+-	f = td->files[0];
+-
+-	if (f == NULL) {
+-		log_err("fio: NULL shared file\n");
+-		return -1;
+-	}
+-
+-	file_size = thread_number * td->o.size;
+-	dprint(FD_FILE, "shared setup %s real_file_size=%llu, desired=%llu\n", 
+-			f->file_name, (unsigned long long)f->real_file_size, (unsigned long long)file_size);
+-
+-	if (f->real_file_size < file_size) {
+-		dprint(FD_FILE, "fio: extending shared file\n");
+-		f->real_file_size = file_size;
+-		err = extend_file(td, f);
+-		if (!err) {
+-			err = __file_invalidate_cache(td, f, 0, f->real_file_size);
+-		}
+-		get_file_sizes(td);
+-		dprint(FD_FILE, "shared setup new real_file_size=%llu\n", 
+-				(unsigned long long)f->real_file_size);
+-	}
+-
+-	return err;
+-}
+-
+ /*
+  * Open the files and setup files sizes, creating files if necessary.
+  */
+@@ -1134,7 +1092,7 @@ int setup_files(struct thread_data *td)
+ 	const unsigned long long bs = td_min_bs(td);
+ 	uint64_t fs = 0;
+ 
+-	dprint(FD_FILE, "setup files (thread_number=%d, subjob_number=%d)\n", td->thread_number, td->subjob_number);
++	dprint(FD_FILE, "setup files\n");
+ 
+ 	old_state = td_bump_runstate(td, TD_SETTING_UP);
+ 

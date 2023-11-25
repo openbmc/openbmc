@@ -1,7 +1,7 @@
-From 79e941be83a7394d03b09c618c8e2924ef962d64 Mon Sep 17 00:00:00 2001
+From c726c9ff098e4b271d60856b462f3dc532763a03 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 17 Jul 2023 15:23:33 +0100
-Subject: [PATCH 10/33] FF-A v15: arm_ffa: efi: corstone1000: enable MM
+Subject: [PATCH 10/38] FF-A v15: arm_ffa: efi: corstone1000: enable MM
  communication
 
 turn on EFI MM communication

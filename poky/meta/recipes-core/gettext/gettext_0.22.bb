@@ -10,8 +10,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 # without libxml in PACKAGECONFIG vendor copy of the lib will be used
 LICENSE:append = " ${@bb.utils.contains('PACKAGECONFIG', 'libxml', '', '& MIT', d)}"
 LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'libxml', '', 'file://libtextstyle/lib/libxml/COPYING;md5=2044417e2e5006b65a8b9067b683fcf1', d)}"
-# without croco in PACKAGECONFIG vendor copy of the lib will be used
-LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'croco', '', 'file://libtextstyle/lib/libcroco/libcroco.h;md5=424013a9ed5401aa58cf83f3188c6865;beginline=10;endline=28', d)}"
 # without glib in PACKAGECONFIG vendor copy of the lib will be used
 LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'glib', '', 'file://libtextstyle/lib/glib/ghash.c;md5=e3159f5ac38dfe77af5cc0ee104dab2d;beginline=10;endline=27', d)}"
 
@@ -44,6 +42,7 @@ EXTRA_OECONF += "--without-lispdir \
                  --without-emacs \
                  --without-cvs \
                  --without-git \
+                 --without-included-libcroco \
                  --cache-file=${B}/config.cache \
                 "
 EXTRA_OECONF:append:class-target = " \
@@ -54,11 +53,10 @@ EXTRA_OECONF:append:class-target = " \
                  gt_cv_locale_de=de_DE.ISO-8859-1 \
 "
 
-PACKAGECONFIG ??= "croco glib libxml"
+PACKAGECONFIG ??= "glib libxml"
 PACKAGECONFIG:class-native = ""
 PACKAGECONFIG:class-nativesdk = ""
 
-PACKAGECONFIG[croco] = "--without-included-libcroco,--with-included-libcroco,libcroco"
 PACKAGECONFIG[glib] = "--without-included-glib,--with-included-glib,glib-2.0"
 PACKAGECONFIG[libxml] = "--without-included-libxml,--with-included-libxml,libxml2"
 # Need paths here to avoid host contamination but this can cause RPATH warnings

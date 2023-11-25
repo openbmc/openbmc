@@ -7,7 +7,7 @@ vmail:x:635:
 rasvd:x:636:
 frr:x:637:
 frrvty:x:638:
-nogroup:x:639:
+nogroup:x:65534:
 ftp:x:640:
 rwhod:x:641:
 lldpd:x:642:

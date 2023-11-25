@@ -1,0 +1,31 @@
+From 830abe652428d9d31780c3ace121635ad7b64274 Mon Sep 17 00:00:00 2001
+From: Eero Aaltonen <eero.aaltonen@vaisala.com>
+Date: Wed Sep 27 15:50:48 2023 +0300
+Subject: [PATCH] Add nss-resolve to the Name Service Switch (NSS)
+
+Add `nss-resolve` so that `systemd-resolved` is used for name
+resolution with glibc `gethostbyname` calls.
+
+Upstream-Status: Inappropriate [no upstream, configuration].
+
+Signed-off-by: Eero Aaltonen <eero.aaltonen@vaisala.com>
+---
+ nsswitch.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nsswitch.conf b/nsswitch.conf
+index 06f03d2..34b165c 100644
+--- a/nsswitch.conf
++++ b/nsswitch.conf
+@@ -8,7 +8,7 @@ passwd:         compat
+ group:          compat
+ shadow:         compat
+ 
+-hosts:          files dns
++hosts:          resolve [!UNAVAIL=return] files dns
+ networks:       files
+ 
+ protocols:      db files
+-- 
+2.25.1
+

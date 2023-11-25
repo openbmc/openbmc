@@ -1389,9 +1389,6 @@ class Machine(models.Model):
         return "Machine " + self.name + "(" + self.description + ")"
 
 
-
-
-
 class BitbakeVersion(models.Model):
 
     name = models.CharField(max_length=32, unique = True)
@@ -1853,6 +1850,8 @@ def signal_runbuilds():
             os.kill(int(pidf.read()), SIGUSR1)
     except FileNotFoundError:
         logger.info("Stopping existing runbuilds: no current process found")
+    except ProcessLookupError:
+        logger.warning("Stopping existing runbuilds: process lookup not found")
 
 class Distro(models.Model):
     search_allowed_fields = ["name", "description", "layer_version__layer__name"]

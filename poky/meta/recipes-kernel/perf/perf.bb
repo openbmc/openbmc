@@ -28,6 +28,9 @@ PACKAGECONFIG[audit] = ",NO_LIBAUDIT=1,audit"
 PACKAGECONFIG[manpages] = ",,xmlto-native asciidoc-native"
 PACKAGECONFIG[cap] = ",,libcap"
 PACKAGECONFIG[libtraceevent] = ",NO_LIBTRACEEVENT=1,libtraceevent"
+# jevents requires host python for generating a .c file, but is
+# unrelated to the python item.
+PACKAGECONFIG[jevents] = ",NO_JEVENTS=1,python3-native"
 # Arm CoreSight
 PACKAGECONFIG[coresight] = "CORESIGHT=1,,opencsd"
 PACKAGECONFIG[pfm4] = ",NO_LIBPFM4=1,libpfm4"
@@ -73,6 +76,15 @@ SPDX_S = "${S}/tools/perf"
 # supported kernel.
 LDFLAGS="-ldl -lutil"
 
+# Perf's build system adds its own optimization flags for most TUs,
+# overriding the flags included here. But for some, perf does not add
+# any -O option, so ensure the distro's chosen optimization gets used
+# for those. Since ${SELECTED_OPTIMIZATION} always includes
+# ${DEBUG_FLAGS} which in turn includes ${DEBUG_PREFIX_MAP}, this also
+# ensures perf is built with appropriate -f*-prefix-map options,
+# avoiding the 'buildpaths' QA warning.
+TARGET_CC_ARCH += "${SELECTED_OPTIMIZATION}"
+
 EXTRA_OEMAKE = '\
     V=1 \
     VF=1 \
@@ -86,7 +98,7 @@ EXTRA_OEMAKE = '\
     AR="${AR}" \
     LD="${LD}" \
     EXTRA_CFLAGS="-ldw -I${S}" \
-    YFLAGS='-y --file-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}' \
+    YFLAGS='-y --file-prefix-map=${WORKDIR}=${TARGET_DBGSRC_DIR}' \
     EXTRA_LDFLAGS="${PERF_EXTRA_LDFLAGS}" \
     perfexecdir=${libexecdir} \
     NO_GTK2=1 \
@@ -126,6 +138,7 @@ PERF_SRC ?= "Makefile \
              tools/perf \
              tools/scripts \
              scripts/ \
+             arch/arm64/tools \
              arch/${ARCH}/Makefile \
 "
 
@@ -171,7 +184,8 @@ python copy_perf_source_from_kernel() {
         src = oe.path.join(src_dir, s)
         dest = oe.path.join(dest_dir, s)
         if not os.path.exists(src):
-            bb.fatal("Path does not exist: %s. Maybe PERF_SRC does not match the kernel version." % src)
+            bb.warn("Path does not exist: %s. Maybe PERF_SRC lists more files than what your kernel version provides and needs." % src)
+            continue
         if os.path.isdir(src):
             oe.path.copyhardlinktree(src, dest)
         else:
@@ -391,7 +405,7 @@ PACKAGESPLITFUNCS =+ "perf_fix_sources"
 perf_fix_sources () {
 	for f in util/parse-events-flex.h util/parse-events-flex.c util/pmu-flex.c \
 			util/pmu-flex.h util/expr-flex.h util/expr-flex.c; do
-		f=${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/$f
+		f=${PKGD}${TARGET_DBGSRC_DIR}/$f
 		if [ -e $f ]; then
 			sed -i -e 's#${S}/##g' $f
 		fi

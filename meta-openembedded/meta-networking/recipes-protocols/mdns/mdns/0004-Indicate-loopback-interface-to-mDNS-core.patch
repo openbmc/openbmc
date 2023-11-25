@@ -14,11 +14,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 7 ++++---
  1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index 9a5b4d7ea4cb..02a19b438e03 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
-@@ -1348,7 +1348,7 @@ mDNSlocal void CleanRecentInterfaces(void)
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
+@@ -1348,7 +1348,7 @@ mDNSlocal void CleanRecentInterfaces(voi
  // Creates a PosixNetworkInterface for the interface whose IP address is
  // intfAddr and whose name is intfName and registers it with mDNS core.
  mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct sockaddr *intfMask,
@@ -27,7 +27,7 @@ index 9a5b4d7ea4cb..02a19b438e03 100644
  {
      int err = 0;
      PosixNetworkInterface *intf;
-@@ -1411,6 +1411,7 @@ mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct
+@@ -1411,6 +1411,7 @@ mDNSlocal int SetupOneInterface(mDNS *co
  
          intf->coreIntf.Advertise = m->AdvertiseLocalAddresses;
          intf->coreIntf.McastTxRx = mDNStrue;
@@ -35,7 +35,7 @@ index 9a5b4d7ea4cb..02a19b438e03 100644
  
          // Set up the extra fields in PosixNetworkInterface.
          assert(intf->intfName != NULL);         // intf->intfName already set up above
-@@ -1561,7 +1562,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
+@@ -1561,7 +1562,7 @@ mDNSlocal int SetupInterfaceList(mDNS *c
                      }
  #endif
                      if (SetupOneInterface(m, i->ifa_addr, i->ifa_netmask,
@@ -44,7 +44,7 @@ index 9a5b4d7ea4cb..02a19b438e03 100644
                      {
                          if (i->ifa_addr->sa_family == AF_INET)
                              foundav4 = mDNStrue;
-@@ -1578,7 +1579,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
+@@ -1578,7 +1579,7 @@ mDNSlocal int SetupInterfaceList(mDNS *c
          // if ((m->HostInterfaces == NULL) && (firstLoopback != NULL))
          if (!foundav4 && firstLoopback)
              (void) SetupOneInterface(m, firstLoopback->ifa_addr, firstLoopback->ifa_netmask,
@@ -53,6 +53,3 @@ index 9a5b4d7ea4cb..02a19b438e03 100644
      }
  
      // Clean up.
--- 
-2.35.1
-

@@ -160,12 +160,6 @@ options are available:
    comments at the top of the BeagleBoneTarget
    ``meta-yocto-bsp/lib/oeqa/controllers/beaglebonetarget.py`` file.
 
--  *"EdgeRouterTarget":* Choose "EdgeRouterTarget" if you are deploying
-   images and running tests on the Ubiquiti Networks EdgeRouter Lite.
-   For information on how to use these tests, see the comments at the
-   top of the EdgeRouterTarget
-   ``meta-yocto-bsp/lib/oeqa/controllers/edgeroutertarget.py`` file.
-
 -  *"GrubTarget":* Choose "GrubTarget" if you are deploying images and running
    tests on any generic PC that boots using GRUB. For information on how
    to use these tests, see the comments at the top of the GrubTarget
@@ -288,7 +282,7 @@ Serial Console Connection
 -------------------------
 
 For test target classes requiring a serial console to interact with the
-bootloader (e.g. BeagleBoneTarget, EdgeRouterTarget, and GrubTarget),
+bootloader (e.g. BeagleBoneTarget and GrubTarget),
 you need to specify a command to use to connect to the serial console of
 the target machine by using the
 :term:`TEST_SERIALCONTROL_CMD`

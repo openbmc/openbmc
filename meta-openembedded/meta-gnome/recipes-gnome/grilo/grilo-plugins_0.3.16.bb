@@ -11,7 +11,6 @@ DEPENDS = " \
     liboauth \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gnome-help vala
 

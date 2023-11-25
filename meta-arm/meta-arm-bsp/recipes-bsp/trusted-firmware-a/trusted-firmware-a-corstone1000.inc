@@ -24,6 +24,16 @@ TFA_SPMD_SPM_AT_SEL2 = "0"
 # BL2 loads BL32 (optee). So, optee needs to be built first:
 DEPENDS += "optee-os"
 
+# Note: Regarding the build option: LOG_LEVEL. 
+# There seems to be an issue when setting it
+# to 50 (LOG_LEVEL_VERBOSE), where the kernel 
+# tee driver sends yielding requests to OP-TEE
+# at a faster pace than OP-TEE processes them,
+# as the processing time is consumed by logging 
+# in TF-A. When this issue occurs, booting halts 
+# as soon as optee driver starts initialization.
+# Therefore, it's not currently recommended to
+# set LOG_LEVEL to 50 at all.
 EXTRA_OEMAKE:append = " \
                         ARCH=aarch64 \
                         TARGET_PLATFORM=${TFA_TARGET_PLATFORM} \
@@ -41,5 +51,4 @@ EXTRA_OEMAKE:append = " \
                         ERRATA_A35_855472=1 \
                         ROT_KEY=plat/arm/board/common/rotpk/arm_rotprivk_rsa.pem \
                         BL32=${RECIPE_SYSROOT}/${nonarch_base_libdir}/firmware/tee-pager_v2.bin \
-                        LOG_LEVEL=50 \
                         "

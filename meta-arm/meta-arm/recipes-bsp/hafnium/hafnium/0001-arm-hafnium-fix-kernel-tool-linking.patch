@@ -1,4 +1,4 @@
-From ef156578c1f7100b339ddfe956ff2cd89d61e0d4 Mon Sep 17 00:00:00 2001
+From c17aabb2535d791a715130f21178946ab9c1e29d Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Tue, 9 Nov 2021 23:31:22 +0000
 Subject: [PATCH] arm/hafnium: fix kernel tool linking

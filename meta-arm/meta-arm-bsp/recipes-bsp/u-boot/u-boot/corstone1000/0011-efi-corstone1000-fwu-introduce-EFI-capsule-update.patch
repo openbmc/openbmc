@@ -1,7 +1,7 @@
-From 90b2741149a538c93aed61522c0d3363351bd578 Mon Sep 17 00:00:00 2001
+From 4483f276e70afdd961449ac45d4d8121c2a9080c Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 17 Jul 2023 15:56:18 +0100
-Subject: [PATCH 11/33] efi: corstone1000: fwu: introduce EFI capsule update
+Subject: [PATCH 11/38] efi: corstone1000: fwu: introduce EFI capsule update
 
 This commit provides capsule update feature for Corstone1000.
 

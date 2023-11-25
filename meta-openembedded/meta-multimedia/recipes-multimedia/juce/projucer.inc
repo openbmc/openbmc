@@ -18,7 +18,8 @@ DEPENDS:append:libc-musl = " libexecinfo"
 SRCREV = "2f980209cc4091a4490bb1bafc5d530f16834e58"
 BRANCH = "master"
 SRC_URI = "git://github.com/WeAreROLI/JUCE.git;protocol=https;branch=${BRANCH} \
-"
+           file://0001-StandardHeader-Include-utility-for-GCC-12-compatibil.patch \
+           "
 
 S = "${WORKDIR}/git"
 PV = "6.1.6"

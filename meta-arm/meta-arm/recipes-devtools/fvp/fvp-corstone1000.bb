@@ -1,11 +1,14 @@
 require fvp-ecosystem.inc
 
-MODEL = "Corstone-1000-23"
+MODEL = "Corstone-1000"
 MODEL_CODE = "FVP_Corstone_1000"
-PV = "11.19_21"
+PV = "11.23_25"
 
-SRC_URI = "https://developer.arm.com/-/media/Arm%20Developer%20Community/Downloads/OSS/FVP/${MODEL}/Linux/${MODEL_CODE}_${PV}_${FVP_ARCH}.tgz;subdir=${BP}"
-SRC_URI[sha256sum] = "dbdcb8b0c206fd56fd2296fe338a62902eb978883ba07f4da28440e180383b24"
+SRC_URI = "https://developer.arm.com/-/media/Arm%20Developer%20Community/Downloads/OSS/FVP/${MODEL}/${MODEL_CODE}_${PV}_${FVP_ARCH}.tgz;subdir=${BP};name=fvp-${HOST_ARCH}"
+SRC_URI[fvp-aarch64.sha256sum] = "e299e81d5fa8b3d2afee0850fd03be31c1a1c3fad07f79849c63e46ee5e36acc"
+SRC_URI[fvp-x86_64.sha256sum] = "ec34c9564ccb5b1eb62fc2757673343a353db1d116a7cb1b5f82f9d985d99cdf"
 
 LIC_FILES_CHKSUM = "file://license_terms/license_agreement.txt;md5=1a33828e132ba71861c11688dbb0bd16 \
-                    file://license_terms/third_party_licenses/third_party_licenses.txt;md5=34a1ba318d745f05e6197def68ea5411"
+                    file://license_terms/third_party_licenses/third_party_licenses.txt;md5=0c32ac6f58ebff83065105042ab98211"
+
+COMPATIBLE_HOST = "(aarch64|x86_64).*-linux"

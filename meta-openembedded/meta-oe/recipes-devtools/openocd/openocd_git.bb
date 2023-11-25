@@ -7,7 +7,7 @@ RDEPENDS:${PN} = "libusb1"
 SRC_URI = " \
     git://repo.or.cz/openocd.git;protocol=http;name=openocd;branch=master \
     git://repo.or.cz/r/git2cl.git;protocol=http;destsuffix=tools/git2cl;name=git2cl;branch=master \
-    git://github.com/msteveb/jimtcl.git;protocol=http;destsuffix=git/jimtcl;name=jimtcl;branch=master \
+    git://github.com/msteveb/jimtcl.git;protocol=https;destsuffix=git/jimtcl;name=jimtcl;branch=master \
     git://repo.or.cz/r/libjaylink.git;protocol=http;destsuffix=git/src/jtag/drivers/libjaylink;name=libjaylink;branch=master \
 "
 

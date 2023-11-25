@@ -1,0 +1,45 @@
+From 63da10da7a57776196a3c323e93ef66f1d553c0c Mon Sep 17 00:00:00 2001
+From: Manoj Kumar <manoj.kumar3@arm.com>
+Date: Mon, 1 Feb 2021 21:36:43 +0530
+Subject: [PATCH] iommu/arm-smmu-v3: workaround for ATC_INV_SIZE_ALL in N1SDP
+
+ATC_INV_SIZE_ALL request should automatically translate to ATS
+address which is not happening in SMMUv3 version gone into
+N1SDP platform. This workaround manually sets the ATS address
+field to proper value for ATC_INV_SIZE_ALL command.
+
+Change-Id: If89465be94720a62be85e1e6612f17e93fa9b8a5
+Upstream-Status: Inappropriate [Workaround]
+Signed-off-by: Manoj Kumar <manoj.kumar3@arm.com>
+Signed-off-by: Khasim Syed Mohammed <khasim.mohammed@arm.com>
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Adam Johnston <adam.johnston@arm.com>
+---
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 1 +
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 6ccbae9b93a1..5387f152fb07 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -1753,6 +1753,7 @@ arm_smmu_atc_inv_to_cmd(int ssid, unsigned long iova, size_t size,
+ 	};
+ 
+ 	if (!size) {
++		cmd->atc.addr = ATC_INV_ADDR_ALL;
+ 		cmd->atc.size = ATC_INV_SIZE_ALL;
+ 		return;
+ 	}
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+index dcab85698a4e..12e12d03eebf 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+@@ -478,6 +478,7 @@ struct arm_smmu_cmdq_ent {
+ 
+ 		#define CMDQ_OP_ATC_INV		0x40
+ 		#define ATC_INV_SIZE_ALL	52
++		#define ATC_INV_ADDR_ALL        0x7FFFFFFFFFFFF000UL
+ 		struct {
+ 			u32			sid;
+ 			u32			ssid;

@@ -16,3 +16,5 @@ inherit autotools pkgconfig
 FILES:${PN} += "${libdir}/dleyna-1.0/connectors/*.so"
 FILES:${PN}-dev += "${libdir}/dleyna-1.0/connectors/*.la"
 FILES:${PN}-dbg += "${libdir}/dleyna-1.0/connectors/.debug/*.so"
+
+SKIP_RECIPE[dleyna-connector-dbus] ?= "Upstream is dead moreover needs porting to work with latest gupnp >= 1.2"

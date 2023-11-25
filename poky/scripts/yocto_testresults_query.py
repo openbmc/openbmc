@@ -56,9 +56,12 @@ def fetch_testresults(workdir, sha1):
         subprocess.check_call(["git", "fetch", "--depth", "1", "origin", f"{rev}:{rev}"], cwd=workdir)
     return branch
 
-def compute_regression_report(workdir, basebranch, baserevision, targetbranch, targetrevision):
+def compute_regression_report(workdir, basebranch, baserevision, targetbranch, targetrevision, args):
     logger.info(f"Running resulttool regression between SHA1 {baserevision} and {targetrevision}")
-    report = subprocess.check_output([resulttool, "regression-git", "--branch", basebranch, "--commit", baserevision, "--branch2", targetbranch, "--commit2", targetrevision, workdir]).decode("utf-8")
+    command = [resulttool, "regression-git", "--branch", basebranch, "--commit", baserevision, "--branch2", targetbranch, "--commit2", targetrevision, workdir]
+    if args.limit:
+        command.extend(["-l", args.limit])
+    report = subprocess.check_output(command).decode("utf-8")
     return report
 
 def print_report_with_header(report, baseversion, baserevision, targetversion, targetrevision):
@@ -85,7 +88,7 @@ def regression(args):
             sys.exit(1)
         basebranch = fetch_testresults(workdir, baserevision)
         targetbranch = fetch_testresults(workdir, targetrevision)
-        report = compute_regression_report(workdir, basebranch, baserevision, targetbranch, targetrevision)
+        report = compute_regression_report(workdir, basebranch, baserevision, targetbranch, targetrevision, args)
         print_report_with_header(report, args.base, baserevision, args.target, targetrevision)
     finally:
         if not args.testresultsdir:
@@ -109,6 +112,10 @@ def main():
         '-t',
         '--testresultsdir',
         help=f"An existing test results directory. {sys.argv[0]} will automatically clone it and use default branch if not provided")
+    parser_regression_report.add_argument(
+        '-l',
+        '--limit',
+        help=f"Maximum number of changes to display per test. Can be set to 0 to print all changes")
     parser_regression_report.set_defaults(func=regression)
 
     args = parser.parse_args()

@@ -19,10 +19,10 @@ TEMPLATE_DEBUG = DEBUG
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/toaster-test-db.sqlite',
+        'NAME': '%s/toaster-test-db.sqlite' % TMPDIR,
         'TEST': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': '/tmp/toaster-test-db.sqlite',
+            'NAME': '%s/toaster-test-db.sqlite' % TMPDIR,
         }
     }
 }

@@ -8,6 +8,7 @@ DEPENDS = "intltool-native gnome-common-native gtk+ gdk-pixbuf-native libxres"
 PACKAGECONFIG ??= "startup-notification"
 PACKAGECONFIG[startup-notification] = "--enable-startup-notification,--disable-startup-notification,startup-notification"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gobject-introspection features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 

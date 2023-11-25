@@ -6,15 +6,16 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 DEPENDS = "zlib libsigc++-2.0 openssl cppunit"
 
+PV = "0.13.8+git"
+
 SRC_URI = "git://github.com/rakshasa/libtorrent;branch=master;protocol=https"
 SRCREV = "e60f222241319aaae482789517ad00ae9344bd13"
 
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
+
 CVE_STATUS[CVE-2009-1760] = "backported-patch: patched in our product"
 
-PV = "0.13.8+git${SRCPV}"
-
 S = "${WORKDIR}/git"
-
 
 PACKAGECONFIG ??= "instrumentation aligned"
 

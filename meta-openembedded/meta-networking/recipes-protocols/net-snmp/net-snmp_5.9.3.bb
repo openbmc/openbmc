@@ -178,7 +178,7 @@ do_install_ptest() {
 }
 
 SYSROOT_PREPROCESS_FUNCS += "net_snmp_sysroot_preprocess"
-SNMP_DBGDIR = "/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
+SNMP_DBGDIR = "${TARGET_DBGSRC_DIR}"
 
 net_snmp_sysroot_preprocess () {
     if [ -e ${D}${bindir}/net-snmp-config ]; then

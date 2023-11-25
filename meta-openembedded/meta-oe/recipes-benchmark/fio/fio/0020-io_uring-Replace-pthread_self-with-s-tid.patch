@@ -1,0 +1,41 @@
+From 72d7f2139454528b9ebfb2f988a35f9a739680d0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Aug 2022 18:08:53 -0700
+Subject: [PATCH] io_uring: Replace pthread_self with s->tid
+
+__init_rand64 takes 64bit value and srand48 takes unsigned 32bit value,
+pthread_t is opaque type and some libcs ( e.g. musl ) do not define them
+in plain old data types and ends up with errors
+
+| t/io_uring.c:809:32: error: incompatible pointer to integer conversion passing 'pthread_t' (aka 'struct __pthread *') to parameter of type 'uint64_t' (aka 'unsigned long') [-Wint-conver
+sion]
+|         __init_rand64(&s->rand_state, pthread_self());
+|                                       ^~~~~~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ t/io_uring.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/t/io_uring.c b/t/io_uring.c
+index 35bf1956..f34a3554 100644
+--- a/t/io_uring.c
++++ b/t/io_uring.c
+@@ -799,15 +799,14 @@ static int submitter_init(struct submitter *s)
+ 	int i, nr_batch, err;
+ 	static int init_printed;
+ 	char buf[80];
+-
+ 	s->tid = gettid();
+ 	printf("submitter=%d, tid=%d, file=%s, node=%d\n", s->index, s->tid,
+ 							s->filename, s->numa_node);
+ 
+ 	set_affinity(s);
+ 
+-	__init_rand64(&s->rand_state, pthread_self());
+-	srand48(pthread_self());
++	__init_rand64(&s->rand_state, s->tid);
++	srand48(s->tid);
+ 
+ 	for (i = 0; i < MAX_FDS; i++)
+ 		s->files[i].fileno = i;

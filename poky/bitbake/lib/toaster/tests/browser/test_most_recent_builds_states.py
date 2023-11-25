@@ -54,6 +54,7 @@ class TestMostRecentBuildsStates(SeleniumTestCase):
         build.outcome = Build.IN_PROGRESS
         build.recipes_to_parse = recipes_to_parse
         build.recipes_parsed = 0
+        build.save()
 
         build_request.state = BuildRequest.REQ_INPROGRESS
         build_request.save()
@@ -100,7 +101,7 @@ class TestMostRecentBuildsStates(SeleniumTestCase):
             'Tasks starting', 'build should show "tasks starting" status')
 
         # first task finished; check tasks progress bar
-        task1.order = 1
+        task1.outcome = Task.OUTCOME_SUCCESS
         task1.save()
 
         self.get(url)
@@ -117,7 +118,7 @@ class TestMostRecentBuildsStates(SeleniumTestCase):
         element = Wait(self.driver).until(task_bar_updated, msg)
 
         # last task finished; check tasks progress bar updates
-        task2.order = 2
+        task2.outcome = Task.OUTCOME_SUCCESS
         task2.save()
 
         self.get(url)

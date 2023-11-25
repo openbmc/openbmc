@@ -1,32 +1,29 @@
-From 449cec34c123b86b792627553c6ec7471d2ee7ed Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Fri, 30 Jun 2017 14:46:51 +0800
+From 6e794a36564a2639a07d8720260e33d7c9435aa4 Mon Sep 17 00:00:00 2001
+From: Alper Ak <alperyasinak1@gmail.com>
+Date: Fri, 10 Nov 2023 20:50:48 +0300
 Subject: [PATCH] support cross compiling
 
 Do not override OE CMAKE variables
 
-Upstream-Status: Pending
-
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
 ---
- CMakeLists.txt | 4 ++--
+ src/CMakeLists.txt | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -10,9 +10,9 @@ IF(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
- ENDIF(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index f549496..ab71fb2 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -4,9 +4,9 @@ set(UNIONFS_SRCS unionfs.c opts.c debug.c findbranch.c readdir.c
+     fuse_ops.c)
+ set(UNIONFSCTL_SRCS unionfsctl.c)
  
- # Select flags.
--SET(CMAKE_C_FLAGS "-pipe -W -Wall -DFORTIFY_SOURCE=2")
-+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -W -Wall -DFORTIFY_SOURCE=2")
+-SET(CMAKE_C_FLAGS "-pipe -W -Wall -D_FORTIFY_SOURCE=2")
++SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pipe -W -Wall -D_FORTIFY_SOURCE=2")
  SET(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g")
 -SET(CMAKE_C_FLAGS_RELEASE "-O2")
 +SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
  SET(CMAKE_C_FLAGS_DEBUG "-O0 -g -DDEBUG")
  
- if (UNIX AND APPLE)
--- 
-2.8.1
-
+ add_executable(unionfs ${UNIONFS_SRCS} ${HASHTABLE_SRCS})

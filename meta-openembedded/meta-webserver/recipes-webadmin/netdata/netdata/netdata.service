@@ -7,7 +7,7 @@ After=network.target
 [Service]
 Type=simple
 ExecStartPre=/bin/mkdir -p /var/log/netdata
-ExecStartPre=/bin/chown -R netdata.netdata /var/log/netdata
+ExecStartPre=/bin/chown -R netdata:netdata /var/log/netdata
 ExecStart=/usr/sbin/netdata -D -u netdata
 
 

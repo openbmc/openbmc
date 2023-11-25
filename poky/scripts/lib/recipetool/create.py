@@ -1212,7 +1212,7 @@ def guess_license(srctree, d):
 
     licenses = []
     licspecs = ['*LICEN[CS]E*', 'COPYING*', '*[Ll]icense*', 'LEGAL*', '[Ll]egal*', '*GPL*', 'README.lic*', 'COPYRIGHT*', '[Cc]opyright*', 'e[dp]l-v10']
-    skip_extensions = (".html", ".js", ".json", ".svg", ".ts")
+    skip_extensions = (".html", ".js", ".json", ".svg", ".ts", ".go")
     licfiles = []
     for root, dirs, files in os.walk(srctree):
         for fn in files:

@@ -10,7 +10,6 @@ DEPENDS = "glib-2.0-native atkmm pangomm glibmm gtk+3 cairomm gdk-pixbuf-native"
 
 BPN = "gtkmm"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase features_check
 

@@ -9,10 +9,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSShared/PlatformCommon.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/mDNSShared/PlatformCommon.c b/mDNSShared/PlatformCommon.c
-index 9ce15468e217..c308af3e8b0e 100644
---- a/mDNSShared/PlatformCommon.c
-+++ b/mDNSShared/PlatformCommon.c
+Index: mDNSResponder/mDNSShared/PlatformCommon.c
+===================================================================
+--- mDNSResponder.orig/mDNSShared/PlatformCommon.c
++++ mDNSResponder/mDNSShared/PlatformCommon.c
 @@ -32,6 +32,7 @@
  #include <time.h>
  #include <sys/time.h>           // Needed for #include <sys/time.h>().

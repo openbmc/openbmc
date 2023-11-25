@@ -1,0 +1,33 @@
+From 1e68459d85f56f805c70236ad47a65a65f426867 Mon Sep 17 00:00:00 2001
+From: Vincent Fu <vincent.fu@samsung.com>
+Date: Mon, 15 Aug 2022 11:40:58 -0400
+Subject: [PATCH] test: fix hash for t0016
+
+I used the wrong hash for t0016 in the original commit. Fix it to refer
+to the hash that fixed the issue in this tree.
+
+Fixes: de31fe9a ("testing: add test for slat + clat = tlat")
+Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
+---
+ t/jobs/{t0016-259ebc00.fio => t0016-d54ae22.fio} | 0
+ t/run-fio-tests.py                               | 2 +-
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename t/jobs/{t0016-259ebc00.fio => t0016-d54ae22.fio} (100%)
+
+diff --git a/t/jobs/t0016-259ebc00.fio b/t/jobs/t0016-d54ae22.fio
+similarity index 100%
+rename from t/jobs/t0016-259ebc00.fio
+rename to t/jobs/t0016-d54ae22.fio
+diff --git a/t/run-fio-tests.py b/t/run-fio-tests.py
+index 2bd02a2a..504b7cdb 100755
+--- a/t/run-fio-tests.py
++++ b/t/run-fio-tests.py
+@@ -850,7 +850,7 @@ TEST_LIST = [
+     {
+         'test_id':          16,
+         'test_class':       FioJobTest_t0015,
+-        'job':              't0016-259ebc00.fio',
++        'job':              't0016-d54ae22.fio',
+         'success':          SUCCESS_DEFAULT,
+         'pre_job':          None,
+         'pre_success':      None,

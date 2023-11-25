@@ -16,7 +16,7 @@ S = "${RUSTSRC}/src/llvm-project/llvm"
 
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=8a15a0759ef07f2682d2ba4b893c9afe"
 
-inherit cmake python3native
+inherit cmake
 
 DEPENDS += "ninja-native rust-llvm-native"
 
@@ -47,6 +47,15 @@ EXTRA_OECMAKE = " \
     -DLLVM_TARGET_ARCH=${TARGET_ARCH} \
     -DCMAKE_INSTALL_PREFIX:PATH=${libdir}/llvm-rust \
 "
+
+# Forcibly disable the detection of these packages as otherwise
+# it will look at the host Python install
+EXTRA_OECMAKE += "\
+    -DPY_PYGMENTS_FOUND=OFF \
+    -DPY_PYGMENTS_LEXERS_C_CPP_FOUND=OFF \
+    -DPY_YAML_FOUND=OFF \
+"
+
 EXTRA_OECMAKE:append:class-target = "\
     -DLLVM_BUILD_TOOLS=OFF \
     -DLLVM_TABLEGEN=${STAGING_LIBDIR_NATIVE}/llvm-rust/bin/llvm-tblgen \

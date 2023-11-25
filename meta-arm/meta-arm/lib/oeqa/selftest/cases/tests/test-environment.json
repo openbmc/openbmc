@@ -1,0 +1,4 @@
+{
+    "fvp-bindir": ".",
+    "exe": "test-environment.py"
+}

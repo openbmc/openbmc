@@ -11,7 +11,6 @@ DEPENDS = "udev gtk+3 libnotify libcanberra bluez5"
 GNOMEBN = "gnome-bluetooth"
 S = "${WORKDIR}/${GNOMEBN}-${PV}"
 
-GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
 
 inherit features_check gnomebase gtk-icon-cache gtk-doc gobject-introspection upstream-version-is-even

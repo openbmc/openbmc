@@ -198,7 +198,9 @@ class BaseConfig(object):
         self.snapshot = False
         self.wictypes = ('wic', 'wic.vmdk', 'wic.qcow2', 'wic.vdi', "wic.vhd", "wic.vhdx")
         self.fstypes = ('ext2', 'ext3', 'ext4', 'jffs2', 'nfs', 'btrfs',
-                        'cpio.gz', 'cpio', 'ramfs', 'tar.bz2', 'tar.gz')
+                        'cpio.gz', 'cpio', 'ramfs', 'tar.bz2', 'tar.gz',
+                        'squashfs', 'squashfs-xz', 'squashfs-lzo',
+                        'squashfs-lz4', 'squashfs-zst')
         self.vmtypes = ('hddimg', 'iso')
         self.fsinfo = {}
         self.network_device = "-device e1000,netdev=net0,mac=@MAC@"

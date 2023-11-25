@@ -20,9 +20,6 @@
 # they would be in ${WORKDIR}.
 #
 
-# Nothing is being built so there is no need for the cross-compiler.
-INHIBIT_DEFAULT_DEPS = "1"
-
 # Skip the unwanted steps
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

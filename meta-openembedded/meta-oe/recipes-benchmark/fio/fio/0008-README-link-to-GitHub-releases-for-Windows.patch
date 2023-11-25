@@ -1,0 +1,33 @@
+From 6809d81b2a9b854697c65e0d69455a39d4497a6b Mon Sep 17 00:00:00 2001
+From: Vincent Fu <vincent.fu@samsung.com>
+Date: Mon, 15 Aug 2022 10:37:57 -0400
+Subject: [PATCH] README: link to GitHub releases for Windows
+
+Note that Windows installers are now available as releases on GitHub.
+
+Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
+---
+ README.rst | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/README.rst b/README.rst
+index 67420903..79582dea 100644
+--- a/README.rst
++++ b/README.rst
+@@ -123,10 +123,12 @@ Solaris:
+ 	``pkgutil -i fio``.
+ 
+ Windows:
+-	Rebecca Cran <rebecca@bsdio.com> has fio packages for Windows at
+-	https://bsdio.com/fio/ . The latest builds for Windows can also
+-	be grabbed from https://ci.appveyor.com/project/axboe/fio by clicking
+-	the latest x86 or x64 build, then selecting the ARTIFACTS tab.
++        Beginning with fio 3.31 Windows installers are available on GitHub at
++        https://github.com/axboe/fio/releases.  Rebecca Cran
++        <rebecca@bsdio.com> has fio packages for Windows at
++        https://bsdio.com/fio/ . The latest builds for Windows can also be
++        grabbed from https://ci.appveyor.com/project/axboe/fio by clicking the
++        latest x86 or x64 build and then selecting the Artifacts tab.
+ 
+ BSDs:
+ 	Packages for BSDs may be available from their binary package repositories.

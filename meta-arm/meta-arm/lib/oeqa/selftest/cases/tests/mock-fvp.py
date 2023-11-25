@@ -2,12 +2,19 @@
 
 import argparse
 import sys
+import os
 
 def do_test_parameters(args):
     if not args.parameter or set(args.parameter) != set(("board.cow=moo", "board.dog=woof")):
         print(f"Unexpected arguments: {args}")
         sys.exit(1)
 
+def do_test_environment(args):
+    if os.environ.get("DISPLAY") == "test_fvp_environment:42":
+        print("Found expected DISPLAY")
+    else:
+        print("Got unexpected environment %s" % str(os.environ))
+        sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

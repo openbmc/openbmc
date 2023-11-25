@@ -111,7 +111,7 @@ python __anonymous () {
             d.appendVar('RDEPENDS:%s-image' % kname, ' %s-modules (= ${EXTENDPKGV})' % kname)
             d.appendVar('RDEPENDS:%s-image-%s' % (kname, typelower), ' %s-modules-${KERNEL_VERSION_PKG_NAME} (= ${EXTENDPKGV})' % kname)
             d.setVar('PKG:%s-modules' % kname, '%s-modules-${KERNEL_VERSION_PKG_NAME}' % kname)
-            d.appendVar('RPROVIDES:%s-modules' % kname, '%s-modules-${KERNEL_VERSION_PKG_NAME}' % kname)
+            d.appendVar('RPROVIDES:%s-modules' % kname, ' %s-modules-${KERNEL_VERSION_PKG_NAME}' % kname)
 
         d.setVar('PKG:%s-image-%s' % (kname,typelower), '%s-image-%s-${KERNEL_VERSION_PKG_NAME}' % (kname, typelower))
         d.setVar('ALLOW_EMPTY:%s-image-%s' % (kname, typelower), '1')
@@ -336,7 +336,7 @@ kernel_do_transform_bundled_initramfs() {
 do_transform_bundled_initramfs[dirs] = "${B}"
 
 python do_package:prepend () {
-    os.environ['STRIP'] = d.getVar('KERNEL_STRIP')
+    d.setVar('STRIP',  d.getVar('KERNEL_STRIP').strip())
 }
 
 python do_devshell:prepend () {

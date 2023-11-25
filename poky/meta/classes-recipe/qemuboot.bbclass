@@ -62,8 +62,8 @@
 # QB_SLIRP_OPT: network option for SLIRP mode, e.g., -netdev user,id=net0"
 #
 # QB_CMDLINE_IP_SLIRP: If QB_NETWORK_DEVICE adds more than one network interface to qemu, usually the
-#                      ip= kernel comand line argument needs to be changed accordingly. Details are documented
-#                      in the kernel docuemntation https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
+#                      ip= kernel command line argument needs to be changed accordingly. Details are documented
+#                      in the kernel documentation https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
 #                      Example to configure only the first interface: "ip=eth0:dhcp"
 # QB_CMDLINE_IP_TAP: This parameter is similar to the QB_CMDLINE_IP_SLIRP parameter. Since the tap interface requires
 #                    static IP configuration @CLIENT@ and @GATEWAY@ place holders are replaced by the IP and the gateway

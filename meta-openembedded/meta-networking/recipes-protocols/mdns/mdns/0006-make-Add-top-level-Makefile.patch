@@ -12,14 +12,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  1 file changed, 2 insertions(+)
  create mode 100644 Makefile
 
-diff --git a/Makefile b/Makefile
-new file mode 100644
-index 000000000000..feb6ac67ef47
+Index: mDNSResponder/Makefile
+===================================================================
 --- /dev/null
-+++ b/Makefile
++++ mDNSResponder/Makefile
 @@ -0,0 +1,2 @@
 +all clean:
 +	cd mDNSPosix && $(MAKE) $@
--- 
-2.35.1
-

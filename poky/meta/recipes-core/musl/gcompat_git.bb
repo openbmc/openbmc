@@ -5,16 +5,16 @@ SUMMARY = "A library which provides glibc-compatible APIs for use on musl libc s
 HOMEPAGE = "https://git.adelielinux.org/adelie/gcompat"
 
 LICENSE = "NCSA"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=eb33ef4af05a9c7602843afb7adfe792"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=802b1aed7330d90086be4de63a3188e3"
 
 SRC_URI = "git://git.adelielinux.org/adelie/gcompat.git;protocol=https;branch=current \
-           file://0001-auxv-new-module.patch \
+           file://0001-Add-fcntl64-wrapper.patch \
            "
 SRC_URI:append:powerpc = "\
            file://0001-make-Static-PIE-does-not-work-on-musl-ppc.patch \
            "
-PV = "1.0.0+1.1+git"
-SRCREV = "c6921a1aa454bb87671f9bd1ecfe47d80d1620aa"
+PV = "1.1.0"
+SRCREV = "b7bfe0b08c52fdc72e0c1d9d4dcb2129f1642bd6"
 
 S = "${WORKDIR}/git"
 

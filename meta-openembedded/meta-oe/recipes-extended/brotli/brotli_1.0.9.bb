@@ -16,7 +16,8 @@ inherit cmake lib_package
 
 do_install:append () {
 	for lib in $(ls ${D}${libdir}/*-static.a); do
-		mv -v "${lib}" "$(echo ${lib} | sed s/-static//)"
+		basename=$(basename ${lib})
+		mv -v "${lib}" "${D}${libdir}/$(echo ${basename} | sed s/-static//)"
 	done
 }
 

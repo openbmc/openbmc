@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1 \
 
 DEPENDS = "atk glibmm"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase features_check
 

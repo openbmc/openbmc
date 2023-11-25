@@ -100,7 +100,7 @@ class FVPRunner:
                 env[name] = os.environ[name]
 
         # Allow filepath to be relative to fvp configuration file
-        cwd = os.path.dirname(fvpconf)
+        cwd = os.path.dirname(fvpconf) or None
         self._logger.debug(f"FVP call will be executed in working directory: {cwd}")
 
         self._logger.debug(f"Constructed FVP call: {shlex_join(cli)}")

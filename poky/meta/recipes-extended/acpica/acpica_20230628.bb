@@ -36,7 +36,7 @@ EXTRA_OEMAKE = "CC='${CC}' \
                 INSTALLDIR=${bindir} \
                 INSTALLFLAGS= \
                 YACC=bison \
-                YFLAGS='-y --file-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}' \
+                YFLAGS='-y --file-prefix-map=${WORKDIR}=${TARGET_DBGSRC_DIR}' \
                 "
 
 do_install() {
@@ -49,4 +49,4 @@ RPROVIDES:${PN} += "iasl"
 RREPLACES:${PN} += "iasl"
 RCONFLICTS:${PN} += "iasl"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

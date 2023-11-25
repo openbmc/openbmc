@@ -48,9 +48,9 @@ do_install() {
 		install -m 0644 ${WORKDIR}/99_sysstat ${D}/etc/default/volatiles
 	fi
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-	        install -d ${D}${sysconfdir}/tmpfiles.d
+	        install -d ${D}${nonarch_libdir}/tmpfiles.d
 	        echo "d ${localstatedir}/log/sa - - - -" \
-		     > ${D}${sysconfdir}/tmpfiles.d/sysstat.conf
+		     > ${D}${nonarch_libdir}/tmpfiles.d/sysstat.conf
 
 		# Unless both cron and systemd are enabled, install our own
 		# systemd unit file. Otherwise the package will install one.
@@ -70,7 +70,11 @@ pkg_postinst:${PN} () {
 	fi
 }
 
-FILES:${PN} += "${systemd_system_unitdir} ${nonarch_base_libdir}/systemd"
+FILES:${PN} += " \
+	${systemd_system_unitdir} \
+	${nonarch_base_libdir}/systemd  \
+	${nonarch_libdir}/tmpfiles.d \
+"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 

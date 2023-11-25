@@ -17,6 +17,7 @@ DEPENDS = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)} \
 "
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gsettings features_check gettext
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"

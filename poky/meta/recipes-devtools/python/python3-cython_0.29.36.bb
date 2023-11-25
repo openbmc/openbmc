@@ -20,17 +20,17 @@ do_install:append() {
 PACKAGESPLITFUNCS =+ "cython_fix_sources"
 
 cython_fix_sources () {
-	for f in ${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Compiler/FlowControl.c \
-		${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Compiler/FusedNode.c \
-		${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Compiler/Scanning.c \
-		${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Compiler/Visitor.c \
-		${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Plex/Actions.c \
-		${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Plex/Scanners.c \
-		${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Runtime/refnanny.c \
-		${PKGD}/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/Cython/Tempita/_tempita.c \
+	for f in ${PKGD}${TARGET_DBGSRC_DIR}/Cython/Compiler/FlowControl.c \
+		${PKGD}${TARGET_DBGSRC_DIR}/Cython/Compiler/FusedNode.c \
+		${PKGD}${TARGET_DBGSRC_DIR}/Cython/Compiler/Scanning.c \
+		${PKGD}${TARGET_DBGSRC_DIR}/Cython/Compiler/Visitor.c \
+		${PKGD}${TARGET_DBGSRC_DIR}/Cython/Plex/Actions.c \
+		${PKGD}${TARGET_DBGSRC_DIR}/Cython/Plex/Scanners.c \
+		${PKGD}${TARGET_DBGSRC_DIR}/Cython/Runtime/refnanny.c \
+		${PKGD}${TARGET_DBGSRC_DIR}/Cython/Tempita/_tempita.c \
 		${PKGD}${libdir}/${PYTHON_DIR}/site-packages/Cython*/SOURCES.txt; do
 		if [ -e $f ]; then
-			sed -i -e 's#${WORKDIR}/Cython-${PV}#/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}#g' $f
+			sed -i -e 's#${WORKDIR}/Cython-${PV}#${TARGET_DBGSRC_DIR}#g' $f
 		fi
 	done
 }

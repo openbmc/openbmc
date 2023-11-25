@@ -1,0 +1,12 @@
+header:
+  version: 13
+
+repos:
+  meta-arm:
+    layers:
+      meta-arm-systemready:
+
+distro: nodistro
+
+target:
+  - arm-systemready-firmware

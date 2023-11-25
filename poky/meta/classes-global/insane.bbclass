@@ -923,8 +923,12 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
 
         if "file-rdeps" not in skip:
             ignored_file_rdeps = set(['/bin/sh', '/usr/bin/env', 'rtld(GNU_HASH)'])
+            if bb.utils.contains('DISTRO_FEATURES', 'usrmerge', True, False, d):
+                ignored_file_rdeps |= set(['/usr/bin/sh'])
             if bb.data.inherits_class('nativesdk', d):
                 ignored_file_rdeps |= set(['/bin/bash', '/usr/bin/perl', 'perl'])
+                if bb.utils.contains('DISTRO_FEATURES', 'usrmerge', True, False, d):
+                    ignored_file_rdeps |= set(['/usr/bin/bash'])
             # For Saving the FILERDEPENDS
             filerdepends = {}
             rdep_data = oe.packagedata.read_subpkgdata(pkg, d)
@@ -1348,6 +1352,61 @@ python do_qa_patch() {
         if msg:
             oe.qa.handle_error("patch-status", msg, d)
 
+    ###########################################################################
+    # Check for missing ptests
+    ###########################################################################
+    def match_line_in_files(toplevel, filename_glob, line_regex):
+        import pathlib
+        try:
+            toppath = pathlib.Path(toplevel)
+            for entry in toppath.glob(filename_glob):
+                try:
+                    with open(entry, 'r', encoding='utf-8', errors='ignore') as f:
+                        for line in f.readlines():
+                            if re.match(line_regex, line):
+                                return True
+                except FileNotFoundError:
+                    # Broken symlink in source
+                    pass
+        except FileNotFoundError:
+            # pathlib.Path.glob() might throw this when file/directory
+            # disappear while scanning.
+            bb.note("unimplemented-ptest: FileNotFoundError exception while scanning (disappearing file while scanning?). Check was ignored." % d.getVar('PN'))
+            pass
+        return False
+
+    srcdir = d.getVar('S')
+    if not bb.utils.contains('DISTRO_FEATURES', 'ptest', True, False, d):
+        pass
+    elif bb.data.inherits_class('ptest', d):
+        bb.note("Package %s QA: skipping unimplemented-ptest: ptest implementation detected" % d.getVar('PN'))
+    elif srcdir == d.getVar('WORKDIR'):
+        bb.note("Package %s QA: skipping unimplemented-ptest: This check is not supported for recipe with \"S = \"${WORKDIR}\"" % d.getVar('PN'))
+
+    # Detect perl Test:: based tests
+    elif os.path.exists(os.path.join(srcdir, "t")) and any(filename.endswith('.t') for filename in os.listdir(os.path.join(srcdir, 't'))):
+        oe.qa.handle_error("unimplemented-ptest", "%s: perl Test:: based tests detected" % d.getVar('PN'), d)
+
+    # Detect pytest-based tests
+    elif match_line_in_files(srcdir, "**/*.py", r'\s*(?:import\s*pytest|from\s*pytest)'):
+        oe.qa.handle_error("unimplemented-ptest", "%s: pytest-based tests detected" % d.getVar('PN'), d)
+
+    # Detect meson-based tests
+    elif os.path.exists(os.path.join(srcdir, "meson.build")) and match_line_in_files(srcdir, "**/meson.build", r'\s*test\s*\('):
+        oe.qa.handle_error("unimplemented-ptest", "%s: meson-based tests detected" % d.getVar('PN'), d)
+
+    # Detect cmake-based tests
+    elif os.path.exists(os.path.join(srcdir, "CMakeLists.txt")) and match_line_in_files(srcdir, "**/CMakeLists.txt", r'\s*(?:add_test|enable_testing)\s*\('):
+        oe.qa.handle_error("unimplemented-ptest", "%s: cmake-based tests detected" % d.getVar('PN'), d)
+
+    # Detect autotools-based·tests
+    elif os.path.exists(os.path.join(srcdir, "Makefile.in")) and (match_line_in_files(srcdir, "**/Makefile.in", r'\s*TESTS\s*\+?=') or match_line_in_files(srcdir,"**/*.at",r'.*AT_INIT')):
+        oe.qa.handle_error("unimplemented-ptest", "%s: autotools-based tests detected" % d.getVar('PN'), d)
+
+    # Last resort, detect a test directory in sources
+    elif any(filename.lower() in ["test", "tests"] for filename in os.listdir(srcdir)):
+        oe.qa.handle_error("unimplemented-ptest", "%s: test subdirectory detected" % d.getVar('PN'), d)
+
     oe.qa.exit_if_errors(d)
 }
 
@@ -1443,35 +1502,18 @@ Rerun configure task after fixing this."""
     oe.qa.exit_if_errors(d)
 }
 
-def unpack_check_src_uri(pn, d):
-    import re
-
-    skip = (d.getVar('INSANE_SKIP') or "").split()
-    if 'src-uri-bad' in skip:
-        bb.note("Recipe %s skipping qa checking: src-uri-bad" % d.getVar('PN'))
-        return
-
-    if "${PN}" in d.getVar("SRC_URI", False):
-        oe.qa.handle_error("src-uri-bad", "%s: SRC_URI uses PN not BPN" % pn, d)
-
-    for url in d.getVar("SRC_URI").split():
-        # Search for github and gitlab URLs that pull unstable archives (comment for future greppers)
-        if re.search(r"git(hu|la)b\.com/.+/.+/archive/.+", url) or "//codeload.github.com/" in url:
-            oe.qa.handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub/GitLab archives, convert recipe to use git protocol" % pn, d)
-
 python do_qa_unpack() {
     src_uri = d.getVar('SRC_URI')
     s_dir = d.getVar('S')
     if src_uri and not os.path.exists(s_dir):
         bb.warn('%s: the directory %s (%s) pointed to by the S variable doesn\'t exist - please set S within the recipe to point to where the source has been unpacked to' % (d.getVar('PN'), d.getVar('S', False), s_dir))
-
-    unpack_check_src_uri(d.getVar('PN'), d)
 }
 
 python do_recipe_qa() {
-    def test_missing_metadata(d):
+    import re
+
+    def test_missing_metadata(pn, d):
         fn = d.getVar("FILE")
-        pn = d.getVar('BPN')
         srcfile = d.getVar('SRC_URI').split()
         # Check that SUMMARY is not the same as the default from bitbake.conf
         if d.getVar('SUMMARY') == d.expand("${PN} version ${PV}-${PR}"):
@@ -1483,16 +1525,31 @@ python do_recipe_qa() {
             else:
                 oe.qa.handle_error("missing-metadata", "Recipe {} in {} does not contain a HOMEPAGE. Please add an entry.".format(pn, fn), d)
 
-    def test_missing_maintainer(d):
+    def test_missing_maintainer(pn, d):
         fn = d.getVar("FILE")
-        pn = d.getVar("PN")
         if pn.endswith("-native") or pn.startswith("nativesdk-") or "packagegroup-" in pn or "core-image-ptest-" in pn:
             return
         if not d.getVar('RECIPE_MAINTAINER'):
             oe.qa.handle_error("missing-maintainer", "Recipe {} in {} does not have an assigned maintainer. Please add an entry into meta/conf/distro/include/maintainers.inc.".format(pn, fn), d)
 
-    test_missing_metadata(d)
-    test_missing_maintainer(d)
+    def test_srcuri(pn, d):
+        skip = (d.getVar('INSANE_SKIP') or "").split()
+        if 'src-uri-bad' in skip:
+            bb.note("Recipe %s skipping qa checking: src-uri-bad" % pn)
+            return
+
+        if "${PN}" in d.getVar("SRC_URI", False):
+            oe.qa.handle_error("src-uri-bad", "%s: SRC_URI uses PN not BPN" % pn, d)
+
+        for url in d.getVar("SRC_URI").split():
+            # Search for github and gitlab URLs that pull unstable archives (comment for future greppers)
+            if re.search(r"git(hu|la)b\.com/.+/.+/archive/.+", url) or "//codeload.github.com/" in url:
+                oe.qa.handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub/GitLab archives, convert recipe to use git protocol" % pn, d)
+
+    pn = d.getVar('PN')
+    test_missing_metadata(pn, d)
+    test_missing_maintainer(pn, d)
+    test_srcuri(pn, d)
     oe.qa.exit_if_errors(d)
 }
 

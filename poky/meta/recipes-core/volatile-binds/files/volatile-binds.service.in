@@ -3,7 +3,8 @@ Description=Bind mount volatile @where@
 DefaultDependencies=no
 Before=local-fs.target
 RequiresMountsFor=@whatparent@ @whereparent@
-ConditionPathIsReadWrite=@whatparent@
+ConditionPathIsReadWrite=|@whatparent@
+ConditionPathExists=|!@whatparent@
 ConditionPathExists=@where@
 ConditionPathIsReadWrite=!@where@
 

@@ -2,9 +2,8 @@ SUMMARY = "Babl is a dynamic, any to any, pixel format conversion library"
 LICENSE = "LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6a6a8e020838b23406c81b19c1d46df6"
 
-GNOMEBASEBUILDCLASS = "meson"
-
 GIR_MESON_OPTION = "enable-gir"
+VALA_MESON_OPTION = "enable-vapi"
 
 inherit setuptools3 gnomebase gobject-introspection vala
 

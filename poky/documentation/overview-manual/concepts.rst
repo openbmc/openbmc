@@ -2189,3 +2189,173 @@ For more information, see the
 BitBake User Manual. You can also reference the "`Why Not
 Fakeroot? <https://github.com/wrpseudo/pseudo/wiki/WhyNotFakeroot>`__"
 article for background information on Fakeroot and Pseudo.
+
+BitBake Tasks Map
+=================
+
+To understand how BitBake operates in the build directory and environment
+we can consider the following recipes and diagram, to have full picture
+about the tasks that BitBake runs to generate the final package file
+for the recipe.
+
+We will have two recipes as an example:
+
+-  ``libhello``: A recipe that provides a shared library
+-  ``sayhello``: A recipe that uses ``libhello`` library to do its job
+
+.. note::
+
+   ``sayhello`` depends on ``libhello`` at compile time as it needs the shared
+   library to do the dynamic linking process. It also depends on it at runtime
+   as the shared library loader needs to find the library.
+   For more details about dependencies check :ref:`ref-varlocality-recipe-dependencies`.
+
+``libhello`` sources are as follows:
+
+-  ``LICENSE``: This is the license associated with this library
+-  ``Makefile``: The file used by ``make`` to build the library
+-  ``hellolib.c``: The implementation of the library
+-  ``hellolib.h``: The C header of the library
+
+``sayhello`` sources are as follows:
+
+-  ``LICENSE``: This is the license associated with this project
+-  ``Makefile``: The file used by ``make`` to build the project
+-  ``sayhello.c``: The source file of the project
+
+Before presenting the contents of each file, here are the steps
+that we need to follow to accomplish what we want in the first place,
+which is integrating ``sayhello`` in our root file system:
+
+#.  Create a Git repository for each project with the corresponding files
+
+#.  Create a recipe for each project
+
+#.  Make sure that ``sayhello`` recipe :term:`DEPENDS` on ``libhello``
+
+#.  Make sure that ``sayhello`` recipe :term:`RDEPENDS` on ``libhello``
+
+#.  Add ``sayhello`` to :term:`IMAGE_INSTALL` to integrate it into
+    the root file system
+
+The following are the contents of ``libhello/Makefile``::
+
+   LIB=libhello.so
+
+   all: $(LIB)
+
+   $(LIB): hellolib.o
+      $(CC) $< -Wl,-soname,$(LIB).1 -fPIC $(LDFLAGS) -shared -o $(LIB).1.0
+
+   %.o: %.c
+      $(CC) -c $<
+
+   clean:
+      rm -rf *.o *.so*
+
+.. note::
+
+   When creating shared libraries, it is strongly recommended to follow the Linux
+   conventions and guidelines (see `this article
+   <https://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html>`__
+   for some background).
+
+.. note::
+
+   When creating ``Makefile`` files, it is strongly recommended to use ``CC``, ``LDFLAGS``
+   and ``CFLAGS`` as BitBake will set them as environment variables according
+   to your build configuration.
+
+The following are the contents of ``libhello/hellolib.h``::
+
+   #ifndef HELLOLIB_H
+   #define HELLOLIB_H
+
+   void Hello();
+
+   #endif
+
+The following are the contents of ``libhello/hellolib.c``::
+
+   #include <stdio.h>
+
+   void Hello(){
+      puts("Hello from a Yocto demo \n");
+   }
+
+The following are the contents of ``sayhello/Makefile``::
+
+   EXEC=sayhello
+   LDFLAGS += -lhello
+
+   all: $(EXEC)
+
+   $(EXEC): sayhello.c
+      $(CC) $< $(LDFLAGS) $(CFLAGS) -o $(EXEC)
+
+   clean:
+      rm -rf $(EXEC) *.o
+
+The following are the contents of ``sayhello/sayhello.c``::
+
+   #include <hellolib.h>
+
+   int main(){
+      Hello();
+      return 0;
+   }
+
+The following are the contents of ``libhello_0.1.bb``::
+
+   SUMMARY = "Hello demo library"
+   DESCRIPTION = "Hello shared library used in Yocto demo"
+
+   # NOTE: Set the License according to the LICENSE file of your project
+   #       and then add LIC_FILES_CHKSUM accordingly
+   LICENSE = "CLOSED"
+
+   # Assuming the branch is main
+   # Change <username> accordingly
+   SRC_URI = "git://github.com/<username>/libhello;branch=main;protocol=https"
+
+   S = "${WORKDIR}/git"
+
+   do_install(){
+      install -d ${D}${includedir}
+      install -d ${D}${libdir}
+
+      install hellolib.h ${D}${includedir}
+      oe_soinstall ${PN}.so.${PV} ${D}${libdir}
+   }
+
+The following are the contents of ``sayhello_0.1.bb``::
+
+   SUMMARY = "SayHello demo"
+   DESCRIPTION = "SayHello project used in Yocto demo"
+
+   # NOTE: Set the License according to the LICENSE file of your project
+   #       and then add LIC_FILES_CHKSUM accordingly
+   LICENSE = "CLOSED"
+
+   # Assuming the branch is main
+   # Change <username> accordingly
+   SRC_URI = "git://github.com/<username>/sayhello;branch=main;protocol=https"
+
+   DEPENDS += "libhello"
+   RDEPENDS:${PN} += "libhello"
+
+   S = "${WORKDIR}/git"
+
+   do_install(){
+      install -d ${D}/usr/bin
+      install -m 0700 sayhello ${D}/usr/bin
+   }
+
+After placing the recipes in a custom layer we can run ``bitbake sayhello``
+to build the recipe.
+
+The following diagram shows the sequences of tasks that BitBake
+executes to accomplish that.
+
+.. image:: svg/bitbake_tasks_map.*
+   :width: 100%

@@ -1,7 +1,7 @@
-From e8b71ec24884a0c973ac663e6802ff529a8be349 Mon Sep 17 00:00:00 2001
+From 6a50d03467b70220b615dbe87b4b49d7f86fcb2f Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 17 Jul 2023 15:11:43 +0100
-Subject: [PATCH 04/33] FF-A v15: arm_ffa: introduce Arm FF-A support
+Subject: [PATCH 04/38] FF-A v15: arm_ffa: introduce Arm FF-A support
 
 Add Arm FF-A support implementing Arm Firmware Framework for Armv8-A v1.0
 

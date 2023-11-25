@@ -25,9 +25,6 @@ RDEPENDS:packagegroup-meta-multimedia = "\
     bluealsa \
     caps \
     cdparanoia \
-    dleyna-connector-dbus \
-    dleyna-renderer \
-    dleyna-server \
     dvb-apps \
     ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "faac mpd", "", d)} \
     gerbera \

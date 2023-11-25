@@ -392,19 +392,7 @@ class SourceGenerator(NodeVisitor):
     def visit_Name(self, node):
         self.write(node.id)
 
-    def visit_Str(self, node):
-        self.write(repr(node.s))
-
-    def visit_Bytes(self, node):
-        self.write(repr(node.s))
-
-    def visit_Num(self, node):
-        self.write(repr(node.n))
-
     def visit_Constant(self, node):
-        # Python 3.8 deprecated visit_Num(), visit_Str(), visit_Bytes(),
-        # visit_NameConstant() and visit_Ellipsis(). They can be removed once we
-        # require 3.8+.
         self.write(repr(node.value))
 
     def visit_Tuple(self, node):

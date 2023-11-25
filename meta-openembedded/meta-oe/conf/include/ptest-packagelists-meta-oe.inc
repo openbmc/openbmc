@@ -28,6 +28,7 @@ PTESTS_FAST_META_OE = "\
     lmdb \
     minicoredumper \
     neon \
+    nlohmann-json \
     nodejs \
     onig \
     poco \
@@ -36,6 +37,7 @@ PTESTS_FAST_META_OE = "\
     uthash \
     xmlsec1 \
     zeromq \
+    cjson \
 "
 PTESTS_FAST_META_OE:append:x86 = " mcelog"
 PTESTS_FAST_META_OE:append:x86-64 = " mcelog"
@@ -49,6 +51,7 @@ PTESTS_SLOW_META_OE = "\
     libusb-compat \
     rsyslog \
     mariadb \
+    re2 \
 "
 PTESTS_SLOW_META_OE:append:x86 = " kernel-selftest"
 PTESTS_SLOW_META_OE:append:x86-64 = " kernel-selftest"

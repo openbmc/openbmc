@@ -41,3 +41,5 @@ EXTRA_OEMESON:append:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon",""," 
 EXTRA_OEMESON:append:armv7ve = "${@bb.utils.contains("TUNE_FEATURES","neon",""," -Dneon=disabled",d)}"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2023-37769] = "not-applicable-config: stress-test is an uninstalled test"

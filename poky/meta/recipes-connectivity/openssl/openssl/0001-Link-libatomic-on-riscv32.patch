@@ -1,0 +1,35 @@
+From 73266b8573c71e6720453c4c5a9e6e8fa4daec65 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 21 Oct 2023 13:03:52 -0700
+Subject: [PATCH] Link libatomic on riscv32
+
+GCC toolchains on linux are not able to build libcrypto without linking
+to libatomic as it does not have all needed atomics implemented as
+intrinsics
+
+Fixes errors like
+
+| ld: ./libcrypto.so: undefined reference to `__atomic_is_lock_free'
+
+Upstream-Status: Submitted [https://github.com/openssl/openssl/pull/22460]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Configurations/10-main.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Configurations/10-main.conf b/Configurations/10-main.conf
+index 46094f59c2..d1a15a1152 100644
+--- a/Configurations/10-main.conf
++++ b/Configurations/10-main.conf
+@@ -816,7 +816,7 @@ my %targets = (
+     },
+ 
+     "linux32-riscv32" => {
+-        inherit_from     => [ "linux-generic32"],
++        inherit_from     => [ "linux-latomic" ],
+         perlasm_scheme   => "linux32",
+         asm_arch         => 'riscv32',
+     },
+-- 
+2.42.0
+

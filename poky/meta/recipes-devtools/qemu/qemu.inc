@@ -29,18 +29,15 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0009-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
            file://0010-hw-pvrdma-Protect-against-buggy-or-malicious-guest-d.patch \
            file://0002-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
-           file://0001-softmmu-Assert-data-in-bounds-in-iotlb_to_section.patch \
-           file://0001-softmmu-Use-async_run_on_cpu-in-tcg_commit.patch \
            file://fixedmeson.patch \
            file://fixmips.patch \
            file://qemu-guest-agent.init \
            file://qemu-guest-agent.udev \
-	   file://CVE-2023-42467.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
 
-SRC_URI[sha256sum] = "710c101198e334d4762eef65f649bc43fa8a5dd75303554b8acfec3eb25f0e55"
+SRC_URI[sha256sum] = "541526a764576eb494d2ff5ec46aeb253e62ea29035d1c23c0a8af4e6cd4f087"
 
 SRC_URI:append:class-target = " file://cross.patch"
 SRC_URI:append:class-nativesdk = " file://cross.patch"
@@ -55,6 +52,9 @@ CVE_STATUS[CVE-2018-18438] = "disputed: The issues identified by this CVE were d
 # As per https://nvd.nist.gov/vuln/detail/CVE-2023-0664
 # https://bugzilla.redhat.com/show_bug.cgi?id=2167423
 CVE_STATUS[CVE-2023-0664] = "not-applicable-platform: Issue only applies on Windows"
+
+# As per https://bugzilla.redhat.com/show_bug.cgi?id=2203387
+CVE_STATUS[CVE-2023-2680] = "not-applicable-platform: RHEL specific issue."
 
 COMPATIBLE_HOST:mipsarchn32 = "null"
 COMPATIBLE_HOST:mipsarchn64 = "null"

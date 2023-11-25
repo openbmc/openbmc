@@ -29,7 +29,7 @@ FILES:${PN} += "${datadir}"
 # used for logging with LOGE in the code. We need to make this match the value we use
 # in the debug source remapping from CFLAGS
 #
-EXTRA_OECMAKE += "-DCMAKE_DEBUG_SRCDIR=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/"
+EXTRA_OECMAKE += "-DCMAKE_DEBUG_SRCDIR=${TARGET_DBGSRC_DIR}/"
 # Binaries built with PCH enabled don't appear reproducible, differing results were seen
 # from some builds depending on the point the PCH was compiled. Disable it to be
 # deterministic

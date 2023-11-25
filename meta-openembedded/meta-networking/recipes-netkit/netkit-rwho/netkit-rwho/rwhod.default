@@ -1,2 +1,0 @@
-#Options for the rwhod daemon.
-RWHOD_OPTIONS="-b"

@@ -14,4 +14,5 @@ SRC_URI += " \
     file://0006-core-ffa-add-TOS_FW_CONFIG-handling.patch \
     file://0007-core-spmc-handle-non-secure-interrupts.patch \
     file://0008-core-spmc-configure-SP-s-NS-interrupt-action-based-o.patch \
+    file://CVE-2023-41325.patch \
    "

@@ -2,11 +2,10 @@ SUMMARY = "Javascript bindings for GNOME"
 LICENSE = "MIT & LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8dcea832f6acf45d856abfeb2d51ec48"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 DEPENDS = "mozjs-115 cairo"
 
-inherit gnomebase gsettings gobject-introspection vala gettext features_check upstream-version-is-even pkgconfig
+inherit gnomebase gsettings gobject-introspection gettext features_check upstream-version-is-even pkgconfig
 
 SRC_URI[archive.sha256sum] = "fbaa20e0917668830800f92951688f9fc08f01296affd5cdb4b35f750be27dc9"
 SRC_URI += " \

@@ -9,16 +9,12 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
-PROFILE_TOOLS_X = ""
 # sysprof doesn't support aarch64 and nios2
-PROFILE_TOOLS_X:aarch64 = ""
-PROFILE_TOOLS_X:nios2 = ""
 PROFILE_TOOLS_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)}"
 
 RRECOMMENDS:${PN} = "\
     ${PERF} \
     blktrace \
-    ${PROFILE_TOOLS_X} \
     ${PROFILE_TOOLS_SYSTEMD} \
     "
 

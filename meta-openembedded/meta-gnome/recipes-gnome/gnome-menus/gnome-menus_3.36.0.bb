@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 DEPENDS = "glib-2.0"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gettext pkgconfig gobject-introspection upstream-version-is-even
 
 SRC_URI[archive.md5sum] = "a8fd71fcf31a87fc799d80396a526829"

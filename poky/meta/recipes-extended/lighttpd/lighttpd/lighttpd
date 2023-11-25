@@ -6,9 +6,14 @@ NAME=lighttpd
 DESC="Lighttpd Web Server"
 OPTS="-f /etc/lighttpd/lighttpd.conf"
 
+configtest() {
+	"$DAEMON" $OPTS -tt || exit 1
+}
+
 case "$1" in
   start)
 	echo -n "Starting $DESC: "
+	configtest
 	start-stop-daemon --start -x "$DAEMON" -- $OPTS
 	echo "$NAME."
 	;;
@@ -17,16 +22,26 @@ case "$1" in
 	start-stop-daemon --stop -x "$DAEMON"
 	echo "$NAME."
 	;;
-  restart|force-reload)
+  restart)
 	echo -n "Restarting $DESC: "
+	configtest
 	start-stop-daemon --stop -x "$DAEMON"
 	sleep 1
 	start-stop-daemon --start -x "$DAEMON" -- $OPTS
 	echo "$NAME."
 	;;
+  reload|force-reload)
+	echo -n "Reloading $DESC: "
+	configtest
+	killall -USR1 "${DAEMON##*/}"
+	echo "$NAME."
+	;;
+  configtest)
+	configtest
+	;;
   *)
 	N=/etc/init.d/$NAME
-	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|reload|force-reload|configtest}" >&2
 	exit 1
 	;;
 esac

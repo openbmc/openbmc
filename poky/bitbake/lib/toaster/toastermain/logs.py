@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import logging
 import json
 from pathlib import Path
 from django.http import HttpRequest
 
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-
+BUILDDIR = Path(os.environ.get('BUILDDIR', '/tmp'))
 
 def log_api_request(request, response, view, logger_name='api'):
     """Helper function for LogAPIMixin"""
@@ -38,8 +38,13 @@ def log_view_mixin(view):
             request = kwargs.get('request')
 
         response = view(*args, **kwargs)
+        view_name = 'unknown'
+        if hasattr(request, 'resolver_match'):
+            if hasattr(request.resolver_match, 'view_name'):
+                view_name = request.resolver_match.view_name
+
         log_api_request(
-            request, response, request.resolver_match.view_name, 'toaster')
+            request, response, view_name, 'toaster')
         return response
     return log_view_request
 
@@ -103,7 +108,7 @@ LOGGING_SETTINGS = {
         'file_django': {
             'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': BASE_DIR / 'logs/django.log',
+            'filename': BUILDDIR / 'toaster_logs/django.log',
             'when': 'D',  # interval type
             'interval': 1,  # defaults to 1
             'backupCount': 10,  # how many files to keep
@@ -112,7 +117,7 @@ LOGGING_SETTINGS = {
         'file_api': {
             'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': BASE_DIR / 'logs/api.log',
+            'filename': BUILDDIR / 'toaster_logs/api.log',
             'when': 'D',
             'interval': 1,
             'backupCount': 10,
@@ -121,7 +126,7 @@ LOGGING_SETTINGS = {
         'file_toaster': {
             'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': BASE_DIR / 'logs/toaster.log',
+            'filename': BUILDDIR / 'toaster_logs/web.log',
             'when': 'D',
             'interval': 1,
             'backupCount': 10,

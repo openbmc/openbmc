@@ -22,11 +22,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index 5d52de31f79b..77d982f4c50b 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
-@@ -1714,7 +1714,7 @@ mDNSlocal void          ProcessRoutingNotification(int sd, GenLinkedList *change
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
+@@ -1714,7 +1714,7 @@ mDNSlocal void          ProcessRoutingNo
  #endif
  
          // Process the NetLink message
@@ -35,6 +35,3 @@ index 5d52de31f79b..77d982f4c50b 100644
              AddInterfaceIndexToList(changedInterfaces, ((struct ifinfomsg*) NLMSG_DATA(pNLMsg))->ifi_index);
          else if (pNLMsg->nlmsg_type == RTM_DELADDR || pNLMsg->nlmsg_type == RTM_NEWADDR)
              AddInterfaceIndexToList(changedInterfaces, ((struct ifaddrmsg*) NLMSG_DATA(pNLMsg))->ifa_index);
--- 
-2.35.1
-

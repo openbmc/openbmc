@@ -58,10 +58,14 @@ do_install:append() {
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}" ] ; then
         install -d ${D}${systemd_unitdir}/system
         install -m 0644 ${S}/src/${GO_IMPORT}/scripts/influxdb.service ${D}${systemd_system_unitdir}/influxdb.service
+        install -d ${D}${libdir}/influxdb/scripts
+        install -m 0755 ${S}/src/${GO_IMPORT}/scripts/influxd-systemd-start.sh ${D}${libdir}/influxdb/scripts/influxd-systemd-start.sh
     fi
 
     # TODO chown
 }
+
+FILES:${PN} += "${libdir}/influxdb/scripts/influxd-systemd-start.sh"
 
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "influxdb"

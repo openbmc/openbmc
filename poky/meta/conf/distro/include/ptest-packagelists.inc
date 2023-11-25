@@ -121,6 +121,8 @@ PTESTS_SLOW = "\
 
 PTESTS_SLOW:remove:riscv64 = "valgrind"
 PTESTS_PROBLEMS:append:riscv64 = " valgrind"
+PTESTS_SLOW:remove:riscv32 = "lttng-tools strace valgrind"
+PTESTS_PROBLEMS:append:riscv32 = " lttng-tools strace valgrind"
 PTESTS_SLOW:append:libc-musl = " libc-test"
 PTESTS_SLOW:remove:x86 = "valgrind"
 PTESTS_PROBLEMS:append:x86 = " valgrind"

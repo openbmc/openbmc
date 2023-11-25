@@ -13,11 +13,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 22 ++++++++++++++++------
  1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index fe7242d83599..a32a880c0ce5 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
-@@ -1043,6 +1043,19 @@ mDNSlocal void FreePosixNetworkInterface(PosixNetworkInterface *intf)
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
+@@ -1043,6 +1043,19 @@ mDNSlocal void FreePosixNetworkInterface
      gRecentInterfaces = intf;
  }
  
@@ -37,7 +37,7 @@ index fe7242d83599..a32a880c0ce5 100644
  // Grab the first interface, deregister it, free it, and repeat until done.
  mDNSlocal void ClearInterfaceList(mDNS *const m)
  {
-@@ -1051,13 +1064,10 @@ mDNSlocal void ClearInterfaceList(mDNS *const m)
+@@ -1051,13 +1064,10 @@ mDNSlocal void ClearInterfaceList(mDNS *
      while (m->HostInterfaces)
      {
          PosixNetworkInterface *intf = (PosixNetworkInterface*)(m->HostInterfaces);
@@ -54,6 +54,3 @@ index fe7242d83599..a32a880c0ce5 100644
  }
  
  mDNSlocal int SetupIPv6Socket(int fd)
--- 
-2.35.1
-

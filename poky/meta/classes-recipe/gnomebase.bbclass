@@ -27,7 +27,7 @@ FILES:${PN} += "${datadir}/application-registry  \
 
 FILES:${PN}-doc += "${datadir}/devhelp"
 
-GNOMEBASEBUILDCLASS ??= "autotools"
+GNOMEBASEBUILDCLASS ??= "meson"
 inherit ${GNOMEBASEBUILDCLASS} pkgconfig
 
 do_install:append() {

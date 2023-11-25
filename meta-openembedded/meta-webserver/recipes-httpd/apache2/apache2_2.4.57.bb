@@ -36,7 +36,7 @@ inherit autotools update-rc.d pkgconfig systemd update-alternatives
 
 DEPENDS = "openssl expat pcre apr apr-util apache2-native "
 
-CVE_PRODUCT = "http_server"
+CVE_PRODUCT = "apache:http_server"
 
 SSTATE_SCAN_FILES += "apxs config_vars.mk config.nice"
 

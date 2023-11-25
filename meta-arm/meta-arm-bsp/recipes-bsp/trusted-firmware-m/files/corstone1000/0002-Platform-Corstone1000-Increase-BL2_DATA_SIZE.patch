@@ -7,7 +7,7 @@ Increases BL2_DATA_SIZE to accommodate the changes in
 metadata_write/read.
 
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/24103]
 
 ---
  platform/ext/target/arm/corstone1000/partition/region_defs.h | 3 ++-

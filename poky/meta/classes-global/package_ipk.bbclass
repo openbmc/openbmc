@@ -47,6 +47,10 @@ python do_package_ipk () {
 do_package_ipk[vardeps] += "ipk_write_pkg"
 do_package_ipk[vardepsexclude] = "BB_NUMBER_THREADS"
 
+# FILE isn't included by default but we want the recipe to change if basename() changes
+IPK_RECIPE_FILE = "${@os.path.basename(d.getVar('FILE'))}"
+IPK_RECIPE_FILE[vardepvalue] = "${IPK_RECIPE_FILE}"
+
 def ipk_write_pkg(pkg, d):
     import re, copy
     import subprocess
@@ -62,7 +66,7 @@ def ipk_write_pkg(pkg, d):
 
     outdir = d.getVar('PKGWRITEDIRIPK')
     pkgdest = d.getVar('PKGDEST')
-    recipesource = os.path.basename(d.getVar('FILE'))
+    recipesource = d.getVar('IPK_RECIPE_FILE')
 
     localdata = bb.data.createCopy(d)
     root = "%s/%s" % (pkgdest, pkg)
@@ -276,6 +280,10 @@ python () {
         deps = ' opkg-utils-native:do_populate_sysroot virtual/fakeroot-native:do_populate_sysroot xz-native:do_populate_sysroot'
         d.appendVarFlag('do_package_write_ipk', 'depends', deps)
         d.setVarFlag('do_package_write_ipk', 'fakeroot', "1")
+
+        # Needed to ensure PKG_xxx renaming of dependency packages works
+        d.setVarFlag('do_package_write_ipk', 'deptask', "do_packagedata")
+        d.setVarFlag('do_package_write_ipk', 'rdeptask', "do_packagedata")
 }
 
 python do_package_write_ipk () {

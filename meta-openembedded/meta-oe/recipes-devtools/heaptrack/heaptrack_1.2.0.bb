@@ -29,4 +29,4 @@ EXTRA_OECMAKE += "-DHEAPTRACK_BUILD_GUI=OFF"
 COMPATIBLE_HOST:riscv32 = "null"
 COMPATIBLE_HOST:riscv64 = "null"
 
-BBCLASSEXTEND = "native nativesdk"
+BBCLASSEXTEND = "native"

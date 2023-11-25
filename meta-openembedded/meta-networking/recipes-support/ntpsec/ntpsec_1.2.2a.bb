@@ -70,7 +70,7 @@ EXTRA_OEWAF_BUILD ?= "-v"
 
 NTP_USER_HOME ?= "/var/lib/ntp"
 
-BISONFLAGS = "--file-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
+BISONFLAGS = "--file-prefix-map=${WORKDIR}=${TARGET_DBGSRC_DIR}"
 
 do_configure:prepend() {
 	export BISONFLAGS="${BISONFLAGS}"

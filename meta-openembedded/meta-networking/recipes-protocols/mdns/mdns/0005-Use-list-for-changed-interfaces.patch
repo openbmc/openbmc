@@ -15,10 +15,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 58 ++++++++++++++++++++++++++++++++-----------
  1 file changed, 43 insertions(+), 15 deletions(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index 02a19b438e03..e20adda92229 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
 @@ -74,6 +74,14 @@ struct IfChangeRec
  };
  typedef struct IfChangeRec IfChangeRec;
@@ -34,7 +34,7 @@ index 02a19b438e03..e20adda92229 100644
  // Note that static data is initialized to zero in (modern) C.
  static PosixEventSource *gEventSources;             // linked list of PosixEventSource's
  static sigset_t gEventSignalSet;                // Signals which event loop listens for
-@@ -1621,6 +1629,23 @@ mDNSlocal mStatus OpenIfNotifySocket(int *pFD)
+@@ -1621,6 +1629,23 @@ mDNSlocal mStatus OpenIfNotifySocket(int
      return err;
  }
  
@@ -58,7 +58,7 @@ index 02a19b438e03..e20adda92229 100644
  #if MDNS_DEBUGMSGS
  mDNSlocal void      PrintNetLinkMsg(const struct nlmsghdr *pNLMsg)
  {
-@@ -1648,14 +1673,13 @@ mDNSlocal void      PrintNetLinkMsg(const struct nlmsghdr *pNLMsg)
+@@ -1648,14 +1673,13 @@ mDNSlocal void      PrintNetLinkMsg(cons
  }
  #endif
  
@@ -74,7 +74,7 @@ index 02a19b438e03..e20adda92229 100644
  
      // The structure here is more complex than it really ought to be because,
      // unfortunately, there's no good way to size a buffer in advance large
-@@ -1691,9 +1715,9 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
+@@ -1691,9 +1715,9 @@ mDNSlocal mDNSu32       ProcessRoutingNo
  
          // Process the NetLink message
          if (pNLMsg->nlmsg_type == RTM_GETLINK || pNLMsg->nlmsg_type == RTM_NEWLINK)
@@ -86,7 +86,7 @@ index 02a19b438e03..e20adda92229 100644
  
          // Advance pNLMsg to the next message in the buffer
          if ((pNLMsg->nlmsg_flags & NLM_F_MULTI) != 0 && pNLMsg->nlmsg_type != NLMSG_DONE)
-@@ -1704,8 +1728,6 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
+@@ -1704,8 +1728,6 @@ mDNSlocal mDNSu32       ProcessRoutingNo
          else
              break;  // all done!
      }
@@ -95,7 +95,7 @@ index 02a19b438e03..e20adda92229 100644
  }
  
  #else // USES_NETLINK
-@@ -1737,14 +1759,13 @@ mDNSlocal void      PrintRoutingSocketMsg(const struct ifa_msghdr *pRSMsg)
+@@ -1737,14 +1759,13 @@ mDNSlocal void      PrintRoutingSocketMs
  }
  #endif
  
@@ -111,7 +111,7 @@ index 02a19b438e03..e20adda92229 100644
  
      readCount = read(sd, buff, sizeof buff);
      if (readCount < (ssize_t) sizeof(struct ifa_msghdr))
-@@ -1759,12 +1780,10 @@ mDNSlocal mDNSu32       ProcessRoutingNotification(int sd)
+@@ -1759,12 +1780,10 @@ mDNSlocal mDNSu32       ProcessRoutingNo
          pRSMsg->ifam_type == RTM_IFINFO)
      {
          if (pRSMsg->ifam_type == RTM_IFINFO)
@@ -126,7 +126,7 @@ index 02a19b438e03..e20adda92229 100644
  }
  
  #endif // USES_NETLINK
-@@ -1774,7 +1793,8 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+@@ -1774,7 +1793,8 @@ mDNSlocal void InterfaceChangeCallback(i
  {
      IfChangeRec     *pChgRec = (IfChangeRec*) context;
      fd_set readFDs;
@@ -136,7 +136,7 @@ index 02a19b438e03..e20adda92229 100644
      struct timeval zeroTimeout = { 0, 0 };
  
      (void)fd; // Unused
-@@ -1782,17 +1802,25 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+@@ -1782,17 +1802,25 @@ mDNSlocal void InterfaceChangeCallback(i
      FD_ZERO(&readFDs);
      FD_SET(pChgRec->NotifySD, &readFDs);
  
@@ -164,6 +164,3 @@ index 02a19b438e03..e20adda92229 100644
  }
  
  // Register with either a Routing Socket or RtNetLink to listen for interface changes.
--- 
-2.35.1
-

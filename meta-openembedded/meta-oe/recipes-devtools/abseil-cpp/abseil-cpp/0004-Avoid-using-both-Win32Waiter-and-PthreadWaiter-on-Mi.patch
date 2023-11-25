@@ -1,0 +1,62 @@
+From cb7665f39e23e95e2466390c60ee5a410780a3ed Mon Sep 17 00:00:00 2001
+From: Derek Mauro <dmauro@google.com>
+Date: Wed, 8 Nov 2023 09:55:31 -0800
+Subject: [PATCH] Avoid using both Win32Waiter and PthreadWaiter on MinGW, and
+ use StdcppWaiter instead.
+
+There are various flavors of MinGW, some of which support pthread,
+and some of which support Win32. Instead of figuring out which
+platform is being used, just use the generic implementation.
+
+PiperOrigin-RevId: 580565507
+Change-Id: Ia85fd7496f1e6ebdeadb95202f0039e844826118
+Upstream-Status: Backport
+---
+ absl/synchronization/internal/pthread_waiter.h | 4 ++--
+ absl/synchronization/internal/win32_waiter.h   | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/absl/synchronization/internal/pthread_waiter.h b/absl/synchronization/internal/pthread_waiter.h
+index 206aefa4..23db76ad 100644
+--- a/absl/synchronization/internal/pthread_waiter.h
++++ b/absl/synchronization/internal/pthread_waiter.h
+@@ -16,7 +16,7 @@
+ #ifndef ABSL_SYNCHRONIZATION_INTERNAL_PTHREAD_WAITER_H_
+ #define ABSL_SYNCHRONIZATION_INTERNAL_PTHREAD_WAITER_H_
+ 
+-#ifndef _WIN32
++#if !defined(_WIN32) && !defined(__MINGW32__)
+ #include <pthread.h>
+ 
+ #include "absl/base/config.h"
+@@ -55,6 +55,6 @@ class PthreadWaiter : public WaiterCrtp<PthreadWaiter> {
+ ABSL_NAMESPACE_END
+ }  // namespace absl
+ 
+-#endif  // ndef _WIN32
++#endif  // !defined(_WIN32) && !defined(__MINGW32__)
+ 
+ #endif  // ABSL_SYNCHRONIZATION_INTERNAL_PTHREAD_WAITER_H_
+diff --git a/absl/synchronization/internal/win32_waiter.h b/absl/synchronization/internal/win32_waiter.h
+index 87eb617c..fdab264e 100644
+--- a/absl/synchronization/internal/win32_waiter.h
++++ b/absl/synchronization/internal/win32_waiter.h
+@@ -20,7 +20,8 @@
+ #include <sdkddkver.h>
+ #endif
+ 
+-#if defined(_WIN32) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++#if defined(_WIN32) && !defined(__MINGW32__) && \
++    _WIN32_WINNT >= _WIN32_WINNT_VISTA
+ 
+ #include "absl/base/config.h"
+ #include "absl/synchronization/internal/kernel_timeout.h"
+@@ -65,6 +66,7 @@ class Win32Waiter : public WaiterCrtp<Win32Waiter> {
+ ABSL_NAMESPACE_END
+ }  // namespace absl
+ 
+-#endif  // defined(_WIN32) && _WIN32_WINNT >= _WIN32_WINNT_VISTA
++#endif  // defined(_WIN32) && !defined(__MINGW32__) &&
++        // _WIN32_WINNT >= _WIN32_WINNT_VISTA
+ 
+ #endif  // ABSL_SYNCHRONIZATION_INTERNAL_WIN32_WAITER_H_

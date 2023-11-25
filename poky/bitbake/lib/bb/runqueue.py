@@ -157,7 +157,7 @@ class RunQueueScheduler(object):
             (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
             self.stamps[tid] = bb.parse.siggen.stampfile_mcfn(taskname, taskfn, extrainfo=False)
             if tid in self.rq.runq_buildable:
-                self.buildable.append(tid)
+                self.buildable.add(tid)
 
         self.rev_prio_map = None
         self.is_pressure_usable()
@@ -1021,6 +1021,7 @@ class RunQueueData:
 
                 for tid in list(runall_tids):
                     mark_active(tid, 1)
+                    self.target_tids.append(tid)
                     if self.cooker.configuration.force:
                         invalidate_task(tid, False)
 
@@ -1318,6 +1319,16 @@ class RunQueue:
         self.worker = {}
         self.fakeworker = {}
 
+    @staticmethod
+    def send_pickled_data(worker, data, name):
+        msg = bytearray()
+        msg.extend(b"<" + name.encode() + b">")
+        pickled_data = pickle.dumps(data)
+        msg.extend(len(pickled_data).to_bytes(4, 'big'))
+        msg.extend(pickled_data)
+        msg.extend(b"</" + name.encode() + b">")
+        worker.stdin.write(msg)
+
     def _start_worker(self, mc, fakeroot = False, rqexec = None):
         logger.debug("Starting bitbake-worker")
         magic = "decafbad"
@@ -1355,9 +1366,9 @@ class RunQueue:
             "umask" : self.cfgData.getVar("BB_DEFAULT_UMASK"),
         }
 
-        worker.stdin.write(b"<cookerconfig>" + pickle.dumps(self.cooker.configuration) + b"</cookerconfig>")
-        worker.stdin.write(b"<extraconfigdata>" + pickle.dumps(self.cooker.extraconfigdata) + b"</extraconfigdata>")
-        worker.stdin.write(b"<workerdata>" + pickle.dumps(workerdata) + b"</workerdata>")
+        RunQueue.send_pickled_data(worker, self.cooker.configuration, "cookerconfig")
+        RunQueue.send_pickled_data(worker, self.cooker.extraconfigdata, "extraconfigdata")
+        RunQueue.send_pickled_data(worker, workerdata, "workerdata")
         worker.stdin.flush()
 
         return RunQueueWorker(worker, workerpipe)
@@ -1367,7 +1378,7 @@ class RunQueue:
             return
         logger.debug("Teardown for bitbake-worker")
         try:
-           worker.process.stdin.write(b"<quit></quit>")
+           RunQueue.send_pickled_data(worker.process, b"", "quit")
            worker.process.stdin.flush()
            worker.process.stdin.close()
         except IOError:
@@ -1756,20 +1767,20 @@ class RunQueue:
         for tid in invalidtasks:
             (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
             pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
-            h = self.rqdata.runtaskentries[tid].hash
+            h = self.rqdata.runtaskentries[tid].unihash
             matches = bb.siggen.find_siginfo(pn, taskname, [], self.cooker.databuilder.mcdata[mc])
             match = None
             for m in matches:
                 if h in m:
                     match = m
             if match is None:
-                bb.fatal("Can't find a task we're supposed to have written out? (hash: %s)?" % h)
+                bb.fatal("Can't find a task we're supposed to have written out? (hash: %s tid: %s)?" % (h, tid))
             matches = {k : v for k, v in iter(matches.items()) if h not in k}
             if matches:
                 latestmatch = sorted(matches.keys(), key=lambda f: matches[f])[-1]
                 prevh = __find_sha256__.search(latestmatch).group(0)
                 output = bb.siggen.compare_sigfiles(latestmatch, match, recursecb)
-                bb.plain("\nTask %s:%s couldn't be used from the cache because:\n  We need hash %s, closest matching task was %s\n  " % (pn, taskname, h, prevh) + '\n  '.join(output))
+                bb.plain("\nTask %s:%s couldn't be used from the cache because:\n  We need hash %s, most recent matching task was %s\n  " % (pn, taskname, h, prevh) + '\n  '.join(output))
 
 
 class RunQueueExecute:
@@ -1851,11 +1862,6 @@ class RunQueueExecute:
         self.tasks_notcovered = set()
         self.scenequeue_notneeded = set()
 
-        # We can't skip specified target tasks which aren't setscene tasks
-        self.cantskip = set(self.rqdata.target_tids)
-        self.cantskip.difference_update(self.rqdata.runq_setscene_tids)
-        self.cantskip.intersection_update(self.rqdata.runtaskentries)
-
         schedulers = self.get_schedulers()
         for scheduler in schedulers:
             if self.scheduler == scheduler.name:
@@ -1868,7 +1874,23 @@ class RunQueueExecute:
 
         #if self.rqdata.runq_setscene_tids:
         self.sqdata = SQData()
-        build_scenequeue_data(self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self)
+        build_scenequeue_data(self.sqdata, self.rqdata, self)
+
+        update_scenequeue_data(self.sqdata.sq_revdeps, self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=True)
+
+        # Compute a list of 'stale' sstate tasks where the current hash does not match the one
+        # in any stamp files. Pass the list out to metadata as an event.
+        found = {}
+        for tid in self.rqdata.runq_setscene_tids:
+            (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+            stamps = bb.build.find_stale_stamps(taskname, taskfn)
+            if stamps:
+                if mc not in found:
+                    found[mc] = {}
+                found[mc][tid] = stamps
+        for mc in found:
+            event = bb.event.StaleSetSceneTasks(found[mc])
+            bb.event.fire(event, self.cooker.databuilder.mcdata[mc])
 
     def runqueue_process_waitpid(self, task, status, fakerootlog=None):
 
@@ -1894,14 +1916,14 @@ class RunQueueExecute:
     def finish_now(self):
         for mc in self.rq.worker:
             try:
-                self.rq.worker[mc].process.stdin.write(b"<finishnow></finishnow>")
+                RunQueue.send_pickled_data(self.rq.worker[mc].process, b"", "finishnow")
                 self.rq.worker[mc].process.stdin.flush()
             except IOError:
                 # worker must have died?
                 pass
         for mc in self.rq.fakeworker:
             try:
-                self.rq.fakeworker[mc].process.stdin.write(b"<finishnow></finishnow>")
+                RunQueue.send_pickled_data(self.rq.fakeworker[mc].process, b"", "finishnow")
                 self.rq.fakeworker[mc].process.stdin.flush()
             except IOError:
                 # worker must have died?
@@ -2196,10 +2218,10 @@ class RunQueueExecute:
             if 'fakeroot' in taskdep and taskname in taskdep['fakeroot'] and not self.cooker.configuration.dry_run:
                 if not mc in self.rq.fakeworker:
                     self.rq.start_fakeworker(self, mc)
-                self.rq.fakeworker[mc].process.stdin.write(b"<runtask>" + pickle.dumps(runtask) + b"</runtask>")
+                RunQueue.send_pickled_data(self.rq.fakeworker[mc].process, runtask, "runtask")
                 self.rq.fakeworker[mc].process.stdin.flush()
             else:
-                self.rq.worker[mc].process.stdin.write(b"<runtask>" + pickle.dumps(runtask) + b"</runtask>")
+                RunQueue.send_pickled_data(self.rq.worker[mc].process, runtask, "runtask")
                 self.rq.worker[mc].process.stdin.flush()
 
             self.build_stamps[task] = bb.parse.siggen.stampfile_mcfn(taskname, taskfn, extrainfo=False)
@@ -2297,10 +2319,10 @@ class RunQueueExecute:
                         self.rq.state = runQueueFailed
                         self.stats.taskFailed()
                         return True
-                self.rq.fakeworker[mc].process.stdin.write(b"<runtask>" + pickle.dumps(runtask) + b"</runtask>")
+                RunQueue.send_pickled_data(self.rq.fakeworker[mc].process, runtask, "runtask")
                 self.rq.fakeworker[mc].process.stdin.flush()
             else:
-                self.rq.worker[mc].process.stdin.write(b"<runtask>" + pickle.dumps(runtask) + b"</runtask>")
+                RunQueue.send_pickled_data(self.rq.worker[mc].process, runtask, "runtask")
                 self.rq.worker[mc].process.stdin.flush()
 
             self.build_stamps[task] = bb.parse.siggen.stampfile_mcfn(taskname, taskfn, extrainfo=False)
@@ -2388,7 +2410,7 @@ class RunQueueExecute:
             return
 
         notcovered = set(self.scenequeue_notcovered)
-        notcovered |= self.cantskip
+        notcovered |= self.sqdata.cantskip
         for tid in self.scenequeue_notcovered:
             notcovered |= self.sqdata.sq_covered_tasks[tid]
         notcovered |= self.sqdata.unskippable.difference(self.rqdata.runq_setscene_tids)
@@ -2502,9 +2524,9 @@ class RunQueueExecute:
 
         if changed:
             for mc in self.rq.worker:
-                self.rq.worker[mc].process.stdin.write(b"<newtaskhashes>" + pickle.dumps(bb.parse.siggen.get_taskhashes()) + b"</newtaskhashes>")
+                RunQueue.send_pickled_data(self.rq.worker[mc].process, bb.parse.siggen.get_taskhashes(), "newtaskhashes")
             for mc in self.rq.fakeworker:
-                self.rq.fakeworker[mc].process.stdin.write(b"<newtaskhashes>" + pickle.dumps(bb.parse.siggen.get_taskhashes()) + b"</newtaskhashes>")
+                RunQueue.send_pickled_data(self.rq.fakeworker[mc].process, bb.parse.siggen.get_taskhashes(), "newtaskhashes")
 
             hashequiv_logger.debug(pprint.pformat("Tasks changed:\n%s" % (changed)))
 
@@ -2767,11 +2789,16 @@ class SQData(object):
         # A list of normal tasks a setscene task covers
         self.sq_covered_tasks = {}
 
-def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
+def build_scenequeue_data(sqdata, rqdata, sqrq):
 
     sq_revdeps = {}
     sq_revdeps_squash = {}
     sq_collated_deps = {}
+
+    # We can't skip specified target tasks which aren't setscene tasks
+    sqdata.cantskip = set(rqdata.target_tids)
+    sqdata.cantskip.difference_update(rqdata.runq_setscene_tids)
+    sqdata.cantskip.intersection_update(rqdata.runtaskentries)
 
     # We need to construct a dependency graph for the setscene functions. Intermediate
     # dependencies between the setscene tasks only complicate the code. This code
@@ -2841,7 +2868,7 @@ def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
     for tid in rqdata.runtaskentries:
         if not rqdata.runtaskentries[tid].revdeps:
             sqdata.unskippable.add(tid)
-    sqdata.unskippable |= sqrq.cantskip
+    sqdata.unskippable |= sqdata.cantskip
     while new:
         new = False
         orig = sqdata.unskippable.copy()
@@ -2950,22 +2977,6 @@ def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
             else:
                 sqrq.sq_deferred[tid] = sqdata.hashes[h]
                 bb.debug(1, "Deferring %s after %s" % (tid, sqdata.hashes[h]))
-
-    update_scenequeue_data(sqdata.sq_revdeps, sqdata, rqdata, rq, cooker, stampcache, sqrq, summary=True)
-
-    # Compute a list of 'stale' sstate tasks where the current hash does not match the one
-    # in any stamp files. Pass the list out to metadata as an event.
-    found = {}
-    for tid in rqdata.runq_setscene_tids:
-        (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
-        stamps = bb.build.find_stale_stamps(taskname, taskfn)
-        if stamps:
-            if mc not in found:
-                found[mc] = {}
-            found[mc][tid] = stamps
-    for mc in found:
-        event = bb.event.StaleSetSceneTasks(found[mc])
-        bb.event.fire(event, cooker.databuilder.mcdata[mc])
 
 def check_setscene_stamps(tid, rqdata, rq, stampcache, noexecstamp=False):
 

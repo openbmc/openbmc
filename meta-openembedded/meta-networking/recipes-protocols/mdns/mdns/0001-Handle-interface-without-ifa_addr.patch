@@ -14,11 +14,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index d7f31cc4d5cf..f10301253f58 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
-@@ -1895,6 +1895,7 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
+@@ -1895,6 +1895,7 @@ mDNSlocal void InterfaceChangeCallback(i
  	    continue;
  
          if ((ifa_loop4 == NULL) &&
@@ -26,7 +26,7 @@ index d7f31cc4d5cf..f10301253f58 100644
              ((*ifi)->ifa_addr->sa_family == AF_INET) &&
              ((*ifi)->ifa_flags & IFF_UP) &&
              ((*ifi)->ifa_flags & IFF_LOOPBACK))
-@@ -1903,7 +1904,8 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+@@ -1903,7 +1904,8 @@ mDNSlocal void InterfaceChangeCallback(i
              continue;
          }
  

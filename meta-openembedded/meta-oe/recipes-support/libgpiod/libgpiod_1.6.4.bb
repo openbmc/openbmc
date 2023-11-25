@@ -30,9 +30,15 @@ RRECOMMENDS:${PN}-ptest += " \
     kernel-module-gpio-mockup \
     ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3-unittest', '', d)} \
 "
-RDEPENDS:${PN}-ptest += "python3-packaging"
+RDEPENDS:${PN}-ptest += " \
+    python3-packaging \
+    ${@bb.utils.contains('PTEST_ENABLED', '1', 'bats', '', d)} \
+"
 
 do_install_ptest:append() {
+    install -m 0755 ${S}/tools/gpio-tools-test ${D}${PTEST_PATH}/tests/
+    install -m 0755 ${S}/tools/gpio-tools-test.bats ${D}${PTEST_PATH}/tests/
+
     if ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'true', 'false', d)}; then
         install -m 0755 ${S}/bindings/python/tests/gpiod_py_test.py ${D}${PTEST_PATH}/tests/
     fi

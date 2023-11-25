@@ -7,13 +7,16 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import re, time
+import re
+import time
 
 from django.urls import reverse
+from selenium.webdriver.support.select import Select
 from django.utils import timezone
+from bldcontrol.models import BuildRequest
 from tests.browser.selenium_helpers import SeleniumTestCase
 
-from orm.models import BitbakeVersion, Release, Project, Build, Target
+from orm.models import BitbakeVersion, Layer, Layer_Version, Recipe, Release, Project, Build, Target, Task
 
 from selenium.webdriver.common.by import By
 
@@ -102,6 +105,66 @@ class TestAllBuildsPage(SeleniumTestCase):
 
         return found_row
 
+    def _get_create_builds(self, **kwargs):
+        """ Create a build and return the build object """
+        build1 = Build.objects.create(**self.project1_build_success)
+        build2 = Build.objects.create(**self.project1_build_failure)
+
+        # add some targets to these builds so they have recipe links
+        # (and so we can find the row in the ToasterTable corresponding to
+        # a particular build)
+        Target.objects.create(build=build1, target='foo')
+        Target.objects.create(build=build2, target='bar')
+
+        if kwargs:
+            # Create kwargs.get('success') builds with success status with target
+            # and kwargs.get('failure') builds with failure status with target
+            for i in range(kwargs.get('success', 0)):
+                now = timezone.now()
+                self.project1_build_success['started_on'] = now
+                self.project1_build_success[
+                    'completed_on'] = now - timezone.timedelta(days=i)
+                build = Build.objects.create(**self.project1_build_success)
+                Target.objects.create(build=build,
+                                      target=f'{i}_success_recipe',
+                                      task=f'{i}_success_task')
+
+                self._set_buildRequest_and_task_on_build(build)
+            for i in range(kwargs.get('failure', 0)):
+                now = timezone.now()
+                self.project1_build_failure['started_on'] = now
+                self.project1_build_failure[
+                    'completed_on'] = now - timezone.timedelta(days=i)
+                build = Build.objects.create(**self.project1_build_failure)
+                Target.objects.create(build=build,
+                                      target=f'{i}_fail_recipe',
+                                      task=f'{i}_fail_task')
+                self._set_buildRequest_and_task_on_build(build)
+        return build1, build2
+
+    def _create_recipe(self):
+        """ Add a recipe to the database and return it """
+        layer = Layer.objects.create()
+        layer_version = Layer_Version.objects.create(layer=layer)
+        return Recipe.objects.create(name='recipe_foo', layer_version=layer_version)
+
+    def _set_buildRequest_and_task_on_build(self, build):
+        """ Set buildRequest and task on build """
+        build.recipes_parsed = 1
+        build.save()
+        buildRequest = BuildRequest.objects.create(
+            build=build,
+            project=self.project1,
+            state=BuildRequest.REQ_COMPLETED)
+        build.build_request = buildRequest
+        recipe = self._create_recipe()
+        task = Task.objects.create(build=build,
+                                   recipe=recipe,
+                                   task_name='task',
+                                   outcome=Task.OUTCOME_SUCCESS)
+        task.save()
+        build.save()
+
     def test_show_tasks_with_suffix(self):
         """ Task should be shown as suffix on build name """
         build = Build.objects.create(**self.project1_build_success)
@@ -128,7 +191,8 @@ class TestAllBuildsPage(SeleniumTestCase):
         but should be shown for other builds
         """
         build1 = Build.objects.create(**self.project1_build_success)
-        default_build = Build.objects.create(**self.default_project_build_success)
+        default_build = Build.objects.create(
+            **self.default_project_build_success)
 
         url = reverse('all-builds')
         self.get(url)
@@ -145,7 +209,6 @@ class TestAllBuildsPage(SeleniumTestCase):
         run_again_button = self.find_all(selector)
         self.assertEqual(len(run_again_button), 0,
                          'should not see a rebuild button for cli builds')
-
 
     def test_tooltips_on_project_name(self):
         """
@@ -188,14 +251,7 @@ class TestAllBuildsPage(SeleniumTestCase):
         recent builds area; failed builds should not have links on the time column,
         or in the recent builds area
         """
-        build1 = Build.objects.create(**self.project1_build_success)
-        build2 = Build.objects.create(**self.project1_build_failure)
-
-        # add some targets to these builds so they have recipe links
-        # (and so we can find the row in the ToasterTable corresponding to
-        # a particular build)
-        Target.objects.create(build=build1, target='foo')
-        Target.objects.create(build=build2, target='bar')
+        build1, build2 = self._get_create_builds()
 
         url = reverse('all-builds')
         self.get(url)
@@ -223,3 +279,185 @@ class TestAllBuildsPage(SeleniumTestCase):
         links = build2_row.find_elements(By.CSS_SELECTOR, 'td.time a')
         msg = 'should not be a link on the build time for a failed build'
         self.assertEquals(len(links), 0, msg)
+
+    def test_builds_table_search_box(self):
+        """ Test the search box in the builds table on the all builds page """
+        self._get_create_builds()
+
+        url = reverse('all-builds')
+        self.get(url)
+
+        # Check search box is present and works
+        self.wait_until_present('#allbuildstable tbody tr')
+        search_box = self.find('#search-input-allbuildstable')
+        self.assertTrue(search_box.is_displayed())
+
+        # Check that we can search for a build by recipe name
+        search_box.send_keys('foo')
+        search_btn = self.find('#search-submit-allbuildstable')
+        search_btn.click()
+        self.wait_until_present('#allbuildstable tbody tr')
+        rows = self.find_all('#allbuildstable tbody tr')
+        self.assertTrue(len(rows) >= 1)
+
+    def test_filtering_on_failure_tasks_column(self):
+        """ Test the filtering on failure tasks column in the builds table on the all builds page """
+        self._get_create_builds(success=10, failure=10)
+
+        url = reverse('all-builds')
+        self.get(url)
+
+        # Check filtering on failure tasks column
+        self.wait_until_present('#allbuildstable tbody tr')
+        failed_tasks_filter = self.find('#failed_tasks_filter')
+        failed_tasks_filter.click()
+        # Check popup is visible
+        time.sleep(1)
+        self.wait_until_present('#filter-modal-allbuildstable')
+        self.assertTrue(
+            self.find('#filter-modal-allbuildstable').is_displayed())
+        # Check that we can filter by failure tasks
+        build_without_failure_tasks = self.find(
+            '#failed_tasks_filter\\:without_failed_tasks')
+        build_without_failure_tasks.click()
+        # click on apply button
+        self.find('#filter-modal-allbuildstable .btn-primary').click()
+        self.wait_until_present('#allbuildstable tbody tr')
+        # Check if filter is applied, by checking if failed_tasks_filter has btn-primary class
+        self.assertTrue(self.find('#failed_tasks_filter').get_attribute(
+            'class').find('btn-primary') != -1)
+
+    def test_filtering_on_completedOn_column(self):
+        """ Test the filtering on completed_on column in the builds table on the all builds page """
+        self._get_create_builds(success=10, failure=10)
+
+        url = reverse('all-builds')
+        self.get(url)
+
+        # Check filtering on failure tasks column
+        self.wait_until_present('#allbuildstable tbody tr')
+        completed_on_filter = self.find('#completed_on_filter')
+        completed_on_filter.click()
+        # Check popup is visible
+        time.sleep(1)
+        self.wait_until_present('#filter-modal-allbuildstable')
+        self.assertTrue(
+            self.find('#filter-modal-allbuildstable').is_displayed())
+        # Check that we can filter by failure tasks
+        build_without_failure_tasks = self.find(
+            '#completed_on_filter\\:date_range')
+        build_without_failure_tasks.click()
+        # click on apply button
+        self.find('#filter-modal-allbuildstable .btn-primary').click()
+        self.wait_until_present('#allbuildstable tbody tr')
+        # Check if filter is applied, by checking if completed_on_filter has btn-primary class
+        self.assertTrue(self.find('#completed_on_filter').get_attribute(
+            'class').find('btn-primary') != -1)
+
+        # Filter by date range
+        self.find('#completed_on_filter').click()
+        self.wait_until_present('#filter-modal-allbuildstable')
+        date_ranges = self.driver.find_elements(
+            By.XPATH, '//input[@class="form-control hasDatepicker"]')
+        today = timezone.now()
+        yestersday = today - timezone.timedelta(days=1)
+        time.sleep(1)
+        date_ranges[0].send_keys(yestersday.strftime('%Y-%m-%d'))
+        date_ranges[1].send_keys(today.strftime('%Y-%m-%d'))
+        self.find('#filter-modal-allbuildstable .btn-primary').click()
+        self.wait_until_present('#allbuildstable tbody tr')
+        self.assertTrue(self.find('#completed_on_filter').get_attribute(
+            'class').find('btn-primary') != -1)
+        # Check if filter is applied, number of builds displayed should be 6
+        time.sleep(1)
+        self.assertTrue(len(self.find_all('#allbuildstable tbody tr')) == 6)
+
+    def test_builds_table_editColumn(self):
+        """ Test the edit column feature in the builds table on the all builds page """
+        self._get_create_builds(success=10, failure=10)
+
+        def test_edit_column(check_box_id):
+            # Check that we can hide/show table column
+            check_box = self.find(f'#{check_box_id}')
+            th_class = str(check_box_id).replace('checkbox-', '')
+            if check_box.is_selected():
+                # check if column is visible in table
+                self.assertTrue(
+                    self.find(
+                        f'#allbuildstable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is checked in EditColumn dropdown, but it's not visible in table"
+                )
+                check_box.click()
+                # check if column is hidden in table
+                self.assertFalse(
+                    self.find(
+                        f'#allbuildstable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is unchecked in EditColumn dropdown, but it's visible in table"
+                )
+            else:
+                # check if column is hidden in table
+                self.assertFalse(
+                    self.find(
+                        f'#allbuildstable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is unchecked in EditColumn dropdown, but it's visible in table"
+                )
+                check_box.click()
+                # check if column is visible in table
+                self.assertTrue(
+                    self.find(
+                        f'#allbuildstable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is checked in EditColumn dropdown, but it's not visible in table"
+                )
+        url = reverse('all-builds')
+        self.get(url)
+        self.wait_until_present('#allbuildstable tbody tr')
+
+        # Check edit column
+        edit_column = self.find('#edit-columns-button')
+        self.assertTrue(edit_column.is_displayed())
+        edit_column.click()
+        # Check dropdown is visible
+        self.wait_until_visible('ul.dropdown-menu.editcol')
+
+        # Check that we can hide the edit column
+        test_edit_column('checkbox-errors_no')
+        test_edit_column('checkbox-failed_tasks')
+        test_edit_column('checkbox-image_files')
+        test_edit_column('checkbox-project')
+        test_edit_column('checkbox-started_on')
+        test_edit_column('checkbox-time')
+        test_edit_column('checkbox-warnings_no')
+
+    def test_builds_table_show_rows(self):
+        """ Test the show rows feature in the builds table on the all builds page """
+        self._get_create_builds(success=100, failure=100)
+
+        def test_show_rows(row_to_show, show_row_link):
+            # Check that we can show rows == row_to_show
+            show_row_link.select_by_value(str(row_to_show))
+            self.wait_until_present('#allbuildstable tbody tr')
+            time.sleep(1)
+            self.assertTrue(
+                len(self.find_all('#allbuildstable tbody tr')) == row_to_show
+            )
+
+        url = reverse('all-builds')
+        self.get(url)
+        self.wait_until_present('#allbuildstable tbody tr')
+
+        show_rows = self.driver.find_elements(
+            By.XPATH,
+            '//select[@class="form-control pagesize-allbuildstable"]'
+        )
+        # Check show rows
+        for show_row_link in show_rows:
+            show_row_link = Select(show_row_link)
+            test_show_rows(10, show_row_link)
+            test_show_rows(25, show_row_link)
+            test_show_rows(50, show_row_link)
+            test_show_rows(100, show_row_link)
+            test_show_rows(150, show_row_link)

@@ -116,6 +116,15 @@ class BuildTest(unittest.TestCase):
         project = Project.objects.create_project(name=BuildTest.PROJECT_NAME,
                                                  release=release)
 
+        passthrough_variable_names = ["SSTATE_DIR", "DL_DIR"]
+        for variable_name in passthrough_variable_names:
+            current_variable = os.environ.get(variable_name)
+            if current_variable:
+                ProjectVariable.objects.get_or_create(
+                    name=variable_name,
+                    value=current_variable,
+                    project=project)
+
         if os.environ.get("TOASTER_TEST_USE_SSTATE_MIRROR"):
             ProjectVariable.objects.get_or_create(
                 name="SSTATE_MIRRORS",

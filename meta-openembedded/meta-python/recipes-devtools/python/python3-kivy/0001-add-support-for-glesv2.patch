@@ -1,8 +1,19 @@
+From 98224fec48d6e0f32b28d81220bf1ee1637ce045 Mon Sep 17 00:00:00 2001
+From: William Huang <whuang8933@gmail.com>
+Date: Thu, 2 Sep 2021 07:25:07 -0400
+Subject: [PATCH] recipes-devtools: python: add support for Kivy
+
 Upstream-Status: Pending
 
+---
+ setup.py | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 35e34afdd..0ba3aca72 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -695,7 +695,18 @@ def determine_gl_flags():
+@@ -730,7 +730,18 @@ def determine_gl_flags():
          c_options['use_x11'] = True
          c_options['use_egl'] = True
      else:
@@ -22,7 +33,7 @@ Upstream-Status: Pending
      return flags, base_flags
  
  
-@@ -723,14 +734,13 @@ def determine_sdl2():
+@@ -774,14 +785,13 @@ def determine_sdl2():
              sdl_inc = join(include, 'SDL2')
              if isdir(sdl_inc):
                  sdl2_paths.append(sdl_inc)
@@ -36,5 +47,5 @@ Upstream-Status: Pending
 -        ['/usr/local/lib/'])
 +        [''])
  
-     if sdl2_flags:
-         flags = merge(flags, sdl2_flags)
+     if kivy_sdl2_path:
+         # If we have a custom path, we need to add the rpath to the linker

@@ -1,0 +1,77 @@
+From 53ceb2d4167b05374678b966031b3d52fc5080a2 Mon Sep 17 00:00:00 2001
+From: Debbie Martin <Debbie.Martin@arm.com>
+Date: Fri, 29 Sep 2023 15:22:17 +0100
+Subject: [PATCH] check-sr-results: Device tree improvements
+
+Make check-sr-results.py accept 'extra_compat' configuration for
+devicetree files, and pass these in the compat list given to
+dt-parser.py.
+
+Update dt-parser.py to parse the GCC version line in the dtb log.
+
+Upstream-Status: Pending
+Signed-off-by: Debbie Martin <Debbie.Martin@arm.com>
+---
+ check-sr-results.py | 12 ++++++++++--
+ dt-parser.py        |  8 ++++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/check-sr-results.py b/check-sr-results.py
+index 48658f0..a207a39 100755
+--- a/check-sr-results.py
++++ b/check-sr-results.py
+@@ -598,7 +598,7 @@ def need_regen(filename, deps, margin=0):
+ # We run dtc and dt-validate to produce the log when needed.
+ # We add markers to the log, which will be ignored by dt-parser.py.
+ # We return a Stats object.
+-def check_devicetree(filename):
++def check_devicetree(filename, extra_compat=None):
+     logging.debug(f"Check Devicetree `{filename}'")
+     stats = Stats()
+     log = f"{filename}.log"
+@@ -644,6 +644,9 @@ def check_devicetree(filename):
+     # We use the compatible strings extracted from Linux bindings to filter out
+     # more false positive.
+     compat = get_compat()
++    if extra_compat:
++        with open(compat, "a") as compat_file:
++            compat_file.write("\n".join(extra_compat))
+     cp = run(f"{dt_parser} --compatibles '{compat}' '{log}'")
+
+     if cp.returncode:
+@@ -930,7 +933,12 @@ def check_file(conffile, filename):
+                 stats.add(check_uefi_capsule(filename))
+
+             if 'devicetree' in conffile:
+-                stats.add(check_devicetree(filename))
++                stats.add(
++                    check_devicetree(
++                        filename,
++                        extra_compat=conffile.get("extra_compat")
++                    )
++                )
+
+             if 'uefi-sniff' in conffile:
+                 stats.add(check_uefi_sniff(filename))
+diff --git a/dt-parser.py b/dt-parser.py
+index 3eccd74..c1c0031 100755
+--- a/dt-parser.py
++++ b/dt-parser.py
+@@ -181,6 +181,14 @@ def parse(filename):
+                 }
+                 continue
+
++            # line [GCC <version>]
++            m = re.match(r'\[GCC [0-9\.]+\]', line)
++            if m:
++                logging.debug(
++                    f"line {i}: GCC version (`{line}')"
++                )
++                continue
++
+             # If we could not parse the line we arrive here and complain.
+             logging.warning(f"Unparsed line {i}: `{line}'")
+
+--
+2.25.1
+

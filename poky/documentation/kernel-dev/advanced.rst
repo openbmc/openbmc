@@ -69,8 +69,7 @@ to indicate the branch.
    You can use the :term:`KBRANCH` value to define an alternate branch typically
    with a machine override as shown here from the ``meta-yocto-bsp`` layer::
 
-           KBRANCH:edgerouter = "standard/edgerouter"
-
+      KBRANCH:beaglebone-yocto = "standard/beaglebone"
 
 The linux-yocto style recipes can optionally define the following
 variables:

@@ -11,7 +11,6 @@ LICENSE = "LGPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gi-docgen ptest-gnome upstream-version-is-even gobject-introspection
 

@@ -17,7 +17,6 @@ DEPENDS = " \
 REQUIRED_DISTRO_FEATURES = "x11 systemd pam polkit gobject-introspection-data"
 GIR_MESON_OPTION = ""
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gsettings pkgconfig gobject-introspection gettext systemd useradd itstool gnome-help features_check
 SRC_URI = "https://download.gnome.org/sources/gdm/${@oe.utils.trim_version("${PV}", 1)}/gdm-${PV}.tar.xz"

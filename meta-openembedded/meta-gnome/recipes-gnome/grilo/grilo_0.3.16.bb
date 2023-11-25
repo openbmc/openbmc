@@ -7,7 +7,6 @@ DEPENDS = " \
     glib-2.0 \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gobject-introspection gtk-doc gettext vala
 

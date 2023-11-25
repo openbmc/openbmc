@@ -2277,7 +2277,7 @@ class GitLfsTest(FetcherTest):
 
     @skipIfNoGitLFS()
     @skipIfNoNetwork()
-    def test_real_git_lfs_repo_succeeds(self):
+    def test_real_git_lfs_repo_skips(self):
         self.d.setVar('SRC_URI', "git://gitlab.com/gitlab-examples/lfs.git;protocol=https;branch=master;lfs=0")
         f = self.get_real_git_lfs_file()
         # This is the actual non-smudged placeholder file on the repo if git-lfs does not run
@@ -2290,24 +2290,41 @@ class GitLfsTest(FetcherTest):
         with open(f) as fh:
             self.assertEqual(lfs_file, fh.read())
 
+    @skipIfNoGitLFS()
     def test_lfs_enabled(self):
         import shutil
 
         uri = 'git://%s;protocol=file;lfs=1;branch=master' % self.srcdir
         self.d.setVar('SRC_URI', uri)
 
-        # Careful: suppress initial attempt at downloading until
-        # we know whether git-lfs is installed.
+        # With git-lfs installed, test that we can fetch and unpack
+        fetcher, ud = self.fetch()
+        shutil.rmtree(self.gitdir, ignore_errors=True)
+        fetcher.unpack(self.d.getVar('WORKDIR'))
+
+    @skipIfNoGitLFS()
+    def test_lfs_disabled(self):
+        import shutil
+
+        uri = 'git://%s;protocol=file;lfs=0;branch=master' % self.srcdir
+        self.d.setVar('SRC_URI', uri)
+
+        # Verify that the fetcher can survive even if the source
+        # repository has Git LFS usage configured.
+        fetcher, ud = self.fetch()
+        fetcher.unpack(self.d.getVar('WORKDIR'))
+
+    def test_lfs_enabled_not_installed(self):
+        import shutil
+
+        uri = 'git://%s;protocol=file;lfs=1;branch=master' % self.srcdir
+        self.d.setVar('SRC_URI', uri)
+
+        # Careful: suppress initial attempt at downloading
         fetcher, ud = self.fetch(uri=None, download=False)
-        self.assertIsNotNone(ud.method._find_git_lfs)
 
-        # If git-lfs can be found, the unpack should be successful. Only
-        # attempt this with the real live copy of git-lfs installed.
-        if ud.method._find_git_lfs(self.d):
-            fetcher.download()
-            shutil.rmtree(self.gitdir, ignore_errors=True)
-            fetcher.unpack(self.d.getVar('WORKDIR'))
-
+        # Artificially assert that git-lfs is not installed, so
+        # we can verify a failure to unpack in it's absence.
         old_find_git_lfs = ud.method._find_git_lfs
         try:
             # If git-lfs cannot be found, the unpack should throw an error
@@ -2319,29 +2336,21 @@ class GitLfsTest(FetcherTest):
         finally:
             ud.method._find_git_lfs = old_find_git_lfs
 
-    def test_lfs_disabled(self):
+    def test_lfs_disabled_not_installed(self):
         import shutil
 
         uri = 'git://%s;protocol=file;lfs=0;branch=master' % self.srcdir
         self.d.setVar('SRC_URI', uri)
 
-        # In contrast to test_lfs_enabled(), allow the implicit download
-        # done by self.fetch() to occur here. The point of this test case
-        # is to verify that the fetcher can survive even if the source
-        # repository has Git LFS usage configured.
-        fetcher, ud = self.fetch()
-        self.assertIsNotNone(ud.method._find_git_lfs)
+        # Careful: suppress initial attempt at downloading
+        fetcher, ud = self.fetch(uri=None, download=False)
 
+        # Artificially assert that git-lfs is not installed, so
+        # we can verify a failure to unpack in it's absence.
         old_find_git_lfs = ud.method._find_git_lfs
         try:
-            # If git-lfs can be found, the unpack should be successful. A
-            # live copy of git-lfs is not required for this case, so
-            # unconditionally forge its presence.
-            ud.method._find_git_lfs = lambda d: True
-            shutil.rmtree(self.gitdir, ignore_errors=True)
-            fetcher.unpack(self.d.getVar('WORKDIR'))
-            # If git-lfs cannot be found, the unpack should be successful
-
+            # Even if git-lfs cannot be found, the unpack should be successful
+            fetcher.download()
             ud.method._find_git_lfs = lambda d: False
             shutil.rmtree(self.gitdir, ignore_errors=True)
             fetcher.unpack(self.d.getVar('WORKDIR'))
@@ -3042,9 +3051,11 @@ class FetchPremirroronlyLocalTest(FetcherTest):
         self.d.setVar("BB_FETCH_PREMIRRORONLY", "1")
         self.d.setVar("BB_NO_NETWORK", "1")
         self.d.setVar("PREMIRRORS", self.recipe_url + " " + "file://{}".format(self.mirrordir) + " \n")
+        self.mirrorname = "git2_git.fake.repo.bitbake.tar.gz"
+        self.mirrorfile = os.path.join(self.mirrordir, self.mirrorname)
+        self.testfilename = "bitbake-fetch.test"
 
     def make_git_repo(self):
-        self.mirrorname = "git2_git.fake.repo.bitbake.tar.gz"
         recipeurl = "git:/git.fake.repo/bitbake"
         os.makedirs(self.gitdir)
         self.git_init(cwd=self.gitdir)
@@ -3054,14 +3065,22 @@ class FetchPremirroronlyLocalTest(FetcherTest):
 
     def git_new_commit(self):
         import random
-        testfilename = "bibake-fetch.test"
         os.unlink(os.path.join(self.mirrordir, self.mirrorname))
-        with open(os.path.join(self.gitdir, testfilename), "w") as testfile:
-            testfile.write("Useless random data {}".format(random.random()))
-        self.git("add {}".format(testfilename), self.gitdir)
-        self.git("commit -a -m \"This random commit {}. I'm useless.\"".format(random.random()), self.gitdir)
+        branch = self.git("branch --show-current", self.gitdir).split()
+        with open(os.path.join(self.gitdir, self.testfilename), "w") as testfile:
+            testfile.write("File {} from branch {}; Useless random data {}".format(self.testfilename, branch, random.random()))
+        self.git("add {}".format(self.testfilename), self.gitdir)
+        self.git("commit -a -m \"This random commit {} in branch {}. I'm useless.\"".format(random.random(), branch), self.gitdir)
         bb.process.run('tar -czvf {} .'.format(os.path.join(self.mirrordir, self.mirrorname)), cwd =  self.gitdir)
         return self.git("rev-parse HEAD", self.gitdir).strip()
+
+    def git_new_branch(self, name):
+        self.git_new_commit()
+        head = self.git("rev-parse HEAD", self.gitdir).strip()
+        self.git("checkout -b {}".format(name), self.gitdir)
+        newrev = self.git_new_commit()
+        self.git("checkout {}".format(head), self.gitdir)
+        return newrev
 
     def test_mirror_commit_nonexistent(self):
         self.make_git_repo()
@@ -3082,6 +3101,59 @@ class FetchPremirroronlyLocalTest(FetcherTest):
         fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
         with self.assertRaises(bb.fetch2.NetworkAccess):
             fetcher.download()
+
+    def test_mirror_tarball_multiple_branches(self):
+        """
+        test if PREMIRRORS can handle multiple name/branches correctly
+        both branches have required revisions
+        """
+        self.make_git_repo()
+        branch1rev = self.git_new_branch("testbranch1")
+        branch2rev = self.git_new_branch("testbranch2")
+        self.recipe_url = "git://git.fake.repo/bitbake;branch=testbranch1,testbranch2;protocol=https;name=branch1,branch2"
+        self.d.setVar("SRCREV_branch1", branch1rev)
+        self.d.setVar("SRCREV_branch2", branch2rev)
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+        self.assertTrue(os.path.exists(self.mirrorfile), "Mirror file doesn't exist")
+        fetcher.download()
+        fetcher.unpack(os.path.join(self.tempdir, "unpacked"))
+        unpacked = os.path.join(self.tempdir, "unpacked", "git", self.testfilename)
+        self.assertTrue(os.path.exists(unpacked), "Repo has not been unpackaged properly!")
+        with open(unpacked, 'r') as f:
+            content = f.read()
+            ## We expect to see testbranch1 in the file, not master, not testbranch2
+            self.assertTrue(content.find("testbranch1") != -1, "Wrong branch has been checked out!")
+
+    def test_mirror_tarball_multiple_branches_nobranch(self):
+        """
+        test if PREMIRRORS can handle multiple name/branches correctly
+        Unbalanced name/branches raises ParameterError
+        """
+        self.make_git_repo()
+        branch1rev = self.git_new_branch("testbranch1")
+        branch2rev = self.git_new_branch("testbranch2")
+        self.recipe_url = "git://git.fake.repo/bitbake;branch=testbranch1;protocol=https;name=branch1,branch2"
+        self.d.setVar("SRCREV_branch1", branch1rev)
+        self.d.setVar("SRCREV_branch2", branch2rev)
+        with self.assertRaises(bb.fetch2.ParameterError):
+            fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+
+    def test_mirror_tarball_multiple_branches_norev(self):
+        """
+        test if PREMIRRORS can handle multiple name/branches correctly
+        one of the branches specifies non existing SRCREV
+        """
+        self.make_git_repo()
+        branch1rev = self.git_new_branch("testbranch1")
+        branch2rev = self.git_new_branch("testbranch2")
+        self.recipe_url = "git://git.fake.repo/bitbake;branch=testbranch1,testbranch2;protocol=https;name=branch1,branch2"
+        self.d.setVar("SRCREV_branch1", branch1rev)
+        self.d.setVar("SRCREV_branch2", "0"*40)
+        fetcher = bb.fetch.Fetch([self.recipe_url], self.d)
+        self.assertTrue(os.path.exists(self.mirrorfile), "Mirror file doesn't exist")
+        with self.assertRaises(bb.fetch2.NetworkAccess):
+            fetcher.download()
+
 
 class FetchPremirroronlyNetworkTest(FetcherTest):
 

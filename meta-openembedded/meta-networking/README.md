@@ -33,7 +33,6 @@ branch: master
 Maintenance
 -----------
 Layer maintainers: Khem Raj <raj.khem@gmail.com>
-                   Armin Kuster <akuster808@gmail.com> (recipes-netkit)
 
 
 Please see the MAINTAINERS file for information on contacting the

@@ -30,8 +30,6 @@ PACKAGECONFIG[nss] = "-DCZMQ_WITH_NSS=ON,-DCZMQ_WITH_NSS=OFF,nss"
 PACKAGECONFIG[systemd] = "-DCZMQ_WITH_SYSTEMD=ON,-DCZMQ_WITH_SYSTEMD=OFF,systemd"
 PACKAGECONFIG[uuid] = "-DCZMQ_WITH_UUID=ON,-DCZMQ_WITH_UUID=OFF,util-linux"
 
-BBCLASSEXTEND = "nativesdk"
-
 do_install:append() {
         mkdir -p ${D}/${includedir}/${BPN}
         mv ${D}/${includedir}/sha1.h ${D}/${includedir}/${BPN}/.

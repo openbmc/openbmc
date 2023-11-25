@@ -14,6 +14,10 @@ local_conf_header:
     SDKMACHINE = "x86_64"
 
 target:
+  # Target packages to test aarch64
+  - fvp-base-a-aem
+  - fvp-corstone1000
+  # Nativesdk to test x86-64
   - nativesdk-fvp-base-a-aem
   - nativesdk-fvp-corstone1000
   - nativesdk-fvp-n1-edge

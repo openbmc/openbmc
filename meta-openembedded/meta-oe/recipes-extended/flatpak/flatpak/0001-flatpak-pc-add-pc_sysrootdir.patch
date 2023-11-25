@@ -5,7 +5,7 @@ Subject: [PATCH] flatpak.pc: add pc_sysrootdir
 
 Signed-off-by: Markus Volk <f_l_k@t-online.de>
 ---
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [oe-specific]
 
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

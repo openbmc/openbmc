@@ -26,10 +26,10 @@ branch: master
 Layout
 ------
 
-recipes-httpd/      Web servers
-recipes-php/        PHP applications
-recipes-support/    Miscellaneous support recipes
-recipes-webadmin/   Standalone web administration interfaces
+* recipes-httpd/      Web servers
+* recipes-php/        PHP applications
+* recipes-support/    Miscellaneous support recipes
+* recipes-webadmin/   Standalone web administration interfaces
 
 
 Notes

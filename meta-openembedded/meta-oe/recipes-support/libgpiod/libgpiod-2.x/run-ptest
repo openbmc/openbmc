@@ -1,6 +1,6 @@
 #!/bin/sh
 
-testbins="gpiod-test gpio-tools-test gpiod-cxx-test"
+testbins="gpiod-test gpio-tools-test.bash gpiod-cxx-test"
 
 ptestdir=$(dirname "$(readlink -f "$0")")
 cd $ptestdir/tests

@@ -456,8 +456,7 @@ def fixup_perms(d):
                 'sbindir',
                 'libexecdir',
                 'libdir',
-                'includedir',
-                'oldincludedir' ]
+                'includedir' ]
 
     for path in target_path_vars:
         dir = d.getVar(path) or ""

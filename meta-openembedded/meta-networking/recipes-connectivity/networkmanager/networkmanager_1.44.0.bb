@@ -22,7 +22,6 @@ DEPENDS = " \
 "
 DEPENDS:append:class-target = " bash-completion"
 
-GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase gettext update-rc.d systemd gobject-introspection gtk-doc update-alternatives upstream-version-is-even
 
 SRC_URI = " \
@@ -31,7 +30,7 @@ SRC_URI = " \
     file://enable-dhcpcd.conf \
     file://enable-iwd.conf \
 "
-SRC_URI:append:libc-musl = " file://0001-linker-scripts-Do-not-export-_IO_stdin_used.patch"
+SRC_URI:append:libc-musl = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' file://0001-linker-scripts-Do-not-export-_IO_stdin_used.patch', '', d)}"
 
 SRC_URI[sha256sum] = "edca09637d182f806b3b12d8c5623d7badbd73ccca1ae63be20d2f298779fb9f"
 

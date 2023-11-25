@@ -3,7 +3,6 @@ SECTION = "x11/gnome"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=75859989545e37968a99b631ef42722e"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 DEPENDS = " \
     appstream-glib-native \
@@ -19,7 +18,7 @@ DEPENDS = " \
     tepl \
 "
 
-inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc vala gettext features_check mime-xdg gtk-icon-cache python3targetconfig
+inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc gettext features_check mime-xdg gtk-icon-cache python3targetconfig
 
 def gnome_verdir(v):
     return oe.utils.trim_version(v, 1)

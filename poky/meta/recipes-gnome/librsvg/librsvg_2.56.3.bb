@@ -14,11 +14,13 @@ SECTION = "x11/utils"
 DEPENDS = "cairo gdk-pixbuf glib-2.0 libxml2 pango python3-docutils-native"
 BBCLASSEXTEND = "native nativesdk"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit cargo_common gnomebase pixbufcache gobject-introspection rust vala gi-docgen cargo-update-recipe-crates
 
 require ${BPN}-crates.inc
 
 SRC_URI += "file://0001-Makefile.am-pass-rust-target-to-cargo-also-when-not-.patch \
+            file://0001-Add-riscv32-support.patch;patchdir=../cargo_home/bitbake/linux-raw-sys-0.4.3 \
            "
 
 SRC_URI[archive.sha256sum] = "5a328048a02d014645cd27f61140f4e0b11280fb2c7f2a21864fe0c59ac1ce88"
@@ -38,7 +40,6 @@ export RUST_TARGET = "${RUST_HOST_SYS}"
 RUSTFLAGS:append:mips = " --cfg crossbeam_no_atomic_64"
 RUSTFLAGS:append:mipsel = " --cfg crossbeam_no_atomic_64"
 RUSTFLAGS:append:powerpc = " --cfg crossbeam_no_atomic_64"
-RUSTFLAGS:append:riscv32 = " --cfg crossbeam_no_atomic_64"
 
 do_configure[postfuncs] += "cargo_common_do_configure"
 

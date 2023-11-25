@@ -11,10 +11,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 
 DEPENDS = "glib-2.0 gupnp"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 SRC_URI = "git://github.com/01org/${BPN}.git;branch=master;protocol=https"
 SRCREV = "1c6853f5bc697dc0a8774fd70dbc915c4dbe7c5b"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
+
+SKIP_RECIPE[dleyna-core] ?= "Upstream is dead moreover needs porting to work with latest gupnp >= 1.2"

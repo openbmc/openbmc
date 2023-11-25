@@ -1,4 +1,4 @@
-From 60b8c4e852cbe76c383d5c495ecc8aeb84b407b6 Mon Sep 17 00:00:00 2001
+From 1c1e7ca2874feaa3e447dce578487d42c226ef46 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Sat, 17 Jul 2021 14:38:02 -0500
 Subject: [PATCH] Use pkg-config-native to find the libssl headers.
@@ -10,7 +10,7 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/Makefile b/scripts/Makefile
-index 9adb6d247..5fe371c7d 100644
+index 9adb6d247818..5fe371c7d7f5 100644
 --- a/scripts/Makefile
 +++ b/scripts/Makefile
 @@ -3,8 +3,8 @@

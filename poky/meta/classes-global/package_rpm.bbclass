@@ -8,12 +8,13 @@ inherit package
 
 IMAGE_PKGTYPE ?= "rpm"
 
-RPM="rpm"
-RPMBUILD="rpmbuild"
+RPM = "rpm"
+RPMBUILD = "rpmbuild"
+RPMBUILD_COMPMODE ?= "${@'w19T%d.zstdio' % int(d.getVar('ZSTD_THREADS'))}"
 
 PKGWRITEDIRRPM = "${WORKDIR}/deploy-rpms"
 
-# Maintaining the perfile dependencies has singificant overhead when writing the
+# Maintaining the perfile dependencies has significant overhead when writing the
 # packages. When set, this value merges them for efficiency.
 MERGEPERFILEDEPS = "1"
 
@@ -62,8 +63,8 @@ def write_rpm_perfiledata(srcname, d):
                 for dep in depends_dict:
                     ver = depends_dict[dep]
                     if dep and ver:
-                        ver = ver.replace("(","")
-                        ver = ver.replace(")","")
+                        ver = ver.replace("(", "")
+                        ver = ver.replace(")", "")
                         outfile.write(dep + " " + ver + " ")
                     else:
                         outfile.write(dep + " ")
@@ -104,9 +105,9 @@ python write_specfile () {
     import oe.packagedata
 
     # append information for logs and patches to %prep
-    def add_prep(d,spec_files_bottom):
+    def add_prep(d, spec_files_bottom):
         if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
-            spec_files_bottom.append('%%prep -n %s' % d.getVar('PN') )
+            spec_files_bottom.append('%%prep -n %s' % d.getVar('PN'))
             spec_files_bottom.append('%s' % "echo \"include logs and patches, Please check them in SOURCES\"")
             spec_files_bottom.append('')
 
@@ -119,7 +120,7 @@ python write_specfile () {
             source_list = os.listdir(ar_outdir)
             source_number = 0
             for source in source_list:
-                # do_deploy_archives may have already run (from sstate) meaning a .src.rpm may already 
+                # do_deploy_archives may have already run (from sstate) meaning a .src.rpm may already
                 # exist in ARCHIVER_OUTDIR so skip if present.
                 if source.endswith(".src.rpm"):
                     continue
@@ -191,7 +192,7 @@ python write_specfile () {
 
     def walk_files(walkpath, target, conffiles, dirfiles):
         # We can race against the ipk/deb backends which create CONTROL or DEBIAN directories
-        # when packaging. We just ignore these files which are created in 
+        # when packaging. We just ignore these files which are created in
         # packages-split/ and not package/
         # We have the odd situation where the CONTROL/DEBIAN directory can be removed in the middle of
         # of the walk, the isdir() test would then fail and the walk code would assume its a file
@@ -445,9 +446,9 @@ python write_specfile () {
         rprovides = bb.utils.explode_dep_versions2(splitrprovides)
         rreplaces = bb.utils.explode_dep_versions2(splitrreplaces)
         for dep in rreplaces:
-            if not dep in robsoletes:
+            if dep not in robsoletes:
                 robsoletes[dep] = rreplaces[dep]
-            if not dep in rprovides:
+            if dep not in rprovides:
                 rprovides[dep] = rreplaces[dep]
         splitrobsoletes = bb.utils.join_deps(robsoletes, commasep=False)
         splitrprovides = bb.utils.join_deps(rprovides, commasep=False)
@@ -517,8 +518,8 @@ python write_specfile () {
             spec_files_bottom.append('')
 
         del localdata
-    
-    add_prep(d,spec_files_bottom)
+
+    add_prep(d, spec_files_bottom)
     spec_preamble_top.append('Summary: %s' % srcsummary)
     spec_preamble_top.append('Name: %s' % srcname)
     spec_preamble_top.append('Version: %s' % srcversion)
@@ -539,9 +540,9 @@ python write_specfile () {
     rprovides = bb.utils.explode_dep_versions2(srcrprovides)
     rreplaces = bb.utils.explode_dep_versions2(srcrreplaces)
     for dep in rreplaces:
-        if not dep in robsoletes:
+        if dep not in robsoletes:
             robsoletes[dep] = rreplaces[dep]
-        if not dep in rprovides:
+        if dep not in rprovides:
             rprovides[dep] = rreplaces[dep]
     srcrobsoletes = bb.utils.join_deps(robsoletes, commasep=False)
     srcrprovides = bb.utils.join_deps(rprovides, commasep=False)
@@ -633,7 +634,6 @@ python do_package_rpm () {
     workdir = d.getVar('WORKDIR')
     tmpdir = d.getVar('TMPDIR')
     pkgd = d.getVar('PKGD')
-    pkgdest = d.getVar('PKGDEST')
     if not workdir or not pkgd or not tmpdir:
         bb.error("Variables incorrectly set, unable to package")
         return
@@ -644,7 +644,7 @@ python do_package_rpm () {
         return
 
     # Construct the spec file...
-    # If the spec file already exist, and has not been stored into 
+    # If the spec file already exist, and has not been stored into
     # pseudo's files.db, it maybe cause rpmbuild src.rpm fail,
     # so remove it before doing rpmbuild src.rpm.
     srcname    = d.getVar('PN')
@@ -660,8 +660,7 @@ python do_package_rpm () {
 
     # Setup the rpmbuild arguments...
     rpmbuild = d.getVar('RPMBUILD')
-    targetsys = d.getVar('TARGET_SYS')
-    targetvendor = d.getVar('HOST_VENDOR')
+    rpmbuild_compmode = d.getVar('RPMBUILD_COMPMODE')
 
     # Too many places in dnf stack assume that arch-independent packages are "noarch".
     # Let's not fight against this.
@@ -669,7 +668,6 @@ python do_package_rpm () {
     if package_arch == "all":
         package_arch = "noarch"
 
-    sdkpkgsuffix = (d.getVar('SDKPKGSUFFIX') or "nativesdk").replace("-", "_")
     d.setVar('PACKAGE_ARCH_EXTEND', package_arch)
     pkgwritedir = d.expand('${PKGWRITEDIRRPM}/${PACKAGE_ARCH_EXTEND}')
     d.setVar('RPM_PKGWRITEDIR', pkgwritedir)
@@ -686,8 +684,8 @@ python do_package_rpm () {
     cmd = cmd + " --define '_use_internal_dependency_generator 0'"
     cmd = cmd + " --define '_binaries_in_noarch_packages_terminate_build 0'"
     cmd = cmd + " --define '_build_id_links none'"
-    cmd = cmd + " --define '_binary_payload w19T%d.zstdio'" % int(d.getVar("ZSTD_THREADS"))
-    cmd = cmd + " --define '_source_payload w19T%d.zstdio'" % int(d.getVar("ZSTD_THREADS"))
+    cmd = cmd + " --define '_source_payload %s'" % rpmbuild_compmode
+    cmd = cmd + " --define '_binary_payload %s'" % rpmbuild_compmode
     cmd = cmd + " --define 'clamp_mtime_to_source_date_epoch 1'"
     cmd = cmd + " --define 'use_source_date_epoch_as_buildtime 1'"
     cmd = cmd + " --define '_buildhost reproducible'"
@@ -728,6 +726,10 @@ python () {
         deps = ' rpm-native:do_populate_sysroot virtual/fakeroot-native:do_populate_sysroot'
         d.appendVarFlag('do_package_write_rpm', 'depends', deps)
         d.setVarFlag('do_package_write_rpm', 'fakeroot', '1')
+
+        # Needed to ensure PKG_xxx renaming of dependency packages works
+        d.setVarFlag('do_package_write_rpm', 'deptask', "do_packagedata")
+        d.setVarFlag('do_package_write_rpm', 'rdeptask', "do_packagedata")
 }
 
 SSTATETASKS += "do_package_write_rpm"

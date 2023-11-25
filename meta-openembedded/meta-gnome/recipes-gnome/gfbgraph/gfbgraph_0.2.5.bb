@@ -10,7 +10,7 @@ DEPENDS = " \
     libsoup-2.4 \
     gnome-online-accounts \
 "
-
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gtk-doc gobject-introspection pkgconfig features_check
 
 # for gnome-online-accounts

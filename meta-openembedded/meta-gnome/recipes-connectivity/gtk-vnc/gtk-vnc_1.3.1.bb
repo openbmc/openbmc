@@ -12,9 +12,11 @@ DEPENDS = " \
     zlib \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 GIR_MESON_OPTION = ""
+VALA_MESON_OPTION = "with-vala"
+VALA_MESON_ENABLE_FLAG ?= 'enabled'
+VALA_MESON_DISABLE_FLAG ?= 'disabled'
 
 PACKAGECONFIG[pulseaudio] = "-Dpulseaudio=enabled,-Dpulseaudio=disabled,pulseaudio"
 PACKAGECONFIG[sasl] = "-Dsasl=enabled,-Dsasl=disabled,cyrus-sasl"

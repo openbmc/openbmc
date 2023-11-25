@@ -1,0 +1,800 @@
+From 1cfbaff9806f17c2afbabe79c1c87b96eba7f35a Mon Sep 17 00:00:00 2001
+From: "Friendy.Su@sony.com" <Friendy.Su@sony.com>
+Date: Mon, 8 Aug 2022 08:35:50 +0000
+Subject: [PATCH] ioengines: merge filecreate, filestat, filedelete engines to
+ fileoperations.c
+
+file operation engines have similar structure, implement them
+in one file.
+
+Signed-off-by: friendy-su <friendy.su@sony.com>
+---
+ Makefile                 |   2 +-
+ engines/filecreate.c     | 118 ---------------
+ engines/filedelete.c     | 115 --------------
+ engines/fileoperations.c | 318 +++++++++++++++++++++++++++++++++++++++
+ engines/filestat.c       | 190 -----------------------
+ 5 files changed, 319 insertions(+), 424 deletions(-)
+ delete mode 100644 engines/filecreate.c
+ delete mode 100644 engines/filedelete.c
+ create mode 100644 engines/fileoperations.c
+ delete mode 100644 engines/filestat.c
+
+diff --git a/Makefile b/Makefile
+index 188a74d7..634d2c93 100644
+--- a/Makefile
++++ b/Makefile
+@@ -56,7 +56,7 @@ SOURCE :=	$(sort $(patsubst $(SRCDIR)/%,%,$(wildcard $(SRCDIR)/crc/*.c)) \
+ 		pshared.c options.c \
+ 		smalloc.c filehash.c profile.c debug.c engines/cpu.c \
+ 		engines/mmap.c engines/sync.c engines/null.c engines/net.c \
+-		engines/ftruncate.c engines/filecreate.c engines/filestat.c engines/filedelete.c \
++		engines/ftruncate.c engines/fileoperations.c \
+ 		engines/exec.c \
+ 		server.c client.c iolog.c backend.c libfio.c flow.c cconv.c \
+ 		gettime-thread.c helpers.c json.c idletime.c td_error.c \
+diff --git a/engines/filecreate.c b/engines/filecreate.c
+deleted file mode 100644
+index 7884752d..00000000
+--- a/engines/filecreate.c
++++ /dev/null
+@@ -1,118 +0,0 @@
+-/*
+- * filecreate engine
+- *
+- * IO engine that doesn't do any IO, just creates files and tracks the latency
+- * of the file creation.
+- */
+-#include <stdio.h>
+-#include <fcntl.h>
+-#include <errno.h>
+-
+-#include "../fio.h"
+-
+-struct fc_data {
+-	enum fio_ddir stat_ddir;
+-};
+-
+-static int open_file(struct thread_data *td, struct fio_file *f)
+-{
+-	struct timespec start;
+-	int do_lat = !td->o.disable_lat;
+-
+-	dprint(FD_FILE, "fd open %s\n", f->file_name);
+-
+-	if (f->filetype != FIO_TYPE_FILE) {
+-		log_err("fio: only files are supported\n");
+-		return 1;
+-	}
+-	if (!strcmp(f->file_name, "-")) {
+-		log_err("fio: can't read/write to stdin/out\n");
+-		return 1;
+-	}
+-
+-	if (do_lat)
+-		fio_gettime(&start, NULL);
+-
+-	f->fd = open(f->file_name, O_CREAT|O_RDWR, 0600);
+-
+-	if (f->fd == -1) {
+-		char buf[FIO_VERROR_SIZE];
+-		int e = errno;
+-
+-		snprintf(buf, sizeof(buf), "open(%s)", f->file_name);
+-		td_verror(td, e, buf);
+-		return 1;
+-	}
+-
+-	if (do_lat) {
+-		struct fc_data *data = td->io_ops_data;
+-		uint64_t nsec;
+-
+-		nsec = ntime_since_now(&start);
+-		add_clat_sample(td, data->stat_ddir, nsec, 0, 0, 0, 0);
+-	}
+-
+-	return 0;
+-}
+-
+-static enum fio_q_status queue_io(struct thread_data *td,
+-				  struct io_u fio_unused *io_u)
+-{
+-	return FIO_Q_COMPLETED;
+-}
+-
+-/*
+- * Ensure that we at least have a block size worth of IO to do for each
+- * file. If the job file has td->o.size < nr_files * block_size, then
+- * fio won't do anything.
+- */
+-static int get_file_size(struct thread_data *td, struct fio_file *f)
+-{
+-	f->real_file_size = td_min_bs(td);
+-	return 0;
+-}
+-
+-static int init(struct thread_data *td)
+-{
+-	struct fc_data *data;
+-
+-	data = calloc(1, sizeof(*data));
+-
+-	if (td_read(td))
+-		data->stat_ddir = DDIR_READ;
+-	else if (td_write(td))
+-		data->stat_ddir = DDIR_WRITE;
+-
+-	td->io_ops_data = data;
+-	return 0;
+-}
+-
+-static void cleanup(struct thread_data *td)
+-{
+-	struct fc_data *data = td->io_ops_data;
+-
+-	free(data);
+-}
+-
+-static struct ioengine_ops ioengine = {
+-	.name		= "filecreate",
+-	.version	= FIO_IOOPS_VERSION,
+-	.init		= init,
+-	.cleanup	= cleanup,
+-	.queue		= queue_io,
+-	.get_file_size	= get_file_size,
+-	.open_file	= open_file,
+-	.close_file	= generic_close_file,
+-	.flags		= FIO_DISKLESSIO | FIO_SYNCIO | FIO_FAKEIO |
+-				FIO_NOSTATS | FIO_NOFILEHASH,
+-};
+-
+-static void fio_init fio_filecreate_register(void)
+-{
+-	register_ioengine(&ioengine);
+-}
+-
+-static void fio_exit fio_filecreate_unregister(void)
+-{
+-	unregister_ioengine(&ioengine);
+-}
+diff --git a/engines/filedelete.c b/engines/filedelete.c
+deleted file mode 100644
+index df388ac9..00000000
+--- a/engines/filedelete.c
++++ /dev/null
+@@ -1,115 +0,0 @@
+-/*
+- * file delete engine
+- *
+- * IO engine that doesn't do any IO, just delete files and track the latency
+- * of the file deletion.
+- */
+-#include <stdio.h>
+-#include <fcntl.h>
+-#include <errno.h>
+-#include <sys/types.h>
+-#include <unistd.h>
+-#include "../fio.h"
+-
+-struct fc_data {
+-	enum fio_ddir stat_ddir;
+-};
+-
+-static int delete_file(struct thread_data *td, struct fio_file *f)
+-{
+-	struct timespec start;
+-	int do_lat = !td->o.disable_lat;
+-	int ret;
+-
+-	dprint(FD_FILE, "fd delete %s\n", f->file_name);
+-
+-	if (f->filetype != FIO_TYPE_FILE) {
+-		log_err("fio: only files are supported\n");
+-		return 1;
+-	}
+-	if (!strcmp(f->file_name, "-")) {
+-		log_err("fio: can't read/write to stdin/out\n");
+-		return 1;
+-	}
+-
+-	if (do_lat)
+-		fio_gettime(&start, NULL);
+-
+-	ret = unlink(f->file_name);
+-
+-	if (ret == -1) {
+-		char buf[FIO_VERROR_SIZE];
+-		int e = errno;
+-
+-		snprintf(buf, sizeof(buf), "delete(%s)", f->file_name);
+-		td_verror(td, e, buf);
+-		return 1;
+-	}
+-
+-	if (do_lat) {
+-		struct fc_data *data = td->io_ops_data;
+-		uint64_t nsec;
+-
+-		nsec = ntime_since_now(&start);
+-		add_clat_sample(td, data->stat_ddir, nsec, 0, 0, 0, 0);
+-	}
+-
+-	return 0;
+-}
+-
+-
+-static enum fio_q_status queue_io(struct thread_data *td, struct io_u fio_unused *io_u)
+-{
+-	return FIO_Q_COMPLETED;
+-}
+-
+-static int init(struct thread_data *td)
+-{
+-	struct fc_data *data;
+-
+-	data = calloc(1, sizeof(*data));
+-
+-	if (td_read(td))
+-		data->stat_ddir = DDIR_READ;
+-	else if (td_write(td))
+-		data->stat_ddir = DDIR_WRITE;
+-
+-	td->io_ops_data = data;
+-	return 0;
+-}
+-
+-static int delete_invalidate(struct thread_data *td, struct fio_file *f)
+-{
+-    /* do nothing because file not opened */
+-    return 0;
+-}
+-
+-static void cleanup(struct thread_data *td)
+-{
+-	struct fc_data *data = td->io_ops_data;
+-
+-	free(data);
+-}
+-
+-static struct ioengine_ops ioengine = {
+-	.name		= "filedelete",
+-	.version	= FIO_IOOPS_VERSION,
+-	.init		= init,
+-	.invalidate	= delete_invalidate,
+-	.cleanup	= cleanup,
+-	.queue		= queue_io,
+-	.get_file_size	= generic_get_file_size,
+-	.open_file	= delete_file,
+-	.flags		=  FIO_SYNCIO | FIO_FAKEIO |
+-				FIO_NOSTATS | FIO_NOFILEHASH,
+-};
+-
+-static void fio_init fio_filedelete_register(void)
+-{
+-	register_ioengine(&ioengine);
+-}
+-
+-static void fio_exit fio_filedelete_unregister(void)
+-{
+-	unregister_ioengine(&ioengine);
+-}
+diff --git a/engines/fileoperations.c b/engines/fileoperations.c
+new file mode 100644
+index 00000000..1db60da1
+--- /dev/null
++++ b/engines/fileoperations.c
+@@ -0,0 +1,318 @@
++/*
++ * fileoperations engine
++ *
++ * IO engine that doesn't do any IO, just operates files and tracks the latency
++ * of the file operation.
++ */
++#include <stdio.h>
++#include <stdlib.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include "../fio.h"
++#include "../optgroup.h"
++#include "../oslib/statx.h"
++
++
++struct fc_data {
++	enum fio_ddir stat_ddir;
++};
++
++struct filestat_options {
++	void *pad;
++	unsigned int stat_type;
++};
++
++enum {
++	FIO_FILESTAT_STAT	= 1,
++	FIO_FILESTAT_LSTAT	= 2,
++	FIO_FILESTAT_STATX	= 3,
++};
++
++static struct fio_option options[] = {
++	{
++		.name	= "stat_type",
++		.lname	= "stat_type",
++		.type	= FIO_OPT_STR,
++		.off1	= offsetof(struct filestat_options, stat_type),
++		.help	= "Specify stat system call type to measure lookup/getattr performance",
++		.def	= "stat",
++		.posval = {
++			  { .ival = "stat",
++			    .oval = FIO_FILESTAT_STAT,
++			    .help = "Use stat(2)",
++			  },
++			  { .ival = "lstat",
++			    .oval = FIO_FILESTAT_LSTAT,
++			    .help = "Use lstat(2)",
++			  },
++			  { .ival = "statx",
++			    .oval = FIO_FILESTAT_STATX,
++			    .help = "Use statx(2) if exists",
++			  },
++		},
++		.category = FIO_OPT_C_ENGINE,
++		.group	= FIO_OPT_G_FILESTAT,
++	},
++	{
++		.name	= NULL,
++	},
++};
++
++
++static int open_file(struct thread_data *td, struct fio_file *f)
++{
++	struct timespec start;
++	int do_lat = !td->o.disable_lat;
++
++	dprint(FD_FILE, "fd open %s\n", f->file_name);
++
++	if (f->filetype != FIO_TYPE_FILE) {
++		log_err("fio: only files are supported\n");
++		return 1;
++	}
++	if (!strcmp(f->file_name, "-")) {
++		log_err("fio: can't read/write to stdin/out\n");
++		return 1;
++	}
++
++	if (do_lat)
++		fio_gettime(&start, NULL);
++
++	f->fd = open(f->file_name, O_CREAT|O_RDWR, 0600);
++
++	if (f->fd == -1) {
++		char buf[FIO_VERROR_SIZE];
++		int e = errno;
++
++		snprintf(buf, sizeof(buf), "open(%s)", f->file_name);
++		td_verror(td, e, buf);
++		return 1;
++	}
++
++	if (do_lat) {
++		struct fc_data *data = td->io_ops_data;
++		uint64_t nsec;
++
++		nsec = ntime_since_now(&start);
++		add_clat_sample(td, data->stat_ddir, nsec, 0, 0, 0, 0);
++	}
++
++	return 0;
++}
++
++static int stat_file(struct thread_data *td, struct fio_file *f)
++{
++	struct filestat_options *o = td->eo;
++	struct timespec start;
++	int do_lat = !td->o.disable_lat;
++	struct stat statbuf;
++#ifndef WIN32
++	struct statx statxbuf;
++	char *abspath;
++#endif
++	int ret;
++
++	dprint(FD_FILE, "fd stat %s\n", f->file_name);
++
++	if (f->filetype != FIO_TYPE_FILE) {
++		log_err("fio: only files are supported\n");
++		return 1;
++	}
++	if (!strcmp(f->file_name, "-")) {
++		log_err("fio: can't read/write to stdin/out\n");
++		return 1;
++	}
++
++	if (do_lat)
++		fio_gettime(&start, NULL);
++
++	switch (o->stat_type) {
++	case FIO_FILESTAT_STAT:
++		ret = stat(f->file_name, &statbuf);
++		break;
++	case FIO_FILESTAT_LSTAT:
++		ret = lstat(f->file_name, &statbuf);
++		break;
++	case FIO_FILESTAT_STATX:
++#ifndef WIN32
++		abspath = realpath(f->file_name, NULL);
++		if (abspath) {
++			ret = statx(-1, abspath, 0, STATX_ALL, &statxbuf);
++			free(abspath);
++		} else
++			ret = -1;
++#else
++		ret = -1;
++#endif
++		break;
++	default:
++		ret = -1;
++		break;
++	}
++
++	if (ret == -1) {
++		char buf[FIO_VERROR_SIZE];
++		int e = errno;
++
++		snprintf(buf, sizeof(buf), "stat(%s) type=%u", f->file_name,
++			o->stat_type);
++		td_verror(td, e, buf);
++		return 1;
++	}
++
++	if (do_lat) {
++		struct fc_data *data = td->io_ops_data;
++		uint64_t nsec;
++
++		nsec = ntime_since_now(&start);
++		add_clat_sample(td, data->stat_ddir, nsec, 0, 0, 0, 0);
++	}
++
++	return 0;
++}
++
++
++static int delete_file(struct thread_data *td, struct fio_file *f)
++{
++	struct timespec start;
++	int do_lat = !td->o.disable_lat;
++	int ret;
++
++	dprint(FD_FILE, "fd delete %s\n", f->file_name);
++
++	if (f->filetype != FIO_TYPE_FILE) {
++		log_err("fio: only files are supported\n");
++		return 1;
++	}
++	if (!strcmp(f->file_name, "-")) {
++		log_err("fio: can't read/write to stdin/out\n");
++		return 1;
++	}
++
++	if (do_lat)
++		fio_gettime(&start, NULL);
++
++	ret = unlink(f->file_name);
++
++	if (ret == -1) {
++		char buf[FIO_VERROR_SIZE];
++		int e = errno;
++
++		snprintf(buf, sizeof(buf), "delete(%s)", f->file_name);
++		td_verror(td, e, buf);
++		return 1;
++	}
++
++	if (do_lat) {
++		struct fc_data *data = td->io_ops_data;
++		uint64_t nsec;
++
++		nsec = ntime_since_now(&start);
++		add_clat_sample(td, data->stat_ddir, nsec, 0, 0, 0, 0);
++	}
++
++	return 0;
++}
++
++static int invalidate_do_nothing(struct thread_data *td, struct fio_file *f)
++{
++	/* do nothing because file not opened */
++	return 0;
++}
++
++static enum fio_q_status queue_io(struct thread_data *td, struct io_u *io_u)
++{
++	return FIO_Q_COMPLETED;
++}
++
++/*
++ * Ensure that we at least have a block size worth of IO to do for each
++ * file. If the job file has td->o.size < nr_files * block_size, then
++ * fio won't do anything.
++ */
++static int get_file_size(struct thread_data *td, struct fio_file *f)
++{
++	f->real_file_size = td_min_bs(td);
++	return 0;
++}
++
++static int init(struct thread_data *td)
++{
++	struct fc_data *data;
++
++	data = calloc(1, sizeof(*data));
++
++	if (td_read(td))
++		data->stat_ddir = DDIR_READ;
++	else if (td_write(td))
++		data->stat_ddir = DDIR_WRITE;
++
++	td->io_ops_data = data;
++	return 0;
++}
++
++static void cleanup(struct thread_data *td)
++{
++	struct fc_data *data = td->io_ops_data;
++
++	free(data);
++}
++
++static struct ioengine_ops ioengine_filecreate = {
++	.name		= "filecreate",
++	.version	= FIO_IOOPS_VERSION,
++	.init		= init,
++	.cleanup	= cleanup,
++	.queue		= queue_io,
++	.get_file_size	= get_file_size,
++	.open_file	= open_file,
++	.close_file	= generic_close_file,
++	.flags		= FIO_DISKLESSIO | FIO_SYNCIO | FIO_FAKEIO |
++				FIO_NOSTATS | FIO_NOFILEHASH,
++};
++
++static struct ioengine_ops ioengine_filestat = {
++	.name		= "filestat",
++	.version	= FIO_IOOPS_VERSION,
++	.init		= init,
++	.cleanup	= cleanup,
++	.queue		= queue_io,
++	.invalidate	= invalidate_do_nothing,
++	.get_file_size	= generic_get_file_size,
++	.open_file	= stat_file,
++	.flags		=  FIO_SYNCIO | FIO_FAKEIO |
++				FIO_NOSTATS | FIO_NOFILEHASH,
++	.options	= options,
++	.option_struct_size = sizeof(struct filestat_options),
++};
++
++static struct ioengine_ops ioengine_filedelete = {
++	.name		= "filedelete",
++	.version	= FIO_IOOPS_VERSION,
++	.init		= init,
++	.invalidate	= invalidate_do_nothing,
++	.cleanup	= cleanup,
++	.queue		= queue_io,
++	.get_file_size	= generic_get_file_size,
++	.open_file	= delete_file,
++	.flags		=  FIO_SYNCIO | FIO_FAKEIO |
++				FIO_NOSTATS | FIO_NOFILEHASH,
++};
++
++
++static void fio_init fio_fileoperations_register(void)
++{
++	register_ioengine(&ioengine_filecreate);
++	register_ioengine(&ioengine_filestat);
++	register_ioengine(&ioengine_filedelete);
++}
++
++static void fio_exit fio_fileoperations_unregister(void)
++{
++	unregister_ioengine(&ioengine_filecreate);
++	unregister_ioengine(&ioengine_filestat);
++	unregister_ioengine(&ioengine_filedelete);
++}
+diff --git a/engines/filestat.c b/engines/filestat.c
+deleted file mode 100644
+index e587eb54..00000000
+--- a/engines/filestat.c
++++ /dev/null
+@@ -1,190 +0,0 @@
+-/*
+- * filestat engine
+- *
+- * IO engine that doesn't do any IO, just stat files and tracks the latency
+- * of the file stat.
+- */
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <fcntl.h>
+-#include <errno.h>
+-#include <sys/types.h>
+-#include <sys/stat.h>
+-#include <unistd.h>
+-#include "../fio.h"
+-#include "../optgroup.h"
+-#include "../oslib/statx.h"
+-
+-struct fc_data {
+-	enum fio_ddir stat_ddir;
+-};
+-
+-struct filestat_options {
+-	void *pad;
+-	unsigned int stat_type;
+-};
+-
+-enum {
+-	FIO_FILESTAT_STAT	= 1,
+-	FIO_FILESTAT_LSTAT	= 2,
+-	FIO_FILESTAT_STATX	= 3,
+-};
+-
+-static struct fio_option options[] = {
+-	{
+-		.name	= "stat_type",
+-		.lname	= "stat_type",
+-		.type	= FIO_OPT_STR,
+-		.off1	= offsetof(struct filestat_options, stat_type),
+-		.help	= "Specify stat system call type to measure lookup/getattr performance",
+-		.def	= "stat",
+-		.posval = {
+-			  { .ival = "stat",
+-			    .oval = FIO_FILESTAT_STAT,
+-			    .help = "Use stat(2)",
+-			  },
+-			  { .ival = "lstat",
+-			    .oval = FIO_FILESTAT_LSTAT,
+-			    .help = "Use lstat(2)",
+-			  },
+-			  { .ival = "statx",
+-			    .oval = FIO_FILESTAT_STATX,
+-			    .help = "Use statx(2) if exists",
+-			  },
+-		},
+-		.category = FIO_OPT_C_ENGINE,
+-		.group	= FIO_OPT_G_FILESTAT,
+-	},
+-	{
+-		.name	= NULL,
+-	},
+-};
+-
+-static int stat_file(struct thread_data *td, struct fio_file *f)
+-{
+-	struct filestat_options *o = td->eo;
+-	struct timespec start;
+-	int do_lat = !td->o.disable_lat;
+-	struct stat statbuf;
+-#ifndef WIN32
+-	struct statx statxbuf;
+-	char *abspath;
+-#endif
+-	int ret;
+-
+-	dprint(FD_FILE, "fd stat %s\n", f->file_name);
+-
+-	if (f->filetype != FIO_TYPE_FILE) {
+-		log_err("fio: only files are supported\n");
+-		return 1;
+-	}
+-	if (!strcmp(f->file_name, "-")) {
+-		log_err("fio: can't read/write to stdin/out\n");
+-		return 1;
+-	}
+-
+-	if (do_lat)
+-		fio_gettime(&start, NULL);
+-
+-	switch (o->stat_type){
+-	case FIO_FILESTAT_STAT:
+-		ret = stat(f->file_name, &statbuf);
+-		break;
+-	case FIO_FILESTAT_LSTAT:
+-		ret = lstat(f->file_name, &statbuf);
+-		break;
+-	case FIO_FILESTAT_STATX:
+-#ifndef WIN32
+-		abspath = realpath(f->file_name, NULL);
+-		if (abspath) {
+-			ret = statx(-1, abspath, 0, STATX_ALL, &statxbuf);
+-			free(abspath);
+-		} else
+-			ret = -1;
+-#else
+-		ret = -1;
+-#endif
+-		break;
+-	default:
+-		ret = -1;
+-		break;
+-	}
+-
+-	if (ret == -1) {
+-		char buf[FIO_VERROR_SIZE];
+-		int e = errno;
+-
+-		snprintf(buf, sizeof(buf), "stat(%s) type=%u", f->file_name,
+-			o->stat_type);
+-		td_verror(td, e, buf);
+-		return 1;
+-	}
+-
+-	if (do_lat) {
+-		struct fc_data *data = td->io_ops_data;
+-		uint64_t nsec;
+-
+-		nsec = ntime_since_now(&start);
+-		add_clat_sample(td, data->stat_ddir, nsec, 0, 0, 0, 0);
+-	}
+-
+-	return 0;
+-}
+-
+-static enum fio_q_status queue_io(struct thread_data *td, struct io_u fio_unused *io_u)
+-{
+-	return FIO_Q_COMPLETED;
+-}
+-
+-static int init(struct thread_data *td)
+-{
+-	struct fc_data *data;
+-
+-	data = calloc(1, sizeof(*data));
+-
+-	if (td_read(td))
+-		data->stat_ddir = DDIR_READ;
+-	else if (td_write(td))
+-		data->stat_ddir = DDIR_WRITE;
+-
+-	td->io_ops_data = data;
+-	return 0;
+-}
+-
+-static void cleanup(struct thread_data *td)
+-{
+-	struct fc_data *data = td->io_ops_data;
+-
+-	free(data);
+-}
+-
+-static int stat_invalidate(struct thread_data *td, struct fio_file *f)
+-{
+-	/* do nothing because file not opened */
+-	return 0;
+-}
+-
+-static struct ioengine_ops ioengine = {
+-	.name		= "filestat",
+-	.version	= FIO_IOOPS_VERSION,
+-	.init		= init,
+-	.cleanup	= cleanup,
+-	.queue		= queue_io,
+-	.invalidate	= stat_invalidate,
+-	.get_file_size	= generic_get_file_size,
+-	.open_file	= stat_file,
+-	.flags		=  FIO_SYNCIO | FIO_FAKEIO |
+-				FIO_NOSTATS | FIO_NOFILEHASH,
+-	.options	= options,
+-	.option_struct_size = sizeof(struct filestat_options),
+-};
+-
+-static void fio_init fio_filestat_register(void)
+-{
+-	register_ioengine(&ioengine);
+-}
+-
+-static void fio_exit fio_filestat_unregister(void)
+-{
+-	unregister_ioengine(&ioengine);
+-}

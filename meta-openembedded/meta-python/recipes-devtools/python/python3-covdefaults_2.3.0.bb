@@ -27,5 +27,3 @@ do_install_ptest() {
         install -d ${D}${PTEST_PATH}
         cp -rf ${S}/tests ${D}${PTEST_PATH}
 }
-
-BBCLASSEXTEND = "native nativesdk"

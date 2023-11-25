@@ -13,7 +13,6 @@ CXXFLAGS += "-D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR"
 inherit gnomebase itstool gettext gnome-help features_check meson gtk-icon-cache mime-xdg
 ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
-GNOMEBASEBUILDCLASS = "meson"
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
 

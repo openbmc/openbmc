@@ -550,8 +550,8 @@ class CommandsSync:
         and return a datastore object representing the environment
         for the recipe.
         """
-        fn = params[0]
-        mc = bb.runqueue.mc_from_tid(fn)
+        virtualfn = params[0]
+        (fn, cls, mc) = bb.cache.virtualfn2realfn(virtualfn)
         appends = params[1]
         appendlist = params[2]
         if len(params) > 3:
@@ -574,10 +574,10 @@ class CommandsSync:
         if config_data:
             # We have to use a different function here if we're passing in a datastore
             # NOTE: we took a copy above, so we don't do it here again
-            envdata = command.cooker.databuilder._parse_recipe(config_data, fn, appendfiles, mc, layername)['']
+            envdata = command.cooker.databuilder._parse_recipe(config_data, fn, appendfiles, mc, layername)[cls]
         else:
             # Use the standard path
-            envdata = command.cooker.databuilder.parseRecipe(fn, appendfiles, layername)
+            envdata = command.cooker.databuilder.parseRecipe(virtualfn, appendfiles, layername)
         idx = command.remotedatastores.store(envdata)
         return DataStoreConnectionHandle(idx)
     parseRecipeFile.readonly = True

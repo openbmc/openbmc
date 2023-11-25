@@ -4,4 +4,5 @@ header:
 local_conf_header:
   tftf: |
     TFA_UBOOT = "0"
+    TFA_UEFI = "0"
     TFTF_TESTS = "1"

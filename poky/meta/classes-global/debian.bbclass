@@ -19,21 +19,6 @@ AUTO_LIBNAME_PKGS = "${PACKAGES}"
 
 inherit package
 
-DEBIANRDEP = "do_packagedata"
-do_package_write_ipk[deptask] = "${DEBIANRDEP}"
-do_package_write_deb[deptask] = "${DEBIANRDEP}"
-do_package_write_tar[deptask] = "${DEBIANRDEP}"
-do_package_write_rpm[deptask] = "${DEBIANRDEP}"
-do_package_write_ipk[rdeptask] = "${DEBIANRDEP}"
-do_package_write_deb[rdeptask] = "${DEBIANRDEP}"
-do_package_write_tar[rdeptask] = "${DEBIANRDEP}"
-do_package_write_rpm[rdeptask] = "${DEBIANRDEP}"
-
-python () {
-    if not d.getVar("PACKAGES"):
-        d.setVar("DEBIANRDEP", "")
-}
-
 python debian_package_name_hook () {
     import glob, copy, stat, errno, re, pathlib, subprocess
 

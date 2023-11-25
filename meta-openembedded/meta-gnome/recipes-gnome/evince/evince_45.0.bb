@@ -25,7 +25,6 @@ DEPENDS = " \
     zlib \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase itstool gnome-help pkgconfig gsettings gobject-introspection gettext mime-xdg gi-docgen features_check gtk-icon-cache
 
@@ -47,8 +46,8 @@ RRECOMMENDS:${PN} = "adwaita-icon-theme"
 PACKAGES =+ "${PN}-nautilus-extension"
 
 do_install:prepend() {
-    sed -i -e 's|${B}/../${PN}-${PV}|/usr/src/debug/${PN}/${PV}-${PR}|g' ${B}/libview/ev-view-type-builtins.c
-    sed -i -e 's|${B}/../${PN}-${PV}|/usr/src/debug/${PN}/${PV}-${PR}|g' ${B}/libdocument/ev-document-type-builtins.c
+    sed -i -e 's|${B}/../${PN}-${PV}|${TARGET_DBGSRC_DIR}|g' ${B}/libview/ev-view-type-builtins.c
+    sed -i -e 's|${B}/../${PN}-${PV}|${TARGET_DBGSRC_DIR}|g' ${B}/libdocument/ev-document-type-builtins.c
 }
 
 FILES:${PN} += "${datadir}/dbus-1 \

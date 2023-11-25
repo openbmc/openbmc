@@ -1,0 +1,55 @@
+From fa64b199318318af7fe598a5b9ec62b981a55e2d Mon Sep 17 00:00:00 2001
+From: Vincent Fu <vincent.fu@samsung.com>
+Date: Mon, 15 Aug 2022 11:34:43 -0400
+Subject: [PATCH] test: add latency test using posixaio ioengine
+
+Make sure that mean(slat) + mean(clat) = mean(total lat).
+
+Tests 15 and 16 use the libaio and null ioengines, respectively. Both of
+those ioengines have commit hooks. Add this new test using the posixaio
+ioengine which does not have a commit hook so that we can better cover
+the possible ways that latency is calcualted.
+
+Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
+---
+ t/jobs/t0017.fio   |  9 +++++++++
+ t/run-fio-tests.py | 10 ++++++++++
+ 2 files changed, 19 insertions(+)
+ create mode 100644 t/jobs/t0017.fio
+
+diff --git a/t/jobs/t0017.fio b/t/jobs/t0017.fio
+new file mode 100644
+index 00000000..14486d98
+--- /dev/null
++++ b/t/jobs/t0017.fio
+@@ -0,0 +1,9 @@
++# Expected result: mean(slat) + mean(clat) = mean(lat)
++# Buggy result: equality does not hold
++# This is similar to t0015 and t0016 except that is uses posixaio which is
++# available on more platforms and does not have a commit hook
++
++[test]
++ioengine=posixaio
++size=1M
++iodepth=16
+diff --git a/t/run-fio-tests.py b/t/run-fio-tests.py
+index d77f20e0..2bd02a2a 100755
+--- a/t/run-fio-tests.py
++++ b/t/run-fio-tests.py
+@@ -857,6 +857,16 @@ TEST_LIST = [
+         'output_format':    'json',
+         'requirements':     [],
+     },
++    {
++        'test_id':          17,
++        'test_class':       FioJobTest_t0015,
++        'job':              't0017.fio',
++        'success':          SUCCESS_DEFAULT,
++        'pre_job':          None,
++        'pre_success':      None,
++        'output_format':    'json',
++        'requirements':     [Requirements.not_windows],
++    },
+     {
+         'test_id':          1000,
+         'test_class':       FioExeTest,

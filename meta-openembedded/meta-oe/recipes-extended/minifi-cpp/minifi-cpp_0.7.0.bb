@@ -66,7 +66,7 @@ EXTRA_OECMAKE += " \
     -DGCC_RANLIB=${STAGING_BINDIR_TOOLCHAIN}/${RANLIB} \
     -DDISABLE_PYTHON_SCRIPTING=ON \
     -DFLEX_TARGET_ARG_COMPILE_FLAGS='--noline' \
-    -DBISON_TARGET_ARG_COMPILE_FLAGS='--no-lines --file-prefix-map=${S}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}' \
+    -DBISON_TARGET_ARG_COMPILE_FLAGS='--no-lines --file-prefix-map=${S}=${TARGET_DBGSRC_DIR}' \
     -DOPENSSLDIR=${sysconfdir}/libressl \
     "
 

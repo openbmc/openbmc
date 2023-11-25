@@ -18,4 +18,4 @@ EXTRA_OECMAKE += "-DOPENJPEG_INSTALL_LIB_DIR=${@d.getVar('baselib').replace('/',
 
 FILES:${PN} += "${libdir}/openjpeg*"
 
-BBCLASSEXTEND = "native nativesdk"
+BBCLASSEXTEND = "native"

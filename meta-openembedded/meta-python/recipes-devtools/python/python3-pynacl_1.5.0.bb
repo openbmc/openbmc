@@ -15,12 +15,6 @@ DEPENDS += "\
     libsodium \
 "
 
-RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-cffi \
-    libsodium \
-"
-
 do_compile:prepend() {
     export SODIUM_INSTALL=system
 }
@@ -28,3 +22,15 @@ do_compile:prepend() {
 do_install:prepend() {
     export SODIUM_INSTALL=system
 }
+
+RDEPENDS:${PN} = "\
+    ${PYTHON_PN}-six \
+    ${PYTHON_PN}-cffi \
+    libsodium \
+"
+
+RPROVIDES:${PN} = "python3-nacl"
+
+# in meta-virtualization layer
+#
+RCONFLICTS:${PN} = "python3-nacl"

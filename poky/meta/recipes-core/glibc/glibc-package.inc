@@ -42,7 +42,7 @@ FILES_SOLIBSDEV = "${libdir}/lib*${SOLIBSDEV}"
 FILES:${PN}-dev += "${libdir}/libpthread.a ${libdir}/libdl.a ${libdir}/libutil.a ${libdir}/libanl.a ${libdir}/*_nonshared.a ${base_libdir}/*_nonshared.a ${base_libdir}/*.o ${datadir}/aclocal"
 RDEPENDS:${PN}-dev = "linux-libc-headers-dev"
 FILES:${PN}-staticdev += "${libdir}/*.a ${base_libdir}/*.a"
-FILES:nscd = "${sbindir}/nscd* ${sysconfdir}/init.d/nscd ${systemd_system_unitdir}/nscd* ${sysconfdir}/tmpfiles.d/nscd.conf \
+FILES:nscd = "${sbindir}/nscd* ${sysconfdir}/init.d/nscd ${systemd_system_unitdir}/nscd* ${nonarch_libdir}/tmpfiles.d/nscd.conf \
               ${sysconfdir}/nscd.conf ${sysconfdir}/default/volatiles/98_nscd ${localstatedir}/db/nscd"
 FILES:${PN}-mtrace = "${bindir}/mtrace"
 FILES:tzcode = "${bindir}/tzselect ${sbindir}/zic ${bindir}/zdump"
@@ -132,9 +132,9 @@ def get_libc_fpu_setting(bb, d):
 
 do_install:append:class-target() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-		install -d ${D}${sysconfdir}/tmpfiles.d
+		install -d ${D}${nonarch_libdir}/tmpfiles.d
 		echo "d /run/nscd 755 root root -" \
-			> ${D}${sysconfdir}/tmpfiles.d/nscd.conf
+			> ${D}${nonarch_libdir}/tmpfiles.d/nscd.conf
 	fi
 
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
@@ -280,7 +280,7 @@ python populate_packages:prepend () {
 pkg_postinst:nscd () {
 	if [ -z "$D" ]; then
 		if command -v systemd-tmpfiles >/dev/null; then
-			systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/nscd.conf
+			systemd-tmpfiles --create ${nonarch_libdir}/tmpfiles.d/nscd.conf
 		elif [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
 			${sysconfdir}/init.d/populate-volatile.sh update
 		fi

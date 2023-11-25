@@ -22,7 +22,7 @@ def _smart_copy(src, dest):
     mode = os.stat(src).st_mode
     if stat.S_ISDIR(mode):
         bb.utils.mkdirhier(dest)
-        cmd = "tar --exclude='.git' --exclude='__pycache__' --xattrs --xattrs-include='*' -chf - -C %s -p . \
+        cmd = "tar --exclude='.git' --exclude='__pycache__' --xattrs --xattrs-include='*' -cf - -C %s -p . \
         | tar --xattrs --xattrs-include='*' -xf - -C %s" % (src, dest)
         subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
     else:

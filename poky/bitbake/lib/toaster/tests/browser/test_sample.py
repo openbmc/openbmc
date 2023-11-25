@@ -27,3 +27,12 @@ class TestSample(SeleniumTestCase):
         self.get(url)
         brand_link = self.find('.toaster-navbar-brand a.brand')
         self.assertEqual(brand_link.text.strip(), 'Toaster')
+
+    def test_no_builds_message(self):
+        """ Test that a message is shown when there are no builds """
+        url = reverse('all-builds')
+        self.get(url)
+        div_msg = self.find('#empty-state-allbuildstable .alert-info')
+
+        msg = 'Sorry - no data found'
+        self.assertEqual(div_msg.text, msg)

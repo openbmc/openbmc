@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=42dfffebc56fec7527aac53b7a89d1d8 \
 
 DEPENDS = "mm-common glib-2.0 libsigc++-2.0 glib-2.0-native"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase
 

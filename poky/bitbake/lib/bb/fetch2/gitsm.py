@@ -218,6 +218,10 @@ class GitSM(Git):
 
             try:
                 newfetch = Fetch([url], d, cache=False)
+                # modpath is needed by unpack tracer to calculate submodule
+                # checkout dir
+                new_ud = newfetch.ud[url]
+                new_ud.modpath = modpath
                 newfetch.unpack(root=os.path.dirname(os.path.join(repo_conf, 'modules', module)))
             except Exception as e:
                 logger.error('gitsm: submodule unpack failed: %s %s' % (type(e).__name__, str(e)))

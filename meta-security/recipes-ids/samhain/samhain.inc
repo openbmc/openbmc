@@ -59,6 +59,7 @@ PACKAGECONFIG[acl] = " --enable-posix-acl , --disable-posix-acl, acl"
 PACKAGECONFIG[audit] = "ac_cv_header_auparse_h=yes,ac_cv_header_auparse_h=no,audit"
 PACKAGECONFIG[ps] = "--with-ps-path=${base_bindir}/ps,,,procps"
 
+EXTRA_OECONF += "INSTALL='install -p'"
 EXTRA_OEMAKE:append:aarch64 = " CPPFLAGS+=-DCONFIG_ARCH_AARCH64=1"
 EXTRA_OEMAKE:append:mips64 = " CPPFLAGS+=-DCONFIG_ARCH_MIPS64=1"
 
@@ -89,6 +90,9 @@ ssp_cv_lib=no
 sh_cv_va_copy=yes
 EOF
     export CONFIG_SITE=${S}/config-site.${BP}
+    # remove the buildpath
+    sed -i -e 's;mydefarg;mydefargholder;g' ${S}/scripts/samhain.ebuild.in
+    sed -i -e 's;mydefarg;mydefargholder;g' ${S}/scripts/samhain.ebuild-light.in
 }
 
 do_configure () {

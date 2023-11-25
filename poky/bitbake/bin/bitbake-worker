@@ -433,18 +433,30 @@ class BitbakeWorker(object):
                 while self.process_waitpid():
                     continue
 
-
     def handle_item(self, item, func):
-        if self.queue.startswith(b"<" + item + b">"):
-            index = self.queue.find(b"</" + item + b">")
-            while index != -1:
-                try:
-                    func(self.queue[(len(item) + 2):index])
-                except pickle.UnpicklingError:
-                    workerlog_write("Unable to unpickle data: %s\n" % ":".join("{:02x}".format(c) for c in self.queue))
-                    raise
-                self.queue = self.queue[(index + len(item) + 3):]
-                index = self.queue.find(b"</" + item + b">")
+        opening_tag = b"<" + item + b">"
+        if not self.queue.startswith(opening_tag):
+            return
+
+        tag_len = len(opening_tag)
+        if len(self.queue) < tag_len + 4:
+            # we need to receive more data
+            return
+        header = self.queue[tag_len:tag_len + 4]
+        payload_len = int.from_bytes(header, 'big')
+        # closing tag has length (tag_len + 1)
+        if len(self.queue) < tag_len * 2 + 1 + payload_len:
+            # we need to receive more data
+            return
+
+        index = self.queue.find(b"</" + item + b">")
+        if index != -1:
+            try:
+                func(self.queue[(tag_len + 4):index])
+            except pickle.UnpicklingError:
+                workerlog_write("Unable to unpickle data: %s\n" % ":".join("{:02x}".format(c) for c in self.queue))
+                raise
+            self.queue = self.queue[(index + len(b"</") + len(item) + len(b">")):]
 
     def handle_cookercfg(self, data):
         self.cookercfg = pickle.loads(data)

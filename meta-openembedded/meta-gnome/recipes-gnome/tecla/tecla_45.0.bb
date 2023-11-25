@@ -10,7 +10,6 @@ DEPENDS = " \
 "
 
 REQUIRED_DISTRO_FEATURES = "wayland"
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase pkgconfig  features_check
 

@@ -1,0 +1,77 @@
+From 75d974a58c461b3b5d35280e497810e46abae4ca Mon Sep 17 00:00:00 2001
+From: William Lyu <William.Lyu@windriver.com>
+Date: Wed, 4 Oct 2023 08:58:41 -0400
+Subject: [PATCH] Fix intermittent failure of test t/op/sigsystem.t
+
+[Perl issue #21546] -- https://github.com/Perl/perl5/issues/21546
+
+This fix addresses the intermittent failure of the test
+t/op/sigsystem.t by improving its robustness. Before the fix, this
+test waits a hard-coded amount of time in the parent process for the
+child process to exit, and the child process may not be able to exit
+soon enough. With this fix, the parent process in this test polls for
+whether the SIGCHLD handler reaped the child process for at most 25
+seconds.
+
+Upstream-Status: Backport [commit ID: 75d974a]
+
+Signed-off-by: William Lyu <William.Lyu@windriver.com>
+Signed-off-by: Randy MacLeod <randy.macleod@windriver.com>
+Reported-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+
+Committer: William Lyu is now a Perl author.
+---
+ AUTHORS          |  1 +
+ t/op/sigsystem.t | 17 ++++++++++++++---
+ 2 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/AUTHORS b/AUTHORS
+index 21948bfdc7..527dd992fd 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -1443,6 +1443,7 @@ Wayne Scott                    <wscott@ichips.intel.com>
+ Wayne Thompson                 <Wayne.Thompson@Ebay.sun.com>
+ Wilfredo Sánchez               <wsanchez@mit.edu>
+ William J. Middleton           <William.Middleton@oslo.mobil.telenor.no>
++William Lyu                    <William.Lyu@windriver.com>
+ William Mann                   <wmann@avici.com>
+ William Middleton              <wmiddlet@adobe.com>
+ William R Ward                 <hermit@BayView.COM>
+diff --git a/t/op/sigsystem.t b/t/op/sigsystem.t
+index 25da854902..831feefb0f 100644
+--- a/t/op/sigsystem.t
++++ b/t/op/sigsystem.t
+@@ -37,7 +37,15 @@ SKIP: {
+     test_system('with reaper');
+ 
+     note("Waiting briefly for SIGCHLD...");
+-    Time::HiRes::sleep(0.500);
++
++    # Wait at most 50 * 0.500 = 25.0 seconds for the child process to be 
++    # reaped. If the child process exits and gets reaped early, this polling
++    # loop will exit early. 
++
++    for (1..50) {
++	last if @pids;
++	Time::HiRes::sleep(0.500);
++    }
+ 
+     ok(@pids == 1, 'Reaped only one process');
+     ok($pids[0] == $pid, "Reaped the right process.") or diag(Dumper(\@pids));
+@@ -50,8 +58,11 @@ sub test_system {
+     my $got_zeroes      = 0;
+ 
+     # This test is looking for a race between system()'s waitpid() and a
+-    # signal handler.    Looping a few times increases the chances of
+-    # catching the error.
++    # signal handler. The system() call is expected to not interfere with the 
++    # SIGCHLD signal handler. In particular, the wait() called within system() 
++    # is expected to reap the child process forked by system() before the 
++    # SIGCHLD signal handler is called. 
++    # Looping a few times increases the chances of catching the error.
+ 
+     for (1..$expected_zeroes) {
+ 	$got_zeroes++ unless system(TRUE);
+-- 
+2.25.1
+

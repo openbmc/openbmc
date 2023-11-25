@@ -92,7 +92,7 @@ do_compile() {
 
     # Setting both variables below causing our makefiles to not work with
     # implicit make rules
-    CFLAGS="-ffile-prefix-map=${S}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
+    CFLAGS="-ffile-prefix-map=${S}=${TARGET_DBGSRC_DIR}"
     unset CPPFLAGS
 
     export SRCDIR=${S}

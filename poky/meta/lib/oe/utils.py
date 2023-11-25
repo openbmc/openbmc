@@ -7,6 +7,7 @@
 import subprocess
 import multiprocessing
 import traceback
+import errno
 
 def read_file(filename):
     try:
@@ -528,3 +529,14 @@ def directory_size(root, blocksize=4096):
         total += sum(roundup(getsize(os.path.join(root, name))) for name in files)
         total += roundup(getsize(root))
     return total
+
+# Update the mtime of a file, skip if permission/read-only issues
+def touch(filename):
+    try:
+        os.utime(filename, None)
+    except PermissionError:
+        pass
+    except OSError as e:
+        # Handle read-only file systems gracefully
+        if e.errno != errno.EROFS:
+            raise e

@@ -5,6 +5,15 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import argparse
+import collections
+import json
+import os
+import os.path
+import pathlib
+import re
+import subprocess
+
 # TODO
 # - option to just list all broken files
 # - test suite
@@ -35,14 +44,12 @@ def blame_patch(patch):
     From a patch filename, return a list of "commit summary (author name <author
     email>)" strings representing the history.
     """
-    import subprocess
     return subprocess.check_output(("git", "log",
                                     "--follow", "--find-renames", "--diff-filter=A",
                                     "--format=%s (%aN <%aE>)",
                                     "--", patch)).decode("utf-8").splitlines()
 
-def patchreview(path, patches):
-    import re, os.path
+def patchreview(patches):
 
     # General pattern: start of line, optional whitespace, tag with optional
     # hyphen or spaces, maybe a colon, some whitespace, then the value, all case
@@ -56,11 +63,10 @@ def patchreview(path, patches):
 
     for patch in patches:
 
-        fullpath = os.path.join(path, patch)
         result = Result()
-        results[fullpath] = result
+        results[patch] = result
 
-        content = open(fullpath, encoding='ascii', errors='ignore').read()
+        content = open(patch, encoding='ascii', errors='ignore').read()
 
         # Find the Signed-off-by tag
         match = sob_re.search(content)
@@ -193,29 +199,56 @@ Patches in Pending state: %s""" % (total_patches,
 def histogram(results):
     from toolz import recipes, dicttoolz
     import math
+
     counts = recipes.countby(lambda r: r.upstream_status, results.values())
     bars = dicttoolz.valmap(lambda v: "#" * int(math.ceil(float(v) / len(results) * 100)), counts)
     for k in bars:
         print("%-20s %s (%d)" % (k.capitalize() if k else "No status", bars[k], counts[k]))
 
+def find_layers(candidate):
+    # candidate can either be the path to a layer directly (eg meta-intel), or a
+    # repository that contains other layers (meta-arm). We can determine what by
+    # looking for a conf/layer.conf file. If that file exists then it's a layer,
+    # otherwise its a repository of layers and we can assume they're called
+    # meta-*.
+
+    if (candidate / "conf" / "layer.conf").exists():
+        return [candidate.absolute()]
+    else:
+        return [d.absolute() for d in candidate.iterdir() if d.is_dir() and (d.name == "meta" or d.name.startswith("meta-"))]
+
+# TODO these don't actually handle dynamic-layers/
+
+def gather_patches(layers):
+    patches = []
+    for directory in layers:
+        filenames = subprocess.check_output(("git", "-C", directory, "ls-files", "recipes-*/**/*.patch", "recipes-*/**/*.diff"), universal_newlines=True).split()
+        patches += [os.path.join(directory, f) for f in filenames]
+    return patches
+
+def count_recipes(layers):
+    count = 0
+    for directory in layers:
+        output = subprocess.check_output(["git", "-C", directory, "ls-files", "recipes-*/**/*.bb"], universal_newlines=True)
+        count += len(output.splitlines())
+    return count
 
 if __name__ == "__main__":
-    import argparse, subprocess, os
-
     args = argparse.ArgumentParser(description="Patch Review Tool")
     args.add_argument("-b", "--blame", action="store_true", help="show blame for malformed patches")
     args.add_argument("-v", "--verbose", action="store_true", help="show per-patch results")
     args.add_argument("-g", "--histogram", action="store_true", help="show patch histogram")
     args.add_argument("-j", "--json", help="update JSON")
-    args.add_argument("directory", help="directory to scan")
+    args.add_argument("directory", type=pathlib.Path, metavar="DIRECTORY", help="directory to scan (layer, or repository of layers)")
     args = args.parse_args()
 
-    patches = subprocess.check_output(("git", "-C", args.directory, "ls-files", "recipes-*/**/*.patch", "recipes-*/**/*.diff")).decode("utf-8").split()
-    results = patchreview(args.directory, patches)
+    layers = find_layers(args.directory)
+    print(f"Found layers {' '.join((d.name for d in layers))}")
+    patches = gather_patches(layers)
+    results = patchreview(patches)
     analyse(results, want_blame=args.blame, verbose=args.verbose)
 
     if args.json:
-        import json, os.path, collections
         if os.path.isfile(args.json):
             data = json.load(open(args.json))
         else:
@@ -223,8 +256,11 @@ if __name__ == "__main__":
 
         row = collections.Counter()
         row["total"] = len(results)
-        row["date"] = subprocess.check_output(["git", "-C", args.directory, "show", "-s", "--pretty=format:%cd", "--date=format:%s"]).decode("utf-8").strip()
-        row["commit"] = subprocess.check_output(["git", "-C", args.directory, "show", "-s", "--pretty=format:%H"]).decode("utf-8").strip()
+        row["date"] = subprocess.check_output(["git", "-C", args.directory, "show", "-s", "--pretty=format:%cd", "--date=format:%s"], universal_newlines=True).strip()
+        row["commit"] = subprocess.check_output(["git", "-C", args.directory, "rev-parse", "HEAD"], universal_newlines=True).strip()
+        row['commit_count'] = subprocess.check_output(["git", "-C", args.directory, "rev-list", "--count", "HEAD"], universal_newlines=True).strip()
+        row['recipe_count'] = count_recipes(layers)
+
         for r in results.values():
             if r.upstream_status in status_values:
                 row[r.upstream_status] += 1

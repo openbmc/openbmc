@@ -38,7 +38,7 @@ file or include from a lower-level configuration file are as follows:
 
 -  ``PREFERRED_PROVIDER_virtual/kernel``
 
--  :term:`MACHINE_FEATURES` (e.g. "apm screen wifi")
+-  :term:`MACHINE_FEATURES` (e.g. "screen wifi")
 
 You might also need these variables:
 

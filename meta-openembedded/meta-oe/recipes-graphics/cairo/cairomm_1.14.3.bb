@@ -3,7 +3,6 @@ SUMMARY = "C++ bindings for Cairo graphics library"
 LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c46bda00ffbb0ba1dac22f8d087f54d9"
 
-GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase
 
 DEPENDS += "boost cairo libsigc++-2.0"

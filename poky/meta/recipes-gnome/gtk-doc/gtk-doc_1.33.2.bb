@@ -5,6 +5,7 @@ HOMEPAGE = "https://www.gtk.org/docs/"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase
 
 # Configure the scripts correctly (and build their dependencies) only if they are actually

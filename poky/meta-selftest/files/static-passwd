@@ -18,3 +18,4 @@ builder:x:522:522::/:/bin/nologin
 _apt:x:523:523::/:/bin/nologin
 weston:x:525:525::/:/bin/nologin
 ptest:x:529:529::/:/bin/nologin
+xuser:x:530:530::/:/bin/nologin

@@ -45,3 +45,5 @@ do_install_ptest() {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2023-45853] = "not-applicable-config: we don't build minizip"

@@ -31,3 +31,6 @@ EXTRA_OEMAKE += "V=1 \
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
 # right path until this is relocated automatically.
 export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
+
+# See the rationale in https://github.com/f-secure-foundry/advisories/blob/master/Security_Advisory-Ref_FSC-HWSEC-VR2021-0001-OP-TEE_TrustZone_bypass.txt.
+CVE_STATUS[CVE-2021-36133] = "disputed: devices shipped open for development purposes"

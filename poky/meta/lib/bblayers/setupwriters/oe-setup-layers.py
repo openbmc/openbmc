@@ -45,7 +45,7 @@ class OeSetupLayersWriter():
         logger.info('Created {}.json'.format(output))
         if not args.json_only:
             self._write_python(os.path.join(os.path.dirname(__file__),'../../../../scripts/oe-setup-layers'), output)
-        logger.info('Created {}'.format(output))
+            logger.info('Created {}'.format(output))
 
     def register_arguments(self, parser):
         parser.add_argument('--json-only', action='store_true',

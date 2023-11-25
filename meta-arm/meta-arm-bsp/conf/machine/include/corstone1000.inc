@@ -52,7 +52,7 @@ EXTRA_IMAGEDEPENDS += "external-system"
 
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel:forcevariable = "linux-yocto"
-PREFERRED_VERSION_linux-yocto = "6.4%"
+PREFERRED_VERSION_linux-yocto = "6.5%"
 KERNEL_IMAGETYPE = "Image.gz"
 
 INITRAMFS_IMAGE_BUNDLE ?= "1"

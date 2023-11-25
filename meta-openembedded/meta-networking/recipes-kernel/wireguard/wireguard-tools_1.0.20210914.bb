@@ -11,24 +11,22 @@ do_install () {
     oe_runmake DESTDIR="${D}" PREFIX="${prefix}" SYSCONFDIR="${sysconfdir}" \
         SYSTEMDUNITDIR="${systemd_system_unitdir}" \
         WITH_SYSTEMDUNITS=${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'yes', '', d)} \
-        WITH_BASHCOMPLETION=yes \
-        WITH_WGQUICK=yes \
+        ${PACKAGECONFIG_CONFARGS} \
         install
 }
 
-PACKAGES += "${PN}-wg-quick"
+PACKAGECONFIG ??= "bash-completion wg-quick"
+
+PACKAGECONFIG[bash-completion] = "WITH_BASHCOMPLETION=yes,WITH_BASHCOMPLETION=no,,bash,,"
+PACKAGECONFIG[wg-quick]        = "WITH_WGQUICK=yes,WITH_WGQUICK=no,,bash,,"
 
 FILES:${PN} = " \
     ${bindir}/wg \
     ${sysconfdir} \
-"
-FILES:${PN}-wg-quick = " \
     ${bindir}/wg-quick \
     ${systemd_system_unitdir} \
 "
 
-RDEPENDS:${PN}-wg-quick = "${PN} bash"
 RRECOMMENDS:${PN} = " \
     kernel-module-wireguard \
-    ${PN}-wg-quick \
     "

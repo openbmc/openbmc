@@ -1,7 +1,7 @@
-From bb0eb602d3697384318cac90605259aa7fb21c9b Mon Sep 17 00:00:00 2001
+From 9be08ccf3f7b30b2c57ff2eb593c5b17c967fc4a Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Fri, 17 Dec 2021 19:49:02 +0000
-Subject: [PATCH 14/33] efi_loader: populate ESRT table if EFI_ESRT config
+Subject: [PATCH 14/38] efi_loader: populate ESRT table if EFI_ESRT config
  option is set
 
 This change is to call efi_esrt_populate function if CONFIG_EFI_ESRT

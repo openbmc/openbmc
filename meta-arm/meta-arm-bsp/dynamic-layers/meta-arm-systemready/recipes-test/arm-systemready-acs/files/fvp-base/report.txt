@@ -1,0 +1,34 @@
+General information
+-------------------
+- Arm SystemReady Band: IR
+- System name: FVP Base A AEM
+- Prepared by:
+- E-mail:
+- Date:
+
+System information
+------------------
+- Company: Arm
+- System: FVP Base A AEM
+- SoC:
+- FW version:
+- Memory:
+- Storage devices / disks:
+- Network controllers:
+- Other Hardware information:
+
+Test Logs and Results
+---------------------
+- ACS version used: 2.0
+- ACS URL (if pre-built binary): https://github.com/ARM-software/arm-systemready/blob/v23.03_IR_2.0.0/IR/prebuilt_images/v23.03_2.0.0/ir-acs-live-image-generic-arm64.wic.xz
+- Changes to ACS (if built from source):
+
+- Test Logs collected
+[X] ACS - SCT
+[X] ACS - BSA - UEFI
+[X] ACS - BSA - Linux
+[X] ACS - FWTS
+[X] ACS - Linux boot log
+[X] ACS - Linux dumps
+[X] ACS - UEFI Shell dumps
+[ ] ACS - Capsule Update

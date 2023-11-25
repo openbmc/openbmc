@@ -11,56 +11,148 @@ import logging
 import argparse
 import sqlite3
 import warnings
+
 warnings.simplefilter("default")
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib"))
 
 import hashserv
+from hashserv.server import DEFAULT_ANON_PERMS
 
 VERSION = "1.0.0"
 
-DEFAULT_BIND = 'unix://./hashserve.sock'
+DEFAULT_BIND = "unix://./hashserve.sock"
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Hash Equivalence Reference Server. Version=%s' % VERSION,
-                                     epilog='''The bind address is the path to a unix domain socket if it is
-                                               prefixed with "unix://". Otherwise, it is an IP address
-                                               and port in form ADDRESS:PORT. To bind to all addresses, leave
-                                               the ADDRESS empty, e.g. "--bind :8686". To bind to a specific
-                                               IPv6 address, enclose the address in "[]", e.g.
-                                               "--bind [::1]:8686"'''
-                                     )
+    parser = argparse.ArgumentParser(
+        description="Hash Equivalence Reference Server. Version=%s" % VERSION,
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog="""
+The bind address may take one of the following formats:
+    unix://PATH         - Bind to unix domain socket at PATH
+    ws://ADDRESS:PORT   - Bind to websocket on ADDRESS:PORT
+    ADDRESS:PORT        - Bind to raw TCP socket on ADDRESS:PORT
 
-    parser.add_argument('-b', '--bind', default=DEFAULT_BIND, help='Bind address (default "%(default)s")')
-    parser.add_argument('-d', '--database', default='./hashserv.db', help='Database file (default "%(default)s")')
-    parser.add_argument('-l', '--log', default='WARNING', help='Set logging level')
-    parser.add_argument('-u', '--upstream', help='Upstream hashserv to pull hashes from')
-    parser.add_argument('-r', '--read-only', action='store_true', help='Disallow write operations from clients')
+To bind to all addresses, leave the ADDRESS empty, e.g. "--bind :8686" or
+"--bind ws://:8686". To bind to a specific IPv6 address, enclose the address in
+"[]", e.g. "--bind [::1]:8686" or "--bind ws://[::1]:8686"
+
+Note that the default Anonymous permissions are designed to not break existing
+server instances when upgrading, but are not particularly secure defaults. If
+you want to use authentication, it is recommended that you use "--anon-perms
+@read" to only give anonymous users read access, or "--anon-perms @none" to
+give un-authenticated users no access at all.
+
+Setting "--anon-perms @all" or "--anon-perms @user-admin" is not allowed, since
+this would allow anonymous users to manage all users accounts, which is a bad
+idea.
+
+If you are using user authentication, you should run your server in websockets
+mode with an SSL terminating load balancer in front of it (as this server does
+not implement SSL). Otherwise all usernames and passwords will be transmitted
+in the clear. When configured this way, clients can connect using a secure
+websocket, as in "wss://SERVER:PORT"
+        """,
+    )
+
+    parser.add_argument(
+        "-b",
+        "--bind",
+        default=os.environ.get("HASHSERVER_BIND", DEFAULT_BIND),
+        help='Bind address (default $HASHSERVER_BIND, "%(default)s")',
+    )
+    parser.add_argument(
+        "-d",
+        "--database",
+        default=os.environ.get("HASHSERVER_DB", "./hashserv.db"),
+        help='Database file (default $HASHSERVER_DB, "%(default)s")',
+    )
+    parser.add_argument(
+        "-l",
+        "--log",
+        default=os.environ.get("HASHSERVER_LOG_LEVEL", "WARNING"),
+        help='Set logging level (default $HASHSERVER_LOG_LEVEL, "%(default)s")',
+    )
+    parser.add_argument(
+        "-u",
+        "--upstream",
+        default=os.environ.get("HASHSERVER_UPSTREAM", None),
+        help="Upstream hashserv to pull hashes from ($HASHSERVER_UPSTREAM)",
+    )
+    parser.add_argument(
+        "-r",
+        "--read-only",
+        action="store_true",
+        help="Disallow write operations from clients ($HASHSERVER_READ_ONLY)",
+    )
+    parser.add_argument(
+        "--db-username",
+        default=os.environ.get("HASHSERVER_DB_USERNAME", None),
+        help="Database username ($HASHSERVER_DB_USERNAME)",
+    )
+    parser.add_argument(
+        "--db-password",
+        default=os.environ.get("HASHSERVER_DB_PASSWORD", None),
+        help="Database password ($HASHSERVER_DB_PASSWORD)",
+    )
+    parser.add_argument(
+        "--anon-perms",
+        metavar="PERM[,PERM[,...]]",
+        default=os.environ.get("HASHSERVER_ANON_PERMS", ",".join(DEFAULT_ANON_PERMS)),
+        help='Permissions to give anonymous users (default $HASHSERVER_ANON_PERMS, "%(default)s")',
+    )
+    parser.add_argument(
+        "--admin-user",
+        default=os.environ.get("HASHSERVER_ADMIN_USER", None),
+        help="Create default admin user with name ADMIN_USER ($HASHSERVER_ADMIN_USER)",
+    )
+    parser.add_argument(
+        "--admin-password",
+        default=os.environ.get("HASHSERVER_ADMIN_PASSWORD", None),
+        help="Create default admin user with password ADMIN_PASSWORD ($HASHSERVER_ADMIN_PASSWORD)",
+    )
 
     args = parser.parse_args()
 
-    logger = logging.getLogger('hashserv')
+    logger = logging.getLogger("hashserv")
 
     level = getattr(logging, args.log.upper(), None)
     if not isinstance(level, int):
-        raise ValueError('Invalid log level: %s' % args.log)
+        raise ValueError("Invalid log level: %s" % args.log)
 
     logger.setLevel(level)
     console = logging.StreamHandler()
     console.setLevel(level)
     logger.addHandler(console)
 
-    server = hashserv.create_server(args.bind, args.database, upstream=args.upstream, read_only=args.read_only)
+    read_only = (os.environ.get("HASHSERVER_READ_ONLY", "0") == "1") or args.read_only
+    if "," in args.anon_perms:
+        anon_perms = args.anon_perms.split(",")
+    else:
+        anon_perms = args.anon_perms.split()
+
+    server = hashserv.create_server(
+        args.bind,
+        args.database,
+        upstream=args.upstream,
+        read_only=read_only,
+        db_username=args.db_username,
+        db_password=args.db_password,
+        anon_perms=anon_perms,
+        admin_username=args.admin_user,
+        admin_password=args.admin_password,
+    )
     server.serve_forever()
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         ret = main()
     except Exception:
         ret = 1
         import traceback
+
         traceback.print_exc()
     sys.exit(ret)

@@ -26,3 +26,4 @@ wayland:x:526:
 render:x:527:
 sgx:x:528:
 ptest:x:529:
+xuser:x:530:

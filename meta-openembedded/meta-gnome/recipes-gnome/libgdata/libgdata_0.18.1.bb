@@ -10,7 +10,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24 \
 DEPENDS = "libxml2 glib-2.0 libsoup-2.4 intltool-native liboauth gcr3 json-glib"
 
 GTKDOC_MESON_OPTION = "gtk_doc"
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase pkgconfig gettext gtk-doc vala gobject-introspection manpages features_check
 

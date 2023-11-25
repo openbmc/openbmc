@@ -17,7 +17,6 @@ DEPENDS = " \
 
 RDEPENDS:${PN} = "xdg-desktop-portal xdg-desktop-portal-gtk"
 
-GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase pkgconfig gsettings features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"

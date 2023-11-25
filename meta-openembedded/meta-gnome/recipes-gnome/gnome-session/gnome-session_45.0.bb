@@ -16,7 +16,6 @@ DEPENDS = " \
     json-glib \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gettext gsettings upstream-version-is-even features_check
 

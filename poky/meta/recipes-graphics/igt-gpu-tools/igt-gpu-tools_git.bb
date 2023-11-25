@@ -24,7 +24,7 @@ PACKAGE_BEFORE_PN = "${PN}-benchmarks ${PN}-tests"
 
 PACKAGECONFIG[chamelium] = "-Dchamelium=enabled,-Dchamelium=disabled,gsl xmlrpc-c"
 
-EXTRA_OEMESON = "-Ddocs=disabled -Drunner=enabled -Dsrcdir=/usr/src/debug/${PN}/${PV}-${PR}/git/ -Dversion_hash=${PV}"
+EXTRA_OEMESON = "-Ddocs=disabled -Drunner=enabled -Dsrcdir=${TARGET_DBGSRC_DIR}/git/ -Dversion_hash=${PV}"
 COMPATIBLE_HOST = "(x86_64.*|i.86.*|arm.*|aarch64).*-linux"
 COMPATIBLE_HOST:libc-musl:class-target = "null"
 SECURITY_LDFLAGS = "${SECURITY_X_LDFLAGS}"

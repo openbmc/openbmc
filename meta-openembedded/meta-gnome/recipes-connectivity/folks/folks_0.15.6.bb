@@ -7,7 +7,6 @@ DEPENDS = " \
     libgee \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 EXTRA_OEMESON += "-Dtests=false -Db_lto=false "
 
 CFLAGS:append:toolchain-clang = " -Wno-error=implicit-function-declaration"

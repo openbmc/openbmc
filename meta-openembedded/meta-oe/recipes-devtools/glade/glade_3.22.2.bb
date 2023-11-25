@@ -8,7 +8,7 @@ DEPENDS = "gtk+3 glib-2.0 libxml2 intltool-native \
            gnome-common-native \
            autoconf-archive-native \
 "
-
+GNOMEBASEBUILDCLASS = "autotools"
 inherit features_check autotools pkgconfig gnomebase gobject-introspection mime-xdg
 
 # xfce4 depends on libwnck3, gtk+3 and libepoxy need to be built with x11 PACKAGECONFIG.

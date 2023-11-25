@@ -63,7 +63,7 @@
     <%/if%>
   </div>
 
-  <div data-build-state="<%:state%>">
+  <div class="build-state" data-build-state="<%:state%>">
     <%if state == 'Cloning'%>
       <%include tmpl='#cloning-repos-build-template'/%>
     <%else state == 'Parsing'%>

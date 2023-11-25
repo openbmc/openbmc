@@ -1,0 +1,36 @@
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/567]
+
+From c84e48f6986054cf8b9459e608235b7bd1635746 Mon Sep 17 00:00:00 2001
+From: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
+Date: Mon, 13 Nov 2023 12:37:23 +0100
+Subject: [PATCH] dlt_cdh:
+
+Make sure on 64 bit we read an ELF64 structure.
+Otherwise we get a read error, and the context file is missing some good
+to know information
+---
+ src/core_dump_handler/dlt_cdh.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/core_dump_handler/dlt_cdh.h b/src/core_dump_handler/dlt_cdh.h
+index 8608c6c4..3dac480a 100644
+--- a/src/core_dump_handler/dlt_cdh.h
++++ b/src/core_dump_handler/dlt_cdh.h
+@@ -45,10 +45,17 @@
+ #define CORE_FILE_PATTERN           "%s/core.%d.%s.%d.gz"
+ #define CONTEXT_FILE_PATTERN        "%s/context.%d.%s.%d.txt"
+ 
++#if ((__SIZEOF_POINTER) == 4)
+ #define ELF_Ehdr    Elf32_Ehdr
+ #define ELF_Phdr    Elf32_Phdr
+ #define ELF_Shdr    Elf32_Shdr
+ #define ELF_Nhdr    Elf32_Nhdr
++#else
++#define ELF_Ehdr    Elf64_Ehdr
++#define ELF_Phdr    Elf64_Phdr
++#define ELF_Shdr    Elf64_Shdr
++#define ELF_Nhdr    Elf64_Nhdr
++#endif
+ 
+ typedef struct
+ {

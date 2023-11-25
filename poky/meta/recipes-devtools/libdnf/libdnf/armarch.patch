@@ -1,0 +1,42 @@
+We change the way rpm architectures work, we make the machine name the default machine
+specific package architecture.
+
+This arm mapping code can work or in the case of qemuarmv5, it doesn't as it creates
+armv5hl which doesn't exist and causes errrors. We can simply remove it, we don't need it.
+
+Upstream-Status: Inappropriate [Relies on OE rpm config]
+
+Index: git/libdnf/hy-util.cpp
+===================================================================
+--- git.orig/libdnf/hy-util.cpp
++++ git/libdnf/hy-util.cpp
+@@ -117,29 +117,6 @@ hy_detect_arch(char **arch)
+     if (uname(&un) < 0)
+         return DNF_ERROR_FAILED;
+ 
+-    if (!strncmp(un.machine, "armv", 4)) {
+-        /* un.machine is armvXE, where X is version number and E is
+-         * endianness (b or l); we need to add modifiers such as
+-         * h (hardfloat), n (neon). Neon is a requirement of armv8 so
+-         * as far as rpm is concerned armv8l is the equivilent of armv7hnl
+-         * (or 7hnb) so we don't explicitly add 'n' for 8+ as it's expected. */
+-        char endian = un.machine[strlen(un.machine)-1];
+-        char *modifier = un.machine + 5;
+-        while(isdigit(*modifier)) /* keep armv7, armv8, armv9, armv10, armv100, ... */
+-            modifier++;
+-        if (getauxval(AT_HWCAP) & HWCAP_ARM_VFP)
+-            *modifier++ = 'h';
+-        if ((atoi(un.machine+4) == 7) && (getauxval(AT_HWCAP) & HWCAP_ARM_NEON))
+-            *modifier++ = 'n';
+-        *modifier++ = endian;
+-        *modifier = 0;
+-    }
+-#ifdef __MIPSEL__
+-    if (!strcmp(un.machine, "mips"))
+-        strcpy(un.machine, "mipsel");
+-    else if (!strcmp(un.machine, "mips64"))
+-        strcpy(un.machine, "mips64el");
+-#endif
+     *arch = g_strdup(un.machine);
+     return 0;
+ }

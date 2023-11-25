@@ -10,8 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464 \
 SRC_URI = "${SAVANNAH_NONGNU_MIRROR}/man-db/man-db-${PV}.tar.xz \
            file://99_mandb \
            file://0001-man-Move-local-variable-declaration-to-function-scop.patch \
-           file://autoconf-2.73.patch \
-           file://man_db.conf-avoid-multilib-install-file-conflict.patch"
+           file://autoconf-2.73.patch"
 SRC_URI[sha256sum] = "cffa1ee4e974be78646c46508e6dd2f37e7c589aaab2938cc1064f058fef9f8d"
 
 DEPENDS = "libpipeline gdbm groff-native base-passwd"
@@ -52,7 +51,9 @@ FILES:${PN}-dev += "${libdir}/man-db/libman.so ${libdir}/${BPN}/libmandb.so"
 
 RDEPENDS:${PN} += "groff"
 RRECOMMENDS:${PN} += "less"
-RPROVIDES:${PN} += " man"
+# iconv from glibc-utils can be used to transform encoding
+RRECOMMENDS:${PN}:append:libc-glibc = " glibc-utils"
+RPROVIDES:${PN} += "man"
 
 def compress_pkg(d):
     if bb.utils.contains("INHERIT", "compress_doc", True, False, d):

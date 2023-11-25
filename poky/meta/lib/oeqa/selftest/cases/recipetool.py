@@ -445,7 +445,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         # Basic test to see if github URL mangling works
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
-        recipefile = os.path.join(temprecipe, 'meson_git.bb')
+        recipefile = os.path.join(temprecipe, 'python3-meson_git.bb')
         srcuri = 'https://github.com/mesonbuild/meson;rev=0.32.0'
         result = runCmd(['recipetool', 'create', '-o', temprecipe, srcuri])
         self.assertTrue(os.path.isfile(recipefile))
@@ -474,12 +474,149 @@ class RecipetoolCreateTests(RecipetoolBase):
         inherits = ['setuptools3']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
+    def test_recipetool_create_python3_pep517_setuptools_build_meta(self):
+        # This test require python 3.11 or above for the tomllib module
+        # or tomli module to be installed
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli
+            except ImportError:
+                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+
+        # Test creating python3 package from tarball (using setuptools.build_meta class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'webcolors'
+        pv = '1.13'
+        recipefile = os.path.join(temprecipe, 'python3-%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/a1/fb/f95560c6a5d4469d9c49e24cf1b5d4d21ffab5608251c6020a965fb7791c/%s-%s.tar.gz' % (pn, pv)
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['SUMMARY'] = 'A library for working with the color formats defined by HTML and CSS.'
+        checkvars['LICENSE'] = set(['BSD-3-Clause'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=702b1ef12cf66832a88f24c8f2ee9c19'
+        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/a1/fb/f95560c6a5d4469d9c49e24cf1b5d4d21ffab5608251c6020a965fb7791c/webcolors-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = 'c9be30c5b0cf1cad32e4cbacbb2229e9'
+        checkvars['SRC_URI[sha1sum]'] = 'c90b84fb65eed9b4c9dea7f08c657bfac0e820a5'
+        checkvars['SRC_URI[sha256sum]'] = 'c225b674c83fa923be93d235330ce0300373d02885cef23238813b0d5668304a'
+        checkvars['SRC_URI[sha384sum]'] = '45652af349660f19f68d01361dd5bda287789e5ea63608f52a8cea526ac04465614db2ea236103fb8456b1fcaea96ed7'
+        checkvars['SRC_URI[sha512sum]'] = '074aaf135ac6b0025b88b731d1d6dfa4c539b4fff7195658cc58a4326bb9f0449a231685d312b4a1ec48ca535a838bfa5c680787fe0e61473a2a092c448937d0'
+        inherits = ['python_setuptools_build_meta']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_pep517_poetry_core_masonry_api(self):
+        # This test require python 3.11 or above for the tomllib module
+        # or tomli module to be installed
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli
+            except ImportError:
+                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+
+        # Test creating python3 package from tarball (using poetry.core.masonry.api class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'iso8601'
+        pv = '2.1.0'
+        recipefile = os.path.join(temprecipe, 'python3-%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/b9/f3/ef59cee614d5e0accf6fd0cbba025b93b272e626ca89fb70a3e9187c5d15/%s-%s.tar.gz' % (pn, pv)
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['SUMMARY'] = 'Simple module to parse ISO 8601 dates'
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=aab31f2ef7ba214a5a341eaa47a7f367'
+        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/b9/f3/ef59cee614d5e0accf6fd0cbba025b93b272e626ca89fb70a3e9187c5d15/iso8601-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = '6e33910eba87066b3be7fcf3d59d16b5'
+        checkvars['SRC_URI[sha1sum]'] = 'efd225b2c9fa7d9e4a1ec6ad94f3295cee982e61'
+        checkvars['SRC_URI[sha256sum]'] = '6b1d3829ee8921c4301998c909f7829fa9ed3cbdac0d3b16af2d743aed1ba8df'
+        checkvars['SRC_URI[sha384sum]'] = '255002433fe65c19adfd6b91494271b613cb25ef6a35ac77436de1e03d60cc07bf89fd716451b917f1435e4384860ef6'
+        checkvars['SRC_URI[sha512sum]'] = 'db57ab2a25ef91e3bc479c8539d27e853cf1fbf60986820b8999ae15d7e566425a1e0cfba47d0f3b23aa703db0576db368e6c110ba2a2f46c9a34e8ee3611fb7'
+        inherits = ['python_poetry_core']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_pep517_flit_core_buildapi(self):
+        # This test require python 3.11 or above for the tomllib module
+        # or tomli module to be installed
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli
+            except ImportError:
+                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+
+        # Test creating python3 package from tarball (using flit_core.buildapi class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'typing-extensions'
+        pv = '4.8.0'
+        recipefile = os.path.join(temprecipe, 'python3-%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/1f/7a/8b94bb016069caa12fc9f587b28080ac33b4fbb8ca369b98bc0a4828543e/typing_extensions-%s.tar.gz' % pv
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['SUMMARY'] = 'Backported and Experimental Type Hints for Python 3.8+'
+        checkvars['LICENSE'] = set(['PSF-2.0'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=fcf6b249c2641540219a727f35d8d2c2'
+        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/1f/7a/8b94bb016069caa12fc9f587b28080ac33b4fbb8ca369b98bc0a4828543e/typing_extensions-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = '74bafe841fbd1c27324afdeb099babdf'
+        checkvars['SRC_URI[sha1sum]'] = 'f8bed69cbad4a57a1a67bf8a31b62b657b47f7a3'
+        checkvars['SRC_URI[sha256sum]'] = 'df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef'
+        checkvars['SRC_URI[sha384sum]'] = '0bd0112234134d965c6884f3c1f95d27b6ae49cfb08108101158e31dff33c2dce729331628b69818850f1acb68f6c8d0'
+        checkvars['SRC_URI[sha512sum]'] = '5fbff10e085fbf3ac2e35d08d913608d8c8bca66903435ede91cdc7776d775689a53d64f5f0615fe687c6c228ac854c8651d99eb1cb96ec61c56b7ca01fdd440'
+        inherits = ['python_flit_core']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_pep517_hatchling(self):
+        # This test require python 3.11 or above for the tomllib module
+        # or tomli module to be installed
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli
+            except ImportError:
+                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+
+        # Test creating python3 package from tarball (using hatchling class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'jsonschema'
+        pv = '4.19.1'
+        recipefile = os.path.join(temprecipe, 'python3-%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/e4/43/087b24516db11722c8687e0caf0f66c7785c0b1c51b0ab951dfde924e3f5/jsonschema-%s.tar.gz' % pv
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['SUMMARY'] = 'An implementation of JSON Schema validation for Python'
+        checkvars['HOMEPAGE'] = 'https://github.com/python-jsonschema/jsonschema'
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=7a60a81c146ec25599a3e1dabb8610a8 file://json/LICENSE;md5=9d4de43111d33570c8fe49b4cb0e01af'
+        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/e4/43/087b24516db11722c8687e0caf0f66c7785c0b1c51b0ab951dfde924e3f5/jsonschema-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = '4d6667ce76f820c35082c2d60a4896ab'
+        checkvars['SRC_URI[sha1sum]'] = '9173714cb88964d07f3a3f4fcaaef638b8ceac0c'
+        checkvars['SRC_URI[sha256sum]'] = 'ec84cc37cfa703ef7cd4928db24f9cb31428a5d0fa77747b8b51a847458e0bbf'
+        checkvars['SRC_URI[sha384sum]'] = '7a53181f0e679aa3dc3eb4d05a420877b7b9bff2d02e81f5c289a37ed1127d6c0cca1f5a5f9e4e166f089ab36bcc2be9'
+        checkvars['SRC_URI[sha512sum]'] = '60fa769faf6e3fc2c14eb9acd189c86e9d366b157230a5681d36552af0c159cb1ad33fd920668a36afdab98bc97253f91501704c5c07b5009fdaf9d29b52060d'
+        inherits = ['python_hatchling']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
     def test_recipetool_create_github_tarball(self):
         # Basic test to ensure github URL mangling doesn't apply to release tarballs
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
         pv = '0.32.0'
-        recipefile = os.path.join(temprecipe, 'meson_%s.bb' % pv)
+        recipefile = os.path.join(temprecipe, 'python3-meson_%s.bb' % pv)
         srcuri = 'https://github.com/mesonbuild/meson/releases/download/%s/meson-%s.tar.gz' % (pv, pv)
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
@@ -532,6 +669,191 @@ class RecipetoolTests(RecipetoolBase):
         libpath = os.path.join(get_bb_var('COREBASE'), 'scripts', 'lib', 'recipetool')
         sys.path.insert(0, libpath)
 
+    def test_recipetool_create_go(self):
+        # Basic test to check go recipe generation
+        def urifiy(url, version, modulepath = None, pathmajor = None, subdir = None):
+            modulepath = ",path='%s'" % modulepath if len(modulepath) else ''
+            pathmajor = ",pathmajor='%s'" % pathmajor if len(pathmajor) else ''
+            subdir = ",subdir='%s'" % subdir if len(subdir) else ''
+            return "${@go_src_uri('%s','%s'%s%s%s)}" % (url, version, modulepath, pathmajor, subdir)
+
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+
+        recipefile = os.path.join(temprecipe, 'edgex-go_git.bb')
+        deps_require_file = os.path.join(temprecipe, 'edgex-go', 'edgex-go-modules.inc')
+        lics_require_file = os.path.join(temprecipe, 'edgex-go', 'edgex-go-licenses.inc')
+        modules_txt_file = os.path.join(temprecipe, 'edgex-go', 'modules.txt')
+
+        srcuri = 'https://github.com/edgexfoundry/edgex-go.git'
+        srcrev = "v3.0.0"
+        srcbranch = "main"
+
+        result = runCmd('recipetool create -o %s %s -S %s -B %s' % (temprecipe, srcuri, srcrev, srcbranch))
+
+        self.maxDiff = None
+        inherits = ['go-vendor']
+
+        checkvars = {}
+        checkvars['GO_IMPORT'] = "github.com/edgexfoundry/edgex-go"
+        checkvars['SRC_URI'] = {'git://${GO_IMPORT};destsuffix=git/src/${GO_IMPORT};nobranch=1;name=${BPN};protocol=https',
+                                'file://modules.txt'}
+        checkvars['LIC_FILES_CHKSUM'] = {'file://src/${GO_IMPORT}/LICENSE;md5=8f8bc924cf73f6a32381e5fd4c58d603'}
+
+        self.assertTrue(os.path.isfile(recipefile))
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+        checkvars = {}
+        checkvars['VENDORED_LIC_FILES_CHKSUM'] = set(
+                 ['file://src/${GO_IMPORT}/vendor/github.com/Microsoft/go-winio/LICENSE;md5=69205ff73858f2c22b2ca135b557e8ef',
+                 'file://src/${GO_IMPORT}/vendor/github.com/armon/go-metrics/LICENSE;md5=d2d77030c0183e3d1e66d26dc1f243be',
+                 'file://src/${GO_IMPORT}/vendor/github.com/cenkalti/backoff/LICENSE;md5=1571d94433e3f3aa05267efd4dbea68b',
+                 'file://src/${GO_IMPORT}/vendor/github.com/davecgh/go-spew/LICENSE;md5=c06795ed54b2a35ebeeb543cd3a73e56',
+                 'file://src/${GO_IMPORT}/vendor/github.com/eclipse/paho.mqtt.golang/LICENSE;md5=dcdb33474b60c38efd27356d8f2edec7',
+                 'file://src/${GO_IMPORT}/vendor/github.com/eclipse/paho.mqtt.golang/edl-v10;md5=3adfcc70f5aeb7a44f3f9b495aa1fbf3',
+                 'file://src/${GO_IMPORT}/vendor/github.com/edgexfoundry/go-mod-bootstrap/v3/LICENSE;md5=0d6dae39976133b2851fba4c1e1275ff',
+                 'file://src/${GO_IMPORT}/vendor/github.com/edgexfoundry/go-mod-configuration/v3/LICENSE;md5=0d6dae39976133b2851fba4c1e1275ff',
+                 'file://src/${GO_IMPORT}/vendor/github.com/edgexfoundry/go-mod-core-contracts/v3/LICENSE;md5=0d6dae39976133b2851fba4c1e1275ff',
+                 'file://src/${GO_IMPORT}/vendor/github.com/edgexfoundry/go-mod-messaging/v3/LICENSE;md5=0d6dae39976133b2851fba4c1e1275ff',
+                 'file://src/${GO_IMPORT}/vendor/github.com/edgexfoundry/go-mod-registry/v3/LICENSE;md5=0d6dae39976133b2851fba4c1e1275ff',
+                 'file://src/${GO_IMPORT}/vendor/github.com/edgexfoundry/go-mod-secrets/v3/LICENSE;md5=f9fa2f4f8e0ef8cc7b5dd150963eb457',
+                 'file://src/${GO_IMPORT}/vendor/github.com/fatih/color/LICENSE.md;md5=316e6d590bdcde7993fb175662c0dd5a',
+                 'file://src/${GO_IMPORT}/vendor/github.com/fxamacker/cbor/v2/LICENSE;md5=827f5a2fa861382d35a3943adf9ebb86',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-jose/go-jose/v3/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-jose/go-jose/v3/json/LICENSE;md5=591778525c869cdde0ab5a1bf283cd81',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-kit/log/LICENSE;md5=5b7c15ad5fffe2ff6e9d58a6c161f082',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-logfmt/logfmt/LICENSE;md5=98e39517c38127f969de33057067091e',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-playground/locales/LICENSE;md5=3ccbda375ee345400ad1da85ba522301',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-playground/universal-translator/LICENSE;md5=2e2b21ef8f61057977d27c727c84bef1',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-playground/validator/v10/LICENSE;md5=a718a0f318d76f7c5d510cbae84f0b60',
+                 'file://src/${GO_IMPORT}/vendor/github.com/go-redis/redis/v7/LICENSE;md5=58103aa5ea1ee9b7a369c9c4a95ef9b5',
+                 'file://src/${GO_IMPORT}/vendor/github.com/golang/protobuf/LICENSE;md5=939cce1ec101726fa754e698ac871622',
+                 'file://src/${GO_IMPORT}/vendor/github.com/gomodule/redigo/LICENSE;md5=2ee41112a44fe7014dce33e26468ba93',
+                 'file://src/${GO_IMPORT}/vendor/github.com/google/uuid/LICENSE;md5=88073b6dd8ec00fe09da59e0b6dfded1',
+                 'file://src/${GO_IMPORT}/vendor/github.com/gorilla/mux/LICENSE;md5=33fa1116c45f9e8de714033f99edde13',
+                 'file://src/${GO_IMPORT}/vendor/github.com/gorilla/websocket/LICENSE;md5=c007b54a1743d596f46b2748d9f8c044',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/consul/api/LICENSE;md5=b8a277a612171b7526e9be072f405ef4',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/errwrap/LICENSE;md5=b278a92d2c1509760384428817710378',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/go-cleanhttp/LICENSE;md5=65d26fcc2f35ea6a181ac777e42db1ea',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/go-hclog/LICENSE;md5=ec7f605b74b9ad03347d0a93a5cc7eb8',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/go-immutable-radix/LICENSE;md5=65d26fcc2f35ea6a181ac777e42db1ea',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/go-multierror/LICENSE;md5=d44fdeb607e2d2614db9464dbedd4094',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/go-rootcerts/LICENSE;md5=65d26fcc2f35ea6a181ac777e42db1ea',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/golang-lru/LICENSE;md5=f27a50d2e878867827842f2c60e30bfc',
+                 'file://src/${GO_IMPORT}/vendor/github.com/hashicorp/serf/LICENSE;md5=b278a92d2c1509760384428817710378',
+                 'file://src/${GO_IMPORT}/vendor/github.com/leodido/go-urn/LICENSE;md5=8f50db5538ec1148a9b3d14ed96c3418',
+                 'file://src/${GO_IMPORT}/vendor/github.com/mattn/go-colorable/LICENSE;md5=24ce168f90aec2456a73de1839037245',
+                 'file://src/${GO_IMPORT}/vendor/github.com/mattn/go-isatty/LICENSE;md5=f509beadd5a11227c27b5d2ad6c9f2c6',
+                 'file://src/${GO_IMPORT}/vendor/github.com/mitchellh/consulstructure/LICENSE;md5=96ada10a9e51c98c4656f2cede08c673',
+                 'file://src/${GO_IMPORT}/vendor/github.com/mitchellh/copystructure/LICENSE;md5=56da355a12d4821cda57b8f23ec34bc4',
+                 'file://src/${GO_IMPORT}/vendor/github.com/mitchellh/go-homedir/LICENSE;md5=3f7765c3d4f58e1f84c4313cecf0f5bd',
+                 'file://src/${GO_IMPORT}/vendor/github.com/mitchellh/mapstructure/LICENSE;md5=3f7765c3d4f58e1f84c4313cecf0f5bd',
+                 'file://src/${GO_IMPORT}/vendor/github.com/mitchellh/reflectwalk/LICENSE;md5=3f7765c3d4f58e1f84c4313cecf0f5bd',
+                 'file://src/${GO_IMPORT}/vendor/github.com/nats-io/nats.go/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327',
+                 'file://src/${GO_IMPORT}/vendor/github.com/nats-io/nkeys/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327',
+                 'file://src/${GO_IMPORT}/vendor/github.com/nats-io/nuid/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327',
+                 'file://src/${GO_IMPORT}/vendor/github.com/pmezard/go-difflib/LICENSE;md5=e9a2ebb8de779a07500ddecca806145e',
+                 'file://src/${GO_IMPORT}/vendor/github.com/rcrowley/go-metrics/LICENSE;md5=1bdf5d819f50f141366dabce3be1460f',
+                 'file://src/${GO_IMPORT}/vendor/github.com/spiffe/go-spiffe/v2/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327',
+                 'file://src/${GO_IMPORT}/vendor/github.com/stretchr/objx/LICENSE;md5=d023fd31d3ca39ec61eec65a91732735',
+                 'file://src/${GO_IMPORT}/vendor/github.com/stretchr/testify/LICENSE;md5=188f01994659f3c0d310612333d2a26f',
+                 'file://src/${GO_IMPORT}/vendor/github.com/x448/float16/LICENSE;md5=de8f8e025d57fe7ee0b67f30d571323b',
+                 'file://src/${GO_IMPORT}/vendor/github.com/zeebo/errs/LICENSE;md5=84914ab36fc0eb48edbaa53e66e8d326',
+                 'file://src/${GO_IMPORT}/vendor/golang.org/x/crypto/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707',
+                 'file://src/${GO_IMPORT}/vendor/golang.org/x/mod/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707',
+                 'file://src/${GO_IMPORT}/vendor/golang.org/x/net/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707',
+                 'file://src/${GO_IMPORT}/vendor/golang.org/x/sync/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707',
+                 'file://src/${GO_IMPORT}/vendor/golang.org/x/sys/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707',
+                 'file://src/${GO_IMPORT}/vendor/golang.org/x/text/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707',
+                 'file://src/${GO_IMPORT}/vendor/golang.org/x/tools/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707',
+                 'file://src/${GO_IMPORT}/vendor/google.golang.org/genproto/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57',
+                 'file://src/${GO_IMPORT}/vendor/google.golang.org/grpc/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57',
+                 'file://src/${GO_IMPORT}/vendor/google.golang.org/protobuf/LICENSE;md5=02d4002e9171d41a8fad93aa7faf3956',
+                 'file://src/${GO_IMPORT}/vendor/gopkg.in/eapache/queue.v1/LICENSE;md5=1bfd4408d3de090ef6b908b0cc45a316',
+                 'file://src/${GO_IMPORT}/vendor/gopkg.in/yaml.v3/LICENSE;md5=3c91c17266710e16afdbb2b6d15c761c'])
+
+        self.assertTrue(os.path.isfile(lics_require_file))
+        self._test_recipe_contents(lics_require_file, checkvars, [])
+
+        dependencies = \
+            [   ('github.com/eclipse/paho.mqtt.golang','v1.4.2', '', '', ''),
+                ('github.com/edgexfoundry/go-mod-bootstrap','v3.0.1','github.com/edgexfoundry/go-mod-bootstrap/v3','/v3', ''),
+                ('github.com/edgexfoundry/go-mod-configuration','v3.0.0','github.com/edgexfoundry/go-mod-configuration/v3','/v3', ''),
+                ('github.com/edgexfoundry/go-mod-core-contracts','v3.0.0','github.com/edgexfoundry/go-mod-core-contracts/v3','/v3', ''),
+                ('github.com/edgexfoundry/go-mod-messaging','v3.0.0','github.com/edgexfoundry/go-mod-messaging/v3','/v3', ''),
+                ('github.com/edgexfoundry/go-mod-secrets','v3.0.1','github.com/edgexfoundry/go-mod-secrets/v3','/v3', ''),
+                ('github.com/fxamacker/cbor','v2.4.0','github.com/fxamacker/cbor/v2','/v2', ''),
+                ('github.com/gomodule/redigo','v1.8.9', '', '', ''),
+                ('github.com/google/uuid','v1.3.0', '', '', ''),
+                ('github.com/gorilla/mux','v1.8.0', '', '', ''),
+                ('github.com/rcrowley/go-metrics','v0.0.0-20201227073835-cf1acfcdf475', '', '', ''),
+                ('github.com/spiffe/go-spiffe','v2.1.4','github.com/spiffe/go-spiffe/v2','/v2', ''),
+                ('github.com/stretchr/testify','v1.8.2', '', '', ''),
+                ('go.googlesource.com/crypto','v0.8.0','golang.org/x/crypto', '', ''),
+                ('gopkg.in/eapache/queue.v1','v1.1.0', '', '', ''),
+                ('gopkg.in/yaml.v3','v3.0.1', '', '', ''),
+                ('github.com/microsoft/go-winio','v0.6.0','github.com/Microsoft/go-winio', '', ''),
+                ('github.com/hashicorp/go-metrics','v0.3.10','github.com/armon/go-metrics', '', ''),
+                ('github.com/cenkalti/backoff','v2.2.1+incompatible', '', '', ''),
+                ('github.com/davecgh/go-spew','v1.1.1', '', '', ''),
+                ('github.com/edgexfoundry/go-mod-registry','v3.0.0','github.com/edgexfoundry/go-mod-registry/v3','/v3', ''),
+                ('github.com/fatih/color','v1.9.0', '', '', ''),
+                ('github.com/go-jose/go-jose','v3.0.0','github.com/go-jose/go-jose/v3','/v3', ''),
+                ('github.com/go-kit/log','v0.2.1', '', '', ''),
+                ('github.com/go-logfmt/logfmt','v0.5.1', '', '', ''),
+                ('github.com/go-playground/locales','v0.14.1', '', '', ''),
+                ('github.com/go-playground/universal-translator','v0.18.1', '', '', ''),
+                ('github.com/go-playground/validator','v10.13.0','github.com/go-playground/validator/v10','/v10', ''),
+                ('github.com/go-redis/redis','v7.3.0','github.com/go-redis/redis/v7','/v7', ''),
+                ('github.com/golang/protobuf','v1.5.2', '', '', ''),
+                ('github.com/gorilla/websocket','v1.4.2', '', '', ''),
+                ('github.com/hashicorp/consul','v1.20.0','github.com/hashicorp/consul/api', '', 'api'),
+                ('github.com/hashicorp/errwrap','v1.0.0', '', '', ''),
+                ('github.com/hashicorp/go-cleanhttp','v0.5.1', '', '', ''),
+                ('github.com/hashicorp/go-hclog','v0.14.1', '', '', ''),
+                ('github.com/hashicorp/go-immutable-radix','v1.3.0', '', '', ''),
+                ('github.com/hashicorp/go-multierror','v1.1.1', '', '', ''),
+                ('github.com/hashicorp/go-rootcerts','v1.0.2', '', '', ''),
+                ('github.com/hashicorp/golang-lru','v0.5.4', '', '', ''),
+                ('github.com/hashicorp/serf','v0.10.1', '', '', ''),
+                ('github.com/leodido/go-urn','v1.2.3', '', '', ''),
+                ('github.com/mattn/go-colorable','v0.1.12', '', '', ''),
+                ('github.com/mattn/go-isatty','v0.0.14', '', '', ''),
+                ('github.com/mitchellh/consulstructure','v0.0.0-20190329231841-56fdc4d2da54', '', '', ''),
+                ('github.com/mitchellh/copystructure','v1.2.0', '', '', ''),
+                ('github.com/mitchellh/go-homedir','v1.1.0', '', '', ''),
+                ('github.com/mitchellh/mapstructure','v1.5.0', '', '', ''),
+                ('github.com/mitchellh/reflectwalk','v1.0.2', '', '', ''),
+                ('github.com/nats-io/nats.go','v1.25.0', '', '', ''),
+                ('github.com/nats-io/nkeys','v0.4.4', '', '', ''),
+                ('github.com/nats-io/nuid','v1.0.1', '', '', ''),
+                ('github.com/pmezard/go-difflib','v1.0.0', '', '', ''),
+                ('github.com/stretchr/objx','v0.5.0', '', '', ''),
+                ('github.com/x448/float16','v0.8.4', '', '', ''),
+                ('github.com/zeebo/errs','v1.3.0', '', '', ''),
+                ('go.googlesource.com/mod','v0.8.0','golang.org/x/mod', '', ''),
+                ('go.googlesource.com/net','v0.9.0','golang.org/x/net', '', ''),
+                ('go.googlesource.com/sync','v0.1.0','golang.org/x/sync', '', ''),
+                ('go.googlesource.com/sys','v0.7.0','golang.org/x/sys', '', ''),
+                ('go.googlesource.com/text','v0.9.0','golang.org/x/text', '', ''),
+                ('go.googlesource.com/tools','v0.6.0','golang.org/x/tools', '', ''),
+                ('github.com/googleapis/go-genproto','v0.0.0-20230223222841-637eb2293923','google.golang.org/genproto', '', ''),
+                ('github.com/grpc/grpc-go','v1.53.0','google.golang.org/grpc', '', ''),
+                ('go.googlesource.com/protobuf','v1.28.1','google.golang.org/protobuf', '', ''),
+            ]
+
+        src_uri = set()
+        for d in dependencies:
+            src_uri.add(urifiy(*d))
+
+        checkvars = {}
+        checkvars['GO_DEPENDENCIES_SRC_URI'] = src_uri
+
+        self.assertTrue(os.path.isfile(deps_require_file))
+        self._test_recipe_contents(deps_require_file, checkvars, [])
+
+
+        
     def _copy_file_with_cleanup(self, srcfile, basedstdir, *paths):
         dstdir = basedstdir
         self.assertTrue(os.path.exists(dstdir))

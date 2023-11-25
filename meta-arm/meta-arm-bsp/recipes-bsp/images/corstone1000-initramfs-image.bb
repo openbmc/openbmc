@@ -21,8 +21,5 @@ IMAGE_FEATURES:remove = "package-management"
 # all optee packages
 IMAGE_INSTALL += "optee-client"
 
-# external system linux userspace test application
-IMAGE_INSTALL += "corstone1000-external-sys-tests"
-
 # TS PSA API tests commands for crypto, its, ps and iat
 IMAGE_INSTALL += "packagegroup-ts-tests-psa"

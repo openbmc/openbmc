@@ -9,11 +9,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
-index 802a13dd70b6..5e74193c0e89 100755
---- a/mDNSPosix/Makefile
-+++ b/mDNSPosix/Makefile
-@@ -276,7 +276,7 @@ libdns_sd: setup $(BUILDDIR)/libdns_sd.$(LDSUFFIX)
+Index: mDNSResponder/mDNSPosix/Makefile
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/Makefile
++++ mDNSResponder/mDNSPosix/Makefile
+@@ -276,7 +276,7 @@ libdns_sd: setup $(BUILDDIR)/libdns_sd.$
  CLIENTLIBOBJS = $(OBJDIR)/dnssd_clientlib.c.so.o $(OBJDIR)/dnssd_clientstub.c.so.o $(OBJDIR)/dnssd_ipc.c.so.o $(OBJDIR)/dnssd_errstring.c.so.o
  
  $(BUILDDIR)/libdns_sd.$(LDSUFFIX): $(CLIENTLIBOBJS)
@@ -22,6 +22,3 @@ index 802a13dd70b6..5e74193c0e89 100755
  	$(STRIP) $@
  
  Clients: setup libdns_sd ../Clients/build/dns-sd
--- 
-2.35.1
-

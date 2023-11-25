@@ -281,6 +281,19 @@ tool.
 
 This class inherits the :ref:`ref-classes-cargo_common` class.
 
+.. _ref-classes-cargo_c:
+
+``cargo_c``
+===========
+
+The :ref:`ref-classes-cargo_c` class can be inherited by a recipe to generate
+a Rust library that can be called by C/C++ code. The recipe which inherits this
+class has to only replace ``inherit cargo`` by ``inherit cargo_c``.
+
+See the :yocto_git:`rust-c-lib-example_git.bb
+</poky/tree/meta-selftest/recipes-devtools/rust/rust-c-lib-example_git.bb>`
+example recipe.
+
 .. _ref-classes-cargo_common:
 
 ``cargo_common``
@@ -370,7 +383,9 @@ preferred CMake Module directory: ``${D}${datadir}/cmake/modules/``.
 ========
 
 The :ref:`ref-classes-cml1` class provides basic support for the Linux kernel style
-build configuration system.
+build configuration system. "cml" stands for "Configuration Menu Language", which
+originates from the Linux kernel but is also used in other projects such as U-Boot
+and BusyBox. It could have been called "kconfig" too.
 
 .. _ref-classes-compress_doc:
 
@@ -1480,6 +1495,9 @@ Here are the tests you can list with the :term:`WARN_QA` and
    also inherits :ref:`ref-classes-features_check` in order for the
    requirement to actually work.
 
+-  ``unimplemented-ptest:`` Checks that ptests are implemented for upstream
+   tests.
+
 -  ``unlisted-pkg-lics:`` Checks that all declared licenses applying
    for a package are also declared on the recipe level (i.e. any license
    in ``LICENSE:*`` should appear in :term:`LICENSE`).
@@ -1776,9 +1794,10 @@ class.
 =========
 
 The :ref:`ref-classes-meson` class allows to create recipes that build software
-using the `Meson <https://mesonbuild.com/>`__ build system. You can use
-the :term:`MESON_BUILDTYPE` and :term:`EXTRA_OEMESON` variables to specify
-additional configuration options to be passed using the ``meson`` command line.
+using the `Meson <https://mesonbuild.com/>`__ build system. You can use the
+:term:`MESON_BUILDTYPE`, :term:`MESON_TARGET` and :term:`EXTRA_OEMESON`
+variables to specify additional configuration options to be passed using the
+``meson`` command line.
 
 .. _ref-classes-metadata_scm:
 

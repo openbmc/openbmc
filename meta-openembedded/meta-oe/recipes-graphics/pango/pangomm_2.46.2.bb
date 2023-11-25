@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d8045f3b8f929c1cb29a1e3fd737b499 \
 
 DEPENDS = "mm-common cairomm glibmm pango"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase features_check
 

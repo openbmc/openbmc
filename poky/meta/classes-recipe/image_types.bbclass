@@ -54,7 +54,7 @@ def imagetypes_getdepends(d):
     # Sort the set so that ordering is consistant
     return " ".join(sorted(deps))
 
-XZ_COMPRESSION_LEVEL ?= "-9"
+XZ_COMPRESSION_LEVEL ?= "-6"
 XZ_INTEGRITY_CHECK ?= "crc32"
 
 ZIP_COMPRESSION_LEVEL ?= "-9"

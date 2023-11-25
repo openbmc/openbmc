@@ -79,7 +79,7 @@ llvm-config = 'llvm-config'
 cups-config = 'cups-config'
 g-ir-scanner = '${STAGING_BINDIR}/g-ir-scanner-wrapper'
 g-ir-compiler = '${STAGING_BINDIR}/g-ir-compiler-wrapper'
-${@rust_tool(d, "HOST_SYS")}
+${@rust_tool(d, "RUST_HOST_SYS")}
 ${@"exe_wrapper = '${WORKDIR}/meson-qemuwrapper'" if d.getVar('EXEWRAPPER_ENABLED') == 'True' else ""}
 
 [built-in options]
@@ -116,7 +116,7 @@ readelf = ${@meson_array('BUILD_READELF', d)}
 objcopy = ${@meson_array('BUILD_OBJCOPY', d)}
 llvm-config = '${STAGING_BINDIR_NATIVE}/llvm-config'
 pkgconfig = 'pkg-config-native'
-${@rust_tool(d, "BUILD_SYS")}
+${@rust_tool(d, "RUST_BUILD_SYS")}
 
 [built-in options]
 c_args = ${@meson_array('BUILD_CFLAGS', d)}

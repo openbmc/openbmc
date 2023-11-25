@@ -5,8 +5,8 @@ Subject: [PATCH] Platform corstone1000 add unique firmware GUID
 
 Add unique Corstone-1000 firmware GUID
 
-Upstream-Status: Pending [Not submitted to upstream yet]
 Signed-off-by: Anusmita Dutta Mazumder <anusmita.duttamazumder@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/24132/3]
 ---
  .../target/arm/corstone1000/fw_update_agent/fwu_agent.c   | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

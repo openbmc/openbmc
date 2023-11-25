@@ -15,7 +15,7 @@
     <div class="tab-content">
         <div class="tab-pane active" id="brought-in-by">
 
-        {% ifequal reverse_count 0 %}
+        {% if reverse_count == 0 %}
            <div class="alert alert-info">
                 <strong>{{package.fullpackagespec}}</strong> has no reverse runtime dependencies.
             </div>
@@ -43,7 +43,7 @@
 					{% endfor %}
                 </tbody>
             </table>
-        {% endifequal %}
+        {% endif %}
         </div> <!-- end tab-pane -->
     </div> <!-- end tab content -->
     {% endwith %}

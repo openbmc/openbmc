@@ -10,6 +10,7 @@ PNAME = "gtksourceview"
 
 S = "${WORKDIR}/${PNAME}-${PV}"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase lib_package gettext features_check gtk-doc gobject-introspection upstream-version-is-even
 
 REQUIRED_DISTRO_FEATURES = "x11"

@@ -33,7 +33,6 @@
 #MACHINE ?= "beaglebone-yocto"
 #MACHINE ?= "genericx86"
 #MACHINE ?= "genericx86-64"
-#MACHINE ?= "edgerouter"
 #
 # This sets the default machine to be qemux86-64 if no other machine is selected:
 MACHINE ??= "qemux86-64"
@@ -228,15 +227,21 @@ BB_DISKMON_DIRS ??= "\
 # Yocto Project SState Mirror
 #
 # The Yocto Project has prebuilt artefacts available for its releases, you can enable
-# use of these by uncommenting the following lines. This will mean the build uses
+# use of these by uncommenting some of the following lines. This will mean the build uses
 # the network to check for artefacts at the start of builds, which does slow it down
-# equally, it will also speed up the builds by not having to build things if they are
+# initially but it will then speed up the builds by not having to build things if they are
 # present in the cache. It assumes you can download something faster than you can build it
 # which will depend on your network.
 # Note: For this to work you also need hash-equivalence passthrough to the matching server
+# There is a choice between our sstate server directly and a faster content delivery network
+# (CDN) kindly provided by JSDelivr, uncomment one of the SSTATE_MIRRORS lines, not both.
+# Using the CDN rather than the yoctoproject.org address is suggested/preferred.
 #
 #BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
-#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
+#SSTATE_MIRRORS ?= "file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH"
+#
+###SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
+
 
 #
 # Qemu configuration

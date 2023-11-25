@@ -521,7 +521,7 @@ python extend_recipe_sysroot() {
 
     binfiles = {}
     # Now handle installs
-    for dep in configuredeps:
+    for dep in sorted(configuredeps):
         c = setscenedeps[dep][0]
         if c not in installed:
             continue

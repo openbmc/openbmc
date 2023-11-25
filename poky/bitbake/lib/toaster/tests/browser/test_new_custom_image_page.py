@@ -48,8 +48,12 @@ class TestNewCustomImagePage(SeleniumTestCase):
         self.recipe = Recipe.objects.create(
             name='core-image-minimal',
             layer_version=layer_version,
+            file_path='/tmp/core-image-minimal.bb',
             is_image=True
         )
+        # create a tmp file for the recipe
+        with open(self.recipe.file_path, 'w') as f:
+            f.write('foo')
 
         # another project with a custom image already in it
         project2 = Project.objects.create(name='whoop', release=release)

@@ -27,11 +27,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 182 +++++++++++++++++++++++++++++++++++++++---
  1 file changed, 172 insertions(+), 10 deletions(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index e20adda92229..5d52de31f79b 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
-@@ -1788,14 +1788,43 @@ mDNSlocal void          ProcessRoutingNotification(int sd, GenLinkedList *change
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
+@@ -1788,14 +1788,43 @@ mDNSlocal void          ProcessRoutingNo
  
  #endif // USES_NETLINK
  
@@ -75,7 +75,7 @@ index e20adda92229..5d52de31f79b 100644
  
      (void)fd; // Unused
  
-@@ -1810,12 +1839,149 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+@@ -1810,12 +1839,149 @@ mDNSlocal void InterfaceChangeCallback(i
      }
      while (0 < select(pChgRec->NotifySD + 1, &readFDs, (fd_set*) NULL, (fd_set*) NULL, &zeroTimeout));
  
@@ -230,7 +230,7 @@ index e20adda92229..5d52de31f79b 100644
      while ((changedInterface = (NetworkInterfaceIndex*)changedInterfaces.Head) != NULL)
      {
          RemoveFromList(&changedInterfaces, changedInterface);
-@@ -1947,15 +2113,11 @@ mDNSexport void mDNSPlatformClose(mDNS *const m)
+@@ -1947,15 +2113,11 @@ mDNSexport void mDNSPlatformClose(mDNS *
  #endif
  }
  
@@ -247,6 +247,3 @@ index e20adda92229..5d52de31f79b 100644
      ClearInterfaceList(m);
      err = SetupInterfaceList(m);
      return PosixErrorToStatus(err);
--- 
-2.35.1
-

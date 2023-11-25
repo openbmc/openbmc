@@ -117,10 +117,6 @@ class OESelftestTestCase(OETestCase):
                 if e.errno != errno.ENOENT:
                     raise
 
-        if self.tc.custommachine:
-            machine_conf = 'MACHINE ??= "%s"\n' % self.tc.custommachine
-            self.set_machine_config(machine_conf)
-
         # tests might need their own setup
         # but if they overwrite this one they have to call
         # super each time, so let's give them an alternative
@@ -178,18 +174,10 @@ class OESelftestTestCase(OETestCase):
         self.logger.debug("Writing to: %s\n%s\n" % (dest_path, data))
         ftools.write_file(dest_path, data)
 
-        if not multiconfig and self.tc.custommachine and 'MACHINE' in data:
-            machine = get_bb_var('MACHINE')
-            self.logger.warning('MACHINE overridden: %s' % machine)
-
     def append_config(self, data):
         """Append to <builddir>/conf/selftest.inc"""
         self.logger.debug("Appending to: %s\n%s\n" % (self.testinc_path, data))
         ftools.append_file(self.testinc_path, data)
-
-        if self.tc.custommachine and 'MACHINE' in data:
-            machine = get_bb_var('MACHINE')
-            self.logger.warning('MACHINE overridden: %s' % machine)
 
     def remove_config(self, data):
         """Remove data from <builddir>/conf/selftest.inc"""

@@ -15,3 +15,5 @@ RDEPENDS:${PN} += "\
     ${PYTHON_PN}-profile \
     ${PYTHON_PN}-core \
 "
+
+BBCLASSEXTEND = "native nativesdk"

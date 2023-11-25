@@ -33,6 +33,7 @@ do_install:append() {
 FILES:${PN} += "${libdir} ${datadir}"
 
 RDEPENDS:${PN} = " \
+    cups \
     dbus-x11 \
     gtk+3 \
     libnotify \

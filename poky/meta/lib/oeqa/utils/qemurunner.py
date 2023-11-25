@@ -445,11 +445,9 @@ class QemuRunner:
         self.logger.debug("Waiting at most %d seconds for login banner (%s)" %
                           (self.boottime, time.strftime("%D %H:%M:%S")))
         endtime = time.time() + self.boottime
-        newlinetime = time.time() + 120
         filelist = [self.server_socket, self.runqemu.stdout]
         reachedlogin = False
         stopread = False
-        sentnewlines = False
         qemusock = None
         bootlog = b''
         data = b''
@@ -458,16 +456,6 @@ class QemuRunner:
                 sread, swrite, serror = select.select(filelist, [], [], 5)
             except InterruptedError:
                 continue
-            # With the 6.5 kernel, the serial port getty sometimes fails to appear, the data
-            # appears lost in some buffer somewhere. Wait two minutes, then if we've not had a login,
-            # try and provoke one. This is a workaround until we can work out the root cause.
-            if time.time() > newlinetime and not sentnewlines:
-                self.logger.warning('Probing the serial port to wake it up!')
-                try:
-                    self.server_socket.sendall(bytes("\n\n", "utf-8"))
-                    sentnewlines = True
-                except BrokenPipeError as e:
-                    self.logger.debug('Probe failed %s' % repr(e))
             for file in sread:
                 if file is self.server_socket:
                     qemusock, addr = self.server_socket.accept()

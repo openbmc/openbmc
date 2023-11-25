@@ -108,10 +108,6 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale.
-USE_L10N = True
-
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
@@ -151,6 +147,8 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'NOT_SUITABLE_FOR_HOSTED_DEPLOYMENT'
+
+TMPDIR = os.environ.get('TOASTER_DJANGO_TMPDIR', '/tmp')
 
 class InvalidString(str):
     def __mod__(self, other):
@@ -218,7 +216,7 @@ CACHES = {
     #        },
            'default': {
                'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-               'LOCATION': '/tmp/toaster_cache_%d' % os.getuid(),
+               'LOCATION': '%s/toaster_cache_%d' % (TMPDIR, os.getuid()),
                'TIMEOUT': 1,
             }
           }
@@ -316,19 +314,18 @@ for t in os.walk(os.path.dirname(currentdir)):
 LOGGING = LOGGING_SETTINGS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+BUILDDIR = os.environ.get("BUILDDIR", TMPDIR)
 
 # LOG VIEWER
 # https://pypi.org/project/django-log-viewer/
 LOG_VIEWER_FILES_PATTERN = '*.log*'
-LOG_VIEWER_FILES_DIR = os.path.join(BASE_DIR, 'logs')
+LOG_VIEWER_FILES_DIR = os.path.join(BUILDDIR, "toaster_logs/")
 LOG_VIEWER_PAGE_LENGTH = 25      # total log lines per-page
 LOG_VIEWER_MAX_READ_LINES = 100000  # total log lines will be read
 LOG_VIEWER_PATTERNS = ['INFO', 'DEBUG', 'WARNING', 'ERROR', 'CRITICAL']
 
 # Optionally you can set the next variables in order to customize the admin:
 LOG_VIEWER_FILE_LIST_TITLE = "Logs list"
-
 
 if DEBUG and SQL_DEBUG:
     LOGGING['loggers']['django.db.backends'] = {

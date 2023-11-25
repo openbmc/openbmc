@@ -7,7 +7,7 @@ Enables signed capsule update and adjusts the necessary structs (fmp_payload_hea
 , image_auth, etc.) to comply with the new capsule generation tool (mkeficapsule).
 
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/24131/3]
 ---
  .../fw_update_agent/uefi_capsule_parser.c     | 25 +++++++++++--------
  .../fw_update_agent/uefi_capsule_parser.h     |  2 ++

@@ -1,0 +1,27 @@
+From 1b594cf12e5a69aa25f49f532c1201a6b39e280d Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Tue, 7 Nov 2023 10:43:32 +0000
+Subject: [PATCH] Migrate to pdm-backend
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ pyproject.toml | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index f549376..c608213 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -36,7 +36,5 @@ includes = [
+ profile = "black"
+ 
+ [build-system]
+-requires = [
+-    "pdm-pep517>=1.0.0",
+-]
+-build-backend = "pdm.pep517.api"
++requires = ["pdm-backend"]
++build-backend = "pdm.backend"
+-- 
+2.39.2
+

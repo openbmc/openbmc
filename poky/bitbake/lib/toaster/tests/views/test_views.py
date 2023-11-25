@@ -9,6 +9,7 @@
 
 """Test cases for Toaster GUI and ReST."""
 
+import pytest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -33,6 +34,7 @@ PROJECT_NAME2 = "test project 2"
 CLI_BUILDS_PROJECT_NAME = 'Command line builds'
 
 
+@pytest.mark.order(1)
 class ViewTests(TestCase):
     """Tests to verify view APIs."""
 
@@ -41,7 +43,15 @@ class ViewTests(TestCase):
     def setUp(self):
 
         self.project = Project.objects.first()
+
         self.recipe1 = Recipe.objects.get(pk=2)
+        # create a file and to recipe1 file_path
+        file_path = f"/tmp/{self.recipe1.name.strip().replace(' ', '-')}.bb"
+        with open(file_path, 'w') as f:
+            f.write('foo')
+        self.recipe1.file_path = file_path
+        self.recipe1.save()
+
         self.customr = CustomImageRecipe.objects.first()
         self.cust_package = CustomImagePackage.objects.first()
         self.package = Package.objects.first()

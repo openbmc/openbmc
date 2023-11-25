@@ -9,9 +9,15 @@ LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://doc/licenses/GPL-2.0;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://doc/licenses/LGPL-2.1;md5=4fbd65380cdd255951079008b364516c"
 
+PR = "r1"
+
 SRC_URI = "git://github.com/FRRouting/frr.git;protocol=https;branch=stable/9.0 \
            file://frr.pam \
            file://0001-tools-make-quiet-actually-suppress-output.patch \
+           file://CVE-2023-46752.patch \
+           file://CVE-2023-46753.patch \
+           file://CVE-2023-47235.patch \
+           file://CVE-2023-47234.patch \
            "
 
 SRCREV = "31ed3dd753d62b5d8916998bc32814007e91364b"

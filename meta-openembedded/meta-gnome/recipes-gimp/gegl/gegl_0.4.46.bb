@@ -17,9 +17,9 @@ DEPENDS:append:toolchain-clang  = " openmp"
 DEPENDS:remove:toolchain-clang:riscv32  = "openmp"
 DEPENDS:remove:toolchain-clang:powerpc  = "openmp"
 
-GNOMEBASEBUILDCLASS = "meson"
+VALA_MESON_OPTION = ""
 
-inherit features_check gnomebase vala gobject-introspection
+inherit features_check gnomebase gobject-introspection vala
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 

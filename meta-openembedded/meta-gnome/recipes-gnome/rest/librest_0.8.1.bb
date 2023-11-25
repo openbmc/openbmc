@@ -13,6 +13,7 @@ DEPENDS = " \
     libxml2-native \
 "
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gobject-introspection vala pkgconfig
 
 GNOMEBN = "rest"

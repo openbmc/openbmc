@@ -14,11 +14,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 24 ++++++++++++++----------
  1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index 0a7c3dfa2475..fe7242d83599 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
-@@ -1322,6 +1322,19 @@ mDNSlocal int SetupSocket(struct sockaddr *intfAddr, mDNSIPPort port, int interf
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
+@@ -1322,6 +1322,19 @@ mDNSlocal int SetupSocket(struct sockadd
      return err;
  }
  
@@ -38,7 +38,7 @@ index 0a7c3dfa2475..fe7242d83599 100644
  // Creates a PosixNetworkInterface for the interface whose IP address is
  // intfAddr and whose name is intfName and registers it with mDNS core.
  mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct sockaddr *intfMask,
-@@ -1559,16 +1572,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
+@@ -1559,16 +1572,7 @@ mDNSlocal int SetupInterfaceList(mDNS *c
  
      // Clean up.
      if (intfList != NULL) freeifaddrs(intfList);
@@ -56,6 +56,3 @@ index 0a7c3dfa2475..fe7242d83599 100644
  
      return err;
  }
--- 
-2.35.1
-

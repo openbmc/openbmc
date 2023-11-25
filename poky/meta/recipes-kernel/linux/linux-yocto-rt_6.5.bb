@@ -14,13 +14,13 @@ python () {
         raise bb.parse.SkipRecipe("Set PREFERRED_PROVIDER_virtual/kernel to linux-yocto-rt to enable it")
 }
 
-SRCREV_machine ?= "712b8fb1342bf829c9ca1e649adc9d112b9c209f"
-SRCREV_meta ?= "06cf3d8830fda41ff271eec7da6e3c8425df790f"
+SRCREV_machine ?= "833c5da68398da64271c26188b9e15286e8e725c"
+SRCREV_meta ?= "e4aaaaddfaf695039a7fc41815e24f57c29e30c0"
 
 SRC_URI = "git://git.yoctoproject.org/linux-yocto.git;branch=${KBRANCH};name=machine;protocol=https \
            git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-6.5;destsuffix=${KMETA};protocol=https"
 
-LINUX_VERSION ?= "6.5.5"
+LINUX_VERSION ?= "6.5.10"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
@@ -36,7 +36,7 @@ LINUX_KERNEL_TYPE = "preempt-rt"
 
 COMPATIBLE_MACHINE = "^(qemux86|qemux86-64|qemuarm|qemuarmv5|qemuarm64|qemuppc|qemumips)$"
 
-KERNEL_DEVICETREE:qemuarmv5 = "versatile-pb.dtb"
+KERNEL_DEVICETREE:qemuarmv5 = "arm/versatile-pb.dtb"
 
 # Functionality flags
 KERNEL_EXTRA_FEATURES ?= "features/netfilter/netfilter.scc features/taskstats/taskstats.scc"

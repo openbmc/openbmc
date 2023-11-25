@@ -14,7 +14,7 @@
     {% include "package_included_tabs.html" with active_tab="dependencies" %}
     <div class="tab-content">
        <div class="tab-pane active" id="dependencies">
-       {% ifnotequal runtime_deps|length 0 %}
+       {% if runtime_deps|length != 0 %}
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
@@ -48,9 +48,9 @@
             <div class="alert alert-info">
                 <strong>{{package.fullpackagespec}}</strong> has no runtime dependencies.
             </div>
-        {% endifnotequal %}
+        {% endif %}
 
-        {% ifnotequal other_deps|length 0 %}
+        {% if other_deps|length != 0 %}
             <h3>Other runtime relationships</h3>
             <table class="table table-bordered table-hover">
                 <thead>
@@ -103,7 +103,7 @@
                         {% endfor %}
                 </tbody>
             </table>
-        {% endifnotequal %}
+        {% endif %}
         </div> <!-- end tab-pane -->
     </div> <!-- end tab content -->
     {% endwith %}

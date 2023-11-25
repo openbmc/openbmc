@@ -22,7 +22,7 @@ index 3540204..5e1e7c9 100755
  		$hdr
  		. "\${srcdir=.}/init.sh"
  		run_strace_match_diff $arg0 $args
-+		rm -rf log exp
++		rm -rf log exp out
  		EOF
  		;;
  

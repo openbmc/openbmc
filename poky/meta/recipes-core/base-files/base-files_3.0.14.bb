@@ -23,6 +23,8 @@ SRC_URI = "file://rotation \
            file://share/dot.profile \
            file://licenses/GPL-2 \
            "
+SRC_URI:append:libc-glibc = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd systemd-resolved', ' file://0001-add-nss-resolve-to-nsswitch.patch', '', d)}"
+
 S = "${WORKDIR}"
 
 INHIBIT_DEFAULT_DEPS = "1"
@@ -135,6 +137,10 @@ do_install () {
 	if [ "${hostname}" ]; then
 		echo ${hostname} > ${D}${sysconfdir}/hostname
 		echo "127.0.1.1 ${hostname}" >> ${D}${sysconfdir}/hosts
+	fi
+
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'false', 'true', d)}; then
+		sed -i '/^::1/s/ localhost//' ${D}${sysconfdir}/hosts
 	fi
 }
 

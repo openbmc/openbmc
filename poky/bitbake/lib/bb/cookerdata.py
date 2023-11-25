@@ -503,8 +503,8 @@ class CookerDataBuilder(object):
 
         if appends:
             bb_data.setVar('__BBAPPEND', " ".join(appends))
-        bb_data = bb.parse.handle(bbfile, bb_data)
-        return bb_data
+
+        return bb.parse.handle(bbfile, bb_data)
 
     def parseRecipeVariants(self, bbfile, appends, virtonly=False, mc=None, layername=None):
         """
@@ -516,8 +516,7 @@ class CookerDataBuilder(object):
             (bbfile, virtual, mc) = bb.cache.virtualfn2realfn(bbfile)
             bb_data = self.mcdata[mc].createCopy()
             bb_data.setVar("__ONLYFINALISE", virtual or "default")
-            datastores = self._parse_recipe(bb_data, bbfile, appends, mc, layername)
-            return datastores
+            return self._parse_recipe(bb_data, bbfile, appends, mc, layername)
 
         if mc is not None:
             bb_data = self.mcdata[mc].createCopy()
@@ -543,5 +542,5 @@ class CookerDataBuilder(object):
         """
         logger.debug("Parsing %s (full)" % virtualfn)
         (fn, virtual, mc) = bb.cache.virtualfn2realfn(virtualfn)
-        bb_data = self.parseRecipeVariants(virtualfn, appends, virtonly=True, layername=layername)
-        return bb_data[virtual]
+        datastores = self.parseRecipeVariants(virtualfn, appends, virtonly=True, layername=layername)
+        return datastores[virtual]

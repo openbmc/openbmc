@@ -6,8 +6,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
 SECTION = "x11/gnome"
 
-GNOMEBASEBUILDCLASS = "meson"
-
 inherit features_check gnomebase gettext upstream-version-is-even pkgconfig
 
 SRC_URI += " file://0001-meson-remove-extraneous-positional-argument.patch"

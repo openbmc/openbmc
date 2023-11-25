@@ -307,7 +307,7 @@ def get_signatures(builddir, failsafe=False, machine=None, extravars=None):
     cmd += 'bitbake '
     if failsafe:
         cmd += '-k '
-    cmd += '-S none world'
+    cmd += '-S lockedsigs world'
     sigs_file = os.path.join(builddir, 'locked-sigs.inc')
     if os.path.exists(sigs_file):
         os.unlink(sigs_file)

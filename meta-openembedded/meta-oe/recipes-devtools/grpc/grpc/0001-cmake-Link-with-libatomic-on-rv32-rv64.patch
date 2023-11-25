@@ -1,4 +1,4 @@
-From 592a4aaba20818bcff9a1448c34b09aff9e0d2e9 Mon Sep 17 00:00:00 2001
+From c321f19ff1cd1251c19d20b17a2d86c4237ce506 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 19 Apr 2022 16:07:19 -0700
 Subject: [PATCH] cmake: Link with libatomic on rv32/rv64
@@ -9,15 +9,16 @@ riscv64-yoe-linux-musl/12.0.1/ld: libgrpc.so.23.0.0: undefined reference to `__a
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  CMakeLists.txt | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a8fd3bf37b3..9f5b242683d 100644
+index b272816685..e1fe1102c4 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -303,6 +303,9 @@ if(UNIX)
+@@ -303,6 +303,9 @@ if(UNIX AND NOT HAIKU)
    if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_POSIX)
      set(_gRPC_ALLTARGETS_LIBRARIES ${_gRPC_ALLTARGETS_LIBRARIES} rt)
    endif()
@@ -26,7 +27,4 @@ index a8fd3bf37b3..9f5b242683d 100644
 +  endif()
  endif()
  
- # configure ccache if requested
--- 
-2.36.0
-
+ include(CheckCXXSourceCompiles)

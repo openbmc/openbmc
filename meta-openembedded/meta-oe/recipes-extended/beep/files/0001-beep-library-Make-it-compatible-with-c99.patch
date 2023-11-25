@@ -1,0 +1,78 @@
+From 66b06e03fc25a168e06c7af5ccccc3162ddbf92a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 13 Nov 2023 17:18:55 -0800
+Subject: [PATCH] beep-library: Make it compatible with < c99
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ beep-library.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+--- a/beep-library.c
++++ b/beep-library.c
+@@ -44,7 +44,7 @@
+ int open_checked_char_device(const char *const device_name)
+ {
+     struct stat sb;
+-
++    int fd = -1;
+     if (-1 == stat(device_name, &sb)) {
+         LOG_VERBOSE("could not stat(2) %s: %s",
+                     device_name, strerror(errno));
+@@ -57,7 +57,7 @@ int open_checked_char_device(const char
+         return -1;
+     }
+ 
+-    const int fd = open(device_name, O_WRONLY);
++    fd = open(device_name, O_WRONLY);
+     if (fd == -1) {
+         LOG_VERBOSE("could not open(2) %s: %s",
+                     device_name, strerror(errno));
+@@ -90,6 +90,7 @@ void safe_error_exit(const char *const m
+ {
+     const int saved_errno = errno;
+     char strerr_buf[128];
++    size_t errlen, msglen;
+     const int ret = strerror_r(saved_errno, strerr_buf, sizeof(strerr_buf));
+     if (ret != 0) {
+         if (write(STDERR_FILENO, "strerror_r error\n",
+@@ -98,14 +99,14 @@ void safe_error_exit(const char *const m
+         }
+         _exit(EXIT_FAILURE);
+     }
+-    const size_t msglen = strlen(msg);
++    msglen = strlen(msg);
+     if (write(STDERR_FILENO, msg, msglen)) {
+         /* ignore all write errors */
+     }
+     if (write(STDERR_FILENO, ": ", 2)) {
+         /* ignore all write errors */
+     }
+-    const size_t errlen = strlen(strerr_buf);
++    errlen = strlen(strerr_buf);
+     if (write(STDERR_FILENO, strerr_buf, errlen)) {
+         /* ignore all write errors */
+     }
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -155,7 +155,6 @@ $(eval $(call CHECK_CFLAGS,common_CFLAGS
+ $(eval $(call CHECK_CFLAGS,common_CFLAGS,-Wall))
+ $(eval $(call CHECK_CFLAGS,common_CFLAGS,-Wextra))
+ $(eval $(call CHECK_CFLAGS,common_CFLAGS,-Weverything))
+-$(eval $(call CHECK_CFLAGS,common_CFLAGS,-Werror))
+ $(eval $(call CHECK_CFLAGS,common_CFLAGS,-Wno-padded))
+ $(eval $(call CHECK_CFLAGS,common_CFLAGS,-Werror=format-security))
+ $(eval $(call CHECK_CFLAGS,common_CFLAGS,-Wno-disabled-macro-expansion))
+@@ -169,11 +168,6 @@ $(eval $(call CHECK_CFLAGS,CFLAGS,-fanal
+ $(eval $(call CHECK_CFLAGS,CFLAGS,-fstack-protector-strong))
+ $(eval $(call CHECK_CFLAGS,CFLAGS,-fstack-clash-protection))
+ $(eval $(call CHECK_CFLAGS,CFLAGS,-fcf-protection))
+-$(eval $(call CHECK_CFLAGS,CFLAGS,-fsanitize=undefined))
+-
+-
+-CFLAGS += -save-temps=obj
+-
+ 
+ $(info # common_CFLAGS=$(common_CFLAGS))
+ $(info # CFLAGS=$(CFLAGS))

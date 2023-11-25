@@ -6,7 +6,7 @@ Subject: [PATCH] Platform: corstone1000: Increase BL2 size in flash layout
 Increases BL2 size to align with the flash page size in corstone1000.
 
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
-Upstream-Status: Pending [Not submitted to upstream yet]
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/24103]
 
 ---
  platform/ext/target/arm/corstone1000/partition/flash_layout.h | 2 +-

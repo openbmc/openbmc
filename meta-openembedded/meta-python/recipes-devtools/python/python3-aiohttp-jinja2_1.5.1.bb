@@ -11,5 +11,3 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-jinja2 \
     ${PYTHON_PN}-aiohttp \
 "
-
-BBCLASSEXTEND = "native nativesdk"

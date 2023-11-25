@@ -49,7 +49,10 @@ PACKAGECONFIG[audit] = "--enable-audit,--disable-audit,audit,"
 PACKAGECONFIG[userdb] = "--enable-db=db,--enable-db=no,db,"
 
 PACKAGES += "${PN}-runtime ${PN}-xtests"
-FILES:${PN} = "${base_libdir}/lib*${SOLIBS}"
+FILES:${PN} = " \
+    ${base_libdir}/lib*${SOLIBS} \
+    ${nonarch_libdir}/tmpfiles.d/*.conf \
+"
 FILES:${PN}-dev += "${base_libdir}/security/*.la ${base_libdir}/*.la ${base_libdir}/lib*${SOLIBSDEV}"
 FILES:${PN}-runtime = "${sysconfdir} ${sbindir} ${systemd_system_unitdir}"
 FILES:${PN}-xtests = "${datadir}/Linux-PAM/xtests"
@@ -130,9 +133,9 @@ do_install() {
         if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','false','true',d)}; then
             rm -rf ${D}${sysconfdir}/init.d/
             rm -rf ${D}${sysconfdir}/rc*
-            install -d ${D}${sysconfdir}/tmpfiles.d
+            install -d ${D}${nonarch_libdir}/tmpfiles.d
             install -m 0644 ${WORKDIR}/pam-volatiles.conf \
-                    ${D}${sysconfdir}/tmpfiles.d/pam.conf
+                    ${D}${nonarch_libdir}/tmpfiles.d/pam.conf
         else
             install -d ${D}${sysconfdir}/default/volatiles
             install -m 0644 ${WORKDIR}/99_pam \

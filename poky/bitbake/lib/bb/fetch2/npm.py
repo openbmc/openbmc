@@ -298,6 +298,7 @@ class Npm(FetchMethod):
         destsuffix = ud.parm.get("destsuffix", "npm")
         destdir = os.path.join(rootdir, destsuffix)
         npm_unpack(ud.localpath, destdir, d)
+        ud.unpack_tracer.unpack("npm", destdir)
 
     def clean(self, ud, d):
         """Clean any existing full or partial download"""

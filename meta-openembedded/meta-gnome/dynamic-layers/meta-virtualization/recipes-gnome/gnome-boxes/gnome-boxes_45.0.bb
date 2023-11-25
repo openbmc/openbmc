@@ -33,6 +33,7 @@ inherit gnomebase gsettings pkgconfig mime-xdg gtk-icon-cache gobject-introspect
 SRC_URI[archive.sha256sum] = "cc63080eefa147a8472ab1a5ff087b97a27ab723a4ee005ed41e8c9dd7798e41"
 
 GIR_MESON_OPTION = ""
+VALA_MESON_OPTION = ""
 
 FILES:${PN} += "${datadir}"
 

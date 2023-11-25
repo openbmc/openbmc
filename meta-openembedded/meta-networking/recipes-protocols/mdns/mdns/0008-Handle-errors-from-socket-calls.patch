@@ -14,11 +14,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 12 +++++++++---
  1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index 77d982f4c50b..cab512160afb 100644
---- a/mDNSPosix/mDNSPosix.c
-+++ b/mDNSPosix/mDNSPosix.c
-@@ -1677,7 +1677,7 @@ mDNSlocal void          ProcessRoutingNotification(int sd, GenLinkedList *change
+Index: mDNSResponder/mDNSPosix/mDNSPosix.c
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
++++ mDNSResponder/mDNSPosix/mDNSPosix.c
+@@ -1677,7 +1677,7 @@ mDNSlocal void          ProcessRoutingNo
  // Read through the messages on sd and if any indicate that any interface records should
  // be torn down and rebuilt, return affected indices as a bitmask. Otherwise return 0.
  {
@@ -27,7 +27,7 @@ index 77d982f4c50b..cab512160afb 100644
      char buff[4096];
      struct nlmsghdr         *pNLMsg = (struct nlmsghdr*) buff;
  
-@@ -1686,7 +1686,10 @@ mDNSlocal void          ProcessRoutingNotification(int sd, GenLinkedList *change
+@@ -1686,7 +1686,10 @@ mDNSlocal void          ProcessRoutingNo
      // enough to hold all pending data and so avoid message fragmentation.
      // (Note that FIONREAD is not supported on AF_NETLINK.)
  
@@ -39,7 +39,7 @@ index 77d982f4c50b..cab512160afb 100644
      while (1)
      {
          // Make sure we've got an entire nlmsghdr in the buffer, and payload, too.
-@@ -1702,7 +1705,9 @@ mDNSlocal void          ProcessRoutingNotification(int sd, GenLinkedList *change
+@@ -1702,7 +1705,9 @@ mDNSlocal void          ProcessRoutingNo
                  pNLMsg = (struct nlmsghdr*) buff;
  
                  // read more data
@@ -50,7 +50,7 @@ index 77d982f4c50b..cab512160afb 100644
                  continue;                   // spin around and revalidate with new readCount
              }
              else
-@@ -2017,6 +2022,7 @@ mDNSlocal mDNSBool mDNSPlatformInit_CanReceiveUnicast(void)
+@@ -2017,6 +2022,7 @@ mDNSlocal mDNSBool mDNSPlatformInit_CanR
      int err;
      int s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
      struct sockaddr_in s5353;
@@ -58,6 +58,3 @@ index 77d982f4c50b..cab512160afb 100644
      s5353.sin_family      = AF_INET;
      s5353.sin_port        = MulticastDNSPort.NotAnInteger;
      s5353.sin_addr.s_addr = 0;
--- 
-2.35.1
-

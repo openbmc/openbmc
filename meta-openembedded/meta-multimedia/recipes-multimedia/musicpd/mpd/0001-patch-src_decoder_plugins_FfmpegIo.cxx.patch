@@ -1,0 +1,26 @@
+From e62fd0eefe8b475e70d87a673a7216aac3bb622f Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 20 Nov 2023 17:49:59 +0100
+Subject: [PATCH] patch src_decoder_plugins_FfmpegIo.cxx
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+Upstream-Status: Pending [https://github.com/MusicPlayerDaemon/MPD/issues/1898]
+---
+ src/decoder/plugins/FfmpegIo.cxx | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/decoder/plugins/FfmpegIo.cxx b/src/decoder/plugins/FfmpegIo.cxx
+index 572f1a86a..3e2347fec 100644
+--- a/src/decoder/plugins/FfmpegIo.cxx
++++ b/src/decoder/plugins/FfmpegIo.cxx
+@@ -25,6 +25,7 @@
+ #include "input/InputStream.hxx"
+ 
+ extern "C" {
++#include <libavutil/error.h>
+ #include <libavutil/mem.h>
+ }
+ 
+-- 
+2.42.0
+

@@ -20,5 +20,3 @@ RDEPENDS:${PN} = "\
     ${PYTHON_PN}-fcntl \
     libudev \
 "
-
-BBCLASSEXTEND = "native nativesdk"

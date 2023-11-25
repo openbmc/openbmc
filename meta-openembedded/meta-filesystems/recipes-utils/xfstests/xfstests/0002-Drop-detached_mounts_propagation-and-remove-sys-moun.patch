@@ -1,8 +1,8 @@
-From dd43cbc7f50266cdc6210f2b920d7f648a83bdd6 Mon Sep 17 00:00:00 2001
+From 559f685f83d12d11bf9ec6c6ce924ee4d0702a2a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 14 Aug 2022 13:33:05 -0700
-Subject: [PATCH 2/2] Drop detached_mounts_propagation and remove sys/mount.h
- from vfs/utils.c
+Subject: [PATCH] Drop detached_mounts_propagation and remove sys/mount.h from
+ vfs/utils.c
 
 with glibc 2.36+ sys/mount.h conflicts with linux/mount.h and here
 linux/mount.h is included via xfs/xfs.h header and we need sys/mount.h
@@ -12,16 +12,16 @@ testcase
 Upstream-Status: Inappropriate [Libc specific Workaround]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
- src/Makefile    | 2 +-
- src/vfs/utils.c | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ src/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 665edcf9..7debcbbd 100644
+index 2815f919..448fccc9 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -31,7 +31,7 @@ LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
+@@ -32,7 +32,7 @@ LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
  	dio-invalidate-cache stat_test t_encrypted_d_revalidate \
  	attr_replace_test swapon mkswap t_attr_corruption t_open_tmpfiles \
  	fscrypt-crypt-util bulkstat_null_ocount splice-test chprojid_fail \
@@ -30,18 +30,3 @@ index 665edcf9..7debcbbd 100644
  	uuid_ioctl
  
  EXTRA_EXECS = dmerror fill2attr fill2fs fill2fs_check scaleread.sh \
-diff --git a/src/vfs/utils.c b/src/vfs/utils.c
-index 1388edda..aacd6c0a 100644
---- a/src/vfs/utils.c
-+++ b/src/vfs/utils.c
-@@ -10,7 +10,6 @@
- #include <stdlib.h>
- #include <sys/eventfd.h>
- #include <sys/fsuid.h>
--#include <sys/mount.h>
- #include <sys/prctl.h>
- #include <sys/socket.h>
- #include <sys/stat.h>
--- 
-2.37.2
-

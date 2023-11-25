@@ -387,13 +387,13 @@ Creating the Append File
 
 You create this file in your custom layer. You also name it accordingly
 based on the linux-yocto recipe you are using. For example, if you are
-modifying the ``meta/recipes-kernel/linux/linux-yocto_4.12.bb`` recipe,
+modifying the ``meta/recipes-kernel/linux/linux-yocto_6.1.bb`` recipe,
 the append file will typically be located as follows within your custom
 layer:
 
 .. code-block:: none
 
-   your-layer/recipes-kernel/linux/linux-yocto_4.12.bbappend
+   your-layer/recipes-kernel/linux/linux-yocto_6.1.bbappend
 
 The append file should initially extend the
 :term:`FILESPATH` search path by
@@ -421,35 +421,31 @@ As an example, consider the following append file used by the BSPs in
 
 .. code-block:: none
 
-   meta-yocto-bsp/recipes-kernel/linux/linux-yocto_4.12.bbappend
+   meta-yocto-bsp/recipes-kernel/linux/linux-yocto_6.1.bbappend
 
 Here are the contents of this file. Be aware that the actual commit ID
 strings in this example listing might be different than the actual
 strings in the file from the ``meta-yocto-bsp`` layer upstream::
 
-   KBRANCH:genericx86  = "standard/base"
-   KBRANCH:genericx86-64  = "standard/base"
+  KBRANCH:genericx86  = "v6.1/standard/base"
+  KBRANCH:genericx86-64  = "v6.1/standard/base"
+  KBRANCH:beaglebone-yocto = "v6.1/standard/beaglebone"
 
-   KMACHINE:genericx86 ?= "common-pc"
-   KMACHINE:genericx86-64 ?= "common-pc-64"
-   KBRANCH:edgerouter = "standard/edgerouter"
-   KBRANCH:beaglebone = "standard/beaglebone"
+  KMACHINE:genericx86 ?= "common-pc"
+  KMACHINE:genericx86-64 ?= "common-pc-64"
+  KMACHINE:beaglebone-yocto ?= "beaglebone"
 
-   SRCREV_machine:genericx86    ?= "d09f2ce584d60ecb7890550c22a80c48b83c2e19"
-   SRCREV_machine:genericx86-64 ?= "d09f2ce584d60ecb7890550c22a80c48b83c2e19"
-   SRCREV_machine:edgerouter ?= "b5c8cfda2dfe296410d51e131289fb09c69e1e7d"
-   SRCREV_machine:beaglebone ?= "b5c8cfda2dfe296410d51e131289fb09c69e1e7d"
+  SRCREV_machine:genericx86 ?= "6ec439b4b456ce929c4c07fe457b5d6a4b468e86"
+  SRCREV_machine:genericx86-64 ?= "6ec439b4b456ce929c4c07fe457b5d6a4b468e86"
+  SRCREV_machine:beaglebone-yocto ?= "423e1996694b61fbfc8ec3bf062fc6461d64fde1"
 
+  COMPATIBLE_MACHINE:genericx86 = "genericx86"
+  COMPATIBLE_MACHINE:genericx86-64 = "genericx86-64"
+  COMPATIBLE_MACHINE:beaglebone-yocto = "beaglebone-yocto"
 
-   COMPATIBLE_MACHINE:genericx86 = "genericx86"
-   COMPATIBLE_MACHINE:genericx86-64 = "genericx86-64"
-   COMPATIBLE_MACHINE:edgerouter = "edgerouter"
-   COMPATIBLE_MACHINE:beaglebone = "beaglebone"
-
-   LINUX_VERSION:genericx86 = "4.12.7"
-   LINUX_VERSION:genericx86-64 = "4.12.7"
-   LINUX_VERSION:edgerouter = "4.12.10"
-   LINUX_VERSION:beaglebone = "4.12.10"
+  LINUX_VERSION:genericx86 = "6.1.30"
+  LINUX_VERSION:genericx86-64 = "6.1.30"
+  LINUX_VERSION:beaglebone-yocto = "6.1.20"
 
 This append file
 contains statements used to support several BSPs that ship with the
@@ -1005,7 +1001,7 @@ Section.
       the following sequence of commands::
 
               $ cd poky/build
-              $ bitbake -c cleanall yocto-linux
+              $ bitbake -c cleanall linux-yocto
               $ bitbake core-image-minimal -c cleanall
               $ bitbake core-image-minimal
               $ runqemu qemux86

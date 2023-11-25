@@ -4,7 +4,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/ubinux/dnf-plugin-tui.git;branch=master;protocol=https"
-SRCREV = "83917a3935ac7ce1d8d96e914d96a6679319a336"
+SRCREV = "baac322a8a6d57e62c703f6ed523152baec18b4f"
 PV = "1.3"
 
 SRC_URI:append:class-target = " file://oe-remote.repo.sample"
@@ -42,6 +42,6 @@ RDEPENDS:${PN} += " \
     dnf \
     libnewt-python \
 "
-DEPENDS:append:class-nativesdk = " file-replacement-nativesdk"
 BBCLASSEXTEND = "nativesdk"
+
 SKIP_RECIPE[dnf-plugin-tui] ?= "${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', '', 'does not build correctly without package_rpm in PACKAGE_CLASSES', d)}"

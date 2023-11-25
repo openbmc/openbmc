@@ -313,6 +313,10 @@ python () {
         deps = ' dpkg-native:do_populate_sysroot virtual/fakeroot-native:do_populate_sysroot'
         d.appendVarFlag('do_package_write_deb', 'depends', deps)
         d.setVarFlag('do_package_write_deb', 'fakeroot', "1")
+
+        # Needed to ensure PKG_xxx renaming of dependency packages works
+        d.setVarFlag('do_package_write_deb', 'deptask', "do_packagedata")
+        d.setVarFlag('do_package_write_deb', 'rdeptask', "do_packagedata")
 }
 
 python do_package_write_deb () {

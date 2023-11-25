@@ -70,8 +70,6 @@ class OESelftestTestContext(OETestContext):
     def __init__(self, td=None, logger=None, machines=None, config_paths=None, newbuilddir=None, keep_builddir=None):
         super(OESelftestTestContext, self).__init__(td, logger)
 
-        self.machines = machines
-        self.custommachine = None
         self.config_paths = config_paths
         self.newbuilddir = newbuilddir
 
@@ -160,12 +158,6 @@ class OESelftestTestContext(OETestContext):
             return NonConcurrentTestSuite(suites, processes, self.setup_builddir, self.removebuilddir, self.bb_vars)
 
     def runTests(self, processes=None, machine=None, skips=[]):
-        if machine:
-            self.custommachine = machine
-            if machine == 'random':
-                self.custommachine = choice(self.machines)
-            self.logger.info('Run tests with custom MACHINE set to: %s' % \
-                    self.custommachine)
         return super(OESelftestTestContext, self).runTests(processes, skips)
 
     def listTests(self, display_type, machine=None):
@@ -205,9 +197,6 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         parser.add_argument('-j', '--num-processes', dest='processes', action='store',
                 type=int, help="number of processes to execute in parallel with")
 
-        parser.add_argument('--machine', required=False, choices=['random', 'all'],
-                            help='Run tests on different machines (random/all).')
-
         parser.add_argument('-t', '--select-tag', dest="select_tags",
                 action='append', default=None,
                 help='Filter all (unhidden) tests to any that match any of the specified tag(s).')
@@ -221,20 +210,6 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         parser.add_argument('-B', '--newbuilddir', help='New build directory to use for tests.')
         parser.add_argument('-v', '--verbose', action='store_true')
         parser.set_defaults(func=self.run)
-
-    def _get_available_machines(self):
-        machines = []
-
-        bbpath = self.tc_kwargs['init']['td']['BBPATH'].split(':')
-
-        for path in bbpath:
-            found_machines = glob.glob(os.path.join(path, 'conf', 'machine', '*.conf'))
-            if found_machines:
-                for i in found_machines:
-                    # eg: '/home/<user>/poky/meta-intel/conf/machine/intel-core2-32.conf'
-                    machines.append(os.path.splitext(os.path.basename(i))[0])
-
-        return machines
 
     def _get_cases_paths(self, bbpath):
         cases_paths = []
@@ -266,7 +241,6 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
             args.list_tests = 'name'
 
         self.tc_kwargs['init']['td'] = bbvars
-        self.tc_kwargs['init']['machines'] = self._get_available_machines()
 
         builddir = os.environ.get("BUILDDIR")
         self.tc_kwargs['init']['config_paths'] = {}
@@ -414,30 +388,7 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
 
         rc = None
         try:
-            if args.machine:
-                logger.info('Custom machine mode enabled. MACHINE set to %s' %
-                        args.machine)
-
-                if args.machine == 'all':
-                    results = []
-                    for m in self.tc_kwargs['init']['machines']:
-                        self.tc_kwargs['run']['machine'] = m
-                        results.append(self._internal_run(logger, args))
-
-                        # XXX: the oe-selftest script only needs to know if one
-                        # machine run fails
-                        for r in results:
-                            rc = r
-                            if not r.wasSuccessful():
-                                break
-
-                else:
-                    self.tc_kwargs['run']['machine'] = args.machine
-                    return self._internal_run(logger, args)
-
-            else:
-                self.tc_kwargs['run']['machine'] = args.machine
-                rc = self._internal_run(logger, args)
+             rc = self._internal_run(logger, args)
         finally:
             config_paths = self.tc_kwargs['init']['config_paths']
 

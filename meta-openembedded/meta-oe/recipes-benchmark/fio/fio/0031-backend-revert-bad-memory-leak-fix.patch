@@ -1,0 +1,39 @@
+From c060732180c981712f9a6fb7108c28a3c301c2c3 Mon Sep 17 00:00:00 2001
+From: Jens Axboe <axboe@kernel.dk>
+Date: Tue, 30 Aug 2022 10:48:18 -0600
+Subject: [PATCH] backend: revert bad memory leak fix
+
+This essentially reverts the commit mentioned in the fixes line, as it
+causes crashes with using a trigger timeout + command.
+
+Fixes: 807473c36e10 ("fixed memory leak detected by ASAN")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ backend.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/backend.c b/backend.c
+index 375a23e4..fe614f6e 100644
+--- a/backend.c
++++ b/backend.c
+@@ -2451,10 +2451,8 @@ reap:
+ 							strerror(ret));
+ 			} else {
+ 				pid_t pid;
+-				struct fio_file **files;
+ 				void *eo;
+ 				dprint(FD_PROCESS, "will fork\n");
+-				files = td->files;
+ 				eo = td->eo;
+ 				read_barrier();
+ 				pid = fork();
+@@ -2465,9 +2463,6 @@ reap:
+ 					_exit(ret);
+ 				} else if (i == fio_debug_jobno)
+ 					*fio_debug_jobp = pid;
+-				// freeing previously allocated memory for files
+-				// this memory freed MUST NOT be shared between processes, only the pointer itself may be shared within TD
+-				free(files);
+ 				free(eo);
+ 				free(fd);
+ 				fd = NULL;

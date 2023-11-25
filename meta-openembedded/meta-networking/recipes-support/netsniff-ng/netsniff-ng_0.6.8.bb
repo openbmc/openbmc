@@ -33,4 +33,4 @@ do_install() {
     oe_runmake DESTDIR=${D} netsniff-ng_install
 }
 
-BBCLASSEXTEND = "native nativesdk"
+BBCLASSEXTEND = "native"

@@ -180,12 +180,6 @@ ignore_errors = {
         'Failed to load DMC firmware',
         'The driver is built-in, so to load the firmware you need to',
         ] + x86_common,
-    'edgerouter' : [
-        'not creating \'/sys/firmware/fdt\'',
-        'Failed to find cpu0 device node',
-        'Fatal server error:',
-        'Server terminated with error',
-        ] + common_errors,
     'beaglebone-yocto' : [
         'Direct firmware load for regulatory.db',
         'failed to load regulatory.db',

@@ -1,7 +1,7 @@
-From 61b5f50718431b5fff57fcaa924238135b11ed3c Mon Sep 17 00:00:00 2001
+From e07a03678e72afa7a5d2ab66ce2e1a21e0a73cfc Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Mon, 17 Jul 2023 16:50:53 +0100
-Subject: [PATCH 17/33] arm:corstone1000: add mmc for fvp
+Subject: [PATCH 17/38] arm:corstone1000: add mmc for fvp
 
 Enable support mmc/sdcard for the corstone1000 FVP.
 

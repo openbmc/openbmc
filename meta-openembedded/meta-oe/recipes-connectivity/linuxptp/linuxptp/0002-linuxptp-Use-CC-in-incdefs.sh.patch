@@ -1,0 +1,34 @@
+From 2cc19a679ec37715df546dd9f00d8d9b0ab20059 Mon Sep 17 00:00:00 2001
+From: Luca Fancellu <luca.fancellu@arm.com>
+Date: Wed, 18 Oct 2023 11:10:18 +0100
+Subject: [PATCH] linuxptp: Use ${CC} in incdefs.sh
+
+The Makefile is defining CC and incdefs.sh is using
+${CROSS_COMPILE}cpp inside it, allowing both to use different
+compilers depending on what the user pass during make invocation
+as CC.
+
+Align them using ${CC} also inside incdefs.sh
+
+Signed-off-by: Luca Fancellu <luca.fancellu@arm.com>
+Upstream-Status: Pending
+---
+ incdefs.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/incdefs.sh b/incdefs.sh
+index a9e94f777f6b..391e63c7fac6 100755
+--- a/incdefs.sh
++++ b/incdefs.sh
+@@ -27,7 +27,7 @@ user_flags()
+ 	printf " -D_GNU_SOURCE"
+ 
+ 	# Get list of directories searched for header files.
+-	dirs=$(echo "" | ${CROSS_COMPILE}cpp -Wp,-v 2>&1 >/dev/null | grep ^" /")
++	dirs=$(${CC} -E -Wp,-v -xc /dev/null 2>&1 >/dev/null | grep ^" /")
+ 
+ 	# Look for clock_adjtime().
+ 	for d in $dirs; do
+-- 
+2.34.1
+

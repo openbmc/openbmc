@@ -10,6 +10,12 @@ PATH="/usr/local/bin:/usr/bin:/bin"
 # Set the prompt for bash and ash (no other shells known to be in use here)
 [ -z "$PS1" ] || PS1='\u@\h:\w\$ '
 
+# Use the EDITOR not being set as a trigger to call resize later on
+FIRSTTIMESETUP=0
+if [ -z "$EDITOR" ] ; then
+	FIRSTTIMESETUP=1
+fi
+
 if [ -d /etc/profile.d ]; then
 	for i in /etc/profile.d/*.sh; do
 		if [ -f $i -a -r $i ]; then
@@ -50,17 +56,19 @@ resize() {
 }
 		fi
 	fi
-	# Use the EDITOR not being set as a trigger to call resize
-	# and only do this for /dev/tty[A-z] which are typically
+	# only do this for /dev/tty[A-z] which are typically
 	# serial ports
-	if [ -z "$EDITOR" -a "$SHLVL" = 1 ] ; then
+	if [ $FIRSTTIMESETUP -eq 1 -a $SHLVL -eq 1 ] ; then
 		case $(tty 2>/dev/null) in
 			/dev/tty[A-z]*) resize >/dev/null;;
 		esac
 	fi
 fi
 
-EDITOR="vi"			# needed for packages like cron, git-commit
+if [ -z "$EDITOR" ]; then
+	EDITOR="vi"			# needed for packages like cron, git-commit
+fi
+
 export PATH PS1 OPIEDIR QPEDIR QTDIR EDITOR TERM
 
 umask 022

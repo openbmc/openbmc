@@ -13,7 +13,6 @@ DEPENDS = " \
     libhandy \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gsettings gnome-help itstool gtk-icon-cache features_check gettext
 

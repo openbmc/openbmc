@@ -1,0 +1,59 @@
+From 98beea79a30f1541e646efae911dfce10ae18f5c Mon Sep 17 00:00:00 2001
+From: Brandon Paupore <brandon.paupore@wdc.com>
+Date: Fri, 5 Aug 2022 12:57:27 -0500
+Subject: [PATCH] Add wait for handling SIGBREAK
+
+When closing a command prompt window or terminating it using something
+like the taskkill command, each child process (such as a running FIO
+workload) is sent a SIGBREAK signal. Once those child processes have
+responded to that signal, Windows terminates them if they're still
+executing.
+
+This change has the main thread to wait for others to exit when handling
+a SIGBREAK signal, such that each job will still have time to wrap-up
+and give stats before the entire program terminates.
+
+Signed-off-by: Brandon Paupore <brandon.paupore@wdc.com>
+---
+ backend.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/backend.c b/backend.c
+index e5bb4e25..375a23e4 100644
+--- a/backend.c
++++ b/backend.c
+@@ -90,6 +90,25 @@ static void sig_int(int sig)
+ 	}
+ }
+ 
++#ifdef WIN32
++static void sig_break(int sig)
++{
++	struct thread_data *td;
++	int i;
++
++	sig_int(sig);
++
++	/**
++	 * Windows terminates all job processes on SIGBREAK after the handler
++	 * returns, so give them time to wrap-up and give stats
++	 */
++	for_each_td(td, i) {
++		while (td->runstate < TD_EXITED)
++			sleep(1);
++	}
++}
++#endif
++
+ void sig_show_status(int sig)
+ {
+ 	show_running_run_stats();
+@@ -112,7 +131,7 @@ static void set_sig_handlers(void)
+ /* Windows uses SIGBREAK as a quit signal from other applications */
+ #ifdef WIN32
+ 	memset(&act, 0, sizeof(act));
+-	act.sa_handler = sig_int;
++	act.sa_handler = sig_break;
+ 	act.sa_flags = SA_RESTART;
+ 	sigaction(SIGBREAK, &act, NULL);
+ #endif

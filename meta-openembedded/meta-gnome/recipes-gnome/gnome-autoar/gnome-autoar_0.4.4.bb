@@ -7,7 +7,6 @@ DEPENDS = " \
     libarchive \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
 GTKDOC_MESON_OPTION = "gtk_doc"

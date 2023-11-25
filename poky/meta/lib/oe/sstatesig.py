@@ -142,9 +142,10 @@ class SignatureGeneratorOEBasicHashMixIn(object):
         super().set_taskdata(data[3:])
 
     def dump_sigs(self, dataCache, options):
-        sigfile = os.getcwd() + "/locked-sigs.inc"
-        bb.plain("Writing locked sigs to %s" % sigfile)
-        self.dump_lockedsigs(sigfile)
+        if 'lockedsigs' in options:
+            sigfile = os.getcwd() + "/locked-sigs.inc"
+            bb.plain("Writing locked sigs to %s" % sigfile)
+            self.dump_lockedsigs(sigfile)
         return super(bb.siggen.SignatureGeneratorBasicHash, self).dump_sigs(dataCache, options)
 
 
@@ -598,9 +599,9 @@ def OEOuthashBasic(path, sigfile, task, d):
                         update_hash(" %10s" % pwd.getpwuid(s.st_uid).pw_name)
                         update_hash(" %10s" % grp.getgrgid(s.st_gid).gr_name)
                     except KeyError as e:
-                        bb.warn("KeyError in %s" % path)
                         msg = ("KeyError: %s\nPath %s is owned by uid %d, gid %d, which doesn't match "
-                            "any user/group on target. This may be due to host contamination." % (e, path, s.st_uid, s.st_gid))
+                            "any user/group on target. This may be due to host contamination." %
+                            (e, os.path.abspath(path), s.st_uid, s.st_gid))
                         raise Exception(msg).with_traceback(e.__traceback__)
 
                 if include_timestamps:

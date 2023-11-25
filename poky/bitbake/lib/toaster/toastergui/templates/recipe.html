@@ -186,9 +186,9 @@
                         <i class="icon-question-sign get-help hover-help" title="{{task.get_outcome_help}}"></i>
                     </td>
                     <td>
-                        {% ifnotequal task.sstate_result task.SSTATE_NA %}
+                        {% if task.sstate_result != task.SSTATE_NA %}
                             {{task.get_sstate_result_display}}
-                        {% endifnotequal %}
+                        {% endif %}
                     </td>
 
                     </tr>

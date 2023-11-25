@@ -5,6 +5,7 @@ SECTION = "libs"
 
 DEPENDS = "glib-2.0 zlib"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gobject-introspection vala
 
 SRC_URI = "https://github.com/jstedfast/${BPN}/releases/download/${PV}/${BP}.tar.xz \

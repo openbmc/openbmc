@@ -20,3 +20,5 @@ inherit autotools pkgconfig
 
 FILES:${PN} += "${datadir}/dbus-1"
 FILES:${PN}-dev += "${libdir}/${BPN}/*.so"
+
+SKIP_RECIPE[dleyna-server] ?= "Upstream is dead moreover needs porting to work with latest gupnp >= 1.2"

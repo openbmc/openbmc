@@ -9,7 +9,7 @@ in the debug source remapping from CFLAGS
 
 We export the right path to use in the recipe with:
 
-EXTRA_OECMAKE = "-DCMAKE_DEBUG_SRCDIR=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/"
+EXTRA_OECMAKE = "-DCMAKE_DEBUG_SRCDIR=${TARGET_DBGSRC_DIR}/"
 
 and we then patch this into the code instead of the broken use
 of CMAKE_SOURCE_DIR since __FILENAME__ will match our path prefix

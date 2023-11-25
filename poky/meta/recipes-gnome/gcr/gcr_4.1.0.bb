@@ -15,7 +15,6 @@ CACHED_CONFIGUREVARS += "ac_cv_path_GPG='gpg2'"
 
 CFLAGS += "-D_GNU_SOURCE"
 
-GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
 inherit gnomebase gtk-icon-cache gi-docgen features_check vala gobject-introspection gettext mime mime-xdg
 

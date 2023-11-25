@@ -9,4 +9,4 @@ __path__ = extend_path(__path__, __name__)
 
 BBIMPORTS = ["data", "path", "utils", "types", "package", "packagedata", \
              "packagegroup", "sstatesig", "lsb", "cachedpath", "license", \
-             "qa", "reproducible", "rust", "buildcfg"]
+             "qa", "reproducible", "rust", "buildcfg", "go"]

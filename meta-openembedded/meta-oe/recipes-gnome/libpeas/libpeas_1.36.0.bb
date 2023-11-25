@@ -5,7 +5,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4b54a1fd55a448865a0b32d41598759d"
 
 DEPENDS = "gtk+3"
 
-GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
 
 inherit gnomebase gobject-introspection gi-docgen gtk-icon-cache features_check

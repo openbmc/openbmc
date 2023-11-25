@@ -15,8 +15,6 @@ import time
 import re
 
 from tests.browser.selenium_helpers_base import SeleniumTestCaseBase
-from tests.builds.buildtest import load_build_environment
-from bldcontrol.models import BuildEnvironment
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
@@ -32,10 +30,6 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
             'toastermain.settings_test':
             raise RuntimeError("Please initialise django with the tests settings:  " \
                 "DJANGO_SETTINGS_MODULE='toastermain.settings_test'")
-
-        if BuildEnvironment.objects.count() == 0:
-            BuildEnvironment.objects.create(betype=BuildEnvironment.TYPE_LOCAL)
-        load_build_environment()
 
         # start toaster
         cmd = "bash -c 'source toaster start'"

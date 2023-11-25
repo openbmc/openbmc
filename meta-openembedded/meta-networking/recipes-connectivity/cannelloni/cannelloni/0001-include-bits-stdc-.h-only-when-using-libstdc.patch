@@ -1,0 +1,37 @@
+From 7aed36765ae44b41ede7e139da0a11b3696f2e06 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 13 Nov 2023 00:07:23 -0800
+Subject: [PATCH] include bits/stdc++.h only when using libstdc++
+
+We have other c++ runtime implementations e.g. llvm's libc++ which does
+not provide this header bits/stdc++.h, therefore make sure that this
+header is only included when using libstdc++
+
+Fixes
+| /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux/cannelloni/1.1.0/git/tcpthread.cpp:27:10: fatal error: 'bits/stdc++.h' file not found
+|    27 | #include <bits/stdc++.h>
+|       |          ^~~~~~~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/mguentner/cannelloni/pull/56]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tcpthread.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tcpthread.cpp b/tcpthread.cpp
+index a1b3047..bb5a7b2 100644
+--- a/tcpthread.cpp
++++ b/tcpthread.cpp
+@@ -24,7 +24,9 @@
+ #include <cstdint>
+ #include <cstdio>
+ 
++#ifdef __GLIBCXX__
+ #include <bits/stdc++.h>
++#endif
+ 
+ #include <linux/can.h>
+ #include <string.h>
+-- 
+2.42.1
+

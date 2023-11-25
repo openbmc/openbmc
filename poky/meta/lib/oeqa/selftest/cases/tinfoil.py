@@ -48,6 +48,17 @@ class TinfoilTests(OESelftestTestCase):
             rd = tinfoil.parse_recipe_file(best[3])
             self.assertEqual(testrecipe, rd.getVar('PN'))
 
+    def test_parse_virtual_recipe(self):
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=False, quiet=2)
+            testrecipe = 'nativesdk-gcc'
+            best = tinfoil.find_best_provider(testrecipe)
+            if not best:
+                self.fail('Unable to find recipe providing %s' % testrecipe)
+            rd = tinfoil.parse_recipe_file(best[3])
+            self.assertEqual(testrecipe, rd.getVar('PN'))
+            self.assertIsNotNone(rd.getVar('FILE_LAYERNAME'))
+
     def test_parse_recipe_copy_expand(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
             tinfoil.prepare(config_only=False, quiet=2)
@@ -66,7 +77,7 @@ class TinfoilTests(OESelftestTestCase):
             localdata.setVar('PN', 'hello')
             self.assertEqual('hello', localdata.getVar('BPN'))
 
-    # The config_data API tp parse_recipe_file is used by:
+    # The config_data API to parse_recipe_file is used by:
     # layerindex-web layerindex/update_layer.py
     def test_parse_recipe_custom_data(self):
         with bb.tinfoil.Tinfoil() as tinfoil:
@@ -74,6 +85,18 @@ class TinfoilTests(OESelftestTestCase):
             localdata = bb.data.createCopy(tinfoil.config_data)
             localdata.setVar("TESTVAR", "testval")
             testrecipe = 'mdadm'
+            best = tinfoil.find_best_provider(testrecipe)
+            if not best:
+                self.fail('Unable to find recipe providing %s' % testrecipe)
+            rd = tinfoil.parse_recipe_file(best[3], config_data=localdata)
+            self.assertEqual("testval", rd.getVar('TESTVAR'))
+
+    def test_parse_virtual_recipe_custom_data(self):
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=False, quiet=2)
+            localdata = bb.data.createCopy(tinfoil.config_data)
+            localdata.setVar("TESTVAR", "testval")
+            testrecipe = 'nativesdk-gcc'
             best = tinfoil.find_best_provider(testrecipe)
             if not best:
                 self.fail('Unable to find recipe providing %s' % testrecipe)

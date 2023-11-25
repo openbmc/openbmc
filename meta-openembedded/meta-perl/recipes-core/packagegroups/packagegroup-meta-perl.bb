@@ -79,7 +79,6 @@ RDEPENDS:packagegroup-meta-perl = "\
     libtest-nowarnings-perl \
     libtest-warn-perl \
     libunicode-linebreak-perl \
-    po4a \
 "
 
 RDEPENDS:packagegroup-meta-perl-extended = "\

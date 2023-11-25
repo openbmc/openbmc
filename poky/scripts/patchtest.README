@@ -1,0 +1,156 @@
+# Patchtest
+
+## Introduction
+
+Patchtest is a test framework for community patches based on the standard
+unittest python module. As input, it needs tree elements to work properly:
+a patch in mbox format (either created with `git format-patch` or fetched
+from 'patchwork'), a test suite and a target repository.
+
+The first test suite intended to be used with patchtest is found in the
+openembedded-core repository [1] targeted for patches that get into the
+openembedded-core mailing list [2]. This suite is also intended as a
+baseline for development of similar suites for other layers as needed.
+
+Patchtest can either run on a host or a guest machine, depending on which
+environment the execution needs to be done. If you plan to test your own patches
+(a good practice before these are sent to the mailing list), the easiest way is
+to install and execute on your local host; in the other hand, if automatic
+testing is intended, the guest method is strongly recommended. The guest
+method requires the use of the patchtest layer, in addition to the tools
+available in oe-core: https://git.yoctoproject.org/patchtest/
+
+## Installation
+
+As a tool for use with the Yocto Project, the [quick start guide](https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html) 
+contains the necessary prerequisites for a basic project. In addition,
+patchtest relies on the following Python modules:
+
+- boto3 (for sending automated results emails only)
+- git-pw>=2.5.0
+- jinja2
+- pylint
+- pyparsing>=3.0.9
+- unidiff
+
+These can be installed by running `pip install -r
+meta/lib/patchtest/requirements.txt`. Note that git-pw is not
+automatically added to the user's PATH; by default, it is installed at
+~/.local/bin/git-pw.
+
+For git-pw (and therefore scripts such as patchtest-get--series) to work, you need
+to provide a Patchwork instance in your user's .gitconfig, like so (the project
+can be specified using the --project argument):
+
+    git config --global pw.server "https://patchwork.yoctoproject.org/api/1.2/"
+
+To work with patchtest, you should have the following repositories cloned:
+
+1. https://git.openembedded.org/openembedded-core/ (or https://git.yoctoproject.org/poky/)
+2. https://git.openembedded.org/bitbake/ (if not using poky)
+3. https://git.yoctoproject.org/patchtest (if using guest mode)
+
+## Usage
+
+### Obtaining Patches
+
+Patch files can be obtained directly from cloned repositories using `git
+format-patch -N` (where N is the number of patches starting from HEAD to
+generate). git-pw can also be used with filters for users, patch/series IDs,
+and timeboxes if specific patches are desired. For more information, see the
+git-pw [documentation](https://patchwork.readthedocs.io/projects/git-pw/en/latest/).
+
+Alternatively, `scripts/patchtest-get-series` can be used to pull mbox files from
+the Patchwork instance configured previously in .gitconfig. It uses a log file
+called ".series_test.log" to store and compare series IDs so that the same
+versions of a patch are not tested multiple times unintentionally. By default,
+it will pull up to five patch series from the last 30 minutes using oe-core as
+the target project, but these parameters can be configured using the `--limit`,
+`--interval`, and `--project` arguments respectively. For more information, run
+`patchtest-get-series -h`.
+
+### Host Mode
+
+To run patchtest on the host, do the following:
+
+1. In openembedded-core/poky, do `source oe-init-build-env`
+2. Generate patch files from the target repository by doing `git-format patch -N`,
+   where N is the number of patches starting at HEAD, or by using git-pw
+   or patchtest-get-series
+3. Run patchtest on a patch file by doing the following:
+
+        patchtest --patch /path/to/patch/file
+
+    or, if you have stored the patch files in a directory, do:
+
+        patchtest --directory /path/to/patch/directory
+
+    For example, to test `master-gcc-Fix--fstack-protector-issue-on-aarch64.patch` against the oe-core test suite:
+        
+        patchtest --patch master-gcc-Fix--fstack-protector-issue-on-aarch64.patch
+
+    If you want to use a different test suite or target repository, you can use the --testdir and --repodir flags:
+    
+        patchtest --patch /path/to/patch/file --repodir /path/to/repo --testdir /path/to/test/dir
+
+### Guest Mode
+
+Patchtest's guest mode has been refactored to more closely mirror the
+typical Yocto Project image build workflow, but there are still some key
+differences to keep in mind. The primary objective is to provide a level
+of isolation from the host when testing patches pulled automatically
+from the mailing lists. When executed this way, the test process is
+essentially running random code from the internet and could be
+catastrophic if malicious bits or even poorly-handled edge cases aren't
+protected against. In order to use this mode, the
+https://git.yoctoproject.org/patchtest/ repository must be cloned and
+the meta-patchtest layer added to bblayers.conf.
+
+The general flow of guest mode is:
+
+1. Run patchtest-setup-sharedir --directory <dirname> to create a
+   directory for mounting
+2. Collect patches via patchtest-get-series (or other manual step) into the
+   <dirname>/mboxes path
+3. Ensure that a user with ID 1200 has appropriate read/write
+   permissions to <dirname> and <dirname>/mboxes, so that the
+   "patchtest" user in the core-image-patchtest image can function
+4. Build the core-image-patchtest image
+5. Run the core-image-patchtest image with the mounted sharedir, like
+   so:
+   `runqemu kvm nographic qemuparams="-snapshot -fsdev
+   local,id=test_mount,path=/workspace/yocto/poky/build/patchtestdir,security_model=mapped
+   -device virtio-9p-pci,fsdev=test_mount,mount_tag=test_mount -smp 4 -m
+   2048"`
+
+Patchtest runs as an initscript for the core-image-patchtest image and
+shuts down after completion, so there is no input required from a user
+during operation. Unlike in host mode, the guest is designed to
+automatically generate test result files, in the same directory as the
+targeted patch files but with .testresult as an extension. These contain
+the entire output of the patchtest run for each respective pass,
+including the PASS, FAIL, and SKIP indicators for each test run.
+
+## Contributing
+
+The yocto mailing list (yocto@lists.yoctoproject.org) is used for questions,
+comments and patch review.  It is subscriber only, so please register before
+posting.
+
+Send pull requests to yocto@lists.yoctoproject.org with '[patchtest]' in the
+subject.
+
+When sending single patches, please use something like:
+
+    git send-email -M -1 --to=yocto@lists.yoctoproject.org  --subject-prefix=patchtest][PATCH
+
+## Maintenance
+-----------
+
+Maintainers:
+    Trevor Gamblin <tgamblin@baylibre.com>
+
+## Links
+-----
+[1] https://git.openembedded.org/openembedded-core/
+[2] https://www.yoctoproject.org/community/mailing-lists/

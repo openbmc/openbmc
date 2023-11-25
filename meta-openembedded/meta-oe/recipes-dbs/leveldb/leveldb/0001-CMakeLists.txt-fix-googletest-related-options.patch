@@ -1,0 +1,55 @@
+From 77da477840f89da7ced29da315de77571e8f190e Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 20 Oct 2023 22:57:48 +0200
+Subject: [PATCH] CMakeLists.txt: fix googletest related options
+
+* https://cmake.org/cmake/help/book/mastering-cmake/chapter/Writing%20CMakeLists%20Files.html
+  says that CMake options are case-sensitive and I don't see lower-case version in
+  currently used googletest submodules and gtest is indeed installed with leveldb
+
+* install_gmock option I don't see at all, so I've kept it as is, INSTALL_GTEST, BUILD_GMOCK
+  do exist as upper-case
+
+$ grep -Ri install_.*mock .
+./CMakeLists.txt:  set(install_gmock OFF)
+./third_party/googletest/googlemock/CMakeLists.txt:install_project(gmock gmock_main)
+$ grep -Ri build_gmock .
+./CMakeLists.txt:  set(BUILD_GMOCK ON)
+./third_party/googletest/googletest/README.md:cmake .. -DBUILD_GMOCK=OFF
+./third_party/googletest/CMakeLists.txt:option(BUILD_GMOCK "Builds the googlemock subproject" ON)
+./third_party/googletest/CMakeLists.txt:if(BUILD_GMOCK)
+$ grep -Ri install_gtest .
+./CMakeLists.txt:  set(INSTALL_GTEST OFF)
+./third_party/googletest/googletest/cmake/internal_utils.cmake:  if(INSTALL_GTEST)
+./third_party/googletest/googletest/CMakeLists.txt:if (INSTALL_GTEST)
+./third_party/googletest/CMakeLists.txt:option(INSTALL_GTEST "Enable installation of googletest. (Projects embedding googletest may want to turn this OFF.)" ON)
+
+* also use CACHE and FORCE as sugested in:
+  https://cmake.org/cmake/help/latest/command/set.html
+  https://stackoverflow.com/questions/20239334/cmake-set-subdirectory-options
+  for the value to correctly propagate into third_party/googletest subdirectory
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/google/leveldb/pull/1152]
+
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fda9e01..f8a2629 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -295,9 +295,9 @@ if(LEVELDB_BUILD_TESTS)
+ 
+   # Prevent overriding the parent project's compiler/linker settings on Windows.
+   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+-  set(install_gtest OFF)
+-  set(install_gmock OFF)
+-  set(build_gmock ON)
++  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
++  set(install_gmock OFF CACHE BOOL "" FORCE)
++  set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
+ 
+   # This project is tested using GoogleTest.
+   add_subdirectory("third_party/googletest")

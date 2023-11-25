@@ -24,3 +24,7 @@ inherit go
 
 GO_WORKDIR ?= "${GO_IMPORT}"
 do_compile[dirs] += "${B}/src/${GO_WORKDIR}"
+
+export GOMODCACHE = "${B}/.mod"
+
+do_compile[cleandirs] += "${B}/.mod"

@@ -84,7 +84,7 @@ webserverStartAll()
     echo "Starting webserver..."
 
     $MANAGE runserver --noreload "$ADDR_PORT" \
-           </dev/null >>${BUILDDIR}/toaster_web.log 2>&1 \
+           </dev/null >>${TOASTER_LOGS_DIR}/web.log 2>&1 \
            & echo $! >${BUILDDIR}/.toastermain.pid
 
     sleep 1
@@ -181,6 +181,14 @@ WEBSERVER=1
 export TOASTER_BUILDSERVER=1
 ADDR_PORT="localhost:8000"
 TOASTERDIR=`dirname $BUILDDIR`
+# ${BUILDDIR}/toaster_logs/ became the default location for toaster logs
+# This is needed for implemented django-log-viewer: https://pypi.org/project/django-log-viewer/
+# If the directory does not exist, create it.
+TOASTER_LOGS_DIR="${BUILDDIR}/toaster_logs/"
+if [ ! -d $TOASTER_LOGS_DIR ]
+then
+    mkdir $TOASTER_LOGS_DIR
+fi
 unset CMD
 for param in $*; do
     case $param in
@@ -299,7 +307,7 @@ case $CMD in
         export BITBAKE_UI='toasterui'
         if [ $TOASTER_BUILDSERVER -eq 1 ] ; then
             $MANAGE runbuilds \
-               </dev/null >>${BUILDDIR}/toaster_runbuilds.log 2>&1 \
+               </dev/null >>${TOASTER_LOGS_DIR}/toaster_runbuilds.log 2>&1 \
                & echo $! >${BUILDDIR}/.runbuilds.pid
         else
             echo "Toaster build server not started."

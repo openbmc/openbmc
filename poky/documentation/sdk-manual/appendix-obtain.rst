@@ -39,27 +39,20 @@ Follow these steps to locate and hand-install the toolchain:
    download the installer appropriate for your build host, target
    hardware, and image type.
 
-   The installer files (``*.sh``) follow this naming convention::
+   The installer files (``*.sh``) follow this naming convention:
+   ``poky-glibc-host_system-core-image-type-arch-toolchain[-ext]-release.sh``:
 
-      poky-glibc-host_system-core-image-type-arch-toolchain[-ext]-release.sh
+   -  ``host_system``: string representing your development system: ``i686`` or ``x86_64``
 
-      Where:
-          host_system is a string representing your development system:
-                 "i686" or "x86_64"
+   -  ``type``: string representing the image: ``sato`` or ``minimal``
 
-          type is a string representing the image:
-                "sato" or "minimal"
+   -  ``arch``: string representing the target architecture such as ``cortexa57-qemuarm64``
 
-          arch is a string representing the target architecture:
-                 "aarch64", "armv5e", "core2-64", "cortexa8hf-neon", "i586", "mips32r2",
-                 "mips64", or "ppc7400"
+   -  ``release``: version of the Yocto Project.
 
-          release is the version of Yocto Project.
-
-          NOTE:
-             The standard SDK installer does not have the "-ext" string as
-             part of the filename.
-
+   .. note::
+      The standard SDK installer does not have the ``-ext`` string as
+      part of the filename.
 
    The toolchains provided by the Yocto
    Project are based off of the ``core-image-sato`` and
@@ -67,16 +60,16 @@ Follow these steps to locate and hand-install the toolchain:
    developing against those images.
 
    For example, if your build host is a 64-bit x86 system and you need
-   an extended SDK for a 64-bit core2 target, go into the ``x86_64``
+   an extended SDK for a 64-bit core2 QEMU target, go into the ``x86_64``
    folder and download the following installer::
 
-      poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
+      poky-glibc-x86_64-core-image-sato-core2-64-qemux86-64-toolchain-&DISTRO;.sh
 
 #. *Run the Installer:* Be sure you have execution privileges and run
    the installer. Following is an example from the ``Downloads``
    directory::
 
-      $ ~/Downloads/poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
+      $ ~/Downloads/poky-glibc-x86_64-core-image-sato-core2-64-qemux86-64-toolchain-&DISTRO;.sh
 
    During execution of the script, you choose the root location for the
    toolchain. See the
@@ -216,21 +209,14 @@ Follow these steps to extract the root filesystem:
    also contain flattened root filesystem image files (``*.ext4``),
    which you can use with QEMU directly.
 
-   The pre-built root filesystem image files follow these naming
-   conventions::
+   The pre-built root filesystem image files follow the
+   ``core-image-profile-machine.tar.bz2`` naming convention:
 
-      core-image-profile-arch.tar.bz2
+   -  ``profile``: filesystem image's profile, such as ``minimal``,
+      ``minimal-dev`` or ``sato``. For information on these types of image
+      profiles, see the "Images" chapter in the Yocto Project Reference Manual.
 
-      Where:
-          profile is the filesystem image's profile:
-                    lsb, lsb-dev, lsb-sdk, minimal, minimal-dev, minimal-initramfs,
-                    sato, sato-dev, sato-sdk, sato-sdk-ptest. For information on
-                    these types of image profiles, see the "Images" chapter in
-                    the Yocto Project Reference Manual.
-
-          arch is a string representing the target architecture:
-                    beaglebone-yocto, beaglebone-yocto-lsb, edgerouter, edgerouter-lsb,
-                    genericx86, genericx86-64, genericx86-64-lsb, genericx86-lsb and qemu*.
+   -  ``machine``:  same string as the name of the parent download directory.
 
    The root filesystems
    provided by the Yocto Project are based off of the

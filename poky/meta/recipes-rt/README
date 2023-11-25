@@ -10,4 +10,4 @@ If you are creating a new BSP which should use linux-yocto-rt by default,
 use the line above in the $MACHINE.conf in your BSP layer, and specify the
 following in a linux-yocto-rt bbappend recipe:
 
-COMPATIBLE_MACHINE_$MACHINE = $MACHINE
+COMPATIBLE_MACHINE:$MACHINE = $MACHINE

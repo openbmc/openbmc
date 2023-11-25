@@ -18,7 +18,6 @@ DEPENDS = " \
     libstemmer \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gettext gnomebase gsettings gobject-introspection vala gtk-doc  bash-completion python3native
 
@@ -45,8 +44,8 @@ EXTRA_OEMESON = " \
 "
 
 do_install:prepend() {
-    sed -i -e 's|${B}/../${PN}-${PV}|/usr/src/debug/${PN}/${PV}-${PR}|g' ${B}/src/libtracker-sparql/tracker-sparql-enum-types.c
-    sed -i -e 's|${B}/../${PN}-${PV}|/usr/src/debug/${PN}/${PV}-${PR}|g' ${B}/src/libtracker-sparql/core/tracker-data-enum-types.c
+    sed -i -e 's|${B}/../${PN}-${PV}|${TARGET_DBGSRC_DIR}|g' ${B}/src/libtracker-sparql/tracker-sparql-enum-types.c
+    sed -i -e 's|${B}/../${PN}-${PV}|${TARGET_DBGSRC_DIR}|g' ${B}/src/libtracker-sparql/core/tracker-data-enum-types.c
 }
 
 GIR_MESON_ENABLE_FLAG = 'enabled'

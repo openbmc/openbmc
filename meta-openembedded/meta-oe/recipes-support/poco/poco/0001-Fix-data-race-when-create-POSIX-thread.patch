@@ -1,0 +1,33 @@
+From 03b68fc924b24e12c87512d790d37fc6ddc352ac Mon Sep 17 00:00:00 2001
+From: Dawid Drozd <drozddawid@gmail.com>
+Date: Sat, 11 Feb 2023 14:48:39 +0400
+Subject: [PATCH] Fix data race when create POSIX thread
+
+When creating thread using pthread_create() `_pData->thread` will be set.
+It could lead to data race as in runnableEntry() we refer to that variable.
+
+Instead use pthread_self().
+getName() is already under mutex.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://github.com/pocoproject/poco/pull/3942/commits/9c8a79b994a367f626c5551e0f38c27d0d8431f1]
+---
+ Foundation/src/Thread_POSIX.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Foundation/src/Thread_POSIX.cpp b/Foundation/src/Thread_POSIX.cpp
+index ceab76e82..3e52cd31f 100644
+--- a/Foundation/src/Thread_POSIX.cpp
++++ b/Foundation/src/Thread_POSIX.cpp
+@@ -351,7 +351,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
+ #endif
+ 
+ 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
+-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
++	setThreadName(pthread_self(), reinterpret_cast<Thread*>(pThread)->getName());
+ 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+ 	try
+ 	{
+-- 
+2.42.0
+

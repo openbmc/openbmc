@@ -14,6 +14,7 @@ from oeqa.selftest.cases.buildhistory import BuildhistoryBase
 from oeqa.core.decorator.data import skipIfMachine
 from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars
 import oeqa.utils.ftools as ftools
+from oeqa.core.decorator import OETestTag
 
 class ImageOptionsTests(OESelftestTestCase):
 
@@ -204,6 +205,7 @@ class ToolchainOptions(OESelftestTestCase):
         self.write_config(features)
         bitbake('fortran-helloworld')
 
+@OETestTag("yocto-mirrors")
 class SourceMirroring(OESelftestTestCase):
     # Can we download everything from the Yocto Sources Mirror over http only
     def test_yocto_source_mirror(self):

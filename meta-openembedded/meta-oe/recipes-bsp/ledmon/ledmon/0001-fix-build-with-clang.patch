@@ -1,0 +1,90 @@
+From 28fd86fb4e18af181174176530a80672de4449d2 Mon Sep 17 00:00:00 2001
+From: alperak <alperyasinak1@gmail.com>
+Date: Sat, 18 Nov 2023 12:27:17 +0300
+Subject: [PATCH] fix build with clang
+
+struct ibpi2value is a structure which contains 2 unsigned integers.  In
+a number of cases the code was not initializing a value for the last value
+in the pair in struct ibpi2value ibpi_to_attention.  This was raised when
+using clang compiler.
+
+vmdssd.c:49:27: error: missing field 'value' initializer
+[-Werror,-Wmissing-field-initializers]
+        {LED_IBPI_PATTERN_UNKNOWN}
+
+dellssd.c:74:27: error: missing field 'value' initializer
+[-Werror,-Wmissing-field-initializers]
+        {LED_IBPI_PATTERN_UNKNOWN}
+
+amd_ipmi.c:57:27: error: missing field 'value'
+initializer [-Werror,-Wmissing-field-initializers]
+        {LED_IBPI_PATTERN_UNKNOWN}
+
+npem.c:76:27: error: missing field 'value'
+initializer [-Werror,-Wmissing-field-initializers]
+        {LED_IBPI_PATTERN_UNKNOWN}
+
+Upstream-Status: Submitted [https://github.com/intel/ledmon/pull/179]
+Signed-off-by: alperak <alperyasinak1@gmail.com>
+---
+ src/amd_ipmi.c | 2 +-
+ src/dellssd.c  | 2 +-
+ src/npem.c     | 2 +-
+ src/vmdssd.c   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/amd_ipmi.c b/src/amd_ipmi.c
+index 726f77d..ad36e9e 100644
+--- a/src/amd_ipmi.c
++++ b/src/amd_ipmi.c
+@@ -53,7 +53,7 @@ const struct ibpi2value ibpi2amd_ipmi[] = {
+ 	{IBPI_PATTERN_FAILED_ARRAY, 0x45},
+ 	{IBPI_PATTERN_REBUILD, 0x46},
+ 	{IBPI_PATTERN_HOTSPARE, 0x47},
+-	{IBPI_PATTERN_UNKNOWN}
++	{IBPI_PATTERN_UNKNOWN, 0}
+ };
+ 
+ #define MG9098_CHIP_ID_REG	0x63
+diff --git a/src/dellssd.c b/src/dellssd.c
+index 3c10ec7..7f02ea1 100644
+--- a/src/dellssd.c
++++ b/src/dellssd.c
+@@ -71,7 +71,7 @@ static const struct ibpi2value ibpi2ssd[] = {
+ 	{IBPI_PATTERN_FAILED_DRIVE, BP_FAULT | BP_ONLINE},
+ 	{IBPI_PATTERN_LOCATE, BP_IDENTIFY | BP_ONLINE},
+ 	{IBPI_PATTERN_LOCATE_OFF, BP_ONLINE},
+-	{IBPI_PATTERN_UNKNOWN}
++	{IBPI_PATTERN_UNKNOWN, 0}
+ };
+ 
+ #define DELL_OEM_NETFN                      0x30
+diff --git a/src/npem.c b/src/npem.c
+index c21276d..3499169 100644
+--- a/src/npem.c
++++ b/src/npem.c
+@@ -72,7 +72,7 @@ const struct ibpi2value ibpi_to_npem_capability[] = {
+ 	{IBPI_PATTERN_FAILED_DRIVE, PCI_NPEM_FAIL_CAP},
+ 	{IBPI_PATTERN_LOCATE, PCI_NPEM_LOCATE_CAP},
+ 	{IBPI_PATTERN_LOCATE_OFF, PCI_NPEM_OK_CAP},
+-	{IBPI_PATTERN_UNKNOWN}
++	{IBPI_PATTERN_UNKNOWN, 0}
+ };
+ 
+ static struct pci_access *get_pci_access()
+diff --git a/src/vmdssd.c b/src/vmdssd.c
+index 51af591..9c63d90 100644
+--- a/src/vmdssd.c
++++ b/src/vmdssd.c
+@@ -45,7 +45,7 @@ struct ibpi2value ibpi_to_attention[] = {
+ 	{IBPI_PATTERN_REBUILD, ATTENTION_REBUILD},
+ 	{IBPI_PATTERN_LOCATE_OFF, ATTENTION_OFF},
+ 	{IBPI_PATTERN_ONESHOT_NORMAL, ATTENTION_OFF},
+-	{IBPI_PATTERN_UNKNOWN}
++	{IBPI_PATTERN_UNKNOWN, 0}
+ };
+ 
+ #define SYSFS_PCIEHP         "/sys/module/pciehp"
+-- 
+2.25.1
+

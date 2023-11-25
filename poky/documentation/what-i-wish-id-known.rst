@@ -29,8 +29,9 @@ contact us with other suggestions.
 #. **Get to know the layer index:**
    All layers can be found in the :oe_layerindex:`layer index <>`. Layers which
    have applied for Yocto Project Compatible status (structure continuity
-   assurance and testing) can be found in the :yocto_home:`Yocto Project Compatible index
-   </software-over/layer/>`. Generally check the Compatible layer index first,
+   assurance and testing) can be found in the :yocto_home:`Yocto Project
+   Compatible Layers </development/yocto-project-compatible-layers/>` page.
+   Generally check the Compatible layer index first,
    and if you don't find the necessary layer check the general layer index. The
    layer index is an original artifact from the Open Embedded Project. As such,
    that index doesn't have the curating and testing that the Yocto Project

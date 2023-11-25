@@ -11,8 +11,9 @@ As a precaution, explicitly reserve this memory via NT_FW_CONFIG to
 prevent the normal world from using it. This is not required on most
 platforms as the Trusted OS is run from secure RAM.
 
-Upstream-Status: Pending (not yet submited to upstream)
+Upstream-Status: Pending (not yet submitted to upstream)
 Signed-off-by: Adam Johnston <adam.johnston@arm.com>
+Signed-off-by: Mariam Elshakfy <mariam.elshakfy@arm.com>
 ---
  plat/arm/board/n1sdp/fdts/n1sdp_nt_fw_config.dts | 12 ++++++++++++
  1 file changed, 12 insertions(+)
@@ -31,9 +32,9 @@ index da5e04ddb6..b7e2d4e86f 100644
 +		#size-cells = <2>;
 +		ranges;
 +
-+		optee@0x08000000 {
++		optee@0xDE000000 {
 +			compatible = "removed-dma-pool";
-+			reg = <0x0 0x08000000 0x0 0x02000000>;
++			reg = <0x0 0xDE000000 0x0 0x02000000>;
 +			no-map;
 +		};
 +	};

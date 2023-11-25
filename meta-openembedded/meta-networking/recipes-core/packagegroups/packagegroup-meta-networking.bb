@@ -13,7 +13,6 @@ PACKAGES = ' \
     packagegroup-meta-networking-filter \
     packagegroup-meta-networking-irc \
     packagegroup-meta-networking-kernel \
-    packagegroup-meta-networking-netkit \
     packagegroup-meta-networking-protocols \
     packagegroup-meta-networking-support \
 '
@@ -26,7 +25,6 @@ RDEPENDS:packagegroup-meta-networking = "\
     packagegroup-meta-networking-filter \
     packagegroup-meta-networking-irc \
     packagegroup-meta-networking-kernel \
-    packagegroup-meta-networking-netkit \
     packagegroup-meta-networking-protocols \
     packagegroup-meta-networking-support \
     "
@@ -133,21 +131,6 @@ RDEPENDS:packagegroup-meta-networking-irc = "\
 RDEPENDS:packagegroup-meta-networking-kernel = "\
     wireguard-tools \
 "
-
-RDEPENDS:packagegroup-meta-networking-netkit = "\
-    netkit-rwho-client \
-    netkit-rwho-server \
-    netkit-rsh-client \
-    netkit-rsh-server \
-    netkit-telnet \
-    netkit-tftp-client \
-    netkit-tftp-server \
-    netkit-ftp \
-    netkit-rpc \
-    "
-
-RDEPENDS:packagegroup-meta-networking-netkit:remove:libc-musl = " \
-    netkit-rsh-client netkit-rsh-server netkit-telnet"
 
 RDEPENDS:packagegroup-meta-networking-protocols = "\
     babeld \

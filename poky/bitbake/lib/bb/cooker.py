@@ -303,6 +303,10 @@ class BBCooker:
         self.data_hash = self.databuilder.data_hash
         self.extraconfigdata = {}
 
+        eventlog = self.data.getVar("BB_DEFAULT_EVENTLOG")
+        if not self.configuration.writeeventlog and eventlog:
+            self.setupEventLog(eventlog)
+
         if consolelog:
             self.data.setVar("BB_CONSOLELOG", consolelog)
 
@@ -345,7 +349,7 @@ class BBCooker:
                     sync=False,
                     upstream=upstream,
                 )
-                self.hashserv.serve_as_process()
+                self.hashserv.serve_as_process(log_level=logging.WARNING)
             for mc in self.databuilder.mcdata:
                 self.databuilder.mcorigdata[mc].setVar("BB_HASHSERVE", self.hashservaddr)
                 self.databuilder.mcdata[mc].setVar("BB_HASHSERVE", self.hashservaddr)
@@ -409,6 +413,18 @@ class BBCooker:
 
         self._parsecache_set(False)
 
+    def setupEventLog(self, eventlog):
+        if self.eventlog and self.eventlog[0] != eventlog:
+            bb.event.unregister_UIHhandler(self.eventlog[1])
+        if not self.eventlog or self.eventlog[0] != eventlog:
+            # we log all events to a file if so directed
+            # register the log file writer as UI Handler
+            if not os.path.exists(os.path.dirname(eventlog)):
+                bb.utils.mkdirhier(os.path.dirname(eventlog))
+            writer = EventWriter(self, eventlog)
+            EventLogWriteHandler = namedtuple('EventLogWriteHandler', ['event'])
+            self.eventlog = (eventlog, bb.event.register_UIHhandler(EventLogWriteHandler(writer)))
+
     def updateConfigOpts(self, options, environment, cmdline):
         self.ui_cmdline = cmdline
         clean = True
@@ -428,14 +444,7 @@ class BBCooker:
                 setattr(self.configuration, o, options[o])
 
         if self.configuration.writeeventlog:
-            if self.eventlog and self.eventlog[0] != self.configuration.writeeventlog:
-                bb.event.unregister_UIHhandler(self.eventlog[1])
-            if not self.eventlog or self.eventlog[0] != self.configuration.writeeventlog:
-                # we log all events to a file if so directed
-                # register the log file writer as UI Handler
-                writer = EventWriter(self, self.configuration.writeeventlog)
-                EventLogWriteHandler = namedtuple('EventLogWriteHandler', ['event'])
-                self.eventlog = (self.configuration.writeeventlog, bb.event.register_UIHhandler(EventLogWriteHandler(writer)))
+            self.setupEventLog(self.configuration.writeeventlog)
 
         bb.msg.loggerDefaultLogLevel = self.configuration.default_loglevel
         bb.msg.loggerDefaultDomains = self.configuration.debug_domains
@@ -1548,7 +1557,13 @@ class BBCooker:
 
 
     def getAllKeysWithFlags(self, flaglist):
+        def dummy_autorev(d):
+            return
+
         dump = {}
+        # Horrible but for now we need to avoid any sideeffects of autorev being called
+        saved = bb.fetch2.get_autorev
+        bb.fetch2.get_autorev = dummy_autorev
         for k in self.data.keys():
             try:
                 expand = True
@@ -1568,6 +1583,7 @@ class BBCooker:
                             dump[k][d] = None
             except Exception as e:
                 print(e)
+        bb.fetch2.get_autorev = saved
         return dump
 
 
@@ -1787,7 +1803,7 @@ class CookerCollectFiles(object):
             for ignored in ('SCCS', 'CVS', '.svn'):
                 if ignored in dirs:
                     dirs.remove(ignored)
-            found += [os.path.join(dir, f) for f in files if (f.endswith(['.bb', '.bbappend']))]
+            found += [os.path.join(dir, f) for f in files if (f.endswith(('.bb', '.bbappend')))]
 
         return found
 

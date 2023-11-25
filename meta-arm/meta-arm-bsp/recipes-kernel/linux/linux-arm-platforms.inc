@@ -30,11 +30,6 @@ LINUX_KERNEL_TYPE:corstone1000 = "standard"
 KERNEL_EXTRA_ARGS:corstone1000 += "CONFIG_INITRAMFS_COMPRESSION_NONE=y"
 SRC_URI:append:corstone1000 = " \
            file://defconfig  \
-           file://0002-Add-external-system-driver.patch \
-           file://0003-Add-rpmsg-driver-for-corstone1000.patch \
-           file://0004-rpmsg-arm-fix-return-value.patch \
-           file://0005-rpmsg-arm-update-chrdev-to-ctrldev-registration.patch \
-           file://0006-Adds-workaround-for-cs1k-specific-bug.patch \
         "
 
 SRC_URI:append:corstone1000 = " ${@bb.utils.contains('MACHINE_FEATURES', \
@@ -72,7 +67,7 @@ COMPATIBLE_MACHINE:musca-s1 = "(^$)"
 #
 # N1SDP KMACHINE
 #
-FILESEXTRAPATHS:prepend:n1sdp := "${THISDIR}/linux-yocto-6.4/n1sdp:"
+FILESEXTRAPATHS:prepend:n1sdp := "${THISDIR}/linux-yocto-6.5/n1sdp:"
 COMPATIBLE_MACHINE:n1sdp = "n1sdp"
 KBUILD_DEFCONFIG:n1sdp = "defconfig"
 KCONFIG_MODE:n1sdp = "--alldefconfig"

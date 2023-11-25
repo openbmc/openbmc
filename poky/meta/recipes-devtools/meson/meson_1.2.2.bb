@@ -66,6 +66,8 @@ def generate_native_link_template(d):
         loader = 'ld64.so.2'
     elif 'loongarch64' in build_arch:
         loader = 'ld-linux-loongarch-lp64d.so.1'
+    elif 'riscv64' in build_arch:
+        loader = 'ld-linux-riscv64-lp64d.so.1'
 
     if loader:
         val += ['-Wl,--dynamic-linker=@{OECORE_NATIVE_SYSROOT}${base_libdir_native}/' + loader]

@@ -10,3 +10,5 @@ inherit pypi setuptools3
 PYPI_PACKAGE = "ninja_syntax"
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/ninja_syntax/"
 UPSTREAM_CHECK_REGEX = "/ninja_syntax/(?P<pver>(\d+[\.\-_]*)+)"
+
+BBCLASSEXTEND = "native nativesdk"

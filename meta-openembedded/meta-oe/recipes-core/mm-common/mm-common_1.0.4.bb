@@ -2,7 +2,6 @@ SUMMARY = "Common GNOME build files for C++ bindings"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase
 

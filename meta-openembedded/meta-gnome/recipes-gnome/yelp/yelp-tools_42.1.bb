@@ -5,8 +5,6 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.GPL;md5=eb723b61539feef013de476e68b5c50a \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
-
 inherit gnomebase itstool
 
 DEPENDS += " \

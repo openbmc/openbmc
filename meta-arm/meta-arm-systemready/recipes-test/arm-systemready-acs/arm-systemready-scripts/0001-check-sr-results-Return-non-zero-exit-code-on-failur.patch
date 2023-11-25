@@ -1,0 +1,37 @@
+From ad8f2826f6e2cefb630f7fc2c7c99857f224e109 Mon Sep 17 00:00:00 2001
+From: Debbie Martin <Debbie.Martin@arm.com>
+Date: Tue, 5 Sep 2023 21:37:46 +0100
+Subject: [PATCH] check-sr-results: Return non-zero exit code on failure
+
+Return a non-zero exit code if there are any warnings or errors found.
+
+Upstream-Status: Pending
+Signed-off-by: Debbie Martin <Debbie.Martin@arm.com>
+---
+ check-sr-results.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/check-sr-results.py b/check-sr-results.py
+index 12b89cd..48658f0 100755
+--- a/check-sr-results.py
++++ b/check-sr-results.py
+@@ -185,6 +185,9 @@ class Stats:
+     def inc_error(self):
+         self._inc('error')
+ 
++    def has_warnings_or_errors(self):
++        return self.data['warning'] or self.data['error']
++
+ 
+ # Download (possibly large) file from URL.
+ # We raise an exception in case of issue.
+@@ -1519,3 +1522,6 @@ if __name__ == '__main__':
+     if args.print_meta:
+         print()
+         print_meta()
++
++    if stats.has_warnings_or_errors():
++        exit(1)
+-- 
+2.25.1
+

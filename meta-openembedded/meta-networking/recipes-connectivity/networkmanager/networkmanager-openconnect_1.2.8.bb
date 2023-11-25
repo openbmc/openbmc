@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=186e8b54342da4f753a62b7748c947db"
 
 DEPENDS = "glib-2.0-native intltool-native libxml2 networkmanager openconnect"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase useradd
 
 SRC_URI = "${GNOME_MIRROR}/NetworkManager-openconnect/${@gnome_verdir("${PV}")}/NetworkManager-openconnect-${PV}.tar.xz"

@@ -21,6 +21,7 @@ SRC_URI:append = "\
     file://0006-Platform-ARM-N1Sdp-Persistent-storage-for-N1Sdp.patch;patchdir=edk2-platforms \
     file://0007-Platform-ARM-N1Sdp-Enable-FaultTolerantWrite-Dxe-dri.patch;patchdir=edk2-platforms \
     file://0008-Platform-ARM-N1Sdp-manually-poll-QSPI-status-bit-aft.patch;patchdir=edk2-platforms \
+    file://0009-Platform-ARM-N1Sdp-Reserve-OP-TEE-Region-from-UEFI.patch;patchdir=edk2-platforms \
 "
 
 do_deploy:append() {

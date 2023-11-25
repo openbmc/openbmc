@@ -12,10 +12,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/Makefile | 14 ++++++++------
  1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
-index 5e74193c0e89..b4313c36b035 100755
---- a/mDNSPosix/Makefile
-+++ b/mDNSPosix/Makefile
+Index: mDNSResponder/mDNSPosix/Makefile
+===================================================================
+--- mDNSResponder.orig/mDNSPosix/Makefile
++++ mDNSResponder/mDNSPosix/Makefile
 @@ -112,9 +112,11 @@ ifeq ($(findstring linux,$(os)),linux)
  ifeq ($(tls), no)
  CFLAGS_OS = -D_GNU_SOURCE -DHAVE_IPV6 -DNOT_HAVE_SA_LEN -DUSES_NETLINK -DHAVE_LINUX -DTARGET_OS_LINUX -ftabstop=4 -Wno-expansion-to-defined
@@ -59,6 +59,3 @@ index 5e74193c0e89..b4313c36b035 100755
  
  $(OBJDIR)/NetMonitor.c.o:            $(COREDIR)/mDNS.c # Note: NetMonitor.c textually imports mDNS.c
  
--- 
-2.35.1
-

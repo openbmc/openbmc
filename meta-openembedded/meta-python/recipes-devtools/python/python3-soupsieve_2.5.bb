@@ -12,10 +12,6 @@ SRC_URI += " \
         file://run-ptest \
 "
 
-RDEPENDS:${PN} += "\
-        ${PYTHON_PN}-beautifulsoup4 \
-"
-
 RDEPENDS:${PN}-ptest += " \
         ${PYTHON_PN}-pytest \
         ${PYTHON_PN}-beautifulsoup4 \

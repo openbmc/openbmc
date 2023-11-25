@@ -49,5 +49,3 @@ ALTERNATIVE:${PN} = "mof_compiler"
 ALTERNATIVE_TARGET[mof_compiler] = "${bindir}/mof_compiler"
 
 ALTERNATIVE_PRIORITY = "60"
-
-BBCLASSEXTEND = "native"

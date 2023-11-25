@@ -135,6 +135,7 @@ PACKAGECONFIG[bzip2] = "-Dbzip2=true,-Dbzip2=false,bzip2"
 PACKAGECONFIG[cgroupv2] = "-Ddefault-hierarchy=unified,-Ddefault-hierarchy=hybrid"
 PACKAGECONFIG[coredump] = "-Dcoredump=true,-Dcoredump=false"
 PACKAGECONFIG[cryptsetup] = "-Dlibcryptsetup=true,-Dlibcryptsetup=false,cryptsetup,,cryptsetup"
+PACKAGECONFIG[cryptsetup-plugins] = "-Dlibcryptsetup-plugins=true,-Dlibcryptsetup-plugins=false,cryptsetup,,cryptsetup"
 PACKAGECONFIG[tpm2] = "-Dtpm2=true,-Dtpm2=false,tpm2-tss,tpm2-tss libtss2 libtss2-tcti-device"
 # If multiple compression libraries are enabled, the format to use for compression is chosen implicitly,
 # so if you want to compress with e.g. lz4 you cannot enable zstd, so you cannot read zstd-compressed journal files.
@@ -178,11 +179,13 @@ PACKAGECONFIG[microhttpd] = "-Dmicrohttpd=true,-Dmicrohttpd=false,libmicrohttpd"
 PACKAGECONFIG[myhostname] = "-Dnss-myhostname=true,-Dnss-myhostname=false,,libnss-myhostname"
 PACKAGECONFIG[networkd] = "-Dnetworkd=true,-Dnetworkd=false"
 PACKAGECONFIG[no-dns-fallback] = "-Ddns-servers="
-PACKAGECONFIG[nss] = "-Dnss-systemd=true,-Dnss-systemd=false"
+PACKAGECONFIG[no-ntp-fallback] = "-Dntp-servers="
+PACKAGECONFIG[nss] = "-Dnss-systemd=true,-Dnss-systemd=false,,libnss-systemd"
 PACKAGECONFIG[nss-mymachines] = "-Dnss-mymachines=true,-Dnss-mymachines=false"
 PACKAGECONFIG[nss-resolve] = "-Dnss-resolve=true,-Dnss-resolve=false"
 PACKAGECONFIG[oomd] = "-Doomd=true,-Doomd=false"
 PACKAGECONFIG[openssl] = "-Dopenssl=true,-Dopenssl=false,openssl"
+PACKAGECONFIG[p11kit] = "-Dp11kit=true,-Dp11kit=false,p11-kit"
 PACKAGECONFIG[pam] = "-Dpam=true,-Dpam=false,libpam,${PAM_PLUGINS}"
 PACKAGECONFIG[pcre2] = "-Dpcre2=true,-Dpcre2=false,libpcre2"
 PACKAGECONFIG[polkit] = "-Dpolkit=true,-Dpolkit=false"
@@ -224,6 +227,8 @@ PACKAGECONFIG[xkbcommon] = "-Dxkbcommon=true,-Dxkbcommon=false,libxkbcommon"
 PACKAGECONFIG[xz] = "-Dxz=true,-Dxz=false,xz"
 PACKAGECONFIG[zlib] = "-Dzlib=true,-Dzlib=false,zlib"
 PACKAGECONFIG[zstd] = "-Dzstd=true,-Dzstd=false,zstd"
+
+RESOLV_CONF ??= ""
 
 # Helper variables to clarify locations.  This mirrors the logic in systemd's
 # build system.
@@ -277,12 +282,12 @@ do_install() {
 	[ ! -e ${D}/${base_sbindir}/udevd ] && ln -s ${rootlibexecdir}/systemd/systemd-udevd ${D}/${base_sbindir}/udevd
 
 	install -d ${D}${sysconfdir}/udev/rules.d/
-	install -d ${D}${sysconfdir}/tmpfiles.d
+	install -d ${D}${nonarch_libdir}/tmpfiles.d
 	for rule in $(find ${WORKDIR} -maxdepth 1 -type f -name "*.rules"); do
 		install -m 0644 $rule ${D}${sysconfdir}/udev/rules.d/
 	done
 
-	install -m 0644 ${WORKDIR}/00-create-volatile.conf ${D}${sysconfdir}/tmpfiles.d/
+	install -m 0644 ${WORKDIR}/00-create-volatile.conf ${D}${nonarch_libdir}/tmpfiles.d/
 
 	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
 		install -d ${D}${sysconfdir}/init.d
@@ -336,8 +341,9 @@ do_install() {
 		echo 'f /run/systemd/resolve/resolv.conf 0644 root root' >>${D}${exec_prefix}/lib/tmpfiles.d/systemd.conf
 		ln -s ../run/systemd/resolve/resolv.conf ${D}${sysconfdir}/resolv-conf.systemd
 	else
-		sed -i -e "s%^L! /etc/resolv.conf.*$%L! /etc/resolv.conf - - - - ../run/systemd/resolve/resolv.conf%g" ${D}${exec_prefix}/lib/tmpfiles.d/etc.conf
-		ln -s ../run/systemd/resolve/resolv.conf ${D}${sysconfdir}/resolv-conf.systemd
+		resolv_conf="${@bb.utils.contains('RESOLV_CONF', 'stub-resolv', 'run/systemd/resolve/stub-resolv.conf', 'run/systemd/resolve/resolv.conf', d)}"
+		sed -i -e "s%^L! /etc/resolv.conf.*$%L! /etc/resolv.conf - - - - ../${resolv_conf}%g" ${D}${exec_prefix}/lib/tmpfiles.d/etc.conf
+		ln -s ../${resolv_conf} ${D}${sysconfdir}/resolv-conf.systemd
 	fi
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'false', 'true', d)}; then
 		rm ${D}${exec_prefix}/lib/tmpfiles.d/x11.conf
@@ -384,20 +390,21 @@ python populate_packages:prepend (){
 PACKAGES_DYNAMIC += "^lib(udev|systemd|nss).*"
 
 PACKAGE_BEFORE_PN = "\
-    ${PN}-gui \
-    ${PN}-vconsole-setup \
-    ${PN}-initramfs \
     ${PN}-analyze \
-    ${PN}-kernel-install \
-    ${PN}-rpm-macros \
     ${PN}-binfmt \
-    ${PN}-zsh-completion \
     ${PN}-container \
+    ${PN}-crypt \
+    ${PN}-extra-utils \
+    ${PN}-gui \
+    ${PN}-initramfs \
     ${PN}-journal-gatewayd \
     ${PN}-journal-upload \
     ${PN}-journal-remote \
-    ${PN}-extra-utils \
+    ${PN}-kernel-install \
+    ${PN}-rpm-macros \
     ${PN}-udev-rules \
+    ${PN}-vconsole-setup \
+    ${PN}-zsh-completion \
     libsystemd-shared \
     udev \
     udev-hwdb \
@@ -445,6 +452,11 @@ USERADD_PARAM:${PN}-journal-remote = "--system -d / -M --shell /sbin/nologin sys
 USERADD_PARAM:${PN}-journal-upload = "--system -d / -M --shell /sbin/nologin systemd-journal-upload"
 
 FILES:${PN}-analyze = "${bindir}/systemd-analyze"
+
+FILES:${PN}-crypt = "${bindir}/systemd-cryptenroll \
+                     ${libdir}/cryptsetup \
+                    "
+RRECOMMENDS:${PN} += "${PN}-crypt"
 
 FILES:${PN}-initramfs = "/init"
 RDEPENDS:${PN}-initramfs = "${PN}"
@@ -523,7 +535,6 @@ FILES:${PN}-container = "${sysconfdir}/dbus-1/system.d/org.freedesktop.import1.c
                          ${exec_prefix}/lib/tmpfiles.d/systemd-nspawn.conf \
                          ${exec_prefix}/lib/tmpfiles.d/README \
                          ${systemd_system_unitdir}/systemd-nspawn@.service \
-                         ${libdir}/libnss_mymachines.so.2 \
                          ${datadir}/dbus-1/system-services/org.freedesktop.import1.service \
                          ${datadir}/dbus-1/system-services/org.freedesktop.machine1.service \
                          ${datadir}/dbus-1/system.d/org.freedesktop.import1.conf \
@@ -531,6 +542,8 @@ FILES:${PN}-container = "${sysconfdir}/dbus-1/system.d/org.freedesktop.import1.c
                          ${datadir}/polkit-1/actions/org.freedesktop.import1.policy \
                          ${datadir}/polkit-1/actions/org.freedesktop.machine1.policy \
                         "
+
+RDEPENDS:${PN}-container = "${@bb.utils.contains('PACKAGECONFIG', 'nss-mymachines', 'libnss-mymachines', '', d)}"
 
 # "machinectl import-tar" uses "tar --numeric-owner", not supported by busybox.
 RRECOMMENDS:${PN}-container += "\
@@ -552,7 +565,6 @@ FILES:${PN}-extra-utils = "\
                         ${bindir}/systemd-run \
                         ${bindir}/systemd-cat \
                         ${bindir}/systemd-creds \
-                        ${bindir}/systemd-cryptenroll \
                         ${bindir}/systemd-delta \
                         ${bindir}/systemd-cgls \
                         ${bindir}/systemd-cgtop \
@@ -786,6 +798,9 @@ python __anonymous() {
     if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
         d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
 
+    if bb.utils.contains('DISTRO_FEATURES', 'systemd-resolved', True, False, d) and not bb.utils.contains('PACKAGECONFIG', 'nss-resolve resolved', True, False, d):
+        bb.error("DISTRO_FEATURES[systemd-resolved] requires PACKAGECONFIG[nss-resolve, resolved]")
+
     if bb.utils.contains('PACKAGECONFIG', 'repart', True, False, d) and not bb.utils.contains('PACKAGECONFIG', 'openssl', True, False, d):
         bb.error("PACKAGECONFIG[repart] requires PACKAGECONFIG[openssl]")
 
@@ -826,15 +841,31 @@ ALTERNATIVE_LINK_NAME[runlevel] = "${base_sbindir}/runlevel"
 ALTERNATIVE_PRIORITY[runlevel] ?= "300"
 
 pkg_postinst:${PN}:libc-glibc () {
-	sed -e '/^hosts:/s/\s*\<myhostname\>//' \
-		-e 's/\(^hosts:.*\)\(\<files\>\)\(.*\)\(\<dns\>\)\(.*\)/\1\2 myhostname \3\4\5/' \
-		-i $D${sysconfdir}/nsswitch.conf
+	if ${@bb.utils.contains('PACKAGECONFIG', 'myhostname', 'true', 'false', d)}; then
+		sed -e '/^hosts:/s/\s*\<myhostname\>//' \
+			-e 's/\(^hosts:.*\)\(\<files\>\)\(.*\)\(\<dns\>\)\(.*\)/\1\2 myhostname \3\4\5/' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
+	if ${@bb.utils.contains('PACKAGECONFIG', 'nss', 'true', 'false', d)}; then
+		sed -e 's#\(^passwd:.*\)#\1 systemd#' \
+			-e 's#\(^group:.*\)#\1 systemd#' \
+			-e 's#\(^shadow:.*\)#\1 systemd#' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
 }
 
 pkg_prerm:${PN}:libc-glibc () {
-	sed -e '/^hosts:/s/\s*\<myhostname\>//' \
-		-e '/^hosts:/s/\s*myhostname//' \
-		-i $D${sysconfdir}/nsswitch.conf
+	if ${@bb.utils.contains('PACKAGECONFIG', 'myhostname', 'true', 'false', d)}; then
+		sed -e '/^hosts:/s/\s*\<myhostname\>//' \
+			-e '/^hosts:/s/\s*myhostname//' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
+	if ${@bb.utils.contains('PACKAGECONFIG', 'nss', 'true', 'false', d)}; then
+		sed -e '/^passwd:/s#\s*systemd##' \
+			-e '/^group:/s#\s*systemd##' \
+			-e '/^shadow:/s#\s*systemd##' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
 }
 
 PACKAGE_WRITE_DEPS += "qemu-native"

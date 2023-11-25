@@ -6,10 +6,22 @@
       <field type="CharField" name="dirpath">b</field>
       <field type="CharField" name="branch">a</field>
   </object>
+  <object pk="1" model="orm.distro">
+     <field type="DateTimeField" name="up_date"><None></None></field>
+     <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">1</field>
+     <field type="CharField" name="name">poky_distro1</field>
+     <field type="CharField" name="description">poky_distro1 description</field>
+  </object>
+  <object pk="2" model="orm.distro">
+     <field type="DateTimeField" name="up_date"><None></None></field>
+     <field to="orm.layer_version" name="layer_version" rel="ManyToOneRel">2</field>
+     <field type="CharField" name="name">poky_distro2</field>
+     <field type="CharField" name="description">poky_distro2 description</field>
+  </object>
   <object pk="1" model="orm.release">
-     <field type="CharField" name="name">master</field>
+     <field type="CharField" name="name">foo_master</field>
      <field type="CharField" name="description">master project</field>
-     <field to="orm.bitbake_version" name="bitbake_version">1</field>
+     <field to="orm.bitbakeversion" name="bitbake_version">1</field>
   </object>
   <object pk="1" model="orm.project">
     <field type="CharField" name="name">a test project</field>

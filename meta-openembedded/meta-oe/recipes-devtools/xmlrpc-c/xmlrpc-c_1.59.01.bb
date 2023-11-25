@@ -41,7 +41,7 @@ do_configure() {
 }
 
 do_install:append:class-target() {
-        sed -i 's,${WORKDIR},/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR},g' ${D}${bindir}/xmlrpc-c-config
+        sed -i 's,${WORKDIR},${TARGET_DBGSRC_DIR},g' ${D}${bindir}/xmlrpc-c-config
 }
 
 BBCLASSEXTEND = "native"

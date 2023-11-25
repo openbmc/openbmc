@@ -68,33 +68,10 @@ SECURITY_NOPIE_CFLAGS ??= ""
 CCACHE_DISABLE ?= "1"
 
 def go_map_arch(a, d):
-    import re
-    if re.match('i.86', a):
-        return '386'
-    elif a == 'x86_64':
-        return 'amd64'
-    elif re.match('arm.*', a):
-        return 'arm'
-    elif re.match('aarch64.*', a):
-        return 'arm64'
-    elif re.match('mips64el.*', a):
-        return 'mips64le'
-    elif re.match('mips64.*', a):
-        return 'mips64'
-    elif a == 'mips':
-        return 'mips'
-    elif a == 'mipsel':
-        return 'mipsle'
-    elif re.match('p(pc|owerpc)(64le)', a):
-        return 'ppc64le'
-    elif re.match('p(pc|owerpc)(64)', a):
-        return 'ppc64'
-    elif a == 'riscv64':
-        return 'riscv64'
-    elif a == 'loongarch64':
-        return 'loong64'
-    else:
+    arch = oe.go.map_arch(a)
+    if not arch:
         raise bb.parse.SkipRecipe("Unsupported CPU architecture: %s" % a)
+    return arch
 
 def go_map_arm(a, d):
     if a.startswith("arm"):

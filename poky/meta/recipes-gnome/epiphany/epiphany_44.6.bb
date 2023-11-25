@@ -23,7 +23,6 @@ DEPENDS = " \
           desktop-file-utils-native \
           "
 
-GNOMEBASEBUILDCLASS = "meson"
 inherit gnomebase gsettings features_check gettext mime-xdg gtk-icon-cache
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 

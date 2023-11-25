@@ -1,0 +1,55 @@
+From ce27f7e22b2cd7453a425e08780a338a71301961 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 20 Nov 2023 15:19:15 +0200
+Subject: [PATCH] config.txt: reintroduce start_x
+
+Reintroduce configuration "start_x". Based on the experience with
+Yocto/OpenEmbedded layer meta-raspberrypi, it has been observed
+that Raspberry Pi 4B 4GB may fail to enable the camera if
+"start_x=1" is at the end of the file. Therefore, "start_x=1"
+is expected in config.txt template and it has been set to replace
+the original occurrence, which is at the middle of the file.
+Also update revision and date stamp.
+
+GitHub pull request: https://github.com/Evilpaul/RPi-config/pull/8
+
+Upstream-Status: Submitted
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ config.txt | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/config.txt b/config.txt
+index 1cf7b29..e28ed02 100644
+--- a/config.txt
++++ b/config.txt
+@@ -1,7 +1,7 @@
+ ################################################################################
+ ##  Raspberry Pi Configuration Settings
+ ##
+-##  Revision 17, 2021/08/15
++##  Revision 18, 2023/11/20
+ ##
+ ##  Details taken from the eLinux wiki and official Raspberry Pi documentation.
+ ##  For up-to-date information please refer to links below.
+@@ -760,6 +760,16 @@
+ ##  Camera Settings
+ ################################################################################
+ 
++## start_x
++##     Set to "1" to enable the camera module.
++##
++##     Enabling the camera requires gpu_mem option to be specified with a value
++##     of at least 128.
++##
++##     Default 0
++##
++#start_x=0
++
+ ## disable_camera_led
+ ##     Turn off the red camera led when recording video or taking a still
+ ##     picture.
+-- 
+2.39.2
+

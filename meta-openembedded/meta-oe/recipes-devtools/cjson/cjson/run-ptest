@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# exclude json_patch_tests
+if ctest -E 'json_patch_tests' ; then
+    echo "PASS: cjson"
+else
+    echo "FAIL: cjson"
+fi

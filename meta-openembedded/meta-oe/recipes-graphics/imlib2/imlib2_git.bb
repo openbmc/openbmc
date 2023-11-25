@@ -7,8 +7,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=344895f253c32f38e182dcaf30fe8a35"
 
 DEPENDS = "freetype "
 PROVIDES = "virtual/imlib2"
-PV = "1.7.1"
-SRCREV = "01424487e360383a039dc123bc2a345fe7ea2535"
+PV = "1.12.1"
+SRCREV = "9198db25369f04db069ce61a661c3c47b2622655"
 
 inherit autotools pkgconfig lib_package
 
@@ -28,7 +28,6 @@ PACKAGECONFIG[png] = "--with-png,--without-png,libpng"
 PACKAGECONFIG[tiff] = "--with-tiff,--without-tiff,tiff"
 PACKAGECONFIG[webp] = "--with-webp,--without-webp,libwebp"
 
-PACKAGECONFIG[bzip2] = "--with-bzip2,--without-bzip2,bzip2"
 PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
 
 PACKAGECONFIG[id3] = "--with-id3,--without-id3,libid3tag"
@@ -37,6 +36,3 @@ PACKAGES =+ "${BPN}-loaders ${BPN}-filters ${BPN}-data"
 FILES:${PN}-data = "${datadir}"
 FILES:imlib2-loaders = "${libdir}/imlib2/loaders/*.so"
 FILES:imlib2-filters = "${libdir}/imlib2/filters/*.so"
-
-inherit multilib_script
-MULTILIB_SCRIPTS = "${PN}-bin:${bindir}/imlib2-config"

@@ -344,9 +344,7 @@ def virtualfn2realfn(virtualfn):
     """
     mc = ""
     if virtualfn.startswith('mc:') and virtualfn.count(':') >= 2:
-        elems = virtualfn.split(':')
-        mc = elems[1]
-        virtualfn = ":".join(elems[2:])
+        (_, mc, virtualfn) = virtualfn.split(':', 2)
 
     fn = virtualfn
     cls = ""
@@ -369,7 +367,7 @@ def realfn2virtual(realfn, cls, mc):
 
 def variant2virtual(realfn, variant):
     """
-    Convert a real filename + the associated subclass keyword to a virtual filename
+    Convert a real filename + a variant to a virtual filename
     """
     if variant == "":
         return realfn

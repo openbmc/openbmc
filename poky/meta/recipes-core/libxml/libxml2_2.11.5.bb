@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://Copyright;md5=2044417e2e5006b65a8b9067b683fcf1 \
 
 DEPENDS = "zlib virtual/libiconv"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase
 
 SRC_URI += "http://www.w3.org/XML/Test/xmlts20130923.tar;subdir=${BP};name=testtar \
@@ -20,6 +21,9 @@ SRC_URI += "http://www.w3.org/XML/Test/xmlts20130923.tar;subdir=${BP};name=testt
 
 SRC_URI[archive.sha256sum] = "3727b078c360ec69fa869de14bd6f75d7ee8d36987b071e6928d4720a28df3a6"
 SRC_URI[testtar.sha256sum] = "c6b2d42ee50b8b236e711a97d68e6c4b5c8d83e69a2be4722379f08702ea7273"
+
+# Disputed as a security issue, but fixed in d39f780
+CVE_STATUS[CVE-2023-45322] = "disputed: issue requires memory allocation to fail"
 
 BINCONFIG = "${bindir}/xml2-config"
 

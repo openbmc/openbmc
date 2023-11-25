@@ -2,7 +2,7 @@ DESCRIPTION = "This is a userland SCTP stack supporting FreeBSD, Linux, Mac OS X
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ffcf846341f3856d79a483eafa18e2a5"
 
-SRCREV = "a10cd498d964508c0e6ec6bd2be9dd4afcbb4d86"
+SRCREV = "a0cbf4681474fab1e89d9e9e2d5c3694fce50359"
 SRC_URI = "git://github.com/sctplab/usrsctp;protocol=https;branch=master \
           "
 

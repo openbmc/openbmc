@@ -7,8 +7,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 COMPATIBLE_MACHINE = "^rpi$"
 
-SRCREV = "648ffc470824c43eb0d16c485f4c24816b32cd6f"
+SRCREV = "6ac2d832c6c3b208e2669f50ec1abf2c20cb7ff4"
 SRC_URI = "git://github.com/Evilpaul/RPi-config.git;protocol=https;branch=master \
+           file://0001-config.txt-reintroduce-start_x.patch \
           "
 
 S = "${WORKDIR}/git"

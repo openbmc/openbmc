@@ -15,7 +15,6 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/cups-${PV}-source.tar.gz \
            file://0004-cups-fix-multilib-install-file-conflicts.patch \
            file://volatiles.99_cups \
            file://cups-volatiles.conf \
-           file://CVE-2023-4504.patch \
            "
 
 GITHUB_BASE_URI = "https://github.com/OpenPrinting/cups/releases"
@@ -38,10 +37,13 @@ GROUPADD_PARAM:${PN} = "--system lpadmin"
 SYSTEMD_SERVICE:${PN} = "cups.socket cups.path cups.service cups-lpd.socket"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
-                   ${@bb.utils.filter('DISTRO_FEATURES', 'pam systemd', d)}"
+                   ${@bb.utils.filter('DISTRO_FEATURES', 'pam systemd', d)} \
+                   openssl \
+"
 PACKAGECONFIG[avahi] = "--with-dnssd=avahi,--with-dnssd=no,avahi"
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl"
-PACKAGECONFIG[gnutls] = "--with-tls=gnutls,--with-tls=no,gnutls"
+PACKAGECONFIG[gnutls] = "--with-tls=gnutls,,gnutls,,,openssl"
+PACKAGECONFIG[openssl] = "--with-tls=openssl,,openssl,,,gnutls"
 PACKAGECONFIG[pam] = "--enable-pam --with-pam-module=unix, --disable-pam, libpam"
 PACKAGECONFIG[systemd] = "--with-systemd=${systemd_system_unitdir},--without-systemd,systemd"
 PACKAGECONFIG[xinetd] = "--with-xinetd=${sysconfdir}/xinetd.d,--without-xinetd,xinetd"

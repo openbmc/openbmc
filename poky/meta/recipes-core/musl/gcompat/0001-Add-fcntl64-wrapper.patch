@@ -1,0 +1,44 @@
+From 37f70f54c74c4ceeb089cbee88311ba00638f211 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 13 Oct 2023 21:02:23 -0700
+Subject: [PATCH] Add fcntl64 wrapper
+
+fixes loadtime errors with pvr precompiled driver for visionfive2
+
+load libpvr_dri_support.so: Error relocating /usr/lib/libpvr_dri_support.so: fcntl64: symbol not found
+
+Upstream-Status: Submitted [https://git.adelielinux.org/adelie/gcompat/-/merge_requests/28]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libgcompat/unistd.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/libgcompat/unistd.c b/libgcompat/unistd.c
+index 011fba2..400abf3 100644
+--- a/libgcompat/unistd.c
++++ b/libgcompat/unistd.c
+@@ -1,6 +1,7 @@
+ #include <assert.h> /* assert */
+ #include <fcntl.h>  /* O_CREAT */
+ #include <limits.h> /* NGROUPS_MAX */
++#include <stdarg.h> /* va_list, va_start, va_end */
+ #include <stddef.h> /* NULL, size_t */
+ #include <unistd.h> /* confstr, getcwd, getgroups, ... */
+ #include <errno.h>  /* ENOSYS, ENOMEM */
+@@ -250,3 +251,13 @@ int __close(int fd)
+ {
+ 	return close(fd);
+ }
++
++int fcntl64 (int fd, int cmd, ...)
++{
++  int ret;
++  va_list ap;
++  va_start(ap, cmd);
++  ret = fcntl(fd, cmd, ap);
++  va_end(ap);
++  return ret;
++}
+-- 
+2.42.0
+

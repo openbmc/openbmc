@@ -1,0 +1,28 @@
+From ced2e933cf647874da4baff002e0987b9bfe5fac Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sat, 18 Nov 2023 15:07:49 +0100
+Subject: [PATCH] meson.build: require for native wayland-scanner
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Submitted [https://github.com/flatpak/flatpak/pull/5596]
+---
+ meson.build | 4 ++--
+ 1 file changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index f4e5b3a3..5d2f9eba 100644
+--- a/meson.build
++++ b/meson.build
+@@ -207,7 +207,7 @@ gtkdoc_dep = dependency('gtk-doc', required : get_option('gtkdoc'))
+ build_gtk_doc = gtkdoc_dep.found()
+ 
+ wayland_client = dependency('wayland-client', required : get_option('wayland_security_context'))
+-wayland_scanner = dependency('wayland-scanner', version : '>= 1.15', required : get_option('wayland_security_context'))
++wayland_scanner = dependency('wayland-scanner', version : '>= 1.15', required : get_option('wayland_security_context'), native : true)
+ wayland_protocols = dependency('wayland-protocols', version : '>= 1.32', required : get_option('wayland_security_context'))
+ build_wayland_security_context = wayland_client.found() and wayland_scanner.found() and wayland_protocols.found()
+ 
+-- 
+2.42.0
+

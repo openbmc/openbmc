@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "libhandy"
 
-GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gtk-icon-cache gobject-introspection features_check
 

@@ -18,7 +18,7 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="dependencies">
-            {% ifequal runtime_deps|length 0 %}
+            {% if runtime_deps|length == 0 %}
                 <div class="alert alert-info">
                     <strong>{{package.fullpackagespec}}</strong> has no runtime dependencies.
                 </div>
@@ -54,8 +54,8 @@
 						{% endfor %}
                     </tbody>
                 </table>
-            {% endifequal %}
-            {% ifnotequal other_deps|length 0 %}
+            {% endif %}
+            {% if other_deps|length != 0 %}
                 <h3>Other runtime relationships</h3>
                 <table class="table table-bordered table-hover">
                     <thead>
@@ -93,7 +93,7 @@
                     	{% endfor %}
                     </tbody>
                 </table>
-                {% endifnotequal %}
+                {% endif %}
             </div> <!-- tab-pane -->
         </div> <!-- tab-content -->
 {% endblock tabcontent %}

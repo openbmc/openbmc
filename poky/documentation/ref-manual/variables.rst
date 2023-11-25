@@ -1358,6 +1358,32 @@ system and gives an overview of their function and contents.
       speed since the build system skips parsing recipes not compatible
       with the current machine.
 
+      If one wants to have a recipe only available for some architectures
+      (here ``aarch64`` and ``mips64``), the following can be used::
+
+         COMPATIBLE_MACHINE = "^$"
+         COMPATIBLE_MACHINE:arch64 = "^(aarch64)$"
+         COMPATIBLE_MACHINE:mips64 = "^(mips64)$"
+
+      The first line means "match all machines whose :term:`MACHINEOVERRIDES`
+      contains the empty string", which will always be none.
+
+      The second is for matching all machines whose :term:`MACHINEOVERRIDES`
+      contains one override which is exactly ``aarch64``.
+
+      The third is for matching all machines whose :term:`MACHINEOVERRIDES`
+      contains one override which is exactly ``mips64``.
+
+      The same could be achieved with::
+
+         COMPATIBLE_MACHINE = "^(aarch64|mips64)$"
+
+      .. note::
+
+         When :term:`COMPATIBLE_MACHINE` is set in a recipe inherits from
+         native, the recipe is always skipped. All native recipes must be
+         entirely target independent and should not rely on :term:`MACHINE`.
+
    :term:`COMPLEMENTARY_GLOB`
       Defines wildcards to match when installing a list of complementary
       packages for all the packages explicitly (or implicitly) installed in
@@ -1698,7 +1724,8 @@ system and gives an overview of their function and contents.
 
       It has the format "reason: description" and the description is optional.
       The Reason is mapped to the final CVE state by mapping via
-      :term:`CVE_CHECK_STATUSMAP`
+      :term:`CVE_CHECK_STATUSMAP`. See :ref:`dev-manual/vulnerabilities:fixing vulnerabilities in recipes`
+      for details.
 
    :term:`CVE_STATUS_GROUPS`
       If there are many CVEs with the same status and reason, they can by simplified by using this
@@ -2458,6 +2485,16 @@ system and gives an overview of their function and contents.
       variable tells the OpenEmbedded build system to prefer the installed
       external tools. See the :ref:`ref-classes-kernel-yocto` class in
       ``meta/classes-recipe`` to see how the variable is used.
+
+   :term:`KERNEL_LOCALVERSION`
+      This variable allows to append a string to the version
+      of the kernel image. This corresponds to the ``CONFIG_LOCALVERSION``
+      kernel configuration parameter.
+
+      Using this variable is only useful when you are using a kernel recipe
+      inheriting the :ref:`ref-classes-kernel` class, and which doesn't
+      already set a local version. Therefore, setting this variable has no
+      impact on ``linux-yocto`` kernels.
 
    :term:`EXTERNAL_TOOLCHAIN`
       When you intend to use an
@@ -3765,9 +3802,9 @@ system and gives an overview of their function and contents.
    :term:`IMAGE_POSTPROCESS_COMMAND`
       Specifies a list of functions to call once the OpenEmbedded build
       system creates the final image output files. You can specify
-      functions separated by semicolons::
+      functions separated by spaces::
 
-         IMAGE_POSTPROCESS_COMMAND += "function; ... "
+         IMAGE_POSTPROCESS_COMMAND += "function"
 
       If you need to pass the root filesystem path to a command within the
       function, you can use ``${IMAGE_ROOTFS}``, which points to the
@@ -3778,9 +3815,9 @@ system and gives an overview of their function and contents.
    :term:`IMAGE_PREPROCESS_COMMAND`
       Specifies a list of functions to call before the OpenEmbedded build
       system creates the final image output files. You can specify
-      functions separated by semicolons::
+      functions separated by spaces::
 
-         IMAGE_PREPROCESS_COMMAND += "function; ... "
+         IMAGE_PREPROCESS_COMMAND += "function"
 
       If you need to pass the root filesystem path to a command within the
       function, you can use ``${IMAGE_ROOTFS}``, which points to the
@@ -4333,17 +4370,16 @@ system and gives an overview of their function and contents.
       This variable is also used from the kernel's append file to identify
       the kernel branch specific to a particular machine or target
       hardware. Continuing with the previous kernel example, the kernel's
-      append file (i.e. ``linux-yocto_4.12.bbappend``) is located in the
+      append file is located in the
       BSP layer for a given machine. For example, the append file for the
-      Beaglebone, EdgeRouter, and generic versions of both 32 and 64-bit IA
+      Beaglebone and generic versions of both 32 and 64-bit IA
       machines (``meta-yocto-bsp``) is named
-      ``meta-yocto-bsp/recipes-kernel/linux/linux-yocto_4.12.bbappend``.
+      ``meta-yocto-bsp/recipes-kernel/linux/linux-yocto_6.1.bbappend``.
       Here are the related statements from that append file::
 
-         KBRANCH:genericx86 = "standard/base"
-         KBRANCH:genericx86-64 = "standard/base"
-         KBRANCH:edgerouter = "standard/edgerouter"
-         KBRANCH:beaglebone = "standard/beaglebone"
+         KBRANCH:genericx86  = "v6.1/standard/base"
+         KBRANCH:genericx86-64  = "v6.1/standard/base"
+         KBRANCH:beaglebone-yocto = "v6.1/standard/beaglebone"
 
       The :term:`KBRANCH` statements
       identify the kernel branch to use when building for each supported
@@ -4718,6 +4754,10 @@ system and gives an overview of their function and contents.
       to the :term:`KERNEL_SRC` variable. Both variables are common variables
       used by external Makefiles to point to the kernel source directory.
 
+   :term:`KERNEL_STRIP`
+      Allows to specific which ``strip`` command to use to strip the kernel
+      binary, typically either GNU binutils ``strip`` or ``llvm-strip``.
+
    :term:`KERNEL_VERSION`
       Specifies the version of the kernel as extracted from ``version.h``
       or ``utsrelease.h`` within the kernel sources. Effects of setting
@@ -5075,7 +5115,6 @@ system and gives an overview of their function and contents.
          MACHINE ?= "genericx86"
          MACHINE ?= "genericx86-64"
          MACHINE ?= "beaglebone"
-         MACHINE ?= "edgerouter"
 
       The last five are Yocto Project reference hardware
       boards, which are provided in the ``meta-yocto-bsp`` layer.
@@ -5280,6 +5319,11 @@ system and gives an overview of their function and contents.
       you to specify the inclusion of debugging symbols and the compiler
       optimizations (none, performance or size).
 
+   :term:`MESON_TARGET`
+      A variable for the :ref:`ref-classes-meson` class, allowing to choose
+      a Meson target to build in :ref:`ref-tasks-compile`.  Otherwise, the
+      default targets are built.
+
    :term:`METADATA_BRANCH`
       The branch currently checked out for the OpenEmbedded-Core layer (path
       determined by :term:`COREBASE`).
@@ -5303,9 +5347,8 @@ system and gives an overview of their function and contents.
       :term:`PREMIRRORS`, the upstream source, and then
       locations specified by :term:`MIRRORS` in that order.
 
-      Assuming your distribution (:term:`DISTRO`) is "poky",
-      the default value for :term:`MIRRORS` is defined in the
-      ``conf/distro/poky.conf`` file in the ``meta-poky`` Git repository.
+      The default value for :term:`MIRRORS` is defined in the
+      ``meta/classes-global/mirrors.bbclass`` file in the core metadata layer.
 
    :term:`MLPREFIX`
       Specifies a prefix has been added to :term:`PN` to create a
@@ -5590,6 +5633,11 @@ system and gives an overview of their function and contents.
 
       For additional information on how this variable is used, see the
       initialization script.
+
+   :term:`OEQA_REPRODUCIBLE_TEST_PACKAGE`
+      Set the package manager(s) for build reproducibility testing.
+      See :yocto_git:`reproducible.py </poky/tree/meta/lib/oeqa/selftest/cases/reproducible.py>`
+      and :doc:`/test-manual/reproducible-builds`.
 
    :term:`OEQA_REPRODUCIBLE_TEST_TARGET`
       Set build target for build reproducibility testing. By default
@@ -6059,13 +6107,11 @@ system and gives an overview of their function and contents.
       omit any argument you like but must retain the separating commas. The
       order is important and specifies the following:
 
-      #. Extra arguments that should be added to the configure script
-         argument list (:term:`EXTRA_OECONF` or
-         :term:`PACKAGECONFIG_CONFARGS`) if
-         the feature is enabled.
+      #. Extra arguments that should be added to :term:`PACKAGECONFIG_CONFARGS`
+         if the feature is enabled.
 
-      #. Extra arguments that should be added to :term:`EXTRA_OECONF` or
-         :term:`PACKAGECONFIG_CONFARGS` if the feature is disabled.
+      #. Extra arguments that should be added to :term:`PACKAGECONFIG_CONFARGS`
+         if the feature is disabled.
 
       #. Additional build dependencies (:term:`DEPENDS`)
          that should be added if the feature is enabled.
@@ -6122,6 +6168,38 @@ system and gives an overview of their function and contents.
          Or, you can just amend the variable::
 
             PACKAGECONFIG:append:pn-recipename = " f4"
+
+      Consider the following example of a :ref:`ref-classes-cmake` recipe with a systemd service
+      in which :term:`PACKAGECONFIG` is used to transform the systemd service
+      into a feature that can be easily enabled or disabled via :term:`PACKAGECONFIG`::
+
+         example.c
+         example.service
+         CMakeLists.txt
+
+      The ``CMakeLists.txt`` file contains::
+
+         if(WITH_SYSTEMD)
+            install(FILES ${PROJECT_SOURCE_DIR}/example.service DESTINATION /etc/systemd/systemd)
+         endif(WITH_SYSTEMD)
+
+      In order to enable the installation of ``example.service`` we need to
+      ensure that ``-DWITH_SYSTEMD=ON`` is passed to the ``cmake`` command
+      execution.  Recipes that have ``CMakeLists.txt`` generally inherit the
+      :ref:`ref-classes-cmake` class, that runs ``cmake`` with
+      :term:`EXTRA_OECMAKE`, which :term:`PACKAGECONFIG_CONFARGS` will be
+      appended to.  Now, knowing that :term:`PACKAGECONFIG_CONFARGS` is
+      automatically filled with either the first or second element of
+      :term:`PACKAGECONFIG` flag value, the recipe would be like::
+
+         inherit cmake
+         PACKAGECONFIG = "systemd"
+         PACKAGECONFIG[systemd] = "-DWITH_SYSTEMD=ON,-DWITH_SYSTEMD=OFF"
+
+      A side note to this recipe is to check if ``systemd`` is in fact the used :term:`INIT_MANAGER`
+      or not::
+
+         PACKAGECONFIG = "${@'systemd' if d.getVar('INIT_MANAGER') == 'systemd' else ''}"
 
    :term:`PACKAGECONFIG_CONFARGS`
       A space-separated list of configuration options generated from the
@@ -6409,9 +6487,9 @@ system and gives an overview of their function and contents.
    :term:`POPULATE_SDK_POST_HOST_COMMAND`
       Specifies a list of functions to call once the OpenEmbedded build
       system has created the host part of the SDK. You can specify
-      functions separated by semicolons::
+      functions separated by spaces::
 
-          POPULATE_SDK_POST_HOST_COMMAND += "function; ... "
+          POPULATE_SDK_POST_HOST_COMMAND += "function"
 
       If you need to pass the SDK path to a command within a function, you
       can use ``${SDK_DIR}``, which points to the parent directory used by
@@ -6421,9 +6499,9 @@ system and gives an overview of their function and contents.
    :term:`POPULATE_SDK_POST_TARGET_COMMAND`
       Specifies a list of functions to call once the OpenEmbedded build
       system has created the target part of the SDK. You can specify
-      functions separated by semicolons::
+      functions separated by spaces::
 
-         POPULATE_SDK_POST_TARGET_COMMAND += "function; ... "
+         POPULATE_SDK_POST_TARGET_COMMAND += "function"
 
       If you need to pass the SDK path to a command within a function, you
       can use ``${SDK_DIR}``, which points to the parent directory used by
@@ -6568,9 +6646,8 @@ system and gives an overview of their function and contents.
       source, and then locations specified by
       :term:`MIRRORS` in that order.
 
-      Assuming your distribution (:term:`DISTRO`) is "poky",
-      the default value for :term:`PREMIRRORS` is defined in the
-      ``conf/distro/poky.conf`` file in the ``meta-poky`` Git repository.
+      The default value for :term:`PREMIRRORS` is defined in the
+      ``meta/classes-global/mirrors.bbclass`` file in the core metadata layer.
 
       Typically, you could add a specific server for the build system to
       attempt before any others by adding something like the following to
@@ -6910,12 +6987,58 @@ system and gives an overview of their function and contents.
       ":ref:`bitbake-user-manual/bitbake-user-manual-execution:dependencies`" sections in the
       BitBake User Manual for additional information on tasks and dependencies.
 
+   :term:`RECIPE_MAINTAINER`
+      This variable defines the name and e-mail address of the maintainer of a
+      recipe. Such information can be used by human users submitted changes,
+      and by automated tools to send notifications, for example about
+      vulnerabilities or source updates.
+
+      The variable can be defined in a global distribution :oe_git:`maintainers.inc
+      </openembedded-core/tree/meta/conf/distro/include/maintainers.inc>` file::
+
+          meta/conf/distro/include/maintainers.inc:RECIPE_MAINTAINER:pn-sysvinit = "Ross Burton <ross.burton@arm.com>"
+
+      It can also be directly defined in a recipe,
+      for example in the ``libgpiod`` one::
+
+          RECIPE_MAINTAINER = "Bartosz Golaszewski <brgl@bgdev.pl>"
+
    :term:`RECIPE_NO_UPDATE_REASON`
       If a recipe should not be replaced by a more recent upstream version,
       putting the reason why in this variable in a recipe allows
       ``devtool check-upgrade-status`` command to display it, as explained
       in the ":ref:`ref-manual/devtool-reference:checking on the upgrade status of a recipe`"
       section.
+
+   :term:`RECIPE_SYSROOT`
+      This variable points to the directory that holds all files populated from
+      recipes specified in :term:`DEPENDS`. As the name indicates,
+      think of this variable as a custom root (``/``) for the recipe that will be
+      used by the compiler in order to find headers and other files needed to complete
+      its job.
+
+      This variable is related to :term:`STAGING_DIR_HOST` or :term:`STAGING_DIR_TARGET`
+      according to the type of the recipe and the build target.
+
+      To better understand this variable, consider the following examples:
+
+      -  For ``#include <header.h>``, ``header.h`` should be in ``"${RECIPE_SYSROOT}/usr/include"``
+
+      -  For ``-lexample``, ``libexample.so`` should be in ``"${RECIPE_SYSROOT}/lib"``
+         or other library sysroot directories.
+
+      The default value is ``"${WORKDIR}/recipe-sysroot"``.
+      Do not modify it.
+
+   :term:`RECIPE_SYSROOT_NATIVE`
+      This is similar to :term:`RECIPE_SYSROOT` but the populated files are from
+      ``-native`` recipes. This allows a recipe built for the target machine to
+      use ``native`` tools.
+
+      This variable is related to :term:`STAGING_DIR_NATIVE`.
+
+      The default value is ``"${WORKDIR}/recipe-sysroot-native"``.
+      Do not modify it.
 
    :term:`REPODIR`
       See :term:`bitbake:REPODIR` in the BitBake manual.
@@ -6979,9 +7102,9 @@ system and gives an overview of their function and contents.
    :term:`ROOTFS_POSTINSTALL_COMMAND`
       Specifies a list of functions to call after the OpenEmbedded build
       system has installed packages. You can specify functions separated by
-      semicolons::
+      spaces::
 
-         ROOTFS_POSTINSTALL_COMMAND += "function; ... "
+         ROOTFS_POSTINSTALL_COMMAND += "function"
 
       If you need to pass the root filesystem path to a command within a
       function, you can use ``${IMAGE_ROOTFS}``, which points to the
@@ -6992,9 +7115,9 @@ system and gives an overview of their function and contents.
    :term:`ROOTFS_POSTPROCESS_COMMAND`
       Specifies a list of functions to call once the OpenEmbedded build
       system has created the root filesystem. You can specify functions
-      separated by semicolons::
+      separated by spaces::
 
-         ROOTFS_POSTPROCESS_COMMAND += "function; ... "
+         ROOTFS_POSTPROCESS_COMMAND += "function"
 
       If you need to pass the root filesystem path to a command within a
       function, you can use ``${IMAGE_ROOTFS}``, which points to the
@@ -7007,9 +7130,9 @@ system and gives an overview of their function and contents.
       system has removed unnecessary packages. When runtime package
       management is disabled in the image, several packages are removed
       including ``base-passwd``, ``shadow``, and ``update-alternatives``.
-      You can specify functions separated by semicolons::
+      You can specify functions separated by spaces::
 
-         ROOTFS_POSTUNINSTALL_COMMAND += "function; ... "
+         ROOTFS_POSTUNINSTALL_COMMAND += "function"
 
       If you need to pass the root filesystem path to a command within a
       function, you can use ``${IMAGE_ROOTFS}``, which points to the
@@ -7020,9 +7143,9 @@ system and gives an overview of their function and contents.
    :term:`ROOTFS_PREPROCESS_COMMAND`
       Specifies a list of functions to call before the OpenEmbedded build
       system has created the root filesystem. You can specify functions
-      separated by semicolons::
+      separated by spaces::
 
-         ROOTFS_PREPROCESS_COMMAND += "function; ... "
+         ROOTFS_PREPROCESS_COMMAND += "function"
 
       If you need to pass the root filesystem path to a command within a
       function, you can use ``${IMAGE_ROOTFS}``, which points to the
@@ -7297,13 +7420,16 @@ system and gives an overview of their function and contents.
       :term:`SDK_EXT_TYPE` is set to "full".
 
    :term:`SDK_NAME`
-      The base name for SDK output files. The name is derived from the
-      :term:`DISTRO`, :term:`TCLIBC`,
-      :term:`SDK_ARCH`,
-      :term:`IMAGE_BASENAME`, and
-      :term:`TUNE_PKGARCH` variables::
+      The base name for SDK output files. The default value (as set in
+      ``meta-poky/conf/distro/poky.conf``) is derived from the
+      :term:`DISTRO`,
+      :term:`TCLIBC`,
+      :term:`SDKMACHINE`,
+      :term:`IMAGE_BASENAME`,
+      :term:`TUNE_PKGARCH`, and
+      :term:`MACHINE` variables::
 
-         SDK_NAME = "${DISTRO}-${TCLIBC}-${SDK_ARCH}-${IMAGE_BASENAME}-${TUNE_PKGARCH}"
+         SDK_NAME = "${DISTRO}-${TCLIBC}-${SDKMACHINE}-${IMAGE_BASENAME}-${TUNE_PKGARCH}-${MACHINE}"
 
    :term:`SDK_OS`
       Specifies the operating system for which the SDK will be built. The
@@ -7334,7 +7460,9 @@ system and gives an overview of their function and contents.
    :term:`SDK_POSTPROCESS_COMMAND`
       Specifies a list of functions to call once the OpenEmbedded build
       system creates the SDK. You can specify functions separated by
-      semicolons: SDK_POSTPROCESS_COMMAND += "function; ... "
+      spaces:
+
+         SDK_POSTPROCESS_COMMAND += "function"
 
       If you need to pass an SDK path to a command within a function, you
       can use ``${SDK_DIR}``, which points to the parent directory used by
@@ -7515,23 +7643,6 @@ system and gives an overview of their function and contents.
       Use spaces to separate multiple devices::
 
          SERIAL_CONSOLES = "115200;ttyS0 115200;ttyS1"
-
-   :term:`SERIAL_CONSOLES_CHECK`
-      Specifies serial consoles, which must be listed in
-      :term:`SERIAL_CONSOLES`, to check against
-      ``/proc/console`` before enabling them using getty. This variable
-      allows aliasing in the format: <device>:<alias>. If a device was
-      listed as "sclp_line0" in ``/dev/`` and "ttyS0" was listed in
-      ``/proc/console``, you would do the following::
-
-         SERIAL_CONSOLES_CHECK = "slcp_line0:ttyS0"
-
-      This variable is currently only supported with SysVinit (i.e. not
-      with systemd). Note that :term:`SERIAL_CONSOLES_CHECK` also requires
-      ``/etc/inittab`` to be writable when used with SysVinit. This makes it
-      incompatible with customizations such as the following::
-
-         EXTRA_IMAGE_FEATURES += "read-only-rootfs"
 
    :term:`SETUPTOOLS_BUILD_ARGS`
       When used by recipes that inherit the :ref:`ref-classes-setuptools3`
@@ -8105,6 +8216,16 @@ system and gives an overview of their function and contents.
              file://.* https://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
              file://.* file:///some-local-dir/sstate/PATH"
 
+      The Yocto Project actually shares the cache data objects built by its
+      autobuilder::
+
+         SSTATE_MIRRORS ?= "file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH"
+
+      As such binary artifacts are built for the generic QEMU machines
+      supported by the various Poky releases, they are less likely to be
+      reusable in real projects building binaries optimized for a specific
+      CPU family.
+
    :term:`SSTATE_SCAN_FILES`
       Controls the list of files the OpenEmbedded build system scans for
       hardcoded installation paths. The variable uses a space-separated
@@ -8221,9 +8342,14 @@ system and gives an overview of their function and contents.
             for ``-native`` recipes, as they make use of host headers and
             libraries.
 
+      Check :term:`RECIPE_SYSROOT` and :term:`RECIPE_SYSROOT_NATIVE`.
+
    :term:`STAGING_DIR_NATIVE`
       Specifies the path to the sysroot directory used when building
       components that run on the build host itself.
+
+      The default value is ``"${RECIPE_SYSROOT_NATIVE}"``,
+      check :term:`RECIPE_SYSROOT_NATIVE`.
 
    :term:`STAGING_DIR_TARGET`
       Specifies the path to the sysroot used for the system for which the
@@ -8408,6 +8534,35 @@ system and gives an overview of their function and contents.
              ${datadir}/terminfo \
              ${libdir}/${BPN}/ptest \
              "
+
+      Consider the following example in which you need to manipulate this variable.
+      Assume you have a recipe ``A`` that provides a shared library ``.so.*`` that is
+      installed into a custom folder other than "``${libdir}``"
+      or "``${base_libdir}``", let's say "``/opt/lib``".
+
+      .. note::
+
+         This is not a recommended way to deal with shared libraries, but this
+         is just to show the usefulness of setting :term:`SYSROOT_DIRS`.
+
+      When a recipe ``B`` :term:`DEPENDS` on ``A``, it means what is in
+      :term:`SYSROOT_DIRS` will be copied from :term:`D` of the recipe ``B``
+      into ``B``'s :term:`SYSROOT_DESTDIR` that is "``${WORKDIR}/sysroot-destdir``".
+
+      Now, since ``/opt/lib`` is not in :term:`SYSROOT_DIRS`, it will never be copied to
+      ``A``'s :term:`RECIPE_SYSROOT`, which is "``${WORKDIR}/recipe-sysroot``". So,
+      the linking process will fail.
+
+      To fix this, you need to add ``/opt/lib`` to :term:`SYSROOT_DIRS`::
+
+         SYSROOT_DIRS:append = " /opt/lib"
+
+      .. note::
+         Even after setting ``/opt/lib`` to :term:`SYSROOT_DIRS`, the linking process will still fail
+         because the linker does not know that location, since :term:`TARGET_LDFLAGS`
+         doesn't contain it (if your recipe is for the target). Therefore, so you should add::
+
+            TARGET_LDFLAGS:append = " -L${RECIPE_SYSROOT}/opt/lib"
 
    :term:`SYSROOT_DIRS_NATIVE`
       Extra directories staged into the sysroot by the
@@ -9045,6 +9200,16 @@ system and gives an overview of their function and contents.
       This variable allows to extend what is installed in the host
       portion of an eSDK. This is similar to :term:`TOOLCHAIN_HOST_TASK`
       applying to SDKs.
+
+   :term:`TOOLCHAIN_OPTIONS`
+      This variable holds extra options passed to the compiler and the linker
+      for non ``-native`` recipes as they have to point to their custom
+      ``sysroot`` folder pointed to by :term:`RECIPE_SYSROOT`::
+
+         TOOLCHAIN_OPTIONS = " --sysroot=${RECIPE_SYSROOT}"
+
+      Native recipes don't need this variable to be set, as they are
+      built for the host machine with the native compiler.
 
    :term:`TOOLCHAIN_OUTPUTNAME`
       This variable defines the name used for the toolchain output. The

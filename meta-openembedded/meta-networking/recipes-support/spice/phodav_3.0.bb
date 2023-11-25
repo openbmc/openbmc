@@ -7,7 +7,6 @@ DEPENDS = " \
     libsoup \
 "
 
-GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = 'gtk_doc'
 GTKDOC_MESON_ENABLE_FLAG = 'enabled'
 GTKDOC_MESON_DISABLE_FLAG = 'disabled'

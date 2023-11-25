@@ -33,7 +33,13 @@ def create_selenium_driver(cls,browser='chrome'):
         browser = env_browser
 
     if browser == 'chrome':
-        return webdriver.Chrome()
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+        options.add_argument('--disable-infobars')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--remote-debugging-port=9222')
+        return webdriver.Chrome(options=options)
     elif browser == 'firefox':
         return webdriver.Firefox()
     elif browser == 'marionette':

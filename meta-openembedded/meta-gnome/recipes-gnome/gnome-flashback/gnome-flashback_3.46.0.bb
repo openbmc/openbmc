@@ -2,6 +2,7 @@ SUMMARY = "GNOME Flashback (GNOME 2) session"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
+GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gsettings gtk-icon-cache gettext upstream-version-is-even features_check
 
 REQUIRED_DISTRO_FEATURES = "x11 polkit systemd pam"

@@ -20,8 +20,8 @@ PIDPREFIX = "/tmp/PRServer_%s_%s.pid"
 singleton = None
 
 class PRServerClient(bb.asyncrpc.AsyncServerConnection):
-    def __init__(self, reader, writer, table, read_only):
-        super().__init__(reader, writer, 'PRSERVICE', logger)
+    def __init__(self, socket, table, read_only):
+        super().__init__(socket, 'PRSERVICE', logger)
         self.handlers.update({
             'get-pr': self.handle_get_pr,
             'import-one': self.handle_import_one,
@@ -36,12 +36,12 @@ class PRServerClient(bb.asyncrpc.AsyncServerConnection):
 
     async def dispatch_message(self, msg):
         try:
-            await super().dispatch_message(msg)
+            return await super().dispatch_message(msg)
         except:
             self.table.sync()
             raise
-
-        self.table.sync_if_dirty()
+        else:
+            self.table.sync_if_dirty()
 
     async def handle_get_pr(self, request):
         version = request['version']
@@ -57,7 +57,7 @@ class PRServerClient(bb.asyncrpc.AsyncServerConnection):
         except sqlite3.Error as exc:
             logger.error(str(exc))
 
-        self.write_message(response)
+        return response
 
     async def handle_import_one(self, request):
         response = None
@@ -71,7 +71,7 @@ class PRServerClient(bb.asyncrpc.AsyncServerConnection):
             if value is not None:
                 response = {'value': value}
 
-        self.write_message(response)
+        return response
 
     async def handle_export(self, request):
         version = request['version']
@@ -85,12 +85,10 @@ class PRServerClient(bb.asyncrpc.AsyncServerConnection):
             logger.error(str(exc))
             metainfo = datainfo = None
 
-        response = {'metainfo': metainfo, 'datainfo': datainfo}
-        self.write_message(response)
+        return {'metainfo': metainfo, 'datainfo': datainfo}
 
     async def handle_is_readonly(self, request):
-        response = {'readonly': self.read_only}
-        self.write_message(response)
+        return {'readonly': self.read_only}
 
 class PRServer(bb.asyncrpc.AsyncServer):
     def __init__(self, dbfile, read_only=False):
@@ -99,20 +97,23 @@ class PRServer(bb.asyncrpc.AsyncServer):
         self.table = None
         self.read_only = read_only
 
-    def accept_client(self, reader, writer):
-        return PRServerClient(reader, writer, self.table, self.read_only)
+    def accept_client(self, socket):
+        return PRServerClient(socket, self.table, self.read_only)
 
-    def _serve_forever(self):
+    def start(self):
+        tasks = super().start()
         self.db = prserv.db.PRData(self.dbfile, read_only=self.read_only)
         self.table = self.db["PRMAIN"]
 
         logger.info("Started PRServer with DBfile: %s, Address: %s, PID: %s" %
                      (self.dbfile, self.address, str(os.getpid())))
 
-        super()._serve_forever()
+        return tasks
 
+    async def stop(self):
         self.table.sync_if_dirty()
         self.db.disconnect()
+        await super().stop()
 
     def signal_handler(self):
         super().signal_handler()
@@ -129,7 +130,7 @@ class PRServSingleton(object):
     def start(self):
         self.prserv = PRServer(self.dbfile)
         self.prserv.start_tcp_server(socket.gethostbyname(self.host), self.port)
-        self.process = self.prserv.serve_as_process()
+        self.process = self.prserv.serve_as_process(log_level=logging.WARNING)
 
         if not self.prserv.address:
             raise PRServiceConfigError
@@ -344,9 +345,9 @@ def auto_shutdown():
 def ping(host, port):
     from . import client
 
-    conn = client.PRClient()
-    conn.connect_tcp(host, port)
-    return conn.ping()
+    with client.PRClient() as conn:
+        conn.connect_tcp(host, port)
+        return conn.ping()
 
 def connect(host, port):
     from . import client

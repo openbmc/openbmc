@@ -148,6 +148,9 @@ IMAGE_BOOT_FILES ?= "${BOOTFILES_DIR_NAME}/* \
                  ${@make_dtb_boot_files(d)} \
                  ${RPI_EXTRA_IMAGE_BOOT_FILES} \
                  "
+
+EXTRA_IMAGEDEPENDS += "rpi-bootfiles"
+
 do_image_wic[depends] += " \
     virtual/kernel:do_deploy \
     rpi-bootfiles:do_deploy \

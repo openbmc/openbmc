@@ -45,7 +45,7 @@ DEPENDS:append:libc-musl = " fts "
 
 # flex hardcodes the input file in #line directives leading to TMPDIR contamination of debug sources.
 do_compile:append() {
-    find ${B} -name '*.c' -or -name '*.h' | xargs sed -i -e 's|${TMPDIR}|/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/|g'
+    find ${B} -name '*.c' -or -name '*.h' | xargs sed -i -e 's|${TMPDIR}|${TARGET_DBGSRC_DIR}/|g'
 }
 
 PACKAGECONFIG ?= "yaml"
@@ -88,5 +88,5 @@ inherit cmake systemd pkgconfig
 
 SYSTEMD_SERVICE:${PN} = "td-agent-bit.service"
 
-EXTRA_OECMAKE += "-DCMAKE_DEBUG_SRCDIR=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}/"
+EXTRA_OECMAKE += "-DCMAKE_DEBUG_SRCDIR=${TARGET_DBGSRC_DIR}/"
 TARGET_CC_ARCH += " ${SELECTED_OPTIMIZATION}"
