@@ -45,6 +45,7 @@ inherit pkgconfig meson \
         phosphor-debug-collector
 
 EXTRA_OEMESON = " \
+    -Dtests=disabled \
     -DBMC_DUMP_PATH=${bmc_dump_path} \
     -DERROR_MAP_YAML=${STAGING_DIR_NATIVE}/${datadir}/dump/errors_watch.yaml \
     "
