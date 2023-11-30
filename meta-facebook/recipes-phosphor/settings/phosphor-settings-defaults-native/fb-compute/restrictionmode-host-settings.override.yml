@@ -2,4 +2,4 @@
     - Interface: xyz.openbmc_project.Control.Security.RestrictionMode
       Properties:
           RestrictionMode:
-              Default: RestrictionMode::Modes::Whitelist
+              Default: RestrictionMode::Modes::Allowlist
