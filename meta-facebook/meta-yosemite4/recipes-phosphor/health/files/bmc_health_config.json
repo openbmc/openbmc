@@ -1,0 +1,60 @@
+{
+  "CPU" : {
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+        "Critical":
+        {
+            "Value": "CPU_CRIT_VAL",
+            "Log": true,
+            "Target": ""
+        },
+        "Warning":
+        {
+            "Value": "CPU_WARN_VAL",
+            "Log": true,
+            "Target": "CPU_WARN_TGT"
+        }
+    }
+  },
+  "Memory" : {
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+        "Critical":
+        {
+            "Value": "MEM_CRIT_VAL",
+            "Log": true,
+            "Target": "MEM_CRIT_TGT"
+        },
+        "Warning":
+        {
+            "Value": "MEM_WARN_VAL",
+            "Log": true,
+            "Target": "MEM_WARN_TGT"
+        }
+    }
+  },
+  "Storage_RW" : {
+    "Path" : "/run/initramfs/rw",
+    "Frequency" : 1,
+    "Window_size": 120,
+    "Threshold":
+    {
+        "Critical":
+        {
+            "Value": "STORAGE_CRIT_VAL",
+            "Log": true,
+            "Target": "STORAGE_CRIT_TGT"
+        },
+        "Warning":
+        {
+            "Value": "STORAGE_WARN_VAL",
+            "Log": true,
+            "Target": "STORAGE_WARN_TGT"
+        }
+    }
+  }
+}
