@@ -57,6 +57,11 @@ FILES:${PN}-dev += "${base_libdir}/security/*.la ${base_libdir}/*.la ${base_libd
 FILES:${PN}-runtime = "${sysconfdir} ${sbindir} ${systemd_system_unitdir}"
 FILES:${PN}-xtests = "${datadir}/Linux-PAM/xtests"
 
+# libpam installs /etc/environment for use with the pam_env plugin. Make sure it is
+# packaged with the pam-plugin-env package to avoid breaking installations which
+# install that file via other packages
+FILES:pam-plugin-env = "${sysconfdir}/environment"
+
 PACKAGES_DYNAMIC += "^${MLPREFIX}pam-plugin-.*"
 
 def get_multilib_bit(d):
@@ -113,7 +118,7 @@ python populate_packages:prepend () {
     pam_pkgname = mlprefix + 'pam-plugin%s'
 
     do_split_packages(d, pam_libdir, r'^pam(.*)\.so$', pam_pkgname,
-                      'PAM plugin for %s', hook=pam_plugin_hook, extra_depends='')
+                      'PAM plugin for %s', hook=pam_plugin_hook, extra_depends='', prepend=True)
     do_split_packages(d, pam_filterdir, r'^(.*)$', 'pam-filter-%s', 'PAM filter for %s', extra_depends='')
 }
 

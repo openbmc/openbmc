@@ -16,7 +16,7 @@ SRC_URI = "git://github.com/nlohmann/json.git;branch=develop;protocol=https \
 SRCREV = "bc889afb4c5bf1c0d8ee29ef35eaaf4c8bef8a5d"
 SRCREV_json-test-data = "a1375cea09d27cc1c4cadb8d00470375b421ac37"
 
-SRCREV_FORMAT = "json-test-data"
+SRCREV_FORMAT .= "_json-test-data"
 
 S = "${WORKDIR}/git"
 
@@ -36,6 +36,7 @@ do_install_ptest () {
     install -d ${D}${PTEST_PATH}/tests
     cp -r ${S}/json_test_data/ ${D}${PTEST_PATH}/
     cp -r ${B}/tests/test-* ${D}${PTEST_PATH}/tests
+    rm -rf ${D}${PTEST_PATH}/json_test_data/.git
 }
 
 

@@ -1,6 +1,6 @@
-From 2cc19a679ec37715df546dd9f00d8d9b0ab20059 Mon Sep 17 00:00:00 2001
+From cffb4807ac0b9ff7aea2aa4f3842985b5363d184 Mon Sep 17 00:00:00 2001
 From: Luca Fancellu <luca.fancellu@arm.com>
-Date: Wed, 18 Oct 2023 11:10:18 +0100
+Date: Mon, 23 Oct 2023 10:43:43 +0100
 Subject: [PATCH] linuxptp: Use ${CC} in incdefs.sh
 
 The Makefile is defining CC and incdefs.sh is using
@@ -8,13 +8,14 @@ ${CROSS_COMPILE}cpp inside it, allowing both to use different
 compilers depending on what the user pass during make invocation
 as CC.
 
-Align them using ${CC} also inside incdefs.sh
+Align them using ${CC} also inside incdefs.sh.
 
 Signed-off-by: Luca Fancellu <luca.fancellu@arm.com>
-Upstream-Status: Pending
+Upstream-Status: Backport [master: cffb4807ac0b9ff7aea2aa4f3842985b5363d184]
 ---
  incdefs.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ makefile   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/incdefs.sh b/incdefs.sh
 index a9e94f777f6b..391e63c7fac6 100755
@@ -29,6 +30,19 @@ index a9e94f777f6b..391e63c7fac6 100755
  
  	# Look for clock_adjtime().
  	for d in $dirs; do
+diff --git a/makefile b/makefile
+index 3e3b8b35fc96..7fc5f6fb8fa8 100644
+--- a/makefile
++++ b/makefile
+@@ -39,7 +39,7 @@ OBJECTS	= $(OBJ) hwstamp_ctl.o nsm.o phc2sys.o phc_ctl.o pmc.o pmc_agent.o \
+ SRC	= $(OBJECTS:.o=.c)
+ DEPEND	= $(OBJECTS:.o=.d)
+ srcdir	:= $(dir $(lastword $(MAKEFILE_LIST)))
+-incdefs := $(shell $(srcdir)/incdefs.sh)
++incdefs := $(shell CC="$(CC)" $(srcdir)/incdefs.sh)
+ version := $(shell $(srcdir)/version.sh $(srcdir))
+ VPATH	= $(srcdir)
+ 
 -- 
 2.34.1
 

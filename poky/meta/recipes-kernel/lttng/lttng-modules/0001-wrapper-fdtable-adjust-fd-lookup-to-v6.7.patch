@@ -1,0 +1,35 @@
+From 76e4ea0c33a8c7726c0df28083d5c8bc1c1335e8 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Thu, 23 Nov 2023 13:49:51 -0500
+Subject: [PATCH] wrapper/fdtable: adjust fd lookup to v6.7+
+
+commit 0ede61d8589cc2d93 [file: convert to SLAB_TYPESAFE_BY_RCU]
+renames lookup_fd_rcu to lookup_fdget_rcu, so we need to
+version adjust the fdtable wrapper accordingly.
+
+Upstream-Status: Submitted [https://lists.lttng.org/pipermail/lttng-dev/2023-November/030667.html]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ include/wrapper/fdtable.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/wrapper/fdtable.h b/include/wrapper/fdtable.h
+index fa5f7207..aaf2b9e7 100644
+--- a/include/wrapper/fdtable.h
++++ b/include/wrapper/fdtable.h
+@@ -16,7 +16,11 @@
+ static inline
+ struct file *lttng_lookup_fd_rcu(unsigned int fd)
+ {
++#if (LTTNG_LINUX_VERSION_CODE < LTTNG_KERNEL_VERSION(6,7,0))
+ 	return lookup_fd_rcu(fd);
++#else
++	return lookup_fdget_rcu(fd);
++#endif
+ }
+ #else
+ static inline
+-- 
+2.34.1
+

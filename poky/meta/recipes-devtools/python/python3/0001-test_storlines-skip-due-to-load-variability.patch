@@ -1,0 +1,32 @@
+From 013ff01fdf2aa6ca69a7c80a2a2996630877e4ea Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 6 Oct 2023 10:59:44 -0400
+Subject: [PATCH] test_storlines: skip due to load variability
+
+This is yet another test that intermittently fails on the Yocto AB when
+a worker is under heavy load, so skip it during testing.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+[YOCTO #14933]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ Lib/test/test_ftplib.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/test/test_ftplib.py b/Lib/test/test_ftplib.py
+index 082a90d46b..508814d56a 100644
+--- a/Lib/test/test_ftplib.py
++++ b/Lib/test/test_ftplib.py
+@@ -629,6 +629,7 @@ def test_storbinary_rest(self):
+             self.client.storbinary('stor', f, rest=r)
+             self.assertEqual(self.server.handler_instance.rest, str(r))
+ 
++    @unittest.skip('timing related test, dependent on load')
+     def test_storlines(self):
+         data = RETR_DATA.replace('\r\n', '\n').encode(self.client.encoding)
+         f = io.BytesIO(data)
+-- 
+2.41.0
+

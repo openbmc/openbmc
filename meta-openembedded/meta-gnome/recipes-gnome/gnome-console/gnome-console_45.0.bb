@@ -14,7 +14,7 @@ DEPENDS = " \
     libadwaita \
     libgtop \
     pcre2 \
-    vte9 \
+    vte \
 "
 
 SRC_URI[archive.sha256sum] = "e7462128d2df2324a1d748062c40429cd0504af09e407067b33f3a9d0c59c8e1"

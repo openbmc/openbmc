@@ -52,6 +52,10 @@ GTKDOC_MESON_OPTION = 'gtk_doc'
 GTKDOC_MESON_ENABLE_FLAG = 'enabled'
 GTKDOC_MESON_DISABLE_FLAG = 'disabled'
 
+do_configure:prepend() {
+	echo ${PV} > ${S}/.tarball-version
+}
+
 PACKAGECONFIG ??= "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)} smartcard"
 PACKAGECONFIG[vapi] = "-Dvapi=enabled,-Dvapi=disabled"
 PACKAGECONFIG[smartcard] = "-Dsmartcard=enabled,-Dsmartcard=disabled,libcacard"

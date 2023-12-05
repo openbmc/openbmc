@@ -180,7 +180,7 @@ To build an initramfs image:
   - `INITRAMFS_IMAGE_BUNDLE = "1"`
   - `BOOT_SPACE = "1073741"`
   - `INITRAMFS_MAXSIZE = "315400"`
-  - `IMAGE_FSTYPES_pn-${INITRAMFS_IMAGE} = "${INITRAMFS_FSTYPES}"`
+  - `IMAGE_FSTYPES:pn-${INITRAMFS_IMAGE} = "${INITRAMFS_FSTYPES}"`
 
 ## Including additional files in the SD card image boot partition
 

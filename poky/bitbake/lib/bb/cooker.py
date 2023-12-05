@@ -102,12 +102,15 @@ class CookerFeatures(object):
 
 class EventWriter:
     def __init__(self, cooker, eventfile):
-        self.file_inited = None
         self.cooker = cooker
         self.eventfile = eventfile
         self.event_queue = []
 
-    def write_event(self, event):
+    def write_variables(self):
+        with open(self.eventfile, "a") as f:
+            f.write("%s\n" % json.dumps({ "allvariables" : self.cooker.getAllKeysWithFlags(["doc", "func"])}))
+
+    def send(self, event):
         with open(self.eventfile, "a") as f:
             try:
                 str_event = codecs.encode(pickle.dumps(event), 'base64').decode('utf-8')
@@ -117,28 +120,6 @@ class EventWriter:
                 import traceback
                 print(err, traceback.format_exc())
 
-    def send(self, event):
-        if self.file_inited:
-            # we have the file, just write the event
-            self.write_event(event)
-        else:
-            # init on bb.event.BuildStarted
-            name = "%s.%s" % (event.__module__, event.__class__.__name__)
-            if name in ("bb.event.BuildStarted", "bb.cooker.CookerExit"):
-                with open(self.eventfile, "w") as f:
-                    f.write("%s\n" % json.dumps({ "allvariables" : self.cooker.getAllKeysWithFlags(["doc", "func"])}))
-
-                self.file_inited = True
-
-                # write pending events
-                for evt in self.event_queue:
-                    self.write_event(evt)
-
-                # also write the current event
-                self.write_event(event)
-            else:
-                # queue all events until the file is inited
-                self.event_queue.append(event)
 
 #============================================================================#
 # BBCooker
@@ -416,6 +397,7 @@ class BBCooker:
     def setupEventLog(self, eventlog):
         if self.eventlog and self.eventlog[0] != eventlog:
             bb.event.unregister_UIHhandler(self.eventlog[1])
+            self.eventlog = None
         if not self.eventlog or self.eventlog[0] != eventlog:
             # we log all events to a file if so directed
             # register the log file writer as UI Handler
@@ -423,7 +405,7 @@ class BBCooker:
                 bb.utils.mkdirhier(os.path.dirname(eventlog))
             writer = EventWriter(self, eventlog)
             EventLogWriteHandler = namedtuple('EventLogWriteHandler', ['event'])
-            self.eventlog = (eventlog, bb.event.register_UIHhandler(EventLogWriteHandler(writer)))
+            self.eventlog = (eventlog, bb.event.register_UIHhandler(EventLogWriteHandler(writer)), writer)
 
     def updateConfigOpts(self, options, environment, cmdline):
         self.ui_cmdline = cmdline
@@ -1404,6 +1386,8 @@ class BBCooker:
         buildname = self.databuilder.mcdata[mc].getVar("BUILDNAME")
         if fireevents:
             bb.event.fire(bb.event.BuildStarted(buildname, [item]), self.databuilder.mcdata[mc])
+            if self.eventlog:
+                self.eventlog[2].write_variables()
             bb.event.enable_heartbeat()
 
         # Execute the runqueue
@@ -1547,6 +1531,8 @@ class BBCooker:
 
         for mc in self.multiconfigs:
             bb.event.fire(bb.event.BuildStarted(buildname, ntargets), self.databuilder.mcdata[mc])
+        if self.eventlog:
+            self.eventlog[2].write_variables()
         bb.event.enable_heartbeat()
 
         rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)

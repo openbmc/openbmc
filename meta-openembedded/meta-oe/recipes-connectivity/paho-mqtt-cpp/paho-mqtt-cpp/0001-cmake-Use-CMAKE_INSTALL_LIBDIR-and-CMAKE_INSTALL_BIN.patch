@@ -8,7 +8,7 @@ This ensures the install paths are not hardcoded.
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
 Upstream-Status: Pending
-
+---
  cmake/CMakeLists.txt       | 4 ++--
  src/samples/CMakeLists.txt | 4 ++--
  2 files changed, 4 insertions(+), 4 deletions(-)
@@ -33,19 +33,27 @@ index a9f8908..7eadc60 100644
 -    DESTINATION lib/cmake/${package_name})
 +    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name})
 diff --git a/src/samples/CMakeLists.txt b/src/samples/CMakeLists.txt
-index 953f5dc..d26729a 100644
+index 3ca0a75..c915cd5 100644
 --- a/src/samples/CMakeLists.txt
 +++ b/src/samples/CMakeLists.txt
-@@ -103,7 +103,7 @@ endif()
+@@ -71,7 +71,7 @@ endforeach()
  
  ## install binaries
- install(TARGETS ${INSTALL_TARGETS} EXPORT PahoMqttCppSamples
--	RUNTIME DESTINATION bin
--	LIBRARY DESTINATION lib
-+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+ install(TARGETS ${EXECUTABLES} EXPORT PahoMqttCppSamples
+-  RUNTIME DESTINATION bin
++  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
  )
  
+ ## Build the SSL/TLS samples, if selected
+@@ -89,7 +89,7 @@ if(PAHO_WITH_SSL)
+   endforeach()
+ 
+   install(TARGETS ${SSL_EXECUTABLES} EXPORT PahoMqttCppSamples
+-    RUNTIME DESTINATION bin
++    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   )
+ endif()
+ 
 -- 
-2.35.1
+2.34.1
 

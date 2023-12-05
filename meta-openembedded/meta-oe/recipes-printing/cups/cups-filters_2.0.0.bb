@@ -5,7 +5,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6d5b952b53dbe7752199903d082e5f07"
 
 DEPENDS = "libcupsfilters libppd glib-2.0 poppler"
 
-SRC_URI = "https://github.com/OpenPrinting/${BPN}/releases/download/${PV}/${BP}.tar.xz"
+SRC_URI = " \
+	https://github.com/OpenPrinting/${BPN}/releases/download/${PV}/${BP}.tar.xz \
+	file://fix-make-race.patch \
+"
 SRC_URI[sha256sum] = "b5152e3dd148ed73835827ac2f219df7cf5808dbf9dbaec2aa0127b44de800d8"
 
 inherit autotools gettext pkgconfig github-releases

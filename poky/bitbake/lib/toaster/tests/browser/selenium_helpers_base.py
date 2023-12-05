@@ -71,7 +71,9 @@ class Wait(WebDriverWait):
     _TIMEOUT = 10
     _POLL_FREQUENCY = 0.5
 
-    def __init__(self, driver):
+    def __init__(self, driver, timeout=_TIMEOUT, poll=_POLL_FREQUENCY):
+        self._TIMEOUT = timeout
+        self._POLL_FREQUENCY = poll
         super(Wait, self).__init__(driver, self._TIMEOUT, self._POLL_FREQUENCY)
 
     def until(self, method, message=''):
@@ -175,18 +177,19 @@ class SeleniumTestCaseBase(unittest.TestCase):
         """ Return the element which currently has focus on the page """
         return self.driver.switch_to.active_element
 
-    def wait_until_present(self, selector):
+    def wait_until_present(self, selector, poll=0.5):
         """ Wait until element matching CSS selector is on the page """
         is_present = lambda driver: self.find(selector)
         msg = 'An element matching "%s" should be on the page' % selector
-        element = Wait(self.driver).until(is_present, msg)
+        element = Wait(self.driver, poll=poll).until(is_present, msg)
         return element
 
-    def wait_until_visible(self, selector):
+    def wait_until_visible(self, selector, poll=1):
         """ Wait until element matching CSS selector is visible on the page """
         is_visible = lambda driver: self.find(selector).is_displayed()
         msg = 'An element matching "%s" should be visible' % selector
-        Wait(self.driver).until(is_visible, msg)
+        Wait(self.driver, poll=poll).until(is_visible, msg)
+        time.sleep(poll)  # wait for visibility to settle
         return self.find(selector)
 
     def wait_until_focused(self, selector):

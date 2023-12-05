@@ -1,7 +1,7 @@
-From d4699d2169fe2d91d0f1f4369d40d2e5f42b8877 Mon Sep 17 00:00:00 2001
+From 465e3ef77f1763d225adc76220e43ee9bd73b178 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 17 May 2022 10:56:59 +0200
-Subject: [PATCH 2/4] iptables/xshared.h: add missing sys.types.h include
+Subject: [PATCH] iptables/xshared.h: add missing sys.types.h include
 
 This resolves the build error under musl:
 
@@ -12,12 +12,13 @@ This resolves the build error under musl:
 
 Upstream-Status: Submitted [via email to phil@nwl.cc]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  iptables/xshared.h | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/iptables/xshared.h b/iptables/xshared.h
-index 0ed9f3c2..b1413834 100644
+index a200e0d..f543dbf 100644
 --- a/iptables/xshared.h
 +++ b/iptables/xshared.h
 @@ -6,6 +6,7 @@
@@ -28,6 +29,3 @@ index 0ed9f3c2..b1413834 100644
  #include <linux/netfilter_arp/arp_tables.h>
  #include <linux/netfilter_ipv4/ip_tables.h>
  #include <linux/netfilter_ipv6/ip6_tables.h>
--- 
-2.30.2
-

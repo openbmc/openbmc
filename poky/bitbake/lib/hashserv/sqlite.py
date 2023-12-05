@@ -109,11 +109,11 @@ class DatabaseEngine(object):
             )
 
     def connect(self, logger):
-        return Database(logger, self.dbname)
+        return Database(logger, self.dbname, self.sync)
 
 
 class Database(object):
-    def __init__(self, logger, dbname, sync=True):
+    def __init__(self, logger, dbname, sync):
         self.dbname = dbname
         self.logger = logger
 
@@ -121,6 +121,11 @@ class Database(object):
         self.db.row_factory = sqlite3.Row
 
         with closing(self.db.cursor()) as cursor:
+            cursor.execute("PRAGMA journal_mode = WAL")
+            cursor.execute(
+                "PRAGMA synchronous = %s" % ("NORMAL" if sync else "OFF")
+            )
+
             cursor.execute("SELECT sqlite_version()")
 
             version = []

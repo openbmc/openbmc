@@ -1,4 +1,4 @@
-From c21adbb0b230ffba97cf5d059e2bd024e13a37df Mon Sep 17 00:00:00 2001
+From 38e7e90cc2075952c1b74f5fca826f9c6cadb2f0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 22 Apr 2017 11:54:57 -0700
 Subject: [PATCH] configure: Check for -Wno-error=format-truncation compiler
@@ -13,8 +13,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
 Upstream-Status: Pending
 
- acinclude/ax_check_compile_flag.m4 | 74 ++++++++++++++++++++++++++++++++++++++
- configure.ac                       |  2 ++
+ acinclude/ax_check_compile_flag.m4 | 74 ++++++++++++++++++++++++++++++
+ configure.ac                       |  2 +
  2 files changed, 76 insertions(+)
  create mode 100644 acinclude/ax_check_compile_flag.m4
 
@@ -99,20 +99,20 @@ index 0000000..dcabb92
 +AS_VAR_POPDEF([CACHEVAR])dnl
 +])dnl AX_CHECK_COMPILE_FLAGS
 diff --git a/configure.ac b/configure.ac
-index ff4688c..9382fdf 100644
+index 2543676..4635474 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -26,6 +26,7 @@ m4_include([acinclude/pkg.m4])
+@@ -28,6 +28,7 @@ m4_include([acinclude/pkg.m4])
+ m4_include([acinclude/tdb.m4])
  m4_include([acinclude/lib-checks.m4])
- m4_include([acinclude/ax_cxx_compile_stdcxx_11.m4])
- m4_include([acinclude/ax_cxx_0x_types.m4])
+ m4_include([acinclude/ax_cxx_compile_stdcxx.m4])
 +m4_include([acinclude/ax_check_compile_flag.m4])
  
  HOSTCXX="$BUILD_CXX"
  PRESET_CFLAGS="$CFLAGS"
-@@ -44,6 +45,7 @@ AC_PROG_CXX
+@@ -59,6 +60,7 @@ AC_USE_SYSTEM_EXTENSIONS
+ 
  AC_LANG([C++])
- AC_CANONICAL_HOST
  
 +AX_CHECK_COMPILE_FLAG([-Werror=format-truncation],[CFLAGS="$CFLAGS -Wno-error=format-truncation" CXXFLAGS="$CXXFLAGS -Wno-error=format-truncation"])
  # Clang 3.2 on some CPUs requires -march-native to detect correctly.

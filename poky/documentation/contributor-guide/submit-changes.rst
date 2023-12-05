@@ -460,7 +460,7 @@ or any layer other than :oe_git:`openembedded-core </openembedded-core/>`,
 please add the appropriate prefix so that it is clear which layer the patch is intended
 to be applied to::
 
-   git send-email --subject-prefix="meta-oe][PATCH" ...
+   git format-patch --subject-prefix="meta-oe][PATCH" ...
 
 .. note::
 

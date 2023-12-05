@@ -461,41 +461,43 @@ class GitApplyTree(PatchTree):
         return (tmpfile, cmd)
 
     @staticmethod
-    def extractPatches(tree, startcommit, outdir, paths=None):
+    def extractPatches(tree, startcommits, outdir, paths=None):
         import tempfile
         import shutil
         tempdir = tempfile.mkdtemp(prefix='oepatch')
         try:
-            shellcmd = ["git", "format-patch", "--no-signature", "--no-numbered", startcommit, "-o", tempdir]
-            if paths:
-                shellcmd.append('--')
-                shellcmd.extend(paths)
-            out = runcmd(["sh", "-c", " ".join(shellcmd)], tree)
-            if out:
-                for srcfile in out.split():
-                    for encoding in ['utf-8', 'latin-1']:
-                        patchlines = []
-                        outfile = None
-                        try:
-                            with open(srcfile, 'r', encoding=encoding) as f:
-                                for line in f:
-                                    if line.startswith(GitApplyTree.patch_line_prefix):
-                                        outfile = line.split()[-1].strip()
-                                        continue
-                                    if line.startswith(GitApplyTree.ignore_commit_prefix):
-                                        continue
-                                    patchlines.append(line)
-                        except UnicodeDecodeError:
-                            continue
-                        break
-                    else:
-                        raise PatchError('Unable to find a character encoding to decode %s' % srcfile)
+            for name, rev in startcommits.items():
+                shellcmd = ["git", "format-patch", "--no-signature", "--no-numbered", rev, "-o", tempdir]
+                if paths:
+                    shellcmd.append('--')
+                    shellcmd.extend(paths)
+                out = runcmd(["sh", "-c", " ".join(shellcmd)], os.path.join(tree, name))
+                if out:
+                    for srcfile in out.split():
+                        for encoding in ['utf-8', 'latin-1']:
+                            patchlines = []
+                            outfile = None
+                            try:
+                                with open(srcfile, 'r', encoding=encoding) as f:
+                                    for line in f:
+                                        if line.startswith(GitApplyTree.patch_line_prefix):
+                                            outfile = line.split()[-1].strip()
+                                            continue
+                                        if line.startswith(GitApplyTree.ignore_commit_prefix):
+                                            continue
+                                        patchlines.append(line)
+                            except UnicodeDecodeError:
+                                continue
+                            break
+                        else:
+                            raise PatchError('Unable to find a character encoding to decode %s' % srcfile)
 
-                    if not outfile:
-                        outfile = os.path.basename(srcfile)
-                    with open(os.path.join(outdir, outfile), 'w') as of:
-                        for line in patchlines:
-                            of.write(line)
+                        if not outfile:
+                            outfile = os.path.basename(srcfile)
+                        bb.utils.mkdirhier(os.path.join(outdir, name))
+                        with open(os.path.join(outdir, name, outfile), 'w') as of:
+                            for line in patchlines:
+                                of.write(line)
         finally:
             shutil.rmtree(tempdir)
 

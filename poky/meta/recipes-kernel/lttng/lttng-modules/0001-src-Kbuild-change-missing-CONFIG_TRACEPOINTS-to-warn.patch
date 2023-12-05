@@ -19,10 +19,10 @@ Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
  src/Kbuild | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/src/Kbuild b/src/Kbuild
-index 7137874..04eb5c9 100644
---- a/src/Kbuild
-+++ b/src/Kbuild
+Index: lttng-modules-2.13.10/src/Kbuild
+===================================================================
+--- lttng-modules-2.13.10.orig/src/Kbuild
++++ lttng-modules-2.13.10/src/Kbuild
 @@ -2,10 +2,13 @@
  
  ifdef CONFIG_LOCALVERSION	# Check if dot-config is included.
@@ -38,7 +38,7 @@ index 7137874..04eb5c9 100644
  TOP_LTTNG_MODULES_DIR := $(shell dirname $(lastword $(MAKEFILE_LIST)))/..
  
  lttng_check_linux_version = $(shell pwd)/include/linux/version.h
-@@ -150,3 +153,5 @@ lttng-statedump-objs := lttng-statedump-impl.o
+@@ -150,3 +153,5 @@ lttng-statedump-objs := lttng-statedump-
  obj-$(CONFIG_LTTNG) += probes/
  obj-$(CONFIG_LTTNG) += lib/
  obj-$(CONFIG_LTTNG) += tests/

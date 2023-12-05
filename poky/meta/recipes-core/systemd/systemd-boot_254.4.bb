@@ -8,6 +8,10 @@ DEPENDS = "intltool-native libcap util-linux gperf-native python3-jinja2-native 
 inherit meson pkgconfig gettext
 inherit deploy
 
+SRC_URI += " \
+           file://0030-meson-Pass-all-static-pie-args-to-linker.patch \
+           "
+
 LDFLAGS:prepend = "${@ " ".join(d.getVar('LD').split()[1:])} "
 
 EFI_LD = "bfd"

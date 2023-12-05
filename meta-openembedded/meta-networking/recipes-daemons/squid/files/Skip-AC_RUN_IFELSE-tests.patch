@@ -1,4 +1,4 @@
-From e4778299a3e49a634d2c7fe4fd9ac77777e829e3 Mon Sep 17 00:00:00 2001
+From 050f8ab275a7a5f3d94045da6b15a2b63dfbeb3f Mon Sep 17 00:00:00 2001
 From: Jim Somerville <Jim.Somerville@windriver.com>
 Date: Tue, 14 Oct 2014 02:56:08 -0400
 Subject: [PATCH] Skip AC_RUN_IFELSE tests
@@ -17,10 +17,10 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  2 files changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/acinclude/krb5.m4 b/acinclude/krb5.m4
-index ad0ba60..4477446 100644
+index 2c4e340..64648e3 100644
 --- a/acinclude/krb5.m4
 +++ b/acinclude/krb5.m4
-@@ -61,7 +61,15 @@ main(void)
+@@ -57,7 +57,15 @@ main(void)
  
          return 0;
  }
@@ -35,13 +35,13 @@ index ad0ba60..4477446 100644
 +     dnl Can't test in cross compiled env - so assume good
 +     squid_cv_broken_heimdal_krb5_h=no
      ])
+     SQUID_STATE_ROLLBACK(squid_krb5_heimdal_test)
    ])
- ]) dnl SQUID_CHECK_KRB5_HEIMDAL_BROKEN_KRB5_H
 diff --git a/acinclude/lib-checks.m4 b/acinclude/lib-checks.m4
-index 1e9333527c..2d42787029 100644
+index 53847a8..850322a 100644
 --- a/acinclude/lib-checks.m4
 +++ b/acinclude/lib-checks.m4
-@@ -227,7 +227,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_CONST_SSL_METHOD],[
+@@ -205,7 +205,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_CONST_SSL_METHOD],[
    [
     AC_MSG_RESULT([no])
    ],
@@ -52,15 +52,14 @@ index 1e9333527c..2d42787029 100644
  
  SQUID_STATE_ROLLBACK(check_const_SSL_METHOD)
  ])
-@@ -386,8 +386,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_TXTDB],[
-   [
-    AC_MSG_RESULT([yes])
-    AC_DEFINE(SQUID_USE_SSLLHASH_HACK, 1)
--  ],
--[])
+@@ -347,7 +349,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_TXTDB],[
+   ],[
+     AC_MSG_RESULT([yes])
+     AC_DEFINE(SQUID_USE_SSLLHASH_HACK, 1)
+-  ],[])
 +  ],[
 +    AC_MSG_RESULT([skipped - can't test in cross-compiled env])
 +  ])
  
- SQUID_STATE_ROLLBACK(check_TXTDB)
+   SQUID_STATE_ROLLBACK(check_TXTDB)
  ])

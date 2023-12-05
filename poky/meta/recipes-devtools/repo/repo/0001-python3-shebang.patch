@@ -19,8 +19,8 @@ index b13e34c..205e0e5 100755
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
- # -*- coding:utf-8 -*-
  #
  # Copyright (C) 2008 The Android Open Source Project
+ #
 --
 2.33.0

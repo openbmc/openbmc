@@ -1,0 +1,684 @@
+From ee5c8b494a3269edd154a0b799a03b39dba2ceb0 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 25 Feb 2019 14:18:21 +0800
+Subject: [PATCH] src/basic/missing.h: check for missing strndupa
+
+include missing.h  for definition of strndupa
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[Rebased for v242]
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+[rebased for systemd 244]
+[Rebased for v247]
+Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
+[Rebased for v254]
+---
+ meson.build                                |  1 +
+ src/backlight/backlight.c                  |  1 +
+ src/basic/cgroup-util.c                    |  1 +
+ src/basic/env-util.c                       |  1 +
+ src/basic/log.c                            |  1 +
+ src/basic/missing_stdlib.h                 | 12 ++++++++++++
+ src/basic/mkdir.c                          |  1 +
+ src/basic/mountpoint-util.c                |  1 +
+ src/basic/parse-util.c                     |  1 +
+ src/basic/path-lookup.c                    |  1 +
+ src/basic/percent-util.c                   |  1 +
+ src/basic/proc-cmdline.c                   |  1 +
+ src/basic/procfs-util.c                    |  1 +
+ src/basic/time-util.c                      |  1 +
+ src/boot/bless-boot.c                      |  1 +
+ src/core/dbus-cgroup.c                     |  1 +
+ src/core/dbus-execute.c                    |  1 +
+ src/core/dbus-util.c                       |  1 +
+ src/core/execute.c                         |  1 +
+ src/core/kmod-setup.c                      |  1 +
+ src/core/service.c                         |  1 +
+ src/coredump/coredump-vacuum.c             |  1 +
+ src/fstab-generator/fstab-generator.c      |  1 +
+ src/journal-remote/journal-remote-main.c   |  1 +
+ src/journal/journalctl.c                   |  1 +
+ src/libsystemd/sd-bus/bus-message.c        |  1 +
+ src/libsystemd/sd-bus/bus-objects.c        |  1 +
+ src/libsystemd/sd-bus/bus-socket.c         |  1 +
+ src/libsystemd/sd-bus/sd-bus.c             |  1 +
+ src/libsystemd/sd-bus/test-bus-benchmark.c |  1 +
+ src/libsystemd/sd-journal/sd-journal.c     |  1 +
+ src/login/pam_systemd.c                    |  1 +
+ src/network/generator/network-generator.c  |  1 +
+ src/nspawn/nspawn-settings.c               |  1 +
+ src/nss-mymachines/nss-mymachines.c        |  1 +
+ src/portable/portable.c                    |  1 +
+ src/resolve/resolvectl.c                   |  1 +
+ src/shared/bus-get-properties.c            |  1 +
+ src/shared/bus-unit-procs.c                |  1 +
+ src/shared/bus-unit-util.c                 |  1 +
+ src/shared/bus-util.c                      |  1 +
+ src/shared/dns-domain.c                    |  1 +
+ src/shared/journal-importer.c              |  1 +
+ src/shared/logs-show.c                     |  1 +
+ src/shared/pager.c                         |  1 +
+ src/socket-proxy/socket-proxyd.c           |  1 +
+ src/test/test-hexdecoct.c                  |  1 +
+ src/udev/udev-builtin-path_id.c            |  1 +
+ src/udev/udev-event.c                      |  1 +
+ src/udev/udev-rules.c                      |  1 +
+ 50 files changed, 61 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index fb96143c37..739b2f7f72 100644
+--- a/meson.build
++++ b/meson.build
+@@ -595,6 +595,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
+ endforeach
+ 
+ foreach ident : [
++        ['strndupa' ,         '''#include <string.h>'''],
+         ['memfd_create',      '''#include <sys/mman.h>'''],
+         ['gettid',            '''#include <sys/types.h>
+                                  #include <unistd.h>'''],
+diff --git a/src/backlight/backlight.c b/src/backlight/backlight.c
+index e66477f328..2613d1e3f9 100644
+--- a/src/backlight/backlight.c
++++ b/src/backlight/backlight.c
+@@ -19,6 +19,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "terminal-util.h"
++#include "missing_stdlib.h"
+ 
+ #define PCI_CLASS_GRAPHICS_CARD 0x30000
+ 
+diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
+index feda596939..11b4375ed5 100644
+--- a/src/basic/cgroup-util.c
++++ b/src/basic/cgroup-util.c
+@@ -38,6 +38,7 @@
+ #include "unit-name.h"
+ #include "user-util.h"
+ #include "xattr-util.h"
++#include "missing_stdlib.h"
+ 
+ static int cg_enumerate_items(const char *controller, const char *path, FILE **_f, const char *item) {
+         _cleanup_free_ char *fs = NULL;
+diff --git a/src/basic/env-util.c b/src/basic/env-util.c
+index 55ac11a512..7ccb1d7887 100644
+--- a/src/basic/env-util.c
++++ b/src/basic/env-util.c
+@@ -19,6 +19,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ /* We follow bash for the character set. Different shells have different rules. */
+ #define VALID_BASH_ENV_NAME_CHARS               \
+diff --git a/src/basic/log.c b/src/basic/log.c
+index fc5793139e..515218fca8 100644
+--- a/src/basic/log.c
++++ b/src/basic/log.c
+@@ -40,6 +40,7 @@
+ #include "terminal-util.h"
+ #include "time-util.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ #define SNDBUF_SIZE (8*1024*1024)
+ #define IOVEC_MAX 256U
+diff --git a/src/basic/missing_stdlib.h b/src/basic/missing_stdlib.h
+index 8c76f93eb2..9068bfb4f0 100644
+--- a/src/basic/missing_stdlib.h
++++ b/src/basic/missing_stdlib.h
+@@ -11,3 +11,15 @@
+ #    error "neither secure_getenv nor __secure_getenv are available"
+ #  endif
+ #endif
++
++/* string.h */
++#if ! HAVE_STRNDUPA
++#define strndupa(s, n) \
++  ({ \
++    const char *__old = (s); \
++    size_t __len = strnlen(__old, (n)); \
++    char *__new = (char *)alloca(__len + 1); \
++    __new[__len] = '\0'; \
++    (char *)memcpy(__new, __old, __len); \
++  })
++#endif
+diff --git a/src/basic/mkdir.c b/src/basic/mkdir.c
+index 7ad19ee33b..cc1d5e1e5b 100644
+--- a/src/basic/mkdir.c
++++ b/src/basic/mkdir.c
+@@ -15,6 +15,7 @@
+ #include "stat-util.h"
+ #include "stdio-util.h"
+ #include "user-util.h"
++#include "missing_stdlib.h"
+ 
+ int mkdirat_safe_internal(
+                 int dir_fd,
+diff --git a/src/basic/mountpoint-util.c b/src/basic/mountpoint-util.c
+index bc74fbef8f..cdb609bb84 100644
+--- a/src/basic/mountpoint-util.c
++++ b/src/basic/mountpoint-util.c
+@@ -18,6 +18,7 @@
+ #include "missing_stat.h"
+ #include "missing_syscall.h"
+ #include "mkdir.h"
++#include "missing_stdlib.h"
+ #include "mountpoint-util.h"
+ #include "nulstr-util.h"
+ #include "parse-util.h"
+diff --git a/src/basic/parse-util.c b/src/basic/parse-util.c
+index 3445d31307..d82b4415d9 100644
+--- a/src/basic/parse-util.c
++++ b/src/basic/parse-util.c
+@@ -18,6 +18,7 @@
+ #include "stat-util.h"
+ #include "string-util.h"
+ #include "strv.h"
++#include "missing_stdlib.h"
+ 
+ int parse_boolean(const char *v) {
+         if (!v)
+diff --git a/src/basic/path-lookup.c b/src/basic/path-lookup.c
+index c99e9d8786..71a917a0b0 100644
+--- a/src/basic/path-lookup.c
++++ b/src/basic/path-lookup.c
+@@ -16,6 +16,7 @@
+ #include "strv.h"
+ #include "tmpfile-util.h"
+ #include "user-util.h"
++#include "missing_stdlib.h"
+ 
+ int xdg_user_runtime_dir(char **ret, const char *suffix) {
+         const char *e;
+diff --git a/src/basic/percent-util.c b/src/basic/percent-util.c
+index cab9d0eaea..5f6ca258e9 100644
+--- a/src/basic/percent-util.c
++++ b/src/basic/percent-util.c
+@@ -3,6 +3,7 @@
+ #include "percent-util.h"
+ #include "string-util.h"
+ #include "parse-util.h"
++#include "missing_stdlib.h"
+ 
+ static int parse_parts_value_whole(const char *p, const char *symbol) {
+         const char *pc, *n;
+diff --git a/src/basic/proc-cmdline.c b/src/basic/proc-cmdline.c
+index eea70d8606..ae3abd8402 100644
+--- a/src/basic/proc-cmdline.c
++++ b/src/basic/proc-cmdline.c
+@@ -16,6 +16,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "virt.h"
++#include "missing_stdlib.h"
+ 
+ int proc_cmdline_filter_pid1_args(char **argv, char ***ret) {
+         enum {
+diff --git a/src/basic/procfs-util.c b/src/basic/procfs-util.c
+index bcba5a5208..64a95dd866 100644
+--- a/src/basic/procfs-util.c
++++ b/src/basic/procfs-util.c
+@@ -12,6 +12,7 @@
+ #include "procfs-util.h"
+ #include "stdio-util.h"
+ #include "string-util.h"
++#include "missing_stdlib.h"
+ 
+ int procfs_get_pid_max(uint64_t *ret) {
+         _cleanup_free_ char *value = NULL;
+diff --git a/src/basic/time-util.c b/src/basic/time-util.c
+index b700f364ef..48a26bcec9 100644
+--- a/src/basic/time-util.c
++++ b/src/basic/time-util.c
+@@ -27,6 +27,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "time-util.h"
++#include "missing_stdlib.h"
+ 
+ static clockid_t map_clock_id(clockid_t c) {
+ 
+diff --git a/src/boot/bless-boot.c b/src/boot/bless-boot.c
+index 59f02b761a..7496646350 100644
+--- a/src/boot/bless-boot.c
++++ b/src/boot/bless-boot.c
+@@ -22,6 +22,7 @@
+ #include "terminal-util.h"
+ #include "verbs.h"
+ #include "virt.h"
++#include "missing_stdlib.h"
+ 
+ static char **arg_path = NULL;
+ 
+diff --git a/src/core/dbus-cgroup.c b/src/core/dbus-cgroup.c
+index b5484eda78..54ed62c790 100644
+--- a/src/core/dbus-cgroup.c
++++ b/src/core/dbus-cgroup.c
+@@ -23,6 +23,7 @@
+ #include "parse-util.h"
+ #include "path-util.h"
+ #include "percent-util.h"
++#include "missing_stdlib.h"
+ #include "socket-util.h"
+ 
+ BUS_DEFINE_PROPERTY_GET(bus_property_get_tasks_max, "t", TasksMax, tasks_max_resolve);
+diff --git a/src/core/dbus-execute.c b/src/core/dbus-execute.c
+index f514b8fd12..4febd0d496 100644
+--- a/src/core/dbus-execute.c
++++ b/src/core/dbus-execute.c
+@@ -48,6 +48,7 @@
+ #include "unit-printf.h"
+ #include "user-util.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ BUS_DEFINE_PROPERTY_GET_ENUM(bus_property_get_exec_output, exec_output, ExecOutput);
+ static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_exec_input, exec_input, ExecInput);
+diff --git a/src/core/dbus-util.c b/src/core/dbus-util.c
+index edfa0eb69a..6fd2ec9062 100644
+--- a/src/core/dbus-util.c
++++ b/src/core/dbus-util.c
+@@ -9,6 +9,7 @@
+ #include "unit-printf.h"
+ #include "user-util.h"
+ #include "unit.h"
++#include "missing_stdlib.h"
+ 
+ int bus_property_get_triggered_unit(
+                 sd_bus *bus,
+diff --git a/src/core/execute.c b/src/core/execute.c
+index 853e87450f..8ef76de9ab 100644
+--- a/src/core/execute.c
++++ b/src/core/execute.c
+@@ -113,6 +113,7 @@
+ #include "unit-serialize.h"
+ #include "user-util.h"
+ #include "utmp-wtmp.h"
++#include "missing_stdlib.h"
+ 
+ #define IDLE_TIMEOUT_USEC (5*USEC_PER_SEC)
+ #define IDLE_TIMEOUT2_USEC (1*USEC_PER_SEC)
+diff --git a/src/core/kmod-setup.c b/src/core/kmod-setup.c
+index e843743777..e149807492 100644
+--- a/src/core/kmod-setup.c
++++ b/src/core/kmod-setup.c
+@@ -13,6 +13,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "virt.h"
++#include "missing_stdlib.h"
+ 
+ #if HAVE_KMOD
+ #include "module-util.h"
+diff --git a/src/core/service.c b/src/core/service.c
+index 9ad3c3d995..b112d64919 100644
+--- a/src/core/service.c
++++ b/src/core/service.c
+@@ -45,6 +45,7 @@
+ #include "unit-name.h"
+ #include "unit.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ #define service_spawn(...) service_spawn_internal(__func__, __VA_ARGS__)
+ 
+diff --git a/src/coredump/coredump-vacuum.c b/src/coredump/coredump-vacuum.c
+index c6e201ecf2..ab034475e2 100644
+--- a/src/coredump/coredump-vacuum.c
++++ b/src/coredump/coredump-vacuum.c
+@@ -17,6 +17,7 @@
+ #include "string-util.h"
+ #include "time-util.h"
+ #include "user-util.h"
++#include "missing_stdlib.h"
+ 
+ #define DEFAULT_MAX_USE_LOWER (uint64_t) (1ULL*1024ULL*1024ULL)           /* 1 MiB */
+ #define DEFAULT_MAX_USE_UPPER (uint64_t) (4ULL*1024ULL*1024ULL*1024ULL)   /* 4 GiB */
+diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-generator.c
+index efc553b698..acea922311 100644
+--- a/src/fstab-generator/fstab-generator.c
++++ b/src/fstab-generator/fstab-generator.c
+@@ -37,6 +37,7 @@
+ #include "unit-name.h"
+ #include "virt.h"
+ #include "volatile-util.h"
++#include "missing_stdlib.h"
+ 
+ typedef enum MountPointFlags {
+         MOUNT_NOAUTO    = 1 << 0,
+diff --git a/src/journal-remote/journal-remote-main.c b/src/journal-remote/journal-remote-main.c
+index 7df264fb53..9463a0e9fb 100644
+--- a/src/journal-remote/journal-remote-main.c
++++ b/src/journal-remote/journal-remote-main.c
+@@ -26,6 +26,7 @@
+ #include "stat-util.h"
+ #include "string-table.h"
+ #include "strv.h"
++#include "missing_stdlib.h"
+ 
+ #define PRIV_KEY_FILE CERTIFICATE_ROOT "/private/journal-remote.pem"
+ #define CERT_FILE     CERTIFICATE_ROOT "/certs/journal-remote.pem"
+diff --git a/src/journal/journalctl.c b/src/journal/journalctl.c
+index da0fac548e..c1c043e0e0 100644
+--- a/src/journal/journalctl.c
++++ b/src/journal/journalctl.c
+@@ -77,6 +77,7 @@
+ #include "unit-name.h"
+ #include "user-util.h"
+ #include "varlink.h"
++#include "missing_stdlib.h"
+ 
+ #define DEFAULT_FSS_INTERVAL_USEC (15*USEC_PER_MINUTE)
+ #define PROCESS_INOTIFY_INTERVAL 1024   /* Every 1,024 messages processed */
+diff --git a/src/libsystemd/sd-bus/bus-message.c b/src/libsystemd/sd-bus/bus-message.c
+index 9719f97c02..75decd9834 100644
+--- a/src/libsystemd/sd-bus/bus-message.c
++++ b/src/libsystemd/sd-bus/bus-message.c
+@@ -19,6 +19,7 @@
+ #include "strv.h"
+ #include "time-util.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ static int message_append_basic(sd_bus_message *m, char type, const void *p, const void **stored);
+ static int message_parse_fields(sd_bus_message *m);
+diff --git a/src/libsystemd/sd-bus/bus-objects.c b/src/libsystemd/sd-bus/bus-objects.c
+index 2ad7a9993d..bba72f99f4 100644
+--- a/src/libsystemd/sd-bus/bus-objects.c
++++ b/src/libsystemd/sd-bus/bus-objects.c
+@@ -11,6 +11,7 @@
+ #include "missing_capability.h"
+ #include "string-util.h"
+ #include "strv.h"
++#include "missing_stdlib.h"
+ 
+ static int node_vtable_get_userdata(
+                 sd_bus *bus,
+diff --git a/src/libsystemd/sd-bus/bus-socket.c b/src/libsystemd/sd-bus/bus-socket.c
+index 64037e4fe0..9b9ce0aaa9 100644
+--- a/src/libsystemd/sd-bus/bus-socket.c
++++ b/src/libsystemd/sd-bus/bus-socket.c
+@@ -28,6 +28,7 @@
+ #include "string-util.h"
+ #include "user-util.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ #define SNDBUF_SIZE (8*1024*1024)
+ 
+diff --git a/src/libsystemd/sd-bus/sd-bus.c b/src/libsystemd/sd-bus/sd-bus.c
+index f6a5e4aa06..b36faa79a3 100644
+--- a/src/libsystemd/sd-bus/sd-bus.c
++++ b/src/libsystemd/sd-bus/sd-bus.c
+@@ -46,6 +46,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "user-util.h"
++#include "missing_stdlib.h"
+ 
+ #define log_debug_bus_message(m)                                         \
+         do {                                                             \
+diff --git a/src/libsystemd/sd-bus/test-bus-benchmark.c b/src/libsystemd/sd-bus/test-bus-benchmark.c
+index 1eb6edd329..d434a3c178 100644
+--- a/src/libsystemd/sd-bus/test-bus-benchmark.c
++++ b/src/libsystemd/sd-bus/test-bus-benchmark.c
+@@ -13,6 +13,7 @@
+ #include "missing_resource.h"
+ #include "string-util.h"
+ #include "time-util.h"
++#include "missing_stdlib.h"
+ 
+ #define MAX_SIZE (2*1024*1024)
+ 
+diff --git a/src/libsystemd/sd-journal/sd-journal.c b/src/libsystemd/sd-journal/sd-journal.c
+index 9947947ef2..8dc6f93159 100644
+--- a/src/libsystemd/sd-journal/sd-journal.c
++++ b/src/libsystemd/sd-journal/sd-journal.c
+@@ -44,6 +44,7 @@
+ #include "strv.h"
+ #include "syslog-util.h"
+ #include "uid-alloc-range.h"
++#include "missing_stdlib.h"
+ 
+ #define JOURNAL_FILES_RECHECK_USEC (2 * USEC_PER_SEC)
+ 
+diff --git a/src/login/pam_systemd.c b/src/login/pam_systemd.c
+index ba2fca32c6..e1f9caa13b 100644
+--- a/src/login/pam_systemd.c
++++ b/src/login/pam_systemd.c
+@@ -34,6 +34,7 @@
+ #include "locale-util.h"
+ #include "login-util.h"
+ #include "macro.h"
++#include "missing_stdlib.h"
+ #include "pam-util.h"
+ #include "parse-util.h"
+ #include "path-util.h"
+diff --git a/src/network/generator/network-generator.c b/src/network/generator/network-generator.c
+index 1090934bfc..69a77f66e2 100644
+--- a/src/network/generator/network-generator.c
++++ b/src/network/generator/network-generator.c
+@@ -14,6 +14,7 @@
+ #include "string-table.h"
+ #include "string-util.h"
+ #include "strv.h"
++#include "missing_stdlib.h"
+ 
+ /*
+   # .network
+diff --git a/src/nspawn/nspawn-settings.c b/src/nspawn/nspawn-settings.c
+index 05bde1c756..aa29587868 100644
+--- a/src/nspawn/nspawn-settings.c
++++ b/src/nspawn/nspawn-settings.c
+@@ -16,6 +16,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "user-util.h"
++#include "missing_stdlib.h"
+ 
+ Settings *settings_new(void) {
+         Settings *s;
+diff --git a/src/nss-mymachines/nss-mymachines.c b/src/nss-mymachines/nss-mymachines.c
+index c64e79bdff..eda26b0b9a 100644
+--- a/src/nss-mymachines/nss-mymachines.c
++++ b/src/nss-mymachines/nss-mymachines.c
+@@ -21,6 +21,7 @@
+ #include "nss-util.h"
+ #include "signal-util.h"
+ #include "string-util.h"
++#include "missing_stdlib.h"
+ 
+ static void setup_logging_once(void) {
+         static pthread_once_t once = PTHREAD_ONCE_INIT;
+diff --git a/src/portable/portable.c b/src/portable/portable.c
+index 7811833fac..c6414da91c 100644
+--- a/src/portable/portable.c
++++ b/src/portable/portable.c
+@@ -40,6 +40,7 @@
+ #include "strv.h"
+ #include "tmpfile-util.h"
+ #include "user-util.h"
++#include "missing_stdlib.h"
+ 
+ /* Markers used in the first line of our 20-portable.conf unit file drop-in to determine, that a) the unit file was
+  * dropped there by the portable service logic and b) for which image it was dropped there. */
+diff --git a/src/resolve/resolvectl.c b/src/resolve/resolvectl.c
+index 2638e985fb..82c903fd66 100644
+--- a/src/resolve/resolvectl.c
++++ b/src/resolve/resolvectl.c
+@@ -48,6 +48,7 @@
+ #include "varlink.h"
+ #include "verb-log-control.h"
+ #include "verbs.h"
++#include "missing_stdlib.h"
+ 
+ static int arg_family = AF_UNSPEC;
+ static int arg_ifindex = 0;
+diff --git a/src/shared/bus-get-properties.c b/src/shared/bus-get-properties.c
+index 8b4f66b22e..5926e4c61b 100644
+--- a/src/shared/bus-get-properties.c
++++ b/src/shared/bus-get-properties.c
+@@ -4,6 +4,7 @@
+ #include "rlimit-util.h"
+ #include "stdio-util.h"
+ #include "string-util.h"
++#include "missing_stdlib.h"
+ 
+ int bus_property_get_bool(
+                 sd_bus *bus,
+diff --git a/src/shared/bus-unit-procs.c b/src/shared/bus-unit-procs.c
+index 8b462b5627..183ce1c18e 100644
+--- a/src/shared/bus-unit-procs.c
++++ b/src/shared/bus-unit-procs.c
+@@ -11,6 +11,7 @@
+ #include "sort-util.h"
+ #include "string-util.h"
+ #include "terminal-util.h"
++#include "missing_stdlib.h"
+ 
+ struct CGroupInfo {
+         char *cgroup_path;
+diff --git a/src/shared/bus-unit-util.c b/src/shared/bus-unit-util.c
+index 1e95e36678..640ee031d5 100644
+--- a/src/shared/bus-unit-util.c
++++ b/src/shared/bus-unit-util.c
+@@ -51,6 +51,7 @@
+ #include "unit-def.h"
+ #include "user-util.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ int bus_parse_unit_info(sd_bus_message *message, UnitInfo *u) {
+         assert(message);
+diff --git a/src/shared/bus-util.c b/src/shared/bus-util.c
+index d09ec5148d..f38a8f7cc1 100644
+--- a/src/shared/bus-util.c
++++ b/src/shared/bus-util.c
+@@ -24,6 +24,7 @@
+ #include "path-util.h"
+ #include "socket-util.h"
+ #include "stdio-util.h"
++#include "missing_stdlib.h"
+ 
+ static int name_owner_change_callback(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
+         sd_event *e = ASSERT_PTR(userdata);
+diff --git a/src/shared/dns-domain.c b/src/shared/dns-domain.c
+index 620b156563..5ee5b09186 100644
+--- a/src/shared/dns-domain.c
++++ b/src/shared/dns-domain.c
+@@ -18,6 +18,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "utf8.h"
++#include "missing_stdlib.h"
+ 
+ int dns_label_unescape(const char **name, char *dest, size_t sz, DNSLabelFlags flags) {
+         const char *n;
+diff --git a/src/shared/journal-importer.c b/src/shared/journal-importer.c
+index d9eabec886..534c6cf7e3 100644
+--- a/src/shared/journal-importer.c
++++ b/src/shared/journal-importer.c
+@@ -16,6 +16,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "unaligned.h"
++#include "missing_stdlib.h"
+ 
+ enum {
+         IMPORTER_STATE_LINE = 0,    /* waiting to read, or reading line */
+diff --git a/src/shared/logs-show.c b/src/shared/logs-show.c
+index b72e516c8d..6e832b74c3 100644
+--- a/src/shared/logs-show.c
++++ b/src/shared/logs-show.c
+@@ -41,6 +41,7 @@
+ #include "time-util.h"
+ #include "utf8.h"
+ #include "web-util.h"
++#include "missing_stdlib.h"
+ 
+ /* up to three lines (each up to 100 characters) or 300 characters, whichever is less */
+ #define PRINT_LINE_THRESHOLD 3
+diff --git a/src/shared/pager.c b/src/shared/pager.c
+index 6ed35a3ca9..99d9d36140 100644
+--- a/src/shared/pager.c
++++ b/src/shared/pager.c
+@@ -25,6 +25,7 @@
+ #include "string-util.h"
+ #include "strv.h"
+ #include "terminal-util.h"
++#include "missing_stdlib.h"
+ 
+ static pid_t pager_pid = 0;
+ 
+diff --git a/src/socket-proxy/socket-proxyd.c b/src/socket-proxy/socket-proxyd.c
+index 821049e667..08a5bdae3d 100644
+--- a/src/socket-proxy/socket-proxyd.c
++++ b/src/socket-proxy/socket-proxyd.c
+@@ -27,6 +27,7 @@
+ #include "set.h"
+ #include "socket-util.h"
+ #include "string-util.h"
++#include "missing_stdlib.h"
+ 
+ #define BUFFER_SIZE (256 * 1024)
+ 
+diff --git a/src/test/test-hexdecoct.c b/src/test/test-hexdecoct.c
+index 9d71db6ae1..a9938c1e6e 100644
+--- a/src/test/test-hexdecoct.c
++++ b/src/test/test-hexdecoct.c
+@@ -7,6 +7,7 @@
+ #include "macro.h"
+ #include "random-util.h"
+ #include "string-util.h"
++#include "missing_stdlib.h"
+ #include "tests.h"
+ 
+ TEST(hexchar) {
+diff --git a/src/udev/udev-builtin-path_id.c b/src/udev/udev-builtin-path_id.c
+index 8e4d57ee72..6b4555b4d5 100644
+--- a/src/udev/udev-builtin-path_id.c
++++ b/src/udev/udev-builtin-path_id.c
+@@ -24,6 +24,7 @@
+ #include "sysexits.h"
+ #include "udev-builtin.h"
+ #include "udev-util.h"
++#include "missing_stdlib.h"
+ 
+ _printf_(2,3)
+ static void path_prepend(char **path, const char *fmt, ...) {
+diff --git a/src/udev/udev-event.c b/src/udev/udev-event.c
+index ec4ad30824..bc40303a46 100644
+--- a/src/udev/udev-event.c
++++ b/src/udev/udev-event.c
+@@ -34,6 +34,7 @@
+ #include "udev-util.h"
+ #include "udev-watch.h"
+ #include "user-util.h"
++#include "missing_stdlib.h"
+ 
+ typedef struct Spawn {
+         sd_device *device;
+diff --git a/src/udev/udev-rules.c b/src/udev/udev-rules.c
+index 5bd09a64d1..0ce79f815c 100644
+--- a/src/udev/udev-rules.c
++++ b/src/udev/udev-rules.c
+@@ -35,6 +35,7 @@
+ #include "udev-util.h"
+ #include "user-util.h"
+ #include "virt.h"
++#include "missing_stdlib.h"
+ 
+ #define RULES_DIRS ((const char* const*) CONF_PATHS_STRV("udev/rules.d"))
+ 
+-- 
+2.39.2
+

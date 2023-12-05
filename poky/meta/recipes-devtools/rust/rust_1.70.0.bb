@@ -72,10 +72,7 @@ do_rust_setup_snapshot[vardepsexclude] += "UNINATIVE_LOADER"
 
 python do_configure() {
     import json
-    try:
-        import configparser
-    except ImportError:
-        import ConfigParser as configparser
+    import configparser
 
     # toml is rather similar to standard ini like format except it likes values
     # that look more JSON like. So for our purposes simply escaping all values
@@ -157,13 +154,9 @@ python do_configure() {
 
     config.set("build", "vendor", e(True))
 
-    if not "targets" in locals():
-        targets = [d.getVar("RUST_TARGET_SYS")]
-    config.set("build", "target", e(targets))
+    config.set("build", "target", e([d.getVar("RUST_TARGET_SYS")]))
 
-    if not "hosts" in locals():
-        hosts = [d.getVar("RUST_HOST_SYS")]
-    config.set("build", "host", e(hosts))
+    config.set("build", "host", e([d.getVar("RUST_HOST_SYS")]))
 
     # We can't use BUILD_SYS since that is something the rust snapshot knows
     # nothing about when trying to build some stage0 tools (like fabricate)
@@ -232,9 +225,11 @@ do_test_compile () {
 
 ALLOW_EMPTY:${PN} = "1"
 
-PACKAGES =+ "${PN}-tools-clippy ${PN}-tools-rustfmt"
+PACKAGES =+ "${PN}-rustdoc ${PN}-tools-clippy ${PN}-tools-rustfmt"
+FILES:${PN}-rustdoc = "${bindir}/rustdoc"
 FILES:${PN}-tools-clippy = "${bindir}/cargo-clippy ${bindir}/clippy-driver"
 FILES:${PN}-tools-rustfmt = "${bindir}/rustfmt"
+RDEPENDS:${PN}-rustdoc = "${PN}"
 RDEPENDS:${PN}-tools-clippy = "${PN}"
 RDEPENDS:${PN}-tools-rustfmt = "${PN}"
 

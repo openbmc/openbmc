@@ -26,3 +26,8 @@ EXTRA_OEMESON:append:riscv32 = " -Dvapi=false"
 EXTRA_OEMESON:append:powerpc64le = " -Dvapi=false"
 
 GTKDOC_MESON_OPTION = "gtk_doc"
+
+do_install:append() {
+    # conflicts with the file provided by network-manager-applet
+    rm -f ${D}${datadir}/glib-2.0/schemas/org.gnome.nm-applet.gschema.xml
+}

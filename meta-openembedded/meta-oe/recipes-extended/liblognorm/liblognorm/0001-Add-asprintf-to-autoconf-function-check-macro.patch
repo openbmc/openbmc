@@ -1,0 +1,28 @@
+From b8c65236cd6cd68b57004479006c683455680a82 Mon Sep 17 00:00:00 2001
+From: Alfred Wingate <parona@protonmail.com>
+Date: Sun, 15 Oct 2023 12:34:52 +0100
+Subject: [PATCH] Add asprintf to autoconf function check macro
+
+Upstream-Status: Submitted [https://github.com/rsyslog/liblognorm/pull/376]
+Signed-off-by: Alfred Wingate <parona@protonmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index b6f92f1..b057550 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -55,7 +55,7 @@ AC_TYPE_SIZE_T
+ AC_FUNC_SELECT_ARGTYPES
+ AC_TYPE_SIGNAL
+ AC_FUNC_STRERROR_R
+-AC_CHECK_FUNCS([strdup strndup strtok_r])
++AC_CHECK_FUNCS([asprintf strdup strndup strtok_r])
+ 
+ LIBLOGNORM_CFLAGS="-I\$(top_srcdir)/src"
+ LIBLOGNORM_LIBS="\$(top_builddir)/src/liblognorm.la"
+-- 
+2.43.0
+

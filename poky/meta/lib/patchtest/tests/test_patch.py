@@ -6,6 +6,7 @@
 #
 
 import base
+import os
 import parse_signed_off_by
 import parse_upstream_status
 import pyparsing
@@ -87,7 +88,7 @@ class TestPatch(base.Base):
                 if TestPatch.prog.search_string(payload):
                     break
             else:
-                self.fail('A patch file has been added without a Signed-off-by tag. Sign off the added patch file (%s)' % newpatch.path)
+                self.fail('A patch file has been added without a Signed-off-by tag: \'%s\'' % os.path.basename(newpatch.path))
 
     def test_cve_tag_format(self):
         for commit in TestPatch.commits:

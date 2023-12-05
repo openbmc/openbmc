@@ -1,0 +1,74 @@
+From cd8bf8a4bf881f84c23a5fc1f48bb716efa51512 Mon Sep 17 00:00:00 2001
+From: Patrick Wicki <patrick.wicki@siemens.com>
+Date: Wed, 22 Nov 2023 15:35:44 +0100
+Subject: [PATCH] squid: make squid-conf-tests run on target device
+
+* Fix paths to allow tests to run outside the original builddir
+* Allow the tests to run on read-only root
+  * Don't overwrite tests with true on success
+  * Change logfile path to /var/log
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
+
+---
+ test-suite/Makefile.am        | 16 ++++++++--------
+ test-suite/test-squid-conf.sh |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/test-suite/Makefile.am b/test-suite/Makefile.am
+index 8becdbc..eccd49c 100644
+--- a/test-suite/Makefile.am
++++ b/test-suite/Makefile.am
+@@ -21,7 +21,7 @@ LDADD = \
+ EXTRA_PROGRAMS = mem_node_test splay
+ 
+ EXTRA_DIST = \
+-	$(srcdir)/squidconf/* \
++	squidconf/* \
+ 	test-functionality.sh \
+ 	test-sources.sh \
+ 	test-squid-conf.sh \
+@@ -134,21 +134,21 @@ VirtualDeleteOperator_SOURCES = \
+ 
+ installcheck-local: squid-conf-tests
+ 
+-squid-conf-tests: $(srcdir)/test-squid-conf.sh $(top_builddir)/src/squid.conf.default $(srcdir)/squidconf/*
+-	@failed=0; cfglist="$(top_builddir)/src/squid.conf.default $(srcdir)/squidconf/*.conf"; rm -f $@ || $(TRUE); \
++squid-conf-tests: test-squid-conf.sh $(top_builddir)/src/squid.conf.default squidconf/*
++	@failed=0; cfglist="$(top_builddir)/src/squid.conf.default squidconf/*.conf"; rm -f $@ || $(TRUE); \
+ 	for cfg in $$cfglist ; do \
+-		$(srcdir)/test-squid-conf.sh $(top_builddir) $(sbindir) $$cfg || \
++		./test-squid-conf.sh $(top_builddir) $(sbindir) $$cfg || \
+ 			{ echo "FAIL: squid.conf test: $$cfg" | \
+ 				sed s%$(top_builddir)/src/%% | \
+-				sed s%$(srcdir)/squidconf/%% ; \
++				sed s%squidconf/%% ; \
+ 				failed=1; break; \
+ 			}; \
+ 		if test "$$failed" -eq 0; then \
+ 			echo "PASS: squid.conf test: $$cfg" | \
+ 				sed s%$(top_builddir)/src/%% | \
+-				sed s%$(srcdir)/squidconf/%% ; \
++				sed s%squidconf/%% ; \
+ 		else break; fi; \
+ 	done; \
+-	if test "$$failed" -eq 0; then cp $(TRUE) $@ ; else exit 1; fi
++	exit "$$failed"
+ 
+-CLEANFILES += squid-conf-tests squid-stderr.log
++CLEANFILES += squid-conf-tests /var/log/squid-stderr.log
+diff --git a/test-suite/test-squid-conf.sh b/test-suite/test-squid-conf.sh
+index 05fcaf3..a5a8a5a 100755
+--- a/test-suite/test-squid-conf.sh
++++ b/test-suite/test-squid-conf.sh
+@@ -111,7 +111,7 @@ then
+     done < $instructionsFile
+ fi
+ 
+-errorLog="squid-stderr.log"
++errorLog="/var/log/squid-stderr.log"
+ 
+ $sbindir/squid -k parse -f $configFile 2> $errorLog
+ result=$?

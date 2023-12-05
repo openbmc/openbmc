@@ -10,9 +10,9 @@ inherit cmake pkgconfig systemd ptest
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'with-external-libsystemd', 'with-builtin-libsystemd', d)} \
                    ${@bb.utils.contains('PTEST_ENABLED', '1', 'with-tests', '', d)}"
-PACKAGECONFIG[with-builtin-libsystemd] = ",,sdbus-c++-libsystemd,libcap"
+PACKAGECONFIG[with-builtin-libsystemd] = ",,sdbus-c++-libsystemd,libcap,basu"
 PACKAGECONFIG[with-external-libsystemd] = ",,systemd,libsystemd"
-PACKAGECONFIG[with-tests] = "-DBUILD_TESTS=ON -DTESTS_INSTALL_PATH=${libdir}/${BPN}/tests,-DBUILD_TESTS=OFF,googletest gmock"
+PACKAGECONFIG[with-tests] = "-DBUILD_TESTS=ON -DTESTS_INSTALL_PATH=${PTEST_PATH},-DBUILD_TESTS=OFF,googletest gmock"
 
 DEPENDS += "expat"
 
@@ -39,14 +39,13 @@ do_install:append() {
     fi
 }
 
-PTEST_PATH = "${libdir}/${BPN}/ptest"
 do_install_ptest() {
-    install -d ${D}${PTEST_PATH}
-    cp -r ${B}/tests/sdbus-c++-unit-tests  ${D}${PTEST_PATH}
+    DESTDIR='${D}' cmake_runcmake_build --target tests/install
 }
 
 FILES:${PN}-ptest =+ "${sysconfdir}/dbus-1/system.d/"
 FILES:${PN}-dev += "${bindir}/sdbus-c++-xml2cpp"
 
+RDEPENDS:${PN}-ptest += "dbus"
 # It adds -isystem which is spurious, no idea where it gets it from
 CCACHE_DISABLE = "1"

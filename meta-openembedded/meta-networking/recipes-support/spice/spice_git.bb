@@ -30,6 +30,10 @@ DEPENDS:append:class-nativesdk = " nativesdk-openssl"
 
 export PYTHON="${STAGING_BINDIR_NATIVE}/python3-native/python3"
 
+do_configure:prepend() {
+	echo ${PV} > ${S}/.tarball-version
+}
+
 PACKAGECONFIG:class-native = ""
 PACKAGECONFIG:class-nativesdk = ""
 PACKAGECONFIG ?= "sasl opus smartcard gstreamer"

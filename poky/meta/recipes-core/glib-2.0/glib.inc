@@ -113,6 +113,11 @@ do_install:append () {
         mkdir -p ${D}${libdir}/gio/modules
 }
 
+do_install:append:class-native () {
+	# Link gio-querymodules into ${bindir} as otherwise tools like meson won't find it
+        ln -rs ${D}${libexecdir}/gio-querymodules ${D}${bindir}
+}
+
 do_install:append:class-target () {
 	# Tests are only installed on targets, not native builds.  Separating this out
 	# keeps glib-2.0-native from depending on DISTRO_FEATURES

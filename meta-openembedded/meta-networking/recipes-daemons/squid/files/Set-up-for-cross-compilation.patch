@@ -1,4 +1,4 @@
-From 995aaf30799fa972441354b6feb45f0621968929 Mon Sep 17 00:00:00 2001
+From c0be3192f608037682464bcb728e97f9d9b543aa Mon Sep 17 00:00:00 2001
 From: Jim Somerville <Jim.Somerville@windriver.com>
 Date: Wed, 16 Oct 2013 16:41:03 -0400
 Subject: [PATCH] Set up for cross compilation
@@ -17,12 +17,12 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+)
 
 diff --git a/configure.ac b/configure.ac
-index fe80ee0..57cd1ac 100644
+index ca0bc79..c222851 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -27,6 +27,7 @@ m4_include([acinclude/lib-checks.m4])
- m4_include([acinclude/ax_cxx_compile_stdcxx_11.m4])
- m4_include([acinclude/ax_cxx_0x_types.m4])
+@@ -29,6 +29,7 @@ m4_include([acinclude/tdb.m4])
+ m4_include([acinclude/lib-checks.m4])
+ m4_include([acinclude/ax_cxx_compile_stdcxx.m4])
  
 +HOSTCXX="$BUILD_CXX"
  PRESET_CFLAGS="$CFLAGS"

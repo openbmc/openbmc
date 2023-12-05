@@ -10,6 +10,9 @@ inherit module
 include lttng-platforms.inc
 
 SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
+           file://0001-fix-phys_proc_id-and-cpu_core_id-moved-in-linux-6.7..patch \
+           file://0002-fix-mm-vmscan-signatures-changed-in-linux-6.7.0-rc1.patch \
+           file://0001-wrapper-fdtable-adjust-fd-lookup-to-v6.7.patch \
            "
 
 # Use :append here so that the patch is applied also when using devupstream

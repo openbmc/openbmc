@@ -11,3 +11,7 @@ SRC_URI = "git://gitlab.freedesktop.org/spice/libcacard.git;protocol=https;branc
 S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
+
+do_configure:prepend() {
+	echo ${PV} > ${S}/.tarball-version
+}

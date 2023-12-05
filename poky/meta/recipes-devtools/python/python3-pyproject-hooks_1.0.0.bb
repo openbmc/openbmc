@@ -22,3 +22,5 @@ RDEPENDS:${PN} += " \
 do_compile:class-native () {
     python_flit_core_do_manual_build
 }
+
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"

@@ -286,5 +286,12 @@ FILES:${PN} =+ "${libdir}/rlm_*.so* ${libdir}/proto_*so*"
 
 RDEPENDS:${PN} += "perl"
 RDEPENDS:${PN}-utils = "${PN} perl"
+RDEPENDS:${PN}-krb5 = "${PN}"
+RDEPENDS:${PN}-ldap = "${PN}"
+RDEPENDS:${PN}-mysql = "${PN}"
+RDEPENDS:${PN}-perl = "${PN}"
+RDEPENDS:${PN}-postgresql = "${PN}"
+RDEPENDS:${PN}-python = "${PN}"
+RDEPENDS:${PN}-unixodbc = "${PN}"
 
 CLEANBROKEN = "1"

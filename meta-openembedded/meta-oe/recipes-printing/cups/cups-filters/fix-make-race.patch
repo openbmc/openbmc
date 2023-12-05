@@ -1,0 +1,33 @@
+From 7aba7c690fd84ca1e48d0cb6829410eeb658c594 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 24 Nov 2023 17:53:49 +0100
+Subject: [PATCH] Fix a Makefile race condition
+
+utils/driverless-fax script may be written before utils directory was created
+
+| make[2]: Entering directory '/home/flk/poky/build/tmp/work/corei7-64-poky-linux/cups-filters/2.0.0/build'
+| sed \
+|   -e "s|\@CUPS_SERVERBIN\@|/usr/libexec/cups|" \
+|   ../cups-filters-2.0.0/utils/driverless-fax.in > utils/driverless-fax
+| /bin/bash: line 2: utils/driverless-fax: No such file or directory
+
+Upstream-Status: Pending
+---
+ Makefile.am | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+--- a/Makefile.am	2023-09-22 18:14:03.000000000 +0200
++++ b/Makefile.am	2023-11-24 19:09:09.339653936 +0100
+@@ -62,7 +62,7 @@
+ # "driverless" utility
+ # ====================
+ utils/driverless-fax: utils/driverless-fax.in Makefile
+-	sed \
++	mkdir -p utils && sed \
+ 	  -e "s|\@CUPS_SERVERBIN\@|$(CUPS_SERVERBIN)|" \
+ 	  $< > $@
+ 
+
+
+
+

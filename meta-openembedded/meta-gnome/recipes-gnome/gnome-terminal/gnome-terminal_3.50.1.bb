@@ -13,7 +13,7 @@ DEPENDS = " \
     desktop-file-utils-native \
     gtk+3 \
     gsettings-desktop-schemas \
-    vte9 \
+    vte \
     dconf \
     libhandy \
     libpcre2 \
@@ -35,4 +35,4 @@ FILES:${PN} += " \
     ${systemd_user_unitdir} \
 "
 
-RRECOMMENDS:${PN} += "gsettings-desktop-schemas"
+RRECOMMENDS:${PN} += "vte-prompt gsettings-desktop-schemas"

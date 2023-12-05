@@ -1,0 +1,43 @@
+From 26a5aa6f70a0b98962884559668b3879dfe6fd02 Mon Sep 17 00:00:00 2001
+From: Carlo Cabrera <30379873+carlocab@users.noreply.github.com>
+Date: Tue, 28 Nov 2023 12:32:51 +0300
+Subject: [PATCH] Fix finding msgpack 6+
+
+msgpack.pc was renamed to msgpack-c.pc upstream in msgpack/msgpack-c#1053.
+
+Upstream-Status: Submitted [https://github.com/tmate-io/tmate/pull/281]
+
+Co-authored-by: Sam James <sam@gentoo.org>
+Signed-off-by: alperak <alperyasinak1@gmail.com>
+---
+ configure.ac | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 028d5559..3badf9e2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -207,7 +207,19 @@ PKG_CHECK_MODULES(
+     LIBS="$MSGPACK_LIBS $LIBS"
+     found_msgpack=yes
+   ],
+-  found_msgpack=no
++  [
++    # msgpack.pc was renamed to msgpack-c.pc in 6.0.0.
++    PKG_CHECK_MODULES(
++      MSGPACKC,
++      msgpack-c >= 1.1.0,
++      [
++        CPPFLAGS="$MSGPACKC_CFLAGS $CPPFLAGS"
++        LIBS="$MSGPACKC_LIBS $LIBS"
++        found_msgpack=yes
++      ],
++      found_msgpack=no
++    )
++  ]
+ )
+ if test "x$found_msgpack" = xno; then
+   AC_MSG_ERROR("msgpack >= 1.1.0 not found")
+-- 
+2.25.1
+

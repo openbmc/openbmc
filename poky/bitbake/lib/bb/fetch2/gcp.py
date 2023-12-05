@@ -47,6 +47,7 @@ class GCP(FetchMethod):
             ud.basename = os.path.basename(ud.path)
 
         ud.localfile = d.expand(urllib.parse.unquote(ud.basename))
+        ud.basecmd = "gsutil stat"
 
     def get_gcp_client(self):
         from google.cloud import storage
@@ -61,7 +62,8 @@ class GCP(FetchMethod):
         if self.gcp_client is None:
             self.get_gcp_client()
 
-        bb.fetch2.check_network_access(d, "gsutil stat", ud.url)
+        bb.fetch2.check_network_access(d, ud.basecmd, f"gs://{ud.host}{ud.path}")
+        runfetchcmd("%s %s" % (ud.basecmd, f"gs://{ud.host}{ud.path}"), d)
 
         # Path sometimes has leading slash, so strip it
         path = ud.path.lstrip("/")
@@ -88,7 +90,8 @@ class GCP(FetchMethod):
         if self.gcp_client is None:
             self.get_gcp_client()
 
-        bb.fetch2.check_network_access(d, "gsutil stat", ud.url)
+        bb.fetch2.check_network_access(d, ud.basecmd, f"gs://{ud.host}{ud.path}")
+        runfetchcmd("%s %s" % (ud.basecmd, f"gs://{ud.host}{ud.path}"), d)
 
         # Path sometimes has leading slash, so strip it
         path = ud.path.lstrip("/")

@@ -16,7 +16,7 @@ import os
 import datetime
 
 exclude_packages = [
-	'rust',
+	'rust-rustdoc',
 	'rust-dbg'
 	]
 

@@ -842,6 +842,26 @@ class TestHashEquivalenceClient(HashEquivalenceTestSetup, unittest.TestCase):
     def get_server_addr(self, server_idx):
         return "unix://" + os.path.join(self.temp_dir.name, 'sock%d' % server_idx)
 
+    def test_get(self):
+        taskhash, outhash, unihash = self.create_test_hash(self.client)
+
+        p = self.run_hashclient(["--address", self.server_address, "get", self.METHOD, taskhash])
+        data = json.loads(p.stdout)
+        self.assertEqual(data["unihash"], unihash)
+        self.assertEqual(data["outhash"], outhash)
+        self.assertEqual(data["taskhash"], taskhash)
+        self.assertEqual(data["method"], self.METHOD)
+
+    def test_get_outhash(self):
+        taskhash, outhash, unihash = self.create_test_hash(self.client)
+
+        p = self.run_hashclient(["--address", self.server_address, "get-outhash", self.METHOD, outhash, taskhash])
+        data = json.loads(p.stdout)
+        self.assertEqual(data["unihash"], unihash)
+        self.assertEqual(data["outhash"], outhash)
+        self.assertEqual(data["taskhash"], taskhash)
+        self.assertEqual(data["method"], self.METHOD)
+
     def test_stats(self):
         p = self.run_hashclient(["--address", self.server_address, "stats"], check=True)
         json.loads(p.stdout)

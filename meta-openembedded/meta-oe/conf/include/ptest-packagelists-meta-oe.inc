@@ -31,7 +31,6 @@ PTESTS_FAST_META_OE = "\
     nlohmann-json \
     nodejs \
     onig \
-    poco \
     protobuf \
     sdbus-c++ \
     uthash \
@@ -51,6 +50,7 @@ PTESTS_SLOW_META_OE = "\
     libusb-compat \
     rsyslog \
     mariadb \
+    poco \
     re2 \
 "
 PTESTS_SLOW_META_OE:append:x86 = " kernel-selftest"

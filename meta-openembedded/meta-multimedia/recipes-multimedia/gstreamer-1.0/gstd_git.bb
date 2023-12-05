@@ -17,7 +17,7 @@ PV = "1.0+really0.15.0"
 
 GTKDOC_MESON_OPTION = "enable-gtk-doc"
 
-inherit meson pkgconfig gettext gtk-doc systemd python3native python3-dir python3targetconfig
+inherit meson pkgconfig gettext gtk-doc python3native python3-dir python3targetconfig
 
 do_install:append() {
         rmdir ${D}${root_prefix}${localstatedir}/run/${BPN} ${D}${root_prefix}${localstatedir}/run \
@@ -28,7 +28,7 @@ do_install:append() {
                 install -d ${D}${sysconfdir}/tmpfiles.d
                 echo "d /run/${BPN} - - - -" \
                 > ${D}${sysconfdir}/tmpfiles.d/${BPN}.conf
-                echo "d /${localstatedir}/log/${BPN} 0755 root root -" \
+                echo "d ${localstatedir}/log/${BPN} 0755 root root -" \
                 >> ${D}${sysconfdir}/tmpfiles.d/${BPN}.conf
         fi
         ln -sf gst-client-1.0 ${D}${bindir}/gst-client
@@ -38,5 +38,3 @@ PACKAGES =+ "${PN}-python"
 
 FILES:${PN} += "${systemd_user_unitdir}"
 FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*"
-
-SYSTEMD_SERVICE:${PN} = "gstd.service"

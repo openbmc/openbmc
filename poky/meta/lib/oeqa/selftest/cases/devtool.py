@@ -1598,6 +1598,53 @@ class DevtoolUpdateTests(DevtoolBase):
         # Try building
         bitbake('%s -c patch' % testrecipe)
 
+    def test_devtool_git_submodules(self):
+        # This tests if we can add a patch in a git submodule and extract it properly using devtool finish
+        # Check preconditions
+        self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
+        self.track_for_cleanup(self.workspacedir)
+        recipe = 'vulkan-samples'
+        src_uri = get_bb_var('SRC_URI', recipe)
+        self.assertIn('gitsm://', src_uri, 'This test expects the %s recipe to be a git recipe with submodules' % recipe)
+        oldrecipefile = get_bb_var('FILE', recipe)
+        recipedir = os.path.dirname(oldrecipefile)
+        result = runCmd('git status --porcelain .', cwd=recipedir)
+        if result.output.strip():
+            self.fail('Recipe directory for %s contains uncommitted changes' % recipe)
+        self.assertIn('/meta/', recipedir)
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify %s %s' % (recipe, tempdir))
+        self.assertExists(os.path.join(tempdir, 'CMakeLists.txt'), 'Extracted source could not be found')
+        # Test devtool status
+        result = runCmd('devtool status')
+        self.assertIn(recipe, result.output)
+        self.assertIn(tempdir, result.output)
+        # Modify a source file in a submodule, (grab the first one)
+        result = runCmd('git submodule --quiet foreach \'echo $sm_path\'', cwd=tempdir)
+        submodule = result.output.splitlines()[0]
+        submodule_path = os.path.join(tempdir, submodule)
+        runCmd('echo "#This is a first comment" >> testfile', cwd=submodule_path)
+        result = runCmd('git status --porcelain . ', cwd=submodule_path)
+        self.assertIn("testfile", result.output)
+        runCmd('git add testfile; git commit -m "Adding a new file"', cwd=submodule_path)
+
+        # Try finish to the original layer
+        self.add_command_to_tearDown('rm -rf %s ; cd %s ; git checkout %s' % (recipedir, os.path.dirname(recipedir), recipedir))
+        runCmd('devtool finish -f %s meta' % recipe)
+        result = runCmd('devtool status')
+        self.assertNotIn(recipe, result.output, 'Recipe should have been reset by finish but wasn\'t')
+        self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after finish')
+        expected_status = [(' M', '.*/%s$' % os.path.basename(oldrecipefile)),
+                           ('??', '.*/.*-Adding-a-new-file.patch$')]
+        self._check_repo_status(recipedir, expected_status)
+        # Make sure the patch is added to the recipe with the correct "patchdir" option
+        result = runCmd('git diff .', cwd=recipedir)
+        addlines = [
+           'file://0001-Adding-a-new-file.patch;patchdir=%s \\\\' % submodule
+        ]
+        self._check_diff(result.output, addlines, [])
 
 class DevtoolExtractTests(DevtoolBase):
 

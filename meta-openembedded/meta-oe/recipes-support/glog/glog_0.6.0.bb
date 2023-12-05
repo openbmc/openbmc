@@ -22,6 +22,8 @@ PACKAGECONFIG ?= "shared unwind 64bit-atomics"
 PACKAGECONFIG:remove:riscv64 = "unwind"
 PACKAGECONFIG:remove:riscv32 = "unwind 64bit-atomics"
 PACKAGECONFIG:remove:mipsarch = "64bit-atomics"
+PACKAGECONFIG:remove:armv5 = "64bit-atomics"
+PACKAGECONFIG:remove:armv6 = "64bit-atomics"
 
 PACKAGECONFIG:append:libc-musl:riscv64 = " execinfo"
 PACKAGECONFIG:append:libc-musl:riscv32 = " execinfo"

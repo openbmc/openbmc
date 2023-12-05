@@ -52,6 +52,22 @@ def print_user(u):
 
 
 def main():
+    def handle_get(args, client):
+        result = client.get_taskhash(args.method, args.taskhash, all_properties=True)
+        if not result:
+            return 0
+
+        print(json.dumps(result, sort_keys=True, indent=4))
+        return 0
+
+    def handle_get_outhash(args, client):
+        result = client.get_outhash(args.method, args.outhash, args.taskhash)
+        if not result:
+            return 0
+
+        print(json.dumps(result, sort_keys=True, indent=4))
+        return 0
+
     def handle_stats(args, client):
         if args.reset:
             s = client.reset_stats()
@@ -188,6 +204,17 @@ def main():
     parser.add_argument('--no-netrc', '-n', action="store_false", dest="netrc", help="Do not use .netrc")
 
     subparsers = parser.add_subparsers()
+
+    get_parser = subparsers.add_parser('get', help="Get the unihash for a taskhash")
+    get_parser.add_argument("method", help="Method to query")
+    get_parser.add_argument("taskhash", help="Task hash to query")
+    get_parser.set_defaults(func=handle_get)
+
+    get_outhash_parser = subparsers.add_parser('get-outhash', help="Get output hash information")
+    get_outhash_parser.add_argument("method", help="Method to query")
+    get_outhash_parser.add_argument("outhash", help="Output hash to query")
+    get_outhash_parser.add_argument("taskhash", help="Task hash to query")
+    get_outhash_parser.set_defaults(func=handle_get_outhash)
 
     stats_parser = subparsers.add_parser('stats', help='Show server stats')
     stats_parser.add_argument('--reset', action='store_true',

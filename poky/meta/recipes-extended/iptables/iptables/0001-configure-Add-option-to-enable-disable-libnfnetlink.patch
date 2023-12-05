@@ -1,7 +1,7 @@
-From 698ed332e2c592235d2b737c545ac25ad0970e15 Mon Sep 17 00:00:00 2001
+From 0096c854d5015918ed154dccb3ad472fd06c1010 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
 Date: Tue, 21 Feb 2017 11:16:31 +0200
-Subject: [PATCH 1/4] configure: Add option to enable/disable libnfnetlink
+Subject: [PATCH] configure: Add option to enable/disable libnfnetlink
 
 This changes the configure behaviour from autodetecting
 for libnfnetlink to having an option to disable it explicitly
@@ -10,12 +10,13 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
+
 ---
  configure.ac | 10 +++++++---
  1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index bc2ed47b..e27745e5 100644
+index d99fa3b..d607772 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -63,6 +63,9 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
@@ -28,9 +29,9 @@ index bc2ed47b..e27745e5 100644
  AC_ARG_ENABLE([connlabel],
  	AS_HELP_STRING([--disable-connlabel],
  	[Do not build libnetfilter_conntrack]),
-@@ -117,9 +120,10 @@ if test "x$enable_bpfc" = "xyes" || test "x$enable_nfsynproxy" = "xyes"; then
- 	AC_CHECK_LIB(pcap, pcap_compile,, AC_MSG_ERROR(missing libpcap library required by bpf compiler or nfsynproxy tool))
- fi
+@@ -113,9 +116,10 @@ AM_CONDITIONAL([ENABLE_SYNCONF], [test "$enable_nfsynproxy" = "yes"])
+ AM_CONDITIONAL([ENABLE_NFTABLES], [test "$enable_nftables" = "yes"])
+ AM_CONDITIONAL([ENABLE_CONNLABEL], [test "$enable_connlabel" = "yes"])
  
 -PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
 -	[nfnetlink=1], [nfnetlink=0])
@@ -40,8 +41,5 @@ index bc2ed47b..e27745e5 100644
 +    ])
 +AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "x$enable_libnfnetlink" = "xyes"])
  
- if test "x$enable_nftables" = "xyes"; then
- 	PKG_CHECK_MODULES([libmnl], [libmnl >= 1.0], [mnl=1], [mnl=0])
--- 
-2.30.2
-
+ if test "x$enable_bpfc" = "xyes" || test "x$enable_nfsynproxy" = "xyes"; then
+ 	PKG_CHECK_MODULES([libpcap], [libpcap], [], [

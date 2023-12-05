@@ -1,0 +1,397 @@
+From aa6e5588e6d01c12e2f101d140cc710ab199df16 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Fri, 1 Mar 2019 15:22:15 +0800
+Subject: [PATCH] do not disable buffer in writing files
+
+Do not disable buffer in writing files, otherwise we get
+failure at boot for musl like below.
+
+  [!!!!!!] Failed to allocate manager object.
+
+And there will be other failures, critical or not critical.
+This is specific to musl.
+
+Upstream-Status: Inappropriate [musl]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[Rebased for v242]
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+[rebased for systemd 243]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+[rebased for systemd 254]
+---
+ src/basic/cgroup-util.c              | 12 ++++++------
+ src/basic/namespace-util.c           |  4 ++--
+ src/basic/procfs-util.c              |  4 ++--
+ src/basic/sysctl-util.c              |  2 +-
+ src/binfmt/binfmt.c                  |  6 +++---
+ src/core/cgroup.c                    |  2 +-
+ src/core/main.c                      |  2 +-
+ src/core/smack-setup.c               |  8 ++++----
+ src/home/homework.c                  |  2 +-
+ src/libsystemd/sd-device/sd-device.c |  2 +-
+ src/nspawn/nspawn-cgroup.c           |  2 +-
+ src/nspawn/nspawn.c                  |  6 +++---
+ src/shared/binfmt-util.c             |  2 +-
+ src/shared/cgroup-setup.c            |  4 ++--
+ src/shared/coredump-util.c           |  2 +-
+ src/shared/sleep-util.c              |  4 ++--
+ src/shared/smack-util.c              |  2 +-
+ src/sleep/sleep.c                    |  4 ++--
+ src/udev/udev-rules.c                |  1 -
+ src/vconsole/vconsole-setup.c        |  2 +-
+ 20 files changed, 36 insertions(+), 37 deletions(-)
+
+--- a/src/basic/cgroup-util.c
++++ b/src/basic/cgroup-util.c
+@@ -400,7 +400,7 @@ int cg_kill_kernel_sigkill(const char *c
+         if (r < 0)
+                 return r;
+ 
+-        r = write_string_file(killfile, "1", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(killfile, "1", 0);
+         if (r < 0)
+                 return r;
+ 
+@@ -806,7 +806,7 @@ int cg_install_release_agent(const char
+ 
+         sc = strstrip(contents);
+         if (isempty(sc)) {
+-                r = write_string_file(fs, agent, WRITE_STRING_FILE_DISABLE_BUFFER);
++                r = write_string_file(fs, agent, 0);
+                 if (r < 0)
+                         return r;
+         } else if (!path_equal(sc, agent))
+@@ -824,7 +824,7 @@ int cg_install_release_agent(const char
+ 
+         sc = strstrip(contents);
+         if (streq(sc, "0")) {
+-                r = write_string_file(fs, "1", WRITE_STRING_FILE_DISABLE_BUFFER);
++                r = write_string_file(fs, "1", 0);
+                 if (r < 0)
+                         return r;
+ 
+@@ -851,7 +851,7 @@ int cg_uninstall_release_agent(const cha
+         if (r < 0)
+                 return r;
+ 
+-        r = write_string_file(fs, "0", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(fs, "0", 0);
+         if (r < 0)
+                 return r;
+ 
+@@ -861,7 +861,7 @@ int cg_uninstall_release_agent(const cha
+         if (r < 0)
+                 return r;
+ 
+-        r = write_string_file(fs, "", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(fs, "", 0);
+         if (r < 0)
+                 return r;
+ 
+@@ -1764,7 +1764,7 @@ int cg_set_attribute(const char *control
+         if (r < 0)
+                 return r;
+ 
+-        return write_string_file(p, value, WRITE_STRING_FILE_DISABLE_BUFFER);
++        return write_string_file(p, value, 0);
+ }
+ 
+ int cg_get_attribute(const char *controller, const char *path, const char *attribute, char **ret) {
+--- a/src/basic/namespace-util.c
++++ b/src/basic/namespace-util.c
+@@ -227,12 +227,12 @@ int userns_acquire(const char *uid_map,
+                 freeze();
+ 
+         xsprintf(path, "/proc/" PID_FMT "/uid_map", pid);
+-        r = write_string_file(path, uid_map, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(path, uid_map, 0);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write UID map: %m");
+ 
+         xsprintf(path, "/proc/" PID_FMT "/gid_map", pid);
+-        r = write_string_file(path, gid_map, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(path, gid_map, 0);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write GID map: %m");
+ 
+--- a/src/basic/procfs-util.c
++++ b/src/basic/procfs-util.c
+@@ -64,13 +64,13 @@ int procfs_tasks_set_limit(uint64_t limi
+          * decrease it, as threads-max is the much more relevant sysctl. */
+         if (limit > pid_max-1) {
+                 sprintf(buffer, "%" PRIu64, limit+1); /* Add one, since PID 0 is not a valid PID */
+-                r = write_string_file("/proc/sys/kernel/pid_max", buffer, WRITE_STRING_FILE_DISABLE_BUFFER);
++                r = write_string_file("/proc/sys/kernel/pid_max", buffer, 0);
+                 if (r < 0)
+                         return r;
+         }
+ 
+         sprintf(buffer, "%" PRIu64, limit);
+-        r = write_string_file("/proc/sys/kernel/threads-max", buffer, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/sys/kernel/threads-max", buffer, 0);
+         if (r < 0) {
+                 uint64_t threads_max;
+ 
+--- a/src/basic/sysctl-util.c
++++ b/src/basic/sysctl-util.c
+@@ -58,7 +58,7 @@ int sysctl_write(const char *property, c
+ 
+         log_debug("Setting '%s' to '%s'", p, value);
+ 
+-        return write_string_file(p, value, WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_DISABLE_BUFFER | WRITE_STRING_FILE_SUPPRESS_REDUNDANT_VIRTUAL);
++        return write_string_file(p, value, WRITE_STRING_FILE_VERIFY_ON_FAILURE | WRITE_STRING_FILE_SUPPRESS_REDUNDANT_VIRTUAL);
+ }
+ 
+ int sysctl_writef(const char *property, const char *format, ...) {
+--- a/src/binfmt/binfmt.c
++++ b/src/binfmt/binfmt.c
+@@ -30,7 +30,7 @@ static bool arg_unregister = false;
+ 
+ static int delete_rule(const char *rulename) {
+         const char *fn = strjoina("/proc/sys/fs/binfmt_misc/", rulename);
+-        return write_string_file(fn, "-1", WRITE_STRING_FILE_DISABLE_BUFFER);
++        return write_string_file(fn, "-1", 0);
+ }
+ 
+ static int apply_rule(const char *filename, unsigned line, const char *rule) {
+@@ -58,7 +58,7 @@ static int apply_rule(const char *filena
+         if (r >= 0)
+                 log_debug("%s:%u: Rule '%s' deleted.", filename, line, rulename);
+ 
+-        r = write_string_file("/proc/sys/fs/binfmt_misc/register", rule, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/sys/fs/binfmt_misc/register", rule, 0);
+         if (r < 0)
+                 return log_error_errno(r, "%s:%u: Failed to add binary format '%s': %m",
+                                        filename, line, rulename);
+@@ -244,7 +244,7 @@ static int run(int argc, char *argv[]) {
+                         return r;
+ 
+                 /* Flush out all rules */
+-                r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", WRITE_STRING_FILE_DISABLE_BUFFER);
++                r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", 0);
+                 if (r < 0)
+                         log_warning_errno(r, "Failed to flush binfmt_misc rules, ignoring: %m");
+                 else
+--- a/src/core/cgroup.c
++++ b/src/core/cgroup.c
+@@ -4349,7 +4349,7 @@ int unit_cgroup_freezer_action(Unit *u,
+                         u->freezer_state = FREEZER_THAWING;
+         }
+ 
+-        r = write_string_file(path, one_zero(action == FREEZER_FREEZE), WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(path, one_zero(action == FREEZER_FREEZE), 0);
+         if (r < 0)
+                 return r;
+ 
+--- a/src/core/main.c
++++ b/src/core/main.c
+@@ -1737,7 +1737,7 @@ static void initialize_core_pattern(bool
+         if (getpid_cached() != 1)
+                 return;
+ 
+-        r = write_string_file("/proc/sys/kernel/core_pattern", arg_early_core_pattern, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/sys/kernel/core_pattern", arg_early_core_pattern, 0);
+         if (r < 0)
+                 log_warning_errno(r, "Failed to write '%s' to /proc/sys/kernel/core_pattern, ignoring: %m",
+                                   arg_early_core_pattern);
+--- a/src/core/smack-setup.c
++++ b/src/core/smack-setup.c
+@@ -319,17 +319,17 @@ int mac_smack_setup(bool *loaded_policy)
+         }
+ 
+ #if HAVE_SMACK_RUN_LABEL
+-        r = write_string_file("/proc/self/attr/current", SMACK_RUN_LABEL, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/self/attr/current", SMACK_RUN_LABEL, 0);
+         if (r < 0)
+                 log_warning_errno(r, "Failed to set SMACK label \"" SMACK_RUN_LABEL "\" on self: %m");
+-        r = write_string_file("/sys/fs/smackfs/ambient", SMACK_RUN_LABEL, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/sys/fs/smackfs/ambient", SMACK_RUN_LABEL, 0);
+         if (r < 0)
+                 log_warning_errno(r, "Failed to set SMACK ambient label \"" SMACK_RUN_LABEL "\": %m");
+         r = write_string_file("/sys/fs/smackfs/netlabel",
+-                              "0.0.0.0/0 " SMACK_RUN_LABEL, WRITE_STRING_FILE_DISABLE_BUFFER);
++                              "0.0.0.0/0 " SMACK_RUN_LABEL, 0);
+         if (r < 0)
+                 log_warning_errno(r, "Failed to set SMACK netlabel rule \"0.0.0.0/0 " SMACK_RUN_LABEL "\": %m");
+-        r = write_string_file("/sys/fs/smackfs/netlabel", "127.0.0.1 -CIPSO", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/sys/fs/smackfs/netlabel", "127.0.0.1 -CIPSO", 0);
+         if (r < 0)
+                 log_warning_errno(r, "Failed to set SMACK netlabel rule \"127.0.0.1 -CIPSO\": %m");
+ #endif
+--- a/src/home/homework.c
++++ b/src/home/homework.c
+@@ -278,7 +278,7 @@ static void drop_caches_now(void) {
+          * for details. We write "2" into /proc/sys/vm/drop_caches to ensure dentries/inodes are flushed, but
+          * not more. */
+ 
+-        r = write_string_file("/proc/sys/vm/drop_caches", "2\n", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/sys/vm/drop_caches", "2\n", 0);
+         if (r < 0)
+                 log_warning_errno(r, "Failed to drop caches, ignoring: %m");
+         else
+--- a/src/libsystemd/sd-device/sd-device.c
++++ b/src/libsystemd/sd-device/sd-device.c
+@@ -2515,7 +2515,7 @@ _public_ int sd_device_set_sysattr_value
+         if (!value)
+                 return -ENOMEM;
+ 
+-        r = write_string_file(path, value, WRITE_STRING_FILE_DISABLE_BUFFER | WRITE_STRING_FILE_NOFOLLOW);
++        r = write_string_file(path, value, 0 | WRITE_STRING_FILE_NOFOLLOW);
+         if (r < 0) {
+                 /* On failure, clear cache entry, as we do not know how it fails. */
+                 device_remove_cached_sysattr_value(device, sysattr);
+--- a/src/nspawn/nspawn-cgroup.c
++++ b/src/nspawn/nspawn-cgroup.c
+@@ -122,7 +122,7 @@ int sync_cgroup(pid_t pid, CGroupUnified
+         fn = strjoina(tree, cgroup, "/cgroup.procs");
+ 
+         sprintf(pid_string, PID_FMT, pid);
+-        r = write_string_file(fn, pid_string, WRITE_STRING_FILE_DISABLE_BUFFER|WRITE_STRING_FILE_MKDIR_0755);
++        r = write_string_file(fn, pid_string, WRITE_STRING_FILE_MKDIR_0755);
+         if (r < 0) {
+                 log_error_errno(r, "Failed to move process: %m");
+                 goto finish;
+--- a/src/nspawn/nspawn.c
++++ b/src/nspawn/nspawn.c
+@@ -2774,7 +2774,7 @@ static int reset_audit_loginuid(void) {
+         if (streq(p, "4294967295"))
+                 return 0;
+ 
+-        r = write_string_file("/proc/self/loginuid", "4294967295", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/self/loginuid", "4294967295", 0);
+         if (r < 0) {
+                 log_error_errno(r,
+                                 "Failed to reset audit login UID. This probably means that your kernel is too\n"
+@@ -4214,7 +4214,7 @@ static int setup_uid_map(
+                 return log_oom();
+ 
+         xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
+-        r = write_string_file(uid_map, s, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(uid_map, s, 0);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write UID map: %m");
+ 
+@@ -4224,7 +4224,7 @@ static int setup_uid_map(
+                 return log_oom();
+ 
+         xsprintf(uid_map, "/proc/" PID_FMT "/gid_map", pid);
+-        r = write_string_file(uid_map, s, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(uid_map, s, 0);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write GID map: %m");
+ 
+--- a/src/shared/binfmt-util.c
++++ b/src/shared/binfmt-util.c
+@@ -46,7 +46,7 @@ int disable_binfmt(void) {
+                 return 0;
+         }
+ 
+-        r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/proc/sys/fs/binfmt_misc/status", "-1", 0);
+         if (r < 0)
+                 return log_warning_errno(r, "Failed to unregister binfmt_misc entries: %m");
+ 
+--- a/src/shared/cgroup-setup.c
++++ b/src/shared/cgroup-setup.c
+@@ -351,7 +351,7 @@ int cg_attach(const char *controller, co
+ 
+         xsprintf(c, PID_FMT "\n", pid);
+ 
+-        r = write_string_file(fs, c, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(fs, c, 0);
+         if (r == -EOPNOTSUPP && cg_is_threaded(controller, path) > 0)
+                 /* When the threaded mode is used, we cannot read/write the file. Let's return recognizable error. */
+                 return -EUCLEAN;
+@@ -964,7 +964,7 @@ int cg_enable_everywhere(
+                                         return log_debug_errno(errno, "Failed to open cgroup.subtree_control file of %s: %m", p);
+                         }
+ 
+-                        r = write_string_stream(f, s, WRITE_STRING_FILE_DISABLE_BUFFER);
++                        r = write_string_stream(f, s, 0);
+                         if (r < 0) {
+                                 log_debug_errno(r, "Failed to %s controller %s for %s (%s): %m",
+                                                 FLAGS_SET(mask, bit) ? "enable" : "disable", n, p, fs);
+--- a/src/shared/coredump-util.c
++++ b/src/shared/coredump-util.c
+@@ -163,7 +163,7 @@ int set_coredump_filter(uint64_t value)
+         xsprintf(t, "0x%"PRIx64, value);
+ 
+         return write_string_file("/proc/self/coredump_filter", t,
+-                                 WRITE_STRING_FILE_VERIFY_ON_FAILURE|WRITE_STRING_FILE_DISABLE_BUFFER);
++                                 0);
+ }
+ 
+ /* Turn off core dumps but only if we're running outside of a container. */
+--- a/src/shared/sleep-util.c
++++ b/src/shared/sleep-util.c
+@@ -1044,7 +1044,7 @@ int write_resume_config(dev_t devno, uin
+ 
+         /* We write the offset first since it's safer. Note that this file is only available in 4.17+, so
+          * fail gracefully if it doesn't exist and we're only overwriting it with 0. */
+-        r = write_string_file("/sys/power/resume_offset", offset_str, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/sys/power/resume_offset", offset_str, 0);
+         if (r == -ENOENT) {
+                 if (offset != 0)
+                         return log_error_errno(SYNTHETIC_ERRNO(EOPNOTSUPP),
+@@ -1060,7 +1060,7 @@ int write_resume_config(dev_t devno, uin
+                 log_debug("Wrote resume_offset=%s for device '%s' to /sys/power/resume_offset.",
+                           offset_str, device);
+ 
+-        r = write_string_file("/sys/power/resume", devno_str, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/sys/power/resume", devno_str, 0);
+         if (r < 0)
+                 return log_error_errno(r,
+                                        "Failed to write device '%s' (%s) to /sys/power/resume: %m",
+--- a/src/shared/smack-util.c
++++ b/src/shared/smack-util.c
+@@ -113,7 +113,7 @@ int mac_smack_apply_pid(pid_t pid, const
+                 return 0;
+ 
+         p = procfs_file_alloca(pid, "attr/current");
+-        r = write_string_file(p, label, WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file(p, label, 0);
+         if (r < 0)
+                 return r;
+ 
+--- a/src/sleep/sleep.c
++++ b/src/sleep/sleep.c
+@@ -139,7 +139,7 @@ static int write_mode(char **modes) {
+         STRV_FOREACH(mode, modes) {
+                 int k;
+ 
+-                k = write_string_file("/sys/power/disk", *mode, WRITE_STRING_FILE_DISABLE_BUFFER);
++                k = write_string_file("/sys/power/disk", *mode, 0);
+                 if (k >= 0)
+                         return 0;
+ 
+@@ -160,7 +160,7 @@ static int write_state(FILE **f, char **
+         STRV_FOREACH(state, states) {
+                 int k;
+ 
+-                k = write_string_stream(*f, *state, WRITE_STRING_FILE_DISABLE_BUFFER);
++                k = write_string_stream(*f, *state, 0);
+                 if (k >= 0)
+                         return 0;
+                 log_debug_errno(k, "Failed to write '%s' to /sys/power/state: %m", *state);
+--- a/src/udev/udev-rules.c
++++ b/src/udev/udev-rules.c
+@@ -2634,7 +2634,6 @@ static int udev_rule_apply_token_to_even
+                 log_event_debug(dev, token, "ATTR '%s' writing '%s'", buf, value);
+                 r = write_string_file(buf, value,
+                                       WRITE_STRING_FILE_VERIFY_ON_FAILURE |
+-                                      WRITE_STRING_FILE_DISABLE_BUFFER |
+                                       WRITE_STRING_FILE_AVOID_NEWLINE |
+                                       WRITE_STRING_FILE_VERIFY_IGNORE_NEWLINE);
+                 if (r < 0)
+--- a/src/vconsole/vconsole-setup.c
++++ b/src/vconsole/vconsole-setup.c
+@@ -260,7 +260,7 @@ static int toggle_utf8_vc(const char *na
+ static int toggle_utf8_sysfs(bool utf8) {
+         int r;
+ 
+-        r = write_string_file("/sys/module/vt/parameters/default_utf8", one_zero(utf8), WRITE_STRING_FILE_DISABLE_BUFFER);
++        r = write_string_file("/sys/module/vt/parameters/default_utf8", one_zero(utf8), 0);
+         if (r < 0)
+                 return log_warning_errno(r, "Failed to %s sysfs UTF-8 flag: %m", enable_disable(utf8));
+ 

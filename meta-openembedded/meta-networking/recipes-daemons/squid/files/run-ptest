@@ -1,3 +1,4 @@
 #!/bin/sh
 #
+make -C test-suite -k squid-conf-tests
 make -C test-suite -k runtest-TESTS

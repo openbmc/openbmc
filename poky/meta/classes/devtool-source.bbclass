@@ -232,6 +232,9 @@ python devtool_post_patch() {
                 bb.process.run('git rebase devtool-no-overrides', cwd=srcsubdir)
         bb.process.run('git checkout %s' % devbranch, cwd=srcsubdir)
     bb.process.run('git tag -f devtool-patched', cwd=srcsubdir)
+    if os.path.exists(os.path.join(srcsubdir, '.gitmodules')):
+        bb.process.run('git submodule foreach --recursive  "git tag -f devtool-patched"', cwd=srcsubdir)
+
 }
 
 python devtool_post_configure() {

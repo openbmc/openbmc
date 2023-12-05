@@ -1,0 +1,54 @@
+From 461d00fcd5c5842b9a56f7462d55d46bf21163cc Mon Sep 17 00:00:00 2001
+From: Patrick Williams <patrick@stwcx.xyz>
+Date: Fri, 1 Dec 2023 11:19:02 -0600
+Subject: [PATCH] Handle build with older versions of GCC
+
+Older versions of GCC (prior to 9.1) did not put the `std::filesystem`
+support directly into libstdcpp, but in a separate `libstdc++fs`.  Add
+meson logic to detect if an extra linker flag is necessary.
+
+Fixes #223.
+
+Tested on AlmaLinux 8 which uses GCC-8.
+
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/xdg/shared-mime-info/-/merge_requests/278]
+---
+ meson.build | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index ecc012f..93acd40 100644
+--- a/meson.build
++++ b/meson.build
+@@ -11,6 +11,7 @@ config = configuration_data()
+ i18n = import('i18n')
+ 
+ cc = meson.get_compiler('c')
++cxx = meson.get_compiler('cpp')
+ 
+ ###############################################################################
+ # Project configuration
+@@ -46,6 +47,19 @@ if not xdgmime_found
+     ''')
+ endif
+ 
++###############################################################################
++# Check if GCC needs -lstdc++fs (before 9.1)
++
++if not cxx.links('''
++        #include <filesystem>
++        int main() {
++            return std::filesystem::is_directory(
++                std::filesystem::status("/tmp")) ? 0 : 1;
++        }
++        ''', name: 'std++fs-check')
++    add_project_link_arguments('-lstdc++fs', language : 'cpp')
++endif
++
+ ###############################################################################
+ # Dependencies
+ 
+-- 
+2.41.0
+

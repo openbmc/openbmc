@@ -672,11 +672,11 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
         destlayerdir: base directory of the layer to place the bbappend in
             (subdirectory path from there will be determined automatically)
         srcfiles: dict of source files to add to SRC_URI, where the value
-            is the full path to the file to be added, and the value is the
-            original filename as it would appear in SRC_URI or None if it
-            isn't already present. You may pass None for this parameter if
-            you simply want to specify your own content via the extralines
-            parameter.
+            is the full path to the file to be added, and the value is a
+            dict with 'path' key containing the original filename as it
+            would appear in SRC_URI or None if it isn't already present.
+            You may pass None for this parameter if you simply want to specify
+            your own content via the extralines parameter.
         install: dict mapping entries in srcfiles to a tuple of two elements:
             install path (*without* ${D} prefix) and permission value (as a
             string, e.g. '0644').
@@ -763,10 +763,9 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
     copyfiles = {}
     if srcfiles:
         instfunclines = []
-        for i, (newfile, origsrcfile) in enumerate(srcfiles.items()):
-            srcfile = origsrcfile
+        for i, (newfile, param) in enumerate(srcfiles.items()):
             srcurientry = None
-            if not srcfile:
+            if not 'path' in param or not param['path']:
                 srcfile = os.path.basename(newfile)
                 srcurientry = 'file://%s' % srcfile
                 if params and params[i]:
@@ -778,7 +777,10 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
                         appendline('SRC_URI:append%s' % appendoverride, '=', ' ' + srcurientry)
                     else:
                         appendline('SRC_URI', '+=', srcurientry)
-            copyfiles[newfile] = srcfile
+                param['path'] = srcfile
+            else:
+                srcfile = param['path']
+            copyfiles[newfile] = param
             if install:
                 institem = install.pop(newfile, None)
                 if institem:
@@ -901,7 +903,12 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
             outdir = redirect_output
         else:
             outdir = appenddir
-        for newfile, srcfile in copyfiles.items():
+        for newfile, param in copyfiles.items():
+            srcfile = param['path']
+            patchdir = param.get('patchdir', ".")
+
+            if patchdir != ".":
+                newfile = os.path.join(os.path.split(newfile)[0], patchdir, os.path.split(newfile)[1])
             filedest = os.path.join(outdir, destsubdir, os.path.basename(srcfile))
             if os.path.abspath(newfile) != os.path.abspath(filedest):
                 if newfile.startswith(tempfile.gettempdir()):
@@ -1035,7 +1042,7 @@ def get_recipe_upstream_version(rd):
             revision = ud.method.latest_revision(ud, rd, 'default')
             upversion = pv
             if revision != rd.getVar("SRCREV"):
-                upversion = upversion + "-new-commits-available" 
+                upversion = upversion + "-new-commits-available"
         else:
             pupver = ud.method.latest_versionstring(ud, rd)
             (upversion, revision) = pupver
