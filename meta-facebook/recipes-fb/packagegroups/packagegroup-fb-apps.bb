@@ -64,5 +64,6 @@ RDEPENDS:${PN}-system = " \
         phosphor-fan-sensor-monitor \
         phosphor-gpio-monitor-monitor \
         tzdata-core \
+        fb-common-functions \
         ${RDEPENDS_PN_SYSTEM_EXTRAS} \
         "
