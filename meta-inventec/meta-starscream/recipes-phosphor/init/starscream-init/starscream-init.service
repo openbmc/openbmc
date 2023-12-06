@@ -1,0 +1,10 @@
+[Unit]
+Description=Essential init commands for starscream
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/sbin/starscream-init.sh
+
+[Install]
+WantedBy=multi-user.target
