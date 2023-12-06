@@ -2,7 +2,7 @@ require conf/distro/include/phosphor-defaults.inc
 require conf/distro/include/phosphor-pkg-tweaks.inc
 
 # Match the distro codename from upstream poky.
-DISTRO_CODENAME ?= "mickledore"
+DISTRO_CODENAME ?= "scarthgap"
 
 # Override these in poky based distros
 POKY_DEFAULT_DISTRO_FEATURES = "opengl ptest multiarch wayland vulkan"
