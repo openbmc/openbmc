@@ -18,7 +18,9 @@ SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs-binarystore;branch=maste
 
 S = "${WORKDIR}/git"
 
-inherit meson pkgconfig
+inherit meson pkgconfig systemd
+
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'blobtool', 'binarystore-migration.service', '', d)}"
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
