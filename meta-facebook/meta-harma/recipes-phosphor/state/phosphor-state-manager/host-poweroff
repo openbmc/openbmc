@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+power_off

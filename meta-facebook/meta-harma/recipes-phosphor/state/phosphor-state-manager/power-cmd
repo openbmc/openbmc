@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+# Power Good Status
+power_status() {
+    if [ "$(get_gpio "power-cpu-good")" -eq 1 ]; then
+        echo "on"
+    else
+        echo "off"
+    fi
+}
+
+# DC off
+power_off() {
+    if [ "$(power_status)" == "on" ]; then
+        echo "Set Host Power Off"
+        set_gpio power-host-control 0
+        sleep 6
+        set_gpio power-host-control 1
+        sleep 1
+    fi
+}
+
+# DC on
+power_on() {
+    if [ "$(power_status)" == "off" ]; then
+        set_gpio power-host-control 0
+        sleep 1
+        set_gpio power-host-control 1
+        sleep 1
+    fi
+
+    for i in $(seq 1 10)
+    do
+        if [ "$(power_status)" == "on" ]; then
+
+           echo "Set Host Power On"
+           return 0
+        fi
+
+        if [ "$i" -eq 10 ]; then
+           echo "Set Host Power On Fail"
+           return 1
+        fi
+    done
+}
+
+# Host reset
+power_reset() {
+    echo "Set Host Reset"
+    set_gpio reset-control 0
+    sleep 1
+    set_gpio reset-control 1
+    sleep 1
+}
