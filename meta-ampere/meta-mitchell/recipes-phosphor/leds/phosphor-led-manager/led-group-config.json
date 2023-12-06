@@ -3,6 +3,20 @@
 		{
 			"group": "bmc_booted",
 			"members": [
+				{
+					"Name": "bmc_ready",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 0,
+					"Priority": "On"
+				},
+				{
+					"Name": "sw_heartbeat",
+					"Action": "Blink",
+					"DutyOn": 50,
+					"Period": 2000,
+					"Priority": "On"
+				}
 			]
 		},
 		{
