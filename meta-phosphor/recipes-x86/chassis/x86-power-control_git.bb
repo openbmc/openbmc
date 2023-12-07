@@ -2,7 +2,7 @@ SUMMARY = "Chassis Power Control service for Intel based platforms"
 DESCRIPTION = "Chassis Power Control service for Intel based platforms"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-SRCREV = "68ea83191882990c0ef80b21ecce2e7136f62151"
+SRCREV = "b1e34a11f5c64a7c4225fb4cf15ee7f9368cbef4"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/x86-power-control.git;protocol=https;branch=master"
