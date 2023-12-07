@@ -50,7 +50,6 @@ RDEPENDS_PN_SYSTEM_EXTRAS:fb-withhost = " \
         fb-ipmi-oem \
         phosphor-hostlogger \
         phosphor-sel-logger \
-        ipmitool \
         phosphor-post-code-manager \
         phosphor-host-postd \
         phosphor-state-manager \
