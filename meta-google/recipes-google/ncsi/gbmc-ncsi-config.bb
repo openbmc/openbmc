@@ -8,6 +8,7 @@ inherit systemd
 GBMC_NCSI_DHCP_RELAY ??= "${@'' if int(d.getVar('FLASH_SIZE')) < 65536 else '1'}"
 GBMC_NCSI_IF_OLD ??= ""
 GBMC_NCSI_PURGE_ETC ??= ""
+GBMC_NCSI_DHCP_IMPERSONATE_HOST ??= "1"
 
 SRC_URI += " \
   ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrncsidhcp.netdev'} \
@@ -162,6 +163,11 @@ do_install:append() {
     ${WORKDIR}/gbmc-ncsi-smartnic-wa.sh.in >${WORKDIR}/gbmc-ncsi-smartnic-wa.sh
   install -d -m0755 ${D}${bindir}
   install -m0755 ${WORKDIR}/gbmc-ncsi-smartnic-wa.sh ${D}${bindir}/
+
+  if [ '${GBMC_NCSI_DHCP_IMPERSONATE_HOST}' != 1 ]; then
+    ln -sv /dev/null ${D}${systemd_system_unitdir}/dhcp6@.service
+    ln -sv /dev/null ${D}${systemd_system_unitdir}/dhcp4@.service
+  fi
 }
 
 do_rm_work:prepend() {
