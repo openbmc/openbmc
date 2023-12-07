@@ -15,6 +15,11 @@
             "name": "PGOOD",
             "pin": "V3",
             "direction": "in"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "X6",
+            "direction": "in"
         }
     ]
 }
