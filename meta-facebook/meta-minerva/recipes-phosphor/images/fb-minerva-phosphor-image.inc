@@ -9,3 +9,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     plat-svc \
 "
+
+# For console to the MTIA blade
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    obmc-console \
+"
