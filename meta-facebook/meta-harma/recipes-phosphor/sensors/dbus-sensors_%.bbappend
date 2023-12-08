@@ -4,4 +4,5 @@ PACKAGECONFIG:harma = " \
     adcsensor \
     hwmontempsensor \
     psusensor \
+    nvmesensor \
 "
