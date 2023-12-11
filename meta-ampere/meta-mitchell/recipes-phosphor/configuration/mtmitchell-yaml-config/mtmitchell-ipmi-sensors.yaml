@@ -43,22 +43,22 @@
 7:
     <<: *TEMP_DEFAULTS
     entityID: 0x37
-    entityInstance: 1
+    entityInstance: 2
     path: /xyz/openbmc_project/sensors/temperature/SysCabInletTemp
 8:
     <<: *TEMP_DEFAULTS
-    entityID: 0x40
-    entityInstance: 1
+    entityID: 0x37
+    entityInstance: 3
     path: /xyz/openbmc_project/sensors/temperature/MBInletTemp1
 9:
     <<: *TEMP_DEFAULTS
-    entityID: 0x40
-    entityInstance: 2
+    entityID: 0x37
+    entityInstance: 4
     path: /xyz/openbmc_project/sensors/temperature/MBInletTemp2
 10:
     <<: *TEMP_DEFAULTS
-    entityID: 0x42
-    entityInstance: 1
+    entityID: 0x7
+    entityInstance: 6
     path: /xyz/openbmc_project/sensors/temperature/AST2600CPUTemp
 11:
     <<: *TEMP_DEFAULTS
@@ -67,7 +67,8 @@
     path: /xyz/openbmc_project/sensors/temperature/NVMeM2_MaxTemp
 12:
     <<: *TEMP_DEFAULTS
-    entityInstance: 12
+    entityID: 0x1e
+    entityInstance: 2
     path: /xyz/openbmc_project/sensors/temperature/NVMeFBP_MaxTemp
 13:
     <<: *TEMP_DEFAULTS
@@ -76,7 +77,8 @@
     path: /xyz/openbmc_project/sensors/temperature/SysInletTemp
 14:
     <<: *TEMP_DEFAULTS
-    entityInstance: 14
+    entityID: 0x1e
+    entityInstance: 4
     path: /xyz/openbmc_project/sensors/temperature/FrontBP_MaxTemp
 16:
     <<: *TEMP_DEFAULTS
