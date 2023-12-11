@@ -8,6 +8,7 @@ RDEPENDS:${PN} += "bash"
 
 SRC_URI += " \
             file://phosphor-multi-gpio-monitor.json \
+            file://phosphor-multi-gpio-presence.json \
             file://ampere_scp_failover.sh \
             file://ampere_psu_reset_hotswap.sh \
            "
@@ -23,9 +24,14 @@ FILES:${PN}-monitor += " \
                         /usr/sbin/ampere_psu_reset_hotswap.sh \
                        "
 
+FILES:${PN}-presence += " \
+                         ${datadir}/${PN}/phosphor-multi-gpio-presence.json \
+                        "
+
 do_install:append() {
     install -d ${D}${sbindir}
     install -m 0644 ${WORKDIR}/phosphor-multi-gpio-monitor.json ${D}${datadir}/${PN}/
+    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
     install -m 0755 ${WORKDIR}/ampere_scp_failover.sh ${D}${sbindir}/
     install -m 0755 ${WORKDIR}/ampere_psu_reset_hotswap.sh ${D}${sbindir}/
 }

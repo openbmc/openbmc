@@ -3,6 +3,7 @@ RDEPENDS:${PN}-extras:append = " \
                                 phosphor-virtual-sensor \
                                 phosphor-misc-usb-ctrl \
                                 phosphor-gpio-monitor-monitor \
+                                phosphor-gpio-monitor-presence \
                                 phosphor-skeleton-control-power \
                                 phosphor-hostlogger \
                                 phosphor-sel-logger \
