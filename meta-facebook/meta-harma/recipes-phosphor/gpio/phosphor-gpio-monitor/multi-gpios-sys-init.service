@@ -1,0 +1,11 @@
+[Unit]
+Wants=xyz.openbmc_project.State.Host@0.service
+After=xyz.openbmc_project.State.Host@0.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/multi-gpios-sys-init
+SyslogIdentifier=Power Good Status Init
+
+[Install]
+WantedBy=multi-user.target

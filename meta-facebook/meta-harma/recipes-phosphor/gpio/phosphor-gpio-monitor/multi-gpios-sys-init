@@ -1,0 +1,151 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+power_good_init() {
+  if [ "$(get_gpio power-host-good)" -eq 1 ]; then
+    busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Running;
+  else
+    busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Off;
+  fi
+}
+
+post_end_init() {
+  if [ "$(get_gpio host-ready-n)" -eq 0 ]; then
+     busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
+     xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
+     xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby;
+  else
+     busctl set-property xyz.openbmc_project.State.Host0 \
+     /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
+     xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Inactive;
+  fi
+}
+
+# Set Post Led out GPIO N0-N7
+set_gpio led-postcode-0 1
+set_gpio led-postcode-1 1
+set_gpio led-postcode-2 1
+set_gpio led-postcode-3 1
+set_gpio led-postcode-4 1
+set_gpio led-postcode-5 1
+set_gpio led-postcode-6 1
+set_gpio led-postcode-7 1
+
+# gpiochip0 166
+set_gpio led-identify-gate 0
+
+# Set SGPIO Initial Value
+# SGPIO Out Bit-01
+set_gpio power-config-disable-e1s-0 0
+# SGPIO Out Bit-05
+set_gpio power-config-disable-e1s-1 0
+# SGPIO Out Bit-09
+set_gpio power-config-asic-module-enable 1
+
+# SGPIO Out Bit-11
+set_gpio power-config-asic-power-good 1
+# SGPIO Out Bit-13
+set_gpio power-config-pdb-power-good 1
+# SGPIO Out Bit-15
+set_gpio smi-control-n 1
+# SGPIO Out Bit-17
+set_gpio nmi-control-n 1
+# SGPIO Out Bit-19
+set_gpio nmi-control-sync-flood-n 1
+
+# SGPIO Out Bit-25
+set_gpio FM_CPU_SP5R1 0
+# SGPIO Out Bit-27
+set_gpio FM_CPU_SP5R2 0
+# SGPIO Out Bit-29
+set_gpio FM_CPU_SP5R3 0
+
+# SGPIO Out Bit-31
+set_gpio FM_CPU_SP5R4 0
+# SGPIO Out Bit-33
+set_gpio FM_CPU0_SA0 0
+# SGPIO Out Bit-35
+set_gpio FM_CPU0_SA1 0
+# SGPIO Out Bit-37
+set_gpio rt-cpu0-p0-enable 1
+# SGPIO Out Bit-39
+set_gpio rt-cpu0-p1-enable 1
+
+# SGPIO Out Bit-41
+set_gpio smb-rt-rom-p0-select 0
+# SGPIO Out Bit-43
+set_gpio smb-rt-rom-p1-select 0
+# SGPIO Out Bit-45
+set_gpio i3c-cpu-mux0-oe-n 0
+# SGPIO Out Bit-47
+set_gpio i3c-cpu-mux0-select 0
+# SGPIO Out Bit-49
+set_gpio i3c-cpu-mux1-oe-n 0
+
+# SGPIO Out Bit-51
+set_gpio i3c-cpu-mux1-select 0
+# SGPIO Out Bit-53
+set_gpio reset-control-bmc 1
+# SGPIO Out Bit-55
+set_gpio reset-control-cpu0-p0-mux 1
+# SGPIO Out Bit-57
+set_gpio reset-control-cpu0-p1-mux 1
+# SGPIO Out Bit-59
+set_gpio reset-control-e1s-mux 1
+
+# SGPIO Out Bit-61
+set_gpio reset-control-mb-mux 1
+# SGPIO Out Bit-63
+set_gpio reset-control-smb-e1s-0 1
+# SGPIO Out Bit-65
+set_gpio reset-control-smb-e1s-1 1
+# SGPIO Out Bit-67
+set_gpio reset-control-srst 1
+# SGPIO Out Bit-69
+set_gpio reset-control-usb-hub 1
+
+# SGPIO Out Bit-71
+set_gpio reset-control 1
+# SGPIO Out Bit-73
+set_gpio reset-control-cpu-kbrst 1
+# SGPIO Out Bit-75
+set_gpio reset-control-platrst 1
+# SGPIO Out Bit-77
+set_gpio bmc-jtag-mux-select-0 0
+# SGPIO Out Bit-79
+set_gpio bmc-jtag-mux-select-1 0
+# SGPIO Out Bit-81
+set_gpio bmc-jtag-select 1
+# SGPIO Out Bit-87
+set_gpio rt-cpu0-p0-force-enable 0
+# SGPIO Out Bit-89
+set_gpio rt-cpu0-p1-force-enable 0
+# SGPIO Out Bit-91
+set_gpio bios-debug-msg-disable 1
+# SGPIO Out Bit-93
+set_gpio uart-control-buffer-select 0
+# SGPIO Out Bit-95
+set_gpio ac-control-n 0
+# SGPIO Out Bit-83
+set_gpio bmc-ready-n 0
+# SGPIO Out Bit-85
+set_gpio bmc-ready-sgpio 1
+
+# Create /dev/mem
+if [ ! -c /dev/mem ]; then
+    /bin/mknod /dev/mem c 1 1
+fi
+
+# The workaround is to disable GPIO passthrough,
+# which is enabled by a hardware strap pin that is active high.
+# This design is intended for a debug presence pin,
+# so the default value is pulled high.
+devmem 0x1e6e251c 32 0
+
+# Initial Power status.
+power_good_init
+post_end_init

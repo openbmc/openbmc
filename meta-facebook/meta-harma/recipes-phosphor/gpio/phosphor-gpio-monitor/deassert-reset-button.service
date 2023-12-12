@@ -1,0 +1,8 @@
+[Unit]
+Description=Deassert Reset Button
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/deassert-reset-button
+
+SyslogIdentifier=deassert-reset-button

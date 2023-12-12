@@ -1,0 +1,38 @@
+[
+    {
+        "Name": "reset-button",
+        "ChipId": "0",
+        "GpioNum": 122,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-reset-button.service"],
+            "FALLING": ["assert-reset-button.service"]
+
+        },
+        "Continue": true
+    },
+    {
+        "Name": "power-host-good",
+        "ChipId": "2",
+        "GpioNum": 60,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-power-good.service"],
+            "FALLING": ["assert-power-good.service"]
+
+        },
+        "Continue": true
+    },
+    {
+        "Name": "host-ready-n",
+        "ChipId": "2",
+        "GpioNum": 66,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-post-end.service"],
+            "FALLING": ["assert-post-end.service"]
+
+        },
+        "Continue": true
+    }
+]

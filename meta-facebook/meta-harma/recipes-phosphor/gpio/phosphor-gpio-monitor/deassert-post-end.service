@@ -1,0 +1,8 @@
+[Unit]
+Description=Deassert Post Complete Status
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/deassert-post-end
+
+SyslogIdentifier=deassert-post-end
