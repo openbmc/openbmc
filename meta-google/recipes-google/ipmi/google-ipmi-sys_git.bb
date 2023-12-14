@@ -17,15 +17,18 @@ DEPENDS += " \
   systemd \
   "
 
+RDEPENDS:${PN} += " \
+  bare-metal-active \
+  "
+
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/google-ipmi-sys;branch=master;protocol=https"
-SRCREV = "f3fe8df305e41eccb6c56c71497660103d87b8ea"
+SRCREV = "1302e83cd81c5351d5f442c9d918ac5d4cc9f25b"
 
 FILES:${PN} += "${libdir}/ipmid-providers"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} += " \
-  gbmc-bare-metal-active.target \
   gbmc-host-poweroff.target \
   gbmc-psu-hardreset.target \
   gbmc-psu-hardreset-pre.target \
