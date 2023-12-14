@@ -1,0 +1,131 @@
+# y = L[(M*x + (B * 10^K1)) * 10^K2]units
+# x: raw value
+# y: real value
+# M: multiplierM
+# B: offsetB
+# K1: bExp
+# K2: rExp
+
+1: &temperature
+  entityID: 0x07
+  entityInstance: 1
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/EVB_Temp
+  sensorReadingType: 0x01
+  multiplierM: 1
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+2:
+  <<: *temperature
+  entityInstance: 2
+  path: /xyz/openbmc_project/sensors/temperature/BMC_CPU_Temp0
+3:
+  <<: *temperature
+  entityInstance: 3
+  path: /xyz/openbmc_project/sensors/temperature/BMC_CPU_Temp1
+
+4: &voltage
+  entityID: 0x07
+  entityInstance: 4
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/ADC1
+  sensorReadingType: 0x01
+  multiplierM: 157
+  offsetB: 0
+  bExp: 0
+  rExp: -4
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  sensorNamePattern: nameLeaf
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+5:
+  <<: *voltage
+  entityInstance: 5
+  path: /xyz/openbmc_project/sensors/voltage/ADC2
+
+6:
+  <<: *voltage
+  entityInstance: 6
+  path: /xyz/openbmc_project/sensors/voltage/ADC3
+
+7:
+  <<: *voltage
+  entityInstance: 7
+  path: /xyz/openbmc_project/sensors/voltage/ADC4
+
+8:
+  <<: *voltage
+  entityInstance: 8
+  path: /xyz/openbmc_project/sensors/voltage/ADC5
+
+9:
+  <<: *voltage
+  entityInstance: 9
+  path: /xyz/openbmc_project/sensors/voltage/ADC6
+
+10:
+  <<: *voltage
+  entityInstance: 10
+  path: /xyz/openbmc_project/sensors/voltage/ADC7
+
+11:
+  <<: *voltage
+  entityInstance: 11
+  path: /xyz/openbmc_project/sensors/voltage/ADC8
+
+12: &fan_tach
+  entityID: 0x1D
+  entityInstance: 1
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan1
+  sensorReadingType: 0x01
+  multiplierM: 80
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  mutability: Mutability::Read
+  sensorNamePattern: nameLeaf
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+13:
+  <<: *fan_tach
+  entityInstance: 2
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan2
+
+14:
+  <<: *fan_tach
+  entityInstance: 3
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan3
+
+15:
+  <<: *fan_tach
+  entityInstance: 4
+  path: /xyz/openbmc_project/sensors/fan_tach/Fan4

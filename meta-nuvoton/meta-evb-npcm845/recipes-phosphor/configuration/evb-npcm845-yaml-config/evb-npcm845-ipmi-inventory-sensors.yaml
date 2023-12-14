@@ -1,0 +1,75 @@
+/xyz/openbmc_project/sensors/temperature/EVB_Temp:
+  eventReadingType: 1
+  sensorID: 0x01
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/BMC_CPU_Temp0:
+  eventReadingType: 1
+  sensorID: 0x02
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/BMC_CPU_Temp1:
+  eventReadingType: 1
+  sensorID: 0x03
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC1:
+  eventReadingType: 1
+  sensorID: 0x04
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC2:
+  eventReadingType: 1
+  sensorID: 0x05
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC3:
+  eventReadingType: 1
+  sensorID: 0x06
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC4:
+  eventReadingType: 1
+  sensorID: 0x07
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC5:
+  eventReadingType: 1
+  sensorID: 0x08
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC6:
+  eventReadingType: 1
+  sensorID: 0x09
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC7:
+  eventReadingType: 1
+  sensorID: 0x0A
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC8:
+  eventReadingType: 1
+  sensorID: 0x0B
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan1:
+  eventReadingType: 1
+  sensorID: 0x0C
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan2:
+  eventReadingType: 1
+  sensorID: 0x0D
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan3:
+  eventReadingType: 1
+  sensorID: 0x0E
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Fan4:
+  eventReadingType: 1
+  sensorID: 0x0F
+  sensorType: 4
+  offset: 0xff
