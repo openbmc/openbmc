@@ -4,3 +4,8 @@
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
 "
+
+# Temporarily add plat-svc for gpio initialization
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    plat-svc \
+"
