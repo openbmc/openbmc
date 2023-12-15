@@ -1,2 +1,2 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-SRC_URI +="file://yosemite4.cfg"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:${THISDIR}/../../../recipes-bsp/uboot/files:"
+SRC_URI +="file://yosemite4-common.cfg"

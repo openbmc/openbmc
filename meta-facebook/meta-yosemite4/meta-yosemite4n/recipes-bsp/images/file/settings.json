@@ -1,0 +1,13 @@
+{
+    "BootBlockAndHeader_no_tip.xml":
+    {
+        "vendor": "100",
+        "board_type": "1",
+        "MC_CONFIG": "0x04",
+        "FIU0_CLK_DIVIDER": "0",
+        "FIU1_CLK_DIVIDER": "0",
+        "FIU3_CLK_DIVIDER": "0",
+        "BAUD_RATE": "57600",
+        "DestAddr": "0xFFFD0000"
+    }
+}
