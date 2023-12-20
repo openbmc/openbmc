@@ -4,6 +4,8 @@ EXTRA_OEMESON:append = " \
                          -Dwarm-reboot=enabled \
                        "
 
+PACKAGECONFIG:remove:yosemite4 = "only-run-apr-on-power-loss"
+
 HOST_DEFAULT_TARGETS:remove:yosemite4 = " \
     obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.target \
     obmc-host-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
