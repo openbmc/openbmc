@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor-Pid-Control Margin-based Fan Control Daemon
+After=xyz.openbmc_project.EntityManager.service
+After=xyz.openbmc_project.ObjectMapper.service
+
+[Service]
+Restart=always
+ExecStart={bindir}/swampd -t
+RestartSec=5
+StartLimitInterval=0
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

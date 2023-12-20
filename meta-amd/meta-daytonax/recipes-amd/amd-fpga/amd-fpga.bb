@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SUMMARY = "AMD FPGA Register Dump Utility"
 DESCRIPTION = "AMD FPGA Register Dump Utility"
 

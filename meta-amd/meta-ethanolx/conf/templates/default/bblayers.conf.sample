@@ -14,4 +14,5 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-amd \
   ##OEROOT##/meta-amd/meta-ethanolx \
+  ##OEROOT##/meta-amd/meta-common \
   "
