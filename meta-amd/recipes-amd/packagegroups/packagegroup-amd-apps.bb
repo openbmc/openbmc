@@ -5,10 +5,13 @@ inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
-        ${PN}-chassis \
         ${PN}-fans \
         ${PN}-flash \
         ${PN}-system \
+        "
+PACKAGES:append:amd-withhost = " \
+        ${PN}-chassis \
+        ${PN}-hostmgmt \
         "
 
 PROVIDES += "virtual/obmc-chassis-mgmt"
@@ -39,10 +42,14 @@ RDEPENDS:${PN}-flash = " \
 
 SUMMARY:${PN}-system = "AMD System"
 RDEPENDS:${PN}-system = " \
-        amd-fpga \
         dbus-sensors \
         entity-manager \
         ipmitool \
-        phosphor-hostlogger \
         srvcfg-manager \
+        ${RDEPENDS_PN_SYSTEM_EXTRAS} \
+        "
+RDEPENDS_PN_SYSTEM_EXTRAS = ""
+RDEPENDS_PN_SYSTEM_EXTRAS:amd-withhost = " \
+        amd-fpga \
+        phosphor-hostlogger \
         "
