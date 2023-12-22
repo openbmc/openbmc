@@ -60,6 +60,17 @@
 					"Period": 1000
 				}
 			]
+		},
+		{
+			"group": "overtemp_fault",
+			"members": [
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
 		}
 	]
 }
