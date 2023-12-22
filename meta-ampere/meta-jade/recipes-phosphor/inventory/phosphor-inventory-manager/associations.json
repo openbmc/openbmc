@@ -1,0 +1,230 @@
+[
+    {
+        "path": "system/chassis/Mt_Jade/FAN3",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN3_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN3_2"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/fan_fault"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/Mt_Jade/FAN4",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN4_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN4_2"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/fan_fault"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/Mt_Jade/FAN5",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN5_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN5_2"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/fan_fault"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/Mt_Jade/FAN6",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN6_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN6_2"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/fan_fault"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/Mt_Jade/FAN7",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN7_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN7_2"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/fan_fault"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/Mt_Jade/FAN8",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN8_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN8_2"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "cooled_by",
+                    "fType": "cooling"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/inventory/system/chassis"
+                ]
+            },
+            {
+                "types": {
+                    "rType": "fault_identified_by",
+                    "fType": "fault_identifying"
+                },
+                "paths": [
+                    "/xyz/openbmc_project/led/groups/fan_fault"
+                ]
+            }
+        ]
+    }
+]
