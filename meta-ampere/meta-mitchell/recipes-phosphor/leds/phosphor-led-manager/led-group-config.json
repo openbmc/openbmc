@@ -43,6 +43,23 @@
 					"Period": 1000
 				}
 			]
+		},
+		{
+			"group": "fan_fault",
+			"members": [
+				{
+					"Name": "fan_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				},
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
 		}
 	]
 }
