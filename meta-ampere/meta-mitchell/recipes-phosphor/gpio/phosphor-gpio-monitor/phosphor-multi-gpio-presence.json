@@ -18,7 +18,7 @@
         "Inventory": "/system/powersupply/PowerSupply0"
     },
     {
-        "Name": "CPU1",
+        "Name": "PSU1",
         "LineName": "presence-ps1",
         "ActiveLow": true,
         "Inventory": "/system/powersupply/PowerSupply1"
