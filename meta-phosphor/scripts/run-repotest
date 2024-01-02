@@ -16,7 +16,7 @@ allowed_patches_tmp=$(mktemp)
 trap 'rm $patch_files_tmp $allowed_patches_tmp' exit
 
 git ls-files -- \
-  '*.patch' \
+  '*.patch' '*.dts' \
   ':!:poky/**' \
   ':!:meta-arm/**' \
   ':!:meta-security/**' \
@@ -43,6 +43,7 @@ meta-google/dynamic-layers/nuvoton-layer/recipes-bsp/images/npcm7xx-igps/0001-Se
 meta-google/recipes-extended/libconfig/files/0001-conf2struct-Use-the-right-perl.patch
 meta-google/recipes-extended/libconfig/files/0001-makefile-Add-missing-LDFLAGS.patch
 meta-google/recipes-phosphor/initrdscripts/obmc-phosphor-initfs/rwfs-clean-dev.patch
+meta-hpe/meta-dl360poc/recipes-kernel/linux/linux-obmc/gxp.dts
 meta-ingrasys/meta-zaius/recipes-bsp/u-boot/u-boot-aspeed/0001-board-aspeed-Add-reset_phy-for-Zaius.patch
 meta-nuvoton/recipes-bsp/images/npcm7xx-igps/0001-Adjust-paths-for-use-with-Bitbake.patch
 meta-yadro/meta-nicole/recipes-bsp/u-boot/files/0001-Add-system-reset-status-support.patch
@@ -61,7 +62,7 @@ files_diff=$(comm -23 "$patch_files_tmp" "$allowed_patches_tmp")
 
 files_count=$(echo -n "$files_diff" | grep -c '^' || true)
 if [[ $files_count -ne 0 ]]; then
-  echo "Patch files found not in allow list"
+  echo "Patch or DTS files found not in allow list"
   echo "$files_diff"
   echo "Patches are not allowed on OpenBMC in these layers.  Please upstream your changes and see \
     https://github.com/openbmc/docs/blob/master/meta-layer-guidelines.md"
