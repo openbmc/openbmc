@@ -83,19 +83,19 @@
   entityID: 0x07
   entityInstance: 0x40
   sensorType: 0x0B
-  path: /xyz/openbmc_project/sensors/utilization/CPU
+  path: /xyz/openbmc_project/metric/bmc/cpu/total
   sensorReadingType: 0x01
   multiplierM: 392
   offsetB: 0
   bExp: 0
   rExp: -3
-  unit: xyz.openbmc_project.Sensor.Value.Unit.Percent
+  unit: xyz.openbmc_project.Metric.Value.Unit.Percent
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
   interfaces:
-    xyz.openbmc_project.Sensor.Value :
+    xyz.openbmc_project.Metric.Value :
       Value:
         Offsets:
           0xFF:
@@ -104,12 +104,12 @@
 0x08:
   <<: *utilization_healthmon
   entityInstance: 0x41
-  path: /xyz/openbmc_project/sensors/utilization/Memory
+  path: /xyz/openbmc_project/metric/bmc/memory/available
 
 0x09:
   <<: *utilization_healthmon
   entityInstance: 0x42
-  path: /xyz/openbmc_project/sensors/utilization/Storage_RW
+  path: /xyz/openbmc_project/metric/bmc/storage/rw
 
 0x0A: &temperature_psu
   entityID: 0x0A
