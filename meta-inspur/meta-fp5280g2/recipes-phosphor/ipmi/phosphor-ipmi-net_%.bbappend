@@ -1,1 +1,0 @@
-DEFAULT_RMCPP_IFACE = "eth1"
