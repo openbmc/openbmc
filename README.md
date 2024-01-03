@@ -141,28 +141,28 @@ You'll get faster results by using the mailing list or Discord.
 ### Will OpenBMC run on my Acme Server Corp. XYZ5000 motherboard?
 
 This is a common question, particularly regarding boards from popular COTS
-(commercial off-the-shelf) vendors such as Supermicro and ASRock.  You can see
+(commercial off-the-shelf) vendors such as Supermicro and ASRock. You can see
 the list of supported boards by running `. setup` (with no further arguments) in
-the root of the OpenBMC source tree.  Most of the platforms supported by OpenBMC
+the root of the OpenBMC source tree. Most of the platforms supported by OpenBMC
 are specialized servers operated by companies running large datacenters, but
 some more generic COTS servers are supported to varying degrees.
 
 If your motherboard is not listed in the output of `. setup` it is not currently
-supported.  Porting OpenBMC to a new platform is a non-trivial undertaking,
+supported. Porting OpenBMC to a new platform is a non-trivial undertaking,
 ideally done with the assistance of schematics and other documentation from the
 manufacturer (it is not completely infeasible to take on a porting effort
 without documentation via reverse engineering, but it is considerably more
 difficult, and probably involves a greater risk of hardware damage).
 
 **However**, even if your motherboard is among those listed in the output of
-`. setup`, there are two significant caveats to bear in mind.  First, not all
+`. setup`, there are two significant caveats to bear in mind. First, not all
 ports are equally mature -- some platforms are better supported than others, and
-functionality on some "supported" boards may be fairly limited.  Second, support
+functionality on some "supported" boards may be fairly limited. Second, support
 for a motherboard is not the same as support for a complete system -- in
 particular, fan control is critically dependent on not just the motherboard but
 also the fans connected to it and the chassis that the board and fans are housed
 in, both of which can vary dramatically between systems using the same board
-model.  So while you may be able to compile and install an OpenBMC build on your
+model. So while you may be able to compile and install an OpenBMC build on your
 system and get some basic functionality, rough edges (such as your cooling fans
 running continuously at full throttle) are likely.
 
@@ -201,12 +201,12 @@ repository.
 
 The Technical Steering Committee (TSC) guides the project. Members are:
 
-- Roxanne Clarke, IBM
-- Nancy Yuen, Google
+- Benjamin Fair, Google
 - Patrick Williams, Meta
-- Terry Duncan, Intel
+- Roxanne Clarke, IBM
 - Sagar Dharia, Microsoft
 - Samer El-Haj-Mahmoud, Arm
+- Terry Duncan, Intel
 
 ## Contact
 
