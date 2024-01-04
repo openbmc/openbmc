@@ -26,12 +26,12 @@ inherit systemd
 
 PACKAGECONFIG[transport-mctp-demux] = "-Dtransport-implementation=mctp-demux"
 PACKAGECONFIG[transport-af-mctp] = "-Dtransport-implementation=af-mctp"
+PACKAGECONFIG[oem-ibm] = "-Doem-ibm=enabled, -Doem-ibm=disabled, , squashfs-tools"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG:append:df-mctp = " transport-af-mctp"
 
 EXTRA_OEMESON = " \
         -Dtests=disabled \
-        -Doem-ibm=disabled \
         "
 
 pkg_prerm:${PN} () {

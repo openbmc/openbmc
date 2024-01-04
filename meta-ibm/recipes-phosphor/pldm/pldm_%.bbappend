@@ -1,8 +1,5 @@
 # Force the mctp-demux to be used until machine is ready to use in-kernel MCTP
-PACKAGECONFIG = "transport-mctp-demux"
-
-PACKAGECONFIG += "oem-ibm"
-PACKAGECONFIG[oem-ibm] = "-Doem-ibm=enabled, -Doem-ibm=disabled, , squashfs-tools"
+PACKAGECONFIG:append = " transport-mctp-demux oem-ibm"
 
 EXTRA_OEMESON += " \
         -Dsoftoff-timeout-seconds=2700 \
