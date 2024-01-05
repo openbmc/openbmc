@@ -14,7 +14,7 @@ python do_ipmb_channels() {
             "type": "ipmb",
             "slave-path": ipmb_channel[i],
             "bmc-addr": 32,
-            "remote-addr": ipmb_remote_addr[i] if i < len(ipmb_remote_addr) else 64,
+            "remote-addr": int(ipmb_remote_addr[i]) if i < len(ipmb_remote_addr) else 64,
             "devIndex": i
         })
 
