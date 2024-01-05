@@ -21,6 +21,11 @@ S = "${WORKDIR}/git"
 
 inherit allarch
 
+# Ideally this recipe would use npm.bbclass, but it doesn't.  Since npm uses
+# python3, we need to inherit this to get the Yocto version of python3 instead
+# of the hosttools one.
+inherit python3native
+
 RDEPENDS:${PN}:append = " bmcweb"
 
 EXTRA_OENPM ?= ""
