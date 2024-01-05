@@ -19,7 +19,7 @@ DEPENDS = " \
 "
 
 
-inherit gettext gnomebase gsettings gobject-introspection vala gtk-doc  bash-completion python3native
+inherit gettext gnomebase gobject-introspection vala gtk-doc bash-completion python3native
 
 SRC_URI += "file://0001-fix-reproducibility.patch"
 SRC_URI[archive.sha256sum] = "52592cfe19baffd16dbe47475be7da750dbd0b6333fd7acb60faa9da5bc40df2"

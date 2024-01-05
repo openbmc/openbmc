@@ -6,102 +6,102 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-from time import sleep
+import string
+import random
 import pytest
-from django.utils import timezone
 from django.urls import reverse
 from selenium.webdriver import Keys
 from selenium.webdriver.support.select import Select
-from selenium.common.exceptions import NoSuchElementException
-from orm.models import Build, Project, Target
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from orm.models import Project
 from tests.functional.functional_helpers import SeleniumFunctionalTestCase
 from selenium.webdriver.common.by import By
 
+from .utils import get_projectId_from_url, wait_until_build, wait_until_build_cancelled
+
 
 @pytest.mark.django_db
+@pytest.mark.order("last")
 class TestProjectConfigTab(SeleniumFunctionalTestCase):
+    PROJECT_NAME = 'TestProjectConfigTab'
+    project_id = None
 
-    def setUp(self):
-        self.recipe = None
-        super().setUp()
-        release = '3'
-        project_name = 'projectmaster'
-        self._create_test_new_project(
-            project_name,
-            release,
-            False,
-        )
-
-    def _create_test_new_project(
-        self,
-        project_name,
-        release,
-        merge_toaster_settings,
-    ):
+    def _create_project(self, project_name, **kwargs):
         """ Create/Test new project using:
           - Project Name: Any string
           - Release: Any string
           - Merge Toaster settings: True or False
         """
+        release = kwargs.get('release', '3')
         self.get(reverse('newproject'))
-        self.driver.find_element(By.ID,
-                                 "new-project-name").send_keys(project_name)
-
-        select = Select(self.find('#projectversion'))
+        self.wait_until_visible('#new-project-name')
+        self.find("#new-project-name").send_keys(project_name)
+        select = Select(self.find("#projectversion"))
         select.select_by_value(release)
 
         # check merge toaster settings
         checkbox = self.find('.checkbox-mergeattr')
-        if merge_toaster_settings:
-            if not checkbox.is_selected():
-                checkbox.click()
+        if not checkbox.is_selected():
+            checkbox.click()
+
+        if self.PROJECT_NAME != 'TestProjectConfigTab':
+            # Reset project name if it's not the default one
+            self.PROJECT_NAME = 'TestProjectConfigTab'
+
+        self.find("#create-project-button").click()
+
+        try:
+            self.wait_until_visible('#hint-error-project-name', poll=3)
+            url = reverse('project', args=(TestProjectConfigTab.project_id, ))
+            self.get(url)
+            self.wait_until_visible('#config-nav', poll=3)
+        except TimeoutException:
+            self.wait_until_visible('#config-nav', poll=3)
+
+    def _random_string(self, length):
+        return ''.join(
+            random.choice(string.ascii_letters) for _ in range(length)
+        )
+
+    def _navigate_to_project_page(self):
+        # Navigate to project page
+        if TestProjectConfigTab.project_id is None:
+            self._create_project(project_name=self._random_string(10))
+            current_url = self.driver.current_url
+            TestProjectConfigTab.project_id = get_projectId_from_url(
+                current_url)
         else:
-            if checkbox.is_selected():
-                checkbox.click()
-
-        self.driver.find_element(By.ID, "create-project-button").click()
-
-    @classmethod
-    def _wait_until_build(cls, state):
-        while True:
-            try:
-                last_build_state = cls.driver.find_element(
-                    By.XPATH,
-                    '//*[@id="latest-builds"]/div[1]//div[@class="build-state"]',
-                )
-                build_state = last_build_state.get_attribute(
-                    'data-build-state')
-                state_text = state.lower().split()
-                if any(x in str(build_state).lower() for x in state_text):
-                    break
-            except NoSuchElementException:
-                continue
-            sleep(1)
+            url = reverse('project', args=(TestProjectConfigTab.project_id,))
+            self.get(url)
+        self.wait_until_visible('#config-nav')
 
     def _create_builds(self):
         # check search box can be use to build recipes
         search_box = self.find('#build-input')
-        search_box.send_keys('core-image-minimal')
+        search_box.send_keys('foo')
         self.find('#build-button').click()
-        sleep(1)
-        self.wait_until_visible('#latest-builds')
+        self.wait_until_present('#latest-builds')
         # loop until reach the parsing state
-        self._wait_until_build('parsing starting cloning')
+        wait_until_build(self, 'queued cloning starting parsing failed')
         lastest_builds = self.driver.find_elements(
             By.XPATH,
             '//div[@id="latest-builds"]/div',
         )
         last_build = lastest_builds[0]
         self.assertTrue(
-            'core-image-minimal' in str(last_build.text)
+            'foo' in str(last_build.text)
         )
-        cancel_button = last_build.find_element(
-            By.XPATH,
-            '//span[@class="cancel-build-btn pull-right alert-link"]',
-        )
-        cancel_button.click()
-        sleep(1)
-        self._wait_until_build('cancelled')
+        last_build = lastest_builds[0]
+        try:
+            cancel_button = last_build.find_element(
+                By.XPATH,
+                '//span[@class="cancel-build-btn pull-right alert-link"]',
+            )
+            cancel_button.click()
+        except NoSuchElementException:
+            # Skip if the build is already cancelled
+            pass
+        wait_until_build_cancelled(self)
 
     def _get_tabs(self):
         # tabs links list
@@ -113,64 +113,6 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
     def _get_config_nav_item(self, index):
         config_nav = self.find('#config-nav')
         return config_nav.find_elements(By.TAG_NAME, 'li')[index]
-
-    def _get_create_builds(self, **kwargs):
-        """ Create a build and return the build object """
-        # parameters for builds to associate with the projects
-        now = timezone.now()
-        release = '3'
-        project_name = 'projectmaster'
-        self._create_test_new_project(
-            project_name+"2",
-            release,
-            False,
-        )
-
-        self.project1_build_success = {
-            'project': Project.objects.get(id=1),
-            'started_on': now,
-            'completed_on': now,
-            'outcome': Build.SUCCEEDED
-        }
-
-        self.project1_build_failure = {
-            'project': Project.objects.get(id=1),
-            'started_on': now,
-            'completed_on': now,
-            'outcome': Build.FAILED
-        }
-        build1 = Build.objects.create(**self.project1_build_success)
-        build2 = Build.objects.create(**self.project1_build_failure)
-
-        # add some targets to these builds so they have recipe links
-        # (and so we can find the row in the ToasterTable corresponding to
-        # a particular build)
-        Target.objects.create(build=build1, target='foo')
-        Target.objects.create(build=build2, target='bar')
-
-        if kwargs:
-            # Create kwargs.get('success') builds with success status with target
-            # and kwargs.get('failure') builds with failure status with target
-            for i in range(kwargs.get('success', 0)):
-                now = timezone.now()
-                self.project1_build_success['started_on'] = now
-                self.project1_build_success[
-                    'completed_on'] = now - timezone.timedelta(days=i)
-                build = Build.objects.create(**self.project1_build_success)
-                Target.objects.create(build=build,
-                                      target=f'{i}_success_recipe',
-                                      task=f'{i}_success_task')
-
-            for i in range(kwargs.get('failure', 0)):
-                now = timezone.now()
-                self.project1_build_failure['started_on'] = now
-                self.project1_build_failure[
-                    'completed_on'] = now - timezone.timedelta(days=i)
-                build = Build.objects.create(**self.project1_build_failure)
-                Target.objects.create(build=build,
-                                      target=f'{i}_fail_recipe',
-                                      task=f'{i}_fail_task')
-        return build1, build2
 
     def test_project_config_nav(self):
         """ Test project config tab navigation:
@@ -188,12 +130,7 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
             - Actions
             - Delete project
         """
-        # navigate to the project page
-        url = reverse("project", args=(1,))
-        self.get(url)
-
-        # check if the menu is displayed
-        self.wait_until_visible('#config-nav')
+        self._navigate_to_project_page()
 
         def _get_config_nav_item(index):
             config_nav = self.find('#config-nav')
@@ -221,20 +158,124 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
         self.assertTrue("actions" in str(actions.text).lower())
 
         conf_nav_list = [
-            [0, 'Configuration', f"/toastergui/project/1"],  # config
-            [2, 'Custom images', f"/toastergui/project/1/customimages"],  # custom images
-            [3, 'Image recipes', f"/toastergui/project/1/images"],  # image recipes
-            [4, 'Software recipes', f"/toastergui/project/1/softwarerecipes"],  # software recipes
-            [5, 'Machines', f"/toastergui/project/1/machines"],  # machines
-            [6, 'Layers', f"/toastergui/project/1/layers"],  # layers
-            [7, 'Distro', f"/toastergui/project/1/distro"],  # distro
-            [9, 'BitBake variables', f"/toastergui/project/1/configuration"],  # bitbake variables
+            # config
+            [0, 'Configuration',
+                f"/toastergui/project/{TestProjectConfigTab.project_id}"],
+            # custom images
+            [2, 'Custom images',
+                f"/toastergui/project/{TestProjectConfigTab.project_id}/customimages"],
+            # image recipes
+            [3, 'Image recipes',
+                f"/toastergui/project/{TestProjectConfigTab.project_id}/images"],
+            # software recipes
+            [4, 'Software recipes',
+                f"/toastergui/project/{TestProjectConfigTab.project_id}/softwarerecipes"],
+            # machines
+            [5, 'Machines',
+                f"/toastergui/project/{TestProjectConfigTab.project_id}/machines"],
+            # layers
+            [6, 'Layers',
+                f"/toastergui/project/{TestProjectConfigTab.project_id}/layers"],
+            # distro
+            [7, 'Distros',
+                f"/toastergui/project/{TestProjectConfigTab.project_id}/distros"],
+            #  [9, 'BitBake variables', f"/toastergui/project/{TestProjectConfigTab.project_id}/configuration"],  # bitbake variables
         ]
         for index, item_name, url in conf_nav_list:
             item = _get_config_nav_item(index)
             if item.get_attribute('class') != 'active':
                 item.click()
             check_config_nav_item(index, item_name, url)
+
+    def test_image_recipe_editColumn(self):
+        """ Test the edit column feature in image recipe table on project page """
+        def test_edit_column(check_box_id):
+            # Check that we can hide/show table column
+            check_box = self.find(f'#{check_box_id}')
+            th_class = str(check_box_id).replace('checkbox-', '')
+            if check_box.is_selected():
+                # check if column is visible in table
+                self.assertTrue(
+                    self.find(
+                        f'#imagerecipestable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is checked in EditColumn dropdown, but it's not visible in table"
+                )
+                check_box.click()
+                # check if column is hidden in table
+                self.assertFalse(
+                    self.find(
+                        f'#imagerecipestable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is unchecked in EditColumn dropdown, but it's visible in table"
+                )
+            else:
+                # check if column is hidden in table
+                self.assertFalse(
+                    self.find(
+                        f'#imagerecipestable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is unchecked in EditColumn dropdown, but it's visible in table"
+                )
+                check_box.click()
+                # check if column is visible in table
+                self.assertTrue(
+                    self.find(
+                        f'#imagerecipestable thead th.{th_class}'
+                    ).is_displayed(),
+                    f"The {th_class} column is checked in EditColumn dropdown, but it's not visible in table"
+                )
+
+        self._navigate_to_project_page()
+        # navigate to project image recipe page
+        recipe_image_page_link = self._get_config_nav_item(3)
+        recipe_image_page_link.click()
+        self.wait_until_present('#imagerecipestable tbody tr')
+
+        # Check edit column
+        edit_column = self.find('#edit-columns-button')
+        self.assertTrue(edit_column.is_displayed())
+        edit_column.click()
+        # Check dropdown is visible
+        self.wait_until_visible('ul.dropdown-menu.editcol')
+
+        # Check that we can hide the edit column
+        test_edit_column('checkbox-get_description_or_summary')
+        test_edit_column('checkbox-layer_version__get_vcs_reference')
+        test_edit_column('checkbox-layer_version__layer__name')
+        test_edit_column('checkbox-license')
+        test_edit_column('checkbox-recipe-file')
+        test_edit_column('checkbox-section')
+        test_edit_column('checkbox-version')
+
+    def test_image_recipe_show_rows(self):
+        """ Test the show rows feature in image recipe table on project page """
+        def test_show_rows(row_to_show, show_row_link):
+            # Check that we can show rows == row_to_show
+            show_row_link.select_by_value(str(row_to_show))
+            self.wait_until_visible('#imagerecipestable tbody tr')
+            self.assertTrue(
+                len(self.find_all('#imagerecipestable tbody tr')) == row_to_show
+            )
+
+        self._navigate_to_project_page()
+        # navigate to project image recipe page
+        recipe_image_page_link = self._get_config_nav_item(3)
+        recipe_image_page_link.click()
+        self.wait_until_present('#imagerecipestable tbody tr')
+
+        show_rows = self.driver.find_elements(
+            By.XPATH,
+            '//select[@class="form-control pagesize-imagerecipestable"]'
+        )
+        # Check show rows
+        for show_row_link in show_rows:
+            show_row_link = Select(show_row_link)
+            test_show_rows(10, show_row_link)
+            test_show_rows(25, show_row_link)
+            test_show_rows(50, show_row_link)
+            test_show_rows(100, show_row_link)
+            test_show_rows(150, show_row_link)
 
     def test_project_config_tab_right_section(self):
         """ Test project config tab right section contains five blocks:
@@ -257,35 +298,31 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
                     - meta-poky
                     - meta-yocto-bsp
         """
-        # navigate to the project page
-        url = reverse("project", args=(1,))
-        self.get(url)
-
+        # Create a new project for this test
+        project_name = self._random_string(10)
+        self._create_project(project_name=project_name)
         # check if the menu is displayed
         self.wait_until_visible('#project-page')
         block_l = self.driver.find_element(
             By.XPATH, '//*[@id="project-page"]/div[2]')
-        machine = self.find('#machine-section')
-        distro = self.find('#distro-section')
-        most_built_recipes = self.driver.find_element(
-            By.XPATH, '//*[@id="project-page"]/div[1]/div[3]')
         project_release = self.driver.find_element(
             By.XPATH, '//*[@id="project-page"]/div[1]/div[4]')
         layers = block_l.find_element(By.ID, 'layer-container')
 
-        def check_machine_distro(self, item_name, new_item_name, block):
+        def check_machine_distro(self, item_name, new_item_name, block_id):
+            block = self.find(f'#{block_id}')
             title = block.find_element(By.TAG_NAME, 'h3')
             self.assertTrue(item_name.capitalize() in title.text)
-            edit_btn = block.find_element(By.ID, f'change-{item_name}-toggle')
+            edit_btn = self.find(f'#change-{item_name}-toggle')
             edit_btn.click()
-            sleep(1)
-            name_input = block.find_element(By.ID, f'{item_name}-change-input')
+            self.wait_until_visible(f'#{item_name}-change-input')
+            name_input = self.find(f'#{item_name}-change-input')
             name_input.clear()
             name_input.send_keys(new_item_name)
-            change_btn = block.find_element(By.ID, f'{item_name}-change-btn')
+            change_btn = self.find(f'#{item_name}-change-btn')
             change_btn.click()
-            sleep(1)
-            project_name = block.find_element(By.ID, f'project-{item_name}-name')
+            self.wait_until_visible(f'#project-{item_name}-name')
+            project_name = self.find(f'#project-{item_name}-name')
             self.assertTrue(new_item_name in project_name.text)
             # check change notificaiton is displayed
             change_notification = self.find('#change-notification')
@@ -294,9 +331,9 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
             )
 
         # Machine
-        check_machine_distro(self, 'machine', 'qemux86-64', machine)
+        check_machine_distro(self, 'machine', 'qemux86-64', 'machine-section')
         # Distro
-        check_machine_distro(self, 'distro', 'poky-altcfg', distro)
+        check_machine_distro(self, 'distro', 'poky-altcfg', 'distro-section')
 
         # Project release
         title = project_release.find_element(By.TAG_NAME, 'h3')
@@ -304,7 +341,6 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
         self.assertTrue(
             "Yocto Project master" in self.find('#project-release-title').text
         )
-
         # Layers
         title = layers.find_element(By.TAG_NAME, 'h3')
         self.assertTrue("Layers" in title.text)
@@ -314,7 +350,9 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
         # meta-yocto-bsp
         layers_list = layers.find_element(By.ID, 'layers-in-project-list')
         layers_list_items = layers_list.find_elements(By.TAG_NAME, 'li')
-        self.assertTrue(len(layers_list_items) == 3)
+        # remove all layers except the first three layers
+        for i in range(3, len(layers_list_items)):
+            layers_list_items[i].find_element(By.TAG_NAME, 'span').click()
         # check can add a layer if exists
         add_layer_input = layers.find_element(By.ID, 'layer-add-input')
         add_layer_input.send_keys('meta-oe')
@@ -326,56 +364,70 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
         dropdown_item.click()
         add_layer_btn = layers.find_element(By.ID, 'add-layer-btn')
         add_layer_btn.click()
-        sleep(1)
+        self.wait_until_visible('#layers-in-project-list')
         # check layer is added
         layers_list_items = layers_list.find_elements(By.TAG_NAME, 'li')
         self.assertTrue(len(layers_list_items) == 4)
 
-        # Most built recipes
-        title = most_built_recipes.find_element(By.TAG_NAME, 'h3')
-        self.assertTrue("Most built recipes" in title.text)
-        # Create a new builds 5
+    def test_most_build_recipes(self):
+        """ Test most build recipes block contains"""
+        def rebuild_from_most_build_recipes(recipe_list_items):
+            checkbox = recipe_list_items[0].find_element(By.TAG_NAME, 'input')
+            checkbox.click()
+            build_btn = self.find('#freq-build-btn')
+            build_btn.click()
+            self.wait_until_visible('#latest-builds')
+            wait_until_build(self, 'queued cloning starting parsing failed')
+            lastest_builds = self.driver.find_elements(
+                By.XPATH,
+                '//div[@id="latest-builds"]/div'
+            )
+            self.assertTrue(len(lastest_builds) >= 2)
+            last_build = lastest_builds[0]
+            try:
+                cancel_button = last_build.find_element(
+                    By.XPATH,
+                    '//span[@class="cancel-build-btn pull-right alert-link"]',
+                )
+                cancel_button.click()
+            except NoSuchElementException:
+                # Skip if the build is already cancelled
+                pass
+            wait_until_build_cancelled(self)
+        # Create a new project for remaining asserts
+        project_name = self._random_string(10)
+        self._create_project(project_name=project_name, release='2')
+        current_url = self.driver.current_url
+        TestProjectConfigTab.project_id = get_projectId_from_url(current_url)
+        url = current_url.split('?')[0]
+
+        # Create a new builds
         self._create_builds()
 
-        # Refresh the page
-        self.get(url)
+        # back to project page
+        self.driver.get(url)
 
-        sleep(1)  # wait for page to load
-        self.wait_until_visible('#project-page')
-        # check can select a recipe and build it
+        self.wait_until_visible('#project-page', poll=3)
+
+        # Most built recipes
         most_built_recipes = self.driver.find_element(
             By.XPATH, '//*[@id="project-page"]/div[1]/div[3]')
-        recipe_list = most_built_recipes.find_element(By.ID, 'freq-build-list')
+        title = most_built_recipes.find_element(By.TAG_NAME, 'h3')
+        self.assertTrue("Most built recipes" in title.text)
+        # check can select a recipe and build it
+        self.wait_until_visible('#freq-build-list', poll=3)
+        recipe_list = self.find('#freq-build-list')
         recipe_list_items = recipe_list.find_elements(By.TAG_NAME, 'li')
         self.assertTrue(
             len(recipe_list_items) > 0,
-            msg="No recipes found in the most built recipes list",
+            msg="Any recipes found in the most built recipes list",
         )
-        checkbox = recipe_list_items[0].find_element(By.TAG_NAME, 'input')
-        checkbox.click()
-        build_btn = self.find('#freq-build-btn')
-        build_btn.click()
-        sleep(1)  # wait for page to load
-        self.wait_until_visible('#latest-builds')
-        self._wait_until_build('parsing starting cloning queueing')
-        lastest_builds = self.driver.find_elements(
-            By.XPATH,
-            '//div[@id="latest-builds"]/div'
-        )
-        last_build = lastest_builds[0]
-        cancel_button = last_build.find_element(
-            By.XPATH,
-            '//span[@class="cancel-build-btn pull-right alert-link"]',
-        )
-        cancel_button.click()
-        self.assertTrue(len(lastest_builds) == 2)
+        rebuild_from_most_build_recipes(recipe_list_items)
+        TestProjectConfigTab.project_id = None  # reset project id
 
     def test_project_page_tab_importlayer(self):
         """ Test project page tab import layer """
-        # navigate to the project page
-        url = reverse("project", args=(1,))
-        self.get(url)
-
+        self._navigate_to_project_page()
         # navigate to "Import layers" tab
         import_layers_tab = self._get_tabs()[2]
         import_layers_tab.find_element(By.TAG_NAME, 'a').click()
@@ -415,10 +467,10 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
 
     def test_project_page_custom_image_no_image(self):
         """ Test project page tab "New custom image" when no custom image """
-        # navigate to the project page
-        url = reverse("project", args=(1,))
-        self.get(url)
-
+        project_name = self._random_string(10)
+        self._create_project(project_name=project_name)
+        current_url = self.driver.current_url
+        TestProjectConfigTab.project_id = get_projectId_from_url(current_url)
         # navigate to "Custom image" tab
         custom_image_section = self._get_config_nav_item(2)
         custom_image_section.click()
@@ -433,8 +485,9 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
         div_empty_msg = self.find('#empty-state-customimagestable')
         link_create_custom_image = div_empty_msg.find_element(
             By.TAG_NAME, 'a')
+        self.assertTrue(TestProjectConfigTab.project_id is not None)
         self.assertTrue(
-            f"/toastergui/project/1/newcustomimage" in str(
+            f"/toastergui/project/{TestProjectConfigTab.project_id}/newcustomimage" in str(
                 link_create_custom_image.get_attribute('href')
             )
         )
@@ -443,6 +496,7 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
                 link_create_custom_image.text
             )
         )
+        TestProjectConfigTab.project_id = None  # reset project id
 
     def test_project_page_image_recipe(self):
         """ Test project page section images
@@ -451,11 +505,7 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
             - Check image recipe build button works
             - Check image recipe table features(show/hide column, pagination)
         """
-        # navigate to the project page
-        url = reverse("project", args=(1,))
-        self.get(url)
-        self.wait_until_visible('#config-nav')
-
+        self._navigate_to_project_page()
         # navigate to "Images section"
         images_section = self._get_config_nav_item(3)
         images_section.click()
@@ -471,108 +521,3 @@ class TestProjectConfigTab(SeleniumFunctionalTestCase):
         self.wait_until_visible('#imagerecipestable tbody tr')
         rows = self.find_all('#imagerecipestable tbody tr')
         self.assertTrue(len(rows) > 0)
-
-        # Test build button
-        image_to_build = rows[0]
-        build_btn = image_to_build.find_element(
-            By.XPATH,
-            '//td[@class="add-del-layers"]'
-        )
-        build_btn.click()
-        self._wait_until_build('parsing starting cloning')
-        lastest_builds = self.driver.find_elements(
-            By.XPATH,
-            '//div[@id="latest-builds"]/div'
-        )
-        self.assertTrue(len(lastest_builds) > 0)
-
-    def test_image_recipe_editColumn(self):
-        """ Test the edit column feature in image recipe table on project page """
-        self._get_create_builds(success=10, failure=10)
-
-        def test_edit_column(check_box_id):
-            # Check that we can hide/show table column
-            check_box = self.find(f'#{check_box_id}')
-            th_class = str(check_box_id).replace('checkbox-', '')
-            if check_box.is_selected():
-                # check if column is visible in table
-                self.assertTrue(
-                    self.find(
-                        f'#imagerecipestable thead th.{th_class}'
-                    ).is_displayed(),
-                    f"The {th_class} column is checked in EditColumn dropdown, but it's not visible in table"
-                )
-                check_box.click()
-                # check if column is hidden in table
-                self.assertFalse(
-                    self.find(
-                        f'#imagerecipestable thead th.{th_class}'
-                    ).is_displayed(),
-                    f"The {th_class} column is unchecked in EditColumn dropdown, but it's visible in table"
-                )
-            else:
-                # check if column is hidden in table
-                self.assertFalse(
-                    self.find(
-                        f'#imagerecipestable thead th.{th_class}'
-                    ).is_displayed(),
-                    f"The {th_class} column is unchecked in EditColumn dropdown, but it's visible in table"
-                )
-                check_box.click()
-                # check if column is visible in table
-                self.assertTrue(
-                    self.find(
-                        f'#imagerecipestable thead th.{th_class}'
-                    ).is_displayed(),
-                    f"The {th_class} column is checked in EditColumn dropdown, but it's not visible in table"
-                )
-
-        url = reverse('projectimagerecipes', args=(1,))
-        self.get(url)
-        self.wait_until_present('#imagerecipestable tbody tr')
-
-        # Check edit column
-        edit_column = self.find('#edit-columns-button')
-        self.assertTrue(edit_column.is_displayed())
-        edit_column.click()
-        # Check dropdown is visible
-        self.wait_until_visible('ul.dropdown-menu.editcol')
-
-        # Check that we can hide the edit column
-        test_edit_column('checkbox-get_description_or_summary')
-        test_edit_column('checkbox-layer_version__get_vcs_reference')
-        test_edit_column('checkbox-layer_version__layer__name')
-        test_edit_column('checkbox-license')
-        test_edit_column('checkbox-recipe-file')
-        test_edit_column('checkbox-section')
-        test_edit_column('checkbox-version')
-
-    def test_image_recipe_show_rows(self):
-        """ Test the show rows feature in image recipe table on project page """
-        self._get_create_builds(success=100, failure=100)
-
-        def test_show_rows(row_to_show, show_row_link):
-            # Check that we can show rows == row_to_show
-            show_row_link.select_by_value(str(row_to_show))
-            self.wait_until_present('#imagerecipestable tbody tr')
-            sleep(1)
-            self.assertTrue(
-                len(self.find_all('#imagerecipestable tbody tr')) == row_to_show
-            )
-
-        url = reverse('projectimagerecipes', args=(2,))
-        self.get(url)
-        self.wait_until_present('#imagerecipestable tbody tr')
-
-        show_rows = self.driver.find_elements(
-            By.XPATH,
-            '//select[@class="form-control pagesize-imagerecipestable"]'
-        )
-        # Check show rows
-        for show_row_link in show_rows:
-            show_row_link = Select(show_row_link)
-            test_show_rows(10, show_row_link)
-            test_show_rows(25, show_row_link)
-            test_show_rows(50, show_row_link)
-            test_show_rows(100, show_row_link)
-            test_show_rows(150, show_row_link)

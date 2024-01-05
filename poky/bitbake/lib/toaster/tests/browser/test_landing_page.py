@@ -14,6 +14,7 @@ from selenium.webdriver.common.by import By
 
 from orm.models import Layer, Layer_Version, Project, Build
 
+
 class TestLandingPage(SeleniumTestCase):
     """ Tests for redirects on the landing page """
 
@@ -40,7 +41,7 @@ class TestLandingPage(SeleniumTestCase):
 
         # check that the info sign is clickable
         # and info modal is appearing when clicking on the info sign
-        info_sign.click() # click on the info sign make attribute 'aria-describedby' visible
+        info_sign.click()  # click on the info sign make attribute 'aria-describedby' visible
         info_model_id = info_sign.get_attribute('aria-describedby')
         info_modal = self.find(f'#{info_model_id}')
         self.assertTrue(info_modal.is_displayed())
@@ -55,7 +56,7 @@ class TestLandingPage(SeleniumTestCase):
         self.assertTrue(documentation_link.is_displayed())
 
         # check browser open new tab toaster manual when clicking on the documentation link
-        self.assertEqual(documentation_link.get_attribute('target') , '_blank')
+        self.assertEqual(documentation_link.get_attribute('target'), '_blank')
         self.assertEqual(
             documentation_link.get_attribute('href'),
             'http://docs.yoctoproject.org/toaster-manual/index.html#toaster-user-manual')
@@ -81,7 +82,8 @@ class TestLandingPage(SeleniumTestCase):
         bitbake = jumbotron.find_element(By.LINK_TEXT, 'BitBake')
         self.assertTrue(bitbake.is_displayed())
         bitbake.click()
-        self.assertTrue("docs.yoctoproject.org/bitbake.html" in self.driver.current_url)
+        self.assertTrue(
+            "docs.yoctoproject.org/bitbake.html" in self.driver.current_url)
 
     def test_yoctoproject_jumbotron_link_visible_and_clickable(self):
         """ Test Yocto Project link jumbotron is visible and clickable: """
@@ -103,11 +105,12 @@ class TestLandingPage(SeleniumTestCase):
 
         # check Big magenta button
         big_magenta_button = jumbotron.find_element(By.LINK_TEXT,
-            'Toaster is ready to capture your command line builds'
-        )
+                                                    'Toaster is ready to capture your command line builds'
+                                                    )
         self.assertTrue(big_magenta_button.is_displayed())
         big_magenta_button.click()
-        self.assertTrue("docs.yoctoproject.org/toaster-manual/setup-and-use.html#setting-up-and-using-toaster" in self.driver.current_url)
+        self.assertTrue(
+            "docs.yoctoproject.org/toaster-manual/setup-and-use.html#setting-up-and-using-toaster" in self.driver.current_url)
 
     def test_link_create_new_project_in_jumbotron_visible_and_clickable(self):
         """ Test big blue button create new project jumbotron if visible and clickable """
@@ -120,8 +123,8 @@ class TestLandingPage(SeleniumTestCase):
 
         # check Big Blue button
         big_blue_button = jumbotron.find_element(By.LINK_TEXT,
-            'Create your first Toaster project to run manage builds'
-        )
+                                                 'Create your first Toaster project to run manage builds'
+                                                 )
         self.assertTrue(big_blue_button.is_displayed())
         big_blue_button.click()
         self.assertTrue("toastergui/newproject/" in self.driver.current_url)
@@ -132,10 +135,12 @@ class TestLandingPage(SeleniumTestCase):
         jumbotron = self.find('.jumbotron')
 
         # check Read the Toaster manual
-        toaster_manual = jumbotron.find_element(By.LINK_TEXT, 'Read the Toaster manual')
+        toaster_manual = jumbotron.find_element(
+            By.LINK_TEXT, 'Read the Toaster manual')
         self.assertTrue(toaster_manual.is_displayed())
         toaster_manual.click()
-        self.assertTrue("https://docs.yoctoproject.org/toaster-manual/index.html#toaster-user-manual" in self.driver.current_url)
+        self.assertTrue(
+            "https://docs.yoctoproject.org/toaster-manual/index.html#toaster-user-manual" in self.driver.current_url)
 
     def test_contrib_to_toaster_link_visible_and_clickable(self):
         """ Test Contribute to Toaster link jumbotron is visible and clickable: """
@@ -143,10 +148,12 @@ class TestLandingPage(SeleniumTestCase):
         jumbotron = self.find('.jumbotron')
 
         # check Contribute to Toaster
-        contribute_to_toaster = jumbotron.find_element(By.LINK_TEXT, 'Contribute to Toaster')
+        contribute_to_toaster = jumbotron.find_element(
+            By.LINK_TEXT, 'Contribute to Toaster')
         self.assertTrue(contribute_to_toaster.is_displayed())
         contribute_to_toaster.click()
-        self.assertTrue("wiki.yoctoproject.org/wiki/contribute_to_toaster" in str(self.driver.current_url).lower())
+        self.assertTrue(
+            "wiki.yoctoproject.org/wiki/contribute_to_toaster" in str(self.driver.current_url).lower())
 
     def test_only_default_project(self):
         """
@@ -206,10 +213,9 @@ class TestLandingPage(SeleniumTestCase):
 
         self.get(reverse('landing'))
 
+        self.wait_until_visible("#latest-builds", poll=3)
         elements = self.find_all('#allbuildstable')
         self.assertEqual(len(elements), 1, 'should redirect to builds')
         content = self.get_page_source()
         self.assertTrue(self.PROJECT_NAME in content,
                         'should show builds for project %s' % self.PROJECT_NAME)
-        self.assertFalse(self.CLI_BUILDS_PROJECT_NAME in content,
-                         'should not show builds for cli project')

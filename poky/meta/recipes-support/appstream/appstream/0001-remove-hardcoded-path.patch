@@ -17,15 +17,19 @@ diff --git a/meson.build b/meson.build
 index fd0e3373..2f273ada 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -124,7 +124,7 @@ if get_option ('gir')
-     dependency('gobject-introspection-1.0', version: '>=1.56')
- endif
- 
--stemmer_inc_dirs = include_directories(['/usr/include'])
-+stemmer_inc_dirs = include_directories([''])
+@@ -185,10 +185,10 @@ endif
+ stemmer_inc_dirs = include_directories()
  if get_option('stemming')
      stemmer_lib = cc.find_library('stemmer', required: true)
+-    stemmer_inc_dirs = include_directories(['/usr/include'])
++    stemmer_inc_dirs = include_directories([''])
      if not cc.has_header('libstemmer.h')
+         if cc.has_header('libstemmer/libstemmer.h')
+-            stemmer_inc_dirs = include_directories('/usr/include/libstemmer')
++            stemmer_inc_dirs = include_directories('')
+         else
+             error('Unable to find Snowball header "libstemmer.h". Please ensure libstemmer/Snowball is installed properly in order to continue.')
+         endif
 -- 
 2.34.1
 

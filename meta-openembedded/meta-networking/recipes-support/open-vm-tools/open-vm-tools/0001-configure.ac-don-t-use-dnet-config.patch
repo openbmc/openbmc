@@ -1,4 +1,4 @@
-From c953564b9f029b31381a2c630b47133ffe6a33e7 Mon Sep 17 00:00:00 2001
+From 547d05ca417c6b75ad06bf3119e1df8869742a70 Mon Sep 17 00:00:00 2001
 From: Martin Kelly <mkelly@xevo.com>
 Date: Fri, 7 Apr 2017 15:20:30 -0700
 Subject: [PATCH] configure.ac: don't use dnet-config
@@ -15,7 +15,7 @@ Signed-off-by: Martin Kelly <mkelly@xevo.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/open-vm-tools/configure.ac b/open-vm-tools/configure.ac
-index 3c058135a..124781f99 100644
+index 26bfdb682..9e2a1d6e3 100644
 --- a/open-vm-tools/configure.ac
 +++ b/open-vm-tools/configure.ac
 @@ -1227,7 +1227,7 @@ if test "$with_dnet" = "yes"; then

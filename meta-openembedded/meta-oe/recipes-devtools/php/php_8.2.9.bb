@@ -6,7 +6,7 @@ LICENSE = "PHP-3.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5ebd5be8e2a89f634486445bd164bef0"
 
 BBCLASSEXTEND = "native"
-DEPENDS = "zlib bzip2 libxml2 virtual/libiconv php-native lemon-native"
+DEPENDS = "zlib bzip2 libxml2 virtual/libiconv php-native"
 DEPENDS:append:libc-musl = " libucontext"
 DEPENDS:class-native = "zlib-native libxml2-native"
 

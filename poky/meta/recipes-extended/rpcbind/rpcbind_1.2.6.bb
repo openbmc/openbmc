@@ -40,7 +40,7 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}/
                           systemd \
 "
 
-EXTRA_OECONF += " --enable-warmstarts --with-rpcuser=rpc"
+EXTRA_OECONF += " --enable-warmstarts --with-rpcuser=rpc --with-statedir=${runtimedir}/rpcbind"
 
 do_install:append () {
 	install -d ${D}${sysconfdir}/init.d

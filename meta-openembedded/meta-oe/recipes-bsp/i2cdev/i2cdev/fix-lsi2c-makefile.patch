@@ -1,0 +1,28 @@
+From 57c09727220e00ab961325a2c85f5611bd1770d6 Mon Sep 17 00:00:00 2001
+Message-Id: <57c09727220e00ab961325a2c85f5611bd1770d6.1701984646.git.joerg.sommer@navimatix.de>
+From: =?UTF-8?q?J=C3=B6rg=20Sommer?= <joerg.sommer@navimatix.de>
+Date: Thu, 7 Dec 2023 22:29:40 +0100
+Subject: [PATCH] lsi2c/Makefile: Use builddir to refer to libi2cdev.a
+
+Signed-off-by: Jörg Sommer <joerg.sommer@navimatix.de>
+Upstream-Status: Submitted [https://github.com/costad2/i2cdev/pull/2/commits/43f15e97d869797dbfeaacafa13216aaaf353426]
+---
+ lsi2c/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lsi2c/Makefile.am b/lsi2c/Makefile.am
+index 6defc1f..0d81d01 100644
+--- a/lsi2c/Makefile.am
++++ b/lsi2c/Makefile.am
+@@ -14,7 +14,7 @@ bin_PROGRAMS=lsi2c
+ lsi2c_SOURCES = lsi2c.c
+ 
+ # Linker options for lsi2c
+-lsi2c_LDADD = $(top_srcdir)/libi2cdev/libi2cdev.a
++lsi2c_LDADD = $(top_builddir)/libi2cdev/libi2cdev.a
+ 
+ # Compiler options for lsi2c
+ lsi2c_CFLAGS = -I$(top_srcdir)/include -std=c99 -fPIC
+-- 
+2.34.1
+

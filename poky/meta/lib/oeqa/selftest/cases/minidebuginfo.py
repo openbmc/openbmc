@@ -21,7 +21,7 @@ class Minidebuginfo(OESelftestTestCase):
         bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME', 'READELF'], image)
 
         self.write_config("""
-PACKAGE_MINIDEBUGINFO = "1"
+DISTRO_FEATURES:append = " minidebuginfo"
 IMAGE_FSTYPES = "tar.bz2"
 """)
         bitbake("{} {}:do_addto_recipe_sysroot".format(image, binutils))

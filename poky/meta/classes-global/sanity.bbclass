@@ -532,7 +532,7 @@ def check_git_version(sanity_data):
 def check_perl_modules(sanity_data):
     import subprocess
     ret = ""
-    modules = ( "Text::ParseWords", "Thread::Queue", "Data::Dumper" )
+    modules = ( "Text::ParseWords", "Thread::Queue", "Data::Dumper", "File::Compare", "File::Copy", "open ':std'", "FindBin" )
     errresult = ''
     for m in modules:
         try:

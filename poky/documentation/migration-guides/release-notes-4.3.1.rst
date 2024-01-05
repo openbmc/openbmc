@@ -19,7 +19,6 @@ Security Fixes in Yocto-4.3.1
 Fixes in Yocto-4.3.1
 ~~~~~~~~~~~~~~~~~~~~
 
--  Remove references to apm in :term:`MACHINE_FEATURES`
 -  baremetal-helloworld: Pull in fix for race condition on x86-64
 -  base: Ensure recipes using mercurial-native have certificates
 -  bb-matrix-plot.sh: Show underscores correctly in labels
@@ -54,6 +53,7 @@ Fixes in Yocto-4.3.1
 -  machine: drop obsolete SERIAL_CONSOLES_CHECK
 -  manuals: correct "yocto-linux" by "linux-yocto"
 -  manuals: improve description of :term:`CVE_STATUS` and :term:`CVE_STATUS_GROUPS`
+-  manuals: Remove references to apm in :term:`MACHINE_FEATURES`
 -  manuals: update linux-yocto append examples
 -  manuals: update list of supported machines
 -  migration-4.3: additional migration items

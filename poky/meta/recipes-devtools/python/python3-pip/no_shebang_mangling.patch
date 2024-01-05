@@ -1,14 +1,23 @@
+From 915bf32cd117cd86cc0d4b96bc9490b1c7119ffd Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 23 Feb 2022 12:27:06 +0000
+Subject: [PATCH] python3-pip: Don't change shebang
+
 Patch pip to disable shebang mangling and also force the python executable
 to be python3 from the environment when building anything for the target
 (or nativesdk). This avoids incorrect interpreter paths in the target scripts.
 
 Upstream-Status: Inappropriate [OE specific config]
 
-Index: pip-22.0.3/src/pip/_vendor/distlib/scripts.py
-===================================================================
---- pip-22.0.3.orig/src/pip/_vendor/distlib/scripts.py
-+++ pip-22.0.3/src/pip/_vendor/distlib/scripts.py
-@@ -135,6 +135,8 @@ class ScriptMaker(object):
+---
+ src/pip/_vendor/distlib/scripts.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/pip/_vendor/distlib/scripts.py b/src/pip/_vendor/distlib/scripts.py
+index d270624..42c0d10 100644
+--- a/src/pip/_vendor/distlib/scripts.py
++++ b/src/pip/_vendor/distlib/scripts.py
+@@ -137,6 +137,8 @@ class ScriptMaker(object):
          See also: http://www.in-ulm.de/~mascheck/various/shebang/#length
                    https://hg.mozilla.org/mozilla-central/file/tip/mach
          """
@@ -17,7 +26,7 @@ Index: pip-22.0.3/src/pip/_vendor/distlib/scripts.py
          if os.name != 'posix':
              simple_shebang = True
          else:
-@@ -340,7 +342,7 @@ class ScriptMaker(object):
+@@ -348,7 +350,7 @@ class ScriptMaker(object):
                  return
  
              match = FIRST_LINE_RE.match(first_line.replace(b'\r\n', b'\n'))

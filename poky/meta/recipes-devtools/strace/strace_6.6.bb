@@ -22,10 +22,8 @@ inherit autotools ptest
 # Not yet ported to rv32
 COMPATIBLE_HOST:riscv32 = "null"
 
-PACKAGECONFIG:class-target ??= "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
-"
-
+# bluez is not enabled by default due to build dependency creep in smaller builds
+# like core-image-minimal leading to significantly more tasks being executed
 PACKAGECONFIG[bluez] = "ac_cv_header_bluetooth_bluetooth_h=yes,ac_cv_header_bluetooth_bluetooth_h=no,bluez5"
 PACKAGECONFIG[libunwind] = "--with-libunwind,--without-libunwind,libunwind"
 

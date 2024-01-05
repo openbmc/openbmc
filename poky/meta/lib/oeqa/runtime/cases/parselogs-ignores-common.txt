@@ -1,0 +1,62 @@
+# Xserver explains what the short codes mean
+(WW) warning, (EE) error, (NI) not implemented, (??) unknown.
+
+# Xserver warns if compiled with ACPI but no acpid running
+Open ACPI failed (/var/run/acpid.socket) (No such file or directory)
+
+# Some machines (eg qemux86) don't enable PAE (they probably should though)
+NX (Execute Disable) protection cannot be enabled: non-PAE kernel!
+
+# Connman's pacrunner warns if external connectivity isn't available
+Failed to find URL:http://ipv4.connman.net/online/status.html
+Failed to find URL:http://ipv6.connman.net/online/status.html
+
+# x86 on 6.6+ outputs this message, it is informational, not an error
+ACPI: _OSC evaluation for CPUs failed, trying _PDC
+
+# These should be reviewed to see if they are still needed
+dma timeout
+can\'t add hid device:
+usbhid: probe of
+_OSC failed (AE_ERROR)
+_OSC failed (AE_SUPPORT)
+AE_ALREADY_EXISTS
+ACPI _OSC request failed (AE_SUPPORT)
+can\'t disable ASPM
+Failed to load module "vesa"
+Failed to load module "modesetting"
+Failed to load module "glx"
+Failed to load module "fbdev"
+Failed to load module "ati"
+[drm] Cannot find any crtc or sizes
+_OSC failed (AE_NOT_FOUND); disabling ASPM
+hd.: possibly failed opcode
+NETLINK INITIALIZATION FAILED
+kernel: Cannot find map file
+omap_hwmod: debugss: _wait_target_disable failed
+VGA arbiter: cannot open kernel arbiter, no multi-card support
+Online check failed for
+netlink init failed
+Fast TSC calibration
+controller can't do DEVSLP, turning off
+stmmac_dvr_probe: warning: cannot get CSR clock
+error: couldn\'t mount because of unsupported optional features
+GPT: Use GNU Parted to correct GPT errors
+Cannot set xattr user.Librepo.DownloadInProgress
+Failed to read /var/lib/nfs/statd/state: Success
+error retry time-out =
+logind: cannot setup systemd-logind helper (-61), using legacy fallback
+Failed to rename network interface
+Failed to process device, ignoring: Device or resource busy
+Cannot find a map file
+[rdrand]: Initialization Failed
+[rndr  ]: Initialization Failed
+[pulseaudio] authkey.c: Failed to open cookie file
+[pulseaudio] authkey.c: Failed to load authentication key
+was skipped because of a failed condition check
+was skipped because all trigger condition checks failed
+xf86OpenConsole: Switching VT failed
+Failed to read LoaderConfigTimeoutOneShot variable, ignoring: Operation not supported
+Failed to read LoaderEntryOneShot variable, ignoring: Operation not supported
+Direct firmware load for regulatory.db
+failed to load regulatory.db

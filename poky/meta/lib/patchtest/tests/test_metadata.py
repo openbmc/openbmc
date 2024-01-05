@@ -25,6 +25,8 @@ class TestMetadata(base.Metadata):
     sha256sum = 'sha256sum'
     git_regex = pyparsing.Regex('^git\:\/\/.*')
     metadata_summary = 'SUMMARY'
+    cve_check_ignore_var = 'CVE_CHECK_IGNORE'
+    cve_status_var = 'CVE_STATUS'
 
     def test_license_presence(self):
         if not self.added:
@@ -178,3 +180,16 @@ class TestMetadata(base.Metadata):
             # "${PN} version ${PN}-${PR}" is the default, so fail if default
             if summary.startswith('%s version' % pn):
                 self.fail('%s is missing in newly added recipe' % self.metadata_summary)
+
+    def test_cve_check_ignore(self):
+        if not self.modified:
+            self.skip('No modified recipes, skipping test')
+        for pn in self.modified:
+            # we are not interested in images
+            if 'core-image' in pn:
+                continue
+            rd = self.tinfoil.parse_recipe(pn)
+            cve_check_ignore = rd.getVar(self.cve_check_ignore_var)
+
+            if cve_check_ignore is not None:
+                self.fail('%s is deprecated and should be replaced by %s' % (self.cve_check_ignore_var, self.cve_status_var))

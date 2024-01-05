@@ -188,6 +188,7 @@ FILES:${PN}-dev:append = " ${datadir}/gobject-introspection-1.0/tests/*.c \
 FILES:${PN}-dbg += "${libdir}/gobject-introspection/giscanner/.debug/"
 FILES:${PN}-staticdev += "${libdir}/gobject-introspection/giscanner/*.a"
 
-RDEPENDS:${PN} = "python3-pickle python3-xml"
+# setuptools can be removed when upstream removes all uses of distutils
+RDEPENDS:${PN} = "python3-pickle python3-xml python3-setuptools"
 
 BBCLASSEXTEND = "native"

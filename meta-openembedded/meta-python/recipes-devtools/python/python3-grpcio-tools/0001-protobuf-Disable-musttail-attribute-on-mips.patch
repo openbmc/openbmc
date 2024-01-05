@@ -14,11 +14,11 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 
 --- a/third_party/protobuf/src/google/protobuf/port_def.inc
 +++ b/third_party/protobuf/src/google/protobuf/port_def.inc
-@@ -338,6 +338,7 @@ static_assert(PROTOBUF_ABSL_MIN(20230125
+@@ -298,6 +298,7 @@
  #error PROTOBUF_TAILCALL was previously defined
  #endif
- #if __has_cpp_attribute(clang::musttail) && !defined(__arm__) &&      \
-+    !defined(__mips__) &&                                        \
+ #if ABSL_HAVE_CPP_ATTRIBUTE(clang::musttail) && !defined(__arm__) &&  \
++    !defined(__mips__) &&                                             \
      !defined(_ARCH_PPC) && !defined(__wasm__) &&                      \
-     !(defined(_MSC_VER) && defined(_M_IX86)) && !defined(__i386__) && \
-     !(defined(__NDK_MAJOR__) && __NDK_MAJOR <= 24)
+     !(defined(_MSC_VER) && defined(_M_IX86)) && !defined(__i386__)
+ // Compilation fails on ARM32: b/195943306

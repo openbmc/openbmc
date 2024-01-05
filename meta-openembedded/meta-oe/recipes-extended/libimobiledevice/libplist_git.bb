@@ -23,6 +23,10 @@ CVE_STATUS_LIBLIST = " \
     CVE-2017-5836 \
 "
 
+do_configure:prepend() {
+    rm ${S}/m4/ax_python_devel.m4
+}
+
 do_install:append () {
     if [ -e ${D}${libdir}/python*/site-packages/plist/_plist.so ]; then
         chrpath -d ${D}${libdir}/python*/site-packages/plist/_plist.so

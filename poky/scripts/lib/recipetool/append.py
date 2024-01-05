@@ -18,6 +18,7 @@ import shutil
 import scriptutils
 import errno
 from collections import defaultdict
+import difflib
 
 logger = logging.getLogger('recipetool')
 
@@ -299,7 +300,9 @@ def appendfile(args):
                 if st.st_mode & stat.S_IXUSR:
                     perms = '0755'
             install = {args.newfile: (args.targetpath, perms)}
-        oe.recipeutils.bbappend_recipe(rd, args.destlayer, {args.newfile: {'path' : sourcepath}}, install, wildcardver=args.wildcard_version, machine=args.machine)
+        if sourcepath:
+            sourcepath = os.path.basename(sourcepath)
+        oe.recipeutils.bbappend_recipe(rd, args.destlayer, {args.newfile: {'newname' : sourcepath}}, install, wildcardver=args.wildcard_version, machine=args.machine)
         tinfoil.modified_files()
         return 0
     else:
@@ -328,6 +331,7 @@ def appendsrc(args, files, rd, extralines=None):
 
     copyfiles = {}
     extralines = extralines or []
+    params = []
     for newfile, srcfile in files.items():
         src_destdir = os.path.dirname(srcfile)
         if not args.use_workdir:
@@ -338,24 +342,45 @@ def appendsrc(args, files, rd, extralines=None):
             src_destdir = os.path.join(os.path.relpath(srcdir, workdir), src_destdir)
         src_destdir = os.path.normpath(src_destdir)
 
-        source_uri = 'file://{0}'.format(os.path.basename(srcfile))
         if src_destdir and src_destdir != '.':
-            source_uri += ';subdir={0}'.format(src_destdir)
-
-        simple = bb.fetch.URI(source_uri)
-        simple.params = {}
-        simple_str = str(simple)
-        if simple_str in simplified:
-            existing = simplified[simple_str]
-            if source_uri != existing:
-                logger.warning('{0!r} is already in SRC_URI, with different parameters: {1!r}, not adding'.format(source_uri, existing))
-            else:
-                logger.warning('{0!r} is already in SRC_URI, not adding'.format(source_uri))
+            params.append({'subdir': src_destdir})
         else:
-            extralines.append('SRC_URI += {0}'.format(source_uri))
-        copyfiles[newfile] = {'path' : srcfile}
+            params.append({})
 
-    oe.recipeutils.bbappend_recipe(rd, args.destlayer, copyfiles, None, wildcardver=args.wildcard_version, machine=args.machine, extralines=extralines)
+        copyfiles[newfile] = {'newname' : os.path.basename(srcfile)}
+
+    dry_run_output = None
+    dry_run_outdir = None
+    if args.dry_run:
+        import tempfile
+        dry_run_output = tempfile.TemporaryDirectory(prefix='devtool')
+        dry_run_outdir = dry_run_output.name
+
+    appendfile, _ = oe.recipeutils.bbappend_recipe(rd, args.destlayer, copyfiles, None, wildcardver=args.wildcard_version, machine=args.machine, extralines=extralines, params=params,
+                                                   redirect_output=dry_run_outdir, update_original_recipe=args.update_recipe)
+    if not appendfile:
+        return
+    if args.dry_run:
+        output = ''
+        appendfilename = os.path.basename(appendfile)
+        newappendfile = appendfile
+        if appendfile and os.path.exists(appendfile):
+            with open(appendfile, 'r') as f:
+                oldlines = f.readlines()
+        else:
+            appendfile = '/dev/null'
+            oldlines = []
+
+        with open(os.path.join(dry_run_outdir, appendfilename), 'r') as f:
+            newlines = f.readlines()
+        diff = difflib.unified_diff(oldlines, newlines, appendfile, newappendfile)
+        difflines = list(diff)
+        if difflines:
+            output += ''.join(difflines)
+        if output:
+            logger.info('Diff of changed files:\n%s' % output)
+        else:
+            logger.info('No changed files')
     tinfoil.modified_files()
 
 def appendsrcfiles(parser, args):
@@ -436,6 +461,8 @@ def register_commands(subparsers):
                                    help='Create/update a bbappend to add or replace source files',
                                    description='Creates a bbappend (or updates an existing one) to add or replace the specified file in the recipe sources, either those in WORKDIR or those in the source tree. This command lets you specify multiple files with a destination directory, so cannot specify the destination filename. See the `appendsrcfile` command for the other behavior.')
     parser.add_argument('-D', '--destdir', help='Destination directory (relative to S or WORKDIR, defaults to ".")', default='', type=destination_path)
+    parser.add_argument('-u', '--update-recipe', help='Update recipe instead of creating (or updating) a bbapend file. DESTLAYER must contains the recipe to update', action='store_true')
+    parser.add_argument('-n', '--dry-run', help='Dry run mode', action='store_true')
     parser.add_argument('files', nargs='+', metavar='FILE', help='File(s) to be added to the recipe sources (WORKDIR or S)', type=existing_path)
     parser.set_defaults(func=lambda a: appendsrcfiles(parser, a), parserecipes=True)
 
@@ -443,6 +470,8 @@ def register_commands(subparsers):
                                    parents=[common_src],
                                    help='Create/update a bbappend to add or replace a source file',
                                    description='Creates a bbappend (or updates an existing one) to add or replace the specified files in the recipe sources, either those in WORKDIR or those in the source tree. This command lets you specify the destination filename, not just destination directory, but only works for one file. See the `appendsrcfiles` command for the other behavior.')
+    parser.add_argument('-u', '--update-recipe', help='Update recipe instead of creating (or updating) a bbapend file. DESTLAYER must contains the recipe to update', action='store_true')
+    parser.add_argument('-n', '--dry-run', help='Dry run mode', action='store_true')
     parser.add_argument('file', metavar='FILE', help='File to be added to the recipe sources (WORKDIR or S)', type=existing_path)
     parser.add_argument('destfile', metavar='DESTFILE', nargs='?', help='Destination path (relative to S or WORKDIR, optional)', type=destination_path)
     parser.set_defaults(func=lambda a: appendsrcfile(parser, a), parserecipes=True)

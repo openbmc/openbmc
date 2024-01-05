@@ -1,4 +1,4 @@
-From 859c21b9a21c53d936301b05044d0c649d6cf32b Mon Sep 17 00:00:00 2001
+From 2904454f3408a3abe3f2b0681504a66ea5ce713c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 24 Mar 2021 17:36:26 -0400
 Subject: [PATCH] hgfsServerLinux: Consider 64bit time_t possibility
@@ -15,15 +15,15 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  1 file changed, 14 deletions(-)
 
 diff --git a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
-index f5cc80b76..5a79d6451 100644
+index 0cc7c4094..445a53881 100644
 --- a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
 +++ b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
-@@ -2566,20 +2566,6 @@ HgfsStatToFileAttr(struct stat *stats,       // IN: stat information
+@@ -2559,20 +2559,6 @@ HgfsStatToFileAttr(struct stat *stats,       // IN: stat information
     LOG(4, "%s: done, permissions %o%o%o%o, size %"FMT64"u\n", __FUNCTION__,
         attr->specialPerms, attr->ownerPerms, attr->groupPerms,
         attr->otherPerms, attr->size);
 -#ifdef __FreeBSD__
--#   if !defined(VM_X86_64) && !defined(VM_ARM_64) && __FreeBSD_version >= 500043
+-#   if !defined(VM_X86_64) && !defined(VM_ARM_64)
 -#      define FMTTIMET ""
 -#   else
 -#      define FMTTIMET "l"

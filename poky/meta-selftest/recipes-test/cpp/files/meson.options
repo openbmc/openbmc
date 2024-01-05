@@ -1,0 +1,3 @@
+
+option('FAILING_TEST', type : 'feature', value : 'disabled',
+    description : 'Compile a failing unit test to test the test infrastructure')

@@ -25,8 +25,6 @@ PACKAGECONFIG ??= ""
 
 PACKACONFIG[email] = "-with-watcher=email=${APRWATCH_FROM} --with-watchee=email=${ARPWATH_REPLY}, , postfix, postfix postfix-cfg"
 
-EXTRA_OECONF:append = " --srcdir=${S}"
-
 CONFIGUREOPTS = " --build=${BUILD_SYS} \
           --host=${HOST_SYS} \
           --target=${TARGET_SYS} \
@@ -41,13 +39,13 @@ CONFIGUREOPTS = " --build=${BUILD_SYS} \
           --localstatedir=${localstatedir} \
           --libdir=${libdir} \
           --includedir=${includedir} \
-          --oldincludedir=${oldincludedir} \
           --infodir=${infodir} \
           --mandir=${mandir} \
+          --srcdir=${S} \
           "
 
 do_configure () {
-    ${S}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF}
+    ${S}/configure ${CONFIGUREOPTS}
 }
 
 do_install () {

@@ -18,7 +18,11 @@ import os
 import re
 import sys
 import subprocess
+import json
+import urllib.request
 from recipetool.create import RecipeHandler
+from urllib.parse import urldefrag
+from recipetool.create import determine_from_url
 
 logger = logging.getLogger('recipetool')
 
@@ -110,6 +114,69 @@ class PythonRecipeHandler(RecipeHandler):
 
     def __init__(self):
         pass
+
+    def process_url(self, args, classes, handled, extravalues):
+        """
+        Convert any pypi url https://pypi.org/project/<package>/<version> into https://files.pythonhosted.org/packages/source/...
+        which corresponds to the archive location, and add pypi class
+        """
+
+        if 'url' in handled:
+            return None
+
+        fetch_uri = None
+        source = args.source
+        required_version = args.version if args.version else None
+        match = re.match(r'https?://pypi.org/project/([^/]+)(?:/([^/]+))?/?$', urldefrag(source)[0])
+        if match:
+            package = match.group(1)
+            version = match.group(2) if match.group(2) else required_version
+
+            json_url = f"https://pypi.org/pypi/%s/json" % package
+            response = urllib.request.urlopen(json_url)
+            if response.status == 200:
+                data = json.loads(response.read())
+                if not version:
+                    # grab latest version
+                    version = data["info"]["version"]
+                pypi_package = data["info"]["name"]
+                for release in reversed(data["releases"][version]):
+                    if release["packagetype"] == "sdist":
+                        fetch_uri = release["url"]
+                        break
+            else:
+                logger.warning("Cannot handle pypi url %s: cannot fetch package information using %s", source, json_url)
+                return None
+        else:
+            match = re.match(r'^https?://files.pythonhosted.org/packages.*/(.*)-.*$', source)
+            if match:
+                fetch_uri = source
+                pypi_package = match.group(1)
+                _, version = determine_from_url(fetch_uri)
+
+        if match and not args.no_pypi:
+            if required_version and version != required_version:
+                raise Exception("Version specified using --version/-V (%s) and version specified in the url (%s) do not match" % (required_version, version))
+            # This is optionnal if BPN looks like "python-<pypi_package>" or "python3-<pypi_package>" (see pypi.bbclass)
+            # but at this point we cannot know because because user can specify the output name of the recipe on the command line
+            extravalues["PYPI_PACKAGE"] = pypi_package
+            # If the tarball extension is not 'tar.gz' (default value in pypi.bblcass) whe should set PYPI_PACKAGE_EXT in the recipe
+            pypi_package_ext = re.match(r'.*%s-%s\.(.*)$' % (pypi_package, version), fetch_uri)
+            if pypi_package_ext:
+                pypi_package_ext = pypi_package_ext.group(1)
+                if pypi_package_ext != "tar.gz":
+                    extravalues["PYPI_PACKAGE_EXT"] = pypi_package_ext
+
+            # Pypi class will handle S and SRC_URI variables, so remove them
+            # TODO: allow oe.recipeutils.patch_recipe_lines() to accept regexp so we can simplify the following to:
+            # extravalues['SRC_URI(?:\[.*?\])?'] = None
+            extravalues['S'] = None
+            extravalues['SRC_URI'] = None
+
+            classes.append('pypi')
+
+        handled.append('url')
+        return fetch_uri
 
     def handle_classifier_license(self, classifiers, existing_licenses=""):
 
@@ -668,6 +735,7 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
         "poetry.core.masonry.api": "python_poetry_core",
         "flit_core.buildapi": "python_flit_core",
         "hatchling.build": "python_hatchling",
+        "maturin": "python_maturin",
     }
 
     # setuptools.build_meta and flit declare project metadata into the "project" section of pyproject.toml
@@ -726,6 +794,7 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
 
     def process(self, srctree, classes, lines_before, lines_after, handled, extravalues):
         info = {}
+        metadata = {}
 
         if 'buildsystem' in handled:
             return False

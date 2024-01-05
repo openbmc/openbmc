@@ -43,8 +43,6 @@ RDEPENDS:${PN} = " \
     xdg-dbus-proxy \
 "
 
-EXTRA_OEMESON += "-Dsystem_dbus_proxy=${bindir}/xdg-dbus-proxy -Dsystem_bubblewrap=${bindir}/bwrap"
-
 GIR_MESON_OPTION = "gir"
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'

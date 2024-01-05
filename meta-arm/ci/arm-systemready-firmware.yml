@@ -1,0 +1,4 @@
+header:
+  version: 11
+  includes:
+    - kas/arm-systemready-firmware.yml

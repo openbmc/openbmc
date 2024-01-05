@@ -15,10 +15,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 4811d4a3d..137b31a82 100644
+index 991a0cf85..e59c82472 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1611,6 +1611,8 @@ fi
+@@ -1660,6 +1660,8 @@ AS_IF([test -n "$MODPROBE_CMD"], [
  
  SYSCONFDIR="$(eval echo $(eval echo $sysconfdir))"
  
@@ -27,10 +27,10 @@ index 4811d4a3d..137b31a82 100644
  SBINDIR="$(eval echo $(eval echo $sbindir))"
  LVM_PATH="$SBINDIR/lvm"
  AC_DEFINE_UNQUOTED(LVM_PATH, ["$LVM_PATH"], [Path to lvm binary.])
-@@ -1829,6 +1831,7 @@ AC_SUBST(SACKPT_CFLAGS)
- AC_SUBST(SACKPT_LIBS)
- AC_SUBST(SALCK_CFLAGS)
- AC_SUBST(SALCK_LIBS)
+@@ -1886,6 +1888,7 @@ AC_SUBST(PYTHON2DIR)
+ AC_SUBST(PYTHON3)
+ AC_SUBST(PYTHON3DIR)
+ AC_SUBST(RT_LIBS)
 +AC_SUBST(BINDIR)
  AC_SUBST(SBINDIR)
  AC_SUBST(SELINUX_LIBS)

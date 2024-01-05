@@ -33,6 +33,10 @@
 # is stored where it can be installed into associated initramfs rootfs.
 STAGING_VERITY_DIR ?= "${TMPDIR}/work-shared/${MACHINE}/dm-verity"
 
+# location of images, default current image recipe. Set to DEPLOY_DIR_IMAGE
+# if non-verity images want to embed the .wks and verity image.
+DM_VERITY_DEPLOY_DIR ?= "${IMGDEPLOYDIR}"
+
 # Define the data block size to use in veritysetup.
 DM_VERITY_IMAGE_DATA_BLOCK_SIZE ?= "1024"
 
@@ -48,6 +52,8 @@ DM_VERITY_SEPARATE_HASH ?= "0"
 # Note - these are passed directly to sgdisk so hyphens needed.
 DM_VERITY_ROOT_GUID ?= "4f68bce3-e8cd-4db1-96e7-fbcaf984b709"
 DM_VERITY_RHASH_GUID ?= "2c7357ed-ebd2-46d9-aec1-23d437ec2bf5"
+
+DEPENDS += "bc-native"
 
 # Process the output from veritysetup and generate the corresponding .env
 # file. The output from veritysetup is not very machine-friendly so we need to
@@ -87,8 +93,8 @@ process_verity() {
     # https://uapi-group.org/specifications/specs/discoverable_partitions_specification/
 
     ROOT_HASH=$(cat $ENV | grep ^ROOT_HASH | sed 's/ROOT_HASH=//' | tr a-f A-F)
-    ROOT_HI=$(echo "obase=16;ibase=16;$ROOT_HASH/2^80" | /usr/bin/bc)
-    ROOT_LO=$(echo "obase=16;ibase=16;$ROOT_HASH%2^80" | /usr/bin/bc)
+    ROOT_HI=$(echo "obase=16;ibase=16;$ROOT_HASH/2^80" | bc)
+    ROOT_LO=$(echo "obase=16;ibase=16;$ROOT_HASH%2^80" | bc)
 
     # Hyphenate as per UUID spec and as expected by wic+sgdisk parameters.
     # Prefix with leading zeros, in case hash chunks weren't using highest bits
@@ -105,15 +111,15 @@ process_verity() {
     # Create wks.in fragment with build specific UUIDs for partitions.
     # Unfortunately the wks.in does not support line continuations...
     # First, the unappended filesystem data partition.
-    echo 'part / --source rawcopy --ondisk sda --sourceparams="file=${IMGDEPLOYDIR}/${DM_VERITY_IMAGE}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.verity" --part-name verityroot --part-type="${DM_VERITY_ROOT_GUID}"'" --uuid=\"$ROOT_UUID\"" > $WKS_INC
+    echo 'part / --source rawcopy --ondisk sda --sourceparams="file=${DM_VERITY_DEPLOY_DIR}/${DM_VERITY_IMAGE}-${MACHINE}.rootfs.${DM_VERITY_IMAGE_TYPE}.verity" --part-name verityroot --part-type="${DM_VERITY_ROOT_GUID}"'" --uuid=\"$ROOT_UUID\"" > $WKS_INC
 
     # note: no default mount point for hash data partition
-    echo 'part --source rawcopy --ondisk sda --sourceparams="file=${IMGDEPLOYDIR}/${DM_VERITY_IMAGE}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.vhash" --part-name verityhash --part-type="${DM_VERITY_RHASH_GUID}"'" --uuid=\"$RHASH_UUID\"" >> $WKS_INC
+    echo 'part --source rawcopy --ondisk sda --sourceparams="file=${DM_VERITY_DEPLOY_DIR}/${DM_VERITY_IMAGE}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.vhash" --part-name verityhash --part-type="${DM_VERITY_RHASH_GUID}"'" --uuid=\"$RHASH_UUID\"" >> $WKS_INC
 }
 
 verity_setup() {
     local TYPE=$1
-    local INPUT=${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.$TYPE
+    local INPUT=${IMAGE_NAME}.$TYPE
     local SIZE=$(stat --printf="%s" $INPUT)
     local OUTPUT=$INPUT.verity
     local OUTPUT_HASH=$INPUT.verity
@@ -155,7 +161,7 @@ verity_setup() {
 # make "dateless" symlink for the hash so the wks can find it.
 verity_hash() {
     cd ${IMGDEPLOYDIR}
-    ln -sf ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${DM_VERITY_IMAGE_TYPE}.vhash \
+    ln -sf ${IMAGE_NAME}.${DM_VERITY_IMAGE_TYPE}.vhash \
         ${IMAGE_BASENAME}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.vhash
 }
 

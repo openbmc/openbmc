@@ -16,6 +16,7 @@ LIC_FILES_CHKSUM = "file://doc/COPYING;md5=2d0aa14b3fce4694e4f615e30186335f \
 
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/attr/${BP}.tar.gz \
            file://run-ptest \
+           file://0001-attr.c-Include-libgen.h-for-posix-version-of-basenam.patch \
 "
 
 inherit ptest update-alternatives autotools gettext

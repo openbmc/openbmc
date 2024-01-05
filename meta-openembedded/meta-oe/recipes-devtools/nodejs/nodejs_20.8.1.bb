@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=162595a4a2f3453a0534e60b0afe4e7b"
 
 CVE_PRODUCT = "nodejs node.js"
 
-DEPENDS = "openssl file-replacement-native"
+DEPENDS = "openssl file-replacement-native python3-packaging-native"
 DEPENDS:append:class-target = " qemu-native"
 DEPENDS:append:class-native = " c-ares-native"
 
@@ -27,6 +27,8 @@ SRC_URI = "http://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz \
            file://0001-Revert-io_uring-changes-from-libuv-1.46.0.patch \
            file://0002-Revert-io_uring-changes-from-libuv-1.45.0.patch \
            file://run-ptest \
+           file://0001-build-fix-build-with-Python-3.12.patch \
+           file://0001-gyp-resolve-python-3.12-issues.patch \
            "
 
 SRC_URI:append:class-target = " \

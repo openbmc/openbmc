@@ -161,6 +161,9 @@ metadata, as extra layers can define their own:
 -  *keyboard:* Include keyboard support (e.g. keymaps will be loaded
    during boot).
 
+-  *minidebuginfo:* Add minimal debug symbols :ref:`(minidebuginfo)<dev-manual/debugging:enabling minidebuginfo>`
+   to binary files containing, allowing ``coredumpctl`` and ``gdb`` to show symbolicated stack traces.
+
 -  *multiarch:* Enable building applications with multiple architecture
    support.
 

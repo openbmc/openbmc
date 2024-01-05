@@ -84,6 +84,7 @@ of the following environment variables (in any order):
     publicvnc - enable a VNC server open to all hosts
     audio - enable audio
     guestagent - enable guest agent communication
+    qmp=<path> - create a QMP socket (defaults to unix:qmp.sock if unspecified)
     [*/]ovmf* - OVMF firmware file or base name for booting with UEFI
   tcpserial=<port> - specify tcp serial port number
   qemuparams=<xyz> - specify custom parameters to QEMU
@@ -221,6 +222,7 @@ class BaseConfig(object):
         self.cleaned = False
         # Files to cleanup after run
         self.cleanup_files = []
+        self.qmp = None
         self.guest_agent = False
         self.guest_agent_sockpath = '/tmp/qga.sock'
 
@@ -369,11 +371,11 @@ class BaseConfig(object):
         if p.endswith('.qemuboot.conf'):
             self.qemuboot = p
             self.qbconfload = True
-        elif re.search('\.bin$', p) or re.search('bzImage', p) or \
+        elif re.search('\\.bin$', p) or re.search('bzImage', p) or \
              re.search('zImage', p) or re.search('vmlinux', p) or \
              re.search('fitImage', p) or re.search('uImage', p):
             self.kernel =  p
-        elif os.path.exists(p) and (not os.path.isdir(p)) and '-image-' in os.path.basename(p):
+        elif os.path.isfile(p) and ('-image-' in os.path.basename(p) or '.rootfs.' in os.path.basename(p)):
             self.rootfs = p
             # Check filename against self.fstypes can handle <file>.cpio.gz,
             # otherwise, its type would be "gz", which is incorrect.
@@ -383,19 +385,19 @@ class BaseConfig(object):
                     fst = t
                     break
             if not fst:
-                m = re.search('.*\.(.*)$', self.rootfs)
+                m = re.search('.*\\.(.*)$', self.rootfs)
                 if m:
                     fst =  m.group(1)
             if fst:
                 self.check_arg_fstype(fst)
-                qb = re.sub('\.' + fst + "$", '.qemuboot.conf', self.rootfs)
+                qb = re.sub('\\.' + fst + "$", '.qemuboot.conf', self.rootfs)
                 if os.path.exists(qb):
                     self.qemuboot = qb
                     self.qbconfload = True
                 else:
                     logger.warning("%s doesn't exist, will try to remove '.rootfs' from filename" % qb)
                     # They to remove .rootfs (IMAGE_NAME_SUFFIX) as well
-                    qb = re.sub('\.rootfs.qemuboot.conf$', '.qemuboot.conf', qb)
+                    qb = re.sub('\\.rootfs.qemuboot.conf$', '.qemuboot.conf', qb)
                     if os.path.exists(qb):
                         self.qemuboot = qb
                         self.qbconfload = True
@@ -536,6 +538,10 @@ to your build configuration.
                 self.qemu_opt_script += ' -vnc :0'
             elif arg == 'guestagent':
                 self.guest_agent = True
+            elif arg == "qmp":
+                self.qmp = "unix:qmp.sock"
+            elif arg.startswith("qmp="):
+                self.qmp = arg[len('qmp='):]
             elif arg.startswith('guestagent-sockpath='):
                 self.guest_agent_sockpath = '%s' % arg[len('guestagent-sockpath='):]
             elif arg.startswith('tcpserial='):
@@ -1406,6 +1412,10 @@ to your build configuration.
             self.qemu_opt += ' -device virtio-serial '
             self.qemu_opt += ' -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0 '
 
+    def setup_qmp(self):
+        if self.qmp:
+            self.qemu_opt += " -qmp %s,server,nowait" % self.qmp
+
     def setup_vga(self):
         if self.nographic == True:
             if self.sdl == True:
@@ -1547,6 +1557,7 @@ to your build configuration.
             self.qemu_opt += " -snapshot"
 
         self.setup_guest_agent()
+        self.setup_qmp()
         self.setup_serial()
         self.setup_vga()
 

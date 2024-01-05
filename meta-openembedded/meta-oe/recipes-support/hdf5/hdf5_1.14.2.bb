@@ -58,7 +58,5 @@ do_install:append() {
 
 BBCLASSEXTEND = "native"
 
-SRC_DISTRIBUTE_LICENSES += "HDF5"
-
 # h5fuse.sh script needs bash
 RDEPENDS:${PN} += "bash"

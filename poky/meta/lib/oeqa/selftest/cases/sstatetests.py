@@ -263,7 +263,7 @@ class SStateDistroTests(SStateBase):
 
 class SStateCacheManagement(SStateBase):
     # Test the sstate-cache-management script. Each element in the global_config list is used with the corresponding element in the target_config list
-    # global_config elements are expected to not generate any sstate files that would be removed by sstate-cache-management.sh (such as changing the value of MACHINE)
+    # global_config elements are expected to not generate any sstate files that would be removed by sstate-cache-management.py (such as changing the value of MACHINE)
     def run_test_sstate_cache_management_script(self, target, global_config=[''], target_config=[''], ignore_patterns=[]):
         self.assertTrue(global_config)
         self.assertTrue(target_config)
@@ -277,14 +277,10 @@ class SStateCacheManagement(SStateBase):
         # For now this only checks if random sstate tasks are handled correctly as a group.
         # In the future we should add control over what tasks we check for.
 
-        sstate_archs_list = []
         expected_remaining_sstate = []
         for idx in range(len(target_config)):
             self.append_config(global_config[idx])
             self.append_recipeinc(target, target_config[idx])
-            sstate_arch = get_bb_var('SSTATE_PKGARCH', target)
-            if not sstate_arch in sstate_archs_list:
-                sstate_archs_list.append(sstate_arch)
             if target_config[idx] == target_config[-1]:
                 target_sstate_before_build = self.search_sstate(target + r'.*?\.tar.zst$')
             bitbake("-cclean %s" % target)
@@ -296,7 +292,7 @@ class SStateCacheManagement(SStateBase):
             self.remove_recipeinc(target, target_config[idx])
             self.assertEqual(result.status, 0, msg = "build of %s failed with %s" % (target, result.output))
 
-        runCmd("sstate-cache-management.sh -y --cache-dir=%s --remove-duplicated --extra-archs=%s" % (self.sstate_path, ','.join(map(str, sstate_archs_list))))
+        runCmd("sstate-cache-management.py -y --cache-dir=%s --remove-duplicated" % (self.sstate_path))
         actual_remaining_sstate = [x for x in self.search_sstate(target + r'.*?\.tar.zst$') if not any(pattern in x for pattern in ignore_patterns)]
 
         actual_not_expected = [x for x in actual_remaining_sstate if x not in expected_remaining_sstate]
@@ -765,22 +761,22 @@ addtask tmptask2 before do_tmptask1
                 hashes = [hash1, hash2]
                 hashfiles = find_siginfo(key, None, hashes)
                 self.assertCountEqual(hashes, hashfiles)
-                bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb)
+                bb.siggen.compare_sigfiles(hashfiles[hash1]['path'], hashfiles[hash2]['path'], recursecb)
 
             for pn in pns:
                 recursecb_count = 0
-                filedates = find_siginfo(pn, "do_tmptask1")
-                self.assertGreaterEqual(len(filedates), 2)
-                latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-2:]
-                bb.siggen.compare_sigfiles(latestfiles[-2], latestfiles[-1], recursecb)
+                matches = find_siginfo(pn, "do_tmptask1")
+                self.assertGreaterEqual(len(matches), 2)
+                latesthashes = sorted(matches.keys(), key=lambda h: matches[h]['time'])[-2:]
+                bb.siggen.compare_sigfiles(matches[latesthashes[-2]]['path'], matches[latesthashes[-1]]['path'], recursecb)
                 self.assertEqual(recursecb_count,1)
 
 class SStatePrintdiff(SStateBase):
     def run_test_printdiff_changerecipe(self, target, change_recipe, change_bbtask, change_content, expected_sametmp_output, expected_difftmp_output):
+        import time
         self.write_config("""
-TMPDIR = "${TOPDIR}/tmp-sstateprintdiff"
-""")
-        self.track_for_cleanup(self.topdir + "/tmp-sstateprintdiff")
+TMPDIR = "${{TOPDIR}}/tmp-sstateprintdiff-sametmp-{}"
+""".format(time.time()))
         # Use runall do_build to ensure any indirect sstate is created, e.g. tzcode-native on both x86 and
         # aarch64 hosts since only allarch target recipes depend upon it and it may not be built otherwise.
         # A bitbake -c cleansstate tzcode-native would cause some of these tests to error for example.
@@ -791,38 +787,36 @@ TMPDIR = "${TOPDIR}/tmp-sstateprintdiff"
         result_sametmp = bitbake("-S printdiff {}".format(target))
 
         self.write_config("""
-TMPDIR = "${TOPDIR}/tmp-sstateprintdiff-2"
-""")
-        self.track_for_cleanup(self.topdir + "/tmp-sstateprintdiff-2")
+TMPDIR = "${{TOPDIR}}/tmp-sstateprintdiff-difftmp-{}"
+""".format(time.time()))
         result_difftmp = bitbake("-S printdiff {}".format(target))
 
         self.delete_recipeinc(change_recipe)
         for item in expected_sametmp_output:
-            self.assertIn(item, result_sametmp.output)
+            self.assertIn(item, result_sametmp.output, msg = "Item {} not found in output:\n{}".format(item, result_sametmp.output))
         for item in expected_difftmp_output:
-            self.assertIn(item, result_difftmp.output)
+            self.assertIn(item, result_difftmp.output, msg = "Item {} not found in output:\n{}".format(item, result_difftmp.output))
 
     def run_test_printdiff_changeconfig(self, target, change_content, expected_sametmp_output, expected_difftmp_output):
+        import time
         self.write_config("""
-TMPDIR = "${TOPDIR}/tmp-sstateprintdiff"
-""")
-        self.track_for_cleanup(self.topdir + "/tmp-sstateprintdiff")
+TMPDIR = "${{TOPDIR}}/tmp-sstateprintdiff-sametmp-{}"
+""".format(time.time()))
         bitbake("--runall build --runall deploy_source_date_epoch {}".format(target))
         bitbake("-S none {}".format(target))
         self.append_config(change_content)
         result_sametmp = bitbake("-S printdiff {}".format(target))
 
         self.write_config("""
-TMPDIR = "${TOPDIR}/tmp-sstateprintdiff-2"
-""")
+TMPDIR = "${{TOPDIR}}/tmp-sstateprintdiff-difftmp-{}"
+""".format(time.time()))
         self.append_config(change_content)
-        self.track_for_cleanup(self.topdir + "/tmp-sstateprintdiff-2")
         result_difftmp = bitbake("-S printdiff {}".format(target))
 
         for item in expected_sametmp_output:
-            self.assertIn(item, result_sametmp.output)
+            self.assertIn(item, result_sametmp.output, msg = "Item {} not found in output:\n{}".format(item, result_sametmp.output))
         for item in expected_difftmp_output:
-            self.assertIn(item, result_difftmp.output)
+            self.assertIn(item, result_difftmp.output, msg = "Item {} not found in output:\n{}".format(item, result_difftmp.output))
 
 
     # Check if printdiff walks the full dependency chain from the image target to where the change is in a specific recipe
@@ -842,7 +836,7 @@ do_install:append() {
 expected_sametmp_output, expected_difftmp_output)
 
     # Check if changes to gcc-source (which uses tmp/work-shared) are correctly discovered
-    def test_gcc_runtime_vs_gcc_source(self):
+    def _test_gcc_runtime_vs_gcc_source(self):
         gcc_source_pn = 'gcc-source-%s' % get_bb_vars(['PV'], 'gcc')['PV']
 
         expected_output = ("Task {}:do_preconfigure couldn't be used from the cache because:".format(gcc_source_pn),
@@ -886,47 +880,82 @@ expected_sametmp_output, expected_difftmp_output)
 
 @OETestTag("yocto-mirrors")
 class SStateMirrors(SStateBase):
-    def check_bb_output(self, output, exceptions):
-        in_tasks = False
-        missing_objects = []
-        checked_urls = []
-        for l in output.splitlines():
-            if "Testing URL" in l:
-                checked_urls.append(l.split()[3])
-            if "The differences between the current build and any cached tasks start at the following tasks" in l:
-                in_tasks = True
-                continue
-            if "Writing task signature files" in l:
-                in_tasks = False
-                continue
-            if in_tasks:
-                recipe_task = l.split("/")[-1]
-                recipe, task = recipe_task.split(":")
-                for e in exceptions:
-                    if e[0] in recipe and task == e[1]:
+    def check_bb_output(self, output, exceptions, check_cdn):
+        def is_exception(object, exceptions):
+            for e in exceptions:
+                if re.search(e, object):
+                    return True
+            return False
+
+        output_l = output.splitlines()
+        for l in output_l:
+            if l.startswith("Sstate summary"):
+                for idx, item in enumerate(l.split()):
+                    if item == 'Missed':
+                        missing_objects = int(l.split()[idx+1])
                         break
                 else:
-                    missing_objects.append(recipe_task)
-        self.assertTrue(len(missing_objects) == 0, "URLs checked:\n{}\nMissing objects in the cache:\n{}".format("\n".join(checked_urls), "\n".join(missing_objects)))
+                    self.fail("Did not find missing objects amount in sstate summary: {}".format(l))
+                break
+        else:
+            self.fail("Did not find 'Sstate summary' line in bitbake output")
 
-    def run_test_cdn_mirror(self, machine, targets, exceptions):
-        exceptions = exceptions + [[t, "do_deploy_source_date_epoch"] for t in targets.split()]
-        exceptions = exceptions + [[t, "do_image_qa"] for t in targets.split()]
-        self.config_sstate(True)
-        self.append_config("""
+        failed_urls = []
+        for l in output_l:
+            if "SState: Unsuccessful fetch test for" in l and check_cdn:
+                missing_object = l.split()[6]
+            elif "SState: Looked for but didn't find file" in l and not check_cdn:
+                missing_object = l.split()[8]
+            else:
+                missing_object = None
+            if missing_object:
+                if not is_exception(missing_object, exceptions):
+                    failed_urls.append(missing_object)
+                else:
+                    missing_objects -= 1
+
+        self.assertEqual(len(failed_urls), missing_objects, "Amount of reported missing objects does not match failed URLs: {}\nFailed URLs:\n{}".format(missing_objects, "\n".join(failed_urls)))
+        self.assertEqual(len(failed_urls), 0, "Missing objects in the cache:\n{}".format("\n".join(failed_urls)))
+
+    def run_test(self, machine, targets, exceptions, check_cdn = True):
+        # sstate is checked for existence of these, but they never get written out to begin with
+        exceptions += ["{}.*image_qa".format(t) for t in targets.split()]
+        exceptions += ["{}.*deploy_source_date_epoch".format(t) for t in targets.split()]
+        exceptions += ["{}.*image_complete".format(t) for t in targets.split()]
+        exceptions += ["linux-yocto.*shared_workdir"]
+        # these get influnced by IMAGE_FSTYPES tweaks in yocto-autobuilder-helper's config.json (on x86-64)
+        # additionally, they depend on noexec (thus, absent stamps) package, install, etc. image tasks,
+        # which makes tracing other changes difficult
+        exceptions += ["{}.*create_spdx".format(t) for t in targets.split()]
+        exceptions += ["{}.*create_runtime_spdx".format(t) for t in targets.split()]
+
+        if check_cdn:
+            self.config_sstate(True)
+            self.append_config("""
 MACHINE = "{}"
 BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
 SSTATE_MIRRORS ?= "file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH"
 """.format(machine))
-        result = bitbake("-D -S printdiff {}".format(targets))
-        self.check_bb_output(result.output, exceptions)
+        else:
+            self.append_config("""
+MACHINE = "{}"
+""".format(machine))
+        result = bitbake("-DD -n {}".format(targets))
+        bitbake("-S none {}".format(targets))
+        self.check_bb_output(result.output, exceptions, check_cdn)
 
     def test_cdn_mirror_qemux86_64(self):
-        # Example:
-        # exceptions = [ ["packagegroup-core-sdk","do_package"] ]
         exceptions = []
-        self.run_test_cdn_mirror("qemux86-64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
+        self.run_test("qemux86-64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
 
     def test_cdn_mirror_qemuarm64(self):
         exceptions = []
-        self.run_test_cdn_mirror("qemuarm64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
+        self.run_test("qemuarm64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
+
+    def test_local_cache_qemux86_64(self):
+        exceptions = []
+        self.run_test("qemux86-64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions, check_cdn = False)
+
+    def test_local_cache_qemuarm64(self):
+        exceptions = []
+        self.run_test("qemuarm64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions, check_cdn = False)

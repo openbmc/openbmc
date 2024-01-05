@@ -7,12 +7,13 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import pytest
 from django.test import TestCase
 from django.core import management
 
 from orm.models import Layer_Version, Machine, Recipe
 
-
+@pytest.mark.order(3)
 class TestLayerIndexUpdater(TestCase):
     def test_run_lsupdates_command(self):
         # Load some release information for us to fetch from the layer index

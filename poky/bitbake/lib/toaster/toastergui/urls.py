@@ -95,6 +95,7 @@ urlpatterns = [
         # project URLs
         url(r'^newproject/$', views.newproject, name='newproject'),
 
+        url(r'^cmdline/$', views.CommandLineBuilds.as_view(), name='cmdlines'),
         url(r'^projects/$',
             tables.ProjectsTable.as_view(template_name="projects-toastertable.html"),
             name='all-projects'),
@@ -206,8 +207,7 @@ urlpatterns = [
         url(r'^js-unit-tests/$', views.jsunittests, name='js-unit-tests'),
 
         # image customisation functionality
-        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)'
-            '/packages/(?P<package_id>\d+|)$',
+        url(r'^xhr_customrecipe/(?P<recipe_id>\d+)/packages/(?P<package_id>\d+|)$',
             api.XhrCustomRecipePackages.as_view(),
             name='xhr_customrecipe_packages'),
 

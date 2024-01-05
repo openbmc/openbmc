@@ -1,4 +1,4 @@
-From b44d1d4e4ba77f1d9cf7de73a3bd210d02b5ff36 Mon Sep 17 00:00:00 2001
+From b294005f3748c6caee002fd7588964f7bf9b1d09 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 24 Mar 2021 17:26:53 -0400
 Subject: [PATCH] Use uintmax_t for handling rlim_t
@@ -7,22 +7,22 @@ rlimit types are not representable with long or long long
 formats, therefore use uintmax_t to typecast rlim_t types
 and use %j to print it
 
+Upstream-Status: Pending
+
 Refit patch for open-vm-tools-11.2.5.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
 ---
-Upstream-Status: Pending
-
  open-vm-tools/lib/hgfsServer/hgfsServerLinux.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
-index 87d419a7b..f5cc80b76 100644
+index 6ed49e2b7..0cc7c4094 100644
 --- a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
 +++ b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
-@@ -5301,8 +5301,8 @@ HgfsWriteCheckIORange(off_t offset,         // IN:
+@@ -5294,8 +5294,8 @@ HgfsWriteCheckIORange(off_t offset,         // IN:
        goto exit;
     }
  

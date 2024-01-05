@@ -1,0 +1,23 @@
+From cfc2c1d53924face11e3fab78ded61c359778eb9 Mon Sep 17 00:00:00 2001
+From: "Frank Ch. Eigler" <fche@redhat.com>
+Date: Sat, 4 Nov 2023 12:19:59 -0400
+Subject: [PATCH] prerelease datestamp fixes
+
+Upstream-Status: Backport
+---
+ NEWS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/NEWS b/NEWS
+index c7f31e8b7..f0f9056c4 100644
+--- a/NEWS
++++ b/NEWS
+@@ -1,4 +1,4 @@
+-* What's new in version 5.0, 2023-11-03
++* What's new in version 5.0, 2023-11-04
+ 
+ - Performance improvements in uprobe registration and module startup.
+ 
+-- 
+2.31.1
+

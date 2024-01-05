@@ -5,7 +5,7 @@ distro: poky
 
 defaults:
   repos:
-    branch: nanbield
+    branch: master
 
 repos:
   meta-arm:

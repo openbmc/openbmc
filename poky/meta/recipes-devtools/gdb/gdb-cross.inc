@@ -1,6 +1,6 @@
 require gdb-common.inc
 
-DEPENDS = "expat-native gmp-native ncurses-native flex-native bison-native"
+DEPENDS = "expat-native gmp-native mpfr-native ncurses-native flex-native bison-native"
 
 inherit python3native pkgconfig
 

@@ -15,6 +15,5 @@ inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
     python3-cgitb \
-    python3-smtpd \
     python3-xml \
 "

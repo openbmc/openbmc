@@ -11,7 +11,7 @@ inherit pypi setuptools3
 PYPI_PACKAGE="unoconv"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-distutils \
+    ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-shell \
 "

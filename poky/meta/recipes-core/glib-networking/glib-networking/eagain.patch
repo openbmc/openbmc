@@ -1,4 +1,8 @@
-In autobuilder testing we regularly see glib-networking ptest fail with:
+From 025bb39dfdb81dd2852deaefea228b197ef3cd8d Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Sat, 6 May 2023 12:18:50 +0100
+Subject: [PATCH] In autobuilder testing we regularly see glib-networking ptest
+ fail with:
 
 GLib-Net:ERROR:/usr/src/debug/glib-networking/2.74.0-r0/tls/tests/connection.c:1944:simul_read_thread: assertion failed (error == NULL): Resource temporarily unavailable (g-io-error-quark, 27)
 Bail out! GLib-Net:ERROR:/usr/src/debug/glib-networking/2.74.0-r0/tls/tests/connection.c:1944:simul_read_thread: assertion failed (error == NULL): Resource temporarily unavailable (g-io-error-quark, 27)
@@ -12,11 +16,15 @@ Upstream-Status: Pending [testing to see if patch resolves the issue]
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Index: glib-networking-2.74.0/tls/tests/connection.c
-===================================================================
---- glib-networking-2.74.0.orig/tls/tests/connection.c
-+++ glib-networking-2.74.0/tls/tests/connection.c
-@@ -1941,6 +1941,10 @@ simul_read_thread (gpointer user_data)
+---
+ tls/tests/connection.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tls/tests/connection.c b/tls/tests/connection.c
+index 62a7fbb..3447c80 100644
+--- a/tls/tests/connection.c
++++ b/tls/tests/connection.c
+@@ -2210,6 +2210,10 @@ simul_read_thread (gpointer user_data)
                                     test->buf + test->nread,
                                     MIN (TEST_DATA_LENGTH / 2, TEST_DATA_LENGTH - test->nread),
                                     NULL, &error);

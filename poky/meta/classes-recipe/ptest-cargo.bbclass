@@ -15,7 +15,7 @@ python do_compile_ptest_cargo() {
     cargo = bb.utils.which(d.getVar("PATH"), d.getVar("CARGO", True))
     cargo_build_flags = d.getVar("CARGO_BUILD_FLAGS", True)
     rust_flags = d.getVar("RUSTFLAGS", True)
-    manifest_path = d.getVar("MANIFEST_PATH", True)
+    manifest_path = d.getVar("CARGO_MANIFEST_PATH", True)
     project_manifest_path = os.path.normpath(manifest_path)
     manifest_dir = os.path.dirname(manifest_path)
 

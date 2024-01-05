@@ -8,6 +8,9 @@ LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=ffeffa59c90c9c4a033c7574f8f3fb75"
 
 SRC_URI[sha256sum] = "09c347a92aa7ff4a8e7f3206795f30d826654baf38b873d0744cd571ca609efc"
 
+UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/Flask"
+UPSTREAM_CHECK_REGEX = "/Flask/(?P<pver>(\d+[\.\-_]*)+)"
+
 inherit pypi python_setuptools_build_meta
 
 CLEANBROKEN = "1"

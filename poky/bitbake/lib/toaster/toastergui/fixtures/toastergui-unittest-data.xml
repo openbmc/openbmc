@@ -46,12 +46,12 @@
   <object pk="1" model="orm.ProjectVariable">
     <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
     <field type="CharField" name="name">MACHINE</field>
-    <field type="TextField" name="value">qemux86</field>
+    <field type="TextField" name="value">qemux86-64</field>
   </object>
   <object pk="2" model="orm.ProjectVariable">
     <field to="orm.project" name="project" rel="ManyToOneRel">2</field>
     <field type="CharField" name="name">MACHINE</field>
-    <field type="TextField" name="value">qemux86</field>
+    <field type="TextField" name="value">qemux86-64</field>
   </object>
   <object pk="1" model="orm.build">
     <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
@@ -79,7 +79,7 @@
   </object>
   <object pk="3" model="orm.build">
     <field to="orm.project" name="project" rel="ManyToOneRel">1</field>
-    <field type="CharField" name="machine">qemux86</field>
+    <field type="CharField" name="machine">qemux86-64</field>
     <field type="CharField" name="distro"></field>
     <field type="CharField" name="distro_version"></field>
     <field type="DateTimeField" name="started_on">2016-02-12T18:46:20.114530+00:00</field>
@@ -91,7 +91,7 @@
   </object>
   <object pk="4" model="orm.build">
     <field to="orm.project" name="project" rel="ManyToOneRel">2</field>
-    <field type="CharField" name="machine">qemux86</field>
+    <field type="CharField" name="machine">qemux86-64</field>
     <field type="CharField" name="distro"></field>
     <field type="CharField" name="distro_version"></field>
     <field type="DateTimeField" name="started_on">2016-02-11T18:46:20.114530+00:00</field>

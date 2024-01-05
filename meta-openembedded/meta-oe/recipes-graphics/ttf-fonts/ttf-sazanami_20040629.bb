@@ -6,7 +6,7 @@ SUMMARY:ttf-sazanami-mincho = "Sazanami Mincho Japanese TrueType font"
 HOMEPAGE = "http://sourceforge.jp/projects/efont/"
 LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://README;md5=97d739900be6e852830f55aa3c07d4a0"
-SRC_DISTRIBUTE_LICENSES += "${PN}"
+
 RPROVIDES:${PN} = "virtual-japanese-font"
 PR = "r9"
 

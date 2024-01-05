@@ -40,6 +40,7 @@ SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git;branch=master;protocol=ht
             file://minifi.service \
             file://systemd-volatile.conf \
             file://sysvinit-volatile.conf \
+            file://0001-config.guess-Support-build-on-aarch64.patch \
             "
 
 SRC_URI[curl.md5sum] = "d0bcc586873cfef08b4b9594e5395a33"

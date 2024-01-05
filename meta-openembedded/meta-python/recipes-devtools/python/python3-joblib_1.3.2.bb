@@ -8,7 +8,6 @@ SRC_URI[sha256sum] = "92f865e621e17784e7955080b6d042489e3b8e294949cc44c6eac304f5
 
 RDEPENDS:${PN} += " \
     python3-asyncio \
-    python3-distutils \
     python3-json \
     python3-multiprocessing \
     python3-pprint \

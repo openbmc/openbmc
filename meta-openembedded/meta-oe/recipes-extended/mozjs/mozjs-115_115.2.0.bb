@@ -15,6 +15,7 @@ SRC_URI = "https://archive.mozilla.org/pub/firefox/releases/${PV}esr/source/fire
            file://0001-rewrite-cargo-host-linker-in-python3.patch  \
            file://musl-disable-stackwalk.patch \
            file://0001-add-arm-to-list-of-mozinline.patch \
+           file://py3.12.patch \
            "
 SRC_URI[sha256sum] = "51534dd2a158d955a2cb67cc1308f100f6c9def0788713ed8b4d743f3ad72457"
 
@@ -28,7 +29,22 @@ DEPENDS:remove:powerpc:toolchain-clang = "icu"
 
 B = "${WORKDIR}/build"
 
-export PYTHONPATH = "${S}/build:${S}/third_party/python/PyYAML/lib3:${S}/testing/mozbase/mozfile:${S}/python/mozboot:${S}/third_party/python/distro:${S}/testing/mozbase/mozinfo:${S}/config:${S}/testing/mozbase/manifestparser:${S}/third_party/python/pytoml:${S}/testing/mozbase/mozprocess:${S}/third_party/python/six:${S}/python/mozbuild:${S}/python/mozbuild/mozbuild:${S}/python/mach:${S}/third_party/python/jsmin:${S}/python/mozversioncontrol"
+export PYTHONPATH = "${S}/build:\
+${S}/third_party/python/PyYAML/lib3:\
+${S}/testing/mozbase/mozfile:\
+${S}/python/mozboot:\
+${S}/third_party/python/distro:\
+${S}/testing/mozbase/mozinfo:\
+${S}/config:\
+${S}/testing/mozbase/manifestparser:\
+${S}/third_party/python/pytoml:\
+${S}/testing/mozbase/mozprocess:\
+${S}/third_party/python/six:\
+${S}/python/mozbuild:\
+${S}/python/mozbuild/mozbuild:\
+${S}/python/mach:\
+${S}/third_party/python/jsmin:\
+${S}/python/mozversioncontrol"
 
 export HOST_CC = "${BUILD_CC}"
 export HOST_CXX = "${BUILD_CXX}"

@@ -10,6 +10,8 @@ SRC_URI[sha256sum] = "3ad0f40a696763bb0f4d4dec5b51f6b53ccfeb7c16ebb5897349303045
 SRC_URI += "file://0001-cli-drop-the-second-argument-from-click.argument-dec.patch"
 
 PYPI_PACKAGE = "wpa_supplicant"
+UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/wpa_supplicant"
+UPSTREAM_CHECK_REGEX = "/wpa_supplicant/(?P<pver>(\d+[\.\-_]*)+)"
 
 inherit pypi setuptools3
 

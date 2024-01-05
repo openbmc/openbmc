@@ -1,0 +1,101 @@
+From 28eac38566327091221aabbc164ea8e433c66e7e Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Sun, 24 Dec 2023 09:27:50 -0800
+Subject: [PATCH 2/2] Fix import of tests.utils to enable pytest
+
+Running the test cases with pytest leads to importlib errors
+because the "utils" module cannot be found.
+
+Upstream-Status: Submitted [https://github.com/sumerc/yappi/pull/164]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ tests/test_asyncio.py              | 2 +-
+ tests/test_asyncio_context_vars.py | 2 +-
+ tests/test_functionality.py        | 2 +-
+ tests/test_gevent.py               | 2 +-
+ tests/test_hooks.py                | 2 +-
+ tests/test_tags.py                 | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/tests/test_asyncio.py b/tests/test_asyncio.py
+index 8e9e631..bb36f4a 100644
+--- a/tests/test_asyncio.py
++++ b/tests/test_asyncio.py
+@@ -2,7 +2,7 @@ import unittest
+ import yappi
+ import asyncio
+ import threading
+-from utils import YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io
++from tests.utils import YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io
+ 
+ 
+ async def async_sleep(sec):
+diff --git a/tests/test_asyncio_context_vars.py b/tests/test_asyncio_context_vars.py
+index 5bd750c..9a253c0 100644
+--- a/tests/test_asyncio_context_vars.py
++++ b/tests/test_asyncio_context_vars.py
+@@ -5,7 +5,7 @@ import contextvars
+ import functools
+ import time
+ import os
+-import utils
++import tests.utils as utils
+ import yappi
+ 
+ async_context_id = contextvars.ContextVar('async_context_id')
+diff --git a/tests/test_functionality.py b/tests/test_functionality.py
+index 38bbe67..8098f17 100644
+--- a/tests/test_functionality.py
++++ b/tests/test_functionality.py
+@@ -5,7 +5,7 @@ import threading
+ import unittest
+ import yappi
+ import _yappi
+-import utils
++import tests.utils as utils
+ import multiprocessing
+ import subprocess
+ 
+diff --git a/tests/test_gevent.py b/tests/test_gevent.py
+index ed9e6ae..502af5f 100644
+--- a/tests/test_gevent.py
++++ b/tests/test_gevent.py
+@@ -2,7 +2,7 @@ import unittest
+ import _yappi
+ import yappi
+ import threading
+-from utils import (
++from tests.utils import (
+     YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io, burn_io_gevent
+ )
+ 
+diff --git a/tests/test_hooks.py b/tests/test_hooks.py
+index 297c643..8c387fc 100644
+--- a/tests/test_hooks.py
++++ b/tests/test_hooks.py
+@@ -5,7 +5,7 @@ import unittest
+ import time
+ 
+ import yappi
+-import utils
++import tests.utils as utils
+ 
+ 
+ def a():
+diff --git a/tests/test_tags.py b/tests/test_tags.py
+index b0b531d..b5a4016 100644
+--- a/tests/test_tags.py
++++ b/tests/test_tags.py
+@@ -2,7 +2,7 @@ import unittest
+ import yappi
+ import threading
+ import time
+-from utils import YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io
++from tests.utils import YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io
+ 
+ 
+ class MultiThreadTests(YappiUnitTestCase):
+-- 
+2.34.1
+

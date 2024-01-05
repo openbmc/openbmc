@@ -116,6 +116,21 @@ def recipename(pkg, d):
 
     return pkgmap(d).get(pkg)
 
+def foreach_runtime_provider_pkgdata(d, rdep, include_rdep=False):
+    pkgdata_dir = d.getVar("PKGDATA_DIR")
+    possibles = set()
+    try:
+        possibles |= set(os.listdir("%s/runtime-rprovides/%s/" % (pkgdata_dir, rdep)))
+    except OSError:
+        pass
+
+    if include_rdep:
+        possibles.add(rdep)
+
+    for p in sorted(list(possibles)):
+        rdep_data = read_subpkgdata(p, d)
+        yield p, rdep_data
+
 def get_package_mapping(pkg, basepkg, d, depversions=None):
     import oe.packagedata
 
@@ -317,7 +332,7 @@ fi
             for p in bb.utils.explode_deps(rprov):
                 subdata_sym = pkgdatadir + "/runtime-rprovides/%s/%s" % (p, pkg)
                 bb.utils.mkdirhier(os.path.dirname(subdata_sym))
-                oe.path.symlink("../../runtime/%s" % pkg, subdata_sym, True)
+                oe.path.relsymlink(subdata_file, subdata_sym, True)
 
         allow_empty = d.getVar('ALLOW_EMPTY:%s' % pkg)
         if not allow_empty:
@@ -328,7 +343,7 @@ fi
         if g or allow_empty == "1":
             # Symlinks needed for reverse lookups (from the final package name)
             subdata_sym = pkgdatadir + "/runtime-reverse/%s" % pkgval
-            oe.path.symlink("../runtime/%s" % pkg, subdata_sym, True)
+            oe.path.relsymlink(subdata_file, subdata_sym, True)
 
             packagedfile = pkgdatadir + '/runtime/%s.packaged' % pkg
             open(packagedfile, 'w').close()

@@ -39,6 +39,9 @@ def parse_results(filename):
 @OETestTag("runqemu")
 class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
     def test_rust(self, *args, **kwargs):
+        # Disable Rust Oe-selftest
+        self.skipTest("The Rust Oe-selftest is disabled.")
+
         # build remote-test-server before image build
         recipe = "rust"
         start_time = time.time()

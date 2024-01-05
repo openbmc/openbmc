@@ -192,8 +192,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
         __run('git submodule foreach \'git tag -f devtool-base-new\'')
         (stdout, _) = __run('git submodule --quiet foreach \'echo $sm_path\'')
         paths += [os.path.join(srctree, p) for p in stdout.splitlines()]
-        md5 = None
-        sha256 = None
+        checksums = {}
         _, _, _, _, _, params = bb.fetch2.decodeurl(uri)
         srcsubdir_rel = params.get('destsuffix', 'git')
         if not srcbranch:
@@ -225,9 +224,6 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
 
         if ftmpdir and keep_temp:
             logger.info('Fetch temp directory is %s' % ftmpdir)
-
-        md5 = checksums['md5sum']
-        sha256 = checksums['sha256sum']
 
         tmpsrctree = _get_srctree(tmpdir)
         srctree = os.path.abspath(srctree)
@@ -297,7 +293,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
             if tmpdir != tmpsrctree:
                 shutil.rmtree(tmpdir)
 
-    return (revs, md5, sha256, srcbranch, srcsubdir_rel)
+    return (revs, checksums, srcbranch, srcsubdir_rel)
 
 def _add_license_diff_to_recipe(path, diff):
     notice_text = """# FIXME: the LIC_FILES_CHKSUM values have been updated by 'devtool upgrade'.
@@ -318,7 +314,7 @@ def _add_license_diff_to_recipe(path, diff):
         f.write("\n#\n\n".encode())
         f.write(orig_content)
 
-def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, srcsubdir_old, srcsubdir_new, workspace, tinfoil, rd, license_diff, new_licenses, srctree, keep_failure):
+def _create_new_recipe(newpv, checksums, srcrev, srcbranch, srcsubdir_old, srcsubdir_new, workspace, tinfoil, rd, license_diff, new_licenses, srctree, keep_failure):
     """Creates the new recipe under workspace"""
 
     bpn = rd.getVar('BPN')
@@ -390,30 +386,39 @@ def _create_new_recipe(newpv, md5, sha256, srcrev, srcbranch, srcsubdir_old, src
                 addnames.append(params['name'])
     # Find what's been set in the original recipe
     oldnames = []
+    oldsums = []
     noname = False
     for varflag in rd.getVarFlags('SRC_URI'):
-        if varflag.endswith(('.md5sum', '.sha256sum')):
-            name = varflag.rsplit('.', 1)[0]
-            if name not in oldnames:
-                oldnames.append(name)
-        elif varflag in ['md5sum', 'sha256sum']:
-            noname = True
+        for checksum in checksums:
+            if varflag.endswith('.' + checksum):
+                name = varflag.rsplit('.', 1)[0]
+                if name not in oldnames:
+                    oldnames.append(name)
+                oldsums.append(checksum)
+            elif varflag == checksum:
+                noname = True
+                oldsums.append(checksum)
     # Even if SRC_URI has named entries it doesn't have to actually use the name
     if noname and addnames and addnames[0] not in oldnames:
         addnames = []
     # Drop any old names (the name actually might include ${PV})
     for name in oldnames:
         if name not in newnames:
-            newvalues['SRC_URI[%s.md5sum]' % name] = None
-            newvalues['SRC_URI[%s.sha256sum]' % name] = None
+            for checksum in oldsums:
+                newvalues['SRC_URI[%s.%s]' % (name, checksum)] = None
 
-    if sha256:
-        if addnames:
-            nameprefix = '%s.' % addnames[0]
-        else:
-            nameprefix = ''
+    nameprefix = '%s.' % addnames[0] if addnames else ''
+
+    # md5sum is deprecated, remove any traces of it. If it was the only old
+    # checksum, then replace it with the default checksums.
+    if 'md5sum' in oldsums:
         newvalues['SRC_URI[%smd5sum]' % nameprefix] = None
-        newvalues['SRC_URI[%ssha256sum]' % nameprefix] = sha256
+        oldsums.remove('md5sum')
+        if not oldsums:
+            oldsums = ["%ssum" % s for s in bb.fetch2.SHOWN_CHECKSUM_LIST]
+
+    for checksum in oldsums:
+        newvalues['SRC_URI[%s%s]' % (nameprefix, checksum)] = checksums[checksum]
 
     if srcsubdir_new != srcsubdir_old:
         s_subdir_old = os.path.relpath(os.path.abspath(rd.getVar('S')), rd.getVar('WORKDIR'))
@@ -571,12 +576,12 @@ def upgrade(args, config, basepath, workspace):
             rev1, srcsubdir1 = standard._extract_source(srctree, False, 'devtool-orig', False, config, basepath, workspace, args.fixed_setup, rd, tinfoil, no_overrides=args.no_overrides)
             old_licenses = _extract_licenses(srctree_s, (rd.getVar('LIC_FILES_CHKSUM') or ""))
             logger.info('Extracting upgraded version source...')
-            rev2, md5, sha256, srcbranch, srcsubdir2 = _extract_new_source(args.version, srctree, args.no_patch,
+            rev2, checksums, srcbranch, srcsubdir2 = _extract_new_source(args.version, srctree, args.no_patch,
                                                     args.srcrev, args.srcbranch, args.branch, args.keep_temp,
                                                     tinfoil, rd)
             new_licenses = _extract_licenses(srctree_s, (rd.getVar('LIC_FILES_CHKSUM') or ""))
             license_diff = _generate_license_diff(old_licenses, new_licenses)
-            rf, copied = _create_new_recipe(args.version, md5, sha256, args.srcrev, srcbranch, srcsubdir1, srcsubdir2, config.workspace_path, tinfoil, rd, license_diff, new_licenses, srctree, args.keep_failure)
+            rf, copied = _create_new_recipe(args.version, checksums, args.srcrev, srcbranch, srcsubdir1, srcsubdir2, config.workspace_path, tinfoil, rd, license_diff, new_licenses, srctree, args.keep_failure)
         except (bb.process.CmdError, DevtoolError) as e:
             recipedir = os.path.join(config.workspace_path, 'recipes', rd.getVar('BPN'))
             _upgrade_error(e, recipedir, srctree, args.keep_failure)
@@ -626,7 +631,7 @@ def check_upgrade_status(args, config, basepath, workspace):
     for result in results:
         # pn, update_status, current, latest, maintainer, latest_commit, no_update_reason
         if args.all or result[1] != 'MATCH':
-            logger.info("{:25} {:15} {:15} {} {} {}".format(   result[0],
+            print("{:25} {:15} {:15} {} {} {}".format(   result[0],
                                                                result[2],
                                                                result[1] if result[1] != 'UPDATE' else (result[3] if not result[3].endswith("new-commits-available") else "new commits"),
                                                                result[4],

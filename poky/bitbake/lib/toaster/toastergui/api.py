@@ -11,7 +11,7 @@ import os
 import re
 import logging
 import json
-import subprocess
+import glob
 from collections import Counter
 
 from orm.models import Project, ProjectTarget, Build, Layer_Version
@@ -227,20 +227,18 @@ class XhrSetDefaultImageUrl(View):
 #    same logical name
 #  * Each project that uses a layer will have its own
 #    LayerVersion and Project Layer for it
-#  * During the Paroject delete process, when the last
+#  * During the Project delete process, when the last
 #    LayerVersion for a 'local_source_dir' layer is deleted
 #    then the Layer record is deleted to remove orphans
 #
 
 def scan_layer_content(layer,layer_version):
     # if this is a local layer directory, we can immediately scan its content
-    if layer.local_source_dir:
+    if os.path.isdir(layer.local_source_dir):
         try:
             # recipes-*/*/*.bb
-            cmd = '%s %s' % ('ls', os.path.join(layer.local_source_dir,'recipes-*/*/*.bb'))
-            recipes_list = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout.read()
-            recipes_list = recipes_list.decode("utf-8").strip()
-            if recipes_list and 'No such' not in recipes_list:
+            recipes_list = glob.glob(os.path.join(layer.local_source_dir, 'recipes-*/*/*.bb'))
+            for recipe in recipes_list:
                 for recipe in recipes_list.split('\n'):
                     recipe_path = recipe[recipe.rfind('recipes-'):]
                     recipe_name = recipe[recipe.rfind('/')+1:].replace('.bb','')
@@ -260,6 +258,9 @@ def scan_layer_content(layer,layer_version):
 
         except Exception as e:
             logger.warning("ERROR:scan_layer_content: %s" % e)
+    else:
+        logger.warning("ERROR: wrong path given")
+        raise KeyError("local_source_dir")
 
 class XhrLayer(View):
     """ Delete, Get, Add and Update Layer information
@@ -456,15 +457,18 @@ class XhrLayer(View):
                              'layerdetailurl':
                              layer_dep.get_detailspage_url(project.pk)})
 
-            # Scan the layer's content and update components
-            scan_layer_content(layer,layer_version)
+            # Only scan_layer_content if layer is local
+            if layer_data.get('local_source_dir', None):
+                # Scan the layer's content and update components
+                scan_layer_content(layer,layer_version)
 
         except Layer_Version.DoesNotExist:
             return error_response("layer-dep-not-found")
         except Project.DoesNotExist:
             return error_response("project-not-found")
-        except KeyError:
-            return error_response("incorrect-parameters")
+        except KeyError as e:
+            _log("KeyError: %s" % e)
+            return error_response(f"incorrect-parameters")
 
         return JsonResponse({'error': "ok",
                              'imported_layer': {

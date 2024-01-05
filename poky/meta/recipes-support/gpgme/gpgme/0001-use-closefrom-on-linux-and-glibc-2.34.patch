@@ -1,4 +1,4 @@
-From adb1d4e5498a19e9d591ac8f42f9ddfdb23a1354 Mon Sep 17 00:00:00 2001
+From e1fc4b06dcb62e1c2d85ae99f39ef1a8860570e1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 15 Jul 2021 12:33:13 -0700
 Subject: [PATCH] use closefrom() on linux and glibc 2.34+
@@ -8,15 +8,16 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Rebase to 1.17.0
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+
 ---
  src/posix-io.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/posix-io.c b/src/posix-io.c
-index 5c6cf1d..52e513a 100644
+index a422d8f..0d0a98b 100644
 --- a/src/posix-io.c
 +++ b/src/posix-io.c
-@@ -570,7 +570,7 @@ _gpgme_io_spawn (const char *path, char *const argv[], unsigned int flags,
+@@ -577,7 +577,7 @@ _gpgme_io_spawn (const char *path, char *const argv[], unsigned int flags,
                if (fd_list[i].fd > fd)
                  fd = fd_list[i].fd;
              fd++;
@@ -25,6 +26,3 @@ index 5c6cf1d..52e513a 100644
              closefrom (fd);
              max_fds = fd;
  #else /*!__sun */
--- 
-2.25.1
-

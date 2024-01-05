@@ -1239,7 +1239,7 @@ def process_split_and_strip_files(d):
         oe.utils.multiprocess_launch(oe.package.runstrip, sfiles, d)
 
     # Build "minidebuginfo" and reinject it back into the stripped binaries
-    if d.getVar('PACKAGE_MINIDEBUGINFO') == '1':
+    if bb.utils.contains('DISTRO_FEATURES', 'minidebuginfo', True, False, d):
         oe.utils.multiprocess_launch(inject_minidebuginfo, list(elffiles), d,
                                      extraargs=(dvar, dv, d))
 

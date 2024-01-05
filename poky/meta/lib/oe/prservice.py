@@ -78,8 +78,7 @@ def prserv_export_tofile(d, metainfo, datainfo, lockdown, nomax=False):
     bb.utils.mkdirhier(d.getVar('PRSERV_DUMPDIR'))
     df = d.getVar('PRSERV_DUMPFILE')
     #write data
-    lf = bb.utils.lockfile("%s.lock" % df)
-    with open(df, "a") as f:
+    with open(df, "a") as f, bb.utils.fileslocked(["%s.lock" % df]) as locks:
         if metainfo:
             #dump column info
             f.write("#PR_core_ver = \"%s\"\n\n" % metainfo['core_ver']);
@@ -113,7 +112,6 @@ def prserv_export_tofile(d, metainfo, datainfo, lockdown, nomax=False):
             if not nomax:
                 for i in idx:
                     f.write("PRAUTO_%s_%s = \"%s\"\n" % (str(datainfo[idx[i]]['version']),str(datainfo[idx[i]]['pkgarch']),str(datainfo[idx[i]]['value'])))
-    bb.utils.unlockfile(lf)
 
 def prserv_check_avail(d):
     host_params = list([_f for _f in (d.getVar("PRSERV_HOST") or '').split(':') if _f])

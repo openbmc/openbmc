@@ -9,6 +9,8 @@ variables:
   # by default
   FF_KUBERNETES_HONOR_ENTRYPOINT: 1
   FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY: 0
+  ACS_TEST: 0
+  ACS_TAG: ""
 
 stages:
   - prep
@@ -67,8 +69,8 @@ stages:
     name: "logs"
     when: always
     paths:
-      - $CI_PROJECT_DIR/work/build/tmp/work*/**/temp/log.do_*.*
-      - $CI_PROJECT_DIR/work/build/tmp/work*/**/testimage/*
+      - $CI_PROJECT_DIR/work/build/tmp*/work*/**/temp/log.do_*.*
+      - $CI_PROJECT_DIR/work/build/tmp*/work*/**/testimage/*
 
 #
 # Prep stage, update repositories once.
@@ -126,6 +128,20 @@ fvp-base:
     matrix:
       - TESTING: testimage
       - FIRMWARE: edk2
+      - SYSTEMREADY_FIRMWARE: arm-systemready-firmware
+
+arm-systemready-ir-acs:
+  extends: .build
+  timeout: 12h
+  parallel:
+    matrix:
+      # arm-systemready-ir-acs must be specified after fvp-base for ordering
+      # purposes for the jobs-to-kas output. It is not enough to just have it
+      # in the job name because fvp-base.yml overwrites the target.
+      - PLATFORM: fvp-base
+        ARM_SYSTEMREADY_IR_ACS: arm-systemready-ir-acs
+  tags:
+    - ${ACS_TAG}
 
 fvps:
   extends: .build

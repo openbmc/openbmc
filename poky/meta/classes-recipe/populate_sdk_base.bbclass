@@ -285,7 +285,7 @@ python check_sdk_sysroots() {
     dir_walk(SCAN_ROOT)
 }
 
-SDKTAROPTS = "--owner=root --group=root"
+SDKTAROPTS = "--owner=root --group=root --clamp-mtime --mtime=@${SOURCE_DATE_EPOCH}"
 
 fakeroot archive_sdk() {
 	# Package it up

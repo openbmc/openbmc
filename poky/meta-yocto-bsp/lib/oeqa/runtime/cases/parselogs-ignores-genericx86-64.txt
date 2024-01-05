@@ -1,0 +1,7 @@
+# These should be reviewed to see if they are still needed
+Direct firmware load for i915
+Failed to load firmware i915
+Failed to fetch GuC
+Failed to initialize GuC
+Failed to load DMC firmware
+The driver is built-in, so to load the firmware you need to

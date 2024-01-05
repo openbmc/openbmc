@@ -1483,6 +1483,42 @@ class Wic2(WicTestCase):
         result = runCmd("%s/usr/sbin/sfdisk --part-label %s 3" % (sysroot, image_path))
         self.assertEqual('ext-space', result.output)
 
+    def test_empty_zeroize_plugin(self):
+        img = 'core-image-minimal'
+        expected_size = [ 1024*1024,    # 1M
+                          512*1024,     # 512K
+                          2*1024*1024]  # 2M
+        # Check combination of sourceparams
+        with NamedTemporaryFile("w", suffix=".wks") as wks:
+            wks.writelines(
+                ['part empty --source empty --sourceparams="fill" --ondisk sda --fixed-size 1M\n',
+                 'part empty --source empty --sourceparams="size=512K" --ondisk sda --size 1M --align 1024\n',
+                 'part empty --source empty --sourceparams="size=2048k,bs=512K" --ondisk sda --size 4M --align 1024\n'
+                 ])
+            wks.flush()
+            cmd = "wic create %s -e %s -o %s" % (wks.name, img, self.resultdir)
+            runCmd(cmd)
+            wksname = os.path.splitext(os.path.basename(wks.name))[0]
+            wicout = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
+            # Skip the complete image and just look at the single partitions
+            for idx, value in enumerate(wicout[1:]):
+                self.logger.info(wicout[idx])
+                # Check if partitions are actually zeroized
+                with open(wicout[idx], mode="rb") as fd:
+                    ba = bytearray(fd.read())
+                    for b in ba:
+                        self.assertEqual(b, 0)
+                self.assertEqual(expected_size[idx], os.path.getsize(wicout[idx]))
+
+        # Check inconsistancy check between "fill" and "--size" parameter
+        with NamedTemporaryFile("w", suffix=".wks") as wks:
+            wks.writelines(['part empty --source empty --sourceparams="fill" --ondisk sda --size 1M\n'])
+            wks.flush()
+            cmd = "wic create %s -e %s -o %s" % (wks.name, img, self.resultdir)
+            result = runCmd(cmd, ignore_status=True)
+            self.assertIn("Source parameter 'fill' only works with the '--fixed-size' option, exiting.", result.output)
+            self.assertNotEqual(0, result.status)
+
 class ModifyTests(WicTestCase):
     def test_wic_ls(self):
         """Test listing image content using 'wic ls'"""

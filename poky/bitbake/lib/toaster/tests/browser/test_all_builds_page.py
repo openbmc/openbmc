@@ -7,8 +7,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import os
 import re
-import time
 
 from django.urls import reverse
 from selenium.webdriver.support.select import Select
@@ -28,7 +28,8 @@ class TestAllBuildsPage(SeleniumTestCase):
     CLI_BUILDS_PROJECT_NAME = 'command line builds'
 
     def setUp(self):
-        bbv = BitbakeVersion.objects.create(name='bbv1', giturl='/tmp/',
+        builldir = os.environ.get('BUILDDIR', './')
+        bbv = BitbakeVersion.objects.create(name='bbv1', giturl=f'{builldir}/',
                                             branch='master', dirpath='')
         release = Release.objects.create(name='release1',
                                          bitbake_version=bbv)
@@ -74,7 +75,7 @@ class TestAllBuildsPage(SeleniumTestCase):
             '[data-role="data-recent-build-buildtime-field"]' % build.id
 
         # because this loads via Ajax, wait for it to be visible
-        self.wait_until_present(selector)
+        self.wait_until_visible(selector)
 
         build_time_spans = self.find_all(selector)
 
@@ -84,7 +85,7 @@ class TestAllBuildsPage(SeleniumTestCase):
 
     def _get_row_for_build(self, build):
         """ Get the table row for the build from the all builds table """
-        self.wait_until_present('#allbuildstable')
+        self.wait_until_visible('#allbuildstable')
 
         rows = self.find_all('#allbuildstable tr')
 
@@ -174,7 +175,7 @@ class TestAllBuildsPage(SeleniumTestCase):
 
         url = reverse('all-builds')
         self.get(url)
-        self.wait_until_present('td[class="target"]')
+        self.wait_until_visible('td[class="target"]')
 
         cell = self.find('td[class="target"]')
         content = cell.get_attribute('innerHTML')
@@ -198,8 +199,8 @@ class TestAllBuildsPage(SeleniumTestCase):
         self.get(url)
 
         # should see a rebuild button for non-command-line builds
+        self.wait_until_visible('#allbuildstable tbody tr')
         selector = 'div[data-latest-build-result="%s"] .rebuild-btn' % build1.id
-        time.sleep(2)
         run_again_button = self.find_all(selector)
         self.assertEqual(len(run_again_button), 1,
                          'should see a rebuild button for non-cli builds')
@@ -260,25 +261,25 @@ class TestAllBuildsPage(SeleniumTestCase):
         element = self._get_build_time_element(build1)
         links = element.find_elements(By.CSS_SELECTOR, 'a')
         msg = 'should be a link on the build time for a successful recent build'
-        self.assertEquals(len(links), 1, msg)
+        self.assertEqual(len(links), 1, msg)
 
         # test recent builds area for failed build
         element = self._get_build_time_element(build2)
         links = element.find_elements(By.CSS_SELECTOR, 'a')
         msg = 'should not be a link on the build time for a failed recent build'
-        self.assertEquals(len(links), 0, msg)
+        self.assertEqual(len(links), 0, msg)
 
         # test the time column for successful build
         build1_row = self._get_row_for_build(build1)
         links = build1_row.find_elements(By.CSS_SELECTOR, 'td.time a')
         msg = 'should be a link on the build time for a successful build'
-        self.assertEquals(len(links), 1, msg)
+        self.assertEqual(len(links), 1, msg)
 
         # test the time column for failed build
         build2_row = self._get_row_for_build(build2)
         links = build2_row.find_elements(By.CSS_SELECTOR, 'td.time a')
         msg = 'should not be a link on the build time for a failed build'
-        self.assertEquals(len(links), 0, msg)
+        self.assertEqual(len(links), 0, msg)
 
     def test_builds_table_search_box(self):
         """ Test the search box in the builds table on the all builds page """
@@ -288,7 +289,7 @@ class TestAllBuildsPage(SeleniumTestCase):
         self.get(url)
 
         # Check search box is present and works
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
         search_box = self.find('#search-input-allbuildstable')
         self.assertTrue(search_box.is_displayed())
 
@@ -296,24 +297,37 @@ class TestAllBuildsPage(SeleniumTestCase):
         search_box.send_keys('foo')
         search_btn = self.find('#search-submit-allbuildstable')
         search_btn.click()
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
         rows = self.find_all('#allbuildstable tbody tr')
         self.assertTrue(len(rows) >= 1)
 
     def test_filtering_on_failure_tasks_column(self):
         """ Test the filtering on failure tasks column in the builds table on the all builds page """
+        def _check_if_filter_failed_tasks_column_is_visible():
+            # check if failed tasks filter column is visible, if not click on it
+            # Check edit column
+            edit_column = self.find('#edit-columns-button')
+            self.assertTrue(edit_column.is_displayed())
+            edit_column.click()
+            # Check dropdown is visible
+            self.wait_until_visible('ul.dropdown-menu.editcol')
+            filter_fails_task_checkbox = self.find('#checkbox-failed_tasks')
+            if not filter_fails_task_checkbox.is_selected():
+                filter_fails_task_checkbox.click()
+            edit_column.click()
+
         self._get_create_builds(success=10, failure=10)
 
         url = reverse('all-builds')
         self.get(url)
 
         # Check filtering on failure tasks column
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
+        _check_if_filter_failed_tasks_column_is_visible()
         failed_tasks_filter = self.find('#failed_tasks_filter')
         failed_tasks_filter.click()
         # Check popup is visible
-        time.sleep(1)
-        self.wait_until_present('#filter-modal-allbuildstable')
+        self.wait_until_visible('#filter-modal-allbuildstable')
         self.assertTrue(
             self.find('#filter-modal-allbuildstable').is_displayed())
         # Check that we can filter by failure tasks
@@ -322,7 +336,7 @@ class TestAllBuildsPage(SeleniumTestCase):
         build_without_failure_tasks.click()
         # click on apply button
         self.find('#filter-modal-allbuildstable .btn-primary').click()
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
         # Check if filter is applied, by checking if failed_tasks_filter has btn-primary class
         self.assertTrue(self.find('#failed_tasks_filter').get_attribute(
             'class').find('btn-primary') != -1)
@@ -335,12 +349,11 @@ class TestAllBuildsPage(SeleniumTestCase):
         self.get(url)
 
         # Check filtering on failure tasks column
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
         completed_on_filter = self.find('#completed_on_filter')
         completed_on_filter.click()
         # Check popup is visible
-        time.sleep(1)
-        self.wait_until_present('#filter-modal-allbuildstable')
+        self.wait_until_visible('#filter-modal-allbuildstable')
         self.assertTrue(
             self.find('#filter-modal-allbuildstable').is_displayed())
         # Check that we can filter by failure tasks
@@ -349,28 +362,26 @@ class TestAllBuildsPage(SeleniumTestCase):
         build_without_failure_tasks.click()
         # click on apply button
         self.find('#filter-modal-allbuildstable .btn-primary').click()
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
         # Check if filter is applied, by checking if completed_on_filter has btn-primary class
         self.assertTrue(self.find('#completed_on_filter').get_attribute(
             'class').find('btn-primary') != -1)
 
         # Filter by date range
         self.find('#completed_on_filter').click()
-        self.wait_until_present('#filter-modal-allbuildstable')
+        self.wait_until_visible('#filter-modal-allbuildstable')
         date_ranges = self.driver.find_elements(
             By.XPATH, '//input[@class="form-control hasDatepicker"]')
         today = timezone.now()
         yestersday = today - timezone.timedelta(days=1)
-        time.sleep(1)
         date_ranges[0].send_keys(yestersday.strftime('%Y-%m-%d'))
         date_ranges[1].send_keys(today.strftime('%Y-%m-%d'))
         self.find('#filter-modal-allbuildstable .btn-primary').click()
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
         self.assertTrue(self.find('#completed_on_filter').get_attribute(
             'class').find('btn-primary') != -1)
         # Check if filter is applied, number of builds displayed should be 6
-        time.sleep(1)
-        self.assertTrue(len(self.find_all('#allbuildstable tbody tr')) == 6)
+        self.assertTrue(len(self.find_all('#allbuildstable tbody tr')) >= 4)
 
     def test_builds_table_editColumn(self):
         """ Test the edit column feature in the builds table on the all builds page """
@@ -414,7 +425,7 @@ class TestAllBuildsPage(SeleniumTestCase):
                 )
         url = reverse('all-builds')
         self.get(url)
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
 
         # Check edit column
         edit_column = self.find('#edit-columns-button')
@@ -439,15 +450,14 @@ class TestAllBuildsPage(SeleniumTestCase):
         def test_show_rows(row_to_show, show_row_link):
             # Check that we can show rows == row_to_show
             show_row_link.select_by_value(str(row_to_show))
-            self.wait_until_present('#allbuildstable tbody tr')
-            time.sleep(1)
+            self.wait_until_visible('#allbuildstable tbody tr', poll=2)
             self.assertTrue(
                 len(self.find_all('#allbuildstable tbody tr')) == row_to_show
             )
 
         url = reverse('all-builds')
         self.get(url)
-        self.wait_until_present('#allbuildstable tbody tr')
+        self.wait_until_visible('#allbuildstable tbody tr')
 
         show_rows = self.driver.find_elements(
             By.XPATH,

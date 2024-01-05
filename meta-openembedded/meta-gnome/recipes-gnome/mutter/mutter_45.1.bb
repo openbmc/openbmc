@@ -6,6 +6,7 @@ DEPENDS = " \
     xserver-xorg-cvt-native \
     wayland-native \
     virtual/libx11 \
+    colord \
     graphene \
     gtk4 \
     gdk-pixbuf \
@@ -13,8 +14,6 @@ DEPENDS = " \
     pango \
     gsettings-desktop-schemas \
     json-glib \
-    gnome-desktop \
-    gnome-settings-daemon \
     libei \
     libxtst \
     libxkbfile \
@@ -41,6 +40,7 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opengl x11', 'opengl glx', '', d)} \
     sm \
     startup-notification \
+    gnome-desktop \
 "
 
 EXTRA_OEMESON += " \
@@ -57,7 +57,9 @@ PACKAGECONFIG[libdisplay-info] = "-Dlibdisplay_info=true, -Dlibdisplay_info=fals
 PACKAGECONFIG[libwacom] = "-Dlibwacom=true, -Dlibwacom=false, libwacom"
 # Remove depending on pipewire-0.2 when mutter is upgraded to 3.36+
 PACKAGECONFIG[remote-desktop] = "-Dremote_desktop=true, -Dremote_desktop=false, pipewire"
+PACKAGECONFIG[gnome-desktop] = "-Dlibgnome_desktop=true, -Dlibgnome_desktop=false, gnome-desktop gnome-settings-daemon"
 PACKAGECONFIG[sm] = "-Dsm=true, -Dsm=false, libsm"
+PACKAGECONFIG[sound-player] = "-Dsound_player=true, -Dsound_player=false, libcanberra"
 PACKAGECONFIG[profiler] = "-Dprofiler=true,-Dprofiler=false,sysprof"
 PACKAGECONFIG[startup-notification] = "-Dstartup_notification=true, -Dstartup_notification=false, startup-notification, startup-notification"
 
@@ -102,5 +104,5 @@ FILES:${PN}-dev += " \
     ${libdir}/${MUTTER_API_NAME}/lib*.so \
 "
 
-RDEPENDS:${PN} += "zenity ${PN}-gsettings"
+RDEPENDS:${PN} += "zenity ${PN}-gsettings gsettings-desktop-schemas"
 

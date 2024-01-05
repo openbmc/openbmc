@@ -1868,6 +1868,15 @@ class Distro(models.Model):
     def __unicode__(self):
         return "Distro " + self.name + "(" + self.description + ")"
 
+class EventLogsImports(models.Model):
+    name = models.CharField(max_length=255)
+    imported = models.BooleanField(default=False)
+    build_id = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 django.db.models.signals.post_save.connect(invalidate_cache)
 django.db.models.signals.post_delete.connect(invalidate_cache)
 django.db.models.signals.m2m_changed.connect(invalidate_cache)

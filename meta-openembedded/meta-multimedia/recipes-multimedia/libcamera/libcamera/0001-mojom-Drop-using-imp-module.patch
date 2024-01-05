@@ -1,0 +1,176 @@
+From 23a9bbb9ab380344c5daf5bc0109fab249e41afd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Dec 2023 10:55:44 -0800
+Subject: [PATCH] mojom: Drop using imp module.
+
+This module is gone in python 3.12 onwards, in most places it is unused
+so remove from those places, in some places where its still is needed
+replace it with importlib.util
+
+Fixes [1]
+
+[1] https://bugs.libcamera.org/show_bug.cgi?id=206
+
+Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2023-December/039986.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/ipc/mojo/public/tools/mojom/mojom/fileutil.py        | 1 -
+ .../ipc/mojo/public/tools/mojom/mojom/fileutil_unittest.py | 1 -
+ .../tools/mojom/mojom/generate/generator_unittest.py       | 7 ++-----
+ .../tools/mojom/mojom/generate/translate_unittest.py       | 1 -
+ .../mojo/public/tools/mojom/mojom/parse/ast_unittest.py    | 1 -
+ .../mojom/mojom/parse/conditional_features_unittest.py     | 7 ++-----
+ utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer.py     | 1 -
+ .../mojo/public/tools/mojom/mojom/parse/lexer_unittest.py  | 6 ++----
+ .../mojo/public/tools/mojom/mojom/parse/parser_unittest.py | 1 -
+ 9 files changed, 6 insertions(+), 20 deletions(-)
+
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/fileutil.py b/utils/ipc/mojo/public/tools/mojom/mojom/fileutil.py
+index bf626f54..e1c823da 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/fileutil.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/fileutil.py
+@@ -3,7 +3,6 @@
+ # found in the LICENSE file.
+ 
+ import errno
+-import imp
+ import os.path
+ import sys
+ 
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/fileutil_unittest.py b/utils/ipc/mojo/public/tools/mojom/mojom/fileutil_unittest.py
+index ff5753a2..e754151f 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/fileutil_unittest.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/fileutil_unittest.py
+@@ -2,7 +2,6 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
+ import os.path
+ import shutil
+ import sys
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/generate/generator_unittest.py b/utils/ipc/mojo/public/tools/mojom/mojom/generate/generator_unittest.py
+index 32c884a8..6cae6092 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/generate/generator_unittest.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/generate/generator_unittest.py
+@@ -2,7 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
++import importlib.util
+ import os.path
+ import sys
+ import unittest
+@@ -18,10 +18,7 @@ def _GetDirAbove(dirname):
+     if tail == dirname:
+       return path
+ 
+-
+-try:
+-  imp.find_module("mojom")
+-except ImportError:
++if importlib.util.find_spec("mojom") is None:
+   sys.path.append(os.path.join(_GetDirAbove("pylib"), "pylib"))
+ from mojom.generate import generator
+ 
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/generate/translate_unittest.py b/utils/ipc/mojo/public/tools/mojom/mojom/generate/translate_unittest.py
+index 19905c8a..09724d88 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/generate/translate_unittest.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/generate/translate_unittest.py
+@@ -2,7 +2,6 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
+ import os.path
+ import sys
+ import unittest
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/parse/ast_unittest.py b/utils/ipc/mojo/public/tools/mojom/mojom/parse/ast_unittest.py
+index 62798631..4ab51033 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/parse/ast_unittest.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/parse/ast_unittest.py
+@@ -2,7 +2,6 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
+ import os.path
+ import sys
+ import unittest
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/parse/conditional_features_unittest.py b/utils/ipc/mojo/public/tools/mojom/mojom/parse/conditional_features_unittest.py
+index aa609be7..f3c2c95f 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/parse/conditional_features_unittest.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/parse/conditional_features_unittest.py
+@@ -2,7 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
++import importlib.util
+ import os
+ import sys
+ import unittest
+@@ -18,10 +18,7 @@ def _GetDirAbove(dirname):
+     if tail == dirname:
+       return path
+ 
+-
+-try:
+-  imp.find_module('mojom')
+-except ImportError:
++if importlib.util.find_spec("mojom") is None:
+   sys.path.append(os.path.join(_GetDirAbove('pylib'), 'pylib'))
+ import mojom.parse.ast as ast
+ import mojom.parse.conditional_features as conditional_features
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer.py b/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer.py
+index 3e084bbf..1e8b49f2 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer.py
+@@ -2,7 +2,6 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
+ import os.path
+ import sys
+ 
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer_unittest.py b/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer_unittest.py
+index eadc6587..77976507 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer_unittest.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/parse/lexer_unittest.py
+@@ -2,7 +2,7 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
++import importlib.util
+ import os.path
+ import sys
+ import unittest
+@@ -22,9 +22,7 @@ def _GetDirAbove(dirname):
+ sys.path.insert(1, os.path.join(_GetDirAbove("mojo"), "third_party"))
+ from ply import lex
+ 
+-try:
+-  imp.find_module("mojom")
+-except ImportError:
++if importlib.util.find_spec("mojom") is None:
+   sys.path.append(os.path.join(_GetDirAbove("pylib"), "pylib"))
+ import mojom.parse.lexer
+ 
+diff --git a/utils/ipc/mojo/public/tools/mojom/mojom/parse/parser_unittest.py b/utils/ipc/mojo/public/tools/mojom/mojom/parse/parser_unittest.py
+index 6d6b7153..7e8acf43 100644
+--- a/utils/ipc/mojo/public/tools/mojom/mojom/parse/parser_unittest.py
++++ b/utils/ipc/mojo/public/tools/mojom/mojom/parse/parser_unittest.py
+@@ -2,7 +2,6 @@
+ # Use of this source code is governed by a BSD-style license that can be
+ # found in the LICENSE file.
+ 
+-import imp
+ import os.path
+ import sys
+ import unittest
+-- 
+2.43.0
+

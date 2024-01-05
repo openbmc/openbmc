@@ -1,0 +1,62 @@
+From 4f887cc665c9a48b83e20ef4abe57afa7e365e0e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@eng.windriver.com>
+Date: Tue, 5 Dec 2023 23:02:22 -0800
+Subject: [PATCH v2] fix compile procan.c failed
+
+1. Compile socat failed if out of tree build (build dir != source dir)
+...
+gcc -c -D CC="gcc" -o procan.o procan.c
+cc1: fatal error: procan.c: No such file or directory
+...
+Explicitly add $srcdir to makefile rule
+
+2. Compile socat failed if multiple words in $(CC), such as CC="gcc -m64"
+...
+from ../socat-1.8.0.0/procan.c:10:
+../socat-1.8.0.0/sysincludes.h:18:10: fatal error: inttypes.h: No such file or directory
+   18 | #include <inttypes.h>   /* uint16_t */
+...
+
+In commit [Procan: print umask, CC, and couple more new infos][1],
+it defeines marcro CC in C source, the space in CC will break
+C source compile. Use first word of $(CC) to defeine marco CC
+
+[1] https://repo.or.cz/socat.git/commit/cd5673dbd0786c94e0b3ace7e35fab14c01e3185
+
+Upstream-Status: Submitted [socat@dest-unreach.org]
+Signed-off-by: Hongxu Jia <hongxu.jia@eng.windriver.com>
+---
+ Makefile.in | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index c01b1a4..48dad69 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -109,8 +109,8 @@ depend: $(CFILES) $(HFILES)
+ socat: socat.o libxio.a
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ socat.o libxio.a $(CLIBS)
+ 
+-procan.o: procan.c
+-	$(CC) $(CFLAGS) -c -D CC=\"$(CC)\" -o $@ procan.c
++procan.o: $(srcdir)/procan.c
++	$(CC) $(CFLAGS) -c -D CC=\"$(firstword $(CC))\" -o $@ $(srcdir)/procan.c
+ 
+ PROCAN_OBJS=procan_main.o procan.o procan-cdefs.o hostan.o error.o sycls.o sysutils.o utils.o vsnprintf_r.o snprinterr.o
+ procan: $(PROCAN_OBJS)
+@@ -132,9 +132,9 @@ install: progs $(srcdir)/doc/socat.1
+ 	mkdir -p $(DESTDIR)$(BINDEST)
+ 	$(INSTALL) -m 755 socat $(DESTDIR)$(BINDEST)/socat1
+ 	ln -sf socat1 $(DESTDIR)$(BINDEST)/socat
+-	$(INSTALL) -m 755 socat-chain.sh  $(DESTDIR)$(BINDEST)
+-	$(INSTALL) -m 755 socat-mux.sh    $(DESTDIR)$(BINDEST)
+-	$(INSTALL) -m 755 socat-broker.sh $(DESTDIR)$(BINDEST)
++	$(INSTALL) -m 755 $(srcdir)/socat-chain.sh  $(DESTDIR)$(BINDEST)
++	$(INSTALL) -m 755 $(srcdir)/socat-mux.sh    $(DESTDIR)$(BINDEST)
++	$(INSTALL) -m 755 $(srcdir)/socat-broker.sh $(DESTDIR)$(BINDEST)
+ 	$(INSTALL) -m 755 procan $(DESTDIR)$(BINDEST)
+ 	$(INSTALL) -m 755 filan $(DESTDIR)$(BINDEST)
+ 	mkdir -p $(DESTDIR)$(MANDEST)/man1
+-- 
+2.42.0
+

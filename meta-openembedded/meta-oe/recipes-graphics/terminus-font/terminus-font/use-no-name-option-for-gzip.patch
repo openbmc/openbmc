@@ -1,0 +1,66 @@
+Build compressed archives with -n
+
+The compressed archives contain a header with the field MTIME
+(Modification Time) which is initialized from the built date.
+As a consequence, two separate builds generate compressed archives
+whose checksum differs. Such behavior prevents reproducible builds.
+
+Adding the -n option to gzip while compressing the archive does
+not save the original time stamp by default hence making
+reproducible build.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Jean-Marc BOUCHE <jean-marc.bouche@foss.st.com>
+Index: terminus-font-4.49.1/Makefile
+===================================================================
+--- terminus-font-4.49.1.orig/Makefile
++++ terminus-font-4.49.1/Makefile
+@@ -92,9 +92,9 @@ otbdir  = $(prefix)/share/fonts/terminus
+ 
+ install: $(PSF) $(PCF)
+ 	mkdir -p $(DESTDIR)$(psfdir)
+-	for i in $(PSF) ; do gzip -c $$i > $(DESTDIR)$(psfdir)/$$i.gz ; done
++	for i in $(PSF) ; do gzip -c -n $$i > $(DESTDIR)$(psfdir)/$$i.gz ; done
+ 	mkdir -p $(DESTDIR)$(x11dir)
+-	for i in $(PCF) ; do gzip -c $$i > $(DESTDIR)$(x11dir)/$$i.gz ; done
++	for i in $(PCF) ; do gzip -c -n $$i > $(DESTDIR)$(x11dir)/$$i.gz ; done
+ 
+ uninstall:
+ 	for i in $(PSF) ; do rm -f $(DESTDIR)$(psfdir)/$$i.gz ; done
+@@ -193,7 +193,7 @@ psf: $(PSF)
+ 
+ install-psf: $(PSF)
+ 	mkdir -p $(DESTDIR)$(psfdir)
+-	for i in $(PSF) ; do gzip -c $$i > $(DESTDIR)$(psfdir)/$$i.gz ; done
++	for i in $(PSF) ; do gzip -c -n $$i > $(DESTDIR)$(psfdir)/$$i.gz ; done
+ 
+ uninstall-psf:
+ 	for i in $(PSF) ; do rm -f $(DESTDIR)$(psfdir)/$$i.gz ; done
+@@ -202,7 +202,7 @@ psf-vgaw: $(PSF_VGAW)
+ 
+ install-psf-vgaw: $(PSF_VGAW)
+ 	mkdir -p $(DESTDIR)$(psfdir)
+-	for i in $(PSF_VGAW) ; do gzip -c $$i > $(DESTDIR)$(psfdir)/$$i.gz ; done
++	for i in $(PSF_VGAW) ; do gzip -c -n $$i > $(DESTDIR)$(psfdir)/$$i.gz ; done
+ 
+ uninstall-psf-vgaw:
+ 	for i in $(PSF_VGAW) ; do rm -f $(DESTDIR)$(psfdir)/$$i.gz ; done
+@@ -279,7 +279,7 @@ pcf: $(PCF)
+ 
+ install-pcf: $(PCF)
+ 	mkdir -p $(DESTDIR)$(x11dir)
+-	for i in $(PCF) ; do gzip -c $$i > $(DESTDIR)$(x11dir)/$$i.gz ; done
++	for i in $(PCF) ; do gzip -c -n $$i > $(DESTDIR)$(x11dir)/$$i.gz ; done
+ 
+ uninstall-pcf:
+ 	for i in $(PCF) ; do rm -f $(DESTDIR)$(x11dir)/$$i.gz ; done
+@@ -288,7 +288,7 @@ pcf-8bit: $(PCF_8BIT)
+ 
+ install-pcf-8bit: $(PCF_8BIT)
+ 	mkdir -p $(DESTDIR)$(x11dir)
+-	for i in $(PCF_8BIT) ; do gzip -c $$i > $(DESTDIR)$(x11dir)/$$i.gz ; done
++	for i in $(PCF_8BIT) ; do gzip -c -n $$i > $(DESTDIR)$(x11dir)/$$i.gz ; done
+ 
+ uninstall-pcf-8bit:
+ 	for i in $(PCF_8BIT) ; do rm -f $(DESTDIR)$(x11dir)/$$i.gz ; done

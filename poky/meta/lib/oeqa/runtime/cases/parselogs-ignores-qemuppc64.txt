@@ -1,0 +1,4 @@
+# These should be reviewed to see if they are still needed
+vio vio: uevent: failed to send synthetic uevent
+synth uevent: /devices/vio: failed to send uevent
+PCI 0000:00 Cannot reserve Legacy IO [io  0x10000-0x10fff]

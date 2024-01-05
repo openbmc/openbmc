@@ -1,4 +1,4 @@
-From 752e30eebe5b91c323bafcbea8d450dd5683701a Mon Sep 17 00:00:00 2001
+From 252aa78526287fe033c5656cd166e551fa5daa88 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 30 Jan 2023 10:31:10 -0800
 Subject: [PATCH] Include missing <cstdint> header
@@ -11,6 +11,7 @@ int32_t.
 
 Upstream-Status: Submitted [https://code-review.googlesource.com/c/re2/+/60970]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  third_party/re2/util/pcre.h | 1 +
  1 file changed, 1 insertion(+)
@@ -27,6 +28,3 @@ index 896b0bd..271a005 100644
  
  #ifdef USEPCRE
  #include <pcre.h>
--- 
-2.39.1
-

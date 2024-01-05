@@ -321,7 +321,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pyflakes \
     python3-pyhamcrest \
     python3-pyiface \
-    python3-pyinotify \
     python3-pyjks \
     python3-pyjwt \
     python3-pykickstart \
@@ -392,7 +391,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-serpent \
     python3-service-identity \
     python3-setuptools-declarative-requirements \
-    python3-setuptools-scm-git-archive \
     python3-sh \
     python3-sijax \
     python3-simpleeval \
@@ -439,7 +437,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-typeguard \
     python3-tzlocal \
     python3-u-msgpack-python \
-    python3-uinput \
     python3-ujson \
     python3-unidiff \
     python3-uritemplate \

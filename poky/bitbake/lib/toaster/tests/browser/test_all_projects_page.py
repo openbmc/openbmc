@@ -7,8 +7,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import os
 import re
-import time
 
 from django.urls import reverse
 from django.utils import timezone
@@ -20,6 +20,7 @@ from orm.models import ProjectVariable
 
 from selenium.webdriver.common.by import By
 
+
 class TestAllProjectsPage(SeleniumTestCase):
     """ Browser tests for projects page /projects/ """
 
@@ -29,7 +30,8 @@ class TestAllProjectsPage(SeleniumTestCase):
 
     def setUp(self):
         """ Add default project manually """
-        project = Project.objects.create_project(self.CLI_BUILDS_PROJECT_NAME, None)
+        project = Project.objects.create_project(
+            self.CLI_BUILDS_PROJECT_NAME, None)
         self.default_project = project
         self.default_project.is_default = True
         self.default_project.save()
@@ -60,12 +62,14 @@ class TestAllProjectsPage(SeleniumTestCase):
 
     def _add_non_default_project(self):
         """ Add another project """
-        bbv = BitbakeVersion.objects.create(name='test bbv', giturl='/tmp/',
+        builldir = os.environ.get('BUILDDIR', './')
+        bbv = BitbakeVersion.objects.create(name='test bbv', giturl=f'{builldir}/',
                                             branch='master', dirpath='')
         self.release = Release.objects.create(name='test release',
                                               branch_name='master',
                                               bitbake_version=bbv)
-        self.project = Project.objects.create_project(self.PROJECT_NAME, self.release)
+        self.project = Project.objects.create_project(
+            self.PROJECT_NAME, self.release)
         self.project.is_default = False
         self.project.save()
 
@@ -77,7 +81,7 @@ class TestAllProjectsPage(SeleniumTestCase):
 
     def _get_row_for_project(self, project_name):
         """ Get the HTML row for a project, or None if not found """
-        self.wait_until_present('#projectstable tbody tr')
+        self.wait_until_visible('#projectstable tbody tr', poll=3)
         rows = self.find_all('#projectstable tbody tr')
 
         # find the row with a project name matching the one supplied
@@ -108,7 +112,8 @@ class TestAllProjectsPage(SeleniumTestCase):
         url = reverse('all-projects')
         self.get(url)
 
-        default_project_row = self._get_row_for_project(self.default_project.name)
+        default_project_row = self._get_row_for_project(
+            self.default_project.name)
 
         self.assertNotEqual(default_project_row, None,
                             'default project "cli builds" should be in page')
@@ -128,7 +133,8 @@ class TestAllProjectsPage(SeleniumTestCase):
         self.wait_until_visible("#projectstable tr")
 
         # find the row for the default project
-        default_project_row = self._get_row_for_project(self.default_project.name)
+        default_project_row = self._get_row_for_project(
+            self.default_project.name)
 
         # check the release text for the default project
         selector = 'span[data-project-field="release"] span.text-muted'
@@ -163,7 +169,8 @@ class TestAllProjectsPage(SeleniumTestCase):
         self.wait_until_visible("#projectstable tr")
 
         # find the row for the default project
-        default_project_row = self._get_row_for_project(self.default_project.name)
+        default_project_row = self._get_row_for_project(
+            self.default_project.name)
 
         # check the machine cell for the default project
         selector = 'span[data-project-field="machine"] span.text-muted'
@@ -198,13 +205,15 @@ class TestAllProjectsPage(SeleniumTestCase):
         self.get(reverse('all-projects'))
 
         # find the row for the default project
-        default_project_row = self._get_row_for_project(self.default_project.name)
+        default_project_row = self._get_row_for_project(
+            self.default_project.name)
 
         # check the link on the name field
         selector = 'span[data-project-field="name"] a'
         element = default_project_row.find_element(By.CSS_SELECTOR, selector)
         link_url = element.get_attribute('href').strip()
-        expected_url = reverse('projectbuilds', args=(self.default_project.id,))
+        expected_url = reverse(
+            'projectbuilds', args=(self.default_project.id,))
         msg = 'link on default project name should point to builds but was %s' % link_url
         self.assertTrue(link_url.endswith(expected_url), msg)
 
@@ -227,7 +236,7 @@ class TestAllProjectsPage(SeleniumTestCase):
         self.get(url)
 
         # Chseck search box is present and works
-        self.wait_until_present('#projectstable tbody tr')
+        self.wait_until_visible('#projectstable tbody tr', poll=3)
         search_box = self.find('#search-input-projectstable')
         self.assertTrue(search_box.is_displayed())
 
@@ -235,8 +244,7 @@ class TestAllProjectsPage(SeleniumTestCase):
         search_box.send_keys('test project 10')
         search_btn = self.find('#search-submit-projectstable')
         search_btn.click()
-        self.wait_until_present('#projectstable tbody tr')
-        time.sleep(1)
+        self.wait_until_visible('#projectstable tbody tr', poll=3)
         rows = self.find_all('#projectstable tbody tr')
         self.assertTrue(len(rows) == 1)
 
@@ -282,7 +290,7 @@ class TestAllProjectsPage(SeleniumTestCase):
                 )
         url = reverse('all-projects')
         self.get(url)
-        self.wait_until_present('#projectstable tbody tr')
+        self.wait_until_visible('#projectstable tbody tr', poll=3)
 
         # Check edit column
         edit_column = self.find('#edit-columns-button')
@@ -305,19 +313,14 @@ class TestAllProjectsPage(SeleniumTestCase):
         def test_show_rows(row_to_show, show_row_link):
             # Check that we can show rows == row_to_show
             show_row_link.select_by_value(str(row_to_show))
-            self.wait_until_present('#projectstable tbody tr')
-            sleep_time = 1
-            if row_to_show == 150:
-                # wait more time for 150 rows
-                sleep_time = 2
-            time.sleep(sleep_time)
+            self.wait_until_visible('#projectstable tbody tr', poll=3)
             self.assertTrue(
                 len(self.find_all('#projectstable tbody tr')) == row_to_show
             )
 
         url = reverse('all-projects')
         self.get(url)
-        self.wait_until_present('#projectstable tbody tr')
+        self.wait_until_visible('#projectstable tbody tr', poll=3)
 
         show_rows = self.driver.find_elements(
             By.XPATH,

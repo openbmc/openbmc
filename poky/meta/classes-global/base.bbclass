@@ -674,6 +674,10 @@ python () {
         elif path.endswith('.deb'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
+        # *.7z should DEPEND on p7zip-native for unpacking
+        elif path.endswith('.7z'):
+            d.appendVarFlag('do_unpack', 'depends', ' p7zip-native:do_populate_sysroot')
+
     set_packagetriplet(d)
 
     # 'multimachine' handling

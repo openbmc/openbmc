@@ -1,4 +1,4 @@
-From ba1728bc27c88597164957d000b70ec4be6edf28 Mon Sep 17 00:00:00 2001
+From bafde4eedc0a22b45e73ee6183b9a11393a1e400 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 13 Feb 2019 15:32:05 +0100
 Subject: [PATCH] Set host_machine correctly when building with mingw32
@@ -13,7 +13,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index f644aa2..64a8684 100644
+index 4ef3343..e498e7e 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
 @@ -29,7 +29,7 @@ endif
@@ -25,7 +25,7 @@ index f644aa2..64a8684 100644
    common_gio_tests_deps += [iphlpapi_dep, winsock2, cc.find_library ('secur32')]
  endif
  
-@@ -210,7 +210,7 @@ if have_dbus_daemon
+@@ -230,7 +230,7 @@ if have_dbus_daemon
  endif
  
  #  Test programs buildable on UNIX only
@@ -34,7 +34,7 @@ index f644aa2..64a8684 100644
    gio_tests += {
      'file' : {},
      'gdbus-peer-object-manager' : {},
-@@ -462,7 +462,7 @@ if host_machine.system() != 'windows'
+@@ -562,7 +562,7 @@ if host_machine.system() != 'windows'
  endif # unix
  
  #  Test programs buildable on Windows only
@@ -43,7 +43,7 @@ index f644aa2..64a8684 100644
    gio_tests += {'win32-streams' : {}}
  endif
  
-@@ -532,7 +532,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
+@@ -632,7 +632,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
    }
  endif
  
@@ -53,10 +53,10 @@ index f644aa2..64a8684 100644
      'gdbus-example-unix-fd-client' : {
        'install' : false,
 diff --git a/glib/tests/meson.build b/glib/tests/meson.build
-index db01b54..6950817 100644
+index d80c86e..5329cda 100644
 --- a/glib/tests/meson.build
 +++ b/glib/tests/meson.build
-@@ -188,7 +188,7 @@ if glib_conf.has('HAVE_EVENTFD')
+@@ -216,7 +216,7 @@ if glib_conf.has('HAVE_EVENTFD')
    }
  endif
  
@@ -66,10 +66,10 @@ index db01b54..6950817 100644
      glib_tests += {
        'gpoll' : {
 diff --git a/meson.build b/meson.build
-index 43bb468..5f9b59c 100644
+index f7e936e..122f8b5 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -43,6 +43,9 @@ else
+@@ -54,6 +54,9 @@ else
  endif
  
  host_system = host_machine.system()

@@ -478,7 +478,7 @@ class GitApplyTree(PatchTree):
                             patchlines = []
                             outfile = None
                             try:
-                                with open(srcfile, 'r', encoding=encoding) as f:
+                                with open(srcfile, 'r', encoding=encoding, newline='') as f:
                                     for line in f:
                                         if line.startswith(GitApplyTree.patch_line_prefix):
                                             outfile = line.split()[-1].strip()

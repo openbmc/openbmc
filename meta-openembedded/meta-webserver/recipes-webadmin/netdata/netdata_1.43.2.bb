@@ -80,4 +80,4 @@ do_install:append() {
 
 FILES:${PN} += "${localstatedir}/cache/netdata/ ${localstatedir}/lib/netdata/"
 
-RDEPENDS:${PN} = "bash zlib"
+RDEPENDS:${PN} = "bash python3-core zlib"

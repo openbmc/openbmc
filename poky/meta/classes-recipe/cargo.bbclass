@@ -30,13 +30,6 @@ B = "${WORKDIR}/build"
 # where the issue occured
 export RUST_BACKTRACE = "1"
 
-# The directory of the Cargo.toml relative to the root directory, per default
-# assume there's a Cargo.toml directly in the root directory
-CARGO_SRC_DIR ??= ""
-
-# The actual path to the Cargo.toml
-MANIFEST_PATH ??= "${S}/${CARGO_SRC_DIR}/Cargo.toml"
-
 RUSTFLAGS ??= ""
 BUILD_MODE = "${@['--release', ''][d.getVar('DEBUG_BUILD') == '1']}"
 # --frozen flag will prevent network access (which is required since only
@@ -44,7 +37,7 @@ BUILD_MODE = "${@['--release', ''][d.getVar('DEBUG_BUILD') == '1']}"
 # and will require an up to date Cargo.lock file.
 # This force the package being built to already ship a Cargo.lock, in the end
 # this is what we want, at least, for reproducibility of the build.
-CARGO_BUILD_FLAGS = "-v --frozen --target ${RUST_HOST_SYS} ${BUILD_MODE} --manifest-path=${MANIFEST_PATH}"
+CARGO_BUILD_FLAGS = "-v --frozen --target ${RUST_HOST_SYS} ${BUILD_MODE} --manifest-path=${CARGO_MANIFEST_PATH}"
 
 # This is based on the content of CARGO_BUILD_FLAGS and generally will need to
 # change if CARGO_BUILD_FLAGS changes.

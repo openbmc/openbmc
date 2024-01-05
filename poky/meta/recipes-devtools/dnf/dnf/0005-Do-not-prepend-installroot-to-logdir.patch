@@ -17,7 +17,7 @@ diff --git a/dnf/cli/cli.py b/dnf/cli/cli.py
 index d2d9c082..82270ecf 100644
 --- a/dnf/cli/cli.py
 +++ b/dnf/cli/cli.py
-@@ -920,7 +920,7 @@ class Cli(object):
+@@ -944,7 +944,7 @@ class Cli(object):
              logger.warning(_("Unable to detect release version (use '--releasever' to specify "
                               "release version)"))
  

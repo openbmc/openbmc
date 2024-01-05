@@ -15,7 +15,7 @@
               <p>A web interface to <a href="https://www.openembedded.org">OpenEmbedded</a> and <a href="https://docs.yoctoproject.org/bitbake.html">BitBake</a>, the <a href="https://www.yoctoproject.org">Yocto Project</a> build system.</p>
 
 		          <p class="top-air">
-		            <a class="btn btn-info btn-lg" href="http://docs.yoctoproject.org/toaster-manual/setup-and-use.html#setting-up-and-using-toaster">
+		            <a class="btn btn-info btn-lg" href="http://docs.yoctoproject.org/toaster-manual/setup-and-use.html#setting-up-and-using-toaster" style="min-width: 460px;">
 			            Toaster is ready to capture your command line builds
 		            </a>
 		          </p>
@@ -23,7 +23,7 @@
 		          {% if lvs_nos %}
                     {% if project_enable %}
 		            <p class="top-air">
-		              <a class="btn btn-primary btn-lg" href="{% url 'newproject' %}">
+		              <a class="btn btn-primary btn-lg" href="{% url 'newproject' %}" style="min-width: 460px;">
 			              Create your first Toaster project to run manage builds
 		              </a>
 		            </p>
@@ -41,6 +41,12 @@
                   </ul>
                 </div>
               {% endif %}
+
+              <p class="top-air">
+		            <a class="btn btn-info btn-lg" href="{% url 'cmdlines' %}" style="min-width: 460px;">
+			            Import command line event logs from build directory
+		            </a>
+		          </p>
 
               <ul class="list-unstyled lead">
                 <li>

@@ -5,7 +5,7 @@ repos:
   meta-secure-core:
     url: https://github.com/Wind-River/meta-secure-core.git
     layers:
-      meta:
+      meta-secure-core-common:
       meta-signing-key:
       meta-efi-secure-boot:
       

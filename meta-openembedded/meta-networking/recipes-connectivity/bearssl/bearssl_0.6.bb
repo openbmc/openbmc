@@ -24,24 +24,29 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=1fc37e1037ae673975fbcb96a98f7191"
 
 PV .= "+git${SRCPV}"
-SRCREV = "79b1a9996c094ff593ae50bc4edc1f349f39dd6d"
+SRCREV = "79c060eea3eea1257797f15ea1608a9a9923aa6f"
 SRC_URI = "git://www.bearssl.org/git/BearSSL;protocol=https;branch=master \
-	   file://0001-conf-Unix.mk-remove-fixed-command-definitions.patch \
-	   file://0002-test-test_x509.c-fix-potential-overflow-issue.patch \
-           file://0001-make-Pass-LDFLAGS-when-building-shared-objects.patch \
-	   "
+           file://0002-test-test_x509.c-fix-potential-overflow-issue.patch \
+           "
 
+SONAME = "libbearssl.so.6"
 # without compile errors like 
 # <..>/ld: build/obj/ghash_pclmul.o: warning: relocation against `br_ghash_pclmul' in read-only section `.text'
 CFLAGS += "-fPIC"
 
+EXTRA_OEMAKE += 'CC="${CC}" CFLAGS="${CFLAGS}" LDDLL="${CCLD} ${LDFLAGS}" LD="${CCLD}" LDFLAGS="${LDFLAGS}" \
+                 BEARSSLDLL=build/${SONAME} \
+                 LDDLLFLAGS="-shared -Wl,-soname,${SONAME}" \
+                 ${@ "STATICLIB=no" if d.getVar('DISABLE_STATIC') != "" else "" } \
+'
+
 S = "${WORKDIR}/git"
-B = "${S}"
 
 do_install() {
-    mkdir -p ${D}/${bindir} ${D}/${libdir}
-    install -m 0644 ${B}/build/brssl ${D}/${bindir}
-    install -m 0644 ${B}/build/libbearssl.so ${D}/${libdir}/libbearssl.so.6.0.0
-    ln -s libbearssl.so.6.0.0 ${D}/${libdir}/libbearssl.so.6
-    ln -s libbearssl.so.6.0.0 ${D}/${libdir}/libbearssl.so
+	install -d ${D}/${bindir} ${D}/${libdir} ${D}/${includedir}
+	install -m 0755 ${B}/build/brssl ${D}/${bindir}
+	oe_libinstall -C ${B}/build libbearssl ${D}/${libdir}
+	for inc in ${S}/inc/*.h; do
+		install -m 0644 "${inc}" ${D}/${includedir}
+	done
 }

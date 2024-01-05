@@ -1,0 +1,19 @@
+SUMMARY = "Pipe viewer test recipe for devtool upgrade test"
+LICENSE = "Artistic-2.0"
+LIC_FILES_CHKSUM = "file://doc/COPYING;md5=9c50db2589ee3ef10a9b7b2e50ce1d02"
+
+SRC_URI = "http://www.ivarch.com/programs/sources/pv-${PV}.tar.gz"
+UPSTREAM_CHECK_URI = "http://www.ivarch.com/programs/pv.shtml"
+RECIPE_NO_UPDATE_REASON = "This recipe is used to test devtool upgrade feature"
+
+SRC_URI[sha1sum] = "395ce62f4f3e035b86c77038f04b96c5aa233595"
+SRC_URI[sha256sum] = "9dd45391806b0ed215abee4c5ac1597d018c386fe9c1f5afd2f6bc3b07fd82c3"
+SRC_URI[sha384sum] = "218c8d2d097aeba5310be759bc20573f18ffa0b11701eac6dd2e7e14ddf13c6e0e094ca7ca026eaa05ef92a056402e36"
+SRC_URI[sha512sum] = "1cf9d7376fceefcd594d0a8b591afc8e11ce89f7210d10ad74438974ecebe9cc5d9ec4db9cc79e0566bfd2b0278c0cc263c07547803e7536432cd1ffd32d8a45"
+
+S = "${WORKDIR}/pv-${PV}"
+
+EXCLUDE_FROM_WORLD = "1"
+
+inherit autotools
+

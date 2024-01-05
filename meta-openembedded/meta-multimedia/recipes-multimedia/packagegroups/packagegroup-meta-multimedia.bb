@@ -62,7 +62,7 @@ RDEPENDS:packagegroup-meta-multimedia-connectivity = "\
     gupnp-dlna \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "gupnp-tools", "", d)} \
     libupnp \
-    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "rygel", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "rygel", "", d), "", d)} \
 "
 RDEPENDS:packagegroup-meta-multimedia-dvb = "\
     oscam \

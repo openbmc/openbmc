@@ -167,8 +167,8 @@ def check_filter_status(options, filter):
 def variable_parent_name(value):
     """ filter extended variable names to the parent name
     """
-    value=re.sub('_\$.*', '', value)
-    return re.sub('_[a-z].*', '', value)
+    value = re.sub(r'_\$.*', '', value)
+    return re.sub(r'_[a-z].*', '', value)
 
 @register.filter
 def filter_setin_files(file_list, matchstr):

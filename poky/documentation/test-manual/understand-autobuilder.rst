@@ -9,8 +9,8 @@ Execution Flow within the Autobuilder
 
 The "a-full" and "a-quick" targets are the usual entry points into the
 Autobuilder and it makes sense to follow the process through the system
-starting there. This is best visualized from the Autobuilder Console
-view (:yocto_ab:`/typhoon/#/console`).
+starting there. This is best visualized from the :yocto_ab:`Autobuilder
+Console view </typhoon/#/console>`.
 
 Each item along the top of that view represents some "target build" and
 these targets are all run in parallel. The 'full' build will trigger the
@@ -18,9 +18,9 @@ majority of them, the "quick" build will trigger some subset of them.
 The Autobuilder effectively runs whichever configuration is defined for
 each of those targets on a separate buildbot worker. To understand the
 configuration, you need to look at the entry on ``config.json`` file
-within the ``yocto-autobuilder-helper`` repository. The targets are
-defined in the ‘overrides' section, a quick example could be qemux86-64
-which looks like::
+within the :yocto_git:`yocto-autobuilder-helper </yocto-autobuilder-helper>`
+repository. The targets are defined in the ``overrides`` section, a quick
+example could be ``qemux86-64`` which looks like::
 
    "qemux86-64" : {
          "MACHINE" : "qemux86-64",
@@ -32,8 +32,8 @@ which looks like::
         }
    },
 
-And to expand that, you need the "arch-qemu" entry from
-the "templates" section, which looks like::
+And to expand that, you need the ``arch-qemu`` entry from
+the ``templates`` section, which looks like::
 
    "arch-qemu" : {
          "BUILDINFO" : true,
@@ -54,11 +54,11 @@ the "templates" section, which looks like::
          }
    },
 
-Combining these two entries you can see that "qemux86-64" is a three step build where the
-``bitbake BBTARGETS`` would be run, then ``bitbake SANITYTARGETS`` for each step; all for
-``MACHINE="qemux86-64"`` but with differing :term:`SDKMACHINE` settings. In step
-1 an extra variable is added to the ``auto.conf`` file to enable wic
-image generation.
+Combining these two entries you can see that ``qemux86-64`` is a three step
+build where ``bitbake BBTARGETS`` would be run, then ``bitbake SANITYTARGETS``
+for each step; all for ``MACHINE="qemux86-64"`` but with differing
+:term:`SDKMACHINE` settings. In step 1, an extra variable is added to the
+``auto.conf`` file to enable wic image generation.
 
 While not every detail of this is covered here, you can see how the
 template mechanism allows quite complex configurations to be built up
@@ -88,9 +88,9 @@ roughly consist of:
 
 #. *Obtain yocto-autobuilder-helper*
 
-   This step clones the ``yocto-autobuilder-helper`` git repository.
-   This is necessary to prevent the requirement to maintain all the
-   release or project-specific code within Buildbot. The branch chosen
+   This step clones the :yocto_git:`yocto-autobuilder-helper </yocto-autobuilder-helper>`
+   git repository. This is necessary to avoid the requirement to maintain all
+   the release or project-specific code within Buildbot. The branch chosen
    matches the release being built so we can support older releases and
    still make changes in newer ones.
 
@@ -163,8 +163,9 @@ Autobuilder Worker Janitor
 --------------------------
 
 This is a process running on each Worker that performs two basic
-operations, including background file deletion at IO idle (see :ref:`test-manual/understand-autobuilder:Autobuilder Target Execution Overview`: Run clobberdir) and
-maintenance of a cache of cloned repositories to improve the speed
+operations, including background file deletion at IO idle (see
+"Run clobberdir" in :ref:`test-manual/understand-autobuilder:Autobuilder Target Execution Overview`)
+and maintenance of a cache of cloned repositories to improve the speed
 the system can checkout repositories.
 
 Shared DL_DIR
@@ -172,7 +173,7 @@ Shared DL_DIR
 
 The Workers are all connected over NFS which allows :term:`DL_DIR` to be shared
 between them. This reduces network accesses from the system and allows
-the build to be sped up. Usage of the directory within the build system
+the build to be sped up. The usage of the directory within the build system
 is designed to be able to be shared over NFS.
 
 Shared SSTATE_DIR
@@ -180,8 +181,8 @@ Shared SSTATE_DIR
 
 The Workers are all connected over NFS which allows the ``sstate``
 directory to be shared between them. This means once a Worker has built
-an artifact, all the others can benefit from it. Usage of the directory
-within the directory is designed for sharing over NFS.
+an artifact, all the others can benefit from it. The usage of the directory
+within the build system is designed for sharing over NFS.
 
 Resulttool
 ----------
@@ -192,7 +193,7 @@ in a given build and their status. Additional information, such as
 failure logs or the time taken to run the tests, may also be included.
 
 Resulttool is part of OpenEmbedded-Core and is used to manipulate these
-json results files. It has the ability to merge files together, display
+JSON results files. It has the ability to merge files together, display
 reports of the test results and compare different result files.
 
 For details, see :yocto_wiki:`/Resulttool`.
@@ -206,7 +207,7 @@ are general setup steps that are run once and include:
 
 #. Set up any :term:`buildtools` tarball if configured.
 
-#. Call "buildhistory-init" if :ref:`ref-classes-buildhistory` is configured.
+#. Call ``buildhistory-init`` if :ref:`ref-classes-buildhistory` is configured.
 
 For each step that is configured in ``config.json``, it will perform the
 following:
@@ -250,15 +251,16 @@ Deploying Yocto Autobuilder
 ===========================
 
 The most up to date information about how to setup and deploy your own
-Autobuilder can be found in README.md in the ``yocto-autobuilder2``
-repository.
+Autobuilder can be found in :yocto_git:`README.md </yocto-autobuilder2/tree/README.md>`
+in the :yocto_git:`yocto-autobuilder2 </yocto-autobuilder2>` repository.
 
-We hope that people can use the ``yocto-autobuilder2`` code directly but
-it is inevitable that users will end up needing to heavily customise the
-``yocto-autobuilder-helper`` repository, particularly the
-``config.json`` file as they will want to define their own test matrix.
+We hope that people can use the :yocto_git:`yocto-autobuilder2 </yocto-autobuilder2>`
+code directly but it is inevitable that users will end up needing to heavily
+customize the :yocto_git:`yocto-autobuilder-helper </yocto-autobuilder-helper>`
+repository, particularly the ``config.json`` file as they will want to define
+their own test matrix.
 
-The Autobuilder supports wo customization options:
+The Autobuilder supports two customization options:
 
 -  variable substitution
 
@@ -278,7 +280,7 @@ environment::
    $ ABHELPER_JSON="config.json /some/location/local.json"
 
 One issue users often run into is validation of the ``config.json`` files. A
-tip for minimizing issues from invalid json files is to use a Git
+tip for minimizing issues from invalid JSON files is to use a Git
 ``pre-commit-hook.sh`` script to verify the JSON file before committing
 it. Create a symbolic link as follows::
 

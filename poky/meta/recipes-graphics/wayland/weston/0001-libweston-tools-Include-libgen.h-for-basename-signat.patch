@@ -1,0 +1,48 @@
+From 2b53236ac637dfa7fb0f438f7391a73f6ef92a06 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 14 Dec 2023 09:13:54 -0800
+Subject: [PATCH] libweston,tools: Include libgen.h for basename signature
+
+Latest musl has removed the declaration from string.h [1] as it only
+implements POSIX version alone and string.h in glibc implements GNU
+version of basename. This now results in compile errors on musl.
+
+This might be a warning with older compilers but it is error with
+Clang-17+ as it treats -Wimplicit-function-declaration as error
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/wayland/weston/-/merge_requests/1420]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libweston/backend-drm/libbacklight.c | 1 +
+ tools/zunitc/src/zunitc_impl.c       | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libweston/backend-drm/libbacklight.c b/libweston/backend-drm/libbacklight.c
+index ca7f2d68..74690fa7 100644
+--- a/libweston/backend-drm/libbacklight.c
++++ b/libweston/backend-drm/libbacklight.c
+@@ -41,6 +41,7 @@
+ #include <drm.h>
+ #include <fcntl.h>
+ #include <malloc.h>
++#include <libgen.h>
+ #include <string.h>
+ #include <errno.h>
+
+diff --git a/tools/zunitc/src/zunitc_impl.c b/tools/zunitc/src/zunitc_impl.c
+index 18f03015..9b460fa0 100644
+--- a/tools/zunitc/src/zunitc_impl.c
++++ b/tools/zunitc/src/zunitc_impl.c
+@@ -27,6 +27,7 @@
+
+ #include <errno.h>
+ #include <fcntl.h>
++#include <libgen.h>
+ #include <stdarg.h>
+ #include <stdbool.h>
+ #include <stdio.h>
+--
+2.43.0
+

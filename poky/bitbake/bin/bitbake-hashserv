@@ -53,6 +53,19 @@ mode with an SSL terminating load balancer in front of it (as this server does
 not implement SSL). Otherwise all usernames and passwords will be transmitted
 in the clear. When configured this way, clients can connect using a secure
 websocket, as in "wss://SERVER:PORT"
+
+The following permissions are supported by the server:
+
+    @none       - No permissions
+    @read       - The ability to read equivalent hashes from the server
+    @report     - The ability to report equivalent hashes to the server
+    @db-admin   - Manage the hash database(s). This includes cleaning the
+                  database, removing hashes, etc.
+    @user-admin - The ability to manage user accounts. This includes, creating
+                  users, deleting users, resetting login tokens, and assigning
+                  permissions.
+    @all        - All possible permissions, including any that may be added
+                  in the future
         """,
     )
 

@@ -1,0 +1,24 @@
+From 3aea1ece0ca6ac0bf0ffe42736827af22966f767 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alexk@zuma.ai>
+Date: Wed, 27 Dec 2023 09:55:48 +0000
+Subject: [PATCH] Greet "OE-Core"
+
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+Upstream-Status: Inappropriate
+---
+ src/main.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main.rs b/src/main.rs
+index f4a310758b19..224eca65c38d 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -3,7 +3,7 @@ use hello_lib::greet;
+ 
+ fn main() {
+     let standard_font = FIGfont::standard().unwrap();
+-    let greeting = greet(None);
++    let greeting = greet(Some("OE-Core"));
+     let figure = standard_font.convert(&greeting);
+     println!("{}", figure.unwrap());
+ }

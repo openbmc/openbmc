@@ -62,6 +62,7 @@ PTESTS_FAST = "\
     python3-hypothesis \
     python3-jinja2 \
     python3-jsonpointer \
+    python3-license-expression \
     python3-markupsafe \
     python3-more-itertools \
     python3-pluggy \

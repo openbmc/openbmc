@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=36d34a46cb71546195d2b0c626a52e5d"
 SRCREV = "35b13a8e8fd2a331854dba6da81a20452e142d6f"
 SRC_URI = " \
     git://github.com/baldurk/${BPN}.git;protocol=https;branch=v1.x \
-    file://0001-renderdoc-use-xxd-instead-of-cross-compiling-shim-bi.patch \
 "
 S = "${WORKDIR}/git"
 
@@ -32,6 +31,7 @@ EXTRA_OECMAKE += "\
     -DENABLE_PYRENDERDOC=OFF \
     -DENABLE_RENDERDOCCMD=ON \
     -DCMAKE_BUILD_TYPE=Release \
+    -DHOST_NATIVE_CPP_COMPILER="${BUILD_CXX}" \
 "
 
 FILES:${PN} += "${libdir}"

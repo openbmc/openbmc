@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "\
 
 SRC_URI = " \
         git://git.libcamera.org/libcamera/libcamera.git;protocol=https;branch=master \
+        file://0001-mojom-Drop-using-imp-module.patch \
 "
 
 SRCREV = "960d0c1e19feaf310321c906e14bd5410c6be629"

@@ -28,12 +28,22 @@ export PKG_CONFIG_ALLOW_CROSS = "1"
 # Don't instruct cargo to use crates downloaded by bitbake. Some rust packages,
 # for example the rust compiler itself, come with their own vendored sources.
 # Specifying two [source.crates-io] will not work.
-CARGO_DISABLE_BITBAKE_VENDORING ?= "0"
+CARGO_DISABLE_BITBAKE_VENDORING ??= "0"
 
 # Used by libstd-rs to point to the vendor dir included in rustc src
-CARGO_VENDORING_DIRECTORY ?= "${CARGO_HOME}/bitbake"
+CARGO_VENDORING_DIRECTORY ??= "${CARGO_HOME}/bitbake"
 
-CARGO_RUST_TARGET_CCLD ?= "${RUST_TARGET_CCLD}"
+# The directory of the Cargo.toml relative to the root directory, per default
+# assume there's a Cargo.toml directly in the root directory
+CARGO_SRC_DIR ??= ""
+
+# The actual path to the Cargo.toml
+CARGO_MANIFEST_PATH ??= "${S}/${CARGO_SRC_DIR}/Cargo.toml"
+
+# Path to Cargo.lock
+CARGO_LOCK_PATH ??= "${@ os.path.join(os.path.dirname(d.getVar('CARGO_MANIFEST_PATH', True)), 'Cargo.lock')}"
+
+CARGO_RUST_TARGET_CCLD ??= "${RUST_TARGET_CCLD}"
 cargo_common_do_configure () {
 	mkdir -p ${CARGO_HOME}/bitbake
 
@@ -161,8 +171,7 @@ python cargo_common_do_patch_paths() {
     # here is better than letting cargo tell (in case the file is missing)
     # "Cargo.lock should be modified but --frozen was given"
 
-    manifest_path = d.getVar("MANIFEST_PATH", True)
-    lockfile = os.path.join(os.path.dirname(manifest_path), "Cargo.lock")
+    lockfile = d.getVar("CARGO_LOCK_PATH", True)
     if not os.path.exists(lockfile):
         bb.fatal(f"{lockfile} file doesn't exist")
 

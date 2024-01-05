@@ -1,0 +1,4 @@
+# These should be reviewed to see if they are still needed
+l4_wkup_cm
+Failed to make EGL context current
+glamor initialization failed

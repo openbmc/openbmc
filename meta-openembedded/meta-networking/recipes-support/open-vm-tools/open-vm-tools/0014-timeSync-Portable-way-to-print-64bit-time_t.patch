@@ -1,0 +1,55 @@
+From 09cc01b2fa15e319afafa13d7365b399a60f443c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 3 Jan 2023 13:36:01 -0800
+Subject: [PATCH] timeSync: Portable way to print 64bit time_t
+
+This ensures when 64bit time_t is used on 32bit architectures (
+-D_TIME_BITS=64 ) then it can print it correctly as well.
+
+Fixes
+pllLinux.c:43:20: error: format specifies type 'long' but the argument has type 'long long' [-Werror,-Wformat]
+|            prefix, tx->offset, tx->freq, tx->maxerror, tx->esterror,
+|                    ^~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/vmware/open-vm-tools/pull/631]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/services/plugins/timeSync/pllLinux.c  | 8 ++++----
+ open-vm-tools/services/plugins/timeSync/slewLinux.c | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/open-vm-tools/services/plugins/timeSync/pllLinux.c b/open-vm-tools/services/plugins/timeSync/pllLinux.c
+index e9c8e61de..90ba8c63f 100644
+--- a/open-vm-tools/services/plugins/timeSync/pllLinux.c
++++ b/open-vm-tools/services/plugins/timeSync/pllLinux.c
+@@ -38,10 +38,10 @@
+ static void
+ TimeSyncLogPLLState(const char *prefix, struct timex *tx)
+ {
+-   g_debug("%s : off %ld freq %ld maxerr %ld esterr %ld status %d "
+-           "const %ld precision %ld tolerance %ld tick %ld\n",
+-           prefix, tx->offset, tx->freq, tx->maxerror, tx->esterror, 
+-           tx->status, tx->constant, tx->precision, tx->tolerance, tx->tick);
++   g_debug("%s : off %jd freq %jd maxerr %jd esterr %jd status %d "
++           "const %jd precision %jd tolerance %jd tick %jd\n",
++           prefix, (intmax_t)tx->offset, (intmax_t)tx->freq, (intmax_t)tx->maxerror, (intmax_t)tx->esterror, 
++           tx->status, (intmax_t)tx->constant, (intmax_t)tx->precision, (intmax_t)tx->tolerance, (intmax_t)tx->tick);
+ }
+ 
+ /*
+diff --git a/open-vm-tools/services/plugins/timeSync/slewLinux.c b/open-vm-tools/services/plugins/timeSync/slewLinux.c
+index 1ab6e3584..0c304b5d7 100644
+--- a/open-vm-tools/services/plugins/timeSync/slewLinux.c
++++ b/open-vm-tools/services/plugins/timeSync/slewLinux.c
+@@ -156,6 +156,6 @@ TimeSync_Slew(int64 delta,
+       g_debug("adjtimex failed: %s\n", strerror(errno));
+       return FALSE;
+    }
+-   g_debug("time slew start: %ld\n", tx.tick);
++   g_debug("time slew start: %jd\n", (intmax_t)tx.tick);
+    return TRUE;
+ }
+-- 
+2.25.1
+

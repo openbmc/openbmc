@@ -258,17 +258,17 @@ class PythonParser():
         if name and (name.endswith(self.getvars) or name.endswith(self.getvarflags) or name in self.containsfuncs or name in self.containsanyfuncs):
             if isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
                 varname = node.args[0].value
-                if name in self.containsfuncs and isinstance(node.args[1], ast.Str):
+                if name in self.containsfuncs and isinstance(node.args[1], ast.Constant):
                     if varname not in self.contains:
                         self.contains[varname] = set()
-                    self.contains[varname].add(node.args[1].s)
-                elif name in self.containsanyfuncs and isinstance(node.args[1], ast.Str):
+                    self.contains[varname].add(node.args[1].value)
+                elif name in self.containsanyfuncs and isinstance(node.args[1], ast.Constant):
                     if varname not in self.contains:
                         self.contains[varname] = set()
-                    self.contains[varname].update(node.args[1].s.split())
+                    self.contains[varname].update(node.args[1].value.split())
                 elif name.endswith(self.getvarflags):
-                    if isinstance(node.args[1], ast.Str):
-                        self.references.add('%s[%s]' % (varname, node.args[1].s))
+                    if isinstance(node.args[1], ast.Constant):
+                        self.references.add('%s[%s]' % (varname, node.args[1].value))
                     else:
                         self.warn(node.func, node.args[1])
                 else:
@@ -276,8 +276,8 @@ class PythonParser():
             else:
                 self.warn(node.func, node.args[0])
         elif name and name.endswith(".expand"):
-            if isinstance(node.args[0], ast.Str):
-                value = node.args[0].s
+            if isinstance(node.args[0], ast.Constant):
+                value = node.args[0].value
                 d = bb.data.init()
                 parser = d.expandWithRefs(value, self.name)
                 self.references |= parser.references
@@ -287,8 +287,8 @@ class PythonParser():
                         self.contains[varname] = set()
                     self.contains[varname] |= parser.contains[varname]
         elif name in self.execfuncs:
-            if isinstance(node.args[0], ast.Str):
-                self.var_execs.add(node.args[0].s)
+            if isinstance(node.args[0], ast.Constant):
+                self.var_execs.add(node.args[0].value)
             else:
                 self.warn(node.func, node.args[0])
         elif name and isinstance(node.func, (ast.Name, ast.Attribute)):

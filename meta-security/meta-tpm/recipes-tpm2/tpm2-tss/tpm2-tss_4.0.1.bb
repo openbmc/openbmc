@@ -93,3 +93,5 @@ FILES:${PN} = "\
     ${sysconfdir}/sysusers.d"
 
 RDEPENDS:libtss2 = "libgcrypt"
+
+BBCLASSEXTEND = "native"

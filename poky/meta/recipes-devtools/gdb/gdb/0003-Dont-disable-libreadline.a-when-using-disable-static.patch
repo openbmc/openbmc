@@ -1,4 +1,4 @@
-From 431a88f4370a23b297998641e1e10ebfd74478d9 Mon Sep 17 00:00:00 2001
+From 683650564cd231bbf09c7cbc35543b77ca0b10d0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:25:03 -0700
 Subject: [PATCH] Dont disable libreadline.a when using --disable-static
@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile.def b/Makefile.def
-index f974565d8ca..039b5a3c209 100644
+index 870150183b9..eb3788da0d2 100644
 --- a/Makefile.def
 +++ b/Makefile.def
-@@ -120,7 +120,8 @@ host_modules= { module= libiconv;
+@@ -119,7 +119,8 @@ host_modules= { module= libiconv;
  		missing= install-html;
  		missing= install-info; };
  host_modules= { module= m4; };
@@ -33,10 +33,10 @@ index f974565d8ca..039b5a3c209 100644
  host_modules= { module= sim; };
  host_modules= { module= texinfo; no_install= true; };
 diff --git a/Makefile.in b/Makefile.in
-index a425b54e094..dfaf585a7c1 100644
+index c97130a2338..a83f98e4778 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -32816,7 +32816,7 @@ configure-readline:
+@@ -31691,7 +31691,7 @@ configure-readline:
  	  $$s/$$module_srcdir/configure \
  	  --srcdir=$${topdir}/$$module_srcdir \
  	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \

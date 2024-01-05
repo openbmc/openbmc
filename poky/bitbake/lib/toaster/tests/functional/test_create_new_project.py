@@ -16,6 +16,7 @@ from selenium.webdriver.common.by import By
 
 
 @pytest.mark.django_db
+@pytest.mark.order("last")
 class TestCreateNewProject(SeleniumFunctionalTestCase):
 
     def _create_test_new_project(
@@ -48,7 +49,7 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
 
         self.driver.find_element(By.ID, "create-project-button").click()
 
-        element = self.wait_until_visible('#project-created-notification')
+        element = self.wait_until_visible('#project-created-notification', poll=3)
         self.assertTrue(
             self.element_exists('#project-created-notification'),
             f"Project:{project_name} creation notification not shown"

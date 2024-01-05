@@ -1,7 +1,7 @@
-From f632148fcc8757bb9a9601a6dab275e88cd309d2 Mon Sep 17 00:00:00 2001
+From 8c850aa109c42d0c193bccc7af45dbc2689b23f6 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 30 Jan 2018 15:28:49 +0800
-Subject: [PATCH 3/7] Correctly install python modules
+Subject: [PATCH] Correctly install python modules
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
@@ -12,15 +12,16 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 Rebase to 1.10.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  lang/python/Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index 6988faf..36c6f7b 100644
+index 68b98e8..bbb9111 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
-@@ -93,6 +93,7 @@ install-exec-local:
+@@ -97,6 +97,7 @@ install-exec-local:
  	  --build-base="$$(basename "$${PYTHON}")-gpg" \
  	  install \
  	  --prefix "$(DESTDIR)$(prefix)" \
@@ -28,6 +29,3 @@ index 6988faf..36c6f7b 100644
  	  --verbose ; \
  	done
  
--- 
-2.7.4
-

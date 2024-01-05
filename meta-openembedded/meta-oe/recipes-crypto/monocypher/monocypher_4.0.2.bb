@@ -11,8 +11,8 @@ SRCREV = "0d85f98c9d9b0227e42cf795cb527dff372b40a4"
 
 S = "${WORKDIR}/git"
 
-CFLAGS+="-pedantic -Wall -Wextra -O3"
-EXTRA_OEMAKE = "'PREFIX=${prefix}' 'DESTDIR=${D}' 'CFLAGS=${CFLAGS}'"
+CFLAGS += "-pedantic -Wall -Wextra -O3"
+EXTRA_OEMAKE = "'PREFIX=${prefix}' 'DESTDIR=${D}' 'CFLAGS=${CFLAGS}' 'LIBDIR=${libdir}'"
 
 do_compile() {
     oe_runmake library

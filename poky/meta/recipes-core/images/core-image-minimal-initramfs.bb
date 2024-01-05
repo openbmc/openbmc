@@ -20,7 +20,6 @@ IMAGE_FEATURES = ""
 # Don't allow the initramfs to contain a kernel
 PACKAGE_EXCLUDE = "kernel-image-*"
 
-export IMAGE_BASENAME = "${MLPREFIX}core-image-minimal-initramfs"
 IMAGE_NAME_SUFFIX ?= ""
 IMAGE_LINGUAS = ""
 

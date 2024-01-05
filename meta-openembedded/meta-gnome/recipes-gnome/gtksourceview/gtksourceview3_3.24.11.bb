@@ -4,7 +4,7 @@ HOMEPAGE = "http://projects.gnome.org/gtksourceview/"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
-DEPENDS = "gtk+3 libxml2 intltool-native gnome-common-native glib-2.0-native"
+DEPENDS = "gtk+3 libxml2 glib-2.0-native"
 
 PNAME = "gtksourceview"
 

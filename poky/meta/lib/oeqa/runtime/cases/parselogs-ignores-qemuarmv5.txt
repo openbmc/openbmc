@@ -1,0 +1,19 @@
+# Code is 2 JENT_ECOARSETIME: Timer too coarse for RNG.
+jitterentropy: Initialization failed with host not compliant with requirements: 2
+
+# These should be reviewed to see if they are still needed
+mmci-pl18x: probe of fpga:05 failed with error -22
+mmci-pl18x: probe of fpga:0b failed with error -22
+
+OF: amba_device_add() failed (-19) for /amba/smc@10100000
+OF: amba_device_add() failed (-19) for /amba/mpmc@10110000
+OF: amba_device_add() failed (-19) for /amba/sctl@101e0000
+OF: amba_device_add() failed (-19) for /amba/watchdog@101e1000
+OF: amba_device_add() failed (-19) for /amba/sci@101f0000
+OF: amba_device_add() failed (-19) for /amba/spi@101f4000
+OF: amba_device_add() failed (-19) for /amba/ssp@101f4000
+OF: amba_device_add() failed (-19) for /amba/fpga/sci@a000
+Failed to initialize '/amba/timer@101e3000': -22
+
+clcd-pl11x: probe of 10120000.display failed with error -2
+arm-charlcd 10008000.lcd: error -ENXIO: IRQ index 0 not found

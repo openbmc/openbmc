@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load projecttags %}
+{% load humanize %}
+{% load static %}
+
+{% block title %} Import Builds from eventlogs - Toaster {% endblock %}
+
+{% block pagecontent %}
+
+<div class="container-fluid">
+    <div id="overlay" class="hide">
+        <div class="spinner">
+            <div class="fa-spin">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h1>Import command line builds</h1>
+                    </div>
+                    {% if import_all %}
+                    <div class="col-md-6">
+                        <button id="import_all" type="button" class="btn btn-primary navbar-btn navbar-right">
+                            <span class="glyphicon glyphicon-upload" style="vertical-align: top;"></span> Import All
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if messages %}
+            <div class="row-fluid" id="empty-state-{{table_name}}">
+                {% for message in messages %}
+                <div class="alert alert-danger">{{message}}</div>
+                {%endfor%}
+            </div>
+            {% endif %}
+            <div class="row">
+                <h4 style="margin-left: 15px;"><strong>Import eventlog file</strong></h4>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'cmdlines' %}" id="form_file">
+                    {% csrf_token %}
+                    <div class="col-md-6" style="padding-left: 20px;">
+                        <div class="row">
+                            <input type="hidden" value="{{dir}}" name="dir">
+                            <div class="col-md-3"> {{ form.eventlog_file}}  </div>
+                        </div>
+                        <div class="row" style="padding-top: 10px;">
+                            <div class="col-md-6">
+                                <button id="file_import" type="submit" disabled="disabled" class="btn btn-default navbar-btn" >
+                                    <span class="glyphicon glyphicon-upload" style="vertical-align: top;"></span> Import
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row" style="padding-top: 20px;">
+                <div class="col-md-8 ">
+                    <h4><strong>Eventlogs from existing build directory: </strong>
+                        <a href="#" data-toggle="tooltip" title="{{dir}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" data-toggle="tooltip">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                            </svg>
+                        </a>
+                    </h4>
+                    {% if files %}
+                    <div class="table-responsive">
+                        <table class="table col-md-6 table-bordered table-hover" id="eventlog-table" style="border-collapse: collapse;">
+                            <thead>
+                            <tr class="row">
+                                <th scope="col">Name</th>
+                                <th scope="col">Size</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for file in files %}
+                                <tr class="row" style="height: 48px;">
+                                    <th scope="row" class="col-md-4" style="vertical-align: middle;">
+                                        <input type="hidden" value="{{file.name}}" name="{{file.name}}">{{file.name}}
+                                    </th>
+                                    <td class="col-md-4 align-middle" style="vertical-align: middle;">{{file.size|filesizeformat}}</td>
+                                    <td class="col-md-4 align-middle" style="vertical-align: middle;">
+                                        {% if file.imported == True and file.build_id is not None %}
+                                            <a href="{% url 'builddashboard' file.build_id %}">Build Details</a>
+                                        {% elif request.session.file == file.name or request.session.all_builds %}
+                                            <a data-toggle="tooltip" title="Build in progress">
+                                                <span class="glyphicon glyphicon-upload" style="font-size: 18px; color:grey"></span>
+                                            </a>
+                                        {%else%}
+                                            <a onclick="_ajax_update('{{file.name}}', false, '{{dir}}')" data-toggle="tooltip" title="Import File">
+                                                <span class="glyphicon glyphicon-upload" style="font-size: 18px;"></span>
+                                            </a>
+                                        {%endif%}
+                                    </td>
+                                </tr>
+                                {% endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="row-fluid" id="empty-state-{{table_name}}">
+                        <div class="alert alert-info">Sorry - no files found</div>
+                    </div>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables-1.13.8.min.css' %}" type='text/css'/>
+<script src="{% static 'js/jquery.dataTables-1.13.8.min.js' %}"> </script>
+<script>
+
+function _ajax_update(file, all, dir){
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+    return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    $.ajax({
+        url:'/toastergui/cmdline/',
+        type: "POST",
+        data: {file: file, all: all, dir: dir},
+        success:function(data){
+            if (data['response']=='building'){
+                location.reload()
+            } else {
+                window.location = '/toastergui/builds/'
+            }
+        },
+        complete:function(data){
+        },
+        error:function (xhr, textStatus, thrownError){
+            console.log('fail');
+        }
+    });
+}
+
+$('#import_all').on('click', function(){
+    _ajax_update("{{files | safe}}", true, "{{dir | safe}}");
+});
+
+
+$('#import_page').hide();
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+
+$("#id_eventlog_file").change(function(){
+    $('#file_import').prop("disabled", false);
+    $('#file_import').addClass('btn-primary')
+    $('#file_import').removeClass('btn-default')
+})
+
+$(document).ajaxStart(function(){
+    $('#overlay').removeClass('hide');
+    window.setTimeout(
+        function() {
+            window.location = '/toastergui/builds/'
+        }, 10000)
+});
+
+$( "#form_file").on( "submit", function( event ) {
+    $('#overlay').removeClass('hide');
+    window.setTimeout(
+        function() {
+            window.location = '/toastergui/builds/'
+        }, 10000)
+});
+
+$(document).ready( function () {
+    $('#eventlog-table').DataTable({order: [[0, 'desc']], "pageLength": 50});
+});
+
+</script>
+
+{% endblock %}

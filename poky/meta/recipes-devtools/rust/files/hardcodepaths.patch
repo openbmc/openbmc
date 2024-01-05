@@ -1,4 +1,4 @@
-When building for the target, some build paths end up embedded in the binaries. 
+When building for the target, some build paths end up embedded in the binaries.
 These changes remove that. Further investigation is needed to work out the way
 to resolve these issues properly upstream.
 
@@ -6,17 +6,19 @@ Upstream-Status: Inappropriate [patches need rework]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 
---- rustc-1.69.0-src/compiler/rustc_codegen_llvm/src/context.rs.orig	2023-04-21 08:38:23.092458478 +0100
-+++ rustc-1.69.0-src/compiler/rustc_codegen_llvm/src/context.rs	2023-04-21 08:39:00.266819755 +0100
-@@ -156,46 +156,6 @@
+diff --git a/compiler/rustc_codegen_llvm/src/context.rs b/compiler/rustc_codegen_llvm/src/context.rs
+index b4b2ab1e1f8a..8bb3e3f0557c 100644
+--- a/compiler/rustc_codegen_llvm/src/context.rs
++++ b/compiler/rustc_codegen_llvm/src/context.rs
+@@ -158,46 +158,6 @@ pub unsafe fn create_module<'ll>(
          }
      }
  
 -    // Ensure the data-layout values hardcoded remain the defaults.
 -    if sess.target.is_builtin {
+-        // tm is disposed by its drop impl
 -        let tm = crate::back::write::create_informational_target_machine(tcx.sess);
--        llvm::LLVMRustSetDataLayoutFromTargetMachine(llmod, tm);
--        llvm::LLVMRustDisposeTargetMachine(tm);
+-        llvm::LLVMRustSetDataLayoutFromTargetMachine(llmod, &tm);
 -
 -        let llvm_data_layout = llvm::LLVMGetDataLayoutStr(llmod);
 -        let llvm_data_layout = str::from_utf8(CStr::from_ptr(llvm_data_layout).to_bytes())

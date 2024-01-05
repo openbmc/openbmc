@@ -1,0 +1,6 @@
+# These should be reviewed to see if they are still needed
+PCI 0000:00 Cannot reserve Legacy IO [io  0x0000-0x0fff]
+host side 80-wire cable detection failed, limiting max speed
+mode "640x480" test failed
+can't handle BAR above 4GB
+Cannot reserve Legacy IO

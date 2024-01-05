@@ -20,9 +20,9 @@ GTKDOC_MESON_OPTION = "enable-gtk-doc"
 inherit meson pkgconfig gettext gtk-doc python3native python3-dir python3targetconfig
 
 do_install:append() {
-        rmdir ${D}${root_prefix}${localstatedir}/run/${BPN} ${D}${root_prefix}${localstatedir}/run \
-              ${D}${root_prefix}${localstatedir}/log/${BPN} ${D}${root_prefix}${localstatedir}/log \
-              ${D}${root_prefix}${localstatedir}
+        rmdir ${D}${exec_prefix}${localstatedir}/run/${BPN} ${D}${exec_prefix}${localstatedir}/run \
+              ${D}${exec_prefix}${localstatedir}/log/${BPN} ${D}${exec_prefix}${localstatedir}/log \
+              ${D}${exec_prefix}${localstatedir}
         rm -f ${D}${bindir}/gst-client ${D}${bindir}/gstd-client
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
                 install -d ${D}${sysconfdir}/tmpfiles.d

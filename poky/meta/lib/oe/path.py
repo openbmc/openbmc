@@ -172,6 +172,9 @@ def symlink(source, destination, force=False):
         if e.errno != errno.EEXIST or os.readlink(destination) != source:
             raise
 
+def relsymlink(target, name, force=False):
+    symlink(os.path.relpath(target, os.path.dirname(name)), name, force=force)
+
 def find(dir, **walkoptions):
     """ Given a directory, recurses into that directory,
     returning all files as absolute paths. """

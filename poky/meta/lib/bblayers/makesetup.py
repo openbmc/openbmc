@@ -6,9 +6,7 @@
 
 import logging
 import os
-import stat
 import sys
-import shutil
 
 import bb.utils
 import bb.process

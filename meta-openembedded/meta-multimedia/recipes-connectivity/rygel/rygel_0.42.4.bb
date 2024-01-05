@@ -18,7 +18,7 @@ RRECOMMENDS:${PN} = "rygel-plugin-media-export"
 inherit gnomebase features_check vala gobject-introspection gettext systemd
 
 # gobject-introspection is mandatory for libmediaart-2.0 and cannot be configured
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data x11"
 
 SRC_URI[archive.sha256sum] = "6310dfaa2d332b66119b9b020fad6a4bd27d9bc61faf780ca5ca0b62813303f7"
 
@@ -37,7 +37,7 @@ PACKAGECONFIG[media-export] = ""
 PACKAGECONFIG[gst-launch] = ""
 PACKAGECONFIG[lms] = ""
 PACKAGECONFIG[tracker3] = ""
-PACKAGECONFIG[gtk+3] = ",-Dgtk=false,gtk+3"
+PACKAGECONFIG[gtk+3] = ",-Dgtk=disabled,gtk+3"
 
 RYGEL_PLUGINS = ""
 RYGEL_PLUGINS:append ="${@bb.utils.contains('PACKAGECONFIG', 'external', ',external', '', d)}"

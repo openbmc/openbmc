@@ -1,4 +1,4 @@
-From 7f7e00ce582d72013cb54278548d3320e032b0dc Mon Sep 17 00:00:00 2001
+From eae0a65a9d6c9df20d05b4208aee23656915480b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Feb 2022 13:32:32 -0800
 Subject: [PATCH] open-vm-tools: Correct include path for poll.h
@@ -13,13 +13,14 @@ Fixes
 | 1 error generated.
 
 Upstream-Status: Pending
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  open-vm-tools/services/plugins/gdp/gdpPlugin.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/open-vm-tools/services/plugins/gdp/gdpPlugin.c b/open-vm-tools/services/plugins/gdp/gdpPlugin.c
-index 2bba2937e..025339595 100644
+index 96e6d717b..0b8a583b8 100644
 --- a/open-vm-tools/services/plugins/gdp/gdpPlugin.c
 +++ b/open-vm-tools/services/plugins/gdp/gdpPlugin.c
 @@ -32,7 +32,7 @@

@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import os
 from django.urls import reverse
 from django.utils import timezone
 
@@ -21,7 +22,8 @@ class TestBuildDashboardPage(SeleniumTestCase):
     """ Tests for the build dashboard /build/X """
 
     def setUp(self):
-        bbv = BitbakeVersion.objects.create(name='bbv1', giturl='/tmp/',
+        builldir = os.environ.get('BUILDDIR', './')
+        bbv = BitbakeVersion.objects.create(name='bbv1', giturl=f'{builldir}/',
                                             branch='master', dirpath="")
         release = Release.objects.create(name='release1',
                                          bitbake_version=bbv)

@@ -186,6 +186,16 @@ class skipIfNotQemu(OETestDecorator):
             self.case.skipTest('Test only runs on qemu machines')
 
 @registerDecorator
+class skipIfNotQemuUsermode(OETestDecorator):
+    """
+    Skip test if MACHINE_FEATURES does not contain qemu-usermode
+    """
+    def setUpDecorator(self):
+        self.logger.debug("Checking if MACHINE_FEATURES does not contain qemu-usermode")
+        if 'qemu-usermode' not in self.case.td.get('MACHINE_FEATURES', '').split():
+            self.case.skipTest('Test requires qemu-usermode in MACHINE_FEATURES')
+
+@registerDecorator
 class skipIfQemu(OETestDecorator):
     """
     Skip test if MACHINE is qemu*

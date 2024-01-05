@@ -51,6 +51,7 @@ RDEPENDS:${PN} = "m4 gnu-config \
 		  perl-module-symbol \
 		  perl-module-thread-queue \
 		  perl-module-threads \
+		  perl-module-feature \
 		 "
 RDEPENDS:${PN}:class-native = "m4-native gnu-config-native hostperl-runtime-native"
 

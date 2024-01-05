@@ -1,4 +1,4 @@
-From 46f346dff73122caffe62eda84596a3a3bec859e Mon Sep 17 00:00:00 2001
+From acc4750ffa79a5c2ef3c95cf31ef51352a68837b Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Tue, 28 Feb 2023 13:43:51 +0800
 Subject: [PATCH] autogen.sh: remove '-unknown' in version
@@ -12,15 +12,16 @@ Remove the '-unknown' suffix to fix this issue.
 Upstream-Status: Submitted [https://lists.gnupg.org/pipermail/gnupg-devel/2023-February/035293.html]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
 ---
  autogen.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/autogen.sh b/autogen.sh
-index 9b36158..d5cccd2 100755
+index 4e1665b..a55326d 100755
 --- a/autogen.sh
 +++ b/autogen.sh
-@@ -266,7 +266,7 @@ if [ "$myhost" = "find-version" ]; then
+@@ -269,7 +269,7 @@ if [ "$myhost" = "find-version" ]; then
      else
        ingit=no
        beta=yes
@@ -29,6 +30,3 @@ index 9b36158..d5cccd2 100755
        rev="0000000"
        rvd="0"
      fi
--- 
-2.17.1
-

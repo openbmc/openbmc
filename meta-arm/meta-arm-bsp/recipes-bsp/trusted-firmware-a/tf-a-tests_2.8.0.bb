@@ -19,6 +19,9 @@ EXTRA_OEMAKE += "USE_NVM=0"
 EXTRA_OEMAKE += "SHELL_COLOR=1"
 EXTRA_OEMAKE += "DEBUG=1"
 
+# Modify mode based on debug or release mode
+TFTF_MODE ?= "debug"
+
 # Platform must be set for each machine
 TFA_PLATFORM ?= "invalid"
 
@@ -45,7 +48,7 @@ SYSROOT_DIRS += "/firmware"
 
 do_install() {
     install -d -m 755 ${D}/firmware
-    install -m 0644 ${B}/${TFA_PLATFORM}/debug/tftf.bin ${D}/firmware/tftf.bin
+    install -m 0644 ${B}/${TFA_PLATFORM}/${TFTF_MODE}/tftf.bin ${D}/firmware/tftf.bin
 }
 
 do_deploy() {

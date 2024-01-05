@@ -24,6 +24,16 @@ import hashserv.client
 logger = logging.getLogger('BitBake.SigGen')
 hashequiv_logger = logging.getLogger('BitBake.SigGen.HashEquiv')
 
+#find_siginfo and find_siginfo_version are set by the metadata siggen
+# The minimum version of the find_siginfo function we need
+find_siginfo_minversion = 2
+
+def check_siggen_version(siggen):
+    if not hasattr(siggen, "find_siginfo_version"):
+        bb.fatal("Siggen from metadata (OE-Core?) is too old, please update it (no version found)")
+    if siggen.find_siginfo_version < siggen.find_siginfo_minversion:
+        bb.fatal("Siggen from metadata (OE-Core?) is too old, please update it (%s vs %s)" % (siggen.find_siginfo_version, siggen.find_siginfo_minversion))
+
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set) or isinstance(obj, frozenset):

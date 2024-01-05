@@ -1,0 +1,37 @@
+From 65b0ac0d998bf0f36924a7c27ed9e702b2a5a453 Mon Sep 17 00:00:00 2001
+From: Violet Purcell <vimproved@inventati.org>
+Date: Sat, 4 Nov 2023 12:09:20 -0400
+Subject: [PATCH] elf.h: add typedefs for Elf64_Relr and Elf32_Relr
+
+These were overlooked when DT_RELR was added in commit
+d32dadd60efb9d3b255351a3b532f8e4c3dd0db1, potentially breaking
+software that treats presence of the DT_RELR macro as implying they
+exist.
+
+Upstream-Status: Backport [1.2.5]
+
+Signed-off-by: Zang Ruochen <zangruochen@loongson.cn>
+
+---
+ include/elf.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/include/elf.h b/include/elf.h
+index 23f2c4bc..72d17c3a 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -558,6 +558,11 @@ typedef struct {
+ 
+ 
+ 
++typedef Elf32_Word Elf32_Relr;
++typedef Elf64_Xword Elf64_Relr;
++
++
++
+ #define ELF32_R_SYM(val)		((val) >> 8)
+ #define ELF32_R_TYPE(val)		((val) & 0xff)
+ #define ELF32_R_INFO(sym, type)		(((sym) << 8) + ((type) & 0xff))
+-- 
+2.25.1
+

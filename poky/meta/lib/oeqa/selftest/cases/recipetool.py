@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
+import errno
 import os
 import shutil
 import tempfile
@@ -348,7 +349,6 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars['LICENSE'] = 'GPL-2.0-only'
         checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263'
         checkvars['SRC_URI'] = 'https://github.com/logrotate/logrotate/releases/download/${PV}/logrotate-${PV}.tar.xz'
-        checkvars['SRC_URI[md5sum]'] = 'a560c57fac87c45b2fc17406cdf79288'
         checkvars['SRC_URI[sha256sum]'] = '2e6a401cac9024db2288297e3be1a8ab60e7401ba8e91225218aaf4a27e82a07'
         self._test_recipe_contents(recipefile, checkvars, [])
 
@@ -406,7 +406,6 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars = {}
         checkvars['LICENSE'] = set(['LGPL-2.1-only', 'MPL-1.1-only'])
         checkvars['SRC_URI'] = 'http://taglib.github.io/releases/taglib-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = 'cee7be0ccfc892fa433d6c837df9522a'
         checkvars['SRC_URI[sha256sum]'] = 'b6d1a5a610aae6ff39d93de5efd0fdc787aa9e9dc1e7026fa4c961b26563526b'
         checkvars['DEPENDS'] = set(['boost', 'zlib'])
         inherits = ['cmake']
@@ -457,6 +456,26 @@ class RecipetoolCreateTests(RecipetoolBase):
 
     def test_recipetool_create_python3_setuptools(self):
         # Test creating python3 package from tarball (using setuptools3 class)
+        # Use the --no-pypi switch to avoid creating a pypi enabled recipe and
+        # and check the created recipe as if it was a more general tarball
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'python-magic'
+        pv = '0.4.15'
+        recipefile = os.path.join(temprecipe, '%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/84/30/80932401906eaf787f2e9bd86dc458f1d2e75b064b4c187341f29516945c/python-magic-%s.tar.gz' % pv
+        result = runCmd('recipetool create --no-pypi -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
+        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/84/30/80932401906eaf787f2e9bd86dc458f1d2e75b064b4c187341f29516945c/python-magic-${PV}.tar.gz'
+        checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
+        inherits = ['setuptools3']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_setuptools_pypi_tarball(self):
+        # Test creating python3 package from tarball (using setuptools3 and pypi classes)
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
         pn = 'python-magic'
@@ -468,10 +487,70 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars = {}
         checkvars['LICENSE'] = set(['MIT'])
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
-        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/84/30/80932401906eaf787f2e9bd86dc458f1d2e75b064b4c187341f29516945c/python-magic-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = 'e384c95a47218f66c6501cd6dd45ff59'
         checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
-        inherits = ['setuptools3']
+        checkvars['PYPI_PACKAGE'] = pn
+        inherits = ['setuptools3', 'pypi']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_setuptools_pypi(self):
+        # Test creating python3 package from pypi url (using setuptools3 and pypi classes)
+        # Intentionnaly using setuptools3 class here instead of any of the pep517 class
+        # to avoid the toml dependency and allows this test to run on host autobuilders
+        # with older version of python
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'python-magic'
+        pv = '0.4.15'
+        recipefile = os.path.join(temprecipe, '%s_%s.bb' % (pn, pv))
+        # First specify the required version in the url
+        srcuri = 'https://pypi.org/project/%s/%s' % (pn, pv)
+        runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
+        checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
+        checkvars['PYPI_PACKAGE'] = pn
+        inherits = ['setuptools3', "pypi"]
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+        # Now specify the version as a recipetool parameter
+        runCmd('rm -rf %s' % recipefile)
+        self.assertFalse(os.path.isfile(recipefile))
+        srcuri = 'https://pypi.org/project/%s' % pn
+        runCmd('recipetool create -o %s %s --version %s' % (temprecipe, srcuri, pv))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
+        checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
+        checkvars['PYPI_PACKAGE'] = pn
+        inherits = ['setuptools3', "pypi"]
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+        # Now, try to grab latest version of the package, so we cannot guess the name of the recipe,
+        # unless hardcoding the latest version but it means we will need to update the test for each release,
+        # so use a regexp
+        runCmd('rm -rf %s' % recipefile)
+        self.assertFalse(os.path.isfile(recipefile))
+        recipefile_re = r'%s_(.*)\.bb' % pn
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        dirlist = os.listdir(temprecipe)
+        if len(dirlist) > 1:
+            self.fail('recipetool created more than just one file; output:\n%s\ndirlist:\n%s' % (result.output, str(dirlist)))
+        if len(dirlist) < 1 or not os.path.isfile(os.path.join(temprecipe, dirlist[0])):
+            self.fail('recipetool did not create recipe file; output:\n%s\ndirlist:\n%s' % (result.output, str(dirlist)))
+        import re
+        match = re.match(recipefile_re, dirlist[0])
+        self.assertTrue(match)
+        latest_pv = match.group(1)
+        self.assertTrue(latest_pv != pv)
+        recipefile = os.path.join(temprecipe, '%s_%s.bb' % (pn, latest_pv))
+        # Do not check LIC_FILES_CHKSUM and SRC_URI checksum here to avoid having updating the test on each release
+        checkvars = {}
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['PYPI_PACKAGE'] = pn
+        inherits = ['setuptools3', "pypi"]
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_python3_pep517_setuptools_build_meta(self):
@@ -498,13 +577,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars['SUMMARY'] = 'A library for working with the color formats defined by HTML and CSS.'
         checkvars['LICENSE'] = set(['BSD-3-Clause'])
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=702b1ef12cf66832a88f24c8f2ee9c19'
-        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/a1/fb/f95560c6a5d4469d9c49e24cf1b5d4d21ffab5608251c6020a965fb7791c/webcolors-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = 'c9be30c5b0cf1cad32e4cbacbb2229e9'
-        checkvars['SRC_URI[sha1sum]'] = 'c90b84fb65eed9b4c9dea7f08c657bfac0e820a5'
         checkvars['SRC_URI[sha256sum]'] = 'c225b674c83fa923be93d235330ce0300373d02885cef23238813b0d5668304a'
-        checkvars['SRC_URI[sha384sum]'] = '45652af349660f19f68d01361dd5bda287789e5ea63608f52a8cea526ac04465614db2ea236103fb8456b1fcaea96ed7'
-        checkvars['SRC_URI[sha512sum]'] = '074aaf135ac6b0025b88b731d1d6dfa4c539b4fff7195658cc58a4326bb9f0449a231685d312b4a1ec48ca535a838bfa5c680787fe0e61473a2a092c448937d0'
-        inherits = ['python_setuptools_build_meta']
+        inherits = ['python_setuptools_build_meta', 'pypi']
 
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
@@ -532,13 +606,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars['SUMMARY'] = 'Simple module to parse ISO 8601 dates'
         checkvars['LICENSE'] = set(['MIT'])
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=aab31f2ef7ba214a5a341eaa47a7f367'
-        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/b9/f3/ef59cee614d5e0accf6fd0cbba025b93b272e626ca89fb70a3e9187c5d15/iso8601-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = '6e33910eba87066b3be7fcf3d59d16b5'
-        checkvars['SRC_URI[sha1sum]'] = 'efd225b2c9fa7d9e4a1ec6ad94f3295cee982e61'
         checkvars['SRC_URI[sha256sum]'] = '6b1d3829ee8921c4301998c909f7829fa9ed3cbdac0d3b16af2d743aed1ba8df'
-        checkvars['SRC_URI[sha384sum]'] = '255002433fe65c19adfd6b91494271b613cb25ef6a35ac77436de1e03d60cc07bf89fd716451b917f1435e4384860ef6'
-        checkvars['SRC_URI[sha512sum]'] = 'db57ab2a25ef91e3bc479c8539d27e853cf1fbf60986820b8999ae15d7e566425a1e0cfba47d0f3b23aa703db0576db368e6c110ba2a2f46c9a34e8ee3611fb7'
-        inherits = ['python_poetry_core']
+        inherits = ['python_poetry_core', 'pypi']
 
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
@@ -566,13 +635,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars['SUMMARY'] = 'Backported and Experimental Type Hints for Python 3.8+'
         checkvars['LICENSE'] = set(['PSF-2.0'])
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=fcf6b249c2641540219a727f35d8d2c2'
-        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/1f/7a/8b94bb016069caa12fc9f587b28080ac33b4fbb8ca369b98bc0a4828543e/typing_extensions-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = '74bafe841fbd1c27324afdeb099babdf'
-        checkvars['SRC_URI[sha1sum]'] = 'f8bed69cbad4a57a1a67bf8a31b62b657b47f7a3'
         checkvars['SRC_URI[sha256sum]'] = 'df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef'
-        checkvars['SRC_URI[sha384sum]'] = '0bd0112234134d965c6884f3c1f95d27b6ae49cfb08108101158e31dff33c2dce729331628b69818850f1acb68f6c8d0'
-        checkvars['SRC_URI[sha512sum]'] = '5fbff10e085fbf3ac2e35d08d913608d8c8bca66903435ede91cdc7776d775689a53d64f5f0615fe687c6c228ac854c8651d99eb1cb96ec61c56b7ca01fdd440'
-        inherits = ['python_flit_core']
+        inherits = ['python_flit_core', 'pypi']
 
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
@@ -601,13 +665,37 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars['HOMEPAGE'] = 'https://github.com/python-jsonschema/jsonschema'
         checkvars['LICENSE'] = set(['MIT'])
         checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=7a60a81c146ec25599a3e1dabb8610a8 file://json/LICENSE;md5=9d4de43111d33570c8fe49b4cb0e01af'
-        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/e4/43/087b24516db11722c8687e0caf0f66c7785c0b1c51b0ab951dfde924e3f5/jsonschema-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = '4d6667ce76f820c35082c2d60a4896ab'
-        checkvars['SRC_URI[sha1sum]'] = '9173714cb88964d07f3a3f4fcaaef638b8ceac0c'
         checkvars['SRC_URI[sha256sum]'] = 'ec84cc37cfa703ef7cd4928db24f9cb31428a5d0fa77747b8b51a847458e0bbf'
-        checkvars['SRC_URI[sha384sum]'] = '7a53181f0e679aa3dc3eb4d05a420877b7b9bff2d02e81f5c289a37ed1127d6c0cca1f5a5f9e4e166f089ab36bcc2be9'
-        checkvars['SRC_URI[sha512sum]'] = '60fa769faf6e3fc2c14eb9acd189c86e9d366b157230a5681d36552af0c159cb1ad33fd920668a36afdab98bc97253f91501704c5c07b5009fdaf9d29b52060d'
-        inherits = ['python_hatchling']
+        inherits = ['python_hatchling', 'pypi']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_pep517_maturin(self):
+        # This test require python 3.11 or above for the tomllib module
+        # or tomli module to be installed
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli
+            except ImportError:
+                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+
+        # Test creating python3 package from tarball (using maturin class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'pydantic-core'
+        pv = '2.14.5'
+        recipefile = os.path.join(temprecipe, 'python3-%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/64/26/cffb93fe9c6b5a91c497f37fae14a4b073ecbc47fc36a9979c7aa888b245/pydantic_core-%s.tar.gz' % pv
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['HOMEPAGE'] = 'https://github.com/pydantic/pydantic-core'
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=ab599c188b4a314d2856b3a55030c75c'
+        checkvars['SRC_URI[sha256sum]'] = '6d30226dfc816dd0fdf120cae611dd2215117e4f9b124af8c60ab9093b6e8e71'
+        inherits = ['python_maturin', 'pypi']
 
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
@@ -853,14 +941,22 @@ class RecipetoolTests(RecipetoolBase):
         self._test_recipe_contents(deps_require_file, checkvars, [])
 
 
-        
+
     def _copy_file_with_cleanup(self, srcfile, basedstdir, *paths):
         dstdir = basedstdir
         self.assertTrue(os.path.exists(dstdir))
         for p in paths:
             dstdir = os.path.join(dstdir, p)
             if not os.path.exists(dstdir):
-                os.makedirs(dstdir)
+                try:
+                    os.makedirs(dstdir)
+                except PermissionError:
+                    return False
+                except OSError as e:
+                    if e.errno == errno.EROFS:
+                        return False
+                    else:
+                        raise e
                 if p == "lib":
                     # Can race with other tests
                     self.add_command_to_tearDown('rmdir --ignore-fail-on-non-empty %s' % dstdir)
@@ -868,8 +964,12 @@ class RecipetoolTests(RecipetoolBase):
                     self.track_for_cleanup(dstdir)
         dstfile = os.path.join(dstdir, os.path.basename(srcfile))
         if srcfile != dstfile:
-            shutil.copy(srcfile, dstfile)
+            try:
+                shutil.copy(srcfile, dstfile)
+            except PermissionError:
+                return False
             self.track_for_cleanup(dstfile)
+        return True
 
     def test_recipetool_load_plugin(self):
         """Test that recipetool loads only the first found plugin in BBPATH."""
@@ -883,15 +983,17 @@ class RecipetoolTests(RecipetoolBase):
             plugincontent = fh.readlines()
         try:
             self.assertIn('meta-selftest', srcfile, 'wrong bbpath plugin found')
-            for path in searchpath:
-                self._copy_file_with_cleanup(srcfile, path, 'lib', 'recipetool')
+            searchpath = [
+                path for path in searchpath
+                if self._copy_file_with_cleanup(srcfile, path, 'lib', 'recipetool')
+            ]
             result = runCmd("recipetool --quiet count")
             self.assertEqual(result.output, '1')
             result = runCmd("recipetool --quiet multiloaded")
             self.assertEqual(result.output, "no")
             for path in searchpath:
                 result = runCmd("recipetool --quiet bbdir")
-                self.assertEqual(result.output, path)
+                self.assertEqual(os.path.realpath(result.output), os.path.realpath(path))
                 os.unlink(os.path.join(result.output, 'lib', 'recipetool', 'bbpath.py'))
         finally:
             with open(srcfile, 'w') as fh:
@@ -1054,9 +1156,9 @@ class RecipetoolAppendsrcBase(RecipetoolBase):
         for uri in src_uri:
             p = urllib.parse.urlparse(uri)
             if p.scheme == 'file':
-                return p.netloc + p.path
+                return p.netloc + p.path, uri
 
-    def _test_appendsrcfile(self, testrecipe, filename=None, destdir=None, has_src_uri=True, srcdir=None, newfile=None, options=''):
+    def _test_appendsrcfile(self, testrecipe, filename=None, destdir=None, has_src_uri=True, srcdir=None, newfile=None, remove=None, machine=None , options=''):
         if newfile is None:
             newfile = self.testfile
 
@@ -1083,12 +1185,40 @@ class RecipetoolAppendsrcBase(RecipetoolBase):
 
         expectedlines = ['FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n',
                          '\n']
+
+        override = ""
+        if machine:
+            options += ' -m %s' % machine
+            override = ':append:%s' % machine
+            expectedlines.extend(['PACKAGE_ARCH = "${MACHINE_ARCH}"\n',
+                                  '\n'])
+
+        if remove:
+            for entry in remove:
+                if machine:
+                    entry_remove_line = 'SRC_URI:remove:%s = " %s"\n' % (machine, entry)
+                else:
+                    entry_remove_line = 'SRC_URI:remove = "%s"\n' % entry
+
+                expectedlines.extend([entry_remove_line,
+                                       '\n'])
+
         if has_src_uri:
             uri = 'file://%s' % filename
             if expected_subdir:
                 uri += ';subdir=%s' % expected_subdir
-            expectedlines[0:0] = ['SRC_URI += "%s"\n' % uri,
-                                  '\n']
+            if machine:
+                src_uri_line = 'SRC_URI%s = " %s"\n' % (override, uri)
+            else:
+                src_uri_line = 'SRC_URI += "%s"\n' % uri
+
+            expectedlines.extend([src_uri_line, '\n'])
+
+        with open("/tmp/tmp.txt", "w") as file:
+            print(expectedlines, file=file)
+
+        if machine:
+            filename = '%s/%s' % (machine, filename)
 
         return self._try_recipetool_appendsrcfile(testrecipe, newfile, destpath, options, expectedlines, [filename])
 
@@ -1143,18 +1273,46 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
 
     def test_recipetool_appendsrcfile_existing_in_src_uri(self):
         testrecipe = 'base-files'
-        filepath = self._get_first_file_uri(testrecipe)
+        filepath,_  = self._get_first_file_uri(testrecipe)
         self.assertTrue(filepath, 'Unable to test, no file:// uri found in SRC_URI for %s' % testrecipe)
         self._test_appendsrcfile(testrecipe, filepath, has_src_uri=False)
 
-    def test_recipetool_appendsrcfile_existing_in_src_uri_diff_params(self):
+    def test_recipetool_appendsrcfile_existing_in_src_uri_diff_params(self, machine=None):
         testrecipe = 'base-files'
         subdir = 'tmp'
-        filepath = self._get_first_file_uri(testrecipe)
+        filepath, srcuri_entry = self._get_first_file_uri(testrecipe)
         self.assertTrue(filepath, 'Unable to test, no file:// uri found in SRC_URI for %s' % testrecipe)
 
-        output = self._test_appendsrcfile(testrecipe, filepath, subdir, has_src_uri=False)
-        self.assertTrue(any('with different parameters' in l for l in output))
+        self._test_appendsrcfile(testrecipe, filepath, subdir, machine=machine, remove=[srcuri_entry])
+
+    def test_recipetool_appendsrcfile_machine(self):
+        # A very basic test
+        self._test_appendsrcfile('base-files', 'a-file', machine='mymachine')
+
+        # Force cleaning the output of previous test
+        self.tearDownLocal()
+
+        # A more complex test: existing entry in src_uri with different param
+        self.test_recipetool_appendsrcfile_existing_in_src_uri_diff_params(machine='mymachine')
+
+    def test_recipetool_appendsrcfile_update_recipe_basic(self):
+        testrecipe = "mtd-utils-selftest"
+        recipefile = get_bb_var('FILE', testrecipe)
+        self.assertIn('meta-selftest', recipefile, 'This test expect %s recipe to be in meta-selftest')
+        cmd = 'recipetool appendsrcfile -W -u meta-selftest %s %s' % (testrecipe, self.testfile)
+        result = runCmd(cmd)
+        self.assertNotIn('Traceback', result.output)
+        self.add_command_to_tearDown('cd %s; rm -f %s/%s; git checkout .' % (os.path.dirname(recipefile), testrecipe, os.path.basename(self.testfile)))
+
+        expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
+                           ('??', '.*/%s/%s$' % (testrecipe, os.path.basename(self.testfile)))]
+        self._check_repo_status(os.path.dirname(recipefile), expected_status)
+        result = runCmd('git diff %s' % os.path.basename(recipefile), cwd=os.path.dirname(recipefile))
+        removelines = []
+        addlines = [
+            'file://%s \\\\' % os.path.basename(self.testfile),
+        ]
+        self._check_diff(result.output, addlines, removelines)
 
     def test_recipetool_appendsrcfile_replace_file_srcdir(self):
         testrecipe = 'bash'

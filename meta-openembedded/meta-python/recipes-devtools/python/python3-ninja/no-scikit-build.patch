@@ -8,11 +8,11 @@ diff --git a/pyproject.toml b/pyproject.toml
 index b895c20..577b642 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -1,7 +1,6 @@
- [build-system]
+@@ -2,7 +2,6 @@
  requires = [
-     "setuptools>=42",
--    "scikit-build>=0.12",
+     "setuptools >=42",
+     "setuptools-scm[toml]",
+-    "scikit-build",
  ]
  build-backend = "setuptools.build_meta"
  

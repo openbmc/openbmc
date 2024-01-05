@@ -8,6 +8,7 @@
 #
 
 from datetime import datetime
+import os
 
 from django.urls import reverse
 from django.utils import timezone
@@ -59,7 +60,8 @@ class TestToasterTableUI(SeleniumTestCase):
         later = now + timezone.timedelta(hours=1)
         even_later = later + timezone.timedelta(hours=1)
 
-        bbv = BitbakeVersion.objects.create(name='test bbv', giturl='/tmp/',
+        builldir = os.environ.get('BUILDDIR', './')
+        bbv = BitbakeVersion.objects.create(name='test bbv', giturl=f'{builldir}/',
                                             branch='master', dirpath='')
         release = Release.objects.create(name='test release',
                                          branch_name='master',

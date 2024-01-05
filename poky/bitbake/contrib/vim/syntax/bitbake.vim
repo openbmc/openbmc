@@ -63,13 +63,14 @@ syn region bbVarFlagFlag        matchgroup=bbArrayBrackets start="\[" end="\]\s*
 
 " Includes and requires
 syn keyword bbInclude           inherit include require contained 
-syn match bbIncludeRest         ".*$" contained contains=bbString,bbVarDeref
+syn match bbIncludeRest         ".*$" contained contains=bbString,bbVarDeref,bbVarPyValue
 syn match bbIncludeLine         "^\(inherit\|include\|require\)\s\+" contains=bbInclude nextgroup=bbIncludeRest
 
 " Add taks and similar
 syn keyword bbStatement         addtask deltask addhandler after before EXPORT_FUNCTIONS contained
-syn match bbStatementRest       ".*$" skipwhite contained contains=bbStatement
-syn match bbStatementLine       "^\(addtask\|deltask\|addhandler\|after\|before\|EXPORT_FUNCTIONS\)\s\+" contains=bbStatement nextgroup=bbStatementRest
+syn match bbStatementRest       /[^\\]*$/ skipwhite contained contains=bbStatement,bbVarDeref,bbVarPyValue
+syn region bbStatementRestCont  start=/.*\\$/ end=/^[^\\]*$/ contained contains=bbStatement,bbVarDeref,bbVarPyValue,bbContinue keepend
+syn match bbStatementLine       "^\(addtask\|deltask\|addhandler\|after\|before\|EXPORT_FUNCTIONS\)\s\+" contains=bbStatement nextgroup=bbStatementRest,bbStatementRestCont
 
 " OE Important Functions
 syn keyword bbOEFunctions       do_fetch do_unpack do_patch do_configure do_compile do_stage do_install do_package contained
@@ -122,6 +123,7 @@ hi def link bbPyFlag            Type
 hi def link bbPyDef             Statement
 hi def link bbStatement         Statement
 hi def link bbStatementRest     Identifier
+hi def link bbStatementRestCont Identifier
 hi def link bbOEFunctions       Special
 hi def link bbVarPyValue        PreProc
 hi def link bbOverrideOperator  Operator

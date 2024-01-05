@@ -1,4 +1,4 @@
-From 39a59ab7efe98c880c783b2ccf43e5a137d2b222 Mon Sep 17 00:00:00 2001
+From a8ef33b0623ba3494594a040ff5c77771168fdd6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 27 Aug 2018 23:22:21 -0700
 Subject: [PATCH] Use off64_t instead of __off64_t
@@ -7,6 +7,7 @@ Fixes
 unknown type name '__off64_t'
 
 Upstream-Status: Pending
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  open-vm-tools/lib/file/fileIOPosix.c | 4 ++--

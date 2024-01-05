@@ -18,7 +18,7 @@ for more information.
 Prerequisites
 -------------
 
-This guide assumes that your host PC is running Ubuntu 20.04 LTS, with at least
+This guide assumes that your host machine is running Ubuntu 20.04 LTS, with at least
 32GB of free disk space and 16GB of RAM as minimum requirement.
 
 The following prerequisites must be available on the host system:
@@ -435,7 +435,7 @@ running the ACS tests.
      dd conv=notrunc if=openSUSE-Tumbleweed-ARM-JeOS-efi.aarch64-<date>-Snapshot<date>.raw skip=<blockaddress_1st_partition> of=corstone1000-efi-partition.img seek=<blockaddress_1st_partition> iflag=fullblock seek=<blockaddress_1st_partition> bs=512 count=<sectorsize_1s_partition> && sync
 
 
-#. Use the provided disk-layout below to label the ESP correctly.
+#. Create the file efi_disk.layout locally. Copy the content of provided disk layout below to the efi_disk.layout to label the ESP correctly.
 
    efi_disk.layout
    ::
@@ -470,7 +470,10 @@ running the ACS tests.
 **Using ESP in FPGA:**
 
 Once the ESP is created, it needs to be flashed to a second USB drive different than ACS image.
-This can be done with the development machine.
+This can be done with the development machine. In the given example here
+we assume the USB device is ``/dev/sdb`` (the user should use ``lsblk`` command to
+confirm). Be cautious here and don't confuse your host machine own hard drive with the
+USB drive. Run the following commands to prepare the ACS image in USB stick:
 
 ::
 
@@ -560,7 +563,7 @@ BOOT partition contains the following:
     └── ramdisk-busybox.img
 
 RESULT partition is used to store the test results.
-**NOTE**: PLEASE MAKE SURE THAT THE RESULT PARTITION IS EMPTY BEFORE YOU START THE TESTING. OTHERWISE THE TEST RESULTS
+**NOTE**: PLEASE MAKE SURE THAT "acs_results" FOLDER UNDER THE RESULT PARTITION IS EMPTY BEFORE YOU START THE TESTING. OTHERWISE THE TEST RESULTS
 WILL NOT BE CONSISTENT
 
 FPGA instructions for ACS image
@@ -589,7 +592,7 @@ SystemReady release in this repository.
 
 Then, the user should prepare a USB stick with ACS image. In the given example here,
 we assume the USB device is ``/dev/sdb`` (the user should use ``lsblk`` command to
-confirm). Be cautious here and don't confuse your host PC's own hard drive with the
+confirm). Be cautious here and don't confuse your host machine own hard drive with the
 USB drive. Run the following commands to prepare the ACS image in USB stick:
 
 ::
@@ -603,6 +606,11 @@ ensure that both USB sticks (ESP and ACS image) are connected to the board,
 and then boot the board.
 
 The FPGA will reset multiple times during the test, and it might take approx. 24-36 hours to finish the test.
+
+**NOTE**: The USB stick which contains the ESP partition might cause grub to
+unable to find the bootable partition (only in the FPGA). If that's the case, please
+remove the USB stick and run the ACS tests. ESP partition can be mounted after
+the platform is booted to linux at the end of the ACS tests.
 
 
 FVP instructions for ACS image and run
@@ -639,6 +647,20 @@ the test. At the end of test, the FVP host terminal will halt showing a shell pr
 Once test is finished, the FVP can be stoped, and result can be copied following above
 instructions.
 
+**NOTE:** A rare issue has been noticed (5-6% occurence) during which the FVP hangs during booting the system while running ACS tests.
+If this happens, please apply the following patch, rebuild the software stack for FVP and re-run the ACS tests.
+
+::
+
+  cd <_workspace>
+  git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git -b CORSTONE1000-2023.11
+  cp -f systemready-patch/embedded-a/corstone1000/sr_ir_workaround/0001-embedded-a-corstone1000-sr-ir-workaround.patch meta-arm
+  cd meta-arm
+  git am 0001-embedded-a-corstone1000-sr-ir-workaround.patch
+  cd ..
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; corstone1000-image -c cleanall; bitbake corstone1000-image"
+
+
 Common to FVP and FPGA
 ======================
 
@@ -657,7 +679,7 @@ The results can be fetched from the ``acs_results`` folder in the RESULT partiti
 Manual capsule update and ESRT checks
 -------------------------------------
 
-The following section describes running manual capsule update with the ``direct`` method.
+The following section describes running manual capsule update.
 
 The steps described in this section perform manual capsule update and show how to use the ESRT feature
 to retrieve the installed capsule details.
@@ -680,6 +702,13 @@ Download u-boot under <_workspace> and install tools:
   git checkout 83aa0ed1e93e1ffac24888d98d37a5b04ed3fb07
   make tools-only_defconfig
   make tools-only
+
+**NOTE:** The following error could happen if the linux build system does not have "libgnutls28-dev".
+ **error: "tools/mkeficapsule.c:21:10: fatal error: gnutls/gnutls.h: No such file or directory"**. If that's the case please install libgnutls28-dev and its dependencies by using the following command.
+
+::
+
+  sudo apt-get install -y libgnutls28-dev
 
 Download systemready-patch repo under <_workspace>:
 ::
@@ -788,20 +817,7 @@ Then, unmount the IR image:
 
    sudo umount /mnt/test
 
-**NOTE:**
-
-The size of first partition in the image file is calculated in the following way. The data is
-just an example and might vary with different ir-acs-live-image-generic-arm64.wic files.
-
-::
-
-   fdisk -lu <path-to-img>/ir-acs-live-image-generic-arm64.wic
-   ->  Device                                                     Start     End Sectors  Size Type
-       <path-to-img>/ir-acs-live-image-generic-arm64.wic1    2048  206847  204800   100M Microsoft basic data
-       <path-to-img>/ir-acs-live-image-generic-arm64.wic2  206848 1024239  817392 399.1M Linux filesystem
-       <path-to-img>/ir-acs-live-image-generic-arm64.wic3 1026048 1128447  102400    50M Microsoft basic data
-
-   ->  <offset_1st_partition> = 2048 * 512 (sector size) = 1048576
+**NOTE:** Please refer to `FVP instructions for ACS image and run`_ section to find the first partition offset.
 
 ******************************
 Performing the capsule update
@@ -819,10 +835,7 @@ Run the FVP with the IR prebuilt image:
 
    <_workspace>/meta-arm/scripts/runfvp --terminals=xterm <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic
 
-**NOTE:**
-
-<path-to-img> must start from the root directory.
-make sure there are no spaces before or after of "=". board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic.
+**NOTE:** <path-to-img> must start from the root directory. make sure there are no spaces before or after of "=". board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic.
 
 Running the FPGA with the IR prebuilt image
 ===========================================
@@ -1060,6 +1073,15 @@ documentation.
 
 On FPGA, please update the cs1000.bin on the SD card with the newly generated wic file.
 
+**NOTE:** Skip the shim patch only applies to Debian installation. The user should remove the patch from meta-arm before running the software to boot OpenSUSE or executing any other tests in this user guide. You can make sure of removing the skip the shim patch by executing the steps below.
+
+::
+
+  cd <_workspace>/meta-arm
+  git reset --hard HEAD~1
+  cd ..
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; corstone1000-image -c cleanall; bitbake corstone1000-image"
+
 *************************************************
 Preparing the Installation Media
 *************************************************
@@ -1084,7 +1106,7 @@ This can be done with your development machine.
 In the example given below, we assume the USB device is ``/dev/sdb`` (the user
 should use the `lsblk` command to confirm).
 
-**NOTE:** Please don't confuse your host PC's own hard drive with the USB drive.
+**NOTE:** Please don't confuse your host machine own hard drive with the USB drive.
 Then, copy the contents of the iso file into the first USB stick by running the
 following command in the development machine:
 
@@ -1100,6 +1122,7 @@ To test Linux distro install and boot on FVP, the user should prepare an mmc ima
 With a minimum size of 8GB formatted with gpt.
 
 ::
+
   #Generating mmc2
   dd if=/dev/zero of=<_workspace>/mmc2_file.img bs=1 count=0 seek=8G; sync;
   parted -s mmc2_file.img mklabel gpt
@@ -1147,7 +1170,7 @@ As the installation process for Debian is different than the one for openSUSE,
 Debian may need some extra steps, that are indicated below:
 
 During Debian installation, please answer the following question:
- - "Force GRUB installation to the EFI removable media path?" Yes
+ - "Force grub installation to the EFI removable media path?" Yes
  - "Update NVRAM variables to automatically boot into Debian?" No
 
 If the grub installation fails, these are the steps to follow on the subsequent
@@ -1198,7 +1221,7 @@ and run this command to boot into the installed OS:
   <_workspace>/meta-arm/scripts/runfvp --terminals=xterm <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file="<_workspace>/mmc2_file.img"
 
 
-Once the FVP begins booting, you will need to quickly change the boot option in GRUB,
+Once the FVP begins booting, you will need to quickly change the boot option in grub,
 to boot into recovery mode. 
 
 **NOTE:** This option will disappear quickly, so it's best to preempt it.
@@ -1212,10 +1235,20 @@ Proceed to edit the following files accordingly:
 
 ::
 
-  vi /etc/systemd/system.conf #Only applicable to Debian
+  #Only applicable to Debian
+  vi /etc/systemd/system.conf
   DefaultDeviceTimeoutSec=infinity
-  vi /usr/lib/systemd/system.conf # Only applicable to openSUSE
+
+::
+
+  #Only applicable to openSUSE
+  vi /usr/lib/systemd/system.conf
   DefaultDeviceTimeoutSec=infinity
+
+  The system.conf has been moved from /etc/systemd/ to /usr/lib/systemd/ and directly modifying
+  the /usr/lib/systemd/system.conf is not working and it is getting overridden. We have to create
+  drop ins system configurations in /etc/systemd/system.conf.d/ directory. So, copy the 
+  /usr/lib/systemd/system.conf to /etc/systemd/system.conf.d/ directory after the mentioned modifications.
 
 The file to be edited next is different depending on the installed distro:
 
@@ -1242,6 +1275,8 @@ The user should see a login prompt after booting, for example, for debian:
 Login with the username root and its corresponding password (already set at
 installation time).
 
+**NOTE:** Debian/OpenSUSE Timeouts are not applicable for all systems. Some systems are faster than the others (especially when running the FVP) and works well with default timeouts. If the system boots to Debian or OpenSUSE unmodified, the user can skip this section.
+
 PSA API tests
 -------------
 
@@ -1261,7 +1296,7 @@ First, load FF-A TEE kernel module:
 
 ::
 
-  insmod /lib/modules/*-yocto-standard/extra/arm-ffa-tee.ko
+  insmod /lib/modules/*-yocto-standard/updates/arm-ffa-tee.ko
 
 Then, check whether the FF-A TEE driver is loaded correctly by using the following command:
 
@@ -1273,7 +1308,7 @@ The output should be:
 
 ::
 
-   arm_ffa_tee 16384 - - Live 0xffffffc000510000 (O)
+   arm_ffa_tee <ID> - - Live <address> (O)
 
 Now, run the PSA API tests in the following order:
 

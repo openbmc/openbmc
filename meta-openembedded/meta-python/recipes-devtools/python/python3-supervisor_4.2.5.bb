@@ -17,7 +17,6 @@ RDEPENDS:${PN} = "\
     python3-xmlrpc \
     python3-resource \
     python3-setuptools \
-    python3-smtpd \
 "
 
 SRC_URI += "file://supervisord.conf \

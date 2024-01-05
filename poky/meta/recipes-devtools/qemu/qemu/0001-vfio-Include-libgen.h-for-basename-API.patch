@@ -1,0 +1,57 @@
+From e31c67ef65a4217f35f6cd40926251054094dff9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 11 Dec 2023 16:44:16 -0800
+Subject: [PATCH v2] vfio: Include libgen.h for basename API
+
+Glibc has two implementation one based on POSIX which is used when
+libgen.h is included and second implementation is GNU implementation
+which is used when string.h is included. The functions are no identical
+in behavior. Musl C library does not implement the GNU version, but it
+has provided a declaration in string.h but this has been corrected in
+latest musl [1] which exposes places where it was being used from
+string.h to error out especially when -Wimplicit-function-declaration is
+treated as error.
+
+| ../qemu-8.1.2/hw/vfio/pci.c:3030:18: error: call to undeclared function 'basename'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+|  3030 |     group_name = basename(group_path);
+
+clang-17 treats this warning as error by default
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://lists.nongnu.org/archive/html/qemu-devel/2023-12/msg01438.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+v2: Add missing link for [1]
+
+ hw/vfio/pci.c      | 1 +
+ hw/vfio/platform.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c62c02f7b6..f043c93b9e 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include <libgen.h>
+ #include <linux/vfio.h>
+ #include <sys/ioctl.h>
+ 
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 8e3d4ac458..a835ab03be 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -16,6 +16,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include <libgen.h>
+ #include <sys/ioctl.h>
+ #include <linux/vfio.h>
+ 
+-- 
+2.43.0
+

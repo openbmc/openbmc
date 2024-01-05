@@ -79,7 +79,7 @@ DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
 
         config = """
 IMAGE_INSTALL:append = " overlayfs-user"
-DISTRO_FEATURES += "systemd overlayfs usrmerge"
+DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
 OVERLAYFS_QA_SKIP[mnt-overlay] = "mount-configured"
 """
 

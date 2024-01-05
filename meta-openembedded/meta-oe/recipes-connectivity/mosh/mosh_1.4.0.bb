@@ -46,3 +46,5 @@ RDEPENDS:${PN}-server += "openssh-sshd"
 #| {standard input}:2103: Error: instruction not supported in Thumb16 mode -- `adcs r7,r7,r7'
 #| {standard input}:2104: Error: selected processor does not support Thumb mode `it cs'
 ARM_INSTRUCTION_SET = "arm"
+
+CXXFLAGS:append = " -std=c++17"

@@ -32,6 +32,7 @@ class TestSample(SeleniumTestCase):
         """ Test that a message is shown when there are no builds """
         url = reverse('all-builds')
         self.get(url)
+        self.wait_until_visible('#empty-state-allbuildstable')  # wait for the empty state div to appear
         div_msg = self.find('#empty-state-allbuildstable .alert-info')
 
         msg = 'Sorry - no data found'

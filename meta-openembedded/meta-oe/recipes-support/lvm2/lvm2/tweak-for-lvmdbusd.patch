@@ -1,0 +1,55 @@
+Not check python modules pyudev and dbus during configure that they are runtime
+dependencies. Deal with them in the package config setting in the recipe.
+
+Remove $(DESTDIR) from install destination that it is not suitable for oe. And
+no generate python cache files too.
+
+Upstream-Status: Pending [oe specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ configure.ac                 | 4 ++--
+ daemons/lvmdbusd/Makefile.in | 6 ++----
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ee088b3f5..b94ef4e56 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1262,8 +1262,8 @@ AS_IF([test "$BUILD_LVMDBUSD" = "yes"], [
+ 	AS_IF([test "$PYTHON3_BINDINGS" = "yes"], [PYTHON_BINDINGS="yes"])
+ 
+ 	# To get this macro, install autoconf-archive package then run autoreconf
+-	AX_PYTHON_MODULE([pyudev], [Required], python3)
+-	AX_PYTHON_MODULE([dbus], [Required], python3)
++	# AX_PYTHON_MODULE([pyudev], [Required], python3)
++	# AX_PYTHON_MODULE([dbus], [Required], python3)
+ ])
+ 
+ ################################################################################
+diff --git a/daemons/lvmdbusd/Makefile.in b/daemons/lvmdbusd/Makefile.in
+index 9c2629279..a79daabf7 100644
+--- a/daemons/lvmdbusd/Makefile.in
++++ b/daemons/lvmdbusd/Makefile.in
+@@ -16,7 +16,7 @@ top_srcdir = @top_srcdir@
+ top_builddir = @top_builddir@
+ 
+ lvmdbuspydir = $(python3dir)/lvmdbusd
+-lvmdbusdir = $(DESTDIR)$(lvmdbuspydir)
++lvmdbusdir = $(lvmdbuspydir)
+ 
+ LVMDBUS_SRCDIR_FILES = \
+ 	automatedproperties.py \
+@@ -55,11 +55,9 @@ install_lvmdbusd: $(LVMDBUSD)
+ 	@echo "    [INSTALL] $<"
+ 	$(Q) $(INSTALL_DIR) $(sbindir)
+ 	$(Q) $(INSTALL_SCRIPT) $(LVMDBUSD) $(sbindir)
+-	$(Q) $(INSTALL_DIR) $(lvmdbusdir) $(lvmdbusdir)/__pycache__
++	$(Q) $(INSTALL_DIR) $(lvmdbusdir)
+ 	$(Q) (cd $(srcdir); $(INSTALL_DATA) $(LVMDBUS_SRCDIR_FILES) $(lvmdbusdir))
+ 	$(Q) $(INSTALL_DATA) $(LVMDBUS_BUILDDIR_FILES) $(lvmdbusdir)
+-	$(Q) PYTHON=$(PYTHON3) $(PYCOMPILE) --destdir "$(DESTDIR)" --basedir "$(lvmdbuspydir)" $(LVMDBUS_SRCDIR_FILES) $(LVMDBUS_BUILDDIR_FILES)
+-	$(Q) $(CHMOD) 444 $(lvmdbusdir)/__pycache__/*.py[co]
+ 
+ install_lvm2: install_lvmdbusd
+ 

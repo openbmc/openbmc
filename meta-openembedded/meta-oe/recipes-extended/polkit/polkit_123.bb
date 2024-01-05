@@ -4,10 +4,10 @@ HOMEPAGE = "http://www.freedesktop.org/wiki/Software/polkit"
 LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=155db86cdbafa7532b41f390409283eb"
 
-SRC_URI = " \
-	git://gitlab.freedesktop.org/polkit/polkit.git;protocol=https;branch=master \
-	file://0001-polkit.service.in-disable-MemoryDenyWriteExecute.patch \
-"
+SRC_URI = "git://gitlab.freedesktop.org/polkit/polkit.git;protocol=https;branch=master \
+           file://0001-polkit.service.in-disable-MemoryDenyWriteExecute.patch \
+           file://0001-jsauthority-Bump-mozjs-to-115.patch \
+           "
 
 S = "${WORKDIR}/git"
 SRCREV = "fc8b07e71d99f88a29258cde99b913b44da1846d"
@@ -31,7 +31,7 @@ PACKAGECONFIG[systemd] = "-Dsession_tracking=libsystemd-login,-Dsession_tracking
 PACKAGECONFIG[consolekit] = ",,,consolekit"
 
 # Default to mozjs javascript library
-PACKAGECONFIG[mozjs] = "-Djs_engine=mozjs,,mozjs-102,,,duktape"
+PACKAGECONFIG[mozjs] = "-Djs_engine=mozjs,,mozjs-115,,,duktape"
 # duktape javascript engine is much smaller and faster but is not compatible with
 # same javascript standards as mozjs. For example array.includes() function is not
 # supported. Test rule compatibility when switching to duktape.

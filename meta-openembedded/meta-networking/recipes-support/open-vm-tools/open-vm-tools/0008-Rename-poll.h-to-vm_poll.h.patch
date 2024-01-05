@@ -1,4 +1,4 @@
-From 0c695d910b3e136e116cdbe0bfc6231dfac255a1 Mon Sep 17 00:00:00 2001
+From e86d7b309bdf5b7c6c38faeded157e220d4ccc78 Mon Sep 17 00:00:00 2001
 From: Randy MacLeod <Randy.MacLeod@windriver.com>
 Date: Wed, 24 Mar 2021 16:21:35 -0400
 Subject: [PATCH] Rename poll.h to vm_poll.h
@@ -13,12 +13,12 @@ we rename poll.h to vm_poll.h.
 
 Update for open-vm-tools-11.2.5.
 
+Upstream-Status: Pending
+
 Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 ---
-Upstream-Status: Pending
-
  open-vm-tools/lib/asyncsocket/asyncsocket.c     | 2 +-
  open-vm-tools/lib/hgfsServer/hgfsServer.c       | 2 +-
  open-vm-tools/lib/include/asyncsocket.h         | 2 +-
@@ -29,7 +29,7 @@ Upstream-Status: Pending
  rename open-vm-tools/lib/include/{poll.h => vm_poll.h} (99%)
 
 diff --git a/open-vm-tools/lib/asyncsocket/asyncsocket.c b/open-vm-tools/lib/asyncsocket/asyncsocket.c
-index b285c59c6..5c528820d 100644
+index 4f413db73..684008d34 100644
 --- a/open-vm-tools/lib/asyncsocket/asyncsocket.c
 +++ b/open-vm-tools/lib/asyncsocket/asyncsocket.c
 @@ -87,7 +87,7 @@
@@ -42,7 +42,7 @@ index b285c59c6..5c528820d 100644
  #include "err.h"
  #include "hostinfo.h"
 diff --git a/open-vm-tools/lib/hgfsServer/hgfsServer.c b/open-vm-tools/lib/hgfsServer/hgfsServer.c
-index 98f5b3f06..b436f0c7e 100644
+index c7b4cdd0f..d6e0cdc0e 100644
 --- a/open-vm-tools/lib/hgfsServer/hgfsServer.c
 +++ b/open-vm-tools/lib/hgfsServer/hgfsServer.c
 @@ -51,7 +51,7 @@
@@ -55,10 +55,10 @@ index 98f5b3f06..b436f0c7e 100644
  #include "vm_basic_asm.h"
  #include "unicodeOperations.h"
 diff --git a/open-vm-tools/lib/include/asyncsocket.h b/open-vm-tools/lib/include/asyncsocket.h
-index dad848093..b61a2561f 100644
+index 09947002e..3800f5971 100644
 --- a/open-vm-tools/lib/include/asyncsocket.h
 +++ b/open-vm-tools/lib/include/asyncsocket.h
-@@ -171,7 +171,7 @@ typedef struct AsyncSocket AsyncSocket;
+@@ -177,7 +177,7 @@ typedef struct AsyncSocket AsyncSocket;
   * Or the client can specify its favorite poll class and locking behavior.
   * Use of IVmdbPoll is only supported for regular sockets and for Attach.
   */
@@ -97,7 +97,7 @@ index ade356b9f..8759fb960 100644
  #endif
  #ifdef __ANDROID__
 diff --git a/open-vm-tools/lib/rpcIn/rpcin.c b/open-vm-tools/lib/rpcIn/rpcin.c
-index 8b1fe759d..f22fcd402 100644
+index f1709fe03..c1a5dfdba 100644
 --- a/open-vm-tools/lib/rpcIn/rpcin.c
 +++ b/open-vm-tools/lib/rpcIn/rpcin.c
 @@ -57,7 +57,7 @@

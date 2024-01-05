@@ -327,7 +327,7 @@ BitBake has determined by doing the following:
    the task. This list also includes indirect dependencies from
    variables depending on other variables, recursively::
 
-      Task dependencies: ['PV', 'SRCREV', 'SRC_URI', 'SRC_URI[md5sum]', 'SRC_URI[sha256sum]', 'base_do_fetch']
+      Task dependencies: ['PV', 'SRCREV', 'SRC_URI', 'SRC_URI[sha256sum]', 'base_do_fetch']
 
    .. note::
 
@@ -1172,6 +1172,21 @@ To support this kind of debugging, you need do the following:
 
    Consider that this will reduce the application's performance and is
    recommended only for debugging purposes.
+
+Enabling Minidebuginfo
+======================
+
+Enabling the :term:`DISTRO_FEATURES` minidebuginfo adds a compressed ELF section ``.gnu_debugdata``
+to all binary files, containing only function names, and thus increasing the size of the
+binaries only by 5 to 10%. For comparison, full debug symbols can be 10 times as big as
+a stripped binary, and it is thus not always possible to deploy full debug symbols.
+Minidebuginfo data allows, on the one side, to retrieve a call-stack using
+GDB (command backtrace) without deploying full debug symbols to the target. It also
+allows to retrieve a symbolicated call-stack when using ``systemd-coredump`` to manage
+coredumps (commands ``coredumpctl list`` and ``coredumpctl info``).
+
+This feature was created by Fedora, see https://fedoraproject.org/wiki/Features/MiniDebugInfo for
+more details.
 
 Other Debugging Tips
 ====================

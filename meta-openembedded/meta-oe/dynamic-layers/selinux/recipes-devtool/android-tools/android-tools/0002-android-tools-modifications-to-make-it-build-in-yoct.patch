@@ -88,11 +88,12 @@ diff --git a/debian/system/core/libbacktrace.mk b/debian/system/core/libbacktrac
 index e3411d76..86e69874 100644
 --- a/debian/system/core/libbacktrace.mk
 +++ b/debian/system/core/libbacktrace.mk
-@@ -1,3 +1,4 @@
+@@ -1,4 +1,4 @@
+-include /usr/share/dpkg/architecture.mk
 +include rules_yocto.mk
- include /usr/share/dpkg/architecture.mk
  
  NAME = libbacktrace
+ 
 @@ -83,10 +84,9 @@ CPPFLAGS += \
  LDFLAGS += \
    -L/usr/lib/p7zip \
@@ -218,6 +219,12 @@ diff --git a/debian/system/core/libutils.mk b/debian/system/core/libutils.mk
 index c37b1d2d..332492c1 100644
 --- a/debian/system/core/libutils.mk
 +++ b/debian/system/core/libutils.mk
+@@ -1,4 +1,4 @@
+-include /usr/share/dpkg/architecture.mk
++include rules_yocto.mk
+ 
+ NAME = libutils
+ 
 @@ -41,7 +41,7 @@ CPPFLAGS += \
  
  LDFLAGS += \

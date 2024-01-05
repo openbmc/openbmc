@@ -14,7 +14,6 @@ RDEPENDS:packagegroup-meta-oe-connectivity += "\
 
 RDEPENDS:packagegroup-meta-oe-extended += "\
     lcdproc \
-    mozjs-102 \
 "
 RDEPENDS:packagegroup-meta-oe-support += "\
     nvmetcli \

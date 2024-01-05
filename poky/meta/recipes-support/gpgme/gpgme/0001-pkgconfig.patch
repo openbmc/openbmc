@@ -1,4 +1,4 @@
-From f8221238d51066b7a1a5f2917cce2791876ea8b0 Mon Sep 17 00:00:00 2001
+From 7b3a00cb0fc27c896dd85c9afc474bd9c2aea30d Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Fri, 10 May 2019 14:23:55 +0800
 Subject: [PATCH] pkgconfig
@@ -26,10 +26,10 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index d1b9aca..9c4f97c 100644
+index ae4c7da..df892c9 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1043,6 +1043,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -1112,6 +1112,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/gpgme-glib.pc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
@@ -38,7 +38,7 @@ index d1b9aca..9c4f97c 100644
  AC_CONFIG_FILES(lang/cpp/tests/Makefile)
  AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig-w32.cmake.in)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 67805a8..d38ba02 100644
+index ca70950..bda5498 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -20,11 +20,11 @@

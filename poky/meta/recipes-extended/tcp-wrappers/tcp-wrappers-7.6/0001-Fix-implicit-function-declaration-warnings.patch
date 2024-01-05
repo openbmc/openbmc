@@ -20,11 +20,16 @@ diff --git a/hosts_access.c b/hosts_access.c
 index 0133e5e..58697ea 100644
 --- a/hosts_access.c
 +++ b/hosts_access.c
-@@ -33,6 +33,7 @@ static char sccsid[] = "@(#) hosts_access.c 1.21 97/02/12 02:13:22";
+@@ -33,6 +33,12 @@ static char sccsid[] = "@(#) hosts_access.c 1.21 97/02/12 02:13:22";
  #endif
  #include <netinet/in.h>
  #include <arpa/inet.h>
-+#include <rpcsvc/ypclnt.h>
++#ifdef USE_GETDOMAIN
++/* defined in workarounds.c */
++extern int     yp_get_default_domain(char **ptr);
++#else
++#  include <rpcsvc/ypclnt.h>
++#endif	/* USE_GETDOMAIN */
  #include <stdio.h>
  #include <stdlib.h>
  #include <syslog.h>

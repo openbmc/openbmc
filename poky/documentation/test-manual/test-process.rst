@@ -20,8 +20,8 @@ helps review and test patches and this is his testing tree).
 We have two broad categories of test builds, including "full" and
 "quick". On the Autobuilder, these can be seen as "a-quick" and
 "a-full", simply for ease of sorting in the UI. Use our Autobuilder
-console view to see where me manage most test-related items, available
-at: :yocto_ab:`/typhoon/#/console`.
+:yocto_ab:`console view </typhoon/#/console>` to see where we manage most
+test-related items.
 
 Builds are triggered manually when the test branches are ready. The
 builds are monitored by the SWAT team. For additional information, see
@@ -34,24 +34,21 @@ which the result was required.
 
 The Autobuilder does build the ``master`` branch once daily for several
 reasons, in particular, to ensure the current ``master`` branch does
-build, but also to keep ``yocto-testresults``
-(:yocto_git:`/yocto-testresults/`),
-buildhistory
-(:yocto_git:`/poky-buildhistory/`), and
-our sstate up to date. On the weekend, there is a master-next build
+build, but also to keep (:yocto_git:`yocto-testresults </yocto-testresults/>`),
+(:yocto_git:`buildhistory </poky-buildhistory/>`), and
+our sstate up to date. On the weekend, there is a ``master-next`` build
 instead to ensure the test results are updated for the less frequently
 run targets.
 
-Performance builds (buildperf-\* targets in the console) are triggered
+Performance builds (``buildperf-\*`` targets in the console) are triggered
 separately every six hours and automatically push their results to the
-buildstats repository at:
-:yocto_git:`/yocto-buildstats/`.
+:yocto_git:`buildstats </yocto-buildstats/>` repository.
 
-The 'quick' targets have been selected to be the ones which catch the
-most failures or give the most valuable data. We run 'fast' ptests in
+The "quick" targets have been selected to be the ones which catch the
+most failures or give the most valuable data. We run "fast" ptests in
 this case for example but not the ones which take a long time. The quick
-target doesn't include \*-lsb builds for all architectures, some world
-builds and doesn't trigger performance tests or ltp testing. The full
+target doesn't include ``\*-lsb`` builds for all architectures, some ``world``
+builds and doesn't trigger performance tests or ``ltp`` testing. The full
 build includes all these things and is slower but more comprehensive.
 
 Release Builds
@@ -67,12 +64,12 @@ that in :ref:`test-manual/test-process:day to day development`, in that the
 a-full target of the Autobuilder is used but in addition the form is
 configured to generate and publish artifacts and the milestone number,
 version, release candidate number and other information is entered. The
-box to "generate an email to QA"is also checked.
+box to "generate an email to QA" is also checked.
 
-When the build completes, an email is sent out using the send-qa-email
-script in the ``yocto-autobuilder-helper`` repository to the list of
-people configured for that release. Release builds are placed into a
-directory in https://autobuilder.yocto.io/pub/releases on the
+When the build completes, an email is sent out using the ``send-qa-email``
+script in the :yocto_git:`yocto-autobuilder-helper </yocto-autobuilder-helper>`
+repository to the list of people configured for that release. Release builds
+are placed into a directory in https://autobuilder.yocto.io/pub/releases on the
 Autobuilder which is included in the email. The process from here is
 more manual and control is effectively passed to release engineering.
 The next steps include:
@@ -80,14 +77,15 @@ The next steps include:
 -  QA teams respond to the email saying which tests they plan to run and
    when the results will be available.
 
--  QA teams run their tests and share their results in the yocto-
-   testresults-contrib repository, along with a summary of their
-   findings.
+-  QA teams run their tests and share their results in the
+   :yocto_git:`yocto-testresults-contrib </yocto-testresults-contrib>`
+   repository, along with a summary of their findings.
 
 -  Release engineering prepare the release as per their process.
 
 -  Test results from the QA teams are included into the release in
-   separate directories and also uploaded to the yocto-testresults
+   separate directories and also uploaded to the
+   :yocto_git:`yocto-testresults </yocto-testresults>`
    repository alongside the other test results for the given revision.
 
 -  The QA report in the final release is regenerated using resulttool to

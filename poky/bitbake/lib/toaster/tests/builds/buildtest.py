@@ -88,7 +88,7 @@ def load_build_environment():
 class BuildTest(unittest.TestCase):
 
     PROJECT_NAME = "Testbuild"
-    BUILDDIR = "/tmp/build/"
+    BUILDDIR = os.environ.get("BUILDDIR")
 
     def build(self, target):
         # So that the buildinfo helper uses the test database'
@@ -116,7 +116,7 @@ class BuildTest(unittest.TestCase):
         project = Project.objects.create_project(name=BuildTest.PROJECT_NAME,
                                                  release=release)
 
-        passthrough_variable_names = ["SSTATE_DIR", "DL_DIR"]
+        passthrough_variable_names = ["SSTATE_DIR", "DL_DIR", "SSTATE_MIRRORS", "BB_HASHSERVE", "BB_HASHSERVE_UPSTREAM"]
         for variable_name in passthrough_variable_names:
             current_variable = os.environ.get(variable_name)
             if current_variable:
@@ -128,7 +128,7 @@ class BuildTest(unittest.TestCase):
         if os.environ.get("TOASTER_TEST_USE_SSTATE_MIRROR"):
             ProjectVariable.objects.get_or_create(
                 name="SSTATE_MIRRORS",
-                value="file://.* http://sstate.yoctoproject.org/PATH;downloadfilename=PATH",
+                value="file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH",
                 project=project)
 
         ProjectTarget.objects.create(project=project,

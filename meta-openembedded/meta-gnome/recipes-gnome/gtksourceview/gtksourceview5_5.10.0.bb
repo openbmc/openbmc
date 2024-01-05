@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 DEPENDS = " \
     fribidi \
     glib-2.0-native \
-    gnome-common-native \
     fontconfig \
     gtk4 \
     libxml2 \

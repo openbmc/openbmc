@@ -1,0 +1,10 @@
+# These should be reviewed to see if they are still needed
+[drm:psb_do_init] *ERROR* Debug is
+wrong ELF class
+Could not enable PowerButton event
+probe of LNXPWRBN:00 failed with error -22
+pmd_set_huge: Cannot satisfy
+failed to setup card detect gpio
+amd_nb: Cannot enumerate AMD northbridges
+failed to retrieve link info, disabling eDP
+Direct firmware load for iwlwifi

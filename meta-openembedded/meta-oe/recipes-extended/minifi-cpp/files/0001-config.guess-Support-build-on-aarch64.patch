@@ -1,0 +1,31 @@
+From 92fdbfdd6b55ff0b65edd9a283ac85ad349e325b Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 12 Dec 2023 07:27:52 +0000
+Subject: [PATCH] config.guess: Fix do_configure error builder aarch64
+
+Fixed configure error when build on aarch64 host:
+error: cannot guess build type; you must specify one
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ config.guess      |   2 +-
+ 1 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/thirdparty/uuid-1.6.2/config.guess b/thirdparty/uuid-1.6.2/config.guess
+index ca2a03c..a858bfd 100755
+--- a/thirdparty/uuid-1.6.2/config.guess
++++ b/thirdparty/uuid-1.6.2/config.guess
+@@ -835,7 +835,7 @@ EOF
+     i*86:Minix:*:*)
+ 	echo ${UNAME_MACHINE}-pc-minix
+ 	exit ;;
+-    arm*:Linux:*:*)
++    arm*:Linux:*:*|aarch64:Linux:*:*)
+ 	eval $set_cc_for_build
+ 	if echo __ARM_EABI__ | $CC_FOR_BUILD -E - 2>/dev/null \
+ 	    | grep -q __ARM_EABI__
+-- 
+2.34.1
+

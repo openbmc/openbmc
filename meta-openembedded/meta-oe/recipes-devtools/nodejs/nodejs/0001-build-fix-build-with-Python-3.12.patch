@@ -1,0 +1,55 @@
+From 656f6c91f1da7f1e1ffb01e2de7d9026a84958b5 Mon Sep 17 00:00:00 2001
+From: Luigi Pinca <luigipinca@gmail.com>
+Date: Wed, 8 Nov 2023 21:20:53 +0100
+Subject: [PATCH] build: fix build with Python 3.12
+
+Replace `distutils.version.StrictVersion` with
+`packaging.version.Version`.
+
+Refs: https://github.com/nodejs/node/pull/50209#issuecomment-1795852539
+PR-URL: https://github.com/nodejs/node/pull/50582
+Reviewed-By: Richard Lau <rlau@redhat.com>
+Reviewed-By: Chengzhong Wu <legendecas@gmail.com>
+
+Upstream-Status: Backport [https://github.com/nodejs/node/commit/95534ad82f4e33f53fd50efe633d43f8da70cba6]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ configure.py | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/configure.py b/configure.py
+index 62f041ce..18fe7c14 100755
+--- a/configure.py
++++ b/configure.py
+@@ -14,8 +14,6 @@ import bz2
+ import io
+ from pathlib import Path
+ 
+-from distutils.version import StrictVersion
+-
+ # If not run from node/, cd to node/.
+ os.chdir(Path(__file__).parent)
+ 
+@@ -30,6 +28,7 @@ tools_path = Path('tools')
+ 
+ sys.path.insert(0, str(tools_path / 'gyp' / 'pylib'))
+ from gyp.common import GetFlavor
++from packaging.version import Version
+ 
+ # imports in tools/configure.d
+ sys.path.insert(0, str(tools_path / 'configure.d'))
+@@ -1565,10 +1564,10 @@ def configure_openssl(o):
+     # supported asm compiler for AVX2. See https://github.com/openssl/openssl/
+     # blob/OpenSSL_1_1_0-stable/crypto/modes/asm/aesni-gcm-x86_64.pl#L52-L69
+     openssl110_asm_supported = \
+-      ('gas_version' in variables and StrictVersion(variables['gas_version']) >= StrictVersion('2.23')) or \
+-      ('xcode_version' in variables and StrictVersion(variables['xcode_version']) >= StrictVersion('5.0')) or \
+-      ('llvm_version' in variables and StrictVersion(variables['llvm_version']) >= StrictVersion('3.3')) or \
+-      ('nasm_version' in variables and StrictVersion(variables['nasm_version']) >= StrictVersion('2.10'))
++      ('gas_version' in variables and Version(variables['gas_version']) >= Version('2.23')) or \
++      ('xcode_version' in variables and Version(variables['xcode_version']) >= Version('5.0')) or \
++      ('llvm_version' in variables and Version(variables['llvm_version']) >= Version('3.3')) or \
++      ('nasm_version' in variables and Version(variables['nasm_version']) >= Version('2.10'))
+ 
+     if is_x86 and not openssl110_asm_supported:
+       error('''Did not find a new enough assembler, install one or build with

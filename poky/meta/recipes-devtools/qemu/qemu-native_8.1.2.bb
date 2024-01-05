@@ -1,6 +1,6 @@
 BPN = "qemu"
 
-DEPENDS = "glib-2.0-native zlib-native ninja-native meson-native"
+DEPENDS += "glib-2.0-native zlib-native"
 
 require qemu-native.inc
 

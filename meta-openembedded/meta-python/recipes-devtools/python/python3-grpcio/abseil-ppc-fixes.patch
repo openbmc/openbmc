@@ -1,4 +1,7 @@
-An all-in-one patch that fixes several issues:
+From 9cec6297effa9fab6f0c71e342046daceecd7d4d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Mar 2021 10:26:25 -0800
+Subject: [PATCH] An all-in-one patch that fixes several issues:
 
 1) UnscaledCycleClock not fully implemented for ppc*-musl (disabled on musl)
 2) powerpc stacktrace implementation only works on glibc (disabled on musl)
@@ -7,19 +10,21 @@ An all-in-one patch that fixes several issues:
 
 Sourced from void linux
 
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Xu Huan <xuhuan.fnst@fujitsu.com>
----
-Upstream-Status: Pending
 
- absl/base/internal/unscaledcycleclock.cc    | 4 ++--
- absl/base/internal/unscaledcycleclock.h     | 3 ++-
- absl/debugging/internal/examine_stack.cc    | 8 +++++++-
- absl/debugging/internal/stacktrace_config.h | 2 +-
+---
+ .../abseil-cpp/absl/base/internal/unscaledcycleclock.cc   | 4 ++--
+ .../absl/base/internal/unscaledcycleclock_config.h        | 3 ++-
+ .../abseil-cpp/absl/debugging/internal/examine_stack.cc   | 8 +++++++-
+ .../absl/debugging/internal/stacktrace_config.h           | 2 +-
  4 files changed, 12 insertions(+), 5 deletions(-)
 
---- a/absl/base/internal/unscaledcycleclock.cc
-+++ b/absl/base/internal/unscaledcycleclock.cc
+diff --git a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
+index b1c396c..d62bfd6 100644
+--- a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
++++ b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
 @@ -20,7 +20,7 @@
  #include <intrin.h>
  #endif
@@ -38,8 +43,24 @@ Upstream-Status: Pending
  
  int64_t UnscaledCycleClock::Now() {
  #ifdef __GLIBC__
---- a/absl/debugging/internal/examine_stack.cc
-+++ b/absl/debugging/internal/examine_stack.cc
+diff --git a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h
+index 24b324a..5e232c1 100644
+--- a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h
++++ b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h
+@@ -21,7 +21,8 @@
+ 
+ // The following platforms have an implementation of a hardware counter.
+ #if defined(__i386__) || defined(__x86_64__) || defined(__aarch64__) || \
+-    defined(__powerpc__) || defined(__ppc__) || defined(__riscv) ||     \
++    ((defined(__powerpc__) || defined(__ppc__)) && defined(__GLIBC__)) || \
++    defined(__riscv) ||     \
+     defined(_M_IX86) || (defined(_M_X64) && !defined(_M_ARM64EC))
+ #define ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 1
+ #else
+diff --git a/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc b/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc
+index 5786322..72c7c46 100644
+--- a/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc
++++ b/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc
 @@ -33,6 +33,10 @@
  #include <csignal>
  #include <cstdio>
@@ -51,7 +72,7 @@ Upstream-Status: Pending
  #include "absl/base/attributes.h"
  #include "absl/base/internal/raw_logging.h"
  #include "absl/base/macros.h"
-@@ -174,8 +178,10 @@ void* GetProgramCounter(void* const vuc)
+@@ -174,8 +178,10 @@ void* GetProgramCounter(void* const vuc) {
      return reinterpret_cast<void*>(context->uc_mcontext.pc);
  #elif defined(__powerpc64__)
      return reinterpret_cast<void*>(context->uc_mcontext.gp_regs[32]);
@@ -63,8 +84,10 @@ Upstream-Status: Pending
  #elif defined(__riscv)
      return reinterpret_cast<void*>(context->uc_mcontext.__gregs[REG_PC]);
  #elif defined(__s390__) && !defined(__s390x__)
---- a/absl/debugging/internal/stacktrace_config.h
-+++ b/absl/debugging/internal/stacktrace_config.h
+diff --git a/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h b/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h
+index 3929b1b..23d5e50 100644
+--- a/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h
++++ b/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h
 @@ -60,7 +60,7 @@
  #elif defined(__i386__) || defined(__x86_64__)
  #define ABSL_STACKTRACE_INL_HEADER \
@@ -74,15 +97,3 @@ Upstream-Status: Pending
  #define ABSL_STACKTRACE_INL_HEADER \
    "absl/debugging/internal/stacktrace_powerpc-inl.inc"
  #elif defined(__aarch64__)
---- a/absl/base/internal/unscaledcycleclock_config.h
-+++ b/absl/base/internal/unscaledcycleclock_config.h
-@@ -21,7 +21,8 @@
- 
- // The following platforms have an implementation of a hardware counter.
- #if defined(__i386__) || defined(__x86_64__) || defined(__aarch64__) || \
--    defined(__powerpc__) || defined(__ppc__) || defined(__riscv) ||     \
-+    ((defined(__powerpc__) || defined(__ppc__)) && defined(__GLIBC__)) || \
-+    defined(__riscv) ||     \
-     defined(_M_IX86) || (defined(_M_X64) && !defined(_M_ARM64EC))
- #define ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 1
- #else

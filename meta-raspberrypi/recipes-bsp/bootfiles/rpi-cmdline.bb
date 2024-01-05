@@ -9,7 +9,9 @@ inherit deploy nopackages
 CMDLINE_DWC_OTG ?= "dwc_otg.lpm_enable=0"
 
 CMDLINE_ROOT_FSTYPE ?= "rootfstype=ext4"
-CMDLINE_ROOTFS ?= "root=/dev/mmcblk0p2 ${CMDLINE_ROOT_FSTYPE} rootwait"
+CMDLINE_ROOT_PARTITION ?= "/dev/mmcblk0p2"
+
+CMDLINE_ROOTFS ?= "root=${CMDLINE_ROOT_PARTITION} ${CMDLINE_ROOT_FSTYPE} rootwait"
 
 CMDLINE_SERIAL ?= "${@oe.utils.conditional("ENABLE_UART", "1", "console=serial0,115200", "", d)}"
 

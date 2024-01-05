@@ -562,7 +562,7 @@ def compare_siglists(a_blob, b_blob, taskdiff=False):
                 elif not hash2 in hashfiles:
                     out.append("Unable to find matching sigdata for %s with hash %s" % (desc, hash2))
                 else:
-                    out2 = bb.siggen.compare_sigfiles(hashfiles[hash1], hashfiles[hash2], recursecb, collapsed=True)
+                    out2 = bb.siggen.compare_sigfiles(hashfiles[hash1]['path'], hashfiles[hash2]['path'], recursecb, collapsed=True)
                     for line in out2:
                         m = hashlib.sha256()
                         m.update(line.encode('utf-8'))

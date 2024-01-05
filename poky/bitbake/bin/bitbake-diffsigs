@@ -72,13 +72,16 @@ def find_siginfo_task(bbhandler, pn, taskname, sig1=None, sig2=None):
         elif sig2 not in sigfiles:
             logger.error('No sigdata files found matching %s %s with signature %s' % (pn, taskname, sig2))
             sys.exit(1)
-        latestfiles = [sigfiles[sig1], sigfiles[sig2]]
     else:
-        filedates = find_siginfo(bbhandler, pn, taskname)
-        latestfiles = sorted(filedates.keys(), key=lambda f: filedates[f])[-2:]
-        if not latestfiles:
+        sigfiles = find_siginfo(bbhandler, pn, taskname)
+        latestsigs = sorted(sigfiles.keys(), key=lambda h: sigfiles[h]['time'])[-2:]
+        if not latestsigs:
             logger.error('No sigdata files found matching %s %s' % (pn, taskname))
             sys.exit(1)
+        sig1 = latestsigs[0]
+        sig2 = latestsigs[1]
+
+    latestfiles = [sigfiles[sig1]['path'], sigfiles[sig2]['path']]
 
     return latestfiles
 

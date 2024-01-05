@@ -2,7 +2,7 @@ BBCLASSEXTEND = "nativesdk"
 
 require qemu.inc
 
-DEPENDS = "glib-2.0 zlib pixman bison-native ninja-native meson-native"
+DEPENDS += "glib-2.0 zlib pixman"
 
 DEPENDS:append:libc-musl = " libucontext"
 

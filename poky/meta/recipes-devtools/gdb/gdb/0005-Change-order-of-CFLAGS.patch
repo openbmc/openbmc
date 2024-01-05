@@ -1,4 +1,4 @@
-From 9e72a19355375e589032809dd2ec051b75d4db07 Mon Sep 17 00:00:00 2001
+From e7041e9346aa0c3aee0b76315559e3ab2ef8977e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:35:39 -0700
 Subject: [PATCH] Change order of CFLAGS
@@ -13,7 +13,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gdbserver/Makefile.in b/gdbserver/Makefile.in
-index 040f0b6faa0..256ce6a3f6a 100644
+index b597515d428..9e615e2842d 100644
 --- a/gdbserver/Makefile.in
 +++ b/gdbserver/Makefile.in
 @@ -156,7 +156,7 @@ WIN32APILIBS = @WIN32APILIBS@

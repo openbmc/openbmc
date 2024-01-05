@@ -1,0 +1,27 @@
+# psplash
+FBIOPUT_VSCREENINFO failed, double buffering disabled
+
+# PCI host bridge to bus 0000:00
+# pci_bus 0000:00: root bus resource [mem 0x10000000-0x17ffffff]
+# pci_bus 0000:00: root bus resource [io  0x1000-0x1fffff]
+# pci_bus 0000:00: No busn resource found for root bus, will use [bus 00-ff]
+# pci 0000:00:00.0: [2046:ab11] type 00 class 0x100000
+# pci 0000:00:00.0: [Firmware Bug]: reg 0x10: invalid BAR (can't size)
+# pci 0000:00:00.0: [Firmware Bug]: reg 0x14: invalid BAR (can't size)
+# pci 0000:00:00.0: [Firmware Bug]: reg 0x18: invalid BAR (can't size)
+# pci 0000:00:00.0: [Firmware Bug]: reg 0x1c: invalid BAR (can't size)
+# pci 0000:00:00.0: [Firmware Bug]: reg 0x20: invalid BAR (can't size)
+# pci 0000:00:00.0: [Firmware Bug]: reg 0x24: invalid BAR (can't size)
+invalid BAR (can't size)
+
+# These should be reviewed to see if they are still needed
+wrong ELF class
+fail to add MMCONFIG information, can't access extended PCI configuration space under this bridge
+can't claim BAR
+amd_nb: Cannot enumerate AMD northbridges
+tsc: HPET/PMTIMER calibration failed
+modeset(0): Failed to initialize the DRI2 extension
+glamor initialization failed
+blk_update_request: I/O error, dev fd0, sector 0 op 0x0:(READ)
+floppy: error
+failed to IDENTIFY (I/O error, err_mask=0x4)

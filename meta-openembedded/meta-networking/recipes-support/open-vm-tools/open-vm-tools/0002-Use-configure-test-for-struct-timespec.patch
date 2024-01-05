@@ -1,4 +1,4 @@
-From 6384b37cdef4ea868c3cee27bb627e4cfbab7b50 Mon Sep 17 00:00:00 2001
+From 74ab6b05fcba32031255624a31676e2aa0db133f Mon Sep 17 00:00:00 2001
 From: Natanael Copa <ncopa@alpinelinux.org>
 Date: Wed, 18 Nov 2015 09:03:00 +0000
 Subject: [PATCH] Use configure test for struct timespec
@@ -6,16 +6,16 @@ Subject: [PATCH] Use configure test for struct timespec
 Use the configure script to test for struct time spec instead of trying
 to keep track of what platforms has it.
 
-Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
----
 Upstream-Status: Pending
 
+Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
+---
  open-vm-tools/configure.ac           | 1 +
  open-vm-tools/lib/include/hgfsUtil.h | 8 +-------
  2 files changed, 2 insertions(+), 7 deletions(-)
 
 diff --git a/open-vm-tools/configure.ac b/open-vm-tools/configure.ac
-index 124781f99..05f37f275 100644
+index 9e2a1d6e3..2f34f6eda 100644
 --- a/open-vm-tools/configure.ac
 +++ b/open-vm-tools/configure.ac
 @@ -1441,6 +1441,7 @@ AC_TYPE_OFF_T

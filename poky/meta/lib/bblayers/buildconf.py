@@ -6,13 +6,7 @@
 
 import logging
 import os
-import stat
 import sys
-import shutil
-import json
-
-import bb.utils
-import bb.process
 
 from bblayers.common import LayerPlugin
 
@@ -58,7 +52,6 @@ TEMPLATECONF={} . {}/oe-init-build-env build-try-{}"""
 
     def do_save_build_conf(self, args):
         """ Save the currently active build configuration (conf/local.conf, conf/bblayers.conf) as a template into a layer.\n This template can later be used for setting up builds via TEMPLATECONF. """
-        repos = {}
         layers = oe.buildcfg.get_layer_revisions(self.tinfoil.config_data)
         targetlayer = None
         oecore = None

@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "4b379bbba8e178128a1cee4a5bd1ae116dedb3da6121b728c18f0f54c8
 
 S = "${WORKDIR}/pgpool-II-${PV}"
 
-inherit autotools systemd
+inherit autotools-brokensep systemd
 
 SYSTEMD_SERVICE:${PN} = "pgpool.service"
 
@@ -34,7 +34,7 @@ PACKAGECONFIG[postgresql] = "--with-pgsql-includedir=${STAGING_INCDIR}/postgresq
 EXTRA_OECONF += "--disable-static \
 	         --disable-rpath \
 	        "
-B = "${S}"
+
 CFLAGS:append = " -fcommon "
 
 FILES:${PN} += "${datadir}/pgpool-II/ "

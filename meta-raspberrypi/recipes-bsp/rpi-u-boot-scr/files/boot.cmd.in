@@ -1,4 +1,4 @@
 fdt addr ${fdt_addr} && fdt get value bootargs /chosen bootargs
-fatload mmc 0:1 ${kernel_addr_r} @@KERNEL_IMAGETYPE@@
-if test ! -e mmc 0:1 uboot.env; then saveenv; fi;
+fatload @@BOOT_MEDIA@@ 0:1 ${kernel_addr_r} @@KERNEL_IMAGETYPE@@
+if test ! -e @@BOOT_MEDIA@@ 0:1 uboot.env; then saveenv; fi;
 @@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr}

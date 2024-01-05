@@ -10,6 +10,7 @@ ExecStop=/usr/bin/redis-cli shutdown
 Restart=always
 LimitNOFILE=10032
 Type=notify
+StateDirectory=redis
 
 [Install]
 WantedBy=multi-user.target

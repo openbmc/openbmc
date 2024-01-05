@@ -9,6 +9,7 @@
 
 """Test cases for Toaster GUI and ReST."""
 
+import os
 import pytest
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -34,11 +35,12 @@ PROJECT_NAME2 = "test project 2"
 CLI_BUILDS_PROJECT_NAME = 'Command line builds'
 
 
-@pytest.mark.order(1)
+
 class ViewTests(TestCase):
     """Tests to verify view APIs."""
 
     fixtures = ['toastergui-unittest-data']
+    builldir = os.environ.get('BUILDDIR')
 
     def setUp(self):
 
@@ -46,7 +48,7 @@ class ViewTests(TestCase):
 
         self.recipe1 = Recipe.objects.get(pk=2)
         # create a file and to recipe1 file_path
-        file_path = f"/tmp/{self.recipe1.name.strip().replace(' ', '-')}.bb"
+        file_path = f"{self.builldir}/{self.recipe1.name.strip().replace(' ', '-')}.bb"
         with open(file_path, 'w') as f:
             f.write('foo')
         self.recipe1.file_path = file_path
@@ -240,7 +242,7 @@ class ViewTests(TestCase):
         recipe = CustomImageRecipe.objects.create(
                      name=name, project=self.project,
                      base_recipe=self.recipe1,
-                     file_path="/tmp/testing",
+                     file_path=f"{self.builldir}/testing",
                      layer_version=self.customr.layer_version)
         url = reverse('xhr_customrecipe_id', args=(recipe.id,))
         response = self.client.delete(url)
@@ -311,7 +313,7 @@ class ViewTests(TestCase):
         """Download the recipe file generated for the custom image"""
 
         # Create a dummy recipe file for the custom image generation to read
-        open("/tmp/a_recipe.bb", 'a').close()
+        open(f"{self.builldir}/a_recipe.bb", 'a').close()
         response = self.client.get(reverse('customrecipedownload',
                                            args=(self.project.id,
                                                  self.customr.id)))

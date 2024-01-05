@@ -385,7 +385,7 @@ def main(server, eventHandler, params):
                     main.shutdown = 1
 
                 logger.info("ToasterUI build done, brbe: %s", brbe)
-                continue
+                break
 
             if isinstance(event, (bb.command.CommandCompleted,
                                   bb.command.CommandFailed,

@@ -129,16 +129,22 @@ EXTRA_OEMAKE = '\
   LIB=${baselib} \
 '
 
-do_compile:prepend:class-target() {
+# Generate a Profile Guided Optimisation wrapper script that uses qemu-user for
+# all cross builds.
+write_pgo_wrapper:class-native = ":"
+write_pgo_wrapper() {
        if ${@bb.utils.contains('PACKAGECONFIG', 'pgo', 'true', 'false', d)}; then
-                qemu_binary="${@qemu_wrapper_cmdline(d, '${STAGING_DIR_TARGET}', ['${B}', '${STAGING_DIR_TARGET}/${base_libdir}'])}"
                 cat >pgo-wrapper <<EOF
 #!/bin/sh
 cd ${B}
-$qemu_binary "\$@"
+${@qemu_wrapper_cmdline(d, '${STAGING_DIR_TARGET}', ['${B}', '${STAGING_DIR_TARGET}/${base_libdir}'])} "\$@"
 EOF
                 chmod +x pgo-wrapper
         fi
+}
+
+do_compile:prepend() {
+        write_pgo_wrapper
 }
 
 do_install:prepend() {

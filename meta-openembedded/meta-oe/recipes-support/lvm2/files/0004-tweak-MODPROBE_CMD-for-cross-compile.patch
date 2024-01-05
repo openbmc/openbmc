@@ -21,18 +21,18 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index e427708..aa374ea 100644
+index b43d8b9be..efe3062c1 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1791,8 +1791,6 @@ if test "$BUILD_DMFILEMAPD" = yes; then
- fi
+@@ -1646,8 +1646,6 @@ AS_IF([test "$BUILD_DMFILEMAPD" = "yes"], [
+ ])
  
  ################################################################################
 -AC_PATH_TOOL(MODPROBE_CMD, modprobe, [], [$PATH_SBIN])
 -
- if test -n "$MODPROBE_CMD"; then
+ AS_IF([test -n "$MODPROBE_CMD"], [
  	AC_DEFINE_UNQUOTED([MODPROBE_CMD], ["$MODPROBE_CMD"], [The path to 'modprobe', if available.])
- fi
+ ])
 -- 
 2.7.4
 

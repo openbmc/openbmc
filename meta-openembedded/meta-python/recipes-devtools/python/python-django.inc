@@ -28,7 +28,6 @@ RDEPENDS:${PN} += "\
     ${PYTHON_PN}-threading \
     ${PYTHON_PN}-unixadmin \
     ${PYTHON_PN}-xml \
-    ${PYTHON_PN}-distutils \
 "
 
 CVE_PRODUCT = "django"

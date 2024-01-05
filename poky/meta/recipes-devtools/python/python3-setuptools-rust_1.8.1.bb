@@ -22,7 +22,6 @@ DEPENDS += "python3-setuptools-scm-native python3-wheel-native"
 DEPENDS += "python3-semantic-version-native"
 
 RDEPENDS:${PN} += " \
-    python3-distutils \
     python3-json \
     python3-semantic-version \
     python3-setuptools \
@@ -33,4 +32,4 @@ RDEPENDS:${PN} += " \
     python3-wheel \
 "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

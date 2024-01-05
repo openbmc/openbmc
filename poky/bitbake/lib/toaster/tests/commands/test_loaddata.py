@@ -6,13 +6,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
-
+import pytest
 from django.test import TestCase
 from django.core import management
 
 from orm.models import Layer_Version, Layer, Release, ToasterSetting
 
-
+@pytest.mark.order(2)
 class TestLoadDataFixtures(TestCase):
     """ Test loading our 3 provided fixtures """
     def test_run_loaddata_poky_command(self):

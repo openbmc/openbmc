@@ -40,7 +40,6 @@ RDEPENDS:${PN} = "${PYTHON_PN}-unittest \
                   ${PYTHON_PN}-shell \
                   ${PYTHON_PN}-doctest \
                   ${PYTHON_PN}-datetime \
-                  ${PYTHON_PN}-distutils \
                   ${PYTHON_PN}-misc \
                   ${PYTHON_PN}-mmap \
                   ${PYTHON_PN}-netclient \

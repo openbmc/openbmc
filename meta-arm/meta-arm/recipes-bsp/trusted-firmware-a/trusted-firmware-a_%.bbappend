@@ -6,6 +6,13 @@ COMPATIBLE_MACHINE:qemuarm-secureboot = "qemuarm-secureboot"
 # arm/aarch32.  This is a known testing hole in TF-A.
 TOOLCHAIN:qemuarm-secureboot = "gcc"
 
+# Enable passing TOS_FW_CONFIG from FIP package to Trusted OS.
+FILESEXTRAPATHS:prepend:qemuarm64-secureboot := "${THISDIR}/files:"
+SRC_URI:append:qemuarm64-secureboot = " \
+            file://0001-Add-spmc_manifest-for-qemu.patch \
+            file://0001-bl31_runtime-revert-usage-of-plat_ic_has_interrupt_t.patch \
+        "
+
 TFA_PLATFORM:qemuarm64-secureboot = "qemu"
 TFA_PLATFORM:qemu-generic-arm64 = "qemu_sbsa"
 TFA_PLATFORM:qemuarm-secureboot = "qemu"

@@ -1,0 +1,29 @@
+lvmdbusd: create dirs for lock file
+
+Create leading dirs for lvmdbusd lock file, otherwise it fails to start:
+
+| systemd[1]: Starting LVM2 D-Bus service...
+| lvmdbusd[1602]: [1602]: Error during creation of lock file(/var/lock/lvm/lvmdbusd): errno(2), exiting!
+
+Upstream-Status: Submitted [https://gitlab.com/lvmteam/lvm2/-/merge_requests/7]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ daemons/lvmdbusd/utils.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/daemons/lvmdbusd/utils.py b/daemons/lvmdbusd/utils.py
+index d479175f6..830648659 100644
+--- a/daemons/lvmdbusd/utils.py
++++ b/daemons/lvmdbusd/utils.py
+@@ -778,6 +778,7 @@ class LockFile(object):
+ 
+ 	def __enter__(self):
+ 		try:
++			os.makedirs(os.path.dirname(self.lock_file))
+ 			self.fd = os.open(self.lock_file, os.O_CREAT | os.O_RDWR, stat.S_IRUSR | stat.S_IWUSR)
+ 
+ 			# Get and set the close on exec and lock the file
+-- 
+2.34.1
+

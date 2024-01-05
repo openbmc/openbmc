@@ -1,4 +1,4 @@
-From 6be6cda5aea42b951212ec5f8a72778b1ef9c2da Mon Sep 17 00:00:00 2001
+From ef466581b53a1e64f53d4839bdacfab1d65cc6b9 Mon Sep 17 00:00:00 2001
 From: Natanael Copa <ncopa@alpinelinux.org>
 Date: Wed, 18 Nov 2015 09:10:14 +0000
 Subject: [PATCH] Fix definition of ALLPERMS and ACCESSPERMS
@@ -8,16 +8,16 @@ assume it is not there instead of testing for specific implementations.
 
 This is needed for musl libc.
 
-Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
----
 Upstream-Status: Pending
 
+Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
+---
  open-vm-tools/lib/hgfsServer/hgfsServerLinux.c      | 8 +++++---
  open-vm-tools/services/plugins/dndcp/dnd/dndLinux.c | 3 +--
  2 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
-index 63c4e65f0..87d419a7b 100644
+index 4a0bc9378..6ed49e2b7 100644
 --- a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
 +++ b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
 @@ -105,11 +105,13 @@ typedef struct DirectoryEntry {

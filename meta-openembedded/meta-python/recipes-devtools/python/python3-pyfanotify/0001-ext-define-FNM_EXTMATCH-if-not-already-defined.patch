@@ -1,19 +1,20 @@
-From 9e7894b97ae7afe43a9901b774de5aef401549ac Mon Sep 17 00:00:00 2001
+From 87f1bf7d1e0ca2a841706d1c41d14382f11264db Mon Sep 17 00:00:00 2001
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 Date: Thu, 28 Apr 2022 16:32:06 +0200
 Subject: [PATCH] ext: define FNM_EXTMATCH if not already defined
 
 On musl this constant is not defined. Define it locally if not present.
 
-Signed-off-by: Bartosz Golaszewski <brgl@bgdev.pl>
----
 Upstream-Status: Inappropriate
 
+Signed-off-by: Bartosz Golaszewski <brgl@bgdev.pl>
+
+---
  src/ext.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/src/ext.c b/src/ext.c
-index e0bbe21..7d979d3 100644
+index fb33de1..fa01a81 100644
 --- a/src/ext.c
 +++ b/src/ext.c
 @@ -19,6 +19,9 @@
@@ -24,8 +25,5 @@ index e0bbe21..7d979d3 100644
 +#define FNM_EXTMATCH 0
 +#endif
  
- PyDoc_STRVAR(ext__doc__,
- "Wrapper for fanotify.\n"
--- 
-2.34.1
-
+ #define FUNUSED __attribute__((unused))
+ 

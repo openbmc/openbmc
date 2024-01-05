@@ -7,8 +7,6 @@ SECTION = "console/network"
 LICENSE = "BSD-1-Clause"
 LIC_FILES_CHKSUM = "file://DISCLAIMER;md5=071bd69cb78b18888ea5e3da5c3127fa"
 
-DEPENDS += "libnsl2"
-
 PACKAGES = "${PN}-dbg libwrap libwrap-doc libwrap-dev libwrap-staticdev ${PN} ${PN}-doc"
 FILES:libwrap = "${base_libdir}/lib*${SOLIBS}"
 FILES:libwrap-doc = "${mandir}/man3 ${mandir}/man5"

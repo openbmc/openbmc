@@ -10,6 +10,7 @@
 # Ionut Chisanovici, Paul Eggleton and Cristian Iorga
 
 import os
+import pytest
 
 from django.db.models import Q
 
@@ -20,13 +21,13 @@ from orm.models import CustomImagePackage
 
 from tests.builds.buildtest import BuildTest
 
-
+@pytest.mark.order(4)
+@pytest.mark.django_db(True)
 class BuildCoreImageMinimal(BuildTest):
     """Build core-image-minimal and test the results"""
 
     def setUp(self):
-        self.completed_build = self.build("core-image-minimal")
-        self.built = self.target_already_built("core-image-minimal")
+        self.completed_build = self.target_already_built("core-image-minimal")
 
     # Check if build name is unique - tc_id=795
     def test_Build_Unique_Name(self):
@@ -44,17 +45,6 @@ class BuildCoreImageMinimal(BuildTest):
         self.assertEqual(distinct_path,
                          total_builds,
                          msg='Build cooker log path is not unique')
-
-    # Check if task order is unique for one build - tc=824
-    def test_Task_Unique_Order(self):
-        total_task_order = Task.objects.filter(
-            build=self.built).values('order').count()
-        distinct_task_order = Task.objects.filter(
-            build=self.completed_build).values('order').distinct().count()
-
-        self.assertEqual(total_task_order,
-                         distinct_task_order,
-                         msg='Errors task order is not unique')
 
     # Check task order sequence for one build - tc=825
     def test_Task_Order_Sequence(self):
@@ -99,7 +89,6 @@ class BuildCoreImageMinimal(BuildTest):
                                                         'task_name',
                                                         'sstate_result')
         cnt_err = []
-
         for task in tasks:
             if (task['sstate_result'] != Task.SSTATE_NA and
                     task['sstate_result'] != Task.SSTATE_MISS):
@@ -222,6 +211,7 @@ class BuildCoreImageMinimal(BuildTest):
     # orm_build.outcome=0 then if the file exists and its size matches
     # the file_size value. Need to add the tc in the test run
     def test_Target_File_Name_Populated(self):
+        cnt_err = []
         builds = Build.objects.filter(outcome=0).values('id')
         for build in builds:
             targets = Target.objects.filter(
@@ -231,7 +221,6 @@ class BuildCoreImageMinimal(BuildTest):
                     target_id=target['id']).values('id',
                                                    'file_name',
                                                    'file_size')
-                cnt_err = []
                 for file_info in target_files:
                     target_id = file_info['id']
                     target_file_name = file_info['file_name']

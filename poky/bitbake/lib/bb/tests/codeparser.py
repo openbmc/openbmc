@@ -467,6 +467,6 @@ esac
     #    self.d.setVar("oe_libinstall", "echo test")
     #    self.d.setVar("FOO", "foo=oe_libinstall; eval $foo")
     #    self.d.setVarFlag("FOO", "vardeps", "oe_*")
-    #    self.assertEquals(deps, set(["oe_libinstall"]))
+    #    self.assertEqual(deps, set(["oe_libinstall"]))
 
 

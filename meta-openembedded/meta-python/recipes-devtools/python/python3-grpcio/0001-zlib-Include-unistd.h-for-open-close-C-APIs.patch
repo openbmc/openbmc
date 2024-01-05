@@ -1,4 +1,4 @@
-From 4432b9a296c9c287dfe281b4d464dfd03e4eb721 Mon Sep 17 00:00:00 2001
+From 6ede7d01b18a4d9eeaccd25f5c1ab9985cb65307 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 12 Feb 2023 21:25:04 -0800
 Subject: [PATCH] zlib: Include unistd.h for open/close C APIs
@@ -6,6 +6,7 @@ Subject: [PATCH] zlib: Include unistd.h for open/close C APIs
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  third_party/zlib/gzguts.h | 1 +
  1 file changed, 1 insertion(+)
@@ -22,6 +23,3 @@ index 57faf37..3c700c2 100644
  #include "zlib.h"
  #ifdef STDC
  #  include <string.h>
--- 
-2.39.1
-

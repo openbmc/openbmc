@@ -137,7 +137,7 @@ RDEPENDS:${PN}-dev += " util-linux-libuuid-dev"
 RPROVIDES:${PN}-dev = "${PN}-libblkid-dev ${PN}-libmount-dev"
 
 RDEPENDS:${PN}-bash-completion += "${PN}-lsblk"
-RDEPENDS:${PN}-ptest += "bash bc btrfs-tools coreutils e2fsprogs findutils grep iproute2 kmod mdadm procps sed socat which xz"
+RDEPENDS:${PN}-ptest += "bash bc btrfs-tools coreutils e2fsprogs findutils grep iproute2 kmod procps sed socat which xz"
 RRECOMMENDS:${PN}-ptest += "kernel-module-scsi-debug kernel-module-sd-mod kernel-module-loop kernel-module-algif-hash"
 RDEPENDS:${PN}-swaponoff = "${PN}-swapon ${PN}-swapoff"
 ALLOW_EMPTY:${PN}-swaponoff = "1"
@@ -320,6 +320,12 @@ do_install_ptest() {
     if ! ${@bb.utils.contains('PACKAGECONFIG', 'pam', 'true', 'false', d)}; then
         rm -rf ${D}${PTEST_PATH}/tests/ts/chfn
     fi
+    # remove raid tests, known failures and avoid dependency on mdadm therefore
+    # See https://github.com/util-linux/util-linux/commit/7519c3edab120b14623931d5ddb16fdc6e7cad5d
+    rm -rf ${D}${PTEST_PATH}/tests/ts/blkid/md-raid0-whole
+    rm -rf ${D}${PTEST_PATH}/tests/ts/blkid/md-raid1-part
+    rm -rf ${D}${PTEST_PATH}/tests/ts/blkid/md-raid1-whole
+    rm -rf ${D}${PTEST_PATH}/tests/ts/fdisk/align-512-4K-md
 }
 
 # Delete tests not working on musl

@@ -6,189 +6,27 @@
 
 import collections
 import os
+import sys
 
 from shutil import rmtree
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 
-common_errors = [
-    "(WW) warning, (EE) error, (NI) not implemented, (??) unknown.",
-    "dma timeout",
-    "can\'t add hid device:",
-    "usbhid: probe of ",
-    "_OSC failed (AE_ERROR)",
-    "_OSC failed (AE_SUPPORT)",
-    "AE_ALREADY_EXISTS",
-    "ACPI _OSC request failed (AE_SUPPORT)",
-    "can\'t disable ASPM",
-    "Failed to load module \"vesa\"",
-    "Failed to load module vesa",
-    "Failed to load module \"modesetting\"",
-    "Failed to load module modesetting",
-    "Failed to load module \"glx\"",
-    "Failed to load module \"fbdev\"",
-    "Failed to load module fbdev",
-    "Failed to load module glx",
-    "[drm] Cannot find any crtc or sizes",
-    "_OSC failed (AE_NOT_FOUND); disabling ASPM",
-    "Open ACPI failed (/var/run/acpid.socket) (No such file or directory)",
-    "NX (Execute Disable) protection cannot be enabled: non-PAE kernel!",
-    "hd.: possibly failed opcode",
-    'NETLINK INITIALIZATION FAILED',
-    'kernel: Cannot find map file',
-    'omap_hwmod: debugss: _wait_target_disable failed',
-    'VGA arbiter: cannot open kernel arbiter, no multi-card support',
-    'Failed to find URL:http://ipv4.connman.net/online/status.html',
-    'Online check failed for',
-    'netlink init failed',
-    'Fast TSC calibration',
-    "BAR 0-9",
-    "Failed to load module \"ati\"",
-    "controller can't do DEVSLP, turning off",
-    "stmmac_dvr_probe: warning: cannot get CSR clock",
-    "error: couldn\'t mount because of unsupported optional features",
-    "GPT: Use GNU Parted to correct GPT errors",
-    "Cannot set xattr user.Librepo.DownloadInProgress",
-    "Failed to read /var/lib/nfs/statd/state: Success",
-    "error retry time-out =",
-    "logind: cannot setup systemd-logind helper (-61), using legacy fallback",
-    "Failed to rename network interface",
-    "Failed to process device, ignoring: Device or resource busy",
-    "Cannot find a map file",
-    "[rdrand]: Initialization Failed",
-    "[rndr  ]: Initialization Failed",
-    "[pulseaudio] authkey.c: Failed to open cookie file",
-    "[pulseaudio] authkey.c: Failed to load authentication key",
-    "was skipped because of a failed condition check",
-    "was skipped because all trigger condition checks failed",
-    "xf86OpenConsole: Switching VT failed",
-    "Failed to read LoaderConfigTimeoutOneShot variable, ignoring: Operation not supported",
-    "Failed to read LoaderEntryOneShot variable, ignoring: Operation not supported",
-    "invalid BAR (can't size)",
-    ]
+# importlib.resources.open_text in Python <3.10 doesn't search all directories
+# when a package is split across multiple directories. Until we can rely on
+# 3.10+, reimplement the searching logic.
+if sys.version_info < (3, 10):
+    def _open_text(package, resource):
+        import importlib, pathlib
+        module = importlib.import_module(package)
+        for path in module.__path__:
+            candidate = pathlib.Path(path) / resource
+            if candidate.exists():
+                return candidate.open(encoding='utf-8')
+        raise FileNotFoundError
+else:
+    from importlib.resources import open_text as _open_text
 
-x86_common = [
-    '[drm:psb_do_init] *ERROR* Debug is',
-    'wrong ELF class',
-    'Could not enable PowerButton event',
-    'probe of LNXPWRBN:00 failed with error -22',
-    'pmd_set_huge: Cannot satisfy',
-    'failed to setup card detect gpio',
-    'amd_nb: Cannot enumerate AMD northbridges',
-    'failed to retrieve link info, disabling eDP',
-    'Direct firmware load for iwlwifi',
-    'Direct firmware load for regulatory.db',
-    'failed to load regulatory.db',
-] + common_errors
-
-qemux86_common = [
-    'wrong ELF class',
-    "fail to add MMCONFIG information, can't access extended PCI configuration space under this bridge.",
-    "can't claim BAR ",
-    'amd_nb: Cannot enumerate AMD northbridges',
-    'tsc: HPET/PMTIMER calibration failed',
-    "modeset(0): Failed to initialize the DRI2 extension",
-    "glamor initialization failed",
-    "blk_update_request: I/O error, dev fd0, sector 0 op 0x0:(READ)",
-    "floppy: error",
-    'failed to IDENTIFY (I/O error, err_mask=0x4)',
-] + common_errors
-
-ignore_errors = {
-    'default' : common_errors,
-    'qemux86' : [
-        'Failed to access perfctr msr (MSR',
-        ] + qemux86_common,
-    'qemux86-64' : qemux86_common,
-    'qemumips' : [
-        'Failed to load module "glx"',
-        'cacheinfo: Failed to find cpu0 device node',
-        ] + common_errors,
-    'qemumips64' : [
-        'cacheinfo: Failed to find cpu0 device node',
-         ] + common_errors,
-    'qemuppc' : [
-        'PCI 0000:00 Cannot reserve Legacy IO [io  0x0000-0x0fff]',
-        'host side 80-wire cable detection failed, limiting max speed',
-        'mode "640x480" test failed',
-        'Failed to load module "glx"',
-        'can\'t handle BAR above 4GB',
-        'Cannot reserve Legacy IO',
-        ] + common_errors,
-    'qemuppc64' : [
-        'vio vio: uevent: failed to send synthetic uevent',
-        'synth uevent: /devices/vio: failed to send uevent',
-        'PCI 0000:00 Cannot reserve Legacy IO [io  0x10000-0x10fff]',
-        ] + common_errors,
-    'qemuarmv5' : [
-        'mmci-pl18x: probe of fpga:05 failed with error -22',
-        'mmci-pl18x: probe of fpga:0b failed with error -22',
-        'Failed to load module "glx"',
-        'OF: amba_device_add() failed (-19) for /amba/smc@10100000',
-        'OF: amba_device_add() failed (-19) for /amba/mpmc@10110000',
-        'OF: amba_device_add() failed (-19) for /amba/sctl@101e0000',
-        'OF: amba_device_add() failed (-19) for /amba/watchdog@101e1000',
-        'OF: amba_device_add() failed (-19) for /amba/sci@101f0000',
-        'OF: amba_device_add() failed (-19) for /amba/spi@101f4000',
-        'OF: amba_device_add() failed (-19) for /amba/ssp@101f4000',
-        'OF: amba_device_add() failed (-19) for /amba/fpga/sci@a000',
-        'Failed to initialize \'/amba/timer@101e3000\': -22',
-        'jitterentropy: Initialization failed with host not compliant with requirements: 2',
-        'clcd-pl11x: probe of 10120000.display failed with error -2',
-        'arm-charlcd 10008000.lcd: error -ENXIO: IRQ index 0 not found'
-        ] + common_errors,
-    'qemuarm64' : [
-        'Fatal server error:',
-        '(EE) Server terminated with error (1). Closing log file.',
-        'dmi: Firmware registration failed.',
-        'irq: type mismatch, failed to map hwirq-27 for /intc',
-        'logind: failed to get session seat',
-        ] + common_errors,
-    'intel-core2-32' : [
-        'ACPI: No _BQC method, cannot determine initial brightness',
-        '[Firmware Bug]: ACPI: No _BQC method, cannot determine initial brightness',
-        '(EE) Failed to load module "psb"',
-        '(EE) Failed to load module psb',
-        '(EE) Failed to load module "psbdrv"',
-        '(EE) Failed to load module psbdrv',
-        '(EE) open /dev/fb0: No such file or directory',
-        '(EE) AIGLX: reverting to software rendering',
-        'dmi: Firmware registration failed.',
-        'ioremap error for 0x78',
-        ] + x86_common,
-    'intel-corei7-64' : [
-        'can\'t set Max Payload Size to 256',
-        'intel_punit_ipc: can\'t request region for resource',
-        '[drm] parse error at position 4 in video mode \'efifb\'',
-        'ACPI Error: Could not enable RealTimeClock event',
-        'ACPI Warning: Could not enable fixed event - RealTimeClock',
-        'hci_intel INT33E1:00: Unable to retrieve gpio',
-        'hci_intel: probe of INT33E1:00 failed',
-        'can\'t derive routing for PCI INT A',
-        'failed to read out thermal zone',
-        'Bluetooth: hci0: Setting Intel event mask failed',
-        'ttyS2 - failed to request DMA',
-        'Bluetooth: hci0: Failed to send firmware data (-38)',
-        'atkbd serio0: Failed to enable keyboard on isa0060/serio0',
-        ] + x86_common,
-    'genericx86' : x86_common,
-    'genericx86-64' : [
-        'Direct firmware load for i915',
-        'Failed to load firmware i915',
-        'Failed to fetch GuC',
-        'Failed to initialize GuC',
-        'Failed to load DMC firmware',
-        'The driver is built-in, so to load the firmware you need to',
-        ] + x86_common,
-    'beaglebone-yocto' : [
-        'Direct firmware load for regulatory.db',
-        'failed to load regulatory.db',
-        'l4_wkup_cm',
-        'Failed to load module "glx"',
-        'Failed to make EGL context current',
-        'glamor initialization failed',
-        ] + common_errors,
-}
 
 class ParseLogsTest(OERuntimeTestCase):
 
@@ -197,6 +35,9 @@ class ParseLogsTest(OERuntimeTestCase):
 
     # The keywords that identify error messages in the log files
     errors = ["error", "cannot", "can't", "failed"]
+
+    # A list of error messages that should be ignored
+    ignore_errors = []
 
     @classmethod
     def setUpClass(cls):
@@ -212,11 +53,20 @@ class ParseLogsTest(OERuntimeTestCase):
 
         cls.errors = [s.casefold() for s in cls.errors]
 
-        try:
-            cls.ignore_errors = [s.casefold() for s in ignore_errors[cls.td.get('MACHINE')]]
-        except KeyError:
-            cls.logger.info('No ignore list found for this machine, using default')
-            cls.ignore_errors = [s.casefold() for s in ignore_errors['default']]
+        cls.load_machine_ignores()
+
+    @classmethod
+    def load_machine_ignores(cls):
+        # Add TARGET_ARCH explicitly as not every machine has that in MACHINEOVERRDES (eg qemux86-64)
+        for candidate in ["common", cls.td.get("TARGET_ARCH")] + cls.td.get("MACHINEOVERRIDES").split(":"):
+            try:
+                name = f"parselogs-ignores-{candidate}.txt"
+                for line in _open_text("oeqa.runtime.cases", name):
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        cls.ignore_errors.append(line.casefold())
+            except FileNotFoundError:
+                pass
 
     # Go through the log locations provided and if it's a folder
     # create a list with all the .log files in it, if it's a file

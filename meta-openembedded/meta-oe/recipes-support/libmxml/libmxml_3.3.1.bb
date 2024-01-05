@@ -8,13 +8,11 @@ SRC_URI = "git://github.com/michaelrsweet/mxml.git;branch=master;protocol=https"
 SRCREV = "fd47c7d115191c8a6bce2c781ffee41e179530f2"
 S = "${WORKDIR}/git"
 
-inherit autotools
+# Package does not support out of tree builds.
+inherit autotools-brokensep
 
 PACKAGECONFIG ??= "threads"
 PACKAGECONFIG[threads] = "--enable-threads,--disable-threads"
-
-# Package does not support out of tree builds.
-B = "${S}"
 
 # MXML uses autotools but it explicitly states it does not support autoheader.
 EXTRA_AUTORECONF = "--exclude=autopoint,autoheader"
