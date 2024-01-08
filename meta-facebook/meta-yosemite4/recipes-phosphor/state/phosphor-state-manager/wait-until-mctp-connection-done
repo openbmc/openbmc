@@ -1,0 +1,13 @@
+#!/bin/bash
+
+EID=$(($1*10))
+
+while true; do
+    busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$EID" xyz.openbmc_project.MCTP.Endpoint EID
+    isMctpConnect=$?;
+    echo $isMctpConnect
+    if [ $isMctpConnect -eq 0 ]; then
+        break;
+    fi
+    sleep 5;
+done

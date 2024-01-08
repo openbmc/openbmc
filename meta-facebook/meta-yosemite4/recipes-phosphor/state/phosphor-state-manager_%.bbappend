@@ -34,6 +34,7 @@ SRC_URI:append:yosemite4 = " \
     file://host-powercycle \
     file://host-powerreset \
     file://power-cmd \
+    file://wait-until-mctp-connection-done \
     "
 
 RDEPENDS:${PN}:append:yosemite4 = " bash"
@@ -51,6 +52,7 @@ do_install:append:yosemite4() {
     install -m 0777 ${WORKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
     install -m 0777 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
     install -m 0777 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
+    install -m 0777 ${WORKDIR}/wait-until-mctp-connection-done ${D}${libexecdir}/${PN}/
 }
 
 FILES:${PN} += " ${systemd_system_unitdir}/*.service"
