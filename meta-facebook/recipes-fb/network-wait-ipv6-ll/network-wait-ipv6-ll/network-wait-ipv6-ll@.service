@@ -1,0 +1,11 @@
+[Unit]
+Description=Wait IPv6 link-local initialization
+Before=systemd-networkd.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/check-ipv6-ll %i
+
+[Install]
+WantedBy=multi-user.target

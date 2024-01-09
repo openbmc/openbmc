@@ -1,0 +1,71 @@
+#!/bin/bash -e
+
+eth_intf="$1"
+exp_ll=""
+ll=""
+
+is_local_mac() {
+    if [ "$((0x${1:0:2} & 0x2))" -gt 0 ]; then
+        return 0
+    fi
+    return 1
+}
+
+mac_to_ll() {
+    IFS=':' read -r -a oct <<< "$1"
+    echo "fe80::$(printf %x $((0x${oct[0]} ^ 2)))${oct[1]}:${oct[2]}ff:fe${oct[3]}:${oct[4]}${oct[5]}" | \
+        sed -E 's/:0+/:/g; s/:{3,}/::/; s/:$/:0/'
+}
+
+get_ll() {
+    ip -6 addr show dev "$eth_intf" scope link | sed -e's/^.*inet6 \([^ ]*\)\/.*$/\1/;t;d'
+}
+
+if ! is_local_mac "$(cat /sys/class/net/"$eth_intf"/address)"; then
+    echo "global mac address found"
+    exit 0;
+else
+    echo "non-global mac address, start fix $eth_intf ipv6-ll"
+fi
+
+# bring up ethernet interface to start NCSI init process
+ifconfig "$eth_intf" up
+
+for _ in {1..30}; do
+    # wait getting address from NC-SI
+    mac=$(cat /sys/class/net/"$eth_intf"/address)
+    if ! is_local_mac "$mac"; then
+        exp_ll=$(mac_to_ll "$mac")
+        echo "$eth_intf mac: $mac"
+        echo "expected ipv6-ll: $exp_ll"
+        ll=$(get_ll)
+        if [ "$ll" == "$exp_ll" ]; then
+            break
+        fi
+        # re-generate link-local address
+        ip -6 addr flush dev "$eth_intf" scope link
+        echo 1 > /proc/sys/net/ipv6/conf/"$eth_intf"/addr_gen_mode
+        echo 0 > /proc/sys/net/ipv6/conf/"$eth_intf"/addr_gen_mode
+        break;
+    fi
+    sleep 1
+done
+
+# exp_ll is not assigned if global mac address not found
+if [ -z "$exp_ll" ]; then
+    echo "no global mac address found"
+    exit 1
+fi
+
+# wait for ipv6-ll to be generated
+if [ "$ll" != "$exp_ll" ]; then
+    for _ in {1..100}; do
+        usleep 10000
+        ll=$(get_ll)
+        if [ "$ll" == "$exp_ll" ]; then
+            break;
+        fi
+    done
+fi
+
+exit 0;

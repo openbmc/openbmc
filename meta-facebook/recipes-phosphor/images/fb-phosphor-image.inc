@@ -25,6 +25,9 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " \
     mmc-utils \
     util-linux-blkdiscard \
     "
+OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-ncsi-nic = " \
+    network-wait-ipv6-ll \
+    "
 
 IMAGE_LINGUAS="en-us"
 
