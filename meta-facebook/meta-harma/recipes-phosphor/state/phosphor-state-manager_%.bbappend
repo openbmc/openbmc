@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG:remove = "no-warm-reboot"
+PACKAGECONFIG:remove = "no-warm-reboot only-run-apr-on-power-loss"
+
 
 CHASSIS_DEFAULT_TARGETS:remove:harma = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
@@ -15,6 +16,8 @@ CHASSIS_DEFAULT_TARGETS:append:harma = " \
 
 HOST_DEFAULT_TARGETS:remove:harma = " \
     obmc-host-start@{}.target.wants/host-poweron@{}.service \
+    obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
+    obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
 "
 
 HOST_DEFAULT_TARGETS:append:harma = " \
