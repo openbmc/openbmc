@@ -1,0 +1,2 @@
+SUBSYSTEM=="tty", ATTRS{iomem_base}=="0x1E78F000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS2", TAG+="systemd"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB1", ENV{SYSTEMD_WANTS}="obmc-console@ttyUSB1", TAG+="systemd"
