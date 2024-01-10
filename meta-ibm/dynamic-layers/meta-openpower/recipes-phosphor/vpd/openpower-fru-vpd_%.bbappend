@@ -6,6 +6,8 @@ DEPENDS:append:p10bmc = " libgpiod"
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " ibm-vpd-parser@.service"
+SYSTEMD_SERVICE:${PN}:append:p10bmc = " ibm-isdimm-vpd-parser@.service"
+SYSTEMD_SERVICE:${PN}:append:p10bmc = " ibm-spi-vpd-parser@.service"
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " system-vpd.service"
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " com.ibm.VPD.Manager.service"
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " wait-vpd-parsers.service"
