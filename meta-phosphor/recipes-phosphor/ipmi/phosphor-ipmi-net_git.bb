@@ -42,6 +42,7 @@ EXTRA_OEMESON = " \
         -Dtests=disabled \
         "
 
+RDEPENDS:${PN} += "srvcfg-manager"
 RRECOMMENDS:${PN} = "pam-ipmi"
 
 FILES:${PN} += " \
