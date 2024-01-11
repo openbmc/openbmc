@@ -10,15 +10,19 @@ RDEPENDS:${PN} += "yosemite4-common-functions"
 SRC_URI += " \
     file://yosemite4-sys-init.service \
     file://yosemite4-early-sys-init \
+    file://yosemite4-schematic-init.service \
+    file://yosemite4-schematic-init \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " \
     yosemite4-sys-init.service \
+    yosemite4-schematic-init.service \
     "
 
 do_install() {
     install -d ${D}${libexecdir}
     install -m 0755 ${WORKDIR}/yosemite4-early-sys-init ${D}${libexecdir}
+    install -m 0755 ${WORKDIR}/yosemite4-schematic-init ${D}${libexecdir}
 }
 

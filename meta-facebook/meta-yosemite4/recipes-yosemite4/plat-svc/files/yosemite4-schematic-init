@@ -1,0 +1,45 @@
+#!/bin/bash -e
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
+# probe devices behind mux for management board cpld
+
+stage=$(busctl introspect xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice/Medusa_Board | grep '.PRODUCT_VERSION' | awk -F\" '{print $2}')
+
+# set initial value for pca9555 i/o pins on medusa board
+if [ -z "$stage" ]; then
+    echo "Failed to check medusa board fru info, all I/O pins are keeping default input"
+elif [ "$stage" = "POC" ]; then
+    set_gpio P48V_OCP_GPIO1       0
+    set_gpio P48V_OCP_GPIO2       0
+    set_gpio P48V_OCP_GPIO3       0
+    set_gpio RST_MUX_R_N          1
+    set_gpio RST_LED_CONTROL_FAN_BOARD_0_N 1
+    set_gpio RST_LED_CONTROL_FAN_BOARD_1_N 1
+    set_gpio RST_IOEXP_FAN_BOARD_0_N       1
+    set_gpio RST_IOEXP_FAN_BOARD_1_N       1
+    set_gpio HSC_OCP_SLOT_ODD_GPIO3        1
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       1
+    set_gpio MEDUSA_BOARD_REV_0   0
+    set_gpio MEDUSA_BOARD_REV_1   0
+    set_gpio MEDUSA_BOARD_REV_2   0
+    set_gpio MEDUSA_BOARD_TYPE    0
+    set_gpio DELTA_MODULE_TYPE    0
+    set_gpio P12V_HSC_TYPE        0
+else
+    set_gpio P48V_OCP_GPIO1       0
+    set_gpio P48V_OCP_GPIO2       0
+    set_gpio P48V_OCP_GPIO3       0
+    set_gpio RST_MUX_R_N          1
+    set_gpio RST_LED_CONTROL_FAN_BOARD_0_N 1
+    set_gpio RST_LED_CONTROL_FAN_BOARD_1_N 1
+    set_gpio RST_IOEXP_FAN_BOARD_0_N       1
+    set_gpio RST_IOEXP_FAN_BOARD_1_N       1
+    set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+fi
+exit 0

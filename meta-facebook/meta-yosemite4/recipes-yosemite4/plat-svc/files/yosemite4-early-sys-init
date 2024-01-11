@@ -31,23 +31,6 @@ set_gpio FM_BMC_READY_R2      1
 set_gpio SPI_LOCK_REQ_BMC_N   1
 set_gpio EN_P3V_BAT_SCALED_R  0
 
-set_gpio P48V_OCP_GPIO1       0
-set_gpio P48V_OCP_GPIO2       0
-set_gpio P48V_OCP_GPIO3       0
-set_gpio RST_MUX_R_N          1
-set_gpio RST_LED_CONTROL_FAN_BOARD_0_N 1
-set_gpio RST_LED_CONTROL_FAN_BOARD_1_N 1
-set_gpio RST_IOEXP_FAN_BOARD_0_N       1
-set_gpio RST_IOEXP_FAN_BOARD_1_N       1
-set_gpio EN_P48V_AUX_0        1
-set_gpio EN_P48V_AUX_1        1
-set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
-set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
-set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
-set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
-set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
-set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
-
 set_gpio NIC0_MAIN_PWR_EN 1
 set_gpio NIC1_MAIN_PWR_EN 1
 set_gpio NIC2_MAIN_PWR_EN 1

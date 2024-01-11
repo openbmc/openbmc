@@ -1,0 +1,12 @@
+[Unit]
+Description=Yosemite4 Schematic Init
+After=xyz.openbmc_project.FruDevice.service
+Requires=xyz.openbmc_project.FruDevice.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/yosemite4-schematic-init
+SyslogIdentifier=Yosemite4 Schematic Init
+
+[Install]
+WantedBy=multi-user.target
