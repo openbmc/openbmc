@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Leak Detect Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i leak detect assert" "BLADE" "%i"
+SyslogIdentifier=%i-leak-detect-assert

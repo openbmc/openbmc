@@ -1,0 +1,937 @@
+[
+    {
+        "Name": "PRSNT_MTIA_BLADE0_N",
+        "ChipId": "2",
+        "GpioNum": 0,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-0.service"],
+            "RISING": ["present-deassert@mtia-blade-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE1_N",
+        "ChipId": "2",
+        "GpioNum": 2,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-1.service"],
+            "RISING": ["present-deassert@mtia-blade-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE2_N",
+        "ChipId": "2",
+        "GpioNum": 4,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-2.service"],
+            "RISING": ["present-deassert@mtia-blade-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE3_N",
+        "ChipId": "2",
+        "GpioNum": 6,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-3.service"],
+            "RISING": ["present-deassert@mtia-blade-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE4_N",
+        "ChipId": "2",
+        "GpioNum": 8,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-4.service"],
+            "RISING": ["present-deassert@mtia-blade-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE5_N",
+        "ChipId": "2",
+        "GpioNum": 10,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-5.service"],
+            "RISING": ["present-deassert@mtia-blade-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE6_N",
+        "ChipId": "2",
+        "GpioNum": 12,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-6.service"],
+            "RISING": ["present-deassert@mtia-blade-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE7_N",
+        "ChipId": "2",
+        "GpioNum": 14,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-7.service"],
+            "RISING": ["present-deassert@mtia-blade-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE8_N",
+        "ChipId": "2",
+        "GpioNum": 16,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-8.service"],
+            "RISING": ["present-deassert@mtia-blade-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE9_N",
+        "ChipId": "2",
+        "GpioNum": 18,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-9.service"],
+            "RISING": ["present-deassert@mtia-blade-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE10_N",
+        "ChipId": "2",
+        "GpioNum": 20,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-10.service"],
+            "RISING": ["present-deassert@mtia-blade-10.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE11_N",
+        "ChipId": "2",
+        "GpioNum": 22,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-11.service"],
+            "RISING": ["present-deassert@mtia-blade-11.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE12_N",
+        "ChipId": "2",
+        "GpioNum": 24,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-12.service"],
+            "RISING": ["present-deassert@mtia-blade-12.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE13_N",
+        "ChipId": "2",
+        "GpioNum": 26,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-13.service"],
+            "RISING": ["present-deassert@mtia-blade-13.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE14_N",
+        "ChipId": "2",
+        "GpioNum": 28,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-14.service"],
+            "RISING": ["present-deassert@mtia-blade-14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE15_N",
+        "ChipId": "2",
+        "GpioNum": 30,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@mtia-blade-15.service"],
+            "RISING": ["present-deassert@mtia-blade-15.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NW_BLADE0_N",
+        "ChipId": "2",
+        "GpioNum": 32,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@network-blade-0.service"],
+            "RISING": ["present-deassert@network-blade-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NW_BLADE1_N",
+        "ChipId": "2",
+        "GpioNum": 34,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@network-blade-1.service"],
+            "RISING": ["present-deassert@network-blade-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NW_BLADE2_N",
+        "ChipId": "2",
+        "GpioNum": 36,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@network-blade-2.service"],
+            "RISING": ["present-deassert@network-blade-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NW_BLADE3_N",
+        "ChipId": "2",
+        "GpioNum": 38,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@network-blade-3.service"],
+            "RISING": ["present-deassert@network-blade-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NW_BLADE4_N",
+        "ChipId": "2",
+        "GpioNum": 40,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@network-blade-4.service"],
+            "RISING": ["present-deassert@network-blade-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NW_BLADE5_N",
+        "ChipId": "2",
+        "GpioNum": 42,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@network-blade-5.service"],
+            "RISING": ["present-deassert@network-blade-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_FCB_TOP_0_N",
+        "ChipId": "2",
+        "GpioNum": 44,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@fcb-top-0.service"],
+            "RISING": ["present-deassert@fcb-top-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_FCB_TOP_1_N",
+        "ChipId": "2",
+        "GpioNum": 46,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@fcb-top-1.service"],
+            "RISING": ["present-deassert@fcb-top-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_FCB_MIDDLE_0_N",
+        "ChipId": "2",
+        "GpioNum": 48,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@fcb-mid-0.service"],
+            "RISING": ["present-deassert@fcb-mid-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_FCB_MIDDLE_1_N",
+        "ChipId": "2",
+        "GpioNum": 50,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@fcb-mid-1.service"],
+            "RISING": ["present-deassert@fcb-mid-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_FCB_BOTTOM_0_N",
+        "ChipId": "2",
+        "GpioNum": 52,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@fcb-bot-0.service"],
+            "RISING": ["present-deassert@fcb-bot-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_FCB_BOTTOM_1_N",
+        "ChipId": "2",
+        "GpioNum": 54,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@fcb-bot-1.service"],
+            "RISING": ["present-deassert@fcb-bot-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE0_PWROK",
+        "ChipId": "2",
+        "GpioNum": 56,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-0.service"],
+            "RISING": ["power-good-deassert@mtia-blade-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE1_PWROK",
+        "ChipId": "2",
+        "GpioNum": 58,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-1.service"],
+            "RISING": ["power-good-deassert@mtia-blade-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE2_PWROK",
+        "ChipId": "2",
+        "GpioNum": 60,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-2.service"],
+            "RISING": ["power-good-deassert@mtia-blade-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE3_PWROK",
+        "ChipId": "2",
+        "GpioNum": 62,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-3.service"],
+            "RISING": ["power-good-deassert@mtia-blade-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE4_PWROK",
+        "ChipId": "2",
+        "GpioNum": 64,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-4.service"],
+            "RISING": ["power-good-deassert@mtia-blade-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE5_PWROK",
+        "ChipId": "2",
+        "GpioNum": 66,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-5.service"],
+            "RISING": ["power-good-deassert@mtia-blade-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE6_PWROK",
+        "ChipId": "2",
+        "GpioNum": 68,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-6.service"],
+            "RISING": ["power-good-deassert@mtia-blade-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE7_PWROK",
+        "ChipId": "2",
+        "GpioNum": 70,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-7.service"],
+            "RISING": ["power-good-deassert@mtia-blade-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE8_PWROK",
+        "ChipId": "2",
+        "GpioNum": 72,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-8.service"],
+            "RISING": ["power-good-deassert@mtia-blade-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE9_PWROK",
+        "ChipId": "2",
+        "GpioNum": 74,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-9.service"],
+            "RISING": ["power-good-deassert@mtia-blade-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE10_PWROK",
+        "ChipId": "2",
+        "GpioNum": 76,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-10.service"],
+            "RISING": ["power-good-deassert@mtia-blade-10.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE11_PWROK",
+        "ChipId": "2",
+        "GpioNum": 78,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-11.service"],
+            "RISING": ["power-good-deassert@mtia-blade-11.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE12_PWROK",
+        "ChipId": "2",
+        "GpioNum": 80,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-12.service"],
+            "RISING": ["power-good-deassert@mtia-blade-12.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE13_PWROK",
+        "ChipId": "2",
+        "GpioNum": 82,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-13.service"],
+            "RISING": ["power-good-deassert@mtia-blade-13.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE14_PWROK",
+        "ChipId": "2",
+        "GpioNum": 84,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-14.service"],
+            "RISING": ["power-good-deassert@mtia-blade-14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_MTIA_BLADE15_PWROK",
+        "ChipId": "2",
+        "GpioNum": 86,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@mtia-blade-15.service"],
+            "RISING": ["power-good-deassert@mtia-blade-15.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NW_BLADE0_PWROK",
+        "ChipId": "2",
+        "GpioNum": 88,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@network-blade-0.service"],
+            "RISING": ["power-good-deassert@network-blade-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NW_BLADE1_PWROK",
+        "ChipId": "2",
+        "GpioNum": 90,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@network-blade-1.service"],
+            "RISING": ["power-good-deassert@network-blade-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NW_BLADE2_PWROK",
+        "ChipId": "2",
+        "GpioNum": 92,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@network-blade-2.service"],
+            "RISING": ["power-good-deassert@network-blade-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NW_BLADE3_PWROK",
+        "ChipId": "2",
+        "GpioNum": 94,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@network-blade-3.service"],
+            "RISING": ["power-good-deassert@network-blade-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NW_BLADE4_PWROK",
+        "ChipId": "2",
+        "GpioNum": 96,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@network-blade-4.service"],
+            "RISING": ["power-good-deassert@network-blade-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NW_BLADE5_PWROK",
+        "ChipId": "2",
+        "GpioNum": 98,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@network-blade-5.service"],
+            "RISING": ["power-good-deassert@network-blade-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_FCB_TOP_0_PWROK",
+        "ChipId": "2",
+        "GpioNum": 100,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@fcb-top-0.service"],
+            "RISING": ["power-good-deassert@fcb-top-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_FCB_TOP_1_PWROK",
+        "ChipId": "2",
+        "GpioNum": 102,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@fcb-top-1.service"],
+            "RISING": ["power-good-deassert@fcb-top-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_FCB_MIDDLE_0_PWROK",
+        "ChipId": "2",
+        "GpioNum": 104,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@fcb-mid-0.service"],
+            "RISING": ["power-good-deassert@fcb-mid-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_FCB_MIDDLE_1_PWROK",
+        "ChipId": "2",
+        "GpioNum": 106,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@fcb-mid-1.service"],
+            "RISING": ["power-good-deassert@fcb-mid-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_FCB_BOTTOM_0_PWROK",
+        "ChipId": "2",
+        "GpioNum": 108,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@fcb-bot-0.service"],
+            "RISING": ["power-good-deassert@fcb-bot-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_FCB_BOTTOM_1_PWROK",
+        "ChipId": "2",
+        "GpioNum": 110,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@fcb-bot-1.service"],
+            "RISING": ["power-good-deassert@fcb-bot-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE0_N",
+        "ChipId": "2",
+        "GpioNum": 112,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-0.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE1_N",
+        "ChipId": "2",
+        "GpioNum": 114,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-1.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE2_N",
+        "ChipId": "2",
+        "GpioNum": 116,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-2.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE3_N",
+        "ChipId": "2",
+        "GpioNum": 118,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-3.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE4_N",
+        "ChipId": "2",
+        "GpioNum": 120,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-4.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE5_N",
+        "ChipId": "2",
+        "GpioNum": 122,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-5.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE6_N",
+        "ChipId": "2",
+        "GpioNum": 124,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-6.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE7_N",
+        "ChipId": "2",
+        "GpioNum": 126,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-7.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE8_N",
+        "ChipId": "2",
+        "GpioNum": 128,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-8.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE9_N",
+        "ChipId": "2",
+        "GpioNum": 130,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-9.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE10_N",
+        "ChipId": "2",
+        "GpioNum": 132,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-10.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-10.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE11_N",
+        "ChipId": "2",
+        "GpioNum": 134,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-11.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-11.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE12_N",
+        "ChipId": "2",
+        "GpioNum": 136,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-12.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-12.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE13_N",
+        "ChipId": "2",
+        "GpioNum": 138,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-13.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-13.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE14_N",
+        "ChipId": "2",
+        "GpioNum": 140,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-14.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_MTIA_BLADE15_N",
+        "ChipId": "2",
+        "GpioNum": 142,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@mtia-blade-15.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-15.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NW_BLADE0_N",
+        "ChipId": "2",
+        "GpioNum": 144,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@network-blade-0.service"],
+            "RISING": ["leak-detect-deassert@network-blade-0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NW_BLADE1_N",
+        "ChipId": "2",
+        "GpioNum": 146,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@network-blade-1.service"],
+            "RISING": ["leak-detect-deassert@network-blade-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NW_BLADE2_N",
+        "ChipId": "2",
+        "GpioNum": 148,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@network-blade-2.service"],
+            "RISING": ["leak-detect-deassert@network-blade-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NW_BLADE3_N",
+        "ChipId": "2",
+        "GpioNum": 150,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@network-blade-3.service"],
+            "RISING": ["leak-detect-deassert@network-blade-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NW_BLADE4_N",
+        "ChipId": "2",
+        "GpioNum": 152,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@network-blade-4.service"],
+            "RISING": ["leak-detect-deassert@network-blade-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NW_BLADE5_N",
+        "ChipId": "2",
+        "GpioNum": 154,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@network-blade-5.service"],
+            "RISING": ["leak-detect-deassert@network-blade-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_READY",
+        "ChipId": "2",
+        "GpioNum": 200,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["rpu-ready-deassert.service"],
+            "RISING": ["rpu-ready-assert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CMM_CABLE_CARTRIDGE_PRSNT_TOP_N",
+        "ChipId": "2",
+        "GpioNum": 224,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["cable-present-assert@cmm-cartridge-top.service"],
+            "RISING": ["cable-present-deassert@cmm-cartridge-top.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CMM_CABLE_CARTRIDGE_PRSNT_BOT_N",
+        "ChipId": "2",
+        "GpioNum": 222,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["cable-present-assert@cmm-cartridge-bot.service"],
+            "RISING": ["cable-present-deassert@cmm-cartridge-bot.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "BOT_BCB_CABLE_PRSNT_N",
+        "ChipId": "2",
+        "GpioNum": 226,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["cable-present-assert@bcb-bot.service"],
+            "RISING": ["cable-present-deassert@bcb-bot.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TOP_BCB_CABLE_PRSNT_N",
+        "ChipId": "2",
+        "GpioNum": 228,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["cable-present-assert@bcb-top.service"],
+            "RISING": ["cable-present-deassert@bcb-top.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CR_TOGGLE_BOOT_N",
+        "ChipId": "2",
+        "GpioNum": 216,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["present-assert@cmm-blade-toggle-switch.service"],
+            "RISING": ["present-deassert@cmm-blade-toggle-switch.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "MGMT_SFP_PRSNT_N",
+        "ChipId": "2",
+        "GpioNum": 238,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["sfp-present-assert.service"],
+            "RISING": ["sfp-present-deassert.service"]
+        },
+        "Continue": true
+    }
+]
