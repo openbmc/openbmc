@@ -327,7 +327,7 @@ BitBake has determined by doing the following:
    the task. This list also includes indirect dependencies from
    variables depending on other variables, recursively::
 
-      Task dependencies: ['PV', 'SRCREV', 'SRC_URI', 'SRC_URI[md5sum]', 'SRC_URI[sha256sum]', 'base_do_fetch']
+      Task dependencies: ['PV', 'SRCREV', 'SRC_URI', 'SRC_URI[sha256sum]', 'base_do_fetch']
 
    .. note::
 

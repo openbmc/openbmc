@@ -27,7 +27,8 @@ SYSTEMD_DISABLED_SYSV_SERVICES = " \
 
 pkg_postinst:${PN} () {
 
-	cd $D${sysconfdir}/init.d  ||  exit 0
+	test -d $D${sysconfdir}/init.d  ||  exit 0
+	cd $D${sysconfdir}/init.d
 
 	echo "Disabling the following sysv scripts: "
 

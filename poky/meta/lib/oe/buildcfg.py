@@ -1,26 +1,27 @@
 
+import os
 import subprocess
 import bb.process
 
 def detect_revision(d):
     path = get_scmbasepath(d)
-    return get_metadata_git_revision(path, d)
+    return get_metadata_git_revision(path)
 
 def detect_branch(d):
     path = get_scmbasepath(d)
-    return get_metadata_git_branch(path, d)
+    return get_metadata_git_branch(path)
 
 def get_scmbasepath(d):
     return os.path.join(d.getVar('COREBASE'), 'meta')
 
-def get_metadata_git_branch(path, d):
+def get_metadata_git_branch(path):
     try:
         rev, _ = bb.process.run('git rev-parse --abbrev-ref HEAD', cwd=path)
     except bb.process.ExecutionError:
         rev = '<unknown>'
     return rev.strip()
 
-def get_metadata_git_revision(path, d):
+def get_metadata_git_revision(path):
     try:
         rev, _ = bb.process.run('git rev-parse HEAD', cwd=path)
     except bb.process.ExecutionError:
@@ -45,5 +46,5 @@ def get_layer_revisions(d):
     layers = (d.getVar("BBLAYERS") or "").split()
     revisions = []
     for i in layers:
-        revisions.append((i, os.path.basename(i), get_metadata_git_branch(i, None).strip(), get_metadata_git_revision(i, None), is_layer_modified(i)))
+        revisions.append((i, os.path.basename(i), get_metadata_git_branch(i).strip(), get_metadata_git_revision(i), is_layer_modified(i)))
     return revisions

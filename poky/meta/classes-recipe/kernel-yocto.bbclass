@@ -176,12 +176,32 @@ do_kernel_metadata() {
 		# kernel source tree, where they'll be used later.
 		check_git_config
 		patches="${@" ".join(find_patches(d,'kernel-meta'))}"
-		for p in $patches; do
+		if [ -n "$patches" ]; then
 		    (
-			cd ${WORKDIR}/kernel-meta
-			git am -s $p
-		    )
-		done
+			    cd ${WORKDIR}/kernel-meta
+
+			    # take the SRC_URI patches, and create a series file
+			    # this is required to support some better processing
+			    # of issues with the patches
+			    rm -f series
+			    for p in $patches; do
+				cp $p .
+				echo "$(basename $p)" >> series
+			    done
+
+			    # process the series with kgit-s2q, which is what is
+			    # handling the rest of the kernel. This allows us
+			    # more flexibility for handling failures or advanced
+			    # mergeing functinoality
+			    message=$(kgit-s2q --gen -v --patches ${WORKDIR}/kernel-meta 2>&1)
+			    if [ $? -ne 0 ]; then
+				# setup to try the patch again
+				kgit-s2q --prev
+				bberror "Problem applying patches to: ${WORKDIR}/kernel-meta"
+				bbfatal_log "\n($message)"
+			    fi
+			)
+		fi
 	fi
 
 	sccs_from_src_uri="${@" ".join(find_sccs(d))}"

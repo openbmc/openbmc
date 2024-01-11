@@ -109,21 +109,6 @@ TESTIMAGE_DUMP_DIR ?= "${LOG_DIR}/runtime-hostdump/"
 
 TESTIMAGE_UPDATE_VARS ?= "DL_DIR WORKDIR DEPLOY_DIR_IMAGE IMAGE_LINK_NAME"
 
-testimage_dump_target () {
-    top -bn1
-    ps
-    free
-    df
-    # The next command will export the default gateway IP
-    export DEFAULT_GATEWAY=$(ip route | awk '/default/ { print $3}')
-    ping -c3 $DEFAULT_GATEWAY
-    dmesg
-    netstat -an
-    ip address
-    # Next command will dump logs from /var/log/
-    find /var/log/ -type f 2>/dev/null -exec echo "====================" \; -exec echo {} \; -exec echo "====================" \; -exec cat {} \; -exec echo "" \;
-}
-
 testimage_dump_monitor () {
     query-status
     query-block
@@ -352,7 +337,6 @@ def testimage_main(d):
     target_kwargs['serialcontrol_cmd'] = d.getVar("TEST_SERIALCONTROL_CMD") or None
     target_kwargs['serialcontrol_extra_args'] = d.getVar("TEST_SERIALCONTROL_EXTRA_ARGS") or ""
     target_kwargs['testimage_dump_monitor'] = d.getVar("testimage_dump_monitor") or ""
-    target_kwargs['testimage_dump_target'] = d.getVar("testimage_dump_target") or ""
 
     def export_ssh_agent(d):
         import os

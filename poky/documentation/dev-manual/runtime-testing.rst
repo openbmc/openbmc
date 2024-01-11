@@ -453,7 +453,7 @@ layer's ``layer.conf`` file as normal). Just remember the following:
    directory.
 
 To create a new test, start by copying an existing module (e.g.
-``syslog.py`` or ``gcc.py`` are good ones to use). Test modules can use
+``oe_syslog.py`` or ``gcc.py`` are good ones to use). Test modules can use
 code from ``meta/lib/oeqa/utils``, which are helper classes.
 
 .. note::

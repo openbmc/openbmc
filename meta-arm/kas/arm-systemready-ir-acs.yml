@@ -8,10 +8,5 @@ env:
   # The full testimage run typically takes around 12-24h on fvp-base.
   TEST_OVERALL_TIMEOUT: "${@ 24*60*60}"
 
-local_conf_header:
-  systemready-ir-acs: |
-    IMAGE_CLASSES:append = " testimage"
-
-
 target:
   - arm-systemready-ir-acs

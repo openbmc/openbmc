@@ -5347,9 +5347,8 @@ system and gives an overview of their function and contents.
       :term:`PREMIRRORS`, the upstream source, and then
       locations specified by :term:`MIRRORS` in that order.
 
-      Assuming your distribution (:term:`DISTRO`) is "poky",
-      the default value for :term:`MIRRORS` is defined in the
-      ``conf/distro/poky.conf`` file in the ``meta-poky`` Git repository.
+      The default value for :term:`MIRRORS` is defined in the
+      ``meta/classes-global/mirrors.bbclass`` file in the core metadata layer.
 
    :term:`MLPREFIX`
       Specifies a prefix has been added to :term:`PN` to create a
@@ -6647,9 +6646,8 @@ system and gives an overview of their function and contents.
       source, and then locations specified by
       :term:`MIRRORS` in that order.
 
-      Assuming your distribution (:term:`DISTRO`) is "poky",
-      the default value for :term:`PREMIRRORS` is defined in the
-      ``conf/distro/poky.conf`` file in the ``meta-poky`` Git repository.
+      The default value for :term:`PREMIRRORS` is defined in the
+      ``meta/classes-global/mirrors.bbclass`` file in the core metadata layer.
 
       Typically, you could add a specific server for the build system to
       attempt before any others by adding something like the following to

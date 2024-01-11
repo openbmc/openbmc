@@ -4,7 +4,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e664eb75e2791c2e505e6e1c274e6d4f"
 
 SRCREV = "218d310e3d840715b1c8e67cefd5b6d71a2d7a1a"
-SRC_URI = "git://github.com/NordicSemiconductor/piccata.git;protocol=http;branch=master"
+SRC_URI = "git://github.com/NordicSemiconductor/piccata.git;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

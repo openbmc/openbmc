@@ -255,7 +255,7 @@ Miscellaneous
 - The previously deprecated ``COMPRESS_CMD`` and
   ``CVE_CHECK_CVE_WHITELIST`` variables have been removed. Use
   :term:`CONVERSION_CMD` and ``CVE_CHECK_WHITELIST`` (replaced by
-  :term:`CVE_CHECK_IGNORE` in version 3.5) respectively
+  :term:`CVE_CHECK_IGNORE` in version 4.0) respectively
   instead.
 
 - The obsolete ``oe_machinstall`` function previously provided in the

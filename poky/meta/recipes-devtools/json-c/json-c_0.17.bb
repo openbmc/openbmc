@@ -17,6 +17,9 @@ UPSTREAM_CHECK_REGEX = "json-c-(?P<pver>\d+(\.\d+)+)-\d+"
 
 RPROVIDES:${PN} = "libjson"
 
+# Required for ICECC builds
+EXTRA_OECMAKE = "-DDISABLE_WERROR=ON"
+
 inherit cmake ptest
 
 do_install_ptest() {

@@ -937,6 +937,7 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
         sstatefile = d.expand("${SSTATE_DIR}/" + getsstatefile(tid, siginfo, d))
 
         if os.path.exists(sstatefile):
+            oe.utils.touch(sstatefile)
             found.add(tid)
             bb.debug(2, "SState: Found valid sstate file %s" % sstatefile)
         else:
@@ -1183,16 +1184,7 @@ python sstate_eventhandler() {
         if not os.path.exists(siginfo):
             bb.siggen.dump_this_task(siginfo, d)
         else:
-            try:
-                os.utime(siginfo, None)
-            except PermissionError:
-                pass
-            except OSError as e:
-                # Handle read-only file systems gracefully
-                import errno
-                if e.errno != errno.EROFS:
-                    raise e
-
+            oe.utils.touch(siginfo)
 }
 
 SSTATE_PRUNE_OBSOLETEWORKDIR ?= "1"

@@ -178,7 +178,7 @@ PACKAGECONFIG[microhttpd] = "-Dmicrohttpd=true,-Dmicrohttpd=false,libmicrohttpd"
 PACKAGECONFIG[myhostname] = "-Dnss-myhostname=true,-Dnss-myhostname=false,,libnss-myhostname"
 PACKAGECONFIG[networkd] = "-Dnetworkd=true,-Dnetworkd=false"
 PACKAGECONFIG[no-dns-fallback] = "-Ddns-servers="
-PACKAGECONFIG[nss] = "-Dnss-systemd=true,-Dnss-systemd=false"
+PACKAGECONFIG[nss] = "-Dnss-systemd=true,-Dnss-systemd=false,,libnss-systemd"
 PACKAGECONFIG[nss-mymachines] = "-Dnss-mymachines=true,-Dnss-mymachines=false"
 PACKAGECONFIG[nss-resolve] = "-Dnss-resolve=true,-Dnss-resolve=false"
 PACKAGECONFIG[oomd] = "-Doomd=true,-Doomd=false"
@@ -826,15 +826,31 @@ ALTERNATIVE_LINK_NAME[runlevel] = "${base_sbindir}/runlevel"
 ALTERNATIVE_PRIORITY[runlevel] ?= "300"
 
 pkg_postinst:${PN}:libc-glibc () {
-	sed -e '/^hosts:/s/\s*\<myhostname\>//' \
-		-e 's/\(^hosts:.*\)\(\<files\>\)\(.*\)\(\<dns\>\)\(.*\)/\1\2 myhostname \3\4\5/' \
-		-i $D${sysconfdir}/nsswitch.conf
+	if ${@bb.utils.contains('PACKAGECONFIG', 'myhostname', 'true', 'false', d)}; then
+		sed -e '/^hosts:/s/\s*\<myhostname\>//' \
+			-e 's/\(^hosts:.*\)\(\<files\>\)\(.*\)\(\<dns\>\)\(.*\)/\1\2 myhostname \3\4\5/' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
+	if ${@bb.utils.contains('PACKAGECONFIG', 'nss', 'true', 'false', d)}; then
+		sed -e 's#\(^passwd:.*\)#\1 systemd#' \
+			-e 's#\(^group:.*\)#\1 systemd#' \
+			-e 's#\(^shadow:.*\)#\1 systemd#' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
 }
 
 pkg_prerm:${PN}:libc-glibc () {
-	sed -e '/^hosts:/s/\s*\<myhostname\>//' \
-		-e '/^hosts:/s/\s*myhostname//' \
-		-i $D${sysconfdir}/nsswitch.conf
+	if ${@bb.utils.contains('PACKAGECONFIG', 'myhostname', 'true', 'false', d)}; then
+		sed -e '/^hosts:/s/\s*\<myhostname\>//' \
+			-e '/^hosts:/s/\s*myhostname//' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
+	if ${@bb.utils.contains('PACKAGECONFIG', 'nss', 'true', 'false', d)}; then
+		sed -e '/^passwd:/s#\s*systemd##' \
+			-e '/^group:/s#\s*systemd##' \
+			-e '/^shadow:/s#\s*systemd##' \
+			-i $D${sysconfdir}/nsswitch.conf
+	fi
 }
 
 PACKAGE_WRITE_DEPS += "qemu-native"

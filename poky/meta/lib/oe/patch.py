@@ -772,8 +772,9 @@ class NOOPResolver(Resolver):
             self.patchset.Push()
         except Exception:
             import sys
-            os.chdir(olddir)
             raise
+        finally:
+            os.chdir(olddir)
 
 # Patch resolver which relies on the user doing all the work involved in the
 # resolution, with the exception of refreshing the remote copy of the patch
@@ -833,9 +834,9 @@ class UserResolver(Resolver):
                             # User did not fix the problem.  Abort.
                             raise PatchError("Patch application failed, and user did not fix and refresh the patch.")
         except Exception:
-            os.chdir(olddir)
             raise
-        os.chdir(olddir)
+        finally:
+            os.chdir(olddir)
 
 
 def patch_path(url, fetch, workdir, expand=True):

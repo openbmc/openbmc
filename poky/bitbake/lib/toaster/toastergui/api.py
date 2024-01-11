@@ -11,7 +11,7 @@ import os
 import re
 import logging
 import json
-import subprocess
+import glob
 from collections import Counter
 
 from orm.models import Project, ProjectTarget, Build, Layer_Version
@@ -234,13 +234,11 @@ class XhrSetDefaultImageUrl(View):
 
 def scan_layer_content(layer,layer_version):
     # if this is a local layer directory, we can immediately scan its content
-    if layer.local_source_dir:
+    if os.path.isdir(layer.local_source_dir):
         try:
             # recipes-*/*/*.bb
-            cmd = '%s %s' % ('ls', os.path.join(layer.local_source_dir,'recipes-*/*/*.bb'))
-            recipes_list = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout.read()
-            recipes_list = recipes_list.decode("utf-8").strip()
-            if recipes_list and 'No such' not in recipes_list:
+            recipes_list = glob.glob(os.path.join(layer.local_source_dir, 'recipes-*/*/*.bb'))
+            for recipe in recipes_list:
                 for recipe in recipes_list.split('\n'):
                     recipe_path = recipe[recipe.rfind('recipes-'):]
                     recipe_name = recipe[recipe.rfind('/')+1:].replace('.bb','')
@@ -260,6 +258,9 @@ def scan_layer_content(layer,layer_version):
 
         except Exception as e:
             logger.warning("ERROR:scan_layer_content: %s" % e)
+    else:
+        logger.warning("ERROR: wrong path given")
+        raise KeyError("local_source_dir")
 
 class XhrLayer(View):
     """ Delete, Get, Add and Update Layer information

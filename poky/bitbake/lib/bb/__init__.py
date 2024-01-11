@@ -15,6 +15,13 @@ import sys
 if sys.version_info < (3, 8, 0):
     raise RuntimeError("Sorry, python 3.8.0 or later is required for this version of bitbake")
 
+if sys.version_info < (3, 10, 0):
+    # With python 3.8 and 3.9, we see errors of "libgcc_s.so.1 must be installed for pthread_cancel to work"
+    # https://stackoverflow.com/questions/64797838/libgcc-s-so-1-must-be-installed-for-pthread-cancel-to-work
+    # https://bugs.ams1.psf.io/issue42888
+    # so ensure libgcc_s is loaded early on
+    import ctypes
+    libgcc_s = ctypes.CDLL('libgcc_s.so.1')
 
 class BBHandledException(Exception):
     """

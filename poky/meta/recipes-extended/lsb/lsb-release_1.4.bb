@@ -14,10 +14,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/lsb/lsb_release/1.4/lsb-release-1.4.tar
            file://help2man-reproducibility.patch \
            "
 
-SRC_URI[md5sum] = "30537ef5a01e0ca94b7b8eb6a36bb1e4"
 SRC_URI[sha256sum] = "99321288f8d62e7a1d485b7c6bdccf06766fb8ca603c6195806e4457fdf17172"
 
-UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/lsb/files/lsb_release/"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/lsb/files/lsb_release/"
 UPSTREAM_CHECK_REGEX = "/lsb_release/(?P<pver>(\d+[\.\-_]*)+)/"
 
 CLEANBROKEN = "1"

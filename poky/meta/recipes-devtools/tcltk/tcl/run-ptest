@@ -3,7 +3,11 @@
 # clock.test needs a timezone to be set
 export TZ="Europe/London"
 export TCL_LIBRARY=library
-SKIPPED_TESTS=
+
+# Some tests are overly strict with timings and fail on loaded systems.
+# See bugs #14825 #14882 #15081 #15321.
+SKIPPED_TESTS='async-* cmdMZ-6.6 event-* exit-1.* socket-* socket_inet-*'
+
 for i in `ls tests/*.test | awk -F/ '{print $2}'`; do
     ./tcltest tests/all.tcl -file $i -skip "$SKIPPED_TESTS" >$i.log 2>&1
     grep -q -F -e "Files with failing tests:" -e "Test files exiting with errors:" $i.log

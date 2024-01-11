@@ -235,7 +235,7 @@ References
 .. _Arm security features: https://www.arm.com/architecture/security-features/platform-security
 .. _linux repo: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/
 .. _FF-A: https://developer.arm.com/documentation/den0077/latest
-.. _FF-M: https://developer.arm.com/-/media/Files/pdf/PlatformSecurityArchitecture/Architect/DEN0063-PSA_Firmware_Framework-1.0.0-2.pdf?revision=2d1429fa-4b5b-461a-a60e-4ef3d8f7f4b4&hash=3BFD6F3E687F324672F18E5BE9F08EDC48087C93
+.. _FF-M: https://developer.arm.com/architectures/Firmware%20Framework%20for%20M-Profile
 .. _FWU: https://developer.arm.com/documentation/den0118/a/
 .. _OPTEE-OS: https://github.com/OP-TEE/optee_os
 .. _PSA: https://www.psacertified.org/

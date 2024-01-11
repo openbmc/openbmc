@@ -7,7 +7,7 @@ SECTION = "libs"
 LICENSE = "HDF5"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9ba0f3d878ab6c2403c86e9b0362d998"
 
-inherit cmake siteinfo qemu multilib_header
+inherit cmake siteinfo qemu multilib_header multilib_script
 
 DEPENDS += "qemu-native zlib"
 
@@ -39,6 +39,10 @@ EOF
 }
 
 do_unpack[postfuncs] += "gen_emu"
+
+MULTILIB_SCRIPTS += "${PN}:${bindir}/h5cc \
+                     ${PN}:${bindir}/h5hlcc \
+"
 
 do_install:append() {
     # Used for generating config files on target

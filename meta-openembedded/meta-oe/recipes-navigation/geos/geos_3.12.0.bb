@@ -13,7 +13,7 @@ inherit cmake pkgconfig binconfig
 PACKAGES =+ "geoslib ${PN}-c1"
 
 DESCRIPTION:${PN}lib = "Geometry engine for Geographic Information Systems - C++ Library"
-FILES:${PN}lib += "${libdir}/libgeos-${PV}.so"
+FILES:${PN}lib += "${libdir}/libgeos.so.*"
 
 DESCRIPTION:${PN}-c1 = "Geometry engine for Geographic Information Systems - C Library"
 FILES:${PN}-c1 += "${libdir}/libgeos_c.so.*"

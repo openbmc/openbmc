@@ -251,10 +251,10 @@ an entire Linux distribution, including the toolchain, from source.
       To use such mirrors, uncomment the below lines in your ``conf/local.conf``
       file in the :term:`Build Directory`::
 
-         BB_SIGNATURE_HANDLER = "OEEquivHash"
-         BB_HASHSERVE = "auto"
          BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
          SSTATE_MIRRORS ?= "file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH"
+         BB_HASHSERVE = "auto"
+         BB_SIGNATURE_HANDLER = "OEEquivHash"
 
 #. **Start the Build:** Continue with the following command to build an OS
    image for the target, which is ``core-image-sato`` in this example:

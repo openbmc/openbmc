@@ -125,7 +125,8 @@ def copyhardlinktree(src, dst):
         if os.path.isdir(src):
             if len(glob.glob('%s/.??*' % src)) > 0:
                 source = './.??* '
-            source += './*'
+            if len(glob.glob('%s/**' % src)) > 0:
+                source += './*'
             s_dir = src
         else:
             source = src

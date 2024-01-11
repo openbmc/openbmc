@@ -1530,6 +1530,11 @@ def _update_recipe_srcrev(recipename, workspace, srctree, rd, appendlayerdir, wi
     recipedir = os.path.basename(recipefile)
     logger.info('Updating SRCREV in recipe %s%s' % (recipedir, dry_run_suffix))
 
+    # Get original SRCREV
+    old_srcrev = rd.getVar('SRCREV') or ''
+    if old_srcrev == "INVALID":
+            raise DevtoolError('Update mode srcrev is only valid for recipe fetched from an SCM repository')
+
     # Get HEAD revision
     try:
         stdout, _ = bb.process.run('git rev-parse HEAD', cwd=srctree)
@@ -1556,7 +1561,6 @@ def _update_recipe_srcrev(recipename, workspace, srctree, rd, appendlayerdir, wi
         if not no_remove:
             # Find list of existing patches in recipe file
             patches_dir = tempfile.mkdtemp(dir=tempdir)
-            old_srcrev = rd.getVar('SRCREV') or ''
             upd_p, new_p, del_p = _export_patches(srctree, rd, old_srcrev,
                                                   patches_dir)
             logger.debug('Patches: update %s, new %s, delete %s' % (dict(upd_p), dict(new_p), dict(del_p)))
@@ -1576,11 +1580,10 @@ def _update_recipe_srcrev(recipename, workspace, srctree, rd, appendlayerdir, wi
                 patchfields['SRC_URI'] = '\\\n    '.join(srcuri)
             if dry_run_outdir:
                 logger.info('Creating bbappend (dry-run)')
-            else:
-                appendfile, destpath = oe.recipeutils.bbappend_recipe(
-                        rd, appendlayerdir, files, wildcardver=wildcard_version,
-                        extralines=patchfields, removevalues=removevalues,
-                        redirect_output=dry_run_outdir)
+            appendfile, destpath = oe.recipeutils.bbappend_recipe(
+                    rd, appendlayerdir, files, wildcardver=wildcard_version,
+                    extralines=patchfields, removevalues=removevalues,
+                    redirect_output=dry_run_outdir)
         else:
             files_dir = _determine_files_dir(rd)
             for basepath, path in upd_f.items():

@@ -1,0 +1,32 @@
+From 44cf51a38cce1e90bb6c22208fa45f95cdcc8f5d Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@strace.io>
+Date: Sat, 14 Oct 2023 08:00:00 +0000
+Subject: [PATCH] tests: fix so_peerpidfd test
+
+* tests/so_peerpidfd.c (print_pidfd): Fix expected output.
+
+Fixes: v6.5~38 "net: implement decoding of SO_PEERPIDFD socket option"
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=2243631
+
+Upstream-Status: Backport [https://github.com/strace/strace/commit/44cf51a38cce1e90bb6c22208fa45f95cdcc8f5d]
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+---
+ tests/so_peerpidfd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/so_peerpidfd.c b/tests/so_peerpidfd.c
+index 33988edec..dfad1c434 100644
+--- a/tests/so_peerpidfd.c
++++ b/tests/so_peerpidfd.c
+@@ -37,7 +37,7 @@ print_pidfd(int *p)
+ 	if (rc < 0)
+ 		printf("%p", p);
+ 	else
+-		printf("%d%s", *p, pidfd_suffix);
++		printf("[%d%s]", *p, pidfd_suffix);
+ }
+ 
+ static void
+-- 
+2.34.1
+

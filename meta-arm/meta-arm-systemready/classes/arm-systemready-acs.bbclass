@@ -12,12 +12,11 @@
 INHIBIT_DEFAULT_DEPS = "1"
 COMPATIBLE_HOST = "aarch64-*"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-inherit nopackages deploy rootfs-postcommands ${IMAGE_CLASSES} python3native
+inherit nopackages deploy rootfs-postcommands ${IMAGE_CLASSES} python3native testimage
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 do_install[noexec] = "1"
-do_testimage[depends] += "mtools-native:do_populate_sysroot"
 
 # Deploy with this suffix so it is picked up in the machine configuration
 IMAGE_DEPLOY_SUFFIX ?= ".wic"
@@ -80,7 +79,9 @@ RM_WORK_EXCLUDE_ITEMS += "${@ os.path.basename(d.getVar('TEST_LOG_DIR')) }"
 
 do_testimage[postfuncs] += "acs_logs_handle"
 do_testimage[depends] += "edk2-test-parser-native:do_populate_sysroot \
-                          arm-systemready-scripts-native:do_populate_sysroot"
+                          arm-systemready-scripts-native:do_populate_sysroot \
+                          mtools-native:do_populate_sysroot \
+                          parted-native:do_populate_sysroot"
 
 # Process the logs
 python acs_logs_handle() {

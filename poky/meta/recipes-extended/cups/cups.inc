@@ -55,7 +55,7 @@ EXTRA_OECONF = " \
                --enable-debug \
                --disable-relro \
                --enable-libusb \
-               --with-system-groups=lpadmin \
+               --with-system-groups=lpadmin,root,sys,wheel \
                --with-cups-group=lp \
                --with-domainsocket=/run/cups/cups.sock \
                --with-pkgconfpath=${libdir}/pkgconfig \
