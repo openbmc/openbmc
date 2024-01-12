@@ -1,0 +1,7 @@
+[Unit]
+Description=slot hot-plug:%i
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done %i
+ExecStart=/bin/systemctl restart phosphor-discover-system-state@%i.service

@@ -148,5 +148,93 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT1_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 44,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT2_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 45,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT3_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 46,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT4_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 47,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT5_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 132,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT6_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 133,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT7_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 134,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_SB_SLOT8_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 135,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hot-plug@8.service"]
+        },
+        "Continue": true
     }
 ]
