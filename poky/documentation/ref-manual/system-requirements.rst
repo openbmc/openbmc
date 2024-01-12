@@ -62,8 +62,6 @@ supported on the following distributions:
 
 -  Ubuntu 22.04 (LTS)
 
--  Fedora 37
-
 -  Fedora 38
 
 -  CentOS Stream 8
@@ -74,19 +72,18 @@ supported on the following distributions:
 
 -  OpenSUSE Leap 15.4
 
--  AlmaLinux 8.8
+-  AlmaLinux 8
 
--  AlmaLinux 9.2
+-  AlmaLinux 9
 
-The following distribution versions are still tested (being listed
-in :term:`SANITY_TESTED_DISTROS`), even though the organizations
-publishing them no longer make updates publicly available:
+-  Rocky 9
+
+The following distribution versions are still tested, even though the
+organizations publishing them no longer make updates publicly available:
 
 -  Ubuntu 18.04 (LTS)
 
--  Ubuntu 22.10
-
--  OpenSUSE Leap 15.3
+-  Ubuntu 23.04
 
 Note that the Yocto Project doesn't have access to private updates
 that some of these versions may have. Therefore, our testing has

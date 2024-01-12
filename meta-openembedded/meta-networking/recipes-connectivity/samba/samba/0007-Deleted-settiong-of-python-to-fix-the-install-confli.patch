@@ -1,4 +1,4 @@
-From f783bb9c87ce11e824dfefca473d0dcf6edad238 Mon Sep 17 00:00:00 2001
+From bf5552f937c745940081e29ef32d52ae26bfd8c1 Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@fujitsu.com>
 Date: Sun, 30 Oct 2022 11:59:31 +0900
 Subject: [PATCH] Deleted settiong of python to fix the install conflict error
@@ -22,7 +22,8 @@ sys.path.insert(0, "/usr/lib/python3.10/site-packages")
 But this setting is for environment when running from source tree. There
 is no necessary on target.
 
-Upstream-Status: Inappropriate
+Upstream-Status: Inappropriate [embedded specific]
+
 Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
 ---
  source4/scripting/bin/samba-gpupdate     | 1 -
@@ -47,7 +48,7 @@ index 4b3f057..08fec2d 100755
  import optparse
  from samba import getopt as options
 diff --git a/source4/scripting/bin/samba-tool b/source4/scripting/bin/samba-tool
-index f8a70a6..3c818de 100755
+index b02ad4d..f69ae10 100755
 --- a/source4/scripting/bin/samba-tool
 +++ b/source4/scripting/bin/samba-tool
 @@ -22,7 +22,6 @@
@@ -59,7 +60,7 @@ index f8a70a6..3c818de 100755
  # make sure the script dies immediately when hitting control-C,
  # rather than raising KeyboardInterrupt. As we do all database
 diff --git a/source4/scripting/bin/samba_dnsupdate b/source4/scripting/bin/samba_dnsupdate
-index 1ce53f5..2cdfbf8 100755
+index 69821e2..4037870 100755
 --- a/source4/scripting/bin/samba_dnsupdate
 +++ b/source4/scripting/bin/samba_dnsupdate
 @@ -36,7 +36,6 @@ os.environ['PYTHONUNBUFFERED'] = '1'
@@ -95,7 +96,7 @@ index 67d801e..2fc0d6a 100755
  import optparse
  import time
 diff --git a/source4/scripting/bin/samba_spnupdate b/source4/scripting/bin/samba_spnupdate
-index 84ff771..b6fe041 100755
+index b421886..5e18ad9 100755
 --- a/source4/scripting/bin/samba_spnupdate
 +++ b/source4/scripting/bin/samba_spnupdate
 @@ -32,7 +32,6 @@ os.environ['PYTHONUNBUFFERED'] = '1'

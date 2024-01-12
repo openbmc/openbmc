@@ -19,15 +19,17 @@ DEPENDS = " \
     libpcre2 \
 "
 
-SRC_URI = "git://gitlab.gnome.org/GNOME/gnome-terminal.git;protocol=https;nobranch=1 \
-           file://0001-Add-W_EXITCODE-macro-for-non-glibc-systems.patch \
-           "
+SRC_URI = " \
+	git://gitlab.gnome.org/GNOME/gnome-terminal.git;protocol=https;nobranch=1 \
+	file://0001-Add-W_EXITCODE-macro-for-non-glibc-systems.patch \
+	file://0001-meson-add-option-to-set-dbus_interfacedir.patch \
+"
 SRCREV = "5ac3b8e4bd6fa02651b3c23cedb0a7e1cd769655"
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[nautilus] = "-Dnautilus_extension=true,-Dnautilus_extension=false,nautilus,nautilus"
-PACKAGECONFIG[search_provider] = "-Dsearch_provider=true,-Dsearch_provider=false,,gnome-shell"
+PACKAGECONFIG[search_provider] = "-Dsearch_provider=true -Ddbus_interface_dir=${STAGING_DATADIR}/dbus-1/interfaces,-Dsearch_provider=false,gnome-shell"
 
 FILES:${PN} += " \
     ${datadir} \

@@ -4,7 +4,7 @@ HOMEPAGE = "https://collectd.org/"
 LICENSE = "GPL-2.0-only & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1bd21f19f7f0c61a7be8ecacb0e28854"
 
-DEPENDS = "rrdtool curl libpcap libxml2 yajl libgcrypt libtool lvm2"
+DEPENDS = "curl libpcap libxml2 yajl libgcrypt libtool lvm2"
 
 SRC_URI = "https://collectd.org/files/collectd-${PV}.tar.bz2 \
            file://collectd.init \

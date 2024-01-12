@@ -243,3 +243,101 @@ unset A[flag@.service]
         with self.assertRaises(bb.parse.ParseError):
             d = bb.parse.handle(f.name, self.d)['']
 
+    export_function_recipe = """
+inherit someclass
+"""
+
+    export_function_recipe2 = """
+inherit someclass
+
+do_compile () {
+    false
+}
+
+python do_compilepython () {
+    bb.note("Something else")
+}
+
+"""
+    export_function_class = """
+someclass_do_compile() {
+    true
+}
+
+python someclass_do_compilepython () {
+    bb.note("Something")
+}
+
+EXPORT_FUNCTIONS do_compile do_compilepython
+"""
+
+    export_function_class2 = """
+secondclass_do_compile() {
+    true
+}
+
+python secondclass_do_compilepython () {
+    bb.note("Something")
+}
+
+EXPORT_FUNCTIONS do_compile do_compilepython
+"""
+
+    def test_parse_export_functions(self):
+        def check_function_flags(d):
+            self.assertEqual(d.getVarFlag("do_compile", "func"), 1)
+            self.assertEqual(d.getVarFlag("do_compilepython", "func"), 1)
+            self.assertEqual(d.getVarFlag("do_compile", "python"), None)
+            self.assertEqual(d.getVarFlag("do_compilepython", "python"), "1")
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            self.d.setVar("__bbclasstype", "recipe")
+            recipename = tempdir + "/recipe.bb"
+            os.makedirs(tempdir + "/classes")
+            with open(tempdir + "/classes/someclass.bbclass", "w") as f:
+                f.write(self.export_function_class)
+                f.flush()
+            with open(tempdir + "/classes/secondclass.bbclass", "w") as f:
+                f.write(self.export_function_class2)
+                f.flush()
+
+            with open(recipename, "w") as f:
+                f.write(self.export_function_recipe)
+                f.flush()
+            os.chdir(tempdir)
+            d = bb.parse.handle(recipename, bb.data.createCopy(self.d))['']
+            self.assertIn("someclass_do_compile", d.getVar("do_compile"))
+            self.assertIn("someclass_do_compilepython", d.getVar("do_compilepython"))
+            check_function_flags(d)
+
+            recipename2 = tempdir + "/recipe2.bb"
+            with open(recipename2, "w") as f:
+                f.write(self.export_function_recipe2)
+                f.flush()
+
+            d = bb.parse.handle(recipename2, bb.data.createCopy(self.d))['']
+            self.assertNotIn("someclass_do_compile", d.getVar("do_compile"))
+            self.assertNotIn("someclass_do_compilepython", d.getVar("do_compilepython"))
+            self.assertIn("false", d.getVar("do_compile"))
+            self.assertIn("else", d.getVar("do_compilepython"))
+            check_function_flags(d)
+
+            with open(recipename, "a+") as f:
+                f.write("\ninherit secondclass\n")
+                f.flush()
+            with open(recipename2, "a+") as f:
+                f.write("\ninherit secondclass\n")
+                f.flush()
+
+            d = bb.parse.handle(recipename, bb.data.createCopy(self.d))['']
+            self.assertIn("secondclass_do_compile", d.getVar("do_compile"))
+            self.assertIn("secondclass_do_compilepython", d.getVar("do_compilepython"))
+            check_function_flags(d)
+
+            d = bb.parse.handle(recipename2, bb.data.createCopy(self.d))['']
+            self.assertNotIn("someclass_do_compile", d.getVar("do_compile"))
+            self.assertNotIn("someclass_do_compilepython", d.getVar("do_compilepython"))
+            self.assertIn("false", d.getVar("do_compile"))
+            self.assertIn("else", d.getVar("do_compilepython"))
+            check_function_flags(d)
+

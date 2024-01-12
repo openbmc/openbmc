@@ -93,6 +93,7 @@ either install it and add it to HOSTTOOLS, or add clang-native from meta-clang t
     sed -i -e 's|^all: docs|all:|' ${S}/tools/testing/selftests/bpf/Makefile
     sed -i -e '/mrecord-mcount/d' ${S}/Makefile
     sed -i -e '/Wno-alloc-size-larger-than/d' ${S}/Makefile
+    sed -i -e '/Wno-alloc-size-larger-than/d' ${S}/scripts/Makefile.*
     for i in ${TEST_LIST}
     do
         oe_runmake -C ${S}/tools/testing/selftests/${i}

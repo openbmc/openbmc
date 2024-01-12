@@ -10,5 +10,6 @@ PYPI_PACKAGE = "gmpy2"
 SRC_URI[sha256sum] = "bc297f1fd8c377ae67a4f493fc0f926e5d1b157e5c342e30a4d84dc7b9f95d96"
 
 inherit pypi setuptools3 python3native
+SRC_URI += "file://0001-src-fix-python-3.12-builds.patch"
 
 BBCLASSEXTEND = "native nativesdk"

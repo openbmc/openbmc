@@ -31,7 +31,6 @@ EXTRA_OEMAKE += " \
 EXTRA_OEMAKE += " HOST_PREFIX=${HOST_PREFIX}"
 EXTRA_OEMAKE += " CROSS_COMPILE64=${HOST_PREFIX}"
 
-CFLAGS[unexport] = "1"
 LDFLAGS[unexport] = "1"
 CPPFLAGS[unexport] = "1"
 AS[unexport] = "1"

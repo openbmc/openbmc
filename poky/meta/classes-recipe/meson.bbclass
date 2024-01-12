@@ -74,7 +74,7 @@ nm = ${@meson_array('NM', d)}
 strip = ${@meson_array('STRIP', d)}
 readelf = ${@meson_array('READELF', d)}
 objcopy = ${@meson_array('OBJCOPY', d)}
-pkgconfig = 'pkg-config'
+pkg-config = 'pkg-config'
 llvm-config = 'llvm-config'
 cups-config = 'cups-config'
 g-ir-scanner = '${STAGING_BINDIR}/g-ir-scanner-wrapper'
@@ -115,7 +115,7 @@ strip = ${@meson_array('BUILD_STRIP', d)}
 readelf = ${@meson_array('BUILD_READELF', d)}
 objcopy = ${@meson_array('BUILD_OBJCOPY', d)}
 llvm-config = '${STAGING_BINDIR_NATIVE}/llvm-config'
-pkgconfig = 'pkg-config-native'
+pkg-config = 'pkg-config-native'
 ${@rust_tool(d, "RUST_BUILD_SYS")}
 
 [built-in options]

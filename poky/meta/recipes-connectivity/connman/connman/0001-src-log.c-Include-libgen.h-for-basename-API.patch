@@ -1,0 +1,55 @@
+From cbba6638986c2de763981bf6fc59df6a86fed44f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 1 Jan 2024 17:42:21 -0800
+Subject: [PATCH v2] src/log.c: Include libgen.h for basename API
+
+Use POSIX version of basename. This comes to front with latest musl
+which dropped the declaration from string.h [1] it fails to build with
+clang-17+ because it treats implicit function declaration as error.
+
+Fix it by applying the basename on a copy of string since posix version
+may modify the input string.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://lore.kernel.org/connman/20240102015917.3732089-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+
+ src/log.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/log.c b/src/log.c
+index 554b046..2df3af7 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -24,6 +24,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <libgen.h>
+ #include <unistd.h>
+ #include <stdarg.h>
+ #include <stdlib.h>
+@@ -196,6 +197,7 @@ int __connman_log_init(const char *program, const char *debug,
+ 		const char *program_name, const char *program_version)
+ {
+ 	static char path[PATH_MAX];
++	char* tmp = strdup(program);
+ 	int option = LOG_NDELAY | LOG_PID;
+ 
+ 	program_exec = program;
+@@ -212,8 +214,8 @@ int __connman_log_init(const char *program, const char *debug,
+ 	if (backtrace)
+ 		signal_setup(signal_handler);
+ 
+-	openlog(basename(program), option, LOG_DAEMON);
+-
++	openlog(basename(tmp), option, LOG_DAEMON);
++	free(tmp);
+ 	syslog(LOG_INFO, "%s version %s", program_name, program_version);
+ 
+ 	return 0;
+-- 
+2.43.0
+

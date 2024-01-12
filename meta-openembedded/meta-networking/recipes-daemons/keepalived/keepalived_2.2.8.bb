@@ -41,7 +41,11 @@ do_install:append() {
     fi
 }
 
+PACKAGE_BEFORE_PN = "${PN}-samples"
+
 FILES:${PN} += "${datadir}/snmp/mibs/KEEPALIVED-MIB.txt"
+
+FILES:${PN}-samples = "${sysconfdir}/keepalived/samples ${sysconfdir}/keepalived/keepalived.conf.sample"
 
 SYSTEMD_SERVICE:${PN} = "keepalived.service"
 SYSTEMD_AUTO_ENABLE ?= "disable"

@@ -1,0 +1,29 @@
+From 0920bd21ceab75bc4b655c571a37835526dd2468 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 27 Dec 2023 15:12:19 +0100
+Subject: [PATCH] versioneer.py: do not use SafeConfigParser
+
+This has been deprecated for a long time, and finally removed in python 3.12
+
+Upstream-Status: Submitted [https://github.com/rsokl/custom_inherit/pull/49]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ versioneer.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/versioneer.py b/versioneer.py
+index 64fea1c..3aa5da3 100644
+--- a/versioneer.py
++++ b/versioneer.py
+@@ -339,9 +339,9 @@ def get_config_from_root(root):
+     # configparser.NoOptionError (if it lacks "VCS="). See the docstring at
+     # the top of versioneer.py for instructions on writing your setup.cfg .
+     setup_cfg = os.path.join(root, "setup.cfg")
+-    parser = configparser.SafeConfigParser()
++    parser = configparser.ConfigParser()
+     with open(setup_cfg, "r") as f:
+-        parser.readfp(f)
++        parser.read_file(f)
+     VCS = parser.get("versioneer", "VCS")  # mandatory
+ 
+     def get(parser, name):

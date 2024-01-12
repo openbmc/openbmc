@@ -5,12 +5,13 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=91e7de50a8d3cf01057f318d72460acd"
 
-SRCREV = "7786c7ded5c9ce7773890d0e3dc27632898fc6b1"
+SRCREV = "3c288a09109969eef9c2da7d92d3c62f92a015cc"
 PV = "2.2.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=https;branch=master \
            file://0001-cmake-Use-a-regular-expression-to-match-x86-architec.patch \
-           file://0001-include-Declare-gVERSION-global-as-extern.patch \
+           file://0001-mraa-Use-posix-basename.patch \
+           file://0002-gpio-Include-limits.h-for-PATH_MAX.patch \
            "
 
 S = "${WORKDIR}/git"

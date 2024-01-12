@@ -1,0 +1,42 @@
+From 0a1af74ed3fae9a9a08b8b1ab89e88c02427ae06 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 10 Jan 2024 05:57:00 +0000
+Subject: [PATCH] csv-revision: Drop the git revision info
+
+The git revison info is added [1] to make the version more descriptive
+to produce an incremental revision number like 1.8.18.13 or 1.8.18.14
+and etc and more clear in terms of "what codebase was used" like
+`1.8.18.13.gee01aa5`. But it also introduces the below version
+inconsistence.
+ root@qemux86-64:~# ipmitool -V
+ ipmitool version 1.8.19.19.gab5ce5b
+ root@qemux86-64:~# rpm -qa | grep ipmitool
+ ipmitool-1.8.19-r0.core2_64
+
+Considering the version we acutally used in oe is a release version,
+the git revision info as [1] is meaningness. So drop the git revsion
+info to remove the above version inconsitence.
+
+[1] https://github.com/ipmitool/ipmitool/commit/ba01dc84b4e225c86eac3f562e629662d752040f
+
+Upstream-Status: Inappropriate [OE-Specific as we use a release version in oe]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ csv-revision | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/csv-revision b/csv-revision
+index 289c133..3fa9f1c 100755
+--- a/csv-revision
++++ b/csv-revision
+@@ -1,5 +1,6 @@
+ #!/bin/sh
+ 
++exit 0
+ git describe --first-parent --tags 2>/dev/null | (
+ 	IFS=- read tag rev hash
+ 	if [ $? ] && [ -n "$rev" ]; then
+-- 
+2.35.5
+

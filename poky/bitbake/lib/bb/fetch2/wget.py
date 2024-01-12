@@ -375,7 +375,7 @@ class Wget(FetchMethod):
                     return self.checkstatus(fetch, ud, d, False)
                 else:
                     # debug for now to avoid spamming the logs in e.g. remote sstate searches
-                    logger.debug2("checkstatus() urlopen failed: %s" % e)
+                    logger.debug2("checkstatus() urlopen failed for %s: %s" % (uri,e))
                     return False
 
         return True

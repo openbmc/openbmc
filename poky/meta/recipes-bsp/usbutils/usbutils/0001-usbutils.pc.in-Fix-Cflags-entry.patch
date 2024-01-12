@@ -1,0 +1,34 @@
+From f558919e858453a31313a3df35906de2e036940c Mon Sep 17 00:00:00 2001
+From: Fabio Estevam <festevam@denx.de>
+Date: Thu, 4 Jan 2024 03:32:11 +0100
+Subject: [PATCH] usbutils.pc.in: Fix Cflags entry
+
+When updating the usbutils version in OpenEmbedded from 015 to 017,
+the following QA error is seen:
+
+QA Issue: File /usr/lib/pkgconfig/usbutils.pc in package usbutils-dev contains reference to TMPDIR [buildpaths]
+
+As this causes reproducibility problem due to the host PC path being
+leaked, it is treated as error.
+
+Fix it by using the standard Cflags entry.
+
+Upstream-Status: Submitted [https://github.com/gregkh/usbutils/pull/184/commits/3b3e5e1ebea7060bfa118d25a91b816dfa176b31]
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+---
+ usbutils.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usbutils.pc.in b/usbutils.pc.in
+index e69778c3195c..0aa0005de951 100644
+--- a/usbutils.pc.in
++++ b/usbutils.pc.in
+@@ -15,4 +15,4 @@ Requires: libusb-1.0 >= 1.0.14  libudev >= 196
+ Conflicts:
+ Libs: -L${libdir}
+ Libs.private: @LIBUSB_LIBS@ @UDEV_LIBS@
+-Cflags: @CFLAGS@ @LIBUSB_CFLAGS@ @UDEV_CFLAGS@
++Cflags: -I${includedir}
+-- 
+2.34.1
+

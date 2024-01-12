@@ -1071,6 +1071,7 @@ FILES:${PN}-bcm4373 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac4373-sdio.bi
   ${nonarch_base_libdir}/firmware/brcm/brcmfmac4373.bin \
   ${nonarch_base_libdir}/firmware/cypress/cyfmac4373-sdio.bin \
   ${nonarch_base_libdir}/firmware/brcm/brcmfmac4373-sdio.clm_blob \
+  ${nonarch_base_libdir}/firmware/cypress/cyfmac4373-sdio.clm_blob \
 "
 
 LICENSE:${PN}-bcm-0bb4-0306 = "Firmware-cypress"

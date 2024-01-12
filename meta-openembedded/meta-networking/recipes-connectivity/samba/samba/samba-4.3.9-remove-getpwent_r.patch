@@ -1,4 +1,4 @@
-From 08003ea30d86a8b983be89f6a161d3baacdaa038 Mon Sep 17 00:00:00 2001
+From e5d9527e6b3b386229747f799c725fcd68bc5228 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 6 Nov 2016 23:40:54 -0800
 Subject: [PATCH] Musl does not have _r versions of getent() and getpwent()
@@ -7,15 +7,15 @@ Subject: [PATCH] Musl does not have _r versions of getent() and getpwent()
 Taken from gentoo
 http://data.gpo.zugaina.org/musl/net-fs/samba/files/samba-4.3.9-remove-getpwent_r.patch
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
 
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
  source4/torture/local/nss_tests.c | 13 ++++++++-----
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/source4/torture/local/nss_tests.c b/source4/torture/local/nss_tests.c
-index 2943122..bc185ca 100644
+index e911aa2..2b39b74 100644
 --- a/source4/torture/local/nss_tests.c
 +++ b/source4/torture/local/nss_tests.c
 @@ -247,7 +247,6 @@ static bool test_getgrnam_r(struct torture_context *tctx,

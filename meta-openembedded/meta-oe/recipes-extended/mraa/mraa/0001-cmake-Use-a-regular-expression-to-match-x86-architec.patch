@@ -13,7 +13,7 @@ So using a wildcard helps in using any x86 arch
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/eclipse/mraa/pull/1125]
 
  CMakeLists.txt | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)

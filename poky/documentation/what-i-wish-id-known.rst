@@ -214,6 +214,13 @@ contact us with other suggestions.
      OpenEmbedded build system. If you are interested in using this type of
      interface to create images, see the :doc:`/toaster-manual/index`.
 
+   * **Discover the VSCode extension**: The `Yocto Project BitBake
+     <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+     extension for the Visual Studio Code IDE provides language features and
+     commands for working with the Yocto Project. If you are interested in using
+     this extension, visit its `marketplace page
+     <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__.
+
    * **Have Available the Yocto Project Reference Manual**: Unlike the rest of
      the Yocto Project manual set, this manual is comprised of material suited
      for reference rather than procedures. You can get build details, a closer

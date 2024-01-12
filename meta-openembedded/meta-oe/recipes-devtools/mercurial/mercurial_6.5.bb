@@ -4,7 +4,7 @@ SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS = "python3 python3-native"
+DEPENDS = "python3 python3-native python3-setuptools-native"
 RDEPENDS:${PN} = "python3 python3-modules"
 
 inherit python3native python3targetconfig

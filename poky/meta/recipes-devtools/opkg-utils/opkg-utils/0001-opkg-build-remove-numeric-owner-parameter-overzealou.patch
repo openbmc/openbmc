@@ -1,0 +1,34 @@
+From 19c2c6a14c8760c3595f5dc6cc89cde85fbdbac1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Piotr=20=C5=81obacz?= <p.lobacz@welotec.com>
+Date: Tue, 9 Jan 2024 09:20:55 +0100
+Subject: [PATCH] opkg-build: remove `--numeric-owner` parameter overzealously
+ added
+
+In some corner cases this parameter has been added overzealously.
+All discussion on this topic can be read in here:
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=15334
+
+Upstream-Status: Backport [https://git.yoctoproject.org/opkg-utils/commit/?id=68a969f0e867ace0d94faf8ebe7c7bb67f59d386]
+
+Signed-off-by: Alex Stewart <alex.stewart@ni.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ opkg-build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/opkg-build b/opkg-build
+index 6edd938..0582958 100755
+--- a/opkg-build
++++ b/opkg-build
+@@ -337,7 +337,7 @@ export LANG=C
+ export LC_ALL=C
+ ( cd $pkg_dir/$CONTROL && find . -type f | sort > $tmp_dir/control_list )
+ ( cd $pkg_dir && find . -path ./$CONTROL -prune -o -path . -o -print  | sort > $tmp_dir/file_list )
+-( cd $pkg_dir && tar $attributesargs $ogargs $tsortargs --numeric-owner --no-recursion $mtime_args -c $tarformat -T $tmp_dir/file_list | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
++( cd $pkg_dir && tar $attributesargs $ogargs $tsortargs --no-recursion $mtime_args -c $tarformat -T $tmp_dir/file_list | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
+ ( cd $pkg_dir/$CONTROL && tar $ogargs $tsortargs --no-recursion $mtime_args -c $tarformat -T $tmp_dir/control_list | gzip $zipargs > $tmp_dir/control.tar.gz )
+ rm $tmp_dir/file_list
+ rm $tmp_dir/control_list
+-- 
+2.43.0
+

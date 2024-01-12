@@ -47,6 +47,7 @@ class TestNewProjectPage(SeleniumTestCase):
 
         url = reverse('newproject')
         self.get(url)
+        self.wait_until_visible('#new-project-name', poll=3)
         self.enter_text('#new-project-name', project_name)
 
         select = Select(self.find('#projectversion'))
@@ -78,6 +79,7 @@ class TestNewProjectPage(SeleniumTestCase):
 
         url = reverse('newproject')
         self.get(url)
+        self.wait_until_visible('#new-project-name', poll=3)
 
         self.enter_text('#new-project-name', project_name)
 
@@ -89,7 +91,8 @@ class TestNewProjectPage(SeleniumTestCase):
 
         self.click("#create-project-button")
 
-        element = self.wait_until_visible('#hint-error-project-name', poll=3)
+        self.wait_until_present('#hint-error-project-name', poll=3)
+        element = self.find('#hint-error-project-name')
 
         self.assertTrue(("Project names must be unique" in element.text),
                         "Did not find unique project name error message")

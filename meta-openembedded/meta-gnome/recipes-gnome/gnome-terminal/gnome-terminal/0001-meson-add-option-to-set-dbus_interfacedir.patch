@@ -1,0 +1,63 @@
+From 61668e1eb86a316d4ad9a6b9cacf8c8cc74a0c33 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sun, 7 Jan 2024 10:40:31 +0100
+Subject: [PATCH] meson: add an option to set dbus_interface_dir
+
+Add an option that allows to set the dbus_interface_dir path manually.
+This will help to cross-compile gnome-terminal on host systems that
+don't have gnome-shell installed.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gnome-terminal/-/issues/8046]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson_options.txt | 7 +++++++
+ src/meson.build   | 7 ++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index b555ab66..8fece058 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -13,6 +13,13 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this programme.  If not, see <https://www.gnu.org/licenses/>.
+ 
++option(
++  'dbus_interface_dir',
++  type: 'string',
++  value: '',
++  description: 'directory for D-Bus session interface files [$datadir/dbus-1/interfaces]',
++)
++
+ option(
+   'dbg',
+   type: 'boolean',
+diff --git a/src/meson.build b/src/meson.build
+index 27ecd893..420ad45c 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -185,6 +185,11 @@ server_sources = app_sources + client_util_sources + debug_sources + dbus_source
+ 
+ if get_option('search_provider')
+ 
++  dbus_interface_dir = get_option('dbus_interface_dir')
++  if dbus_interface_dir == ''
++    dbus_interface_dir = gt_prefix / gt_dbusinterfacedir
++  endif
++
+   server_sources += files(
+     'terminal-search-provider.cc',
+     'terminal-search-provider.hh',
+@@ -192,7 +197,7 @@ if get_option('search_provider')
+ 
+   server_sources += gnome.gdbus_codegen(
+     'terminal-search-provider-gdbus-generated',
+-    gt_prefix / gt_dbusinterfacedir / 'org.gnome.ShellSearchProvider2.xml',
++    dbus_interface_dir / 'org.gnome.ShellSearchProvider2.xml',
+     autocleanup: 'none',
+     install_header: false,
+     interface_prefix: 'org.gnome.Shell',
+-- 
+2.43.0
+

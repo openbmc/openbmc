@@ -1,7 +1,6 @@
-From 235fabb2269a86e016bab2886b9129c77f0fea71 Wed Oct 11 16:18:22 2023
+From f2a76d6595b31b0bc1be7029277676af1b1cc3d3 Mon Sep 17 00:00:00 2001
 From: Mariam Elshakfy <mariam.elshakfy@arm.com>
-Date: Wed Oct 11 16:18:22 2023 +0000
-
+Date: Wed, 11 Oct 2023 16:18:22 +0000
 Subject: [PATCH] Platform/ARM/N1Sdp: Reserve OP-TEE Region from UEFI
 
 To enable cache on N1SDP, OP-TEE has to be moved
@@ -10,6 +9,12 @@ known to application side, it must be reserved
 
 Upstream-Status: Pending (not yet submitted to upstream)
 Signed-off-by: Mariam Elshakfy <mariam.elshakfy@arm.com>
+
+---
+ .../Library/PlatformLib/PlatformLib.inf             |  3 +++
+ .../Library/PlatformLib/PlatformLibMem.c            | 13 +++++++++++++
+ Silicon/ARM/NeoverseN1Soc/NeoverseN1Soc.dec         |  4 ++++
+ 3 files changed, 20 insertions(+)
 
 diff --git a/Silicon/ARM/NeoverseN1Soc/Library/PlatformLib/PlatformLib.inf b/Silicon/ARM/NeoverseN1Soc/Library/PlatformLib/PlatformLib.inf
 index 78f309c3aa..dc82d5bd87 100644
@@ -50,7 +55,7 @@ index 8bb9407490..d8ad0f975c 100644
      EFI_RESOURCE_SYSTEM_MEMORY,
      ResourceAttributes,
 diff --git a/Silicon/ARM/NeoverseN1Soc/NeoverseN1Soc.dec b/Silicon/ARM/NeoverseN1Soc/NeoverseN1Soc.dec
-index 9e257ebde0..b400b94fd5 100644
+index 9e257ebde0..587319262a 100644
 --- a/Silicon/ARM/NeoverseN1Soc/NeoverseN1Soc.dec
 +++ b/Silicon/ARM/NeoverseN1Soc/NeoverseN1Soc.dec
 @@ -86,5 +86,9 @@

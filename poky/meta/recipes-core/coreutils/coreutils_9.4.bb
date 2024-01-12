@@ -210,4 +210,10 @@ do_install_ptest () {
     sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
 }
 
+do_install_ptest:append:libc-musl () {
+    # these tests fail due to bash on musl systems
+    # xmalloc: cannot allocate 16146 bytes
+    sed -i -e '/tests\/dd\/no-allocate.sh/d' ${D}${PTEST_PATH}/Makefile
+    sed -i -e '/tests\/split\/line-bytes.sh/d' ${D}${PTEST_PATH}/Makefile
+}
 FILES:${PN}-ptest += "${bindir}/getlimits"

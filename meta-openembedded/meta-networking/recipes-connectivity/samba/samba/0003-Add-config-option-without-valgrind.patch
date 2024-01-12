@@ -1,4 +1,4 @@
-From 556bb3cf17ccdf0b0ee0d82801c4b20cf0990ae4 Mon Sep 17 00:00:00 2001
+From cceee20e91af751469872b71155b23f0dec290a7 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 20 Jun 2019 14:11:16 +0800
 Subject: [PATCH] Add config option without-valgrind
@@ -9,38 +9,44 @@ Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 
 Update patch to version 4.10.5
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Rebase to 4.19.3
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
  lib/replace/wscript | 5 +++--
- wscript             | 4 ++++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ wscript             | 7 +++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 2f17999..9ef9bd9 100644
+index 37d7759..9dd9b48 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
-@@ -114,8 +114,9 @@ def configure(conf):
+@@ -113,8 +113,9 @@ def configure(conf):
      conf.CHECK_HEADERS('sys/fileio.h sys/filesys.h sys/dustat.h sys/sysmacros.h')
      conf.CHECK_HEADERS('xfs/libxfs.h netgroup.h')
  
 -    conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
--    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
-+    if not Options.options.disable_valgrind:
+-    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h valgrind/callgrind.h')
++    if Options.options.enable_valgrind:
 +        conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
-+        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
++        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h valgrind/callgrind.h')
      conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
      conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
      conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h')
 diff --git a/wscript b/wscript
-index 3af4207..54d7e9e 100644
+index 95ddd9e..6d9577a 100644
 --- a/wscript
 +++ b/wscript
-@@ -116,6 +116,10 @@ def options(opt):
-                   help=("Disable RELRO builds"),
-                   action="store_false", dest='enable_relro')
+@@ -123,6 +123,13 @@ def options(opt):
+                   help=('Disable kernely keyring support for credential storage'),
+                   action='store_false', dest='enable_keyring')
  
++    opt.add_option('--with-valgrind',
++                   help=("Enable use of valgrind"),
++                   action="store_true", dest='enable_valgrind')
 +    opt.add_option('--without-valgrind',
-+                   help=("Disable use of the valgrind headers"),
-+                   action="store_true", dest='disable_valgrind', default=False)
++                   help=("Disable use of valgrind"),
++                   action="store_false", dest='enable_valgrind', default=False)
 +
      gr = opt.option_group('developer options')
  

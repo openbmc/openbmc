@@ -19,7 +19,7 @@ SRC_URI[sha256sum] = "fcfa5a0e42099e12e4bf7a68ebe6fde05553383a682e816a7ec9256ab4
 
 inherit autotools-brokensep pkgconfig python3native
 
-PACKAGECONFIG ?= "ncat nping ndiff pcap"
+PACKAGECONFIG ?= "ncat nping pcap"
 
 PACKAGECONFIG[pcap] = "--with-pcap=linux, --without-pcap, libpcap, libpcap"
 PACKAGECONFIG[pcre] = "--with-libpcre=${STAGING_LIBDIR}/.., --with-libpcre=included, libpcre"

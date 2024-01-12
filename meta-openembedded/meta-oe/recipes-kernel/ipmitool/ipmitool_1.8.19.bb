@@ -24,6 +24,7 @@ DEPENDS = "openssl readline ncurses"
 SRCREV = "ab5ce5baff097ebb6e2a17a171858be213ee68d3"
 SRC_URI = "git://codeberg.org/ipmitool/ipmitool;protocol=https;branch=master \
            ${IANA_ENTERPRISE_NUMBERS} \
+           file://0001-csv-revision-Drop-the-git-revision-info.patch \
            "
 IANA_ENTERPRISE_NUMBERS ?= ""
 

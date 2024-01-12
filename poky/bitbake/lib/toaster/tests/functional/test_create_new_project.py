@@ -32,6 +32,7 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
           - Merge Toaster settings: True or False
         """
         self.get(reverse('newproject'))
+        self.wait_until_visible('#new-project-name', poll=3)
         self.driver.find_element(By.ID,
                                  "new-project-name").send_keys(project_name)
 
@@ -111,7 +112,7 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
         """
         release = '5'
         release_title = 'Yocto Project 3.1 "Dunfell"'
-        project_name = 'projectdunfull'
+        project_name = 'projectdunfell'
         self._create_test_new_project(
             project_name,
             release,

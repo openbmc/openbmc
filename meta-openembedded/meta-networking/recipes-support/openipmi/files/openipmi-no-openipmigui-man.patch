@@ -1,4 +1,4 @@
-From a6ffa3939a3ab2ad6a8d277cd8292b7dad6469c6 Mon Sep 17 00:00:00 2001
+From c76e727433ed895c605f9e7a3612bbc16ff558de Mon Sep 17 00:00:00 2001
 From: Aws Ismail <aws.ismail@windriver.com>
 Date: Thu, 7 Jun 2012 12:28:34 -0400
 Subject: [PATCH] Do not build openipmigui man page
@@ -11,6 +11,7 @@ Upstream-Status: Pending
 
 Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
 ---
  man/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -24,6 +24,8 @@ SRC_URI = "git://github.com/${BPN}/${BPN}.git;branch=master;protocol=https \
 S = "${WORKDIR}/git"
 
 EXTRA_OECMAKE = "-DENABLE_DOCS=OFF"
+PACKAGECONFIG = "readline"
+PACKAGECONFIG[readline] = "-DENABLE_READLINE=ON,-DENABLE_READLINE=OFF,readline"
 
 CFLAGS += "-fno-strict-aliasing"
 LDFLAGS += "-lpython${PYTHON_BASEVERSION}${PYTHON_ABI}"

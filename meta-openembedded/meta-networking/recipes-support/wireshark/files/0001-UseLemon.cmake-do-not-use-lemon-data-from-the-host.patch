@@ -1,0 +1,32 @@
+From 802d3cafa888b36aa72007d48232a010dbb0231d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 27 Dec 2023 16:57:28 +0100
+Subject: [PATCH] UseLemon.cmake: do not use lemon data from the host
+
+We use native lemon, and not the host one, so
+the data should be taken from the source tree as well.
+
+Upstream-Status: Inappropriate [cross-specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ cmake/modules/UseLemon.cmake | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/cmake/modules/UseLemon.cmake b/cmake/modules/UseLemon.cmake
+index fa4034e..83a7ca3 100644
+--- a/cmake/modules/UseLemon.cmake
++++ b/cmake/modules/UseLemon.cmake
+@@ -13,11 +13,12 @@ if(LEMON_EXECUTABLE)
+ 				${_out}.out
+ 			COMMAND ${LEMON_EXECUTABLE}
+ 				-l
+-				-T/usr/share/lemon/lempar.c
++				-T${CMAKE_SOURCE_DIR}/tools/lemon/lempar.c
+ 				-d.
+ 				${_in}
+ 			DEPENDS
+ 				${_in}
++				${CMAKE_SOURCE_DIR}/tools/lemon/lempar.c
+ 		)
+ 	endmacro()
+ 	add_custom_target(lemon)

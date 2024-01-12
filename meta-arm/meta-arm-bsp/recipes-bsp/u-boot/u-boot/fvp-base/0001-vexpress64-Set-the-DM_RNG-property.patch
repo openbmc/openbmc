@@ -1,0 +1,28 @@
+From ddb132d10952366c359bdd04482c1a8c0ba08b8f Mon Sep 17 00:00:00 2001
+From: Debbie Martin <Debbie.Martin@arm.com>
+Date: Fri, 25 Aug 2023 15:09:33 +0100
+Subject: [PATCH] vexpress64: Set the DM_RNG property
+
+Enable the DM_RNG virtio random number generator driver in
+in order to consume entropy within u-boot. This is necessary
+in the case that the kernel is not configured to enable the
+virtio rng driver itself.
+
+Upstream-Status: Pending
+Signed-off-by: Debbie Martin <Debbie.Martin@arm.com>
+---
+ board/armltd/vexpress64/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/board/armltd/vexpress64/Kconfig b/board/armltd/vexpress64/Kconfig
+index cf998096e45f..7ae5055f59b1 100644
+--- a/board/armltd/vexpress64/Kconfig
++++ b/board/armltd/vexpress64/Kconfig
+@@ -21,6 +21,7 @@ config VEXPRESS64_BASE_MODEL
+ 	imply EFI_SET_TIME if DM_RTC
+ 	select LINUX_KERNEL_IMAGE_HEADER
+ 	select POSITION_INDEPENDENT
++	imply DM_RNG
+ 
+ choice
+ 	prompt "VExpress64 board variant"

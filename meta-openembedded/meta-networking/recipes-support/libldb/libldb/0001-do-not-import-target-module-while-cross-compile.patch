@@ -1,4 +1,4 @@
-From 69c409195ede704ed7e9298ed4942cc70a52e099 Mon Sep 17 00:00:00 2001
+From 6a2f229e74804f70f4419b2a1e6843aab059e098 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 25 Jun 2019 14:25:08 +0800
 Subject: [PATCH] do not import target module while cross compile
@@ -19,7 +19,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/buildtools/wafsamba/samba_bundled.py b/buildtools/wafsamba/samba_bundled.py
-index 7d2d855..01dcb56 100644
+index 2300565..26d9e8c 100644
 --- a/buildtools/wafsamba/samba_bundled.py
 +++ b/buildtools/wafsamba/samba_bundled.py
 @@ -4,6 +4,7 @@ import sys
@@ -30,7 +30,7 @@ index 7d2d855..01dcb56 100644
  
  def PRIVATE_NAME(bld, name):
      '''possibly rename a library to include a bundled extension'''
-@@ -241,17 +242,27 @@ def CHECK_BUNDLED_SYSTEM_PYTHON(conf, libname, modulename, minversion='0.0.0'):
+@@ -245,17 +246,27 @@ def CHECK_BUNDLED_SYSTEM_PYTHON(conf, libname, modulename, minversion='0.0.0'):
      # versions
      minversion = minimum_library_version(conf, libname, minversion)
  

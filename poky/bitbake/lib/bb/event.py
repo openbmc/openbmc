@@ -257,14 +257,15 @@ def register(name, handler, mask=None, filename=None, lineno=None, data=None):
         # handle string containing python code
         if isinstance(handler, str):
             tmp = "def %s(e, d):\n%s" % (name, handler)
+            # Inject empty lines to make code match lineno in filename
+            if lineno is not None:
+                tmp = "\n" * (lineno-1) + tmp
             try:
                 code = bb.methodpool.compile_cache(tmp)
                 if not code:
                     if filename is None:
                         filename = "%s(e, d)" % name
                     code = compile(tmp, filename, "exec", ast.PyCF_ONLY_AST)
-                    if lineno is not None:
-                        ast.increment_lineno(code, lineno-1)
                     code = compile(code, filename, "exec")
                     bb.methodpool.compile_cache_add(tmp, code)
             except SyntaxError:

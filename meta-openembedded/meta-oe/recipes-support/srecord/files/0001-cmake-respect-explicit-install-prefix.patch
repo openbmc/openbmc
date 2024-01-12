@@ -1,0 +1,31 @@
+From 4aa8cf8c93e1fa6ffeb40fc3473f32b1b83af141 Mon Sep 17 00:00:00 2001
+From: "Ilya A. Kriveshko" <iillyyaa@gmail.com>
+Date: Tue, 2 Jan 2024 15:37:10 -0500
+Subject: [PATCH] cmake: respect explicit install prefix
+
+If CMAKE_INSTALL_PREFIX was supplied externally, use it.  This follows
+the pattern suggested by cmake documentation in:
+https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT.html
+
+Upstream-status: Submitted [https://github.com/sierrafoxtrot/srecord/pull/68]
+---
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 74b8108c..ac9f464e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -30,9 +30,9 @@ include(InstallRequiredSystemLibraries)
+ include(GNUInstallDirs)
+ 
+ # FHS compliant paths for Linux installation
+-if(NOT WIN32 AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+-#  set(CMAKE_INSTALL_PREFIX "/opt/${PROJECT_NAME}")
+-  set(CMAKE_INSTALL_PREFIX "/usr")
++if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT
++        AND NOT WIN32 AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
++  set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "Install prefix" FORCE)
+ endif()
+ 
+ # Pull in the rest of the pieces

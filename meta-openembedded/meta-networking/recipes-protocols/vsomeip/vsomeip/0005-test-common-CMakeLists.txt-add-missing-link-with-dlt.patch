@@ -1,0 +1,41 @@
+From 8676ef287bb25b49668be4336387bdf83a0cae5c Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 1 Jan 2024 17:02:41 +0800
+Subject: [PATCH] test/common/CMakeLists.txt: add missing link with dlt
+
+The libvsomeip_utilities library uses functions e.g.
+dlt_check_library_version/dlt_register_app/dlt_unregister_app which are
+provided by dlt therefore add it to linker flags.
+
+Fixes:
+x86_64-poky-linux-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: dlt_check_library_version
+>>> referenced by test/common/libvsomeip_utilities.so
+
+x86_64-poky-linux-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: dlt_register_app
+>>> referenced by test/common/libvsomeip_utilities.so
+
+x86_64-poky-linux-ld.lld: error: undefined reference due to --no-allow-shlib-undefined: dlt_unregister_app
+>>> referenced by test/common/libvsomeip_utilities.so
+
+Upstream-Status: Submitted [https://github.com/COVESA/vsomeip/pull/602]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ test/common/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/test/common/CMakeLists.txt b/test/common/CMakeLists.txt
+index d4d14534..afc8c2d6 100644
+--- a/test/common/CMakeLists.txt
++++ b/test/common/CMakeLists.txt
+@@ -27,6 +27,7 @@ TARGET_LINK_LIBRARIES (
+         ${Boost_LIBRARIES}
+         ${DL_LIBRARY}
+         ${TEST_LINK_LIBRARIES}
++        ${DLT_LIBRARIES}
+ )
+ 
+ # ----------------------------------------------------------------------------
+-- 
+2.25.1
+

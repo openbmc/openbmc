@@ -1,17 +1,17 @@
 SUMMARY = "SCP and MCP Firmware"
 DESCRIPTION = "Firmware for SCP and MCP software reference implementation"
-HOMEPAGE = "https://github.com/ARM-software/SCP-firmware"
+HOMEPAGE = "https://gitlab.arm.com/firmware/SCP-firmware"
 
 LICENSE = "BSD-3-Clause & Apache-2.0"
 LIC_FILES_CHKSUM = "file://license.md;beginline=5;md5=9db9e3d2fb8d9300a6c3d15101b19731 \
                     file://contrib/cmsis/git/LICENSE.txt;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-SRC_URI_SCP_FIRMWARE ?= "gitsm://github.com/ARM-software/SCP-firmware.git;protocol=https"
+SRC_URI_SCP_FIRMWARE ?= "gitsm://git.gitlab.arm.com/firmware/SCP-firmware.git;protocol=https"
 SRC_URI = "${SRC_URI_SCP_FIRMWARE};branch=${SRCBRANCH} \
            file://0001-OPTEE-Private-Includes.patch \
           "
 
-SRCBRANCH = "master"
+SRCBRANCH = "main"
 SRCREV  = "cc4c9e017348d92054f74026ee1beb081403c168"
 
 PROVIDES += "virtual/control-processor-firmware"

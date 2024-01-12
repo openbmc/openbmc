@@ -1947,7 +1947,7 @@ class Fetch(object):
                     ret = m.try_mirrors(self, ud, self.d, mirrors, True)
 
             if not ret:
-                raise FetchError("URL %s doesn't work" % u, u)
+                raise FetchError("URL doesn't work", u)
 
     def unpack(self, root, urls=None):
         """

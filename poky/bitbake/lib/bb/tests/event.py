@@ -13,6 +13,7 @@ import pickle
 import threading
 import time
 import unittest
+import tempfile
 from unittest.mock import Mock
 from unittest.mock import call
 
@@ -468,6 +469,8 @@ class EventClassesTest(unittest.TestCase):
 
     def setUp(self):
         bb.event.worker_pid = EventClassesTest._worker_pid
+        self.d = bb.data.init()
+        bb.parse.siggen = bb.siggen.init(self.d)
 
     def test_Event(self):
         """ Test the Event base class """
@@ -950,3 +953,24 @@ class EventClassesTest(unittest.TestCase):
         event = bb.event.FindSigInfoResult(result)
         self.assertEqual(event.result, result)
         self.assertEqual(event.pid, EventClassesTest._worker_pid)
+
+    def test_lineno_in_eventhandler(self):
+        # The error lineno is 5, not 4 since the first line is '\n'
+        error_line = """
+# Comment line1
+# Comment line2
+python test_lineno_in_eventhandler() {
+    This is an error line
+}
+addhandler test_lineno_in_eventhandler
+test_lineno_in_eventhandler[eventmask] = "bb.event.ConfigParsed"
+"""
+
+        with self.assertLogs() as logs:
+            f = tempfile.NamedTemporaryFile(suffix = '.bb')
+            f.write(bytes(error_line, "utf-8"))
+            f.flush()
+            d = bb.parse.handle(f.name, self.d)['']
+
+        output = "".join(logs.output)
+        self.assertTrue(" line 5\n" in output)

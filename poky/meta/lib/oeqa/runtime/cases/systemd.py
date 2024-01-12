@@ -69,8 +69,8 @@ class SystemdBasicTests(SystemdTest):
         """
         endtime = time.time() + (60 * 2)
         while True:
-            status, output = self.target.run('SYSTEMD_BUS_TIMEOUT=240s systemctl --state=activating')
-            if "0 loaded units listed" in output:
+            status, output = self.target.run('SYSTEMD_BUS_TIMEOUT=240s systemctl is-system-running')
+            if "running" in output or "degraded" in output:
                 return (True, '')
             if time.time() >= endtime:
                 return (False, output)

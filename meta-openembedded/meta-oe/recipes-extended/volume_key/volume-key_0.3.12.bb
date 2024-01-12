@@ -27,7 +27,7 @@ DEPENDS += " \
     swig-native \
 "
 
-PACKAGECONFIG ??= "python3"
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[python3] = "--with-python3,--without-python3,python3,python3"
 
 EXTRA_OECONF = "--without-python"

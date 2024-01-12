@@ -24,6 +24,7 @@ PACKAGECONFIG ??= "media-ctl"
 PACKAGECONFIG[media-ctl] = "--enable-v4l-utils,--disable-v4l-utils,,"
 PACKAGECONFIG[qv4l2] = ",--disable-qv4l2"
 PACKAGECONFIG[qvidcap] = ",--disable-qvidcap"
+PACKAGECONFIG[v4l2-tracer] = ",--disable-v4l2-tracer,json-c"
 
 SRC_URI = "\
     git://git.linuxtv.org/v4l-utils.git;protocol=https;branch=stable-1.24 \
@@ -77,7 +78,9 @@ FILES:${PN} = "${bindir} ${sbindir}"
 
 FILES:libv4l += "${libdir}/libv4l*${SOLIBS} ${libdir}/libv4l/*.so ${libdir}/libv4l/plugins/*.so \
                  ${libdir}/libdvbv5*${SOLIBS} \
-                 ${libdir}/libv4l/*-decomp"
+                 ${libdir}/libv4l/*-decomp \
+                 ${libdir}/libv4l2tracer.so \
+"
 
 FILES:libv4l-dev += "${includedir} ${libdir}/pkgconfig \
                      ${libdir}/libv4l*${SOLIBSDEV} ${libdir}/*.la \

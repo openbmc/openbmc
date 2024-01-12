@@ -1,0 +1,40 @@
+From 3fa2ae78db9b31edb4c22f3b5cd36c6c972947f1 Mon Sep 17 00:00:00 2001
+From: Florian Festi <ffesti@redhat.com>
+Date: Wed, 26 Jul 2023 15:01:35 +0200
+Subject: [PATCH] Duplicate filename before passing it to basename
+
+basename is allowed change the string passed to it. While we don't need
+the filename after that just casting away the const seems a bit too
+hacky.
+
+Upstream-Status: Backport [https://github.com/rpm-software-management/rpm/commit/3fa2ae78db9b31edb4c22f3b5cd36c6c972947f1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/rpmuncompress.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tools/rpmuncompress.c b/tools/rpmuncompress.c
+index 58ddf5683..e13cc6a66 100644
+--- a/tools/rpmuncompress.c
++++ b/tools/rpmuncompress.c
+@@ -98,7 +98,8 @@ static char *doUntar(const char *fn)
+ 	if (needtar) {
+ 	    rasprintf(&buf, "%s '%s' | %s %s -", zipper, fn, tar, taropts);
+ 	} else if (at->compressed == COMPRESSED_GEM) {
+-	    const char *bn = basename(fn);
++	    char *tmp = xstrdup(fn);
++	    const char *bn = basename(tmp);
+ 	    size_t nvlen = strlen(bn) - 3;
+ 	    char *gem = rpmGetPath("%{__gem}", NULL);
+ 	    char *gemspec = NULL;
+@@ -112,6 +113,7 @@ static char *doUntar(const char *fn)
+ 
+ 	    free(gemspec);
+ 	    free(gem);
++	    free(tmp);
+ 	} else {
+ 	    rasprintf(&buf, "%s '%s'", zipper, fn);
+ 	}
+-- 
+2.43.0
+

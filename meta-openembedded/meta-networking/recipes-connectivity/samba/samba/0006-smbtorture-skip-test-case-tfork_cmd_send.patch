@@ -1,4 +1,4 @@
-From 950b5977ea7e72343067d0070cc35fb0dc5163d4 Mon Sep 17 00:00:00 2001
+From 4fd04fc7c94d6981f3409d088ab8d32c48460010 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Thu, 25 Aug 2022 16:46:04 +0800
 Subject: [PATCH] smbtorture: skip test case tfork_cmd_send

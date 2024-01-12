@@ -2,7 +2,7 @@ SUMMARY = "Utilities and libraries for handling compiled object files"
 HOMEPAGE = "https://sourceware.org/elfutils"
 DESCRIPTION = "elfutils is a collection of utilities and libraries to read, create and modify ELF binary files, find and handle DWARF debug data, symbols, thread state and stacktraces for processes and core files on GNU/Linux."
 SECTION = "base"
-LICENSE = "GPL-2.0-only & GPL-2.0-or-later & LGPL-3.0-or-later & GPL-3.0-or-later"
+LICENSE = "( GPL-2.0-or-later | LGPL-3.0-or-later ) & GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://debuginfod/debuginfod-client.c;endline=28;md5=f0a7c3170776866ee94e8f9225a6ad79 \
                     "
@@ -109,19 +109,18 @@ EXTRA_OEMAKE:class-nativesdk = ""
 
 BBCLASSEXTEND = "native nativesdk"
 
-# Package utilities separately
+# Package utilities and libraries are listed separately
 PACKAGES =+ "${PN}-binutils libelf libasm libdw libdebuginfod"
 
-# Shared libraries are licensed GPL-2.0-only or GPL-3.0-or-later, binaries
-# GPL-3.0-or-later. According to NEWS file:
-# "The license is now GPLv2/LGPLv3+ for the libraries and GPLv3+ for stand-alone
-# programs. There is now also a formal CONTRIBUTING document describing how to
-# submit patches."
+# According to the upstream website https://sourceware.org/elfutils, the latest
+# license policy is as follows:
+# "License. The libraries and backends are dual GPLv2+/LGPLv3+. The utilities
+# are GPLv3+."
 LICENSE:${PN}-binutils = "GPL-3.0-or-later"
 LICENSE:${PN} = "GPL-3.0-or-later"
-LICENSE:libelf = "GPL-2.0-only | LGPL-3.0-or-later"
-LICENSE:libasm = "GPL-2.0-only | LGPL-3.0-or-later"
-LICENSE:libdw = "GPL-2.0-only | LGPL-3.0-or-later"
+LICENSE:libelf = "GPL-2.0-or-later | LGPL-3.0-or-later"
+LICENSE:libasm = "GPL-2.0-or-later | LGPL-3.0-or-later"
+LICENSE:libdw = "GPL-2.0-or-later | LGPL-3.0-or-later"
 LICENSE:libdebuginfod = "GPL-2.0-or-later | LGPL-3.0-or-later"
 
 FILES:${PN}-binutils = "\

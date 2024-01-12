@@ -1,9 +1,10 @@
-From 515f2455b4b69f5fcd2c61a532663280785db737 Mon Sep 17 00:00:00 2001
+From d302d9a4ac6eb2bbafd248064a878ba287d636b8 Mon Sep 17 00:00:00 2001
 From: Peter Kjellerstedt <pkj@axis.com>
 Date: Tue, 28 Apr 2020 02:05:33 +0200
 Subject: [PATCH] Add options to configure the use of libbsd
 
 Upstream-Status: Inappropriate [oe deterministic build specific]
+
 Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
 
 Rebase to 4.14.4
@@ -15,7 +16,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  3 files changed, 29 insertions(+), 15 deletions(-)
 
 diff --git a/buildtools/wafsamba/wscript b/buildtools/wafsamba/wscript
-index 8729b08..1c55428 100644
+index 30cb366..d167551 100644
 --- a/buildtools/wafsamba/wscript
 +++ b/buildtools/wafsamba/wscript
 @@ -145,6 +145,13 @@ Currently the only tested value is 'smbtorture,smbd/smbd' for Samba'''),
@@ -33,10 +34,10 @@ index 8729b08..1c55428 100644
  
      gr.add_option('-C',
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 9ef9bd9..d47de4f 100644
+index 9dd9b48..a22ae59 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
-@@ -439,20 +439,21 @@ def configure(conf):
+@@ -444,20 +444,21 @@ def configure(conf):
  
      strlcpy_in_bsd = False
  

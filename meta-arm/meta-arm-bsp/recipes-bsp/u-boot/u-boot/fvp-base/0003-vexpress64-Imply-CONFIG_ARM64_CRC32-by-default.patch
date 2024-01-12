@@ -1,0 +1,27 @@
+From 0b2c98baada9541af1595bb552b7e44d6b79c727 Mon Sep 17 00:00:00 2001
+From: Diego Sueiro <diego.sueiro@arm.com>
+Date: Wed, 4 Oct 2023 06:29:12 +0100
+Subject: [PATCH] vexpress64: Imply CONFIG_ARM64_CRC32 by default
+
+Enable the Arm64 CRC-32 instruction by default for
+vexpress64. The CRC-32 instruction is a required
+feature of ARMv8.1 and newer.
+
+Upstream-Status: Pending
+Signed-off-by: Diego Sueiro <diego.sueiro@arm.com>
+---
+ board/armltd/vexpress64/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/board/armltd/vexpress64/Kconfig b/board/armltd/vexpress64/Kconfig
+index b8aead6cc35c..0c2e5f875950 100644
+--- a/board/armltd/vexpress64/Kconfig
++++ b/board/armltd/vexpress64/Kconfig
+@@ -22,6 +22,7 @@ config VEXPRESS64_BASE_MODEL
+ 	select LINUX_KERNEL_IMAGE_HEADER
+ 	select POSITION_INDEPENDENT
+ 	imply DM_RNG
++	imply ARM64_CRC32
+ 
+ choice
+ 	prompt "VExpress64 board variant"

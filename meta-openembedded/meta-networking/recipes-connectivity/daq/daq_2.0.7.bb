@@ -25,7 +25,8 @@ EXTRA_OECONF = "--enable-nfq-module --disable-ipq-module --includedir=${included
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
-inherit autotools
+inherit autotools multilib_script
+MULTILIB_SCRIPTS += "${PN}:${bindir}/daq-modules-config "
 
 DISABLE_STATIC = ""
 

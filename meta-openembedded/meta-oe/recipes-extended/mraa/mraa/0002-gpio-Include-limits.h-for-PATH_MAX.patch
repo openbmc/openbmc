@@ -1,0 +1,30 @@
+From ffa6f1254066b1d5d99192002043be945ff64297 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 31 Dec 2023 19:18:42 -0800
+Subject: [PATCH 2/2] gpio: Include limits.h for PATH_MAX
+
+Musl exposes this problem where PATH_MAX is used but limits.h is not
+included, it works with glibc perhaps due to limits.h being indirectly
+included by another system header.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Submitted [https://github.com/eclipse/mraa/pull/1125]
+ src/gpio/gpio_chardev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/gpio/gpio_chardev.c b/src/gpio/gpio_chardev.c
+index 2cd15968..9f727de7 100644
+--- a/src/gpio/gpio_chardev.c
++++ b/src/gpio/gpio_chardev.c
+@@ -12,6 +12,7 @@
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <limits.h>
+ #include <poll.h>
+ #include <pthread.h>
+ #include <signal.h>
+-- 
+2.43.0
+

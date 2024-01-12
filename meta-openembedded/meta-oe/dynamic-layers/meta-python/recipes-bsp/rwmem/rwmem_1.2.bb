@@ -32,4 +32,4 @@ do_install:append() {
 	install -D -m 0644 ${B}/librwmem/librwmem.a ${D}${libdir}/librwmem.a
 }
 
-FILES:${PN} += "${libdir}/python3.11/site-packages/pyrwmem"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}/pyrwmem"

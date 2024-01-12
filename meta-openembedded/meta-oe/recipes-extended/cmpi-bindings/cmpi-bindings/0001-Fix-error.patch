@@ -1,20 +1,19 @@
-From b8e791ce93a467081fb1594b91841e2f57c634a0 Mon Sep 17 00:00:00 2001
+From 3ab3ac2876cbf4a34a94f0d3256a5be9d1202370 Mon Sep 17 00:00:00 2001
 From: Qian Lei <qianl.fnst@cn.fujitsu.com>
 Date: Fri, 16 Jan 2015 18:37:26 +0800
 Subject: [PATCH] Fix error
 
 Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
----
 Upstream-Status: Pending
-
+---
  swig/python/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/swig/python/CMakeLists.txt b/swig/python/CMakeLists.txt
-index 3976296..8073fc8 100644
+index 93b4755..a7268f0 100644
 --- a/swig/python/CMakeLists.txt
 +++ b/swig/python/CMakeLists.txt
-@@ -27,7 +27,7 @@ SET( SWIG_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/../cmpi.i" )
+@@ -26,7 +26,7 @@ SET( SWIG_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/../cmpi.i" )
  ADD_CUSTOM_COMMAND (
     OUTPUT  ${SWIG_OUTPUT}
     COMMAND ${CMAKE_COMMAND} -E echo_append "Creating wrapper code for Python ..."
@@ -23,6 +22,3 @@ index 3976296..8073fc8 100644
     COMMAND ${CMAKE_COMMAND} -E echo "Done."
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../*.i
--- 
-1.8.3.1
-

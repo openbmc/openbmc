@@ -1,19 +1,18 @@
-From 82dc31b72e77f263574645092ba1597a8f1152e7 Mon Sep 17 00:00:00 2001
+From ace8fed037ec3d03f65f861b4da217faff94015b Mon Sep 17 00:00:00 2001
 From: Wang Mingyu <wangmy@cn.fujitsu.com>
 Date: Fri, 25 Dec 2020 15:10:58 +0900
 Subject: [PATCH] avoid attr unless wanted
 
+Upstream-Status: Inappropriate [embedded specific]
 ---
-Upstream-Status: Pending
-
  lib/replace/wscript | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 21a746a..6be3276 100644
+index 452c741..61fcde0 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
-@@ -968,8 +968,6 @@ def build(bld):
+@@ -983,8 +983,6 @@ def build(bld):
      if not bld.CONFIG_SET('HAVE_INET_ATON'):     REPLACE_SOURCE += ' inet_aton.c'
      if not bld.CONFIG_SET('HAVE_INET_NTOP'):     REPLACE_SOURCE += ' inet_ntop.c'
      if not bld.CONFIG_SET('HAVE_INET_PTON'):     REPLACE_SOURCE += ' inet_pton.c'
@@ -22,7 +21,7 @@ index 21a746a..6be3276 100644
  
      if not bld.CONFIG_SET('HAVE_CLOSEFROM'):
          REPLACE_SOURCE += ' closefrom.c'
-@@ -984,7 +982,7 @@ def build(bld):
+@@ -999,7 +997,7 @@ def build(bld):
                        # hide_symbols=bld.BUILTIN_LIBRARY('replace'),
                        private_library=True,
                        provide_builtin_linking=True,

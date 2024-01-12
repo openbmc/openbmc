@@ -1,4 +1,4 @@
-From 17f05a8d02c589e4867906f70381e63e46a67870 Mon Sep 17 00:00:00 2001
+From 94b951c0cccf67b66749cc87c473e63fa5207e83 Mon Sep 17 00:00:00 2001
 From: Oleksiy Obitotskyy <oobitots@cisco.com>
 Date: Wed, 27 Jan 2021 06:47:13 -0800
 Subject: [PATCH] lemon: Remove #line directives
@@ -8,67 +8,28 @@ directives with extra option '-l'.
 
 Upstream-Status: Pending
 Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
----
- cmake/modules/UseLemon.cmake | 49 +++++++++++++++++++++++++-----------
- 1 file changed, 34 insertions(+), 15 deletions(-)
 
-Index: wireshark-3.4.11/cmake/modules/UseLemon.cmake
-===================================================================
---- wireshark-3.4.11.orig/cmake/modules/UseLemon.cmake
-+++ wireshark-3.4.11/cmake/modules/UseLemon.cmake
-@@ -7,21 +7,40 @@ MACRO(ADD_LEMON_FILES _source _generated
- 
-       SET(_out ${CMAKE_CURRENT_BINARY_DIR}/${_basename})
- 
--      ADD_CUSTOM_COMMAND(
--         OUTPUT
--          ${_out}.c
--          # These files are generated as side-effect
--          ${_out}.h
--          ${_out}.out
--         COMMAND $<TARGET_FILE:lemon>
--           -T${_lemonpardir}/lempar.c
--           -d.
--           ${_in}
--         DEPENDS
--           ${_in}
--           lemon
--           ${_lemonpardir}/lempar.c
--      )
-+      IF (DEFINED ENV{SOURCE_DATE_EPOCH})
-+        ADD_CUSTOM_COMMAND(
-+          OUTPUT
-+            ${_out}.c
-+            # These files are generated as side-effect
-+            ${_out}.h
-+            ${_out}.out
-+          COMMAND lemon
-+            -l
-+            -T${_lemonpardir}/lempar.c
-+            -d.
-+            ${_in}
-+          DEPENDS
-+            ${_in}
-+            lemon
-+            ${_lemonpardir}/lempar.c
-+        )
-+      ELSE ()
-+        ADD_CUSTOM_COMMAND(
-+          OUTPUT
-+            ${_out}.c
-+            # These files are generated as side-effect
-+            ${_out}.h
-+            ${_out}.out
-+          COMMAND lemon
-+            -T${_lemonpardir}/lempar.c
-+            -d.
-+            ${_in}
-+          DEPENDS
-+            ${_in}
-+            lemon
-+            ${_lemonpardir}/lempar.c
-+        )
-+      ENDIF ()
- 
-       LIST(APPEND ${_source} ${_in})
-       LIST(APPEND ${_generated} ${_out}.c)
+---
+ cmake/modules/UseLemon.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cmake/modules/UseLemon.cmake b/cmake/modules/UseLemon.cmake
+index e419de1..fa4034e 100644
+--- a/cmake/modules/UseLemon.cmake
++++ b/cmake/modules/UseLemon.cmake
+@@ -12,6 +12,7 @@ if(LEMON_EXECUTABLE)
+ 				${_out}.h
+ 				${_out}.out
+ 			COMMAND ${LEMON_EXECUTABLE}
++				-l
+ 				-T/usr/share/lemon/lempar.c
+ 				-d.
+ 				${_in}
+@@ -30,6 +31,7 @@ else()
+ 				${_out}.h
+ 				${_out}.out
+ 			COMMAND $<TARGET_FILE:lemon>
++				-l
+ 				-T${CMAKE_SOURCE_DIR}/tools/lemon/lempar.c
+ 				-d.
+ 				${_in}

@@ -334,7 +334,10 @@ to use the Extensible SDK, see the ":doc:`/sdk-manual/extensible`" Chapter in th
 Project Application Development and the Extensible Software Development
 Kit (eSDK) manual. If you want to work on the kernel, see the :doc:`/kernel-dev/index`. If you are going to use
 Toaster, see the ":doc:`/toaster-manual/setup-and-use`"
-section in the Toaster User Manual.
+section in the Toaster User Manual. If you are a VSCode user, you can configure
+the `Yocto Project BitBake
+<https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+extension accordingly.
 
 Setting Up to Use CROss PlatformS (CROPS)
 -----------------------------------------
@@ -426,7 +429,10 @@ section. If you are going to use the Extensible SDK container, see the
 Project Application Development and the Extensible Software Development
 Kit (eSDK) manual. If you are going to use the Toaster container, see
 the ":doc:`/toaster-manual/setup-and-use`"
-section in the Toaster User Manual.
+section in the Toaster User Manual. If you are a VSCode user, you can configure
+the `Yocto Project BitBake
+<https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+extension accordingly.
 
 Setting Up to Use Windows Subsystem For Linux (WSL 2)
 -----------------------------------------------------
@@ -554,7 +560,10 @@ Extensible SDK container, see the ":doc:`/sdk-manual/extensible`" Chapter in the
 Project Application Development and the Extensible Software Development
 Kit (eSDK) manual. If you are going to use the Toaster container, see
 the ":doc:`/toaster-manual/setup-and-use`"
-section in the Toaster User Manual.
+section in the Toaster User Manual. If you are a VSCode user, you can configure
+the `Yocto Project BitBake
+<https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+extension accordingly.
 
 Locating Yocto Project Source Files
 ===================================
@@ -621,7 +630,7 @@ a selection of these components.
 Using the Downloads Page
 ------------------------
 
-The :yocto_home:`Yocto Project Website <>` uses a "DOWNLOADS" page
+The :yocto_home:`Yocto Project Website <>` uses a "RELEASES" page
 from which you can locate and download tarballs of any Yocto Project
 release. Rather than Git repositories, these files represent snapshot
 tarballs similar to the tarballs located in the Index of Releases
@@ -630,11 +639,13 @@ described in the ":ref:`dev-manual/start:accessing source archives`" section.
 #. *Go to the Yocto Project Website:* Open The
    :yocto_home:`Yocto Project Website <>` in your browser.
 
-#. *Get to the Downloads Area:* Select the "DOWNLOADS" item from the
-   pull-down "SOFTWARE" tab menu near the top of the page.
+#. *Get to the Downloads Area:* Select the "RELEASES" item from the
+   pull-down "DEVELOPMENT" tab menu near the top of the page.
 
-#. *Select a Yocto Project Release:* Use the menu next to "RELEASE" to
-   display and choose a recent or past supported Yocto Project release
+#. *Select a Yocto Project Release:* On the top of the "RELEASE" page currently
+   supported releases are displayed, further down past supported Yocto Project
+   releases are visible. The "Download" links in the rows of the table there
+   will lead to the download tarballs for the release.
    (e.g. &DISTRO_NAME_NO_CAP;, &DISTRO_NAME_NO_CAP_MINUS_ONE;, and so forth).
 
    .. note::
@@ -645,9 +656,9 @@ described in the ":ref:`dev-manual/start:accessing source archives`" section.
    You can use the "RELEASE ARCHIVE" link to reveal a menu of all Yocto
    Project releases.
 
-#. *Download Tools or Board Support Packages (BSPs):* From the
-   "DOWNLOADS" page, you can download tools or BSPs as well. Just scroll
-   down the page and look for what you need.
+#. *Download Tools or Board Support Packages (BSPs):* Next to the tarballs you
+   will find download tools or BSPs as well. Just select a Yocto Project
+   release and look for what you need.
 
 Cloning and Checking Out Branches
 =================================

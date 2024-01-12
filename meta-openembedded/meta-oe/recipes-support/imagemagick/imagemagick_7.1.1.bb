@@ -4,16 +4,15 @@ HOMEPAGE = "https://www.imagemagick.org/"
 DESCRIPTION = "ImageMagick is a collection of tools for displaying, converting, and \
 editing raster and vector image files. It can read and write over 200 image file formats."
 LICENSE = "ImageMagick"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=ac58ac14f9d9d02cafd2d81ef38fb2cc \
+LIC_FILES_CHKSUM = "file://LICENSE;md5=2f9de66264141265b203cde9902819ea \
                     file://NOTICE;md5=bcbf1f1897b40ec8df39700cb560e9ed"
 # FIXME: There are many more checked libraries. All should be added or explicitly disabled to get consistent results.
 DEPENDS = "lcms bzip2 jpeg libpng tiff zlib fftw freetype libtool"
 
 BASE_PV := "${PV}"
-PV .= "-8"
-SRC_URI = "git://github.com/ImageMagick/ImageMagick.git;branch=main;protocol=https \
-           file://0001-m4-Use-autconf-provided-AC_FUNC_FSEEKO.patch"
-SRCREV = "920f79206ff59f30a4cff22c9c9c393508b82663"
+PV .= "-26"
+SRC_URI = "git://github.com/ImageMagick/ImageMagick.git;branch=main;protocol=https"
+SRCREV = "570a9a048bb0e3a5c221ca87be9408ae35f711e2"
 
 S = "${WORKDIR}/git"
 
@@ -38,7 +37,7 @@ PACKAGECONFIG[xml] = "--with-xml,--without-xml,libxml2"
 
 do_install:append:class-target() {
     for file in MagickCore-config.im7 MagickWand-config.im7 Magick++-config.im7; do
-        sed -i 's,${STAGING_DIR_NATIVE},,g' ${D}${bindir}/"$file"
+        sed -i 's,${STAGING_DIR_TARGET},,g' ${D}${bindir}/"$file"
     done
     sed -i 's,${S},,g' ${D}${libdir}/ImageMagick-${BASE_PV}/config-Q16HDRI/configure.xml
     sed -i 's,${B},,g' ${D}${libdir}/ImageMagick-${BASE_PV}/config-Q16HDRI/configure.xml

@@ -1,16 +1,15 @@
 SUMMARY = "Lightweight and minimal dumb-terminal emulation program"
 SECTION = "console/utils"
 LICENSE = "GPL-2.0-or-later"
-HOMEPAGE = "https://github.com/npat-efault/picocom"
+HOMEPAGE = "https://gitlab.com/wsakernel/picocom"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3000e4830620e310fe65c0eb69df9e8a"
 
-BASEPV = "3.1"
+BASEPV = "2023-04"
 PV = "${BASEPV}+git${SRCPV}"
 
-SRCREV = "90385aabe2b51f39fa130627d46b377569f82d4a"
+SRCREV = "12537df0314767d5af35bddddbbca3694e6a0342"
 
-SRC_URI = "git://github.com/npat-efault/picocom;branch=master;protocol=https \
-           file://0001-Fix-building-with-musl.patch \
+SRC_URI = "git://gitlab.com/wsakernel/picocom;branch=master;protocol=https \
            "
 
 S = "${WORKDIR}/git"

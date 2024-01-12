@@ -1,4 +1,4 @@
-From f7b8e2e149b06a8033e31f4242c392573fa9ab52 Mon Sep 17 00:00:00 2001
+From ba492aead265edfd1da2a6c45dd7661c248309cb Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 25 Jun 2019 14:25:08 +0800
 Subject: [PATCH] do not import target module while cross compile
@@ -6,18 +6,18 @@ Subject: [PATCH] do not import target module while cross compile
 Some modules such as dynamic library maybe cann't be imported
 while cross compile, we just check whether does the module exist.
 
+Upstream-Status: Pending
+
 Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
 
 update to version 4.10.5, and switch to python3
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
-Upstream-Status: Pending
-
  buildtools/wafsamba/samba_bundled.py | 27 +++++++++++++++++++--------
  1 file changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/buildtools/wafsamba/samba_bundled.py b/buildtools/wafsamba/samba_bundled.py
-index 7d2d855..01dcb56 100644
+index 2300565..26d9e8c 100644
 --- a/buildtools/wafsamba/samba_bundled.py
 +++ b/buildtools/wafsamba/samba_bundled.py
 @@ -4,6 +4,7 @@ import sys
@@ -28,7 +28,7 @@ index 7d2d855..01dcb56 100644
  
  def PRIVATE_NAME(bld, name):
      '''possibly rename a library to include a bundled extension'''
-@@ -241,17 +242,27 @@ def CHECK_BUNDLED_SYSTEM_PYTHON(conf, libname, modulename, minversion='0.0.0'):
+@@ -245,17 +246,27 @@ def CHECK_BUNDLED_SYSTEM_PYTHON(conf, libname, modulename, minversion='0.0.0'):
      # versions
      minversion = minimum_library_version(conf, libname, minversion)
  

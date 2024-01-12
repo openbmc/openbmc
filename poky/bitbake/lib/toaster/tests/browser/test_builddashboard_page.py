@@ -162,6 +162,7 @@ class TestBuildDashboardPage(SeleniumTestCase):
         """
         url = reverse('builddashboard', args=(build.id,))
         self.get(url)
+        self.wait_until_visible('#global-nav', poll=3)
 
     def _get_build_dashboard_errors(self, build):
         """

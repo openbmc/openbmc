@@ -37,7 +37,7 @@ inherit siteinfo
 export CONFIG_SITE
 
 acpaths ?= "default"
-EXTRA_AUTORECONF = "--exclude=autopoint --exclude=gtkdocize"
+EXTRA_AUTORECONF += "--exclude=autopoint"
 
 export lt_cv_sys_lib_dlsearch_path_spec = "${libdir} ${base_libdir}"
 

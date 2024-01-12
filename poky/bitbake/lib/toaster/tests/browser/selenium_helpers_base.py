@@ -182,6 +182,13 @@ class SeleniumTestCaseBase(unittest.TestCase):
         abs_url = '%s%s' % (self.live_server_url, url)
         self.driver.get(abs_url)
 
+        try:  # Ensure page is loaded before proceeding
+            self.wait_until_visible("#global-nav", poll=3)
+        except NoSuchElementException:
+            self.driver.implicitly_wait(3)
+        except TimeoutException:
+            self.driver.implicitly_wait(3)
+
     def find(self, selector):
         """ Find single element by CSS selector """
         return self.driver.find_element(By.CSS_SELECTOR, selector)

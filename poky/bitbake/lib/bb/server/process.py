@@ -500,12 +500,18 @@ class ServerCommunicator():
         self.recv = recv
 
     def runCommand(self, command):
-        self.connection.send(command)
+        try:
+            self.connection.send(command)
+        except BrokenPipeError as e:
+            raise BrokenPipeError("bitbake-server might have died or been forcibly stopped, ie. OOM killed") from e
         if not self.recv.poll(30):
             logger.info("No reply from server in 30s (for command %s at %s)" % (command[0], currenttime()))
             if not self.recv.poll(30):
                 raise ProcessTimeout("Timeout while waiting for a reply from the bitbake server (60s at %s)" % currenttime())
-        ret, exc = self.recv.get()
+        try:
+            ret, exc = self.recv.get()
+        except EOFError as e:
+            raise EOFError("bitbake-server might have died or been forcibly stopped, ie. OOM killed") from e
         # Should probably turn all exceptions in exc back into exceptions?
         # For now, at least handle BBHandledException
         if exc and ("BBHandledException" in exc or "SystemExit" in exc):

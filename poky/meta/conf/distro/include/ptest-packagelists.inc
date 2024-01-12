@@ -57,6 +57,7 @@ PTESTS_FAST = "\
     pango \
     popt \
     python3-atomicwrites \
+    python3-attrs \
     python3-bcrypt \
     python3-calver \
     python3-hypothesis \

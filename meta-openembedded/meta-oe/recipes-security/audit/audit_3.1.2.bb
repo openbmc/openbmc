@@ -27,7 +27,7 @@ INITSCRIPT_PARAMS = "defaults"
 SYSTEMD_PACKAGES = "auditd"
 SYSTEMD_SERVICE:auditd = "auditd.service"
 
-DEPENDS = "python3 tcp-wrappers libcap-ng linux-libc-headers swig-native"
+DEPENDS = "python3 tcp-wrappers libcap-ng linux-libc-headers swig-native python3-setuptools-native"
 
 EXTRA_OECONF = " --with-libwrap \
         --enable-gssapi-krb5=no \

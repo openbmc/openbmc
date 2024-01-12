@@ -1,0 +1,21 @@
+docs/reference: depend on a native gtk-doc
+
+In a cross-compiled environment we don't need a target gtk-doc, but a
+native gtk-doc.
+
+Upstream-Status: Backport [f3ff370d1b24f8afb51cd4e865593d5b678188a9]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/docs/reference/meson.build b/docs/reference/meson.build
+index c417ffecb..67c1dda56 100644
+--- a/docs/reference/meson.build
++++ b/docs/reference/meson.build
+@@ -42,7 +42,7 @@ ignore_decorators = '|'.join(ignore_decorators)
+ if get_option('gtk_doc')
+   # Check we have the minimum gtk-doc version required. Older versions won't
+   # generate correct documentation.
+-  dependency('gtk-doc', version : '>=1.32.1',
++  dependency('gtk-doc', version : '>=1.32.1', native: true,
+     fallback : ['gtk-doc', 'dummy_dep'],
+     default_options : ['tests=false'])
+ 

@@ -21,6 +21,7 @@ SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git;branch=master
            file://depmod-search.conf \
            file://avoid_parallel_tests.patch \
            file://0001-Use-portable-implementation-for-basename-API.patch \
+           file://gtkdocdir.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -35,8 +36,6 @@ PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl,openssl"
 PACKAGECONFIG[xz] = "--with-xz,--without-xz,xz"
 PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
 PACKAGECONFIG[zstd] = "--with-zstd,--without-zstd,zstd"
-
-GTKDOC_DOCDIR = "${S}/libkmod/docs"
 
 PROVIDES += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
 RPROVIDES:${PN} += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"

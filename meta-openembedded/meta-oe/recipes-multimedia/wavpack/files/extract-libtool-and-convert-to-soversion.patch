@@ -1,0 +1,35 @@
+From 25e12cf5918884f232cebc34c92bd548fe40c2b3 Mon Sep 17 00:00:00 2001
+From: Anonymous Maarten <anonymous.maarten@gmail.com>
+Date: Fri, 9 Dec 2022 19:13:09 +0100
+Subject: [PATCH] cmake: extract libtool from configure.ac and convert to
+ SOVERSION
+
+Upstream-Status: Backport [https://github.com/dbry/WavPack/commit/25e12cf5918884f232cebc34c92bd548fe40c2b3]
+Signed-off-by: alperak <alperyasinak1@gmail.com>
+---
+ CMakeLists.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index adc73b09..7ae5043f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,6 +2,18 @@ cmake_minimum_required(VERSION 3.2)
+
+ project(WavPack VERSION 5.6.0)
+
++file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_AC)
++string(REGEX MATCH "LT_CURRENT=([0-9]+)" LT_CURRENT "${CONFIGURE_AC}")
++set(LT_CURRENT "${CMAKE_MATCH_1}")
++string(REGEX MATCH "LT_REVISION=([0-9]+)" LT_REVISION "${CONFIGURE_AC}")
++set(LT_REVISION "${CMAKE_MATCH_1}")
++string(REGEX MATCH "LT_AGE=([0-9]+)" LT_AGE "${CONFIGURE_AC}")
++set(LT_AGE "${CMAKE_MATCH_1}")
++
++math(EXPR SOVERSION_MAJOR "${LT_CURRENT}-${LT_AGE}")
++math(EXPR SOVERSION_MINOR "${LT_AGE}")
++math(EXPR SOVERSION_MICRO "${LT_REVISION}")
++
+ # Languages
+
+ include(CheckLanguage)

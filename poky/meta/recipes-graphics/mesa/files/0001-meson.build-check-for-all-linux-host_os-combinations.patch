@@ -1,4 +1,4 @@
-From b251af67df5a6840d2e9cc06edae2c387f8778f1 Mon Sep 17 00:00:00 2001
+From f2fe76d506f356de055b8eca83a7c9d0744a40af Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair@alistair23.me>
 Date: Thu, 14 Nov 2019 13:04:49 -0800
 Subject: [PATCH] meson.build: check for all linux host_os combinations
@@ -20,7 +20,7 @@ Signed-off-by: Alistair Francis <alistair@alistair23.me>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 22385d8..15f48a6 100644
+index 35cc5f1..9a49c0d 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -121,7 +121,7 @@ with_any_opengl = with_opengl or with_gles1 or with_gles2
@@ -32,7 +32,7 @@ index 22385d8..15f48a6 100644
  
  gallium_drivers = get_option('gallium-drivers')
  if gallium_drivers.contains('auto')
-@@ -909,7 +909,7 @@ if cc.has_function('fmemopen')
+@@ -956,7 +956,7 @@ if cc.has_function('fmemopen')
  endif
  
  # TODO: this is very incomplete

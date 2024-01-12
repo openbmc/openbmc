@@ -24,3 +24,5 @@ RCONFLICTS:${PN} = "speex (< 1.2rc2)"
 RCONFLICTS:${PN}-dbg = "speex-dbg (< 1.2rc2)"
 RCONFLICTS:${PN}-dev = "speex-dev (< 1.2rc2)"
 RCONFLICTS:${PN}-staticdev = "speex-staticdev (< 1.2rc2)"
+
+BBCLASSEXTEND = "native"

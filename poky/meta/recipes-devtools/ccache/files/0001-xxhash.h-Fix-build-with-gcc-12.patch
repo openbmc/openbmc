@@ -1,4 +1,4 @@
-From 550834a3ec2e05e379be63b084e7fa06a1723f84 Mon Sep 17 00:00:00 2001
+From d17fdacf4892a15fafb56b0890ece05b485e89fb Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Mon, 6 Jun 2022 17:53:20 +0800
 Subject: [PATCH] xxhash.h: Fix build with gcc-12
@@ -23,10 +23,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/third_party/xxhash.h b/src/third_party/xxhash.h
-index 08ab794..c754e99 100644
+index a18e8c7..1b72307 100644
 --- a/src/third_party/xxhash.h
 +++ b/src/third_party/xxhash.h
-@@ -1501,7 +1501,7 @@ static void* XXH_memcpy(void* dest, const void* src, size_t size)
+@@ -2107,7 +2107,7 @@ static void* XXH_memcpy(void* dest, const void* src, size_t size)
  #  define XXH_NO_INLINE static
  /* enable inlining hints */
  #elif defined(__GNUC__) || defined(__clang__)

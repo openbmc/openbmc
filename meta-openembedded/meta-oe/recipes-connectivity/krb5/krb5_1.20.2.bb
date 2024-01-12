@@ -103,26 +103,26 @@ do_install:append() {
         -i ${D}${bindir}/krb5-config
 }
 
-PACKAGES =+ "${PN}-admin-server \
-             ${PN}-gss-samples \
-             ${PN}-k5tls \
-             ${PN}-kdc \
-             ${PN}-kdc-ldap \
-             ${PN}-kpropd \
-             ${PN}-otp \
-             ${PN}-pkinit \
-             ${PN}-spake \
-             ${PN}-user \
-             libgssapi-krb5 \
-             libgssrpc \
-             libk5crypto \
-             libkadm5clnt-mit \
-             libkadm5srv-mit \
-             libkdb5 \
-             libkrad \
-             libkrb5 \
-             libkrb5support \
-             libverto"
+PACKAGE_BEFORE_PN =+ "${PN}-admin-server \
+                      ${PN}-gss-samples \
+                      ${PN}-k5tls \
+                      ${PN}-kdc \
+                      ${PN}-kdc-ldap \
+                      ${PN}-kpropd \
+                      ${PN}-otp \
+                      ${PN}-pkinit \
+                      ${PN}-spake \
+                      ${PN}-user \
+                      libgssapi-krb5 \
+                      libgssrpc \
+                      libk5crypto \
+                      libkadm5clnt-mit \
+                      libkadm5srv-mit \
+                      libkdb5 \
+                      libkrad \
+                      libkrb5 \
+                      libkrb5support \
+                      libverto"
 
 FILES:${PN} = "${libdir}/krb5/plugins/preauth/test.so"
 FILES:${PN}-doc += "${datadir}/examples"
@@ -198,4 +198,4 @@ pkg_postinst:${PN}-kdc () {
 BBCLASSEXTEND = "native nativesdk"
 
 inherit multilib_script
-MULTILIB_SCRIPTS = "${PN}-user:${bindir}/krb5-config"
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/krb5-config"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if ./arestest; then
+if ./arestest --gtest_filter=-*.Live*; then
 	echo "PASS: c-ares"
 else
 	echo "FAIL: c-ares"

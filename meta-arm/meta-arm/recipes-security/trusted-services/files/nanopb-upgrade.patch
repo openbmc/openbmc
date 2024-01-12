@@ -1,3 +1,8 @@
+From 35d16cdfd51aeca5df70732accc89e250af86b69 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 29 Sep 2023 16:21:26 +0100
+Subject: [PATCH] Upgrade nanopb
+
 Upgrade the nanopb checkout to 0.4.7 plus some important build fixes, and
 change the build/install process to be more reliable.
 
@@ -6,10 +11,16 @@ current state.
 
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ external/nanopb/fix-pyhon-name.patch       | 41 ----------------------
+ external/nanopb/nanopb-init-cache.cmake.in |  6 +++-
+ external/nanopb/nanopb.cmake               |  7 ++--
+ 3 files changed, 8 insertions(+), 46 deletions(-)
+ delete mode 100644 external/nanopb/fix-pyhon-name.patch
 
 diff --git a/external/nanopb/fix-pyhon-name.patch b/external/nanopb/fix-pyhon-name.patch
 deleted file mode 100644
-index ab0e84c..0000000
+index ab0e84c550f4..000000000000
 --- a/external/nanopb/fix-pyhon-name.patch
 +++ /dev/null
 @@ -1,41 +0,0 @@
@@ -55,7 +66,7 @@ index ab0e84c..0000000
 -     endforeach()
 - endif()
 diff --git a/external/nanopb/nanopb-init-cache.cmake.in b/external/nanopb/nanopb-init-cache.cmake.in
-index fb8104d..8df41dd 100644
+index fb8104d64b26..8df41ddcb5eb 100644
 --- a/external/nanopb/nanopb-init-cache.cmake.in
 +++ b/external/nanopb/nanopb-init-cache.cmake.in
 @@ -12,11 +12,15 @@ set(BUILD_STATIC_LIBS On CACHE BOOL "")
@@ -76,7 +87,7 @@ index fb8104d..8df41dd 100644
 +
  @_cmake_fragment@
 diff --git a/external/nanopb/nanopb.cmake b/external/nanopb/nanopb.cmake
-index 36465f6..57cf3d6 100644
+index 36465f612d5d..57cf3d697fdd 100644
 --- a/external/nanopb/nanopb.cmake
 +++ b/external/nanopb/nanopb.cmake
 @@ -28,7 +28,7 @@ running this module.

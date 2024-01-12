@@ -1,4 +1,4 @@
-From 888bfe48236b4ce382dc3aa49791cadb70a1fbe4 Mon Sep 17 00:00:00 2001
+From 18e3d62f5c8f957acc45695cb99c24510d23b457 Mon Sep 17 00:00:00 2001
 From: Wang Mingyu <wangmy@cn.fujitsu.com>
 Date: Fri, 25 Dec 2020 14:14:08 +0900
 Subject: [PATCH] talloc: Add configure options for packages
@@ -6,7 +6,6 @@ Subject: [PATCH] talloc: Add configure options for packages
 Add configure options for the following packages:
  - acl
  - attr
- - libaio
  - libbsd
  - libcap
  - valgrind
@@ -21,16 +20,20 @@ Signed-off-by: Joe Slater <joe.slater@windriver.com>
 
 Modified tp apply to version 2.2.0
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Rebase to 2.4.1
+Remove libaio option
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- lib/replace/wscript | 89 +++++++++++++++++++++++++++++++++++----------
+ lib/replace/wscript | 78 +++++++++++++++++++++++++++++++++------------
  wscript             |  7 +++-
- 2 files changed, 75 insertions(+), 21 deletions(-)
+ 2 files changed, 64 insertions(+), 21 deletions(-)
 
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 827d74f..0348715 100644
+index 199e636..3593eaf 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
-@@ -25,6 +25,41 @@ def options(opt):
+@@ -25,6 +25,34 @@ def options(opt):
      opt.PRIVATE_EXTENSION_DEFAULT('')
      opt.RECURSE('buildtools/wafsamba')
  
@@ -47,13 +50,6 @@ index 827d74f..0348715 100644
 +    opt.add_option('--without-attr',
 +                   help=("Disable use of attr"),
 +                   action="store_false", dest='enable_attr', default=False)
-+
-+    opt.add_option('--with-libaio',
-+                   help=("Enable use of libaio"),
-+                   action="store_true", dest='enable_libaio')
-+    opt.add_option('--without-libaio',
-+                   help=("Disable use of libaio"),
-+                   action="store_false", dest='enable_libaio', default=False)
 +
 +    opt.add_option('--with-libbsd',
 +                   help=("Enable use of libbsd"),
@@ -72,49 +68,51 @@ index 827d74f..0348715 100644
  @Utils.run_once
  def configure(conf):
      conf.RECURSE('buildtools/wafsamba')
-@@ -35,12 +70,25 @@ def configure(conf):
+@@ -38,18 +66,27 @@ def configure(conf):
      conf.DEFINE('HAVE_LIBREPLACE', 1)
      conf.DEFINE('LIBREPLACE_NETWORK_CHECKS', 1)
  
 -    conf.CHECK_HEADERS('linux/types.h crypt.h locale.h acl/libacl.h compat.h')
 -    conf.CHECK_HEADERS('acl/libacl.h attr/xattr.h compat.h ctype.h dustat.h')
 +    conf.CHECK_HEADERS('linux/types.h crypt.h locale.h compat.h')
-+    conf.CHECK_HEADERS('attr/xattr.h compat.h ctype.h dustat.h')
++    conf.CHECK_HEADERS('compat.h ctype.h dustat.h')
      conf.CHECK_HEADERS('fcntl.h fnmatch.h glob.h history.h krb5.h langinfo.h')
      conf.CHECK_HEADERS('locale.h ndir.h pwd.h')
 -    conf.CHECK_HEADERS('shadow.h sys/acl.h')
 -    conf.CHECK_HEADERS('sys/attributes.h attr/attributes.h sys/capability.h sys/dir.h sys/epoll.h')
 +    conf.CHECK_HEADERS('shadow.h')
 +    conf.CHECK_HEADERS('sys/attributes.h sys/dir.h sys/epoll.h')
-+
+     conf.CHECK_HEADERS('sys/fcntl.h sys/filio.h sys/filsys.h sys/fs/s5param.h')
+     conf.CHECK_HEADERS('sys/id.h sys/ioctl.h sys/ipc.h sys/mman.h sys/mode.h sys/ndir.h sys/priv.h')
+     conf.CHECK_HEADERS('sys/resource.h sys/security.h sys/shm.h sys/statfs.h sys/statvfs.h sys/termio.h')
+     conf.CHECK_HEADERS('sys/vfs.h sys/xattr.h termio.h termios.h sys/file.h')
+     conf.CHECK_HEADERS('sys/ucontext.h sys/wait.h sys/stat.h')
+ 
 +    if Options.options.enable_acl:
 +        conf.CHECK_HEADERS('acl/libacl.h sys/acl.h')
 +
 +    if Options.options.enable_attr:
 +        conf.CHECK_HEADERS('attr/attributes.h attr/xattr.h')
 +
-+    if Options.options.enable_libaio:
-+        conf.CHECK_HEADERS('libaio.h')
-+
 +    if Options.options.enable_libcap:
 +        conf.CHECK_HEADERS('sys/capability.h')
 +
-     conf.CHECK_HEADERS('port.h')
-     conf.CHECK_HEADERS('sys/fcntl.h sys/filio.h sys/filsys.h sys/fs/s5param.h')
-     conf.CHECK_HEADERS('sys/id.h sys/ioctl.h sys/ipc.h sys/mman.h sys/mode.h sys/ndir.h sys/priv.h')
-@@ -110,8 +158,9 @@ def configure(conf):
+     if not conf.CHECK_DECLS('malloc', headers='stdlib.h'):
+         conf.CHECK_HEADERS('malloc.h')
+ 
+@@ -113,8 +150,9 @@ def configure(conf):
      conf.CHECK_HEADERS('sys/fileio.h sys/filesys.h sys/dustat.h sys/sysmacros.h')
      conf.CHECK_HEADERS('xfs/libxfs.h netgroup.h')
  
 -    conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
--    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
+-    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h valgrind/callgrind.h')
 +    if Options.options.enable_valgrind:
 +        conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
-+        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
++        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h valgrind/callgrind.h')
      conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
      conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
      conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h')
-@@ -431,20 +480,20 @@ def configure(conf):
+@@ -443,20 +481,20 @@ def configure(conf):
  
      strlcpy_in_bsd = False
  
@@ -150,7 +148,7 @@ index 827d74f..0348715 100644
      conf.CHECK_CODE('''
                  struct ucred cred;
 diff --git a/wscript b/wscript
-index 3089663..fdf9510 100644
+index 075f1ec..6b4f273 100644
 --- a/wscript
 +++ b/wscript
 @@ -31,7 +31,12 @@ def options(opt):

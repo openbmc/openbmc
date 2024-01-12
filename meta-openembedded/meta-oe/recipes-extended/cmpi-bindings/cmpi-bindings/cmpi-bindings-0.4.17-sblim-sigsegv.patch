@@ -1,12 +1,20 @@
-Port from Fedora20
+From bc32342fa63b8359f985fe1e187e811455c96a50 Mon Sep 17 00:00:00 2001
+From: Qian Lei <qianl.fnst@cn.fujitsu.com>
+Date: Tue, 25 Aug 2015 13:19:51 +0800
+Subject: [PATCH] Port from Fedora20
 
 Upstream-Status: Pending
 Signed-off-by: Qian Lei <qianl.fnst@cn.fujitsu.com>
 
-diff -up cmpi-bindings-0.4.17/swig/python/cmpi_pywbem_bindings.py.orig cmpi-bindings-0.4.17/swig/python/cmpi_pywbem_bindings.py
---- cmpi-bindings-0.4.17/swig/python/cmpi_pywbem_bindings.py.orig	2012-03-01 17:05:31.878367281 +0100
-+++ cmpi-bindings-0.4.17/swig/python/cmpi_pywbem_bindings.py	2012-03-01 17:06:34.718110137 +0100
-@@ -350,10 +350,10 @@ class BrokerCIMOMHandle(object):
+---
+ swig/python/cmpi_pywbem_bindings.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/swig/python/cmpi_pywbem_bindings.py b/swig/python/cmpi_pywbem_bindings.py
+index d643990..7f0cc77 100644
+--- a/swig/python/cmpi_pywbem_bindings.py
++++ b/swig/python/cmpi_pywbem_bindings.py
+@@ -361,10 +361,10 @@ class BrokerCIMOMHandle(object):
              allow_null_ns = False
          else:
              allow_null_ns = True

@@ -3,7 +3,6 @@ DESCRIPTION = "\
     This package contains an I2C dev library and the i2c bus scanning \
     utility lsi2c. \
 "
-AUTHOR = "Danielle Costantino"
 HOMEPAGE = "https://github.com/costad2/i2cdev"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "\

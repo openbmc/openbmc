@@ -1,4 +1,4 @@
-From 5d5e76d369a412bfb3d2cebb5fc0a7509cef878d Mon Sep 17 00:00:00 2001
+From e7f9c9909c27d6ceed5aa4ca17023a1bc94b620a Mon Sep 17 00:00:00 2001
 From: Rod Smith <rodsmith@rodsbooks.com>
 Date: Fri, 15 Apr 2022 18:10:14 -0400
 Subject: [PATCH] Fix failure & crash of sgdisk when compiled with latest popt
@@ -6,11 +6,11 @@ Subject: [PATCH] Fix failure & crash of sgdisk when compiled with latest popt
 
 Upstream-Status: Backport [https://sourceforge.net/p/gptfdisk/code/ci/5d5e76d369a412bfb3d2cebb5fc0a7509cef878d/]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
- NEWS      | 8 ++++++++
- gptcl.cc  | 2 +-
- support.h | 2 +-
- 3 files changed, 10 insertions(+), 2 deletions(-)
+ NEWS     | 8 ++++++++
+ gptcl.cc | 2 +-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/NEWS b/NEWS
 index c7add56..9e153fd 100644
@@ -41,19 +41,6 @@ index 34c9421..0d578eb 100644
     poptResetContext(poptCon);
  
     if (device != NULL) {
-diff --git a/support.h b/support.h
-index 8ba9ad1..f91f1bc 100644
---- a/support.h
-+++ b/support.h
-@@ -8,7 +8,7 @@
- #include <stdlib.h>
- #include <string>
- 
--#define GPTFDISK_VERSION "1.0.9"
-+#define GPTFDISK_VERSION "1.0.9.1"
- 
- #if defined (__FreeBSD__) || defined (__FreeBSD_kernel__) || defined (__APPLE__)
- // Darwin (Mac OS) & FreeBSD: disk IOCTLs are different, and there is no lseek64
 -- 
-2.30.2
+2.35.5
 

@@ -30,8 +30,6 @@ LEAD_SONAME = "libglib-2.0.*"
 
 inherit meson gettext gtk-doc pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages
 
-DEPENDS:append:class-target = "${@' gtk-doc' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
-
 GTKDOC_MESON_OPTION = "gtk_doc"
 
 S = "${WORKDIR}/glib-${PV}"

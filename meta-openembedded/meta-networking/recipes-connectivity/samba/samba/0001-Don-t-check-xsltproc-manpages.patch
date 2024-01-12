@@ -1,4 +1,4 @@
-From f6fa33bfc2e1272198db6ea08910b4162b364b18 Mon Sep 17 00:00:00 2001
+From 5c5418038e392cc00d3293e00ea0cd20b5e19c9a Mon Sep 17 00:00:00 2001
 From: Bian Naimeng <biannm@cn.fujitsu.com>
 Date: Mon, 18 Apr 2016 17:00:53 -0400
 Subject: [PATCH] Don't check xsltproc manpages
@@ -16,7 +16,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/lib/ldb/wscript b/lib/ldb/wscript
-index 60bb7cf..b7b0152 100644
+index ed5d45f..de3c648 100644
 --- a/lib/ldb/wscript
 +++ b/lib/ldb/wscript
 @@ -144,7 +144,7 @@ def configure(conf):
@@ -29,7 +29,7 @@ index 60bb7cf..b7b0152 100644
          # we need this for the ldap backend
          if conf.CHECK_FUNCS_IN('ber_flush ldap_open ldap_initialize', 'lber ldap', headers='lber.h ldap.h'):
 diff --git a/lib/talloc/wscript b/lib/talloc/wscript
-index 3089663..76cd65e 100644
+index 075f1ec..9bd9f73 100644
 --- a/lib/talloc/wscript
 +++ b/lib/talloc/wscript
 @@ -48,7 +48,7 @@ def configure(conf):
@@ -42,7 +42,7 @@ index 3089663..76cd65e 100644
      conf.CHECK_HEADERS('sys/auxv.h')
      conf.CHECK_FUNCS('getauxval')
 diff --git a/lib/tdb/wscript b/lib/tdb/wscript
-index 71ada31..accd474 100644
+index 5e6a928..f13cf2a 100644
 --- a/lib/tdb/wscript
 +++ b/lib/tdb/wscript
 @@ -95,7 +95,7 @@ def configure(conf):

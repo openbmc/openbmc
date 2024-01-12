@@ -5,4 +5,4 @@ LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/wkz/mdio-tools.git;protocol=https;branch=master"
-SRCREV = "42c91efa63ef81992cdcc01e698cf3bc7764bbc3"
+SRCREV = "f74eaf38dbda441df4fcaeb21ca4465957953a2f"

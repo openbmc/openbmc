@@ -1,4 +1,4 @@
-From acd3985f9c428882f1b731a6f9ce5cb1a4a3a02c Mon Sep 17 00:00:00 2001
+From e949da7cb100c571631cd9bc7532e528c1f74820 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 1 Jul 2019 16:14:16 +0800
 Subject: [PATCH] ldb: Add configure options for packages
@@ -6,7 +6,6 @@ Subject: [PATCH] ldb: Add configure options for packages
 Add configure options for the following packages:
  - acl
  - attr
- - libaio
  - libbsd
  - libcap
  - valgrind
@@ -19,17 +18,20 @@ upgrade to version 1.5.4
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 
 Rebase to 2.3.0
+
+Rebase to 2.8.0
+Remove libaio option
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- lib/replace/wscript | 90 +++++++++++++++++++++++++++++++++++----------
- wscript             |  8 ++++
- 2 files changed, 78 insertions(+), 20 deletions(-)
+ lib/replace/wscript | 80 +++++++++++++++++++++++++++++++++------------
+ wscript             |  8 +++++
+ 2 files changed, 68 insertions(+), 20 deletions(-)
 
 diff --git a/lib/replace/wscript b/lib/replace/wscript
-index 5c2b750..a38baae 100644
+index 37d7759..d0d6bb0 100644
 --- a/lib/replace/wscript
 +++ b/lib/replace/wscript
-@@ -25,6 +25,41 @@ def options(opt):
+@@ -25,6 +25,34 @@ def options(opt):
      opt.PRIVATE_EXTENSION_DEFAULT('')
      opt.RECURSE('buildtools/wafsamba')
  
@@ -46,13 +48,6 @@ index 5c2b750..a38baae 100644
 +    opt.add_option('--without-attr',
 +                   help=("Disable use of attr"),
 +                   action="store_false", dest='enable_attr', default=False)
-+
-+    opt.add_option('--with-libaio',
-+                   help=("Enable use of libaio"),
-+                   action="store_true", dest='enable_libaio')
-+    opt.add_option('--without-libaio',
-+                   help=("Disable use of libaio"),
-+                   action="store_false", dest='enable_libaio', default=False)
 +
 +    opt.add_option('--with-libbsd',
 +                   help=("Enable use of libbsd"),
@@ -71,7 +66,7 @@ index 5c2b750..a38baae 100644
  @Utils.run_once
  def configure(conf):
      conf.RECURSE('buildtools/wafsamba')
-@@ -38,12 +73,25 @@ def configure(conf):
+@@ -38,12 +66,22 @@ def configure(conf):
      conf.DEFINE('HAVE_LIBREPLACE', 1)
      conf.DEFINE('LIBREPLACE_NETWORK_CHECKS', 1)
  
@@ -92,28 +87,25 @@ index 5c2b750..a38baae 100644
 +    if Options.options.enable_attr:
 +        conf.CHECK_HEADERS('attr/attributes.h attr/xattr.h')
 +
-+    if Options.options.enable_libaio:
-+        conf.CHECK_HEADERS('libaio.h')
-+
 +    if Options.options.enable_libcap:
 +        conf.CHECK_HEADERS('sys/capability.h')
 +
      conf.CHECK_HEADERS('sys/fcntl.h sys/filio.h sys/filsys.h sys/fs/s5param.h')
      conf.CHECK_HEADERS('sys/id.h sys/ioctl.h sys/ipc.h sys/mman.h sys/mode.h sys/ndir.h sys/priv.h')
      conf.CHECK_HEADERS('sys/resource.h sys/security.h sys/shm.h sys/statfs.h sys/statvfs.h sys/termio.h')
-@@ -113,8 +161,9 @@ def configure(conf):
+@@ -113,8 +151,9 @@ def configure(conf):
      conf.CHECK_HEADERS('sys/fileio.h sys/filesys.h sys/dustat.h sys/sysmacros.h')
      conf.CHECK_HEADERS('xfs/libxfs.h netgroup.h')
  
 -    conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
--    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
+-    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h valgrind/callgrind.h')
 +    if Options.options.enable_valgrind:
 +        conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
-+        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
++        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h valgrind/callgrind.h')
      conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
      conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
      conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h')
-@@ -436,20 +485,21 @@ def configure(conf):
+@@ -443,20 +482,21 @@ def configure(conf):
  
      strlcpy_in_bsd = False
  
@@ -131,7 +123,7 @@ index 5c2b750..a38baae 100644
 -
 -    if not conf.CHECK_FUNCS('closefrom'):
 -        conf.CHECK_FUNCS_IN('closefrom', 'bsd', headers='bsd/unistd.h')
-+    if Options.options.enable_libbsd: 
++    if Options.options.enable_libbsd:
 +        # libbsd on some platforms provides strlcpy and strlcat
 +        if not conf.CHECK_FUNCS('strlcpy strlcat'):
 +            if conf.CHECK_FUNCS_IN('strlcpy strlcat', 'bsd', headers='bsd/string.h',
@@ -150,7 +142,7 @@ index 5c2b750..a38baae 100644
      conf.CHECK_CODE('''
                  struct ucred cred;
 diff --git a/wscript b/wscript
-index 03076e6..5365408 100644
+index ed5d45f..6bb0b37 100644
 --- a/wscript
 +++ b/wscript
 @@ -40,6 +40,14 @@ def options(opt):

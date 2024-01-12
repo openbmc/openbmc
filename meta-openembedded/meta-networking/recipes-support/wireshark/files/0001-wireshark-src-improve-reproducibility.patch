@@ -1,4 +1,4 @@
-From 0a9ab056ce7582033a21d6bc541ece520bf2b0b6 Mon Sep 17 00:00:00 2001
+From d9c4cdad0c48becab491ea4e80e5cd81f7d1dc97 Mon Sep 17 00:00:00 2001
 From: Oleksiy Obitotskyy <oobitots@cisco.com>
 Date: Thu, 26 Nov 2020 05:38:31 -0800
 Subject: [PATCH] wireshark-src: improve reproducibility
@@ -8,15 +8,15 @@ comments.
 
 Upstream-Status: Pending
 Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
----
- tools/make-plugin-reg.py | 2 +-
- tools/ncp2222.py         | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Index: wireshark-4.0.6/tools/ncp2222.py
-===================================================================
---- wireshark-4.0.6.orig/tools/ncp2222.py
-+++ wireshark-4.0.6/tools/ncp2222.py
+---
+ tools/ncp2222.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/ncp2222.py b/tools/ncp2222.py
+index f14d0c5..05073b9 100755
+--- a/tools/ncp2222.py
++++ b/tools/ncp2222.py
 @@ -5891,7 +5891,7 @@ def produce_code():
  
      print("/*")

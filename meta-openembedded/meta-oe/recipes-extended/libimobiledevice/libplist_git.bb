@@ -24,7 +24,7 @@ CVE_STATUS_LIBLIST = " \
 "
 
 do_configure:prepend() {
-    rm ${S}/m4/ax_python_devel.m4
+    rm -f ${S}/m4/ax_python_devel.m4
 }
 
 do_install:append () {

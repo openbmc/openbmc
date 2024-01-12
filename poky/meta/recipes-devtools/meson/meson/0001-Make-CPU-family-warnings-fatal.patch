@@ -1,4 +1,4 @@
-From fcd3260c03f313676720e6219c5953d412fb0a2c Mon Sep 17 00:00:00 2001
+From b77cbe67df5fa0998946503f207c256ee740bb5f Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 3 Jul 2018 13:59:09 +0100
 Subject: [PATCH] Make CPU family warnings fatal
@@ -12,10 +12,10 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  2 files changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index 7e0c567..a180065 100644
+index 07f1229..a35c356 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
-@@ -284,8 +284,8 @@ class MachineInfo(HoldableObject):
+@@ -285,8 +285,8 @@ class MachineInfo(HoldableObject):
                  'but is missing {}.'.format(minimum_literal - set(literal)))
  
          cpu_family = literal['cpu_family']
@@ -27,10 +27,10 @@ index 7e0c567..a180065 100644
          endian = literal['endian']
          if endian not in ('little', 'big'):
 diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
-index e212c7a..9d2bff3 100644
+index 2ba2054..d798e3b 100644
 --- a/mesonbuild/environment.py
 +++ b/mesonbuild/environment.py
-@@ -345,10 +345,8 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
+@@ -359,10 +359,8 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
          if compilers and not any_compiler_has_define(compilers, '__mips64'):
              trial = 'mips'
  

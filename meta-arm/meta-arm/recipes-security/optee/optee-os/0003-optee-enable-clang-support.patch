@@ -1,4 +1,4 @@
-From b33de2f059f1394028a94ee9da081fa6644b50a2 Mon Sep 17 00:00:00 2001
+From 59d4c190eae11c93b26cca5a7b005a17dadc8248 Mon Sep 17 00:00:00 2001
 From: Brett Warren <brett.warren@arm.com>
 Date: Wed, 23 Sep 2020 09:27:34 +0100
 Subject: [PATCH] optee: enable clang support

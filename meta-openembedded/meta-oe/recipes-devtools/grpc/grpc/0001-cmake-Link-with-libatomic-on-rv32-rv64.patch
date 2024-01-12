@@ -1,4 +1,4 @@
-From c321f19ff1cd1251c19d20b17a2d86c4237ce506 Mon Sep 17 00:00:00 2001
+From 54e8dca9b39b8c8a6532576a0286e548f97607fa Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 19 Apr 2022 16:07:19 -0700
 Subject: [PATCH] cmake: Link with libatomic on rv32/rv64
@@ -15,12 +15,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b272816685..e1fe1102c4 100644
+index 06e6453b5c..476d7f1576 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -303,6 +303,9 @@ if(UNIX AND NOT HAIKU)
-   if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_POSIX)
-     set(_gRPC_ALLTARGETS_LIBRARIES ${_gRPC_ALLTARGETS_LIBRARIES} rt)
+@@ -306,6 +306,9 @@ if(UNIX AND NOT HAIKU)
+       set(_gRPC_ALLTARGETS_LIBRARIES ${_gRPC_ALLTARGETS_LIBRARIES} rt)
+     endif()
    endif()
 +  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "riscv64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "riscv32")
 +    set(_gRPC_ALLTARGETS_LIBRARIES ${_gRPC_ALLTARGETS_LIBRARIES} atomic)

@@ -61,7 +61,7 @@ RDEPENDS:${PN} += "python3-requests python3-pillow \
                    python3-xxhash python3-pako \
                    python3-six python3-cryptography \
                    python3-requests-futures \
-                   python3-xmlrunner python3-fasteners \
+                   python3-fasteners \
                    python3-python-vlc \
                    python3-padatious python3-padaos \
                    python3-petact python3-precise-runner \

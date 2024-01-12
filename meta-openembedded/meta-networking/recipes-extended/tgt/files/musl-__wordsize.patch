@@ -1,0 +1,41 @@
+The definition of __WORDSIZE is found in <sys/reg.h>
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/usr/iscsi/iscsid.h
++++ b/usr/iscsi/iscsid.h
+@@ -22,6 +22,9 @@
+ #include <stdint.h>
+ #include <inttypes.h>
+ #include <netdb.h>
++#if !defined(__GLIBC__)
++#include <sys/reg.h>
++#endif
+ 
+ #include "transport.h"
+ #include "list.h"
+--- a/usr/tgtd.h
++++ b/usr/tgtd.h
+@@ -1,6 +1,9 @@
+ #ifndef __TARGET_DAEMON_H
+ #define __TARGET_DAEMON_H
+ 
++#if !defined(__GLIBC__)
++#include <sys/reg.h>
++#endif
+ #include "log.h"
+ #include "scsi_cmnd.h"
+ #include "tgtadm_error.h"
+--- a/usr/util.h
++++ b/usr/util.h
+@@ -19,6 +19,9 @@
+ #include <linux/fs.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#if !defined(__GLIBC__)
++#include <sys/reg.h>
++#endif
+ 
+ #include "be_byteshift.h"
+ 

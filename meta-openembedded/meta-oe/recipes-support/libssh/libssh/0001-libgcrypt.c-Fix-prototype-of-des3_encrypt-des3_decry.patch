@@ -1,4 +1,4 @@
-From 0cade4573334571055127a2d4fe3641e2397948d Mon Sep 17 00:00:00 2001
+From 49a8ae4d6f77434ed9f7a601b9df488b921e4a22 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 20 Mar 2023 21:59:19 -0700
 Subject: [PATCH] libgcrypt.c: Fix prototype of des3_encrypt/des3_decrypt
@@ -18,15 +18,16 @@ TOPDIR/build/tmp/work/cortexa15t2hf-neon-yoe-linux-gnueabi/libssh/0.10.4-r0/git/
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/libgcrypt.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/libgcrypt.c b/src/libgcrypt.c
-index da5588ad..e482b654 100644
+index f410d997..e3f66781 100644
 --- a/src/libgcrypt.c
 +++ b/src/libgcrypt.c
-@@ -469,12 +469,12 @@ static int des3_set_key(struct ssh_cipher_struct *cipher, void *key, void *IV) {
+@@ -416,12 +416,12 @@ static int des3_set_key(struct ssh_cipher_struct *cipher, void *key, void *IV) {
  }
  
  static void des3_encrypt(struct ssh_cipher_struct *cipher, void *in,
@@ -41,6 +42,3 @@ index da5588ad..e482b654 100644
    gcry_cipher_decrypt(cipher->key[0], out, len, in, len);
  }
  
--- 
-2.40.0
-

@@ -377,6 +377,35 @@ If you need to install custom CMake toolchain files supplied by the application
 being built, you should install them (during :ref:`ref-tasks-install`) to the
 preferred CMake Module directory: ``${D}${datadir}/cmake/modules/``.
 
+.. _ref-classes-cmake-qemu:
+
+``cmake-qemu``
+==============
+
+The :ref:`ref-classes-cmake-qemu` class might be used instead of the
+:ref:`ref-classes-cmake` class. In addition to the features provided by the
+:ref:`ref-classes-cmake` class, the :ref:`ref-classes-cmake-qemu` class passes
+the ``CMAKE_CROSSCOMPILING_EMULATOR`` setting to ``cmake``. This allows to use
+QEMU user-mode emulation for the execution of cross-compiled binaries on the
+host machine.  For more information about ``CMAKE_CROSSCOMPILING_EMULATOR``
+please refer to the `related section of the CMake documentation
+<https://cmake.org/cmake/help/latest/variable/CMAKE_CROSSCOMPILING_EMULATOR.html>`__.
+
+Not all platforms are supported by QEMU. This class only works for machines with
+``qemu-usermode`` in the :ref:`ref-features-machine`. Using QEMU user-mode therefore
+involves a certain risk, which is also the reason why this feature is not part of
+the main :ref:`ref-classes-cmake` class by default.
+
+One use case is the execution of cross-compiled unit tests with CTest on the build
+machine. If ``CMAKE_CROSSCOMPILING_EMULATOR`` is configured::
+
+   cmake --build --target test
+
+works transparently with QEMU user-mode.
+
+If the CMake project is developed with this use case in mind this works very nicely.
+This also applies to an IDE configured to use ``cmake-native`` for cross-compiling.
+
 .. _ref-classes-cml1:
 
 ``cml1``
@@ -1537,16 +1566,6 @@ Here are the tests you can list with the :term:`WARN_QA` and
    ``xorg-driver-input.inc`` or ``xorg-driver-video.inc`` will
    automatically get these versions. Consequently, you should only need
    to explicitly add dependencies to binary driver recipes.
-
-.. _ref-classes-insserv:
-
-``insserv``
-===========
-
-The :ref:`ref-classes-insserv` class uses the ``insserv`` utility to update the order
-of symbolic links in ``/etc/rc?.d/`` within an image based on
-dependencies specified by LSB headers in the ``init.d`` scripts
-themselves.
 
 .. _ref-classes-kernel:
 
@@ -3210,7 +3229,7 @@ The :ref:`ref-classes-uboot-config` class provides support for U-Boot configurat
 a machine. Specify the machine in your recipe as follows::
 
    UBOOT_CONFIG ??= <default>
-   UBOOT_CONFIG[foo] = "config,images"
+   UBOOT_CONFIG[foo] = "config,images,binary"
 
 You can also specify the machine using this method::
 

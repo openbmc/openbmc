@@ -9,6 +9,7 @@ PYPI_PACKAGE = "PyYAML"
 
 inherit pypi python_setuptools_build_meta
 
+SRC_URI += "file://0001-Fix-builds-with-Cython-3.patch"
 SRC_URI[sha256sum] = "bfdf460b1736c775f2ba9f6a92bca30bc2095067b8a9d77876d1fad6cc3b4a43"
 
 RDEPENDS:${PN} += "\

@@ -1,22 +1,22 @@
-From 6822c61ade5617c9f109e32ad4cdc115fa9e12c8 Mon Sep 17 00:00:00 2001
+From c533bdced677e2104565fc06602e7e63d9c79ac0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 6 Nov 2016 23:40:54 -0800
 Subject: [PATCH] Lifted from gentoo and ported to 4.4.5
 
 http://data.gpo.zugaina.org/musl/net-fs/samba/files/samba-4.2.7-pam.patch
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
 
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
  source3/wscript | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/source3/wscript b/source3/wscript
-index 22be17a..ee9ce52 100644
+index b7f96f3..ed12b1e 100644
 --- a/source3/wscript
 +++ b/source3/wscript
-@@ -862,7 +862,7 @@ msg.msg_accrightslen = sizeof(fd);
+@@ -863,7 +863,7 @@ msg.msg_accrightslen = sizeof(fd);
          if conf.env.with_iconv:
              conf.DEFINE('HAVE_ICONV', 1)
  
@@ -25,7 +25,7 @@ index 22be17a..ee9ce52 100644
          use_pam=True
          conf.CHECK_HEADERS('security/pam_appl.h pam/pam_appl.h')
          if not conf.CONFIG_SET('HAVE_SECURITY_PAM_APPL_H') and not conf.CONFIG_SET('HAVE_PAM_PAM_APPL_H'):
-@@ -939,6 +939,17 @@ int i; i = PAM_RADIO_TYPE;
+@@ -940,6 +940,17 @@ int i; i = PAM_RADIO_TYPE;
                         "or headers not found. Use --without-pam to disable "
                         "PAM support.");
  

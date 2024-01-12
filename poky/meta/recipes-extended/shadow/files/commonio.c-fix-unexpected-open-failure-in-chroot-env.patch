@@ -1,4 +1,4 @@
-From 21583da072aa66901d859ac00ce209bac87ddecc Mon Sep 17 00:00:00 2001
+From a773c6b240d27e23d6be41decef0edf24fcee523 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 17 Jul 2014 15:53:34 +0800
 Subject: [PATCH] commonio.c-fix-unexpected-open-failure-in-chroot-env
@@ -15,35 +15,37 @@ Note that this patch doesn't change the logic in the code, it just expands
 the codes.
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
-
 ---
  lib/commonio.c | 16 ++++++++++++----
  1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/lib/commonio.c b/lib/commonio.c
-index 9a02ce1..61384ec 100644
+index 73fdb3a..d1231e9 100644
 --- a/lib/commonio.c
 +++ b/lib/commonio.c
-@@ -616,10 +616,18 @@ int commonio_open (struct commonio_db *db, int mode)
+@@ -606,10 +606,18 @@ int commonio_open (struct commonio_db *db, int mode)
  	db->cursor = NULL;
  	db->changed = false;
  
 -	fd = open (db->filename,
 -	             (db->readonly ? O_RDONLY : O_RDWR)
--	           | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW);
+-	           | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW | O_CLOEXEC);
 -	saved_errno = errno;
 +	if (db->readonly) {
 +		fd = open (db->filename,
 +			   (true ? O_RDONLY : O_RDWR)
-+			   | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW);
++			   | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW | O_CLOEXEC);
 +		saved_errno = errno;
 +	} else {
 +		fd = open (db->filename,
 +			   (false ? O_RDONLY : O_RDWR)
-+			   | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW);
++			   | O_NOCTTY | O_NONBLOCK | O_NOFOLLOW| O_CLOEXEC);
 +		saved_errno = errno;
 +	}
 +
  	db->fp = NULL;
  	if (fd >= 0) {
  #ifdef WITH_TCB
+-- 
+2.30.2
+

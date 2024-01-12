@@ -408,6 +408,7 @@ PACKAGE_BEFORE_PN = "\
     ${PN}-zsh-completion \
     libsystemd-shared \
     udev \
+    udev-bash-completion \
     udev-hwdb \
 "
 
@@ -721,6 +722,7 @@ FILES:libsystemd-shared = "${rootlibdir}/systemd/libsystemd-shared*.so"
 
 RPROVIDES:udev = "hotplug"
 
+RDEPENDS:udev-bash-completion += "bash-completion"
 RDEPENDS:udev-hwdb += "udev"
 
 FILES:udev += "${base_sbindir}/udevd \
@@ -782,10 +784,10 @@ FILES:udev += "${base_sbindir}/udevd \
                ${base_bindir}/systemd-hwdb \
                ${base_bindir}/udevadm \
                ${base_sbindir}/udevadm \
-               ${datadir}/bash-completion/completions/udevadm \
                ${systemd_system_unitdir}/systemd-hwdb-update.service \
               "
 
+FILES:udev-bash-completion = "${datadir}/bash-completion/completions/udevadm"
 FILES:udev-hwdb = "${rootlibexecdir}/udev/hwdb.d \
                    "
 

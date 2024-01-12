@@ -11,7 +11,7 @@ inherit autotools gettext pkgconfig python3native features_check
 
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
-DEPENDS = "cups glib-2.0 libusb xmlto-native desktop-file-utils-native autoconf-archive-native"
+DEPENDS = "cups glib-2.0 libusb xmlto-native desktop-file-utils-native autoconf-archive-native python3-setuptools-native"
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd polkit', d)}"
 PACKAGECONFIG[systemd] = ",--without-systemdsystemunitdir,systemd"

@@ -1004,26 +1004,32 @@ class RunQueueData:
         # Handle --runall
         if self.cooker.configuration.runall:
             # re-run the mark_active and then drop unused tasks from new list
-            reduced_tasklist = set(self.runtaskentries.keys())
-            for tid in list(self.runtaskentries.keys()):
-                if tid not in runq_build:
-                   reduced_tasklist.remove(tid)
-            runq_build = {}
 
-            for task in self.cooker.configuration.runall:
-                if not task.startswith("do_"):
-                    task = "do_{0}".format(task)
+            runall_tids = set()
+            added = True
+            while added:
+                reduced_tasklist = set(self.runtaskentries.keys())
+                for tid in list(self.runtaskentries.keys()):
+                    if tid not in runq_build:
+                       reduced_tasklist.remove(tid)
+                runq_build = {}
+
+                orig = runall_tids
                 runall_tids = set()
-                for tid in reduced_tasklist:
-                    wanttid = "{0}:{1}".format(fn_from_tid(tid), task)
-                    if wanttid in self.runtaskentries:
-                        runall_tids.add(wanttid)
+                for task in self.cooker.configuration.runall:
+                    if not task.startswith("do_"):
+                        task = "do_{0}".format(task)
+                    for tid in reduced_tasklist:
+                        wanttid = "{0}:{1}".format(fn_from_tid(tid), task)
+                        if wanttid in self.runtaskentries:
+                            runall_tids.add(wanttid)
 
-                for tid in list(runall_tids):
-                    mark_active(tid, 1)
-                    self.target_tids.append(tid)
-                    if self.cooker.configuration.force:
-                        invalidate_task(tid, False)
+                    for tid in list(runall_tids):
+                        mark_active(tid, 1)
+                        self.target_tids.append(tid)
+                        if self.cooker.configuration.force:
+                            invalidate_task(tid, False)
+                added = runall_tids - orig
 
         delcount = set()
         for tid in list(self.runtaskentries.keys()):
@@ -1685,6 +1691,17 @@ class RunQueue:
         return
 
     def print_diffscenetasks(self):
+        def get_root_invalid_tasks(task, taskdepends, valid, noexec, visited_invalid):
+            invalidtasks = []
+            for t in taskdepends[task].depends:
+                if t not in valid and t not in visited_invalid:
+                    invalidtasks.extend(get_root_invalid_tasks(t, taskdepends, valid, noexec, visited_invalid))
+                    visited_invalid.add(t)
+
+            direct_invalid = [t for t in taskdepends[task].depends if t not in valid]
+            if not direct_invalid and task not in noexec:
+                invalidtasks = [task]
+            return invalidtasks
 
         noexec = []
         tocheck = set()
@@ -1718,35 +1735,35 @@ class RunQueue:
                     valid_new.add(dep)
 
         invalidtasks = set()
-        for tid in self.rqdata.runtaskentries:
-            if tid not in valid_new and tid not in noexec:
-                invalidtasks.add(tid)
 
-        found = set()
-        processed = set()
-        for tid in invalidtasks:
+        toptasks = set(["{}:{}".format(t[3], t[2]) for t in self.rqdata.targets])
+        for tid in toptasks:
             toprocess = set([tid])
             while toprocess:
                 next = set()
+                visited_invalid = set()
                 for t in toprocess:
-                    for dep in self.rqdata.runtaskentries[t].depends:
-                        if dep in invalidtasks:
-                            found.add(tid)
-                        if dep not in processed:
-                            processed.add(dep)
+                    if t not in valid_new and t not in noexec:
+                        invalidtasks.update(get_root_invalid_tasks(t, self.rqdata.runtaskentries, valid_new, noexec, visited_invalid))
+                        continue
+                    if t in self.rqdata.runq_setscene_tids:
+                        for dep in self.rqexe.sqdata.sq_deps[t]:
                             next.add(dep)
+                        continue
+
+                    for dep in self.rqdata.runtaskentries[t].depends:
+                        next.add(dep)
+
                 toprocess = next
-                if tid in found:
-                    toprocess = set()
 
         tasklist = []
-        for tid in invalidtasks.difference(found):
+        for tid in invalidtasks:
             tasklist.append(tid)
 
         if tasklist:
             bb.plain("The differences between the current build and any cached tasks start at the following tasks:\n" + "\n".join(tasklist))
 
-        return invalidtasks.difference(found)
+        return invalidtasks
 
     def write_diffscenetasks(self, invalidtasks):
         bb.siggen.check_siggen_version(bb.siggen)

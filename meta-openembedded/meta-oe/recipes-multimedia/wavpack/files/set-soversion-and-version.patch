@@ -1,0 +1,26 @@
+From 7c1dd729302b7f77f65884df4e79301df1490423 Mon Sep 17 00:00:00 2001
+From: Anonymous Maarten <anonymous.maarten@gmail.com>
+Date: Fri, 9 Dec 2022 19:23:51 +0100
+Subject: [PATCH] cmake: set SOVERSION and VERSION property of wavpack
+
+This is used to version .so libraries on Linux
+
+Upstream-Status: Backport [https://github.com/dbry/WavPack/commit/7c1dd729302b7f77f65884df4e79301df1490423]
+Signed-off-by: alperak <alperyasinak1@gmail.com>
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7ae5043f..285b295b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -361,6 +361,8 @@ if(BUILD_SHARED_LIBS)
+         target_link_directories(wavpack PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym")
+     endif()
+   else()
++    set_target_properties(wavpack PROPERTIES SOVERSION "${SOVERSION_MAJOR}")
++    set_target_properties(wavpack PROPERTIES VERSION "${SOVERSION_MAJOR}.${SOVERSION_MINOR}.${SOVERSION_MICRO}")
+     set(CONFTTEST_CONTENTS "VERS_1 {\n    global: sym;\n};\n\nVERS_2 {\n    global: sym;\n} VERS_1;\n")
+     file(WRITE ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/conftest.map "${CONFTTEST_CONTENTS}")
+     check_c_linker_flag("-Wl,--version-script=${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/conftest.map" COMPILER_SUPPORTS_SYMBOL_MAPS)

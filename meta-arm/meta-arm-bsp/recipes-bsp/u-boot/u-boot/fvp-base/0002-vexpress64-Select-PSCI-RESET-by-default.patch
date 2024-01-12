@@ -1,0 +1,46 @@
+From fdf67502a8112bb54cb1d25657cb35a37035f3e9 Mon Sep 17 00:00:00 2001
+From: Diego Sueiro <diego.sueiro@arm.com>
+Date: Wed, 4 Oct 2023 06:31:50 +0100
+Subject: [PATCH] vexpress64: Select PSCI RESET by default
+
+Set SYSRESET and SYSRESET_PSCI config for vexpress64 by
+by default. This means that the reset_cpu function in
+vexpress64.c is no longer needed because it is called in
+sysreset-uclass.c instead.
+
+Upstream-Status: Pending
+Signed-off-by: Diego Sueiro <diego.sueiro@arm.com>
+---
+ board/armltd/vexpress64/Kconfig      | 2 ++
+ board/armltd/vexpress64/vexpress64.c | 5 -----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/board/armltd/vexpress64/Kconfig b/board/armltd/vexpress64/Kconfig
+index 7ae5055f59b1..b8aead6cc35c 100644
+--- a/board/armltd/vexpress64/Kconfig
++++ b/board/armltd/vexpress64/Kconfig
+@@ -30,6 +30,8 @@ config TARGET_VEXPRESS64_BASE_FVP
+ 	bool "Support Versatile Express ARMv8a FVP BASE model"
+ 	select VEXPRESS64_BASE_MODEL
+ 	imply OF_HAS_PRIOR_STAGE
++	select SYSRESET
++	select SYSRESET_PSCI
+ 
+ config TARGET_VEXPRESS64_BASER_FVP
+ 	bool "Support Versatile Express ARMv8r64 FVP BASE model"
+diff --git a/board/armltd/vexpress64/vexpress64.c b/board/armltd/vexpress64/vexpress64.c
+index ee65a596838a..f73de56464fa 100644
+--- a/board/armltd/vexpress64/vexpress64.c
++++ b/board/armltd/vexpress64/vexpress64.c
+@@ -207,11 +207,6 @@ void *board_fdt_blob_setup(int *err)
+ }
+ #endif
+ 
+-/* Actual reset is done via PSCI. */
+-void reset_cpu(void)
+-{
+-}
+-
+ /*
+  * Board specific ethernet initialization routine.
+  */

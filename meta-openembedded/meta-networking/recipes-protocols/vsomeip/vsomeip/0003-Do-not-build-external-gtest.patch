@@ -1,4 +1,4 @@
-From e012f91a73af7469ef6f660c3a6a752430a4d649 Mon Sep 17 00:00:00 2001
+From b1bf398015bc090020459954e5cd1ec3b51b8ac3 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 11 Jul 2023 16:53:46 +0800
 Subject: [PATCH] Do not build external gtest
@@ -10,15 +10,16 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- CMakeLists.txt                    | 30 ++----------
- test/network_tests/CMakeLists.txt | 80 -------------------------------
- 2 files changed, 3 insertions(+), 107 deletions(-)
+ CMakeLists.txt                    | 11 ----
+ test/CMakeLists.txt               | 22 +------
+ test/network_tests/CMakeLists.txt | 99 -------------------------------
+ 3 files changed, 3 insertions(+), 129 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index e7a92ec6..f6c680d4 100644
+index d791c12e..f1bcba27 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -18,14 +18,6 @@ set (VSOMEIP_VERSION ${VSOMEIP_MAJOR_VERSION}.${VSOMEIP_MINOR_VERSION}.${VSOMEIP
+@@ -18,17 +18,6 @@ set (VSOMEIP_VERSION ${VSOMEIP_MAJOR_VERSION}.${VSOMEIP_MINOR_VERSION}.${VSOMEIP
  set (PACKAGE_VERSION ${VSOMEIP_VERSION}) # Used in documentation/doxygen.in
  set (CMAKE_VERBOSE_MAKEFILE off)
  
@@ -26,16 +27,23 @@ index e7a92ec6..f6c680d4 100644
 -    if (DEFINED ENV{GTEST_ROOT})
 -        set(GTEST_ROOT $ENV{GTEST_ROOT})
 -    else()
--        set(GTEST_ROOT "n/a" CACHE STRING "Path to root folder of googletest. Must be set for building the tests.")
+-        include(FetchContent)
+-        FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googletest.git GIT_TAG v1.14.0) 
+-        FetchContent_Populate(googletest)
+-        set(GTEST_ROOT ${googletest_SOURCE_DIR})
 -    endif()
 -endif()
 -
  ###################################################################################################
  # see http://www.cmake.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file
  ###################################################################################################
-@@ -630,27 +622,11 @@ find_package(benchmark)
- ##############################################################################
- # google test
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index f66ac5d3..6f09bf40 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -17,27 +17,11 @@ find_package(benchmark)
+ # remove export symbols from the cxx flags
+ string(REPLACE "${EXPORTSYMBOLS}" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
  
 -# check for set environment variable
 -if(${GTEST_ROOT} STREQUAL "n/a")
@@ -62,13 +70,13 @@ index e7a92ec6..f6c680d4 100644
 -    set(BUILD_SHARED_LIBS_AUTOMATIC_OFF 0)
 -endif()
  
- 
- 
+ ##############################################################################
+ # build tests
 diff --git a/test/network_tests/CMakeLists.txt b/test/network_tests/CMakeLists.txt
-index 6a148604..a501b6a7 100644
+index 883cc5cf..9a2a4f5e 100644
 --- a/test/network_tests/CMakeLists.txt
 +++ b/test/network_tests/CMakeLists.txt
-@@ -3633,86 +3633,6 @@ if(NOT ${TESTS_BAT})
+@@ -4116,105 +4116,6 @@ if(NOT ${TESTS_BAT})
  
  endif()
  
@@ -97,6 +105,12 @@ index 6a148604..a501b6a7 100644
 -    add_dependencies(${TEST_CLIENT_ID_UTILITY} gtest)
 -    add_dependencies(${TEST_DEBOUNCE_CLIENT} gtest)
 -    add_dependencies(${TEST_DEBOUNCE_SERVICE} gtest)
+-    add_dependencies(${TEST_DEBOUNCE_FILTER_CLIENT} gtest)
+-    add_dependencies(${TEST_DEBOUNCE_FILTER_SERVICE} gtest)
+-    add_dependencies(${TEST_DEBOUNCE_CALLBACK_CLIENT} gtest)
+-    add_dependencies(${TEST_DEBOUNCE_CALLBACK_SERVICE} gtest)
+-    add_dependencies(${TEST_DEBOUNCE_FREQUENCY_CLIENT} gtest)
+-    add_dependencies(${TEST_DEBOUNCE_FREQUENCY_SERVICE} gtest)
 -    add_dependencies(${TEST_SUBSCRIBE_NOTIFY_SERVICE} gtest)
 -    add_dependencies(${TEST_SUBSCRIBE_NOTIFY_ONE_EVENT_TWO_EVENTGROUPS_SERVICE} gtest)
 -    add_dependencies(${TEST_SUBSCRIBE_NOTIFY_ONE_EVENT_TWO_EVENTGROUPS_CLIENT} gtest)
@@ -127,8 +141,13 @@ index 6a148604..a501b6a7 100644
 -    add_dependencies(${TEST_E2E_PROFILE_04_SERVICE} gtest)
 -    add_dependencies(${TEST_E2E_PROFILE_04_CLIENT} gtest)
 -    endif()
+-    if (${TEST_E2E_PROFILE_07})
+-    add_dependencies(${TEST_E2E_PROFILE_07_SERVICE} gtest)
+-    add_dependencies(${TEST_E2E_PROFILE_07_CLIENT} gtest)
+-    endif()
 -    add_dependencies(${TEST_EVENT_SERVICE} gtest)
 -    add_dependencies(${TEST_EVENT_CLIENT} gtest)
+-    if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "QNX")
 -    add_dependencies(${TEST_NPDU_SERVICE_ONE} gtest)
 -    add_dependencies(${TEST_NPDU_SERVICE_TWO} gtest)
 -    add_dependencies(${TEST_NPDU_SERVICE_THREE} gtest)
@@ -139,6 +158,7 @@ index 6a148604..a501b6a7 100644
 -    add_dependencies(${TEST_NPDU_CLIENT_FOUR} gtest)
 -    add_dependencies(${TEST_NPDU_DAEMON_CLIENT} gtest)
 -    add_dependencies(${TEST_NPDU_DAEMON_SERVICE} gtest)
+-    endif()
 -    add_dependencies(${TEST_SOMEIPTP_CLIENT} gtest)
 -    add_dependencies(${TEST_SOMEIPTP_SERVICE} gtest)
 -    if(${TEST_SECOND_ADDRESS})
@@ -148,13 +168,20 @@ index 6a148604..a501b6a7 100644
 -    add_dependencies(${TEST_SUSPEND_RESUME_CLIENT} gtest)
 -    add_dependencies(${TEST_SUSPEND_RESUME_SERVICE} gtest)
 -else()
+-    add_dependencies(${TEST_APPLICATION} gtest)
+-    add_dependencies(${TEST_HEADER_FACTORY} gtest)
+-    add_dependencies(${TEST_HEADER_FACTORY_CLIENT} gtest)
+-    add_dependencies(${TEST_HEADER_FACTORY_SERVICE} gtest)
+-    add_dependencies(${TEST_PAYLOAD_SERVICE} gtest)
+-    add_dependencies(${TEST_PAYLOAD_CLIENT} gtest)
+-    add_dependencies(${TEST_BIG_PAYLOAD_SERVICE} gtest)
+-    add_dependencies(${TEST_BIG_PAYLOAD_CLIENT} gtest)
 -    add_dependencies(${TEST_LOCAL_ROUTING_SERVICE} gtest)
 -    add_dependencies(${TEST_LOCAL_ROUTING_CLIENT} gtest)
 -endif()
--
+ 
  ##############################################################################
  # Add tests to the target build_network_tests
- ##############################################################################
 -- 
 2.25.1
 

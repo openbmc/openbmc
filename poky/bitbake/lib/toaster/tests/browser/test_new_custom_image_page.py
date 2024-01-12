@@ -90,6 +90,7 @@ class TestNewCustomImagePage(SeleniumTestCase):
         """
         url = reverse('newcustomimage', args=(self.project.id,))
         self.get(url)
+        self.wait_until_visible('#global-nav', poll=3)
 
         self.click('button[data-recipe="%s"]' % self.recipe.id)
 
