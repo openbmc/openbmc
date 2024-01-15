@@ -1,0 +1,628 @@
+{
+    "leds": [
+        {
+            "group": "bmc_booted",
+            "members": [
+                {
+                    "Name": "bmc_heart_beat",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "bmc_init_ok",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "power_on",
+            "members": [
+                {
+                    "Name": "bmc_heart_beat",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "chassis_power_on",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "partition_system_attention_indicator",
+            "members": []
+        },
+        {
+            "group": "platform_system_attention_indicator",
+            "members": []
+        },
+        {
+            "group": "enclosure_identify_blink",
+            "members": [
+                {
+                    "Name": "identify",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "identify",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "system_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "system_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm0_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm0_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm0_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm0_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm1_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm1_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm1_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm1_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm2_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm2_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm2_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm2_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm3_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm3_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm3_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm3_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm4_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm4_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm4_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm4_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm5_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm5_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm5_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm5_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm6_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm6_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm6_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm6_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm7_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm7_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "dimm7_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "memory_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "dimm7_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "powersupply_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "psu_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "powersupply_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "psu_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fan_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fan_fault_warning",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "system_hot_fault_critical",
+            "members": [
+                {
+                    "Name": "system_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "system_hot_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "system_hot_fault_warning",
+            "members": [
+                {
+                    "Name": "system_hot_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}
