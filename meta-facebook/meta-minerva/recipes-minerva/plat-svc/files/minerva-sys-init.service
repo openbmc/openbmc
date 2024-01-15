@@ -1,6 +1,6 @@
 [Unit]
 Description=Minerva Early System Init
-Before=phosphor-pid-control.service
+Before=phosphor-multi-gpio-monitor.service
 
 [Service]
 Type=oneshot
