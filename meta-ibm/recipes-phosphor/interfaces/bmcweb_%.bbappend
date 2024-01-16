@@ -24,6 +24,11 @@ EXTRA_OEMESON:append:system1 = " \
      -Dredfish-dbus-log=enabled \
 "
 
+EXTRA_OEMESON:append:sbp1 = " \
+     -Dhttp-body-limit=400 \
+     -Dredfish-dbus-log=enabled \
+"
+
 inherit obmc-phosphor-discovery-service
 
 REGISTERED_SERVICES:${PN} += "obmc_redfish:tcp:443:"
