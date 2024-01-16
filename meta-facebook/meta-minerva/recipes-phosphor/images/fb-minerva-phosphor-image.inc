@@ -14,3 +14,11 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     obmc-console \
 "
+
+# Enable for debug card function
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-ipmi-ipmb \
+    fb-ipmi-oem \
+    obmc-phosphor-buttons-signals \
+    obmc-phosphor-buttons-handler \
+"
