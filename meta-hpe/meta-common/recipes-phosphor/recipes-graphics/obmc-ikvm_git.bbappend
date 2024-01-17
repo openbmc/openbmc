@@ -8,6 +8,6 @@ FILES:${PN} += " \
 "
 
 do_install:append () {
-    install -D -m 0755 ${WORKDIR}/start-ipkvm.service ${D}${systemd_system_unitdir}
+    install -D -m 0644 ${WORKDIR}/start-ipkvm.service ${D}${systemd_system_unitdir}
     install -D -m 0755 ${WORKDIR}/create_usbhid.sh ${D}${bindir}
 }
