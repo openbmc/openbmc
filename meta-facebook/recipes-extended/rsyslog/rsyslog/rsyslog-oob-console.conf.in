@@ -1,0 +1,17 @@
+# Do not queue these, write immediately
+$ActionQueueType Direct
+
+# Send all console logs out as local3.debug logs.
+# local3 is an arbitrary choice among local1-7
+# to ensure we dont conflict with other services.
+# reopenOnTruncate+freshStartTail - ensures we
+# reopen when obmc-console rotates the log-file
+# and start a fresh on the new file.
+input(type="imfile"
+  File="/var/log/obmc-console-__OOB_CONSOLE_HOST__.log"
+  Tag="oob_console[mTerm___OOB_CONSOLE_HOST__]"
+  Severity="debug"
+  Facility="local3"
+  reopenOnTruncate="on"
+  freshStartTail="on"
+)
