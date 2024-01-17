@@ -14,3 +14,6 @@ RDEPENDS:${PN}-extras:append = " \
         pldm \
         "
 
+RDEPENDS:${PN}-devtools:append = " \
+        ipmitool \
+        "
