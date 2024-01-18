@@ -7,7 +7,8 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 
 IMAGE_FILE=$1
 
-SPI_DEV="spi1.0"
+# SPI Get Link name
+SPI_DEV=$(find /sys/bus/spi/devices/ -type l -exec sh -c 'readlink "$1" | grep -q "1e631000.spi" && basename "$1"' _ {} \;)
 SPI_PATH="/sys/bus/spi/drivers/spi-nor"
 
 set_gpio_to_bmc()
@@ -46,7 +47,7 @@ set_gpio_to_bmc
 
 #Bind spi driver to access flash
 echo "bind aspeed-smc spi driver"
-echo -n $SPI_DEV > $SPI_PATH/bind
+echo -n "$SPI_DEV" > "$SPI_PATH"/bind
 sleep 1
 
 #Flashcp image to device.
@@ -76,7 +77,7 @@ fi
 #Unbind spi driver
 sleep 1
 echo "Unbind aspeed-smc spi driver"
-echo -n $SPI_DEV > $SPI_PATH/unbind
+echo -n "$SPI_DEV" > "$SPI_PATH"/unbind
 sleep 10
 
 #Flip GPIO back for host to access SPI flash
