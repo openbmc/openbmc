@@ -48,13 +48,13 @@ do_install:append:harma() {
     install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0777 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/host-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/host-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
 }
 SYSTEMD_OVERRIDE:${PN}-discover:harma += "discover-sys-init.conf:phosphor-discover-system-state@0.service.d/discover-sys-init.conf"
 SYSTEMD_OVERRIDE:${PN}-systemd-target-monitor:harma += "phosphor-state-manager-init.conf:phosphor-systemd-target-monitor.service.d/phosphor-state-manager-init.conf"

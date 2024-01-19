@@ -17,7 +17,7 @@ do_install:append:bletchley() {
     install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0777 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
 }
 
 FILES:${PN}:append:bletchley = " ${systemd_system_unitdir}"

@@ -44,16 +44,16 @@ do_install:append:() {
     install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0777 ${WORKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
 
-    install -m 0777 ${WORKDIR}/assert-reset-button ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/assert-reset-button ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/
 
-    install -m 0777 ${WORKDIR}/assert-post-end ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/deassert-post-end ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/assert-post-end ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/deassert-post-end ${D}${libexecdir}/${PN}/
 
-    install -m 0777 ${WORKDIR}/assert-power-good ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/deassert-power-good ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/assert-power-good ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/deassert-power-good ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-monitor:harma += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"

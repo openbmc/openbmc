@@ -43,6 +43,6 @@ do_install:append:() {
     done
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0777 ${WORKDIR}/logging ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/sfp-present-check ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/logging ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/sfp-present-check ${D}${libexecdir}/${PN}/
 }

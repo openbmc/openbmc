@@ -33,6 +33,6 @@ do_install:append:() {
     install -m 0644 ${WORKDIR}/rescan-fru-device@.service ${D}${systemd_system_unitdir}/rescan-fru-device@.service
     install -m 0644 ${WORKDIR}/slot-hot-plug@.service ${D}${systemd_system_unitdir}/slot-hot-plug@.service
     install -d ${D}${libexecdir}/${PN}
-    install -m 0777 ${WORKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
-    install -m 0777 ${WORKDIR}/rescan-fru-device ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/rescan-fru-device ${D}${libexecdir}/${PN}/
 }
