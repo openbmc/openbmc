@@ -50,6 +50,11 @@ do_configure:prepend:class-target () {
     cp ${STAGING_DIR_NATIVE}/${datadir}/aclocal/introspection.m4 ${S}/m4
 }
 
+do_compile:prepend() {
+    # This prevents g-ir-scanner from writing cache data to $HOME
+    export GI_SCANNER_DISABLE_CACHE=1
+}
+
 # .typelib files are needed at runtime and so they go to the main package (so
 # they'll be together with libraries they support).
 FILES:${PN}:append = " ${libdir}/girepository-*/*.typelib" 

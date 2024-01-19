@@ -1,4 +1,4 @@
-From 4ba40ee527f844a804be571e52d9dc5447ae4cdd Mon Sep 17 00:00:00 2001
+From 0558745601cc72c8d6d79cd691f4b82330b29d58 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 22 Oct 2018 15:19:51 +0800
 Subject: [PATCH] python3: use cc_basename to replace CC for checking compiler
@@ -27,27 +27,27 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 90008bc..bf56195 100644
+index bd2be94..cb9e198 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -134,6 +134,7 @@ AC_CONFIG_HEADERS([pyconfig.h])
+@@ -137,6 +137,7 @@ AC_CONFIG_HEADERS([pyconfig.h])
  AC_CANONICAL_HOST
- AC_SUBST(build)
- AC_SUBST(host)
+ AC_SUBST([build])
+ AC_SUBST([host])
 +LT_INIT
  
  AS_VAR_IF([cross_compiling], [maybe],
   [AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])]
-@@ -887,7 +888,7 @@ AC_MSG_RESULT($with_cxx_main)
+@@ -896,7 +897,7 @@ AC_SUBST([CXX])
  preset_cxx="$CXX"
  if test -z "$CXX"
  then
 -        case "$CC" in
 +        case "$cc_basename" in
-         gcc)    AC_PATH_TOOL(CXX, [g++], [g++], [notfound]) ;;
-         cc)     AC_PATH_TOOL(CXX, [c++], [c++], [notfound]) ;;
-         clang|*/clang)     AC_PATH_TOOL(CXX, [clang++], [clang++], [notfound]) ;;
-@@ -1300,7 +1301,7 @@ rmdir CaseSensitiveTestDir
+         gcc)    AC_PATH_TOOL([CXX], [g++], [g++], [notfound]) ;;
+         cc)     AC_PATH_TOOL([CXX], [c++], [c++], [notfound]) ;;
+         clang|*/clang)     AC_PATH_TOOL([CXX], [clang++], [clang++], [notfound]) ;;
+@@ -1328,7 +1329,7 @@ rmdir CaseSensitiveTestDir
  
  case $ac_sys_system in
  hp*|HP*)
@@ -56,16 +56,16 @@ index 90008bc..bf56195 100644
      cc|*/cc) CC="$CC -Ae";;
      esac;;
  esac
-@@ -1834,7 +1835,7 @@ esac
+@@ -1854,7 +1855,7 @@ esac
  ],
- [AC_MSG_RESULT(no)])
+ [AC_MSG_RESULT([no])])
  if test "$Py_LTO" = 'true' ; then
 -  case $CC in
 +  case $cc_basename in
      *clang*)
        LDFLAGS_NOLTO="-fno-lto"
        dnl Clang linker requires -flto in order to link objects with LTO information.
-@@ -1955,7 +1956,7 @@ then
+@@ -1983,7 +1984,7 @@ then
    fi
  fi
  LLVM_PROF_ERR=no
@@ -74,7 +74,7 @@ index 90008bc..bf56195 100644
    *clang*)
      # Any changes made here should be reflected in the GCC+Darwin case below
      PGO_PROF_GEN_FLAG="-fprofile-instr-generate"
-@@ -2016,7 +2017,7 @@ esac
+@@ -2147,7 +2148,7 @@ AC_MSG_RESULT([$BOLT_APPLY_FLAGS])
  # compiler and platform.  BASECFLAGS tweaks need to be made even if the
  # user set OPT.
  
@@ -83,7 +83,7 @@ index 90008bc..bf56195 100644
      *clang*)
          cc_is_clang=1
          ;;
-@@ -2235,7 +2236,7 @@ yes)
+@@ -2419,7 +2420,7 @@ yes)
  
      # ICC doesn't recognize the option, but only emits a warning
      ## XXX does it emit an unused result warning and can it be disabled?
@@ -92,16 +92,16 @@ index 90008bc..bf56195 100644
              [*icc*], [ac_cv_disable_unused_result_warning=no]
              [PY_CHECK_CC_WARNING([disable], [unused-result])])
      AS_VAR_IF([ac_cv_disable_unused_result_warning], [yes],
-@@ -2477,7 +2478,7 @@ yes)
+@@ -2665,7 +2666,7 @@ yes)
      ;;
  esac
  
 -case "$CC" in
 +case "$cc_basename" in
- *icc*)
-     # ICC needs -fp-model strict or floats behave badly
-     CFLAGS_NODIST="$CFLAGS_NODIST -fp-model strict"
-@@ -3319,7 +3320,7 @@ then
+ *mpicc*)
+     CFLAGS_NODIST="$CFLAGS_NODIST"
+     ;;
+@@ -3482,7 +3483,7 @@ then
  		then
  			LINKFORSHARED="-Wl,--export-dynamic"
  		fi;;
@@ -110,12 +110,12 @@ index 90008bc..bf56195 100644
  		  *gcc*)
  		    if $CC -Xlinker --help 2>&1 | grep export-dynamic >/dev/null
  		    then
-@@ -6410,7 +6411,7 @@ if test "$ac_cv_gcc_asm_for_x87" = yes; then
+@@ -6802,7 +6803,7 @@ if test "$ac_cv_gcc_asm_for_x87" = yes; then
      # Some versions of gcc miscompile inline asm:
      # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46491
      # http://gcc.gnu.org/ml/gcc/2010-11/msg00366.html
 -    case $CC in
 +    case $cc_basename in
          *gcc*)
-             AC_MSG_CHECKING(for gcc ipa-pure-const bug)
+             AC_MSG_CHECKING([for gcc ipa-pure-const bug])
              saved_cflags="$CFLAGS"

@@ -314,6 +314,16 @@ class InheritNode(AstNode):
     def eval(self, data):
         bb.parse.BBHandler.inherit(self.classes, self.filename, self.lineno, data)
 
+class InheritDeferredNode(AstNode):
+    def __init__(self, filename, lineno, classes):
+        AstNode.__init__(self, filename, lineno)
+        self.inherit = (classes, filename, lineno)
+
+    def eval(self, data):
+        inherits = data.getVar('__BBDEFINHERITS', False) or []
+        inherits.append(self.inherit)
+        data.setVar('__BBDEFINHERITS', inherits)
+
 def handleInclude(statements, filename, lineno, m, force):
     statements.append(IncludeNode(filename, lineno, m.group(1), force))
 
@@ -363,6 +373,10 @@ def handlePyLib(statements, filename, lineno, m):
 def handleInherit(statements, filename, lineno, m):
     classes = m.group(1)
     statements.append(InheritNode(filename, lineno, classes))
+
+def handleInheritDeferred(statements, filename, lineno, m):
+    classes = m.group(1)
+    statements.append(InheritDeferredNode(filename, lineno, classes))
 
 def runAnonFuncs(d):
     code = []
@@ -429,6 +443,14 @@ def multi_finalize(fn, d):
     for append in appends:
         logger.debug("Appending .bbappend file %s to %s", append, fn)
         bb.parse.BBHandler.handle(append, d, True)
+
+    while True:
+        inherits = d.getVar('__BBDEFINHERITS', False) or []
+        if not inherits:
+            break
+        inherit, filename, lineno = inherits.pop(0)
+        d.setVar('__BBDEFINHERITS', inherits)
+        bb.parse.BBHandler.inherit(inherit, filename, lineno, d, deferred=True)
 
     onlyfinalise = d.getVar("__ONLYFINALISE", False)
 

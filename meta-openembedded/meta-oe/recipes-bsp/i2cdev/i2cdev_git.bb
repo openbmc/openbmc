@@ -17,6 +17,7 @@ PR = "git${SRCPV}"
 SRC_URI = "\
     git://github.com/costad2/i2cdev.git;protocol=https;branch=master \
     file://fix-lsi2c-makefile.patch \
+    file://fix-musl.patch \
 "
 SRCREV = "ed9ad777d842880e7ac6ca5e0de4bd2d3b4d02dc"
 

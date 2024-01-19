@@ -54,7 +54,8 @@ EXTRA_OECONF += '--enable-languages="${LANGUAGES}" \
                  --disable-g13-test \
 '
 
-inherit autotools texinfo binconfig-disabled pkgconfig ${PYTHON_INHERIT} python3native multilib_header
+inherit autotools texinfo binconfig-disabled pkgconfig multilib_header
+inherit_defer ${PYTHON_INHERIT} python3native
 
 export PKG_CONFIG='pkg-config'
 

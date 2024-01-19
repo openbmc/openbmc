@@ -1,4 +1,4 @@
-From 2afe24fc95dbb89e99df29ccbe73afa835f58202 Mon Sep 17 00:00:00 2001
+From dec8cca59124d7f8796b54902482ceb295a71b51 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 6 Jan 2020 12:44:42 +0100
 Subject: [PATCH] meson.build: use 'python3' directly for python
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index de6d16b5..79cedbf6 100644
+index 9f91ff2f..2391f89d 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -68,7 +68,7 @@ flags = [
+@@ -74,7 +74,7 @@ flags = [
  
  add_project_arguments(cc.get_supported_arguments(flags), language : 'c')
  

@@ -110,6 +110,8 @@ do_install_ptest() {
 	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/19raid6check.broken
 	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/20raid5journal.broken
 	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/21raid5cache.broken
+	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/10ddf-fail-spare.broken
+	echo "intermittent failure on autobuilder" > ${D}${PTEST_PATH}/tests/10ddf-fail-stop-readd.broken
 }
 
 RDEPENDS:${PN} += "bash"

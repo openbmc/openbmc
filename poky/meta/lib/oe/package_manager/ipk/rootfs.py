@@ -165,7 +165,7 @@ class PkgRootfs(DpkgOpkgRootfs):
     """
     def _multilib_sanity_test(self, dirs):
 
-        allow_replace = self.d.getVar("MULTILIBRE_ALLOW_REP")
+        allow_replace = "|".join((self.d.getVar("MULTILIBRE_ALLOW_REP") or "").split())
         if allow_replace is None:
             allow_replace = ""
 

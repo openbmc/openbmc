@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=6e29c688d912da12b66b73e32b03d812"
 
 DEPENDS = "xkbcomp gtk+ iso-codes libxi libxml2"
 
-inherit autotools pkgconfig gettext gobject-introspection features_check
+inherit autotools pkgconfig gettext gobject-introspection features_check gtk-doc
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

@@ -29,7 +29,7 @@ OPKG_POSTPROCESS_COMMANDS = ""
 
 OPKGLIBDIR ??= "${localstatedir}/lib"
 
-MULTILIBRE_ALLOW_REP = "${OPKGLIBDIR}/opkg|/usr/lib/opkg"
+MULTILIBRE_ALLOW_REP += "${OPKGLIBDIR}/opkg /usr/lib/opkg"
 
 python () {
 

@@ -19,5 +19,5 @@ SRC_URI[sha256sum] = "1e572a0735b92aca5746c4528f9bebd35aa0ccf8619b22fa2756137a8c
 
 EXTRA_OECONF += "STAGING_DIR=${STAGING_DIR_NATIVE}"
 
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig gtk-doc
 

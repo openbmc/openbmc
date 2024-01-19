@@ -13,10 +13,13 @@ iface wlan0 inet dhcp
 
 iface atml0 inet dhcp
 
-# Wired or wireless interfaces
-auto eth0
+# Wired or wireless interfaces including predictable names
+auto /eth0
 iface eth0 inet dhcp
 iface eth1 inet dhcp
+
+auto /en*=eth
+iface eth inet dhcp
 
 # Ethernet/RNDIS gadget (g_ether)
 # ... or on host side, usbnet and random hwaddr

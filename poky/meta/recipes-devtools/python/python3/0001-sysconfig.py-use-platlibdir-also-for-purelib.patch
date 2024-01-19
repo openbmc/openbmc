@@ -1,4 +1,4 @@
-From 9162460d81ccc725fb04a14b27d0bf4afcfb69c9 Mon Sep 17 00:00:00 2001
+From a5d429a0e1a4809c1ded7be7e45dcabeb82c53d8 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sun, 12 Sep 2021 21:44:36 +0200
 Subject: [PATCH] sysconfig.py: use platlibdir also for purelib
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index daf9f00..e64bcdc 100644
+index 122d441..79c0510 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -27,7 +27,7 @@ _INSTALL_SCHEMES = {
+@@ -28,7 +28,7 @@ _INSTALL_SCHEMES = {
      'posix_prefix': {
          'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
          'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',

@@ -268,4 +268,4 @@ fakeroot python populate_packages:prepend () {
 # Use the following to extend the useradd with custom functions
 USERADDEXTENSION ?= ""
 
-inherit ${USERADDEXTENSION}
+inherit_defer ${USERADDEXTENSION}

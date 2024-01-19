@@ -1,4 +1,4 @@
-From 13aa6449c47980c7270dad2527c3911517bf34e6 Mon Sep 17 00:00:00 2001
+From b64c131a576a4b4f821514e711ab91b1394fb4ff Mon Sep 17 00:00:00 2001
 From: Tim Orling <timothy.t.orling@intel.com>
 Date: Fri, 18 Jun 2021 11:56:50 -0700
 Subject: [PATCH] test_ctypes.test_find: skip without tools-sdk
@@ -12,13 +12,13 @@ Upstream-Status: Inappropriate [oe-specific]
 Signed-off-by: Tim Orling <timothy.t.orling@intel.com>
 
 ---
- Lib/ctypes/test/test_find.py | 2 ++
+ Lib/test/test_ctypes/test_find.py | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/Lib/ctypes/test/test_find.py b/Lib/ctypes/test/test_find.py
+diff --git a/Lib/test/test_ctypes/test_find.py b/Lib/test/test_ctypes/test_find.py
 index 1ff9d01..59def26 100644
---- a/Lib/ctypes/test/test_find.py
-+++ b/Lib/ctypes/test/test_find.py
+--- a/Lib/test/test_ctypes/test_find.py
++++ b/Lib/test/test_ctypes/test_find.py
 @@ -113,10 +113,12 @@ class FindLibraryLinux(unittest.TestCase):
                  # LD_LIBRARY_PATH)
                  self.assertEqual(find_library(libname), 'lib%s.so' % libname)

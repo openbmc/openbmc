@@ -1,4 +1,4 @@
-From 87d24ee47fd0e0461fca32d17564f21d76cbcb92 Mon Sep 17 00:00:00 2001
+From 9b27fa9bcd5cadd4c841c42710f41a090377e531 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Fri, 24 Mar 2023 16:18:44 +0000
 Subject: [PATCH] src/Gtrace: remove unguarded print() calls
@@ -19,7 +19,7 @@ needs to be implemented.
 
 Fixes #482.
 
-Upstream-Status: Submitted [https://github.com/libunwind/libunwind/pull/483]
+Upstream-Status: Backport [9b27fa9bcd5cadd4c841c42710f41a090377e531]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  src/arm/Gtrace.c | 4 ++--

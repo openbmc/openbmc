@@ -504,8 +504,9 @@ class GoRecipeHandler(RecipeHandler):
 
         return inline_fcn, commit
 
-    def __go_handle_dependencies(self, go_mod, localfilesdir, extravalues, d):
+    def __go_handle_dependencies(self, go_mod, srctree, localfilesdir, extravalues, d):
 
+        import re
         src_uris = []
         src_revs = []
 
@@ -525,6 +526,27 @@ class GoRecipeHandler(RecipeHandler):
 
             return src_rev
 
+        # we first go over replacement list, because we are essentialy
+        # interested only in the replaced path
+        if go_mod['Replace']:
+            for replacement in go_mod['Replace']:
+                oldpath = replacement['Old']['Path']
+                path = replacement['New']['Path']
+                version = ''
+                if 'Version' in replacement['New']:
+                    version = replacement['New']['Version']
+
+                if os.path.exists(os.path.join(srctree, path)):
+                    # the module refers to the local path, remove it from requirement list
+                    # because it's a local module
+                    go_mod['Require'][:] = [v for v in go_mod['Require'] if v.get('Path') != oldpath]
+                else:
+                    # Replace the path and the version, so we don't iterate replacement list anymore
+                    for require in go_mod['Require']:
+                        if require['Path'] == oldpath:
+                            require.update({'Path': path, 'Version': version})
+                            break
+
         for require in go_mod['Require']:
             path = require['Path']
             version = require['Version']
@@ -534,18 +556,9 @@ class GoRecipeHandler(RecipeHandler):
             src_uris.append(inline_fcn)
             src_revs.append(generate_src_rev(path, version, commithash))
 
-        if go_mod['Replace']:
-            for replacement in go_mod['Replace']:
-                oldpath = replacement['Old']['Path']
-                path = replacement['New']['Path']
-                version = replacement['New']['Version']
-
-                inline_fcn, commithash = self.__generate_srcuri_inline_fcn(
-                    path, version, oldpath)
-                src_uris.append(inline_fcn)
-                src_revs.append(generate_src_rev(path, version, commithash))
-
-        pn, _ = determine_from_url(go_mod['Module']['Path'])
+        # strip version part from module URL /vXX
+        baseurl = re.sub(r'/v(\d+)$', '', go_mod['Module']['Path'])
+        pn, _ = determine_from_url(baseurl)
         go_mods_basename = "%s-modules.inc" % pn
 
         go_mods_filename = os.path.join(localfilesdir, go_mods_basename)
@@ -626,7 +639,9 @@ class GoRecipeHandler(RecipeHandler):
                 lic_files_chksum.append(
                     'file://src/${GO_IMPORT}/vendor/%s;md5=%s' % (licvalue[1], licvalue[2]))
 
-        pn, _ = determine_from_url(go_mod['Module']['Path'])
+        # strip version part from module URL /vXX
+        baseurl = re.sub(r'/v(\d+)$', '', go_mod['Module']['Path'])
+        pn, _ = determine_from_url(baseurl)
         licenses_basename = "%s-licenses.inc" % pn
 
         licenses_filename = os.path.join(localfilesdir, licenses_basename)
@@ -672,6 +687,13 @@ class GoRecipeHandler(RecipeHandler):
 
         localfilesdir = tempfile.mkdtemp(prefix='recipetool-go-')
         extravalues.setdefault('extrafiles', {})
+
+        # Use an explicit name determined from the module name because it
+        # might differ from the actual URL for replaced modules
+        # strip version part from module URL /vXX
+        baseurl = re.sub(r'/v(\d+)$', '', go_mod['Module']['Path'])
+        pn, _ = determine_from_url(baseurl)
+
         # go.mod files with version < 1.17 may not include all indirect
         # dependencies. Thus, we have to upgrade the go version.
         if go_version_major == 1 and go_version_minor < 17:
@@ -689,18 +711,18 @@ class GoRecipeHandler(RecipeHandler):
             # Write additional $BPN-modules.inc file
             self.__go_mod_vendor(go_mod, srctree, localfilesdir, extravalues, d)
             lines_before.append("LICENSE += \" & ${GO_MOD_LICENSES}\"")
-            lines_before.append("require ${BPN}-licenses.inc")
+            lines_before.append("require %s-licenses.inc" % (pn))
 
             self.__rewrite_src_uri(lines_before, ["file://modules.txt"])
 
-            self.__go_handle_dependencies(go_mod, localfilesdir, extravalues, d)
-            lines_before.append("require ${BPN}-modules.inc")
+            self.__go_handle_dependencies(go_mod, srctree, localfilesdir, extravalues, d)
+            lines_before.append("require %s-modules.inc" % (pn))
 
         # Do generic license handling
         handle_license_vars(srctree, lines_before, handled, extravalues, d)
         self.__rewrite_lic_uri(lines_before)
 
-        lines_before.append("GO_IMPORT = \"{}\"".format(go_import))
+        lines_before.append("GO_IMPORT = \"{}\"".format(baseurl))
         lines_before.append("SRCREV_FORMAT = \"${BPN}\"")
 
     def __update_lines_before(self, updated, newlines, lines_before):
@@ -720,6 +742,12 @@ class GoRecipeHandler(RecipeHandler):
                 new_licenses = []
                 licenses = origvalue.split('\\')
                 for license in licenses:
+                    if not license:
+                        logger.warning("No license file was detected for the main module!")
+                        # the license list of the main recipe must be empty
+                        # this can happen for example in case of CLOSED license
+                        # Fall through to complete recipe generation
+                        continue
                     license = license.strip()
                     uri, chksum = license.split(';', 1)
                     url = urllib.parse.urlparse(uri)

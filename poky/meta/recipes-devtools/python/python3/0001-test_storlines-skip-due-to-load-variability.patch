@@ -1,4 +1,4 @@
-From 013ff01fdf2aa6ca69a7c80a2a2996630877e4ea Mon Sep 17 00:00:00 2001
+From dc69a1afdb3ba619705ff71e14f19ed3142e422f Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Fri, 6 Oct 2023 10:59:44 -0400
 Subject: [PATCH] test_storlines: skip due to load variability
@@ -11,15 +11,16 @@ Upstream-Status: Inappropriate [OE-Specific]
 [YOCTO #14933]
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+
 ---
  Lib/test/test_ftplib.py | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Lib/test/test_ftplib.py b/Lib/test/test_ftplib.py
-index 082a90d46b..508814d56a 100644
+index 2f191ea..dc29346 100644
 --- a/Lib/test/test_ftplib.py
 +++ b/Lib/test/test_ftplib.py
-@@ -629,6 +629,7 @@ def test_storbinary_rest(self):
+@@ -626,6 +626,7 @@ class TestFTPClass(TestCase):
              self.client.storbinary('stor', f, rest=r)
              self.assertEqual(self.server.handler_instance.rest, str(r))
  
@@ -27,6 +28,3 @@ index 082a90d46b..508814d56a 100644
      def test_storlines(self):
          data = RETR_DATA.replace('\r\n', '\n').encode(self.client.encoding)
          f = io.BytesIO(data)
--- 
-2.41.0
-

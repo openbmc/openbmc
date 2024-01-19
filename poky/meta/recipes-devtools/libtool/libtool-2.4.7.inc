@@ -15,6 +15,7 @@ SRC_URI = "${GNU_MIRROR}/libtool/libtool-${PV}.tar.gz \
            file://0004-ltmain.sh-Fix-sysroot-paths-being-encoded-into-RPATH.patch \
            file://0005-ltmain.in-Don-t-encode-RATHS-which-match-default-lin.patch \
            file://dont-depend-on-help2man.patch \
+           file://0003-libtool.m4-Cleanup-sysroot-trailing.patch \
            file://0006-libtool.m4-Handle-as-a-sysroot-correctly.patch \
            file://nohardcodepaths.patch \
            file://0007-libtool-Fix-support-for-NIOS2-processor.patch \

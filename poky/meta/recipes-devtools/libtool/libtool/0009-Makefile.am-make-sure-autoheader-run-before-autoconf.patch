@@ -11,10 +11,10 @@ So make sure autoheader run before autoconf to avoid this race.
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00015.html]
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/libtool.git/commit/?id=e7dc729dd27b367905cd0ce52b5466d91537857a]
 
 diff --git a/Makefile.am b/Makefile.am
-index 6b546092..84795d87 100644
+index c29860e..9c34bfd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -370,7 +370,7 @@ lt_configure_deps = $(lt_aclocal_m4) $(lt_aclocal_m4_deps)

@@ -201,17 +201,18 @@
     "compression": {
         "summary": "Python high-level compression support",
         "rdepends": [
-            "core"
+            "core",
+            "shell"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/gzip.py",
             "${libdir}/python${PYTHON_MAJMIN}/tarfile.py",
-            "${libdir}/python${PYTHON_MAJMIN}/zipfile.py"
+            "${libdir}/python${PYTHON_MAJMIN}/zipfile",
+            "${libdir}/python${PYTHON_MAJMIN}/zipfile/_path"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/gzip.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/tarfile.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/zipfile.*.pyc"
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/tarfile.*.pyc"
         ]
     },
     "core": {
@@ -271,6 +272,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/importlib/util.py",
             "${libdir}/python${PYTHON_MAJMIN}/inspect.py",
             "${libdir}/python${PYTHON_MAJMIN}/io.py",
+            "${libdir}/python${PYTHON_MAJMIN}/ipaddress.py",
             "${libdir}/python${PYTHON_MAJMIN}/keyword.py",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/__pycache__/_struct.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/__pycache__/binascii.*.so",
@@ -378,6 +380,7 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/imp.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/inspect.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/io.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/ipaddress.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/keyword.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/linecache.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/locale.*.pyc",
@@ -452,9 +455,8 @@
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_hashlib.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_md5.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha1.*.so",
-            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha256.*.so",
-            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha3.*.so",
-            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha512.*.so"
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha2.*.so",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_sha3.*.so"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/crypt.*.pyc",
@@ -550,8 +552,7 @@
             "${libdir}/pkgconfig"
         ],
         "rdepends": [
-            "core",
-            "distutils"
+            "core"
         ],
         "summary": "Python development package"
     },
@@ -566,27 +567,6 @@
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/difflib.*.pyc"
         ]
-    },
-    "distutils-windows": {
-        "summary": "Python distribution utilities (Windows installer stubs)",
-        "rdepends": [
-            "core"
-        ],
-        "files": [],
-        "cached": []
-    },
-    "distutils": {
-        "summary": "Python Distribution Utilities",
-        "rdepends": [
-            "compression",
-            "core",
-            "email",
-            "stringold"
-        ],
-        "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/distutils"
-        ],
-        "cached": []
     },
     "doctest": {
         "summary": "Python framework for running examples in docstrings",
@@ -630,24 +610,12 @@
     "ensurepip": {
         "summary": "Support for bootstrapping the pip installer",
         "rdepends": [
-            "asyncio",
-            "compile",
-            "core",
-            "ctypes",
-            "image",
-            "io",
-            "mmap",
-            "plistlib",
-            "pprint",
-            "unixadmin",
-            "xmlrpc"
+            "core"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/ensurepip/"
         ],
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/ensurepip/_uninstall.*.pyc"
-        ]
+        "cached": []
     },
     "fcntl": {
         "summary": "Python's fcntl interface",
@@ -715,7 +683,6 @@
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/_pyio.py",
-            "${libdir}/python${PYTHON_MAJMIN}/ipaddress.py",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_socket.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_ssl.*.so",
             "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/termios.*.so",
@@ -726,7 +693,6 @@
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/_pyio.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/ipaddress.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/pipes.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/socket.*.pyc",
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/ssl.*.pyc",
@@ -836,7 +802,6 @@
             "db",
             "debugger",
             "difflib",
-            "distutils",
             "doctest",
             "email",
             "ensurepip",
@@ -863,24 +828,20 @@
             "pydoc",
             "resource",
             "shell",
-            "smtpd",
             "sqlite3",
             "statistics",
             "stringold",
             "syslog",
             "terminal",
-            "tomllib",
             "threading",
             "tkinter",
+            "tomllib",
             "unittest",
             "unixadmin",
             "venv",
             "xml",
             "xmlrpc",
             "zoneinfo"
-        ],
-        "rrecommends": [
-            "distutils-windows"
         ],
         "summary": "All Python modules"
     },
@@ -1104,31 +1065,6 @@
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/shlex.*.pyc"
         ]
     },
-    "smtpd": {
-        "summary": "Python Simple Mail Transport Daemon",
-        "rdepends": [
-            "core",
-            "crypt",
-            "datetime",
-            "email",
-            "io",
-            "math",
-            "mime",
-            "netclient",
-            "stringold"
-        ],
-        "files": [
-            "${bindir}/smtpd.py",
-            "${libdir}/python${PYTHON_MAJMIN}/asynchat.py",
-            "${libdir}/python${PYTHON_MAJMIN}/asyncore.py",
-            "${libdir}/python${PYTHON_MAJMIN}/smtpd.py"
-        ],
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/asynchat.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/asyncore.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/smtpd.*.pyc"
-        ]
-    },
     "sqlite3": {
         "summary": "Python Sqlite3 database support",
         "rdepends": [
@@ -1223,18 +1159,12 @@
     "tomllib": {
         "summary": "Provides an interface for parsing TOML",
         "rdepends": [
-            "core",
-            "datetime",
-            "stringold"
+            "core"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/tomllib/"
         ],
-        "cached": [
-            "${libdir}/python${PYTHON_MAJMIN}/tomllib/_re.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/tomllib/_types.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/tomllib/_parser.*.pyc"
-        ]
+        "cached": []
     },
     "turtle": {
         "summary": "Turtle graphics is a popular way for introducing programming to kids.",

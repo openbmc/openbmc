@@ -37,7 +37,7 @@ SDK_PACKAGE_ARCHS += "sdk-provides-dummy-${SDKPKGSUFFIX}"
 # List of locales to install, or "all" for all of them, or unset for none.
 SDKIMAGE_LINGUAS ?= "all"
 
-inherit rootfs_${IMAGE_PKGTYPE}
+inherit_defer rootfs_${IMAGE_PKGTYPE}
 
 SDK_DIR = "${WORKDIR}/sdk"
 SDK_OUTPUT = "${SDK_DIR}/image"

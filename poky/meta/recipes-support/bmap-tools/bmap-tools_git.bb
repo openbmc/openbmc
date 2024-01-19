@@ -9,7 +9,12 @@ SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "git://github.com/intel/${BPN};branch=main;protocol=https"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI = "git://github.com/intel/${BPN};branch=main;protocol=https \
+	file://0001-BmapCopy.py-fix-error-message.patch \
+	file://0002-CLI.py-fix-block-device-udev-race-condition.patch \
+	file://0003-BmapCopy.py-tweak-suggested-udev-rule.patch \
+	"
 
 SRCREV = "d84a6fd202fe246a0bc19ed2082e41bcdd75fb13"
 S = "${WORKDIR}/git"

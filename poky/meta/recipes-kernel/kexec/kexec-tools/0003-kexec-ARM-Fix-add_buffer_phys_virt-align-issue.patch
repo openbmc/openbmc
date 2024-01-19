@@ -1,4 +1,4 @@
-From 55e583d20651e829afbbc8dba0f8ec3017cda2d5 Mon Sep 17 00:00:00 2001
+From b62c1da8f8e641397add10367ee9c4cfdedb1cc0 Mon Sep 17 00:00:00 2001
 From: Haiqing Bai <Haiqing.Bai@windriver.com>
 Date: Mon, 9 Jan 2017 15:26:29 +0800
 Subject: [PATCH] kexec: ARM: Fix add_buffer_phys_virt() align issue
@@ -12,15 +12,16 @@ Upstream-Status: Pending
 
 Suggested-By:fredrik.markstrom@gmail.com
 Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+
 ---
  kexec/arch/arm/crashdump-arm.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/kexec/arch/arm/crashdump-arm.c b/kexec/arch/arm/crashdump-arm.c
-index daa4788..3f72b38 100644
+index 1ec1826..cc20f63 100644
 --- a/kexec/arch/arm/crashdump-arm.c
 +++ b/kexec/arch/arm/crashdump-arm.c
-@@ -240,6 +240,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+@@ -242,6 +242,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
  	void *buf;
  	int err;
  	int last_ranges;
@@ -28,7 +29,7 @@ index daa4788..3f72b38 100644
  
  	/*
  	 * First fetch all the memory (RAM) ranges that we are going to pass to
-@@ -281,6 +282,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+@@ -283,6 +284,7 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
  
  		/* for support LPAE enabled kernel*/
  		elf_info.class = ELFCLASS64;
@@ -36,7 +37,7 @@ index daa4788..3f72b38 100644
  
  		err = crash_create_elf64_headers(info, &elf_info,
  					 usablemem_rgns.ranges,
-@@ -302,8 +304,9 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
+@@ -304,8 +306,9 @@ int load_crashdump_segments(struct kexec_info *info, char *mod_cmdline)
  	 * 1MB) so that available memory passed in kernel command line will be
  	 * aligned to 1MB. This is because kernel create_mapping() wants memory
  	 * regions to be aligned to SECTION_SIZE.

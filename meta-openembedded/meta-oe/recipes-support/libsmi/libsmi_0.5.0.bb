@@ -16,7 +16,10 @@ SRC_URI[sha256sum] = "f21accdadb1bb328ea3f8a13fc34d715baac6e2db66065898346322c72
 
 DEPENDS += "bison-native flex-native wget-native gawk-native"
 
-inherit autotools-brokensep
+inherit autotools-brokensep update-alternatives
+ALTERNATIVE_PRIORITY = "50"
+ALTERNATIVE:${PN}-yang = "ietf-interfaces "
+ALTERNATIVE_LINK_NAME[ietf-interfaces] = "${datadir}/yang/ietf-interfaces.yang"
 
 EXTRA_OECONF = "ac_cv_path_SH=/bin/sh"
 

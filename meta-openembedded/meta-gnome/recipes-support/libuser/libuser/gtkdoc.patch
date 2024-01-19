@@ -1,0 +1,22 @@
+Update the GTK_DOC_CHECK invocation to specify where the
+documentation will be built (as the default is ./docs).
+
+This is needed so that gtkdocize as run by autopoint knows where the
+documentation will be built.
+
+Upstream-Status: Submitted [https://pagure.io/libuser/pull-request/70]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/configure.ac b/configure.ac
+index 0bd4a67..51508b7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -169,7 +169,7 @@ if test "$GCC" = yes ; then
+      AC_MSG_RESULT([$enable_Werror])
+ fi
+ 
+-GTK_DOC_CHECK
++GTK_DOC_CHECK([1.14],[--flavour no-tmpl --docdir docs/reference])
+ 
+ AC_CONFIG_FILES([Makefile po/Makefile.in docs/Makefile docs/reference/Makefile
+ libuser.pc])

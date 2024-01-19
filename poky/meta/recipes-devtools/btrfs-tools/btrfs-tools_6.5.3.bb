@@ -43,7 +43,7 @@ PACKAGECONFIG[crypto-libsodium] = "--with-crypto=libsodium,,libsodium"
 PACKAGECONFIG[crypto-libkcapi] = "--with-crypto=libkcapi,,libkcapi"
 
 inherit autotools-brokensep pkgconfig manpages
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'setuptools3-base', '', d)}
+inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python', 'setuptools3-base', '', d)}
 
 CLEANBROKEN = "1"
 

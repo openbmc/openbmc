@@ -1,0 +1,46 @@
+From 502c0302827cec3d2b2a69fb25189646685ef2ff Mon Sep 17 00:00:00 2001
+From: Fabio Estevam <festevam@denx.de>
+Date: Fri, 12 Jan 2024 00:17:14 -0300
+Subject: [PATCH] keytable: meson: Restrict the installation of
+ 50-rc_keymap.conf
+
+Currently, meson tries to install 50-rc_keymap.conf even if systemd
+is not used.
+
+Commit 01f2c6c58e6f ("keytable: restrict installation of 50-rc_keymap.conf"),
+only allowed 50-rc_keymap.conf to be installed when both BPF and systemd
+were used.
+
+Apply the same logic in meson to fix the problem.
+
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+Signed-off-by: Sean Young <sean@mess.org>
+Upstream-Status: Backport [https://git.linuxtv.org/v4l-utils.git/commit/?id=a21924ec424c4744af6f2a794e0677eba35dd168]
+---
+ utils/keytable/meson.build | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/utils/keytable/meson.build b/utils/keytable/meson.build
+index 4130a4bea514..76ce329eae8e 100644
+--- a/utils/keytable/meson.build
++++ b/utils/keytable/meson.build
+@@ -69,6 +69,8 @@ ir_keytable_udev_rules = files(
+ install_data(ir_keytable_udev_rules,
+              install_dir : ir_keytable_system_dir / 'rules.d')
+
++if ir_bpf_enabled
++if dep_systemd.found()
+ if have_udevdsyscallfilter
+     ir_keytable_systemd_files = files(
+         '50-rc_keymap.conf',
+@@ -76,6 +78,8 @@ if have_udevdsyscallfilter
+     install_data(ir_keytable_systemd_files,
+                  install_dir : systemd_systemdir / 'systemd-udevd.service.d')
+ endif
++endif
++endif
+
+ # Install non-existing directory to create empty directory structure
+ # See: https://github.com/mesonbuild/meson/issues/2904
+--
+2.34.1

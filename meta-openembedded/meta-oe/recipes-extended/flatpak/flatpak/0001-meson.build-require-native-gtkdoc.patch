@@ -1,0 +1,33 @@
+From 49737b1e4a74c77a8cd7ae727974d68503da087f Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 12 Jan 2024 13:52:08 +0100
+Subject: [PATCH] meson.build: require native gtkdoc
+
+this fixes:
+| Run-time dependency gtk-doc found: NO (tried pkgconfig)
+|
+| ../git/meson.build:206:13: ERROR: Dependency "gtk-doc" not found, tried pkgconfig
+
+Upstream-Status: Submitted [https://github.com/flatpak/flatpak/pull/5650/commits/e5de3e46b917f830d7f81e9db6ed2a9b7d7db942]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index f7f9372d..dccc3eb4 100644
+--- a/meson.build
++++ b/meson.build
+@@ -203,7 +203,7 @@ appstream_dep = dependency('appstream', version : '>=0.12.0')
+ gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0')
+ libseccomp_dep = dependency('libseccomp', required : get_option('seccomp'))
+ gir_dep = dependency('gobject-introspection-1.0', version : '>=1.40.0', required : get_option('gir'))
+-gtkdoc_dep = dependency('gtk-doc', required : get_option('gtkdoc'))
++gtkdoc_dep = dependency('gtk-doc', required : get_option('gtkdoc'), native : true)
+ build_gtk_doc = gtkdoc_dep.found()
+ 
+ wayland_client = dependency('wayland-client', required : get_option('wayland_security_context'))
+-- 
+2.43.0
+

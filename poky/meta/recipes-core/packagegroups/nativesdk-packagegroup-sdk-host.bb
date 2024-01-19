@@ -4,7 +4,8 @@
 
 SUMMARY = "Host packages for the standalone SDK or external toolchain"
 
-inherit packagegroup nativesdk
+inherit packagegroup
+inherit_defer nativesdk
 
 PACKAGEGROUP_DISABLE_COMPLEMENTARY = "1"
 

@@ -25,6 +25,9 @@ MIPS_INSTRUCTION_SET = "mips"
 ARM_INSTRUCTION_SET:armv5 = "arm"
 ARM_INSTRUCTION_SET:armv4 = "arm"
 
+# 1.2.4 doesn't support riscv32
+COMPATIBLE_HOST:riscv32 = "null"
+
 # Enable out of tree build
 B = "${WORKDIR}/build"
 

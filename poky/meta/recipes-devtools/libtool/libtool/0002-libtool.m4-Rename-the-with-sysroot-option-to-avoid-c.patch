@@ -84,9 +84,10 @@ Index: libtool-2.4.7/tests/sysroot.at
  AC_OUTPUT(Makefile)
  ]])
 diff --git a/tests/testsuite b/tests/testsuite
+index 24265e4..d388e3e 100755
 --- a/tests/testsuite
 +++ b/tests/testsuite
-@@ -48945,7 +48945,7 @@ $at_traceon; }
+@@ -48997,7 +48997,7 @@ $at_traceon; }
  
  
  LDFLAGS="$LDFLAGS --sysroot=$sysroot -no-undefined"
@@ -95,7 +96,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  
  #???
  if test PATH = "$shlibpath_var"; then
-@@ -49154,7 +49154,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -49211,7 +49211,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([lib2.c])
  LT_INIT
@@ -104,7 +105,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  AC_SUBST([sysroot])
  AC_OUTPUT(Makefile)
  _ATEOF
-@@ -49342,7 +49342,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -49404,7 +49404,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([prog.c])
  LT_INIT
@@ -113,7 +114,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  AC_SUBST([sysroot])
  AC_OUTPUT(Makefile)
  _ATEOF
-@@ -49694,7 +49694,7 @@ $at_traceon; }
+@@ -49761,7 +49761,7 @@ $at_traceon; }
  
  
  LDFLAGS="$LDFLAGS --sysroot=$sysroot -no-undefined"
@@ -122,7 +123,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  
  #???
  if test PATH = "$shlibpath_var"; then
-@@ -49903,7 +49903,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -49975,7 +49975,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([lib2.c])
  LT_INIT
@@ -131,7 +132,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  AC_SUBST([sysroot])
  AC_OUTPUT(Makefile)
  _ATEOF
-@@ -50091,7 +50091,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -50168,7 +50168,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([prog.c])
  LT_INIT
@@ -140,7 +141,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  AC_SUBST([sysroot])
  AC_OUTPUT(Makefile)
  _ATEOF
-@@ -50443,7 +50443,7 @@ $at_traceon; }
+@@ -50525,7 +50525,7 @@ $at_traceon; }
  
  
  LDFLAGS="$LDFLAGS --sysroot=$sysroot -no-undefined"
@@ -149,7 +150,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  
  #???
  if test PATH = "$shlibpath_var"; then
-@@ -50652,7 +50652,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -50739,7 +50739,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([lib2.c])
  LT_INIT
@@ -158,7 +159,7 @@ diff --git a/tests/testsuite b/tests/testsuite
  AC_SUBST([sysroot])
  AC_OUTPUT(Makefile)
  _ATEOF
-@@ -50840,7 +50840,7 @@ AM_INIT_AUTOMAKE([foreign])
+@@ -50932,7 +50932,7 @@ AM_INIT_AUTOMAKE([foreign])
  AC_PROG_CC
  AC_CONFIG_SRCDIR([prog.c])
  LT_INIT

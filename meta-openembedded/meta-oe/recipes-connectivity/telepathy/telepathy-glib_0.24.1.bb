@@ -10,7 +10,7 @@ SRC_URI[sha256sum] = "9e0df1d8f857e0270cf0b32e2d1ca5a24aa7282873361785d573f72ad7
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=e413d83db6ee8f2c8e6055719096a48e"
 
-inherit autotools pkgconfig gettext gobject-introspection vala
+inherit autotools pkgconfig gettext gobject-introspection vala gtk-doc
 
 # Respect GI_DATA_ENABLED value when enabling vala-bindings:
 # configure: error: GObject-Introspection must be enabled for Vala bindings

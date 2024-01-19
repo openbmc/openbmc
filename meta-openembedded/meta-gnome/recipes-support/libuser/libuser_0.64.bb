@@ -14,6 +14,7 @@ SECTION = "base"
 SRC_URI = "https://releases.pagure.org/libuser/libuser-${PV}.tar.gz \
            file://0001-docs-Disable-building.patch \
            file://0002-remove-unused-execinfo.h.patch \
+           file://gtkdoc.patch \
            "
 
 SRC_URI[sha256sum] = "ea6094c72cb9e60a42fb53509dc98d124a340f1c9222783b503208adc16a0a8f"
@@ -25,11 +26,6 @@ inherit autotools features_check gettext python3native python3-dir pkgconfig gtk
 REQUIRED_DISTRO_FEATURES = "pam"
 
 EXTRA_OEMAKE = "PYTHON_CPPFLAGS=-I${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"
-
-GTKDOC_DOCDIR = "${S}/docs/reference"
-
-# run autopoint since it needs ABOUT-NLS and admin/config.rpath from gettext
-#EXTRA_AUTORECONF:remove = "--exclude=autopoint"
 
 do_configure:prepend() {
     install -d ${S}/admin -d ${S}/m4

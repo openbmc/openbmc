@@ -33,7 +33,7 @@ PACKAGECONFIG[python3-probes] = "--with-python3-probes,--without-python3-probes,
 PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod"
 
 inherit autotools gettext pkgconfig systemd
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'python3-probes', 'setuptools3-base', '', d)}
+inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python3-probes', 'setuptools3-base', '', d)}
 
 # | ../git/elaborate.cxx:2601:21: error: storing the address of local variable 'sym' in '*s.systemtap_session::symbol_resolver' [-Werror=dangling-pointer=]
 CXXFLAGS += "-Wno-dangling-pointer"

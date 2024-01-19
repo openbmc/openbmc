@@ -194,6 +194,18 @@ class Rootfs(object, metaclass=ABCMeta):
         post_process_cmds = self.d.getVar("ROOTFS_POSTPROCESS_COMMAND")
         rootfs_post_install_cmds = self.d.getVar('ROOTFS_POSTINSTALL_COMMAND')
 
+        def make_last(command, commands):
+            commands = commands.split()
+            if command in commands:
+                commands.remove(command)
+                commands.append(command)
+            return "".join(commands)
+
+        # We want this to run as late as possible, in particular after
+        # systemd_sysusers_create and set_user_group. Using :append is not enough
+        make_last("tidy_shadowutils_files", post_process_cmds)
+        make_last("rootfs_reproducible", post_process_cmds)
+
         execute_pre_post_process(self.d, pre_process_cmds)
 
         if self.progress_reporter:

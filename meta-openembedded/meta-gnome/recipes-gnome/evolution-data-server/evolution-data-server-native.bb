@@ -1,10 +1,12 @@
 require ${BPN}.inc
 
-inherit native
+inherit_defer native
 
 DEPENDS = "glib-2.0-native"
 
 # build native helpers
+do_configure[noexec] = "1"
+
 do_compile() {
     cd ${S}/src/camel
     sed -i 's:#include "evolution-data-server-config.h"::g' camel-gen-tables.c

@@ -1,4 +1,4 @@
-From 7b0a14e7320078ac891d415cab9b7568e3f52ad8 Mon Sep 17 00:00:00 2001
+From f8a664cf1fc73e381d57d6927207286059744837 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 16 Sep 2021 16:35:37 +0200
 Subject: [PATCH] Lib/pty.py: handle stdin I/O errors same way as master I/O
@@ -30,10 +30,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/pty.py b/Lib/pty.py
-index fefb63a..4cef056 100644
+index 1d97994..fa8821b 100644
 --- a/Lib/pty.py
 +++ b/Lib/pty.py
-@@ -184,7 +184,10 @@ def _copy(master_fd, master_read=_read, stdin_read=_read):
+@@ -178,7 +178,10 @@ def _copy(master_fd, master_read=_read, stdin_read=_read):
              i_buf = i_buf[n:]
  
          if stdin_avail and STDIN_FILENO in rfds:

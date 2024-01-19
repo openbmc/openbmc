@@ -7,6 +7,7 @@ SRC_URI = " \
     gitsm://github.com/flatpak/flatpak;protocol=https;branch=main \
     file://0001-flatpak-pc-add-pc_sysrootdir.patch \
     file://0001-meson.build-require-for-native-wayland-scanner.patch \
+    file://0001-meson.build-require-native-gtkdoc.patch \
 "
 
 SRCREV = "27b11b93c2a80a91c9461bc6c7f5e9a201406041"

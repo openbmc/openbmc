@@ -11,10 +11,10 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00017.html]
 
 diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
-index 3d5dcd0a..2c994612 100644
+index f884824..25a91de 100644
 --- a/build-aux/ltmain.in
 +++ b/build-aux/ltmain.in
-@@ -6475,7 +6475,7 @@ func_mode_link ()
+@@ -6503,7 +6503,7 @@ func_mode_link ()
  	      fi
  	    else
  	      # We cannot seem to hardcode it, guess we'll fake it.

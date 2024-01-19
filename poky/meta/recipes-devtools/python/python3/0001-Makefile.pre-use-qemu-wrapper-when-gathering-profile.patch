@@ -1,4 +1,4 @@
-From 9f85089cc3a21d5ff235bb37c6c9758f2b70497d Mon Sep 17 00:00:00 2001
+From ea8e486a416b90c562f3b33faa91d9d1d030be0e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 30 Jan 2019 12:41:04 +0100
 Subject: [PATCH] Makefile.pre: use qemu wrapper when gathering profile data
@@ -11,16 +11,16 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index f0aedb7..edd70d4 100644
+index 7af1845..fc7ab79 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -519,8 +519,7 @@ build_all_generate_profile:
- 	$(MAKE) @DEF_MAKE_RULE@ CFLAGS_NODIST="$(CFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LDFLAGS_NODIST="$(LDFLAGS_NODIST) $(PGO_PROF_GEN_FLAG)" LIBS="$(LIBS)"
- 
- run_profile_task:
+@@ -656,8 +656,7 @@ profile-run-stamp:
+ 	# enabled.
+ 	$(MAKE) profile-gen-stamp
+ 	# Next, run the profile task to generate the profile information.
 -	@ # FIXME: can't run for a cross build
 -	$(LLVM_PROF_FILE) $(RUNSHARED) ./$(BUILDPYTHON) $(PROFILE_TASK) || true
 +	./pgo-wrapper ./python -m test.regrtest --pgo test_grammar test_opcodes test_dict test_builtin test_exceptions test_types test_support || true
- 
- build_all_merge_profile:
  	$(LLVM_PROF_MERGER)
+ 	# Remove profile generation binary since we are done with it.
+ 	$(MAKE) clean-retain-profile

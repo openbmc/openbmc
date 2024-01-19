@@ -6,7 +6,7 @@ SECTION = "libs"
 DEPENDS = "glib-2.0 zlib"
 
 GNOMEBASEBUILDCLASS = "autotools"
-inherit gnomebase gobject-introspection vala
+inherit gnomebase gobject-introspection vala gtk-doc
 
 SRC_URI = "https://github.com/jstedfast/${BPN}/releases/download/${PV}/${BP}.tar.xz \
     file://iconv-detect.h \

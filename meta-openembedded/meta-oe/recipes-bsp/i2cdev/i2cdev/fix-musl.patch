@@ -1,0 +1,122 @@
+From ce3affeb45a65649dda1edc9a4f0586e9db47ada Mon Sep 17 00:00:00 2001
+Message-Id: <ce3affeb45a65649dda1edc9a4f0586e9db47ada.1705064898.git.joerg.sommer@navimatix.de>
+From: =?UTF-8?q?J=C3=B6rg=20Sommer?= <joerg.sommer@navimatix.de>
+Date: Fri, 12 Jan 2024 13:59:51 +0100
+Subject: [PATCH] lsi2c: Replace error() by fprintf, drop error.h
+
+The MUSL C library doesn't support error.h. Because the only usage of this
+is the *error* function in lsi2c.c, this gets replaced by a *fprintf*. This
+doesn't print the program name, but keeps the message and the error
+description.
+
+Upstream-Status: Submitted [https://github.com/costad2/i2cdev/pull/5]
+---
+ libi2cdev/access.c         | 1 -
+ libi2cdev/i2c-bus-parser.c | 1 -
+ libi2cdev/i2c-dev-path.c   | 1 -
+ libi2cdev/i2c-error.c      | 1 -
+ libi2cdev/init.c           | 2 --
+ libi2cdev/sysfs.c          | 1 -
+ lsi2c/lsi2c.c              | 4 ++--
+ 7 files changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/libi2cdev/access.c b/libi2cdev/access.c
+index 62a3f59..2e77659 100644
+--- a/libi2cdev/access.c
++++ b/libi2cdev/access.c
+@@ -16,7 +16,6 @@
+ 
+ #include "busses.h"
+ #include "data.h"
+-#include "error.h"
+ #include "sysfs.h"
+ 
+ #include "i2cdiscov.h"
+diff --git a/libi2cdev/i2c-bus-parser.c b/libi2cdev/i2c-bus-parser.c
+index c4b8688..8c760e0 100644
+--- a/libi2cdev/i2c-bus-parser.c
++++ b/libi2cdev/i2c-bus-parser.c
+@@ -27,7 +27,6 @@
+ #include <dirent.h>
+ #include <fcntl.h>
+ #include <errno.h>
+-#include <error.h>
+ #include <alloca.h>
+ #include <search.h>
+ 
+diff --git a/libi2cdev/i2c-dev-path.c b/libi2cdev/i2c-dev-path.c
+index b156db7..361761c 100644
+--- a/libi2cdev/i2c-dev-path.c
++++ b/libi2cdev/i2c-dev-path.c
+@@ -11,7 +11,6 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <stdio.h>
+-#include <error.h>
+ 
+ #include <linux/limits.h>
+ 
+diff --git a/libi2cdev/i2c-error.c b/libi2cdev/i2c-error.c
+index f92fb6b..540c112 100644
+--- a/libi2cdev/i2c-error.c
++++ b/libi2cdev/i2c-error.c
+@@ -9,7 +9,6 @@
+ 
+ #include <stdlib.h>
+ #include <stdio.h>
+-#include <error.h>
+ #include <errno.h>
+ #include <stdbool.h>
+ #include <stdarg.h>
+diff --git a/libi2cdev/init.c b/libi2cdev/init.c
+index 99a7edd..dfc4090 100644
+--- a/libi2cdev/init.c
++++ b/libi2cdev/init.c
+@@ -16,10 +16,8 @@
+ #include <errno.h>
+ #include <dirent.h>
+ #include <unistd.h>
+-#include <error.h>
+ #include <limits.h>
+ #include <ctype.h>
+-#include <error.h>
+ #include <fcntl.h>
+ #include <assert.h>
+ 
+diff --git a/libi2cdev/sysfs.c b/libi2cdev/sysfs.c
+index 2811500..a7e13a8 100644
+--- a/libi2cdev/sysfs.c
++++ b/libi2cdev/sysfs.c
+@@ -17,7 +17,6 @@
+ #include <assert.h>
+ #include <string.h>
+ #include <fcntl.h>
+-#include <error.h>
+ #include <errno.h>
+ 
+ #include <sys/types.h>
+diff --git a/lsi2c/lsi2c.c b/lsi2c/lsi2c.c
+index 7af5313..34c6225 100644
+--- a/lsi2c/lsi2c.c
++++ b/lsi2c/lsi2c.c
+@@ -38,7 +38,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <errno.h>
+-#include <error.h>
+ #include <getopt.h>
+ #include <stdbool.h>
+ 
+@@ -205,7 +204,8 @@ static int read_config_file(const char *config_file_name)
+         if (err < 0) {
+             err = -err;
+         }
+-        error(0, err, "Failed to initialize i2cdevices");
++        fflush(stdout);
++        fprintf(stderr, "Failed to initialize i2cdevices: %s", strerror(err));
+         if (config_file) {
+             fclose(config_file);
+         }
+-- 
+2.34.1
+

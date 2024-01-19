@@ -1,4 +1,4 @@
-From 78f482b91d94b44a02e02c4580166757119061ea Mon Sep 17 00:00:00 2001
+From 33bf96f31c4873032ace2cc9afacc3785997527a Mon Sep 17 00:00:00 2001
 From: Paulo Neves <ptsneves@gmail.com>
 Date: Tue, 7 Jun 2022 16:16:41 +0200
 Subject: [PATCH] Avoid shebang overflow on python-config.py
@@ -17,13 +17,13 @@ Upstream-Status: Denied [distribution]
  1 file changed, 2 insertions(+)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 55c7c46..1f6500a 100644
+index fb0b525..75d2e73 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2115,6 +2115,8 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
+@@ -2335,6 +2335,8 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
  	@ # Substitution happens here, as the completely-expanded BINDIR
  	@ # is not available in configure
- 	sed -e "s,@EXENAME@,$(BINDIR)/python$(LDVERSION)$(EXE)," < $(srcdir)/Misc/python-config.in >python-config.py
+ 	sed -e "s,@EXENAME@,$(EXENAME)," < $(srcdir)/Misc/python-config.in >python-config.py
 +	@ # Otherwise we might get huge shebangs with native paths
 +	sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' python-config.py
  	@ # Replace makefile compat. variable references with shell script compat. ones; $(VAR) -> ${VAR}

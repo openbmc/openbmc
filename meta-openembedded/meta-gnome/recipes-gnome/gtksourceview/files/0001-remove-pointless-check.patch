@@ -1,0 +1,38 @@
+From 397751846130f79d5fbe8d617b788f3bcbb36816 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 9 Jan 2024 22:20:03 +0000
+Subject: [PATCH] meson: remove pointless gtk-doc check
+
+There's no point explicitly checking for gtk-doc, for two reasons:
+
+1) In cross-compiled environments this looks for a target gtk-doc, not a
+   native gtk-doc, so it should set native:true.
+
+2) The gnome.gtkdoc() function checks for gtk-doc itself.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gtksourceview/-/merge_requests/351]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ meson.build | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index ba07da70..1109daea 100644
+--- a/meson.build
++++ b/meson.build
+@@ -107,12 +107,6 @@ else
+   vapigen_dep = []
+ endif
+ 
+-if build_gtk_doc
+-  gtk_doc_dep = dependency('gtk-doc', version: gtk_doc_req)
+-else
+-  gtk_doc_dep = []
+-endif
+-
+ # Look for the libxml2 library manually on Visual Studio if
+ # its pkg-config file could not be found, as the NMake
+ # Makefiles of libxml2 do not generate the pkg-config files
+-- 
+2.34.1
+

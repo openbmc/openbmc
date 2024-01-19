@@ -1,0 +1,37 @@
+libtool.m4: Cleanup sysroot trailing "/"
+
+If $CC has --sysroot=/, it is a valid configuration however libtool will
+then set lt_sysroot to "/".
+
+This means references like $lt_sysroot$libdir become //usr/lib instead
+of the more normally expected /usr/lib. This may or may not break something
+but certainly is confusing to the user and gives confusing output. Making
+"/" simply unset lt_sysroot is much cleaner.
+
+Whilst here, trim any trailing '/' from sysroot paths to drop the duplication
+and result in cleaner/consistent output.
+
+* m4/libtool.m4: Cleanup sysroot trailing '/' handling
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/libtool.git/commit/?id=365805327c7b9bbdb0e622b954b6b0d8eaeb3f99]
+Signed-off-by:  Richard Purdie <richard.purdie@linuxfoundation.org>
+
+---
+ m4/libtool.m4 | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index fa1ae91..2f31d24 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -1256,7 +1256,9 @@ lt_sysroot=
+ case $with_libtool_sysroot in #(
+  yes)
+    if test yes = "$GCC"; then
+-     lt_sysroot=`$CC --print-sysroot 2>/dev/null`
++     # Trim trailing / since we'll always append absolute paths and we want
++     # to avoid //, if only for less confusing output for the user.
++     lt_sysroot=`$CC --print-sysroot 2>/dev/null | $SED 's:/\+$::'`
+    fi
+    ;; #(
+  /*)

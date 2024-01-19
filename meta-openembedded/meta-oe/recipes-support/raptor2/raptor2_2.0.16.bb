@@ -15,7 +15,7 @@ SRC_URI = " \
 "
 SRC_URI[sha256sum] = "089db78d7ac982354bdbf39d973baf09581e6904ac4c92a98c5caadb3de44680"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig gtk-doc
 
 EXTRA_OECONF = " \
     --without-xml2-config \

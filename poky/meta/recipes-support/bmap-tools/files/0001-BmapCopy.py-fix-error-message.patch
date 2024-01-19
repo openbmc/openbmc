@@ -1,0 +1,36 @@
+From ad0b0513a46c7d238d0fdabee0267c7084b75e84 Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Thu, 11 Jan 2024 22:04:23 -0500
+Subject: [PATCH 1/3] BmapCopy.py: fix error message
+
+The wrong variable was being used when attempting to print out an informative
+message to the user. Leading to nonsense messages such as:
+
+	bmaptool: info: failed to enable I/O optimization, expect suboptimal speed (reason: cannot switch to the 1 I/O scheduler: 1 in use. None)
+
+Upstream-Status: Submitted [https://github.com/intel/bmap-tools/pull/129]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ bmaptools/BmapCopy.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/bmaptools/BmapCopy.py b/bmaptools/BmapCopy.py
+index 9de7ef434233..b1e8e0fcbdb7 100644
+--- a/bmaptools/BmapCopy.py
++++ b/bmaptools/BmapCopy.py
+@@ -892,9 +892,9 @@ class BmapBdevCopy(BmapCopy):
+                 _log.info(
+                     "failed to enable I/O optimization, expect "
+                     "suboptimal speed (reason: cannot switch to the "
+-                    f"{max_ratio_chg.temp_value} I/O scheduler: "
+-                    f"{max_ratio_chg.old_value or 'unknown scheduler'} in use. "
+-                    f"{max_ratio_chg.error})"
++                    f"'{scheduler_chg.temp_value}' I/O scheduler: "
++                    f"'{scheduler_chg.old_value or 'unknown scheduler'}' in use. "
++                    f"{scheduler_chg.error})"
+                 )
+             if max_ratio_chg.error or scheduler_chg.error:
+                 _log.info(
+-- 
+2.43.0.76.g1a87c842ece3
+

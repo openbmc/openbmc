@@ -1,4 +1,4 @@
-From 46856e692377d21be3562f6f90c242f5c9594ae2 Mon Sep 17 00:00:00 2001
+From ef5728f0af14da5c9f80b0f038fe5bf6d44cb0e9 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Mon, 5 Aug 2019 15:57:39 +0800
 Subject: [PATCH] test_locale.py: correct the test output format
@@ -32,10 +32,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Lib/test/test_locale.py b/Lib/test/test_locale.py
-index f844e62..04df0c2 100644
+index b0d7998..cb12153 100644
 --- a/Lib/test/test_locale.py
 +++ b/Lib/test/test_locale.py
-@@ -564,7 +564,7 @@ class TestMiscellaneous(unittest.TestCase):
+@@ -557,7 +557,7 @@ class TestMiscellaneous(unittest.TestCase):
              self.skipTest('test needs Turkish locale')
          loc = locale.getlocale(locale.LC_CTYPE)
          if verbose:

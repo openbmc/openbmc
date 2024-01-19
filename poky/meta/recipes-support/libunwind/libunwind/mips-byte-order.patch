@@ -1,0 +1,35 @@
+From dbbf8110ed3fd2cbac20a8ec2ac769e13c67bab1 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 16 Jan 2024 18:22:38 +0000
+Subject: [PATCH 2/2] byte order
+
+endian.h on musl/mips can't be included in __ASSEMBLER__ mode,
+so use the __BYTE_ORDER__ symbol instead.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/mips/getcontext.S | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/mips/getcontext.S b/src/mips/getcontext.S
+index d1dbd579..de9b6818 100644
+--- a/src/mips/getcontext.S
++++ b/src/mips/getcontext.S
+@@ -24,12 +24,11 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ 
+ #include "offsets.h"
+-#include <endian.h>
+ 
+ 	.text
+ 
+ #if _MIPS_SIM == _ABIO32
+-# if __BYTE_ORDER == __BIG_ENDIAN
++# if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+ #  define OFFSET 4
+ # else
+ #  define OFFSET 0
+-- 
+2.34.1
+

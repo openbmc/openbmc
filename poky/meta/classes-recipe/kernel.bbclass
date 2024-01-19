@@ -171,7 +171,7 @@ set -e
 # image types.
 
 KERNEL_CLASSES ?= " kernel-uimage "
-inherit ${KERNEL_CLASSES}
+inherit_defer ${KERNEL_CLASSES}
 
 # Old style kernels may set ${S} = ${WORKDIR}/git for example
 # We need to move these over to STAGING_KERNEL_DIR. We can't just

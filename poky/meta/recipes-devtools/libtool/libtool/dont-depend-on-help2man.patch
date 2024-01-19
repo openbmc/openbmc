@@ -4,9 +4,10 @@ Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
 Updated by: Robert Yang <liezhi.yang@windriver.com>
 
 diff --git a/Makefile.am b/Makefile.am
+index 7bd7f72..c29860e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -404,21 +404,6 @@ $(notes_txt): $(notes_texi)
+@@ -411,21 +411,6 @@ $(notes_txt): $(notes_texi)
  	$(AM_V_GEN)$(MAKEINFO) -P '$(srcdir)/doc' --no-headers \
  	    $(MAKEINFOFLAGS) -o '$@' '$(notes_texi)'
  

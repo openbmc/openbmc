@@ -22,7 +22,7 @@ PACKAGE_ARCH_EXPANDED := "${PACKAGE_ARCH}"
 
 LICENSE ?= "MIT"
 
-inherit ${@oe.utils.ifelse(d.getVar('PACKAGE_ARCH_EXPANDED') == 'all', 'allarch', '')}
+inherit_defer ${@oe.utils.ifelse(d.getVar('PACKAGE_ARCH_EXPANDED') == 'all', 'allarch', '')}
 
 # This automatically adds -dbg and -dev flavours of all PACKAGES
 # to the list. Their dependencies (RRECOMMENDS) are handled as usual

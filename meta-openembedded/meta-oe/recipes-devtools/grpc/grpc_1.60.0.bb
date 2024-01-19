@@ -6,7 +6,7 @@ SECTION = "libs"
 LICENSE = "Apache-2.0 & BSD-3-Clause & MPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=731e401b36f8077ae0c134b59be5c906"
 
-DEPENDS = "c-ares protobuf protobuf-native protobuf-c protobuf-c-native openssl libnsl2 abseil-cpp re2"
+DEPENDS = "c-ares protobuf protobuf-native openssl libnsl2 abseil-cpp re2 zlib"
 DEPENDS:append:class-target = " googletest grpc-native "
 DEPENDS:append:class-nativesdk = " grpc-native "
 

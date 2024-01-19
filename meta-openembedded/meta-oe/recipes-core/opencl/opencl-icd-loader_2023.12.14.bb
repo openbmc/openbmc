@@ -9,7 +9,7 @@ inherit pkgconfig cmake
 DEPENDS += "opencl-headers"
 
 PROVIDES = "virtual/opencl-icd"
-RPROVIDES:${PN} = "virtual/opencl-icd"
+RPROVIDES:${PN} = "virtual-opencl-icd"
 
 S = "${WORKDIR}/git"
 

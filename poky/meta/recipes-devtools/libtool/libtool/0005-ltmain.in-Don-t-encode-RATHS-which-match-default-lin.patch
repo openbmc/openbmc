@@ -13,10 +13,10 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00013.html]
 
 diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
-index 96238350..6fb58ed2 100644
+index 40cb94a..2fa055e 100644
 --- a/build-aux/ltmain.in
 +++ b/build-aux/ltmain.in
-@@ -7672,8 +7672,16 @@ EOF
+@@ -7700,8 +7700,16 @@ EOF
  		  esac
  		fi
  	      else
@@ -35,7 +35,7 @@ index 96238350..6fb58ed2 100644
  	      fi
  	    elif test -n "$runpath_var"; then
  	      case "$perm_rpath " in
-@@ -8406,8 +8414,16 @@ EOF
+@@ -8434,8 +8442,16 @@ EOF
  	      esac
  	    fi
  	  else
@@ -54,7 +54,7 @@ index 96238350..6fb58ed2 100644
  	  fi
  	elif test -n "$runpath_var"; then
  	  case "$perm_rpath " in
-@@ -8461,8 +8477,14 @@ EOF
+@@ -8489,8 +8505,14 @@ EOF
  	      esac
  	    fi
  	  else

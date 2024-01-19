@@ -11,12 +11,12 @@ so make automake run after autoheader to avoid the above race.
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00020.html]
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/libtool.git/commit/?id=e01c0bfe5e041418d84460901a1a5b11b89d596f]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 
 diff --git a/Makefile.am b/Makefile.am
-index 84795d87..8c9949ed 100644
+index 9c34bfd..231ef3f 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -333,7 +333,7 @@ EXTRA_DIST     += $(lt_aclocal_m4) \

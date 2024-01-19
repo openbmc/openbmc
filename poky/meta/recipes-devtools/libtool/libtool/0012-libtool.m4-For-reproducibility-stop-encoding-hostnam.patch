@@ -10,13 +10,13 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 https://sources.debian.org/data/main/libt/libtool/2.4.6-10/debian/patches/
         no_hostname.patch
 
-Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00011.html]
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/libtool.git/commit/?id=bd826173c4c9c3fa8d77d92785754897cb4bfd89]
 
 diff --git a/m4/libtool.m4 b/m4/libtool.m4
-index 022c1292..1a8a2998 100644
+index 3794130..84a550c 100644
 --- a/m4/libtool.m4
 +++ b/m4/libtool.m4
-@@ -728,7 +728,6 @@ _LT_CONFIG_SAVE_COMMANDS([
+@@ -730,7 +730,6 @@ _LT_CONFIG_SAVE_COMMANDS([
      cat <<_LT_EOF >> "$cfgfile"
  #! $SHELL
  # Generated automatically by $as_me ($PACKAGE) $VERSION

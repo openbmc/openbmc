@@ -12,7 +12,8 @@ TFA_BL2_BINARY = "bl2-corstone1000.bin"
 TFA_FIP_BINARY = "fip-corstone1000.bin"
 
 # TF-M
-EXTRA_IMAGEDEPENDS += "virtual/trusted-firmware-m"
+EXTRA_IMAGEDEPENDS += "trusted-firmware-m"
+PREFERRED_VERSION_trusted-firmware-m ?= "1.8.%"
 
 # TF-M settings for signing host images
 TFA_BL2_RE_IMAGE_LOAD_ADDRESS = "0x62353000"

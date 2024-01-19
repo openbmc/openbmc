@@ -110,7 +110,7 @@ CFLAGS:append:qemuriscv64 = " -mcmodel=medany"
 # Handle inherits of any of the image classes we need
 IMAGE_CLASSES ??= ""
 IMGCLASSES = " ${IMAGE_CLASSES}"
-inherit ${IMGCLASSES}
+inherit_defer ${IMGCLASSES}
 # Set defaults to satisfy IMAGE_FEATURES check
 IMAGE_FEATURES ?= ""
 IMAGE_FEATURES[type] = "list"

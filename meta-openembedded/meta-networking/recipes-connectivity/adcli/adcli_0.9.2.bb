@@ -6,7 +6,7 @@ SECTION = "net"
 
 SRCREV = "8e88e3590a19006362ea8b8dfdc18bb88b3cb3b5"
 
-SRC_URI = "git://gitlab.freedesktop.org/realmd/adcli;branch=master"
+SRC_URI = "git://gitlab.freedesktop.org/realmd/adcli;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

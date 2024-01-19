@@ -514,9 +514,9 @@ def check_32bit_symbols(path, packagename, d, elf, messages):
     """
     Check that ELF files do not use any 32 bit time APIs from glibc.
     """
-    thirtytwo_bit_time_archs = set(('arm','armeb','mipsarcho32','powerpc','x86'))
+    thirtytwo_bit_time_archs = {'arm','armeb','mipsarcho32','powerpc','x86'}
     overrides = set(d.getVar('OVERRIDES').split(':'))
-    if not(thirtytwo_bit_time_archs & overrides):
+    if not (thirtytwo_bit_time_archs & overrides):
         return
 
     import re
@@ -534,6 +534,7 @@ def check_32bit_symbols(path, packagename, d, elf, messages):
         # /usr/include/signal.h
         "sigtimedwait",
         # /usr/include/sys/time.h
+        "adjtime",
         "futimes", "futimesat", "getitimer", "gettimeofday", "lutimes",
         "setitimer", "settimeofday", "utimes",
         # /usr/include/sys/timex.h
@@ -1570,7 +1571,7 @@ do_unpack[postfuncs] += "do_qa_unpack"
 
 python () {
     import re
-    
+
     tests = d.getVar('ALL_QA').split()
     if "desktop" in tests:
         d.appendVar("PACKAGE_DEPENDS", " desktop-file-utils-native")
@@ -1605,6 +1606,12 @@ python () {
     # why it doesn't work.
     if (d.getVar(d.expand('DEPENDS:${PN}'))):
         oe.qa.handle_error("pkgvarcheck", "recipe uses DEPENDS:${PN}, should use DEPENDS", d)
+
+    # virtual/ is meaningless for those variables
+    for k in ['RDEPENDS', 'RPROVIDES']:
+        for var in bb.utils.explode_deps(d.getVar(k + ':' + pn) or ""):
+            if var.startswith("virtual/"):
+                bb.warn("%s is set to %s, the substring 'virtual/' holds no meaning in this context. It is suggested to use the 'virtual-' instead." % (k, var))
 
     issues = []
     if (d.getVar('PACKAGES') or "").split():

@@ -1,0 +1,31 @@
+From b51031b05f72923ff1cf3b6a4767450dee89d7f4 Mon Sep 17 00:00:00 2001
+From: Grant Nichol <me@grantnichol.com>
+Date: Fri, 22 Dec 2023 23:46:39 -0600
+Subject: [PATCH] riscv: Fix mispelling of extension test macro
+
+When refactoring the riscv extension test macros,
+RISCV_HAS_ZKND_AND_ZKNE was mispelled.
+
+CLA: trivial
+Upstream-Status: Backport [https://github.com/openssl/openssl/pull/23139]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ providers/implementations/ciphers/cipher_aes_xts_hw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/providers/implementations/ciphers/cipher_aes_xts_hw.c b/providers/implementations/ciphers/cipher_aes_xts_hw.c
+index 564d6d6..4cf1361 100644
+--- a/providers/implementations/ciphers/cipher_aes_xts_hw.c
++++ b/providers/implementations/ciphers/cipher_aes_xts_hw.c
+@@ -225,7 +225,7 @@ static const PROV_CIPHER_HW aes_xts_rv32i_zbkb_zknd_zkne = {                   \
+ # define PROV_CIPHER_HW_select_xts()                                           \
+ if (RISCV_HAS_ZBKB_AND_ZKND_AND_ZKNE())                                        \
+     return &aes_xts_rv32i_zbkb_zknd_zkne;                                      \
+-if (RISCV_HAS_ZKND_ZKNE())                                                     \
++if (RISCV_HAS_ZKND_AND_ZKNE())                                                 \
+     return &aes_xts_rv32i_zknd_zkne;
+ # else
+ /* The generic case */
+-- 
+2.43.0
+

@@ -68,8 +68,8 @@ efi_hddimg_populate() {
 	efi_populate $1
 }
 
-inherit ${EFI_CLASS}
-inherit ${PCBIOS_CLASS}
+inherit_defer ${EFI_CLASS}
+inherit_defer ${PCBIOS_CLASS}
 
 populate_kernel() {
 	dest=$1
