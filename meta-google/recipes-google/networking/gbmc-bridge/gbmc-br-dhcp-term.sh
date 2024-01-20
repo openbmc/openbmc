@@ -48,7 +48,7 @@ done
 
 # We need to guarantee we wait at least 5 minutes from reachable in
 # case networking just came up
-wait_min=5
+wait_min=10
 echo "Network is reachable, waiting $wait_min min" >&2
 sleep $((60 * wait_min))
 
@@ -87,7 +87,7 @@ while true; do
   # The process is already stopped, we are done
   [[ "$activestr" == 'inactive' ]] && exit
 
-  # If the process is running, give it at least 5 minutes from when it started
+  # If the process is running, give it at least 10 minutes from when it started
   cur_s="$(cut -d' ' -f1 /proc/uptime)"
   # Remove floating point if applied since bash can't perform float arithmetic
   cur_s="${cur_s%.*}"
