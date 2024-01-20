@@ -2,8 +2,9 @@
 Type=ether
 [Network]
 DHCP=true
-LinkLocalAddressing=1
+LinkLocalAddressing=ipv6
 IPv6AcceptRA=1
+IPv6LinkLocalAddressGenerationMode=eui64
 [DHCP]
 ClientIdentifier=mac
 UseDNS=true
