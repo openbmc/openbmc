@@ -10,6 +10,10 @@ SRC_URI += "file://dropbearkey.service \
             file://migrate-key-location \
            "
 
+do_configure:append() {
+    install -m 0644 ${WORKDIR}/localoptions.h ${B}
+}
+
 # pull in OpenSSH's /usr/libexec/sftp-server so we don't have to rely
 # on the crufty old scp protocol for file transfer
 RDEPENDS:${PN} += "openssh-sftp-server"
