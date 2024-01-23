@@ -4,6 +4,21 @@ if [ ! -e /dev/mtd/rwfs ]; then
     exit 1
 fi
 
+# If "no-persist-fs" is set, only mount as a tmpfs and exit, so that we can
+# still create writable file system entries.
+if /sbin/fw_printenv -n openbmconce | grep -w -q "no-persist-fs"; then
+    echo "Mounting /run/mnt-persist as tmpfs"
+    if ! mkdir -p /run/mnt-persist ; then
+        exit 1
+    fi
+
+    if ! mount -t tmpfs tmpfs /run/mnt-persist ; then
+        exit 1
+    fi
+
+    exit
+fi
+
 if [ ! -e /run/format-persist ]; then
     if ! ubiattach -p /dev/mtd/rwfs > /dev/null ; then
         echo "unformatted-ubi" >> /run/format-persist
