@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable ipmi kcs
+BindsTo=gbmc-bare-metal-active.target
+Before=gbmc-bare-metal-active.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/bin/sh -c 'systemctl stop phosphor-ipmi-kcs@@KCS_DEV@'
+ExecStop=/bin/sh -c 'systemctl start phosphor-ipmi-kcs@@KCS_DEV@'
+
+[Install]
+WantedBy=gbmc-bare-metal-active.target
