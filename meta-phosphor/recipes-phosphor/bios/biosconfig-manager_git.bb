@@ -7,12 +7,13 @@ HOMEPAGE = "https://github.com/openbmc/bios-settings-mgr"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=bcd9ada3a943f58551867d72893cc9ab"
 DEPENDS = " boost \
+            libcereal \
+            nlohmann-json \
             openssl \
             phosphor-dbus-interfaces \
             phosphor-logging \
             sdbusplus \
-            systemd \
-            nlohmann-json "
+            systemd "
 SRCREV = "20de6de8a8fb01032dc90d698559259af4245a87"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
