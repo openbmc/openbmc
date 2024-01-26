@@ -16,14 +16,12 @@ SRC_URI = " \
            file://ampere-platform-init.service \
            file://ampere_platform_init.sh \
            file://mtmitchell_platform_gpios_init.sh \
-           file://gpio-lib.sh \
           "
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "ampere-platform-init.service"
 
 do_install () {
     install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/gpio-lib.sh ${D}${sbindir}/
     install -m 0755 ${WORKDIR}/ampere_platform_init.sh ${D}${sbindir}/
     install -m 0755 ${WORKDIR}/mtmitchell_platform_gpios_init.sh ${D}${sbindir}/platform_gpios_init.sh
     install -d ${D}${systemd_unitdir}/system/
