@@ -1,5 +1,6 @@
 [Match]
-Type=ether
+Driver=ftgmac100
+
 [Network]
 DHCP=true
 LinkLocalAddressing=ipv6
