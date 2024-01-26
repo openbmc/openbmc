@@ -1,13 +1,20 @@
-Don't use the target perl when regenerating the man pages.
+From 1c033f2a23941c46d88b9ac279f87bf2c6e99499 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 15 Jul 2020 16:03:21 +0100
+Subject: [PATCH] Don't use the target perl when regenerating the man pages.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
+---
+ man/local.mk | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
 diff --git a/man/local.mk b/man/local.mk
-index e69858b1..78c68ab5 100644
+index 775c131..ba94753 100644
 --- a/man/local.mk
 +++ b/man/local.mk
-@@ -67,13 +67,12 @@ SUFFIXES += .w .1
+@@ -77,13 +77,12 @@ SUFFIXES += .w .1
  	@echo "Updating man page $@"
  	$(MKDIR_P) $(@D)
  	PATH="$(top_srcdir)/man$(PATH_SEPARATOR)$$PATH"; \

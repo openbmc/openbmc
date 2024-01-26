@@ -263,9 +263,7 @@ do_install() {
 PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-cw1200-license ${PN}-cw1200 \
              ${PN}-ralink-license ${PN}-ralink \
-             ${PN}-mt7601u-license ${PN}-mt7601u \
-             ${PN}-mt7650-license ${PN}-mt7650 \
-             ${PN}-mt76x2-license ${PN}-mt76x2 \
+             ${PN}-mt76x-license ${PN}-mt7601u ${PN}-mt7650 ${PN}-mt76x2 \
              ${PN}-radeon-license ${PN}-radeon \
              ${PN}-amdgpu-license ${PN}-amdgpu \
              ${PN}-marvell-license ${PN}-pcie8897 ${PN}-pcie8997 \
@@ -507,43 +505,36 @@ FILES:${PN}-ralink = " \
 RDEPENDS:${PN}-ralink += "${PN}-ralink-license"
 
 # For mediatek MT7601U
-LICENSE:${PN}-mt7601u = "Firmware-ralink_a_mediatek_company_firmware"
-LICENSE:${PN}-mt7601u-license = "Firmware-ralink_a_mediatek_company_firmware"
+LICENSE:${PN}-mt76x-license = "Firmware-ralink_a_mediatek_company_firmware"
+FILES:${PN}-mt76x-license = "${nonarch_base_libdir}/firmware/LICENCE.ralink_a_mediatek_company_firmware"
 
-FILES:${PN}-mt7601u-license = "${nonarch_base_libdir}/firmware/LICENCE.ralink_a_mediatek_company_firmware"
+LICENSE:${PN}-mt7601u = "Firmware-ralink_a_mediatek_company_firmware"
+
 FILES:${PN}-mt7601u = " \
   ${nonarch_base_libdir}/firmware/mediatek/mt7601u.bin \
   ${nonarch_base_libdir}/firmware/mt7601u.bin \
 "
-RDEPENDS:${PN}-mt7601u += "${PN}-mt7601u-license"
+RDEPENDS:${PN}-mt7601u += "${PN}-mt76x-license"
 
 # For MediaTek Bluetooth USB driver 7650
 LICENSE:${PN}-mt7650 = "Firmware-ralink_a_mediatek_company_firmware"
-LICENSE:${PN}-mt7650-license = "Firmware-ralink_a_mediatek_company_firmware"
 
-FILES:${PN}-mt7650-license = " \
-  ${nonarch_base_libdir}/firmware/LICENCE.ralink_a_mediatek_company_firmware \
-"
 FILES:${PN}-mt7650 = " \
   ${nonarch_base_libdir}/firmware/mediatek/mt7650.bin \
   ${nonarch_base_libdir}/firmware/mt7650.bin \
 "
-RDEPENDS:${PN}-mt7650 += "${PN}-mt7650-license"
+RDEPENDS:${PN}-mt7650 += "${PN}-mt76x-license"
 
 # For MediaTek MT76x2 Wireless MACs
 LICENSE:${PN}-mt76x2 = "Firmware-ralink_a_mediatek_company_firmware"
-LICENSE:${PN}-mt76x2-license = "Firmware-ralink_a_mediatek_company_firmware"
 
-FILES:${PN}-mt76x2-license = " \
-  ${nonarch_base_libdir}/firmware/LICENCE.ralink_a_mediatek_company_firmware \
-"
 FILES:${PN}-mt76x2 = " \
   ${nonarch_base_libdir}/firmware/mediatek/mt7662.bin \
   ${nonarch_base_libdir}/firmware/mt7662.bin \
   ${nonarch_base_libdir}/firmware/mediatek/mt7662_rom_patch.bin \
   ${nonarch_base_libdir}/firmware/mt7662_rom_patch.bin \
 "
-RDEPENDS:${PN}-mt76x2 += "${PN}-mt76x2-license"
+RDEPENDS:${PN}-mt76x2 += "${PN}-mt76x-license"
 
 # For MediaTek
 LICENSE:${PN}-mediatek = "Firmware-mediatek"

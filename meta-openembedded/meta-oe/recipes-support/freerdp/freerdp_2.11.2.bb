@@ -17,6 +17,7 @@ SRCREV = "a38c1be9eee39a9bc22b511fffe96e63fdf8ebe7"
 SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=stable-2.0;protocol=https \
            file://winpr-makecert-Build-with-install-RPATH.patch \
            file://0001-Fix-const-qualifier-error.patch \
+           file://0002-Do-not-install-tools-a-CMake-targets.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -63,7 +64,6 @@ do_configure:append() {
 do_install:append () {
     install -d ${D}${bindir}
     install -m755 winpr/tools/makecert-cli/winpr-makecert ${D}${bindir}
-    rm -rf ${D}${libdir}/cmake
     rm -rf ${D}${libdir}/freerdp
 }
 

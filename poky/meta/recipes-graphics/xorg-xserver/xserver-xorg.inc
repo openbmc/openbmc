@@ -116,7 +116,6 @@ FILES:xf86-video-modesetting = "${libdir}/xorg/modules/drivers/modesetting_drv.s
 
 EXTRA_OEMESON += " \
                  -Dxnest=false \
-                 -Dxvfb=true \
                  -Ddtrace=false \
                  -Dint10=x86emu \
                  -Dxkb_output_dir=/var/lib/xkb \
@@ -138,6 +137,7 @@ PACKAGECONFIG[glamor] = "-Dglamor=true,-Dglamor=false,libepoxy virtual/libgbm,li
 PACKAGECONFIG[unwind] = "-Dlibunwind=true,-Dlibunwind=false,libunwind"
 PACKAGECONFIG[systemd-logind] = "-Dsystemd_logind=true,-Dsystemd_logind=false,dbus,"
 PACKAGECONFIG[xinerama] = "-Dxinerama=true,-Dxinerama=false"
+PACKAGECONFIG[xvfb] = "-Dxvfb=true,-Dxvfb=false"
 
 # Xorg requires a SHA1 implementation, pick one
 XORG_CRYPTO ??= "openssl"
@@ -175,3 +175,5 @@ python populate_packages:prepend() {
     d.appendVar("RPROVIDES:" + pn, " " + get_abi("input"))
     d.appendVar("RPROVIDES:" + pn, " " + get_abi("video"))
 }
+
+CVE_STATUS[CVE-2023-5574] = "${@bb.utils.contains('PACKAGECONFIG', 'xvfb', '', 'not-applicable-config: specific to Xvfb', d)}"

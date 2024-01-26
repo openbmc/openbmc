@@ -27,7 +27,9 @@ PACKAGECONFIG[notvisable] = "--disable-visibility"
 PACKAGECONFIG[openssl] = "--with-openssl=${STAGING_DIR_HOST}/usr --with-crypto-backend=openssl, --without-openssl, openssl, openssl"
 PACKAGECONFIG[botan] = "--with-botan=${STAGING_DIR_HOST}/usr --with-crypto-backend=botan, --without-botan, botan"
 PACKAGECONFIG[migrate] = "--with-migrate"
-PACKAGECONFIG[pk11] = "--enable-p11-kit --with-p11-kit==${STAGING_DIR_HOST}/usr, --without-p11-kit, p11-kit, p11-kit"
+PACKAGECONFIG[pk11] = "--enable-p11-kit --with-p11-kit=${datadir}/p11-kit/modules, --without-p11-kit, p11-kit, p11-kit"
+
+FILES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'pk11', '${datadir}/p11-kit/modules/softhsm2.module', '', d)}"
 
 RDEPENDS:${PN} = "sqlite3"
 BBCLASSEXTEND = "native nativesdk"

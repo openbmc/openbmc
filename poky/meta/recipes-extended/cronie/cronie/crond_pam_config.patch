@@ -1,9 +1,19 @@
+From f5b325cba73018e5be984570fd4e680e59e7865d Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Wed, 20 Jul 2011 02:42:28 +0000
+Subject: [PATCH] cronie: enable PAM support for cronie
+
 password-auth is the Fedora's common pam configure file, use oe common pam
 configure files instead.
 
 Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+
+---
+ pam/crond | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
 diff --git a/pam/crond b/pam/crond
 index 560529d..95a6457 100644
 --- a/pam/crond

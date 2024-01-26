@@ -1,12 +1,7 @@
 RDEPENDS:packagegroup-meta-oe-devtools += "\
     python3-distutils-extra \
     rwmem \
-    mongodb \
 "
-RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv64 = "mongodb"
-RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv32 = "mongodb"
-RDEPENDS:packagegroup-meta-oe-devtools:remove:mipsarch = "mongodb"
-RDEPENDS:packagegroup-meta-oe-devtools:remove:powerpc = "mongodb"
 
 RDEPENDS:packagegroup-meta-oe-connectivity += "\
     lirc \

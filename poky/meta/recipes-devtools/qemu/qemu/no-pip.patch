@@ -22,11 +22,11 @@ as it stands is a workaround.
 Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-diff --git a/configure b/configure
-index 133f4e3235..e4c144b4e2 100755
---- a/configure
-+++ b/configure
-@@ -1009,7 +1009,7 @@ python="$(command -v "$python")"
+Index: qemu-8.2.0/configure
+===================================================================
+--- qemu-8.2.0.orig/configure
++++ qemu-8.2.0/configure
+@@ -937,7 +937,7 @@ python="$(command -v "$python")"
  echo "python determined to be '$python'"
  echo "python version: $($python --version)"
  
@@ -35,11 +35,11 @@ index 133f4e3235..e4c144b4e2 100755
  if test "$?" -ne 0 ; then
      error_exit "python venv creation failed"
  fi
-@@ -1017,6 +1017,7 @@ fi
+@@ -945,6 +945,7 @@ fi
  # Suppress writing compiled files
  python="$python -B"
  mkvenv="$python ${source_path}/python/scripts/mkvenv.py"
 +mkvenv=true
  
- mkvenv_flags=""
- if test "$download" = "enabled" ; then
+ # Finish preparing the virtual environment using vendored .whl files
+ 

@@ -54,6 +54,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/vc4-fkms-v3d-pi4.dtbo \
     overlays/vc4-kms-v3d.dtbo \
     overlays/vc4-kms-v3d-pi4.dtbo \
+    overlays/vc4-kms-v3d-pi5.dtbo \
     overlays/vc4-kms-dsi-7inch.dtbo \
     overlays/w1-gpio.dtbo \
     overlays/w1-gpio-pullup.dtbo \
@@ -77,6 +78,7 @@ RPI_KERNEL_DEVICETREE ?= " \
     bcm2710-rpi-cm3.dtb \
     bcm2711-rpi-cm4.dtb \
     bcm2711-rpi-cm4s.dtb \
+    bcm2712-rpi-5-b.dtb \
     "
 
 KERNEL_DEVICETREE ??= " \

@@ -1,4 +1,4 @@
-From e8808a2f5e17d375411c7409eaffb17e72f65022 Mon Sep 17 00:00:00 2001
+From fb583a57f9f4ab956a09e9bb96d89aa13553bf21 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <Mingli.Yu@windriver.com>
 Date: Fri, 24 Aug 2018 12:04:03 +0800
 Subject: [PATCH] test-gatt: Fix hung issue
@@ -27,10 +27,10 @@ Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index f92d860..a5f7117 100644
+index 5e06d4e..4864d36 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -4479,7 +4479,7 @@ int main(int argc, char *argv[])
+@@ -4546,7 +4546,7 @@ int main(int argc, char *argv[])
  			test_server, service_db_1, NULL,
  			raw_pdu(0x03, 0x00, 0x02),
  			raw_pdu(0xbf, 0x00),

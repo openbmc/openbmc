@@ -5,7 +5,7 @@ HOMEPAGE = "https://pillow.readthedocs.io"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b22dc6b663b9175820e5e03337c7596b"
 
-SRC_URI = "git://github.com/python-pillow/Pillow.git;branch=10.0.x;protocol=https \
+SRC_URI = "git://github.com/python-pillow/Pillow.git;branch=main;protocol=https \
            file://0001-support-cross-compiling.patch \
            file://0001-explicitly-set-compile-options.patch \
            file://run-ptest \
@@ -60,5 +60,3 @@ do_install_ptest() {
 }
 
 BBCLASSEXTEND = "native"
-
-SRCREV = "e34d346f10c0b1c814661e662a3e0c1ef084cf1c"

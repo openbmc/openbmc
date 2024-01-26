@@ -340,6 +340,13 @@ Some modules may require setting the frequency of the crystal oscillator used on
 
     CAN_OSCILLATOR="8000000"
 
+Configure the interrupt pin to the one connected to the CAN module. By default,
+the pins are set to 25 for can0 and 24 for can1. To change them to 12 and 16,
+the following variables also have to be set:
+
+    CAN0_INTERRUPT_PIN = "12"
+    CAN1_INTERRUPT_PIN = "16"
+
 Tested modules:
 
 * PiCAN2 (16 MHz crystal): <http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-23-p-1475.html>

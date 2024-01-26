@@ -2,18 +2,24 @@ SUMMARY = "Multidicts are useful for working with HTTP headers, URL query args e
 HOMEPAGE = "https://github.com/aio-libs/multidict/"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=84c63e2bcd84e619d249af5181e2147f"
-
-SRC_URI[sha256sum] = "3666906492efb76453c0e7b97f2cf459b0682e7402c0489a95484965dbc1da49"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=b4fef6e4b0828c2401fb983363985b39"
 
 inherit pypi setuptools3 ptest
 
+PV .= "+git"
+
+SRCREV = "82b559cdd0b41548f3dadc5561a9aaaa7f93ae14"
+PYPI_SRC_URI = "git://github.com/aio-libs/multidict;branch=master;protocol=https"
+S = "${WORKDIR}/git"
+
 SRC_URI += " \
+  file://0001-Extend-aio-libs-multidict-909-to-3.12-as-well-to-add.patch \
 	file://run-ptest \
 "
 
 RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
+	${PYTHON_PN}-pytest-cov \
 "
 
 do_install_ptest() {

@@ -38,12 +38,13 @@ inherit meson pkgconfig upstream-version-is-even gtk-doc multilib_script
 
 # if qemu usermode isn't available, this value needs to be set statically
 # (otherwise it's determinted by running a small target executable with qemu)
-do_write_config:append:class-target() {
+do_write_config:append() {
     cat >${WORKDIR}/cairo.cross <<EOF
 [properties]
 ipc_rmid_deferred_release = 'true'
 EOF
 }
+EXTRA_OEMESON:append:class-nativesdk = "${@' --cross-file ${WORKDIR}/cairo.cross' if d.getVar('EXEWRAPPER_ENABLED') == 'False' else ''}"
 EXTRA_OEMESON:append:class-target = "${@' --cross-file ${WORKDIR}/cairo.cross' if d.getVar('EXEWRAPPER_ENABLED') == 'False' else ''}"
 
 GTKDOC_MESON_OPTION = "gtk_doc"

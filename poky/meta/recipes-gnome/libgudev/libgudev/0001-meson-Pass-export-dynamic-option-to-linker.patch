@@ -1,0 +1,38 @@
+From dc4fcfb1e1e2326a412b252314af3e9424a31457 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 16 Jan 2024 12:02:46 -0800
+Subject: [PATCH] meson: Pass --export-dynamic option to linker
+
+Bypass the compiler driver trying to comprehend and translate it for
+linker, since its not clear what the right behavior should be, gcc seems
+to translate it into --export-dynamic but clang 18+ rejects it
+
+| x86_64-yoe-linux-clang: error: unknown argument: '-export-dynamic'
+
+also see [1]
+
+This makes it work as intended across gcc and clang
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libgudev/-/merge_requests/30]
+[1] https://discourse.llvm.org/t/clang-option-export-dynamic-parse-to-e-xport-dynamic-error/72454
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gudev/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gudev/meson.build b/gudev/meson.build
+index e904203..3ed580b 100644
+--- a/gudev/meson.build
++++ b/gudev/meson.build
+@@ -33,7 +33,7 @@ libgudev_c_args = [
+ ]
+ 
+ libgudev_link_args = [
+-  '-export-dynamic',
++  '-Wl,--export-dynamic',
+   '-Wl,--version-script,@0@/libgudev-1.0.sym'.format(top_srcdir),
+ ]
+ 
+-- 
+2.43.0
+

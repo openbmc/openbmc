@@ -104,7 +104,6 @@ PTESTS_SLOW = "\
     libgcrypt \
     libmodule-build-perl \
     lttng-tools \
-    mdadm \
     openssh \
     openssl \
     parted \
@@ -135,6 +134,7 @@ PTESTS_PROBLEMS:append:x86 = " valgrind"
 #    ifupdown \ # Tested separately in lib/oeqa/selftest/cases/imagefeatures.py
 #    libinput \ # Tests need an unloaded system to be reliable
 #    libpam \ # Needs pam DISTRO_FEATURE
+#    mdadm \ # tests are flaky in AB.
 #    numactl \ # qemu not (yet) configured for numa; all tests are skipped
 #    libseccomp \ #  tests failed: 38; add to slow tests once addressed
 #    python3-numpy \ # requires even more RAM and (possibly) disk space; multiple failures
@@ -147,6 +147,7 @@ PTESTS_PROBLEMS = "\
     libinput \
     libpam \
     libseccomp \
+    mdadm \
     numactl \
     python3-license-expression \
     python3-numpy \

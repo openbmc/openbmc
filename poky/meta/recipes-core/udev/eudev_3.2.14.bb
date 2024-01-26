@@ -10,6 +10,7 @@ DEPENDS = "gperf-native"
 PROVIDES = "udev"
 
 SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
+           file://netifnames.patch \
            file://init \
            file://local.rules \
            "
@@ -50,6 +51,7 @@ do_install:append() {
 
 	# Use classic network interface naming scheme
 	touch ${D}${sysconfdir}/udev/rules.d/80-net-name-slot.rules
+
 }
 
 do_install:prepend:class-target () {

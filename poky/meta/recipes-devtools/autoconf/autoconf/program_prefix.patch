@@ -1,19 +1,20 @@
-From f4f19a5c03e8ae3b9cc93d24b76694f4b7b2eb76 Mon Sep 17 00:00:00 2001
+From 7949496ff3834dcd98407cc3f3ea022ee2471d52 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Thu, 12 Mar 2020 17:28:38 +0000
-Subject: [PATCH 3/7] program_prefix.patch
+Subject: [PATCH] program_prefix.patch
 
 Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
+
 ---
  lib/autoconf/general.m4 | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/autoconf/general.m4 b/lib/autoconf/general.m4
-index 16f0d074..4c5e0b36 100644
+index 47d896d..3deaa46 100644
 --- a/lib/autoconf/general.m4
 +++ b/lib/autoconf/general.m4
-@@ -2070,7 +2070,7 @@ _AC_CANONICAL_SPLIT([target])
+@@ -2071,7 +2071,7 @@ _AC_CANONICAL_SPLIT([target])
  
  # The aliases save the names the user supplied, while $host etc.
  # will get canonicalized.
@@ -22,6 +23,3 @@ index 16f0d074..4c5e0b36 100644
    test "$program_prefix$program_suffix$program_transform_name" = \
      NONENONEs,x,x, &&
    program_prefix=${target_alias}-[]dnl
--- 
-2.25.1
-

@@ -7,7 +7,7 @@ If CMAKE_INSTALL_PREFIX was supplied externally, use it.  This follows
 the pattern suggested by cmake documentation in:
 https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT.html
 
-Upstream-status: Submitted [https://github.com/sierrafoxtrot/srecord/pull/68]
+Upstream-Status: Submitted [https://github.com/sierrafoxtrot/srecord/pull/68]
 ---
  CMakeLists.txt | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

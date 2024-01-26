@@ -1,14 +1,26 @@
+From 8bcaf677e41f1f5d3fa0a746e35958e7b303ac71 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 15 Jul 2020 16:03:21 +0100
+Subject: [PATCH] autoconf: upgrade to 2.71
+
 For native builds we don't care about the documentation, and this would
 otherwise pull in a dependency on help2man.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
+---
+ Makefile.in | 10 ----------
+ 1 file changed, 10 deletions(-)
+
 diff --git a/Makefile.in b/Makefile.in
-index 146e8e3..a1827c1 100644
+index c8d6425..72d6d05 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -763,10 +762,0 @@ dist_buildaux_SCRIPTS = \
+@@ -771,16 +771,6 @@ buildauxdir = $(pkgdatadir)/build-aux
+ dist_buildaux_DATA = \
+   $(AUXSCRIPTS)
+ 
 -dist_man_MANS = \
 -  man/autoconf.1 \
 -  man/autoheader.1 \
@@ -19,3 +31,6 @@ index 146e8e3..a1827c1 100644
 -  man/ifnames.1
 -
 -
+ # Each manpage depends on:
+ # - its .w and .x files and its source script in bin/
+ # - common.x for the SEE ALSO list

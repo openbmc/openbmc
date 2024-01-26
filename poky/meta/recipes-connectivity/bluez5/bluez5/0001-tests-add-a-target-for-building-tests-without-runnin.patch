@@ -1,4 +1,4 @@
-From 3724958858b0ee430f37fb83388c3737d2039a3a Mon Sep 17 00:00:00 2001
+From 738e73b386352fd90f1f26cc1ee75427cf4dc23b Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 1 Apr 2016 17:07:34 +0300
 Subject: [PATCH] tests: add a target for building tests without running them
@@ -11,7 +11,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index e7221bd..9595fd1 100644
+index e738eb3..dab17dd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -710,6 +710,9 @@ endif

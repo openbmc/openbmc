@@ -1,25 +1,26 @@
-From 0071d28e304745a16871561f23117fdb00dd2559 Mon Sep 17 00:00:00 2001
+From 1a50157aa11da48921200a0d8d4308863716eab0 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Thu, 12 Mar 2020 17:25:23 +0000
-Subject: [PATCH 4/7] autoreconf-exclude.patch
+Subject: [PATCH] autoreconf-exclude.patch
 
 Upstream-Status: Inappropriate [oe specific]
+
 ---
  bin/autoreconf.in | 26 ++++++++++++++++++++++++++
  1 file changed, 26 insertions(+)
 
 diff --git a/bin/autoreconf.in b/bin/autoreconf.in
-index bb9f316d..7da3005b 100644
+index 98ebab6..937f758 100644
 --- a/bin/autoreconf.in
 +++ b/bin/autoreconf.in
-@@ -82,6 +82,7 @@ Operation modes:
+@@ -83,6 +83,7 @@ Operation modes:
    -i, --install            copy missing standard auxiliary files
        --no-recursive       don't rebuild sub-packages
    -s, --symlink            with -i, install symbolic links instead of copies
 +  -x, --exclude=STEPS      steps we should not run
    -m, --make               when applicable, re-run ./configure && make
-   -W, --warnings=CATEGORY  report the warnings falling in CATEGORY [syntax]
- 
+   -W, --warnings=CATEGORY  report the warnings falling in CATEGORY
+                            (comma-separated list accepted)
 @@ -141,6 +142,10 @@ my $run_make = 0;
  # Recurse into subpackages
  my $recursive = 1;
@@ -60,7 +61,7 @@ index bb9f316d..7da3005b 100644
      }
  
  
-@@ -687,9 +698,12 @@ sub autoreconf_current_directory ($)
+@@ -691,9 +702,12 @@ sub autoreconf_current_directory ($)
  	{
  	  $libtoolize .= " --ltdl";
  	}
@@ -73,7 +74,7 @@ index bb9f316d..7da3005b 100644
      }
    else
      {
-@@ -726,8 +740,11 @@ sub autoreconf_current_directory ($)
+@@ -730,8 +744,11 @@ sub autoreconf_current_directory ($)
      }
    elsif ($install)
      {
@@ -85,7 +86,7 @@ index bb9f316d..7da3005b 100644
      }
    else
      {
-@@ -765,7 +782,10 @@ sub autoreconf_current_directory ($)
+@@ -769,7 +786,10 @@ sub autoreconf_current_directory ($)
    # latter runs the former, and (ii) autoconf is stricter than
    # autoheader.  So all in all, autoconf should give better error
    # messages.
@@ -96,7 +97,7 @@ index bb9f316d..7da3005b 100644
  
  
    # -------------------- #
-@@ -786,7 +806,10 @@ sub autoreconf_current_directory ($)
+@@ -790,7 +810,10 @@ sub autoreconf_current_directory ($)
      }
    else
      {
@@ -107,7 +108,7 @@ index bb9f316d..7da3005b 100644
      }
  
  
-@@ -803,7 +826,10 @@ sub autoreconf_current_directory ($)
+@@ -807,7 +830,10 @@ sub autoreconf_current_directory ($)
        # We should always run automake, and let it decide whether it shall
        # update the file or not.  In fact, the effect of '$force' is already
        # included in '$automake' via '--no-force'.
@@ -118,6 +119,3 @@ index bb9f316d..7da3005b 100644
      }
  
    # ---------------------------------------------------- #
--- 
-2.25.1
-

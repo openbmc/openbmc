@@ -956,6 +956,26 @@ def modify(args, config, basepath, workspace):
 
         bb.utils.mkdirhier(os.path.dirname(appendfile))
         with open(appendfile, 'w') as f:
+            # if not present, add type=git-dependency to the secondary sources
+            # (non local files) so they can be extracted correctly when building a recipe after
+            #  doing a devtool modify on it
+            src_uri = rd.getVar('SRC_URI').split()
+            src_uri_append = []
+            src_uri_remove = []
+
+            # Assume first entry is main source extracted in ${S} so skip it
+            src_uri = src_uri[1::]
+
+            #Add "type=git-dependency" to all non local sources
+            for url in src_uri:
+                if not url.startswith('file://') and not 'type=' in url:
+                    src_uri_remove.append(url)
+                    src_uri_append.append('%s;type=git-dependency' % url)
+
+            if src_uri_remove:
+                f.write('SRC_URI:remove = "%s"\n' % ' '.join(src_uri_remove))
+                f.write('SRC_URI:append = "%s"\n\n' % ' '.join(src_uri_append))
+
             f.write('FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n')
             # Local files can be modified/tracked in separate subdir under srctree
             # Mostly useful for packages with S != WORKDIR

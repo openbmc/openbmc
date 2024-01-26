@@ -106,12 +106,11 @@ def compare_users(user, e_user):
     # user and e_user must not have None values. Unset values must be '-'.
     (name, uid, gid, comment, homedir, ushell) = user
     (e_name, e_uid, e_gid, e_comment, e_homedir, e_ushell) = e_user
-    # Ignore 'uid', 'gid' or 'comment' if they are not set
+    # Ignore 'uid', 'gid' or 'homedir' if they are not set
     # Ignore 'shell' and 'ushell' if one is not set
     return name == e_name \
         and (uid == '-' or uid == e_uid) \
         and (gid == '-' or gid == e_gid) \
-        and (comment == '-' or e_comment == '-' or comment.lower() == e_comment.lower()) \
         and (homedir == '-' or e_homedir == '-' or homedir == e_homedir) \
         and (ushell == '-' or e_ushell == '-' or ushell == e_ushell)
 

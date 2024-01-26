@@ -1,0 +1,17 @@
+eudev: consider ID_NET_NAME_MAC as an interface name
+
+eudev might not create names based on slot or path.
+
+Upstream-Status: Submitted [github.com/eudev-project/eudev/pull/274]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+--- a/rules/80-net-name-slot.rules
++++ b/rules/80-net-name-slot.rules
+@@ -10,5 +10,6 @@ ENV{net.ifnames}=="0", GOTO="net_name_sl
+ NAME=="", ENV{ID_NET_NAME_ONBOARD}!="", NAME="$env{ID_NET_NAME_ONBOARD}"
+ NAME=="", ENV{ID_NET_NAME_SLOT}!="", NAME="$env{ID_NET_NAME_SLOT}"
+ NAME=="", ENV{ID_NET_NAME_PATH}!="", NAME="$env{ID_NET_NAME_PATH}"
++NAME=="", ENV{ID_NET_NAME_MAC}!="", NAME="$env{ID_NET_NAME_MAC}"
+ 
+ LABEL="net_name_slot_end"

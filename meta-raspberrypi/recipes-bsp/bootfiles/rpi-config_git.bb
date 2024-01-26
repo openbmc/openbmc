@@ -30,6 +30,8 @@ GPIO_IR ?= "18"
 GPIO_IR_TX ?= "17"
 
 CAN_OSCILLATOR ?= "16000000"
+CAN0_INTERRUPT_PIN ?= "25"
+CAN1_INTERRUPT_PIN ?= "24"
 
 ENABLE_UART ??= ""
 
@@ -268,12 +270,12 @@ do_deploy() {
     # ENABLE DUAL CAN
     if [ "${ENABLE_DUAL_CAN}" = "1" ]; then
         echo "# Enable DUAL CAN" >>$CONFIG
-        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=25" >>$CONFIG
-        echo "dtoverlay=mcp2515-can1,oscillator=${CAN_OSCILLATOR},interrupt=24" >>$CONFIG
+        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=${CAN0_INTERRUPT_PIN}" >>$CONFIG
+        echo "dtoverlay=mcp2515-can1,oscillator=${CAN_OSCILLATOR},interrupt=${CAN1_INTERRUPT_PIN}" >>$CONFIG
     # ENABLE CAN
     elif [ "${ENABLE_CAN}" = "1" ]; then
         echo "# Enable CAN" >>$CONFIG
-        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=25" >>$CONFIG
+        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=${CAN0_INTERRUPT_PIN}" >>$CONFIG
     fi
 
 
@@ -317,6 +319,13 @@ do_deploy() {
         echo "# Enable One-Wire Interface" >> $CONFIG
         echo "dtoverlay=w1-gpio" >> $CONFIG
     fi
+
+    # Reduce config.txt file size to avoid corruption and
+    # to boot successfully Raspberry Pi 5. The issue has
+    # been reported to related projects:
+    # https://github.com/raspberrypi/firmware/issues/1848
+    # https://github.com/Evilpaul/RPi-config/issues/9
+    sed -i '/^##/d' $CONFIG
 }
 
 do_deploy:append:raspberrypi3-64() {

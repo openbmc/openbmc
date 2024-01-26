@@ -1,1 +1,0 @@
-EXTRA_ARGS="-r /dev/hwrng"

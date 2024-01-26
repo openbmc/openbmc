@@ -16,6 +16,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 inherit gnomebase gobject-introspection gtk-doc
 
+SRC_URI += "file://0001-meson-Pass-export-dynamic-option-to-linker.patch"
+
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
 

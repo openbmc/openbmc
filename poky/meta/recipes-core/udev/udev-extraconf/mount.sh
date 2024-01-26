@@ -211,7 +211,7 @@ if [ "$ACTION" = "remove" ] || [ "$ACTION" = "change" ] && [ -x "$UMOUNT" ] && [
         logger "mount.sh/remove" "cleaning up $DEVNAME, was mounted by the auto-mounter"
         for mnt in `cat /proc/mounts | grep "$DEVNAME" | cut -f 2 -d " " `
         do
-                $UMOUNT $mnt
+                $UMOUNT "`printf $mnt`"
         done
         # Remove mount directory created by the auto-mounter
         # and clean up our tmp cache file

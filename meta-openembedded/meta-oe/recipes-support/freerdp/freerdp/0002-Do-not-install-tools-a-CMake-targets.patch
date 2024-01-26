@@ -1,0 +1,45 @@
+From 0ddaeae351295e48365657482f165652051bbca2 Mon Sep 17 00:00:00 2001
+From: Andreas Cord-Landwehr <cordlandwehr@kde.org>
+Date: Wed, 17 Jan 2024 20:00:58 +0100
+Subject: [PATCH] Do not install tools a CMake targets
+
+The cli tools are installed manually and thus are missing in the sysroot
+folder. Do not export their targets because they do not exist and make
+CMake fail when searching for the library.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Andreas Cord-Landwehr <cordlandwehr@kde.org>
+---
+ winpr/tools/hash-cli/CMakeLists.txt     | 2 +-
+ winpr/tools/makecert-cli/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/winpr/tools/hash-cli/CMakeLists.txt b/winpr/tools/hash-cli/CMakeLists.txt
+index 9f8c7a8a0..b6d048fec 100644
+--- a/winpr/tools/hash-cli/CMakeLists.txt
++++ b/winpr/tools/hash-cli/CMakeLists.txt
+@@ -43,7 +43,7 @@ set(${MODULE_PREFIX}_LIBS winpr)
+ 
+ target_link_libraries(${MODULE_NAME} ${${MODULE_PREFIX}_LIBS})
+ 
+-install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT tools EXPORT WinPRTargets)
++install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT tools)
+ 
+ if (WITH_DEBUG_SYMBOLS AND MSVC)
+ 	install(FILES ${CMAKE_BINARY_DIR}/${MODULE_NAME}.pdb DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT symbols)
+diff --git a/winpr/tools/makecert-cli/CMakeLists.txt b/winpr/tools/makecert-cli/CMakeLists.txt
+index 48fda5b5e..c7cf4bfaf 100644
+--- a/winpr/tools/makecert-cli/CMakeLists.txt
++++ b/winpr/tools/makecert-cli/CMakeLists.txt
+@@ -46,7 +46,7 @@ target_link_libraries(${MODULE_NAME} ${${MODULE_PREFIX}_LIBS} winpr)
+ 
+ set_property(TARGET ${MODULE_NAME} PROPERTY FOLDER "WinPR/Tools")
+ 
+-install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT tools EXPORT WinPRTargets)
++install(TARGETS ${MODULE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT tools)
+ if (WITH_DEBUG_SYMBOLS AND MSVC)
+     install(FILES ${CMAKE_PDB_BINARY_DIR}/${MODULE_NAME}.pdb DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT symbols)
+ endif()
+-- 
+2.40.1
+

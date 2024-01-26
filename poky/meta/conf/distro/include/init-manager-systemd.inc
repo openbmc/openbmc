@@ -5,3 +5,5 @@ VIRTUAL-RUNTIME_init_manager ??= "systemd"
 VIRTUAL-RUNTIME_initscripts ??= "systemd-compat-units"
 VIRTUAL-RUNTIME_login_manager ??= "shadow-base"
 VIRTUAL-RUNTIME_dev_manager ??= "systemd"
+# systemd hardcodes /root in its source codes, other values are not offically supported
+ROOT_HOME ?= "/root"

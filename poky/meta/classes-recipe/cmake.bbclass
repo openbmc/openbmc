@@ -72,6 +72,8 @@ OECMAKE_TARGET_COMPILE ?= "all"
 OECMAKE_TARGET_INSTALL ?= "install"
 
 def map_host_os_to_system_name(host_os):
+    if host_os.startswith('darwin'):
+        return 'Darwin'
     if host_os.startswith('mingw'):
         return 'Windows'
     if host_os.startswith('linux'):

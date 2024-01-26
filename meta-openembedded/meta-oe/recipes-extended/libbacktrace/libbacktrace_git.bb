@@ -23,5 +23,7 @@ do_configure() {
     oe_runconf
 }
 
+RDEPENDS:${PN}-dev = ""
+
 # libunwind does not support RISCV32 yet
 COMPATIBLE_HOST:riscv32 = "null"

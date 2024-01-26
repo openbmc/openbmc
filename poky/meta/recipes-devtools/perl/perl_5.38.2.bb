@@ -273,7 +273,7 @@ FILES:${PN} = "${bindir}/perl ${bindir}/perl.real ${bindir}/perl${PV} ${libdir}/
                ${libdir}/perl5/${PV}/ExtUtils/typemap \
                "
 RPROVIDES:${PN} += "perl-module-strict perl-module-vars perl-module-config perl-module-warnings \
-                    perl-module-warnings-register"
+                    perl-module-warnings-register perl-module-config-git"
 
 FILES:${PN}-staticdev:append = " ${libdir}/perl5/${PV}/*/CORE/libperl.a"
 
@@ -306,8 +306,8 @@ ALTERNATIVE_PRIORITY = "40"
 ALTERNATIVE:${PN}-doc = "Thread.3"
 ALTERNATIVE_LINK_NAME[Thread.3] = "${mandir}/man3/Thread.3"
 
-# Create a perl-modules package recommending all the other perl
-# packages (actually the non modules packages and not created too)
+# Create a perl-modules package that represents the collection of all the
+# other perl packages (actually the non modules packages and not created too).
 ALLOW_EMPTY:${PN}-modules = "1"
 PACKAGES += "${PN}-modules "
 
@@ -322,11 +322,13 @@ python split_perl_packages () {
     do_split_packages(d, libdir, r'.*linux/([^\/].*)\.(pm|pl|e2x)', '${PN}-module-%s', 'perl module %s', recursive=True, allow_dirs=False, match_path=True, prepend=False)
     do_split_packages(d, libdir, r'(^(?!(CPAN\/|CPANPLUS\/|Module\/|unicore\/|.*linux\/)[^\/]).*)\.(pm|pl|e2x)', '${PN}-module-%s', 'perl module %s', recursive=True, allow_dirs=False, match_path=True, prepend=False)
 
-    # perl-modules should recommend every perl module, and only the
+    # perl-modules should runtime-depend on every perl module, and only the
     # modules. Don't attempt to use the result of do_split_packages() as some
-    # modules are manually split (eg. perl-module-unicore).
-    packages = filter(lambda p: 'perl-module-' in p, d.getVar('PACKAGES').split())
-    d.setVar(d.expand("RRECOMMENDS:${PN}-modules"), ' '.join(packages))
+    # modules are manually split (eg. perl-module-unicore). Also, the split
+    # packages should not include packages defined in RPROVIDES:${PN}.
+    perl_sub_pkgs = d.getVar(d.expand("RPROVIDES:${PN}")).split()
+    packages = filter(lambda p: 'perl-module-' in p and p not in perl_sub_pkgs, d.getVar('PACKAGES').split())
+    d.setVar(d.expand("RDEPENDS:${PN}-modules"), ' '.join(packages))
 
     # Read the pre-generated dependency file, and use it to set module dependecies
     for line in open(d.expand("${WORKDIR}") + '/perl-rdepends.txt').readlines():
@@ -352,7 +354,8 @@ python() {
         d.setVar("PACKAGES_DYNAMIC", "^nativesdk-perl-module-.*")
 }
 
-RDEPENDS:${PN}-misc += "perl perl-modules"
+RDEPENDS:${PN}-misc += "perl"
+RRECOMMENDS:${PN}-misc += "perl-modules"
 RDEPENDS:${PN}-pod += "perl"
 
 BBCLASSEXTEND = "native nativesdk"

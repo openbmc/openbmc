@@ -18,3 +18,5 @@ RDEPENDS:${PN} += " \
     python3-tomllib \
     python3-xml \
 "
+
+BBCLASSEXTEND = "native nativesdk"

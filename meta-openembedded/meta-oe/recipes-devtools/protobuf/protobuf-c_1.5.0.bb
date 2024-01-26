@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d11077c6a2b5d2e64b9f32b61a9b78ba"
 
 DEPENDS = "protobuf-native protobuf"
 
-SRC_URI = "git://github.com/protobuf-c/protobuf-c.git;branch=next;protocol=https"
+SRC_URI = "git://github.com/protobuf-c/protobuf-c.git;branch=master;protocol=https"
 SRC_URI:append:class-native = " file://0001-Makefile.am-do-not-compile-the-code-which-was-genera.patch"
 
 SRCREV = "8c201f6e47a53feaab773922a743091eb6c8972a"

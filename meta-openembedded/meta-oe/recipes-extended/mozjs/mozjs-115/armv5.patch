@@ -1,0 +1,19 @@
+The ISB instruction isn't available in ARMv5 or v6, so
+guard it's use to fix the build on qemuarmv5.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/js/src/jit/arm/Architecture-arm.cpp b/js/src/jit/arm/Architecture-arm.cpp
+--- a/js/src/jit/arm/Architecture-arm.cpp	2024-01-18 17:31:32.078718197 +0000
++++ b/js/src/jit/arm/Architecture-arm.cpp	2024-01-18 18:00:16.738921445 +0000
+@@ -529,7 +529,9 @@
+ void FlushExecutionContext() {
+ #ifndef JS_SIMULATOR_ARM
++#if __ARM_ARCH >= 7
+   // Ensure that any instructions already in the pipeline are discarded and
+   // reloaded from the icache.
+   asm volatile("isb\n" : : : "memory");
++#endif
+ #else
+   // We assume the icache flushing routines on other platforms take care of this

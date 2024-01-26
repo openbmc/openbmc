@@ -77,7 +77,7 @@ exec_prefix = "${STAGING_DIR_NATIVE}${prefix_native}"
 
 bindir = "${STAGING_BINDIR_NATIVE}"
 sbindir = "${STAGING_SBINDIR_NATIVE}"
-base_libdir = "${STAGING_LIBDIR_NATIVE}"
+base_libdir = "${STAGING_BASE_LIBDIR_NATIVE}"
 libdir = "${STAGING_LIBDIR_NATIVE}"
 includedir = "${STAGING_INCDIR_NATIVE}"
 sysconfdir = "${STAGING_ETCDIR_NATIVE}"

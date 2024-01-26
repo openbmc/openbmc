@@ -1,4 +1,4 @@
-From e4c41db74b8972285cbdfe614c95c1ffd97d70e1 Mon Sep 17 00:00:00 2001
+From b47029e8e582d17c6874d2622fe1a5b834377dbb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 26 Mar 2021 11:59:43 -0700
 Subject: [PATCH] RISC-V: Restore the typcast to 64bit type
@@ -17,15 +17,16 @@ Cc: Daniel Kiper <daniel.kiper@oracle.com>
 Cc: Chester Lin <clin@suse.com>
 Cc: Nikita Ermakov <arei@altlinux.org>
 Cc: Alistair Francis <alistair.francis@wdc.com>
+
 ---
  util/grub-mkimagexx.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/util/grub-mkimagexx.c b/util/grub-mkimagexx.c
-index 00f49ccaa..ac677d03d 100644
+index e50b295..2f09255 100644
 --- a/util/grub-mkimagexx.c
 +++ b/util/grub-mkimagexx.c
-@@ -1242,7 +1242,7 @@ SUFFIX (relocate_addrs) (Elf_Ehdr *e, struct section_metadata *smd,
+@@ -1310,7 +1310,7 @@ SUFFIX (relocate_addrs) (Elf_Ehdr *e, struct section_metadata *smd,
  		  */
  
  		 sym_addr += addend;
@@ -34,6 +35,3 @@ index 00f49ccaa..ac677d03d 100644
  
  		 switch (ELF_R_TYPE (info))
  		   {
--- 
-2.31.1
-

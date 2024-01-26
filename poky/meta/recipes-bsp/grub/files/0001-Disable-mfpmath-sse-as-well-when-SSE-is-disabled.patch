@@ -1,4 +1,4 @@
-From 96d9aa55d29b24e2490d5647a9efc66940fc400f Mon Sep 17 00:00:00 2001
+From 006799e9c4babe8a8340a24501b253e759614a2d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 13 Jan 2016 19:17:31 +0000
 Subject: [PATCH] Disable -mfpmath=sse as well when SSE is disabled
@@ -24,15 +24,16 @@ Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Upstream-Status: Pending
+
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 7656f24..0868ea9 100644
+index cd667a2..8263876 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -824,7 +824,7 @@ fi
+@@ -846,7 +846,7 @@ fi
  if ( test "x$target_cpu" = xi386 || test "x$target_cpu" = xx86_64 ) && test "x$platform" != xemu; then
    # Some toolchains enable these features by default, but they need
    # registers that aren't set up properly in GRUB.
@@ -40,4 +41,4 @@ index 7656f24..0868ea9 100644
 +  TARGET_CFLAGS="$TARGET_CFLAGS -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow -mfpmath=387"
  fi
  
- # GRUB doesn't use float or doubles at all. Yet some toolchains may decide
+ if ( test "x$target_cpu" = xi386 || test "x$target_cpu" = xx86_64 ); then

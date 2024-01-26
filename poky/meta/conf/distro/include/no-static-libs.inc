@@ -21,11 +21,6 @@ DISABLE_STATIC:pn-libusb1-native = ""
 # needed by rust
 DISABLE_STATIC:pn-musl = ""
 
-# needed by shadow-native to build static executables, particularly useradd
-DISABLE_STATIC:pn-attr-native = ""
-DISABLE_STATIC:pn-libbsd-native = ""
-DISABLE_STATIC:pn-libmd-native = ""
-
 EXTRA_OECONF:append = "${DISABLE_STATIC}"
 
 EXTRA_OECMAKE:append:pn-libical = " -DSHARED_ONLY=True"

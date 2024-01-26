@@ -104,6 +104,7 @@ python () {
         # If we deltask do_patch, there's no dependency to ensure do_unpack gets run, so add one
         # Note that we cannot use d.appendVarFlag() here because deps is expected to be a list object, not a string
         d.setVarFlag('do_configure', 'deps', (d.getVarFlag('do_configure', 'deps', False) or []) + ['do_unpack'])
+        d.setVarFlag('do_populate_lic', 'deps', (d.getVarFlag('do_populate_lic', 'deps', False) or []) + ['do_unpack'])
 
         for task in d.getVar("SRCTREECOVEREDTASKS").split():
             if local_srcuri and task in fetch_tasks:

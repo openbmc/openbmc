@@ -22,6 +22,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-intervals \
     python3-ipy \
     python3-iso3166 \
+    python3-multidict \
     python3-parse-type \
     python3-platformdirs \
     python3-polyline \
@@ -71,7 +72,6 @@ PTESTS_PROBLEMS_META_PYTHON ="\
     python3-jsmin \
     python3-license-expression \
     python3-msgpack \
-    python3-multidict \
     python3-ordered-set \
     python3-parse \
     python3-pillow \

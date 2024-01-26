@@ -47,16 +47,6 @@ EXTRA_OECONF += "--without-libcrack \
 
 CFLAGS:append:libc-musl = " -DLIBBSD_OVERLAY"
 
-# Force static linking of utilities so we can use from the sysroot/sstate for useradd
-# without worrying about the dependency libraries being available
-LDFLAGS:append:class-native = " -no-pie"
-do_compile:prepend:class-native () {
-	sed -i -e 's#\(LIBS.*\)-lbsd#\1 ${STAGING_LIBDIR}/libbsd.a ${STAGING_LIBDIR}/libmd.a#g' \
-	       -e 's#\(LIBBSD.*\)-lbsd#\1 ${STAGING_LIBDIR}/libbsd.a ${STAGING_LIBDIR}/libmd.a#g' \
-	       -e 's#\(LIBATTR.*\)-lattr#\1 ${STAGING_LIBDIR}/libattr.a#g' \
-               ${B}/lib/Makefile ${B}/src/Makefile
-}
-
 NSCDOPT = ""
 NSCDOPT:class-native = "--without-nscd"
 NSCDOPT:class-nativesdk = "--without-nscd"
@@ -160,6 +150,20 @@ do_install:append() {
 	touch ${D}${sysconfdir}/subuid
 	touch ${D}${sysconfdir}/subgid
 }
+
+# Make executables look for dynamically linked libraries in a custom location, and install
+# the needed libraries there. That way we can use them from sstate
+# in setscene tasks without worrying about the dependency libraries being available.
+do_install:append:class-native() {
+        binaries=$(find ${D}${base_bindir}/ ${D}${base_sbindir}/ ${D}${bindir}/ ${D}${sbindir}/ -executable -type f)
+        chrpath -k -r ${STAGING_DIR_NATIVE}/lib-shadow-deps $binaries
+        mkdir -p ${D}${STAGING_DIR_NATIVE}/lib-shadow-deps/
+        install ${STAGING_LIBDIR_NATIVE}/libattr.so.* ${STAGING_LIBDIR_NATIVE}/libbsd.so.* ${STAGING_LIBDIR_NATIVE}/libmd.so.* ${D}${STAGING_DIR_NATIVE}/lib-shadow-deps/
+        install ${D}${libdir}/*.so.* ${D}${STAGING_DIR_NATIVE}/lib-shadow-deps/
+}
+
+SYSROOT_DIRS:append:class-native = " ${STAGING_DIR_NATIVE}/lib-shadow-deps/"
+INSANE_SKIP:${PN}:class-native = "already-stripped"
 
 PACKAGES =+ "${PN}-base"
 FILES:${PN}-base = "\
