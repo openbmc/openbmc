@@ -59,7 +59,92 @@
 			]
 		},
 		{
-			"group": "fan_fault",
+			"group": "fan0_fault",
+			"members": [
+				{
+					"Name": "fan_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				},
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
+		},
+		{
+			"group": "fan1_fault",
+			"members": [
+				{
+					"Name": "fan_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				},
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
+		},
+		{
+			"group": "fan2_fault",
+			"members": [
+				{
+					"Name": "fan_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				},
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
+		},
+		{
+			"group": "fan3_fault",
+			"members": [
+				{
+					"Name": "fan_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				},
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
+		},
+		{
+			"group": "fan4_fault",
+			"members": [
+				{
+					"Name": "fan_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				},
+				{
+					"Name": "fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000
+				}
+			]
+		},
+		{
+			"group": "fan5_fault",
 			"members": [
 				{
 					"Name": "fan_fault",
