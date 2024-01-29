@@ -37,6 +37,10 @@ export input_gpios_in_ac=(
 
 export output_high_gpios_in_bmc_reboot=(
     "bmc-vga-en-n"
+    "uart1-mode1"
+    "uart2-mode1"
+    "uart3-mode1"
+    "uart4-mode1"
 )
 
 export output_low_gpios_in_bmc_reboot=(

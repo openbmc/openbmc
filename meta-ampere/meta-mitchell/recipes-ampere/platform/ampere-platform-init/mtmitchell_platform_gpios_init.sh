@@ -70,6 +70,10 @@ export output_high_gpios_in_bmc_reboot=(
     "cpld-user-mode"
     "jtag-srst-n"
     "host0-shd-req-n"
+    "uart1-mode1"
+    "uart2-mode1"
+    "uart3-mode1"
+    "uart4-mode1"
 )
 
 export output_low_gpios_in_bmc_reboot=(
@@ -79,6 +83,10 @@ export output_low_gpios_in_bmc_reboot=(
     "led-fault"
     "spi-nor-access"
     "host0-special-boot"
+    "uart1-mode0"
+    "uart2-mode0"
+    "uart3-mode0"
+    "uart4-mode0"
 )
 
 export input_gpios_in_bmc_reboot=(
