@@ -32,7 +32,7 @@
                     "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan_fault"
+                    "/xyz/openbmc_project/led/groups/fan3_fault"
                 ]
             }
         ]
@@ -70,7 +70,7 @@
                     "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan_fault"
+                    "/xyz/openbmc_project/led/groups/fan4_fault"
                 ]
             }
         ]
@@ -108,7 +108,7 @@
                     "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan_fault"
+                    "/xyz/openbmc_project/led/groups/fan5_fault"
                 ]
             }
         ]
@@ -146,7 +146,7 @@
                     "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan_fault"
+                    "/xyz/openbmc_project/led/groups/fan6_fault"
                 ]
             }
         ]
@@ -184,7 +184,7 @@
                     "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan_fault"
+                    "/xyz/openbmc_project/led/groups/fan7_fault"
                 ]
             }
         ]
@@ -222,7 +222,7 @@
                     "fType": "fault_identifying"
                 },
                 "paths": [
-                    "/xyz/openbmc_project/led/groups/fan_fault"
+                    "/xyz/openbmc_project/led/groups/fan8_fault"
                 ]
             }
         ]
