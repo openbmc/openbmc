@@ -346,6 +346,17 @@
                 {
                     "types":
                     {
+                        "rType": "throttling",
+                        "fType": "throttled_by"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/control/host0/power_cap"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "chassis",
                         "fType": "all_sensors"
                     },
