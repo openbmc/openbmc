@@ -6,6 +6,10 @@ require conf/machine/include/nuvoton.inc
 require conf/machine/include/igps-keys.inc
 
 KERNEL_IMAGETYPE ?= "Image"
+
+KERNEL_IMAGETYPE:df-obmc-static-norootfs = "Image"
+KERNEL_IMAGETYPES:df-obmc-static-norootfs = "${KERNEL_IMAGETYPE}"
+
 KERNEL_EXTRA_ARGS ?= "UIMAGE_LOADADDR=0x00008000"
 
 UBOOT_MACHINE ?= "ArbelEVB_defconfig"
