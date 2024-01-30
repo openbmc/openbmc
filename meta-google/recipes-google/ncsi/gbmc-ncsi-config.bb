@@ -165,8 +165,9 @@ do_install:append() {
   install -m0755 ${WORKDIR}/gbmc-ncsi-smartnic-wa.sh ${D}${bindir}/
 
   if [ '${GBMC_NCSI_DHCP_IMPERSONATE_HOST}' != 1 ]; then
-    ln -sv /dev/null ${D}${systemd_system_unitdir}/dhcp6@.service
-    ln -sv /dev/null ${D}${systemd_system_unitdir}/dhcp4@.service
+    install -d -m0755  ${D}${sysconfdir}/systemd/system/
+    ln -sv /dev/null ${D}${sysconfdir}/systemd/system/dhcp6@.service
+    ln -sv /dev/null ${D}${sysconfdir}/systemd/system/dhcp4@.service
   fi
 }
 
