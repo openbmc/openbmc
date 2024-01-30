@@ -6,6 +6,9 @@ CONVERSION_CMD:fitImage = "run_assemble_fitimage ${IMAGE_NAME}.${type}"
 INITRAMFS_IMAGE="${IMAGE_NAME}.cpio.${INITRAMFS_CTYPE}"
 KERNEL_OUTPUT_DIR="${DEPLOY_DIR_IMAGE}"
 
+FIT_KERNEL_COMP_ALG ?= "none"
+FIT_KERNEL_COMP_ALG_EXTENSION ?= ""
+
 do_image_cpio[depends] += "virtual/kernel:do_deploy"
 
 run_assemble_fitimage() {
@@ -23,6 +26,16 @@ run_assemble_fitimage() {
 UBOOT_MKIMAGE_KERNEL_TYPE ?= "kernel"
 uboot_prep_kimage() {
     cp ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} linux.bin
+
+    if [ "${linux_comp}" != "none" ] ; then
+        linux_suffix="${FIT_KERNEL_COMP_ALG_EXTENSION}"
+        if [ "${linux_comp}" = "gzip" ] ; then
+            gzip -9 linux.bin
+        elif [ "${linux_comp}" = "lzo" ] ; then
+            lzop -9 linux.bin
+        fi
+        mv -f "linux.bin${linux_suffix}" linux.bin
+    fi
 }
 
 DEPENDS:append = " u-boot-tools-native dtc-native virtual/${TARGET_PREFIX}binutils"
