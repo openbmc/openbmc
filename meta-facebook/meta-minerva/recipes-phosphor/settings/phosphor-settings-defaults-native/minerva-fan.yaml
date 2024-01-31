@@ -1,0 +1,5 @@
+/xyz/openbmc_project/inventory/fan:
+- Interface: xyz.openbmc_project.Inventory.Item
+  Properties:
+    PrettyName:
+      Default: '"MINERVA CMM FAN LED"'

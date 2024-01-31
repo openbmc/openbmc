@@ -10,15 +10,19 @@ RDEPENDS:${PN} += "minerva-common-functions"
 SRC_URI += " \
     file://minerva-sys-init.service \
     file://minerva-early-sys-init \
+    file://minerva-fan-status-monitor \
+    file://minerva-fan-status-monitor.service \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " \
     minerva-sys-init.service \
+    minerva-fan-status-monitor.service \
     "
 
 do_install() {
     install -d ${D}${libexecdir}
     install -m 0755 ${WORKDIR}/minerva-early-sys-init ${D}${libexecdir}
+    install -m 0755 ${WORKDIR}/minerva-fan-status-monitor ${D}${libexecdir}
 }
 
