@@ -11,11 +11,29 @@ HOST_DEFAULT_TARGETS:remove:yosemite4 = " \
     obmc-host-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     "
 
+# In order to start the host, we need to ensure the chassis is on also.
+HOST_DEFAULT_TARGETS:append:yosemite4 = " \
+    obmc-host-start@{}.target.requires/obmc-chassis-poweron@{}.target \
+    "
+
+# When we issue a shutdown we need to "stop" the host also so that the
+# Host.CurrentHostState goes to "Off".
+HOST_DEFAULT_TARGETS:append:yosemite4 = " \
+    obmc-host-shutdown@{}.target.requires/obmc-host-stop@{}.target \
+    "
+
 CHASSIS_DEFAULT_TARGETS:remove:yosemite4 = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
     obmc-chassis-poweroff@{}.target.requires/obmc-power-stop@{}.service \
     obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
+    "
+
+# When we power off the host, we do not want to do a full chassis power-off
+# because that will turn off power to the compute card standby domain (and
+# we lose communication with the BIC.
+CHASSIS_DEFAULT_TARGETS:remove:yosemite4 = " \
+    obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     "
 
 SRC_URI:append:yosemite4 = " \
