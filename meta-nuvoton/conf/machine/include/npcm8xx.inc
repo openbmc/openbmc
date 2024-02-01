@@ -43,6 +43,7 @@ UBOOT_MKIMAGE:append:npcm8xx = " -E -B 8"
 
 COMPATIBLE_MACHINE:npcm8xx = "npcm8xx"
 TFA_PLATFORM = "npcm845x"
+PREFERRED_VERSION_trusted-firmware-a ?= "2.9.%"
 
 # Nuvoton prefers optee for BL32.
 TFA_SPD = "opteed"

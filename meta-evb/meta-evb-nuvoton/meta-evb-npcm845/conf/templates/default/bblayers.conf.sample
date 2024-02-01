@@ -13,6 +13,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-arm/meta-arm \
   ##OEROOT##/meta-arm/meta-arm-toolchain \
+  ##OEROOT##/meta-arm/meta-arm-bsp \
   ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-nuvoton/meta-evb-npcm845 \
   ##OEROOT##/meta-evb \
