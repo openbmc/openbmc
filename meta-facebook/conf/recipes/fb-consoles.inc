@@ -19,5 +19,6 @@ def fb_get_consoles(d):
     return " ".join(consoles[:hosts])
 
 OBMC_CONSOLE_TTYS = "${@fb_get_consoles(d)}"
+OBMC_CONSOLE_TTYS:fb-nohost = ""
 
 
