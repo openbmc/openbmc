@@ -1,0 +1,157 @@
+[
+    {
+        "Desc": {
+            "Config": "D-Bus",
+            "Type": "Maximum"
+        }
+    },
+    {
+        "Desc": {
+            "Name": "total_power",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/chassis"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "PSU0_PIN",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc": {
+                        "Name": "PSU1_PIN",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "(P1 > 0 ? P1:0) + (P2 > 0 ? P2:0)"
+    },
+    {
+        "Desc": {
+            "Name": "CPU0_Power",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/chassis"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "p0_power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc": {
+                        "Name": "p0_cache_power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "(P1 > 0 ? P1:0) + (P2 > 0 ? P2:0)"
+    },
+    {
+        "Desc": {
+            "Name": "CPU1_Power",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/chassis"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "p1_power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc": {
+                        "Name": "p1_cache_power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "(P1 > 0 ? P1:0) + (P2 > 0 ? P2:0)"
+    },
+    {
+        "Desc": {
+            "Name": "Altitude",
+            "SensorType": "altitude"
+        },
+        "Threshold": {
+            "WarningHigh": 3050
+        },
+        "Params": {
+            "ConstParam": [
+                {
+                    "ParamName": "P1",
+                    "Value": 227.933
+                }
+            ]
+        },
+        "Expression": "P1"
+    },
+    {
+        "Desc": {
+            "Name": "Ambient Virtual Temp",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "WarningHigh": 45,
+            "HardShutdownHigh": 58,
+            "SoftShutdownHigh": 53
+        },
+        "Params": {
+            "ConstParam": [
+                {
+                    "ParamName": "P1",
+                    "Value": 16
+                }
+            ]
+        },
+        "Expression": "P1"
+    },
+    {
+        "Desc": {
+            "Name": "Fan Rated Speed",
+            "SensorType": "fan_tach"
+        },
+        "Params": {
+            "ConstParam": [
+                {
+                    "ParamName": "P1",
+                    "Value": 24000
+                }
+            ]
+        },
+        "Expression": "P1"
+    }
+]
