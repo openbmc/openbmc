@@ -1,7 +1,6 @@
 OBMC_BMC_INSTANCES ??= "0"
 OBMC_CHASSIS_INSTANCES ??= "0"
 OBMC_HOST_INSTANCES ??= "0"
-OBMC_POWER_INSTANCES ??= "0"
 
 # obmc-bmc-state-manager
 #

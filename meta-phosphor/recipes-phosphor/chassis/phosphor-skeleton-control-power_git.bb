@@ -15,7 +15,7 @@ DBUS_SERVICE:${PN} += "org.openbmc.control.Power@.service"
 OBMC_CONTROL_INST = "org.openbmc.control.Power@{0}.service"
 OBMC_CONTROL_SVC = "org.openbmc.control.Power@.service"
 OBMC_CONTROL_FMT = "../${OBMC_CONTROL_SVC}:multi-user.target.wants/${OBMC_CONTROL_INST}"
-SYSTEMD_LINK:${PN} += "${@compose_list(d, 'OBMC_CONTROL_FMT', 'OBMC_POWER_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'OBMC_CONTROL_FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
 SYSTEMD_SERVICE:${PN} += " \
         phosphor-wait-power-on@.service \
@@ -35,5 +35,5 @@ OFF_INSTFMT = "phosphor-wait-power-off@{0}.service"
 OFF_FMT = "../${OFF_TMPL}:${STOP_TGTFMT}.requires/${OFF_INSTFMT}"
 
 # Build up requires relationship for START_TGTFMT and STOP_TGTFMT
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'ON_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'OFF_FMT', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'ON_FMT', 'OBMC_CHASSIS_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'OFF_FMT', 'OBMC_CHASSIS_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"

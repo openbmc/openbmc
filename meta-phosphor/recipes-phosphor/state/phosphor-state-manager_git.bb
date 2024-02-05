@@ -234,7 +234,7 @@ START_TMPL_CTRL = "obmc-chassis-poweron@.target"
 START_TGTFMT_CTRL = "obmc-host-startmin@{1}.target"
 START_INSTFMT_CTRL = "obmc-chassis-poweron@{0}.target"
 START_FMT_CTRL = "../${START_TMPL_CTRL}:${START_TGTFMT_CTRL}.requires/${START_INSTFMT_CTRL}"
-SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list_zip(d, 'START_FMT_CTRL', 'OBMC_POWER_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list_zip(d, 'START_FMT_CTRL', 'OBMC_CHASSIS_INSTANCES', 'OBMC_CHASSIS_INSTANCES')}"
 
 # Chassis off requires host off
 STOP_TMPL_CTRL = "obmc-host-stop@.target"
