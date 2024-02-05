@@ -2,21 +2,16 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 inherit obmc-phosphor-systemd
 
-# Disable obmc-console ssh ports.
-PACKAGECONFIG:remove:minerva = "ssh"
-
 OBMC_CONSOLE_HOST_TTY = "ttyS5"
-OBMC_CONSOLE_TTYS = "ttyS5"
 
-SRC_URI:append:minerva = " \
-    file://server.ttyS5.conf \
+SRC_URI:append = " \
     file://80-minerva-obmc-console-uart.rules \
     file://select-uart-mux \
 "
 
-RDEPENDS:${PN}:append:minerva = " bash"
+RDEPENDS:${PN}:append = " bash"
 
-do_install:append:minerva() {
+do_install:append() {
 
     # Replace upstream-provided udev rules
     install -d ${D}/${nonarch_base_libdir}/udev/rules.d
