@@ -12,6 +12,7 @@ RDEPENDS:${PN}-extras:append = " \
         phosphor-host-postd \
         libmctp \
         pldm \
+        tzdata-core \
         "
 
 RDEPENDS:${PN}-devtools:append = " \
