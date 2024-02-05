@@ -11,12 +11,6 @@ HOST_DEFAULT_TARGETS:remove:yosemite4 = " \
     obmc-host-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     "
 
-# When we issue a shutdown we need to "stop" the host also so that the
-# Host.CurrentHostState goes to "Off".
-HOST_DEFAULT_TARGETS:append:yosemite4 = " \
-    obmc-host-shutdown@{}.target.requires/obmc-host-stop@{}.target \
-    "
-
 CHASSIS_DEFAULT_TARGETS:remove:yosemite4 = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
