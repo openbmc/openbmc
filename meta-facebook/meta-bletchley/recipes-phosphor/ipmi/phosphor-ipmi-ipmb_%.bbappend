@@ -1,1 +1,1 @@
-IPMB_CHANNELS:bletchley = "/dev/ipmb-13"
+IPMB_CHANNELS = "/dev/ipmb-13"

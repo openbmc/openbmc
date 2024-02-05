@@ -1,5 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG:append:tiogapass = " \
+PACKAGECONFIG:append = " \
         intelcpusensor \
         "

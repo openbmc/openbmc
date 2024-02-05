@@ -1,4 +1,4 @@
-IPMB_CHANNELS:greatlakes = "\
+IPMB_CHANNELS = "\
     /dev/ipmb-0 \
     /dev/ipmb-1 \
     /dev/ipmb-2 \

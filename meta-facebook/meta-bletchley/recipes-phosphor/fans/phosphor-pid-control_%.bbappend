@@ -1,9 +1,9 @@
-FILESEXTRAPATHS:prepend:bletchley := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-FILES:${PN}:append:bletchley = " ${datadir}/swampd"
-FILES:${PN}:append:bletchley = " ${systemd_system_unitdir}/phosphor-pid-control.service.d/*.conf"
+FILES:${PN}:append = " ${datadir}/swampd"
+FILES:${PN}:append = " ${systemd_system_unitdir}/phosphor-pid-control.service.d/*.conf"
 
-do_install:append:bletchley() {
+do_install:append() {
 
     override_dir="${D}${systemd_system_unitdir}/phosphor-pid-control.service.d"
     override_file="${override_dir}/10-bletchley.conf"

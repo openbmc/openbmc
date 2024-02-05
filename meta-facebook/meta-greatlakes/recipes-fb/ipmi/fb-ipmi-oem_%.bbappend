@@ -1,1 +1,1 @@
-EXTRA_OEMESON:append:greatlakes=" -Dpost-code-bytes=${POST_CODE_BYTES}"
+EXTRA_OEMESON:append =" -Dpost-code-bytes=${POST_CODE_BYTES}"

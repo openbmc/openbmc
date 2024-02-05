@@ -1,9 +1,9 @@
-FILESEXTRAPATHS:prepend:harma := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append:harma = " \
+SRC_URI:append = " \
     file://blacklist.json \
     "
 
-do_install:append:harma () {
+do_install:append() {
     install -m 0644 -D ${WORKDIR}/blacklist.json ${D}${datadir}/${PN}/blacklist.json
 }

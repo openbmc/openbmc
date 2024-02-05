@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG:harma = " \
+PACKAGECONFIG = " \
     adcsensor \
     hwmontempsensor \
     psusensor \

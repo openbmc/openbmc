@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG:minerva = " \
+PACKAGECONFIG = " \
     adcsensor \
     fansensor \
     hwmontempsensor \

@@ -11,7 +11,7 @@ SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
             file://slot-hot-plug@.service \
             "
 
-RDEPENDS:${PN}:append:yosemite4 = " bash"
+RDEPENDS:${PN}:append = " bash"
 
 FILES:${PN} += "${systemd_system_unitdir}/*"
 

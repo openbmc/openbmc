@@ -1,10 +1,10 @@
 FILESEXTRAPATHS:prepend:= "${THISDIR}/${PN}:"
-SRC_URI:append:yosemite4 = " file://config.json \
+SRC_URI:append = " file://config.json \
                            "
 
-FILES:${PN}:append:yosemite4 = " ${datadir}/swampd/config.json"
+FILES:${PN}:append = " ${datadir}/swampd/config.json"
 
-do_install:append:yosemite4() {
+do_install:append() {
     install -d ${D}${datadir}/swampd
     install -m 0644 -D ${WORKDIR}/config.json ${D}${datadir}/swampd/config.json
 }

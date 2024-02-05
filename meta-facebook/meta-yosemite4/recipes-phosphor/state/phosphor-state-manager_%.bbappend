@@ -4,14 +4,14 @@ EXTRA_OEMESON:append = " \
                          -Dwarm-reboot=enabled \
                        "
 
-PACKAGECONFIG:remove:yosemite4 = "only-run-apr-on-power-loss"
+PACKAGECONFIG:remove = "only-run-apr-on-power-loss"
 
-HOST_DEFAULT_TARGETS:remove:yosemite4 = " \
+HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.target \
     obmc-host-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     "
 
-CHASSIS_DEFAULT_TARGETS:remove:yosemite4 = " \
+CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
     obmc-chassis-poweroff@{}.target.requires/obmc-power-stop@{}.service \
@@ -21,11 +21,11 @@ CHASSIS_DEFAULT_TARGETS:remove:yosemite4 = " \
 # When we power off the host, we do not want to do a full chassis power-off
 # because that will turn off power to the compute card standby domain (and
 # we lose communication with the BIC.
-CHASSIS_DEFAULT_TARGETS:remove:yosemite4 = " \
+CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     "
 
-SRC_URI:append:yosemite4 = " \
+SRC_URI:append = " \
     file://chassis-poweroff@.service \
     file://chassis-poweron@.service \
     file://chassis-powercycle@.service \
@@ -44,9 +44,9 @@ SRC_URI:append:yosemite4 = " \
     file://wait-until-mctp-connection-done \
     "
 
-RDEPENDS:${PN}:append:yosemite4 = " bash"
+RDEPENDS:${PN}:append = " bash"
 
-do_install:append:yosemite4() {
+do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
 

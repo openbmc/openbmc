@@ -19,7 +19,7 @@ SRC_URI += "file://plat-phosphor-multi-gpio-monitor.json \
             file://deassert-reset-button \
             "
 
-RDEPENDS:${PN}:append:harma = " bash"
+RDEPENDS:${PN}:append = " bash"
 
 FILES:${PN} += "${systemd_system_unitdir}/*"
 
@@ -56,4 +56,4 @@ do_install:append:() {
     install -m 0755 ${WORKDIR}/deassert-power-good ${D}${libexecdir}/${PN}/
 }
 
-SYSTEMD_OVERRIDE:${PN}-monitor:harma += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"
+SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"

@@ -1,4 +1,4 @@
-IPMB_CHANNELS:yosemitev2 = "\
+IPMB_CHANNELS = "\
     /dev/ipmb-1 \
     /dev/ipmb-3 \
     /dev/ipmb-5 \

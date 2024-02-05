@@ -1,7 +1,7 @@
-FILESEXTRAPATHS:prepend:minerva := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append:minerva = " file://led-group-config.json"
+SRC_URI:append = " file://led-group-config.json"
 
-do_install:append:minerva() {
+do_install:append() {
         install -m 0644 ${WORKDIR}/led-group-config.json ${D}${datadir}/phosphor-led-manager/
 }

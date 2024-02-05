@@ -27,4 +27,4 @@ do_install() {
     install -m 0755 ${WORKDIR}/bletchley-host-state-monitor ${D}${libexecdir}
 }
 
-SYSTEMD_OVERRIDE:${PN}:bletchley += "bletchley-sys-init.conf:bletchley-sys-init.service.d/bletchley-sys-init.conf"
+SYSTEMD_OVERRIDE:${PN} += "bletchley-sys-init.conf:bletchley-sys-init.service.d/bletchley-sys-init.conf"

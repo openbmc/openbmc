@@ -1,10 +1,10 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append:harma = " \
+SRC_URI:append = " \
     file://00-bmc-usb0.network \
     "
 
-FILES:${PN}:append:harma = " ${systemd_unitdir}/network/00-bmc-usb0.network"
+FILES:${PN}:append = " ${systemd_unitdir}/network/00-bmc-usb0.network"
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/network/
