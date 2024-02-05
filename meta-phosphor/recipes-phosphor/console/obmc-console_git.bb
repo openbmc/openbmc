@@ -36,7 +36,9 @@ do_install:append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
 
-        install -m 0644 ${WORKDIR}/dropbear.env ${D}${sysconfdir}/${BPN}/
+        if ${@bb.utils.contains('PACKAGECONFIG', 'ssh', 'true', 'false', d)} ; then
+                install -m 0644 ${WORKDIR}/dropbear.env ${D}${sysconfdir}/${BPN}/
+        fi
 
         # If the OBMC_CONSOLE_TTYS variable is used without the default OBMC_CONSOLE_HOST_TTY
         # the port specific config file should be provided. If it is just OBMC_CONSOLE_HOST_TTY,
@@ -80,7 +82,7 @@ FILES:${PN} += "${systemd_system_unitdir}"
 
 TARGET_CFLAGS += "-fpic -O2"
 
-REGISTERED_SERVICES:${PN} += "obmc_console:tcp:2200:"
+REGISTERED_SERVICES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'ssh', 'obmc_console:tcp:2200:', '', d)}"
 OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
 # Support multiple TTY ports using space separated list.
 # Ex. OBMC_CONSOLE_TTYS = "ttyS1 ttyS2"
