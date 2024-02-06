@@ -75,18 +75,21 @@ require conf/distro/include/yocto-uninative.inc
 DISTRO_NAME ?= "Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro)"
 TARGET_VENDOR="-openbmc"
 
+
 VIRTUAL-RUNTIME_keymaps = ""
 
 # Phosphor OpenBMC uses systemd and udev
-VIRTUAL-RUNTIME_init_manager = "systemd"
-VIRTUAL-RUNTIME_initscripts = ""
+INIT_MANAGER = "systemd"
+# systemd doesn't like us using /home/root instead of /root but we've been
+# doing it a long time.  The `INIT_MANAGER = systemd` switches the default to
+# /root, but we should switch it back (and maybe adjust in another commit).
+ROOT_HOME = "/home/root"
 
 DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
         bluez5 \
         ldconfig \
         gobject-introspection-data \
         pulseaudio \
-        sysvinit \
         "
 
 DISTRO_FEATURES_OBMC = " \
@@ -105,9 +108,7 @@ DISTRO_FEATURES_DEFAULT = " \
         pam \
         security \
         slp \
-        systemd \
         seccomp \
-        usrmerge \
         "
 
 DISTRO_FEATURES += " \
