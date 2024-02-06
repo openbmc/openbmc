@@ -9,15 +9,15 @@ if [ -z "$registry" ]; then
 	exit
 fi
 
-# Check if logger-systemd exist. Do nothing if not exists
-if ! command -v logger-systemd;
+# Check if logger exist. Do nothing if not exists
+if ! logger --help | grep journald
 then
-	echo "logger-systemd does not exist. Skip log events for $registry $msgarg"
+	echo "logger does not support the journald option. Skip log events for $registry $msgarg"
 	exit
 fi
 
 # Log events
-logger-systemd --journald << EOF
+logger --journald << EOF
 MESSAGE=
 PRIORITY=
 SEVERITY=

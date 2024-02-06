@@ -122,7 +122,7 @@ function set_boot_progress()
 
 function log_redfish_biosboot_ok_event()
 {
-	logger-systemd --journald << EOF
+	logger --journald << EOF
 MESSAGE=
 PRIORITY=2
 SEVERITY=
@@ -135,7 +135,7 @@ function log_redfish_bios_panic_event()
 {
 	boot_state_str=$(get_boot_stage_string "$1" "$2")
 
-	logger-systemd --journald << EOF
+	logger --journald << EOF
 MESSAGE=
 PRIORITY=2
 SEVERITY=

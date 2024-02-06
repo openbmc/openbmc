@@ -16,7 +16,7 @@ function log_ampere_oem_redfish_event()
 	msgArgs1=$5
 	msgArgs2=$6
 
-logger-systemd --journald << EOF
+logger --journald << EOF
 MESSAGE=${msg}
 PRIORITY=${priority}
 SEVERITY=${severity}
