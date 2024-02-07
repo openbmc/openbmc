@@ -42,7 +42,6 @@ RDEPENDS:${PN}:append = " \
   bash \
   dhcp-done \
   gbmc-ip-monitor \
-  mstpd-mstpd \
   network-sh \
   ndisc6-rdisc6 \
   nftables-systemd \
