@@ -5,13 +5,14 @@ inherit meson pkgconfig systemd
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[libpeci] = "-Dlibpeci=enabled,-Dlibpeci=disabled"
 PACKAGECONFIG[crashdump] = "-Dcrashdump=enabled,-Dcrashdump=disabled"
+PACKAGECONFIG[send-to-logger] = "-Dsend-to-logger=enabled,-Dsend-to-logger=disabled"
 
 SRC_URI = "git://github.com/openbmc/host-error-monitor;branch=master;protocol=https"
 
 DEPENDS = "boost sdbusplus libgpiod libpeci"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "58fa67cb3c299c3c3d82e847ecd109655043c279"
+SRCREV = "97b5ef20b4c2968503ccc0d3dd2d49b2b192f2f2"
 
 S = "${WORKDIR}/git"
 
