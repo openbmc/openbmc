@@ -1,6 +1,7 @@
 PACKAGECONFIG:p10bmc = " \
     hwmontempsensor \
     adcsensor \
+    nvmesensor \
     "
 
 PACKAGECONFIG:genesis3 = " \
