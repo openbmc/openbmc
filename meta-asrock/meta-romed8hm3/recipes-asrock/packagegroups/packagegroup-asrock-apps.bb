@@ -26,4 +26,5 @@ RDEPENDS:${PN}-system = " \
         phosphor-ipmi-kcs \
         phosphor-post-code-manager \
         phosphor-power-regulators \
+        phosphor-software-manager \
         "
