@@ -9,7 +9,7 @@ PACKAGECONFIG[send-to-logger] = "-Dsend-to-logger=enabled,-Dsend-to-logger=disab
 
 SRC_URI = "git://github.com/openbmc/host-error-monitor;branch=master;protocol=https"
 
-DEPENDS = "boost sdbusplus libgpiod libpeci"
+DEPENDS = "boost sdbusplus libgpiod libpeci phosphor-dbus-interfaces"
 
 PV = "0.1+git${SRCPV}"
 SRCREV = "97b5ef20b4c2968503ccc0d3dd2d49b2b192f2f2"
