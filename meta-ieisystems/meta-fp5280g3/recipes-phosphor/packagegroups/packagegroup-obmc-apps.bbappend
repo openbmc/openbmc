@@ -12,7 +12,6 @@ RDEPENDS:${PN}-extras:append = " \
         phosphor-host-postd \
         phosphor-virtual-sensor \
         libmctp \
-        pldm \
         tzdata-core \
         "
 
