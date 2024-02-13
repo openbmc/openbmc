@@ -7,10 +7,6 @@ SYSTEMD_SERVICE:${PN}:remove = " \
                                "
 SRC_URI:remove = "file://pldm-softpoweroff"
 
-EXTRA_OEMESON:append = " \
-                        -Dtransport-implementation=af-mctp \
-                       "
-
 do_install:append() {
     install -d ${D}/${datadir}/pldm
     install ${WORKDIR}/host_eid ${D}/${datadir}/pldm/
