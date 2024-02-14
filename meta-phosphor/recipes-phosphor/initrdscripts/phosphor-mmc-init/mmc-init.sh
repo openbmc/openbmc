@@ -60,6 +60,10 @@ fi
 udevd --daemon
 udevadm trigger --type=devices --action=add
 udevadm settle --timeout=10
+# The real udevd will be started a bit later by systemd-udevd.service
+# so kill the one we started above now that we have the needed
+# devices loaded
+udevadm control --exit
 
 mkdir -p $rodir
 if ! mount /dev/disk/by-partlabel/"$(kgetopt root=PARTLABEL)" $rodir -t ext4 -o ro; then
