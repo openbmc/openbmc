@@ -24,7 +24,6 @@ SYSTEMD_SERVICE:${PN} += " \
   "
 
 DEPENDS += " \
-  fmt \
   sdbusplus \
   stdplus \
   "
