@@ -3,7 +3,6 @@ DESCRIPTION = "Phosphor OpenBMC KCS to DBUS."
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b1beb00e508e89da1ed2a541934f28c0"
 DEPENDS += " \
-        fmt \
         sdbusplus \
         sdeventplus \
         stdplus \
