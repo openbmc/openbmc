@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Provide source directive to shellcheck.
-# shellcheck source=meta-facebook/recipes-phosphor/state/phosphor-state-manager/greatlakes/power-cmd
+# shellcheck source=meta-facebook/meta-greatlakes/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
 SLOT_ID="$1"
