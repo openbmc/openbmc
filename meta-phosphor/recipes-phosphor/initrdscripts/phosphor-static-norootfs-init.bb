@@ -19,6 +19,8 @@ SRC_URI += "\
 
 S = "${WORKDIR}"
 
+NOROOTFS_PERSISTENT_DIRS = "var etc ${@ d.getVar('ROOT_HOME')[1:]}"
+
 inherit allarch
 inherit update-alternatives
 
@@ -31,6 +33,14 @@ do_install() {
     for f in ${SOURCE_FILES} ; do
         install -m 0755 ${S}/$f ${D}${PKG_INSTALL_DIR}/$f
     done
+
+    # Create persistent mount points and add to mount script.
+    for mountpoint in ${NOROOTFS_PERSISTENT_DIRS} ; do
+        mkdir -p ${D}/$mountpoint
+        touch ${D}/$mountpoint/.keep.mount-persistent
+    done
+    sed -i "s#@NOROOTFS_PERSISTENT_DIRS@#${NOROOTFS_PERSISTENT_DIRS}#" \
+        ${D}${PKG_INSTALL_DIR}/50-mount-persistent
 }
 
 RDEPENDS:${PN} += " \
@@ -40,6 +50,8 @@ RDEPENDS:${PN} += " \
     mtd-utils-ubifs \
     udev \
 "
+
+FILES:${PN}:append = " ${@ " ".join([ '/' + x + '/.keep.mount-persistent' for x in d.getVar('NOROOTFS_PERSISTENT_DIRS').split() ])}"
 
 ALTERNATIVE_LINK_NAME[init] = "${base_sbindir}/init"
 # Use a number higher than the systemd init alternative so that

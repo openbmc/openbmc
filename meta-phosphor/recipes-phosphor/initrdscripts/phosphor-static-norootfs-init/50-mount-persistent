@@ -6,7 +6,8 @@ if [ ! -d $PERSIST ]; then
     exit 0
 fi
 
-for m in var etc home/root; do
+# shellcheck disable=SC2043 # @@ pattern will be replaced by recipe
+for m in @NOROOTFS_PERSISTENT_DIRS@; do
     if [ ! -d $PERSIST/$m-data ]; then
         mkdir -p $PERSIST/$m-data
     fi
