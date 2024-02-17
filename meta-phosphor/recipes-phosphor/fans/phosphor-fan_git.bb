@@ -90,8 +90,8 @@ SYSTEMD_LINK:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 SYSTEMD_LINK:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
                                 compose_list(d, 'FMT_MONITOR_MUSR', 'OBMC_CHASSIS_ZERO_ONLY'), \
                                 compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_ZERO_ONLY'), d)}"
-SYSTEMD_SERVICE:sensor-monitor += "sensor-monitor.service"
-SYSTEMD_LINK:sensor-monitor += "../sensor-monitor.service:${MULTI_USR_TGT}.wants/sensor-monitor.service"
+SYSTEMD_SERVICE:${PN}-sensor-monitor += "sensor-monitor.service"
+SYSTEMD_LINK:${PN}-sensor-monitor += "../sensor-monitor.service:${MULTI_USR_TGT}.wants/sensor-monitor.service"
 
 inherit meson pkgconfig python3native
 inherit obmc-phosphor-systemd
@@ -114,7 +114,7 @@ FILES:${PN}-monitor = "${bindir}/phosphor-fan-monitor"
 # Package the JSON config files installed from the repo
 FILES:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
     '${datadir}/phosphor-fan-presence/monitor/*', '', d)}"
-FILES:sensor-monitor += " ${bindir}/sensor-monitor"
+FILES:${PN}-sensor-monitor += " ${bindir}/sensor-monitor"
 
 require ${BPN}.inc
 
@@ -153,4 +153,3 @@ FMT_MONITOR_MUSR = "../${TMPL_MONITOR}:${MULTI_USR_TGT}.wants/${INSTFMT_MONITOR}
 TMPL_MONITOR_INIT = "phosphor-fan-monitor-init@.service"
 INSTFMT_MONITOR_INIT = "phosphor-fan-monitor-init@{0}.service"
 FMT_MONITOR_INIT = "../${TMPL_MONITOR_INIT}:${POWERON_TGT}.wants/${INSTFMT_MONITOR_INIT}"
-FAN_PACKAGES:append = "${@bb.utils.contains('PACKAGECONFIG', 'sensor-monitor', ' sensor-monitor', '', d)}"
