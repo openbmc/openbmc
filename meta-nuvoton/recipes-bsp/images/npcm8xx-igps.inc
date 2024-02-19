@@ -15,7 +15,7 @@ DEST = "${D}${datadir}/${BPN}"
 
 # Adjust paths for use with bitbake
 do_patch() {
-	sed -i -e 's,inputs/,,g' ${S}/py_scripts/ImageGeneration/references/*.xml \
+	sed -i -e 's,output_binaries/tmp/,,g' ${S}/py_scripts/ImageGeneration/references/*.xml \
 		${S}/py_scripts/ImageGeneration/inputs/*.xml
 }
 
