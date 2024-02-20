@@ -11,7 +11,8 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {
@@ -20,6 +21,6 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-threading \
+    python3-numbers \
+    python3-threading \
     "

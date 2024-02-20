@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/symless/synergy-core;protocol=https;nobranch=1"
 
 # Version 1.10.1-stable
 SRCREV ?= "1b4c076127687aceac931d269e898beaac1cad9f"
-PV = "1.10.1+git${SRCPV}"
+PV = "1.10.1+git"
 
 S = "${WORKDIR}/git"
 

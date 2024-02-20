@@ -268,11 +268,15 @@ class SStateCacheManagement(SStateBase):
         self.assertTrue(global_config)
         self.assertTrue(target_config)
         self.assertTrue(len(global_config) == len(target_config), msg='Lists global_config and target_config should have the same number of elements')
-        self.config_sstate(temp_sstate_location=True, add_local_mirrors=[self.sstate_path])
 
-        # If buildhistory is enabled, we need to disable version-going-backwards
-        # QA checks for this test. It may report errors otherwise.
-        self.append_config('ERROR_QA:remove = "version-going-backwards"')
+        for idx in range(len(target_config)):
+            self.append_config(global_config[idx])
+            self.append_recipeinc(target, target_config[idx])
+            bitbake(target)
+            self.remove_config(global_config[idx])
+            self.remove_recipeinc(target, target_config[idx])
+
+        self.config_sstate(temp_sstate_location=True, add_local_mirrors=[self.sstate_path])
 
         # For now this only checks if random sstate tasks are handled correctly as a group.
         # In the future we should add control over what tasks we check for.
@@ -923,7 +927,7 @@ class SStateMirrors(SStateBase):
                 else:
                     missing_objects -= 1
 
-            if "urlopen failed for" in l:
+            if "urlopen failed for" in l and not is_exception(l, exceptions):
                 failed_urls_extrainfo.append(l)
 
         self.assertEqual(len(failed_urls), missing_objects, "Amount of reported missing objects does not match failed URLs: {}\nFailed URLs:\n{}\nFetcher diagnostics:\n{}".format(missing_objects, "\n".join(failed_urls), "\n".join(failed_urls_extrainfo)))

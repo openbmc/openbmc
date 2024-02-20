@@ -78,6 +78,7 @@ https?://downloads.yoctoproject.org/mirror/sources/ https://mirrors.kernel.org/y
 MIRRORS += "\
 git://salsa.debian.org/.*     git://salsa.debian.org/PATH;protocol=https \
 git://git.gnome.org/.*        git://gitlab.gnome.org/GNOME/PATH;protocol=https \
+git://git.infradead.org/.*    git://git.infraroot.at/PATH;protocol=https \
 git://.*/.*                   git://HOST/PATH;protocol=https \
 git://.*/.*                   git://HOST/git/PATH;protocol=https \
 "
@@ -92,6 +93,8 @@ BB_GIT_SHALLOW:pn-binutils-crosssdk-${SDK_SYS} = "1"
 BB_GIT_SHALLOW:pn-binutils-native = "1"
 BB_GIT_SHALLOW:pn-nativesdk-binutils = "1"
 
+BB_GIT_SHALLOW:pn-cross-localedef-native = "1"
 BB_GIT_SHALLOW:pn-glibc = "1"
+BB_GIT_SHALLOW:pn-glibc-tests = "1"
 PREMIRRORS += "git://sourceware.org/git/glibc.git https://downloads.yoctoproject.org/mirror/sources/ \
               git://sourceware.org/git/binutils-gdb.git https://downloads.yoctoproject.org/mirror/sources/"

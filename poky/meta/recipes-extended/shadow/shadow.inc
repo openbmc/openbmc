@@ -74,6 +74,7 @@ PACKAGECONFIG[acl] = "--with-acl,--without-acl,acl"
 PACKAGECONFIG[audit] = "--with-audit,--without-audit,audit"
 PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux libsemanage"
 PACKAGECONFIG[libbsd] = "--with-libbsd,--without-libbsd,libbsd"
+PACKAGECONFIG[logind] = "--enable-logind,--disable-logind,systemd"
 
 RDEPENDS:${PN} = "shadow-securetty \
                   base-passwd \

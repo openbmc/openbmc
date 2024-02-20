@@ -128,4 +128,6 @@ PACKAGE_BEFORE_PN += "${PN}-loadable"
 RDEPENDS:${PN}-loadable += "${PN}"
 FILES:${PN}-loadable += "${libdir}/bash/*"
 
-RPROVIDES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh /bin/bash', '', d)}"
+# Limit the RPROVIDES here to class target so that if usrmerge is enabled for nativesdk, it does not
+# include host system paths in /bin/
+RPROVIDES:${PN}:append:class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh /bin/bash', '', d)}"

@@ -12,9 +12,9 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-unittest-automake-output \
-	${PYTHON_PN}-unixadmin \
+	python3-pytest \
+	python3-unittest-automake-output \
+	python3-unixadmin \
 "
 
 do_install_ptest() {
@@ -22,6 +22,6 @@ do_install_ptest() {
 	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
 }
 
-RDEPENDS:${PN} = "${PYTHON_PN}-misc"
+RDEPENDS:${PN} = "python3-misc"
 
 BBCLASSEXTEND = "native nativesdk"

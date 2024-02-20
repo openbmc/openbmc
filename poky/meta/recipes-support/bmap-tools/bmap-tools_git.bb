@@ -24,7 +24,7 @@ PV = "${BASEVER}+git"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
 # Need df from coreutils
-RDEPENDS:${PN} = "python3-core python3-compression python3-mmap python3-setuptools python3-fcntl python3-six coreutils"
+RDEPENDS:${PN} = "python3-core python3-compression python3-misc python3-mmap python3-setuptools python3-fcntl python3-six coreutils"
 
 inherit setuptools3
 

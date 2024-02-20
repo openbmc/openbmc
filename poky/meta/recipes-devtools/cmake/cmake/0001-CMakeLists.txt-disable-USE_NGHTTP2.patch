@@ -1,4 +1,4 @@
-From 3fd6082c52a8140db5995afb59fb391f7d5c19d7 Mon Sep 17 00:00:00 2001
+From d33d8a5e9f3b25a80d47b72b1a8a6624a85563c1 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Wed, 28 Dec 2022 17:51:27 +0800
 Subject: [PATCH] CMakeLists.txt: disable USE_NGHTTP2
@@ -9,17 +9,21 @@ dependency, disable nghttp2.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Adjust the patch to apply on top of v3.28.3.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
  Utilities/cmcurl/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Utilities/cmcurl/CMakeLists.txt b/Utilities/cmcurl/CMakeLists.txt
-index f842270b..17b1ce19 100644
+index 9387247366..d3de01f4e8 100644
 --- a/Utilities/cmcurl/CMakeLists.txt
 +++ b/Utilities/cmcurl/CMakeLists.txt
-@@ -68,7 +68,7 @@ set(ENABLE_UNIX_SOCKETS OFF CACHE INTERNAL "No curl Unix domain sockets support"
- set(HTTP_ONLY OFF CACHE INTERNAL "Curl is not http-only")
+@@ -88,7 +88,7 @@ set(HTTP_ONLY OFF CACHE INTERNAL "Curl is not http-only")
  set(PICKY_COMPILER OFF CACHE INTERNAL "Enable picky compiler options")
+ set(SHARE_LIB_OBJECT OFF)
  set(USE_LIBIDN2 ON)
 -set(USE_NGHTTP2 ON)
 +set(USE_NGHTTP2 OFF)
@@ -27,5 +31,5 @@ index f842270b..17b1ce19 100644
  set(USE_QUICHE OFF)
  set(USE_WIN32_IDN OFF)
 -- 
-2.25.1
+2.43.0
 

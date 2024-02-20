@@ -1,0 +1,51 @@
+From 5c73e53997df800a742f9cd7355f3045861984bb Mon Sep 17 00:00:00 2001
+From: Frederic Konrad <fkonrad@amd.com>
+Date: Thu, 18 Jan 2024 10:43:44 +0000
+Subject: [PATCH 2/2] linux-user/*: workaround for missing MAP_SHARED_VALIDATE
+
+QEMU v8.1.0 recently requires MAP_SHARED_VALIDATE flags implementation for mmap.
+
+This is missing from the Ubuntu 18.04 compiler but looks like to be in the
+kernel source.
+
+Signed-off-by: Frederic Konrad <fkonrad@amd.com>
+Signed-off-by: Francisco Iglesias <francisco.iglesias@amd.com>
+
+Upstream-Status: Inappropriate [OE specific]
+
+The upstream only supports the last two major releases of an OS.  The ones
+they have declared all have kernel 4.17 or newer.
+
+See:
+https://xilinx.slack.com/archives/D04G2647CTV/p1705074697942019
+
+https://www.qemu.org/docs/master/about/build-platforms.html
+
+ The project aims to support the most recent major version at all times for up
+ to five years after its initial release. Support for the previous major
+ version will be dropped 2 years after the new major version is released or
+ when the vendor itself drops support, whichever comes first.
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ linux-user/mmap-fixed.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/linux-user/mmap-fixed.h b/linux-user/mmap-fixed.h
+index ef6eef5114..ec86586c1f 100644
+--- a/linux-user/mmap-fixed.h
++++ b/linux-user/mmap-fixed.h
+@@ -26,6 +26,10 @@
+ #ifndef MMAP_FIXED_H
+ #define MMAP_FIXED_H
+ 
++#ifndef MAP_SHARED_VALIDATE
++#define MAP_SHARED_VALIDATE 0x03
++#endif
++
+ #ifndef MAP_FIXED_NOREPLACE
+ #define MAP_FIXED_NOREPLACE 0x100000
+ 
+-- 
+2.34.1
+

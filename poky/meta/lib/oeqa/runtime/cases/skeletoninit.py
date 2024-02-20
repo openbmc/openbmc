@@ -17,7 +17,7 @@ class SkeletonBasicTest(OERuntimeTestCase):
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['service'])
     @skipIfDataVar('VIRTUAL-RUNTIME_init_manager', 'systemd',
-                   'Not appropiate for systemd image')
+                   'Not appropriate for systemd image')
     def test_skeleton_availability(self):
         status, output = self.target.run('ls /etc/init.d/skeleton')
         msg = 'skeleton init script not found. Output:\n%s' % output

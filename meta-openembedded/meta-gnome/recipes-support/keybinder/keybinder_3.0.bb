@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1f18f9c6d8b4cfcc7d7804a243a4c0b4"
 S = "${WORKDIR}/git"
 
 SRCREV = "736ccef40d39603b8111c8a3a0bca0319bbafdc0"
-PV = "3.0+git${SRCPV}"
+PV = "3.0+git"
 SRC_URI = "git://github.com/engla/keybinder.git;branch=keybinder-3.0;protocol=https \
 "
 

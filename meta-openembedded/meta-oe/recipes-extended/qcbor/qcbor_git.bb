@@ -12,7 +12,7 @@ SRC_URI = "git://github.com/laurencelundblade/QCBOR;protocol=https;branch=master
 
 SRCREV = "44754f738c6534a4304a83d4c6e97b3d3193d887"
 
-PV = "1.2+git${SRCPV}"
+PV = "1.2+git"
 
 S = "${WORKDIR}/git"
 

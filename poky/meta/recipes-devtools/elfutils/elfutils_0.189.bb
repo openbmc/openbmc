@@ -22,6 +22,7 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://ptest.patch \
            file://0001-tests-Makefile.am-compile-test_nlist-with-standard-C.patch \
            file://0001-Add-helper-function-for-basename.patch \
+           file://0001-tests-fix-build-against-upcoming-gcc-14-Werror-callo.patch \
            "
 SRC_URI:append:libc-musl = " \
            file://0003-musl-utils.patch \

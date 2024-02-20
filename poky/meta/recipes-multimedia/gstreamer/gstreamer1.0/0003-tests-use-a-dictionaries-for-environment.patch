@@ -1,7 +1,7 @@
-From fe830f0f75f3b4b41e3dbef8d4cf6ee4103c9e06 Mon Sep 17 00:00:00 2001
+From 7041bc5adf9501beb1428d8bbae6b351a6bf07f9 Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sat, 24 Apr 2021 10:34:47 +0100
-Subject: [PATCH 3/4] tests: use a dictionaries for environment
+Subject: [PATCH] tests: use a dictionaries for environment
 
 meson environment() can't be passed to configure_file and it is needed for installed_tests,
 use a dictionary as this is simplest solution to install the environment.
@@ -9,15 +9,16 @@ use a dictionary as this is simplest solution to install the environment.
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
 
 Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+
 ---
- subprojects/gstreamer/tests/check/meson.build | 21 ++++++++++++-------
+ tests/check/meson.build | 21 +++++++++++++--------
  1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/subprojects/gstreamer/tests/check/meson.build b/subprojects/gstreamer/tests/check/meson.build
-index 00a138a568..48ec2532f8 100644
---- a/subprojects/gstreamer/tests/check/meson.build
-+++ b/subprojects/gstreamer/tests/check/meson.build
-@@ -161,14 +161,19 @@ foreach t : core_tests
+diff --git a/tests/check/meson.build b/tests/check/meson.build
+index f2d400f..50dff7f 100644
+--- a/tests/check/meson.build
++++ b/tests/check/meson.build
+@@ -160,14 +160,19 @@ foreach t : core_tests
        install: installed_tests_enabled,
      )
  
@@ -45,6 +46,3 @@ index 00a138a568..48ec2532f8 100644
  
      if installed_tests_enabled
        test_conf = configuration_data()
--- 
-2.33.1
-

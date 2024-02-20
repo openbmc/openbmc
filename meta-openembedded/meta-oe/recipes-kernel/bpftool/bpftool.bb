@@ -2,7 +2,7 @@ SUMMARY = "Inspect and manipulate eBPF programs and maps"
 DESCRIPTION = "bpftool is a kernel tool for inspection and simple manipulation \
 of eBPF programs and maps."
 LICENSE = "GPL-2.0-only"
-DEPENDS = "binutils elfutils"
+DEPENDS = "binutils elfutils elfutils-native"
 PROVIDES = "virtual/bpftool"
 
 inherit bash-completion kernelsrc kernel-arch
@@ -15,6 +15,7 @@ EXTRA_OEMAKE = "\
     O=${B} \
     CROSS=${TARGET_PREFIX} \
     CC="${CC} ${DEBUG_PREFIX_MAP} -fdebug-prefix-map=${STAGING_KERNEL_DIR}=${KERNEL_SRC_PATH}" \
+    HOSTCC="${BUILD_CC} ${BUILD_CFLAGS}" \
     LD="${LD}" \
     AR=${AR} \
     ARCH=${ARCH} \

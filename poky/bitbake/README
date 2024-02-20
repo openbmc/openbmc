@@ -18,7 +18,7 @@ Bitbake requires Python version 3.8 or newer.
 Contributing
 ------------
 
-Please refer to our contributor guide here: https://docs.yoctoproject.org/dev/contributor-guide/
+Please refer to our contributor guide here: https://docs.yoctoproject.org/contributor-guide/
 for full details on how to submit changes.
 
 As a quick guide, patches should be sent to bitbake-devel@lists.openembedded.org

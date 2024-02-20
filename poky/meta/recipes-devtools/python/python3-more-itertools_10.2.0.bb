@@ -12,13 +12,13 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN} += " \
-        ${PYTHON_PN}-asyncio \
+        python3-asyncio \
         "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-statistics \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-unittest-automake-output \
+	python3-statistics \
+	python3-pytest \
+	python3-unittest-automake-output \
         "
 
 do_install_ptest() {

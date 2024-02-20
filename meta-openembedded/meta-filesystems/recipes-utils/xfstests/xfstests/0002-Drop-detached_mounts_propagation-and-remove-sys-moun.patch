@@ -1,4 +1,4 @@
-From 559f685f83d12d11bf9ec6c6ce924ee4d0702a2a Mon Sep 17 00:00:00 2001
+From 79c4715a46b80653eb98b61731c094c85e969220 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 14 Aug 2022 13:33:05 -0700
 Subject: [PATCH] Drop detached_mounts_propagation and remove sys/mount.h from
@@ -12,21 +12,20 @@ testcase
 Upstream-Status: Inappropriate [Libc specific Workaround]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  src/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 2815f919..448fccc9 100644
+index e7442487..970f087a 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -32,7 +32,7 @@ LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
+@@ -33,7 +33,7 @@ LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
  	dio-invalidate-cache stat_test t_encrypted_d_revalidate \
  	attr_replace_test swapon mkswap t_attr_corruption t_open_tmpfiles \
  	fscrypt-crypt-util bulkstat_null_ocount splice-test chprojid_fail \
 -	detached_mounts_propagation ext4_resize t_readdir_3 splice2pipe \
 +	ext4_resize t_readdir_3 splice2pipe \
- 	uuid_ioctl
+ 	uuid_ioctl t_snapshot_deleted_subvolume
  
  EXTRA_EXECS = dmerror fill2attr fill2fs fill2fs_check scaleread.sh \

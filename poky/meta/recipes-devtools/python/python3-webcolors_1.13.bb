@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "c225b674c83fa923be93d235330ce0300373d02885cef23238813b0d56
 inherit pypi python_setuptools_build_meta ptest
 
 RDEPENDS:${PN}:class-target = "\
-    ${PYTHON_PN}-stringold \
+    python3-stringold \
 "
 
 SRC_URI += " \
@@ -16,8 +16,8 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-unittest-automake-output \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

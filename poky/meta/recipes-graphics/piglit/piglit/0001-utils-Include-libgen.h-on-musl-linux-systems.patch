@@ -1,0 +1,31 @@
+From 232a67b651ccb415b7d4d47584613359b7ebd920 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 13 Feb 2024 08:53:37 -0800
+Subject: [PATCH] utils: Include libgen.h on musl/linux systems
+
+musl does not provide GNU basename like string.h on glibc based systems
+does, it does provide the POSIX compliant basename function therefore
+allow to include libgen.h on non-glibc based linux systems
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/877]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/util/piglit-util.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/util/piglit-util.h b/tests/util/piglit-util.h
+index 4d3606c70..fdfd903b3 100644
+--- a/tests/util/piglit-util.h
++++ b/tests/util/piglit-util.h
+@@ -52,7 +52,7 @@ extern "C" {
+ #include <math.h>
+ #include <float.h>
+ 
+-#if defined(__APPLE__) || defined(__MINGW32__)
++#if defined(__APPLE__) || defined(__MINGW32__) || (defined(__linux__) && !defined(__GLIBC__))
+ #  include "libgen.h" // for basename
+ #elif defined(_MSC_VER)
+ 
+-- 
+2.43.1
+

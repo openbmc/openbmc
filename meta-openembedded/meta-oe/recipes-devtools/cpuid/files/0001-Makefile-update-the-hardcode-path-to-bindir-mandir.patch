@@ -1,0 +1,36 @@
+From 1339348c5b69b32378a638d65b16297d29c5fa22 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 7 Nov 2023 16:06:49 +0800
+Subject: [PATCH] Makefile: update the hardcode path to bindir/mandir
+
+Update the hardcode path to bindir/mandir
+
+Upstream-Status: Pending [ Send to cpuid@etallen.com ]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 828d2b1..365e26d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -55,10 +55,10 @@ cpuinfo2cpuid.man.gz: cpuinfo2cpuid.man
+ 	gzip < $< > $@
+ 
+ install: $(PROG) $(PROG).man.gz cpuinfo2cpuid cpuinfo2cpuid.man.gz
+-	install -D $(INSTALL_STRIP) -m 755 $(PROG) $(BUILDROOT)/usr/bin/$(PROG)
+-	install -D -m 444 $(PROG).man.gz       $(BUILDROOT)/usr/share/man/man1/$(PROG).1.gz
+-	install -D -m 755 cpuinfo2cpuid        $(BUILDROOT)/usr/bin/cpuinfo2cpuid
+-	install -D -m 444 cpuinfo2cpuid.man.gz $(BUILDROOT)/usr/share/man/man1/cpuinfo2cpuid.1.gz
++	install -D $(INSTALL_STRIP) -m 755 $(PROG) $(BUILDROOT)${bindir}/$(PROG)
++	install -D -m 444 $(PROG).man.gz       $(BUILDROOT)${mandir}/man1/$(PROG).1.gz
++	install -D -m 755 cpuinfo2cpuid        $(BUILDROOT)${bindir}/cpuinfo2cpuid
++	install -D -m 444 cpuinfo2cpuid.man.gz $(BUILDROOT)${mandir}/man1/cpuinfo2cpuid.1.gz
+ 
+ clean:
+ 	rm -f $(PROG) $(PROG).i386 $(PROG).x86_64
+-- 
+2.25.1
+

@@ -12,7 +12,8 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-       ${PYTHON_PN}-pytest \
+       python3-pytest \
+       python3-unittest-automake-output \
 "
 
 do_install_ptest() {
@@ -21,6 +22,6 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-codecs \
-    ${PYTHON_PN}-io \
+    python3-codecs \
+    python3-io \
 "

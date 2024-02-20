@@ -1,4 +1,4 @@
-From 5ce1e410965ed047a03c09b17796162f0363e396 Mon Sep 17 00:00:00 2001
+From b77d4806fd5de50d0b017a3e6a19c5bfdef7b3e4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 13 Feb 2023 12:47:31 -0800
 Subject: [PATCH] v4l2: Define ioctl_req_t for posix/linux case
@@ -18,12 +18,13 @@ gstv4l2object.c:544:23: error: incompatible function pointer types assigning to 
 
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/3950]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  sys/v4l2/gstv4l2object.h | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/sys/v4l2/gstv4l2object.h b/sys/v4l2/gstv4l2object.h
-index 3a5c961..4f43008 100644
+index d95b375..5223cbb 100644
 --- a/sys/v4l2/gstv4l2object.h
 +++ b/sys/v4l2/gstv4l2object.h
 @@ -76,6 +76,8 @@ typedef gboolean  (*GstV4l2UpdateFpsFunction) (GstV4l2Object * v4l2object);
@@ -35,6 +36,3 @@ index 3a5c961..4f43008 100644
  #else
  typedef gulong ioctl_req_t;
  #endif
--- 
-2.39.1
-

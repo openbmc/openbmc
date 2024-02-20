@@ -18,8 +18,9 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-pytest-cov \
+    python3-pytest \
+    python3-pytest-cov \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

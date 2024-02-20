@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://utils/mkyaffs2image.c;beginline=11;endline=13;md5=5f5
                     file://utils/mkyaffsimage.c;beginline=10;endline=12;md5=5f5464f9b3e981ca574e65b00e438561 \
                     "
 
-PV = "0.0+git${SRCPV}"
+PV = "0.0+git"
 
 DEPENDS = "mtd-utils"
 

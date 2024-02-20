@@ -74,6 +74,8 @@ class PkgSdk(Sdk):
 
         if not bb.utils.contains("SDKIMAGE_FEATURES", "package-management", True, False, self.d):
             self.target_pm.remove_packaging_data()
+        else:
+            self.target_pm.remove_lists()
 
         bb.note("Installing NATIVESDK packages")
         self._populate_sysroot(self.host_pm, self.host_manifest)
@@ -85,6 +87,8 @@ class PkgSdk(Sdk):
 
         if not bb.utils.contains("SDKIMAGE_FEATURES", "package-management", True, False, self.d):
             self.host_pm.remove_packaging_data()
+        else:
+            self.host_pm.remove_lists()
 
         target_sysconfdir = os.path.join(self.sdk_target_sysroot, self.sysconfdir)
         host_sysconfdir = os.path.join(self.sdk_host_sysroot, self.sysconfdir)

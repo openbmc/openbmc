@@ -1,0 +1,32 @@
+From 7490ac4629c7fe0dc329647e6e000d4bc13c610d Mon Sep 17 00:00:00 2001
+From: Richard Leitner <dev@g0hl1n.net>
+Date: Wed, 24 Jan 2024 00:49:45 +0100
+Subject: [PATCH] lib: python: remove self-import from setup.py
+
+Importing moteus itself within the setup.py creates some kind of a
+chicken-and-egg problem. Furthermore it isn't used anywhere within
+setup.py. Therefore remove the corresponding import.
+
+Signed-off-by: Richard Leitner <dev@g0hl1n.net>
+
+Upstream-Status: Backport [https://github.com/mjbots/moteus/commit/7490ac4629c7fe0dc329647e6e000d4bc13c610d]
+---
+ setup.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 2731685..6c6064d 100644
+--- a/setup.py
++++ b/setup.py
+@@ -17,8 +17,6 @@
+ import setuptools
+ import pathlib
+ 
+-import moteus
+-
+ here = pathlib.Path(__file__).parent.resolve()
+ 
+ # Get the long description from the README file
+-- 
+2.40.1
+

@@ -1,0 +1,30 @@
+From c4ca86b9cca3643097db0328e2f34dccffbba309 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Simone=20Wei=C3=9F?= <simone.p.weiss@posteo.com>
+Date: Sat, 10 Feb 2024 13:18:44 +0100
+Subject: [PATCH] selftest-hello: add CVE_CHECK_IGNORE
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This should fail the test_cve_tag_format selftest.
+
+Signed-off-by: Simone Weiß <simone.p.weiss@posteo.com>
+---
+ .../recipes-test/selftest-hello/selftest-hello_1.0.bb          | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+index 547587bef4..3ef9b87c34 100644
+--- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+@@ -16,4 +16,5 @@ do_install() {
+ 	install -m 0755 helloworld ${D}${bindir}
+ }
+ 
+-BBCLASSEXTEND = "native nativesdk"
+\ No newline at end of file
++CVE_CHECK_IGNORE = "CVE-2024-12345"
++BBCLASSEXTEND = "native nativesdk"
+-- 
+2.39.2
+

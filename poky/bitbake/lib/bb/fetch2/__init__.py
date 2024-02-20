@@ -875,6 +875,7 @@ FETCH_EXPORT_VARS = ['HOME', 'PATH',
                      'AWS_ROLE_ARN',
                      'AWS_WEB_IDENTITY_TOKEN_FILE',
                      'AWS_DEFAULT_REGION',
+                     'AWS_SESSION_TOKEN',
                      'GIT_CACHE_PATH',
                      'REMOTE_CONTAINERS_IPC',
                      'SSL_CERT_DIR']

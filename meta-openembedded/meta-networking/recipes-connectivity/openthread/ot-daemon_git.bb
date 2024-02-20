@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
                     "
 DEPENDS = "readline"
 SRCREV = "7dfde1f12923f03c9680be4d838b94b7a2320324"
-PV = "0.1+git${SRCPV}"
+PV = "0.1+git"
 
 SRC_URI = "git://github.com/openthread/openthread.git;protocol=https;branch=main \
            file://0001-bn_mul.h-fix-x86-PIC-inline-ASM-compilation-with-GCC.patch \

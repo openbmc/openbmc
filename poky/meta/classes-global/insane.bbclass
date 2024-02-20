@@ -34,7 +34,7 @@ WARN_QA ?= " libdir xorg-driver-abi buildpaths \
             missing-update-alternatives native-last missing-ptest \
             license-exists license-no-generic license-syntax license-format \
             license-incompatible license-file-missing obsolete-license \
-            32bit-time \
+            32bit-time virtual-slash \
             "
 ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             perms dep-cmp pkgvarcheck perm-config perm-line perm-link \
@@ -1607,11 +1607,12 @@ python () {
     if (d.getVar(d.expand('DEPENDS:${PN}'))):
         oe.qa.handle_error("pkgvarcheck", "recipe uses DEPENDS:${PN}, should use DEPENDS", d)
 
-    # virtual/ is meaningless for those variables
-    for k in ['RDEPENDS', 'RPROVIDES']:
-        for var in bb.utils.explode_deps(d.getVar(k + ':' + pn) or ""):
-            if var.startswith("virtual/"):
-                bb.warn("%s is set to %s, the substring 'virtual/' holds no meaning in this context. It is suggested to use the 'virtual-' instead." % (k, var))
+    # virtual/ is meaningless for these variables
+    if "virtual-slash" in (d.getVar("ALL_QA") or "").split():
+        for k in ['RDEPENDS', 'RPROVIDES']:
+            for var in bb.utils.explode_deps(d.getVar(k + ':' + pn) or ""):
+                if var.startswith("virtual/"):
+                    oe.qa.handle_error("virtual-slash", "%s is set to %s but the substring 'virtual/' holds no meaning in this context. It only works for build time dependencies, not runtime ones. It is suggested to use 'VIRTUAL-RUNTIME_' variables instead." % (k, var), d)
 
     issues = []
     if (d.getVar('PACKAGES') or "").split():

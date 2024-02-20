@@ -41,4 +41,4 @@ do_install () {
 FILES:${PN} += "${sysconfdir}/developer.prf ${sysconfdir}/default.prf"
 FILES:${PN}-doc += "lynis.8 FAQ README CHANGELOG.md CONTRIBUTIONS.md CONTRIBUTORS.md" 
 
-RDEPENDS:${PN} += "procps findutils"
+RDEPENDS:${PN} += "procps findutils coreutils iproute2-ip iproute2-ss net-tools"

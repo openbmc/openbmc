@@ -38,6 +38,6 @@ BUILD_OPTIMIZATION:append:mipsel = " -O"
 
 BBCLASSEXTEND = "native nativesdk"
 
-RDEPENDS:${PN} += "libxml2 libxslt ${PYTHON_PN}-compression"
+RDEPENDS:${PN} += "libxml2 libxslt python3-compression"
 
 CLEANBROKEN = "1"

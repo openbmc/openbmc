@@ -28,6 +28,16 @@ def tearDownModule():
     runCmd('rm -rf %s' % templayerdir)
 
 
+def needTomllib(test):
+    # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+    try:
+        import tomllib
+    except ImportError:
+        try:
+            import tomli
+        except ImportError:
+            test.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+
 class RecipetoolBase(devtool.DevtoolTestCase):
 
     def setUpLocal(self):
@@ -441,16 +451,18 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_github(self):
-        # Basic test to see if github URL mangling works
+        # Basic test to see if github URL mangling works. Deliberately use an
+        # older release of Meson at present so we don't need a toml parser.
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
         recipefile = os.path.join(temprecipe, 'python3-meson_git.bb')
-        srcuri = 'https://github.com/mesonbuild/meson;rev=0.32.0'
-        result = runCmd(['recipetool', 'create', '-o', temprecipe, srcuri])
-        self.assertTrue(os.path.isfile(recipefile))
+        srcuri = 'https://github.com/mesonbuild/meson;rev=0.52.1'
+        cmd = ['recipetool', 'create', '-o', temprecipe, srcuri]
+        result = runCmd(cmd)
+        self.assertTrue(os.path.isfile(recipefile), msg="recipe %s not created for command %s, output %s" % (recipefile, " ".join(cmd), result.output))
         checkvars = {}
-        checkvars['LICENSE'] = set(['Apache-2.0'])
-        checkvars['SRC_URI'] = 'git://github.com/mesonbuild/meson;protocol=https;branch=master'
+        checkvars['LICENSE'] = set(['Apache-2.0', "Unknown"])
+        checkvars['SRC_URI'] = 'git://github.com/mesonbuild/meson;protocol=https;branch=0.52'
         inherits = ['setuptools3']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
@@ -554,15 +566,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_python3_pep517_setuptools_build_meta(self):
-        # This test require python 3.11 or above for the tomllib module
-        # or tomli module to be installed
-        try:
-            import tomllib
-        except ImportError:
-            try:
-                import tomli
-            except ImportError:
-                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
 
         # Test creating python3 package from tarball (using setuptools.build_meta class)
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -583,15 +588,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_python3_pep517_poetry_core_masonry_api(self):
-        # This test require python 3.11 or above for the tomllib module
-        # or tomli module to be installed
-        try:
-            import tomllib
-        except ImportError:
-            try:
-                import tomli
-            except ImportError:
-                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
 
         # Test creating python3 package from tarball (using poetry.core.masonry.api class)
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -612,15 +610,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_python3_pep517_flit_core_buildapi(self):
-        # This test require python 3.11 or above for the tomllib module
-        # or tomli module to be installed
-        try:
-            import tomllib
-        except ImportError:
-            try:
-                import tomli
-            except ImportError:
-                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
 
         # Test creating python3 package from tarball (using flit_core.buildapi class)
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -641,15 +632,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_python3_pep517_hatchling(self):
-        # This test require python 3.11 or above for the tomllib module
-        # or tomli module to be installed
-        try:
-            import tomllib
-        except ImportError:
-            try:
-                import tomli
-            except ImportError:
-                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
 
         # Test creating python3 package from tarball (using hatchling class)
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -671,15 +655,8 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_python3_pep517_maturin(self):
-        # This test require python 3.11 or above for the tomllib module
-        # or tomli module to be installed
-        try:
-            import tomllib
-        except ImportError:
-            try:
-                import tomli
-            except ImportError:
-                self.skipTest('Test requires python 3.11 or above for tomllib module or tomli module')
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
 
         # Test creating python3 package from tarball (using maturin class)
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -699,11 +676,31 @@ class RecipetoolCreateTests(RecipetoolBase):
 
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
-    def test_recipetool_create_github_tarball(self):
-        # Basic test to ensure github URL mangling doesn't apply to release tarballs
+    def test_recipetool_create_python3_pep517_mesonpy(self):
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
+
+        # Test creating python3 package from tarball (using mesonpy class)
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
-        pv = '0.32.0'
+        pn = 'siphash24'
+        pv = '1.4'
+        recipefile = os.path.join(temprecipe, 'python3-%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/c2/32/b934a70592f314afcfa86c7f7e388804a8061be65b822e2aa07e573b6477/%s-%s.tar.gz' % (pn, pv)
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['SRC_URI[sha256sum]'] = '7fd65e39b2a7c8c4ddc3a168a687f4610751b0ac2ebb518783c0cdfc30bec4a0'
+        inherits = ['python_mesonpy', 'pypi']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_github_tarball(self):
+        # Basic test to ensure github URL mangling doesn't apply to release tarballs.
+        # Deliberately use an older release of Meson at present so we don't need a toml parser.
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pv = '0.52.1'
         recipefile = os.path.join(temprecipe, 'python3-meson_%s.bb' % pv)
         srcuri = 'https://github.com/mesonbuild/meson/releases/download/%s/meson-%s.tar.gz' % (pv, pv)
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))

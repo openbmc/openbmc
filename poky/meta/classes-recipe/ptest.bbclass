@@ -56,9 +56,9 @@ do_install_ptest_base() {
     if [ -f ${WORKDIR}/run-ptest ]; then
         install -D ${WORKDIR}/run-ptest ${D}${PTEST_PATH}/run-ptest
     fi
-    if grep -q install-ptest: Makefile; then
-        oe_runmake DESTDIR=${D}${PTEST_PATH} install-ptest
-    fi
+
+    grep -q install-ptest: Makefile 2>/dev/null && oe_runmake DESTDIR=${D}${PTEST_PATH} install-ptest
+
     do_install_ptest
     chown -R root:root ${D}${PTEST_PATH}
 

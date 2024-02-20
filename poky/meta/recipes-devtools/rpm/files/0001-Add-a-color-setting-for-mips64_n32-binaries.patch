@@ -1,4 +1,4 @@
-From 93f219df68f3741ff63a294a16bcbe8deba1112f Mon Sep 17 00:00:00 2001
+From ecc45e3ae837ab50603088dcc8fd2f8e67a7ece6 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 9 Mar 2017 18:54:02 +0200
 Subject: [PATCH] Add a color setting for mips64_n32 binaries
@@ -12,10 +12,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 6 insertions(+)
 
 diff --git a/build/rpmfc.c b/build/rpmfc.c
-index 26606378f..a16e3f4e9 100644
+index 4b67a9bae..ed7e4e623 100644
 --- a/build/rpmfc.c
 +++ b/build/rpmfc.c
-@@ -646,6 +646,7 @@ exit:
+@@ -660,6 +660,7 @@ exit:
  static const struct rpmfcTokens_s rpmfcTokens[] = {
    { "directory",		RPMFC_INCLUDE },
  
@@ -23,7 +23,7 @@ index 26606378f..a16e3f4e9 100644
    { "ELF 32-bit",		RPMFC_ELF32|RPMFC_INCLUDE },
    { "ELF 64-bit",		RPMFC_ELF64|RPMFC_INCLUDE },
  
-@@ -1151,6 +1152,9 @@ static uint32_t getElfColor(const char *fn)
+@@ -1158,6 +1159,9 @@ static uint32_t getElfColor(const char *fn)
  		color = RPMFC_ELF32;
  		break;
  	    }
@@ -34,10 +34,10 @@ index 26606378f..a16e3f4e9 100644
  	if (elf)
  	    elf_end(elf);
 diff --git a/rpmrc.in b/rpmrc.in
-index 2975a3a0e..c7232b48b 100644
+index 8646a966b..7349fdfd3 100644
 --- a/rpmrc.in
 +++ b/rpmrc.in
-@@ -139,6 +139,8 @@ archcolor: mipsr6el 1
+@@ -142,6 +142,8 @@ archcolor: mipsr6el 1
  archcolor: mips64r6 2
  archcolor: mips64r6el 2
  

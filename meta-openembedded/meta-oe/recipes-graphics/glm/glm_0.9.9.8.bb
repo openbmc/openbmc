@@ -18,7 +18,7 @@ SRC_URI = " \
     file://glmTargets.cmake \
 "
 SRCREV = "efec5db081e3aad807d0731e172ac597f6a39447"
-PV .= "+0.9.9.9+git${SRCPV}"
+PV .= "+0.9.9.9+git"
 
 S = "${WORKDIR}/git"
 

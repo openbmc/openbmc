@@ -22,10 +22,13 @@ TESTIMAGE_AUTO ??= "0"
 # each entry in it, if artifact pointed by path description exists on target,
 # it will be retrieved onto host
 
-TESTIMAGE_FAILED_QA_ARTIFACTS ??= "\
+TESTIMAGE_FAILED_QA_ARTIFACTS = "\
     ${localstatedir}/log \
     ${sysconfdir}/version \
     ${sysconfdir}/os-release"
+
+# If some ptests are run and fail, retrieve corresponding directories
+TESTIMAGE_FAILED_QA_ARTIFACTS += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '${libdir}/${MCNAME}/ptest', '', d)}"
 
 # You can set (or append to) TEST_SUITES in local.conf to select the tests
 # which you want to run for your target.

@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS += "fmt libinih"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 SRCREV = "8416326777b2aada0706539b8f9f6acefa476b16"
 

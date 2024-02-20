@@ -15,17 +15,17 @@ UPSTREAM_CHECK_REGEX = "scm-(?P<pver>.*)\.tar"
 DEPENDS += "python3-tomli-native python3-packaging-native python3-typing-extensions-native"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-packaging \
-    ${PYTHON_PN}-pip \
-    ${PYTHON_PN}-pyparsing \
-    ${PYTHON_PN}-setuptools \
-    ${PYTHON_PN}-tomli \
-    ${PYTHON_PN}-typing-extensions \
+    python3-packaging \
+    python3-pip \
+    python3-pyparsing \
+    python3-setuptools \
+    python3-tomli \
+    python3-typing-extensions \
 "
 
 RDEPENDS:${PN}:append:class-target = " \
-    ${PYTHON_PN}-debugger \
-    ${PYTHON_PN}-json \
+    python3-debugger \
+    python3-json \
 "
 
 BBCLASSEXTEND = "native nativesdk"

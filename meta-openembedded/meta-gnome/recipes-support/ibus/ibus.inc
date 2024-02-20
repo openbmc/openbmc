@@ -12,6 +12,7 @@ DEPENDS = "unicode-ucd"
 SRC_URI = " \
     git://github.com/ibus/ibus.git;branch=main;protocol=https \
     file://0001-Do-not-try-to-start-dbus-we-do-not-have-dbus-lauch.patch \
+    file://0001-makefile-don-t-gzip-the-man-pages.patch \
 "
 SRCREV = "6a70ab0338206bd1c7d01a4e1874ea0ee5b3a9d3"
 S = "${WORKDIR}/git"

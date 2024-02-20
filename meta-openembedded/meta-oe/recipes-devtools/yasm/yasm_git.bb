@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a12d8903508fb6bfd49d8d82c6170dd9"
 DEPENDS += "flex-native bison-native"
 PACKAGECONFIG[docs] = ",,xmlto-native,"
 
-PV = "1.3.0+git${SRCPV}"
+PV = "1.3.0+git"
 # v1.3.0
 SRCREV = "ba463d3c26c0ece2e797b8d6381b161633b5971a"
 SRC_URI = "git://github.com/yasm/yasm.git;branch=master;protocol=https \

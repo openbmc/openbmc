@@ -20,22 +20,23 @@ SRC_URI += " \
 "
 
 DEPENDS += "\
-    ${PYTHON_PN}-hatch-vcs-native \
+    python3-hatch-vcs-native \
 "
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-math \
-	${PYTHON_PN}-html \
-	${PYTHON_PN}-wcwidth \
-	${PYTHON_PN}-json \
-	${PYTHON_PN}-compression \
-	${PYTHON_PN}-importlib-metadata \
+	python3-math \
+	python3-html \
+	python3-wcwidth \
+	python3-json \
+	python3-compression \
+	python3-importlib-metadata \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-pytest-lazy-fixture \
-    ${PYTHON_PN}-sqlite3 \
+    python3-pytest \
+    python3-pytest-lazy-fixture \
+    python3-sqlite3 \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

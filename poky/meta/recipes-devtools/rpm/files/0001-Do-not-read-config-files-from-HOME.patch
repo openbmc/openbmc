@@ -1,35 +1,36 @@
-From 35381b6cd6c1b571bf7e6b0640de0f54dbf94386 Mon Sep 17 00:00:00 2001
+From 4f34994d9ad38d96976578a9d1a006f72e5aca50 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 10 Jan 2017 14:11:30 +0200
 Subject: [PATCH] Do not read config files from $HOME
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  lib/rpmrc.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-Index: git/lib/rpmrc.c
-===================================================================
---- git.orig/lib/rpmrc.c
-+++ git/lib/rpmrc.c
+diff --git a/lib/rpmrc.c b/lib/rpmrc.c
+index 269d490ac..f39dcfc11 100644
+--- a/lib/rpmrc.c
++++ b/lib/rpmrc.c
 @@ -458,8 +458,7 @@ static void setDefaults(void)
      if (!defrcfiles) {
  	defrcfiles = rstrscat(NULL, confdir, "/rpmrc", ":",
- 				confdir, "/" RPMCANONVENDOR "/rpmrc", ":",
+ 				confdir, "/" RPM_VENDOR "/rpmrc", ":",
 -				SYSCONFDIR "/rpmrc", ":",
 -			  	"~/.rpmrc", NULL);
-+				SYSCONFDIR "/rpmrc", ":");
++				SYSCONFDIR "/rpmrc", NULL);
      }
  
  #ifndef MACROFILES
 @@ -471,8 +470,7 @@ static void setDefaults(void)
-   				confdir, "/" RPMCANONVENDOR "/macros", ":",
+   				confdir, "/" RPM_VENDOR "/macros", ":",
  				SYSCONFDIR "/rpm/macros.*", ":",
  				SYSCONFDIR "/rpm/macros", ":",
 -				SYSCONFDIR "/rpm/%{_target}/macros", ":",
 -				"~/.rpmmacros", NULL);
-+				SYSCONFDIR "/rpm/%{_target}/macros", ":");
++				SYSCONFDIR "/rpm/%{_target}/macros", NULL);
      }
  #else
      macrofiles = MACROFILES;

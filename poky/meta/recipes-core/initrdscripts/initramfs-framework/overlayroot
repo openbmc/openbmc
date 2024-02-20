@@ -15,9 +15,11 @@
 # accessing the original, unmodified rootfs at /rofs after boot.
 #
 # It relies on the initramfs-module-rootfs to mount the original
-# root filesystem, and requires 'rootrw=<foo>' to be passed as a
+# root filesystem, and requires 'overlayrootrwdev=<foo>' to be passed as a
 # kernel parameter, specifying the device/partition intended to
 # use as RW.
+# Mount options of the RW device can be tweaked with 'overlayrootfstype='
+# (defaults to 'ext4') and 'overlayrootfsflags=' ('defaults').
 #
 # This module needs to be executed after the initramfs-module-rootfs
 # since it relies on it to mount the filesystem at initramfs startup
@@ -72,15 +74,19 @@ exit_gracefully() {
     eval "finish_run"
 }
 
+# migrate legacy parameter
+if [ ! -z "$bootparam_rootrw" ]; then
+    bootparam_overlayrootrwdev="$bootparam_rootrw"
+fi
 
-if [ -z "$bootparam_rootrw" ]; then
-    exit_gracefully "rootrw= kernel parameter doesn't exist and its required to mount the overlayfs"
+if [ -z "$bootparam_overlayrootrwdev" ]; then
+    exit_gracefully "overlayrootrwdev= kernel parameter doesn't exist and its required to mount the overlayfs"
 fi
 
 mkdir -p ${RWMOUNT}
 
 # Mount RW device
-if mount -n -t ${bootparam_rootfstype:-ext4} -o ${bootparam_rootflags:-defaults} ${bootparam_rootrw} ${RWMOUNT}
+if mount -n -t ${bootparam_overlayrootfstype:-ext4} -o ${bootparam_overlayrootfsflags:-defaults} ${bootparam_overlayrootrwdev} ${RWMOUNT}
 then
     # Set up overlay directories
     mkdir -p ${UPPER_DIR}

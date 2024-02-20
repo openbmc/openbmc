@@ -37,4 +37,3 @@ downloads/
 sstate-cache/
 toaster.sqlite
 .vscode/
-vscode-bitbake-build/

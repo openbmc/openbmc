@@ -132,7 +132,7 @@ The following permissions are supported by the server:
 
     level = getattr(logging, args.log.upper(), None)
     if not isinstance(level, int):
-        raise ValueError("Invalid log level: %s" % args.log)
+        raise ValueError("Invalid log level: %s (Try ERROR/WARNING/INFO/DEBUG)" % args.log)
 
     logger.setLevel(level)
     console = logging.StreamHandler()

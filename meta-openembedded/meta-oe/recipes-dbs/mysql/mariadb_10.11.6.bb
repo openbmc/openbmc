@@ -1,6 +1,8 @@
 require mariadb.inc
 
 inherit ptest
+inherit useradd
+
 SRC_URI += "${@bb.utils.contains('PTEST_ENABLED', '1', 'file://run-ptest', '', d)}"
 DEPENDS += "${@bb.utils.contains('PTEST_ENABLED', '1', 'rsync-native', '', d)}"
 RDEPENDS:${PN}-ptest += "cmake sed perl-module-test-more"
@@ -35,6 +37,10 @@ DEPENDS += "mariadb-native bison-native boost libpcre2 curl ncurses \
             zlib libaio libedit libevent libxml2 gnutls fmt lzo zstd"
 
 PROVIDES += "mysql5 libmysqlclient"
+
+USERADD_PACKAGES = "${PN}-setupdb"
+USERADD_PARAM:${PN}-setupdb = "--system --home-dir /var/mysql -g mysql --shell /bin/false mysql"
+GROUPADD_PARAM:${PN}-setupdb = "--system mysql"
 
 RPROVIDES:${PN} += "mysql5"
 RREPLACES:${PN} += "mysql5"

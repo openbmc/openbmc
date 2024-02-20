@@ -3,17 +3,28 @@
 # This script is expecting an input of machine name, optionally followed by a
 # colon and a list of one or more parameters separated by commas between
 # brackets.  For example, the following are acceptable:
-# corstone1000-mps3
-# fvp-base: [testimage]
-# qemuarm64-secureboot: [clang, glibc, testimage]
+#   corstone1000-mps3
+#   fvp-base: [testimage]
+#   qemuarm64-secureboot: [clang, glibc, testimage]
+# This argument should be quoted to avoid expansion and to be handled
+# as a single value.
+#
+# Any further arguments will be handled as further yml file basenames.
 #
 # Turn this list into a series of yml files separated by colons to pass to kas
 
 set -e -u
 
-FILES="ci/$(echo $1 | cut -d ':' -f 1).yml"
+# First, parse the GitLab CI job name (CI_JOB_NAME via $1) and accumulate a list
+# of Kas files.
+JOBNAME="$1"
+shift
 
-for i in $(echo $1 | cut -s -d ':' -f 2 | sed 's/[][,]//g'); do
+# The base name of the job
+FILES="ci/$(echo $JOBNAME | cut -d ':' -f 1).yml"
+
+# The list of matrix variations
+for i in $(echo $JOBNAME | cut -s -d ':' -f 2 | sed 's/[][,]//g'); do
 	# Given that there are no yml files for gcc or glibc, as those are the
 	# defaults, we can simply ignore those parameters.  They are necessary
 	# to pass in so that matrix can correctly setup all of the permutations
@@ -21,6 +32,11 @@ for i in $(echo $1 | cut -s -d ':' -f 2 | sed 's/[][,]//g'); do
 	if [[ $i == 'none' ]]; then
 		continue
 	fi
+	FILES+=":ci/$i.yml"
+done
+
+# Now pick up any further names
+for i in $*; do
 	FILES+=":ci/$i.yml"
 done
 

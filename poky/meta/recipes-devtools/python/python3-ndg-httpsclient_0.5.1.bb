@@ -11,15 +11,15 @@ inherit pypi setuptools3 update-alternatives
 PYPI_PACKAGE = "ndg_httpsclient"
 
 DEPENDS += " \
-    ${PYTHON_PN}-pyopenssl \
-    ${PYTHON_PN}-pyasn1 \
+    python3-pyopenssl \
+    python3-pyasn1 \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-pyopenssl \
-    ${PYTHON_PN}-pyasn1 \
+    python3-datetime \
+    python3-logging \
+    python3-pyopenssl \
+    python3-pyasn1 \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -32,7 +32,6 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0010-hw-pvrdma-Protect-against-buggy-or-malicious-guest-d.patch \
            file://0002-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
            file://fixedmeson.patch \
-           file://0001-vfio-Include-libgen.h-for-basename-API.patch \
            file://no-pip.patch \
            file://fix_segv.patch \
            file://qemu-guest-agent.init \
@@ -40,8 +39,20 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
+# SDK_OLDEST_KERNEL is set below 4.17, which is the minimum version required by QEMU >= 8.1
+# This is due to two MMAP flags being used at certain points
+SRC_URI:append:class-nativesdk = " \
+	file://0011-linux-user-workaround-for-missing-MAP_FIXED_NOREPLAC.patch \
+	file://0012-linux-user-workaround-for-missing-MAP_SHARED_VALIDAT.patch \
+        "
 
-SRC_URI[sha256sum] = "bf00d2fa12010df8b0ade93371def58e632cb32a6bfdc5f5a0ff8e6a1fb1bf32"
+# Support building and using native version on pre 4.17 kernels
+SRC_URI:append:class-native = " \
+	file://0011-linux-user-workaround-for-missing-MAP_FIXED_NOREPLAC.patch \
+	file://0012-linux-user-workaround-for-missing-MAP_SHARED_VALIDAT.patch \
+        "
+
+SRC_URI[sha256sum] = "8562751158175f9d187c5f22b57555abe3c870f0325c8ced12c34c6d987729be"
 
 CVE_STATUS[CVE-2017-5957] = "cpe-incorrect: Applies against virglrender < 0.6.0 and not qemu itself"
 
@@ -56,6 +67,12 @@ CVE_STATUS[CVE-2023-0664] = "not-applicable-platform: Issue only applies on Wind
 
 # As per https://bugzilla.redhat.com/show_bug.cgi?id=2203387
 CVE_STATUS[CVE-2023-2680] = "not-applicable-platform: RHEL specific issue."
+
+CVE_STATUS[CVE-2023-3019] = "cpe-incorrect: Applies only against versions before 8.2.0"
+
+CVE_STATUS[CVE-2023-5088] = "cpe-incorrect: Applies only against version 8.2.0 and earlier"
+
+CVE_STATUS[CVE-2023-6693] = "cpe-incorrect: Applies only against version 8.2.0 and earlier"
 
 COMPATIBLE_HOST:mipsarchn32 = "null"
 COMPATIBLE_HOST:mipsarchn64 = "null"
@@ -114,7 +131,8 @@ EXTRA_OECONF = " \
     --extra-ldflags='${LDFLAGS}' \
     --disable-download \
     --disable-docs \
-    --host-cc=${BUILD_CC} \
+    --host-cc='${BUILD_CC}' \
+    --disable-af-xdp \
     ${PACKAGECONFIG_CONFARGS} \
     "
 

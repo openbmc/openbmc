@@ -12,9 +12,10 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-eventlet \
-    ${PYTHON_PN}-gevent \
-	${PYTHON_PN}-pytest \
+    python3-eventlet \
+    python3-gevent \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {
@@ -22,4 +23,4 @@ do_install_ptest() {
 	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
 }
 
-RDEPENDS:${PN} += "${PYTHON_PN}-setuptools ${PYTHON_PN}-fcntl"
+RDEPENDS:${PN} += "python3-setuptools python3-fcntl"

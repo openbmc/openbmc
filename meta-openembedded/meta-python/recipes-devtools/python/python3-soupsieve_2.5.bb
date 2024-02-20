@@ -13,8 +13,9 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-        ${PYTHON_PN}-pytest \
-        ${PYTHON_PN}-beautifulsoup4 \
+    python3-beautifulsoup4 \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

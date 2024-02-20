@@ -16,13 +16,13 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-core \
-	${PYTHON_PN}-xml \
-	${PYTHON_PN}-io \
+	python3-core \
+	python3-xml \
+	python3-io \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+	python3-pytest \
 "
 
 do_install_ptest() {

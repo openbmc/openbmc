@@ -29,6 +29,8 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://0001-Update-test_sysconfig-for-posix_user-purelib.patch \
            file://0001-skip-no_stdout_fileno-test-due-to-load-variability.patch \
            file://0001-test_storlines-skip-due-to-load-variability.patch \
+           file://0001-gh-114492-Initialize-struct-termios-before-calling-t.patch \
+           file://0001-test_xml_etree.py-Fix-for-Expat-2.6.0-with-reparse-d.patch \
            "
 
 SRC_URI:append:class-native = " \

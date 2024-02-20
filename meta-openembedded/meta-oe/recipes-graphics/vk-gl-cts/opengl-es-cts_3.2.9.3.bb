@@ -14,6 +14,10 @@ SRCREV_vulkan-docs = "9a2e576a052a1e65a5d41b593e693ff02745604b"
 SRCREV_video-parser = "7d68747d3524842afaf050c5e00a10f5b8c07904"
 SRC_URI[renderdoc.sha256sum] = "e7b5f0aa5b1b0eadc63a1c624c0ca7f5af133aa857d6a4271b0ef3d0bdb6868e"
 
+SRC_URI += "\
+        git://github.com/nvpro-samples/vk_video_samples.git;protocol=https;destsuffix=git/external/video-parser/src;name=video-parser;branch=main \
+        file://gen-framework-path.patch \
+        "
 S = "${WORKDIR}/git"
 
 do_install() {

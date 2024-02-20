@@ -16,7 +16,7 @@ import argparse
 import re
 import git
 
-re_prefix = re.compile("(\[.*\])", re.DOTALL)
+re_prefix = re.compile(r"(\[.*\])", re.DOTALL)
 
 def get_branch(filepath_repo, filepath_mbox, default_branch):
     branch = None

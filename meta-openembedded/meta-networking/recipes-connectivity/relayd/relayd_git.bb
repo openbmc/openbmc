@@ -8,7 +8,7 @@ DEPENDS = "libubox"
 SRC_URI = "git://git.openwrt.org/project/relayd.git;branch=master"
 
 SRCREV = "f646ba40489371e69f624f2dee2fc4e19ceec00e"
-PV = "0.0.1+git${SRCPV}"
+PV = "0.0.1+git"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

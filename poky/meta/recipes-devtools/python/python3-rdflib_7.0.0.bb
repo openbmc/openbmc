@@ -9,13 +9,13 @@ SRC_URI[sha256sum] = "9995eb8569428059b8c1affd26b25eac510d64f5043d9ce8c84e0d0036
 inherit pypi python_poetry_core
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-isodate \
-    ${PYTHON_PN}-pyparsing \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-xml \
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-core \
+    python3-isodate \
+    python3-pyparsing \
+    python3-logging \
+    python3-numbers \
+    python3-xml \
+    python3-compression \
+    python3-core \
 "
 
 BBCLASSEXTEND = "native nativesdk"

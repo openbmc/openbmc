@@ -1,4 +1,4 @@
-From 73d1af65ccfed87662342274d9ec33900786beb3 Mon Sep 17 00:00:00 2001
+From c9e810840d95554046b7132e3e2c98bf99cb2d89 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:42:38 +0000
 Subject: [PATCH] Fix rpath in libtool when sysroot is enabled
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/ltmain.sh b/ltmain.sh
-index 70e856e0659..11ee684cccf 100644
+index 7f7104ffc82..f59eb4aa631 100644
 --- a/ltmain.sh
 +++ b/ltmain.sh
 @@ -8035,9 +8035,11 @@ EOF

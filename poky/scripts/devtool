@@ -299,8 +299,9 @@ def main():
             return 2
 
     # Search BBPATH first to allow layers to override plugins in scripts_path
-    for path in global_args.bbpath.split(':') + [scripts_path]:
-        pluginpath = os.path.join(path, 'lib', 'devtool')
+    pluginpaths = [os.path.join(path, 'lib', 'devtool') for path in global_args.bbpath.split(':') + [scripts_path]]
+    context.pluginpaths = pluginpaths
+    for pluginpath in pluginpaths:
         scriptutils.load_plugins(logger, plugins, pluginpath)
 
     subparsers = parser.add_subparsers(dest="subparser_name", title='subcommands', metavar='<subcommand>')

@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/tvheadend/tvheadend.git;branch=master;protocol=https
            "
 
 SRCREV = "cc602833684953fc3e6f1c89d4f08f6dfef179e3"
-PV = "4.3+git${SRCPV}"
+PV = "4.3+git"
 PKGV = "4.3+git${GITPKGV}"
 
 S = "${WORKDIR}/git"

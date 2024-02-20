@@ -219,12 +219,16 @@ executing the file is no longer allowed:
     -sh: /usr/bin/rpm: Permission denied
 
 Enabling the audit kernel subsystem may help to debug appraisal
-issues. Enable it by adding the meta-security-framework layer and
+issues. Enable it by adding a kernel configuration fragment and
 changing your local.conf:
     SRC_URI:append:pn-linux-yocto = " file://audit.cfg"
     CORE_IMAGE_EXTRA_INSTALL += "auditd"
 
-Then boot with "ima_appraise=log ima_appraise_tcb".
+Then boot with "ima_appraise=log ima_appraise_tcb integrity_audit=1".
+For example, for QEMU by changing variable QB_KERNEL_CMDLINE_APPEND
+in your local.conf:
+    QB_KERNEL_CMDLINE_APPEND:remove:pn-integrity-image-minimal = "ima_policy=tcb ima_appraise=fix"
+    QB_KERNEL_CMDLINE_APPEND:append:pn-integrity-image-minimal = " ima_appraise=log ima_appraise_tcb integrity_audit=1"
 
 Adding auditd is not strictly necessary but helps to capture a
 more complete set of events in /var/log/audit/ and search in

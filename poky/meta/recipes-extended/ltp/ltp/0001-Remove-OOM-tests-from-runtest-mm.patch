@@ -14,10 +14,10 @@ Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
  1 file changed, 6 deletions(-)
 
 diff --git a/runtest/mm b/runtest/mm
-index 6537666a9..e5a091a5a 100644
+index d859b331c..3c2962f44 100644
 --- a/runtest/mm
 +++ b/runtest/mm
-@@ -73,12 +73,6 @@ ksm06_2 ksm06 -n 8000
+@@ -74,12 +74,6 @@ ksm07 ksm07
  
  cpuset01 cpuset01
  
@@ -31,5 +31,5 @@ index 6537666a9..e5a091a5a 100644
  
  thp01 thp01 -I 120
 -- 
-2.33.0
+2.43.0
 

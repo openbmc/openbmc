@@ -12,11 +12,11 @@ inherit pypi python_setuptools_build_meta
 DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-dbus \
-    ${PYTHON_PN}-unittest \
-    ${PYTHON_PN}-xml \
+    python3-dbus \
+    python3-unittest \
+    python3-xml \
     "
 
-RRECOMMENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'gobject-introspection-data', '${MLPREFIX}${PYTHON_PN}-pygobject', '', d)}"
+RRECOMMENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'gobject-introspection-data', '${MLPREFIX}python3-pygobject', '', d)}"
 
 BBCLASSEXTEND = "native"

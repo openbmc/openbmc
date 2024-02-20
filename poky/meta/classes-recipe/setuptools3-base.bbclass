@@ -4,9 +4,9 @@
 # SPDX-License-Identifier: MIT
 #
 
-DEPENDS:append:class-target = " ${PYTHON_PN}-native ${PYTHON_PN}"
-DEPENDS:append:class-nativesdk = " ${PYTHON_PN}-native ${PYTHON_PN}"
-RDEPENDS:${PN}:append:class-target = " ${PYTHON_PN}-core"
+DEPENDS:append:class-target = " python3-native python3"
+DEPENDS:append:class-nativesdk = " python3-native python3"
+RDEPENDS:${PN}:append:class-target = " python3-core"
 
 export STAGING_INCDIR
 export STAGING_LIBDIR

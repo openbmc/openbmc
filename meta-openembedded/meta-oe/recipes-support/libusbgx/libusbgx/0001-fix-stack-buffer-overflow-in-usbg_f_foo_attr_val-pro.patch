@@ -1,4 +1,4 @@
-From fc7855891c66599487265701294963bb0772bb80 Mon Sep 17 00:00:00 2001
+From 421b366cafdf954b7e1cd2bbb78b55e04d73c082 Mon Sep 17 00:00:00 2001
 From: Wlodzimierz Lipert <wlodzimierz.lipert@gmail.com>
 Date: Mon, 28 Nov 2022 08:29:54 +0100
 Subject: [PATCH] fix: stack-buffer-overflow in usbg_f_foo_attr_val processing.
@@ -386,11 +386,11 @@ index b0409f1..06cee30 100644
  
  #ifdef __cplusplus
 diff --git a/include/usbg/function/uac2.h b/include/usbg/function/uac2.h
-index c1bbb14..1ea55dc 100644
+index 6fc4d24..80918ef 100644
 --- a/include/usbg/function/uac2.h
 +++ b/include/usbg/function/uac2.h
-@@ -53,9 +53,6 @@ union usbg_f_uac2_attr_val {
- 	int p_ssize;
+@@ -110,9 +110,6 @@ union usbg_f_uac2_attr_val {
+ 	const char * function_name;
  };
  
 -#define USBG_F_UAC2_INT_TO_ATTR_VAL(WHAT)			\
@@ -399,7 +399,7 @@ index c1bbb14..1ea55dc 100644
  /**
   * @brief Cast from generic function to uac2 function
   * @param[in] f function to be converted to uac2 funciton.
-@@ -115,7 +112,7 @@ int usbg_f_uac2_get_attr_val(usbg_f_uac2 *af, enum usbg_f_uac2_attr attr,
+@@ -172,7 +169,7 @@ int usbg_f_uac2_get_attr_val(usbg_f_uac2 *af, enum usbg_f_uac2_attr attr,
   * @return 0 on success usbg_error if error occurred.
   */
  int usbg_f_uac2_set_attr_val(usbg_f_uac2 *af, enum usbg_f_uac2_attr attr,
@@ -408,7 +408,7 @@ index c1bbb14..1ea55dc 100644
  
  /**
   * @brief Get the capture channel mask of UAC2 adapter
-@@ -137,8 +134,8 @@ static inline int usbg_f_uac2_get_c_chmask(usbg_f_uac2 *af, int *c_chmask)
+@@ -194,8 +191,8 @@ static inline int usbg_f_uac2_get_c_chmask(usbg_f_uac2 *af, int *c_chmask)
   */
  static inline int usbg_f_uac2_set_c_chmask(usbg_f_uac2 *af, int c_chmask)
  {
@@ -419,7 +419,7 @@ index c1bbb14..1ea55dc 100644
  }
  
  /**
-@@ -161,8 +158,8 @@ static inline int usbg_f_uac2_get_c_srate(usbg_f_uac2 *af, int *c_srate)
+@@ -218,8 +215,8 @@ static inline int usbg_f_uac2_get_c_srate(usbg_f_uac2 *af, int *c_srate)
   */
  static inline int usbg_f_uac2_set_c_srate(usbg_f_uac2 *af, int c_srate)
  {
@@ -430,7 +430,7 @@ index c1bbb14..1ea55dc 100644
  }
  
  /**
-@@ -185,8 +182,8 @@ static inline int usbg_f_uac2_get_c_ssize(usbg_f_uac2 *af, int *c_ssize)
+@@ -242,8 +239,8 @@ static inline int usbg_f_uac2_get_c_ssize(usbg_f_uac2 *af, int *c_ssize)
   */
  static inline int usbg_f_uac2_set_c_ssize(usbg_f_uac2 *af, int c_ssize)
  {
@@ -441,7 +441,7 @@ index c1bbb14..1ea55dc 100644
  }
  
  /**
-@@ -209,8 +206,8 @@ static inline int usbg_f_uac2_get_p_chmask(usbg_f_uac2 *af, int *p_chmask)
+@@ -266,8 +263,8 @@ static inline int usbg_f_uac2_get_p_chmask(usbg_f_uac2 *af, int *p_chmask)
   */
  static inline int usbg_f_uac2_set_p_chmask(usbg_f_uac2 *af, int p_chmask)
  {
@@ -452,7 +452,7 @@ index c1bbb14..1ea55dc 100644
  }
  
  /**
-@@ -233,8 +230,8 @@ static inline int usbg_f_uac2_get_p_srate(usbg_f_uac2 *af, int *p_srate)
+@@ -290,8 +287,8 @@ static inline int usbg_f_uac2_get_p_srate(usbg_f_uac2 *af, int *p_srate)
   */
  static inline int usbg_f_uac2_set_p_srate(usbg_f_uac2 *af, int p_srate)
  {
@@ -463,7 +463,7 @@ index c1bbb14..1ea55dc 100644
  }
  
  /**
-@@ -257,8 +254,8 @@ static inline int usbg_f_uac2_get_p_ssize(usbg_f_uac2 *af, int *p_ssize)
+@@ -314,8 +311,8 @@ static inline int usbg_f_uac2_get_p_ssize(usbg_f_uac2 *af, int *p_ssize)
   */
  static inline int usbg_f_uac2_set_p_ssize(usbg_f_uac2 *af, int p_ssize)
  {
@@ -536,7 +536,7 @@ index 634209f..ac97bc8 100644
  libusbgx_la_CFLAGS = $(LIBCONFIG_CFLAGS)
  AM_CPPFLAGS=-I$(top_srcdir)/include/ -I$(top_builddir)/include/usbg
 diff --git a/src/function/ether.c b/src/function/ether.c
-index ab91af9..d7dcd5d 100644
+index a9eaf33..a1d20f1 100644
 --- a/src/function/ether.c
 +++ b/src/function/ether.c
 @@ -124,7 +124,7 @@ static int ether_libconfig_import(struct usbg_function *f,
@@ -702,10 +702,10 @@ index 519b012..5cdd814 100644
  
  int usbg_f_ms_get_lun_file_s(usbg_f_ms *mf, int lun_id,
 diff --git a/src/function/uac2.c b/src/function/uac2.c
-index f2c1a49..38a9b0f 100644
+index 9ca8b66..fc06c1d 100644
 --- a/src/function/uac2.c
 +++ b/src/function/uac2.c
-@@ -89,7 +89,7 @@ static int uac2_libconfig_import(struct usbg_function *f,
+@@ -125,7 +125,7 @@ static int uac2_libconfig_import(struct usbg_function *f,
  		if (ret < 0)
  			break;
  
@@ -714,7 +714,7 @@ index f2c1a49..38a9b0f 100644
  		if (ret)
  			break;
  	}
-@@ -174,8 +174,8 @@ int usbg_f_uac2_set_attrs(usbg_f_uac2 *af,
+@@ -210,8 +210,8 @@ int usbg_f_uac2_set_attrs(usbg_f_uac2 *af,
  
  	for (i = USBG_F_UAC2_ATTR_MIN; i < USBG_F_UAC2_ATTR_MAX; ++i) {
  		ret = usbg_f_uac2_set_attr_val(af, i,
@@ -725,7 +725,7 @@ index f2c1a49..38a9b0f 100644
  						+ uac2_attr[i].offset));
  		if (ret)
  			break;
-@@ -193,8 +193,8 @@ int usbg_f_uac2_get_attr_val(usbg_f_uac2 *af, enum usbg_f_uac2_attr attr,
+@@ -229,8 +229,8 @@ int usbg_f_uac2_get_attr_val(usbg_f_uac2 *af, enum usbg_f_uac2_attr attr,
  }
  
  int usbg_f_uac2_set_attr_val(usbg_f_uac2 *af, enum usbg_f_uac2_attr attr,
@@ -792,5 +792,5 @@ index 5f7f4e5..7234649 100644
  	char str_addr[USBG_MAX_STR_LENGTH];
  
 -- 
-2.25.1
+2.42.0
 

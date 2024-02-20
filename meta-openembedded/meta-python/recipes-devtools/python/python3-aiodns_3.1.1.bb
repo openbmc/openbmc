@@ -14,3 +14,5 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-asyncio \
     ${PYTHON_PN}-pycares \
 "
+
+BBCLASSEXTEND = "native nativesdk"

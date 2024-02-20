@@ -11,36 +11,36 @@ inherit pypi python_hatchling
 PACKAGES =+ "${PN}-tests"
 FILES:${PN}-tests = "${libdir}/${PYTHON_DIR}/site-packages/jsonschema/tests"
 
-DEPENDS += "${PYTHON_PN}-hatch-fancy-pypi-readme-native ${PYTHON_PN}-hatch-vcs-native "
+DEPENDS += "python3-hatch-fancy-pypi-readme-native python3-hatch-vcs-native "
 
 PACKAGECONFIG ??= "format"
 PACKAGECONFIG[format] = ",,,\
-    ${PYTHON_PN}-idna \
-    ${PYTHON_PN}-jsonpointer \
-    ${PYTHON_PN}-webcolors \
-    ${PYTHON_PN}-rfc3987 \
-    ${PYTHON_PN}-rfc3339-validator \
+    python3-idna \
+    python3-jsonpointer \
+    python3-webcolors \
+    python3-rfc3987 \
+    python3-rfc3339-validator \
 "
 PACKAGECONFIG[nongpl] = ",,,\
-    ${PYTHON_PN}-idna \
-    ${PYTHON_PN}-jsonpointer \
-    ${PYTHON_PN}-webcolors \
-    ${PYTHON_PN}-rfc3986-validator \
-    ${PYTHON_PN}-rfc3339-validator \
+    python3-idna \
+    python3-jsonpointer \
+    python3-webcolors \
+    python3-rfc3986-validator \
+    python3-rfc3339-validator \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-attrs \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-importlib-metadata \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-pyrsistent \
-    ${PYTHON_PN}-zipp \
+    python3-attrs \
+    python3-core \
+    python3-datetime \
+    python3-importlib-metadata \
+    python3-io \
+    python3-json \
+    python3-netclient \
+    python3-numbers \
+    python3-pprint \
+    python3-pyrsistent \
+    python3-zipp \
 "
 
 RDEPENDS:${PN}-tests = "${PN}"

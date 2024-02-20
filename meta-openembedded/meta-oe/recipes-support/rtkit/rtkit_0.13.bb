@@ -19,5 +19,5 @@ PACKAGECONFIG[systemd] = ",,systemd"
 USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system --no-create-home --user-group --shell /bin/nologin rtkit"
 
-FILES:${PN} += "${libdir} ${datadir}"
+FILES:${PN} += "${libdir} ${datadir} ${systemd_system_unitdir}"
 

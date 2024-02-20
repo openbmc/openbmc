@@ -1,0 +1,57 @@
+From 51a048251c552d9ead29a2a3e4884c138fcf9c1c Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Wed, 7 Feb 2024 15:32:45 +0100
+Subject: [PATCH] test_xml_etree.py: Fix for Expat >=2.6.0 with reparse deferral
+
+Upstream-Status: Submitted [https://github.com/python/cpython/pull/115138]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Lib/test/test_xml_etree.py                             | 10 ++++++----
+ .../2024-02-07-15-49-37.gh-issue-115133.WBajNr.rst     |  1 +
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Tests/2024-02-07-15-49-37.gh-issue-115133.WBajNr.rst
+
+diff --git a/Lib/test/test_xml_etree.py b/Lib/test/test_xml_etree.py
+index 53a4e9f..9a0119c 100644
+--- a/Lib/test/test_xml_etree.py
++++ b/Lib/test/test_xml_etree.py
+@@ -1401,6 +1401,7 @@ class XMLPullParserTest(unittest.TestCase):
+     def test_simple_xml(self):
+         for chunk_size in (None, 1, 5):
+             with self.subTest(chunk_size=chunk_size):
++                expected_events = []
+                 parser = ET.XMLPullParser()
+                 self.assert_event_tags(parser, [])
+                 self._feed(parser, "<!-- comment -->\n", chunk_size)
+@@ -1410,16 +1411,17 @@ class XMLPullParserTest(unittest.TestCase):
+                            chunk_size)
+                 self.assert_event_tags(parser, [])
+                 self._feed(parser, ">\n", chunk_size)
+-                self.assert_event_tags(parser, [('end', 'element')])
++                expected_events += [('end', 'element')]
+                 self._feed(parser, "<element>text</element>tail\n", chunk_size)
+                 self._feed(parser, "<empty-element/>\n", chunk_size)
+-                self.assert_event_tags(parser, [
++                expected_events += [
+                     ('end', 'element'),
+                     ('end', 'empty-element'),
+-                    ])
++                    ]
+                 self._feed(parser, "</root>\n", chunk_size)
+-                self.assert_event_tags(parser, [('end', 'root')])
++                expected_events += [('end', 'root')]
+                 self.assertIsNone(parser.close())
++                self.assert_event_tags(parser, expected_events)
+ 
+     def test_feed_while_iterating(self):
+         parser = ET.XMLPullParser()
+diff --git a/Misc/NEWS.d/next/Tests/2024-02-07-15-49-37.gh-issue-115133.WBajNr.rst b/Misc/NEWS.d/next/Tests/2024-02-07-15-49-37.gh-issue-115133.WBajNr.rst
+new file mode 100644
+index 0000000..4dc9c13
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2024-02-07-15-49-37.gh-issue-115133.WBajNr.rst
+@@ -0,0 +1 @@
++Fix etree XMLPullParser tests for Expat >=2.6.0 with reparse deferral
+-- 
+2.43.0
+

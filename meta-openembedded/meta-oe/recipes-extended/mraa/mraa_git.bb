@@ -6,7 +6,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=91e7de50a8d3cf01057f318d72460acd"
 
 SRCREV = "3c288a09109969eef9c2da7d92d3c62f92a015cc"
-PV = "2.2.0+git${SRCPV}"
+PV = "2.2.0+git"
 
 SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=https;branch=master \
            file://0001-cmake-Use-a-regular-expression-to-match-x86-architec.patch \

@@ -12,8 +12,8 @@ SRC_URI[sha256sum] = "f238736bb06590ae52ac1fab06a3a9ef1d8dce2b7a35b5ab329371d6c8
 
 S = "${WORKDIR}/importlib_metadata-${PV}"
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native ${PYTHON_PN}-toml-native"
-RDEPENDS:${PN} += "${PYTHON_PN}-zipp ${PYTHON_PN}-pathlib2"
+DEPENDS += "python3-setuptools-scm-native python3-toml-native"
+RDEPENDS:${PN} += "python3-zipp python3-pathlib2"
 RDEPENDS:${PN}:append:class-target = " python3-misc"
 RDEPENDS:${PN}:append:class-nativesdk = " python3-misc"
 

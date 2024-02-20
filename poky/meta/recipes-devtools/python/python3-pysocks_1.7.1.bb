@@ -10,11 +10,11 @@ PYPI_PACKAGE = "PySocks"
 inherit pypi setuptools3
 
 RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-shell \
+    python3-email \
+    python3-io \
+    python3-logging \
+    python3-netclient \
+    python3-shell \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -1,0 +1,31 @@
+From 7c199e3b191a6f714694035f1eba40112e71675c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 Feb 2024 18:41:51 -0800
+Subject: [PATCH] Check for C standard version >= 23 for [[__fallthrough__]]
+
+This avoids warnings with clang-18+ e.g.
+
+pprintint.h:256:6: error: [[]] attributes are a C23 extension [-Werror,-Wc23-extensions]
+
+Upstream-Status: Submitted [https://github.com/dvidelabs/flatcc/pull/273]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/flatcc/portable/pattributes.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/flatcc/portable/pattributes.h b/include/flatcc/portable/pattributes.h
+index 9240fa3..dd4918a 100644
+--- a/include/flatcc/portable/pattributes.h
++++ b/include/flatcc/portable/pattributes.h
+@@ -57,7 +57,7 @@ extern "C" {
+ 
+ 
+ /* https://en.cppreference.com/w/c/language/attributes/fallthrough */
+-#if PORTABLE_HAS_C_ATTRIBUTE(__fallthrough__)
++#if PORTABLE_HAS_C_ATTRIBUTE(__fallthrough__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+ # define pattribute_fallthrough [[__fallthrough__]]
+ #elif PORTABLE_HAS_ATTRIBUTE(__fallthrough__)
+ # define pattribute_fallthrough __attribute__((__fallthrough__))
+-- 
+2.43.0
+

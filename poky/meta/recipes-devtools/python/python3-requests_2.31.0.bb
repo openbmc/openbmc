@@ -8,17 +8,17 @@ SRC_URI[sha256sum] = "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-ndg-httpsclient \
-    ${PYTHON_PN}-netserver \
-    ${PYTHON_PN}-pyasn1 \
-    ${PYTHON_PN}-pyopenssl \
-    ${PYTHON_PN}-pysocks \
-    ${PYTHON_PN}-urllib3 \
-    ${PYTHON_PN}-chardet \
-    ${PYTHON_PN}-idna \
-    ${PYTHON_PN}-compression \
+    python3-email \
+    python3-json \
+    python3-ndg-httpsclient \
+    python3-netserver \
+    python3-pyasn1 \
+    python3-pyopenssl \
+    python3-pysocks \
+    python3-urllib3 \
+    python3-chardet \
+    python3-idna \
+    python3-compression \
 "
 
 CVE_PRODUCT = "requests"

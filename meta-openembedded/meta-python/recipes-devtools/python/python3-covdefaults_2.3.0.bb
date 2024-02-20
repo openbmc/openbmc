@@ -16,11 +16,12 @@ S = "${WORKDIR}/git"
 inherit setuptools3 ptest
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-coverage \
+    python3-coverage \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

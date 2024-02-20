@@ -19,7 +19,7 @@ SRC_URI[aufs_type.sha256sum] = "7ff6566adb9c7a3b6862cdc85a690ab546f1d0bc81ddd595
 
 UPSTREAM_CHECK_COMMITS = "1"
 
-PV = "4.9+git${SRCPV}"
+PV = "4.9+git"
 
 S = "${WORKDIR}/git"
 

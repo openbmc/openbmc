@@ -8,7 +8,7 @@ HOMEPAGE = "http://www.libimobiledevice.org/"
 
 DEPENDS = "libplist usbmuxd libusbmuxd libtasn1 gnutls libgcrypt libimobiledevice-glue openssl"
 
-PV = "1.3.0+git${SRCPV}"
+PV = "1.3.0+git"
 
 SRCREV = "860ffb707af3af94467d2ece4ad258dda957c6cd"
 SRC_URI = "git://github.com/libimobiledevice/libimobiledevice;protocol=https;branch=master \

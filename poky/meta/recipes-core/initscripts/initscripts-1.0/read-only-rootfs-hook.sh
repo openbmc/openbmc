@@ -37,9 +37,9 @@ if [ "$1" = "start" ] ; then
 		mkdir -p /var/volatile/.lib-work
 		# Try to mount using overlay, which is much faster than copying
 		# files. If that fails, fallback to the slower copy
-		if ! mount -t overlay overlay -olowerdir=/var/lib,upperdir=/var/volatile/lib,workdir=/var/volatile/.lib-work /var/lib > /dev/null 2>&1; then
+		if ! mount -t overlay overlay SED_VARLIBMOUNTARGS -olowerdir=/var/lib,upperdir=/var/volatile/lib,workdir=/var/volatile/.lib-work /var/lib > /dev/null 2>&1; then
 			cp -a /var/lib/* /var/volatile/lib
-			mount --bind /var/volatile/lib /var/lib
+			mount SED_VARLIBMOUNTARGS --bind /var/volatile/lib /var/lib
 		fi
 	fi
 fi

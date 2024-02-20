@@ -12,6 +12,8 @@ SRCREV = "cddfede795971045d99422bd7a9676c8803ec5ee"
 
 S = "${WORKDIR}/git"
 
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
+
 inherit setuptools3
 
 RDEPENDS:${PN} += " \

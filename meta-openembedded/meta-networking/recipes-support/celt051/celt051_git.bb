@@ -12,7 +12,7 @@ like Speex, GSM, or G.729."
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=375f60ab360d17f0172737036ff155b2"
 
-PV = "0.5.1.3+git${SRCPV}"
+PV = "0.5.1.3+git"
 
 SRCREV = "5555aae843f57241d005e330b9cb65602d56db0f"
 

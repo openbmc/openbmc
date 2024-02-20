@@ -6,7 +6,7 @@ SRC_URI = "git://github.com/KhronosGroup/OpenCL-CLHPP.git;protocol=https;branch=
 LICENSE  = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-PV = "2.0.16+git${SRCPV}"
+PV = "2.0.16+git"
 SRCREV = "1df82b9749739f2681081092ae163bb0f0d40f66"
 
 S = "${WORKDIR}/git"

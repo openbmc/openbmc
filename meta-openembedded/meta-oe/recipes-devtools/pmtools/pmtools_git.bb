@@ -4,7 +4,7 @@ HOMEPAGE = "http://lesswatts.org/projects/acpi"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
-PV = "20130209+git${SRCPV}"
+PV = "20130209+git"
 
 SRC_URI = "git://github.com/anyc/pmtools.git;branch=master;protocol=https \
     file://pmtools-switch-to-dynamic-buffer-for-huge-ACPI-table.patch \

@@ -14,15 +14,16 @@ SRC_URI[sha256sum] = "7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c8
 inherit pypi setuptools3 ptest
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-requests (>=2.0.1) \
+    python3-requests (>=2.0.1) \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-betamax \
-	${PYTHON_PN}-mock \
-	${PYTHON_PN}-multiprocessing \
-	${PYTHON_PN}-trustme \
+    python3-betamax \
+    python3-mock \
+    python3-multiprocessing \
+    python3-pytest \
+    python3-trustme \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

@@ -23,7 +23,7 @@ do_install() {
         device=$(echo $s | cut -d\; -f 2)
         label=$(echo $device | sed -e 's/tty//' | tail --bytes=5)
 
-        echo "::respawn:${sbindir}/ttyrun $device ${base_sbindir}/getty $speed $device" >> ${D}${sysconfdir}/inittab
+        echo "$device::respawn:${sbindir}/ttyrun $device ${base_sbindir}/getty $speed $device" >> ${D}${sysconfdir}/inittab
     done
 
 	if [ "${USE_VT}" = "1" ]; then

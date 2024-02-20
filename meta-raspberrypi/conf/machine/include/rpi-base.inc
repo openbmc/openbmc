@@ -28,6 +28,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/hifiberry-amp.dtbo \
     overlays/hifiberry-dac.dtbo \
     overlays/hifiberry-dacplus.dtbo \
+    overlays/hifiberry-dacplusadcpro.dtbo \
     overlays/hifiberry-digi.dtbo \
     overlays/justboom-both.dtbo \
     overlays/justboom-dac.dtbo \

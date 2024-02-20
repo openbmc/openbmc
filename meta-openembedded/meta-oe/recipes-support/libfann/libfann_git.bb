@@ -12,7 +12,7 @@ SRCREV ?= "7ec1fc7e5bd734f1d3c89b095e630e83c86b9be1"
 SRC_URI = "git://github.com/libfann/fann.git;branch=master;protocol=https \
           "
 
-PV = "2.2.0+git${SRCPV}"
+PV = "2.2.0+git"
 
 S = "${WORKDIR}/git"
 

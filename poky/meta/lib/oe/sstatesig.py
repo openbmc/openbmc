@@ -205,10 +205,10 @@ class SignatureGeneratorOEBasicHashMixIn(object):
             return self.lockedhashes[tid]
         return super().get_stampfile_hash(tid)
 
-    def get_unihash(self, tid):
+    def get_cached_unihash(self, tid):
         if tid in self.lockedhashes and self.lockedhashes[tid] and not self._internal:
             return self.lockedhashes[tid]
-        return super().get_unihash(tid)
+        return super().get_cached_unihash(tid)
 
     def dump_sigtask(self, fn, task, stampbase, runtime):
         tid = fn + ":" + task
@@ -326,6 +326,7 @@ class SignatureGeneratorOEEquivHash(SignatureGeneratorOEBasicHashMixIn, bb.sigge
         self.method = data.getVar('SSTATE_HASHEQUIV_METHOD')
         if not self.method:
             bb.fatal("OEEquivHash requires SSTATE_HASHEQUIV_METHOD to be set")
+        self.max_parallel = int(data.getVar('BB_HASHSERVE_MAX_PARALLEL') or 1)
 
 # Insert these classes into siggen's namespace so it can see and select them
 bb.siggen.SignatureGeneratorOEBasicHash = SignatureGeneratorOEBasicHash

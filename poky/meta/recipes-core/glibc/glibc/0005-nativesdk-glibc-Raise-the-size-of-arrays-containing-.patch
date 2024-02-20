@@ -1,4 +1,4 @@
-From e874dacbfdb06520240887e9077c58006ee33f87 Mon Sep 17 00:00:00 2001
+From 49caf586b80ba030a0ee4af9f6128ff2979ea636 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
 Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
@@ -26,7 +26,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  8 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/elf/dl-cache.c b/elf/dl-cache.c
-index 804bf23222..d99501c389 100644
+index 85f3f179ed..cc55887c56 100644
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
 @@ -352,6 +352,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
@@ -41,7 +41,7 @@ index 804bf23222..d99501c389 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 3a23dc618c..563e703096 100644
+index c4a543fb00..27fb70f09b 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -117,8 +117,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
@@ -56,7 +56,7 @@ index 3a23dc618c..563e703096 100644
    SYSTEM_DIRS_LEN
  };
 diff --git a/elf/dl-usage.c b/elf/dl-usage.c
-index 98f0b0d027..ab4f76e1fe 100644
+index 5baac4ba8e..60097ad0e2 100644
 --- a/elf/dl-usage.c
 +++ b/elf/dl-usage.c
 @@ -25,6 +25,8 @@
@@ -68,7 +68,7 @@ index 98f0b0d027..ab4f76e1fe 100644
  void
  _dl_usage (const char *argv0, const char *wrong_option)
  {
-@@ -184,7 +186,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
+@@ -185,7 +187,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
    --list                list all dependencies and how they are resolved\n\
    --verify              verify that given object really is a dynamically linked\n\
                          object we can handle\n\
@@ -77,7 +77,7 @@ index 98f0b0d027..ab4f76e1fe 100644
    --library-path PATH   use given PATH instead of content of the environment\n\
                          variable LD_LIBRARY_PATH\n\
    --glibc-hwcaps-prepend LIST\n\
-@@ -203,7 +205,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
+@@ -204,7 +206,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
  \n\
  This program interpreter self-identifies as: " RTLD "\n\
  ",
@@ -87,7 +87,7 @@ index 98f0b0d027..ab4f76e1fe 100644
    print_hwcaps_subdirectories (state);
    _exit (EXIT_SUCCESS);
 diff --git a/elf/interp.c b/elf/interp.c
-index ae21ae0cb3..b168e6da66 100644
+index 8b705824bf..7d094829f3 100644
 --- a/elf/interp.c
 +++ b/elf/interp.c
 @@ -18,5 +18,5 @@
@@ -98,7 +98,7 @@ index ae21ae0cb3..b168e6da66 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index d26eef1fb4..e5af6e5c01 100644
+index b64c54b53e..caf7001745 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
 @@ -150,6 +150,8 @@ static struct argp argp =
@@ -111,7 +111,7 @@ index d26eef1fb4..e5af6e5c01 100644
  static error_t
  parse_opt (int key, char *arg, struct argp_state *state)
 diff --git a/elf/rtld.c b/elf/rtld.c
-index a91e2a4471..56d816d4d9 100644
+index 4f494b792e..d1c1252188 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
 @@ -190,6 +190,7 @@ dso_name_valid_for_suid (const char *p)
@@ -123,7 +123,7 @@ index a91e2a4471..56d816d4d9 100644
  static void
  audit_list_init (struct audit_list *list)
 diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
-index ee9e97e1bd..01a99382d0 100644
+index 1063c31a2b..57fa832e52 100644
 --- a/iconv/gconv_conf.c
 +++ b/iconv/gconv_conf.c
 @@ -35,7 +35,7 @@
@@ -136,7 +136,7 @@ index ee9e97e1bd..01a99382d0 100644
  /* Type to represent search path.  */
  struct path_elem
 diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
-index bd39ff7fb7..38f9e2ad57 100644
+index 919e49ffc8..cd3f8ba94b 100644
 --- a/sysdeps/generic/dl-cache.h
 +++ b/sysdeps/generic/dl-cache.h
 @@ -34,10 +34,6 @@

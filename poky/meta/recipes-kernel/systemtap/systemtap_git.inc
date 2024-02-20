@@ -10,6 +10,8 @@ SRC_URI = "git://sourceware.org/git/systemtap.git;branch=master;protocol=https \
            file://0001-Makefile.am-remove-runtime-linux-uprobes-and-runtime.patch \
            file://0001-prerelease-datestamp-fixes.patch \
            file://0001-configure.ac-fix-broken-libdebuginfod-library-auto-d.patch \
+           file://0001-bpf-translate.cxx-fix-build-against-upcoming-gcc-14-.patch \
+           file://0001-staprun-fix-build-against-upcoming-gcc-14-Werror-cal.patch \
            "
 
 COMPATIBLE_HOST = '(x86_64|i.86|powerpc|arm|aarch64|microblazeel|mips|riscv64).*-linux'

@@ -13,25 +13,17 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  framework/platform/CMakeLists.txt | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/framework/platform/CMakeLists.txt b/framework/platform/CMakeLists.txt
-index c3ac463e4..030163f6c 100644
 --- a/framework/platform/CMakeLists.txt
 +++ b/framework/platform/CMakeLists.txt
-@@ -73,8 +73,12 @@ if (NOT DEFINED TCUTIL_PLATFORM_SRCS)
+@@ -73,8 +73,9 @@ if (NOT DEFINED TCUTIL_PLATFORM_SRCS)
  			add_definitions(-DDEQP_SUPPORT_WAYLAND=1)
  			include_directories(lnx/wayland)
  
 -			pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
--			pkg_get_variable(WAYLAND_SCANNER wayland-scanner wayland_scanner)
-+			if (NOT DEFINED WAYLAND_PROTOCOLS_DIR)
+-
++			if (NOT WAYLAND_PROTOCOLS_DIR)
 +				pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
 +			endif()
-+			if (NOT DEFINED WAYLAND_SCANNER)
-+				pkg_get_variable(WAYLAND_SCANNER wayland-scanner wayland_scanner)
-+			endif()
- 
- 			set(DEQP_XDG_SHELL_PROTOCOL ${WAYLAND_PROTOCOLS_DIR}/stable/xdg-shell/xdg-shell.xml)
- 			set(DEQP_XDG_SHELL_GEN_OUTPUTS_DIR ${PROJECT_BINARY_DIR}/framework/platform)
--- 
-2.37.3
-
+ 			if (NOT WAYLAND_SCANNER)
+ 				pkg_get_variable(WAYLAND_SCANNER wayland-scanner wayland_scanner)
+ 			endif()

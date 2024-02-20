@@ -37,11 +37,9 @@ DEPENDS = " \
 "
 
 RDEPENDS:${PN} = " \
-    bubblewrap \
     ca-certificates \
     dconf \
     flatpak-xdg-utils \
-    xdg-dbus-proxy \
 "
 
 GIR_MESON_OPTION = "gir"

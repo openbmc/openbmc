@@ -27,9 +27,9 @@ DEPENDS += " \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-misc \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-numbers \
+    python3-misc \
+    python3-logging \
+    python3-numbers \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libxcb', '', d)} \
 "
 
@@ -38,13 +38,14 @@ RDEPENDS:${PN}-ptest += " \
     ghostscript \
     jpeg-tools \
     libwebp \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-image \
-    ${PYTHON_PN}-mmap \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-pytest-timeout \
-    ${PYTHON_PN}-resource \
-    ${PYTHON_PN}-unixadmin\
+    python3-core \
+    python3-image \
+    python3-mmap \
+    python3-pytest \
+    python3-pytest-timeout \
+    python3-resource \
+    python3-unittest-automake-output \
+    python3-unixadmin\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'tk', '', d)} \
 "
 

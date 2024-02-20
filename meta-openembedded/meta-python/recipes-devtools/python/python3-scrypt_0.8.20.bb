@@ -14,11 +14,12 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-ctypes \
+    python3-ctypes \
 "
 
 do_install_ptest() {

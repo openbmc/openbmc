@@ -9,7 +9,7 @@ SRC_URI = "git://chromium.googlesource.com/external/gyp;protocol=https;branch=ma
 SRCREV = "a03d7413becefc8d55c8aa3df58b55b9bd0e9052"
 
 S = "${WORKDIR}/git"
-PV = "0.1+git${SRCPV}"
+PV = "0.1+git"
 
 inherit setuptools3
 

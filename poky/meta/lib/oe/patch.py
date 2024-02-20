@@ -294,8 +294,9 @@ class PatchTree(PatchSet):
         self.Pop(all=True)
 
 class GitApplyTree(PatchTree):
-    patch_line_prefix = '%% original patch'
-    ignore_commit_prefix = '%% ignore'
+    notes_ref = "refs/notes/devtool"
+    original_patch = 'original patch'
+    ignore_commit = 'ignore'
 
     def __init__(self, dir, d):
         PatchTree.__init__(self, dir, d)
@@ -452,13 +453,61 @@ class GitApplyTree(PatchTree):
         # Prepare git command
         cmd = ["git"]
         GitApplyTree.gitCommandUserOptions(cmd, commituser, commitemail)
-        cmd += ["commit", "-F", tmpfile]
+        cmd += ["commit", "-F", tmpfile, "--no-verify"]
         # git doesn't like plain email addresses as authors
         if author and '<' in author:
             cmd.append('--author="%s"' % author)
         if date:
             cmd.append('--date="%s"' % date)
         return (tmpfile, cmd)
+
+    @staticmethod
+    def addNote(repo, ref, key, value=None):
+        note = key + (": %s" % value if value else "")
+        notes_ref = GitApplyTree.notes_ref
+        runcmd(["git", "config", "notes.rewriteMode", "ignore"], repo)
+        runcmd(["git", "config", "notes.displayRef", notes_ref, notes_ref], repo)
+        runcmd(["git", "config", "notes.rewriteRef", notes_ref, notes_ref], repo)
+        runcmd(["git", "notes", "--ref", notes_ref, "append", "-m", note, ref], repo)
+
+    @staticmethod
+    def removeNote(repo, ref, key):
+        notes = GitApplyTree.getNotes(repo, ref)
+        notes = {k: v for k, v in notes.items() if k != key and not k.startswith(key + ":")}
+        runcmd(["git", "notes", "--ref", GitApplyTree.notes_ref, "remove", "--ignore-missing", ref], repo)
+        for note, value in notes.items():
+            GitApplyTree.addNote(repo, ref, note, value)
+
+    @staticmethod
+    def getNotes(repo, ref):
+        import re
+
+        note = None
+        try:
+            note = runcmd(["git", "notes", "--ref", GitApplyTree.notes_ref, "show", ref], repo)
+            prefix = ""
+        except CmdError:
+            note = runcmd(['git', 'show', '-s', '--format=%B', ref], repo)
+            prefix = "%% "
+
+        note_re = re.compile(r'^%s(.*?)(?::\s*(.*))?$' % prefix)
+        notes = dict()
+        for line in note.splitlines():
+            m = note_re.match(line)
+            if m:
+                notes[m.group(1)] = m.group(2)
+
+        return notes
+
+    @staticmethod
+    def commitIgnored(subject, dir=None, files=None, d=None):
+        if files:
+            runcmd(['git', 'add'] + files, dir)
+        cmd = ["git"]
+        GitApplyTree.gitCommandUserOptions(cmd, d=d)
+        cmd += ["commit", "-m", subject, "--no-verify"]
+        runcmd(cmd, dir)
+        GitApplyTree.addNote(dir, "HEAD", GitApplyTree.ignore_commit)
 
     @staticmethod
     def extractPatches(tree, startcommits, outdir, paths=None):
@@ -474,16 +523,19 @@ class GitApplyTree(PatchTree):
                 out = runcmd(["sh", "-c", " ".join(shellcmd)], os.path.join(tree, name))
                 if out:
                     for srcfile in out.split():
+                        # This loop, which is used to remove any line that
+                        # starts with "%% original patch", is kept for backwards
+                        # compatibility. If/when that compatibility is dropped,
+                        # it can be replaced with code to just read the first
+                        # line of the patch file to get the SHA-1, and the code
+                        # below that writes the modified patch file can be
+                        # replaced with a simple file move.
                         for encoding in ['utf-8', 'latin-1']:
                             patchlines = []
-                            outfile = None
                             try:
                                 with open(srcfile, 'r', encoding=encoding, newline='') as f:
                                     for line in f:
-                                        if line.startswith(GitApplyTree.patch_line_prefix):
-                                            outfile = line.split()[-1].strip()
-                                            continue
-                                        if line.startswith(GitApplyTree.ignore_commit_prefix):
+                                        if line.startswith("%% " + GitApplyTree.original_patch):
                                             continue
                                         patchlines.append(line)
                             except UnicodeDecodeError:
@@ -492,8 +544,12 @@ class GitApplyTree(PatchTree):
                         else:
                             raise PatchError('Unable to find a character encoding to decode %s' % srcfile)
 
-                        if not outfile:
-                            outfile = os.path.basename(srcfile)
+                        sha1 = patchlines[0].split()[1]
+                        notes = GitApplyTree.getNotes(os.path.join(tree, name), sha1)
+                        if GitApplyTree.ignore_commit in notes:
+                            continue
+                        outfile = notes.get(GitApplyTree.original_patch, os.path.basename(srcfile))
+
                         bb.utils.mkdirhier(os.path.join(outdir, name))
                         with open(os.path.join(outdir, name, outfile), 'w') as of:
                             for line in patchlines:
@@ -545,28 +601,11 @@ class GitApplyTree(PatchTree):
 
             return runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
 
-        # Add hooks which add a pointer to the original patch file name in the commit message
         reporoot = (runcmd("git rev-parse --show-toplevel".split(), self.dir) or '').strip()
         if not reporoot:
             raise Exception("Cannot get repository root for directory %s" % self.dir)
-        gitdir = (runcmd("git rev-parse --absolute-git-dir".split(), self.dir) or '').strip()
-        if not gitdir:
-            raise Exception("Cannot get gitdir for directory %s" % self.dir)
-        hooks_dir = os.path.join(gitdir, 'hooks')
-        hooks_dir_backup = hooks_dir + '.devtool-orig'
-        if os.path.lexists(hooks_dir_backup):
-            raise Exception("Git hooks backup directory already exists: %s" % hooks_dir_backup)
-        if os.path.lexists(hooks_dir):
-            shutil.move(hooks_dir, hooks_dir_backup)
-        os.mkdir(hooks_dir)
-        commithook = os.path.join(hooks_dir, 'commit-msg')
-        applyhook = os.path.join(hooks_dir, 'applypatch-msg')
-        with open(commithook, 'w') as f:
-            # NOTE: the formatting here is significant; if you change it you'll also need to
-            # change other places which read it back
-            f.write('echo "\n%s: $PATCHFILE" >> $1' % GitApplyTree.patch_line_prefix)
-        os.chmod(commithook, 0o755)
-        shutil.copy2(commithook, applyhook)
+
+        patch_applied = True
         try:
             patchfilevar = 'PATCHFILE="%s"' % os.path.basename(patch['file'])
             if self._need_dirty_check():
@@ -577,7 +616,7 @@ class GitApplyTree(PatchTree):
                     pass
                 else:
                     if output:
-                        # The tree is dirty, not need to try to apply patches with git anymore
+                        # The tree is dirty, no need to try to apply patches with git anymore
                         # since they fail, fallback directly to patch
                         output = PatchTree._applypatch(self, patch, force, reverse, run)
                         output += self._commitpatch(patch, patchfilevar)
@@ -610,10 +649,12 @@ class GitApplyTree(PatchTree):
                     output = PatchTree._applypatch(self, patch, force, reverse, run)
                 output += self._commitpatch(patch, patchfilevar)
                 return output
+        except:
+            patch_applied = False
+            raise
         finally:
-            shutil.rmtree(hooks_dir)
-            if os.path.lexists(hooks_dir_backup):
-                shutil.move(hooks_dir_backup, hooks_dir)
+            if patch_applied:
+                GitApplyTree.addNote(self.dir, "HEAD", GitApplyTree.original_patch, os.path.basename(patch['file']))
 
 
 class QuiltTree(PatchSet):

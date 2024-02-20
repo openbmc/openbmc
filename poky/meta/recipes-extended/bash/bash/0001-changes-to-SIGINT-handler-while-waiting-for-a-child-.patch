@@ -147,7 +147,7 @@ index bbc228e8..e0a66745 100644
 -alias m='more'
 -alias m='more'
 -m is aliased to `more'
-+./type.tests: line 59: type: morealias: not found
++./type.tests: line 56: type: morealias: not found
 +alias morealias='more'
 +alias morealias='more'
 +morealias is aliased to `more'

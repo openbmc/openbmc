@@ -12,7 +12,8 @@ require conf/machine/include/arm/arch-armv8-2a.inc
 AVAILTUNES                                         += "cortexa76-cortexa55 cortexa76-cortexa55-crypto"
 ARMPKGARCH:tune-cortexa76-cortexa55                 = "cortexa76-cortexa55"
 ARMPKGARCH:tune-cortexa76-cortexa55-crypto          = "cortexa76-cortexa55-crypto"
-TUNE_FEATURES:tune-cortexa76-cortexa55              = "${TUNE_FEATURES:tune-armv8-2a} cortexa76-cortexa55"
+# We do not want -march since -mcpu is added above to cover for it
+TUNE_FEATURES:tune-cortexa76-cortexa55              = "aarch64 cortexa76-cortexa55"
 TUNE_FEATURES:tune-cortexa76-cortexa55-crypto       = "${TUNE_FEATURES:tune-cortexa76-cortexa55} crypto"
 PACKAGE_EXTRA_ARCHS:tune-cortexa76-cortexa55        = "${PACKAGE_EXTRA_ARCHS:tune-armv8-2a} cortexa76-cortexa55"
 PACKAGE_EXTRA_ARCHS:tune-cortexa76-cortexa55-crypto = "${PACKAGE_EXTRA_ARCHS:tune-armv8-2a-crypto} cortexa76-cortexa55 cortexa76-cortexa55-crypto"

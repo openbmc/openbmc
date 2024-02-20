@@ -364,12 +364,6 @@ remove_init_link () {
 	fi
 }
 
-make_zimage_symlink_relative () {
-	if [ -L ${IMAGE_ROOTFS}/boot/zImage ]; then
-		(cd ${IMAGE_ROOTFS}/boot/ && for i in `ls zImage-* | sort`; do ln -sf $i zImage; done)
-	fi
-}
-
 python write_image_manifest () {
     from oe.rootfs import image_list_installed_packages
     from oe.utils import format_pkg_list

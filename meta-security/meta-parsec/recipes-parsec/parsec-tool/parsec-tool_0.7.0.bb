@@ -5,7 +5,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 inherit cargo cargo-update-recipe-crates
 
-SRC_URI += "crate://crates.io/parsec-tool/${PV} \
+SRC_URI += "\
+  crate://crates.io/parsec-tool/${PV} \
+  file://0001-parsec-cli-tests.sh-adapt-to-new-serialNumber-output.patch \
 "
 SRC_URI[parsec-tool-0.7.0.sha256sum] = "76afb4416d04c5af9f81285dfff390b09c6926aabd6b4ee20dc07470a9698732"
 

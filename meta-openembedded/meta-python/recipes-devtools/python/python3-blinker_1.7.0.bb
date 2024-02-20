@@ -9,11 +9,12 @@ inherit pypi python_setuptools_build_meta ptest
 SRC_URI += "file://run-ptest"
 
 RDEPENDS:${PN} += "\
-        ${PYTHON_PN}-asyncio \
+        python3-asyncio \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

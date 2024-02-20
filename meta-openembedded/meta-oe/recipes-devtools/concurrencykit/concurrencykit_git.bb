@@ -7,7 +7,7 @@ LICENSE = "BSD-2-Clause & Apache-2.0"
 HOMEPAGE = "http://concurrencykit.org"
 SECTION = "base"
 
-PV = "0.7.0+git${SRCPV}"
+PV = "0.7.0+git"
 SRCREV = "6e8e5bec2e2f8cef2072a68579cbb07ababf3331"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a0b24c1a8f9ad516a297d055b0294231"
 SRC_URI = "git://github.com/concurrencykit/ck.git;branch=master;protocol=https \

@@ -11,14 +11,14 @@ SRC_URI[sha256sum] = "13ae38502be632115abf8a24cbe5f4da52e3b5231990aff31123c80530
 inherit pypi setuptools3
 
 RDEPENDS:${PN}:class-target += " \
-    ${PYTHON_PN}-codecs \
-    ${PYTHON_PN}-crypt \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-shell \
+    python3-codecs \
+    python3-crypt \
+    python3-ctypes \
+    python3-datetime \
+    python3-io \
+    python3-netclient \
+    python3-numbers \
+    python3-shell \
 "
 
 BBCLASSEXTEND = "native nativesdk"

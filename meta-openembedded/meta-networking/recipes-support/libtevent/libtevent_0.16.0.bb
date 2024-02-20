@@ -7,6 +7,7 @@ DEPENDS += "libtalloc libtirpc cmocka"
 RDEPENDS:python3-tevent = "python3"
 
 export PYTHONHASHSEED="1"
+export PYTHONARCHDIR = "${PYTHON_SITEPACKAGES_DIR}"
 
 SRC_URI = "https://samba.org/ftp/tevent/tevent-${PV}.tar.gz \
            file://0001-Add-configure-options-for-packages.patch \

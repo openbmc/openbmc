@@ -20,4 +20,7 @@ do_install_ptest() {
 
 
 RDEPENDS:${PN} += "python3-core python3-pytest"
-RDEPENDS:${PN}-ptest = " python3-unixadmin"
+RDEPENDS:${PN}-ptest = " \
+    python3-unixadmin \
+    python3-unittest-automake-output \
+    "

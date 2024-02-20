@@ -1,7 +1,7 @@
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=72d977d697c3c05830fdff00a7448931"
-SRCREV = "beb4650660179963a8ed5b5cbf2085cc1b34f608"
-PV = "1.0+git${SRCPV}"
+SRCREV = "7626d0a0707391970080d493ce69638719938da7"
+PV = "1.0+git"
 
 SRC_URI = "git://github.com/hartkopp/can-isotp.git;protocol=https;branch=master"
 
@@ -16,4 +16,4 @@ do_install:append() {
     install -Dm 644 ${S}/include/uapi/linux/can/isotp.h ${D}${includedir}/linux/can/isotp.h
 }
 
-EXCLUDE_FROM_WORLD = "1"
+SKIP_RECIPE[can-isotp] ?= "Not needed with kernel 5.10+"

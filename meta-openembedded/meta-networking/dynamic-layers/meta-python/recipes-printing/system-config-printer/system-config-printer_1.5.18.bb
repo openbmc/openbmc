@@ -23,6 +23,9 @@ do_configure:prepend() {
 }
 
 do_install:append() {
+    cp -rf ${B}/cupshelpers.egg-info ${D}${PYTHON_SITEPACKAGES_DIR}
+    cp -rf ${B}/cupshelpers ${D}${PYTHON_SITEPACKAGES_DIR}
+    rm -rf ${D}${PYTHON_SITEPACKAGES_DIR}/*.egg
     for f in __init__.cpython-311.pyc cupshelpers.cpython-311.pyc \
         config.cpython-311.pyc ppds.cpython-311.pyc \
         installdriver.cpython-311.pyc openprinting.cpython-311.pyc \

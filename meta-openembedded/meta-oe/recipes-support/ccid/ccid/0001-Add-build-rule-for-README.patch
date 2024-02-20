@@ -1,24 +1,24 @@
+From c82680a21c7411ba63e5815786eeb471720faa29 Mon Sep 17 00:00:00 2001
+From: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+Date: Wed, 6 Nov 2019 20:10:09 +0800
 Subject: [PATCH] Add build rule for README.
 
 fix do_configure error:
 Makefile.am: required file `./README' not found
 
-Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
----
 Upstream-Status: Pending
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
+---
  Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 49574a3..a5a7c2a 100644
+index e77c4c4..fd77ecd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -26,3 +26,4 @@ libtool: $(LIBTOOL_DEPS)
+@@ -27,3 +27,4 @@ libtool: $(LIBTOOL_DEPS)
  ChangeLog:
  	git log --stat --decorate=short > $@
  
 +README: README.md
--- 
-2.7.4
-

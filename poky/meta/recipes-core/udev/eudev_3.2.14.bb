@@ -49,9 +49,10 @@ do_install:append() {
 	install -d ${D}${sysconfdir}/udev/rules.d
 	install -m 0644 ${WORKDIR}/local.rules ${D}${sysconfdir}/udev/rules.d/local.rules
 
-	# Use classic network interface naming scheme
-	touch ${D}${sysconfdir}/udev/rules.d/80-net-name-slot.rules
-
+	# Use classic network interface naming scheme if no 'pni-names' distro feature
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'pni-names', 'false', 'true', d)}; then
+		touch ${D}${sysconfdir}/udev/rules.d/80-net-name-slot.rules
+	fi
 }
 
 do_install:prepend:class-target () {

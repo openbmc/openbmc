@@ -12,15 +12,15 @@ inherit pypi setuptools3
 CLEANBROKEN = "1"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-codecs \
-    ${PYTHON_PN}-difflib \
-    ${PYTHON_PN}-netserver \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-pickle \
-    ${PYTHON_PN}-pytz \
-    ${PYTHON_PN}-setuptools \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-threading \
+    python3-codecs \
+    python3-difflib \
+    python3-netserver \
+    python3-numbers \
+    python3-pickle \
+    python3-pytz \
+    python3-setuptools \
+    python3-shell \
+    python3-threading \
 "
 
 BBCLASSEXTEND = "native nativesdk"

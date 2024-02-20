@@ -1,0 +1,56 @@
+From 5519de933d851789a672d47be3f53258d036aa18 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Thu, 8 Feb 2024 14:12:17 +0100
+Subject: [PATCH] man/Makefile.am: we seem not to need the work around anymore
+
+* I'm trying to fix random build failure in world builds which sometimes
+  fail with:
+
+Making install in man
+make[1]: Entering directory 'nana/2.5/nana-2.5/man'
+make[2]: Entering directory 'nana/2.5/nana-2.5/man'
+make[2]: Nothing to be done for 'install-exec-am'.
+ TOPDIR/BUILD/hosttools/mkdir -p 'nana/2.5/image/usr/share/man/man1'
+installing nana.1 as /usr/share/man/man1/nana.1
+ TOPDIR/BUILD/hosttools/mkdir -p 'nana/2.5/image/usr/share/man/man3'
+ TOPDIR/BUILD/hosttools/install -c -m 644 I.3 DI.3 L.3 DL.3 Q.3 Qstl.3 nana.3 'nana/2.5/image/usr/share/man/man3'
+ TOPDIR/BUILD/hosttools/install -c -m 644 nana.1 nana-clg.1 'nana/2.5/image/usr/share/man/man1'
+TOPDIR/BUILD/hosttools/install: cannot create regular file 'nana/2.5/image/usr/share/man/man1/nana.1': File exists
+make[2]: *** [Makefile:314: install-man1] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[2]: Leaving directory 'nana/2.5/nana-2.5/man'
+make[1]: Leaving directory 'nana/2.5/nana-2.5/man'
+make[1]: *** [Makefile:450: install-am] Error 2
+make: *** [Makefile:380: install-recursive] Error 1
+
+  I guess it's related to install-data-local work around in:
+  https://github.com/pjmaker/nana/blob/master/man/Makefile.am#L15
+
+  which might not be needed on some make versions and then it ends
+  installing nana.1 multiple times
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+Upstream-Status: Pending
+---
+ man/Makefile.am | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/man/Makefile.am b/man/Makefile.am
+index 4cc5b28..3b2936d 100755
+--- a/man/Makefile.am
++++ b/man/Makefile.am
+@@ -7,14 +7,3 @@ CLEANFILES = *~
+ EXTRA_DIST = nana.1 nana-clg.1 I.3 DI.3 L.3 DL.3 Q.3 Qstl.3 nana.3
+ 
+ man_MANS =  nana.1 nana-clg.1 I.3 DI.3 L.3 DL.3 Q.3 Qstl.3 nana.3 
+-
+-# We seem to have a problem with automake, if I include nana.1 in the
+-# man_MANS variable we don't install it. The following dodgey aims
+-# to fix it.
+-
+-install-data-local:
+-	@sect=1;				\
+-	inst=`echo "nana" | sed '$(transform)'`.1; \
+-	echo installing nana.1 as $(mandir)/man$$sect/$$inst; \
+-	$(INSTALL_DATA) $(srcdir)/nana.1 $(mandir)/man$$sect/$$inst
+-

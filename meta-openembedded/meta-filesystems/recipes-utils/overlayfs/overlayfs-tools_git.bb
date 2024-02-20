@@ -7,7 +7,7 @@ SRC_URI = "\
     git://github.com/kmxz/overlayfs-tools.git;protocol=https;branch=master \
 "
 
-PV = "1.0+git${SRCPV}"
+PV = "1.0+git"
 SRCREV = "b5e5a829895ac98ccfe4629fbfbd8b819262bd00"
 
 S = "${WORKDIR}/git"

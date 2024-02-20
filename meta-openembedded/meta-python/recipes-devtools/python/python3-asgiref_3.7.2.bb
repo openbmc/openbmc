@@ -15,10 +15,11 @@ export HOST_SYS
 inherit pypi ptest setuptools3
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-multiprocessing \
+    python3-asyncio \
+    python3-io \
+    python3-multiprocessing \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

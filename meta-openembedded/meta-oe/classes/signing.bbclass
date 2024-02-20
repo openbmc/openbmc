@@ -161,11 +161,11 @@ signing_import_pubkey_from_pem() {
     local pem="${2}"
 
     if [ -n "${IMPORT_PASS_FILE}" ]; then
-        openssl rsa \
+        openssl pkey \
             -passin "file:${IMPORT_PASS_FILE}" \
             -in "${pem}" -inform pem -pubout -outform der
     else
-        openssl rsa \
+        openssl pkey \
             -in "${pem}" -inform pem -pubout -outform der
     fi |
     signing_pkcs11_tool --type pubkey --write-object /proc/self/fd/0 --label "${role}"
@@ -189,11 +189,11 @@ signing_import_privkey_from_pem() {
     local pem="${2}"
 
     if [ -n "${IMPORT_PASS_FILE}" ]; then
-        openssl rsa \
+        openssl pkey \
             -passin "file:${IMPORT_PASS_FILE}" \
             -in "${pem}" -inform pem -outform der
     else
-        openssl rsa \
+        openssl pkey \
             -in "${pem}" -inform pem -outform der
     fi |
     signing_pkcs11_tool --type privkey --write-object /proc/self/fd/0 --label "${role}"

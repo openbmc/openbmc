@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 DEPENDS = "pidgin json-glib"
 
-PV = "0.1+gitr${SRCPV}"
+PV = "0.1+git"
 
 inherit pkgconfig
 

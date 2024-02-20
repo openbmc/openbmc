@@ -11,8 +11,9 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-pytz \
+    python3-pytest \
+    python3-pytz \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {
@@ -21,6 +22,6 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-numbers \
-"    
+    python3-netclient \
+    python3-numbers \
+"

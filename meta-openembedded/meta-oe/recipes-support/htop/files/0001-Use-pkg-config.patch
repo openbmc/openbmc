@@ -1,4 +1,4 @@
-From 98ed72177c49a8015a443b3ec272fee3fb5a4eb3 Mon Sep 17 00:00:00 2001
+From 0d49ee6416e389b9a7ba693588c2eaf129306a01 Mon Sep 17 00:00:00 2001
 From: Paul Barker <pbarker@toganlabs.com>
 Date: Sun, 5 Nov 2017 22:07:30 +0000
 Subject: [PATCH] htop: Update to v2.0.2
@@ -16,10 +16,10 @@ Upstream-Status: Inappropriate [`ncurses*-config` can be used outside of OpenEmb
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 0e69096..d20014f 100644
+index e4df238a..2a31b201 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -322,10 +322,10 @@ AC_ARG_ENABLE([unicode],
+@@ -391,10 +391,10 @@ AC_ARG_ENABLE([unicode],
                [],
                [enable_unicode=yes])
  if test "x$enable_unicode" = xyes; then
@@ -34,7 +34,7 @@ index 0e69096..d20014f 100644
         HTOP_CHECK_LIB([ncursesw6], [addnwstr], [HAVE_LIBNCURSESW],
          HTOP_CHECK_LIB([ncursesw], [addnwstr], [HAVE_LIBNCURSESW],
           HTOP_CHECK_LIB([ncurses], [addnwstr], [HAVE_LIBNCURSESW],
-@@ -342,8 +342,8 @@ if test "x$enable_unicode" = xyes; then
+@@ -416,8 +416,8 @@ if test "x$enable_unicode" = xyes; then
     # (at this point we already link against a working ncurses library with wide character support)
     AC_SEARCH_LIBS([keypad], [tinfow tinfo])
  else

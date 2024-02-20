@@ -19,16 +19,18 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 
+Refresh for 42.02
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
 ---
- pyproject.toml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index b2e511f..4a285af 100644
+index c9a7979bd..dec4b7157 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -85,7 +85,7 @@ line-length = 79
- target-version = ["py37"]
+@@ -92,7 +92,7 @@ rust-version = ">=1.63.0"
+ 
  
  [tool.pytest.ini_options]
 -addopts = "-r s --capture=no --strict-markers --benchmark-disable"
@@ -36,10 +38,6 @@ index b2e511f..4a285af 100644
  console_output_style = "progress-even-when-capture-no"
  markers = [
      "skip_fips: this test is not executed in FIPS mode",
-@@ -151,4 +151,4 @@ git-only = [
-     "ci-constraints-requirements.txt",
-     ".gitattributes",
-     ".gitignore",
--]
-\ No newline at end of file
-+]
+-- 
+2.34.1
+

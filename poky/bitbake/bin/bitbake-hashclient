@@ -195,6 +195,36 @@ def main():
         columns = client.get_db_query_columns()
         print("\n".join(sorted(columns)))
 
+    def handle_gc_status(args, client):
+        result = client.gc_status()
+        if not result["mark"]:
+            print("No Garbage collection in progress")
+            return 0
+
+        print("Current Mark: %s" % result["mark"])
+        print("Total hashes to keep: %d" % result["keep"])
+        print("Total hashes to remove: %s" % result["remove"])
+        return 0
+
+    def handle_gc_mark(args, client):
+        where = {k: v for k, v in args.where}
+        result = client.gc_mark(args.mark, where)
+        print("New hashes marked: %d" % result["count"])
+        return 0
+
+    def handle_gc_sweep(args, client):
+        result = client.gc_sweep(args.mark)
+        print("Removed %d rows" % result["count"])
+        return 0
+
+    def handle_unihash_exists(args, client):
+        result = client.unihash_exists(args.unihash)
+        if args.quiet:
+            return 0 if result else 1
+
+        print("true" if result else "false")
+        return 0
+
     parser = argparse.ArgumentParser(description='Hash Equivalence Client')
     parser.add_argument('--address', default=DEFAULT_ADDRESS, help='Server address (default "%(default)s")')
     parser.add_argument('--log', default='WARNING', help='Set logging level')
@@ -273,6 +303,24 @@ def main():
 
     db_query_columns_parser = subparsers.add_parser('get-db-query-columns', help="Show columns that can be used in database queries")
     db_query_columns_parser.set_defaults(func=handle_get_db_query_columns)
+
+    gc_status_parser = subparsers.add_parser("gc-status", help="Show garbage collection status")
+    gc_status_parser.set_defaults(func=handle_gc_status)
+
+    gc_mark_parser = subparsers.add_parser('gc-mark', help="Mark hashes to be kept for garbage collection")
+    gc_mark_parser.add_argument("mark", help="Mark for this garbage collection operation")
+    gc_mark_parser.add_argument("--where", "-w", metavar="KEY VALUE", nargs=2, action="append", default=[],
+                             help="Keep entries in table where KEY == VALUE")
+    gc_mark_parser.set_defaults(func=handle_gc_mark)
+
+    gc_sweep_parser = subparsers.add_parser('gc-sweep', help="Perform garbage collection and delete any entries that are not marked")
+    gc_sweep_parser.add_argument("mark", help="Mark for this garbage collection operation")
+    gc_sweep_parser.set_defaults(func=handle_gc_sweep)
+
+    unihash_exists_parser = subparsers.add_parser('unihash-exists', help="Check if a unihash is known to the server")
+    unihash_exists_parser.add_argument("--quiet", action="store_true", help="Don't print status. Instead, exit with 0 if unihash exists and 1 if it does not")
+    unihash_exists_parser.add_argument("unihash", help="Unihash to check")
+    unihash_exists_parser.set_defaults(func=handle_unihash_exists)
 
     args = parser.parse_args()
 

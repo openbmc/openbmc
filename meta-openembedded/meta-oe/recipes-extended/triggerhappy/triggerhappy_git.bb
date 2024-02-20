@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 # matches debian/0.5.0-1 tag
 SRCREV = "44a173195986d0d853316cb02a58785ded66c12b"
-PV = "0.5.0+git${SRCPV}"
+PV = "0.5.0+git"
 SRC_URI = "git://github.com/wertarbyte/${BPN}.git;branch=debian;protocol=https"
 
 S = "${WORKDIR}/git"

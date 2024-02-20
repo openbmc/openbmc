@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/CLIUtils/CLI11"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=afb20fe5f67e21074b10b864d9563c11"
 SRCREV = "291c58789c031208f08f4f261a858b5b7083e8e2"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 SRC_URI += "gitsm://github.com/CLIUtils/CLI11;branch=main;protocol=https \
             https://github.com/philsquared/Catch/releases/download/v2.13.7/catch.hpp \

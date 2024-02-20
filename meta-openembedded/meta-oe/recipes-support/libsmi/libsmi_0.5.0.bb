@@ -21,7 +21,8 @@ ALTERNATIVE_PRIORITY = "50"
 ALTERNATIVE:${PN}-yang = "ietf-interfaces "
 ALTERNATIVE_LINK_NAME[ietf-interfaces] = "${datadir}/yang/ietf-interfaces.yang"
 
-EXTRA_OECONF = "ac_cv_path_SH=/bin/sh"
+EXTRA_OECONF:class-native = "ac_cv_path_SH=/bin/sh"
+EXTRA_OECONF:class-target = "ac_cv_path_SH=/bin/sh ac_cv_path_WGET=${bindir}/wget ac_cv_path_AWK=${bindir}/awk"
 
 do_install:append () {
     install -d ${D}${sysconfdir}

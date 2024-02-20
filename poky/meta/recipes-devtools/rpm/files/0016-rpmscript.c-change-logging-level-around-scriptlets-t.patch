@@ -1,4 +1,4 @@
-From 989e425d416474c191b020d0825895e3df4bd033 Mon Sep 17 00:00:00 2001
+From 0005ab544230020e854e9709b2bc0501702c2968 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 10 Jan 2019 18:14:18 +0100
 Subject: [PATCH] rpmscript.c: change logging level around scriptlets to INFO
@@ -9,15 +9,16 @@ irrelevant noise to rootfs logs.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  lib/rpmscript.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
-Index: git/lib/rpmscript.c
-===================================================================
---- git.orig/lib/rpmscript.c
-+++ git/lib/rpmscript.c
-@@ -270,7 +270,7 @@ static char * writeScript(const char *cm
+diff --git a/lib/rpmscript.c b/lib/rpmscript.c
+index 37ada014c..bab0c97a6 100644
+--- a/lib/rpmscript.c
++++ b/lib/rpmscript.c
+@@ -291,7 +291,7 @@ static char * writeScript(const char *cmd, const char *script)
      if (Ferror(fd))
  	goto exit;
  
@@ -26,7 +27,7 @@ Index: git/lib/rpmscript.c
  	static const char set_x[] = "set -x\n";
  	/* Assume failures will be caught by the write below */
  	Fwrite(set_x, sizeof(set_x[0]), sizeof(set_x)-1, fd);
-@@ -302,7 +302,7 @@ static rpmRC runExtScript(rpmPlugins plu
+@@ -323,7 +323,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
      char *mline = NULL;
      rpmRC rc = RPMRC_FAIL;
  
@@ -35,7 +36,7 @@ Index: git/lib/rpmscript.c
  
      if (script) {
  	fn = writeScript(*argvp[0], script);
-@@ -354,7 +354,7 @@ static rpmRC runExtScript(rpmPlugins plu
+@@ -375,7 +375,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
  		sname, strerror(errno));
  	goto exit;
      } else if (pid == 0) {/* Child */
@@ -44,7 +45,7 @@ Index: git/lib/rpmscript.c
  	       sname, *argvp[0], (unsigned)getpid());
  
  	fclose(in);
-@@ -397,7 +397,7 @@ static rpmRC runExtScript(rpmPlugins plu
+@@ -418,7 +418,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
  	reaped = waitpid(pid, &status, 0);
      } while (reaped == -1 && errno == EINTR);
  

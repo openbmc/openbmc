@@ -15,6 +15,7 @@ UNIHASH_TABLE_DEFINITION = (
     ("method", "TEXT NOT NULL", "UNIQUE"),
     ("taskhash", "TEXT NOT NULL", "UNIQUE"),
     ("unihash", "TEXT NOT NULL", ""),
+    ("gc_mark", "TEXT NOT NULL", ""),
 )
 
 UNIHASH_TABLE_COLUMNS = tuple(name for name, _, _ in UNIHASH_TABLE_DEFINITION)
@@ -44,6 +45,14 @@ USERS_TABLE_DEFINITION = (
 USERS_TABLE_COLUMNS = tuple(name for name, _, _ in USERS_TABLE_DEFINITION)
 
 
+CONFIG_TABLE_DEFINITION = (
+    ("name", "TEXT NOT NULL", "UNIQUE"),
+    ("value", "TEXT", ""),
+)
+
+CONFIG_TABLE_COLUMNS = tuple(name for name, _, _ in CONFIG_TABLE_DEFINITION)
+
+
 def _make_table(cursor, name, definition):
     cursor.execute(
         """
@@ -71,6 +80,35 @@ def map_user(row):
     )
 
 
+def _make_condition_statement(columns, condition):
+    where = {}
+    for c in columns:
+        if c in condition and condition[c] is not None:
+            where[c] = condition[c]
+
+    return where, " AND ".join("%s=:%s" % (k, k) for k in where.keys())
+
+
+def _get_sqlite_version(cursor):
+    cursor.execute("SELECT sqlite_version()")
+
+    version = []
+    for v in cursor.fetchone()[0].split("."):
+        try:
+            version.append(int(v))
+        except ValueError:
+            version.append(v)
+
+    return tuple(version)
+
+
+def _schema_table_name(version):
+    if version >= (3, 33):
+        return "sqlite_schema"
+
+    return "sqlite_master"
+
+
 class DatabaseEngine(object):
     def __init__(self, dbname, sync):
         self.dbname = dbname
@@ -82,9 +120,10 @@ class DatabaseEngine(object):
         db.row_factory = sqlite3.Row
 
         with closing(db.cursor()) as cursor:
-            _make_table(cursor, "unihashes_v2", UNIHASH_TABLE_DEFINITION)
+            _make_table(cursor, "unihashes_v3", UNIHASH_TABLE_DEFINITION)
             _make_table(cursor, "outhashes_v2", OUTHASH_TABLE_DEFINITION)
             _make_table(cursor, "users", USERS_TABLE_DEFINITION)
+            _make_table(cursor, "config", CONFIG_TABLE_DEFINITION)
 
             cursor.execute("PRAGMA journal_mode = WAL")
             cursor.execute(
@@ -96,17 +135,41 @@ class DatabaseEngine(object):
             cursor.execute("DROP INDEX IF EXISTS outhash_lookup")
             cursor.execute("DROP INDEX IF EXISTS taskhash_lookup_v2")
             cursor.execute("DROP INDEX IF EXISTS outhash_lookup_v2")
+            cursor.execute("DROP INDEX IF EXISTS taskhash_lookup_v3")
 
             # TODO: Upgrade from tasks_v2?
             cursor.execute("DROP TABLE IF EXISTS tasks_v2")
 
             # Create new indexes
             cursor.execute(
-                "CREATE INDEX IF NOT EXISTS taskhash_lookup_v3 ON unihashes_v2 (method, taskhash)"
+                "CREATE INDEX IF NOT EXISTS taskhash_lookup_v4 ON unihashes_v3 (method, taskhash)"
+            )
+            cursor.execute(
+                "CREATE INDEX IF NOT EXISTS unihash_lookup_v1 ON unihashes_v3 (unihash)"
             )
             cursor.execute(
                 "CREATE INDEX IF NOT EXISTS outhash_lookup_v3 ON outhashes_v2 (method, outhash)"
             )
+            cursor.execute("CREATE INDEX IF NOT EXISTS config_lookup ON config (name)")
+
+            sqlite_version = _get_sqlite_version(cursor)
+
+            cursor.execute(
+                f"""
+                SELECT name FROM {_schema_table_name(sqlite_version)} WHERE type = 'table' AND name = 'unihashes_v2'
+                """
+            )
+            if cursor.fetchone():
+                self.logger.info("Upgrading Unihashes V2 -> V3...")
+                cursor.execute(
+                    """
+                    INSERT INTO unihashes_v3 (id, method, unihash, taskhash, gc_mark)
+                    SELECT id, method, unihash, taskhash, '' FROM unihashes_v2
+                    """
+                )
+                cursor.execute("DROP TABLE unihashes_v2")
+                db.commit()
+                self.logger.info("Upgrade complete")
 
     def connect(self, logger):
         return Database(logger, self.dbname, self.sync)
@@ -126,22 +189,37 @@ class Database(object):
                 "PRAGMA synchronous = %s" % ("NORMAL" if sync else "OFF")
             )
 
-            cursor.execute("SELECT sqlite_version()")
-
-            version = []
-            for v in cursor.fetchone()[0].split("."):
-                try:
-                    version.append(int(v))
-                except ValueError:
-                    version.append(v)
-
-            self.sqlite_version = tuple(version)
+            self.sqlite_version = _get_sqlite_version(cursor)
 
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         await self.close()
+
+    async def _set_config(self, cursor, name, value):
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO config (id, name, value) VALUES
+            ((SELECT id FROM config WHERE name=:name), :name, :value)
+            """,
+            {
+                "name": name,
+                "value": value,
+            },
+        )
+
+    async def _get_config(self, cursor, name):
+        cursor.execute(
+            "SELECT value FROM config WHERE name=:name",
+            {
+                "name": name,
+            },
+        )
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        return row["value"]
 
     async def close(self):
         self.db.close()
@@ -150,8 +228,8 @@ class Database(object):
         with closing(self.db.cursor()) as cursor:
             cursor.execute(
                 """
-                SELECT *, unihashes_v2.unihash AS unihash FROM outhashes_v2
-                INNER JOIN unihashes_v2 ON unihashes_v2.method=outhashes_v2.method AND unihashes_v2.taskhash=outhashes_v2.taskhash
+                SELECT *, unihashes_v3.unihash AS unihash FROM outhashes_v2
+                INNER JOIN unihashes_v3 ON unihashes_v3.method=outhashes_v2.method AND unihashes_v3.taskhash=outhashes_v2.taskhash
                 WHERE outhashes_v2.method=:method AND outhashes_v2.taskhash=:taskhash
                 ORDER BY outhashes_v2.created ASC
                 LIMIT 1
@@ -167,8 +245,8 @@ class Database(object):
         with closing(self.db.cursor()) as cursor:
             cursor.execute(
                 """
-                SELECT *, unihashes_v2.unihash AS unihash FROM outhashes_v2
-                INNER JOIN unihashes_v2 ON unihashes_v2.method=outhashes_v2.method AND unihashes_v2.taskhash=outhashes_v2.taskhash
+                SELECT *, unihashes_v3.unihash AS unihash FROM outhashes_v2
+                INNER JOIN unihashes_v3 ON unihashes_v3.method=outhashes_v2.method AND unihashes_v3.taskhash=outhashes_v2.taskhash
                 WHERE outhashes_v2.method=:method AND outhashes_v2.outhash=:outhash
                 ORDER BY outhashes_v2.created ASC
                 LIMIT 1
@@ -179,6 +257,19 @@ class Database(object):
                 },
             )
             return cursor.fetchone()
+
+    async def unihash_exists(self, unihash):
+        with closing(self.db.cursor()) as cursor:
+            cursor.execute(
+                """
+                SELECT * FROM unihashes_v3 WHERE unihash=:unihash
+                LIMIT 1
+                """,
+                {
+                    "unihash": unihash,
+                },
+            )
+            return cursor.fetchone() is not None
 
     async def get_outhash(self, method, outhash):
         with closing(self.db.cursor()) as cursor:
@@ -200,8 +291,8 @@ class Database(object):
         with closing(self.db.cursor()) as cursor:
             cursor.execute(
                 """
-                SELECT outhashes_v2.taskhash AS taskhash, unihashes_v2.unihash AS unihash FROM outhashes_v2
-                INNER JOIN unihashes_v2 ON unihashes_v2.method=outhashes_v2.method AND unihashes_v2.taskhash=outhashes_v2.taskhash
+                SELECT outhashes_v2.taskhash AS taskhash, unihashes_v3.unihash AS unihash FROM outhashes_v2
+                INNER JOIN unihashes_v3 ON unihashes_v3.method=outhashes_v2.method AND unihashes_v3.taskhash=outhashes_v2.taskhash
                 -- Select any matching output hash except the one we just inserted
                 WHERE outhashes_v2.method=:method AND outhashes_v2.outhash=:outhash AND outhashes_v2.taskhash!=:taskhash
                 -- Pick the oldest hash
@@ -219,7 +310,7 @@ class Database(object):
     async def get_equivalent(self, method, taskhash):
         with closing(self.db.cursor()) as cursor:
             cursor.execute(
-                "SELECT taskhash, method, unihash FROM unihashes_v2 WHERE method=:method AND taskhash=:taskhash",
+                "SELECT taskhash, method, unihash FROM unihashes_v3 WHERE method=:method AND taskhash=:taskhash",
                 {
                     "method": method,
                     "taskhash": taskhash,
@@ -229,15 +320,9 @@ class Database(object):
 
     async def remove(self, condition):
         def do_remove(columns, table_name, cursor):
-            where = {}
-            for c in columns:
-                if c in condition and condition[c] is not None:
-                    where[c] = condition[c]
-
+            where, clause = _make_condition_statement(columns, condition)
             if where:
-                query = ("DELETE FROM %s WHERE " % table_name) + " AND ".join(
-                    "%s=:%s" % (k, k) for k in where.keys()
-                )
+                query = f"DELETE FROM {table_name} WHERE {clause}"
                 cursor.execute(query, where)
                 return cursor.rowcount
 
@@ -246,17 +331,80 @@ class Database(object):
         count = 0
         with closing(self.db.cursor()) as cursor:
             count += do_remove(OUTHASH_TABLE_COLUMNS, "outhashes_v2", cursor)
-            count += do_remove(UNIHASH_TABLE_COLUMNS, "unihashes_v2", cursor)
+            count += do_remove(UNIHASH_TABLE_COLUMNS, "unihashes_v3", cursor)
             self.db.commit()
 
         return count
+
+    async def get_current_gc_mark(self):
+        with closing(self.db.cursor()) as cursor:
+            return await self._get_config(cursor, "gc-mark")
+
+    async def gc_status(self):
+        with closing(self.db.cursor()) as cursor:
+            cursor.execute(
+                """
+                SELECT COUNT() FROM unihashes_v3 WHERE
+                    gc_mark=COALESCE((SELECT value FROM config WHERE name='gc-mark'), '')
+                """
+            )
+            keep_rows = cursor.fetchone()[0]
+
+            cursor.execute(
+                """
+                SELECT COUNT() FROM unihashes_v3 WHERE
+                    gc_mark!=COALESCE((SELECT value FROM config WHERE name='gc-mark'), '')
+                """
+            )
+            remove_rows = cursor.fetchone()[0]
+
+            current_mark = await self._get_config(cursor, "gc-mark")
+
+            return (keep_rows, remove_rows, current_mark)
+
+    async def gc_mark(self, mark, condition):
+        with closing(self.db.cursor()) as cursor:
+            await self._set_config(cursor, "gc-mark", mark)
+
+            where, clause = _make_condition_statement(UNIHASH_TABLE_COLUMNS, condition)
+
+            new_rows = 0
+            if where:
+                cursor.execute(
+                    f"""
+                    UPDATE unihashes_v3 SET
+                        gc_mark=COALESCE((SELECT value FROM config WHERE name='gc-mark'), '')
+                    WHERE {clause}
+                    """,
+                    where,
+                )
+                new_rows = cursor.rowcount
+
+            self.db.commit()
+            return new_rows
+
+    async def gc_sweep(self):
+        with closing(self.db.cursor()) as cursor:
+            # NOTE: COALESCE is not used in this query so that if the current
+            # mark is NULL, nothing will happen
+            cursor.execute(
+                """
+                DELETE FROM unihashes_v3 WHERE
+                    gc_mark!=(SELECT value FROM config WHERE name='gc-mark')
+                """
+            )
+            count = cursor.rowcount
+            await self._set_config(cursor, "gc-mark", None)
+
+            self.db.commit()
+            return count
 
     async def clean_unused(self, oldest):
         with closing(self.db.cursor()) as cursor:
             cursor.execute(
                 """
                 DELETE FROM outhashes_v2 WHERE created<:oldest AND NOT EXISTS (
-                    SELECT unihashes_v2.id FROM unihashes_v2 WHERE unihashes_v2.method=outhashes_v2.method AND unihashes_v2.taskhash=outhashes_v2.taskhash LIMIT 1
+                    SELECT unihashes_v3.id FROM unihashes_v3 WHERE unihashes_v3.method=outhashes_v2.method AND unihashes_v3.taskhash=outhashes_v2.taskhash LIMIT 1
                 )
                 """,
                 {
@@ -271,7 +419,13 @@ class Database(object):
             prevrowid = cursor.lastrowid
             cursor.execute(
                 """
-                INSERT OR IGNORE INTO unihashes_v2 (method, taskhash, unihash) VALUES(:method, :taskhash, :unihash)
+                INSERT OR IGNORE INTO unihashes_v3 (method, taskhash, unihash, gc_mark) VALUES
+                    (
+                    :method,
+                    :taskhash,
+                    :unihash,
+                    COALESCE((SELECT value FROM config WHERE name='gc-mark'), '')
+                    )
                 """,
                 {
                     "method": method,
@@ -383,14 +537,9 @@ class Database(object):
     async def get_usage(self):
         usage = {}
         with closing(self.db.cursor()) as cursor:
-            if self.sqlite_version >= (3, 33):
-                table_name = "sqlite_schema"
-            else:
-                table_name = "sqlite_master"
-
             cursor.execute(
                 f"""
-                SELECT name FROM {table_name} WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
+                SELECT name FROM {_schema_table_name(self.sqlite_version)} WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
                 """
             )
             for row in cursor.fetchall():

@@ -1,21 +1,20 @@
-From dc0a5c3d2dd4e79d12a150a246a95c4dc88326f1 Mon Sep 17 00:00:00 2001
+From 2829e6998b7595dd2108c1497fdd02485ef99e2c Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Tue, 16 Aug 2011 16:04:35 +0200
 Subject: [PATCH] Upstream: not yet
 
 Fix configure to accept "--prefix=" (a blank prefix).
 
----
 Upstream-Status: Pending
-
+---
  build/make/configure.sh | 20 ++++++++++++++++----
  1 file changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/build/make/configure.sh b/build/make/configure.sh
-index 007e020..04d5cbf 100644
+index b645a666f..0b99a8b38 100644
 --- a/build/make/configure.sh
 +++ b/build/make/configure.sh
-@@ -581,6 +581,8 @@ process_common_cmdline() {
+@@ -658,6 +658,8 @@ process_common_cmdline() {
          ;;
        --prefix=*)
          prefix="${optval}"
@@ -24,7 +23,7 @@ index 007e020..04d5cbf 100644
          ;;
        --libdir=*)
          libdir="${optval}"
-@@ -614,13 +616,23 @@ process_cmdline() {
+@@ -687,13 +689,23 @@ process_cmdline() {
  }
  
  post_process_common_cmdline() {

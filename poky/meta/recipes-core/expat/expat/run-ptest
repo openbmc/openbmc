@@ -5,5 +5,5 @@ TIME=$(which time)
 echo "runtests"
 ${TIME} -f 'Execution time: %e s' bash -c "./runtests -v"
 echo "runtestspp"
-${TIME} -f 'Execution time: %e s' bash -c "./runtestspp -v"
+${TIME} -f 'Execution time: %e s' bash -c "./runtests_cxx -v"
 echo

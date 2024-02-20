@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=00aefaa50aad75c21367df66102d542c \
 
 DEPENDS = "gtk+ glib-2.0 libwnck libxinerama lua virtual/libx11"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 SRCREV = "b9d7ad9c09a5fb17a1562ee1d892798c646e9ec9"
 

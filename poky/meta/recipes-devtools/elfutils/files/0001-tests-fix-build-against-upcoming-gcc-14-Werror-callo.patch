@@ -1,0 +1,39 @@
+From 901c6a8c78c3c4eee244b9d5298cbd7b9aa713d1 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Thu, 21 Dec 2023 09:23:30 +0000
+Subject: [PATCH] tests: fix build against upcoming `gcc-14`
+ (`-Werror=calloc-transposed-args`)
+
+`gcc-14` added a new `-Wcalloc-transposed-args` warning recently. It
+detected minor infelicity in `calloc()` API usage in `elfutils`:
+
+    elfstrmerge.c: In function 'main':
+    elfstrmerge.c:450:32: error:
+      'calloc' sizes specified with 'sizeof' in the earlier argument and not in the later argument [-Werror=calloc-transposed-args]
+      450 |   newscnbufs = calloc (sizeof (void *), newshnums);
+          |                                ^~~~
+    elfstrmerge.c:450:32: note: earlier argument should specify number of elements, later size of each element
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=elfutils.git;a=commit;h=ae580d48278b9924da7503886b37be34378e1b04]
+Signed-off-by: Sergei Trofimovich <slyich@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/elfstrmerge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/elfstrmerge.c b/tests/elfstrmerge.c
+index 56350bb..4eb58bb 100644
+--- a/tests/elfstrmerge.c
++++ b/tests/elfstrmerge.c
+@@ -447,7 +447,7 @@ main (int argc, char **argv)
+     }
+ 
+   newshnums = shdrnum - 1;
+-  newscnbufs = calloc (sizeof (void *), newshnums);
++  newscnbufs = calloc (newshnums, sizeof (void *));
+   if (newscnbufs == NULL)
+     fail_errno ("Couldn't allocate memory for new section buffers", NULL);
+ 
+-- 
+2.43.0
+

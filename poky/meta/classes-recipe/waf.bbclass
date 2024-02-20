@@ -55,7 +55,10 @@ python waf_preconfigure() {
     try:
         result = subprocess.check_output([python, wafbin, '--version'], cwd=subsrcdir, stderr=subprocess.STDOUT)
         version = result.decode('utf-8').split()[1]
-        if bb.utils.vercmp_string_op(version, "1.8.7", ">="):
+        if not bb.utils.is_semver(version):
+            bb.warn("Unable to parse \"waf --version\" output. Assuming waf version without bindir/libdir support.")
+            bb.warn("waf·--version·output = \n%s" % result.decode('utf-8'))
+        elif bb.utils.vercmp_string_op(version, "1.8.7", ">="):
             d.setVar("WAF_EXTRA_CONF", "--bindir=${bindir} --libdir=${libdir}")
     except subprocess.CalledProcessError as e:
         bb.warn("Unable to execute waf --version, exit code %d. Assuming waf version without bindir/libdir support." % e.returncode)

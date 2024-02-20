@@ -16,7 +16,7 @@ DEPENDS = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'boost', '', d)} "
 
 PROVIDES += "${PN}-dev"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 SRCREV = "ebef1e929807629befafbb2918ea1a08c7194554"
 SRC_URI = "git://github.com/USCiLab/cereal.git;branch=master;protocol=https \
            file://0001-sandbox-Do-not-use-int8_t-in-std-uniform_int_distrib.patch \
@@ -28,6 +28,8 @@ SRC_URI = "git://github.com/USCiLab/cereal.git;branch=master;protocol=https \
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig ptest
+
+CXXFLAGS:append:toolchain-clang = " -Wno-error=c++11-narrowing-const-reference"
 
 LIBATOMIC:mips = "${@bb.utils.contains('PTEST_ENABLED', '1', '-DCEREAL_THREAD_LIBS="-latomic"', '', d)}"
 LIBATOMIC:riscv32 = "${@bb.utils.contains('PTEST_ENABLED', '1', '-DCEREAL_THREAD_LIBS="-latomic"', '', d)}"

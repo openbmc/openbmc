@@ -13,27 +13,27 @@ SRC_URI += " \
 
 SRC_URI[sha256sum] = "be1af57fc409f93647f2e8e4573a142ed38724b8cdd389706a867bb4efcf1e78"
 
-DEPENDS += "${PYTHON_PN}"
+DEPENDS += "python3"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-2to3 \
-    ${PYTHON_PN}-compile \
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-html \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-netserver \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-pickle \
-    ${PYTHON_PN}-pkg-resources \
-    ${PYTHON_PN}-pkgutil \
-    ${PYTHON_PN}-plistlib \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-stringold \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-unittest \
-    ${PYTHON_PN}-xml \
+    python3-2to3 \
+    python3-compile \
+    python3-compression \
+    python3-ctypes \
+    python3-email \
+    python3-html \
+    python3-json \
+    python3-netserver \
+    python3-numbers \
+    python3-pickle \
+    python3-pkg-resources \
+    python3-pkgutil \
+    python3-plistlib \
+    python3-shell \
+    python3-stringold \
+    python3-threading \
+    python3-unittest \
+    python3-xml \
 "
 
 BBCLASSEXTEND = "native nativesdk"
@@ -41,13 +41,13 @@ BBCLASSEXTEND = "native nativesdk"
 # The pkg-resources module can be used by itself, without the package downloader
 # and easy_install. Ship it in a separate package so that it can be used by
 # minimal distributions.
-PACKAGES =+ "${PYTHON_PN}-pkg-resources "
-FILES:${PYTHON_PN}-pkg-resources = "${PYTHON_SITEPACKAGES_DIR}/pkg_resources/*"
-RDEPENDS:${PYTHON_PN}-pkg-resources = "\
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-plistlib \
-    ${PYTHON_PN}-pprint \
+PACKAGES =+ "python3-pkg-resources "
+FILES:python3-pkg-resources = "${PYTHON_SITEPACKAGES_DIR}/pkg_resources/*"
+RDEPENDS:python3-pkg-resources = "\
+    python3-compression \
+    python3-email \
+    python3-plistlib \
+    python3-pprint \
 "
 
 # This used to use the bootstrap install which didn't compile. Until we bump the

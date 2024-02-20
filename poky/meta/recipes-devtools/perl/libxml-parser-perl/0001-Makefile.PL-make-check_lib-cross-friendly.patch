@@ -1,0 +1,28 @@
+From bd9b0e10843da72276982bd1394ade734fea0289 Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Fri, 2 Feb 2024 21:15:34 -0800
+Subject: [PATCH] Makefile.PL: make check_lib cross friendly
+
+lib => qw(expat) does not seem to respect EXPATLIBPATH and
+EXPATINCPATH when we are cross-compiling.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ Makefile.PL | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 505d1df..19f428b 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -30,7 +30,7 @@ foreach (@ARGV) {
+ 
+ unless (
+     check_lib(    # fill in what you prompted the user for here
+-        lib     => [qw(expat)],
++        #lib     => [qw(expat)],
+         header  => ['expat.h'],
+         incpath => $expat_incpath,
+         ( $expat_libpath ? ( libpath => $expat_libpath ) : () ),

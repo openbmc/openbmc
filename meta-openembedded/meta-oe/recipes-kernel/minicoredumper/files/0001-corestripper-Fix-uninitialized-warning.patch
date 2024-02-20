@@ -1,0 +1,53 @@
+From bb44bb643cd2a2f937331b4d1a76b03556b718a2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 23 Jan 2024 11:36:41 -0800
+Subject: [PATCH] corestripper: Fix uninitialized warning
+
+Clang finds more open paths where ret can be uninitialized
+
+Fixes
+| ../../../git/src/minicoredumper/corestripper.c:2768:13: error: variable 'ret' is used uninitialized whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
+|  2768 |         } else if (di->core_fd >= 0) {
+|       |                    ^~~~~~~~~~~~~~~~
+| ../../../git/src/minicoredumper/corestripper.c:2773:9: note: uninitialized use occurs here
+|  2773 |         return ret;
+|       |                ^~~
+| ../../../git/src/minicoredumper/corestripper.c:2768:9: note: remove the 'if' if its condition is always true
+|  2768 |         } else if (di->core_fd >= 0) {
+|       |                ^~~~~~~~~~~~~~~~~~~~~
+| ../../../git/src/minicoredumper/corestripper.c:2763:9: note: initialize the variable 'ret' to silence this warning
+|  2763 |         int ret;
+|       |                ^
+|       |                 = 0
+
+Upstream-Status: Submitted [https://github.com/diamon/minicoredumper/pull/15]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/minicoredumper/corestripper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/minicoredumper/corestripper.c b/src/minicoredumper/corestripper.c
+index 3eb9089..e9e3936 100644
+--- a/src/minicoredumper/corestripper.c
++++ b/src/minicoredumper/corestripper.c
+@@ -2707,7 +2707,7 @@ static int dump_data_content_file(struct dump_info *di,
+ 	char *tmp_path;
+ 	FILE *file;
+ 	int len;
+-	int ret;
++	int ret = -1;
+ 
+ 	len = strlen(di->dst_dir) + strlen("/dumps/") + 32 +
+ 	      strlen(dd->ident) + 1;
+@@ -2760,7 +2760,7 @@ out:
+ static int dump_data_content(struct dump_info *di, struct mcd_dump_data *dd,
+ 			     const char *symname)
+ {
+-	int ret;
++	int ret = -1;
+ 
+ 	if (dd->ident) {
+ 		/* dump to external file */
+-- 
+2.43.0
+

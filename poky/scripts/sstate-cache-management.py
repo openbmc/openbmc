@@ -147,7 +147,7 @@ def remove_by_stamps(args, paths):
     for stamps_dir in args.stamps_dir:
         stamps_path = Path(stamps_dir)
         assert stamps_path.is_dir()
-        re_sigdata = re.compile(r"do_.*.sigdata\.([^.]*)")
+        re_sigdata = re.compile(r"do_.*\.sigdata\.([^.]*)")
         all_sums |= set(
             [
                 re_sigdata.search(x.parts[-1]).group(1)

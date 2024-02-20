@@ -1,4 +1,4 @@
-From d836f008a96aa9b2e88c7b394bfc110542e57176 Mon Sep 17 00:00:00 2001
+From f761f5ca2d453e11d34fc7d552dab4a0e189dae9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 4 Aug 2023 09:34:50 -0700
 Subject: [PATCH] aarch64/configure: Pass -mcpu along with -march to detect sve
@@ -51,6 +51,3 @@ index 8a708f2ef4..b6a146d2be 100644
    libc_cv_aarch64_sve_asm=yes
  else
    libc_cv_aarch64_sve_asm=no
--- 
-2.41.0
-

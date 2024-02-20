@@ -658,7 +658,7 @@ If this happens, please apply the following patch, rebuild the software stack fo
   cd meta-arm
   git am 0001-embedded-a-corstone1000-sr-ir-workaround.patch
   cd ..
-  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; corstone1000-image -c cleanall; bitbake corstone1000-image"
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; bitbake corstone1000-image -c cleanall; bitbake corstone1000-image"
 
 
 Common to FVP and FPGA
@@ -1080,7 +1080,7 @@ On FPGA, please update the cs1000.bin on the SD card with the newly generated wi
   cd <_workspace>/meta-arm
   git reset --hard HEAD~1
   cd ..
-  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; corstone1000-image -c cleanall; bitbake corstone1000-image"
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; bitbake corstone1000-image -c cleanall; bitbake corstone1000-image"
 
 *************************************************
 Preparing the Installation Media

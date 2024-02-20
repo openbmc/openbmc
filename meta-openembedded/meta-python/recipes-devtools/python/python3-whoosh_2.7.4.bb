@@ -16,13 +16,13 @@ PYPI_PACKAGE_EXT = "zip"
 inherit ptest pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-multiprocessing \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-pickle \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-stringold \
+    python3-email \
+    python3-multiprocessing \
+    python3-netclient \
+    python3-numbers \
+    python3-pickle \
+    python3-shell \
+    python3-stringold \
 "
 
 SRC_URI += " \
@@ -30,8 +30,9 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-fcntl \
+    python3-fcntl \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

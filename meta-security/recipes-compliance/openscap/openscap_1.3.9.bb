@@ -11,7 +11,9 @@ DEPENDS:class-native = "pkgconfig-native swig-native curl-native libxml2-native 
 
 #Jun 22th, 2023
 SRCREV = "9b3e7563575f7e5b419f8a09999b40f30e3e7c29"
-SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=maint-1.3;protocol=https"
+SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=maint-1.3;protocol=https \
+           file://0001-Replace-distutils.sysconfig-with-sysconfig.patch \
+          "
 
 S = "${WORKDIR}/git"
 

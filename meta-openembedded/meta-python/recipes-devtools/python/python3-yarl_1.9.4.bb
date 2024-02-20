@@ -12,18 +12,19 @@ PYPI_PACKAGE = "yarl"
 inherit pypi ptest python_setuptools_build_meta
 
 DEPENDS += " \
-    ${PYTHON_PN}-expandvars-native \
-    ${PYTHON_PN}-cython-native \
+    python3-expandvars-native \
+    python3-cython-native \
 "
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-multidict \
-    ${PYTHON_PN}-idna \
-    ${PYTHON_PN}-io \
+    python3-multidict \
+    python3-idna \
+    python3-io \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

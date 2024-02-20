@@ -9,7 +9,7 @@ DEPENDS = "libusb1 openssl pcsc-lite"
 SRC_URI = "svn://www.streamboard.tv/svn/oscam;module=trunk;protocol=http \
            "
 SRCREV = "11718"
-PV = "1.10+${SRCPV}"
+PV = "1.10+"
 
 S = "${WORKDIR}/trunk"
 

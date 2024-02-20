@@ -15,10 +15,10 @@ UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/ptyprocess"
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-fcntl \
-    ${PYTHON_PN}-terminal \
-    ${PYTHON_PN}-resource \
+    python3-core \
+    python3-fcntl \
+    python3-terminal \
+    python3-resource \
 "
 
 BBCLASSEXTEND = "native nativesdk"
@@ -30,11 +30,12 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-fcntl \
-	${PYTHON_PN}-terminal \
-	${PYTHON_PN}-resource \
-	bash \
+    bash \
+    python3-fcntl \
+    python3-pytest \
+    python3-resource \
+    python3-terminal \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

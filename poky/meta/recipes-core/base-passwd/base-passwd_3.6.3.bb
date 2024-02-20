@@ -54,7 +54,7 @@ do_install () {
 }
 
 basepasswd_sysroot_postinst() {
-#!/bin/sh
+#!/bin/sh -e
 
 # Install passwd.master and group.master to sysconfdir
 install -d -m 755 ${STAGING_DIR_TARGET}${sysconfdir}

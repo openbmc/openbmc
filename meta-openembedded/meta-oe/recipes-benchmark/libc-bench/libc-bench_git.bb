@@ -7,7 +7,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=9a825c63897c53f487ef900598c31527"
 
 SRCREV = "b6b2ce5f9f87a09b14499cb00c600c601f022634"
-PV = "20110206+git${SRCPV}"
+PV = "20110206+git"
 
 SRC_URI = "git://git.musl-libc.org/libc-bench;branch=master \
            file://0001-build-Do-not-override-ldflags-from-environment.patch \

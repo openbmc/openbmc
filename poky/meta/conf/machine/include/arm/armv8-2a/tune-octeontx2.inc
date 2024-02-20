@@ -8,6 +8,7 @@ require conf/machine/include/arm/arch-armv8-2a.inc
 # Little Endian base configs
 AVAILTUNES += "octeontx2"
 ARMPKGARCH:tune-octeontx2             = "octeontx2"
-TUNE_FEATURES:tune-octeontx2          = "${TUNE_FEATURES:tune-armv8-2a-crypto} octeontx2"
+# We do not want -march since -mcpu is added above to cover for it
+TUNE_FEATURES:tune-octeontx2          = "aarch64 crypto octeontx2"
 PACKAGE_EXTRA_ARCHS:tune-octeontx2    = "${PACKAGE_EXTRA_ARCHS:tune-armv8-2a-crypto} octeontx2"
 BASE_LIB:tune-octeontx2               = "lib64"

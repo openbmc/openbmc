@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4fbd65380cdd255951079008b364516c"
 SRC_URI[sha256sum] = "1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7"
 
 # setup.py of chardet needs this.
-DEPENDS += "${PYTHON_PN}-pytest-runner-native"
+DEPENDS += "python3-pytest-runner-native"
 
 inherit pypi python_setuptools_build_meta
 
@@ -18,7 +18,7 @@ FILES:${PN}-cli += " \
 RDEPENDS:${PN}-cli = "${PN} "
 
 RDEPENDS:${PN}:class-target += " \
-    ${PYTHON_PN}-logging \
+    python3-logging \
 "
 
 BBCLASSEXTEND = "native nativesdk"

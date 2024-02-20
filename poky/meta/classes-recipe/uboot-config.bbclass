@@ -94,6 +94,9 @@ SPL_MKIMAGE_SIGN_ARGS ?= ""
 UBOOT_DTB ?= ""
 UBOOT_DTB_BINARY ??= ""
 
+# uboot-fit_check_sign command
+UBOOT_FIT_CHECK_SIGN ?= "uboot-fit_check_sign"
+
 python () {
     ubootmachine = d.getVar("UBOOT_MACHINE")
     ubootconfigflags = d.getVarFlags('UBOOT_CONFIG')

@@ -17,7 +17,8 @@ SRC_URI += " \
 DEPENDS += " python3-setuptools-scm-native"
 
 RDEPENDS:${PN}-ptest += " \
-        ${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

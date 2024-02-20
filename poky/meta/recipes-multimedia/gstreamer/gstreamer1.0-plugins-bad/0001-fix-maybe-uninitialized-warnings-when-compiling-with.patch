@@ -1,4 +1,4 @@
-From 6c3eeaf6435608f744303c17d52245f926cd28ac Mon Sep 17 00:00:00 2001
+From 8be0c6ac60c96e87d8aa443be9c431844dc3d92a Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 26 Jan 2016 15:16:01 -0800
 Subject: [PATCH] fix maybe-uninitialized warnings when compiling with -Os

@@ -16,7 +16,7 @@ SRC_URI = "git://github.com/mchehab/zbar.git;branch=master;protocol=https \
 SRCREV = "89e7900d85dd54ef351a7ed582aec6a5a5d7fa37"
 
 S = "${WORKDIR}/git"
-PV = "0.23.1+git${SRCPV}"
+PV = "0.23.1+git"
 
 DEPENDS += "xmlto-native"
 

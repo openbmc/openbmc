@@ -3,7 +3,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8f7bb094c7232b058c7e9f2e431f389c"
 HOMEPAGE = "https://pypi.org/project/bcrypt/"
 
-DEPENDS += "${PYTHON_PN}-cffi-native"
+DEPENDS += "python3-cffi-native"
 LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', ' -fuse-ld=bfd', '', d)}"
 
 SRC_URI[sha256sum] = "33313a1200a3ae90b75587ceac502b048b840fc69e7f7a0905b5f87fac7a1258"
@@ -19,8 +19,8 @@ CARGO_SRC_DIR = "src/_bcrypt"
 require ${BPN}-crates.inc
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-unittest-automake-output \
+	python3-pytest \
+	python3-unittest-automake-output \
 "
 
 do_install_ptest() {
@@ -29,8 +29,8 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-cffi \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-six \
+    python3-cffi \
+    python3-ctypes \
+    python3-shell \
+    python3-six \
 "

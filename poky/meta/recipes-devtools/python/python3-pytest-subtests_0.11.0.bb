@@ -11,10 +11,10 @@ SRC_URI[sha256sum] = "51865c88457545f51fb72011942f0a3c6901ee9e24cbfb6d1b9dc1348b
 
 inherit pypi python_setuptools_build_meta
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-pytest \
+    python3-pytest \
 "
 
 BBCLASSEXTEND = "native nativesdk"

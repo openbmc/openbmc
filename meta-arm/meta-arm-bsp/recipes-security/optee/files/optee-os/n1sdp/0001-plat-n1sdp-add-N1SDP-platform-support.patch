@@ -1,4 +1,4 @@
-From 33d86d23bcf2bbcb191e33e3130c3429650b9204 Mon Sep 17 00:00:00 2001
+From 56f2afcd10e8404a3c4efed6277a005fc4099e48 Mon Sep 17 00:00:00 2001
 From: Vishnu Banavath <vishnu.banavath@arm.com>
 Date: Thu, 30 Jun 2022 18:36:26 +0100
 Subject: [PATCH] plat-n1sdp: add N1SDP platform support
@@ -10,10 +10,23 @@ These changes are to add N1SDP platform to optee-os
 
 Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
 Signed-off-by: Mariam Elshakfy <mariam.elshakfy@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ core/arch/arm/plat-n1sdp/conf.mk           | 41 +++++++++++++++++
+ core/arch/arm/plat-n1sdp/main.c            | 53 ++++++++++++++++++++++
+ core/arch/arm/plat-n1sdp/n1sdp_core_pos.S  | 32 +++++++++++++
+ core/arch/arm/plat-n1sdp/platform_config.h | 49 ++++++++++++++++++++
+ core/arch/arm/plat-n1sdp/sub.mk            |  3 ++
+ 5 files changed, 178 insertions(+)
+ create mode 100644 core/arch/arm/plat-n1sdp/conf.mk
+ create mode 100644 core/arch/arm/plat-n1sdp/main.c
+ create mode 100644 core/arch/arm/plat-n1sdp/n1sdp_core_pos.S
+ create mode 100644 core/arch/arm/plat-n1sdp/platform_config.h
+ create mode 100644 core/arch/arm/plat-n1sdp/sub.mk
 
 diff --git a/core/arch/arm/plat-n1sdp/conf.mk b/core/arch/arm/plat-n1sdp/conf.mk
 new file mode 100644
-index 00000000..06b4975a
+index 000000000..3dc79fe20
 --- /dev/null
 +++ b/core/arch/arm/plat-n1sdp/conf.mk
 @@ -0,0 +1,41 @@
@@ -60,7 +73,7 @@ index 00000000..06b4975a
 +$(call force,CFG_CORE_ARM64_PA_BITS,36)
 diff --git a/core/arch/arm/plat-n1sdp/main.c b/core/arch/arm/plat-n1sdp/main.c
 new file mode 100644
-index 00000000..39360711
+index 000000000..38212d84c
 --- /dev/null
 +++ b/core/arch/arm/plat-n1sdp/main.c
 @@ -0,0 +1,53 @@
@@ -108,7 +121,7 @@ index 00000000..39360711
 +
 +void main_secondary_init_gic(void)
 +{
-+	gic_cpu_init();
++	gic_init_per_cpu();
 +}
 +
 +void console_init(void)
@@ -119,7 +132,7 @@ index 00000000..39360711
 +}
 diff --git a/core/arch/arm/plat-n1sdp/n1sdp_core_pos.S b/core/arch/arm/plat-n1sdp/n1sdp_core_pos.S
 new file mode 100644
-index 00000000..439d4e67
+index 000000000..439d4e675
 --- /dev/null
 +++ b/core/arch/arm/plat-n1sdp/n1sdp_core_pos.S
 @@ -0,0 +1,32 @@
@@ -157,7 +170,7 @@ index 00000000..439d4e67
 +END_FUNC get_core_pos_mpidr
 diff --git a/core/arch/arm/plat-n1sdp/platform_config.h b/core/arch/arm/plat-n1sdp/platform_config.h
 new file mode 100644
-index 00000000..81b99409
+index 000000000..81b994091
 --- /dev/null
 +++ b/core/arch/arm/plat-n1sdp/platform_config.h
 @@ -0,0 +1,49 @@
@@ -212,7 +225,7 @@ index 00000000..81b99409
 +#endif /*PLATFORM_CONFIG_H*/
 diff --git a/core/arch/arm/plat-n1sdp/sub.mk b/core/arch/arm/plat-n1sdp/sub.mk
 new file mode 100644
-index 00000000..a0b49da1
+index 000000000..a0b49da14
 --- /dev/null
 +++ b/core/arch/arm/plat-n1sdp/sub.mk
 @@ -0,0 +1,3 @@
@@ -220,4 +233,5 @@ index 00000000..a0b49da1
 +srcs-y += main.c
 +srcs-y	+= n1sdp_core_pos.S
 -- 
-2.17.1
+2.25.1
+

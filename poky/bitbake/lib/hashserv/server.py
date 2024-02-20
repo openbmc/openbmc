@@ -199,7 +199,7 @@ def permissions(*permissions, allow_anon=True, allow_self_service=False):
             if not self.user_has_permissions(*permissions, allow_anon=allow_anon):
                 if not self.user:
                     username = "Anonymous user"
-                    user_perms = self.anon_perms
+                    user_perms = self.server.anon_perms
                 else:
                     username = self.user.username
                     user_perms = self.user.permissions
@@ -223,31 +223,18 @@ def permissions(*permissions, allow_anon=True, allow_self_service=False):
 
 
 class ServerClient(bb.asyncrpc.AsyncServerConnection):
-    def __init__(
-        self,
-        socket,
-        db_engine,
-        request_stats,
-        backfill_queue,
-        upstream,
-        read_only,
-        anon_perms,
-    ):
-        super().__init__(socket, "OEHASHEQUIV", logger)
-        self.db_engine = db_engine
-        self.request_stats = request_stats
+    def __init__(self, socket, server):
+        super().__init__(socket, "OEHASHEQUIV", server.logger)
+        self.server = server
         self.max_chunk = bb.asyncrpc.DEFAULT_MAX_CHUNK
-        self.backfill_queue = backfill_queue
-        self.upstream = upstream
-        self.read_only = read_only
         self.user = None
-        self.anon_perms = anon_perms
 
         self.handlers.update(
             {
                 "get": self.handle_get,
                 "get-outhash": self.handle_get_outhash,
                 "get-stream": self.handle_get_stream,
+                "exists-stream": self.handle_exists_stream,
                 "get-stats": self.handle_get_stats,
                 "get-db-usage": self.handle_get_db_usage,
                 "get-db-query-columns": self.handle_get_db_query_columns,
@@ -261,13 +248,16 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
             }
         )
 
-        if not read_only:
+        if not self.server.read_only:
             self.handlers.update(
                 {
                     "report-equiv": self.handle_equivreport,
                     "reset-stats": self.handle_reset_stats,
                     "backfill-wait": self.handle_backfill_wait,
                     "remove": self.handle_remove,
+                    "gc-mark": self.handle_gc_mark,
+                    "gc-sweep": self.handle_gc_sweep,
+                    "gc-status": self.handle_gc_status,
                     "clean-unused": self.handle_clean_unused,
                     "refresh-token": self.handle_refresh_token,
                     "set-user-perms": self.handle_set_perms,
@@ -282,10 +272,10 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
     def user_has_permissions(self, *permissions, allow_anon=True):
         permissions = set(permissions)
         if allow_anon:
-            if ALL_PERM in self.anon_perms:
+            if ALL_PERM in self.server.anon_perms:
                 return True
 
-            if not permissions - self.anon_perms:
+            if not permissions - self.server.anon_perms:
                 return True
 
         if self.user is None:
@@ -303,10 +293,10 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
         return self.proto_version > (1, 0) and self.proto_version <= (1, 1)
 
     async def process_requests(self):
-        async with self.db_engine.connect(self.logger) as db:
+        async with self.server.db_engine.connect(self.logger) as db:
             self.db = db
-            if self.upstream is not None:
-                self.upstream_client = await create_async_client(self.upstream)
+            if self.server.upstream is not None:
+                self.upstream_client = await create_async_client(self.server.upstream)
             else:
                 self.upstream_client = None
 
@@ -323,7 +313,7 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
                 if "stream" in k:
                     return await self.handlers[k](msg[k])
                 else:
-                    with self.request_stats.start_sample() as self.request_sample, self.request_sample.measure():
+                    with self.server.request_stats.start_sample() as self.request_sample, self.request_sample.measure():
                         return await self.handlers[k](msg[k])
 
         raise bb.asyncrpc.ClientError("Unrecognized command %r" % msg)
@@ -388,8 +378,7 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
         await self.db.insert_unihash(data["method"], data["taskhash"], data["unihash"])
         await self.db.insert_outhash(data)
 
-    @permissions(READ_PERM)
-    async def handle_get_stream(self, request):
+    async def _stream_handler(self, handler):
         await self.socket.send_message("ok")
 
         while True:
@@ -404,41 +393,56 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
                 # possible (which is why the request sample is handled manually
                 # instead of using 'with', and also why logging statements are
                 # commented out.
-                self.request_sample = self.request_stats.start_sample()
+                self.request_sample = self.server.request_stats.start_sample()
                 request_measure = self.request_sample.measure()
                 request_measure.start()
 
                 if l == "END":
                     break
 
-                (method, taskhash) = l.split()
-                # self.logger.debug('Looking up %s %s' % (method, taskhash))
-                row = await self.db.get_equivalent(method, taskhash)
-
-                if row is not None:
-                    msg = row["unihash"]
-                    # self.logger.debug('Found equivalent task %s -> %s', (row['taskhash'], row['unihash']))
-                elif self.upstream_client is not None:
-                    upstream = await self.upstream_client.get_unihash(method, taskhash)
-                    if upstream:
-                        msg = upstream
-                    else:
-                        msg = ""
-                else:
-                    msg = ""
-
+                msg = await handler(l)
                 await self.socket.send(msg)
             finally:
                 request_measure.end()
                 self.request_sample.end()
 
-            # Post to the backfill queue after writing the result to minimize
-            # the turn around time on a request
-            if upstream is not None:
-                await self.backfill_queue.put((method, taskhash))
-
         await self.socket.send("ok")
         return self.NO_RESPONSE
+
+    @permissions(READ_PERM)
+    async def handle_get_stream(self, request):
+        async def handler(l):
+            (method, taskhash) = l.split()
+            # self.logger.debug('Looking up %s %s' % (method, taskhash))
+            row = await self.db.get_equivalent(method, taskhash)
+
+            if row is not None:
+                # self.logger.debug('Found equivalent task %s -> %s', (row['taskhash'], row['unihash']))
+                return row["unihash"]
+
+            if self.upstream_client is not None:
+                upstream = await self.upstream_client.get_unihash(method, taskhash)
+                if upstream:
+                    await self.server.backfill_queue.put((method, taskhash))
+                    return upstream
+
+            return ""
+
+        return await self._stream_handler(handler)
+
+    @permissions(READ_PERM)
+    async def handle_exists_stream(self, request):
+        async def handler(l):
+            if await self.db.unihash_exists(l):
+                return "true"
+
+            if self.upstream_client is not None:
+                if await self.upstream_client.unihash_exists(l):
+                    return "true"
+
+            return "false"
+
+        return await self._stream_handler(handler)
 
     async def report_readonly(self, data):
         method = data["method"]
@@ -461,7 +465,7 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
     # report is made inside the function
     @permissions(READ_PERM)
     async def handle_report(self, data):
-        if self.read_only or not self.user_has_permissions(REPORT_PERM):
+        if self.server.read_only or not self.user_has_permissions(REPORT_PERM):
             return await self.report_readonly(data)
 
         outhash_data = {
@@ -538,24 +542,24 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
     @permissions(READ_PERM)
     async def handle_get_stats(self, request):
         return {
-            "requests": self.request_stats.todict(),
+            "requests": self.server.request_stats.todict(),
         }
 
     @permissions(DB_ADMIN_PERM)
     async def handle_reset_stats(self, request):
         d = {
-            "requests": self.request_stats.todict(),
+            "requests": self.server.request_stats.todict(),
         }
 
-        self.request_stats.reset()
+        self.server.request_stats.reset()
         return d
 
     @permissions(READ_PERM)
     async def handle_backfill_wait(self, request):
         d = {
-            "tasks": self.backfill_queue.qsize(),
+            "tasks": self.server.backfill_queue.qsize(),
         }
-        await self.backfill_queue.join()
+        await self.server.backfill_queue.join()
         return d
 
     @permissions(DB_ADMIN_PERM)
@@ -565,6 +569,46 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
             raise TypeError("Bad condition type %s" % type(condition))
 
         return {"count": await self.db.remove(condition)}
+
+    @permissions(DB_ADMIN_PERM)
+    async def handle_gc_mark(self, request):
+        condition = request["where"]
+        mark = request["mark"]
+
+        if not isinstance(condition, dict):
+            raise TypeError("Bad condition type %s" % type(condition))
+
+        if not isinstance(mark, str):
+            raise TypeError("Bad mark type %s" % type(mark))
+
+        return {"count": await self.db.gc_mark(mark, condition)}
+
+    @permissions(DB_ADMIN_PERM)
+    async def handle_gc_sweep(self, request):
+        mark = request["mark"]
+
+        if not isinstance(mark, str):
+            raise TypeError("Bad mark type %s" % type(mark))
+
+        current_mark = await self.db.get_current_gc_mark()
+
+        if not current_mark or mark != current_mark:
+            raise bb.asyncrpc.InvokeError(
+                f"'{mark}' is not the current mark. Refusing to sweep"
+            )
+
+        count = await self.db.gc_sweep()
+
+        return {"count": count}
+
+    @permissions(DB_ADMIN_PERM)
+    async def handle_gc_status(self, request):
+        (keep_rows, remove_rows, current_mark) = await self.db.gc_status()
+        return {
+            "keep": keep_rows,
+            "remove": remove_rows,
+            "mark": current_mark,
+        }
 
     @permissions(DB_ADMIN_PERM)
     async def handle_clean_unused(self, request):
@@ -779,15 +823,7 @@ class Server(bb.asyncrpc.AsyncServer):
         )
 
     def accept_client(self, socket):
-        return ServerClient(
-            socket,
-            self.db_engine,
-            self.request_stats,
-            self.backfill_queue,
-            self.upstream,
-            self.read_only,
-            self.anon_perms,
-        )
+        return ServerClient(socket, self)
 
     async def create_admin_user(self):
         admin_permissions = (ALL_PERM,)

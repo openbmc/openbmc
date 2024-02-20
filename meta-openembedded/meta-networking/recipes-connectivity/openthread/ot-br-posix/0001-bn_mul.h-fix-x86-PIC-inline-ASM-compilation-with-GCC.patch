@@ -36,7 +36,7 @@ Signed-off-by: Peter Korsgaard <peter@korsgaard.com>
 
 --- a/third_party/openthread/repo/third_party/mbedtls/repo/include/mbedtls/bn_mul.h
 +++ b/third_party/openthread/repo/third_party/mbedtls/repo/include/mbedtls/bn_mul.h
-@@ -55,12 +55,28 @@
+@@ -95,12 +95,28 @@
      ( !defined(__ARMCC_VERSION) || __ARMCC_VERSION >= 6000000 )
  
  /*
@@ -66,3 +66,14 @@ Signed-off-by: Peter Korsgaard <peter@korsgaard.com>
  
  #define MULADDC_INIT                        \
      asm(                                    \
+--- a/third_party/openthread/repo/third_party/mbedtls/repo/CMakeLists.txt
++++ b/third_party/openthread/repo/third_party/mbedtls/repo/CMakeLists.txt
+@@ -210,7 +210,7 @@ if(CMAKE_COMPILER_IS_GNU)
+ endif(CMAKE_COMPILER_IS_GNU)
+ 
+ if(CMAKE_COMPILER_IS_CLANG)
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wwrite-strings -Wpointer-arith -Wimplicit-fallthrough -Wshadow -Wvla -Wformat=2 -Wno-format-nonliteral")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wwrite-strings -Wpointer-arith -Wimplicit-fallthrough -Wshadow -Wvla -Wformat=2 -Wno-format-nonliteral -Wno-error=documentation")
+     set(CMAKE_C_FLAGS_RELEASE     "-O2")
+     set(CMAKE_C_FLAGS_DEBUG       "-O0 -g3")
+     set(CMAKE_C_FLAGS_COVERAGE    "-O0 -g3 --coverage")

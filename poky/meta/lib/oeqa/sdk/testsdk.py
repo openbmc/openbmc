@@ -79,6 +79,9 @@ class TestSDK(TestSDKBase):
         # sdk use network for download projects for build
         export_proxies(d)
 
+        # We need the original PATH for testing the eSDK, not with our manipulations
+        os.environ['PATH'] = d.getVar("BB_ORIGENV", False).getVar("PATH")
+
         tcname = self.get_tcname(d)
 
         if not os.path.exists(tcname):

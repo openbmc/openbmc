@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 DEPENDS = "glib-2.0 gssdp gupnp gupnp-av gupnp-dlna libsoup-2.4 libxml2 dleyna-core"
 RDEPENDS:${PN} = "dleyna-connector-dbus"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 SRC_URI = "git://github.com/01org/${BPN}.git;branch=master;protocol=https"
 SRCREV = "eb895ae82715e9889a948ffa810c0f828b4f4c76"
 S = "${WORKDIR}/git"

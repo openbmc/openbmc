@@ -142,6 +142,8 @@ def _runner(resultklass, prefix=None):
         logger.error(traceback.print_exc())
         logger.error('patchtest: something went wrong')
         return 1
+    if result.test_failure or result.test_error:
+        return 1 
 
     return 0
 
@@ -158,9 +160,14 @@ def run(patch, logfile=None):
     postmerge_resultklass = getResult(patch, True, logfile)
     postmerge_result = _runner(postmerge_resultklass, 'test')
 
+    print('----------------------------------------------------------------------\n')
     if premerge_result == 2 and postmerge_result == 2:
-        logger.error('patchtest: any test cases found - did you specify the correct suite directory?')
-
+        logger.error('patchtest: No test cases found - did you specify the correct suite directory?')
+    if premerge_result == 1 or postmerge_result == 1:
+        logger.error('WARNING: patchtest: At least one patchtest caused a failure or an error - please check')
+    else:
+        logger.error('OK: patchtest: All patchtests passed')
+    print('----------------------------------------------------------------------\n')
     return premerge_result or postmerge_result
 
 def main():

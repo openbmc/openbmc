@@ -7,7 +7,7 @@ DEPENDS = "udev libusb1 libplist libimobiledevice-glue"
 inherit autotools pkgconfig gitpkgv
 
 PKGV = "${GITPKGVTAG}"
-PV = "2.0.2+git${SRCPV}"
+PV = "2.0.2+git"
 
 SRCREV = "36ffb7ab6e2a7e33bd1b56398a88895b7b8c615a"
 SRC_URI = "git://github.com/libimobiledevice/libusbmuxd;protocol=https;branch=master"

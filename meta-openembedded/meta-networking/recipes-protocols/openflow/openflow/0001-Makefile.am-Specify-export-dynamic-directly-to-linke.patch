@@ -1,0 +1,30 @@
+From 12bba388719c425d9b5cd970d4fabf01edf56aa4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 7 Feb 2024 22:33:12 -0800
+Subject: [PATCH] Makefile.am: Specify export-dynamic directly to linker
+
+Fixes build with clang-18+
+| riscv64-yoe-linux-clang: error: unknown argument: '-export-dynamic'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 97ac1f0..e557fe7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -23,7 +23,7 @@ if NDEBUG
+ AM_CPPFLAGS += -DNDEBUG
+ AM_CFLAGS += -fomit-frame-pointer
+ else
+-AM_LDFLAGS = -export-dynamic
++AM_LDFLAGS = -Wl,--export-dynamic
+ endif
+ 
+ CLEANFILES =
+-- 
+2.43.0
+

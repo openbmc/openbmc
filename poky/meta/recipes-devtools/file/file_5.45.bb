@@ -20,12 +20,12 @@ S = "${WORKDIR}/git"
 
 inherit autotools update-alternatives
 
-PACKAGECONFIG ??= "bz2 lzma zlib"
+PACKAGECONFIG ??= "bz2 lzma zlib zstdlib lzlib"
 PACKAGECONFIG[bz2] = "--enable-bzlib, --disable-bzlib, bzip2"
 PACKAGECONFIG[lzma] = "--enable-xzlib, --disable-xzlib, xz"
 PACKAGECONFIG[zlib] = "--enable-zlib, --disable-zlib, zlib"
 PACKAGECONFIG[zstdlib] = "--enable-zstdlib, --disable-zstdlib, zstd"
-PACKAGECONFIG[lzlib] = "--enable-lzlib, --disable-lzlib, lzip"
+PACKAGECONFIG[lzlib] = "--enable-lzlib, --disable-lzlib, lzlib"
 PACKAGECONFIG[seccomp] = "--enable-libseccomp, --disable-libseccomp, libseccomp"
 
 ALTERNATIVE:${PN} = "file"

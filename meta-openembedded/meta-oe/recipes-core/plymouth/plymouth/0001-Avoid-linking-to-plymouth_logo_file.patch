@@ -1,0 +1,28 @@
+From 210090a8bddc4d4fae6089449306276a58db7409 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Wed, 14 Feb 2024 14:45:29 +0100
+Subject: [PATCH] Avoid linking to plymouth_logo_file
+
+Otherwise it would lead to install errors during cross-compilation.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ themes/spinfinity/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/themes/spinfinity/meson.build b/themes/spinfinity/meson.build
+index f48e8e55..da9ea705 100644
+--- a/themes/spinfinity/meson.build
++++ b/themes/spinfinity/meson.build
+@@ -56,5 +56,5 @@ install_data(
+ 
+ install_symlink('header-image.png',
+   install_dir: plymouth_theme_path / 'spinfinity',
+-  pointing_to: plymouth_logo_file,
++  pointing_to: '..' / '..'/ 'bizcom.png',
+ )
+-- 
+2.34.1
+

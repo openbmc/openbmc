@@ -3,7 +3,7 @@ DESCRIPTION = "kexecboot is a graphical linux-as-bootloader implementation based
 HOMEPAGE = "https://github.com/kexecboot/kexecboot/wiki"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
-PV = "0.6+git${SRCPV}"
+PV = "0.6+git"
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/kexecboot/kexecboot.git;branch=master;protocol=https"
 SRC_URI:append:libc-klibc = "\

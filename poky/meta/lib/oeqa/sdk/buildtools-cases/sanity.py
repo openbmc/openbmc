@@ -21,4 +21,4 @@ class SanityTests(OESDKTestCase):
             # Canonicalise the location of this command
             tool_path = os.path.realpath(self._run("command -v %s" % command).strip())
             # Assert that the tool was found inside the SDK root
-            self.assertEquals(os.path.commonprefix((sdk_base, tool_path)), sdk_base)
+            self.assertEqual(os.path.commonprefix((sdk_base, tool_path)), sdk_base)

@@ -335,6 +335,7 @@ python package_convert_pr_autoinc() {
 }
 
 LOCALEBASEPN ??= "${PN}"
+LOCALE_PATHS ?= "${datadir}/locale"
 
 python package_do_split_locales() {
     oe.package.split_locales(d)

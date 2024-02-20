@@ -49,6 +49,8 @@ DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
 TEST_LIST = "\
     ${@bb.utils.filter('PACKAGECONFIG', 'bpf firmware vm', d)} \
     rtc \
+    ptp \
+    timers \
 "
 EXTRA_OEMAKE = '\
     CROSS_COMPILE=${TARGET_PREFIX} \
@@ -153,8 +155,8 @@ INHIBIT_PACKAGE_DEBUG_SPLIT="1"
 FILES:${PN} += "/usr/kernel-selftest"
 
 RDEPENDS:${PN} += "python3 perl perl-module-io-handle"
-# tools/testing/selftests/vm/Makefile doesn't respect LDFLAGS and tools/testing/selftests/Makefile explicitly overrides to empty
-INSANE_SKIP:${PN} += "ldflags libdir"
+
+INSANE_SKIP:${PN} += "libdir"
 
 SECURITY_CFLAGS = ""
 COMPATIBLE_HOST:libc-musl = 'null'

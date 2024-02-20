@@ -44,19 +44,6 @@ Index: git/pseudo_util.c
  
  #include <ctype.h>
  #include <errno.h>
-Index: git/pseudolog.c
-===================================================================
---- git.orig/pseudolog.c
-+++ git/pseudolog.c
-@@ -8,7 +8,7 @@
-  */
- /* We need _XOPEN_SOURCE for strptime(), but if we define that,
-  * we then don't get S_IFSOCK... _GNU_SOURCE turns on everything. */
--#define _GNU_SOURCE
-+#define _DEFAULT_SOURCE
- 
- #include <ctype.h>
- #include <limits.h>
 Index: git/pseudo_client.c
 ===================================================================
 --- git.orig/pseudo_client.c

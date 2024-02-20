@@ -4,7 +4,7 @@ HOMEPAGE = "http://linux-iscsi.org/index.php/Lio-utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=c3ea231a32635cbb5debedf3e88aa3df"
 
-PV = "4.1+git${SRCPV}"
+PV = "4.1+git"
 
 SRC_URI = "git://github.com/Datera/lio-utils.git;branch=master;protocol=https \
            file://0001-Makefiles-Respect-environment-variables-and-add-LDFL.patch \

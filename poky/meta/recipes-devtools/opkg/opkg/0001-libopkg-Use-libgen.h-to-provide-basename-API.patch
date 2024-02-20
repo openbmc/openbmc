@@ -12,7 +12,7 @@ dropped from string.h [1]
 
 [1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
 
-Upstream-Status: Submitted [https://lists.yoctoproject.org/g/opkg/message/12]
+Upstream-Status: Backport [74fc3a991f974095644897d18d43846b5f359dae]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
 v2: Do not override basename wholesale

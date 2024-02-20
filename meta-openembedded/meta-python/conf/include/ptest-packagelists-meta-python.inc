@@ -7,6 +7,7 @@
 #
 # ptests which take less than ~30s each
 PTESTS_FAST_META_PYTHON = "\
+    python3-appdirs \
     python3-ansicolors \
     python3-asgiref \
     python3-aspectlib \
@@ -38,6 +39,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-pyserial \
     python3-pytest-mock \
     python3-pytoml \
+    python3-pyyaml-include \
     python3-rapidjson \
     python3-requests-file \
     python3-requests-toolbelt \
@@ -48,11 +50,13 @@ PTESTS_FAST_META_PYTHON = "\
     python3-soupsieve \
     python3-sqlparse \
     python3-tomlkit \
+    python3-ujson \
     python3-u-msgpack-python \
     python3-unidiff \
     python3-uritemplate \
     python3-xmltodict \
     python3-xxhash \
+    python3-yarl \
 "
 
 PTESTS_SLOW_META_PYTHON = "\
@@ -61,7 +65,6 @@ PTESTS_SLOW_META_PYTHON = "\
 "
 
 PTESTS_PROBLEMS_META_PYTHON ="\
-    python3-appdirs \
     python3-betamax \
     python3-dnspython \
     python3-fastjsonschema \
@@ -83,7 +86,5 @@ PTESTS_PROBLEMS_META_PYTHON ="\
     python3-trustme \
     python3-typeguard \
     python3-whoosh \
-    python3-ujson \
     python3-xlrd \
-    python3-yarl \
 "

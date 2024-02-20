@@ -132,7 +132,7 @@ def get_subject_prefix(path):
     if len(mbox):
         subject = mbox[0]['subject']
         if subject:
-            pattern = re.compile("(\[.*\])", re.DOTALL)
+            pattern = re.compile(r"(\[.*\])", re.DOTALL)
             match = pattern.search(subject)
             if match:
                 prefix = match.group(1)
@@ -146,8 +146,8 @@ def valid_branch(branch):
     invalid  = lbranch.startswith('patch') or \
                lbranch.startswith('rfc') or \
                lbranch.startswith('resend') or \
-               re.search('^v\d+', lbranch) or \
-               re.search('^\d+/\d+', lbranch)
+               re.search(r'^v\d+', lbranch) or \
+               re.search(r'^\d+/\d+', lbranch)
 
     return not invalid
 

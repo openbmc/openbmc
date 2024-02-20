@@ -5,21 +5,21 @@ SUMMARY = "OpenThread Border Router"
 SECTION = "net"
 LICENSE = "BSD-3-Clause & MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=87109e44b2fda96a8991f27684a7349c \
-                    file://third_party/Simple-web-server/repo/LICENSE;md5=852b3f7f320b19f6431487b8b2fb1d74 \
+                    file://third_party/Simple-web-server/repo/LICENSE;md5=091ac9fd29d87ad1ae5bf765d95278b0 \
                     file://third_party/cJSON/repo/LICENSE;md5=218947f77e8cb8e2fa02918dc41c50d0 \
                     file://third_party/http-parser/repo/LICENSE-MIT;md5=9bfa835d048c194ab30487af8d7b3778 \
                     file://third_party/openthread/repo/LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
                     "
-DEPENDS = "autoconf-archive dbus readline avahi jsoncpp boost libnetfilter-queue"
-SRCREV = "ad6822257ffddbac295db97186e4ab449a2ed32a"
-PV = "0.3.0+git${SRCPV}"
+DEPENDS = "autoconf-archive dbus readline avahi jsoncpp boost libnetfilter-queue protobuf protobuf-native"
+SRCREV = "4e937939ba6ce146fd98537cb63e0f4c41c8dbe1"
+PV = "0.3.0+git"
 
 SRC_URI = "gitsm://github.com/openthread/ot-br-posix.git;protocol=https;branch=main \
            file://0001-otbr-agent.service.in-remove-pre-exec-hook-for-mdns-.patch \
            file://0001-cmake-Disable-nonnull-compare-warning-on-gcc.patch \
            file://0001-bn_mul.h-fix-x86-PIC-inline-ASM-compilation-with-GCC.patch \
            file://mbedtls.patch \
-           file://unused_var.patch \
+           file://default-cxx-std.patch \
            "
 
 S = "${WORKDIR}/git"

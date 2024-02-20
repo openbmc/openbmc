@@ -14,7 +14,8 @@ SRC_URI += " \
 inherit pypi python_setuptools_build_meta ptest
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

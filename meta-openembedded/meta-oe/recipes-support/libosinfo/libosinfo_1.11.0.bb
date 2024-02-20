@@ -27,8 +27,8 @@ GIR_MESON_DISABLE_FLAG = 'disabled'
 GTKDOC_MESON_OPTION = "enable-gtk-doc"
 
 EXTRA_OEMESON += " \
-	-Dwith-pci-ids-path=${datadir}/pci.ids \
-	-Dwith-usb-ids-path=${datadir}/usb.ids \
+	-Dwith-pci-ids-path=${datadir}/hwdata/pci.ids \
+	-Dwith-usb-ids-path=${datadir}/hwdata/usb.ids \
 "
 
-RDEPENDS:${PN} = "pciutils-ids usbids"
+RDEPENDS:${PN} = "hwdata"

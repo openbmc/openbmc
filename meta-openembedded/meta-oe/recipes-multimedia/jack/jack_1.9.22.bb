@@ -16,7 +16,10 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "libsamplerate0 libsndfile1"
 
-SRC_URI = "git://github.com/jackaudio/jack2.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/jackaudio/jack2.git;branch=master;protocol=https \
+    file://0001-Conceal-imp-warnings-in-Python3.patch \
+    file://0002-Fix-all-DeprecationWarning-invalid-escape-sequence.patch \
+"
 SRCREV = "4f58969432339a250ce87fe855fb962c67d00ddb"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"

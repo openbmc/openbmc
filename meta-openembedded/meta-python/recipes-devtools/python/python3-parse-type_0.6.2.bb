@@ -8,14 +8,15 @@ SRC_URI[sha256sum] = "79b1f2497060d0928bc46016793f1fca1057c4aacdf15ef876aa48d75a
 PYPI_PACKAGE = "parse_type"
 inherit pypi ptest setuptools3
 
-RDEPENDS:${PN} += "${PYTHON_PN}-parse"
+RDEPENDS:${PN} += "python3-parse"
 
 SRC_URI += " \
 	file://run-ptest \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

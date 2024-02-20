@@ -10,9 +10,10 @@ LIC_FILES_CHKSUM = "file://license.txt;md5=a0013d1b383d72ba4bdc5b750e7d1d77"
 SRC_URI = "\
     git://github.com/raspberrypi/libcamera-apps.git;protocol=https;branch=main \
     file://0001-utils-version.py-use-usr-bin-env-in-shebang.patch \
+    file://0002-Revert-Support-compressed-pixel-formats-when-saving-.patch \
 "
-PV = "1.2.1+git${SRCPV}"
-SRCREV = "1c1d1c1a2a86d70cf873edc8bb72d174f037973a"
+PV = "1.4.2+git${SRCPV}"
+SRCREV = "9ae39f85ae6bee9761c36b9b5b80d675bc1fa369"
 
 S = "${WORKDIR}/git"
 
@@ -38,3 +39,6 @@ EXTRA_OEMESON += "${NEON_FLAGS}"
 do_install:append() {
     rm -v ${D}/${bindir}/camera-bug-report
 }
+
+# not picked automatically, because it's missing common 'lib' prefix
+FILES:${PN}-dev += "${libdir}/rpicam_app.so"

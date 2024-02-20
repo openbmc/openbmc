@@ -1,0 +1,183 @@
+commit 7e9433a56f22426b11cbc9bd80e0debca67c893b
+Author: Jörg Sommer <joerg.sommer@navimatix.de>
+Date:   Mon Jun 26 12:38:30 2023 +0200
+
+    csv2html: Explicitly reference data in top level
+    
+    With g++ 11 *data* became ambiguous with [std::data][1]. Therefore it's
+    needed to explicitly address the variable from the top level scope.
+    
+    [1] https://en.cppreference.com/w/cpp/iterator/data
+
+Upstream-Status: Submitted [https://salsa.debian.org/etbe/bonnie/-/merge_requests/3/diffs?commit_id=fb13a71d56dab8aaa39233fcaaedfb0ba4ad647d]
+
+diff --git a/bon_csv2html.cpp b/bon_csv2html.cpp
+index e9d9c50..652e330 100644
+--- a/bon_csv2html.cpp
++++ b/bon_csv2html.cpp
+@@ -87,8 +87,8 @@ int main(int argc, char **argv)
+     read_in(buf);
+   }
+ 
+-  props = new PPCCHAR[data.size()];
+-  for(i = 0; i < data.size(); i++)
++  props = new PPCCHAR[::data.size()];
++  for(i = 0; i < ::data.size(); i++)
+   {
+     props[i] = new PCCHAR[MAX_ITEMS];
+     props[i][0] = NULL;
+@@ -109,7 +109,7 @@ int main(int argc, char **argv)
+   }
+   calc_vals();
+   int mid_width = header();
+-  for(i = 0; i < data.size(); i++)
++  for(i = 0; i < ::data.size(); i++)
+   {
+ // First print the average speed line
+     printf("<tr>");
+@@ -171,23 +171,23 @@ int compar(const void *a, const void *b)
+ 
+ void calc_vals()
+ {
+-  ITEM *arr = new ITEM[data.size()];
++  ITEM *arr = new ITEM[::data.size()];
+   for(unsigned int column_ind = 0; column_ind < MAX_ITEMS; column_ind++)
+   {
+     switch(vals[column_ind])
+     {
+     case eNoCols:
+     {
+-      for(unsigned int row_ind = 0; row_ind < data.size(); row_ind++)
++      for(unsigned int row_ind = 0; row_ind < ::data.size(); row_ind++)
+       {
+         if(column_ind == COL_CONCURRENCY)
+         {
+-          if(data[row_ind][column_ind] && strcmp("1", data[row_ind][column_ind]))
++          if(::data[row_ind][column_ind] && strcmp("1", ::data[row_ind][column_ind]))
+             col_used[column_ind] = true;
+         }
+         else
+         {
+-          if(data[row_ind][column_ind] && strlen(data[row_ind][column_ind]))
++          if(::data[row_ind][column_ind] && strlen(::data[row_ind][column_ind]))
+             col_used[column_ind] = true;
+         }
+       }
+@@ -195,22 +195,22 @@ void calc_vals()
+     break;
+     case eCPU:
+     {
+-      for(unsigned int row_ind = 0; row_ind < data.size(); row_ind++)
++      for(unsigned int row_ind = 0; row_ind < ::data.size(); row_ind++)
+       {
+         double work, cpu;
+         arr[row_ind].val = 0.0;
+-        if(data[row_ind].size() > column_ind
+-         && sscanf(data[row_ind][column_ind - 1], "%lf", &work) == 1
+-         && sscanf(data[row_ind][column_ind], "%lf", &cpu) == 1)
++        if(::data[row_ind].size() > column_ind
++         && sscanf(::data[row_ind][column_ind - 1], "%lf", &work) == 1
++         && sscanf(::data[row_ind][column_ind], "%lf", &cpu) == 1)
+         {
+           arr[row_ind].val = cpu / work;
+         }
+         arr[row_ind].pos = row_ind;
+       }
+-      qsort(arr, data.size(), sizeof(ITEM), compar);
++      qsort(arr, ::data.size(), sizeof(ITEM), compar);
+       int col_count = -1;
+       double min_col = -1.0, max_col = -1.0;
+-      for(unsigned int sort_ind = 0; sort_ind < data.size(); sort_ind++)
++      for(unsigned int sort_ind = 0; sort_ind < ::data.size(); sort_ind++)
+       {
+         // if item is different from previous or if the first row
+         // (sort_ind == 0) then increment col count
+@@ -239,7 +239,7 @@ void calc_vals()
+           min_col /= mult;
+         }
+         double range_col = max_col - min_col;
+-        for(unsigned int sort_ind = 0; sort_ind < data.size(); sort_ind++)
++        for(unsigned int sort_ind = 0; sort_ind < ::data.size(); sort_ind++)
+         {
+           if(arr[sort_ind].col_ind > -1)
+           {
+@@ -250,7 +250,7 @@ void calc_vals()
+       }
+       else
+       {
+-        for(unsigned int sort_ind = 0; sort_ind < data.size(); sort_ind++)
++        for(unsigned int sort_ind = 0; sort_ind < ::data.size(); sort_ind++)
+         {
+           if(vals[column_ind] == eLatency)
+           {
+@@ -263,25 +263,25 @@ void calc_vals()
+     case eSpeed:
+     case eLatency:
+     {
+-      for(unsigned int row_ind = 0; row_ind < data.size(); row_ind++)
++      for(unsigned int row_ind = 0; row_ind < ::data.size(); row_ind++)
+       {
+         arr[row_ind].val = 0.0;
+-        if(data[row_ind].size() <= column_ind
+-         || sscanf(data[row_ind][column_ind], "%lf", &arr[row_ind].val) == 0)
++        if(::data[row_ind].size() <= column_ind
++         || sscanf(::data[row_ind][column_ind], "%lf", &arr[row_ind].val) == 0)
+           arr[row_ind].val = 0.0;
+         if(vals[column_ind] == eLatency && arr[row_ind].val != 0.0)
+         {
+-          if(strstr(data[row_ind][column_ind], "ms"))
++          if(strstr(::data[row_ind][column_ind], "ms"))
+             arr[row_ind].val *= 1000.0;
+-          else if(!strstr(data[row_ind][column_ind], "us"))
++          else if(!strstr(::data[row_ind][column_ind], "us"))
+             arr[row_ind].val *= 1000000.0; // is !us && !ms then secs!
+         }
+         arr[row_ind].pos = row_ind;
+       }
+-      qsort(arr, data.size(), sizeof(ITEM), compar);
++      qsort(arr, ::data.size(), sizeof(ITEM), compar);
+       int col_count = -1;
+       double min_col = -1.0, max_col = -1.0;
+-      for(unsigned int sort_ind = 0; sort_ind < data.size(); sort_ind++)
++      for(unsigned int sort_ind = 0; sort_ind < ::data.size(); sort_ind++)
+       {
+         // if item is different from previous or if the first row
+         // (sort_ind == 0) then increment col count
+@@ -310,7 +310,7 @@ void calc_vals()
+           min_col /= mult;
+         }
+         double range_col = max_col - min_col;
+-        for(unsigned int sort_ind = 0; sort_ind < data.size(); sort_ind++)
++        for(unsigned int sort_ind = 0; sort_ind < ::data.size(); sort_ind++)
+         {
+           if(arr[sort_ind].col_ind > -1)
+           {
+@@ -332,7 +332,7 @@ void calc_vals()
+       }
+       else
+       {
+-        for(unsigned int sort_ind = 0; sort_ind < data.size(); sort_ind++)
++        for(unsigned int sort_ind = 0; sort_ind < ::data.size(); sort_ind++)
+         {
+           if(vals[column_ind] == eLatency)
+           {
+@@ -481,16 +481,16 @@ void read_in(CPCCHAR buf)
+     free((void *)arr[0]);
+     return;
+   }
+-  data.push_back(arr);
++  ::data.push_back(arr);
+ }
+ 
+ void print_item(int num, int item, CPCCHAR extra)
+ {
+   PCCHAR line_data;
+   char buf[1024];
+-  if(int(data[num].size()) > item)
++  if(int(::data[num].size()) > item)
+   {
+-    line_data = data[num][item];
++    line_data = ::data[num][item];
+     switch(item)
+     {
+     case COL_PUT_BLOCK:

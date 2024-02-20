@@ -703,9 +703,7 @@ def sstate_package(ss, d):
     if d.getVar('SSTATE_SKIP_CREATION') == '1':
         return
 
-    sstate_create_package = ['sstate_report_unihash', 'sstate_create_pkgdirs', 'sstate_create_package']
-    if d.getVar('SSTATE_SIG_KEY'):
-        sstate_create_package.append('sstate_sign_package')
+    sstate_create_package = ['sstate_report_unihash', 'sstate_create_and_sign_package']
 
     for f in (d.getVar('SSTATECREATEFUNCS') or '').split() + \
              sstate_create_package + \
@@ -810,26 +808,100 @@ python sstate_task_postfunc () {
 }
 sstate_task_postfunc[dirs] = "${WORKDIR}"
 
-python sstate_create_pkgdirs () {
-    # report_unihash can change SSTATE_PKG and mkdir -p in shell doesn't own intermediate directories
-    # correctly so do this in an intermediate python task
-    with bb.utils.umask(0o002):
-        bb.utils.mkdirhier(os.path.dirname(d.getVar('SSTATE_PKG')))
+# Create a sstate package
+# If enabled, sign the package.
+# Package and signature are created in a sub-directory
+# and renamed in place once created.
+python sstate_create_and_sign_package () {
+    from pathlib import Path
+
+    # Best effort touch
+    def touch(file):
+        try:
+            file.touch()
+        except:
+            pass
+
+    def update_file(src, dst, force=False):
+        if dst.is_symlink() and not dst.exists():
+            force=True
+        try:
+            # This relies on that src is a temporary file that can be renamed
+            # or left as is.
+            if force:
+                src.rename(dst)
+            else:
+                os.link(src, dst)
+            return True
+        except:
+            pass
+
+        if dst.exists():
+            touch(dst)
+
+        return False
+
+    sign_pkg = (
+        bb.utils.to_boolean(d.getVar("SSTATE_VERIFY_SIG")) and
+        bool(d.getVar("SSTATE_SIG_KEY"))
+    )
+
+    sstate_pkg = Path(d.getVar("SSTATE_PKG"))
+    sstate_pkg_sig = Path(str(sstate_pkg) + ".sig")
+    if sign_pkg:
+        if sstate_pkg.exists() and sstate_pkg_sig.exists():
+            touch(sstate_pkg)
+            touch(sstate_pkg_sig)
+            return
+    else:
+        if sstate_pkg.exists():
+            touch(sstate_pkg)
+            return
+
+    # Create the required sstate directory if it is not present.
+    if not sstate_pkg.parent.is_dir():
+        with bb.utils.umask(0o002):
+            bb.utils.mkdirhier(str(sstate_pkg.parent))
+
+    if sign_pkg:
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory(dir=sstate_pkg.parent) as tmp_dir:
+            tmp_pkg = Path(tmp_dir) / sstate_pkg.name
+            d.setVar("TMP_SSTATE_PKG", str(tmp_pkg))
+            bb.build.exec_func('sstate_archive_package', d)
+
+            from oe.gpg_sign import get_signer
+            signer = get_signer(d, 'local')
+            signer.detach_sign(str(tmp_pkg), d.getVar('SSTATE_SIG_KEY'), None,
+                                d.getVar('SSTATE_SIG_PASSPHRASE'), armor=False)
+
+            tmp_pkg_sig = Path(tmp_dir) / sstate_pkg_sig.name
+            if not update_file(tmp_pkg_sig, sstate_pkg_sig):
+                # If the created signature file could not be copied into place,
+                # then we should not use the sstate package either.
+                return
+
+            # If the .sig file was updated, then the sstate package must also
+            # be updated.
+            update_file(tmp_pkg, sstate_pkg, force=True)
+    else:
+        from tempfile import NamedTemporaryFile
+        with NamedTemporaryFile(prefix=sstate_pkg.name, dir=sstate_pkg.parent) as tmp_pkg_fd:
+            tmp_pkg = tmp_pkg_fd.name
+            d.setVar("TMP_SSTATE_PKG", str(tmp_pkg))
+            bb.build.exec_func('sstate_archive_package',d)
+            update_file(tmp_pkg, sstate_pkg)
+            # update_file() may have renamed tmp_pkg, which must exist when the
+            # NamedTemporaryFile() context handler ends.
+            touch(Path(tmp_pkg))
+
 }
 
-#
 # Shell function to generate a sstate package from a directory
 # set as SSTATE_BUILDDIR. Will be run from within SSTATE_BUILDDIR.
-#
-sstate_create_package () {
-	# Exit early if it already exists
-	if [ -e ${SSTATE_PKG} ]; then
-		touch ${SSTATE_PKG} 2>/dev/null || true
-		return
-	fi
-
-	TFILE=`mktemp ${SSTATE_PKG}.XXXXXXXX`
-
+# The calling function handles moving the sstate package into the final
+# destination.
+sstate_archive_package () {
 	OPT="-cS"
 	ZSTD="zstd -${SSTATE_ZSTD_CLEVEL} -T${ZSTD_THREADS}"
 	# Use pzstd if available
@@ -840,42 +912,18 @@ sstate_create_package () {
 	# Need to handle empty directories
 	if [ "$(ls -A)" ]; then
 		set +e
-		tar -I "$ZSTD" $OPT -f $TFILE *
+		tar -I "$ZSTD" $OPT -f ${TMP_SSTATE_PKG} *
 		ret=$?
 		if [ $ret -ne 0 ] && [ $ret -ne 1 ]; then
 			exit 1
 		fi
 		set -e
 	else
-		tar -I "$ZSTD" $OPT --file=$TFILE --files-from=/dev/null
+		tar -I "$ZSTD" $OPT --file=${TMP_SSTATE_PKG} --files-from=/dev/null
 	fi
-	chmod 0664 $TFILE
-	# Skip if it was already created by some other process
-	if [ -h ${SSTATE_PKG} ] && [ ! -e ${SSTATE_PKG} ]; then
-		# There is a symbolic link, but it links to nothing.
-		# Forcefully replace it with the new file.
-		ln -f $TFILE ${SSTATE_PKG} || true
-	elif [ ! -e ${SSTATE_PKG} ]; then
-		# Move into place using ln to attempt an atomic op.
-		# Abort if it already exists
-		ln $TFILE ${SSTATE_PKG} || true
-	else
-		touch ${SSTATE_PKG} 2>/dev/null || true
-	fi
-	rm $TFILE
+	chmod 0664 ${TMP_SSTATE_PKG}
 }
 
-python sstate_sign_package () {
-    from oe.gpg_sign import get_signer
-
-
-    signer = get_signer(d, 'local')
-    sstate_pkg = d.getVar('SSTATE_PKG')
-    if os.path.exists(sstate_pkg + '.sig'):
-        os.unlink(sstate_pkg + '.sig')
-    signer.detach_sign(sstate_pkg, d.getVar('SSTATE_SIG_KEY', False), None,
-                       d.getVar('SSTATE_SIG_PASSPHRASE'), armor=False)
-}
 
 python sstate_report_unihash() {
     report_unihash = getattr(bb.parse.siggen, 'report_unihash', None)

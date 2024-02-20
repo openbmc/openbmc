@@ -80,21 +80,24 @@ class RpmBasicTest(OERuntimeTestCase):
 
 class RpmInstallRemoveTest(OERuntimeTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        pkgarch = cls.td['TUNE_PKGARCH'].replace('-', '_')
-        rpmdir = os.path.join(cls.tc.td['DEPLOY_DIR'], 'rpm', pkgarch)
+    def _find_test_file(self):
+        pkgarch = self.td['TUNE_PKGARCH'].replace('-', '_')
+        rpmdir = os.path.join(self.tc.td['DEPLOY_DIR'], 'rpm', pkgarch)
         # Pick base-passwd-doc as a test file to get installed, because it's small
         # and it will always be built for standard targets
         rpm_doc = 'base-passwd-doc-*.%s.rpm' % pkgarch
         if not os.path.exists(rpmdir):
-            return
+            self.fail("Rpm directory {} does not exist".format(rpmdir))
         for f in fnmatch.filter(os.listdir(rpmdir), rpm_doc):
-            cls.test_file = os.path.join(rpmdir, f)
-        cls.dst = '/tmp/base-passwd-doc.rpm'
+            self.test_file = os.path.join(rpmdir, f)
+            break
+        else:
+            self.fail("Couldn't find the test rpm file {} in {}".format(rpm_doc, rpmdir))
+        self.dst = '/tmp/base-passwd-doc.rpm'
 
     @OETestDepends(['rpm.RpmBasicTest.test_rpm_query'])
     def test_rpm_install(self):
+        self._find_test_file()
         self.tc.target.copyTo(self.test_file, self.dst)
         status, output = self.target.run('rpm -ivh /tmp/base-passwd-doc.rpm')
         msg = 'Failed to install base-passwd-doc package: %s' % output
@@ -117,6 +120,7 @@ class RpmInstallRemoveTest(OERuntimeTestCase):
         Author:      Alexander Kanavin <alex.kanavin@gmail.com>
         AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
         """
+        self._find_test_file()
         db_files_cmd = 'ls /var/lib/rpm/rpmdb.sqlite*'
         check_log_cmd = "grep RPM /var/log/messages | wc -l"
 

@@ -1,0 +1,42 @@
+From bd0e1bf1504a5cba12133548bc49f1fcaf7b4da2 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Tue, 23 Jan 2024 23:02:02 +0100
+Subject: [PATCH] gh-114492: Initialize struct termios before calling tcgetattr() (GH-114495) (GH-114502)
+
+On Alpine Linux it could leave some field non-initialized.
+(cherry picked from commit d22c066b802592932f9eb18434782299e80ca42e)
+
+Upstream-Status: Backport [https://github.com/python/cpython/commit/386c72d9928c51aa2c855ce592bd8022da3b407f]
+Co-authored-by: Serhiy Storchaka <storchaka@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../next/Library/2024-01-23-21-20-40.gh-issue-114492.vKxl5o.rst | 2 ++
+ Modules/termios.c                                               | 2 ++
+ 2 files changed, 4 insertions(+)
+ create mode 100644 Misc/NEWS.d/next/Library/2024-01-23-21-20-40.gh-issue-114492.vKxl5o.rst
+
+diff --git a/Misc/NEWS.d/next/Library/2024-01-23-21-20-40.gh-issue-114492.vKxl5o.rst b/Misc/NEWS.d/next/Library/2024-01-23-21-20-40.gh-issue-114492.vKxl5o.rst
+new file mode 100644
+index 0000000..8df8299
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2024-01-23-21-20-40.gh-issue-114492.vKxl5o.rst
+@@ -0,0 +1,2 @@
++Make the result of :func:`termios.tcgetattr` reproducible on Alpine Linux.
++Previously it could leave a random garbage in some fields.
+diff --git a/Modules/termios.c b/Modules/termios.c
+index c3d96cc..402e6ac 100644
+--- a/Modules/termios.c
++++ b/Modules/termios.c
+@@ -84,6 +84,8 @@ termios_tcgetattr_impl(PyObject *module, int fd)
+     struct termios mode;
+     int r;
+ 
++    /* Alpine Linux can leave some fields uninitialized. */
++    memset(&mode, 0, sizeof(mode));
+     Py_BEGIN_ALLOW_THREADS
+     r = tcgetattr(fd, &mode);
+     Py_END_ALLOW_THREADS
+-- 
+2.43.0
+

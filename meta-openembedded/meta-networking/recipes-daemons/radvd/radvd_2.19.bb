@@ -62,7 +62,7 @@ do_install:append () {
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM:${PN} = "--system nogroup"
-USERADD_PARAM:${PN} = "--system --home ${localstatedir}/run/radvd/ -M -g nogroup radvd"
+USERADD_PARAM:${PN} = "--system --home ${localstatedir}/run/radvd/ -M -g nogroup --shell /sbin/nologin radvd"
 
 pkg_postinst:${PN} () {
     if [ -z "$D" -a -x /etc/init.d/populate-volatile.sh ]; then

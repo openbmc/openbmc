@@ -13,9 +13,9 @@ SRC_URI[sha256sum] = "d673f56673d87ec740d1a328fa205cafad1d60f5daca4685594deb039d
 
 RDEPENDS:${PN} += "\
   libarchive \
-  ${PYTHON_PN}-ctypes \
-  ${PYTHON_PN}-mmap \
-  ${PYTHON_PN}-logging \
+  python3-ctypes \
+  python3-mmap \
+  python3-logging \
 "
 
 BBCLASSEXTEND = "native"

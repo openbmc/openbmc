@@ -8,7 +8,7 @@ DEPENDS = " \
     startup-notification \
     gtk+3 \
 "
-PV = "2.0.4+git${SRCPV}"
+PV = "2.0.4+git"
 
 SRCREV = "63ec47c5e295ad4f09d1df6d92afb7e10c3fec39"
 SRC_URI = " \

@@ -1,4 +1,4 @@
-From 91a7848698ce6c96c646f3a170714ee71eab6884 Mon Sep 17 00:00:00 2001
+From b1c374f7ede81a98f2d02def2c7ca17f1001f7cb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 May 2020 17:05:45 -0700
 Subject: [PATCH] wordsize.h: Unify the header between arm and aarch64
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 120000 sysdeps/arm/bits/wordsize.h
 
 diff --git a/sysdeps/aarch64/bits/wordsize.h b/sysdeps/aarch64/bits/wordsize.h
-index 04d4be9519..63876a7830 100644
+index 118e59172d..b4b0692eb5 100644
 --- a/sysdeps/aarch64/bits/wordsize.h
 +++ b/sysdeps/aarch64/bits/wordsize.h
 @@ -17,12 +17,16 @@

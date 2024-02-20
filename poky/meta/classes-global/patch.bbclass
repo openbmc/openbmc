@@ -79,9 +79,7 @@ python patch_task_postfunc() {
                         bb.process.run('git checkout patches', cwd=srcsubdir)
         stdout, _ = bb.process.run('git status --porcelain .', cwd=srcsubdir)
         if stdout:
-            useroptions = []
-            oe.patch.GitApplyTree.gitCommandUserOptions(useroptions, d=d)
-            bb.process.run('git add .; git %s commit -a -m "Committing changes from %s\n\n%s"' % (' '.join(useroptions), func, oe.patch.GitApplyTree.ignore_commit_prefix + ' - from %s' % func), cwd=srcsubdir)
+            oe.patch.GitApplyTree.commitIgnored("Add changes from %s" % func, dir=srcsubdir, files=['.'], d=d)
 }
 
 def src_patches(d, all=False, expand=True):

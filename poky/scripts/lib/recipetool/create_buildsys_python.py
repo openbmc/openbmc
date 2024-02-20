@@ -573,12 +573,15 @@ class PythonSetupPyRecipeHandler(PythonRecipeHandler):
         if 'buildsystem' in handled:
             return False
 
+        logger.debug("Trying setup.py parser")
+
         # Check for non-zero size setup.py files
         setupfiles = RecipeHandler.checkfiles(srctree, ['setup.py'])
         for fn in setupfiles:
             if os.path.getsize(fn):
                 break
         else:
+            logger.debug("No setup.py found")
             return False
 
         # setup.py is always parsed to get at certain required information, such as
@@ -736,6 +739,7 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
         "flit_core.buildapi": "python_flit_core",
         "hatchling.build": "python_hatchling",
         "maturin": "python_maturin",
+        "mesonpy": "python_mesonpy",
     }
 
     # setuptools.build_meta and flit declare project metadata into the "project" section of pyproject.toml
@@ -776,6 +780,8 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
         "python3-poetry-core-native",
         # already provided by python_flit_core.bbclass
         "python3-flit-core-native",
+        # already provided by python_mesonpy
+        "python3-meson-python-native",
     ]
 
     # add here a list of known and often used packages and the corresponding bitbake package
@@ -787,6 +793,7 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
         "setuptools-scm": "python3-setuptools-scm",
         "hatchling": "python3-hatchling",
         "hatch-vcs": "python3-hatch-vcs",
+        "meson-python" : "python3-meson-python",
     }
 
     def __init__(self):
@@ -799,12 +806,15 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
         if 'buildsystem' in handled:
             return False
 
+        logger.debug("Trying pyproject.toml parser")
+
         # Check for non-zero size setup.py files
         setupfiles = RecipeHandler.checkfiles(srctree, ["pyproject.toml"])
         for fn in setupfiles:
             if os.path.getsize(fn):
                 break
         else:
+            logger.debug("No pyproject.toml found")
             return False
 
         setupscript = os.path.join(srctree, "pyproject.toml")
@@ -816,14 +826,16 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
                 try:
                     import tomli as tomllib
                 except ImportError:
-                    logger.exception("Neither 'tomllib' nor 'tomli' could be imported. Please use python3.11 or above or install tomli module")
-                    return False
-                except Exception:
-                    logger.exception("Failed to parse pyproject.toml")
+                    logger.error("Neither 'tomllib' nor 'tomli' could be imported, cannot scan pyproject.toml.")
                     return False
 
-            with open(setupscript, "rb") as f:
-                config = tomllib.load(f)
+            try:
+                with open(setupscript, "rb") as f:
+                    config = tomllib.load(f)
+            except Exception:
+                logger.exception("Failed to parse pyproject.toml")
+                return False
+
             build_backend = config["build-system"]["build-backend"]
             if build_backend in self.build_backend_map:
                 classes.append(self.build_backend_map[build_backend])

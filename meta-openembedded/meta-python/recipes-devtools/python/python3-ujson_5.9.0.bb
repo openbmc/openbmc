@@ -13,17 +13,18 @@ SRC_URI += " \
     file://0001-setup.py-Do-not-strip-debugging-symbols.patch \
 "
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-numbers \
+    python3-datetime \
+    python3-numbers \
 "
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-pytz \
+    python3-json \
+    python3-pytest \
+    python3-pytz \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

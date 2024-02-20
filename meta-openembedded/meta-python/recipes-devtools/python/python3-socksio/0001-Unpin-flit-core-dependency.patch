@@ -1,0 +1,21 @@
+From 5c50fd76e7459bb822ff8f712172a78e21b8dd04 Mon Sep 17 00:00:00 2001
+From: Theodore Ni <3806110+tjni@users.noreply.github.com>
+Date: Sun, 13 Aug 2023 09:21:49 -0700
+Subject: [PATCH] Unpin flit-core dependency
+
+Upstream-Status: Submitted [https://github.com/sethmlarson/socksio/pull/61]
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2d6c5a3..60c63ea 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["flit_core >=2,<3"]
++requires = ["flit_core >=2"]
+ build-backend = "flit_core.buildapi"
+ 
+ [tool.flit.metadata]

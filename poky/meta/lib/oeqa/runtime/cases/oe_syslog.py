@@ -116,7 +116,7 @@ class SyslogTestConfig(OERuntimeTestCase):
     @OETestDepends(['oe_syslog.SyslogTestConfig.test_syslog_logger'])
     @OEHasPackage(["busybox-syslog"])
     @skipIfDataVar('VIRTUAL-RUNTIME_init_manager', 'systemd',
-                   'Not appropiate for systemd image')
+                   'Not appropriate for systemd image')
     def test_syslog_startup_config(self):
         cmd = 'echo "LOGFILE=/var/log/test" >> /etc/syslog-startup.conf'
         self.target.run(cmd)

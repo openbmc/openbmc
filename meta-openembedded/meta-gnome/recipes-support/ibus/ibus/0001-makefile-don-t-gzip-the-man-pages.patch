@@ -1,0 +1,164 @@
+From 5307c3b310fabeaa52fafe743c5efaca73ccce46 Mon Sep 17 00:00:00 2001
+From: Emil Velikov <emil.l.velikov@gmail.com>
+Date: Sun, 11 Jun 2023 16:16:35 +0900
+Subject: [PATCH] makefile: don't gzip the man pages
+
+Drop the gzip step from the manpages - distributions already do that as
+needed. In addition this resolves the final reproducibility issue with
+ibus.
+
+BUG=https://github.com/ibus/ibus/pull/2514
+
+Upstream-Status: Backport [https://github.com/ibus/ibus/commit/1a25975d9f55f18eab609e4d147dd32689e367f3]
+Note: This commit is included in version >= 1.5.29 and can be dropped
+after upgrading.
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ bus/Makefile.am        | 6 +-----
+ data/dconf/Makefile.am | 6 +-----
+ setup/Makefile.am      | 6 +-----
+ tools/Makefile.am      | 6 +-----
+ ui/gtk3/Makefile.am    | 6 +-----
+ 5 files changed, 5 insertions(+), 25 deletions(-)
+
+diff --git a/bus/Makefile.am b/bus/Makefile.am
+index e173ee25..d0445d02 100644
+--- a/bus/Makefile.am
++++ b/bus/Makefile.am
+@@ -169,7 +169,6 @@ EXTRA_DIST =                \
+ 
+ CLEANFILES = \
+ 	$(man_one_DATA)            \
+-	$(man_one_files)        \
+ 	$(NULL)
+ 
+ $(libibus):
+@@ -181,14 +180,11 @@ test: ibus-daemon
+ 		$(builddir)/ibus-daemon -v
+ 
+ man_one_in_files = ibus-daemon.1.in
+-man_one_files = $(man_one_in_files:.1.in=.1)
+-man_one_DATA =$(man_one_files:.1=.1.gz) 
++man_one_DATA = $(man_one_in_files:.1.in=.1)
+ man_onedir = $(mandir)/man1
+ %.1: %.1.in
+ 	$(AM_V_GEN) sed \
+ 		-e 's|@VERSION[@]|$(VERSION)|g' $< > $@.tmp && \
+ 		mv $@.tmp $@
+-%.1.gz: %.1
+-	$(AM_V_GEN) gzip -c $< > $@.tmp && mv $@.tmp $@
+ 
+ -include $(top_srcdir)/git.mk
+diff --git a/data/dconf/Makefile.am b/data/dconf/Makefile.am
+index 5360f033..2352f770 100644
+--- a/data/dconf/Makefile.am
++++ b/data/dconf/Makefile.am
+@@ -38,15 +38,12 @@ dconfdb_DATA = 00-upstream-settings
+ 		{ rc=$$?; $(RM) -rf $@; exit $$rc; }
+ 
+ man_5_in_files = 00-upstream-settings.5.in ibus.5.in
+-man_5_files = $(man_5_in_files:.5.in=.5)
+-man_5_DATA =$(man_5_files:.5=.5.gz)
++man_5_DATA = $(man_5_in_files:.5.in=.5)
+ man_5dir = $(mandir)/man5
+ %.5: %.5.in
+ 	$(AM_V_GEN) sed \
+ 	    -e 's|@VERSION[@]|$(VERSION)|g' $< > $@.tmp && \
+ 	    mv $@.tmp $@
+-%.5.gz: %.5
+-	$(AM_V_GEN) gzip -c $< > $@.tmp && mv $@.tmp $@
+ 
+ install-data-hook:
+ 	if test -z "$(DESTDIR)"; then \
+@@ -63,7 +60,6 @@ EXTRA_DIST = \
+ 
+ CLEANFILES = \
+     $(man_5_DATA) \
+-    $(man_5_files) \
+     $(NULL)
+ 
+ MAINTAINERCLEANFILES = \
+diff --git a/setup/Makefile.am b/setup/Makefile.am
+index 34c8f136..b34aa8fc 100644
+--- a/setup/Makefile.am
++++ b/setup/Makefile.am
+@@ -56,20 +56,16 @@ org.freedesktop.IBus.Setup.desktop: ibus-setup.desktop
+ 	$(AM_V_GEN) $(MSGFMT) --desktop --template $< -d $(top_srcdir)/po -o $@
+ 
+ man_one_in_files = ibus-setup.1.in
+-man_one_files = $(man_one_in_files:.1.in=.1)
+-man_one_DATA =$(man_one_files:.1=.1.gz) 
++man_one_DATA = $(man_one_in_files:.1.in=.1)
+ man_onedir = $(mandir)/man1
+ %.1: %.1.in
+ 	$(AM_V_GEN) sed \
+ 		-e 's|@VERSION[@]|$(VERSION)|g' $< > $@.tmp && \
+ 		mv $@.tmp $@
+-%.1.gz: %.1
+-	$(AM_V_GEN) gzip -c $< > $@.tmp && mv $@.tmp $@
+ 
+ CLEANFILES = \
+     $(desktop_DATA) \
+     $(man_one_DATA) \
+-    $(man_one_files) \
+     *.pyc \
+     ibus-setup \
+     $(NULL)
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 5c18d3d6..1c716136 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -79,15 +79,12 @@ bash_completion_DATA= \
+ bash_completiondir=@datadir@/bash-completion/completions
+ 
+ man_one_in_files = ibus.1.in
+-man_one_files = $(man_one_in_files:.1.in=.1)
+-man_one_DATA =$(man_one_files:.1=.1.gz) 
++man_one_DATA = $(man_one_in_files:.1.in=.1)
+ man_onedir = $(mandir)/man1
+ %.1: %.1.in
+ 	$(AM_V_GEN) sed \
+ 		-e 's|@VERSION[@]|$(VERSION)|g' $< > $@.tmp && \
+ 		mv $@.tmp $@
+-%.1.gz: %.1
+-	$(AM_V_GEN) gzip -c $< > $@.tmp && mv $@.tmp $@
+ 
+ EXTRA_DIST = \
+ 	$(man_one_in_files) \
+@@ -96,7 +93,6 @@ EXTRA_DIST = \
+ 
+ CLEANFILES = \
+ 	$(man_one_DATA) \
+-	$(man_one_files) \
+ 	$(NULL)
+ 
+ if ENABLE_EMOJI_DICT
+diff --git a/ui/gtk3/Makefile.am b/ui/gtk3/Makefile.am
+index ab379328..aff035da 100644
+--- a/ui/gtk3/Makefile.am
++++ b/ui/gtk3/Makefile.am
+@@ -242,15 +242,12 @@ panelbinding.o: $(srcdir)/panelbinding.c
+ 
+ MAINTAINERCLEANFILES += extension.c panelbinding.c
+ 
+-man_seven_files = $(man_seven_in_files:.7.in=.7)
+-man_seven_DATA =$(man_seven_files:.7=.7.gz)
++man_seven_DATA = $(man_seven_in_files:.7.in=.7)
+ man_sevendir = $(mandir)/man7
+ %.7: %.7.in
+ 	$(AM_V_GEN) sed \
+ 	    -e 's|@VERSION[@]|$(VERSION)|g' $< > $@.tmp && \
+ 	    mv $@.tmp $@
+-%.7.gz: %.7
+-	$(AM_V_GEN) gzip -c $< > $@.tmp && mv $@.tmp $@
+ 
+ desktop_in_files = \
+     ibus-ui-emojier.desktop.in \
+@@ -278,7 +275,6 @@ CLEANFILES += \
+     $(desktop_DATA) \
+     $(desktop_notrans_files) \
+     $(man_seven_DATA) \
+-    $(man_seven_files) \
+     $(NULL)
+ 
+ endif

@@ -49,11 +49,25 @@ def _is_repo_at_remote_uri(repodir, remote, uri):
 def _contains_submodules(repodir):
     return os.path.exists(os.path.join(repodir,".gitmodules"))
 
+def _write_layer_list(dest, repodirs):
+    layers = []
+    for r in repodirs:
+        for root, dirs, files in os.walk(r):
+            if os.path.basename(root) == 'conf' and 'layer.conf' in files:
+                layers.append(os.path.relpath(os.path.dirname(root), dest))
+    layers_f = os.path.join(dest, ".oe-layers.json")
+    print("Writing list of layers into {}".format(layers_f))
+    with open(layers_f, 'w') as f:
+        json.dump({"version":"1.0","layers":layers}, f, sort_keys=True, indent=4)
+
 def _do_checkout(args, json):
     repos = json['sources']
+    repodirs = []
+    oesetupbuild = None
     for r_name in repos:
         r_data = repos[r_name]
         repodir = os.path.abspath(os.path.join(args['destdir'], r_data['path']))
+        repodirs.append(repodir)
 
         if 'contains_this_file' in r_data.keys():
             force_arg = 'force_bootstraplayer_checkout'
@@ -95,6 +109,17 @@ def _do_checkout(args, json):
 
             if _contains_submodules(repodir):
                 print("Repo {} contains submodules, use 'git submodule update' to ensure they are up to date".format(repodir))
+        if os.path.exists(os.path.join(repodir, 'scripts/oe-setup-build')):
+            oesetupbuild = os.path.join(repodir, 'scripts/oe-setup-build')
+
+    _write_layer_list(args['destdir'], repodirs)
+
+    if oesetupbuild:
+        oesetupbuild_symlink = os.path.join(args['destdir'], 'setup-build')
+        if os.path.exists(oesetupbuild_symlink):
+            os.remove(oesetupbuild_symlink)
+        os.symlink(os.path.relpath(oesetupbuild,args['destdir']),oesetupbuild_symlink)
+        print("\nRun '{}' to list available build configuration templates and set up a build from one of them.".format(oesetupbuild_symlink))
 
 parser = argparse.ArgumentParser(description="A self contained python script that fetches all the needed layers and sets them to correct revisions using data in a json format from a separate file. The json data can be created from an active build directory with 'bitbake-layers create-layers-setup destdir' and there's a sample file and a schema in meta/files/")
 

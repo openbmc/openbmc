@@ -10,4 +10,4 @@ SRC_URI[sha256sum] = "e1ac7b3dc550ee80e602e71c1d168002f062e49f1b11e26a36264dafd4
 
 BBCLASSEXTEND = "native nativesdk"
 
-RDEPENDS:${PN} += "${PYTHON_PN}-logging ${PYTHON_PN}-setuptools"
+RDEPENDS:${PN} += "python3-logging python3-setuptools"

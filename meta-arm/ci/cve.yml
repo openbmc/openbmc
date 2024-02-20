@@ -1,0 +1,19 @@
+header:
+  version: 14
+
+local_conf_header:
+  cve: |
+    INHERIT += "cve-check"
+
+    # Allow the runner environment to provide an API key
+    NVDCVE_API_KEY = "${@d.getVar('BB_ORIGENV').getVar('NVDCVE_API_KEY') or ''}"
+
+    # Just show the warnings for our layers
+    CVE_CHECK_SHOW_WARNINGS = "0"
+    CVE_CHECK_SHOW_WARNINGS:layer-arm-toolchain = "1"
+    CVE_CHECK_SHOW_WARNINGS:layer-meta-arm = "1"
+    CVE_CHECK_SHOW_WARNINGS:layer-meta-arm-bsp = "1"
+    CVE_CHECK_SHOW_WARNINGS:layer-meta-arm-systemready = "1"
+
+    # Ignore the kernel, we sometime carry kernels in meta-arm
+    CVE_CHECK_SHOW_WARNINGS:pn-linux-yocto = "0"

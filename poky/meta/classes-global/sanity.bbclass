@@ -840,6 +840,10 @@ def check_sanity_everybuild(status, d):
         status.addresult("Please use a umask which allows a+rx and u+rwx\n")
     os.umask(omask)
 
+    # Ensure /tmp is NOT mounted with noexec
+    if os.statvfs("/tmp").f_flag & os.ST_NOEXEC:
+        raise_sanity_error("/tmp shouldn't be mounted with noexec.", d)
+
     if d.getVar('TARGET_ARCH') == "arm":
         # This path is no longer user-readable in modern (very recent) Linux
         try:

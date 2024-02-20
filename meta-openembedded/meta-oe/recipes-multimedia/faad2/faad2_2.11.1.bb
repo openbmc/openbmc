@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=381c8cbe277a7bc1ee2ae6083a04c958"
 
 LICENSE_FLAGS = "commercial"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 SRC_URI = "git://github.com/knik0/faad2.git;branch=master;protocol=https"
 SRCREV = "216f00e8ddba6f2c64caf481a04f1ddd78b93e78"

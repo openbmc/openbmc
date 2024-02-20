@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = " \
 
 SRCREV = "05b50d379ff0037de4957bb2a1befcce88b70225"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 LK_REL = "1.0.19"
 
 SRC_URI = " \

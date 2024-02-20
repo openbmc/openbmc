@@ -1,4 +1,4 @@
-From bf8b2fa0f6870589d036f0f33c140a3f85b530a0 Mon Sep 17 00:00:00 2001
+From 99f48716051ce5ddb8c1b77292213af1e462549e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 31 Mar 2020 21:23:28 -0700
 Subject: [PATCH] qt: include ext/qt/gstqtgl.h instead of gst/gl/gstglfuncs.h
@@ -20,13 +20,14 @@ In file included from /mnt/b/yoe/build/tmp/work/cortexa7t2hf-neon-vfpv4-yoe-linu
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  ext/qt/gstqsgtexture.cc | 2 +-
  ext/qt/qtwindow.cc      | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/ext/qt/gstqsgtexture.cc b/ext/qt/gstqsgtexture.cc
-index a05d26e..4cc9fc6 100644
+index 663696b..36b17d4 100644
 --- a/ext/qt/gstqsgtexture.cc
 +++ b/ext/qt/gstqsgtexture.cc
 @@ -27,7 +27,7 @@
@@ -39,7 +40,7 @@ index a05d26e..4cc9fc6 100644
  
  #define GST_CAT_DEFAULT gst_qsg_texture_debug
 diff --git a/ext/qt/qtwindow.cc b/ext/qt/qtwindow.cc
-index 9360c33..0dfd3f1 100644
+index 2872cb5..5a36be9 100644
 --- a/ext/qt/qtwindow.cc
 +++ b/ext/qt/qtwindow.cc
 @@ -25,7 +25,7 @@
@@ -51,6 +52,3 @@ index 9360c33..0dfd3f1 100644
  #include "qtwindow.h"
  #include "gstqsgtexture.h"
  #include "gstqtglutility.h"
--- 
-2.28.0
-

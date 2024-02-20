@@ -58,6 +58,8 @@ cd tests
 max_njobs=$(grep -c ^processor /proc/cpuinfo)
 njobs=0
 
+set +e
+
 for t in *; do
     [ -x $t ] || continue
     [ -f $t ] || continue
@@ -79,6 +81,14 @@ skipped=$(grep -c SKIP ${LOG})
 passed=$(grep -c PASS ${LOG})
 failed=$(grep -c FAIL ${LOG})
 total=$(expr ${passed} + ${failed} + ${skipped})
+
+if [ ${failed} -ne 0 ]; then
+    echo
+    echo "Tests failed for gnutls, log is:"
+    echo "--------------------"
+    cat ${LOG}
+    echo
+fi
 
 echo
 echo "gnutls test summary:"

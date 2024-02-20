@@ -12,11 +12,12 @@ BBCLASSEXTEND = "native nativesdk"
 SRC_URI += "file://run-ptest"
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-math \
+	python3-math \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

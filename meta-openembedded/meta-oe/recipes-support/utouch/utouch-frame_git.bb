@@ -16,6 +16,6 @@ SRC_URI = "git://bitmath.org/git/frame.git;protocol=http;branch=master \
            "
 SRCREV = "95363d5a1f7394d71144bf3b408ef4e6db4350fc"
 
-PV = "1.1.2+git${SRCPV}"
+PV = "1.1.2+git"
 
 S = "${WORKDIR}/git"

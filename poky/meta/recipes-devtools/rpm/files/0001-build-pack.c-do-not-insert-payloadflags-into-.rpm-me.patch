@@ -1,4 +1,4 @@
-From 2d351c666f09cc1b9e368422653fb42ac8b86249 Mon Sep 17 00:00:00 2001
+From ebe65b0e8622c37463697dcec779a42290c33810 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 31 Aug 2021 10:37:05 +0200
 Subject: [PATCH] build/pack.c: do not insert payloadflags into .rpm metadata
@@ -9,15 +9,16 @@ host to the next and breaks reproducibility for .rpm).
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  build/pack.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: git/build/pack.c
-===================================================================
---- git.orig/build/pack.c
-+++ git/build/pack.c
-@@ -328,7 +328,7 @@ static char *getIOFlags(Package pkg)
+diff --git a/build/pack.c b/build/pack.c
+index f382c7da0..0889dd993 100644
+--- a/build/pack.c
++++ b/build/pack.c
+@@ -330,7 +330,7 @@ static char *getIOFlags(Package pkg)
  	    headerPutString(pkg->header, RPMTAG_PAYLOADCOMPRESSOR, compr);
  	buf = xstrdup(rpmio_flags);
  	buf[s - rpmio_flags] = '\0';

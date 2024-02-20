@@ -15,9 +15,9 @@ inherit python_setuptools_build_meta ptest
 S = "${WORKDIR}/git"
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pretend \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-unittest-automake-output \
+    python3-pretend \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

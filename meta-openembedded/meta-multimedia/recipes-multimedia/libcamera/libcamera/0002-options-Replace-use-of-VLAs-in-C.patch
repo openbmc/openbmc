@@ -1,0 +1,91 @@
+From c80d273a57547aec9353d888aa316bf6560cf1ba Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Jan 2024 21:04:28 -0800
+Subject: [PATCH 2/2] options: Replace use of VLAs in C++
+
+Clang++ 18 is fussy about this with new warning checks.
+
+   ../git/src/apps/common/options.cpp:882:20: error: variable length arrays in C++ are a Clang extension [-Werror,-Wvla-cxx-extension]
+      882 |         char shortOptions[optionsMap_.size() * 3 + 2];
+          |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Therefore replace using VLAs with alloca and malloc/free
+
+Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2024-February/040381.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/apps/common/options.cpp      |  4 ++--
+ src/libcamera/ipc_unixsocket.cpp | 12 ++++++++----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/src/apps/common/options.cpp b/src/apps/common/options.cpp
+index 4f7e8691..b020f603 100644
+--- a/src/apps/common/options.cpp
++++ b/src/apps/common/options.cpp
+@@ -879,8 +879,8 @@ OptionsParser::Options OptionsParser::parse(int argc, char **argv)
+ 	 * Allocate short and long options arrays large enough to contain all
+ 	 * options.
+ 	 */
+-	char shortOptions[optionsMap_.size() * 3 + 2];
+-	struct option longOptions[optionsMap_.size() + 1];
++	char *shortOptions = (char*)alloca(optionsMap_.size() * 3 + 2);
++	struct option *longOptions = (struct option*)alloca(optionsMap_.size() + 1);
+ 	unsigned int ids = 0;
+ 	unsigned int idl = 0;
+ 
+diff --git a/src/libcamera/ipc_unixsocket.cpp b/src/libcamera/ipc_unixsocket.cpp
+index 1980d374..3a7f8ee6 100644
+--- a/src/libcamera/ipc_unixsocket.cpp
++++ b/src/libcamera/ipc_unixsocket.cpp
+@@ -247,8 +247,8 @@ int IPCUnixSocket::sendData(const void *buffer, size_t length,
+ 	iov[0].iov_base = const_cast<void *>(buffer);
+ 	iov[0].iov_len = length;
+ 
+-	char buf[CMSG_SPACE(num * sizeof(uint32_t))];
+-	memset(buf, 0, sizeof(buf));
++	char *buf = (char*)malloc(CMSG_SPACE(num * sizeof(uint32_t)));
++	memset((void*)buf, 0, sizeof(buf));
+ 
+ 	struct cmsghdr *cmsg = (struct cmsghdr *)buf;
+ 	cmsg->cmsg_len = CMSG_LEN(num * sizeof(uint32_t));
+@@ -270,9 +270,11 @@ int IPCUnixSocket::sendData(const void *buffer, size_t length,
+ 		int ret = -errno;
+ 		LOG(IPCUnixSocket, Error)
+ 			<< "Failed to sendmsg: " << strerror(-ret);
++    free(buf);
+ 		return ret;
+ 	}
+ 
++  free(buf);
+ 	return 0;
+ }
+ 
+@@ -283,8 +285,8 @@ int IPCUnixSocket::recvData(void *buffer, size_t length,
+ 	iov[0].iov_base = buffer;
+ 	iov[0].iov_len = length;
+ 
+-	char buf[CMSG_SPACE(num * sizeof(uint32_t))];
+-	memset(buf, 0, sizeof(buf));
++	char *buf = (char*)malloc(CMSG_SPACE(num * sizeof(uint32_t)));
++	memset((void*)buf, 0, sizeof(buf));
+ 
+ 	struct cmsghdr *cmsg = (struct cmsghdr *)buf;
+ 	cmsg->cmsg_len = CMSG_LEN(num * sizeof(uint32_t));
+@@ -305,12 +307,14 @@ int IPCUnixSocket::recvData(void *buffer, size_t length,
+ 		if (ret != -EAGAIN)
+ 			LOG(IPCUnixSocket, Error)
+ 				<< "Failed to recvmsg: " << strerror(-ret);
++    free(buf);
+ 		return ret;
+ 	}
+ 
+ 	if (fds)
+ 		memcpy(fds, CMSG_DATA(cmsg), num * sizeof(uint32_t));
+ 
++  free(buf);
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+

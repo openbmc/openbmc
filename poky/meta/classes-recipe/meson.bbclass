@@ -64,10 +64,13 @@ addtask write_config before do_configure
 do_write_config[vardeps] += "CC CXX AR NM STRIP READELF OBJCOPY CFLAGS CXXFLAGS LDFLAGS RUSTC RUSTFLAGS EXEWRAPPER_ENABLED"
 do_write_config() {
     # This needs to be Py to split the args into single-element lists
+    # The generated compile_commands.json file can be used by external IDEs
+    # which do not know the $PATH set-up by bitbake. They need the absolute
+    # compiler paths.
     cat >${WORKDIR}/meson.cross <<EOF
 [binaries]
-c = ${@meson_array('CC', d)}
-cpp = ${@meson_array('CXX', d)}
+c = ${@meson_array_abspath('CC', d)}
+cpp = ${@meson_array_abspath('CXX', d)}
 cython = 'cython3'
 ar = ${@meson_array('AR', d)}
 nm = ${@meson_array('NM', d)}
@@ -90,6 +93,7 @@ cpp_link_args = ${@meson_array('LDFLAGS', d)}
 
 [properties]
 needs_exe_wrapper = true
+sys_root = '${STAGING_DIR_HOST}'
 
 [host_machine]
 system = '${@meson_operating_system('HOST_OS', d)}'
@@ -152,9 +156,6 @@ meson_do_configure() {
     # https://github.com/mesonbuild/meson/commit/ef9aeb188ea2bc7353e59916c18901cde90fa2b3
     unset LD
 
-    # Work around "Meson fails if /tmp is mounted with noexec #2972"
-    mkdir -p "${B}/meson-private/tmp"
-    export TMPDIR="${B}/meson-private/tmp"
     bbnote Executing meson ${EXTRA_OEMESON}...
     if ! meson setup ${MESONOPTS} "${MESON_SOURCEPATH}" "${B}" ${MESON_CROSS_FILE} ${EXTRA_OEMESON}; then
         bbfatal_log meson failed

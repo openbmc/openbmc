@@ -9,21 +9,20 @@ SRC_URI = " \
     git://github.com/pytest-dev/pytest-mock;branch=main;protocol=https \
     file://run-ptest \
     file://0001-test_pytest_mock-skip-args-introspection-tests.patch \
+    file://403.patch \
 "
-
 SRCREV = "69adc6f76c1a7baf4e7a728da9eec38741d5783e"
-
-SRC_URI[sha256sum] = "fbbdb085ef7c252a326fd8cdcac0aa3b1333d8811f131bdcc701002e1be7ed4f"
 
 inherit setuptools3 ptest
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} += " \
     python3-asyncio \
     python3-pytest \
     python3-pytest-asyncio \
     python3-unittest \
+    python3-unittest-automake-output \
 "
 
 S = "${WORKDIR}/git"

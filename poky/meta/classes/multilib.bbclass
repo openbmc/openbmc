@@ -140,6 +140,7 @@ python multilib_virtclass_handler_postkeyexp () {
         return
 
     clsextend.map_depends_variable("DEPENDS")
+    clsextend.map_depends_variable("PACKAGE_WRITE_DEPS")
     clsextend.map_variable("PROVIDES")
 
     if bb.data.inherits_class('cross-canadian', d):

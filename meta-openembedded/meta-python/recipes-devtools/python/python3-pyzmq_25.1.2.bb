@@ -26,13 +26,14 @@ FILES:${PN}-test += "\
 "
 
 RDEPENDS:${PN} += "\
-        ${PYTHON_PN}-json \
-        ${PYTHON_PN}-multiprocessing \
+        python3-json \
+        python3-multiprocessing \
 "
 
 RDEPENDS:${PN}-ptest += "\
-        ${PN}-test \
-        ${PYTHON_PN}-pytest \
+    ${PN}-test \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_compile:prepend() {

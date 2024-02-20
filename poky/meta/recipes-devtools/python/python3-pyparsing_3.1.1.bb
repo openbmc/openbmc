@@ -17,14 +17,14 @@ UPSTREAM_CHECK_REGEX = "pyparsing-(?P<pver>.*)\.tar"
 inherit pypi python_flit_core
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-debugger \
-    ${PYTHON_PN}-html \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-stringold \
-    ${PYTHON_PN}-threading \
+    python3-datetime \
+    python3-debugger \
+    python3-html \
+    python3-json \
+    python3-netclient \
+    python3-pprint \
+    python3-stringold \
+    python3-threading \
 "
 
 BBCLASSEXTEND = "native nativesdk"

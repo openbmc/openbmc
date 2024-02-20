@@ -1,7 +1,7 @@
-From 9b67bb18d8409e0e693cc6000507acbd73a30eab Mon Sep 17 00:00:00 2001
+From 2618ab101f5faaa887c9feeeee84a7d8bc97cbda Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 16 Nov 2022 11:27:24 +0100
-Subject: [PATCH 1/2] meson.build: correctly handle disabled ssh_agent option
+Subject: [PATCH] meson.build: correctly handle disabled ssh_agent option
 
 Existing code produces these errors:
 | gcr/meson.build:61:0: ERROR: Unable to get the path of a not-found external program
@@ -10,15 +10,16 @@ Existing code produces these errors:
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 
 Upstream-Status: Backport [ https://gitlab.gnome.org/GNOME/gcr/-/commit/9b67bb18d8409e0e693cc6000507acbd73a30eab ]
+
 ---
- meson.build | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ meson.build | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 3f35173..11d7fa7 100644
+index dd890a9..1b17b18 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -96,8 +98,10 @@ conf.set('HAVE_TIMEGM', cc.has_function('timegm'))
+@@ -82,8 +82,10 @@ conf.set('HAVE_TIMEGM', cc.has_function('timegm'))
  conf.set('HAVE_MLOCK', cc.has_function('mlock'))
  conf.set_quoted('GPG_EXECUTABLE', gpg_path)
  conf.set_quoted('LIBGCRYPT_VERSION', libgcrypt_dep.version())
@@ -31,6 +32,3 @@ index 3f35173..11d7fa7 100644
  conf.set10('WITH_SYSTEMD', with_systemd)
  config_file = configure_file(
    output: 'config.h',
--- 
-2.34.1
-

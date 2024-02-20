@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
+import argparse
+import json
+import os
+import subprocess
+
+def defaultlayers():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), '.oe-layers.json'))
+
+def makebuildpath(topdir, template):
+    return os.path.join(topdir, "build-{}".format(template))
+
+def discover_templates(layers_file):
+    if not os.path.exists(layers_file):
+        print("List of layers {} does not exist; were the layers set up using the setup-layers script?".format(layers_file))
+        return None
+
+    templates = []
+    layers_list = json.load(open(layers_file))["layers"]
+    for layer in layers_list:
+        template_dir = os.path.join(os.path.dirname(layers_file), layer, 'conf','templates')
+        if os.path.exists(template_dir):
+            for d in sorted(os.listdir(template_dir)):
+                templatepath = os.path.join(template_dir,d)
+                if not os.path.isfile(os.path.join(templatepath,'local.conf.sample')):
+                    continue
+                layer_base = os.path.basename(layer)
+                templatename = "{}-{}".format(layer_base[5:] if layer_base.startswith("meta-") else layer_base, d)
+                buildpath = makebuildpath(os.getcwd(), templatename)
+                notespath = os.path.join(template_dir, d, 'conf-notes.txt')
+                try: notes = open(notespath).read()
+                except: notes = None
+                try: summary = open(os.path.join(template_dir, d, 'conf-summary.txt')).read()
+                except: summary = None
+                templates.append({"templatename":templatename,"templatepath":templatepath,"buildpath":buildpath,"notespath":notespath,"notes":notes,"summary":summary})
+
+    return templates
+
+def print_templates(templates, verbose):
+    print("Available build configurations:\n")
+
+    for i in range(len(templates)):
+        t = templates[i]
+        print("{}. {}".format(i+1, t["templatename"]))
+        print("{}".format(t["summary"].strip() if t["summary"] else "This configuration does not have a summary."))
+        if verbose:
+            print("Configuration template path:", t["templatepath"])
+            print("Build path:", t["buildpath"])
+            print("Usage notes:", t["notespath"] if t["notes"] else "This configuration does not have usage notes.")
+        print("")
+    if not verbose:
+        print("Re-run with 'list -v' to see additional information.")
+
+def list_templates(args):
+    templates = discover_templates(args.layerlist)
+    if not templates:
+        return
+
+    verbose = args.v
+    print_templates(templates, verbose)
+
+def find_template(template_name, templates):
+    print_templates(templates, False)
+    if not template_name:
+        n_s = input("Please choose a configuration by its number: ")
+        try: return templates[int(n_s) - 1]
+        except:
+            print("Invalid selection, please try again.")
+            return None
+    else:
+        for t in templates:
+            if t["templatename"] == template_name:
+                return t
+        print("Configuration {} is not one of {}, please try again.".format(tempalte_name, [t["templatename"] for t in templates]))
+        return None
+
+def setup_build_env(args):
+    templates = discover_templates(args.layerlist)
+    if not templates:
+        return
+
+    template = find_template(args.c, templates)
+    if not template:
+        return
+    builddir = args.b if args.b else template["buildpath"]
+    no_shell = args.no_shell
+    coredir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+    cmd = "TEMPLATECONF={} . {} {}".format(template["templatepath"], os.path.join(coredir, 'oe-init-build-env'), builddir)
+    if not no_shell:
+        cmd = cmd + " && {}".format(os.environ['SHELL'])
+    print("Running:", cmd)
+    subprocess.run(cmd, shell=True, executable=os.environ['SHELL'])
+
+parser = argparse.ArgumentParser(description="A script that discovers available build configurations and sets up a build environment based on one of them. Run without arguments to choose one interactively.")
+parser.add_argument("--layerlist", default=defaultlayers(), help='Where to look for available layers (as written out by setup-layers script) (default is {}).'.format(defaultlayers()))
+
+subparsers = parser.add_subparsers()
+parser_list_templates = subparsers.add_parser('list', help='List available configurations')
+parser_list_templates.add_argument('-v', action='store_true',
+        help='Print detailed information and usage notes for each available build configuration.')
+parser_list_templates.set_defaults(func=list_templates)
+
+parser_setup_env = subparsers.add_parser('setup', help='Set up a build environment and open a shell session with it, ready to run builds.')
+parser_setup_env.add_argument('-c', metavar='configuration_name', help="Use a build configuration configuration_name to set up a build environment (run this script with 'list' to see what is available)")
+parser_setup_env.add_argument('-b', metavar='build_path', help="Set up a build directory in build_path (run this script with 'list -v' to see where it would be by default)")
+parser_setup_env.add_argument('--no-shell', action='store_true',
+        help='Create a build directory but do not start a shell session with the build environment from it.')
+parser_setup_env.set_defaults(func=setup_build_env)
+
+args = parser.parse_args()
+
+if 'func' in args:
+    args.func(args)
+else:
+    from argparse import Namespace
+    setup_build_env(Namespace(layerlist=args.layerlist, c=None, b=None, no_shell=False))

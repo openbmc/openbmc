@@ -1,0 +1,36 @@
+From 52596f023652114642faba5726c99488529029ce Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Thu, 21 Dec 2023 10:00:06 +0000
+Subject: [PATCH] staprun: fix build against upcoming `gcc-14`
+ (`-Werror=calloc-transposed-args`)
+
+`gcc-14` added a new `-Wcalloc-transposed-args` warning recently. It
+detected minor infelicity in `calloc()` API usage in `systemtap`:
+
+    staprun.c: In function 'main':
+    staprun.c:550:50: error: 'calloc' sizes specified with 'sizeof' in the earlier argument and not in the later argument [-Werror=calloc-transposed-args]
+      550 |                 char ** new_argv = calloc(sizeof(char *),argc+2);
+          |                                                  ^~~~
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=systemtap.git;a=commit;h=52596f023652114642faba5726c99488529029ce]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ staprun/staprun.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/staprun/staprun.c b/staprun/staprun.c
+index 8437f3af6..d1b0b221b 100644
+--- a/staprun/staprun.c
++++ b/staprun/staprun.c
+@@ -547,7 +547,7 @@ int main(int argc, char **argv)
+            us to extend argv[], with all the C fun that entails. */
+ #ifdef HAVE_OPENAT
+         if (relay_basedir_fd >= 0) {
+-                char ** new_argv = calloc(sizeof(char *),argc+2);
++                char ** new_argv = calloc(argc+2, sizeof(char *));
+                 const int new_Foption_size = 10; /* -FNNNNN */
+                 char * new_Foption = malloc(new_Foption_size);
+                 int i;
+-- 
+2.43.0
+

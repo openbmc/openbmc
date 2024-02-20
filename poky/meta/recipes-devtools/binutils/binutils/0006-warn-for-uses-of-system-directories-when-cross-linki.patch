@@ -1,4 +1,4 @@
-From 41b09c6a9d78a31db0f3c70d27c05475292bde7e Mon Sep 17 00:00:00 2001
+From a92c46e3703d038d7d810bdc91e8540ad9d9150a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
 Subject: [PATCH] warn for uses of system directories when cross linking
@@ -63,10 +63,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  9 files changed, 87 insertions(+), 2 deletions(-)
 
 diff --git a/ld/config.in b/ld/config.in
-index ad0dc6a106c..d21edaddce7 100644
+index 52d62f06ff0..b5944e7ba55 100644
 --- a/ld/config.in
 +++ b/ld/config.in
-@@ -58,6 +58,9 @@
+@@ -70,6 +70,9 @@
     language is requested. */
  #undef ENABLE_NLS
  
@@ -77,10 +77,10 @@ index ad0dc6a106c..d21edaddce7 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index 1503936432f..29896853a90 100755
+index 6f8a05c3b6c..98a76d6da7f 100755
 --- a/ld/configure
 +++ b/ld/configure
-@@ -839,6 +839,7 @@ with_lib_path
+@@ -844,6 +844,7 @@ with_lib_path
  enable_targets
  enable_64_bit_bfd
  with_sysroot
@@ -88,7 +88,7 @@ index 1503936432f..29896853a90 100755
  enable_gold
  enable_got
  enable_compressed_debug_sections
-@@ -1521,6 +1522,8 @@ Optional Features:
+@@ -1534,6 +1535,8 @@ Optional Features:
    --enable-checking       enable run-time checks
    --enable-targets        alternative target configurations
    --enable-64-bit-bfd     64-bit support (on hosts with narrower word sizes)
@@ -97,7 +97,7 @@ index 1503936432f..29896853a90 100755
    --enable-gold[=ARG]     build gold [ARG={default,yes,no}]
    --enable-got=<type>     GOT handling scheme (target, single, negative,
                            multigot)
-@@ -15483,6 +15486,19 @@ fi
+@@ -15566,6 +15569,19 @@ fi
  
  
  
@@ -118,7 +118,7 @@ index 1503936432f..29896853a90 100755
  if test "${enable_gold+set}" = set; then :
    enableval=$enable_gold; case "${enableval}" in
 diff --git a/ld/configure.ac b/ld/configure.ac
-index 77edac3258c..a74dac63038 100644
+index 4a11787ae71..104a531fb0f 100644
 --- a/ld/configure.ac
 +++ b/ld/configure.ac
 @@ -103,6 +103,16 @@ AC_SUBST(use_sysroot)
@@ -139,10 +139,10 @@ index 77edac3258c..a74dac63038 100644
  dnl "install_as_default" is set to false if gold is the default linker.
  dnl "installed_linker" is the installed BFD linker name.
 diff --git a/ld/ld.h b/ld/ld.h
-index a0f8a15c7a9..e3db345f3a5 100644
+index 54d9079678c..9f0163b2911 100644
 --- a/ld/ld.h
 +++ b/ld/ld.h
-@@ -163,6 +163,14 @@ typedef struct
+@@ -166,6 +166,14 @@ typedef struct
       in the linker script.  */
    bool force_group_allocation;
  
@@ -158,11 +158,11 @@ index a0f8a15c7a9..e3db345f3a5 100644
    enum endian_enum endian;
  
 diff --git a/ld/ld.texi b/ld/ld.texi
-index aa8b1aa86eb..9bc4bc28823 100644
+index 4fda259a552..22685f5f1dd 100644
 --- a/ld/ld.texi
 +++ b/ld/ld.texi
-@@ -3059,6 +3059,18 @@ creation of the metadata note, if one had been enabled by an earlier
- occurrence of the --package-metdata option.
+@@ -3119,6 +3119,18 @@ creation of the metadata note, if one had been enabled by an earlier
+ occurrence of the --package-metadata option.
  If the linker has been built with libjansson, then the JSON string
  will be validated.
 +
@@ -181,7 +181,7 @@ index aa8b1aa86eb..9bc4bc28823 100644
  
  @c man end
 diff --git a/ld/ldfile.c b/ld/ldfile.c
-index df7c9cbd65e..0c965593225 100644
+index dc9875d8813..49d899ee49d 100644
 --- a/ld/ldfile.c
 +++ b/ld/ldfile.c
 @@ -327,6 +327,23 @@ ldfile_add_library_path (const char *name, bool cmdline)
@@ -209,7 +209,7 @@ index df7c9cbd65e..0c965593225 100644
  
  /* Try to open a BFD for a lang_input_statement.  */
 diff --git a/ld/ldlex.h b/ld/ldlex.h
-index 87cac02141d..d1a478fb827 100644
+index 161a9d4d8dc..757fe2f7650 100644
 --- a/ld/ldlex.h
 +++ b/ld/ldlex.h
 @@ -147,6 +147,8 @@ enum option_values
@@ -222,7 +222,7 @@ index 87cac02141d..d1a478fb827 100644
    OPTION_PRINT_OUTPUT_FORMAT,
    OPTION_PRINT_SYSROOT,
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 5c38e8cd313..04eed320aca 100644
+index 01b306e58a1..eddefc24332 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
 @@ -326,6 +326,8 @@ main (int argc, char **argv)
@@ -253,10 +253,10 @@ index 5c38e8cd313..04eed320aca 100644
      {
        if (error_count < MAX_ERRORS_IN_A_ROW)
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index fe8722313fe..1df7af3ccaa 100644
+index 099dff8ecde..e9939000b2e 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
-@@ -629,6 +629,14 @@ static const struct ld_option ld_options[] =
+@@ -642,6 +642,14 @@ static const struct ld_option ld_options[] =
  		   "                                <method> is: share-unconflicted (default),\n"
  		   "                                             share-duplicated"),
      TWO_DASHES },
@@ -271,7 +271,7 @@ index fe8722313fe..1df7af3ccaa 100644
  };
  
  #define OPTION_COUNT ARRAY_SIZE (ld_options)
-@@ -1787,6 +1795,13 @@ parse_args (unsigned argc, char **argv)
+@@ -1818,6 +1826,13 @@ parse_args (unsigned argc, char **argv)
  
  	case OPTION_PRINT_MAP_LOCALS:
  	  config.print_map_locals = true;

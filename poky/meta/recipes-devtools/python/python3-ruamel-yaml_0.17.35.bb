@@ -11,9 +11,9 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "801046a9caacb1b43acc118969b49b96b65e8847f29029563b29ac61d02db61b"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-netclient \
+    python3-shell \
+    python3-datetime \
+    python3-netclient \
 "
 
 do_install:prepend() {

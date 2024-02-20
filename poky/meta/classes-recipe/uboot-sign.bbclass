@@ -88,6 +88,9 @@ UBOOT_FIT_ADDRESS_CELLS ?= "1"
 # This is only necessary for determining the signing configuration
 KERNEL_PN = "${PREFERRED_PROVIDER_virtual/kernel}"
 
+UBOOT_FIT_UBOOT_LOADADDRESS ?= "${UBOOT_LOADADDRESS}"
+UBOOT_FIT_UBOOT_ENTRYPOINT ?= "${UBOOT_ENTRYPOINT}"
+
 python() {
     # We need u-boot-tools-native if we're creating a U-Boot fitImage
     sign = d.getVar('UBOOT_SIGN_ENABLE') == '1'
@@ -109,6 +112,10 @@ concat_dtb() {
 			-K "${UBOOT_DTB_BINARY}" \
 			-r ${B}/fitImage-linux \
 			${UBOOT_MKIMAGE_SIGN_ARGS}
+		# Verify the kernel image and u-boot dtb
+		${UBOOT_FIT_CHECK_SIGN} \
+			-k "${UBOOT_DTB_BINARY}" \
+			-f ${B}/fitImage-linux
 		cp ${UBOOT_DTB_BINARY} ${UBOOT_DTB_SIGNED}
 	fi
 
@@ -248,8 +255,8 @@ uboot_fitimage_assemble() {
             os = "u-boot";
             arch = "${UBOOT_ARCH}";
             compression = "none";
-            load = <${UBOOT_LOADADDRESS}>;
-            entry = <${UBOOT_ENTRYPOINT}>;
+            load = <${UBOOT_FIT_UBOOT_LOADADDRESS}>;
+            entry = <${UBOOT_FIT_UBOOT_ENTRYPOINT}>;
 EOF
 
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
@@ -313,9 +320,17 @@ EOF
 			-K "${SPL_DIR}/${SPL_DTB_BINARY}" \
 			-r ${UBOOT_FITIMAGE_BINARY} \
 			${SPL_MKIMAGE_SIGN_ARGS}
+		#
+		# Verify the U-boot FIT image and SPL dtb
+		#
+		${UBOOT_FIT_CHECK_SIGN} \
+			-k "${SPL_DIR}/${SPL_DTB_BINARY}" \
+			-f ${UBOOT_FITIMAGE_BINARY}
 	fi
 
-	cp ${SPL_DIR}/${SPL_DTB_BINARY} ${SPL_DIR}/${SPL_DTB_SIGNED}
+	if [ -e "${SPL_DIR}/${SPL_DTB_BINARY}" ]; then
+		cp ${SPL_DIR}/${SPL_DTB_BINARY} ${SPL_DIR}/${SPL_DTB_SIGNED}
+	fi
 }
 
 uboot_assemble_fitimage_helper() {

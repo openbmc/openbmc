@@ -24,6 +24,7 @@ do_install_ptest() {
 
 RDEPENDS:${PN}-ptest += "\
     python3-pytest \
+    python3-unittest-automake-output \
 "
 
 RDEPENDS:${PN} += "python3-core python3-crypt python3-ctypes python3-fcntl python3-io python3-shell python3-threading"

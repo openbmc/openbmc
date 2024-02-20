@@ -20,7 +20,10 @@ def plugin_init(plugins):
     return BuildConfPlugin()
 
 class BuildConfPlugin(LayerPlugin):
-    notes_fixme = """FIXME: Please place here the description of this build configuration.
+    notes_fixme = """FIXME: Please place here the detailed instructions for using this build configuration.
+They will be shown to the users when they set up their builds via TEMPLATECONF.
+"""
+    summary_fixme = """FIXME: Please place here the short summary of what this build configuration is for.
 It will be shown to the users when they set up their builds via TEMPLATECONF.
 """
 
@@ -41,14 +44,17 @@ It will be shown to the users when they set up their builds via TEMPLATECONF.
                     bblayers_data = bblayers_data.replace(abspath, "##OEROOT##/" + relpath)
                 dest.write(bblayers_data)
 
+        with open(os.path.join(destdir, "conf-summary.txt"), 'w') as dest:
+            dest.write(self.summary_fixme)
         with open(os.path.join(destdir, "conf-notes.txt"), 'w') as dest:
             dest.write(self.notes_fixme)
 
         logger.info("""Configuration template placed into {}
-Please review the files in there, and particularly provide a configuration description in {}
+Please review the files in there, and particularly provide a configuration summary in {}
+and notes in {}
 You can try out the configuration with
 TEMPLATECONF={} . {}/oe-init-build-env build-try-{}"""
-.format(destdir, os.path.join(destdir, "conf-notes.txt"), destdir, oecorepath, templatename))
+.format(destdir, os.path.join(destdir, "conf-summary.txt"), os.path.join(destdir, "conf-notes.txt"), destdir, oecorepath, templatename))
 
     def do_save_build_conf(self, args):
         """ Save the currently active build configuration (conf/local.conf, conf/bblayers.conf) as a template into a layer.\n This template can later be used for setting up builds via TEMPLATECONF. """

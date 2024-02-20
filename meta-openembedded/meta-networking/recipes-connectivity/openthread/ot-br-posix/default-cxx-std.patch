@@ -1,0 +1,35 @@
+Do not hardcode C std to C99 or C++ std to C++11 if not set
+OE compilers are using newer than these standards and absl needs C++14 minimum
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -46,16 +46,6 @@ set_property(CACHE OTBR_MDNS PROPERTY ST
+ 
+ include("${PROJECT_SOURCE_DIR}/etc/cmake/options.cmake")
+ 
+-if(NOT CMAKE_C_STANDARD)
+-    set(CMAKE_C_STANDARD 99)
+-    set(CMAKE_C_STANDARD_REQUIRED ON)
+-endif()
+-
+-if(NOT CMAKE_CXX_STANDARD)
+-    set(CMAKE_CXX_STANDARD 11)
+-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+-endif()
+-
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ set(CMAKE_EXE_LINKER_FLAGS "-rdynamic ${CMAKE_EXE_LINKER_FLAGS}")
+ 
+@@ -63,6 +53,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+ 	add_compile_options(-Wno-error=nonnull-compare)
+ endif()
+ 
++if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 18.1)
++	add_compile_options(-Wno-error=vla-cxx-extension)
++endif()
++
+ if (OTBR_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+     message(STATUS "Coverage: ON")
+     target_compile_options(otbr-config INTERFACE -g -O0 --coverage)

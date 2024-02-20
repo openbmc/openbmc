@@ -336,7 +336,7 @@ the :yocto_git:`Source Repositories <>`:
    meta-raspberrypi/recipes-bsp/formfactor/formfactor
    meta-raspberrypi/recipes-bsp/formfactor/formfactor/raspberrypi
    meta-raspberrypi/recipes-bsp/formfactor/formfactor/raspberrypi/machconfig
-   meta-raspberrypi/recipes-bsp/formfactor/formfactor_0.0.bbappend
+   meta-raspberrypi/recipes-bsp/formfactor/formfactor_%.bbappend
    meta-raspberrypi/recipes-bsp/rpi-u-boot-src
    meta-raspberrypi/recipes-bsp/rpi-u-boot-src/files
    meta-raspberrypi/recipes-bsp/rpi-u-boot-src/files/boot.cmd.in
@@ -620,7 +620,7 @@ You can find these files in the BSP Layer at::
 
 This optional directory contains miscellaneous recipe files for the BSP.
 Most notably would be the formfactor files. For example, in the
-Raspberry Pi BSP, there is the ``formfactor_0.0.bbappend`` file, which
+Raspberry Pi BSP, there is the ``formfactor_%.bbappend`` file, which
 is an append file used to augment the recipe that starts the build.
 Furthermore, there are machine-specific settings used during the build
 that are defined by the ``machconfig`` file further down in the

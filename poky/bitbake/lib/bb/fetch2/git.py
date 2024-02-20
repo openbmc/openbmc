@@ -87,6 +87,7 @@ from contextlib import contextmanager
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger
+from   bb.fetch2 import trusted_network
 
 
 sha1_re = re.compile(r'^[0-9a-f]{40}$')
@@ -258,7 +259,7 @@ class Git(FetchMethod):
             for name in ud.names:
                 ud.unresolvedrev[name] = 'HEAD'
 
-        ud.basecmd = d.getVar("FETCHCMD_git") or "git -c gc.autoDetach=false -c core.pager=cat"
+        ud.basecmd = d.getVar("FETCHCMD_git") or "git -c gc.autoDetach=false -c core.pager=cat -c safe.bareRepository=all"
 
         write_tarballs = d.getVar("BB_GENERATE_MIRROR_TARBALLS") or "0"
         ud.write_tarballs = write_tarballs != "0" or ud.rebaseable
@@ -355,6 +356,16 @@ class Git(FetchMethod):
         # is not possible
         if bb.utils.to_boolean(d.getVar("BB_FETCH_PREMIRRORONLY")):
             return True
+        # If the url is not in trusted network, that is, BB_NO_NETWORK is set to 0
+        # and BB_ALLOWED_NETWORKS does not contain the host that ud.url uses, then
+        # we need to try premirrors first as using upstream is destined to fail.
+        if not trusted_network(d, ud.url):
+            return True
+        # the following check is to ensure incremental fetch in downloads, this is
+        # because the premirror might be old and does not contain the new rev required,
+        # and this will cause a total removal and new clone. So if we can reach to
+        # network, we prefer upstream over premirror, though the premirror might contain
+        # the new rev.
         if os.path.exists(ud.clonedir):
             return False
         return True
@@ -375,7 +386,11 @@ class Git(FetchMethod):
             else:
                 tmpdir = tempfile.mkdtemp(dir=d.getVar('DL_DIR'))
                 runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=tmpdir)
-                fetch_cmd = "LANG=C %s fetch -f --progress %s " % (ud.basecmd, shlex.quote(tmpdir))
+                output = runfetchcmd("%s remote" % ud.basecmd, d, quiet=True, workdir=ud.clonedir)
+                if 'mirror' in output:
+                    runfetchcmd("%s remote rm mirror" % ud.basecmd, d, workdir=ud.clonedir)
+                runfetchcmd("%s remote add --mirror=fetch mirror %s" % (ud.basecmd, tmpdir), d, workdir=ud.clonedir)
+                fetch_cmd = "LANG=C %s fetch -f --update-head-ok  --progress mirror " % (ud.basecmd)
                 runfetchcmd(fetch_cmd, d, workdir=ud.clonedir)
         repourl = self._get_repo_url(ud)
 
@@ -514,7 +529,7 @@ class Git(FetchMethod):
 
             logger.info("Creating tarball of git repository")
             with create_atomic(ud.fullmirror) as tfile:
-                mtime = runfetchcmd("git log --all -1 --format=%cD", d,
+                mtime = runfetchcmd("{} log --all -1 --format=%cD".format(ud.basecmd), d,
                         quiet=True, workdir=ud.clonedir)
                 runfetchcmd("tar -czf %s --owner oe:0 --group oe:0 --mtime \"%s\" ."
                         % (tfile, mtime), d, workdir=ud.clonedir)
@@ -812,38 +827,42 @@ class Git(FetchMethod):
         """
         pupver = ('', '')
 
-        tagregex = re.compile(d.getVar('UPSTREAM_CHECK_GITTAGREGEX') or r"(?P<pver>([0-9][\.|_]?)+)")
         try:
             output = self._lsremote(ud, d, "refs/tags/*")
         except (bb.fetch2.FetchError, bb.fetch2.NetworkAccess) as e:
             bb.note("Could not list remote: %s" % str(e))
             return pupver
 
+        rev_tag_re = re.compile(r"([0-9a-f]{40})\s+refs/tags/(.*)")
+        pver_re = re.compile(d.getVar('UPSTREAM_CHECK_GITTAGREGEX') or r"(?P<pver>([0-9][\.|_]?)+)")
+        nonrel_re = re.compile(r"(alpha|beta|rc|final)+")
+
         verstring = ""
-        revision = ""
         for line in output.split("\n"):
             if not line:
                 break
 
-            tag_head = line.split("/")[-1]
+            m = rev_tag_re.match(line)
+            if not m:
+                continue
+
+            (revision, tag) = m.groups()
+
             # Ignore non-released branches
-            m = re.search(r"(alpha|beta|rc|final)+", tag_head)
-            if m:
+            if nonrel_re.search(tag):
                 continue
 
             # search for version in the line
-            tag = tagregex.search(tag_head)
-            if tag is None:
+            m = pver_re.search(tag)
+            if not m:
                 continue
 
-            tag = tag.group('pver')
-            tag = tag.replace("_", ".")
+            pver = m.group('pver').replace("_", ".")
 
-            if verstring and bb.utils.vercmp(("0", tag, ""), ("0", verstring, "")) < 0:
+            if verstring and bb.utils.vercmp(("0", pver, ""), ("0", verstring, "")) < 0:
                 continue
 
-            verstring = tag
-            revision = line.split()[0]
+            verstring = pver
             pupver = (verstring, revision)
 
         return pupver

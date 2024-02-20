@@ -530,6 +530,16 @@ class PartitionedImage():
         exec_native_cmd("parted -s %s mklabel %s" % (device, ptable_format),
                         self.native_sysroot)
 
+    def _write_disk_guid(self):
+        if self.ptable_format in ('gpt', 'gpt-hybrid'):
+            if os.getenv('SOURCE_DATE_EPOCH'):
+                self.disk_guid = uuid.UUID(int=int(os.getenv('SOURCE_DATE_EPOCH')))
+            else:
+                self.disk_guid = uuid.uuid4()
+
+            logger.debug("Set disk guid %s", self.disk_guid)
+            sfdisk_cmd = "sfdisk --disk-id %s %s" % (self.path, self.disk_guid)
+            exec_native_cmd(sfdisk_cmd, self.native_sysroot)
 
     def create(self):
         self._make_disk(self.path,
@@ -537,6 +547,7 @@ class PartitionedImage():
                         self.min_size)
 
         self._write_identifier(self.path, self.identifier)
+        self._write_disk_guid()
 
         if self.ptable_format == "gpt-hybrid":
             mbr_path = self.path + ".mbr"

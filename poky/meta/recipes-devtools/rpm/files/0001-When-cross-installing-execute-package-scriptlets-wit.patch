@@ -1,4 +1,4 @@
-From a89daa75ac970d8e247edc762d1181e9a5b0c5d0 Mon Sep 17 00:00:00 2001
+From 82e6d1ad126df88c58120a31fc025691039db7f3 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 17 Jan 2017 14:07:17 +0200
 Subject: [PATCH] When cross-installing, execute package scriptlets without
@@ -24,24 +24,16 @@ Amended 2018-07-03 by Olof Johansson <olofjn@axis.com>:
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  lib/rpmscript.c | 11 ++++++++---
  1 file changed, 8 insertions(+), 3 deletions(-)
 
-Index: git/lib/rpmscript.c
-===================================================================
---- git.orig/lib/rpmscript.c
-+++ git/lib/rpmscript.c
-@@ -18,7 +18,7 @@
- #include "rpmio/rpmio_internal.h"
- 
- #include "lib/rpmplugins.h"     /* rpm plugins hooks */
--
-+#include "lib/rpmchroot.h"      /* rpmChrootOut */
- #include "debug.h"
- 
- struct scriptNextFileFunc_s {
-@@ -427,8 +427,7 @@ exit:
+diff --git a/lib/rpmscript.c b/lib/rpmscript.c
+index b18f851a3..36e37cf77 100644
+--- a/lib/rpmscript.c
++++ b/lib/rpmscript.c
+@@ -448,8 +448,7 @@ exit:
  	Fclose(out);	/* XXX dup'd STDOUT_FILENO */
  
      if (fn) {
@@ -51,7 +43,7 @@ Index: git/lib/rpmscript.c
  	free(fn);
      }
      free(mline);
-@@ -462,7 +461,13 @@ rpmRC rpmScriptRun(rpmScript script, int
+@@ -483,7 +482,13 @@ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
  
      if (rc != RPMRC_FAIL) {
  	if (script_type & RPMSCRIPTLET_EXEC) {

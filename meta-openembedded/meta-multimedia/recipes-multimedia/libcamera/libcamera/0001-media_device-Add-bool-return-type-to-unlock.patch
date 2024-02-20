@@ -1,0 +1,59 @@
+From 6914c4fd3d53c0c6ea304123bf57429bb64ec16f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Jan 2024 21:01:27 -0800
+Subject: [PATCH 1/2] media_device: Add bool return type to unlock()
+
+unlock uses lockf which is marked with __attribute__
+((warn_unused_result)) and compilers warn about it and some treat
+-Wunused-result as error with -Werror turned on, It would be good to
+check if lockf failed or succeeded, however, that piece is not changed
+with this, this fixes build with clang++ 18
+
+    ../git/src/libcamera/media_device.cpp:167:2: error: ignoring return value of function declared with 'warn_unused_result' attribute [-Werror,-Wunused-result]
+      167 |         lockf(fd_.get(), F_ULOCK, 0);
+          |         ^~~~~ ~~~~~~~~~~~~~~~~~~~~~
+    1 error generated.
+
+Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2024-February/040380.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/libcamera/internal/media_device.h | 2 +-
+ src/libcamera/media_device.cpp            | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/libcamera/internal/media_device.h b/include/libcamera/internal/media_device.h
+index eb8cfde4..b09dfd16 100644
+--- a/include/libcamera/internal/media_device.h
++++ b/include/libcamera/internal/media_device.h
+@@ -33,7 +33,7 @@ public:
+ 	bool busy() const { return acquired_; }
+ 
+ 	bool lock();
+-	void unlock();
++	bool unlock();
+ 
+ 	int populate();
+ 	bool isValid() const { return valid_; }
+diff --git a/src/libcamera/media_device.cpp b/src/libcamera/media_device.cpp
+index 2949816b..eaa2fdb0 100644
+--- a/src/libcamera/media_device.cpp
++++ b/src/libcamera/media_device.cpp
+@@ -159,12 +159,12 @@ bool MediaDevice::lock()
+  *
+  * \sa lock()
+  */
+-void MediaDevice::unlock()
++bool MediaDevice::unlock()
+ {
+ 	if (!fd_.isValid())
+-		return;
++		return false;
+ 
+-	lockf(fd_.get(), F_ULOCK, 0);
++	return lockf(fd_.get(), F_ULOCK, 0) == 0;
+ }
+ 
+ /**
+-- 
+2.43.0
+

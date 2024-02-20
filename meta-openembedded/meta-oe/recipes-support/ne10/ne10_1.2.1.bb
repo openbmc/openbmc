@@ -11,7 +11,7 @@ SRC_URI = "git://github.com/projectNe10/Ne10.git;branch=master;protocol=https \
 SRCREV = "18c4c982a595dad069cd8df4932aefb1d257591f"
 
 S = "${WORKDIR}/git"
-PV .= "gitr+${SRCPV}"
+PV .= "+git"
 
 inherit cmake
 

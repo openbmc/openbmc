@@ -9,7 +9,6 @@ RDEPENDS:${PN} += "\
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-misc \
     ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-smtpd \
     ${PYTHON_PN}-threading \
 "
 

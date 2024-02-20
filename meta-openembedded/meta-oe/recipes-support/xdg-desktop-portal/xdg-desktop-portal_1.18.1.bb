@@ -8,6 +8,7 @@ REQUIRED_DISTRO_FEATURES = "polkit"
 DEPENDS = " \
     json-glib \
     glib-2.0 \
+    glib-2.0-native \
     flatpak \
     libportal \
     geoclue \

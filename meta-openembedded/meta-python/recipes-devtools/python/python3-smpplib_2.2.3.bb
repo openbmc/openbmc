@@ -13,15 +13,16 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN} += " \
-        ${PYTHON_PN}-logging \
-        ${PYTHON_PN}-six \
+        python3-logging \
+        python3-six \
 "
 
 RDEPENDS:${PN}-ptest += " \
-        ${PYTHON_PN}-pytest \
-        ${PYTHON_PN}-unittest \
-        ${PYTHON_PN}-profile \
-        ${PYTHON_PN}-mock \
+    python3-mock \
+    python3-profile \
+    python3-pytest \
+    python3-unittest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

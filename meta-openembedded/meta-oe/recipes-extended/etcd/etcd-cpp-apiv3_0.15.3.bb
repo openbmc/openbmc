@@ -19,6 +19,5 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF += "-DCPPREST_EXCLUDE_WEBSOCKETS=ON"
 
-INSANE_SKIP:${PN}:append = " ldflags"
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

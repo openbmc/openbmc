@@ -4,7 +4,7 @@ HOMEPAGE = "https://naios.github.io/function2"
 LICENSE = "BSL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 SRCREV = "a354bd093d2b6e50c9325dbce84d20b4e77aabc6"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 SRC_URI += "gitsm://github.com/Naios/function2;branch=master;protocol=https"
 

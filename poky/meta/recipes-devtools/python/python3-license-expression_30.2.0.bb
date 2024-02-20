@@ -8,14 +8,14 @@ SRC_URI[sha256sum] = "599928edd995c43fc335e0af342076144dc71cb858afa1ed9c1c30c4e8
 
 inherit pypi ptest python_setuptools_build_meta
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-booleanpy \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-stringold \
-    ${PYTHON_PN}-logging \
+    python3-booleanpy \
+    python3-core \
+    python3-json \
+    python3-stringold \
+    python3-logging \
 "
 
 BBCLASSEXTEND = "native nativesdk"
@@ -25,8 +25,8 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-unittest-automake-output \
+	python3-pytest \
+	python3-unittest-automake-output \
 "
 
 do_install_ptest() {

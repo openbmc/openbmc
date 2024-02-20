@@ -9,19 +9,19 @@ inherit pypi
 SRC_URI[sha256sum] = "df6de96010e29ee21f637a147eabf30d50b25e3841dd1d68f93ee89ce77e366c"
 
 DEPENDS += " \
-    ${PYTHON_PN}-pbr \
+    python3-pbr \
     "
 
 # Satisfy setup.py 'setup_requires'
 DEPENDS += " \
-    ${PYTHON_PN}-pbr-native \
+    python3-pbr-native \
     "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-doctest \
-    ${PYTHON_PN}-extras \
-    ${PYTHON_PN}-pbr \
-    ${PYTHON_PN}-six \
+    python3-doctest \
+    python3-extras \
+    python3-pbr \
+    python3-six \
     "
 
 BBCLASSEXTEND = "nativesdk"

@@ -8,15 +8,15 @@ SRC_URI[sha256sum] = "df7aa8afb0148fa78488e7899b2c59b5f4ffcfa82e6c54ccb9dd37c1d7
 inherit pypi python_hatchling
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-certifi \
-    ${PYTHON_PN}-cryptography \
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-idna \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-pyopenssl \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-logging \
+    python3-certifi \
+    python3-cryptography \
+    python3-email \
+    python3-idna \
+    python3-json \
+    python3-netclient \
+    python3-pyopenssl \
+    python3-threading \
+    python3-logging \
 "
 
 CVE_PRODUCT = "urllib3"

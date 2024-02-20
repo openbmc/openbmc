@@ -460,7 +460,7 @@ def sync(args, config, basepath, workspace):
     finally:
         tinfoil.shutdown()
 
-def symlink_oelocal_files_srctree(rd,srctree):
+def symlink_oelocal_files_srctree(rd, srctree):
     import oe.patch
     if os.path.abspath(rd.getVar('S')) == os.path.abspath(rd.getVar('WORKDIR')):
         # If recipe extracts to ${WORKDIR}, symlink the files into the srctree
@@ -484,11 +484,7 @@ def symlink_oelocal_files_srctree(rd,srctree):
                     os.symlink('oe-local-files/%s' % fn, destpth)
                 addfiles.append(os.path.join(relpth, fn))
         if addfiles:
-            bb.process.run('git add %s' % ' '.join(addfiles), cwd=srctree)
-            useroptions = []
-            oe.patch.GitApplyTree.gitCommandUserOptions(useroptions, d=rd)
-            bb.process.run('git %s commit -m "Committing local file symlinks\n\n%s"' % (' '.join(useroptions), oe.patch.GitApplyTree.ignore_commit_prefix), cwd=srctree)
-
+            oe.patch.GitApplyTree.commitIgnored("Add local file symlinks", dir=srctree, files=addfiles, d=rd)
 
 def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, workspace, fixed_setup, d, tinfoil, no_overrides=False):
     """Extract sources of a recipe"""
@@ -657,9 +653,9 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
 
             if os.path.exists(workshareddir) and (not os.listdir(workshareddir) or kernelVersion != staging_kerVer):
                 shutil.rmtree(workshareddir)
-                oe.path.copyhardlinktree(srcsubdir,workshareddir)
+                oe.path.copyhardlinktree(srcsubdir, workshareddir)
             elif not os.path.exists(workshareddir):
-                oe.path.copyhardlinktree(srcsubdir,workshareddir)
+                oe.path.copyhardlinktree(srcsubdir, workshareddir)
 
         tempdir_localdir = os.path.join(tempdir, 'oe-local-files')
         srctree_localdir = os.path.join(srctree, 'oe-local-files')
@@ -667,13 +663,13 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
         if sync:
             bb.process.run('git fetch file://' + srcsubdir + ' ' + devbranch + ':' + devbranch, cwd=srctree)
 
-            # Move oe-local-files directory to srctree
-            # As the oe-local-files is not part of the constructed git tree,
-            # remove them directly during the synchrounizating might surprise
-            # the users.  Instead, we move it to oe-local-files.bak and remind
-            # user in the log message.
+            # Move the oe-local-files directory to srctree.
+            # As oe-local-files is not part of the constructed git tree,
+            # removing it directly during the synchronization might surprise
+            # the user.  Instead, we move it to oe-local-files.bak and remind
+            # the user in the log message.
             if os.path.exists(srctree_localdir + '.bak'):
-                shutil.rmtree(srctree_localdir, srctree_localdir + '.bak')
+                shutil.rmtree(srctree_localdir + '.bak')
 
             if os.path.exists(srctree_localdir):
                 logger.info('Backing up current local file directory %s' % srctree_localdir)
@@ -689,7 +685,7 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
                 shutil.move(tempdir_localdir, srcsubdir)
 
             shutil.move(srcsubdir, srctree)
-            symlink_oelocal_files_srctree(d,srctree)
+            symlink_oelocal_files_srctree(d, srctree)
 
         if is_kernel_yocto:
             logger.info('Copying kernel config to srctree')
@@ -762,7 +758,7 @@ def get_staging_kver(srcdir):
     kerver = []
     staging_kerVer=""
     if os.path.exists(srcdir) and os.listdir(srcdir):
-        with open(os.path.join(srcdir,"Makefile")) as f:
+        with open(os.path.join(srcdir, "Makefile")) as f:
             version = [next(f) for x in range(5)][1:4]
             for word in version:
                 kerver.append(word.split('= ')[1].split('\n')[0])
@@ -843,10 +839,10 @@ def modify(args, config, basepath, workspace):
             staging_kerVer = get_staging_kver(srcdir)
             staging_kbranch = get_staging_kbranch(srcdir)
             if (os.path.exists(srcdir) and os.listdir(srcdir)) and (kernelVersion in staging_kerVer and staging_kbranch == kbranch):
-                oe.path.copyhardlinktree(srcdir,srctree)
+                oe.path.copyhardlinktree(srcdir, srctree)
                 workdir = rd.getVar('WORKDIR')
                 srcsubdir = rd.getVar('S')
-                localfilesdir = os.path.join(srctree,'oe-local-files')
+                localfilesdir = os.path.join(srctree, 'oe-local-files')
                 # Move local source files into separate subdir
                 recipe_patches = [os.path.basename(patch) for patch in oe.recipeutils.get_recipe_patches(rd)]
                 local_files = oe.recipeutils.get_recipe_local_files(rd)
@@ -870,9 +866,9 @@ def modify(args, config, basepath, workspace):
                     for fname in local_files:
                         _move_file(os.path.join(workdir, fname), os.path.join(srctree, 'oe-local-files', fname))
                     with open(os.path.join(srctree, 'oe-local-files', '.gitignore'), 'w') as f:
-                        f.write('# Ignore local files, by default. Remove this file ''if you want to commit the directory to Git\n*\n')
+                        f.write('# Ignore local files, by default. Remove this file if you want to commit the directory to Git\n*\n')
 
-                symlink_oelocal_files_srctree(rd,srctree)
+                symlink_oelocal_files_srctree(rd, srctree)
 
                 task = 'do_configure'
                 res = tinfoil.build_targets(pn, task, handle_events=True)
@@ -880,7 +876,7 @@ def modify(args, config, basepath, workspace):
                 # Copy .config to workspace
                 kconfpath = rd.getVar('B')
                 logger.info('Copying kernel config to workspace')
-                shutil.copy2(os.path.join(kconfpath, '.config'),srctree)
+                shutil.copy2(os.path.join(kconfpath, '.config'), srctree)
 
                 # Set this to true, we still need to get initial_rev
                 # by parsing the git repo
@@ -941,14 +937,13 @@ def modify(args, config, basepath, workspace):
             seen_patches = []
             for branch in branches:
                 branch_patches[branch] = []
-                (stdout, _) = bb.process.run('git log devtool-base..%s' % branch, cwd=srctree)
-                for line in stdout.splitlines():
-                    line = line.strip()
-                    if line.startswith(oe.patch.GitApplyTree.patch_line_prefix):
-                        origpatch = line[len(oe.patch.GitApplyTree.patch_line_prefix):].split(':', 1)[-1].strip()
-                        if not origpatch in seen_patches:
-                            seen_patches.append(origpatch)
-                            branch_patches[branch].append(origpatch)
+                (stdout, _) = bb.process.run('git rev-list devtool-base..%s' % branch, cwd=srctree)
+                for sha1 in stdout.splitlines():
+                    notes = oe.patch.GitApplyTree.getNotes(srctree, sha1.strip())
+                    origpatch = notes.get(oe.patch.GitApplyTree.original_patch)
+                    if origpatch and origpatch not in seen_patches:
+                        seen_patches.append(origpatch)
+                        branch_patches[branch].append(origpatch)
 
         # Need to grab this here in case the source is within a subdirectory
         srctreebase = srctree
@@ -966,7 +961,7 @@ def modify(args, config, basepath, workspace):
             # Assume first entry is main source extracted in ${S} so skip it
             src_uri = src_uri[1::]
 
-            #Add "type=git-dependency" to all non local sources
+            # Add "type=git-dependency" to all non local sources
             for url in src_uri:
                 if not url.startswith('file://') and not 'type=' in url:
                     src_uri_remove.append(url)
@@ -974,7 +969,7 @@ def modify(args, config, basepath, workspace):
 
             if src_uri_remove:
                 f.write('SRC_URI:remove = "%s"\n' % ' '.join(src_uri_remove))
-                f.write('SRC_URI:append = "%s"\n\n' % ' '.join(src_uri_append))
+                f.write('SRC_URI:append = " %s"\n\n' % ' '.join(src_uri_append))
 
             f.write('FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n')
             # Local files can be modified/tracked in separate subdir under srctree
@@ -1004,7 +999,7 @@ def modify(args, config, basepath, workspace):
                         '        mv ${S}/.config ${S}/.config.old\n'
                         '    fi\n'
                         '}\n')
-            if rd.getVarFlag('do_menuconfig','task'):
+            if rd.getVarFlag('do_menuconfig', 'task'):
                 f.write('\ndo_configure:append() {\n'
                 '    if [ ${@oe.types.boolean(d.getVar("KCONFIG_CONFIG_ENABLE_MENUCONFIG"))} = True ]; then\n'
                 '        cp ${KCONFIG_CONFIG_ROOTDIR}/.config ${S}/.config.baseline\n'
@@ -2081,7 +2076,7 @@ def _reset(recipes, no_clean, remove_work, config, basepath, workspace):
                         # We don't want to risk wiping out any work in progress
                         if srctreebase.startswith(os.path.join(config.workspace_path, 'sources')):
                             from datetime import datetime
-                            preservesrc = os.path.join(config.workspace_path, 'attic', 'sources', "{}.{}".format(pn,datetime.now().strftime("%Y%m%d%H%M%S")))
+                            preservesrc = os.path.join(config.workspace_path, 'attic', 'sources', "{}.{}".format(pn, datetime.now().strftime("%Y%m%d%H%M%S")))
                             logger.info('Preserving source tree in %s\nIf you no '
                                         'longer need it then please delete it manually.\n'
                                         'It is also possible to reuse it via devtool source tree argument.'

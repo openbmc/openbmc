@@ -5,7 +5,7 @@ HOMEPAGE = "http://www.netperf.org/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e661ab33a2a71ad6652c178dedf8aaa2"
 
-PV = "2.7.0+git${SRCPV}"
+PV = "2.7.0+git"
 
 SRC_URI = "git://github.com/HewlettPackard/netperf.git;branch=master;protocol=https \
            file://cpu_set.patch \

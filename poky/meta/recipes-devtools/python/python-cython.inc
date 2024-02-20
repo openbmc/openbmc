@@ -15,29 +15,29 @@ UPSTREAM_CHECK_REGEX = "Cython-(?P<pver>.*)\.tar"
 inherit pypi
 
 RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-misc \
-    ${PYTHON_PN}-netserver \
-    ${PYTHON_PN}-pkgutil \
-    ${PYTHON_PN}-pyparsing \
-    ${PYTHON_PN}-setuptools \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-xml \
+    python3-misc \
+    python3-netserver \
+    python3-pkgutil \
+    python3-pyparsing \
+    python3-setuptools \
+    python3-shell \
+    python3-xml \
 "
 
 RDEPENDS:${PN}:class-nativesdk += "\
-    nativesdk-${PYTHON_PN}-misc \
-    nativesdk-${PYTHON_PN}-netserver \
-    nativesdk-${PYTHON_PN}-pkgutil \
-    nativesdk-${PYTHON_PN}-pyparsing \
-    nativesdk-${PYTHON_PN}-setuptools \
-    nativesdk-${PYTHON_PN}-shell \
-    nativesdk-${PYTHON_PN}-xml \
+    nativesdk-python3-misc \
+    nativesdk-python3-netserver \
+    nativesdk-python3-pkgutil \
+    nativesdk-python3-pyparsing \
+    nativesdk-python3-setuptools \
+    nativesdk-python3-shell \
+    nativesdk-python3-xml \
 "
 
 do_install:append() {
 	# Make sure we use /usr/bin/env python
 	for PYTHSCRIPT in `grep -rIl '^#!.*python' ${D}`; do
-		sed -i -e '1s|^#!.*|#!/usr/bin/env ${PYTHON_PN}|' $PYTHSCRIPT
+		sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' $PYTHSCRIPT
 	done
 
         # remove build paths from generated sources

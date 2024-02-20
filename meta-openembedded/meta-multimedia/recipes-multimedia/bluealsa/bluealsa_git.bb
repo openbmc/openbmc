@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8449a4f133a93f6254b496d4fb476e83"
 SRC_URI = "git://github.com/Arkq/bluez-alsa.git;protocol=https;branch=master"
 
 SRCREV = "dd05a1baa261b94da9ba977b5e3392c8b4dc7a5e"
-PV = "4.0.0+git${SRCPV}"
+PV = "4.0.0+git"
 
 S  = "${WORKDIR}/git"
 

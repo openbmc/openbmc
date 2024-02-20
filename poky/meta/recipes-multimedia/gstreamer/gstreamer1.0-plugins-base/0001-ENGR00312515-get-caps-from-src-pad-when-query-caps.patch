@@ -1,13 +1,14 @@
-From f9d48cd85ee68207733b1b91a00453462c33524a Mon Sep 17 00:00:00 2001
+From 63fe5a7b4ef70e2c490bad3b0838329935a8d77c Mon Sep 17 00:00:00 2001
 From: zhouming <b42586@freescale.com>
 Date: Wed, 14 May 2014 10:16:20 +0800
-Subject: [PATCH 1/4] ENGR00312515: get caps from src pad when query caps
+Subject: [PATCH] ENGR00312515: get caps from src pad when query caps
 
 https://bugzilla.gnome.org/show_bug.cgi?id=728312
 
 Upstream-Status: Pending
 
 Signed-off-by: zhouming <b42586@freescale.com>
+
 ---
  gst-libs/gst/tag/gsttagdemux.c | 13 +++++++++++++
  1 file changed, 13 insertions(+)
@@ -16,10 +17,10 @@ Signed-off-by: zhouming <b42586@freescale.com>
 diff --git a/gst-libs/gst/tag/gsttagdemux.c b/gst-libs/gst/tag/gsttagdemux.c
 old mode 100644
 new mode 100755
-index f545857..62d10ef
+index 173da37..2b7f34c
 --- a/gst-libs/gst/tag/gsttagdemux.c
 +++ b/gst-libs/gst/tag/gsttagdemux.c
-@@ -1777,6 +1777,19 @@ gst_tag_demux_pad_query (GstPad * pad, GstObject * parent, GstQuery * query)
+@@ -1796,6 +1796,19 @@ gst_tag_demux_pad_query (GstPad * pad, GstObject * parent, GstQuery * query)
        }
        break;
      }
@@ -39,6 +40,3 @@ index f545857..62d10ef
      default:
        res = gst_pad_query_default (pad, parent, query);
        break;
--- 
-2.28.0
-

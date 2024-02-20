@@ -12,7 +12,7 @@ PYPI_PACKAGE = "pyasn1_modules"
 
 inherit pypi ptest setuptools3
 
-RDEPENDS:${PN} = "${PYTHON_PN}-pyasn1"
+RDEPENDS:${PN} = "python3-pyasn1"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -21,7 +21,8 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+    python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

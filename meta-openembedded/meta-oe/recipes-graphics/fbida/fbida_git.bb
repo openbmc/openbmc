@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e8feb78a32950a909621bbb51f634b39"
 
 DEPENDS = "virtual/libiconv jpeg fontconfig freetype libexif libdrm pixman udev libinput cairo"
 
-PV = "2.14+git${SRCPV}"
+PV = "2.14+git"
 SRC_URI = "git://github.com/kraxel/fbida;protocol=https;branch=master \
            file://fix-preprocessor.patch \
            file://support-jpeg-turbo.patch \

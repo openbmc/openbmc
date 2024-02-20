@@ -23,7 +23,7 @@ inherit lib_package
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=1fc37e1037ae673975fbcb96a98f7191"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 SRCREV = "79c060eea3eea1257797f15ea1608a9a9923aa6f"
 SRC_URI = "git://www.bearssl.org/git/BearSSL;protocol=https;branch=master \
            file://0002-test-test_x509.c-fix-potential-overflow-issue.patch \

@@ -3,7 +3,7 @@ SECTION = "libs/multimedia"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=26107732c2ab637c5710446fcfaf02df"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 SRC_URI = "git://github.com/PortAudio/portaudio.git;branch=master;protocol=https"
 SRCREV = "929e2e8f7af281c5eb4fa07758930d542ec43d97"

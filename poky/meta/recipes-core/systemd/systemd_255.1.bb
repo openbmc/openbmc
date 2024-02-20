@@ -146,7 +146,7 @@ PACKAGECONFIG[default-compression-xz] = "-Dxz=true -Ddefault-compression=xz,,xz"
 PACKAGECONFIG[default-compression-zstd] = "-Dzstd=true -Ddefault-compression=zstd,,zstd"
 PACKAGECONFIG[dbus] = "-Ddbus=true,-Ddbus=false,dbus"
 PACKAGECONFIG[efi] = "-Defi=true -Dbootloader=true,-Defi=false -Dbootloader=false,python3-pyelftools-native"
-PACKAGECONFIG[elfutils] = "-Delfutils=true,-Delfutils=false,elfutils"
+PACKAGECONFIG[elfutils] = "-Delfutils=true,-Delfutils=false,elfutils,,libelf libdw"
 PACKAGECONFIG[firstboot] = "-Dfirstboot=true,-Dfirstboot=false"
 PACKAGECONFIG[repart] = "-Drepart=true,-Drepart=false"
 PACKAGECONFIG[homed] = "-Dhomed=true,-Dhomed=false"
@@ -685,6 +685,7 @@ FILES:${PN} = " ${base_bindir}/* \
                 ${exec_prefix}/lib/sysctl.d \
                 ${exec_prefix}/lib/sysusers.d \
                 ${exec_prefix}/lib/environment.d \
+                ${exec_prefix}/lib/pcrlock.d \
                 ${localstatedir} \
                 ${rootlibexecdir}/modprobe.d/systemd.conf \
                 ${rootlibexecdir}/modprobe.d/README \

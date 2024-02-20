@@ -1,4 +1,4 @@
-From a4a0440a644c6c5e5da096efe3cf05ba309a284f Mon Sep 17 00:00:00 2001
+From ab0ab5e685bd9077c44fdca5c1a27b0f477444d7 Mon Sep 17 00:00:00 2001
 From: "NODA, Kai" <nodakai@gmail.com>
 Date: Sun, 22 Apr 2012 17:01:02 +0900
 Subject: [PATCH] Use /proc/self/exe for "swig -swiglib" on non-Win32
@@ -10,9 +10,11 @@ Upstream-Status: Submitted
 http://sourceforge.net/mailarchive/message.php?msg_id=29179733
 
 ---
- Source/Modules/main.cxx |   24 ++++++++++++++++++++++--
+ Source/Modules/main.cxx | 24 ++++++++++++++++++++++--
  1 file changed, 22 insertions(+), 2 deletions(-)
 
+diff --git a/Source/Modules/main.cxx b/Source/Modules/main.cxx
+index 8a44921..8250dee 100644
 --- a/Source/Modules/main.cxx
 +++ b/Source/Modules/main.cxx
 @@ -25,6 +25,11 @@
@@ -27,7 +29,7 @@ http://sourceforge.net/mailarchive/message.php?msg_id=29179733
  
  // Global variables
  
-@@ -934,9 +939,9 @@ int SWIG_main(int argc, char *argv[], co
+@@ -886,9 +891,9 @@ int SWIG_main(int argc, char *argv[], const TargetLanguageModule *tlm) {
  
    // Check for SWIG_LIB environment variable
    if ((c = getenv("SWIG_LIB")) == (char *) 0) {
@@ -38,7 +40,7 @@ http://sourceforge.net/mailarchive/message.php?msg_id=29179733
      if (!(GetModuleFileName(0, buf, MAX_PATH) == 0 || (p = strrchr(buf, '\\')) == 0)) {
        *(p + 1) = '\0';
        SwigLib = NewStringf("%sLib", buf); // Native windows installation path
-@@ -946,7 +951,22 @@ int SWIG_main(int argc, char *argv[], co
+@@ -898,7 +903,22 @@ int SWIG_main(int argc, char *argv[], const TargetLanguageModule *tlm) {
      if (Len(SWIG_LIB_WIN_UNIX) > 0)
        SwigLibWinUnix = NewString(SWIG_LIB_WIN_UNIX); // Unix installation path using a drive letter (for msys/mingw)
  #else

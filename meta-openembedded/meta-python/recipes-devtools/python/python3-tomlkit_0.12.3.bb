@@ -18,9 +18,10 @@ RDEPENDS:${PN} += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
-        ${PYTHON_PN}-poetry-core \
-        ${PYTHON_PN}-pytest \
-        ${PYTHON_PN}-pyyaml \
+    python3-poetry-core \
+    python3-pytest \
+    python3-pyyaml \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

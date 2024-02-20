@@ -1,0 +1,13 @@
+#!/bin/sh
+
+[ -r /etc/default/usbgx ] && . /etc/default/usbgx
+
+for i in $IMPORT_SCHEMAS; do
+    if [ -e /sys/kernel/config/usb_gadget/"$i"/idVendor ]; then
+        if [ -e /sys/kernel/config/usb_gadget/"$i"/idProduct ]; then
+            idVendor=$(cat /sys/kernel/config/usb_gadget/"$i"/idVendor)
+            idProduct=$(cat /sys/kernel/config/usb_gadget/"$i"/idProduct)
+            /usr/bin/gadget-vid-pid-remove ${idVendor}:${idProduct}
+        fi
+    fi
+done

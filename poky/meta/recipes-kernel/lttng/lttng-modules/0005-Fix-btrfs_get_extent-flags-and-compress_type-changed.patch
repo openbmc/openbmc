@@ -1,0 +1,88 @@
+From 86db094386b43bb5c6b47552f9a4826ca8ba917d Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 22 Jan 2024 13:13:36 -0500
+Subject: [PATCH 5/5] Fix: btrfs_get_extent flags and compress_type changed in
+ linux 6.8.0-rc1
+
+See upstream commit:
+
+    commit f86f7a75e2fb5fd7d31d00eab8a392f97ba42ce9
+    Author: Filipe Manana <fdmanana@suse.com>
+    Date:   Mon Dec 4 16:20:33 2023 +0000
+
+        btrfs: use the flags of an extent map to identify the compression type
+
+        Currently, in struct extent_map, we use an unsigned int (32 bits) to
+        identify the compression type of an extent and an unsigned long (64 bits
+        on a 64 bits platform, 32 bits otherwise) for flags. We are only using
+        6 different flags, so an unsigned long is excessive and we can use flags
+        to identify the compression type instead of using a dedicated 32 bits
+        field.
+
+        We can easily have tens or hundreds of thousands (or more) of extent maps
+        on busy and large filesystems, specially with compression enabled or many
+        or large files with tons of small extents. So it's convenient to have the
+        extent_map structure as small as possible in order to use less memory.
+
+        So remove the compression type field from struct extent_map, use flags
+        to identify the compression type and shorten the flags field from an
+        unsigned long to a u32. This saves 8 bytes (on 64 bits platforms) and
+        reduces the size of the structure from 136 bytes down to 128 bytes, using
+        now only two cache lines, and increases the number of extent maps we can
+        have per 4K page from 30 to 32. By using a u32 for the flags instead of
+        an unsigned long, we no longer use test_bit(), set_bit() and clear_bit(),
+        but that level of atomicity is not needed as most flags are never cleared
+        once set (before adding an extent map to the tree), and the ones that can
+        be cleared or set after an extent map is added to the tree, are always
+        performed while holding the write lock on the extent map tree, while the
+        reader holds a lock on the tree or tests for a flag that never changes
+        once the extent map is in the tree (such as compression flags).
+
+Upstream-Status: Backport [Uhttps://review.lttng.org/c/lttng-modules/+/11700]
+
+Change-Id: I95402d43f064c016b423b48652e4968d3db9b8a9
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ include/instrumentation/events/btrfs.h | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index a2a412b..ffb1b64 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -177,7 +177,30 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__inode, btrfs_inode_evict,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,14,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,8,0))
++
++LTTNG_TRACEPOINT_EVENT(btrfs_get_extent,
++
++	TP_PROTO(const struct btrfs_root *root, const struct btrfs_inode *inode,
++		const struct extent_map *map),
++
++	TP_ARGS(root, inode, map),
++
++	TP_FIELDS(
++		ctf_integer(u64, root_objectid, root->root_key.objectid)
++		ctf_integer(u64, ino, btrfs_ino(inode))
++		ctf_integer(u64, start, map->start)
++		ctf_integer(u64, len, map->len)
++		ctf_integer(u64, orig_start, map->orig_start)
++		ctf_integer(u64, block_start, map->block_start)
++		ctf_integer(u64, block_len, map->block_len)
++		ctf_integer(unsigned int, flags, map->flags)
++		ctf_integer(int, refs, refcount_read(&map->refs))
++		ctf_integer(unsigned int, compress_type, extent_map_compression(map))
++	)
++)
++
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,14,0))
+ 
+ LTTNG_TRACEPOINT_EVENT(btrfs_get_extent,
+ 
+-- 
+2.39.2
+

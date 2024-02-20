@@ -4,7 +4,7 @@ HOMEPAGE = "http://md5deep.sourceforge.net"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9190f660105b9a56cdb272309bfd5491"
 
-PV = "4.4+git${SRCPV}"
+PV = "4.4+git"
 
 SRCREV = "877613493ff44807888ce1928129574be393cbb0"
 

@@ -1,0 +1,120 @@
+From 2caf68370791c7aa48f94628c7f7a012753388c5 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Wed, 14 Feb 2024 15:07:00 +0100
+Subject: [PATCH] Make themes build optional
+
+The users can choose which themes should be built.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ meson_options.txt  | 50 ++++++++++++++++++++++++++++++++++++++++++++++
+ themes/meson.build | 38 ++++++++++++++++++++++++++---------
+ 2 files changed, 79 insertions(+), 9 deletions(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index 4f601bb0..1cbf6d2b 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -83,3 +83,53 @@ option('docs',
+   value: true,
+   description: 'Build documentation',
+ )
++option('spinfinity-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with spinfinity theme',
++)
++option('fade-in-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with fade-in theme',
++)
++option('text-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with text theme',
++)
++option('details-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with details theme',
++)
++option('solar-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with solar theme',
++)
++option('glow-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with glow theme',
++)
++option('script-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with script theme',
++)
++option('spinner-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with spinner theme',
++)
++option('tribar-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with tribar theme',
++)
++option('bgrt-theme',
++  type: 'boolean',
++  value: true,
++  description: 'Build with bgrt theme',
++)
+diff --git a/themes/meson.build b/themes/meson.build
+index dc2ca6e2..15918472 100644
+--- a/themes/meson.build
++++ b/themes/meson.build
+@@ -1,10 +1,30 @@
+-subdir('spinfinity')
+-subdir('fade-in')
++if get_option('spinfinity-theme')
++    subdir('spinfinity')
++endif
++if get_option('fade-in-theme')
++    subdir('fade-in')
++endif
++if get_option('text-theme')
+ subdir('text')
+-subdir('details')
+-subdir('solar')
+-subdir('glow')
+-subdir('script')
+-subdir('spinner')
+-subdir('tribar')
+-subdir('bgrt')
++endif
++if get_option('details-theme')
++    subdir('details')
++endif
++if get_option('solar-theme')
++    subdir('solar')
++endif
++if get_option('glow-theme')
++    subdir('glow')
++endif
++if get_option('script-theme')
++    subdir('script')
++endif
++if get_option('spinner-theme')
++    subdir('spinner')
++endif
++if get_option('tribar-theme')
++    subdir('tribar')
++endif
++if get_option('bgrt-theme')
++    subdir('bgrt')
++endif
+-- 
+2.34.1
+

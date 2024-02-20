@@ -6,10 +6,10 @@ LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=190f79253908c986e6cacf380c3a5f6d"
 SRC_URI[sha256sum] = "6d391a96e59b23130a5cfa74d6fd7f388dbbe26cc8f1edf39fdddf08d9d6676c"
 
 RDEPENDS:${PN}:class-target += " \
-    ${PYTHON_PN}-codecs \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-math \
-    ${PYTHON_PN}-shell \
+    python3-codecs \
+    python3-logging \
+    python3-math \
+    python3-shell \
 "
 
 BBCLASSEXTEND = "native nativesdk"
@@ -21,8 +21,8 @@ SRC_URI += " \
            "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-unittest-automake-output \
+	python3-pytest \
+	python3-unittest-automake-output \
 "
 
 do_install_ptest() {

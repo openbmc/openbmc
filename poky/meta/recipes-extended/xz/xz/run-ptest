@@ -1,0 +1,26 @@
+#!/bin/bash
+
+ptestdir=$(dirname "$(readlink -f "$0")")
+cd "$ptestdir"/tests || exit
+
+# executables test cases
+tests_exec=$(file $(ls test_*) | grep "ELF" | awk -F: '{print $1}')
+for i in ${tests_exec}; do
+    ./$i
+done
+
+# POSIX shell script test cases
+export srcdir=${ptestdir}/tests
+test_shell="test_files.sh test_scripts.sh test_compress.sh"
+for j in ${test_shell}; do
+    if [ $j == "test_compress.sh" ]; then
+        ./$j create_compress_files
+    else
+        ./$j
+    fi
+    if [ $? -eq 0 ]; then
+        echo "PASS: $j"
+    else
+        echo "FAIL: $j"
+    fi
+done

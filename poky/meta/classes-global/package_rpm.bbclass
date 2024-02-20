@@ -103,6 +103,7 @@ def write_rpm_perfiledata(srcname, d):
 
 python write_specfile () {
     import oe.packagedata
+    import os,pwd,grp,stat
 
     # append information for logs and patches to %prep
     def add_prep(d, spec_files_bottom):
@@ -198,10 +199,29 @@ python write_specfile () {
         # of the walk, the isdir() test would then fail and the walk code would assume its a file
         # hence we check for the names in files too.
         for rootpath, dirs, files in os.walk(walkpath):
+            def get_attr(path):
+                stat_f = os.stat(rootpath + "/" + path, follow_symlinks=False)
+                mode = stat.S_IMODE(stat_f.st_mode)
+                try:
+                    owner = pwd.getpwuid(stat_f.st_uid).pw_name
+                except Exception as e:
+                    bb.error("Content of /etc/passwd in sysroot:\n{}".format(
+                        open(d.getVar("RECIPE_SYSROOT") +"/etc/passwd").read()))
+                    raise e
+                try:
+                    group = grp.getgrgid(stat_f.st_gid).gr_name
+                except Exception as e:
+                    bb.error("Content of /etc/group in sysroot:\n{}".format(
+                        open(d.getVar("RECIPE_SYSROOT") +"/etc/group").read()))
+                    raise e
+                return "%attr({:o},{},{}) ".format(mode, owner, group)
+
+            def escape_chars(p):
+                return p.replace("%", "%%").replace("\\", "\\\\").replace('"', '\\"')
+
             path = rootpath.replace(walkpath, "")
             if path.endswith("DEBIAN") or path.endswith("CONTROL"):
                 continue
-            path = path.replace("%", "%%%%%%%%")
 
             # Treat all symlinks to directories as normal files.
             # os.walk() lists them as directories.
@@ -220,25 +240,25 @@ python write_specfile () {
                 for dir in dirs:
                     if dir == "CONTROL" or dir == "DEBIAN":
                         continue
-                    dir = dir.replace("%", "%%%%%%%%")
+                    p = path + '/' + dir
                     # All packages own the directories their files are in...
-                    target.append('%dir "' + path + '/' + dir + '"')
-            else:
+                    target.append(get_attr(dir) + '%dir "' + escape_chars(p) + '"')
+            elif path:
                 # packages own only empty directories or explict directory.
                 # This will prevent the overlapping of security permission.
-                if path and not files and not dirs:
-                    target.append('%dir "' + path + '"')
-                elif path and path in dirfiles:
-                    target.append('%dir "' + path + '"')
+                attr = get_attr(path)
+                if (not files and not dirs) or path in dirfiles:
+                    target.append(attr + '%dir "' + escape_chars(path) + '"')
 
             for file in files:
                 if file == "CONTROL" or file == "DEBIAN":
                     continue
-                file = file.replace("%", "%%%%%%%%")
-                if conffiles.count(path + '/' + file):
-                    target.append('%config "' + path + '/' + file + '"')
+                attr = get_attr(file)
+                p = path + '/' + file
+                if conffiles.count(p):
+                    target.append(attr + '%config "' + escape_chars(p) + '"')
                 else:
-                    target.append('"' + path + '/' + file + '"')
+                    target.append(attr + '"' + escape_chars(p) + '"')
 
     # Prevent the prerm/postrm scripts from being run during an upgrade
     def wrap_uninstall(scriptvar):
@@ -661,6 +681,7 @@ python do_package_rpm () {
     # Setup the rpmbuild arguments...
     rpmbuild = d.getVar('RPMBUILD')
     rpmbuild_compmode = d.getVar('RPMBUILD_COMPMODE')
+    rpmbuild_extra_params = d.getVar('RPMBUILD_EXTRA_PARAMS') or ""
 
     # Too many places in dnf stack assume that arch-independent packages are "noarch".
     # Let's not fight against this.
@@ -699,6 +720,10 @@ python do_package_rpm () {
     cmd = cmd + " --define '_unpackaged_files_terminate_build 0'"
     cmd = cmd + " --define 'debug_package %{nil}'"
     cmd = cmd + " --define '_tmppath " + workdir + "'"
+    cmd = cmd + " --define '_use_weak_usergroup_deps 1'"
+    cmd = cmd + " --define '_passwd_path " + "/completely/bogus/path" + "'"
+    cmd = cmd + " --define '_group_path " + "/completely/bogus/path" + "'"
+    cmd = cmd + rpmbuild_extra_params
     if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
         cmd = cmd + " --define '_sourcedir " + d.getVar('ARCHIVER_OUTDIR') + "'"
         cmdsrpm = cmd + " --define '_srcrpmdir " + d.getVar('ARCHIVER_RPMOUTDIR') + "'"

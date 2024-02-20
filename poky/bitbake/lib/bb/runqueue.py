@@ -270,11 +270,11 @@ class RunQueueScheduler(object):
         best = None
         bestprio = None
         for tid in buildable:
-            taskname = taskname_from_tid(tid)
-            if taskname in skip_buildable and skip_buildable[taskname] >= int(self.skip_maxthread[taskname]):
-                continue
             prio = self.rev_prio_map[tid]
             if bestprio is None or bestprio > prio:
+                taskname = taskname_from_tid(tid)
+                if taskname in skip_buildable and skip_buildable[taskname] >= int(self.skip_maxthread[taskname]):
+                    continue
                 stamp = self.stamps[tid]
                 if stamp in self.rq.build_stamps.values():
                     continue
@@ -1840,6 +1840,7 @@ class RunQueueExecute:
         self.failed_tids = []
         self.sq_deferred = {}
         self.sq_needed_harddeps = set()
+        self.sq_harddep_deferred = set()
 
         self.stampcache = {}
 
@@ -1913,6 +1914,8 @@ class RunQueueExecute:
         for mc in found:
             event = bb.event.StaleSetSceneTasks(found[mc])
             bb.event.fire(event, self.cooker.databuilder.mcdata[mc])
+
+        self.build_taskdepdata_cache()
 
     def runqueue_process_waitpid(self, task, status, fakerootlog=None):
 
@@ -2161,7 +2164,7 @@ class RunQueueExecute:
         if not self.sqdone and self.can_start_task():
             # Find the next setscene to run
             for nexttask in self.sorted_setscene_tids:
-                if nexttask in self.sq_buildable and nexttask not in self.sq_running and self.sqdata.stamps[nexttask] not in self.build_stamps.values():
+                if nexttask in self.sq_buildable and nexttask not in self.sq_running and self.sqdata.stamps[nexttask] not in self.build_stamps.values() and nexttask not in self.sq_harddep_deferred:
                     if nexttask not in self.sqdata.unskippable and self.sqdata.sq_revdeps[nexttask] and \
                             nexttask not in self.sq_needed_harddeps and \
                             self.sqdata.sq_revdeps[nexttask].issubset(self.scenequeue_covered) and \
@@ -2182,6 +2185,7 @@ class RunQueueExecute:
                                 self.sq_buildable.add(dep)
                                 self.sq_needed_harddeps.add(dep)
                                 updated = True
+                        self.sq_harddep_deferred.add(nexttask)
                         if updated:
                             return True
                         continue
@@ -2413,6 +2417,22 @@ class RunQueueExecute:
             ret.add(dep)
         return ret
 
+    # Build the individual cache entries in advance once to save time
+    def build_taskdepdata_cache(self):
+        taskdepdata_cache = {}
+        for task in self.rqdata.runtaskentries:
+            (mc, fn, taskname, taskfn) = split_tid_mcfn(task)
+            pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
+            deps = self.rqdata.runtaskentries[task].depends
+            provides = self.rqdata.dataCaches[mc].fn_provides[taskfn]
+            taskhash = self.rqdata.runtaskentries[task].hash
+            unihash = self.rqdata.runtaskentries[task].unihash
+            deps = self.filtermcdeps(task, mc, deps)
+            hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn]
+            taskdepdata_cache[task] = [pn, taskname, fn, deps, provides, taskhash, unihash, hashfn]
+
+        self.taskdepdata_cache = taskdepdata_cache
+
     # We filter out multiconfig dependencies from taskdepdata we pass to the tasks
     # as most code can't handle them
     def build_taskdepdata(self, task):
@@ -2424,16 +2444,9 @@ class RunQueueExecute:
         while next:
             additional = []
             for revdep in next:
-                (mc, fn, taskname, taskfn) = split_tid_mcfn(revdep)
-                pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
-                deps = self.rqdata.runtaskentries[revdep].depends
-                provides = self.rqdata.dataCaches[mc].fn_provides[taskfn]
-                taskhash = self.rqdata.runtaskentries[revdep].hash
-                unihash = self.rqdata.runtaskentries[revdep].unihash
-                deps = self.filtermcdeps(task, mc, deps)
-                hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn]
-                taskdepdata[revdep] = [pn, taskname, fn, deps, provides, taskhash, unihash, hashfn]
-                for revdep2 in deps:
+                self.taskdepdata_cache[revdep][6] = self.rqdata.runtaskentries[revdep].unihash
+                taskdepdata[revdep] = self.taskdepdata_cache[revdep]
+                for revdep2 in self.taskdepdata_cache[revdep][3]:
                     if revdep2 not in taskdepdata:
                         additional.append(revdep2)
             next = additional
@@ -2667,6 +2680,7 @@ class RunQueueExecute:
         if changed:
             self.stats.updateCovered(len(self.scenequeue_covered), len(self.scenequeue_notcovered))
             self.sq_needed_harddeps = set()
+            self.sq_harddep_deferred = set()
             self.holdoff_need_update = True
 
     def scenequeue_updatecounters(self, task, fail=False):
@@ -2700,6 +2714,13 @@ class RunQueueExecute:
                     if self.rqdata.runtaskentries[dep].revdeps.issubset(self.tasks_scenequeue_done):
                         new.add(dep)
             next = new
+
+        # If this task was one which other setscene tasks have a hard dependency upon, we need
+        # to walk through the hard dependencies and allow execution of those which have completed dependencies.
+        if task in self.sqdata.sq_harddeps:
+            for dep in self.sq_harddep_deferred.copy():
+                if self.sqdata.sq_harddeps_rev[dep].issubset(self.scenequeue_covered | self.scenequeue_notcovered):
+                    self.sq_harddep_deferred.remove(dep)
 
         self.stats.updateCovered(len(self.scenequeue_covered), len(self.scenequeue_notcovered))
         self.holdoff_need_update = True

@@ -646,7 +646,6 @@ described in the ":ref:`dev-manual/start:accessing source archives`" section.
    supported releases are displayed, further down past supported Yocto Project
    releases are visible. The "Download" links in the rows of the table there
    will lead to the download tarballs for the release.
-   (e.g. &DISTRO_NAME_NO_CAP;, &DISTRO_NAME_NO_CAP_MINUS_ONE;, and so forth).
 
    .. note::
 

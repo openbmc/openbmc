@@ -224,12 +224,24 @@ cmake_runcmake_build() {
 	eval ${DESTDIR:+DESTDIR=${DESTDIR} }${CMAKE_VERBOSE} cmake --build '${B}' "$@" -- ${EXTRA_OECMAKE_BUILD}
 }
 
+# Install an already-generated project binary tree. Not checking the compile
+# dependencies again is particularly important for SDK use cases.
+cmake_runcmake_install() {
+	bbnote ${DESTDIR:+DESTDIR=${DESTDIR} }${CMAKE_VERBOSE} cmake --install '${B}'
+	eval ${DESTDIR:+DESTDIR=${DESTDIR} }${CMAKE_VERBOSE} cmake --install '${B}'
+}
+
 cmake_do_compile()  {
 	cmake_runcmake_build --target ${OECMAKE_TARGET_COMPILE}
 }
 
 cmake_do_install() {
-	DESTDIR='${D}' cmake_runcmake_build --target ${OECMAKE_TARGET_INSTALL}
+	if [ "${OECMAKE_TARGET_INSTALL}" = "install" ]; then
+		DESTDIR='${D}' cmake_runcmake_install
+	else
+		# Legacy path which supports also custom install targets
+		DESTDIR='${D}' cmake_runcmake_build --target ${OECMAKE_TARGET_INSTALL}
+	fi
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install do_generate_toolchain_file

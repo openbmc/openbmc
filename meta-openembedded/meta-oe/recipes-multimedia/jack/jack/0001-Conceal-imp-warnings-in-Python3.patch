@@ -1,0 +1,34 @@
+From f864a2aa29377a77c3aef61ce917cc03d099c430 Mon Sep 17 00:00:00 2001
+From: Thomas Nagy <tnagy@waf.io>
+Date: Wed, 14 Aug 2019 22:05:45 +0200
+Subject: [PATCH] Conceal imp warnings in Python3
+
+---
+Upstream-Status: Backport [from waflib not jack: https://gitlab.com/ita1024/waf/-/commit/d2060dfd8af4edb5824153ff24e207b39ecd67a2.patch]
+
+ waflib/Context.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/waflib/Context.py b/waflib/Context.py
+index 761b521f..38ab03f1 100644
+--- a/waflib/Context.py
++++ b/waflib/Context.py
+@@ -6,10 +6,17 @@
+ Classes and functions enabling the command system
+ """
+ 
+-import os, re, imp, sys
++import os, re, sys
+ from waflib import Utils, Errors, Logs
+ import waflib.Node
+ 
++if sys.hexversion > 0x3040000:
++	import types
++	class imp(object):
++		new_module = lambda x: types.ModuleType(x)
++else:
++	import imp
++
+ # the following 3 constants are updated on each new release (do not touch)
+ HEXVERSION=0x2000c00
+ """Constant updated on new releases"""

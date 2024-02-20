@@ -8,7 +8,7 @@ SRC_URI = "git://github.com/miloyip/rapidjson.git;branch=master;protocol=https"
 
 SRCREV = "0ccdbf364c577803e2a751f5aededce935314313"
 
-PV = "1.1.0+git${SRCPV}"
+PV = "1.1.0+git"
 
 S = "${WORKDIR}/git"
 

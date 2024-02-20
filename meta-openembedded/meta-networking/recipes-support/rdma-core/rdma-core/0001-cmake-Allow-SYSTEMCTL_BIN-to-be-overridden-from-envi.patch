@@ -1,4 +1,4 @@
-From 92747aab189aa3cee954ab31ee019205f8984155 Mon Sep 17 00:00:00 2001
+From 209f346d55eeaf74e21c541d70ec43d39b6c8c3c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 27 May 2023 17:22:10 -0700
 Subject: [PATCH] cmake: Allow SYSTEMCTL_BIN to be overridden from environment
@@ -8,16 +8,17 @@ for systemctl
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  CMakeLists.txt | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9b7462861..c4d82fb49 100644
+index 98985e7ee..001efb800 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -226,7 +226,10 @@ else()
-   set(CYTHON_EXECUTABLE "")
+@@ -237,7 +237,10 @@ else()
+   endif()
  endif()
  
 -find_program(SYSTEMCTL_BIN systemctl HINTS "/usr/bin" "/bin")
@@ -28,6 +29,3 @@ index 9b7462861..c4d82fb49 100644
  if (NOT SYSTEMCTL_BIN)
    set (SYSTEMCTL_BIN "/bin/systemctl")
  endif()
--- 
-2.40.1
-

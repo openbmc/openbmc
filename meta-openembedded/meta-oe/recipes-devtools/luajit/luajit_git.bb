@@ -91,10 +91,7 @@ FILES:${PN}-dev += "${libdir}/libluajit-5.1.a \
 "
 FILES:luajit-common = "${datadir}/${BPN}-${PV}"
 
-# mips64/ppc/ppc64/riscv64/riscv32 is not supported in this release
-COMPATIBLE_HOST:mipsarchn32 = "null"
-COMPATIBLE_HOST:mipsarchn64 = "null"
-COMPATIBLE_HOST:powerpc = "null"
+# ppc64/riscv64/riscv32 is not supported in this release
 COMPATIBLE_HOST:powerpc64 = "null"
 COMPATIBLE_HOST:powerpc64le = "null"
 COMPATIBLE_HOST:riscv64 = "null"

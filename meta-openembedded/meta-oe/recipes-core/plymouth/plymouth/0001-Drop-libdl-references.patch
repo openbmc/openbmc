@@ -1,0 +1,70 @@
+From c1d5f8265a1974908ae8dd32714d305035939cc7 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Wed, 14 Feb 2024 12:24:44 +0100
+Subject: [PATCH] Drop libdl references
+
+dl has been integrated into libc since glibc 2.34, dont need to link to
+it any more.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ meson.build                        | 2 --
+ src/client/meson.build             | 1 -
+ src/libply-splash-core/meson.build | 1 -
+ src/libply/meson.build             | 1 -
+ 4 files changed, 5 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index c6996aed..91688f73 100644
+--- a/meson.build
++++ b/meson.build
+@@ -24,8 +24,6 @@ cc = meson.get_compiler('c')
+ lm_dep = cc.find_library('m')
+ lrt_dep = cc.find_library('rt')
+ 
+-ldl_dep = dependency('dl')
+-
+ libpng_dep = dependency('libpng', version: '>= 1.2.16')
+ 
+ libudev_dep = dependency('libudev', required: get_option('udev'))
+diff --git a/src/client/meson.build b/src/client/meson.build
+index 0506c8b4..272a811c 100644
+--- a/src/client/meson.build
++++ b/src/client/meson.build
+@@ -52,7 +52,6 @@ pkgconfig.generate(libply_boot_client,
+   description: 'Client Library for Boot Splash',
+   libraries: [
+     libply,
+-    ldl_dep,
+   ],
+   subdirs: [
+     'plymouth-1/ply',
+diff --git a/src/libply-splash-core/meson.build b/src/libply-splash-core/meson.build
+index cd22345c..c0f62b4b 100644
+--- a/src/libply-splash-core/meson.build
++++ b/src/libply-splash-core/meson.build
+@@ -81,7 +81,6 @@ pkgconfig.generate(libply_splash_core,
+   description: 'Utility Library for Boot Splash Plugins',
+   libraries: [
+     libply,
+-    ldl_dep,
+   ],
+   subdirs: [
+     'plymouth-1/ply',
+diff --git a/src/libply/meson.build b/src/libply/meson.build
+index 70f72488..77dced75 100644
+--- a/src/libply/meson.build
++++ b/src/libply/meson.build
+@@ -17,7 +17,6 @@ libply_sources = files(
+ )
+ 
+ libply_deps = [
+-  ldl_dep,
+   lm_dep,
+ ]
+ 
+-- 
+2.34.1
+

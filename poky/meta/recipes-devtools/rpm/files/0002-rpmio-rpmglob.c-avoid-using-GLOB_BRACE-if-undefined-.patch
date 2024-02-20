@@ -1,0 +1,34 @@
+From f78e05544fb5ae9ef688963f19666f1af34c3d5c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 16 Jan 2024 09:59:26 +0100
+Subject: [PATCH] rpmio/rpmglob.c: avoid using GLOB_BRACE if undefined by C
+ library
+
+This addresses musl failures; if there is code out there relying on
+those braces, it needs to be fixed when used on musl.
+
+This is unlikely to be trivially fixable upstream.
+
+Upstream-Status: Inappropriate [reported at https://github.com/rpm-software-management/rpm/issues/2844]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ rpmio/rpmglob.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/rpmio/rpmglob.c b/rpmio/rpmglob.c
+index 243568766..43c27074a 100644
+--- a/rpmio/rpmglob.c
++++ b/rpmio/rpmglob.c
+@@ -33,6 +33,12 @@
+ 
+ #include "debug.h"
+ 
++/* Don't fail if the standard C library
+++ * doesn't provide brace expansion */
++#ifndef GLOB_BRACE
++#define GLOB_BRACE 0
++#endif
++
+ /* Return 1 if pattern contains a magic char, see glob(7) for a list */
+ static int ismagic(const char *pattern)
+ {

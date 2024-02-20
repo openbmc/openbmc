@@ -1,4 +1,4 @@
-From 08b1aaff972a7f6349373fc1ad4cc23081adb52c Mon Sep 17 00:00:00 2001
+From 27e977d03b0f7c1d0bf19621ef0cec0585410e7b Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 11 Apr 2021 19:48:13 +0100
 Subject: [PATCH] tests: add support for install the tests
@@ -20,7 +20,7 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  create mode 100644 tests/check/template.test.in
 
 diff --git a/meson.build b/meson.build
-index f9f591d..3906fb3 100644
+index 60c7bec..f7650b1 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -606,6 +606,10 @@ if bashcomp_dep.found()

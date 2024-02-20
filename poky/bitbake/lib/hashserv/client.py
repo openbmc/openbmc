@@ -16,6 +16,7 @@ logger = logging.getLogger("hashserv.client")
 class AsyncClient(bb.asyncrpc.AsyncClient):
     MODE_NORMAL = 0
     MODE_GET_STREAM = 1
+    MODE_EXIST_STREAM = 2
 
     def __init__(self, username=None, password=None):
         super().__init__("OEHASHEQUIV", "1.1", logger)
@@ -49,19 +50,36 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
             await self.socket.send("END")
             return await self.socket.recv()
 
-        if new_mode == self.MODE_NORMAL and self.mode == self.MODE_GET_STREAM:
+        async def normal_to_stream(command):
+            r = await self.invoke({command: None})
+            if r != "ok":
+                raise ConnectionError(
+                    f"Unable to transition to stream mode: Bad response from server {r!r}"
+                )
+
+            self.logger.debug("Mode is now %s", command)
+
+        if new_mode == self.mode:
+            return
+
+        self.logger.debug("Transitioning mode %s -> %s", self.mode, new_mode)
+
+        # Always transition to normal mode before switching to any other mode
+        if self.mode != self.MODE_NORMAL:
             r = await self._send_wrapper(stream_to_normal)
             if r != "ok":
                 self.check_invoke_error(r)
-                raise ConnectionError("Unable to transition to normal mode: Bad response from server %r" % r)
-        elif new_mode == self.MODE_GET_STREAM and self.mode == self.MODE_NORMAL:
-            r = await self.invoke({"get-stream": None})
-            if r != "ok":
-                raise ConnectionError("Unable to transition to stream mode: Bad response from server %r" % r)
-        elif new_mode != self.mode:
-            raise Exception(
-                "Undefined mode transition %r -> %r" % (self.mode, new_mode)
-            )
+                raise ConnectionError(
+                    f"Unable to transition to normal mode: Bad response from server {r!r}"
+                )
+            self.logger.debug("Mode is now normal")
+
+        if new_mode == self.MODE_GET_STREAM:
+            await normal_to_stream("get-stream")
+        elif new_mode == self.MODE_EXIST_STREAM:
+            await normal_to_stream("exists-stream")
+        elif new_mode != self.MODE_NORMAL:
+            raise Exception("Undefined mode transition {self.mode!r} -> {new_mode!r}")
 
         self.mode = new_mode
 
@@ -94,6 +112,11 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         return await self.invoke(
             {"get": {"taskhash": taskhash, "method": method, "all": all_properties}}
         )
+
+    async def unihash_exists(self, unihash):
+        await self._set_mode(self.MODE_EXIST_STREAM)
+        r = await self.send_stream(unihash)
+        return r == "true"
 
     async def get_outhash(self, method, outhash, taskhash, with_unihash=True):
         await self._set_mode(self.MODE_NORMAL)
@@ -194,6 +217,34 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         await self._set_mode(self.MODE_NORMAL)
         return (await self.invoke({"get-db-query-columns": {}}))["columns"]
 
+    async def gc_status(self):
+        await self._set_mode(self.MODE_NORMAL)
+        return await self.invoke({"gc-status": {}})
+
+    async def gc_mark(self, mark, where):
+        """
+        Starts a new garbage collection operation identified by "mark". If
+        garbage collection is already in progress with "mark", the collection
+        is continued.
+
+        All unihash entries that match the "where" clause are marked to be
+        kept. In addition, any new entries added to the database after this
+        command will be automatically marked with "mark"
+        """
+        await self._set_mode(self.MODE_NORMAL)
+        return await self.invoke({"gc-mark": {"mark": mark, "where": where}})
+
+    async def gc_sweep(self, mark):
+        """
+        Finishes garbage collection for "mark". All unihash entries that have
+        not been marked will be deleted.
+
+        It is recommended to clean unused outhash entries after running this to
+        cleanup any dangling outhashes
+        """
+        await self._set_mode(self.MODE_NORMAL)
+        return await self.invoke({"gc-sweep": {"mark": mark}})
+
 
 class Client(bb.asyncrpc.Client):
     def __init__(self, username=None, password=None):
@@ -208,6 +259,7 @@ class Client(bb.asyncrpc.Client):
             "report_unihash",
             "report_unihash_equiv",
             "get_taskhash",
+            "unihash_exists",
             "get_outhash",
             "get_stats",
             "reset_stats",
@@ -224,7 +276,90 @@ class Client(bb.asyncrpc.Client):
             "become_user",
             "get_db_usage",
             "get_db_query_columns",
+            "gc_status",
+            "gc_mark",
+            "gc_sweep",
         )
 
     def _get_async_client(self):
         return AsyncClient(self.username, self.password)
+
+
+class ClientPool(bb.asyncrpc.ClientPool):
+    def __init__(
+        self,
+        address,
+        max_clients,
+        *,
+        username=None,
+        password=None,
+        become=None,
+    ):
+        super().__init__(max_clients)
+        self.address = address
+        self.username = username
+        self.password = password
+        self.become = become
+
+    async def _new_client(self):
+        client = await create_async_client(
+            self.address,
+            username=self.username,
+            password=self.password,
+        )
+        if self.become:
+            await client.become_user(self.become)
+        return client
+
+    def _run_key_tasks(self, queries, call):
+        results = {key: None for key in queries.keys()}
+
+        def make_task(key, args):
+            async def task(client):
+                nonlocal results
+                unihash = await call(client, args)
+                results[key] = unihash
+
+            return task
+
+        def gen_tasks():
+            for key, args in queries.items():
+                yield make_task(key, args)
+
+        self.run_tasks(gen_tasks())
+        return results
+
+    def get_unihashes(self, queries):
+        """
+        Query multiple unihashes in parallel.
+
+        The queries argument is a dictionary with arbitrary key. The values
+        must be a tuple of (method, taskhash).
+
+        Returns a dictionary with a corresponding key for each input key, and
+        the value is the queried unihash (which might be none if the query
+        failed)
+        """
+
+        async def call(client, args):
+            method, taskhash = args
+            return await client.get_unihash(method, taskhash)
+
+        return self._run_key_tasks(queries, call)
+
+    def unihashes_exist(self, queries):
+        """
+        Query multiple unihash existence checks in parallel.
+
+        The queries argument is a dictionary with arbitrary key. The values
+        must be a unihash.
+
+        Returns a dictionary with a corresponding key for each input key, and
+        the value is True or False if the unihash is known by the server (or
+        None if there was a failure)
+        """
+
+        async def call(client, unihash):
+            return await client.unihash_exists(unihash)
+
+        return self._run_key_tasks(queries, call)

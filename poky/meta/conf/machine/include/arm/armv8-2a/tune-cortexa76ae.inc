@@ -11,6 +11,7 @@ require conf/machine/include/arm/arch-armv8-2a.inc
 # Little Endian base configs
 AVAILTUNES                                         += "cortexa76ae"
 ARMPKGARCH:tune-cortexa76ae                         = "cortexa76ae"
-TUNE_FEATURES:tune-cortexa76ae                      = "${TUNE_FEATURES:tune-armv8-2a-crypto} cortexa76ae"
+# We do not want -march since -mcpu is added above to cover for it
+TUNE_FEATURES:tune-cortexa76ae                      = "aarch64 crypto cortexa76ae"
 PACKAGE_EXTRA_ARCHS:tune-cortexa76ae                = "${PACKAGE_EXTRA_ARCHS:tune-armv8-2a-crypto} cortexa76ae"
 BASE_LIB:tune-cortexa76ae                           = "lib64"

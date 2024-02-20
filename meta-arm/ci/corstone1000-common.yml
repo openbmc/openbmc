@@ -3,13 +3,40 @@ header:
   includes:
     - ci/base.yml
     - ci/meta-openembedded.yml
-    - ci/poky-tiny.yml
     - ci/meta-secure-core.yml
 
 local_conf_header:
-    extrapackages: |
+  extrapackages: |
     # Intentionally blank to prevent perf from being added to the image in base.yml
 
+  distrosetup: |
+    DISTRO_FEATURES = "usbhost ipv4"
+
+  initramfsetup: |
+    # Telling the build system which image is responsible of the generation of the initramfs rootfs
+    INITRAMFS_IMAGE_BUNDLE = "1"
+    INITRAMFS_IMAGE ?= "core-image-minimal"
+    IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
+    IMAGE_NAME_SUFFIX = ""
+
+    # enable mdev/busybox for init
+    INIT_MANAGER = "mdev-busybox"
+    VIRTUAL-RUNTIME_init_manager = "busybox"
+
+    # prevent the kernel image from being included in the intramfs rootfs
+    PACKAGE_EXCLUDE += "kernel-image-*"
+    # Don't include kernel binary in rootfs /boot path
+    RRECOMMENDS:${KERNEL_PACKAGE_NAME}-base = ""
+
+    # Disable openssl in kmod to shrink the initramfs size
+    PACKAGECONFIG:remove:pn-kmod = "openssl"
+
+    # all optee packages
+    IMAGE_INSTALL += "optee-client"
+
+    # TS PSA API tests commands for crypto, its, ps and iat
+    IMAGE_INSTALL += "packagegroup-ts-tests-psa"
+
 target:
-  - corstone1000-image
+  - corstone1000-flash-firmware-image
   - perf

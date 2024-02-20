@@ -6,7 +6,7 @@ HOMEPAGE = "https://github.com/ssvb/tinymembench/wiki"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://main.c;endline=22;md5=879b9bbb60851454885b5fa47eb6b345"
 
-PV = "0.4.9+git${SRCPV}"
+PV = "0.4.9+git"
 
 SRCREV = "a2cf6d7e382e3aea1eb39173174d9fa28cad15f3"
 SRC_URI = "git://github.com/ssvb/tinymembench.git;branch=master;protocol=https \

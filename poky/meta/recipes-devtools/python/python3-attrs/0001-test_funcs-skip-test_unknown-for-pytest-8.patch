@@ -1,0 +1,30 @@
+From cbe95e1aa6d95195dce13406a6f0522b2964babc Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Fri, 16 Feb 2024 07:17:19 -0800
+Subject: [PATCH] test_funcs: skip test_unknown for pytest 8
+
+https://github.com/python-attrs/attrs/issues/1233
+
+Upstream-Status: Inappropriate [Test case needs to be properly fixed upstream]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ tests/test_funcs.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_funcs.py b/tests/test_funcs.py
+index 044aaab..0872c31 100644
+--- a/tests/test_funcs.py
++++ b/tests/test_funcs.py
+@@ -593,7 +593,7 @@ class TestAssoc:
+         for k, v in change_dict.items():
+             assert getattr(changed, k) == v
+ 
+-    @given(simple_classes())
++    @pytest.mark.skip('Broken with pytest 8. See https://github.com/python-attrs/attrs/issues/1233')
+     def test_unknown(self, C):
+         """
+         Wanting to change an unknown attribute raises an
+-- 
+2.34.1
+

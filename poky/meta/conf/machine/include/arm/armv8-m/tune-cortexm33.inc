@@ -13,5 +13,6 @@ require conf/machine/include/arm/arch-armv8m-main.inc
 # be fixed in GCC
 AVAILTUNES                          += "cortexm33"
 ARMPKGARCH:tune-cortexm33            = "cortexm33"
-TUNE_FEATURES:tune-cortexm33         = "${TUNE_FEATURES:tune-armv8m-maine-vfpv5spd16} cortexm33"
+# We do not want -march since -mcpu is added above to cover for it
+TUNE_FEATURES:tune-cortexm33         = "vfpv5spd16 dsp cortexm33"
 PACKAGE_EXTRA_ARCHS:tune-cortexm33   = "${PACKAGE_EXTRA_ARCHS:tune-armv8m-maine-vfpv5spd16} cortexm33e-fpv5-spd16"

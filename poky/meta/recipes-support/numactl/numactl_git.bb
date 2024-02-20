@@ -10,16 +10,14 @@ inherit autotools-brokensep ptest
 
 LIC_FILES_CHKSUM = "file://README.md;beginline=19;endline=32;md5=9f34c3af4ed6f3f5df0da5f3c0835a43"
 
-SRCREV = "10285f1a1bad49306839b2c463936460b604e3ea"
-PV = "2.0.16"
+SRCREV = "c1165896572b74e971d817909bf652066ddf801a"
+PV = "2.0.17"
 
 SRC_URI = "git://github.com/numactl/numactl;branch=master;protocol=https \
            file://Fix-the-test-output-format.patch \
            file://Makefile \
            file://run-ptest \
            file://0001-define-run-test-target.patch \
-           file://0001-configure-Check-for-largefile-support.patch \
-           file://0002-shm.c-Replace-stat64-fstat64-ftruncate64mmap64-with-.patch \
            "
 
 S = "${WORKDIR}/git"

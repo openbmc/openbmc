@@ -99,6 +99,6 @@ class LibOE(OESelftestTestCase):
 
         dstcnt = len(os.listdir(dst))
         srccnt = len(os.listdir(src))
-        self.assertEquals(dstcnt, len(testfiles), "Number of files in dst (%s) differs from number of files in src(%s)." % (dstcnt, srccnt))
+        self.assertEqual(dstcnt, len(testfiles), "Number of files in dst (%s) differs from number of files in src(%s)." % (dstcnt, srccnt))
 
         oe.path.remove(testloc)

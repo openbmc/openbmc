@@ -133,16 +133,13 @@ including the PASS, FAIL, and SKIP indicators for each test run.
 
 ## Contributing
 
-The yocto mailing list (yocto@lists.yoctoproject.org) is used for questions,
+The yocto mailing list (openembedded-core@lists.openembedded.org) is used for questions,
 comments and patch review.  It is subscriber only, so please register before
 posting.
 
-Send pull requests to yocto@lists.yoctoproject.org with '[patchtest]' in the
-subject.
-
 When sending single patches, please use something like:
 
-    git send-email -M -1 --to=yocto@lists.yoctoproject.org  --subject-prefix=patchtest][PATCH
+    git send-email -M -1 --to=openembedded-core@lists.openembedded.org --subject-prefix=OE-core][PATCH
 
 ## Maintenance
 -----------

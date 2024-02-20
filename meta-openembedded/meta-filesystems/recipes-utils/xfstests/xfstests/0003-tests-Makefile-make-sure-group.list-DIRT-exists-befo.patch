@@ -1,0 +1,239 @@
+From b30d5690d7245aa8bd5ca2896e629e62ec97afda Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Thu, 8 Feb 2024 23:01:36 +0100
+Subject: [PATCH] tests/*/Makefile: make sure group.list DIRT exists before
+ install
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* sometimes make install was failing with:
+  cp: cannot stat 'group.list': No such file or directory
+  and bunch of non-fatal messages:
+  mv: failed to preserve ownership for 'group.list': Invalid argument
+
+* this was when tools/mkgroupfile did
+  mv -f "$new_groups" "$groupfile"
+  overwritting the group.list file while install-sh was already
+  copying it to output
+
+* in the end easily reproducible by
+  1) removing tests/*/group.list before each make install
+  2) adding some sleep in mkgroupfile before the mv call
+
+Upstream-Status: Submitted [https://lore.kernel.org/fstests/20240208225241.644701-1-martin.jansa@gmail.com/]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ tests/btrfs/Makefile    | 2 +-
+ tests/ceph/Makefile     | 2 +-
+ tests/cifs/Makefile     | 2 +-
+ tests/ext4/Makefile     | 2 +-
+ tests/f2fs/Makefile     | 2 +-
+ tests/generic/Makefile  | 2 +-
+ tests/nfs/Makefile      | 2 +-
+ tests/ocfs2/Makefile    | 2 +-
+ tests/overlay/Makefile  | 2 +-
+ tests/perf/Makefile     | 2 +-
+ tests/selftest/Makefile | 2 +-
+ tests/shared/Makefile   | 2 +-
+ tests/tmpfs/Makefile    | 2 +-
+ tests/udf/Makefile      | 2 +-
+ tests/xfs/Makefile      | 2 +-
+ 15 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/tests/btrfs/Makefile b/tests/btrfs/Makefile
+index 1b72a1a1..6d9995b4 100644
+--- a/tests/btrfs/Makefile
++++ b/tests/btrfs/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/ceph/Makefile b/tests/ceph/Makefile
+index 2761e1e9..5f24d518 100644
+--- a/tests/ceph/Makefile
++++ b/tests/ceph/Makefile
+@@ -12,7 +12,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/cifs/Makefile b/tests/cifs/Makefile
+index 62c48935..0b89a01d 100644
+--- a/tests/cifs/Makefile
++++ b/tests/cifs/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/ext4/Makefile b/tests/ext4/Makefile
+index a2a0d561..296e3850 100644
+--- a/tests/ext4/Makefile
++++ b/tests/ext4/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/f2fs/Makefile b/tests/f2fs/Makefile
+index 9d1ed3c6..0a90b465 100644
+--- a/tests/f2fs/Makefile
++++ b/tests/f2fs/Makefile
+@@ -15,7 +15,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/generic/Makefile b/tests/generic/Makefile
+index b464b22b..d6ed3e55 100644
+--- a/tests/generic/Makefile
++++ b/tests/generic/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/nfs/Makefile b/tests/nfs/Makefile
+index 128d2a3a..51590b5c 100644
+--- a/tests/nfs/Makefile
++++ b/tests/nfs/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/ocfs2/Makefile b/tests/ocfs2/Makefile
+index 260ad31b..17e01bf3 100644
+--- a/tests/ocfs2/Makefile
++++ b/tests/ocfs2/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/overlay/Makefile b/tests/overlay/Makefile
+index 2785b94d..c71e78d6 100644
+--- a/tests/overlay/Makefile
++++ b/tests/overlay/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/perf/Makefile b/tests/perf/Makefile
+index 0c74ba39..d72c04d9 100644
+--- a/tests/perf/Makefile
++++ b/tests/perf/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/selftest/Makefile b/tests/selftest/Makefile
+index 3ddfca37..cabc35a9 100644
+--- a/tests/selftest/Makefile
++++ b/tests/selftest/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/shared/Makefile b/tests/shared/Makefile
+index f3128714..2e6aa718 100644
+--- a/tests/shared/Makefile
++++ b/tests/shared/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/tmpfs/Makefile b/tests/tmpfs/Makefile
+index 46544313..46b62dad 100644
+--- a/tests/tmpfs/Makefile
++++ b/tests/tmpfs/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/udf/Makefile b/tests/udf/Makefile
+index ed4434f0..feda69a6 100644
+--- a/tests/udf/Makefile
++++ b/tests/udf/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)
+diff --git a/tests/xfs/Makefile b/tests/xfs/Makefile
+index 5f413e67..6bfafdb1 100644
+--- a/tests/xfs/Makefile
++++ b/tests/xfs/Makefile
+@@ -14,7 +14,7 @@ default: $(DIRT)
+ 
+ include $(BUILDRULES)
+ 
+-install:
++install: default
+ 	$(INSTALL) -m 755 -d $(TARGET_DIR)
+ 	$(INSTALL) -m 755 $(TESTS) $(TARGET_DIR)
+ 	$(INSTALL) -m 644 group.list $(TARGET_DIR)

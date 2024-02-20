@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/probonopd/zsync-curl;protocol=https;branch=master \
            file://make.patch"
 SRCREV = "00141c2806ccc4ddf2ff6263ee1612d19c0b713f"
 
-PV = "0.6.2+git${SRCPV}"
+PV = "0.6.2+git"
 
 inherit autotools
 

@@ -9,7 +9,7 @@ SRC_URI = "git://git.code.sf.net/p/tipc/tipcutils;branch=master \
            file://0001-test-ptts-Set-recv-buffer-size-too-max-to-receive-as.patch \
            "
 SRCREV = "7ab2211b87414ba240b0b2e4af219c1057c9cf9a"
-PV = "2.2.0+git${SRCPV}"
+PV = "2.2.0+git"
 
 inherit autotools pkgconfig
 

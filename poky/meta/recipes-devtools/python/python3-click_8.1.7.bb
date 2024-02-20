@@ -15,9 +15,9 @@ inherit pypi setuptools3 ptest
 SRC_URI += "file://run-ptest"
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
-	${PYTHON_PN}-terminal \
-	${PYTHON_PN}-unixadmin \
+	python3-pytest \
+	python3-terminal \
+	python3-unixadmin \
 "
 
 do_install_ptest() {
@@ -32,8 +32,8 @@ UPSTREAM_CHECK_REGEX = "click/(?P<pver>\d+(\.\d+)+)/"
 CLEANBROKEN = "1"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-threading \
+    python3-io \
+    python3-threading \
     "
 
 BBCLASSEXTEND = "native nativesdk"

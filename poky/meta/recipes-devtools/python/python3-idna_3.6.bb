@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "9ecdbbd083b06798ae1e86adcbfe8ab1479cf864e4ee30fe4e46a003d1
 inherit pypi python_flit_core
 
 RDEPENDS:${PN}:class-target = "\
-    ${PYTHON_PN}-codecs \
+    python3-codecs \
 "
 
 BBCLASSEXTEND = "native nativesdk"

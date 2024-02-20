@@ -170,7 +170,7 @@ python systemd_populate_packages() {
                     base = service[:at] + '@' + service[ext:]
 
                 for path in searchpaths:
-                    if os.path.exists(oe.path.join(d.getVar("D"), path, service)):
+                    if os.path.lexists(oe.path.join(d.getVar("D"), path, service)):
                         path_found = path
                         break
                     elif base is not None:

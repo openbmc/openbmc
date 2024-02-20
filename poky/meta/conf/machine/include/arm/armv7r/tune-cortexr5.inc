@@ -12,3 +12,8 @@ AVAILTUNES                            += "cortexr5"
 ARMPKGARCH:tune-cortexr5               = "cortexr5"
 TUNE_FEATURES:tune-cortexr5            = "${TUNE_FEATURES:tune-armv7r-vfpv3d16} cortexr5 idiv"
 PACKAGE_EXTRA_ARCHS:tune-cortexr5      = "${PACKAGE_EXTRA_ARCHS:tune-armv7r-vfpv3d16} cortexr5-vfpv3d16"
+
+AVAILTUNES                            += "cortexr5hf"
+ARMPKGARCH:tune-cortexr5hf             = "cortexr5"
+TUNE_FEATURES:tune-cortexr5hf          = "${TUNE_FEATURES:tune-cortexr5} callconvention-hard"
+PACKAGE_EXTRA_ARCHS:tune-cortexr5hf    = "cortexr5hf-vfpv3d16"

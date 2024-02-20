@@ -17,7 +17,7 @@ SRC_URI += "file://run-ptest \
 do_install:append() {
     # Make sure we use /usr/bin/env python3
     for PYTHSCRIPT in `grep -rIl '^#!.*python' ${D}`; do
-        sed -i -e '1s|^#!.*|#!/usr/bin/env ${PYTHON_PN}|' $PYTHSCRIPT
+        sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' $PYTHSCRIPT
     done
 }
 
@@ -28,6 +28,7 @@ do_install_ptest() {
 
 RDEPENDS:${PN}-ptest += "\
     python3-pytest \
+    python3-unittest-automake-output \
 "
 
 RDEPENDS:${PN} += "python3-core python3-ctypes python3-datetime python3-json python3-io python3-mmap python3-multiprocessing python3-netclient python3-pickle python3-pprint python3-shell"

@@ -5,7 +5,9 @@ After=sys-kernel-config.mount
 
 [Service]
 Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/bin/gadget-start
+ExecStop=/usr/bin/gadget-stop
 
 [Install]
 WantedBy=usb-gadget.target

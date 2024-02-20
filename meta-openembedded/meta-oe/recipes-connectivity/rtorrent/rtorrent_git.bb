@@ -8,7 +8,7 @@ DEPENDS = "autoconf-archive libsigc++-2.0 curl cppunit libtool libtorrent ncurse
 SRC_URI = "git://github.com/rakshasa/rtorrent;branch=master;protocol=https"
 SRCREV = "d067bd802e44f0e6a747aabcc311ada2175fd550"
 
-PV = "0.9.8+git${SRCPV}"
+PV = "0.9.8+git"
 
 S = "${WORKDIR}/git"
 

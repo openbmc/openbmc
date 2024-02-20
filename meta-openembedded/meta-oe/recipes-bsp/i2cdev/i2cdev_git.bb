@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "\
     file://lsi2c/lsi2c.c;beginline=11;endline=24;md5=72486a5e192d6ac5c7e55a4a95e380a6 \
 "
 
-PR = "git${SRCPV}"
+PV = "0.7.0+git"
 
 SRC_URI = "\
     git://github.com/costad2/i2cdev.git;protocol=https;branch=master \

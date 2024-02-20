@@ -14,18 +14,18 @@ Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
  2 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/test/regress b/test/regress
-index 2ce1705..d086a47 100755
+index f06b22f..2fdfacb 100755
 --- a/test/regress
 +++ b/test/regress
-@@ -74,6 +74,7 @@ probe_hardware()
+@@ -78,6 +78,7 @@ probe_hardware()
  	if [ $numnodes -lt 2 ] ; then
  	    echo "need at least two nodes with at least $NEEDPAGES each of"
  	    echo "free memory for mempolicy regression tests"
 +	    echo "SKIP: numa regress"
-	    exit 77  # Skip test
+ 	    exit 77  # Skip test
  	fi
  }
-@@ -207,10 +208,9 @@ main()
+@@ -209,10 +210,9 @@ main()
  	rm A B
  
  	if [ "$EXIT" = 0 ] ; then
@@ -60,6 +60,3 @@ index aa6ea41..450c510 100755
  }
  
  # still broken
--- 
-1.8.4.2
-

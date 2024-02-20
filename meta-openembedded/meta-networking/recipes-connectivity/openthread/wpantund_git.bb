@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e7820bc7f7d1638a6b54fc2e8d7fb103 \
                     "
 DEPENDS = "autoconf-archive dbus readline boost"
 SRCREV = "0fb1f57e4224e2df3e630e146702bfcf63fbf07a"
-PV = "0.07.01+git${SRCPV}"
+PV = "0.07.01+git"
 
 SRC_URI = "gitsm://github.com/openthread/wpantund.git;protocol=https;branch=master \
            "

@@ -58,11 +58,11 @@ class RunCmdTests(OESelftestTestCase):
         self.assertEqual(result.status, 0)
 
     def test_result_assertion(self):
-        self.assertRaisesRegexp(AssertionError, "Command 'echo .* false' returned non-zero exit status 1:\nfoobar",
+        self.assertRaisesRegex(AssertionError, "Command 'echo .* false' returned non-zero exit status 1:\nfoobar",
                                 runCmd, "echo foobar >&2; false", shell=True)
 
     def test_result_exception(self):
-        self.assertRaisesRegexp(CommandError, "Command 'echo .* false' returned non-zero exit status 1 with output: foobar",
+        self.assertRaisesRegex(CommandError, "Command 'echo .* false' returned non-zero exit status 1 with output: foobar",
                                 runCmd, "echo foobar >&2; false", shell=True, assert_error=False)
 
     def test_output(self):

@@ -33,8 +33,12 @@ under 'Yocto Project Subprojects'). For more information on specific
 failures, see: https://wiki.yoctoproject.org/wiki/Patchtest. Thank
 you!"""
 
+def has_a_failed_test(raw_results):
+    return any(raw_result.split(':')[0] == "FAIL" for raw_result in raw_results.splitlines())
+
 parser = argparse.ArgumentParser(description="Send patchtest results to a submitter for a given patch")
 parser.add_argument("-p", "--patch", dest="patch", required=True, help="The patch file to summarize")
+parser.add_argument("-d", "--debug", dest="debug", required=False, action='store_true', help="Print raw email headers and content, but don't actually send it")
 args = parser.parse_args()
 
 if not os.path.exists(args.patch):
@@ -45,7 +49,6 @@ elif not os.path.exists(args.patch + ".testresult"):
     sys.exit(1)
 
 result_file = args.patch + ".testresult"
-result_basename = os.path.basename(args.patch)
 testresult = None
 
 with open(result_file, "r") as f:
@@ -62,7 +65,9 @@ subject_line = f"Patchtest results for {mbox_subject}"
 reply_address = mbox[0]['from']
 
 # extract the message ID and use that as the in-reply-to address
-in_reply_to = re.findall("<(.*)>", mbox[0]['Message-ID'])[0]
+# TODO: This will need to change again when patchtest can handle a whole
+# series at once
+in_reply_to = mbox[0]['Message-ID']
 
 # the address the results email is sent from
 from_address = "patchtest@automation.yoctoproject.org"
@@ -70,7 +75,7 @@ from_address = "patchtest@automation.yoctoproject.org"
 # mailing list to CC
 cc_address = "openembedded-core@lists.openembedded.org"
 
-if "FAIL" in testresult:
+if has_a_failed_test(testresult):
     reply_contents = None
     if len(max(open(result_file, 'r'), key=len)) > 220:
         warning = "Tests failed for the patch, but the results log could not be processed due to excessive result line length."
@@ -79,18 +84,27 @@ if "FAIL" in testresult:
         reply_contents = greeting + testresult + suggestions
 
     ses_client = boto3.client('ses', region_name='us-west-2')
+
+    # Construct the headers for the email. We only want to reply
+    # directly to the tested patch, so make In-Reply-To and References
+    # the same value.
     raw_data = 'From: ' + from_address + '\nTo: ' + reply_address + \
         '\nCC: ' + cc_address + '\nSubject:' + subject_line + \
         '\nIn-Reply-To:' + in_reply_to + \
+        '\nReferences:' + in_reply_to + \
         '\nMIME-Version: 1.0" + \
         "\nContent-type: Multipart/Mixed;boundary="NextPart"\n\n--NextPart\nContent-Type: text/plain\n\n' + \
         reply_contents + '\n\n--NextPart'
-    response = ses_client.send_raw_email(
-        Source="patchtest@automation.yoctoproject.org",
-        RawMessage={
-            "Data": raw_data,
-        },
-    )
+
+    if args.debug:
+        print(f"RawMessage: \n\n{raw_data}")
+    else:
+        response = ses_client.send_raw_email(
+            Source="patchtest@automation.yoctoproject.org",
+            RawMessage={
+                "Data": raw_data,
+            },
+        )
 
 else:
     print(f"No failures identified for {args.patch}.")

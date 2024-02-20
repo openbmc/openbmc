@@ -4,6 +4,7 @@ Date: Tue, 7 Nov 2023 10:43:32 +0000
 Subject: [PATCH] Migrate to pdm-backend
 
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+Upstream-Status: Pending
 ---
  pyproject.toml | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)

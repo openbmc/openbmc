@@ -10,9 +10,9 @@ inherit pypi setuptools3
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-ply \
-    ${PYTHON_PN}-pprint \
+    python3-netclient \
+    python3-ply \
+    python3-pprint \
     "
 
 RSUGGESTS:${PN}:class-target += "\

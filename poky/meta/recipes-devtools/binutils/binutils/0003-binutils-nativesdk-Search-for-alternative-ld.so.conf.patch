@@ -1,4 +1,4 @@
-From c00ead7264dc1335cb43222cb742b95614666be8 Mon Sep 17 00:00:00 2001
+From 1fe9aa3f25e09281cb018b29081db4cc44bdc01f Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 19 Feb 2020 09:51:16 -0800
 Subject: [PATCH] binutils-nativesdk: Search for alternative ld.so.conf in SDK
@@ -29,38 +29,38 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  5 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index c3adbb0ccad..ce0f7e7f85d 100644
+index f9ee05b1400..07801c2c3ac 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -42,7 +42,8 @@ ZLIBINC = @zlibinc@
  
- ELF_CLFAGS=-DELF_LIST_OPTIONS=@elf_list_options@ \
+ ELF_CFLAGS=-DELF_LIST_OPTIONS=@elf_list_options@ \
  	   -DELF_SHLIB_LIST_OPTIONS=@elf_shlib_list_options@ \
 -	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@
 +	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@ \
 +           -DSYSCONFDIR="\"$(sysconfdir)\""
  WARN_CFLAGS = @WARN_CFLAGS@
  NO_WERROR = @NO_WERROR@
- AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
+ AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CFLAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index d1a56026437..9d86aed12c6 100644
+index abb0565718f..6329a12a0d6 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
-@@ -566,7 +566,8 @@ ZLIB = @zlibdir@ -lz
+@@ -576,7 +576,8 @@ ZLIB = @zlibdir@ -lz
  ZLIBINC = @zlibinc@
- ELF_CLFAGS = -DELF_LIST_OPTIONS=@elf_list_options@ \
+ ELF_CFLAGS = -DELF_LIST_OPTIONS=@elf_list_options@ \
  	   -DELF_SHLIB_LIST_OPTIONS=@elf_shlib_list_options@ \
 -	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@
 +	   -DELF_PLT_UNWIND_LIST_OPTIONS=@elf_plt_unwind_list_options@ \
 +           -DSYSCONFDIR="\"$(sysconfdir)\""
  
- AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
+ AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CFLAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
  
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index f9a6819366f..1519f8ac4e5 100644
+index 2852851dcd5..187b359af86 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
-@@ -936,7 +936,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
+@@ -939,7 +939,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
  
        info.path = NULL;
        info.len = info.alloc = 0;
@@ -70,7 +70,7 @@ index f9a6819366f..1519f8ac4e5 100644
        if (!ldelf_parse_ld_so_conf (&info, tmppath))
  	{
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 06ac2c64fa8..5c38e8cd313 100644
+index e90c2021b33..01b306e58a1 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
 @@ -69,6 +69,7 @@ char *program_name;
@@ -82,7 +82,7 @@ index 06ac2c64fa8..5c38e8cd313 100644
  /* The canonical representation of ld_sysroot.  */
  char *ld_canon_sysroot;
 diff --git a/ld/ldmain.h b/ld/ldmain.h
-index dda124b96e8..ba06a7d7be2 100644
+index 0238aed0ebd..2dd00db13b3 100644
 --- a/ld/ldmain.h
 +++ b/ld/ldmain.h
 @@ -23,6 +23,7 @@

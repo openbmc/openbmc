@@ -12,7 +12,8 @@ require conf/machine/include/arm/arch-armv9a.inc
 AVAILTUNES                                         += "neoversen2 neoversen2-crypto"
 ARMPKGARCH:tune-neoversen2                          = "neoversen2"
 ARMPKGARCH:tune-neoversen2-crypto                   = "neoversen2-crypto"
-TUNE_FEATURES:tune-neoversen2                       = "${TUNE_FEATURES:tune-armv9a} neoversen2"
+# We do not want -march since -mcpu is added above to cover for it
+TUNE_FEATURES:tune-neoversen2                       = "aarch64 neoversen2"
 TUNE_FEATURES:tune-neoversen2-crypto                = "${TUNE_FEATURES:tune-neoversen2} crypto"
 PACKAGE_EXTRA_ARCHS:tune-neoversen2                 = "${PACKAGE_EXTRA_ARCHS:tune-armv9a} neoversen2"
 PACKAGE_EXTRA_ARCHS:tune-neoversen2-crypto          = "${PACKAGE_EXTRA_ARCHS:tune-armv9a-crypto} neoversen2 neoversen2-crypto"

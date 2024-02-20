@@ -1,0 +1,178 @@
+From 864054a6cb971688a181316b8227ae0361b4d69e Mon Sep 17 00:00:00 2001
+From: Andreas Schwab <schwab@suse.de>
+Date: Wed, 9 Oct 2019 17:46:47 +0200
+Subject: [PATCH] ldconfig: handle .dynstr located in separate segment (bug
+ 25087)
+
+To determine the load offset of the DT_STRTAB section search for the
+segment containing it, instead of using the load offset of the first
+segment.
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=58e8f5fd2ba47b6dc47fd4d0a35e4175c7c87aaa]
+
+Backported: ported to support endianness and 32/64 bits.
+Signed-off-by: Fabien Mahot <fabien.mahot@external.desouttertools.com>
+---
+ readelflib.c | 86 +++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 52 insertions(+), 34 deletions(-)
+
+diff --git a/readelflib.c b/readelflib.c
+index a01e1cede3..380aed563d 100644
+--- a/readelflib.c
++++ b/readelflib.c
+@@ -80,7 +80,6 @@ process_elf_file32 (const char *file_name, const char *lib, int *flag,
+ {
+   int i;
+   unsigned int j;
+-  Elf32_Addr loadaddr;
+   unsigned int dynamic_addr;
+   size_t dynamic_size;
+   char *program_interpreter;
+@@ -110,7 +109,6 @@ process_elf_file32 (const char *file_name, const char *lib, int *flag,
+      libc5/libc6.  */
+   *flag = FLAG_ELF;
+ 
+-  loadaddr = -1;
+   dynamic_addr = 0;
+   dynamic_size = 0;
+   program_interpreter = NULL;
+@@ -121,11 +119,6 @@ process_elf_file32 (const char *file_name, const char *lib, int *flag,
+ 
+       switch (read32(segment->p_type, be))
+ 	{
+-	case PT_LOAD:
+-	  if (loadaddr == (Elf32_Addr) -1)
+-	    loadaddr = read32(segment->p_vaddr, be) - read32(segment->p_offset, be);
+-	  break;
+-
+ 	case PT_DYNAMIC:
+ 	  if (dynamic_addr)
+ 	    error (0, 0, _("more than one dynamic segment\n"));
+@@ -188,11 +181,6 @@ process_elf_file32 (const char *file_name, const char *lib, int *flag,
+ 	}
+ 
+     }
+-  if (loadaddr == (Elf32_Addr) -1)
+-    {
+-      /* Very strange. */
+-      loadaddr = 0;
+-    }
+ 
+   /* Now we can read the dynamic sections.  */
+   if (dynamic_size == 0)
+@@ -208,11 +196,32 @@ process_elf_file32 (const char *file_name, const char *lib, int *flag,
+     {
+       check_ptr (dyn_entry);
+       if (read32(dyn_entry->d_tag, be) == DT_STRTAB)
+-	{
+-	  dynamic_strings = (char *) (file_contents + read32(dyn_entry->d_un.d_val, be) - loadaddr);
+-	  check_ptr (dynamic_strings);
+-	  break;
+-	}
++        {
++          /* Find the file offset of the segment containing the dynamic
++             string table.  */
++          Elf32_Off loadoff = -1;
++          for (i = 0, segment = elf_pheader;
++               i < read16(elf_header->e_phnum, be); i++, segment++)
++            {
++              if (read32(segment->p_type, be) == PT_LOAD
++                  && read32(dyn_entry->d_un.d_val, be) >= read32(segment->p_vaddr, be)
++                  && (read32(dyn_entry->d_un.d_val, be) - read32(segment->p_vaddr, be)
++                      < read32(segment->p_filesz, be)))
++                {
++                  loadoff = read32(segment->p_vaddr, be) - read32(segment->p_offset, be);
++                  break;
++                }
++            }
++          if (loadoff == (Elf32_Off) -1)
++            {
++              /* Very strange. */
++              loadoff = 0;
++            }
++
++          dynamic_strings = (char *) (file_contents + read32(dyn_entry->d_un.d_val, be) - loadoff);
++          check_ptr (dynamic_strings);
++          break;
++        }
+     }
+ 
+   if (dynamic_strings == NULL)
+@@ -269,7 +278,6 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+ {
+   int i;
+   unsigned int j;
+-  Elf64_Addr loadaddr;
+   Elf64_Addr dynamic_addr;
+   Elf64_Xword dynamic_size;
+   char *program_interpreter;
+@@ -347,7 +355,6 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+       break;
+     }
+ 
+-  loadaddr = -1;
+   dynamic_addr = 0;
+   dynamic_size = 0;
+   program_interpreter = NULL;
+@@ -358,11 +365,6 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+ 
+       switch (read32(segment->p_type, be))
+ 	{
+-	case PT_LOAD:
+-	  if (loadaddr == (Elf64_Addr) -1)
+-	    loadaddr = read64(segment->p_vaddr, be) - read64(segment->p_offset, be);
+-	  break;
+-
+ 	case PT_DYNAMIC:
+ 	  if (dynamic_addr)
+ 	    error (0, 0, _("more than one dynamic segment\n"));
+@@ -426,11 +428,6 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+ 	}
+ 
+     }
+-  if (loadaddr == (Elf64_Addr) -1)
+-    {
+-      /* Very strange. */
+-      loadaddr = 0;
+-    }
+ 
+   /* Now we can read the dynamic sections.  */
+   if (dynamic_size == 0)
+@@ -446,11 +443,32 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+     {
+       check_ptr (dyn_entry);
+       if (read64(dyn_entry->d_tag, be) == DT_STRTAB)
+-	{
+-	  dynamic_strings = (char *) (file_contents + read64(dyn_entry->d_un.d_val, be) - loadaddr);
+-	  check_ptr (dynamic_strings);
+-	  break;
+-	}
++        {
++          /* Find the file offset of the segment containing the dynamic
++             string table.  */
++          Elf64_Off loadoff = -1;
++          for (i = 0, segment = elf_pheader;
++               i < read16(elf_header->e_phnum, be); i++, segment++)
++            {
++              if (read64(segment->p_type, be) == PT_LOAD
++                  && read64(dyn_entry->d_un.d_val, be) >= read64(segment->p_vaddr, be)
++                  && (read64(dyn_entry->d_un.d_val, be) - read64(segment->p_vaddr, be)
++                      < read64(segment->p_filesz, be)))
++                {
++                  loadoff = read64(segment->p_vaddr, be) - read64(segment->p_offset, be);
++                  break;
++                }
++            }
++          if (loadoff == (Elf32_Off) -1)
++            {
++              /* Very strange. */
++              loadoff = 0;
++            }
++
++          dynamic_strings = (char *) (file_contents + read64(dyn_entry->d_un.d_val, be) - loadoff);
++          check_ptr (dynamic_strings);
++          break;
++        }
+     }
+ 
+   if (dynamic_strings == NULL)

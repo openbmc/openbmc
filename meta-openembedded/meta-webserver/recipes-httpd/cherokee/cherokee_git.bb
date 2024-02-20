@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = "unzip-native libpcre openssl mysql5 ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 
 SRCREV = "9a75e65b876bcc376cb6b379dca1f7ce4a055c59"
-PV = "1.2.104+git${SRCPV}"
+PV = "1.2.104+git"
 SRC_URI = "git://github.com/cherokee/webserver;branch=master;protocol=https \
            file://cherokee.init \
            file://cherokee.service \

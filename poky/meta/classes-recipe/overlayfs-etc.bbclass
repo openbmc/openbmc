@@ -41,6 +41,7 @@ OVERLAYFS_ETC_USE_ORIG_INIT_NAME ??= "1"
 OVERLAYFS_ETC_MOUNT_OPTIONS ??= "defaults"
 OVERLAYFS_ETC_INIT_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-etc-preinit.sh.in"
 OVERLAYFS_ETC_EXPOSE_LOWER ??= "0"
+OVERLAYFS_ETC_CREATE_MOUNT_DIRS ??= "1"
 
 python create_overlayfs_etc_preinit() {
     overlayEtcMountPoint = d.getVar("OVERLAYFS_ETC_MOUNT_POINT")
@@ -62,6 +63,7 @@ python create_overlayfs_etc_preinit() {
     initBaseName = oe.path.join(d.getVar("base_sbindir"), "init")
     origInitNameSuffix = ".orig"
     exposeLower = oe.types.boolean(d.getVar('OVERLAYFS_ETC_EXPOSE_LOWER'))
+    createMoundDirs = oe.types.boolean(d.getVar('OVERLAYFS_ETC_CREATE_MOUNT_DIRS'))
 
     args = {
         'OVERLAYFS_ETC_MOUNT_POINT': overlayEtcMountPoint,
@@ -69,7 +71,8 @@ python create_overlayfs_etc_preinit() {
         'OVERLAYFS_ETC_FSTYPE': overlayEtcFsType,
         'OVERLAYFS_ETC_DEVICE': overlayEtcDevice,
         'SBIN_INIT_NAME': initBaseName + origInitNameSuffix if useOrigInit else initBaseName,
-        'OVERLAYFS_ETC_EXPOSE_LOWER': "true" if exposeLower else "false"
+        'OVERLAYFS_ETC_EXPOSE_LOWER': "true" if exposeLower else "false",
+        'CREATE_MOUNT_DIRS': "true" if createMoundDirs else "false"
     }
 
     if useOrigInit:

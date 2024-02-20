@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://main.c;beginline=2;endline=24;md5=89db8e76f2951f3fad1
 SRC_URI = "git://github.com/bsdphk/Ntimed;branch=master;protocol=https \
            file://use-ldflags.patch"
 
-PV = "0.0+git${SRCPV}"
+PV = "0.0+git"
 SRCREV = "db0abbb4c80f2ecef6bc5d9639bca5bea28532a2"
 
 S = "${WORKDIR}/git"

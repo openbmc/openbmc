@@ -8,8 +8,8 @@ SRC_URI = " \
     git://github.com/raspberrypi/rpi-eeprom.git;protocol=https;branch=master \
 "
 
-SRCREV = "f13b5789f56f65112e2b8aa58be43ebfcbedfe1d"
-PV = "v2023.10.18-2712"
+SRCREV = "759460850c2cb69e19567947a42fbed996e7bf61"
+PV = "v.2024.01.05-2712"
 
 S = "${WORKDIR}/git"
 

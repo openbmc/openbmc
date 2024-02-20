@@ -5,7 +5,7 @@ HOMEPAGE = "https://gitlab.com/wsakernel/picocom"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3000e4830620e310fe65c0eb69df9e8a"
 
 BASEPV = "2023-04"
-PV = "${BASEPV}+git${SRCPV}"
+PV = "${BASEPV}+git"
 
 SRCREV = "12537df0314767d5af35bddddbbca3694e6a0342"
 

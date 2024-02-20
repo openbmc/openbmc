@@ -44,7 +44,7 @@ CVE_STATUS_PHP = " \
     CVE-2007-4596 \
 "
 
-inherit autotools pkgconfig python3native gettext multilib_header multilib_script
+inherit autotools pkgconfig python3native gettext multilib_header multilib_script systemd
 
 # phpize is not scanned for absolute paths by default (but php-config is).
 #
@@ -193,11 +193,11 @@ do_install:append:class-target() {
     install -m 0644 ${WORKDIR}/php-fpm-apache.conf ${D}/${sysconfdir}/apache2/conf.d/php-fpm.conf
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
-        install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/php-fpm.service ${D}${systemd_unitdir}/system/
-        sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' \
-            -e 's,@LOCALSTATEDIR@,${localstatedir},g' \
-            ${D}${systemd_unitdir}/system/php-fpm.service
+        install -d ${D}${systemd_system_unitdir}
+        install -m 0644 ${WORKDIR}/php-fpm.service ${D}${systemd_system_unitdir}/php-fpm.service
+        sed -i -e 's,@LOCALSTATEDIR@,${localstatedir},g' ${D}${systemd_system_unitdir}/php-fpm.service
+        sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_system_unitdir}/php-fpm.service
+        sed -i -e 's,@BINDIR@,${bindir},g' ${D}${systemd_system_unitdir}/php-fpm.service
     fi
 
     if ${@bb.utils.contains('PACKAGECONFIG', 'apache2', 'true', 'false', d)}; then
@@ -259,7 +259,7 @@ FILES:${PN}-cli = "${bindir}/php"
 FILES:${PN}-phpdbg = "${bindir}/phpdbg"
 FILES:${PN}-phar = "${bindir}/phar*"
 FILES:${PN}-cgi = "${bindir}/php-cgi"
-FILES:${PN}-fpm = "${sbindir}/php-fpm ${sysconfdir}/php-fpm.conf ${datadir}/fpm ${sysconfdir}/init.d/php-fpm ${systemd_unitdir}/system/php-fpm.service ${sysconfdir}/php-fpm.d/www.conf.default"
+FILES:${PN}-fpm = "${sbindir}/php-fpm ${sysconfdir}/php-fpm.conf ${datadir}/fpm ${sysconfdir}/init.d/php-fpm ${sysconfdir}/php-fpm.d/www.conf.default"
 FILES:${PN}-fpm-apache2 = "${sysconfdir}/apache2/conf.d/php-fpm.conf"
 CONFFILES:${PN}-fpm = "${sysconfdir}/php-fpm.conf"
 CONFFILES:${PN}-fpm-apache2 = "${sysconfdir}/apache2/conf.d/php-fpm.conf"
@@ -289,6 +289,9 @@ MODPHP_OLDPACKAGE = "${@bb.utils.contains('PACKAGECONFIG', 'apache2', 'modphp', 
 RPROVIDES:${PN}-modphp = "${MODPHP_OLDPACKAGE}"
 RREPLACES:${PN}-modphp = "${MODPHP_OLDPACKAGE}"
 RCONFLICTS:${PN}-modphp = "${MODPHP_OLDPACKAGE}"
+
+SYSTEMD_SERVICE:${PN}-fpm = "php-fpm.service"
+SYSTEMD_PACKAGES += "${PN}-fpm"
 
 do_install:append:class-native() {
     create_wrapper ${D}${bindir}/php \

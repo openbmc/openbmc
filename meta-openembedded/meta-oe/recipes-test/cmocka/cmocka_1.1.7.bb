@@ -7,7 +7,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRCREV = "a01cc69ee9536f90e57c61a198f2d1944d3d4313"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 SRC_URI = "git://git.cryptomilk.org/projects/cmocka.git;protocol=https;branch=stable-1.1 \
            file://0001-include-Check-for-previous-declaration-of-uintptr_t.patch \
            file://run-ptest \
@@ -22,15 +22,15 @@ EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-DCMAKE_BUILD_TYPE
 LTO = ""
 
 do_install:append () {
-    install -d ${D}${datadir}/${BPN}/example
-    install -d ${D}${datadir}/${BPN}/example/mock/chef_wrap
-    install -d ${D}${datadir}/${BPN}/example/mock/uptime
+    install -d ${D}${libdir}/${BPN}/example
+    install -d ${D}${libdir}/${BPN}/example/mock/chef_wrap
+    install -d ${D}${libdir}/${BPN}/example/mock/uptime
 
-    install -m 0755 ${B}/example/*_test ${D}/${datadir}/${BPN}/example
-    install -m 0755 ${B}/example/mock/chef_wrap/waiter_test_wrap ${D}/${datadir}/${BPN}/example/mock/chef_wrap
-    install -m 0755 ${B}/example/mock/uptime/uptime ${D}/${datadir}/${BPN}/example/mock/uptime
-    install -m 0755 ${B}/example/mock/uptime/test_uptime ${D}/${datadir}/${BPN}/example/mock/uptime
-    install -m 0644 ${B}/example/mock/uptime/libproc_uptime.so ${D}/${datadir}/${BPN}/example/mock/libproc_uptime.so
+    install -m 0755 ${B}/example/*_test ${D}/${libdir}/${BPN}/example
+    install -m 0755 ${B}/example/mock/chef_wrap/waiter_test_wrap ${D}/${libdir}/${BPN}/example/mock/chef_wrap
+    install -m 0755 ${B}/example/mock/uptime/uptime ${D}/${libdir}/${BPN}/example/mock/uptime
+    install -m 0755 ${B}/example/mock/uptime/test_uptime ${D}/${libdir}/${BPN}/example/mock/uptime
+    install -m 0644 ${B}/example/mock/uptime/libproc_uptime.so ${D}/${libdir}/${BPN}/example/mock/libproc_uptime.so
 }
 
 do_install_ptest () {
@@ -40,5 +40,4 @@ do_install_ptest () {
 
 PACKAGE_BEFORE_PN += "${PN}-examples"
 
-FILES:${PN}-examples = "${datadir}/${BPN}/example"
-INSANE_SKIP:${PN}-examples = "libdir"
+FILES:${PN}-examples = "${libdir}/${BPN}/example"

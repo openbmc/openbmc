@@ -16,8 +16,9 @@ export HOST_SYS
 inherit pypi ptest python_flit_core
 
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-unixadmin \
+    python3-pytest \
+    python3-unittest-automake-output \
+    python3-unixadmin \
 "
 
 do_install_ptest() {

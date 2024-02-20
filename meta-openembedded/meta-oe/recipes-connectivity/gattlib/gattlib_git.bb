@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=6;md5=a87ee154f005
 DEPENDS = "bluez5 glib-2.0"
 DEPENDS += "glib-2.0-native"
 
-PV = "0.2+git${SRCPV}"
+PV = "0.2+git"
 
 SRC_URI = "git://github.com/labapart/gattlib.git;branch=master;protocol=https \
            file://dbus-avoid-strange-chars-from-the-build-dir.patch \

@@ -21,7 +21,7 @@ BBCLASSEXTEND = "${@' '.join(['mcextend:'+x for x in d.getVar('PTESTS').split()]
 IMAGE_OVERHEAD_FACTOR = "1.0"
 IMAGE_ROOTFS_EXTRA_SPACE = "324288"
 IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-mdadm = "1524288"
-IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-strace = "1024288"
+IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-strace = "1524288"
 IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-lttng-tools = "1524288"
 
 # tar-ptest in particular needs more space
@@ -31,7 +31,7 @@ IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-tar = "1524288"
 QB_MEM = "-m 1024"
 QB_MEM:virtclass-mcextend-lttng-tools = "-m 4096"
 QB_MEM:virtclass-mcextend-python3 = "-m 2048"
-QB_MEM:virtclass-mcextend-python3-cryptography = "-m 4096"
+QB_MEM:virtclass-mcextend-python3-cryptography = "-m 5100"
 
 TEST_SUITES = "ping ssh parselogs ptest"
 
@@ -42,4 +42,3 @@ python () {
     if not d.getVar("MCNAME"):
         raise bb.parse.SkipRecipe("No class extension set")
 }
-

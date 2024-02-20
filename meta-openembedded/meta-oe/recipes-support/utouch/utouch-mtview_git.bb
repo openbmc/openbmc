@@ -14,6 +14,6 @@ SRCREV = "ad437c38dc111cf3990a03abf14efe1b5d89604b"
 
 DEPENDS += "mtdev utouch-frame utouch-evemu libx11"
 
-PV = "1.1.7+git${SRCPV}"
+PV = "1.1.7+git"
 
 S = "${WORKDIR}/git"

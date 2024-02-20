@@ -34,12 +34,12 @@ return value: 1
 
 See: https://bugzilla.yoctoproject.org/show_bug.cgi?id=15178
 
+Upstream-Status: Denied [https://github.com/openssh/openssh-portable/pull/437]
+
 Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
 ---
  regress/banner.sh | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
-
-Upstream-Status: Denied [https://github.com/openssh/openssh-portable/pull/437]
 
 diff --git a/regress/banner.sh b/regress/banner.sh
 index a84feb5a..de84957a 100644

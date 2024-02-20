@@ -18,3 +18,5 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-cffi \
     ${PYTHON_PN}-idna \
 "
+
+BBCLASSEXTEND = "native nativesdk"

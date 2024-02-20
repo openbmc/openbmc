@@ -7,7 +7,7 @@ SRC_URI = "git://gitlab.freedesktop.org/mesa/parallel-deqp-runner.git;protocol=h
            "
 
 # Modify these as desired
-PV = "2020.06.15+git${SRCPV}"
+PV = "2020.06.15+git"
 SRCREV = "e1642fb691d29b1462504b58916f7f514a963e80"
 
 S = "${WORKDIR}/git"

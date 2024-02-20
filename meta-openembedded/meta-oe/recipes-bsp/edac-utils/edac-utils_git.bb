@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 DEPENDS = " sysfsutils"
 
 SRCREV = "1c57818ecee186aa47af0342149577df5302c022"
-PV = "0.18+git${SRCPV}"
+PV = "0.18+git"
 
 S = "${WORKDIR}/git"
 

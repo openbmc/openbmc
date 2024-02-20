@@ -8,7 +8,7 @@ SRC_URI = "git://github.com/any1/aml;branch=master;protocol=https"
 
 SRCREV = "b83f3576ce4187d9285f06e9066ef43a691464d4"
 
-PV = "0.3.0+git${SRCPV}"
+PV = "0.3.0+git"
 
 S = "${WORKDIR}/git"
 

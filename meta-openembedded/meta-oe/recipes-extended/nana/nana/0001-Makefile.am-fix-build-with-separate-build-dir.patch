@@ -1,0 +1,27 @@
+From 22485e13c6e32e63ff522cd367bf63ab0a8848b1 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Wed, 7 Feb 2024 15:42:30 +0000
+Subject: [PATCH] Makefile.am: fix build with separate build dir
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+Upstream-Status: Pending
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 54ceda6..9e9ffe4 100755
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -33,7 +33,7 @@ PROJECTS: 	doc/nana.info
+ #
+ 
+ showconfig:
+-	$(CPP) $(CPPFLAGS) -I$(top_srcdir)/src $(DEFS) $(top_srcdir)/showconfig.c | grep "==>" 
++	$(CPP) $(CPPFLAGS) -I$(top_builddir)/src -I$(top_srcdir)/src $(DEFS) $(top_srcdir)/showconfig.c | grep "==>"
+ 
+ #
+ # various targets for the maintainer to build patches, releases, etc.
+-- 
+2.43.0
+

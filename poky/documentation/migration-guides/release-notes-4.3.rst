@@ -94,7 +94,7 @@ New Features / Enhancements in 4.3
       API to access the kernel tracefs directory (from meta-openembedded)
 
    -  `libxmlb <https://github.com/hughsie/libxmlb>`__: A library to help create
-       and query binary XML blobs (from meta-oe)
+      and query binary XML blobs (from meta-oe)
 
    -  ``musl-legacy-error``: glibc ``error()`` API implementation still needed
       by a few packages.

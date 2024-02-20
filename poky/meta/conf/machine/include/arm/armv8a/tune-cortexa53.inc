@@ -9,7 +9,8 @@ require conf/machine/include/arm/arch-armv8a.inc
 AVAILTUNES += "cortexa53 cortexa53-crypto"
 ARMPKGARCH:tune-cortexa53             = "cortexa53"
 ARMPKGARCH:tune-cortexa53-crypto      = "cortexa53-crypto"
-TUNE_FEATURES:tune-cortexa53          = "${TUNE_FEATURES:tune-armv8a-crc} cortexa53"
+# We do not want -march since -mcpu is added above to cover for it
+TUNE_FEATURES:tune-cortexa53          = "aarch64 crc cortexa53"
 TUNE_FEATURES:tune-cortexa53-crypto   = "${TUNE_FEATURES:tune-cortexa53} crypto"
 PACKAGE_EXTRA_ARCHS:tune-cortexa53             = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc} cortexa53"
 PACKAGE_EXTRA_ARCHS:tune-cortexa53-crypto      = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc-crypto} cortexa53 cortexa53-crypto"

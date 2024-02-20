@@ -1,4 +1,4 @@
-From 738f530829fb5ee37d74191d34f75d72921284ca Mon Sep 17 00:00:00 2001
+From bbc1ea3e4119c665723cfd1c5a364bc8c7cbb464 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Thu, 4 May 2023 18:07:16 +0000
 Subject: [PATCH] utils/version.py: use /usr/bin/env in shebang
@@ -31,7 +31,7 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/utils/version.py b/utils/version.py
-index fc2d431..1400eed 100755
+index 48d7e05..4a5e35c 100755
 --- a/utils/version.py
 +++ b/utils/version.py
 @@ -1,4 +1,4 @@
@@ -39,4 +39,4 @@ index fc2d431..1400eed 100755
 +#!/usr/bin/env python3
  
  # Copyright (C) 2021, Raspberry Pi (Trading) Limited
- # Generate version information for libcamera-apps
+ # Generate version information for rpicam-apps
