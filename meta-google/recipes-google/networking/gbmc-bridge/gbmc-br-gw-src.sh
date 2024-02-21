@@ -94,10 +94,10 @@ gbmc_br_gw_src_hook() {
       return 1
     fi
     # Ignore ULAs and non-gBMC addresses
-    if (( ip_bytes[0] & 0xfe == 0xfc || ip_bytes[8] != 0xfd )); then
+    if (( (ip_bytes[0] & 0xfe) == 0xfc || ip_bytes[8] != 0xfd )); then
       return 0
     fi
-    if (( ip_bytes[9] & 0x0f != 0 )); then
+    if (( (ip_bytes[9] & 0x0f) != 0 )); then
       local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateful
     else
       local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateless
