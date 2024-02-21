@@ -43,8 +43,6 @@ MACHINEOVERRIDES .= ":npcm8xx"
 
 require conf/machine/include/arm/armv8a/tune-cortexa35.inc
 
-UBOOT_MKIMAGE:append:npcm8xx = " -E -B 8"
-
 COMPATIBLE_MACHINE:npcm8xx = "npcm8xx"
 TFA_PLATFORM = "npcm845x"
 
