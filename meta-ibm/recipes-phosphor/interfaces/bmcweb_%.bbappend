@@ -3,7 +3,6 @@ EXTRA_OEMESON:append = " \
     -Dibm-management-console=enabled \
     -Dredfish-dump-log=enabled \
     -Dredfish-oem-manager-fan-data=disabled \
-    -Dbmcweb-logging=error \
     -Dredfish-bmc-journal=disabled \
 "
 
