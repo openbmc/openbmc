@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 inherit obmc-phosphor-systemd
 
-OBMC_CONSOLE_HOST_TTY = "ttyS5"
+OBMC_CONSOLE_TTYS:fb-nohost:append = " ttyS5"
 
 SRC_URI:append = " \
     file://80-minerva-obmc-console-uart.rules \
