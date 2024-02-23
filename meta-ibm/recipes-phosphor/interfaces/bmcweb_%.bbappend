@@ -8,16 +8,16 @@ EXTRA_OEMESON:append = " \
 "
 
 EXTRA_OEMESON:append:p10bmc = " \
-    -Dmutual-tls-auth=disabled \
     -Dkvm=disabled \
     -Dvm-websocket=disabled \
 "
+PACKAGECONFIG:remove:p10bmc = "mutual-tls-auth"
 
 EXTRA_OEMESON:append:witherspoon-tacoma = " \
-    -Dmutual-tls-auth=disabled \
     -Dkvm=disabled \
     -Dvm-websocket=disabled \
 "
+PACKAGECONFIG:remove:witherspoon-tacoma = "mutual-tls-auth"
 
 EXTRA_OEMESON:append:system1 = " \
      -Dhttp-body-limit=400 \

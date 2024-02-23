@@ -28,8 +28,9 @@ inherit systemd
 inherit useradd
 inherit pkgconfig meson ptest
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "mutual-tls-auth"
 PACKAGECONFIG[insecure-redfish-expand]="-Dinsecure-enable-redfish-query=enabled"
+PACKAGECONFIG[mutual-tls-auth]="-Dmutual-tls-auth=enabled,-Dmutual-tls-auth=disabled"
 
 EXTRA_OEMESON = " \
     --buildtype=minsize \
