@@ -4,13 +4,13 @@
     "Window_size": 120,
     "Threshold":
     {
-        "Critical":
+        "Critical_Upper":
         {
             "Value": "CPU_CRIT_VAL",
             "Log": true,
             "Target": ""
         },
-        "Warning":
+        "Warning_Upper":
         {
             "Value": "CPU_WARN_VAL",
             "Log": true,
@@ -23,13 +23,13 @@
     "Window_size": 120,
     "Threshold":
     {
-        "Critical":
+        "Critical_Upper":
         {
             "Value": "MEM_CRIT_VAL",
             "Log": true,
             "Target": "MEM_CRIT_TGT"
         },
-        "Warning":
+        "Warning_Upper":
         {
             "Value": "MEM_WARN_VAL",
             "Log": true,
@@ -43,13 +43,13 @@
     "Window_size": 120,
     "Threshold":
     {
-        "Critical":
+        "Critical_Lower":
         {
             "Value": "STORAGE_CRIT_VAL",
             "Log": true,
             "Target": "STORAGE_CRIT_TGT"
         },
-        "Warning":
+        "Warning_Lower":
         {
             "Value": "STORAGE_WARN_VAL",
             "Log": true,
