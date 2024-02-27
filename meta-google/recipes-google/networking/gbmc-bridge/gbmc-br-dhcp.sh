@@ -45,7 +45,7 @@ if [ "$1" = bound ]; then
   pfx_bytes=()
   ip_to_bytes pfx_bytes "$ipv6"
   # Ensure we are a BMC and have a suffix nibble, the 0th index is reserved
-  if (( pfx_bytes[8] != 0xfd || pfx_bytes[9] & 0xf == 0 )); then
+  if (( pfx_bytes[8] != 0xfd || (pfx_bytes[9] & 0xf) == 0 )); then
     echo "Invalid address" >&2
     exit 1
   fi

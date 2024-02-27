@@ -116,11 +116,11 @@ gbmc_ncsi_br_deprecated_ips_hook() {
     local pfx_bytes=()
     ip_to_bytes pfx_bytes "$ip" || return
     # No ULA Addresses
-    if (( pfx_bytes[0] & 0xfe == 0xfc )); then
+    if (( (pfx_bytes[0] & 0xfe) == 0xfc )); then
       return
     fi
     # We only want to allow a <pfx>::fd0x address, where x>0
-    if (( pfx_bytes[8] != 0xfd || pfx_bytes[9] & 0xf == 0 )); then
+    if (( pfx_bytes[8] != 0xfd || (pfx_bytes[9] & 0xf) == 0 )); then
       return
     fi
     for (( i = 10; i < 16; ++i )); do

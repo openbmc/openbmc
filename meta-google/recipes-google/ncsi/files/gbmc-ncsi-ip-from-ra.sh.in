@@ -69,7 +69,7 @@ while true; do
       t_pfx="${BASH_REMATCH[1]}"
       t_pfx_len="${BASH_REMATCH[2]}"
       ip_to_bytes t_pfx_b "$t_pfx" || continue
-      (( t_pfx_len == 76 && t_pfx_b[8] & 0xfd == 0xfd )) || continue
+      (( t_pfx_len == 76 && (t_pfx_b[8] & 0xfd) == 0xfd )) || continue
       (( t_pfx_b[9] |= 1 ))
       hextet="fd$(printf '%02x' "${t_pfx_b[9]}")"
       pfx="$(ip_bytes_to_str t_pfx_b)"
