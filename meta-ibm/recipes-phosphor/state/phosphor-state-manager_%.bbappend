@@ -1,6 +1,9 @@
 # Witherspoon system does not support warm reboots
 PACKAGECONFIG:append:witherspoon = " no-warm-reboot"
 
+# p10bmc system do not support forced warm reboots
+PACKAGECONFIG:append:p10bmc = " no-force-warm-reboot"
+
 # IBM systems only want power restore when AC loss occurred
 PACKAGECONFIG:append = " only-run-apr-on-power-loss"
 
