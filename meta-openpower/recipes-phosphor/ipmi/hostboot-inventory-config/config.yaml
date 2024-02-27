@@ -114,7 +114,6 @@ MEMBUFF:
       PrettyName:
         IPMIFruSection: Board
         IPMIFruProperty: "Name"
-    xyz.openbmc_project.Inventory.Item.MemoryBuffer:
 
 TPM:
   EntityID: 176
