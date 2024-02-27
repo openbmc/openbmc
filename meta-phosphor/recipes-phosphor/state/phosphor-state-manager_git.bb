@@ -42,6 +42,9 @@ PACKAGECONFIG ??= "no-warm-reboot \
 # Disable warm reboots of host
 PACKAGECONFIG[no-warm-reboot] = "-Dwarm-reboot=disabled,-Dwarm-reboot=enabled"
 
+# Disable forced warm reboots of host
+PACKAGECONFIG[no-force-warm-reboot] = "-Dforce-warm-reboot=disabled,-Dforce-warm-reboot=enabled"
+
 # Only run auto power restore logic if system had ac loss
 PACKAGECONFIG[only-run-apr-on-power-loss] = "-Donly-run-apr-on-power-loss=true,-Donly-run-apr-on-power-loss=false"
 
