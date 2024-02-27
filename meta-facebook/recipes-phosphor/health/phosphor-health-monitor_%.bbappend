@@ -7,9 +7,9 @@ CPU_CRIT_TGT ?= "reboot.target"
 CPU_WARN_VAL ?= "80.0"
 CPU_WARN_TGT ?= ""
 
-MEM_CRIT_VAL ?= "85.0"
+MEM_CRIT_VAL ?= "10.0"
 MEM_CRIT_TGT ?= "reboot.target"
-MEM_WARN_VAL ?= "70.0"
+MEM_WARN_VAL ?= "15.0"
 MEM_WARN_TGT ?= ""
 
 STORAGE_CRIT_VAL ?= "5.0"
