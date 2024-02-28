@@ -8,6 +8,6 @@ fi
 mkdir /run/lock
 
 # Check uboot keys for 'factory-reset'
-if /sbin/fw_printenv openbmcinit openbmconce | grep -q factory-reset ; then
+if /sbin/fw_printenv openbmcinit openbmconce | grep -w -q factory-reset ; then
     echo "factory-reset" >> /run/format-persist
 fi
