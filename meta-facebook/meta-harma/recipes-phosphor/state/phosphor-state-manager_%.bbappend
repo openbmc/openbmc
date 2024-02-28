@@ -1,7 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG:remove = "no-warm-reboot only-run-apr-on-power-loss"
-
+PACKAGECONFIG:remove = "only-run-apr-on-power-loss"
 
 CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \

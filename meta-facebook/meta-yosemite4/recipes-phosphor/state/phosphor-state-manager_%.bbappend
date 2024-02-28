@@ -4,6 +4,7 @@ EXTRA_OEMESON:append = " \
                          -Dwarm-reboot=enabled \
                        "
 
+PACKAGECONFIG:append = "no-warm-reboot"
 PACKAGECONFIG:remove = "only-run-apr-on-power-loss"
 
 HOST_DEFAULT_TARGETS:remove = " \

@@ -35,8 +35,8 @@ SYSTEMD_PACKAGES = "${PN}-discover \
                     ${PN}-systemd-target-monitor \
 "
 
-PACKAGECONFIG ??= "no-warm-reboot \
-                   only-run-apr-on-power-loss \
+# Set the common defaults
+PACKAGECONFIG ??= "only-run-apr-on-power-loss \
                    only-allow-boot-when-bmc-ready"
 
 # Disable warm reboots of host
