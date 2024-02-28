@@ -1,6 +1,6 @@
 [Unit]
 Description=eMMC initialize check
-Before=mnt-data.mount
+Before=mnt-emmc.mount
 Requires=dev-mmcblk0.device
 After=dev-mmcblk0.device
 
