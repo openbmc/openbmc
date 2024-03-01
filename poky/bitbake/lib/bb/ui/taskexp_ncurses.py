@@ -12,7 +12,7 @@
 
 #
 # Execution example:
-#   $ bitbake -g -u taskexp_ncurses.py acl zlib
+#   $ bitbake -g -u taskexp_ncurses zlib acl
 #
 # Self-test example (executes a script of GUI actions):
 #   $ TASK_EXP_UNIT_TEST=1 bitbake -g -u taskexp_ncurses zlib acl

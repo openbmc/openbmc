@@ -170,7 +170,7 @@ You can use the ``oe-pkgdata-util`` command-line utility to query
 various package-related information. When you use the utility, you must
 use it to view information on packages that have already been built.
 
-Following are a few of the available ``oe-pkgdata-util`` subcommands.
+Here are a few of the available ``oe-pkgdata-util`` subcommands.
 
 .. note::
 
@@ -608,7 +608,7 @@ logs, keep in mind the goal is to have informative logs while keeping
 the console as "silent" as possible. Also, if you want status messages
 in the log, use the "debug" loglevel.
 
-Following is an example written in Python. The code handles logging for
+Here is an example written in Python. The code handles logging for
 a function that determines the number of tasks needed to be run. See the
 ":ref:`ref-tasks-listtasks`"
 section for additional information::
@@ -636,7 +636,7 @@ logs, you have the same goals --- informative with minimal console output.
 The syntax you use for recipes written in Bash is similar to that of
 recipes written in Python described in the previous section.
 
-Following is an example written in Bash. The code logs the progress of
+Here is an example written in Bash. The code logs the progress of
 the ``do_my_function`` function::
 
    do_my_function() {
@@ -1236,7 +1236,7 @@ Here are some other tips that you might find useful:
                "$@"
       }
 
-   Following are some usage examples::
+   Here are some usage examples::
 
       $ g FOO # Search recursively for "FOO"
       $ g -i foo # Search recursively for "foo", ignoring case

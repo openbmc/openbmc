@@ -14,7 +14,7 @@
 # partition. This is useful to overwrite old content like
 # filesystem signatures which may be re-recognized otherwise.
 # This feature can be enabled with
-# '--soucreparams="[fill|size=<N>[S|s|K|k|M|G]][,][bs=<N>[S|s|K|k|M|G]]"'
+# '--sourceparams="[fill|size=<N>[S|s|K|k|M|G]][,][bs=<N>[S|s|K|k|M|G]]"'
 # Conflicting or missing options throw errors.
 
 import logging

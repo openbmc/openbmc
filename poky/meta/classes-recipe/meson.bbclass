@@ -64,13 +64,10 @@ addtask write_config before do_configure
 do_write_config[vardeps] += "CC CXX AR NM STRIP READELF OBJCOPY CFLAGS CXXFLAGS LDFLAGS RUSTC RUSTFLAGS EXEWRAPPER_ENABLED"
 do_write_config() {
     # This needs to be Py to split the args into single-element lists
-    # The generated compile_commands.json file can be used by external IDEs
-    # which do not know the $PATH set-up by bitbake. They need the absolute
-    # compiler paths.
     cat >${WORKDIR}/meson.cross <<EOF
 [binaries]
-c = ${@meson_array_abspath('CC', d)}
-cpp = ${@meson_array_abspath('CXX', d)}
+c = ${@meson_array('CC', d)}
+cpp = ${@meson_array('CXX', d)}
 cython = 'cython3'
 ar = ${@meson_array('AR', d)}
 nm = ${@meson_array('NM', d)}

@@ -12,7 +12,7 @@ S = "${WORKDIR}/git"
 inherit setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-parse-type \
-    ${PYTHON_PN}-setuptools \
-    ${PYTHON_PN}-six \
+    python3-parse-type \
+    python3-setuptools \
+    python3-six \
     "

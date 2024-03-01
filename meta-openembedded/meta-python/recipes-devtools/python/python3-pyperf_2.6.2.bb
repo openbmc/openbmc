@@ -15,9 +15,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=78bc2e6e87c8c61272937b879e6dc2f8"
 
 SRC_URI[sha256sum] = "64d8fadce6a74f478f29832c1eaa2a04856655ebff17292d5237fc8317c3a3c5"
 
-DEPENDS += "${PYTHON_PN}-six-native"
+DEPENDS += "python3-six-native"
 
 PYPI_PACKAGE = "pyperf"
 inherit pypi python_setuptools_build_meta
 
-RDEPENDS:${PN} += "${PYTHON_PN}-misc ${PYTHON_PN}-statistics"
+RDEPENDS:${PN} += "python3-misc python3-statistics"

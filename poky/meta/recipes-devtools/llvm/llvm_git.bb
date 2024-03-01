@@ -24,7 +24,7 @@ MAJOR_VERSION = "${@oe.utils.trim_version("${PV}", 1)}"
 LLVM_RELEASE = "${PV}"
 
 BRANCH = "release/${MAJOR_VERSION}.x"
-SRCREV = "0d656f0f12d447ac0e197618a0d25495d66388d1"
+SRCREV = "461274b81d8641eab64d494accddc81d7db8a09e"
 SRC_URI = "git://github.com/llvm/llvm-project.git;branch=${BRANCH};protocol=https \
            file://0007-llvm-allow-env-override-of-exe-path.patch;striplevel=2 \
            file://0001-AsmMatcherEmitter-sort-ClassInfo-lists-by-name-as-we.patch;striplevel=2 \
@@ -148,6 +148,7 @@ FILES:${PN}-bugpointpasses = "\
 
 FILES:${PN}-libllvm = "\
     ${libdir}/libLLVM-${MAJOR_VERSION}.so \
+    ${libdir}/libLLVM.so.${MAJOR_VER}.${MINOR_VER} \
 "
 
 FILES:${PN}-liblto += "\

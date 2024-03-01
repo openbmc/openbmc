@@ -23,14 +23,6 @@ class TestSDKBase(object):
         return configuration
 
     @staticmethod
-    def get_sdk_json_result_dir(d):
-        json_result_dir = os.path.join(d.getVar("LOG_DIR"), 'oeqa')
-        custom_json_result_dir = d.getVar("OEQA_JSON_RESULT_DIR")
-        if custom_json_result_dir:
-            json_result_dir = custom_json_result_dir
-        return json_result_dir
-
-    @staticmethod
     def get_sdk_result_id(configuration):
         return '%s_%s_%s_%s_%s' % (configuration['TEST_TYPE'], configuration['IMAGE_BASENAME'], configuration['SDKMACHINE'], configuration['MACHINE'], configuration['STARTTIME'])
 
@@ -72,6 +64,7 @@ class TestSDK(TestSDKBase):
 
         from bb.utils import export_proxies
         from oeqa.utils import make_logger_bitbake_compatible
+        from oeqa.utils import get_json_result_dir
 
         pn = d.getVar("PN")
         logger = make_logger_bitbake_compatible(logging.getLogger("BitBake"))
@@ -134,7 +127,7 @@ class TestSDK(TestSDKBase):
             component = "%s %s" % (pn, self.context_executor_class.name)
             context_msg = "%s:%s" % (os.path.basename(tcname), os.path.basename(sdk_env))
             configuration = self.get_sdk_configuration(d, self.test_type)
-            result.logDetails(self.get_sdk_json_result_dir(d),
+            result.logDetails(get_json_result_dir(d),
                             configuration,
                             self.get_sdk_result_id(configuration))
             result.logSummary(component, context_msg)

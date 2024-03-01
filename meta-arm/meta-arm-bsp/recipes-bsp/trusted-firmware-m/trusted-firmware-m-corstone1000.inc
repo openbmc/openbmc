@@ -19,6 +19,8 @@ SRC_URI += "git://github.com/OpenAMP/libmetal.git;protocol=https;branch=main;nam
            "
 SRCREV_libmetal = "28fa2351d6a8121ce6c1c2ac5ee43ce08d38dbae"
 EXTRA_OECMAKE += "-DLIBMETAL_SRC_PATH=${S}/../libmetal -DLIBMETAL_BIN_PATH=${B}/libmetal-build"
+# The configuration can fail if libmetal tries to generate the docs and the doxygen bin is found
+EXTRA_OECMAKE += "-DWITH_DOC=False"
 
 # OpenAMP v2023.04.0
 LICENSE += "& BSD-2-Clause & BSD-3-Clause"

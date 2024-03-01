@@ -27,10 +27,8 @@ EXTRASITECONFIG = "CFLAGS='${CFLAGS} -I${SYSROOT_DESTDIR}${includedir}'"
 # TODO: remove this variable when widec is supported in every setup?
 ENABLE_WIDEC ?= "true"
 
-# _GNU_SOURCE is required for widec stuff and is detected automatically
-# for target objects.  But it must be set manually for native and sdk
-# builds.
-BUILD_CPPFLAGS += "-D_GNU_SOURCE"
+# _GNU_SOURCE is required for widec stuff and is not detected automatically
+CPPFLAGS += "-D_GNU_SOURCE"
 
 # natives don't generally look in base_libdir
 base_libdir:class-native = "${libdir}"

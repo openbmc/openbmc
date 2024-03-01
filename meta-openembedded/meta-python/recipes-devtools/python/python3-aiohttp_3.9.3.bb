@@ -10,11 +10,11 @@ PYPI_PACKAGE = "aiohttp"
 inherit python_setuptools_build_meta pypi
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-aiohappyeyeballs \
-    ${PYTHON_PN}-aiosignal \
-    ${PYTHON_PN}-async-timeout \
-    ${PYTHON_PN}-frozenlist \
-    ${PYTHON_PN}-multidict \
-    ${PYTHON_PN}-yarl \
-    ${PYTHON_PN}-aiodns \
+    python3-aiohappyeyeballs \
+    python3-aiosignal \
+    python3-async-timeout \
+    python3-frozenlist \
+    python3-multidict \
+    python3-yarl \
+    python3-aiodns \
 "

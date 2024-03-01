@@ -11,9 +11,9 @@ PYPI_PACKAGE = "tweepy"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-pip \
-    ${PYTHON_PN}-pysocks \
-    ${PYTHON_PN}-requests \
-    ${PYTHON_PN}-requests-oauthlib \
-    ${PYTHON_PN}-six \
+    python3-pip \
+    python3-pysocks \
+    python3-requests \
+    python3-requests-oauthlib \
+    python3-six \
 "

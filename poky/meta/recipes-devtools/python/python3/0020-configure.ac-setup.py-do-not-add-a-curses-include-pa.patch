@@ -1,4 +1,4 @@
-From 1438c3694665961aa9c478727846343ad31fa133 Mon Sep 17 00:00:00 2001
+From d0205c60d08f51d84bd8ddc07a57e8c71710fdad Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 17 Nov 2023 14:16:40 +0100
 Subject: [PATCH] configure.ac: do not add a curses include path from the host
@@ -10,16 +10,15 @@ as dnf failures).
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  configure.ac | 6 ------
  1 file changed, 6 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index d81c19a..b15b765 100644
+index c49cd4f..affdedf 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -6507,12 +6507,6 @@ AS_VAR_IF([have_panel], [no], [
+@@ -6508,12 +6508,6 @@ AS_VAR_IF([have_panel], [no], [
    AC_MSG_RESULT([$have_panel (CFLAGS: $PANEL_CFLAGS, LIBS: $PANEL_LIBS)])
  ])
  

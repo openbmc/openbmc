@@ -15,5 +15,5 @@ CLEANBROKEN = "1"
 PYPI_PACKAGE = "luma.oled"
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-luma-core \
+	python3-luma-core \
 "

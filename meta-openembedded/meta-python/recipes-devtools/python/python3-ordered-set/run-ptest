@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pytest test_ordered_set.py
+pytest --automake test_ordered_set.py

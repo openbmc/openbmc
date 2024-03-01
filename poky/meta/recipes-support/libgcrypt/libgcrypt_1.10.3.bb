@@ -29,9 +29,6 @@ SRC_URI = "${GNUPG_MIRROR}/libgcrypt/libgcrypt-${PV}.tar.bz2 \
            "
 SRC_URI[sha256sum] = "8b0870897ac5ac67ded568dcfadf45969cfa8a6beb0fd60af2a9eadc2a3272aa"
 
-CVE_STATUS[CVE-2018-12433] = "disputed: CVE is disputed and not affecting crypto libraries for any distro."
-CVE_STATUS[CVE-2018-12438] = "disputed: CVE is disputed and not affecting crypto libraries for any distro."
-
 BINCONFIG = "${bindir}/libgcrypt-config"
 
 inherit autotools texinfo binconfig-disabled pkgconfig ptest

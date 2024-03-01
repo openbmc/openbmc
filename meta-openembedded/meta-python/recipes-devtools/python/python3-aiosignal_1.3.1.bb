@@ -10,5 +10,5 @@ inherit pypi setuptools3
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} = "\
-	${PYTHON_PN}-frozenlist \
+	python3-frozenlist \
 "

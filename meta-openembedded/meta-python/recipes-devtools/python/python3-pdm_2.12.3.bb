@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "53cdab727c1469fdc196efd8d7ff8404a3ca91ee43c0a5714736f2020d
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += " \
-    ${PYTHON_PN}-pdm-backend-native \
+    python3-pdm-backend-native \
 "
 
 BBCLASSEXTEND = "native nativesdk"

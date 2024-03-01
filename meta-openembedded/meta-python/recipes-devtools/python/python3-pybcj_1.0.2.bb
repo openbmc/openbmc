@@ -11,14 +11,14 @@ inherit pypi python_setuptools_build_meta pypi
 #PROVIDES = "python3-pybcj"
 
 DEPENDS += " \
-    ${PYTHON_PN}-setuptools-scm-native \
-    ${PYTHON_PN}-toml-native \
-    ${PYTHON_PN}-wheel-native \
+    python3-setuptools-scm-native \
+    python3-toml-native \
+    python3-wheel-native \
 "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-importlib-metadata \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-compression \
+    python3-email \
+    python3-importlib-metadata \
+    python3-core \
+    python3-compression \
 "

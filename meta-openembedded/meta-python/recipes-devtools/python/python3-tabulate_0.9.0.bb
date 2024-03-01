@@ -8,14 +8,14 @@ SRC_URI[sha256sum] = "0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += " \
-	${PYTHON_PN}-setuptools-scm-native \
-	${PYTHON_PN}-toml-native \
+	python3-setuptools-scm-native \
+	python3-toml-native \
 "
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-html \
-	${PYTHON_PN}-core \
-	${PYTHON_PN}-io \
-	${PYTHON_PN}-math \
-	${PYTHON_PN}-profile \
+	python3-html \
+	python3-core \
+	python3-io \
+	python3-math \
+	python3-profile \
 "

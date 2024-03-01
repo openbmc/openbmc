@@ -123,14 +123,18 @@ corstone1000-fvp:
   extends: .build
   parallel:
     matrix:
-      - TESTING: [testimage, tftf]
+      - FIRMWARE: corstone1000-firmware-only
+        TESTING: [testimage, tftf]
+      - FIRMWARE: none
+        TESTING: testimage
 
 corstone1000-mps3:
   extends: .build
   parallel:
     matrix:
-      - TESTING: [none, tftf]
-
+      - FIRMWARE: corstone1000-firmware-only
+        TESTING: [none, tftf]
+      - FIRMWARE: none
 
 fvp-base:
   extends: .build

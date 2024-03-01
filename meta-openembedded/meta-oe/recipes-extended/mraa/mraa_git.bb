@@ -48,20 +48,20 @@ BINDINGS:armv4 ??= "python"
 BINDINGS:armv5 ??= "python"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('PACKAGES', 'node-${PN}', 'nodejs', '', d)} \
- ${@bb.utils.contains('PACKAGES', '${PYTHON_PN}-${PN}', 'python', '', d)}"
+ ${@bb.utils.contains('PACKAGES', 'python3-${PN}', 'python', '', d)}"
 
-PACKAGECONFIG[python] = "-DBUILDSWIGPYTHON=ON, -DBUILDSWIGPYTHON=OFF, swig-native ${PYTHON_PN},"
+PACKAGECONFIG[python] = "-DBUILDSWIGPYTHON=ON, -DBUILDSWIGPYTHON=OFF, swig-native python3,"
 PACKAGECONFIG[nodejs] = "-DBUILDSWIGNODE=ON, -DBUILDSWIGNODE=OFF, swig-native nodejs-native,"
 PACKAGECONFIG[ft4222] = "-DUSBPLAT=ON -DFTDI4222=ON, -DUSBPLAT=OFF -DFTDI4222=OFF,, libft4222"
 
-FILES:${PYTHON_PN}-${PN} = "${PYTHON_SITEPACKAGES_DIR}/"
-RDEPENDS:${PYTHON_PN}-${PN} += "${PYTHON_PN}"
+FILES:python3-${PN} = "${PYTHON_SITEPACKAGES_DIR}/"
+RDEPENDS:python3-${PN} += "python3"
 
 FILES:node-${PN} = "${prefix}/lib/node_modules/"
 RDEPENDS:node-${PN} += "nodejs"
 
 ### Include desired language bindings ###
 PACKAGES =+ "${@bb.utils.contains('BINDINGS', 'nodejs', 'node-${PN}', '', d)}"
-PACKAGES =+ "${@bb.utils.contains('BINDINGS', 'python', '${PYTHON_PN}-${PN}', '', d)}"
+PACKAGES =+ "${@bb.utils.contains('BINDINGS', 'python', 'python3-${PN}', '', d)}"
 
 TOOLCHAIN = "gcc"

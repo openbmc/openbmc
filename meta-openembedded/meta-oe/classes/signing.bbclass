@@ -142,10 +142,10 @@ signing_import_cert_from_pem() {
     signing_pkcs11_tool --type cert --write-object /proc/self/fd/0 --label "${role}"
 }
 
-# signing_import_pubkey_from_der <role> <pem>
+# signing_import_pubkey_from_der <role> <der>
 #
 # Import a public key from DER file to a role. To be used with SoftHSM.
-signing_import_pubkey_from_pem() {
+signing_import_pubkey_from_der() {
     local role="${1}"
     local der="${2}"
 
@@ -171,7 +171,7 @@ signing_import_pubkey_from_pem() {
     signing_pkcs11_tool --type pubkey --write-object /proc/self/fd/0 --label "${role}"
 }
 
-# signing_import_privkey_from_der <role> <pem>
+# signing_import_privkey_from_der <role> <der>
 #
 # Import a private key from DER file to a role. To be used with SoftHSM.
 signing_import_privkey_from_der() {

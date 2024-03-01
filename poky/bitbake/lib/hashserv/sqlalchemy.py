@@ -129,7 +129,11 @@ class DatabaseEngine(object):
             return inspect(conn).has_table(name)
 
         self.logger.info("Using database %s", self.url)
-        self.engine = create_async_engine(self.url, poolclass=NullPool)
+        if self.url.drivername == 'postgresql+psycopg':
+            # Psygopg 3 (psygopg) driver can handle async connection pooling
+            self.engine = create_async_engine(self.url, max_overflow=-1)
+        else:
+            self.engine = create_async_engine(self.url, poolclass=NullPool)
 
         async with self.engine.begin() as conn:
             # Create tables

@@ -1,4 +1,4 @@
-From e6464e01bc1cdf5496be2942d1bac41aa609f47e Mon Sep 17 00:00:00 2001
+From 647f3d946ec3fe4800b2bec89371f85a1a4b15cf Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Thu, 23 May 2019 23:44:06 +0200
 Subject: [PATCH] Set paths to ssh-agent and ssh-add by configure options
@@ -11,15 +11,16 @@ We have no executables in our sysroot so configuration won't find them.
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  configure.ac | 11 +++++++++--
  1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 4b83664..eda0c96 100644
+index f4f793c..5194e5d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -351,8 +351,15 @@ if test "$enable_ssh_agent" = "no"; then
+@@ -356,8 +356,15 @@ if test "$enable_ssh_agent" = "no"; then
  	SSH_AGENT=false
  	SSH_ADD=false
  else
@@ -37,6 +38,3 @@ index 4b83664..eda0c96 100644
  	if test "$SSH_AGENT" = "no" -o "$SSH_ADD" = "no"; then
  		AC_MSG_ERROR([the ssh-agent and ssh-add commands were not found])
  	else
--- 
-2.20.1
-

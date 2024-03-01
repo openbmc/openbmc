@@ -9,6 +9,7 @@ inherit pypi ptest python_hatchling
 
 SRC_URI += " \
 	file://0001-test_funcs-skip-test_unknown-for-pytest-8.patch \
+	file://0001-conftest.py-disable-deadline.patch \
 	file://run-ptest \
 "
 

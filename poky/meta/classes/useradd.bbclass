@@ -103,6 +103,18 @@ fi
 }
 
 useradd_sysroot () {
+	user_group_groupmems_add_sysroot user
+}
+
+groupadd_sysroot () {
+	user_group_groupmems_add_sysroot group
+}
+
+groupmemsadd_sysroot () {
+	user_group_groupmems_add_sysroot groupmems
+}
+
+user_group_groupmems_add_sysroot () {
 	# Pseudo may (do_prepare_recipe_sysroot) or may not (do_populate_sysroot_setscene) be running 
 	# at this point so we're explicit about the environment so pseudo can load if 
 	# not already present.
@@ -131,9 +143,15 @@ useradd_sysroot () {
 	fi
 
 	# Add groups and users defined for all recipe packages
-	GROUPADD_PARAM="${@get_all_cmd_params(d, 'groupadd')}"
-	USERADD_PARAM="${@get_all_cmd_params(d, 'useradd')}"
-	GROUPMEMS_PARAM="${@get_all_cmd_params(d, 'groupmems')}"
+	if test "$1" = "group"; then
+		GROUPADD_PARAM="${@get_all_cmd_params(d, 'groupadd')}"
+	elif test "$1" = "user"; then
+		USERADD_PARAM="${@get_all_cmd_params(d, 'useradd')}"
+	elif test "$1" = "groupmems"; then
+		GROUPMEMS_PARAM="${@get_all_cmd_params(d, 'groupmems')}"
+	elif test "x$1" = "x"; then
+		bbwarn "missing type of passwd db action"
+	fi
 
 	# Tell the system to use the environment vars
 	UA_SYSROOT=1
@@ -148,29 +166,30 @@ useradd_sysroot () {
 EXTRA_STAGING_FIXMES += "PSEUDO_SYSROOT PSEUDO_LOCALSTATEDIR LOGFIFO"
 
 python useradd_sysroot_sstate () {
-    scriptfile = None
-    task = d.getVar("BB_CURRENTTASK")
-    if task == "package_setscene":
-        bb.build.exec_func("useradd_sysroot", d)
-    elif task == "prepare_recipe_sysroot":
-        # Used to update this recipe's own sysroot so the user/groups are available to do_install
+    for type, sort_prefix in [("group", "01"), ("user", "02"), ("groupmems", "03")]:
+        scriptfile = None
+        task = d.getVar("BB_CURRENTTASK")
+        if task == "package_setscene":
+            bb.build.exec_func(type + "add_sysroot", d)
+        elif task == "prepare_recipe_sysroot":
+            # Used to update this recipe's own sysroot so the user/groups are available to do_install
 
-        # If do_populate_sysroot is triggered and we write the file here, there would be an overlapping
-        # files. See usergrouptests.UserGroupTests.test_add_task_between_p_sysroot_and_package
-        scriptfile = d.expand("${RECIPE_SYSROOT}${bindir}/postinst-useradd-${PN}-recipedebug")
+            # If do_populate_sysroot is triggered and we write the file here, there would be an overlapping
+            # files. See usergrouptests.UserGroupTests.test_add_task_between_p_sysroot_and_package
+            scriptfile = d.expand("${RECIPE_SYSROOT}${bindir}/postinst-useradd-" + sort_prefix + type + "-${PN}-recipedebug")
 
-        bb.build.exec_func("useradd_sysroot", d)
-    elif task == "populate_sysroot":
-        # Used when installed in dependent task sysroots
-        scriptfile = d.expand("${SYSROOT_DESTDIR}${bindir}/postinst-useradd-${PN}")
+            bb.build.exec_func(type + "add_sysroot", d)
+        elif task == "populate_sysroot":
+            # Used when installed in dependent task sysroots
+            scriptfile = d.expand("${SYSROOT_DESTDIR}${bindir}/postinst-useradd-" + sort_prefix + type + "-${PN}")
 
-    if scriptfile:
-        bb.utils.mkdirhier(os.path.dirname(scriptfile))
-        with open(scriptfile, 'w') as script:
-            script.write("#!/bin/sh -e\n")
-            bb.data.emit_func("useradd_sysroot", script, d)
-            script.write("useradd_sysroot\n")
-        os.chmod(scriptfile, 0o755)
+        if scriptfile:
+            bb.utils.mkdirhier(os.path.dirname(scriptfile))
+            with open(scriptfile, 'w') as script:
+                script.write("#!/bin/sh -e\n")
+                bb.data.emit_func(type + "add_sysroot", script, d)
+                script.write(type + "add_sysroot\n")
+            os.chmod(scriptfile, 0o755)
 }
 
 do_prepare_recipe_sysroot[postfuncs] += "${SYSROOTFUNC}"

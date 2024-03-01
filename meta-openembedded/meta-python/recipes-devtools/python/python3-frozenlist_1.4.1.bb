@@ -8,8 +8,8 @@ SRC_URI[sha256sum] = "c037a86e8513059a2613aaba4d817bb90b9d9b6b69aace3ce9c877e8c8
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += " \
-    ${PYTHON_PN}-expandvars-native \
-    ${PYTHON_PN}-cython-native \
+    python3-expandvars-native \
+    python3-cython-native \
 "
 
 BBCLASSEXTEND = "native nativesdk"

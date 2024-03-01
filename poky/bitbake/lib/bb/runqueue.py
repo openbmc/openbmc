@@ -220,6 +220,16 @@ class RunQueueScheduler(object):
                 bb.note("Pressure status changed to CPU: %s, IO: %s, Mem: %s (CPU: %s/%s, IO: %s/%s, Mem: %s/%s) - using %s/%s bitbake threads" % (pressure_state + pressure_values + (len(self.rq.runq_running.difference(self.rq.runq_complete)), self.rq.number_tasks)))
             self.pressure_state = pressure_state
             return (exceeds_cpu_pressure or exceeds_io_pressure or exceeds_memory_pressure)
+        elif self.rq.max_loadfactor:
+            limit = False
+            loadfactor = float(os.getloadavg()[0]) / os.cpu_count()
+            # bb.warn("Comparing %s to %s" % (loadfactor, self.rq.max_loadfactor))
+            if loadfactor > self.rq.max_loadfactor:
+                limit = True
+            if hasattr(self, "loadfactor_limit") and limit != self.loadfactor_limit:
+                bb.note("Load average limiting set to %s as load average: %s - using %s/%s bitbake threads" % (limit, loadfactor, len(self.rq.runq_running.difference(self.rq.runq_complete)), self.rq.number_tasks))
+            self.loadfactor_limit = limit
+            return limit
         return False
 
     def next_buildable_task(self):
@@ -1822,6 +1832,7 @@ class RunQueueExecute:
         self.max_cpu_pressure = self.cfgData.getVar("BB_PRESSURE_MAX_CPU")
         self.max_io_pressure = self.cfgData.getVar("BB_PRESSURE_MAX_IO")
         self.max_memory_pressure = self.cfgData.getVar("BB_PRESSURE_MAX_MEMORY")
+        self.max_loadfactor = self.cfgData.getVar("BB_LOADFACTOR_MAX")
 
         self.sq_buildable = set()
         self.sq_running = set()
@@ -1875,6 +1886,11 @@ class RunQueueExecute:
                 bb.fatal("Invalid BB_PRESSURE_MAX_MEMORY %s, minimum value is %s." % (self.max_memory_pressure, lower_limit))
             if self.max_memory_pressure > upper_limit:
                 bb.warn("Your build will be largely unregulated since BB_PRESSURE_MAX_MEMORY is set to %s. It is very unlikely that such high pressure will be experienced." % (self.max_io_pressure))
+
+        if self.max_loadfactor:
+            self.max_loadfactor = float(self.max_loadfactor)
+            if self.max_loadfactor <= 0:
+                bb.fatal("Invalid BB_LOADFACTOR_MAX %s, needs to be greater than zero." % (self.max_loadfactor))
             
         # List of setscene tasks which we've covered
         self.scenequeue_covered = set()

@@ -9,7 +9,7 @@ REQUIRED_DISTRO_FEATURES = "ptest"
 require conf/include/ptest-packagelists-meta-oe.inc
 
 # Include the full set of ptests
-PTESTS_META_OE = "${PTESTS_FAST_META_OE} ${PTESTS_SLOW_META_OE}"
+PTESTS_META_OE = "${PTESTS_FAST_META_OE} ${PTESTS_SLOW_META_OE} ${PTESTS_PROBLEMS_META_OE}"
 
 do_testimage[noexec] = "1"
 do_testimage[depends] = "${@' '.join(['meta-oe-image-ptest-'+x+':do_testimage' for x in d.getVar('PTESTS_META_OE').split()])}"

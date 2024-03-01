@@ -8,12 +8,12 @@ PYPI_PACKAGE = "jedi"
 SRC_URI[sha256sum] = "cf0496f3651bc65d7174ac1b7d043eff454892c708a87d1b683e57b569927ffd"
 
 RDEPENDS:${PN} = " \
-	${PYTHON_PN}-parso \
-	${PYTHON_PN}-core \
-	${PYTHON_PN}-compression \
-	${PYTHON_PN}-pydoc \
-	${PYTHON_PN}-compile \
-	${PYTHON_PN}-json \
+	python3-parso \
+	python3-core \
+	python3-compression \
+	python3-pydoc \
+	python3-compile \
+	python3-json \
 "
 
 inherit setuptools3 pypi

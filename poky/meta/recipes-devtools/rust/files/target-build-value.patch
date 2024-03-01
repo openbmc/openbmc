@@ -7,8 +7,8 @@ Signed-off-by: onur-ozkan <work@onurozkan.dev>
 Signed-off-by: Yash Shinde <Yash.Shinde@windriver.com>
 ---
 diff --git a/src/bootstrap/test.rs b/src/bootstrap/test.rs
---- a/src/bootstrap/test.rs
-+++ b/src/bootstrap/test.rs
+--- a/src/bootstrap/src/core/build_steps/test.rs
++++ b/src/bootstrap/src/core/build_steps/test.rs
 @@ -1489,8 +1489,12 @@
          // NOTE: Only stage 1 is special cased because we need the rustc_private artifacts to match the
          // running compiler in stage 2 when plugins run.

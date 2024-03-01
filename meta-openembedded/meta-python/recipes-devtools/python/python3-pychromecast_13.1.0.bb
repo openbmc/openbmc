@@ -10,11 +10,11 @@ PYPI_PACKAGE = "PyChromecast"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-zeroconf \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-requests \
-    ${PYTHON_PN}-protobuf \
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-casttube \
+    python3-logging \
+    python3-zeroconf \
+    python3-json \
+    python3-requests \
+    python3-protobuf \
+    python3-compression \
+    python3-casttube \
 "

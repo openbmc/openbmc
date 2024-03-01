@@ -311,7 +311,7 @@ system and gives an overview of their function and contents.
 
    :term:`BB_ALLOWED_NETWORKS`
       Specifies a space-delimited list of hosts that the fetcher is allowed
-      to use to obtain the required source code. Following are
+      to use to obtain the required source code. Here are
       considerations surrounding this variable:
 
       -  This host list is only used if :term:`BB_NO_NETWORK` is either not set
@@ -6557,7 +6557,7 @@ system and gives an overview of their function and contents.
       The :term:`PREFERRED_PROVIDER` variable is set with the name (:term:`PN`) of
       the recipe you prefer to provide "virtual/kernel".
 
-      Following are more examples::
+      Here are more examples::
 
          PREFERRED_PROVIDER_virtual/xserver = "xserver-xf86"
          PREFERRED_PROVIDER_virtual/libgl ?= "mesa"
@@ -6812,20 +6812,6 @@ system and gives an overview of their function and contents.
       The OpenEmbedded build system uses the ABI to construct directory
       names used when installing the Python headers and libraries in
       sysroot (e.g. ``.../python3.3m/...``).
-
-   :term:`PYTHON_PN`
-      When used by recipes that inherit the :ref:`ref-classes-setuptools3`
-      class, specifies the major Python version being built. For Python 3.x,
-      :term:`PYTHON_PN` would be "python3". You do not have to set this
-      variable as the OpenEmbedded build system automatically sets it for you.
-
-      The variable allows recipes to use common infrastructure such as the
-      following::
-
-         DEPENDS += "${PYTHON_PN}-native"
-
-      In the previous example,
-      the version of the dependency is :term:`PYTHON_PN`.
 
    :term:`QA_EMPTY_DIRS`
       Specifies a list of directories that are expected to be empty when
@@ -9391,7 +9377,7 @@ system and gives an overview of their function and contents.
       configuration can define the :term:`UBOOT_MACHINE` and optionally the
       :term:`IMAGE_FSTYPES` and the :term:`UBOOT_BINARY`.
 
-      Following is an example from the ``meta-freescale`` layer. ::
+      Here is an example from the ``meta-freescale`` layer. ::
 
          UBOOT_CONFIG ??= "sdcard-ifc-secure-boot sdcard-ifc sdcard-qspi lpuart qspi secure-boot nor"
          UBOOT_CONFIG[nor] = "ls1021atwr_nor_defconfig"
@@ -9929,7 +9915,7 @@ system and gives an overview of their function and contents.
       With the :term:`WKS_FILE_DEPENDS` variable, you have the possibility to
       specify a list of additional dependencies (e.g. native tools,
       bootloaders, and so forth), that are required to build Wic images.
-      Following is an example::
+      Here is an example::
 
          WKS_FILE_DEPENDS = "some-native-tool"
 

@@ -8,13 +8,13 @@ SRC_URI[sha256sum] = "a3caa3a11842fc7d5746376f37195e6af5f17c0a15737538bb1cebf656
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-crypt \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-six \
+    python3-core \
+    python3-crypt \
+    python3-ctypes \
+    python3-io \
+    python3-json \
+    python3-logging \
+    python3-netclient \
+    python3-threading \
+    python3-six \
 "

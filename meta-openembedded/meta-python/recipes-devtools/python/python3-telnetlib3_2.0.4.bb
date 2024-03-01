@@ -11,5 +11,5 @@ PYPI_PACKAGE = "telnetlib3"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-asyncio \
+    python3-asyncio \
 "

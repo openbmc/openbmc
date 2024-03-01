@@ -1,4 +1,7 @@
-rename test target as run-test
+From a5e1fa272f294e739d6caaf629968478796ca53a Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Mon, 19 Oct 2020 14:42:11 -0700
+Subject: [PATCH] rename test target as run-test
 
 Upstream-Status: Pending
 
@@ -8,12 +11,13 @@ not suitable for cross-compile environment, so rename it as run-test.
 and define test target to compile the test files.
 
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
 ---
  Makefile.am | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index e84b21e..94a8bff 100644
+index da01d27..c738b93 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -126,7 +126,9 @@ regress2: $(check_PROGRAMS)

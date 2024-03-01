@@ -69,7 +69,7 @@ do_compile:prepend() {
 		${S}/src/include/builddefs
 	sed -i -e "s,TOPDIR)/python3-pcp.list,TOPDIR)/python3-pcp.list --install-lib=${PYTHON_SITEPACKAGES_DIR},g" ${S}/src/python/GNUmakefile
 	export PYTHON=python3
-	#export PYTHON3=${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN}
+	#export PYTHON3=${STAGING_BINDIR_NATIVE}/python3-native/python3
 }
 
 do_compile() {

@@ -1,4 +1,4 @@
-From 23184742b009ef1a8b2c0c2d79515334d4450cb9 Mon Sep 17 00:00:00 2001
+From 217cea231462e7703e8c9ea39c0a6833f799a420 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Fri, 15 Sep 2023 08:48:33 -0400
 Subject: [PATCH] skip no_stdout_fileno test due to load variability
@@ -11,16 +11,15 @@ Upstream-Status: Inappropriate [OE-Specific]
 [YOCTO #15210]
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
-
 ---
  Lib/test/test_builtin.py | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Lib/test/test_builtin.py b/Lib/test/test_builtin.py
-index de83b52..ba98fe8 100644
+index 4d03c46..b329b7a 100644
 --- a/Lib/test/test_builtin.py
 +++ b/Lib/test/test_builtin.py
-@@ -2300,6 +2300,7 @@ class PtyTests(unittest.TestCase):
+@@ -2326,6 +2326,7 @@ class PtyTests(unittest.TestCase):
          # Check stdin/stdout error handler is used when invoking PyOS_Readline()
          self.check_input_tty("prompté", b"quux\xe9", "ascii")
  

@@ -18,13 +18,13 @@ inherit pypi siteinfo setuptools3
 
 DEPENDS += "openssl swig-native"
 RDEPENDS:${PN} += "\
-  ${PYTHON_PN}-datetime \
-  ${PYTHON_PN}-setuptools \
-  ${PYTHON_PN}-logging \
-  ${PYTHON_PN}-netclient \
-  ${PYTHON_PN}-netserver \
-  ${PYTHON_PN}-numbers \
-  ${PYTHON_PN}-xmlrpc \
+  python3-datetime \
+  python3-setuptools \
+  python3-logging \
+  python3-netclient \
+  python3-netserver \
+  python3-numbers \
+  python3-xmlrpc \
 "
 
 DISTUTILS_BUILD_ARGS += "build_ext --openssl=${STAGING_EXECPREFIXDIR} -I${STAGING_INCDIR}"

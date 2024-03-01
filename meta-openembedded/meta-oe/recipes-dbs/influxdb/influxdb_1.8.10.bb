@@ -45,7 +45,7 @@ do_install:prepend() {
 do_install:append() {
     install -d ${D}${sysconfdir}/influxdb
     install -m 0644 ${WORKDIR}/influxdb.conf ${D}${sysconfdir}/influxdb
-    chown -R root.influxdb ${D}${sysconfdir}/influxdb
+    chown -R root:influxdb ${D}${sysconfdir}/influxdb
 
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/influxdb ${D}${sysconfdir}/init.d/influxdb

@@ -12,4 +12,4 @@ SRC_URI[sha256sum] = "5cb5123b5cf9ee70584244246816e9114227e0b98ad9176eede6ad54bf
 
 inherit pypi python_poetry_core
 
-RDEPENDS:${PN} = "${PYTHON_PN}-pygments"
+RDEPENDS:${PN} = "python3-pygments"

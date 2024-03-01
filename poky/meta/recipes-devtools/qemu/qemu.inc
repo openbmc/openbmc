@@ -54,8 +54,6 @@ SRC_URI:append:class-native = " \
 
 SRC_URI[sha256sum] = "8562751158175f9d187c5f22b57555abe3c870f0325c8ced12c34c6d987729be"
 
-CVE_STATUS[CVE-2017-5957] = "cpe-incorrect: Applies against virglrender < 0.6.0 and not qemu itself"
-
 CVE_STATUS[CVE-2007-0998] = "not-applicable-config: The VNC server can expose host files uder some circumstances. We don't enable it by default."
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1609015#c11

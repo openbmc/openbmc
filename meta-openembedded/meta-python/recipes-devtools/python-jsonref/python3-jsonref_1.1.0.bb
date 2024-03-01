@@ -12,12 +12,12 @@ inherit pypi python_setuptools_build_meta
 BBCLASSEXTEND = "native nativesdk"
 
 DEPENDS += " \
-    ${PYTHON_PN}-pdm-native \
-    ${PYTHON_PN}-pdm-backend-native \
+    python3-pdm-native \
+    python3-pdm-backend-native \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-netclient \
+    python3-core \
+    python3-json \
+    python3-netclient \
 "

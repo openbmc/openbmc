@@ -1295,7 +1295,7 @@ In order to run this task, you must have an existing ``.config`` file.
 See the ":ref:`kernel-dev/common:using \`\`menuconfig\`\``" section for
 information on how to create a configuration file.
 
-Following is sample output from the :ref:`ref-tasks-kernel_configcheck` task:
+Here is sample output from the :ref:`ref-tasks-kernel_configcheck` task:
 
 .. code-block:: none
 
@@ -1726,7 +1726,7 @@ tree. Using Git is an efficient way to see what has changed in the tree.
 What Changed in a Kernel?
 -------------------------
 
-Following are a few examples that show how to use Git commands to
+Here are a few examples that show how to use Git commands to
 examine changes. These examples are by no means the only way to see
 changes.
 

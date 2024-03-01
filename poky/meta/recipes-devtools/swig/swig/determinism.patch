@@ -1,4 +1,4 @@
-From 25bf9893ec1f557781eb241508ea1bec959061fe Mon Sep 17 00:00:00 2001
+From 28648b3873d83e26bd19b64ce2c0a41ced9292d3 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Mon, 1 Mar 2021 00:11:10 +0000
 Subject: [PATCH] swig: Fix reproducibility issue
@@ -8,16 +8,15 @@ breaks reproducibilty.
 
 Upstream-Status: Inappropriate [OE reproducibiity fix upstream unlikely to take]
 RP 2021/3/1
-
 ---
  Source/Modules/main.cxx | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/Source/Modules/main.cxx b/Source/Modules/main.cxx
-index 8250dee..415761d 100644
+index de0a512..ac9e825 100644
 --- a/Source/Modules/main.cxx
 +++ b/Source/Modules/main.cxx
-@@ -629,7 +629,6 @@ static void getoptions(int argc, char *argv[]) {
+@@ -638,7 +638,6 @@ static void getoptions(int argc, char *argv[]) {
  	}
        } else if (strcmp(argv[i], "-version") == 0) {
  	fprintf(stdout, "\nSWIG Version %s\n", Swig_package_version());

@@ -9,7 +9,7 @@ PYPI_PACKAGE = "flask_babel"
 inherit pypi python_poetry_core
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-speaklater \
-    ${PYTHON_PN}-babel \
-    ${PYTHON_PN}-flask \
+    python3-speaklater \
+    python3-babel \
+    python3-flask \
     "

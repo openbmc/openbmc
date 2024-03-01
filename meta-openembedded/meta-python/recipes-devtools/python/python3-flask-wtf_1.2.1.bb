@@ -11,8 +11,8 @@ UPSTREAM_CHECK_REGEX = "/Flask-WTF/(?P<pver>(\d+[\.\-_]*)+)"
 inherit pypi python_hatchling
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-flask \
-    ${PYTHON_PN}-itsdangerous \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-wtforms \
+    python3-flask \
+    python3-itsdangerous \
+    python3-json \
+    python3-wtforms \
 "

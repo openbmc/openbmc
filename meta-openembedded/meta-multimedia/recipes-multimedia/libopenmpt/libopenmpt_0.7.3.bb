@@ -74,6 +74,7 @@ FILES:${PN}-openmpt123-doc = "${mandir}/man1/openmpt123*"
 DEBIAN_NOAUTONAME:${PN} = "1"
 
 RDEPENDS:${PN}:libc-glibc = " \
+    glibc-gconv \
     glibc-gconv-cp1252 \
     glibc-gconv-ibm437 \
     glibc-gconv-iso8859-1 \

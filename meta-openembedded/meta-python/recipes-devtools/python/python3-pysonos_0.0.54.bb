@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "2a72897cfd342382573632d80d38776884a38c8d02353d9d5da4e9e8e8
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += "\
-	${PYTHON_PN}-ifaddr \
-	${PYTHON_PN}-requests \
-	${PYTHON_PN}-xmltodict \
+	python3-ifaddr \
+	python3-requests \
+	python3-xmltodict \
 	"

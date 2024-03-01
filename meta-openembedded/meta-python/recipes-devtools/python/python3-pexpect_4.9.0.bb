@@ -13,12 +13,12 @@ inherit pypi setuptools3
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/pexpect"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-terminal \
-    ${PYTHON_PN}-resource \
-    ${PYTHON_PN}-fcntl \
-    ${PYTHON_PN}-ptyprocess \
+    python3-core \
+    python3-io \
+    python3-terminal \
+    python3-resource \
+    python3-fcntl \
+    python3-ptyprocess \
 "
 
 BBCLASSEXTEND = "native nativesdk"

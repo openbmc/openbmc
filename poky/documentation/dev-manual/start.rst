@@ -36,7 +36,7 @@ particular working environment and set of practices.
     equipment together and set up your development environment's
     hardware topology.
 
-    Here are possible roles:
+    Possible roles are:
 
     -  *Application Developer:* This type of developer does application
        level work on top of an existing software stack.
@@ -99,7 +99,7 @@ particular working environment and set of practices.
 
 #.  *Set up the Application Development Machines:* As mentioned earlier,
     application developers are creating applications on top of existing
-    software stacks. Following are some best practices for setting up
+    software stacks. Here are some best practices for setting up
     machines used for application development:
 
     -  Use a pre-built toolchain that contains the software stack
@@ -118,7 +118,7 @@ particular working environment and set of practices.
 
 #.  *Set up the Core Development Machines:* As mentioned earlier, core
     developers work on the contents of the operating system itself.
-    Following are some best practices for setting up machines used for
+    Here are some best practices for setting up machines used for
     developing images:
 
     -  Have the :term:`OpenEmbedded Build System` available on

@@ -1,4 +1,4 @@
-From f3267ad7994a4b66e6bcf72cb0e418105f77bd52 Mon Sep 17 00:00:00 2001
+From 9eb453283a7ac8a9b1dd3eac86d936c7a430476b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 11 Oct 2022 17:37:01 -0700
 Subject: [PATCH] _setuputils.py: Do not add sys_inc_dir
@@ -10,15 +10,16 @@ we really do not need setuptools to deduce it for us.
 
 Upstream-Status: Inappropriate [ Cross-compile specific ]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  _setuputils.py | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/_setuputils.py b/_setuputils.py
-index d98f716..31134a4 100644
+index 4c25e00..23fdfe1 100644
 --- a/_setuputils.py
 +++ b/_setuputils.py
-@@ -161,7 +161,6 @@ def get_include_dirs(*extra_paths):
+@@ -164,7 +164,6 @@ def get_include_dirs(*extra_paths):
      # Neither sysconfig dir is not enough if we're in a virtualenv; the greenlet.h
      # header goes into a site/ subdir. See https://github.com/pypa/pip/issues/4610
      dist_inc_dir = os.path.abspath(dist_sysconfig.get_python_inc()) # 1
@@ -26,7 +27,7 @@ index d98f716..31134a4 100644
      venv_include_dir = os.path.join(
          sys.prefix, 'include', 'site',
          'python' + sysconfig.get_python_version()
-@@ -175,7 +174,7 @@ def get_include_dirs(*extra_paths):
+@@ -178,7 +177,7 @@ def get_include_dirs(*extra_paths):
  
      return [
          p
@@ -35,6 +36,3 @@ index d98f716..31134a4 100644
          if os.path.exists(p)
      ]
  
--- 
-2.38.0
-

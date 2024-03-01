@@ -9,7 +9,7 @@ SUMMARY = "meta-oe ptest test image"
 DESCRIPTION += "Also including the ${MCNAME} ptest package."
 HOMEPAGE = "https://www.openembedded.org/"
 
-PTESTS_META_OE = "${PTESTS_SLOW_META_OE} ${PTESTS_FAST_META_OE}"
+PTESTS_META_OE = "${PTESTS_SLOW_META_OE} ${PTESTS_FAST_META_OE} ${PTESTS_PROBLEMS_META_OE}"
 
 IMAGE_INSTALL:append = " ${MCNAME}-ptest openssh"
 

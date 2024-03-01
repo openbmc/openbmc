@@ -10,7 +10,7 @@ inherit pypi setuptools3
 PYPI_PACKAGE_EXT = "zip"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-logging \
+    python3-logging \
 "
 
 BBCLASSEXTEND = "native nativesdk"

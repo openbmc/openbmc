@@ -12,5 +12,5 @@ PYPI_PACKAGE = "djangorestframework"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-django \
+    python3-django \
 "

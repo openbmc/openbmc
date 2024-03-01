@@ -13,7 +13,7 @@ do_install:append() {
 }
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-humanfriendly \
+    python3-humanfriendly \
 "
 
 BBCLASSEXTEND = "native nativesdk"

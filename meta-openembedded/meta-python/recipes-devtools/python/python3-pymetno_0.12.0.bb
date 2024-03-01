@@ -12,7 +12,7 @@ inherit setuptools3
 PIP_INSTALL_PACKAGE = "PyMetno"
 
 RDEPENDS:${PN} = "\
-	${PYTHON_PN}-aiohttp (>=3.6.1) \
-	${PYTHON_PN}-async-timeout (>=3.0.1) \
-	${PYTHON_PN}-pytz (>=2019.3) \
+	python3-aiohttp (>=3.6.1) \
+	python3-async-timeout (>=3.0.1) \
+	python3-pytz (>=2019.3) \
 "

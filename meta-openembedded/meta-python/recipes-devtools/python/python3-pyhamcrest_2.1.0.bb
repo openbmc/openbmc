@@ -7,12 +7,12 @@ SRC_URI[sha256sum] = "c6acbec0923d0cb7e72c22af1926f3e7c97b8e8d69fc7498eabacaf7c9
 
 inherit pypi python_setuptools_build_meta
 
-DEPENDS += "${PYTHON_PN}-hatch-vcs-native"
+DEPENDS += "python3-hatch-vcs-native"
 
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/PyHamcrest/"
 UPSTREAM_CHECK_REGEX = "/PyHamcrest/(?P<pver>(\d+[\.\-_]*)+)"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-numbers \
+    python3-six \
+    python3-numbers \
 "

@@ -10,7 +10,7 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "5289b40d98959b16b3f6927781678935d3df1b7c14947f5d7778e5e04dd9a065"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-sortedcontainers \
+    python3-sortedcontainers \
 "
 
 BBCLASSEXTEND = "native"

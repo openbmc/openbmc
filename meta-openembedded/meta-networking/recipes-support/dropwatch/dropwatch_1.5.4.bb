@@ -8,7 +8,9 @@ SECTION = "net/misc"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
-SRC_URI = "git://github.com/nhorman/dropwatch.git;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/nhorman/dropwatch.git;protocol=https;nobranch=1 \
+		  file://0001-fix-bug-build-with-sysroot-head-file-instead-of-loca.patch \
+"
 SRCREV = "1e7e487a019a7c02f1f429c4d3a4647fa3787a13"
 
 S = "${WORKDIR}/git"

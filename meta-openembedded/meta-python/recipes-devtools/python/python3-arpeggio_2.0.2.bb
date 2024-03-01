@@ -10,8 +10,8 @@ inherit pypi setuptools3
 
 # setup.py of Arpeggio needs this.
 DEPENDS += "\
-    ${PYTHON_PN}-pytest-runner-native \
-    ${PYTHON_PN}-wheel-native \
+    python3-pytest-runner-native \
+    python3-wheel-native \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -33,7 +33,7 @@ auto-scaling ensures that the build system fundamentally takes advantage
 of potential parallel operations during the build based on the build
 machine's capabilities.
 
-Following are additional factors that can affect build speed:
+Additional factors that can affect build speed are:
 
 -  File system type: The file system type that the build is being
    performed on can also influence performance. Using ``ext4`` is
@@ -88,7 +88,7 @@ that can help you speed up the build:
    variable to "1".
 
 -  Disable static library generation for recipes derived from
-   ``autoconf`` or ``libtool``: Following is an example showing how to
+   ``autoconf`` or ``libtool``: Here is an example showing how to
    disable static libraries and still provide an override to handle
    exceptions::
 

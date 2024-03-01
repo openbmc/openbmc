@@ -4,7 +4,7 @@ SECTION = "devel/python"
 LICENSE = "Apache-2.0 & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=731e401b36f8077ae0c134b59be5c906"
 
-DEPENDS += "${PYTHON_PN}-protobuf"
+DEPENDS += "python3-protobuf"
 
 SRC_URI += "file://0001-Include-missing-cstdint-header.patch \
            file://abseil-ppc-fixes.patch \
@@ -12,9 +12,9 @@ SRC_URI += "file://0001-Include-missing-cstdint-header.patch \
            "
 SRC_URI[sha256sum] = "dd1d3a8d1d2e50ad9b59e10aa7f07c7d1be2b367f3f2d33c5fade96ed5460962"
 
-RDEPENDS:${PN} = "${PYTHON_PN}-protobuf \
-                  ${PYTHON_PN}-setuptools \
-                  ${PYTHON_PN}-six \
+RDEPENDS:${PN} = "python3-protobuf \
+                  python3-setuptools \
+                  python3-six \
 "
 
 inherit setuptools3

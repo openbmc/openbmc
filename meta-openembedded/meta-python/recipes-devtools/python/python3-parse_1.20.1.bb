@@ -19,6 +19,7 @@ RDEPENDS:${PN} += "\
 
 RDEPENDS:${PN}-ptest += " \
     python3-pytest \
+    python3-unittest-automake-output \
 "
 
 do_install_ptest() {

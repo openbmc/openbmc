@@ -1,0 +1,33 @@
+From 433a412fad2ab0383ac3c625d183a71684f2b97b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 20 Feb 2024 15:35:14 -0800
+Subject: [PATCH] cmake: Check for HP libunwind
+
+This is to ensure that cmake does not detect LLVM unwinder, which
+can provide the support for some HP unwinder functionality but not all
+e.g. unw_strerror goes missing. By checking for libunwind-common.h in
+tests we ensure that this test passes only with HP libunwind.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/FindLibunwind.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/FindLibunwind.cmake b/cmake/FindLibunwind.cmake
+index f66800a18..1ad66fc83 100644
+--- a/cmake/FindLibunwind.cmake
++++ b/cmake/FindLibunwind.cmake
+@@ -22,7 +22,7 @@ find_package(PkgConfig QUIET)
+ pkg_check_modules(PC_LIBUNWIND libunwind)
+ 
+ find_path(LIBUNWIND_INCLUDE_DIRS
+-    NAMES libunwind.h
++    NAMES libunwind-common.h
+     HINTS ${PC_LIBUNWIND_INCLUDE_DIRS}
+ )
+ 
+-- 
+2.43.2
+

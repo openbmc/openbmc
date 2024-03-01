@@ -325,7 +325,10 @@ class Git(FetchMethod):
         return ud.clonedir
 
     def need_update(self, ud, d):
-        return self.clonedir_need_update(ud, d) or self.shallow_tarball_need_update(ud) or self.tarball_need_update(ud)
+        return self.clonedir_need_update(ud, d) \
+                or self.shallow_tarball_need_update(ud) \
+                or self.tarball_need_update(ud) \
+                or self.lfs_need_update(ud, d)
 
     def clonedir_need_update(self, ud, d):
         if not os.path.exists(ud.clonedir):
@@ -334,6 +337,15 @@ class Git(FetchMethod):
             return True
         for name in ud.names:
             if not self._contains_ref(ud, d, name, ud.clonedir):
+                return True
+        return False
+
+    def lfs_need_update(self, ud, d):
+        if self.clonedir_need_update(ud, d):
+            return True
+
+        for name in ud.names:
+            if not self._lfs_objects_downloaded(ud, d, name, ud.clonedir):
                 return True
         return False
 
@@ -467,7 +479,7 @@ class Git(FetchMethod):
             if missing_rev:
                 raise bb.fetch2.FetchError("Unable to find revision %s even from upstream" % missing_rev)
 
-        if self._contains_lfs(ud, d, ud.clonedir) and self._need_lfs(ud):
+        if self.lfs_need_update(ud, d):
             # Unpack temporary working copy, use it to run 'git checkout' to force pre-fetching
             # of all LFS blobs needed at the srcrev.
             #
@@ -709,6 +721,35 @@ class Git(FetchMethod):
         if len(output.split()) > 1:
             raise bb.fetch2.FetchError("The command '%s' gave output with more then 1 line unexpectedly, output: '%s'" % (cmd, output))
         return output.split()[0] != "0"
+
+    def _lfs_objects_downloaded(self, ud, d, name, wd):
+        """
+        Verifies whether the LFS objects for requested revisions have already been downloaded
+        """
+        # Bail out early if this repository doesn't use LFS
+        if not self._need_lfs(ud) or not self._contains_lfs(ud, d, wd):
+            return True
+
+        # The Git LFS specification specifies ([1]) the LFS folder layout so it should be safe to check for file
+        # existence.
+        # [1] https://github.com/git-lfs/git-lfs/blob/main/docs/spec.md#intercepting-git
+        cmd = "%s lfs ls-files -l %s" \
+                % (ud.basecmd, ud.revisions[name])
+        output = runfetchcmd(cmd, d, quiet=True, workdir=wd).rstrip()
+        # Do not do any further matching if no objects are managed by LFS
+        if not output:
+            return True
+
+        # Match all lines beginning with the hexadecimal OID
+        oid_regex = re.compile("^(([a-fA-F0-9]{2})([a-fA-F0-9]{2})[A-Fa-f0-9]+)")
+        for line in output.split("\n"):
+            oid = re.search(oid_regex, line)
+            if not oid:
+                bb.warn("git lfs ls-files output '%s' did not match expected format." % line)
+            if not os.path.exists(os.path.join(wd, "lfs", "objects", oid.group(2), oid.group(3), oid.group(1))):
+                return False
+
+        return True
 
     def _need_lfs(self, ud):
         return ud.parm.get("lfs", "1") == "1"

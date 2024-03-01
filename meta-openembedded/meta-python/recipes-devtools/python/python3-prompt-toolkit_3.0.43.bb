@@ -10,16 +10,16 @@ inherit pypi setuptools3
 PYPI_PACKAGE = "prompt_toolkit"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-terminal \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-wcwidth \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-image \
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-xml \
+    python3-core \
+    python3-six \
+    python3-terminal \
+    python3-threading \
+    python3-wcwidth \
+    python3-datetime \
+    python3-shell \
+    python3-image \
+    python3-asyncio \
+    python3-xml \
 "
 
 BBCLASSEXTEND = "native nativesdk"

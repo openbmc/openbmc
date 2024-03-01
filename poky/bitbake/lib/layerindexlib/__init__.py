@@ -178,9 +178,9 @@ class LayerIndex():
         '''Load the layerindex.
 
            indexURI - An index to load.  (Use multiple calls to load multiple indexes)
-           
+
            reload - If reload is True, then any previously loaded indexes will be forgotten.
-           
+
            load - List of elements to load.  Default loads all items.
                   Note: plugs may ignore this.
 
@@ -383,7 +383,14 @@ layerBranches set.  If not, they are effectively blank.'''
 
                 # Get a list of dependencies and then recursively process them
                 for layerdependency in layerbranch.index.layerDependencies_layerBranchId[layerbranch.id]:
-                    deplayerbranch = layerdependency.dependency_layerBranch
+                    try:
+                        deplayerbranch = layerdependency.dependency_layerBranch
+                    except AttributeError as e:
+                            logger.error('LayerBranch does not exist for dependent layer {}:{}\n' \
+                                '       Cannot continue successfully.\n' \
+                                '       You might be able to resolve this by checking out the layer locally.\n' \
+                                '       Consider reaching out the to the layer maintainers or the layerindex admins' \
+                                .format(layerdependency.dependency.name, layerbranch.branch.name))
 
                     if ignores and deplayerbranch.layer.name in ignores:
                         continue
@@ -846,7 +853,7 @@ class LayerIndexObj():
                     continue
 
                 for layerdependency in layerbranch.index.layerDependencies_layerBranchId[layerbranch.id]:
-                    deplayerbranch = layerdependency.dependency_layerBranch
+                    deplayerbranch = layerdependency.dependency_layerBranch or None
 
                     if ignores and deplayerbranch.layer.name in ignores:
                         continue

@@ -1,0 +1,32 @@
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+Upstream-Status: Inappropriate [https://gitlab.gnome.org/GNOME/gedit/-/issues/588]
+
+Temporary workaround to fix build:
+../plugins/quickhighlight/gedit-quick-highlight-plugin.c: In function ‘gedit_quick_highlight_plugin_load_style’:
+../plugins/quickhighlight/gedit-quick-highlight-plugin.c:96:47: error: implicit declaration of function ‘gtk_source_style_copy’; did you mean ‘gtk_source_style_apply’? [-Wimplicit-function-declaration]
+
+   96 |                         plugin->priv->style = gtk_source_style_copy (style);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~
+      |                                               gtk_source_style_apply
+../plugins/quickhighlight/gedit-quick-highlight-plugin.c:96:47: warning: nested extern declaration of ‘gtk_source_style_copy’ [-Wnested-externs]
+../plugins/quickhighlight/gedit-quick-highlight-plugin.c:96:45: error: assignment to ‘GtkSourceStyle *’ {aka ‘struct _GtkSourceStyle *’} from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+   96 |                         plugin->priv->style = gtk_source_style_copy (style);
+      |                                             ^
+
+--- a/plugins/quickhighlight/gedit-quick-highlight-plugin.c	2024-02-20 08:11:47.925749255 +0100
++++ b/plugins/quickhighlight/gedit-quick-highlight-plugin.c	2024-02-20 08:12:16.218594067 +0100
+@@ -90,11 +90,12 @@
+ 	if (style_scheme != NULL)
+ 	{
+ 		style = gtk_source_style_scheme_get_style (style_scheme, "quick-highlight-match");
+-
++#if 0
+ 		if (style != NULL)
+ 		{
+ 			plugin->priv->style = gtk_source_style_copy (style);
+ 		}
++#endif
+ 	}
+ }
+ 
+

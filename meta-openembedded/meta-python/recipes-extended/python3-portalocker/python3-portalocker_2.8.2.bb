@@ -13,6 +13,6 @@ inherit pypi python_setuptools_build_meta
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} += " \
-        ${PYTHON_PN}-fcntl \
-        ${PYTHON_PN}-logging \
+        python3-fcntl \
+        python3-logging \
 "

@@ -21,6 +21,7 @@ SRC_URI = "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${PV}.tar.x
            file://0002-tests-add-support-for-install-the-tests.patch \
            file://0003-tests-use-a-dictionaries-for-environment.patch \
            file://0004-tests-add-helper-script-to-run-the-installed_tests.patch \
+           file://skip-aggregator-test.patch \
            "
 SRC_URI[sha256sum] = "969aaef396f252ce925132a4be2aa004e0320f5c1baf0acaaae09c544a6759f4"
 

@@ -67,7 +67,7 @@ COMPATIBLE_MACHINE:musca-s1 = "(^$)"
 #
 # N1SDP KMACHINE
 #
-FILESEXTRAPATHS:prepend:n1sdp := "${THISDIR}/linux-yocto-6.1/n1sdp:"
+FILESEXTRAPATHS:prepend:n1sdp := "${THISDIR}/linux-yocto-6.6/n1sdp:"
 COMPATIBLE_MACHINE:n1sdp = "n1sdp"
 KBUILD_DEFCONFIG:n1sdp = "defconfig"
 KCONFIG_MODE:n1sdp = "--alldefconfig"

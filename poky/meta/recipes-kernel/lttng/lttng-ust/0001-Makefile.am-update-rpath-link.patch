@@ -1,4 +1,4 @@
-From 06279f50e924d1d55b43eb3b299f6633ecb1f7a4 Mon Sep 17 00:00:00 2001
+From 7d053804ab3823d40ae10d90f4efc49dbfb4cb66 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Wed, 22 Sep 2021 16:33:10 +0800
 Subject: [PATCH] Makefile.am: update rpath link
@@ -13,15 +13,16 @@ ld: warning: liblttng-ust-tracepoint.so.1, needed by ../../../src/lib/lttng-ust/
 Upstream-Status: Submitted [https://github.com/lttng/lttng-ust/pull/61]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
 ---
  doc/examples/Makefile.am | 2 +-
- 1 file changed, 1 insertions(+), 1 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/doc/examples/Makefile.am b/doc/examples/Makefile.am
-index 8ee0564..20d246c 100644
+index 57782cc..d46caa6 100644
 --- a/doc/examples/Makefile.am
 +++ b/doc/examples/Makefile.am
-@@ -142,7 +142,7 @@ all-local:
+@@ -167,7 +167,7 @@ all-local:
  				CFLAGS='$(CFLAGS)' \
  				AM_CFLAGS='$(AM_CFLAGS)' \
  				LDFLAGS="$(LDFLAGS)" \
@@ -30,6 +31,3 @@ index 8ee0564..20d246c 100644
  				LTTNG_GEN_TP_PATH="$$rel_src_subdir$(top_srcdir)/tools/" \
  				AM_V_P="$(AM_V_P)" \
  				AM_V_at="$(AM_V_at)" \
--- 
-2.17.1
-

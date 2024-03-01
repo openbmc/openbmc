@@ -11,5 +11,5 @@ PYPI_PACKAGE = "aiofiles"
 inherit pypi python_hatchling
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-asyncio \
+    python3-asyncio \
 "

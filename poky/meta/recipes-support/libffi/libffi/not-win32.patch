@@ -1,4 +1,4 @@
-From 20bc4e03442e15965ae3907013e9a177878f0323 Mon Sep 17 00:00:00 2001
+From be9d4cc110c159812699780348686da371296b94 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Thu, 4 Feb 2016 16:22:50 +0000
 Subject: [PATCH] libffi: ensure sysroot paths are not in libffi.pc
@@ -15,16 +15,15 @@ As this block is generally pointless, disable it.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 7e8cd98..cf37e88 100644
+index 816bfd6..e37c5a8 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -405,7 +405,7 @@ AC_ARG_ENABLE(multi-os-directory,
+@@ -401,7 +401,7 @@ AC_ARG_ENABLE(multi-os-directory,
  
  # These variables are only ever used when we cross-build to X86_WIN32.
  # And we only support this with GCC, so...

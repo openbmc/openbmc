@@ -9,7 +9,7 @@ require conf/include/ptest-packagelists-meta-perl.inc
 DESCRIPTION += "Also including the ${MCNAME} ptest package."
 HOMEPAGE = "https://www.openembedded.org/"
 
-PTESTS_META_PERL = "${PTESTS_SLOW_META_PERL} ${PTESTS_FAST_META_PERL}"
+PTESTS_META_PERL = "${PTESTS_SLOW_META_PERL} ${PTESTS_FAST_META_PERL} ${PTESTS_PROBLEMS_META_PERL}"
 
 IMAGE_INSTALL:append = " ${MCNAME}-ptest openssh"
 

@@ -1,0 +1,52 @@
+From debd676cd94f92a30b3be45f1245aa13d8c398c0 Mon Sep 17 00:00:00 2001
+From: Philip Balister <philip@balister.org>
+Date: Wed, 8 Jul 2020 09:41:43 -0400
+Subject: [PATCH] Do not strip binaries.
+
+ * OpenEmbedded strips them after creating debug packages.
+
+Signed-off-by: Philip Balister <philip@balister.org>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ tools/pybind11NewTools.cmake | 7 -------
+ tools/pybind11Tools.cmake    | 6 ------
+ 2 files changed, 13 deletions(-)
+
+diff --git a/tools/pybind11NewTools.cmake b/tools/pybind11NewTools.cmake
+index 7d7424a7..accd90c4 100644
+--- a/tools/pybind11NewTools.cmake
++++ b/tools/pybind11NewTools.cmake
+@@ -233,13 +233,6 @@ function(pybind11_add_module target_name)
+     endif()
+   endif()
+ 
+-  # Use case-insensitive comparison to match the result of $<CONFIG:cfgs>
+-  string(TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
+-  if(NOT MSVC AND NOT "${uppercase_CMAKE_BUILD_TYPE}" MATCHES DEBUG|RELWITHDEBINFO)
+-    # Strip unnecessary sections of the binary on Linux/macOS
+-    pybind11_strip(${target_name})
+-  endif()
+-
+   if(MSVC)
+     target_link_libraries(${target_name} PRIVATE pybind11::windows_extras)
+   endif()
+diff --git a/tools/pybind11Tools.cmake b/tools/pybind11Tools.cmake
+index 66ad00a4..855ede41 100644
+--- a/tools/pybind11Tools.cmake
++++ b/tools/pybind11Tools.cmake
+@@ -212,12 +212,6 @@ function(pybind11_add_module target_name)
+     endif()
+   endif()
+ 
+-  # Use case-insensitive comparison to match the result of $<CONFIG:cfgs>
+-  string(TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
+-  if(NOT MSVC AND NOT "${uppercase_CMAKE_BUILD_TYPE}" MATCHES DEBUG|RELWITHDEBINFO)
+-    pybind11_strip(${target_name})
+-  endif()
+-
+   if(MSVC)
+     target_link_libraries(${target_name} PRIVATE pybind11::windows_extras)
+   endif()
+-- 
+2.39.2
+

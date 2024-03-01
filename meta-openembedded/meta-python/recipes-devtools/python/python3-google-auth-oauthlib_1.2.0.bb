@@ -9,6 +9,6 @@ SRC_URI[sha256sum] = "292d2d3783349f2b0734a0a0207b1e1e322ac193c2c09d8f7c613fb7cc
 inherit pypi setuptools3
 
 RDEPENDS:${PN} = " \
-    ${PYTHON_PN}-google-auth \
-    ${PYTHON_PN}-requests-oauthlib \
+    python3-google-auth \
+    python3-requests-oauthlib \
 "

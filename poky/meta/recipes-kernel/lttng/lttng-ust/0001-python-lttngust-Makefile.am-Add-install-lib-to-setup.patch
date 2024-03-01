@@ -1,6 +1,6 @@
-From dd1fdc841d069dbd4e284f430a88af79de951124 Mon Sep 17 00:00:00 2001
-From: Robert Yang <liezhi.yang@windriver.com>
-Date: Thu, 26 Sep 2019 17:54:00 +0800
+From f65efd963e52de51d35e2e03fb773f33dd64f565 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 20 Feb 2024 12:19:06 +0000
 Subject: [PATCH] python-lttngust/Makefile.am: Add --install-lib to setup.py
 
 Otherwise it may install to /usr/lib, but should be /usr/lib64 when cross
@@ -15,15 +15,15 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/python-lttngust/Makefile.am b/src/python-lttngust/Makefile.am
-index f95482d..f76d95b 100644
+index d53e21d..283901e 100644
 --- a/src/python-lttngust/Makefile.am
 +++ b/src/python-lttngust/Makefile.am
-@@ -32,7 +32,7 @@ install-exec-local: build-python-bindings.stamp
+@@ -45,7 +45,7 @@ install-exec-local: build-python-bindings.stamp
  	if [ "$(DESTDIR)" != "" ]; then \
  		opts="$$opts --root=$(DESTDIR)"; \
  	fi; \
--	$(PYTHON) $(builddir)/setup.py install $$opts;
-+	$(PYTHON) $(builddir)/setup.py install $$opts --install-lib=$(pythondir);
+-	$(PYTHON) $(builddir)/setup.py install $(PY_INSTALL_OPTS) $$opts;
++	$(PYTHON) $(builddir)/setup.py install $(PY_INSTALL_OPTS) $$opts --install-lib=$(pythondir);
  
  clean-local:
  	rm -rf $(builddir)/build

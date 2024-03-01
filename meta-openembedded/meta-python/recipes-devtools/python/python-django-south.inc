@@ -13,5 +13,5 @@ inherit pypi
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-django \
+    python3-django \
     "

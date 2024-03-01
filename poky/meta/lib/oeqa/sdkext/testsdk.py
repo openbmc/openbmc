@@ -16,6 +16,7 @@ class TestSDKExt(TestSDKBase):
         from bb.utils import export_proxies
         from oeqa.utils import avoid_paths_in_environ, make_logger_bitbake_compatible, subprocesstweak
         from oeqa.sdkext.context import OESDKExtTestContext, OESDKExtTestContextExecutor
+        from oeqa.utils import get_json_result_dir
 
         pn = d.getVar("PN")
         logger = make_logger_bitbake_compatible(logging.getLogger("BitBake"))
@@ -91,7 +92,7 @@ class TestSDKExt(TestSDKBase):
             component = "%s %s" % (pn, OESDKExtTestContextExecutor.name)
             context_msg = "%s:%s" % (os.path.basename(tcname), os.path.basename(sdk_env))
             configuration = self.get_sdk_configuration(d, 'sdkext')
-            result.logDetails(self.get_sdk_json_result_dir(d),
+            result.logDetails(get_json_result_dir(d),
                             configuration,
                             self.get_sdk_result_id(configuration))
             result.logSummary(component, context_msg)

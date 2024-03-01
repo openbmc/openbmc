@@ -20,9 +20,9 @@ FILES:${PN}-tests += " \
 "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-netclient \
+    python3-json \
+    python3-logging \
+    python3-netclient \
 "
 
 RDEPENDS:${PN}-samples += " \
@@ -31,5 +31,5 @@ RDEPENDS:${PN}-samples += " \
 
 RDEPENDS:${PN}-tests += " \
     ${PN} \
-    ${PYTHON_PN}-unittest \
+    python3-unittest \
 "

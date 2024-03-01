@@ -17,13 +17,24 @@ from .exceptions import ConnectionClosedError, InvokeError
 
 
 class AsyncClient(object):
-    def __init__(self, proto_name, proto_version, logger, timeout=30):
+    def __init__(
+        self,
+        proto_name,
+        proto_version,
+        logger,
+        timeout=30,
+        server_headers=False,
+        headers={},
+    ):
         self.socket = None
         self.max_chunk = DEFAULT_MAX_CHUNK
         self.proto_name = proto_name
         self.proto_version = proto_version
         self.logger = logger
         self.timeout = timeout
+        self.needs_server_headers = server_headers
+        self.server_headers = {}
+        self.headers = headers
 
     async def connect_tcp(self, address, port):
         async def connect_sock():
@@ -61,8 +72,28 @@ class AsyncClient(object):
     async def setup_connection(self):
         # Send headers
         await self.socket.send("%s %s" % (self.proto_name, self.proto_version))
+        await self.socket.send(
+            "needs-headers: %s" % ("true" if self.needs_server_headers else "false")
+        )
+        for k, v in self.headers.items():
+            await self.socket.send("%s: %s" % (k, v))
+
         # End of headers
         await self.socket.send("")
+
+        self.server_headers = {}
+        if self.needs_server_headers:
+            while True:
+                line = await self.socket.recv()
+                if not line:
+                    # End headers
+                    break
+                tag, value = line.split(":", 1)
+                self.server_headers[tag.lower()] = value.strip()
+
+    async def get_header(self, tag, default):
+        await self.connect()
+        return self.server_headers.get(tag, default)
 
     async def connect(self):
         if self.socket is None:

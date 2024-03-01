@@ -9,4 +9,4 @@ SRC_URI[sha256sum] = "0e33670e83f6a33ebb0822e43a609c3247178d4a375ff50a4689e266d8
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} += "${PYTHON_PN}-fcntl ${PYTHON_PN}-logging ${PYTHON_PN}-io"
+RDEPENDS:${PN} += "python3-fcntl python3-logging python3-io"

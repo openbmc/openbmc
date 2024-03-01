@@ -22,9 +22,8 @@ EXTRA_OECONF = "--disable-xml-docs \
                 --disable-doxygen-docs \
                 --enable-largefile \
                 --with-system-socket=/run/dbus/system_bus_socket \
-                --enable-tests \
+                --enable-modular-tests \
                 --enable-checks \
-                --enable-asserts \
                 --runstatedir=/run \
                 "
 EXTRA_OECONF:append:class-target = " SYSTEMCTL=${base_bindir}/systemctl"

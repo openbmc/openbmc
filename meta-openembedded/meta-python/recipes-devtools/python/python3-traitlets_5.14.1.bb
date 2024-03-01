@@ -8,6 +8,6 @@ SRC_URI[sha256sum] = "8585105b371a04b8316a43d5ce29c098575c2e477850b62b848b964f14
 inherit pypi python_hatchling
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-ipython-genutils \
-    ${PYTHON_PN}-decorator \
+    python3-ipython-genutils \
+    python3-decorator \
 "

@@ -1,0 +1,29 @@
+From 5e6eb640f54a0d716d62ab4db8d96d3b6f3aa7bc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 19 Feb 2024 22:11:41 -0800
+Subject: [PATCH] cython: Use cythyon3 in cmake check
+
+OE does not install cython anymore, it only has cython3
+therefore point the build system to find cython3
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cython/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cython/CMakeLists.txt b/cython/CMakeLists.txt
+index daa4f76..93dd030 100644
+--- a/cython/CMakeLists.txt
++++ b/cython/CMakeLists.txt
+@@ -1,5 +1,5 @@
+ find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+-find_program(CYTHON "cython")
++find_program(CYTHON "cython3")
+ 
+ if(NOT USE_INSTALLED_POCKETSPHINX)
+   set_property(TARGET pocketsphinx PROPERTY POSITION_INDEPENDENT_CODE on)
+-- 
+2.43.2
+

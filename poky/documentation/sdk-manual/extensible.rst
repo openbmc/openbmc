@@ -63,6 +63,8 @@ their own pros and cons:
    need to provide a well-functioning binary artefact cache over the network
    for developers with underpowered laptops.
 
+.. _setting_up_ext_sdk_in_build:
+
 Setting up the Extensible SDK environment directly in a Yocto build
 -------------------------------------------------------------------
 
@@ -168,6 +170,8 @@ architecture. The example assumes the SDK installer is located in
    that case, set up the proper permissions in the directory and run the
    installer again.
 
+.. _running_the_ext_sdk_env:
+
 Running the Extensible SDK Environment Setup Script
 ===================================================
 
@@ -205,6 +209,8 @@ use the SDK (e.g. ``PATH``, :term:`CC`, :term:`LD`, and so forth). If you want
 to see all the environment variables the script exports, examine the
 installation file itself.
 
+.. _using_devtool:
+
 Using ``devtool`` in Your SDK Workflow
 ======================================
 
@@ -230,12 +236,14 @@ all the commands.
    See the ":doc:`/ref-manual/devtool-reference`"
    section in the Yocto Project Reference Manual.
 
-Three ``devtool`` subcommands provide entry-points into development:
+``devtool`` subcommands provide entry-points into development:
 
 -  *devtool add*: Assists in adding new software to be built.
 
 -  *devtool modify*: Sets up an environment to enable you to modify
    the source of an existing component.
+
+-  *devtool ide-sdk*: Generates a configuration for an IDE.
 
 -  *devtool upgrade*: Updates an existing recipe so that you can
    build it for an updated set of source files.
@@ -613,6 +621,279 @@ command:
       You can use the ``devtool reset`` command to put things back should you
       decide you do not want to proceed with your work. If you do use this
       command, realize that the source tree is preserved.
+
+``devtool ide-sdk`` configures IDEs for the extensible SDK
+----------------------------------------------------------
+
+``devtool ide-sdk`` automatically configures IDEs to use the extensible SDK.
+To make sure that all parts of the extensible SDK required by the generated
+IDE configuration are available, ``devtool ide-sdk`` uses BitBake in the
+background to bootstrap the extensible SDK.
+
+The extensible SDK supports two different development modes.
+``devtool ide-sdk`` supports both of them:
+
+#. *Modified mode*:
+
+   By default ``devtool ide-sdk`` generates IDE configurations for recipes in
+   workspaces created by ``devtool modify`` or ``devtool add`` as described in
+   :ref:`using_devtool`.  This mode creates IDE configurations with support for
+   advanced features, such as deploying the binaries to the remote target
+   device and performing remote debugging sessions. The generated IDE
+   configurations use the per recipe sysroots as Bitbake does internally.
+
+   In order to use the tool, a few settings are needed. As a starting example,
+   the following lines of code can be added to the ``local.conf`` file::
+
+      # Build the companion debug file system
+      IMAGE_GEN_DEBUGFS = "1"
+      # Optimize build time: with devtool ide-sdk the dbg tar is not needed
+      IMAGE_FSTYPES_DEBUGFS = ""
+      # Without copying the binaries into roofs-dbg, GDB does not find all source files.
+      IMAGE_CLASSES += "image-combined-dbg"
+
+      # SSH is mandatory, no password simplifies the usage
+      EXTRA_IMAGE_FEATURES += "\
+         ssh-server-openssh \
+         debug-tweaks \
+      "
+
+      # Remote debugging needs gdbserver on the target device
+      IMAGE_INSTALL:append = " gdbserver"
+
+      # Add the recipes which should be modified to the image
+      # Otherwise some dependencies might be missing.
+      IMAGE_INSTALL:append = " my-recipe"
+
+   Assuming the BitBake environment is set up correctly and a workspace has
+   been created for the recipe using ``devtool modify my-recipe``, the
+   following command can create the SDK and the configuration for VSCode in
+   the recipe workspace::
+
+      $ devtool ide-sdk my-recipe core-image-minimal --target root@192.168.7.2
+
+   The command requires an image recipe (``core-image-minimal`` for this example)
+   that is used to create the SDK. This firmware image should also be installed
+   on the target device.  It is possible to pass multiple package recipes.
+   ``devtool ide-sdk`` tries to create an IDE configuration for all package
+   recipes.
+
+   What this command does exactly depends on the recipe, more precisely on the
+   build tool used by the recipe. The basic idea is to configure the IDE so
+   that it calls the build tool exactly as ``bitbake`` does.
+
+   For example, a CMake preset is created for a recipe that inherits
+   :ref:`ref-classes-cmake`. In the case of VSCode, CMake presets are supported
+   by the CMake Tools plugin.  This is an example of how the build
+   configuration used by ``bitbake`` is exported to an IDE configuration that
+   gives exactly the same build results.
+
+   Support for remote debugging with seamless integration into the IDE is
+   important for a cross-SDK. ``devtool ide-sdk`` automatically generates the
+   necessary helper scripts for deploying the compiled artifacts to the target
+   device as well as the necessary configuration for the debugger and the IDE.
+
+   .. note::
+
+      To ensure that the debug symbols on the build machine match the binaries
+      running on the target device, it is essential that the image built by
+      ``devtool ide-sdk`` is running on the target device.
+
+   ``devtool ide-sdk`` aims to support multiple programming languages and
+   multiple IDEs natively. "Natively" means that the IDE is configured to call
+   the build tool (e.g. CMake or Meson) directly. This has several advantages.
+   First of all, it is much faster than ``devtool build``, but it also allows
+   to use the very good integration of tools like CMake or GDB in VSCode and
+   other IDEs. However, supporting many programming languages and multiple
+   IDEs is quite an elaborate and constantly evolving thing. Support for IDEs
+   is therefore implemented as plugins. Plugins can also be provided by
+   optional layers.
+
+   The default IDE is VSCode. Some hints about using VSCode:
+
+   -  To work on the source code of a recipe an instance of VSCode is started in
+      the recipe's workspace. Example::
+
+         code build/workspace/sources/my-recipe
+
+   -  To work with CMake press ``Ctrl + Shift + p``, type ``cmake``. This will
+      show some possible commands like selecting a CMake preset, compiling or
+      running CTest.
+
+      For recipes inheriting :ref:`ref-classes-cmake-qemu` rather than
+      :ref:`ref-classes-cmake`, executing cross-compiled unit tests on the host
+      can be supported transparently with QEMU user-mode.
+
+   -  To work with Meson press ``Ctrl + Shift + p``, type ``meson``. This will
+      show some possible commands like compiling or executing the unit tests.
+
+      A note on running cross-compiled unit tests on the host: Meson enables
+      support for QEMU user-mode by default. It is expected that the execution
+      of the unit tests from the IDE will work easily without any additional
+      steps, provided that the code is suitable for execution on the host
+      machine.
+
+   -  For the deployment to the target device, just press ``Ctrl + Shift + p``,
+      type ``task``.  Select ``install && deploy-target``.
+
+   -  For remote debugging, switch to the debugging view by pressing the "play"
+      button with the ``bug icon`` on the left side. This will provide a green
+      play button with a drop-down list where a debug configuration can be
+      selected.  After selecting one of the generated configurations, press the
+      "play" button.
+
+      Starting a remote debugging session automatically initiates the deployment
+      to the target device. If this is not desired, the
+      ``"dependsOn": ["install && deploy-target...]`` parameter of the tasks
+      with ``"label": "gdbserver start...`` can be removed from the
+      ``tasks.json`` file.
+
+      VSCode supports GDB with many different setups and configurations for many
+      different use cases.  However, most of these setups have some limitations
+      when it comes to cross-development, support only a few target
+      architectures or require a high performance target device. Therefore
+      ``devtool ide-sdk`` supports the classic, generic setup with GDB on the
+      development host and gdbserver on the target device.
+
+      Roughly summarized, this means:
+
+      -  The binaries are copied via SSH to the remote target device by a script
+         referred by ``tasks.json``.
+
+      -  gdbserver is started on the remote target device via SSH by a script
+         referred by ``tasks.json``.
+
+         Changing the parameters that are passed to the debugging executable
+         requires modifying the generated script. The script is located at
+         ``oe-scripts/gdbserver_*``. Defining the parameters in the ``args``
+         field in the ``launch.json`` file does not work.
+
+      -  VSCode connects to gdbserver as documented in
+         `Remote debugging or debugging with a local debugger server
+         <https://code.visualstudio.com/docs/cpp/launch-json-reference#_remote-debugging-or-debugging-with-a-local-debugger-server>`__.
+
+   Additionally ``--ide=none`` is supported. With the ``none`` IDE parameter,
+   some generic configuration files like ``gdbinit`` files and some helper
+   scripts starting gdbserver remotely on the target device as well as the GDB
+   client on the host are generated.
+
+   Here is a usage example for the ``cmake-example`` recipe from the
+   ``meta-selftest`` layer which inherits :ref:`ref-classes-cmake-qemu`:
+
+   .. code-block:: sh
+
+      # Create the SDK
+      devtool modify cmake-example
+      devtool ide-sdk cmake-example core-image-minimal -c --debug-build-config --ide=none
+
+      # Install the firmware on a target device or start QEMU
+      runqemu
+
+      # From exploring the workspace of cmake-example
+      cd build/workspace/sources/cmake-example
+
+      # Find cmake-native and save the path into a variable
+      # Note: using just cmake instead of $CMAKE_NATIVE would work in many cases
+      CMAKE_NATIVE="$(jq -r '.configurePresets[0] | "\(.cmakeExecutable)"' CMakeUserPresets.json)"
+
+      # List available CMake presets
+      "$CMAKE_NATIVE" --list-presets
+      Available configure presets:
+
+        "cmake-example-cortexa57" - cmake-example: cortexa57
+
+      # Re-compile the already compiled sources
+      "$CMAKE_NATIVE" --build --preset cmake-example-cortexa57
+      ninja: no work to do.
+      # Do a clean re-build
+      "$CMAKE_NATIVE" --build --preset cmake-example-cortexa57 --target clean
+      [1/1] Cleaning all built files...
+      Cleaning... 8 files.
+      "$CMAKE_NATIVE" --build --preset cmake-example-cortexa57 --target all
+      [7/7] Linking CXX executable cmake-example
+
+      # Run the cross-compiled unit tests with QEMU user-mode
+      "$CMAKE_NATIVE" --build --preset cmake-example-cortexa57 --target test
+      [0/1] Running tests...
+      Test project .../build/tmp/work/cortexa57-poky-linux/cmake-example/1.0/cmake-example-1.0
+          Start 1: test-cmake-example
+      1/1 Test #1: test-cmake-example ...............   Passed    0.03 sec
+
+      100% tests passed, 0 tests failed out of 1
+
+      Total Test time (real) =   0.03 sec
+
+      # Using CTest directly is possible as well
+      CTEST_NATIVE="$(dirname "$CMAKE_NATIVE")/ctest"
+
+      # List available CMake presets
+      "$CTEST_NATIVE" --list-presets
+      Available test presets:
+
+        "cmake-example-cortexa57" - cmake-example: cortexa57
+
+      # Run the cross-compiled unit tests with QEMU user-mode
+      "$CTEST_NATIVE" --preset "cmake-example-cortexa57"
+      Test project ...build/tmp/work/cortexa57-poky-linux/cmake-example/1.0/cmake-example-1.0
+          Start 1: test-cmake-example
+      1/1 Test #1: test-cmake-example ...............   Passed    0.03 sec
+
+      100% tests passed, 0 tests failed out of 1
+
+      Total Test time (real) =   0.03 sec
+
+      # Deploying the new build to the target device (default is QEUM at 192.168.7.2)
+      oe-scripts/install_and_deploy_cmake-example-cortexa57
+
+      # Start a remote debugging session with gdbserver on the target and GDB on the host
+      oe-scripts/gdbserver_1234_usr-bin-cmake-example_m
+      oe-scripts/gdb_1234_usr-bin-cmake-example
+      break main
+      run
+      step
+      stepi
+      continue
+      quit
+
+      # Stop gdbserver on the target device
+      oe-scripts/gdbserver_1234_usr-bin-cmake-example_m stop
+
+#. *Shared sysroots mode*
+
+   For some recipes and use cases a per-recipe sysroot based SDK is not
+   suitable.  Optionally ``devtool ide-sdk`` configures the IDE to use the
+   toolchain provided by the extensible SDK as described in
+   :ref:`running_the_ext_sdk_env`. ``devtool ide-sdk --mode=shared`` is
+   basically a wrapper for the setup of the extensible SDK as described in
+   :ref:`setting_up_ext_sdk_in_build`. The IDE gets a configuration to use the
+   shared sysroots.
+
+   Creating a SDK with shared sysroots that contains all the dependencies needed
+   to work with ``my-recipe`` is possible with the following example command::
+
+      $ devtool ide-sdk --mode=shared my-recipe
+
+   For VSCode the cross-toolchain is exposed as a CMake kit. CMake kits are
+   defined in ``~/.local/share/CMakeTools/cmake-tools-kits.json``.
+   The following example shows how the cross-toolchain can be selected in
+   VSCode. First of all we need a folder containing a CMake project.
+   For this example, let's create a CMake project and start VSCode::
+
+      mkdir kit-test
+      echo "project(foo VERSION 1.0)" > kit-test/CMakeLists.txt
+      code kit-test
+
+   If there is a CMake project in the workspace, cross-compilation is supported:
+
+   - Press ``Ctrl + Shift + P``, type ``CMake: Scan for Kits``
+   - Press ``Ctrl + Shift + P``, type ``CMake: Select a Kit``
+
+   Finally most of the features provided by CMake and the IDE should be available.
+
+   Other IDEs than VSCode are supported as well. However,
+   ``devtool ide-sdk --mode=shared --ide=none my-recipe`` is currently
+   just a simple wrapper for the setup of the extensible SDK, as described in
+   :ref:`setting_up_ext_sdk_in_build`.
 
 Use ``devtool upgrade`` to Create a Version of the Recipe that Supports a Newer Version of the Software
 -------------------------------------------------------------------------------------------------------

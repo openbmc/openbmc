@@ -11,9 +11,9 @@ SRC_URI[sha256sum] = "c02f372a88e0d17f36d3093a644c73cfc1788e876a7c4bcb4020a77512
 inherit pypi setuptools3
 
 DEPENDS += " \
-    ${PYTHON_PN}-cython-native \
-    ${PYTHON_PN}-numpy-native \
-    ${PYTHON_PN}-versioneer-native \
+    python3-cython-native \
+    python3-numpy-native \
+    python3-versioneer-native \
 "
 
 PACKAGESPLITFUNCS =+ "fix_cythonized_sources"
@@ -29,10 +29,10 @@ fix_cythonized_sources() {
 CFLAGS:append:toolchain-clang = " -Wno-error=deprecated-declarations"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-numpy \
-    ${PYTHON_PN}-dateutil \
-    ${PYTHON_PN}-dateutil-zoneinfo \
-    ${PYTHON_PN}-pytz \
-    ${PYTHON_PN}-profile \
+    python3-json \
+    python3-numpy \
+    python3-dateutil \
+    python3-dateutil-zoneinfo \
+    python3-pytz \
+    python3-profile \
 "

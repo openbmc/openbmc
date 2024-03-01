@@ -12,11 +12,11 @@ PYPI_PACKAGE = "pycares"
 
 inherit pypi setuptools3
 
-DEPENDS += "${PYTHON_PN}-cffi-native"
+DEPENDS += "python3-cffi-native"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-cffi \
-    ${PYTHON_PN}-idna \
+    python3-cffi \
+    python3-idna \
 "
 
 BBCLASSEXTEND = "native nativesdk"

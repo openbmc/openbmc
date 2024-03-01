@@ -9,24 +9,24 @@ SRC_URI[sha256sum] = "921fb57ea2ae3ae2806e18895bb0457697f27221b345c8b05afa4cb304
 inherit pypi setuptools3
 
 RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-ply \
-    ${PYTHON_PN}-pyyaml \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-pywbem \
-    ${PYTHON_PN}-click \
-    ${PYTHON_PN}-requests \
-    ${PYTHON_PN}-prompt-toolkit \
-    ${PYTHON_PN}-mock \
-    ${PYTHON_PN}-packaging \
-    ${PYTHON_PN}-nocasedict \
-    ${PYTHON_PN}-yamlloader \
-    ${PYTHON_PN}-click-repl \
-    ${PYTHON_PN}-click-spinner \
-    ${PYTHON_PN}-asciitree \
-    ${PYTHON_PN}-tabulate \
-    ${PYTHON_PN}-pydicti \
-    ${PYTHON_PN}-nocaselist \
-    ${PYTHON_PN}-custom-inherit \
+    python3-ply \
+    python3-pyyaml \
+    python3-six \
+    python3-pywbem \
+    python3-click \
+    python3-requests \
+    python3-prompt-toolkit \
+    python3-mock \
+    python3-packaging \
+    python3-nocasedict \
+    python3-yamlloader \
+    python3-click-repl \
+    python3-click-spinner \
+    python3-asciitree \
+    python3-tabulate \
+    python3-pydicti \
+    python3-nocaselist \
+    python3-custom-inherit \
 "
 
 BBCLASSEXTEND = "native"

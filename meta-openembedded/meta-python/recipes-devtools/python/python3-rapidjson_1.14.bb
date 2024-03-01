@@ -24,13 +24,13 @@ DEPENDS += " \
 
 # Adding required python package for the ptest (pytest and pytest->automake report translation)
 RDEPENDS:${PN}-ptest += " \
-    ${PYTHON_PN}-pytest \
-    ${PYTHON_PN}-unittest-automake-output \
-    ${PYTHON_PN}-pytz \
+    python3-pytest \
+    python3-unittest-automake-output \
+    python3-pytz \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-core \
+    python3-core \
 "
 
 # Installing the test suite on the target

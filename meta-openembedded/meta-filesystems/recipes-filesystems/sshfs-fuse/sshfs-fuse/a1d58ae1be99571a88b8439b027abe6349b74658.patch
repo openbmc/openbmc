@@ -1,0 +1,31 @@
+From a1d58ae1be99571a88b8439b027abe6349b74658 Mon Sep 17 00:00:00 2001
+From: Gabriel Staples <ercaguy@gmail.com>
+Date: Tue, 22 Dec 2020 23:26:40 -0800
+Subject: [PATCH] Fix deprecated warning in conftest.py
+
+```
+test/conftest.py:66
+  sshfs/build/test/conftest.py:66: PytestDeprecationWarning: @pytest.yield_fixture is deprecated.
+  Use @pytest.fixture instead; they are the same.
+    @pytest.yield_fixture(autouse=True)
+```
+
+Upstream-Status: Submitted [https://github.com/libfuse/sshfs/pull/238]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/conftest.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/conftest.py b/test/conftest.py
+index 70cd0c62..d58d45b2 100644
+--- a/test/conftest.py
++++ b/test/conftest.py
+@@ -63,7 +63,7 @@ def register_output(self, pattern, count=1, flags=re.MULTILINE):
+ # relies on tests running sequential (i.e., don't dare to use e.g. the xdist
+ # plugin)
+ current_capfd = None
+-@pytest.yield_fixture(autouse=True)
++@pytest.fixture(autouse=True)
+ def save_cap_fixtures(request, capfd):
+     global current_capfd
+     capfd.false_positives = []

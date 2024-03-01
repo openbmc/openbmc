@@ -1,0 +1,82 @@
+From 7a75d76c2d6bfb917f30ced8f5c0a9a4157f7819 Mon Sep 17 00:00:00 2001
+From: aekoroglu <ali.erdinc.koroglu@intel.com>
+Date: Fri, 24 Jun 2022 14:12:59 +0300
+Subject: [PATCH] DeprecationWarning invalid escape sequence fix
+
+Upstream-Status: Submitted [https://github.com/tikitu/jsmin/pull/38]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ jsmin/test.py | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/jsmin/test.py b/jsmin/test.py
+index 173ac65..afea4e7 100644
+--- a/jsmin/test.py
++++ b/jsmin/test.py
+@@ -337,8 +337,8 @@ def testImplicitSemicolon3(self):
+         self.assertMinified("return//comment...\r\na", "return\na")
+ 
+     def testSingleComment2(self):
+-        self.assertMinified('x.replace(/\//, "_")// slash to underscore',
+-                'x.replace(/\//,"_")')
++        self.assertMinified('x.replace(/\\//, "_")// slash to underscore',
++                'x.replace(/\\//,"_")')
+ 
+     def testSlashesNearComments(self):
+         original = '''
+@@ -383,8 +383,8 @@ def test_space_in_regex(self):
+         self.assertMinified(original, original)
+ 
+     def test_brackets_around_slashed_regex(self):
+-        original = 'function a() { /\//.test("a") }'
+-        expected = 'function a(){/\//.test("a")}'
++        original = 'function a() { /\\//.test("a") }'
++        expected = 'function a(){/\\//.test("a")}'
+         self.assertMinified(original, expected)
+ 
+     def test_angular_1(self):
+@@ -455,12 +455,12 @@ def testBackticksTagged(self):
+     def test_issue_bitbucket_16(self):
+         original = """
+             f = function() {
+-                return /DataTree\/(.*)\//.exec(this._url)[1];
++                return /DataTree\\/(.*)\\//.exec(this._url)[1];
+             }
+         """
+         self.assertMinified(
+             original,
+-            'f=function(){return /DataTree\/(.*)\//.exec(this._url)[1];}')
++            'f=function(){return /DataTree\\/(.*)\\//.exec(this._url)[1];}')
+ 
+     def test_issue_bitbucket_17(self):
+         original = "// hi\n/^(get|post|head|put)$/i.test('POST')"
+@@ -470,7 +470,7 @@ def test_issue_bitbucket_17(self):
+     def test_issue_6(self):
+         original = '''
+             respond.regex = {
+-                comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
++                comments: /\\/\\*[^*]*\\*+([^/][^*]*\\*+)*\\//gi,
+                 urls: 'whatever'
+             };
+         '''
+@@ -548,16 +548,16 @@ def test_issue_9_multi_comments(self):
+ 
+     def test_issue_12_re_nl_if(self):
+         original = '''
+-            var re = /\d{4}/
++            var re = /\\d{4}/
+             if (1) { console.log(2); }'''
+         self.assertMinified(
+-            original, 'var re=/\d{4}/\nif(1){console.log(2);}')
++            original, 'var re=/\\d{4}/\nif(1){console.log(2);}')
+ 
+     def test_issue_12_re_nl_other(self):
+         original = '''
+-            var re = /\d{4}/
++            var re = /\\d{4}/
+             g = 10'''
+-        self.assertMinified(original , 'var re=/\d{4}/\ng=10')
++        self.assertMinified(original , 'var re=/\\d{4}/\ng=10')
+ 
+     def test_preserve_copyright(self):
+         original = '''

@@ -16,10 +16,10 @@ inherit setuptools3
 PIP_INSTALL_PACKAGE = "geomet"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-click \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-six \
+    python3-click \
+    python3-core \
+    python3-io \
+    python3-json \
+    python3-logging \
+    python3-six \
 "

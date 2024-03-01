@@ -37,7 +37,7 @@ library files.
    Some previously released versions of the Yocto Project defined the
    static library files through ``${PN}-dev``.
 
-Following is part of the BitBake configuration file, where you can see
+Here is the part of the BitBake configuration file, where you can see
 how the static library files are defined::
 
    PACKAGE_BEFORE_PN ?= ""
@@ -177,7 +177,7 @@ Additional Implementation Details
 ---------------------------------
 
 There are generic implementation details as well as details that are specific to
-package management systems. Following are implementation details
+package management systems. Here are implementation details
 that exist regardless of the package management system:
 
 -  The typical convention used for the class extension code as used by

@@ -143,4 +143,4 @@ FILES:${PN}-conf += "${sysconfdir}/squid"
 FILES:${PN}-networkmanager = "${libdir}/NetworkManager/dispatcher.d"
 
 RDEPENDS:${PN} += "perl ${PN}-conf"
-RDEPENDS:${PN}-ptest += "perl make"
+RDEPENDS:${PN}-ptest += "perl make bash"

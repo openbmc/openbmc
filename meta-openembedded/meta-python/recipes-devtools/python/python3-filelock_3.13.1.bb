@@ -12,5 +12,5 @@ BBCLASSEXTEND = "native nativesdk"
 inherit pypi python_hatchling
 
 DEPENDS += "\
-    ${PYTHON_PN}-hatch-vcs-native \
+    python3-hatch-vcs-native \
 "

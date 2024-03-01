@@ -12,12 +12,12 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "a6f5977418eff3b2d5500d54d9db50c8277a368436f4e4f8ddb1be3422870184"
 
 RDEPENDS:${PN} += "\
-	${PYTHON_PN}-compression \
-	${PYTHON_PN}-io \
-	${PYTHON_PN}-pprint \
-	${PYTHON_PN}-shell \
-	${PYTHON_PN}-jdcal \
-	${PYTHON_PN}-et-xmlfile \
-	${PYTHON_PN}-numbers \
-	${PYTHON_PN}-xml \
+	python3-compression \
+	python3-io \
+	python3-pprint \
+	python3-shell \
+	python3-jdcal \
+	python3-et-xmlfile \
+	python3-numbers \
+	python3-xml \
 "

@@ -1,0 +1,31 @@
+From 417ed0045b3d04f539a8eb18b07a208c75f6c7e1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 20 Feb 2024 16:08:20 -0800
+Subject: [PATCH] cmake: Pass --noline flag to flex
+
+This ensures that line directive is not emitted into lexer output which
+could be absolute build paths, since these files end up in dbg packages
+this can be flagged as a build/packaging warning.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/configure_options.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/configure_options.cmake b/cmake/configure_options.cmake
+index f3673f399..fbd0bd2c3 100644
+--- a/cmake/configure_options.cmake
++++ b/cmake/configure_options.cmake
+@@ -28,7 +28,7 @@ if ( ENABLE_LARGE_PCAP )
+ endif ( ENABLE_LARGE_PCAP )
+ 
+ # Flex Lexer
+-set ( FLEX_FLAGS "-Ca" )
++set ( FLEX_FLAGS "-Ca --noline" )
+ 
+ # documentation
+ 
+-- 
+2.43.2
+

@@ -59,6 +59,7 @@ FILES:${PN}-libs = "${libdir}/${BPN}/*.so /usr/lib/${BPN}/*.so"
 
 INSANE_SKIP:${PN}-libs = "dev-so"
 RDEPENDS:${PN} += "${PN}-libs"
+RDEPENDS:${PN}-ptest += "packagegroup-core-buildessential"
 
 PACKAGECONFIG ??= "libgcrypt non32bit snmp-bc"
 PACKAGECONFIG[sysfs] = "--enable-sysfs,--disable-sysfs,sysfsutils,"

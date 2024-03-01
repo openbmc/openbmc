@@ -1,0 +1,32 @@
+From 9357da2a5a829f7a0620e6c19835a65b7b02a8fb Mon Sep 17 00:00:00 2001
+From: Khawaja Shaheryar <behzadshaheryar@gmail.com>
+Date: Tue, 20 Feb 2024 21:03:26 +0500
+Subject: [PATCH] example: Use -lm for the fst module
+
+If -lm is not passed in Makefile.am, the following is seen
+| arm-yoe-linux-gnueabi-ld.lld: error: undefined symbol: ceilf
+| >>> referenced by math.h:632 (/usr/include/c++/v1/math.h:632)
+| >>>               libdaq_static_fst_la-daq_fst.o:(std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<FstKey, FstNode*>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<FstKey, FstNode*>, std::__1::__unordered_map_hasher<FstKey, std::__1::__hash_value_type<FstKey, FstNode*>, FstKeyHash, std::__1::equal_to<FstKey>, true>, std::__1::__unordered_map_equal<FstKey, std::__1::__hash_value_type<FstKey, FstNode*>, std::__1::equal_to<FstKey>, FstKeyHash, true>, std::__1::allocator<std::__1::__hash_value_type<FstKey, FstNode*>>>::__emplace_unique_key_args<FstKey, std::__1::pair<FstKey const, FstNode*>>(FstKey const&, std::__1::pair<FstKey const, FstNode*>&&)) in archive ../modules/fst/.libs/libdaq_static_fst.a
+
+Upstream-Status: Pending
+
+Signed-off-by: Khawaja Shaheryar <behzadshaheryar@gmail.com>
+---
+ example/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/example/Makefile.am b/example/Makefile.am
+index 0d5ca31..1eaa9e8 100644
+--- a/example/Makefile.am
++++ b/example/Makefile.am
+@@ -31,6 +31,7 @@ endif
+ if BUILD_FST_MODULE
+ daqtest_static_CFLAGS += -DBUILD_FST_MODULE
+ daqtest_static_LDADD += ${top_builddir}/modules/fst/libdaq_static_fst.la $(DAQ_FST_LIBS)
++daqtest_static_LDFLAGS += -lm
+ endif
+ if BUILD_NETMAP_MODULE
+ daqtest_static_CFLAGS += -DBUILD_NETMAP_MODULE
+-- 
+2.34.1
+

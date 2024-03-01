@@ -9,5 +9,5 @@ SRC_URI[sha256sum] = "d4540617648cb5f895730f1ad8c82a65f2dad0166f57b75f3ca54759c4
 inherit setuptools3 pypi
 
 RDEPENDS:${PN} += " \
-        ${PYTHON_PN}-dateutil \
+        python3-dateutil \
         "

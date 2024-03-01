@@ -10,12 +10,6 @@ def meson_array(var, d):
     items = d.getVar(var).split()
     return repr(items[0] if len(items) == 1 else items)
 
-def meson_array_abspath(var, d):
-    import shutil
-    items = d.getVar(var).split()
-    items[0] = shutil.which(items[0]) or items[0]
-    return repr(items[0] if len(items) == 1 else items)
-
 # Map our ARCH values to what Meson expects:
 # http://mesonbuild.com/Reference-tables.html#cpu-families
 def meson_cpu_family(var, d):

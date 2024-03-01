@@ -9,7 +9,7 @@ REQUIRED_DISTRO_FEATURES = "ptest"
 require conf/include/ptest-packagelists-meta-perl.inc
 
 # Include the full set of ptests
-PTESTS_META_PERL = "${PTESTS_FAST_META_PERL} ${PTESTS_SLOW_META_PERL}"
+PTESTS_META_PERL = "${PTESTS_FAST_META_PERL} ${PTESTS_SLOW_META_PERL} ${PTESTS_PROBLEMS_META_PERL}"
 
 do_testimage[noexec] = "1"
 do_testimage[depends] = "${@' '.join(['meta-perl-image-ptest-'+x+':do_testimage' for x in d.getVar('PTESTS_META_PERL').split()])}"

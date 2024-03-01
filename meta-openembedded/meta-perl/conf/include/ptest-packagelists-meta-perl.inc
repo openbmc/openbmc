@@ -10,7 +10,9 @@ PTESTS_FAST_META_PERL = "\
     libcapture-tiny-perl \
     libcgi-perl \
     libcrypt-openssl-random-perl \
+    libdigest-hmac-perl \
     libextutils-config-perl \
+    libextutils-installpaths-perl \
     libhtml-tagset-perl \
     libmozilla-ca-perl \
     libmodule-build-tiny-perl \
@@ -31,13 +33,10 @@ PTESTS_PROBLEMS_META_PERL ="\
     libcrypt-openssl-rsa-perl \
     libdata-hexdump-perl \
     libdbd-sqlite-perl \
-    libdigest-hmac-perl \
     libdigest-sha1-perl \
     libnet-dns-perl \
     libnet-dns-sec-perl \
     libnet-ldap-perl \
-    libencode-perl \
-    libextutils-installpaths-perl \
     libfile-slurper-perl \
     libhtml-parser-perl \
     libmime-types-perl \

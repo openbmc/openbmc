@@ -5,10 +5,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRC_URI[sha256sum] = "a54534acf9b89bc7ed264807013b505bf07f74dbe4bcfa37d32bd063870b087c"
 
-DEPENDS += "${PYTHON_PN}-pbr-native"
+DEPENDS += "python3-pbr-native"
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} += "${PYTHON_PN}-pbr ${PYTHON_PN}-six"
+RDEPENDS:${PN} += "python3-pbr python3-six"
 
 BBCLASSEXTEND = "native"

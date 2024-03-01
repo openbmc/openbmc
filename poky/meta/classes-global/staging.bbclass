@@ -245,7 +245,7 @@ def staging_populate_sysroot_dir(targetsysroot, nativesysroot, native, d):
                         continue
 
     staging_processfixme(fixme, targetdir, targetsysroot, nativesysroot, d)
-    for p in postinsts:
+    for p in sorted(postinsts):
         bb.note("Running postinst {}, output:\n{}".format(p, subprocess.check_output(p, shell=True, stderr=subprocess.STDOUT)))
 
 #
@@ -629,7 +629,7 @@ python extend_recipe_sysroot() {
     for f in fixme:
         staging_processfixme(fixme[f], f, recipesysroot, recipesysrootnative, d)
 
-    for p in postinsts:
+    for p in sorted(postinsts):
         bb.note("Running postinst {}, output:\n{}".format(p, subprocess.check_output(p, shell=True, stderr=subprocess.STDOUT)))
 
     for dep in manifests:

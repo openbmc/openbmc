@@ -10,10 +10,10 @@ SRC_URI[sha256sum] = "5c6837a13ecc1903aab7a545353312049dfedfe5105362ad3a8d9d2078
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += " \
-	${PYTHON_PN}-setuptools-scm-native \
+	python3-setuptools-scm-native \
 "
 
 RDEPENDS:${PN} = " \
-	${PYTHON_PN}-six \
-	${PYTHON_PN}-compression \
+	python3-six \
+	python3-compression \
 "

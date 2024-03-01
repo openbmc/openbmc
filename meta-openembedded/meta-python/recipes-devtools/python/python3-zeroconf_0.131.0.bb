@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "90c431e99192a044a5e0217afd7ca0ca9824af93190332e6f7baf4da53
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-ifaddr \
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-async-timeout \
+    python3-ifaddr \
+    python3-asyncio \
+    python3-async-timeout \
 "

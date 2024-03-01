@@ -9,8 +9,8 @@ Signed-off-by: Yash Shinde <Yash.Shinde@windriver.com>
 ---
 diff --git a/src/bootstrap/synthetic_targets.rs b/ src/bootstrap/synthetic_targets.rs
 index d2c65b740da..45baf56f46b 100644
---- a/src/bootstrap/synthetic_targets.rs
-+++ b/src/bootstrap/synthetic_targets.rs
+--- a/src/bootstrap/src/core/build_steps/synthetic_targets.rs
++++ b/src/bootstrap/src/core/build_steps/synthetic_targets.rs
 @@ -59,6 +59,7 @@ fn create_synthetic_target(
      let mut cmd = Command::new(builder.rustc(compiler));
      cmd.arg("--target").arg(base.rustc_target_arg());

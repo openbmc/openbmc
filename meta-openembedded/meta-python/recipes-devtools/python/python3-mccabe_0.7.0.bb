@@ -8,6 +8,6 @@ SRC_URI[sha256sum] = "348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f
 
 inherit pypi setuptools3
 
-DEPENDS += "${PYTHON_PN}-pytest-runner-native"
+DEPENDS += "python3-pytest-runner-native"
 
 BBCLASSEXTEND = "native nativesdk"

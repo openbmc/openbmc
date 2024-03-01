@@ -8,4 +8,4 @@ SRC_URI[sha256sum] = "a83aca08fbe7aacb79fec788c9c0bac936343560ed9ec18b82a13a12c2
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} += "${PYTHON_PN}-hpack ${PYTHON_PN}-hyperframe"
+RDEPENDS:${PN} += "python3-hpack python3-hyperframe"

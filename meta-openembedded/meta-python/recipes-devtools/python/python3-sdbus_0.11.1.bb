@@ -9,9 +9,9 @@ REQUIRED_DISTRO_FEATURES = "systemd"
 DEPENDS += "systemd"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-core \
+    python3-asyncio \
+    python3-numbers \
+    python3-core \
 "
 
 inherit pypi setuptools3 features_check pkgconfig

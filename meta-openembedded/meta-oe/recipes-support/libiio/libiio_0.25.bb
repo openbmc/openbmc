@@ -43,19 +43,19 @@ PACKAGECONFIG[xml_backend] = "-DWITH_XML_BACKEND=ON,${XML_BACKEND_DISABLE},libxm
 PACKAGECONFIG[dnssd] = "-DHAVE_DNS_SD=ON,-DHAVE_DNS_SD=off,avahi"
 PACKAGECONFIG[libiio-python3] = "-DPYTHON_BINDINGS=ON,-DPYTHON_BINDINGS=OFF"
 
-PACKAGES =+ "${PN}-iiod ${PN}-tests ${PN}-${PYTHON_PN}"
+PACKAGES =+ "${PN}-iiod ${PN}-tests ${PN}-python3"
 
-# Inheriting setuptools3 incorrectly adds the dependency on ${PYTHON_PN}-core
-# to ${PN} instead of to ${PN}-${PYTHON_PN} where it belongs.
-RDEPENDS:${PN}:remove = "${PYTHON_PN}-core"
-RDEPENDS:${PN}-${PYTHON_PN} = "${PN} ${PYTHON_PN}-core ${PYTHON_PN}-ctypes ${PYTHON_PN}-stringold"
+# Inheriting setuptools3 incorrectly adds the dependency on python3-core
+# to ${PN} instead of to ${PN}-python3 where it belongs.
+RDEPENDS:${PN}:remove = "python3-core"
+RDEPENDS:${PN}-python3 = "${PN} python3-core python3-ctypes python3-stringold"
 
 FILES:${PN}-iiod = " \
     ${sbindir}/iiod \
     ${systemd_system_unitdir}/iiod.service \
 "
 FILES:${PN}-tests = "${bindir}"
-FILES:${PN}-${PYTHON_PN} = "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-python3 = "${PYTHON_SITEPACKAGES_DIR}"
 
 SYSTEMD_PACKAGES = "${PN}-iiod"
 SYSTEMD_SERVICE:${PN}-iiod = "iiod.service"

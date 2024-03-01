@@ -96,6 +96,9 @@ do_configure () {
 	linux-gnu64-x86_64)
 		target=linux-x86_64
 		;;
+	linux-loongarch64)
+		target=linux64-loongarch64
+		;;
 	linux-mips | linux-mipsel)
 		# specifying TARGET_CC_ARCH prevents openssl from (incorrectly) adding target architecture flags
 		target="linux-mips32 ${TARGET_CC_ARCH}"
@@ -257,5 +260,3 @@ CVE_PRODUCT = "openssl:openssl"
 
 CVE_VERSION_SUFFIX = "alphabetical"
 
-# Apache in meta-webserver is already recent enough
-CVE_STATUS[CVE-2019-0190] = "not-applicable-config: Only affects OpenSSL >= 1.1.1 in combination with Apache < 2.4.37"

@@ -13,10 +13,10 @@ do_configure:prepend() {
 }
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-misc \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-fcntl \
+    python3-ctypes \
+    python3-misc \
+    python3-six \
+    python3-threading \
+    python3-fcntl \
     libudev \
 "

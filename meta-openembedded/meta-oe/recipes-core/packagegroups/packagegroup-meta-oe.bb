@@ -874,6 +874,7 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     raptor2 \
     rdfind \
     re2 \
+    sdmon \
     sdparm \
     serial-forward \
     read-edid \

@@ -16,10 +16,10 @@ inherit pypi python_setuptools_build_meta
 CLEANBROKEN = "1"
 
 RDEPENDS:${PN} = " \
-    ${PYTHON_PN}-blinker \
-    ${PYTHON_PN}-click \
-    ${PYTHON_PN}-itsdangerous \
-    ${PYTHON_PN}-jinja2 \
-    ${PYTHON_PN}-profile \
-    ${PYTHON_PN}-werkzeug \
+    python3-blinker \
+    python3-click \
+    python3-itsdangerous \
+    python3-jinja2 \
+    python3-profile \
+    python3-werkzeug \
 "

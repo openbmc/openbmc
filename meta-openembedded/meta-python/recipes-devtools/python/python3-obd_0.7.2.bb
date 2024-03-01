@@ -6,4 +6,4 @@ SRC_URI[sha256sum] = "20d38c9ded3daad1e8affab3ff367a70788d4f29ac77ab7aacddc6a6d2
 
 inherit setuptools3 pypi
 
-RDEPENDS:${PN} += "${PYTHON_PN}-pyserial ${PYTHON_PN}-pint ${PYTHON_PN}-setuptools ${PYTHON_PN}-packaging"
+RDEPENDS:${PN} += "python3-pyserial python3-pint python3-setuptools python3-packaging"

@@ -8,10 +8,10 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "ea99368214a4ce613924be99d71db58c269631e95eff4fa09b7354e52dc006a5"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-marshmallow \
-    ${PYTHON_PN}-packaging \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-logging \
+    python3-marshmallow \
+    python3-packaging \
+    python3-core \
+    python3-json \
+    python3-asyncio \
+    python3-logging \
 "

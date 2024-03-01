@@ -11,8 +11,8 @@ PYPI_PACKAGE = "aiodns"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-pycares \
+    python3-asyncio \
+    python3-pycares \
 "
 
 BBCLASSEXTEND = "native nativesdk"

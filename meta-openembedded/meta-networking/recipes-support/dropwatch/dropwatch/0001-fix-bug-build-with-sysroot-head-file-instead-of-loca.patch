@@ -1,0 +1,28 @@
+From 4872c52f55f9cb089e6681c3f1926663145b52ae Mon Sep 17 00:00:00 2001
+From: chenheyun <chen_heyun@163.com>
+Date: Sun, 18 Feb 2024 05:08:25 -0800
+Subject: [PATCH] fix bug: build with sysroot head file instead of local head
+ file:net_dropmon.h
+
+Signed-off-by: chenheyun <chen_heyun@163.com>
+---
+ src/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main.c b/src/main.c
+index e4746d9..81dc4da 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -26,8 +26,8 @@
+ #include <netlink/netlink.h>
+ #include <netlink/genl/genl.h>
+ #include <netlink/genl/ctrl.h>
++#include <net_dropmon.h>
+ 
+-#include "net_dropmon.h"
+ #include "lookup.h"
+ 
+ /*
+-- 
+2.25.1
+

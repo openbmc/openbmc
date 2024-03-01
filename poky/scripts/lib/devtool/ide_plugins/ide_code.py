@@ -194,6 +194,7 @@ class IdeVSCode(IdeBase):
             properties_dict["configurationProvider"] = "ms-vscode.cmake-tools"
         elif modified_recipe.build_tool is BuildTool.MESON:
             properties_dict["configurationProvider"] = "mesonbuild.mesonbuild"
+            properties_dict["compilerPath"] = os.path.join(modified_recipe.staging_bindir_toolchain, modified_recipe.cxx.split()[0])
         else:  # no C/C++ build
             return
 
@@ -241,8 +242,19 @@ class IdeVSCode(IdeBase):
         if gdb_cross_config.image_recipe.rootfs_dbg:
             launch_config['additionalSOLibSearchPath'] = modified_recipe.solib_search_path_str(
                 gdb_cross_config.image_recipe)
-            src_file_map["/usr/src/debug"] = os.path.join(
-                gdb_cross_config.image_recipe.rootfs_dbg, "usr", "src", "debug")
+            # First: Search for sources of this recipe in the workspace folder
+            if modified_recipe.pn in modified_recipe.target_dbgsrc_dir:
+                src_file_map[modified_recipe.target_dbgsrc_dir] = "${workspaceFolder}"
+            else:
+                logger.error(
+                    "TARGET_DBGSRC_DIR must contain the recipe name PN.")
+            # Second: Search for sources of other recipes in the rootfs-dbg
+            if modified_recipe.target_dbgsrc_dir.startswith("/usr/src/debug"):
+                src_file_map["/usr/src/debug"] = os.path.join(
+                    gdb_cross_config.image_recipe.rootfs_dbg, "usr", "src", "debug")
+            else:
+                logger.error(
+                    "TARGET_DBGSRC_DIR must start with /usr/src/debug.")
         else:
             logger.warning(
                 "Cannot setup debug symbols configuration for GDB. IMAGE_GEN_DEBUGFS is not enabled.")
@@ -254,8 +266,10 @@ class IdeVSCode(IdeBase):
     def vscode_launch(self, modified_recipe):
         """GDB Launch configuration for binaries (elf files)"""
 
-        configurations = [self.vscode_launch_bin_dbg(
-            gdb_cross_config) for gdb_cross_config in self.gdb_cross_configs]
+        configurations = []
+        for gdb_cross_config in self.gdb_cross_configs:
+            if gdb_cross_config.modified_recipe is modified_recipe:
+                configurations.append(self.vscode_launch_bin_dbg(gdb_cross_config))
         launch_dict = {
             "version": "0.2.0",
             "configurations": configurations
@@ -279,6 +293,8 @@ class IdeVSCode(IdeBase):
             ]
         }
         for gdb_cross_config in self.gdb_cross_configs:
+            if gdb_cross_config.modified_recipe is not modified_recipe:
+                continue
             tasks_dict['tasks'].append(
                 {
                     "label": gdb_cross_config.id_pretty,
@@ -393,6 +409,8 @@ class IdeVSCode(IdeBase):
         }
         if modified_recipe.gdb_cross:
             for gdb_cross_config in self.gdb_cross_configs:
+                if gdb_cross_config.modified_recipe is not modified_recipe:
+                    continue
                 tasks_dict['tasks'].append(
                     {
                         "label": gdb_cross_config.id_pretty,

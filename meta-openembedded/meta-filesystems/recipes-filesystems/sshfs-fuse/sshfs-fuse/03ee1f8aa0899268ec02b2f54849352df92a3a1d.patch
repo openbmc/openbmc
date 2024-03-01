@@ -1,0 +1,34 @@
+From 03ee1f8aa0899268ec02b2f54849352df92a3a1d Mon Sep 17 00:00:00 2001
+From: Gabriel Staples <ercaguy@gmail.com>
+Date: Tue, 22 Dec 2020 23:33:55 -0800
+Subject: [PATCH] pytest.ini: fix test warning
+
+Warning:
+
+```
+test/util.py:99
+  sshfs/build/test/util.py:99: PytestUnknownMarkWarning: Unknown pytest.mark.uses_fuse - is this a typo?
+  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/mark.html
+    return pytest.mark.uses_fuse()
+```
+
+References for the fix:
+
+1. https://stackoverflow.com/questions/60806473/pytestunknownmarkwarning-unknown-pytest-mark-xxx-is-this-a-typo/60813297#60813297
+1. https://docs.pytest.org/en/stable/mark.html
+
+Upstream-Status: Submitted [https://github.com/libfuse/sshfs/pull/238]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/pytest.ini | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/test/pytest.ini b/test/pytest.ini
+index 95161546..7a7efed4 100644
+--- a/test/pytest.ini
++++ b/test/pytest.ini
+@@ -1,2 +1,4 @@
+ [pytest]
+ addopts = --verbose --assert=rewrite --tb=native -x -r a
++markers =
++    uses_fuse

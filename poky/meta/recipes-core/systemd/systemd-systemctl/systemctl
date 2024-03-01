@@ -209,7 +209,7 @@ class SystemdUnit():
         except KeyError:
             pass
 
-    def enable(self, caller_unit=None):
+    def enable(self, units_enabled=[]):
         # if we're enabling an instance, first extract the actual instance
         # then figure out what the template unit is
         template = re.match(r"[^@]+@(?P<instance>[^\.]*)\.", self.unit)
@@ -248,8 +248,9 @@ class SystemdUnit():
         try:
             for also in config.get('Install', 'Also'):
                 try:
-                    if caller_unit != also:
-                        SystemdUnit(self.root, also).enable(unit)
+                     units_enabled.append(unit)
+                     if also not in units_enabled:
+                        SystemdUnit(self.root, also).enable(units_enabled)
                 except SystemdUnitNotFoundError as e:
                     sys.exit("Error: Systemctl also enable issue with  %s (%s)" % (service, e.unit))
 

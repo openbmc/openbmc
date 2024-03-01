@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "cb08ed940183f6343a64e465e83b3a3f13c53e1baabb8d72b5da4545ef
 PYPI_PACKAGE = "Flask-Bootstrap"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-dominate \
-    ${PYTHON_PN}-flask \
-    ${PYTHON_PN}-visitor \
+    python3-dominate \
+    python3-flask \
+    python3-visitor \
     "

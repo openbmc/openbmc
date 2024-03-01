@@ -10,12 +10,12 @@ PYPI_PACKAGE = "ConfigArgParse"
 inherit pypi setuptools3
 
 PACKAGECONFIG ?= "yaml"
-PACKAGECONFIG[yaml] = ",,,${PYTHON_PN}-pyyaml"
+PACKAGECONFIG[yaml] = ",,,python3-pyyaml"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-json \
+    python3-core \
+    python3-shell \
+    python3-json \
 "
 
 BBCLASSEXTEND = "native nativesdk"

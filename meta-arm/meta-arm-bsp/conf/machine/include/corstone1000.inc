@@ -35,7 +35,8 @@ IMAGE_CMD:wic[vardeps] += "GRUB_LINUX_APPEND"
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
 PREFERRED_VERSION_linux-yocto ?= "6.6.%"
-KERNEL_IMAGETYPE = "Image.gz"
+KERNEL_IMAGETYPE = "Image"
+KERNEL_IMAGETYPE:firmware = "Image.gz"
 # add FF-A support in the kernel
 MACHINE_FEATURES += "arm-ffa"
 # enable this feature for kernel debugging
@@ -44,7 +45,16 @@ MACHINE_FEATURES += "arm-ffa"
 # login terminal serial port settings
 SERIAL_CONSOLES ?= "115200;ttyAMA0"
 
-WKS_FILE ?= "corstone1000-flash-firmware.wks.in"
+IMAGE_FSTYPES += "wic"
+# Need to clear the suffix so TESTIMAGE_AUTO works
+IMAGE_NAME_SUFFIX = ""
+WKS_FILE ?= "efi-disk-no-swap.wks.in"
+WKS_FILE:firmware ?= "corstone1000-flash-firmware.wks.in"
 
 # making sure EXTRA_IMAGEDEPENDS will be used while creating the image
 WKS_FILE_DEPENDS:append = " ${EXTRA_IMAGEDEPENDS}"
+
+# If not building under the firmware multiconf we need to build the actual firmware
+FIRMWARE_DEPLOYEMENT ?= "firmware-deploy-image"
+FIRMWARE_DEPLOYEMENT:firmware ?= ""
+EXTRA_IMAGEDEPENDS += "${FIRMWARE_DEPLOYEMENT}"

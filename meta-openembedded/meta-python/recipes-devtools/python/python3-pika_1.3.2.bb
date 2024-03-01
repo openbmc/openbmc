@@ -15,12 +15,12 @@ inherit pypi python_setuptools_build_meta
 PYPI_PACKAGE = "pika"
 
 DEPENDS += " \
-	${PYTHON_PN}-setuptools-scm-native \
-	${PYTHON_PN}-toml-native \
+	python3-setuptools-scm-native \
+	python3-toml-native \
 "
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-logging \
-	${PYTHON_PN}-tornado \
-	${PYTHON_PN}-twisted \
+	python3-logging \
+	python3-tornado \
+	python3-twisted \
 "

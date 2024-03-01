@@ -256,7 +256,7 @@ section in the Yocto Project Development Tasks Manual.
 Build History
 -------------
 
-Following are changes to Build History:
+The changes to Build History are:
 
 -  Installed package sizes: ``installed-package-sizes.txt`` for an image
    now records the size of the files installed by each package instead
@@ -279,7 +279,7 @@ section in the Yocto Project Development Tasks Manual.
 ``udev``
 --------
 
-Following are changes to ``udev``:
+The changes to ``udev`` are:
 
 -  ``udev`` no longer brings in ``udev-extraconf`` automatically through
    :term:`RRECOMMENDS`, since this was originally
@@ -323,7 +323,7 @@ Removed and Renamed Recipes
 Other Changes
 -------------
 
-Following is a list of short entries describing other changes:
+Here is a list of short entries describing other changes:
 
 -  ``run-postinsts``: Make this generic.
 

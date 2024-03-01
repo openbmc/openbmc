@@ -182,8 +182,10 @@ class TestMetadata(base.Metadata):
                 self.fail('%s is missing in newly added recipe' % self.metadata_summary)
 
     def test_cve_check_ignore(self):
-        if not self.modified:
-            self.skip('No modified recipes, skipping test')
+        # Skip if we neither modified a recipe or target branches are not
+        # Nanbield and newer. CVE_CHECK_IGNORE was first deprecated in Nanbield.
+        if not self.modified or PatchTestInput.repo.branch == "kirkstone" or PatchTestInput.repo.branch == "dunfell":
+            self.skip('No modified recipes or older target branch, skipping test')
         for pn in self.modified:
             # we are not interested in images
             if 'core-image' in pn:

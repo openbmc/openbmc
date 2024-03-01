@@ -9,7 +9,7 @@ SUMMARY = "meta-python ptest test image"
 DESCRIPTION += "Also including the ${MCNAME} ptest package."
 HOMEPAGE = "https://www.openembedded.org/"
 
-PTESTS_META_PYTHON = "${PTESTS_SLOW_META_PYTHON} ${PTESTS_FAST_META_PYTHON}"
+PTESTS_META_PYTHON = "${PTESTS_SLOW_META_PYTHON} ${PTESTS_FAST_META_PYTHON} ${PTESTS_PROBLEMS_META_PYTHON}"
 
 IMAGE_INSTALL:append = " ${MCNAME}-ptest openssh"
 

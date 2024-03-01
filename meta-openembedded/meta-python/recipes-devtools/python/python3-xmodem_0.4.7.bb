@@ -14,6 +14,6 @@ do_install:append() {
 }
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-logging \
+    python3-logging \
 "
 BBCLASSEXTEND = "native nativesdk"

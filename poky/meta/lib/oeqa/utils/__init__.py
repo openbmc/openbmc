@@ -90,3 +90,10 @@ def load_test_components(logger, executor):
                                 "_executor_class defined." % (comp_name, comp_context))
 
     return components
+
+def get_json_result_dir(d):
+    json_result_dir = os.path.join(d.getVar("LOG_DIR"), 'oeqa')
+    custom_json_result_dir = d.getVar("OEQA_JSON_RESULT_DIR")
+    if custom_json_result_dir:
+        json_result_dir = custom_json_result_dir
+    return json_result_dir

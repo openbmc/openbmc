@@ -16,4 +16,4 @@ inherit pypi python_setuptools_build_meta
 UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/pymysql/"
 UPSTREAM_CHECK_REGEX = "/pymysql/(?P<pver>(\d+[\.\-_]*)+)"
 
-RDEPENDS:${PN} += "${PYTHON_PN}-cryptography"
+RDEPENDS:${PN} += "python3-cryptography"

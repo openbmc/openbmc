@@ -1,4 +1,4 @@
-From 42e7d5f5f1d84a56b125aa05de33d31e28ad1124 Mon Sep 17 00:00:00 2001
+From 561216c8cbc280aaa9aecf30cb11835a4a0a78ed Mon Sep 17 00:00:00 2001
 From: Richard Purdie <rpurdie@linux.intel.com>
 Date: Wed, 31 Dec 2008 17:20:38 +0000
 Subject: [PATCH] pciutils: Upgarde 2.2.4 -> 3.0.3
@@ -17,18 +17,17 @@ Ionut Radu <ionutx.radu@intel.com>
 2017/6/15 - RP - Cleanups and merging patches
 
 Upstream-Status: Inappropriate [embedded specific]
-
 ---
  Makefile      |  2 +-
  lib/configure | 14 ++++++++++----
  2 files changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 3df076d..9b247d3 100644
+index aaec04e..9c1dab0 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -110,7 +110,7 @@ example$(EXEEXT): example.o lib/$(PCIIMPLIB)
- example.o: example.c $(PCIINC)
+@@ -123,7 +123,7 @@ pcilmr$(EXEEXT): pcilmr.o $(LMROBJS) $(COMMON) lib/$(PCIIMPLIB)
+ pcilmr.o: pcilmr.c $(LMRINC)
  
  %$(EXEEXT): %.o
 -	$(CC) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
@@ -37,7 +36,7 @@ index 3df076d..9b247d3 100644
  ifdef PCI_OS_WINDOWS
  comma := ,
 diff --git a/lib/configure b/lib/configure
-index 57b064b..b269332 100755
+index 3df057a..c87e71c 100755
 --- a/lib/configure
 +++ b/lib/configure
 @@ -9,6 +9,10 @@ echo_n() {

@@ -54,11 +54,21 @@ python waf_preconfigure() {
     wafbin = os.path.join(subsrcdir, 'waf')
     try:
         result = subprocess.check_output([python, wafbin, '--version'], cwd=subsrcdir, stderr=subprocess.STDOUT)
-        version = result.decode('utf-8').split()[1]
-        if not bb.utils.is_semver(version):
+        # Output looks like:
+        #  # output from lower modules (e.g. warnings, ...)
+        #  waf X.Y.Z ...
+        # So, look for the line starting with "waf "
+        version = None
+        for line in result.decode('utf-8').split("\n"):
+            if line.startswith("waf "):
+                version = line.split()[1]
+                break
+
+        if not version or not bb.utils.is_semver(version):
             bb.warn("Unable to parse \"waf --version\" output. Assuming waf version without bindir/libdir support.")
             bb.warn("waf·--version·output = \n%s" % result.decode('utf-8'))
         elif bb.utils.vercmp_string_op(version, "1.8.7", ">="):
+            bb.note("waf version is high enough to add --bindir and --libdir")
             d.setVar("WAF_EXTRA_CONF", "--bindir=${bindir} --libdir=${libdir}")
     except subprocess.CalledProcessError as e:
         bb.warn("Unable to execute waf --version, exit code %d. Assuming waf version without bindir/libdir support." % e.returncode)

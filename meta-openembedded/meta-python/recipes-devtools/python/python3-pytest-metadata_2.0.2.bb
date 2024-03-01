@@ -1,5 +1,5 @@
 DESCRIPTION = "pytest-metadata is a plugin that allowed for accessing pytest metadata"
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 LICENSE = "MPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5d425c8f3157dbf212db2ec53d9e5132"
@@ -11,7 +11,7 @@ PYPI_PACKAGE = "pytest-metadata"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} = " \
-    ${PYTHON_PN}-pytest \
+    python3-pytest \
 "
 
 BBCLASSEXTEND = "native nativesdk"

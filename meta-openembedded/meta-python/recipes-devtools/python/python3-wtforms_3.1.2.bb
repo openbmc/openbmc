@@ -13,12 +13,12 @@ UPSTREAM_CHECK_REGEX = "/WTForms/(?P<pver>(\d+[\.\-_]*)+)"
 inherit pypi python_hatchling
 
 DEPENDS += "\
-    ${PYTHON_PN}-pip-native \
-    ${PYTHON_PN}-babel-native \
+    python3-pip-native \
+    python3-babel-native \
     "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-netserver \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-markupsafe \
+    python3-netserver \
+    python3-numbers \
+    python3-markupsafe \
     "

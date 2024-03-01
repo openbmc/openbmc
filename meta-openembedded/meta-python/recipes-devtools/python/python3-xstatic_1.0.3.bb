@@ -9,7 +9,7 @@ PYPI_PACKAGE = "XStatic"
 SRC_URI[sha256sum] = "402544cc9e179489441054f09c807804e115ea246907de87c0355fb4f5a31268"
 
 DEPENDS += " \
-    ${PYTHON_PN}-pip \
+    python3-pip \
 "
 
 inherit pypi setuptools3

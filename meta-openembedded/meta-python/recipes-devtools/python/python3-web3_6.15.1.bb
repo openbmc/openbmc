@@ -9,18 +9,18 @@ SRC_URI[sha256sum] = "f9e7eefc1b3c3d194868a4ef9583b625c18ea3f31a48ebe143183db748
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-aiohttp \
-    ${PYTHON_PN}-eth-abi \
-    ${PYTHON_PN}-eth-account \
-    ${PYTHON_PN}-eth-hash \
-    ${PYTHON_PN}-eth-typing \
-    ${PYTHON_PN}-eth-utils \
-    ${PYTHON_PN}-hexbytes \
-    ${PYTHON_PN}-jsonschema \
-    ${PYTHON_PN}-protobuf \
-    ${PYTHON_PN}-pydantic \
-    ${PYTHON_PN}-requests \
-    ${PYTHON_PN}-typing-extensions \
-    ${PYTHON_PN}-websockets \
-    ${PYTHON_PN}-pyunormalize \
+    python3-aiohttp \
+    python3-eth-abi \
+    python3-eth-account \
+    python3-eth-hash \
+    python3-eth-typing \
+    python3-eth-utils \
+    python3-hexbytes \
+    python3-jsonschema \
+    python3-protobuf \
+    python3-pydantic \
+    python3-requests \
+    python3-typing-extensions \
+    python3-websockets \
+    python3-pyunormalize \
 "

@@ -12,6 +12,6 @@ inherit pypi setuptools3
 CLEANBROKEN = "1"
 
 RDEPENDS:${PN} += " \
-        ${PYTHON_PN}-modules \
+        python3-modules \
 "
 

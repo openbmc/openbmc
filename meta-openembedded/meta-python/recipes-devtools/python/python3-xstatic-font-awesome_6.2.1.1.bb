@@ -9,8 +9,8 @@ PYPI_PACKAGE = "XStatic-Font-Awesome"
 SRC_URI[sha256sum] = "f075871096128638f2e1539020d8227754c3d885dd68e7ee6de9a01235076828"
 
 DEPENDS += " \
-    ${PYTHON_PN}-xstatic \
-    ${PYTHON_PN}-pip \
+    python3-xstatic \
+    python3-pip \
 "
 
 inherit pypi setuptools3

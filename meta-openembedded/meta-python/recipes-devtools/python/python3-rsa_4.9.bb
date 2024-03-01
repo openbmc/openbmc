@@ -26,14 +26,14 @@ ALTERNATIVE_PRIORITY = "30"
 
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-crypt \
-    ${PYTHON_PN}-doctest \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-math \
-    ${PYTHON_PN}-multiprocessing \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-pickle \
+    python3-compression \
+    python3-crypt \
+    python3-doctest \
+    python3-logging \
+    python3-math \
+    python3-multiprocessing \
+    python3-netclient \
+    python3-pickle \
 "
 
-RDEPENDS:${PN} += "${PYTHON_PN}-pyasn1"
+RDEPENDS:${PN} += "python3-pyasn1"

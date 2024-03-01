@@ -8,8 +8,8 @@ SRC_URI[sha256sum] = "440b6b49e5e975f9a640a2519abb2feddd96eb2aeb1715f87f947a7a07
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-trafaret \
-    ${PYTHON_PN}-pyyaml \
+    python3-trafaret \
+    python3-pyyaml \
 "
 
 BBCLASSEXTEND = "native nativesdk"

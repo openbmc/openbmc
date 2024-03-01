@@ -11,6 +11,6 @@ SRC_URI += "file://remove-pip-requires.patch"
 PYPI_PACKAGE = "Flask-XStatic"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-flask \
-    ${PYTHON_PN}-xstatic \
+    python3-flask \
+    python3-xstatic \
     "

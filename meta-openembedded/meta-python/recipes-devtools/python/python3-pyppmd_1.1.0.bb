@@ -9,12 +9,12 @@ inherit pypi python_setuptools_build_meta
 SRC_URI[sha256sum] = "1d38ce2e4b7eb84b53bc8a52380b94f66ba6c39328b8800b30c2b5bf31693973"
 
 DEPENDS += " \
-    ${PYTHON_PN}-setuptools-scm-native \
-    ${PYTHON_PN}-toml-native \
-    ${PYTHON_PN}-wheel-native \
+    python3-setuptools-scm-native \
+    python3-toml-native \
+    python3-wheel-native \
 "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-importlib-metadata \
+    python3-email \
+    python3-importlib-metadata \
 "

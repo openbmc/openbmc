@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "427af957daa58bc909471c6c40f74c5450fa123dd093fc53efd2e91d27
 
 inherit pypi python_setuptools_build_meta
 
-RDEPENDS:${PN} += "${PYTHON_PN}-stringold ${PYTHON_PN}-netclient ${PYTHON_PN}-idna"
+RDEPENDS:${PN} += "python3-stringold python3-netclient python3-idna"
 
 PACKAGES =. "${PN}-test "
 

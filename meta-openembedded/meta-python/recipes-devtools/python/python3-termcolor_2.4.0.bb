@@ -9,8 +9,8 @@ inherit pypi python_setuptools_build_meta
 SRC_URI[sha256sum] = "aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"
 
 DEPENDS += " \
-	${PYTHON_PN}-toml-native \
-	${PYTHON_PN}-hatch-vcs-native \
+	python3-toml-native \
+	python3-hatch-vcs-native \
 "
 
 BBCLASSEXTEND = "native"

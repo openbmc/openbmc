@@ -21,6 +21,7 @@ RDEPENDS:${PN}-ptest += " \
     python3-typing-extensions \
     python3-unittest-automake-output \
     python3-unixadmin \
+    python3-mypy \
 "
 
 do_install_ptest() {

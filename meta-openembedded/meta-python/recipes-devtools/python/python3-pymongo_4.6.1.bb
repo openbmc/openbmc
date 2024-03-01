@@ -12,19 +12,19 @@ SRC_URI[sha256sum] = "31dab1f3e1d0cdd57e8df01b645f52d43cc1b653ed3afd535d2891f4fc
 
 inherit pypi setuptools3
 
-PACKAGES =+ "${PYTHON_PN}-bson"
+PACKAGES =+ "python3-bson"
 
-FILES:${PYTHON_PN}-bson = "${PYTHON_SITEPACKAGES_DIR}/bson/*"
+FILES:python3-bson = "${PYTHON_SITEPACKAGES_DIR}/bson/*"
 
-RDEPENDS:${PYTHON_PN}-bson += " \
-     ${PYTHON_PN}-datetime \
-     ${PYTHON_PN}-json \
-     ${PYTHON_PN}-netclient \
-     ${PYTHON_PN}-numbers \
-     ${PYTHON_PN}-threading \
+RDEPENDS:python3-bson += " \
+     python3-datetime \
+     python3-json \
+     python3-netclient \
+     python3-numbers \
+     python3-threading \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-bson \
-    ${PYTHON_PN}-pprint \
+    python3-bson \
+    python3-pprint \
 "

@@ -737,7 +737,7 @@ workflow:
 .. image:: figures/YP-flow-diagram.png
     :width: 100%
 
-Following is a brief summary of the "workflow":
+Here is a brief summary of the "workflow":
 
 #. Developers specify architecture, policies, patches and configuration
    details.

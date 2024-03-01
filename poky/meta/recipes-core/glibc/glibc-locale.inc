@@ -28,7 +28,7 @@ LOCALE_GENERATION_WITH_CROSS-LOCALEDEF = "1"
 
 PROVIDES = "virtual/libc-locale"
 
-PACKAGES = "localedef ${PN}-dbg"
+PACKAGES = "localedef ${PN}-dbg ${LOCALEBASEPN}-locale-alias"
 
 PACKAGES_DYNAMIC = "^locale-base-.* \
                     ^glibc-gconv-.* ^glibc-charmap-.* ^glibc-localedata-.* ^glibc-binary-localedata-.* \
@@ -61,6 +61,7 @@ DESCRIPTION:localedef = "glibc: compile locale definition files"
 # Explicitly add ${MLPREFIX} for FILES:glibc-gconv.
 FILES:${MLPREFIX}glibc-gconv = "${libdir}/gconv/*"
 FILES:localedef = "${bindir}/localedef"
+FILES:${LOCALEBASEPN}-locale-alias = "${datadir}/locale/locale.alias"
 
 LOCALETREESRC = "${COMPONENTS_DIR}/${PACKAGE_ARCH}/glibc-stash-locale"
 

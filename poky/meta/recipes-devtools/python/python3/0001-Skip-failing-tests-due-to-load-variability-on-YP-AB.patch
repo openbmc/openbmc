@@ -1,4 +1,4 @@
-From bafdd769330c9d49a066fb1427f451b8d253262d Mon Sep 17 00:00:00 2001
+From 3471e3478e0760c42e04f8046cee2367ab5706d2 Mon Sep 17 00:00:00 2001
 From: Yi Fan Yu <yifan.yu@windriver.com>
 Date: Thu, 1 Apr 2021 13:08:37 -0700
 Subject: [PATCH] Skip failing tests due to load variability on YP AB
@@ -17,14 +17,13 @@ Skip two additional tests due to suspected load variability failures.
 [YOCTO #15177]
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
-
 ---
  Lib/test/_test_multiprocessing.py | 3 +++
  Lib/test/test_time.py             | 2 ++
  2 files changed, 5 insertions(+)
 
 diff --git a/Lib/test/_test_multiprocessing.py b/Lib/test/_test_multiprocessing.py
-index d52b10c..5f0e4e3 100644
+index e42c7ab..dff5227 100644
 --- a/Lib/test/_test_multiprocessing.py
 +++ b/Lib/test/_test_multiprocessing.py
 @@ -682,6 +682,7 @@ class _TestProcess(BaseTestCase):
@@ -43,7 +42,7 @@ index d52b10c..5f0e4e3 100644
      def test_timeout(self):
          """
          Test wait(timeout)
-@@ -4992,6 +4994,7 @@ class TestWait(unittest.TestCase):
+@@ -5024,6 +5026,7 @@ class TestWait(unittest.TestCase):
          time.sleep(period)
  
      @support.requires_resource('walltime')

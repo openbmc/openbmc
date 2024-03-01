@@ -9,12 +9,12 @@ PYPI_PACKAGE = "xmlschema"
 inherit pypi setuptools3
 
 DEPENDS += "\
-    ${PYTHON_PN}-elementpath-native \
+    python3-elementpath-native \
 "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-elementpath \
-    ${PYTHON_PN}-modules \
+    python3-elementpath \
+    python3-modules \
 "
 
 BBCLASSEXTEND = "native nativesdk"

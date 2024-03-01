@@ -8,21 +8,21 @@ PYPI_PACKAGE = "ipython"
 SRC_URI[sha256sum] = "48fbc236fbe0e138b88773fa0437751f14c3645fb483f1d4c5dee58b37e5ce73"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-setuptools \
-    ${PYTHON_PN}-jedi \
-    ${PYTHON_PN}-decorator \
-    ${PYTHON_PN}-pickleshare \
-    ${PYTHON_PN}-traitlets \
-    ${PYTHON_PN}-prompt-toolkit \
-    ${PYTHON_PN}-pygments \
-    ${PYTHON_PN}-backcall \
-    ${PYTHON_PN}-pydoc \
-    ${PYTHON_PN}-debugger \
-    ${PYTHON_PN}-pexpect \
-    ${PYTHON_PN}-unixadmin \
-    ${PYTHON_PN}-misc \
-    ${PYTHON_PN}-sqlite3 \
-    ${PYTHON_PN}-stack-data \
+    python3-setuptools \
+    python3-jedi \
+    python3-decorator \
+    python3-pickleshare \
+    python3-traitlets \
+    python3-prompt-toolkit \
+    python3-pygments \
+    python3-backcall \
+    python3-pydoc \
+    python3-debugger \
+    python3-pexpect \
+    python3-unixadmin \
+    python3-misc \
+    python3-sqlite3 \
+    python3-stack-data \
 "
 
 inherit setuptools3 pypi

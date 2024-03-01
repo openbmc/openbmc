@@ -15,9 +15,9 @@ SRC_URI[sha256sum] = "507e811ecea72b18a404947aded4b3390e1db8f826b494d76550ef45bb
 inherit pypi python_flit_core
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-markupsafe \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-profile \
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-json \
+    python3-markupsafe \
+    python3-logging \
+    python3-profile \
+    python3-compression \
+    python3-json \
 "

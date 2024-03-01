@@ -13,16 +13,16 @@ SRC_URI[sha256sum] = "0a34f9534356e5fd33af8cdda109d5e945b6335cb50399b267c46368c4
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-cython \
-    ${PYTHON_PN}-geomet \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-misc \
-    ${PYTHON_PN}-multiprocessing \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-six \
+    python3-cython \
+    python3-geomet \
+    python3-json \
+    python3-misc \
+    python3-multiprocessing \
+    python3-numbers \
+    python3-six \
     libevent \
 "
 
 DEPENDS += "\
-    ${PYTHON_PN}-cython \
+    python3-cython \
 "

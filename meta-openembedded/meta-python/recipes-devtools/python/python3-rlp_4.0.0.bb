@@ -11,6 +11,6 @@ inherit pypi setuptools3
 DEPENDS += "python3-pip-native"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-eth-utils \
-    ${PYTHON_PN}-typing-extensions \
+    python3-eth-utils \
+    python3-typing-extensions \
 "

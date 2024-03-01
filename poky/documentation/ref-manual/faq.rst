@@ -90,7 +90,7 @@ HTTPS requests and direct them to the ``http://`` sources mirror. You
 can use ``file://`` URLs to point to local directories or network shares
 as well.
 
-Here are other options::
+Another option is to set::
 
    BB_NO_NETWORK = "1"
 
@@ -106,7 +106,7 @@ This statement limits the build system to pulling source from the
 :term:`PREMIRRORS` only.  Again, this technique is useful for reproducing
 builds.
 
-Here is another technique::
+Here is yet another technique::
 
    BB_GENERATE_MIRROR_TARBALLS = "1"
 
@@ -135,7 +135,7 @@ Most source fetching by the OpenEmbedded build system is done by
 single user or can be in ``/usr/local/etc/wgetrc`` as a global user
 file.
 
-Following is the applicable code for setting various proxy types in the
+Here is the applicable code for setting various proxy types in the
 ``.wgetrc`` file. By default, these settings are disabled with comments.
 To use them, remove the comments::
 

@@ -301,6 +301,7 @@ class RecipeModified:
         self.staging_incdir = None
         self.strip_cmd = None
         self.target_arch = None
+        self.target_dbgsrc_dir = None
         self.topdir = None
         self.workdir = None
         self.recipe_id = None
@@ -345,6 +346,7 @@ class RecipeModified:
         self.base_libdir = recipe_d.getVar('base_libdir')
         self.bblayers = recipe_d.getVar('BBLAYERS').split()
         self.bpn = recipe_d.getVar('BPN')
+        self.cxx = recipe_d.getVar('CXX')
         self.d = recipe_d.getVar('D')
         self.fakerootcmd = recipe_d.getVar('FAKEROOTCMD')
         self.fakerootenv = recipe_d.getVar('FAKEROOTENV')
@@ -360,10 +362,13 @@ class RecipeModified:
             recipe_d.getVar('RECIPE_SYSROOT'))
         self.recipe_sysroot_native = os.path.realpath(
             recipe_d.getVar('RECIPE_SYSROOT_NATIVE'))
+        self.staging_bindir_toolchain = os.path.realpath(
+            recipe_d.getVar('STAGING_BINDIR_TOOLCHAIN'))
         self.staging_incdir = os.path.realpath(
             recipe_d.getVar('STAGING_INCDIR'))
         self.strip_cmd = recipe_d.getVar('STRIP')
         self.target_arch = recipe_d.getVar('TARGET_ARCH')
+        self.target_dbgsrc_dir = recipe_d.getVar('TARGET_DBGSRC_DIR')
         self.topdir = recipe_d.getVar('TOPDIR')
         self.workdir = os.path.realpath(recipe_d.getVar('WORKDIR'))
 
@@ -695,7 +700,7 @@ class RecipeModified:
         """find all executable elf files in the image directory"""
         binaries = []
         d_len = len(self.d)
-        re_so = re.compile('.*\.so[.0-9]*$')
+        re_so = re.compile(r'.*\.so[.0-9]*$')
         for root, _, files in os.walk(self.d, followlinks=False):
             for file in files:
                 if os.path.islink(file):

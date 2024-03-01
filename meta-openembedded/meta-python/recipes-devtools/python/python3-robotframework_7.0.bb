@@ -16,15 +16,15 @@ PYPI_PACKAGE_EXT = "zip"
 SRC_URI[sha256sum] = "04623f758346c917db182e17591ffa474090560c02ed5a64343902e72b7b4bd5"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-xml \
-    ${PYTHON_PN}-difflib \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-html \
-    ${PYTHON_PN}-docutils \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-profile \
+    python3-shell \
+    python3-pprint \
+    python3-xml \
+    python3-difflib \
+    python3-threading \
+    python3-html \
+    python3-docutils \
+    python3-ctypes \
+    python3-logging \
+    python3-numbers \
+    python3-profile \
 "

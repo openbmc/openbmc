@@ -652,11 +652,15 @@ def split_locales(d):
     locales = set()
     for localepath in (d.getVar('LOCALE_PATHS') or "").split():
         localedir = dvar + localepath
-        if cpath.isdir(localedir):
-            locales.update(os.listdir(localedir))
-            localepaths.append(localepath)
-        else:
-            bb.debug(1, "No locale files in %s" % localepath)
+        if not cpath.isdir(localedir):
+            bb.debug(1, 'No locale files in %s' % localepath)
+            continue
+
+        localepaths.append(localepath)
+        with os.scandir(localedir) as it:
+            for entry in it:
+                if entry.is_dir():
+                    locales.add(entry.name)
 
     if len(locales) == 0:
         bb.debug(1, "No locale files in this package")

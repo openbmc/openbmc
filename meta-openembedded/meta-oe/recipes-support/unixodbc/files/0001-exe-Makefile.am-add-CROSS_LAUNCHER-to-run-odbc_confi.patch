@@ -1,0 +1,54 @@
+From e886222c70d4b251f0785f670477b7aee938e5af Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 21 Feb 2024 13:55:41 +0800
+Subject: [PATCH] exe/Makefile.am: add CROSS_LAUNCHER to run odbc_config
+
+In case of cross compilation, the odbc_config cannot run, the error message
+would be like below:
+
+  /bin/bash: line 1: ../exe/odbc_config: cannot execute binary file: Exec format error
+
+Add CROSS_LAUNCHER to allow the possibility of running odbc_config correctly in
+case of cross compilation.
+
+For example, here's a possible value for it (Yocto project environment, aarch64 target).
+  export CROSS_LAUNCHER="PSEUDO_UNLOAD=1 qemu-aarch64 -r 5.15 \
+  -L /PATH/TO/unixodbc/2.3.11/recipe-sysroot \
+  -E LD_LIBRARY_PATH=/PATH/TO/unixodbc/2.3.11/recipe-sysroot//usr/lib:/PATH/TO/unixodbc/2.3.11/recipe-sysroot//usr/lib  "
+
+Other projects can use the launcher they like to allow correct generation of
+the odbc.pc file in cross compilation environment.
+
+Upstream-Status: Submitted [Personal Email, nick.gorham@easysoft.com]
+
+As said in the official website, https://www.unixodbc.org/, the way to report bug and send
+out patch is via personal email. So there's a public link above.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ exe/Makefile.am | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/exe/Makefile.am b/exe/Makefile.am
+index 03f3d5a..5f33cf2 100644
+--- a/exe/Makefile.am
++++ b/exe/Makefile.am
+@@ -59,11 +59,13 @@ slencheck_SOURCES = slencheck.c
+ dltest_DEPENDENCIES = $(LTDLDEPS)
+ dltest_LDADD = $(LIBLTDL)
+ 
++CROSS_LAUNCHER ?= ""
++
+ all-am:
+-	@sed "s![@]ODBC_ULEN[@]!`$(top_builddir)/exe/odbc_config$(EXEEXT) --ulen`!" \
++	@sed "s![@]ODBC_ULEN[@]!`$(CROSS_LAUNCHER)$(top_builddir)/exe/odbc_config$(EXEEXT) --ulen`!" \
+ 	  $(top_builddir)/DriverManager/odbc.pc > $(top_builddir)/exe/odbc.pc.tmp
+ 	@mv -f $(top_builddir)/exe/odbc.pc.tmp $(top_builddir)/DriverManager/odbc.pc
+-	@sed "s![@]ODBC_CFLAGS[@]!`$(top_builddir)/exe/odbc_config$(EXEEXT) --cflags | sed 's/ -I.*//'`!" \
++	@sed "s![@]ODBC_CFLAGS[@]!`$(CROSS_LAUNCHER)$(top_builddir)/exe/odbc_config$(EXEEXT) --cflags | sed 's/ -I.*//'`!" \
+ 	  $(top_builddir)/DriverManager/odbc.pc > $(top_builddir)/exe/odbc.pc.tmp
+ 	@mv -f $(top_builddir)/exe/odbc.pc.tmp $(top_builddir)/DriverManager/odbc.pc
+ 
+-- 
+2.34.1
+

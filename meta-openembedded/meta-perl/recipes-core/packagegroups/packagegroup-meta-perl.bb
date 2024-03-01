@@ -100,6 +100,3 @@ RDEPENDS:packagegroup-meta-perl-ptest-packages = "\
 "
 
 EXCLUDE_FROM_WORLD = "1"
-
-# perl-module-encode is preferred over libencode-perl
-# libencode-locale-perl depends on libencode-perl

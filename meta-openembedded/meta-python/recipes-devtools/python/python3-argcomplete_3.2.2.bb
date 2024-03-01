@@ -10,8 +10,8 @@ PYPI_PACKAGE = "argcomplete"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-io \
+    python3-core \
+    python3-io \
 "
 
 BBCLASSEXTEND = "native nativesdk"

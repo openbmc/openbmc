@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4fbd65380cdd255951079008b364516c"
 
 PYPI_PACKAGE = "systemd-python"
 DEPENDS += "systemd (<=235)"
-RDEPENDS:${PN} += "systemd ${PYTHON_PN}-syslog ${PYTHON_PN}-logging python3-syslog"
+RDEPENDS:${PN} += "systemd python3-syslog python3-logging python3-syslog"
 REQUIRED_DISTRO_FEATURES = "systemd"
 inherit pypi features_check pkgconfig setuptools3
 SRC_URI:append:libc-musl = " file://0001-Provide-implementation-of-strndupa-for-musl.patch"

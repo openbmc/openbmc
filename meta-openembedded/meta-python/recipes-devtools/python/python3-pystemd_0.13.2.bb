@@ -6,12 +6,12 @@ SRC_URI[sha256sum] = "4dcfa4b13a55685c49d3d17c10631eca18c33770f66316f8ef2337b895
 
 DEPENDS = "systemd python3-cython-native"
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-xml \
-    ${PYTHON_PN}-lxml \
-    ${PYTHON_PN}-pprint \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-io \
+    python3-xml \
+    python3-lxml \
+    python3-pprint \
+    python3-core \
+    python3-shell \
+    python3-io \
 "
 REQUIRED_DISTRO_FEATURES = "systemd"
 

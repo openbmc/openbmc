@@ -5,4 +5,5 @@ mysql:x:603:
 postgres:x:28:
 zabbix:x:605:
 mail:x:606:
+influxdb:x:622:
 nogroup:x:65534:

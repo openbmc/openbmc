@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -e
+
+make -C build check

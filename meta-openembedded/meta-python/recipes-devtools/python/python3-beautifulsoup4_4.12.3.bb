@@ -8,11 +8,11 @@ SRC_URI[sha256sum] = "74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7
 inherit pypi python_hatchling
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-html5lib \
-    ${PYTHON_PN}-lxml \
-    ${PYTHON_PN}-soupsieve \
-    ${PYTHON_PN}-html \
-    ${PYTHON_PN}-logging \
+    python3-html5lib \
+    python3-lxml \
+    python3-soupsieve \
+    python3-html \
+    python3-logging \
 "
 
 BBCLASSEXTEND = "native nativesdk"

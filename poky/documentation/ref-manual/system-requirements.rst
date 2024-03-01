@@ -164,8 +164,8 @@ with a supported Ubuntu or Debian Linux distribution::
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo apt install make python3-pip inkscape texlive-latex-extra
-   &PIP3_HOST_PACKAGES_DOC;
+   $ sudo apt install git make inkscape texlive-latex-extra
+   $ sudo apt install sphinx python3-saneyaml python3-sphinx-rtd-theme
 
 Fedora Packages
 ---------------
@@ -177,7 +177,7 @@ with a supported Fedora Linux distribution::
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo dnf install make python3-pip which inkscape texlive-fncychap
+   $ sudo dnf install git make python3-pip which inkscape texlive-fncychap
    &PIP3_HOST_PACKAGES_DOC;
 
 openSUSE Packages
@@ -190,7 +190,7 @@ with a supported openSUSE distribution::
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo zypper install make python3-pip which inkscape texlive-fncychap
+   $ sudo zypper install git make python3-pip which inkscape texlive-fncychap
    &PIP3_HOST_PACKAGES_DOC;
 
 
@@ -217,7 +217,7 @@ with a supported AlmaLinux distribution::
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo dnf install make python3-pip which inkscape texlive-fncychap
+   $ sudo dnf install git make python3-pip which inkscape texlive-fncychap
    &PIP3_HOST_PACKAGES_DOC;
 
 .. _system-requirements-buildtools:

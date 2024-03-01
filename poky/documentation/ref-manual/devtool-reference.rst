@@ -378,7 +378,7 @@ command::
 Unless you provide a specific recipe name on the command line, the
 command checks all recipes in all configured layers.
 
-Following is a partial example table that reports on all the recipes::
+Here is a partial example table that reports on all the recipes::
 
    $ devtool check-upgrade-status
    ...
@@ -598,7 +598,7 @@ The ``devtool status`` command has no command-line options::
 
    $ devtool status
 
-Following is sample output after using
+Here is sample output after using
 :ref:`devtool add <ref-manual/devtool-reference:adding a new recipe to the workspace layer>`
 to create and add the ``mtr_0.86.bb`` recipe to the ``workspace`` directory::
 

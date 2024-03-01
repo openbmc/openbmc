@@ -8,6 +8,6 @@ SRC_URI[sha256sum] = "b4f37c3ac52d8a445af3a66bce57b33b5e90b97c696b7b984f530cf8f0
 inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} += "\
-	${PYTHON_PN}-logging \
-	${PYTHON_PN}-fcntl \
+	python3-logging \
+	python3-fcntl \
 "

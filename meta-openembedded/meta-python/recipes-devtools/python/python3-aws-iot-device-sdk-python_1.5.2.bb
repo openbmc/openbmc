@@ -27,15 +27,15 @@ do_install:append() {
 PACKAGES =+ "${PN}-examples"
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-crypt \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-math \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-threading \
+    python3-crypt \
+    python3-datetime \
+    python3-io \
+    python3-json \
+    python3-logging \
+    python3-math \
+    python3-netclient \
+    python3-numbers \
+    python3-threading \
 "
 RDEPENDS:${PN}-examples += "${PN}"
 

@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import contextlib
 import unittest
 import hashlib
 import tempfile
@@ -2261,10 +2262,14 @@ class GitLfsTest(FetcherTest):
 
         bb.utils.mkdirhier(self.srcdir)
         self.git_init(cwd=self.srcdir)
-        with open(os.path.join(self.srcdir, '.gitattributes'), 'wt') as attrs:
-            attrs.write('*.mp3 filter=lfs -text')
-        self.git(['add', '.gitattributes'], cwd=self.srcdir)
-        self.git(['commit', '-m', "attributes", '.gitattributes'], cwd=self.srcdir)
+        self.commit_file('.gitattributes', '*.mp3 filter=lfs -text')
+
+    def commit_file(self, filename, content):
+        with open(os.path.join(self.srcdir, filename), "w") as f:
+            f.write(content)
+        self.git(["add", filename], cwd=self.srcdir)
+        self.git(["commit", "-m", "Change"], cwd=self.srcdir)
+        return self.git(["rev-parse", "HEAD"], cwd=self.srcdir).strip()
 
     def fetch(self, uri=None, download=True):
         uris = self.d.getVar('SRC_URI').split()
@@ -2283,6 +2288,44 @@ class GitLfsTest(FetcherTest):
         fetcher.unpack(self.d.getVar('WORKDIR'))
         unpacked_lfs_file = os.path.join(self.d.getVar('WORKDIR'), 'git', "Cat_poster_1.jpg")
         return unpacked_lfs_file
+
+    @skipIfNoGitLFS()
+    def test_fetch_lfs_on_srcrev_change(self):
+        """Test if fetch downloads missing LFS objects when a different revision within an existing repository is requested"""
+        self.git(["lfs", "install", "--local"], cwd=self.srcdir)
+
+        @contextlib.contextmanager
+        def hide_upstream_repository():
+            """Hide the upstream repository to make sure that git lfs cannot pull from it"""
+            temp_name = self.srcdir + ".bak"
+            os.rename(self.srcdir, temp_name)
+            try:
+                yield
+            finally:
+                os.rename(temp_name, self.srcdir)
+
+        def fetch_and_verify(revision, filename, content):
+            self.d.setVar('SRCREV', revision)
+            fetcher, ud = self.fetch()
+
+            with hide_upstream_repository():
+                workdir = self.d.getVar('WORKDIR')
+                fetcher.unpack(workdir)
+
+                with open(os.path.join(workdir, "git", filename)) as f:
+                    self.assertEqual(f.read(), content)
+
+        commit_1 = self.commit_file("a.mp3", "version 1")
+        commit_2 = self.commit_file("a.mp3", "version 2")
+
+        self.d.setVar('SRC_URI', "git://%s;protocol=file;lfs=1;branch=master" % self.srcdir)
+
+        # Seed the local download folder by fetching the latest commit and verifying that the LFS contents are
+        # available even when the upstream repository disappears.
+        fetch_and_verify(commit_2, "a.mp3", "version 2")
+        # Verify that even when an older revision is fetched, the needed LFS objects are fetched into the download
+        # folder.
+        fetch_and_verify(commit_1, "a.mp3", "version 1")
 
     @skipIfNoGitLFS()
     @skipIfNoNetwork()

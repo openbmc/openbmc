@@ -13,21 +13,21 @@ FILES:${PN} += "${datadir}/django"
 BBCLASSEXTEND = "native nativesdk"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-ctypes \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-email \
-    ${PYTHON_PN}-html \
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-multiprocessing \
-    ${PYTHON_PN}-netserver \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-pkgutil \
-    ${PYTHON_PN}-pytz \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-unixadmin \
-    ${PYTHON_PN}-xml \
+    python3-compression \
+    python3-ctypes \
+    python3-datetime \
+    python3-email \
+    python3-html \
+    python3-json \
+    python3-logging \
+    python3-multiprocessing \
+    python3-netserver \
+    python3-numbers \
+    python3-pkgutil \
+    python3-pytz \
+    python3-threading \
+    python3-unixadmin \
+    python3-xml \
 "
 
 CVE_PRODUCT = "django"

@@ -10,13 +10,13 @@ PYPI_PACKAGE = "diskcache"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-json \
-    ${PYTHON_PN}-pickle \
-    ${PYTHON_PN}-sqlite3 \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-threading \
+    python3-json \
+    python3-pickle \
+    python3-sqlite3 \
+    python3-core \
+    python3-io \
+    python3-compression \
+    python3-threading \
 "
 
 CLEANBROKEN = "1"

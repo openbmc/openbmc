@@ -9,5 +9,5 @@ SRC_URI[sha256sum] = "4503dc59f4ced53a54643272c61dc305d1dbbfbd7d6bdf296948de9f34
 
 inherit pypi setuptools3
 
-DEPENDS += "${PYTHON_PN}-cython-native"
-RDEPENDS:${PN} += "${PYTHON_PN}-toolz"
+DEPENDS += "python3-cython-native"
+RDEPENDS:${PN} += "python3-toolz"

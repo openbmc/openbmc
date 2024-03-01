@@ -278,7 +278,7 @@ python package_do_split_gconvs () {
                 bb.fatal("unknown arch:" + target_arch + " for locale_arch_options")
 
             localedef_opts += " --force --no-hard-links --no-archive --prefix=%s \
-                --inputfile=%s/%s/i18n/locales/%s --charmap=%s %s/%s" \
+                --inputfile=%s/%s/i18n/locales/%s --charmap=%s %s/%s --no-warnings=ascii" \
                 % (treedir, treedir, datadir, locale, encoding, outputpath, name)
 
             cmd = "PATH=\"%s\" I18NPATH=\"%s\" GCONV_PATH=\"%s\" cross-localedef %s" % \

@@ -10,16 +10,16 @@ PYPI_PACKAGE = "sh"
 inherit pypi python_poetry_core
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-codecs \
-    ${PYTHON_PN}-compression \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-resource \
-    ${PYTHON_PN}-shell \
-    ${PYTHON_PN}-terminal \
-    ${PYTHON_PN}-threading \
-    ${PYTHON_PN}-unixadmin \
-    ${PYTHON_PN}-fcntl \
+    python3-asyncio \
+    python3-codecs \
+    python3-compression \
+    python3-core \
+    python3-io \
+    python3-logging \
+    python3-resource \
+    python3-shell \
+    python3-terminal \
+    python3-threading \
+    python3-unixadmin \
+    python3-fcntl \
 "

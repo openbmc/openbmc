@@ -36,9 +36,9 @@ RDEPENDS:${PN}-cli += "\
 "
 
 FILES:${PN} = "\
-    /usr/lib/python${PYTHON_BASEVERSION} \
+    ${libdir}/${PYTHON_DIR} \
 "
 
 FILES:${PN}-cli = "\
-    /usr/bin/httpx \
+    ${bindir}/httpx \
 "

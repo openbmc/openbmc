@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "9d793b08dd857e38d0b6ffe9e6b7145d7c485a42dcfea04905ca0cdb60
 SRC_URI += "file://no-scikit-build.patch \
             file://run-ninja-from-path.patch"
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 do_install:append () {
 	rm -rf ${D}${bindir}

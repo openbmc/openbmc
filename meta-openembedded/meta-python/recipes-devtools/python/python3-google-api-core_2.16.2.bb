@@ -8,18 +8,18 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "032d37b45d1d6bdaf68fb11ff621e2593263a239fa9246e2e94325f9c47876d2"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-asyncio \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-math \
+    python3-asyncio \
+    python3-datetime \
+    python3-logging \
+    python3-math \
 "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-googleapis-common-protos \
-    ${PYTHON_PN}-google-auth \
-    ${PYTHON_PN}-grpcio \
-    ${PYTHON_PN}-protobuf \
-    ${PYTHON_PN}-pytz \
-    ${PYTHON_PN}-requests \
-    ${PYTHON_PN}-six \
+    python3-googleapis-common-protos \
+    python3-google-auth \
+    python3-grpcio \
+    python3-protobuf \
+    python3-pytz \
+    python3-requests \
+    python3-six \
 "

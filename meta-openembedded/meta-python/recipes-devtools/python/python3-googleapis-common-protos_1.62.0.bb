@@ -8,6 +8,6 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "83f0ece9f94e5672cced82f592d2a5edf527a96ed1794f0bab36d5735c996277"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-grpcio \
-    ${PYTHON_PN}-protobuf \
+    python3-grpcio \
+    python3-protobuf \
 "

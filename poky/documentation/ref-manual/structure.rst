@@ -537,7 +537,7 @@ recipe-specific :term:`WORKDIR` directories. Thus, the
 This directory holds information that BitBake uses for accounting
 purposes to track what tasks have run and when they have run. The
 directory is sub-divided by architecture, package name, and version.
-Following is an example::
+Here is an example::
 
       stamps/all-poky-linux/distcc-config/1.0-r0.do_build-2fdd....2do
 

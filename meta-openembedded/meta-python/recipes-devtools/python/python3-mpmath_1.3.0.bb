@@ -10,7 +10,7 @@ SRC_URI[sha256sum] = "7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a
 
 inherit pypi setuptools3
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 RDEPENDS:${PN} += " \
     python3-image \
     python3-math \

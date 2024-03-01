@@ -7,5 +7,5 @@ zabbix:x:605:605::/:/bin/nologin
 cyrus:x:606:nogroup::/:/bin/nologin
 pcp:x:620:nogroup::/:/bin/nologin
 pcpqa:x:621:nogroup::/:/bin/nologin
-influxdb:x:622:nogroup::/:/bin/nologin
+influxdb:x:622:influxdb::/var/lib/influxdb:/bin/nologin
 mongodb:x:623:nogroup::/:/bin/nologin

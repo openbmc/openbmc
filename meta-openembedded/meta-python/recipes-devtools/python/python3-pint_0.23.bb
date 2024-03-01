@@ -21,12 +21,12 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-setuptools \
-    ${PYTHON_PN}-packaging \
+    python3-setuptools \
+    python3-packaging \
 "
 
 RDEPENDS:${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+	python3-pytest \
 "
 
 do_install_ptest() {

@@ -144,9 +144,7 @@ do_install:append:mingw32() {
         rm -f ${D}${bindir}/gtester-report
 }
 
-# remove setuptools dependency when usage of distutils is dropped in
-# https://gitlab.gnome.org/GNOME/glib/-/blob/main/gio/gdbus-2.0/codegen/utils.py
-CODEGEN_PYTHON_RDEPENDS = "python3 python3-setuptools python3-xml"
+CODEGEN_PYTHON_RDEPENDS = "python3 python3-packaging python3-xml"
 CODEGEN_PYTHON_RDEPENDS:mingw32 = ""
 
 RDEPENDS:${PN}-codegen += "${CODEGEN_PYTHON_RDEPENDS}"

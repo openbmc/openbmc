@@ -7,6 +7,6 @@ SRC_URI[sha256sum] = "aa92b70a33e2ac0bb33cd745eb61776594dc48764b06c35e0efd050b7f
 
 inherit pypi python_poetry_core 
 
-DEPENDS += "${PYTHON_PN}-versioneer-native"
+DEPENDS += "python3-versioneer-native"
 
-RDEPENDS:${PN} += "${PYTHON_PN}-json"
+RDEPENDS:${PN} += "python3-json"

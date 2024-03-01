@@ -1,6 +1,6 @@
-DEPENDS:append:class-target = " ${PYTHON_PN}-native ${PYTHON_PN}"
-DEPENDS:append:class-nativesdk = " ${PYTHON_PN}-native ${PYTHON_PN}"
-RDEPENDS:${PN} += "${@['', '${PYTHON_PN}-core']['${CLASSOVERRIDE}' == 'class-target']}"
+DEPENDS:append:class-target = " python3-native python3"
+DEPENDS:append:class-nativesdk = " python3-native python3"
+RDEPENDS:${PN} += "${@['', 'python3-core']['${CLASSOVERRIDE}' == 'class-target']}"
 
 inherit distutils-common-base python3native python3targetconfig
 

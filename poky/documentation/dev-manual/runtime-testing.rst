@@ -193,7 +193,7 @@ perform a one-time setup of your controller image by doing the following:
    "controller" image and you can customize the image recipe as you would
    any other recipe.
 
-   Here are the image recipe requirements:
+   Image recipe requirements are:
 
    -  Inherits ``core-image`` so that kernel modules are installed.
 
@@ -572,7 +572,7 @@ data:
    When set to "true", the package is not automatically installed into
    the DUT.
 
-Following is an example JSON file that handles test "foo" installing
+Here is an example JSON file that handles test "foo" installing
 package "bar" and test "foobar" installing packages "foo" and "bar".
 Once the test is complete, the packages are removed from the DUT::
 

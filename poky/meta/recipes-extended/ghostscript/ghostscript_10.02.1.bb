@@ -73,3 +73,4 @@ COMPATIBLE_HOST = "^(?!arc).*"
 CVE_PRODUCT = "ghostscript gpl_ghostscript"
 
 CVE_STATUS[CVE-2023-38560] = "not-applicable-config: PCL isn't part of the Ghostscript release"
+CVE_STATUS[CVE-2023-38559] = "cpe-incorrect: Issue only appears in versions before 10.02.0"

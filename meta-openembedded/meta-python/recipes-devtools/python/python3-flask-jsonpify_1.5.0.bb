@@ -11,4 +11,4 @@ SRC_URI[sha256sum] = "8ac4c732aa5b11d9f6c2de58065d3b669f139518ca8f529bce943817e2
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} += "${PYTHON_PN}-flask"
+RDEPENDS:${PN} += "python3-flask"

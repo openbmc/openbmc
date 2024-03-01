@@ -83,7 +83,7 @@ git://.*/.*                   git://HOST/PATH;protocol=https \
 git://.*/.*                   git://HOST/git/PATH;protocol=https \
 "
 
-# Switch glibc and binutils recipes to use shallow clones as they're large and this
+# Switch llvm, glibc and binutils recipes to use shallow clones as they're large and this
 # improves user experience whilst allowing the flexibility of git urls in the recipes
 BB_GIT_SHALLOW:pn-binutils = "1"
 BB_GIT_SHALLOW:pn-binutils-cross-${TARGET_ARCH} = "1"
@@ -98,3 +98,7 @@ BB_GIT_SHALLOW:pn-glibc = "1"
 BB_GIT_SHALLOW:pn-glibc-tests = "1"
 PREMIRRORS += "git://sourceware.org/git/glibc.git https://downloads.yoctoproject.org/mirror/sources/ \
               git://sourceware.org/git/binutils-gdb.git https://downloads.yoctoproject.org/mirror/sources/"
+
+BB_GIT_SHALLOW:pn-llvm = "1"
+BB_GIT_SHALLOW:pn-llvm-native = "1"
+BB_GIT_SHALLOW:pn-nativesdk-llvm = "1"

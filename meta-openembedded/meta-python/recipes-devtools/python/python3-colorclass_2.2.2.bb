@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "6d4fe287766166a98ca7bc6f6312daf04a0481b1eda43e7173484051c0
 PYPI_PACKAGE="colorclass"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-ctypes \
+    python3-ctypes \
 "
 
 BBCLASSEXTEND = "native nativesdk"

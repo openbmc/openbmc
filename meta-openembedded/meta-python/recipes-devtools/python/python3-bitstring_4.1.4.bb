@@ -10,10 +10,10 @@ PYPI_PACKAGE = "bitstring"
 inherit pypi python_poetry_core
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-mmap \
-    ${PYTHON_PN}-numbers \
+    python3-core \
+    python3-io \
+    python3-mmap \
+    python3-numbers \
 "
 
 BBCLASSEXTEND = "native nativesdk"

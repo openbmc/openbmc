@@ -9,21 +9,21 @@ SRC_URI[sha256sum] = "2a6b0db0441e63a2dd74cbd18f5d9ae7e08dc0e54685aa486361d0db6a
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += " \
-    ${PYTHON_PN}-setuptools-scm-native \
-    ${PYTHON_PN}-toml-native \
-    ${PYTHON_PN}-wheel-native \
+    python3-setuptools-scm-native \
+    python3-toml-native \
+    python3-wheel-native \
 "
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-pycryptodomex \
-    ${PYTHON_PN}-multivolumefile \
-    ${PYTHON_PN}-pybcj \
-    ${PYTHON_PN}-inflate64 \
-    ${PYTHON_PN}-pyppmd \
-    ${PYTHON_PN}-pyzstd \
-    ${PYTHON_PN}-brotli \
-    ${PYTHON_PN}-multiprocessing \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-threading \
+    python3-pycryptodomex \
+    python3-multivolumefile \
+    python3-pybcj \
+    python3-inflate64 \
+    python3-pyppmd \
+    python3-pyzstd \
+    python3-brotli \
+    python3-multiprocessing \
+    python3-datetime \
+    python3-core \
+    python3-threading \
 "

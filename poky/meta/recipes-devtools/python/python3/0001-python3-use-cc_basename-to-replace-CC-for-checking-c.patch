@@ -1,4 +1,4 @@
-From 0558745601cc72c8d6d79cd691f4b82330b29d58 Mon Sep 17 00:00:00 2001
+From ababc7b1db8c406910766e11cdd04cbef7a706c9 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 22 Oct 2018 15:19:51 +0800
 Subject: [PATCH] python3: use cc_basename to replace CC for checking compiler
@@ -21,13 +21,12 @@ Signed-off-by: Li Zhou <li.zhou@windriver.com>
 patch originally from Li Zhou, I just rework it to new version
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
-
 ---
  configure.ac | 19 ++++++++++---------
  1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index bd2be94..cb9e198 100644
+index 384718d..5a1d58b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -137,6 +137,7 @@ AC_CONFIG_HEADERS([pyconfig.h])
@@ -110,7 +109,7 @@ index bd2be94..cb9e198 100644
  		  *gcc*)
  		    if $CC -Xlinker --help 2>&1 | grep export-dynamic >/dev/null
  		    then
-@@ -6802,7 +6803,7 @@ if test "$ac_cv_gcc_asm_for_x87" = yes; then
+@@ -6803,7 +6804,7 @@ if test "$ac_cv_gcc_asm_for_x87" = yes; then
      # Some versions of gcc miscompile inline asm:
      # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46491
      # http://gcc.gnu.org/ml/gcc/2010-11/msg00366.html

@@ -4,8 +4,7 @@ SECTION = "libs/network"
 LICENSE = "GPL-2.0-or-later | BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=6;md5=a87ee154f005a6f035b8b34ac2191f3b"
 
-DEPENDS = "bluez5 glib-2.0"
-DEPENDS += "glib-2.0-native"
+DEPENDS = "bluez5 glib-2.0 glib-2.0-native python3-packaging-native"
 
 PV = "0.2+git"
 
@@ -26,7 +25,7 @@ PACKAGECONFIG[force-dbus] = "-DGATTLIB_FORCE_DBUS=TRUE,-DGATTLIB_FORCE_DBUS=FALS
 EXTRA_OECMAKE += "-DGATTLIB_PYTHON_INTERFACE=OFF"
 EXTRA_OECMAKE += "-DGATTLIB_BUILD_DOCS=OFF"
 
-inherit pkgconfig cmake
+inherit pkgconfig cmake python3native
 
 do_compile:append() {
     for f in org-bluez-gattdescriptor1.c org-bluez-battery1.c org-bluez-adaptater1.c \

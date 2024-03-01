@@ -32,7 +32,7 @@ that contain image recipe files::
 
    $ ls meta*/recipes*/images/*.bb
 
-Following is a list of supported recipes:
+Here is a list of supported recipes:
 
 -  ``build-appliance-image``: An example virtual machine that contains
    all the pieces required to run builds using the build system as well

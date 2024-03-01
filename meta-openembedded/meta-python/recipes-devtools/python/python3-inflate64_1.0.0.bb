@@ -11,6 +11,6 @@ SRC_URI[sha256sum] = "3278827b803cf006a1df251f3e13374c7d26db779e5a33329cc11789b8
 PYPI_PACKAGE = "inflate64"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-importlib-metadata \
+    python3-core \
+    python3-importlib-metadata \
 "

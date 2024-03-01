@@ -13,13 +13,13 @@ inherit pypi python_setuptools_build_meta
 PACKAGES =+ "${PN}-zoneinfo"
 FILES:${PN}-zoneinfo = "${libdir}/${PYTHON_DIR}/site-packages/dateutil/zoneinfo"
 
-DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-numbers \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-stringold \
+    python3-datetime \
+    python3-numbers \
+    python3-six \
+    python3-stringold \
 "
 
 BBCLASSEXTEND = "native nativesdk"

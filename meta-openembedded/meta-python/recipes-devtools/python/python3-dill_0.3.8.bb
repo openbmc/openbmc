@@ -10,10 +10,10 @@ inherit pypi setuptools3
 PYPI_PACKAGE_EXT = "tar.gz"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-multiprocessing \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-profile \
-    ${PYTHON_PN}-core \
+    python3-multiprocessing \
+    python3-logging \
+    python3-profile \
+    python3-core \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -27,9 +27,9 @@ distutils3_do_compile() {
         NO_FETCH_BUILD=1 \
         STAGING_INCDIR=${STAGING_INCDIR} \
         STAGING_LIBDIR=${STAGING_LIBDIR} \
-        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py \
+        ${STAGING_BINDIR_NATIVE}/python3-native/python3 setup.py \
         build --build-base=${B} ${DISTUTILS_BUILD_ARGS} || \
-        bbfatal_log "'${PYTHON_PN} setup.py build ${DISTUTILS_BUILD_ARGS}' execution failed."
+        bbfatal_log "'python3 setup.py build ${DISTUTILS_BUILD_ARGS}' execution failed."
 }
 distutils3_do_compile[vardepsexclude] = "MACHINE"
 
@@ -39,9 +39,9 @@ distutils3_do_install() {
         STAGING_INCDIR=${STAGING_INCDIR} \
         STAGING_LIBDIR=${STAGING_LIBDIR} \
         PYTHONPATH=${D}${PYTHON_SITEPACKAGES_DIR} \
-        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py \
+        ${STAGING_BINDIR_NATIVE}/python3-native/python3 setup.py \
         build --build-base=${B} install --skip-build ${DISTUTILS_INSTALL_ARGS} || \
-        bbfatal_log "'${PYTHON_PN} setup.py install ${DISTUTILS_INSTALL_ARGS}' execution failed."
+        bbfatal_log "'python3 setup.py install ${DISTUTILS_INSTALL_ARGS}' execution failed."
 
         # support filenames with *spaces*
         find ${D} -name "*.py" -exec grep -q ${D} {} \; \

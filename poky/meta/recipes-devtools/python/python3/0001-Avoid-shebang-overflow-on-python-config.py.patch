@@ -1,4 +1,4 @@
-From 33bf96f31c4873032ace2cc9afacc3785997527a Mon Sep 17 00:00:00 2001
+From 365399f17d35719d828ddd49182dcb401fb7791c Mon Sep 17 00:00:00 2001
 From: Paulo Neves <ptsneves@gmail.com>
 Date: Tue, 7 Jun 2022 16:16:41 +0200
 Subject: [PATCH] Avoid shebang overflow on python-config.py
@@ -11,16 +11,15 @@ Denial reason: [1]
 Upstream-Status: Denied [distribution]
 
 [1] https://github.com/python/cpython/pull/93760#pullrequestreview-1005365737
-
 ---
  Makefile.pre.in | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index fb0b525..75d2e73 100644
+index 77bf09a..6353c57 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2335,6 +2335,8 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
+@@ -2339,6 +2339,8 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
  	@ # Substitution happens here, as the completely-expanded BINDIR
  	@ # is not available in configure
  	sed -e "s,@EXENAME@,$(EXENAME)," < $(srcdir)/Misc/python-config.in >python-config.py

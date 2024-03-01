@@ -9,8 +9,8 @@ SRC_URI[sha256sum] = "5f370f952971e7d17c7d1ead40e49f32345a7f7a5373571ef44d800d06
 inherit pypi setuptools3 
 
 RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-stringold \
-    ${PYTHON_PN}-threading \
+    python3-stringold \
+    python3-threading \
 "
 
 BBCLASSEXTEND = "native"

@@ -1,4 +1,4 @@
-From 2058584b7e87d6bd9d1765577766e0df7752232c Mon Sep 17 00:00:00 2001
+From 27402453f25fbdb5a9fb1a1b88d1c4d9852187d2 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sun, 5 Sep 2021 10:44:19 +0200
 Subject: [PATCH] lttng-ust-common: link with liburcu explicitly
@@ -7,15 +7,16 @@ Otherwise linking errors are seen on x86-32.
 
 Upstream-Status: Submitted [by email to lttng-dev, Francis, Jonathan]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  src/lib/lttng-ust-common/Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/src/lib/lttng-ust-common/Makefile.am b/src/lib/lttng-ust-common/Makefile.am
-index caeea2b..30febf0 100644
+index 1ccc290..6531fa0 100644
 --- a/src/lib/lttng-ust-common/Makefile.am
 +++ b/src/lib/lttng-ust-common/Makefile.am
-@@ -15,6 +15,7 @@ liblttng_ust_common_la_SOURCES = \
+@@ -16,6 +16,7 @@ liblttng_ust_common_la_SOURCES = \
  
  liblttng_ust_common_la_LIBADD = \
  	$(top_builddir)/src/common/libcommon.la \

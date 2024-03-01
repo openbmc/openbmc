@@ -39,7 +39,7 @@ PACKAGES =+ "\
 "
 
 DEPENDS += " \
-    ${PYTHON_PN}-incremental-native \
+    python3-incremental-native \
 "
 
 RDEPENDS:${PN} = "\
@@ -56,22 +56,22 @@ RDEPENDS:${PN} = "\
     ${PN}-zsh \
 "
 
-RDEPENDS:${PN}-core = "${PYTHON_PN}-appdirs \
-                       ${PYTHON_PN}-asyncio \
-                       ${PYTHON_PN}-automat \
-                       ${PYTHON_PN}-constantly \
-                       ${PYTHON_PN}-core \
-                       ${PYTHON_PN}-debugger \
-                       ${PYTHON_PN}-hyperlink \
-                       ${PYTHON_PN}-incremental \
-                       ${PYTHON_PN}-pyhamcrest \
-                       ${PYTHON_PN}-pyserial \
-                       ${PYTHON_PN}-typing-extensions \
-                       ${PYTHON_PN}-unixadmin \
-                       ${PYTHON_PN}-zopeinterface \
+RDEPENDS:${PN}-core = "python3-appdirs \
+                       python3-asyncio \
+                       python3-automat \
+                       python3-constantly \
+                       python3-core \
+                       python3-debugger \
+                       python3-hyperlink \
+                       python3-incremental \
+                       python3-pyhamcrest \
+                       python3-pyserial \
+                       python3-typing-extensions \
+                       python3-unixadmin \
+                       python3-zopeinterface \
 "
 RDEPENDS:${PN}-test = "${PN}"
-RDEPENDS:${PN}-conch = "${PN}-core ${PN}-protocols ${PYTHON_PN}-bcrypt ${PYTHON_PN}-cryptography ${PYTHON_PN}-pyasn1 ${PYTHON_PN}-pickle"
+RDEPENDS:${PN}-conch = "${PN}-core ${PN}-protocols python3-bcrypt python3-cryptography python3-pyasn1 python3-pickle"
 RDEPENDS:${PN}-mail = "${PN}-core ${PN}-protocols"
 RDEPENDS:${PN}-names = "${PN}-core"
 RDEPENDS:${PN}-news = "${PN}-core ${PN}-protocols"

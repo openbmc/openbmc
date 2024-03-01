@@ -26,7 +26,7 @@ export BUILD_SYS
 export HOST_SYS
 
 EXTRA_OECONF += "--with-python-rev=${PYTHON_BASEVERSION} \
-                 --with-python-binary=${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} \
+                 --with-python-binary=${STAGING_BINDIR_NATIVE}/python3-native/python3 \
                  --with-pythonsitedir=${PYTHON_SITEPACKAGES_DIR} \
                  --libdir=${libdir} \
                  --with-securedir=${base_libdir}/security \

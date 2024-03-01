@@ -149,13 +149,6 @@ def get_testimage_configuration(d, test_type, machine):
     return configuration
 get_testimage_configuration[vardepsexclude] = "DATETIME"
 
-def get_testimage_json_result_dir(d):
-    json_result_dir = os.path.join(d.getVar("LOG_DIR"), 'oeqa')
-    custom_json_result_dir = d.getVar("OEQA_JSON_RESULT_DIR")
-    if custom_json_result_dir:
-        json_result_dir = custom_json_result_dir
-    return json_result_dir
-
 def get_testimage_result_id(configuration):
     return '%s_%s_%s_%s' % (configuration['TEST_TYPE'], configuration['IMAGE_BASENAME'], configuration['MACHINE'], configuration['STARTTIME'])
 
@@ -177,40 +170,6 @@ def get_testimage_boot_patterns(d):
                 boot_patterns[flag] = flagval.encode().decode('unicode-escape')
     return boot_patterns
 
-def get_artifacts_list(target, raw_list):
-    result = []
-    # Passed list may contains patterns in paths, expand them directly on target
-    for raw_path in raw_list.split():
-        cmd = f"for p in {raw_path}; do if [ -e $p ]; then echo $p; fi; done"
-        try:
-            status, output = target.run(cmd)
-            if status != 0 or not output:
-                raise Exception()
-            result += output.split()
-        except:
-            bb.note(f"No file/directory matching path {raw_path}")
-
-    return result
-
-def retrieve_test_artifacts(target, artifacts_list, target_dir):
-    import shutil
-
-    local_artifacts_dir = os.path.join(target_dir, "artifacts")
-    if os.path.isdir(local_artifacts_dir):
-        shutil.rmtree(local_artifacts_dir)
-
-    os.makedirs(local_artifacts_dir)
-    for artifact_path in artifacts_list:
-        if not os.path.isabs(artifact_path):
-            bb.warn(f"{artifact_path} is not an absolute path")
-            continue
-        try:
-            dest_dir = os.path.join(local_artifacts_dir, os.path.dirname(artifact_path[1:]))
-            os.makedirs(dest_dir, exist_ok=True)
-            target.copyFrom(artifact_path, dest_dir)
-        except:
-            bb.warn(f"Can not retrieve {artifact_path} from test target")
-
 def testimage_main(d):
     import os
     import json
@@ -224,6 +183,8 @@ def testimage_main(d):
     from oeqa.core.target.qemu import supported_fstypes
     from oeqa.core.utils.test import getSuiteCases
     from oeqa.utils import make_logger_bitbake_compatible
+    from oeqa.utils import get_json_result_dir
+    from oeqa.utils.postactions import run_failed_tests_post_actions
 
     def sigterm_exception(signum, stackframe):
         """
@@ -406,11 +367,7 @@ def testimage_main(d):
         results = tc.runTests()
         complete = True
         if results.hasAnyFailingTest():
-            artifacts_list = get_artifacts_list(tc.target, d.getVar("TESTIMAGE_FAILED_QA_ARTIFACTS"))
-            if not artifacts_list:
-                bb.warn("Could not load artifacts list, skip artifacts retrieval")
-            else:
-                retrieve_test_artifacts(tc.target, artifacts_list, get_testimage_json_result_dir(d))
+            run_failed_tests_post_actions(d, tc)
     except (KeyboardInterrupt, BlockingIOError) as err:
         if isinstance(err, KeyboardInterrupt):
             bb.error('testimage interrupted, shutting down...')
@@ -426,14 +383,14 @@ def testimage_main(d):
     # Show results (if we have them)
     if results:
         configuration = get_testimage_configuration(d, 'runtime', machine)
-        results.logDetails(get_testimage_json_result_dir(d),
+        results.logDetails(get_json_result_dir(d),
                         configuration,
                         get_testimage_result_id(configuration),
                         dump_streams=d.getVar('TESTREPORT_FULLLOGS'))
         results.logSummary(pn)
 
     # Copy additional logs to tmp/log/oeqa so it's easier to find them
-    targetdir = os.path.join(get_testimage_json_result_dir(d), d.getVar("PN"))
+    targetdir = os.path.join(get_json_result_dir(d), d.getVar("PN"))
     os.makedirs(targetdir, exist_ok=True)
     os.symlink(bootlog, os.path.join(targetdir, os.path.basename(bootlog)))
     os.symlink(d.getVar("BB_LOGFILE"), os.path.join(targetdir, os.path.basename(d.getVar("BB_LOGFILE") + "." + d.getVar('DATETIME'))))

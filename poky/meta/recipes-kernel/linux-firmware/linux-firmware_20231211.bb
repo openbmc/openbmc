@@ -280,6 +280,7 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-rtl8761 \
              ${PN}-rtl8168 \
              ${PN}-rtl8822 \
+             ${PN}-rtl-nic \
              ${PN}-cypress-license \
              ${PN}-broadcom-license \
              ${PN}-bcm-0bb4-0306 \
@@ -348,6 +349,7 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-bnx2 \
              ${PN}-bnx2x \
              ${PN}-liquidio \
+             ${PN}-mellanox \
              ${PN}-nvidia-license \
              ${PN}-nvidia-tegra-k1 ${PN}-nvidia-tegra \
              ${PN}-nvidia-gpu \
@@ -366,7 +368,9 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-olpc-license ${PN}-olpc \
              ${PN}-phanfw-license ${PN}-phanfw \
              ${PN}-powervr-license ${PN}-powervr \
+             ${PN}-prestera \
              ${PN}-qat ${PN}-qat-license \
+             ${PN}-qed \
              ${PN}-qcom-license ${PN}-qcom-yamato-license \
              ${PN}-qcom-venus-1.8 ${PN}-qcom-venus-4.2 ${PN}-qcom-venus-5.2 ${PN}-qcom-venus-5.4 ${PN}-qcom-venus-6.0 \
              ${PN}-qcom-vpu-1.0 ${PN}-qcom-vpu-2.0 \
@@ -817,6 +821,7 @@ LICENSE:${PN}-rtl8761 = "Firmware-rtlwifi_firmware"
 LICENSE:${PN}-rtl8821 = "Firmware-rtlwifi_firmware"
 LICENSE:${PN}-rtl8822 = "Firmware-rtlwifi_firmware"
 LICENSE:${PN}-rtl-license = "Firmware-rtlwifi_firmware"
+LICENSE:${PN}-rtl-nic = "WHENCE"
 LICENSE:${PN}-rtl8168 = "WHENCE"
 
 FILES:${PN}-rtl-license = " \
@@ -852,6 +857,9 @@ FILES:${PN}-rtl8822 = " \
   ${nonarch_base_libdir}/firmware/rtw88/rtw8822*.bin \
   ${nonarch_base_libdir}/firmware/rtlwifi/rtl8822*.bin \
 "
+FILES:${PN}-rtl-nic = " \
+  ${nonarch_base_libdir}/firmware/rtl_nic/*.fw \
+"
 
 RDEPENDS:${PN}-rtl8188 += "${PN}-rtl-license"
 RDEPENDS:${PN}-rtl8192ce += "${PN}-rtl-license"
@@ -862,6 +870,7 @@ RDEPENDS:${PN}-rtl8821 += "${PN}-rtl-license"
 RDEPENDS:${PN}-rtl8761 += "${PN}-rtl-license"
 RDEPENDS:${PN}-rtl8822 += "${PN}-rtl-license"
 RDEPENDS:${PN}-rtl8168 += "${PN}-whence-license"
+RDEPENDS:${PN}-rtl-nic += "${PN}-whence-license"
 
 # For TI wl1251
 LICENSE:${PN}-wl1251 = "Firmware-wl1251"
@@ -1325,6 +1334,9 @@ FILES:${PN}-qat-license   = "${nonarch_base_libdir}/firmware/LICENCE.qat_firmwar
 FILES:${PN}-qat           = "${nonarch_base_libdir}/firmware/qat*.bin"
 RDEPENDS:${PN}-qat        = "${PN}-qat-license"
 
+LICENSE:${PN}-qed         = "WHENCE"
+FILES:${PN}-qed           = "${nonarch_base_libdir}/firmware/qed/*"
+
 # For QCOM VPU/GPU and SDM845
 LICENSE:${PN}-qcom-license = "Firmware-qcom"
 LICENSE:${PN}-qcom-yamato-license = "Firmware-qcom-yamato"
@@ -1466,6 +1478,12 @@ RRECOMMENDS:${PN}-qcom-sc8280xp-lenovo-x13s-compute = "${PN}-qcom-sc8280xp-lenov
 RRECOMMENDS:${PN}-qcom-sc8280xp-lenovo-x13s-sensors = "${PN}-qcom-sc8280xp-lenovo-x13s-compat"
 
 FILES:${PN}-liquidio = "${nonarch_base_libdir}/firmware/liquidio"
+
+FILES:${PN}-mellanox = "${nonarch_base_libdir}/firmware/mellanox"
+
+LICENSE:${PN}-prestera = "Firmware-Marvell"
+FILES:${PN}-prestera = "${nonarch_base_libdir}/firmware/mrvl/prestera"
+RDEPENDS:${PN}-prestera = "${PN}-marvell-license"
 
 # For Rockchip
 LICENSE:${PN}-rockchip-dptx = "Firmware-rockchip"

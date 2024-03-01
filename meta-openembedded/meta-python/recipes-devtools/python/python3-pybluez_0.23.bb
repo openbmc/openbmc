@@ -22,5 +22,5 @@ do_configure:prepend() {
 
 RDEPENDS:${PN} += "\
     bluez5 \
-    ${PYTHON_PN}-fcntl \
+    python3-fcntl \
 "

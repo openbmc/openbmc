@@ -9,8 +9,8 @@ SRC_URI[sha256sum] = "4148645659b08b70d72460ed1921158027a9e53ae8b7234149b1400edd
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += "\
-    ${PYTHON_PN}-pytest-runner-native \
-    ${PYTHON_PN}-wheel-native \
+    python3-pytest-runner-native \
+    python3-wheel-native \
 "
 
 PACKAGES =+ "${PN}-tests"
@@ -21,17 +21,17 @@ FILES:${PN}-tests += " \
 "
 
 RDEPENDS:${PN}:class-target += "\
-    ${PYTHON_PN}-lazy-object-proxy \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-six \
-    ${PYTHON_PN}-wrapt \
-    ${PYTHON_PN}-setuptools \
-    ${PYTHON_PN}-typing-extensions \
+    python3-lazy-object-proxy \
+    python3-logging \
+    python3-six \
+    python3-wrapt \
+    python3-setuptools \
+    python3-typing-extensions \
 "
 
 RDEPENDS:${PN}-tests:class-target += "\
-    ${PYTHON_PN}-unittest \
-    ${PYTHON_PN}-xml \
+    python3-unittest \
+    python3-xml \
 "
 
 BBCLASSEXTEND = "native nativesdk"

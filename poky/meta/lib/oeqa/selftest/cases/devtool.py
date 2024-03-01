@@ -2544,6 +2544,10 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertEqual(status, 0, msg="%s failed: %s" % (ptest_cmd, output))
         self.assertIn("PASS: cpp-example-lib", output)
 
+        # Verify remote debugging works
+        self._gdb_cross_debugging(
+            qemu, recipe_name, example_exe, MAGIC_STRING_ORIG)
+
         # Replace the Magic String in the code, compile and deploy to Qemu
         cpp_example_lib_hpp = os.path.join(tempdir, 'cpp-example-lib.hpp')
         with open(cpp_example_lib_hpp, 'r') as file:
@@ -2565,6 +2569,10 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertEqual(status, 0, msg="%s failed: %s" % (ptest_cmd, output))
         self.assertIn("PASS: cpp-example-lib", output)
 
+        # Verify remote debugging works wit the modified magic string
+        self._gdb_cross_debugging(
+            qemu, recipe_name, example_exe, MAGIC_STRING_NEW)
+
     def _gdb_cross(self):
         """Verify gdb-cross is provided by devtool ide-sdk"""
         target_arch = self.td["TARGET_ARCH"]
@@ -2578,12 +2586,21 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertEqual(r.status, 0)
         self.assertIn("GNU gdb", r.output)
 
-    def _gdb_cross_debugging(self, qemu, recipe_name, example_exe):
+    def _gdb_cross_debugging(self, qemu, recipe_name, example_exe, magic_string):
         """Verify gdb-cross is working
 
         Test remote debugging:
         break main
         run
+        continue
+        break CppExample::print_json()
+        continue
+        print CppExample::test_string.compare("cpp-example-lib Magic: 123456789")
+        $1 = 0
+        print CppExample::test_string.compare("cpp-example-lib Magic: 123456789aaa")
+        $2 = -3
+        list cpp-example-lib.hpp:13,13
+        13	    inline static const std::string test_string = "cpp-example-lib Magic: 123456789";
         continue
         """
         sshargs = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
@@ -2609,10 +2626,21 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertIn("gdbserver", r.output)
 
         # Test remote debugging works
-        r = runCmd(
-            gdb_script + " --batch -ex 'break main' --ex 'run' -ex 'continue'")
+        gdb_batch_cmd = " --batch -ex 'break main' -ex 'run'"
+        gdb_batch_cmd += " -ex 'break CppExample::print_json()' -ex 'continue'"
+        gdb_batch_cmd += " -ex 'print CppExample::test_string.compare(\"cpp-example-lib %s\")'" % magic_string
+        gdb_batch_cmd += " -ex 'print CppExample::test_string.compare(\"cpp-example-lib %saaa\")'" % magic_string
+        gdb_batch_cmd += " -ex 'list cpp-example-lib.hpp:13,13'"
+        gdb_batch_cmd += " -ex 'continue'"
+        r = runCmd(gdb_script + gdb_batch_cmd)
+        self.logger.debug("%s %s returned: %s", gdb_script,
+                          gdb_batch_cmd, r.output)
         self.assertEqual(r.status, 0)
         self.assertIn("Breakpoint 1, main", r.output)
+        self.assertIn("$1 = 0", r.output)  # test.string.compare equal
+        self.assertIn("$2 = -3", r.output)  # test.string.compare longer
+        self.assertIn(
+            'inline static const std::string test_string = "cpp-example-lib %s";' % magic_string, r.output)
         self.assertIn("exited normally", r.output)
 
         # Stop the gdbserver
@@ -2689,14 +2717,12 @@ class DevtoolIdeSdkTests(DevtoolBase):
             bitbake_sdk_cmd = 'devtool ide-sdk %s %s -t root@%s -c --ide=none' % (
                 recipe_name, testimage, qemu.ip)
             runCmd(bitbake_sdk_cmd)
+            self._gdb_cross()
             self._verify_cmake_preset(tempdir)
             self._devtool_ide_sdk_qemu(tempdir, qemu, recipe_name, example_exe)
             # Verify the oe-scripts sym-link is valid
             self.assertEqual(self._workspace_scripts_dir(
                 recipe_name), self._sources_scripts_dir(tempdir))
-            # Verify GDB is working after devtool ide-sdk
-            self._gdb_cross()
-            self._gdb_cross_debugging(qemu, recipe_name, example_exe)
 
             # meson-example recipe
             recipe_name = "meson-example"
@@ -2707,13 +2733,11 @@ class DevtoolIdeSdkTests(DevtoolBase):
             bitbake_sdk_cmd = 'devtool ide-sdk %s %s -t root@%s -c --ide=none' % (
                 recipe_name, testimage, qemu.ip)
             runCmd(bitbake_sdk_cmd)
+            self._gdb_cross()
             self._devtool_ide_sdk_qemu(tempdir, qemu, recipe_name, example_exe)
             # Verify the oe-scripts sym-link is valid
             self.assertEqual(self._workspace_scripts_dir(
                 recipe_name), self._sources_scripts_dir(tempdir))
-            # Verify GDB is working after devtool ide-sdk
-            self._gdb_cross()
-            self._gdb_cross_debugging(qemu, recipe_name, example_exe)
 
     def test_devtool_ide_sdk_code_cmake(self):
         """Verify a cmake recipe works with ide=code mode"""

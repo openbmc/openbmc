@@ -10,4 +10,4 @@ UPSTREAM_CHECK_REGEX = "/Flask-SQLAlchemy/(?P<pver>(\d+[\.\-_]*)+)"
 
 inherit pypi python_setuptools_build_meta
 
-RDEPENDS:${PN} = "${PYTHON_PN}-sqlalchemy ${PYTHON_PN}-flask"
+RDEPENDS:${PN} = "python3-sqlalchemy python3-flask"

@@ -48,6 +48,8 @@ class RecipetoolBase(devtool.DevtoolTestCase):
         self.testfile = os.path.join(self.tempdir, 'testfile')
         with open(self.testfile, 'w') as f:
             f.write('Test file\n')
+        config = 'BBMASK += "meta-poky/recipes-core/base-files/base-files_%.bbappend"\n'
+        self.append_config(config)
 
     def tearDownLocal(self):
         runCmd('rm -rf %s/recipes-*' % self.templayerdir)

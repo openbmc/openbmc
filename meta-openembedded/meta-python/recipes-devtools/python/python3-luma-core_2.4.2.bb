@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "963c264164d4374f549d57db09599e0ca458cea1bd05e16939897619be
 PYPI_PACKAGE = "luma.core"
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-pillow \
-	${PYTHON_PN}-threading \
-	${PYTHON_PN}-smbus2 \
+	python3-pillow \
+	python3-threading \
+	python3-smbus2 \
 "

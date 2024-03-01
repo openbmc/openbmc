@@ -11,7 +11,7 @@ PYPI_PACKAGE = "olefile"
 PYPI_PACKAGE_EXT = "zip"
 
 RDEPENDS:${PN} += "\
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-logging \
+    python3-core \
+    python3-datetime \
+    python3-logging \
 "

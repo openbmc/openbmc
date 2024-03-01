@@ -7,4 +7,4 @@ SRC_URI[sha256sum] = "17849c23dba3d667247dc4defe1757fff98694e90fe37474f3feebb69c
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} = "${PYTHON_PN}-click ${PYTHON_PN}-prompt-toolkit"
+RDEPENDS:${PN} = "python3-click python3-prompt-toolkit"

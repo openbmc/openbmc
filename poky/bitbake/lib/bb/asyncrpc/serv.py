@@ -39,9 +39,13 @@ class AsyncServerConnection(object):
                 "address": socket.address,
             },
         )
+        self.client_headers = {}
 
     async def close(self):
         await self.socket.close()
+
+    async def handle_headers(self, headers):
+        return {}
 
     async def process_requests(self):
         try:
@@ -64,12 +68,20 @@ class AsyncServerConnection(object):
                 )
                 return
 
-            # Read headers. Currently, no headers are implemented, so look for
-            # an empty line to signal the end of the headers
+            # Read headers
+            self.client_headers = {}
             while True:
                 header = await self.socket.recv()
                 if not header:
+                    # Empty line. End of headers
                     break
+                tag, value = header.split(":", 1)
+                self.client_headers[tag.lower()] = value.strip()
+
+            if self.client_headers.get("needs-headers", "false") == "true":
+                for k, v in (await self.handle_headers(self.client_headers)).items():
+                    await self.socket.send("%s: %s" % (k, v))
+                await self.socket.send("")
 
             # Handle messages
             while True:

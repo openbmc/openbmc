@@ -1,0 +1,35 @@
+From eb164bb201c0f792fa8aa78270c47294065183a3 Mon Sep 17 00:00:00 2001
+From: Oleh Matiusha <omatiush@cisco.com>
+Date: Tue, 6 Feb 2024 09:33:11 +0000
+Subject: [PATCH 1/2] yasm: Set build date to SOURCE_DATE_EPOCH
+
+If SOURCE_DATE_EPOCH is set, use it to generate a reproducible
+string for BUILD_DATE.
+
+Signed-off-by: Oleh Matiusha <omatiush@cisco.com>
+---
+ configure.ac | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 2823ecd..eeb51ce 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -103,6 +103,14 @@ AM_WITH_DMALLOC
+ #
+ AC_CHECK_HEADERS([strings.h libgen.h unistd.h direct.h sys/stat.h])
+ 
++# Use reproducible build date and time
++if test "$SOURCE_DATE_EPOCH"; then
++	DATE_FMT="%d %b %Y %H:%M:%S"
++	BUILD_DATE=$(LC_ALL=C date -u -d "@$SOURCE_DATE_EPOCH" "+$DATE_FMT")
++	AC_DEFINE_UNQUOTED([BUILD_DATE], ["$BUILD_DATE"], [Use reproducidle build date])
++fi
++
++
+ #
+ # Checks for typedefs, structures, and compiler characteristics.
+ #
+-- 
+2.33.0
+

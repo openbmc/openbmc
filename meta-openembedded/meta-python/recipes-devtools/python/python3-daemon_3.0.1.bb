@@ -2,10 +2,10 @@ DESCRIPTION = "Library to implement a well-behaved Unix daemon process"
 HOMEPAGE = "https://pagure.io/python-daemon/"
 SECTION = "devel/python"
 
-DEPENDS += "${PYTHON_PN}-docutils-native"
-RDEPENDS:${PN} = "${PYTHON_PN}-docutils \
-                  ${PYTHON_PN}-lockfile (>= 0.10) \
-                  ${PYTHON_PN}-resource \
+DEPENDS += "python3-docutils-native"
+RDEPENDS:${PN} = "python3-docutils \
+                  python3-lockfile (>= 0.10) \
+                  python3-resource \
 "
 
 LICENSE = "Apache-2.0 & GPL-3.0-only"

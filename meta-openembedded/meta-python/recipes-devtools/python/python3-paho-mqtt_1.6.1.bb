@@ -9,7 +9,7 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "2a8291c81623aec00372b5a85558a372c747cbca8e9934dfe218638b8eefc26f"
 
-DEPENDS += "${PYTHON_PN}-pytest-runner-native"
+DEPENDS += "python3-pytest-runner-native"
 
 do_install:append() {
         install -d -m0755 ${D}${datadir}/${BPN}/examples
@@ -18,16 +18,16 @@ do_install:append() {
 
 PACKAGES =+ "${PN}-examples"
 
-RDEPENDS:${PN}-examples += "${PN} ${PYTHON_PN}-core"
+RDEPENDS:${PN}-examples += "${PN} python3-core"
 
 FILES:${PN}-examples = "${datadir}/${BPN}/examples"
 
 RDEPENDS:${PN} = "\
-    ${PYTHON_PN}-io \
-    ${PYTHON_PN}-logging \
-    ${PYTHON_PN}-math \
-    ${PYTHON_PN}-netclient \
-    ${PYTHON_PN}-threading \
+    python3-io \
+    python3-logging \
+    python3-math \
+    python3-netclient \
+    python3-threading \
 "
 
 BBCLASSEXTEND = "native nativesdk"

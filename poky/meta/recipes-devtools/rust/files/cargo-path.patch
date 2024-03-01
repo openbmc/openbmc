@@ -21,8 +21,8 @@ diff --git a/src/bootstrap/bootstrap.py b/src/bootstrap/bootstrap.py
 --- a/src/bootstrap/bootstrap.py
 +++ b/src/bootstrap/bootstrap.py
 @@ -954,9 +954,11 @@
-         if deny_warnings:
-             env["RUSTFLAGS"] += " -Dwarnings"
+         if "RUSTFLAGS_BOOTSTRAP" in env:
+             env["RUSTFLAGS"] += " " + env["RUSTFLAGS_BOOTSTRAP"]
 
 -        env["PATH"] = os.path.join(self.bin_root(), "bin") + \
 -            os.pathsep + env["PATH"]

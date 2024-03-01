@@ -160,7 +160,7 @@ Follow these steps to set up and execute multiple configuration builds:
    The location for these multiconfig configuration files is specific.
    They must reside in the current :term:`Build Directory` in a sub-directory of
    ``conf`` named ``multiconfig`` or within a layer's ``conf`` directory
-   under a directory named ``multiconfig``. Following is an example that defines
+   under a directory named ``multiconfig``. Here is an example that defines
    two configuration files for the "x86" and "arm" multiconfigs:
 
    .. image:: figures/multiconfig_files.png

@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "3b2eede94d64538cb894eec50302a881e056ed7e057f0e24fb45b28a19
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \
-	${PYTHON_PN}-dnspython \
-	${PYTHON_PN}-six \
-	${PYTHON_PN}-greenlet \
+	python3-dnspython \
+	python3-six \
+	python3-greenlet \
 "

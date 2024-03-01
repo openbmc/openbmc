@@ -14,10 +14,10 @@ PYPI_PACKAGE="rarfile"
 
 RDEPENDS:${PN} += "\
     p7zip \
-    ${PYTHON_PN}-core \
-    ${PYTHON_PN}-datetime \
-    ${PYTHON_PN}-crypt \
-    ${PYTHON_PN}-io \
+    python3-core \
+    python3-datetime \
+    python3-crypt \
+    python3-io \
 "
 
 BBCLASSEXTEND = "native nativesdk"

@@ -22,6 +22,10 @@ class UserGroupTests(OESelftestTestCase):
         # Test for YOCTO #14961
         self.assertTrue(bitbake('useraddbadtask -C fetch'))
 
+    def test_postinst_order(self):
+        self.logger.info("Building dcreategroup")
+        self.assertTrue(bitbake(' dcreategroup'))
+
     def test_static_useradd_from_dynamic(self):
         metaselftestpath = get_test_layer()
         self.logger.info("Building core-image-minimal to generate passwd/group file")

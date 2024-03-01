@@ -12,11 +12,11 @@ BBCLASSEXTEND = "native nativesdk"
 inherit pypi python_hatchling
 
 DEPENDS += "\
-    ${PYTHON_PN}-hatch-vcs-native \
+    python3-hatch-vcs-native \
 "
 
 RDEPENDS:${PN} += " \
-    ${PYTHON_PN}-distlib \
-    ${PYTHON_PN}-filelock \
-    ${PYTHON_PN}-platformdirs \
+    python3-distlib \
+    python3-filelock \
+    python3-platformdirs \
 "

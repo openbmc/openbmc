@@ -57,7 +57,7 @@ EXTRA_OECMAKE:append:libc-musl = " -DENABLE_NLS=OFF -DENABLE_OPENMP=OFF"
 # --sysconfdir prevents rpm from attempting to access machine-specific configuration in sysroot/etc; we need to have it in rootfs
 # --localstatedir prevents rpm from writing its database to native sysroot when building images
 EXTRA_OECMAKE:append:class-native = " -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc -DCMAKE_INSTALL_LOCALSTATEDIR:PATH=/var"
-EXTRA_OECMAKE:append:class-nativesdk = " -DCMAKE_INSTALL_FULL_SYSCONFDIR=/etc"
+EXTRA_OECMAKE:append:class-nativesdk = " -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc -DCMAKE_INSTALL_FULL_SYSCONFDIR=/etc"
 
 inherit cmake gettext pkgconfig python3targetconfig
 OECMAKE_GENERATOR = "Unix Makefiles"
