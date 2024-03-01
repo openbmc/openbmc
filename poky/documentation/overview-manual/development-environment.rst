@@ -131,6 +131,14 @@ are several ways of working in the Yocto Project environment:
    Toaster and on how to use Toaster in general, see the
    :doc:`/toaster-manual/index`.
 
+-  *Using the VSCode Extension:* You can use the `Yocto Project BitBake
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+   extension for Visual Studio Code to start your BitBake builds through a
+   graphical user interface.
+
+   Learn more about the VSCode Extension on the `extension's marketplace page
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__.
+
 Yocto Project Source Repositories
 =================================
 

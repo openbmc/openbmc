@@ -227,7 +227,7 @@ class XhrSetDefaultImageUrl(View):
 #    same logical name
 #  * Each project that uses a layer will have its own
 #    LayerVersion and Project Layer for it
-#  * During the Paroject delete process, when the last
+#  * During the Project delete process, when the last
 #    LayerVersion for a 'local_source_dir' layer is deleted
 #    then the Layer record is deleted to remove orphans
 #
@@ -457,15 +457,18 @@ class XhrLayer(View):
                              'layerdetailurl':
                              layer_dep.get_detailspage_url(project.pk)})
 
-            # Scan the layer's content and update components
-            scan_layer_content(layer,layer_version)
+            # Only scan_layer_content if layer is local
+            if layer_data.get('local_source_dir', None):
+                # Scan the layer's content and update components
+                scan_layer_content(layer,layer_version)
 
         except Layer_Version.DoesNotExist:
             return error_response("layer-dep-not-found")
         except Project.DoesNotExist:
             return error_response("project-not-found")
-        except KeyError:
-            return error_response("incorrect-parameters")
+        except KeyError as e:
+            _log("KeyError: %s" % e)
+            return error_response(f"incorrect-parameters")
 
         return JsonResponse({'error': "ok",
                              'imported_layer': {

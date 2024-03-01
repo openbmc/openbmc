@@ -1075,7 +1075,7 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
             "%s:%s" % (runtime_ref.externalDocumentId, runtime_doc.SPDXID),
             comment="Runtime dependencies for %s" % name
         )
-
+    bb.utils.mkdirhier(spdx_workdir)
     image_spdx_path = spdx_workdir / (rootfs_name + ".spdx.json")
 
     with image_spdx_path.open("wb") as f:

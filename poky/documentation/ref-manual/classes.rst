@@ -1538,16 +1538,6 @@ Here are the tests you can list with the :term:`WARN_QA` and
    automatically get these versions. Consequently, you should only need
    to explicitly add dependencies to binary driver recipes.
 
-.. _ref-classes-insserv:
-
-``insserv``
-===========
-
-The :ref:`ref-classes-insserv` class uses the ``insserv`` utility to update the order
-of symbolic links in ``/etc/rc?.d/`` within an image based on
-dependencies specified by LSB headers in the ``init.d`` scripts
-themselves.
-
 .. _ref-classes-kernel:
 
 ``kernel``
@@ -3210,7 +3200,7 @@ The :ref:`ref-classes-uboot-config` class provides support for U-Boot configurat
 a machine. Specify the machine in your recipe as follows::
 
    UBOOT_CONFIG ??= <default>
-   UBOOT_CONFIG[foo] = "config,images"
+   UBOOT_CONFIG[foo] = "config,images,binary"
 
 You can also specify the machine using this method::
 

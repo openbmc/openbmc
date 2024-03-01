@@ -131,6 +131,9 @@ def get_source_date_epoch_from_youngest_file(d, sourcedir):
         files = [f for f in files if not f[0] == '.']
 
         for fname in files:
+            if fname == "singletask.lock":
+                 # Ignore externalsrc/devtool lockfile [YOCTO #14921]
+                 continue
             filename = os.path.join(root, fname)
             try:
                 mtime = int(os.lstat(filename).st_mtime)

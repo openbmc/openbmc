@@ -52,6 +52,8 @@ In order to run tests, you need to do the following:
          -  Be sure to use an absolute path when calling this script
             with sudo.
 
+         -  Ensure that your host has the package ``iptables`` installed.
+
          -  The package recipe ``qemu-helper-native`` is required to run
             this script. Build the package using the following command::
 

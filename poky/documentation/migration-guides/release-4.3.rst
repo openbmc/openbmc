@@ -8,3 +8,5 @@ Release 4.3 (nanbield)
    migration-4.3
    release-notes-4.3
    release-notes-4.3.1
+   release-notes-4.3.2
+   release-notes-4.3.3

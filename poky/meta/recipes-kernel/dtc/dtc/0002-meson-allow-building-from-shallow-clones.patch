@@ -1,0 +1,38 @@
+From 4415b0baece3c4351a6d3637c2754abbefd4795d Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Sat, 16 Dec 2023 18:58:31 +0100
+Subject: [PATCH 2/2] meson: allow building from shallow clones
+
+When building from shallow clone, tag is not available
+and version defaults to git hash.
+Problem is that some builds check DTC version and fail the comparison.
+Example is https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
+Which fails to build with following error:
+dtc version too old (039a994), you need at least version 1.4.4
+
+Drop --always from git describe command, see
+https://github.com/mesonbuild/meson/blob/1.3.0/mesonbuild/utils/universal.py#L773
+This will make it more closer to build via Makefile.
+
+Upstream-Status: Submitted [https://github.com/dgibson/dtc/pull/122]
+
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index 78251eb..fc0c92a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -56,6 +56,7 @@ py = py.find_installation(required: get_option('python'))
+ swig = find_program('swig', required: get_option('python'))
+ 
+ version_gen_h = vcs_tag(
++  command: ['git', 'describe', '--dirty=+'],
+   input: 'version_gen.h.in',
+   output: 'version_gen.h',
+ )
+-- 
+2.30.2
+

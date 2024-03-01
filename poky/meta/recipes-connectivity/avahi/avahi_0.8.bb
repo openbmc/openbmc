@@ -6,7 +6,7 @@ IPv4 Link-Local Addresses" (IETF RFC3927), a protocol for automatic IP address \
 configuration from the link-local 169.254.0.0/16 range without the need for a central \
 server.'
 HOMEPAGE = "http://avahi.org"
-BUGTRACKER = "https://github.com/lathiat/avahi/issues"
+BUGTRACKER = "https://github.com/avahi/avahi/issues"
 SECTION = "network"
 
 # major part is under LGPL-2.1-or-later, but several .dtd, .xsl, initscripts and
@@ -37,8 +37,7 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/avahi-${PV}.tar.gz \
            file://CVE-2023-38473.patch \
            "
 
-GITHUB_BASE_URI = "https://github.com/lathiat/avahi/releases/"
-SRC_URI[md5sum] = "229c6aa30674fc43c202b22c5f8c2be7"
+GITHUB_BASE_URI = "https://github.com/avahi/avahi/releases/"
 SRC_URI[sha256sum] = "060309d7a333d38d951bc27598c677af1796934dbd98e1024e7ad8de798fedda"
 
 CVE_STATUS[CVE-2021-26720] = "not-applicable-platform: Issue only affects Debian/SUSE"

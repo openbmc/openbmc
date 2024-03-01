@@ -1,4 +1,4 @@
-From d027b1d85a8c1a0193b6e4a00083d3038d699a59 Mon Sep 17 00:00:00 2001
+From 06ebd1b2ced426c420ed162980eca194f9f918ae Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Tue, 22 Sep 2020 15:02:33 +0800
 Subject: [PATCH] There are conflict of config files between kea and lib32-kea:
@@ -35,10 +35,10 @@ index e6ae8b8..50a3092 100644
  //          "param1": "foo"
  //      }
 diff --git a/src/bin/keactrl/kea-dhcp4.conf.pre b/src/bin/keactrl/kea-dhcp4.conf.pre
-index 26bf163..49ddb0a 100644
+index 6edb8a1..b2a7385 100644
 --- a/src/bin/keactrl/kea-dhcp4.conf.pre
 +++ b/src/bin/keactrl/kea-dhcp4.conf.pre
-@@ -252,7 +252,7 @@
+@@ -255,7 +255,7 @@
      //       // of all devices serviced by Kea, including their identifiers
      //       // (like MAC address), their location in the network, times
      //       // when they were active etc.
@@ -47,7 +47,7 @@ index 26bf163..49ddb0a 100644
      //       "parameters": {
      //           "path": "/var/lib/kea",
      //           "base-name": "kea-forensic4"
-@@ -269,7 +269,7 @@
+@@ -272,7 +272,7 @@
      //       // of specific options or perhaps even a combination of several
      //       // options and fields to uniquely identify a client. Those scenarios
      //       // are addressed by the Flexible Identifiers hook application.

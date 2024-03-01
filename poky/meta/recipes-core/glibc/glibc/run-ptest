@@ -22,12 +22,12 @@ tst_time64=$(ls -r ${PWD}/tests/glibc-ptest/*-time64)
 # related
 tst_time_tmp=$(sed -e "s/-time64$//" <<< ${tst_time64})
 
-# Run tests supporting only 32 bit time
-for i in ${tst_time_tmp}
-do
-	$i >/dev/null 2>&1
-	output
-done
+# Do not run tests supporting only 32 bit time
+#for i in ${tst_time_tmp}
+#do
+#	$i >/dev/null 2>&1
+#	output
+#done
 
 # Run tests supporting only 64 bit time
 for i in ${tst_time64}

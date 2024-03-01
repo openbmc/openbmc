@@ -340,6 +340,18 @@ the Yocto Project:
    view information about builds. For information on Toaster, see the
    :doc:`/toaster-manual/index`.
 
+-  *VSCode IDE Extension:* The `Yocto Project BitBake
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+   extension for Visual Studio Code provides a rich set of features for working
+   with BitBake recipes. The extension provides syntax highlighting,
+   hover tips, and completion for BitBake files as well as embedded Python and
+   Bash languages. Additional views and commands allow you to efficiently
+   browse, build and edit recipes. It also provides SDK integration for
+   cross-compiling and debugging through ``devtool``.
+
+   Learn more about the VSCode Extension on the `extension's frontpage
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__.
+
 Production Tools
 ----------------
 
@@ -604,6 +616,14 @@ Build Host runs, you have several choices.
 
    For information about and how to use Toaster, see the
    :doc:`/toaster-manual/index`.
+
+-  *Using the VSCode Extension:* You can use the `Yocto Project BitBake
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+   extension for Visual Studio Code to start your BitBake builds through a
+   graphical user interface.
+
+   Learn more about the VSCode Extension on the `extension's marketplace page
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
 
 Reference Embedded Distribution (Poky)
 ======================================

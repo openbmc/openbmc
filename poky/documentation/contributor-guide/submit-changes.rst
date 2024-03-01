@@ -57,7 +57,7 @@ Set up Git
 The first thing to do is to install Git packages. Here is an example
 on Debian and Ubuntu::
 
-   sudo aptitude install git-core git-email
+   sudo apt install git-core git-email
 
 Then, you need to set a name and e-mail address that Git will
 use to identify your commits::
@@ -438,7 +438,7 @@ their e-mail clients will default to including your email address in the
 conversation anyway.
 
 Anyway, you'll also be able to access the new messages on mailing list archives,
-either through a web browser, or for the lists archived on https://lore.kernelorg,
+either through a web browser, or for the lists archived on https://lore.kernel.org,
 through an individual newsgroup feed or a git repository.
 
 Sending Patches via Email

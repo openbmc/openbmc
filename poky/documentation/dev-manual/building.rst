@@ -32,6 +32,10 @@ build host running Linux.
       OpenEmbedded build system, see the
       :doc:`/brief-yoctoprojectqs/index` document.
 
+   -  You can also use the `Yocto Project BitBake
+      <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
+      extension for Visual Studio Code to build images.
+
 The build process creates an entire Linux distribution from source and
 places it in your :term:`Build Directory` under ``tmp/deploy/images``. For
 detailed information on the build process using BitBake, see the

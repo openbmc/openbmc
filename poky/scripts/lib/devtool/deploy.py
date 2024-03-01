@@ -140,6 +140,7 @@ def deploy(args, config, basepath, workspace):
     import math
     import oe.recipeutils
     import oe.package
+    import oe.utils
 
     check_workspace_recipe(workspace, args.recipename, checksrc=False)
 
@@ -174,7 +175,7 @@ def deploy(args, config, basepath, workspace):
             exec_fakeroot(rd, "cp -af %s %s" % (os.path.join(srcdir, '.'), recipe_outdir), shell=True)
             os.environ['PATH'] = ':'.join([os.environ['PATH'], rd.getVar('PATH') or ''])
             oe.package.strip_execs(args.recipename, recipe_outdir, rd.getVar('STRIP'), rd.getVar('libdir'),
-                        rd.getVar('base_libdir'), rd)
+                        rd.getVar('base_libdir'), oe.utils.get_bb_number_threads(rd), rd)
 
         filelist = []
         inodes = set({})

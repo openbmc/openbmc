@@ -79,20 +79,19 @@ def get_patched_cves(d):
     import re
     import oe.patch
 
-    pn = d.getVar("PN")
-    cve_match = re.compile("CVE:( CVE\-\d{4}\-\d+)+")
+    cve_match = re.compile(r"CVE:( CVE-\d{4}-\d+)+")
 
     # Matches the last "CVE-YYYY-ID" in the file name, also if written
     # in lowercase. Possible to have multiple CVE IDs in a single
     # file name, but only the last one will be detected from the file name.
     # However, patch files contents addressing multiple CVE IDs are supported
     # (cve_match regular expression)
-
-    cve_file_name_match = re.compile(".*([Cc][Vv][Ee]\-\d{4}\-\d+)")
+    cve_file_name_match = re.compile(r".*(CVE-\d{4}-\d+)", re.IGNORECASE)
 
     patched_cves = set()
-    bb.debug(2, "Looking for patches that solves CVEs for %s" % pn)
-    for url in oe.patch.src_patches(d):
+    patches = oe.patch.src_patches(d)
+    bb.debug(2, "Scanning %d patches for CVEs" % len(patches))
+    for url in patches:
         patch_file = bb.fetch.decodeurl(url)[2]
 
         # Check patch file name for CVE ID
@@ -100,7 +99,7 @@ def get_patched_cves(d):
         if fname_match:
             cve = fname_match.group(1).upper()
             patched_cves.add(cve)
-            bb.debug(2, "Found CVE %s from patch file name %s" % (cve, patch_file))
+            bb.debug(2, "Found %s from patch file name %s" % (cve, patch_file))
 
         # Remote patches won't be present and compressed patches won't be
         # unpacked, so say we're not scanning them
@@ -231,7 +230,7 @@ def decode_cve_status(d, cve):
     Convert CVE_STATUS into status, detail and description.
     """
     status = d.getVarFlag("CVE_STATUS", cve)
-    if status is None:
+    if not status:
         return ("", "", "")
 
     status_split = status.split(':', 1)
@@ -240,7 +239,7 @@ def decode_cve_status(d, cve):
 
     status_mapping = d.getVarFlag("CVE_CHECK_STATUSMAP", detail)
     if status_mapping is None:
-        bb.warn('Invalid detail %s for CVE_STATUS[%s] = "%s", fallback to Unpatched' % (detail, cve, status))
+        bb.warn('Invalid detail "%s" for CVE_STATUS[%s] = "%s", fallback to Unpatched' % (detail, cve, status))
         status_mapping = "Unpatched"
 
     return (status_mapping, detail, description)

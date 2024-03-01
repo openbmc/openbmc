@@ -18,5 +18,5 @@ do_install() {
 
 FILES:${PN} += "\
     ${exec_prefix} \
-    ${sysconfdir \
+    ${sysconfdir} \
 "

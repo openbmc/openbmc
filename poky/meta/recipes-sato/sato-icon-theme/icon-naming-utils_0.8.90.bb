@@ -14,7 +14,7 @@ DEPENDS = "libxml-simple-perl-native"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-SRC_URI = "http://tango.freedesktop.org/releases/icon-naming-utils-${PV}.tar.gz"
+SRC_URI = "${DEBIAN_MIRROR}/main/i/icon-naming-utils/icon-naming-utils_${PV}.orig.tar.gz"
 SRC_URI[sha256sum] = "044ab2199ed8c6a55ce36fd4fcd8b8021a5e21f5bab028c0a7cdcf52a5902e1c"
 
 inherit autotools allarch perlnative

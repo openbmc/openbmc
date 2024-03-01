@@ -10,4 +10,5 @@ SRC_URI += " \
     file://0002-core-Define-section-attributes-for-clang.patch \
     file://0003-optee-enable-clang-support.patch \
     file://0004-core-link-add-no-warn-rwx-segments.patch \
+    file://0005-ta-pkcs11-Improve-PIN-counter-handling-robustness.patch \
    "

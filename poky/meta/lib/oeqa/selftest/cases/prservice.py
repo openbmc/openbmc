@@ -14,12 +14,24 @@ from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var
 from oeqa.utils.network import get_free_port
 
+import bb.utils
+
 class BitbakePrTests(OESelftestTestCase):
 
     @classmethod
     def setUpClass(cls):
         super(BitbakePrTests, cls).setUpClass()
         cls.pkgdata_dir = get_bb_var('PKGDATA_DIR')
+
+        cls.exported_db_path = os.path.join(cls.builddir, 'export.inc')
+        cls.current_db_path = os.path.join(get_bb_var('PERSISTENT_DIR'), 'prserv.sqlite3')
+
+    def cleanup(self):
+        # Ensure any memory resident bitbake is stopped
+        bitbake("-m")
+        # Remove any existing export file or prserv database
+        bb.utils.remove(self.exported_db_path)
+        bb.utils.remove(self.current_db_path + "*")
 
     def get_pr_version(self, package_name):
         package_data_file = os.path.join(self.pkgdata_dir, 'runtime', package_name)
@@ -49,6 +61,7 @@ class BitbakePrTests(OESelftestTestCase):
         self.assertEqual(res.status, 0, msg=res.output)
 
     def config_pr_tests(self, package_name, package_type='rpm', pr_socket='localhost:0'):
+        self.cleanup()
         config_package_data = 'PACKAGE_CLASSES = "package_%s"' % package_type
         self.write_config(config_package_data)
         config_server_data = 'PRSERV_HOST = "%s"' % pr_socket
@@ -68,30 +81,32 @@ class BitbakePrTests(OESelftestTestCase):
         self.assertTrue(pr_2 - pr_1 == 1, "New PR %s did not increment as expected (from %s), difference should be 1" % (pr_2, pr_1))
         self.assertTrue(stamp_1 != stamp_2, "Different pkg rev. but same stamp: %s" % stamp_1)
 
+        self.cleanup()
+
     def run_test_pr_export_import(self, package_name, replace_current_db=True):
         self.config_pr_tests(package_name)
 
         self.increment_package_pr(package_name)
         pr_1 = self.get_pr_version(package_name)
 
-        exported_db_path = os.path.join(self.builddir, 'export.inc')
-        export_result = runCmd("bitbake-prserv-tool export %s" % exported_db_path, ignore_status=True)
+        export_result = runCmd("bitbake-prserv-tool export %s" % self.exported_db_path, ignore_status=True)
         self.assertEqual(export_result.status, 0, msg="PR Service database export failed: %s" % export_result.output)
-        self.assertTrue(os.path.exists(exported_db_path), msg="%s didn't exist, tool output %s" % (exported_db_path, export_result.output))
+        self.assertTrue(os.path.exists(self.exported_db_path), msg="%s didn't exist, tool output %s" % (self.exported_db_path, export_result.output))
 
         if replace_current_db:
-            current_db_path = os.path.join(get_bb_var('PERSISTENT_DIR'), 'prserv.sqlite3')
-            self.assertTrue(os.path.exists(current_db_path), msg="Path to current PR Service database is invalid: %s" % current_db_path)
-            os.remove(current_db_path)
+            self.assertTrue(os.path.exists(self.current_db_path), msg="Path to current PR Service database is invalid: %s" % self.current_db_path)
+            os.remove(self.current_db_path)
 
-        import_result = runCmd("bitbake-prserv-tool import %s" % exported_db_path, ignore_status=True)
-        os.remove(exported_db_path)
+        import_result = runCmd("bitbake-prserv-tool import %s" % self.exported_db_path, ignore_status=True)
+        #os.remove(self.exported_db_path)
         self.assertEqual(import_result.status, 0, msg="PR Service database import failed: %s" % import_result.output)
 
         self.increment_package_pr(package_name)
         pr_2 = self.get_pr_version(package_name)
 
         self.assertTrue(pr_2 - pr_1 == 1, "New PR %s did not increment as expected (from %s), difference should be 1" % (pr_2, pr_1))
+
+        self.cleanup()
 
     def test_import_export_replace_db(self):
         self.run_test_pr_export_import('m4')

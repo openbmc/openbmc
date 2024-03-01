@@ -1,4 +1,4 @@
-From 9ec4eedeb3f67db0bff09f5d859318d05ff47964 Mon Sep 17 00:00:00 2001
+From cf7df91cc8c3b4811235ef8aec144c5f0cf90bdb Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 15 Feb 2019 11:17:27 +0100
 Subject: [PATCH] Do not write $bindir into pkg-config files
@@ -16,7 +16,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/gio/meson.build b/gio/meson.build
-index a320c0f..86ce7c4 100644
+index 5f91586..1a95f4f 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
 @@ -884,14 +884,14 @@ pkg.generate(libgio,

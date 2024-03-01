@@ -195,6 +195,7 @@ python multilib_virtclass_handler_global () {
             # from a copy of the datastore
             localdata = bb.data.createCopy(d)
             localdata.delVar("KERNEL_VERSION")
+            localdata.delVar("KERNEL_VERSION_PKG_NAME")
 
             variants = (e.data.getVar("MULTILIB_VARIANTS") or "").split()
 

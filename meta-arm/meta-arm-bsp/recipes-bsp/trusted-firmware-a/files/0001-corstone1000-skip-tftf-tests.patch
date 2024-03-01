@@ -1,0 +1,33 @@
+From 27300daa2397c89e13aa648db30aa5c6acb06bcc Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Fri, 2 Feb 2024 11:58:33 +0000
+Subject: [PATCH] corstone1000: skip tftf tests
+
+Skip some tests for platform corstone1000 which make the tftf tests
+hanged when use with optee v3.22
+
+Upstream-Status: Pending
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ plat/arm/corstone1000/tests_to_skip.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/plat/arm/corstone1000/tests_to_skip.txt b/plat/arm/corstone1000/tests_to_skip.txt
+index fdab230..c5eaac0 100644
+--- a/plat/arm/corstone1000/tests_to_skip.txt
++++ b/plat/arm/corstone1000/tests_to_skip.txt
+@@ -13,3 +13,11 @@ Timer framework Validation/Verify the timer interrupt generation
+ CPU Hotplug/CPU hotplug
+ PSCI CPU Suspend
+ PSCI STAT/for valid composite state CPU suspend
++FF-A Direct messaging/FF-A Request SP-to-SP direct messaging
++FF-A Direct messaging/FF-A Request SP-to-SP direct messaging deadlock
++FF-A Memory Sharing/Share Memory with Secure World
++FF-A Memory Sharing/Request Donate Memory SP-to-SP
++FF-A Memory Sharing/Request Share Memory SP-to-VM
++SIMD,SVE Registers context/Check that SIMD registers context is preserved
++FF-A Interrupt/Test NS interrupts
++SMMUv3 tests
+-- 
+2.34.1
+

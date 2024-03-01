@@ -336,7 +336,7 @@ def sstate_install(ss, d):
     for lock in locks:
         bb.utils.unlockfile(lock)
 
-sstate_install[vardepsexclude] += "SSTATE_ALLOW_OVERLAP_FILES STATE_MANMACH SSTATE_MANFILEPREFIX"
+sstate_install[vardepsexclude] += "SSTATE_ALLOW_OVERLAP_FILES SSTATE_MANMACH SSTATE_MANFILEPREFIX"
 sstate_install[vardeps] += "${SSTATEPOSTINSTFUNCS}"
 
 def sstate_installpkg(ss, d):
@@ -703,7 +703,7 @@ def sstate_package(ss, d):
     if d.getVar('SSTATE_SKIP_CREATION') == '1':
         return
 
-    sstate_create_package = ['sstate_report_unihash', 'sstate_create_package']
+    sstate_create_package = ['sstate_report_unihash', 'sstate_create_pkgdirs', 'sstate_create_package']
     if d.getVar('SSTATE_SIG_KEY'):
         sstate_create_package.append('sstate_sign_package')
 
@@ -810,6 +810,12 @@ python sstate_task_postfunc () {
 }
 sstate_task_postfunc[dirs] = "${WORKDIR}"
 
+python sstate_create_pkgdirs () {
+    # report_unihash can change SSTATE_PKG and mkdir -p in shell doesn't own intermediate directories
+    # correctly so do this in an intermediate python task
+    with bb.utils.umask(0o002):
+        bb.utils.mkdirhier(os.path.dirname(d.getVar('SSTATE_PKG')))
+}
 
 #
 # Shell function to generate a sstate package from a directory
@@ -822,7 +828,6 @@ sstate_create_package () {
 		return
 	fi
 
-	mkdir --mode=0775 -p `dirname ${SSTATE_PKG}`
 	TFILE=`mktemp ${SSTATE_PKG}.XXXXXXXX`
 
 	OPT="-cS"

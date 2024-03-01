@@ -1,4 +1,4 @@
-From 9aa9574861fad39d0679025e35fe1e188345f685 Mon Sep 17 00:00:00 2001
+From 7865d698b5d392aac3a3d32e9ebd5fea45017d15 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sat, 16 Sep 2023 22:28:27 +0200
 Subject: [PATCH] meson.build: do not enable pidfd features on native glib
@@ -9,12 +9,13 @@ where these features are not implemented.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  meson.build | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 1c36993..bbf97fc 100644
+index f055079..77d78aa 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -981,7 +981,8 @@ if cc.links('''#include <sys/syscall.h>
@@ -27,6 +28,3 @@ index 1c36993..bbf97fc 100644
  endif
  
  # Check for __uint128_t (gcc) by checking for 128-bit division
--- 
-2.30.2
-

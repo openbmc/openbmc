@@ -41,6 +41,8 @@ SRC_URI[sha256sum] = "148ce262f6c86487455fb1d9793c3f58bc3e1da477a29617fadb0420f5
 
 S = "${WORKDIR}/gtk-${PV}"
 
+CVE_PRODUCT = "gnome:gtk"
+
 inherit meson gettext pkgconfig gi-docgen update-alternatives gsettings features_check gobject-introspection
 
 # TBD: nativesdk

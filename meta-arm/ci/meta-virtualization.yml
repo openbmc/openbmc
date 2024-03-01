@@ -5,4 +5,4 @@ header:
 
 repos:
   meta-virtualization:
-    url: git://git.yoctoproject.org/meta-virtualization
+    url: https://git.yoctoproject.org/meta-virtualization

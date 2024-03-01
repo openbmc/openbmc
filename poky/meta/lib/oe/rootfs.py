@@ -349,7 +349,8 @@ class Rootfs(object, metaclass=ABCMeta):
             bb.utils.mkdirhier(versioned_modules_dir)
 
             bb.note("Running depmodwrapper for %s ..." % versioned_modules_dir)
-            self._exec_shell_cmd(['depmodwrapper', '-a', '-b', self.image_rootfs, kernel_ver, kernel_package_name])
+            if self._exec_shell_cmd(['depmodwrapper', '-a', '-b', self.image_rootfs, kernel_ver, kernel_package_name]):
+                bb.fatal("Kernel modules dependency generation failed")
 
     """
     Create devfs:

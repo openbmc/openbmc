@@ -1,4 +1,4 @@
-From 79ce7e545dd3a93f77d2146d50b6fa061fbceed9 Mon Sep 17 00:00:00 2001
+From 53bcd4b6cd3fe3fe4246914462e6724761eecf51 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 3 Oct 2017 10:45:55 +0300
 Subject: [PATCH] Do not hardcode python path into various tools
@@ -23,7 +23,7 @@ index 67d3675..4e92a7a 100755
  # GDBus - GLib D-Bus Library
  #
 diff --git a/gobject/glib-genmarshal.in b/gobject/glib-genmarshal.in
-index 7380f24..c8abeaa 100755
+index aa5af43..56e8e2e 100755
 --- a/gobject/glib-genmarshal.in
 +++ b/gobject/glib-genmarshal.in
 @@ -1,4 +1,4 @@
@@ -33,7 +33,7 @@ index 7380f24..c8abeaa 100755
  # pylint: disable=too-many-lines, missing-docstring, invalid-name
  
 diff --git a/gobject/glib-mkenums.in b/gobject/glib-mkenums.in
-index 91ad779..3ebef62 100755
+index 353e53a..8ed6c39 100755
 --- a/gobject/glib-mkenums.in
 +++ b/gobject/glib-mkenums.in
 @@ -1,4 +1,4 @@

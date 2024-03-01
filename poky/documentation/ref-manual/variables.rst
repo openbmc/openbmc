@@ -9383,23 +9383,30 @@ system and gives an overview of their function and contents.
       See the machine include files in the :term:`Source Directory`
       for these features.
 
+   :term:`UBOOT_BINARY`
+      Specifies the name of the binary build by U-Boot.
+
    :term:`UBOOT_CONFIG`
-      Configures the :term:`UBOOT_MACHINE` and can
-      also define :term:`IMAGE_FSTYPES` for individual
-      cases.
+      Configures one or more U-Boot configurations to build. Each
+      configuration can define the :term:`UBOOT_MACHINE` and optionally the
+      :term:`IMAGE_FSTYPES` and the :term:`UBOOT_BINARY`.
 
-      Following is an example from the ``meta-fsl-arm`` layer. ::
+      Following is an example from the ``meta-freescale`` layer. ::
 
-         UBOOT_CONFIG ??= "sd"
-         UBOOT_CONFIG[sd] = "mx6qsabreauto_config,sdcard"
-         UBOOT_CONFIG[eimnor] = "mx6qsabreauto_eimnor_config"
-         UBOOT_CONFIG[nand] = "mx6qsabreauto_nand_config,ubifs"
-         UBOOT_CONFIG[spinor] = "mx6qsabreauto_spinor_config"
+         UBOOT_CONFIG ??= "sdcard-ifc-secure-boot sdcard-ifc sdcard-qspi lpuart qspi secure-boot nor"
+         UBOOT_CONFIG[nor] = "ls1021atwr_nor_defconfig"
+         UBOOT_CONFIG[sdcard-ifc] = "ls1021atwr_sdcard_ifc_defconfig,,u-boot-with-spl-pbl.bin"
+         UBOOT_CONFIG[sdcard-qspi] = "ls1021atwr_sdcard_qspi_defconfig,,u-boot-with-spl-pbl.bin"
+         UBOOT_CONFIG[lpuart] = "ls1021atwr_nor_lpuart_defconfig"
+         UBOOT_CONFIG[qspi] = "ls1021atwr_qspi_defconfig"
+         UBOOT_CONFIG[secure-boot] = "ls1021atwr_nor_SECURE_BOOT_defconfig"
+         UBOOT_CONFIG[sdcard-ifc-secure-boot] = "ls1021atwr_sdcard_ifc_SECURE_BOOT_defconfig,,u-boot-with-spl-pbl.bin"
 
-      In this example, "sd" is selected as the configuration of the possible four for the
-      :term:`UBOOT_MACHINE`. The "sd" configuration defines
-      "mx6qsabreauto_config" as the value for :term:`UBOOT_MACHINE`, while the
-      "sdcard" specifies the :term:`IMAGE_FSTYPES` to use for the U-Boot image.
+      In this example, all possible seven configurations are selected. Each
+      configuration specifies "..._defconfig" as :term:`UBOOT_MACHINE`, and
+      the "sd..." configurations define an individual name for
+      :term:`UBOOT_BINARY`. No configuration defines a second parameter for
+      :term:`IMAGE_FSTYPES` to use for the U-Boot image.
 
       For more information on how the :term:`UBOOT_CONFIG` is handled, see the
       :ref:`ref-classes-uboot-config` class.

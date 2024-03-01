@@ -169,6 +169,11 @@ Here is a list of resources you might find helpful:
    the :term:`OpenEmbedded Build System`, which uses
    BitBake, that reports build information.
 
+-  `Yocto Project BitBake extension for VSCode
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__:
+   This extension provides a rich feature set when working with BitBake recipes
+   within the Visual Studio Code IDE.
+
 -  :yocto_wiki:`FAQ </FAQ>`: A list of commonly asked
    questions and their answers.
 
