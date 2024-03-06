@@ -244,7 +244,7 @@ STOP_TMPL_CTRL = "obmc-host-stop@.target"
 STOP_TGTFMT_CTRL = "obmc-chassis-poweroff@{0}.target"
 STOP_INSTFMT_CTRL = "obmc-host-stop@{1}.target"
 STOP_FMT_CTRL = "../${STOP_TMPL_CTRL}:${STOP_TGTFMT_CTRL}.requires/${STOP_INSTFMT_CTRL}"
-SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list_zip(d, 'STOP_FMT_CTRL', 'OBMC_CHASSIS_INSTANCES', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list_zip(d, 'STOP_FMT_CTRL', 'OBMC_HOST_INSTANCES', 'OBMC_HOST_INSTANCES')}"
 
 # Hard power off requires chassis off
 HARD_OFF_TMPL_CTRL = "obmc-chassis-poweroff@.target"
