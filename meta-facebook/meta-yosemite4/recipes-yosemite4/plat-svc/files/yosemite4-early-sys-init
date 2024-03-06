@@ -36,4 +36,9 @@ set_gpio NIC1_MAIN_PWR_EN 1
 set_gpio NIC2_MAIN_PWR_EN 1
 set_gpio NIC3_MAIN_PWR_EN 1
 
+# short-term set gpio v0~v3 to input pin for slot5~8 reset button
+mknod -m 660 /dev/mem c 1 1
+chown root:kmem /dev/mem
+devmem 0x1e78008c 32 0x19000000
+
 exit 0
