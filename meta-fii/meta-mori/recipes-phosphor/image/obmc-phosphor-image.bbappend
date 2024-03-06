@@ -36,9 +36,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mori = " phosphor-logging"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " mori-cmd"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " mori-boot"
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " mori-fw"
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " virtual/bmc-update"
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " virtual/bios-update"
-OBMC_IMAGE_EXTRA_INSTALL:append:mori = " virtual/cpld-update"
 
 # Required for phosphor-ipmi-ssif
 OBMC_IMAGE_EXTRA_INSTALL:append:mori = " virtual-obmc-host-ipmi-hw"
