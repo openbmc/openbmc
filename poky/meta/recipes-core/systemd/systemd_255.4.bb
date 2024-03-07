@@ -306,7 +306,7 @@ do_install() {
 		# /var/log is typically a symbolic link to inside /var/volatile,
 		# which is expected to be empty.
 		rm -rf ${D}${localstatedir}/log
-	else
+	elif [ -e ${D}${localstatedir}/log/journal ]; then
 		chown root:systemd-journal ${D}${localstatedir}/log/journal
 
 		# journal-remote creates this at start
