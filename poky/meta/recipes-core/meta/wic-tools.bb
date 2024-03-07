@@ -4,7 +4,7 @@ LICENSE = "MIT"
 
 DEPENDS = "\
            parted-native gptfdisk-native dosfstools-native \
-           mtools-native bmap-tools-native grub-native cdrtools-native \
+           mtools-native bmaptool-native grub-native cdrtools-native \
            btrfs-tools-native squashfs-tools-native pseudo-native \
            e2fsprogs-native util-linux-native tar-native erofs-utils-native \
            virtual/${TARGET_PREFIX}binutils \

@@ -4,9 +4,9 @@ SECTION = "x11/application"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=35d145429ad3cbf5308d1dc93f66376b"
 
-DEPENDS = "exo libexif libxfce4ui libxfce4util xfconf cairo file"
+DEPENDS = "exo libexif libxfce4ui libxfce4util xfconf cairo file glib-2.0-native python3-packaging-native"
 
-inherit xfce-app mime-xdg
+inherit xfce-app mime-xdg python3native
 
 RRECOMMENDS:${PN} += "tumbler"
 

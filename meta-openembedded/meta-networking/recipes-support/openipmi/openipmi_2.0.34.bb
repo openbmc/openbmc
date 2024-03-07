@@ -42,7 +42,9 @@ CFLAGS += "-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 
 EXTRA_OECONF = "--disable-static \
                 --with-perl='${STAGING_BINDIR_NATIVE}/perl-native/perl' \
-                --with-glibver=2.0"
+                --with-glibver=2.0 \
+                --with-pythoncflags='-I${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}' \
+               "
 
 PACKAGECONFIG ??= "gdbm"
 PACKAGECONFIG[gdbm] = "ac_cv_header_gdbm_h=yes,ac_cv_header_gdbm_h=no,gdbm,"
@@ -64,7 +66,7 @@ FILES:${PN}-dbg += " \
 
 do_configure () {
     # Let's perform regular configuration first then handle perl issues.
-    PYTHON_CPPFLAGS=-I${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI} autotools_do_configure
+    autotools_do_configure
 
     perl_ver=`perl -V:version | cut -d\' -f 2`
     

@@ -1,4 +1,4 @@
-From 69011c7227ad1aaf08d5ab28e46f85dac951c597 Mon Sep 17 00:00:00 2001
+From 264ae7b062ac52a5545a8a562b51001f7ce7369d Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 21 Apr 2022 17:22:35 +0800
 Subject: [PATCH] drbd-utils: support usermerge
@@ -21,10 +21,10 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  10 files changed, 32 insertions(+), 32 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index ae575586..3d7deeae 100644
+index f1d69ea3..3289ac7d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -180,7 +180,7 @@ AC_ARG_WITH(tmpfilesdir,
+@@ -183,7 +183,7 @@ AC_ARG_WITH(tmpfilesdir,
  AC_SUBST(tmpfilesdir)
  
  # set default early
@@ -34,12 +34,12 @@ index ae575586..3d7deeae 100644
     test x"$with_udev" = xyes ; then
  	if test x"$PKG_CONFIG" != x; then
 diff --git a/scripts/Makefile.in b/scripts/Makefile.in
-index fcd298e9..bab441a5 100644
+index aca15a22..a1cd2ffe 100644
 --- a/scripts/Makefile.in
 +++ b/scripts/Makefile.in
-@@ -88,11 +88,11 @@ ifeq ($(subst both,systemd,$(initscripttype)),systemd)
+@@ -91,11 +91,11 @@ ifeq ($(subst both,systemd,$(initscripttype)),systemd)
  	install -d $(DESTDIR)$(systemdunitdir)
- 	install -m 644 drbd.service $(DESTDIR)$(systemdunitdir)/
+ 	install -m 644 $(SYSTEMD_UNITS) $(DESTDIR)$(systemdunitdir)/
  	install -m 644 $(SYSTEMD_TEMPLATES) $(DESTDIR)$(systemdunitdir)/
 -	install -d $(DESTDIR)/lib/drbd/scripts
 -	install -m 755 drbd $(DESTDIR)/lib/drbd/scripts
@@ -110,7 +110,7 @@ index 96c599e7..c81e95a6 100644
  [Install]
  WantedBy=multi-user.target
 diff --git a/scripts/drbd@.service b/scripts/drbd@.service
-index 76514c5b..e2e500ba 100644
+index 0fad10be..556f3857 100644
 --- a/scripts/drbd@.service
 +++ b/scripts/drbd@.service
 @@ -35,8 +35,8 @@ RemainAfterExit=yes
@@ -199,6 +199,3 @@ index 0fcefc5f..81f7d5ec 100644
  
  spell:
  	for f in drbdadm_adjust.c drbdadm_main.c drbdadm_parser.c drbdadm_usage_cnt.c drbdsetup.c drbdtool_common.c; do \
--- 
-2.25.1
-

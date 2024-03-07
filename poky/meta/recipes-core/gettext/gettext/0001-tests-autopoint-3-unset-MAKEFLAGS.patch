@@ -1,4 +1,4 @@
-From 38b256e5aa7dfeb42acffd89565e53a2c0bab3e3 Mon Sep 17 00:00:00 2001
+From 7006142d199af13628edc687847a9a5bac48b45d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 7 Jan 2020 16:44:38 +0100
 Subject: [PATCH] tests/autopoint-3: unset MAKEFLAGS
@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/gettext-tools/tests/autopoint-3 b/gettext-tools/tests/autopoint-3
-index e13552b..55188df 100755
+index bd3fbf3..380eaac 100755
 --- a/gettext-tools/tests/autopoint-3
 +++ b/gettext-tools/tests/autopoint-3
-@@ -126,6 +126,7 @@ test $? = 0 || { cat autopoint.err; Exit 1; }
+@@ -131,6 +131,7 @@ test $? = 0 || { cat autopoint.err; Exit 1; }
  ${CONFIG_SHELL} ./configure >/dev/null 2>autpoint.err
  test $? = 0 || { cat autopoint.err; Exit 1; }
  

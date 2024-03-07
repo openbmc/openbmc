@@ -1,4 +1,4 @@
-From 39d332a8801de5d9ef09dacb3dba85c208b7b2ad Mon Sep 17 00:00:00 2001
+From 42ae3f8a5e32ba0681ccd1552a203ddad8748a6e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 12 Dec 2019 13:45:52 +0100
 Subject: [PATCH] tests: do not hardcode the build path into a helper library
@@ -10,7 +10,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/test/Makemodule.am b/test/Makemodule.am
-index 17d4927..015de7f 100644
+index e1d715d..cffe732 100644
 --- a/test/Makemodule.am
 +++ b/test/Makemodule.am
 @@ -30,7 +30,7 @@ EXTRA_DIST += \
@@ -21,4 +21,4 @@ index 17d4927..015de7f 100644
 +libtestlookup_la_CFLAGS = -DBASEDIR=\"/tmp/acl-ptest\"
  libtestlookup_la_LDFLAGS = -rpath $(abs_builddir)
  
- AM_TESTS_ENVIRONMENT = PATH="$(abs_top_builddir):$$PATH";
+ # Make sure translations don't break tests when matching output.

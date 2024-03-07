@@ -1,4 +1,4 @@
-From ed1975deeaa47f98d212fd144c8bda075b1a5d36 Mon Sep 17 00:00:00 2001
+From 46d9d889a07fc9f9f089f800e5c0e895889c44ae Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 4 Oct 2017 22:30:46 -0700
 Subject: [PATCH] libasm may link with libbz2 if found
@@ -11,26 +11,29 @@ where indirect libraries may be not found by linker
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  src/Makefile.am | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index c28d81f..951e978 100644
+index 853eda4..da7f3b4 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -40,11 +40,11 @@ EXTRA_DIST += make-debug-archive.in
+@@ -40,7 +40,7 @@ EXTRA_DIST += make-debug-archive.in
  CLEANFILES += make-debug-archive
  
  if BUILD_STATIC
 -libasm = ../libasm/libasm.a
 +libasm = ../libasm/libasm.a $(zip_LIBS)
  libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) -ldl -lpthread
- libelf = ../libelf/libelf.a -lz
+ libelf = ../libelf/libelf.a -lz $(zstd_LIBS)
+ if LIBDEBUGINFOD
+@@ -49,7 +49,7 @@ else
+ libdebuginfod =
+ endif
  else
 -libasm = ../libasm/libasm.so
 +libasm = ../libasm/libasm.so $(zip_LIBS)
  libdw = ../libdw/libdw.so $(zip_LIBS) $(libelf) $(libebl) -ldl
  libelf = ../libelf/libelf.so
- endif
+ if LIBDEBUGINFOD

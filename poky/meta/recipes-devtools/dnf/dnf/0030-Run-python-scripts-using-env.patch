@@ -1,20 +1,19 @@
-From 8d97b72a1d77149e2f9048d1ca6cef66da1a8aa5 Mon Sep 17 00:00:00 2001
+From d3556767b84f3687743fdad0a88af0739d736ea9 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:29:37 +0200
-Subject: [PATCH 2/5] Run python scripts using env
+Subject: [PATCH] Run python scripts using env
 
 Otherwise the build tools hardcode the python path into them.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  bin/dnf-automatic.in | 2 +-
  bin/dnf.in           | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/bin/dnf-automatic.in b/bin/dnf-automatic.in
-index 5b06aa26..891b4c24 100755
+index 17e35a05..28827e38 100755
 --- a/bin/dnf-automatic.in
 +++ b/bin/dnf-automatic.in
 @@ -1,4 +1,4 @@
@@ -24,7 +23,7 @@ index 5b06aa26..891b4c24 100755
  #
  # Copyright (C) 2014-2016 Red Hat, Inc.
 diff --git a/bin/dnf.in b/bin/dnf.in
-index 645d0f06..bdf7b3c4 100755
+index 55ceb3f2..e38973c7 100755
 --- a/bin/dnf.in
 +++ b/bin/dnf.in
 @@ -1,4 +1,4 @@
@@ -33,6 +32,3 @@ index 645d0f06..bdf7b3c4 100755
  # The dnf executable script.
  #
  # Copyright (C) 2012-2016 Red Hat, Inc.
--- 
-2.14.2
-

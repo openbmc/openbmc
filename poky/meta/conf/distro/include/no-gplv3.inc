@@ -6,7 +6,7 @@
 # will be a cost in reduced functionality.
 
 # Settings for full-cmdline
-RDEPENDS:packagegroup-core-full-cmdline-utils:remove = "bash bc coreutils cpio ed findutils gawk grep mc mc-fish mc-helpers mc-helpers-perl sed tar time"
+RDEPENDS:packagegroup-core-full-cmdline-utils:remove = "bash bc coreutils cpio ed findutils gawk grep mc mc-shell mc-helpers mc-helpers-perl sed tar time"
 RDEPENDS:packagegroup-core-full-cmdline-dev-utils:remove = "diffutils m4 make patch"
 RDEPENDS:packagegroup-core-full-cmdline-multiuser:remove = "gzip"
 
@@ -19,6 +19,8 @@ PACKAGECONFIG:remove:pn-bluez5 = "readline"
 # so install rpm but not dnf
 IMAGE_FEATURES:remove:pn-core-image-weston = "package-management"
 CORE_IMAGE_EXTRA_INSTALL:pn-core-image-weston += "rpm"
+IMAGE_FEATURES:remove:pn-core-image-full-cmdline = "package-management"
+CORE_IMAGE_EXTRA_INSTALL:pn-core-image-full-cmdline += "rpm"
 
 # matchbox-terminal depends on vte, which is gpl3
 CORE_IMAGE_BASE_INSTALL:remove:pn-core-image-weston = "matchbox-terminal"

@@ -54,6 +54,7 @@ class oeGoToolchainSelfTest(OESelftestTestCase):
         cmd = cmd + "export GOPATH=%s; " % self.go_path
         cmd = cmd + "export GOFLAGS=-modcacherw; "
         cmd = cmd + "export CGO_ENABLED=1; "
+        cmd = cmd + "export GOPROXY=https://proxy.golang.org,direct; "
         cmd = cmd + "${CROSS_COMPILE}go %s" % gocmd
         return runCmd(cmd).status
 

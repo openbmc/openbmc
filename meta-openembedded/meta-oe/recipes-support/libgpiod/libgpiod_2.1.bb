@@ -24,7 +24,7 @@ RDEPENDS:${PN}-ptest += " \
     bash \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'shunit2', '', d)} \
 "
-RRECOMMENDS:${PN}-ptest += "kernel-module-gpio-sim"
+RRECOMMENDS:${PN}-ptest += "kernel-module-gpio-sim kernel-module-configfs"
 
 do_install_ptest:append() {
     install -m 0755 ${S}/tools/gpio-tools-test.bash ${D}${PTEST_PATH}/tests/

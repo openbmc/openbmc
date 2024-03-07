@@ -1,4 +1,4 @@
-From 05f0674c93d94fe6b29c1b707980aac469ddcd72 Mon Sep 17 00:00:00 2001
+From a8eb944a10353403241608a084787f6efcbb2eb7 Mon Sep 17 00:00:00 2001
 From: Jordan Williams <jordan@jwillikers.com>
 Date: Fri, 1 Dec 2023 09:53:50 -0600
 Subject: [PATCH] Switch from the deprecated distutils module to the packaging

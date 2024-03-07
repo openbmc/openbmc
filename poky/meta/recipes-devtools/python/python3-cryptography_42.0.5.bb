@@ -60,9 +60,6 @@ do_install_ptest() {
     cp -r ${S}/pyproject.toml ${D}${PTEST_PATH}/
 }
 
-FILES:${PN}-ptest += " \
-    ${PTEST_PATH}/check-memfree.py \
-"
 FILES:${PN}-dbg += " \
     ${PYTHON_SITEPACKAGES_DIR}/${SRCNAME}/hazmat/bindings/.debug \
 "

@@ -1,4 +1,4 @@
-From dc83a79053597546b2b42fcf578f3a7727b13f3b Mon Sep 17 00:00:00 2001
+From 25229773a9d4472235278bb45f75439e56630cee Mon Sep 17 00:00:00 2001
 From: Joe Slater <joe.slater@windriver.com>
 Date: Wed, 22 Jul 2020 13:31:11 -0700
 Subject: [PATCH] libdnf: allow reproducible binary builds
@@ -9,7 +9,6 @@ TESTDATADIR, since the default is guaranteed to be wrong for target builds.
 Upstream-Status: Pending
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
-
 ---
  CMakeLists.txt | 7 ++++++-
  1 file changed, 6 insertions(+), 1 deletion(-)

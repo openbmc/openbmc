@@ -79,7 +79,7 @@ class SStateBase(OESelftestTestCase):
                         result.append(f)
         return result
 
-    # Test sstate files creation and their location
+    # Test sstate files creation and their location and directory perms
     def run_test_sstate_creation(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True, should_pass=True):
         self.config_sstate(temp_sstate_location, [self.sstate_path])
 
@@ -87,6 +87,19 @@ class SStateBase(OESelftestTestCase):
             bitbake(['-cclean'] + targets)
         else:
             bitbake(['-ccleansstate'] + targets)
+
+        # We need to test that the env umask have does not effect sstate directory creation
+        # So, first, we'll get the current umask and set it to something we know incorrect
+        # See: sstate_task_postfunc for correct umask of os.umask(0o002)
+        import os
+        def current_umask():
+            current_umask = os.umask(0)
+            os.umask(current_umask)
+            return current_umask
+
+        orig_umask = current_umask()
+        # Set it to a umask we know will be 'wrong'
+        os.umask(0o022)
 
         bitbake(targets)
         file_tracker = []
@@ -103,6 +116,19 @@ class SStateBase(OESelftestTestCase):
             self.assertTrue(file_tracker , msg="Could not find sstate files for: %s" % ', '.join(map(str, targets)))
         else:
             self.assertTrue(not file_tracker , msg="Found sstate files in the wrong place for: %s (found %s)" % (', '.join(map(str, targets)), str(file_tracker)))
+
+        # Now we'll walk the tree to check the mode and see if things are incorrect.
+        badperms = []
+        for root, dirs, files in os.walk(self.sstate_path):
+            for directory in dirs:
+                if (os.stat(os.path.join(root, directory)).st_mode & 0o777) != 0o775:
+                    badperms.append(os.path.join(root, directory))
+
+        # Return to original umask
+        os.umask(orig_umask)
+
+        if should_pass:
+            self.assertTrue(badperms , msg="Found sstate directories with the wrong permissions: %s (found %s)" % (', '.join(map(str, targets)), str(badperms)))
 
     # Test the sstate files deletion part of the do_cleansstate task
     def run_test_cleansstate_task(self, targets, distro_specific=True, distro_nonspecific=True, temp_sstate_location=True):

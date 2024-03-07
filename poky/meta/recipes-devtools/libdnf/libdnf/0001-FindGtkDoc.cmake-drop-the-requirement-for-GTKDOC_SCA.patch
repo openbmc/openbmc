@@ -1,7 +1,7 @@
-From 9bb7630915c3e787732463a3e2064fe0e177101b Mon Sep 17 00:00:00 2001
+From 5d6db56791d326e6b486dca54fe2335af0225229 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 24 Nov 2016 14:33:07 +0200
-Subject: [PATCH 1/4] FindGtkDoc.cmake: drop the requirement for
+Subject: [PATCH] FindGtkDoc.cmake: drop the requirement for
  GTKDOC_SCANGOBJ_WRAPPER
 
 For some reason cmake is not able to find it when building in openembedded,
@@ -14,7 +14,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/cmake/modules/FindGtkDoc.cmake b/cmake/modules/FindGtkDoc.cmake
-index 92b2cc7..39f34bd 100644
+index 92b2cc7e..39f34bd5 100644
 --- a/cmake/modules/FindGtkDoc.cmake
 +++ b/cmake/modules/FindGtkDoc.cmake
 @@ -52,7 +52,7 @@ find_program(GTKDOC_MKHTML_EXE gtkdoc-mkhtml PATH "${GLIB_PREFIX}/bin")
@@ -26,6 +26,3 @@ index 92b2cc7..39f34bd 100644
      VERSION_VAR GtkDoc_VERSION)
  
  # ::
--- 
-2.11.0
-

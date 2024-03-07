@@ -65,6 +65,9 @@ do_install_ptest() {
     cp -r ../build "${D}${PTEST_PATH}"
     cp -r "${S}/build-aux" "${D}${PTEST_PATH}/build"
     cp -r "${S}" "${D}${PTEST_PATH}"
+    rm -rf ${D}${PTEST_PATH}/build/config.log ${D}${PTEST_PATH}/build/autom4te.cache \
+        ${D}${PTEST_PATH}/git/.git ${D}${PTEST_PATH}/git/autom4te.cache
+    sed -i -e 's;${RECIPE_SYSROOT};;g' ${D}${PTEST_PATH}/build/config.status
 }
 
 RDEPENDS:${PN}-ptest += "bash coreutils e2fsprogs e2tools gawk make perl"

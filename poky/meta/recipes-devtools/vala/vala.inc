@@ -3,7 +3,7 @@ HOMEPAGE = "http://vala-project.org"
 DESCRIPTION = "Vala is a C#-like language dedicated to ease GObject programming. \
 Vala compiles to plain C and has no runtime environment nor penalities whatsoever."
 SECTION = "devel"
-DEPENDS = "bison-native flex-native glib-2.0"
+DEPENDS = "bison-native flex-native glib-2.0 gobject-introspection"
 
 # Appending libxslt-native to dependencies has an effect
 # of rebuilding the manual, which is very slow. Let's do this

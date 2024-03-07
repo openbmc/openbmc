@@ -221,6 +221,7 @@ def testimage_main(d):
     # ones of the current environment because some tests require them.
     for var in d.getVar('TESTIMAGE_UPDATE_VARS').split():
         td[var] = d.getVar(var)
+    td['ORIGPATH'] = d.getVar("BB_ORIGENV").getVar("PATH")
 
     image_manifest = "%s.manifest" % image_name
     image_packages = OERuntimeTestContextExecutor.readPackagesManifest(image_manifest)

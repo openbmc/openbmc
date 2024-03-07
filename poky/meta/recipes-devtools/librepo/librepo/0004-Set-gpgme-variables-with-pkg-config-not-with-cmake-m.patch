@@ -1,4 +1,4 @@
-From 25113b34bc1aae377d7bf447e69528783e2c177e Mon Sep 17 00:00:00 2001
+From b5918f06d790dc346d41de4b3a3ec01f290c1d25 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:23:27 +0200
 Subject: [PATCH] Set gpgme variables with pkg-config, not with cmake module
@@ -6,25 +6,21 @@ Subject: [PATCH] Set gpgme variables with pkg-config, not with cmake module
 
 Upstream-Status: Inappropriate [gpgme upstream does not have pkg-config support and is not interested in it]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  CMakeLists.txt | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index cd975a8..713cc87 100644
+index 6c00024..a2f57af 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -35,7 +35,8 @@ PKG_CHECK_MODULES(LIBXML2 libxml-2.0 REQUIRED)
+@@ -37,7 +37,8 @@ PKG_CHECK_MODULES(LIBXML2 libxml-2.0 REQUIRED)
  FIND_PACKAGE(CURL 7.52.0 REQUIRED)
  
  IF (USE_GPGME)
 -    FIND_PACKAGE(Gpgme REQUIRED)
 +    PKG_CHECK_MODULES(GPGME gpgme REQUIRED)
 +    set(GPGME_VANILLA_LIBRARIES ${GPGME_LIBRARIES})
- ELSE (USE_GPGME)
-     PKG_CHECK_MODULES(RPM REQUIRED rpm>=4.18.0)
- ENDIF (USE_GPGME)
--- 
-2.34.1
-
+     IF (ENABLE_SELINUX)
+         PKG_CHECK_MODULES(SELINUX REQUIRED libselinux)
+     ENDIF(ENABLE_SELINUX)

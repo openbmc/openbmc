@@ -33,7 +33,13 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0002-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
            file://fixedmeson.patch \
            file://no-pip.patch \
-           file://fix_segv.patch \
+           file://4a8579ad8629b57a43daa62e46cc7af6e1078116.patch \
+           file://0001-linux-user-x86_64-Handle-the-vsyscall-page-in-open_s.patch \
+           file://0002-linux-user-loongarch64-Remove-TARGET_FORCE_SHMLBA.patch \
+           file://0003-linux-user-Add-strace-for-shmat.patch \
+           file://0004-linux-user-Rewrite-target_shmat.patch \
+           file://0005-tests-tcg-Check-that-shmat-does-not-break-proc-self-.patch \
+           file://CVE-2023-6683.patch \
            file://qemu-guest-agent.init \
            file://qemu-guest-agent.udev \
            "

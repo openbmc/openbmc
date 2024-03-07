@@ -1,4 +1,4 @@
-From cabfcba1ff7511ffd6b91ca244288d44f585aad2 Mon Sep 17 00:00:00 2001
+From d6864bd78c01c5e8578805a7b67555c70a0e99a2 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Fri, 23 Sep 2016 01:04:50 -0700
 Subject: [PATCH] boost-math: disable pch for gcc
@@ -14,10 +14,10 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libs/math/build/Jamfile.v2 b/libs/math/build/Jamfile.v2
-index e19fb2e..82472a7 100644
+index fd840287e..5aff7d724 100644
 --- a/libs/math/build/Jamfile.v2
 +++ b/libs/math/build/Jamfile.v2
-@@ -13,7 +13,7 @@ project
+@@ -14,7 +14,7 @@ project
        #<toolset>intel-linux:<pch>off
        <toolset>intel-darwin:<pch>off
        <toolset>msvc-7.1:<pch>off
@@ -26,6 +26,3 @@ index e19fb2e..82472a7 100644
        #<toolset>gcc:<cxxflags>-fvisibility=hidden
        <toolset>intel-linux:<cxxflags>-fvisibility=hidden
        #<toolset>sun:<cxxflags>-xldscope=hidden
--- 
-2.7.4
-

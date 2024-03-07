@@ -141,17 +141,18 @@ diff --git a/gdk/gdkgl.c b/gdk/gdkgl.c
 index 9690077cc2..55f85ef605 100644
 --- a/gdk/gdkgl.c
 +++ b/gdk/gdkgl.c
-@@ -26,7 +26,9 @@
- # include "win32/gdkwin32.h"
- #endif
+@@ -21,8 +21,9 @@
+ #include "gdkglcontextprivate.h"
  
+ #include "gdkinternals.h"
+-
 +#ifdef HAVE_OPENGL
  #include <epoxy/gl.h>
 +#endif
  #include <math.h>
  #include <string.h>
  
-@@ -40,6 +42,7 @@ gdk_cairo_surface_mark_as_direct (cairo_surface_t *surface,
+@@ -36,6 +37,7 @@
                                 g_object_ref (window),  g_object_unref);
  }
  
@@ -159,7 +160,7 @@ index 9690077cc2..55f85ef605 100644
  static const char *
  get_vertex_type_name (int type)
  {
-@@ -212,6 +215,7 @@ use_texture_rect_program (GdkGLContextPaintData *paint_data)
+@@ -208,6 +210,7 @@
        glUseProgram (paint_data->current_program->program);
      }
  }
@@ -167,7 +168,7 @@ index 9690077cc2..55f85ef605 100644
  
  void
  gdk_gl_texture_quads (GdkGLContext *paint_context,
-@@ -220,6 +224,7 @@ gdk_gl_texture_quads (GdkGLContext *paint_context,
+@@ -216,6 +219,7 @@
                        GdkTexturedQuad *quads,
                        gboolean flip_colors)
  {
@@ -175,7 +176,7 @@ index 9690077cc2..55f85ef605 100644
    GdkGLContextPaintData *paint_data  = gdk_gl_context_get_paint_data (paint_context);
    GdkGLContextProgram *program;
    GdkWindow *window = gdk_gl_context_get_window (paint_context);
-@@ -293,6 +298,7 @@ gdk_gl_texture_quads (GdkGLContext *paint_context,
+@@ -289,6 +293,7 @@
  
    glDisableVertexAttribArray (program->position_location);
    glDisableVertexAttribArray (program->uv_location);
@@ -183,15 +184,15 @@ index 9690077cc2..55f85ef605 100644
  }
  
  /* x,y,width,height describes a rectangle in the gl render buffer
-@@ -341,6 +347,7 @@ gdk_cairo_draw_from_gl (cairo_t              *cr,
+@@ -337,6 +342,7 @@
                          int                   width,
                          int                   height)
  {
 +#ifdef HAVE_OPENGL
-   GdkGLContext *paint_context;
+   GdkGLContext *paint_context, *current_context;
    cairo_surface_t *image;
    cairo_matrix_t matrix;
-@@ -718,6 +725,7 @@ out:
+@@ -703,6 +709,7 @@
    if (clip_region)
      cairo_region_destroy (clip_region);
  
@@ -199,7 +200,7 @@ index 9690077cc2..55f85ef605 100644
  }
  
  /* This is always called with the paint context current */
-@@ -725,6 +733,7 @@ void
+@@ -710,6 +717,7 @@
  gdk_gl_texture_from_surface (cairo_surface_t *surface,
  			     cairo_region_t  *region)
  {
@@ -207,7 +208,7 @@ index 9690077cc2..55f85ef605 100644
    GdkGLContext *paint_context;
    cairo_surface_t *image;
    double device_x_offset, device_y_offset;
-@@ -825,4 +834,5 @@ gdk_gl_texture_from_surface (cairo_surface_t *surface,
+@@ -810,4 +818,5 @@
  
    glDisable (GL_SCISSOR_TEST);
    glDeleteTextures (1, &texture_id);

@@ -1,7 +1,7 @@
-From 0e0b63ae80df5d7849b2e1c5ab9a668e8378b5e8 Mon Sep 17 00:00:00 2001
+From e5aa66b1af2d49f159c4daefc598f96744ee988d Mon Sep 17 00:00:00 2001
 From: Zhixiong Chi <zhixiong.chi@windriver.com>
-Date: Tue, 28 Mar 2023 06:05:45 +0000
-Subject: [PATCH] Drop ptests fixtures and recorde_modes
+Date: Thu, 29 Feb 2024 12:31:58 -0800
+Subject: [PATCH] [PATCH] Drop ptests fixtures and recorde_modes
 
 The usage of fixture in test_fixtures has been deprecated.
 See https://docs.pytest.org/en/stable/explanation/fixtures.html and
@@ -12,14 +12,15 @@ re-sold several times, and it adds X-Amzn-Trace-Id header that can possibly
 diff for each request.
 It leads to ptest failure, so drop it now until we find the solution.
 
-Upstream-Status: Inappropriate [oe specific]
+Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  tests/integration/test_fixtures.py     |  60 -----------
- tests/integration/test_record_modes.py | 132 -------------------------
- tests/unit/test_fixtures.py            |  94 ------------------
- 3 files changed, 286 deletions(-)
+ tests/integration/test_record_modes.py | 141 -------------------------
+ tests/unit/test_fixtures.py            |  94 -----------------
+ 3 files changed, 295 deletions(-)
  delete mode 100644 tests/integration/test_fixtures.py
  delete mode 100644 tests/integration/test_record_modes.py
  delete mode 100644 tests/unit/test_fixtures.py
@@ -92,10 +93,12 @@ index fc3d1e7..0000000
 -    assert True
 diff --git a/tests/integration/test_record_modes.py b/tests/integration/test_record_modes.py
 deleted file mode 100644
-index 58c8846..0000000
+index 988b851..0000000
 --- a/tests/integration/test_record_modes.py
 +++ /dev/null
-@@ -1,132 +0,0 @@
+@@ -1,141 +0,0 @@
+-import re
+-
 -from betamax import Betamax, BetamaxError
 -
 -from tests.integration.helper import IntegrationHelper
@@ -137,8 +140,15 @@ index 58c8846..0000000
 -            # this test to succeed.
 -            # NOTE(hroncok): httpbin.org added X-Processed-Time header that
 -            # can possibly differ (and often does)
+-            r0_content = r0.content.decode(encoding='utf-8', errors='strict')
+-            r1_content = r1.content.decode(encoding='utf-8', errors='strict')
+-            r0_content = re.sub('"X-Amzn-Trace-Id": "[^"]+"', '"X-Amzn-Trace-Id": ""', r0_content)
+-            r1_content = re.sub('"X-Amzn-Trace-Id": "[^"]+"', '"X-Amzn-Trace-Id": ""', r1_content)
+-            # NOTE(jhatler): httpbin.org added "X-Amzn-Trace-Id" to their
+-            # response, which is a unique ID that will differ between requests.
+-            # We remove it from the response body before comparing.
 -            assert r0_headers == r1_headers
--            assert r0.content == r1.content
+-            assert r0_content == r1_content
 -
 -
 -class TestRecordNone(IntegrationHelper):
@@ -230,7 +240,7 @@ index 58c8846..0000000
 -            assert len(cassette.interactions) == 5
 diff --git a/tests/unit/test_fixtures.py b/tests/unit/test_fixtures.py
 deleted file mode 100644
-index 387d9ce..0000000
+index 41f33eb..0000000
 --- a/tests/unit/test_fixtures.py
 +++ /dev/null
 @@ -1,94 +0,0 @@
@@ -263,9 +273,9 @@ index 387d9ce..0000000
 -        # Mock a pytest request object
 -        request = mock.MagicMock()
 -        request.cls = request.module = None
--        request.function.__name__ = 'test'
+-        request.node.name = request.function.__name__ = 'test'
 -
--        pytest_fixture.betamax_recorder(request)
+-        pytest_fixture._betamax_recorder(request)
 -        assert request.addfinalizer.called is True
 -        request.addfinalizer.assert_called_once_with(self.mocked_betamax.stop)
 -
@@ -273,9 +283,9 @@ index 387d9ce..0000000
 -        # Mock a pytest request object
 -        request = mock.MagicMock()
 -        request.cls = request.module = None
--        request.function.__name__ = 'test'
+-        request.node.name = request.function.__name__ = 'test'
 -
--        pytest_fixture.betamax_recorder(request)
+-        pytest_fixture._betamax_recorder(request)
 -        self.mocked_betamax.start.assert_called_once_with()
 -
 -
@@ -329,5 +339,5 @@ index 387d9ce..0000000
 -
 -        recorder.stop.assert_called_once_with()
 -- 
-2.35.5
+2.44.0
 

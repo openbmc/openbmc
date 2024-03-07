@@ -1,4 +1,4 @@
-From 2396fd67d81e54e18fbad67a5ff67d5684a01013 Mon Sep 17 00:00:00 2001
+From 4409f128c81a9d76b9360b002a1d76043c77b53e Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:27:30 +0800
 Subject: [PATCH] Fix build on aarch64/musl
@@ -16,7 +16,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Rebase to 0.170
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  backends/aarch64_initreg.c | 4 ++--
  backends/arm_initreg.c     | 2 +-

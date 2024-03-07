@@ -1,4 +1,4 @@
-From df7506918efc8748dac8b8398021e1b79d694ba4 Mon Sep 17 00:00:00 2001
+From ce840b6b111e1e109e511f6833d6aa419e2b723a Mon Sep 17 00:00:00 2001
 From: Philip Withnall <philip@tecnocode.co.uk>
 Date: Tue, 23 Jan 2024 11:16:52 +0000
 Subject: [PATCH] Merge branch '2887-memory-monitor-tests' into 'main'
@@ -22,7 +22,7 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  4 files changed, 113 insertions(+), 74 deletions(-)
 
 diff --git a/gio/tests/memory-monitor-dbus.py.in b/gio/tests/memory-monitor-dbus.py.in
-index bf3291847..7aae01e70 100755
+index bf32918..7aae01e 100755
 --- a/gio/tests/memory-monitor-dbus.py.in
 +++ b/gio/tests/memory-monitor-dbus.py.in
 @@ -16,7 +16,6 @@ import sys
@@ -130,7 +130,7 @@ index bf3291847..7aae01e70 100755
  except ImportError as e:
      @unittest.skip("Cannot import %s" % e.name)
 diff --git a/gio/tests/memory-monitor-portal.py.in b/gio/tests/memory-monitor-portal.py.in
-index 748cee850..f570508f9 100755
+index 748cee8..f570508 100755
 --- a/gio/tests/memory-monitor-portal.py.in
 +++ b/gio/tests/memory-monitor-portal.py.in
 @@ -16,7 +16,6 @@ import sys
@@ -222,7 +222,7 @@ index 748cee850..f570508f9 100755
  except ImportError as e:
      @unittest.skip("Cannot import %s" % e.name)
 diff --git a/gio/tests/power-profile-monitor-dbus.py.in b/gio/tests/power-profile-monitor-dbus.py.in
-index 06e594f4a..f955afc80 100755
+index 06e594f..f955afc 100755
 --- a/gio/tests/power-profile-monitor-dbus.py.in
 +++ b/gio/tests/power-profile-monitor-dbus.py.in
 @@ -16,7 +16,6 @@ import sys
@@ -295,7 +295,7 @@ index 06e594f4a..f955afc80 100755
  except ImportError as e:
      @unittest.skip("Cannot import %s" % e.name)
 diff --git a/gio/tests/power-profile-monitor-portal.py.in b/gio/tests/power-profile-monitor-portal.py.in
-index 09e9a450d..ad2abf621 100755
+index 09e9a45..ad2abf6 100755
 --- a/gio/tests/power-profile-monitor-portal.py.in
 +++ b/gio/tests/power-profile-monitor-portal.py.in
 @@ -16,7 +16,6 @@ import sys
@@ -359,6 +359,3 @@ index 09e9a450d..ad2abf621 100755
  
          def test_power_profile_power_saver_enabled_portal_default(self):
              '''power-saver-enabled property default value'''
--- 
-2.34.1
-

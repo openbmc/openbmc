@@ -206,7 +206,7 @@ history, see the
    part of the shared state (sstate) packages. If you maintain an sstate
    feed, it's expected that either all your building systems that
    contribute to the sstate feed use a shared PR service, or you do not
-   run a PR Service on any of your building systems.
+   run a PR service on any of your building systems.
 
    That's because if you had multiple machines sharing a PR service but
    not their sstate feed, you could end up with "diverging" hashes for

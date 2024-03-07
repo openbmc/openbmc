@@ -1,4 +1,4 @@
-From bfa655d63e79ba5a75441604ca14a70800794189 Mon Sep 17 00:00:00 2001
+From d393759315b189a738e4b6a2ce31dc18dbbfae29 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 11 May 2022 21:41:14 +0200
 Subject: [PATCH] _distutils/sysconfig.py: make it possible to substite the
@@ -15,7 +15,6 @@ would happen to this module in light of distutils deprecation.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
-
 ---
  setuptools/_distutils/sysconfig.py | 12 ++++++++++--
  1 file changed, 10 insertions(+), 2 deletions(-)

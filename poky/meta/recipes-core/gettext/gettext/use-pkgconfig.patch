@@ -1,4 +1,4 @@
-From 38c361e6860bfaefbefeccae621e698c301879f2 Mon Sep 17 00:00:00 2001
+From 6aa1338b916fe72c200b6f160b934be15b6ff590 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 23 Jan 2018 00:54:13 +0000
 Subject: [PATCH] gettext: beat library detection into shape
@@ -12,12 +12,11 @@ Simply delete all the crazy, and replace with a single call to pkg-config.
 
 Upstream-Status: Inappropriate [upstream still refuse to consider pkg-config]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-
 ---
- gettext-tools/gnulib-m4/libxml.m4             | 105 +----------------
- libtextstyle/gnulib-local/m4/libglib.m4       | 106 +++---------------
- libtextstyle/gnulib-m4/libglib.m4             | 106 +++---------------
- 3 files changed, 79 insertions(+), 470 deletions(-)
+ gettext-tools/gnulib-m4/libxml.m4       | 105 ++---------------------
+ libtextstyle/gnulib-local/m4/libglib.m4 | 106 +++---------------------
+ libtextstyle/gnulib-m4/libglib.m4       | 106 +++---------------------
+ 3 files changed, 31 insertions(+), 286 deletions(-)
 
 diff --git a/gettext-tools/gnulib-m4/libxml.m4 b/gettext-tools/gnulib-m4/libxml.m4
 index 0340490..0355388 100644
@@ -143,7 +142,7 @@ index 0340490..0355388 100644
    ])
    AC_SUBST([LIBXML])
 diff --git a/libtextstyle/gnulib-local/m4/libglib.m4 b/libtextstyle/gnulib-local/m4/libglib.m4
-index 7ee5029..bb1e5e4 100644
+index dbc9eb8..136e512 100644
 --- a/libtextstyle/gnulib-local/m4/libglib.m4
 +++ b/libtextstyle/gnulib-local/m4/libglib.m4
 @@ -6,106 +6,26 @@ dnl with or without modifications, as long as this notice is preserved.
@@ -267,7 +266,7 @@ index 7ee5029..bb1e5e4 100644
    AC_SUBST([LTLIBGLIB])
    AC_SUBST([INCGLIB])
 diff --git a/libtextstyle/gnulib-m4/libglib.m4 b/libtextstyle/gnulib-m4/libglib.m4
-index 7ee5029..bb1e5e4 100644
+index dbc9eb8..136e512 100644
 --- a/libtextstyle/gnulib-m4/libglib.m4
 +++ b/libtextstyle/gnulib-m4/libglib.m4
 @@ -6,106 +6,26 @@ dnl with or without modifications, as long as this notice is preserved.

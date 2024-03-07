@@ -1,4 +1,4 @@
-From cf7df91cc8c3b4811235ef8aec144c5f0cf90bdb Mon Sep 17 00:00:00 2001
+From e7077aa23bfcd31a8e72e39dc93ce4f854678376 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 15 Feb 2019 11:17:27 +0100
 Subject: [PATCH] Do not write $bindir into pkg-config files
@@ -9,7 +9,6 @@ rather than use target paths).
 
 Upstream-Status: Inappropriate [upstream wants the paths in .pc files]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  gio/meson.build  | 16 ++++++++--------
  glib/meson.build |  6 +++---

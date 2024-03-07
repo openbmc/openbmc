@@ -1,7 +1,7 @@
 SUMMARY = "A console-only image with more full-featured Linux system \
 functionality installed."
 
-IMAGE_FEATURES += "splash ssh-server-openssh"
+IMAGE_FEATURES += "splash ssh-server-openssh package-management"
 
 IMAGE_INSTALL = "\
     packagegroup-core-boot \

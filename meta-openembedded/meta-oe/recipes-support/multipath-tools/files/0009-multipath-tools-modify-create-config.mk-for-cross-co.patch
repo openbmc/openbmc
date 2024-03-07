@@ -1,0 +1,40 @@
+From 7452549e572b1c40aefe25524bf4bbbf34c952e5 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 4 Jun 2019 11:39:39 +0800
+Subject: [PATCH 09/12] multipath-tools: modify create-config.mk for
+ cross-compilation
+
+Do not look for systemd info on the host, and allow us to pass in CFLAGS
+using the OPTFLAGS variable.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+
+Rebase to 0.9.8
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ create-config.mk | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/create-config.mk b/create-config.mk
+index 4d318b96..a65975ba 100644
+--- a/create-config.mk
++++ b/create-config.mk
+@@ -127,10 +127,6 @@ ifeq ($(ENABLE_DMEVENTS_POLL),0)
+ 	DEFINES += -DNO_DMEVENTS_POLL
+ endif
+ 
+-SYSTEMD := $(strip $(or $(shell $(PKG_CONFIG) --modversion libsystemd 2>/dev/null | awk '{print $$1}'), \
+-			$(shell systemctl --version 2>/dev/null | sed -n 's/systemd \([0-9]*\).*/\1/p')))
+-
+-
+ # $(call TEST_CC_OPTION,option,fallback)
+ # Test if the C compiler supports the option.
+ # Evaluates to "option" if yes, and "fallback" otherwise.
+-- 
+2.25.1
+

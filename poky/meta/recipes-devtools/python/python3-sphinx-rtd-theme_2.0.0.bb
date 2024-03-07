@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=a1db7d4ef426c2935227264e1d4ae8f9 \
 RDEPENDS:${PN} += " \
     python3-compile \
     python3-sphinx \
+    python3-sphinxcontrib-jquery \
 "
 
 PYPI_PACKAGE = "sphinx_rtd_theme"

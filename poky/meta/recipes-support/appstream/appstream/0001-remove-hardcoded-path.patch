@@ -1,4 +1,4 @@
-From 6ab00a4279823829a9b82dc9e4d055da4de88c6e Mon Sep 17 00:00:00 2001
+From fe9ebb8c0fa7b84a9c5c667386b8fbb3baea2fad Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Mon, 12 Dec 2022 15:42:42 +0100
 Subject: [PATCH] remove hardcoded path
@@ -10,11 +10,11 @@ Dont include hardcoded path. This fixes:
 
 Upstream-Status: Inappropriate [oe-specific]
 ---
- meson.build       | 2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index fd0e3373..2f273ada 100644
+index fa171d5..79d5168 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -185,10 +185,10 @@ endif
@@ -30,6 +30,3 @@ index fd0e3373..2f273ada 100644
          else
              error('Unable to find Snowball header "libstemmer.h". Please ensure libstemmer/Snowball is installed properly in order to continue.')
          endif
--- 
-2.34.1
-

@@ -1,4 +1,4 @@
-From c0a465ccae395871ab10932975e37894220bc6a1 Mon Sep 17 00:00:00 2001
+From a6b3bc4fb3db996cd6c5616a99c16d085704dae0 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 1 Jun 2021 10:23:59 +0800
 Subject: [PATCH] drop FindPythonInstDir.cmake
@@ -37,6 +37,3 @@ index ed098ded..8b137891 100644
 -stdout.write(path)"
 -OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
 +
--- 
-2.18.1
-

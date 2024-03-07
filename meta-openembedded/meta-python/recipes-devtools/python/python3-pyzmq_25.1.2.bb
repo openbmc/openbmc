@@ -34,6 +34,7 @@ RDEPENDS:${PN}-ptest += "\
     ${PN}-test \
     python3-pytest \
     python3-unittest-automake-output \
+    python3-unixadmin \
 "
 
 do_compile:prepend() {

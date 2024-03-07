@@ -40,7 +40,7 @@ RDEPENDS:packagegroup-self-hosted-host-tools = "\
     iptables \
     lsb-release \
     mc \
-    mc-fish \
+    mc-shell \
     mc-helpers \
     mc-helpers-perl \
     parted \

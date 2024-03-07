@@ -9,8 +9,9 @@ GO_INSTALL = "\
     ${GO_IMPORT}/cmd/crucible \
     ${GO_IMPORT}/cmd/habtool \
 "
-SRCREV = "358b5e7adb7f101f870f2b42fe5371460a3cccb6"
+SRCREV = "dec27cd4e0e0db106c0a21d429c04ca8d36bbdd5"
 
+export GOPROXY = "https://proxy.golang.org,direct"
 # Workaround for network access issue during compile step.
 # This needs to be fixed in the recipes buildsystem so that
 # it can be accomplished during do_fetch task.

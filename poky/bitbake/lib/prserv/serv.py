@@ -262,8 +262,11 @@ def stop_daemon(host, port):
             os.kill(pid, signal.SIGTERM)
             time.sleep(0.1)
 
-        if os.path.exists(pidfile):
+        try:
             os.remove(pidfile)
+        except FileNotFoundError:
+            # The PID file might have been removed by the exiting process
+            pass
 
     except OSError as e:
         err = str(e)

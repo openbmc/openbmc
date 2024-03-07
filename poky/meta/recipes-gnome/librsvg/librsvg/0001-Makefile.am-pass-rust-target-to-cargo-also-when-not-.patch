@@ -1,4 +1,4 @@
-From 95b2cd0169cb1b4694c2bce67169b1aa1d5e2be0 Mon Sep 17 00:00:00 2001
+From d0f4f5b3ae900b9d092407e29b5372d93910c18c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 21 Sep 2021 16:27:14 +0200
 Subject: [PATCH] Makefile.am: pass rust target to cargo also when not cross
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  2 files changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index e93714e..effe5d3 100644
+index 2a89954..4e296d3 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -137,9 +137,7 @@ else
+@@ -173,9 +173,7 @@ else
  CARGO_RELEASE_ARGS=--release
  endif
  
@@ -28,10 +28,10 @@ index e93714e..effe5d3 100644
  CARGO_VERBOSE = $(cargo_verbose_$(V))
  cargo_verbose_ = $(cargo_verbose_$(AM_DEFAULT_VERBOSITY))
 diff --git a/configure.ac b/configure.ac
-index 41590ca..84cd56b 100644
+index 42215cf..2499c96 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -255,9 +255,7 @@ AC_ARG_VAR(RUST_TARGET, [Set rust target (default=$host)])
+@@ -292,9 +292,7 @@ AC_ARG_VAR(RUST_TARGET, [Set rust target (default=$host)])
  : ${RUST_TARGET:=$host}
  
  AM_CONDITIONAL([CROSS_COMPILING], [test "x$cross_compiling" = xyes])
@@ -42,6 +42,3 @@ index 41590ca..84cd56b 100644
  AC_SUBST([RUST_TARGET_SUBDIR])
  
  dnl ===========================================================================
--- 
-2.20.1
-

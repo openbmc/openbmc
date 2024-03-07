@@ -28,6 +28,7 @@ Hardware Reference Boards
 The following boards are supported by the meta-yocto-bsp layer:
 
   * Texas Instruments Beaglebone (beaglebone-yocto)
+  * General 64-bit Arm SystemReady platforms (genericarm64)
   * General IA platforms (genericx86 and genericx86-64)
 
 For more information see the board's section below. The appropriate MACHINE
@@ -55,7 +56,8 @@ Consumer Devices
 
 The following consumer devices are supported by the meta-yocto-bsp layer:
 
-  * Intel x86 based PCs and devices (genericx86)
+  * Arm-based SystemReady devices (genericarm64)
+  * Intel x86 based PCs and devices (genericx86 and genericx86-64)
 
 For more information see the device's section below. The appropriate MACHINE
 variable value corresponding to the device is given in brackets.
@@ -124,6 +126,20 @@ USB Device:
      b) Use systemd-boot instead
      - Build an image with EFI_PROVIDER="systemd-boot" then use the above
        dd command to write the image to a USB stick.
+
+
+SystemReady Arm Platforms
+=========================
+
+The genericarm64 MACHINE is designed to work on standard SystemReady IR
+compliant boards with preinstalled firmware.
+
+The genericarm64 MACHINE is currently tested on the following platforms:
+
+  * Texas Instruments BeaglePlay
+
+The images built are EFI bootable disk images and can be written directly to a
+SD card for booting, for example.
 
 
 Texas Instruments Beaglebone (beaglebone-yocto)

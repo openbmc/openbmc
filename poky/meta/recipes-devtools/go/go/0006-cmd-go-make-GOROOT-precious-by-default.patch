@@ -1,9 +1,7 @@
-From efab470498bb0a30ee2d00455a0c8c10459f6347 Mon Sep 17 00:00:00 2001
+From aff5a740d6286c04beb0593fc68b0aea5a95ad39 Mon Sep 17 00:00:00 2001
 From: Alex Kube <alexander.j.kube@gmail.com>
 Date: Wed, 23 Oct 2019 21:18:56 +0430
 Subject: [PATCH 6/9] cmd/go: make GOROOT precious by default
-
-Upstream-Status: Inappropriate [OE specific]
 
 The go build tool normally rebuilds whatever it detects is
 stale.  This can be a problem when GOROOT is intended to
@@ -20,7 +18,10 @@ Adapted to Go 1.13 from patches originally submitted to
 the meta/recipes-devtools/go tree by
 Matt Madison <matt@madison.systems>.
 
+Upstream-Status: Inappropriate [OE specific]
+
 Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
 ---
  src/cmd/go/internal/work/action.go |  3 +++
  src/cmd/go/internal/work/build.go  |  6 ++++++
@@ -28,10 +29,10 @@ Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
  3 files changed, 34 insertions(+)
 
 diff --git a/src/cmd/go/internal/work/action.go b/src/cmd/go/internal/work/action.go
-index 8beb134..68a8cfe 100644
+index a59072e591..9e35ebde0c 100644
 --- a/src/cmd/go/internal/work/action.go
 +++ b/src/cmd/go/internal/work/action.go
-@@ -718,6 +718,9 @@ func (b *Builder) addTransitiveLinkDeps(a, a1 *Action, shlib string) {
+@@ -754,6 +754,9 @@ func (b *Builder) addTransitiveLinkDeps(a, a1 *Action, shlib string) {
  			if p1 == nil || p1.Shlib == "" || haveShlib[filepath.Base(p1.Shlib)] {
  				continue
  			}
@@ -42,10 +43,10 @@ index 8beb134..68a8cfe 100644
  			// TODO(rsc): The use of ModeInstall here is suspect, but if we only do ModeBuild,
  			// we'll end up building an overall library or executable that depends at runtime
 diff --git a/src/cmd/go/internal/work/build.go b/src/cmd/go/internal/work/build.go
-index 2f2860a..8cc6166 100644
+index 408edb5119..3d60252127 100644
 --- a/src/cmd/go/internal/work/build.go
 +++ b/src/cmd/go/internal/work/build.go
-@@ -217,6 +217,8 @@ See also: go install, go get, go clean.
+@@ -233,6 +233,8 @@ See also: go install, go get, go clean.
  
  const concurrentGCBackendCompilationEnabledByDefault = true
  
@@ -54,7 +55,7 @@ index 2f2860a..8cc6166 100644
  func init() {
  	// break init cycle
  	CmdBuild.Run = runBuild
-@@ -230,6 +232,10 @@ func init() {
+@@ -246,6 +248,10 @@ func init() {
  		AddCoverFlags(CmdBuild, nil)
  		AddCoverFlags(CmdInstall, nil)
  	}
@@ -66,11 +67,11 @@ index 2f2860a..8cc6166 100644
  
  // Note that flags consulted by other parts of the code
 diff --git a/src/cmd/go/internal/work/exec.go b/src/cmd/go/internal/work/exec.go
-index 62e1774..cde867b 100644
+index 9724cd07d0..544df461a2 100644
 --- a/src/cmd/go/internal/work/exec.go
 +++ b/src/cmd/go/internal/work/exec.go
-@@ -546,6 +546,23 @@ func (b *Builder) build(ctx context.Context, a *Action) (err error) {
- 		return errors.New("cannot compile Go " + p.Module.GoVersion + " code")
+@@ -544,6 +544,23 @@ func (b *Builder) build(ctx context.Context, a *Action) (err error) {
+ 		return err
  	}
  
 +	if goRootPrecious && (a.Package.Standard || a.Package.Goroot) {
@@ -90,10 +91,10 @@ index 62e1774..cde867b 100644
 +		}
 +	}
 +
- 	if err := b.Mkdir(a.Objdir); err != nil {
+ 	if err := sh.Mkdir(a.Objdir); err != nil {
  		return err
  	}
-@@ -1643,6 +1660,14 @@ func (b *Builder) linkShared(ctx context.Context, a *Action) (err error) {
+@@ -1737,6 +1754,14 @@ func (b *Builder) linkShared(ctx context.Context, a *Action) (err error) {
  		return err
  	}
  
@@ -105,9 +106,9 @@ index 62e1774..cde867b 100644
 +		}
 +	}
 +
- 	if err := b.Mkdir(a.Objdir); err != nil {
+ 	if err := b.Shell(a).Mkdir(a.Objdir); err != nil {
  		return err
  	}
 -- 
-2.30.2
+2.44.0
 

@@ -1,14 +1,50 @@
+From 4f05492ac07a7bbaf06dd8265b9cba329e1b53e9 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 30 Aug 2017 15:05:16 +0800
+Subject: [PATCH] lsof: remove host information from version.h
+
 lsof doesn't embed the username or hostname in the build if SOURCE_DATE_EPOCH is
 defined, but this still embeds build paths.  Delete all of the host details to
 ensure that no host information is leaked into the binary.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ autotools/version.h.in      | 16 ++++-----
+ lib/dialects/linux/Makefile | 69 ++++++-------------------------------
+ 2 files changed, 19 insertions(+), 66 deletions(-)
 
-diff --git a/dialects/linux/Makefile b/dialects/linux/Makefile
-index 176a4c2..ef5a633 100644
---- a/dialects/linux/Makefile
-+++ b/dialects/linux/Makefile
+diff --git a/autotools/version.h.in b/autotools/version.h.in
+index aac0b80..2e635a5 100644
+--- a/autotools/version.h.in
++++ b/autotools/version.h.in
+@@ -37,13 +37,13 @@
+ 
+ #include "config.h"
+ #define LSOF_VERSION PACKAGE_VERSION
+-#define LSOF_HOST "@host@"
+-#define LSOF_LOGNAME "@logname@"
+-#define LSOF_USER "@user@"
+-#define LSOF_CC "@cc@"
+-#define LSOF_CCV "@ccv@"
+-#define LSOF_CCFLAGS "@ccflags@"
+-#define LSOF_LDFLAGS "@ldflags@"
+-#define LSOF_SYSINFO "@sysinfo@"
++#define LSOF_HOST ""
++#define LSOF_LOGNAME ""
++#define LSOF_USER ""
++#define LSOF_CC ""
++#define LSOF_CCV ""
++#define LSOF_CCFLAGS ""
++#define LSOF_LDFLAGS ""
++#define LSOF_SYSINFO ""
+ 
+ #endif
+diff --git a/lib/dialects/linux/Makefile b/lib/dialects/linux/Makefile
+index f8adaa6..7a79ca7 100644
+--- a/lib/dialects/linux/Makefile
++++ b/lib/dialects/linux/Makefile
 @@ -83,64 +83,17 @@ ${LIB}: FRC
  version.h:	FRC
  	@echo Constructing version.h

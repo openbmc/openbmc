@@ -1,4 +1,4 @@
-From 5cca2fa5997292a87302bdc7e7ed3231371e98bd Mon Sep 17 00:00:00 2001
+From e3f9a8a69d3a340c1a1d0bba566e71f20f635a43 Mon Sep 17 00:00:00 2001
 From: Alex Kube <alexander.j.kube@gmail.com>
 Date: Wed, 23 Oct 2019 21:15:37 +0430
 Subject: [PATCH 2/9] cmd/go: Allow GOTOOLDIR to be overridden in the
@@ -13,16 +13,17 @@ Matt Madison <matt@madison.systems>.
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
 ---
  src/cmd/dist/build.go          | 4 +++-
  src/cmd/go/internal/cfg/cfg.go | 6 +++++-
  2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/src/cmd/dist/build.go b/src/cmd/dist/build.go
-index c36a12e..5d31718 100644
+index 32e59b446a..06ee4de8a9 100644
 --- a/src/cmd/dist/build.go
 +++ b/src/cmd/dist/build.go
-@@ -264,7 +264,9 @@ func xinit() {
+@@ -259,7 +259,9 @@ func xinit() {
  	}
  	xatexit(rmworkdir)
  
@@ -30,14 +31,14 @@ index c36a12e..5d31718 100644
 +	if tooldir = os.Getenv("GOTOOLDIR"); tooldir == "" {
 +		tooldir = pathf("%s/pkg/tool/%s_%s", goroot, gohostos, gohostarch)
 +	}
- }
  
- // compilerEnv returns a map from "goos/goarch" to the
+ 	goversion := findgoversion()
+ 	isRelease = strings.HasPrefix(goversion, "release.") || strings.HasPrefix(goversion, "go")
 diff --git a/src/cmd/go/internal/cfg/cfg.go b/src/cmd/go/internal/cfg/cfg.go
-index 3257140..bb46253 100644
+index a8daa2dfc3..393ada39c9 100644
 --- a/src/cmd/go/internal/cfg/cfg.go
 +++ b/src/cmd/go/internal/cfg/cfg.go
-@@ -229,7 +229,11 @@ func SetGOROOT(goroot string, isTestGo bool) {
+@@ -230,7 +230,11 @@ func SetGOROOT(goroot string, isTestGo bool) {
  			// This matches the initialization of ToolDir in go/build, except for
  			// using ctxt.GOROOT and the installed GOOS and GOARCH rather than the
  			// GOROOT, GOOS, and GOARCH reported by the runtime package.
@@ -51,5 +52,5 @@ index 3257140..bb46253 100644
  	}
  }
 -- 
-2.30.2
+2.44.0
 

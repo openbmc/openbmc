@@ -55,7 +55,7 @@ do_install_ptest () {
 }
 
 
-RDEPENDS:${PN}-ptest += "bash lsb-release make"
+RDEPENDS:${PN}-ptest += "bash file lsb-release make"
 RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils"
 RDEPENDS:${PN}-ptest:append:libc-musl = " musl-utils"
 

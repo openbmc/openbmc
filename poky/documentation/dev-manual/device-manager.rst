@@ -60,10 +60,10 @@ kernel.
 All devices created by ``devtmpfs`` will be owned by ``root`` and have
 permissions ``0600``.
 
-To have more control over the device nodes, you can use a device manager
-like ``udev`` or ``busybox-mdev``. You choose the device manager by
-defining the ``VIRTUAL-RUNTIME_dev_manager`` variable in your machine or
-distro configuration file. Alternatively, you can set this variable in
+To have more control over the device nodes, you can use a device manager like
+``udev`` or ``busybox-mdev``. You choose the device manager by defining the
+:term:`VIRTUAL-RUNTIME_dev_manager <VIRTUAL-RUNTIME>` variable in your machine
+or distro configuration file. Alternatively, you can set this variable in
 your ``local.conf`` configuration file::
 
    VIRTUAL-RUNTIME_dev_manager = "udev"

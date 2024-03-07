@@ -1115,7 +1115,8 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
             logger.debug("Mirror fetch failure for url %s (original url: %s)" % (ud.url, origud.url))
             logger.debug(str(e))
         try:
-            ud.method.clean(ud, ld)
+            if ud.method.cleanup_upon_failure():
+                ud.method.clean(ud, ld)
         except UnboundLocalError:
             pass
         return False
@@ -1439,6 +1440,12 @@ class FetchMethod(object):
         be displayed if there is no checksum)?
         """
         return False
+
+    def cleanup_upon_failure(self):
+        """
+        When a fetch fails, should clean() be called?
+        """
+        return True
 
     def verify_donestamp(self, ud, d):
         """
@@ -1885,7 +1892,7 @@ class Fetch(object):
                             logger.debug(str(e))
                         firsterr = e
                         # Remove any incomplete fetch
-                        if not verified_stamp:
+                        if not verified_stamp and m.cleanup_upon_failure():
                             m.clean(ud, self.d)
                         logger.debug("Trying MIRRORS")
                         mirrors = mirror_from_string(self.d.getVar('MIRRORS'))

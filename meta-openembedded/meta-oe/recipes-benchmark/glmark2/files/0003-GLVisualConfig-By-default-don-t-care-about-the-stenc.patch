@@ -1,0 +1,103 @@
+From b59ec731c8c7e084b289e4ea92938faaebcc389d Mon Sep 17 00:00:00 2001
+From: Alexandros Frantzis <alexandros.frantzis@collabora.com>
+Date: Wed, 1 Nov 2023 13:43:00 +0200
+Subject: [PATCH] GLVisualConfig: By default don't care about the stencil
+ config component
+
+Our benchmarks don't use a stencil buffer, but its presence doesn't hurt
+either, so don't mark configs that have one as unacceptable. Our scoring
+still favors configs without one, unless the user explicitly specifies
+otherwise with --visual-config.
+
+Upstream-Status: Backport [https://github.com/glmark2/glmark2/commit/5f23d540342ba69e12afeb6a1ac4f6fd36747975]
+---
+ doc/glmark2.1.in         | 2 +-
+ src/gl-visual-config.cpp | 9 ++++++---
+ src/gl-visual-config.h   | 2 +-
+ src/options.cpp          | 6 +++---
+ 4 files changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/doc/glmark2.1.in b/doc/glmark2.1.in
+index 015ba20..1f4a047 100644
+--- a/doc/glmark2.1.in
++++ b/doc/glmark2.1.in
+@@ -38,7 +38,7 @@ Render to an off-screen surface
+ The visual configuration to use for the rendering target:
+ \'id=ID:red=R:green=G:blue=B:alpha=A:buffer=BUF:stencil=STENCIL:samples=SAMPLES'.
+ The parameters may be defined in any order, and any omitted parameters assume a
+-default value of '0' (id, stencil, samples) or '1' (red, green, blue, alpha, buffer).
++default value of '0' (id, samples), -1 (stencil) or '1' (red, green, blue, alpha, buffer).
+ If 'id' is set to a non-zero value, all other parameters are ignored
+ .TP
+ \fB\-\-reuse\-context\fR
+diff --git a/src/gl-visual-config.cpp b/src/gl-visual-config.cpp
+index de92f93..665f53a 100644
+--- a/src/gl-visual-config.cpp
++++ b/src/gl-visual-config.cpp
+@@ -26,7 +26,7 @@
+ #include <vector>
+ 
+ GLVisualConfig::GLVisualConfig(const std::string &s) :
+-    id(0), red(1), green(1), blue(1), alpha(1), depth(1), stencil(0), buffer(1), samples(0)
++    GLVisualConfig()
+ {
+     std::vector<std::string> elems;
+ 
+@@ -85,7 +85,7 @@ GLVisualConfig::match_score(const GLVisualConfig &target) const
+     score += score_component(blue, target.blue, 4);
+     score += score_component(alpha, target.alpha, 4);
+     score += score_component(depth, target.depth, 1);
+-    score += score_component(stencil, target.stencil, 0);
++    score += score_component(stencil, target.stencil, 1);
+     score += score_component(buffer, target.buffer, 1);
+     score += score_component(samples, target.samples, -1);
+ 
+@@ -135,11 +135,14 @@ GLVisualConfig::score_component(int component, int target, int scale) const
+          * score for all components ranges from [0,MAXIMUM_COMPONENT_SCORE).
+          * If scale > 0, we reward the largest positive difference from target,
+          * otherwise the smallest positive difference from target.
++         * We also reward the smallest positive difference from the target,
++         * if the target < 0, i.e., we don't care about this value.
+          */
+         int diff = std::abs(scale) * (component - target);
+         if (diff > 0)
+         {
+-            score = scale < 0 ? MAXIMUM_COMPONENT_SCORE - diff : diff;
++            score = (scale < 0 || target < 0) ?
++                    MAXIMUM_COMPONENT_SCORE - diff : diff;
+             score = std::min(MAXIMUM_COMPONENT_SCORE, score);
+             score = std::max(0, score);
+         }
+diff --git a/src/gl-visual-config.h b/src/gl-visual-config.h
+index b28473f..013ce14 100644
+--- a/src/gl-visual-config.h
++++ b/src/gl-visual-config.h
+@@ -31,7 +31,7 @@ class GLVisualConfig
+ {
+ public:
+     GLVisualConfig():
+-        id(0), red(1), green(1), blue(1), alpha(1), depth(1), stencil(0), buffer(1), samples(0) {}
++        id(0), red(1), green(1), blue(1), alpha(1), depth(1), stencil(-1), buffer(1), samples(0) {}
+     GLVisualConfig(const std::string &s);
+ 
+     /**
+diff --git a/src/options.cpp b/src/options.cpp
+index 8d1ec16..3a31d3d 100644
+--- a/src/options.cpp
++++ b/src/options.cpp
+@@ -213,9 +213,9 @@ Options::print_help()
+            "                         target: 'id=ID:red=R:green=G:blue=B:alpha=A:buffer=BUF:\n"
+            "                         stencil=STENCIL:samples=SAMPLES'. The parameters may be\n"
+            "                         defined in any order, and any omitted parameters assume a\n"
+-           "                         default value of '0' (id, stencil, samples) or '1' (red,\n"
+-           "                         green, blue, alpha, buffer). If 'id' is set to a non-zero\n"
+-           "                         value, all other parameters are ignored\n"
++           "                         default value of '0' (id, samples), '-1' (stencil) or\n"
++           "                         '1' (red, green, blue, alpha, buffer). If 'id' is set to\n"
++           "                         a non-zero value, all other parameters are ignored\n"
+            "      --reuse-context    Use a single context for all scenes\n"
+            "                         (by default, each scene gets its own context)\n"
+            "  -s, --size WxH         Size of the output window (default: 800x600)\n"
+-- 
+2.44.0
+

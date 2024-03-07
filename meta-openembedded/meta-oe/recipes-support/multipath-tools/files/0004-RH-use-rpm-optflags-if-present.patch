@@ -1,0 +1,55 @@
+From f1b74f21875d6d9f0a5ac3d67df40a28b167052a Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 26 Nov 2018 09:19:17 +0800
+Subject: [PATCH 04/12] RH: use rpm optflags if present
+
+Use the passed in optflags when compiling as an RPM, and keep the
+default flags as close as possible to the current fedora flags, while
+still being generic.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+
+Upstream-Status: Pending
+
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+
+Rebase to 0.9.8
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile.inc | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.inc b/Makefile.inc
+index de89b21f..6ac632ff 100644
+--- a/Makefile.inc
++++ b/Makefile.inc
+@@ -95,7 +95,15 @@ SYSTEMD_LIBDEPS := $(if $(SYSTEMD),$(if $(shell test $(SYSTEMD) -gt 209 && echo
+ MODPROBE_UNIT := $(shell test "0$(SYSTEMD)" -lt 245 2>/dev/null || \
+ 			echo "modprobe@dm_multipath.service")
+ 
+-OPTFLAGS	:= -O2 -g $(STACKPROT) --param=ssp-buffer-size=4
++ifndef RPM_OPT_FLAGS
++	OPTFLAGS	:= -O2 -g $(STACKPROT) --param=ssp-buffer-size=4
++else
++	OPTFLAGS = $(RPM_OPT_FLAGS)
++endif
++OPTFLAGS       += -Wextra -Wstrict-prototypes -Wformat=0 -Werror=implicit-int \
++                  -Werror=implicit-function-declaration -Wno-sign-compare \
++                  -Wno-unused-parameter -Werror=cast-qual \
++                  -Werror=discarded-qualifiers
+ WARNFLAGS	:= -Werror -Wall -Wextra -Wformat=2 $(WFORMATOVERFLOW) -Werror=implicit-int \
+ 		  -Werror=implicit-function-declaration -Werror=format-security \
+ 		  $(WNOCLOBBERED) -Werror=cast-qual $(ERROR_DISCARDED_QUALIFIERS) $(W_URCU_TYPE_LIMITS)
+@@ -105,7 +113,7 @@ CPPFLAGS	:= $(FORTIFY_OPT) $(CPPFLAGS) $(D_URCU_VERSION) \
+ 		   -DRUNTIME_DIR=\"$(runtimedir)\" -DCONFIG_DIR=\"$(configdir)\" \
+ 		   -DDEFAULT_CONFIGFILE=\"$(configfile)\" -DSTATE_DIR=\"$(statedir)\" \
+ 		   -DEXTRAVERSION=\"$(EXTRAVERSION)\" -MMD -MP
+-CFLAGS		:= -std=gnu99 $(CFLAGS) $(OPTFLAGS) $(WARNFLAGS) -pipe
++CFLAGS		:= -std=gnu99 $(CFLAGS) $(OPTFLAGS) -pipe
+ BIN_CFLAGS	:= -fPIE -DPIE
+ LIB_CFLAGS	:= -fPIC
+ SHARED_FLAGS	:= -shared
+-- 
+2.25.1
+

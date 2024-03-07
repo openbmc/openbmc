@@ -1,3 +1,8 @@
+From aa0f8b65feec64420a9b7b61cfcc8bcce161e14b Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Thu, 9 Nov 2023 10:29:31 +0000
+Subject: [PATCH] libdnf: Fix arm arch mapping issues for qemuarmv5
+
 We change the way rpm architectures work, we make the machine name the default machine
 specific package architecture.
 
@@ -5,11 +10,14 @@ This arm mapping code can work or in the case of qemuarmv5, it doesn't as it cre
 armv5hl which doesn't exist and causes errrors. We can simply remove it, we don't need it.
 
 Upstream-Status: Inappropriate [Relies on OE rpm config]
+---
+ libdnf/hy-util.cpp | 23 -----------------------
+ 1 file changed, 23 deletions(-)
 
-Index: git/libdnf/hy-util.cpp
-===================================================================
---- git.orig/libdnf/hy-util.cpp
-+++ git/libdnf/hy-util.cpp
+diff --git a/libdnf/hy-util.cpp b/libdnf/hy-util.cpp
+index 9978c8e9..aa1369b6 100644
+--- a/libdnf/hy-util.cpp
++++ b/libdnf/hy-util.cpp
 @@ -117,29 +117,6 @@ hy_detect_arch(char **arch)
      if (uname(&un) < 0)
          return DNF_ERROR_FAILED;

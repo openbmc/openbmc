@@ -1,4 +1,4 @@
-From b87ae6860ea44996b677ad1c4a9793720b77c67c Mon Sep 17 00:00:00 2001
+From bf9bde4af952b67cc357d25b9863889099ea9665 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 7 Feb 2017 12:16:03 +0200
 Subject: [PATCH] Get parameters for both libsolv and libsolvext (libdnf is
@@ -7,7 +7,6 @@ Subject: [PATCH] Get parameters for both libsolv and libsolvext (libdnf is
 
 Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/312]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

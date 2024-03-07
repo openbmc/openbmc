@@ -6,9 +6,9 @@
 
 # This class provides a common workflow to use asymmetric (i.e. RSA) keys to
 # sign artifacts. Usually, the keys are either stored as simple files in the
-# file system or on a HSM (Hardware Security Module). While files are easy to
-# use, it's hard to verify that no copies of the private have been made and
-# only authorized persons are able to use the key. Use of an HSM addresses
+# file system or on an HSM (Hardware Security Module). While files are easy to
+# use, it's hard to verify that no copies of the private key have been made
+# and only authorized persons are able to use the key. Use of an HSM addresses
 # these risks by only allowing use of the key via an API (often PKCS #11). The
 # standard way of referring to a specific key in an HSM are PKCS #11 URIs (RFC
 # 7512).

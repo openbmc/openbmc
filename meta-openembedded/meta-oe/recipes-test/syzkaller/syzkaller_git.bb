@@ -10,7 +10,13 @@ SRC_URI = "git://${GO_IMPORT};protocol=https;destsuffix=${BPN}-${PV}/src/${GO_IM
            file://0001-sys-targets-targets.go-allow-users-to-override-hardc.patch;patchdir=src/${GO_IMPORT} \
            file://0001-executor-Include-missing-linux-falloc.h.patch;patchdir=src/${GO_IMPORT} \
            "
-SRCREV = "6d01f20890edf11b99bb54573025b11c1acd2d52"
+SRCREV = "25905f5d0a2a7883bd33491997556193582c6059"
+
+export GOPROXY = "https://proxy.golang.org,direct"
+# Workaround for network access issue during compile step.
+# This needs to be fixed in the recipes buildsystem so that
+# it can be accomplished during do_fetch task.
+do_compile[network] = "1"
 
 COMPATIBLE_HOST = "(x86_64|i.86|arm|aarch64).*-linux"
 
@@ -25,6 +31,8 @@ export TARGETARCH = '${GOARCH}'
 export TARGETVMARCH = '${GOARCH}'
 
 CGO_ENABLED = "1"
+
+LDFLAGS:append:class-target = "${@bb.utils.contains_any("TC_CXX_RUNTIME", "llvm android", " -lc++", " -lstdc++", d)}"
 
 DEPENDS:class-native += "qemu-system-native"
 
@@ -46,7 +54,7 @@ do_compile:class-target() {
     unset GOOS
     unset GOARCH
 
-    oe_runmake GO="${GO}" CC="${CXX}" CFLAGS="${CXXFLAGS} ${LDFLAGS}" REV=${SRCREV} target
+    oe_runmake GO="${GO}" CFLAGS="${CXXFLAGS} ${LDFLAGS}" REV=${SRCREV} target
 }
 
 do_install:class-native() {

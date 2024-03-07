@@ -18,6 +18,7 @@ CVE_STATUS[CVE-2007-6109] = "fixed-version: The CPE in the NVD database doesn't 
 PACKAGECONFIG[gnutls] = "--with-gnutls=yes,--with-gnutls=no,gnutls"
 PACKAGECONFIG[kerberos] = "--with-kerberos=yes,--with-kerberos=no,krb5"
 PACKAGECONFIG[libgmp] = "--with-libgmp=yes,--with-libgmp=no,gmp"
+PACKAGECONFIG[selinux] = "--with-selinux=yes,--with-selinux=no,libselinux"
 
 PACKAGECONFIG ??= "gnutls kerberos libgmp"
 

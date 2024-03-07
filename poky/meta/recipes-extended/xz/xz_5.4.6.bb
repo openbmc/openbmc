@@ -28,7 +28,8 @@ SRC_URI = "https://github.com/tukaani-project/xz/releases/download/v${PV}/xz-${P
            file://run-ptest \
           "
 SRC_URI[sha256sum] = "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
-UPSTREAM_CHECK_REGEX = "xz-(?P<pver>\d+(\.\d+)+)\.tar"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_CHECK_URI = "https://github.com/tukaani-project/xz/releases/"
 
 CACHED_CONFIGUREVARS += "gl_cv_posix_shell=/bin/sh"
 

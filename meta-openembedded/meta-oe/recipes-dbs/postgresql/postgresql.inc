@@ -54,7 +54,7 @@ pkg_postinst:${PN} () {
 
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'pam systemd', d)} \
-    openssl python uuid libxml tcl perl zlib \
+    openssl python uuid libxml tcl perl zlib icu \
 "
 PACKAGECONFIG[tcl] = "--with-tcl --with-tclconfig=${STAGING_BINDIR_CROSS},--without-tcl,tcl tcl-native,"
 PACKAGECONFIG[perl] = "--with-perl,--without-perl,perl,perl"
@@ -69,6 +69,7 @@ PACKAGECONFIG[libxslt] = "--with-libxslt,--without-libxslt,libxslt"
 PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
 PACKAGECONFIG[lz4] = "--with-lz4,--without-lz4,lz4"
 PACKAGECONFIG[openssl] = "--with-ssl=openssl,ac_cv_file__dev_urandom=yes,openssl"
+PACKAGECONFIG[icu] = "--with-icu,--without-icu,icu,icu"
 
 EXTRA_OECONF += "--enable-thread-safety --disable-rpath \
     --datadir=${datadir}/${BPN} \
@@ -228,6 +229,16 @@ do_install:append() {
 
 SSTATE_SCAN_FILES += "Makefile.global"
 SSTATE_SCAN_FILES:remove = "*_config"
+
+postgresql_fix_sources () {
+	for f in ${PKGD}${TARGET_DBGSRC_DIR}/src/pl/plperl/Util.c \
+			${PKGD}${TARGET_DBGSRC_DIR}/src/pl/plperl/SPI.c; do
+		if [ -e $f ]; then
+			sed -i -e 's#${B}/../${P}#${TARGET_DBGSRC_DIR}#g' $f
+		fi
+	done
+}
+PACKAGESPLITFUNCS =+ "postgresql_fix_sources"
 
 PACKAGES =+ "${PN}-client ${PN}-server-dev ${PN}-timezone \
     libecpg-compat libecpg-compat-dev \

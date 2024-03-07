@@ -1,4 +1,4 @@
-From 6e2ddcb5465d10618345b12e0b4471ead0f14304 Mon Sep 17 00:00:00 2001
+From 4933aef791857a5aac650b60af800778658b875b Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Tue, 22 Mar 2016 15:14:58 +0200
 Subject: [PATCH] Install gio-querymodules as libexec_PROGRAM
@@ -8,7 +8,6 @@ renamer does not cope with library packages with files in ${bindir}
 
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Upstream-Status: Inappropriate [OE specific]
-
 ---
  gio/meson.build | 1 +
  1 file changed, 1 insertion(+)

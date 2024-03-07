@@ -1,4 +1,4 @@
-From 046d853818f18bac5df4dfc007151e06fd64a5b3 Mon Sep 17 00:00:00 2001
+From 95148a804be66092564f81306a02f625d5b8a5d0 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Sun, 17 Sep 2023 23:26:59 +0200
 Subject: [PATCH] polkit.service.in: disable MemoryDenyWriteExecute
@@ -16,11 +16,11 @@ Signed-off-by: Markus Volk <f_l_k@t-online.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/data/polkit.service.in b/data/polkit.service.in
-index 2113ff7..42dfd90 100644
+index e6db351..4390cce 100644
 --- a/data/polkit.service.in
 +++ b/data/polkit.service.in
-@@ -14,7 +14,7 @@ Group=@polkitd_user@
- IPAddressDeny=any
+@@ -12,7 +12,7 @@ ExecStart=@libprivdir@/polkitd --no-debug
+ User=@polkitd_user@
  LimitMEMLOCK=0
  LockPersonality=yes
 -MemoryDenyWriteExecute=yes
@@ -28,6 +28,3 @@ index 2113ff7..42dfd90 100644
  NoNewPrivileges=yes
  PrivateDevices=yes
  PrivateNetwork=yes
--- 
-2.41.0
-

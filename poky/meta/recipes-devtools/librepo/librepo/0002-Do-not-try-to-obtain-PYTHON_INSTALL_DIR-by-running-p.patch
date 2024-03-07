@@ -1,4 +1,4 @@
-From 82bd6d196a0453657cbacaaedd75b2d2fe0bf9ba Mon Sep 17 00:00:00 2001
+From 76052aa40c61580869472fd3f009a4ab1620b998 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:05:36 +0200
 Subject: [PATCH] Do not try to obtain PYTHON_INSTALL_DIR by running python.
@@ -33,6 +33,3 @@ index 8523ca7..06e5f7b 100644
  INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
  
  MESSAGE(STATUS "Python3 install dir is ${PYTHON_INSTALL_DIR}")
--- 
-2.25.1
-

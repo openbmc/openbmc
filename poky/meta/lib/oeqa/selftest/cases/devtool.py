@@ -1165,9 +1165,10 @@ class DevtoolUpdateTests(DevtoolBase):
         result = runCmd('git commit -m "Add a new file"', cwd=tempdir)
         self.add_command_to_tearDown('cd %s; rm %s/*.patch; git checkout %s %s' % (os.path.dirname(recipefile), testrecipe, testrecipe, os.path.basename(recipefile)))
         result = runCmd('devtool update-recipe %s' % testrecipe)
+        result = runCmd('git add minicom', cwd=os.path.dirname(recipefile))
         expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
-                           ('??', '.*/0001-Change-the-README.patch$'),
-                           ('??', '.*/0002-Add-a-new-file.patch$')]
+                           ('A ', '.*/0001-Change-the-README.patch$'),
+                           ('A ', '.*/0002-Add-a-new-file.patch$')]
         self._check_repo_status(os.path.dirname(recipefile), expected_status)
 
     def test_devtool_update_recipe_git(self):

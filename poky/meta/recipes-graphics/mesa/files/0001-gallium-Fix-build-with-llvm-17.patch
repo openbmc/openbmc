@@ -1,4 +1,4 @@
-From 6d07f6aa7f92f40d78a2db645f16f0f3e7d3c2e8 Mon Sep 17 00:00:00 2001
+From 3e1e5c475b52651657c906e6b03ee13567cccdd7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 23 Jun 2023 01:20:38 -0700
 Subject: [PATCH] gallium: Fix build with llvm 17
@@ -9,7 +9,6 @@ so add conditions to exclude them for llvm >= 17
 
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/23827]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  src/gallium/auxiliary/gallivm/lp_bld_init.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)

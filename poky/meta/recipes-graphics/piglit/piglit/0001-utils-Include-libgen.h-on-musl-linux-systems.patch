@@ -1,4 +1,4 @@
-From 232a67b651ccb415b7d4d47584613359b7ebd920 Mon Sep 17 00:00:00 2001
+From 608cdeddc8e8a679b195927c4d34dc8d93142a91 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 13 Feb 2024 08:53:37 -0800
 Subject: [PATCH] utils: Include libgen.h on musl/linux systems
@@ -26,6 +26,3 @@ index 4d3606c70..fdfd903b3 100644
  #  include "libgen.h" // for basename
  #elif defined(_MSC_VER)
  
--- 
-2.43.1
-

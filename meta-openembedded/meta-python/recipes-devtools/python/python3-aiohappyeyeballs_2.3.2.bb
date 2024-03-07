@@ -8,5 +8,5 @@ SRC_URI[sha256sum] = "77e15a733090547a1f5369a1287ddfc944bd30df0eb8993f585259c34b
 
 inherit pypi python_poetry_core
 
-BBCLASSSEXTEND = "native nativesdk"
+BBCLASSEXTEND = "native nativesdk"
 

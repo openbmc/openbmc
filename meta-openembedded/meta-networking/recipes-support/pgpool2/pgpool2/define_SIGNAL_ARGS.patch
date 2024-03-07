@@ -1,0 +1,25 @@
+Define SIGNAL_ARGS if its not defined, this is flagged with
+newer C compilers e.g. clang18, where if it is not defined
+then it ends up with compiler errors
+
+/usr/include/postgresql/server/port.h:488:28: error: a parameter l
+ist without types is only allowed in a function definition
+|   488 | typedef void (*pqsigfunc) (SIGNAL_ARGS);
+|       |                            ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/src/include/pool_type.h
++++ b/src/include/pool_type.h
+@@ -125,7 +125,9 @@ extern void ExceptionalCondition(const c
+ #define LONGALIGN(LEN)			TYPEALIGN(ALIGNOF_LONG, (LEN))
+ #define DOUBLEALIGN(LEN)		TYPEALIGN(ALIGNOF_DOUBLE, (LEN))
+ #define MAXALIGN(LEN)			TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
+-
++#ifndef SIGNAL_ARGS
++#define SIGNAL_ARGS  int postgres_signal_arg
++#endif
+ /*
+  *  It seems that sockaddr_storage is now commonly used in place of sockaddr.
+  *  So, define it if it is not define yet, and create new SockAddr structure

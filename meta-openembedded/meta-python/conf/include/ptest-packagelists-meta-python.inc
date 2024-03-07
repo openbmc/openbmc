@@ -17,7 +17,9 @@ PTESTS_FAST_META_PYTHON = "\
     python3-click \
     python3-dominate \
     python3-execnet \
+    python3-freezegun \
     python3-geojson \
+    python3-gpiod \
     python3-gunicorn \
     python3-html2text \
     python3-inflection \
@@ -29,6 +31,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-jsmin \
     python3-msgpack \
     python3-multidict \
+    python3-netaddr \
     python3-ordered-set \
     python3-parse \
     python3-parse-type \
@@ -64,13 +67,17 @@ PTESTS_FAST_META_PYTHON = "\
     python3-u-msgpack-python \
     python3-unidiff \
     python3-uritemplate \
+    python3-wrapt \
+    python3-xlrd \
     python3-xmltodict \
     python3-xxhash \
     python3-yarl \
 "
 
 PTESTS_SLOW_META_PYTHON = "\
+    python3-arrow \
     python3-lz4 \
+    python3-marshmallow \
     python3-yappi \
 "
 
@@ -78,11 +85,9 @@ PTESTS_PROBLEMS_META_PYTHON ="\
     python3-betamax \
     python3-dnspython \
     python3-fastjsonschema \
-    python3-gpiod \
     python3-pillow \
     python3-pint \
     python3-pyzmq \
     python3-scrypt \
     python3-whoosh \
-    python3-xlrd \
 "

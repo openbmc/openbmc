@@ -650,9 +650,9 @@ class QemuRunner:
         if hasattr(self, 'qmp') and self.qmp:
             self.qmp.settimeout(timeout)
             if args is not None:
-                return self.qmp.cmd(command, args)
+                return self.qmp.cmd_raw(command, args)
             else:
-                return self.qmp.cmd(command)
+                return self.qmp.cmd_raw(command)
 
     def run_serial(self, command, raw=False, timeout=60):
         # Returns (status, output) where status is 1 on success and 0 on error

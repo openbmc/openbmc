@@ -27,6 +27,7 @@ RDEPENDS:${PN}-ptest += "\
     python3-pytest \
     python3-pytest-benchmark \
     python3-pytest-cache \
+    python3-statistics \
     python3-unittest-automake-output \
 "
 RDEPENDS:${PN} += "\

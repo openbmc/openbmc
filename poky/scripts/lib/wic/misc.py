@@ -25,7 +25,7 @@ from wic import WicError
 logger = logging.getLogger('wic')
 
 # executable -> recipe pairs for exec_native_cmd
-NATIVE_RECIPES = {"bmaptool": "bmap-tools",
+NATIVE_RECIPES = {"bmaptool": "bmaptool",
                   "dumpe2fs": "e2fsprogs",
                   "grub-mkimage": "grub-efi",
                   "isohybrid": "syslinux",

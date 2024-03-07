@@ -1,4 +1,4 @@
-From 4a2a0a93b469093b60ffd0bec55d33d1e03d4713 Mon Sep 17 00:00:00 2001
+From 83333bc873c2655ff1de161f6b7db930f22f1cea Mon Sep 17 00:00:00 2001
 From: Joe Slater <jslater@windriver.com>
 Date: Thu, 7 Jun 2012 16:37:01 -0700
 Subject: [PATCH] instal libgettextlib.a before removing it
@@ -10,16 +10,15 @@ the operations.
 Upstream-Status: Pending
 
 Signed-off-by: Joe Slater <jslater@windriver.com>
-
 ---
  gettext-tools/gnulib-lib/Makefile.am | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/gettext-tools/gnulib-lib/Makefile.am b/gettext-tools/gnulib-lib/Makefile.am
-index 2126699..d2dd7e4 100644
+index ab729cd..a0d713e 100644
 --- a/gettext-tools/gnulib-lib/Makefile.am
 +++ b/gettext-tools/gnulib-lib/Makefile.am
-@@ -58,6 +58,10 @@ endif
+@@ -58,6 +58,10 @@ AM_CFLAGS = @WARN_CFLAGS@
  # Rules generated and collected by gnulib-tool.
  include Makefile.gnulib
  

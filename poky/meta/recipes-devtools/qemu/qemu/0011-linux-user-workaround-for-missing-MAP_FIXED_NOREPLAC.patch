@@ -40,10 +40,10 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
  create mode 100644 linux-user/mmap-fixed.c
  create mode 100644 linux-user/mmap-fixed.h
 
-Index: qemu-8.2.0/linux-user/elfload.c
+Index: qemu-8.2.1/linux-user/elfload.c
 ===================================================================
---- qemu-8.2.0.orig/linux-user/elfload.c
-+++ qemu-8.2.0/linux-user/elfload.c
+--- qemu-8.2.1.orig/linux-user/elfload.c
++++ qemu-8.2.1/linux-user/elfload.c
 @@ -22,6 +22,7 @@
  #include "qemu/error-report.h"
  #include "target_signal.h"
@@ -65,10 +65,10 @@ Index: qemu-8.2.0/linux-user/elfload.c
      int ret;
  
      if (p == MAP_FAILED) {
-Index: qemu-8.2.0/linux-user/meson.build
+Index: qemu-8.2.1/linux-user/meson.build
 ===================================================================
---- qemu-8.2.0.orig/linux-user/meson.build
-+++ qemu-8.2.0/linux-user/meson.build
+--- qemu-8.2.1.orig/linux-user/meson.build
++++ qemu-8.2.1/linux-user/meson.build
 @@ -14,6 +14,7 @@ linux_user_ss.add(files(
    'linuxload.c',
    'main.c',
@@ -77,10 +77,10 @@ Index: qemu-8.2.0/linux-user/meson.build
    'signal.c',
    'strace.c',
    'syscall.c',
-Index: qemu-8.2.0/linux-user/mmap-fixed.c
+Index: qemu-8.2.1/linux-user/mmap-fixed.c
 ===================================================================
 --- /dev/null
-+++ qemu-8.2.0/linux-user/mmap-fixed.c
++++ qemu-8.2.1/linux-user/mmap-fixed.c
 @@ -0,0 +1,63 @@
 +/*
 + * Workaround for MAP_FIXED_NOREPLACE
@@ -145,10 +145,10 @@ Index: qemu-8.2.0/linux-user/mmap-fixed.c
 +}
 +
 +#endif
-Index: qemu-8.2.0/linux-user/mmap-fixed.h
+Index: qemu-8.2.1/linux-user/mmap-fixed.h
 ===================================================================
 --- /dev/null
-+++ qemu-8.2.0/linux-user/mmap-fixed.h
++++ qemu-8.2.1/linux-user/mmap-fixed.h
 @@ -0,0 +1,39 @@
 +/*
 + * Workaround for MAP_FIXED_NOREPLACE
@@ -189,10 +189,10 @@ Index: qemu-8.2.0/linux-user/mmap-fixed.h
 +#endif /* MAP_FIXED_NOREPLACE */
 +
 +#endif /* MMAP_FIXED_H */
-Index: qemu-8.2.0/linux-user/mmap.c
+Index: qemu-8.2.1/linux-user/mmap.c
 ===================================================================
---- qemu-8.2.0.orig/linux-user/mmap.c
-+++ qemu-8.2.0/linux-user/mmap.c
+--- qemu-8.2.1.orig/linux-user/mmap.c
++++ qemu-8.2.1/linux-user/mmap.c
 @@ -25,6 +25,7 @@
  #include "user-mmap.h"
  #include "target_mman.h"
@@ -201,7 +201,16 @@ Index: qemu-8.2.0/linux-user/mmap.c
  
  #ifdef TARGET_ARM
  #include "target/arm/cpu-features.h"
-@@ -304,9 +305,9 @@ static bool mmap_frag(abi_ulong real_sta
+@@ -273,7 +274,7 @@ int target_mprotect(abi_ulong start, abi
+ static int do_munmap(void *addr, size_t len)
+ {
+     if (reserved_va) {
+-        void *ptr = mmap(addr, len, PROT_NONE,
++        void *ptr =  mmap_fixed_noreplace(addr, len, PROT_NONE,
+                          MAP_FIXED | MAP_ANONYMOUS
+                          | MAP_PRIVATE | MAP_NORESERVE, -1, 0);
+         return ptr == addr ? 0 : -1;
+@@ -319,9 +320,9 @@ static bool mmap_frag(abi_ulong real_sta
           * outside of the fragment we need to map.  Allocate a new host
           * page to cover, discarding whatever else may have been present.
           */
@@ -214,7 +223,7 @@ Index: qemu-8.2.0/linux-user/mmap.c
          if (p != host_start) {
              if (p != MAP_FAILED) {
                  munmap(p, qemu_host_page_size);
-@@ -405,8 +406,9 @@ abi_ulong mmap_find_vma(abi_ulong start,
+@@ -420,8 +421,9 @@ abi_ulong mmap_find_vma(abi_ulong start,
           *  - mremap() with MREMAP_FIXED flag
           *  - shmat() with SHM_REMAP flag
           */
@@ -226,7 +235,7 @@ Index: qemu-8.2.0/linux-user/mmap.c
  
          /* ENOMEM, if host address space has no memory */
          if (ptr == MAP_FAILED) {
-@@ -600,16 +602,16 @@ abi_long target_mmap(abi_ulong start, ab
+@@ -615,16 +617,16 @@ abi_long target_mmap(abi_ulong start, ab
           * especially important if qemu_host_page_size >
           * qemu_real_host_page_size.
           */
@@ -247,7 +256,7 @@ Index: qemu-8.2.0/linux-user/mmap.c
              if (p == MAP_FAILED) {
                  munmap(g2h_untagged(start), host_len);
                  goto fail;
-@@ -734,8 +736,9 @@ abi_long target_mmap(abi_ulong start, ab
+@@ -749,8 +751,9 @@ abi_long target_mmap(abi_ulong start, ab
              len1 = real_last - real_start + 1;
              want_p = g2h_untagged(real_start);
  
@@ -259,23 +268,10 @@ Index: qemu-8.2.0/linux-user/mmap.c
              if (p != want_p) {
                  if (p != MAP_FAILED) {
                      munmap(p, len1);
-@@ -837,9 +840,9 @@ static int mmap_reserve_or_unmap(abi_ulo
-     host_start = g2h_untagged(real_start);
- 
-     if (reserved_va) {
--        void *ptr = mmap(host_start, real_len, PROT_NONE,
--                         MAP_FIXED | MAP_ANONYMOUS
--                         | MAP_PRIVATE | MAP_NORESERVE, -1, 0);
-+        void *ptr = mmap_fixed_noreplace(host_start, real_len, PROT_NONE,
-+                                         MAP_FIXED | MAP_ANONYMOUS
-+                                         | MAP_PRIVATE | MAP_NORESERVE, -1, 0);
-         return ptr == host_start ? 0 : -1;
-     }
-     return munmap(host_start, real_len);
-Index: qemu-8.2.0/linux-user/syscall.c
+Index: qemu-8.2.1/linux-user/syscall.c
 ===================================================================
---- qemu-8.2.0.orig/linux-user/syscall.c
-+++ qemu-8.2.0/linux-user/syscall.c
+--- qemu-8.2.1.orig/linux-user/syscall.c
++++ qemu-8.2.1/linux-user/syscall.c
 @@ -145,6 +145,7 @@
  #include "qapi/error.h"
  #include "fd-trans.h"

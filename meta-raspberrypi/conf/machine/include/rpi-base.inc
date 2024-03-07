@@ -26,9 +26,15 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/gpio-poweroff.dtbo \
     overlays/gpio-shutdown.dtbo \
     overlays/hifiberry-amp.dtbo \
+    overlays/hifiberry-amp100.dtbo \
+    overlays/hifiberry-amp3.dtbo \
+    overlays/hifiberry-amp4pro.dtbo \
     overlays/hifiberry-dac.dtbo \
     overlays/hifiberry-dacplus.dtbo \
     overlays/hifiberry-dacplusadcpro.dtbo \
+    overlays/hifiberry-dacplusdsp.dtbo \
+    overlays/hifiberry-dacplushd.dtbo \
+    overlays/hifiberry-digi-pro.dtbo \
     overlays/hifiberry-digi.dtbo \
     overlays/justboom-both.dtbo \
     overlays/justboom-dac.dtbo \

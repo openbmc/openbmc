@@ -1375,7 +1375,7 @@ This next list, shows the variables associated with a standard SDK:
    Lists packages that make up the target part of the SDK (i.e. the part
    built for the target hardware).
 
--  :term:`SDKPATH`: Defines the
+-  :term:`SDKPATHINSTALL`: Defines the
    default SDK installation path offered by the installation script.
 
 -  :term:`SDK_HOST_MANIFEST`:

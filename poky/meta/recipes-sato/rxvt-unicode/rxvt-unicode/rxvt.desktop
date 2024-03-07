@@ -1,6 +1,6 @@
 [Desktop Entry]
 Version=1.0
-Name=Terminal
+Name=Rxvt Terminal
 Comment=A unicode capable rxvt clone
 Exec=rxvt
 Icon=utilities-terminal

@@ -1,4 +1,4 @@
-From 59402e3a61d14eb7ce8c2019ea1a87ad4bd28605 Mon Sep 17 00:00:00 2001
+From bbb0845c0a79238fb2e84cca41826a0944b6ce7e Mon Sep 17 00:00:00 2001
 From: Anuj Mittal <anuj.mittal@intel.com>
 Date: Thu, 14 Nov 2019 10:13:53 +0800
 Subject: [PATCH] dont setup compiler flags -m32/-m64
@@ -13,13 +13,14 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
  1 file changed, 14 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index c7e3cf3..24486e0 100644
+index 493a43e6d..42dccbdfe 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
-@@ -430,20 +430,6 @@ local rule compile-link-flags ( * )
+@@ -360,20 +360,6 @@ local rule compile-link-flags ( * )
+     compile-link-flags <link>shared/<target-os>$(non-windows) : -fPIC ;
  }
  
- {
+-{
 -    # Handle address-model
 -    compile-link-flags <target-os>aix/<address-model>32 : -maix32 ;
 -    compile-link-flags <target-os>aix/<address-model>64 : -maix64 ;
@@ -33,10 +34,6 @@ index c7e3cf3..24486e0 100644
 -    compile-link-flags <target-os>$(generic-os)/<architecture>$(arch)/<address-model>64 : -m64 ;
 -}
 -
--{
+ {
      # Handle threading
      local rule threading-flags ( * )
-     {
--- 
-2.7.4
-

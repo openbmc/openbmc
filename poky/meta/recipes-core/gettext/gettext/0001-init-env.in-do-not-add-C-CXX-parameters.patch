@@ -1,4 +1,4 @@
-From 9b912a47f790a7b282ec0c2295a188c5d8fb6a7c Mon Sep 17 00:00:00 2001
+From c58c503c532d20883a93ef778327c86dd6de24f6 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 6 Mar 2020 21:04:05 +0000
 Subject: [PATCH] init-env.in: do not add C/CXX parameters

@@ -1,7 +1,7 @@
-From 73efe0ea75c3ac4cb088f300acc3de44d5dd3344 Mon Sep 17 00:00:00 2001
+From 575b848a3b3c14280679db80d0d518922c83d62a Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Fri, 11 Aug 2023 14:20:48 +0800
-Subject: [PATCH] [CMake] Add a variable to control macro
+Subject: [PATCH] Add a variable to control macro
  __PAS_ALWAYS_INLINE_BUT_NOT_INLINE
  https://bugs.webkit.org/show_bug.cgi?id=260065
 
@@ -44,7 +44,7 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  2 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/Source/bmalloc/libpas/src/libpas/pas_utils_prefix.h b/Source/bmalloc/libpas/src/libpas/pas_utils_prefix.h
-index 5d5fb38cddbd..a554f70064eb 100644
+index 5d5fb38c..a554f700 100644
 --- a/Source/bmalloc/libpas/src/libpas/pas_utils_prefix.h
 +++ b/Source/bmalloc/libpas/src/libpas/pas_utils_prefix.h
 @@ -44,7 +44,7 @@ __PAS_BEGIN_EXTERN_C;
@@ -57,7 +57,7 @@ index 5d5fb38cddbd..a554f70064eb 100644
  #else
  #define __PAS_ALWAYS_INLINE_BUT_NOT_INLINE
 diff --git a/Source/cmake/WebKitCompilerFlags.cmake b/Source/cmake/WebKitCompilerFlags.cmake
-index 9b2fecf9a0d3..7cdc2b6afbe0 100644
+index 9b2fecf9..7cdc2b6a 100644
 --- a/Source/cmake/WebKitCompilerFlags.cmake
 +++ b/Source/cmake/WebKitCompilerFlags.cmake
 @@ -453,3 +453,10 @@ endif ()
@@ -71,6 +71,3 @@ index 9b2fecf9a0d3..7cdc2b6afbe0 100644
 +if (WEBKIT_NO_INLINE_HINTS)
 +    add_definitions(-DWEBKIT_NO_INLINE_HINTS)
 +endif ()
--- 
-2.34.1
-

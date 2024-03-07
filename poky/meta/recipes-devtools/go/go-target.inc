@@ -13,9 +13,7 @@ export CGO_CXXFLAGS = "${CXXFLAGS}"
 export CGO_LDFLAGS = "${@ ' '.join(filter(lambda f: not f.startswith('-fdebug-prefix-map'), d.getVar('LDFLAGS').split())) }"
 
 export GOCACHE = "${B}/.cache"
-GO_LDFLAGS = ""
-GO_LDFLAGS:class-nativesdk = " -linkmode external"
-export GO_LDFLAGS
+export GO_LDFLAGS = ""
 export GOBUILDFLAGS = "-gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH -trimpath"
 CC:append:class-nativesdk = " ${SECURITY_NOPIE_CFLAGS}"
 

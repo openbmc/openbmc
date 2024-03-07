@@ -7,9 +7,11 @@ DESCRIPTION = "FUSE (Filesystem in Userspace) is a simple interface for userspac
 HOMEPAGE = "https://github.com/libfuse/libfuse"
 SECTION = "libs"
 LICENSE = "GPL-2.0-only & LGPL-2.0-only"
-LIC_FILES_CHKSUM = "file://GPL2.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
-                    file://LGPL2.txt;md5=4fbd65380cdd255951079008b364516c \
-                    file://LICENSE;md5=a55c12a2d7d742ecb41ca9ae0a6ddc66"
+LIC_FILES_CHKSUM = " \
+    file://GPL2.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+    file://LGPL2.txt;md5=4fbd65380cdd255951079008b364516c \
+    file://LICENSE;md5=a55c12a2d7d742ecb41ca9ae0a6ddc66 \
+"
 
 SRC_URI = "https://github.com/libfuse/libfuse/releases/download/fuse-${PV}/fuse-${PV}.tar.gz \
 "
@@ -25,40 +27,40 @@ CVE_PRODUCT = "fuse_project:fuse"
 inherit meson pkgconfig ptest
 
 SRC_URI += " \
-        file://run-ptest \
+    file://run-ptest \
 "
 
 RDEPENDS:${PN}-ptest += " \
     python3-pytest \
     python3-looseversion \
-    kernel-module-cuse \
     bash \
 "
+RRECOMMENDS:${PN}-ptest += " kernel-module-cuse"
 
 do_install_ptest() {
-        install -d ${D}${PTEST_PATH}/test
-        install -d ${D}${PTEST_PATH}/example
-        install -d ${D}${PTEST_PATH}/util
-        cp -rf ${S}/test/* ${D}${PTEST_PATH}/test/
+    install -d ${D}${PTEST_PATH}/test
+    install -d ${D}${PTEST_PATH}/example
+    install -d ${D}${PTEST_PATH}/util
+    cp -rf ${S}/test/* ${D}${PTEST_PATH}/test/
 
-        example_excutables=`find ${B}/example -type f -executable`
-        util_excutables=`find ${B}/util -type f -executable`
-        test_excutables=`find ${B}/test -type f -executable`
+    example_excutables=`find ${B}/example -type f -executable`
+    util_excutables=`find ${B}/util -type f -executable`
+    test_excutables=`find ${B}/test -type f -executable`
 
-        for e in $example_excutables
-        do
-            cp -rf $e  ${D}${PTEST_PATH}/example/
-         done
+    for e in $example_excutables
+    do
+        cp -rf $e  ${D}${PTEST_PATH}/example/
+    done
 
-        for e in $util_excutables
-        do
-            cp -rf $e  ${D}${PTEST_PATH}/util/
-        done
+    for e in $util_excutables
+    do
+        cp -rf $e  ${D}${PTEST_PATH}/util/
+    done
 
-        for e in $test_excutables
-        do
-            cp -rf $e  ${D}${PTEST_PATH}/test
-        done
+    for e in $test_excutables
+    do
+        cp -rf $e  ${D}${PTEST_PATH}/test
+    done
 }
 
 DEPENDS = "udev"

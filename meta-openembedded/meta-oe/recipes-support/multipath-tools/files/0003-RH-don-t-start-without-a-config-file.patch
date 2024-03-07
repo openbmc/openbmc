@@ -1,0 +1,117 @@
+From de8ee3480ec7479ed014c197a9d747403f6e0237 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 23 Nov 2018 17:25:15 +0800
+Subject: [PATCH 03/12] RH: don't start without a config file
+
+If /etc/multipath.conf doesn't exist, don't start multipathd and blacklist
+all devices when running multipath.  A completely blank configuration file
+is almost never what users want.  Also, people may have the multipath
+packages installed but don't want to use them.  This patch provides a
+simple way to disable multipath.  Simply removing or renaming
+/etc/multipath.conf will keep multipath from doing anything.
+
+Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
+
+Upstream-Status: Pending
+
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+
+Rebase to 0.9.8
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ libmultipath/config.c            | 18 ++++++++++++++++++
+ libmultipath/config.h            |  1 +
+ multipath/multipath.rules.in     |  1 +
+ multipathd/multipathd.8.in       |  2 ++
+ multipathd/multipathd.service.in |  1 +
+ 5 files changed, 23 insertions(+)
+
+diff --git a/libmultipath/config.c b/libmultipath/config.c
+index 83fa7369..8a3a8f37 100644
+--- a/libmultipath/config.c
++++ b/libmultipath/config.c
+@@ -26,6 +26,7 @@
+ #include "mpath_cmd.h"
+ #include "propsel.h"
+ #include "foreign.h"
++#include "version.h"
+ 
+ /*
+  * We don't support re-initialization after
+@@ -959,6 +960,23 @@ int _init_config (const char *file, struct config *conf)
+ 		}
+ 		factorize_hwtable(conf->hwtable, builtin_hwtable_size, file);
+ 		validate_pctable(conf->overrides, 0, file);
++	} else {
++		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
++		if (conf->blist_devnode == NULL) {
++			conf->blist_devnode = vector_alloc();
++			if (!conf->blist_devnode) {
++				conf->blist_devnode = vector_alloc();
++				if (!conf->blist_devnode) {
++					condlog(0, "cannot allocate blacklist\n");
++					goto out;
++				}
++			}
++			if (store_ble(conf->blist_devnode, strdup(".*"),
++				ORIGIN_NO_CONFIG)) {
++				condlog(0, "cannot store default no-config blacklist\n");
++				goto out;
++			}
++		}
+ 	}
+ 
+ 	conf->processed_main_config = 1;
+diff --git a/libmultipath/config.h b/libmultipath/config.h
+index 384193ab..158cebf0 100644
+--- a/libmultipath/config.h
++++ b/libmultipath/config.h
+@@ -10,6 +10,7 @@
+ 
+ #define ORIGIN_DEFAULT 0
+ #define ORIGIN_CONFIG  1
++#define ORIGIN_NO_CONFIG 2
+ 
+ enum devtypes {
+ 	DEV_NONE,
+diff --git a/multipath/multipath.rules.in b/multipath/multipath.rules.in
+index 780bf852..2c518378 100644
+--- a/multipath/multipath.rules.in
++++ b/multipath/multipath.rules.in
+@@ -9,6 +9,7 @@ IMPORT{cmdline}="nompath"
+ ENV{nompath}=="?*", GOTO="end_mpath"
+ IMPORT{cmdline}="multipath"
+ ENV{multipath}=="off", GOTO="end_mpath"
++TEST!="/etc/multipath.conf", GOTO="end_mpath"
+ 
+ ENV{DEVTYPE}!="partition", GOTO="test_dev"
+ IMPORT{parent}="DM_MULTIPATH_DEVICE_PATH"
+diff --git a/multipathd/multipathd.8.in b/multipathd/multipathd.8.in
+index f1cab3ff..5ae21db1 100644
+--- a/multipathd/multipathd.8.in
++++ b/multipathd/multipathd.8.in
+@@ -49,6 +49,8 @@ map regains its maximum performance and redundancy.
+ With the \fB-k\fR option, \fBmultipathd\fR acts as a client utility that
+ sends commands to a running instance of the multipathd daemon (see
+ \fBCOMMANDS\fR below).
++
++In this Linux distribution, multipathd does not run unless a /etc/multipath.conf file exists.
+ .
+ .
+ .\" ----------------------------------------------------------------------------
+diff --git a/multipathd/multipathd.service.in b/multipathd/multipathd.service.in
+index 6d03ff71..0cd85102 100644
+--- a/multipathd/multipathd.service.in
++++ b/multipathd/multipathd.service.in
+@@ -5,6 +5,7 @@ Before=local-fs-pre.target blk-availability.service shutdown.target
+ Wants=systemd-udevd-kernel.socket @MODPROBE_UNIT@
+ After=systemd-udevd-kernel.socket @MODPROBE_UNIT@
+ After=multipathd.socket systemd-remount-fs.service
++ConditionPathExists=/etc/multipath.conf
+ Before=initrd-cleanup.service
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-- 
+2.25.1
+

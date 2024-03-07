@@ -1,5 +1,4 @@
 drd/tests/annotate_sem
-drd/tests/boost_thread
 gdbserver_tests/hgtls
 helgrind/tests/hg05_race2
 helgrind/tests/tc20_verifywrap
@@ -15,7 +14,6 @@ memcheck/tests/atomic_incs
 memcheck/tests/bug464969_d_demangle
 memcheck/tests/cxx17_aligned_new
 memcheck/tests/demangle
-memcheck/tests/linux/timerfd-syscall
 memcheck/tests/long_namespace_xml
 memcheck/tests/mismatches
 memcheck/tests/mismatches_xml

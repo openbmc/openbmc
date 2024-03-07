@@ -1,4 +1,4 @@
-From 3f05b9418c88bbb83c08b57cc5529b006f26fff4 Mon Sep 17 00:00:00 2001
+From 878e51f82100c698236fda0e069e14ea9249350c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 8 Jan 2020 18:22:46 +0100
 Subject: [PATCH] gio/tests/resources.c: comment out a build host-only test
@@ -8,7 +8,6 @@ not cross-compatible (hardcodes ld and objcopy).
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  gio/tests/resources.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

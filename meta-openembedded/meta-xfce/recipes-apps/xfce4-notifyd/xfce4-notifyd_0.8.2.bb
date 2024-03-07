@@ -10,9 +10,11 @@ DEPENDS = " \
     libxfce4ui \
     xfconf \
     xfce4-panel \
+    python3-packaging-native \
 "
 
 inherit xfce-app
+inherit python3native
 
 SRC_URI:append = " file://xfce4-notifyd-get-var-abs-path.patch"
 

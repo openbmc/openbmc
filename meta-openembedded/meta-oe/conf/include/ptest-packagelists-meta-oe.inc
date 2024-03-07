@@ -18,6 +18,7 @@ PTESTS_FAST_META_OE = "\
     leveldb \
     libcereal \
     libee \
+    libgpiod \
     libio-pty-perl \
     libmanette \
     librelp \
@@ -62,7 +63,6 @@ PTESTS_PROBLEMS_META_OE ="\
     jemalloc \
     keyutils \
     libdbi-perl \
-    libgpiod \
     libjcat \
     libteam \
     libxml++ \

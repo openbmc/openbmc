@@ -1,21 +1,19 @@
-From 780fd27ea6f7f2c446c46a7a5e26d94106c67efd Mon Sep 17 00:00:00 2001
+From ba079b8d6a50796db41bb0ddf4c22bfe022ef898 Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Sun, 20 Nov 2016 15:04:52 +0000
-Subject: [PATCH] Add support for RISC-V.
+Subject: [PATCH 1/5] Add support for RISC-V.
 
 The architecture is sufficiently similar to aarch64 that simply
 extending the existing aarch64 macro works.
 ---
-Upstream-Status: Pending
-
- src/include/storage/s_lock.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/include/storage/s_lock.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/src/include/storage/s_lock.h b/src/include/storage/s_lock.h
-index 4d3ffc7..22e27bf 100644
+index c9fa84c..9b491e8 100644
 --- a/src/include/storage/s_lock.h
 +++ b/src/include/storage/s_lock.h
-@@ -317,11 +317,12 @@ tas(volatile slock_t *lock)
+@@ -252,11 +252,12 @@ spin_delay(void)
  
  /*
   * On ARM and ARM64, we use __sync_lock_test_and_set(int *, int) if available.
@@ -24,21 +22,20 @@ index 4d3ffc7..22e27bf 100644
   * We use the int-width variant of the builtin because it works on more chips
   * than other widths.
   */
--#if defined(__arm__) || defined(__arm) || defined(__aarch64__) || defined(__aarch64)
-+#if defined(__arm__) || defined(__arm) || defined(__aarch64__) || defined(__aarch64) || defined(__riscv)
+-#if defined(__arm__) || defined(__arm) || defined(__aarch64__)
++#if defined(__arm__) || defined(__arm) || defined(__aarch64__) || defined(__riscv)
  #ifdef HAVE_GCC__SYNC_INT32_TAS
  #define HAS_TEST_AND_SET
  
-@@ -355,8 +356,7 @@ spin_delay(void)
+@@ -290,7 +291,7 @@ spin_delay(void)
  
- #endif	 /* __aarch64__ || __aarch64 */
+ #endif	 /* __aarch64__ */
  #endif	 /* HAVE_GCC__SYNC_INT32_TAS */
--#endif	 /* __arm__ || __arm || __aarch64__ || __aarch64 */
--
-+#endif	 /* __arm__ || __arm || __aarch64__ || __aarch64 || __riscv */
+-#endif	 /* __arm__ || __arm || __aarch64__ */
++#endif	 /* __arm__ || __arm || __aarch64__ || __riscv */
+ 
  
  /* S/390 and S/390x Linux (32- and 64-bit zSeries) */
- #if defined(__s390__) || defined(__s390x__)
 -- 
-2.34.1
+2.25.1
 

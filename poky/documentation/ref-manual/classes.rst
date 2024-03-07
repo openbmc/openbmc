@@ -1297,6 +1297,11 @@ The tests you can list with the :term:`WARN_QA` and
    paths to locations on the build host were used. Using such paths
    might result in host contamination of the build output.
 
+-  ``cve_status_not_in_db:`` Checks for each component if CVEs that are ignored
+   via :term:`CVE_STATUS`, that those are (still) reported for this component
+   in the NIST database. If not, a warning is printed. This check is disabled
+   by default.
+
 -  ``debug-deps:`` Checks that all packages except ``-dbg`` packages
    do not depend on ``-dbg`` packages, which would cause a packaging
    bug.

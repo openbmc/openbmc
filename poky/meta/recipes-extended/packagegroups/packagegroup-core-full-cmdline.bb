@@ -42,7 +42,7 @@ RDEPENDS:packagegroup-core-full-cmdline-utils = "\
     less \
     makedevs \
     mc \
-    mc-fish \
+    mc-shell \
     mc-helpers \
     mc-helpers-perl \
     ncurses \

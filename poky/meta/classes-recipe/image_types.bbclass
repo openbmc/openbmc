@@ -133,8 +133,8 @@ IMAGE_CMD:erofs-lz4hc = "mkfs.erofs -zlz4hc ${EXTRA_IMAGECMD} ${IMGDEPLOYDIR}/${
 # can (e.g. device files, symlinks, etc.) and therefore it not suitable for all
 # use cases
 oe_mkvfatfs () {
-    mkfs.vfat $@ -C ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.vfat ${ROOTFS_SIZE}
-    mcopy -i "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.vfat" -vsmpQ ${IMAGE_ROOTFS}/* ::/
+    mkfs.vfat $@ -C ${IMGDEPLOYDIR}/${IMAGE_NAME}.vfat ${ROOTFS_SIZE}
+    mcopy -i "${IMGDEPLOYDIR}/${IMAGE_NAME}.vfat" -vsmpQ ${IMAGE_ROOTFS}/* ::/
 }
 
 IMAGE_CMD:vfat = "oe_mkvfatfs ${EXTRA_IMAGECMD}"
@@ -363,7 +363,7 @@ CONVERSION_DEPENDS_zip = "zip-native"
 CONVERSION_DEPENDS_7zip = "p7zip-native"
 CONVERSION_DEPENDS_zst = "zstd-native"
 CONVERSION_DEPENDS_sum = "mtd-utils-native"
-CONVERSION_DEPENDS_bmap = "bmap-tools-native"
+CONVERSION_DEPENDS_bmap = "bmaptool-native"
 CONVERSION_DEPENDS_u-boot = "u-boot-tools-native"
 CONVERSION_DEPENDS_vmdk = "qemu-system-native"
 CONVERSION_DEPENDS_vdi = "qemu-system-native"

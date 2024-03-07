@@ -150,6 +150,9 @@ class Git(FetchMethod):
     def supports_checksum(self, urldata):
         return False
 
+    def cleanup_upon_failure(self):
+        return False
+
     def urldata_init(self, ud, d):
         """
         init git specific variable within url data

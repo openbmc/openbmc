@@ -1,4 +1,4 @@
-From c8c223045821cac97f798cfa63f19853621a8a2a Mon Sep 17 00:00:00 2001
+From 8ae2e9c2a04e089306693a021149dc6b7d1bd679 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 12 Jun 2015 17:08:46 +0300
 Subject: [PATCH] Remove the warning about deprecated paths in schemas
@@ -9,7 +9,6 @@ messages, and meta/lib/oe/rootfs.py complaints about them.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  gio/glib-compile-schemas.c | 13 -------------
  1 file changed, 13 deletions(-)

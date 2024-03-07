@@ -1,4 +1,4 @@
-From 95398982f4a120147a98a27e176facf6d95b2bf7 Mon Sep 17 00:00:00 2001
+From a180f6821f81c65e320be0cebac72b4dcf86342e Mon Sep 17 00:00:00 2001
 From: Adrian Perez de Castro <aperez@igalia.com>
 Date: Thu, 2 Jun 2022 11:19:06 +0300
 Subject: [PATCH] FELightningNEON.cpp fails to build, NEON fast path seems
@@ -33,7 +33,6 @@ left for a follow-up fix.
 
 Upstream-Status: Submitted [https://github.com/WebKit/WebKit/pull/1233]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  .../cpu/arm/filters/FELightingNEON.cpp        |  4 +-
  .../graphics/cpu/arm/filters/FELightingNEON.h | 52 +++++++++----------

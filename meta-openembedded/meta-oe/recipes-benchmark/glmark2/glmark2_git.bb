@@ -17,6 +17,7 @@ SRC_URI = " \
     git://github.com/glmark2/glmark2.git;protocol=https;branch=master \
     file://0001-fix-dispmanx-build.patch \
     file://0002-run-dispmanx-fullscreen.patch \
+    file://0003-GLVisualConfig-By-default-don-t-care-about-the-stenc.patch \
 "
 SRCREV = "42e3d8fe3aa88743ef90348138f643f7b04a9237"
 
