@@ -1,0 +1,268 @@
+{
+    "entries": [
+        {
+            "attribute_name": "host1_boot_config",
+            "displayName": "Host 1 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 1",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        },
+        {
+            "attribute_name": "host2_boot_config",
+            "displayName": "Host 2 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 2",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        },
+        {
+            "attribute_name": "host3_boot_config",
+            "displayName": "Host 3 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 3",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        },
+        {
+            "attribute_name": "host4_boot_config",
+            "displayName": "Host 4 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 4",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        },
+        {
+            "attribute_name": "host5_boot_config",
+            "displayName": "Host 5 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 5",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        },
+        {
+            "attribute_name": "host6_boot_config",
+            "displayName": "Host 6 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 6",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        },
+        {
+            "attribute_name": "host7_boot_config",
+            "displayName": "Host 7 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 7",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        },
+        {
+            "attribute_name": "host8_boot_config",
+            "displayName": "Host 8 Boot Config Setting",
+            "helpText": "This is the boot configuration setting for Host 8",
+            "boot_config_type": "Default",
+            "supported_ordered_and_fail_through_modes": "OrderedAndLimitedFailThrough",
+            "minimum_number_of_boot_sources_settings": 2,
+            "maximum_number_of_boot_sources_settings": 6,
+            "possible_boot_source_settings": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "value_names": [
+                "BootSource_USB",
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_Other",
+                "BootSource_None"
+            ],
+            "default_order_and_fail_through_mode": "OrderedAndLimitedFailThrough",
+            "default_boot_source_settings": [
+                "BootSource_Network",
+                "BootSource_HDD",
+                "BootSource_CDROM",
+                "BootSource_USB",
+                "BootSource_Other"
+            ]
+        }
+    ]
+}
