@@ -1,0 +1,2 @@
+CPU_CRIT_TGT = ""
+MEM_CRIT_TGT = ""
