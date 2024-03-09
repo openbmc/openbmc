@@ -17,8 +17,8 @@ def fb_get_consoles(d):
         [ f"ttyS{i}" for i in sorted(set(range(0,16)).difference(skipped)) ]
 
     return " ".join(consoles[:hosts])
+fb_get_consoles[vardeps] += "OBMC_HOST_INSTANCES OBMC_CONSOLE_HOST_TTY OBMC_CONSOLE_TTY_SKIP"
 
 OBMC_CONSOLE_TTYS = "${@fb_get_consoles(d)}"
 OBMC_CONSOLE_TTYS:fb-nohost = ""
-
-
+OBMC_CONSOLE_TTYS[vardeps] += "fb_get_consoles"
