@@ -85,6 +85,10 @@ INIT_MANAGER = "systemd"
 # /root, but we should switch it back (and maybe adjust in another commit).
 ROOT_HOME = "/home/root"
 
+# We want to persist /var/log, which is likely to be used for
+# obmc-console and/or journald.
+VOLATILE_LOG_DIR = "no"
+
 DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
         bluez5 \
         ldconfig \
