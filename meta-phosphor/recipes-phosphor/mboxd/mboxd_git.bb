@@ -22,6 +22,7 @@ SYSTEMD_SUBSTITUTIONS += "WINDOW_NUM:${MBOXD_WINDOW_NUM}:${PN}.service"
 SYSTEMD_SERVICE:${PN} += "mboxd.service"
 SYSTEMD_SERVICE:${PN} += "mboxd-reload@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK[vardeps] += "OBMC_HOST_INSTANCES"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-systemd

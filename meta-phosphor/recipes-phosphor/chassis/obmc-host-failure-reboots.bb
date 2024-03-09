@@ -7,6 +7,7 @@ PR = "r1"
 
 SYSTEMD_SERVICE:${PN} += "${TMPL}"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'LINK_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK[vardeps] += "OBMC_HOST_INSTANCES"
 
 inherit obmc-phosphor-systemd
 

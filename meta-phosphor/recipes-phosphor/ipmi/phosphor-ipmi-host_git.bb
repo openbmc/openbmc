@@ -116,6 +116,7 @@ SOFT_SVC = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 SOFT_TGTFMT = "obmc-host-shutdown@{0}.target"
 SOFT_FMT = "../${SOFT_SVC}:${SOFT_TGTFMT}.requires/${SOFT_SVC}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK[vardeps] += "OBMC_HOST_INSTANCES"
 
 #Collect all hardcoded sensor yamls from different recipes and
 #merge all of them with sensor.yaml.

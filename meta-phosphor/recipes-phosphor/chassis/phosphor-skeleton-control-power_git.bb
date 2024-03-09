@@ -16,6 +16,7 @@ OBMC_CONTROL_INST = "org.openbmc.control.Power@{0}.service"
 OBMC_CONTROL_SVC = "org.openbmc.control.Power@.service"
 OBMC_CONTROL_FMT = "../${OBMC_CONTROL_SVC}:multi-user.target.wants/${OBMC_CONTROL_INST}"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'OBMC_CONTROL_FMT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK[vardeps] += "OBMC_CHASSIS_INSTANCES"
 
 SYSTEMD_SERVICE:${PN} += " \
         phosphor-wait-power-on@.service \

@@ -44,6 +44,7 @@ SYSTEMD_LINK:${PN} += "../obmc-led-group-start@.service:multi-user.target.wants/
 STATES = "start stop"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'FMT', 'CHASSIS_TARGETS', 'STATES')}"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'CHASSIS_LED_BLACKOUT_FMT', 'OBMC_CHASSIS_INSTANCES' )}"
+SYSTEMD_LINK[vardeps] += "OBMC_CHASSIS_INSTANCES"
 # Install the override to set up a Conflicts relation
 SYSTEMD_OVERRIDE:${PN} += "bmc_booted.conf:obmc-led-group-start@bmc_booted.service.d/bmc_booted.conf"
 
