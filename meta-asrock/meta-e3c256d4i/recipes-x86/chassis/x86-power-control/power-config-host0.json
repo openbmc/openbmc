@@ -7,16 +7,25 @@
             "Polarity": "ActiveLow"
         },
         {
+            // See below for why this is disabled instead of using NMI_BTN_N
             "Name" : "NMIButton",
-            "LineName" : "NMI_BTN_N",
+            "LineName" : "",
             "Type" : "GPIO",
             "Polarity": "ActiveLow"
         },
         {
+            // Some revisions of the e3c256d4i board have a hardware bug that
+            // breaks the BMC_NMI line (asserting it doesn't actually trigger an
+            // NMI on the host), but as a workaround treating the NMI_BTN_N line
+            // (normally the NMI button input) instead as an output and driving
+            // it low will actually do it.  Since there's (AFAIK) no actual
+            // physical button or connector for one available on the board
+            // anyway, making the button input unusable isn't a big loss, and
+            // the hack works on boards both with and without the bug.
             "Name" : "NMIOut",
-            "LineName" : "BMC_NMI",
+            "LineName" : "NMI_BTN_N",
             "Type" : "GPIO",
-            "Polarity": "ActiveHigh"
+            "Polarity": "ActiveLow"
         },
         {
             "Name" : "PostComplete",
