@@ -3,6 +3,9 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 inherit obmc-phosphor-systemd systemd
 
 SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
+            file://configure-nic-mctp-endpoint.sh \
+            file://setup-nic-endpoint-slot@.service \
+            file://remove-nic-endpoint-slot@.service \
             file://set-button-sled.service \
             file://probe-slot-device@.service \
             file://probe-slot-device \
@@ -20,6 +23,8 @@ SYSTEMD_SERVICE:${PN} += " \
     probe-slot-device@.service \
     rescan-fru-device@.service \
     slot-hot-plug@.service \
+    setup-nic-endpoint-slot@.service \
+    remove-nic-endpoint-slot@.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -32,7 +37,11 @@ do_install:append:() {
     install -m 0644 ${WORKDIR}/probe-slot-device@.service ${D}${systemd_system_unitdir}/probe-slot-device@.service
     install -m 0644 ${WORKDIR}/rescan-fru-device@.service ${D}${systemd_system_unitdir}/rescan-fru-device@.service
     install -m 0644 ${WORKDIR}/slot-hot-plug@.service ${D}${systemd_system_unitdir}/slot-hot-plug@.service
+    install -m 0644 ${WORKDIR}/setup-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/remove-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${WORKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/rescan-fru-device ${D}${libexecdir}/${PN}/
+    install -d ${D}/${bindir}
+    install -m 0755 ${WORKDIR}/configure-nic-mctp-endpoint.sh ${D}/${bindir}/
 }

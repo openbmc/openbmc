@@ -101,11 +101,13 @@
         "Name": "PRSNT_NIC0_N",
         "ChipId": "0",
         "GpioNum": 165,
-        "EventMon": "FALLING",
+        "EventMon": "BOTH",
         "Targets": {
+            "RISING": ["remove-nic-endpoint-slot@1.service"],
             "FALLING": [
                 "obmc-chassis-powercycle@1.target",
-                "obmc-chassis-powercycle@2.target"
+                "obmc-chassis-powercycle@2.target",
+                "setup-nic-endpoint-slot@1.service"
             ]
         },
         "Continue": true
@@ -114,11 +116,13 @@
         "Name": "PRSNT_NIC1_N",
         "ChipId": "0",
         "GpioNum": 32,
-        "EventMon": "FALLING",
+        "EventMon": "BOTH",
         "Targets": {
+            "RISING": ["remove-nic-endpoint-slot@2.service"],
             "FALLING": [
                 "obmc-chassis-powercycle@3.target",
-                "obmc-chassis-powercycle@4.target"
+                "obmc-chassis-powercycle@4.target",
+                "setup-nic-endpoint-slot@2.service"
             ]
         },
         "Continue": true
@@ -127,11 +131,13 @@
         "Name": "PRSNT_NIC2_N",
         "ChipId": "0",
         "GpioNum": 33,
-        "EventMon": "FALLING",
+        "EventMon": "BOTH",
         "Targets": {
+            "RISING": ["remove-nic-endpoint-slot@3.service"],
             "FALLING": [
                 "obmc-chassis-powercycle@5.target",
-                "obmc-chassis-powercycle@6.target"
+                "obmc-chassis-powercycle@6.target",
+                "setup-nic-endpoint-slot@3.service"
             ]
         },
         "Continue": true
@@ -140,11 +146,13 @@
         "Name": "PRSNT_NIC3_N",
         "ChipId": "0",
         "GpioNum": 99,
-        "EventMon": "FALLING",
+        "EventMon": "BOTH",
         "Targets": {
+            "RISING": ["remove-nic-endpoint-slot@3.service"],
             "FALLING": [
                 "obmc-chassis-powercycle@7.target",
-                "obmc-chassis-powercycle@8.target"
+                "obmc-chassis-powercycle@8.target",
+                "setup-nic-endpoint-slot@4.service"
             ]
         },
         "Continue": true

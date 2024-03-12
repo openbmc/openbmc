@@ -1,0 +1,8 @@
+[Unit]
+Description=Remove MCTP endpoint for Slot%i NIC
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/configure-nic-mctp-endpoint.sh remove %i
+SyslogIdentifier=remove-nic-endpoint-slot%i
+
