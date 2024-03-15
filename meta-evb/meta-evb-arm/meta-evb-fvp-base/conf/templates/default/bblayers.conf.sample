@@ -1,0 +1,20 @@
+# LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+LCONF_VERSION = "8"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-arm/meta-arm \
+  ##OEROOT##/meta-arm/meta-arm-toolchain \
+  ##OEROOT##/meta-arm/meta-arm-bsp \
+  ##OEROOT##/meta-evb \
+  ##OEROOT##/meta-evb/meta-evb-arm/meta-evb-fvp-base \
+"
+
