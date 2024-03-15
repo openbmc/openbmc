@@ -18,16 +18,3 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-hpe/meta-gxp \
   ##OEROOT##/meta-hpe/meta-dl360-g11 \
   "
-BBLAYERS_NON_REMOVABLE ?= " \
-  ##OEROOT##/meta \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-perl \
-  ##OEROOT##/meta-openembedded/meta-python \
-  ##OEROOT##/meta-openembedded/meta-webserver \
-  ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-hpe \
-  ##OEROOT##/meta-hpe/meta-common \
-  ##OEROOT##/meta-hpe/meta-gxp \
-  ##OEROOT##/meta-hpe/meta-dl360-g11 \
-  "
