@@ -49,7 +49,7 @@ RDEPENDS:${PN}-kudo-system = " \
 SUMMARY:${PN}-kudo-fw = "kudo Firmware"
 RDEPENDS:${PN}-kudo-fw = " \
     kudo-fw \
-    kudo-bios-update \
+    virtual/bios-update \
     kudo-bmc-update \
     kudo-cpld-update \
     kudo-scp-update \
