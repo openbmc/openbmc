@@ -4,14 +4,6 @@ require conf/distro/include/phosphor-pkg-tweaks.inc
 # Match the distro codename from upstream poky.
 DISTRO_CODENAME ?= "scarthgap"
 
-# Override these in poky based distros
-POKY_DEFAULT_DISTRO_FEATURES = "opengl ptest multiarch wayland vulkan"
-POKY_DEFAULT_EXTRA_RDEPENDS = "packagegroup-core-boot"
-POKY_DEFAULT_EXTRA_RRECOMMENDS = "kernel-module-af-packet"
-
-DISTRO_EXTRA_RDEPENDS += " ${POKY_DEFAULT_EXTRA_RDEPENDS}"
-DISTRO_EXTRA_RRECOMMENDS += " ${POKY_DEFAULT_EXTRA_RRECOMMENDS}"
-
 DISTROOVERRIDES .= ":openbmc-phosphor"
 
 TCLIBCAPPEND = ""
