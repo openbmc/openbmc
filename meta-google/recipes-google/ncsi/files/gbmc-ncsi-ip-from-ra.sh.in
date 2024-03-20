@@ -60,6 +60,8 @@ w=60
 while true; do
   start=$SECONDS
   while read -r line; do
+    # `script` terminates all lines with a CRLF, remove it
+    line="${line:0:-1}"
     if [ -z "$line" ]; then
       hextet=
       pfx=
@@ -87,7 +89,7 @@ while true; do
       set_net || true
       set_host || true
     fi
-  done < <(rdisc6 -d -m "$NCSI_IF" -w $(( w * 1000 )) 2>/dev/null)
+  done < <(exec script -q -c "rdisc6 -d -m $NCSI_IF -w $(( w * 1000 ))" /dev/null 2>/dev/null)
   # If rdisc6 exits early we still want to wait the full `w` time before
   # starting again.
   (( timeout = start + w - SECONDS ))
