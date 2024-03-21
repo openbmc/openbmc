@@ -46,6 +46,7 @@ RDEPENDS:${PN}-system = " \
         entity-manager \
         ipmitool \
         srvcfg-manager \
+        phosphor-state-manager-bmc \
         ${RDEPENDS_PN_SYSTEM_EXTRAS} \
         "
 RDEPENDS_PN_SYSTEM_EXTRAS = ""
