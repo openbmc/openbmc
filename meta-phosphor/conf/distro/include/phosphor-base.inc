@@ -32,18 +32,20 @@ https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
 CONNECTIVITY_CHECK_URIS ?= "https://yoctoproject.org/connectivity.html"
 
 SANITY_TESTED_DISTROS ?= " \
-            poky-2.4 \n \
-            poky-2.5 \n \
-            ubuntu-15.04 \n \
-            ubuntu-16.04 \n \
-            ubuntu-16.10 \n \
-            ubuntu-17.04 \n \
-            fedora-26 \n \
-            centos-7 \n \
-            debian-8 \n \
-            debian-9 \n \
-            opensuse-42.1 \n \
-            opensuse-42.2 \n \
+            poky-4.2 \n \
+            poky-4.3 \n \
+            ubuntu-18.04 \n \
+            ubuntu-20.04 \n \
+            ubuntu-22.04 \n \
+            ubuntu-23.04 \n \
+            fedora-38 \n \
+            centosstream-8 \n \
+            debian-11 \n \
+            debian-12 \n \
+            opensuseleap-15.4 \n \
+            almalinux-8.8 \n \
+            almalinux-9.2 \n \
+            rocky-9 \n \
             "
 #
 # OELAYOUT_ABI allows us to notify users when the format of TMPDIR changes in
