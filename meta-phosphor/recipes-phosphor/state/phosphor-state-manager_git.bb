@@ -79,7 +79,7 @@ DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
 DEPENDS += "libgpiod"
 
-RDEPENDS:${PN}-chassis += "bash"
+RDEPENDS:${PN}-bmc += "bash"
 RDEPENDS:${PN}-host += "bash"
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
@@ -105,10 +105,9 @@ SYSTEMD_SERVICE:${PN}-chassis += "phosphor-set-chassis-transition-to-off@.servic
 
 SYSTEMD_SERVICE:${PN}-chassis-poweron-log += "phosphor-create-chassis-poweron-log@.service"
 
-FILES:${PN}-chassis += "${bindir}/obmcutil"
-
 FILES:${PN}-bmc = "${bindir}/phosphor-bmc-state-manager"
 FILES:${PN}-bmc += "${sysconfdir}/phosphor-systemd-target-monitor/phosphor-service-monitor-default.json"
+FILES:${PN}-bmc += "${bindir}/obmcutil"
 DBUS_SERVICE:${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 DBUS_SERVICE:${PN}-bmc += "obmc-bmc-service-quiesce@.target"
 
