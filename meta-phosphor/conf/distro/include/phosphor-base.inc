@@ -51,8 +51,7 @@ SANITY_TESTED_DISTROS ?= " \
 # that breaks the format and have been previously discussed on the mailing list
 # with general agreement from the core team.
 #
-
-OELAYOUT_ABI = "12"
+OELAYOUT_ABI = "15"
 
 # QA check settings - a little stricter than the OE-Core defaults
 WARN_TO_ERROR_QA = "already-stripped compile-host-path install-host-path \
