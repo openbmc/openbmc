@@ -12,7 +12,6 @@ DEPENDS:append:ibm-ac-server = " power-sequencer"
 DEPENDS:append:p10bmc = " power-sequencer"
 
 PACKAGECONFIG:append:ibm-ac-server = " monitor"
-PACKAGECONFIG:append:swift = " monitor"
 PACKAGECONFIG:append:p10bmc = " monitor-ng"
 PACKAGECONFIG:append:system1 = " monitor-ng"
 

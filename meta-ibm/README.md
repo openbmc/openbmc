@@ -32,7 +32,7 @@ Server with up to 6 NVIDIA Tesla GPUs. More information can be found
 [here](https://www.ibm.com/us-en/marketplace/power-systems-ac922).
 
 In addition to witherspoon, this layer contains additional machine
-configurations such as swift. The default machine target is witherspoon,
+configurations such as p10bmc. The default machine target is witherspoon,
 so in order to build a different configuration, or to build witherspoon
 after building a different one, set the MACHINE environment to the desired
 configuration name (see the conf/machine/ subdirectory for available options):
@@ -45,7 +45,7 @@ Then build:
 
 Example:
 
-    export MACHINE=swift
+    export MACHINE=p10bmc
     bitbake obmc-phosphor-image
     bitbake phosphor-logging
 

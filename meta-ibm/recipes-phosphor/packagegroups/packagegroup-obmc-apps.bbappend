@@ -39,7 +39,6 @@ RDEPENDS:${PN}-extras:remove:p10bmc = "obmc-ikvm liberation-fonts uart-render-co
 RDEPENDS:${PN}-extras:append:witherspoon-tacoma = " pldm srvcfg-manager biosconfig-manager phosphor-post-code-manager phosphor-host-postd kexec-tools makedumpfile kdump vmcore-dmesg debug-trigger libmctp"
 RDEPENDS:${PN}-extras:remove:witherspoon-tacoma = "obmc-ikvm liberation-fonts uart-render-controller"
 RDEPENDS:${PN}-extras:append:sbp1 = " phosphor-ipmi-ipmb "
-RDEPENDS:${PN}-extras:remove:swift = "obmc-ikvm"
 
 RDEPENDS:${PN}-software:append:ibm-ac-server = " phosphor-software-manager-sync"
 RDEPENDS:${PN}-software:append:p10bmc = " phosphor-software-manager-usb"

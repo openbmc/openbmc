@@ -1,5 +1,4 @@
 #MACHINE ?= "p10bmc"
-#MACHINE ?= "swift"
 MACHINE ??= "witherspoon"
 DISTRO ?= "openbmc-openpower"
 PACKAGE_CLASSES ?= "package_ipk"

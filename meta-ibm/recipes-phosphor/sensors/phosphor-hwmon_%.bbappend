@@ -16,22 +16,6 @@ CHIPS:witherspoon = " \
                bus@1e78a000/i2c-bus@180/ir35221@71 \
                bus@1e78a000/i2c-bus@380/tmp275@4a \
                "
-CHIPS:swift = " \
-               bus@1e78a000/i2c-bus@100/max31785@52 \
-               bus@1e78a000/i2c-bus@100/power-supply@68 \
-               bus@1e78a000/i2c-bus@100/power-supply@69 \
-               bus@1e78a000/i2c-bus@440/tmp275@4a \
-               bus@1e78a000/i2c-bus@440/tmp275@48 \
-               bus@1e78a000/i2c-bus@300/tmp275@48 \
-               bus@1e78a000/i2c-bus@300/dps310@76 \
-               bus@1e78a000/i2c-bus@300/si7021a20@20 \
-               bus@1e78a000/i2c-bus@380/ir35219@70 \
-               bus@1e78a000/i2c-bus@380/ir35221@71 \
-               bus@1e78a000/i2c-bus@380/ir35221@72 \
-               bus@1e78a000/i2c-bus@3c0/ir35219@70 \
-               bus@1e78a000/i2c-bus@3c0/ir35221@71 \
-               bus@1e78a000/i2c-bus@3c0/ir35221@72 \
-               "
 
 CHIPS:witherspoon-tacoma = " \
                bus@1e78a000/i2c-bus@200/max31785@52 \
