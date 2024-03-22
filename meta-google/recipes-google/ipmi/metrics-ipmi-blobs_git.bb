@@ -7,10 +7,10 @@ require ../google-misc/google-misc.inc
 inherit pkgconfig
 
 DEPENDS += " \
+  nanopb-generator-native \
+  nanopb-runtime \
   phosphor-ipmi-blobs \
   phosphor-logging \
-  protobuf-native \
-  protobuf \
   "
 
 FILES:${PN} += "${libdir}/blob-ipmid"
