@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable NFS"
+
+kconf non-hardware nfs.cfg
