@@ -12,7 +12,6 @@ do_fru_upgrade() {
 	ampere_fru_upgrade -d $FRU_DEVICE -f "$IMAGE"
 
 	systemctl restart xyz.openbmc_project.FruDevice.service
-	systemctl restart phosphor-ipmi-host.service
 }
 
 do_smpmpro_upgrade() {
