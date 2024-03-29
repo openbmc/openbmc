@@ -1,0 +1,3 @@
+Example build invocations:
+
+bitbake obmc-phosphor-image
