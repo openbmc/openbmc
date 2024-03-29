@@ -94,6 +94,9 @@ python do_gbmc_version () {
     }
     dev_id["aux"] =  subpoint << 16 | (0xFFFF & point)
 
+    dev_id["manuf_id"] = 11129
+    dev_id["prod_id"] = 14426
+
   with open(path, 'w') as f:
     json.dump(dev_id, f, sort_keys=True, indent=4)
 }
