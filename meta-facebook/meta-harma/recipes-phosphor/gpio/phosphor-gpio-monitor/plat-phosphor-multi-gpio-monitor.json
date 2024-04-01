@@ -24,7 +24,7 @@
         "Continue": true
     },
     {
-        "Name": "host-ready-n",
+        "Name": "post-end-n",
         "ChipId": "2",
         "GpioNum": 66,
         "EventMon": "BOTH",
