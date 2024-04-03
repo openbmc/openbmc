@@ -2,6 +2,15 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
 source /usr/libexec/yosemite4-common-functions
 
+
+enable_all_fan_input()
+{
+    for file in /sys/bus/i2c/devices/*/hwmon/*/fan*_enable
+    do
+      echo 1 > "${file}"
+    done
+}
+
 # probe devices behind mux for management board cpld
 
 rev_id_gpiochip=$(basename "/sys/bus/i2c/devices/13-0020/"*gpiochip*)
@@ -40,5 +49,8 @@ set_gpio NIC3_MAIN_PWR_EN 1
 mknod -m 660 /dev/mem c 1 1
 chown root:kmem /dev/mem
 devmem 0x1e78008c 32 0x19000000
+
+# Enable all fan input as early as possible
+enable_all_fan_input
 
 exit 0
