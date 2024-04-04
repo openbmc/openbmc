@@ -2,5 +2,5 @@ PR = "r1"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/openpower-libhei;branch=master;protocol=https"
-SRCREV = "2c3a7914656806fda7ad4bb8f8fcb1545ecd8b70"
+SRCREV = "c0115566a038eb2722b74b9ab004c26272388d1f"
 
