@@ -14,7 +14,7 @@ GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gtk-doc gobject-introspection pkgconfig features_check
 
 # for gnome-online-accounts
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 #SRC_URI += " file://0001-Update-rest-requirement-to-rest-1.0.patch"
 SRC_URI[archive.sha256sum] = "9cb381b3f78ba1136df97af3f06e3b11dcc2ab339ac08f74eda0f8057d6603e3"

@@ -24,8 +24,6 @@ S = "${WORKDIR}/git"
 
 inherit python_setuptools3_rust cargo-update-recipe-crates
 
-PIP_INSTALL_DIST_PATH = "${S}/dist"
-
 # crossbeam-* -> std::sync::atomic AtomicI64, AtomicU64
 # not supported on mips/powerpc with 32-bit pointers
 # https://doc.rust-lang.org/std/sync/atomic/#portability

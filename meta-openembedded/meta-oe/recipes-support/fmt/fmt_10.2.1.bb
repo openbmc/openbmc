@@ -9,7 +9,7 @@ SRCREV = "e69e5f977d458f2650bb346dadf2ad30c5320281"
 
 S = "${WORKDIR}/git"
 
-inherit cmake ptest
+inherit cmake
 
 EXTRA_OECMAKE += "-DBUILD_SHARED_LIBS=ON"
 

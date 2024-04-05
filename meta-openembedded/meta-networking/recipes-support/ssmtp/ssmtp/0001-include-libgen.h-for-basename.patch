@@ -1,0 +1,32 @@
+From b48840952ec9a68363bed960e98dd6c7aaa3acec Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 11:55:59 -0700
+Subject: [PATCH] include libgen.h for basename
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ssmtp.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ssmtp.c b/ssmtp.c
+index 0a719ac..4dedaf8 100644
+--- a/ssmtp.c
++++ b/ssmtp.c
+@@ -23,6 +23,7 @@
+ #include <signal.h>
+ #include <setjmp.h>
+ #include <string.h>
++#include <libgen.h>
+ #include <ctype.h>
+ #include <netdb.h>
+ #ifdef HAVE_SSL
+-- 
+2.44.0
+

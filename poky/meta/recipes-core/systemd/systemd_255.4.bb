@@ -28,6 +28,7 @@ SRC_URI += " \
            file://systemd-pager.sh \
            file://0002-binfmt-Don-t-install-dependency-links-at-install-tim.patch \
            file://0008-implment-systemd-sysv-install-for-OE.patch \
+           file://0001-NamePolicy.patch \
            "
 
 # patches needed by musl
@@ -248,6 +249,7 @@ EXTRA_OEMESON += "-Dnobody-user=nobody \
                   -Dsystem-alloc-gid-min=101 \
                   -Dsystem-gid-max=999 \
                   -Dcreate-log-dirs=false \
+                  ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', '-Ddefault-mdns=no -Ddefault-llmnr=no', '', d)} \
                   "
 
 # Hardcode target binary paths to avoid using paths from sysroot or worse

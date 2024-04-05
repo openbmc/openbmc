@@ -19,11 +19,15 @@ LIC_FILES_CHKSUM = "file://README;md5=72cff06b7954222c24d38bc2c41b234e \
                     "
 SRC_URI = "${KERNELORG_MIRROR}/linux/docs/${BPN}/${BP}.tar.gz \
            file://0001-man.ml-do-not-use-dev-stdin.patch \
+           file://0001-GNUmakefile-use-env-from-PATH.patch \
            "
 
 SRC_URI[sha256sum] = "006906e7be81a71c2d347809597bcb91485fa7fa488acdaa79e681ddfa894568"
 
 inherit manpages
+
+# can be dropped when ubuntu 18.04 is not in use anymore
+DEPENDS += "coreutils-native"
 
 MAN_PKG = "${PN}"
 

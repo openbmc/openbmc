@@ -13,7 +13,9 @@ RDEPENDS:${PN} = "\
     python3-aiohappyeyeballs \
     python3-aiosignal \
     python3-async-timeout \
+    python3-attrs \
     python3-frozenlist \
+    python3-misc \
     python3-multidict \
     python3-yarl \
     python3-aiodns \

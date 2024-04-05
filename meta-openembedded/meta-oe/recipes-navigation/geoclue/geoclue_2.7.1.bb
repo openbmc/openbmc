@@ -22,18 +22,18 @@ S = "${WORKDIR}/git"
 # Without this line, package is declared a library and named libgeoclue*
 AUTO_LIBNAME_PKGS = ""
 
-PACKAGECONFIG ??= "3g modem-gps cdma nmea lib"
+PACKAGECONFIG ??= "3g modem-gps cdma nmea lib agent"
 PACKAGECONFIG[3g] = "-D3g-source=true,-D3g-source=false,modemmanager"
 PACKAGECONFIG[modem-gps] = "-Dmodem-gps-source=true,-Dmodem-gps-source=false,modemmanager"
 PACKAGECONFIG[cdma] = "-Dcdma-source=true,-Dcdma-source=false,modemmanager"
 PACKAGECONFIG[nmea] = "-Dnmea-source=true,-Dnmea-source=false,avahi,avahi-daemon"
 PACKAGECONFIG[lib] = "-Dlibgeoclue=true,-Dlibgeoclue=false"
+PACKAGECONFIG[agent] = "-Ddemo-agent=true,-Ddemo-agent=false,libnotify"
 
 GTKDOC_MESON_OPTION = "gtk-doc"
 
 EXTRA_OEMESON += " \
     -Ddbus-sys-dir=${sysconfdir}/dbus-1/system.d \
-    -Ddemo-agent=false \
 "
 
 USERADD_PACKAGES = "${PN}"

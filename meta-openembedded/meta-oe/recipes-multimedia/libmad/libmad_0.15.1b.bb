@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
     file://version.h;beginline=1;endline=8;md5=aa07311dd39288d4349f28e1de516454"
 SECTION = "libs"
 DEPENDS = "libid3tag"
-PR = "r3"
 
 SRC_URI = "ftp://ftp.mars.org/pub/mpeg/libmad-${PV}.tar.gz \
     file://no-force-mem.patch \

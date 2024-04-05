@@ -8,6 +8,8 @@ inherit uboot-config cml1
 
 DEPENDS += "kern-tools-native"
 
+CONFIGURE_FILES = "${@d.getVar('UBOOT_MACHINE') or '.config'}"
+
 do_configure () {
     if [ -n "${UBOOT_CONFIG}" ]; then
         unset i j

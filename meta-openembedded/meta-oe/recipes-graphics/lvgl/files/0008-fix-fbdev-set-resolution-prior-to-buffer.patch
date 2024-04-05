@@ -1,0 +1,29 @@
+From a6f822f75b3ba01b00c028608c93160d09a6ffd1 Mon Sep 17 00:00:00 2001
+From: Jaeyoon Jung <jaeyoon.jung@lge.com>
+Date: Mon, 1 Apr 2024 18:00:39 +0900
+Subject: [PATCH] fix(fbdev): set resolution prior to buffer
+
+Otherwise it ends up with using the default value 800x480 and may fail
+at lv_display_set_buffers due to incorrect resolution.
+
+Upstream-Status: Submitted [https://github.com/lvgl/lvgl/pull/6004]
+Signed-off-by: Jaeyoon Jung <jaeyoon.jung@lge.com>
+---
+
+ src/drivers/display/fb/lv_linux_fbdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/drivers/display/fb/lv_linux_fbdev.c b/src/drivers/display/fb/lv_linux_fbdev.c
+index b3cc89199..5fb4c5c9f 100644
+--- a/src/drivers/display/fb/lv_linux_fbdev.c
++++ b/src/drivers/display/fb/lv_linux_fbdev.c
+@@ -233,8 +233,8 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
+         draw_buf_2 = malloc(draw_buf_size);
+     }
+ 
+-    lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
+     lv_display_set_resolution(disp, hor_res, ver_res);
++    lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
+ 
+     if(width > 0) {
+         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));

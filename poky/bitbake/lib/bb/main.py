@@ -217,7 +217,9 @@ def create_bitbake_parser():
                              "execution. The SIGNATURE_HANDLER parameter is passed to the "
                              "handler. Two common values are none and printdiff but the handler "
                              "may define more/less. none means only dump the signature, printdiff"
-                             " means compare the dumped signature with the cached one.")
+                             " means recursively compare the dumped signature with the most recent"
+                             " one in a local build or sstate cache (can be used to find out why tasks re-run"
+                             " when that is not expected)")
 
     exec_group.add_argument("--revisions-changed", action="store_true",
                         help="Set the exit code depending on whether upstream floating "

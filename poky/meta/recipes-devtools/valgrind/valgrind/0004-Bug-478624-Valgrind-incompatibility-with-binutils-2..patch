@@ -1,0 +1,137 @@
+From 41ff9aa49f6c54c66d0e6b37f265fd9cb0176057 Mon Sep 17 00:00:00 2001
+From: Paul Floyd <pjfloyd@wanadoo.fr>
+Date: Sun, 17 Dec 2023 14:18:51 +0100
+Subject: [PATCH 4/4] Bug 478624 - Valgrind incompatibility with binutils-2.42
+ on x86 with new nop patterns (unhandled instruction bytes: 0x2E 0x8D 0xB4
+ 0x26)
+
+It was a bit of a struggle to get the testcase to build
+with both clang and gcc (oddly enough gcc was more difficult) so
+I just resorted to using .byte arrays.
+
+(cherry picked from commit d35005cef8ad8207542738812705ceabf137d7e0)
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=valgrind.git;a=commit;h=41ff9aa49f6c54c66d0e6b37f265fd9cb0176057]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .gitignore                                 |  1 +
+ NEWS                                       |  2 ++
+ VEX/priv/guest_x86_toIR.c                  | 22 +++++++++++++-
+ none/tests/x86/Makefile.am                 |  2 ++
+ none/tests/x86/gnu_binutils_nop.c          | 34 ++++++++++++++++++++++
+ none/tests/x86/gnu_binutils_nop.stderr.exp |  0
+ none/tests/x86/gnu_binutils_nop.vgtest     |  2 ++
+ 7 files changed, 62 insertions(+), 1 deletion(-)
+ create mode 100644 none/tests/x86/gnu_binutils_nop.c
+ create mode 100644 none/tests/x86/gnu_binutils_nop.stderr.exp
+ create mode 100644 none/tests/x86/gnu_binutils_nop.vgtest
+
+--- a/NEWS
++++ b/NEWS
+@@ -9,6 +9,8 @@ The following bugs have been fixed or re
+         file produced by mold
+ 476708  valgrind-monitor.py regular expressions should use raw strings
+ 477198  Add fchmodat2 syscall on linux
++478624  Valgrind incompatibility with binutils-2.42 on x86 with new nop patterns
++        (unhandled instruction bytes: 0x2E 0x8D 0xB4 0x26)
+ 
+ To see details of a given bug, visit
+   https://bugs.kde.org/show_bug.cgi?id=XXXXXX
+--- a/VEX/priv/guest_x86_toIR.c
++++ b/VEX/priv/guest_x86_toIR.c
+@@ -8198,7 +8198,7 @@ DisResult disInstr_X86_WRK (
+          delta += 5;
+          goto decode_success;
+       }
+-      /* Don't barf on recent binutils padding,
++      /* Don't barf on recent (2010) binutils padding,
+          all variants of which are: nopw %cs:0x0(%eax,%eax,1)
+          66 2e 0f 1f 84 00 00 00 00 00
+          66 66 2e 0f 1f 84 00 00 00 00 00
+@@ -8222,6 +8222,26 @@ DisResult disInstr_X86_WRK (
+             goto decode_success;
+          }
+       }
++
++      /* bug478624 GNU binutils uses a leal of esi into itself with
++         a zero offset and CS prefix as an 8 byte no-op (Dec 2023).
++         Since the CS prefix is hardly ever used we don't do much
++         to decode it, just a few cases for conditional branches.
++         So add handling here with other pseudo-no-ops.
++       */
++      if (code[0] == 0x2E && code[1] == 0x8D) {
++         if (code[2] == 0x74 && code[3] == 0x26 && code[4] == 0x00) {
++            DIP("leal %%cs:0(%%esi,%%eiz,1),%%esi\n");
++            delta += 5;
++            goto decode_success;
++         }
++         if (code[2] == 0xB4 && code[3] == 0x26 && code[4] == 0x00
++             && code[5] == 0x00 && code[6] == 0x00 && code[7] == 0x00) {
++            DIP("leal %%cs:0(%%esi,%%eiz,1),%%esi\n");
++            delta += 8;
++            goto decode_success;
++         }
++      }
+ 
+       // Intel CET requires the following opcodes to be treated as NOPs
+       // with any prefix and ModRM, SIB and disp combination:
+--- a/none/tests/x86/Makefile.am
++++ b/none/tests/x86/Makefile.am
+@@ -52,6 +52,7 @@ EXTRA_DIST = \
+ 	fxtract.stdout.exp fxtract.stderr.exp fxtract.vgtest \
+ 	fxtract.stdout.exp-older-glibc \
+ 	getseg.stdout.exp getseg.stderr.exp getseg.vgtest \
++	gnu_binutils_nop.stderr.exp gnu_binutils_nop.vgtest \
+ 	incdec_alt.stdout.exp incdec_alt.stderr.exp incdec_alt.vgtest \
+ 	int.stderr.exp int.stdout.exp int.disabled \
+ 	$(addsuffix .stderr.exp,$(INSN_TESTS)) \
+@@ -100,6 +101,7 @@ check_PROGRAMS = \
+ 	fpu_lazy_eflags \
+ 	fxtract \
+ 	getseg \
++	gnu_binutils_nop \
+ 	incdec_alt \
+ 	$(INSN_TESTS) \
+ 	int \
+--- /dev/null
++++ b/none/tests/x86/gnu_binutils_nop.c
+@@ -0,0 +1,34 @@
++int main(void)
++{
++    // GNU binutils uses various opcodes as alternatives for nop
++    // the idea is that it is faster to execute one large opcode
++    // with no side-effects than multiple repetitions of the
++    // single byte 'nop'. This gives more choice when code
++    // needs to be padded.
++   
++   // the following is based on
++   // https://sourceware.org/cgit/binutils-gdb/tree/gas/config/tc-i386.c#n1256
++
++    // one byte
++    __asm__ __volatile__("nop");
++    // two bytes
++    __asm__ __volatile__("xchg %ax,%ax");
++    // three bytes
++    //__asm__ __volatile__("leal 0(%esi),%esi");
++    __asm__ __volatile__(".byte 0x8d,0x76,0x00");
++    // four bytes
++    //__asm__ __volatile__("leal 0(%esi,%eiz),%esi");
++    __asm__ __volatile__(".byte 0x8d,0x74,0x26,0x00");
++    // five bytes
++    //__asm__ __volatile__("leal %cs:0(%esi,%eiz),%esi");
++    __asm__ __volatile__(".byte 0x2e,0x8d,0x74,0x26,0x00");
++    // six bytes
++    //__asm__ __volatile__("leal 0L(%esi),%esi");
++    __asm__ __volatile__(".byte 0x8d,0xb6,0x00,0x00,0x00,0x00");
++    // seven bytes
++    //__asm__ __volatile__("leal 0L(%esi,%eiz),%esi");
++    __asm__ __volatile__(".byte 0x8d,0xb4,0x26,0x00,0x00,0x00,0x00");
++    // eight bytes
++    //__asm__ __volatile__("leal %cs:0L(%esi,%eiz),%esi");
++    __asm__ __volatile__(".byte 0x2e,0x8d,0xb4,0x26,0x00,0x00,0x00,0x00");
++}
+--- /dev/null
++++ b/none/tests/x86/gnu_binutils_nop.vgtest
+@@ -0,0 +1,2 @@
++prog: gnu_binutils_nop
++vgopts: -q

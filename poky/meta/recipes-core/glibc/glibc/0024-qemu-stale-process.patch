@@ -1,0 +1,45 @@
+glibc: Skip 2 qemu tests that can hang in oe-selftest
+
+qemumips and qemuppc were leaving stale processes behind after
+running glibc oe-selftest. During analysis, it was found that
+it was due to "tst-scm_rights" and "tst-scm_rights-time64" tests.
+Disable them so that there are no stale processes left behind.
+
+[YOCTO #15423]
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=15423
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Yash Shinde <Yash.Shinde@windriver.com>
+---
+diff --git a/sysdeps/unix/sysv/linux/Makefile  b/sysdeps/unix/sysv/linux/Makefile
+--- a/sysdeps/unix/sysv/linux/Makefile    2024-03-18 01:15:49.019202881 -0700
++++ b/sysdeps/unix/sysv/linux/Makefile  2024-03-14 06:26:18.581404107 -0700
+@@ -222,7 +222,6 @@
+   tst-process_mrelease \
+   tst-quota \
+   tst-rlimit-infinity \
+-  tst-scm_rights \
+   tst-sigtimedwait \
+   tst-sync_file_range \
+   tst-sysconf-iov_max \
+@@ -233,6 +232,8 @@
+   tst-timerfd \
+   tst-ttyname-direct \
+   tst-ttyname-namespace \
++  # Skip this test to avoid stale qemu process
++  # tst-scm_rights \
+   # tests
+
+ # process_madvise requires CAP_SYS_ADMIN.
+@@ -270,9 +271,10 @@
+   tst-ntp_gettimex-time64 \
+   tst-ppoll-time64 \
+   tst-prctl-time64 \
+-  tst-scm_rights-time64 \
+   tst-sigtimedwait-time64 \
+   tst-timerfd-time64 \
++  # Skip this test to avoid stale qemu process
++  # tst-scm_rights-time64 \
+   # tests-time64
+
+ tests-clone-internal = \

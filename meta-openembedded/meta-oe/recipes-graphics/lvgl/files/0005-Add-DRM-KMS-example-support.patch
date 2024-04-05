@@ -1,0 +1,59 @@
+From dabf40559428733413432afa29598bc145aa6636 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Tue, 12 Mar 2024 03:08:13 +0100
+Subject: [PATCH 5/6] Add DRM/KMS example support
+
+Extend the main.c to support both legacy fbdev and DRM/KMS initialization.
+
+To use legacy fbdev support, adjust lv_conf.h as follows:
+LV_USE_LINUX_FBDEV=1
+LV_USE_LINUX_DRM=0
+
+To use DRM/KMS support, adjust lv_conf.h as follows:
+LV_USE_LINUX_FBDEV=0
+LV_USE_LINUX_DRM=1
+
+Upstream-Status: Submitted [https://github.com/lvgl/lv_port_linux_frame_buffer/pull/47]
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+ CMakeLists.txt | 5 ++++-
+ main.c         | 8 ++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d91b196..c1cfb7f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,6 +12,9 @@ target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR})
+ 
+ add_executable(main main.c mouse_cursor_icon.c)
+ 
+-target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} m pthread)
++include(${CMAKE_CURRENT_LIST_DIR}/lvgl/tests/FindLibDRM.cmake)
++include_directories(${Libdrm_INCLUDE_DIRS})
++
++target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} ${Libdrm_LIBRARIES} m pthread)
+ add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+ 
+diff --git a/main.c b/main.c
+index 288519c..ab4e936 100644
+--- a/main.c
++++ b/main.c
+@@ -17,6 +17,14 @@ static void lv_linux_disp_init(void)
+ 
+     lv_linux_fbdev_set_file(disp, videocard);
+ }
++#elif LV_USE_LINUX_DRM
++static void lv_linux_disp_init(void)
++{
++    const char *videocard = lv_linux_get_video_card_node("/dev/dri/card0");
++    lv_display_t * disp = lv_linux_drm_create();
++
++    lv_linux_drm_set_file(disp, videocard, -1);
++}
+ #else
+ #error Unsupported configuration
+ #endif
+-- 
+2.43.0
+

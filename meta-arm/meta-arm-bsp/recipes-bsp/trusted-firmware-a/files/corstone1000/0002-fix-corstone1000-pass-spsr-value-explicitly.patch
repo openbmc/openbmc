@@ -1,0 +1,32 @@
+From d70a07562d3b0a7b4441922fd3ce136565927d04 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <Emekcan.Aras@arm.com>
+Date: Wed, 21 Feb 2024 07:57:36 +0000
+Subject: [PATCH] fix(corstone1000): pass spsr value explicitly
+
+Passes spsr value for BL32 (OPTEE) explicitly between different boot
+stages.
+
+Upstream-Status: Pending
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+---
+ .../corstone1000/common/corstone1000_bl2_mem_params_desc.c     | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_bl2_mem_params_desc.c b/plat/arm/board/corstone1000/common/corstone1000_bl2_mem_params_desc.c
+index fe521a9fa..2cc096f38 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_bl2_mem_params_desc.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_bl2_mem_params_desc.c
+@@ -72,7 +72,8 @@ static bl_mem_params_node_t bl2_mem_params_descs[] = {
+ 		SET_STATIC_PARAM_HEAD(ep_info, PARAM_EP,
+ 			VERSION_2, entry_point_info_t, NON_SECURE | EXECUTABLE),
+ 		.ep_info.pc = BL33_BASE,
+-
++		.ep_info.spsr = SPSR_64(MODE_EL2, MODE_SP_ELX,
++				       DISABLE_ALL_EXCEPTIONS),
+ 		SET_STATIC_PARAM_HEAD(image_info, PARAM_EP,
+ 			VERSION_2, image_info_t, 0),
+ 		.image_info.image_base = BL33_BASE,
+-- 
+2.25.1
+
+

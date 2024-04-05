@@ -18,13 +18,13 @@ PACKAGECONFIG[gupnp] = "-Dgupnp=enabled,-Dgupnp=disabled,gupnp"
 PACKAGECONFIG[gstreamer] = "-Dgstreamer=enabled,-Dgstreamer=disabled,gstreamer1.0"
 PACKAGECONFIG[introspection] = "-Dintrospection=enabled,-Dintrospection=disabled,"
 
-EXTRA_OEMESON = "-Dgstreamer=disabled"
-
 GTKDOC_MESON_OPTION = "gtk_doc"
 GTKDOC_MESON_ENABLE_FLAG = "enabled"
 GTKDOC_MESON_DISABLE_FLAG = "disabled"
 
 inherit meson gtk-doc gobject-introspection
+
+EXTRA_OEMESON = "-Dexamples=disabled -Dtests=disabled"
 
 FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
 FILES:${PN}-dev += "${libdir}/gstreamer-1.0/*.la"

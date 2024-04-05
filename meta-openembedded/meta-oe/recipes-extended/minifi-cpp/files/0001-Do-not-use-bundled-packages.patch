@@ -1,0 +1,108 @@
+From 65923a872e44cb461ef1a03374057351f0bc5efe Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 19 Mar 2024 19:39:04 +0800
+Subject: [PATCH] Do not use bundled packages
+
+Use external dependencies for openssl, curl, bzip2, zlib, libarchive,
+xz, yaml-cpp and libxml2.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CMakeLists.txt                       | 23 ++++++-----------------
+ extensions/libarchive/CMakeLists.txt |  7 ++-----
+ 2 files changed, 8 insertions(+), 22 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 13a2b992..8a1dd6d9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -222,9 +222,7 @@ else()
+ endif()
+ 
+ if (NOT DISABLE_BZIP2 AND (NOT DISABLE_LIBARCHIVE OR (NOT DISABLE_ROCKSDB AND NOT WIN32)))
+-    include(BundledBZip2)
+-    use_bundled_bzip2(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/bzip2/dummy")
++    find_package(BZip2 REQUIRED)
+ endif()
+ 
+ if(NOT WIN32)
+@@ -247,9 +245,7 @@ endif()
+ 
+ # OpenSSL
+ if (NOT OPENSSL_OFF)
+-    include(BundledOpenSSL)
+-    use_openssl("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
+-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/ssl")
++    find_package(OpenSSL REQUIRED)
+ 
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOPENSSL_SUPPORT")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DOPENSSL_SUPPORT")
+@@ -262,9 +258,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSODIUM_STATIC=1")
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSODIUM_STATIC=1")
+ 
+ # zlib
+-include(BundledZLIB)
+-use_bundled_zlib(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/zlib/dummy")
++find_package(ZLIB REQUIRED)
+ 
+ # uthash
+ add_library(ut INTERFACE)
+@@ -272,9 +266,7 @@ target_include_directories(ut SYSTEM INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/thir
+ 
+ # cURL
+ if(NOT DISABLE_CURL)
+-    include(BundledLibcURL)
+-    use_bundled_curl(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/curl/dummy")
++    find_package(CURL REQUIRED)
+ else()
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDISABLE_CURL")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDISABLE_CURL")
+@@ -285,8 +277,7 @@ include(BundledSpdlog)
+ use_bundled_spdlog(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+ 
+ # yaml-cpp
+-include(BundledYamlCpp)
+-use_bundled_yamlcpp(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
++find_package(yaml-cpp REQUIRED)
+ 
+ # concurrentqueue
+ add_library(concurrentqueue INTERFACE)
+@@ -357,9 +348,7 @@ include(Extensions)
+ add_subdirectory(libminifi)
+ 
+ if ((ENABLE_OPENWSMAN AND NOT DISABLE_CIVET AND NOT DISABLE_CURL) OR ENABLE_ALL OR ENABLE_AZURE)
+-    include(BundledLibXml2)
+-    use_bundled_libxml2(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/libxml2/dummy")
++    find_package(LibXml2 REQUIRED)
+ endif()
+ 
+ if (ENABLE_ALL OR ENABLE_PROMETHEUS OR NOT DISABLE_CIVET)
+diff --git a/extensions/libarchive/CMakeLists.txt b/extensions/libarchive/CMakeLists.txt
+index 2b89d3ea..49e13e21 100644
+--- a/extensions/libarchive/CMakeLists.txt
++++ b/extensions/libarchive/CMakeLists.txt
+@@ -22,13 +22,10 @@ if (DISABLE_LIBARCHIVE)
+ endif()
+ 
+ if (NOT DISABLE_LZMA)
+-    include(BundledLibLZMA)
+-    use_bundled_liblzma(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/liblzma/dummy")
++    find_package(LibLZMA REQUIRED)
+ endif()
+ 
+-include(BundledLibArchive)
+-use_bundled_libarchive(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
++find_package(LibArchive REQUIRED)
+ 
+ include(${CMAKE_SOURCE_DIR}/extensions/ExtensionHeader.txt)
+ 
+-- 
+2.25.1
+

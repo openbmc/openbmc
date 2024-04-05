@@ -25,4 +25,6 @@ PACKAGECONFIG ??= "pulseaudio sasl"
 
 inherit pkgconfig gnomebase gettext gobject-introspection vala features_check
 
+PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
+
 SRC_URI[archive.sha256sum] = "512763ac4e0559d0158b6682ca5dd1a3bd633f082f5e4349d7158e6b5f80f1ce"

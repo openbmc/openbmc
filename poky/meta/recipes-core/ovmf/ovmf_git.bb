@@ -30,6 +30,9 @@ PV = "edk2-stable202308"
 SRCREV = "819cfc6b42a68790a23509e4fcc58ceb70e1965e"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
+CVE_PRODUCT = "edk2"
+CVE_VERSION = "${@d.getVar('PV').split('stable')[1]}"
+
 inherit deploy
 
 PARALLEL_MAKE = ""

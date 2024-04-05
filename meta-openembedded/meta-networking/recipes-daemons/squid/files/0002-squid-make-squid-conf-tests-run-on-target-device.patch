@@ -17,8 +17,6 @@ Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
  test-suite/test-squid-conf.sh |  2 +-
  2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/test-suite/Makefile.am b/test-suite/Makefile.am
-index 8becdbc..eccd49c 100644
 --- a/test-suite/Makefile.am
 +++ b/test-suite/Makefile.am
 @@ -21,7 +21,7 @@ LDADD = \
@@ -59,8 +57,6 @@ index 8becdbc..eccd49c 100644
  
 -CLEANFILES += squid-conf-tests squid-stderr.log
 +CLEANFILES += squid-conf-tests /var/log/squid-stderr.log
-diff --git a/test-suite/test-squid-conf.sh b/test-suite/test-squid-conf.sh
-index 05fcaf3..a5a8a5a 100755
 --- a/test-suite/test-squid-conf.sh
 +++ b/test-suite/test-squid-conf.sh
 @@ -111,7 +111,7 @@ then

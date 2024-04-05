@@ -1,0 +1,44 @@
+From f3a213cf4922c122e554277ea2031c0c54cd3fe5 Mon Sep 17 00:00:00 2001
+From: Dan McGregor <dan.mcgregor@vecima.com>
+Date: Wed, 13 Mar 2024 14:08:25 -0600
+Subject: [PATCH] Adjust test expectations for ptest
+
+Because of the way we install ptests, some first party imports
+became third party. Reflect that in the test case.
+
+Upstream-Status: Inappropriate (embedded specific)
+Signed-off-by: Dan McGregor <dan.mcgregor@vecima.com>
+---
+ tests/functional/w/wrong_import_order.txt | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/tests/functional/w/wrong_import_order.txt b/tests/functional/w/wrong_import_order.txt
+index 068d2140d..9594ff9e0 100644
+--- a/tests/functional/w/wrong_import_order.txt
++++ b/tests/functional/w/wrong_import_order.txt
+@@ -3,14 +3,14 @@ wrong-import-order:14:0:14:10::"standard import ""sys"" should be placed before
+ wrong-import-order:15:0:15:15::"standard import ""datetime"" should be placed before third party imports ""six"", ""astroid.are_exclusive""":UNDEFINED
+ wrong-import-order:18:0:18:22::"third party import ""totally_missing"" should be placed before local import ""package.Class""":UNDEFINED
+ wrong-import-order:20:0:20:14::"third party import ""astroid"" should be placed before local imports ""package.Class"", "".package""":UNDEFINED
+-wrong-import-order:22:0:22:22::"first party import ""pylint.checkers"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
+-wrong-import-order:23:0:23:25::"first party import ""pylint.config"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
+-wrong-import-order:24:0:24:17::"first party import ""pylint.sys"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
+-wrong-import-order:25:0:25:28::"first party import ""pylint.pyreverse"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
+-wrong-import-order:30:0:30:40::"third party import ""six.moves.urllib.parse.quote"" should be placed before first party imports ""pylint.checkers"", ""pylint.config"", ""pylint.sys"", ""pylint.pyreverse"" and local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
+-wrong-import-order:31:0:31:23::"first party import ""pylint.constants"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
+-wrong-import-order:32:0:32:19::"standard import ""re"" should be placed before third party imports ""six"", ""astroid.are_exclusive"", ""unused_import"", ""totally_missing"", ""astroid"", ""six.moves.urllib.parse.quote"", first party imports ""pylint.checkers"", ""pylint.config"", ""pylint.sys"", ""pylint.pyreverse"", ""pylint.constants"", and local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
+-wrong-import-order:32:0:32:19::"third party import ""requests"" should be placed before first party imports ""pylint.checkers"", ""pylint.config"", ""pylint.sys"", ""pylint.pyreverse"", ""pylint.constants"" and local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
+-wrong-import-order:33:0:33:24::"first party import ""pylint.exceptions"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
+-wrong-import-order:34:0:34:21::"first party import ""pylint.message"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
+-wrong-import-order:35:0:35:11::"standard import ""time"" should be placed before third party imports ""six"", ""astroid.are_exclusive"", ""unused_import"" (...) ""astroid"", ""six.moves.urllib.parse.quote"", ""requests"", first party imports ""pylint.checkers"", ""pylint.config"", ""pylint.sys"" (...) ""pylint.constants"", ""pylint.exceptions"", ""pylint.message"", and local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
++wrong-import-order:22:0:22:22::"third party import ""pylint.checkers"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
++wrong-import-order:23:0:23:25::"third party import ""pylint.config"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
++wrong-import-order:24:0:24:17::"third party import ""pylint.sys"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
++wrong-import-order:25:0:25:28::"third party import ""pylint.pyreverse"" should be placed before local imports ""package.Class"", "".package"", "".package2""":UNDEFINED
++wrong-import-order:30:0:30:40::"third party import ""six.moves.urllib.parse.quote"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
++wrong-import-order:31:0:31:23::"third party import ""pylint.constants"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
++wrong-import-order:32:0:32:19::"standard import ""re"" should be placed before third party imports ""six"", ""astroid.are_exclusive"", ""unused_import"" (...) ""pylint.pyreverse"", ""six.moves.urllib.parse.quote"", ""pylint.constants"" and local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
++wrong-import-order:32:0:32:19::"third party import ""requests"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
++wrong-import-order:33:0:33:24::"third party import ""pylint.exceptions"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
++wrong-import-order:34:0:34:21::"third party import ""pylint.message"" should be placed before local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED
++wrong-import-order:35:0:35:11::"standard import ""time"" should be placed before third party imports ""six"", ""astroid.are_exclusive"", ""unused_import"" (...) ""requests"", ""pylint.exceptions"", ""pylint.message"" and local imports ""package.Class"", "".package"", "".package2"" (...) ""package3.Class3"", "".package4"", ""package4.Class4""":UNDEFINED

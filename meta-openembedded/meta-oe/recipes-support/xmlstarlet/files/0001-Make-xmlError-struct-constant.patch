@@ -1,0 +1,45 @@
+From f7a5ebc3a673b246a64c9a664df304c1520a3951 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Mar 2024 12:35:17 -0800
+Subject: [PATCH] Make xmlError struct constant
+
+In libxml2 commit v2.12.0~14 the API changed so that
+xmlGetLastError() returns pointer to a constant xmlError struct.
+Reflect this change in our code.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/xml.c     | 2 +-
+ src/xmlstar.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/xml.c b/src/xml.c
+index cf47cc2..e6f19c1 100644
+--- a/src/xml.c
++++ b/src/xml.c
+@@ -104,7 +104,7 @@ void reportGenericError(void* ctx, const char * msg, ...) {
+ /* by default all errors are reported */
+ static ErrorInfo errorInfo = { NULL, NULL, VERBOSE, CONTINUE };
+ 
+-void reportError(void *ptr, xmlErrorPtr error)
++void reportError(void *ptr, const xmlError *error)
+ {
+     ErrorInfo *errorInfo = (ErrorInfo*) ptr;
+     assert(errorInfo);
+diff --git a/src/xmlstar.h b/src/xmlstar.h
+index 3e1eed3..7e41ac4 100644
+--- a/src/xmlstar.h
++++ b/src/xmlstar.h
+@@ -32,7 +32,7 @@ typedef struct _errorInfo {
+     ErrorStop stop;
+ } ErrorInfo;
+ 
+-void reportError(void *ptr, xmlErrorPtr error);
++void reportError(void *ptr, const xmlError* error);
+ void suppressErrors(void);
+ 
+ typedef struct _gOptions {
+-- 
+2.44.0
+

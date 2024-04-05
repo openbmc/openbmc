@@ -1,0 +1,32 @@
+From 5bbdd06503456784c5ffa22409e8bab50470d673 Mon Sep 17 00:00:00 2001
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Mon, 27 Nov 2023 15:11:45 +0100
+Subject: [PATCH] osinfo: Make xmlError struct constant in
+ propagate_libxml_error()
+
+In libxml2 commit v2.12.0~14 the API changed so that
+xmlGetLastError() returns pointer to a constant xmlError struct.
+Reflect this change in our code.
+
+Upstream-Status: Backport [https://gitlab.com/libosinfo/libosinfo/-/merge_requests/155]
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+---
+ osinfo/osinfo_install_script.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/osinfo/osinfo_install_script.c b/osinfo/osinfo_install_script.c
+index 5800f37..303245a 100644
+--- a/osinfo/osinfo_install_script.c
++++ b/osinfo/osinfo_install_script.c
+@@ -769,7 +769,7 @@ static void propagate_libxml_error(GError **error, const char *format, ...) G_GN
+ 
+ static void propagate_libxml_error(GError **error, const char *format, ...)
+ {
+-    xmlErrorPtr err = xmlGetLastError();
++    const xmlError *err = xmlGetLastError();
+     char *prefix;
+     va_list ap;
+ 
+-- 
+2.44.0
+

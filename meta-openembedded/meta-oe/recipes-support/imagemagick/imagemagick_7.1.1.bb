@@ -52,7 +52,7 @@ FILES:${PN}-dev += "${libdir}/ImageMagick-${BASE_PV}/modules-Q16/*/*.a"
 
 FILES:${PN}-dbg += "${libdir}/ImageMagick-${BASE_PV}/modules-Q16/*/.debug/*"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 ALTERNATIVE_PRIORITY = "100"
 

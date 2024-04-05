@@ -5,11 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=24dce5ef6a13563241c24bc366f48886"
 
 SRC_URI[sha256sum] = "0dc87637d5de53dd5eec3a6a01753b1ccf99494bd756aafecd74b4fa9e729015"
 
-PYPI_PACKAGE = "sphinxcontrib-htmlhelp"
+PYPI_PACKAGE = "sphinxcontrib_htmlhelp"
 
 inherit pypi python_flit_core
-
-PYPI_ARCHIVE_NAME = "sphinxcontrib_htmlhelp-${PV}.${PYPI_PACKAGE_EXT}"
-S = "${WORKDIR}/sphinxcontrib_htmlhelp-${PV}"
 
 BBCLASSEXTEND = "native nativesdk"

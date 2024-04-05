@@ -1,0 +1,41 @@
+Upstream-Status: Submitted [https://github.com/khvzak/bluez-tools/pull/47]
+
+From f9bc83d46f131037f7fa5195a506b65560199d0d Mon Sep 17 00:00:00 2001
+Message-Id: <f9bc83d46f131037f7fa5195a506b65560199d0d.1710791715.git.joerg.sommer@navimatix.de>
+From: George Talusan <george.talusan@gmail.com>
+Date: Mon, 26 Oct 2020 21:35:51 -0400
+Subject: [PATCH] fix null checks
+
+---
+ src/lib/bluez/obex/obex_file_transfer.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib/bluez/obex/obex_file_transfer.c b/src/lib/bluez/obex/obex_file_transfer.c
+index 2d3dafe..91c41d6 100644
+--- a/src/lib/bluez/obex/obex_file_transfer.c
++++ b/src/lib/bluez/obex/obex_file_transfer.c
+@@ -194,7 +194,7 @@ GVariant *obex_file_transfer_get_file(ObexFileTransfer *self, const gchar *targe
+ 	g_assert(OBEX_FILE_TRANSFER_IS(self));
+ 	GVariant *ret = NULL;
+ 	GVariant *proxy_ret = g_dbus_proxy_call_sync(self->priv->proxy, "GetFile", g_variant_new ("(ss)", targetfile, sourcefile), G_DBUS_CALL_FLAGS_NONE, -1, NULL, error);
+-	if (proxy_ret != NULL)
++	if (proxy_ret == NULL)
+ 		return NULL;
+ 	ret = g_variant_ref_sink(proxy_ret);
+ 	g_variant_unref(proxy_ret);
+@@ -228,9 +228,9 @@ GVariant *obex_file_transfer_put_file(ObexFileTransfer *self, const gchar *sourc
+ 	g_assert(OBEX_FILE_TRANSFER_IS(self));
+ 	GVariant *ret = NULL;
+ 	GVariant *proxy_ret = g_dbus_proxy_call_sync(self->priv->proxy, "PutFile", g_variant_new ("(ss)", targetfile, sourcefile), G_DBUS_CALL_FLAGS_NONE, -1, NULL, error);
+-	if (proxy_ret != NULL)
++	if (proxy_ret == NULL)
+ 		return NULL;
+ 	ret = g_variant_ref_sink(proxy_ret);
+ 	g_variant_unref(proxy_ret);
+ 	return ret;
+-}
+\ No newline at end of file
++}
+-- 
+2.34.1
+

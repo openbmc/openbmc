@@ -16,7 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3461,27 +3461,18 @@ AC_ARG_ENABLE(mmal,
+@@ -3460,27 +3460,18 @@ AC_ARG_ENABLE(mmal,
    AS_HELP_STRING([--enable-mmal],
      [Multi-Media Abstraction Layer (MMAL) hardware plugin (default enable)]))
  if test "${enable_mmal}" != "no"; then

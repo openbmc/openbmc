@@ -6,7 +6,9 @@ DEPENDS = "libnl"
 RDEPENDS:${PN} = "bash perl"
 
 SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=master;protocol=https \
-           file://0001-cmake-Allow-SYSTEMCTL_BIN-to-be-overridden-from-envi.patch"
+           file://0001-cmake-Allow-SYSTEMCTL_BIN-to-be-overridden-from-envi.patch \
+           file://0001-include-libgen.h-for-basename.patch \
+"
 SRCREV = "bc6b4bc134532e952fe7f8efc251e1f89b912098"
 S = "${WORKDIR}/git"
 

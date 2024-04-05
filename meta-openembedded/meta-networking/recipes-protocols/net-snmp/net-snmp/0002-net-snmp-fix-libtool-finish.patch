@@ -1,0 +1,36 @@
+From 5f002c3cc46ecf4d4a29571309f2cc0d3d34330f Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Fri, 16 Jan 2015 14:14:01 +0800
+Subject: [PATCH] net-snmp: fix "libtool --finish"
+
+LIB_LDCONFIG_CMD failed since it is using a host dir $(libdir)
+which is /usr/lib64 does not exist on host when compile 64bit
+image.
+
+In fact, configuring dynamic linker run-time bindings is meaningless
+at this step,  If it is needed, Poky would write ldconfig scripts to
+rpm-postinst for each recipe while do_package, in package.bbclass.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Roy.Li <rongqing.li@windriver.com>
+---
+ Makefile.top | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.top b/Makefile.top
+index d1b3923..53e0392 100644
+--- a/Makefile.top
++++ b/Makefile.top
+@@ -89,7 +89,7 @@ LIBREVISION = 1
+ LIB_LD_CMD      = $(LIBTOOL) --mode=link $(LINKCC) $(CFLAGS) -rpath $(libdir) -version-info $(LIBCURRENT):$(LIBREVISION):$(LIBAGE) @LD_NO_UNDEFINED@ -o
+ LIB_EXTENSION   = la
+ LIB_VERSION     =
+-LIB_LDCONFIG_CMD = $(LIBTOOL) --mode=finish $(INSTALL_PREFIX)$(libdir)
++LIB_LDCONFIG_CMD = echo "do not ldconfig\n"
+ LINK		= $(LIBTOOL) --mode=link $(LINKCC)
+ # RANLIB 	= @RANLIB@
+ RANLIB		= :
+-- 
+2.25.1
+

@@ -7,6 +7,8 @@ Subject: [PATCH] Do not strip binaries.
 
 Signed-off-by: Philip Balister <philip@balister.org>
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+
+Upstream-Status: Pending
 ---
  tools/pybind11NewTools.cmake | 7 -------
  tools/pybind11Tools.cmake    | 6 ------

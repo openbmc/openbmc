@@ -1,4 +1,4 @@
-From 33844f6773a676bd57240954e402ae9a843663a4 Mon Sep 17 00:00:00 2001
+From abadd821acffd5dbc870f86dad3c3a6bf3f2f74f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 16 Jun 2017 15:43:00 +0800
 Subject: [PATCH 10/11] invoking mkfs with infinite timeout
@@ -18,10 +18,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/blivet/tasks/fsmkfs.py b/blivet/tasks/fsmkfs.py
-index e4a6aaa8..9730f7e5 100644
+index e9daa9e..2174cc3 100644
 --- a/blivet/tasks/fsmkfs.py
 +++ b/blivet/tasks/fsmkfs.py
-@@ -203,7 +203,7 @@ class FSMkfs(task.BasicApplication, FSMkfsTask):
+@@ -207,7 +207,7 @@ class FSMkfs(task.BasicApplication, FSMkfsTask):
          options = options or []
          cmd = self._mkfs_command(options, label, set_uuid, nodiscard)
          try:
@@ -30,6 +30,3 @@ index e4a6aaa8..9730f7e5 100644
          except OSError as e:
              raise FSError(e)
  
--- 
-2.7.4
-

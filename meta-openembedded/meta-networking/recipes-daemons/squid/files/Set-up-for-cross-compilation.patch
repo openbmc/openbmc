@@ -16,8 +16,6 @@ Upstream-Status: Pending
  configure.ac | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/configure.ac b/configure.ac
-index ca0bc79..c222851 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -29,6 +29,7 @@ m4_include([acinclude/tdb.m4])

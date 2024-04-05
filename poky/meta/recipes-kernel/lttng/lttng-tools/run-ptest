@@ -1,8 +1,33 @@
 #!/bin/sh
 # Without --ignore-exit, the tap harness causes any FAILs within a
 # test plan to raise ERRORs; this is just noise.
+
+#Detecting whether current system has lttng kernel modules
+LTTNG_KMOD_PATH=/lib/modules/$(uname -r)/kernel/lttng-modules/lttng-tracer.ko
+function validate_lttng_modules_present()
+{
+	# Check for loadable modules.
+	if [ -f "$LTTNG_KMOD_PATH" ]; then
+		return 0
+	fi
+
+	# Check for builtin modules.
+	ls /proc/lttng > /dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		return 0
+	fi
+
+	return 1
+}
+
 export LD_LIBRARY_PATH=FIXMEPTESTPATH/tests/utils/testapp/userspace-probe-elf-binary/.libs
 makeargs="LOG_DRIVER_FLAGS=--ignore-exit top_srcdir=FIXMEPTESTPATH top_builddir=FIXMEPTESTPATH"
+
+#If current system doesn't have lttng kernel modules, disable lttng kernel related tests.
+validate_lttng_modules_present || {
+	makeargs="$makeargs LTTNG_TOOLS_DISABLE_KERNEL_TESTS=1"
+}
+
 make -k -t all >error.log 2>&1
 # Can specify a test e.g.:
 # -C tests/regression/ check TESTS='kernel/test_callstack'

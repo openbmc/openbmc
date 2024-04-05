@@ -11,6 +11,7 @@ PTESTS_FAST_META_PERL = "\
     libcgi-perl \
     libcrypt-openssl-random-perl \
     libdigest-hmac-perl \
+    liberror-perl \
     libextutils-config-perl \
     libextutils-installpaths-perl \
     libhtml-tagset-perl \

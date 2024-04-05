@@ -11,12 +11,14 @@ Upstream-Status: Pending
  configure.ac | 2 ++
  1 file changed, 2 insertions(+)
 
+diff --git a/configure.ac b/configure.ac
+index 68fd51c..4cb71fe 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -53,6 +53,8 @@ case "$host" in
-    *-cygwin*) default_enable_heap_checker=no; default_enable_cpu_profiler=no;;
-    *-freebsd*) default_enable_heap_checker=no;;
-    *-darwin*) default_enable_heap_checker=no;;
+              need_nanosleep=no;;
+    *-cygwin*) default_enable_cpu_profiler=no;;
+    *-linux*) default_enable_heap_checker=yes; heap_checker_supported=yes;;
 +   *-musl*) default_enable_heap_checker=no; default_enable_heap_profiler=no;
 +            default_enable_debugalloc=no; default_enable_libunwind=no;
  esac

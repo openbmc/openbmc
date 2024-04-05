@@ -1,0 +1,32 @@
+From 1b9677f40ac547ba19d1cdbfd700901eab0a0d0b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 13:07:28 -0700
+Subject: [PATCH] include libgen.h for basename
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [ Sent to maintainer and lvm-devel@redhat.com ]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/device/device_id.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/device/device_id.c b/lib/device/device_id.c
+index 1422f5d05..8215811bd 100644
+--- a/lib/device/device_id.c
++++ b/lib/device/device_id.c
+@@ -25,6 +25,7 @@
+ #include "lib/datastruct/str_list.h"
+ #include "lib/metadata/metadata-exported.h"
+ 
++#include <libgen.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+-- 
+2.44.0
+

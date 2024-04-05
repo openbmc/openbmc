@@ -18,8 +18,6 @@ RDEPENDS:${PN} = "python3-json"
 
 inherit setuptools3
 
-PIP_INSTALL_PACKAGE = "python_cson"
-
 do_configure:prepend() {
     echo "__version__=${PV}" > ${S}/version.py
 }

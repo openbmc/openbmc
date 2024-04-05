@@ -6,7 +6,7 @@ Subject: [PATCH] ssaparse: enhance SSA text lines parsing.
 some parser will pass in the original ssa text line which starts with "Dialog:"
 and there's are maybe multiple Dialog lines in one input buffer.
 
-Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=747496]
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gst-plugins-base/-/issues/178]
 
 Signed-off-by: Mingke Wang <mingke.wang@freescale.com>
 

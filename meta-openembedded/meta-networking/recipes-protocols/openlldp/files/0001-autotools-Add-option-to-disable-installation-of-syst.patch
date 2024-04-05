@@ -1,4 +1,4 @@
-From dc3f2250908587710f109c80ddf8a94f0bc40b82 Mon Sep 17 00:00:00 2001
+From 7147add9fedfb28909639ae419f995041d086266 Mon Sep 17 00:00:00 2001
 From: Jonathan Richardson <jonathan.richardson@broadcom.com>
 Date: Fri, 6 Apr 2018 10:49:04 -0700
 Subject: [PATCH] autotools: Add option to disable installation of systemd conf
@@ -23,10 +23,10 @@ Upstream-Status: Pending
  2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 292c0fd..0fb9bb0 100644
+index 86174e9..e90e966 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -138,8 +138,9 @@ install-data-hook:	installdirs-local
+@@ -141,8 +141,9 @@ install-data-hook:	installdirs-local
  pkgconfigdir = ${libdir}/pkgconfig
  pkgconfig_DATA = lldpad.pc liblldp_clif.pc
  
@@ -38,10 +38,10 @@ index 292c0fd..0fb9bb0 100644
  bashcompletiondir = $(sysconfdir)/bash_completion.d
  dist_bashcompletion_DATA = contrib/bash_completion/lldpad contrib/bash_completion/lldptool
 diff --git a/configure.ac b/configure.ac
-index 0667446..f75f433 100644
+index fa2f3a0..1a038cd 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -95,6 +95,15 @@ AC_TYPE_UINT16_T
+@@ -132,6 +132,15 @@ AC_TYPE_UINT16_T
  AC_TYPE_UINT32_T
  AC_TYPE_UINT8_T
  

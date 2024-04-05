@@ -1,0 +1,53 @@
+From 7a6089a400a573b9a4fd92f29c00a6be7b8ef269 Mon Sep 17 00:00:00 2001
+From: Phil Sutter <phil@nwl.cc>
+Date: Thu, 2 Nov 2023 16:02:14 +0100
+Subject: [PATCH] tests: shell: Fix sets/reset_command_0 for current kernels
+
+Since kernel commit 4c90bba60c26 ("netfilter: nf_tables: do not refresh
+timeout when resetting element"), element reset won't touch expiry
+anymore. Invert the one check to make sure it remains unaltered, drop
+the other testing behaviour for per-element timeouts.
+
+Signed-off-by: Phil Sutter <phil@nwl.cc>
+
+Upstream-Status: Backport
+[https://git.netfilter.org/nftables/commit/?id=7a6089a400a573b9a4fd92f29c00a6be7b8ef269]
+
+Signed-off-by: William Lyu <William.Lyu@windriver.com>
+---
+ tests/shell/testcases/sets/reset_command_0 | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/tests/shell/testcases/sets/reset_command_0 b/tests/shell/testcases/sets/reset_command_0
+index e663dac8..d38ddb3f 100755
+--- a/tests/shell/testcases/sets/reset_command_0
++++ b/tests/shell/testcases/sets/reset_command_0
+@@ -44,10 +44,10 @@ elem='element t s { 1.0.0.1 . udp . 53 }'
+ 	grep 'elements = ' | drop_seconds | uniq | wc -l) == 1 ]]
+ echo OK
+ 
+-echo -n "counters and expiry are reset: "
++echo -n "counters are reset, expiry left alone: "
+ NEW=$($NFT "get $elem")
+ grep -q 'counter packets 0 bytes 0' <<< "$NEW"
+-[[ $(expires_minutes <<< "$NEW") -gt 20 ]]
++[[ $(expires_minutes <<< "$NEW") -lt 20 ]]
+ echo OK
+ 
+ echo -n "get map elem matches reset map elem: "
+@@ -80,12 +80,6 @@ OUT=$($NFT reset map t m)
+ $DIFF -u <(echo "$EXP") <(echo "$OUT")
+ echo OK
+ 
+-echo -n "reset command respects per-element timeout: "
+-VAL=$($NFT get element t s '{ 2.0.0.2 . tcp . 22 }' | expires_minutes)
+-[[ $VAL -lt 15 ]]	# custom timeout applies
+-[[ $VAL -gt 10 ]]	# expires was reset
+-echo OK
+-
+ echo -n "remaining elements are reset: "
+ OUT=$($NFT list ruleset)
+ grep -q '2.0.0.2 . tcp . 22 counter packets 0 bytes 0' <<< "$OUT"
+-- 
+2.43.0
+

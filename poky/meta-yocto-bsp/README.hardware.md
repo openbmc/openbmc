@@ -1,5 +1,5 @@
-                  Yocto Project Hardware Reference BSPs README
-                  ============================================
+Yocto Project Hardware Reference BSPs README
+============================================
 
 This file gives details about using the Yocto Project hardware reference BSPs.
 The machines supported can be seen in the conf/machine/ directory and are listed 
@@ -13,9 +13,7 @@ consult the documentation for your board/device.
 Support for additional devices is normally added by adding BSP layers to your 
 configuration. For more information please see the Yocto Board Support Package 
 (BSP) Developer's Guide - documentation source is in documentation/bspguide or 
-download the PDF from:
-
-   https://docs.yoctoproject.org/
+download the PDF from https://docs.yoctoproject.org/
 
 Note that these reference BSPs use the linux-yocto kernel and in general don't
 pull in binary module support for the platforms. This means some device functionality
@@ -27,9 +25,9 @@ Hardware Reference Boards
 
 The following boards are supported by the meta-yocto-bsp layer:
 
-  * Texas Instruments Beaglebone (beaglebone-yocto)
-  * General 64-bit Arm SystemReady platforms (genericarm64)
-  * General IA platforms (genericx86 and genericx86-64)
+  * Texas Instruments Beaglebone (`beaglebone-yocto`)
+  * General 64-bit Arm SystemReady platforms (`genericarm64`)
+  * General IA platforms (`genericx86` and `genericx86-64`)
 
 For more information see the board's section below. The appropriate MACHINE
 variable value corresponding to the board is given in brackets.
@@ -40,36 +38,36 @@ Reference Board Maintenance and Contributions
 Please refer to our contributor guide here: https://docs.yoctoproject.org/dev/contributor-guide/
 for full details on how to submit changes.
 
-As a quick guide, patches should be sent to poky@lists.yoctoproject.org
+As a quick guide, patches should be sent to <poky@lists.yoctoproject.org>
 The git command to do that would be:
  
      git send-email -M -1 --to poky@lists.yoctoproject.org
 
 Send pull requests, patches, comments or questions about meta-yocto-bsp to 
-poky@lists.yoctoproject.org
+<poky@lists.yoctoproject.org>.
 
-Maintainers: Kevin Hao <kexin.hao@windriver.com>
-             Bruce Ashfield <bruce.ashfield@gmail.com>
+Maintainers:
+* Kevin Hao <kexin.hao@windriver.com>
+* Bruce Ashfield <bruce.ashfield@gmail.com>
 
 Consumer Devices
 ================
 
 The following consumer devices are supported by the meta-yocto-bsp layer:
 
-  * Arm-based SystemReady devices (genericarm64)
-  * Intel x86 based PCs and devices (genericx86 and genericx86-64)
+  * Arm-based SystemReady devices (`genericarm64`)
+  * Intel x86 based PCs and devices (`genericx86` and `genericx86-64`)
 
 For more information see the device's section below. The appropriate MACHINE
 variable value corresponding to the device is given in brackets.
 
 
-
-                      Specific Hardware Documentation
-                      ===============================
+Specific Hardware Documentation
+===============================
 
 
 Intel x86 based PCs and devices (genericx86*)
-=============================================
+---------------------------------------------
 
 The genericx86 and genericx86-64 MACHINE are tested on the following platforms:
 
@@ -96,17 +94,18 @@ target boot device is /dev/sdb, be sure to verify this and use the correct
 device as the following commands are run as root and are not reversable.
 
 USB Device:
+
   1. Build a live image. This image type consists of a simple filesystem
      without a partition table, which is suitable for USB keys, and with the
      default setup for the genericx86 machine, this image type is built
      automatically for any image you build. For example:
 
-     $ bitbake core-image-minimal
+         $ bitbake core-image-minimal
 
-  2. Use the "dd" utility to write the image to the raw block device. For
+  2. Use the `dd` utility to write the image to the raw block device. For
      example:
 
-     # dd if=core-image-minimal-genericx86.hddimg of=/dev/sdb
+         # dd if=core-image-minimal-genericx86.hddimg of=/dev/sdb
 
   If the device fails to boot with "Boot error" displayed, or apparently
   stops just after the SYSLINUX version banner, it is likely the BIOS cannot
@@ -120,16 +119,16 @@ USB Device:
 
   2. Use a ".wic" image with an EFI partition
 
-     a) With a default grub-efi bootloader:
-     # dd if=core-image-minimal-genericx86-64.wic of=/dev/sdb
+     1. With a default grub-efi bootloader:
 
-     b) Use systemd-boot instead
-     - Build an image with EFI_PROVIDER="systemd-boot" then use the above
-       dd command to write the image to a USB stick.
+            # dd if=core-image-minimal-genericx86-64.wic of=/dev/sdb
+
+     2. Use systemd-boot instead. Build an image with `EFI_PROVIDER="systemd-boot"` then use the above
+       `dd` command to write the image to a USB stick.
 
 
-SystemReady Arm Platforms
-=========================
+SystemReady Arm Platforms (genericarm64)
+----------------------------------------
 
 The genericarm64 MACHINE is designed to work on standard SystemReady IR
 compliant boards with preinstalled firmware.
@@ -141,17 +140,22 @@ The genericarm64 MACHINE is currently tested on the following platforms:
 The images built are EFI bootable disk images and can be written directly to a
 SD card for booting, for example.
 
+There is also limited support for booting a genericarm64 image inside QEMU. When
+building the image also build the `u-boot` recipe to build the required
+firmware (note that this firmware will _not_ boot on real hardware), then use
+`runqemu` as usual.
+
 
 Texas Instruments Beaglebone (beaglebone-yocto)
-===============================================
+-----------------------------------------------
 
 The Beaglebone is an ARM Cortex-A8 development board with USB, Ethernet, 2D/3D
 accelerated graphics, audio, serial, JTAG, and SD/MMC. The Black adds a faster
 CPU, more RAM, eMMC flash and a micro HDMI port. The beaglebone MACHINE is
 tested on the following platforms:
 
-  o Beaglebone Black A6
-  o Beaglebone A6 (the original "White" model)
+  * Beaglebone Black A6
+  * Beaglebone A6 (the original "White" model)
 
 The Beaglebone Black has eMMC, while the White does not. Pressing the USER/BOOT
 button when powering on will temporarily change the boot order. But for the sake
@@ -169,10 +173,10 @@ From a Linux system with access to the image files perform the following steps:
 
   1. Build an image. For example:
 
-     $ bitbake core-image-minimal
+         $ bitbake core-image-minimal
 
   2. Use the "dd" utility to write the image to the SD card. For example:
 
-     # dd if=core-image-minimal-beaglebone-yocto.wic of=/dev/sdb
+         # dd if=core-image-minimal-beaglebone-yocto.wic of=/dev/sdb
 
   3. Insert the SD card into the Beaglebone and boot the board.

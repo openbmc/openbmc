@@ -6,49 +6,27 @@ Subject: [PATCH] Compatibility fixes for musl.
 ---
 Upstream-Status: Pending
 
- m4/pc_from_ucontext.m4             | 4 +++-
- src/getpc.h                        | 3 +++
+ src/getpc.h                        | 4 ++++
  src/stacktrace_powerpc-linux-inl.h | 8 ++++++--
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/m4/pc_from_ucontext.m4 b/m4/pc_from_ucontext.m4
-index 7f09dd7..5f4ee8c 100644
---- a/m4/pc_from_ucontext.m4
-+++ b/m4/pc_from_ucontext.m4
-@@ -34,6 +34,7 @@ AC_DEFUN([AC_PC_FROM_UCONTEXT],
-    pc_fields="$pc_fields uc_mcontext.gregs[[R15]]"     # Linux (arm old [untested])
-    pc_fields="$pc_fields uc_mcontext.arm_pc"           # Linux (arm arch 5)
-    pc_fields="$pc_fields uc_mcontext.gp_regs[[PT_NIP]]"  # Suse SLES 11 (ppc64)
-+   pc_fields="$pc_fields uc_mcontext.gregs[[PT_NIP]]"
-    pc_fields="$pc_fields uc_mcontext.mc_eip"           # FreeBSD (i386)
-    pc_fields="$pc_fields uc_mcontext.mc_srr0"          # FreeBSD (powerpc, powerpc64)
-    pc_fields="$pc_fields uc_mcontext.mc_rip"           # FreeBSD (x86_64 [untested])
-@@ -77,7 +78,8 @@ AC_DEFUN([AC_PC_FROM_UCONTEXT],
-                         pc_field_found=true)
-        elif test "x$ac_cv_header_ucontext_h" = xyes; then
-          AC_TRY_COMPILE([#define _GNU_SOURCE 1
--                         #include <ucontext.h>],
-+                         #include <ucontext.h>
-+                         #include <asm/ptrace.h>],
-                         [ucontext_t u; return u.$pc_field == 0;],
-                         AC_DEFINE_UNQUOTED(PC_FROM_UCONTEXT, $pc_field,
-                                            How to access the PC from a struct ucontext)
 diff --git a/src/getpc.h b/src/getpc.h
-index 9605363..cd8ccfa 100644
+index 87d18b6..c569731 100644
 --- a/src/getpc.h
 +++ b/src/getpc.h
-@@ -68,6 +68,9 @@
+@@ -68,6 +68,10 @@
  typedef ucontext ucontext_t;
  #endif
  
 +#if defined(__powerpc__) && !defined(PT_NIP)
 +#define PT_NIP 32
 +#endif
++
+ namespace tcmalloc {
+ namespace getpc {
  
- // Take the example where function Foo() calls function Bar().  For
- // many architectures, Bar() is responsible for setting up and tearing
 diff --git a/src/stacktrace_powerpc-linux-inl.h b/src/stacktrace_powerpc-linux-inl.h
-index a301a46..efca426 100644
+index 883e7d2..212bd25 100644
 --- a/src/stacktrace_powerpc-linux-inl.h
 +++ b/src/stacktrace_powerpc-linux-inl.h
 @@ -186,7 +186,7 @@ static int GET_STACK_TRACE_OR_FRAMES {

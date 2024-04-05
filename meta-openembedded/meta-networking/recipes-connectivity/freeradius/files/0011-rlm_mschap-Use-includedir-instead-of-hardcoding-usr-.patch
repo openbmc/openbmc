@@ -14,18 +14,15 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/modules/rlm_mschap/configure.ac b/src/modules/rlm_mschap/configure.ac
-index 0fd105d7e6..6ab15509e5 100644
+index 953336f475..77a18af55d 100644
 --- a/src/modules/rlm_mschap/configure.ac
 +++ b/src/modules/rlm_mschap/configure.ac
-@@ -75,7 +75,7 @@ if test x$with_[]modname != xno; then
-         mod_ldflags="-F /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks -framework DirectoryService"
-     fi
+@@ -77,7 +77,7 @@ else
+         FR_MODULE_FEATURE([opendirectory], [without opendirectory support])
+ fi
  
--    smart_try_dir="$winbind_include_dir /usr/include/samba-4.0"
-+    smart_try_dir="$winbind_include_dir =/usr/include/samba-4.0"
-     FR_SMART_CHECK_INCLUDE(wbclient.h, [#include <stdint.h>
- 					#include <stdbool.h>])
-     if test "x$ac_cv_header_wbclient_h" != "xyes"; then
--- 
-2.25.1
-
+-smart_try_dir="$winbind_include_dir /usr/include/samba-4.0"
++smart_try_dir="$winbind_include_dir =/usr/include/samba-4.0"
+ FR_SMART_CHECK_INCLUDE(wbclient.h, [#include <stdint.h>
+ 				#include <stdbool.h>])
+ if test "x$ac_cv_header_wbclient_h" != "xyes"; then

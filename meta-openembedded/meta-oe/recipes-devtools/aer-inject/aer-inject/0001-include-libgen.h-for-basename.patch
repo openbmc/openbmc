@@ -1,0 +1,32 @@
+From a2ccd98076c2ac81830234555edf362ee19a337d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 09:00:41 -0700
+Subject: [PATCH] include libgen.h for basename
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [Emailed patch to Author]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ aer-inject.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/aer-inject.c b/aer-inject.c
+index 74e7f72..eed1211 100644
+--- a/aer-inject.c
++++ b/aer-inject.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include <stdio.h>
++#include <libgen.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <fcntl.h>
+-- 
+2.44.0
+

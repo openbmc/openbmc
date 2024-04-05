@@ -19,7 +19,7 @@ CVE_PRODUCT = "libsoup"
 
 S = "${WORKDIR}/libsoup-${PV}"
 
-inherit meson gettext pkgconfig upstream-version-is-even gobject-introspection gi-docgen
+inherit meson gettext pkgconfig upstream-version-is-even gobject-introspection gi-docgen vala
 
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
@@ -39,7 +39,7 @@ EOF
 }
 EXTRA_OEMESON:append:class-target = " --cross-file ${WORKDIR}/soup.cross"
 
-EXTRA_OEMESON += "-Dvapi=disabled -Dtls_check=false"
+EXTRA_OEMESON += "-Dtls_check=false"
 # Disable the test suites
 EXTRA_OEMESON += "-Dtests=false -Dautobahn=disabled -Dpkcs11_tests=disabled"
 

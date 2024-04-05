@@ -18,7 +18,6 @@ SRC_URI[sha256sum] = "ef9f7906484cfde4ba223b2682a37058f9a3c7d3bb1adda7a34a67402e
 
 S = "${WORKDIR}/${BPN}"
 
-PR = "r1"
 
 do_compile:prepend() {
     # PO subdir must be in build directory

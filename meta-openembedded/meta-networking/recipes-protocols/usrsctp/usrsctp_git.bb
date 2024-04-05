@@ -2,7 +2,7 @@ DESCRIPTION = "This is a userland SCTP stack supporting FreeBSD, Linux, Mac OS X
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ffcf846341f3856d79a483eafa18e2a5"
 
-SRCREV = "a0cbf4681474fab1e89d9e9e2d5c3694fce50359"
+SRCREV = "848eca82f92273af9a79687a90343a2ebcf3481d"
 SRC_URI = "git://github.com/sctplab/usrsctp;protocol=https;branch=master \
           "
 
@@ -24,4 +24,4 @@ PACKAGECONFIG[inet6] = "--enable-inet6,--disable-inet6,"
 
 EXTRA_OECONF += "--disable-debug"
 
-CVE_VERSION = "0.9.3.0"
+CVE_VERSION = "0.9.5.0"

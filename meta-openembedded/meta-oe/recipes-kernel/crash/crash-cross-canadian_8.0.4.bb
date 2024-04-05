@@ -6,7 +6,6 @@ BPN = "crash"
 
 require crash.inc
 
-PR = "${INC_PR}.0"
 
 DEPENDS = "\
     nativesdk-ncurses \

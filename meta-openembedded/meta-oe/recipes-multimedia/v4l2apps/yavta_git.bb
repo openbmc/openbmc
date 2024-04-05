@@ -7,7 +7,6 @@ SRC_URI = "git://git.ideasonboard.org/yavta.git;branch=master \
 SRCREV = "65f740aa1758531fd810339bc1b7d1d33666e28a"
 
 PV = "0.0"
-PR = "r2"
 S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="

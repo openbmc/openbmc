@@ -17,9 +17,7 @@ require ${BPN}-crates.inc
 
 inherit pypi cargo-update-recipe-crates python_maturin
 
-S = "${WORKDIR}/pydantic_core-${PV}"
-
-PYPI_ARCHIVE_NAME = "pydantic_core-${PV}.${PYPI_PACKAGE_EXT}"
+PYPI_PACKAGE = "pydantic_core"
 
 RDEPENDS:${PN} += "python3-typing-extensions"
 

@@ -7,6 +7,8 @@ Use reproducible build date instead of compilation time and date.
 
 Signed-off-by: Oleh Matiusha <omatiush@cisco.com>
 
+
+Upstream-Status: Pending
 ---
  tools/re2c/parser.c | 5 +++++
  1 file changed, 5 insertions(+)

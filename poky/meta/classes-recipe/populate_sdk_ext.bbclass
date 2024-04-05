@@ -494,7 +494,7 @@ def prepare_locked_cache(d, baseoutpath, derivative, conf_initpath):
     bb.utils.remove(sstate_out, True)
 
     # uninative.bbclass sets NATIVELSBSTRING to 'universal%s' % oe.utils.host_gcc_version(d)
-    fixedlsbstring = "universal%s" % oe.utils.host_gcc_version(d)
+    fixedlsbstring = "universal%s" % oe.utils.host_gcc_version(d) if bb.data.inherits_class('uninative', d) else ""
 
     sdk_include_toolchain = (d.getVar('SDK_INCLUDE_TOOLCHAIN') == '1')
     sdk_ext_type = d.getVar('SDK_EXT_TYPE')

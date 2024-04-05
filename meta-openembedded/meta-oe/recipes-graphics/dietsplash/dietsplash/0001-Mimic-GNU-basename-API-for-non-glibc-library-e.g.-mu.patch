@@ -1,0 +1,28 @@
+From 272491297564513c4ce49a11bc1ecc523a3afd63 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 15 Mar 2024 11:05:54 -0700
+Subject: [PATCH] Mimic GNU basename() API for non-glibc library e.g. musl
+
+Upstream-Status: Submitted [https://github.com/lucasdemarchi/dietsplash/pull/7]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/util.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/util.h b/src/util.h
+index 1f4c3ef..a3ab54a 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -60,6 +60,9 @@
+  */
+ #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + _array_size_chk(arr))
+ 
++#if !defined(__GLIBC__)
++#define basename(src) (strrchr(src,'/') ? strrchr(src,'/')+1 : src)
++#endif
+ 
+ #define DIE_PREFIX "[" PACKAGE_NAME "] ERR: "
+ #define LOG_SUFFIX "\n"
+-- 
+2.44.0
+

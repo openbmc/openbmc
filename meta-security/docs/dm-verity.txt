@@ -3,7 +3,7 @@ dm-verity and Yocto/OE
 The dm-verity feature provides a level of data integrity and resistance to
 data tampering.  It does this by creating a hash for each data block of
 the underlying device as the base of a hash tree.  There are many
-documents out there to further explain the implementaion, such as the
+documents out there to further explain the implementation, such as the
 in-kernel one itself:
 
 https://docs.kernel.org/admin-guide/device-mapper/verity.html

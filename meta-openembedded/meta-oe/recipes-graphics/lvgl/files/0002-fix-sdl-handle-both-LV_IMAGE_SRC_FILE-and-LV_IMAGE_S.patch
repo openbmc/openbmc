@@ -1,0 +1,63 @@
+From 5b7f657e8ad656e0854f2252b3bd482b966d650c Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Wed, 13 Mar 2024 02:12:30 +0100
+Subject: [PATCH 2/2] fix(sdl): handle both LV_IMAGE_SRC_FILE and
+ LV_IMAGE_SRC_VARIABLE
+
+The SDL image draw code currently assumes that the image source is a
+filename and attempts to open that filename. This is not necessarily
+the case, e.g. the lv_demo_fb uses encoded images which are of type
+LV_IMAGE_SRC_VARIABLE and instead of filename, come with a buffer of
+pixels. Handle the later using SDL_CreateRGBSurfaceFrom().
+
+Upstream-Status: Submitted [https://github.com/lvgl/lvgl/pull/5852]
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+ src/draw/sdl/lv_draw_sdl.c | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/src/draw/sdl/lv_draw_sdl.c b/src/draw/sdl/lv_draw_sdl.c
+index cbb555d94..5eee5b725 100644
+--- a/src/draw/sdl/lv_draw_sdl.c
++++ b/src/draw/sdl/lv_draw_sdl.c
+@@ -224,10 +224,34 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
+             break;
+         case LV_DRAW_TASK_TYPE_IMAGE: {
+                 lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
+-                const char * path = image_dsc->src;
+-                SDL_Surface * surface = IMG_Load(&path[2]);
++                lv_image_src_t type = lv_image_src_get_type(image_dsc->src);
++                SDL_Surface * surface = NULL;
++                if(type == LV_IMAGE_SRC_FILE) {
++                    const char * path = image_dsc->src;
++                    surface = IMG_Load(&path[2]);
++                }
++                else if(type == LV_IMAGE_SRC_VARIABLE) {
++                    lv_image_dsc_t * lvd = image_dsc->src;
++                    surface = SDL_CreateRGBSurfaceFrom(lvd->data,
++                                                       lvd->header.w, lvd->header.h,
++                                                       LV_COLOR_FORMAT_GET_BPP(lvd->header.cf),
++                                                       lvd->header.stride,
++#if SDL_BYTEORDER == SDL_LIL_ENDIAN
++                                                       0x00FF0000,
++                                                       0x0000FF00,
++                                                       0x000000FF,
++                                                       0xFF000000
++#else
++                                                       0x0000FF00,
++                                                       0x00FF0000,
++                                                       0xFF000000,
++                                                       0x000000FF
++#endif
++                                                      );
++                }
++
+                 if(surface == NULL) {
+-                    fprintf(stderr, "could not load image: %s\n", IMG_GetError());
++                    fprintf(stderr, "could not load image\n");
+                     return false;
+                 }
+ 
+-- 
+2.43.0
+

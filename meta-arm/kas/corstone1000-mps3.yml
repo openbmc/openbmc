@@ -2,5 +2,7 @@ header:
   version: 14
   includes:
     - kas/corstone1000-base.yml
+    - kas/corstone1000-image-configuration.yml
+    - kas/corstone1000-firmware-only.yml
 
 machine: corstone1000-mps3

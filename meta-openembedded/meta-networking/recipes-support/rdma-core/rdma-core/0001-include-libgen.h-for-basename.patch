@@ -1,0 +1,58 @@
+From ae6adc4c748e67919fdf8ae1d44c619ee104c271 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 11:37:41 -0700
+Subject: [PATCH] include libgen.h for basename
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://github.com/linux-rdma/rdma-core/pull/1443]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kernel-boot/rdma_rename.c  | 1 +
+ librdmacm/examples/rping.c | 1 +
+ providers/mlx5/mlx5_vfio.c | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/kernel-boot/rdma_rename.c b/kernel-boot/rdma_rename.c
+index 4af9e4a39..5193ac411 100644
+--- a/kernel-boot/rdma_rename.c
++++ b/kernel-boot/rdma_rename.c
+@@ -2,6 +2,7 @@
+ /* Copyright (c) 2019, Mellanox Technologies. All rights reserved. See COPYING file */
+ 
+ #define _GNU_SOURCE
++#include <libgen.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/librdmacm/examples/rping.c b/librdmacm/examples/rping.c
+index cc16ad910..0f1321458 100644
+--- a/librdmacm/examples/rping.c
++++ b/librdmacm/examples/rping.c
+@@ -33,6 +33,7 @@
+ #define _GNU_SOURCE
+ #include <endian.h>
+ #include <getopt.h>
++#include <libgen.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
+diff --git a/providers/mlx5/mlx5_vfio.c b/providers/mlx5/mlx5_vfio.c
+index cd0c41462..4d064b1fc 100644
+--- a/providers/mlx5/mlx5_vfio.c
++++ b/providers/mlx5/mlx5_vfio.c
+@@ -6,6 +6,7 @@
+ #define _GNU_SOURCE
+ #include <config.h>
+ 
++#include <libgen.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+-- 
+2.44.0
+

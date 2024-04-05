@@ -63,6 +63,7 @@ EXTRA_OECONF:class-target = "\
     --with-berkeley-db=no \
     --enable-info \
     --enable-rewrite \
+    --with-mpm=prefork \
     --enable-mpms-shared \
     ap_cv_void_ptr_lt_long=no \
     ac_cv_have_threadsafe_pollset=no \

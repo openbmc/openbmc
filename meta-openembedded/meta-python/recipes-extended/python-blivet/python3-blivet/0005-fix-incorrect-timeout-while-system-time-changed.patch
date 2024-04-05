@@ -1,4 +1,4 @@
-From f783b9b00da5df176fcd7927b752f574ca6db319 Mon Sep 17 00:00:00 2001
+From c645c83628b2290855cbd225e13c038ab75a7f74 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 26 Aug 2016 02:02:49 -0400
 Subject: [PATCH 05/11] fix incorrect timeout while system time changed
@@ -22,10 +22,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index 7e89949..5571e73 100644
+index 58117ae..5bc5804 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -163,14 +163,14 @@ def timeout_command(argv, timeout, *args, **kwargs):
+@@ -176,14 +176,14 @@ def timeout_command(argv, timeout, *args, **kwargs):
      """call shell-command and either return its output or kill it
      if it doesn't normally exit within timeout seconds and return None"""
      import subprocess, datetime, os, time, signal
@@ -43,6 +43,3 @@ index 7e89949..5571e73 100644
                  os.kill(proc.pid, signal.SIGKILL)
                  os.waitpid(-1, os.WNOHANG)
                  program_log.debug("%d seconds timeout" % timeout)
--- 
-2.7.4
-

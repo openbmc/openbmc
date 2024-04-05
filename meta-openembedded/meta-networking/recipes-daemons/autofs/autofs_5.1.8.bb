@@ -29,6 +29,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/daemons/autofs/v5/autofs-${PV}.tar.gz \
            file://mount_conflict.patch \
            file://0001-autofs-5.1.8-add-autofs_strerror_r-helper-for-musl.patch \
            file://0002-autofs-5.1.8-handle-innetgr-not-present-in-musl.patch \
+           file://0001-include-libgen.h-for-basename.patch \
            "
 SRC_URI[sha256sum] = "0bd401c56f0eb1ca6251344c3a3d70bface3eccf9c67117cd184422c4cace30c"
 

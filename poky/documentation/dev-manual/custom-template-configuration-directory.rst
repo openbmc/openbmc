@@ -42,11 +42,11 @@ would be::
    TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf/templates/default}
 
 If you look at a configuration template directory, you will
-see the ``bblayers.conf.sample``, ``local.conf.sample``, and
+see the ``bblayers.conf.sample``, ``local.conf.sample``, ``conf-summary.txt`` and
 ``conf-notes.txt`` files. The build system uses these files to form the
 respective ``bblayers.conf`` file, ``local.conf`` file, and show
-users a note about the build they're setting up
+users usage information about the build they're setting up
 when running the ``oe-init-build-env`` setup script. These can be
 edited further if needed to improve or change the build configurations
-available to the users.
+available to the users, and provide useful summaries and detailed usage notes.
 

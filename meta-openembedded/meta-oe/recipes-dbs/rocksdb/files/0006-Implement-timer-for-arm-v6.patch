@@ -1,0 +1,40 @@
+From 9e274ba2762724f353227b5a3a6e4433f706468a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Mar 2024 14:16:08 +0800
+Subject: [PATCH] Implement timer for arm >= v6
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../range/range_tree/lib/portability/toku_time.h   | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+index ad7d9f2124..bcb795b7e7 100644
+--- a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
++++ b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+@@ -168,6 +168,20 @@ static inline tokutime_t toku_time_now(void) {
+   struct timeval tv;
+   gettimeofday(&tv, nullptr);
+   return (uint64_t)tv.tv_sec * 1000000 + tv.tv_usec;
++#elif (__ARM_ARCH >= 6)
++  uint32_t pmccntr;
++  uint32_t pmuseren;
++  uint32_t pmcntenset;
++  // Read the user mode perf monitor counter access permissions.
++  asm volatile("mrc p15, 0, %0, c9, c14, 0" : "=r"(pmuseren));
++  if (pmuseren & 1) {  // Allows reading perfmon counters for user mode code.
++    asm volatile("mrc p15, 0, %0, c9, c12, 1" : "=r"(pmcntenset));
++    if (pmcntenset & 0x80000000ul) {  // Is it counting?
++      asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(pmccntr));
++      // The counter is set up to count every 64th cycle
++      return (uint64_t)pmccntr * 64;  // Should optimize to << 6
++    }
++  }
+ #else
+ #error No timer implementation for this platform
+ #endif
+-- 
+2.25.1
+

@@ -4,7 +4,6 @@ SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=3d82780e8917b360cbee7b9ec3e40734"
 
-PR = "r2"
 
 # v0.97
 SRCREV = "57ebc07ad8723ea4106090536c58c7f7160743e2"

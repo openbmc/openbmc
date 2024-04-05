@@ -10,8 +10,6 @@ SRC_URI[sha256sum] = "4e65e9e0d80fc9e609574b9983cf32579f305c718afb30d7233ab81857
 
 inherit python_flit_core pypi ptest
 
-PIP_INSTALL_PACKAGE = "marshmallow"
-
 SRC_URI += " \
         file://run-ptest \
 "

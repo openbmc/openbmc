@@ -1,4 +1,4 @@
-From 9cec6297effa9fab6f0c71e342046daceecd7d4d Mon Sep 17 00:00:00 2001
+From 102dcce6610e6606fffd3a4986f84eb52177f8c8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 13 Mar 2021 10:26:25 -0800
 Subject: [PATCH] An all-in-one patch that fixes several issues:
@@ -13,7 +13,6 @@ Sourced from void linux
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Xu Huan <xuhuan.fnst@fujitsu.com>
-
 ---
  .../abseil-cpp/absl/base/internal/unscaledcycleclock.cc   | 4 ++--
  .../absl/base/internal/unscaledcycleclock_config.h        | 3 ++-
@@ -22,7 +21,7 @@ Signed-off-by: Xu Huan <xuhuan.fnst@fujitsu.com>
  4 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
-index b1c396c..d62bfd6 100644
+index 05e0e7b..f11fecb 100644
 --- a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
 +++ b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
 @@ -20,7 +20,7 @@
@@ -58,10 +57,10 @@ index 24b324a..5e232c1 100644
  #define ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 1
  #else
 diff --git a/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc b/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc
-index 5786322..72c7c46 100644
+index 3dd6ba1..9f0601c 100644
 --- a/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc
 +++ b/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc
-@@ -33,6 +33,10 @@
+@@ -36,6 +36,10 @@
  #include <csignal>
  #include <cstdio>
  
@@ -72,7 +71,7 @@ index 5786322..72c7c46 100644
  #include "absl/base/attributes.h"
  #include "absl/base/internal/raw_logging.h"
  #include "absl/base/macros.h"
-@@ -174,8 +178,10 @@ void* GetProgramCounter(void* const vuc) {
+@@ -177,8 +181,10 @@ void* GetProgramCounter(void* const vuc) {
      return reinterpret_cast<void*>(context->uc_mcontext.pc);
  #elif defined(__powerpc64__)
      return reinterpret_cast<void*>(context->uc_mcontext.gp_regs[32]);

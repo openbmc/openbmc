@@ -1,0 +1,50 @@
+From 5b921009b0db2c5c15aef7ce241d3c81f9c272c9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Mar 2024 12:26:39 -0800
+Subject: [PATCH] taglib: Fix build on x86 32-bit
+
+While compiling with clang, there are errors seen such as
+on function override signature mismatches
+
+meta_engine/taglib.cpp:240:10: error: virtual function 'tell' has a different return type ('long') than the function it overrides (which has return type 'offset_t' (aka 'long long'))
+  240 |     long tell() const
+      |     ~~~~ ^
+/mnt/b/yoe/master/build/tmp/work/core2-32-yoe-linux/vlc/3.0.20/recipe-sysroot/usr/include/taglib/tiostream.h:156:22: note: overridden virtual function is here
+  156 |     virtual offset_t tell() const = 0;
+      |             ~~~~~~~~ ^
+meta_engine/taglib.cpp:245:10: error: virtual function 'length' has a different return type ('long') than the function it overrides (which has return type 'offset_t' (aka 'long long'))
+  245 |     long length()
+      |     ~~~~ ^
+/mnt/b/yoe/master/build/tmp/work/core2-32-yoe-linux/vlc/3.0.20/recipe-sysroot/usr/include/taglib/tiostream.h:161:22: note: overridden virtual function is here
+  161 |     virtual offset_t length() = 0;
+      |             ~~~~~~~~ ^
+
+Upstream-Status: Submitted [https://mailman.videolan.org/pipermail/vlc-devel/2024-March/143639.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ modules/meta_engine/taglib.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/modules/meta_engine/taglib.cpp b/modules/meta_engine/taglib.cpp
+index f371485008..129fdf55f1 100644
+--- a/modules/meta_engine/taglib.cpp
++++ b/modules/meta_engine/taglib.cpp
+@@ -237,12 +237,12 @@ public:
+         return;
+     }
+ 
+-    long tell() const
++    offset_t tell() const
+     {
+-        return m_previousPos;
++        return (offset_t)m_previousPos;
+     }
+ 
+-    long length()
++    offset_t length()
+     {
+         uint64_t i_size;
+         if (vlc_stream_GetSize( m_stream, &i_size ) != VLC_SUCCESS)
+-- 
+2.44.0
+

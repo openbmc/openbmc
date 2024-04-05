@@ -1,0 +1,32 @@
+From aa1f157c675da248ed186e020d17cb2528d0be12 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 22 Jun 2017 10:25:08 +0800
+Subject: [PATCH] net-snmp: fix for --disable-des
+
+Include des.h only if it's found in openssl so that
+the --disable-des works correctly.
+
+Upstream-Status: Submitted [net-snmp-coders@lists.sourceforge.net]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ snmplib/scapi.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/snmplib/scapi.c b/snmplib/scapi.c
+index ac77004..7545bfa 100644
+--- a/snmplib/scapi.c
++++ b/snmplib/scapi.c
+@@ -86,7 +86,9 @@ netsnmp_feature_child_of(usm_scapi, usm_support);
+ #include <openssl/hmac.h>
+ #include <openssl/evp.h>
+ #include <openssl/rand.h>
++#ifdef HAVE_OPENSSL_DES_H
+ #include <openssl/des.h>
++#endif
+ #ifdef HAVE_AES
+ #include <openssl/aes.h>
+ #endif
+-- 
+2.25.1
+

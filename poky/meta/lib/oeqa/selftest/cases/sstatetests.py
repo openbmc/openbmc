@@ -772,15 +772,16 @@ addtask tmptask2 before do_tmptask1
 
             def find_siginfo(pn, taskname, sigs=None):
                 result = None
+                command_complete = False
                 tinfoil.set_event_mask(["bb.event.FindSigInfoResult",
                                 "bb.command.CommandCompleted"])
                 ret = tinfoil.run_command("findSigInfo", pn, taskname, sigs)
                 if ret:
-                    while True:
+                    while result is None or not command_complete:
                         event = tinfoil.wait_event(1)
                         if event:
                             if isinstance(event, bb.command.CommandCompleted):
-                                break
+                                command_complete = True
                             elif isinstance(event, bb.event.FindSigInfoResult):
                                 result = event.result
                 return result
@@ -959,7 +960,7 @@ class SStateMirrors(SStateBase):
         self.assertEqual(len(failed_urls), missing_objects, "Amount of reported missing objects does not match failed URLs: {}\nFailed URLs:\n{}\nFetcher diagnostics:\n{}".format(missing_objects, "\n".join(failed_urls), "\n".join(failed_urls_extrainfo)))
         self.assertEqual(len(failed_urls), 0, "Missing objects in the cache:\n{}\nFetcher diagnostics:\n{}".format("\n".join(failed_urls), "\n".join(failed_urls_extrainfo)))
 
-    def run_test(self, machine, targets, exceptions, check_cdn = True):
+    def run_test(self, machine, targets, exceptions, check_cdn = True, ignore_errors = False):
         # sstate is checked for existence of these, but they never get written out to begin with
         exceptions += ["{}.*image_qa".format(t) for t in targets.split()]
         exceptions += ["{}.*deploy_source_date_epoch".format(t) for t in targets.split()]
@@ -984,14 +985,18 @@ MACHINE = "{}"
 """.format(machine))
         result = bitbake("-DD -n {}".format(targets))
         bitbake("-S none {}".format(targets))
+        if ignore_errors:
+            return
         self.check_bb_output(result.output, exceptions, check_cdn)
 
     def test_cdn_mirror_qemux86_64(self):
         exceptions = []
+        self.run_test("qemux86-64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions, ignore_errors = True)
         self.run_test("qemux86-64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
 
     def test_cdn_mirror_qemuarm64(self):
         exceptions = []
+        self.run_test("qemuarm64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions, ignore_errors = True)
         self.run_test("qemuarm64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
 
     def test_local_cache_qemux86_64(self):

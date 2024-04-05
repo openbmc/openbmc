@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022-2023, Arm Limited.
+ # Copyright (c) 2022-2024, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -152,7 +152,7 @@ commands to build the stack. kas version 4 is required. To install kas, run:
 
     pip3 install kas
 
-If 'kas' command is not found in command-line, please make sure the user installation directories are visible on $PATH. If you have sudo rights, try 'sudo pip3 install kas'. 
+If 'kas' command is not found in command-line, please make sure the user installation directories are visible on $PATH. If you have sudo rights, try 'sudo pip3 install kas'.
 
 In the top directory of the workspace ``<_workspace>``, run:
 
@@ -171,7 +171,7 @@ the EULA at https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula
 by setting the ARM_FVP_EULA_ACCEPT environment variable as follows:
 
 ::
-  
+
     export ARM_FVP_EULA_ACCEPT="True"
 
 then run:
@@ -189,12 +189,12 @@ Once the build is successful, all output binaries will be placed in the followin
  - ``<_workspace>/build/tmp/deploy/images/corstone1000-mps3/`` folder for FPGA build.
 
 Everything apart from the Secure Enclave ROM firmware and External System firmware, is bundled into a single binary, the
-``corstone1000-image-corstone1000-{mps3,fvp}.wic`` file.
+``corstone1000-flash-firmware-image-corstone1000-{mps3,fvp}.wic`` file.
 
 The output binaries run in the Corstone-1000 platform are the following:
  - The Secure Enclave ROM firmware: ``<_workspace>/build/tmp/deploy/images/corstone1000-{mps3,fvp}/bl1.bin``
  - The External System firmware: ``<_workspace>/build/tmp/deploy/images/corstone1000-{mps3,fvp}/es_flashfw.bin``
- - The flash image: ``<_workspace>/build/tmp/deploy/images/corstone1000-{mps3,fvp}/corstone1000-image-corstone1000-{mps3,fvp}.wic``
+ - The flash image: ``<_workspace>/build/tmp/deploy/images/corstone1000-{mps3,fvp}/corstone1000-flash-firmware-image-corstone1000-{mps3,fvp}.wic``
 
 Flash the firmware image on FPGA
 --------------------------------
@@ -252,17 +252,17 @@ stack can be seen below;
 
   [IMAGES]
   TOTALIMAGES: 3      ;Number of Images (Max: 32)
-   
+
   IMAGE0PORT: 1
   IMAGE0ADDRESS: 0x00_0000_0000
   IMAGE0UPDATE: RAM
   IMAGE0FILE: \SOFTWARE\bl1.bin
-   
+
   IMAGE1PORT: 0
   IMAGE1ADDRESS: 0x00_0000_0000
   IMAGE1UPDATE: AUTOQSPI
   IMAGE1FILE: \SOFTWARE\cs1000.bin
-   
+
   IMAGE2PORT: 2
   IMAGE2ADDRESS: 0x00_0000_0000
   IMAGE2UPDATE: RAM
@@ -273,7 +273,7 @@ OUTPUT_DIR = ``<_workspace>/build/tmp/deploy/images/corstone1000-mps3``
 1. Copy ``bl1.bin`` from OUTPUT_DIR directory to SOFTWARE directory of the FPGA bundle.
 2. Copy ``es_flashfw.bin`` from OUTPUT_DIR directory to SOFTWARE directory of the FPGA bundle
    and rename the binary to ``es0.bin``.
-3. Copy ``corstone1000-image-corstone1000-mps3.wic`` from OUTPUT_DIR directory to SOFTWARE
+3. Copy ``corstone1000-flash-firmware-image-corstone1000-mps3.wic`` from OUTPUT_DIR directory to SOFTWARE
    directory of the FPGA bundle and rename the wic image to ``cs1000.bin``.
 
 **NOTE:** Renaming of the images are required because MCC firmware has
@@ -337,7 +337,7 @@ The latest supported Fixed Virtual Platform (FVP) version is 11_23.25 and is aut
 
 ::
 
-<_workspace>/meta-arm/scripts/runfvp <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- --version
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "../meta-arm/scripts/runfvp -- --version"
 
 The FVP can also be manually downloaded from the `Arm Ecosystem FVPs`_ page. On this page, navigate
 to "Corstone IoT FVPs" section to download the Corstone-1000 platform FVP installer.  Follow the
@@ -347,7 +347,7 @@ To run the FVP using the runfvp command, please run the following command:
 
 ::
 
-<_workspace>/meta-arm/scripts/runfvp --terminals=xterm <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "../meta-arm/scripts/runfvp --terminals=xterm"
 
 When the script is executed, three terminal instances will be launched, one for the boot processor
 (aka Secure Enclave) processing element and two for the Host processing element. Once the FVP is
@@ -488,7 +488,7 @@ the 2nd MMC card image.
 
 ::
 
-   <_workspace>/meta-arm/scripts/runfvp <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file="${<path-to-img>/ir_acs_live_image.img}" -C board.msd_mmc_2.p_mmc_file="${<path-to-img>/corstone1000-efi-partition.img}"
+   kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "../meta-arm/scripts/runfvp -- -C board.msd_mmc.p_mmc_file="${<path-to-img>/ir_acs_live_image.img}" -C board.msd_mmc_2.p_mmc_file="${<path-to-img>/corstone1000-efi-partition.img}"
 
 Clean Secure Flash Before Testing (applicable to FPGA only)
 ===========================================================
@@ -510,7 +510,7 @@ boot. Run following commands to build such image.
 
 Replace the bl1.bin and cs1000.bin files on the SD card with following files:
   - The ROM firmware: <_workspace>/build/tmp/deploy/images/corstone1000-mps3/bl1.bin
-  - The flash image: <_workspace>/build/tmp/deploy/images/corstone1000-mps3/corstone1000-image-corstone1000-mps3.wic
+  - The flash image: <_workspace>/build/tmp/deploy/images/corstone1000-mps3/corstone1000-flash-firmware-image-corstone1000-mps3.wic
 
 Now reboot the board. This step erases the Corstone-1000 SecureEnclave flash
 completely, the user should expect following message from TF-M log (can be seen
@@ -626,7 +626,7 @@ SD cards.
 
   unxz ${<path-to-img>/ir-acs-live-image-generic-arm64.wic.xz}
 
-  <_workspace>/meta-arm/scripts/runfvp  --terminals=xterm <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic -C board.msd_mmc_2.p_mmc_file="${<path-to-img>/corstone1000-efi-partition.img}"
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "../meta-arm/scripts/runfvp --terminals=xterm -- -C board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic -C board.msd_mmc_2.p_mmc_file="${<path-to-img>/corstone1000-efi-partition.img}"
 
 The test results can be fetched using following commands:
 
@@ -658,7 +658,7 @@ If this happens, please apply the following patch, rebuild the software stack fo
   cd meta-arm
   git am 0001-embedded-a-corstone1000-sr-ir-workaround.patch
   cd ..
-  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; bitbake corstone1000-image -c cleanall; bitbake corstone1000-image"
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; bitbake corstone1000-flash-firmware-image -c cleanall; bitbake corstone1000-flash-firmware-image"
 
 
 Common to FVP and FPGA
@@ -833,7 +833,7 @@ Run the FVP with the IR prebuilt image:
 
 ::
 
-   <_workspace>/meta-arm/scripts/runfvp --terminals=xterm <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic
+   kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "../meta-arm/scripts/runfvp --terminals=xterm -- -C board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic"
 
 **NOTE:** <path-to-img> must start from the root directory. make sure there are no spaces before or after of "=". board.msd_mmc.p_mmc_file=<path-to-img>/ir-acs-live-image-generic-arm64.wic.
 
@@ -857,25 +857,25 @@ Then, type FS0: as shown below:
 
   FS0:
 
-In case of the positive scenario run the update with the higher version capsule as shown below: 
+In case of the positive scenario run the update with the higher version capsule as shown below:
 
 ::
-  
+
   EFI/BOOT/app/CapsuleApp.efi cs1k_cap_<fvp/mps3>_v6
 
 After successfully updating the capsule the system will reset.
 
-In case of the negative scenario run the update with the lower version capsule as shown below: 
+In case of the negative scenario run the update with the lower version capsule as shown below:
 
 ::
-  
+
   EFI/BOOT/app/CapsuleApp.efi cs1k_cap_<fvp/mps3>_v5
 
 The command above should fail and in the TF-M logs the following message should appear:
 
 ::
 
-   ERROR: flash_full_capsule: version error 
+   ERROR: flash_full_capsule: version error
 
 Then, reboot manually:
 
@@ -942,7 +942,7 @@ In the Linux command-line run the following:
 
    # cd /sys/firmware/efi/esrt/entries/entry0
    # cat *
-    
+
    0x0
    989f3a4e-46e0-4cd0-9877-a25c70c01329
    0
@@ -956,7 +956,7 @@ In the Linux command-line run the following:
    fw_class:	989f3a4e-46e0-4cd0-9877-a25c70c01329
    fw_type:	0
    fw_version:	6
-   last_attempt_status:	0 
+   last_attempt_status:	0
    last_attempt_version:	6
    lowest_supported_fw_ver:	0
 
@@ -964,12 +964,12 @@ In the Linux command-line run the following:
 Negative scenario (Applicable to FPGA only)
 ===========================================
 
-In the negative case scenario (rollback the capsule version), the user should 
-see appropriate logs in the secure enclave terminal. 
+In the negative case scenario (rollback the capsule version), the user should
+see appropriate logs in the secure enclave terminal.
 
 ::
 
-  ...  
+  ...
     uefi_capsule_retrieve_images: image 0 at 0xa0000070, size=15654928
     uefi_capsule_retrieve_images: exit
     flash_full_capsule: enter: image = 0x0xa0000070, size = 7764541, version = 5
@@ -988,8 +988,8 @@ see appropriate logs in the secure enclave terminal.
   ...
 
 
-If capsule pass initial verification, but fails verifications performed during 
-boot time, secure enclave will try new images predetermined number of times 
+If capsule pass initial verification, but fails verifications performed during
+boot time, secure enclave will try new images predetermined number of times
 (defined in the code), before reverting back to the previous good bank.
 
 ::
@@ -1007,7 +1007,7 @@ In the Linux command-line run the following:
 
    # cd /sys/firmware/efi/esrt/entries/entry0
    # cat *
-    
+
    0x0
    989f3a4e-46e0-4cd0-9877-a25c70c01329
    0
@@ -1035,7 +1035,7 @@ Linux distros tests
 -------------------
 
 *************************************************************
-Debian install and boot preparation 
+Debian install and boot preparation
 *************************************************************
 
 There is a known issue in the `Shim 15.7 <https://salsa.debian.org/efi-team/shim/-/tree/upstream/15.7?ref_type=tags>`__
@@ -1064,12 +1064,12 @@ documentation.
 **On FPGA**
 ::
 
-  kas shell meta-arm/kas/corstone1000-mps3.yml:meta-arm/ci/debug.yml -c="bitbake u-boot trusted-firmware-a corstone1000-image -c cleansstate; bitbake corstone1000-image"
+  kas shell meta-arm/kas/corstone1000-mps3.yml:meta-arm/ci/debug.yml -c="bitbake u-boot trusted-firmware-a corstone1000-flash-firmware-image -c cleansstate; bitbake corstone1000-flash-firmware-image"
 
 **On FVP**
 ::
 
-  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot trusted-firmware-a corstone1000-image -c cleansstate; bitbake corstone1000-image"
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot trusted-firmware-a corstone1000-flash-firmware-image -c cleansstate; bitbake corstone1000-flash-firmware-image"
 
 On FPGA, please update the cs1000.bin on the SD card with the newly generated wic file.
 
@@ -1080,7 +1080,7 @@ On FPGA, please update the cs1000.bin on the SD card with the newly generated wi
   cd <_workspace>/meta-arm
   git reset --hard HEAD~1
   cd ..
-  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; bitbake corstone1000-image -c cleanall; bitbake corstone1000-image"
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c="bitbake u-boot -c cleanall; bitbake trusted-firmware-a -c cleanall; bitbake corstone1000-flash-firmware-image -c cleanall; bitbake corstone1000-flash-firmware-image"
 
 *************************************************
 Preparing the Installation Media
@@ -1089,7 +1089,7 @@ Preparing the Installation Media
 Download one of following Linux distro images:
  - `Debian installer image <https://cdimage.debian.org/debian-cd/current/arm64/iso-dvd/>`__ (Tested on: debian-12.2.0-arm64-DVD-1.iso)
  - `OpenSUSE Tumbleweed installer image <http://download.opensuse.org/ports/aarch64/tumbleweed/iso/>`__ (Tested on: openSUSE-Tumbleweed-DVD-aarch64-Snapshot20231120-Media.iso)
-  
+
 **NOTE:** For OpenSUSE Tumbleweed, the user should look for a DVD Snapshot like
 openSUSE-Tumbleweed-DVD-aarch64-Snapshot<date>-Media.iso
 
@@ -1100,7 +1100,7 @@ FPGA
 To test Linux distro install and boot on FPGA, the user should prepare two empty USB
 sticks (minimum size should be 4GB and formatted with FAT32).
 
-The downloaded iso file needs to be flashed to your USB drive. 
+The downloaded iso file needs to be flashed to your USB drive.
 This can be done with your development machine.
 
 In the example given below, we assume the USB device is ``/dev/sdb`` (the user
@@ -1157,10 +1157,10 @@ FVP
 
 ::
 
-  <_workspace>/meta-arm/scripts/runfvp --terminals=xterm <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file="<path-to-iso_file>" -C board.msd_mmc_2.p_mmc_file="<_workspace>/mmc2_file.img"
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "../meta-arm/scripts/runfvp --terminals=xterm -- -C board.msd_mmc.p_mmc_file="<path-to-iso_file>" -C board.msd_mmc_2.p_mmc_file="<_workspace>/mmc2_file.img"
 
 The installer should now start.
-The os will be installed on the second mmc 'mmc2_file.img'. 
+The os will be installed on the second mmc 'mmc2_file.img'.
 
 *******************************************************
 Debian install clarifications
@@ -1209,24 +1209,23 @@ FPGA
 Once the installation is complete, unplug the first USB stick and reboot the
 board.
 The board will then enter recovery mode, from which the user can access a shell
-after entering the password for the root user. 
+after entering the password for the root user.
 
 FVP
 ==============
-Once the installation is complete, you will need to exit the shell instance 
+Once the installation is complete, you will need to exit the shell instance
 and run this command to boot into the installed OS:
 
-:: 
+::
 
-  <_workspace>/meta-arm/scripts/runfvp --terminals=xterm <_workspace>/build/tmp/deploy/images/corstone1000-fvp/corstone1000-image-corstone1000-fvp.fvpconf -- -C board.msd_mmc.p_mmc_file="<_workspace>/mmc2_file.img"
-
+  kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml -c "../meta-arm/scripts/runfvp --terminals=xterm -- -C board.msd_mmc.p_mmc_file="<path-to-iso_file>" -C board.msd_mmc.p_mmc_file="<_workspace>/mmc2_file.img"
 
 Once the FVP begins booting, you will need to quickly change the boot option in grub,
-to boot into recovery mode. 
+to boot into recovery mode.
 
 **NOTE:** This option will disappear quickly, so it's best to preempt it.
 
-Select 'Advanced Options for '<OS>' and then '<OS> (recovery mode)'. 
+Select 'Advanced Options for '<OS>' and then '<OS> (recovery mode)'.
 
 Common
 ==============
@@ -1247,7 +1246,7 @@ Proceed to edit the following files accordingly:
 
   The system.conf has been moved from /etc/systemd/ to /usr/lib/systemd/ and directly modifying
   the /usr/lib/systemd/system.conf is not working and it is getting overridden. We have to create
-  drop ins system configurations in /etc/systemd/system.conf.d/ directory. So, copy the 
+  drop ins system configurations in /etc/systemd/system.conf.d/ directory. So, copy the
   /usr/lib/systemd/system.conf to /etc/systemd/system.conf.d/ directory after the mentioned modifications.
 
 The file to be edited next is different depending on the installed distro:
@@ -1338,7 +1337,7 @@ To report any security issues identified with Corstone-1000, please send an emai
 
 --------------
 
-*Copyright (c) 2022-2023, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2024, Arm Limited. All rights reserved.*
 
 .. _Arm Ecosystem FVPs: https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
 .. _U-Boot repo: https://github.com/u-boot/u-boot.git

@@ -2,7 +2,7 @@ require ${BPN}.inc
 
 DEPENDS = " \
     ${BPN}-native gperf-native \
-    glib-2.0 gtk+3 gtk4 libxml2 icu \
+    glib-2.0 json-glib gtk4 libxml2 icu \
     dbus db virtual/libiconv zlib libsoup-3.0 libical nss libsecret \
 "
 
@@ -29,15 +29,20 @@ EXTRA_OECMAKE = " \
     ${@bb.utils.contains('GI_DATA_ENABLED', 'True', '-DENABLE_INTROSPECTION=ON -DENABLE_VALA_BINDINGS=ON', '-DENABLE_INTROSPECTION=OFF', d)} \
     -D${LKSTRFTIME} \
     -DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')} \
+    -DENABLE_GTK=OFF \
+    -DENABLE_GTK4=ON \
+    -DENABLE_INSTALLED_TESTS=OFF \
+    -DENABLE_EXAMPLES=OFF \
+    -DENABLE_MAINTAINER_MODE=OFF \
 "
 
 EXTRA_OECMAKE:append:class-target = " -DG_IR_COMPILER=${STAGING_BINDIR}/g-ir-compiler-wrapper"
 EXTRA_OECMAKE:append:class-target = " -DG_IR_SCANNER=${STAGING_BINDIR}/g-ir-scanner-wrapper"
 
-PACKAGECONFIG ?= "oauth"
+PACKAGECONFIG ?= "goa oauth"
 
 PACKAGECONFIG[canberra] = "-DENABLE_CANBERRA=ON,-DENABLE_CANBERRA=OFF,libcanberra"
-PACKAGECONFIG[oauth]    = "-DENABLE_OAUTH2_WEBKITGTK=ON -DENABLE_OAUTH2_WEBKITGTK4=OFF,-DENABLE_OAUTH2_WEBKITGTK4=OFF -DENABLE_OAUTH2_WEBKITGTK=OFF,webkitgtk3 json-glib"
+PACKAGECONFIG[oauth]    = "-DENABLE_OAUTH2_WEBKITGTK4=ON -DENABLE_OAUTH2_WEBKITGTK=OFF,-DENABLE_OAUTH2_WEBKITGTK4=OFF -DENABLE_OAUTH2_WEBKITGTK=OFF,webkitgtk json-glib"
 PACKAGECONFIG[goa]    = "-DENABLE_GOA=ON,-DENABLE_GOA=OFF,gnome-online-accounts"
 PACKAGECONFIG[kerberos]    = "-DWITH_KRB5=ON,-DWITH_KRB5=OFF,krb5"
 # BROKEN: due missing pkg-config in openldap eds' cmake finds host-libs when

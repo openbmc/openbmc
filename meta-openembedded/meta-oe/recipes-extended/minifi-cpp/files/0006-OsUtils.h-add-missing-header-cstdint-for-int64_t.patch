@@ -1,0 +1,36 @@
+From 08d1b4b66fedde97eefb5e3ff6aa98fd02be7c21 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 20 Mar 2024 10:03:14 +0800
+Subject: [PATCH] OsUtils.h: add missing header <cstdint> for int64_t
+
+Fix build with musl:
+libminifi/include/utils/OsUtils.h:31:1: error: 'int64_t' does not name a type
+   31 | int64_t getCurrentProcessPhysicalMemoryUsage();
+      | ^~~~~~~
+libminifi/include/utils/OsUtils.h:22:1: note: 'int64_t' is defined in header '<cstdint>'; did you forget to '#include <cstdint>'?
+   21 | #include <system_error>
+  +++ |+#include <cstdint>
+   22 |
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ libminifi/include/utils/OsUtils.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libminifi/include/utils/OsUtils.h b/libminifi/include/utils/OsUtils.h
+index a7117233..5e623d1a 100644
+--- a/libminifi/include/utils/OsUtils.h
++++ b/libminifi/include/utils/OsUtils.h
+@@ -19,6 +19,7 @@
+ #include <string>
+ #include <optional>
+ #include <system_error>
++#include <cstdint>
+ 
+ struct sockaddr;
+ 
+-- 
+2.25.1
+

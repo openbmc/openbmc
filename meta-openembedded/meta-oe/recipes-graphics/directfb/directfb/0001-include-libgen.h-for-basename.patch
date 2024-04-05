@@ -1,0 +1,32 @@
+From c8cf3ffd4fa14cdc6d607a09d51e898dec922348 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 18:17:44 -0700
+Subject: [PATCH] include libgen.h for basename
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Inappropriate [Upstream is dead]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ systems/fbdev/fbdev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/systems/fbdev/fbdev.c b/systems/fbdev/fbdev.c
+index 5297358..4e6f178 100644
+--- a/systems/fbdev/fbdev.c
++++ b/systems/fbdev/fbdev.c
+@@ -42,6 +42,7 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <strings.h>
++#include <libgen.h>
+ #if defined(HAVE_SYSIO)
+ # include <sys/io.h>
+ #endif
+-- 
+2.44.0
+

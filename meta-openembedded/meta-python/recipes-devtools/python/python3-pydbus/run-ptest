@@ -1,0 +1,15 @@
+#!/bin/sh
+
+for case in `find tests -type f -name '*.sh'`; do
+    bash $case python3 >$case.output 2>&1
+    ret=$?
+    if [ $ret -ne 0 ]; then
+        cat $case.output
+        echo "FAIL: ${case}"
+    elif grep -i 'SKIP' $case.output; then
+        echo "SKIP: ${case}"
+    else
+        echo "PASS: ${case}"
+    fi
+    rm -f $case.output
+done

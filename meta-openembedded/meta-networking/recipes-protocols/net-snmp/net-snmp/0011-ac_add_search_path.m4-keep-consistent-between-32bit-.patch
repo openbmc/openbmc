@@ -1,0 +1,40 @@
+From 85a6c5017a2cd18a5a66afcb3f6a02276c101ad0 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 29 Jan 2021 08:49:15 +0000
+Subject: [PATCH] ac_add_search_path.m4: keep consistent between 32bit and
+ 64bit
+
+With configure option "--with-openssl=${STAGING_EXECPREFIXDIR}", it behaves
+differently between 32bit and 64bit system as the openssl lib resides under
+/build/tmp/work/corei7-64-wrs-linux/net-snmp/5.9-r0/recipe-sysroot/usr/lib64
+for 64bit system, but resides under [1] for 32bit system.
+
+So add the patch to fix the gap between 32bit and 64bit system.
+
+[1] /build/tmp/work/corei7-64-wrs-linux/net-snmp/5.9-r0/recipe-sysroot/usr/lib
+
+Upstream-Status: Inappropriate [configuration specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ m4/ac_add_search_path.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/m4/ac_add_search_path.m4 b/m4/ac_add_search_path.m4
+index 8e0a819..e9585bc 100644
+--- a/m4/ac_add_search_path.m4
++++ b/m4/ac_add_search_path.m4
+@@ -3,8 +3,8 @@ dnl Add a search path to the LIBS and CPPFLAGS variables
+ dnl
+ AC_DEFUN([AC_ADD_SEARCH_PATH],[
+   if test "x$1" != x -a -d $1; then
+-     if test -d $1/lib; then
+-       LDFLAGS="-L$1/lib $LDFLAGS"
++     if test -d $1/${libdir:5}; then
++       LDFLAGS="-L$1/${libdir:5} $LDFLAGS"
+      fi
+      if test -d $1/include; then
+ 	CPPFLAGS="-I$1/include $CPPFLAGS"
+-- 
+2.25.1
+

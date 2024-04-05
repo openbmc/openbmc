@@ -9,16 +9,10 @@ SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-SRC_URI = "git://github.com/yoctoproject/${BPN};branch=main;protocol=https \
-	file://0001-BmapCopy.py-fix-error-message.patch \
-	file://0002-CLI.py-fix-block-device-udev-race-condition.patch \
-	file://0003-BmapCopy.py-tweak-suggested-udev-rule.patch \
-	"
-
-SRCREV = "d84a6fd202fe246a0bc19ed2082e41bcdd75fb13"
+SRC_URI = "git://github.com/yoctoproject/${BPN};branch=main;protocol=https"
+SRCREV = "2ff5750b8a3e0b36a9993c20e2ea10a07bc62085"
 S = "${WORKDIR}/git"
-BASEVER = "3.7"
+BASEVER = "3.8.0"
 PV = "${BASEVER}+git"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
@@ -27,5 +21,9 @@ UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 RDEPENDS:${PN} = "python3-core python3-compression python3-misc python3-mmap python3-setuptools python3-fcntl python3-six coreutils"
 
 inherit setuptools3
+
+# For compatibility with layers before scarthgap
+RREPLACES:${PN} = "bmap-tools"
+RCONFLICTS:${PN} = "bmap-tools"
 
 BBCLASSEXTEND = "native nativesdk"

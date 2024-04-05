@@ -16,6 +16,8 @@ Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 
 Rebase to 0.9.8
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Upstream-Status: Pending
 ---
  Makefile.inc        | 2 +-
  kpartx/kpartx.rules | 2 +-

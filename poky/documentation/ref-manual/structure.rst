@@ -172,10 +172,11 @@ targets to build. Here is an example::
    You can also run generated QEMU images with a command like 'runqemu qemux86-64'
 
 The default output of the ``oe-init-build-env`` script is from the
-``conf-notes.txt`` file, which is found in the ``meta-poky`` directory
+``conf-summary.txt`` and ``conf-notes.txt`` files, which are found in the ``meta-poky`` directory
 within the :term:`Source Directory`. If you design a
-custom distribution, you can include your own version of this
-configuration file to mention the targets defined by your distribution.
+custom distribution, you can include your own versions of these
+configuration files where you can provide a brief summary and detailed usage
+notes, such as a list of the targets defined by your distribution.
 See the
 ":ref:`dev-manual/custom-template-configuration-directory:creating a custom template configuration directory`"
 section in the Yocto Project Development Tasks Manual for more

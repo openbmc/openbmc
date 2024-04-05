@@ -1,4 +1,4 @@
-From cf168ae0b7bceab8432d096719b331f18428fe39 Mon Sep 17 00:00:00 2001
+From 034a9c4ce2ae61cfcffa977f1eb8e6f68947f480 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2020 15:10:37 -0700
 Subject: [PATCH] cmake: Add check for atomic support
@@ -18,6 +18,7 @@ Fixes
 | /mnt/b/yoe/build/tmp/work/mips32r2-yoe-linux/rocksdb/6.6.4-r0/recipe-sysroot-native/usr/bin/mips-yoe-linux/mips-yoe-linux-ld: librocksdb.so.6.6.4: undefined reference to `__atomic_fetch_add_8'
 
 Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/6555]
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  CMakeLists.txt                  |  5 +++
@@ -25,9 +26,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 74 insertions(+)
  create mode 100644 cmake/modules/CheckAtomic.cmake
 
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5cfc1b4803..0a7f820a22 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1057,7 +1057,12 @@ set(ROCKSDB_SHARED_LIB rocksdb-shared${A
+@@ -1038,7 +1038,12 @@ set(ROCKSDB_SHARED_LIB rocksdb-shared${ARTIFACT_SUFFIX})
  if(WIN32)
    set(SYSTEM_LIBS ${SYSTEM_LIBS} shlwapi.lib rpcrt4.lib)
  else()
@@ -40,6 +43,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  endif()
  
  set(ROCKSDB_PLUGIN_EXTERNS "")
+diff --git a/cmake/modules/CheckAtomic.cmake b/cmake/modules/CheckAtomic.cmake
+new file mode 100644
+index 0000000000..8b7dc8a377
 --- /dev/null
 +++ b/cmake/modules/CheckAtomic.cmake
 @@ -0,0 +1,69 @@
@@ -112,3 +118,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +  endif()
 +endif()
 +
+-- 
+2.25.1
+

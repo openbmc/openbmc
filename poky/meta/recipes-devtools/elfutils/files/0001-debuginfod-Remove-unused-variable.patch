@@ -1,0 +1,34 @@
+From c3502140e51886bffc6ae5cd256308e40e0cbb78 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 9 Mar 2024 15:52:32 -0800
+Subject: [PATCH] debuginfod: Remove unused variable
+
+Recent commit acd9525e9 has removed all references to max_fds
+therefore remove it, moreover clang18 is happier
+
+| ../../elfutils-0.191/debuginfod/debuginfod.cxx:1448:8: error: private field 'max_fds' is not used [-Werror,-Wunused-private-field]
+|  1448 |   long max_fds;
+|       |        ^
+| 1 error generated.
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/elfutils-devel/2024q1/006900.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ debuginfod/debuginfod.cxx | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/debuginfod/debuginfod.cxx b/debuginfod/debuginfod.cxx
+index 560880f2..72617848 100644
+--- a/debuginfod/debuginfod.cxx
++++ b/debuginfod/debuginfod.cxx
+@@ -1445,7 +1445,6 @@ private:
+ 
+   map<key,fdcache_entry> entries; // optimized for lookup
+   time_t last_cleaning;
+-  long max_fds;
+   long max_mbs;
+ 
+ public:
+-- 
+2.44.0
+

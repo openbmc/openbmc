@@ -1,4 +1,4 @@
-From 919fc5d674fae99fe21ba1351d98b75e466f425f Mon Sep 17 00:00:00 2001
+From 46ab1ca6e6fb8e1196e0665a54506dff370f8f2a Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 22 Feb 2017 11:36:11 +0200
 Subject: [PATCH] nss: fix support cross compiling
@@ -10,15 +10,15 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- nss/coreconf/arch.mk    | 2 +-
+ nss/coreconf/arch.mk    | 4 ++--
  nss/lib/freebl/Makefile | 6 ++++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/nss/coreconf/arch.mk b/nss/coreconf/arch.mk
-index 2012d18..78fca62 100644
+index 17e9fae..bc4180a 100644
 --- a/nss/coreconf/arch.mk
 +++ b/nss/coreconf/arch.mk
-@@ -26,11 +26,11 @@ OS_ARCH := $(subst /,_,$(shell uname -s)
+@@ -26,11 +26,11 @@ OS_ARCH := $(subst /,_,$(shell uname -s))
  # Attempt to differentiate between sparc and x86 Solaris
  #
  
@@ -31,9 +31,9 @@ index 2012d18..78fca62 100644
 +    OS_RELEASE ?= $(shell uname -r)
  endif
  
- #
+ 
 diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
-index 0b8c6f4..b38889f 100644
+index eeee90a..7ee8736 100644
 --- a/nss/lib/freebl/Makefile
 +++ b/nss/lib/freebl/Makefile
 @@ -36,6 +36,12 @@ ifdef USE_64

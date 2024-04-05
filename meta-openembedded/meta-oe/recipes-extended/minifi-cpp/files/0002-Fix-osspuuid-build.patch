@@ -1,0 +1,78 @@
+From 4e8e1943541d3b887ba86dc1b488cbb058c7d1cd Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 19 Mar 2024 20:48:25 +0800
+Subject: [PATCH] Fix osspuuid build
+
+* Specify correct configure options to fix osspuuid cross build.
+* Do not download osspuuid source during compile.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ cmake/BundledOSSPUUID.cmake                         | 10 +++++-----
+ .../ossp-uuid/ossp-uuid-cross-compile-fix.patch     | 13 +++++++++++++
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+ create mode 100644 thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch
+
+diff --git a/cmake/BundledOSSPUUID.cmake b/cmake/BundledOSSPUUID.cmake
+index c4fa1523..1faf2e5c 100644
+--- a/cmake/BundledOSSPUUID.cmake
++++ b/cmake/BundledOSSPUUID.cmake
+@@ -23,10 +23,12 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
+     set(PATCH_FILE1 "${SOURCE_DIR}/thirdparty/ossp-uuid/ossp-uuid-mac-fix.patch")
+     set(PATCH_FILE2 "${SOURCE_DIR}/thirdparty/ossp-uuid/ossp-uuid-no-prog.patch")
+     set(PATCH_FILE3 "${SOURCE_DIR}/thirdparty/ossp-uuid/ossp-uuid-update-config-guess.patch")
++    set(PATCH_FILE4 "${SOURCE_DIR}/thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch")
+     set(PC ${Bash_EXECUTABLE} -c "set -x &&\
+             (\"${Patch_EXECUTABLE}\" -p1 -R -s -f --dry-run -i \"${PATCH_FILE1}\" || \"${Patch_EXECUTABLE}\" -p1 -N -i \"${PATCH_FILE1}\") &&\
+             (\"${Patch_EXECUTABLE}\" -p1 -R -s -f --dry-run -i \"${PATCH_FILE2}\" || \"${Patch_EXECUTABLE}\" -p1 -N -i \"${PATCH_FILE2}\") &&\
+-            (\"${Patch_EXECUTABLE}\" -p1 -R -s -f --dry-run -i \"${PATCH_FILE3}\" || \"${Patch_EXECUTABLE}\" -p1 -N -i \"${PATCH_FILE3}\") ")
++            (\"${Patch_EXECUTABLE}\" -p1 -R -s -f --dry-run -i \"${PATCH_FILE3}\" || \"${Patch_EXECUTABLE}\" -p1 -N -i \"${PATCH_FILE3}\") &&\
++            (\"${Patch_EXECUTABLE}\" -p1 -R -s -f --dry-run -i \"${PATCH_FILE4}\" || \"${Patch_EXECUTABLE}\" -p1 -N -i \"${PATCH_FILE4}\") ")
+ 
+     # Define byproducts
+     set(BYPRODUCTS "lib/libuuid.a"
+@@ -39,7 +41,7 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
+     ENDFOREACH(BYPRODUCT)
+ 
+     # Build project
+-    set(CONFIGURE_COMMAND ./configure "CC=${CMAKE_C_COMPILER}" "CXX=${CMAKE_CXX_COMPILER}" "CFLAGS=${PASSTHROUGH_CMAKE_C_FLAGS} -fPIC" "CXXFLAGS=${PASSTHROUGH_CMAKE_CXX_FLAGS} -fPIC" --enable-shared=no --with-cxx --without-perl --without-php --without-pgsql "--prefix=${BINARY_DIR}/thirdparty/ossp-uuid-install")
++    set(CONFIGURE_COMMAND ac_cv_va_copy=C99 ./configure --host=${HOST_SYS} --build=${BUILD_SYS} "CC=${CMAKE_C_COMPILER}" "CXX=${CMAKE_CXX_COMPILER}" "CFLAGS=${PASSTHROUGH_CMAKE_C_FLAGS} -fPIC" "CXXFLAGS=${PASSTHROUGH_CMAKE_CXX_FLAGS} -fPIC" --enable-shared=no --with-cxx --without-perl --without-php --without-pgsql "--prefix=${BINARY_DIR}/thirdparty/ossp-uuid-install")
+     string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
+     if(NOT build_type MATCHES debug)
+         list(APPEND CONFIGURE_COMMAND --enable-debug=yes)
+@@ -47,10 +49,8 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
+ 
+     ExternalProject_Add(
+             ossp-uuid-external
+-            URL "https://deb.debian.org/debian/pool/main/o/ossp-uuid/ossp-uuid_1.6.2.orig.tar.gz"
+-            URL_HASH "SHA256=11a615225baa5f8bb686824423f50e4427acd3f70d394765bdff32801f0fd5b0"
+             BUILD_IN_SOURCE true
+-            SOURCE_DIR "${BINARY_DIR}/thirdparty/ossp-uuid-src"
++            SOURCE_DIR "${SOURCE_DIR}/thirdparty/uuid-1.6.2"
+             BUILD_COMMAND make
+             CMAKE_COMMAND ""
+             UPDATE_COMMAND ""
+diff --git a/thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch b/thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch
+new file mode 100644
+index 00000000..b8d7b0bb
+--- /dev/null
++++ b/thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch
+@@ -0,0 +1,13 @@
++diff --git a/shtool b/shtool
++index a2d2567..ab4fe17 100755
++--- a/shtool
+++++ b/shtool
++@@ -1400,7 +1400,7 @@ install )
++             if [ ".$opt_t" = .yes ]; then
++                 echo "strip $dsttmp" 1>&2
++             fi
++-            strip $dsttmp || shtool_exit $?
+++            $STRIP $dsttmp || shtool_exit $?
++         fi
++         if [ ".$opt_o" != . ]; then
++             if [ ".$opt_t" = .yes ]; then
+-- 
+2.25.1
+

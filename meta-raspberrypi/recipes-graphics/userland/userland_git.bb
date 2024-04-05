@@ -46,6 +46,7 @@ SRC_URI = "\
     file://0022-all-host_applications-remove-non-existent-projects.patch \
     file://0023-hello_pi-optionally-build-wayland-specific-app.patch \
     file://0024-userland-Sync-needed-defines-for-weston-build.patch \
+    file://0025-CMakeLists.txt-.pc-respect-CMAKE_INSTALL_LIBDIR.patch \
 "
 
 SRC_URI:remove:toolchain-clang = "file://0021-cmake-Disable-format-overflow-warning-as-error.patch"

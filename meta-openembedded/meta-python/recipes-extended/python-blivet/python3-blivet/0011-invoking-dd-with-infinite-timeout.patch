@@ -1,7 +1,7 @@
-From 21ca2b859a49e96a230d55a7866dfc7ed5d1366c Mon Sep 17 00:00:00 2001
+From 5ee527fab06f9d33b162a6cd0c068d7b3ac2ecb0 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 6 Mar 2018 17:28:56 +0800
-Subject: [PATCH 11/11] invoking dd with infinite timeout
+Subject: [PATCH] invoking dd with infinite timeout
 
 This large timeout is needed when running on machines with
 lots of disks, or with slow disks.
@@ -14,10 +14,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/blivet/devices/partition.py b/blivet/devices/partition.py
-index 623e1c9..141d8ad 100644
+index 2d67be8..a4cf9a0 100644
 --- a/blivet/devices/partition.py
 +++ b/blivet/devices/partition.py
-@@ -618,7 +618,7 @@ class PartitionDevice(StorageDevice):
+@@ -677,7 +677,7 @@ class PartitionDevice(StorageDevice):
          cmd = ["dd", "if=/dev/zero", "of=%s" % device, "bs=%d" % bs,
                 "seek=%d" % start, "count=%d" % count]
          try:
@@ -26,6 +26,3 @@ index 623e1c9..141d8ad 100644
          except OSError as e:
              log.error(str(e))
          finally:
--- 
-2.7.4
-

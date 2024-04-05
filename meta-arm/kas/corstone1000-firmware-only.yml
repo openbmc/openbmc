@@ -1,0 +1,21 @@
+---
+header:
+  version: 14
+
+local_conf_header:
+  firmwarebuild: |
+    # Need to ensure the rescue linux options are selected
+    OVERRIDES .= ":firmware"
+
+    # Need to ensure we build with a small libc
+    TCLIBC="musl"
+
+  mass-storage: |
+    # Ensure the Mass Storage device is absent
+    FVP_CONFIG[board.msd_mmc.p_mmc_file] = "invalid.dat"
+
+  test-configuration: |
+    TEST_SUITES = "_qemutiny ping"
+    # Remove Dropbear SSH as it will not fit into the corstone1000 image.
+    IMAGE_FEATURES:remove = "ssh-server-dropbear"
+    CORE_IMAGE_EXTRA_INSTALL:remove = "ssh-pregen-hostkeys"

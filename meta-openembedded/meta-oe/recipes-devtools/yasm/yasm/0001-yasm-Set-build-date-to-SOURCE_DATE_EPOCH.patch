@@ -7,6 +7,8 @@ If SOURCE_DATE_EPOCH is set, use it to generate a reproducible
 string for BUILD_DATE.
 
 Signed-off-by: Oleh Matiusha <omatiush@cisco.com>
+
+Upstream-Status: Pending
 ---
  configure.ac | 8 ++++++++
  1 file changed, 8 insertions(+)

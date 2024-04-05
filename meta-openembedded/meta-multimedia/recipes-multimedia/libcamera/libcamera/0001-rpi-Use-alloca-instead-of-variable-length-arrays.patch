@@ -1,7 +1,7 @@
-From 7982e55ce3a8b3c60a47258ff7d37d0dd78c303d Mon Sep 17 00:00:00 2001
+From 11cc6dbd45f0880beea64cdc514f57484b90bc39 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 20 Feb 2024 18:44:23 -0800
-Subject: [PATCH] rpi: Use alloca instead of variable length arrays
+Subject: [PATCH] rpi: Use malloc instead of variable length arrays
 
 Clang-18+ diagnoses this as error
 
@@ -10,12 +10,14 @@ Clang-18+ diagnoses this as error
 
 Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2024-February/040529.html]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+s
 ---
- src/ipa/rpi/controller/rpi/alsc.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/ipa/rpi/controller/rpi/alsc.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/src/ipa/rpi/controller/rpi/alsc.cpp b/src/ipa/rpi/controller/rpi/alsc.cpp
-index 8a205c60..8c0ae8eb 100644
+index 8a205c60..a7d42614 100644
 --- a/src/ipa/rpi/controller/rpi/alsc.cpp
 +++ b/src/ipa/rpi/controller/rpi/alsc.cpp
 @@ -496,8 +496,8 @@ void resampleCalTable(const Array2D<double> &calTableIn,
@@ -24,11 +26,18 @@ index 8a205c60..8c0ae8eb 100644
  	 */
 -	int xLo[X], xHi[X];
 -	double xf[X];
-+	int *xLo = (int*)alloca(X), *xHi = (int*)alloca(X);
-+	double *xf = (double*)alloca(X);
++	int *xLo = (int*)malloc(X), *xHi = (int*)malloc(X);
++	double *xf = (double*)malloc(X);
  	double scaleX = cameraMode.sensorWidth /
  			(cameraMode.width * cameraMode.scaleX);
  	double xOff = cameraMode.cropX / (double)cameraMode.sensorWidth;
--- 
-2.43.2
-
+@@ -539,6 +539,9 @@ void resampleCalTable(const Array2D<double> &calTableIn,
+ 			*(out++) = above * (1 - yf) + below * yf;
+ 		}
+ 	}
++	free(xf);
++	free(xHi);
++	free(xLo);
+ }
+ 
+ /* Calculate chrominance statistics (R/G and B/G) for each region. */

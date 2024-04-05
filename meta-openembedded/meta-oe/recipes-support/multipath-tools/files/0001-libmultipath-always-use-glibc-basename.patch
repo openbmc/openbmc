@@ -1,0 +1,42 @@
+From 389286b25a903be62ce7f964246824fcc20c4c67 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 26 Mar 2024 18:56:55 -0700
+Subject: [PATCH] libmultipath: always use glibc basename()
+
+There is a use of basename() which expects it to be GNU version of
+basename, which is not available in other libcs e.g. musl on Linux
+therefore provide a version for such cases
+
+Upstream-Status: Submitted [https://github.com/opensvc/multipath-tools/pull/84]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libmultipath/configure.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/libmultipath/configure.c b/libmultipath/configure.c
+index 4ecf6ba4..e81cc67c 100644
+--- a/libmultipath/configure.c
++++ b/libmultipath/configure.c
+@@ -43,6 +43,19 @@
+ #include "sysfs.h"
+ #include "io_err_stat.h"
+ 
++#ifndef __GLIBC__
++/*
++ * glibc's non-destructive version of basename()
++ * License: LGPL-2.1-or-later
++ */
++static const char *__basename(const char *filename)
++{
++	char *p = strrchr(filename, '/');
++	return p ? p + 1 : filename;
++}
++#define basename(x) __basename(x)
++#endif
++
+ /* group paths in pg by host adapter
+  */
+ int group_by_host_adapter(struct pathgroup *pgp, vector adapters)
+-- 
+2.44.0
+

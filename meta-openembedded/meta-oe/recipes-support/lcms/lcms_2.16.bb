@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "d873d34ad8b9b4cea010631f1a6228d2087475e4dc5e763eb81acc23d9
 
 DEPENDS = "tiff"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 S = "${WORKDIR}/lcms2-${PV}"
 

@@ -1,0 +1,32 @@
+From 32f99ce7e890a457af50606ea7b577659a2a790a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 17:35:07 -0700
+Subject: [PATCH] include libgen.h for basename
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://github.com/thkukuk/wtmpdb/pull/11]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/wtmpdb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/wtmpdb.c b/src/wtmpdb.c
+index aac7b5b..eaffae6 100644
+--- a/src/wtmpdb.c
++++ b/src/wtmpdb.c
+@@ -30,6 +30,7 @@
+ #include <time.h>
+ #include <ctype.h>
+ #include <errno.h>
++#include <libgen.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-- 
+2.44.0
+

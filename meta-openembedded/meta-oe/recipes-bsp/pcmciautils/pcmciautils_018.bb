@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 DEPENDS = "udev sysfsutils flex-native bison-native"
 RDEPENDS:${PN} = "udev module-init-tools"
 
-PR = "r1"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/pcmcia/${BP}.tar.xz \
            file://makefile_fix.patch \

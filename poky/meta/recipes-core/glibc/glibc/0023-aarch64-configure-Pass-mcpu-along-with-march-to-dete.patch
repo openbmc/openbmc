@@ -1,53 +1,62 @@
-From f761f5ca2d453e11d34fc7d552dab4a0e189dae9 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Fri, 4 Aug 2023 09:34:50 -0700
-Subject: [PATCH] aarch64/configure: Pass -mcpu along with -march to detect sve
- support
+From 73c26018ed0ecd9c807bb363cc2c2ab4aca66a82 Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <szabolcs.nagy@arm.com>
+Date: Wed, 13 Mar 2024 14:34:14 +0000
+Subject: [PATCH] aarch64: fix check for SVE support in assembler
 
-SVE support logic in configure is rightly passing -march=<arch>+sve to
-compiler to override whatever user might have passed via environment,
-however GCC does not do as intended when -mcpu is part of environment
-compiler flags, then it overrides the -march computed from -mcpu and
-igonores other -march values so this test fails for lot of aarch64
-machines which pass -mcpu that does not support sve. This is seemingly a
-bug in GCC [1], until that is fixed we preempt -mcpu along with -march
-in the configure test itself. It does not change functionality and yet
-lets us through the GCC inconsistency.
+Due to GCC bug 110901 -mcpu can override -march setting when compiling
+asm code and thus a compiler targetting a specific cpu can fail the
+configure check even when binutils gas supports SVE.
 
-[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110901
+The workaround is that explicit .arch directive overrides both -mcpu
+and -march, and since that's what the actual SVE memcpy uses the
+configure check should use that too even if the GCC issue is fixed
+independently.
 
-Upstream-Status: Inappropriate [Workaround for a GCC issue]
+Upstream-Status: Backport [https://sourceware.org/git/?p=glibc.git;a=commit;h=73c26018ed0ecd9c807bb363cc2c2ab4aca66a82]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Reviewed-by: Florian Weimer <fweimer@redhat.com>
 ---
- sysdeps/aarch64/configure    | 2 +-
- sysdeps/aarch64/configure.ac | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ sysdeps/aarch64/configure    | 5 +++--
+ sysdeps/aarch64/configure.ac | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+ mode change 100644 => 100755 sysdeps/aarch64/configure
 
 diff --git a/sysdeps/aarch64/configure b/sysdeps/aarch64/configure
-index 5e91fab023..39dddc66d4 100644
+old mode 100644
+new mode 100755
+index ca57edce47..9606137e8d
 --- a/sysdeps/aarch64/configure
 +++ b/sysdeps/aarch64/configure
-@@ -327,7 +327,7 @@ else $as_nop
+@@ -325,9 +325,10 @@ then :
+   printf %s "(cached) " >&6
+ else $as_nop
    cat > conftest.s <<\EOF
-         ptrue p0.b
+-        ptrue p0.b
++	.arch armv8.2-a+sve
++	ptrue p0.b
  EOF
 -if { ac_try='${CC-cc} -c -march=armv8.2-a+sve conftest.s 1>&5'
-+if { ac_try='${CC-cc} -c -mcpu=generic+sve -march=armv8.2-a+sve conftest.s 1>&5'
++if { ac_try='${CC-cc} -c conftest.s 1>&5'
    { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
    (eval $ac_try) 2>&5
    ac_status=$?
 diff --git a/sysdeps/aarch64/configure.ac b/sysdeps/aarch64/configure.ac
-index 8a708f2ef4..b6a146d2be 100644
+index 27874eceb4..56d12d661d 100644
 --- a/sysdeps/aarch64/configure.ac
 +++ b/sysdeps/aarch64/configure.ac
-@@ -92,7 +92,7 @@ AC_CACHE_CHECK([for SVE support in assembler], [libc_cv_aarch64_sve_asm], [dnl
+@@ -90,9 +90,10 @@ LIBC_CONFIG_VAR([aarch64-variant-pcs], [$libc_cv_aarch64_variant_pcs])
+ # Check if asm support armv8.2-a+sve
+ AC_CACHE_CHECK([for SVE support in assembler], [libc_cv_aarch64_sve_asm], [dnl
  cat > conftest.s <<\EOF
-         ptrue p0.b
+-        ptrue p0.b
++	.arch armv8.2-a+sve
++	ptrue p0.b
  EOF
 -if AC_TRY_COMMAND(${CC-cc} -c -march=armv8.2-a+sve conftest.s 1>&AS_MESSAGE_LOG_FD); then
-+if AC_TRY_COMMAND(${CC-cc} -c -mcpu=generic+sve -march=armv8.2-a+sve conftest.s 1>&AS_MESSAGE_LOG_FD); then
++if AC_TRY_COMMAND(${CC-cc} -c conftest.s 1>&AS_MESSAGE_LOG_FD); then
    libc_cv_aarch64_sve_asm=yes
  else
    libc_cv_aarch64_sve_asm=no
+-- 
+2.44.0
+

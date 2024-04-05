@@ -23,7 +23,7 @@ SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.xz \
 SRC_URI[sha256sum] = "ea613a4cf44612326e917201bbbcdfbd301de21ffc3b59b6e5c07e040b275e52"
 
 # http://git.savannah.gnu.org/cgit/coreutils.git/commit/?id=v8.27-101-gf5d7c0842
-# 
+#
 CVE_STATUS[CVE-2016-2781] = "disputed: runcon is not really a sandbox command, use `runcon ... setsid ...` to avoid this particular issue."
 
 EXTRA_OECONF:class-target = "--enable-install-program=arch,hostname --libexecdir=${libdir}"
@@ -169,7 +169,7 @@ BBCLASSEXTEND = "native nativesdk"
 
 inherit ptest
 
-RDEPENDS:${PN}-ptest += "bash findutils gawk liberror-perl make perl perl-modules python3-core sed shadow"
+RDEPENDS:${PN}-ptest += "bash findutils gawk make perl perl-modules python3-core sed shadow"
 
 # -dev automatic dependencies fails as we don't want libmodule-build-perl-dev, its too heavy
 # may need tweaking if DEPENDS changes

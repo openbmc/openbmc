@@ -1,0 +1,113 @@
+From 1b4d42ca2e97061042ec44a0b34ceb176c78c7e1 Mon Sep 17 00:00:00 2001
+From: d-winsor <danwin@microsoft.com>
+Date: Mon, 26 Feb 2024 13:17:12 -0800
+Subject: [PATCH] Fix initialization in test (#1140)
+
+* Suppress unsafe-buffer-usage
+
+Upstream-Status: Backport [https://github.com/microsoft/GSL/commit/1b4d42ca2e97061042ec44a0b34ceb176c78c7e1]
+
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ include/gsl/span     | 10 ++++++++++
+ include/gsl/util     | 10 ++++++++++
+ tests/CMakeLists.txt | 10 ++++++++++
+ tests/span_tests.cpp |  2 +-
+ 4 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/include/gsl/span b/include/gsl/span
+index cc8a7b9..d254e4d 100644
+--- a/include/gsl/span
++++ b/include/gsl/span
+@@ -58,6 +58,12 @@
+ #pragma GCC diagnostic ignored "-Wsign-conversion"
+ #endif
+ 
++// Turn off clang unsafe buffer warnings as all accessed are guarded by runtime checks
++#if defined(__clang__) && __has_warning("-Wunsafe-buffer-usage")
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
++#endif // defined(__clang__) && __has_warning("-Wunsafe-buffer-usage")
++
+ namespace gsl
+ {
+ 
+@@ -818,4 +824,8 @@ as_writable_bytes(span<ElementType, Extent> s) noexcept
+ #pragma GCC diagnostic pop
+ #endif // __GNUC__ > 6
+ 
++#if defined(__clang__) && __has_warning("-Wunsafe-buffer-usage")
++#pragma clang diagnostic pop
++#endif
++
+ #endif // GSL_SPAN_H
+diff --git a/include/gsl/util b/include/gsl/util
+index a215bad..11735a8 100644
+--- a/include/gsl/util
++++ b/include/gsl/util
+@@ -39,6 +39,12 @@
+ 
+ #endif // _MSC_VER
+ 
++// Turn off clang unsafe buffer warnings as all accessed are guarded by runtime checks
++#if defined(__clang__) && __has_warning("-Wunsafe-buffer-usage")
++#pragma clang diagnostic push
++#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
++#endif // defined(__clang__) && __has_warning("-Wunsafe-buffer-usage")
++
+ #if defined(__cplusplus) && (__cplusplus >= 201703L)
+ #define GSL_NODISCARD [[nodiscard]]
+ #else
+@@ -157,4 +163,8 @@ constexpr auto at(std::span<T, extent> sp, const index i) -> decltype(sp[sp.size
+ 
+ #endif // _MSC_VER
+ 
++#if defined(__clang__) && __has_warning("-Wunsafe-buffer-usage")
++#pragma clang diagnostic pop
++#endif
++
+ #endif // GSL_UTIL_H
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index cab4e56..20de9e1 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -167,6 +167,11 @@ else()
+         >
+     )
+ endif(MSVC)
++check_cxx_compiler_flag("-Wno-unsafe-buffer-usage" WARN_UNSAFE_BUFFER)
++if (WARN_UNSAFE_BUFFER)
++  # This test uses very greedy heuristics such as "no pointer arithmetic on raw buffer"
++  target_compile_options(gsl_tests_config INTERFACE "-Wno-unsafe-buffer-usage")
++endif()
+ 
+ # for tests to find the gtest header
+ target_include_directories(gsl_tests_config SYSTEM INTERFACE
+@@ -267,6 +272,11 @@ else()
+         >
+     )
+ endif(MSVC)
++check_cxx_compiler_flag("-Wno-unsafe-buffer-usage" WARN_UNSAFE_BUFFER)
++if (WARN_UNSAFE_BUFFER)
++  # This test uses very greedy heuristics such as "no pointer arithmetic on raw buffer"
++  target_compile_options(gsl_tests_config_noexcept INTERFACE "-Wno-unsafe-buffer-usage")
++endif()
+ 
+ add_executable(gsl_noexcept_tests no_exception_ensure_tests.cpp)
+ target_link_libraries(gsl_noexcept_tests
+diff --git a/tests/span_tests.cpp b/tests/span_tests.cpp
+index 33ccf56..3c1dfe5 100644
+--- a/tests/span_tests.cpp
++++ b/tests/span_tests.cpp
+@@ -330,7 +330,7 @@ TEST(span_test, from_array_constructor)
+         EXPECT_TRUE(s.data() == std::addressof(arr2d[0]));
+     }
+ 
+-    int arr3d[2][3][2] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
++    int arr3d[2][3][2] = { { {1, 2}, {3, 4}, {5, 6} }, { {7, 8}, {9, 10}, {11, 12} } };
+ 
+ #ifdef CONFIRM_COMPILATION_ERRORS
+     {
+-- 
+2.30.2
+

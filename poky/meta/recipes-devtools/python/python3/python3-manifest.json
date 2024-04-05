@@ -201,8 +201,7 @@
     "compression": {
         "summary": "Python high-level compression support",
         "rdepends": [
-            "core",
-            "shell"
+            "core"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/gzip.py",
@@ -525,7 +524,6 @@
         "rdepends": [
             "core",
             "pprint",
-            "profile",
             "shell",
             "stringold"
         ],
@@ -577,7 +575,6 @@
             "debugger",
             "difflib",
             "pprint",
-            "profile",
             "shell",
             "stringold",
             "unittest"
@@ -997,8 +994,7 @@
     "pprint": {
         "summary": "Python pretty-print support",
         "rdepends": [
-            "core",
-            "profile"
+            "core"
         ],
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/pprint.py"
@@ -1189,7 +1185,6 @@
             "netclient",
             "numbers",
             "pprint",
-            "profile",
             "stringold"
         ],
         "files": [

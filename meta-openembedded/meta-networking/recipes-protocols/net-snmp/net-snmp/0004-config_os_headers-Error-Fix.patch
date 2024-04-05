@@ -1,0 +1,37 @@
+From b1c941c20577578aa5ff3450d9d8d7a23c55d14a Mon Sep 17 00:00:00 2001
+From: Li xin <lixin.fnst@cn.fujitsu.com>
+Date: Fri, 21 Aug 2015 18:23:13 +0900
+Subject: [PATCH] config_os_headers: Error Fix
+
+ERROR: This autoconf log indicates errors, it looked at host include
+and/or library paths while determining system capabilities.
+cc1: warning: include location "/usr/local/include" is unsafe for cross-compilation [-Wpoison-system-directories]
+conftest.c:168:17: fatal error: pkg.h: No such file or directory
+ #include <pkg.h>
+                 ^
+
+Upstream-Status: Pending
+
+Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
+---
+ configure.d/config_os_headers | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.d/config_os_headers b/configure.d/config_os_headers
+index c0688f8..f68713c 100644
+--- a/configure.d/config_os_headers
++++ b/configure.d/config_os_headers
+@@ -395,8 +395,8 @@ then
+     unset ac_cv_header_pkg_h
+     netsnmp_save_CPPFLAGS="$CPPFLAGS"
+     netsnmp_save_LDFLAGS="$LDFLAGS"
+-    CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+-    LDFLAGS="$LDFLAGS -L/usr/local/lib"
++    CPPFLAGS="$CPPFLAGS"
++    LDFLAGS="$LDFLAGS"
+     AC_CHECK_HEADERS(pkg.h,
+         NETSNMP_SEARCH_LIBS(pkg_init, pkg,
+ 	    AC_DEFINE(HAVE_LIBPKG, 1, [define if you have BSD pkg-ng])))
+-- 
+2.25.1
+

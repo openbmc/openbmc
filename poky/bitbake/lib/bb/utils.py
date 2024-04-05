@@ -1142,7 +1142,10 @@ def get_referenced_vars(start_expr, d):
 
 
 def cpu_count():
-    return multiprocessing.cpu_count()
+    try:
+        return len(os.sched_getaffinity(0))
+    except OSError:
+        return multiprocessing.cpu_count()
 
 def nonblockingfd(fd):
     fcntl.fcntl(fd, fcntl.F_SETFL, fcntl.fcntl(fd, fcntl.F_GETFL) | os.O_NONBLOCK)

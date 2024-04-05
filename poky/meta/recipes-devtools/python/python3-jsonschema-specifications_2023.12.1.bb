@@ -9,10 +9,8 @@ SRC_URI[sha256sum] = "48a76787b3e70f5ed53f1160d2b81f586e4ca6d1548c5de7085d168267
 
 inherit pypi python_hatchling
 
+PYPI_PACKAGE = "jsonschema_specifications"
+
 DEPENDS += "${PYTHON_PN}-hatch-vcs-native"
-
-S = "${WORKDIR}/jsonschema_specifications-${PV}"
-
-PYPI_ARCHIVE_NAME = "jsonschema_specifications-${PV}.${PYPI_PACKAGE_EXT}"
 
 BBCLASSEXTEND = "native nativesdk"

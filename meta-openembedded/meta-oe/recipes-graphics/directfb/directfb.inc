@@ -23,6 +23,7 @@ SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/DirectFB-${PV}.tar.g
            file://fix-tslib-version-check.patch \
            file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
            file://0001-os-linux-Fix-build-when-__NR_futex-is-not-available.patch \
+           file://0001-include-libgen.h-for-basename.patch \
            "
 
 S = "${WORKDIR}/DirectFB-${PV}"

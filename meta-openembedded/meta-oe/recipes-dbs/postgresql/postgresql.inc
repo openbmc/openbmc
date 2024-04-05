@@ -35,6 +35,7 @@ LEAD_SONAME = "libpq.so"
 
 # LDFLAGS for shared libraries
 export LDFLAGS_SL = "${LDFLAGS}"
+export LDFLAGS_EX_BE = "-Wl,--export-dynamic"
 
 inherit autotools pkgconfig perlnative python3native python3targetconfig useradd update-rc.d systemd gettext cpan-base multilib_header
 

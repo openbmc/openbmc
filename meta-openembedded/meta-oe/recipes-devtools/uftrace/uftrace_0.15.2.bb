@@ -11,7 +11,8 @@ DEPENDS:append:libc-musl = " argp-standalone"
 inherit autotools
 
 SRCREV = "9d8657e90b918994d7d2bcf6dd2cc7354c35a1b4"
-SRC_URI = "git://github.com/namhyung/${BPN};branch=master;protocol=https"
+SRC_URI = "git://github.com/namhyung/${BPN};branch=master;protocol=https \
+           file://0001-include-libgen.h-for-basename.patch"
 S = "${WORKDIR}/git"
 
 LDFLAGS:append:libc-musl = " -largp"

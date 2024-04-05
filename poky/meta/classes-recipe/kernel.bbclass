@@ -645,7 +645,7 @@ python check_oldest_kernel() {
 }
 
 check_oldest_kernel[vardepsexclude] += "OLDEST_KERNEL KERNEL_VERSION"
-do_configure[prefuncs] += "check_oldest_kernel"
+do_compile[postfuncs] += "check_oldest_kernel"
 
 KERNEL_LOCALVERSION ??= ""
 

@@ -241,6 +241,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     vnstat \
     wpan-tools \
     ettercap \
+    libcpr \
 "
 RDEPENDS:packagegroup-meta-networking-support:remove:mipsarch = "memcached"
 RDEPENDS:packagegroup-meta-networking-support:remove:riscv64 = "memcached"

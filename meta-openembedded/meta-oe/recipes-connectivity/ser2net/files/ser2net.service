@@ -1,0 +1,13 @@
+[Unit]
+Description=Serial port to network proxy
+Documentation=man:ser2net(8)
+After=network.target
+Wants=network.target
+ConditionFileNotEmpty=@SYSCONFDIR@/ser2net/ser2net.yaml
+
+[Service]
+Type=exec
+ExecStart=@SBINDIR@/ser2net -n
+
+[Install]
+WantedBy=multi-user.target

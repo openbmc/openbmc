@@ -1,0 +1,39 @@
+From 1d2197c195e19f1414afef75186bdd4c27b3ee5a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 23 Mar 2024 18:16:19 -0700
+Subject: [PATCH] Include linux/stat.h only when sys/stat.h is not included
+
+This ends up providing certain functions from both headers e.g.
+statx and statx_timestamp since liburing.h forcefully defines _GNU_SOURCE
+to help musl compile liburing, however, this define then causes these
+two files to conflict in plocate, it seems this file is redundant here
+when sys/stat.h is included anyway, mark it for conditional include
+
+Fixes
+| In file included from ../plocate-1.1.22/plocate.cpp:5:
+| In file included from ../plocate-1.1.22/io_uring_engine.h:14:
+| In file included from /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/plocate/1.1.22/recipe-sysroot/usr/include/liburing.h:14:
+| /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/plocate/1.1.22/recipe-sysroot/usr/include/sys/stat.h:124:8: error: redefinition of 'statx_timestamp'
+|   124 | struct statx_timestamp {
+|       |        ^
+| /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/plocate/1.1.22/recipe-sysroot/usr/include/linux/stat.h:56:8: note: previous definition is here                                             |    56 | struct statx_timestamp {                                                                                                                                                                    |       |        ^                                                                                                                                                                                    | In file included from ../plocate-1.1.22/plocate.cpp:5:                                                                                                                                              | In file included from ../plocate-1.1.22/io_uring_engine.h:14:                                                                                                                                       | In file included from /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/plocate/1.1.22/recipe-sysroot/usr/include/liburing.h:14:                                                             | /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/plocate/1.1.22/recipe-sysroot/usr/include/sys/stat.h:129:8: error: redefinition of 'statx'                                                 |   129 | struct statx {                                                                                                                                                                              |       |        ^                                                                                                                                                                                    | /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/plocate/1.1.22/recipe-sysroot/usr/include/linux/stat.h:99:8: note: previous definition is here
+|    99 | struct statx {
+|       |        ^
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ io_uring_engine.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/io_uring_engine.h
++++ b/io_uring_engine.h
+@@ -7,7 +7,6 @@
+ #include <string_view>
+ #include <sys/socket.h>
+ #include <sys/types.h>
+-#include <linux/stat.h>
+ 
+ struct io_uring_sqe;
+ #ifndef WITHOUT_URING

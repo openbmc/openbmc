@@ -1359,7 +1359,7 @@ class RunQueue:
             fakerootcmd = shlex.split(mcdata.getVar("FAKEROOTCMD"))
             fakerootenv = (mcdata.getVar("FAKEROOTBASEENV") or "").split()
             env = os.environ.copy()
-            for key, value in (var.split('=') for var in fakerootenv):
+            for key, value in (var.split('=',1) for var in fakerootenv):
                 env[key] = value
             worker = subprocess.Popen(fakerootcmd + [sys.executable, workerscript, magic], stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=env)
             fakerootlogs = self.rqdata.dataCaches[mc].fakerootlogs

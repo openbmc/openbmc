@@ -1,0 +1,50 @@
+From 8c5c0a7a48af7652c50bc27a4efdd9cb4f7d95bd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 24 Mar 2024 21:58:50 -0700
+Subject: [PATCH] ipset: Define portable basename function
+
+Newer version of musl have removed prototype for basename in string.h [1]
+which now makes it fail to compile with newer clang 18+ compiler therefore
+define own basename utility function and not depend on platform for it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ipset.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/ipset.c b/src/ipset.c
+index 162f477..7b5d580 100644
+--- a/src/ipset.c
++++ b/src/ipset.c
+@@ -16,6 +16,16 @@
+ #include <libipset/ipset.h>		/* ipset library */
+ #include <libipset/xlate.h>		/* translate to nftables */
+ 
++/* basename is implemented differently across different C libraries. This
++ * implementation matches the one provided by the GNU libc, and does not
++ * modify its input parameter.
++ */
++static const char *ipset_basename(const char *path)
++{
++	const char *base = strrchr(path, '/');
++	return base ? base + 1 : path;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -32,7 +42,7 @@ main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	if (!strcmp(basename(argv[0]), "ipset-translate")) {
++	if (!strcmp(ipset_basename(argv[0]), "ipset-translate")) {
+ 		ret = ipset_xlate_argv(ipset, argc, argv);
+ 	} else {
+ 		ret = ipset_parse_argv(ipset, argc, argv);
+-- 
+2.44.0
+

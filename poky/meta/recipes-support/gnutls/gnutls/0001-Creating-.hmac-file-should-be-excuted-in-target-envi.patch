@@ -1,4 +1,4 @@
-From 21a8295bac3805e4490ba2b5f136e7f4c121061b Mon Sep 17 00:00:00 2001
+From 7be8ec59a53e93c2bd453b3ba2d63d1b300ef11f Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@fujitsu.com>
 Date: Mon, 23 May 2022 10:44:43 +0900
 Subject: [PATCH] Creating .hmac file should be excuted in target environment,
@@ -6,16 +6,15 @@ Subject: [PATCH] Creating .hmac file should be excuted in target environment,
 
 Upstream-Status: Inappropriate [https://gitlab.com/gnutls/gnutls/-/issues/1373]
 Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
-
 ---
  lib/Makefile.am | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/lib/Makefile.am b/lib/Makefile.am
-index 6d4e8d2..24ef108 100644
+index a50d311..193ea19 100644
 --- a/lib/Makefile.am
 +++ b/lib/Makefile.am
-@@ -206,8 +206,7 @@ hmac_file = .libs/.$(gnutls_so).hmac
+@@ -198,8 +198,7 @@ hmac_file = .libs/.$(gnutls_so).hmac
  
  all-local: $(hmac_file)
  

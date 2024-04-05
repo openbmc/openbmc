@@ -16,6 +16,7 @@ ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
 
+SRC_URI += "file://0001-Build-fix-needed-with-taglib-2.0.patch"
 SRC_URI[archive.sha256sum] = "3f1d00c4a650fe7902167648286b32c9ca4ef86e31a5d8ccca0139f12d10d0b3"
 
 PACKAGECONFIG ??= "exiv2 taglib libgsf poppler"

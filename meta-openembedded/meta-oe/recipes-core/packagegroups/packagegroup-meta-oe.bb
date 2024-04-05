@@ -310,6 +310,7 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     yasm \
     json-schema-validator \
     poke \
+    microsoft-gsl \
 "
 RDEPENDS:packagegroup-meta-oe-devtools:append:x86 = " cpuid msr-tools pahole pmtools"
 RDEPENDS:packagegroup-meta-oe-devtools:append:x86-64 = " cpuid msr-tools pahole pcimem pmtools"

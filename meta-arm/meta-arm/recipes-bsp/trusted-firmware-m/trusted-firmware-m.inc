@@ -22,13 +22,13 @@ INHIBIT_DEFAULT_DEPS = "1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-# At present, TF-M needs GCC >10 but <11.3 so use 11.2:
-# https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git/tree/docs/getting_started/tfm_getting_started.rst?h=TF-Mv1.8.0#n214
+# At present, TF-M Select other GNU Arm compiler versions instead of 11.2:
+# https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git/tree/docs/getting_started/tfm_getting_started.rst#n214
 #
 # See tools/requirements.txt for Python dependencies
 DEPENDS += "cmake-native \
             ninja-native \
-            gcc-arm-none-eabi-11.2-native \
+            gcc-arm-none-eabi-native \
             python3-cbor2-native \
             python3-click-native \
             python3-cryptography-native \

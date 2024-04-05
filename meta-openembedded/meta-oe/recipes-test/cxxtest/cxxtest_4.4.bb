@@ -10,8 +10,6 @@ SRC_URI[sha256sum] = "1c154fef91c65dbf1cd4519af7ade70a61d85a923b6e0c0b007dc7f489
 
 inherit setuptools3
 
-PIP_INSTALL_DIST_PATH = "${B}/python/python3/dist"
-
 SETUPTOOLS_SETUP_PATH = "${S}/python"
 
 do_install:append() {

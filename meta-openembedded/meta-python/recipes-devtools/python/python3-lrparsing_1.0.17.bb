@@ -17,7 +17,6 @@ RDEPENDS:${PN} = " \
 "
 
 inherit setuptools3
-PIP_INSTALL_PACKAGE = "lrparsing"
 
 S = "${WORKDIR}/lrparsing-${PV}"
 

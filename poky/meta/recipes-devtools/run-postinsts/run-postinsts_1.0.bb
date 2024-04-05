@@ -12,6 +12,8 @@ S = "${WORKDIR}"
 
 inherit allarch systemd update-rc.d
 
+RDEPENDS:${PN} = "util-linux-fcntl-lock"
+
 INITSCRIPT_NAME = "run-postinsts"
 INITSCRIPT_PARAMS = "start 99 S ."
 

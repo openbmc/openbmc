@@ -1,0 +1,62 @@
+From 3881757eabfde2ff54400ab127b106ab085d83f0 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 13 Mar 2024 11:22:05 +0800
+Subject: [PATCH] lock.py: fix Exception handling
+
+Before, when logdir is not writable, _try_lock will raise an Exception
+like "Permission denied: '/var/log/log_lock.pid'", and in this case,
+_unlock_thread will not be called and the variable count will not be
+handled, it maybe cause log_lock.pid not be deleted in case like [1].
+
+For [1], it is an cross compile case, when dnf install some packages to
+rootfs, seems like some threads don't do chroot like work, some threads
+do chroot like work. so for the threads don't do chroot, "Permission denied"
+Exception happend, for the threads that do chroot, log_lock.pid will be
+created under installroot/var/log/log_lock.pid, since variable count not
+handled correct before, log_lock.pid may not be deleted correctly.
+
+So fixed like this, if _try_lock raise Exception, _unlock_thread first,
+then raise the Exception.
+
+[1] https://github.com/rpm-software-management/dnf/issues/1963
+
+Upstream-Status: Submitted [ https://github.com/rpm-software-management/dnf/pull/2065 ]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ dnf/lock.py | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/dnf/lock.py b/dnf/lock.py
+index 6817aac9..5718062a 100644
+--- a/dnf/lock.py
++++ b/dnf/lock.py
+@@ -128,7 +128,11 @@ class ProcessLock(object):
+         self._lock_thread()
+         prev_pid = -1
+         my_pid = os.getpid()
+-        pid = self._try_lock(my_pid)
++        try:
++            pid = self._try_lock(my_pid)
++        except Exception:
++            self._unlock_thread()
++            raise
+         while pid != my_pid:
+             if pid != -1:
+                 if not self.blocking:
+@@ -140,7 +144,11 @@ class ProcessLock(object):
+                     logger.info(msg)
+                     prev_pid = pid
+             time.sleep(1)
+-            pid = self._try_lock(my_pid)
++            try:
++                pid = self._try_lock(my_pid)
++            except Exception:
++                self._unlock_thread()
++                raise
+ 
+     def __exit__(self, *exc_args):
+         if self.count == 1:
+-- 
+2.25.1
+

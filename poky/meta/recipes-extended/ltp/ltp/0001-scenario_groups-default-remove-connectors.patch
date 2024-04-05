@@ -1,0 +1,34 @@
+From 14c710cae38aa96bd8d681e891b6a1d691f99988 Mon Sep 17 00:00:00 2001
+From: Xiangyu Chen <xiangyu.chen@windriver.com>
+Date: Thu, 14 Mar 2024 09:47:10 +0800
+Subject: [PATCH] scenario_groups/default: remove connectors
+
+runtest/connectors was removed in 9b642d89c, thus update scenario_groups/default.
+
+Fixes: 9b642d89c ("runtest: Merge runtest/connectors to kernel_misc")
+Closes: https://github.com/linux-test-project/ltp/pull/1144
+
+Upstream-Status: Backport from
+[https://github.com/linux-test-project/ltp/commit/14c710ca]
+
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ scenario_groups/default | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/scenario_groups/default b/scenario_groups/default
+index f17b2061a..ec77d8fb8 100644
+--- a/scenario_groups/default
++++ b/scenario_groups/default
+@@ -16,7 +16,6 @@ controllers
+ filecaps
+ cap_bounds
+ fcntl-locktests
+-connectors
+ power_management_tests
+ hugetlb
+ commands
+-- 
+2.34.1
+

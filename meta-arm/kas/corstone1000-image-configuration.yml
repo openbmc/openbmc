@@ -1,0 +1,40 @@
+header:
+  version: 14
+
+local_conf_header:
+  extrapackages: |
+    # Intentionally blank to prevent perf from being added to the image in base.yml
+
+  firmwarebuild: |
+    # Only needed as kas doesn't add it automatically unless you have 2 targets in seperate configs
+    BBMULTICONFIG ?= "firmware"
+
+  distrosetup: |
+    DISTRO_FEATURES = "usbhost ipv4"
+
+  initramfsetup: |
+    # Telling the build system which image is responsible of the generation of the initramfs rootfs
+    INITRAMFS_IMAGE_BUNDLE:firmware = "1"
+    INITRAMFS_IMAGE:firmware ?= "core-image-minimal"
+    IMAGE_FSTYPES:firmware:pn-core-image-minimal = "${INITRAMFS_FSTYPES}"
+    IMAGE_NAME_SUFFIX:firmware = ""
+
+    # enable mdev/busybox for init
+    INIT_MANAGER:firmware = "mdev-busybox"
+    VIRTUAL-RUNTIME_init_manager:firmware = "busybox"
+
+    # prevent the kernel image from being included in the intramfs rootfs
+    PACKAGE_EXCLUDE:firmware += "kernel-image-*"
+
+    # Disable openssl in kmod to shrink the initramfs size
+    PACKAGECONFIG:remove:firmware:pn-kmod = "openssl"
+
+  imageextras: |
+    # Don't include kernel binary in rootfs /boot path
+    RRECOMMENDS:${KERNEL_PACKAGE_NAME}-base = ""
+
+    # all optee packages
+    CORE_IMAGE_EXTRA_INSTALL += "optee-client"
+
+    # TS PSA API tests commands for crypto, its, ps and iat
+    CORE_IMAGE_EXTRA_INSTALL += "packagegroup-ts-tests-psa"

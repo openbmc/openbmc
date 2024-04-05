@@ -1,0 +1,69 @@
+From b202ce51f7b68c460fcd1b6d9c3ffa8aaf2baaf6 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Tue, 12 Mar 2024 19:05:38 +0100
+Subject: [PATCH 6/6] Add SDL2 example support
+
+Extend the main.c to support both legacy fbdev, DRM/KMS, SDL2 initialization.
+The SDL2 window resolution can be configured using environment variables
+LV_VIDEO_WIDTH and LV_VIDEO_HEIGHT and defaults to 800 x 480 .
+
+To use legacy fbdev support, adjust lv_conf.h as follows:
+LV_USE_LINUX_FBDEV=1
+LV_USE_LINUX_DRM=0
+LV_USE_SDL=0
+
+To use DRM/KMS support, adjust lv_conf.h as follows:
+LV_USE_LINUX_FBDEV=0
+LV_USE_LINUX_DRM=1
+LV_USE_SDL=0
+
+To use SDL2 support, adjust lv_conf.h as follows:
+LV_USE_LINUX_FBDEV=0
+LV_USE_LINUX_DRM=0
+LV_USE_SDL=1
+
+Upstream-Status: Submitted [https://github.com/lvgl/lv_port_linux_frame_buffer/pull/47]
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+ CMakeLists.txt | 6 +++++-
+ main.c         | 8 ++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c1cfb7f..658193f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -15,6 +15,10 @@ add_executable(main main.c mouse_cursor_icon.c)
+ include(${CMAKE_CURRENT_LIST_DIR}/lvgl/tests/FindLibDRM.cmake)
+ include_directories(${Libdrm_INCLUDE_DIRS})
+ 
+-target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} ${Libdrm_LIBRARIES} m pthread)
++find_package(SDL2)
++find_package(SDL2_image)
++include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
++
++target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${Libdrm_LIBRARIES} m pthread)
+ add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+ 
+diff --git a/main.c b/main.c
+index ab4e936..4b66ebc 100644
+--- a/main.c
++++ b/main.c
+@@ -25,6 +25,14 @@ static void lv_linux_disp_init(void)
+ 
+     lv_linux_drm_set_file(disp, videocard, -1);
+ }
++#elif LV_USE_SDL
++static void lv_linux_disp_init(void)
++{
++    const int width = atoi(getenv("LV_VIDEO_WIDTH") ? : "800");
++    const int height = atoi(getenv("LV_VIDEO_HEIGHT") ? : "480");
++
++    lv_sdl_window_create(width, height);
++}
+ #else
+ #error Unsupported configuration
+ #endif
+-- 
+2.43.0
+

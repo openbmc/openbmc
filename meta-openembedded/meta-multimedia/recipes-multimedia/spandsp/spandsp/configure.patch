@@ -1,0 +1,56 @@
+From: =?UTF-8?q?J=C3=B6rg=20Sommer?= <joerg.sommer@navimatix.de>
+Date: Thu, 14 Mar 2024 09:41:57 +0100
+Subject: [PATCH 2/2] configure: Replace manual search for libxml by
+ AC_CHECK_LIB
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The manual search fails if the include directories (and build environment)
+are located somewhere else.
+
+Signed-off-by: Jörg Sommer <joerg.sommer@navimatix.de>
+Upstream-Status: Submitted [https://github.com/freeswitch/spandsp/pull/74]
+---
+
+ERROR: spandsp-3.0.0+git-r0 do_configure: QA Issue: This autoconf log indicates errors, it looked at host include and/or library paths while determining system capabilities.
+
+ configure.ac | 22 +++++-----------------
+ 1 file changed, 5 insertions(+), 17 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2140837..b5138d6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -185,23 +185,11 @@ then
+ fi
+ 
+ # Determine XML2 include path
+-AC_MSG_CHECKING(for libxml/xmlmemory.h)
+-
+-# Can we include headers using system include dirs?
+-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <libxml/xmlmemory.h>]], [[int a = 1;]])],[XML2_INCLUDE=" "],[XML2_INCLUDE=])
+-
+-# Hunt through several possible directories to find the includes for libxml2
+-if test "x$XML2_INCLUDE" = "x"; then
+-    old_CPPFLAGS="$CPPFLAGS"
+-    for i in $xml2_include_dir /usr/include /usr/local/include /usr/include/libxml2 /usr/local/include/libxml2 ; do
+-        CPPFLAGS="$old_CPPFLAGS -I$i"
+-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <libxml/xmlmemory.h>]], [[int a = 1;]])],[XML2_INCLUDE="-I$i"],[XML2_INCLUDE=
+-        ])
+-        if test "x$XML2_INCLUDE" != "x"; then
+-            break;
+-        fi
+-    done
+-    CPPFLAGS="$old_CPPFLAGS $XML2_INCLUDE"
++AC_CHECK_LIB([xml2], [xmlParseFile], [libxml2_found=yes])
++if test "$libxml2_found" = "yes" ; then
++    AC_DEFINE(HAVE_LIBXML2,1,[defined when libxml2 is available])
++else
++    AC_MSG_WARN([libxml2 not found. Disabling cache.])
+ fi
+ 
+ AC_CHECK_HEADERS([libxml/xmlmemory.h])
+-- 
+2.34.1
+

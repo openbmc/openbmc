@@ -25,7 +25,9 @@ SYSTEMD_SERVICE:${PN} = "cryptmount.service"
 do_install:append () {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -D -m 0644 ${S}/sysinit/cryptmount.service ${D}${systemd_system_unitdir}/cryptmount.service
-        rm -fr ${D}/usr/lib
+        if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','false','true',d)}; then
+           rm -fr ${D}/usr/lib
+        fi
     fi
 }
 

@@ -1,4 +1,4 @@
-From f53481dc4a56b8a996628733553e080bb0aafdd7 Mon Sep 17 00:00:00 2001
+From f159d71d742ace5640c7810bcc27365f8fde95a3 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Nov 2018 17:07:22 +0800
 Subject: [PATCH 07/11] invoking mount with infinite timeout
@@ -14,10 +14,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index 5571e73..02c8033 100644
+index 5bc5804..9de77e1 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -258,7 +258,7 @@ def mount(device, mountpoint, fstype, options=None):
+@@ -271,7 +271,7 @@ def mount(device, mountpoint, fstype, options=None):
          makedirs(mountpoint)
  
      argv = ["mount", "-t", fstype, "-o", options, device, mountpoint]
@@ -26,6 +26,3 @@ index 5571e73..02c8033 100644
  
  
  def umount(mountpoint):
--- 
-2.7.4
-

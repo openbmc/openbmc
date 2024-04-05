@@ -1,4 +1,7 @@
-clang/arm: Do not use MUST_TAIL_CALL
+From c50f2277509f2e6f087cda2eaf323eaf569aad8d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Sep 2023 12:42:06 -0700
+Subject: [PATCH] clang/arm: Do not use MUST_TAIL_CALL
 
 This causes clang-17 to crash see [1]
 this code is new in webkit 2.42[2] thats why we do not see the crash in older webkit
@@ -8,9 +11,15 @@ this code is new in webkit 2.42[2] thats why we do not see the crash in older we
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Source/WTF/wtf/Compiler.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/WTF/wtf/Compiler.h b/Source/WTF/wtf/Compiler.h
+index 449ca502..daac29d7 100644
 --- a/Source/WTF/wtf/Compiler.h
 +++ b/Source/WTF/wtf/Compiler.h
-@@ -284,7 +284,7 @@
+@@ -321,7 +321,7 @@
  /* MUST_TAIL_CALL */
  
  #if !defined(MUST_TAIL_CALL) && defined(__cplusplus) && defined(__has_cpp_attribute)

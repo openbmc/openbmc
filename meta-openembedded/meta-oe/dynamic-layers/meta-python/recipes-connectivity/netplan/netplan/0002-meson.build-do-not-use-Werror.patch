@@ -1,0 +1,29 @@
+From 668ee79f39614ad758edd44c42b8b0eff57877cf Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sun, 3 Oct 2021 21:52:16 +0200
+Subject: [PATCH] meson.build: do not use -Werror
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 30f33fe2..0b214795 100644
+--- a/meson.build
++++ b/meson.build
+@@ -4,7 +4,7 @@ project('netplan', 'c',
+         default_options: [
+             'c_std=c99',
+             'warning_level=2',
+-            'werror=true',
++            'werror=false',
+         ],
+         meson_version: '>= 0.61.0',
+ )
+-- 
+2.25.1
+

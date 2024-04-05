@@ -1,20 +1,20 @@
-From e0df1f07d1707d5daf0358cc60b30f06121f7e60 Mon Sep 17 00:00:00 2001
+From 0ea11f520a8b4453e60eaf0679b9feb757024422 Mon Sep 17 00:00:00 2001
 From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
 Date: Fri, 25 Dec 2020 11:41:43 +0900
 Subject: [PATCH] don't fail if GLOB_BRACE is not defined
 
-Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
----
 Upstream-Status: Pending
 
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+---
  src/util.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
 diff --git a/src/util.c b/src/util.c
-index 841ec12..59595da 100644
+index 36eb896a..ee13ec44 100644
 --- a/src/util.c
 +++ b/src/util.c
-@@ -32,6 +32,12 @@
+@@ -35,6 +35,12 @@
  #include "names.h"
  #include "yaml-helpers.h"
  
@@ -24,7 +24,7 @@ index 841ec12..59595da 100644
 +#define GLOB_BRACE 0
 +#endif
 +
- NETPLAN_ABI GHashTable*
+ GHashTable*
  wifi_frequency_24;
  
 -- 

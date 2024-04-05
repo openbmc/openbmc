@@ -16,9 +16,6 @@ SRCREV = "9be6a51d1660991562eefaaddefa757ca0e0e00f"
 S = "${WORKDIR}/git"
 
 inherit setuptools3 ptest
-PIP_INSTALL_PACKAGE = "inotify"
-PIP_INSTALL_DIST_PATH = "${S}/dist"
-
 
 RDEPENDS:${PN} += " \
     python3-ctypes \

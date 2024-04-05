@@ -2,15 +2,22 @@ header:
   version: 14
   includes:
     - kas/corstone1000-base.yml
+    - kas/corstone1000-image-configuration.yml
+    - kas/corstone1000-firmware-only.yml
     - kas/fvp-eula.yml
 
-machine: corstone1000-fvp
+env:
+  DISPLAY:
+  WAYLAND_DISPLAY:
+  XAUTHORITY:
 
 local_conf_header:
-    fvp-config: |
-        # Remove Dropbear SSH as it will not fit into the corstone1000 image.
-        IMAGE_FEATURES:remove = " ssh-server-dropbear"
-        INHERIT += "fvpboot"
+  testimagefvp: |
+    LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
+    IMAGE_CLASSES += "fvpboot"
 
-target:
-  - corstone1000-image
+  mass-storage: |
+    # Ensure the Mass Storage device is absent
+    FVP_CONFIG[board.msd_mmc.p_mmc_file] = "invalid.dat"
+
+machine: corstone1000-fvp

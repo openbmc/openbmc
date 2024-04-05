@@ -1,0 +1,26 @@
+From 961d2e3718e9e6d652cadf5b4d3597cfe822dd04 Mon Sep 17 00:00:00 2001
+From: Ali Can Ozaslan <ali.oezaslan@arm.com>
+Date: Wed, 24 Jan 2024 16:10:08 +0000
+Subject: [PATCH] arm/trusted-firmware-m: disable address warnings into an
+ error
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Ali Can Ozaslan <ali.oezaslan@arm.com>
+Upstream-Status: Inappropriate
+
+---
+ toolchain_GNUARM.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/toolchain_GNUARM.cmake b/toolchain_GNUARM.cmake
+index b6ae50ec3..4c2f5b3d7 100644
+--- a/toolchain_GNUARM.cmake
++++ b/toolchain_GNUARM.cmake
+@@ -111,6 +111,7 @@ add_compile_options(
+     -Wno-format
+     -Wno-return-type
+     -Wno-unused-but-set-variable
++    -Wno-error=address
+     -c
+     -fdata-sections
+     -ffunction-sections

@@ -1,0 +1,45 @@
+From 85d90749a10b5f91741d37b75825935bf7cc4fb3 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Tue, 12 Mar 2024 03:00:37 +0100
+Subject: [PATCH 3/6] Make fbdev device node runtime configurable via
+ environment variable
+
+Test whether $LV_VIDEO_CARD environment variable is non-NULL and in
+case it is, use it as the video card file in lv_linux_fbdev_set_file().
+Otherwise fall back to /dev/fb0, i.e. the current behavior. This way,
+it is possible to test LVGL on systems with multiple fbdev devices.
+
+Upstream-Status: Submitted [https://github.com/lvgl/lv_port_linux_frame_buffer/pull/47]
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+ main.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index 9775b9c..b64a098 100644
+--- a/main.c
++++ b/main.c
+@@ -4,13 +4,19 @@
+ #include <pthread.h>
+ #include <time.h>
+ 
++static const char *lv_linux_get_video_card_node(const char *videocard_default)
++{
++    return getenv("LV_VIDEO_CARD") ? : videocard_default;
++}
++
+ int main(void)
+ {
++    const char *videocard = lv_linux_get_video_card_node("/dev/fb0");
+     lv_init();
+ 
+     /*Linux frame buffer device init*/
+     lv_display_t * disp = lv_linux_fbdev_create();
+-    lv_linux_fbdev_set_file(disp, "/dev/fb0");
++    lv_linux_fbdev_set_file(disp, videocard);
+ 
+     /*Create a Demo*/
+     lv_demo_widgets();
+-- 
+2.43.0
+

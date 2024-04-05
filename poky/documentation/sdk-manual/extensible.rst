@@ -76,7 +76,7 @@ Setting up the Extensible SDK environment directly in a Yocto build
       $ bitbake meta-ide-support
       $ bitbake -c populate_sysroot gtk+3
       # or any other target or native item that the application developer would need
-      $ bitbake build-sysroots
+      $ bitbake build-sysroots -c build_native_sysroot && bitbake build-sysroots -c build_target_sysroot
 
 Setting up the Extensible SDK from a standalone installer
 ---------------------------------------------------------
@@ -1507,8 +1507,12 @@ In this scenario, the Yocto build tooling, e.g. ``bitbake``
 is directly accessible to build additional items, and it
 can simply be executed directly::
 
+   $ bitbake curl-native
+   # Add newly built native items to native sysroot
+   $ bitbake build-sysroots -c build_native_sysroot
    $ bitbake mesa
-   $ bitbake build-sysroots
+   # Add newly built target items to target sysroot
+   $ bitbake build-sysroots -c build_target_sysroot
 
 When using a standalone installer for the Extensible SDK
 --------------------------------------------------------

@@ -1,0 +1,132 @@
+From d8379ec6365a925db33cae94fb6783cdbdb6a922 Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 25 Mar 2024 09:40:29 -0400
+Subject: [PATCH 2/4] Fix: ASoC add component to set_bias_level events in linux
+ 6.9-rc1
+
+See upstream commit:
+
+    commit 6ef46a69ec32fe1cf56de67742fcd01af4bf48af
+    Author: Luca Ceresoli <luca.ceresoli@bootlin.com>
+    Date:   Wed Mar 6 10:30:00 2024 +0100
+
+        ASoC: trace: add component to set_bias_level trace events
+
+        The snd_soc_bias_level_start and snd_soc_bias_level_done trace events
+        currently look like:
+
+                   aplay-229   [000]  1250.140778: snd_soc_bias_level_start: card=vscn-2046 val=1
+                   aplay-229   [000]  1250.140784: snd_soc_bias_level_done: card=vscn-2046 val=1
+                   aplay-229   [000]  1250.140786: snd_soc_bias_level_start: card=vscn-2046 val=2
+                   aplay-229   [000]  1250.140788: snd_soc_bias_level_done: card=vscn-2046 val=2
+            kworker/u8:1-21    [000]  1250.140871: snd_soc_bias_level_start: card=vscn-2046 val=1
+            kworker/u8:0-11    [000]  1250.140951: snd_soc_bias_level_start: card=vscn-2046 val=1
+            kworker/u8:0-11    [000]  1250.140956: snd_soc_bias_level_done: card=vscn-2046 val=1
+            kworker/u8:0-11    [000]  1250.140959: snd_soc_bias_level_start: card=vscn-2046 val=2
+            kworker/u8:0-11    [000]  1250.140961: snd_soc_bias_level_done: card=vscn-2046 val=2
+            kworker/u8:1-21    [000]  1250.167219: snd_soc_bias_level_done: card=vscn-2046 val=1
+            kworker/u8:1-21    [000]  1250.167222: snd_soc_bias_level_start: card=vscn-2046 val=2
+            kworker/u8:1-21    [000]  1250.167232: snd_soc_bias_level_done: card=vscn-2046 val=2
+            kworker/u8:0-11    [000]  1250.167440: snd_soc_bias_level_start: card=vscn-2046 val=3
+            kworker/u8:0-11    [000]  1250.167444: snd_soc_bias_level_done: card=vscn-2046 val=3
+            kworker/u8:1-21    [000]  1250.167497: snd_soc_bias_level_start: card=vscn-2046 val=3
+            kworker/u8:1-21    [000]  1250.167506: snd_soc_bias_level_done: card=vscn-2046 val=3
+
+        There are clearly multiple calls, one per component, but they cannot be
+        discriminated from each other.
+
+        Change the ftrace events to also print the component name, to make it clear
+        which part of the code is involved. This requires changing the passed value
+        from a struct snd_soc_card, where the DAPM context is not kwown, to a
+        struct snd_soc_dapm_context where it is obviously known but the a card
+        pointer is also available.
+
+        With this change, the resulting trace becomes:
+
+                   aplay-247   [000]  1436.357332: snd_soc_bias_level_start: card=vscn-2046 component=(none) val=1
+                   aplay-247   [000]  1436.357338: snd_soc_bias_level_done: card=vscn-2046 component=(none) val=1
+                   aplay-247   [000]  1436.357340: snd_soc_bias_level_start: card=vscn-2046 component=(none) val=2
+                   aplay-247   [000]  1436.357343: snd_soc_bias_level_done: card=vscn-2046 component=(none) val=2
+            kworker/u8:4-215   [000]  1436.357437: snd_soc_bias_level_start: card=vscn-2046 component=ff560000.codec val=1
+            kworker/u8:5-231   [000]  1436.357518: snd_soc_bias_level_start: card=vscn-2046 component=ff320000.i2s val=1
+            kworker/u8:5-231   [000]  1436.357523: snd_soc_bias_level_done: card=vscn-2046 component=ff320000.i2s val=1
+            kworker/u8:5-231   [000]  1436.357526: snd_soc_bias_level_start: card=vscn-2046 component=ff320000.i2s val=2
+            kworker/u8:5-231   [000]  1436.357528: snd_soc_bias_level_done: card=vscn-2046 component=ff320000.i2s val=2
+            kworker/u8:4-215   [000]  1436.383217: snd_soc_bias_level_done: card=vscn-2046 component=ff560000.codec val=1
+            kworker/u8:4-215   [000]  1436.383221: snd_soc_bias_level_start: card=vscn-2046 component=ff560000.codec val=2
+            kworker/u8:4-215   [000]  1436.383231: snd_soc_bias_level_done: card=vscn-2046 component=ff560000.codec val=2
+            kworker/u8:5-231   [000]  1436.383468: snd_soc_bias_level_start: card=vscn-2046 component=ff320000.i2s val=3
+            kworker/u8:5-231   [000]  1436.383472: snd_soc_bias_level_done: card=vscn-2046 component=ff320000.i2s val=3
+            kworker/u8:4-215   [000]  1436.383503: snd_soc_bias_level_start: card=vscn-2046 component=ff560000.codec val=3
+            kworker/u8:4-215   [000]  1436.383513: snd_soc_bias_level_done: card=vscn-2046 component=ff560000.codec val=3
+
+Upstream-Status: Backport [303434ab Fix: ASoC add component to set_bias_level events in linux 6.9-rc1]
+
+Change-Id: I959f1680c002acdf29828b968d3975247f5433d8
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/asoc.h | 36 +++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+Index: lttng-modules-2.13.12/include/instrumentation/events/asoc.h
+===================================================================
+--- lttng-modules-2.13.12.orig/include/instrumentation/events/asoc.h
++++ lttng-modules-2.13.12/include/instrumentation/events/asoc.h
+@@ -10,6 +10,7 @@
+ #include <lttng/kernel-version.h>
+ 
+ #define DAPM_DIRECT "(direct)"
++#define DAPM_COMPONENT_NONE "(none)"
+ 
+ #ifndef _TRACE_ASOC_DEF
+ #define _TRACE_ASOC_DEF
+@@ -119,6 +120,40 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(asoc
+ )
+ #endif
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,9,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(asoc_snd_soc_dapm_context,
++
++	TP_PROTO(struct snd_soc_dapm_context *dapm, int val),
++
++	TP_ARGS(dapm, val),
++
++	TP_FIELDS(
++		ctf_string(name, dapm->card->name)
++		ctf_string(component, dapm->component ? dapm->component->name : DAPM_COMPONENT_NONE)
++		ctf_integer(int, val, val)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(asoc_snd_soc_dapm_context, snd_soc_bias_level_start,
++
++	asoc_snd_soc_bias_level_start,
++
++	TP_PROTO(struct snd_soc_dapm_context *dapm, int val),
++
++	TP_ARGS(dapm, val)
++
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(asoc_snd_soc_dapm_context, snd_soc_bias_level_done,
++
++	asoc_snd_soc_bias_level_done,
++
++	TP_PROTO(struct snd_soc_dapm_context *dapm, int val),
++
++	TP_ARGS(dapm, val)
++
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_CLASS(asoc_snd_soc_card,
+ 
+ 	TP_PROTO(struct snd_soc_card *card, int val),
+@@ -150,6 +185,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(asoc
+ 	TP_ARGS(card, val)
+ 
+ )
++#endif
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,9,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(asoc_snd_soc_dapm_basic,

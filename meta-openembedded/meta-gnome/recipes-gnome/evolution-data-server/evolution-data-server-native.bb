@@ -23,3 +23,4 @@ do_install() {
     install -d ${D}${bindir}
     install -m 755 ${B}/* ${D}${bindir}
 }
+

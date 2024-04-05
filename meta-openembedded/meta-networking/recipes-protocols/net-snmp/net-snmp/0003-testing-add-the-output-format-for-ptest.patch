@@ -1,0 +1,37 @@
+From 2a1a2b58af09c6c03026474f1fd0db7d36e977c7 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 14 Jan 2015 15:10:06 +0800
+Subject: [PATCH] testing: add the output format for ptest
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ testing/RUNTESTS | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/testing/RUNTESTS b/testing/RUNTESTS
+index 6715831..a2b6fb8 100755
+--- a/testing/RUNTESTS
++++ b/testing/RUNTESTS
+@@ -17,13 +17,17 @@ failed_count=0
+ rm -f failed_tests
+ for i in "${srcdir}"/testing/fulltests/default/T*$1*; do
+     echo "RUNNING $i"
++    test_name=`basename $i`
+     ${srcdir}/testing/fulltests/support/simple_run $i
+     if [ $? = 0 ]; then
++        echo "PASS: $test_name"
+         success_count=`expr $success_count + 1`
+     else
++        echo "FAIL: $test_name"
+         failed_count=`expr $failed_count + 1`
+         echo "$i" >> failed_tests
+     fi
++    echo
+ done
+ 
+ if [ -f failed_tests ]; then
+-- 
+2.25.1
+

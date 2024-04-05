@@ -1,0 +1,84 @@
+From 37caab7a43da5ede0ff1eb700f0257a213ac4b18 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 10:46:50 -0700
+Subject: [PATCH 1/2] include libgen.h for basename API prototype
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://lore.kernel.org/fstests/20240325175323.3450750-1-raj.khem@gmail.com/T/#t]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/splice-test.c                   | 1 +
+ src/stat_test.c                     | 1 +
+ src/t_ext4_dax_inline_corruption.c  | 1 +
+ src/t_ext4_dax_journal_corruption.c | 1 +
+ src/t_mmap_collision.c              | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/src/splice-test.c b/src/splice-test.c
+index eb863673..7b7094f5 100644
+--- a/src/splice-test.c
++++ b/src/splice-test.c
+@@ -11,6 +11,7 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <err.h>
++#include <libgen.h>
+ 
+ #include <stdlib.h>
+ #include <stdio.h>
+diff --git a/src/stat_test.c b/src/stat_test.c
+index 95cfdc4f..77e1acdd 100644
+--- a/src/stat_test.c
++++ b/src/stat_test.c
+@@ -4,6 +4,7 @@
+  * Written by David Howells (dhowells@redhat.com)
+  */
+ 
++#include <libgen.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/src/t_ext4_dax_inline_corruption.c b/src/t_ext4_dax_inline_corruption.c
+index e1a39a6c..a40c5df5 100644
+--- a/src/t_ext4_dax_inline_corruption.c
++++ b/src/t_ext4_dax_inline_corruption.c
+@@ -2,6 +2,7 @@
+ /* Copyright (c) 2018 Intel Corporation. */
+ #include <errno.h>
+ #include <fcntl.h>
++#include <libgen.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/t_ext4_dax_journal_corruption.c b/src/t_ext4_dax_journal_corruption.c
+index ba7a96e4..53be10c2 100644
+--- a/src/t_ext4_dax_journal_corruption.c
++++ b/src/t_ext4_dax_journal_corruption.c
+@@ -2,6 +2,7 @@
+ /* Copyright (c) 2018 Intel Corporation. */
+ #include <errno.h>
+ #include <fcntl.h>
++#include <libgen.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/t_mmap_collision.c b/src/t_mmap_collision.c
+index c872f4e2..d9315fcf 100644
+--- a/src/t_mmap_collision.c
++++ b/src/t_mmap_collision.c
+@@ -15,6 +15,7 @@
+  */
+ #include <errno.h>
+ #include <fcntl.h>
++#include <libgen.h>
+ #include <pthread.h>
+ #include <stdbool.h>
+ #include <stdio.h>
+-- 
+2.44.0
+

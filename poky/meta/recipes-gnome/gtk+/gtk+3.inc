@@ -33,7 +33,10 @@ GTKDOC_MESON_OPTION = 'gtk_doc'
 EXTRA_OEMESON = "-Dxinerama=no -Dtests=false"
 EXTRA_OEMESON:append:class-native = " -Ddemos=false -Dexamples=false"
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'opengl wayland x11', d)}"
+PACKAGECONFIG ??= " \
+	${@bb.utils.filter('DISTRO_FEATURES', 'opengl x11', d)} \
+	${@bb.utils.contains('DISTRO_FEATURES', 'opengl wayland', 'wayland', '', d)} \
+"
 PACKAGECONFIG:class-native = "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG:class-nativesdk = "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 

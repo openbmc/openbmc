@@ -290,12 +290,12 @@ class URI(object):
 
     def _param_str_split(self, string, elmdelim, kvdelim="="):
         ret = collections.OrderedDict()
-        for k, v in [x.split(kvdelim, 1) for x in string.split(elmdelim) if x]:
+        for k, v in [x.split(kvdelim, 1) if kvdelim in x else (x, None) for x in string.split(elmdelim) if x]:
             ret[k] = v
         return ret
 
     def _param_str_join(self, dict_, elmdelim, kvdelim="="):
-        return elmdelim.join([kvdelim.join([k, v]) for k, v in dict_.items()])
+        return elmdelim.join([kvdelim.join([k, v]) if v else k for k, v in dict_.items()])
 
     @property
     def hostport(self):
@@ -943,7 +943,10 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
         elif e.stderr:
             output = "output:\n%s" % e.stderr
         else:
-            output = "no output"
+            if log:
+                output = "see logfile for output"
+            else:
+                output = "no output"
         error_message = "Fetch command %s failed with exit code %s, %s" % (e.command, e.exitcode, output)
     except bb.process.CmdError as e:
         error_message = "Fetch command %s could not be run:\n%s" % (e.command, e.msg)

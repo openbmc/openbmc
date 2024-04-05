@@ -11,15 +11,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=87109e44b2fda96a8991f27684a7349c \
                     file://third_party/openthread/repo/LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
                     "
 DEPENDS = "autoconf-archive dbus readline avahi jsoncpp boost libnetfilter-queue protobuf protobuf-native"
-SRCREV = "4e937939ba6ce146fd98537cb63e0f4c41c8dbe1"
+SRCREV = "a35cc682305bb2201c314472adf06a4960536750"
 PV = "0.3.0+git"
 
 SRC_URI = "gitsm://github.com/openthread/ot-br-posix.git;protocol=https;branch=main \
            file://0001-otbr-agent.service.in-remove-pre-exec-hook-for-mdns-.patch \
            file://0001-cmake-Disable-nonnull-compare-warning-on-gcc.patch \
-           file://0001-bn_mul.h-fix-x86-PIC-inline-ASM-compilation-with-GCC.patch \
-           file://mbedtls.patch \
            file://default-cxx-std.patch \
+           file://musl-fixes.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -56,6 +55,7 @@ EXTRA_OECMAKE = "-DBUILD_TESTING=OFF \
                  -DOT_DHCP6_CLIENT=ON \
                  -DOT_DHCP6_SERVER=ON \
                  "
+EXTRA_OECMAKE:append:libc-musl = " -DOT_TARGET_MUSL=ON"
 
 RDEPENDS:${PN} = "iproute2 ipset avahi-daemon"
 

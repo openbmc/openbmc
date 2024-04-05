@@ -1,0 +1,56 @@
+From 6b45c5f80d20e7bbf3d98c1fa17d2cf8716af3bb Mon Sep 17 00:00:00 2001
+From: Xiangyu Chen <xiangyu.chen@windriver.com>
+Date: Mon, 25 Mar 2024 18:20:14 +0800
+Subject: [PATCH] Fix: rotation-destroy-flush: fix session daemon abort if no
+ kernel module present
+
+Testing rotation-destroy-flush when no lttng kernel modules present, it would
+be failed with error message:
+
+  Error: Unable to load required module lttng-ring-buffer-client-discard
+  not ok 1 - Start session daemon
+  Failed test 'Start session daemon'
+  not ok 2 - Create session rotation_destroy_flush in -o /tmp/tmp.test_rot ...
+  ...
+
+This because test script that sets the LTTNG_ABORT_ON_ERROR environment
+variable. It's this environment variable that causes the sessiond to handle the
+kernel module loading failure as an abort rather than a warning.
+
+Using "check_skip_kernel_test" to detect whether the kernel module fails to
+load is expected or not. If the failure is expected, the script won't set that
+environment variable any more.
+
+Fixes: 3a174400
+("tests:add check_skip_kernel_test to check root user and lttng kernel modules")
+
+Upstream-Status: Submitted [https://review.lttng.org/c/lttng-tools/+/12155]
+
+Change-Id: I371e9ba717613e2940186f710cf3cccd35baed6c
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ .../ust/rotation-destroy-flush/test_rotation_destroy_flush  | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/regression/ust/rotation-destroy-flush/test_rotation_destroy_flush b/tests/regression/ust/rotation-destroy-flush/test_rotation_destroy_flush
+index 669bcbc43..64161768f 100755
+--- a/tests/regression/ust/rotation-destroy-flush/test_rotation_destroy_flush
++++ b/tests/regression/ust/rotation-destroy-flush/test_rotation_destroy_flush
+@@ -23,11 +23,11 @@ SIZE_LIMIT=$PAGE_SIZE
+ NR_ITER=10
+ NUM_TESTS=$((15*$NR_ITER))
+ 
+-# Ensure the daemons invoke abort on error.
+-export LTTNG_ABORT_ON_ERROR=1
+-
+ source $TESTDIR/utils/utils.sh
+ 
++# Ensure the daemons invoke abort on error.
++check_skip_kernel_test || export LTTNG_ABORT_ON_ERROR=1
++
+ # MUST set TESTDIR before calling those functions
+ function run_app()
+ {
+-- 
+2.25.1
+

@@ -16,5 +16,3 @@ target:
   - nativesdk-gcc-aarch64-none-elf
   - gcc-arm-none-eabi
   - nativesdk-gcc-arm-none-eabi
-  - gcc-arm-none-eabi-11.2
-  - nativesdk-gcc-arm-none-eabi-11.2

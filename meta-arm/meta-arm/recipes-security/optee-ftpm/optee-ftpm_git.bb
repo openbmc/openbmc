@@ -22,8 +22,9 @@ FTPM_UUID="bc50d971-d4c9-42c4-82cb-343fb7f37896"
 
 SRC_URI = "gitsm://github.com/Microsoft/ms-tpm-20-ref;branch=main;protocol=https \
            file://0001-add-enum-to-ta-flags.patch"
-
 SRCREV = "d638536d0fe01acd5e39ffa1bd100b3da82d92c7"
+
+UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"
 

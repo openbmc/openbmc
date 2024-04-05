@@ -29,6 +29,13 @@ Other Directories
 
   This directory contains scripts used in running the CI tests
 
+Mailing List
+------------
+To interact with the meta-arm developer community, please email the meta-arm mailing list at meta-arm@lists.yoctoproject.org
+Currently, it is configured to only allow emails to members from those subscribed.
+To subscribe to the meta-arm mailing list, please go to
+https://lists.yoctoproject.org/g/meta-arm
+
 Contributing
 ------------
 Currently, we only accept patches from the meta-arm mailing list.  For general
@@ -48,6 +55,13 @@ The component being changed in the shortlog should be prefixed with the layer na
   arm-bsp/trusted-firmware-a: decrease frobbing level
 
   arm-toolchain/gcc: enable foobar v2
+
+Releases and Release Schedule
+--------------
+We follow the Yocto Project release methodology, schedule, and stable/LTS support timelines.  For more information on these, please reference:
+https://docs.yoctoproject.org/ref-manual/release-process.html
+https://wiki.yoctoproject.org/wiki/Releases
+https://wiki.yoctoproject.org/wiki/Stable_Release_and_LTS
 
 Reporting bugs
 --------------

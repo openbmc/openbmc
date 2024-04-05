@@ -1,7 +1,9 @@
-if ! xargs --version > /dev/null 2>&1; then
-	echo "xargs is required by the relocation script, please install it first. Abort!"
-	exit 1
-fi
+for cmd in xargs file; do
+	if ! command -v $cmd > /dev/null 2>&1; then
+		echo "The command '$cmd' is required by the relocation script, please install it first. Abort!"
+		exit 1
+	fi
+done
 
 # fix dynamic loader paths in all ELF SDK binaries
 # allow symlinks to be accessed via the find command too

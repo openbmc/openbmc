@@ -183,7 +183,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, extraconfigdata, runtask):
     if 'fakeroot' in taskdep and taskname in taskdep['fakeroot'] and not dry_run:
         fakeroot = True
         envvars = (runtask['fakerootenv'] or "").split()
-        for key, value in (var.split('=') for var in envvars):
+        for key, value in (var.split('=',1) for var in envvars):
             envbackup[key] = os.environ.get(key)
             os.environ[key] = value
             fakeenv[key] = value
@@ -195,7 +195,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, extraconfigdata, runtask):
                         (fn, taskname, ', '.join(fakedirs)))
     else:
         envvars = (runtask['fakerootnoenv'] or "").split()
-        for key, value in (var.split('=') for var in envvars):
+        for key, value in (var.split('=',1) for var in envvars):
             envbackup[key] = os.environ.get(key)
             os.environ[key] = value
             fakeenv[key] = value
@@ -237,11 +237,13 @@ def fork_off_task(cfg, data, databuilder, workerdata, extraconfigdata, runtask):
             # Let SIGHUP exit as SIGTERM
             signal.signal(signal.SIGHUP, sigterm_handler)
 
-            # No stdin
-            newsi = os.open(os.devnull, os.O_RDWR)
-            os.dup2(newsi, sys.stdin.fileno())
+            # No stdin & stdout
+            # stdout is used as a status report channel and must not be used by child processes.
+            dumbio = os.open(os.devnull, os.O_RDWR)
+            os.dup2(dumbio, sys.stdin.fileno())
+            os.dup2(dumbio, sys.stdout.fileno())
 
-            if umask:
+            if umask is not None:
                 os.umask(umask)
 
             try:
@@ -305,6 +307,10 @@ def fork_off_task(cfg, data, databuilder, workerdata, extraconfigdata, runtask):
                 if not quieterrors:
                     logger.critical(traceback.format_exc())
                 os._exit(1)
+
+            sys.stdout.flush()
+            sys.stderr.flush()
+
             try:
                 if dry_run:
                     return 0

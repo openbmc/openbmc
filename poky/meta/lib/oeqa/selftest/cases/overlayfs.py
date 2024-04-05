@@ -353,6 +353,7 @@ EXTRA_IMAGE_FEATURES += "read-only-rootfs"
 # Image configuration for overlayfs-etc
 OVERLAYFS_ETC_MOUNT_POINT = "/data"
 OVERLAYFS_ETC_DEVICE = "/dev/sda3"
+OVERLAYFS_ROOTFS_TYPE = "ext4"
 """
 
         self.write_config(config)
@@ -367,13 +368,17 @@ OVERLAYFS_ETC_DEVICE = "/dev/sda3"
 
     @skipIfNotMachine("qemux86-64", "tests are qemux86-64 specific currently")
     def test_sbin_init_preinit(self):
-        self.run_sbin_init(False)
+        self.run_sbin_init(False, "ext4")
 
     @skipIfNotMachine("qemux86-64", "tests are qemux86-64 specific currently")
     def test_sbin_init_original(self):
-        self.run_sbin_init(True)
+        self.run_sbin_init(True, "ext4")
 
-    def run_sbin_init(self, origInit):
+    @skipIfNotMachine("qemux86-64", "tests are qemux86-64 specific currently")
+    def test_sbin_init_read_only(self):
+        self.run_sbin_init(True, "squashfs")
+
+    def run_sbin_init(self, origInit, rootfsType):
         """
         Summary:   Confirm we can replace original init and mount overlay on top of /etc
         Expected:  Image is created successfully and /etc is mounted as an overlay
@@ -384,7 +389,9 @@ OVERLAYFS_ETC_DEVICE = "/dev/sda3"
 
         args = {
             'OVERLAYFS_INIT_OPTION': "" if origInit else "init=/sbin/preinit",
-            'OVERLAYFS_ETC_USE_ORIG_INIT_NAME': int(origInit == True)
+            'OVERLAYFS_ETC_USE_ORIG_INIT_NAME': int(origInit == True),
+            'OVERLAYFS_ROOTFS_TYPE': rootfsType,
+            'OVERLAYFS_ETC_CREATE_MOUNT_DIRS': int(rootfsType == "ext4")
         }
 
         self.write_config(config.format(**args))
@@ -437,7 +444,9 @@ IMAGE_INSTALL:append = " overlayfs-user"
 
         args = {
             'OVERLAYFS_INIT_OPTION': "",
-            'OVERLAYFS_ETC_USE_ORIG_INIT_NAME': 1
+            'OVERLAYFS_ETC_USE_ORIG_INIT_NAME': 1,
+            'OVERLAYFS_ROOTFS_TYPE': "ext4",
+            'OVERLAYFS_ETC_CREATE_MOUNT_DIRS': 1
         }
 
         self.write_config(config.format(**args))
@@ -463,10 +472,14 @@ IMAGE_INSTALL:append = " overlayfs-user"
 INIT_MANAGER = "systemd"
 
 # enable overlayfs in the kernel
-KERNEL_EXTRA_FEATURES:append = " features/overlayfs/overlayfs.scc"
+KERNEL_EXTRA_FEATURES:append = " \
+    features/overlayfs/overlayfs.scc \
+    cfg/fs/squashfs.scc"
 
 IMAGE_FSTYPES += "wic"
 OVERLAYFS_INIT_OPTION = "{OVERLAYFS_INIT_OPTION}"
+OVERLAYFS_ROOTFS_TYPE = "{OVERLAYFS_ROOTFS_TYPE}"
+OVERLAYFS_ETC_CREATE_MOUNT_DIRS = "{OVERLAYFS_ETC_CREATE_MOUNT_DIRS}"
 WKS_FILE = "overlayfs_etc.wks.in"
 
 EXTRA_IMAGE_FEATURES += "read-only-rootfs"
@@ -477,4 +490,13 @@ OVERLAYFS_ETC_MOUNT_POINT = "/data"
 OVERLAYFS_ETC_FSTYPE = "ext4"
 OVERLAYFS_ETC_DEVICE = "/dev/sda3"
 OVERLAYFS_ETC_USE_ORIG_INIT_NAME = "{OVERLAYFS_ETC_USE_ORIG_INIT_NAME}"
+
+ROOTFS_POSTPROCESS_COMMAND += "{OVERLAYFS_ROOTFS_TYPE}_rootfs"
+
+ext4_rootfs() {{
+}}
+
+squashfs_rootfs() {{
+    mkdir -p ${{IMAGE_ROOTFS}}/data
+}}
 """

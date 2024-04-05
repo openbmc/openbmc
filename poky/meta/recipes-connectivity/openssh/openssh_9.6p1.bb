@@ -85,6 +85,9 @@ EXTRA_OECONF:append:libc-musl = " --disable-wtmp --disable-lastlog"
 EXTRA_OECONF:append:mips = " --without-hardening"
 EXTRA_OECONF:append:mips64 = " --without-hardening"
 
+# Work around ICE on powerpc64le starting in 9.6p1
+EXTRA_OECONF:append:powerpc64le = " --without-hardening"
+
 # Since we do not depend on libbsd, we do not want configure to use it
 # just because it finds libutil.h.  But, specifying --disable-libutil
 # causes compile errors, so...

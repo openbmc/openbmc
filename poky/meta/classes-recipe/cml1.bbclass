@@ -61,16 +61,14 @@ python do_menuconfig() {
     oe_terminal("sh -c 'make %s; if [ \\$? -ne 0 ]; then echo \"Command failed.\"; printf \"Press any key to continue... \"; read r; fi'" % d.getVar('KCONFIG_CONFIG_COMMAND'),
                 d.getVar('PN') + ' Configuration', d)
 
-    # FIXME this check can be removed when the minimum bitbake version has been bumped
-    if hasattr(bb.build, 'write_taint'):
-        try:
-            newmtime = os.path.getmtime(config)
-        except OSError:
-            newmtime = 0
+    try:
+        newmtime = os.path.getmtime(config)
+    except OSError:
+        newmtime = 0
 
-        if newmtime > mtime:
-            bb.note("Configuration changed, recompile will be forced")
-            bb.build.write_taint('do_compile', d)
+    if newmtime > mtime:
+        bb.plain("Changed configuration saved at:\n %s\nRecompile will be forced" % config)
+        bb.build.write_taint('do_compile', d)
 }
 do_menuconfig[depends] += "ncurses-native:do_populate_sysroot"
 do_menuconfig[nostamp] = "1"

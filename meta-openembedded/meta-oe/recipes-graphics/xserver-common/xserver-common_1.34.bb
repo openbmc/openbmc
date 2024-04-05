@@ -2,7 +2,6 @@ SUMMARY = "Common X11 scripts and support files"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-PR = "r9"
 
 # we are using a gpe-style Makefile
 inherit features_check gpe

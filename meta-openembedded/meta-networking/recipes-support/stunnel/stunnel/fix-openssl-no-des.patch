@@ -11,17 +11,16 @@ failed. Fix it by checking macro OPENSSL_NO_DES to use openssl des related
 library conditionaly.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
-
 ---
  src/common.h   | 2 ++
  src/protocol.c | 6 +++---
  2 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/src/common.h b/src/common.h
-index bc37eb5..03ee3e5 100644
+index 2b4869f..180d31a 100644
 --- a/src/common.h
 +++ b/src/common.h
-@@ -486,7 +486,9 @@ extern char *sys_errlist[];
+@@ -492,7 +492,9 @@ extern char *sys_errlist[];
  #ifndef OPENSSL_NO_MD4
  #include <openssl/md4.h>
  #endif /* !defined(OPENSSL_NO_MD4) */
@@ -32,29 +31,29 @@ index bc37eb5..03ee3e5 100644
  #include <openssl/dh.h>
  #if OPENSSL_VERSION_NUMBER<0x10100000L
 diff --git a/src/protocol.c b/src/protocol.c
-index 804f115..d9b2b50 100644
+index cfe6d3b..3936aea 100644
 --- a/src/protocol.c
 +++ b/src/protocol.c
-@@ -66,7 +66,7 @@ NOEXPORT char *nntp_client(CLI *, SERVICE_OPTIONS *, const PHASE);
- NOEXPORT char *ldap_client(CLI *, SERVICE_OPTIONS *, const PHASE);
- NOEXPORT char *connect_server(CLI *, SERVICE_OPTIONS *, const PHASE);
- NOEXPORT char *connect_client(CLI *, SERVICE_OPTIONS *, const PHASE);
+@@ -81,7 +81,7 @@ NOEXPORT void ldap_client_middle(CLI *);
+ 
+ NOEXPORT void connect_server_early(CLI *);
+ NOEXPORT void connect_client_middle(CLI *);
 -#ifndef OPENSSL_NO_MD4
 +#if !defined(OPENSSL_NO_MD4) && !defined(OPENSSL_NO_DES)
- NOEXPORT void ntlm(CLI *, SERVICE_OPTIONS *);
+ NOEXPORT void ntlm(CLI *);
  NOEXPORT char *ntlm1(void);
  NOEXPORT char *ntlm3(char *, char *, char *, char *);
-@@ -1351,7 +1351,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
-     fd_printf(c, c->remote_fd.fd, "Host: %s", opt->protocol_host);
-     if(opt->protocol_username && opt->protocol_password) {
-         if(!strcasecmp(opt->protocol_authentication, "ntlm")) {
+@@ -1331,7 +1331,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
+     fd_printf(c, c->remote_fd.fd, "Host: %s", c->opt->protocol_host);
+     if(c->opt->protocol_username && c->opt->protocol_password) {
+         if(!strcasecmp(c->opt->protocol_authentication, "ntlm")) {
 -#ifndef OPENSSL_NO_MD4
 +#if !defined(OPENSSL_NO_MD4) && !defined(OPENSSL_NO_DES)
-             ntlm(c, opt);
+             ntlm(c);
  #else
              s_log(LOG_ERR, "NTLM authentication is not available");
-@@ -1395,7 +1395,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
-     return NULL;
+@@ -1374,7 +1374,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
+     str_free(line);
  }
  
 -#ifndef OPENSSL_NO_MD4
@@ -62,3 +61,6 @@ index 804f115..d9b2b50 100644
  
  /*
   * NTLM code is based on the following documentation:
+-- 
+2.34.1
+

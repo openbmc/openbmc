@@ -31,6 +31,8 @@ PACKAGECONFIG ?= ""
 PACKAGECONFIG[nautilus] = "-Dnautilus_extension=true,-Dnautilus_extension=false,nautilus,nautilus"
 PACKAGECONFIG[search_provider] = "-Dsearch_provider=true -Ddbus_interface_dir=${STAGING_DATADIR}/dbus-1/interfaces,-Dsearch_provider=false,gnome-shell"
 
+PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
+
 FILES:${PN} += " \
     ${datadir} \
     ${libdir}/nautilus/extensions-4 \

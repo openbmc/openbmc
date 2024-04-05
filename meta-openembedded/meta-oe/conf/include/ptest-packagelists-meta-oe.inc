@@ -10,7 +10,6 @@ PTESTS_FAST_META_OE = "\
     cmocka \
     cunit \
     duktape \
-    fmt \
     function2 \
     fwupd \
     gcab \
@@ -27,6 +26,7 @@ PTESTS_FAST_META_OE = "\
     libxml++-5.0 \
     libyang \
     lmdb \
+    microsoft-gsl \
     minicoredumper \
     neon \
     nlohmann-json \

@@ -1,0 +1,68 @@
+From 40657a770baadfff30abfecf7638e7b1c340db4d Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Thu, 14 Mar 2024 03:23:10 +0100
+Subject: [PATCH] fix(cmake): generate versioned shared libraries
+
+Add missing version suffix to shared libraries. Currently the filename of
+generated shared libraries is only liblvgl.so, which prevents coexistence
+of different versions of LVGL on the same system. Set VERSION and SOVERSION
+to make cmake add the version suffix to generated shared libraries. That
+changes the filename to liblvgl.so.9.0.0 and includes symlink with major
+ABI version, i.e. liblvgl.so.9 .
+
+Upstream-Status: Submitted [https://github.com/lvgl/lvgl/pull/5865]
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+ env_support/cmake/custom.cmake | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/env_support/cmake/custom.cmake b/env_support/cmake/custom.cmake
+index 9800468eb..6f33f1cc8 100644
+--- a/env_support/cmake/custom.cmake
++++ b/env_support/cmake/custom.cmake
+@@ -1,3 +1,6 @@
++set(LVGL_VERSION "9.0.0")
++set(LVGL_SOVERSION "9")
++
+ # Option to define LV_LVGL_H_INCLUDE_SIMPLE, default: ON
+ option(LV_LVGL_H_INCLUDE_SIMPLE
+        "Use #include \"lvgl.h\" instead of #include \"../../lvgl.h\"" ON)
+@@ -119,6 +122,8 @@ install(
+ set_target_properties(
+   lvgl
+   PROPERTIES OUTPUT_NAME lvgl
++             VERSION ${LVGL_VERSION}
++             SOVERSION ${LVGL_SOVERSION}
+              ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+              RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+@@ -137,6 +142,8 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+   set_target_properties(
+     lvgl_thorvg
+     PROPERTIES OUTPUT_NAME lvgl_thorvg
++               VERSION ${LVGL_VERSION}
++               SOVERSION ${LVGL_SOVERSION}
+                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+@@ -155,6 +162,8 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
+   set_target_properties(
+     lvgl_demos
+     PROPERTIES OUTPUT_NAME lvgl_demos
++               VERSION ${LVGL_VERSION}
++               SOVERSION ${LVGL_SOVERSION}
+                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+@@ -173,6 +182,8 @@ if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+   set_target_properties(
+     lvgl_examples
+     PROPERTIES OUTPUT_NAME lvgl_examples
++               VERSION ${LVGL_VERSION}
++               SOVERSION ${LVGL_SOVERSION}
+                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+-- 
+2.43.0
+

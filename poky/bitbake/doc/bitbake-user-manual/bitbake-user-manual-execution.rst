@@ -586,10 +586,11 @@ or possibly those defined in the metadata/signature handler itself. The
 simplest parameter to pass is "none", which causes a set of signature
 information to be written out into ``STAMPS_DIR`` corresponding to the
 targets specified. The other currently available parameter is
-"printdiff", which causes BitBake to try to establish the closest
+"printdiff", which causes BitBake to try to establish the most recent
 signature match it can (e.g. in the sstate cache) and then run
-``bitbake-diffsigs`` over the matches to determine the stamps and delta
-where these two stamp trees diverge.
+compare the matched signatures to determine the stamps and delta
+where these two stamp trees diverge. This can be used to determine why
+tasks need to be re-run in situations where that is not expected.
 
 .. note::
 

@@ -1,0 +1,45 @@
+From 45a532ad73b1ba27fc951657a33f39e8fa915765 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 10:02:20 -0700
+Subject: [PATCH] include libgen.h for basename API prototype
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-xfs/20240325170941.3279129-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common/main.c    | 1 +
+ invutil/invidx.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/common/main.c b/common/main.c
+index 1db07d4..ca3b7d4 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -16,6 +16,7 @@
+  * Inc.,  51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include <libgen.h>
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+diff --git a/invutil/invidx.c b/invutil/invidx.c
+index 5874e8d..c4e2e21 100644
+--- a/invutil/invidx.c
++++ b/invutil/invidx.c
+@@ -19,6 +19,7 @@
+ #include <xfs/xfs.h>
+ #include <xfs/jdm.h>
+ 
++#include <libgen.h>
+ #include <stdio.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+-- 
+2.44.0
+

@@ -1,0 +1,52 @@
+From 593da8e11cc5029773ad330b5d7633ee9f2fba95 Mon Sep 17 00:00:00 2001
+From: Marek Vasut <marex@denx.de>
+Date: Tue, 12 Mar 2024 18:09:42 +0100
+Subject: [PATCH 4/6] Factor out fbdev initialization code
+
+Pull fbdev initialization code into separate function and add ifdef
+around it, so it can be conditionally compiled in. This is done in
+preparation for addition of other backend initialization example
+code.
+
+Upstream-Status: Submitted [https://github.com/lvgl/lv_port_linux_frame_buffer/pull/47]
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+ main.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/main.c b/main.c
+index b64a098..288519c 100644
+--- a/main.c
++++ b/main.c
+@@ -9,14 +9,24 @@ static const char *lv_linux_get_video_card_node(const char *videocard_default)
+     return getenv("LV_VIDEO_CARD") ? : videocard_default;
+ }
+ 
+-int main(void)
++#if LV_USE_LINUX_FBDEV
++static void lv_linux_disp_init(void)
+ {
+     const char *videocard = lv_linux_get_video_card_node("/dev/fb0");
+-    lv_init();
+-
+-    /*Linux frame buffer device init*/
+     lv_display_t * disp = lv_linux_fbdev_create();
++
+     lv_linux_fbdev_set_file(disp, videocard);
++}
++#else
++#error Unsupported configuration
++#endif
++
++int main(void)
++{
++    lv_init();
++
++    /*Linux display device init*/
++    lv_linux_disp_init();
+ 
+     /*Create a Demo*/
+     lv_demo_widgets();
+-- 
+2.43.0
+

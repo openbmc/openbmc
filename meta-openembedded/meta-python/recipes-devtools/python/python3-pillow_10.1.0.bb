@@ -14,9 +14,6 @@ SRCREV ?= "da59ad000d1405eaecd557175e29083a87d19f7c"
 
 inherit setuptools3 ptest
 
-PIP_INSTALL_PACKAGE = "Pillow"
-PIP_INSTALL_DIST_PATH = "${S}/dist"
-
 DEPENDS += " \
     zlib \
     jpeg \

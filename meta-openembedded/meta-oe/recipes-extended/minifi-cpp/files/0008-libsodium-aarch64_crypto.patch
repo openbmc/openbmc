@@ -1,0 +1,38 @@
+Move target #pragma after arm_neon.h include
+
+Fix per android/ndk#1945
+
+If the pragma is done before the header include,
+when using clang compiler attribute may apply to the functions in arm_neon.h
+
+Upstream-Status: Submitted [https://github.com/jedisct1/libsodium/pull/1321]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/thirdparty/libsodium-stable/src/libsodium/crypto_aead/aes256gcm/armcrypto/aead_aes256gcm_armcrypto.c
++++ b/thirdparty/libsodium-stable/src/libsodium/crypto_aead/aes256gcm/armcrypto/aead_aes256gcm_armcrypto.c
+@@ -19,12 +19,6 @@
+ #define __vectorcall
+ #endif
+ 
+-#ifdef __clang__
+-#pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), apply_to = function)
+-#elif defined(__GNUC__)
+-#pragma GCC target("+simd+crypto")
+-#endif
+-
+ #ifndef __ARM_FEATURE_CRYPTO
+ #define __ARM_FEATURE_CRYPTO 1
+ #endif
+@@ -34,6 +28,12 @@
+ 
+ #include <arm_neon.h>
+ 
++#ifdef __clang__
++#pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), apply_to = function)
++#elif defined(__GNUC__)
++#pragma GCC target("+simd+crypto")
++#endif
++
+ #define ABYTES    crypto_aead_aes256gcm_ABYTES
+ #define NPUBBYTES crypto_aead_aes256gcm_NPUBBYTES
+ #define KEYBYTES  crypto_aead_aes256gcm_KEYBYTES

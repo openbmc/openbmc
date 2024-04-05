@@ -16,6 +16,7 @@ SRC_URI = "git://sourceware.org/git/lvm2.git;branch=main \
            file://0006-start-lvm2-monitor.service-after-tmp.mount.patch \
            file://reproducible-build.patch \
            file://0001-configure.ac-check-egrep.patch \
+           file://0001-include-libgen.h-for-basename.patch \
            "
 
 SRCREV = "016e469caf856f1eb8dde39df0d1aa2e74225aed"

@@ -1,6 +1,5 @@
 require crash.inc
 
-PR = "${INC_PR}.0"
 
 BBCLASSEXTEND = "native cross"
 

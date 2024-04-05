@@ -1,6 +1,5 @@
 SUMMARY = "Packages required for a target (on-device) SDK"
 
-PR = "r1"
 
 inherit packagegroup
 

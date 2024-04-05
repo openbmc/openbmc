@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = " \
 
 DEPENDS = "glib-2.0 glib-2.0-native libgudev"
 
-inherit meson pkgconfig bash-completion gobject-introspection
+inherit meson pkgconfig bash-completion gobject-introspection upstream-version-is-even
 
 SRCREV = "9c0309fcd3142411c921c14f7dd675cac086bab6"
 SRC_URI = "git://gitlab.freedesktop.org/mobile-broadband/libmbim.git;protocol=https;branch=main"

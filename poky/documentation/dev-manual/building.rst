@@ -775,10 +775,9 @@ your tunings to best consider build times and package feed maintenance.
       in the script for information on how to use the tool.
 
    -  *BitBake's "-S printdiff" Option:* Using this option causes
-      BitBake to try to establish the closest signature match it can
-      (e.g. in the shared state cache) and then run ``bitbake-diffsigs``
-      over the matches to determine the stamps and delta where these two
-      stamp trees diverge.
+      BitBake to try to establish the most recent signature match
+      (e.g. in the shared state cache) and then compare matched signatures
+      to determine the stamps and delta where these two stamp trees diverge.
 
 Building Software from an External Source
 =========================================

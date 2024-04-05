@@ -1,0 +1,32 @@
+From 2ebc0ff33e41d23e4d3aec1a86f3d8bd4be410e7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Mar 2024 14:14:58 +0800
+Subject: [PATCH] Implement timer implementation for mips platform
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../lock/range/range_tree/lib/portability/toku_time.h       | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+index 0a7488c397..ad7d9f2124 100644
+--- a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
++++ b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+@@ -162,6 +162,12 @@ static inline tokutime_t toku_time_now(void) {
+   unsigned long result;
+   asm volatile ("rdtime.d\t%0,$r0" : "=r" (result));
+   return result;
++#elif defined(__mips__)
++  // mips apparently only allows rdtsc for superusers, so we fall
++  // back to gettimeofday.  It's possible clock_gettime would be better.
++  struct timeval tv;
++  gettimeofday(&tv, nullptr);
++  return (uint64_t)tv.tv_sec * 1000000 + tv.tv_usec;
+ #else
+ #error No timer implementation for this platform
+ #endif
+-- 
+2.25.1
+

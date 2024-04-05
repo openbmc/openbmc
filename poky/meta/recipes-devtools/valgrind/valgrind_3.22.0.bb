@@ -33,6 +33,10 @@ SRC_URI = "https://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://0001-none-tests-fdleak_cmsg.stderr.exp-adjust-tmp-paths.patch \
            file://0001-memcheck-tests-Fix-timerfd-syscall-test.patch \
            file://0001-docs-Disable-manual-validation.patch \
+           file://0001-valgrind-monitor.py-regular-expressions-should-use-r.patch \
+           file://0002-Bug-476548-valgrind-3.22.0-fails-on-assertion-when-l.patch \
+           file://0003-Add-fchmodat2-syscall-on-linux.patch \
+           file://0004-Bug-478624-Valgrind-incompatibility-with-binutils-2..patch \
            "
 SRC_URI[sha256sum] = "c811db5add2c5f729944caf47c4e7a65dcaabb9461e472b578765dd7bf6d2d4c"
 UPSTREAM_CHECK_REGEX = "valgrind-(?P<pver>\d+(\.\d+)+)\.tar"

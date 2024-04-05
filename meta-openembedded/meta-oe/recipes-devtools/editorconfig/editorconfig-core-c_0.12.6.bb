@@ -13,3 +13,6 @@ inherit cmake
 
 DEPENDS = "pcre2"
 
+do_install:append() {
+    sed -i -e 's|${STAGING_DIR_HOST}||g' ${D}${libdir}/cmake/EditorConfig/EditorConfigTargets.cmake
+}

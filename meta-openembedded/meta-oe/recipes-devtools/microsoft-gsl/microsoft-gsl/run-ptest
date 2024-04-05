@@ -1,0 +1,4 @@
+#!/bin/sh
+
+gsl_tests && echo "PASS: gsl_tests" || echo "FAIL: gsl_tests"
+gsl_noexcept_tests && echo "PASS: gsl_noexcept_tests" || echo "FAIL: gsl_noexcept_tests"

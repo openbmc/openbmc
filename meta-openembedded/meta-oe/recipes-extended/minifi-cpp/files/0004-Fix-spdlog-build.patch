@@ -1,0 +1,44 @@
+From 8a5fe73f722718aa5c9a467c28a26913771f7208 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 19 Mar 2024 20:57:37 +0800
+Subject: [PATCH] Fix spdlog build
+
+* Specify CMAKE_INSTALL_LIBDIR to fix multilib build.
+* Do not download spdlog source during compile.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ cmake/BundledSpdlog.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/BundledSpdlog.cmake b/cmake/BundledSpdlog.cmake
+index 974cbbaa..c0c45688 100644
+--- a/cmake/BundledSpdlog.cmake
++++ b/cmake/BundledSpdlog.cmake
+@@ -35,11 +35,12 @@ function(use_bundled_spdlog SOURCE_DIR BINARY_DIR)
+     endif()
+ 
+     # Set build options
+-    set(SPDLOG_SOURCE_DIR "${BINARY_DIR}/thirdparty/spdlog-src")
++    set(SPDLOG_SOURCE_DIR "${SOURCE_DIR}/thirdparty/spdlog-src")
+     set(SPDLOG_INSTALL_DIR "${BINARY_DIR}/thirdparty/spdlog-install")
+     set(SPDLOG_LIBRARY "${SPDLOG_INSTALL_DIR}/${BYPRODUCT}")
+     set(SPDLOG_CMAKE_ARGS ${PASSTHROUGH_CMAKE_ARGS}
+             "-DCMAKE_INSTALL_PREFIX=${SPDLOG_INSTALL_DIR}"
++            "-DCMAKE_INSTALL_LIBDIR=${LIBDIR}"
+             "-DSPDLOG_BUILD_EXAMPLE=OFF"
+             "-DSPDLOG_BUILD_TESTS=OFF"
+             "-DSPDLOG_BUILD_TESTING=OFF"
+@@ -49,7 +50,6 @@ function(use_bundled_spdlog SOURCE_DIR BINARY_DIR)
+     # Build project
+     ExternalProject_Add(
+             spdlog-external
+-            URL "https://github.com/gabime/spdlog/archive/v1.8.0.zip"
+             SOURCE_DIR "${SPDLOG_SOURCE_DIR}"
+             CMAKE_ARGS ${SPDLOG_CMAKE_ARGS}
+             BUILD_BYPRODUCTS "${SPDLOG_LIBRARY}"
+-- 
+2.25.1
+

@@ -1,0 +1,56 @@
+From fe4600de549549fbb3033fc1b37904ba6b3fe2af Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 8 Mar 2024 15:53:11 +0100
+Subject: [PATCH] Revert "meson: do not pull in clc for clover"
+
+This reverts commit 815a6647eb1383e9dc704ffcc266d85f3b13338a.
+Upstream-Status: Inappropriate [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27783/diffs?commit_id=a976f2c9f0c07f9e06cc9affd9124b45bc60c2bd]
+
+Once the merge request above was added, it will only be possible to provide opencl spir-v with gallium-rusticl=true. This is not yet supported in the mesa recipe.
+For now reverting this commit allows to still use clover with opencl-spirv, which would otherwise be broken starting from mesa 24.0.2.
+
+After it was merged, this patch needs to be removed and rusticl support will be required
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build              | 3 ++-
+ src/compiler/meson.build | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 25e92ea5f95..3956e19c08f 100644
+--- a/meson.build
++++ b/meson.build
+@@ -818,6 +818,7 @@ if _opencl != 'disabled'
+     error('The Clover OpenCL state tracker requires rtti')
+   endif
+ 
++  with_clc = true
+   with_gallium_opencl = true
+   with_opencl_icd = _opencl == 'icd'
+ else
+@@ -842,7 +843,7 @@ if with_gallium_rusticl
+ endif
+ 
+ dep_clc = null_dep
+-if with_gallium_opencl or with_clc
++if with_clc
+   dep_clc = dependency('libclc')
+ endif
+ 
+diff --git a/src/compiler/meson.build b/src/compiler/meson.build
+index 8d73544c6d8..1dae56d1b2b 100644
+--- a/src/compiler/meson.build
++++ b/src/compiler/meson.build
+@@ -79,7 +79,7 @@ subdir('nir')
+ 
+ subdir('spirv')
+ 
+-if with_clc
++if with_opencl_spirv
+   subdir('clc')
+ endif
+ if with_gallium
+-- 
+2.44.0
+

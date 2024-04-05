@@ -100,4 +100,4 @@ RDEPENDS:${PN}-dev = "libfftw libfftwl libfftwf"
 RDEPENDS:${PN}-ptest += "perl"
 RDEPENDS:${PN}-ptest:remove = "fftw"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

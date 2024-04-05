@@ -1,0 +1,161 @@
+From: =?UTF-8?q?J=C3=B6rg=20Sommer?= <joerg.sommer@navimatix.de>
+Date: Thu, 14 Mar 2024 08:08:13 +0100
+Subject: [PATCH 1/2] configure: Use AX_PROG_CC_FOR_BUILD for cross compiling
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The macro AX_PROG_CC_FOR_BUILD [1] sets the variables CC_FOR_BUILD and
+..._FLAGS_FOR_BUILD they can be used [2] to build binaries used at compile
+time.
+
+[1]: https://www.gnu.org/software/autoconf-archive/ax_prog_cc_for_build.html
+[2]: https://stackoverflow.com/questions/24201260/autotools-cross-compilation-and-generated-sources/24208587#24208587
+
+Signed-off-by: Jörg Sommer <joerg.sommer@navimatix.de>
+Upstream-Status: Submitted [https://github.com/freeswitch/spandsp/pull/74]
+---
+ configure.ac    | 49 +-------------------------------------------
+ src/Makefile.am | 54 +++++++++++++++++++++++++------------------------
+ 2 files changed, 29 insertions(+), 74 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 96fd022..2140837 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -55,54 +55,7 @@ AC_LANG([C])
+ 
+ AX_COMPILER_VENDOR
+ 
+-if test "${build}" != "${host}"
+-then
+-    # If we are doing a Canadian Cross, in which the host and build systems
+-    # are not the same, we set reasonable default values for the tools.
+-
+-    CC_FOR_BUILD=${CC_FOR_BUILD-gcc}
+-    CPPFLAGS_FOR_BUILD="\$(CPPFLAGS)"
+-    CC=${CC-${host_alias}-gcc}
+-    CFLAGS=${CFLAGS-"-g -O2"}
+-    CXX=${CXX-${host_alias}-c++}
+-    CXXFLAGS=${CXXFLAGS-"-g -O2"}
+-else
+-    # Set reasonable default values for some tools even if not Canadian.
+-    # Of course, these are different reasonable default values, originally
+-    # specified directly in the Makefile.
+-    # We don't export, so that autoconf can do its job.
+-    # Note that all these settings are above the fragment inclusion point
+-    # in Makefile.in, so can still be overridden by fragments.
+-    # This is all going to change when we autoconfiscate...
+-    CC_FOR_BUILD="\$(CC)"
+-    CPPFLAGS_FOR_BUILD="\$(CPPFLAGS)"
+-    AC_PROG_CC
+-
+-    # We must set the default linker to the linker used by gcc for the correct
+-    # operation of libtool.  If LD is not defined and we are using gcc, try to
+-    # set the LD default to the ld used by gcc.
+-    if test -z "$LD"
+-    then
+-        if test "$GCC" = yes
+-        then
+-            case $build in
+-            *-*-mingw*)
+-                gcc_prog_ld=`$CC -print-prog-name=ld 2>&1 | tr -d '\015'` ;;
+-            *)
+-                gcc_prog_ld=`$CC -print-prog-name=ld 2>&1` ;;
+-            esac
+-            case $gcc_prog_ld in
+-            # Accept absolute paths.
+-            [[\\/]* | [A-Za-z]:[\\/]*)]
+-                LD="$gcc_prog_ld" ;;
+-            esac
+-        fi
+-    fi
+-
+-    CXX=${CXX-"c++"}
+-    CFLAGS=${CFLAGS-"-g -O2"}
+-    CXXFLAGS=${CXXFLAGS-"-g -O2"}
+-fi
++AX_PROG_CC_FOR_BUILD
+ 
+ AC_DEFUN([REMOVE_FROM_VAR],[
+     new_val=""
+diff --git a/src/Makefile.am b/src/Makefile.am
+index e05fad5..9b409a1 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -386,44 +386,46 @@ noinst_HEADERS = cielab_luts.h \
+                  v34_tx_pre_emphasis_filters.h \
+                  v34_tables.h
+ 
+-make_at_dictionary$(EXEEXT): $(top_srcdir)/src/make_at_dictionary.c
+-	$(CC_FOR_BUILD) -o make_at_dictionary$(EXEEXT) $(top_srcdir)/src/make_at_dictionary.c -DHAVE_CONFIG_H -I$(top_builddir)/src
++LINK_FOR_BUILD.c = $(CC_FOR_BUILD) -DHAVE_CONFIG_H -I$(top_builddir)/src $(CFLAGS_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) $(TARGET_ARCH_FOR_BUILD)
+ 
+-make_cielab_luts$(EXEEXT): $(top_srcdir)/src/make_cielab_luts.c
+-	$(CC_FOR_BUILD) -o make_cielab_luts$(EXEEXT) $(top_srcdir)/src/make_cielab_luts.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_at_dictionary$(BUILD_EXEEXT): $(top_srcdir)/src/make_at_dictionary.c
++	$(LINK_FOR_BUILD.c) -o $@ $^
+ 
+-make_math_fixed_tables$(EXEEXT): $(top_srcdir)/src/make_math_fixed_tables.c
+-	$(CC_FOR_BUILD) -o make_math_fixed_tables$(EXEEXT) $(top_srcdir)/src/make_math_fixed_tables.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_cielab_luts$(BUILD_EXEEXT): $(top_srcdir)/src/make_cielab_luts.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_modem_filter$(EXEEXT): $(top_srcdir)/src/make_modem_filter.c $(top_srcdir)/src/filter_tools.c
+-	$(CC_FOR_BUILD) -o make_modem_filter$(EXEEXT) $(top_srcdir)/src/make_modem_filter.c $(top_srcdir)/src/filter_tools.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_math_fixed_tables$(BUILD_EXEEXT): $(top_srcdir)/src/make_math_fixed_tables.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_modem_godard_coefficients$(EXEEXT): $(top_srcdir)/src/make_modem_godard_coefficients.c $(top_srcdir)/src/filter_tools.c
+-	$(CC_FOR_BUILD) -o make_modem_godard_coefficients$(EXEEXT) $(top_srcdir)/src/make_modem_godard_coefficients.c $(top_srcdir)/src/filter_tools.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_modem_filter$(BUILD_EXEEXT): $(top_srcdir)/src/make_modem_filter.c $(top_srcdir)/src/filter_tools.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_t43_gray_code_tables$(EXEEXT): $(top_srcdir)/src/make_t43_gray_code_tables.c
+-	$(CC_FOR_BUILD) -o make_t43_gray_code_tables$(EXEEXT) $(top_srcdir)/src/make_t43_gray_code_tables.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_modem_godard_coefficients$(BUILD_EXEEXT): $(top_srcdir)/src/make_modem_godard_coefficients.c $(top_srcdir)/src/filter_tools.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_v17_v32_constellation_map$(EXEEXT): $(top_srcdir)/src/make_v17_v32_constellation_map.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
+-	$(CC_FOR_BUILD) -o make_v17_v32_constellation_map$(EXEEXT) $(top_srcdir)/src/make_v17_v32_constellation_map.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_t43_gray_code_tables$(BUILD_EXEEXT): $(top_srcdir)/src/make_t43_gray_code_tables.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_v17_v32_convolutional_encoder$(EXEEXT): $(top_srcdir)/src/make_v17_v32_convolutional_encoder.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
+-	$(CC_FOR_BUILD) -o make_v17_v32_convolutional_encoder$(EXEEXT) $(top_srcdir)/src/make_v17_v32_convolutional_encoder.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_v17_v32_constellation_map$(BUILD_EXEEXT): $(top_srcdir)/src/make_v17_v32_constellation_map.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_v29_constellation_map$(EXEEXT): $(top_srcdir)/src/make_v29_constellation_map.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
+-	$(CC_FOR_BUILD) -o make_v29_constellation_map$(EXEEXT) $(top_srcdir)/src/make_v29_constellation_map.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_v17_v32_convolutional_encoder$(BUILD_EXEEXT): $(top_srcdir)/src/make_v17_v32_convolutional_encoder.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_v34_convolutional_coders$(EXEEXT): $(top_srcdir)/src/make_v34_convolutional_coders.c
+-	$(CC_FOR_BUILD) -o make_v34_convolutional_coders$(EXEEXT) $(top_srcdir)/src/make_v34_convolutional_coders.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_v29_constellation_map$(BUILD_EXEEXT): $(top_srcdir)/src/make_v29_constellation_map.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_v34_probe_signals$(EXEEXT): $(top_srcdir)/src/make_v34_probe_signals.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
+-	$(CC_FOR_BUILD) -o make_v34_probe_signals$(EXEEXT) $(top_srcdir)/src/make_v34_probe_signals.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c -DHAVE_CONFIG_H -I$(top_builddir)/src -lm
++make_v34_convolutional_coders$(BUILD_EXEEXT): $(top_srcdir)/src/make_v34_convolutional_coders.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -lm
+ 
+-make_v34_shell_map$(EXEEXT): $(top_srcdir)/src/make_v34_shell_map.c
+-	$(CC_FOR_BUILD) -o make_v34_shell_map$(EXEEXT) $(top_srcdir)/src/make_v34_shell_map.c -DHAVE_CONFIG_H -I$(top_builddir)/src
++make_v34_probe_signals$(BUILD_EXEEXT): $(top_srcdir)/src/make_v34_probe_signals.c $(top_srcdir)/src/g711.c $(top_srcdir)/src/alloc.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -I$(top_srcdir)/src -lm
+ 
+-make_v34_tx_pre_emphasis_filters$(EXEEXT): $(top_srcdir)/src/make_v34_tx_pre_emphasis_filters.c $(top_srcdir)/tools/meteor-engine.c
+-	$(CC_FOR_BUILD) -o make_v34_tx_pre_emphasis_filters$(EXEEXT) $(top_srcdir)/src/make_v34_tx_pre_emphasis_filters.c $(top_srcdir)/tools/meteor-engine.c -DHAVE_CONFIG_H -I$(top_builddir)/src -I$(top_builddir)/tools -lm
++make_v34_shell_map$(BUILD_EXEEXT): $(top_srcdir)/src/make_v34_shell_map.c
++	$(LINK_FOR_BUILD.c) -o $@ $^
++
++make_v34_tx_pre_emphasis_filters$(BUILD_EXEEXT): $(top_srcdir)/src/make_v34_tx_pre_emphasis_filters.c $(top_srcdir)/tools/meteor-engine.c
++	$(LINK_FOR_BUILD.c) -o $@ $^ -I$(top_srcdir)/tools -lm
+ 
+ # We need to run make_at_dictionary, so it generates the
+ # at_interpreter_dictionary.h file
+-- 
+2.34.1
+

@@ -9,6 +9,7 @@ inherit meson pkgconfig
 
 DEPENDS = "zstd liburing"
 
-SRC_URI = "https://plocate.sesse.net/download/${BP}.tar.gz"
+SRC_URI = "https://plocate.sesse.net/download/${BP}.tar.gz \
+           file://0001-Include-linux-stat.h-only-when-sys-stat.h-is-not-inc.patch"
 
 SRC_URI[sha256sum] = "3b7e4741b4aa2ec044e53eff06474a32a3fb1e928b9382351fe79d4c27fb0049"

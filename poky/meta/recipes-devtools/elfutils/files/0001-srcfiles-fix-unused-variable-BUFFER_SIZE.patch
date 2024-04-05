@@ -1,0 +1,36 @@
+From db51a55a8e3811d19265bf12d2ff715c6cf558b4 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <jose.quaresma@foundries.io>
+Date: Tue, 19 Mar 2024 10:17:59 +0000
+Subject: [PATCH] srcfiles: fix unused variable BUFFER_SIZE
+
+The const variable BUFFER_SIZE is used only on the zip_files
+function witch is only available with LIBARCHIVE.
+
+| ../../elfutils-0.191/src/srcfiles.cxx:81:18: error: unused variable 'BUFFER_SIZE' [-Werror,-Wunused-const-variable]
+|    81 | constexpr size_t BUFFER_SIZE = 8192;
+|       |                  ^~~~~~~~~~~
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=elfutils.git;a=commitdiff;h=ef8a4b841aaf26326b8961a651dbe915d54d23e7]
+
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
+---
+ src/srcfiles.cxx | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/srcfiles.cxx b/src/srcfiles.cxx
+index 892737cc..09d50f8d 100644
+--- a/src/srcfiles.cxx
++++ b/src/srcfiles.cxx
+@@ -78,7 +78,9 @@ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
+ /* Bug report address.  */
+ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
+ 
++#ifdef HAVE_LIBARCHIVE
+ constexpr size_t BUFFER_SIZE = 8192;
++#endif
+ 
+ /* Definitions of arguments for argp functions.  */
+ static const struct argp_option options[] =
+-- 
+2.44.0
+

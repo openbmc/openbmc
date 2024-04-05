@@ -1,0 +1,45 @@
+From 5b8fab1584017d9d9be008c23b90128bba41a7b5 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Thu, 28 Mar 2024 12:16:57 +0000
+Subject: [PATCH] README.licensing/flock: Add MIT license mention
+
+Looking at the license text, flock.c is under the MIT license (see
+https://spdx.org/licenses/MIT).
+
+Add an SPDX license identifier header and add to the list of licenses the
+source so everything is correctly listed/identified.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Submitted [https://github.com/util-linux/util-linux/pull/2870]
+
+---
+ README.licensing  | 2 ++
+ sys-utils/flock.c | 4 +++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/README.licensing b/README.licensing
+index 4454f8392a..535ad34813 100644
+--- a/README.licensing
++++ b/README.licensing
+@@ -12,6 +12,8 @@ There is code under:
+ 
+    * LGPL-2.1-or-later  - GNU Lesser General Public License 2.1 or any later version
+ 
++   * MIT                - MIT License
++
+    * BSD-2-Clause       - Simplified BSD License
+ 
+    * BSD-3-Clause       - BSD 3-Clause "New" or "Revised" License
+diff --git a/sys-utils/flock.c b/sys-utils/flock.c
+index fed29d7270..7d878ff810 100644
+--- a/sys-utils/flock.c
++++ b/sys-utils/flock.c
+@@ -1,4 +1,6 @@
+-/*   Copyright 2003-2005 H. Peter Anvin - All Rights Reserved
++/*   SPDX-License-Identifier: MIT
++ *
++ *   Copyright 2003-2005 H. Peter Anvin - All Rights Reserved
+  *
+  *   Permission is hereby granted, free of charge, to any person
+  *   obtaining a copy of this software and associated documentation

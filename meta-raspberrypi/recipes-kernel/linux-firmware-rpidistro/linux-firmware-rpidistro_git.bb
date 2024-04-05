@@ -7,7 +7,7 @@ SECTION = "kernel"
 
 LICENSE = "GPL-2.0-only & binary-redist-Cypress-rpidistro & Synaptics-rpidistro"
 LIC_FILES_CHKSUM = "\
-    file://debian/copyright;md5=03475efdcf4c53c8f2d8fb4bc1fc6965 \
+    file://debian/copyright;md5=291ee5385b4cf74b10c5fb5a46a7bbc6 \
 "
 # Where these are no common licenses, set NO_GENERIC_LICENSE so that the
 # license files will be copied from the fetched source.
@@ -15,11 +15,11 @@ NO_GENERIC_LICENSE[binary-redist-Cypress-rpidistro] = "debian/copyright"
 NO_GENERIC_LICENSE[Synaptics-rpidistro] = "debian/copyright"
 LICENSE_FLAGS = "synaptics-killswitch"
 
-SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bullseye;protocol=https \
+SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bookworm;protocol=https \
     file://0001-Default-43455-firmware-to-standard-variant.patch \
 "
-SRCREV = "2c3a8701193ba23d0ef85cdf0d0c9e47baf03dfc"
-PV = "20230210-5_bpo11+1"
+SRCREV = "223ccf3a3ddb11b3ea829749fbbba4d65b380897"
+PV = "20230625-2+rpt2"
 S = "${WORKDIR}/git"
 
 inherit allarch
@@ -71,7 +71,10 @@ FILES:${PN}-bcm43430 = " \
 "
 FILES:${PN}-bcm43436 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43436-*"
 FILES:${PN}-bcm43436s = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43436s*"
-FILES:${PN}-bcm43439 = "${nonarch_base_libdir}/firmware/cypress/43439A0-7.95.49.00.combined"
+FILES:${PN}-bcm43439 = " \
+    ${nonarch_base_libdir}/firmware/cypress/43439A0-7.95.49.00.combined \
+    ${nonarch_base_libdir}/firmware/cypress/cyfmac43439-sdio* \
+"
 FILES:${PN}-bcm43455 = " \
     ${nonarch_base_libdir}/firmware/brcm/brcmfmac43455* \
     ${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio* \

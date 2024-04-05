@@ -43,7 +43,8 @@ export lt_cv_sys_lib_dlsearch_path_spec = "${libdir} ${base_libdir}"
 
 # When building tools for use at build-time it's recommended for the build
 # system to use these variables when cross-compiling.
-# (http://sources.redhat.com/autobook/autobook/autobook_270.html)
+# https://www.gnu.org/software/autoconf-archive/ax_prog_cc_for_build.html
+# https://stackoverflow.com/questions/24201260/autotools-cross-compilation-and-generated-sources/24208587#24208587
 export CPP_FOR_BUILD = "${BUILD_CPP}"
 export CPPFLAGS_FOR_BUILD = "${BUILD_CPPFLAGS}"
 

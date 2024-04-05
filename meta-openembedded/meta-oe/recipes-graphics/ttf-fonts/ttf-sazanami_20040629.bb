@@ -8,7 +8,6 @@ LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://README;md5=97d739900be6e852830f55aa3c07d4a0"
 
 RPROVIDES:${PN} = "virtual-japanese-font"
-PR = "r9"
 
 SRC_URI = "http://osdn.dl.sourceforge.jp/efont/10087/sazanami-20040629.tar.bz2"
 S = "${WORKDIR}/sazanami-20040629"

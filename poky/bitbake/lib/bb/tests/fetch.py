@@ -308,6 +308,21 @@ class URITest(unittest.TestCase):
             'params': {"someparam" : "1"},
             'query': {},
             'relative': True
+        },
+        "https://www.innodisk.com/Download_file?9BE0BF6657;downloadfilename=EGPL-T101.zip": {
+            'uri': 'https://www.innodisk.com/Download_file?9BE0BF6657;downloadfilename=EGPL-T101.zip',
+            'scheme': 'https',
+            'hostname': 'www.innodisk.com',
+            'port': None,
+            'hostport': 'www.innodisk.com',
+            'path': '/Download_file',
+            'userinfo': '',
+            'userinfo': '',
+            'username': '',
+            'password': '',
+            'params': {"downloadfilename" : "EGPL-T101.zip"},
+            'query': {"9BE0BF6657": None},
+            'relative': False
         }
 
     }

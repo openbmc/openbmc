@@ -1,0 +1,39 @@
+From 1c697e4d75f0045d5364d622960ff8047a4ad3ec Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 19 Mar 2024 20:56:05 +0800
+Subject: [PATCH] Fix libsodium build
+
+* Specify correct configure options to fix libsodium cross build.
+* Do not download libsodium source during compile.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ cmake/BundledLibSodium.cmake | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/cmake/BundledLibSodium.cmake b/cmake/BundledLibSodium.cmake
+index 3a3daf41..d851f753 100644
+--- a/cmake/BundledLibSodium.cmake
++++ b/cmake/BundledLibSodium.cmake
+@@ -58,14 +58,12 @@ function(use_bundled_libsodium SOURCE_DIR BINARY_DIR)
+                 EXCLUDE_FROM_ALL TRUE
+         )
+     else()
+-        set(CONFIGURE_COMMAND ./configure --disable-pie --enable-minimal "--prefix=${LIBSODIUM_BIN_DIR}")
++        set(CONFIGURE_COMMAND ./configure --host=${HOST_SYS} --build=${BUILD_SYS} --disable-pie --enable-minimal "--prefix=${LIBSODIUM_BIN_DIR}")
+ 
+         ExternalProject_Add(
+                 libsodium-external
+-                URL "${LIBSODIUM_OFFICIAL_MIRROR_URL} ${LIBSODIUM_GITHUB_MIRROR_URL} ${LIBSODIUM_GENTOO_MIRROR_URL}"
+-                URL_HASH ${LIBSODIUM_URL_HASH}
+                 BUILD_IN_SOURCE true
+-                SOURCE_DIR "${BINARY_DIR}/thirdparty/libsodium-src"
++                SOURCE_DIR "${SOURCE_DIR}/thirdparty/libsodium-stable"
+                 BUILD_COMMAND make
+                 CMAKE_COMMAND ""
+                 UPDATE_COMMAND ""
+-- 
+2.25.1
+

@@ -1,15 +1,14 @@
-From f2a76d6595b31b0bc1be7029277676af1b1cc3d3 Mon Sep 17 00:00:00 2001
+From 60dfd5bb8f25fa5f0b6c07c3098836bec1668c19 Mon Sep 17 00:00:00 2001
 From: Mariam Elshakfy <mariam.elshakfy@arm.com>
-Date: Wed, 11 Oct 2023 16:18:22 +0000
+Date: Thu, 14 Mar 2024 14:47:27 +0000
 Subject: [PATCH] Platform/ARM/N1Sdp: Reserve OP-TEE Region from UEFI
 
 To enable cache on N1SDP, OP-TEE has to be moved
 to run from DDR4 memory. Since this memory is
 known to application side, it must be reserved
 
-Upstream-Status: Pending (not yet submitted to upstream)
+Upstream-Status: Inappropriate [will not be submitted as it's a workaround to address hardware issue]
 Signed-off-by: Mariam Elshakfy <mariam.elshakfy@arm.com>
-
 ---
  .../Library/PlatformLib/PlatformLib.inf             |  3 +++
  .../Library/PlatformLib/PlatformLibMem.c            | 13 +++++++++++++
@@ -68,3 +67,6 @@ index 9e257ebde0..587319262a 100644
 +
  [Ppis]
    gNtFwConfigDtInfoPpiGuid =  { 0xb50dee0e, 0x577f, 0x47fb, { 0x83, 0xd0, 0x41, 0x78, 0x61, 0x8b, 0x33, 0x8a } }
+-- 
+2.38.1
+

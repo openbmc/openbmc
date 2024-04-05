@@ -73,7 +73,6 @@ do_compile() {
     cmake_do_compile
 }
 
-PIP_INSTALL_PACKAGE = "pylibiio"
 do_install() {
     if ${@bb.utils.contains('PACKAGECONFIG', 'libiio-python3', 'true', 'false', d)}; then
         setuptools3_do_install

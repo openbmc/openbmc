@@ -2292,7 +2292,7 @@ system and gives an overview of their function and contents.
    :term:`DOC_COMPRESS`
       When inheriting the :ref:`ref-classes-compress_doc`
       class, this variable sets the compression policy used when the
-      OpenEmbedded build system compresses man pages and info pages. By
+      OpenEmbedded build system compresses manual and info pages. By
       default, the compression method used is gz (gzip). Other policies
       available are xz and bz2.
 
@@ -7910,6 +7910,11 @@ system and gives an overview of their function and contents.
       ``tmp/deploy/images/MACHINE`` by a factor of 130 (+15 MiB for this
       image), compared to just using the :ref:`ref-classes-create-spdx` class
       with no option.
+
+   :term:`SPDX_NAMESPACE_PREFIX`
+      This option could be used in order to change the prefix of ``spdxDocument``
+      and the prefix of ``documentNamespace``. It is set by default to
+      ``http://spdx.org/spdxdoc``.
 
    :term:`SPDX_PRETTY`
       This option makes the SPDX output more human-readable, using

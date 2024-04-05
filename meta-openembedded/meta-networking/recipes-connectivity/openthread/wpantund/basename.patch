@@ -1,0 +1,19 @@
+include libgen.h for getting prototype for basename()
+Newer musl has remove prototype from string.h [1]
+which renders a compile error with newer compilers like
+clang 18+ about missing prototype.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/third_party/openthread/tools/spi-hdlc-adapter/spi-hdlc-adapter.c
++++ b/third_party/openthread/tools/spi-hdlc-adapter/spi-hdlc-adapter.c
+@@ -32,6 +32,7 @@
+ #endif
+ 
+ #include <assert.h>
++#include <libgen.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stdint.h>

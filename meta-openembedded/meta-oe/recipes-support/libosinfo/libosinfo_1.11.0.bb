@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c"
 SRC_URI = " \
 	git://gitlab.com/libosinfo/libosinfo.git;branch=main;protocol=https \
 	file://0001-meson.build-allow-crosscompiling-gir.patch \
+	file://0001-osinfo-Make-xmlError-struct-constant-in-propagate_li.patch \
 "
 
 SRCREV = "ca9dd5b810dc04ea38048ae9be491654c8596ef9"

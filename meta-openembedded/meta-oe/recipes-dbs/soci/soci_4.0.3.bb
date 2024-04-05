@@ -43,3 +43,7 @@ FILES:${PN}-mysql = "${libdir}/lib${BPN}_mysql.so.*"
 FILES:${PN}-postgresql = "${libdir}/lib${BPN}_postgresql.so.*"
 FILES:${PN}-odbc = "${libdir}/lib${BPN}_odbc.so.*"
 FILES:${PN}-oracle = "${libdir}/lib${BPN}_oracle.so.*"
+
+do_install:append() {
+    sed -i 's|${RECIPE_SYSROOT}${prefix}|${_IMPORT_PREFIX}|g' ${D}${libdir}/cmake/SOCI/SOCITargets*.cmake
+}

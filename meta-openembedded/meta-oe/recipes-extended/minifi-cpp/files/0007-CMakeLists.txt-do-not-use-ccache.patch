@@ -1,0 +1,38 @@
+From 44867a8e4100a7296b98e0e850d950d24b980959 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 21 Mar 2024 10:18:39 +0800
+Subject: [PATCH] CMakeLists.txt: do not use ccache
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CMakeLists.txt | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8a1dd6d91..8a5314544 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -82,12 +82,12 @@ if (USE_REAL_ODBC_TEST_DRIVER)
+ endif()
+ 
+ # Use ccache if present
+-find_program(CCACHE_FOUND ccache)
+-if(CCACHE_FOUND)
+-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+-    message("-- Found ccache: ${CCACHE_FOUND}")
+-endif(CCACHE_FOUND)
++#find_program(CCACHE_FOUND ccache)
++#if(CCACHE_FOUND)
++#    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
++#    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
++#    message("-- Found ccache: ${CCACHE_FOUND}")
++#endif(CCACHE_FOUND)
+ 
+ # Use gold linker if instructed
+ if (UNIX AND USE_GOLD_LINKER AND NOT APPLE )
+-- 
+2.25.1
+

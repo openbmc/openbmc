@@ -28,6 +28,35 @@ def get_metadata_git_revision(path):
         rev = '<unknown>'
     return rev.strip()
 
+def get_metadata_git_toplevel(path):
+    try:
+        toplevel, _ = bb.process.run('git rev-parse --show-toplevel', cwd=path)
+    except bb.process.ExecutionError:
+        return ""
+    return toplevel.strip()
+
+def get_metadata_git_remotes(path):
+    try:
+        remotes_list, _ = bb.process.run('git remote', cwd=path)
+        remotes = remotes_list.split()
+    except bb.process.ExecutionError:
+        remotes = []
+    return remotes
+
+def get_metadata_git_remote_url(path, remote):
+    try:
+        uri, _ = bb.process.run('git remote get-url {remote}'.format(remote=remote), cwd=path)
+    except bb.process.ExecutionError:
+        return ""
+    return uri.strip()
+
+def get_metadata_git_describe(path):
+    try:
+        describe, _ = bb.process.run('git describe --tags', cwd=path)
+    except bb.process.ExecutionError:
+        return ""
+    return describe.strip()
+
 def is_layer_modified(path):
     try:
         subprocess.check_output("""cd %s; export PSEUDO_UNLOAD=1; set -e;

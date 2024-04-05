@@ -1,4 +1,4 @@
-From 12e2579333258d1a690f8718e91b0f217078e886 Mon Sep 17 00:00:00 2001
+From 6a85945c060154581f5a129a6a946258bf9333c4 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 8 May 2017 03:54:12 -0400
 Subject: [PATCH 08/11] use oe variable to replace hardcoded dir
@@ -15,10 +15,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index b745a79..b5b4258 100644
+index e6bb3f3..700085b 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -61,10 +61,10 @@ class blivet_sdist(sdist):
+@@ -73,10 +73,10 @@ class blivet_sdist(sdist):
  
  
  data_files = [
@@ -33,6 +33,3 @@ index b745a79..b5b4258 100644
  ]
  
  
--- 
-2.7.4
-

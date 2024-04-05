@@ -1,4 +1,4 @@
-From 114c42fba3fc86119710e8dd1bb2b7a9e39e3064 Mon Sep 17 00:00:00 2001
+From 1ba84e1b8d4c9a3ad85dc443b0df4d79c89cca4b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 17 Jun 2021 19:35:01 -0700
 Subject: [PATCH] replace old sync with new atomic builtin equivalents
@@ -6,13 +6,15 @@ Subject: [PATCH] replace old sync with new atomic builtin equivalents
 Helps compiling with gcc on newer arches e.g. riscv32 where these
 __sync* builtins are not implemented atleast for 64bit values
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
 
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
  .../range/range_tree/lib/portability/toku_atomic.h   | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/utilities/transactions/lock/range/range_tree/lib/portability/toku_atomic.h b/utilities/transactions/lock/range/range_tree/lib/portability/toku_atomic.h
+index aaa2298faf..9385902808 100644
 --- a/utilities/transactions/lock/range/range_tree/lib/portability/toku_atomic.h
 +++ b/utilities/transactions/lock/range/range_tree/lib/portability/toku_atomic.h
 @@ -77,37 +77,37 @@ template <typename T, typename U>
@@ -59,3 +61,6 @@ Upstream-Status: Pending
  }
  
  // in case you include this but not toku_portability.h
+-- 
+2.25.1
+

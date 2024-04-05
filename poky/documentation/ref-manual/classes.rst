@@ -421,7 +421,7 @@ and BusyBox. It could have been called "kconfig" too.
 ``compress_doc``
 ================
 
-Enables compression for man pages and info pages. This class is intended
+Enables compression for manual and info pages. This class is intended
 to be inherited globally. The default compression mechanism is gz (gzip)
 but you can select an alternative mechanism by setting the
 :term:`DOC_COMPRESS` variable.
@@ -1184,13 +1184,17 @@ enables the :ref:`ref-classes-image_types` class. The :ref:`ref-classes-image` c
 ``IMGCLASSES`` variable as follows::
 
    IMGCLASSES = "rootfs_${IMAGE_PKGTYPE} image_types ${IMAGE_CLASSES}"
-   IMGCLASSES += "${@['populate_sdk_base', 'populate_sdk_ext']['linux' in d.getVar("SDK_OS")]}"
+   # Only Linux SDKs support populate_sdk_ext, fall back to populate_sdk_base
+   # in the non-Linux SDK_OS case, such as mingw32
+   inherit populate_sdk_base
+   IMGCLASSES += "${@['', 'populate_sdk_ext']['linux' in d.getVar("SDK_OS")]}"
    IMGCLASSES += "${@bb.utils.contains_any('IMAGE_FSTYPES', 'live iso hddimg', 'image-live', '', d)}"
    IMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'container', 'image-container', '', d)}"
    IMGCLASSES += "image_types_wic"
    IMGCLASSES += "rootfs-postcommands"
    IMGCLASSES += "image-postinst-intercepts"
-   inherit ${IMGCLASSES}
+   IMGCLASSES += "overlayfs-etc"
+   inherit_defer ${IMGCLASSES}
 
 The :ref:`ref-classes-image_types` class also handles conversion and compression of images.
 

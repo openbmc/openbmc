@@ -1,14 +1,11 @@
 header:
   version: 14
 
-env:
-  DISPLAY: ""
-
-distro: poky-tiny
+distro: poky
 
 defaults:
   repos:
-    branch: nanbield
+    branch: master
 
 repos:
   meta-arm:
@@ -19,14 +16,14 @@ repos:
 
   poky:
     url: https://git.yoctoproject.org/git/poky
-    commit: 2e9c2a2381105f1306bcbcb54816cbc5d8110eff
+    # commit: 2e9c2a2381105f1306bcbcb54816cbc5d8110eff
     layers:
       meta:
       meta-poky:
 
   meta-openembedded:
     url: https://git.openembedded.org/meta-openembedded
-    commit: 1750c66ae8e4268c472c0b2b94748a59d6ef866d
+    # commit: 1750c66ae8e4268c472c0b2b94748a59d6ef866d
     layers:
       meta-oe:
       meta-python:
@@ -34,15 +31,17 @@ repos:
 
   meta-secure-core:
     url: https://github.com/wind-river/meta-secure-core.git
-    commit: e29165a1031dcf601edbed1733cedd64826672a5
+    # commit: e29165a1031dcf601edbed1733cedd64826672a5
     layers:
-      meta:
+      meta-secure-core-common:
       meta-signing-key:
       meta-efi-secure-boot:
 
 local_conf_header:
   base: |
     CONF_VERSION = "2"
+
+  setup: |
     PACKAGE_CLASSES = "package_ipk"
     BB_NUMBER_THREADS ?= "16"
     PARALLEL_MAKE ?= "-j16"
@@ -51,4 +50,4 @@ local_conf_header:
 machine: unset
 
 target:
-  - corstone1000-image
+  - corstone1000-flash-firmware-image

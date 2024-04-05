@@ -1,0 +1,17 @@
+Upstream-Status: Backport [https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=3243d790ee32aa8eda69226d81b1e79dbd1dcd87]
+
+Signed-off-by: Harish Sadineni <Harish.Sadineni@windriver.com>
+
+diff --git a/gprofng/gp-display-html/gp-display-html.in b/gprofng/gp-display-html/gp-display-html.in
+index 6f37ca282e7..306c99a0ec3 100644
+--- a/gprofng/gp-display-html/gp-display-html.in
++++ b/gprofng/gp-display-html/gp-display-html.in
+@@ -25,7 +25,7 @@ use warnings;
+ # Disable before release
+ # use Perl::Critic;
+ 
+-use bignum;
++use bigint;
+ use List::Util qw (max);
+ use Cwd qw (abs_path cwd);
+ use File::Basename;

@@ -28,6 +28,7 @@ SRCREV = "68737d20556d37364c95776044b1119c0912a36a"
 
 SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=https \
            file://0001-Remove-OOM-tests-from-runtest-mm.patch \
+           file://0001-scenario_groups-default-remove-connectors.patch \
            "
 
 S = "${WORKDIR}/git"

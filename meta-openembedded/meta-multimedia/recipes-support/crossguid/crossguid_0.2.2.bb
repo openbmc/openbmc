@@ -15,3 +15,6 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
+do_install:append() {
+    sed -i -e 's|${STAGING_DIR_HOST}||g' ${D}${datadir}/crossguid/cmake/crossguid-config.cmake
+}

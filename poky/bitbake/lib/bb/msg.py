@@ -230,7 +230,7 @@ def logger_create(name, output=sys.stderr, level=logging.INFO, preserve_handlers
     console = logging.StreamHandler(output)
     console.addFilter(bb.msg.LogFilterShowOnce())
     format = bb.msg.BBLogFormatter("%(levelname)s: %(message)s")
-    if color == 'always' or (color == 'auto' and output.isatty()):
+    if color == 'always' or (color == 'auto' and output.isatty() and os.environ.get('NO_COLOR', '') == ''):
         format.enable_color()
     console.setFormatter(format)
     if preserve_handlers:

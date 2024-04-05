@@ -6,6 +6,7 @@
 import bb.siggen
 import bb.runqueue
 import oe
+import netrc
 
 def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCaches):
     # Return True if we should keep the dependency, False to drop it
@@ -327,6 +328,18 @@ class SignatureGeneratorOEEquivHash(SignatureGeneratorOEBasicHashMixIn, bb.sigge
         if not self.method:
             bb.fatal("OEEquivHash requires SSTATE_HASHEQUIV_METHOD to be set")
         self.max_parallel = int(data.getVar('BB_HASHSERVE_MAX_PARALLEL') or 1)
+        self.username = data.getVar("BB_HASHSERVE_USERNAME")
+        self.password = data.getVar("BB_HASHSERVE_PASSWORD")
+        if not self.username or not self.password:
+            try:
+                n = netrc.netrc()
+                auth = n.authenticators(self.server)
+                if auth is not None:
+                    self.username, _, self.password = auth
+            except FileNotFoundError:
+                pass
+            except netrc.NetrcParseError as e:
+                bb.warn("Error parsing %s:%s: %s" % (e.filename, str(e.lineno), e.msg))
 
 # Insert these classes into siggen's namespace so it can see and select them
 bb.siggen.SignatureGeneratorOEBasicHash = SignatureGeneratorOEBasicHash

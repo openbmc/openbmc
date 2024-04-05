@@ -1,4 +1,4 @@
-From 9937e89c22eb2f2db9a936e7bc4442857b4192f5 Mon Sep 17 00:00:00 2001
+From 7c8f367faf8848a43a414079189e10270d6c0fcc Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 18 Dec 2019 12:29:50 +0100
 Subject: [PATCH] freebl: add a configure option to disable ARM HW crypto
@@ -15,10 +15,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 5 insertions(+)
 
 diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
-index b38889f..4616aac 100644
+index 7ee8736..f9b4925 100644
 --- a/nss/lib/freebl/Makefile
 +++ b/nss/lib/freebl/Makefile
-@@ -139,6 +139,8 @@ endif
+@@ -142,6 +142,8 @@ endif
          endif
      endif
  endif
@@ -27,16 +27,16 @@ index b38889f..4616aac 100644
  ifeq ($(CPU_ARCH),aarch64)
      ifdef CC_IS_CLANG
          DEFINES += -DUSE_HW_AES -DUSE_HW_SHA1 -DUSE_HW_SHA2
-@@ -180,6 +182,7 @@ endif
+@@ -183,6 +185,7 @@ endif
          endif
      endif
  endif
 +endif
  
- ifeq ($(OS_TARGET),OSF1)
-     DEFINES += -DMP_ASSEMBLY_MULTIPLY -DMP_NO_MP_WORD
+ ifeq (OS2,$(OS_TARGET))
+     ASFILES  = mpi_x86_os2.s
 diff --git a/nss/lib/freebl/gcm.c b/nss/lib/freebl/gcm.c
-index ac461b4..04cb180 100644
+index 2dae724..9ee7fc8 100644
 --- a/nss/lib/freebl/gcm.c
 +++ b/nss/lib/freebl/gcm.c
 @@ -18,6 +18,7 @@

@@ -432,7 +432,7 @@ varies by component:
    :oe_lists:`bitbake-devel </g/bitbake-devel>`
    mailing list.
 
--  *"meta-\*" trees:* These trees contain Metadata. Use the
+-  *meta-poky* and *meta-yocto-bsp* trees: These trees contain Metadata. Use the
    :yocto_lists:`poky </g/poky>` mailing list.
 
 -  *Documentation*: For changes to the Yocto Project documentation, use the

@@ -13,7 +13,6 @@ RDEPENDS:${PN}-serif = "${PN}-common"
 RDEPENDS:${PN}-serif-condensed = "${PN}-common"
 RDEPENDS:${PN}-mathtexgyre = "${PN}-common"
 RDEPENDS:${PN}-common = ""
-PR = "r7"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/dejavu/dejavu-fonts-ttf-${PV}.tar.bz2 \
            file://30-dejavu-aliases.conf"

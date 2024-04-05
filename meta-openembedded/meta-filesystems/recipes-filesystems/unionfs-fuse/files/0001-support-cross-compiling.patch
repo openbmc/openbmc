@@ -7,6 +7,8 @@ Do not override OE CMAKE variables
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
+
+Upstream-Status: Pending
 ---
  src/CMakeLists.txt | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

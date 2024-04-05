@@ -346,6 +346,8 @@ def main():
                 login, _, password = auth
         except FileNotFoundError:
             pass
+        except netrc.NetrcParseError as e:
+            sys.stderr.write(f"Error parsing {e.filename}:{e.lineno}: {e.msg}\n")
 
     func = getattr(args, 'func', None)
     if func:

@@ -15,7 +15,6 @@ SRC_URI = "git://github.com/seveas/python-prctl;protocol=https;branch=main \
            file://0001-support-cross-complication.patch \
 "
 inherit setuptools3 python3native
-PIP_INSTALL_PACKAGE = "python_prctl"
 
 DEPENDS += "libcap"
 

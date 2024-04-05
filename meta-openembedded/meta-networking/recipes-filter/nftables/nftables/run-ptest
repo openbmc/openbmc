@@ -1,17 +1,17 @@
 #!/bin/sh
 
 NFTABLESLIB=@libdir@/nftables
-cd ${NFTABLESLIB}/ptest
+cd ${NFTABLESLIB}/ptest || exit 1
 
 LOG="${NFTABLESLIB}/ptest/nftables_ptest_$(date +%Y%m%d-%H%M%S).log"
-tests/shell/run-tests.sh -v | sed  -e '/OK/ s/^/PASS: / ; /FAILED/ s/^/FAIL: /' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | tee -a ${LOG}
+tests/shell/run-tests.sh -v | sed -E '/I: \[OK\]/ s/^/PASS: / ; /W: \[(CHK DUMP|VALGRIND|TAINTED|DUMP FAIL|FAILED)\]/ s/^/FAIL: /' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | tee -a "${LOG}"
 
-passed=`grep PASS: ${LOG}|wc -l`
-failed=`grep FAIL: ${LOG}|wc -l`
+passed=$(grep -c PASS: "${LOG}")
+failed=$(grep -c FAIL: "${LOG}")
 all=$((passed + failed))
 
 (   echo "=== Test Summary ==="
     echo "TOTAL: ${all}"
     echo "PASSED: ${passed}"
     echo "FAILED: ${failed}"
-) | tee -a ${LOG}
+) | tee -a "${LOG}"

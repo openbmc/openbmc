@@ -1,4 +1,4 @@
-From ec0e52b49c9b6869413c9544c2ed44710ab91141 Mon Sep 17 00:00:00 2001
+From d36e65f3e31c882f62d5cfeb7b0e1441d5fdc821 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sat, 14 Apr 2018 16:15:59 +0800
 Subject: [PATCH] drop zenity detection
@@ -13,10 +13,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 5 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 528b7d2..8932ae6 100644
+index bbb4db8..2010d78 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -337,11 +337,6 @@ fi
+@@ -336,11 +336,6 @@ fi
  
  AM_CONDITIONAL(HAVE_SM, test "$found_sm" = "yes") 
  
@@ -28,6 +28,3 @@ index 528b7d2..8932ae6 100644
  AC_SEARCH_LIBS([dlsym], [dl], [], [
    AC_MSG_ERROR([unable to find the dlsym() function])
  ])
--- 
-2.31.1
-

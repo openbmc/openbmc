@@ -1,0 +1,59 @@
+From d675808d300278a9e7143428cfecf3fda61cc9a2 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 21 Mar 2024 10:59:29 +0000
+Subject: [PATCH] src/mmap_hook.cc: Fix build for 32bit machine
+
+Fixed build error on 32bit machine:
+
+../git/src/mmap_hook.cc:309:31: error: static assertion failed
+ 309 | static_assert(sizeof(int32_t) == sizeof(off_t), "");
+
+This is because oe's off_t is 64bit on both 32 and 64bit system, which is the
+default value of glibc, so the assertion would be failed on 32bit system, and
+remove mmap() and mmap64() to fix the redefined error.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ src/mmap_hook.cc | 22 ----------------------
+ 1 file changed, 22 deletions(-)
+
+diff --git a/src/mmap_hook.cc b/src/mmap_hook.cc
+index 0a0f62f..27425e4 100644
+--- a/src/mmap_hook.cc
++++ b/src/mmap_hook.cc
+@@ -302,30 +302,8 @@ void* mmap(void* start, size_t length, int prot, int flags, int fd, off_t off) _
+ 
+ #define HOOKED_MMAP
+ 
+-#elif defined(DEFINED_DO_MMAP) && defined(__linux__) && !GOOD_LINUX_SYSTEM
+-// Linuxes with 32-bit off_t. We're being careful with mmap64 being
+-// 64-bit and mmap being 32-bit.
+-
+-static_assert(sizeof(int32_t) == sizeof(off_t), "");
+-
+-extern "C" void* mmap64(void* start, size_t length, int prot, int flags, int fd, int64_t off)
+-  __THROW ATTRIBUTE_SECTION(malloc_hook);
+-extern "C" void* mmap(void* start, size_t length, int prot, int flags, int fd, off_t off)
+-  __THROW ATTRIBUTE_SECTION(malloc_hook);
+-
+-void* mmap(void *start, size_t length, int prot, int flags, int fd, off_t off) __THROW {
+-  return do_mmap_with_hooks(start, length, prot, flags, fd, off);
+-}
+-
+-void* mmap64(void *start, size_t length, int prot, int flags, int fd, int64_t off) __THROW {
+-  return do_mmap_with_hooks(start, length, prot, flags, fd, off);
+-}
+-
+-#define HOOKED_MMAP
+-
+ #endif  // Linux/32-bit off_t case
+ 
+-
+ #ifdef HOOKED_MMAP
+ 
+ extern "C" int munmap(void* start, size_t length) __THROW ATTRIBUTE_SECTION(malloc_hook);
+-- 
+2.35.5
+

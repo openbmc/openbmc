@@ -17,5 +17,3 @@ SRCREV= "88cf6d9b9b685ffa1720644bd53c742afb10a414"
 S = "${WORKDIR}/git"
 
 inherit setuptools3
-
-PIP_INSTALL_PACKAGE = "txWS"

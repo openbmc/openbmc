@@ -59,4 +59,11 @@ SP_PATHS:append = "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test', \
 EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test', \
                                         ' CFG_SPMC_TESTS=y', '' , d)}"
 
+# Block Storage SP
+DEPENDS:append  = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-block-storage', \
+                                        ' ts-sp-block-storage', '' , d)}"
+
+SP_PATHS:append = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-block-storage', \
+                                        ' ${TS_BIN}/${BLOCK_STORAGE_UUID}.stripped.elf', '', d)}"
+
 EXTRA_OEMAKE:append = "${@oe.utils.conditional('SP_PATHS', '', '', ' CFG_MAP_EXT_DT_SECURE=y CFG_SECURE_PARTITION=y SP_PATHS="${SP_PATHS}" ', d)}"

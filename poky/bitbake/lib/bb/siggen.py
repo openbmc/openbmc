@@ -535,23 +535,34 @@ class SignatureGeneratorUniHashMixIn(object):
         # hashes to appear over time, but much less likely for them to
         # disappear
         self.unihash_exists_cache = set()
+        self.username = None
+        self.password = None
         super().__init__(data)
 
     def get_taskdata(self):
-        return (self.server, self.method, self.extramethod, self.max_parallel) + super().get_taskdata()
+        return (self.server, self.method, self.extramethod, self.max_parallel, self.username, self.password) + super().get_taskdata()
 
     def set_taskdata(self, data):
-        self.server, self.method, self.extramethod, self.max_parallel = data[:4]
-        super().set_taskdata(data[4:])
+        self.server, self.method, self.extramethod, self.max_parallel, self.username, self.password = data[:6]
+        super().set_taskdata(data[6:])
+
+    def get_hashserv_creds(self):
+        if self.username and self.password:
+            return {
+                "username": self.username,
+                "password": self.password,
+            }
+
+        return {}
 
     def client(self):
         if getattr(self, '_client', None) is None:
-            self._client = hashserv.create_client(self.server)
+            self._client = hashserv.create_client(self.server, **self.get_hashserv_creds())
         return self._client
 
     def client_pool(self):
         if getattr(self, '_client_pool', None) is None:
-            self._client_pool = hashserv.client.ClientPool(self.server, self.max_parallel)
+            self._client_pool = hashserv.client.ClientPool(self.server, self.max_parallel, **self.get_hashserv_creds())
         return self._client_pool
 
     def reset(self, data):

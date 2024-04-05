@@ -1,0 +1,37 @@
+From dc3aa0ff5a41114b17816f1f36f6bb5631c6ab5c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 7 Mar 2024 17:17:29 -0800
+Subject: [PATCH] Build fix needed with taglib 2.0
+
+Fixes
+| ../gnome-commander-1.16.1/src/tags/gnome-cmd-tags-taglib.cc:153:29: error: no member named 'sampleWidth' in 'TagLib::FLAC::Properties'
+|   153 |         if (flacProperties->sampleWidth())
+|       |             ~~~~~~~~~~~~~~  ^
+| ../gnome-commander-1.16.1/src/tags/gnome-cmd-tags-taglib.cc:154:67: error: no member named 'sampleWidth' in 'TagLib::FLAC::Properties'
+|   154 |             cout << "Audio.FLAC.SampleWidth  " << flacProperties->sampleWidth()<< endl;
+|       |                                                   ~~~~~~~~~~~~~~  ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/tags/gnome-cmd-tags-taglib.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tags/gnome-cmd-tags-taglib.cc b/src/tags/gnome-cmd-tags-taglib.cc
+index 9e65836..573f5eb 100644
+--- a/src/tags/gnome-cmd-tags-taglib.cc
++++ b/src/tags/gnome-cmd-tags-taglib.cc
+@@ -150,8 +150,8 @@ bool getAudioProperties(GnomeCmdFileMetadata &metadata, const TagLib::AudioPrope
+     if (flacProperties)
+     {
+         metadata.add(TAG_AUDIO_CODEC,"FLAC");
+-        if (flacProperties->sampleWidth())
+-            cout << "Audio.FLAC.SampleWidth  " << flacProperties->sampleWidth()<< endl;
++        if (flacProperties->bitsPerSample())
++            cout << "Audio.FLAC.BitsPerSample  " << flacProperties->bitsPerSample()<< endl;
+ 
+         return true;
+     }
+-- 
+2.44.0
+

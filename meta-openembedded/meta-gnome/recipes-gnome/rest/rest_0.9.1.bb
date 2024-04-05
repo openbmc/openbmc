@@ -14,7 +14,8 @@ DEPENDS = " \
     libxml2-native \
 "
 
-inherit gnomebase gobject-introspection vala pkgconfig gi-docgen
+inherit gnomebase gobject-introspection vala pkgconfig gi-docgen features_check
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[examples] = "-Dexamples=true,-Dexamples=false"

@@ -1,0 +1,53 @@
+From 85e1c38bcf84bd4e2ce63ef74f0cfa1f5e92261e Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Wed, 27 Mar 2024 23:46:31 +0100
+Subject: [PATCH] Adapt check_cxx_compiler_flag to cmake 3.0.2
+
+Backporting commits which are upgrading cmake_minimum_required and
+include check_cxx_compiler_flag have too many additional changes.
+
+Let's just do a simple adaptation of our backported patch so
+it works with older cmake version instead.
+
+This can be safely removed when recipe version is upgraded.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ tests/CMakeLists.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 20de9e1..54c3ac5 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -5,6 +5,7 @@ enable_testing()  # again, for support standalone testing
+ 
+ include(FindPkgConfig)
+ include(ExternalProject)
++include(CheckCXXCompilerFlag)
+ 
+ # will make visual studio generated project group files
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+@@ -167,7 +168,7 @@ else()
+         >
+     )
+ endif(MSVC)
+-check_cxx_compiler_flag("-Wno-unsafe-buffer-usage" WARN_UNSAFE_BUFFER)
++CHECK_CXX_COMPILER_FLAG("-Wno-unsafe-buffer-usage" WARN_UNSAFE_BUFFER)
+ if (WARN_UNSAFE_BUFFER)
+   # This test uses very greedy heuristics such as "no pointer arithmetic on raw buffer"
+   target_compile_options(gsl_tests_config INTERFACE "-Wno-unsafe-buffer-usage")
+@@ -272,7 +273,7 @@ else()
+         >
+     )
+ endif(MSVC)
+-check_cxx_compiler_flag("-Wno-unsafe-buffer-usage" WARN_UNSAFE_BUFFER)
++CHECK_CXX_COMPILER_FLAG("-Wno-unsafe-buffer-usage" WARN_UNSAFE_BUFFER)
+ if (WARN_UNSAFE_BUFFER)
+   # This test uses very greedy heuristics such as "no pointer arithmetic on raw buffer"
+   target_compile_options(gsl_tests_config_noexcept INTERFACE "-Wno-unsafe-buffer-usage")
+-- 
+2.30.2
+

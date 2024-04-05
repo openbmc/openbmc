@@ -10,8 +10,6 @@ require ${BPN}-crates.inc
 
 inherit pypi cargo-update-recipe-crates python_maturin
 
-S = "${WORKDIR}/rpds_py-${PV}"
-
-PYPI_ARCHIVE_NAME = "rpds_py-${PV}.${PYPI_PACKAGE_EXT}"
+PYPI_PACKAGE = "rpds_py"
 
 BBCLASSEXTEND = "native nativesdk"

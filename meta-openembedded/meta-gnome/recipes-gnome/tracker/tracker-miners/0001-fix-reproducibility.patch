@@ -39,21 +39,6 @@ index 935584185..aa6126081 100644
  
  # We use tracker-miners-3.0 rather than tracker3-miners inside the lib64
  # directory, following the existing convention in that directory.
-@@ -421,10 +421,10 @@ tracker_writeback_modules_dir = join_paths(get_option('prefix'), get_option('lib
- tracker_extract_rules_dir = join_paths(get_option('prefix'), get_option('datadir'), tracker_versioned_name, 'extract-rules')
- tracker_miner_services_dir = join_paths(get_option('prefix'), get_option('datadir'), tracker_versioned_name, 'miners')
- 
--tracker_uninstalled_cli_subcommands_dir = meson.current_build_dir() / 'src' / 'tracker' / 'subcommands'
--tracker_uninstalled_extract_rules_dir = join_paths(meson.current_build_dir(), 'src', 'tracker-extract', 'uninstalled-rules')
--tracker_uninstalled_writeback_modules_dir = join_paths(meson.current_build_dir(), 'src', 'tracker-writeback')
--uninstalled_tracker_extract_path = join_paths(meson.current_build_dir(), 'src', 'tracker-extract', 'tracker-extract-3')
-+tracker_uninstalled_cli_subcommands_dir = '/usr/src/debug/tracker/src/tracker/subcommands'
-+tracker_uninstalled_extract_rules_dir = join_paths('usr', 'src', 'debug', 'tracker', 'src', 'tracker-extract', 'uninstalled-rules')
-+tracker_uninstalled_writeback_modules_dir = join_paths('usr', 'src', 'debug', 'tracker', 'src', 'tracker-writeback')
-+uninstalled_tracker_extract_path = join_paths('usr', 'src', 'debug', 'tracker', 'src', 'tracker-extract', 'tracker-extract-3')
- 
- gsettings_schema_dir = join_paths(get_option('prefix'), get_option('datadir'), 'glib-2.0', 'schemas')
- po_dir = join_paths(meson.current_source_dir(), 'po')
 @@ -438,8 +438,8 @@ subdir('data')
  subdir('docs')
  
@@ -65,18 +50,6 @@ index 935584185..aa6126081 100644
  ]
  
  if get_option('tests_tap_protocol')
-@@ -454,9 +454,9 @@ run_uninstalled_conf = configuration_data()
- run_uninstalled_conf.set('tracker_sparql_uninstalled_dir', tracker_sparql_uninstalled_dir)
- run_uninstalled_conf.set('tracker_uninstalled_cli_dir', tracker_uninstalled_cli_dir)
- run_uninstalled_conf.set('tracker_uninstalled_cli_subcommands_dir', tracker_uninstalled_cli_subcommands_dir)
--run_uninstalled_conf.set('tracker_uninstalled_domain_rule', meson.current_build_dir() / 'tests' / 'functional-tests' / 'config' / 'test-domain.rule')
-+run_uninstalled_conf.set('tracker_uninstalled_domain_rule', '/usr/src/debug/tracker/tests/functional-tests/config/test-domain.rule')
- run_uninstalled_conf.set('tracker_uninstalled_extract_rules_dir', tracker_uninstalled_extract_rules_dir)
--run_uninstalled_conf.set('tracker_uninstalled_extractors_dir', meson.current_build_dir() / 'src' / 'tracker-extract')
-+run_uninstalled_conf.set('tracker_uninstalled_extractors_dir', '/usr/src/debug/tracker/src/tracker-extract')
- run_uninstalled_conf.set('tracker_uninstalled_miner_services_dir', tracker_uninstalled_miner_services_dir)
- run_uninstalled_conf.set('tracker_uninstalled_testutils_dir', tracker_uninstalled_testutils_dir)
- run_uninstalled_conf.set('tracker_uninstalled_writeback_modules_dir', tracker_uninstalled_writeback_modules_dir)
 diff --git a/src/tracker-extract/meson.build b/src/tracker-extract/meson.build
 index 4aaad5c41..d17cce221 100644
 --- a/src/tracker-extract/meson.build
@@ -103,6 +76,43 @@ index e131b85ad..59e509fa6 100644
  
  libtracker_miner_test_deps = [tracker_miners_common_dep, tracker_miner_dep, tracker_sparql]
  
+ 
+diff --git a/src/miners/fs/meson.build b/src/miners/fs/meson.build
+index 6e5883288..04750f82b 100644
+--- a/src/miners/fs/meson.build
++++ b/src/miners/fs/meson.build
+@@ -67,8 +67,8 @@ executable('tracker-miner-fs-@0@'.format(tracker_api_major),
+     dependencies: tracker_miner_fs_deps,
+     c_args: [
+         tracker_c_args,
+-        '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
+-        '-DBUILD_EXTRACTDIR="@0@"'.format(meson.build_root() / 'src' / 'tracker-extract'),
++        '-DBUILDROOT="@0@"'.format(get_option('prefix') / 'src'),
++        '-DBUILD_EXTRACTDIR="@0@"'.format(get_option('prefix') / 'src' / 'tracker-extract'),
+         '-DLIBEXECDIR="@0@"'.format(get_option('prefix') / get_option('libexecdir')),
+     ],
+     install: true,
+diff --git a/src/libtracker-miners-common/tracker-landlock.c b/src/libtracker-miners-common/tracker-landlock.c
+index 27e7db65b..3021343eb 100644
+--- a/src/libtracker-miners-common/tracker-landlock.c
++++ b/src/libtracker-miners-common/tracker-landlock.c
+@@ -276,7 +276,7 @@
+ 			          LANDLOCK_ACCESS_FS_READ_DIR);
+ 		}
+ 	}
+-
++#if 0
+ 	current_dir = g_get_current_dir ();
+ 
+ 	/* Detect running in-tree */
+@@ -296,7 +296,7 @@
+ 			          in_tree_rules[i].flags);
+ 		}
+ 	}
+-
++#endif
+ 	/* Add user cache for readonly databases */
+ #ifdef MINER_FS_CACHE_LOCATION
+ 	add_rule (landlock_fd, MINER_FS_CACHE_LOCATION,
 -- 
 2.41.0
-

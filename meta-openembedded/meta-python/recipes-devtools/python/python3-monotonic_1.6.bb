@@ -11,5 +11,3 @@ SRC_URI = "git://github.com/atdt/monotonic.git;branch=master;protocol=https"
 S = "${WORKDIR}/git"
 
 inherit setuptools3
-
-PIP_INSTALL_PACKAGE = "monotonic"

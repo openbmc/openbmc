@@ -18,6 +18,8 @@ PACKAGE_INSTALL = " \
 IMAGE_FEATURES = ""
 IMAGE_LINGUAS = ""
 
+IMAGE_NAME_SUFFIX ?= ""
+
 # Can we somehow inspect reverse dependencies to avoid these variables?
 python __anonymous() {
     verity_image = d.getVar('DM_VERITY_IMAGE')

@@ -10,11 +10,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  configure.ac | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/configure.ac b/configure.ac
-index 9f1c099e13..8e45a05808 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -98,6 +98,11 @@ AS_IF([test -n "${with_binary_version}"],[
+@@ -98,6 +98,11 @@ AS_IF([test -n "${with_binary_version}"]
  dnl Prevent clang from accepting unknown flags with a mere warning
  AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CFLAGS])
  AX_APPEND_COMPILE_FLAGS([-Werror=unknown-warning-option -Werror=invalid-command-line-argument], [CXXFLAGS])
@@ -26,6 +24,3 @@ index 9f1c099e13..8e45a05808 100644
  
  dnl
  dnl  Check the operating system
--- 
-2.39.2
-

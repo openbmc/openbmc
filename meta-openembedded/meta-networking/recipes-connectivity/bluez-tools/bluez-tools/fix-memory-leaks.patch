@@ -1,0 +1,768 @@
+Upstream-Status: Submitted [https://github.com/khvzak/bluez-tools/pull/48]
+
+From e5db2eec2591f0109f0eb7c2631055210b55f2f5 Mon Sep 17 00:00:00 2001
+Message-Id: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Sat, 7 Nov 2020 01:07:24 -0500
+Subject: [PATCH 1/9] Remove memory leaks and overall restructure
+ manager_find_adapter
+
+---
+ src/lib/manager.c | 61 +++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 43 insertions(+), 18 deletions(-)
+
+diff --git a/src/lib/manager.c b/src/lib/manager.c
+index 5286a3a..2263afc 100644
+--- a/src/lib/manager.c
++++ b/src/lib/manager.c
+@@ -136,43 +136,68 @@ const gchar *manager_find_adapter(Manager *self, const gchar *pattern, GError **
+     GVariant *ifaces_and_properties;
+     GVariantIter i;
+ 
++    gchar *pattern_lowercase = g_ascii_strdown(pattern, -1);
++
+     g_variant_iter_init(&i, objects);
+-    while (g_variant_iter_next(&i, "{&o@a{sa{sv}}}", &object_path, &ifaces_and_properties))
++    gboolean still_looking = TRUE;
++    while (still_looking && g_variant_iter_next(&i, "{&o@a{sa{sv}}}", &object_path, &ifaces_and_properties))
+     {
+         const gchar *interface_name;
+-        GVariant *properties;
+         GVariantIter ii;
++        GVariant* properties;
+         g_variant_iter_init(&ii, ifaces_and_properties);
+         while (g_variant_iter_next(&ii, "{&s@a{sv}}", &interface_name, &properties))
+         {
+-            if (g_strstr_len(g_ascii_strdown(interface_name, -1), -1, "adapter"))
++            gchar *interface_name_lowercase = g_ascii_strdown(interface_name, -1);
++            if (strstr(interface_name_lowercase, "adapter"))
+             {
+-                const gchar *object_base_name = g_path_get_basename(object_path);
+-                if (g_strstr_len(g_ascii_strdown(object_base_name, -1), -1, g_ascii_strdown(pattern, -1)))
++                g_free(interface_name_lowercase);
++
++                gchar *object_base_name_original = g_path_get_basename(object_path);
++                gchar *object_base_name = g_ascii_strdown(interface_name, -1);
++                g_free(object_base_name_original);
++
++                if (strstr(object_base_name, pattern_lowercase))
+                 {
+-                    const gchar *retVal = g_strdup(object_path);
+-                    g_variant_unref(properties);
+-                    g_variant_unref(ifaces_and_properties);
+-                    g_variant_unref(objects);
+-                    return retVal;
++                    still_looking = FALSE;
++                    g_free(object_base_name);
++                    break;
+                 }
+-                const gchar *address = g_variant_get_string(g_variant_lookup_value(properties, "Address", NULL), NULL);
+-                if (g_strstr_len(g_ascii_strdown(address, -1), -1, g_ascii_strdown(pattern, -1)))
++
++                g_free(object_base_name);
++
++                const gchar *address_original = g_variant_get_string(g_variant_lookup_value(properties, "Address", NULL), NULL);
++                gchar *address = g_ascii_strdown(address_original, -1);
++
++                if (strstr(address, pattern_lowercase))
+                 {
+-                    gchar *retVal = g_strdup(object_path);
+-                    g_variant_unref(properties);
+-                    g_variant_unref(ifaces_and_properties);
+-                    g_variant_unref(objects);
+-                    return retVal;
++                    still_looking = FALSE;
++                    g_free(address);
++                    break;
+                 }
++                g_free(address);
+             }
++            else
++            {
++                g_free(interface_name_lowercase);
++            }
++
+             g_variant_unref(properties);
+         }
++
+         g_variant_unref(ifaces_and_properties);
+     }
+     g_variant_unref(objects);
++    g_free(pattern_lowercase);
+ 
+-    return NULL;
++    if (still_looking)
++    {
++        return NULL;
++    }
++    else
++    {
++        return object_path;
++    }
+ }
+ 
+ GPtrArray *manager_get_adapters(Manager *self)
+-- 
+2.34.1
+
+
+From 163fcc94f1bc7c8f238e78adb03af914a566d979 Mon Sep 17 00:00:00 2001
+Message-Id: <163fcc94f1bc7c8f238e78adb03af914a566d979.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Sat, 7 Nov 2020 22:12:21 -0500
+Subject: [PATCH 2/9] Replace manager_default_adapter with
+ manager_find_adapter(..., NULL, ...)
+
+---
+ src/lib/helpers.c | 57 ++++++++++++++++++-----------------------------
+ src/lib/manager.c | 51 +++++++++---------------------------------
+ src/lib/manager.h |  1 -
+ 3 files changed, 33 insertions(+), 76 deletions(-)
+
+diff --git a/src/lib/helpers.c b/src/lib/helpers.c
+index d7e95f9..99561b5 100644
+--- a/src/lib/helpers.c
++++ b/src/lib/helpers.c
+@@ -159,52 +159,39 @@ Adapter *find_adapter(const gchar *name, GError **error)
+ 
+     Manager *manager = g_object_new(MANAGER_TYPE, NULL);
+ 
+-    // If name is null or empty - return default adapter
+-    if (name == NULL || strlen(name) == 0)
++    // Try to find by id
++    adapter_path = (gchar *) manager_find_adapter(manager, name, error);
++
++    // Found
++    if (adapter_path)
+     {
+-        adapter_path = (gchar *) manager_default_adapter(manager, error);
+-        if (adapter_path)
+-        {
+-            // adapter = g_object_new(ADAPTER_TYPE, "DBusObjectPath", adapter_path, NULL);
+-            adapter = adapter_new(adapter_path);
+-        }
++        // adapter = g_object_new(ADAPTER_TYPE, "DBusObjectPath", adapter_path, NULL);
++        adapter = adapter_new(adapter_path);
+     }
+     else
+     {
+-        // Try to find by id
+-        adapter_path = (gchar *) manager_find_adapter(manager, name, error);
+-
+-        // Found
+-        if (adapter_path)
++        // Try to find by name
++        const GPtrArray *adapters_list = manager_get_adapters(manager);
++        g_assert(adapters_list != NULL);
++        for (int i = 0; i < adapters_list->len; i++)
+         {
++            adapter_path = g_ptr_array_index(adapters_list, i);
+             // adapter = g_object_new(ADAPTER_TYPE, "DBusObjectPath", adapter_path, NULL);
+             adapter = adapter_new(adapter_path);
+-        }
+-        else
+-        {
+-            // Try to find by name
+-            const GPtrArray *adapters_list = manager_get_adapters(manager);
+-            g_assert(adapters_list != NULL);
+-            for (int i = 0; i < adapters_list->len; i++)
++            adapter_path = NULL;
++
++            if (g_strcmp0(name, adapter_get_name(adapter, error)) == 0)
+             {
+-                adapter_path = g_ptr_array_index(adapters_list, i);
+-                // adapter = g_object_new(ADAPTER_TYPE, "DBusObjectPath", adapter_path, NULL);
+-                adapter = adapter_new(adapter_path);
+-                adapter_path = NULL;
+-
+-                if (g_strcmp0(name, adapter_get_name(adapter, error)) == 0)
++                if (*error)
+                 {
+-                    if (error)
+-                    {
+-                        g_error_free(*error);
+-                        *error = NULL;
+-                    }
+-                    break;
++                    g_error_free(*error);
++                    *error = NULL;
+                 }
+-
+-                g_object_unref(adapter);
+-                adapter = NULL;
++                break;
+             }
++
++            g_object_unref(adapter);
++            adapter = NULL;
+         }
+     }
+ 
+diff --git a/src/lib/manager.c b/src/lib/manager.c
+index 2263afc..891fc45 100644
+--- a/src/lib/manager.c
++++ b/src/lib/manager.c
+@@ -84,45 +84,6 @@ GVariant *manager_get_managed_objects(Manager *self, GError **error)
+     return retVal;
+ }
+ 
+-const gchar *manager_default_adapter(Manager *self, GError **error)
+-{
+-    g_assert(MANAGER_IS(self));
+-
+-    GVariant *objects = NULL;
+-    objects = manager_get_managed_objects(self, error);
+-    if (objects == NULL)
+-        return NULL;
+-
+-    const gchar *object_path;
+-    GVariant *ifaces_and_properties;
+-    GVariantIter i;
+-
+-    g_variant_iter_init(&i, objects);
+-    while (g_variant_iter_next(&i, "{&o@a{sa{sv}}}", &object_path, &ifaces_and_properties))
+-    {
+-        const gchar *interface_name;
+-        GVariant *properties;
+-        GVariantIter ii;
+-        g_variant_iter_init(&ii, ifaces_and_properties);
+-        while (g_variant_iter_next(&ii, "{&s@a{sv}}", &interface_name, &properties))
+-        {
+-            if (g_strstr_len(g_ascii_strdown(interface_name, -1), -1, "adapter"))
+-            {
+-                const gchar *retVal = g_strdup(object_path);
+-                g_variant_unref(properties);
+-                g_variant_unref(ifaces_and_properties);
+-                g_variant_unref(objects);
+-                return retVal;
+-            }
+-            g_variant_unref(properties);
+-        }
+-        g_variant_unref(ifaces_and_properties);
+-    }
+-    g_variant_unref(objects);
+-
+-    return NULL;
+-}
+-
+ const gchar *manager_find_adapter(Manager *self, const gchar *pattern, GError **error)
+ {
+     g_assert(MANAGER_IS(self));
+@@ -136,7 +97,11 @@ const gchar *manager_find_adapter(Manager *self, const gchar *pattern, GError **
+     GVariant *ifaces_and_properties;
+     GVariantIter i;
+ 
+-    gchar *pattern_lowercase = g_ascii_strdown(pattern, -1);
++    gchar *pattern_lowercase = NULL;
++    if (pattern != NULL)
++    {
++        pattern_lowercase = g_ascii_strdown(pattern, -1);
++    }
+ 
+     g_variant_iter_init(&i, objects);
+     gboolean still_looking = TRUE;
+@@ -153,6 +118,12 @@ const gchar *manager_find_adapter(Manager *self, const gchar *pattern, GError **
+             {
+                 g_free(interface_name_lowercase);
+ 
++                if (!pattern_lowercase)
++                {
++                    still_looking = FALSE;
++                    break;
++                }
++
+                 gchar *object_base_name_original = g_path_get_basename(object_path);
+                 gchar *object_base_name = g_ascii_strdown(interface_name, -1);
+                 g_free(object_base_name_original);
+diff --git a/src/lib/manager.h b/src/lib/manager.h
+index 0c9e052..b651812 100644
+--- a/src/lib/manager.h
++++ b/src/lib/manager.h
+@@ -54,7 +54,6 @@ extern "C" {
+      * Method definitions.
+      */
+     GVariant *manager_get_managed_objects(Manager *self, GError **error);
+-    const gchar *manager_default_adapter(Manager *self, GError **error);
+     const gchar *manager_find_adapter(Manager *self, const gchar *pattern, GError **error);
+     GPtrArray *manager_get_adapters(Manager *self);
+     const gchar **manager_get_devices(Manager *self, const gchar *adapter_pattern);
+-- 
+2.34.1
+
+
+From b463d9cfc2390ca6352c16e6f6e113cf42d0f688 Mon Sep 17 00:00:00 2001
+Message-Id: <b463d9cfc2390ca6352c16e6f6e113cf42d0f688.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Sat, 7 Nov 2020 23:38:42 -0500
+Subject: [PATCH 3/9] Fix remaining g_ascii_strdown leaks
+
+---
+ src/lib/helpers.c    | 2 +-
+ src/lib/manager.c    | 5 ++++-
+ src/lib/properties.c | 4 ++--
+ 3 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/lib/helpers.c b/src/lib/helpers.c
+index 99561b5..b61bc07 100644
+--- a/src/lib/helpers.c
++++ b/src/lib/helpers.c
+@@ -242,7 +242,7 @@ Device *find_device(Adapter *adapter, const gchar *name, GError **error)
+                     
+                     if(g_variant_lookup(properties, "Address", "s", &address))
+                     {
+-                        if(g_strcmp0(g_ascii_strdown(address, -1), g_ascii_strdown(name, -1)) == 0)
++                        if(name && address && g_ascii_strcasecmp(address, name) == 0)
+                         {
+                             device = device_new(object_path);
+                         }
+diff --git a/src/lib/manager.c b/src/lib/manager.c
+index 891fc45..d506ae6 100644
+--- a/src/lib/manager.c
++++ b/src/lib/manager.c
+@@ -200,8 +200,11 @@ GPtrArray *manager_get_adapters(Manager *self)
+         g_variant_iter_init(&ii, ifaces_and_properties);
+         while (g_variant_iter_next(&ii, "{&s@a{sv}}", &interface_name, &properties))
+         {
+-            if (g_strstr_len(g_ascii_strdown(interface_name, -1), -1, "adapter"))
++            char* interface_name_lowercase = g_ascii_strdown(interface_name, -1);
++            if (strstr(interface_name_lowercase, "adapter"))
+                 g_ptr_array_add(adapter_array, (gpointer) g_strdup(object_path));
++
++            g_free(interface_name_lowercase);
+             g_variant_unref(properties);
+         }
+         g_variant_unref(ifaces_and_properties);
+diff --git a/src/lib/properties.c b/src/lib/properties.c
+index 8b913d5..70a7640 100644
+--- a/src/lib/properties.c
++++ b/src/lib/properties.c
+@@ -205,12 +205,12 @@ static void _properties_create_gdbus_proxy(Properties *self, GError **error)
+ {
+     if(self->priv->dbus_type && self->priv->dbus_service_name && self->priv->dbus_object_path)
+     {
+-        if(g_ascii_strcasecmp(g_ascii_strdown(self->priv->dbus_type, -1), "system") == 0)
++        if(g_ascii_strcasecmp(self->priv->dbus_type, "system") == 0)
+         {
+             g_assert(system_conn != NULL);
+             self->priv->proxy = g_dbus_proxy_new_sync(system_conn, G_DBUS_PROXY_FLAGS_NONE, NULL, self->priv->dbus_service_name, self->priv->dbus_object_path, PROPERTIES_DBUS_INTERFACE, NULL, error);
+         }
+-        else if(g_ascii_strcasecmp(g_ascii_strdown(self->priv->dbus_type, -1), "session") == 0)
++        else if(g_ascii_strcasecmp(self->priv->dbus_type, "session") == 0)
+         {
+             g_assert(session_conn != NULL);
+             self->priv->proxy = g_dbus_proxy_new_sync(session_conn, G_DBUS_PROXY_FLAGS_NONE, NULL, self->priv->dbus_service_name, self->priv->dbus_object_path, PROPERTIES_DBUS_INTERFACE, NULL, error);
+-- 
+2.34.1
+
+
+From 7ca191164a3a3d8867b1a4af7cd349dc53569fa3 Mon Sep 17 00:00:00 2001
+Message-Id: <7ca191164a3a3d8867b1a4af7cd349dc53569fa3.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Sun, 8 Nov 2020 14:04:36 -0500
+Subject: [PATCH 4/9] Don't leak g_variant_lookup_value results in bt-obex
+
+---
+ src/bt-obex.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/src/bt-obex.c b/src/bt-obex.c
+index 8aacb40..0f044a5 100644
+--- a/src/bt-obex.c
++++ b/src/bt-obex.c
+@@ -213,15 +213,24 @@ static void _obex_opp_client_object_manager_handler(GDBusConnection *connection,
+             g_hash_table_insert(_transfers, g_strdup(interface_object_path), t);
+ 
+             ObexTransferInfo *info = g_malloc0(sizeof(ObexTransferInfo));
+-            info->filesize = g_variant_get_uint64(g_variant_lookup_value(properties, "Size", NULL));
+-            info->filename = g_strdup(g_variant_get_string(g_variant_lookup_value(properties, "Name", NULL), NULL));
+-            info->status = g_strdup(g_variant_get_string(g_variant_lookup_value(properties, "Status", NULL), NULL));
+-            ObexSession *session = obex_session_new(g_variant_get_string(g_variant_lookup_value(properties, "Session", NULL), NULL));
+-            
++
++            GVariant* size_variant = g_variant_lookup_value(properties, "Size", NULL);
++            GVariant* name_variant = g_variant_lookup_value(properties, "Name", NULL);
++            GVariant* status_variant = g_variant_lookup_value(properties, "Status", NULL);
++            GVariant* session_variant = g_variant_lookup_value(properties, "Session", NULL);
++
++            info->filesize = g_variant_get_uint64(size_variant);
++            info->filename = g_variant_dup_string(name_variant, NULL);
++            info->status = g_variant_dup_string(status_variant, NULL);
++            ObexSession *session = obex_session_new(g_variant_get_string(session_variant, NULL));
+             info->obex_root = g_strdup(obex_session_get_root(session, NULL));
+-            
++
++            g_variant_unref(size_variant);
++            g_variant_unref(name_variant);
++            g_variant_unref(status_variant);
++            g_variant_unref(session_variant);
+             g_object_unref(session);
+-            
++
+             g_hash_table_insert(_transfer_infos, g_strdup(interface_object_path), info);
+             if(g_strcmp0(info->status, "queued") == 0)
+                 g_print("[Transfer#%s] Waiting...\n", info->filename);
+-- 
+2.34.1
+
+
+From 7100380b710b36f8e31748ac5bf0e6ffb7c4eed7 Mon Sep 17 00:00:00 2001
+Message-Id: <7100380b710b36f8e31748ac5bf0e6ffb7c4eed7.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Thu, 12 Nov 2020 21:41:55 -0500
+Subject: [PATCH 5/9] Correctly free temporary values in bt-obex
+
+---
+ src/bt-obex.c     | 35 +++++++++++++++++++++++++----------
+ src/lib/helpers.c |  3 ++-
+ 2 files changed, 27 insertions(+), 11 deletions(-)
+
+diff --git a/src/bt-obex.c b/src/bt-obex.c
+index 0f044a5..547186b 100644
+--- a/src/bt-obex.c
++++ b/src/bt-obex.c
+@@ -70,25 +70,32 @@ static void _obex_server_object_manager_handler(GDBusConnection *connection, con
+         const gchar *interface_object_path = g_variant_get_string(g_variant_get_child_value(parameters, 0), NULL);
+         GVariant *interfaces_and_properties = g_variant_get_child_value(parameters, 1);
+         GVariant *properties = NULL;
+-        
++
+         if(g_variant_lookup(interfaces_and_properties, OBEX_TRANSFER_DBUS_INTERFACE, "@a{sv}", &properties))
+         {
+             g_print("[OBEX Server] Transfer started\n");
+             ObexTransfer *t = obex_transfer_new(interface_object_path);
+             g_hash_table_insert(_transfers, g_strdup(interface_object_path), t);
+-            
++
++            GVariant* size_variant = g_variant_lookup_value(properties, "Size", NULL);
++            GVariant* status_variant = g_variant_lookup_value(properties, "Status", NULL);
++            GVariant* session_variant = g_variant_lookup_value(properties, "Session", NULL);
++
+             ObexTransferInfo *info = g_malloc0(sizeof(ObexTransferInfo));
+-            info->filesize = g_variant_get_uint64(g_variant_lookup_value(properties, "Size", NULL));
+-            info->status = g_strdup(g_variant_get_string(g_variant_lookup_value(properties, "Status", NULL), NULL));
+-            ObexSession *session = obex_session_new(g_variant_get_string(g_variant_lookup_value(properties, "Session", NULL), NULL));
+-            
++            info->filesize = g_variant_get_uint64(size_variant);
++            info->status = g_strdup(g_variant_get_string(status_variant, NULL));
++
++            ObexSession *session = obex_session_new(g_variant_get_string(session_variant, NULL));
+             info->obex_root = g_strdup(obex_session_get_root(session, NULL));
+-            
+             g_object_unref(session);
++
++            g_variant_unref(size_variant);
++            g_variant_unref(status_variant);
++            g_variant_unref(session_variant);
+             
+             g_hash_table_insert(_transfer_infos, g_strdup(interface_object_path), info);
+         }
+-        
++
+         if(g_variant_lookup(interfaces_and_properties, OBEX_SESSION_DBUS_INTERFACE, "@a{sv}", &properties))
+         {
+             g_print("[OBEX Server] OBEX session opened\n");
+@@ -177,7 +184,12 @@ static void _obex_server_properties_handler(GDBusConnection *connection, const g
+             {
+                 g_print("[OBEX Server] Transfer succeeded\n");
+                 ObexTransferInfo *info = g_hash_table_lookup(_transfer_infos, object_path);
+-                g_rename(g_build_filename(info->obex_root, info->filename, NULL), g_build_filename(_root_path, info->filename, NULL));
++
++                gchar* old_name = g_build_filename(info->obex_root, info->filename, NULL);
++                gchar* new_name = g_build_filename(_root_path, info->filename, NULL);
++                g_rename(old_name, new_name);
++                g_free(old_name);
++                g_free(new_name);
+             }
+             else if(g_strcmp0(status, "error") == 0)
+             {
+@@ -202,7 +214,8 @@ static void _obex_opp_client_object_manager_handler(GDBusConnection *connection,
+ {
+     if(g_strcmp0(signal_name, "InterfacesAdded") == 0)
+     {
+-        const gchar *interface_object_path = g_variant_get_string(g_variant_get_child_value(parameters, 0), NULL);
++        GVariant* interface_value = g_variant_get_child_value(parameters, 0);
++        const gchar *interface_object_path = g_variant_get_string(interface_value, NULL);
+         GVariant *interfaces_and_properties = g_variant_get_child_value(parameters, 1);
+         GVariant *properties = NULL;
+         
+@@ -242,6 +255,8 @@ static void _obex_opp_client_object_manager_handler(GDBusConnection *connection,
+         }
+         
+         g_variant_unref(interfaces_and_properties);
++        g_variant_unref(interface_value);
++
+         if(properties)
+             g_variant_unref(properties);
+     }
+diff --git a/src/lib/helpers.c b/src/lib/helpers.c
+index b61bc07..d9e2257 100644
+--- a/src/lib/helpers.c
++++ b/src/lib/helpers.c
+@@ -171,7 +171,7 @@ Adapter *find_adapter(const gchar *name, GError **error)
+     else
+     {
+         // Try to find by name
+-        const GPtrArray *adapters_list = manager_get_adapters(manager);
++        GPtrArray *adapters_list = manager_get_adapters(manager);
+         g_assert(adapters_list != NULL);
+         for (int i = 0; i < adapters_list->len; i++)
+         {
+@@ -193,6 +193,7 @@ Adapter *find_adapter(const gchar *name, GError **error)
+             g_object_unref(adapter);
+             adapter = NULL;
+         }
++        g_ptr_array_unref(adapters_list);
+     }
+ 
+     g_object_unref(manager);
+-- 
+2.34.1
+
+
+From 860fb6e19a7bc272722c36a980004044bc9906e5 Mon Sep 17 00:00:00 2001
+Message-Id: <860fb6e19a7bc272722c36a980004044bc9906e5.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Thu, 12 Nov 2020 21:45:51 -0500
+Subject: [PATCH 6/9] Use g_hash_table_new_full() instead of manual freeing
+
+---
+ src/bt-obex.c | 56 +++++++++++++++++----------------------------------
+ 1 file changed, 18 insertions(+), 38 deletions(-)
+
+diff --git a/src/bt-obex.c b/src/bt-obex.c
+index 547186b..413c12d 100644
+--- a/src/bt-obex.c
++++ b/src/bt-obex.c
+@@ -55,6 +55,14 @@ struct _ObexTransferInfo {
+     gchar *status;
+ };
+ 
++static void obex_transfer_info_free(ObexTransferInfo* info)
++{
++    g_free(info->filename);
++    g_free(info->obex_root);
++    g_free(info->status);
++    g_free(info);
++}
++
+ static void sigterm_handler(int sig)
+ {
+     g_message("%s received", sig == SIGTERM ? "SIGTERM" : "SIGINT");
+@@ -117,10 +125,7 @@ static void _obex_server_object_manager_handler(GDBusConnection *connection, con
+             if(g_strcmp0(*inf, OBEX_TRANSFER_DBUS_INTERFACE) == 0)
+             {
+                 g_print("[OBEX Server] OBEX transfer closed\n");
+-                ObexTransfer *transfer = g_hash_table_lookup(_transfers, interface_object_path);
+                 g_hash_table_remove(_transfers, interface_object_path);
+-                g_object_unref(transfer);
+-                g_free(g_hash_table_lookup(_transfer_infos, interface_object_path));
+                 g_hash_table_remove(_transfer_infos, interface_object_path);
+             }
+             
+@@ -272,10 +277,7 @@ static void _obex_opp_client_object_manager_handler(GDBusConnection *connection,
+             if(g_strcmp0(*inf, OBEX_TRANSFER_DBUS_INTERFACE) == 0)
+             {
+                 // g_print("[OBEX Client] OBEX transfer closed\n");
+-                ObexTransfer *transfer = g_hash_table_lookup(_transfers, interface_object_path);
+                 g_hash_table_remove(_transfers, interface_object_path);
+-                g_object_unref(transfer);
+-                g_free(g_hash_table_lookup(_transfer_infos, interface_object_path));
+                 g_hash_table_remove(_transfer_infos, interface_object_path);
+                 if (g_main_loop_is_running(mainloop))
+                     g_main_loop_quit(mainloop);
+@@ -514,8 +516,8 @@ int main(int argc, char *argv[])
+             exit_if_error(error);
+         }
+ 
+-        _transfers = g_hash_table_new(g_str_hash, g_str_equal);
+-        _transfer_infos = g_hash_table_new(g_str_hash, g_str_equal);
++        _transfers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref);
++        _transfer_infos = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, (GDestroyNotify)obex_transfer_info_free);
+ 
+         ObexAgentManager *manager = obex_agent_manager_new();
+         
+@@ -552,21 +554,10 @@ int main(int argc, char *argv[])
+         g_hash_table_iter_init(&iter, _transfers);
+         while (g_hash_table_iter_next(&iter, &key, &value))
+         {
+-            ObexTransfer *t = OBEX_TRANSFER(value);
+-            obex_transfer_cancel(t, NULL); // skip errors
+-            g_object_unref(t);
+-            g_hash_table_iter_remove(&iter);
+-        }
+-        g_hash_table_unref(_transfers);
+-        
+-        // Remove transfer information
+-        g_hash_table_iter_init(&iter, _transfer_infos);
+-        while (g_hash_table_iter_next(&iter, &key, &value))
+-        {
+-            g_free(value);
+-            g_hash_table_iter_remove(&iter);
++            obex_transfer_cancel(OBEX_TRANSFER(value), NULL);
+         }
+         g_hash_table_unref(_transfers);
++        g_hash_table_unref(_transfer_infos);
+ 
+         g_dbus_connection_signal_unsubscribe(session_conn, obex_server_object_id);
+         g_dbus_connection_signal_unsubscribe(session_conn, obex_server_properties_id);
+@@ -588,8 +579,8 @@ int main(int argc, char *argv[])
+             exit_if_error(error);
+         }
+         
+-        _transfers = g_hash_table_new(g_str_hash, g_str_equal);
+-        _transfer_infos = g_hash_table_new(g_str_hash, g_str_equal);
++        _transfers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref);
++        _transfer_infos = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+ 
+         gchar * files_to_send[] = {NULL, NULL};
+         files_to_send[0] = g_path_is_absolute(opp_file_arg) ? g_strdup(opp_file_arg) : get_absolute_path(opp_file_arg);
+@@ -663,24 +654,13 @@ int main(int argc, char *argv[])
+         g_hash_table_iter_init(&iter, _transfers);
+         while (g_hash_table_iter_next(&iter, &key, &value))
+         {
+-            ObexTransfer *t = OBEX_TRANSFER(value);
+-            obex_transfer_cancel(t, NULL); // skip errors
+-            g_object_unref(t);
+-            g_hash_table_iter_remove(&iter);
++            obex_transfer_cancel(OBEX_TRANSFER(value), NULL);
+         }
+         g_hash_table_unref(_transfers);
+-        
+-        // Remove transfer information objects
+-        g_hash_table_iter_init(&iter, _transfer_infos);
+-        while (g_hash_table_iter_next(&iter, &key, &value))
+-        {
+-            g_free(value);
+-            g_hash_table_iter_remove(&iter);
+-        }
+-        g_hash_table_unref(_transfers);
+-        
+-        g_object_unref(client);
+ 
++        g_hash_table_unref(_transfer_infos);
++        g_object_unref(client);
++        g_object_unref(session);
+         g_variant_unref(device_dict);
+ 
+         g_free(src_address);
+-- 
+2.34.1
+
+
+From 9804eb7e5996c52cc542eef59ba3b5f4d0b0b2f9 Mon Sep 17 00:00:00 2001
+Message-Id: <9804eb7e5996c52cc542eef59ba3b5f4d0b0b2f9.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Thu, 12 Nov 2020 21:51:34 -0500
+Subject: [PATCH 7/9] Don't set filesize if we don't know the size
+
+I only meant to fix the g_variant_unref warning, but fixing all of them
+works too!
+---
+ src/bt-obex.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/src/bt-obex.c b/src/bt-obex.c
+index 413c12d..219d458 100644
+--- a/src/bt-obex.c
++++ b/src/bt-obex.c
+@@ -90,14 +90,22 @@ static void _obex_server_object_manager_handler(GDBusConnection *connection, con
+             GVariant* session_variant = g_variant_lookup_value(properties, "Session", NULL);
+ 
+             ObexTransferInfo *info = g_malloc0(sizeof(ObexTransferInfo));
+-            info->filesize = g_variant_get_uint64(size_variant);
+             info->status = g_strdup(g_variant_get_string(status_variant, NULL));
+ 
+             ObexSession *session = obex_session_new(g_variant_get_string(session_variant, NULL));
+             info->obex_root = g_strdup(obex_session_get_root(session, NULL));
+             g_object_unref(session);
+ 
+-            g_variant_unref(size_variant);
++            if (size_variant != NULL)
++            {
++                info->filesize = g_variant_get_uint64(size_variant);
++                g_variant_unref(size_variant);
++            }
++            else
++            {
++                info->filesize = 0;
++            }
++
+             g_variant_unref(status_variant);
+             g_variant_unref(session_variant);
+             
+-- 
+2.34.1
+
+
+From 9566f84464d486983ec597945bc4d5d1594ed830 Mon Sep 17 00:00:00 2001
+Message-Id: <9566f84464d486983ec597945bc4d5d1594ed830.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Sun, 15 Nov 2020 16:18:36 -0500
+Subject: [PATCH 8/9] Fix a use-after-free in bt-obex
+
+---
+ src/bt-obex.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bt-obex.c b/src/bt-obex.c
+index 219d458..7dc5d6b 100644
+--- a/src/bt-obex.c
++++ b/src/bt-obex.c
+@@ -626,7 +626,7 @@ int main(int argc, char *argv[])
+         mainloop = g_main_loop_new(NULL, FALSE);
+ 
+         ObexClient *client = obex_client_new();
+-        const gchar *session_path = obex_client_create_session(client, dst_address, device_dict, &error);
++        const gchar *session_path = obex_client_create_session(client, dst_address, g_variant_ref(device_dict), &error);
+         exit_if_error(error);
+         ObexSession *session = obex_session_new(session_path);
+         ObexObjectPush *oop = obex_object_push_new(obex_session_get_dbus_object_path(session));
+-- 
+2.34.1
+
+
+From 5271a4c6419b54a0b18070d39bfc69fae2819c00 Mon Sep 17 00:00:00 2001
+Message-Id: <5271a4c6419b54a0b18070d39bfc69fae2819c00.1710791277.git.joerg.sommer@navimatix.de>
+In-Reply-To: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+References: <e5db2eec2591f0109f0eb7c2631055210b55f2f5.1710791277.git.joerg.sommer@navimatix.de>
+From: thatlittlegit <personal@thatlittlegit.tk>
+Date: Sat, 21 Nov 2020 13:09:46 -0500
+Subject: [PATCH 9/9] Fix running sdptool if it isn't in $PATH
+
+---
+ src/bt-device.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/bt-device.c b/src/bt-device.c
+index a739b98..948a10c 100644
+--- a/src/bt-device.c
++++ b/src/bt-device.c
+@@ -331,9 +331,9 @@ static GHashTable *_bt_device_sdp_browse(const gchar *device_path, const gchar *
+         }
+         
+         if(pattern == NULL || strlen(pattern) == 0)
+-            execl("/bin/sdptool", "/bin/sdptool", "browse", "--xml", device_path, (char *) 0);
++            execlp("sdptool", "sdptool", "browse", "--xml", device_path, (char *) 0);
+         else
+-            execl("/bin/sdptool", "/bin/sdptool", "browse", "--xml", "--uuid", pattern, device_path, (char *) 0);
++            execlp("sdptool", "sdptool", "browse", "--xml", "--uuid", pattern, device_path, (char *) 0);
+         
+     }
+     if(pid == -1)
+-- 
+2.34.1
+

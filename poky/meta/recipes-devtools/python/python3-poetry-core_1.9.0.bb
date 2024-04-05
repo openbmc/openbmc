@@ -18,8 +18,8 @@ LIC_FILES_CHKSUM = "\
 SRC_URI[sha256sum] = "fa7a4001eae8aa572ee84f35feb510b321bd652e5cf9293249d62853e1f935a2"
 
 inherit python_poetry_core pypi
-PYPI_ARCHIVE_NAME = "poetry_core-${PV}.${PYPI_PACKAGE_EXT}"
-S = "${WORKDIR}/poetry_core-${PV}"
+
+PYPI_PACKAGE = "poetry_core"
 
 RDEPENDS:${PN}:append:class-target = "\
     python3-compression \

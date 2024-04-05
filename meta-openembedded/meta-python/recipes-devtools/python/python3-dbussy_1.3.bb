@@ -12,8 +12,6 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-PIP_INSTALL_PACKAGE = "DBussy"
-
 RDEPENDS:${PN} += "\
     python3-asyncio \
     python3-core \

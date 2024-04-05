@@ -7,7 +7,7 @@ Signed-off-by: Tim Orling <TicoTimo@gmail.com>
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1892,7 +1892,16 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libblu
+@@ -1891,7 +1891,16 @@ PKG_ENABLE_MODULES_VLC([BLURAY], [libblu
  dnl
  dnl  OpenCV wrapper and example filters
  dnl

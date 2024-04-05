@@ -14,6 +14,7 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 inherit gnomebase pkgconfig gettext gtk-doc vala gobject-introspection manpages features_check
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('PACKAGECONFIG', 'goa', 'opengl', '', d)}"
 
 do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/gdata/.libs"

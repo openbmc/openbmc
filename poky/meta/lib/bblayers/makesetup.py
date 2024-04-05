@@ -9,7 +9,6 @@ import os
 import sys
 
 import bb.utils
-import bb.process
 
 from bblayers.common import LayerPlugin
 
@@ -24,24 +23,11 @@ def plugin_init(plugins):
 
 class MakeSetupPlugin(LayerPlugin):
 
-    def _get_repo_path(self, layer_path):
-        repo_path, _ = bb.process.run('git rev-parse --show-toplevel', cwd=layer_path)
-        return repo_path.strip()
-
-    def _get_remotes(self, repo_path):
+    def _get_remotes_with_url(self, repo_path):
         remotes = {}
-        remotes_list,_ = bb.process.run('git remote', cwd=repo_path)
-        for r in remotes_list.split():
-            uri,_ = bb.process.run('git remote get-url {r}'.format(r=r), cwd=repo_path)
-            remotes[r] = {'uri':uri.strip()}
+        for r in oe.buildcfg.get_metadata_git_remotes(repo_path):
+            remotes[r] = {'uri':oe.buildcfg.get_metadata_git_remote_url(repo_path, r)}
         return remotes
-
-    def _get_describe(self, repo_path):
-        try:
-            describe,_ = bb.process.run('git describe --tags', cwd=repo_path)
-        except bb.process.ExecutionError:
-            return ""
-        return describe.strip()
 
     def _is_submodule(self, repo_path):
         # This is slightly brittle: git does not offer a way to tell whether
@@ -56,10 +42,7 @@ class MakeSetupPlugin(LayerPlugin):
         available here. """
         repos = {}
         layers = oe.buildcfg.get_layer_revisions(self.tinfoil.config_data)
-        try:
-            destdir_repo = self._get_repo_path(destdir)
-        except bb.process.ExecutionError:
-            destdir_repo = None
+        destdir_repo = oe.buildcfg.get_metadata_git_toplevel(destdir)
 
         for (l_path, l_name, l_branch, l_rev, l_ismodified) in layers:
             if l_name == 'workspace':
@@ -67,12 +50,16 @@ class MakeSetupPlugin(LayerPlugin):
             if l_ismodified:
                 logger.error("Layer {name} in {path} has uncommitted modifications or is not in a git repository.".format(name=l_name,path=l_path))
                 return
-            repo_path = self._get_repo_path(l_path)
+            repo_path = oe.buildcfg.get_metadata_git_toplevel(l_path)
 
             if self._is_submodule(repo_path):
                 continue
             if repo_path not in repos.keys():
-                repos[repo_path] = {'path':os.path.basename(repo_path),'git-remote':{'rev':l_rev, 'branch':l_branch, 'remotes':self._get_remotes(repo_path), 'describe':self._get_describe(repo_path)}}
+                repos[repo_path] = {'path':os.path.basename(repo_path),'git-remote':{
+                        'rev':l_rev,
+                        'branch':l_branch,
+                        'remotes':self._get_remotes_with_url(repo_path),
+                        'describe':oe.buildcfg.get_metadata_git_describe(repo_path)}}
                 if repo_path == destdir_repo:
                     repos[repo_path]['contains_this_file'] = True
                 if not repos[repo_path]['git-remote']['remotes'] and not repos[repo_path]['contains_this_file']:

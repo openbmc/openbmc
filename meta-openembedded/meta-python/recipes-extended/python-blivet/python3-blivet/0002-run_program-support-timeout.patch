@@ -1,4 +1,4 @@
-From 713cf821ebe17f9e1771502a85e0905ea04dafae Mon Sep 17 00:00:00 2001
+From 8a18a6c1dea7cce6669d0eeb4230e85aa88d8e44 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Nov 2018 17:03:58 +0800
 Subject: [PATCH 02/11] run_program support timeout
@@ -7,14 +7,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- blivet/util.py | 70 ++++++++++++++++++++++++++++++++++------------------------
+ blivet/util.py | 70 +++++++++++++++++++++++++++++---------------------
  1 file changed, 41 insertions(+), 29 deletions(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index 4eac8b9..4f05076 100644
+index f8a8f88..a5da7b6 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -158,6 +158,30 @@ class Path(str):
+@@ -171,6 +171,30 @@ class Path(str):
      def __hash__(self):
          return self._path.__hash__()
  
@@ -45,7 +45,7 @@ index 4eac8b9..4f05076 100644
  
  def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=False, binary_output=False):
      if env_prune is None:
-@@ -180,35 +204,23 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
+@@ -193,35 +217,23 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
              stderr_dir = subprocess.STDOUT
          else:
              stderr_dir = subprocess.PIPE
@@ -98,6 +98,3 @@ index 4eac8b9..4f05076 100644
  
  
  def run_program(*args, **kwargs):
--- 
-2.7.4
-

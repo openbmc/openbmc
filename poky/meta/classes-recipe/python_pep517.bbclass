@@ -42,7 +42,7 @@ python_pep517_do_compile () {
 do_compile[cleandirs] += "${PEP517_WHEEL_PATH}"
 
 python_pep517_do_install () {
-    COUNT=$(find ${PEP517_WHEEL_PATH} -name '*.whl' | wc -l)
+    COUNT=$(find ${PEP517_WHEEL_PATH} -name '*.whl' -maxdepth 1 | wc -l)
     if test $COUNT -eq 0; then
         bbfatal No wheels found in ${PEP517_WHEEL_PATH}
     elif test $COUNT -gt 1; then

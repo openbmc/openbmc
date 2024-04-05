@@ -10,189 +10,214 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
----
- acinclude.m4                                                | 4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac        | 4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_firebird/configure.ac   | 4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_iodbc/configure.ac      | 4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_mysql/configure.ac      | 6 +++---
- src/modules/rlm_sql/drivers/rlm_sql_oracle/configure.ac     | 2 +-
- src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac | 4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_unixodbc/configure.ac   | 4 ++--
- 8 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index a953d0e1b6..ede143d3c2 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -115,7 +115,7 @@ dnl #
- dnl #  Try to guess possible locations.
- dnl #
- if test "x$smart_lib" = "x"; then
--  for try in /usr/local/lib /opt/lib; do
-+  for try in $smart_lib_dir; do
-     AC_MSG_CHECKING([for $2 in -l$1 in $try])
-     LIBS="-l$1 $old_LIBS"
-     CPPFLAGS="-L$try -Wl,-rpath,$try $old_CPPFLAGS"
-@@ -155,7 +155,7 @@ ac_safe=`echo "$1" | sed 'y%./+-%__pm%'`
+Rebased for 3.2.3
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ m4/fr_smart_check_include.m4                                |    2 +-
+ m4/fr_smart_check_lib.m4                                    |   22 ----------------------
+ src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac        |    4 ++--
+ src/modules/rlm_sql/drivers/rlm_sql_firebird/configure.ac   |    4 ++--
+ src/modules/rlm_sql/drivers/rlm_sql_iodbc/configure.ac      |    4 ++--
+ src/modules/rlm_sql/drivers/rlm_sql_mysql/configure.ac      |    6 +++---
+ src/modules/rlm_sql/drivers/rlm_sql_oracle/configure.ac     |    2 +-
+ src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac |    4 ++--
+ src/modules/rlm_sql/drivers/rlm_sql_unixodbc/configure.ac   |    4 ++--
+ 9 files changed, 15 insertions(+), 37 deletions(-)
+
+diff --git a/m4/fr_smart_check_include.m4 b/m4/fr_smart_check_include.m4
+index e7d4443f9c..2b69704f98 100644
+--- a/m4/fr_smart_check_include.m4
++++ b/m4/fr_smart_check_include.m4
+@@ -9,7 +9,7 @@ ac_safe=`echo "$1" | sed 'y%./+-%__pm%'`
  old_CPPFLAGS="$CPPFLAGS"
  smart_include=
  dnl #  The default directories we search in (in addition to the compilers search path)
 -smart_include_dir="/usr/local/include /opt/include"
-+smart_include_dir=
++smart_include_dir=""
  
  dnl #  Our local versions
  _smart_try_dir=
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac
-index 44f84aa27e..23a1899591 100644
+index 0d94ee9bf6..6108e62054 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac
-@@ -61,14 +61,14 @@ if test x$with_[]modname != xno; then
- 		esac])
+@@ -58,14 +58,14 @@ AC_ARG_WITH(ibmdb2-dir,
+ 	esac])
  
- 	dnl Check for SQLConnect in -ldb2
--	smart_try_dir="$ibmdb2_lib_dir /usr/local/db2/lib /usr/IBMdb2/V7.1/lib"
-+	smart_try_dir="$ibmdb2_lib_dir"
- 	FR_SMART_CHECK_LIB(db2, SQLConnect)
- 	if test "x$ac_cv_lib_db2_SQLConnect" != xyes; then
- 		fail="$fail libdb2"
- 	fi
+ dnl Check for SQLConnect in -ldb2
+-smart_try_dir="$ibmdb2_lib_dir /usr/local/db2/lib /usr/IBMdb2/V7.1/lib"
++smart_try_dir="$ibmdb2_lib_dir"
+ FR_SMART_CHECK_LIB(db2, SQLConnect)
+ if test "x$ac_cv_lib_db2_SQLConnect" != xyes; then
+ 	FR_MODULE_FAIL([libdb2])
+ fi
  
- 	dnl Check for sqlcli.h
--	smart_try_dir="$ibmdb2_include_dir /usr/local/db2/include /usr/IBMdb2/V7.1/include"
-+	smart_try_dir="$ibmdb2_include_dir"
- 	FR_SMART_CHECK_INCLUDE(sqlcli.h)
- 	if test "x$ac_cv_header_sqlcli_h" != xyes; then
- 		fail="$fail sqlcli.h"
+ dnl Check for sqlcli.h
+-smart_try_dir="$ibmdb2_include_dir /usr/local/db2/include /usr/IBMdb2/V7.1/include"
++smart_try_dir="$ibmdb2_include_dir"
+ FR_SMART_CHECK_INCLUDE(sqlcli.h)
+ if test "x$ac_cv_header_sqlcli_h" != xyes; then
+ 	FR_MODULE_FAIL([sqlcli.h])
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_firebird/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_firebird/configure.ac
-index 4c2fd7ba9e..10c864def5 100644
+index 5aa7b4b6ee..2eda5b6cc5 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_firebird/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_firebird/configure.ac
-@@ -60,14 +60,14 @@ if test x$with_[]modname != xno; then
- 		esac])
+@@ -58,14 +58,14 @@ AC_ARG_WITH(firebird-dir,
+ 	esac])
  
- 	dnl Check for isc_attach_database in -lfbclient
--	smart_try_dir="$firebird_lib_dir /usr/lib/firebird2/lib /usr/local/firebird/lib"
-+	smart_try_dir="$firebird_lib_dir"
- 	FR_SMART_CHECK_LIB(fbclient, isc_attach_database)
- 	if test "x$ac_cv_lib_fbclient_isc_attach_database" != xyes; then
- 		fail="$fail libfbclient"
- 	fi
+ dnl Check for isc_attach_database in -lfbclient
+-smart_try_dir="$firebird_lib_dir /usr/lib/firebird2/lib /usr/local/firebird/lib"
++smart_try_dir="$firebird_lib_dir"
+ FR_SMART_CHECK_LIB(fbclient, isc_attach_database)
+ if test "x$ac_cv_lib_fbclient_isc_attach_database" != xyes; then
+ 	FR_MODULE_FAIL([libfbclient])
+ fi
  
- 	dnl Check for ibase.h
--	smart_try_dir="$firebird_include_dir /usr/lib/firebird2/include /usr/local/firebird/include"
-+	smart_try_dir="$firebird_include_dir"
- 	FR_SMART_CHECK_INCLUDE(ibase.h)
- 	if test "x$ac_cv_header_ibase_h" != xyes; then
- 		fail="$fail ibase.h"
+ dnl Check for ibase.h
+-smart_try_dir="$firebird_include_dir /usr/lib/firebird2/include /usr/local/firebird/include"
++smart_try_dir="$firebird_include_dir"
+ FR_SMART_CHECK_INCLUDE(ibase.h)
+ if test "x$ac_cv_header_ibase_h" != xyes; then
+ 	FR_MODULE_FAIL([ibase.h])
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_iodbc/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_iodbc/configure.ac
-index d26ac9c431..6e4500e948 100644
+index d96216aca8..88cbc469f7 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_iodbc/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_iodbc/configure.ac
-@@ -61,14 +61,14 @@ if test x$with_[]modname != xno; then
- 		esac])
+@@ -58,14 +58,14 @@ AC_ARG_WITH(iodbc-dir,
+ 	esac])
  
- 	dnl Check for SQLConnect in -liodbc
--	smart_try_dir="$iodbc_lib_dir /usr/lib /usr/lib/iodbc /usr/local/lib/iodbc /usr/local/iodbc/lib/iodbc"
-+	smart_try_dir="$iodbc_lib_dir"
- 	FR_SMART_CHECK_LIB(iodbc, SQLConnect)
- 	if test "x$ac_cv_lib_iodbc_SQLConnect" != xyes; then
- 		fail="$fail libiodbc"
- 	fi
+ dnl Check for SQLConnect in -liodbc
+-smart_try_dir="$iodbc_lib_dir /usr/lib /usr/lib/iodbc /usr/local/lib/iodbc /usr/local/iodbc/lib/iodbc"
++smart_try_dir="$iodbc_lib_dir"
+ FR_SMART_CHECK_LIB(iodbc, SQLConnect)
+ if test "x$ac_cv_lib_iodbc_SQLConnect" != xyes; then
+ 	FR_MODULE_FAIL([libiodbc])
+ fi
  
- 	dnl Check for isql.h
--	smart_try_dir="$iodbc_include_dir /usr/include /usr/include/iodbc /usr/local/iodbc/include"
-+	smart_try_dir="$iodbc_include_dir"
- 	FR_SMART_CHECK_INCLUDE(isql.h)
- 	if test "x$ac_cv_header_isql_h" != xyes; then
- 		fail="$fail isql.h"
+ dnl Check for isql.h
+-smart_try_dir="$iodbc_include_dir /usr/include /usr/include/iodbc /usr/local/iodbc/include"
++smart_try_dir="$iodbc_include_dir"
+ FR_SMART_CHECK_INCLUDE(isql.h)
+ if test "x$ac_cv_header_isql_h" != xyes; then
+ 	FR_MODULE_FAIL([isql.h])
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_mysql/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_mysql/configure.ac
-index df36da77bf..31359041c7 100644
+index d36aecbda6..201a623d4e 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_mysql/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_mysql/configure.ac
-@@ -140,7 +140,7 @@ if test x$with_[]modname != xno; then
+@@ -138,7 +138,7 @@ fi
  
- 	dnl # Check for libmysqlclient_r
- 	if test "x$have_a_libmysqlclient" != "xyes"; then
--	    smart_try_dir="$mysql_lib_dir /usr/lib /usr/lib/mysql /usr/local/lib/mysql /usr/local/mysql/lib/mysql"
-+	    smart_try_dir="$mysql_lib_dir"
- 	    FR_SMART_CHECK_LIB(mysqlclient_r, mysql_init)
- 	    if test "x$ac_cv_lib_mysqlclient_r_mysql_init" = "xyes"; then
- 			have_a_libmysqlclient='yes'
-@@ -149,7 +149,7 @@ if test x$with_[]modname != xno; then
+ dnl # Check for libmysqlclient_r
+ if test "x$have_a_libmysqlclient" != "xyes"; then
+-    smart_try_dir="$mysql_lib_dir /usr/lib /usr/lib/mysql /usr/local/lib/mysql /usr/local/mysql/lib/mysql"
++    smart_try_dir="$mysql_lib_dir"
+     FR_SMART_CHECK_LIB(mysqlclient_r, mysql_init)
+     if test "x$ac_cv_lib_mysqlclient_r_mysql_init" = "xyes"; then
+ 		have_a_libmysqlclient='yes'
+@@ -147,7 +147,7 @@ fi
  
- 	dnl # Check for libmysqlclient
- 	if test "x$have_a_libmysqlclient" != "xyes"; then
--	    smart_try_dir="$mysql_lib_dir /usr/lib /usr/lib/mysql /usr/local/lib/mysql /usr/local/mysql/lib/mysql"
-+	    smart_try_dir="$mysql_lib_dir"
- 	    FR_SMART_CHECK_LIB(mysqlclient, mysql_init)
- 	    if test "x$ac_cv_lib_mysqlclient_mysql_init" = "xyes"; then
- 			have_a_libmysqlclient='yes'
-@@ -243,7 +243,7 @@ if test x$with_[]modname != xno; then
-     fi
+ dnl # Check for libmysqlclient
+ if test "x$have_a_libmysqlclient" != "xyes"; then
+-    smart_try_dir="$mysql_lib_dir /usr/lib /usr/lib/mysql /usr/local/lib/mysql /usr/local/mysql/lib/mysql"
++    smart_try_dir="$mysql_lib_dir"
+     FR_SMART_CHECK_LIB(mysqlclient, mysql_init)
+     if test "x$ac_cv_lib_mysqlclient_mysql_init" = "xyes"; then
+ 		have_a_libmysqlclient='yes'
+@@ -242,7 +242,7 @@ if test "x$have_mysql_h" != "xyes"; then
+ fi
  
-     if test "x$have_mysql_h" != "xyes"; then
--		smart_try_dir="$mysql_include_dir /usr/local/include /usr/local/mysql/include"
-+		smart_try_dir="$mysql_include_dir"
- 		FR_SMART_CHECK_INCLUDE(mysql/mysql.h)
- 		if test "x$ac_cv_header_mysql_mysql_h" = "xyes"; then
- 	    	AC_DEFINE(HAVE_MYSQL_MYSQL_H, [], [Define if you have <mysql/mysql.h>])
+ if test "x$have_mysql_h" != "xyes"; then
+-	smart_try_dir="$mysql_include_dir /usr/local/include /usr/local/mysql/include"
++	smart_try_dir="$mysql_include_dir"
+ 	FR_SMART_CHECK_INCLUDE(mysql/mysql.h)
+ 	if test "x$ac_cv_header_mysql_mysql_h" = "xyes"; then
+ 	AC_DEFINE(HAVE_MYSQL_MYSQL_H, [], [Define if you have <mysql/mysql.h>])
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_oracle/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_oracle/configure.ac
-index 3b45da582a..03e6607d2b 100644
+index f31b7d2c5a..67bbf66df5 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_oracle/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_oracle/configure.ac
-@@ -68,7 +68,7 @@ if test x$with_[]modname != xno; then
-     dnl # Check for header files
-     dnl ############################################################
+@@ -66,7 +66,7 @@ dnl ############################################################
+ dnl # Check for header files
+ dnl ############################################################
  
--    smart_try_dir="$oracle_include_dir /usr/local/instaclient/include"
-+    smart_try_dir="$oracle_include_dir"
+-smart_try_dir="$oracle_include_dir /usr/local/instaclient/include"
++smart_try_dir="$oracle_include_dir"
  
-     if test "x$ORACLE_HOME" != "x"; then
+ if test "x$ORACLE_HOME" != "x"; then
  	smart_try_dir="${smart_try_dir} ${ORACLE_HOME}/include"
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac
-index 8ac1022e89..d46c0f66bf 100644
+index 46587e4099..b41c51bda7 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac
-@@ -45,7 +45,7 @@ if test x$with_[]modname != xno; then
- 	  esac ]
- 	)
+@@ -43,7 +43,7 @@ AC_ARG_WITH(rlm-sql-postgresql-include-dir,
+ 		;;
+ 	esac])
  
--	smart_try_dir="$rlm_sql_postgresql_include_dir /usr/include/postgresql /usr/local/pgsql/include /usr/include/pgsql"
-+	smart_try_dir="$rlm_sql_postgresql_include_dir"
- 	FR_SMART_CHECK_INCLUDE(libpq-fe.h)
- 	if test "x$ac_cv_header_libpqmfe_h" != "xyes"; then
- 		fail="$fail libpq-fe.h"
-@@ -94,7 +94,7 @@ if test x$with_[]modname != xno; then
- 		  ])
- 	fi
+-smart_try_dir="$rlm_sql_postgresql_include_dir /usr/include/postgresql /usr/local/pgsql/include /usr/include/pgsql"
++smart_try_dir="$rlm_sql_postgresql_include_dir"
+ FR_SMART_CHECK_INCLUDE(libpq-fe.h)
+ if test "x$ac_cv_header_libpqmfe_h" != "xyes"; then
+ 	FR_MODULE_FAIL([libpq-fe.h])
+@@ -95,7 +95,7 @@ else
+ 		])
+ fi
  
--	smart_try_dir="$rlm_sql_postgresql_lib_dir /usr/lib /usr/local/pgsql/lib"
-+	smart_try_dir="$rlm_sql_postgresql_lib_dir"
- 	FR_SMART_CHECK_LIB(pq, PQconnectdb)
- 	if test "x$ac_cv_lib_pq_PQconnectdb" != "xyes"; then
- 		fail="$fail libpq"
+-smart_try_dir="$rlm_sql_postgresql_lib_dir /usr/lib /usr/local/pgsql/lib"
++smart_try_dir="$rlm_sql_postgresql_lib_dir"
+ FR_SMART_CHECK_LIB(pq, PQconnectdb)
+ if test "x$ac_cv_lib_pq_PQconnectdb" != "xyes"; then
+ 	FR_MODULE_FAIL([libpq])
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_unixodbc/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_unixodbc/configure.ac
-index f10279fe1f..0081a338c8 100644
+index 3bdfae6032..ce68c312c6 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_unixodbc/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_unixodbc/configure.ac
-@@ -61,14 +61,14 @@ if test x$with_[]modname != xno; then
- 		esac])
+@@ -58,14 +58,14 @@ AC_ARG_WITH(unixodbc-dir,
+ 	esac])
  
- 	dnl Check for SQLConnect in -lodbc
--	smart_try_dir="$unixodbc_lib_dir /usr/local/unixodbc/lib"
-+	smart_try_dir="$unixodbc_lib_dir"
- 	FR_SMART_CHECK_LIB(odbc, SQLConnect)
- 	if test "x$ac_cv_lib_odbc_SQLConnect" != xyes; then
- 		fail="$fail libodbc"
- 	fi
+ dnl Check for SQLConnect in -lodbc
+-smart_try_dir="$unixodbc_lib_dir /usr/local/unixodbc/lib"
++smart_try_dir="$unixodbc_lib_dir"
+ FR_SMART_CHECK_LIB(odbc, SQLConnect)
+ if test "x$ac_cv_lib_odbc_SQLConnect" != xyes; then
+ 	FR_MODULE_FAIL([libodbc])
+ fi
  
- 	dnl Check for sql.h
--	smart_try_dir="$unixodbc_include_dir /usr/local/unixodbc/include"
-+	smart_try_dir="$unixodbc_include_dir"
- 	FR_SMART_CHECK_INCLUDE(sql.h)
- 	if test "x$ac_cv_header_sql_h" != xyes; then
- 		fail="$fail sql.h"
--- 
-2.25.1
-
+ dnl Check for sql.h
+-smart_try_dir="$unixodbc_include_dir /usr/local/unixodbc/include"
++smart_try_dir="$unixodbc_include_dir"
+ FR_SMART_CHECK_INCLUDE(sql.h)
+ if test "x$ac_cv_header_sql_h" != xyes; then
+ 	FR_MODULE_FAIL([sql.h])
+diff --git a/m4/fr_smart_check_lib.m4 b/m4/fr_smart_check_lib.m4
+index 16ac5b3c5e..0f5e9fc6d6 100644
+--- a/m4/fr_smart_check_lib.m4
++++ b/m4/fr_smart_check_lib.m4
+@@ -64,28 +64,6 @@ if test "x$smart_lib" = "x"; then
+   LIBS="$old_LIBS"
+ fi
+ 
+-dnl #
+-dnl #  Try to guess possible locations.
+-dnl #
+-if test "x$smart_lib" = "x"; then
+-  for try in /usr/local/lib /opt/lib; do
+-    AC_MSG_CHECKING([for $2 in -l$1 in $try])
+-    LIBS="-l$1 $old_LIBS"
+-    CPPFLAGS="-L$try -Wl,-rpath,$try $old_CPPFLAGS"
+-    AC_TRY_LINK([extern char $2();],
+-		[$2()],
+-		[
+-		  smart_lib="-l$1"
+-		  smart_ldflags="-L$try -Wl,-rpath,$try"
+-		  AC_MSG_RESULT(yes)
+-		  break
+-		],
+-		[AC_MSG_RESULT(no)])
+-  done
+-  LIBS="$old_LIBS"
+-  CPPFLAGS="$old_CPPFLAGS"
+-fi
+-
+ dnl #
+ dnl #  Found it, set the appropriate variable.
+ dnl #

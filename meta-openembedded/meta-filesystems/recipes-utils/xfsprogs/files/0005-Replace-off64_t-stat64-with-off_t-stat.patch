@@ -42,18 +42,18 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  26 files changed, 74 insertions(+), 74 deletions(-)
 
 diff --git a/copy/xfs_copy.c b/copy/xfs_copy.c
-index 79f6594..854fd7f 100644
+index 0420649..98a578a 100644
 --- a/copy/xfs_copy.c
 +++ b/copy/xfs_copy.c
-@@ -888,7 +888,7 @@ main(int argc, char **argv)
+@@ -881,7 +881,7 @@ main(int argc, char **argv)
  			}
  		} else  {
- 			char	*lb[XFS_MAX_SECTORSIZE] = { NULL };
+ 			char	*lb = memalign(wbuf_align, XFS_MAX_SECTORSIZE);
 -			off64_t	off;
 +			off_t	off;
+ 			ssize_t	len;
  
  			/* ensure device files are sufficiently large */
- 
 diff --git a/fsr/xfs_fsr.c b/fsr/xfs_fsr.c
 index ba02506..12fffbd 100644
 --- a/fsr/xfs_fsr.c
@@ -68,7 +68,7 @@ index ba02506..12fffbd 100644
  	int 		ct, wc, wc_b4;
  	char		ffname[SMBUFSZ];
 diff --git a/io/bmap.c b/io/bmap.c
-index 27383ca..0b14bb7 100644
+index 722a389..6182e1c 100644
 --- a/io/bmap.c
 +++ b/io/bmap.c
 @@ -257,7 +257,7 @@ bmap_f(
@@ -186,7 +186,7 @@ index 7db5184..bf11963 100644
  	swidth = (fsgeo->swidth * fsgeo->blocksize);
  
 diff --git a/io/io.h b/io/io.h
-index 64b7a66..5f42301 100644
+index fe474fa..68e5e48 100644
 --- a/io/io.h
 +++ b/io/io.h
 @@ -53,7 +53,7 @@ extern int stat_f(int argc, char **argv);
@@ -603,7 +603,7 @@ index 1d04919..a74b613 100644
  
  	init_cvtnum(&blocksize, &sectsize);
 diff --git a/libxfs/rdwr.c b/libxfs/rdwr.c
-index d5aad3e..0faa05b 100644
+index 0e33211..153007d 100644
 --- a/libxfs/rdwr.c
 +++ b/libxfs/rdwr.c
 @@ -576,7 +576,7 @@ libxfs_balloc(
@@ -615,8 +615,8 @@ index d5aad3e..0faa05b 100644
  {
  	int	sts;
  
-@@ -639,7 +639,7 @@ libxfs_readbufr_map(struct xfs_buftarg *btp, struct xfs_buf *bp, int flags)
- 	fd = libxfs_device_to_fd(btp->bt_bdev);
+@@ -638,7 +638,7 @@ libxfs_readbufr_map(struct xfs_buftarg *btp, struct xfs_buf *bp, int flags)
+ 
  	buf = bp->b_addr;
  	for (i = 0; i < bp->b_nmaps; i++) {
 -		off64_t	offset = LIBXFS_BBTOOFF64(bp->b_maps[i].bm_bn);
@@ -624,7 +624,7 @@ index d5aad3e..0faa05b 100644
  		int len = BBTOB(bp->b_maps[i].bm_len);
  
  		error = __read_buf(fd, buf, len, offset, flags);
-@@ -798,7 +798,7 @@ err:
+@@ -797,7 +797,7 @@ err:
  }
  
  static int
@@ -633,7 +633,7 @@ index d5aad3e..0faa05b 100644
  {
  	int	sts;
  
-@@ -864,7 +864,7 @@ libxfs_bwrite(
+@@ -863,7 +863,7 @@ libxfs_bwrite(
  		void	*buf = bp->b_addr;
  
  		for (i = 0; i < bp->b_nmaps; i++) {
@@ -643,20 +643,20 @@ index d5aad3e..0faa05b 100644
  
  			bp->b_error = __write_buf(fd, buf, len, offset,
 diff --git a/mdrestore/xfs_mdrestore.c b/mdrestore/xfs_mdrestore.c
-index 7c1a66c..bb54e38 100644
+index 8e3998d..334bdd2 100644
 --- a/mdrestore/xfs_mdrestore.c
 +++ b/mdrestore/xfs_mdrestore.c
-@@ -116,7 +116,7 @@ perform_restore(
+@@ -160,7 +160,7 @@ verify_device_size(
+ 	} else {
  		/* ensure device is sufficiently large enough */
- 
- 		char		*lb[XFS_MAX_SECTORSIZE] = { NULL };
+ 		char		lb[XFS_MAX_SECTORSIZE] = { 0 };
 -		off64_t		off;
 +		off_t		off;
  
- 		off = sb.sb_dblocks * sb.sb_blocksize - sizeof(lb);
- 		if (pwrite(dst_fd, lb, sizeof(lb), off) < 0)
+ 		off = nr_blocks * blocksize - sizeof(lb);
+ 		if (pwrite(dev_fd, lb, sizeof(lb), off) < 0)
 diff --git a/repair/prefetch.c b/repair/prefetch.c
-index 017750e..35b5013 100644
+index 78c1e39..b0dd197 100644
 --- a/repair/prefetch.c
 +++ b/repair/prefetch.c
 @@ -475,7 +475,7 @@ pf_batch_read(
@@ -669,7 +669,7 @@ index 017750e..35b5013 100644
  	int			i;
  	int			inode_bufs;
 diff --git a/scrub/spacemap.c b/scrub/spacemap.c
-index 03440d3..00bee17 100644
+index b6fd411..9cefe07 100644
 --- a/scrub/spacemap.c
 +++ b/scrub/spacemap.c
 @@ -97,11 +97,11 @@ scan_ag_rmaps(
@@ -688,7 +688,7 @@ index 03440d3..00bee17 100644
  	memset(keys, 0, sizeof(struct fsmap) * 2);
  	keys->fmr_device = ctx->fsinfo.fs_datadev;
 diff --git a/spaceman/freesp.c b/spaceman/freesp.c
-index 423568a..df878ce 100644
+index 70dcdb5..f5177cb 100644
 --- a/spaceman/freesp.c
 +++ b/spaceman/freesp.c
 @@ -62,7 +62,7 @@ static void

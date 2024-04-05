@@ -1,13 +1,12 @@
-From e6889d60891383ce6aa66aa3db30255af58bcf3c Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+From 29221ae42e424c6100b8c313d2b61801430c872d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller=20installed=5Ftests=20is=20false?=
+ <schnitzeltony@gmail.com>
 Date: Wed, 27 Oct 2021 20:04:02 +0200
 Subject: [PATCH] meson.build: Do not add dir installed-tests when
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
- installed_tests is false
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -15,16 +14,15 @@ Content-Transfer-Encoding: 8bit
 Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/690]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
-
 ---
  meson.build | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 86239a4..11c04e2 100644
+index 3058e8c..06cf8da 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -681,7 +681,9 @@ endif
+@@ -688,7 +688,9 @@ endif
  
  ### Tests and test setups ######################################################
  

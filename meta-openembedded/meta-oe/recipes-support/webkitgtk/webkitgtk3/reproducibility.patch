@@ -1,4 +1,4 @@
-From 3b25aac4240d8af8bed3b0113110b36980370a98 Mon Sep 17 00:00:00 2001
+From 7336dfd02c20ec9b2a984e1e42d17201af55c8f5 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 27 Jul 2023 22:09:06 +0200
 Subject: [PATCH] webkitgtk3: add recipe
@@ -11,7 +11,6 @@ then this could be submitted upstream, sadly my ruby isn't up to that.
 
 Upstream-Status: Pending [could be reworked]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
-
 ---
  Source/JavaScriptCore/generator/GeneratedFile.rb | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

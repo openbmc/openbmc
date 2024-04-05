@@ -1,0 +1,64 @@
+From 027b649fdb831868e71be01cafdacc49a5f419ab Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Fri, 17 Nov 2023 14:01:21 +0100
+Subject: [PATCH 1/4] valgrind-monitor.py regular expressions should use raw
+ strings
+
+With python 3.12 gdb will produce the following SyntaxWarning when
+loading valgrind-monitor-def.py:
+
+  /usr/share/gdb/auto-load/valgrind-monitor-def.py:214:
+  SyntaxWarning: invalid escape sequence '\['
+    if re.fullmatch("^0x[0123456789ABCDEFabcdef]+\[[^\[\]]+\]$", arg_str):
+
+In a future python version this will become an SyntaxError.
+
+Use a raw strings for the regular expression.
+
+https://bugs.kde.org/show_bug.cgi?id=476708
+(cherry picked from commit 0fbfbe05028ad18efda786a256a2738d2c231ed4)
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=valgrind.git;a=commit;h=027b649fdb831868e71be01cafdacc49a5f419ab]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ NEWS                                          | 13 +++++++++++++
+ coregrind/m_gdbserver/valgrind-monitor-def.py |  2 +-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/NEWS b/NEWS
+index f11da4be8..ee5b4ff11 100644
+--- a/NEWS
++++ b/NEWS
+@@ -1,3 +1,16 @@
++Branch 3.22
++~~~~~~~~~~~
++
++* ==================== FIXED BUGS ====================
++
++The following bugs have been fixed or resolved on this branch.
++
++476708  valgrind-monitor.py regular expressions should use raw strings
++
++To see details of a given bug, visit
++  https://bugs.kde.org/show_bug.cgi?id=XXXXXX
++where XXXXXX is the bug number as listed above.
++
+ Release 3.22.0 (31 Oct 2023)
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+diff --git a/coregrind/m_gdbserver/valgrind-monitor-def.py b/coregrind/m_gdbserver/valgrind-monitor-def.py
+index b4e7b992d..d74b1590c 100644
+--- a/coregrind/m_gdbserver/valgrind-monitor-def.py
++++ b/coregrind/m_gdbserver/valgrind-monitor-def.py
+@@ -211,7 +211,7 @@ class Valgrind_ADDR_LEN_opt(Valgrind_Command):
+ For compatibility reason with the Valgrind gdbserver monitor command,
+ we detect and accept usages such as 0x1234ABCD[10]."""
+     def invoke(self, arg_str : str, from_tty : bool) -> None:
+-        if re.fullmatch("^0x[0123456789ABCDEFabcdef]+\[[^\[\]]+\]$", arg_str):
++        if re.fullmatch(r"^0x[0123456789ABCDEFabcdef]+\[[^\[\]]+\]$", arg_str):
+             arg_str = arg_str.replace("[", " ")
+             arg_str = arg_str.replace("]", " ")
+         eval_execute_2(self, arg_str,
+-- 
+2.44.0
+

@@ -13,9 +13,6 @@ DEPENDS += "n1sdp-board-firmware"
 EXTRA_OECMAKE:append = " \
     -DSCP_N1SDP_SENSOR_LIB_PATH=${RECIPE_SYSROOT}/n1sdp-board-firmware_source/LIB/sensor.a \
 "
-# scp-firmware version aligning to Arm Reference Solutions N1SDP-2023.06.22 Release
-SRCREV = "543ae8ca3c9e38da3058311118fa3ceef1da47f7"
-PV .= "+git"
 
 do_install:append() {
    fiptool \

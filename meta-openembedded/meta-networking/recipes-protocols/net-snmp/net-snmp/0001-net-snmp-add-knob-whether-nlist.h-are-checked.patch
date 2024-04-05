@@ -1,0 +1,38 @@
+From 787269b337e70f073e194c3b361eaf4d5f2291ce Mon Sep 17 00:00:00 2001
+From: Chong Lu <Chong.Lu@windriver.com>
+Date: Thu, 28 May 2020 09:46:34 -0500
+Subject: [PATCH] net-snmp: add knob whether nlist.h are checked
+
+Previously, it still was checked when there was no nlish.h in sysroots directory.
+Add knob to decide whether nlist.h are checked or not.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
+---
+ configure.d/config_os_headers | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.d/config_os_headers b/configure.d/config_os_headers
+index 584064e..c0688f8 100644
+--- a/configure.d/config_os_headers
++++ b/configure.d/config_os_headers
+@@ -37,6 +37,7 @@ AC_CHECK_HEADERS([getopt.h   pthread.h  regex.h      ] dnl
+                  [sys/timeb.h        ])
+ 
+ #  Library and Agent:
++if test "x$with_elf" != "xno"; then
+ AC_CHECK_HEADERS([nlist.h],,,[
+ AC_INCLUDES_DEFAULT
+ [
+@@ -44,6 +45,7 @@ AC_INCLUDES_DEFAULT
+ #define LIBBSD_DISABLE_DEPRECATED 1
+ #endif
+ ]])
++fi
+ 
+ #  Library:
+ AC_CHECK_HEADERS([crt_externs.h                        ] dnl
+-- 
+2.25.1
+

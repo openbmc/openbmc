@@ -29,11 +29,19 @@ do_install:append() {
 	oe_multilib_header gmp.h
 }
 
-do_install:prepend:class-target() {
+fix_absolute_paths () {
         sed -i \
         -e "s|--sysroot=${STAGING_DIR_HOST}||g" \
         -e "s|${DEBUG_PREFIX_MAP}||g" \
          ${B}/gmp.h
+}
+
+do_install:prepend:class-target() {
+    fix_absolute_paths
+}
+
+do_install:prepend:class-nativesdk() {
+    fix_absolute_paths
 }
 
 SSTATE_SCAN_FILES += "gmp.h"

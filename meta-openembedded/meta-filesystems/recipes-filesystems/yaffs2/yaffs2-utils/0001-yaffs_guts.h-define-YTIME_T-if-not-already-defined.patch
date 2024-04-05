@@ -1,0 +1,34 @@
+From 05cc2b958090f96d6fa128da43aa69669625e529 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 5 Mar 2024 12:03:23 +0000
+Subject: [PATCH] yaffs_guts.h: define YTIME_T if not already defined
+
+Fixed:
+yaffs_guts.h:501:9: error: unknown type name 'YTIME_T'
+  501 |         YTIME_T yst_uid;
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ yaffs_guts.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/yaffs_guts.h b/yaffs_guts.h
+index 74ded0b..598271b 100644
+--- a/yaffs_guts.h
++++ b/yaffs_guts.h
+@@ -487,6 +487,10 @@ struct yaffs_obj {
+ 
+ 	YCHAR short_name[YAFFS_SHORT_NAME_LENGTH + 1];
+ 
++#ifndef YTIME_T
++#define YTIME_T     time_t
++#endif
++
+ #ifdef CONFIG_YAFFS_WINCE
+ 	//these are always 64 bits
+ 	u32 win_ctime[2];
+-- 
+2.35.5
+

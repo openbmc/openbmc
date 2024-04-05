@@ -10,7 +10,6 @@ inherit autotools-brokensep update-alternatives
 DEPENDS += "libtirpc"
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
 
-PR = "r2"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/lmbench/lmbench-${PV}.tgz \
            file://lmbench-run \

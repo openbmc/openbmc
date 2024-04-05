@@ -16,8 +16,6 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  acinclude/lib-checks.m4 |  8 ++++++--
  2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/acinclude/krb5.m4 b/acinclude/krb5.m4
-index 2c4e340..64648e3 100644
 --- a/acinclude/krb5.m4
 +++ b/acinclude/krb5.m4
 @@ -57,7 +57,15 @@ main(void)
@@ -37,11 +35,9 @@ index 2c4e340..64648e3 100644
      ])
      SQUID_STATE_ROLLBACK(squid_krb5_heimdal_test)
    ])
-diff --git a/acinclude/lib-checks.m4 b/acinclude/lib-checks.m4
-index 53847a8..850322a 100644
 --- a/acinclude/lib-checks.m4
 +++ b/acinclude/lib-checks.m4
-@@ -205,7 +205,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_CONST_SSL_METHOD],[
+@@ -205,7 +205,9 @@ AC_DEFUN([SQUID_CHECK_OPENSSL_CONST_SSL_
    [
     AC_MSG_RESULT([no])
    ],

@@ -1,0 +1,65 @@
+From 1523e00a2a76e285262c8aa3721b5d99f3f2d612 Mon Sep 17 00:00:00 2001
+From: Thomas Devoogdt <thomas.devoogdt@barco.com>
+Date: Mon, 16 Jan 2023 17:03:30 +0100
+Subject: [PATCH] REGRESSION(257865@main): B3Validate.cpp: fix
+
+ !ENABLE(WEBASSEMBLY_B3JIT)
+
+https://bugs.webkit.org/show_bug.cgi?id=250681
+
+Reviewed by NOBODY (OOPS!).
+
+WasmTypeDefinition.h isn't included if not ENABLE(WEBASSEMBLY_B3JIT).
+Also, toB3Type and simdScalarType are not defined if it is included.
+
+Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
+
+Upstream-Status: Inappropriate [https://bugs.launchpad.net/ubuntu/+source/webkit2gtk/+bug/2008798]
+---
+ Source/JavaScriptCore/b3/B3Validate.cpp | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/Source/JavaScriptCore/b3/B3Validate.cpp b/Source/JavaScriptCore/b3/B3Validate.cpp
+index eaaa3749..1d089783 100644
+--- a/Source/JavaScriptCore/b3/B3Validate.cpp
++++ b/Source/JavaScriptCore/b3/B3Validate.cpp
+@@ -47,6 +47,12 @@
+ #include <wtf/StringPrintStream.h>
+ #include <wtf/text/CString.h>
+ 
++#if ENABLE(WEBASSEMBLY) && ENABLE(WEBASSEMBLY_B3JIT)
++#define simdScalarTypeToB3Type(type) toB3Type(Wasm::simdScalarType(type))
++#else
++#define simdScalarTypeToB3Type(type) B3::Type()
++#endif
++
+ namespace JSC { namespace B3 {
+ 
+ namespace {
+@@ -454,7 +460,7 @@ public:
+             case VectorExtractLane:
+                 VALIDATE(!value->kind().hasExtraBits(), ("At ", *value));
+                 VALIDATE(value->numChildren() == 1, ("At ", *value));
+-                VALIDATE(value->type() == toB3Type(Wasm::simdScalarType(value->asSIMDValue()->simdLane())), ("At ", *value));
++                VALIDATE(value->type() == simdScalarTypeToB3Type(value->asSIMDValue()->simdLane()), ("At ", *value));
+                 VALIDATE(value->child(0)->type() == V128, ("At ", *value));
+                 break;
+             case VectorReplaceLane:
+@@ -462,7 +468,7 @@ public:
+                 VALIDATE(value->numChildren() == 2, ("At ", *value));
+                 VALIDATE(value->type() == V128, ("At ", *value));
+                 VALIDATE(value->child(0)->type() == V128, ("At ", *value));
+-                VALIDATE(value->child(1)->type() == toB3Type(Wasm::simdScalarType(value->asSIMDValue()->simdLane())), ("At ", *value));
++                VALIDATE(value->child(1)->type() == simdScalarTypeToB3Type(value->asSIMDValue()->simdLane()), ("At ", *value));
+                 break;
+             case VectorDupElement:
+                 VALIDATE(!value->kind().hasExtraBits(), ("At ", *value));
+@@ -484,7 +490,7 @@ public:
+                 VALIDATE(!value->kind().hasExtraBits(), ("At ", *value));
+                 VALIDATE(value->numChildren() == 1, ("At ", *value));
+                 VALIDATE(value->type() == V128, ("At ", *value));
+-                VALIDATE(value->child(0)->type() == toB3Type(Wasm::simdScalarType(value->asSIMDValue()->simdLane())), ("At ", *value));
++                VALIDATE(value->child(0)->type() == simdScalarTypeToB3Type(value->asSIMDValue()->simdLane()), ("At ", *value));
+                 break;
+ 
+             case VectorPopcnt:

@@ -1,0 +1,46 @@
+From b5cbe0953a7e7a3c77c7ec69dfe81254475f08c0 Mon Sep 17 00:00:00 2001
+From: Zheng Ruoqin <zhengrq.fnst@fujitsu.com>
+Date: Wed, 9 Jun 2021 15:47:30 +0900
+Subject: [PATCH] net snmp: fix engineBoots value on SIGHUP
+
+Upstream-Status: Pending
+
+Signed-off-by: Marian Florea <marian.florea@windriver.com>
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ agent/snmpd.c    | 1 +
+ snmplib/snmpv3.c | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/agent/snmpd.c b/agent/snmpd.c
+index fe31c87..d9f68dd 100644
+--- a/agent/snmpd.c
++++ b/agent/snmpd.c
+@@ -1169,6 +1169,7 @@ snmpd_reconfig(void)
+     snmp_log(LOG_INFO, "NET-SNMP version %s restarted\n",
+              netsnmp_get_version());
+     update_config();
++    snmp_store(app_name);
+     send_easy_trap(SNMP_TRAP_ENTERPRISESPECIFIC, 3);
+ #ifdef HAVE_SIGPROCMASK
+     ret = sigprocmask(SIG_UNBLOCK, &set, NULL);
+diff --git a/snmplib/snmpv3.c b/snmplib/snmpv3.c
+index be9256f..d17d2e3 100644
+--- a/snmplib/snmpv3.c
++++ b/snmplib/snmpv3.c
+@@ -1071,9 +1071,9 @@ init_snmpv3_post_config(int majorid, int minorid, void *serverarg,
+     /*
+      * if our engineID has changed at all, the boots record must be set to 1 
+      */
+-    if (engineIDLen != oldEngineIDLength ||
++    if (oldEngineIDLength != (size_t)0 && (engineIDLen != oldEngineIDLength ||
+         oldEngineID == NULL || c_engineID == NULL ||
+-        memcmp(oldEngineID, c_engineID, engineIDLen) != 0) {
++        memcmp(oldEngineID, c_engineID, engineIDLen) != 0)) {
+         engineBoots = 1;
+     }
+ 
+-- 
+2.25.1
+

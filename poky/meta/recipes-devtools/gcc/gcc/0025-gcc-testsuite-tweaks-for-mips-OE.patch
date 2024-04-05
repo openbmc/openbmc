@@ -80,8 +80,8 @@ index 9d79b9402e9..e0e5cbb1af8 100644
 +        # Demote run tests to $do-what-limit if set
 +	switch $do_what {
 +	    run {
-+    	        set do_what $do-what-limit
-+  		set dg-do-what $do-what-limit
++    	        set do_what ${do-what-limit}
++  		set dg-do-what ${do-what-limit}
 +	    }
 +        }
 +    }

@@ -1,0 +1,725 @@
+From 8f7fba136391e2020cd0fc9dca76932d3faa21eb Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 8 Mar 2024 16:29:22 +0100
+Subject: [PATCH] CMakeLists.txt, *.pc: respect CMAKE_INSTALL_LIBDIR
+
+* and CMAKE_INSTALL_BINDIR, CMAKE_INSTALL_INCLUDEDIR as well
+* fixes installation paths with multilib
+  lib32-userland fails with:
+
+ERROR: QA Issue: lib32-userland: Files/directories were installed but not shipped in any package:
+  /usr/lib/libbrcmEGL.so
+  /usr/lib/libvchiq_arm.so
+...
+  /usr/lib/pkgconfig/wayland-egl.pc
+Please set FILES such that these items are packaged. Alternatively if they are unneeded, avoid installing them or delete them within do_install.
+lib32-userland: 66 installed and not shipped files. [installed-vs-shipped]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+Upstream-Status: Pending
+
+ CMakeLists.txt                                |  2 +-
+ containers/CMakeLists.txt                     |  2 +-
+ containers/test/CMakeLists.txt                | 24 +++++++++----------
+ helpers/dtoverlay/CMakeLists.txt              |  2 +-
+ .../linux/apps/dtmerge/CMakeLists.txt         |  2 +-
+ .../linux/apps/dtoverlay/CMakeLists.txt       |  6 ++---
+ .../linux/apps/gencmd/CMakeLists.txt          |  2 +-
+ .../apps/hello_pi/hello_audio/CMakeLists.txt  |  2 +-
+ .../hello_pi/hello_dispmanx/CMakeLists.txt    |  2 +-
+ .../apps/hello_pi/hello_encode/CMakeLists.txt |  2 +-
+ .../apps/hello_pi/hello_font/CMakeLists.txt   |  2 +-
+ .../apps/hello_pi/hello_jpeg/CMakeLists.txt   |  2 +-
+ .../apps/hello_pi/hello_teapot/CMakeLists.txt |  2 +-
+ .../apps/hello_pi/hello_tiger/CMakeLists.txt  |  2 +-
+ .../hello_pi/hello_triangle/CMakeLists.txt    |  2 +-
+ .../hello_pi/hello_triangle2/CMakeLists.txt   |  2 +-
+ .../apps/hello_pi/hello_video/CMakeLists.txt  |  2 +-
+ .../hello_pi/hello_videocube/CMakeLists.txt   |  2 +-
+ .../hello_pi/hello_wayland/CMakeLists.txt     |  2 +-
+ .../apps/hello_pi/hello_world/CMakeLists.txt  |  2 +-
+ .../linux/apps/raspicam/CMakeLists.txt        |  2 +-
+ .../linux/apps/smem/CMakeLists.txt            |  2 +-
+ .../linux/apps/tvservice/CMakeLists.txt       |  2 +-
+ .../linux/apps/vcmailbox/CMakeLists.txt       |  2 +-
+ .../linux/libs/bcm_host/CMakeLists.txt        |  2 +-
+ .../linux/libs/debug_sym/CMakeLists.txt       |  6 ++---
+ .../linux/libs/sm/CMakeLists.txt              |  4 ++--
+ interface/khronos/CMakeLists.txt              | 10 ++++----
+ interface/mmal/CMakeLists.txt                 |  4 ++--
+ interface/mmal/components/CMakeLists.txt      |  2 +-
+ interface/mmal/core/CMakeLists.txt            |  4 ++--
+ interface/mmal/util/CMakeLists.txt            |  4 ++--
+ interface/mmal/vc/CMakeLists.txt              |  6 ++---
+ interface/vchiq_arm/CMakeLists.txt            |  4 ++--
+ interface/vcos/CMakeLists.txt                 |  2 +-
+ interface/vcos/generic/CMakeLists.txt         |  2 +-
+ interface/vcos/pthreads/CMakeLists.txt        |  4 ++--
+ interface/vmcs_host/CMakeLists.txt            |  2 +-
+ makefiles/cmake/vmcs.cmake                    |  2 +-
+ middleware/openmaxil/CMakeLists.txt           |  2 +-
+ pkgconfig/bcm_host.pc.in                      |  2 +-
+ pkgconfig/brcmegl.pc.in                       |  2 +-
+ pkgconfig/brcmglesv2.pc.in                    |  2 +-
+ pkgconfig/brcmvg.pc.in                        |  2 +-
+ pkgconfig/mmal.pc.in                          |  2 +-
+ pkgconfig/vcsm.pc.in                          |  2 +-
+ 46 files changed, 73 insertions(+), 73 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3e3c90e..0bb54b7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -136,7 +136,7 @@ if(PKG_CONFIG_FOUND)
+ 	foreach(PCFILE bcm_host.pc brcmegl.pc brcmglesv2.pc brcmvg.pc vcsm.pc mmal.pc openmaxil.pc)
+ 		configure_file("pkgconfig/${PCFILE}.in" "${PCFILE}" @ONLY)
+ 		install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/${PCFILE}"
+-			DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
++			DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+ 	endforeach()
+ endif()
+ # Remove cache entry, if one added by command line
+diff --git a/containers/CMakeLists.txt b/containers/CMakeLists.txt
+index 5570038..6c3d39c 100644
+--- a/containers/CMakeLists.txt
++++ b/containers/CMakeLists.txt
+@@ -66,7 +66,7 @@ set(packetizers_SRCS ${packetizers_SRCS} ${SOURCE_DIR}/h264/avc1_packetizer.c)
+ 
+ add_library(containers ${LIBRARY_TYPE} ${core_SRCS} ${io_SRCS} ${net_SRCS} ${packetizers_SRCS})
+ target_link_libraries(containers vcos)
+-install(TARGETS containers DESTINATION lib)
++install(TARGETS containers DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+ set(container_readers)
+ set(container_writers)
+diff --git a/containers/test/CMakeLists.txt b/containers/test/CMakeLists.txt
+index 7d36352..832ad0f 100644
+--- a/containers/test/CMakeLists.txt
++++ b/containers/test/CMakeLists.txt
+@@ -1,17 +1,17 @@
+ # Generate test application
+ add_executable(containers_test test.c)
+ target_link_libraries(containers_test -Wl,--no-whole-archive containers)
+-install(TARGETS containers_test DESTINATION bin)
++install(TARGETS containers_test DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ # Generate test application
+ add_executable(containers_check_frame_int check_frame_int.c)
+ target_link_libraries(containers_check_frame_int -Wl,--no-whole-archive containers)
+-install(TARGETS containers_check_frame_int DESTINATION bin)
++install(TARGETS containers_check_frame_int DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ # Generate autotest application
+ #add_executable(containers_autotest autotest.cpp crc_32.c)
+ #target_link_libraries(containers_autotest -Wl,--no-whole-archive containers})
+-#install(TARGETS containers_autotest DESTINATION bin)
++#install(TARGETS containers_autotest DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ # Helper code to provide non-blocking console input
+ if (WIN32)
+@@ -28,39 +28,39 @@ add_dependencies(containers_test containers_test_extra)
+ # Generate net test applications
+ add_executable(containers_stream_client stream_client.c ${NB_IO_SOURCE})
+ target_link_libraries(containers_stream_client containers)
+-install(TARGETS containers_stream_client DESTINATION bin)
++install(TARGETS containers_stream_client DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ add_executable(containers_stream_server stream_server.c)
+ target_link_libraries(containers_stream_server containers)
+-install(TARGETS containers_stream_server DESTINATION bin)
++install(TARGETS containers_stream_server DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ add_executable(containers_datagram_sender datagram_sender.c)
+ target_link_libraries(containers_datagram_sender containers)
+-install(TARGETS containers_datagram_sender DESTINATION bin)
++install(TARGETS containers_datagram_sender DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ add_executable(containers_datagram_receiver datagram_receiver.c)
+ target_link_libraries(containers_datagram_receiver containers)
+-install(TARGETS containers_datagram_receiver DESTINATION bin)
++install(TARGETS containers_datagram_receiver DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ add_executable(containers_rtp_decoder rtp_decoder.c ${NB_IO_SOURCE})
+ target_link_libraries(containers_rtp_decoder containers)
+-install(TARGETS containers_rtp_decoder DESTINATION bin)
++install(TARGETS containers_rtp_decoder DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ # Generate URI test application
+ add_executable(containers_test_uri test_uri.c)
+ target_link_libraries(containers_test_uri containers)
+-install(TARGETS containers_test_uri DESTINATION bin)
++install(TARGETS containers_test_uri DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ # Generate URI pipe application
+ add_executable(containers_uri_pipe uri_pipe.c ${NB_IO_SOURCE})
+ target_link_libraries(containers_uri_pipe containers)
+-install(TARGETS containers_uri_pipe DESTINATION bin)
++install(TARGETS containers_uri_pipe DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ # Generate bit stream test application
+ add_executable(containers_test_bits test_bits.c)
+ target_link_libraries(containers_test_bits containers)
+-install(TARGETS containers_test_bits DESTINATION bin)
++install(TARGETS containers_test_bits DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ # Generate packet file dump application
+ add_executable(containers_dump_pktfile dump_pktfile.c)
+-install(TARGETS containers_dump_pktfile DESTINATION bin)
++install(TARGETS containers_dump_pktfile DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/helpers/dtoverlay/CMakeLists.txt b/helpers/dtoverlay/CMakeLists.txt
+index b3bd30f..7e83780 100644
+--- a/helpers/dtoverlay/CMakeLists.txt
++++ b/helpers/dtoverlay/CMakeLists.txt
+@@ -22,4 +22,4 @@ add_library (dtovl ${SHARED}
+ 
+ target_link_libraries(dtovl fdt)
+ 
+-install (TARGETS dtovl DESTINATION lib)
++install (TARGETS dtovl DESTINATION ${CMAKE_INSTALL_LIBDIR})
+diff --git a/host_applications/linux/apps/dtmerge/CMakeLists.txt b/host_applications/linux/apps/dtmerge/CMakeLists.txt
+index d3f7e36..daa91e5 100755
+--- a/host_applications/linux/apps/dtmerge/CMakeLists.txt
++++ b/host_applications/linux/apps/dtmerge/CMakeLists.txt
+@@ -17,5 +17,5 @@ include_directories (
+ add_executable(dtmerge dtmerge.c)
+ target_link_libraries(dtmerge dtovl)
+ 
+-install(TARGETS dtmerge RUNTIME DESTINATION bin)
++install(TARGETS dtmerge RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(FILES dtmerge.1 DESTINATION man/man1)
+diff --git a/host_applications/linux/apps/dtoverlay/CMakeLists.txt b/host_applications/linux/apps/dtoverlay/CMakeLists.txt
+index 97bcadc..238296d 100755
+--- a/host_applications/linux/apps/dtoverlay/CMakeLists.txt
++++ b/host_applications/linux/apps/dtoverlay/CMakeLists.txt
+@@ -16,12 +16,12 @@ include_directories (
+ 
+ add_executable(dtoverlay dtoverlay_main.c utils.c)
+ target_link_libraries(dtoverlay dtovl)
+-install(TARGETS dtoverlay RUNTIME DESTINATION bin)
++install(TARGETS dtoverlay RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(FILES dtoverlay.1 DESTINATION man/man1)
+ 
+ add_custom_command(TARGET dtoverlay POST_BUILD COMMAND ln;-sf;dtoverlay;dtparam)
+-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dtparam DESTINATION bin)
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dtparam DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(FILES dtparam.1 DESTINATION man/man1)
+ 
+ set(DTOVERLAY_SCRIPTS dtoverlay-pre dtoverlay-post)
+-install(PROGRAMS ${DTOVERLAY_SCRIPTS} DESTINATION bin)
++install(PROGRAMS ${DTOVERLAY_SCRIPTS} DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/gencmd/CMakeLists.txt b/host_applications/linux/apps/gencmd/CMakeLists.txt
+index 0c2c32a..fdd2f00 100644
+--- a/host_applications/linux/apps/gencmd/CMakeLists.txt
++++ b/host_applications/linux/apps/gencmd/CMakeLists.txt
+@@ -16,5 +16,5 @@ include_directories( ../../../..
+ 
+ add_executable(vcgencmd gencmd.c)
+ target_link_libraries(vcgencmd vcos vchiq_arm vchostif)
+-install(TARGETS vcgencmd RUNTIME DESTINATION bin)
++install(TARGETS vcgencmd RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(FILES vcgencmd.1 DESTINATION man/man1)
+diff --git a/host_applications/linux/apps/hello_pi/hello_audio/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_audio/CMakeLists.txt
+index 03207c5..8f4d06c 100644
+--- a/host_applications/linux/apps/hello_pi/hello_audio/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_audio/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_dispmanx/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_dispmanx/CMakeLists.txt
+index 0471a1d..fd8b85e 100644
+--- a/host_applications/linux/apps/hello_pi/hello_dispmanx/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_dispmanx/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_encode/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_encode/CMakeLists.txt
+index 147623b..98a197a 100644
+--- a/host_applications/linux/apps/hello_pi/hello_encode/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_encode/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_font/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_font/CMakeLists.txt
+index 448d2cf..1d89f4c 100644
+--- a/host_applications/linux/apps/hello_pi/hello_font/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_font/CMakeLists.txt
+@@ -6,4 +6,4 @@ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ target_link_libraries(${EXEC} vgfont freetype z)
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_jpeg/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_jpeg/CMakeLists.txt
+index a56dda5..f611f8e 100644
+--- a/host_applications/linux/apps/hello_pi/hello_jpeg/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_jpeg/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_teapot/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_teapot/CMakeLists.txt
+index cdb8413..a60da3e 100644
+--- a/host_applications/linux/apps/hello_pi/hello_teapot/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_teapot/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_tiger/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_tiger/CMakeLists.txt
+index b253f3f..1104a8b 100644
+--- a/host_applications/linux/apps/hello_pi/hello_tiger/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_tiger/CMakeLists.txt
+@@ -6,4 +6,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_triangle/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_triangle/CMakeLists.txt
+index 4e8128e..4b738bb 100644
+--- a/host_applications/linux/apps/hello_pi/hello_triangle/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_triangle/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_triangle2/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_triangle2/CMakeLists.txt
+index 390980a..c8c534f 100644
+--- a/host_applications/linux/apps/hello_pi/hello_triangle2/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_triangle2/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_video/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_video/CMakeLists.txt
+index 42187af..6b15ca2 100644
+--- a/host_applications/linux/apps/hello_pi/hello_video/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_video/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_videocube/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_videocube/CMakeLists.txt
+index d7fb059..9612ffe 100644
+--- a/host_applications/linux/apps/hello_pi/hello_videocube/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_videocube/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_wayland/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_wayland/CMakeLists.txt
+index 9a2f75c..9a468a6 100644
+--- a/host_applications/linux/apps/hello_pi/hello_wayland/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_wayland/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS} -lwayland-client -lwayland-egl)
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/hello_pi/hello_world/CMakeLists.txt b/host_applications/linux/apps/hello_pi/hello_world/CMakeLists.txt
+index b0120fe..97d90f6 100644
+--- a/host_applications/linux/apps/hello_pi/hello_world/CMakeLists.txt
++++ b/host_applications/linux/apps/hello_pi/hello_world/CMakeLists.txt
+@@ -5,4 +5,4 @@ add_executable(${EXEC} ${SRCS})
+ target_link_libraries(${EXEC} ${HELLO_PI_LIBS})
+ 
+ install(TARGETS ${EXEC}
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/host_applications/linux/apps/raspicam/CMakeLists.txt b/host_applications/linux/apps/raspicam/CMakeLists.txt
+index f73a4d0..4a9cd88 100644
+--- a/host_applications/linux/apps/raspicam/CMakeLists.txt
++++ b/host_applications/linux/apps/raspicam/CMakeLists.txt
+@@ -66,6 +66,6 @@ target_link_libraries(raspiyuv   ${MMAL_LIBS} vcos bcm_host m)
+ target_link_libraries(raspivid   ${MMAL_LIBS} vcos bcm_host m)
+ target_link_libraries(raspividyuv   ${MMAL_LIBS} vcos bcm_host m)
+ 
+-install(TARGETS raspistill raspiyuv raspivid raspividyuv RUNTIME DESTINATION bin)
++install(TARGETS raspistill raspiyuv raspivid raspividyuv RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(FILES raspistill.1 raspiyuv.1 raspivid.1 raspividyuv.1 DESTINATION man/man1)
+ install(FILES raspicam.7 DESTINATION man/man7)
+diff --git a/host_applications/linux/apps/smem/CMakeLists.txt b/host_applications/linux/apps/smem/CMakeLists.txt
+index 0fa8328..60c9c61 100644
+--- a/host_applications/linux/apps/smem/CMakeLists.txt
++++ b/host_applications/linux/apps/smem/CMakeLists.txt
+@@ -16,5 +16,5 @@ include_directories (
+ add_executable(vcsmem smem.c)
+ target_link_libraries(vcsmem vcos vcsm vchostif)
+ 
+-install(TARGETS vcsmem RUNTIME DESTINATION bin)
++install(TARGETS vcsmem RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+diff --git a/host_applications/linux/apps/tvservice/CMakeLists.txt b/host_applications/linux/apps/tvservice/CMakeLists.txt
+index 0190774..fad5a6b 100644
+--- a/host_applications/linux/apps/tvservice/CMakeLists.txt
++++ b/host_applications/linux/apps/tvservice/CMakeLists.txt
+@@ -3,5 +3,5 @@ add_executable(tvservice tvservice.c)
+ target_link_libraries(tvservice vchostif bcm_host)
+ 
+ install(TARGETS tvservice
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(FILES tvservice.1 DESTINATION man/man1)
+diff --git a/host_applications/linux/apps/vcmailbox/CMakeLists.txt b/host_applications/linux/apps/vcmailbox/CMakeLists.txt
+index d153363..2731724 100644
+--- a/host_applications/linux/apps/vcmailbox/CMakeLists.txt
++++ b/host_applications/linux/apps/vcmailbox/CMakeLists.txt
+@@ -2,6 +2,6 @@ add_executable(vcmailbox vcmailbox.c)
+ target_link_libraries(vcmailbox vchostif)
+ 
+ install(TARGETS vcmailbox
+-        RUNTIME DESTINATION bin)
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ install(FILES vcmailbox.1 DESTINATION man/man1)
+ install(FILES vcmailbox.7 raspiotp.7 raspirev.7 DESTINATION man/man7)
+diff --git a/host_applications/linux/libs/bcm_host/CMakeLists.txt b/host_applications/linux/libs/bcm_host/CMakeLists.txt
+index 7a4ab06..3614943 100644
+--- a/host_applications/linux/libs/bcm_host/CMakeLists.txt
++++ b/host_applications/linux/libs/bcm_host/CMakeLists.txt
+@@ -19,5 +19,5 @@ add_library(bcm_host ${SHARED} bcm_host.c)
+ 
+ target_link_libraries(bcm_host vcos vchostif)
+ 
+-install(TARGETS bcm_host DESTINATION lib)
++install(TARGETS bcm_host DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+diff --git a/host_applications/linux/libs/debug_sym/CMakeLists.txt b/host_applications/linux/libs/debug_sym/CMakeLists.txt
+index d437b99..37eb759 100644
+--- a/host_applications/linux/libs/debug_sym/CMakeLists.txt
++++ b/host_applications/linux/libs/debug_sym/CMakeLists.txt
+@@ -11,6 +11,6 @@ include_directories (
+ add_library(debug_sym ${SHARED} debug_sym.c)
+ add_library(debug_sym_static STATIC debug_sym.c)
+ 
+-install(TARGETS debug_sym DESTINATION lib)
+-install(TARGETS debug_sym_static DESTINATION lib)
+-install(FILES debug_sym.h DESTINATION include/interface/debug_sym)
++install(TARGETS debug_sym DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(TARGETS debug_sym_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(FILES debug_sym.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/debug_sym)
+diff --git a/host_applications/linux/libs/sm/CMakeLists.txt b/host_applications/linux/libs/sm/CMakeLists.txt
+index 5ce5aca..84d8123 100644
+--- a/host_applications/linux/libs/sm/CMakeLists.txt
++++ b/host_applications/linux/libs/sm/CMakeLists.txt
+@@ -14,5 +14,5 @@ add_library(vcsm ${SHARED} user-vcsm.c)
+ 
+ target_link_libraries(vcsm vcos)
+ 
+-install(TARGETS vcsm DESTINATION lib)
+-install(FILES user-vcsm.h DESTINATION include/interface/vcsm)
++install(TARGETS vcsm DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(FILES user-vcsm.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/vcsm)
+diff --git a/interface/khronos/CMakeLists.txt b/interface/khronos/CMakeLists.txt
+index 95c0e11..00316a5 100644
+--- a/interface/khronos/CMakeLists.txt
++++ b/interface/khronos/CMakeLists.txt
+@@ -94,11 +94,11 @@ if (BUILD_WAYLAND)
+    )
+ 
+    add_library(wayland-egl ${SHARED} ${WAYLAND_EGL_SOURCE})
+-   install(TARGETS wayland-egl DESTINATION lib)
++   install(TARGETS wayland-egl DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+    configure_file ("wayland-egl/wayland-egl.pc.in" "wayland-egl/wayland-egl.pc" @ONLY)
+    install (FILES "${CMAKE_CURRENT_BINARY_DIR}/wayland-egl/wayland-egl.pc"
+-            DESTINATION lib/pkgconfig)
++            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+ endif ()
+ 
+ add_library(EGL ${SHARED} ${EGL_SOURCE})
+@@ -126,8 +126,8 @@ target_link_libraries(GLESv2 EGL khrn_client vcos)
+ target_link_libraries(WFC EGL)
+ target_link_libraries(OpenVG EGL)
+ 
+-install(TARGETS EGL GLESv2 OpenVG WFC khrn_client DESTINATION lib)
+-install(TARGETS EGL_static GLESv2_static khrn_static DESTINATION lib)
++install(TARGETS EGL GLESv2 OpenVG WFC khrn_client DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(TARGETS EGL_static GLESv2_static khrn_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+ # recommended names to use to avoid conflicts with mesa libs
+ add_library(brcmEGL ${SHARED} ${EGL_SOURCE})
+@@ -140,4 +140,4 @@ target_link_libraries(brcmGLESv2 brcmEGL khrn_client vcos)
+ target_link_libraries(brcmWFC brcmEGL)
+ target_link_libraries(brcmOpenVG brcmEGL)
+ 
+-install(TARGETS brcmEGL brcmGLESv2 brcmOpenVG brcmWFC DESTINATION lib)
++install(TARGETS brcmEGL brcmGLESv2 brcmOpenVG brcmWFC DESTINATION ${CMAKE_INSTALL_LIBDIR})
+diff --git a/interface/mmal/CMakeLists.txt b/interface/mmal/CMakeLists.txt
+index c5c1642..fe784e8 100644
+--- a/interface/mmal/CMakeLists.txt
++++ b/interface/mmal/CMakeLists.txt
+@@ -16,7 +16,7 @@ add_subdirectory(client)
+ 
+ target_link_libraries(mmal mmal_core mmal_util mmal_vc_client vcos mmal_components)
+ 
+-install(TARGETS mmal DESTINATION lib)
++install(TARGETS mmal DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install(FILES
+    mmal.h
+    mmal_buffer.h
+@@ -36,7 +36,7 @@ install(FILES
+    mmal_pool.h mmal_port.h
+    mmal_queue.h
+    mmal_types.h
+-   DESTINATION include/interface/mmal
++   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/mmal
+ )
+ 
+ # Test apps
+diff --git a/interface/mmal/components/CMakeLists.txt b/interface/mmal/components/CMakeLists.txt
+index d65fa37..4c85de0 100644
+--- a/interface/mmal/components/CMakeLists.txt
++++ b/interface/mmal/components/CMakeLists.txt
+@@ -30,5 +30,5 @@ set(container_libs ${container_libs} containers)
+ target_link_libraries(mmal_components ${container_libs} mmal_util)
+ target_link_libraries(mmal_components mmal_core)
+ 
+-install(TARGETS mmal_components DESTINATION lib)
++install(TARGETS mmal_components DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+diff --git a/interface/mmal/core/CMakeLists.txt b/interface/mmal/core/CMakeLists.txt
+index efa14d9..4fe0779 100644
+--- a/interface/mmal/core/CMakeLists.txt
++++ b/interface/mmal/core/CMakeLists.txt
+@@ -13,7 +13,7 @@ add_library (mmal_core ${LIBRARY_TYPE}
+ 
+ target_link_libraries (mmal_core vcos mmal_vc_client)
+ 
+-install(TARGETS mmal_core DESTINATION lib)
++install(TARGETS mmal_core DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install(FILES
+    mmal_buffer_private.h
+    mmal_clock_private.h
+@@ -21,5 +21,5 @@ install(FILES
+    mmal_core_private.h
+    mmal_port_private.h
+    mmal_events_private.h
+-   DESTINATION include/interface/mmal/core
++   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/mmal/core
+ )
+diff --git a/interface/mmal/util/CMakeLists.txt b/interface/mmal/util/CMakeLists.txt
+index b2a6858..e51afd0 100644
+--- a/interface/mmal/util/CMakeLists.txt
++++ b/interface/mmal/util/CMakeLists.txt
+@@ -12,7 +12,7 @@ add_library (mmal_util ${LIBRARY_TYPE}
+ 
+ target_link_libraries (mmal_util vcos)
+ 
+-install(TARGETS mmal_util DESTINATION lib)
++install(TARGETS mmal_util DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install(FILES
+    mmal_component_wrapper.h
+    mmal_connection.h
+@@ -24,5 +24,5 @@ install(FILES
+    mmal_util.h
+    mmal_util_params.h
+    mmal_util_rational.h
+-   DESTINATION include/interface/mmal/util
++   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/mmal/util
+ )
+diff --git a/interface/mmal/vc/CMakeLists.txt b/interface/mmal/vc/CMakeLists.txt
+index d6e80db..3b9ec64 100644
+--- a/interface/mmal/vc/CMakeLists.txt
++++ b/interface/mmal/vc/CMakeLists.txt
+@@ -8,12 +8,12 @@ target_link_libraries(mmal_vc_client vchiq_arm vcos vcsm)
+ if(BUILD_MMAL_APPS)
+ add_executable(mmal_vc_diag mmal_vc_diag.c)
+ target_link_libraries(mmal_vc_diag mmal mmal_vc_client debug_sym vcos)
+-install(TARGETS mmal_vc_diag RUNTIME DESTINATION bin)
++install(TARGETS mmal_vc_diag RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ endif(BUILD_MMAL_APPS)
+ 
+ include_directories ( ../../../host_applications/linux/libs/sm )
+ 
+-install(TARGETS mmal_vc_client DESTINATION lib)
++install(TARGETS mmal_vc_client DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install(FILES
+    mmal_vc_api.h
+    mmal_vc_api_drm.h
+@@ -22,5 +22,5 @@ install(FILES
+    mmal_vc_msgs.h
+    mmal_vc_opaque_alloc.h
+    mmal_vc_shm.h
+-   DESTINATION include/interface/mmal/vc
++   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/mmal/vc
+ )
+diff --git a/interface/vchiq_arm/CMakeLists.txt b/interface/vchiq_arm/CMakeLists.txt
+index 7af383d..e5a3224 100644
+--- a/interface/vchiq_arm/CMakeLists.txt
++++ b/interface/vchiq_arm/CMakeLists.txt
+@@ -5,7 +5,7 @@ add_library(vchiq_arm SHARED
+ # pull in VCHI cond variable emulation
+ target_link_libraries(vchiq_arm vcos)
+ 
+-install(TARGETS vchiq_arm DESTINATION lib)
++install(TARGETS vchiq_arm DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ #install(FILES etc/10-vchiq.rules DESTINATION /etc/udev/rules.d)
+ 
+ include_directories(../..)
+@@ -17,4 +17,4 @@ target_link_libraries(vchiq_test
+                       vchiq_arm
+                       vcos)
+ 
+-install(TARGETS vchiq_test RUNTIME DESTINATION bin)
++install(TARGETS vchiq_test RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+diff --git a/interface/vcos/CMakeLists.txt b/interface/vcos/CMakeLists.txt
+index 23a8d72..b0924a4 100644
+--- a/interface/vcos/CMakeLists.txt
++++ b/interface/vcos/CMakeLists.txt
+@@ -65,4 +65,4 @@ if (WIN32)
+    configure_file (build_all.bat.in build_all.bat @ONLY)
+ endif ()
+ 
+-#install (FILES ${HEADERS} DESTINATION include/interface/vcos)
++#install (FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/vcos)
+diff --git a/interface/vcos/generic/CMakeLists.txt b/interface/vcos/generic/CMakeLists.txt
+index c09f376..8af98fd 100644
+--- a/interface/vcos/generic/CMakeLists.txt
++++ b/interface/vcos/generic/CMakeLists.txt
+@@ -18,4 +18,4 @@ foreach (header ${HEADERS})
+    configure_file ("${header}" "${VCOS_HEADERS_BUILD_DIR}/generic/${header}" COPYONLY)
+ endforeach ()
+ 
+-install (FILES ${HEADERS} DESTINATION include/interface/vcos/generic)
++install (FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/interface/vcos/generic)
+diff --git a/interface/vcos/pthreads/CMakeLists.txt b/interface/vcos/pthreads/CMakeLists.txt
+index d6cd415..821b3f3 100644
+--- a/interface/vcos/pthreads/CMakeLists.txt
++++ b/interface/vcos/pthreads/CMakeLists.txt
+@@ -50,5 +50,5 @@ else ()
+ endif ()
+ 
+ 
+-#install(FILES ${HEADERS} DESTINATION include)
+-install(TARGETS vcos DESTINATION lib)
++#install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(TARGETS vcos DESTINATION ${CMAKE_INSTALL_LIBDIR})
+diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
+index 76813c9..0984d8a 100755
+--- a/interface/vmcs_host/CMakeLists.txt
++++ b/interface/vmcs_host/CMakeLists.txt
+@@ -35,5 +35,5 @@ target_link_libraries(vchostif vchiq_arm vcos)
+ 
+ #target_link_libraries(bufman WFC)
+ 
+-install(TARGETS ${INSTALL_TARGETS} DESTINATION lib)
++install(TARGETS ${INSTALL_TARGETS} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
+diff --git a/makefiles/cmake/vmcs.cmake b/makefiles/cmake/vmcs.cmake
+index 7c97463..a1eb911 100644
+--- a/makefiles/cmake/vmcs.cmake
++++ b/makefiles/cmake/vmcs.cmake
+@@ -16,7 +16,7 @@ endif()
+ SET(CMAKE_INSTALL_PREFIX "${VMCS_INSTALL_PREFIX}" CACHE INTERNAL "Prefix
+     prepended to install directories" FORCE)
+ if(NOT DEFINED VMCS_PLUGIN_DIR)
+-  SET(VMCS_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_SHARED_LIBRARY_PREFIX}/plugins)
++  SET(VMCS_PLUGIN_DIR ${CMAKE_INSTALL_LIBDIR}/plugins)
+ endif()
+ 
+ # What kind of system are we?
+diff --git a/middleware/openmaxil/CMakeLists.txt b/middleware/openmaxil/CMakeLists.txt
+index 3e9c5f9..c063740 100644
+--- a/middleware/openmaxil/CMakeLists.txt
++++ b/middleware/openmaxil/CMakeLists.txt
+@@ -49,4 +49,4 @@ else ()
+ 
+ endif ()
+ 
+-install (TARGETS openmaxil DESTINATION lib)
++install (TARGETS openmaxil DESTINATION ${CMAKE_INSTALL_LIBDIR})
+diff --git a/pkgconfig/bcm_host.pc.in b/pkgconfig/bcm_host.pc.in
+index c7237c5..2988b42 100644
+--- a/pkgconfig/bcm_host.pc.in
++++ b/pkgconfig/bcm_host.pc.in
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${exec_prefix}/lib
++libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/include
+ 
+ Name: bcm_host
+diff --git a/pkgconfig/brcmegl.pc.in b/pkgconfig/brcmegl.pc.in
+index 5dd3d5b..a45bf22 100644
+--- a/pkgconfig/brcmegl.pc.in
++++ b/pkgconfig/brcmegl.pc.in
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${exec_prefix}/lib
++libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/include
+ 
+ Name: brcmEGL
+diff --git a/pkgconfig/brcmglesv2.pc.in b/pkgconfig/brcmglesv2.pc.in
+index e0e36f5..902fbf3 100644
+--- a/pkgconfig/brcmglesv2.pc.in
++++ b/pkgconfig/brcmglesv2.pc.in
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${exec_prefix}/lib
++libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/include
+ 
+ Name: brcmGLESv2
+diff --git a/pkgconfig/brcmvg.pc.in b/pkgconfig/brcmvg.pc.in
+index 763a44b..98489ee 100644
+--- a/pkgconfig/brcmvg.pc.in
++++ b/pkgconfig/brcmvg.pc.in
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${exec_prefix}/lib
++libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/include
+ 
+ Name: brcmOpenVG
+diff --git a/pkgconfig/mmal.pc.in b/pkgconfig/mmal.pc.in
+index 37d344c..1ffa4f5 100644
+--- a/pkgconfig/mmal.pc.in
++++ b/pkgconfig/mmal.pc.in
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${exec_prefix}/lib
++libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/include
+ 
+ Name: MMAL
+diff --git a/pkgconfig/vcsm.pc.in b/pkgconfig/vcsm.pc.in
+index b12c56f..6f762cb 100644
+--- a/pkgconfig/vcsm.pc.in
++++ b/pkgconfig/vcsm.pc.in
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+-libdir=${exec_prefix}/lib
++libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+ includedir=${prefix}/include
+ 
+ Name: VCSM

@@ -111,10 +111,10 @@ process_verity() {
     # Create wks.in fragment with build specific UUIDs for partitions.
     # Unfortunately the wks.in does not support line continuations...
     # First, the unappended filesystem data partition.
-    echo 'part / --source rawcopy --ondisk sda --sourceparams="file=${DM_VERITY_DEPLOY_DIR}/${DM_VERITY_IMAGE}-${MACHINE}.rootfs.${DM_VERITY_IMAGE_TYPE}.verity" --part-name verityroot --part-type="${DM_VERITY_ROOT_GUID}"'" --uuid=\"$ROOT_UUID\"" > $WKS_INC
+    echo 'part / --source rawcopy --ondisk sda --sourceparams="file=${DM_VERITY_DEPLOY_DIR}/${DM_VERITY_IMAGE}-${MACHINE}${IMAGE_NAME_SUFFIX}.${DM_VERITY_IMAGE_TYPE}.verity" --part-name verityroot --part-type="${DM_VERITY_ROOT_GUID}"'" --uuid=\"$ROOT_UUID\"" > $WKS_INC
 
     # note: no default mount point for hash data partition
-    echo 'part --source rawcopy --ondisk sda --sourceparams="file=${DM_VERITY_DEPLOY_DIR}/${DM_VERITY_IMAGE}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.vhash" --part-name verityhash --part-type="${DM_VERITY_RHASH_GUID}"'" --uuid=\"$RHASH_UUID\"" >> $WKS_INC
+    echo 'part --source rawcopy --ondisk sda --sourceparams="file=${DM_VERITY_DEPLOY_DIR}/${DM_VERITY_IMAGE}-${MACHINE}${IMAGE_NAME_SUFFIX}.${DM_VERITY_IMAGE_TYPE}.vhash" --part-name verityhash --part-type="${DM_VERITY_RHASH_GUID}"'" --uuid=\"$RHASH_UUID\"" >> $WKS_INC
 }
 
 verity_setup() {
@@ -162,7 +162,7 @@ verity_setup() {
 verity_hash() {
     cd ${IMGDEPLOYDIR}
     ln -sf ${IMAGE_NAME}.${DM_VERITY_IMAGE_TYPE}.vhash \
-        ${IMAGE_BASENAME}-${MACHINE}.${DM_VERITY_IMAGE_TYPE}.vhash
+        ${IMAGE_BASENAME}-${MACHINE}${IMAGE_NAME_SUFFIX}.${DM_VERITY_IMAGE_TYPE}.vhash
 }
 
 VERITY_TYPES = " \
@@ -177,6 +177,24 @@ CONVERSION_CMD:verity = "verity_setup ${type}"
 CONVERSION_DEPENDS_verity = "cryptsetup-native"
 IMAGE_CMD:vhash = "verity_hash"
 
+def get_verity_fstypes(d):
+    verity_image = d.getVar('DM_VERITY_IMAGE')
+    verity_type = d.getVar('DM_VERITY_IMAGE_TYPE')
+    verity_hash = d.getVar('DM_VERITY_SEPARATE_HASH')
+    pn = d.getVar('PN')
+
+    fstypes = ""
+    if not pn.endswith(verity_image):
+        return fstypes # This doesn't concern this image
+
+    fstypes = verity_type + ".verity"
+    if verity_hash == "1":
+        fstypes += " vhash"
+
+    return fstypes
+
+IMAGE_FSTYPES += "${@get_verity_fstypes(d)}"
+
 python __anonymous() {
     verity_image = d.getVar('DM_VERITY_IMAGE')
     verity_type = d.getVar('DM_VERITY_IMAGE_TYPE')
@@ -188,15 +206,11 @@ python __anonymous() {
         bb.warn('dm-verity-img class inherited but not used')
         return
 
-    if verity_image != pn:
+    if not pn.endswith(verity_image):
         return # This doesn't concern this image
 
     if len(verity_type.split()) != 1:
         bb.fatal('DM_VERITY_IMAGE_TYPE must contain exactly one type')
-
-    d.appendVar('IMAGE_FSTYPES', ' %s.verity' % verity_type)
-    if verity_hash == "1":
-        d.appendVar('IMAGE_FSTYPES', ' vhash')
 
     # If we're using wic: we'll have to use partition images and not the rootfs
     # source plugin so add the appropriate dependency.

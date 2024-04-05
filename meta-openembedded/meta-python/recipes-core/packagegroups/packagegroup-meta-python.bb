@@ -311,6 +311,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pycodestyle \
     python3-pyconnman \
     python3-pycurl \
+    python3-pydbus \
     python3-pydicti \
     python3-pyephem \
     python3-pyexpect \

@@ -1,0 +1,71 @@
+From 35d2acc61b1b27c0810a80cd21de65f29dc79df7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 24 Mar 2024 11:27:21 -0700
+Subject: [PATCH] ipu3: Use posix basename
+
+musl does not implement GNU basename extention and with latest musl
+the prototype from string.h is also removed [1] which now results in
+compile errors e.g.
+
+../git/utils/ipu3/ipu3-pack.c:21:47: error: call to undeclared function 'basename'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+
+These utilities are using this function in usage() which is used just
+before program exit. Always use the basename APIs from libgen.h which is
+posix implementation
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2024-March/041180.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ utils/ipu3/ipu3-pack.c   | 4 ++--
+ utils/ipu3/ipu3-unpack.c | 3 ++-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/utils/ipu3/ipu3-pack.c b/utils/ipu3/ipu3-pack.c
+index decbfc6c..23d2db8b 100644
+--- a/utils/ipu3/ipu3-pack.c
++++ b/utils/ipu3/ipu3-pack.c
+@@ -8,6 +8,7 @@
+ 
+ #include <errno.h>
+ #include <fcntl.h>
++#include <libgen.h>
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -15,9 +16,8 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
+-static void usage(const char *argv0)
++static void usage(char *argv0)
+ {
+-
+ 	printf("Usage: %s input-file output-file\n", basename(argv0));
+ 	printf("Convert unpacked RAW10 Bayer data to the IPU3 packed Bayer formats\n");
+ 	printf("If the output-file '-', output data will be written to standard output\n");
+diff --git a/utils/ipu3/ipu3-unpack.c b/utils/ipu3/ipu3-unpack.c
+index 9d2c1200..1505a970 100644
+--- a/utils/ipu3/ipu3-unpack.c
++++ b/utils/ipu3/ipu3-unpack.c
+@@ -8,6 +8,7 @@
+ 
+ #include <errno.h>
+ #include <fcntl.h>
++#include <libgen.h>
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <string.h>
+@@ -15,7 +16,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
+-static void usage(const char *argv0)
++static void usage(char *argv0)
+ {
+ 	printf("Usage: %s input-file output-file\n", basename(argv0));
+ 	printf("Unpack the IPU3 raw Bayer format to 16-bit Bayer\n");
+-- 
+2.44.0
+

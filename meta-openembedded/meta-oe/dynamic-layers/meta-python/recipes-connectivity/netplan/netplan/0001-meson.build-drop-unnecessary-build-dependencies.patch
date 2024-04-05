@@ -1,0 +1,58 @@
+From d3aa30f5cd7ba375e006a755752acbcfcd619452 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 6 Mar 2024 19:27:15 +0800
+Subject: [PATCH] meson.build: drop unnecessary build dependencies
+
+The pytest and pycoverage are required by meson test but not for
+building. Mark them as 'required: false' to get rid of unnecessary
+build dependencies.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ meson.build | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 9556836a..30f33fe2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -25,8 +25,8 @@ bash_completions_dir = completions.get_variable(pkgconfig: 'completionsdir', def
+ # Order: Fedora/Mageia/openSUSE || Debian/Ubuntu
+ pyflakes = find_program('pyflakes-3', 'pyflakes3', required: false)
+ pycodestyle = find_program('pycodestyle-3', 'pycodestyle', 'pep8', required: false)
+-pytest = find_program('pytest-3', 'pytest3')  # also requires the pytest-cov plugin
+-pycoverage = find_program('coverage-3', 'python3-coverage')
++pytest = find_program('pytest-3', 'pytest3', required: false)  # also requires the pytest-cov plugin
++pycoverage = find_program('coverage-3', 'python3-coverage', required: false)
+ pandoc = find_program('pandoc', required: false)
+ find = find_program('find')
+ 
+@@ -75,6 +75,7 @@ if get_option('unit_testing')
+ endif
+ 
+ #FIXME: exclude doc/env/
++if pyflakes.found() and pycodestyle.found()
+ test('linting',
+      pyflakes,
+      timeout: 100,
+@@ -91,7 +92,9 @@ test('legacy-tests',
+      find_program('tests/cli_legacy.py'),
+      timeout: 600,
+      env: test_env)
++endif
+ #TODO: split out dbus tests into own test() instance, to run in parallel
++if pycoverage.found()
+ test('unit-tests',
+      pycoverage,
+      args: ['run', '-a', '-m', 'pytest', '-s', '-v', '--cov-append', meson.current_source_dir()],
+@@ -143,4 +146,5 @@ if get_option('b_coverage')
+          priority: -99, # run last
+          is_parallel: false)
+ endif
++endif
+ 
+-- 
+2.25.1
+

@@ -179,7 +179,7 @@ class TerminalFilter(object):
             new[3] = new[3] & ~termios.ECHO
             termios.tcsetattr(fd, termios.TCSADRAIN, new)
             curses.setupterm()
-            if curses.tigetnum("colors") > 2:
+            if curses.tigetnum("colors") > 2 and os.environ.get('NO_COLOR', '') == '':
                 for h in handlers:
                     try:
                         h.formatter.enable_color()

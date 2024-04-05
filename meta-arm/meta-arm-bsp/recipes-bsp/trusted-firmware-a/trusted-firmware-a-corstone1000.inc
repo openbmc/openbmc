@@ -5,9 +5,8 @@ COMPATIBLE_MACHINE = "(corstone1000)"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/corstone1000:"
 SRC_URI:append = " \
 	file://0001-Fix-FF-A-version-in-SPMC-manifest.patch \
-	file://0002-feat-corstone1000-bl2-loads-fip-based-on-metadata.patch \
-	file://0003-psci-SMCCC_ARCH_FEATURES-discovery-through-PSCI_FEATURES.patch \
-	file://0004-fix-corstone1000-add-cpuhelper-to-makefile.patch \
+	file://0002-fix-corstone1000-pass-spsr-value-explicitly.patch \
+	file://0003-fix-spmd-remove-EL3-interrupt-registration.patch \
        "
 
 TFA_DEBUG = "1"
@@ -51,4 +50,5 @@ EXTRA_OEMAKE:append = " \
                         ERRATA_A35_855472=1 \
                         ROT_KEY=plat/arm/board/common/rotpk/arm_rotprivk_rsa.pem \
                         BL32=${RECIPE_SYSROOT}/${nonarch_base_libdir}/firmware/tee-pager_v2.bin \
+                        FVP_USE_GIC_DRIVER=FVP_GICV2 \
                         "

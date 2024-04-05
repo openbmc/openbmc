@@ -1,7 +1,6 @@
 SUMMARY = "All packages for full XFCE installation"
 SECTION = "x11/wm"
 
-PR = "r10"
 
 inherit packagegroup features_check
 
