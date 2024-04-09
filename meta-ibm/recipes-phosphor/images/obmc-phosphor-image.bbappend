@@ -1,6 +1,8 @@
 OBMC_IMAGE_EXTRA_INSTALL:append:ibm-ac-server = " mboxd max31785-msl phosphor-msl-verify liberation-fonts uart-render-controller first-boot-set-hostname"
 OBMC_IMAGE_EXTRA_INSTALL:remove:witherspoon-tacoma = " liberation-fonts uart-render-controller"
 OBMC_IMAGE_EXTRA_INSTALL:append:p10bmc = " mboxd"
+# No host firmware related features for huygens wanted yet
+OBMC_IMAGE_EXTRA_INSTALL:remove:huygens = " mboxd"
 
 IMAGE_FEATURES:append = " obmc-dbus-monitor"
 

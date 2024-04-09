@@ -28,6 +28,7 @@ EXTRA_IBM_LOGGING_PKGS:p10bmc = " \
 RDEPENDS:${PN}-inventory:append:ibm-ac-server = " openpower-fru-vpd openpower-occ-control phosphor-cooling-type phosphor-gpio-monitor-presence"
 RDEPENDS:${PN}-inventory:append:p10bmc = " openpower-fru-vpd openpower-occ-control phosphor-gpio-monitor-presence entity-manager"
 RDEPENDS:${PN}-inventory:append:witherspoon-tacoma = " entity-manager"
+RDEPENDS:${PN}-inventory:remove:huygens = " openpower-occ-control"
 
 RDEPENDS:${PN}-fan-control:append:ibm-ac-server = " fan-watchdog"
 RDEPENDS:${PN}-fan-control:append:p10bmc = " fan-watchdog phosphor-fan-sensor-monitor"
