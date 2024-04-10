@@ -95,8 +95,8 @@
 { "Name": "RSSD30", "LineName": "RSSD30_PRESENT_N", "ActiveLow": true, "Bias": "PULL_UP", "Inventory": "/system/chassis/motherboard/rssd30" },
 { "Name": "RSSD31", "LineName": "RSSD31_PRESENT_N", "ActiveLow": true, "Bias": "PULL_UP", "Inventory": "/system/chassis/motherboard/rssd31" },
 { "Name": "RSSD32", "LineName": "RSSD32_PRESENT_N", "ActiveLow": true, "Bias": "PULL_UP", "Inventory": "/system/chassis/motherboard/rssd32" },
-{ "Name": "CPU0", "LineName": "FM_CPU0_SKTOCC_N", "ActiveLow": true, "Bias": "DISABLE", "Inventory": "/system/chassis/motherboard/cpu0" },
-{ "Name": "CPU1", "LineName": "FM_CPU1_SKTOCC_N", "ActiveLow": true, "Bias": "DISABLE", "Inventory": "/system/chassis/motherboard/cpu1" },
-{ "Name": "CPU2", "LineName": "FM_CPU2_SKTOCC_N", "ActiveLow": true, "Bias": "DISABLE", "Inventory": "/system/chassis/motherboard/cpu2" },
-{ "Name": "CPU3", "LineName": "FM_CPU3_SKTOCC_N", "ActiveLow": true, "Bias": "DISABLE", "Inventory": "/system/chassis/motherboard/cpu3" }
+{ "Name": "CPU0", "LineName": "FM_CPU0_SKTOCC_N", "ActiveLow": true, "Bias": "PULL_UP", "Inventory": "/system/chassis/motherboard/cpu0" },
+{ "Name": "CPU1", "LineName": "FM_CPU1_SKTOCC_N", "ActiveLow": true, "Bias": "PULL_UP", "Inventory": "/system/chassis/motherboard/cpu1" },
+{ "Name": "CPU2", "LineName": "FM_CPU2_SKTOCC_N", "ActiveLow": true, "Bias": "PULL_UP", "Inventory": "/system/chassis/motherboard/cpu2" },
+{ "Name": "CPU3", "LineName": "FM_CPU3_SKTOCC_N", "ActiveLow": true, "Bias": "PULL_UP", "Inventory": "/system/chassis/motherboard/cpu3" }
 ]
