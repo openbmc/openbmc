@@ -7,6 +7,8 @@ PACKAGECONFIG[libpeci] = "-Dlibpeci=enabled,-Dlibpeci=disabled"
 PACKAGECONFIG[crashdump] = "-Dcrashdump=enabled,-Dcrashdump=disabled"
 PACKAGECONFIG[send-to-logger] = "-Dsend-to-logger=enabled,-Dsend-to-logger=disabled"
 
+EXTRA_OEMESON += "-Dtests=disabled"
+
 SRC_URI = "git://github.com/openbmc/host-error-monitor;branch=master;protocol=https"
 
 DEPENDS = "boost sdbusplus libgpiod libpeci phosphor-dbus-interfaces"
