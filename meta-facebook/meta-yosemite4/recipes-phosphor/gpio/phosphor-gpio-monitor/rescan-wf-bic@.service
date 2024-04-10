@@ -1,0 +1,7 @@
+[Unit]
+Description=Rescan WF BIC's EID for slot %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/rescan-wf-bic %i
+SyslogIdentifier=rescan-wf-bic%i

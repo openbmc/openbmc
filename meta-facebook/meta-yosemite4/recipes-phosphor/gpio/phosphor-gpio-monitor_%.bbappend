@@ -12,6 +12,8 @@ SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
             file://rescan-fru-device@.service \
             file://rescan-fru-device \
             file://slot-hot-plug@.service \
+            file://rescan-wf-bic \
+            file://rescan-wf-bic@.service \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -25,6 +27,7 @@ SYSTEMD_SERVICE:${PN} += " \
     slot-hot-plug@.service \
     setup-nic-endpoint-slot@.service \
     remove-nic-endpoint-slot@.service \
+    rescan-wf-bic@.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -39,9 +42,11 @@ do_install:append:() {
     install -m 0644 ${WORKDIR}/slot-hot-plug@.service ${D}${systemd_system_unitdir}/slot-hot-plug@.service
     install -m 0644 ${WORKDIR}/setup-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/remove-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/rescan-wf-bic@.service ${D}${systemd_system_unitdir}/
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${WORKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/rescan-fru-device ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/rescan-wf-bic ${D}${libexecdir}/${PN}/
     install -d ${D}/${bindir}
     install -m 0755 ${WORKDIR}/configure-nic-mctp-endpoint.sh ${D}/${bindir}/
 }

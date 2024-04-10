@@ -15,7 +15,7 @@
         "GpioNum": 10,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@1.service", "rescan-fru-device@1.service"],
+            "RISING": ["probe-slot-device@1.service", "rescan-fru-device@1.service", "rescan-wf-bic@1.service"],
             "FALLING": ["rescan-fru-device@1.service"]
         },
         "Continue": true
@@ -26,7 +26,7 @@
         "GpioNum": 11,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@2.service", "rescan-fru-device@2.service"],
+            "RISING": ["probe-slot-device@2.service", "rescan-fru-device@2.service", "rescan-wf-bic@2.service"],
             "FALLING": ["rescan-fru-device@2.service"]
         },
         "Continue": true
@@ -37,7 +37,7 @@
         "GpioNum": 12,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@3.service", "rescan-fru-device@3.service"],
+            "RISING": ["probe-slot-device@3.service", "rescan-fru-device@3.service", "rescan-wf-bic@3.service"],
             "FALLING": ["rescan-fru-device@3.service"]
         },
         "Continue": true
@@ -48,7 +48,7 @@
         "GpioNum": 13,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@4.service", "rescan-fru-device@4.service"],
+            "RISING": ["probe-slot-device@4.service", "rescan-fru-device@4.service", "rescan-wf-bic@4.service"],
             "FALLING": ["rescan-fru-device@4.service"]
         },
         "Continue": true
@@ -59,7 +59,7 @@
         "GpioNum": 190,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@5.service", "rescan-fru-device@5.service"],
+            "RISING": ["probe-slot-device@5.service", "rescan-fru-device@5.service", "rescan-wf-bic@5.service"],
             "FALLING": ["rescan-fru-device@5.service"]
         },
         "Continue": true
@@ -70,7 +70,7 @@
         "GpioNum": 191,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@6.service", "rescan-fru-device@6.service"],
+            "RISING": ["probe-slot-device@6.service", "rescan-fru-device@6.service", "rescan-wf-bic@6.service"],
             "FALLING": ["rescan-fru-device@6.service"]
         },
         "Continue": true
@@ -81,7 +81,7 @@
         "GpioNum": 195,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@7.service", "rescan-fru-device@7.service"],
+            "RISING": ["probe-slot-device@7.service", "rescan-fru-device@7.service", "rescan-wf-bic@7.service"],
             "FALLING": ["rescan-fru-device@7.service"]
         },
         "Continue": true
@@ -92,7 +92,7 @@
         "GpioNum": 202,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@8.service", "rescan-fru-device@8.service"],
+            "RISING": ["probe-slot-device@8.service", "rescan-fru-device@8.service", "rescan-wf-bic@8.service"],
             "FALLING": ["rescan-fru-device@8.service"]
         },
         "Continue": true
