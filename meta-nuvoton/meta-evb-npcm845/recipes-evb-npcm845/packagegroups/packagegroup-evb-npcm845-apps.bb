@@ -57,4 +57,5 @@ RDEPENDS:${PN}-system = " \
         phosphor-image-signing \
         optee-client \
         optee-test \
+        persistent-net-name \
         "
