@@ -671,6 +671,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c01_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot1/pcie_card1"
+                    ]
                 }
             ]
         },
@@ -698,6 +709,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c02_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot2/pcie_card2"
                     ]
                 }
             ]
@@ -727,6 +749,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c03_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot3/pcie_card3"
+                    ]
                 }
             ]
         },
@@ -754,6 +787,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c04_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot4/pcie_card4"
                     ]
                 }
             ]
@@ -783,6 +827,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c05_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot5/pcie_card5"
+                    ]
                 }
             ]
         },
@@ -810,6 +865,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c06_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot6/pcie_card6"
                     ]
                 }
             ]
@@ -839,6 +905,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c07_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot7/pcie_card7"
+                    ]
                 }
             ]
         },
@@ -866,6 +943,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c08_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8"
                     ]
                 }
             ]
@@ -895,6 +983,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c09_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot9/pcie_card9"
+                    ]
                 }
             ]
         },
@@ -923,6 +1022,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c10_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10"
+                    ]
                 }
             ]
         },
@@ -950,6 +1060,34 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot_c11_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/pcieslot12",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot12/pcie_card12"
                     ]
                 }
             ]
@@ -2587,6 +2725,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm3/cpu1"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme0/drive0"
+                    ]
                 }
             ]
         },
@@ -2614,6 +2763,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme1_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme1/drive1"
                     ]
                 },
                 {
@@ -2658,6 +2818,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme2/drive2"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2692,6 +2863,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme3_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme3/drive3"
                     ]
                 },
                 {
@@ -2736,6 +2918,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme4/drive4"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2770,6 +2963,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme5_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme5/drive5"
                     ]
                 },
                 {
@@ -2814,6 +3018,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme6/drive6"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2848,6 +3063,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme7_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme7/drive7"
                     ]
                 },
                 {
@@ -2892,6 +3118,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme8/drive8"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2926,6 +3163,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme9_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dasd_backplane/nvme9/drive9"
                     ]
                 },
                 {
