@@ -2157,6 +2157,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot0/pcie_card0"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2191,6 +2202,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot1_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot1/pcie_card1"
                     ]
                 },
                 {
@@ -2235,6 +2257,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot2/pcie_card2"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2269,6 +2302,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot3_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot3/pcie_card3"
                     ]
                 },
                 {
@@ -2313,6 +2357,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot4/pcie_card4"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2348,6 +2403,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot6_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot6/pcie_card6"
+                    ]
                 }
             ]
         },
@@ -2375,6 +2441,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot7_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot7/pcie_card7"
                     ]
                 },
                 {
@@ -2419,6 +2496,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2453,6 +2541,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot9_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot9/pcie_card9"
                     ]
                 },
                 {
@@ -2497,6 +2596,17 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
@@ -2536,12 +2646,40 @@
                 {
                     "types":
                     {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "connecting",
                         "fType": "connected_to"
                     },
                     "paths":
                     [
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/pcieslot12",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "contained_by",
+                        "fType": "containing"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot12/pcie_card12"
                     ]
                 }
             ]
