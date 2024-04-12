@@ -1,3 +1,4 @@
 #!/bin/sh
 
-pytest --automake
+pytest --automake \
+-k 'not test_callable_check and not test_on_recv_basic and not test_on_recv_wake and not test_on_recv_async and not test_on_recv_async_error and not test_curve'

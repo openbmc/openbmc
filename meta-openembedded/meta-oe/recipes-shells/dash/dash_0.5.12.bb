@@ -2,7 +2,7 @@ SUMMARY = "Small and fast POSIX-compliant shell"
 HOMEPAGE = "http://gondor.apana.org.au/~herbert/dash/"
 SECTION = "System Environment/Shells"
 
-LICENSE = "BSD-3-Clause & GPL-2.0-or-later"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b5262b4a1a1bff72b48e935531976d2e"
 
 inherit autotools update-alternatives

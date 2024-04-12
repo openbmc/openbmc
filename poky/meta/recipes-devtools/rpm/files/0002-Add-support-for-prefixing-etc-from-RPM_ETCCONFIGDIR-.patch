@@ -1,4 +1,4 @@
-From e53c0e2586bc6f4677db3c6898a6428283a6b785 Mon Sep 17 00:00:00 2001
+From d7143dc4e75c8bcc5cc4c852a4b972942b7e4d07 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 20 Jan 2017 13:33:05 +0200
 Subject: [PATCH] Add support for prefixing /etc from RPM_ETCCONFIGDIR
@@ -9,16 +9,15 @@ from target rootfs instead of its own native sysroot.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  lib/rpmrc.c | 19 ++++++++++++++-----
  1 file changed, 14 insertions(+), 5 deletions(-)
 
 diff --git a/lib/rpmrc.c b/lib/rpmrc.c
-index f39dcfc11..f27f88753 100644
+index 483585ae4..ea858c290 100644
 --- a/lib/rpmrc.c
 +++ b/lib/rpmrc.c
-@@ -455,10 +455,14 @@ const char * lookupInDefaultTable(const char * name,
+@@ -456,10 +456,14 @@ const char * lookupInDefaultTable(const char * name,
  static void setDefaults(void)
  {
      const char *confdir = rpmConfigDir();
@@ -34,7 +33,7 @@ index f39dcfc11..f27f88753 100644
      }
  
  #ifndef MACROFILES
-@@ -468,9 +472,9 @@ static void setDefaults(void)
+@@ -469,9 +473,9 @@ static void setDefaults(void)
  				confdir, "/platform/%{_target}/macros", ":",
  				confdir, "/fileattrs/*.attr", ":",
    				confdir, "/" RPM_VENDOR "/macros", ":",
@@ -47,7 +46,7 @@ index f39dcfc11..f27f88753 100644
      }
  #else
      macrofiles = MACROFILES;
-@@ -1114,7 +1118,11 @@ static void read_auxv(void)
+@@ -1115,7 +1119,11 @@ static void read_auxv(void)
   */
  static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
  {
@@ -60,7 +59,7 @@ index f39dcfc11..f27f88753 100644
      static struct utsname un;
      char * chptr;
      canonEntry canon;
-@@ -1434,6 +1442,7 @@ static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
+@@ -1435,6 +1443,7 @@ static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
  
      if (arch) *arch = un.machine;
      if (os) *os = un.sysname;

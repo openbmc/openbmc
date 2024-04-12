@@ -1,7 +1,7 @@
-From b5cfd8ab77e7f305b170a8cd25575e8cc08babc5 Mon Sep 17 00:00:00 2001
+From 67f9f4dbb58a9213232523a433cd6d7c50eeadc7 Mon Sep 17 00:00:00 2001
 From: Jon Mason <jon.mason@arm.com>
 Date: Wed, 30 Nov 2022 18:59:59 +0000
-Subject: [PATCH 18/38] corstone1000: add compressed kernel support
+Subject: [PATCH] corstone1000: add compressed kernel support
 
 The corstone1000 kernel has become too large to fit in the available
 storage.  Swtiching to a compressed kernel avoids the problem, but
@@ -29,6 +29,3 @@ index 76158fc37d..a92668389a 100644
  CONFIG_CONSOLE_RECORD=y
  CONFIG_LOGLEVEL=7
  # CONFIG_DISPLAY_CPUINFO is not set
--- 
-2.25.1
-

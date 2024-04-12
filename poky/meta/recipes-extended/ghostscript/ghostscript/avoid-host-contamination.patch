@@ -1,7 +1,7 @@
-From 0ccbaa134093bf6afc79f2d20d061bca5a8754ed Mon Sep 17 00:00:00 2001
+From b36713c8f1ba0e5755b78845a433354a63663b1a Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Thu, 29 Mar 2018 16:02:05 +0800
-Subject: [PATCH 04/10] avoid host contamination
+Subject: [PATCH] avoid host contamination
 
 Remove hardcode path refer to host to avoid host contamination.
 
@@ -15,10 +15,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/devices/devs.mak b/devices/devs.mak
-index 846aa50..9570182 100644
+index 186f704..88ab8c9 100644
 --- a/devices/devs.mak
 +++ b/devices/devs.mak
-@@ -393,7 +393,7 @@ $(DEVOBJ)gdevxalt.$(OBJ) : $(DEVSRC)gdevxalt.c $(GDEVX) $(math__h) $(memory__h)\
+@@ -397,7 +397,7 @@ $(DEVOBJ)gdevxalt.$(OBJ) : $(DEVSRC)gdevxalt.c $(GDEVX) $(math__h) $(memory__h)\
  ### NON PORTABLE, ONLY UNIX WITH GCC SUPPORT
  
  $(DEVOBJ)X11.so : $(x11alt_) $(x11_) $(DEVS_MAK) $(MAKEDIRS)
@@ -27,6 +27,3 @@ index 846aa50..9570182 100644
  
  ###### --------------- Memory-buffered printer devices --------------- ######
  
--- 
-1.8.3.1
-

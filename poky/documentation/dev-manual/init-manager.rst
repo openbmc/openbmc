@@ -121,7 +121,7 @@ increasing levels of complexity and functionality:
    :widths: 40 20 20 20
    :header-rows: 1
 
-   * - 
+   * -
      - BusyBox init
      - SysVinit
      - systemd

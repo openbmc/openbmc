@@ -1,4 +1,4 @@
-From a9166bf422da1001bac9cc819386bf39b7cd1b73 Mon Sep 17 00:00:00 2001
+From 76856a34a4e339e4a53b09d028f89fcc520e3127 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
 Date: Tue, 9 Feb 2016 11:44:01 +0200
 Subject: [PATCH] Fix the path of corosync and dlm header files check
@@ -9,16 +9,15 @@ Fix it.
 Upstream-Status: Inappropriate [Yocto specific]
 
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
-
 ---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 2767ac6..46bf57b 100644
+index cbdba49..7bfd336 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -91,8 +91,8 @@ FAILED_SLOTS_DIR = $(RUN_DIR)/failed-slots
+@@ -109,8 +109,8 @@ FAILED_SLOTS_DIR = $(RUN_DIR)/failed-slots
  SYSTEMD_DIR=/lib/systemd/system
  LIB_DIR=/usr/libexec/mdadm
  

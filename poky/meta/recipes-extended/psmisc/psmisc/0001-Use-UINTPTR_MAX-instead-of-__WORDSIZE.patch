@@ -1,4 +1,4 @@
-From 115fcf1daff18aa2f2e130d63704f04031878db0 Mon Sep 17 00:00:00 2001
+From 338d2d46d1c20ebadf317938af98d0532a62f8d4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 24 Mar 2016 15:46:14 +0000
 Subject: [PATCH] Use UINTPTR_MAX instead of __WORDSIZE
@@ -13,7 +13,7 @@ Upstream-Status: Pending
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/src/peekfd.c b/src/peekfd.c
-index 5aa990a..7e8e3fc 100644
+index 36dff04..2b4b1dc 100644
 --- a/src/peekfd.c
 +++ b/src/peekfd.c
 @@ -30,8 +30,11 @@
@@ -28,7 +28,7 @@ index 5aa990a..7e8e3fc 100644
  #include <getopt.h>
  #include <ctype.h>
  #include <dirent.h>
-@@ -266,11 +269,11 @@ int main(int argc, char **argv)
+@@ -341,11 +344,11 @@ int main(int argc, char **argv)
  		if (WIFSTOPPED(status)) {
  #ifdef PPC
  			struct pt_regs regs;

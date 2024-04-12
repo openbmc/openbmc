@@ -1,20 +1,19 @@
-From 4f34994d9ad38d96976578a9d1a006f72e5aca50 Mon Sep 17 00:00:00 2001
+From e210458d125793915abce30420d866a30305c37a Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 10 Jan 2017 14:11:30 +0200
 Subject: [PATCH] Do not read config files from $HOME
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  lib/rpmrc.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/lib/rpmrc.c b/lib/rpmrc.c
-index 269d490ac..f39dcfc11 100644
+index 9437a0ff1..483585ae4 100644
 --- a/lib/rpmrc.c
 +++ b/lib/rpmrc.c
-@@ -458,8 +458,7 @@ static void setDefaults(void)
+@@ -459,8 +459,7 @@ static void setDefaults(void)
      if (!defrcfiles) {
  	defrcfiles = rstrscat(NULL, confdir, "/rpmrc", ":",
  				confdir, "/" RPM_VENDOR "/rpmrc", ":",
@@ -24,7 +23,7 @@ index 269d490ac..f39dcfc11 100644
      }
  
  #ifndef MACROFILES
-@@ -471,8 +470,7 @@ static void setDefaults(void)
+@@ -472,8 +471,7 @@ static void setDefaults(void)
    				confdir, "/" RPM_VENDOR "/macros", ":",
  				SYSCONFDIR "/rpm/macros.*", ":",
  				SYSCONFDIR "/rpm/macros", ":",

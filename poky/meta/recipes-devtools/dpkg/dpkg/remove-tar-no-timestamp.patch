@@ -1,4 +1,8 @@
-busybox-1.19.4 tar utility doesn't support --warning=no-timestamp
+From add92699ca1397205e1d7b46c3ab43de06b9a6c7 Mon Sep 17 00:00:00 2001
+From: Constantin Musca <constantinx.musca@intel.com>
+Date: Tue, 28 Aug 2012 17:02:40 +0300
+Subject: [PATCH] busybox-1.19.4 tar utility doesn't support
+ --warning=no-timestamp
 
 Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
 
@@ -8,10 +12,10 @@ Upstream-Status: Inappropriate [configuration]
  1 file changed, 1 deletion(-)
 
 diff --git a/src/deb/extract.c b/src/deb/extract.c
-index a1b2dc0..95e2372 100644
+index 8b78a7eab..fd7595808 100644
 --- a/src/deb/extract.c
 +++ b/src/deb/extract.c
-@@ -333,7 +333,6 @@ extracthalf(const char *debar, const char *dir,
+@@ -338,7 +338,6 @@ extracthalf(const char *debar, const char *dir,
  
        command_add_arg(&cmd, "-f");
        command_add_arg(&cmd, "-");
@@ -19,6 +23,3 @@ index a1b2dc0..95e2372 100644
  
        m_dup2(p2[0],0);
        close(p2[0]);
--- 
-2.25.1
-

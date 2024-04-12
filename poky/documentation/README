@@ -165,6 +165,20 @@ To run Vale:
 
  $ make stylecheck
 
+Link checking the Yocto Project documentation
+=============================================
+
+To fix errors which are not reported by Sphinx itself,
+the project uses sphinx-lint (https://github.com/sphinx-contrib/sphinx-lint).
+
+To install sphinx-lint:
+
+ $ pip install sphinx-lint
+
+To run sphinx-lint:
+
+ $ make sphinx-lint
+
 Sphinx theme and CSS customization
 ==================================
 

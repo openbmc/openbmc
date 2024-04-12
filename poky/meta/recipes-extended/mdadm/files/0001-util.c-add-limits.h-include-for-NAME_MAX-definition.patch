@@ -1,0 +1,24 @@
+From 8fa7d3cb96e8833743b635fb198675ad6c020b6e Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 12 Mar 2024 10:51:51 +0100
+Subject: [PATCH] util.c: add limits.h include for NAME_MAX definition
+
+Upstream-Status: Submitted [mariusz.tkaczyk@linux.intel.com,linux-raid@vger.kernel.org]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util.c b/util.c
+index b145447..a9cb6c4 100644
+--- a/util.c
++++ b/util.c
+@@ -36,7 +36,7 @@
+ #include	<ctype.h>
+ #include	<dirent.h>
+ #include	<dlfcn.h>
+-
++#include	<limits.h>
+ 
+ /*
+  * following taken from linux/blkpg.h because they aren't

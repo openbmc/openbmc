@@ -1,0 +1,56 @@
+From 7759ceda978aba38861d4846d0c1657465b72f04 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 24 Mar 2024 23:13:32 -0700
+Subject: [PATCH] include libgen.h for basename API
+
+Musl does no more provide it via string.h therefore builds with newer
+compilers e.g. clang-18 fails due to missing prototype for basename
+therefore add libgen.h to included headers list
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-raid/20240325061537.275811-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Monitor.c        | 1 +
+ platform-intel.c | 1 +
+ super-intel.c    | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/Monitor.c b/Monitor.c
+index 824a69f..e3942e1 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -26,6 +26,7 @@
+ #include	"udev.h"
+ #include	"md_p.h"
+ #include	"md_u.h"
++#include  <libgen.h>
+ #include	<sys/wait.h>
+ #include	<limits.h>
+ #include	<syslog.h>
+diff --git a/platform-intel.c b/platform-intel.c
+index ac282bc..5d6687d 100644
+--- a/platform-intel.c
++++ b/platform-intel.c
+@@ -19,6 +19,7 @@
+ #include "mdadm.h"
+ #include "platform-intel.h"
+ #include "probe_roms.h"
++#include <libgen.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/super-intel.c b/super-intel.c
+index dbea235..881dbda 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -23,6 +23,7 @@
+ #include "dlink.h"
+ #include "sha1.h"
+ #include "platform-intel.h"
++#include <libgen.h>
+ #include <values.h>
+ #include <scsi/sg.h>
+ #include <ctype.h>
+-- 
+2.44.0
+

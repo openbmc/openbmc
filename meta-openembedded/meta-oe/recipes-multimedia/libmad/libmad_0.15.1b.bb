@@ -1,6 +1,6 @@
 SUMMARY = "MPEG Audio Decoder library"
-HOMEPAGE = "http://sourceforge.net/projects/mad/"
-BUGTRACKER = "http://sourceforge.net/tracker/?group_id=12349&atid=112349"
+HOMEPAGE = "https://sourceforge.net/projects/mad/"
+BUGTRACKER = "https://sourceforge.net/tracker/?group_id=12349&atid=112349"
 LICENSE = "GPL-2.0-or-later"
 LICENSE_FLAGS = "commercial"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 SECTION = "libs"
 DEPENDS = "libid3tag"
 
-SRC_URI = "ftp://ftp.mars.org/pub/mpeg/libmad-${PV}.tar.gz \
+SRC_URI = "https://downloads.sourceforge.net/mad/libmad-${PV}.tar.gz \
     file://no-force-mem.patch \
     file://add-pkgconfig.patch \
     file://fix_for_mips_with_gcc-4.5.0.patch \
@@ -19,7 +19,6 @@ SRC_URI = "ftp://ftp.mars.org/pub/mpeg/libmad-${PV}.tar.gz \
 "
 SRC_URI:append:toolchain-clang = " file://0004-Remove-clang-unsupported-compiler-flags.patch "
 
-SRC_URI[md5sum] = "1be543bc30c56fb6bea1d7bf6a64e66c"
 SRC_URI[sha256sum] = "bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690"
 
 S = "${WORKDIR}/libmad-${PV}"

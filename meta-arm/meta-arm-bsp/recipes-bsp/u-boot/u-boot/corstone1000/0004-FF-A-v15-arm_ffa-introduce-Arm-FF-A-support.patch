@@ -1,7 +1,7 @@
-From 6a50d03467b70220b615dbe87b4b49d7f86fcb2f Mon Sep 17 00:00:00 2001
+From d1f0d01f1d863c2b98cc181dfc752f6c71faefaf Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 17 Jul 2023 15:11:43 +0100
-Subject: [PATCH 04/38] FF-A v15: arm_ffa: introduce Arm FF-A support
+Subject: [PATCH] FF-A v15: arm_ffa: introduce Arm FF-A support
 
 Add Arm FF-A support implementing Arm Firmware Framework for Armv8-A v1.0
 
@@ -2127,6 +2127,3 @@ index 307ad6931c..3c6af2e3d2 100644
  	UCLASS_FIRMWARE,	/* Firmware */
  	UCLASS_FPGA,		/* FPGA device */
  	UCLASS_FUZZING_ENGINE,	/* Fuzzing engine */
--- 
-2.25.1
-

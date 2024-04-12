@@ -1,4 +1,4 @@
-From 7894b508a61bb87f05f7eb0a1e912a2422f4fcd2 Mon Sep 17 00:00:00 2001
+From 58bf006646a063837c46b695f7e7ebb69bee7238 Mon Sep 17 00:00:00 2001
 From: Mark Hatle <mark.hatle@windriver.com>
 Date: Tue, 15 Aug 2017 16:41:57 -0500
 Subject: [PATCH] perl: disable auto requires
@@ -12,7 +12,6 @@ generation.  This matches the behavior from the previous RPM5 implementation.
 Upstream-Status: Inappropriate [OE specific configuration]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
-
 ---
  fileattrs/perl.attr    | 2 +-
  fileattrs/perllib.attr | 2 +-

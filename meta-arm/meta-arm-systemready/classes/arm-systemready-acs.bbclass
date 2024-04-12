@@ -86,7 +86,7 @@ do_testimage[depends] += "edk2-test-parser-native:do_populate_sysroot \
 # Process the logs
 python acs_logs_handle() {
     import logging
-    from oeqa.utils import make_logger_bitbake_compatible
+    from oeqa.utils import make_logger_bitbake_compatible, get_json_result_dir
     import shutil
 
     deploy_dir_image = d.getVar('DEPLOY_DIR_IMAGE')
@@ -117,7 +117,7 @@ python acs_logs_handle() {
     os.symlink(os.path.basename(logdir), loglink)
 
     # Create a top-level symlink to the acs_results directory
-    top_logdir = os.path.join(get_testimage_json_result_dir(d), d.getVar("PN"))
+    top_logdir = os.path.join(get_json_result_dir(d), d.getVar("PN"))
     log_name = d.getVar('ACS_LOG_NAME')
     top_link = os.path.join(top_logdir, log_name)
     log_target = os.path.relpath(logdir, top_logdir)

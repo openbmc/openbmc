@@ -1,4 +1,4 @@
-From d77429bf20d138ec8ce577c0080cae1f1bc2aa6f Mon Sep 17 00:00:00 2001
+From 86e585cc0dd06dfa20f584af8b59d52a59accb45 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 9 Jan 2017 18:52:11 +0200
 Subject: [PATCH] Do not add an unsatisfiable dependency when building rpms in
@@ -9,7 +9,6 @@ hand produces rpms that way by design.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  build/pack.c | 4 ----
  1 file changed, 4 deletions(-)

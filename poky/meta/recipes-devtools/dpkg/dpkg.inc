@@ -11,7 +11,7 @@ RDEPENDS:${PN}:class-native = ""
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
-inherit autotools gettext perlnative pkgconfig perl-version update-alternatives
+inherit autotools gettext perlnative pkgconfig perl-version update-alternatives bash-completion
 
 PERL:class-native = "${STAGING_BINDIR_NATIVE}/perl-native/perl"
 

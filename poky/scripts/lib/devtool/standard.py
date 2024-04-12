@@ -1885,6 +1885,8 @@ def _update_recipe(recipename, workspace, rd, mode, appendlayerdir, wildcard_ver
         for line in stdout.splitlines():
             branchname = line[2:]
             if line.startswith('* '):
+                if 'HEAD' in line:
+                    raise DevtoolError('Detached HEAD - please check out a branch, e.g., "devtool"')
                 startbranch = branchname
             if branchname.startswith(override_branch_prefix):
                 override_branches.append(branchname)

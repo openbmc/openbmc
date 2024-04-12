@@ -1,10 +1,17 @@
-Set the max-time timeout to 600 so the timeout is 10 minutes instead of 13 seconds.
+From 42cddb52e821cfc2f09f1974742714e5f2f1856e Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 15 Mar 2024 14:37:37 +0000
+Subject: [PATCH] Set the max-time timeout to 600 so the timeout is 10 minutes
+ instead of 13 seconds.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/servers.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/servers.pm b/tests/servers.pm
-index d4472d509..aeab62c47 100644
+index d4472d5..9999938 100644
 --- a/tests/servers.pm
 +++ b/tests/servers.pm
 @@ -120,7 +120,7 @@ my $sshdverstr;  # for socks server, ssh daemon version string

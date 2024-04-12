@@ -1,4 +1,4 @@
-From e37f7f6a0f1ef1b594574d11a8b90b8c861d047b Mon Sep 17 00:00:00 2001
+From ca91d9fc07943f209988411f2596e4b69828f208 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
 Date: Sun, 15 Mar 2015 09:02:14 +0000
 Subject: [PATCH] mdadm: Fix build in x32 ABI
@@ -12,16 +12,15 @@ data type in x32 ABI is long long int.
 Upstream-Status: Pending
 
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
-
 ---
  monitor.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/monitor.c b/monitor.c
-index 81537ed..7c33382 100644
+index 4acec67..8dcdfd6 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -445,9 +445,12 @@ static int read_and_act(struct active_array *a, fd_set *fds)
+@@ -447,9 +447,12 @@ static int read_and_act(struct active_array *a, fd_set *fds)
  		if (FD_ISSET(mdi->bb_fd, fds))
  			check_for_cleared_bb(a, mdi);
  	}

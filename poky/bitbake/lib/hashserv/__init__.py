@@ -5,38 +5,13 @@
 
 import asyncio
 from contextlib import closing
-import re
 import itertools
 import json
 from collections import namedtuple
 from urllib.parse import urlparse
-
-UNIX_PREFIX = "unix://"
-WS_PREFIX = "ws://"
-WSS_PREFIX = "wss://"
-
-ADDR_TYPE_UNIX = 0
-ADDR_TYPE_TCP = 1
-ADDR_TYPE_WS = 2
+from bb.asyncrpc.client import parse_address, ADDR_TYPE_UNIX, ADDR_TYPE_WS
 
 User = namedtuple("User", ("username", "permissions"))
-
-
-def parse_address(addr):
-    if addr.startswith(UNIX_PREFIX):
-        return (ADDR_TYPE_UNIX, (addr[len(UNIX_PREFIX) :],))
-    elif addr.startswith(WS_PREFIX) or addr.startswith(WSS_PREFIX):
-        return (ADDR_TYPE_WS, (addr,))
-    else:
-        m = re.match(r"\[(?P<host>[^\]]*)\]:(?P<port>\d+)$", addr)
-        if m is not None:
-            host = m.group("host")
-            port = m.group("port")
-        else:
-            host, port = addr.split(":")
-
-        return (ADDR_TYPE_TCP, (host, int(port)))
-
 
 def create_server(
     addr,

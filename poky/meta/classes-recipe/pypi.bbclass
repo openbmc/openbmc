@@ -12,14 +12,19 @@ def pypi_package(d):
         return bpn[8:]
     return bpn
 
+# The PyPi package name (defaults to PN without the python3- prefix)
 PYPI_PACKAGE ?= "${@pypi_package(d)}"
+# The file extension of the source archive
 PYPI_PACKAGE_EXT ?= "tar.gz"
-PYPI_ARCHIVE_NAME ?= "${PYPI_PACKAGE}-${PV}.${PYPI_PACKAGE_EXT}"
+# An optional prefix for the download file in the case of name collisions
 PYPI_ARCHIVE_NAME_PREFIX ?= ""
 
 def pypi_src_uri(d):
+    """
+    Construct a source URL as per https://warehouse.pypa.io/api-reference/integration-guide.html#predictable-urls.
+    """
     package = d.getVar('PYPI_PACKAGE')
-    archive_name = d.getVar('PYPI_ARCHIVE_NAME')
+    archive_name = d.expand('${PYPI_PACKAGE}-${PV}.${PYPI_PACKAGE_EXT}')
     archive_downloadname = d.getVar('PYPI_ARCHIVE_NAME_PREFIX') + archive_name
     return 'https://files.pythonhosted.org/packages/source/%s/%s/%s;downloadfilename=%s' % (package[0], package, archive_name, archive_downloadname)
 

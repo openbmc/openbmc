@@ -1,0 +1,88 @@
+From 6be1c45e1f7ee78499bdca76c25ec23a61317134 Mon Sep 17 00:00:00 2001
+From: Rui Costa <rui.ms.costa@ctw.bmwgroup.com>
+Date: Wed, 20 Mar 2024 14:58:27 +0000
+Subject: [PATCH 1/2] Remove cpp unittest compilation
+
+Upstream-Status: Inappropriate [oe-specific]
+---
+ lang/c++/CMakeLists.txt | 61 -----------------------------------------
+ 1 file changed, 61 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4a3793152..d94ba42d3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -131,70 +131,9 @@ set_target_properties (avrocpp_s PROPERTIES
+ target_link_libraries (avrocpp ${Boost_LIBRARIES} ${SNAPPY_LIBRARIES})
+ target_include_directories(avrocpp PRIVATE ${SNAPPY_INCLUDE_DIR})
+
+-add_executable (precompile test/precompile.cc)
+-
+-target_link_libraries (precompile avrocpp_s ${Boost_LIBRARIES} ${SNAPPY_LIBRARIES})
+-
+-macro (gen file ns)
+-    add_custom_command (OUTPUT ${file}.hh
+-        COMMAND avrogencpp
+-            -p -
+-            -i ${CMAKE_CURRENT_SOURCE_DIR}/jsonschemas/${file}
+-            -o ${file}.hh -n ${ns} -U
+-        DEPENDS avrogencpp ${CMAKE_CURRENT_SOURCE_DIR}/jsonschemas/${file})
+-    add_custom_target (${file}_hh DEPENDS ${file}.hh)
+-endmacro (gen)
+-
+-gen (empty_record empty)
+-gen (bigrecord testgen)
+-gen (bigrecord_r testgen_r)
+-gen (bigrecord2 testgen2)
+-gen (tweet testgen3)
+-gen (union_array_union uau)
+-gen (union_map_union umu)
+-gen (union_conflict uc)
+-gen (recursive rec)
+-gen (reuse ru)
+-gen (circulardep cd)
+-gen (tree1 tr1)
+-gen (tree2 tr2)
+-gen (crossref cr)
+-gen (primitivetypes pt)
+-gen (cpp_reserved_words cppres)
+-
+ add_executable (avrogencpp impl/avrogencpp.cc)
+ target_link_libraries (avrogencpp avrocpp_s ${Boost_LIBRARIES} ${SNAPPY_LIBRARIES})
+
+-enable_testing()
+-
+-macro (unittest name)
+-    add_executable (${name} test/${name}.cc)
+-    target_link_libraries (${name} avrocpp ${Boost_LIBRARIES} ${SNAPPY_LIBRARIES})
+-    add_test (NAME ${name} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+-        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${name})
+-endmacro (unittest)
+-
+-unittest (buffertest)
+-unittest (unittest)
+-unittest (SchemaTests)
+-unittest (LargeSchemaTests)
+-unittest (CodecTests)
+-unittest (StreamTests)
+-unittest (SpecificTests)
+-unittest (DataFileTests)
+-unittest (JsonTests)
+-unittest (AvrogencppTests)
+-unittest (CompilerTests)
+-unittest (AvrogencppTestReservedWords)
+-
+-add_dependencies (AvrogencppTestReservedWords cpp_reserved_words_hh)
+-
+-add_dependencies (AvrogencppTests bigrecord_hh bigrecord_r_hh bigrecord2_hh
+-    tweet_hh
+-    union_array_union_hh union_map_union_hh union_conflict_hh
+-    recursive_hh reuse_hh circulardep_hh tree1_hh tree2_hh crossref_hh
+-    primitivetypes_hh empty_record_hh)
+-
+ include (InstallRequiredSystemLibraries)
+
+ set (CPACK_PACKAGE_FILE_NAME "avrocpp-${AVRO_VERSION_MAJOR}")
+--
+2.44.0
+

@@ -1,8 +1,7 @@
-From 95589fd6c92d41aa22d30a34193006216c6ee827 Mon Sep 17 00:00:00 2001
+From c95d1bd311b251e5dd6c6e53c2dc7977bdca7870 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Fri, 23 Jun 2023 13:44:10 +0100
-Subject: [PATCH 08/38] FF-A v15: arm_ffa: introduce armffa command Sandbox
- test
+Subject: [PATCH] FF-A v15: arm_ffa: introduce armffa command Sandbox test
 
 Add Sandbox test for the armffa command
 
@@ -90,6 +89,3 @@ index 0000000000..9a44a397e8
 +}
 +
 +DM_TEST(dm_test_armffa_cmd, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
--- 
-2.25.1
-

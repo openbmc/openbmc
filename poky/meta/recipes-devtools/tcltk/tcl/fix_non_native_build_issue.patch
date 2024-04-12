@@ -1,19 +1,18 @@
-From 8a6c77cdd265fe7ce35929f58f1ade0c6bc4025b Mon Sep 17 00:00:00 2001
+From 371aa300369e9ea3234cba22d5c0babc7d40dfdf Mon Sep 17 00:00:00 2001
 From: Nitin A Kamble <nitin.a.kamble@intel.com>
 Date: Fri, 13 Aug 2010 12:24:00 -0700
 Subject: [PATCH] tcl: fix a build issue
 
 Upstream-Status: Inappropriate [upstream does not support installed tests]
-
 ---
  unix/Makefile.in | 20 ++++++++++----------
  1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/unix/Makefile.in b/unix/Makefile.in
-index b110fe9..d7b35a8 100644
+index 9dd053d..a3b7d69 100644
 --- a/unix/Makefile.in
 +++ b/unix/Makefile.in
-@@ -814,23 +814,23 @@ tcltest-real:
+@@ -815,7 +815,7 @@ tcltest-real:
  test: test-tcl test-packages
  
  test-tcl: ${TCLTEST_EXE}
@@ -21,9 +20,11 @@ index b110fe9..d7b35a8 100644
 +	$(SHELL_ENV) ${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl $(TESTFLAGS)
  
  gdb-test: ${TCLTEST_EXE}
- 	@echo "set env @LD_LIBRARY_PATH_VAR@=`pwd`:$${@LD_LIBRARY_PATH_VAR@}" > gdb.run
- 	@echo "set env TCL_LIBRARY=${TCL_BUILDTIME_LIBRARY}" >> gdb.run
- 	@echo "set args $(TOP_DIR)/tests/all.tcl $(TESTFLAGS) -singleproc 1" >> gdb.run
+ 	@printf '%s ' set env @LD_LIBRARY_PATH_VAR@=\"`pwd`$${@LD_LIBRARY_PATH_VAR@:+:$${@LD_LIBRARY_PATH_VAR}}\" > gdb.run
+@@ -824,17 +824,17 @@ gdb-test: ${TCLTEST_EXE}
+ 	@printf '\n' >>gdb.run
+ 	@printf '%s ' set args $(call shquotequote,$(TOP_DIR))/tests/all.tcl\
+ 		$(call shquotequote,$(TESTFLAGS)) -singleproc 1 >> gdb.run
 -	$(GDB) ./${TCLTEST_EXE} --command=gdb.run
 +	$(GDB) ${TCLTEST_EXE} --command=gdb.run
  	rm gdb.run
@@ -41,7 +42,7 @@ index b110fe9..d7b35a8 100644
  
  # The following target generates the shared libraries in dltest/ that are used
  # for testing; they are included as part of the "tcltest" target (via the
-@@ -848,28 +848,28 @@ dltest.marker: ${STUB_LIB_FILE}
+@@ -852,28 +852,28 @@ dltest.marker: ${STUB_LIB_FILE}
  # This target can be used to run tclsh from the build directory
  # via `make shell SCRIPT=/tmp/foo.tcl`
  shell: ${TCL_EXE}

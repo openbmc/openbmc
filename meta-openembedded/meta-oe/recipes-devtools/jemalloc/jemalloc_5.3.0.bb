@@ -13,10 +13,10 @@ SECTION = "libs"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea061f8731d5e6a5761dfad951ef5f5f"
 
-SRC_URI = "git://github.com/jemalloc/jemalloc.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/jemalloc/jemalloc.git;branch=dev;protocol=https \
            file://run-ptest \
            "
-SRCREV = "54eaed1d8b56b1aa528be3bdd1877e59c56fa90c"
+SRCREV = "630434bb0ac619f7beec927569782d924c459385"
 
 S = "${WORKDIR}/git"
 
@@ -27,7 +27,7 @@ EXTRA_AUTORECONF += "--exclude=autoheader"
 EXTRA_OECONF:append:libc-musl = " --with-jemalloc-prefix=je_"
 # For some reason VERSION file populated only in tarball distribution.
 # Adding jemalloc version since this recipe is using source code from git tag
-EXTRA_OECONF:append = " --with-version=${PV}-0-g${SRCREV}"
+EXTRA_OECONF:append = " --with-version=${PV}-0-g${SRCREV} --enable-xmalloc"
 
 do_install:append() {
 	sed -i -e 's@${STAGING_DIR_HOST}@@g' \

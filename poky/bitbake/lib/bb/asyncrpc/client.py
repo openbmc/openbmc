@@ -10,11 +10,34 @@ import json
 import os
 import socket
 import sys
+import re
 import contextlib
 from threading import Thread
 from .connection import StreamConnection, WebsocketConnection, DEFAULT_MAX_CHUNK
 from .exceptions import ConnectionClosedError, InvokeError
 
+UNIX_PREFIX = "unix://"
+WS_PREFIX = "ws://"
+WSS_PREFIX = "wss://"
+
+ADDR_TYPE_UNIX = 0
+ADDR_TYPE_TCP = 1
+ADDR_TYPE_WS = 2
+
+def parse_address(addr):
+    if addr.startswith(UNIX_PREFIX):
+        return (ADDR_TYPE_UNIX, (addr[len(UNIX_PREFIX) :],))
+    elif addr.startswith(WS_PREFIX) or addr.startswith(WSS_PREFIX):
+        return (ADDR_TYPE_WS, (addr,))
+    else:
+        m = re.match(r"\[(?P<host>[^\]]*)\]:(?P<port>\d+)$", addr)
+        if m is not None:
+            host = m.group("host")
+            port = m.group("port")
+        else:
+            host, port = addr.split(":")
+
+        return (ADDR_TYPE_TCP, (host, int(port)))
 
 class AsyncClient(object):
     def __init__(

@@ -17,10 +17,12 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig ptest features_check
 
+inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3native', '', d)}
+
 REQUIRED_DISTRO_FEATURES = "seccomp"
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG[python] = "--enable-python, --disable-python, python3"
+PACKAGECONFIG[python] = "--enable-python, --disable-python, python3-cython-native"
 
 DISABLE_STATIC = ""
 
@@ -48,9 +50,13 @@ do_install_ptest() {
     for file in $(find tools/.libs/* -executable -type f); do
         install -m 744 ${S}/${file} ${D}/${PTEST_PATH}/tools
     done
+     # fix python shebang
+     sed -i -e 's@cmd /usr/bin/env python @cmd /usr/bin/env python3 @' ${D}/${PTEST_PATH}/tests/regression
+     sed -i -e 's@^#!/usr/bin/env python$@#!/usr/bin/env python3@' ${D}/${PTEST_PATH}/tests/*.py
 }
 
-FILES:${PN} = "${bindir} ${libdir}/${BPN}.so*"
+FILES:${PN} = "${bindir} ${libdir}/${BPN}.so* ${PYTHON_SITEPACKAGES_DIR}/"
 FILES:${PN}-dbg += "${libdir}/${PN}/tests/.debug/* ${libdir}/${PN}/tools/.debug"
 
+RDEPENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3', '', d)}"
 RDEPENDS:${PN}-ptest = "coreutils bash"

@@ -619,7 +619,7 @@ containing the release you wish to use, for example
 
 You will find there source archives of individual components (if you wish
 to use them individually), and of the corresponding Poky release bundling
-a selection of these components. 
+a selection of these components.
 
 .. note::
 

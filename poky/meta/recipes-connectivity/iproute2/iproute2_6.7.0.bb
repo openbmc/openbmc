@@ -59,6 +59,7 @@ do_install () {
 INSANE_SKIP:${PN}-tc = "dev-so"
 
 IPROUTE2_PACKAGES =+ "\
+    ${PN}-bridge \
     ${PN}-devlink \
     ${PN}-genl \
     ${PN}-ifstat \
@@ -91,6 +92,7 @@ FILES:${PN}-tipc = "${base_sbindir}/tipc"
 FILES:${PN}-devlink = "${base_sbindir}/devlink"
 FILES:${PN}-rdma = "${base_sbindir}/rdma"
 FILES:${PN}-routel = "${base_sbindir}/routel"
+FILES:${PN}-bridge = "${base_sbindir}/bridge"
 
 RDEPENDS:${PN}-routel = "python3-core"
 

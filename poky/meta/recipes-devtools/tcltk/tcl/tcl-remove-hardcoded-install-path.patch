@@ -1,4 +1,4 @@
-From 6efc98774681795712073c2b91e5e9d1763239b8 Mon Sep 17 00:00:00 2001
+From 050fc597fbfa4da2c31bd0df58c871892a490470 Mon Sep 17 00:00:00 2001
 From: "Song.Li" <Song.Li@windriver.com>
 Date: Wed, 1 Aug 2012 19:05:51 +0800
 Subject: [PATCH] tcl:install tcl to lib64 instead of lib on 64bit target
@@ -13,15 +13,14 @@ Signed-off-by: Song.Li <Song.Li@windriver.com>
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- configure    | 2 +-
- configure.in | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ unix/configure.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: unix/configure.in
-===================================================================
---- a/unix.orig/configure.in	2013-11-10 23:20:50.000000000 -0800
-+++ b/unix/configure.in	2013-11-10 23:39:41.199428131 -0800
-@@ -790,7 +790,7 @@
+diff --git a/unix/configure.in b/unix/configure.in
+index 4f62510..4974fb6 100644
+--- a/unix/configure.in
++++ b/unix/configure.in
+@@ -775,7 +775,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
  
  eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
  

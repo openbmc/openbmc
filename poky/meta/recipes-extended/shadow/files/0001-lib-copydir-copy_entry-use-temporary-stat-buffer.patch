@@ -16,11 +16,9 @@ Signed-off-by: Enrico Scholz <enrico.scholz@sigma-chemnitz.de>
  lib/copydir.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Index: shadow-4.14.2/lib/copydir.c
-===================================================================
---- shadow-4.14.2.orig/lib/copydir.c
-+++ shadow-4.14.2/lib/copydir.c
-@@ -415,6 +415,7 @@ static int copy_entry (const struct path
+--- a/lib/copydir.c
++++ b/lib/copydir.c
+@@ -400,6 +400,7 @@ static int copy_entry (const struct path
  {
  	int err = 0;
  	struct stat sb;
@@ -28,12 +26,12 @@ Index: shadow-4.14.2/lib/copydir.c
  	struct link_name *lp;
  	struct timespec mt[2];
  
-@@ -436,7 +437,7 @@ static int copy_entry (const struct path
- 		 * If the destination already exists do nothing.
- 		 * This is after the copy_dir above to still iterate into subdirectories.
- 		 */
--		if (fstatat(dst->dirfd, dst->name, &sb, AT_SYMLINK_NOFOLLOW) != -1) {
-+		if (fstatat(dst->dirfd, dst->name, &tmp_sb, AT_SYMLINK_NOFOLLOW) != -1) {
- 			return 0;
- 		}
+@@ -423,7 +424,7 @@ static int copy_entry (const struct path
+ 	* If the destination already exists do nothing.
+ 	* This is after the copy_dir above to still iterate into subdirectories.
+ 	*/
+-	if (fstatat(dst->dirfd, dst->name, &sb, AT_SYMLINK_NOFOLLOW) != -1) {
++	if (fstatat(dst->dirfd, dst->name, &tmp_sb, AT_SYMLINK_NOFOLLOW) != -1) {
+ 		return err;
+ 	}
  

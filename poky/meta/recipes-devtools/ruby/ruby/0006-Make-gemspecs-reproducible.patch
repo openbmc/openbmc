@@ -1,4 +1,4 @@
-From 3f60710bc29c1b08e128314d40101e87b7d2c9a1 Mon Sep 17 00:00:00 2001
+From 1dc7ef09c3c567c4adb09ccfd97e0e59c58edb9f Mon Sep 17 00:00:00 2001
 From: Lucas Kanashiro <kanashiro@debian.org>
 Date: Fri, 1 Nov 2019 15:25:17 -0300
 Subject: [PATCH] Make gemspecs reproducible
@@ -7,7 +7,6 @@ Without an explicit date, they will get the current date and make the
 build unreproducible
 
 Upstream-Status: Backport [debian]
-
 ---
  ext/bigdecimal/bigdecimal.gemspec | 1 +
  ext/fiddle/fiddle.gemspec         | 1 +
@@ -17,12 +16,12 @@ Upstream-Status: Backport [debian]
  5 files changed, 5 insertions(+)
 
 diff --git a/ext/bigdecimal/bigdecimal.gemspec b/ext/bigdecimal/bigdecimal.gemspec
-index d215757..5148d56 100644
+index f9f3b45..b9a469d 100644
 --- a/ext/bigdecimal/bigdecimal.gemspec
 +++ b/ext/bigdecimal/bigdecimal.gemspec
-@@ -4,6 +4,7 @@ Gem::Specification.new do |s|
-   s.name          = "bigdecimal"
-   s.version       = "3.1.3"
+@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
+   s.name          = name
+   s.version       = source_version
    s.authors       = ["Kenta Murata", "Zachary Scott", "Shigeo Kobayashi"]
 +  s.date          = RUBY_RELEASE_DATE
    s.email         = ["mrkn@mrkn.jp"]
@@ -41,10 +40,10 @@ index 8781093..efdca32 100644
    spec.email         = ["aaron@tenderlovemaking.com", "hsbt@ruby-lang.org"]
  
 diff --git a/ext/io/console/io-console.gemspec b/ext/io/console/io-console.gemspec
-index d26a757..cc88c55 100644
+index d4f5276..8f89611 100644
 --- a/ext/io/console/io-console.gemspec
 +++ b/ext/io/console/io-console.gemspec
-@@ -4,6 +4,7 @@ _VERSION = "0.6.0"
+@@ -4,6 +4,7 @@ _VERSION = "0.7.1"
  Gem::Specification.new do |s|
    s.name = "io-console"
    s.version = _VERSION
@@ -65,7 +64,7 @@ index 1f4798e..48743cf 100644
    spec.email         = ["knu@idaemons.org", "ume@mahoroba.org"]
  
 diff --git a/lib/rdoc/rdoc.gemspec b/lib/rdoc/rdoc.gemspec
-index 3c96f7d..fec0872 100644
+index 93a281c..cc5c155 100644
 --- a/lib/rdoc/rdoc.gemspec
 +++ b/lib/rdoc/rdoc.gemspec
 @@ -7,6 +7,7 @@ end

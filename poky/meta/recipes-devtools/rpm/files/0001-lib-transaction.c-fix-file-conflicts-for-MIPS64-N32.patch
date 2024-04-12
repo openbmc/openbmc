@@ -1,4 +1,4 @@
-From bfceae7386b5fec108f98ad59ad96e57aecb08d3 Mon Sep 17 00:00:00 2001
+From b04ecb793a3c859985eead5e261785b27a4c4a20 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 7 May 2020 17:40:58 +0800
 Subject: [PATCH] lib/transaction.c: fix file conflicts for MIPS64 N32
@@ -27,7 +27,6 @@ Fixed by performing a 'last-in-wins' resolution when "neither is preferred".
 Upstream-Status: Submitted <https://github.com/rpm-software-management/rpm/issues/193>
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
-
 ---
  lib/transaction.c | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)

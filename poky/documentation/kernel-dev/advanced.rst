@@ -303,8 +303,8 @@ The following listings show the ``build.scc`` file and part of the
                         .
                         .
                         .
- 	        char *dump_write = NULL, *files_source = NULL;
- 	        int opt;
+                char *dump_write = NULL, *files_source = NULL;
+                int opt;
       --
       2.10.1
 

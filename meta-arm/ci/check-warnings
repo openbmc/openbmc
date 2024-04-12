@@ -7,7 +7,7 @@ set -e -u
 
 LOGFILE=$1
 
-LINES=$(sed -e "/attempting MIRRORS if available/d" -e "/Error parsing .*netrc:/d" $LOGFILE | wc -l)
+LINES=$(grep --invert-match "attempting MIRRORS if available" $LOGFILE | wc -l)
 if test "$LINES" -ne 0; then
     echo ==============================
     echo The build had warnings/errors:

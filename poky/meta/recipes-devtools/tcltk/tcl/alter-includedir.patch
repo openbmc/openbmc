@@ -1,4 +1,4 @@
-From 27e5595c065ce3af687818555a882ab5e1dfbc2b Mon Sep 17 00:00:00 2001
+From 3130dca60636dc12d0d12df75b002fd123349e21 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Tue, 22 Nov 2022 18:48:27 +0800
 Subject: [PATCH] tcl: update the header location
@@ -19,7 +19,6 @@ to detect tcl doesn't find the header.
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
-
 ---
  unix/Makefile.in  | 2 +-
  unix/configure.in | 4 ++--
@@ -27,7 +26,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/unix/Makefile.in b/unix/Makefile.in
-index 0b8179f..4824b28 100644
+index a3b7d69..969ddb8 100644
 --- a/unix/Makefile.in
 +++ b/unix/Makefile.in
 @@ -57,7 +57,7 @@ SCRIPT_INSTALL_DIR	= $(INSTALL_ROOT)$(TCL_LIBRARY)
@@ -40,10 +39,10 @@ index 0b8179f..4824b28 100644
  # Path to the private tcl header dir:
  PRIVATE_INCLUDE_DIR	= @PRIVATE_INCLUDE_DIR@
 diff --git a/unix/configure.in b/unix/configure.in
-index 0354a0b..2d0c00f 100644
+index 4974fb6..a72934f 100644
 --- a/unix/configure.in
 +++ b/unix/configure.in
-@@ -774,7 +774,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
+@@ -776,7 +776,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
  eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
  
  test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
@@ -52,7 +51,7 @@ index 0354a0b..2d0c00f 100644
  HTML_DIR='$(DISTDIR)/html'
  
  # Note:  in the following variable, it's important to use the absolute
-@@ -895,7 +895,7 @@ TCL_BUILD_STUB_LIB_PATH="`pwd`/${TCL_STUB_LIB_FILE}"
+@@ -897,7 +897,7 @@ TCL_BUILD_STUB_LIB_PATH="`pwd`/${TCL_STUB_LIB_FILE}"
  TCL_STUB_LIB_PATH="${TCL_STUB_LIB_DIR}/${TCL_STUB_LIB_FILE}"
  
  # Install time header dir can be set via --includedir

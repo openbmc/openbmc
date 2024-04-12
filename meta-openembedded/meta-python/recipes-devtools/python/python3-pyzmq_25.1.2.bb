@@ -28,6 +28,7 @@ FILES:${PN}-test += "\
 RDEPENDS:${PN} += "\
         python3-json \
         python3-multiprocessing \
+        python3-tornado \
 "
 
 RDEPENDS:${PN}-ptest += "\

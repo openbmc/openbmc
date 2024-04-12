@@ -186,4 +186,5 @@ USERADD_PARAM:${PN} = " \
     --system --no-create-home \
     --home ${NGINX_WWWDIR} \
     --groups www-data \
+    --shell ${base_sbindir}/nologin \
     --user-group ${NGINX_USER}"

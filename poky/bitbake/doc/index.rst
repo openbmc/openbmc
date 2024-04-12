@@ -13,6 +13,7 @@ BitBake User Manual
    bitbake-user-manual/bitbake-user-manual-intro
    bitbake-user-manual/bitbake-user-manual-execution
    bitbake-user-manual/bitbake-user-manual-metadata
+   bitbake-user-manual/bitbake-user-manual-ref-variables-context
    bitbake-user-manual/bitbake-user-manual-fetching
    bitbake-user-manual/bitbake-user-manual-ref-variables
    bitbake-user-manual/bitbake-user-manual-hello

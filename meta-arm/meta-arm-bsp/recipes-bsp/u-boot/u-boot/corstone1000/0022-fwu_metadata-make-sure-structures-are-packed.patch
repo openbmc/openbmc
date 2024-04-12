@@ -1,7 +1,7 @@
-From b2e413049dcf3dcbe3891a8a70bdd36f30b2e6c8 Mon Sep 17 00:00:00 2001
+From b1445e50c1f260e3454bc4946ea1009ff3e0dda6 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 1 Feb 2023 16:13:24 +0000
-Subject: [PATCH 22/38] fwu_metadata: make sure structures are packed
+Subject: [PATCH] fwu_metadata: make sure structures are packed
 
 The fwu metadata in the metadata partitions
 should/are packed to guarantee that the info is
@@ -45,6 +45,3 @@ index 8fda4f4ac2..c61221a917 100644
 +} __packed;
  
  #endif /* _FWU_MDATA_H_ */
--- 
-2.25.1
-

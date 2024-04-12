@@ -1,7 +1,7 @@
-From 8ee7a9c05eb1abe10be139f439f2adf638614290 Mon Sep 17 00:00:00 2001
+From 03f53356a5b8b30b981ab7a16c6f48ca7fffe489 Mon Sep 17 00:00:00 2001
 From: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
 Date: Tue, 18 Jul 2023 12:21:39 +0100
-Subject: [PATCH 30/38] Enable EFI set/get time services
+Subject: [PATCH] Enable EFI set/get time services
 
 SetTime_Conf and SetTime_Func tests in UEFI SCT test suite of ACS
 fails with unsupported return value. CONFIG_EFI_SET_TIME and
@@ -28,6 +28,3 @@ index ccd558cfce..a0af413de8 100644
 +CONFIG_SYSRESET_PSCI=y
 +CONFIG_EFI_SET_TIME=y
 +CONFIG_EFI_GET_TIME=y
--- 
-2.25.1
-

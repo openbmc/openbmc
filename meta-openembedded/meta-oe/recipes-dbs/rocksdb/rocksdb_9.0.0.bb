@@ -16,6 +16,7 @@ SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH};protocol=htt
            file://0004-Implement-support-for-musl-ppc64.patch \
            file://0005-Implement-timer-implementation-for-mips-platform.patch \
            file://0006-Implement-timer-for-arm-v6.patch \
+           file://0007-Fix-declaration-scope-of-LE_LOAD32-in-crc32c.patch \
           "
 
 SRC_URI:append:riscv32 = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
@@ -43,6 +44,8 @@ EXTRA_OECMAKE = "\
     -DWITH_TOOLS=OFF \
     -DFAIL_ON_WARNINGS=OFF \
 "
+
+CXXFLAGS += "${@bb.utils.contains('SELECTED_OPTIMIZATION', '-Og', '-DXXH_NO_INLINE_HINTS', '', d)}"
 
 do_install:append() {
     # Fix for qa check buildpaths

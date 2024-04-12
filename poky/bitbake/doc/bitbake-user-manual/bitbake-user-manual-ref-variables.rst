@@ -432,6 +432,15 @@ overview of their function and contents.
       ``ConfigParsed`` event can set the variable to trigger the re-parse.
       You must be careful to avoid recursive loops with this functionality.
 
+   :term:`BB_LOADFACTOR_MAX`
+      Setting this to a value will cause BitBake to check the system load
+      average before executing new tasks. If the load average is above the
+      the number of CPUs multipled by this factor, no new task will be started
+      unless there is no task executing. A value of "1.5" has been found to
+      work reasonably. This is helpful for systems which don't have pressure
+      regulation enabled, which is more granular. Pressure values take
+      precedence over loadfactor.
+
    :term:`BB_LOGCONFIG`
       Specifies the name of a config file that contains the user logging
       configuration. See

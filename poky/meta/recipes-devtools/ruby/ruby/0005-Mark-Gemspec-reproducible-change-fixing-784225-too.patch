@@ -1,4 +1,4 @@
-From 6e1dc610724a7aa8368cbcddf4bbe21cccc0f731 Mon Sep 17 00:00:00 2001
+From 3bc324379aa3e322bad9353da8c0064cd671cc74 Mon Sep 17 00:00:00 2001
 From: Lucas Kanashiro <kanashiro@debian.org>
 Date: Fri, 1 Nov 2019 15:25:17 -0300
 Subject: [PATCH] Make gemspecs reproducible
@@ -12,20 +12,20 @@ Upstream-Status: Backport [debian]
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/lib/rubygems/specification.rb b/lib/rubygems/specification.rb
-index 0d72cee..eb7bc25 100644
+index a0c7faa..f0722d9 100644
 --- a/lib/rubygems/specification.rb
 +++ b/lib/rubygems/specification.rb
-@@ -1691,7 +1691,9 @@ class Gem::Specification < Gem::BasicSpecification
-         raise(Gem::InvalidSpecificationException,
-               "invalid date format in specification: #{date.inspect}")
-       end
--    when Time, DateLike then
-+    when Time then
-+      Time.utc(date.utc.year, date.utc.month, date.utc.day)
-+    when DateLike then
-       Time.utc(date.year, date.month, date.day)
-     else
-       TODAY
+@@ -1774,7 +1774,9 @@ class Gem::Specification < Gem::BasicSpecification
+                 raise(Gem::InvalidSpecificationException,
+                       "invalid date format in specification: #{date.inspect}")
+               end
+-            when Time, DateLike then
++            when Time then
++              Time.utc(date.utc.year, date.utc.month, date.utc.day)
++            when DateLike then
+               Time.utc(date.year, date.month, date.day)
+             else
+               TODAY
 -- 
-2.25.1
+2.39.2
 

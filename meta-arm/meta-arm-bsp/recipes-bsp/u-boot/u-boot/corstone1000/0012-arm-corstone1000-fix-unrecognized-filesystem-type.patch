@@ -1,7 +1,7 @@
-From 7844378788f308f3540c5eb10956c84113005fcc Mon Sep 17 00:00:00 2001
+From 2351cdc3787cd8b06579dcb1986fe80a57dd2d6e Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Fri, 4 Mar 2022 15:56:09 +0000
-Subject: [PATCH 12/38] arm: corstone1000: fix unrecognized filesystem type
+Subject: [PATCH] arm: corstone1000: fix unrecognized filesystem type
 
 Some usb sticks are not recognized by usb, just add a
 delay before checking status.
@@ -26,6 +26,3 @@ index ac64275773..1d2680c3cd 100644
  	debug("STATUS phase\n");
  	result = usb_bulk_msg(us->pusb_dev, pipein, csw, UMASS_BBB_CSW_SIZE,
  				&actlen, USB_CNTL_TIMEOUT*5);
--- 
-2.25.1
-

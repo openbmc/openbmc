@@ -14,7 +14,7 @@ LICENSE = "BSD-2-Clause"
 
 DEPENDS = "ncurses"
 
-SRC_URI = "ftp://ftp.netbsd.org/pub/NetBSD/misc/tnftp/${BPN}-${PV}.tar.gz \
+SRC_URI = "https://ftp.netbsd.org/pub/NetBSD/misc/tnftp/${BPN}-${PV}.tar.gz \
            file://0001-libedit-Include-missing-header-stdc-predef.h.patch \
 "
 

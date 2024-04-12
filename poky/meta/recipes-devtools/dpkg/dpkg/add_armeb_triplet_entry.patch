@@ -1,5 +1,11 @@
-Author: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
-Date:   Wed Apr 8 18:08:14 2015 +0530
+From 1c3a109df54b6092fa85a1fe2b7771e3b959655f Mon Sep 17 00:00:00 2001
+From: "Krishnanjanappa, Jagadeesh"
+ <jagadeesh.krishnanjanappa@caviumnetworks.com>
+Date: Wed, 8 Apr 2015 18:08:14 +0530
+Subject: [PATCH] dpkg: add triplet entry to fix build error for armeb
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 [PATCH] add armeb triplet entry into triplettable.
 
@@ -25,24 +31,19 @@ Upstream-Status: Pending
 
 Signed-off-by: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
-
 ---
  data/tupletable | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/data/tupletable b/data/tupletable
-index b7802bec3..5f500f6ca 100644
+index ae9f2ddb4..7436f8056 100644
 --- a/data/tupletable
 +++ b/data/tupletable
-@@ -12,6 +12,7 @@ base-musl-linux-<cpu>		musl-linux-<cpu>
- ilp32-gnu-linux-arm64		arm64ilp32
+@@ -27,6 +27,7 @@ eabihf-musl-linux-arm		musl-linux-armhf
+ base-musl-linux-<cpu>		musl-linux-<cpu>
  eabihf-gnu-linux-arm		armhf
  eabi-gnu-linux-arm		armel
 +eabi-gnu-linux-armeb		armeb
  abin32-gnu-linux-mips64r6el	mipsn32r6el
  abin32-gnu-linux-mips64r6	mipsn32r6
  abin32-gnu-linux-mips64el	mipsn32el
--- 
-2.11.0
-
-

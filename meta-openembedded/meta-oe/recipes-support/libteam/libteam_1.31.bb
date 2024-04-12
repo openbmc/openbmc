@@ -35,7 +35,13 @@ FILES:${PN}-utils = "${bindir}/bond2team \
 "
 
 RDEPENDS:${PN}-utils = "bash"
-RDEPENDS:${PN}-ptest = "python3-core"
+RDEPENDS:${PN}-ptest = "python3-core libteam-utils"
+# Ensure kernel has these mods enabled features/net/team/team.scc
+RRECOMMENDS:${PN} += "kernel-module-team kernel-module-team-mode-activebackup \
+                      kernel-module-team-mode-broadcast \
+                      kernel-module-team-mode-loadbalance \
+                      kernel-module-team-mode-random \
+                      kernel-module-team-mode-roundrobin"
 
 do_install_ptest() {
 	install ${S}/scripts/team_basic_test.py ${D}${PTEST_PATH}/

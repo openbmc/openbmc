@@ -1,4 +1,4 @@
-From 2ddd34b6838e836cf94a9da2f65cd01a21252846 Mon Sep 17 00:00:00 2001
+From 46a1faf3687764ddf1567455de39482b72e50725 Mon Sep 17 00:00:00 2001
 From: Emekcan Aras <emekcan.aras@arm.com>
 Date: Wed, 15 Nov 2023 16:04:06 +0000
 Subject: [PATCH] corstone1000: enable virtio-net support
@@ -92,6 +92,3 @@ index 2de3f5d7b3..8770b474e2 100644
  CONFIG_EFI_GET_TIME=y
 +CONFIG_VIRTIO_NET=y
 +CONFIG_VIRTIO_MMIO=y
--- 
-2.25.1
-

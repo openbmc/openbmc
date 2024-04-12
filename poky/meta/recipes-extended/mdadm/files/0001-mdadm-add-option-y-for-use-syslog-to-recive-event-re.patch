@@ -1,4 +1,4 @@
-From 5fdc0173cb4fcf8656f0889ad364d2549795607f Mon Sep 17 00:00:00 2001
+From c27e128fdc062ec3fcdf7b48a8c5078615c538df Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 1 Jul 2019 11:34:49 +0800
 Subject: [PATCH] mdadm: add option -y for use syslog to recive event report
@@ -14,15 +14,12 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/systemd/mdmonitor.service b/systemd/mdmonitor.service
-index 46f7b88..3fc4687 100644
+index 9c36478..d289846 100644
 --- a/systemd/mdmonitor.service
 +++ b/systemd/mdmonitor.service
-@@ -13,4 +13,4 @@ DefaultDependencies=no
+@@ -14,4 +14,4 @@ Documentation=man:mdadm(8)
  Environment=  MDADM_MONITOR_ARGS=--scan
  EnvironmentFile=-/run/sysconfig/mdadm
  ExecStartPre=-/usr/lib/mdadm/mdadm_env.sh
 -ExecStart=BINDIR/mdadm --monitor $MDADM_MONITOR_ARGS
 +ExecStart=BINDIR/mdadm --monitor -y $MDADM_MONITOR_ARGS
--- 
-2.7.4
-

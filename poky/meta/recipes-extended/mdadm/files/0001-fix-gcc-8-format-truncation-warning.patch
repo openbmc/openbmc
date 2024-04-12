@@ -1,4 +1,4 @@
-From 3158d3788c2e0fb75ace2c89840bd8a977fb4cb0 Mon Sep 17 00:00:00 2001
+From 78e5bb08971a5644a56af60d51ef35e13522e811 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 14 Dec 2018 15:12:31 +0800
 Subject: [PATCH] fix gcc-8 format-truncation warning
@@ -22,7 +22,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/super0.c b/super0.c
-index 756cab5..12c28da 100644
+index a7c5f81..a79b6bd 100644
 --- a/super0.c
 +++ b/super0.c
 @@ -229,7 +229,7 @@ static void examine_super0(struct supertype *st, char *homehost)
@@ -34,6 +34,3 @@ index 756cab5..12c28da 100644
  		int wonly, failfast;
  		if (d>=0) dp = &sb->disks[d];
  		else dp = &sb->this_disk;
--- 
-2.7.4
-

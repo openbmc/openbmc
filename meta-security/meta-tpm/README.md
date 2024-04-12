@@ -57,14 +57,14 @@ other layers needed. e.g.:
 Maintenance
 -----------
 
-Send pull requests, patches, comments or questions to yocto@lists.yoctoproject.org
+Send pull requests, patches, comments or questions to yocto-patches@lists.yoctoproject.org  
 
 When sending single patches, please using something like:
-'git send-email -1 --to yocto@lists.yoctoproject.org --subject-prefix=meta-security][PATCH'
+'git send-email -1 --to yocto-patches@lists.yoctoproject.org --subject-prefix=meta-security][PATCH'
 
 These values can be set as defaults for this repository:
 
-$ git config sendemail.to yocto@lists.yoctoproject.org
+$ git config sendemail.to yocto-patches@lists.yoctoproject.org
 $ git config format.subjectPrefix meta-security][PATCH
 
 Now you can just do 'git send-email origin/master' to send all local patches.

@@ -315,11 +315,7 @@ home directory:
 
 #. *Create Structure*: Create the layer's structure::
 
-      $ mkdir meta-mylayer
-      $ mkdir meta-mylayer/conf
-      $ mkdir meta-mylayer/recipes-kernel
-      $ mkdir meta-mylayer/recipes-kernel/linux
-      $ mkdir meta-mylayer/recipes-kernel/linux/linux-yocto
+      $ mkdir -p meta-mylayer/conf meta-mylayer/recipes-kernel/linux/linux-yocto
 
    The ``conf`` directory holds your configuration files, while the
    ``recipes-kernel`` directory holds your append file and eventual
@@ -964,9 +960,7 @@ Section.
    additional structure to your layer using the following commands::
 
       $ cd ~/meta-mylayer
-      $ mkdir recipes-kernel
-      $ mkdir recipes-kernel/linux
-      $ mkdir recipes-kernel/linux/linux-yocto
+      $ mkdir -p recipes-kernel recipes-kernel/linux/linux-yocto
 
    Once you have created this
    hierarchy in your layer, you can move the patch file using the
@@ -1674,10 +1668,10 @@ looks much like the one provided with the ``hello-mod`` template::
    SRC := $(shell pwd)
 
    all:
-   	$(MAKE) -C $(KERNEL_SRC) M=$(SRC)
+        $(MAKE) -C $(KERNEL_SRC) M=$(SRC)
 
    modules_install:
-   	$(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
+        $(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
    ...
 
 The important point to note here is the :term:`KERNEL_SRC` variable. The

@@ -1,7 +1,7 @@
-From 147f98fbefc7e13d1b9a3ae4b5fd3adc30dbed6b Mon Sep 17 00:00:00 2001
+From b15518faa5eba9ffb9da4d6e17d8ab4bb8e69f27 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 1 Feb 2023 16:17:21 +0000
-Subject: [PATCH 24/38] corstone1000: adjust boot bank and kernel location
+Subject: [PATCH] corstone1000: adjust boot bank and kernel location
 
 Adjust in the env boot script the address of the
 bootbank with the new gpt layout, and also the
@@ -31,6 +31,3 @@ index b24ff07fc6..a6ee496221 100644
  kernel_addr_bank_1=0x0936E000
  retrieve_kernel_load_addr=
  	if itest.l *${boot_bank_flag} == 0; then
--- 
-2.25.1
-

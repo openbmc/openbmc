@@ -336,7 +336,9 @@ def print_html_report(data, id_comp, buildstats):
                 test_i = test_data['tests'][test]
                 meas_i = test_i['measurements'][meas]
                 commit_num = get_data_item(meta, 'layers.meta.commit_count')
-                samples.append(measurement_stats(meas_i))
+                # Add start_time for both test measurement types of sysres and disk usage
+                start_time = test_i['start_time'][0]
+                samples.append(measurement_stats(meas_i, '', start_time))
                 samples[-1]['commit_num'] = commit_num
 
             absdiff = samples[-1]['val_cls'](samples[-1]['mean'] - samples[id_comp]['mean'])
@@ -473,7 +475,7 @@ Examine build performance test results from a Git repository"""
     group.add_argument('--branch', '-B', default='master', help="Branch to find commit in")
     group.add_argument('--branch2', help="Branch to find comparision revisions in")
     group.add_argument('--machine', default='qemux86')
-    group.add_argument('--history-length', default=25, type=int,
+    group.add_argument('--history-length', default=300, type=int,
                        help="Number of tested revisions to plot in html report")
     group.add_argument('--commit',
                        help="Revision to search for")

@@ -1,4 +1,4 @@
-From ebe65b0e8622c37463697dcec779a42290c33810 Mon Sep 17 00:00:00 2001
+From ae4fdd8e8d052835973e6ff4b7550f93bde30a98 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 31 Aug 2021 10:37:05 +0200
 Subject: [PATCH] build/pack.c: do not insert payloadflags into .rpm metadata
@@ -9,7 +9,6 @@ host to the next and breaks reproducibility for .rpm).
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
-
 ---
  build/pack.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

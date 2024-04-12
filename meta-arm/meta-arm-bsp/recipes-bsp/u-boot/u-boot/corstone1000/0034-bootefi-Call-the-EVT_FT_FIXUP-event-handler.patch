@@ -1,7 +1,7 @@
-From 829e5d3a505452fbdb420432dc885903332a8cdc Mon Sep 17 00:00:00 2001
+From ff83070da7d1f547fc640e8446251f8e1e4ffc33 Mon Sep 17 00:00:00 2001
 From: Sughosh Ganu <sughosh.ganu@linaro.org>
 Date: Thu, 21 Sep 2023 14:15:13 +0100
-Subject: [PATCH 34/38] bootefi: Call the EVT_FT_FIXUP event handler
+Subject: [PATCH] bootefi: Call the EVT_FT_FIXUP event handler
 
 The bootefi command passes the devicetree to the kernel through the
 EFI config table. Call the event handlers for fixing the devicetree
@@ -51,6 +51,3 @@ index 5c0afec154..f9588b66c7 100644
  
  	if (CONFIG_IS_ENABLED(EFI_TCG2_PROTOCOL_MEASURE_DTB)) {
  		ret = efi_tcg2_measure_dtb(fdt);
--- 
-2.25.1
-

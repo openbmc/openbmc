@@ -1,7 +1,10 @@
-From 8659eeeeda74d71e12080121f0b13a88cbdda433 Mon Sep 17 00:00:00 2001
+From 6dd80236a91a505b5753bb74e5f1b47330d8b16b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
 Date: Tue, 21 Feb 2017 11:23:27 -0600
 Subject: [PATCH] dpkg-deb/build.c: Remove usage of --clamp-mtime in tar
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Recently dpkg added --clamp-mtime to tar to create reproducible
 build tarballs [1].
@@ -24,10 +27,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/deb/build.c b/src/deb/build.c
-index 5c74ff3..76613ad 100644
+index 1f0c050ee..92aba9553 100644
 --- a/src/deb/build.c
 +++ b/src/deb/build.c
-@@ -505,7 +505,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
+@@ -504,7 +504,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
  
      command_init(&cmd, TAR, "tar -cf");
      command_add_args(&cmd, "tar", "-cf", "-", "--format=gnu",
@@ -36,6 +39,3 @@ index 5c74ff3..76613ad 100644
      /* Mode might become a positional argument, pass it before -T. */
      if (options->mode)
        command_add_args(&cmd, "--mode", options->mode, NULL);
--- 
-2.25.1
-

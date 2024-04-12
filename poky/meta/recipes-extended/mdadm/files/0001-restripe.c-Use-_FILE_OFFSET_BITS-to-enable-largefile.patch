@@ -1,4 +1,4 @@
-From 6b861a267a6ef6f60f6cc21e4c8e6d7cdd2451dc Mon Sep 17 00:00:00 2001
+From aa86de05cd6a75222b38e0789ac96fe00f705430 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 10 Nov 2022 12:31:22 -0800
 Subject: [PATCH] restripe.c: Use _FILE_OFFSET_BITS to enable largefile support
@@ -10,9 +10,57 @@ the width of types
 Upstream-Status: Submitted [https://lore.kernel.org/linux-raid/20221110225546.337164-1-raj.khem@gmail.com/]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- restripe.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ raid6check.c | 11 +++++++----
+ restripe.c   | 13 ++++++++-----
+ swap_super.c | 13 +++++++------
+ 3 files changed, 22 insertions(+), 15 deletions(-)
 
+diff --git a/raid6check.c b/raid6check.c
+index 9947776..8e7f142 100644
+--- a/raid6check.c
++++ b/raid6check.c
+@@ -22,6 +22,9 @@
+  *    Based on "restripe.c" from "mdadm" codebase
+  */
+ 
++/* Enable largefile support */
++#define _FILE_OFFSET_BITS 64
++
+ #include "mdadm.h"
+ #include <stdint.h>
+ #include <sys/mman.h>
+@@ -284,9 +287,9 @@ int manual_repair(int chunk_size, int syndrome_disks,
+ 	}
+ 
+ 	int write_res1, write_res2;
+-	off64_t seek_res;
++	off_t seek_res;
+ 
+-	seek_res = lseek64(source[fd1],
++	seek_res = lseek(source[fd1],
+ 			   offsets[fd1] + start * chunk_size, SEEK_SET);
+ 	if (seek_res < 0) {
+ 		fprintf(stderr, "lseek failed for failed_disk1\n");
+@@ -294,7 +297,7 @@ int manual_repair(int chunk_size, int syndrome_disks,
+ 	}
+ 	write_res1 = write(source[fd1], blocks[failed_slot1], chunk_size);
+ 
+-	seek_res = lseek64(source[fd2],
++	seek_res = lseek(source[fd2],
+ 			   offsets[fd2] + start * chunk_size, SEEK_SET);
+ 	if (seek_res < 0) {
+ 		fprintf(stderr, "lseek failed for failed_disk2\n");
+@@ -379,7 +382,7 @@ int check_stripes(struct mdinfo *info, int *source, unsigned long long *offsets,
+ 			goto exitCheck;
+ 		}
+ 		for (i = 0 ; i < raid_disks ; i++) {
+-			off64_t seek_res = lseek64(source[i], offsets[i] + start * chunk_size,
++			off_t seek_res = lseek(source[i], offsets[i] + start * chunk_size,
+ 						   SEEK_SET);
+ 			if (seek_res < 0) {
+ 				fprintf(stderr, "lseek to source %d failed\n", i);
+diff --git a/restripe.c b/restripe.c
+index a7a7229..1c03577 100644
 --- a/restripe.c
 +++ b/restripe.c
 @@ -22,6 +22,9 @@
@@ -25,7 +73,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include "mdadm.h"
  #include <stdint.h>
  
-@@ -581,7 +584,7 @@ int save_stripes(int *source, unsigned l
+@@ -581,7 +584,7 @@ int save_stripes(int *source, unsigned long long *offsets,
  				       raid_disks, level, layout);
  			if (dnum < 0) abort();
  			if (source[dnum] < 0 ||
@@ -34,7 +82,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  				    offsets[dnum] + offset, 0) < 0 ||
  			    read(source[dnum], buf+disk * chunk_size,
  				 chunk_size) != chunk_size) {
-@@ -754,8 +757,8 @@ int restore_stripes(int *dest, unsigned
+@@ -754,8 +757,8 @@ int restore_stripes(int *dest, unsigned long long *offsets,
  					   raid_disks, level, layout);
  			if (src_buf == NULL) {
  				/* read from file */
@@ -45,7 +93,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  					rv = -1;
  					goto abort;
  				}
-@@ -816,7 +819,7 @@ int restore_stripes(int *dest, unsigned
+@@ -816,7 +819,7 @@ int restore_stripes(int *dest, unsigned long long *offsets,
  		}
  		for (i=0; i < raid_disks ; i++)
  			if (dest[i] >= 0) {
@@ -54,7 +102,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  					 offsets[i]+offset, 0) < 0) {
  					rv = -1;
  					goto abort;
-@@ -866,7 +869,7 @@ int test_stripes(int *source, unsigned l
+@@ -866,7 +869,7 @@ int test_stripes(int *source, unsigned long long *offsets,
  		int disk;
  
  		for (i = 0 ; i < raid_disks ; i++) {
@@ -63,48 +111,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  			    (read(source[i], stripes[i], chunk_size) !=
  			     chunk_size)) {
  				free(q);
---- a/raid6check.c
-+++ b/raid6check.c
-@@ -22,6 +22,9 @@
-  *    Based on "restripe.c" from "mdadm" codebase
-  */
- 
-+/* Enable largefile support */
-+#define _FILE_OFFSET_BITS 64
-+
- #include "mdadm.h"
- #include <stdint.h>
- #include <signal.h>
-@@ -279,9 +282,9 @@ int manual_repair(int chunk_size, int sy
- 	}
- 
- 	int write_res1, write_res2;
--	off64_t seek_res;
-+	off_t seek_res;
- 
--	seek_res = lseek64(source[fd1],
-+	seek_res = lseek(source[fd1],
- 			   offsets[fd1] + start * chunk_size, SEEK_SET);
- 	if (seek_res < 0) {
- 		fprintf(stderr, "lseek failed for failed_disk1\n");
-@@ -289,7 +292,7 @@ int manual_repair(int chunk_size, int sy
- 	}
- 	write_res1 = write(source[fd1], blocks[failed_slot1], chunk_size);
- 
--	seek_res = lseek64(source[fd2],
-+	seek_res = lseek(source[fd2],
- 			   offsets[fd2] + start * chunk_size, SEEK_SET);
- 	if (seek_res < 0) {
- 		fprintf(stderr, "lseek failed for failed_disk2\n");
-@@ -374,7 +377,7 @@ int check_stripes(struct mdinfo *info, i
- 			goto exitCheck;
- 		}
- 		for (i = 0 ; i < raid_disks ; i++) {
--			off64_t seek_res = lseek64(source[i], offsets[i] + start * chunk_size,
-+			off_t seek_res = lseek(source[i], offsets[i] + start * chunk_size,
- 						   SEEK_SET);
- 			if (seek_res < 0) {
- 				fprintf(stderr, "lseek to source %d failed\n", i);
+diff --git a/swap_super.c b/swap_super.c
+index b6db574..18c89e2 100644
 --- a/swap_super.c
 +++ b/swap_super.c
 @@ -1,3 +1,6 @@

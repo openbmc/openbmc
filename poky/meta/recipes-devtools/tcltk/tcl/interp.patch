@@ -1,11 +1,19 @@
+From 426aa2ff62dda77fd011e8f630b9d4ea17984817 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Mon, 12 Jul 2021 14:50:13 +0100
+Subject: [PATCH] tcl: fix race in interp.test
+
 The interp-36.7 patch has race conditions and is missing cleanup.  This patch by
 a Tcl maintainer should improve matters.
 
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/interp.test | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/tests/interp.test b/tests/interp.test
-index d7424847f..fc90990f3 100644
+index d742484..fc90990 100644
 --- a/tests/interp.test
 +++ b/tests/interp.test
 @@ -3595,17 +3595,18 @@ test interp-36.7 {ChildBgerror sets error handler of child [1999035]} -setup {

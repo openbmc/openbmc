@@ -1,7 +1,7 @@
-From 9c789dbc70d58f55c84cc02ac35783af0aae85d5 Mon Sep 17 00:00:00 2001
+From effa8444b74e456f724146c2593991281f95762d Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Wed, 10 May 2023 17:34:55 +0100
-Subject: [PATCH 07/38] FF-A v15: arm_ffa: introduce sandbox test cases for
+Subject: [PATCH] FF-A v15: arm_ffa: introduce sandbox test cases for
  UCLASS_FFA
 
 Add functional test cases for the FF-A support
@@ -336,6 +336,3 @@ index 0000000000..6912666bb4
 +}
 +
 +DM_TEST(dm_test_ffa_nack, UT_TESTF_SCAN_FDT | UT_TESTF_CONSOLE_REC);
--- 
-2.25.1
-

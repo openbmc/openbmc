@@ -1,7 +1,7 @@
-From 747da6c0d1f2558ebeaf01ba9f762efa58a08a72 Mon Sep 17 00:00:00 2001
+From 67c439b974da80208962c1c7f0a1291908e23a30 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Mon, 27 Feb 2023 14:40:13 +0000
-Subject: [PATCH 28/38] corstone1000: boot index from active
+Subject: [PATCH] corstone1000: boot index from active
 
 In our platform, the Secure Enclave is the one who control
 all the boot tries and status, so, every time we get here
@@ -36,6 +36,3 @@ index a045262ebb..53c65506d5 100644
  }
  
  int board_late_init(void)
--- 
-2.25.1
-

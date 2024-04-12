@@ -665,7 +665,7 @@ The padding size can be modified by setting :term:`DT_PADDING_SIZE`
 to the desired size, in bytes.
 
 See :oe_git:`devicetree.bbclass sources
-</openembedded-core/tree/meta/classes-recipe/devicetree.bbclass>` 
+</openembedded-core/tree/meta/classes-recipe/devicetree.bbclass>`
 for further variables controlling this class.
 
 Here is an excerpt of an example ``recipes-kernel/linux/devicetree-acme.bb``
@@ -938,6 +938,20 @@ The :ref:`ref-classes-go-mod` class allows to use Go modules, and inherits the
 :ref:`ref-classes-go` class.
 
 See the associated :term:`GO_WORKDIR` variable.
+
+.. _ref-classes-go-vendor:
+
+``go-vendor``
+=============
+
+The :ref:`ref-classes-go-vendor` class implements support for offline builds,
+also known as Go vendoring. In such a scenario, the module dependencias are
+downloaded during the :ref:`ref-tasks-fetch` task rather than when modules are
+imported, thus being coherent with Yocto's concept of fetching every source
+beforehand.
+
+The dependencies are unpacked into the modules' ``vendor`` directory, where a
+manifest file is generated.
 
 .. _ref-classes-gobject-introspection:
 
@@ -3270,7 +3284,7 @@ The variables used by this class are:
 -  :term:`UBOOT_FIT_KEY_REQ_ARGS`: ``openssl req`` arguments.
 -  :term:`UBOOT_FIT_SIGN_ALG`: signature algorithm for the FIT image.
 -  :term:`UBOOT_FIT_SIGN_NUMBITS`: size of the private key for FIT image
-   signing.                                                  
+   signing.
 -  :term:`UBOOT_FIT_KEY_SIGN_PKCS`: algorithm for the public key certificate
    for FIT image signing.
 -  :term:`UBOOT_FITIMAGE_ENABLE`: enable the generation of a U-Boot FIT image.

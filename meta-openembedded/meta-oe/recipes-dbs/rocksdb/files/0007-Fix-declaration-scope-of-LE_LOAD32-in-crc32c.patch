@@ -1,0 +1,39 @@
+From ed549d43c8b691cd7891c7e5c76df189feb04b4f Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Sun, 7 Apr 2024 17:16:53 +0800
+Subject: [PATCH] Fix declaration scope of LE_LOAD32 in crc32c
+
+Fix build error when __SSE4_2__ is defined:
+util/crc32c.cc: In function 'void rocksdb::crc32c::DefaultCRC32(uint64_t*, const uint8_t**)':
+util/crc32c.cc:267:53: error: 'LE_LOAD32' was not declared in this scope
+  267 |   *l = _mm_crc32_u32(static_cast<unsigned int>(*l), LE_LOAD32(*p));
+      |                                                     ^~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/12515]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ util/crc32c.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/crc32c.cc b/util/crc32c.cc
+index 38a69bb50..aa13ad882 100644
+--- a/util/crc32c.cc
++++ b/util/crc32c.cc
+@@ -242,12 +242,12 @@ static const uint32_t table3_[256] = {
+     0xc747336e, 0x1a0299d6, 0x782010ef, 0xa565ba57, 0xbc65029d, 0x6120a825,
+     0x0302211c, 0xde478ba4, 0x31035088, 0xec46fa30, 0x8e647309, 0x5321d9b1,
+     0x4a21617b, 0x9764cbc3, 0xf54642fa, 0x2803e842};
++#endif  // !__SSE4_2__
+ 
+ // Used to fetch a naturally-aligned 32-bit word in little endian byte-order
+ static inline uint32_t LE_LOAD32(const uint8_t* p) {
+   return DecodeFixed32(reinterpret_cast<const char*>(p));
+ }
+-#endif  // !__SSE4_2__
+ 
+ static inline void DefaultCRC32(uint64_t* l, uint8_t const** p) {
+ #ifndef __SSE4_2__
+-- 
+2.25.1
+

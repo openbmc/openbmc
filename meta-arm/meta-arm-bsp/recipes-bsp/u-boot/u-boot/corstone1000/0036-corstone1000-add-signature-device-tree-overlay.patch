@@ -1,7 +1,7 @@
-From b6e69bd68c1e0171aa2acb78bec54da02defe129 Mon Sep 17 00:00:00 2001
+From 57e2230470c32bf2c6206813bcdfc9ce30b70c1d Mon Sep 17 00:00:00 2001
 From: Emekcan Aras <emekcan.aras@arm.com>
 Date: Wed, 13 Sep 2023 13:20:15 +0100
-Subject: [PATCH 36/38] corstone1000: add signature device tree overlay
+Subject: [PATCH] corstone1000: add signature device tree overlay
 
 Adds signature device tree overlay.
 
@@ -26,6 +26,3 @@ index 1e0ec075e4..077673dd44 100644
  	soc {
  		compatible = "simple-bus";
  		#address-cells = <1>;
--- 
-2.25.1
-

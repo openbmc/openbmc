@@ -21,8 +21,7 @@ FILES:${PN}-ptest += "${libdir}/libgpiosim.so.*"
 FILES:${PN}-ptest-dev += "${includedir}/gpiosim.h"
 
 RDEPENDS:${PN}-ptest += " \
-    bash \
-    ${@bb.utils.contains('PTEST_ENABLED', '1', 'shunit2', '', d)} \
+    ${@bb.utils.contains('PTEST_ENABLED', '1', 'shunit2 bash', '', d)} \
 "
 RRECOMMENDS:${PN}-ptest += "kernel-module-gpio-sim kernel-module-configfs"
 

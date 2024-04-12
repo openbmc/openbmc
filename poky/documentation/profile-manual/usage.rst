@@ -1058,13 +1058,13 @@ section::
    name: do_fork
    ID: 944
    format:
-           field:unsigned short common_type;	offset:0;	size:2;	signed:0;
-           field:unsigned char common_flags;	offset:2;	size:1;	signed:0;
-           field:unsigned char common_preempt_count;	offset:3;	size:1;	signed:0;
-           field:int common_pid;	offset:4;	size:4;	signed:1;
-           field:int common_padding;	offset:8;	size:4;	signed:1;
+           field:unsigned short common_type;    offset:0;       size:2; signed:0;
+           field:unsigned char common_flags;    offset:2;       size:1; signed:0;
+           field:unsigned char common_preempt_count;    offset:3;       size:1; signed:0;
+           field:int common_pid;        offset:4;       size:4; signed:1;
+           field:int common_padding;    offset:8;       size:4; signed:1;
 
-           field:unsigned long __probe_ip;	offset:12;	size:4;	signed:0;
+           field:unsigned long __probe_ip;      offset:12;      size:4; signed:0;
 
    print fmt: "(%lx)", REC->__probe_ip
 
@@ -1550,17 +1550,17 @@ like ftrace to display the event as text. The format of the
    name: kmalloc
    ID: 313
    format:
-           field:unsigned short common_type;	offset:0;	size:2;	signed:0;
-           field:unsigned char common_flags;	offset:2;	size:1;	signed:0;
-           field:unsigned char common_preempt_count;	offset:3;	size:1;	signed:0;
-           field:int common_pid;	offset:4;	size:4;	signed:1;
-           field:int common_padding;	offset:8;	size:4;	signed:1;
+           field:unsigned short common_type;    offset:0;       size:2; signed:0;
+           field:unsigned char common_flags;    offset:2;       size:1; signed:0;
+           field:unsigned char common_preempt_count;    offset:3;       size:1; signed:0;
+           field:int common_pid;        offset:4;       size:4; signed:1;
+           field:int common_padding;    offset:8;       size:4; signed:1;
 
-           field:unsigned long call_site;	offset:16;	size:8;	signed:0;
-           field:const void * ptr;	offset:24;	size:8;	signed:0;
-           field:size_t bytes_req;	offset:32;	size:8;	signed:0;
-           field:size_t bytes_alloc;	offset:40;	size:8;	signed:0;
-           field:gfp_t gfp_flags;	offset:48;	size:4;	signed:0;
+           field:unsigned long call_site;       offset:16;      size:8; signed:0;
+           field:const void * ptr;      offset:24;      size:8; signed:0;
+           field:size_t bytes_req;      offset:32;      size:8; signed:0;
+           field:size_t bytes_alloc;    offset:40;      size:8; signed:0;
+           field:gfp_t gfp_flags;       offset:48;      size:4; signed:0;
 
    print fmt: "call_site=%lx ptr=%p bytes_req=%zu bytes_alloc=%zu gfp_flags=%s", REC->call_site, REC->ptr, REC->bytes_req, REC->bytes_alloc,
    (REC->gfp_flags) ? __print_flags(REC->gfp_flags, "|", {(unsigned long)(((( gfp_t)0x10u) | (( gfp_t)0x40u) | (( gfp_t)0x80u) | ((
@@ -1872,7 +1872,7 @@ Practically speaking, that means you need to do the following:
 
 -  Or build a non-SDK image but include the profiling tools
    (edit ``local.conf`` and add ``tools-profile`` to the end of
-   :term:``EXTRA_IMAGE_FEATURES`` variable)::
+   :term:`EXTRA_IMAGE_FEATURES` variable)::
 
       $ bitbake core-image-sato
 
@@ -2355,29 +2355,29 @@ first part of the filenames::
     8,32   1        0    58.516990819     0  m   N cfq3551 put_queue
 
    CPU0 (sdc):
-    Reads Queued:           0,        0KiB	 Writes Queued:         331,   26,284KiB
-    Read Dispatches:        0,        0KiB	 Write Dispatches:      485,   40,484KiB
-    Reads Requeued:         0		 Writes Requeued:         0
-    Reads Completed:        0,        0KiB	 Writes Completed:      511,   41,000KiB
-    Read Merges:            0,        0KiB	 Write Merges:           13,      160KiB
-    Read depth:             0        	 Write depth:             2
-    IO unplugs:            23        	 Timer unplugs:           0
+    Reads Queued:           0,        0KiB       Writes Queued:         331,   26,284KiB
+    Read Dispatches:        0,        0KiB       Write Dispatches:      485,   40,484KiB
+    Reads Requeued:         0                    Writes Requeued:         0
+    Reads Completed:        0,        0KiB       Writes Completed:      511,   41,000KiB
+    Read Merges:            0,        0KiB       Write Merges:           13,      160KiB
+    Read depth:             0                    Write depth:             2
+    IO unplugs:            23                    Timer unplugs:           0
    CPU1 (sdc):
-    Reads Queued:           0,        0KiB	 Writes Queued:         249,   15,800KiB
-    Read Dispatches:        0,        0KiB	 Write Dispatches:       42,    1,600KiB
-    Reads Requeued:         0		 Writes Requeued:         0
-    Reads Completed:        0,        0KiB	 Writes Completed:       16,    1,084KiB
-    Read Merges:            0,        0KiB	 Write Merges:           40,      276KiB
-    Read depth:             0        	 Write depth:             2
-    IO unplugs:            30        	 Timer unplugs:           1
+    Reads Queued:           0,        0KiB       Writes Queued:         249,   15,800KiB
+    Read Dispatches:        0,        0KiB       Write Dispatches:       42,    1,600KiB
+    Reads Requeued:         0                    Writes Requeued:         0
+    Reads Completed:        0,        0KiB       Writes Completed:       16,    1,084KiB
+    Read Merges:            0,        0KiB       Write Merges:           40,      276KiB
+    Read depth:             0                    Write depth:             2
+    IO unplugs:            30                    Timer unplugs:           1
 
    Total (sdc):
-    Reads Queued:           0,        0KiB	 Writes Queued:         580,   42,084KiB
-    Read Dispatches:        0,        0KiB	 Write Dispatches:      527,   42,084KiB
-    Reads Requeued:         0		 Writes Requeued:         0
-    Reads Completed:        0,        0KiB	 Writes Completed:      527,   42,084KiB
-    Read Merges:            0,        0KiB	 Write Merges:           53,      436KiB
-    IO unplugs:            53        	 Timer unplugs:           1
+    Reads Queued:           0,        0KiB       Writes Queued:         580,   42,084KiB
+    Read Dispatches:        0,        0KiB       Write Dispatches:      527,   42,084KiB
+    Reads Requeued:         0                    Writes Requeued:         0
+    Reads Completed:        0,        0KiB       Writes Completed:      527,   42,084KiB
+    Read Merges:            0,        0KiB       Write Merges:           53,      436KiB
+    IO unplugs:            53                    Timer unplugs:           1
 
    Throughput (R/W): 0KiB/s / 719KiB/s
    Events (sdc): 6,592 entries
@@ -2500,29 +2500,29 @@ And run blkparse on the host system using the device name::
     8,32   1        0   177.266696560     0  m   N cfq1267 put_queue
 
    CPU0 (sdc):
-    Reads Queued:           0,        0KiB	 Writes Queued:         270,   21,708KiB
-    Read Dispatches:       59,    2,628KiB	 Write Dispatches:      495,   39,964KiB
-    Reads Requeued:         0		 Writes Requeued:         0
-    Reads Completed:       90,    2,752KiB	 Writes Completed:      543,   41,596KiB
-    Read Merges:            0,        0KiB	 Write Merges:            9,      344KiB
-    Read depth:             2        	 Write depth:             2
-    IO unplugs:            20        	 Timer unplugs:           1
+    Reads Queued:           0,        0KiB       Writes Queued:         270,   21,708KiB
+    Read Dispatches:       59,    2,628KiB       Write Dispatches:      495,   39,964KiB
+    Reads Requeued:         0                    Writes Requeued:         0
+    Reads Completed:       90,    2,752KiB       Writes Completed:      543,   41,596KiB
+    Read Merges:            0,        0KiB       Write Merges:            9,      344KiB
+    Read depth:             2                    Write depth:             2
+    IO unplugs:            20                    Timer unplugs:           1
    CPU1 (sdc):
-    Reads Queued:         688,    2,752KiB	 Writes Queued:         381,   20,652KiB
-    Read Dispatches:       31,      124KiB	 Write Dispatches:       59,    2,396KiB
-    Reads Requeued:         0		 Writes Requeued:         0
-    Reads Completed:        0,        0KiB	 Writes Completed:       11,      764KiB
-    Read Merges:          598,    2,392KiB	 Write Merges:           88,      448KiB
-    Read depth:             2        	 Write depth:             2
-    IO unplugs:            52        	 Timer unplugs:           0
+    Reads Queued:         688,    2,752KiB       Writes Queued:         381,   20,652KiB
+    Read Dispatches:       31,      124KiB       Write Dispatches:       59,    2,396KiB
+    Reads Requeued:         0                    Writes Requeued:         0
+    Reads Completed:        0,        0KiB       Writes Completed:       11,      764KiB
+    Read Merges:          598,    2,392KiB       Write Merges:           88,      448KiB
+    Read depth:             2                    Write depth:             2
+    IO unplugs:            52                    Timer unplugs:           0
 
    Total (sdc):
-    Reads Queued:         688,    2,752KiB	 Writes Queued:         651,   42,360KiB
-    Read Dispatches:       90,    2,752KiB	 Write Dispatches:      554,   42,360KiB
-    Reads Requeued:         0		 Writes Requeued:         0
-    Reads Completed:       90,    2,752KiB	 Writes Completed:      554,   42,360KiB
-    Read Merges:          598,    2,392KiB	 Write Merges:           97,      792KiB
-    IO unplugs:            72        	 Timer unplugs:           1
+    Reads Queued:         688,    2,752KiB       Writes Queued:         651,   42,360KiB
+    Read Dispatches:       90,    2,752KiB       Write Dispatches:      554,   42,360KiB
+    Reads Requeued:         0                    Writes Requeued:         0
+    Reads Completed:       90,    2,752KiB       Writes Completed:      554,   42,360KiB
+    Read Merges:          598,    2,392KiB       Write Merges:           97,      792KiB
+    IO unplugs:            72                    Timer unplugs:           1
 
    Throughput (R/W): 15KiB/s / 238KiB/s
    Events (sdc): 9,301 entries

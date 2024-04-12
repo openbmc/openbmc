@@ -121,7 +121,7 @@ Removed variables
 The following variables have been removed:
 
 -  ``SERIAL_CONSOLE``, deprecated since version 2.6, replaced by :term:`SERIAL_CONSOLES`.
--  ``PACKAGEBUILDPKGD``, a mostly internal variable in the ref:`ref-classes-package`
+-  ``PACKAGEBUILDPKGD``, a mostly internal variable in the :ref:`ref-classes-package`
    class was rarely used to customise packaging. If you were using this in your custom
    recipes or bbappends, you will need to switch to using :term:`PACKAGE_PREPROCESS_FUNCS`
    or :term:`PACKAGESPLITFUNCS` instead.

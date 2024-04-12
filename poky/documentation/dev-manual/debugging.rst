@@ -270,13 +270,17 @@ format and can be converted to images (e.g. using the ``dot`` tool from
       displays paths between graph nodes.
 
 You can use a different method to view dependency information by using
-the following command::
+either::
 
    $ bitbake -g -u taskexp recipename
 
-This command
-displays a GUI window from which you can view build-time and runtime
-dependencies for the recipes involved in building recipename.
+or::
+
+   $ bitbake -g -u taskexp_ncurses recipename
+
+The ``-u taskdep`` option GUI window from which you can view build-time and
+runtime dependencies for the recipes involved in building recipename. The
+``-u taskexp_ncurses`` option uses ncurses instead of GTK to render the UI.
 
 Viewing Task Variable Dependencies
 ==================================

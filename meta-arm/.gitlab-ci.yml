@@ -1,4 +1,4 @@
-image: ${MIRROR_GHCR}/siemens/kas/kas:4.3.1
+image: ${MIRROR_GHCR}/siemens/kas/kas:4.3.2
 
 variables:
   # These are needed as the k8s executor doesn't respect the container
@@ -259,14 +259,6 @@ qemuarmv5:
 
 sgi575:
   extends: .build
-
-tc1:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: testimage
-  tags:
-    - x86_64
 
 toolchains:
   extends: .build

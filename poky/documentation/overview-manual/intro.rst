@@ -38,7 +38,7 @@ This manual does not give you the following:
    procedures reside in other manuals within the Yocto Project
    documentation set. For example, the :doc:`/dev-manual/index`
    provides examples on how to perform
-   various development tasks. As another example, the 
+   various development tasks. As another example, the
    :doc:`/sdk-manual/index` manual contains detailed
    instructions on how to install an SDK, which is used to develop
    applications for target hardware.

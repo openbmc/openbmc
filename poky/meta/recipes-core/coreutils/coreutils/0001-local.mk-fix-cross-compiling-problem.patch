@@ -1,4 +1,7 @@
-Subject: local.mk: fix cross compiling problem
+From 7cb2d20cfa2a27191255031d231cd41917dcffe8 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 26 Dec 2016 16:10:35 +0800
+Subject: [PATCH] local.mk: fix cross compiling problem
 
 We meet the following error when cross compiling.
 | Makefile:3418: *** Recursive variable 'INSTALL' references itself (eventually).  Stop.
@@ -12,15 +15,12 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/local.mk b/src/local.mk
-index 36dfa4e..c5898cc 100644
+index 96ee941..cdd47d6 100644
 --- a/src/local.mk
 +++ b/src/local.mk
-@@ -649,4 +649,4 @@ cu_install_program = @INSTALL_PROGRAM@
+@@ -704,4 +704,4 @@ cu_install_program = @INSTALL@
  else
  cu_install_program = src/ginstall
  endif
 -INSTALL = $(cu_install_program) -c
 +INSTALL_PROGRAM = $(cu_install_program)
--- 
-2.1.0
-

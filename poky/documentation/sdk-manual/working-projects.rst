@@ -295,12 +295,12 @@ example:
       all: main.o module.o
         ${CC} main.o module.o -o target_bin
       main.o: main.c module.h
-      	${CC} -I . -c main.c
+        ${CC} -I . -c main.c
       module.o: module.c module.h
         ${CC} -I . -c module.c
       clean:
-      	rm -rf *.o
-      	rm target_bin
+        rm -rf *.o
+        rm target_bin
 
 #. *Make the Project:* Use the ``make`` command to create the binary
    output file. Because variables are commented out in the Makefile, the

@@ -7,49 +7,77 @@
 
 import os
 import sys,logging
-import optparse
+import argparse
 import warnings
 warnings.simplefilter("default")
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)),'lib'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib"))
 
 import prserv
 import prserv.serv
 
-__version__="1.0.0"
+VERSION = "1.1.0"
 
-PRHOST_DEFAULT='0.0.0.0'
+PRHOST_DEFAULT="0.0.0.0"
 PRPORT_DEFAULT=8585
 
 def main():
-    parser = optparse.OptionParser(
-        version="Bitbake PR Service Core version %s, %%prog version %s" % (prserv.__version__, __version__),
-        usage = "%prog < --start | --stop > [options]")
+    parser = argparse.ArgumentParser(
+        description="BitBake PR Server. Version=%s" % VERSION,
+        formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_option("-f", "--file", help="database filename(default: prserv.sqlite3)", action="store",
-                      dest="dbfile", type="string", default="prserv.sqlite3")
-    parser.add_option("-l", "--log", help="log filename(default: prserv.log)", action="store",
-                      dest="logfile", type="string", default="prserv.log")
-    parser.add_option("--loglevel", help="logging level, i.e. CRITICAL, ERROR, WARNING, INFO, DEBUG",
-                      action = "store", type="string", dest="loglevel", default = "INFO")
-    parser.add_option("--start", help="start daemon",
-                      action="store_true", dest="start")
-    parser.add_option("--stop", help="stop daemon",
-                      action="store_true", dest="stop")
-    parser.add_option("--host", help="ip address to bind", action="store",
-                      dest="host", type="string", default=PRHOST_DEFAULT)
-    parser.add_option("--port", help="port number(default: 8585)", action="store",
-                      dest="port", type="int", default=PRPORT_DEFAULT)
-    parser.add_option("-r", "--read-only", help="open database in read-only mode",
-                      action="store_true")
+    parser.add_argument(
+        "-f",
+        "--file",
+        default="prserv.sqlite3",
+        help="database filename (default: prserv.sqlite3)",
+    )
+    parser.add_argument(
+        "-l",
+        "--log",
+        default="prserv.log",
+        help="log filename(default: prserv.log)",
+    )
+    parser.add_argument(
+        "--loglevel",
+        default="INFO",
+        help="logging level, i.e. CRITICAL, ERROR, WARNING, INFO, DEBUG",
+    )
+    parser.add_argument(
+        "--start",
+        action="store_true",
+        help="start daemon",
+    )
+    parser.add_argument(
+        "--stop",
+        action="store_true",
+        help="stop daemon",
+    )
+    parser.add_argument(
+        "--host",
+        help="ip address to bind",
+        default=PRHOST_DEFAULT,
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=PRPORT_DEFAULT,
+        help="port number (default: 8585)",
+    )
+    parser.add_argument(
+        "-r",
+        "--read-only",
+        action="store_true",
+        help="open database in read-only mode",
+    )
 
-    options, args = parser.parse_args(sys.argv)
-    prserv.init_logger(os.path.abspath(options.logfile),options.loglevel)
+    args = parser.parse_args()
+    prserv.init_logger(os.path.abspath(args.log), args.loglevel)
 
-    if options.start:
-        ret=prserv.serv.start_daemon(options.dbfile, options.host, options.port,os.path.abspath(options.logfile), options.read_only)
-    elif options.stop:
-        ret=prserv.serv.stop_daemon(options.host, options.port)
+    if args.start:
+        ret=prserv.serv.start_daemon(args.file, args.host, args.port, os.path.abspath(args.log), args.read_only)
+    elif args.stop:
+        ret=prserv.serv.stop_daemon(args.host, args.port)
     else:
         ret=parser.print_help()
     return ret

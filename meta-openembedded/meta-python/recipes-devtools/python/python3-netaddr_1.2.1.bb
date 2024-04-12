@@ -20,3 +20,6 @@ do_install_ptest() {
     cp -rf ${S}/netaddr/tests/* ${D}${PTEST_PATH}/tests/
 }
 
+do_install_ptest:append:libc-musl () {
+    sed -i -e "/--automake/ s/$/ -k 'not test_strategy_ipv6'/" ${D}${PTEST_PATH}/run-ptest
+}

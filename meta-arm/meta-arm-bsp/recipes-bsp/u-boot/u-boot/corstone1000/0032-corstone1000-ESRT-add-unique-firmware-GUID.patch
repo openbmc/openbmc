@@ -1,7 +1,7 @@
-From 7e63d4982fd4436d9d0d9abebd9e0ed1473f5237 Mon Sep 17 00:00:00 2001
+From 1f1e0c35c9a11e956a8dc10002d17a497de947e3 Mon Sep 17 00:00:00 2001
 From: Anusmita Dutta Mazumder <anusmita.duttamazumder@arm.com>
 Date: Tue, 8 Aug 2023 10:24:39 +0000
-Subject: [PATCH 32/38] corstone1000: ESRT: add unique firmware GUID
+Subject: [PATCH] corstone1000: ESRT: add unique firmware GUID
 
 Add unique Corstone-1000 firmware GUID
 
@@ -42,6 +42,3 @@ index c6ab6e2182..7792a6aa83 100644
  #else
  	ret = efi_fill_image_desc_array(image_info_size, image_info,
  					descriptor_version, descriptor_count,
--- 
-2.25.1
-

@@ -91,7 +91,16 @@ def setup_build_env(args):
     builddir = args.b if args.b else template["buildpath"]
     no_shell = args.no_shell
     coredir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-    cmd = "TEMPLATECONF={} . {} {}".format(template["templatepath"], os.path.join(coredir, 'oe-init-build-env'), builddir)
+    cmd_base = ". {} {}".format(os.path.join(coredir, 'oe-init-build-env'), os.path.abspath(builddir))
+
+    initbuild = os.path.join(builddir, 'init-build-env')
+    if not os.path.exists(initbuild):
+        os.makedirs(builddir, exist_ok=True)
+        with open(initbuild, 'w') as f:
+            f.write(cmd_base)
+    print("\nRun '. {}' to initialize the build in a current shell session.\n".format(initbuild))
+
+    cmd = "TEMPLATECONF={} {}".format(template["templatepath"], cmd_base)
     if not no_shell:
         cmd = cmd + " && {}".format(os.environ['SHELL'])
     print("Running:", cmd)

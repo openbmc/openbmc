@@ -1,4 +1,4 @@
-From ca4655f36c3c7883eb50381902890b23f0e8aaab Mon Sep 17 00:00:00 2001
+From c39a074ff3c4d21c100d387661c7d725b5eae7b0 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 29 Nov 2023 14:06:15 +0100
 Subject: [PATCH] CMakeLists.txt: look for lua with pkg-config rather than
@@ -8,16 +8,15 @@ Otherwise cmake will try to find libm, badly, and fail.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
-
 ---
  CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7f0630453..d0ea565f3 100644
+index 4a383ceba..ed847c09a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -187,7 +187,7 @@ set(REQFUNCS
+@@ -190,7 +190,7 @@ set(REQFUNCS
  )
  
  find_package(PkgConfig REQUIRED)

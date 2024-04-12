@@ -1,11 +1,15 @@
-Upstream-Status: Inappropriate [disable feature]
+From 008ec5150dd086ffa3940cb520f1ca91939f138d Mon Sep 17 00:00:00 2001
+From: Chris Larson <kergoth@openedhand.com>
+Date: Tue, 5 Sep 2006 07:24:58 +0000
+Subject: [PATCH] Add dpkg, modified from upstream oe.
 
+Upstream-Status: Inappropriate [disable feature]
 ---
  Makefile.am | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index d963a10..7cef7f5 100644
+index 7186045d4..daca9faf2 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -11,7 +11,6 @@ SUBDIRS = \
@@ -16,6 +20,3 @@ index d963a10..7cef7f5 100644
  	# EOL
  
  ACLOCAL_AMFLAGS = -I m4
--- 
-2.25.1
-

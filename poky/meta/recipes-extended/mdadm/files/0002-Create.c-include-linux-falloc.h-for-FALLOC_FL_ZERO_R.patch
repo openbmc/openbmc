@@ -1,0 +1,27 @@
+From a22b2345b9773d362acd85dd4c4a6a3cda9100d4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 12 Mar 2024 10:54:08 +0100
+Subject: [PATCH] Create.c: include linux/falloc.h for FALLOC_FL_ZERO_RANGE
+ definition
+
+glibc provides this through fcntl.h but musl does not - should
+be reported and fixed there.
+
+Upstream-Status: Inappropriate [musl-specific issue]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Create.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Create.c b/Create.c
+index 8082f54..7071f0a 100644
+--- a/Create.c
++++ b/Create.c
+@@ -31,6 +31,7 @@
+ #include	<signal.h>
+ #include	<sys/signalfd.h>
+ #include	<sys/wait.h>
++#include	<linux/falloc.h>
+ 
+ static int round_size_and_verify(unsigned long long *size, int chunk)
+ {

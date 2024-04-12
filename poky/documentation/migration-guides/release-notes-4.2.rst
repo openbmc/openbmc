@@ -35,7 +35,7 @@ New Features / Enhancements in 4.2
 
    -  BitBake's UI will now ping the server regularly to ensure
       it is still alive.
- 
+
 -  New variables:
 
    -  :term:`VOLATILE_TMP_DIR` allows to specify
@@ -288,7 +288,7 @@ New Features / Enhancements in 4.2
       BitBake manual. All variables should be easy to access through the Yocto
       Manual variable index.
    -  Expanded the description of the :term:`BB_NUMBER_THREADS` variable.
-      
+
 -  Miscellaneous changes:
 
    -  Supporting 64 bit dates on 32 bit platforms: several packages have been

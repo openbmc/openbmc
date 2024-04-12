@@ -1,7 +1,7 @@
-From b65511da443c07b45151b30ea2dc280219f4252b Mon Sep 17 00:00:00 2001
+From affde70e4ba728b0ce855f53501bdb5caa8afa6d Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Fri, 11 Aug 2023 10:41:19 +0100
-Subject: [PATCH 31/38] corstone1000: detect inflated kernel size
+Subject: [PATCH] corstone1000: detect inflated kernel size
 
 use filesize variable set by unzip command
 
@@ -24,6 +24,3 @@ index a0af413de8..5b0b2ac3bf 100644
  CONFIG_CONSOLE_RECORD=y
  CONFIG_LOGLEVEL=7
  # CONFIG_DISPLAY_CPUINFO is not set
--- 
-2.25.1
-

@@ -159,8 +159,8 @@ html_last_updated_fmt = '%b %d, %Y'
 html_secnumber_suffix = " "
 
 latex_elements = {
-    'passoptionstopackages': '\PassOptionsToPackage{bookmarksdepth=5}{hyperref}',
-    'preamble': '\setcounter{tocdepth}{2}',
+    'passoptionstopackages': '\\PassOptionsToPackage{bookmarksdepth=5}{hyperref}',
+    'preamble': '\\setcounter{tocdepth}{2}',
 }
 
 # Make the EPUB builder prefer PNG to SVG because of issues rendering Inkscape SVG

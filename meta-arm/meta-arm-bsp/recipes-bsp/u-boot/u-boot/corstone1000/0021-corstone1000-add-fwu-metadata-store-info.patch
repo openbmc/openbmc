@@ -1,7 +1,7 @@
-From 7f0ab0707b476d141bcf16de78d09c793b3b7387 Mon Sep 17 00:00:00 2001
+From c250b6b896facee9ef42f88f5c76f055dbcfc708 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Wed, 1 Feb 2023 15:58:07 +0000
-Subject: [PATCH 21/38] corstone1000: add fwu-metadata store info
+Subject: [PATCH] corstone1000: add fwu-metadata store info
 
 Add fwu-mdata node and handle for the reference
 nvmxip-qspi.
@@ -37,6 +37,3 @@ index 533dfdf8e1..1e0ec075e4 100644
  	soc {
  		compatible = "simple-bus";
  		#address-cells = <1>;
--- 
-2.25.1
-

@@ -1,7 +1,7 @@
-From d7682e9f7c45fffe5be0bc67ee9e31fdca1b94c5 Mon Sep 17 00:00:00 2001
+From 47479f96cb3b3646d298c39216b2c960940476bd Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Wed, 30 Nov 2022 19:11:43 +0000
-Subject: [PATCH 19/38] arm/corstone1000: esrt support
+Subject: [PATCH] arm/corstone1000: esrt support
 
 The implementation is platform specific and would require
 change in future.
@@ -220,6 +220,3 @@ index bf90a98b5a..d20568c1c8 100644
  	/* Initialize variable services */
  	ret = efi_init_variables();
  	if (ret != EFI_SUCCESS)
--- 
-2.25.1
-

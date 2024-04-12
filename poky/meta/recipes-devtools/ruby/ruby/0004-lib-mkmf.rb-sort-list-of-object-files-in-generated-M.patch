@@ -1,6 +1,7 @@
+From 99734381652602f76075017576a819c427ebb5f2 Mon Sep 17 00:00:00 2001
 From: Reiner Herrmann <reiner@reiner-h.de>
 Date: Tue, 10 Oct 2017 15:06:13 -0300
-Subject: lib/mkmf.rb: sort list of object files in generated Makefile
+Subject: [PATCH] lib/mkmf.rb: sort list of object files in generated Makefile
 
 Without sorting the list explicitly, its order is indeterministic,
 because readdir() is also not deterministic.
@@ -15,9 +16,11 @@ Signed-off-by: Reiner Herrmann <reiner@reiner-h.de>
  lib/mkmf.rb | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/lib/mkmf.rb b/lib/mkmf.rb
+index 6da7dde..3af30a9 100644
 --- a/lib/mkmf.rb
 +++ b/lib/mkmf.rb
-@@ -2315,7 +2315,7 @@
+@@ -2368,7 +2368,7 @@ LOCAL_LIBS = #{$LOCAL_LIBS}
  LIBS = #{$LIBRUBYARG} #{$libs} #{$LIBS}
  ORIG_SRCS = #{orig_srcs.collect(&File.method(:basename)).join(' ')}
  SRCS = $(ORIG_SRCS) #{(srcs - orig_srcs).collect(&File.method(:basename)).join(' ')}

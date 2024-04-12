@@ -1,4 +1,4 @@
-From a26530083a29eeee910bfd606ecc621acecd547a Mon Sep 17 00:00:00 2001
+From f53ffb5b27ab7d4a4c62df00ebd6a1a6936d1709 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 3 Aug 2011 14:12:30 -0700
 Subject: [PATCH] coreutils: Fix build on uclibc
@@ -12,16 +12,15 @@ and make life easier for cross compilation process.
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Upstream-Status: Inappropriate [Upstream does care for AIX while we may not]
-
 ---
  m4/getloadavg.m4 | 12 ------------
  1 file changed, 12 deletions(-)
 
 diff --git a/m4/getloadavg.m4 b/m4/getloadavg.m4
-index 8e96965..63782a2 100644
+index 9d0236f..68f7c52 100644
 --- a/m4/getloadavg.m4
 +++ b/m4/getloadavg.m4
-@@ -41,18 +41,6 @@ AC_CHECK_FUNC([getloadavg], [],
+@@ -46,18 +46,6 @@ if test $ac_cv_func_getloadavg != yes; then
         [LIBS="-lutil $LIBS" gl_func_getloadavg_done=yes])
     fi
  

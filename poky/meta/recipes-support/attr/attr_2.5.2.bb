@@ -1,0 +1,5 @@
+require attr.inc
+
+SRC_URI[sha256sum] = "39bf67452fa41d0948c2197601053f48b3d78a029389734332a6309a680c6c87"
+
+BBCLASSEXTEND = "native nativesdk"

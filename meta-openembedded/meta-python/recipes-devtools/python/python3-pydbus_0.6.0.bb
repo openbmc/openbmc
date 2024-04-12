@@ -20,7 +20,7 @@ RDEPENDS:${PN} = "python3-pygobject \
                   python3-io \
                   python3-logging"
 
-RDEPENDS:${PN}-ptests = "bash"
+RDEPENDS:${PN}-ptest += "bash"
 
 do_install_ptest() {
         install -d ${D}${PTEST_PATH}/tests

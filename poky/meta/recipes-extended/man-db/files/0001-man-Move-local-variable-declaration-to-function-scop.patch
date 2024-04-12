@@ -1,4 +1,4 @@
-From 126dfefb5fddf411ad0a1316209e9c1b47abfcd2 Mon Sep 17 00:00:00 2001
+From e4125223631f0d555fc327da6d8705bcc8ee5ba5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 9 Feb 2022 17:30:16 -0800
 Subject: [PATCH] man: Move local variable declaration to function scope
@@ -10,16 +10,15 @@ code without changing the logic, until its fixed in clang
 
 Upstream-Status: Inappropriate [Inappropriate: Clang bug]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  src/man.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/man.c b/src/man.c
-index f16fae8..333df03 100644
+index 195d35d..6870989 100644
 --- a/src/man.c
 +++ b/src/man.c
-@@ -352,7 +352,7 @@ static void init_html_pager (void)
+@@ -379,7 +379,7 @@ static void init_html_pager (void)
  static error_t parse_opt (int key, char *arg, struct argp_state *state)
  {
  	static bool apropos, whatis; /* retain values between calls */
@@ -28,7 +27,7 @@ index f16fae8..333df03 100644
  	/* Please keep these keys in the same order as in options above. */
  	switch (key) {
  		case 'C':
-@@ -384,7 +384,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
+@@ -411,7 +411,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
  		case OPT_WARNINGS:
  #ifdef NROFF_WARNINGS
  			{

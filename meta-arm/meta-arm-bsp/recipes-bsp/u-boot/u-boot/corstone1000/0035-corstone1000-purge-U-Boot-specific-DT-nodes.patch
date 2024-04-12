@@ -1,7 +1,7 @@
-From 3654cebe9449584aa94563b2252c267b926219c9 Mon Sep 17 00:00:00 2001
+From 49e3463a397b61e859df5e1a383f82d64c1e4f3f Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Thu, 21 Sep 2023 15:24:34 +0100
-Subject: [PATCH 35/38] corstone1000: purge U-Boot specific DT nodes
+Subject: [PATCH] corstone1000: purge U-Boot specific DT nodes
 
 Remove U-Boot specific DT nodes before passing the DT to Linux
 
@@ -46,6 +46,3 @@ index 53c65506d5..e3c0e5bf50 100644
  #define CORSTONE1000_KERNEL_PARTS 2
  #define CORSTONE1000_KERNEL_PRIMARY "kernel_primary"
  #define CORSTONE1000_KERNEL_SECONDARY "kernel_secondary"
--- 
-2.25.1
-

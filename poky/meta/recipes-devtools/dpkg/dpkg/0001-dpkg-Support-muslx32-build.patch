@@ -1,4 +1,4 @@
-From a328c8bec0bf8071ae8f20fee4c7475205064ba1 Mon Sep 17 00:00:00 2001
+From 1d192b60fc43e24e1c2d6ff452dabeee7a227cc0 Mon Sep 17 00:00:00 2001
 From: sweeaun <swee.aun.khor@intel.com>
 Date: Sun, 10 Sep 2017 00:14:15 -0700
 Subject: [PATCH] dpkg: Support muslx32 build
@@ -13,10 +13,10 @@ Signed-off-by: sweeaun <swee.aun.khor@intel.com>
  2 files changed, 2 insertions(+)
 
 diff --git a/data/ostable b/data/ostable
-index be64342..87db273 100644
+index 860355774..28779beca 100644
 --- a/data/ostable
 +++ b/data/ostable
-@@ -19,6 +19,7 @@ base-uclibc-linux	linux-uclibc		linux[^-]*-uclibc
+@@ -21,6 +21,7 @@ base-uclibc-linux	linux-uclibc		linux[^-]*-uclibc
  eabihf-musl-linux	linux-musleabihf	linux[^-]*-musleabihf
  eabi-musl-linux		linux-musleabi		linux[^-]*-musleabi
  base-musl-linux		linux-musl		linux[^-]*-musl
@@ -25,17 +25,14 @@ index be64342..87db273 100644
  eabi-gnu-linux		linux-gnueabi		linux[^-]*-gnueabi
  abin32-gnu-linux	linux-gnuabin32		linux[^-]*-gnuabin32
 diff --git a/data/tupletable b/data/tupletable
-index 28f00bf..748ffab 100644
+index 82ae3604e..707d85bdb 100644
 --- a/data/tupletable
 +++ b/data/tupletable
-@@ -10,6 +10,7 @@ base-uclibc-linux-<cpu>		uclibc-linux-<cpu>
+@@ -26,6 +26,7 @@ base-uclibc-linux-<cpu>		uclibc-linux-<cpu>
  eabihf-musl-linux-arm		musl-linux-armhf
  eabi-musl-linux-arm		musl-linux-armel
  base-musl-linux-<cpu>		musl-linux-<cpu>
 +x32-musl-linux-amd64		x32
- ilp32-gnu-linux-arm64		arm64ilp32
  eabihf-gnu-linux-arm		armhf
  eabi-gnu-linux-arm		armel
--- 
-2.7.4
-
+ eabi-gnu-linux-armeb		armeb

@@ -1,0 +1,75 @@
+From b21a9d4f10a066cac76bb345d31fdd24afcf3e6f Mon Sep 17 00:00:00 2001
+From: Fathi Boudra <fathi.boudra@linaro.org>
+Date: Tue, 9 Apr 2024 08:47:37 +0200
+Subject: [PATCH] musl: basename: use portable implementation for basename API
+
+musl has removed the non-prototype declaration of basename from string.h which
+now results in build errors with newer clang compilers.
+
+Implement GNU basename behavior using strchr which is portable across libcs.
+
+Fixes:
+| ../../git/tools/mountcomposefs.c:43:20:
+| error: call to undeclared function 'basename'; ISO C99 and later do not
+| support implicit function declarations [-Wimplicit-function-declaration]
+|    43 |         const char *bin = basename(argv0);
+|       |                           ^
+| ../../git/tools/mountcomposefs.c:43:14:
+| error: incompatible integer to pointer conversion initializing 'const char *'
+| with an expression of type 'int' [-Wint-conversion]
+|    43 |         const char *bin = basename(argv0);
+|       |                     ^     ~~~~~~~~~~~~~~~
+
+For reference:
+https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Closes: https://github.com/containers/composefs/issues/272
+
+Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
+
+Upstream-Status: Submitted [https://github.com/containers/composefs/pull/273]
+---
+ libcomposefs/lcfs-utils.h |    6 ++++++
+ tools/mkcomposefs.c       |    2 +-
+ tools/mountcomposefs.c    |    3 ++-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+--- a/tools/mountcomposefs.c
++++ b/tools/mountcomposefs.c
+@@ -37,10 +37,11 @@
+ #include <linux/fsverity.h>
+ 
+ #include "libcomposefs/lcfs-mount.h"
++#include "libcomposefs/lcfs-utils.h"
+ 
+ static void usage(const char *argv0)
+ {
+-	const char *bin = basename(argv0);
++	const char *bin = gnu_basename(argv0);
+ 	fprintf(stderr,
+ 		"usage: %s [-t type] [-o opt[,opts..]] IMAGE MOUNTPOINT\n"
+ 		"Example:\n"
+--- a/libcomposefs/lcfs-utils.h
++++ b/libcomposefs/lcfs-utils.h
+@@ -161,4 +161,10 @@ static inline void *steal_pointer(void *
+ /* type safety */
+ #define steal_pointer(pp) (0 ? (*(pp)) : (steal_pointer)(pp))
+ 
++static inline const char *gnu_basename(const char *filename)
++{
++	const char *p = strrchr(filename, '/');
++	return p ? p+1 : filename;
++}
++
+ #endif
+--- a/tools/mkcomposefs.c
++++ b/tools/mkcomposefs.c
+@@ -315,7 +315,7 @@ static int fill_store(struct lcfs_node_s
+ 
+ static void usage(const char *argv0)
+ {
+-	const char *bin = basename(argv0);
++	const char *bin = gnu_basename(argv0);
+ 	fprintf(stderr,
+ 		"Usage: %s [OPTIONS] SOURCE IMAGE\n"
+ 		"Options:\n"

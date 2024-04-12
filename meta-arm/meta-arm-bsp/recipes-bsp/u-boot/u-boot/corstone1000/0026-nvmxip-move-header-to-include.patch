@@ -1,7 +1,7 @@
-From 2214be0f540121767d7b6ec4910a7389a1edd13c Mon Sep 17 00:00:00 2001
+From e7db287eb8bda80465d0c11cbb41acc798bb9fc6 Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Fri, 9 Jun 2023 13:31:53 +0100
-Subject: [PATCH 26/38] nvmxip: move header to include
+Subject: [PATCH] nvmxip: move header to include
 
 Move header to include to allow external code
 to get the internal bdev structures to access
@@ -37,6 +37,3 @@ diff --git a/drivers/mtd/nvmxip/nvmxip.h b/include/nvmxip.h
 similarity index 100%
 rename from drivers/mtd/nvmxip/nvmxip.h
 rename to include/nvmxip.h
--- 
-2.25.1
-

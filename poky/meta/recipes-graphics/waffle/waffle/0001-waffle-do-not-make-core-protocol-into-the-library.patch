@@ -1,4 +1,4 @@
-From 71f9399d6cea1e2e885a98b98d82eb628832a86e Mon Sep 17 00:00:00 2001
+From 79b9e4338f803d79449e53a40b1ecc0a5a5889e4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 26 Oct 2021 08:52:17 +0200
 Subject: [PATCH] waffle: do not make core protocol into the library
@@ -9,16 +9,15 @@ wayland.xml from the host.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
-
 ---
  src/waffle/meson.build | 7 -------
  1 file changed, 7 deletions(-)
 
 diff --git a/src/waffle/meson.build b/src/waffle/meson.build
-index e2636c7..3ff5762 100644
+index 1cc99f6..022745a 100644
 --- a/src/waffle/meson.build
 +++ b/src/waffle/meson.build
-@@ -88,12 +88,6 @@ if build_surfaceless
+@@ -89,12 +89,6 @@ if build_surfaceless
  endif
  
  if build_wayland
@@ -31,7 +30,7 @@ index e2636c7..3ff5762 100644
    wl_xdg_shell_proto_c = custom_target(
      'wl-xdg-shell-proto.c',
      input: wayland_xdg_shell_xml,
-@@ -114,7 +108,6 @@ if build_wayland
+@@ -115,7 +109,6 @@ if build_wayland
      'wayland/wayland_wrapper.c',
    )
    files_libwaffle += [

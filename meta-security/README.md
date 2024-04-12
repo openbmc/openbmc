@@ -69,10 +69,10 @@ This will activate the dynamic-layer mechanism.
 Maintenance
 ======================================
 
-Send pull requests, patches, comments or questions to yocto@lists.yoctoproject.org
+Send pull requests, patches, comments or questions to yocto-patches@lists.yoctoproject.org  
 
 When sending single patches, please using something like:
-'git send-email -1 --to yocto@lists.yoctoproject.org --subject-prefix=meta-security][PATCH'
+'git send-email -1 --to yocto-patches@lists.yoctoproject.org --subject-prefix=meta-security][PATCH'
 
 These values can be set as defaults for this repository:
 

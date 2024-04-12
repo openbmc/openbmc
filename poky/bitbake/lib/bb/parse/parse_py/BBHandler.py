@@ -34,6 +34,7 @@ __infunc__ = []
 __inpython__ = False
 __body__   = []
 __classname__ = ""
+__residue__ = []
 
 cached_statements = {}
 
@@ -80,7 +81,7 @@ def inherit(files, fn, lineno, d, deferred=False):
             __inherit_cache = d.getVar('__inherit_cache', False) or []
 
 def get_statements(filename, absolute_filename, base_name):
-    global cached_statements
+    global cached_statements, __residue__, __body__
 
     try:
         return cached_statements[absolute_filename]
@@ -99,6 +100,11 @@ def get_statements(filename, absolute_filename, base_name):
         if __inpython__:
             # add a blank line to close out any python definition
             feeder(lineno, "", filename, base_name, statements, eof=True)
+
+        if __residue__:
+            raise ParseError("Unparsed lines %s: %s" % (filename, str(__residue__)), filename, lineno)
+        if __body__:
+            raise ParseError("Unparsed lines from unclosed function %s: %s" % (filename, str(__body__)), filename, lineno)
 
         if filename.endswith(".bbclass") or filename.endswith(".inc"):
             cached_statements[absolute_filename] = statements

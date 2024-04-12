@@ -1,13 +1,21 @@
-This patch is used to create a new sub package libpam-xtests to do more checks.
+From 060726f7e60c8ecb5bf50fd776910b290d9a0a69 Mon Sep 17 00:00:00 2001
+From: Kang Kai <kai.kang@windriver.com>
+Date: Tue, 19 Jul 2011 17:08:31 +0800
+Subject: [PATCH] This patch is used to create a new sub package libpam-xtests
+ to do more checks.
 
 Upstream-Status: Pending
 
 Signed-off-by: Kang Kai <kai.kang@windriver.com>
-Index: Linux-PAM-1.3.0/xtests/Makefile.am
-===================================================================
---- Linux-PAM-1.3.0.orig/xtests/Makefile.am
-+++ Linux-PAM-1.3.0/xtests/Makefile.am
-@@ -7,7 +7,7 @@ AM_CFLAGS = -DLIBPAM_COMPILE -I$(top_src
+---
+ xtests/Makefile.am | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/xtests/Makefile.am b/xtests/Makefile.am
+index acf9746..9826c9f 100644
+--- a/xtests/Makefile.am
++++ b/xtests/Makefile.am
+@@ -8,7 +8,7 @@ AM_CFLAGS = -DLIBPAM_COMPILE -I$(top_srcdir)/libpam/include \
  LDADD = $(top_builddir)/libpam/libpam.la \
  	$(top_builddir)/libpam_misc/libpam_misc.la
  
@@ -16,7 +24,7 @@ Index: Linux-PAM-1.3.0/xtests/Makefile.am
  
  EXTRA_DIST = run-xtests.sh tst-pam_dispatch1.pamd tst-pam_dispatch2.pamd \
  	tst-pam_dispatch3.pamd tst-pam_dispatch4.pamd \
-@@ -51,3 +51,18 @@ EXTRA_PROGRAMS = $(XTESTS)
+@@ -55,3 +55,18 @@ EXTRA_PROGRAMS = $(XTESTS)
  
  xtests: $(XTESTS) run-xtests.sh
  	"$(srcdir)"/run-xtests.sh "$(srcdir)" ${XTESTS} ${NOSRCTESTS}

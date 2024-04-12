@@ -66,6 +66,9 @@ instructions:
 -  :yocto_lists:`/g/yocto` --- general Yocto Project
    discussion mailing list.
 
+-  :yocto_lists:`/g/yocto-patches` --- patch contribution mailing list for Yocto
+   Project-related layers which do not have their own mailing list.
+
 -  :oe_lists:`/g/openembedded-core` --- discussion mailing
    list about OpenEmbedded-Core (the core metadata).
 

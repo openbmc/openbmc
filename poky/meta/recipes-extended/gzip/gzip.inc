@@ -8,6 +8,7 @@ inherit autotools texinfo
 export DEFS="NO_ASM"
 
 EXTRA_OEMAKE:class-target = "GREP=${base_bindir}/grep"
+EXTRA_OEMAKE:append:class-nativesdk = " GREP=grep"
 EXTRA_OECONF:append:libc-musl = " gl_cv_func_fflush_stdin=yes "
 
 do_install:append () {

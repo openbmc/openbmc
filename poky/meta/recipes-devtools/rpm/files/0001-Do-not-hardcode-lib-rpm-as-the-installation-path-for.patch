@@ -1,4 +1,4 @@
-From 7948f21e08bc7552b281ed0098a9c8099d2370cb Mon Sep 17 00:00:00 2001
+From 73d6841d9ef2a8ac7bd63f9645a3efe8038dfdd4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 27 Feb 2017 09:43:30 +0200
 Subject: [PATCH] Do not hardcode "lib/rpm" as the installation path for
@@ -6,19 +6,18 @@ Subject: [PATCH] Do not hardcode "lib/rpm" as the installation path for
 
 Upstream-Status: Denied [https://github.com/rpm-software-management/rpm/pull/263]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  CMakeLists.txt | 2 +-
  macros.in      | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 2767915fb..7f0630453 100644
+index 7808115c1..4a383ceba 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -32,7 +32,7 @@ option(WITH_FSVERITY "Build with fsverity support" OFF)
- option(WITH_IMAEVM "Build with IMA support" OFF)
+@@ -33,7 +33,7 @@ option(WITH_IMAEVM "Build with IMA support" OFF)
  option(WITH_FAPOLICYD "Build with fapolicyd support" ON)
+ option(WITH_READLINE "Build with readline support" ON)
  
 -set(RPM_CONFIGDIR "${CMAKE_INSTALL_PREFIX}/lib/rpm" CACHE PATH "rpm home")
 +set(RPM_CONFIGDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/rpm" CACHE PATH "rpm home")

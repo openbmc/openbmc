@@ -83,7 +83,7 @@ Fixes in Yocto-4.0.5
 Known Issues in Yocto-4.0.5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- There are recent CVEs in key components such as openssl. They are not included in this release as it was built before the issues were known and fixes were available but these are now available on the kirkstone branch. 
+- There are recent CVEs in key components such as openssl. They are not included in this release as it was built before the issues were known and fixes were available but these are now available on the kirkstone branch.
 
 
 Contributors to Yocto-4.0.5

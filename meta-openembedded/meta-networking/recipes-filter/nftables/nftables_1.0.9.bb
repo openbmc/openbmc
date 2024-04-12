@@ -37,8 +37,6 @@ SETUPTOOLS_SETUP_PATH = "${S}/py"
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'setuptools3', '', d)}
 
-RRECOMMENDS:${PN} += "kernel-module-nf-tables"
-
 PACKAGES =+ "${PN}-python"
 FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 RDEPENDS:${PN}-python = "python3-core python3-json ${PN}"
@@ -66,7 +64,29 @@ do_install() {
     fi
 }
 
-RDEPENDS:${PN}-ptest += " ${PN}-python bash make iproute2 iputils-ping procps python3-core python3-ctypes python3-json python3-misc sed util-linux"
+RDEPENDS:${PN}-ptest += " ${PN}-python bash coreutils make iproute2 iputils-ping procps python3-core python3-ctypes python3-json python3-misc sed util-linux"
+
+RRECOMMENDS:${PN}-ptest += "\
+kernel-module-nft-chain-nat     kernel-module-nft-queue \
+kernel-module-nft-compat        kernel-module-nft-quota \
+kernel-module-nft-connlimit     kernel-module-nft-redir \
+kernel-module-nft-ct            kernel-module-nft-reject \
+kernel-module-nft-flow-offload  kernel-module-nft-reject-inet \
+kernel-module-nft-hash          kernel-module-nft-reject-ipv4 \
+kernel-module-nft-limit         kernel-module-nft-reject-ipv6 \
+kernel-module-nft-log           kernel-module-nft-socket \
+kernel-module-nft-masq          kernel-module-nft-synproxy \
+kernel-module-nft-nat           kernel-module-nft-tunnel \
+kernel-module-nft-numgen        kernel-module-nft-xfrm \
+kernel-module-nft-osf \
+kernel-module-nf-flow-table \
+kernel-module-nf-flow-table-inet \
+kernel-module-nf-nat \
+kernel-module-nf-log-syslog \
+kernel-module-nf-nat-ftp \
+kernel-module-nf-nat-sip \
+kernel-module-8021q \
+kernel-module-dummy"
 
 TESTDIR = "tests"
 

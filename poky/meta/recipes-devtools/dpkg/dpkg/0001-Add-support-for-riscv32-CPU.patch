@@ -1,4 +1,4 @@
-From 279e4c274f5f295823cf9fa95d3ba131f6d711db Mon Sep 17 00:00:00 2001
+From 21459bb8d9a997e6a92885a4ef337ede9cc5aba7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 29 Apr 2020 22:02:23 -0700
 Subject: [PATCH] Add support for riscv32 CPU
@@ -11,10 +11,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+)
 
 diff --git a/data/cputable b/data/cputable
-index 9f2a8e0..1d935b1 100644
+index 575c008e3..7a801a03a 100644
 --- a/data/cputable
 +++ b/data/cputable
-@@ -41,6 +41,7 @@ powerpc		powerpc		(powerpc|ppc)		32	big
+@@ -43,6 +43,7 @@ powerpc		powerpc		(powerpc|ppc)		32	big
  powerpcel	powerpcle	powerpcle		32	little
  ppc64		powerpc64	(powerpc|ppc)64		64	big
  ppc64el		powerpc64le	powerpc64le		64	little
@@ -23,10 +23,10 @@ index 9f2a8e0..1d935b1 100644
  s390		s390		s390			32	big
  s390x		s390x		s390x			64	big
 diff --git a/scripts/Dpkg/Vendor/Debian.pm b/scripts/Dpkg/Vendor/Debian.pm
-index a352bbd..fa1d90b 100644
+index fcf5b1e2a..175c9f436 100644
 --- a/scripts/Dpkg/Vendor/Debian.pm
 +++ b/scripts/Dpkg/Vendor/Debian.pm
-@@ -306,6 +306,7 @@ sub _add_build_flags {
+@@ -202,6 +202,7 @@ sub set_build_features {
          powerpc
          ppc64
          ppc64el
@@ -34,6 +34,3 @@ index a352bbd..fa1d90b 100644
          riscv64
          s390x
          sparc
--- 
-2.26.2
-

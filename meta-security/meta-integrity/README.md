@@ -41,7 +41,7 @@ Patches
 =======
 
 For discussion or patch submission via email, use the
-yocto@yoctoproject.org mailing list. When submitting patches that way,
+yocto-patches@yoctoproject.org mailing list. When submitting patches that way,
 make sure to copy the maintainer and add a "[meta-integrity]"
 prefix to the subject of the mails.
 

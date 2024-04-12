@@ -1,4 +1,4 @@
-From 81700d1a0e51391028c761cc8ef1cd660084d114 Mon Sep 17 00:00:00 2001
+From f446686c26c499e15ef17d495a93cfbc20e16090 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 12 Apr 2016 15:51:54 +0100
 Subject: [PATCH] rsync: remove upstream's rebuild logic
@@ -8,16 +8,15 @@ generally overcomplicated, and we ensure that autoreconf is invoked if required.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-
 ---
  Makefile.in | 54 -----------------------------------------------------
  1 file changed, 54 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 3cde955..d963a70 100644
+index a1253e5..a084935 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -190,60 +190,6 @@ gensend: gen
+@@ -192,60 +192,6 @@ gensend: gen
  	fi
  	rsync -aic $(GENFILES) git-version.h $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/ || true
  

@@ -440,7 +440,7 @@ varies by component:
 
 For changes to other layers and tools hosted in the Yocto Project source
 repositories (i.e. :yocto_git:`git.yoctoproject.org <>`), use the
-:yocto_lists:`yocto </g/yocto/>` general mailing list.
+:yocto_lists:`yocto-patches </g/yocto-patches/>` general mailing list.
 
 For changes to other layers hosted in the OpenEmbedded source
 repositories (i.e. :oe_git:`git.openembedded.org <>`), use

@@ -2,7 +2,7 @@ eudev: consider ID_NET_NAME_MAC as an interface name
 
 eudev might not create names based on slot or path.
 
-Upstream-Status: Submitted [github.com/eudev-project/eudev/pull/274]
+Upstream-Status: Backport [github.com/eudev-project/eudev/pull/274]
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
 

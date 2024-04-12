@@ -1,7 +1,7 @@
-From 2d225908fde28c9759fae7a9fdce6bb8c39ec579 Mon Sep 17 00:00:00 2001
+From 57e4d6e9c5fc174a96366268150bc85de75baa79 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Wed, 10 May 2023 17:27:01 +0100
-Subject: [PATCH 05/38] FF-A v15: arm_ffa: introduce armffa command
+Subject: [PATCH] FF-A v15: arm_ffa: introduce armffa command
 
 Provide armffa command showcasing the use of the U-Boot FF-A support
 
@@ -431,6 +431,3 @@ index 9200c8028b..a7d5392859 100644
  	select LIB_UUID
  	select DEVRES
  	help
--- 
-2.25.1
-

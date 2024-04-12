@@ -38,7 +38,7 @@ New Features / Enhancements in 4.0
 
 - Inclusive language adjustments to some variable names - see the
   :ref:`4.0 migration guide <migration-4.0-inclusive-language>` for details.
-  
+
 - New recipes:
 
    - ``buildtools-docs-tarball``
@@ -114,7 +114,7 @@ New Features / Enhancements in 4.0
 - BitBake enhancements:
 
    - Fetcher enhancements:
-   
+
       - New :ref:`bitbake-user-manual/bitbake-user-manual-fetching:crate fetcher (\`\`crate://\`\`)` for Rust packages
       - Added striplevel support to unpack
       - git: Add a warning asking users to set a branch in git urls
@@ -127,7 +127,7 @@ New Features / Enhancements in 4.0
       - ssh: now supports checkstatus, allows : in URLs (both required for use with sstate) and no longer requires username
       - wget: add redirectauth parameter
       - wget: add 30s timeout for checkstatus calls
-   
+
    - Show warnings for append/prepend/remove operators combined with +=/.=
    - Add bb.warnonce() and bb.erroronce() log methods
    - Improved setscene task display
@@ -140,7 +140,7 @@ New Features / Enhancements in 4.0
 -  Architecture-specific enhancements:
 
    - ARM:
-  
+
       - tune-cortexa72: Enable the crc extension by default for cortexa72
       - qemuarm64: Add tiny ktype to qemuarm64 bsp
       - armv9a/tune: Add the support for the Neoverse N2 core
@@ -163,7 +163,7 @@ New Features / Enhancements in 4.0
       - linux-yocto-dev: add qemuriscv32
       - packagegroup-core-tools-profile: Enable systemtap for riscv64
       - qemuriscv: Use virtio-tablet-pci for mouse
-  
+
    - x86:
 
       - kernel-yocto: conditionally enable stack protection checking on x86-64
@@ -199,7 +199,7 @@ New Features / Enhancements in 4.0
 - yocto-check-layer: improved README checks
 - cve-check: add json output format
 - cve-check: add coverage statistics on recipes with/without CVEs
-- Added mirrors for kernel sources and uninative binaries on kernel.org 
+- Added mirrors for kernel sources and uninative binaries on kernel.org
 - glibc and binutils recipes now use shallow mirror tarballs for faster fetching
 - When patching fails, show more information on the fatal error
 
@@ -234,7 +234,7 @@ New Features / Enhancements in 4.0
    - Detect more known licenses in Python code
    - Move license md5sums data into CSV files
    - npm: Use README as license fallback
-   
+
 - SDK-related enhancements:
 
    - Extended recipes to :ref:`ref-classes-nativesdk`: ``cargo``,
@@ -244,7 +244,7 @@ New Features / Enhancements in 4.0
    - Support creating per-toolchain cmake file in SDK
 
 - Rust enhancements:
-   
+
    - New python_setuptools3_rust class to enable building python extensions in Rust
    - classes/meson: Add optional rust definitions
 

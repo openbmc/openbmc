@@ -13,6 +13,7 @@ TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-python3-testtools \
     nativesdk-python3-subunit \
     nativesdk-python3-pyyaml \
+    nativesdk-python3-websockets \
     nativesdk-ncurses-terminfo-base \
     nativesdk-chrpath \
     nativesdk-tar \

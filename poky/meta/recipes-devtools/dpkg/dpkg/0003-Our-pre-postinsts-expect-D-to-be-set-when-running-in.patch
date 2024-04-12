@@ -1,4 +1,4 @@
-From ff325b35639a797edd92b373fbebf7b8b9f3f0c3 Mon Sep 17 00:00:00 2001
+From b6c28222276704a1e1a544983e38dfa2f3fb481a Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 26 Aug 2015 16:25:45 +0300
 Subject: [PATCH] Our pre/postinsts expect $D to be set when running in a
@@ -11,13 +11,12 @@ RP 2011/12/07
 ALIMON 2016/05/26
 ALIMON 2017/02/21
 KKang 2019/02/20
-
 ---
  src/main/script.c | 53 +++--------------------------------------------
  1 file changed, 3 insertions(+), 50 deletions(-)
 
 diff --git a/src/main/script.c b/src/main/script.c
-index ecce4d842..16f4e6ff5 100644
+index 017d92efe..181e7c710 100644
 --- a/src/main/script.c
 +++ b/src/main/script.c
 @@ -97,58 +97,11 @@ static const char *

@@ -247,7 +247,7 @@ poky
 
 openembedded-core
 
--  Repository Location: oe_git:`/openembedded-core`
+-  Repository Location: :oe_git:`/openembedded-core`
 -  Branch: :oe_git:`kirkstone </openembedded-core/log/?h=kirkstone>`
 -  Tag:  :oe_git:`yocto-4.0.4 </openembedded-core/log/?h=yocto-4.0.4>`
 -  Git Revision: :oe_git:`f7766da462905ec67bf549d46b8017be36cd5b2a </openembedded-core/commit/?id=f7766da462905ec67bf549d46b8017be36cd5b2a>`

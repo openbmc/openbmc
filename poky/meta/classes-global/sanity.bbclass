@@ -40,7 +40,7 @@ BBLAYERS_CONF_UPDATE_FUNCS += " \
     conf/site.conf:SCONF_VERSION:SITE_CONF_VERSION:oecore_update_siteconf \
 "
 
-SANITY_DIFF_TOOL ?= "meld"
+SANITY_DIFF_TOOL ?= "diff -u"
 
 SANITY_LOCALCONF_SAMPLE ?= "${COREBASE}/meta*/conf/templates/default/local.conf.sample"
 python oecore_update_localconf() {

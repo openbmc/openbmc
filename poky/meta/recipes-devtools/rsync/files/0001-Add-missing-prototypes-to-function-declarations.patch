@@ -1,4 +1,4 @@
-From 651425fced0691d9063fe417388ba6ca1c38c40b Mon Sep 17 00:00:00 2001
+From 2beb35c34c45320144f37b12ef4d72fb8734280e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 29 Aug 2022 19:53:28 -0700
 Subject: [PATCH] Add missing prototypes to function declarations
@@ -15,7 +15,6 @@ Fixes errors like
 
 Upstream-Status: Submitted [https://lists.samba.org/archive/rsync/2022-August/032858.html]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  checksum.c       | 2 +-
  exclude.c        | 2 +-
@@ -30,10 +29,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  10 files changed, 12 insertions(+), 13 deletions(-)
 
 diff --git a/checksum.c b/checksum.c
-index 60de365..67a9e16 100644
+index cb21882..736818b 100644
 --- a/checksum.c
 +++ b/checksum.c
-@@ -778,7 +778,7 @@ static void verify_digest(struct name_num_item *nni, BOOL check_auth_list)
+@@ -779,7 +779,7 @@ static void verify_digest(struct name_num_item *nni, BOOL check_auth_list)
  }
  #endif
  
@@ -43,7 +42,7 @@ index 60de365..67a9e16 100644
  #if defined SUPPORT_XXH3 || defined USE_OPENSSL
  	struct name_num_item *nni;
 diff --git a/exclude.c b/exclude.c
-index ffe55b1..a85ea76 100644
+index 87edbcf..ae0de2f 100644
 --- a/exclude.c
 +++ b/exclude.c
 @@ -363,7 +363,7 @@ void implied_include_partial_string(const char *s_start, const char *s_end)
@@ -96,10 +95,10 @@ index e4ba1cc..8482b71 100644
  	int options = LOG_PID;
  
 diff --git a/main.c b/main.c
-index d2a7b9b..c50af45 100644
+index 0c60b86..4bc664a 100644
 --- a/main.c
 +++ b/main.c
-@@ -244,7 +244,7 @@ void read_del_stats(int f)
+@@ -246,7 +246,7 @@ void read_del_stats(int f)
  	stats.deleted_files += stats.deleted_specials = read_varint(f);
  }
  

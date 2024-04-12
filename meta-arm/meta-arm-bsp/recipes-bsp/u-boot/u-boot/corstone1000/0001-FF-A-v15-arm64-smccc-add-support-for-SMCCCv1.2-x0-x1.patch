@@ -1,8 +1,8 @@
-From 6b7a5bff8d68b191569557b6444e2c5061af8074 Mon Sep 17 00:00:00 2001
+From cc651db9a1370e697fd2525ce58b81ff7e112474 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Fri, 29 Jul 2022 13:06:19 +0100
-Subject: [PATCH 01/38] FF-A v15: arm64: smccc: add support for SMCCCv1.2
- x0-x17 registers
+Subject: [PATCH] FF-A v15: arm64: smccc: add support for SMCCCv1.2 x0-x17
+ registers
 
 add support for x0-x17 registers used by the SMC calls
 
@@ -196,6 +196,3 @@ index e1d09884a1..f44e9e8f93 100644
  /**
   * struct arm_smccc_quirk - Contains quirk information
   * @id: quirk identification
--- 
-2.25.1
-

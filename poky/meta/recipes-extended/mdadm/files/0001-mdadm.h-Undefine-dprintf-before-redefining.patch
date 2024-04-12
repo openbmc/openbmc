@@ -1,4 +1,4 @@
-From b431cb4e1ed060122fa300dc0008f74080d38f73 Mon Sep 17 00:00:00 2001
+From 4dd5c2659722b44409cee28b4cea68cdeaa1f987 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 9 May 2016 22:03:57 +0000
 Subject: [PATCH] mdadm.h: Undefine dprintf before redefining
@@ -20,10 +20,10 @@ Upstream-Status: Pending
  1 file changed, 2 insertions(+)
 
 diff --git a/mdadm.h b/mdadm.h
-index 387e681..bb943bf 100644
+index 1f28b3e..04996e2 100644
 --- a/mdadm.h
 +++ b/mdadm.h
-@@ -1649,11 +1649,13 @@ static inline char *to_subarray(struct mdstat_ent *ent, char *container)
+@@ -1869,11 +1869,13 @@ static inline sighandler_t signal_s(int sig, sighandler_t handler)
  }
  
  #ifdef DEBUG

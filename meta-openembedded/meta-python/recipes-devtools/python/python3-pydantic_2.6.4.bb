@@ -49,5 +49,5 @@ do_install_ptest() {
     rm -f ${D}${PTEST_PATH}/tests/test_mypy.py
     # We are not trying to run benchmarks
     rm -rf ${D}${PTEST_PATH}/tests/benchmarks
+    sed -i -e "/--automake/ s/$/ -k 'not test_config_validation_error_cause and not test_dataclass_config_validate_default and not test_annotated_validator_nested and not test_use_bare and not test_use_no_fields and not test_validator_bad_fields_throws_configerror and not test_assert_raises_validation_error and not test_model_config_validate_default'/" ${D}${PTEST_PATH}/run-ptest
 }
-

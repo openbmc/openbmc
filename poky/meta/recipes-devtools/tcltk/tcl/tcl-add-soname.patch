@@ -1,20 +1,19 @@
-From d6155ec08b355d64f1a7db407254d159037bb72a Mon Sep 17 00:00:00 2001
+From b89fd73daf9b3eb2f889f65baba5f90d8a930c82 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <rpurdie@linux.intel.com>
 Date: Wed, 9 Dec 2009 23:59:44 +0000
 Subject: [PATCH] tcl: Add tcltk from OE.dev but with legacy staging function
 
 Upstream-Status: Pending
-
 ---
  unix/Makefile.in | 5 ++++-
  unix/tcl.m4      | 3 +++
  2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/unix/Makefile.in b/unix/Makefile.in
-index 398afd0..804532e 100644
+index 7619afc..9dd053d 100644
 --- a/unix/Makefile.in
 +++ b/unix/Makefile.in
-@@ -893,7 +893,10 @@ install-binaries: binaries
+@@ -904,7 +904,10 @@ install-binaries: binaries
  	done
  	@echo "Installing $(LIB_FILE) to $(DLL_INSTALL_DIR)/"
  	@@INSTALL_LIB@
@@ -27,10 +26,10 @@ index 398afd0..804532e 100644
  	@$(INSTALL_PROGRAM) ${TCL_EXE} "$(BIN_INSTALL_DIR)/tclsh$(VERSION)${EXE_SUFFIX}"
  	@echo "Installing tclConfig.sh to $(CONFIG_INSTALL_DIR)/"
 diff --git a/unix/tcl.m4 b/unix/tcl.m4
-index f3d08ec..797c93f 100644
+index 0307a06..37c4d67 100644
 --- a/unix/tcl.m4
 +++ b/unix/tcl.m4
-@@ -1382,6 +1382,9 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
+@@ -1378,6 +1378,9 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
  	    # get rid of the warnings.
  	    #CFLAGS_OPTIMIZE="${CFLAGS_OPTIMIZE} -D__NO_STRING_INLINES -D__NO_MATH_INLINES"
  

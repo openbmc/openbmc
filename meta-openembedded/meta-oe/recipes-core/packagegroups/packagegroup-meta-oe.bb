@@ -184,7 +184,6 @@ RDEPENDS:packagegroup-meta-oe-core = "\
     libnfc \
     libsigc++-2.0 \
     libsigc++-3 \
-    libxml++ \
     mdbus2 \
     distro-feed-configs \
     mm-common \

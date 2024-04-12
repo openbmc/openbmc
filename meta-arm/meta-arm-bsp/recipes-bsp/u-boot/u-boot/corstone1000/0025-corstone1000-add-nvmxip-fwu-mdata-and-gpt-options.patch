@@ -1,7 +1,7 @@
-From ff2e0fe577c5a564a10bcc730392dd5397f6cb34 Mon Sep 17 00:00:00 2001
+From 085b51e1545e905b4ba87c529954f31067032eaa Mon Sep 17 00:00:00 2001
 From: Rui Miguel Silva <rui.silva@linaro.org>
 Date: Mon, 17 Jul 2023 17:33:52 +0100
-Subject: [PATCH 25/38] corstone1000: add nvmxip, fwu-mdata and gpt options
+Subject: [PATCH] corstone1000: add nvmxip, fwu-mdata and gpt options
 
 Enable the newest features: nvmxip, fwu-metadata and
 gpt. Commands to print the partition info, gpt info
@@ -70,6 +70,3 @@ index a92668389a..4c75a01818 100644
 +# CONFIG_TOOLS_MKEFICAPSULE is not set
 +CONFIG_DM_GPIO=y
 \ No newline at end of file
--- 
-2.25.1
-

@@ -501,12 +501,12 @@ the "meta" layer at ``meta/recipes-bsp/formfactor``::
    INHIBIT_DEFAULT_DEPS = "1"
 
    do_install() {
-	   # Install file only if it has contents
+           # Install file only if it has contents
            install -d ${D}${sysconfdir}/formfactor/
            install -m 0644 ${S}/config ${D}${sysconfdir}/formfactor/
-	   if [ -s "${S}/machconfig" ]; then
-	           install -m 0644 ${S}/machconfig ${D}${sysconfdir}/formfactor/
-	   fi
+           if [ -s "${S}/machconfig" ]; then
+                   install -m 0644 ${S}/machconfig ${D}${sysconfdir}/formfactor/
+           fi
    }
 
 In the main recipe, note the :term:`SRC_URI`
@@ -582,10 +582,10 @@ Directory`.  Here is the main ``xserver-xf86-config`` recipe, which is named
    ALLOW_EMPTY:${PN} = "1"
 
    do_install () {
-	if test -s ${WORKDIR}/xorg.conf; then
-		install -d ${D}/${sysconfdir}/X11
-		install -m 0644 ${WORKDIR}/xorg.conf ${D}/${sysconfdir}/X11/
-	fi
+        if test -s ${WORKDIR}/xorg.conf; then
+                install -d ${D}/${sysconfdir}/X11
+                install -m 0644 ${WORKDIR}/xorg.conf ${D}/${sysconfdir}/X11/
+        fi
    }
 
 Here is the append file, which is named ``xserver-xf86-config_%.bbappend``
@@ -732,7 +732,7 @@ The following list describes the available commands:
 
 -  ``save-build-conf``: Saves the currently active build configuration
    (``conf/local.conf``, ``conf/bblayers.conf``) as a template into a layer.
-   This template can later be used for setting up builds via :term:``TEMPLATECONF``.
+   This template can later be used for setting up builds via :term:`TEMPLATECONF`.
    For information about saving and using configuration templates, see
    ":ref:`dev-manual/custom-template-configuration-directory:creating a custom template configuration directory`".
 

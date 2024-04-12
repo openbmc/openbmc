@@ -1,4 +1,4 @@
-From 0005ab544230020e854e9709b2bc0501702c2968 Mon Sep 17 00:00:00 2001
+From f01d9c24bb86bc47ad2453483518dbb25953cac7 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 10 Jan 2019 18:14:18 +0100
 Subject: [PATCH] rpmscript.c: change logging level around scriptlets to INFO
@@ -9,13 +9,12 @@ irrelevant noise to rootfs logs.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  lib/rpmscript.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/lib/rpmscript.c b/lib/rpmscript.c
-index 37ada014c..bab0c97a6 100644
+index 7b7e26606..1dcd23be5 100644
 --- a/lib/rpmscript.c
 +++ b/lib/rpmscript.c
 @@ -291,7 +291,7 @@ static char * writeScript(const char *cmd, const char *script)

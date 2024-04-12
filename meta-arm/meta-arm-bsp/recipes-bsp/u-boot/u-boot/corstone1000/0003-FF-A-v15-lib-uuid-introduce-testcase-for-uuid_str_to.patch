@@ -1,7 +1,7 @@
-From fa4a5b45d0254e347ba15992d997529f5056fe8f Mon Sep 17 00:00:00 2001
+From fe51e27e4f0033e9737a1099d0dd06f976a60705 Mon Sep 17 00:00:00 2001
 From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
 Date: Mon, 27 Mar 2023 16:24:29 +0100
-Subject: [PATCH 03/38] FF-A v15: lib: uuid: introduce testcase for
+Subject: [PATCH] FF-A v15: lib: uuid: introduce testcase for
  uuid_str_to_le_bin
 
 provide a test case
@@ -89,6 +89,3 @@ index 0000000000..e24331a136
 +}
 +
 +LIB_TEST(lib_test_uuid_to_le, 0);
--- 
-2.25.1
-
