@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit allarch
 
-SRC_URI:evb-npcm845 = " \
+SRC_URI = " \
     file://evb-npcm845-ipmi-fru.yaml \
     file://evb-npcm845-ipmi-fru-properties.yaml \
     file://evb-npcm845-ipmi-sensors.yaml \
@@ -14,7 +14,7 @@ SRC_URI:evb-npcm845 = " \
 
 S = "${WORKDIR}"
 
-do_install:evb-npcm845() {
+do_install() {
     install -m 0644 -D evb-npcm845-ipmi-fru-properties.yaml \
         ${D}${datadir}/${BPN}/ipmi-extra-properties.yaml
     install -m 0644 -D evb-npcm845-ipmi-fru.yaml \

@@ -1,4 +1,4 @@
-PACKAGECONFIG:evb-npcm845 = " \
+PACKAGECONFIG = " \
     hwmontempsensor \
     fansensor \
     adcsensor \
