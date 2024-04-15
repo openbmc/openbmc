@@ -1,0 +1,7 @@
+[Unit]
+Description=%i GPIO Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i gpio assert" "GPIO" "%i"
+SyslogIdentifier=%i-gpio-assert

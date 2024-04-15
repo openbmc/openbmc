@@ -17,6 +17,9 @@ SRC_URI += "file://plat-phosphor-multi-gpio-monitor.json \
             file://deassert-post-end \
             file://assert-reset-button \
             file://deassert-reset-button \
+            file://assert-gpio-log@.service \
+            file://deassert-gpio-log@.service \
+            file://logging \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -44,6 +47,7 @@ do_install:append:() {
     install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
+    install -m 0755 ${WORKDIR}/logging ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
 
     install -m 0755 ${WORKDIR}/assert-reset-button ${D}${libexecdir}/${PN}/
