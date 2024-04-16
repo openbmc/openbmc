@@ -31,7 +31,7 @@ FILES:${PN}:append= " ${libexecdir}/${PN}"
 BLETCHLEY_SYS_ST_INIT_CONF_FMT = "bletchley-system-state-init.conf:phosphor-discover-system-state@{0}.service.d/bletchley-system-state-init.conf"
 SYSTEMD_OVERRIDE:${PN}-discover += "${@compose_list_zip(d, 'BLETCHLEY_SYS_ST_INIT_CONF_FMT', 'OBMC_HOST_INSTANCES')}"
 
-PACKAGECONFIG:append = "no-warm-reboot"
+PACKAGECONFIG:append = " no-warm-reboot"
 PACKAGECONFIG:remove = "only-run-apr-on-power-loss"
 
 #======================
