@@ -1,0 +1,73 @@
+From b757e6842f9631757f0d1a6b3833aabffa9ffeee Mon Sep 17 00:00:00 2001
+From: Alexey Gladkov <legion@kernel.org>
+Date: Thu, 29 Feb 2024 17:38:37 +0100
+Subject: [PATCH] Remove non-free Agafari fonts
+
+Based on legal analysis, we are removing non-free fonts for now. If we
+can change the license of these fonts, we will return them back.
+
+From: Stanislav Brabec <sbrabec@suse.com>
+Date: Wed, 28 Feb 2024 16:47:54 +0100
+Subject: kbd: Legal problems of Agafari fonts
+
+    The data/consolefonts/README.Ethiopic contains a notice:
+    Agafari:
+      Donated by the Ethiopian Science and Technology Commission
+      <ncic@padis.gn.apc.org> or <ncic@telecom.net.et> and may be redistributed
+      for non-commercial use under Unix environments only.
+
+    According to our legal review, it makes impossible to distribute these
+    fonts as part of any commercial products, and even makes it impossible to
+    distribute kbd sources as part of any commercial product services.
+
+    Additionally, it makes the whole kbd package incompatible with GPL, so the
+    COPYING file (created during build of the tarball) cannot declare GPL
+    version 2. It also violates section 6 of GPL (no further restrictions).
+
+    That is why several GNU/Linux distributions exclude Agafari from the
+    release. To be on a safe side, SUSE even decided to repack any source
+    tarballs before putting it to their servers.
+
+    This was probably reported to the former kbd maintainer about 20 years ago,
+    but nothing changed over years.
+
+    That is why I recommend removing Agafari fonts and removing the reference
+    to them from README.Ethiopic. Alternatively, you can ask the Ethiopian
+    Science and Technology Commission for re-licensing.
+
+Signed-off-by: Alexey Gladkov <legion@kernel.org>
+
+Upstream-Status: Backport [https://github.com/legionus/kbd/commit/b757e6842f9631757f0d1a6b3833aabffa9ffeee]
+
+[do_configure prepend added to remove binary files]
+
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ data/consolefonts/Agafari-12.psfu | Bin 7989 -> 0 bytes
+ data/consolefonts/Agafari-14.psfu | Bin 9013 -> 0 bytes
+ data/consolefonts/Agafari-16.psfu | Bin 10037 -> 0 bytes
+ data/consolefonts/README.Ethiopic |   5 -----
+ 4 files changed, 5 deletions(-)
+ delete mode 100644 data/consolefonts/Agafari-12.psfu
+ delete mode 100644 data/consolefonts/Agafari-14.psfu
+ delete mode 100644 data/consolefonts/Agafari-16.psfu
+
+diff --git a/data/consolefonts/README.Ethiopic b/data/consolefonts/README.Ethiopic
+index 7502722..2810797 100644
+--- a/data/consolefonts/README.Ethiopic
++++ b/data/consolefonts/README.Ethiopic
+@@ -14,11 +14,6 @@ Ethiopic fonts:
+      restrictions below:
+ 
+ 
+-Agafari:
+-  Donated by the Ethiopian Science and Technology Commission 
+-  <ncic@padis.gn.apc.org> or <ncic@telecom.net.et> and may be redistributed
+-  for non-commercial use under Unix environments only.
+-
+ Goha and GohaClassic:
+   Donated by Yitna Firdyiwek <ybf2u@virgina.edu> of GohaTibeb Associates
+   and may be redistributed without restriction under the GNU GPL 2.0.
+-- 
+2.30.2
+

@@ -11,6 +11,6 @@ inherit pypi python_hatchling
 
 PYPI_PACKAGE = "jsonschema_specifications"
 
-DEPENDS += "${PYTHON_PN}-hatch-vcs-native"
+DEPENDS += "python3-hatch-vcs-native"
 
 BBCLASSEXTEND = "native nativesdk"

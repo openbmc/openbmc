@@ -4,10 +4,16 @@ Creating Your Own Distribution
 ******************************
 
 When you build an image using the Yocto Project and do not alter any
-distribution :term:`Metadata`, you are
-creating a Poky distribution. If you wish to gain more control over
-package alternative selections, compile-time options, and other
-low-level configurations, you can create your own distribution.
+distribution :term:`Metadata`, you are using the Poky distribution.
+Poky is explicitly a *reference* distribution for testing and
+development purposes. It enables most hardware and software features
+so that they can be tested, but this also means that from a security
+point of view the attack surface is very large. Additionally, at some
+point it is likely that you will want to gain more control over package
+alternative selections, compile-time options, and other low-level
+configurations. For both of these reasons, if you are using the Yocto
+Project for production use then you are strongly encouraged to create
+your own distribution.
 
 To create your own distribution, the basic steps consist of creating
 your own distribution layer, creating your own distribution
@@ -107,3 +113,23 @@ layer. The following steps provide some more detail:
    For information on append files, see the
    ":ref:`dev-manual/layers:appending other layers metadata with your layer`"
    section.
+
+Copying and modifying the Poky distribution
+===========================================
+
+Instead of creating a custom distribution from scratch as per above, you may
+wish to start your custom distribution configuration by copying the Poky
+distribution provided within the ``meta-poky`` layer and then modifying it.
+This is fine, however if you do this you should keep the following in mind:
+
+-  Every reference to Poky needs to be updated in your copy so that it
+   will still apply. This includes override usage within files (e.g. ``:poky``)
+   and in directory names. This is a good opportunity to evaluate each one of
+   these customizations to see if they are needed for your use case.
+
+-  Unless you also intend to use them, the ``poky-tiny``, ``poky-altcfg`` and
+   ``poky-bleeding`` variants and any references to them can be removed.
+
+-  More generally, the Poky distribution configuration enables a lot more
+   than you likely need for your production use case. You should evaluate *every*
+   configuration choice made in your copy to determine if it is needed.

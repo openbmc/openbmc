@@ -564,6 +564,13 @@ The ``Patched`` state of a CVE issue is detected from patch files with the forma
 ``CVE-ID.patch``, e.g. ``CVE-2019-20633.patch``, in the :term:`SRC_URI` and using
 CVE metadata of format ``CVE: CVE-ID`` in the commit message of the patch file.
 
+.. note::
+
+   Commit message metadata (``CVE: CVE-ID`` in a patch header) will not be scanned
+   in any patches that are remote, i.e. that are anything other than local files
+   referenced via ``file://`` in SRC_URI. However, a ``CVE-ID`` in a remote patch
+   file name itself will be registered.
+
 If the recipe adds ``CVE-ID`` as flag of the :term:`CVE_STATUS` variable with status
 mapped to ``Ignored``, then the CVE state is reported as ``Ignored``::
 
@@ -1582,6 +1589,12 @@ The tests you can list with the :term:`WARN_QA` and
       This is only relevant when you are using runtime package management
       on your target system.
 
+-  ``virtual-slash:`` Checks to see if ``virtual/`` is being used in
+   :term:`RDEPENDS` or :term:`RPROVIDES`, which is not good practice ---
+   ``virtual/`` is a convention intended for use in the build context
+   (i.e. :term:`PROVIDES` and :term:`DEPENDS`) rather than the runtime
+   context.
+
 -  ``xorg-driver-abi:`` Checks that all packages containing Xorg
    drivers have ABI dependencies. The ``xserver-xorg`` recipe provides
    driver ABI names. All drivers should depend on the ABI versions that
@@ -2371,6 +2384,24 @@ section of ``pyproject.toml`` (See `PEP-518 <https://www.python.org/dev/peps/pep
 
 Python modules built with ``flit_core.buildapi`` are pure Python (no
 ``C`` or ``Rust`` extensions).
+
+Internally this uses the :ref:`ref-classes-python_pep517` class.
+
+.. _ref-classes-python_maturin:
+
+``python_maturin``
+==================
+
+The :ref:`ref-classes-python_maturin` class provides support for python-maturin, a replacement
+for setuptools_rust and another "backend" for building Python Wheels.
+
+.. _ref-classes-python_mesonpy:
+
+``python_mesonpy``
+==================
+
+The :ref:`ref-classes-python_mesonpy` class enables building Python modules which use the
+meson-python build system.
 
 Internally this uses the :ref:`ref-classes-python_pep517` class.
 

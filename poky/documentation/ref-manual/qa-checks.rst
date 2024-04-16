@@ -799,6 +799,14 @@ Errors and Warnings
     section in the Yocto Project Development Tasks Manual. See also the
     ":ref:`ref-classes-ptest`" section.
 
+.. _qa-check-virtual-slash:
+
+- ``<variable> is set to <value> but the substring 'virtual/' holds no meaning in this context. It only works for build time dependencies, not runtime ones. It is suggested to use 'VIRTUAL-RUNTIME_' variables instead.``
+
+    ``virtual/`` is a convention intended for use in the build context
+    (i.e. :term:`PROVIDES` and :term:`DEPENDS`) rather than the runtime
+    context (i.e. :term:`RPROVIDES` and :term:`RDEPENDS`). Use
+    :term:`VIRTUAL-RUNTIME` variables instead for the latter.
 
 
 Configuring and Disabling QA Checks

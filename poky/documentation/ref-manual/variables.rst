@@ -4048,7 +4048,7 @@ system and gives an overview of their function and contents.
       The default value of the variable is set as follows in the
       ``meta/conf/distro/defaultsetup.conf`` file::
 
-         INHERIT_DISTRO ?= "debian devshell sstate license"
+         INHERIT_DISTRO ?= "debian devshell sstate license remove-libtool create-spdx"
 
    :term:`INHIBIT_DEFAULT_DEPS`
       Prevents the default dependencies, namely the C compiler and standard
@@ -8812,6 +8812,10 @@ system and gives an overview of their function and contents.
       :term:`CXXFLAGS` variable in the environment to the :term:`TARGET_CXXFLAGS`
       value so that executables built using the SDK also have the flags
       applied.
+
+   :term:`TARGET_DBGSRC_DIR`
+      Specifies the target path to debug source files. The default is
+      ``/usr/src/debug/${PN}/${PV}``.
 
    :term:`TARGET_FPU`
       Specifies the method for handling FPU code. For FPU-less targets,

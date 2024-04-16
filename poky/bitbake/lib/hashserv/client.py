@@ -27,9 +27,7 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
 
     async def setup_connection(self):
         await super().setup_connection()
-        cur_mode = self.mode
         self.mode = self.MODE_NORMAL
-        await self._set_mode(cur_mode)
         if self.username:
             # Save off become user temporarily because auth() resets it
             become = self.saved_become_user
@@ -38,12 +36,19 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
             if become:
                 await self.become_user(become)
 
-    async def send_stream(self, msg):
+    async def send_stream(self, mode, msg):
         async def proc():
+            await self._set_mode(mode)
             await self.socket.send(msg)
             return await self.socket.recv()
 
         return await self._send_wrapper(proc)
+
+    async def invoke(self, *args, **kwargs):
+        # It's OK if connection errors cause a failure here, because the mode
+        # is also reset to normal on a new connection
+        await self._set_mode(self.MODE_NORMAL)
+        return await super().invoke(*args, **kwargs)
 
     async def _set_mode(self, new_mode):
         async def stream_to_normal():
@@ -84,14 +89,12 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         self.mode = new_mode
 
     async def get_unihash(self, method, taskhash):
-        await self._set_mode(self.MODE_GET_STREAM)
-        r = await self.send_stream("%s %s" % (method, taskhash))
+        r = await self.send_stream(self.MODE_GET_STREAM, "%s %s" % (method, taskhash))
         if not r:
             return None
         return r
 
     async def report_unihash(self, taskhash, method, outhash, unihash, extra={}):
-        await self._set_mode(self.MODE_NORMAL)
         m = extra.copy()
         m["taskhash"] = taskhash
         m["method"] = method
@@ -100,7 +103,6 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         return await self.invoke({"report": m})
 
     async def report_unihash_equiv(self, taskhash, method, unihash, extra={}):
-        await self._set_mode(self.MODE_NORMAL)
         m = extra.copy()
         m["taskhash"] = taskhash
         m["method"] = method
@@ -108,18 +110,15 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         return await self.invoke({"report-equiv": m})
 
     async def get_taskhash(self, method, taskhash, all_properties=False):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke(
             {"get": {"taskhash": taskhash, "method": method, "all": all_properties}}
         )
 
     async def unihash_exists(self, unihash):
-        await self._set_mode(self.MODE_EXIST_STREAM)
-        r = await self.send_stream(unihash)
+        r = await self.send_stream(self.MODE_EXIST_STREAM, unihash)
         return r == "true"
 
     async def get_outhash(self, method, outhash, taskhash, with_unihash=True):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke(
             {
                 "get-outhash": {
@@ -132,27 +131,21 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         )
 
     async def get_stats(self):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"get-stats": None})
 
     async def reset_stats(self):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"reset-stats": None})
 
     async def backfill_wait(self):
-        await self._set_mode(self.MODE_NORMAL)
         return (await self.invoke({"backfill-wait": None}))["tasks"]
 
     async def remove(self, where):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"remove": {"where": where}})
 
     async def clean_unused(self, max_age):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"clean-unused": {"max_age_seconds": max_age}})
 
     async def auth(self, username, token):
-        await self._set_mode(self.MODE_NORMAL)
         result = await self.invoke({"auth": {"username": username, "token": token}})
         self.username = username
         self.password = token
@@ -160,7 +153,6 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         return result
 
     async def refresh_token(self, username=None):
-        await self._set_mode(self.MODE_NORMAL)
         m = {}
         if username:
             m["username"] = username
@@ -174,34 +166,28 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         return result
 
     async def set_user_perms(self, username, permissions):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke(
             {"set-user-perms": {"username": username, "permissions": permissions}}
         )
 
     async def get_user(self, username=None):
-        await self._set_mode(self.MODE_NORMAL)
         m = {}
         if username:
             m["username"] = username
         return await self.invoke({"get-user": m})
 
     async def get_all_users(self):
-        await self._set_mode(self.MODE_NORMAL)
         return (await self.invoke({"get-all-users": {}}))["users"]
 
     async def new_user(self, username, permissions):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke(
             {"new-user": {"username": username, "permissions": permissions}}
         )
 
     async def delete_user(self, username):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"delete-user": {"username": username}})
 
     async def become_user(self, username):
-        await self._set_mode(self.MODE_NORMAL)
         result = await self.invoke({"become-user": {"username": username}})
         if username == self.username:
             self.saved_become_user = None
@@ -210,15 +196,12 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         return result
 
     async def get_db_usage(self):
-        await self._set_mode(self.MODE_NORMAL)
         return (await self.invoke({"get-db-usage": {}}))["usage"]
 
     async def get_db_query_columns(self):
-        await self._set_mode(self.MODE_NORMAL)
         return (await self.invoke({"get-db-query-columns": {}}))["columns"]
 
     async def gc_status(self):
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"gc-status": {}})
 
     async def gc_mark(self, mark, where):
@@ -231,7 +214,6 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         kept. In addition, any new entries added to the database after this
         command will be automatically marked with "mark"
         """
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"gc-mark": {"mark": mark, "where": where}})
 
     async def gc_sweep(self, mark):
@@ -242,7 +224,6 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         It is recommended to clean unused outhash entries after running this to
         cleanup any dangling outhashes
         """
-        await self._set_mode(self.MODE_NORMAL)
         return await self.invoke({"gc-sweep": {"mark": mark}})
 
 

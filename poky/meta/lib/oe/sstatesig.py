@@ -431,10 +431,7 @@ def find_siginfo(pn, taskname, taskhashlist, d):
                 actual_hashval = get_hashval(fullpath)
                 if actual_hashval in hashfiles:
                     continue
-                try:
-                    hashfiles[actual_hashval] = {'path':fullpath, 'sstate':True, 'time':get_time(fullpath)}
-                except FileNotFoundError:
-                    bb.warn("Could not obtain mtime for {}".format(fullpath))
+                hashfiles[actual_hashval] = {'path':fullpath, 'sstate':True, 'time':get_time(fullpath)}
 
     return hashfiles
 

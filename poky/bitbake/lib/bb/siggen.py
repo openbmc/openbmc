@@ -582,7 +582,11 @@ class SignatureGeneratorUniHashMixIn(object):
 
             yield
         finally:
-            os.environ = orig_env
+            for k, v in self.env.items():
+                if k in orig_env:
+                    os.environ[k] = orig_env[k]
+                else:
+                    del os.environ[k]
 
     @contextmanager
     def client(self):

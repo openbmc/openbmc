@@ -1,76 +1,50 @@
-<script type="module">
-  // Get raw data
-  const rawData = [
-    {% for sample in measurement.samples %}
-      [{{ sample.commit_num }}, {{ sample.mean.gv_value() }}, {{ sample.start_time }}],
-    {% endfor %}
-  ];
+<script type="text/javascript">
+  chartsDrawing += 1;
+  google.charts.setOnLoadCallback(drawChart_{{ chart_elem_id }});
+  function drawChart_{{ chart_elem_id }}() {
+    var data = new google.visualization.DataTable();
 
-  const convertToMinute = (time) => {
-    return time[0]*60 + time[1] + time[2]/60 + time[3]/3600;
-  }
+    // Chart options
+    var options = {
+      theme : 'material',
+      legend: 'none',
+      hAxis: { format: '', title: 'Commit number',
+               minValue: {{ chart_opts.haxis.min }},
+               maxValue: {{ chart_opts.haxis.max }} },
+      {% if measurement.type == 'time' %}
+      vAxis: { format: 'h:mm:ss' },
+      {% else %}
+      vAxis: { format: '' },
+      {% endif %}
+      pointSize: 5,
+      chartArea: { left: 80, right: 15 },
+    };
 
-  // Convert raw data to the format: [time, value]
-  const data = rawData.map(([commit, value, time]) => {
-    return [
-      // The Date object takes values in milliseconds rather than seconds. So to use a Unix timestamp we have to multiply it by 1000.
-      new Date(time * 1000).getTime(),
-      // Assuming the array values are duration in the format [hours, minutes, seconds, milliseconds]
-      Array.isArray(value) ? convertToMinute(value) : value
-    ]
-  });
+    // Define data columns
+    data.addColumn('number', 'Commit');
+    data.addColumn('{{ measurement.value_type.gv_data_type }}',
+                   '{{ measurement.value_type.quantity }}');
+    // Add data rows
+    data.addRows([
+      {% for sample in measurement.samples %}
+        [{{ sample.commit_num }}, {{ sample.mean.gv_value() }}],
+      {% endfor %}
+    ]);
 
-  // Set chart options
-  const option = {
-    tooltip: {
-      trigger: 'axis',
-      valueFormatter: (value) => {
-        const hours = Math.floor(value/60)
-        const minutes = Math.floor(value % 60)
-        const seconds = Math.floor((value * 60) % 60)
-        return hours + ':' + minutes + ':' + seconds
-      }
-    },
-    xAxis: {
-      type: 'time',
-    },
-    yAxis: {
-      name: '{{ measurement.value_type.quantity }}' == 'time' ? 'Duration in minutes' : 'Disk size in MB',
-      type: 'value',
-      min: function(value) {
-        return Math.round(value.min - 0.5);
-      },
-      max: function(value) {
-        return Math.round(value.max + 0.5);
-      }
-    },
-    dataZoom: [
-      {
-        type: 'slider',
-        xAxisIndex: 0,
-        filterMode: 'none'
-      },
-    ],
-    series: [
-      {
-        name: '{{ measurement.value_type.quantity }}',
-        type: 'line',
-        smooth: true,
-        symbol: 'none',
-        data: data
-      }
-    ]
-  };
-
-  // Draw chart
-  const chart_div = document.getElementById('{{ chart_elem_id }}');
-  const measurement_chart= echarts.init(chart_div, null, {
-    height: 320
-  });
-  // Change chart size with browser resize
-  window.addEventListener('resize', function() {
-    measurement_chart.resize();
-  });
-  measurement_chart.setOption(option);
+    // Finally, draw the chart
+    chart_div = document.getElementById('{{ chart_elem_id }}');
+    var chart = new google.visualization.LineChart(chart_div);
+    google.visualization.events.addListener(chart, 'ready', function () {
+      //chart_div = document.getElementById('{{ chart_elem_id }}');
+      //chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+      png_div = document.getElementById('{{ chart_elem_id }}_png');
+      png_div.outerHTML = '<a id="{{ chart_elem_id }}_png" href="' + chart.getImageURI() + '">PNG</a>';
+      console.log("CHART READY: {{ chart_elem_id }}");
+      chartsDrawing -= 1;
+      if (chartsDrawing == 0)
+        console.log("ALL CHARTS READY");
+    });
+    chart.draw(data, options);
+}
 </script>
 

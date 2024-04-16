@@ -1,5 +1,5 @@
 #
-# AUTOREV and PV containing SRCPV needs to be set early, before any anonymous python
+# AUTOREV and PV containing '+git' needs to be set early, before any anonymous python
 # expands anything containing PV, else the parse process won't trigger the fetcher to
 # cache the needed version data
 #
@@ -13,7 +13,7 @@ python pokybleeding_version_handler () {
             bb.warn("Here 5 %s %s" % (d.getVar("PN"), bpn))
         d.setVar("SRCREV", "${AUTOREV}")
         if "+git" not in d.getVar("PV"):
-            d.appendVar("PV", "+git${SRCPV}")
+            d.appendVar("PV", "+git")
 }
 
 addhandler pokybleeding_version_handler

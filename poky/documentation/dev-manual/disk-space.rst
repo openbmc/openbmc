@@ -49,7 +49,7 @@ requires a full build environment to be available and doesn't work well
 covering multiple releases. It won't work either on limited environments
 such as BSD based NAS::
 
-   sstate-cache-management.sh --remove-duplicated --cache-dir=build/sstate-cache
+   sstate-cache-management.py --remove-duplicated --cache-dir=sstate-cache
 
 This command will ask you to confirm the deletions it identifies.
 Run ``sstate-cache-management.sh`` for more details about this script.
