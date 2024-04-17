@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # CXL need about 30 seconds to boot up. Wait 30 seconds then start polling CXLs status.
-sleep 30
+sleep 40
 
 wf_eid=$(($1 * 10 + 2))
 count=0
