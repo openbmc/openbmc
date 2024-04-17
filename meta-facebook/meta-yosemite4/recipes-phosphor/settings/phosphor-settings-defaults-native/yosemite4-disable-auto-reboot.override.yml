@@ -1,0 +1,11 @@
+/xyz/openbmc_project/control/host{}/auto_reboot:
+    - Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
+      Properties:
+          AutoReboot:
+             Default: 'false'
+
+/xyz/openbmc_project/control/host{}/auto_reboot/one_time:
+    - Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
+      Properties:
+          AutoReboot:
+             Default: 'false'
