@@ -8,14 +8,14 @@ FILENAME = "Poleg_bootblock_${PV}.bin"
 
 S = "${WORKDIR}"
 
-SRCREV = "4fa655f95547b927b0133c8ed96c88c5d14ac7b3"
+SRCREV = "cac8f0ed8c6e875148ec37b657fcbdd1058c2c69"
 SRC_URI = " \
     https://raw.githubusercontent.com/Nuvoton-Israel/bootblock/${SRCREV}/LICENSE;name=lic \
     https://github.com/Nuvoton-Israel/bootblock/releases/download/BootBlock_${PV}/Poleg_bootblock_basic.bin;downloadfilename=${FILENAME};name=bin \
 "
 
 SRC_URI[lic.md5sum] = "b234ee4d69f5fce4486a80fdaf4a4263"
-SRC_URI[bin.sha256sum] = "a33f3fe96786929a8f35e986ae76bbd1bf53459770a6ece7d6777dced1d62ddf"
+SRC_URI[bin.sha256sum] = "1bc367032b2ac76190064256a306993a0405de2a2af5b4fad2c549ccd6a0ba0f"
 
 inherit deploy
 
