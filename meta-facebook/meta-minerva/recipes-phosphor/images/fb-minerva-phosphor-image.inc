@@ -27,3 +27,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-sel-logger \
 "
+
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-state-manager \
+"
