@@ -19,7 +19,12 @@ SRC_URI += "\
 
 S = "${WORKDIR}"
 
-NOROOTFS_PERSISTENT_DIRS = "var etc ${@ d.getVar('ROOT_HOME')[1:]}"
+NOROOTFS_PERSISTENT_DIRS = "\
+    var \
+    etc \
+    home \
+    ${@ bb.utils.contains('ROOT_HOME', '/home/root', '', d.getVar('ROOT_HOME')[1:], d)} \
+    "
 
 inherit allarch
 inherit update-alternatives
