@@ -38,7 +38,5 @@ FILES:${PN}:append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
 FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV}"
 
 do_install:append(){
-   install -d ${D}/var/lib/fb-ipmi-oem
-   install -d ${D}${includedir}/fb-ipmi-oem
-   install -m 0644 -D ${S}/include/*.hpp ${D}${includedir}/fb-ipmi-oem
+   install -d ${D}/var/lib/${PN}
 }
