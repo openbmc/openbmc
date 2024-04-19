@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGECONFIG:remove = "only-run-apr-on-power-loss"
+PACKAGECONFIG:append = " host-gpio"
 
 CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
