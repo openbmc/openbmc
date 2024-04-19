@@ -51,6 +51,9 @@ PACKAGECONFIG[only-run-apr-on-power-loss] = "-Donly-run-apr-on-power-loss=true,-
 # Only allow boot operations when BMC is in Ready state
 PACKAGECONFIG[only-allow-boot-when-bmc-ready] = "-Donly-allow-boot-when-bmc-ready=true,-Donly-allow-boot-when-bmc-ready=false"
 
+# Enable host state GPIO
+PACKAGECONFIG[host-gpio] = "-Dhost-gpios=enabled,-Dhost-gpios=disabled,gpioplus"
+
 # The host-check function will check if the host is running
 # after a BMC reset.
 # The reset-sensor-states function will reset the host
@@ -85,6 +88,7 @@ RDEPENDS:${PN}-host += "bash"
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
 FILES:${PN}-host = "${bindir}/phosphor-host-state-manager"
+FILES:${PN}-host += "${bindir}/phosphor-host-condition-gpio"
 FILES:${PN}-host += "${libexecdir}/phosphor-state-manager/host-reboot"
 DBUS_SERVICE:${PN}-host += "xyz.openbmc_project.State.Host@.service"
 DBUS_SERVICE:${PN}-host += "phosphor-reboot-host@.service"
@@ -92,6 +96,7 @@ SYSTEMD_SERVICE:${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
 SYSTEMD_SERVICE:${PN}-host += "phosphor-clear-one-time@.service"
 SYSTEMD_SERVICE:${PN}-host += "phosphor-set-host-transition-to-running@.service"
 SYSTEMD_SERVICE:${PN}-host += "phosphor-set-host-transition-to-off@.service"
+SYSTEMD_SERVICE:${PN}-host += "${@bb.utils.contains('PACKAGECONFIG', 'host-gpio', 'phosphor-host-condition-gpio@.service', '', d)}"
 
 FILES:${PN}-chassis = "${bindir}/phosphor-chassis-state-manager"
 DBUS_SERVICE:${PN}-chassis += "xyz.openbmc_project.State.Chassis@.service"
