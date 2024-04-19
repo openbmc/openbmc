@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-HOST_SERVICE="xyz.openbmc_project.State.HostCondition.Gpio"
+HOST_SERVICE="xyz.openbmc_project.State.HostCondition.Gpio0"
 HOST_OBJPATH="/xyz/openbmc_project/Gpios/host0"
 HOST_INTERFACE="xyz.openbmc_project.Condition.HostFirmware"
 HOST_PROPERTY="CurrentFirmwareCondition"

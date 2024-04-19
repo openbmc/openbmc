@@ -13,7 +13,7 @@ cnt=60
 while [ "$cnt" -gt 0 ];
 do
 	cnt=$((cnt - 1))
-	st=$(busctl call xyz.openbmc_project.State.HostCondition.Gpio \
+	st=$(busctl call xyz.openbmc_project.State.HostCondition.Gpio0 \
 		/xyz/openbmc_project/Gpios/host0 org.freedesktop.DBus.Properties \
 		Get ss xyz.openbmc_project.Condition.HostFirmware \
 		CurrentFirmwareCondition | cut -d"." -f6)
