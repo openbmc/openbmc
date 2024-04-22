@@ -9,7 +9,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "boost"
 DEPENDS += "nss-pam-ldapd"
 DEPENDS += "systemd"
-SRCREV = "d9adc73a09cc17253ed8774dd72362ba5083d578"
+SRCREV = "86597bd333f455cba08d9b9b30207958ea14f211"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
