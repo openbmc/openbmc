@@ -4,9 +4,9 @@
 action=$1
 slot=$2
 # NIC bus are 24~27.
-bus=$((23 + slot))
+bus=$((24 + slot))
 # Static EID for NIC are 90~93.
-eid=$((89 + slot))
+eid=$((90 + slot))
 
 sleep 2
 

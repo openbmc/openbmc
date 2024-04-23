@@ -103,11 +103,11 @@
         "GpioNum": 165,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["remove-nic-endpoint-slot@1.service"],
+            "RISING": ["remove-nic-endpoint-slot@0.service"],
             "FALLING": [
                 "obmc-chassis-powercycle@1.target",
                 "obmc-chassis-powercycle@2.target",
-                "setup-nic-endpoint-slot@1.service"
+                "setup-nic-endpoint-slot@0.service"
             ]
         },
         "Continue": true
@@ -118,11 +118,11 @@
         "GpioNum": 32,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["remove-nic-endpoint-slot@2.service"],
+            "RISING": ["remove-nic-endpoint-slot@1.service"],
             "FALLING": [
                 "obmc-chassis-powercycle@3.target",
                 "obmc-chassis-powercycle@4.target",
-                "setup-nic-endpoint-slot@2.service"
+                "setup-nic-endpoint-slot@1.service"
             ]
         },
         "Continue": true
@@ -133,11 +133,11 @@
         "GpioNum": 33,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["remove-nic-endpoint-slot@3.service"],
+            "RISING": ["remove-nic-endpoint-slot@2.service"],
             "FALLING": [
                 "obmc-chassis-powercycle@5.target",
                 "obmc-chassis-powercycle@6.target",
-                "setup-nic-endpoint-slot@3.service"
+                "setup-nic-endpoint-slot@2.service"
             ]
         },
         "Continue": true
@@ -152,7 +152,7 @@
             "FALLING": [
                 "obmc-chassis-powercycle@7.target",
                 "obmc-chassis-powercycle@8.target",
-                "setup-nic-endpoint-slot@4.service"
+                "setup-nic-endpoint-slot@3.service"
             ]
         },
         "Continue": true
