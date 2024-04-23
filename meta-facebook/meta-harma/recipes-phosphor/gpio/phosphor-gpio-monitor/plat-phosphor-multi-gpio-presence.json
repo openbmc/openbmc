@@ -1,0 +1,37 @@
+[
+    {
+        "Name": "presence-ocp-0",
+        "LineName": "reset-control-pcie-expansion-0",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Harma_MB/presence_ocp_0"
+    },
+    {
+        "Name": "presence-e1s-0",
+        "LineName": "presence-e1s-0",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Harma_MB/presence_e1s_0"
+    },
+    {
+        "Name": "presence-e1s-1",
+        "LineName": "presence-e1s-1",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Harma_MB/presence_e1s_1"
+    },
+    {
+        "Name": "presence-asic-modules-0",
+        "LineName": "presence-asic-modules-0",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Harma_MB/presence_asic_modules_0"
+    },
+    {
+        "Name": "presence-asic-modules-1",
+        "LineName": "presence-asic-modules-1",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Harma_MB/presence_asic_modules_1"
+    }
+]

@@ -20,3 +20,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     obmc-phosphor-buttons-signals \
     obmc-phosphor-buttons-handler \
 "
+
+# Monitor gpio status
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-gpio-monitor-presence \
+"
