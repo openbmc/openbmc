@@ -9,7 +9,7 @@
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS:prepend = "nodejs-native "
-SRCREV = "d1ef18e6f9ed1527b66cec07eba6acaf9a95819c"
+SRCREV = "51abe87feea7261ec6f7589d8214af3d8019e71e"
 PV = "1.0+git${SRCPV}"
 # This recipe requires online access to build, as it uses NPM for dependency
 # management and resolution.
