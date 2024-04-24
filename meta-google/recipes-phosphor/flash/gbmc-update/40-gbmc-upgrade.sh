@@ -78,8 +78,14 @@ gbmc_upgrade_hook() {
 
   local tmpdir
   tmpdir="$(mktemp -d)" || return
+  if ! gbmc_upgrade_dl_unpack; then
+    echo 'upgrade unpack failed' >&2
+    # shellcheck disable=SC2153
+    rm -rf -- "$tmpdir" "$GBMC_UPGRADE_SIG" "$GBMC_UPGRADE_IMG"
+    return 1
+  fi
   # shellcheck disable=SC2015
-  gbmc_upgrade_dl_unpack && gbmc_br_run_hooks GBMC_UPGRADE_HOOKS || true
+  gbmc_br_run_hooks GBMC_UPGRADE_HOOKS || true
   # shellcheck disable=SC2153
   rm -rf -- "$tmpdir" "$GBMC_UPGRADE_SIG" "$GBMC_UPGRADE_IMG"
 }
