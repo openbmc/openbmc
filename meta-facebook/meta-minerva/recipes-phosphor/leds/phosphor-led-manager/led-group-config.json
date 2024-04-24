@@ -36,11 +36,14 @@
             "group": "fan_fault",
             "members": [
                 {
-                    "Name": "fan_fault_amber",
+                    "Name": "fan_status_led",
+                    "Action": "On"
+                },
+                {
+                    "Name": "fan_fault_led_n",
                     "Action": "On"
                 }
             ]
         }
-
     ]
 }
