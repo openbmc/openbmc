@@ -4,8 +4,7 @@ Description=Chassis Power Cycle: %i
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/phosphor-state-manager/chassis-powercycle %i
-ExecStartPost=/usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done %i
-ExecStartPost=/bin/systemctl restart phosphor-discover-system-state@%i.service
+ExecStartPost=/bin/bash -c "/usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done %i && systemctl restart phosphor-discover-system-state@%i.service"
 
 [Install]
 WantedBy=obmc-chassis-powercycle@%i.target
