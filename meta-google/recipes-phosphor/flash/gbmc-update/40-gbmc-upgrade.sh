@@ -51,7 +51,7 @@ gbmc_upgrade_dl_unpack() {
   while true; do
     local st=()
     curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
-      tar "${tflags[@]}" --wildcards -xC "$tmpdir" "${GBMC_UPGRADE_UNPACK_FILES[@]}" 2>"$tmpdir"/tarerr \
+      tar "${tflags[@]}" --wildcards --warning=none -xC "$tmpdir" "${GBMC_UPGRADE_UNPACK_FILES[@]}" 2>"$tmpdir"/tarerr \
       && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
     # Curl failures should continue
     if (( st[0] == 0 )); then
