@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI:append = " \
-    file://journald-size-policy-2MB.conf \
+    file://journald-size-policy-10MB.conf \
     file://journald-storage-policy.conf \
     file://systemd-networkd-only-wait-for-one.conf \
 "
@@ -9,8 +9,8 @@ SRC_URI:append = " \
 do_install:append() {
 
     install -m 644 -D \
-        ${WORKDIR}/journald-size-policy-2MB.conf \
-        ${D}${systemd_unitdir}/journald.conf.d/journald-size-policy-2MB.conf
+        ${WORKDIR}/journald-size-policy-10MB.conf \
+        ${D}${systemd_unitdir}/journald.conf.d/journald-size-policy-10MB.conf
 
     install -m 644 -D \
         ${WORKDIR}/journald-storage-policy.conf \
