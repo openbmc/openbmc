@@ -1,15 +1,15 @@
 [
     {
-        "Name": "CPU_1",
+        "Name": "CPU01",
         "LineName": "presence-cpu0",
         "ActiveLow": true,
-        "Inventory": "/system/chassis/motherboard/CPU_1"
+        "Inventory": "/system/chassis/motherboard/cpu0"
     },
     {
-        "Name": "CPU_2",
+        "Name": "CPU02",
         "LineName": "presence-cpu1",
         "ActiveLow": true,
-        "Inventory": "/system/chassis/motherboard/CPU_2"
+        "Inventory": "/system/chassis/motherboard/cpu1"
     },
     {
         "Name": "PSU0",
