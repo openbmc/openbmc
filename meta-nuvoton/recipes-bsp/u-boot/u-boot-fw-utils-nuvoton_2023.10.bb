@@ -1,4 +1,4 @@
-require u-boot-common-nuvoton.inc
+require u-boot-common-nuvoton_${PV}.inc
 
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
 DEPENDS = "mtd-utils bison-native"
