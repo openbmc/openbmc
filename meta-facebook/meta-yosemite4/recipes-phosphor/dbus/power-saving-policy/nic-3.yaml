@@ -1,0 +1,79 @@
+- name: nic 3 current host state path group
+  class: group
+  group: path
+  members:
+      - meta: PATH
+        path: /xyz/openbmc_project/state/host5
+      - meta: PATH
+        path: /xyz/openbmc_project/state/host6
+
+- name: current host state property
+  class: group
+  group: property
+  type: string
+  members:
+      - interface: xyz.openbmc_project.State.Host
+        meta: PROPERTY
+        property: CurrentHostState
+
+- name: nic 3 main mode monitor
+  class: watch
+  watch: property
+  paths: nic 3 current host state path group
+  properties: current host state property
+  callback: check if fulfill nic main mode requirement
+
+- name: nic 3 aux mode monitor
+  class: watch
+  watch: property
+  paths: nic 3 current host state path group
+  properties: current host state property
+  callback: check if fulfill nic aux mode requirement
+
+- name: check if fulfill nic main mode requirement
+  class: condition
+  condition: count
+  paths: nic 3 current host state path group
+  properties: current host state property
+  callback: switch nic 3 to main mode
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: xyz.openbmc_project.State.Host.HostState.Running
+
+- name: check if fulfill nic aux mode requirement
+  class: condition
+  condition: count
+  paths: nic 3 current host state path group
+  properties: current host state property
+  callback: switch nic 3 to aux mode
+  countop: "=="
+  countbound: 2
+  op: "=="
+  bound: xyz.openbmc_project.State.Host.HostState.Off
+
+- name: switch nic 3 to main mode
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: switch-nic-to-main-mode@3.service
+        type: string
+      - value: replace
+        type: string
+
+- name: switch nic 3 to aux mode
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: switch-nic-to-aux-mode@3.service
+        type: string
+      - value: replace
+        type: string

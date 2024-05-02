@@ -1,0 +1,7 @@
+[Unit]
+Description=Switch nic %i to aux mode
+
+[Service]
+Type=oneshot
+ExecStart=switch-nic-main-or-aux-mode %i aux
+

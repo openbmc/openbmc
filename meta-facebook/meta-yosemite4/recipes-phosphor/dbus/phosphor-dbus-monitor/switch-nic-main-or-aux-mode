@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+SLOT=$1
+MODE=$2
+GPIO_CHIP=$(basename "/sys/bus/i2c/devices/28-0024/"*gpiochip*)
+
+if [ "$MODE" = "main" ]
+then
+    gpio_val=1
+elif [ "$MODE" = "aux" ]
+then
+    gpio_val=0
+else
+    echo "Mode must be either main or aux instead of \"$MODE\"."
+    exit 255
+fi
+
+if test -z "$SLOT"
+then
+    echo "Slot number(1st parameter) is required."
+    exit 255
+elif [ "$SLOT" -gt 4 ]
+then
+    echo "Slot number must between 1~4."
+    exit 255
+fi
+
+# nic1~4 = gpio pin 4~7
+gpio_pin=$(( SLOT + 3 ))
+
+gpioset "$GPIO_CHIP" $gpio_pin=$gpio_val
+
+exit 0
