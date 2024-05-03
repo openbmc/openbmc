@@ -6,8 +6,6 @@ source /usr/libexec/minerva-common-functions
 # Minerva CMM Sled Power Cycle and Chassis Power Cycle
 
 cmm-hsc-power-cycle() {
-    #TBD: Since there has a 2nd HSC, it is necessary to determine which HSC it is now.
-
     # LTC4287 MFR_REBOOT_CONTROL (FDh) Read/Write
     # [3]:
     #       REBOOT 0 Write a 1 to reboot.
@@ -22,21 +20,49 @@ cmm-hsc-power-cycle() {
     #       101 18.6 s
     #       110 37.1 s
     #       111 74.2 s
-    i2cset -y -f 0 0x44 0xfd 0x00
-    i2cset -y -f 0 0x44 0xfd 0x0b
+    ret1=$(i2cset -y -f 0 0x44 0xfd 0x00)
+    ret2=$(i2cset -y -f 0 0x44 0xfd 0x0b)
+
+    # XDP710 RESTART command (0xEC)
+    ret3=$(i2cset -f -y 0 0x43 0xec)
+
+    if [ "$ret3" -ne 0 ] && { [ "$ret1" -ne 0 ] || [ "$ret2" -ne 0 ]; }; then
+        return 1
+    else
+        return 0
+    fi
+
 }
 
-compute-blade-hsc-power-off() {
+compute-blade-hsc-power-control() {
+
+    if [ "$1" == "on" ];then
+        val=0
+    elif [ "$1" == "off" ]; then
+        val=1
+    else
+        return 1
+    fi
+
     for i in {0..15}
     do
-        set_gpio "PWREN_MTIA_BLADE${i}_HSC_EN_N" 1
+        set_gpio "PWREN_MTIA_BLADE${i}_HSC_EN_N" $val
     done
 }
 
-network-blade-hsc-power-off() {
-    for i in {0..15}
+network-blade-hsc-power-control() {
+    
+    if [ "$1" == "on" ];then
+        val=0
+    elif [ "$1" == "off" ]; then
+        val=1
+    else
+        return 1
+    fi
+    
+    for i in {0..5}
     do
-        set_gpio "PWREN_MTIA_BLADE${i}_HSC_EN_N" 1
+        set_gpio "PWREN_NW_BLADE${i}_HSC_EN_N" $val
     done
 }
 
@@ -50,8 +76,11 @@ elif [ "$1" == 1 ]
 then
     echo "Staring CMM Chassis Power Cycle"
 
-    compute-blade-hsc-power-off
-    network-blade-hsc-power-off
+    compute-blade-hsc-power-control "off"
+    network-blade-hsc-power-control "off"
+    sleep 0.2 # 200ms
+    compute-blade-hsc-power-control "on"
+    network-blade-hsc-power-control "on"
     cmm-hsc-power-cycle
 else
     echo "Invalid CMM Cycle"
