@@ -1,11 +1,15 @@
 #!/bin/bash
 
 # CXL need about 30 seconds to boot up. Wait 30 seconds then start polling CXLs status.
-sleep 40
+sleep 30
 
 wf_eid=$(($1 * 10 + 2))
 count=0
-while [ $count -lt 3 ]; do
+
+# retry getting EID to maximum 60 seconds
+while [ $count -lt 15 ]; do
+    count=$((count + 1))
+    sleep 2
 
     output=$(pldmtool raw -m "$wf_eid" -d 0x80 0x02 0x3A 0x04 0x01)
 
@@ -16,18 +20,19 @@ while [ $count -lt 3 ]; do
     cxl2_ready=$(echo "$rx_data" | awk '{print substr($10,1,2)}')
 
     if [ "$cxl1_ready" == "01" ]; then
-        busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL1
+        if ! busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL1; then
+            continue
+        fi
     fi
 
     if [ "$cxl2_ready" == "01" ]; then
-        busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL2
+        if ! busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL2; then
+            continue
+        fi
     fi
 
     if [ "$cxl1_ready" == "01" ] && [ "$cxl2_ready" == "01" ]; then
         break
     fi
-
-    count=$((count + 1))
-    sleep 2
 
 done
