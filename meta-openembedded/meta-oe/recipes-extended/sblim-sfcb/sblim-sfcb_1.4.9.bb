@@ -86,3 +86,8 @@ FILES:${PN} += "${libdir}/sfcb ${datadir}/sfcb"
 FILES:${PN}-dbg += "${libdir}/sfcb/.debug"
 
 RDEPENDS:${PN} = "perl bash"
+
+# This one is reproducible only on 32bit MACHINEs
+# http://errors.yoctoproject.org/Errors/Details/766970/
+# sblim-sfcb-1.4.9/trace.c:214:18: error: passing argument 1 of 'gmtime_r' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

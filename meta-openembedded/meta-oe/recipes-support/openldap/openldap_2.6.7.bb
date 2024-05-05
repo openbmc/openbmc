@@ -229,3 +229,8 @@ python populate_packages:prepend () {
 }
 
 BBCLASSEXTEND = "native"
+
+# This one is reproducible only on 32bit MACHINEs
+# http://errors.yoctoproject.org/Errors/Details/766968/
+# tls_g.c:971:57: error: passing argument 4 of 'gnutls_fingerprint' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

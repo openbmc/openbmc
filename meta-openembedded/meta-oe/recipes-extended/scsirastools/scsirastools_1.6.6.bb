@@ -44,3 +44,18 @@ FILES:${PN}-raidmon = "${sbindir}/sgraidmon ${sysconfdir}/init.d/sgraid"
 RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN}-diskmon += "${PN} bash"
 RDEPENDS:${PN}-raidmon += "${PN} bash"
+
+# This one is reproducible only on 32bit MACHINEs
+# http://errors.yoctoproject.org/Errors/Details/766967/
+# scsirastools-1.6.6/src/sgdiag.c:238:23: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgdiag.c:697:10: error: passing argument 1 of 'time' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgdiag.c:699:30: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgdiag.c:733:10: error: passing argument 1 of 'time' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgdefects.c:214:23: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgmode.c:290:23: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgdiskmon.c:1278:23: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgdskfl.c:318:23: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgdskfl.c:829:37: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgraidmon.c:1641:23: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+# scsirastools-1.6.6/src/sgsafte.c:1298:23: error: passing argument 1 of 'ctime' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"
