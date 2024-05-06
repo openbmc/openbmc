@@ -17,31 +17,32 @@ IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 # Server 12v power on
 chassis-power-on()
 {
-        if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
-        then
-                echo "Failed to set slot$1 power on"
-        fi
-        sleep 1
+    if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
+    then
+        echo "Failed to set slot$1 power on"
+    fi
+    sleep 1
 
-        # Check chassis status after doing 12V on
-        chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
-        if [ "$chassis_status" == "$STATE_ON" ]
-        then
-                busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
-                echo "Chassis is power on"
-        else
-                busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
-                echo "Chassis is power off"
-                exit 0;
-        fi
+    # Check chassis status after doing 12V on
+    chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+    if [ "$chassis_status" == "$STATE_ON" ]
+    then
+        busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
+        echo "Chassis is power on"
+    else
+        busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
+        echo "Chassis is power off"
+        exit 0;
+    fi
 }
 
 chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
 if [ "$chassis_status" == "$STATE_OFF" ]
 then
-        chassis-power-on
-        exit 0;
+    chassis-power-on
+    /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
+    exit 0;
 else
-        echo "Chassis is already on"
-        exit 0;
+    echo "Chassis is already on"
+    exit 0;
 fi

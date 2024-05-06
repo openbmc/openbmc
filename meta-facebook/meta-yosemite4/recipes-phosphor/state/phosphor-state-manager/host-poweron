@@ -2,10 +2,13 @@
 
 # Provide source directive to shellcheck.
 # shellcheck source=meta-facebook/meta-greatlakes/recipes-phosphor/state/phosphor-state-manager/power-cmd
+CHASSIS_ID=$1
 source /usr/libexec/phosphor-state-manager/power-cmd
 
 # TODO: check power status before do power on
 # Set state effecter state: Entity ID 0x0000 for host power control, 0x1 for power on
+/usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID"
+
 EID=$(($1*10))
 if ! pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x01 -m "$EID"
 then
