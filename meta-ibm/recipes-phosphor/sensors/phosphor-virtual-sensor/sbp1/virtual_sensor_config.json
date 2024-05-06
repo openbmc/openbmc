@@ -437,5 +437,491 @@
       ]
     },
     "Expression": "ifNan(P0 / (V0 * 0.9), 0)"
+  },
+  {
+    "Desc": {
+      "Name": "PVCORE_NIC1_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "PVCORE_NIC1_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "PVCORE_NIC1_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "PVCORE_NIC1_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.35
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.0041
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "PVCORE_NIC2_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "PVCORE_NIC2_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "PVCORE_NIC2_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "PVCORE_NIC2_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.35
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.0041
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P1V2_NIC_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P1V2_NIC_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P1V2_NIC_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P1V2_NIC_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.44
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.0045
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P1V8_NIC_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P1V8_NIC_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P1V8_NIC_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P1V8_NIC_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.66
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.00505
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P3V3_NIC_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P3V3_NIC_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P3V3_NIC_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P3V3_NIC_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.90
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.00675
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P5V_AUX_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P5V_AUX_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P5V_AUX_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P5V_AUX_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 1.25
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.0079
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P3V3_AUX_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P3V3_AUX_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P3V3_AUX_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P3V3_AUX_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.90
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.00675
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P1V8_PCH_AUX_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P1V8_PCH_AUX_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P1V8_PCH_AUX_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P1V8_PCH_AUX_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.40
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.022
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P1V05_PCH_AUX_Input_Current",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P1V05_PCH_AUX_Output_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P1V05_PCH_AUX_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P1V05_PCH_AUX_Input_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ],
+      "ConstParam": [
+        {
+          "ParamName": "O",
+          "Value": 0.40
+        },
+        {
+          "ParamName": "R",
+          "Value": 0.0042
+        }
+      ]
+    },
+    "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
   }
 ]
