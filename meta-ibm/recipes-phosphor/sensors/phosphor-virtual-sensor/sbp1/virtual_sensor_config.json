@@ -923,5 +923,1192 @@
       ]
     },
     "Expression": "(P3 > 0) ? ((O + P1 + R * P2 * P2) / P3) : 0"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_CURRENT_CPUs",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "PVCCINFAON_PVCCFA_EHV_CPU0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "PVCCINFAON_PVCCFA_EHV_CPU1_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "PVCCINFAON_PVCCFA_EHV_CPU2_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "PVCCINFAON_PVCCFA_EHV_CPU3_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "PVCCIN_PVCCFA_EHV_FIVRA_CPU0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P5",
+          "Desc": {
+            "Name": "PVCCIN_PVCCFA_EHV_FIVRA_CPU0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P6",
+          "Desc": {
+            "Name": "PVCCIN_PVCCFA_EHV_FIVRA_CPU0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P7",
+          "Desc": {
+            "Name": "PVCCIN_PVCCFA_EHV_FIVRA_CPU0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P8",
+          "Desc": {
+            "Name": "PVNN_MAIN_CPU0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P9",
+          "Desc": {
+            "Name": "PVNN_MAIN_CPU1_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P10",
+          "Desc": {
+            "Name": "PVNN_MAIN_CPU2_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P11",
+          "Desc": {
+            "Name": "PVNN_MAIN_CPU3_Input_Current",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11)"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_POWER_CPUs",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_CURRENT_CPUs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_CURRENT_DIMMs",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "CPU0_DIMM_12V_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "CPU1_DIMM_12V_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "CPU2_DIMM_12V_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "CPU3_DIMM_12V_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P5",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU1_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P6",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU2_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P7",
+          "Desc": {
+            "Name": "PVCCD_HV_CPU3_Input_Current",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3, P4, P5, P6, P7)"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_POWER_DIMMs",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_CURRENT_DIMMs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_CURRENT_FANs",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN1_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_FAN2_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_FAN3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "SSB_FAN4_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P5",
+          "Desc": {
+            "Name": "SSB_FAN5_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P6",
+          "Desc": {
+            "Name": "SSB_FAN6_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P7",
+          "Desc": {
+            "Name": "SSB_FAN7_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P8",
+          "Desc": {
+            "Name": "SSB_FAN8_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P9",
+          "Desc": {
+            "Name": "SSB_FAN9_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P10",
+          "Desc": {
+            "Name": "SSB_FAN10_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P11",
+          "Desc": {
+            "Name": "SSB_FAN11_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P12",
+          "Desc": {
+            "Name": "SSB_FAN12_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P13",
+          "Desc": {
+            "Name": "SSB_FAN13_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P14",
+          "Desc": {
+            "Name": "SSB_FAN14_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P15",
+          "Desc": {
+            "Name": "SSB_FAN15_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P16",
+          "Desc": {
+            "Name": "SSB_FAN16_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P17",
+          "Desc": {
+            "Name": "SSB_FAN17_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P18",
+          "Desc": {
+            "Name": "SSB_FAN18_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P19",
+          "Desc": {
+            "Name": "SSB_FAN19_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P20",
+          "Desc": {
+            "Name": "SSB_FAN20_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P21",
+          "Desc": {
+            "Name": "SSB_FAN21_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P22",
+          "Desc": {
+            "Name": "SSB_FAN22_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P23",
+          "Desc": {
+            "Name": "SSB_FAN23_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P24",
+          "Desc": {
+            "Name": "SSB_FAN24_Output_Current",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24)"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_POWER_FANs",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_CURRENT_FANs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_CURRENT_RSSDs",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD01_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD02_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD03_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "SSB_RSSD04_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P5",
+          "Desc": {
+            "Name": "SSB_RSSD05_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P6",
+          "Desc": {
+            "Name": "SSB_RSSD06_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P7",
+          "Desc": {
+            "Name": "SSB_RSSD07_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P8",
+          "Desc": {
+            "Name": "SSB_RSSD08_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P9",
+          "Desc": {
+            "Name": "SSB_RSSD09_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P10",
+          "Desc": {
+            "Name": "SSB_RSSD10_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P11",
+          "Desc": {
+            "Name": "SSB_RSSD11_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P12",
+          "Desc": {
+            "Name": "SSB_RSSD12_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P13",
+          "Desc": {
+            "Name": "SSB_RSSD13_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P14",
+          "Desc": {
+            "Name": "SSB_RSSD14_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P15",
+          "Desc": {
+            "Name": "SSB_RSSD15_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P16",
+          "Desc": {
+            "Name": "SSB_RSSD16_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P17",
+          "Desc": {
+            "Name": "SSB_RSSD17_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P18",
+          "Desc": {
+            "Name": "SSB_RSSD18_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P19",
+          "Desc": {
+            "Name": "SSB_RSSD19_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P20",
+          "Desc": {
+            "Name": "SSB_RSSD20_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P21",
+          "Desc": {
+            "Name": "SSB_RSSD21_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P22",
+          "Desc": {
+            "Name": "SSB_RSSD22_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P23",
+          "Desc": {
+            "Name": "SSB_RSSD23_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P24",
+          "Desc": {
+            "Name": "SSB_RSSD24_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P25",
+          "Desc": {
+            "Name": "SSB_RSSD25_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P26",
+          "Desc": {
+            "Name": "SSB_RSSD26_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P27",
+          "Desc": {
+            "Name": "SSB_RSSD27_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P28",
+          "Desc": {
+            "Name": "SSB_RSSD28_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P29",
+          "Desc": {
+            "Name": "SSB_RSSD29_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P30",
+          "Desc": {
+            "Name": "SSB_RSSD30_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P31",
+          "Desc": {
+            "Name": "SSB_RSSD31_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P32",
+          "Desc": {
+            "Name": "SSB_RSSD32_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P27, P28, P29, P30, P31, P32)"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_POWER_RSSDs",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_CURRENT_RSSDs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_CURRENT_AUX",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P1V05_PCH_AUX_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P3V3_AUX_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P5V_AUX_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P1V8_PCH_AUX_Input_Current",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3)"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_POWER_AUX",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_CURRENT_AUX",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_CURRENT_NICs",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P1V2_NIC_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P1V8_NIC_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P3V3_NIC_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "PVCORE_NIC1_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "PVCORE_NIC2_Input_Current",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3, P4)"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_POWER_NICs",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_CURRENT_NICs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_POWER_TOTAL",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_POWER_AUX",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V_POWER_CPUs",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P12V_POWER_DIMMs",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P12V_POWER_RSSDs",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "P12V_POWER_FANs",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P5",
+          "Desc": {
+            "Name": "P12V_POWER_NICs",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3, P4, P5)"
+  },
+  {
+    "Desc": {
+      "Name": "P12V_CURRENT_TOTAL",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "P12V_CURRENT_NICs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "P12V_CURRENT_AUX",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "P12V_CURRENT_RSSDs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "P12V_CURRENT_FANs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P4",
+          "Desc": {
+            "Name": "P12V_CURRENT_CPUs",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P5",
+          "Desc": {
+            "Name": "P12V_CURRENT_DIMMs",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3, P4, P5)"
+  },
+  {
+    "Desc": {
+      "Name": "P380V_INPUT_POWER_TOTAL",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "BCM0_Input_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "BCM1_Input_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "BCM2_Input_Power",
+            "SensorType": "power"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "BCM3_Input_Power",
+            "SensorType": "power"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3)"
+  },
+  {
+    "Desc": {
+      "Name": "P380V_INPUT_CURRENT_TOTAL",
+      "SensorType": "current"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "BCM0_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "BCM1_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "BCM2_Input_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "BCM3_Input_Current",
+            "SensorType": "current"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0, P1, P2, P3)"
   }
 ]
