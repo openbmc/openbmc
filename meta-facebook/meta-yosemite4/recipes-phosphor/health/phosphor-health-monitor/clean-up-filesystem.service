@@ -1,0 +1,7 @@
+[Unit]
+Description=Clean up files that might full up filesystem
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-health-monitor/clean-up-filesystem
+SyslogIdentifier=clean-up-filesystem
