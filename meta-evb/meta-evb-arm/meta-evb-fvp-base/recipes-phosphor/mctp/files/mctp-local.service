@@ -1,0 +1,18 @@
+[Unit]
+Description=MCTP configuration for serial ttyAMA1
+After=mctpd.service
+Before=pldmd.service
+BindTo=mctpd.service
+
+[Service]
+Type=simple
+ExecStartPre=stty -F /dev/ttyAMA1 115200 litout -crtscts -ixon -echo raw
+ExecStart=mctp link serial /dev/ttyAMA1
+ExecStartPost=sleep 3
+ExecStartPost=mctp link set mctpserial0 up
+ExecStartPost=mctp addr add 8 dev mctpserial0
+ExecStartPost=mctp route add 18 via mctpserial0
+ExecStartPost=busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpoint say mctpserial0 0
+
+[Install]
+WantedBy=mctpd.service
