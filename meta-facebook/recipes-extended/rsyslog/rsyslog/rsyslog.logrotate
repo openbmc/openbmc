@@ -7,6 +7,6 @@
     size 64k
     missingok
     postrotate
-        systemctl reload rsyslog 2> /dev/null || true
+        systemctl restart rsyslog 2> /dev/null || true
     endscript
 }
