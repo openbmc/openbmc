@@ -36,3 +36,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     mdio-tools \
 "
+
+# Monitor the chassis power status
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-power-control \
+"
