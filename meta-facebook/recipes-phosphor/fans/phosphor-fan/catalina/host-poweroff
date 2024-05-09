@@ -1,0 +1,5 @@
+#!/bin/bash
+# Power off the hosts when fan sensors crossed thresholds.
+
+echo "This feature is not implemented in catalina and it will be implemented in future."
+
