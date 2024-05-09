@@ -3,13 +3,11 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
-power_good_init() {
+host_led_init() {
   if [ "$(get_gpio power-host-good)" -eq 1 ]; then
-    busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
-    xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Running;
+    systemctl start obmc-led-group-start@power_on.service
   else
-    busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
-    xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Off;
+    systemctl start obmc-led-group-stop@power_on.service
   fi
 }
 
@@ -147,5 +145,5 @@ fi
 devmem 0x1e6e251c 32 0
 
 # Initial Power status.
-power_good_init
+host_led_init
 post_end_init
