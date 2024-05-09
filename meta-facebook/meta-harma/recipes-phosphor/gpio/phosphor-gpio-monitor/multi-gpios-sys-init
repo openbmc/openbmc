@@ -14,7 +14,7 @@ power_good_init() {
 }
 
 post_end_init() {
-  if [ "$(get_gpio host-ready-n)" -eq 0 ]; then
+  if [ "$(get_gpio post-end-n)" -eq 0 ]; then
      busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
      xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
      xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby;
