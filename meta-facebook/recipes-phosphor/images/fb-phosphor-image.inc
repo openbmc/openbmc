@@ -19,6 +19,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
     jq \
     strace \
     tmux \
+    tcpdump \
     wget \
     "
 OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " \
