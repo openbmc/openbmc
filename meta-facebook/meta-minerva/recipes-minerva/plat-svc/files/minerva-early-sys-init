@@ -2,6 +2,10 @@
 # shellcheck source=meta-facebook/meta-minerva/recipes-minerva/plat-tool/files/minerva-common-functions
 source /usr/libexec/minerva-common-functions
 
+power_on_led_init() {
+    systemctl start obmc-led-group-start@power_on.service
+}
+
 # set initial value for GPIO output pins
 set_gpio PWREN_MTIA_BLADE0_EN_N 0
 set_gpio PWREN_MTIA_BLADE1_EN_N 0
@@ -91,4 +95,7 @@ set_gpio RST_I2CRST_FCB_T_R_N 1
 set_gpio wFM_88E6393X_BIN_UPDATE_EN_N 1
 set_gpio WATER_VALVE_CLOSED_N 0
 set_gpio BMC_READY 1
+
+power_on_led_init
+
 exit 0
