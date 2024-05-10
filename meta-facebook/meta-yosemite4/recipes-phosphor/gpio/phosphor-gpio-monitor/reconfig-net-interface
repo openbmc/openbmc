@@ -1,0 +1,23 @@
+#!/bin/bash
+
+to_local_admin_mac() {
+    # Set sencond bit of first byte
+    modified_byte=$((16#${1:0:2} | 0x02))
+    modified_mac="$(printf "%02X" "$modified_byte")${1:2}"
+    echo "$modified_mac"
+}
+
+INTF=$1
+
+networkctl down "$INTF"
+
+# Set interface to local Admin MAC
+local_mac=$(to_local_admin_mac "$(cat /sys/class/net/"$INTF"/address)")
+ip link set dev "$INTF" address "$local_mac"
+
+networkctl up "$INTF"
+
+# wait getting address from NC-SI
+systemctl restart network-wait-ipv6-ll@"$INTF".service
+
+networkctl reconfigure "$INTF"

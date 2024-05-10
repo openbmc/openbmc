@@ -1,0 +1,7 @@
+[Unit]
+Description=Reconfigure network interface %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/reconfig-net-interface %i
+SyslogIdentifier=reconfig-net-interface-%i

@@ -122,7 +122,8 @@
             "FALLING": [
                 "obmc-chassis-powercycle@3.target",
                 "obmc-chassis-powercycle@4.target",
-                "setup-nic-endpoint-slot@1.service"
+                "setup-nic-endpoint-slot@1.service",
+                "reconfig-net-interface@eth0.service"
             ]
         },
         "Continue": true
@@ -137,7 +138,8 @@
             "FALLING": [
                 "obmc-chassis-powercycle@5.target",
                 "obmc-chassis-powercycle@6.target",
-                "setup-nic-endpoint-slot@2.service"
+                "setup-nic-endpoint-slot@2.service",
+                "reconfig-net-interface@eth1.service"
             ]
         },
         "Continue": true

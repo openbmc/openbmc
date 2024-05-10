@@ -9,6 +9,8 @@ SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
             file://set-button-sled.service \
             file://probe-slot-device@.service \
             file://probe-slot-device \
+            file://reconfig-net-interface@.service \
+            file://reconfig-net-interface \
             file://rescan-fru-device@.service \
             file://rescan-fru-device \
             file://slot-hot-plug@.service \
@@ -28,6 +30,7 @@ SYSTEMD_SERVICE:${PN} += " \
     setup-nic-endpoint-slot@.service \
     remove-nic-endpoint-slot@.service \
     rescan-wf-bic@.service \
+    reconfig-net-interface@.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -41,10 +44,12 @@ do_install:append:() {
     install -m 0644 ${WORKDIR}/rescan-fru-device@.service ${D}${systemd_system_unitdir}/rescan-fru-device@.service
     install -m 0644 ${WORKDIR}/slot-hot-plug@.service ${D}${systemd_system_unitdir}/slot-hot-plug@.service
     install -m 0644 ${WORKDIR}/setup-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/reconfig-net-interface@.service  ${D}${systemd_system_unitdir}/reconfig-net-interface@.service
     install -m 0644 ${WORKDIR}/remove-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/rescan-wf-bic@.service ${D}${systemd_system_unitdir}/
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${WORKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/reconfig-net-interface ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/rescan-fru-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/rescan-wf-bic ${D}${libexecdir}/${PN}/
     install -d ${D}/${bindir}
