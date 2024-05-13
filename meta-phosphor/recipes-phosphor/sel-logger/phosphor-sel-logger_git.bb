@@ -14,7 +14,7 @@ DEPENDS += " \
   sdbusplus \
   systemd \
   "
-SRCREV = "0acff271cffc724fc0aa0c41e9b25ba2d7e8c5a6"
+SRCREV = "9fa224c5eadf64505ef2c41334f7125fe899176b"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[log-threshold] = "-Dlog-threshold=true,-Dlog-threshold=false,"
 PACKAGECONFIG[log-pulse] = "-Dlog-pulse=true,-Dlog-pulse=false,"
