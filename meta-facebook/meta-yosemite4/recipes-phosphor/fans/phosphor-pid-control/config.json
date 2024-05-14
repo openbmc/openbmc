@@ -2674,7 +2674,7 @@
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
-    
+
         {
             "name": "FANBOARD0_FAN0_TACH_IL",
             "type": "fan",
@@ -2707,114 +2707,6 @@
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN1_TACH_OL",
             "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN1_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN2_TACH_IL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN2_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN2_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN2_TACH_OL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN2_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN2_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN3_TACH_IL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN3_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN3_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN3_TACH_OL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN3_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN3_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN4_TACH_IL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN4_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN4_TACH_OL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN4_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN5_TACH_IL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN5_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD0_FAN5_TACH_OL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN5_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD1_FAN0_TACH_IL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN0_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN0_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD1_FAN0_TACH_OL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN0_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN0_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD1_FAN1_TACH_IL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN1_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN1_PWM",
-            "min": 0,
-            "max": 255,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "FANBOARD1_FAN1_TACH_OL",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN1_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN1_PWM",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -2856,37 +2748,145 @@
             "ignoreDbusMinMax": true
         },
         {
-            "name": "FANBOARD1_FAN4_TACH_IL",
+            "name": "FANBOARD0_FAN4_TACH_IL",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN4_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN4_PWM",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN4_PWM",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "FANBOARD1_FAN4_TACH_OL",
+            "name": "FANBOARD0_FAN4_TACH_OL",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN4_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN4_PWM",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN4_PWM",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "FANBOARD1_FAN5_TACH_IL",
+            "name": "FANBOARD0_FAN5_TACH_IL",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN5_TACH_IL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN5_PWM",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN5_PWM",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "FANBOARD1_FAN5_TACH_OL",
+            "name": "FANBOARD0_FAN5_TACH_OL",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN5_TACH_OL",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN5_PWM",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN5_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN6_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN6_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN6_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN6_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN7_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD7_FAN1_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD7_FAN1_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN7_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN7_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN7_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD0_FAN8_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN8_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD0_FAN8_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN8_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD0_FAN9_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN9_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD0_FAN9_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD0_FAN9_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN10_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN10_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN10_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN10_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN11_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN11_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FANBOARD1_FAN11_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FANBOARD1_FAN11_PWM",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -2910,26 +2910,26 @@
                         "FANBOARD0_FAN0_TACH_OL",
                         "FANBOARD0_FAN1_TACH_IL",
                         "FANBOARD0_FAN1_TACH_OL",
-                        "FANBOARD0_FAN2_TACH_IL",
-                        "FANBOARD0_FAN2_TACH_OL",
-                        "FANBOARD0_FAN3_TACH_IL",
-                        "FANBOARD0_FAN3_TACH_OL",
-                        "FANBOARD0_FAN4_TACH_IL",
-                        "FANBOARD0_FAN4_TACH_OL",
-                        "FANBOARD0_FAN5_TACH_IL",
-                        "FANBOARD0_FAN5_TACH_OL",
-                        "FANBOARD1_FAN0_TACH_IL",
-                        "FANBOARD1_FAN0_TACH_OL",
-                        "FANBOARD1_FAN1_TACH_IL",
-                        "FANBOARD1_FAN1_TACH_OL",
                         "FANBOARD1_FAN2_TACH_IL",
                         "FANBOARD1_FAN2_TACH_OL",
                         "FANBOARD1_FAN3_TACH_IL",
                         "FANBOARD1_FAN3_TACH_OL",
-                        "FANBOARD1_FAN4_TACH_IL",
-                        "FANBOARD1_FAN4_TACH_OL",
-                        "FANBOARD1_FAN5_TACH_IL",
-                        "FANBOARD1_FAN5_TACH_OL"
+                        "FANBOARD0_FAN4_TACH_IL",
+                        "FANBOARD0_FAN4_TACH_OL",
+                        "FANBOARD0_FAN5_TACH_IL",
+                        "FANBOARD0_FAN5_TACH_OL",
+                        "FANBOARD1_FAN6_TACH_IL",
+                        "FANBOARD1_FAN6_TACH_OL",
+                        "FANBOARD1_FAN7_TACH_IL",
+                        "FANBOARD1_FAN7_TACH_OL",
+                        "FANBOARD0_FAN8_TACH_IL",
+                        "FANBOARD0_FAN8_TACH_OL",
+                        "FANBOARD0_FAN9_TACH_IL",
+                        "FANBOARD0_FAN9_TACH_OL",
+                        "FANBOARD1_FAN10_TACH_IL",
+                        "FANBOARD1_FAN10_TACH_OL",
+                        "FANBOARD1_FAN11_TACH_IL",
+                        "FANBOARD1_FAN11_TACH_OL"
                     ],
                     "setpoint": 0.0,
                     "pid": {
@@ -3912,7 +3912,6 @@
                         "WF_E1S_TEMP_C_20_62",
                         "WF_E1S_TEMP_C_20_72",
                         "WF_E1S_TEMP_C_20_82"
-
                     ],
                     "setpoint": 68.0,
                     "pid": {
