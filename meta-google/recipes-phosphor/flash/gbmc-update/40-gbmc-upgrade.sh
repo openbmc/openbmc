@@ -28,6 +28,11 @@ else
 fi
 
 gbmc_upgrade_dl_unpack() {
+  if [ -z "${bootfile_url-}" ]; then
+    echo "bootfile_url is empty" >&2
+    return 1
+  fi
+
   echo "Fetching $bootfile_url" >&2
 
   # We only support tarballs at the moment, our URLs will always denote
@@ -74,8 +79,6 @@ gbmc_upgrade_dl_unpack() {
 }
 
 gbmc_upgrade_hook() {
-  [ -n "${bootfile_url-}" ] || return 0
-
   local tmpdir
   tmpdir="$(mktemp -d)" || return
   if ! gbmc_upgrade_dl_unpack; then
