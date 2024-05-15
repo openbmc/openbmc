@@ -477,5 +477,285 @@
             ]
         },
         "Expression": "(((P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12 + P13 + P14 + P15 + P16 + P17 + P18 + P19 + P20 + P21 + P22 + P23 + P24) / 24) * 0.0725) - 14.5"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_10",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_10"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_10",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_10",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_10 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_20",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_20"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_20",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_20",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_20 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_30",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_30"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_30",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_30",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_30 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_40",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_40"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_40",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_40",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_40 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_50",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_50"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_50",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_50",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_50 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_60",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_60"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_60",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_60",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_60 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_70",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_70"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_70",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_70",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_70 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MB_FIO_TEMP_C_3_80",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/Item/Board/PLDM_Device_80"
+            ]
+        ],
+        "Threshold": {
+            "CriticalHigh": 40
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "Fan_PWM",
+                    "Desc": {
+                        "Name": "FANBOARD0_FAN0_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_80",
+                    "Desc": {
+                        "Name": "MB_FIO_TEMP_C_3_80",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "MB_FIO_TEMP_80 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
     }
 ]
