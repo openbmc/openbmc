@@ -40,15 +40,15 @@ machine() {
     local cfg name tmpl
     local configs
 
-	# zsh requires wordsplit so that variable expansion behaves like bash
-	if [ -n "$ZSH_NAME" ]; then
-		setopt local_options shwordsplit
-	fi
-	if which find > /dev/null 2>&1; then
+    # zsh requires wordsplit so that variable expansion behaves like bash
+    if [ -n "$ZSH_NAME" ]; then
+        setopt local_options shwordsplit
+    fi
+    if which find > /dev/null 2>&1; then
         configs="$(find meta-* -path "*/conf/machine/*.conf")"
-	else
-		configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
-	fi
+    else
+        configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
+    fi
     # Add qemu machines.
     configs="$configs $(ls -1 poky/meta/conf/machine/qemu*.conf)"
 
@@ -94,9 +94,9 @@ machine() {
 }
 
 if [ -z "$1" ]; then
-	echo Target machine must be specified. Use one of:
-	echo
-	machine | sort | sed "s/qemu[^[:space:]]*//" | "${COLUMN[@]}"
+    echo Target machine must be specified. Use one of:
+    echo
+    machine | sort | sed "s/qemu[^[:space:]]*//" | "${COLUMN[@]}"
 else
     bld_dir=$2
     if [ -z "$2" ]; then
