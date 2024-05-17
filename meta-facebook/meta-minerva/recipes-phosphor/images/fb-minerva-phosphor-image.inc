@@ -31,3 +31,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-state-manager \
 "
+
+# Enable mdio-tools for communication with the PHY chip
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    mdio-tools \
+"
