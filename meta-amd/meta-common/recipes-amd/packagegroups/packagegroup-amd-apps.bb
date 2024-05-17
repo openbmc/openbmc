@@ -53,4 +53,5 @@ RDEPENDS_PN_SYSTEM_EXTRAS = ""
 RDEPENDS_PN_SYSTEM_EXTRAS:amd-withhost = " \
         amd-fpga \
         phosphor-hostlogger \
+        phosphor-watchdog \
         "
