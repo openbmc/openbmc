@@ -20,4 +20,39 @@ else
     echo "0" > "$SLOT_FILE"
 fi
 
+# Below is the diagram of the smart valve implemtation on the CMM.
+# There are two end-device for smart valve and two communication interfaces.
+# One is Modbus (RS485) interface connected to FT4232H channel 1, 2.
+# Anorther is by ethernet interface which is connected to Marvell 88E6369X switch.
+# The PoE interface is connected to STM32F + BCM59011 PoE controller (Broadcom solution) for PoE power supply.
+# BMC can control the PoE power supply by sending command to STM32F via RS232.
+#
+# Diagram:
+#   D_485_x = End device for smart valve x via RS485
+#   D_POE_x = End device for smart valve x via PoE
+#
+#  +----------+                       +-------------+
+#  | FT4232H  |   <----- USB ---->    |     BMC     |
+#  +----------+                       +-------------+
+#   /   |   \    \                           |
+#  ch0  ch1  ch2 ch3                        RMII
+#   |    |     |   \                         |
+#   X    (RS485)    RS232             +-------------+
+#        /     \        \             |    Marvell  |
+#       /       \        \            |   88E6369X  |
+#|D_485_0|   |D_485_1|   |STM32F|     +-------------+
+#                           |            |       |
+#                          i2c           |       |
+#                           |            |       |
+#                        |BCM59011|      1000 Base-T
+#                           |            |        |
+#                           |(power      |(data   |(data
+#                           |            |        |
+#                        P54 POE----->|D_POE_0| |D_POE_1|
+POE_DEV="/dev/ttyPOE"
+# Set baud rate to 19200 and raw mode
+stty -F $POE_DEV 19200 raw
+# Send Power Source Configuration Command (0x18) to STM32F for enable PoE
+echo -e '\x18\x00\x00\x2c\x01\x00\x00\xff\xff\xff\xff\x41' > $POE_DEV
+
 exit 0

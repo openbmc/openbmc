@@ -1,1 +1,5 @@
 SUBSYSTEM=="tty", ATTRS{iomem_base}=="0x1E790000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS5", TAG+="systemd"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011"
+SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="03", SYMLINK+="ttyPOE"
+SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-1"
+SUBSYSTEM=="tty", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyRS485-0"
