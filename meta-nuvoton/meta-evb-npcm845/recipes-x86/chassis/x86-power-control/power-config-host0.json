@@ -1,0 +1,52 @@
+{
+    "gpio_configs":[
+      {
+          "Name" : "NMIButton",
+          "LineName" : "NMI_BUTTON",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveLow"
+      },
+      {
+          "Name" : "NMIOut",
+          "LineName" : "NMI_OUT",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveHigh"
+      },
+      {
+          "Name" : "PostComplete",
+          "LineName" : "POST_COMPLETE",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveLow"
+      },
+      {
+          "Name" : "PowerButton",
+          "LineName" : "POWER_BUTTON",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveLow"
+      },
+      {
+          "Name" : "PowerOk",
+          "LineName" : "PS_PWROK",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveHigh"
+      },
+      {
+          "Name" : "PowerOut",
+          "LineName" : "POWER_OUT",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveLow"
+      },
+      {
+          "Name" : "ResetButton",
+          "LineName" : "RESET_BUTTON",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveLow"
+      },
+      {
+          "Name" : "ResetOut",
+          "LineName" : "RESET_OUT",
+          "Type" : "GPIO",
+          "Polarity" : "ActiveLow"
+      }
+    ]
+  }
