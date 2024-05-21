@@ -1,0 +1,122 @@
+- name: board 0 fan 4 current critical alarm path group
+  class: group
+  group: path
+  members:
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_IL
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_OL
+
+- name: current fan critical alarm property
+  class: group
+  group: property
+  type: boolean
+  members:
+      - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+        meta: PROPERTY
+        property: CriticalAlarmHigh
+      - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+        meta: PROPERTY
+        property: CriticalAlarmLow
+
+- name: board 0 fan 4 critical alarm assert
+  class: watch
+  watch: property
+  paths: board 0 fan 4 current critical alarm path group
+  properties: current fan critical alarm property
+  callback: check if fan critical threshold assert
+
+- name: board 0 fan 4 critical alarm deassert
+  class: watch
+  watch: property
+  paths: board 0 fan 4 current critical alarm path group
+  properties: current fan critical alarm property
+  callback: check if fan critical threshold deassert
+
+- name: check if fan critical threshold assert
+  class: condition
+  condition: count
+  paths: board 0 fan 4 current critical alarm path group
+  properties: current fan critical alarm property
+  callback: set fan fail
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: true
+
+- name: check if fan critical threshold deassert
+  class: condition
+  condition: count
+  paths: board 0 fan 4 current critical alarm path group
+  properties: current fan critical alarm property
+  callback: set fan ok
+  countop: "<"
+  countbound: 1
+  op: "=="
+  bound: true
+
+- name: set fan ok group assert
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: obmc-led-group-start@fan4_ok.service
+        type: string
+      - value: replace
+        type: string
+
+- name: set fan ok group deassert
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: obmc-led-group-stop@fan4_ok.service
+        type: string
+      - value: replace
+        type: string
+
+- name: set fan fail group assert
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: obmc-led-group-start@fan4_fail.service
+        type: string
+      - value: replace
+        type: string
+
+- name: set fan fail group deassert
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: obmc-led-group-stop@fan4_fail.service
+        type: string
+      - value: replace
+        type: string
+
+- name: set fan ok
+  class: callback
+  callback: group
+  members:
+      - set fan ok group assert
+      - set fan fail group deassert
+
+- name: set fan fail
+  class: callback
+  callback: group
+  members:
+      - set fan fail group assert
+      - set fan ok group deassert

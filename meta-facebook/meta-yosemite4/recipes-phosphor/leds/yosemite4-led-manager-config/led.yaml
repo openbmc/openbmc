@@ -1,0 +1,143 @@
+fan0_ok:
+    fan0_blue:
+        Action: "On"
+    fan0_amber:
+        Action: "Off"
+
+fan0_fail:
+    fan0_blue:
+        Action: "Off"
+    fan0_amber:
+        Action: "On"
+
+fan1_ok:
+    fan1_blue:
+        Action: "On"
+    fan1_amber:
+        Action: "Off"
+
+fan1_fail:
+    fan1_blue:
+        Action: "Off"
+    fan1_amber:
+        Action: "On"
+
+fan2_ok:
+    fan2_blue:
+        Action: "On"
+    fan2_amber:
+        Action: "Off"
+
+fan2_fail:
+    fan2_blue:
+        Action: "Off"
+    fan2_amber:
+        Action: "On"
+
+fan3_ok:
+    fan3_blue:
+        Action: "On"
+    fan3_amber:
+        Action: "Off"
+
+fan3_fail:
+    fan3_blue:
+        Action: "Off"
+    fan3_amber:
+        Action: "On"
+
+fan4_ok:
+    fan4_blue:
+        Action: "On"
+    fan4_amber:
+        Action: "Off"
+
+fan4_fail:
+    fan4_blue:
+        Action: "Off"
+    fan4_amber:
+        Action: "On"
+
+fan5_ok:
+    fan5_blue:
+        Action: "On"
+    fan5_amber:
+        Action: "Off"
+
+fan5_fail:
+    fan5_blue:
+        Action: "Off"
+    fan5_amber:
+        Action: "On"
+
+fan6_ok:
+    fan6_blue:
+        Action: "On"
+    fan6_amber:
+        Action: "Off"
+
+fan6_fail:
+    fan6_blue:
+        Action: "Off"
+    fan6_amber:
+        Action: "On"
+
+fan7_ok:
+    fan7_blue:
+        Action: "On"
+    fan7_amber:
+        Action: "Off"
+
+fan7_fail:
+    fan7_blue:
+        Action: "Off"
+    fan7_amber:
+        Action: "On"
+
+fan8_ok:
+    fan8_blue:
+        Action: "On"
+    fan8_amber:
+        Action: "Off"
+
+fan8_fail:
+    fan8_blue:
+        Action: "Off"
+    fan8_amber:
+        Action: "On"
+
+fan9_ok:
+    fan9_blue:
+        Action: "On"
+    fan9_amber:
+        Action: "Off"
+
+fan9_fail:
+    fan9_blue:
+        Action: "Off"
+    fan9_amber:
+        Action: "On"
+
+fan10_ok:
+    fan10_blue:
+        Action: "On"
+    fan10_amber:
+        Action: "Off"
+
+fan10_fail:
+    fan10_blue:
+        Action: "Off"
+    fan10_amber:
+        Action: "On"
+
+fan11_ok:
+    fan11_blue:
+        Action: "On"
+    fan11_amber:
+        Action: "Off"
+
+fan11_fail:
+    fan11_blue:
+        Action: "Off"
+    fan11_amber:
+        Action: "On"
