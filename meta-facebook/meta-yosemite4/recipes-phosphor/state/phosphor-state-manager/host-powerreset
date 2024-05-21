@@ -3,7 +3,7 @@
 # shellcheck disable=SC2120
 
 # Provide source directive to shellcheck.
-# shellcheck source=meta-facebook/meta-greatlakes/recipes-phosphor/state/phosphor-state-manager/power-cmd
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
 # TODO: check power status before do power reset

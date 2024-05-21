@@ -3,7 +3,7 @@
 # shellcheck disable=SC2120
 
 # Provide source directive to shellcheck.
-# shellcheck source=meta-facebook/meta-greatlakes/recipes-phosphor/state/phosphor-state-manager/power-cmd
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 #IO 0:7 input port for showing slot 1:8 power status
 #IO 8:16 output port for controlling slot 1:8 power status
@@ -42,7 +42,11 @@ chassis-power-off()
         fi
 }
 
-chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+if ! chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
+    echo "Failed to get chassis status"
+    exit 1
+fi
+
 if [ "$chassis_status" == "$STATE_ON" ]
 then
         chassis-power-off

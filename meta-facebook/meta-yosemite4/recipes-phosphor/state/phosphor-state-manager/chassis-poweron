@@ -3,7 +3,7 @@
 # shellcheck disable=SC2120
 
 # Provide source directive to shellcheck.
-# shellcheck source=meta-facebook/meta-greatlakes/recipes-phosphor/state/phosphor-state-manager/power-cmd
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
 GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
@@ -36,7 +36,11 @@ chassis-power-on()
     fi
 }
 
-chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+if ! chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
+    echo "Failed to get chassis status"
+    exit 1
+fi
+
 if [ "$chassis_status" == "$STATE_OFF" ]
 then
     chassis-power-on

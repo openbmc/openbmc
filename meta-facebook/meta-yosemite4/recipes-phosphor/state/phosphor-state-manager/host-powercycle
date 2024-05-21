@@ -3,15 +3,55 @@
 # shellcheck disable=SC2120
 
 # Provide source directive to shellcheck.
-# shellcheck source=meta-facebook/meta-greatlakes/recipes-phosphor/state/phosphor-state-manager/power-cmd
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
+CHASSIS_ID=$1
 
-# TODO: check power status before do power cycle
-# Set state effecter state: Entity ID 0x0000 for host power control, 0x3 for power cycle
-EID=$(($1*10))
-if ! pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x03 -m "$EID"
-then
-    echo "Failed to set host$1 power cycle"
-else
-    echo "Host is power cycle"
+CHASSIS_BUS=$((CHASSIS_ID - 1))
+IO_EXP_P0_PWRGD_R_OUT=18
+GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
+
+EID=$((CHASSIS_ID * 10))
+
+get_host_status() {
+    if ! host_status=$(gpioget "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT"); then
+        echo "Failed to get host status"
+        exit 1
+    fi
+}
+
+# Get initial host status
+get_host_status
+
+# Current power is ON, cycle do OFF to ON. If current power is OFF then do ON
+if [ "$host_status" == "$STATE_ON" ]; then
+    # Set state effecter state: Entity ID 0x0000 for host power control, 0x2 for power off
+    pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x02 -m "$EID"
+    # Wait for the host to power off
+    sleep 10s
+
+    # Get host status again after attempting to power off
+    get_host_status
+
+    if [ "$host_status" != "$STATE_OFF" ]; then
+        echo "Do power cycle fail, fail to set host$CHASSIS_ID power off"
+        exit 1
+    fi
 fi
+
+if [ "$host_status" != "$STATE_ON" ]; then
+    # Set state effecter state: Entity ID 0x0000 for host power control, 0x1 for power on
+    pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x01 -m "$EID"
+    sleep 2s
+
+    # Get host status again after attempting to power on
+    get_host_status
+
+    if [ "$host_status" != "$STATE_ON" ]; then
+        echo "Do power cycle, failed to set host$CHASSIS_ID power on"
+        exit 1
+    fi
+fi
+
+echo "Host power cycle success"
+exit 0;

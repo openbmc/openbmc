@@ -3,15 +3,49 @@
 # shellcheck disable=SC2120
 
 # Provide source directive to shellcheck.
-# shellcheck source=meta-facebook/meta-greatlakes/recipes-phosphor/state/phosphor-state-manager/power-cmd
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
-# TODO: check power status before do power off
+CHASSIS_BUS=$(($1 - 1))
+IO_EXP_P0_PWRGD_R_OUT=18
+GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
+
+get_host_status() {
+    if ! host_status=$(gpioget "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT"); then
+        echo "Failed to get host status"
+        exit 1
+    fi
+}
+
+get_host_status
+
+if [ "$host_status" == "$STATE_OFF" ]
+then
+    echo "Already host power off."
+    exit 0;
+fi
+
 # Set state effecter state: Entity ID 0x0000 for host power control, 0x2 for power off
 EID=$(($1*10))
-if ! pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x02 -m "$EID"
+pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x02 -m "$EID"
+
+# Host power off will trigger the BIC to configure the server board CPLD register and set the power sequence.
+# Power Sequence:
+#   - Set PLAT_PLDM_HOST_PWR_CTRL_DEFAULT to 0xFF
+#   - Set PLAT_PLDM_HOST_PWR_BTN_LOW to 0xFE
+#   - Sleep for 6 seconds
+#   - Set PLAT_PLDM_HOST_PWR_CTRL_DEFAULT back to 0xFF
+
+# Wait for the host to power off
+sleep 10s
+
+get_host_status
+
+if [ "$host_status" == "$STATE_OFF" ]
 then
-    echo "Failed to set host$1 power off"
+    echo "Host power off success"
+    exit 0;
 else
-    echo "Host is power off"
+    echo "Failed to set host$1 power off"
+    exit 1
 fi
