@@ -4,25 +4,36 @@ HOMEPAGE = "https://github.com/Nuvoton-Israel/npcm8xx-bootblock"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-BB_TIP = "arbel_a35_bootblock.bin"
-BB_NO_TIP = "arbel_a35_bootblock_no_tip.bin"
-
-OUTPUT_BB_TIP_BIN    = "Images/tip"
-OUTPUT_BB_NO_TIP_BIN = "Images/no_tip"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 S = "${WORKDIR}/git"
-
+B = "${S}/Sources"
+BB_BRANCH ?= "main"
 SRC_URI = " \
-    git://github.com/Nuvoton-Israel/npcm8xx-bootblock;branch=main;protocol=https"
+    git://github.com/Nuvoton-Israel/npcm8xx-bootblock;branch=${BB_BRANCH};protocol=https"
+
+export CROSS_COMPILE="${TARGET_PREFIX}"
+CFLAGS[unexport] = "1"
+LDFLAGS[unexport] = "1"
+AS[unexport] = "1"
+LD[unexport] = "1"
+do_configure[noexec] = "1"
+
+EXTRA_OEMAKE += "CROSS_COMPILER_INC=${STAGING_DIR_HOST}${includedir}"
+
+TIP = "${@'tip' if d.getVar("TIP_IMAGE") == 'True' else 'no_tip'}"
+BOOTBLOCK = "arbel_a35_bootblock"
+BOOTBLOCK .= "${@'_no_tip' if d.getVar("TIP_IMAGE") != 'True' else ''}"
+
+do_compile() {
+    oe_runmake "${BOOTBLOCK}" ENCLAVE="${TIP}"
+}
+do_compile[cleandirs] = "${B}/Images"
 
 inherit deploy
-
-do_deploy () {
-    if [ "${TIP_IMAGE}" = "True" ] ; then
-        install -D -m 644 ${OUTPUT_BB_TIP_BIN}/${BB_TIP} ${DEPLOYDIR}/${BB_TIP}
-    else
-        install -D -m 644 ${OUTPUT_BB_NO_TIP_BIN}/${BB_NO_TIP} ${DEPLOYDIR}/${BB_NO_TIP}
-    fi
+do_deploy() {
+    install -d ${DEPLOYDIR}
+    install -m 644 "${B}/Images/${TIP}/${BOOTBLOCK}.bin" "${DEPLOYDIR}/${BOOTBLOCK}.bin"
 }
 
 addtask deploy before do_build after do_compile
