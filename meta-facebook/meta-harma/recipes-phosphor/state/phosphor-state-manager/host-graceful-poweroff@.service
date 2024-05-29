@@ -1,0 +1,15 @@
+[Unit]
+Description=power off host:%i
+Wants=obmc-host-stop-pre@%i.target
+Before=obmc-host-stop-pre@%i.target
+Conflicts=obmc-host-start@%i.target
+ConditionPathExists=!/run/openbmc/host@%i-request
+
+[Service]
+Restart=no
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/phosphor-state-manager/host-graceful-poweroff %i
+
+[Install]
+WantedBy=obmc-host-shutdown@%i.target

@@ -2,8 +2,5 @@
 
 # shellcheck source=meta-facebook/meta-harma/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
-if [ "$(power_status)" == "on" ]; then
-  power_off
-  sleep 10
-  power_on
-fi
+
+force_power_off

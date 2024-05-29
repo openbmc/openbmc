@@ -1,9 +1,0 @@
-[Unit]
-Description=power off host:%i
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-state-manager/host-poweroff %i
-
-[Install]
-WantedBy=obmc-host-shutdown@%i.target
