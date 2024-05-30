@@ -141,13 +141,13 @@
         "Continue": true
     },
     {
-        "Name": "host-ready-n",
+        "Name": "post-end-n",
         "ChipId": "2",
         "GpioNum": 66,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-post-end.service","deassert-gpio-log@host-ready-n.service"],
-            "FALLING": ["assert-post-end.service","assert-gpio-log@host-ready-n.service"]
+            "RISING": ["deassert-post-end.service","deassert-gpio-log@post-end-n.service"],
+            "FALLING": ["assert-post-end.service","assert-gpio-log@post-end-n.service"]
 
         },
         "Continue": true
@@ -160,6 +160,16 @@
         "Targets": {
             "RISING": ["deassert-gpio-log@leakage-detect-alert.service"],
             "FALLING": ["assert-gpio-log@leakage-detect-alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "power-hsc-good",
+        "ChipId": "2",
+        "GpioNum": 10,
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING": ["deassert-power-hsc-good.service"]
         },
         "Continue": true
     }

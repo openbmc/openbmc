@@ -1,0 +1,8 @@
+[Unit]
+Description=Deassert Power HSC Good Status
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/deassert-power-hsc-good
+
+SyslogIdentifier=deassert-power-hsc-good
