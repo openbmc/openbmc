@@ -146,8 +146,8 @@
         "GpioNum": 66,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-post-end.service","deassert-gpio-log@post-end-n.service"],
-            "FALLING": ["assert-post-end.service","assert-gpio-log@post-end-n.service"]
+            "RISING": ["deassert-post-end.service"],
+            "FALLING": ["assert-post-end.service"]
 
         },
         "Continue": true
