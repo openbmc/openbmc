@@ -4,4 +4,4 @@
           PowerRestorePolicy:
               Default: RestorePolicy::Policy::AlwaysOn
           PowerRestoreDelay:
-              Default: 30000000
+              Default: 300000000
