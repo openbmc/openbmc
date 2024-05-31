@@ -1,0 +1,13 @@
+{
+    "BootBlockAndHeader.xml":
+    {
+        "MC_CONFIG": "0x04"
+    },
+    "key_setting_edit_me.py":
+    {
+        "COMBO1_OFFSET": "2048*1024"
+    },
+    "BootBlockAndHeader_no_tip.xml":
+    {
+    }
+}
