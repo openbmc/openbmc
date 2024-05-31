@@ -3,6 +3,7 @@ OBMC_IMAGE_EXTRA_INSTALL:remove:witherspoon-tacoma = " liberation-fonts uart-ren
 OBMC_IMAGE_EXTRA_INSTALL:append:p10bmc = " mboxd"
 # No host firmware related features for huygens wanted yet
 OBMC_IMAGE_EXTRA_INSTALL:remove:huygens = " mboxd"
+OBMC_IMAGE_EXTRA_INSTALL:append:df-chrony = " chrony"
 
 IMAGE_FEATURES:append = " obmc-dbus-monitor"
 
