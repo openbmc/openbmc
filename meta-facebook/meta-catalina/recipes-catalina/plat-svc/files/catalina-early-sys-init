@@ -1,0 +1,22 @@
+#!/bin/bash -e
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+# Enable standby power and bind i2c components
+/usr/libexec/catalina/standby-power-enable
+
+# Workaround
+# rebind PDB i2c mux
+echo 1-0070 > /sys/bus/i2c/drivers/pca954x/bind
+# rebind PDB Fan IC
+echo 18-0021 > /sys/bus/i2c/drivers/max31790/bind
+echo 18-0027 > /sys/bus/i2c/drivers/max31790/bind
+# rebind PDB FRU
+echo 21-0054 > /sys/bus/i2c/drivers/at24/bind
+# rebind OSFP FRU
+echo 22-0051 > /sys/bus/i2c/drivers/at24/bind
+# rebind FIO FRU
+echo 23-0053 > /sys/bus/i2c/drivers/at24/bind
+
+
+exit 0

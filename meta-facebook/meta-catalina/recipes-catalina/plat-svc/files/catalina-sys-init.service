@@ -1,0 +1,16 @@
+[Unit]
+Description=Catalina Early System Init
+Before=phosphor-multi-gpio-monitor.service
+Before=phosphor-multi-gpio-presence.service
+Before=phosphor-pid-control.service
+Before=xyz.openbmc_project.EntityManager.service
+Before=xyz.openbmc_project.fansensor.service
+Before=systemd-networkd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/catalina/catalina-early-sys-init
+SyslogIdentifier=Catalina Early Init
+
+[Install]
+WantedBy=multi-user.target

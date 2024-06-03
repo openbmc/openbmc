@@ -10,3 +10,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor-presence \
 "
+
+# Catalina platform services
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    plat-svc \
+"
