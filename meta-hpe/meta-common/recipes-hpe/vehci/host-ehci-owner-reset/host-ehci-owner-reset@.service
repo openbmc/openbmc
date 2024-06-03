@@ -1,7 +1,7 @@
 [Unit]
 Description=GXP EHCI Owner Reset Service
-Wants=start-ipkvm.service
-After=start-ipkvm.service
+Wants=obmc-ikvm.service
+After=obmc-ikvm.service
 StartLimitIntervalSec=0
 
 [Service]
