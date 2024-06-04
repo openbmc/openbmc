@@ -15,7 +15,6 @@ SRC_URI:append:fb-withhost = " file://obmc-chassis-hard-poweroff@.target \
 
 PACKAGECONFIG:append = " json sensor-monitor"
 
-EXTRA_OEMESON = "-Duse-host-power-state=enabled"
 
 RDEPENDS:${PN}-sensor-monitor = " bash"
 
