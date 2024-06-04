@@ -24,6 +24,10 @@ inherit useradd
 
 EXTRA_OEMESON = "-Dtests=disabled"
 
+PACKAGECONFIG ?= "root-user-mgmt"
+PACKAGECONFIG[root-user-mgmt] = "-Droot_user_mgmt=enabled, -Droot_user_mgmt=disabled"
+
+
 do_install:append() {
   install -d ${D}${libexecdir}
   install -m 0755 ${WORKDIR}/upgrade_hostconsole_group.sh ${D}${libexecdir}/upgrade_hostconsole_group.sh
