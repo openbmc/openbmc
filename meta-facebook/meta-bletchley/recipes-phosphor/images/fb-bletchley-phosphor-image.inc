@@ -3,7 +3,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     plat-svc \
     motor-ctrl \
     phosphor-virtual-sensor \
-    usbutils \
     idevicerestore \
     fw-update \
     phosphor-sel-logger \

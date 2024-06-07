@@ -25,4 +25,3 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 # This enables the feature of dbus-monitor which defined in
 # `meta-phosphor/classes/obmc-phosphor-images.bbclass`
 IMAGE_FEATURES:append = " obmc-dbus-monitor"
-

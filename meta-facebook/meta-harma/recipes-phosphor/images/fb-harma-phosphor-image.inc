@@ -15,11 +15,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-power-control \
 "
 
-# It is for lsusb app.
-OBMC_IMAGE_EXTRA_INSTALL:append = " \
-    usbutils \
-"
-
 # Allow scripted access to SITV BMC
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     sshpass \
