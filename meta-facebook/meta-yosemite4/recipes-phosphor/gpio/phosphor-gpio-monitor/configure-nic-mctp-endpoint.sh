@@ -1,5 +1,41 @@
 #!/bin/sh
 
+INVALID_INPUT=255
+
+# Set Broadcom & Nvidia NIC sensors status
+set_TMP421_sensor_enabled() {
+    enabled_value=$1
+
+    for nic_id in 0 1 2 3; do
+        busctl set-property xyz.openbmc_project.HwmonTempSensor /xyz/openbmc_project/sensors/temperature/NIC${nic_id}_TEMP_C xyz.openbmc_project.Object.Enable Enabled b "$enabled_value" 2> /dev/null
+    done
+}
+
+# Set Terminus NIC sensors status
+set_EMC1403_sensor_enabled() {
+    enabled_value=$1
+
+    for i2c_bus in 24 25 26 27; do
+        busctl set-property xyz.openbmc_project.HwmonTempSensor /xyz/openbmc_project/sensors/temperature/NIC_TEMP_${i2c_bus} xyz.openbmc_project.Object.Enable Enabled b "$value" 2> /dev/null
+    done
+}
+
+set_nic_sensors_enabled() {
+    value=$1
+
+    if [ "$value" != "true" ] && [ "$value" != "false" ]; then
+        echo "Invalid value: $value, the value should only be 'true' or 'false'"
+        return $INVALID_INPUT
+    fi
+
+    # Set Broadcom & Nvidia NIC sensors status
+    set_TMP421_sensor_enabled "$value"
+    # Set Terminus NIC sensors status
+    set_EMC1403_sensor_enabled "$value"
+
+    sleep 1
+}
+
 # This script is a backup solution for setting up/removing MCTP endpoint for NICs
 action=$1
 slot=$2
@@ -11,8 +47,12 @@ eid=$((90 + slot))
 sleep 2
 
 if [ "$action" = "add" ]; then
+    set_nic_sensors_enabled "false"
     echo "Adding MCTP endpoint for slot $slot"
     busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP AssignEndpointStatic sayy "mctpi2c${bus}" 1 0x32 "$eid"
+
+    sleep 3
+    set_nic_sensors_enabled "true"
 elif [ "$action" = "remove" ]; then
     echo "Removing MCTP endpoint for slot $slot"
     busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/${eid} au.com.CodeConstruct.MCTP.Endpoint Remove
