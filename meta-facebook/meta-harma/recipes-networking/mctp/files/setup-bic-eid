@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Set BIC EID
+bic_addr=0x20
+busnum=9
+maxRetries=10
+retryInterval=1
+
+retry_command() {
+
+    command="$1"
+    retries=0
+
+    while [ $retries -lt $maxRetries ]; do
+        if bash -c "$command"; then
+            return 0
+        else
+            retries=$((retries + 1))
+            echo "Retry $retries/$maxRetries: Command failed. Retrying in $retryInterval seconds..."
+            sleep $retryInterval
+        fi
+    done
+
+    return 1
+}
+
+command="
+    busctl call xyz.openbmc_project.MCTP \
+    /xyz/openbmc_project/mctp \
+    au.com.CodeConstruct.MCTP \
+    LearnEndpoint \
+    say mctpi2c${busnum} 1 ${bic_addr}"
+
+if ! retry_command "$command"; then
+    echo "Failed to busctl call after $maxRetries attempts."
+    exit 1
+fi
+echo "BIC EID set to ${bic_addr}"
+exit 0
