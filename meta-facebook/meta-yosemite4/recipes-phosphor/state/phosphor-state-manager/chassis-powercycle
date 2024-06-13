@@ -11,11 +11,11 @@ CHASSIS_ID=$1
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 IO_EXP_SLED_CYCLE=12
-IO_EXP_BIC_PWR_CTRL=32
+#IO_EXP_BIC_PWR_CTRL=32
 
 GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
 GPIOCHIP_IO_EXP_SLED_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$MANAGEMENT_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLED_PWR_CTRL_ADDR/"*gpiochip*)
-GPIOCHIP_IO_EXP_BIC_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$IO_EXP_SLOT_PWR_STATUS-00$IO_EXP_BIC_PWR_CTRL_ADDR/"*gpiochip*)
+#GPIOCHIP_IO_EXP_BIC_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$IO_EXP_SLOT_PWR_STATUS-00$IO_EXP_BIC_PWR_CTRL_ADDR/"*gpiochip*)
 
 chassis-power-cycle()
 {
@@ -26,10 +26,8 @@ chassis-power-cycle()
         chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
         if [ "$chassis_status" == "$STATE_ON" ]
         then
-            if ! gpioset "$GPIOCHIP_IO_EXP_BIC_PWR_CTRL" "$IO_EXP_BIC_PWR_CTRL"=0
-            then
-                echo "Failed to set slot$1 sentinel dome bic off"
-            fi
+            busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}0" au.com.CodeConstruct.MCTP.Endpoint Remove
+            busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}2" au.com.CodeConstruct.MCTP.Endpoint Remove
             sleep 1
             if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
             then
@@ -49,6 +47,7 @@ chassis-power-cycle()
         then
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
             /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
+            echo "Chassis$CHASSIS_ID cycle success"
             exit 0;
         else
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
