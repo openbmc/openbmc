@@ -55,6 +55,7 @@ gbmc_upgrade_dl_unpack() {
   stime=5
   while true; do
     local st=()
+    update-dhcp-status 'ONGOING' "downloading and unpacking from ${bootfile_url}, remaining time $(( timeout - SECONDS ))"
     curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
       tar "${tflags[@]}" --wildcards --warning=none -xC "$tmpdir" "${GBMC_UPGRADE_UNPACK_FILES[@]}" 2>"$tmpdir"/tarerr \
       && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")

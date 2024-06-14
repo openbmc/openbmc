@@ -25,7 +25,7 @@ gbmc_psu_hardreset_hook() {
   fi
 
   echo "Powercycling" >&2
-  systemctl start gbmc-psu-hardreset.target || return
+  update-dhcp-status 'POWERCYCLE' "netboot powercycle"
 
   # Ensure that we don't continue the DHCP process while waiting for the
   # powercycle.

@@ -42,20 +42,25 @@ if [ "$1" = bound ]; then
   # shellcheck disable=SC2154
   echo "DHCPv6(gbmcbr): $ipv6/128" >&2
 
+  update-dhcp-status 'ONGOING' "Received dhcp response ${ipv6}"
   pfx_bytes=()
   ip_to_bytes pfx_bytes "$ipv6"
   # Ensure we are a BMC and have a suffix nibble, the 0th index is reserved
   if (( pfx_bytes[8] != 0xfd || (pfx_bytes[9] & 0xf) == 0 )); then
-    echo "Invalid address" >&2
+    echo "Invalid address prefix ${ipv6}" >&2
+    update-dhcp-status 'ONGOING' "Invalid address prefix ${ipv6}"
     exit 1
   fi
   # Ensure we don't have more than a /80 address
   for (( i = 10; i < 16; ++i )); do
     if (( pfx_bytes[i] != 0 )); then
-      echo "Invalid address" >&2
+      echo "Invalid address ${ipv6}" >&2
+      update-dhcp-status 'ONGOING' "Invalid address ${ipv6}"
       exit 1
     fi
   done
+
+  update-dhcp-status 'ONGOING' "Setting hostname ${fqdn} and ip ${ipv6}"
 
   pfx="$(ip_bytes_to_str pfx_bytes)"
   gbmc_br_set_ip "$pfx" || exit
@@ -70,11 +75,13 @@ if [ "$1" = bound ]; then
   # If any of our hooks had expectations we should fail here
   if [ "${#GBMC_BR_DHCP_OUTSTANDING[@]}" -gt 0 ]; then
     echo "Not done with DHCP process: ${!GBMC_BR_DHCP_OUTSTANDING[*]}" >&2
+    update-dhcp-status 'ONGOING' "Outstanding DHCP hooks ${!GBMC_BR_DHCP_OUTSTANDING[*]}"
     exit 1
   fi
 
   # Ensure that the installer knows we have completed processing DHCP by
   # running a service that reports completion
-  echo 'Start DHCP Done' >&2
-  systemctl start dhcp-done@DONE --no-block
+  echo 'Signaling dhcp done' >&2
+  update-dhcp-status 'DONE' "Netboot finished"
+
 fi

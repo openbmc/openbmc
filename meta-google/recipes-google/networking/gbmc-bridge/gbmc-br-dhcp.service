@@ -1,13 +1,14 @@
 [Unit]
 Description=gBMC DHCP Client
-After=network.target
+After=network.target dhcp-done.service
+Wants=dhcp-done.service
 StartLimitIntervalSec=10
 StartLimitBurst=3
 
 [Service]
 Restart=on-failure
 RestartSec=5
-ExecCondition=/bin/bash -c "! /bin/systemctl is-active -q dhcp-done@*"
+ExecStartPre=/usr/bin/update-dhcp-status 'ONGOING' 'Starting dhcp process'
 ExecStart=/usr/bin/udhcpc6 -f -q -O fqdn -O bootfile_url -O bootfile_param -i gbmcbr -s /usr/libexec/gbmc-br-dhcp.sh
 
 [Install]
