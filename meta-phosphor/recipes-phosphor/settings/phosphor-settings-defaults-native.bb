@@ -24,4 +24,8 @@ do_install() {
                 sed "s/{}/${i}/g" ${f} >> ${DEST}/defaults.yaml
             done
         done
+        for f in ${SETTINGS_BMC_TEMPLATES};
+        do
+            cat $f >> ${DEST}/defaults.yaml
+        done
 }
