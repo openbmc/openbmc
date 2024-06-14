@@ -12,7 +12,7 @@ FIT_KERNEL_COMP_ALG_EXTENSION ?= ""
 do_image_cpio[depends] += "virtual/kernel:do_deploy"
 
 run_assemble_fitimage() {
-    export linux_comp="none"
+    export linux_comp="${FIT_KERNEL_COMP_ALG}"
     fitimage_assemble $1.its $1.fitImage 1
 
     # The fitimage_assemble puts the image into DEPLOY_DIR_NAME due to
