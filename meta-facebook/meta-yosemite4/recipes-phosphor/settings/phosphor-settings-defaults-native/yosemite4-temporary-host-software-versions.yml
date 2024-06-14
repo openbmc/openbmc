@@ -1,0 +1,119 @@
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_bios:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_cpld:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_bic:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_vr_pvddcr_cpu0:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_vr_pvddcr_cpu1:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_vr_pvdd11_s3:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_retimer_x8:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Sentinel_Dome_retimer_x16:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Wailua_Falls_bic:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_ab_asci1:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_cd_asci1:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_ab_asci2:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_cd_asci2:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Wailua_Falls_cxl_1:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/host{}/Wailua_Falls_cxl_2:
+  - Interface: "xyz.openbmc_project.Software.Version"
+    Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
