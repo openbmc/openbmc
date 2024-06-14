@@ -1,5 +1,4 @@
 EXTRA_OEMESON:append = " \
-    -Dinsecure-tftp-update=enabled \
     -Dibm-management-console=enabled \
     -Dredfish-dump-log=enabled \
     -Dredfish-oem-manager-fan-data=disabled \
