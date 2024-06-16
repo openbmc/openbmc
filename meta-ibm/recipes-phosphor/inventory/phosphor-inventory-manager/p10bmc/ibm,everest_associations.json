@@ -1233,6 +1233,20 @@
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C8_Temp",
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C8_Local_Temp"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connected_to",
+                        "fType": "connecting"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8/c8_connector0",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8/c8_connector1",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8/c8_connector2",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8/c8_connector3"
+                    ]
                 }
             ]
         },
@@ -1269,6 +1283,20 @@
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C10_Temp",
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C10_Local_Temp"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connected_to",
+                        "fType": "connecting"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10/c10_connector0",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10/c10_connector1",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10/c10_connector2",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10/c10_connector3"
+                    ]
                 }
             ]
         },
@@ -1286,6 +1314,20 @@
                     [
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C11_Temp",
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C11_Local_Temp"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connected_to",
+                        "fType": "connecting"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11/c11_connector0",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11/c11_connector1",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11/c11_connector2",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11/c11_connector3"
                     ]
                 }
             ]
