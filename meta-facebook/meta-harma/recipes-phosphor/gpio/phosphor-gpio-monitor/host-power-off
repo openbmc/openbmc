@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#To avoid AC cycle trigger this script.
+sleep 5
+
+# Set Host Power Off
+obmcutil poweroff

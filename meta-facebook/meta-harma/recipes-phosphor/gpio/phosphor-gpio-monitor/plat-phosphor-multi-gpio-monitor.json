@@ -86,16 +86,6 @@
         "Continue": true
     },
     {
-        "Name": "cpu0-err-alert",
-        "ChipId": "0",
-        "GpioNum": 21,
-        "EventMon": "FALLING",
-        "Targets": {
-            "FALLING": ["assert-gpio-log@cpu0-err-alert.service"]
-        },
-        "Continue": true
-    },
-    {
         "Name": "reset-cause-platrst",
         "ChipId": "0",
         "GpioNum": 16,
@@ -158,18 +148,19 @@
         "GpioNum": 92,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@leakage-detect-alert.service"],
-            "FALLING": ["assert-gpio-log@leakage-detect-alert.service"]
+            "RISING": ["deassert-gpio-log@leakage-detect-alert.service", "host-power-on.service"],
+            "FALLING": ["assert-gpio-log@leakage-detect-alert.service", "host-power-off.service"]
         },
         "Continue": true
     },
     {
         "Name": "power-hsc-good",
-        "ChipId": "2",
-        "GpioNum": 10,
-        "EventMon": "RISING",
+        "ChipId": "0",
+        "GpioNum": 21,
+        "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-power-hsc-good.service"]
+            "RISING": ["host-power-on.service"],
+            "FALLING": ["host-power-off.service"]
         },
         "Continue": true
     }

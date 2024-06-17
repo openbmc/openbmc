@@ -1,0 +1,8 @@
+[Unit]
+Description=Host power off assertion
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/host-power-off
+
+SyslogIdentifier=host-power-off

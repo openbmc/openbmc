@@ -1,0 +1,8 @@
+[Unit]
+Description=Host power on assertion
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/host-power-on
+
+SyslogIdentifier=host-power-on
