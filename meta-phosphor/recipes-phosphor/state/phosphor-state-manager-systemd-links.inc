@@ -1,5 +1,5 @@
 HOST_DEFAULT_TARGETS = " \
-    multi-user.target.requires/obmc-host-reset@{}.target \
+    multi-user.target.wants/obmc-host-reset@{}.target \
     multi-user.target.wants/phosphor-discover-system-state@{}.service \
     obmc-host-start@{}.target.requires/obmc-host-startmin@{}.target \
     obmc-host-start@{}.target.requires/phosphor-reset-host-reboot-attempts@{}.service \
