@@ -99,6 +99,6 @@ fi
 
 if ! eval "$CMD";
 then
-	echo "ERROR: The firmware update not successfull"
+	echo "ERROR: The firmware update not successful"
 	exit 1
 fi

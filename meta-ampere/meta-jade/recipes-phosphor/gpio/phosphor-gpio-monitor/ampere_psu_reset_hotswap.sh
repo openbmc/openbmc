@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # When system only use single PSU ( ex : PSU1 ) to power ON normal 12V,
-# HSC2 will be trigged Fault event (FET health).
+# HSC2 will be triggered Fault event (FET health).
 # At this time, to plug-in PSU2 in system, PSU2 won't deliver power to
 # +12V_MB because HSC2 is protected by Fault event.
 # Due to HSC2 protected, the PSU redundancy mechanism can't be created.
@@ -10,8 +10,8 @@
 
 # BMC SW work-around solution:
 # - When BMC detect event PSU is plugged in system, BMC will reset HSC
-# by disbale HOT SWAP and then enable HOT SWAP through pmbus command to clear
-# Fault event.
+# by disabling HOT SWAP and then enabling HOT SWAP through pmbus command
+# to clear Fault event.
 
 # Note:
 # In case hot swap occurs during BMC reset, BMC still not in operation state,

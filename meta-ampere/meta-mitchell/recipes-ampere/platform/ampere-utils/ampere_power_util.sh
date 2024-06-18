@@ -46,7 +46,7 @@ soft_off() {
 		cnt=$((cnt - 1))
 	done
 
-	# Softpoweroff is successed
+	# Softpoweroff is successful
 	sleep 2
 	rm -rf /run/openbmc/host@0-softpoweroff
 	if [ -f "/run/openbmc/host@0-softpoweroff-shutdown-ack" ]; then
