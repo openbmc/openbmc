@@ -69,6 +69,17 @@ HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.service \
     "
 
+#We need to ensure that the chassis power is always on.
+CHASSIS_DEFAULT_TARGETS:remove = " \
+    obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
+    "
+
+HARD_OFF_TMPL_CTRL=""
+HARD_OFF_TGTFMT_CTRL=""
+HARD_OFF_FMT_CTRL=""
+HARD_OFF_INSTFMT_CTRL=""
+
+
 SRC_URI:append = " \
     file://chassis-powercycle \
     file://chassis-powercycle@.service \

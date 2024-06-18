@@ -38,6 +38,7 @@ pkg_postinst:${PN}-sensor-monitor() {
     mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.requires
     mkdir -p $D/var/lib/phosphor-fan-presence
 
+# It should be create by PSM, should we remove it?
     LINK="$D$systemd_system_unitdir/obmc-chassis-hard-poweroff@0.target.requires/obmc-chassis-poweroff@.target"
     TARGET="../obmc-chassis-poweroff@0.target"
     ln -s $TARGET $LINK
@@ -46,6 +47,11 @@ pkg_postinst:${PN}-sensor-monitor() {
     TARGET="../obmc-poweroff.service"
     ln -s $TARGET $LINK
 }
+
+pkg_postinst:${PN}-sensor-monitor:harma() {
+    rm -f $D$systemd_system_unitdir/obmc-chassis-hard-poweroff@0.target.requires/obmc-chassis-poweroff@.target
+}
+
 
 FILES:${PN}-sensor-monitor += "${libexecdir}/phosphor-fan-sensor-monitor/host-poweroff"
 FILES:${PN}-sensor-monitor += "${systemd_system_unitdir}"
