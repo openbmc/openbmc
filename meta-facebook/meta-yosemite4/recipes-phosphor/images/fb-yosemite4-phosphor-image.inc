@@ -14,9 +14,11 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     plat-svc \
 "
-
+# Enable obmc-phosphor-buttons which needed by debug card function.
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
+    obmc-phosphor-buttons-signals \
+    obmc-phosphor-buttons-handler \
 "
 
 # This enables the feature of dbus-monitor which defined in
