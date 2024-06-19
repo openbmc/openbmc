@@ -14,6 +14,7 @@ DEPENDS += " \
         ${PYTHON_PN}-pyyaml-native \
         ${PYTHON_PN}-setuptools-native \
         ${PYTHON_PN}-mako-native \
+        nlohmann-json \
 "
 PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', \
          'obmc-ubi-fs phosphor-mmc obmc-static-norootfs', '', 'jffs-workaround', d)}"
