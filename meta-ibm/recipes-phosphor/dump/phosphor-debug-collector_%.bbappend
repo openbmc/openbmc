@@ -12,27 +12,3 @@ SYSTEMD_SERVICE:${PN}-manager:witherspoon-tacoma += "clear_hostdumps_poweroff.se
 EXTRA_OEMESON:append:p10bmc = " -DBMC_DUMP_TOTAL_SIZE=409600"
 EXTRA_OEMESON:append:p10bmc = " -DBMC_DUMP_MAX_SIZE=20480"
 
-install_ibm_plugins() {
-    install ${S}/tools/dreport.d/ibm.d/plugins.d/* ${D}${dreport_plugin_dir}/
-}
-
-#Link in the plugins so dreport run them at the appropriate time
-python link_ibm_plugins() {
-    source = d.getVar('S', True)
-    source_path = os.path.join(source, "tools", "dreport.d", "ibm.d", "plugins.d")
-    op_plugins = os.listdir(source_path)
-    for op_plugin in op_plugins:
-        op_plugin_name = os.path.join(source_path, op_plugin)
-        install_dreport_user_script("dreport.conf", op_plugin_name, d)
-}
-
-#Install dump header script from dreport/ibm.d to dreport/include.d
-install_dreport_header() {
-    install -d ${D}${dreport_include_dir}
-    install -m 0755 ${S}/tools/dreport.d/ibm.d/gendumpheader ${D}${dreport_include_dir}/
-}
-
-IBM_INSTALL_POSTFUNCS = "install_ibm_plugins link_ibm_plugins"
-IBM_INSTALL_POSTFUNCS:append:p10bmc = " install_dreport_header"
-
-do_install[postfuncs] += "${IBM_INSTALL_POSTFUNCS}"
