@@ -28,7 +28,7 @@
                     "Name": "fp_id_amber",
                     "Action": "Blink",
                     "DutyOn": 50,
-                    "Period": 250
+                    "Period": 1000
                 }
             ]
         }
