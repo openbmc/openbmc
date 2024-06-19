@@ -23,7 +23,7 @@ python link_ibm_plugins() {
     op_plugins = os.listdir(source_path)
     for op_plugin in op_plugins:
         op_plugin_name = os.path.join(source_path, op_plugin)
-        install_dreport_user_script(op_plugin_name, d)
+        install_dreport_user_script("dreport.conf", op_plugin_name, d)
 }
 
 #Install dump header script from dreport/ibm.d to dreport/include.d
