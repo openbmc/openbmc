@@ -3,6 +3,7 @@ From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Thu, 28 May 2020 02:03:39 +0200
 Subject: [PATCH] meta-selftest: add test for .patch file with long filename
 
+Upstream-Status: Inappropriate [Test artefact]
 ---
  patch-me | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

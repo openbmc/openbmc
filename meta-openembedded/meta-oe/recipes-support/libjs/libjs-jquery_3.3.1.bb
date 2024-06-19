@@ -10,7 +10,8 @@ SRC_URI[sha256sum] = "e04d192c2356e9d4c2b2c7d83fde9408713212b53c4d106e5b9e46c1a5
 JQUERYDIR = "${datadir}/javascript/jquery"
 JQUERYDOCDIR = "${docdir}/libjs-jquery"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -d -m 0755 ${D}${JQUERYDIR}

@@ -1,0 +1,62 @@
+From 2272df8407d86519d72504d6468b710e7eb56de8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 May 2024 00:23:43 -0700
+Subject: [PATCH] Link in libexecinfo if it has backtrace() API
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ m4/libopenflow.m4     | 5 +++++
+ tests/automake.mk     | 2 +-
+ utilities/automake.mk | 4 ++--
+ 3 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/m4/libopenflow.m4 b/m4/libopenflow.m4
+index 58014ed..c9302b8 100644
+--- a/m4/libopenflow.m4
++++ b/m4/libopenflow.m4
+@@ -96,6 +96,11 @@ AC_DEFUN([OFP_CHECK_FAULT_LIBS],
+   [AC_CHECK_LIB([dl], [dladdr], [FAULT_LIBS=-ldl])
+    AC_SUBST([FAULT_LIBS])])
+ 
++dnl Checks for libraries needed by lib/fault.c.
++AC_DEFUN([OFP_CHECK_FAULT_LIBS],
++  [AC_CHECK_LIB([execinfo], [backtrace], [FAULT_LIBS=-lexecinfo])
++   AC_SUBST([FAULT_LIBS])])
++
+ dnl Checks for libraries needed by lib/socket-util.c.
+ AC_DEFUN([OFP_CHECK_SOCKET_LIBS],
+   [AC_CHECK_LIB([socket], [connect])
+diff --git a/tests/automake.mk b/tests/automake.mk
+index a4e945a..0944275 100644
+--- a/tests/automake.mk
++++ b/tests/automake.mk
+@@ -27,7 +27,7 @@ EXTRA_DIST += tests/test-stp.sh
+ noinst_PROGRAMS += tests/test-stp
+ 
+ tests_test_stp_SOURCES = tests/test-stp.c
+-tests_test_stp_LDADD = lib/libopenflow.a
++tests_test_stp_LDADD = lib/libopenflow.a $(FAULT_LIBS)
+ stp_files = \
+ 	tests/test-stp-ieee802.1d-1998 \
+ 	tests/test-stp-ieee802.1d-2004-fig17.4 \
+diff --git a/utilities/automake.mk b/utilities/automake.mk
+index d6f79a8..0608655 100644
+--- a/utilities/automake.mk
++++ b/utilities/automake.mk
+@@ -36,10 +36,10 @@ utilities_dpctl_SOURCES = utilities/dpctl.c
+ utilities_dpctl_LDADD = lib/libopenflow.a $(FAULT_LIBS) $(SSL_LIBS)
+ 
+ utilities_vlogconf_SOURCES = utilities/vlogconf.c
+-utilities_vlogconf_LDADD = lib/libopenflow.a
++utilities_vlogconf_LDADD = lib/libopenflow.a $(FAULT_LIBS)
+ 
+ utilities_ofp_discover_SOURCES = utilities/ofp-discover.c
+-utilities_ofp_discover_LDADD = lib/libopenflow.a
++utilities_ofp_discover_LDADD = lib/libopenflow.a $(FAULT_LIBS)
+ 
+ utilities_ofp_kill_SOURCES = utilities/ofp-kill.c
+ utilities_ofp_kill_LDADD = lib/libopenflow.a
+-- 
+2.45.1
+

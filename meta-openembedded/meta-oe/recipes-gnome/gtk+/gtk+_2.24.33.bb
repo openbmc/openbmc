@@ -32,3 +32,5 @@ python populate_packages:prepend () {
     if (d.getVar('DEBIAN_NAMES')):
         d.setVar(d.expand('PKG:${PN}'), '${MLPREFIX}libgtk-2.0')
 }
+
+CFLAGS += "-Wno-error=incompatible-pointer-types"

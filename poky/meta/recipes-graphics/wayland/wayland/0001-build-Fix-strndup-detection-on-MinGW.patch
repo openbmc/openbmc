@@ -1,4 +1,4 @@
-From b4c64b6f07743e3fb63ce52359bc664ab7d60df0 Mon Sep 17 00:00:00 2001
+From a90bfa622f7323074c715674b368cba80bc7d196 Mon Sep 17 00:00:00 2001
 From: Joshua Watt <JPEWhacker@gmail.com>
 Date: Thu, 20 Feb 2020 15:20:45 -0600
 Subject: [PATCH] build: Fix strndup detection on MinGW
@@ -20,10 +20,10 @@ Signed-off-by: Denys Dmytriyenko <denis@denix.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 3bc25c9..adde7b9 100644
+index 8e28f2a..b56ba91 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -38,11 +38,11 @@ have_funcs = [
+@@ -45,11 +45,11 @@ have_funcs = [
  	'prctl',
  	'memfd_create',
  	'mremap',
@@ -36,6 +36,3 @@ index 3bc25c9..adde7b9 100644
  config_h.set10('HAVE_XUCRED_CR_PID', cc.has_member('struct xucred', 'cr_pid', prefix : '#include <sys/ucred.h>'))
  have_broken_msg_cmsg_cloexec = false
  if host_machine.system() == 'freebsd'
--- 
-2.7.4
-

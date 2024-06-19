@@ -26,8 +26,6 @@
 
 
 DEVTOOL_TEMPDIR ?= ""
-DEVTOOL_PATCH_SRCDIR = "${DEVTOOL_TEMPDIR}/patchworkdir"
-
 
 python() {
     tempdir = d.getVar('DEVTOOL_TEMPDIR')
@@ -60,7 +58,6 @@ python() {
     else:
         unpacktask = 'do_unpack'
     d.appendVarFlag(unpacktask, 'postfuncs', ' devtool_post_unpack')
-    d.prependVarFlag('do_patch', 'prefuncs', ' devtool_pre_patch')
     d.appendVarFlag('do_patch', 'postfuncs', ' devtool_post_patch')
 
     # NOTE: in order for the patch stuff to be fully functional,
@@ -79,67 +76,23 @@ python devtool_post_unpack() {
 
     tempdir = d.getVar('DEVTOOL_TEMPDIR')
     workdir = d.getVar('WORKDIR')
+    unpackdir = d.getVar('UNPACKDIR')
     srcsubdir = d.getVar('S')
 
-    def _move_file(src, dst):
-        """Move a file. Creates all the directory components of destination path."""
-        dst_d = os.path.dirname(dst)
-        if dst_d:
-            bb.utils.mkdirhier(dst_d)
-        shutil.move(src, dst)
-
-    def _ls_tree(directory):
-        """Recursive listing of files in a directory"""
-        ret = []
-        for root, dirs, files in os.walk(directory):
-            ret.extend([os.path.relpath(os.path.join(root, fname), directory) for
-                        fname in files])
-        return ret
-
-    is_kernel_yocto = bb.data.inherits_class('kernel-yocto', d)
-    # Move local source files into separate subdir
-    recipe_patches = [os.path.basename(patch) for patch in
-                        oe.recipeutils.get_recipe_patches(d)]
+    # Add locally copied files to gitignore as we add back to the metadata directly
     local_files = oe.recipeutils.get_recipe_local_files(d)
-
-    if is_kernel_yocto:
-        for key in [f for f in local_files if f.endswith('scc')]:
-            with open(local_files[key], 'r') as sccfile:
-                for l in sccfile:
-                    line = l.split()
-                    if line and line[0] in ('kconf', 'patch'):
-                        cfg = os.path.join(os.path.dirname(local_files[key]), line[-1])
-                        if cfg not in local_files.values():
-                            local_files[line[-1]] = cfg
-                            shutil.copy2(cfg, workdir)
-
-    # Ignore local files with subdir={BP}
     srcabspath = os.path.abspath(srcsubdir)
     local_files = [fname for fname in local_files if
-                    os.path.exists(os.path.join(workdir, fname)) and
-                    (srcabspath == workdir or not
-                    os.path.join(workdir, fname).startswith(srcabspath +
-                        os.sep))]
+                    os.path.exists(os.path.join(unpackdir, fname)) and
+                    srcabspath == unpackdir]
     if local_files:
-        for fname in local_files:
-            _move_file(os.path.join(workdir, fname),
-                        os.path.join(tempdir, 'oe-local-files', fname))
-        with open(os.path.join(tempdir, 'oe-local-files', '.gitignore'),
-                    'w') as f:
-            f.write('# Ignore local files, by default. Remove this file '
-                    'if you want to commit the directory to Git\n*\n')
+        with open(os.path.join(tempdir, '.gitignore'), 'a+') as f:
+            f.write('# Ignore local files, by default. Remove following lines'
+                    'if you want to commit the directory to Git\n')
+            for fname in local_files:
+                f.write('%s\n' % fname)
 
-    if srcsubdir == workdir:
-        # Find non-patch non-local sources that were "unpacked" to srctree
-        # directory
-        src_files = [fname for fname in _ls_tree(workdir) if
-                        os.path.basename(fname) not in recipe_patches]
-        srcsubdir = d.getVar('DEVTOOL_PATCH_SRCDIR')
-        # Move source files to S
-        for path in src_files:
-            _move_file(os.path.join(workdir, path),
-                        os.path.join(srcsubdir, path))
-    elif os.path.dirname(srcsubdir) != workdir:
+    if os.path.dirname(srcsubdir) != workdir:
         # Handle if S is set to a subdirectory of the source
         srcsubdir = os.path.join(workdir, os.path.relpath(srcsubdir, workdir).split(os.sep)[0])
 
@@ -162,11 +115,6 @@ python devtool_post_unpack() {
 
     with open(os.path.join(tempdir, 'srcsubdir'), 'w') as f:
         f.write(srcsubdir)
-}
-
-python devtool_pre_patch() {
-    if d.getVar('S') == d.getVar('WORKDIR'):
-        d.setVar('S', '${DEVTOOL_PATCH_SRCDIR}')
 }
 
 python devtool_post_patch() {

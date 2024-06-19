@@ -195,14 +195,28 @@ def strip_execs(pn, dstdir, strip_cmd, libdir, base_libdir, max_process, qa_alre
 
     oe.utils.multiprocess_launch_mp(runstrip, sfiles, max_process)
 
+TRANSLATE = (
+    ("@", "@at@"),
+    (" ", "@space@"),
+    ("\t", "@tab@"),
+    ("[", "@openbrace@"),
+    ("]", "@closebrace@"),
+    ("_", "@underscore@"),
+    (":", "@colon@"),
+)
 
 def file_translate(file):
-    ft = file.replace("@", "@at@")
-    ft = ft.replace(" ", "@space@")
-    ft = ft.replace("\t", "@tab@")
-    ft = ft.replace("[", "@openbrace@")
-    ft = ft.replace("]", "@closebrace@")
-    ft = ft.replace("_", "@underscore@")
+    ft = file
+    for s, replace in TRANSLATE:
+        ft = ft.replace(s, replace)
+
+    return ft
+
+def file_reverse_translate(file):
+    ft = file
+    for s, replace in reversed(TRANSLATE):
+        ft = ft.replace(replace, s)
+
     return ft
 
 def filedeprunner(arg):

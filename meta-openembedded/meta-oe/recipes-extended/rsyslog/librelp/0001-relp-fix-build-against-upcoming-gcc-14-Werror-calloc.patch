@@ -1,0 +1,37 @@
+From baf992f82aa987c608731866876adb856847ea45 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 May 2024 18:03:40 -0700
+Subject: [PATCH] relp: fix build against upcoming `gcc-14`
+ (`-Werror=calloc-transposed-args`)
+
+`gcc-14` added a new `-Wcalloc-transposed-args` warning recently. It
+   detected minor infelicity in `calloc()` API usage
+
+Fixes
+../../git/src/relp.c: In function 'addToEpollSet':
+../../git/src/relp.c:101:39: error: 'calloc' sizes specified with 'sizeof' in the earlier argument and not in the later argument [-Werror=calloc-transposed-args]
+  101 |         CHKmalloc(epd = calloc(sizeof(epolld_t), 1));
+      |                                       ^~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/rsyslog/librelp/pull/264]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/relp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/relp.c b/src/relp.c
+index eadda36..6268f1d 100644
+--- a/src/relp.c
++++ b/src/relp.c
+@@ -98,7 +98,7 @@ addToEpollSet(relpEngine_t *const pThis, epolld_type_t typ, void *ptr, int sock,
+ 	epolld_t *epd = NULL;
+ 	ENTER_RELPFUNC;
+ 
+-	CHKmalloc(epd = calloc(sizeof(epolld_t), 1));
++	CHKmalloc(epd = calloc(1, sizeof(epolld_t)));
+ 	epd->typ = typ;
+ 	epd->ptr = ptr;
+ 	epd->sock = sock;
+-- 
+2.45.0
+

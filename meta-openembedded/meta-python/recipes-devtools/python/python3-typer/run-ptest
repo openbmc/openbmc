@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Ignore the test_tutorial and test_completion.
+# Because it needs the docs_src package what is not in Yocto.
+# And the tests are not that useful for Yocto.
+pytest --automake --ignore tests/test_tutorial --ignore tests/test_completion

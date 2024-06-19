@@ -42,11 +42,11 @@ do_install:append () {
 	install -m 0644 ${S}/ulogd.8 ${D}${mandir}/man8/ulogd.8
 
 	install -d ${D}${systemd_system_unitdir}
-	install -m 0644 ${WORKDIR}/ulogd.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${UNPACKDIR}/ulogd.service ${D}${systemd_system_unitdir}
 	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_system_unitdir}/ulogd.service
 
 	install -d ${D}${sysconfdir}/init.d
-	install -m 755 ${WORKDIR}/ulogd.init ${D}${sysconfdir}/init.d/ulogd
+	install -m 755 ${UNPACKDIR}/ulogd.init ${D}${sysconfdir}/init.d/ulogd
 }
 
 PACKAGES += "${PN}-plugins"

@@ -21,7 +21,8 @@ SRC_URI = "\
   file://alsa-state-init \
 "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 # As the recipe doesn't inherit systemd.bbclass, we need to set this variable
 # manually to avoid unnecessary postinst/preinst generated.
@@ -38,15 +39,15 @@ INITSCRIPT_PARAMS = "start 39 S . stop 31 0 6 ."
 do_install() {
     # Only install the init script when 'sysvinit' is in DISTRO_FEATURES.
     if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
-	sed -i -e "s:#STATEDIR#:${localstatedir}/lib/alsa:g" ${WORKDIR}/alsa-state-init
+	sed -i -e "s:#STATEDIR#:${localstatedir}/lib/alsa:g" ${S}/alsa-state-init
 	install -d ${D}${sysconfdir}/init.d
-	install -m 0755 ${WORKDIR}/alsa-state-init ${D}${sysconfdir}/init.d/alsa-state
+	install -m 0755 ${S}/alsa-state-init ${D}${sysconfdir}/init.d/alsa-state
     fi
 
     install -d ${D}/${localstatedir}/lib/alsa
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/asound.conf ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/*.state ${D}${localstatedir}/lib/alsa
+    install -m 0644 ${S}/asound.conf ${D}${sysconfdir}
+    install -m 0644 ${S}/*.state ${D}${localstatedir}/lib/alsa
 }
 
 PACKAGES += "alsa-states"

@@ -1,0 +1,46 @@
+From 23ae981ba46f6d5af03b12083ad32de9c1f148b2 Mon Sep 17 00:00:00 2001
+From: magicWenli <48174882+magicwenli@users.noreply.github.com>
+Date: Fri, 12 Apr 2024 07:52:53 +0000
+Subject: [PATCH] Add SOVERSION for shared lib, and comment example by default
+
+Upstream-Status: Pending
+---
+ CMakeLists.txt | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,8 @@
+ cmake_minimum_required(VERSION 2.8.3)
+ project(serial)
++set (SERIAL_VERSION_MAJOR 1)
++set (SERIAL_VERSION_MINOR 2)
++set (SERIAL_VERSION_PATCH 1)
+ 
+ # Find catkin
+ find_package(catkin REQUIRED)
+@@ -45,7 +48,7 @@ else()
+ endif()
+ 
+ ## Add serial library
+-add_library(${PROJECT_NAME} ${serial_SRCS})
++add_library(${PROJECT_NAME} SHARED ${serial_SRCS})
+ if(APPLE)
+ 	target_link_libraries(${PROJECT_NAME} ${FOUNDATION_LIBRARY} ${IOKIT_LIBRARY})
+ elseif(UNIX)
+@@ -55,9 +58,12 @@ else()
+ endif()
+ 
+ ## Uncomment for example
+-add_executable(serial_example examples/serial_example.cc)
+-add_dependencies(serial_example ${PROJECT_NAME})
+-target_link_libraries(serial_example ${PROJECT_NAME})
++# add_executable(serial_example examples/serial_example.cc)
++# add_dependencies(serial_example ${PROJECT_NAME})
++# target_link_libraries(serial_example ${PROJECT_NAME})
++
++set (SERIAL_VERSION_STRING ${SERIAL_VERSION_MAJOR}.${SERIAL_VERSION_MINOR}.${SERIAL_VERSION_PATCH})
++set_target_properties (${PROJECT_NAME} PROPERTIES VERSION ${SERIAL_VERSION_STRING} SOVERSION ${SERIAL_VERSION_MAJOR})
+ 
+ ## Include headers
+ include_directories(include)

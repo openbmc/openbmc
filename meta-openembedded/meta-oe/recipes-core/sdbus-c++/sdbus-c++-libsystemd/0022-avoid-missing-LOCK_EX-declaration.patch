@@ -1,7 +1,7 @@
-From fd52f1764647e03a35e8f0ed0ef952049073ccbd Mon Sep 17 00:00:00 2001
+From 97d3ed7834bd86615ba4acdbef984c677b7e7791 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Tue, 2 Jan 2024 11:03:27 +0800
-Subject: [PATCH 22/22] avoid missing LOCK_EX declaration
+Subject: [PATCH] avoid missing LOCK_EX declaration
 
 This only happens on MUSL. Include sys/file.h to avoid compilation
 error about missing LOCK_EX declaration.
@@ -14,8 +14,6 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  src/shared/dev-setup.h | 1 +
  2 files changed, 2 insertions(+)
 
-diff --git a/src/core/exec-invoke.c b/src/core/exec-invoke.c
-index 70d963e269..7084811439 100644
 --- a/src/core/exec-invoke.c
 +++ b/src/core/exec-invoke.c
 @@ -4,6 +4,7 @@
@@ -26,8 +24,6 @@ index 70d963e269..7084811439 100644
  
  #if HAVE_PAM
  #include <security/pam_appl.h>
-diff --git a/src/shared/dev-setup.h b/src/shared/dev-setup.h
-index 5339bc4e5e..0697495f23 100644
 --- a/src/shared/dev-setup.h
 +++ b/src/shared/dev-setup.h
 @@ -2,6 +2,7 @@
@@ -38,6 +34,3 @@ index 5339bc4e5e..0697495f23 100644
  
  int lock_dev_console(void);
  
--- 
-2.34.1
-

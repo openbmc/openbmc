@@ -6,7 +6,7 @@ Subject: [PATCH] Fixes for the Meson build of libtraceevent:
 - Make the plugin directory the same as the Makefiles
 - Install the plugins as modules not static and versioned shared libraries
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://lore.kernel.org/linux-trace-devel/20240311111140.1789879-1-alex@linutronix.de/T/#u]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  meson.build         | 2 +-

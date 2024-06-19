@@ -21,5 +21,5 @@ RDEPENDS:${PN} = "gcc-symlinks g++-symlinks cpp cpp-symlinks \
                   libtool libtool-dev \
                   pkgconfig"
 
-# usefull, but not in oe-core/meta-oe yet: patchutils
-RRECOMMENDS:${PN} = " g77-symlinks gfortran-symlinks"
+# useful, but not in oe-core/meta-oe yet: patchutils
+RRECOMMENDS:${PN} = "${@bb.utils.contains('FORTRAN', ',fortran', 'gfortran gfortran-symlinks', '', d)}"

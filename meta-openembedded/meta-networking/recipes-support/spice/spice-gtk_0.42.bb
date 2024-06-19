@@ -40,7 +40,7 @@ DEPENDS = " \
 "
 DEPENDS:append:libc-musl = " libucontext"
 
-RDEPENDS:${PN} = "python3-pyparsing python3-six usbids"
+RDEPENDS:${PN} = "python3-pyparsing python3-six hwdata"
 
 inherit meson pkgconfig vala gobject-introspection features_check gtk-doc
 
@@ -59,8 +59,9 @@ do_configure:prepend() {
 PACKAGECONFIG ??= "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)} smartcard"
 PACKAGECONFIG[vapi] = "-Dvapi=enabled,-Dvapi=disabled"
 PACKAGECONFIG[smartcard] = "-Dsmartcard=enabled,-Dsmartcard=disabled,libcacard"
+PACKAGECONFIG[webdav] = "-Dwebdav=enabled,-Dwebdav=disabled,phodav libsoup"
 
-EXTRA_OEMESON = "-Dpie=true -Dusb-ids-path=${datadir}/usb.ids "
+EXTRA_OEMESON = "-Dpie=true -Dusb-ids-path=${datadir}/hwdata/usb.ids "
 EXTRA_OEMESON:append:libc-musl = " -Dcoroutine=libucontext"
 
 LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -Wl,--undefined-version', '', d)}"

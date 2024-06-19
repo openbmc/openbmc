@@ -108,24 +108,24 @@ do_install () {
     chown ${NGINX_USER}:www-data -R ${D}${NGINX_WWWDIR}
 
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/nginx.init ${D}${sysconfdir}/init.d/nginx
+    install -m 0755 ${UNPACKDIR}/nginx.init ${D}${sysconfdir}/init.d/nginx
     sed -i 's,/usr/sbin/,${sbindir}/,g' ${D}${sysconfdir}/init.d/nginx
     sed -i 's,/etc/,${sysconfdir}/,g'  ${D}${sysconfdir}/init.d/nginx
 
     install -d ${D}${sysconfdir}/nginx
-    install -m 0644 ${WORKDIR}/nginx.conf ${D}${sysconfdir}/nginx/nginx.conf
+    install -m 0644 ${UNPACKDIR}/nginx.conf ${D}${sysconfdir}/nginx/nginx.conf
     sed -i 's,/etc/,${sysconfdir}/,g' ${D}${sysconfdir}/nginx/nginx.conf
     sed -i 's,/var/,${localstatedir}/,g' ${D}${sysconfdir}/nginx/nginx.conf
     sed -i 's/^user.*/user ${NGINX_USER};/g' ${D}${sysconfdir}/nginx/nginx.conf
-    install -Dm 0644 ${WORKDIR}/default_server.site ${D}${sysconfdir}/nginx/sites-available/default_server
+    install -Dm 0644 ${UNPACKDIR}/default_server.site ${D}${sysconfdir}/nginx/sites-available/default_server
     sed -i 's,/var/,${localstatedir}/,g' ${D}${sysconfdir}/nginx/sites-available/default_server
     install -d ${D}${sysconfdir}/nginx/sites-enabled
     ln -s ../sites-available/default_server ${D}${sysconfdir}/nginx/sites-enabled/
 
-    install -m 0644 ${WORKDIR}/proxy_params ${D}${sysconfdir}/nginx/proxy_params
+    install -m 0644 ${UNPACKDIR}/proxy_params ${D}${sysconfdir}/nginx/proxy_params
 
     install -d ${D}${sysconfdir}/default/volatiles
-    install -m 0644 ${WORKDIR}/nginx-volatile.conf ${D}${sysconfdir}/default/volatiles/99_nginx
+    install -m 0644 ${UNPACKDIR}/nginx-volatile.conf ${D}${sysconfdir}/default/volatiles/99_nginx
     sed -i 's,/var/,${localstatedir}/,g' ${D}${sysconfdir}/default/volatiles/99_nginx
     sed -i 's,@NGINX_USER@,${NGINX_USER},g' ${D}${sysconfdir}/default/volatiles/99_nginx
 
@@ -140,7 +140,7 @@ do_install () {
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
         install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/nginx.service ${D}${systemd_unitdir}/system/
+        install -m 0644 ${UNPACKDIR}/nginx.service ${D}${systemd_unitdir}/system/
         sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' \
             -e 's,@LOCALSTATEDIR@,${localstatedir},g' \
             -e 's,@SBINDIR@,${sbindir},g' \

@@ -30,6 +30,7 @@ do_install_ptest () {
     install ${S}/t/*.t* ${D}${PTEST_PATH}/t
     install ${S}/t/data/* ${D}${PTEST_PATH}/t/data
 }
+RDEPENDS:${PN}-ptest += "perl-modules"
 
 FILES:${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/Geo/IP/.debug"
 

@@ -8,13 +8,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "nasm-native"
 
-SRC_URI = "git://github.com/mirror/x264;branch=stable;protocol=https \
-           file://don-t-default-to-cortex-a9-with-neon.patch \
-           file://Fix-X32-build-by-disabling-asm.patch \
+SRC_URI = "git://code.videolan.org/videolan/x264.git;branch=stable;protocol=https \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "baee400fa9ced6f5481a728138fed6e867b0ff7f"
+SRCREV = "31e19f92f00c7003fa115047ce50978bc98c3a0d"
 
 PV = "r3039+git"
 
@@ -41,6 +39,7 @@ EXTRA_OECONF = '--prefix=${prefix} \
                 --disable-opencl \
                 --enable-pic \
                 ${X264_DISABLE_ASM} \
+                --extra-cflags="${TUNE_CCARGS}" \
                '
 
 do_configure() {
@@ -54,3 +53,5 @@ do_install() {
 }
 
 AS[unexport] = "1"
+
+COMPATIBLE_HOST:x86-x32 = "null"

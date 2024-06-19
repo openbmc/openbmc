@@ -1,4 +1,4 @@
-From bbb0845c0a79238fb2e84cca41826a0944b6ce7e Mon Sep 17 00:00:00 2001
+From 9c3d6fa3544ca7bd6d8c4f4edbb62282cbc35861 Mon Sep 17 00:00:00 2001
 From: Anuj Mittal <anuj.mittal@intel.com>
 Date: Thu, 14 Nov 2019 10:13:53 +0800
 Subject: [PATCH] dont setup compiler flags -m32/-m64
@@ -13,7 +13,7 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
  1 file changed, 14 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index 493a43e6d..42dccbdfe 100644
+index 0186545e8..ba33c4086 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
 @@ -360,20 +360,6 @@ local rule compile-link-flags ( * )

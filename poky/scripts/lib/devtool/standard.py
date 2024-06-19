@@ -387,6 +387,19 @@ def _git_ls_tree(repodir, treeish='HEAD', recursive=False):
                 ret[split[3]] = split[0:3]
     return ret
 
+def _git_modified(repodir):
+    """List the difference between HEAD and the index"""
+    import bb
+    cmd = ['git', 'status', '--porcelain']
+    out, _ = bb.process.run(cmd, cwd=repodir)
+    ret = []
+    if out:
+        for line in out.split("\n"):
+            if line and not line.startswith('??'):
+                ret.append(line[3:])
+    return ret
+
+
 def _git_exclude_path(srctree, path):
     """Return pathspec (list of paths) that excludes certain path"""
     # NOTE: "Filtering out" files/paths in this way is not entirely reliable -
@@ -459,32 +472,6 @@ def sync(args, config, basepath, workspace):
             return 1
     finally:
         tinfoil.shutdown()
-
-def symlink_oelocal_files_srctree(rd, srctree):
-    import oe.patch
-    if os.path.abspath(rd.getVar('S')) == os.path.abspath(rd.getVar('WORKDIR')):
-        # If recipe extracts to ${WORKDIR}, symlink the files into the srctree
-        # (otherwise the recipe won't build as expected)
-        local_files_dir = os.path.join(srctree, 'oe-local-files')
-        addfiles = []
-        for root, _, files in os.walk(local_files_dir):
-            relpth = os.path.relpath(root, local_files_dir)
-            if relpth != '.':
-                bb.utils.mkdirhier(os.path.join(srctree, relpth))
-            for fn in files:
-                if fn == '.gitignore':
-                    continue
-                destpth = os.path.join(srctree, relpth, fn)
-                if os.path.exists(destpth):
-                    os.unlink(destpth)
-                if relpth != '.':
-                    back_relpth = os.path.relpath(local_files_dir, root)
-                    os.symlink('%s/oe-local-files/%s/%s' % (back_relpth, relpth, fn), destpth)
-                else:
-                    os.symlink('oe-local-files/%s' % fn, destpth)
-                addfiles.append(os.path.join(relpth, fn))
-        if addfiles:
-            oe.patch.GitApplyTree.commitIgnored("Add local file symlinks", dir=srctree, files=addfiles, d=rd)
 
 def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, workspace, fixed_setup, d, tinfoil, no_overrides=False):
     """Extract sources of a recipe"""
@@ -657,35 +644,22 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
             elif not os.path.exists(workshareddir):
                 oe.path.copyhardlinktree(srcsubdir, workshareddir)
 
-        tempdir_localdir = os.path.join(tempdir, 'oe-local-files')
-        srctree_localdir = os.path.join(srctree, 'oe-local-files')
-
         if sync:
-            bb.process.run('git fetch file://' + srcsubdir + ' ' + devbranch + ':' + devbranch, cwd=srctree)
+            try:
+                logger.info('Backing up current %s branch as branch: %s.bak' % (devbranch, devbranch))
+                bb.process.run('git branch -f ' + devbranch + '.bak', cwd=srctree)
 
-            # Move the oe-local-files directory to srctree.
-            # As oe-local-files is not part of the constructed git tree,
-            # removing it directly during the synchronization might surprise
-            # the user.  Instead, we move it to oe-local-files.bak and remind
-            # the user in the log message.
-            if os.path.exists(srctree_localdir + '.bak'):
-                shutil.rmtree(srctree_localdir + '.bak')
+                # Use git fetch to update the source with the current recipe
+                # To be able to update the currently checked out branch with
+                # possibly new history (no fast-forward) git needs to be told
+                # that's ok
+                logger.info('Syncing source files including patches to git branch: %s' % devbranch)
+                bb.process.run('git fetch --update-head-ok --force file://' + srcsubdir + ' ' + devbranch + ':' + devbranch, cwd=srctree)
+            except bb.process.ExecutionError as e:
+                raise DevtoolError("Error when syncing source files to local checkout: %s" % str(e))
 
-            if os.path.exists(srctree_localdir):
-                logger.info('Backing up current local file directory %s' % srctree_localdir)
-                shutil.move(srctree_localdir, srctree_localdir + '.bak')
-
-            if os.path.exists(tempdir_localdir):
-                logger.info('Syncing local source files to srctree...')
-                shutil.copytree(tempdir_localdir, srctree_localdir)
         else:
-            # Move oe-local-files directory to srctree
-            if os.path.exists(tempdir_localdir):
-                logger.info('Adding local source files to srctree...')
-                shutil.move(tempdir_localdir, srcsubdir)
-
             shutil.move(srcsubdir, srctree)
-            symlink_oelocal_files_srctree(d, srctree)
 
         if is_kernel_yocto:
             logger.info('Copying kernel config to srctree')
@@ -841,34 +815,22 @@ def modify(args, config, basepath, workspace):
             if (os.path.exists(srcdir) and os.listdir(srcdir)) and (kernelVersion in staging_kerVer and staging_kbranch == kbranch):
                 oe.path.copyhardlinktree(srcdir, srctree)
                 workdir = rd.getVar('WORKDIR')
+                unpackdir = rd.getVar('UNPACKDIR')
                 srcsubdir = rd.getVar('S')
                 localfilesdir = os.path.join(srctree, 'oe-local-files')
-                # Move local source files into separate subdir
-                recipe_patches = [os.path.basename(patch) for patch in oe.recipeutils.get_recipe_patches(rd)]
+
+                # Add locally copied files to gitignore as we add back to the metadata directly
                 local_files = oe.recipeutils.get_recipe_local_files(rd)
-
-                for key in local_files.copy():
-                    if key.endswith('scc'):
-                        sccfile = open(local_files[key], 'r')
-                        for l in sccfile:
-                            line = l.split()
-                            if line and line[0] in ('kconf', 'patch'):
-                                cfg = os.path.join(os.path.dirname(local_files[key]), line[-1])
-                                if not cfg in local_files.values():
-                                    local_files[line[-1]] = cfg
-                                    shutil.copy2(cfg, workdir)
-                        sccfile.close()
-
-                # Ignore local files with subdir={BP}
                 srcabspath = os.path.abspath(srcsubdir)
-                local_files = [fname for fname in local_files if os.path.exists(os.path.join(workdir, fname)) and  (srcabspath == workdir or not  os.path.join(workdir, fname).startswith(srcabspath + os.sep))]
+                local_files = [fname for fname in local_files if
+                               os.path.exists(os.path.join(unpackdir, fname)) and
+                               srcabspath == unpackdir]
                 if local_files:
-                    for fname in local_files:
-                        _move_file(os.path.join(workdir, fname), os.path.join(srctree, 'oe-local-files', fname))
-                    with open(os.path.join(srctree, 'oe-local-files', '.gitignore'), 'w') as f:
-                        f.write('# Ignore local files, by default. Remove this file if you want to commit the directory to Git\n*\n')
-
-                symlink_oelocal_files_srctree(rd, srctree)
+                    with open(os.path.join(srctree, '.gitignore'), 'a+') as f:
+                        f.write('# Ignore local files, by default. Remove following lines'
+                                'if you want to commit the directory to Git\n')
+                        for fname in local_files:
+                            f.write('%s\n' % fname)
 
                 task = 'do_configure'
                 res = tinfoil.build_targets(pn, task, handle_events=True)
@@ -893,7 +855,10 @@ def modify(args, config, basepath, workspace):
                 (stdout, _) = bb.process.run('git rev-list --reverse %s..HEAD' % initial_revs["."], cwd=srctree)
                 commits["."] = stdout.split()
                 check_commits = True
-                (stdout, _) = bb.process.run('git submodule --quiet foreach --recursive  \'echo `git rev-parse devtool-base` $PWD\'', cwd=srctree)
+                try:
+                    (stdout, _) = bb.process.run('git submodule --quiet foreach --recursive  \'echo `git rev-parse devtool-base` $PWD\'', cwd=srctree)
+                except bb.process.ExecutionError:
+                    stdout = ""
                 for line in stdout.splitlines():
                     (rev, submodule_path) = line.split()
                     submodule = os.path.relpath(submodule_path, srctree)
@@ -1452,8 +1417,10 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
          1. updated - files that already exist in SRCURI
          2. added - new files files that don't exist in SRCURI
          3  removed - files that exist in SRCURI but not in exported files
-      In each dict the key is the 'basepath' of the URI and value is the
-      absolute path to the existing file in recipe space (if any).
+       In each dict the key is the 'basepath' of the URI and value is:
+         - for updated and added dicts, a dict with 1 optionnal key:
+           - 'path': the absolute path to the existing file in recipe space (if any)
+         - for removed dict, the absolute path to the existing file in recipe space
     """
     import oe.recipeutils
 
@@ -1462,6 +1429,7 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
     # Instead they are directly copied over the original source files (in
     # recipe space).
     existing_files = oe.recipeutils.get_recipe_local_files(rd)
+
     new_set = None
     updated = OrderedDict()
     added = OrderedDict()
@@ -1478,24 +1446,28 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
     if branchname.startswith(override_branch_prefix):
         return (updated, added, removed)
 
-    local_files_dir = os.path.join(srctreebase, 'oe-local-files')
-    git_files = _git_ls_tree(srctree)
-    if 'oe-local-files' in git_files:
-        # If tracked by Git, take the files from srctree HEAD. First get
-        # the tree object of the directory
-        tmp_index = os.path.join(srctree, '.git', 'index.tmp.devtool')
-        tree = git_files['oe-local-files'][2]
-        bb.process.run(['git', 'checkout', tree, '--', '.'], cwd=srctree,
-                        env=dict(os.environ, GIT_WORK_TREE=destdir,
-                                 GIT_INDEX_FILE=tmp_index))
-        new_set = list(_git_ls_tree(srctree, tree, True).keys())
-    elif os.path.isdir(local_files_dir):
-        # If not tracked by Git, just copy from working copy
-        new_set = _ls_tree(local_files_dir)
-        bb.process.run(['cp', '-ax',
-                        os.path.join(local_files_dir, '.'), destdir])
-    else:
-        new_set = []
+    files = _git_modified(srctree)
+        #if not files:
+        #    files = _ls_tree(srctree)
+    for f in files:
+        fullfile = os.path.join(srctree, f)
+        if os.path.exists(os.path.join(fullfile, ".git")):
+            # submodules handled elsewhere
+            continue
+        if f not in existing_files:
+            added[f] = {}
+            if os.path.isdir(os.path.join(srctree, f)):
+                shutil.copytree(fullfile, os.path.join(destdir, f))
+            else:
+                shutil.copy2(fullfile, os.path.join(destdir, f))
+        elif not os.path.exists(fullfile):
+            removed[f] = existing_files[f]
+        elif f in existing_files:
+            updated[f] = {'path' : existing_files[f]}
+            if os.path.isdir(os.path.join(srctree, f)):
+                shutil.copytree(fullfile, os.path.join(destdir, f))
+            else:
+                shutil.copy2(fullfile, os.path.join(destdir, f))
 
     # Special handling for kernel config
     if bb.data.inherits_class('kernel-yocto', rd):
@@ -1503,17 +1475,14 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
         fragment_path = os.path.join(destdir, fragment_fn)
         if _create_kconfig_diff(srctree, rd, fragment_path):
             if os.path.exists(fragment_path):
-                if fragment_fn not in new_set:
-                    new_set.append(fragment_fn)
-                # Copy fragment to local-files
-                if os.path.isdir(local_files_dir):
-                    shutil.copy2(fragment_path, local_files_dir)
+                if fragment_fn in removed:
+                    del removed[fragment_fn]
+                if fragment_fn not in updated and fragment_fn not in added:
+                    added[fragment_fn] = {}
             else:
-                if fragment_fn in new_set:
-                    new_set.remove(fragment_fn)
-                # Remove fragment from local-files
-                if os.path.exists(os.path.join(local_files_dir, fragment_fn)):
-                    os.unlink(os.path.join(local_files_dir, fragment_fn))
+                if fragment_fn in updated:
+                    revoved[fragment_fn] = updated[fragment_fn]
+                    del updated[fragment_fn]
 
     # Special handling for cml1, ccmake, etc bbclasses that generated
     # configuration fragment files that are consumed as source files
@@ -1521,42 +1490,13 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
         if bb.data.inherits_class(frag_class, rd):
             srcpath = os.path.join(rd.getVar('WORKDIR'), frag_name)
             if os.path.exists(srcpath):
-                if frag_name not in new_set:
-                    new_set.append(frag_name)
+                if frag_name in removed:
+                    del removed[frag_name]
+                if frag_name not in updated:
+                    added[frag_name] = {}
                 # copy fragment into destdir
                 shutil.copy2(srcpath, destdir)
-                # copy fragment into local files if exists
-                if os.path.isdir(local_files_dir):
-                    shutil.copy2(srcpath, local_files_dir)
 
-    if new_set is not None:
-        for fname in new_set:
-            if fname in existing_files:
-                origpath = existing_files.pop(fname)
-                workpath = os.path.join(local_files_dir, fname)
-                if not filecmp.cmp(origpath, workpath):
-                    updated[fname] = origpath
-            elif fname != '.gitignore':
-                added[fname] = None
-
-        workdir = rd.getVar('WORKDIR')
-        s = rd.getVar('S')
-        if not s.endswith(os.sep):
-            s += os.sep
-
-        if workdir != s:
-            # Handle files where subdir= was specified
-            for fname in list(existing_files.keys()):
-                # FIXME handle both subdir starting with BP and not?
-                fworkpath = os.path.join(workdir, fname)
-                if fworkpath.startswith(s):
-                    fpath = os.path.join(srctree, os.path.relpath(fworkpath, s))
-                    if os.path.exists(fpath):
-                        origpath = existing_files.pop(fname)
-                        if not filecmp.cmp(origpath, fpath):
-                            updated[fpath] = origpath
-
-        removed = existing_files
     return (updated, added, removed)
 
 
@@ -1640,7 +1580,8 @@ def _update_recipe_srcrev(recipename, workspace, srctree, rd, appendlayerdir, wi
                     redirect_output=dry_run_outdir)
         else:
             files_dir = _determine_files_dir(rd)
-            for basepath, path in upd_f.items():
+            for basepath, param in upd_f.items():
+                path = param['path']
                 logger.info('Updating file %s%s' % (basepath, dry_run_suffix))
                 if os.path.isabs(basepath):
                     # Original file (probably with subdir pointing inside source tree)
@@ -1650,7 +1591,8 @@ def _update_recipe_srcrev(recipename, workspace, srctree, rd, appendlayerdir, wi
                     _move_file(os.path.join(local_files_dir, basepath), path,
                                dry_run_outdir=dry_run_outdir, base_outdir=recipedir)
                 update_srcuri= True
-            for basepath, path in new_f.items():
+            for basepath, param in new_f.items():
+                path = param['path']
                 logger.info('Adding new file %s%s' % (basepath, dry_run_suffix))
                 _move_file(os.path.join(local_files_dir, basepath),
                            os.path.join(files_dir, basepath),
@@ -1772,7 +1714,8 @@ def _update_recipe_patch(recipename, workspace, srctree, rd, appendlayerdir, wil
         else:
             # Update existing files
             files_dir = _determine_files_dir(rd)
-            for basepath, path in upd_f.items():
+            for basepath, param in upd_f.items():
+                path = param['path']
                 logger.info('Updating file %s' % basepath)
                 if os.path.isabs(basepath):
                     # Original file (probably with subdir pointing inside source tree)
@@ -1806,7 +1749,7 @@ def _update_recipe_patch(recipename, workspace, srctree, rd, appendlayerdir, wil
                            dry_run_outdir=dry_run_outdir, base_outdir=recipedir)
                 updatefiles = True
             # Add any new files
-            for basepath, path in new_f.items():
+            for basepath, param in new_f.items():
                 logger.info('Adding new file %s%s' % (basepath, dry_run_suffix))
                 _move_file(os.path.join(local_files_dir, basepath),
                            os.path.join(files_dir, basepath),

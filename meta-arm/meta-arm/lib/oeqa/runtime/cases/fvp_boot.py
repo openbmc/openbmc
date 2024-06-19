@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: MIT
 
 from oeqa.runtime.case import OERuntimeTestCase
-import pexpect
-
 
 class FVPBootTest(OERuntimeTestCase):
     """
@@ -11,6 +9,8 @@ class FVPBootTest(OERuntimeTestCase):
     """
 
     def test_fvp_boot(self):
+        import pexpect
+
         self.target.transition("off")
         timeout = int(self.td.get('TEST_FVP_LINUX_BOOT_TIMEOUT') or 10*60)
         self.target.transition("linux", timeout)

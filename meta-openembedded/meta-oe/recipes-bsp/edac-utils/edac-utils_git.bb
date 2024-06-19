@@ -48,7 +48,7 @@ RDEPENDS:${PN}:append = " \
 
 do_install:append() {
 	install -d ${D}${systemd_unitdir}/system
-	install -m 644 ${WORKDIR}/edac.service ${D}/${systemd_unitdir}/system
+	install -m 644 ${UNPACKDIR}/edac.service ${D}/${systemd_unitdir}/system
 	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}/${systemd_unitdir}/system/edac.service
 }
 

@@ -1,7 +1,7 @@
-From a965129153a0cca340535fe2cf99dbfef9b557da Mon Sep 17 00:00:00 2001
+From 1ba2a22575c1b73b5ab09e040a00f370eca4b758 Mon Sep 17 00:00:00 2001
 From: Julian Hall <julian.hall@arm.com>
 Date: Tue, 12 Oct 2021 15:45:41 +0100
-Subject: [PATCH 1/6] Add stub capsule update service components
+Subject: [PATCH 1/8] Add stub capsule update service components
 
 To facilitate development of a capsule update service provider,
 stub components are added to provide a starting point for an
@@ -15,7 +15,7 @@ Change-Id: I0d4049bb4de5af7ca80806403301692507085d28
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 ---
  .../backend/capsule_update_backend.h          |  24 ++++
- .../provider/capsule_update_provider.c        | 133 ++++++++++++++++++
+ .../provider/capsule_update_provider.c        | 135 ++++++++++++++++++
  .../provider/capsule_update_provider.h        |  51 +++++++
  .../capsule_update/provider/component.cmake   |  13 ++
  .../se-proxy/infra/corstone1000/infra.cmake   |   1 +
@@ -23,7 +23,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  .../capsule_update/capsule_update_proto.h     |  13 ++
  protocols/service/capsule_update/opcodes.h    |  17 +++
  protocols/service/capsule_update/parameters.h |  15 ++
- 9 files changed, 272 insertions(+), 4 deletions(-)
+ 9 files changed, 274 insertions(+), 4 deletions(-)
  create mode 100644 components/service/capsule_update/backend/capsule_update_backend.h
  create mode 100644 components/service/capsule_update/provider/capsule_update_provider.c
  create mode 100644 components/service/capsule_update/provider/capsule_update_provider.h
@@ -34,7 +34,7 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 
 diff --git a/components/service/capsule_update/backend/capsule_update_backend.h b/components/service/capsule_update/backend/capsule_update_backend.h
 new file mode 100644
-index 000000000000..f3144ff1d7d5
+index 000000000..f3144ff1d
 --- /dev/null
 +++ b/components/service/capsule_update/backend/capsule_update_backend.h
 @@ -0,0 +1,24 @@
@@ -64,10 +64,10 @@ index 000000000000..f3144ff1d7d5
 +#endif /* CAPSULE_UPDATE_BACKEND_H */
 diff --git a/components/service/capsule_update/provider/capsule_update_provider.c b/components/service/capsule_update/provider/capsule_update_provider.c
 new file mode 100644
-index 000000000000..e133753f8560
+index 000000000..f35c272d2
 --- /dev/null
 +++ b/components/service/capsule_update/provider/capsule_update_provider.c
-@@ -0,0 +1,133 @@
+@@ -0,0 +1,135 @@
 +/*
 + * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
 + *
@@ -92,8 +92,8 @@ index 000000000000..e133753f8560
 +};
 +
 +/* Service request handlers */
-+static rpc_status_t update_capsule_handler(void *context, struct call_req *req);
-+static rpc_status_t boot_confirmed_handler(void *context, struct call_req *req);
++static rpc_status_t update_capsule_handler(void *context, struct rpc_request *req);
++static rpc_status_t boot_confirmed_handler(void *context, struct rpc_request *req);
 +
 +/* Handler mapping table for service */
 +static const struct service_handler handler_table[] = {
@@ -101,21 +101,23 @@ index 000000000000..e133753f8560
 +	{CAPSULE_UPDATE_OPCODE_BOOT_CONFIRMED,			boot_confirmed_handler}
 +};
 +
-+struct rpc_interface *capsule_update_provider_init(
++struct rpc_service_interface *capsule_update_provider_init(
 +	struct capsule_update_provider *context)
 +{
-+	struct rpc_interface *rpc_interface = NULL;
++	struct rpc_service_interface *rpc_interface = NULL;
++	const struct rpc_uuid dummy_uuid = { .uuid = { 0 }};
++	if (!context)
++		return NULL;
 +
-+	if (context) {
++	service_provider_init(
++		&context->base_provider,
++		context,
++		&dummy_uuid,
++		handler_table,
++		sizeof(handler_table)/sizeof(struct service_handler));
 +
-+		service_provider_init(
-+			&context->base_provider,
-+			context,
-+			handler_table,
-+			sizeof(handler_table)/sizeof(struct service_handler));
++	rpc_interface = service_provider_get_rpc_interface(&context->base_provider);
 +
-+		rpc_interface = service_provider_get_rpc_interface(&context->base_provider);
-+	}
 +
 +	return rpc_interface;
 +}
@@ -125,7 +127,7 @@ index 000000000000..e133753f8560
 +	(void)context;
 +}
 +
-+static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller *caller)
++static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller_interface *caller)
 +{
 +	uint32_t ioctl_id;
 +	psa_handle_t handle;
@@ -179,10 +181,10 @@ index 000000000000..e133753f8560
 +
 +}
 +
-+static rpc_status_t update_capsule_handler(void *context, struct call_req *req)
++static rpc_status_t update_capsule_handler(void *context, struct rpc_request *req)
 +{
 +	struct capsule_update_provider *this_instance = (struct capsule_update_provider*)context;
-+	struct rpc_caller *caller = this_instance->client.caller;
++	struct rpc_caller_interface *caller = this_instance->client.session->caller;
 +	uint32_t opcode = req->opcode;
 +	rpc_status_t rpc_status = TS_RPC_ERROR_NOT_READY;
 +
@@ -190,10 +192,10 @@ index 000000000000..e133753f8560
 +	return rpc_status;
 +}
 +
-+static rpc_status_t boot_confirmed_handler(void *context, struct call_req *req)
++static rpc_status_t boot_confirmed_handler(void *context, struct rpc_request *req)
 +{
 +	struct capsule_update_provider *this_instance = (struct capsule_update_provider*)context;
-+	struct rpc_caller *caller = this_instance->client.caller;
++	struct rpc_caller_interface *caller = this_instance->client.session->caller;
 +	uint32_t opcode = req->opcode;
 +	rpc_status_t rpc_status = TS_RPC_ERROR_NOT_READY;
 +
@@ -203,7 +205,7 @@ index 000000000000..e133753f8560
 +}
 diff --git a/components/service/capsule_update/provider/capsule_update_provider.h b/components/service/capsule_update/provider/capsule_update_provider.h
 new file mode 100644
-index 000000000000..3de49854ea90
+index 000000000..5dc5535d6
 --- /dev/null
 +++ b/components/service/capsule_update/provider/capsule_update_provider.h
 @@ -0,0 +1,51 @@
@@ -216,7 +218,7 @@ index 000000000000..3de49854ea90
 +#ifndef CAPSULE_UPDATE_PROVIDER_H
 +#define CAPSULE_UPDATE_PROVIDER_H
 +
-+#include <rpc/common/endpoint/rpc_interface.h>
++#include <rpc/common/endpoint/rpc_service_interface.h>
 +#include <service/common/provider/service_provider.h>
 +#include <service/common/client/service_client.h>
 +#include <service/capsule_update/backend/capsule_update_backend.h>
@@ -240,9 +242,9 @@ index 000000000000..3de49854ea90
 + *
 + * @param[in] context The instance to initialize
 + *
-+ * \return An rpc_interface or NULL on failure
++ * \return An rpc_service_interface or NULL on failure
 + */
-+struct rpc_interface *capsule_update_provider_init(
++struct rpc_service_interface *capsule_update_provider_init(
 +	struct capsule_update_provider *context);
 +
 +/**
@@ -260,7 +262,7 @@ index 000000000000..3de49854ea90
 +#endif /* CAPSULE_UPDATE_PROVIDER_H */
 diff --git a/components/service/capsule_update/provider/component.cmake b/components/service/capsule_update/provider/component.cmake
 new file mode 100644
-index 000000000000..1d412eb234d9
+index 000000000..1d412eb23
 --- /dev/null
 +++ b/components/service/capsule_update/provider/component.cmake
 @@ -0,0 +1,13 @@
@@ -278,7 +280,7 @@ index 000000000000..1d412eb234d9
 +	"${CMAKE_CURRENT_LIST_DIR}/capsule_update_provider.c"
 +	)
 diff --git a/deployments/se-proxy/infra/corstone1000/infra.cmake b/deployments/se-proxy/infra/corstone1000/infra.cmake
-index 4e7e2bd58028..e60b5400617f 100644
+index a52a1b711..4658c9662 100644
 --- a/deployments/se-proxy/infra/corstone1000/infra.cmake
 +++ b/deployments/se-proxy/infra/corstone1000/infra.cmake
 @@ -21,6 +21,7 @@ add_components(TARGET "se-proxy"
@@ -290,7 +292,7 @@ index 4e7e2bd58028..e60b5400617f 100644
  )
  
 diff --git a/deployments/se-proxy/se_proxy_interfaces.h b/deployments/se-proxy/se_proxy_interfaces.h
-index 48908f846990..3d4a7c204785 100644
+index 48908f846..3d4a7c204 100644
 --- a/deployments/se-proxy/se_proxy_interfaces.h
 +++ b/deployments/se-proxy/se_proxy_interfaces.h
 @@ -8,9 +8,10 @@
@@ -310,7 +312,7 @@ index 48908f846990..3d4a7c204785 100644
  #endif /* SE_PROXY_INTERFACES_H */
 diff --git a/protocols/service/capsule_update/capsule_update_proto.h b/protocols/service/capsule_update/capsule_update_proto.h
 new file mode 100644
-index 000000000000..8f326cd387fb
+index 000000000..8f326cd38
 --- /dev/null
 +++ b/protocols/service/capsule_update/capsule_update_proto.h
 @@ -0,0 +1,13 @@
@@ -329,7 +331,7 @@ index 000000000000..8f326cd387fb
 +#endif /* CAPSULE_UPDATE_PROTO_H */
 diff --git a/protocols/service/capsule_update/opcodes.h b/protocols/service/capsule_update/opcodes.h
 new file mode 100644
-index 000000000000..8185a0902378
+index 000000000..8185a0902
 --- /dev/null
 +++ b/protocols/service/capsule_update/opcodes.h
 @@ -0,0 +1,17 @@
@@ -352,7 +354,7 @@ index 000000000000..8185a0902378
 +#endif /* CAPSULE_UPDATE_OPCODES_H */
 diff --git a/protocols/service/capsule_update/parameters.h b/protocols/service/capsule_update/parameters.h
 new file mode 100644
-index 000000000000..285d924186be
+index 000000000..285d92418
 --- /dev/null
 +++ b/protocols/service/capsule_update/parameters.h
 @@ -0,0 +1,15 @@
@@ -372,5 +374,5 @@ index 000000000000..285d924186be
 +
 +#endif /* CAPSULE_UPDATE_PARAMETERS_H */
 -- 
-2.40.0
+2.25.1
 

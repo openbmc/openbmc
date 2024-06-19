@@ -138,14 +138,20 @@ class StreamServer(object):
 
 
 class TCPStreamServer(StreamServer):
-    def __init__(self, host, port, handler, logger):
+    def __init__(self, host, port, handler, logger, *, reuseport=False):
         super().__init__(handler, logger)
         self.host = host
         self.port = port
+        self.reuseport = reuseport
 
     def start(self, loop):
         self.server = loop.run_until_complete(
-            asyncio.start_server(self.handle_stream_client, self.host, self.port)
+            asyncio.start_server(
+                self.handle_stream_client,
+                self.host,
+                self.port,
+                reuse_port=self.reuseport,
+            )
         )
 
         for s in self.server.sockets:
@@ -209,11 +215,12 @@ class UnixStreamServer(StreamServer):
 
 
 class WebsocketsServer(object):
-    def __init__(self, host, port, handler, logger):
+    def __init__(self, host, port, handler, logger, *, reuseport=False):
         self.host = host
         self.port = port
         self.handler = handler
         self.logger = logger
+        self.reuseport = reuseport
 
     def start(self, loop):
         import websockets.server
@@ -224,6 +231,7 @@ class WebsocketsServer(object):
                 self.host,
                 self.port,
                 ping_interval=None,
+                reuse_port=self.reuseport,
             )
         )
 
@@ -262,14 +270,26 @@ class AsyncServer(object):
         self.loop = None
         self.run_tasks = []
 
-    def start_tcp_server(self, host, port):
-        self.server = TCPStreamServer(host, port, self._client_handler, self.logger)
+    def start_tcp_server(self, host, port, *, reuseport=False):
+        self.server = TCPStreamServer(
+            host,
+            port,
+            self._client_handler,
+            self.logger,
+            reuseport=reuseport,
+        )
 
     def start_unix_server(self, path):
         self.server = UnixStreamServer(path, self._client_handler, self.logger)
 
-    def start_websocket_server(self, host, port):
-        self.server = WebsocketsServer(host, port, self._client_handler, self.logger)
+    def start_websocket_server(self, host, port, reuseport=False):
+        self.server = WebsocketsServer(
+            host,
+            port,
+            self._client_handler,
+            self.logger,
+            reuseport=reuseport,
+        )
 
     async def _client_handler(self, socket):
         address = socket.address
@@ -368,8 +388,7 @@ class AsyncServer(object):
 
             self._serve_forever(tasks)
 
-            if sys.version_info >= (3, 6):
-                self.loop.run_until_complete(self.loop.shutdown_asyncgens())
+            self.loop.run_until_complete(self.loop.shutdown_asyncgens())
             self.loop.close()
 
         queue = multiprocessing.Queue()

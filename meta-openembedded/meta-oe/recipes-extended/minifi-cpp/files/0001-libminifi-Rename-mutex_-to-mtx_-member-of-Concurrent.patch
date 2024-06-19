@@ -1,0 +1,37 @@
+From cd2b5362fe2e63dff3666ce72da27979fe06a519 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 May 2024 22:24:52 -0700
+Subject: [PATCH] libminifi: Rename mutex_ to mtx_ member of ConcurrentQueue
+
+Fixes
+libminifi/include/utils/MinifiConcurrentQueue.h:48:75: error: no member named 'mutex_' in 'ConcurrentQueue<T>'; did you mean 'mtx_'?
+|    48 |     : ConcurrentQueue(std::move(other), std::lock_guard<std::mutex>(other.mutex_)) {}
+|       |                                                                           ^~~~~~
+|       |                                                                           mtx_
+| libminifi/include/utils/MinifiConcurrentQueue.h:140:22: note: 'mtx_' declared here
+|   140 |   mutable std::mutex mtx_;
+|       |                      ^
+| 1 error generated.
+
+Upstream-Status: Submitted [https://github.com/apache/nifi-minifi-cpp/pull/1803]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libminifi/include/utils/MinifiConcurrentQueue.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libminifi/include/utils/MinifiConcurrentQueue.h b/libminifi/include/utils/MinifiConcurrentQueue.h
+index 8abc0ec93..1db58080b 100644
+--- a/libminifi/include/utils/MinifiConcurrentQueue.h
++++ b/libminifi/include/utils/MinifiConcurrentQueue.h
+@@ -45,7 +45,7 @@ class ConcurrentQueue {
+   ConcurrentQueue(const ConcurrentQueue& other) = delete;
+   ConcurrentQueue& operator=(const ConcurrentQueue& other) = delete;
+   ConcurrentQueue(ConcurrentQueue&& other)
+-    : ConcurrentQueue(std::move(other), std::lock_guard<std::mutex>(other.mutex_)) {}
++    : ConcurrentQueue(std::move(other), std::lock_guard<std::mutex>(other.mtx_)) {}
+ 
+   ConcurrentQueue& operator=(ConcurrentQueue&& other) {
+     if (this != &other) {
+-- 
+2.45.1
+

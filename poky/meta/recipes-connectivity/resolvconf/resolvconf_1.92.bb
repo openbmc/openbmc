@@ -29,7 +29,7 @@ do_compile () {
 
 do_install () {
 	install -d ${D}${sysconfdir}/default/volatiles
-	install -m 0644 ${WORKDIR}/99_resolvconf ${D}${sysconfdir}/default/volatiles
+	install -m 0644 ${UNPACKDIR}/99_resolvconf ${D}${sysconfdir}/default/volatiles
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		install -d ${D}${sysconfdir}/tmpfiles.d
 		echo "d /run/${BPN}/interface - - - -" \

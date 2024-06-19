@@ -70,27 +70,30 @@ cannot be split without infringing syntactic rules
 or reducing readability, as well as for command output
 which should be kept unmodified.
 
-### Project names
-
-Project names should be capitalized in the same
-way they are on Wikipedia, in particular:
-
-* BitBake
-* OpenEmbedded
-
-There are exceptions in which such names can be used
-in lower case:
-
-* When referring to a package name
-* When referring to the corresponding command name
-* When used in a cross-reference title. Such
-  titles are usually in lower case.
-
 ### File, tool and command names
 
-File, tool and command names should be double tick-quoted.
+File, tool, command and package names should be double tick-quoted.
 For example, ``` ``conf/local.conf`` ``` is preferred over
 `"conf/local.conf"`.
+
+### Project names
+
+Project names should be introduced with single quotes, to have them rendered
+with an italic font and make them easier to distinguish from command names
+(double tick-quoted) and from regular English words.
+
+An exception is when project names appear in hyperlinks, as nested markup
+is not supported by Sphinx yet.
+
+Project names should also be capitalized (or not) in the same way they are on
+Wikipedia, or on their own project pages if they are not described on
+Wikipedia. If a project name isn't capitalized, it should remain so even
+at the beginning of a sentence.
+
+For example:
+
+* ``` `BitBake` ```
+* ``` `ftrace` ```
 
 ### Variables
 

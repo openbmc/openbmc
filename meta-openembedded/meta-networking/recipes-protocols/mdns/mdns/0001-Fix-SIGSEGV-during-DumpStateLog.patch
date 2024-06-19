@@ -1,4 +1,4 @@
-From 14cc53bb09a3d8adf301f3842c765598467e63e1 Mon Sep 17 00:00:00 2001
+From 2db1f5bc941e4b4cd1721e361a47cfe288b07a76 Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Thu, 1 Feb 2024 14:07:03 +0000
 Subject: [PATCH] Fix SIGSEGV during DumpStateLog()
@@ -25,6 +25,3 @@ index 7a4ca19eff6d..d449dde320f6 100644
      {
          return;
      }
--- 
-2.39.0
-

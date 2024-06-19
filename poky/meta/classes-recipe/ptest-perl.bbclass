@@ -13,7 +13,7 @@ SRC_URI += "file://ptest-perl/run-ptest"
 do_install_ptest_perl() {
 	install -d ${D}${PTEST_PATH}
 	if [ ! -f ${D}${PTEST_PATH}/run-ptest ]; then
-		install -m 0755 ${WORKDIR}/ptest-perl/run-ptest ${D}${PTEST_PATH}
+		install -m 0755 ${UNPACKDIR}/ptest-perl/run-ptest ${D}${PTEST_PATH}
 	fi
 	cp -r ${B}/t ${D}${PTEST_PATH}
 	chown -R root:root ${D}${PTEST_PATH}

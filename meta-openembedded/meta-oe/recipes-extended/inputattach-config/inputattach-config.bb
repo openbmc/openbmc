@@ -8,5 +8,5 @@ do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
 do_install() {
-    install -Dm 0644 ${WORKDIR}/inputattach.conf ${D}${sysconfdir}/inputattach.conf
+    install -Dm 0644 ${UNPACKDIR}/inputattach.conf ${D}${sysconfdir}/inputattach.conf
 }

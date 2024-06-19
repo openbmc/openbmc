@@ -1,0 +1,23 @@
+From 4c8f95fedecbc590eb7cd98aaf97912fa36b8f2e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Jun 2024 23:58:36 -0700
+Subject: [PATCH] efi/generate_binary.py: Use env to detect python3
+
+This enables python3 from native sysroot correctly
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ efi/generate_binary.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/efi/generate_binary.py b/efi/generate_binary.py
+index 443472a..a4611bb 100755
+--- a/efi/generate_binary.py
++++ b/efi/generate_binary.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python3
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2021 Javier Martinez Canillas <javierm@redhat.com>
+ # Copyright (C) 2021 Richard Hughes <richard@hughsie.com>

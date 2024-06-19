@@ -8,13 +8,14 @@ i.e. when lt_sysroot is not set, it will still behave the same and add
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00017.html]
+Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00017.html]
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/libtool.git/commit/?id=3221f9f0fb98d5740ab5d0e8db6a731302520644]
 
-diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
-index f884824..25a91de 100644
---- a/build-aux/ltmain.in
-+++ b/build-aux/ltmain.in
-@@ -6503,7 +6503,7 @@ func_mode_link ()
+Index: libtool-2.5.0/build-aux/ltmain.in
+===================================================================
+--- libtool-2.5.0.orig/build-aux/ltmain.in
++++ libtool-2.5.0/build-aux/ltmain.in
+@@ -6514,7 +6514,7 @@ func_mode_link ()
  	      fi
  	    else
  	      # We cannot seem to hardcode it, guess we'll fake it.
@@ -23,6 +24,3 @@ index f884824..25a91de 100644
  	      # Try looking first in the location we're being installed to.
  	      if test -n "$inst_prefix_dir"; then
  		case $libdir in
--- 
-2.25.1
-

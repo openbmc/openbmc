@@ -1,0 +1,44 @@
+Fix incompatible pointer type error when gcc option '-Wincompatible-pointer-types' set:
+
+cdrkit-1.1.11/genisoimage/eltorito.c:399:41: error: passing argument 1 of 'set_721' from incompatible pointer type [-Wincompatible-pointer-types]
+  399 |                                 set_721(&last_section_header->entry_count, nentries);
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                         |
+      |                                         char (*)[2]
+In file included from cdrkit/1.1.11/cdrkit-1.1.11/genisoimage/eltorito.c:39:
+cdrkit-1.1.11/genisoimage/genisoimage.h:507:21: note: expected 'char *' but argument is of type 'char (*)[2]'
+  507 | extern void set_721(char *, unsigned int);
+      |                     ^~~~~~
+
+Upstream-Status: Inactive-Upstream [lastrelease: 2010]
+
+[1]: https://en.wikipedia.org/wiki/Cdrkit
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ genisoimage/eltorito.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/genisoimage/eltorito.c b/genisoimage/eltorito.c
+index a804988..e48d58c 100644
+--- a/genisoimage/eltorito.c
++++ b/genisoimage/eltorito.c
+@@ -396,7 +396,7 @@ get_torito_desc(struct eltorito_boot_descriptor *boot_desc)
+ 			    (arch != newarch) ||
+ 			    (current_boot_entry->type & ELTORITO_SECTION_HEADER)) {
+ 			if (last_section_header)
+-				set_721(&last_section_header->entry_count, nentries);
++				set_721((char *)(&last_section_header->entry_count), nentries);
+ 			nentries = 1;
+ 			last_section_header = (struct eltorito_sectionheader_entry *)
+ 							(de2->table + offset);
+@@ -419,7 +419,7 @@ get_torito_desc(struct eltorito_boot_descriptor *boot_desc)
+ 	}
+ 
+ 	if (last_section_header) {
+-		set_721(&last_section_header->entry_count, nentries);
++		set_721((char *)(&last_section_header->entry_count), nentries);
+ 		last_section_header->header_id[0] = EL_TORITO_SHDR_ID_LAST_SHDR;
+ 	}
+ 

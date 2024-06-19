@@ -26,9 +26,9 @@ ourversion = None
 if len(sys.argv) == 2:
     ourversion = sys.argv[1]
 
-activereleases = ["nanbield", "kirkstone", "dunfell"]
-devbranch = "scarthgap"
-ltsseries = ["kirkstone", "dunfell"]
+activereleases = ["scarthgap", "nanbield", "kirkstone", "dunfell"]
+devbranch = "styhead"
+ltsseries = ["scarthgap", "kirkstone", "dunfell"]
 
 # used by run-docs-builds to get the default page
 if ourversion == "getlatest":
@@ -36,6 +36,7 @@ if ourversion == "getlatest":
     sys.exit(0)
 
 release_series = collections.OrderedDict()
+release_series["styhead"] = "5.1"
 release_series["scarthgap"] = "5.0"
 release_series["nanbield"] = "4.3"
 release_series["mickledore"] = "4.2"
@@ -68,6 +69,7 @@ release_series["laverne"] = "0.9"
 
 
 bitbake_mapping = {
+    "styhead" : "2.10",
     "scarthgap" : "2.8",
     "nanbield" : "2.6",
     "mickledore" : "2.4",

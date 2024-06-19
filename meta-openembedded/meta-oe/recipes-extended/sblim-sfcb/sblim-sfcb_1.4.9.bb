@@ -64,7 +64,7 @@ do_install() {
     oe_runmake DESTDIR=${D} install
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/sfcb.service ${D}${systemd_unitdir}/system/sblim-sfcb.service
+    install -m 0644 ${UNPACKDIR}/sfcb.service ${D}${systemd_unitdir}/system/sblim-sfcb.service
 
     install -d ${D}${sysconfdir}/init.d
     mv ${D}${sysconfdir}/init.d/sfcb ${D}${sysconfdir}/init.d/sblim-sfcb

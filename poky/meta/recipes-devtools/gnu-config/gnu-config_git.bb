@@ -24,7 +24,7 @@ do_compile[noexec] = "1"
 do_install () {
 	install -d ${D}${datadir}/gnu-config \
 		   ${D}${bindir}
-	cat ${WORKDIR}/gnu-configize.in | \
+	cat ${UNPACKDIR}/gnu-configize.in | \
 		sed -e 's,@gnu-configdir@,${datadir}/gnu-config,g' \
 		    -e 's,@autom4te_perllibdir@,${datadir}/autoconf,g' > ${D}${bindir}/gnu-configize
 	# In the native case we want the system perl as perl-native can't have built yet

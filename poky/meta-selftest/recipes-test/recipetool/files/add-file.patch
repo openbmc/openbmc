@@ -1,3 +1,5 @@
+Upstream-Status: Inappropriate [Test artefact]
+
 diff --git a/file2 b/file2
 new file mode 100644
 index 0000000..049b42e

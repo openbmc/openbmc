@@ -108,32 +108,9 @@ generated with DocBook.
 How to build the Yocto Project documentation
 ============================================
 
-Sphinx is written in Python. While it might work with Python2, for
-obvious reasons, we will only support building the Yocto Project
-documentation with Python3.
-
-Sphinx might be available in your Linux distro packages repositories,
-however it is not recommended to use distro packages, as they might be
-old versions, especially if you are using an LTS version of your
-distro. The recommended method to install the latest versions of Sphinx
-and of its required dependencies is to use the Python Package Index (pip).
-
-To install all required packages run:
-
- $ pip3 install sphinx sphinx_rtd_theme pyyaml
-
-To make sure you always have the latest versions of such packages, you
-should regularly run the same command with an added "--upgrade" option:
-
- $ pip3 install --upgrade sphinx sphinx_rtd_theme pyyaml
-
-Also install the "inkscape" package from your distribution.
-Inkscape is need to convert SVG graphics to PNG (for EPUB
-export) and to PDF (for PDF export).
-
-Additionally install "fncychap.sty" TeX font if you want to build PDFs. Debian
-and Ubuntu have it in "texlive-latex-extra" package while RedHat distributions
-and OpenSUSE have it in "texlive-fncychap" package for example.
+To build the documentation, you need Sphinx and a few other packages,
+which depend on your host GNU/Linux distribution. Such packages are listed on
+https://docs.yoctoproject.org/dev/ref-manual/system-requirements.html#required-packages-for-the-build-host
 
 To build the documentation locally, run:
 

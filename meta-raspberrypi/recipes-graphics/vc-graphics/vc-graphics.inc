@@ -33,10 +33,10 @@ do_install () {
   cp -R include/* ${D}${includedir}
 
   install -d ${D}${libdir}/pkgconfig
-  install -m 0644 ${WORKDIR}/egl.pc ${D}${libdir}/pkgconfig/
+  install -m 0644 ${UNPACKDIR}/egl.pc ${D}${libdir}/pkgconfig/
 
   install -d ${D}/${sysconfdir}/init.d
-  install -m 0755 ${WORKDIR}/vchiq.sh ${D}${sysconfdir}/init.d/
+  install -m 0755 ${UNPACKDIR}/vchiq.sh ${D}${sysconfdir}/init.d/
 }
 
 # These are proprietary binaries generated elsewhere so don't check ldflags

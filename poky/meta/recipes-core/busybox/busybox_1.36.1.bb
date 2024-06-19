@@ -2,7 +2,6 @@ require busybox.inc
 
 SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-depmod-Ignore-.debug-directories.patch \
-           file://busybox-udhcpc-no_deconfig.patch \
            file://find-touchscreen.sh \
            file://busybox-cron \
            file://busybox-httpd \

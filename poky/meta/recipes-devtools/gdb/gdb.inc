@@ -10,7 +10,6 @@ SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
            file://0003-Dont-disable-libreadline.a-when-using-disable-static.patch \
            file://0004-use-asm-sgidefs.h.patch \
            file://0005-Change-order-of-CFLAGS.patch \
-           file://0006-resolve-restrict-keyword-conflict.patch \
            file://0007-Fix-invalid-sigprocmask-call.patch \
            file://0008-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch \
            "

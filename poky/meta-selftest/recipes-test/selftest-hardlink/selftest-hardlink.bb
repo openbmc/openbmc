@@ -6,7 +6,8 @@ SRC_URI = "file://hello.c \
            file://gdb.sh \
 "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_compile () {
 	${CC} hello.c -o hello1 ${CFLAGS} ${LDFLAGS}
@@ -14,7 +15,7 @@ do_compile () {
 
 do_install () {
 	install -d ${D}${bindir}
-	install -m 755 ${WORKDIR}/gdb.sh ${D}${bindir}/
+	install -m 755 ${S}/gdb.sh ${D}${bindir}/
 	install -m 755 hello1 ${D}${bindir}/hello1
 	ln ${D}${bindir}/hello1 ${D}${bindir}/hello2
 

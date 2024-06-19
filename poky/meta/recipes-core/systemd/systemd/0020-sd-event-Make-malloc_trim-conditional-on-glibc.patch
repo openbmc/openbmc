@@ -1,7 +1,7 @@
-From 9eb4867b4e2dbdb2484ae854022aff97e2f0feb3 Mon Sep 17 00:00:00 2001
+From 751fb8c9a05115f5329cfa25e69afe7657124c20 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 2 Aug 2023 12:06:27 -0700
-Subject: [PATCH 20/22] sd-event: Make malloc_trim() conditional on glibc
+Subject: [PATCH] sd-event: Make malloc_trim() conditional on glibc
 
 musl does not have this API
 
@@ -12,7 +12,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/libsystemd/sd-event/sd-event.c b/src/libsystemd/sd-event/sd-event.c
-index 288798a0dc..6419a7f216 100644
+index b6899df192..0c03287004 100644
 --- a/src/libsystemd/sd-event/sd-event.c
 +++ b/src/libsystemd/sd-event/sd-event.c
 @@ -1874,7 +1874,7 @@ _public_ int sd_event_add_exit(
@@ -34,6 +34,3 @@ index 288798a0dc..6419a7f216 100644
          usec_t after_timestamp = now(CLOCK_MONOTONIC);
  
          if (r > 0)
--- 
-2.34.1
-

@@ -194,8 +194,23 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         parser.add_argument('-R', '--skip-tests', required=False, action='store',
                 nargs='+', dest="skips", default=None,
                 help='Skip the tests specified. Format should be <module>[.<class>[.<test_method>]]')
+
+        def check_parallel_support(parameter):
+            if not parameter.isdigit():
+                import argparse
+                raise argparse.ArgumentTypeError("argument -j/--num-processes: invalid int value: '%s' " % str(parameter))
+
+            processes = int(parameter)
+            if processes:
+                try:
+                    import testtools, subunit
+                except ImportError:
+                    print("Failed to import testtools or subunit, the testcases will run serially")
+                    processes = None
+            return processes
+
         parser.add_argument('-j', '--num-processes', dest='processes', action='store',
-                type=int, help="number of processes to execute in parallel with")
+                type=check_parallel_support, help="number of processes to execute in parallel with")
 
         parser.add_argument('-t', '--select-tag', dest="select_tags",
                 action='append', default=None,

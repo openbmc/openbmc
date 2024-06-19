@@ -25,7 +25,7 @@ def create_artifacts_directory(d, tc):
 def get_target_disk_usage(d, tc):
     output_file = os.path.join(get_json_result_dir(d), "artifacts", "target_disk_usage.txt")
     try:
-        (status, output) = tc.target.run('df -hl')
+        (status, output) = tc.target.run('df -h')
         with open(output_file, 'w') as f:
             f.write(output)
             f.write("\n")

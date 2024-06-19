@@ -1,4 +1,4 @@
-require recipes-bsp/uefi/edk2-firmware_202402.bb
+require recipes-bsp/uefi/edk2-firmware_202405.bb
 PROVIDES:remove = "virtual/bootloader"
 
 LICENSE += "& Apache-2.0"

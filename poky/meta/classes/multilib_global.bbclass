@@ -171,24 +171,23 @@ def preferred_ml_updates(d):
     d.appendVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS", " " + " ".join(extras))
 
 python multilib_virtclass_handler_vendor () {
-    if isinstance(e, bb.event.ConfigParsed):
-        for v in e.data.getVar("MULTILIB_VARIANTS").split():
-            if e.data.getVar("TARGET_VENDOR:virtclass-multilib-" + v, False) is None:
-                e.data.setVar("TARGET_VENDOR:virtclass-multilib-" + v, e.data.getVar("TARGET_VENDOR", False) + "ml" + v)
-        preferred_ml_updates(e.data)
+    for v in d.getVar("MULTILIB_VARIANTS").split():
+        if d.getVar("TARGET_VENDOR:virtclass-multilib-" + v, False) is None:
+            d.setVar("TARGET_VENDOR:virtclass-multilib-" + v, d.getVar("TARGET_VENDOR", False) + "ml" + v)
+    preferred_ml_updates(d)
 }
 addhandler multilib_virtclass_handler_vendor
 multilib_virtclass_handler_vendor[eventmask] = "bb.event.ConfigParsed"
 
 python multilib_virtclass_handler_global () {
-    variant = e.data.getVar("BBEXTENDVARIANT")
+    variant = d.getVar("BBEXTENDVARIANT")
     if variant:
         return
 
     non_ml_recipes = d.getVar('NON_MULTILIB_RECIPES').split()
 
-    if bb.data.inherits_class('kernel', e.data) or \
-            bb.data.inherits_class('module-base', e.data) or \
+    if bb.data.inherits_class('kernel', d) or \
+            bb.data.inherits_class('module-base', d) or \
             d.getVar('BPN') in non_ml_recipes:
 
             # We need to avoid expanding KERNEL_VERSION which we can do by deleting it
@@ -197,7 +196,7 @@ python multilib_virtclass_handler_global () {
             localdata.delVar("KERNEL_VERSION")
             localdata.delVar("KERNEL_VERSION_PKG_NAME")
 
-            variants = (e.data.getVar("MULTILIB_VARIANTS") or "").split()
+            variants = (d.getVar("MULTILIB_VARIANTS") or "").split()
 
             import oe.classextend
             clsextends = []
@@ -208,22 +207,22 @@ python multilib_virtclass_handler_global () {
             origprovs = provs = localdata.getVar("PROVIDES") or ""
             for clsextend in clsextends:
                 provs = provs + " " + clsextend.map_variable("PROVIDES", setvar=False)
-            e.data.setVar("PROVIDES", provs)
+            d.setVar("PROVIDES", provs)
 
             # Process RPROVIDES
             origrprovs = rprovs = localdata.getVar("RPROVIDES") or ""
             for clsextend in clsextends:
                 rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES", setvar=False)
             if rprovs.strip():
-                e.data.setVar("RPROVIDES", rprovs)
+                d.setVar("RPROVIDES", rprovs)
 
             # Process RPROVIDES:${PN}...
-            for pkg in (e.data.getVar("PACKAGES") or "").split():
+            for pkg in (d.getVar("PACKAGES") or "").split():
                 origrprovs = rprovs = localdata.getVar("RPROVIDES:%s" % pkg) or ""
                 for clsextend in clsextends:
                     rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES:%s" % pkg, setvar=False)
                     rprovs = rprovs + " " + clsextend.extname + "-" + pkg
-                e.data.setVar("RPROVIDES:%s" % pkg, rprovs)
+                d.setVar("RPROVIDES:%s" % pkg, rprovs)
 }
 
 addhandler multilib_virtclass_handler_global

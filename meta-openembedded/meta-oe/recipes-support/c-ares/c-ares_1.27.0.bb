@@ -5,7 +5,7 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=fdbc58a6da11a9f68aa73c453818decc"
 
-SRC_URI = "https://c-ares.org/download/${BPN}-${PV}.tar.gz \
+SRC_URI = "https://github.com/c-ares/c-ares/releases/download/cares-1_27_0/${BPN}-${PV}.tar.gz \
            file://run-ptest"
 SRC_URI[sha256sum] = "0a72be66959955c43e2af2fbd03418e82a2bd5464604ec9a62147e37aceb420b"
 
@@ -20,7 +20,7 @@ EXTRA_OECMAKE = "-DCARES_STATIC=${@ 'ON' if d.getVar('DISABLE_STATIC') == '' els
 do_install_ptest () {
 	install -d ${D}${PTEST_PATH}
 	install -m 0755 ${B}/bin/arestest ${D}${PTEST_PATH}
-	install -m 0755 ${WORKDIR}/run-ptest ${D}${PTEST_PATH}
+	install -m 0755 ${UNPACKDIR}/run-ptest ${D}${PTEST_PATH}
 }
 
 PACKAGE_BEFORE_PN = "${PN}-utils"

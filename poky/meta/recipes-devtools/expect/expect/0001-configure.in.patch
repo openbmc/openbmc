@@ -1,7 +1,7 @@
 Allow cross compiling.
 
 Signed-off-by: Anders Roxell <anders.roxell@enea.com>
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [no activity since 2018; cvs server went read-only]
 ---
 diff -uNr a/configure.in b/configure.in
 --- a/configure.in	2012-12-14 15:31:32.623180450 +0100

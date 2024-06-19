@@ -48,12 +48,12 @@ RDEPENDS:${PN}-bin = " \
 
 FILES:${PN} += " \
     ${datadir}/geisview \
-    ${libdir}/${PYTHON_DIR}/site-packages/geis* \
-    ${libdir}/${PYTHON_DIR}/site-packages/_*.so \
+    ${PYTHON_SITEPACKAGES_DIR}/geis* \
+    ${PYTHON_SITEPACKAGES_DIR}/_*.so \
 "
 
-FILES:${PN}-dbg += "${libdir}/${PYTHON_DIR}/site-packages/.debug"
+FILES:${PN}-dbg += "${PYTHON_SITEPACKAGES_DIR}/.debug"
 
-FILES:${PN}-dev += "${libdir}/${PYTHON_DIR}/site-packages/_*.la"
+FILES:${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/_*.la"
 
-FILES:${PN}-staticdev += "${libdir}/${PYTHON_DIR}/site-packages/_*.a"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/_*.a"

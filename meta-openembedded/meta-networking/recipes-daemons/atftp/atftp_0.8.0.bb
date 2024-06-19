@@ -29,14 +29,14 @@ EXTRA_OEMAKE = "CFLAGS='${CFLAGS} -std=gnu89'"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/atftpd.init ${D}${sysconfdir}/init.d/atftpd
+    install -m 0755 ${UNPACKDIR}/atftpd.init ${D}${sysconfdir}/init.d/atftpd
 
     install -d ${D}/srv/tftp
 
     rm ${D}${sbindir}/in.tftpd
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/atftpd.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/atftpd.service ${D}${systemd_unitdir}/system
 }
 
 PACKAGES =+ "${PN}d"

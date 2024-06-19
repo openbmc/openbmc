@@ -93,6 +93,14 @@ def sstate_lockedsigs(d):
             sigs[pn][task] = [h, siggen_lockedsigs_var]
     return sigs
 
+def lockedsigs_unihashmap(d):
+    unihashmap = {}
+    data = (d.getVar("SIGGEN_UNIHASHMAP") or "").split()
+    for entry in data:
+        pn, task, taskhash, unihash = entry.split(":")
+        unihashmap[(pn, task)] = (taskhash, unihash)
+    return unihashmap
+
 class SignatureGeneratorOEBasicHashMixIn(object):
     supports_multiconfig_datacaches = True
 
@@ -100,6 +108,7 @@ class SignatureGeneratorOEBasicHashMixIn(object):
         self.abisaferecipes = (data.getVar("SIGGEN_EXCLUDERECIPES_ABISAFE") or "").split()
         self.saferecipedeps = (data.getVar("SIGGEN_EXCLUDE_SAFE_RECIPE_DEPS") or "").split()
         self.lockedsigs = sstate_lockedsigs(data)
+        self.unihashmap = lockedsigs_unihashmap(data)
         self.lockedhashes = {}
         self.lockedpnmap = {}
         self.lockedhashfn = {}
@@ -209,6 +218,15 @@ class SignatureGeneratorOEBasicHashMixIn(object):
     def get_cached_unihash(self, tid):
         if tid in self.lockedhashes and self.lockedhashes[tid] and not self._internal:
             return self.lockedhashes[tid]
+
+        (mc, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
+        recipename = self.lockedpnmap[fn]
+
+        if (recipename, task) in self.unihashmap:
+            taskhash, unihash = self.unihashmap[(recipename, task)]
+            if taskhash == self.taskhash[tid]:
+                return unihash
+
         return super().get_cached_unihash(tid)
 
     def dump_sigtask(self, fn, task, stampbase, runtime):
@@ -219,6 +237,7 @@ class SignatureGeneratorOEBasicHashMixIn(object):
 
     def dump_lockedsigs(self, sigfile, taskfilter=None):
         types = {}
+        unihashmap = {}
         for tid in self.runtaskdeps:
             # Bitbake changed this to a tuple in newer versions
             if isinstance(tid, tuple):
@@ -226,12 +245,17 @@ class SignatureGeneratorOEBasicHashMixIn(object):
             if taskfilter:
                 if not tid in taskfilter:
                     continue
-            fn = bb.runqueue.fn_from_tid(tid)
+            (_, _, task, fn) = bb.runqueue.split_tid_mcfn(tid)
             t = self.lockedhashfn[fn].split(" ")[1].split(":")[5]
             t = 't-' + t.replace('_', '-')
             if t not in types:
                 types[t] = []
             types[t].append(tid)
+
+            taskhash = self.taskhash[tid]
+            unihash = self.get_unihash(tid)
+            if taskhash != unihash:
+                unihashmap[tid] = "    " + self.lockedpnmap[fn] + ":" + task + ":" + taskhash + ":" + unihash
 
         with open(sigfile, "w") as f:
             l = sorted(types)
@@ -245,7 +269,12 @@ class SignatureGeneratorOEBasicHashMixIn(object):
                         continue
                     f.write("    " + self.lockedpnmap[fn] + ":" + task + ":" + self.get_unihash(tid) + " \\\n")
                 f.write('    "\n')
-            f.write('SIGGEN_LOCKEDSIGS_TYPES:%s = "%s"' % (self.machine, " ".join(l)))
+            f.write('SIGGEN_LOCKEDSIGS_TYPES:%s = "%s"\n' % (self.machine, " ".join(l)))
+            f.write('SIGGEN_UNIHASHMAP += "\\\n')
+            sortedtid = sorted(unihashmap, key=lambda tid: self.lockedpnmap[bb.runqueue.fn_from_tid(tid)])
+            for tid in sortedtid:
+                f.write(unihashmap[tid] + " \\\n")
+            f.write('    "\n')
 
     def dump_siglist(self, sigfile, path_prefix_strip=None):
         def strip_fn(fn):
@@ -327,7 +356,6 @@ class SignatureGeneratorOEEquivHash(SignatureGeneratorOEBasicHashMixIn, bb.sigge
         self.method = data.getVar('SSTATE_HASHEQUIV_METHOD')
         if not self.method:
             bb.fatal("OEEquivHash requires SSTATE_HASHEQUIV_METHOD to be set")
-        self.max_parallel = int(data.getVar('BB_HASHSERVE_MAX_PARALLEL') or 1)
         self.username = data.getVar("BB_HASHSERVE_USERNAME")
         self.password = data.getVar("BB_HASHSERVE_PASSWORD")
         if not self.username or not self.password:

@@ -1,53 +1,42 @@
-From 66430e7c6fbd5187b66560909a510e136fed91c0 Mon Sep 17 00:00:00 2001
-From: Daniela Plascencia <daniela.plascencia@linux.intel.com>
-Date: Thu, 23 Feb 2017 10:34:27 -0600
-Subject: [PATCH] meta: adding hello-yocto recipe
+From 74bc209a4fbe4da2f57e153ccfff3d2241dada8d Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 31 May 2024 11:03:47 -0400
+Subject: [PATCH] selftest-hello: add selftest-hello-extra
 
-This is a sample recipe
+This should fail the test_lic_files_chksum_presence test.
 
-Signed-off-by: Daniela Plascencia <daniela.plascencia@linux.intel.com>
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- .../hello-world/hello-world/hello_world.c      |  5 +++++
- .../hello-world/hello-world_1.0.bb             | 18 ++++++++++++++++++
- 2 files changed, 23 insertions(+)
- create mode 100644 meta/recipes-devtools/hello-world/hello-world/hello_world.c
- create mode 100644 meta/recipes-devtools/hello-world/hello-world_1.0.bb
+ .../selftest-hello-extra_1.0.bb               | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+ create mode 100644 meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
 
-diff --git a/meta/recipes-devtools/hello-world/hello-world/hello_world.c b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
 new file mode 100644
-index 0000000000..0d59f57d4c
+index 00000000000..875bcbef859
 --- /dev/null
-+++ b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
-@@ -0,0 +1,5 @@
-+#include <stdio.h>
-+
-+int main(){
-+    printf("Hello World\n");
-+}
-diff --git a/meta/recipes-devtools/hello-world/hello-world_1.0.bb b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
-new file mode 100644
-index 0000000000..3c990c108a
---- /dev/null
-+++ b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
-@@ -0,0 +1,18 @@
-+SUMMARY = "This is a sample summary"
-+DESCRIPTION = "This is a sample description"
-+HOMEPAGE = "https://sample.com/this-is-a-sample"
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
+@@ -0,0 +1,20 @@
++SUMMARY = "This is an example summary"
++DESCRIPTION = "Simple helloworld application -- selftest variant"
++SECTION = "examples"
 +LICENSE = "MIT"
 +
-+SRC_URI += "file://hello_world.c"
++SRC_URI = "file://helloworld.c"
 +
-+SRC_URI[md5sum] = "4ee21e9dcc9b5b6012c23038734e1632"
-+SRC_URI[sha256sum] = "edef2bbde0fbf0d88232782a0eded323f483a0519d6fde9a3b1809056fd35f3e"
++S = "${WORKDIR}/sources"
++UNPACKDIR = "${S}"
 +
-+do_compile(){
-+    ${CC} -o hello_world ../hello_world.c
++do_compile() {
++	${CC} ${CFLAGS} ${LDFLAGS} helloworld.c -o helloworld
 +}
 +
-+do_install(){
-+    install -d ${D}${bindir}
-+    install -m +x hello_world ${D}${bindir}/hello_world
++do_install() {
++	install -d ${D}${bindir}
++	install -m 0755 helloworld ${D}${bindir}
 +}
++
++BBCLASSEXTEND = "native nativesdk"
 -- 
-2.41.0
+2.45.1
 

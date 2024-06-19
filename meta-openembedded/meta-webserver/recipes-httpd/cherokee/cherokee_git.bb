@@ -36,13 +36,13 @@ EXTRA_OECONF = "--disable-static \
 
 do_install:append () {
     install -m 0755 -d ${D}${sysconfdir}/init.d
-    install -m 755 ${WORKDIR}/cherokee.init ${D}${sysconfdir}/init.d/cherokee
+    install -m 755 ${UNPACKDIR}/cherokee.init ${D}${sysconfdir}/init.d/cherokee
 
     # clean up .la files for plugins
     rm -f ${D}${libdir}/cherokee/*.la
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/cherokee.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/cherokee.service ${D}${systemd_unitdir}/system
     rmdir "${D}${localstatedir}/run"
     rmdir --ignore-fail-on-non-empty "${D}${localstatedir}"
 }

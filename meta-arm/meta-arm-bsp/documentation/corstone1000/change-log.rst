@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022-2023, Arm Limited.
+ # Copyright (c) 2022-2024, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -9,6 +9,78 @@ Change Log
 
 This document contains a summary of the new features, changes and
 fixes in each release of Corstone-1000 software stack.
+
+
+***************
+Version 2024.06
+***************
+
+Changes
+=======
+
+- Re-enabling support for the External System using linux remoteproc (only supporting switching on and off the External System)
+- UEFI Secure Boot and Authenticated Variable support
+- RSE Comms replaces OpenAMP
+- The EFI System partition image is now created by the meta-arm build system.
+  This image is mounted on the second MMC card by default in the FVP.
+- The capsule generation script is now part of the meta-arm build system.
+  Corstone1000-flash-firmware-image recipe generates a capsule binary using the U-Boot capsule generation tool that includes
+  all the firmware binaries and recovery kernel image.
+- SW components upgrades
+- Bug fixes
+
+
+Corstone-1000 components versions
+=================================
+
++-------------------------------------------+-----------------------------------------------------+
+| arm-tstee                                 |                   2.0.0                             |
++-------------------------------------------+-----------------------------------------------------+
+| linux-yocto                               |                   6.6.23                            |
++-------------------------------------------+-----------------------------------------------------+
+| u-boot                                    |                   2023.07.02                        |
++-------------------------------------------+-----------------------------------------------------+
+| external-system                           |                   0.1.0                             |
++-------------------------------------------+-----------------------------------------------------+
+| optee-client                              |                   4.1.0                             |
++-------------------------------------------+-----------------------------------------------------+
+| optee-os                                  |                   4.1.0                             |
++-------------------------------------------+-----------------------------------------------------+
+| trusted-firmware-a                        |                   2.10.4                            |
++-------------------------------------------+-----------------------------------------------------+
+| trusted-firmware-m                        |                   2.0.0                             |
++-------------------------------------------+-----------------------------------------------------+
+| libts                                     |                   602be60719                        |
++-------------------------------------------+-----------------------------------------------------+
+| ts-newlib                                 |                   4.1.0                             |
++-------------------------------------------+-----------------------------------------------------+
+| ts-psa-{crypto, iat, its. ps}-api-test    |                   602be60719                        |
++-------------------------------------------+-----------------------------------------------------+
+| ts-sp-{se-proxy, smm-gateway}             |                   602be60719                        |
++-------------------------------------------+-----------------------------------------------------+
+
+Yocto distribution components versions
+======================================
+
++-------------------------------------------+------------------------------+
+| meta-arm                                  | scarthgap                    |
++-------------------------------------------+------------------------------+
+| poky                                      | scarthgap                    |
++-------------------------------------------+------------------------------+
+| meta-openembedded                         | scarthgap                    |
++-------------------------------------------+------------------------------+
+| meta-secure-core                          | scarthgap                    |
++-------------------------------------------+------------------------------+
+| busybox                                   |                   1.36.1     |
++-------------------------------------------+------------------------------+
+| musl                                      |                   1.2.4      |
++-------------------------------------------+------------------------------+
+| gcc-arm-none-eabi                         |          13.2.Rel1           |
++-------------------------------------------+------------------------------+
+| gcc-cross-aarch64                         |                   13.2.0     |
++-------------------------------------------+------------------------------+
+| openssl                                   |                   3.2.1      |
++-------------------------------------------+------------------------------+
 
 ***************
 Version 2023.11
@@ -298,4 +370,4 @@ Changes
 
 --------------
 
-*Copyright (c) 2022-2023, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2024, Arm Limited. All rights reserved.*

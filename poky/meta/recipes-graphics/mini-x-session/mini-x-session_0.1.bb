@@ -11,7 +11,9 @@ SECTION = "x11"
 RCONFLICTS:${PN} = "matchbox-common"
 
 SRC_URI = "file://mini-x-session"
-S = "${WORKDIR}"
+
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 RDEPENDS:${PN} = "sudo"
 

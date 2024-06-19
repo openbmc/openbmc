@@ -1,7 +1,7 @@
-From 51a7024967187644011c5043ef0f733cf81b26be Mon Sep 17 00:00:00 2001
+From 1923e1f4dbd8f912701c2870822fa4b61eb6082d Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Mon, 14 Feb 2022 08:22:25 +0000
-Subject: [PATCH 2/6] Fixes in AEAD for psa-arch test 54 and 58.
+Subject: [PATCH 2/8] Fixes in AEAD for psa-arch test 54 and 58.
 
 Upstream-Status: Pending [Not submitted to upstream yet]
 Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
@@ -17,10 +17,10 @@ Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
  6 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h b/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h
-index c4ffb20cf7f8..a91f66c14008 100644
+index bf39762b0..27ffbc66e 100644
 --- a/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h
 +++ b/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h
-@@ -309,6 +309,7 @@ static inline psa_status_t crypto_caller_aead_update(struct service_client *cont
+@@ -314,6 +314,7 @@ static inline psa_status_t crypto_caller_aead_update(struct service_client *cont
  	size_t req_len = req_fixed_len;
  
  	*output_length = 0;
@@ -29,7 +29,7 @@ index c4ffb20cf7f8..a91f66c14008 100644
  
  	/* Mandatory input data parameter */
 diff --git a/components/service/crypto/include/psa/crypto_sizes.h b/components/service/crypto/include/psa/crypto_sizes.h
-index 30aa102da581..130d27295878 100644
+index 30aa102da..130d27295 100644
 --- a/components/service/crypto/include/psa/crypto_sizes.h
 +++ b/components/service/crypto/include/psa/crypto_sizes.h
 @@ -351,7 +351,7 @@
@@ -42,10 +42,10 @@ index 30aa102da581..130d27295878 100644
  /** A sufficient output buffer size for psa_aead_update().
   *
 diff --git a/components/service/crypto/provider/extension/aead/aead_provider.c b/components/service/crypto/provider/extension/aead/aead_provider.c
-index 14a25436b3f6..6b144db821de 100644
+index b73d88d32..6a0f96c3c 100644
 --- a/components/service/crypto/provider/extension/aead/aead_provider.c
 +++ b/components/service/crypto/provider/extension/aead/aead_provider.c
-@@ -283,10 +283,11 @@ static rpc_status_t aead_update_handler(void *context, struct call_req *req)
+@@ -283,10 +283,11 @@ static rpc_status_t aead_update_handler(void *context, struct rpc_request *req)
  	uint32_t op_handle;
  	const uint8_t *input;
  	size_t input_len;
@@ -56,9 +56,9 @@ index 14a25436b3f6..6b144db821de 100644
 -			&input, &input_len);
 +			&recv_output_size, &input, &input_len);
  
- 	if (rpc_status == TS_RPC_CALL_ACCEPTED) {
+ 	if (rpc_status == RPC_SUCCESS) {
  
-@@ -300,9 +301,12 @@ static rpc_status_t aead_update_handler(void *context, struct call_req *req)
+@@ -300,9 +301,12 @@ static rpc_status_t aead_update_handler(void *context, struct rpc_request *req)
  		if (crypto_context) {
  
  			size_t output_len = 0;
@@ -73,30 +73,30 @@ index 14a25436b3f6..6b144db821de 100644
  
  				psa_status = psa_aead_update(&crypto_context->op.aead,
 diff --git a/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h b/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h
-index bb1a2a97e4b7..0156aaba3fe3 100644
+index be76d2bc6..590973048 100644
 --- a/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h
 +++ b/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h
 @@ -51,6 +51,7 @@ struct aead_provider_serializer {
  	/* Operation: aead_update */
- 	rpc_status_t (*deserialize_aead_update_req)(const struct call_param_buf *req_buf,
+ 	rpc_status_t (*deserialize_aead_update_req)(const struct rpc_buffer *req_buf,
  		uint32_t *op_handle,
 +                uint32_t *output_size,
  		const uint8_t **input, size_t *input_len);
  
- 	rpc_status_t (*serialize_aead_update_resp)(struct call_param_buf *resp_buf,
+ 	rpc_status_t (*serialize_aead_update_resp)(struct rpc_buffer *resp_buf,
 diff --git a/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c b/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c
-index 6f00b3e3f6f1..45c739abcbb4 100644
+index 8f8c3c7f2..922a7b651 100644
 --- a/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c
 +++ b/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c
-@@ -192,6 +192,7 @@ static rpc_status_t deserialize_aead_update_ad_req(const struct call_param_buf *
+@@ -192,6 +192,7 @@ static rpc_status_t deserialize_aead_update_ad_req(const struct rpc_buffer *req_
  /* Operation: aead_update */
- static rpc_status_t deserialize_aead_update_req(const struct call_param_buf *req_buf,
+ static rpc_status_t deserialize_aead_update_req(const struct rpc_buffer *req_buf,
  	uint32_t *op_handle,
 +        uint32_t *output_size,
  	const uint8_t **input, size_t *input_len)
  {
- 	rpc_status_t rpc_status = TS_RPC_ERROR_INVALID_REQ_BODY;
-@@ -208,6 +209,7 @@ static rpc_status_t deserialize_aead_update_req(const struct call_param_buf *req
+ 	rpc_status_t rpc_status = RPC_ERROR_INVALID_REQUEST_BODY;
+@@ -208,6 +209,7 @@ static rpc_status_t deserialize_aead_update_req(const struct rpc_buffer *req_buf
  		memcpy(&recv_msg, req_buf->data, expected_fixed_len);
  
  		*op_handle = recv_msg.op_handle;
@@ -105,7 +105,7 @@ index 6f00b3e3f6f1..45c739abcbb4 100644
  		tlv_const_iterator_begin(&req_iter,
  			(uint8_t*)req_buf->data + expected_fixed_len,
 diff --git a/protocols/service/crypto/packed-c/aead.h b/protocols/service/crypto/packed-c/aead.h
-index 0be266b52403..435fd3b523ce 100644
+index 0be266b52..435fd3b52 100644
 --- a/protocols/service/crypto/packed-c/aead.h
 +++ b/protocols/service/crypto/packed-c/aead.h
 @@ -98,6 +98,7 @@ enum
@@ -117,5 +117,5 @@ index 0be266b52403..435fd3b523ce 100644
  
  /* Variable length input parameter tags */
 -- 
-2.40.0
+2.25.1
 

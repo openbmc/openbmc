@@ -8,9 +8,9 @@
 
   <!-- Bitbake versions which correspond to the metadata release -->
   <object model="orm.bitbakeversion" pk="1">
-    <field type="CharField" name="name">kirkstone</field>
+    <field type="CharField" name="name">scarthgap</field>
     <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
-    <field type="CharField" name="branch">2.0</field>
+    <field type="CharField" name="branch">2.8</field>
   </object>
   <object model="orm.bitbakeversion" pk="2">
     <field type="CharField" name="name">HEAD</field>
@@ -23,23 +23,18 @@
     <field type="CharField" name="branch">master</field>
   </object>
   <object model="orm.bitbakeversion" pk="4">
-    <field type="CharField" name="name">mickledore</field>
+    <field type="CharField" name="name">kirkstone</field>
     <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
-    <field type="CharField" name="branch">2.4</field>
-  </object>
-  <object model="orm.bitbakeversion" pk="5">
-    <field type="CharField" name="name">dunfell</field>
-    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
-    <field type="CharField" name="branch">1.46</field>
+    <field type="CharField" name="branch">2.0</field>
   </object>
 
   <!-- Releases available -->
   <object model="orm.release" pk="1">
-    <field type="CharField" name="name">kirkstone</field>
-    <field type="CharField" name="description">Openembedded Kirkstone</field>
+    <field type="CharField" name="name">scarthgap</field>
+    <field type="CharField" name="description">Openembedded Scarthgap</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
-    <field type="CharField" name="branch_name">kirkstone</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=kirkstone\"&gt;OpenEmbedded Kirkstone&lt;/a&gt; branch.</field>
+    <field type="CharField" name="branch_name">scarthgap</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=scarthgap\"&gt;OpenEmbedded Scarthgap&lt;/a&gt; branch.</field>
   </object>
   <object model="orm.release" pk="2">
     <field type="CharField" name="name">local</field>
@@ -56,18 +51,11 @@
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/\"&gt;OpenEmbedded master&lt;/a&gt; branch.</field>
   </object>
   <object model="orm.release" pk="4">
-    <field type="CharField" name="name">mickledore</field>
-    <field type="CharField" name="description">Openembedded Mickledore</field>
+    <field type="CharField" name="name">kirkstone</field>
+    <field type="CharField" name="description">Openembedded Kirkstone</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">4</field>
-    <field type="CharField" name="branch_name">mickledore</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=mickledore\"&gt;OpenEmbedded Mickledore&lt;/a&gt; branch.</field>
-  </object>
-  <object model="orm.release" pk="5">
-    <field type="CharField" name="name">dunfell</field>
-    <field type="CharField" name="description">Openembedded Dunfell</field>
-    <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">5</field>
-    <field type="CharField" name="branch_name">dunfell</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=dunfell\"&gt;OpenEmbedded Dunfell&lt;/a&gt; branch.</field>
+    <field type="CharField" name="branch_name">kirkstone</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href=\"https://cgit.openembedded.org/openembedded-core/log/?h=kirkstone\"&gt;OpenEmbedded Kirkstone&lt;/a&gt; branch.</field>
   </object>
 
   <!-- Default layers for each release -->
@@ -85,10 +73,6 @@
   </object>
   <object model="orm.releasedefaultlayer" pk="4">
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
-    <field type="CharField" name="layer_name">openembedded-core</field>
-  </object>
-  <object model="orm.releasedefaultlayer" pk="5">
-    <field rel="ManyToOneRel" to="orm.release" name="release">5</field>
     <field type="CharField" name="layer_name">openembedded-core</field>
   </object>
 

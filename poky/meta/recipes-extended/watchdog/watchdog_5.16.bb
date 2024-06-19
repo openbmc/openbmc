@@ -50,8 +50,8 @@ do_install:append() {
 	install -m 0644 ${S}/debian/watchdog.service ${D}${systemd_system_unitdir}
 	install -m 0644 ${S}/debian/wd_keepalive.service ${D}${systemd_system_unitdir}
 
-	install -Dm 0755 ${WORKDIR}/watchdog.init ${D}/${sysconfdir}/init.d/watchdog
-	install -Dm 0755 ${WORKDIR}/wd_keepalive.init ${D}${sysconfdir}/init.d/wd_keepalive
+	install -Dm 0755 ${UNPACKDIR}/watchdog.init ${D}/${sysconfdir}/init.d/watchdog
+	install -Dm 0755 ${UNPACKDIR}/wd_keepalive.init ${D}${sysconfdir}/init.d/wd_keepalive
 
 	# watchdog.conf is provided by the watchdog-config recipe
 	rm ${D}${sysconfdir}/watchdog.conf

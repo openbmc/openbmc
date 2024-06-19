@@ -11,14 +11,11 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/quilt/quilt-${PV}.tar.gz \
         file://run-ptest \
         file://test.sh \
         file://0001-tests-Allow-different-output-from-mv.patch \
-        file://fix-grep-3.8.patch \
-        file://faildiff-order.patch \
-        file://0001-test-Fix-a-race-condition-in-merge.test.patch \
 "
 
 SRC_URI:append:class-target = " file://gnu_patch_test_fix_target.patch"
 
-SRC_URI[sha256sum] = "3be3be0987e72a6c364678bb827e3e1fcc10322b56bc5f02b576698f55013cc2"
+SRC_URI[sha256sum] = "fe8c09de03c106e85b3737c8f03ade147c956b79ed7af485a1c8a3858db38426"
 
 inherit autotools-brokensep ptest
 
@@ -67,7 +64,7 @@ DEPENDS:append:class-target = "${@bb.utils.contains('PTEST_ENABLED', '1', ' ptes
 PACKAGE_WRITE_DEPS += "ptest-runner"
 
 do_install_ptest() {
-	install ${WORKDIR}/test.sh ${D}${PTEST_PATH}
+	install ${UNPACKDIR}/test.sh ${D}${PTEST_PATH}
     mkdir ${D}${PTEST_PATH}/test
     install ${S}/test/* ${D}${PTEST_PATH}/test
     # mail needs a MTA, and the patch-wrapper is disabled
@@ -97,5 +94,5 @@ RDEPENDS:${PN}-ptest += "file sed gawk diffutils findutils ed perl \
                          perl-module-filehandle perl-module-getopt-std \
                          perl-module-posix perl-module-file-temp \
                          perl-module-text-parsewords perl-module-overloading \
-                         bash util-linux-getopt ptest-runner \
+                         bash util-linux-getopt ptest-runner coreutils \
                         "

@@ -6,11 +6,13 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 PV = "0.1.0"
 
 SRC_URI = "file://fb.modes"
-S = "${WORKDIR}"
+
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/fb.modes ${D}${sysconfdir}
+    install -m 0644 ${UNPACKDIR}/fb.modes ${D}${sysconfdir}
 }
 
 # fb.modes file is MACHINE_ARCH, base.bbclass correctly changes it to MACHINE_ARCH, but too late for allarch.bbclass

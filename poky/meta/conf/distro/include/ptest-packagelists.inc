@@ -63,12 +63,14 @@ PTESTS_FAST = "\
     python3-jinja2 \
     python3-jsonpointer \
     python3-license-expression \
+    python3-mako \
     python3-markupsafe \
     python3-more-itertools \
     python3-pluggy \
     python3-pyasn1 \
     python3-pytz \
     python3-pyyaml \
+    python3-rpds-py \
     python3-trove-classifiers \
     python3-wcwidth \
     python3-webcolors \

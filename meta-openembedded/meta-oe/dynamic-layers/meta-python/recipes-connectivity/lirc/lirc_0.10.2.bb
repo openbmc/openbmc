@@ -70,13 +70,13 @@ do_install:append() {
 
     install -m 0755 -d ${D}${sysconfdir}
     install -m 0755 -d ${D}${sysconfdir}/lirc
-    install -m 0644 ${WORKDIR}/lircd.conf ${D}${sysconfdir}/lirc/
-    install -m 0644 ${WORKDIR}/lirc_options.conf ${D}${sysconfdir}/lirc/
+    install -m 0644 ${UNPACKDIR}/lircd.conf ${D}${sysconfdir}/lirc/
+    install -m 0644 ${UNPACKDIR}/lirc_options.conf ${D}${sysconfdir}/lirc/
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0755 -d ${D}${systemd_unitdir}/system ${D}${libdir}/tmpfiles.d
-        install -m 0644 ${WORKDIR}/lircd.service ${D}${systemd_unitdir}/system/
-        install -m 0755 ${WORKDIR}/lircexec.init ${D}${systemd_unitdir}/system/
-        install -m 0644 ${WORKDIR}/lirc.tmpfiles ${D}${libdir}/tmpfiles.d/lirc.conf
+        install -m 0644 ${UNPACKDIR}/lircd.service ${D}${systemd_unitdir}/system/
+        install -m 0755 ${UNPACKDIR}/lircexec.init ${D}${systemd_unitdir}/system/
+        install -m 0644 ${UNPACKDIR}/lirc.tmpfiles ${D}${libdir}/tmpfiles.d/lirc.conf
     else
         rm -rf ${D}/lib
     fi
@@ -101,7 +101,7 @@ FILES:${PN} += "${systemd_unitdir}/system/lircd.service"
 FILES:${PN} += "${systemd_unitdir}/system/lircd.socket"
 FILES:${PN} += "${libdir}/tmpfiles.d/lirc.conf"
 FILES:${PN}-dbg += "${libdir}/lirc/plugins/.debug"
-FILES:${PN}-python += "${bindir}/irdb-get ${bindir}/irtext2udp ${bindir}/lircd-setup ${bindir}/pronto2lirc ${libdir}/python*/site-packages"
+FILES:${PN}-python += "${bindir}/irdb-get ${bindir}/irtext2udp ${bindir}/lircd-setup ${bindir}/pronto2lirc ${PYTHON_SITEPACKAGES_DIR}"
 
 INITSCRIPT_PACKAGES = "lirc lirc-exec"
 INITSCRIPT_NAME:lirc-exec = "lircexec"

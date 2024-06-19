@@ -33,7 +33,7 @@ def main():
         add_help=False)
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
-    parser.add_argument('-F', '--force', help='Force add without recipe parse verification', action='store_true')
+    parser.add_argument('-F', '--force', help='Forced execution: can be specified multiple times. -F will force add without recipe parse verification and -FF will additionally force the run withput layer parsing.', action='count', default=0)
     parser.add_argument('--color', choices=['auto', 'always', 'never'], default='auto', help='Colorize output (where %(metavar)s is %(choices)s)', metavar='COLOR')
 
     global_args, unparsed_args = parser.parse_known_args()
@@ -59,16 +59,20 @@ def main():
     plugins = []
     tinfoil = bb.tinfoil.Tinfoil(tracking=True)
     tinfoil.logger.setLevel(logger.getEffectiveLevel())
-    try:
+    if global_args.force > 1:
+        bbpaths = []
+    else:
         tinfoil.prepare(True)
-        for path in ([topdir] +
-                    tinfoil.config_data.getVar('BBPATH').split(':')):
+        bbpaths = tinfoil.config_data.getVar('BBPATH').split(':')
+    
+    try: 
+        for path in ([topdir] + bbpaths):
             pluginpath = os.path.join(path, 'lib', 'bblayers')
             bb.utils.load_plugins(logger, plugins, pluginpath)
 
         registered = False
         for plugin in plugins:
-            if hasattr(plugin, 'tinfoil_init'):
+            if hasattr(plugin, 'tinfoil_init') and global_args.force <= 1:
                 plugin.tinfoil_init(tinfoil)
             if hasattr(plugin, 'register_commands'):
                 registered = True

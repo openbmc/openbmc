@@ -15,14 +15,29 @@ scriptpath.add_bitbake_lib_path()
 
 import bb.tinfoil
 import subprocess
+import argparse
 
 if __name__ == "__main__":
+    p = argparse.ArgumentParser()
+    p.add_argument("-d", action='store_true', \
+                         help="store debuginfod files in project sub-directory")
+    
+    args = p.parse_args()
+    
     with bb.tinfoil.Tinfoil() as tinfoil:
         tinfoil.prepare(config_only=True)
         package_classes_var = "DEPLOY_DIR_" + tinfoil.config_data.getVar("PACKAGE_CLASSES").split()[0].replace("package_", "").upper()
         feed_dir = tinfoil.config_data.getVar(package_classes_var, expand=True)
 
+    opts = [ '--verbose', '-R', '-U', feed_dir ]
+    
+    if args.d:
+        fdir = os.path.join(os.getcwd(), 'oedid-files')
+        os.makedirs(fdir, exist_ok=True)
+        opts += [ '-d', os.path.join(fdir, 'did.sqlite') ]
+        
     subprocess.call(['bitbake', '-c', 'addto_recipe_sysroot', 'elfutils-native'])
 
-    subprocess.call(['oe-run-native', 'elfutils-native', 'debuginfod', '--verbose', '-R', '-U', feed_dir])
+    subprocess.call(['oe-run-native', 'elfutils-native', 'debuginfod'] + opts)
+    # we should not get here
     print("\nTo use the debuginfod server please ensure that this variable PACKAGECONFIG:pn-elfutils-native = \"debuginfod libdebuginfod\" is set in the local.conf")

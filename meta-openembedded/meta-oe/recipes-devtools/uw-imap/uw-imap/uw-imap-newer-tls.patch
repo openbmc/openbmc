@@ -1,0 +1,29 @@
+Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
+Upstream-Status: Pending
+
+--- imap-2007f/src/osdep/unix/ssl_unix.c.old	2024-05-08 09:41:06.183450584 +0200
++++ imap-2007f/src/osdep/unix/ssl_unix.c	2024-05-08 09:43:38.512931933 +0200
+@@ -220,7 +220,11 @@
+   if (ssl_last_error) fs_give ((void **) &ssl_last_error);
+   ssl_last_host = host;
+   if (!(stream->context = SSL_CTX_new ((flags & NET_TLSCLIENT) ?
++#if OPENSSL_VERSION_NUMBER >= 0x10100000
++				       TLS_client_method () :
++#else
+ 				       TLSv1_client_method () :
++#endif
+ 				       SSLv23_client_method ())))
+     return "SSL context failed";
+   SSL_CTX_set_options (stream->context,0);
+@@ -703,7 +707,11 @@
+   }
+ 				/* create context */
+   if (!(stream->context = SSL_CTX_new (start_tls ?
++#if OPENSSL_VERSION_NUMBER >= 0x10100000
++				       TLS_server_method () :
++#else
+ 				       TLSv1_server_method () :
++#endif
+ 				       SSLv23_server_method ())))
+     syslog (LOG_ALERT,"Unable to create SSL context, host=%.80s",
+ 	    tcp_clienthost ());

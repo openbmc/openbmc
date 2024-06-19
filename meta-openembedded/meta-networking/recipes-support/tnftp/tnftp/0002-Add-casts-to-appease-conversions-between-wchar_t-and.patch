@@ -1,0 +1,29 @@
+From 5c8334f86d139de987c716a0d5acc0f40d8d3b7d Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 14 Jun 2024 06:38:37 +0000
+Subject: [PATCH] Add casts to appease conversions between wchar_t and wint_t
+
+Upstream-Status: Backport [http://cvsweb.netbsd.org/bsdweb.cgi/src/lib/libedit/terminal.c.diff?r1=1.43&r2=1.44&only_with_tag=MAIN&f=h]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ libedit/terminal.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libedit/terminal.c b/libedit/terminal.c
+index 19cee48..13f7bcd 100644
+--- a/libedit/terminal.c
++++ b/libedit/terminal.c
+@@ -594,7 +594,8 @@ mc_again:
+ 				 * NOTE THAT terminal_overwrite() WILL CHANGE
+ 				 * el->el_cursor.h!!!
+ 				 */
+-				terminal_overwrite(el, &el->el_display[
++				terminal_overwrite(el,
++					(wchar_t *)&el->el_display[
+ 				    el->el_cursor.v][el->el_cursor.h],
+ 				    (size_t)(where - el->el_cursor.h));
+ 
+-- 
+2.35.5
+

@@ -1,22 +1,24 @@
-From 0096c854d5015918ed154dccb3ad472fd06c1010 Mon Sep 17 00:00:00 2001
+From 653db8b938166db7833135f615b90c38a3f27a30 Mon Sep 17 00:00:00 2001
 From: "Maxin B. John" <maxin.john@intel.com>
-Date: Tue, 21 Feb 2017 11:16:31 +0200
+Date: Thu, 25 Apr 2024 10:51:02 +0200
 Subject: [PATCH] configure: Add option to enable/disable libnfnetlink
 
-This changes the configure behaviour from autodetecting
-for libnfnetlink to having an option to disable it explicitly
+Default behavior (autodetecting) does not change, but specifying
+either option would explicitly disable or enable libnfnetlink support,
+and if the library is not found in the latter case, ./configure will error
+out.
 
-Upstream-Status: Pending
-
+Upstream-Status: Backport [https://git.netfilter.org/iptables/commit/?id=653db8b938166db7833135f615b90c38a3f27a30]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
-
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+Signed-off-by: Phil Sutter <phil@nwl.cc>
 ---
- configure.ac | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ configure.ac | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index d99fa3b..d607772 100644
+index d99fa3b9..2293702b 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -63,6 +63,9 @@ AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
@@ -25,21 +27,27 @@ index d99fa3b..d607772 100644
  	[enable_nftables="$enableval"], [enable_nftables="yes"])
 +AC_ARG_ENABLE([libnfnetlink],
 +    AS_HELP_STRING([--disable-libnfnetlink], [Do not use netfilter netlink library]),
-+    [enable_libnfnetlink="$enableval"], [enable_libnfnetlink="yes"])
++    [enable_libnfnetlink="$enableval"], [enable_libnfnetlink="auto"])
  AC_ARG_ENABLE([connlabel],
  	AS_HELP_STRING([--disable-connlabel],
  	[Do not build libnetfilter_conntrack]),
-@@ -113,9 +116,10 @@ AM_CONDITIONAL([ENABLE_SYNCONF], [test "$enable_nfsynproxy" = "yes"])
+@@ -113,8 +116,14 @@ AM_CONDITIONAL([ENABLE_SYNCONF], [test "$enable_nfsynproxy" = "yes"])
  AM_CONDITIONAL([ENABLE_NFTABLES], [test "$enable_nftables" = "yes"])
  AM_CONDITIONAL([ENABLE_CONNLABEL], [test "$enable_connlabel" = "yes"])
  
 -PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
 -	[nfnetlink=1], [nfnetlink=0])
--AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "$nfnetlink" = 1])
-+AS_IF([test "x$enable_libnfnetlink" = "xyes"], [
-+    PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0])
-+    ])
-+AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "x$enable_libnfnetlink" = "xyes"])
++# If specified explicitly on the command line, error out when library was not found
++# Otherwise, disable and continue
++AS_IF([test "x$enable_libnfnetlink" = "xyes"],
++	[PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
++			   [nfnetlink=1])],
++      [test "x$enable_libnfnetlink" = "xauto"],
++	[PKG_CHECK_MODULES([libnfnetlink], [libnfnetlink >= 1.0],
++			   [nfnetlink=1], [nfnetlink=0])])
+ AM_CONDITIONAL([HAVE_LIBNFNETLINK], [test "$nfnetlink" = 1])
  
  if test "x$enable_bpfc" = "xyes" || test "x$enable_nfsynproxy" = "xyes"; then
- 	PKG_CHECK_MODULES([libpcap], [libpcap], [], [
+-- 
+2.39.2
+

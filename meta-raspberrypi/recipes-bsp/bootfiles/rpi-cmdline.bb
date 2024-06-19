@@ -46,6 +46,9 @@ CMDLINE_ISOL_CPUS ?= "${@setup_isolcpus(d)}"
 # if the MAC addresses are omitted, random values will be used
 CMDLINE_RNDIS ?= ""
 
+# That allows to keep the traditional network interface names
+CMDLINE_IFNAMES ?= "net.ifnames=0"
+
 CMDLINE = " \
     ${CMDLINE_ISOL_CPUS} \
     ${CMDLINE_DWC_OTG} \
@@ -57,6 +60,7 @@ CMDLINE = " \
     ${CMDLINE_PITFT} \
     ${CMDLINE_DEBUG} \
     ${CMDLINE_RNDIS} \
+    ${CMDLINE_IFNAMES} \
     "
 
 do_compile() {

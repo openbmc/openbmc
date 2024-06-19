@@ -37,7 +37,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI:append = " file://appendtest.txt"
 
 sysroot_stage_all:append() {
-	install -m 644 ${WORKDIR}/appendtest.txt ${SYSROOT_DESTDIR}/
+	install -m 644 ${UNPACKDIR}/appendtest.txt ${SYSROOT_DESTDIR}/
 }
 
 """

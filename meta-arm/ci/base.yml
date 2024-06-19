@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
 header:
   version: 14
 
@@ -27,12 +29,12 @@ env:
 local_conf_header:
   base: |
     CONF_VERSION = "2"
+    BB_SERVER_TIMEOUT = "300"
   setup: |
     PACKAGE_CLASSES = "package_ipk"
     PACKAGECONFIG:remove:pn-qemu-system-native = "gtk+ sdl"
     PACKAGECONFIG:append:pn-perf = " coresight"
     INHERIT += "rm_work"
-    DISTRO_FEATURES:remove = "ptest"
   extrapackages: |
     CORE_IMAGE_EXTRA_INSTALL += "perf opencsd"
     CORE_IMAGE_EXTRA_INSTALL:append:aarch64 = " gator-daemon"

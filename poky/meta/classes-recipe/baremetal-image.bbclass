@@ -103,7 +103,7 @@ QB_OPT_APPEND:append:qemuriscv32 = " -bios none"
 # since medlow can only access addresses below 0x80000000 and RAM
 # starts at 0x80000000 on RISC-V 64
 # Keep RISC-V 32 using -mcmodel=medlow (symbols lie between -2GB:2GB)
-CFLAGS:append:qemuriscv64 = " -mcmodel=medany"
+TARGET_CFLAGS:append:qemuriscv64 = " -mcmodel=medany"
 
 
 ## Emulate image.bbclass

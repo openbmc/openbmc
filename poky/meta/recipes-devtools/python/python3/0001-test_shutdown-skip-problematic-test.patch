@@ -1,0 +1,46 @@
+From 9d4cdbde100798ba9fa1cf3f82dbaf18fd10a543 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Wed, 8 May 2024 11:58:09 -0400
+Subject: [PATCH] test_shutdown: skip problematic test
+
+This test hangs frequently when run on the Autobuilder. Disable it in
+testing until the cause can be determined.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ Lib/test/test_concurrent_futures/test_shutdown.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Lib/test/test_concurrent_futures/test_shutdown.py b/Lib/test/test_concurrent_futures/test_shutdown.py
+index 7a4065afd4..6b878a48bf 100644
+--- a/Lib/test/test_concurrent_futures/test_shutdown.py
++++ b/Lib/test/test_concurrent_futures/test_shutdown.py
+@@ -20,6 +20,7 @@ def sleep_and_print(t, msg):
+     sys.stdout.flush()
+ 
+ 
++@unittest.skip("skipping problematic test")
+ class ExecutorShutdownTest:
+     def test_run_after_shutdown(self):
+         self.executor.shutdown()
+@@ -156,6 +157,7 @@ def timeout(_signum, _frame):
+             signal.signal(signal.SIGALRM, old_handler)
+ 
+ 
++@unittest.skip("skipping problematic test")
+ class ThreadPoolShutdownTest(ThreadPoolMixin, ExecutorShutdownTest, BaseTestCase):
+     def test_threads_terminate(self):
+         def acquire_lock(lock):
+@@ -252,6 +254,7 @@ def test_cancel_futures_wait_false(self):
+         self.assertIn(out.strip(), [b"apple", b""])
+ 
+ 
++@unittest.skip("skipping problematic test")
+ class ProcessPoolShutdownTest(ExecutorShutdownTest):
+     def test_processes_terminate(self):
+         def acquire_lock(lock):
+-- 
+2.45.0
+

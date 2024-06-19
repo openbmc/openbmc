@@ -1,0 +1,75 @@
+From 7c25404d64ef8efec63c154ce38b0bb38845680f Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Tue, 5 Dec 2023 20:23:55 +0100
+Subject: [PATCH] efi: corstone1000: fwu: update RPC ABI
+
+The Trusted Services RPC protocol format changed: the
+data has to be placed in w3 and the memory handle has
+to be placed in w4-w5.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ lib/efi_loader/efi_capsule.c | 14 +++++++++++---
+ lib/efi_loader/efi_setup.c   | 14 +++++++++++---
+ 2 files changed, 22 insertions(+), 6 deletions(-)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index f3326b1f67..1d966e3f26 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -790,12 +790,20 @@ static int __efi_runtime efi_corstone1000_buffer_ready_event(u32 capsule_image_s
+ 	}
+ 
+ 	/*
+-	 * setting the buffer ready event arguments in register w4:
++	 * setting the buffer ready event arguments in register w3:
+ 	 * - capsule update interface ID (31:16)
+ 	 * - the buffer ready event ID (15:0)
+ 	 */
+-	msg.data1 = PREP_SEPROXY_SVC_ID(CORSTONE1000_SEPROXY_UPDATE_SVC_ID) |
+-		PREP_SEPROXY_EVT(CORSTONE1000_BUFFER_READY_EVT); /* w4 */
++	msg.data0 = PREP_SEPROXY_SVC_ID(CORSTONE1000_SEPROXY_UPDATE_SVC_ID) |
++		PREP_SEPROXY_EVT(CORSTONE1000_BUFFER_READY_EVT); /* w3 */
++
++	/*
++	 * setting the memory handle fields to
++	 * FFA_MEM_HANDLE_INVALID (0xFFFF_FFFF_FFFF_FFFF)
++	 * to signal that there is no shared memory used
++	*/
++	msg.data1 = 0xFFFFFFFF;	/* w4 */
++	msg.data2 = 0xFFFFFFFF; /* w5 */
+ 
+ 	return ffa_sync_send_receive(dev, CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
+ }
+diff --git a/lib/efi_loader/efi_setup.c b/lib/efi_loader/efi_setup.c
+index d20568c1c8..c31e74532f 100644
+--- a/lib/efi_loader/efi_setup.c
++++ b/lib/efi_loader/efi_setup.c
+@@ -157,12 +157,20 @@ static int efi_corstone1000_uboot_efi_started_event(void)
+ 	}
+ 
+ 	/*
+-	 * setting the kernel started  event arguments:
++	 * setting the kernel started  event arguments in register w3::
+ 	 * setting capsule update interface ID(31:16)
+ 	 * the kernel started event ID(15:0)
+ 	 */
+-	msg.data1 = PREP_SEPROXY_SVC_ID(CORSTONE1000_SEPROXY_UPDATE_SVC_ID) |
+-			PREP_SEPROXY_EVT(CORSTONE1000_UBOOT_EFI_STARTED_EVT); /* w4 */
++	msg.data0 = PREP_SEPROXY_SVC_ID(CORSTONE1000_SEPROXY_UPDATE_SVC_ID) |
++			PREP_SEPROXY_EVT(CORSTONE1000_UBOOT_EFI_STARTED_EVT); /* w3 */
++
++	/*
++	 * setting the memory handle fields to
++	 * FFA_MEM_HANDLE_INVALID (0xFFFF_FFFF_FFFF_FFFF)
++	 * to signal that there is no shared memory used
++	*/
++	msg.data1 = 0xFFFFFFFF;	/* w4 */
++	msg.data2 = 0xFFFFFFFF; /* w5 */
+ 
+ 	return ffa_sync_send_receive(dev, CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
+ }
+-- 
+2.25.1
+

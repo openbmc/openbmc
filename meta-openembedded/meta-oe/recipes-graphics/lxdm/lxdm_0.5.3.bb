@@ -61,12 +61,12 @@ do_compile:append() {
 
 do_install:append() {
     install -d ${D}${localstatedir}/lib/lxdm
-    install -m 644 ${WORKDIR}/lxdm.conf ${D}${localstatedir}/lib/lxdm
+    install -m 644 ${UNPACKDIR}/lxdm.conf ${D}${localstatedir}/lib/lxdm
     if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
         # ArchLinux version of pam config has the following advantages:
         # * simple setup of passwordless login
         # * in XFCE powerdown/restart enabled in logoff dialog
-        install -m 644 ${WORKDIR}/${@bb.utils.contains("DISTRO_TYPE", "debug", "lxdm-pam-debug", "lxdm-pam",d)} ${D}${sysconfdir}/pam.d/lxdm
+        install -m 644 ${UNPACKDIR}/${@bb.utils.contains("DISTRO_TYPE", "debug", "lxdm-pam-debug", "lxdm-pam",d)} ${D}${sysconfdir}/pam.d/lxdm
     fi
 }
 

@@ -8,7 +8,7 @@ is used by MMU, the "SECTION_SIZE" is defined with
 (1 << 21), but 'add_buffer_phys_virt()' hardcode this
 to (1 << 20).
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [via email to horms@kernel.org,http://lists.infradead.org/pipermail/kexec/2024-April/029903.html]
 
 Suggested-By:fredrik.markstrom@gmail.com
 Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>

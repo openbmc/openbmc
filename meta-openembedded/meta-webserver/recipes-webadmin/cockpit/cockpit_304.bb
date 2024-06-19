@@ -193,7 +193,7 @@ do_install:append() {
     chmod 4750 ${D}${libexecdir}/cockpit-session
 
     install -d "${D}${sysconfdir}/pam.d"
-    install -p -m 0644 ${WORKDIR}/cockpit.pam ${D}${sysconfdir}/pam.d/cockpit
+    install -p -m 0644 ${UNPACKDIR}/cockpit.pam ${D}${sysconfdir}/pam.d/cockpit
 
     # provided by firewalld
     rm -rf ${D}${libdir}/firewalld

@@ -1,0 +1,34 @@
+From 8e907753625faba3284925983ef8e83f8491aa76 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 10 May 2024 17:44:47 -0700
+Subject: [PATCH] tests/arm: Use -O instead of -O0
+
+GCC-14 fails to compile the testcase with -O2 [1]
+therefore workaround it by using -O1, which works
+and for OE/cross-compiling it is fine, -O0 is used
+to make these tests compile natively on an arm target
+and gcc would take less memory compiling with -O0
+-O would take a bit more memory but in cross compiling
+we have enough of it on build host.
+
+[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=115042
+Upstream-Status: Inappropriate [WORKAROUND]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ none/tests/arm/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/none/tests/arm/Makefile.am
++++ b/none/tests/arm/Makefile.am
+@@ -57,9 +57,9 @@ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_N
+ # Also force -O0 since -O takes hundreds of MB of memory 
+ # for v6intThumb.c.
+ v6intARM_CFLAGS   = $(AM_CFLAGS) -g -O0 -marm
+-v6intThumb_CFLAGS = $(AM_CFLAGS) -g -O0 -mthumb
++v6intThumb_CFLAGS = $(AM_CFLAGS) -g -O -mthumb
+ 
+-v6media_CFLAGS    = $(AM_CFLAGS) -g -O0 -mthumb
++v6media_CFLAGS    = $(AM_CFLAGS) -g -O -mthumb
+ 
+ v8crypto_a_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -marm -march=armv8-a
+ v8crypto_t_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -mthumb -march=armv8-a

@@ -22,7 +22,7 @@ addtask do_patchbuild after do_patch before do_configure
 
 do_patchbuild () {
 	rm -f ${S}/CMakeLists.txt
-	cp ${WORKDIR}/CMakeLists.txt ${S}/
+	cp ${UNPACKDIR}/CMakeLists.txt ${S}/
 }
 
 do_install:append () {

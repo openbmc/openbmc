@@ -1,6 +1,6 @@
-From 6c7ac367a873bf827c19b81085c943eace917a99 Mon Sep 17 00:00:00 2001
+From e79933e2fc68570066eca66f0b599d259b7a1731 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
-Date: Fri, 8 Sep 2023 14:41:00 -0400
+Date: Fri, 31 May 2024 08:18:48 -0400
 Subject: [PATCH] selftest-hello: remove helloworld.c
 
 This should pass the test_src_uri_left_files selftest.
@@ -8,13 +8,13 @@ This should pass the test_src_uri_left_files selftest.
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
  .../recipes-test/selftest-hello/files/helloworld.c        | 8 --------
- .../recipes-test/selftest-hello/selftest-hello_1.0.bb     | 4 +---
- 2 files changed, 1 insertion(+), 11 deletions(-)
+ .../recipes-test/selftest-hello/selftest-hello_1.0.bb     | 2 --
+ 2 files changed, 10 deletions(-)
  delete mode 100644 meta-selftest/recipes-test/selftest-hello/files/helloworld.c
 
 diff --git a/meta-selftest/recipes-test/selftest-hello/files/helloworld.c b/meta-selftest/recipes-test/selftest-hello/files/helloworld.c
 deleted file mode 100644
-index fc7169b7b8..0000000000
+index fc7169b7b83..00000000000
 --- a/meta-selftest/recipes-test/selftest-hello/files/helloworld.c
 +++ /dev/null
 @@ -1,8 +0,0 @@
@@ -27,7 +27,7 @@ index fc7169b7b8..0000000000
 -	return 0;
 -}
 diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-index 547587bef4..f6817f05bc 100644
+index 2dc352d479e..e95270adaeb 100644
 --- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 +++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 @@ -3,8 +3,6 @@ SECTION = "examples"
@@ -36,16 +36,9 @@ index 547587bef4..f6817f05bc 100644
  
 -SRC_URI = "file://helloworld.c"
 -
- S = "${WORKDIR}"
+ S = "${WORKDIR}/sources"
+ UNPACKDIR = "${S}"
  
- do_compile() {
-@@ -16,4 +14,4 @@ do_install() {
- 	install -m 0755 helloworld ${D}${bindir}
- }
- 
--BBCLASSEXTEND = "native nativesdk"
-\ No newline at end of file
-+BBCLASSEXTEND = "native nativesdk"
 -- 
-2.41.0
+2.45.1
 

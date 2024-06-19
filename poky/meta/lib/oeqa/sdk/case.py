@@ -6,6 +6,7 @@
 
 import os
 import subprocess
+import shutil
 
 from oeqa.core.case import OETestCase
 
@@ -21,12 +22,14 @@ class OESDKTestCase(OETestCase):
             archive = os.path.basename(urlparse(url).path)
 
         if dl_dir:
-            tarball = os.path.join(dl_dir, archive)
-            if os.path.exists(tarball):
-                return tarball
+            archive_tarball = os.path.join(dl_dir, archive)
+            if os.path.exists(archive_tarball):
+                return archive_tarball
 
         tarball = os.path.join(workdir, archive)
         subprocess.check_output(["wget", "-O", tarball, url], stderr=subprocess.STDOUT)
+        if dl_dir and not os.path.exists(archive_tarball):
+            shutil.copyfile(tarball, archive_tarball)
         return tarball
 
     def check_elf(self, path, target_os=None, target_arch=None):

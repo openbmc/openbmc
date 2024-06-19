@@ -28,6 +28,6 @@ do_install:append() {
 	install -d ${D}${sysconfdir}/supervisor
 	install -d ${D}${systemd_system_unitdir}
 
-	install -m 0644 ${WORKDIR}/supervisord.conf ${D}${sysconfdir}/supervisor
-	install -m 0644 ${WORKDIR}/supervisor.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${UNPACKDIR}/supervisord.conf ${D}${sysconfdir}/supervisor
+	install -m 0644 ${UNPACKDIR}/supervisor.service ${D}${systemd_system_unitdir}
 }

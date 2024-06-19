@@ -1,7 +1,7 @@
-From b7c827bb44edbb6251c9fcdb80aa03982c0e7bf3 Mon Sep 17 00:00:00 2001
+From 5442d8ddb285d33b459aefc76962640afd131280 Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Tue, 10 Mar 2020 11:05:20 +0000
-Subject: [PATCH 14/22] Handle missing gshadow
+Subject: [PATCH] Handle missing gshadow
 
 gshadow usage is now present in the userdb code. Mask all uses of it to
 allow compilation on musl
@@ -168,6 +168,3 @@ index f60d48ace4..e878199a28 100644
                          if (r < 0)
                                  return r;
  
--- 
-2.34.1
-

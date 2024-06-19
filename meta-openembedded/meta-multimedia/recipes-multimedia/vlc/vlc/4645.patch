@@ -1,0 +1,179 @@
+From 1e2918115ca2f5c4ffde00dc02ad89525714f6c2 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Tue, 5 Dec 2023 09:23:35 +0100
+Subject: [PATCH 1/5] input: fix incompatible-pointer-types assignment
+
+Fixes #28441
+Upstream-Status: Backport [https://code.videolan.org/videolan/vlc/-/merge_requests/4645]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/input/input_internal.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/input/input_internal.h b/src/input/input_internal.h
+index d29731edca1b..ea02f39f5add 100644
+--- a/src/input/input_internal.h
++++ b/src/input/input_internal.h
+@@ -117,7 +117,7 @@ typedef struct input_thread_private_t
+ 
+     /* Title infos FIXME multi-input (not easy) ? */
+     int          i_title;
+-    const input_title_t **title;
++    input_title_t * const *title;
+ 
+     int i_title_offset;
+     int i_seekpoint_offset;
+-- 
+GitLab
+
+
+From adcf4e66e2ce2c382bb97957c91bfde040f4f3ca Mon Sep 17 00:00:00 2001
+From: Zhao Zhili <quinkblack@foxmail.com>
+Date: Thu, 1 Mar 2018 14:25:59 +0800
+Subject: [PATCH 2/5] yadif: fix variable type
+
+Signed-off-by: Thomas Guillem <thomas@gllm.fr>
+(cherry picked from commit 77b86f4452be4dbe0d56a9cd1b66da61b116da60)
+Signed-off-by: Thomas Guillem <thomas@gllm.fr>
+---
+ modules/video_filter/deinterlace/yadif.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/modules/video_filter/deinterlace/yadif.h b/modules/video_filter/deinterlace/yadif.h
+index 4bc592ba9307..af16443d0804 100644
+--- a/modules/video_filter/deinterlace/yadif.h
++++ b/modules/video_filter/deinterlace/yadif.h
+@@ -140,10 +140,10 @@ static void yadif_filter_line_c(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8
+ }
+ 
+ static void yadif_filter_line_c_16bit(uint8_t *dst8, uint8_t *prev8, uint8_t *cur8, uint8_t *next8, int w, int prefs, int mrefs, int parity, int mode) {
+-    uint8_t *dst = (uint8_t *)dst8;
+-    uint8_t *prev = (uint8_t *)prev8;
+-    uint8_t *cur = (uint8_t *)cur8;
+-    uint8_t *next = (uint8_t *)next8;
++    uint16_t *dst = (uint16_t *)dst8;
++    uint16_t *prev = (uint16_t *)prev8;
++    uint16_t *cur = (uint16_t *)cur8;
++    uint16_t *next = (uint16_t *)next8;
+     int x;
+     uint16_t *prev2= parity ? prev : cur ;
+     uint16_t *next2= parity ? cur  : next;
+-- 
+GitLab
+
+
+From 45198e5328ff2b2f4eb2fb76add0789fec26270f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+Date: Sun, 3 Mar 2019 09:59:10 +0200
+Subject: [PATCH 3/5] swscale: avoid invalid pointer conversion
+
+(cherry picked from commit ab00e6c59d42e05ab08893091783d8b5febc0058)
+Signed-off-by: Thomas Guillem <thomas@gllm.fr>
+---
+ modules/video_chroma/swscale.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/modules/video_chroma/swscale.c b/modules/video_chroma/swscale.c
+index 8993d11ec5dd..11897527355c 100644
+--- a/modules/video_chroma/swscale.c
++++ b/modules/video_chroma/swscale.c
+@@ -588,8 +588,9 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
+ {
+     filter_sys_t *p_sys = p_filter->p_sys;
+     uint8_t palette[AVPALETTE_SIZE];
+-    uint8_t *src[4]; int src_stride[4];
+-    uint8_t *dst[4]; int dst_stride[4];
++    uint8_t *src[4], *dst[4];
++    const uint8_t *csrc[4];
++    int src_stride[4], dst_stride[4];
+ 
+     GetPixels( src, src_stride, p_sys->desc_in, &p_filter->fmt_in.video,
+                p_src, i_plane_count, b_swap_uvi );
+@@ -606,11 +607,14 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
+     GetPixels( dst, dst_stride, p_sys->desc_out, &p_filter->fmt_out.video,
+                p_dst, i_plane_count, b_swap_uvo );
+ 
++    for (size_t i = 0; i < ARRAY_SIZE(src); i++)
++        csrc[i] = src[i];
++
+ #if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
+-    sws_scale( ctx, src, src_stride, 0, i_height,
++    sws_scale( ctx, csrc, src_stride, 0, i_height,
+                dst, dst_stride );
+ #else
+-    sws_scale_ordered( ctx, src, src_stride, 0, i_height,
++    sws_scale_ordered( ctx, csrc, src_stride, 0, i_height,
+                        dst, dst_stride );
+ #endif
+ }
+-- 
+GitLab
+
+
+From 4431076ad4a21fdcabd3f7ef1d61c45891689b0c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+Date: Sun, 3 Mar 2019 17:20:04 +0200
+Subject: [PATCH 4/5] dynamicoverlay: fix variable shadowing
+
+(cherry picked from commit d42e05d6b2c061ae352c131d5aebf8c8d8aa6d35)
+Signed-off-by: Thomas Guillem <thomas@gllm.fr>
+---
+ modules/spu/dynamicoverlay/dynamicoverlay_commands.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/modules/spu/dynamicoverlay/dynamicoverlay_commands.c b/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
+index a93462925e8a..a85f9aafb0b9 100644
+--- a/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
++++ b/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
+@@ -899,12 +899,11 @@ static const commanddesc_static_t p_commands[] =
+ void RegisterCommand( filter_t *p_filter )
+ {
+     filter_sys_t *p_sys = (filter_sys_t*) p_filter->p_sys;
+-    size_t i_index = 0;
+ 
+     p_sys->i_commands = ARRAY_SIZE(p_commands);
+     p_sys->pp_commands = (commanddesc_t **) calloc( p_sys->i_commands, sizeof(commanddesc_t*) );
+     if( !p_sys->pp_commands ) return;
+-    for( i_index = 0; i_index < p_sys->i_commands; i_index ++ )
++    for( size_t i_index = 0; i_index < p_sys->i_commands; i_index ++ )
+     {
+         p_sys->pp_commands[i_index] = (commanddesc_t *) malloc( sizeof(commanddesc_t) );
+         if( !p_sys->pp_commands[i_index] ) return;
+-- 
+GitLab
+
+
+From fda14fc7c013eb75291df10cc8b88336c51328ad Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+Date: Mon, 26 Feb 2018 20:43:03 +0200
+Subject: [PATCH 5/5] dynamicoverlay: fix memory corruption
+
+Font alpha is 8-bits, not 32-bits.
+
+(cherry picked from commit 6f14081af7325d334a53126c4eea52bc30fc08a0)
+Signed-off-by: Thomas Guillem <thomas@gllm.fr>
+---
+ modules/spu/dynamicoverlay/dynamicoverlay_commands.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/modules/spu/dynamicoverlay/dynamicoverlay_commands.c b/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
+index a85f9aafb0b9..7a71c6f2373a 100644
+--- a/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
++++ b/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
+@@ -234,8 +234,12 @@ static int parser_SetTextAlpha( char *psz_command, char *psz_end,
+     skip_space( &psz_command );
+     if( isdigit( (unsigned char)*psz_command ) )
+     {
+-        if( parse_digit( &psz_command, &p_params->fontstyle.i_font_alpha ) == VLC_EGENERIC )
++        int32_t value;
++
++        if( parse_digit( &psz_command, &value ) == VLC_EGENERIC )
+             return VLC_EGENERIC;
++
++        p_params->fontstyle.i_font_alpha = value;
+     }
+     return VLC_SUCCESS;
+ }
+-- 
+GitLab
+

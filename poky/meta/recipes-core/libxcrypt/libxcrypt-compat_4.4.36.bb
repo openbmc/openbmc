@@ -1,5 +1,5 @@
 #
-# This provides libcrypto.so.1 which contains obsolete APIs, needed for uninative in particular
+# This provides libcrypt.so.1 which contains obsolete APIs, needed for uninative in particular
 #
 
 require libxcrypt.inc

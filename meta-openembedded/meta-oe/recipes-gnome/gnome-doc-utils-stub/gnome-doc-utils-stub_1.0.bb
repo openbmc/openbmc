@@ -11,7 +11,7 @@ PROVIDES = "gnome-doc-utils"
 
 do_install:append() {
         install -d ${D}${datadir}/aclocal/
-        install ${WORKDIR}/gnome-doc-utils.m4 ${D}${datadir}/aclocal/
+        install ${UNPACKDIR}/gnome-doc-utils.m4 ${D}${datadir}/aclocal/
 }
 
 FILES:${PN} += "${datadir}"

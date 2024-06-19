@@ -1,16 +1,21 @@
 #! /bin/sh
 
-# Multiply all timeouts by ten so they're more likely to work
-# on a loaded system.
+# Multiply all timeouts by five so they're more likely to work
+# on a loaded system. The default timeout is 20s so this makes it
+# one minute.
 export CK_TIMEOUT_MULTIPLIER=5
 
 # Skip some tests that we know are problematic
 export GST_CHECKS_IGNORE=""
+
 # gstnetclientclock.c:test_functioning is very sensitive to load
 GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,test_functioning"
 
 # aggregator.c:test_infinite_seek_50_src_live is known to be flaky
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/410
 GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,test_infinite_seek_50_src_live"
+
+# Known unreliable tests as per subprojects/gst-devtools/validate/launcher/testsuites/check.py:
+GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE:parser_pull_short_read"
 
 gnome-desktop-testing-runner gstreamer

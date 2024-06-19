@@ -18,7 +18,7 @@ number), please contact the meta-arm mailing list at
 meta-arm@lists.yoctoproject.org and arm-security@arm.com.
 
 If you are dealing with a not-yet released or urgent issue, please send a mail
-to the maintainers (see README.md) and arm-security@arm.com, including as much
+to the maintainers \(see [README.md](/README.md)\) and arm-security@arm.com, including as much
 detail as possible.  Encrypted emails using PGP are welcome.
 
 For more information, please visit https://developer.arm.com/support/arm-security-updates/report-security-vulnerabilities.
@@ -27,11 +27,20 @@ For more information, please visit https://developer.arm.com/support/arm-securit
 ## Branches maintained with security fixes
 
 meta-arm follows the Yocto release model, so see
-[https://wiki.yoctoproject.org/wiki/Stable_Release_and_LTS Stable release and
-LTS] for detailed info regarding the policies and maintenance of stable
+[Stable release and LTS](https://wiki.yoctoproject.org/wiki/Stable_Release_and_LTS)
+for detailed info regarding the policies and maintenance of stable
 branches.
 
-The [https://wiki.yoctoproject.org/wiki/Releases Release page] contains a list of all
+The [Release page](https://wiki.yoctoproject.org/wiki/Releases) contains a list of all
 releases of the Yocto Project. Versions in grey are no longer actively maintained with
 security patches, but well-tested patches may still be accepted for them for
 significant issues.
+
+
+# Disclaimer
+
+Arm reference solutions are Arm public example software projects that track and
+pull upstream components, incorporating their respective security fixes
+published over time. Arm partners are responsible for ensuring that the
+components they use contain all the required security fixes, if and when they
+deploy a product derived from Arm reference solutions.

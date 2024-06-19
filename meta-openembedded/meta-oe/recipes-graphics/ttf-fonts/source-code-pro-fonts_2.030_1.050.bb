@@ -16,7 +16,7 @@ S = "${WORKDIR}/source-code-pro-2.030R-ro-1.050R-it"
 
 do_install() {
     install -d ${D}${sysconfdir}/fonts/conf.d/
-    install -m 0644 ${WORKDIR}/44-source-code-pro-fonts-fontconfig.conf ${D}${sysconfdir}/fonts/conf.d/
+    install -m 0644 ${UNPACKDIR}/44-source-code-pro-fonts-fontconfig.conf ${D}${sysconfdir}/fonts/conf.d/
 
     install -d ${D}${datadir}/fonts/truetype/
     find ./ -name '*.otf' -exec install -m 0644 {} ${D}${datadir}/fonts/truetype/ \;

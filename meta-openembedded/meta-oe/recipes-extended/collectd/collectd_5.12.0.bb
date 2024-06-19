@@ -63,7 +63,7 @@ EXTRA_OECONF = " \
 
 do_install:append() {
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/collectd.init ${D}${sysconfdir}/init.d/collectd
+    install -m 0755 ${UNPACKDIR}/collectd.init ${D}${sysconfdir}/init.d/collectd
     sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}${sysconfdir}/init.d/collectd
     sed -i 's!/etc/!${sysconfdir}/!g' ${D}${sysconfdir}/init.d/collectd
     sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/collectd
@@ -77,7 +77,7 @@ do_install:append() {
 
     # Install systemd unit files
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/collectd.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/collectd.service ${D}${systemd_unitdir}/system
     sed -i -e 's,@SBINDIR@,${sbindir},g' \
         ${D}${systemd_unitdir}/system/collectd.service
 }

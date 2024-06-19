@@ -29,7 +29,7 @@ CFLAGS += "-D_GNU_SOURCE"
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/pppoe-server.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/pppoe-server.service ${D}${systemd_unitdir}/system
     sed -i -e 's#@SYSCONFDIR@#${sysconfdir}#g' ${D}${systemd_unitdir}/system/pppoe-server.service
     sed -i -e 's#@SBINDIR@#${sbindir}#g' ${D}${systemd_unitdir}/system/pppoe-server.service
     install -d ${D}${datadir}/doc/${PN}
@@ -41,8 +41,8 @@ do_install:append() {
 do_install() {
     # Install init script and default settings
     install -m 0755 -d ${D}${sysconfdir}/default ${D}${sysconfdir}/init.d
-    install -m 0644 ${WORKDIR}/pppoe-server.default ${D}${sysconfdir}/default/pppoe-server
-    install -m 0755 ${WORKDIR}/pppoe-server.init ${D}${sysconfdir}/init.d/pppoe-server
+    install -m 0644 ${UNPACKDIR}/pppoe-server.default ${D}${sysconfdir}/default/pppoe-server
+    install -m 0755 ${UNPACKDIR}/pppoe-server.init ${D}${sysconfdir}/init.d/pppoe-server
     # Install
     oe_runmake -C ${S} DESTDIR=${D} docdir=${docdir} install
     chmod 4755 ${D}${sbindir}/pppoe

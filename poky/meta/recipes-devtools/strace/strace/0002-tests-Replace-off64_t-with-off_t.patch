@@ -1,4 +1,4 @@
-From 579b2ebe52d4b97f954e6188df2d07e137820075 Mon Sep 17 00:00:00 2001
+From 1891db87da3b204c512f47155aaa4e692008f1bf Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 15 Dec 2022 15:56:13 -0800
 Subject: [PATCH] tests: Replace off64_t with off_t
@@ -10,9 +10,12 @@ Upstream-Status: Submitted [https://github.com/strace/strace/pull/230]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  tests/readahead.c        | 2 +-
+ tests/sync_file_range.c  | 4 ++--
  tests/sync_file_range2.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/tests/readahead.c b/tests/readahead.c
+index 1072378..b9597e6 100644
 --- a/tests/readahead.c
 +++ b/tests/readahead.c
 @@ -42,7 +42,7 @@ static const int fds[] = {
@@ -24,19 +27,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  	-0x8000000000000000LL,
  	-0x5060708090a0b0c0LL,
  	-1LL,
---- a/tests/sync_file_range2.c
-+++ b/tests/sync_file_range2.c
-@@ -20,8 +20,8 @@ int
- main(void)
- {
- 	const int fd = -1;
--	const off64_t offset = 0xdeadbeefbadc0ded;
--	const off64_t nbytes = 0xfacefeedcafef00d;
-+	const off_t offset = 0xdeadbeefbadc0ded;
-+	const off_t nbytes = 0xfacefeedcafef00d;
- 	const unsigned int flags = -1;
- 
- 	int rc = sync_file_range(fd, offset, nbytes, flags);
+diff --git a/tests/sync_file_range.c b/tests/sync_file_range.c
+index e93ab6c..dc76865 100644
 --- a/tests/sync_file_range.c
 +++ b/tests/sync_file_range.c
 @@ -20,8 +20,8 @@ int
@@ -47,6 +39,21 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 -	const off64_t nbytes = 0xfacefeedcafef00dULL;
 +	const off_t offset = 0xdeadbeefbadc0dedULL;
 +	const off_t nbytes = 0xfacefeedcafef00dULL;
+ 	const unsigned int flags = -1;
+ 
+ 	int rc = sync_file_range(fd, offset, nbytes, flags);
+diff --git a/tests/sync_file_range2.c b/tests/sync_file_range2.c
+index b8dc712..e4b003c 100644
+--- a/tests/sync_file_range2.c
++++ b/tests/sync_file_range2.c
+@@ -20,8 +20,8 @@ int
+ main(void)
+ {
+ 	const int fd = -1;
+-	const off64_t offset = 0xdeadbeefbadc0ded;
+-	const off64_t nbytes = 0xfacefeedcafef00d;
++	const off_t offset = 0xdeadbeefbadc0ded;
++	const off_t nbytes = 0xfacefeedcafef00d;
  	const unsigned int flags = -1;
  
  	int rc = sync_file_range(fd, offset, nbytes, flags);

@@ -1,5 +1,4 @@
 SUMMARY = "Radically simplified static file serving for WSGI applications"
-AUTHOR = "David Evans <d@evans.io>"
 HOMEPAGE = "https://whitenoise.evans.io"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=aba4901cc64e401cea5a267eac2a2e1e"

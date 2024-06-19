@@ -18,6 +18,10 @@ TOOLCHAIN = "gcc"
 
 FILES:${PN} = "${bindir}/ts-demo"
 
+# TODO: remove FORTIFY_SOURCE as MbedTLS fails to build in yocto if this
+# compilation flag is used.
+lcl_maybe_fortify = "${@oe.utils.conditional('OPTLEVEL','-O0','','${OPTLEVEL}',d)}"
+
 do_install:append () {
     install -d ${D}${bindir}
     mv ${D}${TS_INSTALL}/bin/ts-demo ${D}${bindir}

@@ -1,0 +1,46 @@
+From 9e4063a9a3fb2fab69d906902a8432da2544654b Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@fujitsu.com>
+Date: Tue, 11 Jun 2024 01:38:55 +0000
+Subject: [PATCH] cmpi-bindings: Fix build error with gcc14.
+
+The build error is as the following:
+
+| build-daily-2/tmp/work/aarch64-ubinux-linux/cmpi-bindings/1.0.4/git/swig/python/../../src/target_python.c:168:21: error: passing argument 1 of 'Py_SetProgramName' from incompatible pointer type [-Wincompatible-pointer-types]
+|   168 |   Py_SetProgramName("cmpi_swig");
+|       |                     ^~~~~~~~~~~
+|       |                     |
+|       |                     char *
+| build-daily-2/tmp/work/aarch64-ubinux-linux/cmpi-bindings/1.0.4/recipe-sysroot/usr/include/python3.12/pylifecycle.h:37:56: note: expected 'const wchar_t *' {aka 'const unsigned int *'} but argument is of type 'char *'
+|    37 | Py_DEPRECATED(3.11) PyAPI_FUNC(void) Py_SetProgramName(const wchar_t *);
+|       |        
+
+Upstream-Status: Submitted
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ src/target_python.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/target_python.c b/src/target_python.c
+index a8dfd30..69a2515 100644
+--- a/src/target_python.c
++++ b/src/target_python.c
+@@ -154,6 +154,7 @@ cleanup:
+ static int
+ PyGlobalInitialize(const CMPIBroker* broker, CMPIStatus* st)
+ {
++  const wchar_t proname[] = L"cmpi_swig";
+ /*  _SBLIM_TRACE(1,("<%d/0x%x> PyGlobalInitialize() called", getpid(), pthread_self())); */
+   
+   if (_TARGET_INIT)
+@@ -165,7 +166,7 @@ PyGlobalInitialize(const CMPIBroker* broker, CMPIStatus* st)
+   
+   _SBLIM_TRACE(1,("<%d/0x%x> Python: Loading", getpid(), pthread_self()));
+   
+-  Py_SetProgramName("cmpi_swig");
++  Py_SetProgramName(proname);
+   Py_Initialize();
+ #if PY_MAJOR_VERSION < 3
+   SWIGEXPORT void SWIG_init(void);
+-- 
+2.34.1
+

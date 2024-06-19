@@ -44,7 +44,7 @@ do_install() {
     install ${S}/linux/miniupnpd.init.d.script ${D}/${sysconfdir}/init.d/miniupnpd
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/miniupnpd.service ${D}${systemd_unitdir}/system/
+    install -m 0644 ${UNPACKDIR}/miniupnpd.service ${D}${systemd_unitdir}/system/
 }
 
 SYSTEMD_SERVICE:${PN} = "miniupnpd.service"

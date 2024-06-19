@@ -1,7 +1,7 @@
 Use proper -L path when cross compiling.
 
 Signed-off-by: Anders Roxell <anders.roxell@enea.com>
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [no activity since 2018; cvs server went read-only]
 ---
 diff -uNr a/tclconfig/tcl.m4 b/tclconfig/tcl.m4
 --- a/tclconfig/tcl.m4	2012-12-14 09:16:58.789861281 +0100

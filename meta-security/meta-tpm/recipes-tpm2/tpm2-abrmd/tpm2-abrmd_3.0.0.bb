@@ -40,10 +40,10 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir},
 
 do_install:append() {
     install -d "${D}${sysconfdir}/init.d"
-    install -m 0755 "${WORKDIR}/tpm2-abrmd-init.sh" "${D}${sysconfdir}/init.d/tpm2-abrmd"
+    install -m 0755 "${UNPACKDIR}/tpm2-abrmd-init.sh" "${D}${sysconfdir}/init.d/tpm2-abrmd"
 
     install -d "${D}${sysconfdir}/default"
-    install -m 0644 "${WORKDIR}/tpm2-abrmd.default" "${D}${sysconfdir}/default/tpm2-abrmd"
+    install -m 0644 "${UNPACKDIR}/tpm2-abrmd.default" "${D}${sysconfdir}/default/tpm2-abrmd"
 }
 
 FILES:${PN} += "${libdir}/systemd/system-preset \

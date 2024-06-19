@@ -76,7 +76,7 @@ do_install_ptest_base () {
 	done
 
 	install -d ${D}${PTEST_PATH}
-	cp ${WORKDIR}/run-ptest ${D}${PTEST_PATH}/
+	cp ${UNPACKDIR}/run-ptest ${D}${PTEST_PATH}/
 
 }
 

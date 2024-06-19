@@ -169,14 +169,14 @@ do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/init.d
         install -d ${D}${sysconfdir}/default/volatiles
-        install -m 0755 ${WORKDIR}/freeradius ${D}/etc/init.d/radiusd
-        install -m 0644 ${WORKDIR}/volatiles.58_radiusd ${D}${sysconfdir}/default/volatiles/58_radiusd
+        install -m 0755 ${UNPACKDIR}/freeradius ${D}/etc/init.d/radiusd
+        install -m 0644 ${UNPACKDIR}/volatiles.58_radiusd ${D}${sysconfdir}/default/volatiles/58_radiusd
     fi
 
     # For systemd
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/radiusd.service ${D}${systemd_unitdir}/system
+        install -m 0644 ${UNPACKDIR}/radiusd.service ${D}${systemd_unitdir}/system
         sed -i -e 's,@BASE_BINDIR@,${base_bindir},g' \
             -e 's,@SBINDIR@,${sbindir},g' \
             -e 's,@STATEDIR@,${localstatedir},g' \
@@ -184,7 +184,7 @@ do_install() {
             ${D}${systemd_unitdir}/system/radiusd.service
 
         install -d ${D}${sysconfdir}/tmpfiles.d/
-        install -m 0644 ${WORKDIR}/radiusd-volatiles.conf ${D}${sysconfdir}/tmpfiles.d/radiusd.conf
+        install -m 0644 ${UNPACKDIR}/radiusd-volatiles.conf ${D}${sysconfdir}/tmpfiles.d/radiusd.conf
     fi
 
     oe_multilib_header freeradius/autoconf.h

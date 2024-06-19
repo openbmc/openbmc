@@ -1,7 +1,7 @@
-From 01195eb9f7d59139fb45df506ac6b3968c14a57f Mon Sep 17 00:00:00 2001
+From d4b0bb9c7651017985fdd75469f37c34ce2f2c50 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 13:55:12 +0800
-Subject: [PATCH 01/22] missing_type.h: add comparison_fn_t
+Subject: [PATCH] missing_type.h: add comparison_fn_t
 
 Make it work with musl where comparison_fn_t and is not provided.
 
@@ -56,6 +56,3 @@ index ae91534198..7f67eea38b 100644
  
  const char * const catalog_file_dirs[] = {
          "/usr/local/lib/systemd/catalog/",
--- 
-2.34.1
-

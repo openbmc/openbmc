@@ -1,0 +1,76 @@
+From c9e05b03c18e898be604ab90401476e9c473cc52 Mon Sep 17 00:00:00 2001
+From: Jonathan Wakely <jwakely@redhat.com>
+Date: Thu, 16 May 2024 17:15:55 +0100
+Subject: [PATCH] libstdc++: Fix typo in _Grapheme_cluster_view::_Iterator
+ [PR115119]
+
+libstdc++-v3/ChangeLog:
+
+	PR libstdc++/115119
+	* include/bits/unicode.h (_Iterator::operator++(int)): Fix typo
+	in increment expression.
+	* testsuite/ext/unicode/grapheme_view.cc: Check post-increment
+	on view's iterator.
+
+Drop it when upgrading to 14.2
+
+Upstream-Status: Backport [https://github.com/gcc-mirror/gcc/commit/c9e05b03c18e898be604ab90401476e9c473cc52]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libstdc++-v3/include/bits/unicode.h                 |  6 ++++--
+ libstdc++-v3/testsuite/ext/unicode/grapheme_view.cc | 11 +++++++++++
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/libstdc++-v3/include/bits/unicode.h b/libstdc++-v3/include/bits/unicode.h
+index 46238143fb6..a14a17c5dfc 100644
+--- a/libstdc++-v3/include/bits/unicode.h
++++ b/libstdc++-v3/include/bits/unicode.h
+@@ -34,10 +34,12 @@
+ #include <array>
+ #include <bit>      // bit_width
+ #include <charconv> // __detail::__from_chars_alnum_to_val_table
++#include <string_view>
+ #include <cstdint>
+ #include <bits/stl_algo.h>
+ #include <bits/stl_iterator.h>
+-#include <bits/ranges_base.h>
++#include <bits/ranges_base.h> // iterator_t, sentinel_t, input_range, etc.
++#include <bits/ranges_util.h> // view_interface
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+@@ -802,7 +804,7 @@ inline namespace __v15_1_0
+ 	operator++(int)
+ 	{
+ 	  auto __tmp = *this;
+-	  ++this;
++	  ++*this;
+ 	  return __tmp;
+ 	}
+ 
+diff --git a/libstdc++-v3/testsuite/ext/unicode/grapheme_view.cc b/libstdc++-v3/testsuite/ext/unicode/grapheme_view.cc
+index ac1e8c50b05..a3bb36e14b8 100644
+--- a/libstdc++-v3/testsuite/ext/unicode/grapheme_view.cc
++++ b/libstdc++-v3/testsuite/ext/unicode/grapheme_view.cc
+@@ -83,10 +83,21 @@ test_breaks()
+   VERIFY( iter == gv.end() );
+ }
+ 
++constexpr void
++test_pr115119()
++{
++  // PR 115119 Typo in _Grapheme_cluster_view::_Iterator::operator++(int)
++  uc::_Grapheme_cluster_view gv(" "sv);
++  auto it = std::ranges::begin(gv);
++  it++;
++  VERIFY( it == std::ranges::end(gv) );
++}
++
+ int main()
+ {
+   auto run_tests = []{
+     test_breaks();
++    test_pr115119();
+     return true;
+   };
+ 

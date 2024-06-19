@@ -22,11 +22,9 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  none/tests/arm/Makefile.am | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/none/tests/arm/Makefile.am b/none/tests/arm/Makefile.am
-index 4507a20..825290f 100644
 --- a/none/tests/arm/Makefile.am
 +++ b/none/tests/arm/Makefile.am
-@@ -62,8 +62,10 @@ neon64_CFLAGS     = $(AM_CFLAGS) -g -O0 -mcpu=cortex-a8 \
+@@ -87,8 +87,10 @@ neon64_CFLAGS     = $(AM_CFLAGS) -g -O0
  			-mfpu=neon \
  			-mthumb
  
@@ -39,6 +37,3 @@ index 4507a20..825290f 100644
 +vcvt_fixed_float_VFP_CFLAGS = $(AM_CFLAGS) -g -mcpu=cortex-a8 -mfpu=vfpv3
 +
 +vfpv4_fma_CFLAGS  = $(AM_CFLAGS) -g -O0 -march=armv7ve -mcpu=cortex-a15 -mfpu=vfpv4 -marm
--- 
-1.9.1
-

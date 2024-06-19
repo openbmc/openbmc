@@ -1,31 +1,25 @@
-From 7d4d3fee0c7111830ee9b2b049ae3ce265b26030 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Simone=20Wei=C3=9F?= <simone.p.weiss@posteo.com>
-Date: Sat, 10 Feb 2024 13:23:56 +0100
+From f91073242268d2b2c1a1a705e7fd585679f78a59 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 31 May 2024 09:18:17 -0400
 Subject: [PATCH] selftest-hello: add CVE_STATUS
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
 This should pass the test_cve_tag_format selftest.
 
-Signed-off-by: Simone Weiß <simone.p.weiss@posteo.com>
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- .../recipes-test/selftest-hello/selftest-hello_1.0.bb         | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-index 547587bef4..9908b3b417 100644
+index 2dc352d479e..88c5c98608f 100644
 --- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 +++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-@@ -16,4 +16,6 @@ do_install() {
+@@ -17,4 +17,5 @@ do_install() {
  	install -m 0755 helloworld ${D}${bindir}
  }
  
--BBCLASSEXTEND = "native nativesdk"
-\ No newline at end of file
 +CVE_STATUS[CVE-2024-12345] = "not-applicable-platform: Issue only applies on Windows"
-+
-+BBCLASSEXTEND = "native nativesdk"
+ BBCLASSEXTEND = "native nativesdk"
 -- 
-2.39.2
+2.45.1
 

@@ -17,19 +17,15 @@ Upstream-Status: Pending
  teamd/teamd_runner_lacp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/teamd/teamd_runner_lacp.c b/teamd/teamd_runner_lacp.c
-index 9c77fae..8800854 100644
 --- a/teamd/teamd_runner_lacp.c
 +++ b/teamd/teamd_runner_lacp.c
-@@ -23,6 +23,7 @@
+@@ -23,12 +23,12 @@
  #include <unistd.h>
  #include <limits.h>
  #include <sys/ioctl.h>
 +#include <net/ethernet.h>
- #include <linux/if_ether.h>
  #include <sys/socket.h>
- #include <linux/netdevice.h>
-@@ -30,7 +31,6 @@
+ #include <netinet/in.h>
  #include <errno.h>
  #include <team.h>
  #include <private/misc.h>
@@ -37,6 +33,3 @@ index 9c77fae..8800854 100644
  
  #include "teamd.h"
  #include "teamd_config.h"
--- 
-2.13.2
-

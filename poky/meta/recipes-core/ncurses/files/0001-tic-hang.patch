@@ -1,7 +1,7 @@
-From 168ba7a681be73ac024438e33e14fde1d5aea97d Mon Sep 17 00:00:00 2001
+From a51a53f0eecfd4d083aba8dfcd47c65e93978ff1 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 30 Mar 2018 10:02:24 +0800
-Subject: [PATCH 1/2] tic hang
+Subject: [PATCH] tic hang
 
 Upstream-Status: Inappropriate [configuration]
 
@@ -17,10 +17,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/misc/terminfo.src b/misc/terminfo.src
-index 84f4810..6b385ec 100644
+index 5d575b8e..f9cc6880 100644
 --- a/misc/terminfo.src
 +++ b/misc/terminfo.src
-@@ -5562,12 +5562,11 @@ konsole-xf3x|KDE console window with keyboard for XFree86 3.x xterm,
+@@ -6518,12 +6518,11 @@ konsole-xf3x|KDE console window with keyboard for XFree86 3.x xterm,
  # The value for kbs (see konsole-vt100) reflects local customization rather
  # than the settings used for XFree86 xterm.
  konsole-xf4x|KDE console window with keyboard for XFree86 4.x xterm,
@@ -38,6 +38,3 @@ index 84f4810..6b385ec 100644
  
  # Obsolete: vt100.keymap
  # KDE's "vt100" keyboard has no relationship to any terminal that DEC made, but
--- 
-1.8.3.1
-

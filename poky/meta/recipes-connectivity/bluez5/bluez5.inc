@@ -85,7 +85,7 @@ NOINST_TOOLS = " \
 
 do_install:append() {
 	install -d ${D}${INIT_D_DIR}
-	install -m 0755 ${WORKDIR}/init ${D}${INIT_D_DIR}/bluetooth
+	install -m 0755 ${UNPACKDIR}/init ${D}${INIT_D_DIR}/bluetooth
 
 	if [ -f ${D}/${sysconfdir}/init.d/bluetooth ]; then
 		sed -i -e 's#@LIBEXECDIR@#${libexecdir}#g' ${D}/${sysconfdir}/init.d/bluetooth

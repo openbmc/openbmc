@@ -1,14 +1,21 @@
-configure.ac:  override CONFIGURE_LINE
+From f5c6fabbdf2e7bfa105658b9dfe45d2ab86f34bb Mon Sep 17 00:00:00 2001
+From: Joe Slater <joe.slater@windriver.com>
+Date: Fri, 17 Jul 2020 13:59:56 -0700
+Subject: [PATCH] configure.ac:  override CONFIGURE_LINE
 
 For reproducible binaries, we need to report a constant CONFIGURE_LINE.
 
 Upstream-Status: Pending
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
+---
+ configure.ac | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-
---- git.orig/configure.ac
-+++ git/configure.ac
+diff --git a/configure.ac b/configure.ac
+index 5364dd68e..c2dbf3c9f 100644
+--- a/configure.ac
++++ b/configure.ac
 @@ -15,7 +15,15 @@ AC_PREREQ(2.69)
  ################################################################################
  dnl -- Process this file with autoconf to produce a configure script.

@@ -58,7 +58,7 @@ do_compile:prepend () {
 do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/saslauthd.service ${D}${systemd_unitdir}/system
+        install -m 0644 ${UNPACKDIR}/saslauthd.service ${D}${systemd_unitdir}/system
 
         sed -i -e 's#@SBINDIR@#${sbindir}#g' ${D}${systemd_unitdir}/system/saslauthd.service
         sed -i -e 's#@LOCALSTATEDIR@#${localstatedir}#g' ${D}${systemd_unitdir}/system/saslauthd.service
@@ -68,7 +68,7 @@ do_install:append() {
         echo "d /run/saslauthd/ - - - -" > ${D}${sysconfdir}/tmpfiles.d/saslauthd.conf
 
         install -d ${D}${sysconfdir}/default/
-        install -m 0644 ${WORKDIR}/saslauthd.conf ${D}${sysconfdir}/default/saslauthd
+        install -m 0644 ${UNPACKDIR}/saslauthd.conf ${D}${sysconfdir}/default/saslauthd
         sed -i -e 's#@LOCALSTATEDIR@#${localstatedir}#g' ${D}${sysconfdir}/default/saslauthd
     fi
 }

@@ -11,7 +11,9 @@ and one process tries to chown a file that the other process has just deleted.
 Also install-manx should be a phony target, and for clarity use $^ instead of $?
 in the install command.
 
-Upstream-Status: Pending
+Upstream ticket: https://unicode-org.atlassian.net/jira/software/c/projects/ICU/issues/ICU-21172
+
+Upstream-Status: Submitted [https://github.com/unicode-org/icu/pull/2966]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 ---
  Makefile.in | 8 ++++----

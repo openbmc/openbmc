@@ -28,6 +28,6 @@ inherit autotools
 do_install:append() {
     install -d ${D}/${sysconfdir}
     install -d ${D}/${sysconfdir}/cron.d
-    install ${WORKDIR}/GeoIP.conf ${D}/${sysconfdir}/
-    install ${WORKDIR}/geoipupdate.cron ${D}/${sysconfdir}/cron.d/
+    install ${UNPACKDIR}/GeoIP.conf ${D}/${sysconfdir}/
+    install ${UNPACKDIR}/geoipupdate.cron ${D}/${sysconfdir}/cron.d/
 }

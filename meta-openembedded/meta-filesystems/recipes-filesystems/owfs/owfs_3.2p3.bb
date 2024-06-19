@@ -37,8 +37,8 @@ EXTRA_OECONF = " \
 do_install:prepend() {
     install -d ${D}${sysconfdir}/default/
     install -d ${D}${sysconfdir}/init.d/
-    install -m 0755 ${WORKDIR}/owhttpd ${D}${sysconfdir}/init.d/owhttpd
-    install -m 0755 ${WORKDIR}/owserver ${D}${sysconfdir}/init.d/owserver
+    install -m 0755 ${UNPACKDIR}/owhttpd ${D}${sysconfdir}/init.d/owhttpd
+    install -m 0755 ${UNPACKDIR}/owserver ${D}${sysconfdir}/init.d/owserver
 }
 
 PACKAGES =+ "owftpd owhttpd owserver owshell libowcapi libow libownet owmon owtap"

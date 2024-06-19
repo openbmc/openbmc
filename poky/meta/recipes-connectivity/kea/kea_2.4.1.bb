@@ -17,7 +17,6 @@ SRC_URI = "http://ftp.isc.org/isc/kea/${PV}/${BP}.tar.gz \
            file://fix-multilib-conflict.patch \
            file://fix_pid_keactrl.patch \
            file://0001-src-lib-log-logger_unittest_support.cc-do-not-write-.patch \
-           file://0001-kea-fix-reproducible-build-failure.patch \
            "
 SRC_URI[sha256sum] = "815c61f5c271caa4a1db31dd656eb50a7f6ea973da3690f7c8581408e180131a"
 
@@ -39,6 +38,7 @@ DEBUG_OPTIMIZATION:append:mipsel = " -O"
 BUILD_OPTIMIZATION:remove:mipsel = " -Og"
 BUILD_OPTIMIZATION:append:mipsel = " -O"
 
+CXXFLAGS:remove = "-fvisibility-inlines-hidden"
 EXTRA_OECONF = "--with-boost-libs=-lboost_system \
                 --with-log4cplus=${STAGING_DIR_TARGET}${prefix} \
                 --with-openssl=${STAGING_DIR_TARGET}${prefix}"
@@ -47,7 +47,7 @@ do_configure:prepend() {
     # replace abs_top_builddir to avoid introducing the build path
     # don't expand the abs_top_builddir on the target as the abs_top_builddir is meanlingless on the target
     find ${S} -type f -name *.sh.in | xargs sed -i  "s:@abs_top_builddir@:@abs_top_builddir_placeholder@:g"
-    sed -i "s:@abs_top_srcdir@:@abs_top_srcdir_placeholder@:g" ${S}/src/bin/admin/kea-admin.in
+    sed -i "s:@abs_top_builddir@:@abs_top_builddir_placeholder@:g" ${S}/src/bin/admin/kea-admin.in
 }
 
 # patch out build host paths for reproducibility
@@ -59,8 +59,8 @@ do_install:append() {
     install -d ${D}${sysconfdir}/init.d
     install -d ${D}${systemd_system_unitdir}
 
-    install -m 0644 ${WORKDIR}/kea-dhcp*service ${D}${systemd_system_unitdir}
-    install -m 0755 ${WORKDIR}/kea-*-server ${D}${sysconfdir}/init.d
+    install -m 0644 ${UNPACKDIR}/kea-dhcp*service ${D}${systemd_system_unitdir}
+    install -m 0755 ${UNPACKDIR}/kea-*-server ${D}${sysconfdir}/init.d
     sed -i -e 's,@SBINDIR@,${sbindir},g' -e 's,@BASE_BINDIR@,${base_bindir},g' \
            -e 's,@LOCALSTATEDIR@,${localstatedir},g' -e 's,@SYSCONFDIR@,${sysconfdir},g' \
            ${D}${systemd_system_unitdir}/kea-dhcp*service ${D}${sbindir}/keactrl

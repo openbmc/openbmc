@@ -2,7 +2,7 @@ SUMMARY = "Kernel selftest for Linux"
 DESCRIPTION = "Kernel selftest for Linux"
 LICENSE = "GPL-2.0-only"
 
-LIC_FILES_CHKSUM = "file://../COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+LIC_FILES_CHKSUM = "file://${UNPACKDIR}/COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 DEPENDS = "rsync-native llvm-native"
 
@@ -120,7 +120,7 @@ do_install() {
 }
 
 do_configure() {
-    install -D -m 0644 ${WORKDIR}/COPYING ${S}/COPYING
+    install -D -m 0644 ${UNPACKDIR}/COPYING ${S}/COPYING
 }
 
 do_patch[prefuncs] += "copy_kselftest_source_from_kernel remove_unrelated"

@@ -1,0 +1,35 @@
+From 542c6f25327587d5a6bffb8a45b457ec85dcf8e1 Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Tue, 19 Dec 2023 13:24:50 +0100
+Subject: [PATCH 3/3] configure: Further defang the -Werror check
+
+Incompatible pointer types are actually errors (in the sense
+that they are invalid C).  Compilers have merely tolerated them as
+warnings for backwards compatibility.  This is changing with Clang 16
+and GCC 14, so relax the check a little.
+
+Upstream-Status: Submitted [https://github.com/fvwmorg/fvwm/pull/100]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c9fcede6..2e9615b2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -220,9 +220,8 @@ AC_MINIX
+ 
+ # catch -Werror and similar options when running configure
+ AC_TRY_COMPILE([#include <stdio.h>],
+-[int i; int *p; char *c;
+-  switch (*p = p = *c) { case 0: printf("%Q", c, p); }
+-  *c = &i; c = p;
++[int unused; int *p; char *c;
++  printf("%Q", c, p);
+   while (1 || (unsigned int)3 >= 0 || ((int)-1) == ((unsigned int)1));
+ ], , AC_MSG_ERROR("
+ configure is not able to compile programs with warnings.  Please
+-- 
+2.45.0
+

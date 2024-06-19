@@ -193,13 +193,17 @@ def prune_lockedsigs(excluded_tasks, excluded_targets, lockedsigs, onlynative, p
                     else:
                         f.write(line)
                         invalue = False
-                elif line.startswith('SIGGEN_LOCKEDSIGS'):
+                elif line.startswith('SIGGEN_LOCKEDSIGS_t'):
                     invalue = True
+                    f.write(line)
+                else:
+                    invalue = False
                     f.write(line)
 
 def merge_lockedsigs(copy_tasks, lockedsigs_main, lockedsigs_extra, merged_output, copy_output=None):
     merged = {}
     arch_order = []
+    otherdata = []
     with open(lockedsigs_main, 'r') as f:
         invalue = None
         for line in f:
@@ -212,6 +216,9 @@ def merge_lockedsigs(copy_tasks, lockedsigs_main, lockedsigs_extra, merged_outpu
                 invalue = line[18:].split('=', 1)[0].rstrip()
                 merged[invalue] = []
                 arch_order.append(invalue)
+            else:
+                invalue = None
+                otherdata.append(line)
 
     with open(lockedsigs_extra, 'r') as f:
         invalue = None
@@ -246,6 +253,7 @@ def merge_lockedsigs(copy_tasks, lockedsigs_main, lockedsigs_extra, merged_outpu
                     f.write('    "\n')
                     fulltypes.append(typename)
             f.write('SIGGEN_LOCKEDSIGS_TYPES = "%s"\n' % ' '.join(fulltypes))
+            f.write('\n' + ''.join(otherdata))
 
     if copy_output:
         write_sigs_file(copy_output, list(tocopy.keys()), tocopy)

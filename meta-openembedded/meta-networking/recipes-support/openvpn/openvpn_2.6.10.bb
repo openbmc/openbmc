@@ -44,7 +44,7 @@ PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
 do_install:append() {
     install -d ${D}/${sysconfdir}/init.d
-    install -m 755 ${WORKDIR}/openvpn ${D}/${sysconfdir}/init.d
+    install -m 755 ${UNPACKDIR}/openvpn ${D}/${sysconfdir}/init.d
 
     install -d ${D}/${sysconfdir}/openvpn
     install -d ${D}/${sysconfdir}/openvpn/server

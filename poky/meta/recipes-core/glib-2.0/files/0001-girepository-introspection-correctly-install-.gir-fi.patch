@@ -1,0 +1,88 @@
+From f1beef5c2d09fae3a5e5a314f984cb3f20abe732 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 23 Apr 2024 11:24:34 +0200
+Subject: [PATCH] girepository/introspection: correctly install .gir files into
+ custom locations provided via meson option
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/4020]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ girepository/introspection/meson.build | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/girepository/introspection/meson.build b/girepository/introspection/meson.build
+index 9405686..862ca61 100644
+--- a/girepository/introspection/meson.build
++++ b/girepository/introspection/meson.build
+@@ -49,6 +49,7 @@ glib_gir = gnome.generate_gir(libglib,
+   export_packages: 'glib-2.0',
+   header: 'glib.h',
+   install: true,
++  install_dir_gir: glib_girdir,
+   dependencies: [
+     libgobject_dep,
+   ],
+@@ -76,6 +77,7 @@ if host_system == 'windows'
+     header: 'glib.h',
+     includes: [ glib_gir[0] ],
+     install: true,
++    install_dir_gir: glib_girdir,
+     dependencies: [
+       libgobject_dep,
+     ],
+@@ -104,6 +106,7 @@ else
+     header: 'glib.h',
+     includes: [ glib_gir[0] ],
+     install: true,
++    install_dir_gir: glib_girdir,
+     dependencies: [
+       libgobject_dep,
+     ],
+@@ -137,6 +140,7 @@ gobject_gir = gnome.generate_gir(libgobject,
+   header: 'glib-object.h',
+   includes: [ glib_gir[0] ],
+   install: true,
++  install_dir_gir: glib_girdir,
+   env: gi_gen_env_variables,
+   extra_args: gir_args + [
+       '-DGOBJECT_COMPILATION',
+@@ -162,6 +166,7 @@ gmodule_gir = gnome.generate_gir(libgmodule,
+   header: 'gmodule.h',
+   includes: [ glib_gir[0] ],
+   install: true,
++  install_dir_gir: glib_girdir,
+   dependencies: [
+     libglib_dep,
+   ],
+@@ -224,6 +229,7 @@ gio_gir = gnome.generate_gir(libgio,
+   header: 'gio/gio.h',
+   includes: [ glib_gir[0], gmodule_gir[0], gobject_gir[0] ],
+   install: true,
++  install_dir_gir: glib_girdir,
+   dependencies: [
+     libglib_dep,
+     libgobject_dep,
+@@ -249,6 +255,7 @@ if host_system == 'windows'
+     header: 'gio/gio.h',
+     includes: [ glib_gir[0], gmodule_gir[0], gobject_gir[0], gio_gir[0] ],
+     install: true,
++    install_dir_gir: glib_girdir,
+     dependencies: [
+       libglib_dep,
+       libgobject_dep,
+@@ -277,6 +284,7 @@ else
+     header: 'gio/gio.h',
+     includes: [ glib_gir[0], gmodule_gir[0], gobject_gir[0], gio_gir[0] ],
+     install: true,
++    install_dir_gir: glib_girdir,
+     dependencies: [
+       libglib_dep,
+       libgobject_dep,
+@@ -314,6 +322,7 @@ girepository_gir = gnome.generate_gir(libgirepository,
+   header: 'girepository/girepository.h',
+   includes: [ glib_gir[0], gmodule_gir[0], gobject_gir[0], gio_gir[0] ],
+   install: true,
++  install_dir_gir: glib_girdir,
+   dependencies: [ libglib_dep, libgobject_dep, libgmodule_dep, libgio_dep ],
+   extra_args: gir_args + libgirepository_gir_args,
+ )

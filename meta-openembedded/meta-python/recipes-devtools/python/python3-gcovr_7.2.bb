@@ -11,6 +11,13 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-RDEPENDS:${PN} += "python3-jinja2 python3-lxml python3-setuptools python3-pygments python3-multiprocessing"
+RDEPENDS:${PN} += " \
+    python3-colorlog \
+    python3-jinja2 \
+    python3-lxml \
+    python3-multiprocessing \
+    python3-pygments \
+    python3-setuptools \
+"
 
 BBCLASSEXTEND = "native nativesdk"

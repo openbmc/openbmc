@@ -3,7 +3,7 @@ SECTION = "console/network"
 HOMEPAGE = "http://fronteed.com/iCheck"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://icheck.js;start_line=1;end_line=8;md5=404078d7de9f05ed64d364274f790055"
+LIC_FILES_CHKSUM = "file://icheck.js;beginline=6;endline=7;md5=ea25eee37fc3b14403e215bfe13564bc"
 
 SRC_URI = "git://github.com/fronteed/icheck.git;protocol=https;branch=${PV}"
 

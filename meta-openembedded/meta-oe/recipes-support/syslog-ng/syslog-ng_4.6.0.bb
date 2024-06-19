@@ -77,12 +77,12 @@ do_configure:prepend() {
 do_install:append() {
     install -d ${D}${sysconfdir}/${BPN}
     install -d ${D}${sysconfdir}/init.d
-    install -m 755 ${WORKDIR}/initscript ${D}${sysconfdir}/init.d/syslog
+    install -m 755 ${UNPACKDIR}/initscript ${D}${sysconfdir}/init.d/syslog
 
     install -d ${D}${sysconfdir}/default/volatiles/
-    install -m 644 ${WORKDIR}/volatiles.03_syslog-ng ${D}${sysconfdir}/default/volatiles/03_syslog-ng
+    install -m 644 ${UNPACKDIR}/volatiles.03_syslog-ng ${D}${sysconfdir}/default/volatiles/03_syslog-ng
     install -d ${D}${sysconfdir}/tmpfiles.d/
-    install -m 644 ${WORKDIR}/syslog-ng-tmp.conf ${D}${sysconfdir}/tmpfiles.d/syslog-ng.conf
+    install -m 644 ${UNPACKDIR}/syslog-ng-tmp.conf ${D}${sysconfdir}/tmpfiles.d/syslog-ng.conf
 
     install -d ${D}${localstatedir}/lib/${BPN}
     # Remove /var/run as it is created on startup
@@ -94,7 +94,7 @@ do_install:append() {
 
     # support for systemd
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -m 644 ${WORKDIR}/syslog-ng.conf.systemd ${D}${sysconfdir}/${BPN}/${BPN}.conf
+        install -m 644 ${UNPACKDIR}/syslog-ng.conf.systemd ${D}${sysconfdir}/${BPN}/${BPN}.conf
 
         install -d ${D}${systemd_unitdir}/system/
         install -m 644 ${S}/contrib/systemd/${BPN}@.service ${D}${systemd_unitdir}/system/${BPN}@.service
@@ -107,7 +107,7 @@ do_install:append() {
         install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
         ln -sf ../${BPN}@.service ${D}${systemd_unitdir}/system/multi-user.target.wants/${BPN}@default.service
     else
-        install -m 644 ${WORKDIR}/syslog-ng.conf.sysvinit ${D}${sysconfdir}/${BPN}/${BPN}.conf
+        install -m 644 ${UNPACKDIR}/syslog-ng.conf.sysvinit ${D}${sysconfdir}/${BPN}/${BPN}.conf
     fi
 
     oe_multilib_header syslog-ng/syslog-ng-config.h
@@ -147,3 +147,11 @@ SYSTEMD_SERVICE:${PN} = "${BPN}@.service"
 
 INITSCRIPT_NAME = "syslog"
 INITSCRIPT_PARAMS = "start 20 2 3 4 5 . stop 90 0 1 6 ."
+
+# Fails only with 32bit MACHINEs
+# http://errors.yoctoproject.org/Errors/Details/766956/
+# syslog-ng-4.6.0/modules/secure-logging/slog.c:937:63: error: passing argument 4 of 'g_io_channel_write_chars' from incompatible pointer type [-Wincompatible-pointer-types]
+# syslog-ng-4.6.0/modules/secure-logging/slog.c:955:99: error: passing argument 5 of 'cmac' from incompatible pointer type [-Wincompatible-pointer-types]
+# syslog-ng-4.6.0/modules/secure-logging/slog.c:959:74: error: passing argument 4 of 'g_io_channel_write_chars' from incompatible pointer type [-Wincompatible-pointer-types]
+# syslog-ng-4.6.0/modules/secure-logging/slog.c:975:107: error: passing argument 4 of 'g_io_channel_write_chars' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

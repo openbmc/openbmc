@@ -7,7 +7,7 @@ The disabled tests rely on timing to pass correctly. On a virtualized
 system under heavy load, these tests randomly fail because they miss
 a timer or other timing related issues.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/apache/apr/pull/54]
 Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
 
 ---

@@ -81,7 +81,7 @@ do_install:append() {
 	install -m 755 ${S}/etc/rc/ntpd ${D}${sysconfdir}/init.d
 	cp -r ${S}/etc/ntp.d ${D}${sysconfdir}
 
-	sed -e 's:@NTP_USER_HOME@:${NTP_USER_HOME}:g' ${WORKDIR}/volatiles.ntpsec >${T}/volatiles.ntpsec
+	sed -e 's:@NTP_USER_HOME@:${NTP_USER_HOME}:g' ${UNPACKDIR}/volatiles.ntpsec >${T}/volatiles.ntpsec
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
 		cp ${B}/main/etc/* ${D}${systemd_system_unitdir}
 		awk '{print $1, $5, $4, $2, $3, "-"}' ${T}/volatiles.ntpsec >${T}/tmpfiles.ntpsec

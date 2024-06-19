@@ -74,7 +74,7 @@ do_install:append () {
     install -m 0755 ${S}/etc/sysconfig/openl2tpd ${D}${sysconfdir}/default/openl2tpd
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -D -m 0644 ${WORKDIR}/openl2tpd.service ${D}${systemd_system_unitdir}/openl2tpd.service
+        install -D -m 0644 ${UNPACKDIR}/openl2tpd.service ${D}${systemd_system_unitdir}/openl2tpd.service
         sed -i -e 's,@STATEDIR@,${localstatedir},g' \
                -e 's,@SYSCONFDIR@,${sysconfdir},g' \
                -e 's,@SBINDIR@,${sbindir},g' \

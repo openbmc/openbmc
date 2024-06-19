@@ -1,4 +1,4 @@
-From cbb8f5c05fce1d56ae2e5fa9f57fc49c47bed5ab Mon Sep 17 00:00:00 2001
+From d16aed3118bee1e0a7d0bc9e0f34c427a405a6d8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Sun, 12 May 2019 21:58:02 +0200
 Subject: [PATCH] Move the function cd_icc_create_from_edid to avoid udev
@@ -89,10 +89,10 @@ index a5e2328..dec509a 100644
 +}
 +
 diff --git a/lib/colord/cd-icc.c b/lib/colord/cd-icc.c
-index 8beec43..398ff7a 100644
+index 3937d8a..daf6f4d 100644
 --- a/lib/colord/cd-icc.c
 +++ b/lib/colord/cd-icc.c
-@@ -3114,68 +3114,6 @@ cd_icc_create_default (CdIcc *icc, GError **error)
+@@ -3117,68 +3117,6 @@ cd_icc_create_default (CdIcc *icc, GError **error)
  	return cd_icc_create_default_full (icc, CD_ICC_LOAD_FLAGS_NONE, error);
  }
  
@@ -161,6 +161,3 @@ index 8beec43..398ff7a 100644
  /**
   * cd_icc_create_from_edid:
   * @icc: A valid #CdIcc
--- 
-2.20.1
-

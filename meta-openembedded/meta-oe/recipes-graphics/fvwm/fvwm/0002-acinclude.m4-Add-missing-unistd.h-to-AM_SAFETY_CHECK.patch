@@ -1,0 +1,32 @@
+From 51287fb60263530f61b14df5519e10dabe67d2ad Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Thu, 24 Nov 2022 13:07:56 +0100
+Subject: [PATCH 2/3] acinclude.m4: Add missing <unistd.h> to
+ AM_SAFETY_CHECK_MKSTEMP
+
+Otherwise, the check fails on a compiler which does not support
+implicit function declarations (a language feature removed in 1999).
+
+Upstream-Status: Submitted [https://github.com/fvwmorg/fvwm/pull/100]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ acinclude.m4 | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index b66042f9..4dee2abe 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -1154,6 +1154,9 @@ AC_DEFUN([AM_SAFETY_CHECK_MKSTEMP],[
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#ifdef HAVE_UNISTD_H
++#include <unistd.h>
++#endif
+ int main(void)
+ {
+   char template[128];
+-- 
+2.45.0
+

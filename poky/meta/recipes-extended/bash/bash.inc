@@ -108,7 +108,7 @@ do_install_ptest () {
 	cp ${B}/config.h ${D}${PTEST_PATH}
 	cp ${B}/version.h ${D}${PTEST_PATH}
 	cp ${S}/y.tab.[ch] ${D}${PTEST_PATH}
-	install -D ${WORKDIR}/run-bash-ptests ${D}${PTEST_PATH}/run-bash-ptests
+	install -D ${UNPACKDIR}/run-bash-ptests ${D}${PTEST_PATH}/run-bash-ptests
         sed -i -e 's/^Makefile/_Makefile/' -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
 	    -e 's|${DEBUG_PREFIX_MAP}||g' \
 	    -e 's|${BUILD_LDFLAGS}||g' \

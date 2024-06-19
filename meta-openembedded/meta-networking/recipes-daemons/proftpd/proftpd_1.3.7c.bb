@@ -82,14 +82,14 @@ do_install () {
     sed -i '/ *User[ \t]*/s/ftp/${FTPUSER}/' ${D}${sysconfdir}/proftpd.conf
     sed -i '/ *Group[ \t]*/s/ftp/${FTPGROUP}/' ${D}${sysconfdir}/proftpd.conf
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/proftpd-basic.init ${D}${sysconfdir}/init.d/proftpd
+    install -m 0755 ${UNPACKDIR}/proftpd-basic.init ${D}${sysconfdir}/init.d/proftpd
     sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}${sysconfdir}/init.d/proftpd
     sed -i 's!/etc/!${sysconfdir}/!g' ${D}${sysconfdir}/init.d/proftpd
     sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/proftpd
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}${sysconfdir}/init.d/proftpd
 
     install -d ${D}${sysconfdir}/default
-    install -m 0755 ${WORKDIR}/default ${D}${sysconfdir}/default/proftpd
+    install -m 0755 ${UNPACKDIR}/default ${D}${sysconfdir}/default/proftpd
 
     # create the pub directory
     mkdir -p ${D}/home/${FTPUSER}/pub/
@@ -105,7 +105,7 @@ do_install () {
     fi
 
     install -d ${D}/${systemd_unitdir}/system
-    install -m 644 ${WORKDIR}/proftpd.service ${D}/${systemd_unitdir}/system
+    install -m 644 ${UNPACKDIR}/proftpd.service ${D}/${systemd_unitdir}/system
     sed -e 's,@BASE_SBINDIR@,${base_sbindir},g' \
         -e 's,@SYSCONFDIR@,${sysconfdir},g' \
         -e 's,@SBINDIR@,${sbindir},g' \

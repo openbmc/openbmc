@@ -10,36 +10,27 @@ TFM_DEBUG = "1"
 TFM_PLATFORM_IS_FVP ?= "FALSE"
 EXTRA_OECMAKE += "-DPLATFORM_IS_FVP=${TFM_PLATFORM_IS_FVP}"
 EXTRA_OECMAKE += "-DCC312_LEGACY_DRIVER_API_ENABLED=OFF"
+EXTRA_OECMAKE:append:corstone1000-fvp = " -DENABLE_MULTICORE=${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000_fvp_smp', 'TRUE', 'FALSE', d)}"
 
-# libmetal v2023.04.0
-LICENSE += "& BSD-3-Clause"
-LIC_FILES_CHKSUM += "file://../libmetal/LICENSE.md;md5=f4d5df0f12dcea1b1a0124219c0dbab4"
-SRC_URI += "git://github.com/OpenAMP/libmetal.git;protocol=https;branch=main;name=libmetal;destsuffix=git/libmetal \
-            file://0001-cmake-modify-path-to-libmetal-version-file.patch;patchdir=../libmetal \
-            file://0002-arm-trusted-firmware-m-disable-address-warnings-into.patch \
+SRC_URI += " \
+            file://0001-arm-trusted-firmware-m-disable-address-warnings-into.patch \
            "
-SRCREV_libmetal = "28fa2351d6a8121ce6c1c2ac5ee43ce08d38dbae"
-EXTRA_OECMAKE += "-DLIBMETAL_SRC_PATH=${S}/../libmetal -DLIBMETAL_BIN_PATH=${B}/libmetal-build"
-# The configuration can fail if libmetal tries to generate the docs and the doxygen bin is found
-EXTRA_OECMAKE += "-DWITH_DOC=False"
-
-# OpenAMP v2023.04.0
-LICENSE += "& BSD-2-Clause & BSD-3-Clause"
-LIC_FILES_CHKSUM += "file://../openamp/LICENSE.md;md5=ab88daf995c0bd0071c2e1e55f3d3505"
-SRC_URI += "git://github.com/OpenAMP/open-amp.git;protocol=https;branch=main;name=openamp;destsuffix=git/openamp"
-SRCREV_openamp = "accac4d3610cbb268f3c3fe3c31dc45dd4c4dd17"
-EXTRA_OECMAKE += "-DLIBOPENAMP_SRC_PATH=${S}/../openamp -DLIBOPENAMP_BIN_PATH=${B}/libopenamp-build"
-
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI:append:corstone1000 = " \
     file://0001-platform-corstone1000-Update-MPU-configuration.patch \
     file://0002-platform-corstone1000-Cover-S_DATA-with-MPU.patch \
-    file://0003-Platform-corstone1000-Fix-issues-due-to-adjustment-M.patch \
-    file://0004-platform-corstone1000-align-capsule-update-structs.patch \
-    file://0005-platform-corstone1000-fix-synchronization-issue-on-o.patch \
-    file://0006-Platform-Corstone1000-skip-the-first-nv-counter.patch \
-    file://0007-platform-corstone1000-add-unique-guid-for-mps3.patch \    
+    file://0003-platform-corstone1000-align-capsule-update-structs.patch \
+    file://0004-Platform-Corstone1000-skip-the-first-nv-counter.patch \
+    file://0005-platform-corstone1000-add-unique-guid-for-mps3.patch \
+    file://0006-Platform-Corstone1000-Enable-host-firewall-in-FVP.patch \
+    file://0007-platform-corstone1000-Increase-ITS-max-asset-size.patch \
+    file://0008-Platform-CS1000-Replace-OpenAMP-with-RSE_COMMS.patch \
+    file://0009-platform-corstone1000-Increase-RSE_COMMS-buffer-size.patch \
+    file://0010-CC312-alignment-of-cc312-differences-between-fvp-and.patch \
+    file://0011-Platform-corstone1000-Increase-buffers-for-EFI-vars.patch \
+    file://0012-corstone1000-Remove-reset-after-capsule-update.patch \
+    file://0013-platform-CS1000-Add-multicore-support-for-FVP.patch \
     "
 
 # TF-M ships patches for external dependencies that needs to be applied

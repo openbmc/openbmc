@@ -32,7 +32,7 @@ def _run(cmd, cwd=''):
 
 def _get_srctree(tmpdir):
     srctree = tmpdir
-    dirs = scriptutils.filter_src_subdirs(tmpdir)
+    dirs = os.listdir(tmpdir)
     if len(dirs) == 1:
         srctree = os.path.join(tmpdir, dirs[0])
     else:
@@ -534,6 +534,15 @@ def _generate_license_diff(old_licenses, new_licenses):
             diff = diff + line
     return diff
 
+def _run_recipe_update_extra_tasks(pn, rd, tinfoil):
+    tasks = []
+    for task in (rd.getVar('RECIPE_UPDATE_EXTRA_TASKS') or '').split():
+        logger.info('Running extra recipe update task: %s' % task)
+        res = tinfoil.build_targets(pn, task, handle_events=True)
+
+        if not res:
+            raise DevtoolError('Running extra recipe update task %s for %s failed' % (task, pn))
+
 def upgrade(args, config, basepath, workspace):
     """Entry point for the devtool 'upgrade' subcommand"""
 
@@ -608,6 +617,8 @@ def upgrade(args, config, basepath, workspace):
         af = _write_append(rf, srctree, srctree_s, args.same_dir, args.no_same_dir, rev2,
                         copied, config.workspace_path, rd)
         standard._add_md5(config, pn, af)
+
+        _run_recipe_update_extra_tasks(pn, rd, tinfoil)
 
         update_unlockedsigs(basepath, workspace, args.fixed_setup, [pn])
 

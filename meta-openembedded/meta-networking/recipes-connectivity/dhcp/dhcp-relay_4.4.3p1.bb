@@ -53,16 +53,16 @@ do_configure:prepend () {
 }
 
 do_install:append () {
-    install -Dm 0644 ${WORKDIR}/default-relay ${D}${sysconfdir}/default/dhcp-relay
+    install -Dm 0644 ${UNPACKDIR}/default-relay ${D}${sysconfdir}/default/dhcp-relay
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/dhcrelay.service ${D}${systemd_unitdir}/system
+        install -m 0644 ${UNPACKDIR}/dhcrelay.service ${D}${systemd_unitdir}/system
         sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/dhcrelay.service
         sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' ${D}${systemd_unitdir}/system/dhcrelay.service
     else
         install -d ${D}${sysconfdir}/init.d
-        install -m 0755 ${WORKDIR}/init-relay ${D}${sysconfdir}/init.d/dhcp-relay
+        install -m 0755 ${UNPACKDIR}/init-relay ${D}${sysconfdir}/init.d/dhcp-relay
     fi
 }
 

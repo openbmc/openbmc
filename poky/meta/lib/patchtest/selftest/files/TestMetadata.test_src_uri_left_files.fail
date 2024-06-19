@@ -1,17 +1,17 @@
-From 4ab06b5f81455249cd5e89d2cce9863803b5ecb5 Mon Sep 17 00:00:00 2001
+From f2f7b6bcb831289bc3ba2343ad7dc5bee6d6e0cd Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
-Date: Fri, 8 Sep 2023 14:41:00 -0400
+Date: Fri, 31 May 2024 08:45:41 -0400
 Subject: [PATCH] selftest-hello: remove helloworld.c
 
 This should fail the test_src_uri_left_files selftest.
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- .../recipes-test/selftest-hello/selftest-hello_1.0.bb         | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-index 547587bef4..f6817f05bc 100644
+index 2dc352d479e..e95270adaeb 100644
 --- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 +++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 @@ -3,8 +3,6 @@ SECTION = "examples"
@@ -20,16 +20,9 @@ index 547587bef4..f6817f05bc 100644
  
 -SRC_URI = "file://helloworld.c"
 -
- S = "${WORKDIR}"
+ S = "${WORKDIR}/sources"
+ UNPACKDIR = "${S}"
  
- do_compile() {
-@@ -16,4 +14,4 @@ do_install() {
- 	install -m 0755 helloworld ${D}${bindir}
- }
- 
--BBCLASSEXTEND = "native nativesdk"
-\ No newline at end of file
-+BBCLASSEXTEND = "native nativesdk"
 -- 
-2.41.0
+2.45.1
 

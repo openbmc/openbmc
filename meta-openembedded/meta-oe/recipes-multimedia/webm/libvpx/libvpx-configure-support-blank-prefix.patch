@@ -1,4 +1,4 @@
-From 2829e6998b7595dd2108c1497fdd02485ef99e2c Mon Sep 17 00:00:00 2001
+From 1bbbf27a23c91dcc271b773a97153063461b986d Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Tue, 16 Aug 2011 16:04:35 +0200
 Subject: [PATCH] Upstream: not yet
@@ -11,10 +11,10 @@ Upstream-Status: Pending
  1 file changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/build/make/configure.sh b/build/make/configure.sh
-index b645a666f..0b99a8b38 100644
+index 93643f3de..e84198200 100644
 --- a/build/make/configure.sh
 +++ b/build/make/configure.sh
-@@ -658,6 +658,8 @@ process_common_cmdline() {
+@@ -692,6 +692,8 @@ process_common_cmdline() {
          ;;
        --prefix=*)
          prefix="${optval}"
@@ -23,7 +23,7 @@ index b645a666f..0b99a8b38 100644
          ;;
        --libdir=*)
          libdir="${optval}"
-@@ -687,13 +689,23 @@ process_cmdline() {
+@@ -721,13 +723,23 @@ process_cmdline() {
  }
  
  post_process_common_cmdline() {

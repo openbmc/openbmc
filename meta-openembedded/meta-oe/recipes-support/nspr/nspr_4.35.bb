@@ -171,7 +171,7 @@ do_compile:append() {
 }
 
 do_install:append() {
-    install -D ${WORKDIR}/nspr.pc.in ${D}${libdir}/pkgconfig/nspr.pc
+    install -D ${UNPACKDIR}/nspr.pc.in ${D}${libdir}/pkgconfig/nspr.pc
     sed -i  \
     -e 's:NSPRVERSION:${PV}:g' \
     -e 's:OEPREFIX:${prefix}:g' \

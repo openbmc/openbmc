@@ -1,0 +1,85 @@
+From 2b7a51556185539a0f9baef0f109e0814933d6b3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 19 May 2024 17:11:20 -0700
+Subject: [PATCH] Provide strtod_l signature on non-glibc linux ( musl )
+ systems
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gsoap/stdsoap2.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+--- a/gsoap/stdsoap2.cpp
++++ b/gsoap/stdsoap2.cpp
+@@ -74,6 +74,11 @@ A commercial use license is available fr
+ 
+ #include "stdsoap2.h"
+ 
++#if defined(__linux__) && !defined(__GLIBC__)
++struct __locale_struct;
++double strtod_l(const char *__restrict, char **__restrict, struct __locale_struct *);
++#endif
++
+ #if GSOAP_VERSION != GSOAP_LIB_VERSION
+ # error "GSOAP VERSION MISMATCH IN LIBRARY: PLEASE REINSTALL PACKAGE"
+ #endif
+@@ -5457,7 +5462,7 @@ tcp_gethostbyname(struct soap *soap, con
+ {
+ #if (defined(_AIX43) || defined(TRU64) || defined(HP_UX)) && defined(HAVE_GETHOSTBYNAME_R)
+   struct hostent_data ht_data;
+-#elif (!defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || defined(__ANDROID__) || defined(FREEBSD) || defined(__FreeBSD__)) && !defined(SUN_OS) && !defined(__QNX__) && !defined(QNX) && defined(HAVE_GETHOSTBYNAME_R)
++#elif (!defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || defined(__ANDROID__) || defined(FREEBSD) || defined(__FreeBSD__)) && !defined(SUN_OS) && !defined(__QNX__) && !defined(QNX) && defined(HAVE_GETHOSTBYNAME_R)
+   int r;
+   char *tmpbuf = soap->tmpbuf;
+   size_t tmplen = sizeof(soap->tmpbuf);
+@@ -5490,7 +5495,7 @@ tcp_gethostbyname(struct soap *soap, con
+     hostent = NULL;
+     soap->errnum = h_errno;
+   }
+-#elif (!defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || defined(__ANDROID__) || defined(FREEBSD) || defined(__FreeBSD__)) && !defined(SUN_OS) && !defined(__QNX__) && !defined(QNX) && defined(HAVE_GETHOSTBYNAME_R)
++#elif (!defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || defined(__ANDROID__) || defined(FREEBSD) || defined(__FreeBSD__)) && !defined(SUN_OS) && !defined(__QNX__) && !defined(QNX) && defined(HAVE_GETHOSTBYNAME_R)
+   while ((r = gethostbyname_r(addr, hostent, tmpbuf, tmplen, &hostent, &soap->errnum)) < 0)
+   {
+     if (tmpbuf != soap->tmpbuf)
+@@ -23192,7 +23197,7 @@ soap_strerror(struct soap *soap)
+   {
+ #ifndef WIN32
+ # ifdef HAVE_STRERROR_R
+-#  if !defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
++#  if !defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
+     err = strerror_r(err, soap->msgbuf, sizeof(soap->msgbuf)); /* XSI-compliant */
+     if (err != 0)
+       soap_strcpy(soap->msgbuf, sizeof(soap->msgbuf), "unknown error");
+--- a/gsoap/stdsoap2.c
++++ b/gsoap/stdsoap2.c
+@@ -74,6 +74,11 @@ A commercial use license is available fr
+ 
+ #include "stdsoap2.h"
+ 
++#if defined(__linux__) && !defined(__GLIBC__)
++struct __locale_struct;
++double strtod_l(const char *__restrict, char **__restrict, struct __locale_struct *);
++#endif
++
+ #if GSOAP_VERSION != GSOAP_LIB_VERSION
+ # error "GSOAP VERSION MISMATCH IN LIBRARY: PLEASE REINSTALL PACKAGE"
+ #endif
+@@ -5490,7 +5495,7 @@ tcp_gethostbyname(struct soap *soap, con
+     hostent = NULL;
+     soap->errnum = h_errno;
+   }
+-#elif (!defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || defined(__ANDROID__) || defined(FREEBSD) || defined(__FreeBSD__)) && !defined(SUN_OS) && !defined(__QNX__) && !defined(QNX) && defined(HAVE_GETHOSTBYNAME_R)
++#elif (!defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || _POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || defined(__ANDROID__) || defined(FREEBSD) || defined(__FreeBSD__)) && !defined(SUN_OS) && !defined(__QNX__) && !defined(QNX) && defined(HAVE_GETHOSTBYNAME_R)
+   while ((r = gethostbyname_r(addr, hostent, tmpbuf, tmplen, &hostent, &soap->errnum)) < 0)
+   {
+     if (tmpbuf != soap->tmpbuf)
+@@ -23192,7 +23197,7 @@ soap_strerror(struct soap *soap)
+   {
+ #ifndef WIN32
+ # ifdef HAVE_STRERROR_R
+-#  if !defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
++#  if !defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
+     err = strerror_r(err, soap->msgbuf, sizeof(soap->msgbuf)); /* XSI-compliant */
+     if (err != 0)
+       soap_strcpy(soap->msgbuf, sizeof(soap->msgbuf), "unknown error");

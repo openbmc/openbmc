@@ -1,4 +1,4 @@
-From 4cd26cfaec255ec87f22abe886e0be89312a9671 Mon Sep 17 00:00:00 2001
+From 920ff2e0e838fae4fe49bf8e8fa093d5b2485677 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Mon, 18 Jan 2016 11:01:00 -0800
 Subject: [PATCH] update gawk paths, /bin/gawk -> /usr/bin/gawk
@@ -11,22 +11,24 @@ from #!/bin/gawk to #!/usr/bin/gawk. Fixes missing RDPENDS QA tests:
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
-
 ---
  src/mpers.awk               | 2 +-
+ tests-m32/caps-abbrev.awk   | 2 +-
  tests-m32/caps.awk          | 2 +-
  tests-m32/match.awk         | 2 +-
  tests-m32/rt_sigaction.awk  | 2 +-
+ tests-mx32/caps-abbrev.awk  | 2 +-
  tests-mx32/caps.awk         | 2 +-
  tests-mx32/match.awk        | 2 +-
  tests-mx32/rt_sigaction.awk | 2 +-
+ tests/caps-abbrev.awk       | 2 +-
  tests/caps.awk              | 2 +-
  tests/match.awk             | 2 +-
  tests/rt_sigaction.awk      | 2 +-
- 10 files changed, 10 insertions(+), 10 deletions(-)
+ 13 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/src/mpers.awk b/src/mpers.awk
-index 25a212f..b2ff53f 100644
+index 425ab65..33ece5c 100644
 --- a/src/mpers.awk
 +++ b/src/mpers.awk
 @@ -1,4 +1,4 @@
@@ -35,6 +37,16 @@ index 25a212f..b2ff53f 100644
  #
  # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
  # Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
+diff --git a/tests-m32/caps-abbrev.awk b/tests-m32/caps-abbrev.awk
+index e8393fd..76c4e51 100644
+--- a/tests-m32/caps-abbrev.awk
++++ b/tests-m32/caps-abbrev.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # This file is part of caps strace test.
+ #
 diff --git a/tests-m32/caps.awk b/tests-m32/caps.awk
 index 69500ec..e5dfd87 100644
 --- a/tests-m32/caps.awk
@@ -65,6 +77,16 @@ index dce78f5..573d9ea 100644
  #
  # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
  # Copyright (c) 2016 Elvira Khabirova <lineprinter0@gmail.com>
+diff --git a/tests-mx32/caps-abbrev.awk b/tests-mx32/caps-abbrev.awk
+index e8393fd..76c4e51 100644
+--- a/tests-mx32/caps-abbrev.awk
++++ b/tests-mx32/caps-abbrev.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # This file is part of caps strace test.
+ #
 diff --git a/tests-mx32/caps.awk b/tests-mx32/caps.awk
 index 69500ec..e5dfd87 100644
 --- a/tests-mx32/caps.awk
@@ -95,6 +117,16 @@ index dce78f5..573d9ea 100644
  #
  # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
  # Copyright (c) 2016 Elvira Khabirova <lineprinter0@gmail.com>
+diff --git a/tests/caps-abbrev.awk b/tests/caps-abbrev.awk
+index e8393fd..76c4e51 100644
+--- a/tests/caps-abbrev.awk
++++ b/tests/caps-abbrev.awk
+@@ -1,4 +1,4 @@
+-#!/bin/gawk
++#!/usr/bin/gawk
+ #
+ # This file is part of caps strace test.
+ #
 diff --git a/tests/caps.awk b/tests/caps.awk
 index 69500ec..e5dfd87 100644
 --- a/tests/caps.awk
@@ -125,33 +157,3 @@ index dce78f5..573d9ea 100644
  #
  # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
  # Copyright (c) 2016 Elvira Khabirova <lineprinter0@gmail.com>
-diff --git a/tests-m32/caps-abbrev.awk b/tests-m32/caps-abbrev.awk
-index c00023b..a56cd56 100644
---- a/tests-m32/caps-abbrev.awk
-+++ b/tests-m32/caps-abbrev.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # This file is part of caps strace test.
- #
-diff --git a/tests-mx32/caps-abbrev.awk b/tests-mx32/caps-abbrev.awk
-index c00023b..a56cd56 100644
---- a/tests-mx32/caps-abbrev.awk
-+++ b/tests-mx32/caps-abbrev.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # This file is part of caps strace test.
- #
-diff --git a/tests/caps-abbrev.awk b/tests/caps-abbrev.awk
-index c00023b..a56cd56 100644
---- a/tests/caps-abbrev.awk
-+++ b/tests/caps-abbrev.awk
-@@ -1,4 +1,4 @@
--#!/bin/gawk
-+#!/usr/bin/gawk
- #
- # This file is part of caps strace test.
- #

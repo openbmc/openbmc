@@ -45,7 +45,7 @@ do_install() {
 	rm -rf ${D}/var
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
 	        install -d ${D}/etc/default/volatiles
-		install -m 0644 ${WORKDIR}/99_sysstat ${D}/etc/default/volatiles
+		install -m 0644 ${UNPACKDIR}/99_sysstat ${D}/etc/default/volatiles
 	fi
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 	        install -d ${D}${nonarch_libdir}/tmpfiles.d
@@ -56,7 +56,7 @@ do_install() {
 		# systemd unit file. Otherwise the package will install one.
 	        if ${@bb.utils.contains('PACKAGECONFIG', 'cron systemd', 'false', 'true', d)}; then
 			install -d ${D}${systemd_system_unitdir}
-			install -m 0644 ${WORKDIR}/sysstat.service ${D}${systemd_system_unitdir}
+			install -m 0644 ${UNPACKDIR}/sysstat.service ${D}${systemd_system_unitdir}
 			sed -i -e 's#@LIBEXECDIR@#${libexecdir}#g' ${D}${systemd_system_unitdir}/sysstat.service
 	        fi
 	fi

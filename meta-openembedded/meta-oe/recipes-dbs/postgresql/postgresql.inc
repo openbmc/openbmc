@@ -198,24 +198,24 @@ do_install:append() {
 
     # install dirs and server init
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/${BPN}.init ${D}${sysconfdir}/init.d/${BPN}-server
+    install -m 0755 ${UNPACKDIR}/${BPN}.init ${D}${sysconfdir}/init.d/${BPN}-server
     sed -i -e "s/^PGVERSION=.*$/PGVERSION=${PV}/g" ${D}${sysconfdir}/init.d/${BPN}-server
-    install -m 0755 ${WORKDIR}/${BPN}-setup ${D}${bindir}/${BPN}-setup
+    install -m 0755 ${UNPACKDIR}/${BPN}-setup ${D}${bindir}/${BPN}-setup
     install -d -m 700 ${D}${localstatedir}/lib/${BPN}/data
     install -d -m 700 ${D}${localstatedir}/lib/${BPN}/backups
-    install -m 644 ${WORKDIR}/${BPN}-profile ${D}${localstatedir}/lib/${BPN}/.profile
+    install -m 644 ${UNPACKDIR}/${BPN}-profile ${D}${localstatedir}/lib/${BPN}/.profile
     chown -R postgres:postgres ${D}${localstatedir}/lib/${BPN}
     # multiple server config directory
     install -d -m 700 ${D}${sysconfdir}/default/${BPN}
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/pam.d
-        install -m 644 ${WORKDIR}/postgresql.pam ${D}${sysconfdir}/pam.d/postgresql
+        install -m 644 ${UNPACKDIR}/postgresql.pam ${D}${sysconfdir}/pam.d/postgresql
     fi
 
     # Install systemd unit files
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/postgresql.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/postgresql.service ${D}${systemd_unitdir}/system
     sed -i -e 's,@BINDIR@,${bindir},g' \
         ${D}${systemd_unitdir}/system/postgresql.service
     # Remove the build path

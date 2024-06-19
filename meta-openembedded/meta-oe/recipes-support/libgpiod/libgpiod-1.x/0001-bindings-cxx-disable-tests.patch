@@ -1,0 +1,33 @@
+From 8293f0b8a329beed542f5c8a2efa4641759fccf4 Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Date: Tue, 11 Jun 2024 10:34:14 +0200
+Subject: [PATCH] bindings: cxx: disable tests
+
+Meta-openembedded is moving to catch2 v3 which will make the C++ tests
+incompatible with the testing library. As this is an older version of
+the project, just disable C++ tests entirely.
+
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+---
+Upstream-Status: Inappropriate [upstream continues to use Catch2 v2]
+
+ bindings/cxx/Makefile.am | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/bindings/cxx/Makefile.am b/bindings/cxx/Makefile.am
+index 5c40ceb..d901836 100644
+--- a/bindings/cxx/Makefile.am
++++ b/bindings/cxx/Makefile.am
+@@ -19,9 +19,3 @@ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libgpiodcxx.pc
+ 
+ SUBDIRS = . examples
+-
+-if WITH_TESTS
+-
+-SUBDIRS += tests
+-
+-endif
+-- 
+2.40.1
+

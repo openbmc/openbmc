@@ -46,7 +46,7 @@ do_install:append() {
     install -m 0644 ${S}/service/systemd/mosquitto.service.notify ${D}${systemd_unitdir}/system/mosquitto.service
 
     install -d ${D}${sysconfdir}/init.d/
-    install -m 0755 ${WORKDIR}/mosquitto.init ${D}${sysconfdir}/init.d/mosquitto
+    install -m 0755 ${UNPACKDIR}/mosquitto.init ${D}${sysconfdir}/init.d/mosquitto
     sed -i -e 's,@SBINDIR@,${sbindir},g' \
         -e 's,@BASE_SBINDIR@,${base_sbindir},g' \
         -e 's,@LOCALSTATEDIR@,${localstatedir},g' \

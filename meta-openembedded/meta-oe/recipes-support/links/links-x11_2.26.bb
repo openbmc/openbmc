@@ -23,7 +23,7 @@ EXTRA_OECONF = "--enable-graphics \
 
 do_install:append() {
     install -d ${D}/${datadir}/applications
-    install -m 0644 ${WORKDIR}/links2.desktop ${D}/${datadir}/applications
+    install -m 0644 ${UNPACKDIR}/links2.desktop ${D}/${datadir}/applications
     install -d ${D}/${datadir}/pixmaps
-    install -m 0644 ${WORKDIR}/links2.png ${D}/${datadir}/pixmaps
+    install -m 0644 ${UNPACKDIR}/links2.png ${D}/${datadir}/pixmaps
 }

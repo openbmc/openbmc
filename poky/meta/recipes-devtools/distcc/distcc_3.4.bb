@@ -50,10 +50,10 @@ do_install() {
     oe_runmake 'DESTDIR=${D}'  "GZIP_BIN=gzip -n" install
     install -d ${D}${sysconfdir}/init.d/
     install -d ${D}${sysconfdir}/default
-    install -m 0755 ${WORKDIR}/distcc ${D}${sysconfdir}/init.d/
-    install -m 0755 ${WORKDIR}/default ${D}${sysconfdir}/default/distcc
+    install -m 0755 ${UNPACKDIR}/distcc ${D}${sysconfdir}/init.d/
+    install -m 0755 ${UNPACKDIR}/default ${D}${sysconfdir}/default/distcc
     install -d ${D}${systemd_system_unitdir}/
-    install -m 0644 ${WORKDIR}/distcc.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/distcc.service ${D}${systemd_system_unitdir}
     sed -i -e 's,@BINDIR@,${bindir},g' ${D}${systemd_system_unitdir}/distcc.service
 }
 

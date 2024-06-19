@@ -26,7 +26,7 @@ PACKAGECONFIG[systemd] = ",,systemd"
 
 do_install:append() {
         if [ "${VIRTUAL-RUNTIME_init_manager}" != "systemd" ]; then
-                install -Dm755 ${WORKDIR}/init ${D}/${sysconfdir}/init.d/seatd
+                install -Dm755 ${UNPACKDIR}/init ${D}/${sysconfdir}/init.d/seatd
         fi
 }
 

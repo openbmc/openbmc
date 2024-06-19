@@ -28,9 +28,7 @@ class TrustedServicesTest(OERuntimeTestCase):
     @OEHasPackage(['ts-psa-crypto-api-test'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_03_psa_crypto_api_test(self):
-        # There are a two expected PSA Crypto tests failures testing features
-        # TS will not support.
-        self.run_test_tool('psa-crypto-api-test', expected_status=46)
+        self.run_test_tool('psa-crypto-api-test')
 
     @OEHasPackage(['ts-psa-its-api-test'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
@@ -40,8 +38,7 @@ class TrustedServicesTest(OERuntimeTestCase):
     @OEHasPackage(['ts-psa-ps-api-test'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_05_psa_ps_api_test(self):
-        # There are a few expected PSA Storage tests failing
-        self.run_test_tool('psa-ps-api-test', expected_status=46)
+        self.run_test_tool('psa-ps-api-test')
 
     @OEHasPackage(['ts-psa-iat-api-test'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
@@ -53,13 +50,12 @@ class TrustedServicesTest(OERuntimeTestCase):
     def test_09_ts_service_grp_check(self):
         # If this test fails, available test groups in ts-service-test have changed and all
         # tests using the test executable need to be double checked to ensure test group to
-        # TS SP mapping is still valid. 
+        # TS SP mapping is still valid.
         test_grp_list="FwuServiceTests PsServiceTests ItsServiceTests AttestationProvisioningTests"
         test_grp_list+=" AttestationServiceTests CryptoKeyDerivationServicePackedcTests"
         test_grp_list+=" CryptoMacServicePackedcTests CryptoCipherServicePackedcTests"
         test_grp_list+=" CryptoHashServicePackedcTests CryptoServicePackedcTests"
         test_grp_list+=" CryptoServiceProtobufTests CryptoServiceLimitTests"
-        test_grp_list+=" DiscoveryServiceTests"
         self.run_test_tool('ts-service-test -lg', expected_output=test_grp_list)
 
     @OEHasPackage(['optee-test'])
@@ -79,7 +75,7 @@ class TrustedServicesTest(OERuntimeTestCase):
     def test_11_ps_service_tests(self):
         if 'ts-storage' not in self.tc.td['MACHINE_FEATURES'] and \
            'ts-se-proxy' not in self.tc.td['MACHINE_FEATURES']:
-            self.skipTest('Storage SP is not included into OPTEE')
+            self.skipTest('Storage SP is not deployed in the system.')
         self.run_test_tool('ts-service-test -g PsServiceTests')
 
     @OEHasPackage(['ts-service-test'])
@@ -87,7 +83,7 @@ class TrustedServicesTest(OERuntimeTestCase):
     def test_12_its_service_tests(self):
         if 'ts-its' not in self.tc.td['MACHINE_FEATURES'] and \
            'ts-se-proxy' not in self.tc.td['MACHINE_FEATURES']:
-            self.skipTest('Internal Storage SP is not included into OPTEE')
+            self.skipTest('Internal Storage SP is not deployed in the system.')
         self.run_test_tool('ts-service-test -g ItsServiceTests')
 
     @OEHasPackage(['ts-service-test'])
@@ -95,9 +91,8 @@ class TrustedServicesTest(OERuntimeTestCase):
     def test_14_attestation_service_tests(self):
         if 'ts-attestation' not in self.tc.td['MACHINE_FEATURES'] and \
            'ts-se-proxy' not in self.tc.td['MACHINE_FEATURES']:
-            self.skipTest('Attestation SP is not included into OPTEE')
-        for grp in ["AttestationProvisioningTests", "AttestationServiceTests"]:
-            self.run_test_tool('ts-service-test -g %s'%grp)
+            self.skipTest('Attestation SP is not deployed in the system.')
+        self.run_test_tool('ts-service-test -g Attestation')
 
     @OEHasPackage(['ts-service-test'])
     @skipIfNotInDataVar('MACHINE_FEATURES', 'ts-crypto', 'Crypto SP is not included')
@@ -105,16 +100,5 @@ class TrustedServicesTest(OERuntimeTestCase):
     def test_15_crypto_service_tests(self):
         if 'ts-crypto' not in self.tc.td['MACHINE_FEATURES'] and \
            'ts-se-proxy' not in self.tc.td['MACHINE_FEATURES']:
-            self.skipTest('Crypto SP is not included into OPTEE')
-        for grp in ["CryptoKeyDerivationServicePackedcTests", "CryptoMacServicePackedcTests", \
-                    "CryptoCipherServicePackedcTests", "CryptoHashServicePackedcTests", \
-                    "CryptoServicePackedcTests", "CryptoServiceProtobufTests CryptoServiceLimitTests"]:
-            self.run_test_tool('ts-service-test -g %s'%grp)
-
-    @OEHasPackage(['ts-service-test'])
-    @OETestDepends(['ssh.SSHTest.test_ssh'])
-    def test_16_discovery_service_test(self):
-        if 'ts-crypto' not in self.tc.td['MACHINE_FEATURES'] and \
-           'ts-se-proxy' not in self.tc.td['MACHINE_FEATURES']:
-            self.skipTest('Crypto SP is not included into OPTEE')
-        self.run_test_tool('ts-service-test -g DiscoveryServiceTests')
+            self.skipTest('Crypto SP is not deployed in the system.')
+        self.run_test_tool('ts-service-test -g Crypto')

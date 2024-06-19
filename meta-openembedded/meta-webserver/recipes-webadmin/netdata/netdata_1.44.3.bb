@@ -55,13 +55,13 @@ do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         # Install systemd unit files
         install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/netdata.service ${D}${systemd_unitdir}/system
+        install -m 0644 ${UNPACKDIR}/netdata.service ${D}${systemd_unitdir}/system
         sed -i -e 's,@@datadir,${datadir_native},g' ${D}${systemd_unitdir}/system/netdata.service
     fi
 
     # Install default netdata.conf
     install -d ${D}${sysconfdir}/netdata
-    install -m 0644 ${WORKDIR}/netdata.conf ${D}${sysconfdir}/netdata/
+    install -m 0644 ${UNPACKDIR}/netdata.conf ${D}${sysconfdir}/netdata/
     sed -i -e 's,@@sysconfdir,${sysconfdir},g' ${D}${sysconfdir}/netdata/netdata.conf
     sed -i -e 's,@@libdir,${libexecdir},g' ${D}${sysconfdir}/netdata/netdata.conf
     sed -i -e 's,@@datadir,${datadir},g' ${D}${sysconfdir}/netdata/netdata.conf

@@ -1,4 +1,4 @@
-From b7ce05b2d969b311c6061bda32c3117c76bf7e0c Mon Sep 17 00:00:00 2001
+From 0671715ae6d411b5d2d4c53fee42a6e9fe2562c2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 31 Jan 2023 22:03:38 -0800
 Subject: [PATCH] aarch64: Fix include paths when S != B
@@ -24,32 +24,44 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- gcc/config/aarch64/aarch64.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ gcc/config/aarch64/aarch64.h | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/aarch64/aarch64.h b/gcc/config/aarch64/aarch64.h
-index 73b09e20508..10ea3672f20 100644
+index 45e901cda64..591062d4b39 100644
 --- a/gcc/config/aarch64/aarch64.h
 +++ b/gcc/config/aarch64/aarch64.h
-@@ -161,8 +161,8 @@
- enum class aarch64_feature : unsigned char {
+@@ -170,9 +170,9 @@ enum class aarch64_feature : unsigned char {
+ #define DEF_AARCH64_ISA_MODE(IDENT) IDENT,
  #define AARCH64_OPT_EXTENSION(A, IDENT, C, D, E, F) IDENT,
  #define AARCH64_ARCH(A, B, IDENT, D, E) IDENT,
+-#include "aarch64-isa-modes.def"
 -#include "aarch64-option-extensions.def"
 -#include "aarch64-arches.def"
++#include "config/aarch64/aarch64-isa-modes.def"
 +#include "config/aarch64/aarch64-option-extensions.def"
 +#include "config/aarch64/aarch64-arches.def"
  };
  
  /* Define unique flags for each of the above.  */
-@@ -171,8 +171,8 @@ enum class aarch64_feature : unsigned char {
-     = aarch64_feature_flags (1) << int (aarch64_feature::IDENT);
+@@ -182,16 +182,16 @@ enum class aarch64_feature : unsigned char {
+ #define DEF_AARCH64_ISA_MODE(IDENT) HANDLE (IDENT)
  #define AARCH64_OPT_EXTENSION(A, IDENT, C, D, E, F) HANDLE (IDENT)
  #define AARCH64_ARCH(A, B, IDENT, D, E) HANDLE (IDENT)
+-#include "aarch64-isa-modes.def"
 -#include "aarch64-option-extensions.def"
 -#include "aarch64-arches.def"
++#include "config/aarch64/aarch64-isa-modes.def"
 +#include "config/aarch64/aarch64-option-extensions.def"
 +#include "config/aarch64/aarch64-arches.def"
  #undef HANDLE
  
- #endif
+ constexpr auto AARCH64_FL_SM_STATE = AARCH64_FL_SM_ON | AARCH64_FL_SM_OFF;
+ 
+ constexpr unsigned int AARCH64_NUM_ISA_MODES = (0
+ #define DEF_AARCH64_ISA_MODE(IDENT) + 1
+-#include "aarch64-isa-modes.def"
++#include "config/aarch64/aarch64-isa-modes.def"
+ );
+ 
+ /* The mask of all ISA modes.  */

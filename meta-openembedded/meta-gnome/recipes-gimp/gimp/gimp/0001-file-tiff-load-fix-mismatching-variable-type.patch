@@ -1,0 +1,24 @@
+From a2458f1528e5733574bb26ff5452b1329116e6db Mon Sep 17 00:00:00 2001
+From: Simon Budig <simon@budig.de>
+Date: Sat, 20 May 2023 18:40:41 +0200
+Subject: [PATCH] file-tiff-load: fix mismatching variable type
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gimp/-/commit/a2458f1528e5733574bb26ff5452b1329116e6db]
+Signed-off-by: Khem Raj <raj.khem@gmai.com>
+---
+ plug-ins/file-tiff/file-tiff-load.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/plug-ins/file-tiff/file-tiff-load.c
++++ b/plug-ins/file-tiff/file-tiff-load.c
+@@ -1301,8 +1301,8 @@ load_image (GFile        *file,
+ 
+       /* any resolution info in the file? */
+       {
+-        gfloat   xres = 72.0;
+-        gfloat   yres = 72.0;
++        gdouble   xres = 72.0;
++        gdouble   yres = 72.0;
+         gushort  read_unit;
+         GimpUnit unit = GIMP_UNIT_PIXEL; /* invalid unit */
+ 

@@ -15,8 +15,6 @@ Upstream-Status: Pending [https://github.com/fluent/fluent-bit/issues/5492]
  lib/cmetrics/CMakeLists.txt | 7 +------
  3 files changed, 3 insertions(+), 17 deletions(-)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3dba5a8..d94b988 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -46,11 +46,7 @@ else()
@@ -32,8 +30,6 @@ index 3dba5a8..d94b988 100644
  
  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv7l")
    set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -latomic")
-diff --git a/lib/chunkio/CMakeLists.txt b/lib/chunkio/CMakeLists.txt
-index bbe1f39..809ea93 100644
 --- a/lib/chunkio/CMakeLists.txt
 +++ b/lib/chunkio/CMakeLists.txt
 @@ -14,12 +14,7 @@ else()
@@ -50,21 +46,19 @@ index bbe1f39..809ea93 100644
  
  include(cmake/macros.cmake)
  
-diff --git a/lib/cmetrics/CMakeLists.txt b/lib/cmetrics/CMakeLists.txt
-index 60e8774..e3d6149 100644
 --- a/lib/cmetrics/CMakeLists.txt
 +++ b/lib/cmetrics/CMakeLists.txt
 @@ -34,12 +34,7 @@ set(CMT_VERSION_MINOR  3)
- set(CMT_VERSION_PATCH  5)
+ set(CMT_VERSION_PATCH  7)
  set(CMT_VERSION_STR "${CMT_VERSION_MAJOR}.${CMT_VERSION_MINOR}.${CMT_VERSION_PATCH}")
  
--# Define __FILENAME__ consistently across Operating Systems
+-# Define __CMT_FILENAME__ consistently across Operating Systems
 -if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
--  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
 -else()
--  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__=__FILE__")
 -endif()
-+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__=__FILE__")
  
  # Configuration options
- option(CMT_DEV             "Enable development mode"                   No)
+ option(CMT_DEV                       "Enable development mode"                   No)

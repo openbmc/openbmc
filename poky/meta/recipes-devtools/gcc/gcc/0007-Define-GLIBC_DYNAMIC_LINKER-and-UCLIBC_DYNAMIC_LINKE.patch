@@ -1,4 +1,4 @@
-From aacfd6e14dd583b1fdc65691def61c5e1bc89708 Mon Sep 17 00:00:00 2001
+From bce0b7e2e130a069a93c839b856aa19b64d5ca54 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:24:50 +0400
 Subject: [PATCH] Define GLIBC_DYNAMIC_LINKER and UCLIBC_DYNAMIC_LINKER
@@ -36,7 +36,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  18 files changed, 53 insertions(+), 58 deletions(-)
 
 diff --git a/gcc/config/aarch64/aarch64-linux.h b/gcc/config/aarch64/aarch64-linux.h
-index 4277f03da2a..e4c92c03291 100644
+index 8e51c8202cc..732e4f4a477 100644
 --- a/gcc/config/aarch64/aarch64-linux.h
 +++ b/gcc/config/aarch64/aarch64-linux.h
 @@ -21,10 +21,10 @@
@@ -53,7 +53,7 @@ index 4277f03da2a..e4c92c03291 100644
  #undef  ASAN_CC1_SPEC
  #define ASAN_CC1_SPEC "%{%:sanitize(address):-funwind-tables}"
 diff --git a/gcc/config/alpha/linux-elf.h b/gcc/config/alpha/linux-elf.h
-index 03f783f2ad1..4fa02668aa7 100644
+index 40ccf0bd9b4..ab5c59655fc 100644
 --- a/gcc/config/alpha/linux-elf.h
 +++ b/gcc/config/alpha/linux-elf.h
 @@ -23,8 +23,8 @@ along with GCC; see the file COPYING3.  If not see
@@ -68,7 +68,7 @@ index 03f783f2ad1..4fa02668aa7 100644
  #define CHOOSE_DYNAMIC_LINKER(G, U) "%{mglibc:" G ";:" U "}"
  #elif DEFAULT_LIBC == LIBC_GLIBC
 diff --git a/gcc/config/arm/linux-eabi.h b/gcc/config/arm/linux-eabi.h
-index a119875599d..dce7f59eeea 100644
+index eef791f6a02..335cb4c3607 100644
 --- a/gcc/config/arm/linux-eabi.h
 +++ b/gcc/config/arm/linux-eabi.h
 @@ -62,8 +62,8 @@
@@ -92,7 +92,7 @@ index a119875599d..dce7f59eeea 100644
  /* At this point, bpabi.h will have clobbered LINK_SPEC.  We want to
     use the GNU/Linux version, not the generic BPABI version.  */
 diff --git a/gcc/config/arm/linux-elf.h b/gcc/config/arm/linux-elf.h
-index 7b7b7cbbe14..98ef2267117 100644
+index ccae8abf6f6..ea421d03891 100644
 --- a/gcc/config/arm/linux-elf.h
 +++ b/gcc/config/arm/linux-elf.h
 @@ -60,7 +60,7 @@
@@ -105,7 +105,7 @@ index 7b7b7cbbe14..98ef2267117 100644
  #define LINUX_TARGET_LINK_SPEC  "%{h*} \
     %{static:-Bstatic} \
 diff --git a/gcc/config/i386/linux.h b/gcc/config/i386/linux.h
-index bbb7cc7115e..7d9272040ee 100644
+index 20a96d56e65..7a7a4f873e4 100644
 --- a/gcc/config/i386/linux.h
 +++ b/gcc/config/i386/linux.h
 @@ -20,7 +20,7 @@ along with GCC; see the file COPYING3.  If not see
@@ -119,7 +119,7 @@ index bbb7cc7115e..7d9272040ee 100644
 -#define MUSL_DYNAMIC_LINKER "/lib/ld-musl-i386.so.1"
 +#define MUSL_DYNAMIC_LINKER SYSTEMLIBS_DIR "ld-musl-i386.so.1"
 diff --git a/gcc/config/i386/linux64.h b/gcc/config/i386/linux64.h
-index 2bd9f48e271..dbbe7ca5440 100644
+index 3dd23eef5e5..960cd7c0450 100644
 --- a/gcc/config/i386/linux64.h
 +++ b/gcc/config/i386/linux64.h
 @@ -27,13 +27,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
@@ -143,7 +143,7 @@ index 2bd9f48e271..dbbe7ca5440 100644
 -#define MUSL_DYNAMIC_LINKERX32 "/lib/ld-musl-x32.so.1"
 +#define MUSL_DYNAMIC_LINKERX32 SYSTEMLIBS_DIR "ld-musl-x32.so.1"
 diff --git a/gcc/config/linux.h b/gcc/config/linux.h
-index e3aca79cccc..6491c6b84f5 100644
+index a7248ac90d0..e36f32bf59e 100644
 --- a/gcc/config/linux.h
 +++ b/gcc/config/linux.h
 @@ -86,10 +86,10 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
@@ -162,25 +162,29 @@ index e3aca79cccc..6491c6b84f5 100644
  #define BIONIC_DYNAMIC_LINKER32 "/system/bin/linker"
  #define BIONIC_DYNAMIC_LINKER64 "/system/bin/linker64"
 diff --git a/gcc/config/loongarch/gnu-user.h b/gcc/config/loongarch/gnu-user.h
-index aecaa02a199..62f88f7f9a2 100644
+index e5d84e180e3..98cb49c189f 100644
 --- a/gcc/config/loongarch/gnu-user.h
 +++ b/gcc/config/loongarch/gnu-user.h
-@@ -31,11 +31,11 @@ along with GCC; see the file COPYING3.  If not see
+@@ -31,7 +31,7 @@ along with GCC; see the file COPYING3.  If not see
  
  #undef GLIBC_DYNAMIC_LINKER
  #define GLIBC_DYNAMIC_LINKER \
 -  "/lib" ABI_GRLEN_SPEC "/ld-linux-loongarch-" ABI_SPEC ".so.1"
 +  SYSTEMLIBS_DIR "ld-linux-loongarch-" ABI_SPEC ".so.1"
  
+ #define MUSL_ABI_SPEC \
+   "%{mabi=lp64d:}" \
+@@ -40,7 +40,7 @@ along with GCC; see the file COPYING3.  If not see
+ 
  #undef MUSL_DYNAMIC_LINKER
  #define MUSL_DYNAMIC_LINKER \
--  "/lib" ABI_GRLEN_SPEC "/ld-musl-loongarch-" ABI_SPEC ".so.1"
-+  SYSTEMLIBS_DIR "ld-musl-loongarch-" ABI_SPEC ".so.1"
+-  "/lib/ld-musl-loongarch" ABI_GRLEN_SPEC MUSL_ABI_SPEC ".so.1"
++  SYSTEMLIBS_DIR "ld-musl-loongarch" ABI_GRLEN_SPEC MUSL_ABI_SPEC ".so.1"
  
  #undef GNU_USER_TARGET_LINK_SPEC
  #define GNU_USER_TARGET_LINK_SPEC \
 diff --git a/gcc/config/microblaze/linux.h b/gcc/config/microblaze/linux.h
-index e2e2c421c52..6f26480e3b5 100644
+index 5ed8ee518be..5553e7cac21 100644
 --- a/gcc/config/microblaze/linux.h
 +++ b/gcc/config/microblaze/linux.h
 @@ -28,7 +28,7 @@
@@ -202,7 +206,7 @@ index e2e2c421c52..6f26480e3b5 100644
  #undef  SUBTARGET_EXTRA_SPECS
  #define SUBTARGET_EXTRA_SPECS \
 diff --git a/gcc/config/mips/linux.h b/gcc/config/mips/linux.h
-index 5add34ea134..34692b433b8 100644
+index 8d098dd2f44..1c5ebbd26d5 100644
 --- a/gcc/config/mips/linux.h
 +++ b/gcc/config/mips/linux.h
 @@ -22,29 +22,29 @@ along with GCC; see the file COPYING3.  If not see
@@ -245,7 +249,7 @@ index 5add34ea134..34692b433b8 100644
  #define BIONIC_DYNAMIC_LINKERN32 "/system/bin/linker32"
  #define GNU_USER_DYNAMIC_LINKERN32 \
 diff --git a/gcc/config/nios2/linux.h b/gcc/config/nios2/linux.h
-index 2ce097ebbce..1d45d7b4962 100644
+index 06c442e85f4..b21a3c076c9 100644
 --- a/gcc/config/nios2/linux.h
 +++ b/gcc/config/nios2/linux.h
 @@ -29,10 +29,10 @@
@@ -262,7 +266,7 @@ index 2ce097ebbce..1d45d7b4962 100644
  #undef LINK_SPEC
  #define LINK_SPEC LINK_SPEC_ENDIAN \
 diff --git a/gcc/config/riscv/linux.h b/gcc/config/riscv/linux.h
-index 3e625e0f867..dc3afc97e27 100644
+index 15851f653bc..d8aaab9631f 100644
 --- a/gcc/config/riscv/linux.h
 +++ b/gcc/config/riscv/linux.h
 @@ -22,7 +22,7 @@ along with GCC; see the file COPYING3.  If not see
@@ -284,10 +288,10 @@ index 3e625e0f867..dc3afc97e27 100644
  #define ICACHE_FLUSH_FUNC "__riscv_flush_icache"
  
 diff --git a/gcc/config/rs6000/linux64.h b/gcc/config/rs6000/linux64.h
-index 9e457033d11..2ddab7c99c1 100644
+index 655d1054d76..a11ae7643b7 100644
 --- a/gcc/config/rs6000/linux64.h
 +++ b/gcc/config/rs6000/linux64.h
-@@ -339,24 +339,19 @@ extern int dot_symbols;
+@@ -340,24 +340,19 @@ extern int dot_symbols;
  #undef	LINK_OS_DEFAULT_SPEC
  #define LINK_OS_DEFAULT_SPEC "%(link_os_linux)"
  
@@ -318,7 +322,7 @@ index 9e457033d11..2ddab7c99c1 100644
  #undef  DEFAULT_ASM_ENDIAN
  #if (TARGET_DEFAULT & MASK_LITTLE_ENDIAN)
 diff --git a/gcc/config/rs6000/sysv4.h b/gcc/config/rs6000/sysv4.h
-index ae932fc22f0..26db003cb3a 100644
+index bcafa9d0cf4..8fda952e69c 100644
 --- a/gcc/config/rs6000/sysv4.h
 +++ b/gcc/config/rs6000/sysv4.h
 @@ -771,10 +771,10 @@ GNU_USER_TARGET_CC1_SPEC
@@ -335,7 +339,7 @@ index ae932fc22f0..26db003cb3a 100644
  #ifndef GNU_USER_DYNAMIC_LINKER
  #define GNU_USER_DYNAMIC_LINKER GLIBC_DYNAMIC_LINKER
 diff --git a/gcc/config/s390/linux.h b/gcc/config/s390/linux.h
-index 02aa1edaff8..fab268d61f4 100644
+index 83ea2f669a0..bc7cffbad3f 100644
 --- a/gcc/config/s390/linux.h
 +++ b/gcc/config/s390/linux.h
 @@ -72,13 +72,13 @@ along with GCC; see the file COPYING3.  If not see
@@ -357,7 +361,7 @@ index 02aa1edaff8..fab268d61f4 100644
  #undef  LINK_SPEC
  #define LINK_SPEC \
 diff --git a/gcc/config/sh/linux.h b/gcc/config/sh/linux.h
-index 29f5902b98b..83d1e53e6e2 100644
+index 34cbbed633f..14000d3394c 100644
 --- a/gcc/config/sh/linux.h
 +++ b/gcc/config/sh/linux.h
 @@ -61,10 +61,10 @@ along with GCC; see the file COPYING3.  If not see
@@ -374,7 +378,7 @@ index 29f5902b98b..83d1e53e6e2 100644
  #undef SUBTARGET_LINK_EMUL_SUFFIX
  #define SUBTARGET_LINK_EMUL_SUFFIX "%{mfdpic:_fd;:_linux}"
 diff --git a/gcc/config/sparc/linux.h b/gcc/config/sparc/linux.h
-index 0e33b3cac2c..84f29adbb35 100644
+index 9646fa9c41e..396fb047fac 100644
 --- a/gcc/config/sparc/linux.h
 +++ b/gcc/config/sparc/linux.h
 @@ -78,7 +78,7 @@ extern const char *host_detect_local_cpu (int argc, const char **argv);
@@ -387,7 +391,7 @@ index 0e33b3cac2c..84f29adbb35 100644
  #undef  LINK_SPEC
  #define LINK_SPEC "-m elf32_sparc %{shared:-shared} \
 diff --git a/gcc/config/sparc/linux64.h b/gcc/config/sparc/linux64.h
-index f1cc0a19e49..94bc2032803 100644
+index 1e2e4aef2ad..25fcc37eca2 100644
 --- a/gcc/config/sparc/linux64.h
 +++ b/gcc/config/sparc/linux64.h
 @@ -78,8 +78,8 @@ along with GCC; see the file COPYING3.  If not see

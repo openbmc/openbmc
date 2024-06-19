@@ -1,4 +1,4 @@
-From 3fad4821d90cd264d1b94253b9cf4fdf5d4034b8 Mon Sep 17 00:00:00 2001
+From cf77d301faf96cc892c6df0e19fccbf5853f249d Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 29 May 2019 00:10:32 +0100
 Subject: [PATCH] strace: Tweak ptest disk space management
@@ -9,16 +9,15 @@ using around 600MB of disk space and running our ptest images out of space.
 RP 2019/5/29
 
 Upstream-Status: Inappropriate [specific to OE image space issues]
-
 ---
  tests/gen_tests.sh | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/tests/gen_tests.sh b/tests/gen_tests.sh
-index 3540204..5e1e7c9 100755
+index ce1467e..8f47651 100755
 --- a/tests/gen_tests.sh
 +++ b/tests/gen_tests.sh
-@@ -62,6 +62,7 @@ while read -r name arg0 args; do {
+@@ -73,6 +73,7 @@ while read -r name arg0 args; do {
  		$hdr
  		. "\${srcdir=.}/init.sh"
  		run_strace_match_diff $arg0 $args

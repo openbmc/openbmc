@@ -41,7 +41,7 @@ file://${COMMON_LICENSE_DIR}/Zlib;md5=87f239f408daca8a157858e192597633 \
 "
 IMAGE_CLASSES:remove = "license_image"
 
-COMPATIBLE_MACHINE = "fvp-*"
+COMPATIBLE_MACHINE = "(fvp-.+|.+-fvp)"
 
 TEST_SUITES = "arm_systemready_ir_acs"
 

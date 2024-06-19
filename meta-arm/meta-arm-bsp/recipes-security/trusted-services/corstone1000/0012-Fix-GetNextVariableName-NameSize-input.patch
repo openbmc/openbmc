@@ -1,0 +1,495 @@
+From cc4cc9f3f5f02f713cf4da1854f3085bf31e71cf Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Sat, 13 Apr 2024 14:52:23 +0200
+Subject: [PATCH 2/3] Fix GetNextVariableName NameSize input
+
+Based on the specification the NameSize shall be set to the available
+buffer size at the first call instead of the NameSize of the
+provided variable.
+Change smm-gateway and the tests according this. Also remove
+sanitize_get_next_var_name_param utility function, which is not
+compilant with this solution.
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/28022]
+---
+ .../backend/test/variable_store_tests.cpp     | 48 +++++++--------
+ .../backend/uefi_variable_store.c             | 60 ++++++++++++-------
+ .../backend/uefi_variable_store.h             |  5 +-
+ .../smm_variable/backend/variable_index.c     |  3 +
+ .../provider/smm_variable_provider.c          | 59 +++++-------------
+ .../service/smm_variable_attack_tests.cpp     | 29 ++++-----
+ .../service/smm_variable_service_tests.cpp    |  7 ++-
+ 7 files changed, 98 insertions(+), 113 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp b/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp
+index fd48f13fb..72772821c 100644
+--- a/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp
++++ b/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp
+@@ -501,15 +501,13 @@ TEST(UefiVariableStoreTests, bootServiceAccess)
+ 	std::vector<uint8_t> msg_buffer(VARIABLE_BUFFER_SIZE);
+ 	SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *next_name =
+ 		(SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *) msg_buffer.data();
+-	size_t max_name_len =
+-		VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 
+ 	size_t total_len = 0;
+-	next_name->NameSize = sizeof(int16_t);
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	next_name->Name[0] = 0;
+ 
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_NOT_FOUND, status);
+ }
+@@ -574,47 +572,48 @@ TEST(UefiVariableStoreTests, enumerateStoreContents)
+ 	std::vector<uint8_t> msg_buffer(VARIABLE_BUFFER_SIZE);
+ 	SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *next_name =
+ 		(SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *) msg_buffer.data();
+-	size_t max_name_len =
+-		VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 
+ 	/* First check handling of invalid variable name */
+ 	std::u16string bogus_name = to_variable_name(u"bogus_variable");
+ 	size_t bogus_name_size = string_get_size_in_bytes(bogus_name);
+ 	next_name->Guid = m_common_guid;
+-	next_name->NameSize = bogus_name_size;
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	memcpy(next_name->Name, bogus_name.data(), bogus_name_size);
+ 
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_INVALID_PARAMETER, status);
+ 
+ 	/* Enumerate store contents */
+ 	next_name->NameSize = sizeof(int16_t);
+ 	next_name->Name[0] = 0;
+-	/* Check if the correct NameSize is returned if max_name_len is too small */
++	/* Check if the correct NameSize is returned if namesize is too small */
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    0, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_BUFFER_TOO_SMALL, status);
+ 	UNSIGNED_LONGLONGS_EQUAL(sizeof(var_name_1), next_name->NameSize);
+ 
+-	/* And then used the previously received next_name->NameSize as max_name_len */
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    next_name->NameSize, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+ 	CHECK_TRUE(compare_variable_name(var_name_1, next_name->Name, next_name->NameSize));
+ 
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+ 	CHECK_TRUE(compare_variable_name(var_name_2, next_name->Name, next_name->NameSize));
+ 
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+ 	CHECK_TRUE(compare_variable_name(var_name_3, next_name->Name, next_name->NameSize));
+ 
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_NOT_FOUND, status);
+ 
+ 	power_cycle();
+@@ -622,21 +621,23 @@ TEST(UefiVariableStoreTests, enumerateStoreContents)
+ 	/* Enumerate again - should be left with just NV variables.
+ 	 * Use a different but equally valid null name.
+ 	 */
+-	next_name->NameSize = 10 * sizeof(int16_t);
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	memset(next_name->Name, 0, next_name->NameSize);
+ 
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+ 	CHECK_TRUE(compare_variable_name(var_name_1, next_name->Name, next_name->NameSize));
+ 
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+ 	CHECK_TRUE(compare_variable_name(var_name_3, next_name->Name, next_name->NameSize));
+ 
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_NOT_FOUND, status);
+ }
+ 
+@@ -672,21 +673,20 @@ TEST(UefiVariableStoreTests, failedNvSet)
+ 	std::vector<uint8_t> msg_buffer(VARIABLE_BUFFER_SIZE);
+ 	SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *next_name =
+ 		(SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *) msg_buffer.data();
+-	size_t max_name_len =
+-		VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 
+ 	/* Enumerate store contents */
+ 	size_t total_len = 0;
+-	next_name->NameSize = sizeof(int16_t);
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	next_name->Name[0] = 0;
+ 
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+ 	CHECK_TRUE(compare_variable_name(var_name_1, next_name->Name, next_name->NameSize));
+ 
++	next_name->NameSize = VARIABLE_BUFFER_SIZE - SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_NAME_OFFSET;
+ 	status = uefi_variable_store_get_next_variable_name(&m_uefi_variable_store, next_name,
+-							    max_name_len, &total_len);
++							    &total_len);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_NOT_FOUND, status);
+ }
+ 
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.c b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+index 5b46c1371..caf6698aa 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+@@ -404,9 +404,27 @@ efi_status_t uefi_variable_store_get_variable(const struct uefi_variable_store *
+ efi_status_t
+ uefi_variable_store_get_next_variable_name(const struct uefi_variable_store *context,
+ 					   SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *cur,
+-					   size_t max_name_len, size_t *total_length)
++					   size_t *total_length)
+ {
+-	efi_status_t status = check_name_terminator(cur->Name, cur->NameSize);
++	efi_status_t status = EFI_SUCCESS;
++	size_t buffer_size = 0;
++
++	if (!cur)
++		return EFI_INVALID_PARAMETER;
++	/*
++	 * NameSize is set to the buffer size to store the names,
++	 * let's calculate the size actually being used.
++	 */
++	buffer_size = cur->NameSize;
++	for (int i = 0; i < buffer_size / sizeof(int16_t); i++) {
++		if (cur->Name[i] == 0) {
++			/* With null terminator */
++			cur->NameSize = 2*(i+1);
++			break;
++		}
++	}
++
++	status = check_name_terminator(cur->Name, cur->NameSize);
+ 
+ 	if (status != EFI_SUCCESS)
+ 		return status;
+@@ -418,21 +436,11 @@ uefi_variable_store_get_next_variable_name(const struct uefi_variable_store *con
+ 			&context->variable_index, &cur->Guid, cur->NameSize, cur->Name, &status);
+ 
+ 		if (info && (status == EFI_SUCCESS)) {
+-			/* The NameSize has to be set in every case according to the UEFI specs.
+-			 * In case of EFI_BUFFER_TOO_SMALL it has to reflect the size of buffer
+-			 * needed.
+-			 */
+-			cur->NameSize = info->metadata.name_size;
+-			*total_length = sizeof(SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME);
+-
+-			if (info->metadata.name_size <= max_name_len) {
++			if (info->metadata.name_size <= buffer_size) {
+ 				cur->Guid = info->metadata.guid;
++				cur->NameSize = info->metadata.name_size;
+ 				memcpy(cur->Name, info->metadata.name, info->metadata.name_size);
+ 
+-				*total_length =
+-					SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME_TOTAL_SIZE(
+-						cur);
+-
+ 				/*
+ 				 * Check if variable is accessible (e.g boot variable is not
+ 				 * accessible at runtime)
+@@ -442,6 +450,10 @@ uefi_variable_store_get_next_variable_name(const struct uefi_variable_store *con
+ 				if (status == EFI_SUCCESS)
+ 					break;
+ 			} else {
++				/* The VariableNameSize is updated to reflect the size of buffer needed */
++				cur->NameSize = info->metadata.name_size;
++				memset(cur->Name, 0, buffer_size);
++				memset(&cur->Guid, 0, sizeof(EFI_GUID));
+ 				status = EFI_BUFFER_TOO_SMALL;
+ 				break;
+ 			}
+@@ -450,18 +462,24 @@ uefi_variable_store_get_next_variable_name(const struct uefi_variable_store *con
+ 			/* Do not hide original error if there is any */
+ 			if (status == EFI_SUCCESS)
+ 				status = EFI_NOT_FOUND;
++
++			memset(cur->Name, 0, buffer_size);
++			memset(&cur->Guid, 0, sizeof(EFI_GUID));
++			cur->NameSize = 0;
+ 			break;
+ 		}
+ 	}
+ 
+-	/* If we found no accessible variable clear the fields for security */
+-	if (status != EFI_SUCCESS) {
+-		memset(cur->Name, 0, max_name_len);
+-		memset(&cur->Guid, 0, sizeof(EFI_GUID));
+-		if (status != EFI_BUFFER_TOO_SMALL)
+-			cur->NameSize = 0;
++	if (status == EFI_SUCCESS) {
++		/* Store everything including the name */
++		*total_length =
++			SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME_TOTAL_SIZE(
++				cur);
++	} else {
++		/* Do not store the name, only the size */
++		*total_length =
++			SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME_NAME_OFFSET;
+ 	}
+-
+ 	return status;
+ }
+ 
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.h b/components/service/uefi/smm_variable/backend/uefi_variable_store.h
+index 8be5f36e6..2493ff6b4 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.h
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.h
+@@ -134,8 +134,7 @@ efi_status_t uefi_variable_store_get_variable(const struct uefi_variable_store *
+  * Used for enumerating the store contents
+  *
+  * @param[in]  context uefi_variable_store instance
+- * @param[out] cur Current variable name
+- * @param[in]  max_name_len The maximum variable name length
++ * @param[inout] cur The size of the VariableName buffer
+  * @param[out] total_len The total length of the output
+  *
+  * @return     EFI_SUCCESS if successful
+@@ -143,7 +142,7 @@ efi_status_t uefi_variable_store_get_variable(const struct uefi_variable_store *
+ efi_status_t
+ uefi_variable_store_get_next_variable_name(const struct uefi_variable_store *context,
+ 					   SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *cur,
+-					   size_t max_name_len, size_t *total_length);
++					   size_t *total_length);
+ 
+ /**
+  * @brief      Query for variable info
+diff --git a/components/service/uefi/smm_variable/backend/variable_index.c b/components/service/uefi/smm_variable/backend/variable_index.c
+index d850dbe18..e2fe6dd38 100644
+--- a/components/service/uefi/smm_variable/backend/variable_index.c
++++ b/components/service/uefi/smm_variable/backend/variable_index.c
+@@ -27,6 +27,9 @@ static uint64_t name_hash(const EFI_GUID *guid, size_t name_size, const int16_t
+ 
+ 	/* Extend to cover name up to but not including null terminator */
+ 	for (size_t i = 0; i < (name_size - sizeof(int16_t)) / sizeof(int16_t); ++i) {
++		/* Only hash till the first null terminator */
++		if (name[i] == 0)
++			break;
+ 		hash = ((hash << 5) + hash) + name[i];
+ 	}
+ 
+diff --git a/components/service/uefi/smm_variable/provider/smm_variable_provider.c b/components/service/uefi/smm_variable/provider/smm_variable_provider.c
+index ca3f7e5e5..1a5269338 100644
+--- a/components/service/uefi/smm_variable/provider/smm_variable_provider.c
++++ b/components/service/uefi/smm_variable/provider/smm_variable_provider.c
+@@ -81,30 +81,6 @@ static efi_status_t sanitize_access_variable_param(struct rpc_request *req, size
+ 	return efi_status;
+ }
+ 
+-static efi_status_t sanitize_get_next_var_name_param(struct rpc_request *req, size_t *param_len)
+-{
+-	efi_status_t efi_status = EFI_INVALID_PARAMETER;
+-	*param_len = 0;
+-	const struct rpc_buffer *req_buf = &req->request;
+-
+-	if (req_buf->data_length >= SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME_NAME_OFFSET) {
+-		const SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *param =
+-			(const SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *)req_buf->data;
+-
+-		size_t max_space_for_name =
+-			req_buf->data_length -
+-			SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME_NAME_OFFSET;
+-
+-		if (param->NameSize <= max_space_for_name) {
+-			*param_len =
+-				SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME_TOTAL_SIZE(param);
+-			efi_status = EFI_SUCCESS;
+-		}
+-	}
+-
+-	return efi_status;
+-}
+-
+ static efi_status_t sanitize_var_check_property_param(struct rpc_request *req, size_t *param_len)
+ {
+ 	efi_status_t efi_status = EFI_INVALID_PARAMETER;
+@@ -146,7 +122,7 @@ static rpc_status_t get_variable_handler(void *context, struct rpc_request *req)
+ 			struct rpc_buffer *req_buf = &req->request;
+ 			size_t max_data_len = resp_buf->size - param_len;
+ 
+-			memmove(resp_buf->data, req_buf->data, param_len);
++			memcpy(resp_buf->data, req_buf->data, param_len);
+ 
+ 			efi_status = uefi_variable_store_get_variable(
+ 				&this_instance->variable_store,
+@@ -167,28 +143,21 @@ static rpc_status_t get_next_variable_name_handler(void *context, struct rpc_req
+ {
+ 	struct smm_variable_provider *this_instance = (struct smm_variable_provider *)context;
+ 
+-	size_t param_len = 0;
+-	efi_status_t efi_status = sanitize_get_next_var_name_param(req, &param_len);
++	efi_status_t efi_status = EFI_SUCCESS;
++	size_t variable_size = 0;
+ 
+-	if (efi_status == EFI_SUCCESS) {
+-		/* Valid get next variable name header */
+-		struct rpc_buffer *resp_buf = &req->response;
++	/* Valid get next variable name header */
++	struct rpc_buffer *resp_buf = &req->response;
++	struct rpc_buffer *req_buf = &req->request;
+ 
+-		if (resp_buf->size >= param_len) {
+-			struct rpc_buffer *req_buf = &req->request;
++	memcpy(resp_buf->data, req_buf->data, req_buf->data_length);
+ 
+-			memmove(resp_buf->data, req_buf->data, param_len);
++	efi_status = uefi_variable_store_get_next_variable_name(
++		&this_instance->variable_store,
++		(SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *)resp_buf->data,
++		&variable_size);
+ 
+-			efi_status = uefi_variable_store_get_next_variable_name(
+-				&this_instance->variable_store,
+-				(SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *)resp_buf->data,
+-				((SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME*)resp_buf->data)->NameSize,
+-				&resp_buf->data_length);
+-		} else {
+-			/* Reponse buffer not big enough */
+-			efi_status = EFI_BAD_BUFFER_SIZE;
+-		}
+-	}
++	resp_buf->data_length = variable_size;
+ 
+ 	req->service_status = efi_status;
+ 
+@@ -240,7 +209,7 @@ static rpc_status_t query_variable_info_handler(void *context, struct rpc_reques
+ 		struct rpc_buffer *resp_buf = &req->response;
+ 
+ 		if (resp_buf->size >= req_buf->data_length) {
+-			memmove(resp_buf->data, req_buf->data, req_buf->data_length);
++			memcpy(resp_buf->data, req_buf->data, req_buf->data_length);
+ 
+ 			efi_status = uefi_variable_store_query_variable_info(
+ 				&this_instance->variable_store,
+@@ -308,7 +277,7 @@ static rpc_status_t get_var_check_property_handler(void *context, struct rpc_req
+ 
+ 		if (resp_buf->size >= param_len) {
+ 			struct rpc_buffer *req_buf = &req->request;
+-			memmove(resp_buf->data, req_buf->data, param_len);
++			memcpy(resp_buf->data, req_buf->data, param_len);
+ 			resp_buf->data_length = param_len;
+ 
+ 			efi_status = uefi_variable_store_get_var_check_property(
+diff --git a/components/service/uefi/smm_variable/test/service/smm_variable_attack_tests.cpp b/components/service/uefi/smm_variable/test/service/smm_variable_attack_tests.cpp
+index 76b62fd35..98e61fec0 100644
+--- a/components/service/uefi/smm_variable/test/service/smm_variable_attack_tests.cpp
++++ b/components/service/uefi/smm_variable/test/service/smm_variable_attack_tests.cpp
+@@ -176,19 +176,6 @@ TEST(SmmVariableAttackTests, setAndGetWithSizeMaxNameSize)
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, efi_status);
+ }
+ 
+-TEST(SmmVariableAttackTests, enumerateWithOversizeName)
+-{
+-	efi_status_t efi_status = EFI_SUCCESS;
+-	std::u16string var_name = null_name;
+-	EFI_GUID guid;
+-	memset(&guid, 0, sizeof(guid));
+-
+-	efi_status = m_client->get_next_variable_name(guid, var_name,
+-						      (var_name.size() + 1) * sizeof(int16_t) + 1);
+-
+-	UNSIGNED_LONGLONGS_EQUAL(EFI_INVALID_PARAMETER, efi_status);
+-}
+-
+ TEST(SmmVariableAttackTests, enumerateWithSizeMaxNameSize)
+ {
+ 	efi_status_t efi_status = EFI_SUCCESS;
+@@ -202,17 +189,23 @@ TEST(SmmVariableAttackTests, enumerateWithSizeMaxNameSize)
+ 
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, efi_status);
+ 
+-	/* Initial iteration uses good name length */
+-	efi_status = m_client->get_next_variable_name(guid, var_name);
++	/* Initial iteration uses good name length for next variable */
++	efi_status = m_client->get_next_variable_name(guid, var_name, std::numeric_limits<size_t>::max());
+ 
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, efi_status);
+ 
+-	/* Next iteration uses invalid name length */
+-	efi_status = m_client->get_next_variable_name(guid, var_name,
+-						      std::numeric_limits<size_t>::max());
++	/* Next iteration uses invalid name length, so a null terminator can not fit */
++	var_name = null_name;
++	efi_status = m_client->get_next_variable_name(guid, var_name, 1);
+ 
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_INVALID_PARAMETER, efi_status);
+ 
++	/* Next iteration uses invalid name length, so a null terminator can not fit */
++	var_name = null_name;
++	efi_status = m_client->get_next_variable_name(guid, var_name, 2);
++
++	UNSIGNED_LONGLONGS_EQUAL(EFI_BUFFER_TOO_SMALL, efi_status);
++
+ 	/* Expect to be able to remove the variable */
+ 	efi_status = m_client->remove_variable(m_common_guid, var_name_1);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, efi_status);
+diff --git a/components/service/uefi/smm_variable/test/service/smm_variable_service_tests.cpp b/components/service/uefi/smm_variable/test/service/smm_variable_service_tests.cpp
+index e82a90c37..8fa4f8077 100644
+--- a/components/service/uefi/smm_variable/test/service/smm_variable_service_tests.cpp
++++ b/components/service/uefi/smm_variable/test/service/smm_variable_service_tests.cpp
+@@ -9,6 +9,7 @@
+ #include <cstring>
+ #include <locale>
+ #include <sstream>
++#include <limits>
+ 
+ #include "util.h"
+ 
+@@ -154,7 +155,7 @@ TEST_GROUP(SmmVariableServiceTests)
+ #endif
+ 
+ 		do {
+-			status = m_client->get_next_variable_name(guid, var_name);
++			status = m_client->get_next_variable_name(guid, var_name, max_variable_size);
+ 
+ 			/* There are no more variables in the persistent store */
+ 			if (status == EFI_NOT_FOUND) {
+@@ -223,6 +224,8 @@ TEST_GROUP(SmmVariableServiceTests)
+ 	std::u16string m_ro_variable = to_variable_name(u"ro_variable");
+ 	std::u16string m_boot_finished_var_name = to_variable_name(u"finished");
+ 
++	uint32_t max_variable_size = 4096;
++
+ 	/* Cleanup skips these variables */
+ 	std::vector<std::u16string *> m_non_rm_vars{ &m_ro_variable, &m_boot_finished_var_name };
+ 
+@@ -654,7 +657,7 @@ TEST(SmmVariableServiceTests, enumerateStoreContents)
+ 	std::u16string *expected_variables[] = { &var_name_1, &var_name_2, &var_name_3 };
+ 
+ 	do {
+-		efi_status = m_client->get_next_variable_name(guid, var_name);
++		efi_status = m_client->get_next_variable_name(guid, var_name, max_variable_size);
+ 		if (efi_status != EFI_SUCCESS)
+ 			break;
+ 
+-- 
+2.25.1
+

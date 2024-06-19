@@ -189,7 +189,6 @@ def sstate_state_fromvars(d, task = None):
     plaindirs = (d.getVarFlag("do_" + task, 'sstate-plaindirs') or "").split()
     lockfiles = (d.getVarFlag("do_" + task, 'sstate-lockfile') or "").split()
     lockfilesshared = (d.getVarFlag("do_" + task, 'sstate-lockfile-shared') or "").split()
-    interceptfuncs = (d.getVarFlag("do_" + task, 'sstate-interceptfuncs') or "").split()
     fixmedir = d.getVarFlag("do_" + task, 'sstate-fixmedir') or ""
     if not task or len(inputs) != len(outputs):
         bb.fatal("sstate variables not setup correctly?!")
@@ -205,7 +204,6 @@ def sstate_state_fromvars(d, task = None):
     ss['lockfiles'] = lockfiles
     ss['lockfiles-shared'] = lockfilesshared
     ss['plaindirs'] = plaindirs
-    ss['interceptfuncs'] = interceptfuncs
     ss['fixmedir'] = fixmedir
     return ss
 
@@ -225,11 +223,22 @@ def sstate_install(ss, d):
     import oe.sstatesig
     import subprocess
 
+    def prepdir(dir):
+        # remove dir if it exists, ensure any parent directories do exist
+        if os.path.exists(dir):
+            oe.path.remove(dir)
+        bb.utils.mkdirhier(dir)
+        oe.path.remove(dir)
+
+    sstateinst = d.getVar("SSTATE_INSTDIR")
+
+    for state in ss['dirs']:
+        prepdir(state[1])
+        bb.utils.rename(sstateinst + state[0], state[1])
+
     sharedfiles = []
     shareddirs = []
     bb.utils.mkdirhier(d.expand("${SSTATE_MANIFESTS}"))
-
-    sstateinst = d.expand("${WORKDIR}/sstate-install-%s/" % ss['task'])
 
     manifest, d2 = oe.sstatesig.sstate_get_manifest_filename(ss['task'], d)
 
@@ -329,6 +338,17 @@ def sstate_install(ss, d):
         if os.path.exists(state[1]):
             oe.path.copyhardlinktree(state[1], state[2])
 
+    for plain in ss['plaindirs']:
+        workdir = d.getVar('WORKDIR')
+        sharedworkdir = os.path.join(d.getVar('TMPDIR'), "work-shared")
+        src = sstateinst + "/" + plain.replace(workdir, '')
+        if sharedworkdir in plain:
+            src = sstateinst + "/" + plain.replace(sharedworkdir, '')
+        dest = plain
+        bb.utils.mkdirhier(src)
+        prepdir(dest)
+        bb.utils.rename(src, dest)
+
     for postinst in (d.getVar('SSTATEPOSTINSTFUNCS') or '').split():
         # All hooks should run in the SSTATE_INSTDIR
         bb.build.exec_func(postinst, d, (sstateinst,))
@@ -393,28 +413,7 @@ def sstate_installpkgdir(ss, d):
         # All hooks should run in the SSTATE_INSTDIR
         bb.build.exec_func(f, d, (sstateinst,))
 
-    def prepdir(dir):
-        # remove dir if it exists, ensure any parent directories do exist
-        if os.path.exists(dir):
-            oe.path.remove(dir)
-        bb.utils.mkdirhier(dir)
-        oe.path.remove(dir)
-
-    for state in ss['dirs']:
-        prepdir(state[1])
-        bb.utils.rename(sstateinst + state[0], state[1])
     sstate_install(ss, d)
-
-    for plain in ss['plaindirs']:
-        workdir = d.getVar('WORKDIR')
-        sharedworkdir = os.path.join(d.getVar('TMPDIR'), "work-shared")
-        src = sstateinst + "/" + plain.replace(workdir, '')
-        if sharedworkdir in plain:
-            src = sstateinst + "/" + plain.replace(sharedworkdir, '')
-        dest = plain
-        bb.utils.mkdirhier(src)
-        prepdir(dest)
-        bb.utils.rename(src, dest)
 
     return True
 
@@ -790,9 +789,6 @@ sstate_task_prefunc[dirs] = "${WORKDIR}"
 python sstate_task_postfunc () {
     shared_state = sstate_state_fromvars(d)
 
-    for intercept in shared_state['interceptfuncs']:
-        bb.build.exec_func(intercept, d, (d.getVar("WORKDIR"),))
-
     omask = os.umask(0o002)
     if omask != 0o002:
        bb.note("Using umask 0o002 (not %0o) for sstate packaging" % omask)
@@ -1115,7 +1111,7 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
         bb.parse.siggen.checkhashes(sq_data, missed, found, d)
 
     return found
-setscene_depvalid[vardepsexclude] = "SSTATE_EXCLUDEDEPS_SYSROOT"
+setscene_depvalid[vardepsexclude] = "SSTATE_EXCLUDEDEPS_SYSROOT _SSTATE_EXCLUDEDEPS_SYSROOT"
 
 BB_SETSCENE_DEPVALID = "setscene_depvalid"
 

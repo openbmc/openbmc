@@ -1,7 +1,0 @@
-define KMACHINE generic-arm64
-define KTYPE preempt-rt
-define KARCH arm64
-
-kconf hardware generic-arm64-preempt-rt-tweaks.cfg
-include ktypes/preempt-rt/preempt-rt.scc
-include features/bluetooth/bluetooth.scc

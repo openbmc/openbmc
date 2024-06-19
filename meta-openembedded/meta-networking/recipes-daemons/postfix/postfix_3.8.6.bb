@@ -136,21 +136,21 @@ do_install () {
     mv ${D}${sysconfdir}/postfix/main.cf ${D}${sysconfdir}/postfix/${MLPREFIX}sample-main.cf
     install -m 755 ${S}/bin/smtp-sink ${D}/${sbindir}/
     install -d ${D}${sysconfdir}/init.d
-    install -m 644 ${WORKDIR}/main.cf ${D}${sysconfdir}/postfix/main.cf
+    install -m 644 ${UNPACKDIR}/main.cf ${D}${sysconfdir}/postfix/main.cf
     sed -i 's#@LIBEXECDIR@#${libexecdir}#' ${D}${sysconfdir}/postfix/main.cf
 
-    install -m 755 ${WORKDIR}/check_hostname.sh ${D}${sbindir}/
+    install -m 755 ${UNPACKDIR}/check_hostname.sh ${D}${sbindir}/
 
-    install -m 755 ${WORKDIR}/postfix ${D}${sysconfdir}/init.d/postfix
-    install -m 644 ${WORKDIR}/internal_recipient ${D}${sysconfdir}/postfix/internal_recipient
+    install -m 755 ${UNPACKDIR}/postfix ${D}${sysconfdir}/init.d/postfix
+    install -m 644 ${UNPACKDIR}/internal_recipient ${D}${sysconfdir}/postfix/internal_recipient
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/postfix.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/postfix.service ${D}${systemd_unitdir}/system
     sed -i -e 's#@LIBEXECDIR@#${libexecdir}#g' ${D}${systemd_unitdir}/system/postfix.service
     sed -i -e 's#@LOCALSTATEDIR@#${localstatedir}#g' ${D}${systemd_unitdir}/system/postfix.service
     sed -i -e 's#@SBINDIR@#${sbindir}#g' ${D}${systemd_unitdir}/system/postfix.service
 
-    install -m 0755 ${WORKDIR}/aliasesdb ${D}${libexecdir}/postfix
+    install -m 0755 ${UNPACKDIR}/aliasesdb ${D}${libexecdir}/postfix
 
     install -m 770 -d ${D}${localstatedir}/spool/postfix
     chown postfix:postfix ${D}${localstatedir}/spool/postfix

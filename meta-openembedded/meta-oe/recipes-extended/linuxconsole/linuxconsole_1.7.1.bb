@@ -50,11 +50,11 @@ do_compile() {
 do_install() {
     oe_runmake install
 
-    install -Dm 0644 ${WORKDIR}/51-these-are-not-joysticks-rm.rules ${D}${nonarch_base_libdir}/udev/rules.d/51-these-are-not-joysticks-rm.rules
-    install -Dm 0644 ${WORKDIR}/60-joystick.rules ${D}${nonarch_base_libdir}/udev/rules.d/60-joystick.rules
+    install -Dm 0644 ${UNPACKDIR}/51-these-are-not-joysticks-rm.rules ${D}${nonarch_base_libdir}/udev/rules.d/51-these-are-not-joysticks-rm.rules
+    install -Dm 0644 ${UNPACKDIR}/60-joystick.rules ${D}${nonarch_base_libdir}/udev/rules.d/60-joystick.rules
 
-    install -Dm 0644 ${WORKDIR}/inputattach.service ${D}${systemd_system_unitdir}/inputattach.service
-    install -Dm 0755 ${WORKDIR}/inputattachctl ${D}${bindir}/inputattachctl
+    install -Dm 0644 ${UNPACKDIR}/inputattach.service ${D}${systemd_system_unitdir}/inputattach.service
+    install -Dm 0755 ${UNPACKDIR}/inputattachctl ${D}${bindir}/inputattachctl
 }
 
 PACKAGES += "inputattach joystick-jscal joystick"

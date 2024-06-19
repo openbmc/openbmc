@@ -17,9 +17,10 @@ Upstream-Status: Pending
 +++ b/adb/adb_auth_host.c
 @@ -75,6 +75,7 @@ static int RSA_to_RSAPublicKey(RSA *rsa,
      BIGNUM* rem = BN_new();
-     BIGNUM* n = BN_new();
+-    BIGNUM* n = BN_new();
++    const BIGNUM* n;
      BIGNUM* n0inv = BN_new();
-+    BIGNUM* e = BN_new();
++    const BIGNUM* e;
  
      if (RSA_size(rsa) != RSANUMBYTES) {
          ret = 0;
@@ -32,7 +33,7 @@ Upstream-Status: Pending
      BN_set_bit(r, RSANUMWORDS * 32);
      BN_mod_sqr(rr, r, n, ctx);
      BN_div(NULL, rem, n, r32, ctx);
-@@ -96,7 +97,7 @@ static int RSA_to_RSAPublicKey(RSA *rsa,
+@@ -96,11 +97,10 @@ static int RSA_to_RSAPublicKey(RSA *rsa,
          BN_div(n, rem, n, r32, ctx);
          pkey->n[i] = BN_get_word(rem);
      }
@@ -41,3 +42,7 @@ Upstream-Status: Pending
  
  out:
      BN_free(n0inv);
+-    BN_free(n);
+     BN_free(rem);
+     BN_free(r);
+     BN_free(rr);

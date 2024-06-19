@@ -38,19 +38,20 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--system -d /var/lib/influxdb -m -s /bin/nologin influxdb"
 
 do_install:prepend() {
-    rm ${B}/src/${GO_IMPORT}/build.py
-    rm ${B}/src/${GO_IMPORT}/build.sh
-    rm ${B}/src/${GO_IMPORT}/Dockerfile*
+    test -e ${B}/src/${GO_IMPORT}/build.py && rm ${B}/src/${GO_IMPORT}/build.py 
+    test -e ${B}/src/${GO_IMPORT}/build.sh && rm ${B}/src/${GO_IMPORT}/build.sh
+    rm -rf ${B}/src/${GO_IMPORT}/Dockerfile*
+
     sed -i -e "s#usr/bin/sh#bin/sh#g" ${B}/src/${GO_IMPORT}/scripts/ci/run_perftest.sh
 }
 
 do_install:append() {
     install -d ${D}${sysconfdir}/influxdb
-    install -m 0644 ${WORKDIR}/influxdb.conf ${D}${sysconfdir}/influxdb
+    install -m 0644 ${UNPACKDIR}/influxdb.conf ${D}${sysconfdir}/influxdb
     chown -R root:influxdb ${D}${sysconfdir}/influxdb
 
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/influxdb ${D}${sysconfdir}/init.d/influxdb
+    install -m 0755 ${UNPACKDIR}/influxdb ${D}${sysconfdir}/init.d/influxdb
 
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'sysvinit', d)}" ] ; then
         install -d ${D}${sysconfdir}/logrotate.d

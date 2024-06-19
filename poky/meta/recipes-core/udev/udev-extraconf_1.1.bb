@@ -13,28 +13,29 @@ SRC_URI = " \
        file://localextra.rules \
 "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 MOUNT_BASE = "/run/media"
 
 do_install() {
     install -d ${D}${sysconfdir}/udev/rules.d
 
-    install -m 0644 ${WORKDIR}/automount.rules     ${D}${sysconfdir}/udev/rules.d/automount.rules
-    install -m 0644 ${WORKDIR}/autonet.rules       ${D}${sysconfdir}/udev/rules.d/autonet.rules
-    install -m 0644 ${WORKDIR}/localextra.rules    ${D}${sysconfdir}/udev/rules.d/localextra.rules
+    install -m 0644 ${S}/automount.rules     ${D}${sysconfdir}/udev/rules.d/automount.rules
+    install -m 0644 ${S}/autonet.rules       ${D}${sysconfdir}/udev/rules.d/autonet.rules
+    install -m 0644 ${S}/localextra.rules    ${D}${sysconfdir}/udev/rules.d/localextra.rules
 
     install -d ${D}${sysconfdir}/udev/mount.ignorelist.d
-    install -m 0644 ${WORKDIR}/mount.ignorelist     ${D}${sysconfdir}/udev/
+    install -m 0644 ${S}/mount.ignorelist     ${D}${sysconfdir}/udev/
 
     install -d ${D}${sysconfdir}/udev/scripts/
 
-    install -m 0755 ${WORKDIR}/mount.sh ${D}${sysconfdir}/udev/scripts/mount.sh
+    install -m 0755 ${S}/mount.sh ${D}${sysconfdir}/udev/scripts/mount.sh
     sed -i 's|@systemd_unitdir@|${systemd_unitdir}|g' ${D}${sysconfdir}/udev/scripts/mount.sh
     sed -i 's|@base_sbindir@|${base_sbindir}|g' ${D}${sysconfdir}/udev/scripts/mount.sh
     sed -i 's|@MOUNT_BASE@|${MOUNT_BASE}|g' ${D}${sysconfdir}/udev/scripts/mount.sh
 
-    install -m 0755 ${WORKDIR}/network.sh ${D}${sysconfdir}/udev/scripts
+    install -m 0755 ${S}/network.sh ${D}${sysconfdir}/udev/scripts
 }
 
 pkg_postinst:${PN} () {

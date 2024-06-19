@@ -33,13 +33,13 @@ SYSTEMD_AUTO_ENABLE = "disable"
 do_install:append () {
     #install the init.d/smartd
     install -d ${D}${sysconfdir}/init.d
-    install -p -m 0755 ${WORKDIR}/initd.smartd ${D}${sysconfdir}/init.d/smartd
+    install -p -m 0755 ${UNPACKDIR}/initd.smartd ${D}${sysconfdir}/init.d/smartd
     install -d ${D}${sysconfdir}/default
-    install -p -m 0644 ${WORKDIR}/smartmontools.default ${D}${sysconfdir}/default/smartmontools
+    install -p -m 0644 ${UNPACKDIR}/smartmontools.default ${D}${sysconfdir}/default/smartmontools
 
     #install systemd service file
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/smartd.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/smartd.service ${D}${systemd_unitdir}/system
     sed -i -e 's,@BASE_BINDIR@,${base_bindir},g' \
         -e 's,@SYSCONFDIR@,${sysconfdir},g' \
         -e 's,@SBINDIR@,${sbindir},g' \

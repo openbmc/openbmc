@@ -11,6 +11,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase vala gobject-introspection
 
+CFLAGS += "-Wno-incompatible-pointer-types"
+
 do_configure:prepend() {
     MACROS="libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4"
     for i in ${MACROS}; do

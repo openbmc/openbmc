@@ -69,9 +69,9 @@ inherit multilib_header
 
 do_install() {
 	oe_runmake install_root=${D} install
-	install -Dm 0644 ${WORKDIR}/etc/ld.so.conf ${D}/${sysconfdir}/ld.so.conf
+	install -Dm 0644 ${UNPACKDIR}/etc/ld.so.conf ${D}/${sysconfdir}/ld.so.conf
 	install -d ${D}${localedir}
-	make -f ${WORKDIR}/generate-supported.mk IN="${S}/localedata/SUPPORTED" OUT="${WORKDIR}/SUPPORTED"
+	make -f ${UNPACKDIR}/generate-supported.mk IN="${S}/localedata/SUPPORTED" OUT="${WORKDIR}/SUPPORTED"
 	# get rid of some broken files...
 	for i in ${GLIBC_BROKEN_LOCALES}; do
 		sed -i "/$i/d" ${WORKDIR}/SUPPORTED
@@ -101,7 +101,7 @@ do_install() {
 	install -d ${D}${localstatedir}/db/nscd
 	install -m 0755 ${S}/nscd/nscd.init ${D}${sysconfdir}/init.d/nscd
 	install -m 0755 ${S}/nscd/nscd.conf ${D}${sysconfdir}/nscd.conf
-	install -m 0755 ${WORKDIR}/makedbs.sh ${D}${localstatedir}/db
+	install -m 0755 ${UNPACKDIR}/makedbs.sh ${D}${localstatedir}/db
 	sed -i "s%daemon%start-stop-daemon --start --exec%g" ${D}${sysconfdir}/init.d/nscd
 	sed -i "s|\(enable-cache\t\+netgroup\t\+\)yes|\1no|" ${D}${sysconfdir}/nscd.conf
 

@@ -19,8 +19,8 @@ do_install() {
             ${D}${sysconfdir}/inittab.d \
             ${D}${sysconfdir}/init.d
 
-        install -m 0755 ${WORKDIR}/gpio-shutdown-keymap.sh ${D}${sysconfdir}/init.d/
-        install -m 0755 ${WORKDIR}/bind_gpio_shutdown.tab ${D}${sysconfdir}/inittab.d/
+        install -m 0755 ${UNPACKDIR}/gpio-shutdown-keymap.sh ${D}${sysconfdir}/init.d/
+        install -m 0755 ${UNPACKDIR}/bind_gpio_shutdown.tab ${D}${sysconfdir}/inittab.d/
     elif ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         # Systemd init does not require any configuration.
         # Note: cannot have an empty branch, hence the redundant dir install.

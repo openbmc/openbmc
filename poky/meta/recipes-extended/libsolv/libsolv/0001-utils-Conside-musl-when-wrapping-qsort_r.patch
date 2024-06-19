@@ -1,4 +1,4 @@
-From 06321f1a2aa89b8e028946e793344657eaad0165 Mon Sep 17 00:00:00 2001
+From e1db3c41fa84391b7ab299f7351f58b413ed2994 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 28 Oct 2021 22:28:45 -0700
 Subject: [PATCH] utils: Conside musl when wrapping qsort_r
@@ -29,6 +29,3 @@ index 72426e09..8f29bc5a 100644
  
  void
  solv_sort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *, void *), void *compard)
--- 
-2.33.1
-

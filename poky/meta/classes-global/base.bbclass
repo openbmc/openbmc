@@ -153,20 +153,38 @@ python base_do_fetch() {
 }
 
 addtask unpack after do_fetch
-do_unpack[dirs] = "${WORKDIR}"
-
-do_unpack[cleandirs] = "${@d.getVar('S') if os.path.normpath(d.getVar('S')) != os.path.normpath(d.getVar('WORKDIR')) else os.path.join('${S}', 'patches')}"
+do_unpack[cleandirs] = "${UNPACKDIR}"
 
 python base_do_unpack() {
+    import shutil
+
+    sourcedir = d.getVar('S')
+    # Intentionally keep SOURCE_BASEDIR internal to the task just for SDE
+    d.setVar("SOURCE_BASEDIR", sourcedir)
+
     src_uri = (d.getVar('SRC_URI') or "").split()
     if not src_uri:
         return
 
+    basedir = None
+    unpackdir = d.getVar('UNPACKDIR')
+    workdir = d.getVar('WORKDIR')
+    if sourcedir.startswith(workdir) and not sourcedir.startswith(unpackdir):
+        basedir = sourcedir.replace(workdir, '').strip("/").split('/')[0]
+        if basedir:
+            bb.utils.remove(workdir + '/' + basedir, True)
+            d.setVar("SOURCE_BASEDIR", workdir + '/' + basedir)
+
     try:
         fetcher = bb.fetch2.Fetch(src_uri, d)
-        fetcher.unpack(d.getVar('WORKDIR'))
+        fetcher.unpack(d.getVar('UNPACKDIR'))
     except bb.fetch2.BBFetchException as e:
         bb.fatal("Bitbake Fetcher Error: " + repr(e))
+
+    if basedir and os.path.exists(unpackdir + '/' + basedir):
+        # Compatibility magic to ensure ${WORKDIR}/git and ${WORKDIR}/${BP}
+        # as often used in S work as expected.
+        shutil.move(unpackdir + '/' + basedir, workdir + '/' + basedir)
 }
 
 SSTATETASKS += "do_deploy_source_date_epoch"
@@ -199,8 +217,8 @@ addtask do_deploy_source_date_epoch_setscene
 addtask do_deploy_source_date_epoch before do_configure after do_patch
 
 python create_source_date_epoch_stamp() {
-    # Version: 1
-    source_date_epoch = oe.reproducible.get_source_date_epoch(d, d.getVar('S'))
+    # Version: 2
+    source_date_epoch = oe.reproducible.get_source_date_epoch(d, d.getVar('SOURCE_BASEDIR') or d.getVar('S'))
     oe.reproducible.epochfile_write(source_date_epoch, d.getVar('SDE_FILE'), d)
 }
 do_unpack[postfuncs] += "create_source_date_epoch_stamp"
@@ -409,16 +427,6 @@ python () {
     # Handle backfilling
     oe.utils.features_backfill("DISTRO_FEATURES", d)
     oe.utils.features_backfill("MACHINE_FEATURES", d)
-
-    if d.getVar("S")[-1] == '/':
-        bb.warn("Recipe %s sets S variable with trailing slash '%s', remove it" % (d.getVar("PN"), d.getVar("S")))
-    if d.getVar("B")[-1] == '/':
-        bb.warn("Recipe %s sets B variable with trailing slash '%s', remove it" % (d.getVar("PN"), d.getVar("B")))
-
-    if os.path.normpath(d.getVar("WORKDIR")) != os.path.normpath(d.getVar("S")):
-        d.appendVar("PSEUDO_IGNORE_PATHS", ",${S}")
-    if os.path.normpath(d.getVar("WORKDIR")) != os.path.normpath(d.getVar("B")):
-        d.appendVar("PSEUDO_IGNORE_PATHS", ",${B}")
 
     # To add a recipe to the skip list , set:
     #   SKIP_RECIPE[pn] = "message"

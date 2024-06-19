@@ -7,6 +7,7 @@
 import re
 import subprocess
 from oe.package_manager import *
+from oe.package_manager.common_deb_ipk import OpkgDpkgPM
 
 class DpkgIndexer(Indexer):
     def _create_configs(self):
@@ -111,72 +112,6 @@ class PMPkgsList(PkgsList):
 
         return opkg_query(cmd_output)
 
-class OpkgDpkgPM(PackageManager):
-    def __init__(self, d, target_rootfs):
-        """
-        This is an abstract class. Do not instantiate this directly.
-        """
-        super(OpkgDpkgPM, self).__init__(d, target_rootfs)
-
-    def package_info(self, pkg, cmd):
-        """
-        Returns a dictionary with the package info.
-
-        This method extracts the common parts for Opkg and Dpkg
-        """
-
-        try:
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True).decode("utf-8")
-        except subprocess.CalledProcessError as e:
-            bb.fatal("Unable to list available packages. Command '%s' "
-                     "returned %d:\n%s" % (cmd, e.returncode, e.output.decode("utf-8")))
-        return opkg_query(output)
-
-    def extract(self, pkg, pkg_info):
-        """
-        Returns the path to a tmpdir where resides the contents of a package.
-
-        Deleting the tmpdir is responsability of the caller.
-
-        This method extracts the common parts for Opkg and Dpkg
-        """
-
-        ar_cmd = bb.utils.which(os.getenv("PATH"), "ar")
-        tar_cmd = bb.utils.which(os.getenv("PATH"), "tar")
-        pkg_path = pkg_info[pkg]["filepath"]
-
-        if not os.path.isfile(pkg_path):
-            bb.fatal("Unable to extract package for '%s'."
-                     "File %s doesn't exists" % (pkg, pkg_path))
-
-        tmp_dir = tempfile.mkdtemp()
-        current_dir = os.getcwd()
-        os.chdir(tmp_dir)
-        data_tar = 'data.tar.xz'
-
-        try:
-            cmd = [ar_cmd, 'x', pkg_path]
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-            cmd = [tar_cmd, 'xf', data_tar]
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            bb.utils.remove(tmp_dir, recurse=True)
-            bb.fatal("Unable to extract %s package. Command '%s' "
-                     "returned %d:\n%s" % (pkg_path, ' '.join(cmd), e.returncode, e.output.decode("utf-8")))
-        except OSError as e:
-            bb.utils.remove(tmp_dir, recurse=True)
-            bb.fatal("Unable to extract %s package. Command '%s' "
-                     "returned %d:\n%s at %s" % (pkg_path, ' '.join(cmd), e.errno, e.strerror, e.filename))
-
-        bb.note("Extracted %s to %s" % (pkg_path, tmp_dir))
-        bb.utils.remove(os.path.join(tmp_dir, "debian-binary"))
-        bb.utils.remove(os.path.join(tmp_dir, "control.tar.gz"))
-        os.chdir(current_dir)
-
-        return tmp_dir
-
-    def _handle_intercept_failure(self, registered_pkgs):
-        self.mark_packages("unpacked", registered_pkgs.split())
 
 class DpkgPM(OpkgDpkgPM):
     def __init__(self, d, target_rootfs, archs, base_archs, apt_conf_dir=None, deb_repo_workdir="oe-rootfs-repo", filterbydependencies=True):
@@ -496,7 +431,7 @@ class DpkgPM(OpkgDpkgPM):
         Returns a dictionary with the package info.
         """
         cmd = "%s show %s" % (self.apt_cache_cmd, pkg)
-        pkg_info = super(DpkgPM, self).package_info(pkg, cmd)
+        pkg_info = self._common_package_info(cmd)
 
         pkg_arch = pkg_info[pkg]["pkgarch"]
         pkg_filename = pkg_info[pkg]["filename"]
@@ -504,19 +439,3 @@ class DpkgPM(OpkgDpkgPM):
                 os.path.join(self.deploy_dir, pkg_arch, pkg_filename)
 
         return pkg_info
-
-    def extract(self, pkg):
-        """
-        Returns the path to a tmpdir where resides the contents of a package.
-
-        Deleting the tmpdir is responsability of the caller.
-        """
-        pkg_info = self.package_info(pkg)
-        if not pkg_info:
-            bb.fatal("Unable to get information for package '%s' while "
-                     "trying to extract the package."  % pkg)
-
-        tmp_dir = super(DpkgPM, self).extract(pkg, pkg_info)
-        bb.utils.remove(os.path.join(tmp_dir, "data.tar.xz"))
-
-        return tmp_dir

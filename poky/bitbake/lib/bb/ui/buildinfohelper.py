@@ -559,7 +559,10 @@ class ORMWrapper(object):
                 # we might have an invalid link; no way to detect this. just set it to None
                 filetarget_obj = None
 
-            parent_obj = Target_File.objects.get(target = target_obj, path = parent_path, inodetype = Target_File.ITYPE_DIRECTORY)
+            try:
+                parent_obj = Target_File.objects.get(target = target_obj, path = parent_path, inodetype = Target_File.ITYPE_DIRECTORY)
+            except Target_File.DoesNotExist:
+                parent_obj = None
 
             Target_File.objects.create(
                         target = target_obj,

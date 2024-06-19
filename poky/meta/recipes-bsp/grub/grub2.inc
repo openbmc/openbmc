@@ -14,7 +14,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 CVE_PRODUCT = "grub2"
 
 SRC_URI = "${GNU_MIRROR}/grub/grub-${PV}.tar.gz \
-           file://0001-Disable-mfpmath-sse-as-well-when-SSE-is-disabled.patch \
            file://autogen.sh-exclude-pc.patch \
            file://grub-module-explicitly-keeps-symbole-.module_license.patch \
            file://0001-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
@@ -52,6 +51,10 @@ GRUBPLATFORM ??= "pc"
 inherit autotools gettext texinfo pkgconfig
 
 CFLAGS:remove = "-O2"
+# It doesn't support sse, its make.defaults sets:
+# CFLAGS += -mno-mmx -mno-sse
+# So also remove -mfpmath=sse from TUNE_CCARGS
+TUNE_CCARGS:remove = "-mfpmath=sse"
 
 EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --disable-grub-mkfont \

@@ -1,6 +1,7 @@
 [Unit]
 Conflicts=sshd.service
 Wants=sshdgenkeys.service
+After=nss-user-lookup.target
 
 [Socket]
 ExecStartPre=@BASE_BINDIR@/mkdir -p /var/run/sshd

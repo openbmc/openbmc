@@ -16,10 +16,17 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib
 import prserv
 import prserv.serv
 
-VERSION = "1.1.0"
+VERSION = "2.0.0"
 
 PRHOST_DEFAULT="0.0.0.0"
 PRPORT_DEFAULT=8585
+
+def init_logger(logfile, loglevel):
+    numeric_level = getattr(logging, loglevel.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError("Invalid log level: %s" % loglevel)
+    FORMAT = "%(asctime)-15s %(message)s"
+    logging.basicConfig(level=numeric_level, filename=logfile, format=FORMAT)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -70,12 +77,25 @@ def main():
         action="store_true",
         help="open database in read-only mode",
     )
+    parser.add_argument(
+        "-u",
+        "--upstream",
+        default=os.environ.get("PRSERVER_UPSTREAM", None),
+        help="Upstream PR service (host:port)",
+    )
 
     args = parser.parse_args()
-    prserv.init_logger(os.path.abspath(args.log), args.loglevel)
+    init_logger(os.path.abspath(args.log), args.loglevel)
 
     if args.start:
-        ret=prserv.serv.start_daemon(args.file, args.host, args.port, os.path.abspath(args.log), args.read_only)
+        ret=prserv.serv.start_daemon(
+            args.file,
+            args.host,
+            args.port,
+            os.path.abspath(args.log),
+            args.read_only,
+            args.upstream
+        )
     elif args.stop:
         ret=prserv.serv.stop_daemon(args.host, args.port)
     else:

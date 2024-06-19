@@ -27,7 +27,7 @@ do_install() {
 }
 
 do_install_ptest() {
-        cp ${WORKDIR}/rt_bmark.py ${D}${PTEST_PATH}
+        cp ${UNPACKDIR}/rt_bmark.py ${D}${PTEST_PATH}
 }
 
 RDEPENDS:${PN}-ptest += " stress-ng python3 python3-multiprocessing python3-datetime python3-misc"

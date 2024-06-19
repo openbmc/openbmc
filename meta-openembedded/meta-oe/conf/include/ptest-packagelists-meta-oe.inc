@@ -35,6 +35,8 @@ PTESTS_FAST_META_OE = "\
     onig \
     oprofile \
     protobuf \
+    pv \
+    python3-pefile \
     sdbus-c++ \
     uthash \
     xmlsec1 \
@@ -68,5 +70,4 @@ PTESTS_PROBLEMS_META_OE ="\
     libteam \
     ostree \
     psqlodbc \
-    pv \
 "

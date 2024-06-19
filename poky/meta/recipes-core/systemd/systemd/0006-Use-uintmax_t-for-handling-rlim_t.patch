@@ -1,7 +1,7 @@
-From 96e975a2412a20e5f80bd3ab144057d275eb8597 Mon Sep 17 00:00:00 2001
+From c58933386caa8e45b5e814ec4ff210b18ab401da Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:12:41 +0800
-Subject: [PATCH 06/22] Use uintmax_t for handling rlim_t
+Subject: [PATCH] Use uintmax_t for handling rlim_t
 
 PRIu{32,64} is not right format to represent rlim_t type
 therefore use %ju and typecast the rlim_t variables to
@@ -86,10 +86,10 @@ index c1f0b2b974..61c5412582 100644
          return 1;
  }
 diff --git a/src/core/execute.c b/src/core/execute.c
-index bd3da0c401..df1870fd2f 100644
+index 531bec4c92..602a95f674 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -1045,9 +1045,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+@@ -1041,9 +1041,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
          for (unsigned i = 0; i < RLIM_NLIMITS; i++)
                  if (c->rlimit[i]) {
                          fprintf(f, "%sLimit%s: " RLIM_FMT "\n",
@@ -101,6 +101,3 @@ index bd3da0c401..df1870fd2f 100644
                  }
  
          if (c->ioprio_set) {
--- 
-2.34.1
-

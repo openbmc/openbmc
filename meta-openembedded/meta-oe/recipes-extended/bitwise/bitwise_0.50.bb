@@ -27,6 +27,6 @@ inherit autotools ptest
 
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}
-    install -m 0644 ${WORKDIR}/ptest.out.expected ${D}${PTEST_PATH}/ptest.out.expected
+    install -m 0644 ${UNPACKDIR}/ptest.out.expected ${D}${PTEST_PATH}/ptest.out.expected
 }
 

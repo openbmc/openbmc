@@ -1,50 +1,100 @@
-<script type="text/javascript">
-  chartsDrawing += 1;
-  google.charts.setOnLoadCallback(drawChart_{{ chart_elem_id }});
-  function drawChart_{{ chart_elem_id }}() {
-    var data = new google.visualization.DataTable();
+<script type="module">
+  // Get raw data
+  const rawData = [
+    {% for sample in measurement.samples %}
+      [{{ sample.commit_num }}, {{ sample.mean.gv_value() }}, {{ sample.start_time }}, '{{sample.commit}}'],
+    {% endfor %}
+  ];
 
-    // Chart options
-    var options = {
-      theme : 'material',
-      legend: 'none',
-      hAxis: { format: '', title: 'Commit number',
-               minValue: {{ chart_opts.haxis.min }},
-               maxValue: {{ chart_opts.haxis.max }} },
-      {% if measurement.type == 'time' %}
-      vAxis: { format: 'h:mm:ss' },
-      {% else %}
-      vAxis: { format: '' },
-      {% endif %}
-      pointSize: 5,
-      chartArea: { left: 80, right: 15 },
-    };
+  const convertToMinute = (time) => {
+    return time[0]*60 + time[1] + time[2]/60 + time[3]/3600;
+  }
 
-    // Define data columns
-    data.addColumn('number', 'Commit');
-    data.addColumn('{{ measurement.value_type.gv_data_type }}',
-                   '{{ measurement.value_type.quantity }}');
-    // Add data rows
-    data.addRows([
-      {% for sample in measurement.samples %}
-        [{{ sample.commit_num }}, {{ sample.mean.gv_value() }}],
-      {% endfor %}
-    ]);
+  // Update value format to either minutes or leave as size value
+  const updateValue = (value) => {
+    // Assuming the array values are duration in the format [hours, minutes, seconds, milliseconds]
+    return Array.isArray(value) ? convertToMinute(value) : value
+  }
 
-    // Finally, draw the chart
-    chart_div = document.getElementById('{{ chart_elem_id }}');
-    var chart = new google.visualization.LineChart(chart_div);
-    google.visualization.events.addListener(chart, 'ready', function () {
-      //chart_div = document.getElementById('{{ chart_elem_id }}');
-      //chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-      png_div = document.getElementById('{{ chart_elem_id }}_png');
-      png_div.outerHTML = '<a id="{{ chart_elem_id }}_png" href="' + chart.getImageURI() + '">PNG</a>';
-      console.log("CHART READY: {{ chart_elem_id }}");
-      chartsDrawing -= 1;
-      if (chartsDrawing == 0)
-        console.log("ALL CHARTS READY");
+  // Convert raw data to the format: [time, value]
+  const data = rawData.map(([commit, value, time]) => {
+    return [
+      // The Date object takes values in milliseconds rather than seconds. So to use a Unix timestamp we have to multiply it by 1000.
+      new Date(time * 1000).getTime(),
+      // Assuming the array values are duration in the format [hours, minutes, seconds, milliseconds]
+      updateValue(value)
+    ]
+  });
+
+  // Set chart options
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      enterable: true,
+      position: function (point, params, dom, rect, size) {
+        return [point[0]-150, '10%'];
+      },
+      formatter: function (param) {
+        const value = param[0].value[1]
+        const sample  = rawData.filter(([commit, dataValue]) => updateValue(dataValue) === value)
+        // Add commit hash to the tooltip as a link
+        const commitLink = `https://git.yoctoproject.org/poky/commit/?id=${sample[0][3]}`
+        if ('{{ measurement.value_type.quantity }}' == 'time') {
+          const hours = Math.floor(value/60)
+          const minutes = Math.floor(value % 60)
+          const seconds = Math.floor((value * 60) % 60)
+          return `<strong>Duration:</strong> ${hours}:${minutes}:${seconds}, <br/> <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>`
+        }
+        return `<strong>Size:</strong> ${value.toFixed(2)} MB, <br/> <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>`
+      ;}
+    },
+    xAxis: {
+      type: 'time',
+    },
+    yAxis: {
+      name: '{{ measurement.value_type.quantity }}' == 'time' ? 'Duration in minutes' : 'Disk size in MB',
+      type: 'value',
+      min: function(value) {
+        return Math.round(value.min - 0.5);
+      },
+      max: function(value) {
+        return Math.round(value.max + 0.5);
+      }
+    },
+    dataZoom: [
+      {
+        type: 'slider',
+        xAxisIndex: 0,
+        filterMode: 'none'
+      },
+    ],
+    series: [
+      {
+        name: '{{ measurement.value_type.quantity }}',
+        type: 'line',
+        step: 'start',
+        symbol: 'none',
+        data: data
+      }
+    ]
+  };
+
+  // Draw chart
+  const chart_div = document.getElementById('{{ chart_elem_id }}');
+  // Set dark mode
+  let measurement_chart
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      measurement_chart= echarts.init(chart_div, 'dark', {
+      height: 320
     });
-    chart.draw(data, options);
-}
+  } else {
+      measurement_chart= echarts.init(chart_div, null, {
+      height: 320
+    });
+  }
+  // Change chart size with browser resize
+  window.addEventListener('resize', function() {
+    measurement_chart.resize();
+  });
+  measurement_chart.setOption(option);
 </script>
-

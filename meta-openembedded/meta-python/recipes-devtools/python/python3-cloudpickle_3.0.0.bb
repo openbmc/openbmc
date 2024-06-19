@@ -8,7 +8,7 @@ data."
 HOMEPAGE = "https://github.com/cloudpipe/cloudpickle"
 
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE.cloudpickle;md5=b4d59aa5e2cc777722aac17841237931"
+LIC_FILES_CHKSUM = "file://${UNPACKDIR}/LICENSE.cloudpickle;md5=b4d59aa5e2cc777722aac17841237931"
 
 inherit pypi python_flit_core
 

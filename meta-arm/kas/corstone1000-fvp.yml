@@ -13,7 +13,6 @@ env:
 
 local_conf_header:
   testimagefvp: |
-    LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
     IMAGE_CLASSES += "fvpboot"
 
   mass-storage: |

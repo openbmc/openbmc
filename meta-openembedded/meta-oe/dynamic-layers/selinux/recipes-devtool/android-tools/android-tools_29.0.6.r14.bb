@@ -52,6 +52,7 @@ SRC_URI += " \
     file://0003-Update-usage-of-usbdevfs_urb-to-match-new-kernel-UAP.patch \
     file://0004-adb-Fix-build-on-big-endian-systems.patch \
     file://0005-adb-Allow-adbd-to-be-run-as-root.patch \
+    file://0001-liblp-fix-building-with-GCC-14.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -138,7 +139,7 @@ do_compile() {
 
 do_install() {
     install -d ${D}${base_sbindir}
-    install -m 0755 ${S}/../remount -D ${D}${base_sbindir}/remount
+    install -m 0755 ${UNPACKDIR}/remount -D ${D}${base_sbindir}/remount
 
     for tool in img2simg simg2img fastboot adbd; do
         if echo ${TOOLS_TO_BUILD} | grep -q "$tool" ; then
@@ -153,7 +154,7 @@ do_install() {
     fi
 
     # Outside the if statement to avoid errors during do_package
-    install -D -p -m0644 ${WORKDIR}/android-tools-adbd.service \
+    install -D -p -m0644 ${UNPACKDIR}/android-tools-adbd.service \
       ${D}${systemd_unitdir}/system/android-tools-adbd.service
 
     install -d  ${D}${libdir}/android/

@@ -35,7 +35,7 @@ do_install () {
 
 	# If volatiles are used, then we'll also need /run/network there too.
 	install -d ${D}/etc/default/volatiles
-	install -m 0644 ${WORKDIR}/99_network ${D}/etc/default/volatiles
+	install -m 0644 ${UNPACKDIR}/99_network ${D}/etc/default/volatiles
 
 	install -m 0755 ifup ${D}${base_sbindir}/
 	ln ${D}${base_sbindir}/ifup ${D}${base_sbindir}/ifdown

@@ -63,10 +63,10 @@ FILES:${PN}-dbg += "${bindir}/.debug/* \
                     ${libdir}/ldb/.debug/* \
                     ${libdir}/ldb/modules/ldb/.debug/*"
 
-FILES:pyldb = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/* \
+FILES:pyldb = "${PYTHON_SITEPACKAGES_DIR}/* \
                ${libdir}/libpyldb-util.*.so.* \
               "
-FILES:pyldb-dbg = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/.debug \
+FILES:pyldb-dbg = "${PYTHON_SITEPACKAGES_DIR}/.debug \
                    ${libdir}/.debug/libpyldb-util.*.so.*"
 FILES:pyldb-dev = "${libdir}/libpyldb-util.*.so"
 

@@ -44,8 +44,6 @@ PACKAGECONFIG[werror] = "-DMBEDTLS_FATAL_WARNINGS=ON,-DMBEDTLS_FATAL_WARNINGS=OF
 PACKAGECONFIG[psa] = ""
 PACKAGECONFIG[tests] = "-DENABLE_TESTING=ON,-DENABLE_TESTING=OFF"
 
-EXTRA_OECMAKE = "-DLIB_INSTALL_DIR:STRING=${libdir}"
-
 # For now the only way to enable PSA is to explicitly pass a -D via CFLAGS
 CFLAGS:append = "${@bb.utils.contains('PACKAGECONFIG', 'psa', ' -DMBEDTLS_USE_PSA_CRYPTO', '', d)}"
 
@@ -55,7 +53,7 @@ RPROVIDES:${PN} = "polarssl"
 PACKAGES =+ "${PN}-programs"
 FILES:${PN}-programs = "${bindir}/"
 
-ALTERNATIVE:${PN}-programs = "hello"
+ALTERNATIVE:${PN}-programs = "${@bb.utils.contains('PACKAGECONFIG', 'programs', 'hello', '', d)}"
 ALTERNATIVE_LINK_NAME[hello] = "${bindir}/hello"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -27,7 +27,7 @@ SRC_URI = "git://github.com/TigerVNC/tigervnc.git;branch=1.11-branch;protocol=ht
 XORG_PN ?= "xorg-server"
 XORG_PV ?= "1.20.6"
 SRC_URI += "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${XORG_PV}.tar.bz2;name=xorg"
-XORG_S = "${WORKDIR}/${XORG_PN}-${XORG_PV}"
+XORG_S = "${UNPACKDIR}/${XORG_PN}-${XORG_PV}"
 SRC_URI[xorg.md5sum] = "a98170084f2c8fed480d2ff601f8a14b"
 SRC_URI[xorg.sha256sum] = "6316146304e6e8a36d5904987ae2917b5d5b195dc9fc63d67f7aca137e5a51d1"
 

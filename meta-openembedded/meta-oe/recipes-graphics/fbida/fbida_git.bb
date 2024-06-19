@@ -26,7 +26,7 @@ S = "${WORKDIR}/git"
 inherit meson pkgconfig features_check
 
 # Depends on libepoxy
-REQUIRED_DISTRO_FEATURES = "opengl"
+REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('PACKAGECONFIG', 'pdf', 'opengl', '', d)}"
 
 PACKAGECONFIG ??= "gif png pdf"
 PACKAGECONFIG[gif] = "-Dgif=enabled,-Dgif=disabled,giflib"

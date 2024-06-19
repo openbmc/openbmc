@@ -16,6 +16,7 @@ import time
 import warnings
 import netrc
 import json
+import statistics
 warnings.simplefilter("default")
 
 try:
@@ -81,6 +82,7 @@ def main():
             nonlocal found_hashes
             nonlocal missed_hashes
             nonlocal max_time
+            nonlocal times
 
             with hashserv.create_client(args.address) as client:
                 for i in range(args.requests):
@@ -98,29 +100,41 @@ def main():
                         else:
                             missed_hashes += 1
 
-                        max_time = max(elapsed, max_time)
+                        times.append(elapsed)
                         pbar.update()
 
         max_time = 0
         found_hashes = 0
         missed_hashes = 0
         lock = threading.Lock()
-        total_requests = args.clients * args.requests
+        times = []
         start_time = time.perf_counter()
-        with ProgressBar(total=total_requests) as pbar:
+        with ProgressBar(total=args.clients * args.requests) as pbar:
             threads = [threading.Thread(target=thread_main, args=(pbar, lock), daemon=False) for _ in range(args.clients)]
             for t in threads:
                 t.start()
 
             for t in threads:
                 t.join()
+        total_elapsed = time.perf_counter() - start_time
 
-        elapsed = time.perf_counter() - start_time
         with lock:
-            print("%d requests in %.1fs. %.1f requests per second" % (total_requests, elapsed, total_requests / elapsed))
-            print("Average request time %.8fs" % (elapsed / total_requests))
-            print("Max request time was %.8fs" % max_time)
-            print("Found %d hashes, missed %d" % (found_hashes, missed_hashes))
+            mean = statistics.mean(times)
+            median = statistics.median(times)
+            stddev = statistics.pstdev(times)
+
+            print(f"Number of clients:    {args.clients}")
+            print(f"Requests per client:  {args.requests}")
+            print(f"Number of requests:   {len(times)}")
+            print(f"Total elapsed time:   {total_elapsed:.3f}s")
+            print(f"Total request rate:   {len(times)/total_elapsed:.3f} req/s")
+            print(f"Average request time: {mean:.3f}s")
+            print(f"Median request time:  {median:.3f}s")
+            print(f"Request time std dev: {stddev:.3f}s")
+            print(f"Maximum request time: {max(times):.3f}s")
+            print(f"Minimum request time: {min(times):.3f}s")
+            print(f"Hashes found:         {found_hashes}")
+            print(f"Hashes missed:        {missed_hashes}")
 
         if args.report:
             with ProgressBar(total=args.requests) as pbar:
@@ -225,6 +239,32 @@ def main():
         print("true" if result else "false")
         return 0
 
+    def handle_ping(args, client):
+        times = []
+        for i in range(1, args.count + 1):
+            if not args.quiet:
+                print(f"Ping {i} of {args.count}... ", end="")
+            start_time = time.perf_counter()
+            client.ping()
+            elapsed = time.perf_counter() - start_time
+            times.append(elapsed)
+            if not args.quiet:
+                print(f"{elapsed:.3f}s")
+
+        mean = statistics.mean(times)
+        median = statistics.median(times)
+        std_dev = statistics.pstdev(times)
+
+        if not args.quiet:
+            print("------------------------")
+        print(f"Number of pings:         {len(times)}")
+        print(f"Average round trip time: {mean:.3f}s")
+        print(f"Median round trip time:  {median:.3f}s")
+        print(f"Round trip time std dev: {std_dev:.3f}s")
+        print(f"Min time is:             {min(times):.3f}s")
+        print(f"Max time is:             {max(times):.3f}s")
+        return 0
+
     parser = argparse.ArgumentParser(description='Hash Equivalence Client')
     parser.add_argument('--address', default=DEFAULT_ADDRESS, help='Server address (default "%(default)s")')
     parser.add_argument('--log', default='WARNING', help='Set logging level')
@@ -321,6 +361,11 @@ def main():
     unihash_exists_parser.add_argument("--quiet", action="store_true", help="Don't print status. Instead, exit with 0 if unihash exists and 1 if it does not")
     unihash_exists_parser.add_argument("unihash", help="Unihash to check")
     unihash_exists_parser.set_defaults(func=handle_unihash_exists)
+
+    ping_parser = subparsers.add_parser('ping', help="Ping server")
+    ping_parser.add_argument("-n", "--count", type=int, help="Number of pings. Default is %(default)s", default=10)
+    ping_parser.add_argument("-q", "--quiet", action="store_true", help="Don't print each ping; only print results")
+    ping_parser.set_defaults(func=handle_ping)
 
     args = parser.parse_args()
 

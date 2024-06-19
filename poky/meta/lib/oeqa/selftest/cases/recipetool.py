@@ -120,9 +120,15 @@ class RecipetoolAppendTests(RecipetoolBase):
         self._try_recipetool_appendfile_fail('/dev/console', self.testfile, ['ERROR: /dev/console cannot be handled by this tool'])
 
     def test_recipetool_appendfile_alternatives(self):
+        lspath = '/bin/ls'
+        dirname = "base_bindir"
+        if "usrmerge" in get_bb_var('DISTRO_FEATURES'):
+            lspath = '/usr/bin/ls'
+            dirname = "bindir"
+
         # Now try with a file we know should be an alternative
         # (this is very much a fake example, but one we know is reliably an alternative)
-        self._try_recipetool_appendfile_fail('/bin/ls', self.testfile, ['ERROR: File /bin/ls is an alternative possibly provided by the following recipes:', 'coreutils', 'busybox'])
+        self._try_recipetool_appendfile_fail(lspath, self.testfile, ['ERROR: File %s is an alternative possibly provided by the following recipes:' % lspath, 'coreutils', 'busybox'])
         # Need a test file - should be executable
         testfile2 = os.path.join(self.corebase, 'oe-init-build-env')
         testfile2name = os.path.basename(testfile2)
@@ -131,12 +137,12 @@ class RecipetoolAppendTests(RecipetoolBase):
                          'SRC_URI += "file://%s"\n' % testfile2name,
                          '\n',
                          'do_install:append() {\n',
-                         '    install -d ${D}${base_bindir}\n',
-                         '    install -m 0755 ${WORKDIR}/%s ${D}${base_bindir}/ls\n' % testfile2name,
+                         '    install -d ${D}${%s}\n' % dirname,
+                         '    install -m 0755 ${UNPACKDIR}/%s ${D}${%s}/ls\n' % (testfile2name, dirname),
                          '}\n']
-        self._try_recipetool_appendfile('coreutils', '/bin/ls', testfile2, '-r coreutils', expectedlines, [testfile2name])
+        self._try_recipetool_appendfile('coreutils', lspath, testfile2, '-r coreutils', expectedlines, [testfile2name])
         # Now try bbappending the same file again, contents should not change
-        bbappendfile, _ = self._try_recipetool_appendfile('coreutils', '/bin/ls', self.testfile, '-r coreutils', expectedlines, [testfile2name])
+        bbappendfile, _ = self._try_recipetool_appendfile('coreutils', lspath, self.testfile, '-r coreutils', expectedlines, [testfile2name])
         # But file should have
         copiedfile = os.path.join(os.path.dirname(bbappendfile), 'coreutils', testfile2name)
         result = runCmd('diff -q %s %s' % (testfile2, copiedfile), ignore_status=True)
@@ -158,7 +164,7 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append() {\n',
                          '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/something\n',
+                         '    install -m 0644 ${UNPACKDIR}/testfile ${D}${datadir}/something\n',
                          '}\n']
         self._try_recipetool_appendfile('netbase', '/usr/share/something', self.testfile, '-r netbase', expectedlines, ['testfile'])
         # Try adding another file, this time where the source file is executable
@@ -173,8 +179,8 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append() {\n',
                          '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/something\n',
-                         '    install -m 0755 ${WORKDIR}/%s ${D}${datadir}/scriptname\n' % testfile2name,
+                         '    install -m 0644 ${UNPACKDIR}/testfile ${D}${datadir}/something\n',
+                         '    install -m 0755 ${UNPACKDIR}/%s ${D}${datadir}/scriptname\n' % testfile2name,
                          '}\n']
         self._try_recipetool_appendfile('netbase', '/usr/share/scriptname', testfile2, '-r netbase', expectedlines, ['testfile', testfile2name])
 
@@ -186,7 +192,7 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append() {\n',
                          '    install -d ${D}${bindir}\n',
-                         '    install -m 0755 ${WORKDIR}/testfile ${D}${bindir}/selftest-recipetool-testbin\n',
+                         '    install -m 0755 ${UNPACKDIR}/testfile ${D}${bindir}/selftest-recipetool-testbin\n',
                          '}\n']
         _, output = self._try_recipetool_appendfile('netbase', '/usr/bin/selftest-recipetool-testbin', self.testfile, '-r netbase', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
@@ -201,7 +207,7 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append:mymachine() {\n',
                          '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/something\n',
+                         '    install -m 0644 ${UNPACKDIR}/testfile ${D}${datadir}/something\n',
                          '}\n']
         _, output = self._try_recipetool_appendfile('netbase', '/usr/share/something', self.testfile, '-r netbase -m mymachine', expectedlines, ['mymachine/testfile'])
         self.assertNotIn('WARNING: ', output)
@@ -235,7 +241,7 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append() {\n',
                          '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/selftest-replaceme-subdir\n',
+                         '    install -m 0644 ${UNPACKDIR}/testfile ${D}${datadir}/selftest-replaceme-subdir\n',
                          '}\n']
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-subdir', self.testfile, '', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
@@ -262,7 +268,7 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append() {\n',
                          '    install -d ${D}${sysconfdir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${sysconfdir}/selftest-replaceme-patched\n',
+                         '    install -m 0644 ${UNPACKDIR}/testfile ${D}${sysconfdir}/selftest-replaceme-patched\n',
                          '}\n']
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/etc/selftest-replaceme-patched', self.testfile, '', expectedlines, ['testfile'])
         for line in output.splitlines():
@@ -280,7 +286,7 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append() {\n',
                          '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/selftest-replaceme-scripted\n',
+                         '    install -m 0644 ${UNPACKDIR}/testfile ${D}${datadir}/selftest-replaceme-scripted\n',
                          '}\n']
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-scripted', self.testfile, '', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
@@ -303,7 +309,7 @@ class RecipetoolAppendTests(RecipetoolBase):
                          '\n',
                          'do_install:append() {\n',
                          '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/selftest-replaceme-postinst\n',
+                         '    install -m 0644 ${UNPACKDIR}/testfile ${D}${datadir}/selftest-replaceme-postinst\n',
                          '}\n']
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-postinst', self.testfile, '-r selftest-recipetool-appendfile', expectedlines, ['testfile'])
 

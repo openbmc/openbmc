@@ -3,7 +3,7 @@ From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Wed, 30 Aug 2023 12:15:00 -0400
 Subject: [PATCH] selftest-hello: upgrade 1.0 -> 1.1
 
-This file should pass the test_series_merge_on_head test.
+This file should skip the test_series_merge_on_head test.
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---

@@ -6,6 +6,7 @@
 
 import logging
 import bb.asyncrpc
+from . import create_async_client
 
 logger = logging.getLogger("BitBake.PRserv")
 
@@ -13,16 +14,16 @@ class PRAsyncClient(bb.asyncrpc.AsyncClient):
     def __init__(self):
         super().__init__("PRSERVICE", "1.0", logger)
 
-    async def getPR(self, version, pkgarch, checksum):
+    async def getPR(self, version, pkgarch, checksum, history=False):
         response = await self.invoke(
-            {"get-pr": {"version": version, "pkgarch": pkgarch, "checksum": checksum}}
+            {"get-pr": {"version": version, "pkgarch": pkgarch, "checksum": checksum, "history": history}}
         )
         if response:
             return response["value"]
 
-    async def test_pr(self, version, pkgarch, checksum):
+    async def test_pr(self, version, pkgarch, checksum, history=False):
         response = await self.invoke(
-            {"test-pr": {"version": version, "pkgarch": pkgarch, "checksum": checksum}}
+            {"test-pr": {"version": version, "pkgarch": pkgarch, "checksum": checksum, "history": history}}
         )
         if response:
             return response["value"]
@@ -48,9 +49,9 @@ class PRAsyncClient(bb.asyncrpc.AsyncClient):
         if response:
             return response["value"]
 
-    async def export(self, version, pkgarch, checksum, colinfo):
+    async def export(self, version, pkgarch, checksum, colinfo, history=False):
         response = await self.invoke(
-            {"export": {"version": version, "pkgarch": pkgarch, "checksum": checksum, "colinfo": colinfo}}
+            {"export": {"version": version, "pkgarch": pkgarch, "checksum": checksum, "colinfo": colinfo, "history": history}}
         )
         if response:
             return (response["metainfo"], response["datainfo"])
@@ -65,7 +66,7 @@ class PRAsyncClient(bb.asyncrpc.AsyncClient):
 class PRClient(bb.asyncrpc.Client):
     def __init__(self):
         super().__init__()
-        self._add_methods("getPR", "test_pr", "test_package", "importone", "export", "is_readonly")
+        self._add_methods("getPR", "test_pr", "test_package", "max_package_pr", "importone", "export", "is_readonly")
 
     def _get_async_client(self):
         return PRAsyncClient()

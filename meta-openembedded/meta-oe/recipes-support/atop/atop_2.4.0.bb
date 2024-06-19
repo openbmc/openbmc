@@ -35,12 +35,12 @@ do_install() {
         make DESTDIR=${D} VERS=${PV} SYSDPATH=${systemd_system_unitdir} \
             PMPATHD=${systemd_unitdir}/system-sleep systemdinstall
         install -d ${D}${sysconfdir}/tmpfiles.d
-        install -m 644 ${WORKDIR}/volatiles.atop.conf ${D}${sysconfdir}/tmpfiles.d/atop.conf
+        install -m 644 ${UNPACKDIR}/volatiles.atop.conf ${D}${sysconfdir}/tmpfiles.d/atop.conf
         rm -f ${D}${systemd_system_unitdir}/atopacct.service
     else
         make DESTDIR=${D} VERS=${PV} sysvinstall
         install -d ${D}${sysconfdir}/default/volatiles
-        install -m 644 ${WORKDIR}/volatiles.99_atop ${D}${sysconfdir}/default/volatiles/99_atop
+        install -m 644 ${UNPACKDIR}/volatiles.99_atop ${D}${sysconfdir}/default/volatiles/99_atop
         rm -f ${D}${sysconfdir}/init.d/atopacct
     fi
 

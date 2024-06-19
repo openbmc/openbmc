@@ -1,32 +1,43 @@
-From 1fbb446d1849b1208012cbdae5d85d228cdbe4a6 Mon Sep 17 00:00:00 2001
+From 04eb94a0134ef5eb5b5fd783b303104fbfcd8437 Mon Sep 17 00:00:00 2001
 From: First Last <first.last@example.com>
-Date: Tue, 29 Aug 2023 13:32:24 -0400
-Subject: [PATCH] selftest-hello: add a summary
+Date: Fri, 31 May 2024 11:03:47 -0400
+Subject: [PATCH] selftest-hello: add selftest-hello-extra
 
-This patch should fail the selftests because the author address is from the
-invalid "example.com".
+This should fail the test_author_valid test.
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- .../recipes-test/selftest-hello/selftest-hello_1.0.bb          | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ .../selftest-hello-extra_1.0.bb               | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+ create mode 100644 meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
 
-diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-index 547587bef4..491f0a3df7 100644
---- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-+++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-@@ -1,3 +1,4 @@
-+SUMMARY = "A cool sample"
- DESCRIPTION = "Simple helloworld application -- selftest variant"
- SECTION = "examples"
- LICENSE = "MIT"
-@@ -16,4 +17,4 @@ do_install() {
- 	install -m 0755 helloworld ${D}${bindir}
- }
- 
--BBCLASSEXTEND = "native nativesdk"
-\ No newline at end of file
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
+new file mode 100644
+index 00000000000..f3dec1b220c
+--- /dev/null
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
+@@ -0,0 +1,21 @@
++SUMMARY = "This is an example summary"
++DESCRIPTION = "Simple helloworld application -- selftest variant"
++SECTION = "examples"
++LICENSE = "MIT"
++LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
++
++SRC_URI = "file://helloworld.c"
++
++S = "${WORKDIR}/sources"
++UNPACKDIR = "${S}"
++
++do_compile() {
++	${CC} ${CFLAGS} ${LDFLAGS} helloworld.c -o helloworld
++}
++
++do_install() {
++	install -d ${D}${bindir}
++	install -m 0755 helloworld ${D}${bindir}
++}
++
 +BBCLASSEXTEND = "native nativesdk"
 -- 
-2.41.0
+2.45.1
 

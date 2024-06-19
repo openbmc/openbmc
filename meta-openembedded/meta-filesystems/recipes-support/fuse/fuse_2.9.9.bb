@@ -68,7 +68,7 @@ do_install:append() {
     # Install systemd related configuration file
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/modules-load.d
-        install -m 0644 ${WORKDIR}/fuse.conf ${D}${sysconfdir}/modules-load.d
+        install -m 0644 ${UNPACKDIR}/fuse.conf ${D}${sysconfdir}/modules-load.d
     fi
 }
 

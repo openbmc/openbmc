@@ -16,11 +16,11 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/tmpfiles.d
-        install -m 0644 ${WORKDIR}/samhain-server-volatiles.conf \
+        install -m 0644 ${UNPACKDIR}/samhain-server-volatiles.conf \
             ${D}${sysconfdir}/tmpfiles.d/samhain-server.conf
     else
         install -d ${D}${sysconfdir}/default/volatiles
-        install -m 0644 ${WORKDIR}/samhain-server-volatiles \
+        install -m 0644 ${UNPACKDIR}/samhain-server-volatiles \
             ${D}${sysconfdir}/default/volatiles/samhain-server
     fi
 

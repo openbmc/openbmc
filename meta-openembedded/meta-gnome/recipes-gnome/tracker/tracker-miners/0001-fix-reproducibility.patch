@@ -1,4 +1,4 @@
-From 2bbd07843e8ec34311cafab35f21b40c86e0dd7f Mon Sep 17 00:00:00 2001
+From 1b7a34b7de9eb2ae776f7cf4dc6221f49b2395ee Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Tue, 12 Sep 2023 17:00:41 +0200
 Subject: [PATCH] meson: fix reproducibility
@@ -12,16 +12,18 @@ Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Markus Volk <f_l_k@t-online.de>
 ---
- meson.build                        | 20 ++++++++++----------
- src/tracker-extract/meson.build    |  2 +-
- tests/tracker-miner-fs/meson.build |  2 +-
- 3 files changed, 12 insertions(+), 12 deletions(-)
+ meson.build                                     | 8 ++++----
+ src/libtracker-miners-common/tracker-landlock.c | 4 ++--
+ src/miners/fs/meson.build                       | 4 ++--
+ src/tracker-extract/meson.build                 | 2 +-
+ tests/tracker-miner-fs/meson.build              | 2 +-
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 935584185..aa6126081 100644
+index 37f5148..18f4bfa 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -380,7 +380,7 @@ conf.set('PACKAGE_VERSION', '"@0@"'.format(meson.project_version()))
+@@ -393,7 +393,7 @@ conf.set('PACKAGE_VERSION', '"@0@"'.format(meson.project_version()))
  conf.set('TRACKER_VERSION', '"@0@"'.format(meson.project_version()))
  
  # Config that goes in some other generated files (.desktop, .pc, etc)
@@ -30,7 +32,7 @@ index 935584185..aa6126081 100644
  conf.set('exec_prefix', get_option('prefix'))
  conf.set('bindir', join_paths(get_option('prefix'), get_option('bindir')))
  conf.set('datadir', datadir)
-@@ -409,7 +409,7 @@ tracker_c_args = [
+@@ -422,7 +422,7 @@ tracker_c_args = [
  configinc = include_directories('./')
  srcinc = include_directories('src/')
  
@@ -39,7 +41,7 @@ index 935584185..aa6126081 100644
  
  # We use tracker-miners-3.0 rather than tracker3-miners inside the lib64
  # directory, following the existing convention in that directory.
-@@ -438,8 +438,8 @@ subdir('data')
+@@ -451,8 +451,8 @@ subdir('data')
  subdir('docs')
  
  test_c_args = tracker_c_args + [
@@ -50,35 +52,30 @@ index 935584185..aa6126081 100644
  ]
  
  if get_option('tests_tap_protocol')
-diff --git a/src/tracker-extract/meson.build b/src/tracker-extract/meson.build
-index 4aaad5c41..d17cce221 100644
---- a/src/tracker-extract/meson.build
-+++ b/src/tracker-extract/meson.build
-@@ -159,7 +159,7 @@ endif
- executable('tracker-extract-@0@'.format(tracker_api_major),
-   tracker_extract_sources,
-   # Manually add the root dir to work around https://github.com/mesonbuild/meson/issues/1387
--  c_args: tracker_c_args + ['-I' + meson.build_root()],
-+  c_args: tracker_c_args,
-   export_dynamic: true,
-   dependencies: tracker_extract_dependencies,
-   install: true,
-diff --git a/tests/tracker-miner-fs/meson.build b/tests/tracker-miner-fs/meson.build
-index e131b85ad..59e509fa6 100644
---- a/tests/tracker-miner-fs/meson.build
-+++ b/tests/tracker-miner-fs/meson.build
-@@ -19,7 +19,7 @@ libtracker_miner_test_c_args = [
- ]
+diff --git a/src/libtracker-miners-common/tracker-landlock.c b/src/libtracker-miners-common/tracker-landlock.c
+index 6d4510b..189d2fb 100644
+--- a/src/libtracker-miners-common/tracker-landlock.c
++++ b/src/libtracker-miners-common/tracker-landlock.c
+@@ -282,7 +282,7 @@ tracker_landlock_init (const gchar * const *indexed_folders)
+ 			          LANDLOCK_ACCESS_FS_READ_DIR);
+ 		}
+ 	}
+-
++#if 0
+ 	current_dir = g_get_current_dir ();
  
- libtracker_miner_test_environment = environment()
--libtracker_miner_test_environment.set('GSETTINGS_SCHEMA_DIR', join_paths(meson.build_root(), 'data'))
-+libtracker_miner_test_environment.set('GSETTINGS_SCHEMA_DIR', '/usr/src/debug/tracker-miners/data')
- 
- libtracker_miner_test_deps = [tracker_miners_common_dep, tracker_miner_dep, tracker_sparql]
- 
- 
+ 	/* Detect running in-tree */
+@@ -302,7 +302,7 @@ tracker_landlock_init (const gchar * const *indexed_folders)
+ 			          in_tree_rules[i].flags);
+ 		}
+ 	}
+-
++#endif
+ 	/* Add user cache for readonly databases */
+ #ifdef MINER_FS_CACHE_LOCATION
+ 	add_rule (landlock_fd, MINER_FS_CACHE_LOCATION,
 diff --git a/src/miners/fs/meson.build b/src/miners/fs/meson.build
-index 6e5883288..04750f82b 100644
+index 6e58832..04750f8 100644
 --- a/src/miners/fs/meson.build
 +++ b/src/miners/fs/meson.build
 @@ -67,8 +67,8 @@ executable('tracker-miner-fs-@0@'.format(tracker_api_major),
@@ -92,27 +89,29 @@ index 6e5883288..04750f82b 100644
          '-DLIBEXECDIR="@0@"'.format(get_option('prefix') / get_option('libexecdir')),
      ],
      install: true,
-diff --git a/src/libtracker-miners-common/tracker-landlock.c b/src/libtracker-miners-common/tracker-landlock.c
-index 27e7db65b..3021343eb 100644
---- a/src/libtracker-miners-common/tracker-landlock.c
-+++ b/src/libtracker-miners-common/tracker-landlock.c
-@@ -276,7 +276,7 @@
- 			          LANDLOCK_ACCESS_FS_READ_DIR);
- 		}
- 	}
--
-+#if 0
- 	current_dir = g_get_current_dir ();
+diff --git a/src/tracker-extract/meson.build b/src/tracker-extract/meson.build
+index 2e4f61d..b47581c 100644
+--- a/src/tracker-extract/meson.build
++++ b/src/tracker-extract/meson.build
+@@ -158,7 +158,7 @@ endif
+ executable('tracker-extract-@0@'.format(tracker_api_major),
+   tracker_extract_sources,
+   # Manually add the root dir to work around https://github.com/mesonbuild/meson/issues/1387
+-  c_args: tracker_c_args + ['-I' + meson.build_root()],
++  c_args: tracker_c_args,
+   export_dynamic: true,
+   dependencies: tracker_extract_dependencies,
+   install: true,
+diff --git a/tests/tracker-miner-fs/meson.build b/tests/tracker-miner-fs/meson.build
+index 8c081fd..9792082 100644
+--- a/tests/tracker-miner-fs/meson.build
++++ b/tests/tracker-miner-fs/meson.build
+@@ -18,7 +18,7 @@ libtracker_miner_test_c_args = [
+ ]
  
- 	/* Detect running in-tree */
-@@ -296,7 +296,7 @@
- 			          in_tree_rules[i].flags);
- 		}
- 	}
--
-+#endif
- 	/* Add user cache for readonly databases */
- #ifdef MINER_FS_CACHE_LOCATION
- 	add_rule (landlock_fd, MINER_FS_CACHE_LOCATION,
--- 
-2.41.0
+ libtracker_miner_test_environment = environment()
+-libtracker_miner_test_environment.set('GSETTINGS_SCHEMA_DIR', join_paths(meson.build_root(), 'data'))
++libtracker_miner_test_environment.set('GSETTINGS_SCHEMA_DIR', '/usr/src/debug/tracker-miners/data')
+ 
+ libtracker_miner_test_deps = [tracker_miners_common_dep, tracker_miner_dep, tracker_sparql]
+ 

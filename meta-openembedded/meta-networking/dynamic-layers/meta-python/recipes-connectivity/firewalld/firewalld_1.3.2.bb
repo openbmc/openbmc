@@ -146,7 +146,7 @@ do_install:append() {
         # firewalld ships an init script but it contains Red Hat-isms, replace it with our own
         rm -rf ${D}${sysconfdir}/rc.d/
         install -d ${D}${sysconfdir}/init.d
-        install -m0755 ${WORKDIR}/firewalld.init ${D}${sysconfdir}/init.d/firewalld
+        install -m0755 ${UNPACKDIR}/firewalld.init ${D}${sysconfdir}/init.d/firewalld
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'polkit', 'false', 'true', d)}; then

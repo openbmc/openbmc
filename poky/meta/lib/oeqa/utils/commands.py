@@ -314,7 +314,23 @@ def create_temp_layer(templayerdir, templayername, priority=999, recipepathspec=
 @contextlib.contextmanager
 def runqemu(pn, ssh=True, runqemuparams='', image_fstype=None, launch_cmd=None, qemuparams=None, overrides={}, discard_writes=True):
     """
-    launch_cmd means directly run the command, don't need set rootfs or env vars.
+    Starts a context manager for a 'oeqa.targetcontrol.QemuTarget' resource.
+    The underlying Qemu will be booted into a shell when the generator yields
+    and stopped when the 'with' block exits.
+
+    Usage:
+
+        with runqemu('core-image-minimal') as qemu:
+            qemu.run_serial('cat /proc/cpuinfo')
+
+    Args:
+        pn (str): (image) recipe to run on
+        ssh (boolean): whether or not to enable SSH (network access)
+        runqemuparams (str): space-separated list of params to pass to 'runqemu' script (like 'nographics', 'ovmf', etc.)
+        image_fstype (str): IMAGE_FSTYPE to use
+        launch_cmd (str): directly run this command and bypass automatic runqemu parameter generation
+        overrides (dict): dict of "'<bitbake-variable>': value" pairs that allows overriding bitbake variables
+        discard_writes (boolean): enables qemu -snapshot feature to prevent modifying original image
     """
 
     import bb.tinfoil

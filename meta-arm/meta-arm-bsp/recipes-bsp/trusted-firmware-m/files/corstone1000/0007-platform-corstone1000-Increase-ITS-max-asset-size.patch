@@ -1,0 +1,27 @@
+From 2edf197735bd0efb1428c1710443dddcb376d930 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Wed, 17 Apr 2024 11:34:45 +0000
+Subject: [PATCH] platform: corstone1000: Increase ITS max asset size
+
+Increases the max asset size for ITS to enable parsec services & tests
+​
+Upstream-Status: Pending
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Vikas Katariya <vikas.katariya@arm.com>
+---
+ platform/ext/target/arm/corstone1000/config_tfm_target.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/platform/ext/target/arm/corstone1000/config_tfm_target.h b/platform/ext/target/arm/corstone1000/config_tfm_target.h
+index 2c7341afd4..2eb0924770 100644
+--- a/platform/ext/target/arm/corstone1000/config_tfm_target.h
++++ b/platform/ext/target/arm/corstone1000/config_tfm_target.h
+@@ -20,4 +20,8 @@
+ /* The maximum number of assets to be stored in the Protected Storage area. */
+ #define PS_NUM_ASSETS        20
+ 
++/* The maximum size of asset to be stored in the Internal Trusted Storage area. */
++#undef ITS_MAX_ASSET_SIZE
++#define ITS_MAX_ASSET_SIZE   2048
++
+ #endif /* __CONFIG_TFM_TARGET_H__ */

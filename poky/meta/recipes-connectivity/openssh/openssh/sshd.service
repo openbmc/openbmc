@@ -2,6 +2,7 @@
 Description=OpenSSH server daemon
 Wants=sshdgenkeys.service
 After=sshdgenkeys.service
+After=nss-user-lookup.target
 
 [Service]
 Environment="SSHD_OPTS="

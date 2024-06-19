@@ -1,7 +1,7 @@
-From dad7f897c0de654fa5592fda3e90f874639849f9 Mon Sep 17 00:00:00 2001
+From dcd9639657e4122b7665b01a067219f990ee3ace Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:00:06 +0800
-Subject: [PATCH 05/22] add missing FTW_ macros for musl
+Subject: [PATCH] add missing FTW_ macros for musl
 
 This is to avoid build failures like below for musl.
 
@@ -39,6 +39,3 @@ index 8684d064ec..70fc2b5376 100644
  
  static char **list_nftw = NULL;
  
--- 
-2.34.1
-

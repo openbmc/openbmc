@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/linjackson78/jstyleson"
 SRC_URI += " file://LICENSE "
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE;md5=d97b96c7337934ee448ffd4392f32079"
+LIC_FILES_CHKSUM = "file://${UNPACKDIR}/LICENSE;md5=d97b96c7337934ee448ffd4392f32079"
 
 PYPI_PACKAGE_EXT = "tar.gz"
 

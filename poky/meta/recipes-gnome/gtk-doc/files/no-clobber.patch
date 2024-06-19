@@ -1,4 +1,4 @@
-From 8bc4c1f169f89bc5531da5b7e892b8f20e0f9a18 Mon Sep 17 00:00:00 2001
+From fa5e31e02b9d3c6c5ec3cdc1f34dd6c179520fd0 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Wed, 21 Mar 2018 14:47:29 +0000
 Subject: [PATCH] gtk-doc: don't regenerate gtk-doc in do_install
@@ -20,16 +20,15 @@ files which don't already exist.
 
 Upstream-Status: Submitted [https://bugzilla.gnome.org/show_bug.cgi?id=794571]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-
 ---
  buildsystems/autotools/gtk-doc.make | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/buildsystems/autotools/gtk-doc.make b/buildsystems/autotools/gtk-doc.make
-index 7d9a27f..8cb336d 100644
+index fb2e7e2..4f6fe2b 100644
 --- a/buildsystems/autotools/gtk-doc.make
 +++ b/buildsystems/autotools/gtk-doc.make
-@@ -111,7 +111,7 @@ setup-build.stamp:
+@@ -112,7 +112,7 @@ setup-build.stamp:
  	      destdir=`dirname $(abs_builddir)/$$file`; \
  	      test -d "$$destdir" || mkdir -p "$$destdir"; \
  	      test -f $(abs_srcdir)/$$file && \

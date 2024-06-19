@@ -1,7 +1,7 @@
-From beab76b5708862f44d9acbe7a92db45e2f99259f Mon Sep 17 00:00:00 2001
+From 935033dd40772240c9bcc6b9610d78eb3753bfaf Mon Sep 17 00:00:00 2001
 From: Nate Karstens <nate.karstens@garmin.com>
 Date: Tue, 1 Aug 2017 17:06:01 -0500
-Subject: [PATCH 4/8] Indicate loopback interface to mDNS core
+Subject: [PATCH] Indicate loopback interface to mDNS core
 
 Tells the mDNS core if an interface is a loopback interface,
 similar to AddInterfaceToList() in the MacOS implementation.
@@ -14,11 +14,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 7 ++++---
  1 file changed, 4 insertions(+), 3 deletions(-)
 
-Index: mDNSResponder/mDNSPosix/mDNSPosix.c
-===================================================================
---- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
-+++ mDNSResponder/mDNSPosix/mDNSPosix.c
-@@ -1348,7 +1348,7 @@ mDNSlocal void CleanRecentInterfaces(voi
+diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
+index 15bbecee04a4..f4c31a07d587 100644
+--- a/mDNSPosix/mDNSPosix.c
++++ b/mDNSPosix/mDNSPosix.c
+@@ -1348,7 +1348,7 @@ mDNSlocal void CleanRecentInterfaces(void)
  // Creates a PosixNetworkInterface for the interface whose IP address is
  // intfAddr and whose name is intfName and registers it with mDNS core.
  mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct sockaddr *intfMask,
@@ -27,7 +27,7 @@ Index: mDNSResponder/mDNSPosix/mDNSPosix.c
  {
      int err = 0;
      PosixNetworkInterface *intf;
-@@ -1411,6 +1411,7 @@ mDNSlocal int SetupOneInterface(mDNS *co
+@@ -1411,6 +1411,7 @@ mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct
  
          intf->coreIntf.Advertise = m->AdvertiseLocalAddresses;
          intf->coreIntf.McastTxRx = mDNStrue;
@@ -35,7 +35,7 @@ Index: mDNSResponder/mDNSPosix/mDNSPosix.c
  
          // Set up the extra fields in PosixNetworkInterface.
          assert(intf->intfName != NULL);         // intf->intfName already set up above
-@@ -1561,7 +1562,7 @@ mDNSlocal int SetupInterfaceList(mDNS *c
+@@ -1561,7 +1562,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
                      }
  #endif
                      if (SetupOneInterface(m, i->ifa_addr, i->ifa_netmask,
@@ -44,7 +44,7 @@ Index: mDNSResponder/mDNSPosix/mDNSPosix.c
                      {
                          if (i->ifa_addr->sa_family == AF_INET)
                              foundav4 = mDNStrue;
-@@ -1578,7 +1579,7 @@ mDNSlocal int SetupInterfaceList(mDNS *c
+@@ -1578,7 +1579,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
          // if ((m->HostInterfaces == NULL) && (firstLoopback != NULL))
          if (!foundav4 && firstLoopback)
              (void) SetupOneInterface(m, firstLoopback->ifa_addr, firstLoopback->ifa_netmask,

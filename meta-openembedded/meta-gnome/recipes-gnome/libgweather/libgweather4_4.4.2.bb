@@ -28,3 +28,7 @@ FILES:${PN} += " \
     ${datadir}/libgweather-4 \
     ${libdir}/libgweather-4 \
 "
+
+do_configure:prepend() {
+    cp -f ${STAGING_LIBDIR}/girepository-1.0/GLib*typelib ${STAGING_LIBDIR_NATIVE}/girepository-1.0/
+}

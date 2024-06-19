@@ -38,6 +38,7 @@ def filter_nativesdk_deps(srcname, var):
 
 # Construct per file dependencies file
 def write_rpm_perfiledata(srcname, d):
+    import oe.package
     workdir = d.getVar('WORKDIR')
     packages = d.getVar('PACKAGES')
     pkgd = d.getVar('PKGD')
@@ -53,12 +54,7 @@ def write_rpm_perfiledata(srcname, d):
                 key = "FILE" + varname + ":" + dfile + ":" + pkg
                 deps = filter_nativesdk_deps(srcname, d.getVar(key) or "")
                 depends_dict = bb.utils.explode_dep_versions(deps)
-                file = dfile.replace("@underscore@", "_")
-                file = file.replace("@closebrace@", "]")
-                file = file.replace("@openbrace@", "[")
-                file = file.replace("@tab@", "\t")
-                file = file.replace("@space@", " ")
-                file = file.replace("@at@", "@")
+                file = oe.package.file_reverse_translate(dfile)
                 outfile.write('"' + pkgd + file + '" : "')
                 for dep in depends_dict:
                     ver = depends_dict[dep]
@@ -191,7 +187,7 @@ python write_specfile () {
                 if not len(depends_dict[dep]):
                     array.append("%s: %s" % (tag, dep))
 
-    def walk_files(walkpath, target, conffiles, dirfiles):
+    def walk_files(walkpath, target, conffiles):
         # We can race against the ipk/deb backends which create CONTROL or DEBIAN directories
         # when packaging. We just ignore these files which are created in
         # packages-split/ and not package/
@@ -233,22 +229,12 @@ python write_specfile () {
                     return False
             dirs[:] = [dir for dir in dirs if not move_to_files(dir)]
 
-            # Directory handling can happen in two ways, either DIRFILES is not set at all
-            # in which case we fall back to the older behaviour of packages owning all their
-            # directories
-            if dirfiles is None:
-                for dir in dirs:
-                    if dir == "CONTROL" or dir == "DEBIAN":
-                        continue
-                    p = path + '/' + dir
-                    # All packages own the directories their files are in...
-                    target.append(get_attr(dir) + '%dir "' + escape_chars(p) + '"')
-            elif path:
-                # packages own only empty directories or explict directory.
-                # This will prevent the overlapping of security permission.
-                attr = get_attr(path)
-                if (not files and not dirs) or path in dirfiles:
-                    target.append(attr + '%dir "' + escape_chars(path) + '"')
+            for dir in dirs:
+                if dir == "CONTROL" or dir == "DEBIAN":
+                    continue
+                p = path + '/' + dir
+                # All packages own the directories their files are in...
+                target.append(get_attr(dir) + '%dir "' + escape_chars(p) + '"')
 
             for file in files:
                 if file == "CONTROL" or file == "DEBIAN":
@@ -363,9 +349,6 @@ python write_specfile () {
         localdata.setVar('OVERRIDES', d.getVar("OVERRIDES", False) + ":" + pkg)
 
         conffiles = oe.package.get_conffiles(pkg, d)
-        dirfiles = localdata.getVar('DIRFILES')
-        if dirfiles is not None:
-            dirfiles = dirfiles.split()
 
         splitname    = pkgname
 
@@ -430,7 +413,7 @@ python write_specfile () {
             srcrpostrm     = splitrpostrm
 
             file_list = []
-            walk_files(root, file_list, conffiles, dirfiles)
+            walk_files(root, file_list, conffiles)
             if not file_list and localdata.getVar('ALLOW_EMPTY', False) != "1":
                 bb.note("Not creating empty RPM package for %s" % splitname)
             else:
@@ -522,7 +505,7 @@ python write_specfile () {
 
         # Now process files
         file_list = []
-        walk_files(root, file_list, conffiles, dirfiles)
+        walk_files(root, file_list, conffiles)
         if not file_list and localdata.getVar('ALLOW_EMPTY', False) != "1":
             bb.note("Not creating empty RPM package for %s" % splitname)
         else:

@@ -15,7 +15,6 @@ FILES:${PN}-tests = "${libdir}/${PYTHON_DIR}/site-packages/OpenSSL/test"
 
 RDEPENDS:${PN}:class-target = " \
     python3-cryptography \
-    python3-six \
     python3-threading \
 "
 RDEPENDS:${PN}-tests = "${PN}"

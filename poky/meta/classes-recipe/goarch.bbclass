@@ -38,13 +38,13 @@ BASE_GOARM:armv5 = '5'
 # Go supports dynamic linking on a limited set of architectures.
 # See the supportsDynlink function in go/src/cmd/compile/internal/gc/main.go
 GO_DYNLINK = ""
-GO_DYNLINK:arm = ""
-GO_DYNLINK:aarch64 = ""
-GO_DYNLINK:x86 = ""
-GO_DYNLINK:x86-64 = ""
-GO_DYNLINK:powerpc64 = ""
-GO_DYNLINK:powerpc64le = ""
-GO_DYNLINK:class-native = ""
+GO_DYNLINK:arm ?= "1"
+GO_DYNLINK:aarch64 ?= "1"
+GO_DYNLINK:x86 ?= "1"
+GO_DYNLINK:x86-64 ?= "1"
+GO_DYNLINK:powerpc64 ?= "1"
+GO_DYNLINK:powerpc64le ?= "1"
+GO_DYNLINK:class-native ?= ""
 GO_DYNLINK:class-nativesdk = ""
 
 # define here because everybody inherits this class

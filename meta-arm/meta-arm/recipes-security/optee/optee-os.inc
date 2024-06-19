@@ -24,7 +24,6 @@ EXTRA_OEMAKE += " \
     CFG_${OPTEE_CORE}_core=y \
     CROSS_COMPILE_core=${HOST_PREFIX} \
     CROSS_COMPILE_ta_${OPTEE_ARCH}=${HOST_PREFIX} \
-    NOWERROR=1 \
     ta-targets=ta_${OPTEE_ARCH} \
     O=${B} \
 "
@@ -80,4 +79,3 @@ INSANE_SKIP:${PN} = "textrel"
 INSANE_SKIP:${PN} += "buildpaths"
 INSANE_SKIP:${PN}-dev = "staticdev"
 INHIBIT_PACKAGE_STRIP = "1"
-

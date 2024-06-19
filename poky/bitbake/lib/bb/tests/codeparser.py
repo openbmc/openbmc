@@ -106,6 +106,46 @@ ${D}${libdir}/pkgconfig/*.pc
         self.parseExpression("foo=$(echo bar)")
         self.assertExecs(set(["echo"]))
 
+    def test_assign_subshell_expansion_quotes(self):
+        self.parseExpression('foo="$(echo bar)"')
+        self.assertExecs(set(["echo"]))
+
+    def test_assign_subshell_expansion_nested(self):
+        self.parseExpression('foo="$(func1 "$(func2 bar$(func3))")"')
+        self.assertExecs(set(["func1", "func2", "func3"]))
+
+    def test_assign_subshell_expansion_multiple(self):
+        self.parseExpression('foo="$(func1 "$(func2)") $(func3)"')
+        self.assertExecs(set(["func1", "func2", "func3"]))
+
+    def test_assign_subshell_expansion_escaped_quotes(self):
+        self.parseExpression('foo="\\"fo\\"o$(func1)"')
+        self.assertExecs(set(["func1"]))
+
+    def test_assign_subshell_expansion_empty(self):
+        self.parseExpression('foo="bar$()foo"')
+        self.assertExecs(set())
+
+    def test_assign_subshell_backticks(self):
+        self.parseExpression("foo=`echo bar`")
+        self.assertExecs(set(["echo"]))
+
+    def test_assign_subshell_backticks_quotes(self):
+        self.parseExpression('foo="`echo bar`"')
+        self.assertExecs(set(["echo"]))
+
+    def test_assign_subshell_backticks_multiple(self):
+        self.parseExpression('foo="`func1 bar` `func2`"')
+        self.assertExecs(set(["func1", "func2"]))
+
+    def test_assign_subshell_backticks_escaped_quotes(self):
+        self.parseExpression('foo="\\"fo\\"o`func1`"')
+        self.assertExecs(set(["func1"]))
+
+    def test_assign_subshell_backticks_empty(self):
+        self.parseExpression('foo="bar``foo"')
+        self.assertExecs(set())
+
     def test_shell_unexpanded(self):
         self.setEmptyVars(["QT_BASE_NAME"])
         self.parseExpression('echo "${QT_BASE_NAME}"')

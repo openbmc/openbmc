@@ -38,7 +38,7 @@ do_install:append () {
 	rmdir ${D}${datadir}/${BPN} || true
 
 	install -m 0755 -d ${D}${sysconfdir}
-	install -m 0644 ${WORKDIR}/inputrc ${D}${sysconfdir}/inputrc
+	install -m 0644 ${UNPACKDIR}/inputrc ${D}${sysconfdir}/inputrc
 }
 
 BBCLASSEXTEND = "native nativesdk"
@@ -54,4 +54,4 @@ ALTERNATIVE_LINK_NAME[history.3] = "${mandir}/man3/history.3"
 # OpenSuse injects versions into libreadline leading to conficits between our native one and theirs
 # see their spec file for where this is injected. Extra versioning is harmless so we just do the same.
 SRC_URI:append:class-native = " file://rl-native.map"
-LDFLAGS:append:class-native = " -Wl,--version-script=${WORKDIR}/rl-native.map"
+LDFLAGS:append:class-native = " -Wl,--version-script=${UNPACKDIR}/rl-native.map"

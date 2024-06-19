@@ -27,7 +27,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_configure() {
-    cp ${WORKDIR}/config.linux-cross .
+    cp ${UNPACKDIR}/config.linux-cross .
     echo "COMPILE_OPTS+=" -fPIC -DXLOCALE_NOT_USED"" >> config.linux-cross
     ./genMakefiles linux-cross
 }

@@ -43,14 +43,14 @@ do_install() {
     export PREFIX=${D}/${prefix}
     oe_runmake install
     install -d ${D}/${sysconfdir}/redis
-    install -m 0644 ${WORKDIR}/redis.conf ${D}/${sysconfdir}/redis/redis.conf
+    install -m 0644 ${UNPACKDIR}/redis.conf ${D}/${sysconfdir}/redis/redis.conf
     install -d ${D}/${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/init-redis-server ${D}/${sysconfdir}/init.d/redis-server
+    install -m 0755 ${UNPACKDIR}/init-redis-server ${D}/${sysconfdir}/init.d/redis-server
     install -d ${D}/var/lib/redis/
     chown redis.redis ${D}/var/lib/redis/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/redis.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/redis.service ${D}${systemd_system_unitdir}
     sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}${systemd_system_unitdir}/redis.service
 
     if [ "${REDIS_ON_SYSTEMD}" = true ]; then

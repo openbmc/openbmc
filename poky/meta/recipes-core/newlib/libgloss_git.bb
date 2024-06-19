@@ -6,7 +6,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/libgloss:"
 
 SRC_URI:append = " file://libgloss-build-without-nostdinc.patch"
 SRC_URI:append:powerpc = " file://fix-rs6000-crt0.patch"
-SRC_URI:append:powerpc = " file://fix-rs6000-cflags.patch"
 
 do_configure() {
 	${S}/libgloss/configure ${EXTRA_OECONF}

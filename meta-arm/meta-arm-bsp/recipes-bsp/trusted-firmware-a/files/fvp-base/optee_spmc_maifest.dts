@@ -1,0 +1,116 @@
+/* SPDX-License-Identifier: BSD-3-Clause */
+/*
+ * Copyright (c) 2022-2023, Arm Limited. All rights reserved.
+ */
+
+
+/*
+ * The content of the SPMC manifest may depend on integration settings like the
+ * set of deployed SP. This information lives in the integration system and 
+ * hence this file should be store in meta-arm. This avoids indirect
+ * dependencies between integration systems using the same file which would
+ * enforce some from of cooperation. 
+ */
+
+/dts-v1/;
+
+/ {
+	compatible = "arm,ffa-core-manifest-1.0";
+	#address-cells = <2>;
+	#size-cells = <1>;
+
+	attribute {
+		spmc_id = <0x8000>;
+		maj_ver = <0x1>;
+		min_ver = <0x0>;
+		exec_state = <0x0>;
+		load_address = <0x0 0x6000000>;
+		entrypoint = <0x0 0x6000000>;
+		binary_size = <0x80000>;
+	};
+
+/*
+ * This file will be preprocessed by TF-A's build system. If Measured Boot is
+ * enabled in TF-A's config, the build system will add the MEASURED_BOOT=1 macro
+ * to the preprocessor arguments.
+ */
+#if MEASURED_BOOT
+	tpm_event_log {
+		compatible = "arm,tpm_event_log";
+		tpm_event_log_addr = <0x0 0x0>;
+		tpm_event_log_size = <0x0>;
+		tpm_event_log_max_size = <0x0>;
+	};
+#endif
+
+/* If the ARM_BL2_SP_LIST_DTS is defined, SPs should be loaded from FIP */
+#ifdef ARM_BL2_SP_LIST_DTS
+	sp_packages {
+		compatible = "arm,sp_pkg";
+#if !SPMC_TESTS
+		block_storage {
+			uuid = <0x806e6463 0x2f4652eb 0xdf8c4fac 0x9c518739>;
+			load-address = <0x0 0x7a00000>;
+		};
+		internal_trusted_storage {
+			uuid = <0x48ef1edc 0xcf4c7ab1 0xcfdf8bac 0x141b71f7>;
+			load-address = <0x0 0x7a80000>;
+		};
+
+		protected_storage_sp {
+			uuid = <0x01f81b75 0x6847de3d 0x100f14a5 0x9017edae>;
+			load-address = <0x0 0x7b00000>;
+		};
+
+		crypto_sp {
+			uuid = <0xd552dfd9 0xb24ba216 0x6dd2a49a 0xc0e8843b>;
+			load-address = <0x0 0x7b80000>;
+		};
+
+#if MEASURED_BOOT
+		initial_attestation_sp {
+			uuid = <0x55f1baa1 0x95467688 0x95547c8f 0x74b98d5e>;
+			load-address = <0x0 0x7c80000>;
+		};
+#endif
+
+#if TS_SMM_GATEWAY
+		smm_gateway {
+			uuid = <0x33d532ed 0x0942e699 0x722dc09c 0xa798d9cd>;
+			load-address = <0x0 0x7d00000>;
+		};
+#endif /* TS_SMM_GATEWAY */
+
+#if TS_FW_UPDATE
+		fwu {
+			uuid = <0x38a82368 0x0e47061b 0xce0c7497 0xfd53fb8b>;
+			load-address = <0x0 0x7d80000>;
+		};
+#endif /* TS_FW_UPDATE */
+
+#else /* SPMC_TESTS */
+		test_sp1 {
+			uuid = <0xc3db9e5c 0x67433a7b 0x197c839f 0x376ae81a>;
+			load-address = <0x0 0x7a00000>;
+		};
+
+		test_sp2 {
+			uuid = <0x4c161778 0x1a4d0cc4 0xb29b7a86 0x1af48c27>;
+			load-address = <0x0 0x7a20000>;
+		};
+
+		test_sp3 {
+			uuid = <0x0001eb23 0x97442ae3 0x112f5290 0xa6af84e5>;
+			load-address = <0x0 0x7a40000>;
+		};
+
+		test_sp4 {
+			/* SP binary UUID */
+			uuid = <0xed623742 0x6f407277 0x270cd899 0xf8bb0ada>;
+			load-address = <0x0 0x7a80000>;
+		};
+#endif /* SPMC_TESTS */
+
+	};
+#endif /* ARM_BL2_SP_LIST_DTS */
+};

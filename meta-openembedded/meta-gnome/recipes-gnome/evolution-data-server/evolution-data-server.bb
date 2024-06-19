@@ -58,7 +58,7 @@ LDFLAGS += "-lpthread -lgmodule-2.0 -lgthread-2.0"
 GI_DATA_ENABLED:libc-musl="False"
 
 do_configure:append () {
-    cp ${WORKDIR}/iconv-detect.h ${S}/src
+    cp ${UNPACKDIR}/iconv-detect.h ${S}/src
     # avoid writing perl-native path into csv2vcard shebang
     sed -i "s|@PERL@|${bindir}/perl|" ${S}/src/tools/addressbook-export/csv2vcard.in
 }

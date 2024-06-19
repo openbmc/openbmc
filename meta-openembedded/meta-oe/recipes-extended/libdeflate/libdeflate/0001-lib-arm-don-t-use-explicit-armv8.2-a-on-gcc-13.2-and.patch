@@ -1,0 +1,57 @@
+From 684ebc7f8eb44558219d4b5be52add1250b3c0ca Mon Sep 17 00:00:00 2001
+From: Eric Biggers <ebiggers@google.com>
+Date: Tue, 30 Apr 2024 11:27:55 -0700
+Subject: [PATCH] lib/arm: don't use explicit armv8.2-a on gcc 13.2 and later
+
+Resolves https://github.com/ebiggers/libdeflate/issues/369
+---
+Upstream-Status: Backport [https://github.com/ebiggers/libdeflate/pull/370]
+
+ lib/arm/adler32_impl.h | 10 ++++++----
+ lib/arm/crc32_impl.h   | 10 ++++++----
+ 2 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/lib/arm/adler32_impl.h b/lib/arm/adler32_impl.h
+index 6453b8e..6144afb 100644
+--- a/lib/arm/adler32_impl.h
++++ b/lib/arm/adler32_impl.h
+@@ -214,11 +214,13 @@ adler32_arm_neon(u32 adler, const u8 *p, size_t len)
+ #  ifdef __clang__
+ #    define ATTRIBUTES	_target_attribute("dotprod")
+    /*
+-    * With gcc, arch=armv8.2-a is needed for dotprod intrinsics, unless the
+-    * default target is armv8.3-a or later in which case it must be omitted.
+-    * armv8.3-a or later can be detected by checking for __ARM_FEATURE_JCVT.
++    * With gcc 13.1 and earlier (before gcc commit 73d3bc348190 or 9aac37ab8a7b,
++    * "aarch64: Remove architecture dependencies from intrinsics"),
++    * arch=armv8.2-a is needed for the dotprod intrinsics, unless the default
++    * target is armv8.3-a or later in which case it must be omitted.  armv8.3-a
++    * or later can be detected by checking for __ARM_FEATURE_JCVT.
+     */
+-#  elif defined(__ARM_FEATURE_JCVT)
++#  elif GCC_PREREQ(13, 2) || defined(__ARM_FEATURE_JCVT)
+ #    define ATTRIBUTES	_target_attribute("+dotprod")
+ #  else
+ #    define ATTRIBUTES	_target_attribute("arch=armv8.2-a+dotprod")
+diff --git a/lib/arm/crc32_impl.h b/lib/arm/crc32_impl.h
+index 3c4bec7..5363041 100644
+--- a/lib/arm/crc32_impl.h
++++ b/lib/arm/crc32_impl.h
+@@ -551,11 +551,13 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
+ #  ifdef __clang__
+ #    define ATTRIBUTES	_target_attribute("aes,crc,sha3")
+    /*
+-    * With gcc, arch=armv8.2-a is needed for the sha3 intrinsics, unless the
+-    * default target is armv8.3-a or later in which case it must be omitted.
+-    * armv8.3-a or later can be detected by checking for __ARM_FEATURE_JCVT.
++    * With gcc 13.1 and earlier (before gcc commit 73d3bc348190 or 9aac37ab8a7b,
++    * "aarch64: Remove architecture dependencies from intrinsics"),
++    * arch=armv8.2-a is needed for the sha3 intrinsics, unless the default
++    * target is armv8.3-a or later in which case it must be omitted.  armv8.3-a
++    * or later can be detected by checking for __ARM_FEATURE_JCVT.
+     */
+-#  elif defined(__ARM_FEATURE_JCVT)
++#  elif GCC_PREREQ(13, 2) || defined(__ARM_FEATURE_JCVT)
+ #    define ATTRIBUTES	_target_attribute("+crypto,+crc,+sha3")
+ #  else
+ #    define ATTRIBUTES	_target_attribute("arch=armv8.2-a+crypto+crc+sha3")

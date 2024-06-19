@@ -36,10 +36,10 @@ do_install() {
     install -m 755 rarpd.init ${D}${sysconfdir}/init.d/rarpd
     install -m 755 rarpd ${D}${sbindir}/rarpd
     install -m 644 rarpd.8 ${D}${mandir}/man8/rarpd.8
-    install -m 644 ${WORKDIR}/ethers.sample ${D}${sysconfdir}/ethers
+    install -m 644 ${UNPACKDIR}/ethers.sample ${D}${sysconfdir}/ethers
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/rarpd.service ${D}${systemd_unitdir}/system/
+    install -m 0644 ${UNPACKDIR}/rarpd.service ${D}${systemd_unitdir}/system/
 }
 
 inherit systemd

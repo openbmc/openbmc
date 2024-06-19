@@ -40,7 +40,7 @@ EXTRA_OEMAKE = "tmpfilesdir_DATA="
 #}
 
 do_install:append() {
-    install -D -m 0644 ${WORKDIR}/corosync.conf ${D}${sysconfdir}/corosync/corosync.conf.example
+    install -D -m 0644 ${UNPACKDIR}/corosync.conf ${D}${sysconfdir}/corosync/corosync.conf.example
     install -d ${D}${sysconfdir}/sysconfig/
     install -m 0644 ${S}/init/corosync.sysconfig.example ${D}${sysconfdir}/sysconfig/corosync
     install -m 0644 ${S}/tools/corosync-notifyd.sysconfig.example ${D}${sysconfdir}/sysconfig/corosync-notifyd

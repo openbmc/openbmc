@@ -58,10 +58,10 @@ do_install() {
 
     unionmount_target_dir=${D}${prefix}/xfstests/unionmount-testsuite
     install -d $unionmount_target_dir/tests
-    install ${WORKDIR}/unionmount-testsuite/tests/* -t $unionmount_target_dir/tests
-    install ${WORKDIR}/unionmount-testsuite/*.py -t $unionmount_target_dir
-    install ${WORKDIR}/unionmount-testsuite/run -t $unionmount_target_dir
-    install ${WORKDIR}/unionmount-testsuite/README -t $unionmount_target_dir
+    install ${UNPACKDIR}/unionmount-testsuite/tests/* -t $unionmount_target_dir/tests
+    install ${UNPACKDIR}/unionmount-testsuite/*.py -t $unionmount_target_dir
+    install ${UNPACKDIR}/unionmount-testsuite/run -t $unionmount_target_dir
+    install ${UNPACKDIR}/unionmount-testsuite/README -t $unionmount_target_dir
 }
 
 FILES:${PN} += "${prefix}/xfstests"

@@ -708,7 +708,7 @@ class TestProjectPage(SeleniumFunctionalTestCase):
                 - Check layer summary
                 - Check layer description
         """
-        url = reverse("layerdetails", args=(TestProjectPage.project_id, 8))
+        url = reverse("layerdetails", args=(TestProjectPage.project_id, 7))
         self.get(url)
         self.wait_until_visible('.page-header')
         # check title is displayed

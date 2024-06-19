@@ -142,9 +142,6 @@ clamav_av_func_working_snprintf_long=${clamav_av_func_working_snprintf_long=yes}
 clamav_av_have_in_port_t=${clamav_av_have_in_port_t=yes}
 clamav_av_have_in_addr_t=${clamav_av_have_in_addr_t=yes}
 
-#dbus
-ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=yes}
-
 # lftp
 ac_cv_file___dev_ptc_=yes
 

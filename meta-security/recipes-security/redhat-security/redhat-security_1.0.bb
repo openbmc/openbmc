@@ -18,23 +18,24 @@ SRC_URI = "file://find-chroot-py.sh \
            file://selinux-check-devices.sh \
            file://selinux-ls-unconfined.sh"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
 	install -d ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-chroot-py.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-chroot.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-elf4tmp.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-execstack.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-hidden-exec.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-nodrop-groups.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-sh4errors.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/find-sh4tmp.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/lib-bin-check.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/rpm-chksec.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/rpm-drop-groups.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/selinux-check-devices.sh    ${D}${bindir}
-	install -m 0755 ${WORKDIR}/selinux-ls-unconfined.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-chroot-py.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-chroot.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-elf4tmp.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-execstack.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-hidden-exec.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-nodrop-groups.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-sh4errors.sh    ${D}${bindir}
+	install -m 0755 ${S}/find-sh4tmp.sh    ${D}${bindir}
+	install -m 0755 ${S}/lib-bin-check.sh    ${D}${bindir}
+	install -m 0755 ${S}/rpm-chksec.sh    ${D}${bindir}
+	install -m 0755 ${S}/rpm-drop-groups.sh    ${D}${bindir}
+	install -m 0755 ${S}/selinux-check-devices.sh    ${D}${bindir}
+	install -m 0755 ${S}/selinux-ls-unconfined.sh    ${D}${bindir}
 }
 
 RDEPENDS:${PN} = "file libcap-ng procps findutils"

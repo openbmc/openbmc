@@ -42,14 +42,14 @@ do_configure:prepend() {
 }
 
 do_install() {
-    sed -e 's#/usr/sbin/#${sbindir}/#g' -i ${WORKDIR}/init
+    sed -e 's#/usr/sbin/#${sbindir}/#g' -i ${UNPACKDIR}/init
     install -d ${D}${sbindir} ${D}${bindir} ${D}${sysconfdir}/init.d ${D}${systemd_system_unitdir}
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        sed -e 's#/usr/sbin/#${sbindir}/#g' ${WORKDIR}/netserver.service > ${D}${systemd_system_unitdir}/netserver.service
+        sed -e 's#/usr/sbin/#${sbindir}/#g' ${UNPACKDIR}/netserver.service > ${D}${systemd_system_unitdir}/netserver.service
     fi
     install -m 4755 src/netperf ${D}${bindir}
     install -m 4755 src/netserver ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/netperf
+    install -m 0755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/netperf
 
     # man
     install -d ${D}${mandir}/man1/

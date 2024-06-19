@@ -15,7 +15,7 @@ CONFIGUREOPTS = " --prefix=${prefix} \
                   --localstatedir=${localstatedir} \
                   --libdir=${libdir} \
                   --includedir=${includedir} \
-                  --oldincludedir=${oldincludedir} \
+                  --oldincludedir=${includedir} \
                   --infodir=${infodir} \
                   --mandir=${mandir} \
                   ${PACKAGECONFIG_CONFARGS} \

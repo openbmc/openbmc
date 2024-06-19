@@ -268,7 +268,7 @@ class NpmShrinkWrap(FetchMethod):
 
     def unpack(self, ud, rootdir, d):
         """Unpack the downloaded dependencies"""
-        destdir = d.getVar("S")
+        destdir = rootdir
         destsuffix = ud.parm.get("destsuffix")
         if destsuffix:
             destdir = os.path.join(rootdir, destsuffix)

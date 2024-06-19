@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/config.h.in
 +++ b/config.h.in
-@@ -301,6 +301,9 @@
+@@ -424,6 +424,9 @@
  /* Define to 1 if you have the <sys/sysnvl.h> header file. */
  #undef HAVE_SYS_SYSNVL_H
  
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4098,6 +4098,7 @@ AC_CHECK_HEADERS([       \
+@@ -4881,6 +4881,7 @@ AC_CHECK_HEADERS([       \
          sys/syscall.h    \
          sys/sysnvl.h     \
          sys/time.h       \
@@ -39,7 +39,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
 --- a/memcheck/tests/linux/timerfd-syscall.c
 +++ b/memcheck/tests/linux/timerfd-syscall.c
-@@ -45,6 +45,9 @@
+@@ -42,6 +42,9 @@
  #if defined(HAVE_SYS_TIME_H)
  #include <sys/time.h>
  #endif
@@ -49,7 +49,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #if defined(HAVE_SYS_TYPES_H)
  #include <sys/types.h>
  #endif
-@@ -54,7 +57,8 @@
+@@ -51,7 +54,8 @@
   * timerfd_* system call numbers introduced in 2.6.23. These constants are
   * not yet in the glibc 2.7 headers, that is why they are defined here.
   */
@@ -59,7 +59,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #if defined(__x86_64__)
  #define __NR_timerfd_create  283
  #elif defined(__i386__)
-@@ -67,8 +71,10 @@
+@@ -64,8 +68,10 @@
  #error Cannot detect your architecture!
  #endif
  #endif
@@ -71,7 +71,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #if defined(__x86_64__)
  #define __NR_timerfd_settime 286
  #define __NR_timerfd_gettime 287
-@@ -85,7 +91,7 @@
+@@ -82,7 +88,7 @@
  #error Cannot detect your architecture!
  #endif
  #endif
@@ -80,7 +80,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  
  /* Definitions from include/linux/timerfd.h */
-@@ -127,6 +133,7 @@ void set_timespec(struct timespec *tmr,
+@@ -124,6 +130,7 @@ void set_timespec(struct timespec *tmr,
    tmr->tv_nsec = (long) (1000ULL * (ustime % 1000000ULL));
  }
  
@@ -88,7 +88,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  int timerfd_create(int clockid, int flags)
  {
    return syscall(__NR_timerfd_create, clockid, flags);
-@@ -142,6 +149,7 @@ int timerfd_gettime(int ufc, struct itim
+@@ -139,6 +146,7 @@ int timerfd_gettime(int ufc, struct itim
  {
    return syscall(__NR_timerfd_gettime, ufc, otmr);
  }

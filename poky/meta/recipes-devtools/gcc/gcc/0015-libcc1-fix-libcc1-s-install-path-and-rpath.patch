@@ -1,4 +1,4 @@
-From 5de63874335c1c673dd132f6aca00dc13f1eac51 Mon Sep 17 00:00:00 2001
+From c2ea8aaa7b00c519c9c269c23ff840138ae491ac Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Sun, 5 Jul 2015 20:25:18 -0700
 Subject: [PATCH] libcc1: fix libcc1's install path and rpath
@@ -20,7 +20,7 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/libcc1/Makefile.am b/libcc1/Makefile.am
-index 921a33fe236..938e6f964cd 100644
+index b592bc8645f..97e2b615fb7 100644
 --- a/libcc1/Makefile.am
 +++ b/libcc1/Makefile.am
 @@ -40,8 +40,8 @@ libiberty = $(if $(wildcard $(libiberty_noasan)),$(Wc)$(libiberty_noasan), \

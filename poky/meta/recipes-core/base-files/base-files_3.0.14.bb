@@ -25,7 +25,8 @@ SRC_URI = "file://rotation \
            "
 SRC_URI:append:libc-glibc = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd systemd-resolved', ' file://0001-add-nss-resolve-to-nsswitch.patch', '', d)}"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -113,23 +114,23 @@ do_install () {
 	ln -snf ../run ${D}${localstatedir}/run
 	ln -snf ../run/lock ${D}${localstatedir}/lock
 
-	install -m 0644 ${WORKDIR}/hosts ${D}${sysconfdir}/hosts
+	install -m 0644 ${S}/hosts ${D}${sysconfdir}/hosts
 	${BASEFILESISSUEINSTALL}
 
-	rotation=`cat ${WORKDIR}/rotation`
+	rotation=`cat ${S}/rotation`
 	if [ "$rotation" != "0" ]; then
- 		install -m 0644 ${WORKDIR}/rotation ${D}${sysconfdir}/rotation
+ 		install -m 0644 ${S}/rotation ${D}${sysconfdir}/rotation
 	fi
 
-	install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
-	install -m 0644 ${WORKDIR}/profile ${D}${sysconfdir}/profile
+	install -m 0644 ${S}/fstab ${D}${sysconfdir}/fstab
+	install -m 0644 ${S}/profile ${D}${sysconfdir}/profile
 	sed -i 's#ROOTHOME#${ROOT_HOME}#' ${D}${sysconfdir}/profile
         sed -i 's#@BINDIR@#${bindir}#g' ${D}${sysconfdir}/profile
-	install -m 0644 ${WORKDIR}/shells ${D}${sysconfdir}/shells
-	install -m 0755 ${WORKDIR}/share/dot.profile ${D}${sysconfdir}/skel/.profile
-	install -m 0755 ${WORKDIR}/share/dot.bashrc ${D}${sysconfdir}/skel/.bashrc
-	install -m 0644 ${WORKDIR}/host.conf ${D}${sysconfdir}/host.conf
-	install -m 0644 ${WORKDIR}/motd ${D}${sysconfdir}/motd
+	install -m 0644 ${S}/shells ${D}${sysconfdir}/shells
+	install -m 0755 ${S}/share/dot.profile ${D}${sysconfdir}/skel/.profile
+	install -m 0755 ${S}/share/dot.bashrc ${D}${sysconfdir}/skel/.bashrc
+	install -m 0644 ${S}/host.conf ${D}${sysconfdir}/host.conf
+	install -m 0644 ${S}/motd ${D}${sysconfdir}/motd
 
 	ln -sf /proc/mounts ${D}${sysconfdir}/mtab
 
@@ -145,12 +146,12 @@ do_install () {
 }
 
 do_install:append:libc-glibc () {
-	install -m 0644 ${WORKDIR}/nsswitch.conf ${D}${sysconfdir}/nsswitch.conf
+	install -m 0644 ${S}/nsswitch.conf ${D}${sysconfdir}/nsswitch.conf
 }
 
 DISTRO_VERSION[vardepsexclude] += "DATE"
 do_install_basefilesissue () {
-	install -m 644 ${WORKDIR}/issue*  ${D}${sysconfdir}
+	install -m 644 ${S}/issue*  ${D}${sysconfdir}
         if [ -n "${DISTRO_NAME}" ]; then
 		printf "${DISTRO_NAME} " >> ${D}${sysconfdir}/issue
 		printf "${DISTRO_NAME} " >> ${D}${sysconfdir}/issue.net

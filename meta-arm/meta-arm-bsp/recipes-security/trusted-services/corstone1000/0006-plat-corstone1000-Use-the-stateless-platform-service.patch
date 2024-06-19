@@ -1,9 +1,9 @@
-From a71e99045996c57a4f80509ae8b770aa4f73f6c0 Mon Sep 17 00:00:00 2001
+From c2edcd8bd3d8817765f280708eae894d6cd8d974 Mon Sep 17 00:00:00 2001
 From: Emekcan Aras <emekcan.aras@arm.com>
 Date: Sun, 18 Jun 2023 14:38:42 +0100
-Subject: [PATCH] plat: corstone1000: Use the stateless platform service calls
- Calls to psa_connect is not needed and psa_call can be called directly with a
- pre defined handle.
+Subject: [PATCH 6/8] plat: corstone1000: Use the stateless platform service
+ calls Calls to psa_connect is not needed and psa_call can be called directly
+ with a pre defined handle.
 
 Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
 Signed-off-by: Mohamed Omar Asaker <mohamed.omarasaker@arm.com>
@@ -18,18 +18,18 @@ Upstream-Status: Inappropriate [Design is to revisted]
  4 files changed, 17 insertions(+), 27 deletions(-)
 
 diff --git a/components/service/capsule_update/provider/capsule_update_provider.c b/components/service/capsule_update/provider/capsule_update_provider.c
-index 991a2235..6809249f 100644
+index bfeb7301a..12c552dae 100644
 --- a/components/service/capsule_update/provider/capsule_update_provider.c
 +++ b/components/service/capsule_update/provider/capsule_update_provider.c
-@@ -61,7 +61,6 @@ void capsule_update_provider_deinit(struct capsule_update_provider *context)
- static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller *caller)
+@@ -63,7 +63,6 @@ void capsule_update_provider_deinit(struct capsule_update_provider *context)
+ static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller_interface *caller)
  {
  	uint32_t ioctl_id;
 -	psa_handle_t handle;
  	rpc_status_t rpc_status = TS_RPC_CALL_ACCEPTED;
  
  	struct psa_invec in_vec[] = {
-@@ -79,31 +78,18 @@ static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller *caller)
+@@ -81,31 +80,18 @@ static rpc_status_t event_handler(uint32_t opcode, struct rpc_caller_interface *
  		case CAPSULE_UPDATE_REQUEST:
  		/* Openamp call with IOCTL for firmware update*/
  		ioctl_id = IOCTL_CORSTONE1000_FWU_FLASH_IMAGES;
@@ -67,20 +67,20 @@ index 991a2235..6809249f 100644
  		default:
  			EMSG("%s unsupported opcode", __func__);
 diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.c b/components/service/capsule_update/provider/corstone1000_fmp_service.c
-index 6a7a47a7..d811af9f 100644
+index 56ce38579..bebdf859f 100644
 --- a/components/service/capsule_update/provider/corstone1000_fmp_service.c
 +++ b/components/service/capsule_update/provider/corstone1000_fmp_service.c
 @@ -238,8 +238,7 @@ static psa_status_t unpack_image_info(void *buffer, uint32_t size)
      return PSA_SUCCESS;
  }
  
--static psa_status_t get_image_info(struct rpc_caller *caller,
+-static psa_status_t get_image_info(struct rpc_caller_interface *caller,
 -			   psa_handle_t platform_service_handle)
-+static psa_status_t get_image_info(struct rpc_caller *caller)
++static psa_status_t get_image_info(struct rpc_caller_interface *caller)
  {
      psa_status_t status;
      psa_handle_t handle;
-@@ -255,7 +254,7 @@ static psa_status_t get_image_info(struct rpc_caller *caller,
+@@ -255,7 +254,7 @@ static psa_status_t get_image_info(struct rpc_caller_interface *caller,
  
      memset(image_info_buffer, 0, IMAGE_INFO_BUFFER_SIZE);
  
@@ -89,13 +89,13 @@ index 6a7a47a7..d811af9f 100644
  	     in_vec, IOVEC_LEN(in_vec), out_vec, IOVEC_LEN(out_vec));
  
      status = unpack_image_info(image_info_buffer, IMAGE_INFO_BUFFER_SIZE);
-@@ -288,12 +287,11 @@ static psa_status_t set_image_info(struct rpc_caller *caller)
+@@ -288,12 +287,11 @@ static psa_status_t set_image_info(struct rpc_caller_interface *caller)
      return PSA_SUCCESS;
  }
  
--void set_fmp_image_info(struct rpc_caller *caller,
+-void set_fmp_image_info(struct rpc_caller_interface *caller,
 -			psa_handle_t platform_service_handle)
-+void set_fmp_image_info(struct rpc_caller *caller)
++void set_fmp_image_info(struct rpc_caller_interface *caller)
  {
      psa_status_t status;
  
@@ -105,21 +105,21 @@ index 6a7a47a7..d811af9f 100644
  	return;
      }
 diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.h b/components/service/capsule_update/provider/corstone1000_fmp_service.h
-index 95fba2a0..963223e8 100644
+index d0023dc07..486fa10b4 100644
 --- a/components/service/capsule_update/provider/corstone1000_fmp_service.h
 +++ b/components/service/capsule_update/provider/corstone1000_fmp_service.h
 @@ -16,8 +16,7 @@ extern "C" {
  
- void provision_fmp_variables_metadata(struct rpc_caller *caller);
+ void provision_fmp_variables_metadata(struct rpc_caller_interface *caller);
  
--void set_fmp_image_info(struct rpc_caller *caller,
+-void set_fmp_image_info(struct rpc_caller_interface *caller,
 -		psa_handle_t platform_service_handle);
-+void set_fmp_image_info(struct rpc_caller *caller);
++void set_fmp_image_info(struct rpc_caller_interface *caller);
  
  #ifdef __cplusplus
  } /* extern "C" */
 diff --git a/components/service/common/include/psa/sid.h b/components/service/common/include/psa/sid.h
-index 5aaa659d..fc3a4fb0 100644
+index 5aaa659d4..fc3a4fb06 100644
 --- a/components/service/common/include/psa/sid.h
 +++ b/components/service/common/include/psa/sid.h
 @@ -40,6 +40,13 @@ extern "C" {
@@ -137,5 +137,5 @@ index 5aaa659d..fc3a4fb0 100644
  #define TFM_SP_PLATFORM_SYSTEM_RESET_SID                           (0x00000040U)
  #define TFM_SP_PLATFORM_SYSTEM_RESET_VERSION                       (1U)
 -- 
-2.17.1
+2.25.1
 

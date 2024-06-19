@@ -125,6 +125,11 @@ The following permissions are supported by the server:
         default=os.environ.get("HASHSERVER_ADMIN_PASSWORD", None),
         help="Create default admin user with password ADMIN_PASSWORD ($HASHSERVER_ADMIN_PASSWORD)",
     )
+    parser.add_argument(
+        "--reuseport",
+        action="store_true",
+        help="Enable SO_REUSEPORT, allowing multiple servers to bind to the same port for load balancing",
+    )
 
     args = parser.parse_args()
 
@@ -132,7 +137,9 @@ The following permissions are supported by the server:
 
     level = getattr(logging, args.log.upper(), None)
     if not isinstance(level, int):
-        raise ValueError("Invalid log level: %s (Try ERROR/WARNING/INFO/DEBUG)" % args.log)
+        raise ValueError(
+            "Invalid log level: %s (Try ERROR/WARNING/INFO/DEBUG)" % args.log
+        )
 
     logger.setLevel(level)
     console = logging.StreamHandler()
@@ -155,6 +162,7 @@ The following permissions are supported by the server:
         anon_perms=anon_perms,
         admin_username=args.admin_user,
         admin_password=args.admin_password,
+        reuseport=args.reuseport,
     )
     server.serve_forever()
     return 0

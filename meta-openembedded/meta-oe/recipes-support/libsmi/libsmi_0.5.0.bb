@@ -18,15 +18,18 @@ DEPENDS += "bison-native flex-native wget-native gawk-native"
 
 inherit autotools-brokensep update-alternatives
 ALTERNATIVE_PRIORITY = "50"
-ALTERNATIVE:${PN}-yang = "ietf-interfaces "
+ALTERNATIVE:${PN}-yang = " ietf-interfaces ietf-netconf-acm ietf-netconf-with-defaults ietf-netconf"
 ALTERNATIVE_LINK_NAME[ietf-interfaces] = "${datadir}/yang/ietf-interfaces.yang"
+ALTERNATIVE_LINK_NAME[ietf-netconf-acm] = "${datadir}/yang/ietf-netconf-acm.yang"
+ALTERNATIVE_LINK_NAME[ietf-netconf-with-defaults] = "${datadir}/yang/ietf-netconf-with-defaults.yang"
+ALTERNATIVE_LINK_NAME[ietf-netconf] = "${datadir}/yang/ietf-netconf.yang"
 
 EXTRA_OECONF:class-native = "ac_cv_path_SH=/bin/sh"
 EXTRA_OECONF:class-target = "ac_cv_path_SH=/bin/sh ac_cv_path_WGET=${bindir}/wget ac_cv_path_AWK=${bindir}/awk"
 
 do_install:append () {
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/smi.conf ${D}${sysconfdir}/smi.conf
+    install -m 0644 ${UNPACKDIR}/smi.conf ${D}${sysconfdir}/smi.conf
 }
 
 PACKAGES += "${PN}-mibs ${PN}-pibs ${PN}-yang"

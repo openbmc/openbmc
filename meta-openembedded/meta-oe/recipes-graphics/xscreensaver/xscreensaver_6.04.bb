@@ -34,11 +34,11 @@ PACKAGECONFIG = "png ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd',
 PACKAGECONFIG[systemd] = "--with-systemd=yes,--with-systemd=no,systemd"
 PACKAGECONFIG[png] = "--with-png=yes,--with-png=no,libpng"
 
-CONFIGUREOPTS:remove = "--disable-silent-rules --disable-dependency-tracking ${@append_libtool_sysroot(d)}"
+CONFIGUREOPTS:remove = "--disable-silent-rules --disable-dependency-tracking"
 EXTRA_OECONF:remove = "--disable-static"
 
 do_install:append() {
-    install -D ${WORKDIR}/xscreensaver.service ${D}${systemd_unitdir}/system/xscreensaver.service
+    install -D ${UNPACKDIR}/xscreensaver.service ${D}${systemd_unitdir}/system/xscreensaver.service
     for f in xscreensaver-getimage-file xscreensaver-getimage-video webcollage xscreensaver-text vidwhacker
     do
         sed -i -e "s|${STAGING_BINDIR_NATIVE}/perl-native/perl|/usr/bin/perl|g" ${D}/${libexecdir}/${PN}/$f

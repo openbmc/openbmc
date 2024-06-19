@@ -22,8 +22,8 @@ do_install:append() {
     rm -rf ${D}/usr/share/gammu
     #install default configuration files
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/gammurc ${D}${sysconfdir}/gammurc
-    install -m 0644 ${WORKDIR}/gammu-smsdrc ${D}${sysconfdir}/gammu-smsdrc
+    install -m 0644 ${UNPACKDIR}/gammurc ${D}${sysconfdir}/gammurc
+    install -m 0644 ${UNPACKDIR}/gammu-smsdrc ${D}${sysconfdir}/gammu-smsdrc
 }
 
 EXTRA_OECONF = " \

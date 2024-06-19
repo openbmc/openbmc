@@ -76,7 +76,7 @@ do_install:append() {
         ${D}/${localstatedir}/lib/mpd/music
 
     install -d ${D}/${sysconfdir}
-    install -m 644 ${WORKDIR}/mpd.conf.in ${D}/${sysconfdir}/mpd.conf
+    install -m 644 ${UNPACKDIR}/mpd.conf.in ${D}/${sysconfdir}/mpd.conf
     sed -i \
         -e 's|%music_directory%|${localstatedir}/lib/mpd/music|' \
         -e 's|%playlist_directory%|${localstatedir}/lib/mpd/playlists|' \
@@ -100,3 +100,6 @@ USERADD_PARAM:${PN} = " \
     --home ${localstatedir}/lib/mpd \
     --groups audio \
     --user-group mpd"
+
+CVE_STATUS[CVE-2020-7465] = "cpe-incorrect: The recipe used in the meta-openembedded is a different mpd package compared to the one which has the CVE issue."
+CVE_STATUS[CVE-2020-7466] = "cpe-incorrect: The recipe used in the meta-openembedded is a different mpd package compared to the one which has the CVE issue."

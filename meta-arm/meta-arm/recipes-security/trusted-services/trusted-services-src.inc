@@ -2,19 +2,17 @@
 
 LICENSE = "Apache-2.0 & BSD-3-Clause & BSD-2-Clause & Zlib"
 
-SRC_URI = "git://git.trustedfirmware.org/TS/trusted-services.git;protocol=https;branch=integration;name=trusted-services;destsuffix=git/trusted-services \
+SRC_URI = "git://git.trustedfirmware.org/TS/trusted-services.git;protocol=https;branch=main;name=trusted-services;destsuffix=git/trusted-services \
 "
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append = "\
-	file://0001-Limit-nanopb-build-to-single-process.patch \
-	file://0001-LazyFetch-allow-setting-the-cmake-generator.patch \
-	file://nanopb-upgrade.patch \
+    file://0001-Allow-configuring-flash-image-files-compile-time.patch \
 "
 
-#Latest on 2023 April 28
-SRCREV_trusted-services = "08b3d39471f4914186bd23793dc920e83b0e3197"
+# Trusted Services; aka. 2024 April 19
+SRCREV_trusted-services = "602be607198ea784bc5ab1c0c9d3ac4e2c67f1d9"
 LIC_FILES_CHKSUM = "file://${S}/license.rst;md5=ea160bac7f690a069c608516b17997f4"
 
 S = "${WORKDIR}/git/trusted-services"
@@ -25,10 +23,10 @@ SRC_URI += "git://github.com/dgibson/dtc;name=dtc;protocol=https;branch=main;des
 SRCREV_dtc = "b6910bec11614980a21e46fbccc35934b671bd81"
 LIC_FILES_CHKSUM += "file://../dtc/README.license;md5=a1eb22e37f09df5b5511b8a278992d0e"
 
-# MbedTLS, tag "mbedtls-3.3.0"
+# MbedTLS, tag "v3.5.1"
 SRC_URI += "git://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;branch=master;destsuffix=git/mbedtls"
-SRCREV_mbedtls = "8c89224991adff88d53cd380f42a2baa36f91454"
-LIC_FILES_CHKSUM += "file://../mbedtls/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
+SRCREV_mbedtls = "15254759342494c7e969766d5424d78d7deb9bfa"
+LIC_FILES_CHKSUM += "file://../mbedtls/LICENSE;md5=379d5819937a6c2f1ef1630d341e026d"
 
 # Nanopb, tag "nanopb-0.4.7" plus some further fixes
 SRC_URI += "git://github.com/nanopb/nanopb.git;name=nanopb;protocol=https;branch=master;destsuffix=git/nanopb"
@@ -50,17 +48,7 @@ SRC_URI += "git://github.com/cpputest/cpputest.git;name=cpputest;protocol=https;
 SRCREV_cpputest = "e25097614e1c4856036366877a02346c4b36bb5b"
 LIC_FILES_CHKSUM += "file://../cpputest/COPYING;md5=ce5d5f1fe02bcd1343ced64a06fd4177"
 
-# Libmetal
-SRC_URI += "git://github.com/OpenAMP/libmetal.git;name=libmetal;protocol=https;branch=main;destsuffix=git/libmetal"
-SRCREV_libmetal = "f252f0e007fbfb8b3a52b1d5901250ddac96baad"
-LIC_FILES_CHKSUM += "file://../libmetal/LICENSE.md;md5=fe0b8a4beea8f0813b606d15a3df3d3c"
-
-# Openamp
-SRC_URI += "git://github.com/OpenAMP/open-amp.git;name=openamp;protocol=https;branch=main;destsuffix=git/openamp"
-SRCREV_openamp = "347397decaa43372fc4d00f965640ebde042966d"
-LIC_FILES_CHKSUM += "file://../openamp/LICENSE.md;md5=a8d8cf662ef6bf9936a1e1413585ecbf"
-
-SRCREV_FORMAT = "trusted-services_dtc_mbedtls_nanopb_qcbor_tcose_cpputest_libmetal_openamp"
+SRCREV_FORMAT = "trusted-services_dtc_mbedtls_nanopb_qcbor_tcose_cpputest"
 
 inherit apply_local_src_patches
 LOCAL_SRC_PATCHES_INPUT_DIR = "N/A"
@@ -74,6 +62,11 @@ do_apply_local_src_patches() {
     apply_local_src_patches ${S}/external/nanopb ${WORKDIR}/git/nanopb
 }
 
+do_config:append:() {
+    # Fine tune MbedTLS configuration for crypto only operation.
+    sh -c "cd ${WORKDIR}/git/mbedtls; python3 scripts/config.py crypto"
+}
+
 # Paths to dependencies required by some TS SPs/tools
 EXTRA_OECMAKE += "-DDTC_SOURCE_DIR=${WORKDIR}/git/dtc \
                   -DCPPUTEST_SOURCE_DIR=${WORKDIR}/git/cpputest \
@@ -81,6 +74,4 @@ EXTRA_OECMAKE += "-DDTC_SOURCE_DIR=${WORKDIR}/git/dtc \
                   -DT_COSE_SOURCE_DIR=${WORKDIR}/git/tcose \
                   -DQCBOR_SOURCE_DIR=${WORKDIR}/git/qcbor \
                   -DMBEDTLS_SOURCE_DIR=${WORKDIR}/git/mbedtls \
-                  -DOPENAMP_SOURCE_DIR=${WORKDIR}/git/openamp \
-                  -DLIBMETAL_SOURCE_DIR=${WORKDIR}/git/libmetal \
                  "

@@ -50,7 +50,7 @@ RPROVIDES:${PN} = "polarssl"
 PACKAGES =+ "${PN}-programs"
 FILES:${PN}-programs = "${bindir}/"
 
-ALTERNATIVE:${PN}-programs = "hello"
+ALTERNATIVE:${PN}-programs = "${@bb.utils.contains('PACKAGECONFIG', 'programs', 'hello', '', d)}"
 ALTERNATIVE_LINK_NAME[hello] = "${bindir}/hello"
 
 BBCLASSEXTEND = "native nativesdk"

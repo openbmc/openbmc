@@ -19,30 +19,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  none/tests/arm/Makefile.am | 18 +++++++++---------
  3 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/Makefile.all.am b/Makefile.all.am
-index 02059a3..c7c4700 100644
---- a/Makefile.all.am
-+++ b/Makefile.all.am
-@@ -197,11 +197,11 @@ AM_CCASFLAGS_PPC64LE_LINUX  = @FLAG_M64@ -g
- 
- AM_FLAG_M3264_ARM_LINUX   = @FLAG_M32@
- AM_CFLAGS_ARM_LINUX       = @FLAG_M32@ \
--			 	$(AM_CFLAGS_BASE) -marm -mcpu=cortex-a8
-+			 	$(AM_CFLAGS_BASE) -marm
- AM_CFLAGS_PSO_ARM_LINUX   = @FLAG_M32@ $(AM_CFLAGS_BASE) \
--				-marm -mcpu=cortex-a8 $(AM_CFLAGS_PSO_BASE)
-+				-marm $(AM_CFLAGS_PSO_BASE)
- AM_CCASFLAGS_ARM_LINUX    = @FLAG_M32@ \
--				-marm -mcpu=cortex-a8 -g
-+				-marm -g
- 
- AM_FLAG_M3264_ARM64_LINUX = @FLAG_M64@
- AM_CFLAGS_ARM64_LINUX     = @FLAG_M64@ $(AM_CFLAGS_BASE)
-diff --git a/helgrind/tests/Makefile.am b/helgrind/tests/Makefile.am
-index df82169..07eb66a 100644
 --- a/helgrind/tests/Makefile.am
 +++ b/helgrind/tests/Makefile.am
-@@ -189,9 +189,9 @@ if ! VGCONF_PLATFORMS_INCLUDE_X86_DARWIN
+@@ -223,9 +223,9 @@ if ! VGCONF_PLATFORMS_INCLUDE_X86_DARWIN
  endif
  
  if VGCONF_PLATFORMS_INCLUDE_ARM_LINUX
@@ -55,11 +34,9 @@ index df82169..07eb66a 100644
  else
  annotate_hbefore_CFLAGS = $(AM_CFLAGS)
  tc07_hbl1_CFLAGS        = $(AM_CFLAGS)
-diff --git a/none/tests/arm/Makefile.am b/none/tests/arm/Makefile.am
-index 024eb6d..ccecb90 100644
 --- a/none/tests/arm/Makefile.am
 +++ b/none/tests/arm/Makefile.am
-@@ -52,10 +52,10 @@ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_NONNULL@
+@@ -56,10 +56,10 @@ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_N
  # need special helping w.r.t -mfpu and -mfloat-abi, though.
  # Also force -O0 since -O takes hundreds of MB of memory 
  # for v6intThumb.c.
@@ -71,11 +48,11 @@ index 024eb6d..ccecb90 100644
 -v6media_CFLAGS    = $(AM_CFLAGS) -g -O0 -mcpu=cortex-a8 -mthumb
 +v6media_CFLAGS    = $(AM_CFLAGS) -g -O0 -mthumb
  
- v8crypto_a_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -marm
- v8crypto_t_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -mthumb
-@@ -65,23 +65,23 @@ v8memory_a_CFLAGS = $(AM_CFLAGS) -g -O0 \
- v8memory_t_CFLAGS = $(AM_CFLAGS) -g -O0 \
- 			-march=armv8-a -mfpu=crypto-neon-fp-armv8 -mthumb
+ v8crypto_a_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -marm -march=armv8-a
+ v8crypto_t_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -mthumb -march=armv8-a
+@@ -74,23 +74,23 @@ v8memory_t_CFLAGS = $(AM_CFLAGS) -g -O0
+ 
+ vcvt_fixed_float_VFP_CFLAGS = $(AM_CFLAGS) -g -O0 -mcpu=cortex-a8 -mfpu=neon
  
 -vfp_CFLAGS        = $(AM_CFLAGS) -g -O0 -mcpu=cortex-a8 \
 +vfp_CFLAGS        = $(AM_CFLAGS) -g -O0 \
@@ -103,6 +80,3 @@ index 024eb6d..ccecb90 100644
 +vcvt_fixed_float_VFP_CFLAGS = $(AM_CFLAGS) -g -mfpu=vfpv3
  
  vfpv4_fma_CFLAGS  = $(AM_CFLAGS) -g -O0 -march=armv7ve -mcpu=cortex-a15 -mfpu=vfpv4 -marm
--- 
-2.12.2
-

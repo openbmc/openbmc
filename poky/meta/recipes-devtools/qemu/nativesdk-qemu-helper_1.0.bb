@@ -18,7 +18,8 @@ SRC_URI = "file://${COREBASE}/scripts/runqemu \
            file://${COREBASE}/scripts/runqemu-export-rootfs \
           "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit nativesdk
 
@@ -28,6 +29,6 @@ do_compile() {
 
 do_install() {
 	install -d ${D}${bindir}
-	install -m 0755 ${WORKDIR}${COREBASE}/scripts/oe-* ${D}${bindir}/
-	install -m 0755 ${WORKDIR}${COREBASE}/scripts/runqemu* ${D}${bindir}/
+	install -m 0755 ${S}${COREBASE}/scripts/oe-* ${D}${bindir}/
+	install -m 0755 ${S}${COREBASE}/scripts/runqemu* ${D}${bindir}/
 }

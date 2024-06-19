@@ -1,4 +1,4 @@
-From 1b1d1ce4227b6bea7c7def5dac4a663486e070c2 Mon Sep 17 00:00:00 2001
+From 506ff13a044439a170f770b6663a64c942ae0a05 Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 2 May 2021 01:58:01 +0100
 Subject: [PATCH] tests: add helper script to run the installed_tests
@@ -10,7 +10,6 @@ testing framework.
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
 
 Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
-
 ---
  tests/check/meson.build      | 17 +++++++++++++++++
  tests/check/template.sh.in   |  9 +++++++++
@@ -19,10 +18,10 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  create mode 100755 tests/check/template.sh.in
 
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index 50dff7f..2b9e979 100644
+index 330abaa..5d383b1 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
-@@ -184,6 +184,23 @@ foreach t : core_tests
+@@ -185,6 +185,23 @@ foreach t : core_tests
          install_dir: installed_tests_metadir,
          configuration: test_conf
        )

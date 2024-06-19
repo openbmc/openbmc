@@ -1,2 +1,0 @@
-COMPATIBLE_MACHINE:n1sdp = "n1sdp"
-OPTEEMACHINE:n1sdp = "n1sdp"

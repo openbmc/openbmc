@@ -46,9 +46,9 @@ do_install:append () {
 	install -d ${D}${sysconfdir}/init.d
 	sed -e 's,/etc/,${sysconfdir}/,g' \
 		-e 's,/sbin/,${sbindir}/,g' \
-		${WORKDIR}/init.d > ${D}${sysconfdir}/init.d/rpcbind
+		${UNPACKDIR}/init.d > ${D}${sysconfdir}/init.d/rpcbind
 	chmod 0755 ${D}${sysconfdir}/init.d/rpcbind
-	install -m 0644 ${WORKDIR}/rpcbind.conf ${D}${sysconfdir}/rpcbind.conf
+	install -m 0644 ${UNPACKDIR}/rpcbind.conf ${D}${sysconfdir}/rpcbind.conf
 }
 
 ALTERNATIVE:${PN} = "rpcinfo"

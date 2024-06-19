@@ -28,8 +28,8 @@ do_configure:prepend() {
 }
 
 do_install:append () {
-    if [ -e ${D}${libdir}/python*/site-packages/plist/_plist.so ]; then
-        chrpath -d ${D}${libdir}/python*/site-packages/plist/_plist.so
+    if [ -e ${D}${PYTHON_SITEPACKAGES_DIR}/plist/_plist.so ]; then
+        chrpath -d ${D}${PYTHON_SITEPACKAGES_DIR}/plist/_plist.so
     fi
 }
 
@@ -40,4 +40,4 @@ PACKAGES =+ "${PN}-utils \
 FILES:${PN} = "${libdir}/libplist-2.0${SOLIBS}"
 FILES:${PN}++ = "${libdir}/libplist++-2.0${SOLIBS}"
 FILES:${PN}-utils = "${bindir}/*"
-FILES:${PN}-python = "${libdir}/python*/site-packages/*"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*"

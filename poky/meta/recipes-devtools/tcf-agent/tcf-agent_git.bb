@@ -54,9 +54,9 @@ CFLAGS:append:loongarch64 = " ${LCL_STOP_SERVICES}"
 do_install() {
 	oe_runmake install INSTALLROOT=${D}
 	install -d ${D}${sysconfdir}/init.d/
-	install -m 0755 ${WORKDIR}/tcf-agent.init ${D}${sysconfdir}/init.d/tcf-agent
+	install -m 0755 ${UNPACKDIR}/tcf-agent.init ${D}${sysconfdir}/init.d/tcf-agent
 	install -d ${D}${systemd_system_unitdir}
-	install -m 0644 ${WORKDIR}/tcf-agent.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${UNPACKDIR}/tcf-agent.service ${D}${systemd_system_unitdir}
 	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_system_unitdir}/tcf-agent.service
 }
 

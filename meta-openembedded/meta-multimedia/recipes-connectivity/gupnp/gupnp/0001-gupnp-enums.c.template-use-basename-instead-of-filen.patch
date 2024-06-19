@@ -1,0 +1,32 @@
+From f875a0afe24fdebdefc46d132f6722dfcb55115a Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Wed, 24 Apr 2024 18:52:45 +0200
+Subject: [PATCH] gupnp-enums.c.template: use @basename@ instead of @filename@
+
+This would prevent the build path from leaking into the source code.
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gupnp/-/merge_requests/36]
+---
+ libgupnp/gupnp-enums.c.template | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libgupnp/gupnp-enums.c.template b/libgupnp/gupnp-enums.c.template
+index 3ce5fa4..a7ff89c 100644
+--- a/libgupnp/gupnp-enums.c.template
++++ b/libgupnp/gupnp-enums.c.template
+@@ -3,8 +3,8 @@
+ 
+ /*** END file-header ***/
+ /*** BEGIN file-production ***/
+-/* enumerations from "@filename@" */
+-#include "@filename@"
++/* enumerations from "@basename@" */
++#include "@basename@"
+ /*** END file-production ***/
+ /*** BEGIN value-header ***/
+ GType
+-- 
+2.44.0
+

@@ -132,7 +132,7 @@ do_install () {
 
     oe_runmake install NO_PYTHON_COMPILE=1
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/bootchartd_stop.sh ${D}${sysconfdir}/init.d
+    install -m 0755 ${UNPACKDIR}/bootchartd_stop.sh ${D}${sysconfdir}/init.d
 
     echo 'EXIT_PROC="$EXIT_PROC matchbox-window-manager"' >> ${D}${sysconfdir}/bootchartd.conf
 

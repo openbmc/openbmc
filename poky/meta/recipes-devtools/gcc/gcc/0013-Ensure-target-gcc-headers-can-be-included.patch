@@ -1,4 +1,4 @@
-From 531b9df680c4380797e8e7705a8e7f8ed17ebe68 Mon Sep 17 00:00:00 2001
+From 6ad8db533c7d53a85e6280da1ad88ed4077258fb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 10:25:11 +0000
 Subject: [PATCH] Ensure target gcc headers can be included
@@ -25,10 +25,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  4 files changed, 22 insertions(+)
 
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index 04f28984b34..8ef996c0f4d 100644
+index 956437df95b..6a009c696e9 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
-@@ -640,6 +640,7 @@ libexecdir = @libexecdir@
+@@ -671,6 +671,7 @@ libexecdir = @libexecdir@
  
  # Directory in which the compiler finds libraries etc.
  libsubdir = $(libdir)/gcc/$(real_target_noncanonical)/$(version)$(accel_dir_suffix)
@@ -36,7 +36,7 @@ index 04f28984b34..8ef996c0f4d 100644
  # Directory in which the compiler finds executables
  libexecsubdir = $(libexecdir)/gcc/$(real_target_noncanonical)/$(version)$(accel_dir_suffix)
  # Directory in which all plugin resources are installed
-@@ -3059,6 +3060,7 @@ CFLAGS-intl.o += -DLOCALEDIR=\"$(localedir)\"
+@@ -3199,6 +3200,7 @@ CFLAGS-intl.o += -DLOCALEDIR=\"$(localedir)\"
  
  PREPROCESSOR_DEFINES = \
    -DGCC_INCLUDE_DIR=\"$(libsubdir)/include\" \
@@ -45,7 +45,7 @@ index 04f28984b34..8ef996c0f4d 100644
    -DGPLUSPLUS_INCLUDE_DIR=\"$(gcc_gxx_include_dir)\" \
    -DGPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT=$(gcc_gxx_include_dir_add_sysroot) \
 diff --git a/gcc/config/linux.h b/gcc/config/linux.h
-index 6491c6b84f5..57496ff1f2f 100644
+index e36f32bf59e..c6aada42eb7 100644
 --- a/gcc/config/linux.h
 +++ b/gcc/config/linux.h
 @@ -157,6 +157,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
@@ -71,7 +71,7 @@ index 6491c6b84f5..57496ff1f2f 100644
      { GCC_INCLUDE_DIR, "GCC", 0, 1, 0, 0 },		\
      { 0, 0, 0, 0, 0, 0 }				\
 diff --git a/gcc/config/rs6000/sysv4.h b/gcc/config/rs6000/sysv4.h
-index 26db003cb3a..3a443abcf6b 100644
+index 8fda952e69c..247acec9d8e 100644
 --- a/gcc/config/rs6000/sysv4.h
 +++ b/gcc/config/rs6000/sysv4.h
 @@ -986,6 +986,13 @@ ncrtn.o%s"
@@ -97,7 +97,7 @@ index 26db003cb3a..3a443abcf6b 100644
      { GCC_INCLUDE_DIR, "GCC", 0, 1, 0, 0 },		\
      { 0, 0, 0, 0, 0, 0 }				\
 diff --git a/gcc/cppdefault.cc b/gcc/cppdefault.cc
-index 141bb4d25f6..734590a7059 100644
+index f82b4badad7..98bd66f95c6 100644
 --- a/gcc/cppdefault.cc
 +++ b/gcc/cppdefault.cc
 @@ -64,6 +64,10 @@ const struct default_include cpp_include_defaults[]

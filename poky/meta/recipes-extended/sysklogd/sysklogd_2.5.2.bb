@@ -24,7 +24,7 @@ do_install:append () {
        install -d ${D}${sysconfdir}
        install -m 644 ${S}/syslog.conf ${D}${sysconfdir}/syslog.conf
        install -d ${D}${sysconfdir}/init.d
-       install -m 755 ${WORKDIR}/sysklogd ${D}${sysconfdir}/init.d/syslog
+       install -m 755 ${UNPACKDIR}/sysklogd ${D}${sysconfdir}/init.d/syslog
 }
 
 SYSTEMD_PACKAGES = "${PN}"

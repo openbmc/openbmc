@@ -1,0 +1,28 @@
+From b2ef7318686d13cfa2ac76d6f2d69c17135328df Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Thu, 11 Apr 2024 13:35:54 +0000
+Subject: [PATCH] corstone1000: Enable UEFI Secure boot
+
+Enable secure boot and related configurations for corstone1000
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ configs/corstone1000_defconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index 8770b474e2..0ecba096d5 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -80,3 +80,7 @@ CONFIG_EFI_SET_TIME=y
+ CONFIG_EFI_GET_TIME=y
+ CONFIG_VIRTIO_NET=y
+ CONFIG_VIRTIO_MMIO=y
++CONFIG_EFI_SECURE_BOOT=y
++CONFIG_FIT_SIGNATURE=y
++CONFIG_EFI_LOADER=y
++CONFIG_CMD_NVEDIT_EFI=y
+-- 
+2.34.1
+

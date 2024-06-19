@@ -55,22 +55,22 @@ SYSTEMD_SERVICE:${PN} = "atd.service"
 do_patch[postfuncs] += "copy_posix_files"
 
 copy_posix_files() {
-    cp -f ${WORKDIR}/posixtm.[ch] ${S}
+    cp -f ${UNPACKDIR}/posixtm.[ch] ${S}
 }
 
 do_install () {
 	oe_runmake -e "IROOT=${D}" install
 
 	install -d ${D}${sysconfdir}/init.d
-	install -m 0755    ${WORKDIR}/atd.init		${D}${sysconfdir}/init.d/atd
+	install -m 0755    ${UNPACKDIR}/atd.init		${D}${sysconfdir}/init.d/atd
 
 	# install systemd unit files
 	install -d ${D}${systemd_system_unitdir}
-	install -m 0644 ${WORKDIR}/atd.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${UNPACKDIR}/atd.service ${D}${systemd_system_unitdir}
 	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_system_unitdir}/atd.service
 
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
-		install -D -m 0644 ${WORKDIR}/${BP}/pam.conf ${D}${sysconfdir}/pam.d/atd
+		install -D -m 0644 ${S}/pam.conf ${D}${sysconfdir}/pam.d/atd
 	fi
         rm -f ${D}${datadir}/at/batch-job
 }

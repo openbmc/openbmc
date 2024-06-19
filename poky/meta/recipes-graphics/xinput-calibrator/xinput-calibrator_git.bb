@@ -27,7 +27,7 @@ do_install:append() {
     install -m 0755 ${S}/scripts/xinput_calibrator_pointercal.sh ${D}${bindir}/xinput_calibrator_once.sh
 
     install -d ${D}${sysconfdir}/X11/Xsession.d/
-    install -m 0755 ${WORKDIR}/30xinput_calibrate.sh ${D}${sysconfdir}/X11/Xsession.d/
+    install -m 0755 ${UNPACKDIR}/30xinput_calibrate.sh ${D}${sysconfdir}/X11/Xsession.d/
 
     install -d ${D}${sysconfdir}/xdg/autostart
     sed -e 's,^Exec=.*,Exec=${bindir}/xinput_calibrator_once.sh,' ${S}/scripts/xinput_calibrator.desktop > ${D}${sysconfdir}/xdg/autostart/xinput_calibrator.desktop

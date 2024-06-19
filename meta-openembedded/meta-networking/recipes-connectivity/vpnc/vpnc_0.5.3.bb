@@ -38,14 +38,14 @@ inherit perlnative pkgconfig
 do_configure:append () {
     # Make sure we use our nativeperl wrapper
     sed -i "1s:#!.*:#!/usr/bin/env nativeperl:" ${S}/*.pl
-    cp ${WORKDIR}/long-help ${S}
+    cp ${UNPACKDIR}/long-help ${S}
 }
 
 do_install () {
     sed -i s:m600:m\ 600:g Makefile
     oe_runmake 'DESTDIR=${D}' 'PREFIX=/usr' install
     rm -f ${D}${sysconfdir}/vpnc/vpnc.conf #This file is useless
-    install ${WORKDIR}/default.conf ${D}${sysconfdir}/vpnc/default.conf
+    install ${UNPACKDIR}/default.conf ${D}${sysconfdir}/vpnc/default.conf
 }
 
 SYSROOT_PREPROCESS_FUNCS += "vpnc_sysroot_preprocess"

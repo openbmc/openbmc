@@ -15,7 +15,9 @@ DEPENDS += "\
 "
 
 RDEPENDS:${PN} += " \
+    python3-jinja2 \
     python3-pytest \
+    python3-pytest-metadata \
 "
 
 BBCLASSEXTEND = "native nativesdk"

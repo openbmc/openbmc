@@ -1,0 +1,47 @@
+From 7721d33dfc87b40db72cefa399c46b25b1255247 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Wed, 3 Apr 2024 14:02:42 +0100
+Subject: [PATCH] Corstone1000: Change MMCOMM buffer location
+
+MM Communicate buffer is accessed by normal world but at the moment
+it's allocated in the secure ram. This moves mm communicate buffer
+to the DDR and also fixes the capsule buffer size since it cannot be
+more than the bank size.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ configs/corstone1000_defconfig | 2 +-
+ include/configs/corstone1000.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index 8770b474e2..ae164be030 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -62,7 +62,7 @@ CONFIG_NVMXIP_QSPI=y
+ CONFIG_EFI_MM_COMM_TEE=y
+ CONFIG_FFA_SHARED_MM_BUF_SIZE=4096
+ CONFIG_FFA_SHARED_MM_BUF_OFFSET=0
+-CONFIG_FFA_SHARED_MM_BUF_ADDR=0x02000000
++CONFIG_FFA_SHARED_MM_BUF_ADDR=0x81FFF000
+ CONFIG_EFI_RUNTIME_UPDATE_CAPSULE=y
+ CONFIG_EFI_CAPSULE_FIRMWARE_FIT=y
+ CONFIG_FWU_NUM_IMAGES_PER_BANK=4
+diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
+index 8622565a87..fe5b064c85 100644
+--- a/include/configs/corstone1000.h
++++ b/include/configs/corstone1000.h
+@@ -31,7 +31,7 @@
+ #define PREP_SEPROXY_EVT(x)	(FIELD_PREP(PREP_SEPROXY_EVT_MASK, (x)))
+ 
+ /* Size in 4KB pages of the EFI capsule buffer */
+-#define CORSTONE1000_CAPSULE_BUFFER_SIZE	(8192) /* 32 MB */
++#define CORSTONE1000_CAPSULE_BUFFER_SIZE	(4096) /* 16 MB */
+ 
+ /* Capsule GUID */
+ #define EFI_CORSTONE1000_CAPSULE_ID_GUID \
+-- 
+2.25.1
+
+

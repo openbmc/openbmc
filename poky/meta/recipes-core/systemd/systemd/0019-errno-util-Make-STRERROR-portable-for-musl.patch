@@ -1,7 +1,7 @@
-From 46d80840bfe37e67d4f18c37a77751ea1fe63a07 Mon Sep 17 00:00:00 2001
+From 32371040c2aa649e23c3b0f2c5ee27995a16526a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 23 Jan 2023 23:39:46 -0800
-Subject: [PATCH 19/22] errno-util: Make STRERROR portable for musl
+Subject: [PATCH] errno-util: Make STRERROR portable for musl
 
 Sadly, systemd has decided to use yet another GNU extention in a macro
 lets make this such that we can use XSI compliant strerror_r() for
@@ -37,6 +37,3 @@ index 27804e6382..274c1c6ef1 100644
  /* A helper to print an error message or message for functions that return 0 on EOF.
   * Note that we can't use ({ … }) to define a temporary variable, so errnum is
   * evaluated twice. */
--- 
-2.34.1
-

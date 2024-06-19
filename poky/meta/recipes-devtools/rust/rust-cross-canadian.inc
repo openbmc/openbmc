@@ -12,7 +12,8 @@ DEPENDS += "virtual/${SDK_PREFIX}gcc virtual/nativesdk-libc virtual/nativesdk-${
 
 SRC_URI += "file://target-rust-ccld.c"
 LIC_FILES_CHKSUM = "file://target-rust-ccld.c;md5=af4e0e29f81a34cffe05aa07c89e93e9;endline=7"
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 # Need to use our SDK's sh here, see #14878
 create_sdk_wrapper () {
@@ -46,7 +47,7 @@ do_install () {
     # where the context is easier to do the env maniupations needed
     install -d ${SYS_BINDIR}
     outfile="${SYS_BINDIR}/target-rust-ccld"
-    ${CC} ${WORKDIR}/target-rust-ccld.c -o $outfile
+    ${CC} ${S}/target-rust-ccld.c -o $outfile
     chmod +x "$outfile"
     create_sdk_wrapper "${SYS_BINDIR}/target-rust-ccld-wrapper" "CC"
 

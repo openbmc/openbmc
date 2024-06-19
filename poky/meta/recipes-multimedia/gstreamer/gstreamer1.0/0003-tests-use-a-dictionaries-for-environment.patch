@@ -1,4 +1,4 @@
-From 7041bc5adf9501beb1428d8bbae6b351a6bf07f9 Mon Sep 17 00:00:00 2001
+From 453865e8938c5f50f14409b67246bbbd801fa44d Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sat, 24 Apr 2021 10:34:47 +0100
 Subject: [PATCH] tests: use a dictionaries for environment
@@ -9,16 +9,15 @@ use a dictionary as this is simplest solution to install the environment.
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
 
 Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
-
 ---
  tests/check/meson.build | 21 +++++++++++++--------
  1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index f2d400f..50dff7f 100644
+index 08f8fd8..330abaa 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
-@@ -160,14 +160,19 @@ foreach t : core_tests
+@@ -161,14 +161,19 @@ foreach t : core_tests
        install: installed_tests_enabled,
      )
  

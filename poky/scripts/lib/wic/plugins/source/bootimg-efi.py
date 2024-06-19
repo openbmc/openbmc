@@ -428,10 +428,10 @@ class BootimgEFIPlugin(SourcePlugin):
             elif source_params['loader'] == 'uefi-kernel':
                 kernel = get_bitbake_var("KERNEL_IMAGETYPE")
                 if not kernel:
-                    raise WicError("Empty KERNEL_IMAGETYPE %s\n" % target)
+                    raise WicError("Empty KERNEL_IMAGETYPE")
                 target = get_bitbake_var("TARGET_SYS")
                 if not target:
-                    raise WicError("Unknown arch (TARGET_SYS) %s\n" % target)
+                    raise WicError("Empty TARGET_SYS")
 
                 if re.match("x86_64", target):
                     kernel_efi_image = "bootx64.efi"

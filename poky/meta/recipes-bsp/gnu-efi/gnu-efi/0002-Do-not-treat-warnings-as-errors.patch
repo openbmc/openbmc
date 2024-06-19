@@ -1,0 +1,32 @@
+From 89218bb3c5eb7b97987769cb4f7bf8323d35ca7e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 16 May 2024 21:38:32 +0800
+Subject: [PATCH] Do not treat warnings as errors
+
+There are additional warnings found with musl which are
+treated as errors and fails the build, we have more combinations
+then upstream supports to handle
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Make.defaults | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Make.defaults b/Make.defaults
+index 0068e31..b643285 100755
+--- a/Make.defaults
++++ b/Make.defaults
+@@ -190,7 +190,7 @@ CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Werror \
+            -funsigned-char -fshort-wchar -fno-strict-aliasing \
+            -ffreestanding -fno-stack-protector
+ else
+-CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Wno-pointer-sign -Werror \
++CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Wno-pointer-sign \
+            -funsigned-char -fshort-wchar -fno-strict-aliasing \
+ 	   -ffreestanding -fno-stack-protector -fno-stack-check \
+            $(if $(findstring gcc,$(CC)),-fno-merge-all-constants,)
+-- 
+2.25.1
+

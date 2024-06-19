@@ -52,7 +52,7 @@ RDEPENDS:${PN}-testsuite += "${PN} bash perl"
 RDEPENDS:python3-${PN} += "${PN} python3"
 
 do_configure:prepend () {
-    cp ${WORKDIR}/config.linux ${B}
+    cp ${UNPACKDIR}/config.linux ${B}
     rm -rf ${S}/include/pcp/configsz.h
     rm -rf ${S}/include/pcp/platformsz.h
     export SED=${TMPDIR}/hosttools/sed

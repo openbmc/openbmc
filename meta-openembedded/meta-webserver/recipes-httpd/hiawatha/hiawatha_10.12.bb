@@ -37,9 +37,9 @@ EXTRA_OECMAKE = " -DENABLE_IPV6=OFF \
 
 do_install:append() {
     # Copy over init script and sed in the correct sbin path
-    sed -i 's,sed_sbin_path,${sbindir},' ${WORKDIR}/hiawatha-init
+    sed -i 's,sed_sbin_path,${sbindir},' ${UNPACKDIR}/hiawatha-init
     mkdir -p ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/hiawatha-init ${D}${sysconfdir}/init.d/hiawatha
+    install -m 0755 ${UNPACKDIR}/hiawatha-init ${D}${sysconfdir}/init.d/hiawatha
 
     # configure php-fcgi to have a working configuration
     # by default if php is installed
@@ -47,7 +47,7 @@ do_install:append() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}/${systemd_unitdir}/system
-        install -m 644 ${WORKDIR}/hiawatha.service ${D}/${systemd_unitdir}/system
+        install -m 644 ${UNPACKDIR}/hiawatha.service ${D}/${systemd_unitdir}/system
     fi
 
     # /var/log/hiawatha and /var/lib/hiawatha needs to be created in runtime.

@@ -65,14 +65,14 @@ do_install() {
     oe_runmake DESTDIR=${D} install
 
     install -D -m 0755 ${S}/debian/init.d ${D}${sysconfdir}/init.d/ippoold
-    install -D -m 0644 ${WORKDIR}/ippool.service ${D}${systemd_system_unitdir}/ippool.service
+    install -D -m 0644 ${UNPACKDIR}/ippool.service ${D}${systemd_system_unitdir}/ippool.service
     sed -i -e 's:@SBINDIR@:${sbindir}:g' ${D}${systemd_system_unitdir}/ippool.service
 
     # install self test
     install -d ${D}/opt/${BPN}
     install ${S}/test/all.tcl  ${S}/test/ippool.test \
         ${S}/test/test_procs.tcl ${D}/opt/${BPN}
-    install ${WORKDIR}/runtest.sh ${D}/opt/${BPN}
+    install ${UNPACKDIR}/runtest.sh ${D}/opt/${BPN}
     # fix the ../ippoolconfig in test_procs.tcl
     sed -i -e "s:../ippoolconfig:ippoolconfig:" \
         ${D}/opt/${BPN}/test_procs.tcl

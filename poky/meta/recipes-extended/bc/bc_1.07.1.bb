@@ -27,7 +27,7 @@ PACKAGECONFIG[readline] = "--with-readline,--without-readline,readline"
 PACKAGECONFIG[libedit] = "--with-libedit,--without-libedit,libedit"
 
 do_compile:prepend() {
-    cp -f ${WORKDIR}/libmath.h ${B}/bc/libmath.h
+    cp -f ${UNPACKDIR}/libmath.h ${B}/bc/libmath.h
 }
 
 do_install_ptest() {

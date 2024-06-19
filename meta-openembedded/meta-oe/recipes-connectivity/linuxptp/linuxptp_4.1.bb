@@ -46,10 +46,10 @@ do_install() {
     install -d ${D}/${systemd_unitdir}/system/
     for service in ${LINUXPTP_SYSTEMD_SERVICES}; do
         sed -i -e 's,@SBINDIR@,${sbindir},g' \
-            ${WORKDIR}/systemd/$service.in
+            ${UNPACKDIR}/systemd/$service.in
         sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' \
-            ${WORKDIR}/systemd/$service.in
-        install -m 644 ${WORKDIR}/systemd/$service.in \
+            ${UNPACKDIR}/systemd/$service.in
+        install -m 644 ${UNPACKDIR}/systemd/$service.in \
             ${D}/${systemd_unitdir}/system/$service
     done
 }

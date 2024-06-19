@@ -9,9 +9,12 @@ SRC_URI[sha256sum] = "40d1cf5bc8e1b0e55dac7bb2e3fbc2aea05b6679444864781299b24db0
 
 inherit allarch
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 do_install() {
     install -d ${D}${datadir}/movies
-    install -m 0644 ${WORKDIR}/big_buck_bunny_480p_surround-fix.avi ${D}${datadir}/movies/
+    install -m 0644 ${UNPACKDIR}/big_buck_bunny_480p_surround-fix.avi ${D}${datadir}/movies/
 }
 
 FILES:${PN} += "${datadir}/movies"

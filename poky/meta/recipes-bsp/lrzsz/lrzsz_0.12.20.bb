@@ -46,3 +46,9 @@ ALTERNATIVE_TARGET[rb] = "${bindir}/lrz"
 ALTERNATIVE_TARGET[sz] = "${bindir}/lsz"
 ALTERNATIVE_TARGET[sx] = "${bindir}/lsz"
 ALTERNATIVE_TARGET[sb] = "${bindir}/lsz"
+
+# http://errors.yoctoproject.org/Errors/Details/766929/
+# lrzsz-0.12.20/src/tcp.c:75:56: error: passing argument 3 of 'getsockname' from incompatible pointer type [-Wincompatible-pointer-types]
+# lrzsz-0.12.20/src/tcp.c:83:52: error: passing argument 3 of 'getsockname' from incompatible pointer type [-Wincompatible-pointer-types]
+# lrzsz-0.12.20/src/tcp.c:103:51: error: passing argument 3 of 'accept' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

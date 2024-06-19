@@ -2,12 +2,15 @@ To work with autoconf 2.73, tweak the macro ordering in configure.in.
 
 Upstream-Status: Pending
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ configure.ac | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-Index: libarchive-3.6.2/configure.ac
-===================================================================
---- libarchive-3.6.2.orig/configure.ac
-+++ libarchive-3.6.2/configure.ac
-@@ -357,6 +357,19 @@ if test "x$with_bz2lib" != "xno"; then
+diff --git a/configure.ac b/configure.ac
+index 503bb75..e3101da 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -414,6 +414,19 @@ if test "x$with_bz2lib" != "xno"; then
    esac
  fi
  
@@ -27,9 +30,9 @@ Index: libarchive-3.6.2/configure.ac
  AC_ARG_WITH([libb2],
    AS_HELP_STRING([--without-libb2], [Don't build support for BLAKE2 through libb2]))
  
-@@ -558,19 +571,6 @@ LDFLAGS=$save_LDFLAGS
+@@ -678,19 +691,6 @@ fi
  
- AC_SUBST(GC_SECTIONS)
+ AC_SUBST(DEAD_CODE_REMOVAL)
  
 -# Checks for typedefs, structures, and compiler characteristics.
 -AC_C_CONST
@@ -47,3 +50,6 @@ Index: libarchive-3.6.2/configure.ac
  # Check for tm_gmtoff in struct tm
  AC_CHECK_MEMBERS([struct tm.tm_gmtoff, struct tm.__tm_gmtoff],,,
  [
+-- 
+2.34.1
+

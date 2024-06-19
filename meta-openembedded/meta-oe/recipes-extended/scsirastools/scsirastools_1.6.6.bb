@@ -24,7 +24,7 @@ EXTRA_OEMAKE += "CC='${CC}' CFLAGS='${CFLAGS} -D_LARGEFILE64_SOURCE=1' sbindir=$
 
 do_configure:append() {
 	oe_runmake -C mdadm.d mdadm-1.3.0
-	patch -p0 < ${WORKDIR}/mdadm.patch
+	patch -p0 < ${UNPACKDIR}/mdadm.patch
 }
 INITSCRIPT_PACKAGES = "${PN}-diskmon ${PN}-raidmon"
 INITSCRIPT_NAME:${PN}-diskmon = "sgdisk"

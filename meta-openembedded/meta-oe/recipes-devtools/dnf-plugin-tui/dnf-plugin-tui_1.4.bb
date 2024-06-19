@@ -24,7 +24,7 @@ do_install:append() {
 
 do_install:append:class-target() {
     install -d ${D}${sysconfdir}/yum.repos.d
-    install -m 0644 ${WORKDIR}/oe-remote.repo.sample ${D}${sysconfdir}/yum.repos.d
+    install -m 0644 ${UNPACKDIR}/oe-remote.repo.sample ${D}${sysconfdir}/yum.repos.d
 }
 
 do_install:append:class-nativesdk() {

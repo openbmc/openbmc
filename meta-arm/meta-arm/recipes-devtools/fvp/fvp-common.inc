@@ -29,10 +29,17 @@ def get_real_pv(d):
     pv = d.getVar("PV")
     return "%s.%s_%s" % tuple(pv.split("."))
 
+def get_fm_short_pv_url(d):
+    # FVP versions are like 11.12_43
+    pv = d.getVar("PV")
+    return "FM_%s_%s" % tuple(pv.split("."))[:2]
+
+
 # If PV is 1.2.3, VERSION=1.2, BUILD=3, PV_URL=1.2_3.
 VERSION = "${@oe.utils.trim_version(d.getVar('PV', -1))}"
 BUILD = "${@d.getVar('PV').split('.')[-1]}"
 PV_URL = "${@get_real_pv(d)}"
+PV_URL_SHORT="${@get_fm_short_pv_url(d)}"
 
 # The directory the FVP is installed into
 FVPDIR = "${libdir}/fvp/${BPN}"

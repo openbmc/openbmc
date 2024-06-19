@@ -28,6 +28,14 @@ B = "${WORKDIR}/build"
 ## disable stdlib
 TARGET_CC_ARCH:append = " -nostdlib"
 
+# Both the C library and the application should share the same mcmodel.
+# Use the medium-any code model for the RISC-V 64 bit implementation,
+# since medlow can only access addresses below 0x80000000 and RAM
+# starts at 0x80000000 on RISC-V 64
+# Keep RISC-V 32 using -mcmodel=medlow (symbols lie between -2GB:2GB)
+TARGET_CFLAGS:append:qemuriscv64 = " -mcmodel=medany"
+
+
 EXTRA_OECONF = " \
                 --build=${BUILD_SYS}  \
                 --target=${TARGET_SYS} \

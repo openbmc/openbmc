@@ -57,6 +57,10 @@ applied and that the issue needs to be investigated. ``Ignored`` means that afte
 analysis, it has been deemed to ignore the issue as it for example affects
 the software component on a different operating system platform.
 
+By default, no NVD API key is used to retrieve data from the CVE database, which
+results in larger delays between NVD API requests. See the :term:`NVDCVE_API_KEY`
+documentation on how to request and set a NVD API key.
+
 After a build with CVE check enabled, reports for each compiled source recipe will be
 found in ``build/tmp/deploy/cve``.
 

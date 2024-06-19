@@ -30,6 +30,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \
            file://0008-include-linux-limits.h-for-MAX_INPUT.patch \
            file://0009-Prevent-running-check-tests-on-host-if-cross-compili.patch \
            file://0010-oprofile-Determine-the-root-home-directory-dynamical.patch \
+           file://0011-replace-__FILE__-with-__FILE_NAME__.patch \
            file://0001-configure-Include-unistd.h-for-getpid-API.patch \
            file://0001-Replace-std-bind2nd-with-generic-lambda.patch \
 "
@@ -42,7 +43,7 @@ inherit autotools pkgconfig ptest
 
 EXTRA_OECONF = "--with-kernel=${STAGING_DIR_HOST}${prefix} --without-x ac_cv_prog_XSLTPROC="
 do_configure () {
-	cp ${WORKDIR}/acinclude.m4 ${S}/
+	cp ${UNPACKDIR}/acinclude.m4 ${S}/
 	autotools_do_configure
 }
 

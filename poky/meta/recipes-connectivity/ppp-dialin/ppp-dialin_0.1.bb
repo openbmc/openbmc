@@ -11,14 +11,15 @@ SRC_URI = "file://host-peer \
 
 inherit allarch useradd
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
 	install -d ${D}${sysconfdir}/ppp/peers
-	install -m 0644 ${WORKDIR}/host-peer ${D}${sysconfdir}/ppp/peers/host
+	install -m 0644 ${S}/host-peer ${D}${sysconfdir}/ppp/peers/host
 
 	install -d ${D}${sbindir}
-	install -m 0755 ${WORKDIR}/ppp-dialin ${D}${sbindir}
+	install -m 0755 ${S}/ppp-dialin ${D}${sbindir}
 }
 
 USERADD_PACKAGES = "${PN}"

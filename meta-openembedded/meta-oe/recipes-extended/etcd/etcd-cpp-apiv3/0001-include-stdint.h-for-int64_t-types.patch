@@ -1,0 +1,27 @@
+From 44f4254fe96c43437400f94a8a2800175ddf3279 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 May 2024 21:00:48 -0700
+Subject: [PATCH] include stdint.h for int64_t types
+
+This is exposed when compiling for musl platforms where this
+header is not included indirectly.
+
+Upstream-Status: Submitted [https://github.com/etcd-cpp-apiv3/etcd-cpp-apiv3/pull/270]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Value.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/Value.cpp b/src/Value.cpp
+index cbda697..d6f2c9c 100644
+--- a/src/Value.cpp
++++ b/src/Value.cpp
+@@ -1,4 +1,5 @@
+ #include <iomanip>
++#include <cstdint>
+ 
+ #include "etcd/Value.hpp"
+ #include "etcd/v3/KeyValue.hpp"
+-- 
+2.45.1
+

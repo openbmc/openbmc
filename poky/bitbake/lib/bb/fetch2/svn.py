@@ -210,3 +210,6 @@ class Svn(FetchMethod):
 
     def _build_revision(self, ud, d):
         return ud.revision
+
+    def supports_checksum(self, urldata):
+        return False

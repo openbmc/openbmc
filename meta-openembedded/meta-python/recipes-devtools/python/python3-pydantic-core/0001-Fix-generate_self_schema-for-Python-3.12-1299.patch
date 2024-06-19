@@ -1,0 +1,29 @@
+From 0dcca2ed6a83ebbc944ec8cbd2f67ffec8043461 Mon Sep 17 00:00:00 2001
+From: Jelle Zijlstra <jelle.zijlstra@gmail.com>
+Date: Wed, 22 May 2024 07:44:10 -0700
+Subject: [PATCH] Fix generate_self_schema for Python 3.12+ (#1299)
+
+Upstream-Status: Backport [https://github.com/pydantic/pydantic-core/commit/a7620419383a69bd2b28ab953c9a17f6ed35bb9a]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ generate_self_schema.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/generate_self_schema.py b/generate_self_schema.py
+index 8d27247..109fca0 100644
+--- a/generate_self_schema.py
++++ b/generate_self_schema.py
+@@ -189,7 +189,12 @@ def all_literal_values(type_: type[core_schema.Literal]) -> list[any]:
+ 
+ def eval_forward_ref(type_: Any) -> Any:
+     try:
+-        return type_._evaluate(core_schema.__dict__, None, set())
++        try:
++            # Python 3.12+
++            return type_._evaluate(core_schema.__dict__, None, type_params=set(), recursive_guard=set())
++        except TypeError:
++            # Python 3.9+
++            return type_._evaluate(core_schema.__dict__, None, set())
+     except TypeError:
+         # for Python 3.8
+         return type_._evaluate(core_schema.__dict__, None)

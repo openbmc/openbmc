@@ -1,4 +1,4 @@
-From 8b7fbbb405959f2868ad6eadd7dd00018758a8a5 Mon Sep 17 00:00:00 2001
+From 50d3b9d3ca0e1ff47c8e7559303855530e58839a Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 7 Sep 2016 14:52:04 +0300
 Subject: [PATCH] Do not error out if xsltproc is not found.
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index b0c88d7..2a61d6e 100644
+index 8725074..0491090 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -58,7 +58,7 @@ dnl Check for xsltproc
+@@ -37,7 +37,7 @@ dnl Check for xsltproc
  dnl
  AC_PATH_PROG([XSLTPROC], [xsltproc])
  if test -z "$XSLTPROC"; then
@@ -26,6 +26,3 @@ index b0c88d7..2a61d6e 100644
  fi
  
  dnl
--- 
-2.9.3
-

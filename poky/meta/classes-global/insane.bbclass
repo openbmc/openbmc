@@ -45,11 +45,10 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             already-stripped installed-vs-shipped ldflags compile-host-path \
             install-host-path pn-overrides unknown-configure-option \
             useless-rpaths rpaths staticdev empty-dirs \
-            patch-fuzz \
+            patch-fuzz patch-status \
             "
 # Add usrmerge QA check based on distro feature
 ERROR_QA:append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
-ERROR_QA:append:layer-core = " patch-status"
 WARN_QA:append:layer-core = " missing-metadata missing-maintainer"
 
 FAKEROOT_QA = "host-user-contaminated"
@@ -58,7 +57,7 @@ enabled tests are listed here, the do_package_qa task will run under fakeroot."
 
 ALL_QA = "${WARN_QA} ${ERROR_QA}"
 
-UNKNOWN_CONFIGURE_OPT_IGNORE ?= "--enable-nls --disable-nls --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot --disable-static"
+UNKNOWN_CONFIGURE_OPT_IGNORE ?= "--enable-nls --disable-nls --disable-silent-rules --disable-dependency-tracking --disable-static"
 
 # This is a list of directories that are expected to be empty.
 QA_EMPTY_DIRS ?= " \
@@ -298,7 +297,7 @@ def package_qa_check_libdir(d):
                         try:
                             elf.open()
                             messages.append("%s: found library in wrong location: %s" % (package, rel_path))
-                        except (oe.qa.NotELFFileError):
+                        except (oe.qa.NotELFFileError, FileNotFoundError):
                             pass
                 if exec_re.match(rel_path):
                     if libdir not in rel_path and libexecdir not in rel_path:
@@ -307,7 +306,7 @@ def package_qa_check_libdir(d):
                         try:
                             elf.open()
                             messages.append("%s: found library in wrong location: %s" % (package, rel_path))
-                        except (oe.qa.NotELFFileError):
+                        except (oe.qa.NotELFFileError, FileNotFoundError):
                             pass
 
     if messages:
@@ -334,20 +333,15 @@ def package_qa_check_arch(path,name,d, elf, messages):
     if not elf:
         return
 
-    target_os   = d.getVar('HOST_OS')
-    target_arch = d.getVar('HOST_ARCH')
+    host_os   = d.getVar('HOST_OS')
+    host_arch = d.getVar('HOST_ARCH')
     provides = d.getVar('PROVIDES')
     bpn = d.getVar('BPN')
 
-    if target_arch == "allarch":
+    if host_arch == "allarch":
         pn = d.getVar('PN')
         oe.qa.add_message(messages, "arch", pn + ": Recipe inherits the allarch class, but has packaged architecture-specific binaries")
         return
-
-    # FIXME: Cross package confuse this check, so just skip them
-    for s in ['cross', 'nativesdk', 'cross-canadian']:
-        if bb.data.inherits_class(s, d):
-            return
 
     # avoid following links to /usr/bin (e.g. on udev builds)
     # we will check the files pointed to anyway...
@@ -356,12 +350,12 @@ def package_qa_check_arch(path,name,d, elf, messages):
 
     #if this will throw an exception, then fix the dict above
     (machine, osabi, abiversion, littleendian, bits) \
-        = oe.elf.machine_dict(d)[target_os][target_arch]
+        = oe.elf.machine_dict(d)[host_os][host_arch]
 
     # Check the architecture and endiannes of the binary
     is_32 = (("virtual/kernel" in provides) or bb.data.inherits_class("module", d)) and \
-            (target_os == "linux-gnux32" or target_os == "linux-muslx32" or \
-            target_os == "linux-gnu_ilp32" or re.match(r'mips64.*32', d.getVar('DEFAULTTUNE')))
+            (host_os == "linux-gnux32" or host_os == "linux-muslx32" or \
+            host_os == "linux-gnu_ilp32" or re.match(r'mips64.*32', d.getVar('DEFAULTTUNE')))
     is_bpf = (oe.qa.elf_machine_to_string(elf.machine()) == "BPF")
     if not ((machine == elf.machine()) or is_32 or is_bpf):
         oe.qa.add_message(messages, "arch", "Architecture did not match (%s, expected %s) in %s" % \
@@ -464,8 +458,8 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
     with open(path, 'rb') as f:
         file_content = f.read()
         if tmpdir in file_content:
-            trimmed = path.replace(os.path.join (d.getVar("PKGDEST"), name), "")
-            oe.qa.add_message(messages, "buildpaths", "File %s in package %s contains reference to TMPDIR" % (trimmed, name))
+            path = package_qa_clean_path(path, d, name)
+            oe.qa.add_message(messages, "buildpaths", "File %s in package %s contains reference to TMPDIR" % (path, name))
 
 
 QAPATHTEST[xorg-driver-abi] = "package_qa_check_xorg_driver_abi"
@@ -494,7 +488,7 @@ def package_qa_check_infodir(path, name, d, elf, messages):
     infodir = d.expand("${infodir}/dir")
 
     if infodir in path:
-        oe.qa.add_message(messages, "infodir", "The /usr/share/info/dir file is not meant to be shipped in a particular package.")
+        oe.qa.add_message(messages, "infodir", "The %s file is not meant to be shipped in a particular package." % infodir)
 
 QAPATHTEST[symlink-to-sysroot] = "package_qa_check_symlink_to_sysroot"
 def package_qa_check_symlink_to_sysroot(path, name, d, elf, messages):
@@ -506,8 +500,8 @@ def package_qa_check_symlink_to_sysroot(path, name, d, elf, messages):
         if os.path.isabs(target):
             tmpdir = d.getVar('TMPDIR')
             if target.startswith(tmpdir):
-                trimmed = path.replace(os.path.join (d.getVar("PKGDEST"), name), "")
-                oe.qa.add_message(messages, "symlink-to-sysroot", "Symlink %s in %s points to TMPDIR" % (trimmed, name))
+                path = package_qa_clean_path(path, d, name)
+                oe.qa.add_message(messages, "symlink-to-sysroot", "Symlink %s in %s points to TMPDIR" % (path, name))
 
 QAPATHTEST[32bit-time] = "check_32bit_symbols"
 def check_32bit_symbols(path, packagename, d, elf, messages):
@@ -840,10 +834,6 @@ def prepopulate_objdump_p(elf, d):
 
 # Walk over all files in a directory and call func
 def package_qa_walk(warnfuncs, errorfuncs, package, d):
-    #if this will throw an exception, then fix the dict above
-    target_os   = d.getVar('HOST_OS')
-    target_arch = d.getVar('HOST_ARCH')
-
     warnings = {}
     errors = {}
     elves = {}
@@ -1399,7 +1389,7 @@ python do_qa_patch() {
         oe.qa.handle_error("unimplemented-ptest", "%s: autotools-based tests detected" % d.getVar('PN'), d)
 
     # Last resort, detect a test directory in sources
-    elif any(filename.lower() in ["test", "tests"] for filename in os.listdir(srcdir)):
+    elif os.path.exists(srcdir) and any(filename.lower() in ["test", "tests"] for filename in os.listdir(srcdir)):
         oe.qa.handle_error("unimplemented-ptest", "%s: test subdirectory detected" % d.getVar('PN'), d)
 
     oe.qa.exit_if_errors(d)
@@ -1601,6 +1591,21 @@ python () {
     prog = re.compile(r'[A-Z]')
     if prog.search(pn):
         oe.qa.handle_error("uppercase-pn", 'PN: %s is upper case, this can result in unexpected behavior.' % pn, d)
+
+    sourcedir = d.getVar("S")
+    builddir = d.getVar("B")
+    workdir = d.getVar("WORKDIR")
+    unpackdir = d.getVar("UNPACKDIR")
+    if sourcedir == workdir:
+        bb.fatal("Using S = ${WORKDIR} is no longer supported")
+    if builddir == workdir:
+        bb.fatal("Using B = ${WORKDIR} is no longer supported")
+    if unpackdir == workdir:
+        bb.fatal("Using UNPACKDIR = ${WORKDIR} is not supported")
+    if sourcedir[-1] == '/':
+        bb.warn("Recipe %s sets S variable with trailing slash '%s', remove it" % (d.getVar("PN"), d.getVar("S")))
+    if builddir[-1] == '/':
+        bb.warn("Recipe %s sets B variable with trailing slash '%s', remove it" % (d.getVar("PN"), d.getVar("B")))
 
     # Some people mistakenly use DEPENDS:${PN} instead of DEPENDS and wonder
     # why it doesn't work.

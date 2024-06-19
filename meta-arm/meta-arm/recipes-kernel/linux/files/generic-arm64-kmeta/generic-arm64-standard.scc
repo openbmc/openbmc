@@ -1,6 +1,0 @@
-define KMACHINE generic-arm64
-define KTYPE standard
-define KARCH arm64
-
-include ktypes/standard/standard.scc
-include features/bluetooth/bluetooth.scc

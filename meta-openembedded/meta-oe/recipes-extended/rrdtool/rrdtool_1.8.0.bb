@@ -11,6 +11,7 @@ PV = "1.8.0"
 
 SRC_URI = "\
     git://github.com/oetiker/rrdtool-1.x.git;protocol=https;branch=master \
+    file://b76e3c578f1e9f582e9c28f50d82b1f569602075.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -59,7 +60,7 @@ export STAGING_LIBDIR
 export STAGING_INCDIR
 
 # emulate cpan_do_configure
-EXTRA_OEMAKE = ' PERL5LIB="${PERL_ARCHLIB}" '
+EXTRA_OEMAKE = ' CC="${CC} -Wno-incompatible-pointer-types" PERL5LIB="${PERL_ARCHLIB}" '
 # Avoid do_configure error on some hosts
 
 do_configure() {
@@ -103,6 +104,11 @@ do_configure() {
         ${B}/examples/*.pl
 }
 
+do_install:append:class-native() {
+    # Replace the shebang line in cgi-demo.cgi
+    sed -i '1s|^.*$|#!/usr/bin/env rrdcgi|' ${D}${datadir}/rrdtool/examples/cgi-demo.cgi
+}
+
 PACKAGES =+ "${PN}-perl ${PN}-python"
 PACKAGES =+ "rrdcached"
 
@@ -124,8 +130,8 @@ RDEPENDS:${PN}-perl = "perl perl-module-lib perl-module-getopt-long perl-module-
 
 DESCRIPTION:${PN}-python = \
 "The ${PN}-python package includes RRDtool bindings for python."
-FILES:${PN}-python = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*"
 RDEPENDS:${PN}-python = "python3"
 
 FILES:${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/RRDs/.debug \
-    ${libdir}/python${PYTHON_BASEVERSION}/site-packages/.debug"
+    ${PYTHON_SITEPACKAGES_DIR}/.debug"

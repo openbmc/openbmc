@@ -34,6 +34,7 @@ do_install() {
 
     for fw in \
             brcmfmac43430-sdio \
+            brcmfmac43430b0-sdio \
             brcmfmac43436-sdio \
             brcmfmac43436s-sdio \
             brcmfmac43455-sdio \
@@ -69,7 +70,10 @@ FILES:${PN}-bcm43430 = " \
     ${nonarch_base_libdir}/firmware/cypress/cyfmac43430-sdio.bin \
     ${nonarch_base_libdir}/firmware/cypress/cyfmac43430-sdio.clm_blob \
 "
-FILES:${PN}-bcm43436 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43436-*"
+FILES:${PN}-bcm43436 = " \
+    ${nonarch_base_libdir}/firmware/brcm/brcmfmac43436-* \
+    ${nonarch_base_libdir}/firmware/brcm/brcmfmac43430b0-* \
+"
 FILES:${PN}-bcm43436s = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43436s*"
 FILES:${PN}-bcm43439 = " \
     ${nonarch_base_libdir}/firmware/cypress/43439A0-7.95.49.00.combined \

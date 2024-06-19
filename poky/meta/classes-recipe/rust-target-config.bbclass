@@ -21,6 +21,9 @@ def llvm_features_from_tune(d):
 
     if 'vfpv4' in feat:
         f.append("+vfp4")
+    elif 'vfpv4d16' in feat:
+        f.append("+vfp4")
+        f.append("-d32")
     elif 'vfpv3' in feat:
         f.append("+vfp3")
     elif 'vfpv3d16' in feat:

@@ -10,14 +10,14 @@ Upstream-Status: Inappropriate [Upstream are unlikely to accept this change of d
  m4/libtool.m4 | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/m4/libtool.m4 b/m4/libtool.m4
-index 2f31d24..bd90775 100644
---- a/m4/libtool.m4
-+++ b/m4/libtool.m4
-@@ -1254,18 +1254,18 @@ dnl lt_sysroot will always be passed unquoted.  We quote it here
+Index: libtool-2.5.0/m4/libtool.m4
+===================================================================
+--- libtool-2.5.0.orig/m4/libtool.m4
++++ libtool-2.5.0/m4/libtool.m4
+@@ -1253,18 +1253,18 @@ dnl lt_sysroot will always be passed unq
  dnl in case the user passed a directory name.
  lt_sysroot=
- case $with_libtool_sysroot in #(
+ case $with_sysroot in #(
 - yes)
 + no)
     if test yes = "$GCC"; then
@@ -29,10 +29,10 @@ index 2f31d24..bd90775 100644
 + yes|''|/)
 +   ;; #(
   /*)
-    lt_sysroot=`echo "$with_libtool_sysroot" | $SED -e "$sed_quote_subst"`
+    lt_sysroot=`echo "$with_sysroot" | $SED -e "$sed_quote_subst"`
     ;; #(
 - no|'')
 -   ;; #(
   *)
-    AC_MSG_RESULT([$with_libtool_sysroot])
+    AC_MSG_RESULT([$with_sysroot])
     AC_MSG_ERROR([The sysroot must be an absolute path.])

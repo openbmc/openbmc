@@ -1,0 +1,77 @@
+From 46477eb182af51b5da8299b295a6d61e566e3693 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 14 Jun 2024 06:27:19 +0000
+Subject: [PATCH] Add casts to appease conversions between wchar_t and wint_t
+
+Upstream-Status: Backport [http://cvsweb.netbsd.org/bsdweb.cgi/src/lib/libedit/refresh.c.diff?r1=1.57&r2=1.58&only_with_tag=MAIN&f=h]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ libedit/refresh.c    | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/libedit/refresh.c b/libedit/refresh.c
+index 093f993..a6d4574 100644
+--- a/libedit/refresh.c
++++ b/libedit/refresh.c
+@@ -111,7 +111,7 @@ re_nextline(EditLine *el)
+ 	 */
+ 	if (el->el_refresh.r_cursor.v + 1 >= el->el_terminal.t_size.v) {
+ 		int i, lins = el->el_terminal.t_size.v;
+-		wchar_t *firstline = el->el_vdisplay[0];
++		wint_t *firstline = el->el_vdisplay[0];
+ 
+ 		for(i = 1; i < lins; i++)
+ 			el->el_vdisplay[i - 1] = el->el_vdisplay[i];
+@@ -340,7 +340,8 @@ re_refresh(EditLine *el)
+ 	ELRE_DEBUG(1, (__F, "updating %d lines.\r\n", el->el_refresh.r_newcv));
+ 	for (i = 0; i <= el->el_refresh.r_newcv; i++) {
+ 		/* NOTE THAT re_update_line MAY CHANGE el_display[i] */
+-		re_update_line(el, el->el_display[i], el->el_vdisplay[i], i);
++		re_update_line(el, (wchar_t *)el->el_display[i],
++				(wchar_t *)el->el_vdisplay[i], i);
+ 
+ 		/*
+ 		 * Copy the new line to be the current one, and pad out with
+@@ -349,8 +350,9 @@ re_refresh(EditLine *el)
+ 		 * end of the screen line, it won't be a NUL or some old
+ 		 * leftover stuff.
+ 		 */
+-		re__copy_and_pad(el->el_display[i], el->el_vdisplay[i],
+-		    (size_t) el->el_terminal.t_size.h);
++		re__copy_and_pad((wchar_t *)el->el_display[i], 
++			(wchar_t *)el->el_vdisplay[i],
++			(size_t) el->el_terminal.t_size.h);
+ 	}
+ 	ELRE_DEBUG(1, (__F,
+ 	"\r\nel->el_refresh.r_cursor.v=%d,el->el_refresh.r_oldcv=%d i=%d\r\n",
+@@ -361,7 +363,7 @@ re_refresh(EditLine *el)
+ 			terminal_move_to_line(el, i);
+ 			terminal_move_to_char(el, 0);
+                         /* This wcslen should be safe even with MB_FILL_CHARs */
+-			terminal_clear_EOL(el, (int) wcslen(el->el_display[i]));
++			terminal_clear_EOL(el, (int) wcslen((const wchar_t *)el->el_display[i]));
+ #ifdef DEBUG_REFRESH
+ 			terminal_overwrite(el, L"C\b", 2);
+ #endif /* DEBUG_REFRESH */
+@@ -1097,7 +1099,7 @@ re_refresh_cursor(EditLine *el)
+ static void
+ re_fastputc(EditLine *el, wint_t c)
+ {
+-	wchar_t *lastline;
++	wint_t *lastline;
+ 	int w;
+ 
+ 	w = wcwidth(c);
+@@ -1132,7 +1134,7 @@ re_fastputc(EditLine *el, wint_t c)
+ 			el->el_cursor.v++;
+ 			lastline = el->el_display[++el->el_refresh.r_oldcv];
+ 		}
+-		re__copy_and_pad(lastline, L"", (size_t)el->el_terminal.t_size.h);
++		re__copy_and_pad((wchar_t *)lastline, L"", (size_t)el->el_terminal.t_size.h);
+ 
+ 		if (EL_HAS_AUTO_MARGINS) {
+ 			if (EL_HAS_MAGIC_MARGINS) {
+-- 
+2.35.5
+

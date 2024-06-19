@@ -9,7 +9,8 @@ SRC_URI = "file://file1 \
            file://file3 \
            file://file4"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 PACKAGES =+ "${PN}-user3"
 

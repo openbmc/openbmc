@@ -43,7 +43,7 @@ CONFIGUREOPTS = " \
     --localstatedir=${localstatedir} \
     --libdir=${libdir} \
     --includedir=${includedir} \
-    --oldincludedir=${oldincludedir} \
+    --oldincludedir=${includedir} \
     --infodir=${infodir} \
     --mandir=${mandir} \
     --disable-silent-rules \

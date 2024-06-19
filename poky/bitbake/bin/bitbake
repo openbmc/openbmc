@@ -27,7 +27,7 @@ from bb.main import bitbake_main, BitBakeConfigParameters, BBMainException
 
 bb.utils.check_system_locale()
 
-__version__ = "2.9.0"
+__version__ = "2.9.1"
 
 if __name__ == "__main__":
     if __version__ != bb.__version__:

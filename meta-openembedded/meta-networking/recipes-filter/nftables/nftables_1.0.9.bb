@@ -35,9 +35,9 @@ EXTRA_OECONF = " \
 
 SETUPTOOLS_SETUP_PATH = "${S}/py"
 
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'setuptools3', '', d)}
+inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python', 'setuptools3', '', d)}
 
-PACKAGES =+ "${PN}-python"
+PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'python', '${PN}-python', '', d)}"
 FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 RDEPENDS:${PN}-python = "python3-core python3-json ${PN}"
 

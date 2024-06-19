@@ -13,7 +13,8 @@ do_compile[noexec] = "1"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
 	install -Dm 0644 ${S}/error.h -t ${D}${includedir}

@@ -62,7 +62,7 @@ do_install () {
     install -d ${D}${sysconfdir}
     # fix up hardcoded paths
     sed -i -e 's,/etc/,${sysconfdir}/,' -e 's,/usr/sbin/,${sbindir}/,' \
-        ${WORKDIR}/openct.service ${WORKDIR}/openct.init
+        ${UNPACKDIR}/openct.service ${UNPACKDIR}/openct.init
 
     oe_runmake install DESTDIR=${D}
     install -dm 755 ${D}${libdir}/ctapi/
@@ -70,11 +70,11 @@ do_install () {
     install -Dpm 644 etc/openct.udev ${D}${nonarch_libdir}/udev/rules.d/60-openct.rules
     install -pm 644 etc/openct.conf ${D}${sysconfdir}/openct.conf
 
-    install -Dpm 755 ${WORKDIR}/openct.init ${D}${sysconfdir}/init.d/openct
-    install -Dpm 644 ${WORKDIR}/openct.sysconfig ${D}${sysconfdir}/sysconfig/openct
+    install -Dpm 755 ${UNPACKDIR}/openct.init ${D}${sysconfdir}/init.d/openct
+    install -Dpm 644 ${UNPACKDIR}/openct.sysconfig ${D}${sysconfdir}/sysconfig/openct
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 644 ${WORKDIR}/openct.service ${D}${systemd_unitdir}/system
+    install -m 644 ${UNPACKDIR}/openct.service ${D}${systemd_unitdir}/system
 
     so=$(find ${D} -name \*.so | sed "s|^${D}||")
     sed -i -e 's|\\(LIBPATH\\s*\\).*|\\1$so|' etc/reader.conf

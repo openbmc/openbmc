@@ -5,7 +5,8 @@ LICENSE = "MIT"
 
 DEPENDS += "coreutils-native"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit useradd allarch
 

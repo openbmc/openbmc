@@ -63,7 +63,7 @@ def find_sccs(d):
     return sources_list
 
 # check the SRC_URI for "kmeta" type'd git repositories. Return the name of
-# the repository as it will be found in WORKDIR
+# the repository as it will be found in UNPACKDIR
 def find_kernel_feature_dirs(d):
     feature_dirs=[]
     fetch = bb.fetch2.Fetch([], d)
@@ -147,24 +147,24 @@ do_kernel_metadata() {
 	# from the source tree, into a common location and normalized "defconfig" name,
 	# where the rest of the process will include and incoroporate it into the build
 	#
-	# If the fetcher has already placed a defconfig in WORKDIR (from the SRC_URI),
+	# If the fetcher has already placed a defconfig in UNPACKDIR (from the SRC_URI),
 	# we don't overwrite it, but instead warn the user that SRC_URI defconfigs take
 	# precendence.
 	#
 	if [ -n "${KBUILD_DEFCONFIG}" ]; then
 		if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}" ]; then
-			if [ -f "${WORKDIR}/defconfig" ]; then
+			if [ -f "${UNPACKDIR}/defconfig" ]; then
 				# If the two defconfig's are different, warn that we overwrote the
-				# one already placed in WORKDIR
-				cmp "${WORKDIR}/defconfig" "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"
+				# one already placed in UNPACKDIR
+				cmp "${UNPACKDIR}/defconfig" "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"
 				if [ $? -ne 0 ]; then
-					bbdebug 1 "detected SRC_URI or unpatched defconfig in WORKDIR. ${KBUILD_DEFCONFIG} copied over it"
+					bbdebug 1 "detected SRC_URI or patched defconfig in UNPACKDIR. ${KBUILD_DEFCONFIG} copied over it"
 				fi
-				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${UNPACKDIR}/defconfig
 			else
-				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${UNPACKDIR}/defconfig
 			fi
-			in_tree_defconfig="${WORKDIR}/defconfig"
+			in_tree_defconfig="${UNPACKDIR}/defconfig"
 		else
 			bbfatal "A KBUILD_DEFCONFIG '${KBUILD_DEFCONFIG}' was specified, but not present in the source tree (${S}/arch/${ARCH}/configs/)"
 		fi
@@ -178,7 +178,7 @@ do_kernel_metadata() {
 		patches="${@" ".join(find_patches(d,'kernel-meta'))}"
 		if [ -n "$patches" ]; then
 		    (
-			    cd ${WORKDIR}/kernel-meta
+			    cd ${UNPACKDIR}/kernel-meta
 
 			    # take the SRC_URI patches, and create a series file
 			    # this is required to support some better processing
@@ -193,11 +193,11 @@ do_kernel_metadata() {
 			    # handling the rest of the kernel. This allows us
 			    # more flexibility for handling failures or advanced
 			    # mergeing functinoality
-			    message=$(kgit-s2q --gen -v --patches ${WORKDIR}/kernel-meta 2>&1)
+			    message=$(kgit-s2q --gen -v --patches ${UNPACKDIR}/kernel-meta 2>&1)
 			    if [ $? -ne 0 ]; then
 				# setup to try the patch again
 				kgit-s2q --prev
-				bberror "Problem applying patches to: ${WORKDIR}/kernel-meta"
+				bberror "Problem applying patches to: ${UNPACKDIR}/kernel-meta"
 				bbfatal_log "\n($message)"
 			    fi
 			)
@@ -232,12 +232,10 @@ do_kernel_metadata() {
 	# SRC_URI. If they were supplied, we convert them into include directives
 	# for the update part of the process
 	for f in ${feat_dirs}; do
-		if [ -d "${WORKDIR}/$f/kernel-meta" ]; then
-			includes="$includes -I${WORKDIR}/$f/kernel-meta"
-		elif [ -d "${WORKDIR}/../oe-local-files/$f" ]; then
-			includes="$includes -I${WORKDIR}/../oe-local-files/$f"
-	        elif [ -d "${WORKDIR}/$f" ]; then
-			includes="$includes -I${WORKDIR}/$f"
+		if [ -d "${UNPACKDIR}/$f/kernel-meta" ]; then
+			includes="$includes -I${UNPACKDIR}/$f/kernel-meta"
+	        elif [ -d "${UNPACKDIR}/$f" ]; then
+			includes="$includes -I${UNPACKDIR}/$f"
 		fi
 	done
 	for s in ${sccs} ${patches}; do
@@ -379,19 +377,19 @@ do_kernel_checkout() {
 	set +e
 
 	source_dir=`echo ${S} | sed 's%/$%%'`
-	source_workdir="${WORKDIR}/git"
-	if [ -d "${WORKDIR}/git/" ]; then
+	source_workdir="${UNPACKDIR}/git"
+	if [ -d "${UNPACKDIR}/git/" ]; then
 		# case: git repository
 		# if S is WORKDIR/git, then we shouldn't be moving or deleting the tree.
 		if [ "${source_dir}" != "${source_workdir}" ]; then
 			if [ -d "${source_workdir}/.git" ]; then
 				# regular git repository with .git
 				rm -rf ${S}
-				mv ${WORKDIR}/git ${S}
+				mv ${UNPACKDIR}/git ${S}
 			else
 				# create source for bare cloned git repository
 				git clone ${WORKDIR}/git ${S}
-				rm -rf ${WORKDIR}/git
+				rm -rf ${UNPACKDIR}/git
 			fi
 		fi
 		cd ${S}
@@ -434,13 +432,18 @@ do_kernel_checkout() {
 
 	set -e
 }
-do_kernel_checkout[dirs] = "${S} ${WORKDIR}"
+do_kernel_checkout[dirs] = "${S} ${UNPACKDIR}"
 
 addtask kernel_checkout before do_kernel_metadata after do_symlink_kernsrc
 addtask kernel_metadata after do_validate_branches do_unpack before do_patch
 do_kernel_metadata[depends] = "kern-tools-native:do_populate_sysroot"
 do_kernel_metadata[file-checksums] = " ${@get_dirs_with_fragments(d)}"
 do_validate_branches[depends] = "kern-tools-native:do_populate_sysroot"
+
+# ${S} doesn't exist for us at unpack
+do_qa_unpack() {
+    return
+}
 
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
@@ -460,7 +463,7 @@ do_kernel_configme() {
 			config_flags=""
 			;;
 		*)
-			if [ -f ${WORKDIR}/defconfig ]; then
+			if [ -f ${UNPACKDIR}/defconfig ]; then
 				config_flags="-n"
 			fi
 			;;

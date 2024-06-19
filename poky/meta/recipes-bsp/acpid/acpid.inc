@@ -27,13 +27,13 @@ SYSTEMD_SERVICE:${PN} = "acpid.service"
 
 do_install:append () {
 	install -d ${D}${sysconfdir}/init.d
-	sed -e 's,/usr/sbin,${sbindir},g' ${WORKDIR}/init > ${D}${sysconfdir}/init.d/acpid
+	sed -e 's,/usr/sbin,${sbindir},g' ${UNPACKDIR}/init > ${D}${sysconfdir}/init.d/acpid
 	chmod 755 ${D}${sysconfdir}/init.d/acpid
 
 	install -d ${D}${sysconfdir}/acpi
 	install -d ${D}${sysconfdir}/acpi/events
 
 	install -d ${D}${systemd_system_unitdir}
-	install -m 0644 ${WORKDIR}/acpid.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${UNPACKDIR}/acpid.service ${D}${systemd_system_unitdir}
 	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_system_unitdir}/acpid.service
 }

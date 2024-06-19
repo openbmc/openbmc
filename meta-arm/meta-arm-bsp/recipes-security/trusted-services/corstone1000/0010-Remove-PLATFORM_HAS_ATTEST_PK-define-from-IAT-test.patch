@@ -1,0 +1,27 @@
+From a94bcd8af80c42adf99a7114174afea4000e6647 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Tue, 14 May 2024 15:58:15 +0200
+Subject: [PATCH] Remove PLATFORM_HAS_ATTEST_PK define from IAT test
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Inappropriate [Should remove the flag only for CS1000]
+---
+ deployments/psa-api-test/initial_attestation/iat-api-test.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/deployments/psa-api-test/initial_attestation/iat-api-test.cmake b/deployments/psa-api-test/initial_attestation/iat-api-test.cmake
+index 4d1d2b1a9..eb4db223c 100644
+--- a/deployments/psa-api-test/initial_attestation/iat-api-test.cmake
++++ b/deployments/psa-api-test/initial_attestation/iat-api-test.cmake
+@@ -15,7 +15,7 @@ set(TS_ARCH_TEST_SUITE INITIAL_ATTESTATION CACHE STRING "Arch test suite")
+ #  Set additional defines needed for build.
+ #-------------------------------------------------------------------------------
+ list(APPEND PSA_ARCH_TEST_EXTERNAL_DEFS
+-	-DPSA_ALG_MD4=0x02000002 -DPLATFORM_HAS_ATTEST_PK)
++	-DPSA_ALG_MD4=0x02000002)
+ 
+ #-------------------------------------------------------------------------------
+ #  The arch test build system puts its build output under a test suite specific
+-- 
+2.25.1
+

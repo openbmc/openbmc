@@ -86,7 +86,7 @@ ALTERNATIVE_LINK_NAME[resolv-conf] = "${@bb.utils.contains('DISTRO_FEATURES','sy
 do_install:append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
 		install -d ${D}${sysconfdir}/init.d
-		install -m 0755 ${WORKDIR}/connman ${D}${sysconfdir}/init.d/connman
+		install -m 0755 ${UNPACKDIR}/connman ${D}${sysconfdir}/init.d/connman
 		sed -i s%@DATADIR@%${datadir}% ${D}${sysconfdir}/init.d/connman
 	fi
 

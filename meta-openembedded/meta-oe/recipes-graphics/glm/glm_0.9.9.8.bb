@@ -29,10 +29,10 @@ do_install() {
     cp -R --no-dereference --preserve=mode,links ${S}/glm ${D}${includedir}
     cp -R --no-dereference --preserve=mode,links ${S}/doc ${D}${docdir}/glm
     rm ${D}${includedir}/glm/CMakeLists.txt
-    sed "s/@VERSION@/${PV}/" ${WORKDIR}/glmConfigVersion.cmake.in > ${D}${libdir}/cmake/glm/glmConfigVersion.cmake
-    sed "s/@VERSION@/${PV}/" ${WORKDIR}/glmConfig.cmake.in > ${D}${libdir}/cmake/glm/glmConfig.cmake
-    sed "s/@VERSION@/${PV}/" ${WORKDIR}/glm.pc.in > ${D}${libdir}/pkgconfig/glm.pc
-    install -Dm644 ${WORKDIR}/glmTargets.cmake ${D}${libdir}/cmake/glm/glmTargets.cmake
+    sed "s/@VERSION@/${PV}/" ${UNPACKDIR}/glmConfigVersion.cmake.in > ${D}${libdir}/cmake/glm/glmConfigVersion.cmake
+    sed "s/@VERSION@/${PV}/" ${UNPACKDIR}/glmConfig.cmake.in > ${D}${libdir}/cmake/glm/glmConfig.cmake
+    sed "s/@VERSION@/${PV}/" ${UNPACKDIR}/glm.pc.in > ${D}${libdir}/pkgconfig/glm.pc
+    install -Dm644 ${UNPACKDIR}/glmTargets.cmake ${D}${libdir}/cmake/glm/glmTargets.cmake
 
 }
 

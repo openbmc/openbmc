@@ -1,0 +1,29 @@
+From 648868595cf290e77aab1f271db2a57e1f791301 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 May 2024 20:37:07 -0700
+Subject: [PATCH] executor: Remove including <error.h> in test_linux.h
+
+it seems to be redundant and moreover it lets us compile on musl which
+does not provide this system header
+
+Upstream-Status: Submitted [https://github.com/google/syzkaller/pull/4822]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ executor/test_linux.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/executor/test_linux.h b/executor/test_linux.h
+index 7cf459569..8c9493539 100644
+--- a/executor/test_linux.h
++++ b/executor/test_linux.h
+@@ -1,7 +1,6 @@
+ // Copyright 2017 syzkaller project authors. All rights reserved.
+ // Use of this source code is governed by Apache 2 LICENSE that can be found in the LICENSE file.
+ 
+-#include <error.h>
+ #include <stdint.h>
+ #include <sys/utsname.h>
+ 
+-- 
+2.45.1
+

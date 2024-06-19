@@ -1,0 +1,74 @@
+From 3359a87a71307336100b84e66b69bad385cd3cfc Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Mon, 6 May 2024 01:36:39 +0200
+Subject: [PATCH] crypto: use _Generic only if !defined(__cplusplus)
+
+* fixes build with gcc-14 which has __builtin_addc and __builtin_subc
+  with gcc-13 it was already using the #else branch because of missing builtins
+
+* fixes
+  https://github.com/grpc/grpc/issues/35945
+
+* _Generic was introduced in boringssl with:
+  https://boringssl.googlesource.com/boringssl/+/70ca6bc24be103dabd68e448cd3af29b929b771d%5E%21/#F4
+
+* but e.g. third_party/boringssl-with-bazel/src/ssl/d1_both.cc includes
+  this internal.h and from the .cc extension gcc will process it as C++
+  where _Generic isn't available, causing:
+
+In file included from third_party/boringssl-with-bazel/src/ssl/d1_both.cc:125:
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h: In function 'uint32_t CRYPTO_addc_u32(uint32_t, uint32_t, uint32_t, uint32_t*)':
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1159:7: error: expected primary-expression before 'unsigned'
+ 1159 |       unsigned: __builtin_addc,                     \
+      |       ^~~~~~~~
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1166:10: note: in expansion of macro 'CRYPTO_GENERIC_ADDC'
+ 1166 |   return CRYPTO_GENERIC_ADDC(x, y, carry, out_carry);
+      |          ^~~~~~~~~~~~~~~~~~~
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1160:7: error: expected primary-expression before 'unsigned'
+ 1160 |       unsigned long: __builtin_addcl,               \
+      |       ^~~~~~~~
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1166:10: note: in expansion of macro 'CRYPTO_GENERIC_ADDC'
+ 1166 |   return CRYPTO_GENERIC_ADDC(x, y, carry, out_carry);
+      |          ^~~~~~~~~~~~~~~~~~~
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1161:7: error: expected primary-expression before 'unsigned'
+ 1161 |       unsigned long long: __builtin_addcll))((x), (y), (carry), (out_carry))
+      |       ^~~~~~~~
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1166:10: note: in expansion of macro 'CRYPTO_GENERIC_ADDC'
+ 1166 |   return CRYPTO_GENERIC_ADDC(x, y, carry, out_carry);
+      |          ^~~~~~~~~~~~~~~~~~~
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1158:4: error: '_Generic' was not declared in this scope
+ 1158 |   (_Generic((x),                                    \
+      |    ^~~~~~~~
+third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1166:10: note: in expansion of macro 'CRYPTO_GENERIC_ADDC'
+ 1166 |   return CRYPTO_GENERIC_ADDC(x, y, carry, out_carry);
+      |          ^~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+Upstream-Status: Submitted [https://boringssl-review.googlesource.com/c/boringssl/+/68227 crypto: use _Generic only if !defined(__cplusplus)]
+
+ crypto/internal.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/internal.h b/crypto/internal.h
+index a77102d76..30d6826dd 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -1176,7 +1176,7 @@ static inline uint64_t CRYPTO_rotr_u64(uint64_t value, int shift) {
+ 
+ // CRYPTO_addc_* returns |x + y + carry|, and sets |*out_carry| to the carry
+ // bit. |carry| must be zero or one.
+-#if OPENSSL_HAS_BUILTIN(__builtin_addc)
++#if OPENSSL_HAS_BUILTIN(__builtin_addc) && !defined(__cplusplus)
+ 
+ #define CRYPTO_GENERIC_ADDC(x, y, carry, out_carry) \
+   (_Generic((x),                                    \
+@@ -1228,7 +1228,7 @@ static inline uint64_t CRYPTO_addc_u64(uint64_t x, uint64_t y, uint64_t carry,
+ 
+ // CRYPTO_subc_* returns |x - y - borrow|, and sets |*out_borrow| to the borrow
+ // bit. |borrow| must be zero or one.
+-#if OPENSSL_HAS_BUILTIN(__builtin_subc)
++#if OPENSSL_HAS_BUILTIN(__builtin_subc) && !defined(__cplusplus)
+ 
+ #define CRYPTO_GENERIC_SUBC(x, y, borrow, out_borrow) \
+   (_Generic((x),                                      \

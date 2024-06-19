@@ -221,20 +221,6 @@ def siteinfo_get_files(d, sysrootcache=False):
         # This would show up as breaking sstatetests.SStateTests.test_sstate_32_64_same_hash for example
         searched = []
 
-    if not sysrootcache:
-        return sitefiles, searched
-
-    # Now check for siteconfig cache files in sysroots
-    path_siteconfig = d.getVar('SITECONFIG_SYSROOTCACHE')
-    if path_siteconfig and os.path.isdir(path_siteconfig):
-        for i in os.listdir(path_siteconfig):
-            if not i.endswith("_config"):
-                continue
-            filename = os.path.join(path_siteconfig, i)
-            sitefiles.append(filename)
     return sitefiles, searched
 
-#
-# Make some information available via variables
-#
-SITECONFIG_SYSROOTCACHE = "${STAGING_DATADIR}/${TARGET_SYS}_config_site.d"
+

@@ -13,3 +13,6 @@ RRECOMMENDS:${PN} = "mpd"
 inherit xfce-app
 
 SRC_URI[sha256sum] = "4867d5dd100fa42ab39ebde6c784ec21ee31717f1adb3f4da070dafb3848d96d"
+
+# Fixes build with GCC-14 which enables incompatible-pointer-types as error
+CFLAGS += "-Wno-error=incompatible-pointer-types"

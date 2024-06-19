@@ -30,5 +30,5 @@ CACHED_CONFIGUREVARS += "ac_cv_prog_STRIP=/bin/true"
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/domainname.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/domainname.service ${D}${systemd_unitdir}/system
 }

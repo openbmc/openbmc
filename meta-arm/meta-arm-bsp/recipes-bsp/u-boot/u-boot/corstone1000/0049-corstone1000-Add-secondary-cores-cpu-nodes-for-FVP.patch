@@ -1,0 +1,63 @@
+From 68708d6b4953f58a0484b9a83efa8318747cea80 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Thu, 9 May 2024 14:16:55 +0000
+Subject: [PATCH] arm: dts: corstone1000: enable secondary cores for FVP
+
+Add the secondary cores nodes in the dts file
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20240612100421.47938-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ arch/arm/dts/corstone1000-fvp.dts | 25 +++++++++++++++++++++++++
+ arch/arm/dts/corstone1000.dtsi    |  2 +-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/dts/corstone1000-fvp.dts b/arch/arm/dts/corstone1000-fvp.dts
+index 26b0f1b3ce..3076fb9f34 100644
+--- a/arch/arm/dts/corstone1000-fvp.dts
++++ b/arch/arm/dts/corstone1000-fvp.dts
+@@ -49,3 +49,28 @@
+ 		clock-names = "smclk", "apb_pclk";
+ 	};
+ };
++
++&cpus {
++	cpu1: cpu@1 {
++		device_type = "cpu";
++		compatible = "arm,cortex-a35";
++		reg = <0x1>;
++		enable-method = "psci";
++		next-level-cache = <&L2_0>;
++	};
++	cpu2: cpu@2 {
++		device_type = "cpu";
++		compatible = "arm,cortex-a35";
++		reg = <0x2>;
++		enable-method = "psci";
++		next-level-cache = <&L2_0>;
++	};
++	cpu3: cpu@3 {
++		device_type = "cpu";
++		compatible = "arm,cortex-a35";
++		reg = <0x3>;
++		enable-method = "psci";
++		next-level-cache = <&L2_0>;
++	};
++};
++
+diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
+index 1e0ec075e4..5d9d95b21c 100644
+--- a/arch/arm/dts/corstone1000.dtsi
++++ b/arch/arm/dts/corstone1000.dtsi
+@@ -21,7 +21,7 @@
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ 
+-	cpus {
++	cpus: cpus {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+ 
+-- 
+2.25.1
+

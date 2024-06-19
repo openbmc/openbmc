@@ -38,17 +38,17 @@ INITSCRIPT_PARAMS = "defaults"
 INHIBIT_UPDATERCD_BBCLASS = "${@bb.utils.contains('PACKAGECONFIG', 'examples', '1', '0', d)}"
 
 do_install:append() {
-    install -Dm 0755 ${WORKDIR}/gadget-start ${D}${bindir}/gadget-start
+    install -Dm 0755 ${UNPACKDIR}/gadget-start ${D}${bindir}/gadget-start
     sed -i -e 's,/usr/bin,${bindir},g' -e 's,/etc,${sysconfdir},g' ${D}${bindir}/gadget-start
-    install -m 0755 ${WORKDIR}/gadget-start ${D}${bindir}/gadget-stop
+    install -m 0755 ${UNPACKDIR}/gadget-start ${D}${bindir}/gadget-stop
     sed -i -e 's,/usr/bin,${bindir},g' -e 's,/etc,${sysconfdir},g' ${D}${bindir}/gadget-stop
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -Dm 0644 ${WORKDIR}/usbgx.service ${D}${systemd_system_unitdir}/usbgx.service
+        install -Dm 0644 ${UNPACKDIR}/usbgx.service ${D}${systemd_system_unitdir}/usbgx.service
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
-        install -Dm 0755 ${WORKDIR}/usbgx.initd ${D}${sysconfdir}/init.d/usbgx
+        install -Dm 0755 ${UNPACKDIR}/usbgx.initd ${D}${sysconfdir}/init.d/usbgx
     fi
 }
 

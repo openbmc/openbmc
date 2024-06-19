@@ -1,4 +1,4 @@
-From febfac59d0e8a864370d0b4018b4e497ceec156d Mon Sep 17 00:00:00 2001
+From 25bc008191c9b518f30e3ed87e204e25bdafb854 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:10:06 +0400
 Subject: [PATCH] 64-bit multilib hack
@@ -28,19 +28,17 @@ Upstream-Status: Inappropriate [OE-Specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Elvis Dowson <elvis.dowson@gmail.com>
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
-Signed-off-by: Zang Ruochen <zangruochen@loongson.cn>
 ---
  gcc/config/aarch64/t-aarch64-linux |  8 ++++----
  gcc/config/arc/t-multilib-linux    |  4 ++--
  gcc/config/i386/t-linux64          |  6 ++----
  gcc/config/mips/t-linux64          | 28 ++--------------------------
- gcc/config/riscv/t-linux           |  4 ++--
+ gcc/config/riscv/t-linux           |  6 +++---
  gcc/config/rs6000/t-linux64        |  5 ++---
- gcc/config/loongarch/t-linux       | 34 ++++++++++++++++++----------------
- 7 files changed, 32 insertions(+), 57 deletions(-)
+ 6 files changed, 15 insertions(+), 42 deletions(-)
 
 diff --git a/gcc/config/aarch64/t-aarch64-linux b/gcc/config/aarch64/t-aarch64-linux
-index 57bf4100fcd..aaef5da8059 100644
+index 3f7b786ecbb..a6c1c92fc7f 100644
 --- a/gcc/config/aarch64/t-aarch64-linux
 +++ b/gcc/config/aarch64/t-aarch64-linux
 @@ -21,8 +21,8 @@
@@ -57,7 +55,7 @@ index 57bf4100fcd..aaef5da8059 100644
 -MULTILIB_OSDIRNAMES += mabi.ilp32=../libilp32$(call if_multiarch,:aarch64$(AARCH_BE)-linux-gnu_ilp32)
 +#MULTILIB_OSDIRNAMES += mabi.ilp32=../libilp32$(call if_multiarch,:aarch64$(AARCH_BE)-linux-gnu_ilp32)
 diff --git a/gcc/config/arc/t-multilib-linux b/gcc/config/arc/t-multilib-linux
-index a839e4ea67c..f92664573a9 100644
+index 07bc77ba34a..f7e2e3919cf 100644
 --- a/gcc/config/arc/t-multilib-linux
 +++ b/gcc/config/arc/t-multilib-linux
 @@ -16,9 +16,9 @@
@@ -73,7 +71,7 @@ index a839e4ea67c..f92664573a9 100644
  # Aliases:
  MULTILIB_MATCHES += mcpu?arc700=mA7
 diff --git a/gcc/config/i386/t-linux64 b/gcc/config/i386/t-linux64
-index 138956b0962..d6e0cdc4342 100644
+index f9edc289e57..047d8e4aff9 100644
 --- a/gcc/config/i386/t-linux64
 +++ b/gcc/config/i386/t-linux64
 @@ -32,7 +32,5 @@
@@ -87,7 +85,7 @@ index 138956b0962..d6e0cdc4342 100644
 +MULTILIB_DIRNAMES = . .
 +MULTILIB_OSDIRNAMES = ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir))
 diff --git a/gcc/config/mips/t-linux64 b/gcc/config/mips/t-linux64
-index 176091cabb6..8258ef40559 100644
+index e4e2f5eaedb..c503974de37 100644
 --- a/gcc/config/mips/t-linux64
 +++ b/gcc/config/mips/t-linux64
 @@ -17,29 +17,5 @@
@@ -123,17 +121,20 @@ index 176091cabb6..8258ef40559 100644
 +MULTILIB_DIRNAMES = . . .
 +MULTILIB_OSDIRNAMES = ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir))
 diff --git a/gcc/config/riscv/t-linux b/gcc/config/riscv/t-linux
-index 216d2776a18..e3c520f4bf6 100644
+index a6f64f88d25..0e21db58f7d 100644
 --- a/gcc/config/riscv/t-linux
 +++ b/gcc/config/riscv/t-linux
-@@ -1,3 +1,3 @@
+@@ -1,5 +1,5 @@
  # Only XLEN and ABI affect Linux multilib dir names, e.g. /lib32/ilp32d/
 -MULTILIB_DIRNAMES := $(patsubst rv32%,lib32,$(patsubst rv64%,lib64,$(MULTILIB_DIRNAMES)))
 -MULTILIB_OSDIRNAMES := $(patsubst lib%,../lib%,$(MULTILIB_DIRNAMES))
 +#MULTILIB_DIRNAMES := $(patsubst rv32%,lib32,$(patsubst rv64%,lib64,$(MULTILIB_DIRNAMES)))
 +#MULTILIB_OSDIRNAMES := $(patsubst lib%,../lib%,$(MULTILIB_DIRNAMES))
+ 
+-MULTIARCH_DIRNAME := $(call if_multiarch,$(firstword $(subst -, ,$(target)))-linux-gnu)
++#MULTIARCH_DIRNAME := $(call if_multiarch,$(firstword $(subst -, ,$(target)))-linux-gnu)
 diff --git a/gcc/config/rs6000/t-linux64 b/gcc/config/rs6000/t-linux64
-index 01a94242308..1429eceaebf 100644
+index 248b5891e36..379689561a7 100644
 --- a/gcc/config/rs6000/t-linux64
 +++ b/gcc/config/rs6000/t-linux64
 @@ -26,10 +26,9 @@
@@ -149,53 +150,3 @@ index 01a94242308..1429eceaebf 100644
  
  rs6000-linux.o: $(srcdir)/config/rs6000/rs6000-linux.cc
  	$(COMPILE) $<
-diff --git a/gcc/config/loongarch/t-linux b/gcc/config/loongarch/t-linux
-index e40da1792..0c7ec9f8a 100644
---- a/gcc/config/loongarch/t-linux
-+++ b/gcc/config/loongarch/t-linux
-@@ -18,7 +18,9 @@
-
- # Multilib
- MULTILIB_OPTIONS = mabi=lp64d/mabi=lp64f/mabi=lp64s
--MULTILIB_DIRNAMES = base/lp64d base/lp64f base/lp64s
-+#MULTILIB_DIRNAMES = base/lp64d base/lp64f base/lp64s
-+MULTILIB_DIRNAMES = . . .
-+MULTILIB_OSDIRNAMES = ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir))
-
- # The GCC driver always gets all abi-related options on the command line.
- # (see loongarch-driver.c:driver_get_normalized_m_opts)
-@@ -36,18 +38,18 @@ else
- endif
-
- # Don't define MULTILIB_OSDIRNAMES if multilib is disabled.
--ifeq ($(filter LA_DISABLE_MULTILIB,$(tm_defines)),)
--
--    MULTILIB_OSDIRNAMES = \
--      mabi.lp64d=../lib64$\
--      $(call if_multiarch,:loongarch64-linux-gnu)
--
--    MULTILIB_OSDIRNAMES += \
--      mabi.lp64f=../lib64/f32$\
--      $(call if_multiarch,:loongarch64-linux-gnuf32)
--
--    MULTILIB_OSDIRNAMES += \
--      mabi.lp64s=../lib64/sf$\
--      $(call if_multiarch,:loongarch64-linux-gnusf)
--
--endif
-+#ifeq ($(filter LA_DISABLE_MULTILIB,$(tm_defines)),)
-+#
-+#    MULTILIB_OSDIRNAMES = \
-+#      mabi.lp64d=../lib64$\
-+#      $(call if_multiarch,:loongarch64-linux-gnu)
-+#
-+#    MULTILIB_OSDIRNAMES += \
-+#      mabi.lp64f=../lib64/f32$\
-+#      $(call if_multiarch,:loongarch64-linux-gnuf32)
-+#
-+#    MULTILIB_OSDIRNAMES += \
-+#      mabi.lp64s=../lib64/sf$\
-+#      $(call if_multiarch,:loongarch64-linux-gnusf)
-+#
-+#endif
-

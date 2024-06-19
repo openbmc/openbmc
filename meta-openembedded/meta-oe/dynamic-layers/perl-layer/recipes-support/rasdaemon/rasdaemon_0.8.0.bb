@@ -34,9 +34,9 @@ LDFLAGS:append:libc-musl = " -largp"
 
 do_install:append() {
 	install -d ${D}${sysconfdir}/init.d
-	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/rasdaemon
+	install -m 755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/rasdaemon
 	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/rasdaemon.service ${D}${systemd_unitdir}/system
+	install -m 0644 ${UNPACKDIR}/rasdaemon.service ${D}${systemd_unitdir}/system
 }
 
 FILES:${PN} += "${sbindir}/rasdaemon \

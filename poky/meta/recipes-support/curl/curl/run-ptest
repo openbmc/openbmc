@@ -7,5 +7,13 @@ cd tests
 # Use automake-style output
 # Run four tests in parallel
 # Print log output on failure
+
 # Don't run the flaky or timing dependent tests
-./runtests.pl -a -n -am -j4 -p !flaky !timing-dependent
+# Until https://github.com/curl/curl/issues/13350 is resolved, don't run FTP tests
+# We don't enable --libcurl
+# Don't assume curl-config exists
+# We don't have the source tree
+./runtests.pl \
+    -a -c curl -vc curl -n -am -j4 -p \
+    !flaky !timing-dependent !FTP \
+    !--libcurl !curl-config !source\ analysis !checksrc !documentation

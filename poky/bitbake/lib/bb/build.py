@@ -197,6 +197,8 @@ def exec_func(func, d, dirs = None):
         for cdir in d.expand(cleandirs).split():
             bb.utils.remove(cdir, True)
             bb.utils.mkdirhier(cdir)
+            if cdir == oldcwd:
+                os.chdir(cdir)
 
     if flags and dirs is None:
         dirs = flags.get('dirs')

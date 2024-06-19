@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   int showVersion = 0;
   int showOot = 0;
   int rc;
-  char * countStr = NULL;
+  const char * countStr = NULL;
   struct poptOption options[] = {
             { "version", 'v', POPT_ARG_NONE, &showVersion, 0, 
 			"Display the version of this program, and exit" },
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
             { 0, 0, 0, 0, 0 }
         };
 
-  optCon = poptGetContext("usleep", argc, argv, options,0);
+  optCon = poptGetContext("usleep", argc, (const char **)argv, options,0);
   /*poptReadDefaultConfig(optCon, 1);*/
   poptSetOtherOptionHelp(optCon, "[microseconds]");
 

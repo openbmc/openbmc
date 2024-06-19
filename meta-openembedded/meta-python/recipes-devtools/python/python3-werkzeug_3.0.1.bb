@@ -20,4 +20,5 @@ RDEPENDS:${PN} += " \
     python3-profile \
     python3-compression \
     python3-json \
+    python3-difflib \
 "

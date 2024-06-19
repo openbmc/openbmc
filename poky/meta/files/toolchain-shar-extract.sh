@@ -164,7 +164,9 @@ else
 fi
 
 # limit the length for target_sdk_dir, ensure the relocation behaviour in relocate_sdk.py has right result.
-if [ ${#target_sdk_dir} -gt 2048 ]; then
+# This is due to ELF interpreter being set to 'a'*1024 in
+# meta/recipes-core/meta/uninative-tarball.bb
+if [ ${#target_sdk_dir} -gt 1024 ]; then
 	echo "Error: The target directory path is too long!!!"
 	exit 1
 fi

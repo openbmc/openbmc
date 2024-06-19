@@ -25,10 +25,11 @@ INHERIT += "create-spdx"
 
         deploy_dir = get_bb_var("DEPLOY_DIR")
         machine_var = get_bb_var("MACHINE")
+        spdx_version = get_bb_var("SPDX_VERSION")
         # qemux86-64 creates the directory qemux86_64
         machine_dir = machine_var.replace("-", "_")
 
-        full_file_path = os.path.join(deploy_dir, "spdx", machine_dir, high_level_dir, spdx_file)
+        full_file_path = os.path.join(deploy_dir, "spdx", spdx_version, machine_dir, high_level_dir, spdx_file)
 
         try:
             os.remove(full_file_path)

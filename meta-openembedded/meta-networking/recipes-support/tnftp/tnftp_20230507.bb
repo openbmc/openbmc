@@ -16,6 +16,8 @@ DEPENDS = "ncurses"
 
 SRC_URI = "https://ftp.netbsd.org/pub/NetBSD/misc/tnftp/${BPN}-${PV}.tar.gz \
            file://0001-libedit-Include-missing-header-stdc-predef.h.patch \
+           file://0001-Add-casts-to-appease-conversions-between-wchar_t-and.patch \
+           file://0002-Add-casts-to-appease-conversions-between-wchar_t-and.patch \
 "
 
 inherit autotools update-alternatives pkgconfig

@@ -17,20 +17,20 @@ SRC_URI = "file://installscript.sh \
 EXCLUDE_FROM_WORLD = "1"
 
 install_extrafunc() {
-	install -m 0644 ${WORKDIR}/selftest-replaceme-inst-func ${D}${datadir}/selftest-replaceme-inst-func
+	install -m 0644 ${UNPACKDIR}/selftest-replaceme-inst-func ${D}${datadir}/selftest-replaceme-inst-func
 }
 
 do_install() {
 	install -d ${D}${datadir}/
-	install -m 0644 ${WORKDIR}/selftest-replaceme-orig ${D}${datadir}/selftest-replaceme-orig
-	install -m 0644 ${WORKDIR}/selftest-replaceme-todir ${D}${datadir}
-	install -m 0644 ${WORKDIR}/file1 ${D}${datadir}/selftest-replaceme-renamed
-	install -m 0644 ${WORKDIR}/subdir/fileinsubdir ${D}${datadir}/selftest-replaceme-subdir
-	cp ${WORKDIR}/selftest-replaceme-inst-glob* ${D}${datadir}/selftest-replaceme-inst-globfile
-	cp ${WORKDIR}/selftest-replaceme-inst-todir-glob* ${D}${datadir}
+	install -m 0644 ${UNPACKDIR}/selftest-replaceme-orig ${D}${datadir}/selftest-replaceme-orig
+	install -m 0644 ${UNPACKDIR}/selftest-replaceme-todir ${D}${datadir}
+	install -m 0644 ${UNPACKDIR}/file1 ${D}${datadir}/selftest-replaceme-renamed
+	install -m 0644 ${UNPACKDIR}/subdir/fileinsubdir ${D}${datadir}/selftest-replaceme-subdir
+	cp ${UNPACKDIR}/selftest-replaceme-inst-glob* ${D}${datadir}/selftest-replaceme-inst-globfile
+	cp ${UNPACKDIR}/selftest-replaceme-inst-todir-glob* ${D}${datadir}
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${S}/file2 ${D}${sysconfdir}/selftest-replaceme-patched
-	sh ${WORKDIR}/installscript.sh ${D}${datadir}
+	sh ${UNPACKDIR}/installscript.sh ${D}${datadir}
 	install_extrafunc
 }
 

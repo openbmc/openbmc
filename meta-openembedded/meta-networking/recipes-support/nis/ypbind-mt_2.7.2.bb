@@ -49,10 +49,10 @@ do_install:append () {
     install -d ${D}${sysconfdir}/init.d
     install -d ${D}${sysconfdir}/rcS.d
 
-    install -m 0755 ${WORKDIR}/ypbind.init ${D}${sysconfdir}/init.d/ypbind
+    install -m 0755 ${UNPACKDIR}/ypbind.init ${D}${sysconfdir}/init.d/ypbind
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/ypbind.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/ypbind.service ${D}${systemd_unitdir}/system
 }
 
 # uses glibc internal APIs e.g. _hostalias

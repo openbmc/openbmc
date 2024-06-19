@@ -2,12 +2,12 @@ DESCRIPTION = "etcd is a distributed key-value store for distributed systems"
 HOMEPAGE = "https://etcd.io/"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${S}/${GO_INSTALL}/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
+LIC_FILES_CHKSUM = "file://${GO_INSTALL}/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRC_URI = " \
-    git://github.com/etcd-io/etcd;branch=release-3.5;protocol=https \
-    file://0001-xxhash-bump-to-v2.1.2.patch;patchdir=src/${GO_IMPORT} \
-    file://0001-test_lib.sh-remove-gobin-requirement-during-build.patch;patchdir=src/${GO_IMPORT} \
+    git://github.com/etcd-io/etcd;branch=release-3.5;protocol=https;destsuffix=${GO_SRCURI_DESTSUFFIX} \
+    file://0001-xxhash-bump-to-v2.1.2.patch;patchdir=${GO_INSTALL} \
+    file://0001-test_lib.sh-remove-gobin-requirement-during-build.patch;patchdir=${GO_INSTALL} \
     file://etcd.service \
     file://etcd-existing.conf \
     file://etcd-new.service \
@@ -62,11 +62,11 @@ do_install:append() {
     install -m 0755 ${D}${libdir}/go/src/go.etcd.io/etcd/v3/bin/etcd ${D}${bindir}
     install -m 0755 ${D}${libdir}/go/src/go.etcd.io/etcd/v3/bin/etcdctl ${D}${bindir}
     install -m 0755 ${D}${libdir}/go/src/go.etcd.io/etcd/v3/bin/etcdutl ${D}${bindir}
-    install -m 0644 ${WORKDIR}/etcd-existing.conf -D -t ${D}${sysconfdir}/etcd.d
+    install -m 0644 ${UNPACKDIR}/etcd-existing.conf -D -t ${D}${sysconfdir}/etcd.d
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/etcd.service ${D}${systemd_system_unitdir}/
-    install -m 0644 ${WORKDIR}/etcd-new.service ${D}${systemd_system_unitdir}/
-    install -m 0644 ${WORKDIR}/etcd-new.path ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/etcd.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/etcd-new.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/etcd-new.path ${D}${systemd_system_unitdir}/
 }
 
 FILES:${PN}:append = " ${sysconfdir}/etcd.d/etcd-existing.conf"

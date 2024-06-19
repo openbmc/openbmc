@@ -5,30 +5,30 @@
 #
 
 python multilib_virtclass_handler () {
-    cls = e.data.getVar("BBEXTENDCURR")
-    variant = e.data.getVar("BBEXTENDVARIANT")
+    cls = d.getVar("BBEXTENDCURR")
+    variant = d.getVar("BBEXTENDVARIANT")
     if cls != "multilib" or not variant:
         return
 
-    localdata = bb.data.createCopy(e.data)
+    localdata = bb.data.createCopy(d)
     localdata.delVar('TMPDIR')
-    e.data.setVar('STAGING_KERNEL_DIR', localdata.getVar('STAGING_KERNEL_DIR'))
+    d.setVar('STAGING_KERNEL_DIR', localdata.getVar('STAGING_KERNEL_DIR'))
 
     # There should only be one kernel in multilib configs
     # We also skip multilib setup for module packages.
-    provides = (e.data.getVar("PROVIDES") or "").split()
+    provides = (d.getVar("PROVIDES") or "").split()
     non_ml_recipes = d.getVar('NON_MULTILIB_RECIPES').split()
-    bpn = e.data.getVar("BPN")
-    if "virtual/kernel" in provides or \
-            bb.data.inherits_class('module-base', e.data) or \
-            bpn in non_ml_recipes:
+    bpn = d.getVar("BPN")
+    if ("virtual/kernel" in provides
+            or bb.data.inherits_class('module-base', d)
+            or bpn in non_ml_recipes):
         raise bb.parse.SkipRecipe("We shouldn't have multilib variants for %s" % bpn)
 
-    save_var_name=e.data.getVar("MULTILIB_SAVE_VARNAME") or ""
+    save_var_name = d.getVar("MULTILIB_SAVE_VARNAME") or ""
     for name in save_var_name.split():
-        val=e.data.getVar(name)
+        val = d.getVar(name)
         if val:
-            e.data.setVar(name + "_MULTILIB_ORIGINAL", val)
+            d.setVar(name + "_MULTILIB_ORIGINAL", val)
 
     # We nearly don't need this but dependencies on NON_MULTILIB_RECIPES don't work without it
     d.setVar("SSTATE_ARCHS_TUNEPKG", "${@all_multilib_tune_values(d, 'TUNE_PKGARCH')}")
@@ -36,66 +36,67 @@ python multilib_virtclass_handler () {
     overrides = e.data.getVar("OVERRIDES", False)
     pn = e.data.getVar("PN", False)
     overrides = overrides.replace("pn-${PN}", "pn-${PN}:pn-" + pn)
-    e.data.setVar("OVERRIDES", overrides)
+    d.setVar("OVERRIDES", overrides)
 
-    if bb.data.inherits_class('image', e.data):
-        e.data.setVar("MLPREFIX", variant + "-")
-        e.data.setVar("PN", variant + "-" + e.data.getVar("PN", False))
-        e.data.setVar('SDKTARGETSYSROOT', e.data.getVar('SDKTARGETSYSROOT'))
+    if bb.data.inherits_class('image', d):
+        d.setVar("MLPREFIX", variant + "-")
+        d.setVar("PN", variant + "-" + d.getVar("PN", False))
+        d.setVar('SDKTARGETSYSROOT', d.getVar('SDKTARGETSYSROOT'))
         override = ":virtclass-multilib-" + variant
-        e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)
-        target_vendor = e.data.getVar("TARGET_VENDOR:" + "virtclass-multilib-" + variant, False)
+        d.setVar("OVERRIDES", d.getVar("OVERRIDES", False) + override)
+        target_vendor = d.getVar("TARGET_VENDOR:" + "virtclass-multilib-" + variant, False)
         if target_vendor:
-            e.data.setVar("TARGET_VENDOR", target_vendor)
+            d.setVar("TARGET_VENDOR", target_vendor)
         return
 
-    if bb.data.inherits_class('cross-canadian', e.data):
+    if bb.data.inherits_class('cross-canadian', d):
         # Multilib cross-candian should use the same nativesdk sysroot without MLPREFIX
-        e.data.setVar("RECIPE_SYSROOT", "${WORKDIR}/recipe-sysroot")
-        e.data.setVar("STAGING_DIR_TARGET", "${WORKDIR}/recipe-sysroot")
-        e.data.setVar("STAGING_DIR_HOST", "${WORKDIR}/recipe-sysroot")
-        e.data.setVar("RECIPE_SYSROOT_MANIFEST_SUBDIR", "nativesdk-" + variant)
-        e.data.setVar("MLPREFIX", variant + "-")
+        d.setVar("RECIPE_SYSROOT", "${WORKDIR}/recipe-sysroot")
+        d.setVar("STAGING_DIR_TARGET", "${WORKDIR}/recipe-sysroot")
+        d.setVar("STAGING_DIR_HOST", "${WORKDIR}/recipe-sysroot")
+        d.setVar("RECIPE_SYSROOT_MANIFEST_SUBDIR", "nativesdk-" + variant)
+        d.setVar("MLPREFIX", variant + "-")
         override = ":virtclass-multilib-" + variant
-        e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)
+        d.setVar("OVERRIDES", d.getVar("OVERRIDES", False) + override)
         return
 
-    if bb.data.inherits_class('native', e.data):
+    if bb.data.inherits_class('native', d):
         raise bb.parse.SkipRecipe("We can't extend native recipes")
 
-    if bb.data.inherits_class('nativesdk', e.data) or bb.data.inherits_class('crosssdk', e.data):
+    if bb.data.inherits_class('nativesdk', d) or bb.data.inherits_class('crosssdk', d):
         raise bb.parse.SkipRecipe("We can't extend nativesdk recipes")
 
-    if bb.data.inherits_class('allarch', e.data) and not d.getVar('MULTILIB_VARIANTS') \
-        and not bb.data.inherits_class('packagegroup', e.data):
+    if (bb.data.inherits_class('allarch', d)
+            and not d.getVar('MULTILIB_VARIANTS')
+            and not bb.data.inherits_class('packagegroup', d)):
         raise bb.parse.SkipRecipe("Don't extend allarch recipes which are not packagegroups")
 
     # Expand this since this won't work correctly once we set a multilib into place
-    e.data.setVar("ALL_MULTILIB_PACKAGE_ARCHS", e.data.getVar("ALL_MULTILIB_PACKAGE_ARCHS"))
+    d.setVar("ALL_MULTILIB_PACKAGE_ARCHS", d.getVar("ALL_MULTILIB_PACKAGE_ARCHS"))
  
     override = ":virtclass-multilib-" + variant
 
-    skip_msg = e.data.getVarFlag('SKIP_RECIPE', e.data.getVar('PN'))
+    skip_msg = d.getVarFlag('SKIP_RECIPE', d.getVar('PN'))
     if skip_msg:
-        pn_new = variant + "-" + e.data.getVar('PN')
-        if not e.data.getVarFlag('SKIP_RECIPE', pn_new):
-            e.data.setVarFlag('SKIP_RECIPE', pn_new, skip_msg)
+        pn_new = variant + "-" + d.getVar('PN')
+        if not d.getVarFlag('SKIP_RECIPE', pn_new):
+            d.setVarFlag('SKIP_RECIPE', pn_new, skip_msg)
 
-    e.data.setVar("MLPREFIX", variant + "-")
-    e.data.setVar("PN", variant + "-" + e.data.getVar("PN", False))
-    e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)
+    d.setVar("MLPREFIX", variant + "-")
+    d.setVar("PN", variant + "-" + d.getVar("PN", False))
+    d.setVar("OVERRIDES", d.getVar("OVERRIDES", False) + override)
 
     # Expand INCOMPATIBLE_LICENSE_EXCEPTIONS with multilib prefix
-    pkgs = e.data.getVar("INCOMPATIBLE_LICENSE_EXCEPTIONS")
+    pkgs = d.getVar("INCOMPATIBLE_LICENSE_EXCEPTIONS")
     if pkgs:
         for pkg in pkgs.split():
             pkgs += " " + variant + "-" + pkg
-        e.data.setVar("INCOMPATIBLE_LICENSE_EXCEPTIONS", pkgs)
+        d.setVar("INCOMPATIBLE_LICENSE_EXCEPTIONS", pkgs)
 
     # DEFAULTTUNE can change TARGET_ARCH override so expand this now before update_data
-    newtune = e.data.getVar("DEFAULTTUNE:" + "virtclass-multilib-" + variant, False)
+    newtune = d.getVar("DEFAULTTUNE:" + "virtclass-multilib-" + variant, False)
     if newtune:
-        e.data.setVar("DEFAULTTUNE", newtune)
+        d.setVar("DEFAULTTUNE", newtune)
 }
 
 addhandler multilib_virtclass_handler

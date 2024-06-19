@@ -1,6 +1,6 @@
 #!/bin/sh
 
-testbins="gpiod-test gpio-tools-test gpiod-cxx-test gpiod_py_test.py"
+testbins="gpiod-test gpio-tools-test gpiod_py_test.py"
 
 ptestdir=$(dirname "$(readlink -f "$0")")
 cd $ptestdir/tests

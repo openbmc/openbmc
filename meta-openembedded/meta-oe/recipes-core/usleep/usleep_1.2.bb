@@ -3,7 +3,8 @@ SECTION = "base"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 DEPENDS = "popt"
 
 SRC_URI = "file://usleep.c \
@@ -19,8 +20,8 @@ do_install() {
     install -d ${D}${base_bindir}
     install -d ${D}${mandir}/man1
 
-    install -m 0755 ${WORKDIR}/usleep   ${D}${base_bindir}
-    install -m 0644 ${WORKDIR}/usleep.1 ${D}${mandir}/man1
+    install -m 0755 ${UNPACKDIR}/usleep   ${D}${base_bindir}
+    install -m 0644 ${UNPACKDIR}/usleep.1 ${D}${mandir}/man1
 }
 
 inherit update-alternatives

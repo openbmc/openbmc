@@ -29,6 +29,6 @@ do_configure:prepend() {
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/firmwared.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/firmwared.service ${D}${systemd_system_unitdir}
     sed -i -e 's,@BINDIR@,${bindir},g' ${D}${systemd_system_unitdir}/firmwared.service
 }

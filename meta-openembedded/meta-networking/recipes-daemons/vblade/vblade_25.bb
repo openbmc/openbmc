@@ -27,22 +27,22 @@ do_install() {
     install -D -m 0755 ${S}/vbladed ${D}/${sbindir}/vbladed
     install -D -m 0644 ${S}/vblade.8 ${D}/${mandir}/man8/vblade.8
 
-    install -D -m 0644 ${WORKDIR}/${BPN}.conf ${D}/${sysconfdir}/${BPN}.conf
-    install -D -m 0755 ${WORKDIR}/${BPN}.init ${D}/${sysconfdir}/init.d/${BPN}
+    install -D -m 0644 ${UNPACKDIR}/${BPN}.conf ${D}/${sysconfdir}/${BPN}.conf
+    install -D -m 0755 ${UNPACKDIR}/${BPN}.init ${D}/${sysconfdir}/init.d/${BPN}
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}/${sysconfdir}/default/volatiles
-        install -m 0755 ${WORKDIR}/volatiles.99_vblade ${D}/${sysconfdir}/default/volatiles/99_vblade
+        install -m 0755 ${UNPACKDIR}/volatiles.99_vblade ${D}/${sysconfdir}/default/volatiles/99_vblade
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}/${bindir}
-        install -m 0755 ${WORKDIR}/${BPN}.init ${D}/${bindir}/
+        install -m 0755 ${UNPACKDIR}/${BPN}.init ${D}/${bindir}/
         install -d ${D}${sysconfdir}/tmpfiles.d
         echo "d /var/run/${BPN} 0755 root root -" > ${D}${sysconfdir}/tmpfiles.d/${BPN}.conf
 
         install -d ${D}${systemd_system_unitdir}
-        install -m 0644 ${WORKDIR}/vblade.service ${D}${systemd_system_unitdir}
+        install -m 0644 ${UNPACKDIR}/vblade.service ${D}${systemd_system_unitdir}
         sed -e 's,@BINDIR@,${bindir},g' -i ${D}${systemd_system_unitdir}/*.service
     fi
 

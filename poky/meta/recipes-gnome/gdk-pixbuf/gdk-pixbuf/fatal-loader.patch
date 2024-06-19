@@ -1,4 +1,4 @@
-From b511bd1efb43ffc49c753e309717a242ec686ef1 Mon Sep 17 00:00:00 2001
+From f78ab4edaee5f62663a9a4bcfa56e5c524da4474 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 1 Apr 2014 17:23:36 +0100
 Subject: [PATCH] gdk-pixbuf: add an option so that loader errors are fatal
@@ -8,13 +8,12 @@ non-zero if the loader had errors (missing libraries, generally).
 
 Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/merge_requests/144]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-
 ---
  gdk-pixbuf/queryloaders.c | 19 +++++++++++++++----
  1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/gdk-pixbuf/queryloaders.c b/gdk-pixbuf/queryloaders.c
-index 1d39b44..2b00815 100644
+index baa9a5c..9b6fa89 100644
 --- a/gdk-pixbuf/queryloaders.c
 +++ b/gdk-pixbuf/queryloaders.c
 @@ -216,7 +216,7 @@ write_loader_info (GString *contents, const char *path, GdkPixbufFormat *info)
@@ -77,7 +76,7 @@ index 1d39b44..2b00815 100644
                  }
                  g_free (cwd);
          }
-@@ -490,5 +498,8 @@ int main (int argc, char **argv)
+@@ -492,5 +500,8 @@ int main (int argc, char **argv)
  
          g_free (pixbuf_libdir);
  

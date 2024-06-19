@@ -1,0 +1,35 @@
+From 298dec6f87061914c85049faca3d0ff3310d1794 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 6 May 2024 12:15:30 -0700
+Subject: [PATCH] initialize timespec variable
+
+Fixes build warnings with GCC14
+
+/mnt/b/yoe/master/build/tmp/work/core2-32-yoe-linux/pcapplusplus/23.09/git/Packet++/src/RawPacket.cpp: In constructor 'pcpp::RawPacket::RawPacket(const uint8_t*, int, timeval, bool, pcpp::LinkLayerType)':
+/mnt/b/yoe/master/build/tmp/work/core2-32-yoe-linux/pcapplusplus/23.09/git/Packet++/src/RawPacket.cpp:23:18: error: 'nsec_time.timespec::<anonymous>' is used uninitialized [-Werror=uninitialized]
+   23 |         timespec nsec_time;
+      |                  ^~~~~~~~~
+cc1plus: all warnings being treated as errors
+
+Upstream-Status: Submitted [https://github.com/seladb/PcapPlusPlus/pull/1389]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Packet++/src/RawPacket.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Packet++/src/RawPacket.cpp b/Packet++/src/RawPacket.cpp
+index 8ad52d52..07dbbbe2 100644
+--- a/Packet++/src/RawPacket.cpp
++++ b/Packet++/src/RawPacket.cpp
+@@ -20,7 +20,7 @@ void RawPacket::init(bool deleteRawDataAtDestructor)
+ 
+ RawPacket::RawPacket(const uint8_t* pRawData, int rawDataLen, timeval timestamp, bool deleteRawDataAtDestructor, LinkLayerType layerType)
+ {
+-	timespec nsec_time;
++	timespec nsec_time = {};
+ 	TIMEVAL_TO_TIMESPEC(&timestamp, &nsec_time);
+ 	init(deleteRawDataAtDestructor);
+ 	setRawData(pRawData, rawDataLen, nsec_time, layerType);
+-- 
+2.45.0
+

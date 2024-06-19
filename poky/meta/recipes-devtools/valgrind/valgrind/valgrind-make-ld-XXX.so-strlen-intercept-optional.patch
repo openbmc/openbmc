@@ -16,11 +16,9 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  coregrind/m_redir.c | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/coregrind/m_redir.c b/coregrind/m_redir.c
-index ff35009..d7d6816 100644
 --- a/coregrind/m_redir.c
 +++ b/coregrind/m_redir.c
-@@ -1275,7 +1275,18 @@ static void add_hardwired_spec (const  HChar* sopatt, const HChar* fnpatt,
+@@ -1307,7 +1307,18 @@ static void add_hardwired_spec (const  H
     spec->to_addr     = to_addr;
     spec->isWrap      = False;
     spec->isGlobal    = False;
@@ -40,6 +38,3 @@ index ff35009..d7d6816 100644
     /* VARIABLE PARTS */
     spec->mark        = False; /* not significant */
     spec->done        = False; /* not significant */
--- 
-1.9.1
-

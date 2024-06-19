@@ -1,4 +1,4 @@
-From e6eb7536fcfc2c75f7831f67b1f16f3f36ef2545 Mon Sep 17 00:00:00 2001
+From 39fbcdfc5383bdae95293a3109c847f64d193b54 Mon Sep 17 00:00:00 2001
 From: Andrey Zhizhikin <andrey.z@gmail.com>
 Date: Mon, 27 Jan 2020 10:22:35 +0000
 Subject: [PATCH] opencv: resolve missing opencv data dir in yocto build
@@ -12,18 +12,17 @@ Upstream-Status: Inappropriate [OE-specific]
 
 Signed-off-by: Andrey Zhizhikin <andrey.z@gmail.com>
 Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
-
 ---
- ext/opencv/meson.build | 3 +++
+ gst-libs/gst/opencv/meson.build | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/ext/opencv/meson.build b/ext/opencv/meson.build
-index 37e2015..326f737 100644
---- a/ext/opencv/meson.build
-+++ b/ext/opencv/meson.build
-@@ -87,6 +87,9 @@ if opencv_found
-   opencv_prefix = opencv_dep.get_variable('prefix')
-   gstopencv_cargs += ['-DOPENCV_PREFIX="' + opencv_prefix + '"']
+diff --git a/gst-libs/gst/opencv/meson.build b/gst-libs/gst/opencv/meson.build
+index 1d337f1..f47939a 100644
+--- a/gst-libs/gst/opencv/meson.build
++++ b/gst-libs/gst/opencv/meson.build
+@@ -52,6 +52,9 @@ if opencv_found
+   # /usr/include/opencv4/opencv2/flann/logger.h:83:36: error: format string is not a string literal [-Werror,-Wformat-nonliteral]
+   gstopencv_cargs += cxx.get_supported_arguments(['-Wno-missing-include-dirs', '-Wno-format-nonliteral'])
  
 +  pkgconf_sysroot = run_command(python3, '-c', 'import os; print(os.environ.get("PKG_CONFIG_SYSROOT_DIR"))').stdout().strip()
 +  opencv_prefix = pkgconf_sysroot + opencv_prefix

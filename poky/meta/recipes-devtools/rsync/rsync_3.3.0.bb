@@ -61,7 +61,7 @@ do_configure:append () {
 
 do_install:append() {
 	install -d ${D}${sysconfdir}
-	install -m 0644 ${WORKDIR}/rsyncd.conf ${D}${sysconfdir}
+	install -m 0644 ${UNPACKDIR}/rsyncd.conf ${D}${sysconfdir}
 }
 
 BBCLASSEXTEND = "native nativesdk"

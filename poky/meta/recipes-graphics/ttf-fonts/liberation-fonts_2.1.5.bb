@@ -26,7 +26,7 @@ do_install () {
 	done
 
 	install -d ${D}${sysconfdir}/fonts/conf.d/
-	install -m 0644 ${WORKDIR}/30-liberation-aliases.conf ${D}${sysconfdir}/fonts/conf.d/
+	install -m 0644 ${UNPACKDIR}/30-liberation-aliases.conf ${D}${sysconfdir}/fonts/conf.d/
 
 	install -d ${D}${prefix}/share/doc/${BPN}/
 	install -m 0644 LICENSE ${D}${datadir}/doc/${BPN}/

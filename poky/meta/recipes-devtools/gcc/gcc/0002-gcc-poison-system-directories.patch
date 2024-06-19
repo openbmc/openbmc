@@ -1,4 +1,4 @@
-From 52676b5934ba127c3af39fc484c8236c8fa60b96 Mon Sep 17 00:00:00 2001
+From 05be69910c99d739ce9246a3bb9426fa6d9f19d4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 8 Mar 2021 16:04:20 -0800
 Subject: [PATCH] gcc: poison-system-directories
@@ -25,10 +25,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  7 files changed, 86 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/common.opt b/gcc/common.opt
-index 862c474d3c8..64c4277c991 100644
+index ad348844775..df3992b420d 100644
 --- a/gcc/common.opt
 +++ b/gcc/common.opt
-@@ -711,6 +711,10 @@ Wreturn-local-addr
+@@ -715,6 +715,10 @@ Wreturn-local-addr
  Common Var(warn_return_local_addr) Init(1) Warning
  Warn about returning a pointer/reference to a local or temporary variable.
  
@@ -40,10 +40,10 @@ index 862c474d3c8..64c4277c991 100644
  Common Var(warn_shadow) Warning
  Warn when one variable shadows another.  Same as -Wshadow=global.
 diff --git a/gcc/config.in b/gcc/config.in
-index 4cad077bfbe..80e832fdb84 100644
+index f3de4ba6776..3ce3113510b 100644
 --- a/gcc/config.in
 +++ b/gcc/config.in
-@@ -236,6 +236,16 @@
+@@ -249,6 +249,16 @@
  #endif
  
  
@@ -61,18 +61,18 @@ index 4cad077bfbe..80e832fdb84 100644
     optimizer and back end) to be checked for dynamic type safety at runtime.
     This is quite expensive. */
 diff --git a/gcc/configure b/gcc/configure
-index c7b26d1927d..3508be7b439 100755
+index 266ab8f84b2..3c346acbce0 100755
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -1026,6 +1026,7 @@ enable_maintainer_mode
+@@ -1050,6 +1050,7 @@ enable_maintainer_mode
  enable_link_mutex
  enable_link_serialization
  enable_version_specific_runtime_libs
 +enable_poison_system_directories
  enable_plugin
  enable_host_shared
- enable_libquadmath_support
-@@ -1788,6 +1789,8 @@ Optional Features:
+ enable_host_pie
+@@ -1823,6 +1824,8 @@ Optional Features:
    --enable-version-specific-runtime-libs
                            specify that runtime libraries should be installed
                            in a compiler-specific directory
@@ -80,8 +80,8 @@ index c7b26d1927d..3508be7b439 100755
 +                          warn for use of native system header directories
    --enable-plugin         enable plugin support
    --enable-host-shared    build host code as shared libraries
-   --disable-libquadmath-support
-@@ -31753,6 +31756,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
+   --enable-host-pie       build host code as PIE
+@@ -34020,6 +34023,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
  fi
  
  
@@ -105,10 +105,10 @@ index c7b26d1927d..3508be7b439 100755
  
  
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index 09082e8ccae..6cd01a8966b 100644
+index a5aec1bc967..4d8123085b8 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -7292,6 +7292,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
+@@ -7518,6 +7518,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
                  [specify that runtime libraries should be
                   installed in a compiler-specific directory])])
  
@@ -132,10 +132,10 @@ index 09082e8ccae..6cd01a8966b 100644
  AC_SUBST(subdirs)
  AC_SUBST(srcdir)
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index de40f62e219..d6f203c8b71 100644
+index 1006510fc6a..389155f8ed5 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -384,6 +384,7 @@ Objective-C and Objective-C++ Dialects}.
+@@ -391,6 +391,7 @@ Objective-C and Objective-C++ Dialects}.
  -Wpacked  -Wno-packed-bitfield-compat  -Wpacked-not-aligned  -Wpadded
  -Wparentheses  -Wno-pedantic-ms-format
  -Wpointer-arith  -Wno-pointer-compare  -Wno-pointer-to-int-cast
@@ -143,7 +143,7 @@ index de40f62e219..d6f203c8b71 100644
  -Wno-pragmas  -Wno-prio-ctor-dtor  -Wredundant-decls
  -Wrestrict  -Wno-return-local-addr  -Wreturn-type
  -Wno-scalar-storage-order  -Wsequence-point
-@@ -8426,6 +8427,14 @@ made up of data only and thus requires no special treatment.  But, for
+@@ -8860,6 +8861,14 @@ made up of data only and thus requires no special treatment.  But, for
  most targets, it is made up of code and thus requires the stack to be
  made executable in order for the program to work properly.
  
@@ -159,19 +159,19 @@ index de40f62e219..d6f203c8b71 100644
  @opindex Wno-float-equal
  @item -Wfloat-equal
 diff --git a/gcc/gcc.cc b/gcc/gcc.cc
-index 16bb07f2cdc..5feae021545 100644
+index 728332b8153..343e4915097 100644
 --- a/gcc/gcc.cc
 +++ b/gcc/gcc.cc
-@@ -1146,6 +1146,8 @@ proper position among the other output files.  */
+@@ -1159,6 +1159,8 @@ proper position among the other output files.  */
     "%{fuse-ld=*:-fuse-ld=%*} " LINK_COMPRESS_DEBUG_SPEC \
     "%X %{o*} %{e*} %{N} %{n} %{r}\
      %{s} %{t} %{u*} %{z} %{Z} %{!nostdlib:%{!r:%{!nostartfiles:%S}}} \
 +    %{Wno-poison-system-directories:--no-poison-system-directories} \
 +    %{Werror=poison-system-directories:--error-poison-system-directories} \
-     %{static|no-pie|static-pie:} %@{L*} %(mfwrap) %(link_libgcc) " \
+     %{static|no-pie|static-pie:} %@{L*} %(link_libgcc) " \
      VTABLE_VERIFICATION_SPEC " " SANITIZER_EARLY_SPEC " %o "" \
      %{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*:%*} 1):\
-@@ -1241,8 +1243,11 @@ static const char *cpp_unique_options =
+@@ -1260,8 +1262,11 @@ static const char *cpp_unique_options =
  static const char *cpp_options =
  "%(cpp_unique_options) %1 %{m*} %{std*&ansi&trigraphs} %{W*&pedantic*} %{w}\
   %{f*} %{g*:%{%:debug-level-gt(0):%{g*}\
@@ -186,7 +186,7 @@ index 16bb07f2cdc..5feae021545 100644
  /* Pass -d* flags, possibly modifying -dumpdir, -dumpbase et al.
  
 diff --git a/gcc/incpath.cc b/gcc/incpath.cc
-index 4d44321183f..46c0d543205 100644
+index 64cdd2f4a1b..e572d98ab17 100644
 --- a/gcc/incpath.cc
 +++ b/gcc/incpath.cc
 @@ -26,6 +26,7 @@

@@ -26,5 +26,9 @@ ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 RDEPENDS:${PN} = "connman"
 
 do_install:append() {
-    install -m 0644 ${WORKDIR}/images/* ${D}/usr/share/icons/hicolor/22x22/apps/
+    install -m 0644 ${UNPACKDIR}/images/* ${D}/usr/share/icons/hicolor/22x22/apps/
 }
+
+# http://errors.yoctoproject.org/Errors/Details/766926/
+# connman-client.c:200:15: error: assignment to 'GtkTreeModel *' {aka 'struct _GtkTreeModel *'} from incompatible pointer type 'GtkTreeStore *' {aka 'struct _GtkTreeStore *'} [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

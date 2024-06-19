@@ -1,7 +1,7 @@
-From a198bcd457abd04f2e22812ff3a37246aa564614 Mon Sep 17 00:00:00 2001
+From dfa9e2c494d1a834f5bdfe4dc24e8329dd8720eb Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Mon, 5 Dec 2022 15:14:12 +0000
-Subject: [PATCH 2/6] make: Set libdns_sd.so soname correctly
+Subject: [PATCH] make: Set libdns_sd.so soname correctly
 
 Upstream-Status: Pending
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
@@ -9,11 +9,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: mDNSResponder/mDNSPosix/Makefile
-===================================================================
---- mDNSResponder.orig/mDNSPosix/Makefile
-+++ mDNSResponder/mDNSPosix/Makefile
-@@ -276,7 +276,7 @@ libdns_sd: setup $(BUILDDIR)/libdns_sd.$
+diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
+index 041706523139..c877c8bb19e6 100755
+--- a/mDNSPosix/Makefile
++++ b/mDNSPosix/Makefile
+@@ -276,7 +276,7 @@ libdns_sd: setup $(BUILDDIR)/libdns_sd.$(LDSUFFIX)
  CLIENTLIBOBJS = $(OBJDIR)/dnssd_clientlib.c.so.o $(OBJDIR)/dnssd_clientstub.c.so.o $(OBJDIR)/dnssd_ipc.c.so.o $(OBJDIR)/dnssd_errstring.c.so.o
  
  $(BUILDDIR)/libdns_sd.$(LDSUFFIX): $(CLIENTLIBOBJS)

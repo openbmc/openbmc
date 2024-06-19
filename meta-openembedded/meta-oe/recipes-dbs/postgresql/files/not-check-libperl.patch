@@ -23,7 +23,7 @@ diff --git a/configure.ac b/configure.ac
 index fba79ee..7170f26 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2261,7 +2261,7 @@ Use --without-tcl to disable building PL/Tcl.])
+@@ -2297,7 +2297,7 @@ Use --without-tcl to disable building PL/Tcl.])
  fi
  
  # check for <perl.h>

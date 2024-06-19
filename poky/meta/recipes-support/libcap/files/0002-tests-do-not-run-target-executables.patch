@@ -1,11 +1,10 @@
-From 10212b6d4e8843feffbeab5336342d97f3a46bb2 Mon Sep 17 00:00:00 2001
+From a3368b38abfb703e730fc5462f42cc5d177d864d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 20 Dec 2019 16:54:05 +0100
 Subject: [PATCH] tests: do not run target executables
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  tests/Makefile | 2 --
  1 file changed, 2 deletions(-)

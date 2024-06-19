@@ -9,3 +9,5 @@ SRC_URI = "http://dfu-util.sourceforge.net/releases/${BP}.tar.gz"
 SRC_URI[sha256sum] = "b4b53ba21a82ef7e3d4c47df2952adf5fa494f499b6b0b57c58c5d04ae8ff19e"
 
 inherit autotools pkgconfig
+
+BBCLASSEXTEND = "nativesdk"

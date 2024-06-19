@@ -1,3 +1,8 @@
+From 34f5a21afae759d48fa11e77b622ca35a4feabaa Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 6 Dec 2023 10:24:46 +0800
+Subject: [PATCH] lvm2: 2.03.16 -> 2.03.22
+
 Not check python modules pyudev and dbus during configure that they are runtime
 dependencies. Deal with them in the package config setting in the recipe.
 
@@ -13,10 +18,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  2 files changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index ee088b3f5..b94ef4e56 100644
+index 9dfdcfe01..fcf5c8b78 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1262,8 +1262,8 @@ AS_IF([test "$BUILD_LVMDBUSD" = "yes"], [
+@@ -1282,8 +1282,8 @@ AS_IF([test "$BUILD_LVMDBUSD" = "yes"], [
  	AS_IF([test "$PYTHON3_BINDINGS" = "yes"], [PYTHON_BINDINGS="yes"])
  
  	# To get this macro, install autoconf-archive package then run autoreconf
@@ -28,7 +33,7 @@ index ee088b3f5..b94ef4e56 100644
  
  ################################################################################
 diff --git a/daemons/lvmdbusd/Makefile.in b/daemons/lvmdbusd/Makefile.in
-index 9c2629279..a79daabf7 100644
+index 08b061fb2..e2b1c3209 100644
 --- a/daemons/lvmdbusd/Makefile.in
 +++ b/daemons/lvmdbusd/Makefile.in
 @@ -16,7 +16,7 @@ top_srcdir = @top_srcdir@
@@ -41,7 +46,7 @@ index 9c2629279..a79daabf7 100644
  LVMDBUS_SRCDIR_FILES = \
  	automatedproperties.py \
 @@ -55,11 +55,9 @@ install_lvmdbusd: $(LVMDBUSD)
- 	@echo "    [INSTALL] $<"
+ 	$(SHOW) "    [INSTALL] $<"
  	$(Q) $(INSTALL_DIR) $(sbindir)
  	$(Q) $(INSTALL_SCRIPT) $(LVMDBUSD) $(sbindir)
 -	$(Q) $(INSTALL_DIR) $(lvmdbusdir) $(lvmdbusdir)/__pycache__

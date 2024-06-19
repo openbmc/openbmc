@@ -1,0 +1,758 @@
+From 370811420cfa1c14146f45de308bbccf70408eb8 Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Fri, 5 Apr 2024 11:19:37 +0200
+Subject: [PATCH] Provide crypto api to create uefi priv var fingerprint
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add new call to the crypto backend to calculate a hash of the common
+name of the signing certificate’s Subject and the tbsCertificate
+of the top-level issuer certificate.
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/27953]
+---
+ .../client/caller/packed-c/crypto_caller.h    |   1 +
+ ...aller_get_uefi_priv_auth_var_fingerprint.h |  90 ++++++++
+ .../packed-c/packedc_crypto_client.cpp        |   8 +
+ .../protocol/packed-c/packedc_crypto_client.h |   4 +
+ .../service/crypto/client/psa/component.cmake |   1 +
+ .../service/crypto/client/psa/crypto_client.h |   5 +
+ .../psa/get_uefi_priv_auth_var_fingerprint.c  |  21 ++
+ .../service/crypto/provider/crypto_provider.c | 212 +++++++++++++++---
+ .../serializer/crypto_provider_serializer.h   |   8 +
+ .../packedc_crypto_provider_serializer.c      |  54 +++++
+ .../backend/direct/uefi_direct_backend.c      |  90 ++++++++
+ deployments/smm-gateway/smm-gateway.cmake     |   5 +
+ .../get_uefi_priv_auth_var_fingerprint.h      |  21 ++
+ protocols/service/crypto/packed-c/opcodes.h   |   1 +
+ 14 files changed, 488 insertions(+), 33 deletions(-)
+ create mode 100644 components/service/crypto/client/caller/packed-c/crypto_caller_get_uefi_priv_auth_var_fingerprint.h
+ create mode 100644 components/service/crypto/client/psa/get_uefi_priv_auth_var_fingerprint.c
+ create mode 100644 protocols/service/crypto/packed-c/get_uefi_priv_auth_var_fingerprint.h
+
+diff --git a/components/service/crypto/client/caller/packed-c/crypto_caller.h b/components/service/crypto/client/caller/packed-c/crypto_caller.h
+index d834bc207..d5dd0f70d 100644
+--- a/components/service/crypto/client/caller/packed-c/crypto_caller.h
++++ b/components/service/crypto/client/caller/packed-c/crypto_caller.h
+@@ -31,5 +31,6 @@
+ #include "crypto_caller_sign_hash.h"
+ #include "crypto_caller_verify_hash.h"
+ #include "crypto_caller_verify_pkcs7_signature.h"
++#include "crypto_caller_get_uefi_priv_auth_var_fingerprint.h"
+ 
+ #endif /* PACKEDC_CRYPTO_CALLER_H */
+diff --git a/components/service/crypto/client/caller/packed-c/crypto_caller_get_uefi_priv_auth_var_fingerprint.h b/components/service/crypto/client/caller/packed-c/crypto_caller_get_uefi_priv_auth_var_fingerprint.h
+new file mode 100644
+index 000000000..d3446e445
+--- /dev/null
++++ b/components/service/crypto/client/caller/packed-c/crypto_caller_get_uefi_priv_auth_var_fingerprint.h
+@@ -0,0 +1,90 @@
++/*
++ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PACKEDC_CRYPTO_CALLER_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_H
++#define PACKEDC_CRYPTO_CALLER_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_H
++
++#include <common/tlv/tlv.h>
++#include <protocols/common/efi/efi_status.h>
++#include <protocols/rpc/common/packed-c/status.h>
++#include <protocols/service/crypto/packed-c/opcodes.h>
++#include <protocols/service/crypto/packed-c/get_uefi_priv_auth_var_fingerprint.h>
++#include <service/common/client/service_client.h>
++#include <stdlib.h>
++#include <string.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++static inline int crypto_caller_get_uefi_priv_auth_var_fingerprint(struct service_client *context,
++						       const uint8_t *signature_cert,
++						       uint64_t signature_cert_len,
++						       uint8_t *output)
++{
++	efi_status_t efi_status = EFI_SUCCESS;
++	size_t req_len = 0;
++
++	if (signature_cert_len > UINT16_MAX)
++		return RPC_ERROR_INVALID_VALUE;
++
++	struct tlv_record signature_record = {
++		.tag = TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_IN_TAG_SIGNATURE,
++		.length = (uint16_t)signature_cert_len,
++		.value = signature_cert
++	};
++
++	req_len += tlv_required_space(signature_record.length);
++
++	rpc_call_handle call_handle;
++	uint8_t *req_buf;
++
++	call_handle = rpc_caller_session_begin(context->session, &req_buf, req_len, 0);
++
++	if (call_handle) {
++		uint8_t *resp_buf;
++		size_t resp_len;
++		service_status_t service_status;
++		struct tlv_iterator req_iter;
++
++		tlv_iterator_begin(&req_iter, req_buf, req_len);
++		tlv_encode(&req_iter, &signature_record);
++
++		context->rpc_status = rpc_caller_session_invoke(
++			call_handle, TS_CRYPTO_OPCODE_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT, &resp_buf, &resp_len,
++			&service_status);
++
++		if (context->rpc_status == RPC_SUCCESS) {
++
++			if (service_status == EFI_SUCCESS) {
++
++				struct tlv_const_iterator resp_iter;
++				struct tlv_record decoded_record;
++				tlv_const_iterator_begin(&resp_iter, resp_buf, resp_len);
++
++				if (tlv_find_decode(&resp_iter,
++							TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_OUT_TAG_IDENTIFIER, &decoded_record)) {
++
++					memcpy(output, decoded_record.value, PSA_HASH_MAX_SIZE);
++				}
++				else {
++					/* Mandatory response parameter missing */
++					efi_status = EFI_INVALID_PARAMETER;
++				}
++			}
++		}
++
++		rpc_caller_session_end(call_handle);
++	}
++
++	return efi_status;
++}
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* PACKEDC_CRYPTO_CALLER_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_H */
+diff --git a/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.cpp b/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.cpp
+index aaa71f0c8..e0f6a15a8 100644
+--- a/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.cpp
++++ b/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.cpp
+@@ -428,3 +428,11 @@ int packedc_crypto_client::verify_pkcs7_signature(const uint8_t *signature_cert,
+ 						    hash, hash_len, public_key_cert,
+ 						    public_key_cert_len);
+ }
++
++int packedc_crypto_client::get_uefi_priv_auth_var_fingerprint(const uint8_t *signature_cert,
++						  uint64_t signature_cert_len,
++						  uint8_t *output)
++{
++	return crypto_caller_get_uefi_priv_auth_var_fingerprint(&m_client, signature_cert, signature_cert_len,
++						    output);
++}
+diff --git a/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.h b/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.h
+index 8d4f60cf9..ec6c51c7f 100644
+--- a/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.h
++++ b/components/service/crypto/client/cpp/protocol/packed-c/packedc_crypto_client.h
+@@ -236,6 +236,10 @@ public:
+ 	int verify_pkcs7_signature(const uint8_t *signature_cert, uint64_t signature_cert_len,
+ 				   const uint8_t *hash, uint64_t hash_len,
+ 				   const uint8_t *public_key_cert, uint64_t public_key_cert_len);
++
++	int get_uefi_priv_auth_var_fingerprint(const uint8_t *signature_cert,
++				    uint64_t signature_cert_len,
++				    uint8_t *output);
+ };
+ 
+ #endif /* PACKEDC_CRYPTO_CLIENT_H */
+diff --git a/components/service/crypto/client/psa/component.cmake b/components/service/crypto/client/psa/component.cmake
+index 359db3b4a..5bee0c652 100644
+--- a/components/service/crypto/client/psa/component.cmake
++++ b/components/service/crypto/client/psa/component.cmake
+@@ -32,4 +32,5 @@ target_sources(${TGT} PRIVATE
+ 	"${CMAKE_CURRENT_LIST_DIR}/psa_sign_message.c"
+ 	"${CMAKE_CURRENT_LIST_DIR}/psa_verify_message.c"
+ 	"${CMAKE_CURRENT_LIST_DIR}/verify_pkcs7_signature.c"
++	"${CMAKE_CURRENT_LIST_DIR}/get_uefi_priv_auth_var_fingerprint.c"
+ 	)
+diff --git a/components/service/crypto/client/psa/crypto_client.h b/components/service/crypto/client/psa/crypto_client.h
+index 4b59bbe32..af04df11e 100644
+--- a/components/service/crypto/client/psa/crypto_client.h
++++ b/components/service/crypto/client/psa/crypto_client.h
+@@ -7,10 +7,15 @@
+ #ifndef CRYPTO_CLIENT_H
+ #define CRYPTO_CLIENT_H
+ 
++#include <stddef.h>
+ #include <stdint.h>
+ 
+ int verify_pkcs7_signature(const uint8_t *signature_cert, uint64_t signature_cert_len,
+ 			   const uint8_t *hash, uint64_t hash_len, const uint8_t *public_key_cert,
+ 			   uint64_t public_key_cert_len);
+ 
++int get_uefi_priv_auth_var_fingerprint_handler(const uint8_t *signature_cert,
++				    uint64_t signature_cert_len,
++				    uint8_t *output);
++
+ #endif /* CRYPTO_CLIENT_H */
+diff --git a/components/service/crypto/client/psa/get_uefi_priv_auth_var_fingerprint.c b/components/service/crypto/client/psa/get_uefi_priv_auth_var_fingerprint.c
+new file mode 100644
+index 000000000..702aaa0c4
+--- /dev/null
++++ b/components/service/crypto/client/psa/get_uefi_priv_auth_var_fingerprint.c
+@@ -0,0 +1,21 @@
++/*
++ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include "crypto_caller_selector.h"
++#include "crypto_client.h"
++#include "psa_crypto_client.h"
++
++int get_uefi_priv_auth_var_fingerprint_handler(const uint8_t *signature_cert,
++				    uint64_t signature_cert_len,
++				    uint8_t *output)
++{
++	if (psa_crypto_client_instance.init_status != PSA_SUCCESS)
++		return psa_crypto_client_instance.init_status;
++
++	return crypto_caller_get_uefi_priv_auth_var_fingerprint(&psa_crypto_client_instance.base,
++						    signature_cert, signature_cert_len,
++						    output);
++}
+diff --git a/components/service/crypto/provider/crypto_provider.c b/components/service/crypto/provider/crypto_provider.c
+index 9cd520859..4535d6dbe 100644
+--- a/components/service/crypto/provider/crypto_provider.c
++++ b/components/service/crypto/provider/crypto_provider.c
+@@ -3,12 +3,15 @@
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
++#include <protocols/common/efi/efi_status.h>
+ #include <protocols/rpc/common/packed-c/status.h>
+ #include <protocols/service/crypto/packed-c/opcodes.h>
+ #include <service/crypto/backend/crypto_backend.h>
+ #include <service/crypto/provider/crypto_provider.h>
++#include <compiler.h>
+ #include <stdint.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+ #include "crypto_partition.h"
+ #include "crypto_uuid.h"
+@@ -28,25 +31,27 @@ static rpc_status_t copy_key_handler(void *context, struct rpc_request *req);
+ static rpc_status_t purge_key_handler(void *context, struct rpc_request *req);
+ static rpc_status_t get_key_attributes_handler(void *context, struct rpc_request *req);
+ static rpc_status_t verify_pkcs7_signature_handler(void *context, struct rpc_request *req);
++static rpc_status_t get_uefi_priv_auth_var_fingerprint_handler(void *context, struct rpc_request *req);
+ 
+ /* Handler mapping table for service */
+ static const struct service_handler handler_table[] = {
+-	{ TS_CRYPTO_OPCODE_GENERATE_KEY,           generate_key_handler },
+-	{ TS_CRYPTO_OPCODE_DESTROY_KEY,            destroy_key_handler },
+-	{ TS_CRYPTO_OPCODE_EXPORT_KEY,             export_key_handler },
+-	{ TS_CRYPTO_OPCODE_EXPORT_PUBLIC_KEY,      export_public_key_handler },
+-	{ TS_CRYPTO_OPCODE_IMPORT_KEY,             import_key_handler },
+-	{ TS_CRYPTO_OPCODE_SIGN_HASH,              asymmetric_sign_handler },
+-	{ TS_CRYPTO_OPCODE_VERIFY_HASH,            asymmetric_verify_handler },
+-	{ TS_CRYPTO_OPCODE_ASYMMETRIC_DECRYPT,     asymmetric_decrypt_handler },
+-	{ TS_CRYPTO_OPCODE_ASYMMETRIC_ENCRYPT,     asymmetric_encrypt_handler },
+-	{ TS_CRYPTO_OPCODE_GENERATE_RANDOM,        generate_random_handler },
+-	{ TS_CRYPTO_OPCODE_COPY_KEY,               copy_key_handler },
+-	{ TS_CRYPTO_OPCODE_PURGE_KEY,              purge_key_handler },
+-	{ TS_CRYPTO_OPCODE_GET_KEY_ATTRIBUTES,     get_key_attributes_handler },
+-	{ TS_CRYPTO_OPCODE_SIGN_MESSAGE,           asymmetric_sign_handler },
+-	{ TS_CRYPTO_OPCODE_VERIFY_MESSAGE,         asymmetric_verify_handler },
+-	{ TS_CRYPTO_OPCODE_VERIFY_PKCS7_SIGNATURE, verify_pkcs7_signature_handler },
++	{ TS_CRYPTO_OPCODE_GENERATE_KEY,            generate_key_handler },
++	{ TS_CRYPTO_OPCODE_DESTROY_KEY,             destroy_key_handler },
++	{ TS_CRYPTO_OPCODE_EXPORT_KEY,              export_key_handler },
++	{ TS_CRYPTO_OPCODE_EXPORT_PUBLIC_KEY,       export_public_key_handler },
++	{ TS_CRYPTO_OPCODE_IMPORT_KEY,              import_key_handler },
++	{ TS_CRYPTO_OPCODE_SIGN_HASH,               asymmetric_sign_handler },
++	{ TS_CRYPTO_OPCODE_VERIFY_HASH,             asymmetric_verify_handler },
++	{ TS_CRYPTO_OPCODE_ASYMMETRIC_DECRYPT,      asymmetric_decrypt_handler },
++	{ TS_CRYPTO_OPCODE_ASYMMETRIC_ENCRYPT,      asymmetric_encrypt_handler },
++	{ TS_CRYPTO_OPCODE_GENERATE_RANDOM,         generate_random_handler },
++	{ TS_CRYPTO_OPCODE_COPY_KEY,                copy_key_handler },
++	{ TS_CRYPTO_OPCODE_PURGE_KEY,               purge_key_handler },
++	{ TS_CRYPTO_OPCODE_GET_KEY_ATTRIBUTES,      get_key_attributes_handler },
++	{ TS_CRYPTO_OPCODE_SIGN_MESSAGE,            asymmetric_sign_handler },
++	{ TS_CRYPTO_OPCODE_VERIFY_MESSAGE,          asymmetric_verify_handler },
++	{ TS_CRYPTO_OPCODE_VERIFY_PKCS7_SIGNATURE,  verify_pkcs7_signature_handler },
++	{ TS_CRYPTO_OPCODE_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT, get_uefi_priv_auth_var_fingerprint_handler },
+ };
+ 
+ struct rpc_service_interface *
+@@ -664,33 +669,44 @@ static rpc_status_t verify_pkcs7_signature_handler(void *context, struct rpc_req
+ 	}
+ 
+ 	if (rpc_status == RPC_SUCCESS) {
+-		/* Parse the public key certificate */
+-		mbedtls_x509_crt signer_certificate;
++		/* Parse the PKCS#7 DER encoded signature block */
++		mbedtls_pkcs7 pkcs7_structure;
+ 
+-		mbedtls_x509_crt_init(&signer_certificate);
++		mbedtls_pkcs7_init(&pkcs7_structure);
+ 
+-		mbedtls_status = mbedtls_x509_crt_parse_der(&signer_certificate, public_key_cert,
+-							    public_key_cert_len);
++		mbedtls_status = mbedtls_pkcs7_parse_der(&pkcs7_structure, signature_cert,
++								signature_cert_len);
+ 
+-		if (mbedtls_status == 0) {
+-			/* Parse the PKCS#7 DER encoded signature block */
+-			mbedtls_pkcs7 pkcs7_structure;
++		if (mbedtls_status == MBEDTLS_PKCS7_SIGNED_DATA) {
+ 
+-			mbedtls_pkcs7_init(&pkcs7_structure);
++			/*
++			 * If a separate public key is provided, verify the signature with it,
++			 * else use the key from the pkcs7 signature structure, because it is
++			 * a self-signed certificate.
++			 */
++			if(public_key_cert_len) {
++				/* Parse the public key certificate */
++				mbedtls_x509_crt signer_certificate;
+ 
+-			mbedtls_status = mbedtls_pkcs7_parse_der(&pkcs7_structure, signature_cert,
+-								 signature_cert_len);
++				mbedtls_x509_crt_init(&signer_certificate);
+ 
+-			if (mbedtls_status == MBEDTLS_PKCS7_SIGNED_DATA) {
+-				/* Verify hash against signed hash */
++				mbedtls_status = mbedtls_x509_crt_parse_der(&signer_certificate, public_key_cert,
++									public_key_cert_len);
++
++				if (mbedtls_status == 0) {
++					/* Verify hash against signed hash */
++					mbedtls_status = mbedtls_pkcs7_signed_hash_verify(
++						&pkcs7_structure, &signer_certificate, hash, hash_len);
++				}
++
++				mbedtls_x509_crt_free(&signer_certificate);
++			} else {
+ 				mbedtls_status = mbedtls_pkcs7_signed_hash_verify(
+-					&pkcs7_structure, &signer_certificate, hash, hash_len);
++					&pkcs7_structure, &pkcs7_structure.private_signed_data.private_certs, hash, hash_len);
+ 			}
+-
+-			mbedtls_pkcs7_free(&pkcs7_structure);
+ 		}
+ 
+-		mbedtls_x509_crt_free(&signer_certificate);
++		mbedtls_pkcs7_free(&pkcs7_structure);
+ 	}
+ 
+ 	free(signature_cert);
+@@ -702,6 +718,128 @@ static rpc_status_t verify_pkcs7_signature_handler(void *context, struct rpc_req
+ 
+ 	return rpc_status;
+ }
++
++/*
++ * Official value: http://www.oid-info.com/get/2.5.4.3
++ * Hex converter: https://misc.daniel-marschall.de/asn.1/oid-converter/online.php
++ */
++static const mbedtls_asn1_buf* findCommonName(const mbedtls_x509_name *name)
++{
++	uint8_t CN_oid_tag = 0x06;
++	uint8_t CN_oid_len = 0x03;
++	uint8_t CN_oid_val[3] = {0x55, 0x04, 0x03};
++
++	while (name)
++	{
++		if (name->oid.tag == CN_oid_tag && name->oid.len == CN_oid_len) {
++			if (name->oid.p != NULL) {
++				if (!memcmp(name->oid.p, CN_oid_val, CN_oid_len))
++					return &name->val;
++			}
++		}
++
++		name = name->next;
++	}
++
++	return NULL;
++}
++
++static rpc_status_t get_uefi_priv_auth_var_fingerprint_handler(void *context, struct rpc_request *req)
++{
++	rpc_status_t rpc_status = RPC_ERROR_INTERNAL;
++	struct rpc_buffer *req_buf = &req->request;
++	const struct crypto_provider_serializer *serializer = get_crypto_serializer(context, req);
++
++	int mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++
++	uint8_t *signature_cert = NULL;
++	uint64_t signature_cert_len = 0;
++
++	if (serializer) {
++		/* First collect the lengths of the field */
++		rpc_status = serializer->deserialize_get_uefi_priv_auth_var_fingerprint_req(
++			req_buf, NULL, &signature_cert_len);
++
++		if (rpc_status == RPC_SUCCESS) {
++			/* Allocate the needed space and get the data */
++			signature_cert = (uint8_t *)malloc(signature_cert_len);
++
++			if (signature_cert) {
++				rpc_status = serializer->deserialize_get_uefi_priv_auth_var_fingerprint_req(
++					req_buf, signature_cert, &signature_cert_len);
++			} else {
++				rpc_status = RPC_ERROR_RESOURCE_FAILURE;
++			}
++		}
++	}
++
++	if (rpc_status == RPC_SUCCESS) {
++		/* Parse the PKCS#7 DER encoded signature block */
++		mbedtls_pkcs7 pkcs7_structure;
++
++		mbedtls_pkcs7_init(&pkcs7_structure);
++
++		mbedtls_status = mbedtls_pkcs7_parse_der(&pkcs7_structure, signature_cert,
++								signature_cert_len);
++
++		if (mbedtls_status == MBEDTLS_PKCS7_SIGNED_DATA) {
++
++			uint8_t output_buffer[PSA_HASH_MAX_SIZE] =  { 0 };
++			size_t __maybe_unused output_size = 0;
++			const mbedtls_asn1_buf *signerCertCN = NULL;
++			const mbedtls_x509_crt *topLevelCert = &pkcs7_structure.private_signed_data.private_certs;
++			const mbedtls_x509_buf *toplevelCertTbs = NULL;
++			struct rpc_buffer *resp_buf = &req->response;;
++			psa_hash_operation_t op = PSA_HASH_OPERATION_INIT;
++
++			/* Find common name field of the signing certificate, which is the first in the chain */
++			signerCertCN = findCommonName(&topLevelCert->subject);
++			if (!signerCertCN)
++				mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++
++			/* Get the TopLevel certificate which is the last in the chain */
++			while(topLevelCert->next)
++				topLevelCert = topLevelCert->next;
++			toplevelCertTbs = &topLevelCert->tbs;
++
++			/* Hash the data to create the fingerprint */
++			op = psa_hash_operation_init();
++
++			if (psa_hash_setup(&op, PSA_ALG_SHA_256) != PSA_SUCCESS)
++				mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++
++			if (psa_hash_update(&op, signerCertCN->p, signerCertCN->len)) {
++				psa_hash_abort(&op);
++				mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++			}
++
++			if (psa_hash_update(&op, toplevelCertTbs->p, toplevelCertTbs->len)) {
++				psa_hash_abort(&op);
++				mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++			}
++
++			if (psa_hash_finish(&op, (uint8_t*)&output_buffer, PSA_HASH_MAX_SIZE, &output_size)) {
++				psa_hash_abort(&op);
++				mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++			}
++
++			/* Clear the remaining part of the buffer for consistency */
++			memset(&output_buffer[output_size], 0, PSA_HASH_MAX_SIZE - output_size);
++
++			rpc_status = serializer->serialize_get_uefi_priv_auth_var_fingerprint_resp(
++				resp_buf, (uint8_t*)&output_buffer);
++		}
++
++		mbedtls_pkcs7_free(&pkcs7_structure);
++	}
++
++	free(signature_cert);
++
++	/* Provide the result of the verification */
++	req->service_status = (mbedtls_status == MBEDTLS_PKCS7_SIGNED_DATA) ? EFI_SUCCESS : EFI_COMPROMISED_DATA;
++
++	return rpc_status;
++}
+ #else
+ static rpc_status_t verify_pkcs7_signature_handler(void *context, struct rpc_request *req)
+ {
+@@ -710,4 +848,12 @@ static rpc_status_t verify_pkcs7_signature_handler(void *context, struct rpc_req
+ 
+ 	return RPC_ERROR_INTERNAL;
+ }
++
++static rpc_status_t get_uefi_priv_auth_var_fingerprint_handler(void *context, struct rpc_request *req)
++{
++	(void)context;
++	(void)req;
++
++	return RPC_ERROR_INTERNAL;
++}
+ #endif
+diff --git a/components/service/crypto/provider/serializer/crypto_provider_serializer.h b/components/service/crypto/provider/serializer/crypto_provider_serializer.h
+index bd5336c3d..2b965afdb 100644
+--- a/components/service/crypto/provider/serializer/crypto_provider_serializer.h
++++ b/components/service/crypto/provider/serializer/crypto_provider_serializer.h
+@@ -126,6 +126,14 @@ struct crypto_provider_serializer {
+ 							       uint8_t *hash, uint64_t *hash_len,
+ 							       uint8_t *public_key_cert,
+ 							       uint64_t *public_key_cert_len);
++
++	/* Operation: get_uefi_priv_auth_var_fingerprintentifier */
++	rpc_status_t (*deserialize_get_uefi_priv_auth_var_fingerprint_req)(const struct rpc_buffer *req_buf,
++								uint8_t *signed_data,
++								uint64_t *signed_data_len);
++
++	rpc_status_t (*serialize_get_uefi_priv_auth_var_fingerprint_resp)(struct rpc_buffer *resp_buf,
++							       const uint8_t *output);
+ };
+ 
+ #endif /* CRYPTO_PROVIDER_SERIALIZER_H */
+diff --git a/components/service/crypto/provider/serializer/packed-c/packedc_crypto_provider_serializer.c b/components/service/crypto/provider/serializer/packed-c/packedc_crypto_provider_serializer.c
+index 050ef2f7d..89e07e2c8 100644
+--- a/components/service/crypto/provider/serializer/packed-c/packedc_crypto_provider_serializer.c
++++ b/components/service/crypto/provider/serializer/packed-c/packedc_crypto_provider_serializer.c
+@@ -22,6 +22,7 @@
+ #include <protocols/service/crypto/packed-c/sign_hash.h>
+ #include <protocols/service/crypto/packed-c/verify_hash.h>
+ #include <protocols/service/crypto/packed-c/verify_pkcs7_signature.h>
++#include <protocols/service/crypto/packed-c/get_uefi_priv_auth_var_fingerprint.h>
+ #include <service/crypto/backend/crypto_backend.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -675,6 +676,57 @@ static rpc_status_t deserialize_verify_pkcs7_signature_req(
+ 	return rpc_status;
+ }
+ 
++/* Operation: get_uefi_priv_auth_var_fingerprintentifier */
++static rpc_status_t deserialize_get_uefi_priv_auth_var_fingerprint_req(const struct rpc_buffer *req_buf,
++							uint8_t *signed_data,
++							uint64_t *signed_data_len)
++{
++	rpc_status_t rpc_status = RPC_ERROR_INVALID_REQUEST_BODY;
++
++	if (req_buf->data_length) {
++		struct tlv_const_iterator req_iter;
++		struct tlv_record decoded_record;
++
++		rpc_status = RPC_SUCCESS;
++
++		tlv_const_iterator_begin(&req_iter, (uint8_t *)req_buf->data, req_buf->data_length);
++
++		if (tlv_find_decode(&req_iter, TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_IN_TAG_SIGNATURE,
++				    &decoded_record)) {
++			*signed_data_len = decoded_record.length;
++
++			if (signed_data)
++				memcpy(signed_data, decoded_record.value, decoded_record.length);
++		} else {
++			/* Default to a zero length */
++			*signed_data_len = 0;
++		}
++	}
++
++	return rpc_status;
++}
++
++static rpc_status_t serialize_get_uefi_priv_auth_var_fingerprint_resp(struct rpc_buffer *resp_buf,
++							const uint8_t *output)
++{
++	rpc_status_t rpc_status = RPC_ERROR_INTERNAL;
++	struct tlv_iterator resp_iter;
++	struct tlv_record out_record;
++
++	out_record.tag = TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_OUT_TAG_IDENTIFIER;
++	out_record.length = PSA_HASH_MAX_SIZE;
++	out_record.value = output;
++
++	tlv_iterator_begin(&resp_iter, resp_buf->data, resp_buf->size);
++
++	if (tlv_encode(&resp_iter, &out_record)) {
++		resp_buf->data_length = tlv_required_space(PSA_HASH_MAX_SIZE);
++		rpc_status = RPC_SUCCESS;
++	}
++
++	return rpc_status;
++}
++
+ /* Singleton method to provide access to the serializer instance */
+ const struct crypto_provider_serializer *packedc_crypto_provider_serializer_instance(void)
+ {
+@@ -704,6 +756,8 @@ const struct crypto_provider_serializer *packedc_crypto_provider_serializer_inst
+ 		deserialize_generate_random_req,
+ 		serialize_generate_random_resp,
+ 		deserialize_verify_pkcs7_signature_req,
++		deserialize_get_uefi_priv_auth_var_fingerprint_req,
++		serialize_get_uefi_priv_auth_var_fingerprint_resp
+ 	};
+ 
+ 	return &instance;
+diff --git a/components/service/uefi/smm_variable/backend/direct/uefi_direct_backend.c b/components/service/uefi/smm_variable/backend/direct/uefi_direct_backend.c
+index bf978c5dd..c7ca07254 100644
+--- a/components/service/uefi/smm_variable/backend/direct/uefi_direct_backend.c
++++ b/components/service/uefi/smm_variable/backend/direct/uefi_direct_backend.c
+@@ -9,6 +9,8 @@
+ #include <mbedtls/pkcs7.h>
+ #include <mbedtls/x509_crt.h>
+ #include <stdint.h>
++#include <string.h>
++#include <compiler.h>
+ 
+ int verify_pkcs7_signature(const uint8_t *signature_cert, uint64_t signature_cert_len,
+ 			   const uint8_t *hash, uint64_t hash_len, const uint8_t *public_key_cert,
+@@ -46,3 +48,91 @@ int verify_pkcs7_signature(const uint8_t *signature_cert, uint64_t signature_cer
+ 
+ 	return mbedtls_status;
+ }
++
++/*
++ * Official value: http://www.oid-info.com/get/2.5.4.3
++ * Hex converter: https://misc.daniel-marschall.de/asn.1/oid-converter/online.php
++ */
++static const mbedtls_asn1_buf* findCommonName(const mbedtls_x509_name *name)
++{
++	uint8_t CN_oid_tag = 0x06;
++	uint8_t CN_oid_len = 0x03;
++	uint8_t CN_oid_val[3] = {0x55, 0x04, 0x03};
++
++	while (name)
++	{
++		if (name->oid.tag == CN_oid_tag && name->oid.len == CN_oid_len) {
++			if (name->oid.p != NULL) {
++				if (!memcmp(name->oid.p, CN_oid_val, CN_oid_len))
++					return &name->val;
++			}
++		}
++
++		name = name->next;
++	}
++
++	return NULL;
++}
++
++int get_uefi_priv_auth_var_fingerprint_handler(const uint8_t *signature_cert,
++				    uint64_t signature_cert_len,
++				    uint8_t *output)
++{
++	int mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++
++	/* Parse the PKCS#7 DER encoded signature block */
++	mbedtls_pkcs7 pkcs7_structure;
++
++	mbedtls_pkcs7_init(&pkcs7_structure);
++
++	mbedtls_status = mbedtls_pkcs7_parse_der(&pkcs7_structure, signature_cert,
++							signature_cert_len);
++
++	if (mbedtls_status == MBEDTLS_PKCS7_SIGNED_DATA) {
++
++		uint8_t output_buffer[PSA_HASH_MAX_SIZE] =  { 0 };
++		size_t __maybe_unused output_size = 0;
++		const mbedtls_asn1_buf *signerCertCN = NULL;
++		const mbedtls_x509_crt *topLevelCert = &pkcs7_structure.private_signed_data.private_certs;
++		const mbedtls_x509_buf *toplevelCertTbs = NULL;
++		psa_hash_operation_t op = PSA_HASH_OPERATION_INIT;
++
++		/* Find common name field of the signing certificate, which is the first in the chain */
++		signerCertCN = findCommonName(&topLevelCert->subject);
++		if (!signerCertCN)
++			mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++
++		/* Get the TopLevel certificate which is the last in the chain */
++		while(topLevelCert->next)
++			topLevelCert = topLevelCert->next;
++		toplevelCertTbs = &topLevelCert->tbs;
++
++		/* Hash the data to create the fingerprint */
++		op = psa_hash_operation_init();
++
++		if (psa_hash_setup(&op, PSA_ALG_SHA_256) != PSA_SUCCESS)
++			mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++
++		if (psa_hash_update(&op, signerCertCN->p, signerCertCN->len)) {
++			psa_hash_abort(&op);
++			mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++		}
++
++		if (psa_hash_update(&op, toplevelCertTbs->p, toplevelCertTbs->len)) {
++			psa_hash_abort(&op);
++			mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++		}
++
++		if (psa_hash_finish(&op, (uint8_t*)&output_buffer, PSA_HASH_MAX_SIZE, &output_size)) {
++			psa_hash_abort(&op);
++			mbedtls_status = MBEDTLS_ERR_PKCS7_VERIFY_FAIL;
++		}
++
++		/* Clear the remaining part of the buffer for consistency */
++		memset(&output_buffer[output_size], 0, PSA_HASH_MAX_SIZE - output_size);
++	}
++
++	mbedtls_pkcs7_free(&pkcs7_structure);
++
++	return mbedtls_status;
++}
+diff --git a/deployments/smm-gateway/smm-gateway.cmake b/deployments/smm-gateway/smm-gateway.cmake
+index e5ee03b60..de519892d 100644
+--- a/deployments/smm-gateway/smm-gateway.cmake
++++ b/deployments/smm-gateway/smm-gateway.cmake
+@@ -17,6 +17,11 @@ include(${TS_ROOT}/external/MbedTLS/MbedTLS.cmake)
+ target_link_libraries(smm-gateway PRIVATE MbedTLS::mbedcrypto)
+ target_link_libraries(smm-gateway PRIVATE MbedTLS::mbedx509)
+ 
++# Pass the location of the mbedtls config file to C preprocessor.
++target_compile_definitions(smm-gateway PRIVATE
++		MBEDTLS_USER_CONFIG_FILE="${MBEDTLS_USER_CONFIG_FILE}"
++)
++
+ target_compile_definitions(smm-gateway PRIVATE
+ 	-DUEFI_INTERNAL_CRYPTO
+ )
+diff --git a/protocols/service/crypto/packed-c/get_uefi_priv_auth_var_fingerprint.h b/protocols/service/crypto/packed-c/get_uefi_priv_auth_var_fingerprint.h
+new file mode 100644
+index 000000000..29964b33c
+--- /dev/null
++++ b/protocols/service/crypto/packed-c/get_uefi_priv_auth_var_fingerprint.h
+@@ -0,0 +1,21 @@
++/*
++ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_H
++#define TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_H
++
++#include <stdint.h>
++
++/* Variable length output parameter tags */
++enum {
++	TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_OUT_TAG_IDENTIFIER = 1,
++};
++
++/* Variable length input parameter tags */
++enum {
++	TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_IN_TAG_SIGNATURE = 1,
++};
++
++#endif /* TS_CRYPTO_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT_H */
+diff --git a/protocols/service/crypto/packed-c/opcodes.h b/protocols/service/crypto/packed-c/opcodes.h
+index 35b81599b..8bc2b49b0 100644
+--- a/protocols/service/crypto/packed-c/opcodes.h
++++ b/protocols/service/crypto/packed-c/opcodes.h
+@@ -28,6 +28,7 @@
+ #define TS_CRYPTO_OPCODE_SIGN_MESSAGE           (TS_CRYPTO_OPCODE_BASE + 16)
+ #define TS_CRYPTO_OPCODE_VERIFY_MESSAGE         (TS_CRYPTO_OPCODE_BASE + 17)
+ #define TS_CRYPTO_OPCODE_VERIFY_PKCS7_SIGNATURE (TS_CRYPTO_OPCODE_BASE + 18)
++#define TS_CRYPTO_OPCODE_GET_UEFI_PRIV_AUTH_VAR_FINGERPRINT (TS_CRYPTO_OPCODE_BASE + 19)
+ 
+ /* Hash operations */
+ #define TS_CRYPTO_OPCODE_HASH_BASE              (0x0200)
+-- 
+2.25.1
+

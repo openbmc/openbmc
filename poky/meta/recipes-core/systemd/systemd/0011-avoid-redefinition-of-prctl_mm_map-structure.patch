@@ -1,7 +1,7 @@
-From 49c446cfb78cf74a909bed8c3798b77a5469866a Mon Sep 17 00:00:00 2001
+From c866c8652f06af4cd0b9bd7eedc606449f432b95 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:44:54 +0800
-Subject: [PATCH 11/22] avoid redefinition of prctl_mm_map structure
+Subject: [PATCH] avoid redefinition of prctl_mm_map structure
 
 Fix the following compile failure:
 error: redefinition of 'struct prctl_mm_map'
@@ -27,6 +27,3 @@ index 7d9e395c92..88c2d7dfac 100644
  
  /* 58319057b7847667f0c9585b9de0e8932b0fdb08 (4.3) */
  #ifndef PR_CAP_AMBIENT
--- 
-2.34.1
-

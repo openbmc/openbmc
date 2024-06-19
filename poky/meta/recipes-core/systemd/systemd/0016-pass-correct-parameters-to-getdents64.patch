@@ -1,7 +1,7 @@
-From 0994b59dba9f248ad31cb7087046dc00b72cb4ea Mon Sep 17 00:00:00 2001
+From 01de9e5a6e4ad2f361d3eb4d9839c7afd91cc677 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 21 Jan 2022 15:15:11 -0800
-Subject: [PATCH 16/22] pass correct parameters to getdents64
+Subject: [PATCH] pass correct parameters to getdents64
 
 Fixes
 ../git/src/basic/recurse-dir.c:57:40: error: incompatible pointer types passing 'uint8_t *' (aka 'unsigned char *') to parameter of type 'struct dirent *' [-Werror,-Wincompatible-pointer-types]
@@ -32,6 +32,3 @@ index 5e98b7a5d8..aef065047b 100644
                  if (n < 0)
                          return -errno;
                  if (n == 0)
--- 
-2.34.1
-

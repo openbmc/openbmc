@@ -18,11 +18,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  docs/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/Makefile.am b/docs/Makefile.am
-index d4250e8..c500306 100644
 --- a/docs/Makefile.am
 +++ b/docs/Makefile.am
-@@ -192,7 +192,7 @@ valid-manpages: $(MANPAGES_XML_FILES)
+@@ -194,7 +194,7 @@ valid-manpages: $(MANPAGES_XML_FILES)
  	  touch $@; \
  	fi
  
@@ -31,6 +29,3 @@ index d4250e8..c500306 100644
  
  # The text version of the FAQ.
  FAQ.txt:
--- 
-2.34.1
-

@@ -1,0 +1,43 @@
+From 725b1530456545e8511adc9cbdd265309dffad53 Mon Sep 17 00:00:00 2001
+From: Hongren Zheng <i@zenithal.me>
+Date: Fri, 26 Apr 2024 06:03:43 +0000
+Subject: [PATCH] Implement riscv_vlen_asm for riscv32
+
+riscvcap.c: undefined reference to 'riscv_vlen_asm'
+
+Upstream-Status: Backport [https://github.com/openssl/openssl/pull/24270]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ crypto/riscv32cpuid.pl | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/crypto/riscv32cpuid.pl b/crypto/riscv32cpuid.pl
+index 20694e7..ac1c043 100644
+--- a/crypto/riscv32cpuid.pl
++++ b/crypto/riscv32cpuid.pl
+@@ -84,5 +84,22 @@ OPENSSL_cleanse:
+ ___
+ }
+ 
++{
++my ($ret) = ('a0');
++$code .= <<___;
++################################################################################
++# size_t riscv_vlen_asm(void)
++# Return VLEN (i.e. the length of a vector register in bits).
++.p2align 3
++.globl riscv_vlen_asm
++.type riscv_vlen_asm,\@function
++riscv_vlen_asm:
++    csrr $ret, vlenb
++    slli $ret, $ret, 3
++    ret
++.size riscv_vlen_asm,.-riscv_vlen_asm
++___
++}
++
+ print $code;
+ close STDOUT or die "error closing STDOUT: $!";
+-- 
+2.45.0
+

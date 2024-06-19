@@ -8,5 +8,5 @@ do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
 do_install() {
-    install -Dm 0644 ${WORKDIR}/usbgx.default ${D}${sysconfdir}/default/usbgx
+    install -Dm 0644 ${UNPACKDIR}/usbgx.default ${D}${sysconfdir}/default/usbgx
 }

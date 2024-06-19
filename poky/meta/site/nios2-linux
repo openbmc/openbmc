@@ -33,9 +33,6 @@ db_cv_alignp_t=${db_cv_alignp_t='unsigned long'}
 db_cv_posixmutexes=${db_cv_posixmutexes=no}
 db_cv_uimutexes=${db_cv_uimutexes=no}
 
-# D-BUS
-ac_cv_func_posix_getpwnam_r=${ac_cv_func_posix_getpwnam_r=yes}
-
 # edb
 db_cv_spinlocks=${db_cv_spinlocks=no}
 
@@ -46,9 +43,6 @@ ettercap_cv_type_socklen_t=${ettercap_cv_type_socklen_t=yes}
 compat_cv_func_snprintf_works=${compat_cv_func_snprintf_works=yes}
 compat_cv_func_basename_works=${compat_cv_func_basename_works=no}
 compat_cv_func_dirname_works=${compat_cv_func_dirname_works=no}
-
-# fnmatch
-ac_cv_func_fnmatch_works=${ac_cv_func_fnmatch_works=yes}
 
 # gettext
 am_cv_func_working_getline=${am_cv_func_working_getline=yes}
@@ -164,15 +158,6 @@ jm_cv_func_working_readdir=yes
 dpkg_cv_va_copy=${ac_cv_va_copy=yes}
 dpkg_cv___va_copy=${ac_cv___va_copy=yes}
 
-# eds-dbus
-ac_cv_libiconv_utf8=${ac_cv_libiconv_utf8=yes}
-ac_cv_func_getpgrp_void=yes
-ac_cv_func_setpgrp_void=yes
-ac_cv_func_setgrent_void=yes
-ac_cv_func_malloc_0_nonnull=yes
-ac_cv_func_malloc_works=yes
-ac_cv_func_posix_getpwuid_r=${ac_cv_func_posix_getpwuid_r=yes}
-ac_cv_func_posix_getgrgid_r=${ac_cv_func_posix_getgrgid_r=yes}
 ac_cv_func_setvbuf_reversed=no
 ac_cv_sizeof___int64=${ac_cv_sizeof___int64=0}
 ac_cv_sizeof_char=${ac_cv_sizeof_char=1}
@@ -317,9 +302,6 @@ samba_cv_LINUX_LFS_SUPPORT=${samba_cv_LINUX_LFS_SUPPORT=yes}
 clamav_av_func_working_snprintf_long=${clamav_av_func_working_snprintf_long=yes}
 clamav_av_have_in_port_t=${clamav_av_have_in_port_t=yes}
 clamav_av_have_in_addr_t=${clamav_av_have_in_addr_t=yes}
-
-#dbus
-ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=yes}
 
 # lftp
 ac_cv_file___dev_ptc_=yes

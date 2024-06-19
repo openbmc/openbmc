@@ -463,7 +463,7 @@ kernel_do_install() {
 		rm -f "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/build"
 		rm -f "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/source"
 		# Remove empty module directories to prevent QA issues
-		find "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/kernel" -type d -empty -delete
+		[ -d "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/kernel" ] && find "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/kernel" -type d -empty -delete
 	else
 		bbnote "no modules to install"
 	fi
@@ -679,8 +679,8 @@ kernel_do_configure() {
 
 	# Copy defconfig to .config if .config does not exist. This allows
 	# recipes to manage the .config themselves in do_configure:prepend().
-	if [ -f "${WORKDIR}/defconfig" ] && [ ! -f "${B}/.config" ]; then
-		cp "${WORKDIR}/defconfig" "${B}/.config"
+	if [ -f "${UNPACKDIR}/defconfig" ] && [ ! -f "${B}/.config" ]; then
+		cp "${UNPACKDIR}/defconfig" "${B}/.config"
 	fi
 
 	${KERNEL_CONFIG_COMMAND}

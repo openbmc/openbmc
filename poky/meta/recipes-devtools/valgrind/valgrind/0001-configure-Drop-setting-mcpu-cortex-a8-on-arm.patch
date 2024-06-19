@@ -1,0 +1,40 @@
+From b17b6d7d3a65c14f91f090f3f4f9898d6fa3a9e4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 10 May 2024 16:27:34 -0700
+Subject: [PATCH] configure: Drop setting mcpu=cortex-a8 on arm
+
+The -march settings from environment expresses the flags
+appropriately, moreover, this conflicts when using armhf
+without neon [1]
+
+[1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=928224
+
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=454346]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 39d8b6d..d61b3a6 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -275,13 +275,13 @@ case "${host_cpu}" in
+ 
+      armv8*)
+         AC_MSG_RESULT([ok (${host_cpu})])
+-        VGCONF_PLATFORM_ARM_ARCH="-marm -mcpu=cortex-a8"
++        VGCONF_PLATFORM_ARM_ARCH="-marm"
+         ARCH_MAX="arm"
+         ;;
+ 
+      armv7*)
+         AC_MSG_RESULT([ok (${host_cpu})])
+-        VGCONF_PLATFORM_ARM_ARCH="-marm -mcpu=cortex-a8"
++        VGCONF_PLATFORM_ARM_ARCH="-marm"
+         ARCH_MAX="arm"
+         ;;
+ 
+-- 
+2.45.0
+

@@ -53,8 +53,8 @@ do_install_ptest() {
 }
 
 do_install_ptest_base() {
-    if [ -f ${WORKDIR}/run-ptest ]; then
-        install -D ${WORKDIR}/run-ptest ${D}${PTEST_PATH}/run-ptest
+    if [ -f ${UNPACKDIR}/run-ptest ]; then
+        install -D ${UNPACKDIR}/run-ptest ${D}${PTEST_PATH}/run-ptest
     fi
 
     grep -q install-ptest: Makefile 2>/dev/null && oe_runmake DESTDIR=${D}${PTEST_PATH} install-ptest

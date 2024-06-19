@@ -41,8 +41,8 @@ do_configure:prepend() {
     #
     # logo support, if you supply logo_linux_clut224.ppm in SRC_URI, then it's going to be used
     #
-    if [ -e ${WORKDIR}/logo_linux_clut224.ppm ]; then
-        install -m 0644 ${WORKDIR}/logo_linux_clut224.ppm drivers/video/logo/logo_linux_clut224.ppm
+    if [ -e ${UNPACKDIR}/logo_linux_clut224.ppm ]; then
+        install -m 0644 ${UNPACKDIR}/logo_linux_clut224.ppm drivers/video/logo/logo_linux_clut224.ppm
         kernel_conf_variable LOGO y
         kernel_conf_variable LOGO_LINUX_CLUT224 y
     fi

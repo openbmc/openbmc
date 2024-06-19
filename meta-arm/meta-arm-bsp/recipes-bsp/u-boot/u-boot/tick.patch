@@ -1,0 +1,187 @@
+From b18a3c183d20812933d192d4b0d622b11ef2bf29 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Wed, 1 May 2024 09:16:32 +0100
+Subject: [PATCH 1/2] arm: Move sev() and wfe() definitions to common Arm
+ header file
+
+The sev() and wfe() asm macros are currently defined only for
+mach-exynos. As these are common Arm instructions, move them to the
+common asm/system.h header file, for both Armv7 and Armv8, so they
+can be used by other machines.
+
+wfe may theoretically trigger a context switch if an interrupt occurs
+so add a memory barrier to this call.
+
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Reviewed-by: Andre Przywara<andre.przywara@arm.com>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ arch/arm/include/asm/system.h              |  9 +++++++++
+ arch/arm/mach-exynos/include/mach/system.h | 19 -------------------
+ 2 files changed, 9 insertions(+), 19 deletions(-)
+
+diff --git a/arch/arm/include/asm/system.h b/arch/arm/include/asm/system.h
+index 43f7503571..51123c2968 100644
+--- a/arch/arm/include/asm/system.h
++++ b/arch/arm/include/asm/system.h
+@@ -154,6 +154,13 @@ enum dcache_option {
+ 	"wfi" : : : "memory");		\
+ 	})
+ 
++#define wfe()				\
++	({asm volatile(			\
++	"wfe" : : : "memory");		\
++	})
++
++#define sev() asm volatile("sev")
++
+ static inline unsigned int current_el(void)
+ {
+ 	unsigned long el;
+@@ -369,6 +376,8 @@ void switch_to_hypervisor_ret(void);
+ 
+ #ifdef __ARM_ARCH_7A__
+ #define wfi() __asm__ __volatile__ ("wfi" : : : "memory")
++#define wfe() __asm__ __volatile__ ("wfe" : : : "memory")
++#define sev() __asm__ __volatile__ ("sev")
+ #else
+ #define wfi()
+ #endif
+diff --git a/arch/arm/mach-exynos/include/mach/system.h b/arch/arm/mach-exynos/include/mach/system.h
+index 5d0bebac57..0aed4c3e2b 100644
+--- a/arch/arm/mach-exynos/include/mach/system.h
++++ b/arch/arm/mach-exynos/include/mach/system.h
+@@ -36,25 +36,6 @@ struct exynos5_sysreg {
+ 
+ #define USB20_PHY_CFG_HOST_LINK_EN	(1 << 0)
+ 
+-/*
+- * This instruction causes an event to be signaled to all cores
+- * within a multiprocessor system. If SEV is implemented,
+- * WFE must also be implemented.
+- */
+-#define sev() __asm__ __volatile__ ("sev\n\t" : : );
+-/*
+- * If the Event Register is not set, WFE suspends execution until
+- * one of the following events occurs:
+- * - an IRQ interrupt, unless masked by the CPSR I-bit
+- * - an FIQ interrupt, unless masked by the CPSR F-bit
+- * - an Imprecise Data abort, unless masked by the CPSR A-bit
+- * - a Debug Entry request, if Debug is enabled
+- * - an Event signaled by another processor using the SEV instruction.
+- * If the Event Register is set, WFE clears it and returns immediately.
+- * If WFE is implemented, SEV must also be implemented.
+- */
+-#define wfe() __asm__ __volatile__ ("wfe\n\t" : : );
+-
+ /* Move 0xd3 value to CPSR register to enable SVC mode */
+ #define svc32_mode_en() __asm__ __volatile__				\
+ 			("@ I&F disable, Mode: 0x13 - SVC\n\t"		\
+-- 
+2.34.1
+
+
+From ebc84d7b60c1ed3398e9f600fe3dc8406500bd35 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Wed, 1 May 2024 09:16:33 +0100
+Subject: [PATCH 2/2] armv8: generic_timer: Use event stream for udelay
+
+Polling cntpct_el0 in a tight loop for delays is inefficient.
+This is particularly apparent on Arm FVPs, which do not simulate
+real time, meaning that a 1s sleep can take a couple of orders
+of magnitude longer to execute in wall time.
+
+If running at EL2 or above (where CNTHCTL_EL2 is available), enable
+the cntpct_el0 event stream temporarily and use wfe to implement
+the delay more efficiently. The event period is chosen as a
+trade-off between efficiency and the fact that Arm FVPs do not
+typically simulate real time.
+
+This is only implemented for Armv8 boards, where an architectural
+timer exists, and only enabled by default for the ARCH_VEXPRESS64
+board family.
+
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/arm/cpu/armv8/Kconfig         |  8 ++++++++
+ arch/arm/cpu/armv8/generic_timer.c | 27 +++++++++++++++++++++++++++
+ arch/arm/include/asm/system.h      |  6 ++++--
+ 3 files changed, 39 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
+index 9f0fb369f7..199335cd60 100644
+--- a/arch/arm/cpu/armv8/Kconfig
++++ b/arch/arm/cpu/armv8/Kconfig
+@@ -191,6 +191,14 @@ config ARMV8_EA_EL3_FIRST
+ 	  Exception handling at all exception levels for External Abort and
+ 	  SError interrupt exception are taken in EL3.
+ 
++config ARMV8_UDELAY_EVENT_STREAM
++	bool "Use the event stream for udelay"
++	default y if ARCH_VEXPRESS64
++	help
++	  Use the event stream provided by the AArch64 architectural timer for
++	  delays. This is more efficient than the default polling
++	  implementation.
++
+ menuconfig ARMV8_CRYPTO
+ 	bool "ARM64 Accelerated Cryptographic Algorithms"
+ 
+diff --git a/arch/arm/cpu/armv8/generic_timer.c b/arch/arm/cpu/armv8/generic_timer.c
+index e4aa5a4745..1de7ec596f 100644
+--- a/arch/arm/cpu/armv8/generic_timer.c
++++ b/arch/arm/cpu/armv8/generic_timer.c
+@@ -114,3 +114,30 @@ ulong timer_get_boot_us(void)
+ 
+ 	return val / get_tbclk();
+ }
++
++#if CONFIG_IS_ENABLED(ARMV8_UDELAY_EVENT_STREAM)
++void __udelay(unsigned long usec)
++{
++	u64 target = get_ticks() + usec_to_tick(usec);
++
++	/* At EL2 or above, use the event stream to avoid polling CNTPCT_EL0 so often */
++	if (current_el() >= 2) {
++		u32 cnthctl_val;
++		const u8 event_period = 0x7;
++
++		asm volatile("mrs %0, cnthctl_el2" : "=r" (cnthctl_val));
++		asm volatile("msr cnthctl_el2, %0" : : "r"
++			(cnthctl_val | CNTHCTL_EL2_EVNT_EN | CNTHCTL_EL2_EVNT_I(event_period)));
++
++		while (get_ticks() + (1ULL << event_period) <= target)
++			wfe();
++
++		/* Reset the event stream */
++		asm volatile("msr cnthctl_el2, %0" : : "r" (cnthctl_val));
++	}
++
++	/* Fall back to polling CNTPCT_EL0 */
++	while (get_ticks() <= target)
++		;
++}
++#endif
+diff --git a/arch/arm/include/asm/system.h b/arch/arm/include/asm/system.h
+index 51123c2968..7e30cac32a 100644
+--- a/arch/arm/include/asm/system.h
++++ b/arch/arm/include/asm/system.h
+@@ -69,8 +69,10 @@
+ /*
+  * CNTHCTL_EL2 bits definitions
+  */
+-#define CNTHCTL_EL2_EL1PCEN_EN	(1 << 1)  /* Physical timer regs accessible   */
+-#define CNTHCTL_EL2_EL1PCTEN_EN	(1 << 0)  /* Physical counter accessible      */
++#define CNTHCTL_EL2_EVNT_EN	BIT(2)	     /* Enable the event stream       */
++#define CNTHCTL_EL2_EVNT_I(val)	((val) << 4) /* Event stream trigger bits     */
++#define CNTHCTL_EL2_EL1PCEN_EN	(1 << 1)     /* Physical timer regs accessible */
++#define CNTHCTL_EL2_EL1PCTEN_EN	(1 << 0)     /* Physical counter accessible   */
+ 
+ /*
+  * HCR_EL2 bits definitions
+-- 
+2.34.1
+

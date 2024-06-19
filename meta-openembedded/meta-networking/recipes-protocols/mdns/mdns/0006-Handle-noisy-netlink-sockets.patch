@@ -1,7 +1,7 @@
-From bfa1d68bed863e22c40a6d9a19ffbcc8694bbff6 Mon Sep 17 00:00:00 2001
+From 105514b75df6d7abd052ec64d8106f5c07cc4782 Mon Sep 17 00:00:00 2001
 From: Nate Karstens <nate.karstens@garmin.com>
 Date: Mon, 24 Jul 2017 09:38:55 -0500
-Subject: [PATCH 6/8] Handle noisy netlink sockets
+Subject: [PATCH] Handle noisy netlink sockets
 
 The POSIX implementation currently clears all network interfaces
 when netlink indicates that there has been a change. This causes
@@ -27,11 +27,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 182 +++++++++++++++++++++++++++++++++++++++---
  1 file changed, 172 insertions(+), 10 deletions(-)
 
-Index: mDNSResponder/mDNSPosix/mDNSPosix.c
-===================================================================
---- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
-+++ mDNSResponder/mDNSPosix/mDNSPosix.c
-@@ -1788,14 +1788,43 @@ mDNSlocal void          ProcessRoutingNo
+diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
+index 6b2fe76d4b66..ecd5741d038d 100644
+--- a/mDNSPosix/mDNSPosix.c
++++ b/mDNSPosix/mDNSPosix.c
+@@ -1788,14 +1788,43 @@ mDNSlocal void          ProcessRoutingNotification(int sd, GenLinkedList *change
  
  #endif // USES_NETLINK
  
@@ -75,7 +75,7 @@ Index: mDNSResponder/mDNSPosix/mDNSPosix.c
  
      (void)fd; // Unused
  
-@@ -1810,12 +1839,149 @@ mDNSlocal void InterfaceChangeCallback(i
+@@ -1810,12 +1839,149 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
      }
      while (0 < select(pChgRec->NotifySD + 1, &readFDs, (fd_set*) NULL, (fd_set*) NULL, &zeroTimeout));
  
@@ -230,7 +230,7 @@ Index: mDNSResponder/mDNSPosix/mDNSPosix.c
      while ((changedInterface = (NetworkInterfaceIndex*)changedInterfaces.Head) != NULL)
      {
          RemoveFromList(&changedInterfaces, changedInterface);
-@@ -1947,15 +2113,11 @@ mDNSexport void mDNSPlatformClose(mDNS *
+@@ -1947,15 +2113,11 @@ mDNSexport void mDNSPlatformClose(mDNS *const m)
  #endif
  }
  

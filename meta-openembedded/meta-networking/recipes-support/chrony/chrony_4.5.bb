@@ -90,7 +90,7 @@ do_install() {
 
     # Config file
     install -d ${D}${sysconfdir}
-    install -m 644 ${WORKDIR}/chrony.conf ${D}${sysconfdir}
+    install -m 644 ${UNPACKDIR}/chrony.conf ${D}${sysconfdir}
     if ${@bb.utils.contains('PACKAGECONFIG', 'privdrop', 'true', 'false', d)}; then
         echo "# Define user to drop to after dropping root privileges" >> ${D}${sysconfdir}/chrony.conf
         echo "user chronyd" >> ${D}${sysconfdir}/chrony.conf
@@ -98,7 +98,7 @@ do_install() {
 
     # System V init script
     install -d ${D}${sysconfdir}/init.d
-    install -m 755 ${WORKDIR}/chronyd ${D}${sysconfdir}/init.d
+    install -m 755 ${UNPACKDIR}/chronyd ${D}${sysconfdir}/init.d
 
     # systemd unit configuration file
     install -d ${D}${systemd_unitdir}/system

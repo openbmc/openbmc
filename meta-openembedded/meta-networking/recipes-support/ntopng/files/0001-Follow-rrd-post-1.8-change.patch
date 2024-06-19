@@ -1,0 +1,32 @@
+From a3bd9efe78f9c381f19b99c8ceb7f52b4c2a52b8 Mon Sep 17 00:00:00 2001
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Wed, 5 Jun 2024 09:40:17 +0300
+Subject: [PATCH] Follow rrd post-1.8 change
+
+Git version of rrdtool has changed rrd_tune argument from char pointer
+to const char pointer. GCC 14 is more strict regarding the pointer
+constantness checks and errors out in such a case. Update rrd_tune
+invokation.
+
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Upstream-Status: Pending [CLA is not signed on our side]
+---
+ src/LuaEngineNtop.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/LuaEngineNtop.cpp b/src/LuaEngineNtop.cpp
+index bd2de79e3021..dd00f1608f78 100644
+--- a/src/LuaEngineNtop.cpp
++++ b/src/LuaEngineNtop.cpp
+@@ -5427,7 +5427,7 @@ static int ntop_rrd_tune(lua_State* vm) {
+   filename = argv[1];
+ 
+   reset_rrd_state();
+-  status = rrd_tune(argc, (char**)argv);
++  status = rrd_tune(argc, (const char**)argv);
+ 
+   if(status != 0) {
+     char *err = rrd_get_error();
+-- 
+2.39.2
+

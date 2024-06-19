@@ -1,3 +1,5 @@
+Upstream-Status: Inappropriate [Test artefact]
+
 diff --git a/patch-me b/patch-me
 index a20b29a..5e35d1b 100644
 --- a/patch-me

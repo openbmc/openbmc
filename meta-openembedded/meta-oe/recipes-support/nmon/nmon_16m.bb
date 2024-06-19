@@ -18,7 +18,8 @@ CFLAGS += "-D JFS -D GETUSER -Wall -D LARGEMEM"
 LDFLAGS += "-ltinfo -lncursesw -lm"
 ASNEEDED:pn-nmon = ""
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_compile() {
     ${CC} ${CFLAGS} ${LDFLAGS} lmon${PV}.c -o nmon

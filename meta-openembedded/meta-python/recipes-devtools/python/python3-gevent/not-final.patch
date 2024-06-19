@@ -1,0 +1,16 @@
+gevent fails to build with Cython 3.0.10.  As per
+https://github.com/gevent/gevent/issues/2031, removing the
+cython.final decorator works around this.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+--- a/src/gevent/_gevent_cqueue.pxd
++++ b/src/gevent/_gevent_cqueue.pxd
+@@ -75,7 +75,6 @@ cdef class ItemWaiter(Waiter):
+     cdef readonly Queue queue
+ 
+ 
+-@cython.final
+ cdef class UnboundQueue(Queue):
+     pass

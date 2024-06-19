@@ -1,4 +1,4 @@
-From 8c4c59521720f8c1b1e38e38896b47fcb1bf00ac Mon Sep 17 00:00:00 2001
+From 18b0057e4e2c5cf6fc6541670418f43f0381db3e Mon Sep 17 00:00:00 2001
 From: Szabolcs Nagy <nsz@port70.net>
 Date: Sat, 24 Oct 2015 20:09:53 +0000
 Subject: [PATCH] libgcc_s: Use alias for __cpu_indicator_init instead of
@@ -39,10 +39,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/gcc/config/i386/i386-expand.cc b/gcc/config/i386/i386-expand.cc
-index 0d817fc3f3b..8d34d19d3f9 100644
+index 8bb8f21e686..bcf976aa1b9 100644
 --- a/gcc/config/i386/i386-expand.cc
 +++ b/gcc/config/i386/i386-expand.cc
-@@ -12691,10 +12691,10 @@ ix86_expand_builtin (tree exp, rtx target, rtx subtarget,
+@@ -13087,10 +13087,10 @@ ix86_expand_builtin (tree exp, rtx target, rtx subtarget,
      {
      case IX86_BUILTIN_CPU_INIT:
        {
@@ -56,7 +56,7 @@ index 0d817fc3f3b..8d34d19d3f9 100644
  	return expand_expr (call_expr, target, mode, EXPAND_NORMAL);
        }
 diff --git a/libgcc/config/i386/cpuinfo.c b/libgcc/config/i386/cpuinfo.c
-index 50b6d8248a2..724ced402a1 100644
+index 0bd6dffe17e..ef4acb175a4 100644
 --- a/libgcc/config/i386/cpuinfo.c
 +++ b/libgcc/config/i386/cpuinfo.c
 @@ -63,7 +63,7 @@ __cpu_indicator_init (void)

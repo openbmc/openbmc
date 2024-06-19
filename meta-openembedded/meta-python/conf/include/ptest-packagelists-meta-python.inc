@@ -17,8 +17,10 @@ PTESTS_FAST_META_PYTHON = "\
     python3-cachetools \
     python3-cbor2 \
     python3-click \
+    python3-dasbus \
     python3-dominate \
     python3-execnet \
+    python3-flask \
     python3-flexcache \
     python3-flexparser \
     python3-freezegun \
@@ -87,12 +89,15 @@ PTESTS_FAST_META_PYTHON = "\
 
 PTESTS_SLOW_META_PYTHON = "\
     python3-arrow \
+    python3-ecdsa \
     python3-google-auth \
     python3-lz4 \
     python3-marshmallow \
     python3-pillow \
     python3-pytest-localserver \
+    python3-scrypt \
     python3-traitlets \
+    python3-typer \
     python3-yappi \
 "
 
@@ -102,6 +107,5 @@ PTESTS_PROBLEMS_META_PYTHON ="\
     python3-fastjsonschema \
     python3-pint \
     python3-pyzmq \
-    python3-scrypt \
     python3-whoosh \
 "

@@ -331,7 +331,7 @@ python split_perl_packages () {
     d.setVar(d.expand("RDEPENDS:${PN}-modules"), ' '.join(packages))
 
     # Read the pre-generated dependency file, and use it to set module dependecies
-    for line in open(d.expand("${WORKDIR}") + '/perl-rdepends.txt').readlines():
+    for line in open(d.getVar("UNPACKDIR") + '/perl-rdepends.txt').readlines():
         splitline = line.split()
         # Filter empty lines and comments
         if len(splitline) == 0 or splitline[0].startswith("#"):

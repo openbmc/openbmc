@@ -28,7 +28,7 @@ do_install() {
     rm -rf ${D}${datadir}/${BPN}/patches
 
     install -d ${D}${sysconfdir}/apache2/conf.d
-    install -m 0644 ${WORKDIR}/apache.conf ${D}${sysconfdir}/apache2/conf.d/phpmyadmin.conf
+    install -m 0644 ${UNPACKDIR}/apache.conf ${D}${sysconfdir}/apache2/conf.d/phpmyadmin.conf
 
     # Remove a few scripts that explicitly require bash (!)
     rm -f ${D}${datadir}/phpmyadmin/libraries/transformations/*.sh

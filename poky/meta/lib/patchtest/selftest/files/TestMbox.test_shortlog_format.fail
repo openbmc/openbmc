@@ -1,23 +1,25 @@
-From 35ccee3cee96fb29514475279248078d88907231 Mon Sep 17 00:00:00 2001
+From c9519f11502d5bb5c143ed43b4c981b6a211bdf9 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
-Date: Tue, 29 Aug 2023 14:12:27 -0400
+Date: Fri, 31 May 2024 09:54:50 -0400
 Subject: [PATCH] selftest-hello% fix CVE-1234-56789
+
+This should fail the test_shortlog_format test.
 
 CVE: CVE-1234-56789
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- .../files/0001-Fix-CVE-1234-56789.patch       | 27 +++++++++++++++++++
- .../selftest-hello/selftest-hello_1.0.bb      |  6 +++--
- 2 files changed, 31 insertions(+), 2 deletions(-)
+ .../files/0001-Fix-CVE-1234-56789.patch       | 26 +++++++++++++++++++
+ .../selftest-hello/selftest-hello_1.0.bb      |  4 ++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
  create mode 100644 meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch
 
 diff --git a/meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch b/meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch
 new file mode 100644
-index 0000000000..9219b8db62
+index 00000000000..8a4f9329303
 --- /dev/null
 +++ b/meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,26 @@
 +From b26a31186e6ee2eb1f506d5f2f9394d327a0df2f Mon Sep 17 00:00:00 2001
 +From: Trevor Gamblin <tgamblin@baylibre.com>
 +Date: Tue, 29 Aug 2023 14:08:20 -0400
@@ -35,19 +37,17 @@ index 0000000000..9219b8db62
 +index 1788f38..83d7918 100644
 +--- a/strlen.c
 ++++ b/strlen.c
-+@@ -8,6 +8,7 @@ int main() {
-+ 
-+ 	printf("%d\n", str_len(string1));
-+ 	printf("%d\n", str_len(string2));
-++	printf("CVE FIXED!!!\n");
-+ 
-+ 	return 0;
-+ }
-+-- 
-+2.41.0
 +
++int main() {
++
++	printf("%d\n", str_len(string1));
++	printf("%d\n", str_len(string2));
++	printf("CVE FIXED!!!\n");
++
++	return 0;
++}
 diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-index 547587bef4..76975a6729 100644
+index 2dc352d479e..d937759f157 100644
 --- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 +++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 @@ -3,7 +3,9 @@ SECTION = "examples"
@@ -56,18 +56,11 @@ index 547587bef4..76975a6729 100644
  
 -SRC_URI = "file://helloworld.c"
 +SRC_URI = "file://helloworld.c \
-+           file://CVE-1234-56789.patch \
-+           "
++           file://0001-Fix-CVE-1234-56789.patch \
++	   "
  
- S = "${WORKDIR}"
- 
-@@ -16,4 +18,4 @@ do_install() {
- 	install -m 0755 helloworld ${D}${bindir}
- }
- 
--BBCLASSEXTEND = "native nativesdk"
-\ No newline at end of file
-+BBCLASSEXTEND = "native nativesdk"
+ S = "${WORKDIR}/sources"
+ UNPACKDIR = "${S}"
 -- 
-2.41.0
+2.45.1
 

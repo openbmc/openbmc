@@ -34,30 +34,30 @@ do_install:append () {
                        ${D}${sysconfdir}/default/volatiles \
                        ${D}${docdir}/radvd
     # Install init script and volatiles
-    install -m 0755 ${WORKDIR}/radvd.init ${D}${sysconfdir}/init.d/radvd
+    install -m 0755 ${UNPACKDIR}/radvd.init ${D}${sysconfdir}/init.d/radvd
     sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}${sysconfdir}/init.d/radvd
     sed -i 's!/etc/!${sysconfdir}/!g' ${D}${sysconfdir}/init.d/radvd
     sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/radvd
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}${sysconfdir}/init.d/radvd
 
-    install -m 0644 ${WORKDIR}/volatiles.03_radvd ${D}${sysconfdir}/default/volatiles/03_radvd
+    install -m 0644 ${UNPACKDIR}/volatiles.03_radvd ${D}${sysconfdir}/default/volatiles/03_radvd
 
     # Install systemd service files
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/radvd.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/radvd.service ${D}${systemd_unitdir}/system
     sed -i -e 's#@SYSCONFDIR@#${sysconfdir}#g' \
            -e 's#@SBINDIR@#${sbindir}#g' \
            -e 's#@BASE_BINDIR@#${base_bindir}#g' ${D}${systemd_unitdir}/system/radvd.service
 
     # Install default environment file
-    install -m 0644 ${WORKDIR}/radvd.default ${D}${sysconfdir}/default/radvd
+    install -m 0644 ${UNPACKDIR}/radvd.default ${D}${sysconfdir}/default/radvd
 
     # Documentation
     for i in radvd.conf.example README; do \
         install -m 0644 ${S}/$i ${D}${docdir}/radvd; \
     done
 
-    install -m 0644 ${WORKDIR}/radvd.conf ${D}${sysconfdir}/radvd.conf
+    install -m 0644 ${UNPACKDIR}/radvd.conf ${D}${sysconfdir}/radvd.conf
 }
 
 USERADD_PACKAGES = "${PN}"

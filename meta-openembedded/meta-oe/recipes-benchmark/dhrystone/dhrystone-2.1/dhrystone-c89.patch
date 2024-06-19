@@ -1,0 +1,242 @@
+dhrystone: make it speak C89
+
+Update Dhrystone sources to stop using K&R C and use something close to C89.
+This fixes compilation errors reported by the GCC 14.
+
+Upstream-Status: Pending
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+
+Index: dhrystone-2.1/dhry.h
+===================================================================
+--- dhrystone-2.1.orig/dhry.h
++++ dhrystone-2.1/dhry.h
+@@ -423,3 +423,13 @@ typedef struct record
+ #ifndef HZ
+    extern long HZ;
+ #endif
++
++void Proc_2 (One_Fifty   *Int_Par_Ref);
++void Proc_3 (Rec_Pointer *Ptr_Ref_Par);
++void Proc_4();
++void Proc_5();
++void Proc_6 (Enumeration  Enum_Val_Par, Enumeration *Enum_Ref_Par);
++void Proc_7 (One_Fifty Int_1_Par_Val, One_Fifty Int_2_Par_Val, One_Fifty *Int_Par_Ref);
++void Proc_8 (Arr_1_Dim Arr_1_Par_Ref, Arr_2_Dim Arr_2_Par_Ref, int Int_1_Par_Val, int Int_2_Par_Val);
++
++Boolean Func_2 (Str_30  Str_1_Par_Ref, Str_30  Str_2_Par_Ref);
+Index: dhrystone-2.1/dhry_1.c
+===================================================================
+--- dhrystone-2.1.orig/dhry_1.c
++++ dhrystone-2.1/dhry_1.c
+@@ -14,6 +14,8 @@
+  *
+  ****************************************************************************
+  */
++#include <stdlib.h>
++#include <string.h>
+ 
+ #include "dhry.h"
+ 
+@@ -28,7 +30,6 @@ char            Ch_1_Glob,
+ int             Arr_1_Glob [50];
+ int             Arr_2_Glob [50] [50];
+ 
+-extern char     *malloc ();
+ Enumeration     Func_1 ();
+   /* forward declaration necessary since Enumeration may not simply be int */
+ 
+@@ -41,6 +42,8 @@ Enumeration     Func_1 ();
+         Boolean Reg = true;
+ #endif
+ 
++void Proc_1 (REG Rec_Pointer Ptr_Val_Par);
++
+ /* variables for time measurement: */
+ 
+ #ifdef TIMES
+@@ -70,7 +73,7 @@ float           Microseconds,
+ /* end of variables for time measurement */
+ 
+ 
+-main ()
++int main (void)
+ /*****/
+ 
+   /* main program, corresponds to procedures        */
+@@ -218,7 +221,7 @@ main ()
+   printf ("Arr_2_Glob[8][7]:    %d\n", Arr_2_Glob[8][7]);
+   printf ("        should be:   Number_Of_Runs + 10\n");
+   printf ("Ptr_Glob->\n");
+-  printf ("  Ptr_Comp:          %d\n", (int) Ptr_Glob->Ptr_Comp);
++  printf ("  Ptr_Comp:          %lu\n", (unsigned long) Ptr_Glob->Ptr_Comp);
+   printf ("        should be:   (implementation-dependent)\n");
+   printf ("  Discr:             %d\n", Ptr_Glob->Discr);
+   printf ("        should be:   %d\n", 0);
+@@ -229,7 +232,7 @@ main ()
+   printf ("  Str_Comp:          %s\n", Ptr_Glob->variant.var_1.Str_Comp);
+   printf ("        should be:   DHRYSTONE PROGRAM, SOME STRING\n");
+   printf ("Next_Ptr_Glob->\n");
+-  printf ("  Ptr_Comp:          %d\n", (int) Next_Ptr_Glob->Ptr_Comp);
++  printf ("  Ptr_Comp:          %lu\n", (unsigned long) Next_Ptr_Glob->Ptr_Comp);
+   printf ("        should be:   (implementation-dependent), same as above\n");
+   printf ("  Discr:             %d\n", Next_Ptr_Glob->Discr);
+   printf ("        should be:   %d\n", 0);
+@@ -280,14 +283,13 @@ main ()
+     printf ("%6.1f \n", Dhrystones_Per_Second);
+     printf ("\n");
+   }
+-  
++  return 0;
+ }
+ 
+ 
+-Proc_1 (Ptr_Val_Par)
++void Proc_1 (REG Rec_Pointer Ptr_Val_Par)
+ /******************/
+ 
+-REG Rec_Pointer Ptr_Val_Par;
+     /* executed once */
+ {
+   REG Rec_Pointer Next_Record = Ptr_Val_Par->Ptr_Comp;  
+@@ -318,12 +320,10 @@ REG Rec_Pointer Ptr_Val_Par;
+ } /* Proc_1 */
+ 
+ 
+-Proc_2 (Int_Par_Ref)
++void Proc_2 (One_Fifty   *Int_Par_Ref)
+ /******************/
+     /* executed once */
+     /* *Int_Par_Ref == 1, becomes 4 */
+-
+-One_Fifty   *Int_Par_Ref;
+ {
+   One_Fifty  Int_Loc;  
+   Enumeration   Enum_Loc;
+@@ -341,13 +341,10 @@ One_Fifty   *Int_Par_Ref;
+ } /* Proc_2 */
+ 
+ 
+-Proc_3 (Ptr_Ref_Par)
++void Proc_3 (Rec_Pointer *Ptr_Ref_Par)
+ /******************/
+     /* executed once */
+     /* Ptr_Ref_Par becomes Ptr_Glob */
+-
+-Rec_Pointer *Ptr_Ref_Par;
+-
+ {
+   if (Ptr_Glob != Null)
+     /* then, executed */
+@@ -356,7 +353,7 @@ Rec_Pointer *Ptr_Ref_Par;
+ } /* Proc_3 */
+ 
+ 
+-Proc_4 () /* without parameters */
++void Proc_4 () /* without parameters */
+ /*******/
+     /* executed once */
+ {
+@@ -368,7 +365,7 @@ Proc_4 () /* without parameters */
+ } /* Proc_4 */
+ 
+ 
+-Proc_5 () /* without parameters */
++void Proc_5 () /* without parameters */
+ /*******/
+     /* executed once */
+ {
+Index: dhrystone-2.1/dhry_2.c
+===================================================================
+--- dhrystone-2.1.orig/dhry_2.c
++++ dhrystone-2.1/dhry_2.c
+@@ -14,6 +14,7 @@
+  *
+  ****************************************************************************
+  */
++#include <string.h>
+ 
+ #include "dhry.h"
+ 
+@@ -26,14 +27,14 @@
+ extern  int     Int_Glob;
+ extern  char    Ch_1_Glob;
+ 
++Boolean Func_3 (Enumeration Enum_Par_Val);
+ 
+-Proc_6 (Enum_Val_Par, Enum_Ref_Par)
++
++void Proc_6 (Enumeration  Enum_Val_Par, Enumeration *Enum_Ref_Par)
+ /*********************************/
+     /* executed once */
+     /* Enum_Val_Par == Ident_3, Enum_Ref_Par becomes Ident_2 */
+ 
+-Enumeration  Enum_Val_Par;
+-Enumeration *Enum_Ref_Par;
+ {
+   *Enum_Ref_Par = Enum_Val_Par;
+   if (! Func_3 (Enum_Val_Par))
+@@ -61,7 +62,7 @@ Enumeration *Enum_Ref_Par;
+ } /* Proc_6 */
+ 
+ 
+-Proc_7 (Int_1_Par_Val, Int_2_Par_Val, Int_Par_Ref)
++void Proc_7 (One_Fifty Int_1_Par_Val, One_Fifty Int_2_Par_Val, One_Fifty *Int_Par_Ref)
+ /**********************************************/
+     /* executed three times                                      */ 
+     /* first call:      Int_1_Par_Val == 2, Int_2_Par_Val == 3,  */
+@@ -70,9 +71,6 @@ Proc_7 (Int_1_Par_Val, Int_2_Par_Val, In
+     /*                  Int_Par_Ref becomes 17                   */
+     /* third call:      Int_1_Par_Val == 6, Int_2_Par_Val == 10, */
+     /*                  Int_Par_Ref becomes 18                   */
+-One_Fifty       Int_1_Par_Val;
+-One_Fifty       Int_2_Par_Val;
+-One_Fifty      *Int_Par_Ref;
+ {
+   One_Fifty Int_Loc;
+ 
+@@ -81,15 +79,11 @@ One_Fifty      *Int_Par_Ref;
+ } /* Proc_7 */
+ 
+ 
+-Proc_8 (Arr_1_Par_Ref, Arr_2_Par_Ref, Int_1_Par_Val, Int_2_Par_Val)
++void Proc_8 (Arr_1_Dim Arr_1_Par_Ref, Arr_2_Dim Arr_2_Par_Ref, int Int_1_Par_Val, int Int_2_Par_Val)
+ /*********************************************************************/
+     /* executed once      */
+     /* Int_Par_Val_1 == 3 */
+     /* Int_Par_Val_2 == 7 */
+-Arr_1_Dim       Arr_1_Par_Ref;
+-Arr_2_Dim       Arr_2_Par_Ref;
+-int             Int_1_Par_Val;
+-int             Int_2_Par_Val;
+ {
+   REG One_Fifty Int_Index;
+   REG One_Fifty Int_Loc;
+@@ -132,14 +126,11 @@ Capital_Letter   Ch_2_Par_Val;
+ } /* Func_1 */
+ 
+ 
+-Boolean Func_2 (Str_1_Par_Ref, Str_2_Par_Ref)
++Boolean Func_2 (Str_30  Str_1_Par_Ref, Str_30  Str_2_Par_Ref)
+ /*************************************************/
+     /* executed once */
+     /* Str_1_Par_Ref == "DHRYSTONE PROGRAM, 1'ST STRING" */
+     /* Str_2_Par_Ref == "DHRYSTONE PROGRAM, 2'ND STRING" */
+-
+-Str_30  Str_1_Par_Ref;
+-Str_30  Str_2_Par_Ref;
+ {
+   REG One_Thirty        Int_Loc;
+       Capital_Letter    Ch_Loc;
+@@ -174,11 +165,10 @@ Str_30  Str_2_Par_Ref;
+ } /* Func_2 */
+ 
+ 
+-Boolean Func_3 (Enum_Par_Val)
++Boolean Func_3 (Enumeration Enum_Par_Val)
+ /***************************/
+     /* executed once        */
+     /* Enum_Par_Val == Ident_3 */
+-Enumeration Enum_Par_Val;
+ {
+   Enumeration Enum_Loc;
+ 

@@ -1,8 +1,7 @@
-From 5325ab5813617f35f03806ec420829dde7104387 Mon Sep 17 00:00:00 2001
+From 2903e42c7cd727a2374d21b78950308de792ebe8 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 14:56:21 +0800
-Subject: [PATCH 04/22] don't fail if GLOB_BRACE and GLOB_ALTDIRFUNC is not
- defined
+Subject: [PATCH] don't fail if GLOB_BRACE and GLOB_ALTDIRFUNC is not defined
 
 If the standard library doesn't provide brace
 expansion users just won't get it.
@@ -115,7 +114,7 @@ index 9b3e73cce0..3790ba3be5 100644
  
          (void) rm_rf(template, REMOVE_ROOT|REMOVE_PHYSICAL);
 diff --git a/src/tmpfiles/tmpfiles.c b/src/tmpfiles/tmpfiles.c
-index 230ec09b97..2cc5f391d7 100644
+index 6a1c7725a1..138b3ac561 100644
 --- a/src/tmpfiles/tmpfiles.c
 +++ b/src/tmpfiles/tmpfiles.c
 @@ -73,6 +73,12 @@
@@ -131,7 +130,7 @@ index 230ec09b97..2cc5f391d7 100644
  /* This reads all files listed in /etc/tmpfiles.d/?*.conf and creates
   * them in the file system. This is intended to be used to create
   * properly owned directories beneath /tmp, /var/tmp, /run, which are
-@@ -2434,7 +2440,9 @@ finish:
+@@ -2426,7 +2432,9 @@ finish:
  
  static int glob_item(Context *c, Item *i, action_t action) {
          _cleanup_globfree_ glob_t g = {
@@ -141,7 +140,7 @@ index 230ec09b97..2cc5f391d7 100644
          };
          int r = 0, k;
  
-@@ -2461,7 +2469,9 @@ static int glob_item_recursively(
+@@ -2453,7 +2461,9 @@ static int glob_item_recursively(
                  fdaction_t action) {
  
          _cleanup_globfree_ glob_t g = {
@@ -151,6 +150,3 @@ index 230ec09b97..2cc5f391d7 100644
          };
          int r = 0, k;
  
--- 
-2.34.1
-

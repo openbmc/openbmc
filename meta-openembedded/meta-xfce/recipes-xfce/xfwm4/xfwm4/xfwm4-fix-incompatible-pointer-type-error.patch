@@ -1,0 +1,38 @@
+Fix xfwm4 incompatible pointer type error:
+
+| ../../xfwm4-4.18.0/src/startup_notification.c:139:57: error: passing argument 2 of 'sn_startup_sequence_get_last_active_time' from incompatible pointer type [-Wincompatible-pointer-types]
+|   139 |     sn_startup_sequence_get_last_active_time (sequence, &l_sec, &l_usec);
+|       |                                                         ^~~~~~
+|       |                                                         |
+|       |                                                         long int *
+| In file included from .../usr/include/startup-notification-1.0/libsn/sn.h:32,
+|                  from ../../xfwm4-4.18.0/src/startup_notification.c:33:
+| .../usr/include/startup-notification-1.0/libsn/sn-monitor.h:84:79: note: expected 'time_t *' {aka 'long long int *'} but argument is of type 'long int *'
+|    84 |                                                            time_t            *tv_sec,
+|       |                                                            ~~~~~~~~~~~~~~~~~~~^~~~~~
+
+It is caused by a patch of startup-notification in oe-core which is
+backported from upstream mailllist and changes the signature of function
+sn_startup_sequence_get_last_active_time().
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ src/startup_notification.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/startup_notification.c b/src/startup_notification.c
+index 2a08cad..05434ca 100644
+--- a/src/startup_notification.c
++++ b/src/startup_notification.c
+@@ -136,7 +136,7 @@ sn_collect_timed_out_foreach (void *element, void *data)
+ 
+     sequence = element;
+     ctod = (CollectTimedOutData *) data;
+-    sn_startup_sequence_get_last_active_time (sequence, &l_sec, &l_usec);
++    sn_startup_sequence_get_last_active_time (sequence, (time_t *)&l_sec, &l_usec);
+     tv_sec = l_sec; tv_usec = l_usec;
+ 
+     elapsed = ((double) ctod->now - (tv_sec * G_USEC_PER_SEC) - tv_usec)

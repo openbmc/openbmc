@@ -33,7 +33,7 @@ RDEPENDS:${PN} += "libdbi-perl \
 
 do_install:append() {
     if [ ${PERL_DBM_TEST} = "1" ]; then
-        install -m 755 -D ${WORKDIR}/sqlite-perl-test.pl ${D}/${bindir}/sqlite-perl-test.pl
+        install -m 755 -D ${UNPACKDIR}/sqlite-perl-test.pl ${D}/${bindir}/sqlite-perl-test.pl
     fi
 }
 

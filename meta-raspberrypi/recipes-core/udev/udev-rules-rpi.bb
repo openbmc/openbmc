@@ -15,5 +15,5 @@ INHIBIT_DEFAULT_DEPS = "1"
 do_install () {
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${S}/etc.armhf/udev/rules.d/99-com.rules ${D}${sysconfdir}/udev/rules.d/
-    install -m 0644 ${WORKDIR}/can.rules ${D}${sysconfdir}/udev/rules.d/
+    install -m 0644 ${UNPACKDIR}/can.rules ${D}${sysconfdir}/udev/rules.d/
 }

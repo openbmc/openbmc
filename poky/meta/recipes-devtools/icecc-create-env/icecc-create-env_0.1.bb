@@ -26,11 +26,12 @@ ICECC_DISABLED = "1"
 PATCHTOOL = "patch"
 SRC_URI = "file://icecc-create-env"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -d ${D}/${bindir}
-    install -m 0755 ${WORKDIR}/icecc-create-env ${D}/${bindir}
+    install -m 0755 ${S}/icecc-create-env ${D}/${bindir}
 }
 
 BBCLASSEXTEND = "native nativesdk"

@@ -1,0 +1,46 @@
+From 04149f9ec9b37b5bb4c2b6c38d4560b2c122c483 Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Thu, 23 May 2024 23:28:42 +0200
+Subject: [PATCH] po: force Language: header for "fr" and "de" locals
+
+Language: header is "new" and used to be derived from Language-Team
+header. But, for fr.po and de.po, Language can't be derived.
+
+Force "Language" header to avoid having a default Language header.
+
+Upstream-Status: Inactive-Upstream [lastrelease: 26-Apr-2006]
+See: http://download.savannah.nongnu.org/releases/hddtemp/?C=M&O=D
+
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ po/de.po | 1 +
+ po/fr.po | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/po/de.po b/po/de.po
+index 3b79e08..d04976b 100644
+--- a/po/de.po
++++ b/po/de.po
+@@ -13,6 +13,7 @@ msgstr ""
+ "PO-Revision-Date: 2011-08-30 16:40+0200\n"
+ "Last-Translator: Vinzenz Vietzke <vinz@v1nz.org>\n"
+ "Language-Team: <debian-l10n-german@lists.debian.org>\n"
++"Language: de\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=UTF-8\n"
+ "Content-Transfer-Encoding: 8bit"
+diff --git a/po/fr.po b/po/fr.po
+index 2fd97c5..0b3bf19 100644
+--- a/po/fr.po
++++ b/po/fr.po
+@@ -12,6 +12,7 @@ msgstr ""
+ "PO-Revision-Date: 2011-08-30 16:38+0200\n"
+ "Last-Translator: Aurelien Jarno <aurelien@aurel32.net>\n"
+ "Language-Team: FRANCAIS <fr@li.org>\n"
++"Language: fr\n"
+ "MIME-Version: 1.0\n"
+ "Content-Type: text/plain; charset=ISO-8859-1\n"
+ "Content-Transfer-Encoding: 8bit\n"
+-- 
+2.39.2
+

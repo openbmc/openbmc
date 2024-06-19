@@ -1,4 +1,4 @@
-From 696d696381dd99ec2bddb1170f96f98da36eb418 Mon Sep 17 00:00:00 2001
+From 92a77026cc64f5eab4cb6b35e4a7c59e6ab8aa20 Mon Sep 17 00:00:00 2001
 From: Andrei Gherzan <andrei.gherzan@huawei.com>
 Date: Wed, 22 Dec 2021 12:49:25 +0100
 Subject: [PATCH] Fix install path of linux64.h
@@ -17,11 +17,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index 8ef996c0f4d..21daf380e34 100644
+index 6a009c696e9..da54dd42adf 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
-@@ -3731,6 +3731,8 @@ install-plugin: installdirs lang.install-plugin s-header-vars install-gengtype
- 	  "$(srcdir)"/config/* | "$(srcdir)"/common/config/* \
+@@ -3900,6 +3900,8 @@ install-plugin: installdirs lang.install-plugin s-header-vars install-gengtype
+ 	  | "$(srcdir)"/config/* | "$(srcdir)"/common/config/* \
  	  | "$(srcdir)"/c-family/* | "$(srcdir)"/*.def ) \
  	    base=`echo "$$path" | sed -e "s|$$srcdirstrip/||"`;; \
 +	  */linux64.h ) \

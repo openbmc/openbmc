@@ -32,6 +32,6 @@ do_install () {
     install -d ${D}${sysconfdir}/network/if-up.d
     install -d ${D}${sysconfdir}/default
     install -c -m 755 ${S}/zeroconf ${D}${sbindir}/zeroconf
-    install -c -m 755 ${WORKDIR}/debian-zeroconf ${D}${sysconfdir}/network/if-up.d/zeroconf
-    install -c ${WORKDIR}/zeroconf-default ${D}${sysconfdir}/default/zeroconf
+    install -c -m 755 ${UNPACKDIR}/debian-zeroconf ${D}${sysconfdir}/network/if-up.d/zeroconf
+    install -c ${UNPACKDIR}/zeroconf-default ${D}${sysconfdir}/default/zeroconf
 }

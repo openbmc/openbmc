@@ -74,8 +74,8 @@ do_install:append() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         mkdir -p ${D}/${sysconfdir}/init.d ${D}/${sysconfdir}/default
-        install -m 0755 ${WORKDIR}/etc/init.d/* ${D}/${sysconfdir}/init.d
-        install -m 0644 ${WORKDIR}/etc/default/* ${D}/${sysconfdir}/default
+        install -m 0755 ${UNPACKDIR}/etc/init.d/* ${D}/${sysconfdir}/init.d
+        install -m 0644 ${UNPACKDIR}/etc/default/* ${D}/${sysconfdir}/default
 
         mkdir -p ${D}/${sysconfdir}/default/volatiles
         echo "d root root 0755 ${localstatedir}/run/krb5kdc none" \
@@ -90,11 +90,11 @@ do_install:append() {
               > ${D}${sysconfdir}/tmpfiles.d/krb5.conf
 
         mkdir -p ${D}/${sysconfdir}/default
-        install -m 0644 ${WORKDIR}/etc/default/* ${D}/${sysconfdir}/default
+        install -m 0644 ${UNPACKDIR}/etc/default/* ${D}/${sysconfdir}/default
 
         install -d ${D}${systemd_system_unitdir}
-        install -m 0644 ${WORKDIR}/krb5-admin-server.service ${D}${systemd_system_unitdir}
-        install -m 0644 ${WORKDIR}/krb5-kdc.service ${D}${systemd_system_unitdir}
+        install -m 0644 ${UNPACKDIR}/krb5-admin-server.service ${D}${systemd_system_unitdir}
+        install -m 0644 ${UNPACKDIR}/krb5-kdc.service ${D}${systemd_system_unitdir}
     fi
 
     sed -e 's@[^ ]*-ffile-prefix-map=[^ "]*@@g' \

@@ -18,12 +18,12 @@ class TestMetadata(base.Metadata):
     lictag_re  = pyparsing.AtLineStart("License-Update:")
     lic_chksum_added = pyparsing.AtLineStart("+" + metadata_chksum)
     lic_chksum_removed = pyparsing.AtLineStart("-" + metadata_chksum)
-    add_mark = pyparsing.Regex('\+ ')
+    add_mark = pyparsing.Regex('\\+ ')
     max_length = 200
     metadata_src_uri  = 'SRC_URI'
     md5sum    = 'md5sum'
     sha256sum = 'sha256sum'
-    git_regex = pyparsing.Regex('^git\:\/\/.*')
+    git_regex = pyparsing.Regex('^git\\:\\/\\/.*')
     metadata_summary = 'SUMMARY'
     cve_check_ignore_var = 'CVE_CHECK_IGNORE'
     cve_status_var = 'CVE_STATUS'

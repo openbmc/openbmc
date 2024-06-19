@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 #include <sys/socket.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <netinet/in.h>
 #include <netdb.h>

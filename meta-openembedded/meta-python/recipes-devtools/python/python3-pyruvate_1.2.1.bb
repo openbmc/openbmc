@@ -9,16 +9,16 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI += "\
     git://gitlab.com/tschorr/pyruvate.git;protocol=https;branch=main \
-    file://0001-linux.rs-Define-consts-for-rv32-architecture.patch;patchdir=../cargo_home/bitbake/nix-0.23.2/ \
-    file://0001-musl-Define-SOCK_NONBLOCK-with-O_NONBLOCK.patch;patchdir=../cargo_home/bitbake/libc-0.2.138/ \
-    file://0001-musl-riscv32-Define-F_SETLK-F_SETLKW-and-fix-F_GETLK.patch;patchdir=../cargo_home/bitbake/libc-0.2.138/ \
-    file://0001-musl-Move-F_OFD_GETLK-F_OFD_SETLK-and-F_OFD_SETLKW-t.patch;patchdir=../cargo_home/bitbake/libc-0.2.138/ \
-    file://0001-musl-Define-O_LARGEFILE-for-riscv32.patch;patchdir=../cargo_home/bitbake/libc-0.2.138/ \
-    file://0001-musl-Define-SOCK_SEQPACKET-in-common-place.patch;patchdir=../cargo_home/bitbake/libc-0.2.138/ \
+    file://0001-linux.rs-Define-consts-for-rv32-architecture.patch;patchdir=${UNPACKDIR}/cargo_home/bitbake/nix-0.23.2/ \
+    file://0001-musl-Define-SOCK_NONBLOCK-with-O_NONBLOCK.patch;patchdir=${UNPACKDIR}/cargo_home/bitbake/libc-0.2.138/ \
+    file://0001-musl-riscv32-Define-F_SETLK-F_SETLKW-and-fix-F_GETLK.patch;patchdir=${UNPACKDIR}/cargo_home/bitbake/libc-0.2.138/ \
+    file://0001-musl-Move-F_OFD_GETLK-F_OFD_SETLK-and-F_OFD_SETLKW-t.patch;patchdir=${UNPACKDIR}/cargo_home/bitbake/libc-0.2.138/ \
+    file://0001-musl-Define-O_LARGEFILE-for-riscv32.patch;patchdir=${UNPACKDIR}/cargo_home/bitbake/libc-0.2.138/ \
+    file://0001-musl-Define-SOCK_SEQPACKET-in-common-place.patch;patchdir=${UNPACKDIR}/cargo_home/bitbake/libc-0.2.138/ \
 "
 SRCREV = "57db64c9f65ced05c71b8d786c1cedfaa2991597"
 
-SRC_URI:append:mips = " file://0001-check-for-mips-targets-for-stat.st_dev-definitions.patch;patchdir=../cargo_home/bitbake/libsystemd-0.5.0/"
+SRC_URI:append:mips = " file://0001-check-for-mips-targets-for-stat.st_dev-definitions.patch;patchdir=${UNPACKDIR}/cargo_home/bitbake/libsystemd-0.5.0/"
 
 S = "${WORKDIR}/git"
 

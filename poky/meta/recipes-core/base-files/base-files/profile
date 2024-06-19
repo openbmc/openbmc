@@ -58,7 +58,7 @@ resize() {
 	fi
 	# only do this for /dev/tty[A-z] which are typically
 	# serial ports
-	if [ $FIRSTTIMESETUP -eq 1 -a $SHLVL -eq 1 ] ; then
+	if [ $FIRSTTIMESETUP -eq 1 -a ${SHLVL:-1} -eq 1 ] ; then
 		case $(tty 2>/dev/null) in
 			/dev/tty[A-z]*) resize >/dev/null;;
 		esac

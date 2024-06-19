@@ -5,7 +5,8 @@ LICENSE = "MIT"
 
 PACKAGE_WRITE_DEPS += "systemd-systemctl-native"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit features_check
 

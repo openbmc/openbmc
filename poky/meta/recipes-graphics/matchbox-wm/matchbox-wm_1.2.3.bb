@@ -34,5 +34,5 @@ EXTRA_OECONF = " --enable-startup-notification \
                  --with-expat-includes=${STAGING_INCDIR}"
 
 do_install:prepend() {
-	install ${WORKDIR}/kbdconfig ${S}/data/kbdconfig
+	install ${UNPACKDIR}/kbdconfig ${S}/data/kbdconfig
 }

@@ -294,7 +294,7 @@ class SizeVal(MeasurementVal):
             return "null"
         return self / 1024
 
-def measurement_stats(meas, prefix=''):
+def measurement_stats(meas, prefix='', time=0):
     """Get statistics of a measurement"""
     if not meas:
         return {prefix + 'sample_cnt': 0,
@@ -319,6 +319,8 @@ def measurement_stats(meas, prefix=''):
     stats['quantity'] = val_cls.quantity
     stats[prefix + 'sample_cnt'] = len(values)
 
+    # Add start time for both type sysres and disk usage
+    start_time = time 
     mean_val = val_cls(mean(values))
     min_val = val_cls(min(values))
     max_val = val_cls(max(values))
@@ -334,6 +336,7 @@ def measurement_stats(meas, prefix=''):
     stats[prefix + 'max'] = max_val
     stats[prefix + 'minus'] = val_cls(mean_val - min_val)
     stats[prefix + 'plus'] = val_cls(max_val - mean_val)
+    stats[prefix + 'start_time'] = start_time
 
     return stats
 

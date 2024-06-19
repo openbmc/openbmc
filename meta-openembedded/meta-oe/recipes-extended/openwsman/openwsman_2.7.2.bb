@@ -57,7 +57,7 @@ do_install:append() {
     chmod 755 ${D}/${sysconfdir}/openwsman/owsmangencert.sh
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}/${systemd_unitdir}/system
-        install -m 644 ${WORKDIR}/openwsmand.service ${D}/${systemd_unitdir}/system
+        install -m 644 ${UNPACKDIR}/openwsmand.service ${D}/${systemd_unitdir}/system
 
         sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/openwsmand.service
         sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' ${D}${systemd_unitdir}/system/openwsmand.service

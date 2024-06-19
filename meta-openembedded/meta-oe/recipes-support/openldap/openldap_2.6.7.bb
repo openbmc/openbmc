@@ -160,7 +160,7 @@ FILES:${PN}-dbg += "${libexecdir}/openldap/.debug"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/init.d
-    cat ${WORKDIR}/initscript > ${D}${sysconfdir}/init.d/openldap
+    cat ${UNPACKDIR}/initscript > ${D}${sysconfdir}/init.d/openldap
     chmod 755 ${D}${sysconfdir}/init.d/openldap
     # This is duplicated in /etc/openldap and is for slapd
     rm -f ${D}${localstatedir}/openldap-data/DB_CONFIG.example
@@ -177,7 +177,7 @@ do_install:append() {
     rmdir --ignore-fail-on-non-empty "${D}${localstatedir}"
 
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/slapd.service ${D}${systemd_unitdir}/system/
+    install -m 0644 ${UNPACKDIR}/slapd.service ${D}${systemd_unitdir}/system/
     sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/*.service
 
     # Uses mdm as the database

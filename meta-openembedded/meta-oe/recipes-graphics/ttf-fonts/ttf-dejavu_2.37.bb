@@ -23,7 +23,7 @@ UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/dejavu/files/dejavu/"
 
 do_install:append () {
     install -d ${D}${sysconfdir}/fonts/conf.d/
-    install -m 0644 ${WORKDIR}/30-dejavu-aliases.conf ${D}${sysconfdir}/fonts/conf.d/
+    install -m 0644 ${UNPACKDIR}/30-dejavu-aliases.conf ${D}${sysconfdir}/fonts/conf.d/
 }
 
 PACKAGES = "\

@@ -18,7 +18,7 @@ do_compile() {
 }
 
 do_install() {
-   install -Dm 0755 ${WORKDIR}/${BPN}.initd ${D}${sysconfdir}/init.d/${BPN}
+   install -Dm 0755 ${UNPACKDIR}/${BPN}.initd ${D}${sysconfdir}/init.d/${BPN}
    install -Dm 0755 ${S}/nbcat ${D}${bindir}/nbcat
    install -Dm 0755 ${S}/mkemlog ${D}${bindir}/mkemlog
 }

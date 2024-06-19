@@ -60,9 +60,6 @@ db_cv_align_t=${db_cv_align_t='unsigned long long'}
 db_cv_fcntl_f_setfd=${db_cv_fcntl_f_setfd=yes}
 db_cv_sprintf_count=${db_cv_sprintf_count=yes}
 
-# D-BUS
-ac_cv_func_posix_getpwnam_r=${ac_cv_func_posix_getpwnam_r=yes}
-
 # ettercap
 ettercap_cv_type_socklen_t=${ettercap_cv_type_socklen_t=yes}
 
@@ -74,9 +71,6 @@ ac_cv_uchar=${ac_cv_uchar=no}
 ac_cv_uint=${ac_cv_uint=yes}
 ac_cv_ulong=${ac_cv_ulong=yes}
 ac_cv_ushort=${ac_cv_ushort=yes}
-
-# intercom
-ac_cv_func_fnmatch_works=${ac_cv_func_fnmatch_works=yes}
 
 # jikes-native
 ac_cv_sizeof_wchar_t=4
@@ -148,12 +142,6 @@ jm_cv_func_working_readdir=yes
 # xorg X11R7
 ac_cv_sys_linker_h=${ac_cv_sys_linker_h=no}
 ac_cv_file__usr_share_X11_sgml_defs_ent=${ac_cv_file__usr_share_X11_sgml_defs_ent=no}
-
-# evolution-data-server
-ac_cv_libiconv_utf8=${ac_cv_libiconv_utf8=yes}
-
-#dbus
-ac_cv_have_abstract_sockets=${ac_cv_have_abstract_sockets=yes}
 
 #libpciaccess
 have_mtrr_h=yes

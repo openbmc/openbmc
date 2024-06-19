@@ -316,6 +316,7 @@ PACKAGES += "\
 	${PN}-staticdev \
 "
 
+INSANE_SKIP += " 32bit-time"
 INSANE_SKIP:${PN}-dbg = "staticdev"
 INSANE_SKIP:${PN}-utils += "ldflags"
 INSANE_SKIP:libstdc++ += "ldflags"

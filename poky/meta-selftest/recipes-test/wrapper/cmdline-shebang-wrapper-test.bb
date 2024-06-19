@@ -9,7 +9,7 @@ EXCLUDE_FROM_WORLD = "1"
 do_install() {
     install -d ${D}${bindir}
     # was not able to make ownership preservation check
-    install -m 0400 ${WORKDIR}/test.awk ${D}${bindir}/test
+    install -m 0400 ${UNPACKDIR}/test.awk ${D}${bindir}/test
 
     perm_old="$(stat --format='%a' ${D}${bindir}/test)"
     sed -i -e 's|@AWK_BIN@|${bindir}/awk|g' ${D}${bindir}/test

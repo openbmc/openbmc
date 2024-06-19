@@ -1,0 +1,52 @@
+From 6c35fc94ca30a4d0662479f7ef8a704d97aa7352 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 18 May 2024 18:13:30 -0700
+Subject: [PATCH] stdlib: Make iconv use portable across glibc/musl
+
+This is a backport from libsdl2
+
+Upstream-Status: Backport [https://github.com/libsdl-org/SDL/blob/main/src/stdlib/SDL_iconv.c#L49C1-L51C1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/stdlib/SDL_iconv.c | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
+
+diff --git a/src/stdlib/SDL_iconv.c b/src/stdlib/SDL_iconv.c
+index fa56a99..087b6ec 100644
+--- a/src/stdlib/SDL_iconv.c
++++ b/src/stdlib/SDL_iconv.c
+@@ -28,27 +28,16 @@
+ 
+ #ifdef HAVE_ICONV
+ 
+-/* Depending on which standard the iconv() was implemented with,
+-   iconv() may or may not use const char ** for the inbuf param.
+-   If we get this wrong, it's just a warning, so no big deal.
+-*/
+-#if defined(_XGP6) || \
+-    defined(__GLIBC__) && ((__GLIBC__ > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2))
+-#define ICONV_INBUF_NONCONST
+-#endif
+-
+ #include <errno.h>
+ 
+ size_t SDL_iconv(SDL_iconv_t cd,
+                  const char **inbuf, size_t *inbytesleft,
+                  char **outbuf, size_t *outbytesleft)
+ {
+-	size_t retCode;
+-#ifdef ICONV_INBUF_NONCONST
+-	retCode = iconv(cd, (char **)inbuf, inbytesleft, outbuf, outbytesleft);
+-#else
+-	retCode = iconv(cd, inbuf, inbytesleft, outbuf, outbytesleft);
+-#endif
++  /* iconv's second parameter may or may not be `const char const *` depending on the
++     C runtime's whims. Casting to void * seems to make everyone happy, though. */
++
++	const size_t retCode = iconv((iconv_t)((uintptr_t)cd), (void *)inbuf, inbytesleft, outbuf, outbytesleft);
+ 	if ( retCode == (size_t)-1 ) {
+ 		switch(errno) {
+ 		    case E2BIG:
+-- 
+2.45.1
+

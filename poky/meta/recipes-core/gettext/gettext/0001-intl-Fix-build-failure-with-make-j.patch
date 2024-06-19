@@ -1,0 +1,35 @@
+From 97a6a63ad61949663283f5fad68c9d5fb9be1f15 Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Tue, 12 Sep 2023 11:33:41 +0200
+Subject: [PATCH] intl: Fix build failure with "make -j".
+
+Reported by Christian Weisgerber <naddy@mips.inka.de> at
+<https://lists.gnu.org/archive/html/bug-gettext/2023-09/msg00005.html>.
+
+* gettext-runtime/intl/Makefile.am (langprefs.lo, log.lo): Depend on gettextP.h
+and its subordinate includes.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/gitweb/?p=gettext.git;a=commit;h=97a6a63ad61949663283f5fad68c9d5fb9be1f15]
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ gettext-runtime/intl/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gettext-runtime/intl/Makefile.am b/gettext-runtime/intl/Makefile.am
+index da7abb758..9e56978bc 100644
+--- a/gettext-runtime/intl/Makefile.am
++++ b/gettext-runtime/intl/Makefile.am
+@@ -387,8 +387,8 @@ dngettext.lo:        ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo
+ ngettext.lo:         ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
+ plural.lo:           ../config.h $(srcdir)/plural-exp.h $(PLURAL_DEPS)
+ plural-exp.lo:       ../config.h $(srcdir)/plural-exp.h
+-langprefs.lo:        ../config.h
+-log.lo:              ../config.h
++langprefs.lo:        ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
++log.lo:              ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
+ printf.lo:           ../config.h
+ setlocale.lo:        ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
+ version.lo:          ../config.h libgnuintl.h
+-- 
+2.25.1
+

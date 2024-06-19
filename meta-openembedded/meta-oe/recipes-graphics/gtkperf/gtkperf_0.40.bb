@@ -24,7 +24,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 do_configure:prepend () {
     rm -f ${S}/m4/init.m4
-    cp -f ${WORKDIR}/Makevars ${S}/po/
+    cp -f ${UNPACKDIR}/Makevars ${S}/po/
 }
 
 do_install:append () {

@@ -37,8 +37,8 @@ do_install() {
 
     install -m 0755 ${S}/iozone ${D}${bindir}
     install -m 0755 ${S}/fileop ${D}${bindir}
-    install -m 0644 ${WORKDIR}/${BPN}_${PV}/docs/iozone.1 ${D}${mandir}/man1/
-    install -m 0644 ${WORKDIR}/copyright.txt ${D}${datadir}/doc/${BPN}/
+    install -m 0644 ${S}/../../docs/iozone.1 ${D}${mandir}/man1/
+    install -m 0644 ${UNPACKDIR}/copyright.txt ${D}${datadir}/doc/${BPN}/
 
     install -m 0644 ${S}/*.dem ${D}${datadir}/doc/${BPN}/examples
     install -m 0644 ${S}/client_list ${D}${datadir}/doc/${BPN}/examples
@@ -48,9 +48,9 @@ do_install() {
     install -m 0755 ${S}/gengnuplot.sh ${D}${datadir}/doc/${BPN}/examples
     install -m 0755 ${S}/report.pl ${D}${datadir}/doc/${BPN}/examples
 
-    install -m 0644 ${WORKDIR}/${BPN}_${PV}/docs/Iozone_ps.gz ${D}${datadir}/doc/${BPN}/
-    install -m 0644 ${WORKDIR}/${BPN}_${PV}/docs/IOzone_msword_98.pdf ${D}${datadir}/doc/${BPN}/
-    install -m 0644 ${WORKDIR}/${BPN}_${PV}/docs/Run_rules.doc ${D}${datadir}/doc/${BPN}/
+    install -m 0644 ${S}/../../docs/Iozone_ps.gz ${D}${datadir}/doc/${BPN}/
+    install -m 0644 ${S}/../../docs/IOzone_msword_98.pdf ${D}${datadir}/doc/${BPN}/
+    install -m 0644 ${S}/../../docs/Run_rules.doc ${D}${datadir}/doc/${BPN}/
 }
 
 FILES:${PN} += "${datadir}/doc/${PN}/copyright.txt"

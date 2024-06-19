@@ -184,8 +184,8 @@ SYSTEMD_SERVICE:${PN}-dnsconfd = "avahi-dnsconfd.service"
 
 do_install:append() {
 	install -d ${D}${sysconfdir}/udhcpc.d
-	install ${WORKDIR}/00avahi-autoipd ${D}${sysconfdir}/udhcpc.d
-	install ${WORKDIR}/99avahi-autoipd ${D}${sysconfdir}/udhcpc.d
+	install ${UNPACKDIR}/00avahi-autoipd ${D}${sysconfdir}/udhcpc.d
+	install ${UNPACKDIR}/99avahi-autoipd ${D}${sysconfdir}/udhcpc.d
 }
 
 # At the time the postinst runs, dbus might not be setup so only restart if running 

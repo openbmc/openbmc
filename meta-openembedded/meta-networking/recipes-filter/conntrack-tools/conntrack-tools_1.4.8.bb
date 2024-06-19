@@ -34,8 +34,8 @@ do_install:append() {
 	install -d ${D}/${sysconfdir}/conntrackd
 	install -d ${D}/${sysconfdir}/init.d
 	install -m 0644 ${S}/doc/sync/ftfw/conntrackd.conf ${D}/${sysconfdir}/conntrackd/conntrackd.conf.sample
-	install -m 0755 ${WORKDIR}/conntrack-failover ${D}/${sysconfdir}/init.d/conntrack-failover
-	install -m 0755 ${WORKDIR}/init ${D}/${sysconfdir}/init.d/conntrackd
+	install -m 0755 ${UNPACKDIR}/conntrack-failover ${D}/${sysconfdir}/init.d/conntrack-failover
+	install -m 0755 ${UNPACKDIR}/init ${D}/${sysconfdir}/init.d/conntrackd
 
 	# Fix hardcoded paths in scripts
 	sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}/${sysconfdir}/init.d/conntrack-failover ${D}/${sysconfdir}/init.d/conntrackd
@@ -45,7 +45,7 @@ do_install:append() {
 
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		install -d ${D}/${systemd_system_unitdir}
-		install -m 644 ${WORKDIR}/conntrackd.service ${D}/${systemd_system_unitdir}
+		install -m 644 ${UNPACKDIR}/conntrackd.service ${D}/${systemd_system_unitdir}
 	fi
 }
 

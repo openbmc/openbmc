@@ -72,6 +72,7 @@ stages:
     - if: '$KERNEL != "linux-yocto-dev"'
   script:
     - KASFILES=$(./ci/jobs-to-kas "$CI_JOB_NAME" $EXTRA_KAS_FILES):lockfile.yml
+    - echo KASFILES=$KASFILES
     - kas dump --update --force-checkout --resolve-refs --resolve-env $KASFILES
     - kas build $KASFILES
     - ./ci/check-warnings $KAS_WORK_DIR/build/warnings.log
@@ -119,31 +120,6 @@ update-repos:
 #  VIRT: [none, xen]
 #  TESTING: testimage
 
-corstone1000-fvp:
-  extends: .build
-  parallel:
-    matrix:
-      - FIRMWARE: corstone1000-firmware-only
-        TESTING: [testimage, tftf]
-      - FIRMWARE: none
-        TESTING: testimage
-
-corstone1000-mps3:
-  extends: .build
-  parallel:
-    matrix:
-      - FIRMWARE: corstone1000-firmware-only
-        TESTING: [none, tftf]
-      - FIRMWARE: none
-
-fvp-base:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: testimage
-      - FIRMWARE: edk2
-      - SYSTEMREADY_FIRMWARE: arm-systemready-firmware
-
 arm-systemready-ir-acs:
   extends: .build
   timeout: 12h
@@ -157,11 +133,90 @@ arm-systemready-ir-acs:
   tags:
     - ${ACS_TAG}
 
+# Validate layers are Yocto Project Compatible
+check-layers:
+  extends: .setup
+  script:
+    - kas shell --update --force-checkout ci/base.yml:ci/meta-openembedded.yml:lockfile.yml --command \
+      "yocto-check-layer-wrapper $CI_PROJECT_DIR/$LAYER --dependency $CI_PROJECT_DIR/meta-* $KAS_WORK_DIR/meta-openembedded/meta-oe --no-auto-dependency"
+  parallel:
+    matrix:
+      - LAYER: [meta-arm, meta-arm-bsp, meta-arm-toolchain]
+
+corstone1000-fvp:
+  extends: .build
+  parallel:
+    matrix:
+      - FIRMWARE: corstone1000-firmware-only
+        TESTING: [testimage, tftf]
+      - FIRMWARE: none
+        TESTING: testimage
+      - SYSTEMREADY_FIRMWARE: arm-systemready-firmware
+
+corstone1000-mps3:
+  extends: .build
+  parallel:
+    matrix:
+      - FIRMWARE: corstone1000-firmware-only
+        TESTING: [none, tftf]
+      - FIRMWARE: none
+
+documentation:
+  extends: .setup
+  script:
+    - |
+      # This can be removed when the kas container has python3-venv installed
+      sudo apt-get update && sudo apt-get install --yes python3-venv
+
+      python3 -m venv venv
+      . ./venv/bin/activate
+
+      pip3 install -r meta-arm-bsp/documentation/requirements.txt
+
+      for CONF in meta-*/documentation/*/conf.py ; do
+        echo Building $CONF...
+        SOURCE_DIR=$(dirname $CONF)
+        MACHINE=$(basename $SOURCE_DIR)
+        sphinx-build -vW $SOURCE_DIR build-docs/$MACHINE
+      done
+      test -d build-docs/
+  artifacts:
+    paths:
+      - build-docs/
+
+fvp-base:
+  extends: .build
+  parallel:
+    matrix:
+      - TS: [none, fvp-base-ts]
+        TESTING: testimage
+      - FIRMWARE: edk2
+      - SYSTEMREADY_FIRMWARE: arm-systemready-firmware
+
+arm-systemready-ir-acs:
+  extends: .build
+  timeout: 12h
+  parallel:
+    matrix:
+      # arm-systemready-ir-acs must be specified after fvp-base for ordering
+      # purposes for the jobs-to-kas output. It is not enough to just have it
+      # in the job name because fvp-base.yml overwrites the target.
+      - PLATFORM: [fvp-base, corstone1000-fvp]
+        ARM_SYSTEMREADY_IR_ACS: arm-systemready-ir-acs
+  tags:
+    - ${ACS_TAG}
+
 fvps:
   extends: .build
 
-generic-arm64:
+genericarm64:
   extends: .build
+  parallel:
+    matrix:
+      - TOOLCHAINS: [gcc, clang]
+        TESTING: testimage
+      - KERNEL: linux-yocto-dev
+        TESTING: testimage
 
 juno:
   extends: .build
@@ -170,27 +225,41 @@ juno:
       - TOOLCHAINS: [gcc, clang]
         FIRMWARE: [u-boot, edk2]
 
+# What percentage of machines in the layer do we build
+machine-coverage:
+  extends: .setup
+  script:
+    - ./ci/check-machine-coverage
+  coverage: '/Coverage: \d+/'
+
+metrics:
+  extends: .setup
+  artifacts:
+    reports:
+      metrics: metrics.txt
+  script:
+    - kas shell --update --force-checkout ci/base.yml --command \
+      "$CI_PROJECT_DIR/ci/patchreview $CI_PROJECT_DIR/meta-* --verbose --metrics $CI_PROJECT_DIR/metrics.txt"
+
 musca-b1:
   extends: .build
 
 musca-s1:
   extends: .build
 
-n1sdp:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: [none, n1sdp-ts, n1sdp-optee, tftf]
-
-qemu-generic-arm64:
-  extends: .build
-  parallel:
-    matrix:
-      - KERNEL: [linux-yocto, linux-yocto-rt]
-        TOOLCHAINS: [gcc, clang]
-        TESTING: testimage
-      - KERNEL: linux-yocto-dev
-        TESTING: testimage
+pending-updates:
+  extends: .setup
+  artifacts:
+    paths:
+      - update-report
+  script:
+    - rm -fr update-report
+    # This configuration has all of the layers we need enabled
+    - kas shell --update --force-checkout ci/qemuarm64.yml:ci/meta-openembedded.yml:ci/meta-secure-core.yml:lockfile.yml --command \
+      "$CI_PROJECT_DIR/scripts/machine-summary.py -t report -o $CI_PROJECT_DIR/update-report $($CI_PROJECT_DIR/ci/listmachines.py meta-arm meta-arm-bsp)"
+  # Do this on x86 whilst the compilers are x86-only
+  tags:
+    - x86_64
 
 qemuarm64-secureboot:
   extends: .build
@@ -257,11 +326,15 @@ qemuarmv5:
       - DISTRO: poky-tiny
         TESTING: testimage
 
-sgi575:
+sbsa-ref:
   extends: .build
-
-toolchains:
-  extends: .build
+  parallel:
+    matrix:
+      - KERNEL: [linux-yocto, linux-yocto-rt]
+        TOOLCHAINS: [gcc, clang]
+        TESTING: testimage
+      - KERNEL: linux-yocto-dev
+        TESTING: testimage
 
 selftest:
   extends: .setup
@@ -269,65 +342,8 @@ selftest:
     - KASFILES=./ci/qemuarm64.yml:./ci/selftest.yml:lockfile.yml
     - kas shell --update --force-checkout $KASFILES -c 'oe-selftest --num-processes 2 --select-tag meta-arm --run-all-tests'
 
-# Validate layers are Yocto Project Compatible
-check-layers:
-  extends: .setup
-  script:
-    - kas shell --update --force-checkout ci/base.yml:ci/meta-openembedded.yml:lockfile.yml --command \
-      "yocto-check-layer-wrapper $CI_PROJECT_DIR/$LAYER --dependency $CI_PROJECT_DIR/meta-* $KAS_WORK_DIR/meta-openembedded/meta-oe --no-auto-dependency"
-  parallel:
-    matrix:
-      - LAYER: [meta-arm, meta-arm-bsp, meta-arm-toolchain]
+sgi575:
+  extends: .build
 
-pending-updates:
-  extends: .setup
-  artifacts:
-    paths:
-      - update-report
-  script:
-    - rm -fr update-report
-    # This configuration has all of the layers we need enabled
-    - kas shell --update --force-checkout ci/qemuarm64.yml:ci/meta-openembedded.yml:ci/meta-secure-core.yml:lockfile.yml --command \
-      "$CI_PROJECT_DIR/scripts/machine-summary.py -t report -o $CI_PROJECT_DIR/update-report $($CI_PROJECT_DIR/ci/listmachines.py meta-arm meta-arm-bsp)"
-  # Do this on x86 whilst the compilers are x86-only
-  tags:
-    - x86_64
-
-# What percentage of machines in the layer do we build
-machine-coverage:
-  extends: .setup
-  script:
-    - ./ci/check-machine-coverage
-  coverage: '/Coverage: \d+/'
-
-metrics:
-  extends: .setup
-  artifacts:
-    reports:
-      metrics: metrics.txt
-  script:
-    - kas shell --update --force-checkout ci/base.yml --command \
-      "$CI_PROJECT_DIR/ci/patchreview $CI_PROJECT_DIR/meta-* --verbose --metrics $CI_PROJECT_DIR/metrics.txt"
-
-documentation:
-  extends: .setup
-  script:
-    - |
-      # This can be removed when the kas container has python3-venv installed
-      sudo apt-get update && sudo apt-get install --yes python3-venv
-
-      python3 -m venv venv
-      . ./venv/bin/activate
-
-      pip3 install -r meta-arm-bsp/documentation/requirements.txt
-
-      for CONF in meta-*/documentation/*/conf.py ; do
-        echo Building $CONF...
-        SOURCE_DIR=$(dirname $CONF)
-        MACHINE=$(basename $SOURCE_DIR)
-        sphinx-build -vW $SOURCE_DIR build-docs/$MACHINE
-      done
-      test -d build-docs/
-  artifacts:
-    paths:
-      - build-docs/
+toolchains:
+  extends: .build

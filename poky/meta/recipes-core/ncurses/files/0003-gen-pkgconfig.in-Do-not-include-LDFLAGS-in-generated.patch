@@ -1,4 +1,4 @@
-From 10cd0c12a6e14fb4f0498c299c1dd32720b710da Mon Sep 17 00:00:00 2001
+From 5962a5ee2885f67a396f7e8955ac1bbd7f15d4aa Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan@nathanrossi.com>
 Date: Mon, 14 Dec 2020 13:39:02 +1000
 Subject: [PATCH] gen-pkgconfig.in: Do not include LDFLAGS in generated pc
@@ -10,13 +10,12 @@ includes build host specific paths and options (e.g. uninative and
 
 Upstream-Status: Inappropriate [OE Specific]
 Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
-
 ---
  misc/gen-pkgconfig.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/misc/gen-pkgconfig.in b/misc/gen-pkgconfig.in
-index a45dd54f..85273054 100644
+index 89a5cd4a..07d94d17 100644
 --- a/misc/gen-pkgconfig.in
 +++ b/misc/gen-pkgconfig.in
 @@ -83,7 +83,7 @@ if [ "$includedir" != "/usr/include" ]; then

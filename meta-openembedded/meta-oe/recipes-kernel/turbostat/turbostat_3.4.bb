@@ -12,7 +12,7 @@ processor frequency and idle power saving state residency on supported \
 processors."
 
 LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://../COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+LIC_FILES_CHKSUM = "file://${UNPACKDIR}/COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 COMPATIBLE_HOST:libc-musl = "null"
 
@@ -50,7 +50,7 @@ do_configure:prepend() {
 		cp -r ${STAGING_KERNEL_DIR}/include/linux/const.h ${S}
 	fi
 	cp -r ${STAGING_KERNEL_DIR}/tools/power/x86/turbostat/* ${S}
-	cp -r ${WORKDIR}/COPYING ${S}
+	cp -r ${UNPACKDIR}/COPYING ${S}
 }
 
 

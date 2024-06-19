@@ -37,8 +37,8 @@ S = "${WORKDIR}/git"
 inherit autotools pkgconfig
 
 do_install:append() {
-        if [ -e ${WORKDIR}/iana-enterprise-numbers ]; then
-                install -Dm 0755 ${WORKDIR}/iana-enterprise-numbers ${D}${datadir}/misc/enterprise-numbers
+        if [ -e ${UNPACKDIR}/iana-enterprise-numbers ]; then
+                install -Dm 0755 ${UNPACKDIR}/iana-enterprise-numbers ${D}${datadir}/misc/enterprise-numbers
         fi
 }
 

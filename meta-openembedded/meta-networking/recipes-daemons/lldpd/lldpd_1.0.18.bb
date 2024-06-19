@@ -48,8 +48,8 @@ INITSCRIPT_PARAMS = "defaults"
 SYSTEMD_SERVICE:${PN} = "lldpd.service"
 
 do_install:append() {
-    install -Dm 0755 ${WORKDIR}/lldpd.init.d ${D}${sysconfdir}/init.d/lldpd
-    install -Dm 0644 ${WORKDIR}/lldpd.default ${D}${sysconfdir}/default/lldpd
+    install -Dm 0755 ${UNPACKDIR}/lldpd.init.d ${D}${sysconfdir}/init.d/lldpd
+    install -Dm 0644 ${UNPACKDIR}/lldpd.default ${D}${sysconfdir}/default/lldpd
     # Make an empty configuration file
     touch ${D}${sysconfdir}/lldpd.conf
 }

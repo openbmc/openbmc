@@ -38,15 +38,20 @@ do_compile() {
 do_compile[cleandirs] = "${B}"
 
 do_install() {
-    install -D -p -m 0644 ${B}/product/${PRODUCT}/firmware/release/bin/firmware.bin ${D}/firmware/es_flashfw.bin
+    install -D -p -m 0644 ${B}/product/${PRODUCT}/firmware/release/bin/firmware.bin ${D}${nonarch_base_libdir}/firmware/es_flashfw.bin
+    install -D -p -m 0644 ${B}/product/${PRODUCT}/firmware/release/bin/firmware.elf ${D}${nonarch_base_libdir}/firmware/es_flashfw.elf
 }
 
-FILES:${PN} = "/firmware"
-SYSROOT_DIRS += "/firmware"
+FILES:${PN} = "${nonarch_base_libdir}/firmware/es_flashfw.bin"
+FILES:${PN}-elf = "${nonarch_base_libdir}/firmware/es_flashfw.elf"
+PACKAGES += "${PN}-elf"
+INSANE_SKIP:${PN}-elf += "arch"
+
+SYSROOT_DIRS += "${nonarch_base_libdir}/firmware"
 
 inherit deploy
 
 do_deploy() {
-    cp -rf ${D}/firmware/* ${DEPLOYDIR}/
+    cp -rf ${D}${nonarch_base_libdir}/firmware/* ${DEPLOYDIR}/
 }
 addtask deploy after do_install

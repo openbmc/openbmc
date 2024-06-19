@@ -43,8 +43,8 @@ do_configure:append() {
 
 do_install:append() {
     install -d ${D}${sysconfdir}/pgpool-II
-    install -D -m 0644 ${WORKDIR}/pgpool.sysconfig  ${D}${sysconfdir}/pgpool-II/pgpool.conf
+    install -D -m 0644 ${UNPACKDIR}/pgpool.sysconfig  ${D}${sysconfdir}/pgpool-II/pgpool.conf
     install -D -m 0644 ${S}/src/sample/pcp.conf.sample ${D}${sysconfdir}/pgpool-II/pcp.conf
     install -D -m 0644 ${S}/src/sample/pool_hba.conf.sample ${D}${sysconfdir}/pgpool-II/pool_hba.conf
-    install -Dm 0644 ${WORKDIR}/pgpool.service ${D}${systemd_system_unitdir}/pgpool.service
+    install -Dm 0644 ${UNPACKDIR}/pgpool.service ${D}${systemd_system_unitdir}/pgpool.service
 }

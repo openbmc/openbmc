@@ -1,4 +1,4 @@
-From f15b19d8e058c983c49c4566c1879fdaf5b1ab54 Mon Sep 17 00:00:00 2001
+From a9bb04b7cf02b2f2d16f68733488f9e48fc7e7a9 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 10 Mar 2020 08:26:53 -0700
 Subject: [PATCH] gentypes/genmodes: Do not use __LINE__ for maintaining
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 19 insertions(+), 19 deletions(-)
 
 diff --git a/gcc/gengtype.cc b/gcc/gengtype.cc
-index 7763f40e9ab..4f0c1eb1508 100644
+index c0ecbe8558b..9f8ab7146c0 100644
 --- a/gcc/gengtype.cc
 +++ b/gcc/gengtype.cc
 @@ -1005,7 +1005,7 @@ create_field_at (pair_p next, type_p type, const char *name, options_p opt,
@@ -38,7 +38,7 @@ index 7763f40e9ab..4f0c1eb1508 100644
  
  /* Reverse a linked list of 'struct pair's in place.  */
  pair_p
-@@ -5223,7 +5223,7 @@ main (int argc, char **argv)
+@@ -5232,7 +5232,7 @@ main (int argc, char **argv)
        /* These types are set up with #define or else outside of where
           we can see them.  We should initialize them before calling
           read_input_list.  */
@@ -48,7 +48,7 @@ index 7763f40e9ab..4f0c1eb1508 100644
        POS_HERE (do_scalar_typedef ("CUMULATIVE_ARGS", &pos));
        POS_HERE (do_scalar_typedef ("REAL_VALUE_TYPE", &pos));
 diff --git a/gcc/genmodes.cc b/gcc/genmodes.cc
-index 715787b8f48..302adff28d5 100644
+index eb3f9e2f0c1..5425635cb22 100644
 --- a/gcc/genmodes.cc
 +++ b/gcc/genmodes.cc
 @@ -441,7 +441,7 @@ complete_all_modes (void)

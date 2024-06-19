@@ -15,6 +15,7 @@ SRC_URI = "http://www.libsdl.org/release/SDL-${PV}.tar.gz \
            file://libsdl-1.2.15-xdata32.patch \
            file://pkgconfig.patch \
            file://0001-build-Pass-tag-CC-explictly-when-using-libtool.patch \
+           file://0001-stdlib-Make-iconv-use-portable-across-glibc-musl.patch \
            file://CVE-2019-7577.patch \
            file://CVE-2019-7574.patch \
            file://CVE-2019-7572.patch \

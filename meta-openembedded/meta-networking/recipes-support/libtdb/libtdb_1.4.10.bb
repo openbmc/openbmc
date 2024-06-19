@@ -58,6 +58,6 @@ RPROVIDES:${PN}-dbg += "python3-tdb-dbg"
 
 FILES:${PN} = "${libdir}/*.so.*"
 FILES:tdb-tools = "${bindir}/*"
-FILES:python3-tdb = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
+FILES:python3-tdb = "${PYTHON_SITEPACKAGES_DIR}/*"
 RDEPENDS:python3-tdb = "python3"
 INSANE_SKIP:${MLPREFIX}python3-tdb = "dev-so"

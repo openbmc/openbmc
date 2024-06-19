@@ -1,0 +1,146 @@
+From 5b418e141aadcb6604406f75e156317bd143d898 Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Fri, 5 Apr 2024 11:27:15 +0200
+Subject: [PATCH 1/3] Add timestamp validation for uefi variables
+
+Return failure if uefi variable creation or update is not
+requested with newer timestamp.
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/27955]
+---
+ .../backend/uefi_variable_store.c             | 35 +++++++++++++++----
+ .../smm_variable/backend/variable_index.c     |  1 +
+ .../smm_variable/backend/variable_index.h     |  1 +
+ 3 files changed, 30 insertions(+), 7 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.c b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+index c1691dc8f..1b624f0c9 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+@@ -76,6 +76,7 @@ static efi_status_t verify_var_by_key_var(const efi_data_map *new_var,
+ 					  const uint8_t *hash_buffer, size_t hash_len);
+ 
+ static efi_status_t authenticate_variable(const struct uefi_variable_store *context,
++					  EFI_TIME *timestamp,
+ 					  SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var);
+ #endif
+ 
+@@ -197,6 +198,7 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 					      const SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var)
+ {
+ 	bool should_sync_index = false;
++	EFI_TIME timestamp = { 0 };
+ 
+ 	/* Validate incoming request */
+ 	efi_status_t status = check_name_terminator(var->Name, var->NameSize);
+@@ -225,6 +227,9 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 			return EFI_OUT_OF_RESOURCES;
+ 	}
+ 
++	/* Save the timestamp into a buffer, which can be overwritten by the authentication function */
++	memcpy(&timestamp, &info->metadata.timestamp, sizeof(EFI_TIME));
++
+ 	/* Control access */
+ 	status = check_access_permitted_on_set(context, info, var);
+ 
+@@ -240,7 +245,7 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 			if (info->metadata.attributes &
+ 			    EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
+ 				status = authenticate_variable(
+-					context, (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
++					context, &timestamp, (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
+ 
+ 				if (status != EFI_SUCCESS)
+ 					return status;
+@@ -326,7 +331,7 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 			 */
+ 			if (var->Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
+ 				status = authenticate_variable(
+-					context, (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
++					context, &timestamp, (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
+ 
+ 				if (status != EFI_SUCCESS)
+ 					return status;
+@@ -358,9 +363,11 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 		if (should_sync_index)
+ 			status = sync_variable_index(context);
+ 
+-		/* Store any variable data to the storage backend */
+-		if (info->is_variable_set && (status == EFI_SUCCESS))
++		/* Store any variable data to the storage backend with the updated metadata */
++		if (info->is_variable_set && (status == EFI_SUCCESS)) {
++			memcpy(&info->metadata.timestamp, &timestamp, sizeof(EFI_TIME));
+ 			status = store_variable_data(context, info, var);
++		}
+ 	}
+ 
+ 	variable_index_remove_unused_entry(&context->variable_index, info);
+@@ -1106,6 +1113,7 @@ static efi_status_t verify_var_by_key_var(const efi_data_map *new_var,
+  * then verifies it.
+  */
+ static efi_status_t authenticate_variable(const struct uefi_variable_store *context,
++					  EFI_TIME *timestamp,
+ 					  SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var)
+ {
+ 	efi_status_t status = EFI_SUCCESS;
+@@ -1223,9 +1231,7 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ 	 *
+ 	 * UEFI: Page 253
+ 	 * 2. Verify that Pad1, Nanosecond, TimeZone, Daylight and Pad2 components
+-	 * of the TimeStamp value are set to zero. Unless the EFI_VARIABLE_APPEND_WRITE
+-	 * attribute is set, verify that the TimeStamp value is later than the current
+-	 * timestamp value associated with the variable
++	 * of the TimeStamp value are set to zero.
+ 	 */
+ 	if ((var_map.efi_auth_descriptor->TimeStamp.Pad1 != 0) ||
+ 	    (var_map.efi_auth_descriptor->TimeStamp.Pad2 != 0) ||
+@@ -1235,6 +1241,21 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ 		return EFI_SECURITY_VIOLATION;
+ 	}
+ 
++	/**
++	 * UEFI: Page 253
++	 * Unless the EFI_VARIABLE_APPEND_WRITE attribute is set, verify
++	 * that the TimeStamp value is later than the current
++	 * timestamp value associated with the variable
++	 */
++	if (!(var->Attributes & EFI_VARIABLE_APPEND_WRITE)) {
++		if (memcmp(&var_map.efi_auth_descriptor->TimeStamp, timestamp, sizeof(EFI_GUID)) <= 0) {
++			EMSG("Timestamp violation");
++			return EFI_SECURITY_VIOLATION;
++		}
++
++		/* Save new timestamp */
++		memcpy(timestamp, &var_map.efi_auth_descriptor->TimeStamp, sizeof(EFI_TIME));
++	}
+ 	/* Calculate hash for the variable only once */
+ 	hash_result = calc_variable_hash(&var_map, (uint8_t *)&hash_buffer, sizeof(hash_buffer),
+ 					 &hash_len);
+diff --git a/components/service/uefi/smm_variable/backend/variable_index.c b/components/service/uefi/smm_variable/backend/variable_index.c
+index e2fe6dd38..f4194d2d3 100644
+--- a/components/service/uefi/smm_variable/backend/variable_index.c
++++ b/components/service/uefi/smm_variable/backend/variable_index.c
+@@ -198,6 +198,7 @@ static struct variable_entry *add_entry(const struct variable_index *context, co
+ 			/* Initialize metadata */
+ 			info->metadata.uid = generate_uid(context, guid, name_size, name);
+ 			info->metadata.guid = *guid;
++			memset(&info->metadata.timestamp, 0, sizeof(EFI_TIME));
+ 			info->metadata.attributes = 0;
+ 			info->metadata.name_size = name_size;
+ 			memcpy(info->metadata.name, name, name_size);
+diff --git a/components/service/uefi/smm_variable/backend/variable_index.h b/components/service/uefi/smm_variable/backend/variable_index.h
+index 5d3b7a7c6..7eef7b86b 100644
+--- a/components/service/uefi/smm_variable/backend/variable_index.h
++++ b/components/service/uefi/smm_variable/backend/variable_index.h
+@@ -32,6 +32,7 @@ extern "C" {
+  */
+ struct variable_metadata {
+ 	EFI_GUID guid;
++	EFI_TIME timestamp;
+ 	size_t name_size;
+ 	int16_t name[VARIABLE_INDEX_MAX_NAME_SIZE];
+ 	uint32_t attributes;
+-- 
+2.25.1
+

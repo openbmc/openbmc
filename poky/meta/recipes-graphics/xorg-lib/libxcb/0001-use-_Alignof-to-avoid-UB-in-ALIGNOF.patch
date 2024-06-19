@@ -1,4 +1,4 @@
-From d55b6b1fa87700f3eae3a29522972d2e7be7d53e Mon Sep 17 00:00:00 2001
+From b529f25a3dcd1547f49d341a0a34fbc1379ed58d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 14 Jan 2023 10:11:35 -0800
 Subject: [PATCH] use _Alignof to avoid UB in ALIGNOF
@@ -20,7 +20,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/src/c_client.py b/src/c_client.py
-index fd256f0..4e48f13 100644
+index b7db543..ec81758 100644
 --- a/src/c_client.py
 +++ b/src/c_client.py
 @@ -288,7 +288,6 @@ def c_open(self):
@@ -40,6 +40,3 @@ index fd256f0..4e48f13 100644
               % (space,
                   'char'
                    if field.c_field_type == 'void' or field.type.is_switch
--- 
-2.39.0
-

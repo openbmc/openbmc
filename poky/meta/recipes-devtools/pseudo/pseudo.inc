@@ -133,8 +133,8 @@ do_install:append:class-native () {
 	chrpath ${D}${bindir}/pseudo -r `chrpath ${D}${bindir}/pseudo | cut -d = -f 2 | sed s/XORIGIN/\\$ORIGIN/`
 	install -d ${D}${sysconfdir}
 	# The fallback files should never be modified
-	install -m 444 ${WORKDIR}/fallback-passwd ${D}${sysconfdir}/passwd
-	install -m 444 ${WORKDIR}/fallback-group ${D}${sysconfdir}/group
+	install -m 444 ${UNPACKDIR}/fallback-passwd ${D}${sysconfdir}/passwd
+	install -m 444 ${UNPACKDIR}/fallback-group ${D}${sysconfdir}/group
 
 	# Two native/nativesdk entries below are the same
 	# If necessary install for the alternative machine arch.  This is only

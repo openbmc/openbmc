@@ -57,12 +57,6 @@ export CXXFLAGS_FOR_BUILD="${BUILD_CXXFLAGS}"
 export LD_FOR_BUILD = "${BUILD_LD}"
 export LDFLAGS_FOR_BUILD = "${BUILD_LDFLAGS}"
 
-def append_libtool_sysroot(d):
-    # Only supply libtool sysroot option for non-native packages
-    if not bb.data.inherits_class('native', d):
-        return '--with-libtool-sysroot=${STAGING_DIR_HOST}'
-    return ""
-
 CONFIGUREOPTS = " --build=${BUILD_SYS} \
 		  --host=${HOST_SYS} \
 		  --target=${TARGET_SYS} \
@@ -81,8 +75,7 @@ CONFIGUREOPTS = " --build=${BUILD_SYS} \
 		  --infodir=${infodir} \
 		  --mandir=${mandir} \
 		  --disable-silent-rules \
-		  ${CONFIGUREOPT_DEPTRACK} \
-		  ${@append_libtool_sysroot(d)}"
+		  ${CONFIGUREOPT_DEPTRACK}"
 CONFIGUREOPT_DEPTRACK ?= "--disable-dependency-tracking"
 
 CACHED_CONFIGUREVARS ?= ""
@@ -253,8 +246,6 @@ autotools_do_install() {
 		rm -f ${D}${infodir}/dir
 	fi
 }
-
-inherit siteconfig
 
 EXPORT_FUNCTIONS do_configure do_compile do_install
 

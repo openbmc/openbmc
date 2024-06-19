@@ -1,7 +1,7 @@
-From 22316f200803225f2d375ae5c36ffead59e2f6b8 Mon Sep 17 00:00:00 2001
+From f871ac42165c29f763785aa0199dfc76f1731f4d Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Mon, 5 Dec 2022 15:14:26 +0000
-Subject: [PATCH 4/6] make: Separate TLS targets from libraries
+Subject: [PATCH] make: Separate TLS targets from libraries
 
 There are dependencies on TLSOBJS, which fails when `-lmbedtls` is
 listed as a dependency, so separate it out.
@@ -12,10 +12,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/Makefile | 14 ++++++++------
  1 file changed, 8 insertions(+), 6 deletions(-)
 
-Index: mDNSResponder/mDNSPosix/Makefile
-===================================================================
---- mDNSResponder.orig/mDNSPosix/Makefile
-+++ mDNSResponder/mDNSPosix/Makefile
+diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
+index c877c8bb19e6..3a5897c4dbee 100755
+--- a/mDNSPosix/Makefile
++++ b/mDNSPosix/Makefile
 @@ -112,9 +112,11 @@ ifeq ($(findstring linux,$(os)),linux)
  ifeq ($(tls), no)
  CFLAGS_OS = -D_GNU_SOURCE -DHAVE_IPV6 -DNOT_HAVE_SA_LEN -DUSES_NETLINK -DHAVE_LINUX -DTARGET_OS_LINUX -ftabstop=4 -Wno-expansion-to-defined

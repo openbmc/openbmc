@@ -84,11 +84,11 @@ do_install () {
 	    rm -rf ${D}${sysconfdir}/init.d/
 	    rm -rf ${D}${sysconfdir}/rc*
 	    install -d ${D}${sysconfdir}/tmpfiles.d
-	    install -m 0644 ${WORKDIR}/cups-volatiles.conf \
+	    install -m 0644 ${UNPACKDIR}/cups-volatiles.conf \
 		    ${D}${sysconfdir}/tmpfiles.d/cups.conf
 	else
 	    install -d ${D}${sysconfdir}/default/volatiles
-	    install -m 0644 ${WORKDIR}/volatiles.99_cups \
+	    install -m 0644 ${UNPACKDIR}/volatiles.99_cups \
 		    ${D}${sysconfdir}/default/volatiles/99_cups
 	fi
 }

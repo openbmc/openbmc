@@ -7,7 +7,7 @@ INHIBIT_DEFAULT_DEPS = "1"
 
 do_install () {
 	install -d ${D}${base_libdir}/udev/rules.d
-	install -m 644 ${WORKDIR}/80-udisks-rpi.rules ${D}${base_libdir}/udev/rules.d
+	install -m 644 ${UNPACKDIR}/80-udisks-rpi.rules ${D}${base_libdir}/udev/rules.d
 }
 
 FILES:${PN} = "${base_libdir}/udev/rules.d"

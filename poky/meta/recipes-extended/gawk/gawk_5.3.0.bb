@@ -16,6 +16,7 @@ PACKAGECONFIG[readline] = "--with-readline,--without-readline,readline"
 PACKAGECONFIG[mpfr] = "--with-mpfr,--without-mpfr, mpfr"
 
 SRC_URI = "${GNU_MIRROR}/gawk/gawk-${PV}.tar.gz \
+           file://0001-m4-readline-add-missing-includes.patch \
            file://run-ptest \
            "
 
@@ -51,6 +52,8 @@ do_install_ptest() {
 		cp ${S}/test/$i* ${D}${PTEST_PATH}/test
 	done
 	sed -i \
+	    -e 's|#! /bin/gawk|#! ${bindir}/gawk|g' \
+	    -e 's|#! /usr/local/bin/gawk|#! ${bindir}/gawk|g' \
 	    -e 's|#!${base_bindir}/awk|#!${bindir}/awk|g' ${D}${PTEST_PATH}/test/*.awk
 
 	sed -i -e "s|GAWKLOCALE|LANG|g" ${D}${PTEST_PATH}/test/Maketests

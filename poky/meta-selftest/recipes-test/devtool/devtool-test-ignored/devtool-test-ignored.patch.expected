@@ -3,6 +3,7 @@ From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Thu, 28 May 2020 01:32:31 +0200
 Subject: [PATCH] meta-selftest: add test of .gitignore in tarball
 
+Upstream-Status: Inappropriate [Test artefact]
 ---
  ignored | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

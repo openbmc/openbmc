@@ -21,17 +21,17 @@ do_install () {
     # Install systemd related configuration file
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/init.d
-        install -m 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/zram
+        install -m 0755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/zram
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${libexecdir}
-        install -m 0755 ${WORKDIR}/zram-swap-init ${D}${libexecdir}
-        install -m 0755 ${WORKDIR}/zram-swap-deinit ${D}${libexecdir}
+        install -m 0755 ${UNPACKDIR}/zram-swap-init ${D}${libexecdir}
+        install -m 0755 ${UNPACKDIR}/zram-swap-deinit ${D}${libexecdir}
         install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${WORKDIR}/zram-swap.service ${D}${systemd_unitdir}/system/zram-swap.service
+        install -m 0644 ${UNPACKDIR}/zram-swap.service ${D}${systemd_unitdir}/system/zram-swap.service
         sed -i -e "s,@LIBEXECDIR@,${libexecdir},g" ${D}${systemd_unitdir}/system/zram-swap.service
-        install -m 0644 ${WORKDIR}/dev-zram0.swap ${D}${systemd_unitdir}/system/dev-zram0.swap
+        install -m 0644 ${UNPACKDIR}/dev-zram0.swap ${D}${systemd_unitdir}/system/dev-zram0.swap
     fi
 }
 

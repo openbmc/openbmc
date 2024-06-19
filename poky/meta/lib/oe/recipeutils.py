@@ -818,7 +818,7 @@ def bbappend_recipe(rd, destlayerdir, srcfiles, install=None, wildcardver=False,
                     instdirline = 'install -d ${D}%s' % os.path.dirname(instdestpath)
                     if not instdirline in instfunclines:
                         instfunclines.append(instdirline)
-                    instfunclines.append('install -m %s ${WORKDIR}/%s ${D}%s' % (perms, os.path.basename(srcfile), instdestpath))
+                    instfunclines.append('install -m %s ${UNPACKDIR}/%s ${D}%s' % (perms, os.path.basename(srcfile), instdestpath))
         if instfunclines:
             bbappendlines.append(('do_install:append%s()' % appendoverride, '', instfunclines))
 

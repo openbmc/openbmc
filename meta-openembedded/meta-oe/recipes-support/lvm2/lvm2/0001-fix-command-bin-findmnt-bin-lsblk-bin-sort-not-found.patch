@@ -1,4 +1,4 @@
-From ddf36613f3408ce42f15b03b4e9c6ad8478b97f8 Mon Sep 17 00:00:00 2001
+From 2ff2a867db8d3e1c660d191a1805f9e355169c80 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 2 Mar 2021 01:33:05 -0800
 Subject: [PATCH] fix command /bin/findmnt, /bin/lsblk, /bin/sort not found
@@ -15,10 +15,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 991a0cf85..e59c82472 100644
+index d9e7964c3..9dfdcfe01 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1660,6 +1660,8 @@ AS_IF([test -n "$MODPROBE_CMD"], [
+@@ -1704,6 +1704,8 @@ AS_IF([test -n "$MODPROBE_CMD"], [
  
  SYSCONFDIR="$(eval echo $(eval echo $sysconfdir))"
  
@@ -27,7 +27,7 @@ index 991a0cf85..e59c82472 100644
  SBINDIR="$(eval echo $(eval echo $sbindir))"
  LVM_PATH="$SBINDIR/lvm"
  AC_DEFINE_UNQUOTED(LVM_PATH, ["$LVM_PATH"], [Path to lvm binary.])
-@@ -1886,6 +1888,7 @@ AC_SUBST(PYTHON2DIR)
+@@ -1944,6 +1946,7 @@ AC_SUBST(PYTHON2DIR)
  AC_SUBST(PYTHON3)
  AC_SUBST(PYTHON3DIR)
  AC_SUBST(RT_LIBS)
@@ -68,6 +68,3 @@ index 7c517b87b..7ef1bb766 100644
  
  # Do not show tool errors by default (only done/skipping summary
  # message provided by this script) and no verbose mode by default.
--- 
-2.29.2
-

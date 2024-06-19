@@ -9,12 +9,16 @@ different flags than git builds on other host distros.
 Upstream-Status: Inappropriate [upstream needs to check compiler and component versions properly]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 
+Rebased for 2.45.1.
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
 ---
  config.mak.uname | 4 ----
  1 file changed, 4 deletions(-)
 
 diff --git a/config.mak.uname b/config.mak.uname
-index 259d151..136ae3b 100644
+index a7607a5..251057e 100644
 --- a/config.mak.uname
 +++ b/config.mak.uname
 @@ -64,10 +64,6 @@ ifeq ($(uname_S),Linux)
@@ -22,9 +26,9 @@ index 259d151..136ae3b 100644
  	HAVE_PLATFORM_PROCINFO = YesPlease
  	COMPAT_OBJS += compat/linux/procinfo.o
 -	# centos7/rhel7 provides gcc 4.8.5 and zlib 1.2.7.
--	ifneq ($(findstring .el7.,$(uname_R)),)
+-        ifneq ($(findstring .el7.,$(uname_R)),)
 -		BASIC_CFLAGS += -std=c99
--	endif
+-        endif
  endif
  ifeq ($(uname_S),GNU/kFreeBSD)
  	HAVE_ALLOCA_H = YesPlease

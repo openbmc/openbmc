@@ -1,0 +1,42 @@
+Subject: Modify binary name "convert" to "convert.im7"
+
+The change is needed to resolve the below compilation error
+after giflib version upgrade. Log data follows:
+| DEBUG: Executing shell function do_compile
+| NOTE: make -j 8
+| make -C doc
+| make[1]: Entering directory '../giflib/5.2.2/giflib-5.2.2/doc'
+| convert ../pic/gifgrid.gif -resize 50x50 giflib-logo.gif
+| make[1]: convert: No such file or directory
+| make[1]: *** [Makefile:46: giflib-logo.gif] Error 127
+| make[1]: Leaving directory '../giflib/5.2.2/giflib-5.2.2/doc'
+| make: *** [Makefile:93: all] Error 2
+| ERROR: oe_runmake failed
+
+Added dependency on ImageMagick which includes "convert" utility,
+to ensure availability of required tool during compilation process.
+
+This patch updates the binary name used in Makefile from
+"convert" to "convert.im7" for resizing the logo image used in HTML
+documentation as Imagemagick installs binary in this format.
+
+Below commits justify the cause of adding the suffix to binaries
+provided by ImageMagic package:
+https://git.openembedded.org/meta-openembedded/commit/meta-oe/recipes-support/imagemagick?id=dcbb49f707e7ad9bf755dd3275ffc442154b8144
+https://git.openembedded.org/meta-openembedded/commit/meta-oe/recipes-support/imagemagick?id=6e0c24e9b3f9d430dec57f61f8c12c74bca5375d
+
+Signed-off-by:   Bhabu Bindu <bhabubindu@kpit.com>
+Upstream-Status: Inappropriate [OE specific]
+
+===================================================================
+--- a/doc/Makefile
++++ b/doc/Makefile
+@@ -43,7 +43,7 @@
+ 
+ # Logo image file for HTML docs
+ giflib-logo.gif: ../pic/gifgrid.gif
+-	convert $^ -resize 50x50 $@
++	convert.im7 $^ -resize 50x50 $@
+ 
+ # Philosophical choice: the website gets the internal manual pages
+ allhtml: $(XMLALL:.xml=.html) giflib-logo.gif

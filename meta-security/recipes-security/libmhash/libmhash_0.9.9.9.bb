@@ -31,8 +31,8 @@ do_install:append() {
 
 do_compile_ptest() {
     if [ ! -d ${S}/demo ]; then mkdir ${S}/demo; fi
-    cp ${WORKDIR}/Makefile.test ${S}/demo/Makefile
-    cp ${WORKDIR}/mhash.c ${S}/demo/
+    cp ${UNPACKDIR}/Makefile.test ${S}/demo/Makefile
+    cp ${UNPACKDIR}/mhash.c ${S}/demo/
     make -C ${S}/demo CFLAGS="${CFLAGS} -I${S}/include/" LDFLAGS="${LDFLAGS} -L${S}/lib/.libs"
 }
 

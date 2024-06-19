@@ -50,7 +50,7 @@ do_configure () {
 do_install:append () {
     if [ ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'yes', '', d)} = yes ]; then
         install -d -m 0755 ${D}/${sysconfdir}/pam.d
-        install -m 0644 ${WORKDIR}/vlock_pam ${D}${sysconfdir}/pam.d/vlock
+        install -m 0644 ${UNPACKDIR}/vlock_pam ${D}${sysconfdir}/pam.d/vlock
     fi
 }
 

@@ -1,0 +1,282 @@
+From 19e79008e0fa3193b54bf6499516dc75cb10f6ec Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Thu, 11 Apr 2024 13:42:03 +0200
+Subject: [PATCH 2/3] Isolate common uefi variable authentication steps
+
+Currently all auth variables are authenticated with the secure boot
+keys. To introduce corrent check for Private Authenticated Variables
+first separate the common steps from the secure boot related steps.
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/27956]
+---
+ .../backend/uefi_variable_store.c             | 191 ++++++++++--------
+ 1 file changed, 103 insertions(+), 88 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.c b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+index 1b624f0c9..1384d0def 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+@@ -78,6 +78,12 @@ static efi_status_t verify_var_by_key_var(const efi_data_map *new_var,
+ static efi_status_t authenticate_variable(const struct uefi_variable_store *context,
+ 					  EFI_TIME *timestamp,
+ 					  SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var);
++
++static efi_status_t authenticate_secure_boot_variable(const struct uefi_variable_store *context,
++						      efi_data_map* var_map,
++						      uint8_t* hash_buffer,
++						      size_t hash_len,
++						      uint64_t max_variable_size);
+ #endif
+ 
+ static efi_status_t store_variable_data(const struct uefi_variable_store *context,
+@@ -1118,30 +1124,109 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ {
+ 	efi_status_t status = EFI_SUCCESS;
+ 	EFI_GUID pkcs7_guid = EFI_CERT_TYPE_PKCS7_GUID;
+-	EFI_GUID global_variable_guid = EFI_GLOBAL_VARIABLE;
+-	EFI_GUID security_database_guid = EFI_IMAGE_SECURITY_DATABASE_GUID;
+ 	SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO variable_info = { 0, 0, 0, 0 };
+-	SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *pk_variable = NULL;
+-	size_t pk_payload_size = 0;
+ 	efi_data_map var_map = { NULL, NULL, NULL, 0, 0, NULL, 0, NULL };
+ 	uint8_t hash_buffer[PSA_HASH_MAX_SIZE];
+ 	size_t hash_len = 0;
+-	bool hash_result = false;
+ 
+ 	/* Create a map of the fields of the new variable including the auth header */
+ 	if (!init_efi_data_map(var, true, &var_map))
+ 		return EFI_SECURITY_VIOLATION;
+ 
+-	/* database variables can be verified by either PK or KEK while images
+-	 * should be checked by db and dbx so the length of two will be enough.
+-	 */
+-	SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *allowed_key_store_variables[] = { NULL, NULL };
+-
+ 	/* Find the maximal size of variables for the GetVariable operation */
+ 	status = uefi_variable_store_query_variable_info(context, &variable_info);
+ 	if (status != EFI_SUCCESS)
+ 		return EFI_SECURITY_VIOLATION;
+ 
++	/**
++	 * UEFI: Page 246
++	 * If the EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set in a
++	 * SetVariable() call, and firmware does not support signature type of the certificate
++	 * included in the EFI_VARIABLE_AUTHENTICATION_2 descriptor, then the SetVariable() call
++	 * shall return EFI_INVALID_PARAMETER. The list of signature types supported by the
++	 * firmware is defined by the SignatureSupport variable. Signature type of the certificate
++	 * is defined by its digest and encryption algorithms.
++	 */
++	/* TODO: Should support WIN_CERT_TYPE_PKCS_SIGNED_DATA and WIN_CERT_TYPE_EFI_PKCS115 */
++	if (var_map.efi_auth_descriptor->AuthInfo.Hdr.wCertificateType != WIN_CERT_TYPE_EFI_GUID)
++		return EFI_INVALID_PARAMETER;
++
++	/* Only a CertType of EFI_CERT_TYPE_PKCS7_GUID is accepted */
++	if (!compare_guid(&var_map.efi_auth_descriptor->AuthInfo.CertType, &pkcs7_guid))
++		return EFI_SECURITY_VIOLATION;
++
++	/**
++	 * Time associated with the authentication descriptor. For the TimeStamp value,
++	 * components Pad1, Nanosecond, TimeZone, Daylight and Pad2 shall be set to 0.
++	 * This means that the time shall always be expressed in GMT.
++	 *
++	 * UEFI: Page 253
++	 * 2. Verify that Pad1, Nanosecond, TimeZone, Daylight and Pad2 components
++	 * of the TimeStamp value are set to zero.
++	 */
++	if ((var_map.efi_auth_descriptor->TimeStamp.Pad1 != 0) ||
++	    (var_map.efi_auth_descriptor->TimeStamp.Pad2 != 0) ||
++	    (var_map.efi_auth_descriptor->TimeStamp.Nanosecond != 0) ||
++	    (var_map.efi_auth_descriptor->TimeStamp.TimeZone != 0) ||
++	    (var_map.efi_auth_descriptor->TimeStamp.Daylight != 0)) {
++		return EFI_SECURITY_VIOLATION;
++	}
++
++	/**
++	 * UEFI: Page 253
++	 * Unless the EFI_VARIABLE_APPEND_WRITE attribute is set, verify
++	 * that the TimeStamp value is later than the current
++	 * timestamp value associated with the variable
++	 */
++	if (!(var->Attributes & EFI_VARIABLE_APPEND_WRITE)) {
++		if (memcmp(&var_map.efi_auth_descriptor->TimeStamp, timestamp, sizeof(EFI_GUID)) <= 0) {
++			EMSG("Timestamp violation");
++			return EFI_SECURITY_VIOLATION;
++		}
++
++		/* Save new timestamp */
++		memcpy(timestamp, &var_map.efi_auth_descriptor->TimeStamp, sizeof(EFI_TIME));
++	}
++	/* Calculate hash for the variable only once */
++	if (calc_variable_hash(&var_map, (uint8_t *)&hash_buffer, sizeof(hash_buffer), &hash_len) == 0) {
++		status = EFI_SECURITY_VIOLATION;
++	}
++
++	/* Run Secure Boot related authentication steps */
++	status = authenticate_secure_boot_variable(context, &var_map, (uint8_t*) &hash_buffer, hash_len, variable_info.MaximumVariableSize);
++
++	/* Remove the authentication header from the variable if the authentication is successful */
++	if (status == EFI_SUCCESS) {
++		uint8_t *smm_payload =
++			(uint8_t *)var + SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_DATA_OFFSET(var);
++
++		memmove(smm_payload, var_map.payload, var_map.payload_len);
++		memset((uint8_t *)smm_payload + var_map.payload_len, 0,
++		       var_map.efi_auth_descriptor_len);
++
++		var->DataSize -= var_map.efi_auth_descriptor_len;
++	}
++
++	return status;
++}
++
++static efi_status_t authenticate_secure_boot_variable(const struct uefi_variable_store *context,
++						      efi_data_map* var_map,
++						      uint8_t* hash_buffer,
++						      size_t hash_len,
++						      uint64_t max_variable_size)
++{
++	efi_status_t status = EFI_SUCCESS;
++	EFI_GUID global_variable_guid = EFI_GLOBAL_VARIABLE;
++	EFI_GUID security_database_guid = EFI_IMAGE_SECURITY_DATABASE_GUID;
++	SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *pk_variable = NULL;
++	size_t pk_payload_size = 0;
++
++	/* database variables can be verified by either PK or KEK while images
++	 * should be checked by db and dbx so the length of two will be enough.
++	 */
++	SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *allowed_key_store_variables[] = { NULL, NULL };
++
+ 	/**
+ 	 * UEFI: Page 253
+ 	 * 3. If the variable SetupMode==1, and the variable is a secure
+@@ -1166,14 +1251,14 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ 	 * Platform Key is checked to enable or disable authentication.
+ 	 */
+ 	create_smm_variable(&pk_variable, sizeof(EFI_PLATFORM_KEY_NAME),
+-			    variable_info.MaximumVariableSize, (uint8_t *)EFI_PLATFORM_KEY_NAME,
++			    max_variable_size, (uint8_t *)EFI_PLATFORM_KEY_NAME,
+ 			    &global_variable_guid);
+ 
+ 	if (!pk_variable)
+ 		return EFI_OUT_OF_RESOURCES;
+ 
+ 	status = uefi_variable_store_get_variable(
+-		context, pk_variable, variable_info.MaximumVariableSize, &pk_payload_size);
++		context, pk_variable, max_variable_size, &pk_payload_size);
+ 
+ 	/* If PK does not exist authentication is disabled */
+ 	if (status != EFI_SUCCESS) {
+@@ -1207,66 +1292,8 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ 		goto end;
+ 	}
+ 
+-	/**
+-	 * UEFI: Page 246
+-	 * If the EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set in a
+-	 * SetVariable() call, and firmware does not support signature type of the certificate
+-	 * included in the EFI_VARIABLE_AUTHENTICATION_2 descriptor, then the SetVariable() call
+-	 * shall return EFI_INVALID_PARAMETER. The list of signature types supported by the
+-	 * firmware is defined by the SignatureSupport variable. Signature type of the certificate
+-	 * is defined by its digest and encryption algorithms.
+-	 */
+-	/* TODO: Should support WIN_CERT_TYPE_PKCS_SIGNED_DATA and WIN_CERT_TYPE_EFI_PKCS115 */
+-	if (var_map.efi_auth_descriptor->AuthInfo.Hdr.wCertificateType != WIN_CERT_TYPE_EFI_GUID)
+-		return EFI_INVALID_PARAMETER;
+-
+-	/* Only a CertType of EFI_CERT_TYPE_PKCS7_GUID is accepted */
+-	if (!compare_guid(&var_map.efi_auth_descriptor->AuthInfo.CertType, &pkcs7_guid))
+-		return EFI_SECURITY_VIOLATION;
+-
+-	/**
+-	 * Time associated with the authentication descriptor. For the TimeStamp value,
+-	 * components Pad1, Nanosecond, TimeZone, Daylight and Pad2 shall be set to 0.
+-	 * This means that the time shall always be expressed in GMT.
+-	 *
+-	 * UEFI: Page 253
+-	 * 2. Verify that Pad1, Nanosecond, TimeZone, Daylight and Pad2 components
+-	 * of the TimeStamp value are set to zero.
+-	 */
+-	if ((var_map.efi_auth_descriptor->TimeStamp.Pad1 != 0) ||
+-	    (var_map.efi_auth_descriptor->TimeStamp.Pad2 != 0) ||
+-	    (var_map.efi_auth_descriptor->TimeStamp.Nanosecond != 0) ||
+-	    (var_map.efi_auth_descriptor->TimeStamp.TimeZone != 0) ||
+-	    (var_map.efi_auth_descriptor->TimeStamp.Daylight != 0)) {
+-		return EFI_SECURITY_VIOLATION;
+-	}
+-
+-	/**
+-	 * UEFI: Page 253
+-	 * Unless the EFI_VARIABLE_APPEND_WRITE attribute is set, verify
+-	 * that the TimeStamp value is later than the current
+-	 * timestamp value associated with the variable
+-	 */
+-	if (!(var->Attributes & EFI_VARIABLE_APPEND_WRITE)) {
+-		if (memcmp(&var_map.efi_auth_descriptor->TimeStamp, timestamp, sizeof(EFI_GUID)) <= 0) {
+-			EMSG("Timestamp violation");
+-			return EFI_SECURITY_VIOLATION;
+-		}
+-
+-		/* Save new timestamp */
+-		memcpy(timestamp, &var_map.efi_auth_descriptor->TimeStamp, sizeof(EFI_TIME));
+-	}
+-	/* Calculate hash for the variable only once */
+-	hash_result = calc_variable_hash(&var_map, (uint8_t *)&hash_buffer, sizeof(hash_buffer),
+-					 &hash_len);
+-
+-	if (!hash_result) {
+-		status = EFI_SECURITY_VIOLATION;
+-		goto end;
+-	}
+-
+-	status = select_verification_keys(var_map, global_variable_guid, security_database_guid,
+-					  variable_info.MaximumVariableSize,
++	status = select_verification_keys(*var_map, global_variable_guid, security_database_guid,
++					  max_variable_size,
+ 					  &allowed_key_store_variables[0]);
+ 
+ 	if (status != EFI_SUCCESS)
+@@ -1280,8 +1307,8 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ 			continue;
+ 
+ 		status = uefi_variable_store_get_variable(context, allowed_key_store_variables[i],
+-							  variable_info.MaximumVariableSize,
+-							  &actual_variable_length);
++							max_variable_size,
++							&actual_variable_length);
+ 
+ 		if (status) {
+ 			/* When the parent does not exist it is considered verification failure */
+@@ -1297,8 +1324,8 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ 			goto end;
+ 		}
+ 
+-		status = verify_var_by_key_var(&var_map, &allowed_key_store_var_map,
+-					       (uint8_t *)&hash_buffer, hash_len);
++		status = verify_var_by_key_var(var_map, &allowed_key_store_var_map,
++					hash_buffer, hash_len);
+ 
+ 		if (status == EFI_SUCCESS)
+ 			goto end;
+@@ -1311,18 +1338,6 @@ end:
+ 			free(allowed_key_store_variables[i]);
+ 	}
+ 
+-	/* Remove the authentication header from the variable if the authentication is successful */
+-	if (status == EFI_SUCCESS) {
+-		uint8_t *smm_payload =
+-			(uint8_t *)var + SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE_DATA_OFFSET(var);
+-
+-		memmove(smm_payload, var_map.payload, var_map.payload_len);
+-		memset((uint8_t *)smm_payload + var_map.payload_len, 0,
+-		       var_map.efi_auth_descriptor_len);
+-
+-		var->DataSize -= var_map.efi_auth_descriptor_len;
+-	}
+-
+ 	return status;
+ }
+ #endif
+-- 
+2.25.1
+

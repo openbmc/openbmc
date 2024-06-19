@@ -1,0 +1,28 @@
+From 21b0c9f028b6b04fa2f027510ec90969735f4dd1 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 17 Apr 2024 19:31:03 +0200
+Subject: [PATCH] platform: corstone1000: Increase RSE_COMMS buffer size
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending
+---
+ platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h b/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h
+index 6d79dd3bf..f079f6504 100644
+--- a/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h
++++ b/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h
+@@ -16,7 +16,7 @@ extern "C" {
+ #endif
+ 
+  /* size suits to fit the largest message too (EFI variables) */
+-#define RSE_COMMS_PAYLOAD_MAX_SIZE (0x2100)
++#define RSE_COMMS_PAYLOAD_MAX_SIZE (0x43C0)
+ 
+ /*
+  * Allocated for each client request.
+-- 
+2.25.1
+
+

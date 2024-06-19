@@ -1,7 +1,7 @@
-From 872b72739e62123867ce6c4f82aa37de24cc3f75 Mon Sep 17 00:00:00 2001
+From 776913624aaf696a3b2920b8d7506b3aae042bf1 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sat, 22 May 2021 20:26:24 +0200
-Subject: [PATCH 02/22] add fallback parse_printf_format implementation
+Subject: [PATCH] add fallback parse_printf_format implementation
 
 Upstream-Status: Inappropriate [musl specific]
 
@@ -22,10 +22,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index 7419e2b0b0..01fd3ffc19 100644
+index 187e7b216d..c4694a9ddc 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -725,6 +725,7 @@ endif
+@@ -727,6 +727,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -34,7 +34,7 @@ index 7419e2b0b0..01fd3ffc19 100644
                    'threads.h',
                    'valgrind/memcheck.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index d7450d8b44..c3e3daf4bd 100644
+index 111253e3a5..bdaa2fc5e4 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
 @@ -183,6 +183,11 @@ endforeach
@@ -429,6 +429,3 @@ index be23b2fe75..69a2eb6404 100644
  
  #define SNDBUF_SIZE (8*1024*1024)
  
--- 
-2.34.1
-

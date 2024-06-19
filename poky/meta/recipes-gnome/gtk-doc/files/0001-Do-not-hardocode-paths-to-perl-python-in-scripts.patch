@@ -1,4 +1,4 @@
-From 80e6aff72affa6d92f5abd7ff6353dfc4a7bff38 Mon Sep 17 00:00:00 2001
+From 64163565f8d6853b02e53308a6e6ba23d9d96299 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 31 Aug 2016 16:44:46 +0300
 Subject: [PATCH] Do not hardocode paths to perl/python in scripts.
@@ -9,7 +9,6 @@ on targets either.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  gtkdoc-check.in    | 2 +-
  gtkdoc-depscan.in  | 2 +-
@@ -25,7 +24,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  11 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/gtkdoc-check.in b/gtkdoc-check.in
-index 8c8e917..f6a25f6 100755
+index d9e2ad5..9ec526d 100755
 --- a/gtkdoc-check.in
 +++ b/gtkdoc-check.in
 @@ -1,4 +1,4 @@
@@ -35,7 +34,7 @@ index 8c8e917..f6a25f6 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-depscan.in b/gtkdoc-depscan.in
-index 9bfaf30..aadc952 100755
+index c43317c..200837c 100755
 --- a/gtkdoc-depscan.in
 +++ b/gtkdoc-depscan.in
 @@ -1,4 +1,4 @@
@@ -45,7 +44,7 @@ index 9bfaf30..aadc952 100755
  from __future__ import print_function
  
 diff --git a/gtkdoc-fixxref.in b/gtkdoc-fixxref.in
-index 44f6bd1..26fbd93 100755
+index f9c4905..ed2ead1 100755
 --- a/gtkdoc-fixxref.in
 +++ b/gtkdoc-fixxref.in
 @@ -1,4 +1,4 @@
@@ -55,7 +54,7 @@ index 44f6bd1..26fbd93 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-mkdb.in b/gtkdoc-mkdb.in
-index 42d5731..3a56d56 100755
+index 641f3c4..35e95fb 100755
 --- a/gtkdoc-mkdb.in
 +++ b/gtkdoc-mkdb.in
 @@ -1,4 +1,4 @@
@@ -65,7 +64,7 @@ index 42d5731..3a56d56 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-mkhtml.in b/gtkdoc-mkhtml.in
-index 0d0a15d..914ff55 100755
+index b09f7a9..8d45966 100755
 --- a/gtkdoc-mkhtml.in
 +++ b/gtkdoc-mkhtml.in
 @@ -1,4 +1,4 @@
@@ -75,7 +74,7 @@ index 0d0a15d..914ff55 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-mkman.in b/gtkdoc-mkman.in
-index c5445cd..65db71a 100755
+index 8f7b018..9bac0b6 100755
 --- a/gtkdoc-mkman.in
 +++ b/gtkdoc-mkman.in
 @@ -1,4 +1,4 @@
@@ -85,7 +84,7 @@ index c5445cd..65db71a 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-mkpdf.in b/gtkdoc-mkpdf.in
-index e8c0c03..f807236 100755
+index 7dca4b0..808f92d 100755
 --- a/gtkdoc-mkpdf.in
 +++ b/gtkdoc-mkpdf.in
 @@ -1,4 +1,4 @@
@@ -95,7 +94,7 @@ index e8c0c03..f807236 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-rebase.in b/gtkdoc-rebase.in
-index 17a71c2..ec3fd28 100755
+index e8b0bf5..a960d8f 100755
 --- a/gtkdoc-rebase.in
 +++ b/gtkdoc-rebase.in
 @@ -1,4 +1,4 @@
@@ -105,7 +104,7 @@ index 17a71c2..ec3fd28 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-scan.in b/gtkdoc-scan.in
-index 954c811..f461504 100755
+index 7893ebc..b7eb83d 100755
 --- a/gtkdoc-scan.in
 +++ b/gtkdoc-scan.in
 @@ -1,4 +1,4 @@
@@ -115,7 +114,7 @@ index 954c811..f461504 100755
  #
  # gtk-doc - GTK DocBook documentation generator.
 diff --git a/gtkdoc-scangobj.in b/gtkdoc-scangobj.in
-index 4cbe130..52c2c24 100755
+index 7660c70..c6ff072 100755
 --- a/gtkdoc-scangobj.in
 +++ b/gtkdoc-scangobj.in
 @@ -1,4 +1,4 @@

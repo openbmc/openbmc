@@ -5,9 +5,9 @@ Subject: [PATCH] configure: Check for clang
 
 Disable gcc specific options if using clang
 
+Upstream-Status: Inactive-Upstream [https://gitlab.xiph.org/xiph/vorbis,https://github.com/xiph/vorbis]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
 
  configure.ac | 19 +++++++++++++++++--
  1 file changed, 17 insertions(+), 2 deletions(-)

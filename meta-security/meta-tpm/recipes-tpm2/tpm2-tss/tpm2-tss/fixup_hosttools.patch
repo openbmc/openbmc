@@ -1,17 +1,26 @@
-revert configure: add checks for all tools used by make install
+From ab120a9642516cdfdae5c5b8a91e42e2c9898172 Mon Sep 17 00:00:00 2001
+From: Valentin Kunin <kunin@google.com>
+Date: Mon, 20 May 2024 21:09:27 +0000
+Subject: [PATCH] revert configure: add checks for all tools used by make
+ install
 
 Not appropriate for cross build env.
 
 Upstream-Status: Inappropriate [OE specific]
-Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
-Index: tpm2-tss-4.0.1/configure.ac
-===================================================================
---- tpm2-tss-4.0.1.orig/configure.ac
-+++ tpm2-tss-4.0.1/configure.ac
-@@ -554,17 +554,6 @@ AM_CONDITIONAL(SYSD_SYSUSERS, test "x$systemd_sysusers" = "xyes")
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+Signed-off-by: Valentin Kunin <kunin@google.com>
+---
+ configure.ac | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index eb6051ea..a52c4725 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -663,17 +663,6 @@ AM_CONDITIONAL([SYSD_SYSUSERS], [test "x$systemd_sysusers" = "xyes" && test "x$s
  AC_CHECK_PROG(systemd_tmpfiles, systemd-tmpfiles, yes)
- AM_CONDITIONAL(SYSD_TMPFILES, test "x$systemd_tmpfiles" = "xyes")
+ AM_CONDITIONAL([SYSD_TMPFILES], [test "x$systemd_tmpfiles" = "xyes" && test "x$tmpfilesdir" != "xno"])
  
 -# Check all tools used by make install
 -AS_IF([test "$HOSTOS" = "Linux" && test "x$systemd_sysusers" != "xyes"],
@@ -27,3 +36,5 @@ Index: tpm2-tss-4.0.1/configure.ac
  AC_SUBST([PATH])
  
  dnl --------- Doxy Gen -----------------------
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog

@@ -80,7 +80,7 @@ python do_compile () {
     import subprocess
 
     # Build a separate executable for each splash image
-    workdir = d.getVar('WORKDIR')
+    workdir = d.getVar('UNPACKDIR')
     convertscript = "%s/make-image-header.sh" % d.getVar('S')
     destfile = "%s/psplash-poky-img.h" % d.getVar('B')
     localfiles = d.getVar('SPLASH_LOCALPATHS').split()
@@ -103,7 +103,7 @@ python do_compile () {
 do_install:append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
 		install -d ${D}${sysconfdir}/init.d/
-		install -m 0755 ${WORKDIR}/psplash-init ${D}${sysconfdir}/init.d/psplash.sh
+		install -m 0755 ${UNPACKDIR}/psplash-init ${D}${sysconfdir}/init.d/psplash.sh
 
 		# make fifo for psplash
 		install -d ${D}/mnt
@@ -112,8 +112,8 @@ do_install:append() {
 
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		install -d ${D}${systemd_system_unitdir}
-		install -m 644 ${WORKDIR}/psplash-start.service ${D}/${systemd_system_unitdir}
-		install -m 644 ${WORKDIR}/psplash-systemd.service ${D}/${systemd_system_unitdir}
+		install -m 644 ${UNPACKDIR}/psplash-start.service ${D}/${systemd_system_unitdir}
+		install -m 644 ${UNPACKDIR}/psplash-systemd.service ${D}/${systemd_system_unitdir}
 	fi
 
 	install -d ${D}${bindir}

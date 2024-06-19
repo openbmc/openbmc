@@ -484,19 +484,34 @@ class ShellParser():
         """
 
         words = list(words)
-        for word in list(words):
+        for word in words:
             wtree = pyshlex.make_wordtree(word[1])
             for part in wtree:
                 if not isinstance(part, list):
                     continue
 
-                if part[0] in ('`', '$('):
-                    command = pyshlex.wordtree_as_string(part[1:-1])
-                    self._parse_shell(command)
+                candidates = [part]
 
-                    if word[0] in ("cmd_name", "cmd_word"):
-                        if word in words:
-                            words.remove(word)
+                # If command is of type:
+                #
+                #   var="... $(cmd [...]) ..."
+                #
+                # Then iterate on what's between the quotes and if we find a
+                # list, make that what we check for below.
+                if len(part) >= 3 and part[0] == '"':
+                    for p in part[1:-1]:
+                        if isinstance(p, list):
+                            candidates.append(p)
+
+                for candidate in candidates:
+                    if len(candidate) >= 2:
+                        if candidate[0] in ('`', '$('):
+                            command = pyshlex.wordtree_as_string(candidate[1:-1])
+                            self._parse_shell(command)
+
+                            if word[0] in ("cmd_name", "cmd_word"):
+                                if word in words:
+                                    words.remove(word)
 
         usetoken = False
         for word in words:

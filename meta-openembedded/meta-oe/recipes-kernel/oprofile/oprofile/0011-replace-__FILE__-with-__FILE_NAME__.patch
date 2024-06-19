@@ -1,0 +1,47 @@
+From 640b116618b89eeddd61a91b793bb3c879adfe57 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 7 May 2024 19:56:59 -0700
+Subject: [PATCH] replace __FILE__ with __FILE_NAME__
+
+This helps build paths not beeing assumed during runtime
+since in cross-builds its possible that absolute paths during
+build will not match runtime paths
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libutil++/tests/file_manip_tests.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/libutil++/tests/file_manip_tests.cpp b/libutil++/tests/file_manip_tests.cpp
+index dfe161b..3d960bc 100644
+--- a/libutil++/tests/file_manip_tests.cpp
++++ b/libutil++/tests/file_manip_tests.cpp
+@@ -138,9 +138,9 @@ static void is_directory_tests()
+ static input_output<pair<string, string>, bool>
+ expect_is_files_identical[] = {
+ #define MAKE_PAIR(a, b) make_pair(string(a), string(b))
+-	{ MAKE_PAIR(__FILE__, __FILE__), true },
+-	{ MAKE_PAIR(__FILE__, "not_existing"), false },
+-	{ MAKE_PAIR("not_exisiting", __FILE__), false },
++	{ MAKE_PAIR(__FILE_NAME__, __FILE_NAME__), true },
++	{ MAKE_PAIR(__FILE_NAME__, "not_existing"), false },
++	{ MAKE_PAIR("not_exisiting", __FILE_NAME__), false },
+ 	{ MAKE_PAIR("not_exisiting", "not_existing"), false },
+ 	{ MAKE_PAIR("", ""), false }
+ #undef MAKE_PAIR
+@@ -163,8 +163,8 @@ void is_files_identical_tests(char const * prog_name)
+ 
+ static input_output<char const *, bool> expect_op_file_readable[] =
+ {
+-	{ __FILE__, true },
+-	{ "./" __FILE__, true },
++	{ __FILE_NAME__, true },
++	{ "./" __FILE_NAME__, true },
+ 	{ ".", false },
+ 	{ "/.", false },
+ 	{ "./", false },
+-- 
+2.45.0
+

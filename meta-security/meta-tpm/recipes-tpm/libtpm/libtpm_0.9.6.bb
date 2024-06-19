@@ -13,4 +13,4 @@ inherit autotools-brokensep pkgconfig perlnative
 PACKAGECONFIG ?= "openssl"
 PACKAGECONFIG[openssl] = "--with-openssl, --without-openssl, openssl"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

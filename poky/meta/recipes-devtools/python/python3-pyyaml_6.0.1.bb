@@ -34,7 +34,7 @@ RDEPENDS:${PN}-ptest += " \
 
 do_install_ptest() {
 	install -d ${D}${PTEST_PATH}/tests
-	cp -rf ${WORKDIR}/test_dump_load.py ${D}${PTEST_PATH}/tests/
+	cp -rf ${UNPACKDIR}/test_dump_load.py ${D}${PTEST_PATH}/tests/
 }
 
 BBCLASSEXTEND = "native nativesdk"

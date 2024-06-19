@@ -1,0 +1,28 @@
+From 1410d9e9c3e73b1319b98be67ad00c7630c4cb2e Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <Emekcan.Aras@arm.com>
+Date: Wed, 3 Apr 2024 16:05:07 +0100
+Subject: [PATCH] increase tzdram size
+
+Upstream-Status: Pending
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ core/arch/arm/plat-corstone1000/conf.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/arch/arm/plat-corstone1000/conf.mk b/core/arch/arm/plat-corstone1000/conf.mk
+index 98347b143..c2dd71f05 100644
+--- a/core/arch/arm/plat-corstone1000/conf.mk
++++ b/core/arch/arm/plat-corstone1000/conf.mk
+@@ -34,7 +34,7 @@ CFG_TEE_CORE_NB_CORE ?= 1
+ CFG_TZDRAM_START ?= 0x02002000
+ 
+ # TEE_RAM (OPTEE kernel + DATA) + TA_RAM = 3MB
+-CFG_TZDRAM_SIZE  ?= 0x300000
++CFG_TZDRAM_SIZE  ?= 0x340000
+ CFG_SHMEM_START  ?= 0x86000000
+ CFG_SHMEM_SIZE   ?= 0x00200000
+ 
+-- 
+2.25.1
+

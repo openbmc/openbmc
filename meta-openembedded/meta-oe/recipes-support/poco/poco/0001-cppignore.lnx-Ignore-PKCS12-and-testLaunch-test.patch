@@ -1,4 +1,4 @@
-From 879ddb725823c78c9510cfd39786adb16f3726c8 Mon Sep 17 00:00:00 2001
+From 6b1123b313e439d8bfae3570a3e541b3aa26f3ad Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 16 Sep 2023 19:52:56 -0700
 Subject: [PATCH] cppignore.lnx: Ignore PKCS12 and testLaunch test
@@ -48,10 +48,10 @@ Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
  1 file changed, 9 insertions(+)
 
 diff --git a/cppignore.lnx b/cppignore.lnx
-index 2c2376526..65df4af08 100644
+index b3288d474..9aad48ca5 100644
 --- a/cppignore.lnx
 +++ b/cppignore.lnx
-@@ -28,3 +28,12 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
+@@ -30,3 +30,12 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
  CppUnit::TestCaller<HTTPSStreamFactoryTest>.testProxy
  CppUnit::TestCaller<DNSTest>.testHostByAddress
  CppUnit::TestCaller<DNSTest>.testHostByName

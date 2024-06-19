@@ -26,5 +26,5 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 do_install:append () {
 	install -d ${D}/${sysconfdir}/X11/Xsession.d
-	install -m 755 ${WORKDIR}/70settings-daemon.sh ${D}/${sysconfdir}/X11/Xsession.d/
+	install -m 755 ${UNPACKDIR}/70settings-daemon.sh ${D}/${sysconfdir}/X11/Xsession.d/
 }

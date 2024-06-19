@@ -49,7 +49,7 @@ do_install() {
     # Don't install /var/lock when populating rootfs. Do it through volatile
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/default/volatiles
-        install -m 0644 ${WORKDIR}/99_logcheck ${D}${sysconfdir}/default/volatiles
+        install -m 0644 ${UNPACKDIR}/99_logcheck ${D}${sysconfdir}/default/volatiles
     fi
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/tmpfiles.d

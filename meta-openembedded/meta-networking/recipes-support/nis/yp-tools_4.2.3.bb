@@ -43,5 +43,5 @@ FILES:${PN}-staticdev += " ${libdir}/yp-nis/*.a"
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/domainname.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/domainname.service ${D}${systemd_unitdir}/system
 }

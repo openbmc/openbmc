@@ -17,19 +17,14 @@ Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
  VEX/priv/guest_s390_defs.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/VEX/priv/guest_s390_defs.h b/VEX/priv/guest_s390_defs.h
-index 9054290..dab8002 100644
 --- a/VEX/priv/guest_s390_defs.h
 +++ b/VEX/priv/guest_s390_defs.h
 @@ -284,7 +284,7 @@ typedef enum {
-    S390_VEC_OP_VBPERM,
-    S390_VEC_OP_VMSL,
+    S390_VEC_OP_VCLFNL,
+    S390_VEC_OP_VCRNF,
     S390_VEC_OP_LAST             // supposed to be the last element in enum
 -} s390x_vec_op_t;
 +};
  
  /* Arguments of s390x_dirtyhelper_vec_op(...) which are packed into one
     ULong variable.
--- 
-2.29.2
-

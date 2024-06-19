@@ -24,14 +24,15 @@ SRC_URI = "file://keymap.sh"
 INITSCRIPT_NAME = "keymap.sh"
 INITSCRIPT_PARAMS = "start 01 S ."
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install () {
     # Only install the script if 'sysvinit' is in DISTRO_FEATURES
     # THe ulitity this script provides could be achieved by systemd-vconsole-setup.service
     if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
 	install -d ${D}${sysconfdir}/init.d/
-	install -m 0755 ${WORKDIR}/keymap.sh ${D}${sysconfdir}/init.d/
+	install -m 0755 ${S}/keymap.sh ${D}${sysconfdir}/init.d/
     fi
 }
 

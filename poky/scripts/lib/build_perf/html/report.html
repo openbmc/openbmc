@@ -3,11 +3,7 @@
 <head>
 {# Scripts, for visualization#}
 <!--START-OF-SCRIPTS-->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-google.charts.load('current', {'packages':['corechart']});
-var chartsDrawing = 0;
-</script>
+<script src=" https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js "></script>
 
 {# Render measurement result charts #}
 {% for test in test_data %}
@@ -23,28 +19,29 @@ var chartsDrawing = 0;
 
 {# Styles #}
 <style>
+:root {
+  --text: #000;
+  --bg: #fff;
+  --h2heading: #707070;
+  --link: #0000EE;
+  --trtopborder: #9ca3af;
+  --trborder: #e5e7eb;
+  --chartborder: #f0f0f0;
+  }
 .meta-table {
   font-size: 14px;
   text-align: left;
   border-collapse: collapse;
 }
-.meta-table tr:nth-child(even){background-color: #f2f2f2}
-meta-table th, .meta-table td {
-  padding: 4px;
-}
 .summary {
-  margin: 0;
   font-size: 14px;
   text-align: left;
   border-collapse: collapse;
 }
-summary th, .meta-table td {
-  padding: 4px;
-}
 .measurement {
   padding: 8px 0px 8px 8px;
-  border: 2px solid #f0f0f0;
-  margin-bottom: 10px;
+  border: 2px solid var(--chartborder);
+  margin: 1.5rem 0;
 }
 .details {
   margin: 0;
@@ -64,18 +61,71 @@ summary th, .meta-table td {
   background-color: #f0f0f0;
   margin-left: 10px;
 }
-hr {
-  color: #f0f0f0;
+.card-container {
+  border-bottom-width: 1px;
+  padding: 1.25rem 3rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border-radius: 0.25rem;
+}
+body {
+  font-family: 'Helvetica', sans-serif;
+  margin: 3rem 8rem;
+  background-color: var(--bg);
+  color: var(--text);
+}
+h1 {
+  text-align: center;
 }
 h2 {
-  font-size: 20px;
+  font-size: 1.5rem;
   margin-bottom: 0px;
-  color: #707070;
+  color: var(--h2heading);
+  padding-top: 1.5rem;
 }
 h3 {
-  font-size: 16px;
+  font-size: 1.3rem;
   margin: 0px;
-  color: #707070;
+  color: var(--h2heading);
+  padding: 1.5rem 0;
+}
+h4 {
+  font-size: 14px;
+  font-weight: lighter;
+  line-height: 1.2rem;
+  margin: auto;
+  padding-top: 1rem;
+}
+table {
+  margin-top: 1.5rem;
+  line-height: 2rem;
+}
+tr {
+  border-bottom: 1px solid var(--trborder);
+}
+tr:first-child {
+  border-bottom: 1px solid var(--trtopborder);
+}
+tr:last-child {
+  border-bottom: none;
+}
+a {
+  text-decoration: none;
+  font-weight: bold;
+  color: var(--link);
+}
+a:hover {
+  color: #8080ff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e9e8fa;
+    --bg: #0F0C28;
+    --h2heading: #B8B7CB;
+    --link: #87cefa;
+    --trtopborder: #394150;
+    --trborder: #212936;
+    --chartborder: #b1b0bf;
+  }
 }
 </style>
 
@@ -83,13 +133,14 @@ h3 {
 </head>
 
 {% macro poky_link(commit) -%}
-    <a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?id={{ commit }}">{{ commit[0:11] }}</a>
+  <a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?id={{ commit }}">{{ commit[0:11] }}</a>
 {%- endmacro %}
 
-<body><div style="width: 700px">
+<body><div>
+  <h1 style="text-align: center;">Performance Test Report</h1>
   {# Test metadata #}
   <h2>General</h2>
-  <hr>
+  <h4>The table provides an overview of the comparison between two selected commits from the same branch.</h4>
   <table class="meta-table" style="width: 100%">
     <tr>
       <th></th>
@@ -112,19 +163,21 @@ h3 {
 
   {# Test result summary #}
   <h2>Test result summary</h2>
-  <hr>
+  <h4>The test summary presents a thorough breakdown of each test conducted on the branch, including details such as build time and disk space consumption. Additionally, it gives insights into the average time taken for test execution, along with absolute and relative values for a better understanding.</h4>
   <table class="summary" style="width: 100%">
+    <tr>
+      <th>Test name</th>
+      <th>Measurement description</th>
+      <th>Mean value</th>
+      <th>Absolute difference</th>
+      <th>Relative difference</th>
+    </tr>
     {% for test in test_data %}
-      {% if loop.index is even %}
-        {% set row_style = 'style="background-color: #f2f2f2"' %}
-      {% else %}
-        {% set row_style = 'style="background-color: #ffffff"' %}
-      {% endif %}
       {% if test.status == 'SUCCESS' %}
         {% for measurement in test.measurements %}
           <tr {{ row_style }}>
             {% if loop.index == 1 %}
-              <td>{{ test.name }}: {{ test.description }}</td>
+              <td><a href=#{{test.name}}>{{ test.name }}: {{ test.description }}</a></td>
             {% else %}
               {# add empty cell in place of the test name#}
               <td></td>
@@ -153,10 +206,12 @@ h3 {
   </table>
 
   {# Detailed test results #}
+  <h2>Test details</h2>
+  <h4>The following section provides details of each test, accompanied by charts representing build time and disk usage over time or by commit number.</h4>
   {% for test in test_data %}
-  <h2>{{ test.name }}: {{ test.description }}</h2>
-  <hr>
+  <h3 style="color: #000;" id={{test.name}}>{{ test.name }}: {{ test.description }}</h3>
     {% if test.status == 'SUCCESS' %}
+    <div class="card-container">
       {% for measurement in test.measurements %}
         <div class="measurement">
           <h3>{{ measurement.description }}</h3>
@@ -275,7 +330,8 @@ h3 {
             {% endif %}
           {% endif %}
         </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     {# Unsuccessful test #}
     {% else %}
       <span style="font-size: 150%; font-weight: bold; color: red;">{{ test.status }}

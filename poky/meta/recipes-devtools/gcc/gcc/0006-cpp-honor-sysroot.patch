@@ -1,4 +1,4 @@
-From f0b4d02a3a3dca1d67fd7add15ed63c2cd572bb9 Mon Sep 17 00:00:00 2001
+From 970960876045c99011658836f385c6f4d6d78fa6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:22:00 +0400
 Subject: [PATCH] cpp: honor sysroot.
@@ -26,7 +26,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/cp/lang-specs.h b/gcc/cp/lang-specs.h
-index c591d155cc1..61927869fe1 100644
+index 7a7f5ff0ab5..fb3d88cdb11 100644
 --- a/gcc/cp/lang-specs.h
 +++ b/gcc/cp/lang-specs.h
 @@ -116,7 +116,7 @@ along with GCC; see the file COPYING3.  If not see
@@ -39,11 +39,11 @@ index c591d155cc1..61927869fe1 100644
        "    %{fmodule-only:%{!S:-o %g.s%V}}"
        "    %{!fmodule-only:%{!fmodule-header*:%(invoke_as)}}}"
 diff --git a/gcc/gcc.cc b/gcc/gcc.cc
-index 5feae021545..8af0c814c33 100644
+index 343e4915097..e3e9374d1cc 100644
 --- a/gcc/gcc.cc
 +++ b/gcc/gcc.cc
-@@ -1468,7 +1468,7 @@ static const struct compiler default_compilers[] =
- 					   %W{o*:--output-pch %*}}%V}}}}}}}", 0, 0, 0},
+@@ -1487,7 +1487,7 @@ static const struct compiler default_compilers[] =
+ 					   %W{o*:--output-pch %w%*}}%{!S:%V}}}}}}}}", 0, 0, 0},
    {".i", "@cpp-output", 0, 0, 0},
    {"@cpp-output",
 -   "%{!M:%{!MM:%{!E:cc1 -fpreprocessed %i %(cc1_options) %{!fsyntax-only:%(invoke_as)}}}}", 0, 0, 0},

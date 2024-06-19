@@ -34,6 +34,9 @@ DEPENDS = " \
 SRC_URI = " \
     git://github.com/fvwmorg/fvwm.git;protocol=https;branch=master \
     file://0001-Fix-compilation-for-disabled-gnome.patch \
+    file://0001-configure-Do-not-require-support-for-implicit-ints.patch \
+    file://0002-acinclude.m4-Add-missing-unistd.h-to-AM_SAFETY_CHECK.patch \
+    file://0003-configure-Further-defang-the-Werror-check.patch \
 "
 
 SRCREV = "7baf540e56fb1a3e91752acba872a88543529d46"

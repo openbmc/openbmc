@@ -1,4 +1,4 @@
-From e3103459416616d3b8508e7176e897b0ae6c90f2 Mon Sep 17 00:00:00 2001
+From a86919ed5468f3c152114446c189b00f5f656d59 Mon Sep 17 00:00:00 2001
 From: Dengke Du <dengke.du@windriver.com>
 Date: Tue, 25 Oct 2016 11:49:40 +0000
 Subject: [PATCH] implement libc specific reopen_stream
@@ -14,18 +14,17 @@ http://git.alpinelinux.org/cgit/aports/tree/main/lvm2/fix-stdio-usage.patch
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Dengke Du <dengke.du@windriver.com>
 
----
 Upstream-Status: Pending
-
+---
  lib/log/log.c      | 6 ++++++
  tools/lvmcmdline.c | 6 +++---
  2 files changed, 9 insertions(+), 3 deletions(-)
 
-Index: LVM2.2.02.177/lib/log/log.c
-===================================================================
---- LVM2.2.02.177.orig/lib/log/log.c
-+++ LVM2.2.02.177/lib/log/log.c
-@@ -161,6 +161,7 @@ static void _check_and_replace_standard_
+diff --git a/lib/log/log.c b/lib/log/log.c
+index 7b88252f0..e1720098a 100644
+--- a/lib/log/log.c
++++ b/lib/log/log.c
+@@ -165,6 +165,7 @@ static void _check_and_replace_standard_log_streams(FILE *old_stream, FILE *new_
   * Close and reopen standard stream on file descriptor fd.
   */
  int reopen_standard_stream(FILE **stream, const char *mode)
@@ -33,7 +32,7 @@ Index: LVM2.2.02.177/lib/log/log.c
  {
  	int fd, fd_copy, new_fd;
  	const char *name;
-@@ -207,6 +208,11 @@ int reopen_standard_stream(FILE **stream
+@@ -211,6 +212,11 @@ int reopen_standard_stream(FILE **stream, const char *mode)
  	*stream = new_stream;
  	return 1;
  }
@@ -45,11 +44,11 @@ Index: LVM2.2.02.177/lib/log/log.c
  
  void init_log_fn(lvm2_log_fn_t log_fn)
  {
-Index: LVM2.2.02.177/tools/lvmcmdline.c
-===================================================================
---- LVM2.2.02.177.orig/tools/lvmcmdline.c
-+++ LVM2.2.02.177/tools/lvmcmdline.c
-@@ -3095,7 +3095,7 @@ static int _check_standard_fds(void)
+diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
+index 3fd23a521..c2ee39905 100644
+--- a/tools/lvmcmdline.c
++++ b/tools/lvmcmdline.c
+@@ -3380,7 +3380,7 @@ static int _check_standard_fds(void)
  	int err = is_valid_fd(STDERR_FILENO);
  
  	if (!is_valid_fd(STDIN_FILENO) &&
@@ -58,7 +57,7 @@ Index: LVM2.2.02.177/tools/lvmcmdline.c
  		if (err)
  			perror("stdin stream open");
  		else
-@@ -3105,7 +3105,7 @@ static int _check_standard_fds(void)
+@@ -3390,7 +3390,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDOUT_FILENO) &&
@@ -67,7 +66,7 @@ Index: LVM2.2.02.177/tools/lvmcmdline.c
  		if (err)
  			perror("stdout stream open");
  		/* else no stdout */
-@@ -3113,7 +3113,7 @@ static int _check_standard_fds(void)
+@@ -3398,7 +3398,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDERR_FILENO) &&

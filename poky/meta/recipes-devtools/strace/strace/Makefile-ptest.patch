@@ -1,4 +1,4 @@
-From 1f50e0a09d828be8f5b1f28db9af0b12492a1553 Mon Sep 17 00:00:00 2001
+From 245f6322cf64e562d3227dfac26ce93c905b0380 Mon Sep 17 00:00:00 2001
 From: Gabriel Barbu <gabriel.barbu@enea.com>
 Date: Thu, 25 Jul 2013 15:28:33 +0200
 Subject: [PATCH] strace: Add ptest
@@ -8,16 +8,15 @@ Upstream-Status: Inappropriate
 Signed-off-by: Gabriel Barbu <gabriel.barbu@enea.com>
 Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
-
 ---
  tests/Makefile.am | 20 ++++++++++++++++++++
  1 file changed, 20 insertions(+)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 55566ee..a7ae6f9 100644
+index ef68898..735b73d 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -16,6 +16,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
+@@ -18,6 +18,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
  MPERS_NAME =
  MPERS_CC_FLAGS =
  ARCH_MFLAGS =
@@ -25,7 +24,7 @@ index 55566ee..a7ae6f9 100644
  AM_CFLAGS = $(WARN_CFLAGS)
  bundled_CPPFLAGS =
  if USE_BUNDLED_HEADERS
-@@ -703,3 +704,22 @@ BUILT_SOURCES = ksysent.h
+@@ -889,3 +890,22 @@ BUILT_SOURCES = ksysent.h
  CLEANFILES = ksysent.h
  
  include ../src/scno.am

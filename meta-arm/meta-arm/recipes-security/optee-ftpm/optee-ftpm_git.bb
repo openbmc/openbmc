@@ -5,7 +5,6 @@ HOMEPAGE = "https://github.com/microsoft/ms-tpm-20-ref/"
 COMPATIBLE_MACHINE ?= "invalid"
 COMPATIBLE_MACHINE:qemuarm64 = "qemuarm64"
 COMPATIBLE_MACHINE:qemuarm64-secureboot = "qemuarm64"
-COMPATIBLE_MACHINE:qemu-generic-arm64 = "qemu-generic-arm64"
 COMPATIBLE_MACHINE:qemuarm-secureboot = "qemuarm"
 
 #FIXME - doesn't currently work with clang
@@ -42,6 +41,11 @@ EXTRA_OEMAKE += '\
 EXTRA_OEMAKE:append:aarch64:qemuall = "\
     CFG_ARM64_ta_arm64=y \
 "
+
+# TODO: GCC 14.1 is finding genuine issues with the code but as upstream appear to be removing
+# the code we're building (https://github.com/microsoft/ms-tpm-20-ref/pull/108) lets just
+# ignore them for now.
+CFLAGS += "-Wno-implicit-function-declaration -Wno-incompatible-pointer-types"
 
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
 # right path until this is relocated automatically.

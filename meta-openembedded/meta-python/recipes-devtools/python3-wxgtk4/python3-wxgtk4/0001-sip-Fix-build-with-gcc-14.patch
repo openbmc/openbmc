@@ -1,0 +1,31 @@
+From 5234a454a1b9f11f83e59909fb2972176497e02c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 9 May 2024 17:35:11 -0700
+Subject: [PATCH] sip: Fix build with gcc-14
+
+Fixes -Wincompatible-pointer-types
+sip/siplib/siplib.c:3900:20: error: assignment to 'sipSimpleWrapper *' {aka 'struct _sipSimpleWrapper *'} from incompatible pointer type 'PyObject *' {aka 'struct _object *'} [-Wincompatible-pointer-types]
+|  3900 |             *selfp = va_arg(va, PyObject *);
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sip/siplib/siplib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sip/siplib/siplib.c b/sip/siplib/siplib.c
+index 95563e5c..ae3fac60 100644
+--- a/sip/siplib/siplib.c
++++ b/sip/siplib/siplib.c
+@@ -3897,7 +3897,7 @@ static int parsePass1(PyObject **parseErrp, sipSimpleWrapper **selfp,
+     {
+     case '#':
+             /* A ctor has an argument with the /Transfer/ annotation. */
+-            *selfp = va_arg(va, PyObject *);
++            *selfp = (sipSimpleWrapper *)va_arg(va, PyObject *);
+             break;
+ 
+     case 'B':
+-- 
+2.45.0
+

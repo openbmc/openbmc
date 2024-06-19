@@ -60,6 +60,11 @@ SRC_URI:append = " \
     file://0042-corstone1000-enable-virtio-net-support.patch		  \
     file://0043-firmware-psci-Fix-bind_smccc_features-psci-check.patch		  \
     file://0044-corstone1000-set-unique-GUID-for-fvp-and-mps3.patch		  \
+    file://0045-efi-corstone1000-fwu-update-RPC-ABI.patch			  \
+    file://0046-Corstone1000-Change-MMCOMM-buffer-location.patch		  \
+    file://0047-corstone1000-dts-add-external-system-node.patch \
+    file://0048-corstone1000-Enable-UEFI-Secure-boot.patch 			  \
+    file://0049-corstone1000-Add-secondary-cores-cpu-nodes-for-FVP.patch	  \
     "
 
 do_configure:append() {

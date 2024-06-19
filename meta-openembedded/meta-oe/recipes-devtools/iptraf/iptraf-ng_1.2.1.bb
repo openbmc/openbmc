@@ -42,7 +42,7 @@ do_compile() {
 do_install() {
     oe_runmake DESTDIR=${D} install
     install -D -m 0644 -p ${S}/iptraf-ng-logrotate.conf ${D}${sysconfdir}/logrotate.d/iptraf-ng
-    install -Dm 0644 ${WORKDIR}/iptraf-ng-tmpfiles.conf ${D}${libdir}/tmpfiles.d/iptraf-ng-tmpfiles.conf
+    install -Dm 0644 ${UNPACKDIR}/iptraf-ng-tmpfiles.conf ${D}${libdir}/tmpfiles.d/iptraf-ng-tmpfiles.conf
 }
 
 FILES:${PN} += "${libdir}/tmpfiles.d"

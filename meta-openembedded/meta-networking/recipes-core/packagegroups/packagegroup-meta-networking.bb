@@ -236,6 +236,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     rdma-core \
     tcpreplay \
     tinyproxy \
+    udpcast \
     uftp \
     unbound \
     vnstat \

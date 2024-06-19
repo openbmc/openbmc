@@ -23,7 +23,8 @@ SRC_URI = "git://github.com/google/fonts.git;protocol=https;branch=main;subpath=
            git://github.com/google/fonts.git;protocol=https;branch=main;subpath=ofl/firasanscondensed;name=firasanscondensed \
            git://github.com/google/fonts.git;protocol=https;branch=main;subpath=ofl/firasansextracondensed;name=firasansextracondensed"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install:append() {
     install -d ${D}${datadir}/fonts/truetype/

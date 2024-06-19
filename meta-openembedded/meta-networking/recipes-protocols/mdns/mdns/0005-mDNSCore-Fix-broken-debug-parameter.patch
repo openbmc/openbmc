@@ -1,20 +1,19 @@
-From 764b6202402e9e5687ff873330e5ad6be6f69df7 Mon Sep 17 00:00:00 2001
+From 0b3953dfdeef8dc9b8a23820659feee9e15b5bad Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Mon, 5 Dec 2022 22:49:49 +0000
 Subject: [PATCH] mDNSCore: Fix broken debug parameter
 
 Upstream-Status: Pending
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
-
 ---
  mDNSCore/mDNS.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: mDNSResponder/mDNSCore/mDNS.c
-===================================================================
---- mDNSResponder.orig/mDNSCore/mDNS.c
-+++ mDNSResponder/mDNSCore/mDNS.c
-@@ -10231,7 +10231,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastA
+diff --git a/mDNSCore/mDNS.c b/mDNSCore/mDNS.c
+index d4519a7f62aa..3090edb2ac5d 100644
+--- a/mDNSCore/mDNS.c
++++ b/mDNSCore/mDNS.c
+@@ -10253,7 +10253,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastAnswers(mDNS *const m, const DNSMessage *
  #else
                              const DNSServRef dnsserv = qptr->qDNSServer;
  #endif

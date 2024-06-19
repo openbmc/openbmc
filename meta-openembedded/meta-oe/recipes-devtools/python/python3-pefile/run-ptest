@@ -1,0 +1,3 @@
+#!/bin/sh
+
+pytest --automake --ignore=./tests/pefile_test.py

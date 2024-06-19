@@ -26,7 +26,7 @@ do_install() {
     install -d ${D}${sbindir} ${D}${sysconfdir}/ppp ${D}${mandir}/man8
     install -m 555 pptp ${D}${sbindir}
     install -m 644 pptp.8 ${D}${mandir}/man8
-    install -m 644 ${WORKDIR}/options.pptp ${D}${sysconfdir}/ppp
+    install -m 644 ${UNPACKDIR}/options.pptp ${D}${sysconfdir}/ppp
 }
 
 RDEPENDS:${PN} = "ppp"

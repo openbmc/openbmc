@@ -24,3 +24,5 @@ do_install() {
         install -m 0644 ${S}/libs/sysplugins/*.php ${D}${datadir}/php/smarty3/libs/sysplugins/
 }
 FILES:${PN} = "${datadir}/php/smarty3/"
+
+CVE_STATUS[CVE-2020-10375] = "cpe-incorrect: The recipe used in the meta-openembedded is a different smarty package compared to the one which has the CVE issue."

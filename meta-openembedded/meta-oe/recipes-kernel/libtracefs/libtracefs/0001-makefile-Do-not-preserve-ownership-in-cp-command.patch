@@ -1,4 +1,4 @@
-From 6650d0e79eea330b53635574885208a138fef97e Mon Sep 17 00:00:00 2001
+From ab6f78bfd6811c648ee71663cfc4dc8be151a519 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 21 Dec 2022 22:50:56 -0800
 Subject: [PATCH] makefile: Do not preserve ownership in cp command
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 27d425c..3aea142 100644
+index 7f4f5c3..1ba7b9d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -273,7 +273,7 @@ endif # DESTDIR = ""
+@@ -296,7 +296,7 @@ endif # DESTDIR = ""
  
  install_libs: libs install_pkgconfig
  	$(Q)$(call do_install,$(LIBTRACEFS_SHARED),$(libdir_SQ)); \
@@ -26,6 +26,3 @@ index 27d425c..3aea142 100644
  	$(Q)$(call do_install,$(src)/include/tracefs.h,$(includedir_SQ),644)
  	$(Q)$(call install_ld_config)
  
--- 
-2.39.0
-

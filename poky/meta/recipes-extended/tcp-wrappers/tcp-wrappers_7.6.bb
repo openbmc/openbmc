@@ -120,8 +120,8 @@ do_install () {
 		install -m 0644 $m.8 ${D}${mandir}/man8/ || exit 1
 	done
 
-	install -m 0644 ${WORKDIR}/try-from.8 ${D}${mandir}/man8/
-	install -m 0644 ${WORKDIR}/safe_finger.8 ${D}${mandir}/man8/
+	install -m 0644 ${UNPACKDIR}/try-from.8 ${D}${mandir}/man8/
+	install -m 0644 ${UNPACKDIR}/safe_finger.8 ${D}${mandir}/man8/
 
 	install -d ${D}${includedir}
 	install -m 0644 tcpd.h ${D}${includedir}/

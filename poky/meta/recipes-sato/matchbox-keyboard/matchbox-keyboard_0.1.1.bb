@@ -47,7 +47,7 @@ FILES:${PN}-applet = "${libdir}/matchbox-panel/*.so"
 
 do_install:append () {
 	install -d ${D}/${sysconfdir}/X11/Xsession.d/
-	install -m 755 ${WORKDIR}/80matchboxkeyboard.sh ${D}/${sysconfdir}/X11/Xsession.d/
+	install -m 755 ${UNPACKDIR}/80matchboxkeyboard.sh ${D}/${sysconfdir}/X11/Xsession.d/
 
 	rm -f ${D}${libdir}/gtk-2.0/*/immodules/*.la
 	rm -f ${D}${libdir}/gtk-3.0/*/immodules/*.la

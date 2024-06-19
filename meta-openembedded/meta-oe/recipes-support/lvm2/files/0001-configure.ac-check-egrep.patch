@@ -1,4 +1,7 @@
-configure.ac: check egrep
+From f261b2f1bc16c32a55a22e28bf1b2f15ac6c7a88 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 6 Dec 2023 10:24:46 +0800
+Subject: [PATCH] configure.ac: check egrep
 
 The macro AC_HEADER_STDC which requires AC_PROG_EGREP has been removed
 from configure.ac, then it fails to substitute '@EGREP@':
@@ -17,10 +20,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/configure.ac b/configure.ac
-index 2e52498f9..d9462e22c 100644
+index c2dbf3c9f..d9e7964c3 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -78,6 +78,7 @@ AC_PROG_LN_S
+@@ -88,6 +88,7 @@ AC_PROG_EGREP
  AC_PROG_MAKE_SET
  AC_PROG_MKDIR_P
  AC_PROG_RANLIB
@@ -28,6 +31,3 @@ index 2e52498f9..d9462e22c 100644
  AC_CHECK_TOOL([READELF], [readelf])
  AC_CHECK_TOOL(AR, ar)
  AC_PATH_TOOL(CFLOW_CMD, cflow)
--- 
-2.34.1
-

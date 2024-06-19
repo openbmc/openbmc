@@ -101,7 +101,7 @@ def determine_file_source(targetpath, rd):
     import oe.recipeutils
 
     # See if it's in do_install for the recipe
-    workdir = rd.getVar('WORKDIR')
+    unpackdir = rd.getVar('UNPACKDIR')
     src_uri = rd.getVar('SRC_URI')
     srcfile = ''
     modpatches = []
@@ -113,9 +113,9 @@ def determine_file_source(targetpath, rd):
         if not srcpath.startswith('/'):
             # Handle non-absolute path
             srcpath = os.path.abspath(os.path.join(rd.getVarFlag('do_install', 'dirs').split()[-1], srcpath))
-        if srcpath.startswith(workdir):
+        if srcpath.startswith(unpackdir):
             # OK, now we have the source file name, look for it in SRC_URI
-            workdirfile = os.path.relpath(srcpath, workdir)
+            workdirfile = os.path.relpath(srcpath, unpackdir)
             # FIXME this is where we ought to have some code in the fetcher, because this is naive
             for item in src_uri.split():
                 localpath = bb.fetch2.localpath(item, rd)

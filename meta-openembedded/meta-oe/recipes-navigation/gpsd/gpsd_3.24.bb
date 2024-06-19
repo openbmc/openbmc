@@ -68,7 +68,7 @@ do_install() {
 
 do_install:append() {
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/gpsd.init ${D}${sysconfdir}/init.d/gpsd
+    install -m 0755 ${UNPACKDIR}/gpsd.init ${D}${sysconfdir}/init.d/gpsd
     install -d ${D}${sysconfdir}/default
     install -m 0644 ${S}/packaging/deb/etc_default_gpsd ${D}${sysconfdir}/default/gpsd.default
 

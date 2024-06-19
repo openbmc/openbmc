@@ -12,11 +12,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00013.html]
 
-diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
-index 40cb94a..2fa055e 100644
---- a/build-aux/ltmain.in
-+++ b/build-aux/ltmain.in
-@@ -7700,8 +7700,16 @@ EOF
+Index: libtool-2.5.0/build-aux/ltmain.in
+===================================================================
+--- libtool-2.5.0.orig/build-aux/ltmain.in
++++ libtool-2.5.0/build-aux/ltmain.in
+@@ -7602,8 +7602,16 @@ func_mode_link ()
  		  esac
  		fi
  	      else
@@ -35,7 +35,7 @@ index 40cb94a..2fa055e 100644
  	      fi
  	    elif test -n "$runpath_var"; then
  	      case "$perm_rpath " in
-@@ -8434,8 +8442,16 @@ EOF
+@@ -8336,8 +8344,16 @@ func_mode_link ()
  	      esac
  	    fi
  	  else
@@ -54,7 +54,7 @@ index 40cb94a..2fa055e 100644
  	  fi
  	elif test -n "$runpath_var"; then
  	  case "$perm_rpath " in
-@@ -8489,8 +8505,14 @@ EOF
+@@ -8391,8 +8407,14 @@ func_mode_link ()
  	      esac
  	    fi
  	  else
@@ -71,6 +71,3 @@ index 40cb94a..2fa055e 100644
  	  fi
  	elif test -n "$runpath_var"; then
  	  case "$finalize_perm_rpath " in
--- 
-2.25.1
-

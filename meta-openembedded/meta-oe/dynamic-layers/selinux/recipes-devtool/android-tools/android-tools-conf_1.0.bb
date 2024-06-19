@@ -7,7 +7,7 @@ SRC_URI = "file://android-gadget-setup"
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/android-gadget-setup ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/android-gadget-setup ${D}${bindir}
 }
 
 python () {

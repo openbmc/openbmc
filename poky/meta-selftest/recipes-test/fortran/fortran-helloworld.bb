@@ -11,7 +11,7 @@ SECURITY_CFLAGS = ""
 SECURITY_LDFLAGS = ""
 
 do_compile() {
-	${FC} ${LDFLAGS} ${WORKDIR}/hello.f95 -o ${B}/fortran-hello
+	${FC} ${LDFLAGS} ${UNPACKDIR}/hello.f95 -o ${B}/fortran-hello
 }
 
 do_install() {

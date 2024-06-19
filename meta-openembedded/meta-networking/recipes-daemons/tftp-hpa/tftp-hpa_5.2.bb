@@ -58,18 +58,18 @@ do_install() {
 
     install -m 755 -d ${D}${localstatedir}/lib/tftpboot/
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/tftpd-hpa
+    install -m 0755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/tftpd-hpa
     sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}${sysconfdir}/init.d/tftpd-hpa
     sed -i 's!/etc/!${sysconfdir}/!g' ${D}${sysconfdir}/init.d/tftpd-hpa
     sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/tftpd-hpa
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}${sysconfdir}/init.d/tftpd-hpa
 
     install -d ${D}${sysconfdir}/default
-    install -m 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/tftpd-hpa
+    install -m 0644 ${UNPACKDIR}/default ${D}${sysconfdir}/default/tftpd-hpa
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/tftpd-hpa.socket ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/tftpd-hpa.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/tftpd-hpa.socket ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/tftpd-hpa.service ${D}${systemd_unitdir}/system
     sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/tftpd-hpa.service
 }
 

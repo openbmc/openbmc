@@ -3,7 +3,7 @@
 SUMMARY = "Generates Icecream toolchain for SDK"
 DESCRIPTION = "${SUMMARY}"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/icecc-env.sh;beginline=2;endline=20;md5=dd6b68c1efed8a9fb04e409b3b287d47"
+LIC_FILES_CHKSUM = "file://${UNPACKDIR}/icecc-env.sh;beginline=2;endline=20;md5=dd6b68c1efed8a9fb04e409b3b287d47"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -23,12 +23,12 @@ do_install() {
     install -d ${D}${SDKPATHNATIVE}${datadir}/icecream/bin
 
     install -d ${D}${SDKPATHNATIVE}/environment-setup.d/
-    install -m 0644 ${WORKDIR}/icecc-env.sh ${D}${SDKPATHNATIVE}/environment-setup.d/
+    install -m 0644 ${UNPACKDIR}/icecc-env.sh ${D}${SDKPATHNATIVE}/environment-setup.d/
     sed -i ${D}${SDKPATHNATIVE}/environment-setup.d/icecc-env.sh \
         -e 's,@TOOLCHAIN_ENV@,${ENV_NAME},g'
 
     install -d ${D}${SDKPATHNATIVE}/post-relocate-setup.d/
-    install -m 0755 ${WORKDIR}/icecc-setup.sh ${D}${SDKPATHNATIVE}/post-relocate-setup.d/
+    install -m 0755 ${UNPACKDIR}/icecc-setup.sh ${D}${SDKPATHNATIVE}/post-relocate-setup.d/
     sed -i ${D}${SDKPATHNATIVE}/post-relocate-setup.d/icecc-setup.sh \
         -e 's,@TOOLCHAIN_ENV@,${ENV_NAME},g'
 }

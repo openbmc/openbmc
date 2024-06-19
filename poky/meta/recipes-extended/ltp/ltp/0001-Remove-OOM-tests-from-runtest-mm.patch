@@ -1,4 +1,4 @@
-From e87c2ad1e16cdbd62ba71b2ace3270503decaa56 Mon Sep 17 00:00:00 2001
+From 768159aa53257d247645a12518778f50b8fdf578 Mon Sep 17 00:00:00 2001
 From: "Mingde (Matthew) Zeng" <matthewzmd@gmail.com>
 Date: Wed, 29 Jul 2020 08:47:09 -0400
 Subject: [PATCH] Remove OOM tests from runtest/mm
@@ -14,10 +14,10 @@ Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
  1 file changed, 6 deletions(-)
 
 diff --git a/runtest/mm b/runtest/mm
-index d859b331c..3c2962f44 100644
+index 6a8cd0b9d..8ce3f4416 100644
 --- a/runtest/mm
 +++ b/runtest/mm
-@@ -74,12 +74,6 @@ ksm07 ksm07
+@@ -76,12 +76,6 @@ ksm07 ksm07
  
  cpuset01 cpuset01
  
@@ -30,6 +30,3 @@ index d859b331c..3c2962f44 100644
  swapping01 swapping01 -i 5
  
  thp01 thp01 -I 120
--- 
-2.43.0
-

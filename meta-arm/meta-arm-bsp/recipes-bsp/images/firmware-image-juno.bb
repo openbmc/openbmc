@@ -14,7 +14,7 @@ COMPATIBLE_MACHINE = "juno"
 
 LINARO_RELEASE = "19.06"
 
-SRC_URI = "http://releases.linaro.org/members/arm/platforms/${LINARO_RELEASE}/juno-latest-oe-uboot.zip;subdir=${UNPACK_DIR} \
+SRC_URI = "http://releases.linaro.org/members/arm/platforms/${LINARO_RELEASE}/juno-latest-oe-uboot.zip;subdir=${S} \
     file://images-r0.txt \
     file://images-r1.txt \
     file://images-r2.txt \
@@ -23,7 +23,8 @@ SRC_URI = "http://releases.linaro.org/members/arm/platforms/${LINARO_RELEASE}/ju
 SRC_URI[md5sum] = "01b662b81fa409d55ff298238ad24003"
 SRC_URI[sha256sum] = "b8a3909bb3bc4350a8771b863193a3e33b358e2a727624a77c9ecf13516cec82"
 
-UNPACK_DIR = "juno-firmware-${LINARO_RELEASE}"
+FIRMWARE_DIR = "juno-firmware-${LINARO_RELEASE}"
+S = "${UNPACKDIR}/${FIRMWARE_DIR}"
 
 inherit deploy nopackages
 
@@ -33,23 +34,23 @@ do_compile[noexec] = "1"
 # The ${D} is used as a temporary directory and we don't generate any
 # packages for this recipe.
 do_install() {
-    cp -a ${WORKDIR}/${UNPACK_DIR} ${D}
+    cp -a ${S} ${D}/
     cp -f ${RECIPE_SYSROOT}/firmware/bl1-juno.bin \
-        ${D}/${UNPACK_DIR}/SOFTWARE/bl1.bin
+        ${D}/${FIRMWARE_DIR}/SOFTWARE/bl1.bin
 
     cp -f ${RECIPE_SYSROOT}/firmware/fip-juno.bin \
-        ${D}/${UNPACK_DIR}/SOFTWARE/fip.bin
+        ${D}/${FIRMWARE_DIR}/SOFTWARE/fip.bin
 
     cp -f ${RECIPE_SYSROOT}/firmware/scp_romfw_bypass.bin \
-        ${D}/${UNPACK_DIR}/SOFTWARE/scp_bl1.bin
+        ${D}/${FIRMWARE_DIR}/SOFTWARE/scp_bl1.bin
 
     # u-boot environment file
-    cp -f ${WORKDIR}/uEnv.txt ${D}/${UNPACK_DIR}/SOFTWARE/
+    cp -f ${UNPACKDIR}/uEnv.txt ${D}/${FIRMWARE_DIR}/SOFTWARE/
 
     # Juno images list file
-    cp -f ${WORKDIR}/images-r0.txt ${D}/${UNPACK_DIR}/SITE1/HBI0262B/images.txt
-    cp -f ${WORKDIR}/images-r1.txt ${D}/${UNPACK_DIR}/SITE1/HBI0262C/images.txt
-    cp -f ${WORKDIR}/images-r2.txt ${D}/${UNPACK_DIR}/SITE1/HBI0262D/images.txt
+    cp -f ${UNPACKDIR}/images-r0.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262B/images.txt
+    cp -f ${UNPACKDIR}/images-r1.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262C/images.txt
+    cp -f ${UNPACKDIR}/images-r2.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262D/images.txt
 }
 
 do_deploy() {
@@ -59,18 +60,18 @@ do_deploy() {
     # task.
     for f in ${KERNEL_DEVICETREE}; do
         install -m 755 -c ${DEPLOY_DIR_IMAGE}/$(basename $f) \
-            ${D}/${UNPACK_DIR}/SOFTWARE/.
+            ${D}/${FIRMWARE_DIR}/SOFTWARE/
     done
 
     if [ "${INITRAMFS_IMAGE_BUNDLE}" -eq 1 ]; then
         cp -L -f ${DEPLOY_DIR_IMAGE}/Image.gz-initramfs-juno.bin \
-            ${D}/${UNPACK_DIR}/SOFTWARE/Image
+            ${D}/${FIRMWARE_DIR}/SOFTWARE/Image
     else
-        cp -L -f ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ${D}/${UNPACK_DIR}/SOFTWARE/
+        cp -L -f ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ${D}/${FIRMWARE_DIR}/SOFTWARE/
     fi
 
     # Compress the files
-    tar -C ${D}/${UNPACK_DIR} -zcvf ${WORKDIR}/${PN}.tar.gz ./
+    tar -C ${D}/${FIRMWARE_DIR} -zcvf ${WORKDIR}/${PN}.tar.gz ./
 
     # Deploy the compressed archive to the deploy folder
     install -D -p -m0644 ${WORKDIR}/${PN}.tar.gz ${DEPLOYDIR}/${PN}.tar.gz

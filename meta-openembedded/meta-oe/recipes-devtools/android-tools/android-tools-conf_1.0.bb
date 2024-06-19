@@ -9,7 +9,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/android-gadget-setup ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/android-gadget-setup ${D}${bindir}
 }
 
 python () {

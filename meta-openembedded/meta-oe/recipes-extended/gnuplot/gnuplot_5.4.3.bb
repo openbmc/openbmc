@@ -50,14 +50,14 @@ EXTRA_OECONF = " \
 "
 
 do_compile:prepend() {
-    install -m 0644 ${WORKDIR}/qtplot-0.2/qtopia.trm ${S}/term/
+    install -m 0644 ${UNPACKDIR}/qtplot-0.2/qtopia.trm ${S}/term/
 }
 
 do_install:append:class-target() {
     install -d ${D}${datadir}/applications/
-    install -m 0644 ${WORKDIR}/gnuplot.desktop ${D}${datadir}/applications/
+    install -m 0644 ${UNPACKDIR}/gnuplot.desktop ${D}${datadir}/applications/
     install -d ${D}${datadir}/pixmaps/
-    install -m 0644 ${WORKDIR}/gnuplot.png ${D}${datadir}/pixmaps/
+    install -m 0644 ${UNPACKDIR}/gnuplot.png ${D}${datadir}/pixmaps/
 }
 
 PACKAGES =+ "${PN}-x11"

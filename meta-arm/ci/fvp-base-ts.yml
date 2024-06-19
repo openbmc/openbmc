@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
+header:
+  version: 14
+  includes:
+    - ci/fvp-base.yml
+    - ci/meta-openembedded.yml
+    - ci/testimage.yml
+
+local_conf_header:
+  trusted_services: |
+    # Enable the needed test suites
+    TEST_SUITES = " ping ssh trusted_services"
+    # Include all Secure Partitions into the image
+    MACHINE_FEATURES:append = " arm-ffa ts-crypto ts-storage ts-its"
+    MACHINE_FEATURES:append = " ts-attestation ts-smm-gateway optee-spmc-test"
+    MACHINE_FEATURES:append = " ts-block-storage ts-fwu"
+    # Include TS demo/test tools into image
+    IMAGE_INSTALL:append = " packagegroup-ts-tests"
+    # Include TS PSA Arch tests into image
+    IMAGE_INSTALL:append = " packagegroup-ts-tests-psa"
+    CORE_IMAGE_EXTRA_INSTALL += "optee-test"
+    # Set the TS environment
+    TS_ENV="sp"
+    # Enable and configure semihosting
+    FVP_CONFIG[cluster0.cpu0.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[cluster0.cpu1.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[cluster0.cpu2.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[cluster0.cpu3.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[cluster1.cpu0.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[cluster1.cpu1.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[cluster1.cpu2.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[cluster1.cpu3.semihosting-cwd] = "${DEPLOY_DIR_IMAGE}"
+    FVP_CONFIG[semihosting-enable] = "True"

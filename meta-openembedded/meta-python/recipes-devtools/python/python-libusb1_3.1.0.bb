@@ -1,6 +1,5 @@
 SUMMARY = "Pure-python wrapper for libusb-1.0"
 HOMEPAGE = "http://github.com/vpelletier/python-libusb1"
-AUTHOR = "Vincent Pelletier <plr.vincent@gmail.com>"
 LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=751419260aa954499f7abaabaa882bbe \

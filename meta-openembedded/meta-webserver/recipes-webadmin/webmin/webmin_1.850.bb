@@ -82,7 +82,7 @@ do_install() {
     install -m 0755 webmin-init ${D}${sysconfdir}/init.d/webmin
 
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/webmin.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/webmin.service ${D}${systemd_unitdir}/system
     sed -i -e 's,@SYSCONFDIR@,${sysconfdir},g' \
            ${D}${systemd_unitdir}/system/webmin.service
 
@@ -117,7 +117,7 @@ do_install() {
     export atboot=1
     export no_pam=1
     mkdir -p $tempdir
-    ${S}/../setup.sh
+    ${UNPACKDIR}/setup.sh
 
     # Ensure correct PERLLIB path
     sed -i -e 's#${D}##g' ${D}${sysconfdir}/webmin/start

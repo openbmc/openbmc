@@ -1681,6 +1681,12 @@ system and gives an overview of their function and contents.
    :term:`CVE_CHECK_IGNORE`
       This variable is deprecated and should be replaced by :term:`CVE_STATUS`.
 
+   :term:`CVE_CHECK_REPORT_PATCHED`
+      Specifies whether or not the :ref:`ref-classes-cve-check`
+      class should report patched or ignored CVEs. The default is "1", but you
+      may wish to set it to "0" if you do not need patched or ignored CVEs in
+      the logs.
+
    :term:`CVE_CHECK_SHOW_WARNINGS`
       Specifies whether or not the :ref:`ref-classes-cve-check`
       class should generate warning messages on the console when unpatched
@@ -5585,6 +5591,21 @@ system and gives an overview of their function and contents.
 
          NON_MULTILIB_RECIPES = "grub grub-efi make-mod-scripts ovmf u-boot"
 
+   :term:`NVDCVE_API_KEY`
+      The NVD API key used to retrieve data from the CVE database when
+      using :ref:`ref-classes-cve-check`.
+
+      By default, no API key is used, which results in larger delays between API
+      requests and limits the number of queries to the public rate limits posted
+      at the `NVD developer's page <https://nvd.nist.gov/developers/start-here>`__.
+      
+      NVD API keys can be requested through the
+      `Request an API Key <https://nvd.nist.gov/developers/request-an-api-key>`__
+      page. You can set this variable to the NVD API key in your ``local.conf`` file.
+      Example::
+
+          NVDCVE_API_KEY = "fe753&7a2-1427-347d-23ff-b2e2b7ca5f3"
+
    :term:`OBJCOPY`
       The minimal command and arguments to run ``objcopy``.
 
@@ -6829,6 +6850,19 @@ system and gives an overview of their function and contents.
       explicitly if that will not match the package name (e.g. where the
       package name has a prefix, underscores, uppercase letters etc.)
 
+   :term:`PYPI_PACKAGE_EXT`
+      When inheriting the :ref:`ref-classes-pypi` class, specifies the
+      file extension to use when fetching a package from `PyPI
+      <https://pypi.org/>`__. Default is ``tar.gz``.
+
+   :term:`PYPI_SRC_URI`
+      When inheriting the :ref:`ref-classes-pypi` class, specifies the
+      full `pythonhosted <https://files.pythonhosted.org/>`__ URI for
+      fetching the package to be built. The default value is constructed
+      based upon :term:`PYPI_PACKAGE`, :term:`PYPI_PACKAGE_EXT`, and
+      :term:`PV`. Most recipes will not need to set this variable unless
+      they are building an unstable (i.e. development) version.
+
    :term:`PYTHON_ABI`
       When used by recipes that inherit the :ref:`ref-classes-setuptools3`
       class, denotes the Application Binary Interface (ABI) currently in use
@@ -7051,6 +7085,13 @@ system and gives an overview of their function and contents.
 
       The default value is ``"${WORKDIR}/recipe-sysroot-native"``.
       Do not modify it.
+
+   :term:`RECIPE_UPDATE_EXTRA_TASKS`
+      For some recipes, after the new source has been unpacked, additional tasks
+      may need to be run during an upgrade. A good example of this is recipes
+      which inherit :ref:`ref-classes-cargo-update-recipe-crates`, where the
+      `do_update_crates` task needs to be run whenever Cargo.toml/Cargo.lock have
+      changed in the source.
 
    :term:`REPODIR`
       See :term:`bitbake:REPODIR` in the BitBake manual.
@@ -9670,6 +9711,11 @@ system and gives an overview of their function and contents.
       :ref:`ref-classes-insane` class and is only enabled if the
       recipe inherits the :ref:`ref-classes-autotools` class.
 
+   :term:`UNPACKDIR`
+      This variable, used by the :ref:`ref-classes-base` class,
+      specifies where fetches sources should be unpacked by the
+      :ref:`ref-tasks-unpack` task.
+
    :term:`UPDATERCPN`
       For recipes inheriting the
       :ref:`ref-classes-update-rc.d` class, :term:`UPDATERCPN`
@@ -9770,6 +9816,12 @@ system and gives an overview of their function and contents.
       For more information, see
       ``meta-poky/conf/templates/default/local.conf.sample`` in the
       :term:`Source Directory`.
+
+   :term:`USERADD_DEPENDS`
+      Specifies a list of recipes that create users / groups (via
+      :term:`USERADD_PARAM` / :term:`GROUPADD_PARAM`) which a recipe
+      depends upon. This ensures that those users / groups are available
+      when building a recipe.
 
    :term:`USERADD_ERROR_DYNAMIC`
       If set to ``error``, forces the OpenEmbedded build system to produce

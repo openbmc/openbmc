@@ -97,18 +97,18 @@ do_install () {
 
 	sed -e \
 		's:#PSPLASH_TEXT#:${@bb.utils.contains("PACKAGECONFIG","psplash-text-updates","yes","no", d)}:g' \
-		${WORKDIR}/rcS-default > ${D}${sysconfdir}/default/rcS
+		${UNPACKDIR}/rcS-default > ${D}${sysconfdir}/default/rcS
 	chmod 0644 ${D}${sysconfdir}/default/rcS
-	install -m 0755    ${WORKDIR}/rc		${D}${sysconfdir}/init.d
-	install -m 0755    ${WORKDIR}/rcS		${D}${sysconfdir}/init.d
-	install -m 0755    ${WORKDIR}/bootlogd.init     ${D}${sysconfdir}/init.d/bootlogd
+	install -m 0755    ${UNPACKDIR}/rc		${D}${sysconfdir}/init.d
+	install -m 0755    ${UNPACKDIR}/rcS		${D}${sysconfdir}/init.d
+	install -m 0755    ${UNPACKDIR}/bootlogd.init     ${D}${sysconfdir}/init.d/bootlogd
 	ln -sf bootlogd ${D}${sysconfdir}/init.d/stop-bootlogd
 
 	update-rc.d -r ${D} bootlogd start 07 S .
 	update-rc.d -r ${D} stop-bootlogd start 99 2 3 4 5 .
 
 	install -d ${D}${sysconfdir}/default/volatiles
-	install -m 0644 ${WORKDIR}/01_bootlogd ${D}${sysconfdir}/default/volatiles
+	install -m 0644 ${UNPACKDIR}/01_bootlogd ${D}${sysconfdir}/default/volatiles
 
 	chown root:shutdown ${D}${base_sbindir}/halt ${D}${base_sbindir}/shutdown
 	chmod o-x,u+s ${D}${base_sbindir}/halt ${D}${base_sbindir}/shutdown

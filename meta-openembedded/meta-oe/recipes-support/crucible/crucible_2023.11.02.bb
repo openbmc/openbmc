@@ -3,7 +3,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=201414b6610203caed355323b1ab3116"
 
 GO_IMPORT = "github.com/usbarmory/crucible"
-SRC_URI = "git://${GO_IMPORT}.git;protocol=https;branch=master"
+SRC_URI = "git://${GO_IMPORT}.git;protocol=https;branch=master;destsuffix=${GO_SRCURI_DESTSUFFIX}"
 
 GO_INSTALL = "\
     ${GO_IMPORT}/cmd/crucible \

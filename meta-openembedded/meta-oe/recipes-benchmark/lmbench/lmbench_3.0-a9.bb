@@ -75,7 +75,7 @@ do_install () {
             DESTDIR="${D}" \
             -C src install
     mv ${D}${bindir}/line ${D}${bindir}/lm_line
-    install -m 0755 ${WORKDIR}/lmbench-run ${D}${bindir}/
+    install -m 0755 ${UNPACKDIR}/lmbench-run ${D}${bindir}/
     install -m 0755 ${S}/bin/${TARGET_SYS}/cache ${D}${bindir}/
     sed -i -e 's,^SHAREDIR=.*$,SHAREDIR=${datadir}/${BPN},;' \
            -e 's,^CONFIG=.*$,CONFIG=`$SCRIPTSDIR/config`,;' \

@@ -1,0 +1,88 @@
+From ac2ff1dbe0b44953de636c50c7d7f8c1e9f1e458 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Sat, 4 May 2024 09:13:06 +0100
+Subject: [PATCH] nvme: Use C99 types for uint32_t
+
+<stdint.h> provides `uint32_t`, while `u_int_32` is an unofficial/internal
+typedef that glibc happens to provide. This fixes the build on musl.
+
+Bug: https://bugs.gentoo.org/931194
+
+Upstream-Status: Backport [https://github.com/linux-nvme/nvme-cli/commit/ac2ff1dbe0b44953de636c50c7d7f8c1e9f1e458]
+Signed-off-by: Sam James <sam@gentoo.org>
+---
+ nvme.c        | 13 +++++++------
+ util/base64.c |  5 +++--
+ 2 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/nvme.c b/nvme.c
+index 46a2399a..5409ddf2 100644
+--- a/nvme.c
++++ b/nvme.c
+@@ -34,6 +34,7 @@
+ #include <inttypes.h>
+ #include <locale.h>
+ #include <stdio.h>
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+@@ -9081,8 +9082,8 @@ static int check_dhchap_key(int argc, char **argv, struct command *command, stru
+ 
+ 	unsigned char decoded_key[128];
+ 	unsigned int decoded_len;
+-	u_int32_t crc = crc32(0L, NULL, 0);
+-	u_int32_t key_crc;
++	uint32_t crc = crc32(0L, NULL, 0);
++	uint32_t key_crc;
+ 	int err = 0, hmac;
+ 	struct config {
+ 		char	*key;
+@@ -9150,10 +9151,10 @@ static int check_dhchap_key(int argc, char **argv, struct command *command, stru
+ 		return -EINVAL;
+ 	}
+ 	crc = crc32(crc, decoded_key, decoded_len);
+-	key_crc = ((u_int32_t)decoded_key[decoded_len]) |
+-		   ((u_int32_t)decoded_key[decoded_len + 1] << 8) |
+-		   ((u_int32_t)decoded_key[decoded_len + 2] << 16) |
+-		   ((u_int32_t)decoded_key[decoded_len + 3] << 24);
++	key_crc = ((uint32_t)decoded_key[decoded_len]) |
++		   ((uint32_t)decoded_key[decoded_len + 1] << 8) |
++		   ((uint32_t)decoded_key[decoded_len + 2] << 16) |
++		   ((uint32_t)decoded_key[decoded_len + 3] << 24);
+ 	if (key_crc != crc) {
+ 		nvme_show_error("CRC mismatch (key %08x, crc %08x)", key_crc, crc);
+ 		return -EINVAL;
+diff --git a/util/base64.c b/util/base64.c
+index 7f47cda6..0e89f2e9 100644
+--- a/util/base64.c
++++ b/util/base64.c
+@@ -20,6 +20,7 @@
+  * MA  02110-1301, USA.
+  */
+ 
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <errno.h>
+@@ -42,7 +43,7 @@ static const char base64_table[65] =
+ int base64_encode(const unsigned char *src, int srclen, char *dst)
+ {
+ 	int i, bits = 0;
+-	u_int32_t ac = 0;
++	uint32_t ac = 0;
+ 	char *cp = dst;
+ 
+ 	for (i = 0; i < srclen; i++) {
+@@ -77,7 +78,7 @@ int base64_encode(const unsigned char *src, int srclen, char *dst)
+  */
+ int base64_decode(const char *src, int srclen, unsigned char *dst)
+ {
+-	u_int32_t ac = 0;
++	uint32_t ac = 0;
+ 	int i, bits = 0;
+ 	unsigned char *bp = dst;
+ 
+-- 
+2.45.1
+

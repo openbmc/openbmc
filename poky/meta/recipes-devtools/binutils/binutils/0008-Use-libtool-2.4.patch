@@ -19543,18 +19543,6 @@ index 3701bd8e796..9e36ae7c51c 100755
    # FIXME: first we should search . and the directory the executable is in
    shlibpath_var=PATH
    ;;
-@@ -13596,7 +14245,11 @@ else
-   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
-   lt_status=$lt_dlunknown
-   cat > conftest.$ac_ext <<_LT_EOF
-+<<<<<<< HEAD
- #line 13599 "configure"
-+=======
-+#line $LINENO "configure"
-+>>>>>>> b932158cf4c (Use libtool 2.4)
- #include "confdefs.h"
- 
- #if HAVE_DLFCN_H
 @@ -13640,10 +14293,10 @@ else
  /* When -fvisbility=hidden is used, assume the code has been annotated
     correspondingly for the symbols needed.  */
@@ -19568,18 +19556,6 @@ index 3701bd8e796..9e36ae7c51c 100755
  int main ()
  {
    void *self = dlopen (0, LT_DLGLOBAL|LT_DLLAZY_OR_NOW);
-@@ -13702,7 +14355,11 @@ else
-   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
-   lt_status=$lt_dlunknown
-   cat > conftest.$ac_ext <<_LT_EOF
-+<<<<<<< HEAD
- #line 13705 "configure"
-+=======
-+#line $LINENO "configure"
-+>>>>>>> b932158cf4c (Use libtool 2.4)
- #include "confdefs.h"
- 
- #if HAVE_DLFCN_H
 @@ -13746,10 +14403,10 @@ else
  /* When -fvisbility=hidden is used, assume the code has been annotated
     correspondingly for the symbols needed.  */

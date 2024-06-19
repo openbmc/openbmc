@@ -2,6 +2,7 @@ GCCMULTILIB = "--enable-multilib"
 require gcc-configure-common.inc
 
 EXTRA_OECONF_PATHS = "\
+    --with-gxx-libcxx-include-dir=${target_includedir}/c++/v1 \
     --with-build-sysroot=${STAGING_DIR_TARGET} \
 "
 
@@ -32,8 +33,7 @@ PACKAGES = "\
     ${PN} ${PN}-plugins ${PN}-symlinks \
     g++ g++-symlinks \
     cpp cpp-symlinks \
-    g77 g77-symlinks \
-    gfortran gfortran-symlinks \
+    ${@bb.utils.contains('FORTRAN', ',fortran', 'gfortran gfortran-symlinks', '', d)} \
     gcov gcov-symlinks \
     ${PN}-doc \
     ${PN}-dev \
@@ -60,7 +60,7 @@ RRECOMMENDS:${PN} += "\
     libssp \
     libssp-dev \
 "
-RDEPENDS:${PN} += "cpp"
+RDEPENDS:${PN} += "binutils cpp"
 
 FILES:${PN}-dev = "\
     ${gcclibdir}/${TARGET_SYS}/${BINV}/lib*${SOLIBSDEV} \
@@ -80,22 +80,14 @@ FILES:${PN}-plugins = "\
 "
 ALLOW_EMPTY:${PN}-plugins = "1"
 
-FILES:g77 = "\
-    ${bindir}/${TARGET_PREFIX}g77 \
-    ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/f771 \
-"
-FILES:g77-symlinks = "\
-    ${bindir}/g77 \
-    ${bindir}/f77 \
-"
-RRECOMMENDS:g77 = "\
-    libg2c \
-    libg2c-dev \
-"
-
+INSANE_SKIP:${MLPREFIX}gfortran += "dev-deps"
 FILES:gfortran = "\
     ${bindir}/${TARGET_PREFIX}gfortran \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/f951 \
+"
+RDEPENDS:gfortran = "\
+    gcc \
+    libgfortran-dev \
 "
 RRECOMMENDS:gfortran = "\
     libquadmath \
@@ -197,11 +189,6 @@ do_install () {
 	# Not sure why we end up with these but we don't want them...
 	rm -f ${TARGET_PREFIX}${TARGET_PREFIX}*
 
-	# Symlinks so we can use these trivially on the target
-	if [ -e ${TARGET_PREFIX}g77 ]; then
-		ln -sf ${TARGET_PREFIX}g77 g77 || true
-		ln -sf g77 f77 || true
-	fi
 	if [ -e ${TARGET_PREFIX}gfortran ]; then
 		ln -sf ${TARGET_PREFIX}gfortran gfortran || true
 		ln -sf gfortran f95 || true

@@ -4,7 +4,7 @@ APIs to netlink protocol based Linux kernel interfaces. libnl is the core \
 library implementing the fundamentals required to use the netlink protocol \
 such as socket handling, message construction and parsing, and sending \
 and receiving of data."
-HOMEPAGE = "http://www.infradead.org/~tgr/libnl/"
+HOMEPAGE = "https://github.com/thom311/libnl"
 SECTION = "libs/network"
 
 PE = "1"

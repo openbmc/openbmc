@@ -10,7 +10,7 @@ SRC_URI = "file://50-org.freedesktop.udiskie.rules"
 RDEPENDS:${PN} += "udisks2"
 
 do_install() {
-    install -m 0755 ${WORKDIR}/50-org.freedesktop.udiskie.rules ${D}${sysconfdir}/polkit-1/rules.d
+    install -m 0755 ${UNPACKDIR}/50-org.freedesktop.udiskie.rules ${D}${sysconfdir}/polkit-1/rules.d
 }
 
 USERADD_PACKAGES = "${PN}"

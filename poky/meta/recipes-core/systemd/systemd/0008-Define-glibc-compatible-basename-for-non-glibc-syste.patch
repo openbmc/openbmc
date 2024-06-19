@@ -1,8 +1,7 @@
-From bab07e779ff23d5593bb118efaaa31b60a6dce87 Mon Sep 17 00:00:00 2001
+From d98f6bd4d8acdc4c1a5bff4c699f5004a6ebccce Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 27 May 2018 08:36:44 -0700
-Subject: [PATCH 08/22] Define glibc compatible basename() for non-glibc
- systems
+Subject: [PATCH] Define glibc compatible basename() for non-glibc systems
 
 Fixes builds with musl, even though systemd is adamant about
 using non-posix basename implementation, we have a way out
@@ -29,6 +28,3 @@ index b6d8be3083..0a29036c4c 100644
  static inline char* strstr_ptr(const char *haystack, const char *needle) {
          if (!haystack || !needle)
                  return NULL;
--- 
-2.34.1
-

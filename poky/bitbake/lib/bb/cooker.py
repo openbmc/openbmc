@@ -315,13 +315,13 @@ class BBCooker:
                 dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
                 upstream = self.data.getVar("BB_HASHSERVE_UPSTREAM") or None
                 if upstream:
-                    import socket
                     try:
-                        sock = socket.create_connection(upstream.split(":"), 5)
-                        sock.close()
-                    except socket.error as e:
+                        with hashserv.create_client(upstream) as client:
+                            client.ping()
+                    except (ConnectionError, ImportError) as e:
                         bb.warn("BB_HASHSERVE_UPSTREAM is not valid, unable to connect hash equivalence server at '%s': %s"
                                  % (upstream, repr(e)))
+                        upstream = None
 
                 self.hashservaddr = "unix://%s/hashserve.sock" % self.data.getVar("TOPDIR")
                 self.hashserv = hashserv.create_server(
@@ -680,14 +680,14 @@ class BBCooker:
         bb.event.fire(bb.event.TreeDataPreparationCompleted(len(fulltargetlist)), self.data)
         return taskdata, runlist
 
-    def prepareTreeData(self, pkgs_to_build, task):
+    def prepareTreeData(self, pkgs_to_build, task, halt=False):
         """
         Prepare a runqueue and taskdata object for iteration over pkgs_to_build
         """
 
         # We set halt to False here to prevent unbuildable targets raising
         # an exception when we're just generating data
-        taskdata, runlist = self.buildTaskData(pkgs_to_build, task, False, allowincomplete=True)
+        taskdata, runlist = self.buildTaskData(pkgs_to_build, task, halt, allowincomplete=True)
 
         return runlist, taskdata
 
@@ -701,7 +701,7 @@ class BBCooker:
         if not task.startswith("do_"):
             task = "do_%s" % task
 
-        runlist, taskdata = self.prepareTreeData(pkgs_to_build, task)
+        runlist, taskdata = self.prepareTreeData(pkgs_to_build, task, halt=True)
         rq = bb.runqueue.RunQueue(self, self.data, self.recipecaches, taskdata, runlist)
         rq.rqdata.prepare()
         return self.buildDependTree(rq, taskdata)
@@ -1459,7 +1459,6 @@ class BBCooker:
 
                     if t in task or getAllTaskSignatures:
                         try:
-                            rq.rqdata.prepare_task_hash(tid)
                             sig.append([pn, t, rq.rqdata.get_task_unihash(tid)])
                         except KeyError:
                             sig.append(self.getTaskSignatures(target, [t])[0])
@@ -1813,8 +1812,8 @@ class CookerCollectFiles(object):
             bb.event.fire(CookerExit(), eventdata)
 
         # We need to track where we look so that we can know when the cache is invalid. There
-        # is no nice way to do this, this is horrid. We intercept the os.listdir()
-        # (or os.scandir() for python 3.6+) calls while we run glob().
+        # is no nice way to do this, this is horrid. We intercept the os.listdir() and os.scandir()
+        # calls while we run glob().
         origlistdir = os.listdir
         if hasattr(os, 'scandir'):
             origscandir = os.scandir
@@ -2225,9 +2224,8 @@ class CookerParser(object):
 
         for process in self.processes:
             process.join()
-            # Added in 3.7, cleans up zombies
-            if hasattr(process, "close"):
-                process.close()
+            # clean up zombies
+            process.close()
 
         bb.codeparser.parser_cache_save()
         bb.codeparser.parser_cache_savemerge()
@@ -2237,12 +2235,13 @@ class CookerParser(object):
             profiles = []
             for i in self.process_names:
                 logfile = "profile-parse-%s.log" % i
-                if os.path.exists(logfile):
+                if os.path.exists(logfile) and os.path.getsize(logfile):
                     profiles.append(logfile)
 
-            pout = "profile-parse.log.processed"
-            bb.utils.process_profilelog(profiles, pout = pout)
-            print("Processed parsing statistics saved to %s" % (pout))
+            if profiles:
+                pout = "profile-parse.log.processed"
+                bb.utils.process_profilelog(profiles, pout = pout)
+                print("Processed parsing statistics saved to %s" % (pout))
 
     def final_cleanup(self):
         if self.syncthread:

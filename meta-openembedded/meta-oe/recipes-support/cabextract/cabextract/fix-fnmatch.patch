@@ -1,0 +1,40 @@
+From - Mon Jun 11 00:00:00 2024
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Subject: [PATCH] Don't play with fnmatch.c replacement
+
+Currently fnmatch.c, even if it is selected, conditionally disables compilation
+of fnmatch() funciton even though the rest of the code expects to get it (e.g.
+because Autoconf didn't detect the working implementation and enabled fnmatch.c
+to replace it). Drop the extra conditionals, to fix Autoconf magic.
+
+Observed error:
+
+ld: src/cabextract.o: in function `process_cabinet':
+/usr/src/debug/cabextract/1.11/src/cabextract.c:499:(.text.startup+0xf1c): undefined reference to `rpl_fnmatch'
+collect2: error: ld returned 1 exit status
+
+Upstream-Status: Submitted [https://github.com/kyz/libmspack/pull/51]
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+
+Index: cabextract-1.11/fnmatch.c
+===================================================================
+--- cabextract-1.11.orig/fnmatch.c
++++ cabextract-1.11/fnmatch.c
+@@ -49,11 +49,6 @@ static const char rcsid[] =
+    it is simpler to just do this in the source for each such file.
+ */
+ 
+-#if defined (_LIBC) || !defined (__GNU_LIBRARY__)
+-
+-#if !defined(__GNU_LIBRARY__) && !defined(STDC_HEADERS)
+-#endif
+-
+ /* Match STRING against the filename pattern PATTERN, returning zero if
+    it matches, nonzero if not.  */
+ int
+@@ -216,5 +211,3 @@ int         flags;
+ 
+         return FNM_NOMATCH;
+ }
+-
+-#endif /* _LIBC or not __GNU_LIBRARY__.  */

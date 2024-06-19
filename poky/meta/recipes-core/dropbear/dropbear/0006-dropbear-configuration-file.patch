@@ -1,4 +1,4 @@
-From e3a5db1b6d3f6382a15b2266458c26c645a10f18 Mon Sep 17 00:00:00 2001
+From 16b147f97f0938cddb55ec1c90bc919c13f26fc0 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <Mingli.Yu@windriver.com>
 Date: Thu, 6 Sep 2018 15:54:00 +0800
 Subject: [PATCH] dropbear configuration file
@@ -12,14 +12,14 @@ Signed-off-by: Maxin B. John <maxin.john@enea.com>
 Signed-off-by: Xiaofeng Yan <xiaofeng.yan@windriver.com>
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 ---
- svr-authpam.c | 2 +-
+ src/svr-authpam.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/svr-authpam.c b/svr-authpam.c
-index d201bc9..165ec5c 100644
---- a/svr-authpam.c
-+++ b/svr-authpam.c
-@@ -223,7 +223,7 @@ void svr_auth_pam(int valid_user) {
+diff --git a/src/svr-authpam.c b/src/svr-authpam.c
+index ec14632..026102f 100644
+--- a/src/svr-authpam.c
++++ b/src/svr-authpam.c
+@@ -224,7 +224,7 @@ void svr_auth_pam(int valid_user) {
  	}
  
  	/* Init pam */
@@ -28,6 +28,3 @@ index d201bc9..165ec5c 100644
  		dropbear_log(LOG_WARNING, "pam_start() failed, rc=%d, %s", 
  				rc, pam_strerror(pamHandlep, rc));
  		goto cleanup;
--- 
-2.7.4
-

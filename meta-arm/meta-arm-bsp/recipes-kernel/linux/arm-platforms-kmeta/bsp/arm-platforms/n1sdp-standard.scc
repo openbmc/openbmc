@@ -1,5 +1,0 @@
-define KMACHINE n1sdp
-define KTYPE standard
-define KARCH arm64
-
-include ktypes/standard/standard.scc

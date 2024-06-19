@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1978dbc41673ab1c20e64b287c8317bc"
 
 SRC_URI = "git://github.com/obgm/libcoap.git;branch=main;protocol=https \
            file://run-ptest \
+           file://CVE-2024-0962.patch \
            "
 SRCREV = "5fd2f89ef068214130e5d60b7087ef48711fa615"
 
@@ -50,7 +51,7 @@ do_compile:prepend() {
 
 do_install_ptest () {
 	install -d ${D}${PTEST_PATH}
-	install -m 0755 ${WORKDIR}/run-ptest ${D}${PTEST_PATH}/run-ptest
+	install -m 0755 ${UNPACKDIR}/run-ptest ${D}${PTEST_PATH}/run-ptest
 	install -m 0755 ${B}/tests/testdriver ${D}${PTEST_PATH}/testdriver
 }
 

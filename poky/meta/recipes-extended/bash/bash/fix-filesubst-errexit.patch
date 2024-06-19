@@ -1,0 +1,34 @@
+From 59ddfda14e3c9aa6286bb4c4c0748f7c1324a65a Mon Sep 17 00:00:00 2001
+From: Chet Ramey <chet.ramey@case.edu>
+Date: Fri, 7 Apr 2023 00:28:46 -0700
+Subject: [PATCH] $(<nosuchfile) is no longer a fatal error with errexit
+ enabled
+
+This is a trimmed-down version of a commit in the bash 'devel' branch
+[1] that contains this fix as well as other unrelated ones.
+
+[1] https://git.savannah.gnu.org/cgit/bash.git/commit/?h=devel&id=ec9447ce9392a0f93d96789c3741285fede8a150
+
+Upstream-Status: Backport
+
+Signed-off-by: Zev Weiss <zev@bewilderbeest.net>
+---
+ builtins/evalstring.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/builtins/evalstring.c b/builtins/evalstring.c
+index df3dd68e2a7e..6612081cd646 100644
+--- a/builtins/evalstring.c
++++ b/builtins/evalstring.c
+@@ -753,7 +753,7 @@ open_redir_file (r, fnp)
+   fd = open(fn, O_RDONLY);
+   if (fd < 0)
+     {
+-      file_error (fn);
++      internal_error ("%s: %s", fn, strerror (errno));
+       free (fn);
+       if (fnp)
+ 	*fnp = 0;
+-- 
+2.40.0
+

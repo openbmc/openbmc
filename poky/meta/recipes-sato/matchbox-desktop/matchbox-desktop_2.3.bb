@@ -27,7 +27,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 do_install:append() {
     install -d ${D}${datadir}/matchbox/vfolders/
-    install -m 0644 ${WORKDIR}/vfolders/* ${D}${datadir}/matchbox/vfolders/
+    install -m 0644 ${UNPACKDIR}/vfolders/* ${D}${datadir}/matchbox/vfolders/
 }
 
 FILES:${PN} += "${datadir}/matchbox/vfolders/"

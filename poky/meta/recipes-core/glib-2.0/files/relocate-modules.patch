@@ -1,0 +1,44 @@
+From 0133aeabd37a9137722abd86039d7d0797b5896f Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Fri, 11 Mar 2016 15:35:55 +0000
+Subject: [PATCH] glib-2.0: relocate the GIO module directory for native builds
+
+Instead of hard-coding GIO_MODULE_PATH when glib is built, use dladdr() to
+determine where libglib.so is and use that path to calculate GIO_MODULES_DIR.
+
+This solves relocation problems with GIOModule for native builds of glib.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+Port patch to 2.48
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+---
+ gio/giomodule.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/gio/giomodule.c b/gio/giomodule.c
+index 1e14955..3c09bb5 100644
+--- a/gio/giomodule.c
++++ b/gio/giomodule.c
+@@ -1259,11 +1259,6 @@ get_gio_module_dir (void)
+       g_free (install_dir);
+ #else
+       module_dir = g_strdup (GIO_MODULE_DIR);
+-#ifdef __APPLE__
+-#include "TargetConditionals.h"
+-/* Only auto-relocate on macOS, not watchOS etc; older macOS SDKs only define TARGET_OS_MAC */
+-#if (defined (TARGET_OS_OSX) && TARGET_OS_OSX) || \
+-     (!defined (TARGET_OS_OSX) && defined (TARGET_OS_MAC) && TARGET_OS_MAC)
+ #include <dlfcn.h>
+       {
+         g_autofree gchar *path = NULL;
+@@ -1282,8 +1277,6 @@ get_gio_module_dir (void)
+               }
+           }
+       }
+-#endif
+-#endif
+ #endif
+     }
+ 

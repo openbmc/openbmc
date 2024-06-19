@@ -8,7 +8,6 @@
 from . import create_server, create_client
 from .server import DEFAULT_ANON_PERMS, ALL_PERMISSIONS
 from bb.asyncrpc import InvokeError
-from .client import ClientPool
 import hashlib
 import logging
 import multiprocessing
@@ -94,9 +93,6 @@ class HashEquivalenceTestSetup(object):
         return self.start_client(self.auth_server_address, user["username"], user["token"])
 
     def setUp(self):
-        if sys.version_info < (3, 5, 0):
-            self.skipTest('Python 3.5 or later required')
-
         self.temp_dir = tempfile.TemporaryDirectory(prefix='bb-hashserv')
         self.addCleanup(self.temp_dir.cleanup)
 
@@ -555,8 +551,7 @@ class HashEquivalenceCommonTests(object):
         # shares a taskhash with Task 2
         self.assertClientGetHash(self.client, taskhash2, unihash2)
 
-
-    def test_client_pool_get_unihashes(self):
+    def test_get_unihash_batch(self):
         TEST_INPUT = (
             # taskhash                                   outhash                                                            unihash
             ('8aa96fcffb5831b3c2c0cb75f0431e3f8b20554a', 'afe240a439959ce86f5e322f8c208e1fedefea9e813f2140c81af866cc9edf7e','218e57509998197d570e2c98512d0105985dffc9'),
@@ -573,28 +568,27 @@ class HashEquivalenceCommonTests(object):
             "6b6be7a84ab179b4240c4302518dc3f6",
         )
 
-        with ClientPool(self.server_address, 10) as client_pool:
-            for taskhash, outhash, unihash in TEST_INPUT:
-                self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
+        for taskhash, outhash, unihash in TEST_INPUT:
+            self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
 
-            query = {idx: (self.METHOD, data[0]) for idx, data in enumerate(TEST_INPUT)}
-            for idx, taskhash in enumerate(EXTRA_QUERIES):
-                query[idx + len(TEST_INPUT)] = (self.METHOD, taskhash)
 
-            result = client_pool.get_unihashes(query)
+        result = self.client.get_unihash_batch(
+            [(self.METHOD, data[0]) for data in TEST_INPUT] +
+            [(self.METHOD, e) for e in EXTRA_QUERIES]
+        )
 
-            self.assertDictEqual(result, {
-                0: "218e57509998197d570e2c98512d0105985dffc9",
-                1: "218e57509998197d570e2c98512d0105985dffc9",
-                2: "218e57509998197d570e2c98512d0105985dffc9",
-                3: "3b5d3d83f07f259e9086fcb422c855286e18a57d",
-                4: "f46d3fbb439bd9b921095da657a4de906510d2cd",
-                5: "f46d3fbb439bd9b921095da657a4de906510d2cd",
-                6: "05d2a63c81e32f0a36542ca677e8ad852365c538",
-                7: None,
-            })
+        self.assertListEqual(result, [
+            "218e57509998197d570e2c98512d0105985dffc9",
+            "218e57509998197d570e2c98512d0105985dffc9",
+            "218e57509998197d570e2c98512d0105985dffc9",
+            "3b5d3d83f07f259e9086fcb422c855286e18a57d",
+            "f46d3fbb439bd9b921095da657a4de906510d2cd",
+            "f46d3fbb439bd9b921095da657a4de906510d2cd",
+            "05d2a63c81e32f0a36542ca677e8ad852365c538",
+            None,
+        ])
 
-    def test_client_pool_unihash_exists(self):
+    def test_unihash_exists_batch(self):
         TEST_INPUT = (
             # taskhash                                   outhash                                                            unihash
             ('8aa96fcffb5831b3c2c0cb75f0431e3f8b20554a', 'afe240a439959ce86f5e322f8c208e1fedefea9e813f2140c81af866cc9edf7e','218e57509998197d570e2c98512d0105985dffc9'),
@@ -614,28 +608,24 @@ class HashEquivalenceCommonTests(object):
         result_unihashes = set()
 
 
-        with ClientPool(self.server_address, 10) as client_pool:
-            for taskhash, outhash, unihash in TEST_INPUT:
-                result = self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
-                result_unihashes.add(result["unihash"])
+        for taskhash, outhash, unihash in TEST_INPUT:
+            result = self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
+            result_unihashes.add(result["unihash"])
 
-            query = {}
-            expected = {}
+        query = []
+        expected = []
 
-            for _, _, unihash in TEST_INPUT:
-                idx = len(query)
-                query[idx] = unihash
-                expected[idx] = unihash in result_unihashes
+        for _, _, unihash in TEST_INPUT:
+            query.append(unihash)
+            expected.append(unihash in result_unihashes)
 
 
-            for unihash in EXTRA_QUERIES:
-                idx = len(query)
-                query[idx] = unihash
-                expected[idx] = False
+        for unihash in EXTRA_QUERIES:
+            query.append(unihash)
+            expected.append(False)
 
-            result = client_pool.unihashes_exist(query)
-            self.assertDictEqual(result, expected)
-
+        result = self.client.unihash_exists_batch(query)
+        self.assertListEqual(result, expected)
 
     def test_auth_read_perms(self):
         admin_client = self.start_auth_server()

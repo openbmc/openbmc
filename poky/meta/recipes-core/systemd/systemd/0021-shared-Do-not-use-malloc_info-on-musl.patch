@@ -1,7 +1,7 @@
-From 502597b9ddd6b145541b23fadca0b1d3ca9f6367 Mon Sep 17 00:00:00 2001
+From 4fe2a8b1aab7297beac50f6ce46f3df4169de218 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 2 Aug 2023 12:20:40 -0700
-Subject: [PATCH 21/22] shared: Do not use malloc_info on musl
+Subject: [PATCH] shared: Do not use malloc_info on musl
 
 Upstream-Status: Inappropriate [musl-specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
@@ -52,6 +52,3 @@ index 8e70e365dd..9e782caec9 100644
                  (void) memstream_dump(LOG_INFO, &m);
                  break;
          }
--- 
-2.34.1
-

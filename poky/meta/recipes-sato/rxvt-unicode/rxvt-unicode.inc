@@ -51,8 +51,8 @@ do_install:append () {
 	install -d ${D}/${datadir}/applications
 	install -d ${D}/${datadir}/pixmaps/
 
-	install -m 0644 ${WORKDIR}/rxvt.png ${D}/${datadir}/pixmaps
-	install -m 0644 ${WORKDIR}/rxvt.desktop ${D}/${datadir}/applications
+	install -m 0644 ${UNPACKDIR}/rxvt.png ${D}/${datadir}/pixmaps
+	install -m 0644 ${UNPACKDIR}/rxvt.desktop ${D}/${datadir}/applications
 
 	${STAGING_BINDIR_NATIVE}/tic -x ${S}/doc/etc/rxvt-unicode.terminfo -o ${D}${datadir}/terminfo || \
 	${STAGING_BINDIR_NATIVE}/tic ${S}/doc/etc/rxvt-unicode.terminfo -o ${D}${datadir}/terminfo

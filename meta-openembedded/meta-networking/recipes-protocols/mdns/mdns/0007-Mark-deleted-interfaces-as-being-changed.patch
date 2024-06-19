@@ -1,7 +1,7 @@
-From a8accffb95267490b50401c8b65ec18db57b5ef5 Mon Sep 17 00:00:00 2001
+From 3715b3f4a0ba2d2cb05e5ba617b523c759c88d4b Mon Sep 17 00:00:00 2001
 From: Nate Karstens <nate.karstens@garmin.com>
 Date: Wed, 9 Aug 2017 09:16:58 -0500
-Subject: [PATCH 7/8] Mark deleted interfaces as being changed
+Subject: [PATCH] Mark deleted interfaces as being changed
 
 Netlink notification handling ignores messages for deleted links,
 RTM_DELLINK. It does handle RTM_GETLINK. According to libnl docu-
@@ -22,11 +22,11 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  mDNSPosix/mDNSPosix.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: mDNSResponder/mDNSPosix/mDNSPosix.c
-===================================================================
---- mDNSResponder.orig/mDNSPosix/mDNSPosix.c
-+++ mDNSResponder/mDNSPosix/mDNSPosix.c
-@@ -1714,7 +1714,7 @@ mDNSlocal void          ProcessRoutingNo
+diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
+index ecd5741d038d..776531dbc8e8 100644
+--- a/mDNSPosix/mDNSPosix.c
++++ b/mDNSPosix/mDNSPosix.c
+@@ -1714,7 +1714,7 @@ mDNSlocal void          ProcessRoutingNotification(int sd, GenLinkedList *change
  #endif
  
          // Process the NetLink message

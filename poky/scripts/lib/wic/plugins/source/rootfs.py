@@ -43,7 +43,7 @@ class RootfsPlugin(SourcePlugin):
         # directory, or modify a directory outside OpenEmbedded).
         full_path = os.path.realpath(os.path.join(rootfs_dir, path))
         if not full_path.startswith(os.path.realpath(rootfs_dir)):
-            logger.error("%s: Must point inside the rootfs:" % (cmd, path))
+            logger.error("%s: Must point inside the rootfs: %s" % (cmd, path))
             sys.exit(1)
 
         return full_path

@@ -1,7 +1,7 @@
-From 87f1d38f40c5fe9cadf2b2de442473e4e5605788 Mon Sep 17 00:00:00 2001
+From 843c6c94bf6a29eaceeefafa420cd86a32e844d2 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 14:18:21 +0800
-Subject: [PATCH 03/22] src/basic/missing.h: check for missing strndupa
+Subject: [PATCH] src/basic/missing.h: check for missing strndupa
 
 include missing.h  for definition of strndupa
 
@@ -75,10 +75,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  51 files changed, 62 insertions(+)
 
 diff --git a/meson.build b/meson.build
-index 01fd3ffc19..61a872b753 100644
+index c4694a9ddc..d376b76afa 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -567,6 +567,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
+@@ -569,6 +569,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
  endforeach
  
  foreach ident : [
@@ -87,7 +87,7 @@ index 01fd3ffc19..61a872b753 100644
          ['gettid',            '''#include <sys/types.h>
                                   #include <unistd.h>'''],
 diff --git a/src/backlight/backlight.c b/src/backlight/backlight.c
-index 5ac9f904a9..99d5122dd7 100644
+index b2032adaa5..ee9201826d 100644
 --- a/src/backlight/backlight.c
 +++ b/src/backlight/backlight.c
 @@ -20,6 +20,7 @@
@@ -111,7 +111,7 @@ index 18b16ecc0e..d2be79622f 100644
  static int cg_enumerate_items(const char *controller, const char *path, FILE **ret, const char *item) {
          _cleanup_free_ char *fs = NULL;
 diff --git a/src/basic/env-util.c b/src/basic/env-util.c
-index d3bf73385f..16b17358ca 100644
+index a97651d7af..09fa601250 100644
 --- a/src/basic/env-util.c
 +++ b/src/basic/env-util.c
 @@ -19,6 +19,7 @@
@@ -123,7 +123,7 @@ index d3bf73385f..16b17358ca 100644
  /* We follow bash for the character set. Different shells have different rules. */
  #define VALID_BASH_ENV_NAME_CHARS               \
 diff --git a/src/basic/log.c b/src/basic/log.c
-index 1470611a75..9924ec2b9a 100644
+index 7a443005f6..eed69a48ee 100644
 --- a/src/basic/log.c
 +++ b/src/basic/log.c
 @@ -40,6 +40,7 @@
@@ -251,7 +251,7 @@ index f9014dc560..1d7840a5b5 100644
  static clockid_t map_clock_id(clockid_t c) {
  
 diff --git a/src/boot/bless-boot.c b/src/boot/bless-boot.c
-index 0c0b4f23c7..68fe5ca509 100644
+index 12dfdf76fa..e66332519a 100644
 --- a/src/boot/bless-boot.c
 +++ b/src/boot/bless-boot.c
 @@ -22,6 +22,7 @@
@@ -263,7 +263,7 @@ index 0c0b4f23c7..68fe5ca509 100644
  static char **arg_path = NULL;
  
 diff --git a/src/core/dbus-cgroup.c b/src/core/dbus-cgroup.c
-index 4237e694c0..05f9d9d9a9 100644
+index 8a9570fd21..ac4202e5ce 100644
 --- a/src/core/dbus-cgroup.c
 +++ b/src/core/dbus-cgroup.c
 @@ -25,6 +25,7 @@
@@ -275,7 +275,7 @@ index 4237e694c0..05f9d9d9a9 100644
  
  BUS_DEFINE_PROPERTY_GET(bus_property_get_tasks_max, "t", CGroupTasksMax, cgroup_tasks_max_resolve);
 diff --git a/src/core/dbus-execute.c b/src/core/dbus-execute.c
-index 4daa1cefd3..2c77901471 100644
+index 2d05ba7e1d..61a7de0037 100644
 --- a/src/core/dbus-execute.c
 +++ b/src/core/dbus-execute.c
 @@ -42,6 +42,7 @@
@@ -287,10 +287,10 @@ index 4daa1cefd3..2c77901471 100644
  BUS_DEFINE_PROPERTY_GET_ENUM(bus_property_get_exec_output, exec_output, ExecOutput);
  static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_exec_input, exec_input, ExecInput);
 diff --git a/src/core/dbus-util.c b/src/core/dbus-util.c
-index d680a64268..e59f48103e 100644
+index 7bb026af48..a86128e40c 100644
 --- a/src/core/dbus-util.c
 +++ b/src/core/dbus-util.c
-@@ -9,6 +9,7 @@
+@@ -10,6 +10,7 @@
  #include "unit-printf.h"
  #include "user-util.h"
  #include "unit.h"
@@ -299,7 +299,7 @@ index d680a64268..e59f48103e 100644
  int bus_property_get_triggered_unit(
                  sd_bus *bus,
 diff --git a/src/core/execute.c b/src/core/execute.c
-index ef0bf88687..bd3da0c401 100644
+index 8dbdfcf369..531bec4c92 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
 @@ -72,6 +72,7 @@
@@ -323,7 +323,7 @@ index b8e3f7aadd..8ce8ca68d8 100644
  #if HAVE_KMOD
  #include "module-util.h"
 diff --git a/src/core/service.c b/src/core/service.c
-index b9eb40c555..268fe7573b 100644
+index 42fffbbd67..80a8d05a19 100644
 --- a/src/core/service.c
 +++ b/src/core/service.c
 @@ -45,6 +45,7 @@
@@ -359,7 +359,7 @@ index 016f3baa7f..b1def81313 100644
  typedef enum MountPointFlags {
          MOUNT_NOAUTO    = 1 << 0,
 diff --git a/src/journal-remote/journal-remote-main.c b/src/journal-remote/journal-remote-main.c
-index da0f20d3ce..f22ce41908 100644
+index 2d380bc7a7..d3f5612728 100644
 --- a/src/journal-remote/journal-remote-main.c
 +++ b/src/journal-remote/journal-remote-main.c
 @@ -27,6 +27,7 @@
@@ -371,7 +371,7 @@ index da0f20d3ce..f22ce41908 100644
  #define PRIV_KEY_FILE CERTIFICATE_ROOT "/private/journal-remote.pem"
  #define CERT_FILE     CERTIFICATE_ROOT "/certs/journal-remote.pem"
 diff --git a/src/journal/journalctl.c b/src/journal/journalctl.c
-index 7f3dcd56a4..41b7cbaaf1 100644
+index 87e2f28841..58275f41f1 100644
 --- a/src/journal/journalctl.c
 +++ b/src/journal/journalctl.c
 @@ -77,6 +77,7 @@
@@ -383,7 +383,7 @@ index 7f3dcd56a4..41b7cbaaf1 100644
  #define DEFAULT_FSS_INTERVAL_USEC (15*USEC_PER_MINUTE)
  #define PROCESS_INOTIFY_INTERVAL 1024   /* Every 1,024 messages processed */
 diff --git a/src/libsystemd/sd-bus/bus-message.c b/src/libsystemd/sd-bus/bus-message.c
-index ff0228081f..9066fcb133 100644
+index ab8b06896d..43f9131205 100644
 --- a/src/libsystemd/sd-bus/bus-message.c
 +++ b/src/libsystemd/sd-bus/bus-message.c
 @@ -19,6 +19,7 @@
@@ -407,7 +407,7 @@ index c25c40ff37..57a5da704f 100644
  static int node_vtable_get_userdata(
                  sd_bus *bus,
 diff --git a/src/libsystemd/sd-bus/bus-socket.c b/src/libsystemd/sd-bus/bus-socket.c
-index 3c59d0d615..746922d46f 100644
+index 5ade8e99aa..7553cf319d 100644
 --- a/src/libsystemd/sd-bus/bus-socket.c
 +++ b/src/libsystemd/sd-bus/bus-socket.c
 @@ -29,6 +29,7 @@
@@ -419,7 +419,7 @@ index 3c59d0d615..746922d46f 100644
  #define SNDBUF_SIZE (8*1024*1024)
  
 diff --git a/src/libsystemd/sd-bus/sd-bus.c b/src/libsystemd/sd-bus/sd-bus.c
-index 4a0259f8bb..aaa90d2223 100644
+index 8befc97460..6ee4d4f595 100644
 --- a/src/libsystemd/sd-bus/sd-bus.c
 +++ b/src/libsystemd/sd-bus/sd-bus.c
 @@ -46,6 +46,7 @@
@@ -443,7 +443,7 @@ index d988588de0..458df8df9a 100644
  #define MAX_SIZE (2*1024*1024)
  
 diff --git a/src/libsystemd/sd-journal/sd-journal.c b/src/libsystemd/sd-journal/sd-journal.c
-index 6b9ff0a4ed..4a5027ad0f 100644
+index 7a1dd2569f..d187baad47 100644
 --- a/src/libsystemd/sd-journal/sd-journal.c
 +++ b/src/libsystemd/sd-journal/sd-journal.c
 @@ -44,6 +44,7 @@
@@ -455,7 +455,7 @@ index 6b9ff0a4ed..4a5027ad0f 100644
  #define JOURNAL_FILES_RECHECK_USEC (2 * USEC_PER_SEC)
  
 diff --git a/src/login/pam_systemd.c b/src/login/pam_systemd.c
-index b8da266e27..4bb8dd9496 100644
+index bf45974ca5..2cb7e930c0 100644
 --- a/src/login/pam_systemd.c
 +++ b/src/login/pam_systemd.c
 @@ -35,6 +35,7 @@
@@ -503,10 +503,10 @@ index c64e79bdff..eda26b0b9a 100644
  static void setup_logging_once(void) {
          static pthread_once_t once = PTHREAD_ONCE_INIT;
 diff --git a/src/portable/portable.c b/src/portable/portable.c
-index d4b448a627..bb26623565 100644
+index 3b2a37912f..835a3fdeaa 100644
 --- a/src/portable/portable.c
 +++ b/src/portable/portable.c
-@@ -40,6 +40,7 @@
+@@ -42,6 +42,7 @@
  #include "strv.h"
  #include "tmpfile-util.h"
  #include "user-util.h"
@@ -551,7 +551,7 @@ index 8b462b5627..183ce1c18e 100644
  struct CGroupInfo {
          char *cgroup_path;
 diff --git a/src/shared/bus-unit-util.c b/src/shared/bus-unit-util.c
-index 4ee9706847..30c8084847 100644
+index 50de98941f..d47beccb0b 100644
 --- a/src/shared/bus-unit-util.c
 +++ b/src/shared/bus-unit-util.c
 @@ -50,6 +50,7 @@
@@ -599,7 +599,7 @@ index 83e9834bbf..74eaae6f5e 100644
  enum {
          IMPORTER_STATE_LINE = 0,    /* waiting to read, or reading line */
 diff --git a/src/shared/logs-show.c b/src/shared/logs-show.c
-index a5d04003bd..10392c132d 100644
+index 0a31be382f..92d629e7e0 100644
 --- a/src/shared/logs-show.c
 +++ b/src/shared/logs-show.c
 @@ -41,6 +41,7 @@
@@ -683,7 +683,7 @@ index ed22c8b679..19ebe20237 100644
  UdevEvent *udev_event_new(sd_device *dev, usec_t exec_delay_usec, sd_netlink *rtnl, int log_level) {
          UdevEvent *event;
 diff --git a/src/udev/udev-rules.c b/src/udev/udev-rules.c
-index 5f12002394..febe345b4c 100644
+index c242549654..e5b8df5c2d 100644
 --- a/src/udev/udev-rules.c
 +++ b/src/udev/udev-rules.c
 @@ -41,6 +41,7 @@
@@ -694,6 +694,3 @@ index 5f12002394..febe345b4c 100644
  
  #define RULES_DIRS ((const char* const*) CONF_PATHS_STRV("udev/rules.d"))
  
--- 
-2.34.1
-

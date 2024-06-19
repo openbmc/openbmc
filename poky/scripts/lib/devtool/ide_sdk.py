@@ -1052,7 +1052,7 @@ def register_commands(subparsers, context):
     parser_ide_sdk.add_argument(
         '-I', '--key', help='Specify ssh private key for connection to the target')
     parser_ide_sdk.add_argument(
-        '--skip-bitbake', help='Generate IDE configuration but skip calling bibtake to update the SDK.', action='store_true')
+        '--skip-bitbake', help='Generate IDE configuration but skip calling bitbake to update the SDK', action='store_true')
     parser_ide_sdk.add_argument(
         '-k', '--bitbake-k', help='Pass -k parameter to bitbake', action='store_true')
     parser_ide_sdk.add_argument(

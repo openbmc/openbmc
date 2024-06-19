@@ -1,0 +1,19 @@
+SUMMARY = "The guessing game from The Rust Book using pyo3."
+DESCRIPTION = "Wrap a version of the guessing game from The Rust Book \
+to run in Python using pyo3."
+HOMEPAGE = "https://www.maturin.rs/tutorial"
+SECTION = "devel/python"
+LICENSE = "MIT & Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE-APACHE;md5=1836efb2eb779966696f473ee8540542 \
+                    file://LICENSE-MIT;md5=85fd3b67069cff784d98ebfc7d5c0797"
+
+SRC_URI = "git://git.yoctoproject.org/guessing-game.git;protocol=https;branch=main"
+
+PV = "0.2.0"
+SRCREV = "40cf004c2772ffa20ea803fa3be1528a75be3e98"
+
+S = "${WORKDIR}/git"
+
+inherit python_maturin cargo-update-recipe-crates
+
+require ${BPN}-crates.inc

@@ -4,10 +4,10 @@ The `runfvp` tool in meta-arm makes it easy to run Yocto Project disk images ins
 
 ## Running images with `runfvp`
 
-To build images with the FVP integration, the `fvpboot` class needs to be inherited.  If the machine does not do this explicitly it can be done in `local.conf`:
+To build images with the FVP integration, the `fvpboot` image class needs to be inherited.  If the machine does not do this explicitly it can be done in `local.conf`:
 
 ```
-INHERIT += "fvpboot"
+IMAGE_CLASSES += "fvpboot"
 ```
 
 The class will download the correct FVP and write a `.fvpconf` configuration file when an image is built.

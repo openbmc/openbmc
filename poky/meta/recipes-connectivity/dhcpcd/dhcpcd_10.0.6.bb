@@ -52,7 +52,7 @@ USERADD_PARAM:${PN} = "--system -d ${DBDIR} -M -s /bin/false -U dhcpcd"
 do_install:append () {
     # install systemd unit files
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/dhcpcd*.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/dhcpcd*.service ${D}${systemd_system_unitdir}
 
     chmod 700 ${D}${DBDIR}
     chown dhcpcd:dhcpcd ${D}${DBDIR}

@@ -1,0 +1,36 @@
+From 18f4eca291cabf93d87e7c9051268d9c385b8f37 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 May 2024 18:23:06 -0700
+Subject: [PATCH] inputdrivers: Correct the signature of bind() call on musl
+ systems
+
+Its flagged with GCC14
+
+../../../DirectFB-1.7.7/inputdrivers/linux_input/linux_input.c:1551:27: error: passing argument 2 of 'bind' from incompatible pointer type [-Wincompatible-pointer-types]
+ 1551 |      rt = bind(socket_fd, &sock_addr,
+      |                           ^~~~~~~~~~
+      |                           |
+      |                           struct sockaddr_un *
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ inputdrivers/linux_input/linux_input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inputdrivers/linux_input/linux_input.c b/inputdrivers/linux_input/linux_input.c
+index 03deebc..207f5a5 100644
+--- a/inputdrivers/linux_input/linux_input.c
++++ b/inputdrivers/linux_input/linux_input.c
+@@ -1548,7 +1548,7 @@ udev_hotplug_EventThread(DirectThread *thread, void * hotplug_data)
+              "/org/kernel/udev/monitor",
+              sizeof(sock_addr.sun_path) - 1);
+ 
+-     rt = bind(socket_fd, &sock_addr,
++     rt = bind(socket_fd, (struct sockaddr *)&sock_addr,
+                sizeof(sock_addr.sun_family)+1+strlen(&sock_addr.sun_path[1]));
+      if (rt < 0) {
+           D_PERROR( "DirectFB/linux_input: bind() failed: %s\n",
+-- 
+2.45.1
+

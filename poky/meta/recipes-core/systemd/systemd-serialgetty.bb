@@ -9,7 +9,8 @@ SERIAL_TERM ?= "linux"
 
 SRC_URI = "file://serial-getty@.service"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 # As this package is tied to systemd, only build it when we're also building systemd.
 inherit features_check
@@ -21,7 +22,7 @@ do_install() {
 		default_baudrate=`echo "${SERIAL_CONSOLES}" | sed 's/\;.*//'`
 		install -d ${D}${systemd_system_unitdir}/
 		install -d ${D}${sysconfdir}/systemd/system/getty.target.wants/
-		install -m 0644 ${WORKDIR}/serial-getty@.service ${D}${systemd_system_unitdir}/
+		install -m 0644 ${S}/serial-getty@.service ${D}${systemd_system_unitdir}/
 		sed -i -e "s/\@BAUDRATE\@/$default_baudrate/g" ${D}${systemd_system_unitdir}/serial-getty@.service
 		sed -i -e "s/\@TERM\@/${SERIAL_TERM}/g" ${D}${systemd_system_unitdir}/serial-getty@.service
 
@@ -35,7 +36,7 @@ do_install() {
 					${D}${sysconfdir}/systemd/system/getty.target.wants/serial-getty@$ttydev.service
 			else
 				# install custom service file for the non-default baudrate
-				install -m 0644 ${WORKDIR}/serial-getty@.service ${D}${systemd_system_unitdir}/serial-getty$baudrate@.service
+				install -m 0644 ${S}/serial-getty@.service ${D}${systemd_system_unitdir}/serial-getty$baudrate@.service
 				sed -i -e "s/\@BAUDRATE\@/$baudrate/g" ${D}${systemd_system_unitdir}/serial-getty$baudrate@.service
 				# enable the service
 				ln -sf ${systemd_system_unitdir}/serial-getty$baudrate@.service \

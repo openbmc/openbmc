@@ -109,9 +109,6 @@ ettercap_cv_type_socklen_t=${ettercap_cv_type_socklen_t=yes}
 # libesmtp
 acx_working_snprintf=${acx_working_snprintf=yes}
 
-# D-BUS
-ac_cv_func_posix_getpwnam_r=${ac_cv_func_posix_getpwnam_r=yes}
-
 # httppc
 ac_cv_strerror_r_SUSv3=${ac_cv_strerror_r_SUSv3=no}
 
@@ -149,9 +146,6 @@ mysql_cv_func_atomic_add=${mysql_cv_func_atomic_add=no}
 
 # gettext
 am_cv_func_working_getline=${am_cv_func_working_getline=yes}
-
-# fnmatch
-ac_cv_func_fnmatch_works=${ac_cv_func_fnmatch_works=yes}
 
 # rsync
 rsync_cv_HAVE_BROKEN_LARGEFILE=${rsync_cv_HAVE_BROKEN_LARGEFILE=no}

@@ -8,6 +8,8 @@ inherit xfce update-alternatives features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
+SRC_URI += "file://xfwm4-fix-incompatible-pointer-type-error.patch"
+
 SRC_URI[sha256sum] = "92cd1b889bb25cb4bc06c1c6736c238d96e79c1e706b9f77fad0a89d6e5fc13f"
 
 PACKAGECONFIG ?= " \

@@ -1,7 +1,7 @@
-From 2adbe9773cd65c48eec9df96868d4a738927c8d9 Mon Sep 17 00:00:00 2001
+From 5305c5f18236a9d7f2e633ea6ad317e09e8f29d5 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Tue, 10 Jul 2018 15:40:17 +0800
-Subject: [PATCH 10/22] distinguish XSI-compliant strerror_r from GNU-specifi
+Subject: [PATCH] distinguish XSI-compliant strerror_r from GNU-specifi
  strerror_r
 
 XSI-compliant strerror_r and GNU-specifi strerror_r are different.
@@ -24,10 +24,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  2 files changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/src/libsystemd/sd-bus/bus-error.c b/src/libsystemd/sd-bus/bus-error.c
-index 77b2e1a0fd..fdba0e0142 100644
+index f415797700..a5c6e9a3bd 100644
 --- a/src/libsystemd/sd-bus/bus-error.c
 +++ b/src/libsystemd/sd-bus/bus-error.c
-@@ -408,7 +408,12 @@ static void bus_error_strerror(sd_bus_error *e, int error) {
+@@ -410,7 +410,12 @@ static void bus_error_strerror(sd_bus_error *e, int error) {
                          return;
  
                  errno = 0;
@@ -40,7 +40,7 @@ index 77b2e1a0fd..fdba0e0142 100644
                  if (errno == ERANGE || strlen(x) >= k - 1) {
                          free(m);
                          k *= 2;
-@@ -593,8 +598,12 @@ const char* _bus_error_message(const sd_bus_error *e, int error, char buf[static
+@@ -595,8 +600,12 @@ const char* _bus_error_message(const sd_bus_error *e, int error, char buf[static
  
          if (e && e->message)
                  return e->message;
@@ -71,6 +71,3 @@ index 69a2eb6404..1561859650 100644
                  if (errno == 0) {
                          char error[STRLEN("ERRNO=") + DECIMAL_STR_MAX(int) + 1];
  
--- 
-2.34.1
-

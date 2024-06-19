@@ -19,5 +19,5 @@ FILES:${PN} += "${libdir}/*"
 
 INSANE_SKIP:${PN}-dev = "dev-elf"
 
-PACKAGECONFIG ??= "ui"
+PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', '${GTK3DISTROFEATURES}', 'ui', '', d)}"
 PACKAGECONFIG[ui] = "-Dui=enabled,-Dui=disabled,gtk+3"

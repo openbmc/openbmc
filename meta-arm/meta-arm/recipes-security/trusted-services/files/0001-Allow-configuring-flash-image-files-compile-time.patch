@@ -1,0 +1,100 @@
+From 9fbeb9dd8c4f2c842248541b73e4cff9c6f8d26e Mon Sep 17 00:00:00 2001
+From: Gyorgy Szing <gyorgy.szing@arm.com>
+Date: Wed, 27 Mar 2024 21:53:51 +0000
+Subject: [PATCH 1/1] Allow configuring flash image files compile time
+
+Allow configuring image file PATH name for file and semihosted
+block_store using CMake build options.
+
+Upstream-Status: Pending
+
+Signed-off-by: Gyorgy Szing <gyorgy.szing@arm.com>
+---
+ .../block_storage/factory/file/block_store_factory.c        | 6 +++++-
+ .../service/block_storage/factory/file/component.cmake      | 6 +++++-
+ .../block_storage/factory/semihosting/block_store_factory.c | 6 +++++-
+ .../block_storage/factory/semihosting/component.cmake       | 6 +++++-
+ 4 files changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/components/service/block_storage/factory/file/block_store_factory.c b/components/service/block_storage/factory/file/block_store_factory.c
+index c6915107b..ef05ee791 100644
+--- a/components/service/block_storage/factory/file/block_store_factory.c
++++ b/components/service/block_storage/factory/file/block_store_factory.c
+@@ -25,6 +25,10 @@
+ #define FILE_BLOCK_SIZE (512)
+ #endif
+ 
++#ifndef FILE_BLK_FILE_NAME
++#define FILE_BLK_FILE_NAME "secure-flash.img"
++#endif
++
+ static char disk_img_filename[256];
+ 
+ struct block_store_assembly {
+@@ -60,7 +64,7 @@ struct block_store *file_block_store_factory_create(void)
+ 
+ 		/* Ensure disk image filename is set */
+ 		if (disk_img_filename[0] == '\0')
+-			file_block_store_factory_set_filename("secure-flash.img");
++			file_block_store_factory_set_filename(FILE_BLK_FILE_NAME);
+ 
+ 		/* Initialise a file_block_store to provide underlying storage */
+ 		struct block_store *secure_flash = file_block_store_init(
+diff --git a/components/service/block_storage/factory/file/component.cmake b/components/service/block_storage/factory/file/component.cmake
+index 644f03972..fa15d1399 100644
+--- a/components/service/block_storage/factory/file/component.cmake
++++ b/components/service/block_storage/factory/file/component.cmake
+@@ -17,4 +17,8 @@ if (NOT DEFINED TS_BLOCK_STORE_FACTORY)
+ 	set(TS_BLOCK_STORE_FACTORY "file_block_store_factory")
+ 	target_compile_definitions(${TGT} PRIVATE
+ 		CONCRETE_BLOCK_STORE_FACTORY=${TS_BLOCK_STORE_FACTORY})
+-endif()
+\ No newline at end of file
++endif()
++
++set(FILE_BLK_FILE_NAME "secure-flash.img" CACHE PATH "PATH to block storage flash image file.")
++set_property(SOURCE "${CMAKE_CURRENT_LIST_DIR}/block_store_factory.c" APPEND PROPERTY COMPILE_DEFINITIONS FILE_BLK_FILE_NAME="${FILE_BLK_FILE_NAME}")
++message(status "Block storage image file PATH is ${FILE_BLK_FILE_NAME}")
+diff --git a/components/service/block_storage/factory/semihosting/block_store_factory.c b/components/service/block_storage/factory/semihosting/block_store_factory.c
+index 8e58e3638..09bdb74eb 100644
+--- a/components/service/block_storage/factory/semihosting/block_store_factory.c
++++ b/components/service/block_storage/factory/semihosting/block_store_factory.c
+@@ -21,6 +21,10 @@
+ /* Most common block size for UEFI volumes */
+ #define SEMIHOSTING_BLOCK_SIZE		(512)
+ 
++#ifndef SEMIHOSTING_BLK_FILE_NAME
++#define SEMIHOSTING_BLK_FILE_NAME "secure-flash.img"
++#endif
++
+ struct block_store_assembly
+ {
+ 	struct semihosting_block_store semihosting_block_store;
+@@ -55,7 +59,7 @@ struct block_store *semihosting_block_store_factory_create(void)
+ 		/* Initialise a semihosting_block_store to provide underlying storage */
+ 		struct block_store *secure_flash = semihosting_block_store_init(
+ 			&assembly->semihosting_block_store,
+-			"secure-flash.img",
++			SEMIHOSTING_BLK_FILE_NAME,
+ 			SEMIHOSTING_BLOCK_SIZE);
+ 
+ 		if (secure_flash) {
+diff --git a/components/service/block_storage/factory/semihosting/component.cmake b/components/service/block_storage/factory/semihosting/component.cmake
+index 97affaf49..98d6dcdcb 100644
+--- a/components/service/block_storage/factory/semihosting/component.cmake
++++ b/components/service/block_storage/factory/semihosting/component.cmake
+@@ -17,4 +17,8 @@ if (NOT DEFINED TS_BLOCK_STORE_FACTORY)
+ 	set(TS_BLOCK_STORE_FACTORY "semihosting_block_store_factory")
+ 	target_compile_definitions(${TGT} PRIVATE
+ 		CONCRETE_BLOCK_STORE_FACTORY=${TS_BLOCK_STORE_FACTORY})
+-endif()
+\ No newline at end of file
++endif()
++
++set(SEMIHOSTING_BLK_FILE_NAME "secure-flash.img" CACHE PATH "PATH to block storage flash image file.")
++set_property(SOURCE "${CMAKE_CURRENT_LIST_DIR}/block_store_factory.c" APPEND PROPERTY COMPILE_DEFINITIONS SEMIHOSTING_BLK_FILE_NAME="${SEMIHOSTING_BLK_FILE_NAME}")
++message(status "Block storage semihosting image file PATH is ${SEMIHOSTING_BLK_FILE_NAME}")
+\ No newline at end of file
+-- 
+2.34.1
+

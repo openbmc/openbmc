@@ -8,7 +8,7 @@ HOMEPAGE = "https://docbook.org"
 # upgrading this recipe, please verify whether this is still needed.
 
 LICENSE = "OASIS"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/LICENSE-OASIS;md5=c608985dd5f7f215e669e7639a0b1d2e"
+LIC_FILES_CHKSUM = "file://${S}/LICENSE-OASIS;md5=c608985dd5f7f215e669e7639a0b1d2e"
 
 # To support apps with xml schema backward compatibility, we must
 # install a set of schemas. Install the latest based on PV and then
@@ -41,7 +41,8 @@ SRC_URI[payloadPV.sha256sum] = "4e4e037a2b83c98c6c94818390d4bdd3f6e10f6ec62dd791
 
 UPSTREAM_CHECK_REGEX = "docbook-xml-(?P<pver>4(\.\d+)).zip"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_configure (){
     :

@@ -33,7 +33,7 @@ do_configure:prepend() {
 
 do_configure:append () {
     install -d ${S}/include/linux/
-    cp ${WORKDIR}/aufs_type.h ${S}/include/linux/
+    cp ${UNPACKDIR}/aufs_type.h ${S}/include/linux/
     sed -i -e 's;__user;;' ${S}/include/linux/aufs_type.h
 }
 

@@ -36,7 +36,7 @@ EXTRA_OECONF = "--with-pty-mode=0620 --with-pty-group=5 --with-sys-screenrc=${sy
 do_install:append () {
 	install -D -m 644 ${S}/etc/etcscreenrc ${D}/${sysconfdir}/screenrc
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
-		install -D -m 644 ${WORKDIR}/screen.pam ${D}/${sysconfdir}/pam.d/screen
+		install -D -m 644 ${UNPACKDIR}/screen.pam ${D}/${sysconfdir}/pam.d/screen
 	fi
 }
 

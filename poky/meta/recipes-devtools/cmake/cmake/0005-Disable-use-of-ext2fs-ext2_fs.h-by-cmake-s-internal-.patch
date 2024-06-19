@@ -1,4 +1,4 @@
-From fd9a04c1434e12f21c043385e306e0b52d38d749 Mon Sep 17 00:00:00 2001
+From 2d3f6933f78d393514a48f8222ac8c3c39cb5fc7 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Thu, 5 Jul 2018 10:28:04 -0300
 Subject: [PATCH] Disable use of ext2fs/ext2_fs.h by cmake's internal
@@ -13,16 +13,15 @@ Upstream-Status: Inappropriate [config]
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
-
 ---
  Utilities/cmlibarchive/CMakeLists.txt | 8 ++------
  1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/Utilities/cmlibarchive/CMakeLists.txt b/Utilities/cmlibarchive/CMakeLists.txt
-index bfcaf30..2960683 100644
+index e47184b7..e4964c32 100644
 --- a/Utilities/cmlibarchive/CMakeLists.txt
 +++ b/Utilities/cmlibarchive/CMakeLists.txt
-@@ -682,12 +682,8 @@ LA_CHECK_INCLUDE_FILE("copyfile.h" HAVE_COPYFILE_H)
+@@ -721,12 +721,8 @@ LA_CHECK_INCLUDE_FILE("copyfile.h" HAVE_COPYFILE_H)
  LA_CHECK_INCLUDE_FILE("direct.h" HAVE_DIRECT_H)
  LA_CHECK_INCLUDE_FILE("dlfcn.h" HAVE_DLFCN_H)
  LA_CHECK_INCLUDE_FILE("errno.h" HAVE_ERRNO_H)
@@ -35,5 +34,5 @@ index bfcaf30..2960683 100644
 +SET(HAVE_EXT2FS_EXT2_FS_H 0)
 +SET(HAVE_WORKING_EXT2_IOC_GETFLAGS 0)
  LA_CHECK_INCLUDE_FILE("fcntl.h" HAVE_FCNTL_H)
+ LA_CHECK_INCLUDE_FILE("fnmatch.h" HAVE_FNMATCH_H)
  LA_CHECK_INCLUDE_FILE("grp.h" HAVE_GRP_H)
- LA_CHECK_INCLUDE_FILE("io.h" HAVE_IO_H)

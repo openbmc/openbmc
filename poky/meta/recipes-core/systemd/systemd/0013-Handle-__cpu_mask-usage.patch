@@ -1,7 +1,7 @@
-From 2f90f8463423cfbb7e83fcef42f1071018c3b56e Mon Sep 17 00:00:00 2001
+From f6b69f28657c09b1181552d85e52ced0e01182e3 Mon Sep 17 00:00:00 2001
 From: Scott Murray <scott.murray@konsulko.com>
 Date: Fri, 13 Sep 2019 19:26:27 -0400
-Subject: [PATCH 13/22] Handle __cpu_mask usage
+Subject: [PATCH] Handle __cpu_mask usage
 
 Fixes errors:
 
@@ -55,6 +55,3 @@ index ea0c58770e..b65c0bd370 100644
  
  /* Print information about various types. Useful when diagnosing
   * gcc diagnostics on an unfamiliar architecture. */
--- 
-2.34.1
-

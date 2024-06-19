@@ -21,19 +21,22 @@ SRC_URI = "\
     file://wired.network \
 "
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 do_install() {
-	install -D -m0644 ${WORKDIR}/journald.conf ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
-	install -D -m0644 ${WORKDIR}/logind.conf ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
-	install -D -m0644 ${WORKDIR}/system.conf ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+	install -D -m0644 ${S}/journald.conf ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+	install -D -m0644 ${S}/logind.conf ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
+	install -D -m0644 ${S}/system.conf ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
 
         if ${@bb.utils.contains('PACKAGECONFIG', 'dhcp-ethernet', 'true', 'false', d)}; then
-		install -D -m0644 ${WORKDIR}/wired.network ${D}${systemd_unitdir}/network/80-wired.network
+		install -D -m0644 ${S}/wired.network ${D}${systemd_unitdir}/network/80-wired.network
         fi
 }
 
 # Based on change from YP bug 8141, OE commit 5196d7bacaef1076c361adaa2867be31759c1b52
 do_install:append:qemuall() {
-	install -D -m0644 ${WORKDIR}/system.conf-qemuall ${D}${systemd_unitdir}/system.conf.d/01-${PN}.conf
+	install -D -m0644 ${S}/system.conf-qemuall ${D}${systemd_unitdir}/system.conf.d/01-${PN}.conf
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

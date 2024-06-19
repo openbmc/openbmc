@@ -1,7 +1,7 @@
-From 4842cff4f1329f0b5034b529d56f8ad1f234ac4c Mon Sep 17 00:00:00 2001
+From 5bf8235bc5c802908aa5d95740350927d87e953a Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 10 Oct 2017 14:33:30 -0700
-Subject: [PATCH 07/22] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
+Subject: [PATCH] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
 
 Avoid using AT_SYMLINK_NOFOLLOW flag. It doesn't seem like the right
 thing to do and it's not portable (not supported by musl). See:
@@ -31,7 +31,7 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  2 files changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/src/basic/fs-util.h b/src/basic/fs-util.h
-index 1023ab73ca..c78ff6f27f 100644
+index 6a1e2e76d1..c3f7235e09 100644
 --- a/src/basic/fs-util.h
 +++ b/src/basic/fs-util.h
 @@ -49,8 +49,27 @@ int futimens_opath(int fd, const struct timespec ts[2]);
@@ -64,7 +64,7 @@ index 1023ab73ca..c78ff6f27f 100644
  int touch_file(const char *path, bool parents, usec_t stamp, uid_t uid, gid_t gid, mode_t mode);
  
 diff --git a/src/shared/base-filesystem.c b/src/shared/base-filesystem.c
-index 569ef466c3..7ae921a113 100644
+index a4e2dae245..67aa8ea1f2 100644
 --- a/src/shared/base-filesystem.c
 +++ b/src/shared/base-filesystem.c
 @@ -145,7 +145,7 @@ int base_filesystem_create_fd(int fd, const char *root, uid_t uid, gid_t gid) {
@@ -94,6 +94,3 @@ index 569ef466c3..7ae921a113 100644
                                                  continue;
                                  }
  
--- 
-2.34.1
-

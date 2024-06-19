@@ -52,9 +52,5 @@ do_install_ptest() {
     for tool in ${FILES:${PN}-tools}; do
         install ${B}/tools/.libs/$(basename $tool) ${D}${PTEST_PATH}/tests/
     done
-
-    if ${@bb.utils.contains('PACKAGECONFIG', 'cxx', 'true', 'false', d)}; then
-        install -m 0755 ${B}/bindings/cxx/tests/.libs/gpiod-cxx-test ${D}${PTEST_PATH}/tests/
-    fi
 }
 

@@ -20,6 +20,7 @@ do_configure[cleandirs] = "${B}"
 B = "${WORKDIR}/build"
 
 do_compile() {
+	oe_runmake -C ${S} tzdata.zi
 	for zone in ${TZONES}; do
 		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${B}/zoneinfo -L /dev/null ${S}/${zone}
 		${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${B}/zoneinfo/posix -L /dev/null ${S}/${zone}
@@ -37,6 +38,7 @@ do_install() {
 	cp -pP "${S}/iso3166.tab" ${D}${datadir}/zoneinfo
 	cp -pP "${S}/leapseconds" ${D}${datadir}/zoneinfo
 	cp -pP "${S}/leap-seconds.list" ${D}${datadir}/zoneinfo
+	cp -pP "${S}/tzdata.zi" ${D}${datadir}/zoneinfo
 
 	# Install default timezone
 	if [ -e ${D}${datadir}/zoneinfo/${DEFAULT_TIMEZONE} ]; then
@@ -141,6 +143,7 @@ FILES:tzdata-core += " \
     ${sysconfdir}/timezone \
     ${datadir}/zoneinfo/leapseconds \
     ${datadir}/zoneinfo/leap-seconds.list \
+    ${datadir}/zoneinfo/tzdata.zi \
     ${datadir}/zoneinfo/Pacific/Honolulu \
     ${datadir}/zoneinfo/America/Anchorage \
     ${datadir}/zoneinfo/America/Los_Angeles \

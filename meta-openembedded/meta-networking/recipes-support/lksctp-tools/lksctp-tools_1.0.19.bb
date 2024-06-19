@@ -27,8 +27,8 @@ BBCLASSEXTEND = "native"
 inherit autotools-brokensep pkgconfig binconfig ptest
 
 do_install_ptest () {
-    install -m 0755 ${WORKDIR}/v4test.sh ${D}${PTEST_PATH}
-    install -m 0755 ${WORKDIR}/v6test.sh ${D}${PTEST_PATH}
+    install -m 0755 ${UNPACKDIR}/v4test.sh ${D}${PTEST_PATH}
+    install -m 0755 ${UNPACKDIR}/v6test.sh ${D}${PTEST_PATH}
     for testcase in `find ${B}/src/apps/.libs ${B}/src/func_tests/.libs -maxdepth 1 -type f -executable`; do
         install $testcase ${D}${PTEST_PATH}
     done

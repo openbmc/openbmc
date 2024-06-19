@@ -52,7 +52,7 @@ do_install:append () {
     install -d 755 ${D}/etc/dovecot
     touch 644 ${D}/etc/dovecot/dovecot.conf
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}" ]; then
-        install -m 0644 ${WORKDIR}/dovecot.service ${D}${systemd_unitdir}/system
+        install -m 0644 ${UNPACKDIR}/dovecot.service ${D}${systemd_unitdir}/system
         sed -i -e 's#@SYSCONFDIR@#${sysconfdir}#g' ${D}${systemd_unitdir}/system/dovecot.service
         sed -i -e 's#@SBINDIR@#${sbindir}#g' ${D}${systemd_unitdir}/system/dovecot.service
     fi

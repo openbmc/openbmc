@@ -1,0 +1,38 @@
+From 4f4e84f139e2a8682f1374a592f2636c43ad857b Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 21 May 2024 15:10:11 +0000
+Subject: [PATCH] m4/readline: add missing includes
+
+The cross-specific code fragment only includes stdio.h, where the native
+fragment also includes fcntl.h and unistd.h.  This is important because
+GCC 14.1 has made the implicit definitions an error:
+
+conftest.c: In function 'main':
+conftest.c:144:9: error: implicit declaration of function 'close'; did you mean 'pclose'? [-Wimplicit-function-declaration]
+conftest.c:146:14: error: implicit declaration of function 'open'; did you mean 'popen'? [-Wimplicit-function-declaration]
+
+Add the missing includes so that the check doesn't always fail due to
+these errors.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/gawk.git/commit/?id=c1613c310d71b87f509458e0259ecd10eda2b140]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ m4/readline.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/m4/readline.m4 b/m4/readline.m4
+index 38f96326..efd52d4e 100644
+--- a/m4/readline.m4
++++ b/m4/readline.m4
+@@ -66,6 +66,8 @@ dnl action if false:
+ dnl action if cross compiling:
+ 		[AC_LINK_IFELSE(
+ 			[AC_LANG_PROGRAM([[#include <stdio.h>
++#include <fcntl.h>
++#include <unistd.h>
+ #include <readline/readline.h>
+ #include <readline/history.h>]],		dnl includes
+ 			dnl function body
+-- 
+2.34.1
+

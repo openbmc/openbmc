@@ -1,0 +1,58 @@
+From 9bb17e292631f54fb5af4be4fae32ccd3d3d15c7 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 27 May 2024 13:13:15 -0400
+Subject: [PATCH 2/3] fix: btrfs: move ->parent and ->ref_root into
+ btrfs_delayed_ref_node (v6.10)
+
+See upstream commit:
+
+  commit cf4f04325b2b27efa5697ba0ea4c1abdee0035b4
+  Author: Josef Bacik <josef@toxicpanda.com>
+  Date:   Fri Apr 12 22:57:13 2024 -0400
+
+    btrfs: move ->parent and ->ref_root into btrfs_delayed_ref_node
+
+    These two members are shared by both the tree refs and data refs, so
+    move them into btrfs_delayed_ref_node proper.  This allows us to greatly
+    simplify the comparison code, as the shared refs always only sort on
+    parent, and the non shared refs always sort first on ref_root, and then
+    only data refs sort on their specific fields.
+
+Upstream-Status: Backport [9bb17e29 fix: btrfs: move ->parent and ->ref_root into btrfs_delayed_ref_node (v6.10)]
+
+Change-Id: Ib7c92cc4bb8d674ac66ccfa25c03476f7adaaf90
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/btrfs.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index d73c1ce5..c0c746e2 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -912,8 +912,8 @@ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs_delayed_tree_ref,
+ 		ctf_integer(u64, bytenr, ref->bytenr)
+ 		ctf_integer(u64, num_bytes, ref->num_bytes)
+ 		ctf_integer(int, action, ref->action)
+-		ctf_integer(u64, parent, ref->tree_ref.parent)
+-		ctf_integer(u64, ref_root, ref->tree_ref.root)
++		ctf_integer(u64, parent, ref->parent)
++		ctf_integer(u64, ref_root, ref->ref_root)
+ 		ctf_integer(int, level, ref->tree_ref.level)
+ 		ctf_integer(int, type, ref->type)
+ 		ctf_integer(u64, seq, ref->seq)
+@@ -1196,8 +1196,8 @@ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs_delayed_data_ref,
+ 		ctf_integer(u64, bytenr, ref->bytenr)
+ 		ctf_integer(u64, num_bytes, ref->num_bytes)
+ 		ctf_integer(int, action, ref->action)
+-		ctf_integer(u64, parent, ref->data_ref.parent)
+-		ctf_integer(u64, ref_root, ref->data_ref.root)
++		ctf_integer(u64, parent, ref->parent)
++		ctf_integer(u64, ref_root, ref->ref_root)
+ 		ctf_integer(u64, owner, ref->data_ref.objectid)
+ 		ctf_integer(u64, offset, ref->data_ref.offset)
+ 		ctf_integer(int, type, ref->type)
+-- 
+2.39.2
+

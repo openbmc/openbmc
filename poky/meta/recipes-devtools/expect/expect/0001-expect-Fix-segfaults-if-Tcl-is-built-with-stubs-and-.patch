@@ -42,7 +42,7 @@ Example:
  }
 Author: Sergei Golovan <sgolovan@debian.org>
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [no activity since 2018; cvs server went read-only]
 This patch is backported from fedora changes for expect:
 http://pkgs.fedoraproject.org/cgit/rpms/expect.git/commit/
 ?h=master&id=b6737eed550be93182f2ed194e836a6cbbcf4fa3

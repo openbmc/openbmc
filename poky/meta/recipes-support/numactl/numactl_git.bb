@@ -52,7 +52,7 @@ do_install_ptest() {
         install -m 0755 ${B}/test/$i ${D}${PTEST_PATH}/test
     done
 
-    install -m 0755 ${WORKDIR}/Makefile ${D}${PTEST_PATH}/
+    install -m 0755 ${UNPACKDIR}/Makefile ${D}${PTEST_PATH}/
     install -m 0755 ${B}/.libs/numactl ${D}${PTEST_PATH}/
 }
 

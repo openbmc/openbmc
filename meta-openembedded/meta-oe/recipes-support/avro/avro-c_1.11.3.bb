@@ -1,5 +1,5 @@
 SUMMARY = "Apache Avro data serialization system."
-HOMEPAGE = "http://apr.apache.org/"
+HOMEPAGE = "https://avro.apache.org/"
 SECTION = "libs"
 
 LICENSE = "Apache-2.0"

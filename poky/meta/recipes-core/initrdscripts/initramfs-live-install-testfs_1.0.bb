@@ -5,10 +5,11 @@ SRC_URI = "file://init-install-testfs.sh"
 
 RDEPENDS:${PN} = "grub parted e2fsprogs-mke2fs"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
-        install -m 0755 ${WORKDIR}/init-install-testfs.sh ${D}/install.sh
+        install -m 0755 ${S}/init-install-testfs.sh ${D}/install.sh
 }
 
 INHIBIT_DEFAULT_DEPS = "1"

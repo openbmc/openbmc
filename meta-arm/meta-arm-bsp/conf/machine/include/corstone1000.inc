@@ -55,6 +55,11 @@ WKS_FILE:firmware ?= "corstone1000-flash-firmware.wks.in"
 WKS_FILE_DEPENDS:append = " ${EXTRA_IMAGEDEPENDS}"
 
 # If not building under the firmware multiconf we need to build the actual firmware
-FIRMWARE_DEPLOYEMENT ?= "firmware-deploy-image"
-FIRMWARE_DEPLOYEMENT:firmware ?= ""
-EXTRA_IMAGEDEPENDS += "${FIRMWARE_DEPLOYEMENT}"
+FIRMWARE_DEPLOYMENT ?= "firmware-deploy-image"
+FIRMWARE_DEPLOYMENT:firmware ?= ""
+EXTRA_IMAGEDEPENDS += "${FIRMWARE_DEPLOYMENT}"
+
+ARM_SYSTEMREADY_FIRMWARE = "${FIRMWARE_DEPLOYMENT}:do_deploy \
+                            corstone1000-esp-image:do_image_complete \
+                           "
+ARM_SYSTEMREADY_ACS_CONSOLE ?= "default"

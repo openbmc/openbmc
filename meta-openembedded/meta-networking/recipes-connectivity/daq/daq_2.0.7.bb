@@ -11,6 +11,7 @@ DEPENDS = "libpcap libpcre libdnet bison-native libnetfilter-queue"
 SRC_URI = "http://fossies.org/linux/misc/daq-${PV}.tar.gz \
            file://disable-run-test-program-while-cross-compiling.patch \
            file://0001-correct-the-location-of-unistd.h.patch \
+           file://daq-fix-incompatible-pointer-type-error.patch \
            "
 SRC_URI[sha256sum] = "bdc4e5a24d1ea492c39ee213a63c55466a2e8114b6a9abed609927ae13a7705e"
 # these 2 create undeclared dependency on libdnet and libnetfilter-queue from meta-networking

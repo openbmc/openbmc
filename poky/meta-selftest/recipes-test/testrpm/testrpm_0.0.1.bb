@@ -6,6 +6,9 @@ LICENSE = "MIT"
 SRC_URI = "file://testfile.txt"
 INHIBIT_DEFAULT_DEPS = "1"
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 do_compile(){
 	echo "testdata" > ${B}/"file with [brackets].txt"
 	echo "testdata" > ${B}/"file with (parentheses).txt"

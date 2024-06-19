@@ -50,8 +50,8 @@ class ActionPlugin(LayerPlugin):
 
         try:
             notadded, _ = bb.utils.edit_bblayers_conf(bblayers_conf, layerdirs, None)
-            self.tinfoil.modified_files()
             if not (args.force or notadded):
+                self.tinfoil.modified_files()
                 try:
                     self.tinfoil.run_command('parseConfiguration')
                 except (bb.tinfoil.TinfoilUIException, bb.BBHandledException):
@@ -83,6 +83,8 @@ class ActionPlugin(LayerPlugin):
                 layerdir = os.path.abspath(item)
             layerdirs.append(layerdir)
         (_, notremoved) = bb.utils.edit_bblayers_conf(bblayers_conf, None, layerdirs)
+        if args.force > 1:
+            return 0
         self.tinfoil.modified_files()
         if notremoved:
             for item in notremoved:

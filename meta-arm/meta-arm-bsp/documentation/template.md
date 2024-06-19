@@ -16,4 +16,4 @@
 
 *A summary of how to deploy or execute the image*
 
-*For example, an overview of the N1SDP SD structure, or FVP arguments*
+*For example, an overview of FVP arguments*

@@ -30,8 +30,8 @@ do_configure:prepend() {
 
 do_install:append () {
     install -d ${D}${systemd_system_unitdir}
-    sed 's:@bindir@:${sbindir}:' < ${WORKDIR}/gpm.service.in >${D}${systemd_system_unitdir}/gpm.service
-    install -D -m 0755 ${WORKDIR}/init ${D}${INIT_D_DIR}/gpm
+    sed 's:@bindir@:${sbindir}:' < ${UNPACKDIR}/gpm.service.in >${D}${systemd_system_unitdir}/gpm.service
+    install -D -m 0755 ${UNPACKDIR}/init ${D}${INIT_D_DIR}/gpm
     ln -s libgpm.so.2 ${D}${libdir}/libgpm.so
 }
 

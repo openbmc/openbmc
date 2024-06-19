@@ -36,7 +36,7 @@ SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 do_install:append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		install -d ${D}${systemd_system_unitdir}
-		install -m 0644 ${WORKDIR}/tinyproxy.service ${D}${systemd_system_unitdir}
+		install -m 0644 ${UNPACKDIR}/tinyproxy.service ${D}${systemd_system_unitdir}
 	fi
-	install -m 0644 ${WORKDIR}/tinyproxy.conf ${D}${sysconfdir}/tinyproxy.conf
+	install -m 0644 ${UNPACKDIR}/tinyproxy.conf ${D}${sysconfdir}/tinyproxy.conf
 }

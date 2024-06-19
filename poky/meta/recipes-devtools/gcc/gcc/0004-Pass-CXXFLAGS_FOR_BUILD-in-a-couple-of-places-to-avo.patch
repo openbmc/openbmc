@@ -1,4 +1,4 @@
-From 6fbf920ccde6efc2d0caafde996d9e5738a1ba37 Mon Sep 17 00:00:00 2001
+From 5bef09b829ab8042acc045474cf10f4c4fb15dd5 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 28 Oct 2021 11:33:40 +0100
 Subject: [PATCH] Pass CXXFLAGS_FOR_BUILD in a couple of places to avoid these
@@ -23,10 +23,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 4 insertions(+)
 
 diff --git a/Makefile.in b/Makefile.in
-index 06a9398e172..4b0069b257c 100644
+index db4fa6c6260..dee862be8a5 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -178,6 +178,7 @@ BUILD_EXPORTS = \
+@@ -179,6 +179,7 @@ BUILD_EXPORTS = \
  # built for the build system to override those in BASE_FLAGS_TO_PASS.
  EXTRA_BUILD_FLAGS = \
  	CFLAGS="$(CFLAGS_FOR_BUILD)" \
@@ -34,7 +34,7 @@ index 06a9398e172..4b0069b257c 100644
  	LDFLAGS="$(LDFLAGS_FOR_BUILD)"
  
  # This is the list of directories to built for the host system.
-@@ -210,6 +211,7 @@ HOST_EXPORTS = \
+@@ -211,6 +212,7 @@ HOST_EXPORTS = \
  	CPP_FOR_BUILD="$(CPP_FOR_BUILD)"; export CPP_FOR_BUILD; \
  	CPPFLAGS_FOR_BUILD="$(CPPFLAGS_FOR_BUILD)"; export CPPFLAGS_FOR_BUILD; \
  	CXX_FOR_BUILD="$(CXX_FOR_BUILD)"; export CXX_FOR_BUILD; \
@@ -43,10 +43,10 @@ index 06a9398e172..4b0069b257c 100644
  	DSYMUTIL="$(DSYMUTIL)"; export DSYMUTIL; \
  	LD="$(LD)"; export LD; \
 diff --git a/Makefile.tpl b/Makefile.tpl
-index dfbd74b68f8..419b332953b 100644
+index 1d5813cd569..ff0fae53b0c 100644
 --- a/Makefile.tpl
 +++ b/Makefile.tpl
-@@ -181,6 +181,7 @@ BUILD_EXPORTS = \
+@@ -182,6 +182,7 @@ BUILD_EXPORTS = \
  # built for the build system to override those in BASE_FLAGS_TO_PASS.
  EXTRA_BUILD_FLAGS = \
  	CFLAGS="$(CFLAGS_FOR_BUILD)" \
@@ -54,7 +54,7 @@ index dfbd74b68f8..419b332953b 100644
  	LDFLAGS="$(LDFLAGS_FOR_BUILD)"
  
  # This is the list of directories to built for the host system.
-@@ -213,6 +214,7 @@ HOST_EXPORTS = \
+@@ -214,6 +215,7 @@ HOST_EXPORTS = \
  	CPP_FOR_BUILD="$(CPP_FOR_BUILD)"; export CPP_FOR_BUILD; \
  	CPPFLAGS_FOR_BUILD="$(CPPFLAGS_FOR_BUILD)"; export CPPFLAGS_FOR_BUILD; \
  	CXX_FOR_BUILD="$(CXX_FOR_BUILD)"; export CXX_FOR_BUILD; \

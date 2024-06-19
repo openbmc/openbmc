@@ -80,23 +80,23 @@ do_install:append () {
     mv ${D}${libexecdir}/telnetd ${D}${sbindir}/in.telnetd
     if [ -e ${D}${libexecdir}/rexecd ]; then
         mv ${D}${libexecdir}/rexecd ${D}${sbindir}/in.rexecd
-        cp ${WORKDIR}/rexec.xinetd.inetutils ${D}/${sysconfdir}/xinetd.d/rexec
+        cp ${UNPACKDIR}/rexec.xinetd.inetutils ${D}/${sysconfdir}/xinetd.d/rexec
     fi
     if [ -e ${D}${libexecdir}/rlogind ]; then
         mv ${D}${libexecdir}/rlogind ${D}${sbindir}/in.rlogind
-        cp ${WORKDIR}/rlogin.xinetd.inetutils ${D}/${sysconfdir}/xinetd.d/rlogin
+        cp ${UNPACKDIR}/rlogin.xinetd.inetutils ${D}/${sysconfdir}/xinetd.d/rlogin
     fi
     if [ -e ${D}${libexecdir}/rshd ]; then
         mv ${D}${libexecdir}/rshd ${D}${sbindir}/in.rshd
-        cp ${WORKDIR}/rsh.xinetd.inetutils ${D}/${sysconfdir}/xinetd.d/rsh
+        cp ${UNPACKDIR}/rsh.xinetd.inetutils ${D}/${sysconfdir}/xinetd.d/rsh
     fi
     if [ -e ${D}${libexecdir}/talkd ]; then
         mv ${D}${libexecdir}/talkd ${D}${sbindir}/in.talkd
     fi
     mv ${D}${libexecdir}/uucpd ${D}${sbindir}/in.uucpd
     mv ${D}${libexecdir}/* ${D}${bindir}/
-    cp ${WORKDIR}/telnet.xinetd.inetutils  ${D}/${sysconfdir}/xinetd.d/telnet
-    cp ${WORKDIR}/tftpd.xinetd.inetutils  ${D}/${sysconfdir}/xinetd.d/tftpd
+    cp ${UNPACKDIR}/telnet.xinetd.inetutils  ${D}/${sysconfdir}/xinetd.d/telnet
+    cp ${UNPACKDIR}/tftpd.xinetd.inetutils  ${D}/${sysconfdir}/xinetd.d/tftpd
 
     sed -e 's,@SBINDIR@,${sbindir},g' -i ${D}/${sysconfdir}/xinetd.d/*
     if [ -e ${D}${libdir}/charset.alias ]; then

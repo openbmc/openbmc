@@ -1,0 +1,26 @@
+From 9f4d839847666019cadf57aa34fd366801c11a44 Mon Sep 17 00:00:00 2001
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Fri, 24 May 2024 14:13:35 +0300
+Subject: [PATCH] liblp: fix building with GCC 14
+
+Upstream-Status: Pending
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+---
+ system/core/fs_mgr/liblp/utility.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/system/core/fs_mgr/liblp/utility.cpp b/system/core/fs_mgr/liblp/utility.cpp
+index 48c5c8318d99..0aa8023aa87d 100644
+--- a/system/core/fs_mgr/liblp/utility.cpp
++++ b/system/core/fs_mgr/liblp/utility.cpp
+@@ -24,6 +24,7 @@
+ #include <sys/ioctl.h>
+ #endif
+ 
++#include <algorithm>
+ #include <map>
+ #include <string>
+ #include <vector>
+-- 
+2.39.2
+

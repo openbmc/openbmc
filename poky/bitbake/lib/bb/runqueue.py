@@ -1273,26 +1273,40 @@ class RunQueueData:
 
         bb.parse.siggen.set_setscene_tasks(self.runq_setscene_tids)
 
+        starttime = time.time()
+        lasttime = starttime
+
         # Iterate over the task list and call into the siggen code
         dealtwith = set()
         todeal = set(self.runtaskentries)
         while todeal:
+            ready = set()
             for tid in todeal.copy():
                 if not (self.runtaskentries[tid].depends - dealtwith):
-                    dealtwith.add(tid)
-                    todeal.remove(tid)
-                    self.prepare_task_hash(tid)
-                bb.event.check_for_interrupts(self.cooker.data)
+                    self.runtaskentries[tid].taskhash_deps = bb.parse.siggen.prep_taskhash(tid, self.runtaskentries[tid].depends, self.dataCaches)
+                    # get_taskhash for a given tid *must* be called before get_unihash* below
+                    self.runtaskentries[tid].hash = bb.parse.siggen.get_taskhash(tid, self.runtaskentries[tid].depends, self.dataCaches)
+                    ready.add(tid)
+            unihashes = bb.parse.siggen.get_unihashes(ready)
+            for tid in ready:
+                dealtwith.add(tid)
+                todeal.remove(tid)
+                self.runtaskentries[tid].unihash = unihashes[tid]
+
+            bb.event.check_for_interrupts(self.cooker.data)
+
+            if time.time() > (lasttime + 30):
+                lasttime = time.time()
+                hashequiv_logger.verbose("Initial setup loop progress: %s of %s in %s" % (len(todeal), len(self.runtaskentries), lasttime - starttime))
+
+        endtime = time.time()
+        if (endtime-starttime > 60):
+            hashequiv_logger.verbose("Initial setup loop took: %s" % (endtime-starttime))
 
         bb.parse.siggen.writeout_file_checksum_cache()
 
         #self.dump_data()
         return len(self.runtaskentries)
-
-    def prepare_task_hash(self, tid):
-        bb.parse.siggen.prep_taskhash(tid, self.runtaskentries[tid].depends, self.dataCaches)
-        self.runtaskentries[tid].hash = bb.parse.siggen.get_taskhash(tid, self.runtaskentries[tid].depends, self.dataCaches)
-        self.runtaskentries[tid].unihash = bb.parse.siggen.get_unihash(tid)
 
     def dump_data(self):
         """
@@ -2438,14 +2452,17 @@ class RunQueueExecute:
         taskdepdata_cache = {}
         for task in self.rqdata.runtaskentries:
             (mc, fn, taskname, taskfn) = split_tid_mcfn(task)
-            pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
-            deps = self.rqdata.runtaskentries[task].depends
-            provides = self.rqdata.dataCaches[mc].fn_provides[taskfn]
-            taskhash = self.rqdata.runtaskentries[task].hash
-            unihash = self.rqdata.runtaskentries[task].unihash
-            deps = self.filtermcdeps(task, mc, deps)
-            hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn]
-            taskdepdata_cache[task] = [pn, taskname, fn, deps, provides, taskhash, unihash, hashfn]
+            taskdepdata_cache[task] = bb.TaskData(
+                pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn],
+                taskname = taskname,
+                fn = fn,
+                deps = self.filtermcdeps(task, mc, self.rqdata.runtaskentries[task].depends),
+                provides = self.rqdata.dataCaches[mc].fn_provides[taskfn],
+                taskhash = self.rqdata.runtaskentries[task].hash,
+                unihash = self.rqdata.runtaskentries[task].unihash,
+                hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn],
+                taskhash_deps = self.rqdata.runtaskentries[task].taskhash_deps,
+            )
 
         self.taskdepdata_cache = taskdepdata_cache
 
@@ -2460,9 +2477,11 @@ class RunQueueExecute:
         while next:
             additional = []
             for revdep in next:
-                self.taskdepdata_cache[revdep][6] = self.rqdata.runtaskentries[revdep].unihash
+                self.taskdepdata_cache[revdep] = self.taskdepdata_cache[revdep]._replace(
+                    unihash=self.rqdata.runtaskentries[revdep].unihash
+                )
                 taskdepdata[revdep] = self.taskdepdata_cache[revdep]
-                for revdep2 in self.taskdepdata_cache[revdep][3]:
+                for revdep2 in self.taskdepdata_cache[revdep].deps:
                     if revdep2 not in taskdepdata:
                         additional.append(revdep2)
             next = additional
@@ -2531,9 +2550,6 @@ class RunQueueExecute:
                     self.rqdata.runtaskentries[hashtid].unihash = unihash
                     bb.parse.siggen.set_unihash(hashtid, unihash)
                     toprocess.add(hashtid)
-                if torehash:
-                    # Need to save after set_unihash above
-                    bb.parse.siggen.save_unitaskhashes()
 
         # Work out all tasks which depend upon these
         total = set()
@@ -2556,17 +2572,28 @@ class RunQueueExecute:
             elif self.rqdata.runtaskentries[p].depends.isdisjoint(total):
                 next.add(p)
 
+        starttime = time.time()
+        lasttime = starttime
+
         # When an item doesn't have dependencies in total, we can process it. Drop items from total when handled
         while next:
             current = next.copy()
             next = set()
+            ready = {}
             for tid in current:
                 if self.rqdata.runtaskentries[p].depends and not self.rqdata.runtaskentries[tid].depends.isdisjoint(total):
                     continue
+                # get_taskhash for a given tid *must* be called before get_unihash* below
+                ready[tid] = bb.parse.siggen.get_taskhash(tid, self.rqdata.runtaskentries[tid].depends, self.rqdata.dataCaches)
+
+            unihashes = bb.parse.siggen.get_unihashes(ready.keys())
+
+            for tid in ready:
                 orighash = self.rqdata.runtaskentries[tid].hash
-                newhash = bb.parse.siggen.get_taskhash(tid, self.rqdata.runtaskentries[tid].depends, self.rqdata.dataCaches)
+                newhash = ready[tid]
                 origuni = self.rqdata.runtaskentries[tid].unihash
-                newuni = bb.parse.siggen.get_unihash(tid)
+                newuni = unihashes[tid]
+
                 # FIXME, need to check it can come from sstate at all for determinism?
                 remapped = False
                 if newuni == origuni:
@@ -2587,6 +2614,15 @@ class RunQueueExecute:
                 next |= self.rqdata.runtaskentries[tid].revdeps
                 total.remove(tid)
                 next.intersection_update(total)
+                bb.event.check_for_interrupts(self.cooker.data)
+
+                if time.time() > (lasttime + 30):
+                    lasttime = time.time()
+                    hashequiv_logger.verbose("Rehash loop slow progress: %s in %s" % (len(total), lasttime - starttime))
+
+        endtime = time.time()
+        if (endtime-starttime > 60):
+            hashequiv_logger.verbose("Rehash loop took more than 60s: %s" % (endtime-starttime))
 
         if changed:
             for mc in self.rq.worker:
@@ -2806,13 +2842,19 @@ class RunQueueExecute:
             additional = []
             for revdep in next:
                 (mc, fn, taskname, taskfn) = split_tid_mcfn(revdep)
-                pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn]
                 deps = getsetscenedeps(revdep)
-                provides = self.rqdata.dataCaches[mc].fn_provides[taskfn]
-                taskhash = self.rqdata.runtaskentries[revdep].hash
-                unihash = self.rqdata.runtaskentries[revdep].unihash
-                hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn]
-                taskdepdata[revdep] = [pn, taskname, fn, deps, provides, taskhash, unihash, hashfn]
+
+                taskdepdata[revdep] = bb.TaskData(
+                    pn = self.rqdata.dataCaches[mc].pkg_fn[taskfn],
+                    taskname = taskname,
+                    fn = fn,
+                    deps = deps,
+                    provides = self.rqdata.dataCaches[mc].fn_provides[taskfn],
+                    taskhash = self.rqdata.runtaskentries[revdep].hash,
+                    unihash = self.rqdata.runtaskentries[revdep].unihash,
+                    hashfn = self.rqdata.dataCaches[mc].hashfn[taskfn],
+                    taskhash_deps = self.rqdata.runtaskentries[revdep].taskhash_deps,
+                )
                 for revdep2 in deps:
                     if revdep2 not in taskdepdata:
                         additional.append(revdep2)

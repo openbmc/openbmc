@@ -31,7 +31,7 @@ EXTRA_OECONF += "--enable-tools"
 do_install:append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
 		install -d ${D}${sysconfdir}/init.d/
-		sed "s:@installpath@:${libexecdir}/nfc:" ${WORKDIR}/neard.in \
+		sed "s:@installpath@:${libexecdir}/nfc:" ${UNPACKDIR}/neard.in \
 		  > ${D}${sysconfdir}/init.d/neard
 		chmod 0755 ${D}${sysconfdir}/init.d/neard
 	fi

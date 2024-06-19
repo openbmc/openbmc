@@ -1,4 +1,4 @@
-From 939a899b862f7a25e52b74d1587fc75fc65779c0 Mon Sep 17 00:00:00 2001
+From db4380eac3cd9baa2f31bcd2fb936ed51f27b415 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 13 May 2020 15:10:38 -0700
 Subject: [PATCH] libatomic: Do not enforce march on aarch64
@@ -17,25 +17,25 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 deletions(-)
 
 diff --git a/libatomic/Makefile.am b/libatomic/Makefile.am
-index c6c8d81c56a..d959a5d040e 100644
+index 980677f3533..26188917946 100644
 --- a/libatomic/Makefile.am
 +++ b/libatomic/Makefile.am
-@@ -125,7 +125,6 @@ libatomic_la_LIBADD = $(foreach s,$(SIZES),$(addsuffix _$(s)_.lo,$(SIZEOBJS)))
+@@ -130,7 +130,6 @@ libatomic_la_LIBADD = $(foreach s,$(SIZES),$(addsuffix _$(s)_.lo,$(SIZEOBJS)))
  ## On a target-specific basis, include alternates to be selected by IFUNC.
  if HAVE_IFUNC
  if ARCH_AARCH64_LINUX
 -IFUNC_OPTIONS	     = -march=armv8-a+lse
  libatomic_la_LIBADD += $(foreach s,$(SIZES),$(addsuffix _$(s)_1_.lo,$(SIZEOBJS)))
- libatomic_la_SOURCES += atomic_16.S
  
+ endif
 diff --git a/libatomic/Makefile.in b/libatomic/Makefile.in
-index a0fa3dfc8cc..e70d389874a 100644
+index d9d529bc502..47dacef9e01 100644
 --- a/libatomic/Makefile.in
 +++ b/libatomic/Makefile.in
-@@ -447,7 +447,6 @@ M_SRC = $(firstword $(filter %/$(M_FILE), $(all_c_files)))
+@@ -452,7 +452,6 @@ M_SRC = $(firstword $(filter %/$(M_FILE), $(all_c_files)))
  libatomic_la_LIBADD = $(foreach s,$(SIZES),$(addsuffix \
- 	_$(s)_.lo,$(SIZEOBJS))) $(am__append_1) $(am__append_3) \
- 	$(am__append_4) $(am__append_5)
+ 	_$(s)_.lo,$(SIZEOBJS))) $(am__append_1) $(am__append_2) \
+ 	$(am__append_3) $(am__append_4)
 -@ARCH_AARCH64_LINUX_TRUE@@HAVE_IFUNC_TRUE@IFUNC_OPTIONS = -march=armv8-a+lse
  @ARCH_ARM_LINUX_TRUE@@HAVE_IFUNC_TRUE@IFUNC_OPTIONS = -march=armv7-a+fp -DHAVE_KERNEL64
  @ARCH_I386_TRUE@@HAVE_IFUNC_TRUE@IFUNC_OPTIONS = -march=i586

@@ -21,9 +21,6 @@ db_cv_sprintf_count=${db_cv_sprintf_count=yes}
 db_cv_align_t=${db_cv_align_t='unsigned long long'}
 db_cv_alignp_t=${db_cv_alignp_t='unsigned long'}
 
-# D-BUS
-ac_cv_func_posix_getpwnam_r=${ac_cv_func_posix_getpwnam_r=yes}
-
 # edb
 db_cv_spinlocks=${db_cv_spinlocks=no}
 
@@ -34,9 +31,6 @@ ettercap_cv_type_socklen_t=${ettercap_cv_type_socklen_t=yes}
 compat_cv_func_snprintf_works=${compat_cv_func_snprintf_works=yes}
 compat_cv_func_basename_works=${compat_cv_func_basename_works=no}
 compat_cv_func_dirname_works=${compat_cv_func_dirname_works=no}
-
-# fnmatch
-ac_cv_func_fnmatch_works=${ac_cv_func_fnmatch_works=yes}
 
 # gettext
 am_cv_func_working_getline=${am_cv_func_working_getline=yes}
@@ -122,7 +116,3 @@ lf_cv_sane_realloc=yes
 
 # xffm
 jm_cv_func_working_readdir=yes
-
-# evolution-data-server
-ac_cv_libiconv_utf8=${ac_cv_libiconv_utf8=yes}
-

@@ -1,0 +1,91 @@
+From 38dea7dd671fd621b563377cfbd95e4783568c6e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zolt=C3=A1n=20B=C3=B6sz=C3=B6rm=C3=A9nyi?=
+ <zboszor@gmail.com>
+Date: Fri, 7 Jun 2024 10:32:40 +0200
+Subject: [PATCH] feat(dracut-install): split ldd command arguments for
+ execvp()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This restores a not-so-subtle feature of previously executing ldd
+via popen(), i.e. the ability to use a cross-compiled sysroot.
+
+The ldd command may be passed in via the DRACUT_LDD environment
+variable, and the command may contain command line arguments.
+The number of such arguments are not known in advance.
+
+Split the command into executable and arguments and run it
+via execvp().
+
+Fixes: d010fa0d7f8ef42ad31729d027d2e4be6dd6e588
+Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
+Upstream-Status: Submitted [https://github.com/dracut-ng/dracut-ng/pull/339]
+---
+ src/install/dracut-install.c | 47 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 46 insertions(+), 1 deletion(-)
+
+diff --git a/src/install/dracut-install.c b/src/install/dracut-install.c
+index e9708c45..724b27b5 100644
+--- a/src/install/dracut-install.c
++++ b/src/install/dracut-install.c
+@@ -559,10 +559,55 @@ static int resolve_deps(const char *src)
+         log_debug("%s %s", ldd, fullsrcpath);
+         pid_t ldd_pid;
+         if ((ldd_pid = fork()) == 0) {
++                char **cmdline = NULL;
++                int start, pos, idx = 0;
++                /* Account for at least 2 elements plus the terminating NULL in cmdline */
++                int args = 3;
++
++                /* Estimate the number of space-separated elements in the "ldd" string */
++                pos = 0;
++                while (isspace(ldd[pos]))
++                        pos++;
++                for (; ldd[pos]; pos++) {
++                        if (isspace(ldd[pos])) {
++                                if (pos)
++                                        args++;
++                                while (isspace(ldd[pos]))
++                                        pos++;
++                        }
++                }
++
++                cmdline = malloc(args * sizeof(char *));
++                memset(cmdline, 0, args * sizeof(char *));
++
++                pos = 0;
++                while (isspace(ldd[pos]))
++                        pos++;
++                start = pos;
++                for (; ldd[pos]; pos++) {
++                        while (ldd[pos] && !isspace(ldd[pos]))
++                                pos++;
++
++                        cmdline[idx] = malloc(pos - start + 1);
++                        memcpy(cmdline[idx], ldd + start, pos - start);
++                        cmdline[idx][pos - start] = 0;
++                        idx++;
++
++                        if (!ldd[pos])
++                                break;
++
++                        while (isspace(ldd[pos]))
++                                pos++;
++                        start = pos;
++                }
++
++                cmdline[idx++] = fullsrcpath;
++                cmdline[idx] = NULL;
++
+                 dup2(fds[1], 1);
+                 dup2(fds[1], 2);
+                 putenv("LC_ALL=C");
+-                execlp(ldd, ldd, fullsrcpath, (char *)NULL);
++                execvp(cmdline[0], cmdline);
+                 _exit(errno == ENOENT ? 127 : 126);
+         }
+         close(fds[1]);
+-- 
+2.45.2
+

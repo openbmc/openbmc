@@ -7,7 +7,6 @@ BUGTRACKER = "http://savannah.gnu.org/bugs/?group=findutils"
 SECTION = "console/utils"
 
 SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.xz \
-          file://autoconf-2.73.patch \
           file://run-ptest \
           "
 

@@ -37,7 +37,7 @@ do_install() {
 
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
 	        install -d ${D}/etc/default/volatiles
-		install -m 0644 ${WORKDIR}/99_mandb ${D}/etc/default/volatiles
+		install -m 0644 ${UNPACKDIR}/99_mandb ${D}/etc/default/volatiles
 	fi
 }
 

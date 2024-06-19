@@ -1,0 +1,33 @@
+From afe336ab63ff9b64ef759255de6b03b897dc4453 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 19 May 2024 09:09:46 -0700
+Subject: [PATCH] tests: Include math.h for fabs() definition
+
+Fixes build with gcc-14
+
+../../sox-14.4.2/src/sox_sample_test.h:190:3: error: implicit declaration of function 'fabs' [-Wimplicit-function-declaration]
+  190 |   assert(fabs(d - 1) < 1e-9 && clips == 0);
+      |   ^~~~~~
+      ../../sox-14.4.2/src/sox_sample_test.h:23:1: note: include '<math.h>' or provide a declaration of 'fabs'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/sox_sample_test.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/sox_sample_test.h b/src/sox_sample_test.h
+index 62b55e4..17f0069 100644
+--- a/src/sox_sample_test.h
++++ b/src/sox_sample_test.h
+@@ -19,6 +19,7 @@
+ #undef NDEBUG /* Must undef above assert.h or other that might include it. */
+ #endif
+ #include <assert.h>
++#include <math.h>
+ #include "sox.h"
+ 
+ #define TEST_UINT(bits) \
+-- 
+2.45.1
+

@@ -1,0 +1,32 @@
+From 78270f9159a9ec7284ca39a2fbb1774347942de1 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Wed, 24 Apr 2024 19:08:43 +0200
+Subject: [PATCH] gssdp-enums.c.template: use basename instead of filename
+
+This would prevent the build path from leaking into the source code.
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gssdp/-/merge_requests/13]
+---
+ libgssdp/gssdp-enums.c.template | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libgssdp/gssdp-enums.c.template b/libgssdp/gssdp-enums.c.template
+index 600d426..2dfb859 100644
+--- a/libgssdp/gssdp-enums.c.template
++++ b/libgssdp/gssdp-enums.c.template
+@@ -3,8 +3,8 @@
+ 
+ /*** END file-header ***/
+ /*** BEGIN file-production ***/
+-/* enumerations from "@filename@" */
+-#include "@filename@"
++/* enumerations from "@basename@" */
++#include "@basename@"
+ /*** END file-production ***/
+ /*** BEGIN value-header ***/
+ GType
+-- 
+2.44.0
+

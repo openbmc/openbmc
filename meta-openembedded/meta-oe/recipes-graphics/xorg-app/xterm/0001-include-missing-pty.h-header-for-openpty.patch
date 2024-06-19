@@ -1,0 +1,30 @@
+From e30ab2d73a21bc55511cbedbb9ae603246dbfcd1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 16 May 2024 23:10:00 -0700
+Subject: [PATCH] include missing pty.h header for openpty()
+
+On musl this problem is unearthed
+
+Fix
+./main.c: In function 'get_pty':
+./main.c:3123:14: error: implicit declaration of function 'openpty'; did you mean 'openat'? [-Wimplicit-function-declaration]
+ 3123 |     result = openpty(pty, &opened_tty, ttydev, NULL, NULL);
+      |              ^~~~~~~
+      |              openat
+
+Upstream-Status: Submitted [sent to dickey@invisible-island.net]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/main.c
++++ b/main.c
+@@ -89,6 +89,7 @@
+ 
+ #define RES_OFFSET(field)	XtOffsetOf(XTERM_RESOURCE, field)
+ 
++#include <pty.h>
+ #include <xterm.h>
+ #include <version.h>
+ #include <graphics.h>

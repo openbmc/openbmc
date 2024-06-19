@@ -1,6 +1,6 @@
-From ca9b419f2c146061f73ee045cb0a069c18b40cd0 Mon Sep 17 00:00:00 2001
-From: Mingli Yu <mingli.yu@windriver.com>
-Date: Wed, 15 Dec 2021 14:00:08 +0800
+From 889583912ddd7abc628f2703892ec4884db6419a Mon Sep 17 00:00:00 2001
+From: Soumya Sambu <soumya.sambu@windriver.com>
+Date: Tue, 7 May 2024 08:39:16 +0000
 Subject: [PATCH 01/11] ext/opcache/config.m4: enable opcache
 
 We can't use AC_TRY_RUN to run programs in a cross compile
@@ -20,15 +20,18 @@ Signed-off-by: Claude Bing <cbing@cybernetics.com>
 
 update patch to version 8.1.0
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
+update patch to version 8.2.18
+Signed-off-by: Soumya Sambu <soumya.sambu@windriver.com>
 ---
  ext/opcache/config.m4 | 204 ++----------------------------------------
  1 file changed, 8 insertions(+), 196 deletions(-)
 
 diff --git a/ext/opcache/config.m4 b/ext/opcache/config.m4
-index 2a83fa2..9471b5d 100644
+index 6bf07ad3..5d645b86 100644
 --- a/ext/opcache/config.m4
 +++ b/ext/opcache/config.m4
-@@ -108,209 +108,21 @@ if test "$PHP_OPCACHE" != "no"; then
+@@ -113,209 +113,21 @@ if test "$PHP_OPCACHE" != "no"; then
    AC_CHECK_FUNCS([mprotect])
  
    AC_MSG_CHECKING(for sysvipc shared memory support)
@@ -40,7 +43,7 @@ index 2a83fa2..9471b5d 100644
 -#include <unistd.h>
 -#include <string.h>
 -
--int main() {
+-int main(void) {
 -  pid_t pid;
 -  int status;
 -  int ipc_id;
@@ -121,7 +124,7 @@ index 2a83fa2..9471b5d 100644
 -# define MAP_FAILED ((void*)-1)
 -#endif
 -
--int main() {
+-int main(void) {
 -  pid_t pid;
 -  int status;
 -  char *shm;
@@ -185,7 +188,7 @@ index 2a83fa2..9471b5d 100644
 -# define MAP_FAILED ((void*)-1)
 -#endif
 -
--int main() {
+-int main(void) {
 -  pid_t pid;
 -  int status;
 -  int fd;
@@ -247,5 +250,5 @@ index 2a83fa2..9471b5d 100644
    PHP_NEW_EXTENSION(opcache,
  	ZendAccelerator.c \
 -- 
-2.17.1
+2.40.0
 

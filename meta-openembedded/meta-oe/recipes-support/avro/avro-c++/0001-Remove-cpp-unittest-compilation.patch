@@ -1,9 +1,10 @@
 From 6be1c45e1f7ee78499bdca76c25ec23a61317134 Mon Sep 17 00:00:00 2001
 From: Rui Costa <rui.ms.costa@ctw.bmwgroup.com>
 Date: Wed, 20 Mar 2024 14:58:27 +0000
-Subject: [PATCH 1/2] Remove cpp unittest compilation
+Subject: [PATCH] Remove cpp unittest compilation
 
 Upstream-Status: Inappropriate [oe-specific]
+
 ---
  lang/c++/CMakeLists.txt | 61 -----------------------------------------
  1 file changed, 61 deletions(-)
@@ -83,6 +84,3 @@ index 4a3793152..d94ba42d3 100644
  include (InstallRequiredSystemLibraries)
 
  set (CPACK_PACKAGE_FILE_NAME "avrocpp-${AVRO_VERSION_MAJOR}")
---
-2.44.0
-

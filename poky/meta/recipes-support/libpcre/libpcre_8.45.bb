@@ -56,7 +56,7 @@ BBCLASSEXTEND = "native nativesdk"
 
 do_install_ptest() {
 	t=${D}${PTEST_PATH}
-	cp ${WORKDIR}/Makefile $t
+	cp ${UNPACKDIR}/Makefile $t
 	cp -r ${S}/testdata $t
 	for i in pcre_stringpiece_unittest pcregrep pcretest; \
 	  do cp ${B}/.libs/$i $t; \

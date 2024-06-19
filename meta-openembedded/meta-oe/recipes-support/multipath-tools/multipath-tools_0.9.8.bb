@@ -91,14 +91,14 @@ do_install() {
     #
     if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)};then
         install -d ${D}${sysconfdir}/init.d
-        cp ${WORKDIR}/multipathd.oe ${D}${sysconfdir}/init.d/multipathd
+        cp ${UNPACKDIR}/multipathd.oe ${D}${sysconfdir}/init.d/multipathd
     fi
 
     sed -i "s:/usr/lib/udev/kpartx_id:${nonarch_base_libdir}/udev/kpartx_id:g" \
         ${D}${nonarch_base_libdir}/udev/rules.d/11-dm-mpath.rules
 
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/multipath.conf.example \
+    install -m 0644 ${UNPACKDIR}/multipath.conf.example \
     ${D}${sysconfdir}/multipath.conf.example
 }
 

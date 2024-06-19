@@ -18,6 +18,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/kexec/kexec-tools-${PV}.tar.gz
            file://0005-Disable-PIE-during-link.patch \
            file://0001-arm64-kexec-disabled-check-if-kaslr-seed-dtb-propert.patch \
            file://Fix-building-on-x86_64-with-binutils-2.41.patch \
+           file://0001-x86-linux-setup.c-Use-POSIX-basename-API.patch \
            "
 
 SRC_URI[sha256sum] = "f33d2660b3e38d25a127e87097978e0f7a9a73ab5151a29eb80974d169ff6a29"
@@ -44,15 +45,15 @@ do_compile:prepend() {
 
 do_install:append () {
         install -d ${D}${sysconfdir}/sysconfig
-        install -m 0644 ${WORKDIR}/kdump.conf ${D}${sysconfdir}/sysconfig
+        install -m 0644 ${UNPACKDIR}/kdump.conf ${D}${sysconfdir}/sysconfig
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
-                install -D -m 0755 ${WORKDIR}/kdump ${D}${sysconfdir}/init.d/kdump
+                install -D -m 0755 ${UNPACKDIR}/kdump ${D}${sysconfdir}/init.d/kdump
         fi
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-                install -D -m 0755 ${WORKDIR}/kdump ${D}${libexecdir}/kdump-helper
-                install -D -m 0644 ${WORKDIR}/kdump.service ${D}${systemd_system_unitdir}/kdump.service
+                install -D -m 0755 ${UNPACKDIR}/kdump ${D}${libexecdir}/kdump-helper
+                install -D -m 0644 ${UNPACKDIR}/kdump.service ${D}${systemd_system_unitdir}/kdump.service
                 sed -i -e 's,@LIBEXECDIR@,${libexecdir},g' ${D}${systemd_system_unitdir}/kdump.service
         fi
 }

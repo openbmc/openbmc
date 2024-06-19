@@ -157,9 +157,9 @@ do_install () {
         fi
     fi
 
-    if [ -e ${WORKDIR}/fw_env.config ] ; then
+    if [ -e ${UNPACKDIR}/fw_env.config ] ; then
         install -d ${D}${sysconfdir}
-        install -m 644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
+        install -m 644 ${UNPACKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
     fi
 
     if [ -n "${SPL_BINARY}" ]
@@ -259,8 +259,8 @@ do_deploy () {
         fi
     fi
 
-    if [ -e ${WORKDIR}/fw_env.config ] ; then
-        install -D -m 644 ${WORKDIR}/fw_env.config ${DEPLOYDIR}/fw_env.config-${MACHINE}-${PV}-${PR}
+    if [ -e ${UNPACKDIR}/fw_env.config ] ; then
+        install -D -m 644 ${UNPACKDIR}/fw_env.config ${DEPLOYDIR}/fw_env.config-${MACHINE}-${PV}-${PR}
         cd ${DEPLOYDIR}
         ln -sf fw_env.config-${MACHINE}-${PV}-${PR} fw_env.config-${MACHINE}
         ln -sf fw_env.config-${MACHINE}-${PV}-${PR} fw_env.config

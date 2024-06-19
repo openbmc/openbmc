@@ -473,7 +473,8 @@ def create_diff_gz(d, src_orig, src, ar_outdir):
 
 def is_work_shared(d):
     sharedworkdir = os.path.join(d.getVar('TMPDIR'), 'work-shared')
-    return d.getVar('S').startswith(sharedworkdir)
+    sourcedir = os.path.realpath(d.getVar('S'))
+    return sourcedir.startswith(sharedworkdir)
 
 # Run do_unpack and do_patch
 python do_unpack_and_patch() {

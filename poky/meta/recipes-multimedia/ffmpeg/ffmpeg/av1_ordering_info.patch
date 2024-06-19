@@ -1,0 +1,91 @@
+From cafb4c554845332eeb33284cf6498049997dc67e Mon Sep 17 00:00:00 2001
+From: Mark Thompson <sw@jkqxz.net>
+Date: Wed, 20 Mar 2024 20:35:28 +0000
+Subject: [PATCH] lavc/cbs_av1: Save more frame ordering information
+
+This is wanted by the Vulkan decoder.
+
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Upstream-Status: Backport [https://git.ffmpeg.org/gitweb/ffmpeg.git/commitdiff/ecdc94b97f809d5f2b88640842fd0541951ad295]
+---
+ libavcodec/cbs_av1.h                 |  5 +++++
+ libavcodec/cbs_av1_syntax_template.c | 25 +++++++++++++++++++++----
+ 2 files changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/libavcodec/cbs_av1.h b/libavcodec/cbs_av1.h
+index a5402f069d..a027013bc7 100644
+--- a/libavcodec/cbs_av1.h
++++ b/libavcodec/cbs_av1.h
+@@ -427,6 +427,8 @@ typedef struct AV1ReferenceFrameState {
+     int bit_depth;      // RefBitDepth
+     int order_hint;     // RefOrderHint
+ 
++    int saved_order_hints[AV1_TOTAL_REFS_PER_FRAME]; // SavedOrderHints[ref]
++
+     int8_t  loop_filter_ref_deltas[AV1_TOTAL_REFS_PER_FRAME];
+     int8_t  loop_filter_mode_deltas[2];
+     uint8_t feature_enabled[AV1_MAX_SEGMENTS][AV1_SEG_LVL_MAX];
+@@ -464,6 +466,9 @@ typedef struct CodedBitstreamAV1Context {
+     int tile_rows;
+     int tile_num;
+ 
++    int order_hints[AV1_TOTAL_REFS_PER_FRAME];         // OrderHints
++    int ref_frame_sign_bias[AV1_TOTAL_REFS_PER_FRAME]; // RefFrameSignBias
++
+     AV1ReferenceFrameState ref[AV1_NUM_REF_FRAMES];
+ 
+     // AVOptions
+diff --git a/libavcodec/cbs_av1_syntax_template.c b/libavcodec/cbs_av1_syntax_template.c
+index 3be1f2d30f..2979c5d98f 100644
+--- a/libavcodec/cbs_av1_syntax_template.c
++++ b/libavcodec/cbs_av1_syntax_template.c
+@@ -1414,6 +1414,8 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
+             priv->ref[i].valid = 0;
+             priv->ref[i].order_hint = 0;
+         }
++        for (i = 0; i < AV1_REFS_PER_FRAME; i++)
++            priv->order_hints[i + AV1_REF_FRAME_LAST] = 0;
+     }
+ 
+     flag(disable_cdf_update);
+@@ -1568,11 +1570,20 @@ static int FUNC(uncompressed_header)(CodedBitstreamContext *ctx, RWContext *rw,
+         else
+             flag(use_ref_frame_mvs);
+ 
+-        infer(allow_intrabc, 0);
+-    }
++        for (i = 0; i < AV1_REFS_PER_FRAME; i++) {
++            int ref_frame = AV1_REF_FRAME_LAST + i;
++            int hint = priv->ref[current->ref_frame_idx[i]].order_hint;
++            priv->order_hints[ref_frame] = hint;
++            if (!seq->enable_order_hint) {
++                priv->ref_frame_sign_bias[ref_frame] = 0;
++            } else {
++                priv->ref_frame_sign_bias[ref_frame] =
++                    cbs_av1_get_relative_dist(seq, hint,
++                                              current->order_hint) > 0;
++            }
++        }
+ 
+-    if (!frame_is_intra) {
+-        // Derive reference frame sign biases.
++        infer(allow_intrabc, 0);
+     }
+ 
+     if (seq->reduced_still_picture_header || current->disable_cdf_update)
+@@ -1674,6 +1685,12 @@ update_refs:
+                 .bit_depth      = priv->bit_depth,
+                 .order_hint     = priv->order_hint,
+             };
++
++            for (int j = 0; j < AV1_REFS_PER_FRAME; j++) {
++                priv->ref[i].saved_order_hints[j + AV1_REF_FRAME_LAST] =
++                    priv->order_hints[j + AV1_REF_FRAME_LAST];
++            }
++
+             memcpy(priv->ref[i].loop_filter_ref_deltas, current->loop_filter_ref_deltas,
+                    sizeof(current->loop_filter_ref_deltas));
+             memcpy(priv->ref[i].loop_filter_mode_deltas, current->loop_filter_mode_deltas,
+-- 
+2.25.1
+

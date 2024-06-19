@@ -1,4 +1,4 @@
-From 71b5a3905d5cd0feca88a0d61d7657ba5296a052 Mon Sep 17 00:00:00 2001
+From 6d16911316cb576db0239f607e60918a222e4436 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Sun, 24 Apr 2022 17:25:33 +0800
 Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
@@ -20,9 +20,11 @@ Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
 Rebase to 1.7.1
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
- Makefile | 42 ++++++++++++++++++++++--------------------
- 1 file changed, 22 insertions(+), 20 deletions(-)
+ Makefile | 40 +++++++++++++++++++++-------------------
+ 1 file changed, 21 insertions(+), 19 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 71d8548..22acdd5 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -8,12 +8,6 @@ ifeq ($(strip $CC),)
@@ -126,7 +128,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  	@sed -e "s/@DATE@/$(DATE)/" \
  	     -e "s/@VERSION@/$(VERSION)/" \
  	     $(VPATH)makedumpfile.8.in > $(VPATH)makedumpfile.8
-@@ -120,7 +122,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(
+@@ -120,7 +122,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(OBJ_ARCH)
  	     $(VPATH)makedumpfile.conf.5.in > $(VPATH)makedumpfile.conf.5
  
  eppic_makedumpfile.so: extension_eppic.c

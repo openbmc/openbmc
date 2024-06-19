@@ -28,11 +28,11 @@ do_install:append(){
 
 # Systemd script
     install -d ${D}${nonarch_base_libdir}/systemd/system
-    install -m 0755 ${WORKDIR}/minidlna.service ${D}${nonarch_base_libdir}/systemd/system
+    install -m 0755 ${UNPACKDIR}/minidlna.service ${D}${nonarch_base_libdir}/systemd/system
 
 # Sysvinit script
     install -d ${D}${sysconfdir}/init.d
-    install -m 0755 ${WORKDIR}/minidlna-daemon.init.d ${D}${sysconfdir}/init.d/minidlna
+    install -m 0755 ${UNPACKDIR}/minidlna-daemon.init.d ${D}${sysconfdir}/init.d/minidlna
 
 }
 

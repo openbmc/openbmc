@@ -66,7 +66,7 @@ do_install:append() {
 	install -d ${D}${sysconfdir}/sysconfig/xrdp
 	install -m 0644 ${S}/instfiles/*.ini ${D}${sysconfdir}/xrdp/
 	install -m 0644 ${S}/keygen/openssl.conf ${D}${sysconfdir}/xrdp/
-	install -m 0644 ${WORKDIR}/xrdp.sysconfig ${D}${sysconfdir}/sysconfig/xrdp/
+	install -m 0644 ${UNPACKDIR}/xrdp.sysconfig ${D}${sysconfdir}/sysconfig/xrdp/
 	chown xrdp:xrdp ${D}${sysconfdir}/xrdp
 }
 

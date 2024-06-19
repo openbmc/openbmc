@@ -1,21 +1,19 @@
-From f89919ea86d38404dd621521680a0162367bb965 Mon Sep 17 00:00:00 2001
+From 974c3a143bc67faaff9abcc0a06a3d5e692fc660 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
-Date: Wed, 6 Sep 2023 09:09:27 -0400
+Date: Fri, 31 May 2024 11:51:15 -0400
 Subject: [PATCH] selftest-hello: update LIC_FILES_CHKSUM
 
-License-Update: Fix checksum
+This should pass the test_lic_files_chksum_modified_not_mentioned test.
 
-This test should pass the
-test_metadata_lic_files_chksum.LicFilesChkSum.test_lic_files_chksum_modified_not_mentioned
-test.
+License-Update: Stuff happened!
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- .../recipes-test/selftest-hello/selftest-hello_1.0.bb         | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-index 547587bef4..65dda40aba 100644
+index 2dc352d479e..356921db1dd 100644
 --- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 +++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 @@ -1,7 +1,7 @@
@@ -27,13 +25,6 @@ index 547587bef4..65dda40aba 100644
  
  SRC_URI = "file://helloworld.c"
  
-@@ -16,4 +16,4 @@ do_install() {
- 	install -m 0755 helloworld ${D}${bindir}
- }
- 
--BBCLASSEXTEND = "native nativesdk"
-\ No newline at end of file
-+BBCLASSEXTEND = "native nativesdk"
 -- 
-2.41.0
+2.45.1
 

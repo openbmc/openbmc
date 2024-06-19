@@ -4,7 +4,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;m
 
 SRC_URI = "file://inittab"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -14,7 +15,7 @@ do_compile() {
 
 do_install() {
 	install -d ${D}${sysconfdir}
-	install -D -m 0644 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab
+	install -D -m 0644 ${S}/inittab ${D}${sysconfdir}/inittab
 
     CONSOLES="${SERIAL_CONSOLES}"
     for s in $CONSOLES

@@ -1,5 +1,5 @@
 SUMMARY = "Apache Avro data serialization system."
-HOMEPAGE = "http://apr.apache.org/"
+HOMEPAGE = "https://avro.apache.org/"
 SECTION = "libs"
 
 LICENSE = "Apache-2.0"
@@ -18,3 +18,5 @@ SRC_URI = "git://github.com/apache/avro;branch=${BRANCH};protocol=https \
 S = "${WORKDIR}/git/lang/c++"
 
 inherit cmake pkgconfig
+
+BBCLASSEXTEND = "native nativesdk"

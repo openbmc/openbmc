@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://update-rc.d;beginline=5;endline=15;md5=d40a07c27f5354
 
 SRC_URI = "git://git.yoctoproject.org/update-rc.d;branch=master;protocol=https"
 SRCREV = "b8f950105010270a768aa12245d6abf166346015"
+PV .= "+git"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

@@ -15,5 +15,5 @@ inherit autotools lib_package pkgconfig
 
 do_install:append() {
     install -D -m 0644 ${S}/src/dvbcsa/dvbcsa.h ${D}${includedir}/dvbcsa/dvbcsa.h
-    install -D -m 0644 ${WORKDIR}/libdvbcsa.pc ${D}${libdir}/pkgconfig/libdvbcsa.pc
+    install -D -m 0644 ${UNPACKDIR}/libdvbcsa.pc ${D}${libdir}/pkgconfig/libdvbcsa.pc
 }

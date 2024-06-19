@@ -19,5 +19,5 @@ export ac_cv_have_iconv_detect_h="yes"
 export ac_cv_sys_file_offset_bits="64"
 
 do_configure:append () {
-    cp ${WORKDIR}/iconv-detect.h ${S}
+    cp ${UNPACKDIR}/iconv-detect.h ${S}
 }

@@ -6,7 +6,7 @@ SRC_URI:append = "\
 
 do_install:append() {
     # dm-verity
-    install ${WORKDIR}/dmverity ${D}/init.d/80-dmverity
+    install ${S}/dmverity ${D}/init.d/80-dmverity
 }
 
 PACKAGES:append = " initramfs-module-dmverity"

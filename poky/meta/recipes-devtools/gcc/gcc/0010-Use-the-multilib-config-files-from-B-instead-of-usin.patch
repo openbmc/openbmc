@@ -1,4 +1,4 @@
-From b015460586e2ea8a35a11d1a607728707bdf6509 Mon Sep 17 00:00:00 2001
+From 7e5706e74643d8bf78b117620849e546a31295c5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:33:04 +0400
 Subject: [PATCH] Use the multilib config files from ${B} instead of using the
@@ -18,10 +18,10 @@ Upstream-Status: Inappropriate [configuration]
  2 files changed, 36 insertions(+), 8 deletions(-)
 
 diff --git a/gcc/configure b/gcc/configure
-index cf773a8b854..448a1ec093e 100755
+index 3870d6e9b6d..07a0b8571d2 100755
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -13487,10 +13487,20 @@ done
+@@ -15135,10 +15135,20 @@ done
  tmake_file_=
  for f in ${tmake_file}
  do
@@ -46,7 +46,7 @@ index cf773a8b854..448a1ec093e 100755
  done
  tmake_file="${tmake_file_}${omp_device_property_tmake_file}"
  
-@@ -13501,6 +13511,10 @@ tm_file_list="options.h"
+@@ -15149,6 +15159,10 @@ tm_file_list="options.h"
  tm_include_list="options.h insn-constants.h"
  for f in $tm_file; do
    case $f in
@@ -58,10 +58,10 @@ index cf773a8b854..448a1ec093e 100755
         f=`echo $f | sed 's/^..//'`
         tm_file_list="${tm_file_list} $f"
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index 22591478b72..b6e7f5149a7 100644
+index 15670de1706..fd96dd7ba49 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -2337,10 +2337,20 @@ done
+@@ -2363,10 +2363,20 @@ done
  tmake_file_=
  for f in ${tmake_file}
  do
@@ -86,7 +86,7 @@ index 22591478b72..b6e7f5149a7 100644
  done
  tmake_file="${tmake_file_}${omp_device_property_tmake_file}"
  
-@@ -2351,6 +2361,10 @@ tm_file_list="options.h"
+@@ -2377,6 +2387,10 @@ tm_file_list="options.h"
  tm_include_list="options.h insn-constants.h"
  for f in $tm_file; do
    case $f in

@@ -5,7 +5,7 @@ SECTION = "console/network"
 HOMEPAGE = "http://samba.org/ppp/"
 BUGTRACKER = "http://ppp.samba.org/cgi-bin/ppp-bugs"
 DEPENDS = "libpcap openssl virtual/crypt"
-LICENSE = "BSD-3-Clause & BSD-3-Clause-Attribution & GPL-2.0-or-later & LGPL-2.0-or-later & PD"
+LICENSE = "BSD-3-Clause & BSD-3-Clause-Attribution & GPL-2.0-or-later & LGPL-2.0-or-later & PD & RSA-MD"
 LIC_FILES_CHKSUM = "file://pppd/ccp.c;beginline=1;endline=29;md5=e2c43fe6e81ff77d87dc9c290a424dea \
                     file://pppd/plugins/passprompt.c;beginline=1;endline=10;md5=3bcbcdbf0e369c9a3e0b8c8275b065d8 \
                     file://pppd/tdb.c;beginline=1;endline=27;md5=4ca3a9991b011038d085d6675ae7c4e6 \
@@ -35,20 +35,20 @@ do_install:append () {
 	mkdir -p ${D}${bindir}/ ${D}${sysconfdir}/init.d
 	mkdir -p ${D}${sysconfdir}/ppp/ip-up.d/
 	mkdir -p ${D}${sysconfdir}/ppp/ip-down.d/
-	install -m 0755 ${WORKDIR}/pon ${D}${bindir}/pon
-	install -m 0755 ${WORKDIR}/poff ${D}${bindir}/poff
-	install -m 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/ppp
-	install -m 0755 ${WORKDIR}/ip-up ${D}${sysconfdir}/ppp/
-	install -m 0755 ${WORKDIR}/ip-down ${D}${sysconfdir}/ppp/
-	install -m 0755 ${WORKDIR}/08setupdns ${D}${sysconfdir}/ppp/ip-up.d/
-	install -m 0755 ${WORKDIR}/92removedns ${D}${sysconfdir}/ppp/ip-down.d/
+	install -m 0755 ${UNPACKDIR}/pon ${D}${bindir}/pon
+	install -m 0755 ${UNPACKDIR}/poff ${D}${bindir}/poff
+	install -m 0755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/ppp
+	install -m 0755 ${UNPACKDIR}/ip-up ${D}${sysconfdir}/ppp/
+	install -m 0755 ${UNPACKDIR}/ip-down ${D}${sysconfdir}/ppp/
+	install -m 0755 ${UNPACKDIR}/08setupdns ${D}${sysconfdir}/ppp/ip-up.d/
+	install -m 0755 ${UNPACKDIR}/92removedns ${D}${sysconfdir}/ppp/ip-down.d/
 	mkdir -p ${D}${sysconfdir}/chatscripts
 	mkdir -p ${D}${sysconfdir}/ppp/peers
-	install -m 0755 ${WORKDIR}/pap ${D}${sysconfdir}/chatscripts
-	install -m 0755 ${WORKDIR}/ppp_on_boot ${D}${sysconfdir}/ppp/ppp_on_boot
-	install -m 0755 ${WORKDIR}/provider ${D}${sysconfdir}/ppp/peers/provider
+	install -m 0755 ${UNPACKDIR}/pap ${D}${sysconfdir}/chatscripts
+	install -m 0755 ${UNPACKDIR}/ppp_on_boot ${D}${sysconfdir}/ppp/ppp_on_boot
+	install -m 0755 ${UNPACKDIR}/provider ${D}${sysconfdir}/ppp/peers/provider
 	install -d ${D}${systemd_system_unitdir}
-	install -m 0644 ${WORKDIR}/ppp@.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${UNPACKDIR}/ppp@.service ${D}${systemd_system_unitdir}
 	sed -i -e 's,@SBINDIR@,${sbindir},g' \
 	       ${D}${systemd_system_unitdir}/ppp@.service
 }

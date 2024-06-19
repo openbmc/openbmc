@@ -23,7 +23,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.(\d*[02468])+(\.\d+)+)"
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 do_install:append() {
-	install -m 0644 -D ${WORKDIR}/gst-player.desktop ${D}${datadir}/applications/gst-player.desktop
+	install -m 0644 -D ${UNPACKDIR}/gst-player.desktop ${D}${datadir}/applications/gst-player.desktop
 }
 
 RDEPENDS:${PN} = "gstreamer1.0-plugins-base-playback"

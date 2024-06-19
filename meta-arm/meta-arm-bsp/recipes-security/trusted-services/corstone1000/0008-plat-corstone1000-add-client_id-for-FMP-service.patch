@@ -1,0 +1,49 @@
+From f6ed75939f0b57e6b0e50ab11cdc3304098456dd Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Fri, 5 Apr 2024 17:31:03 +0200
+Subject: [PATCH 8/8] plat: corstone1000: add client_id for FMP service
+
+Corstone1000 uses trusted-firmware-m as secure enclave software component. Due
+to the changes in TF-M 2.0, psa services requires a seperate client_id now.
+This commit adds smm-gateway-sp client id to the FMP services since FMP structure
+accessed by u-boot via smm-gateway-sp.
+
+Signed-off-by: emeara01 <emekcan.aras@arm.com>
+Upstream-Status: Inappropriate [Design is to revisted]
+---
+ .../capsule_update/provider/corstone1000_fmp_service.c       | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.c b/components/service/capsule_update/provider/corstone1000_fmp_service.c
+index bebdf859f..1b4813d62 100644
+--- a/components/service/capsule_update/provider/corstone1000_fmp_service.c
++++ b/components/service/capsule_update/provider/corstone1000_fmp_service.c
+@@ -33,6 +33,7 @@
+ 	 EFI_VARIABLE_APPEND_WRITE)
+ 
+ #define FMP_VARIABLES_COUNT	6
++#define SMM_GW_SP_ID		0x8003
+ 
+ static struct variable_metadata fmp_variables_metadata[FMP_VARIABLES_COUNT] = {
+     {
+@@ -91,7 +92,7 @@ static psa_status_t protected_storage_set(struct rpc_caller_interface *caller,
+ 		{ .base = psa_ptr_to_u32(&create_flags), .len = sizeof(create_flags) },
+ 	};
+ 
+-	psa_status = psa_call(caller, TFM_PROTECTED_STORAGE_SERVICE_HANDLE, TFM_PS_ITS_SET,
++	psa_status = psa_call_client_id(caller, TFM_PROTECTED_STORAGE_SERVICE_HANDLE, SMM_GW_SP_ID,TFM_PS_ITS_SET,
+ 			      in_vec, IOVEC_LEN(in_vec), NULL, 0);
+ 	if (psa_status < 0)
+ 		EMSG("ipc_set: psa_call failed: %d", psa_status);
+@@ -114,7 +115,7 @@ static psa_status_t protected_storage_get(struct rpc_caller_interface *caller,
+ 		{ .base = psa_ptr_to_u32(p_data), .len = data_size },
+ 	};
+ 
+-	psa_status = psa_call(caller, TFM_PROTECTED_STORAGE_SERVICE_HANDLE,
++	psa_status = psa_call_client_id(caller, TFM_PROTECTED_STORAGE_SERVICE_HANDLE, SMM_GW_SP_ID,
+ 			      TFM_PS_ITS_GET, in_vec, IOVEC_LEN(in_vec),
+ 			      out_vec, IOVEC_LEN(out_vec));
+ 
+-- 
+2.25.1
+

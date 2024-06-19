@@ -116,12 +116,12 @@ do_configure:append() {
 do_install:append() {
     install -d ${D}${sysconfdir}/snmp
     install -d ${D}${sysconfdir}/init.d
-    install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/snmpd
-    install -m 644 ${WORKDIR}/snmpd.conf ${D}${sysconfdir}/snmp/
-    install -m 644 ${WORKDIR}/snmptrapd.conf ${D}${sysconfdir}/snmp/
+    install -m 755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/snmpd
+    install -m 644 ${UNPACKDIR}/snmpd.conf ${D}${sysconfdir}/snmp/
+    install -m 644 ${UNPACKDIR}/snmptrapd.conf ${D}${sysconfdir}/snmp/
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/snmpd.service ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/snmptrapd.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/snmpd.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/snmptrapd.service ${D}${systemd_unitdir}/system
     sed -e "s@^NSC_SRCDIR=.*@NSC_SRCDIR=.@g" \
         -i ${D}${bindir}/net-snmp-create-v3-user
     sed -e 's@^NSC_SRCDIR=.*@NSC_SRCDIR=.@g' \

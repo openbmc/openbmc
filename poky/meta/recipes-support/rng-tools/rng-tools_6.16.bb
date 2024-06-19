@@ -50,9 +50,9 @@ do_configure:prepend() {
 }
 
 do_install:append() {
-    install -Dm 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/rng-tools
-    install -Dm 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/rng-tools
-    install -Dm 0644 ${WORKDIR}/rng-tools.service \
+    install -Dm 0644 ${UNPACKDIR}/default ${D}${sysconfdir}/default/rng-tools
+    install -Dm 0755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/rng-tools
+    install -Dm 0644 ${UNPACKDIR}/rng-tools.service \
                      ${D}${systemd_system_unitdir}/rng-tools.service
     sed -i \
         -e 's,@SYSCONFDIR@,${sysconfdir},g' \
@@ -67,3 +67,7 @@ do_install:append() {
             ${D}${systemd_system_unitdir}/rng-tools.service
     fi
 }
+
+# libargp detection fails
+# http://errors.yoctoproject.org/Errors/Details/766951/
+CFLAGS += "-Wno-error=incompatible-pointer-types"

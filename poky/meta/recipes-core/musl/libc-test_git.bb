@@ -50,7 +50,7 @@ do_install () {
 }
 
 do_install_ptest_base:append() {
-    install -Dm 0755 ${WORKDIR}/run-libc-ptests ${D}${PTEST_PATH}/run-libc-ptests
+    install -Dm 0755 ${UNPACKDIR}/run-libc-ptests ${D}${PTEST_PATH}/run-libc-ptests
 }
 
 COMPATIBLE_HOST = "null"

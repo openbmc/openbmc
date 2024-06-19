@@ -22,61 +22,30 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://powerpc_rom.bin \
            file://run-ptest \
            file://0001-qemu-Add-addition-environment-space-to-boot-loader-q.patch \
-           file://0003-apic-fixup-fallthrough-to-PIC.patch \
-           file://0004-configure-Add-pkg-config-handling-for-libgcrypt.patch \
-           file://0005-qemu-Do-not-include-file-if-not-exists.patch \
-           file://0006-qemu-Add-some-user-space-mmap-tweaks-to-address-musl.patch \
-           file://0007-qemu-Determinism-fixes.patch \
-           file://0008-tests-meson.build-use-relative-path-to-refer-to-file.patch \
-           file://0009-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
-           file://0010-hw-pvrdma-Protect-against-buggy-or-malicious-guest-d.patch \
-           file://0002-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
-           file://fixedmeson.patch \
-           file://no-pip.patch \
-           file://4a8579ad8629b57a43daa62e46cc7af6e1078116.patch \
-           file://0001-linux-user-x86_64-Handle-the-vsyscall-page-in-open_s.patch \
-           file://0002-linux-user-loongarch64-Remove-TARGET_FORCE_SHMLBA.patch \
-           file://0003-linux-user-Add-strace-for-shmat.patch \
-           file://0004-linux-user-Rewrite-target_shmat.patch \
-           file://0005-tests-tcg-Check-that-shmat-does-not-break-proc-self-.patch \
-           file://CVE-2023-6683.patch \
+           file://0002-apic-fixup-fallthrough-to-PIC.patch \
+           file://0003-configure-Add-pkg-config-handling-for-libgcrypt.patch \
+           file://0004-qemu-Do-not-include-file-if-not-exists.patch \
+           file://0005-qemu-Add-some-user-space-mmap-tweaks-to-address-musl.patch \
+           file://0006-qemu-Determinism-fixes.patch \
+           file://0007-tests-meson.build-use-relative-path-to-refer-to-file.patch \
+           file://0008-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
+           file://0009-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
+           file://0010-configure-lookup-meson-exutable-from-PATH.patch \
+           file://0011-qemu-Ensure-pip-and-the-python-venv-aren-t-used-for-.patch \
            file://qemu-guest-agent.init \
            file://qemu-guest-agent.udev \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-# SDK_OLDEST_KERNEL is set below 4.17, which is the minimum version required by QEMU >= 8.1
-# This is due to two MMAP flags being used at certain points
-SRC_URI:append:class-nativesdk = " \
-	file://0011-linux-user-workaround-for-missing-MAP_FIXED_NOREPLAC.patch \
-	file://0012-linux-user-workaround-for-missing-MAP_SHARED_VALIDAT.patch \
-        "
-
-# Support building and using native version on pre 4.17 kernels
-SRC_URI:append:class-native = " \
-	file://0011-linux-user-workaround-for-missing-MAP_FIXED_NOREPLAC.patch \
-	file://0012-linux-user-workaround-for-missing-MAP_SHARED_VALIDAT.patch \
-        "
-
-SRC_URI[sha256sum] = "8562751158175f9d187c5f22b57555abe3c870f0325c8ced12c34c6d987729be"
+SRC_URI[sha256sum] = "32708ac66c30d8c892633ea968c771c1c76d597d70ddead21a0d22ccf386da69"
 
 CVE_STATUS[CVE-2007-0998] = "not-applicable-config: The VNC server can expose host files uder some circumstances. We don't enable it by default."
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1609015#c11
 CVE_STATUS[CVE-2018-18438] = "disputed: The issues identified by this CVE were determined to not constitute a vulnerability."
 
-# As per https://nvd.nist.gov/vuln/detail/CVE-2023-0664
-# https://bugzilla.redhat.com/show_bug.cgi?id=2167423
-CVE_STATUS[CVE-2023-0664] = "not-applicable-platform: Issue only applies on Windows"
-
 # As per https://bugzilla.redhat.com/show_bug.cgi?id=2203387
 CVE_STATUS[CVE-2023-2680] = "not-applicable-platform: RHEL specific issue."
-
-CVE_STATUS[CVE-2023-3019] = "cpe-incorrect: Applies only against versions before 8.2.0"
-
-CVE_STATUS[CVE-2023-5088] = "cpe-incorrect: Applies only against version 8.2.0 and earlier"
-
-CVE_STATUS[CVE-2023-6693] = "cpe-incorrect: Applies only against version 8.2.0 and earlier"
 
 COMPATIBLE_HOST:mipsarchn32 = "null"
 COMPATIBLE_HOST:mipsarchn64 = "null"
@@ -168,11 +137,11 @@ do_install () {
 	# If we built the guest agent, also install startup/udev rules
 	if [ -e "${D}${bindir}/qemu-ga" ]; then
 		install -d ${D}${sysconfdir}/init.d/
-		install -m 0755 ${WORKDIR}/qemu-guest-agent.init ${D}${sysconfdir}/init.d/qemu-guest-agent
+		install -m 0755 ${UNPACKDIR}/qemu-guest-agent.init ${D}${sysconfdir}/init.d/qemu-guest-agent
 		sed -i 's:@bindir@:${bindir}:' ${D}${sysconfdir}/init.d/qemu-guest-agent
 
 		install -d ${D}${sysconfdir}/udev/rules.d/
-		install -m 0644 ${WORKDIR}/qemu-guest-agent.udev ${D}${sysconfdir}/udev/rules.d/60-qemu-guest-agent.rules
+		install -m 0644 ${UNPACKDIR}/qemu-guest-agent.udev ${D}${sysconfdir}/udev/rules.d/60-qemu-guest-agent.rules
 
 		install -d ${D}${systemd_unitdir}/system/
 		install -m 0644 ${S}/contrib/systemd/qemu-guest-agent.service ${D}${systemd_unitdir}/system
@@ -182,6 +151,8 @@ do_install () {
 	rm ${D}${datadir}/qemu/s390-netboot.img -f
 	# ELF binary /usr/share/qemu/s390-ccw.img has relocations in .text [textrel]
 	rm ${D}${datadir}/qemu/s390-ccw.img -f
+	# We don't support PARISC and these cause strip and SDK relocation errors
+	rm ${D}${datadir}/qemu/hppa* -f
 }
 
 # The following fragment will create a wrapper for qemu-mips user emulation

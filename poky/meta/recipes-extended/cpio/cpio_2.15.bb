@@ -16,6 +16,7 @@ SRC_URI[sha256sum] = "efa50ef983137eefc0a02fdb51509d624b5e3295c980aa127ceee41834
 inherit autotools gettext texinfo ptest
 
 CVE_STATUS[CVE-2010-4226] = "not-applicable-platform: Issue applies to use of cpio in SUSE/OBS"
+CVE_STATUS[CVE-2023-7216] = "disputed: intended behaviour, see https://lists.gnu.org/archive/html/bug-cpio/2024-03/msg00000.html"
 
 EXTRA_OECONF += "DEFAULT_RMT_DIR=${sbindir}"
 
@@ -50,7 +51,7 @@ do_install_ptest() {
     install --mode=755 ${B}/tests/atlocal ${D}${PTEST_PATH}/tests/
     install --mode=755 ${B}/tests/genfile ${D}${PTEST_PATH}/tests/
     install --mode=755 ${S}/tests/testsuite ${D}${PTEST_PATH}/tests/
-    install --mode=755 ${WORKDIR}/test.sh ${D}${PTEST_PATH}/test.sh
+    install --mode=755 ${UNPACKDIR}/test.sh ${D}${PTEST_PATH}/test.sh
     sed -i "s#@PTEST_PATH@#${PTEST_PATH}#g" ${D}${PTEST_PATH}/test.sh
 }
 

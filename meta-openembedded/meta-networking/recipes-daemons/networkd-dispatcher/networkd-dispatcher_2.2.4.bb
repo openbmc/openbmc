@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=84dcc94da3adb52b53ae4fa38fe49e5d"
 
 inherit features_check systemd
 
-RDEPENDS:${PN} = "python3-pygobject python3-dbus"
+RDEPENDS:${PN} = "python3-pygobject python3-dbus python3-json"
 REQUIRED_DISTRO_FEATURES = "systemd gobject-introspection-data"
 
 SRCREV = "dfd26d72793914eb3da910ef8c71de6d7c8942a2"

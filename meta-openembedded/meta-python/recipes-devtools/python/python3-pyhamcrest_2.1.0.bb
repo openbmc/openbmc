@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=79391bf1501c898472d043f36e960612"
 
 SRC_URI[sha256sum] = "c6acbec0923d0cb7e72c22af1926f3e7c97b8e8d69fc7498eabacaf7c975bd9c"
 
-inherit pypi python_setuptools_build_meta
+inherit pypi python_hatchling
 
 DEPENDS += "python3-hatch-vcs-native"
 
@@ -13,6 +13,6 @@ UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/PyHamcrest/"
 UPSTREAM_CHECK_REGEX = "/PyHamcrest/(?P<pver>(\d+[\.\-_]*)+)"
 
 RDEPENDS:${PN} += " \
-    python3-six \
+    python3-asyncio \
     python3-numbers \
 "

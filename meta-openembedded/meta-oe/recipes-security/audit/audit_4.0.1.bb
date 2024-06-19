@@ -44,8 +44,8 @@ EXTRA_OECONF = " \
 
 EXTRA_OEMAKE = " \
         PYTHON=python3 \
-        pythondir=${libdir}/python${PYTHON_BASEVERSION}/site-packages \
-        pyexecdir=${libdir}/python${PYTHON_BASEVERSION}/site-packages \
+        pythondir=${PYTHON_SITEPACKAGES_DIR} \
+        pyexecdir=${PYTHON_SITEPACKAGES_DIR} \
         STDINC='${STAGING_INCDIR}' \
         "
 
@@ -90,11 +90,11 @@ do_install:append() {
     install -m 0640 ${D}/etc/audit/rules.d/audit.rules ${D}/etc/audit/audit.rules
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -D -m 0644 ${WORKDIR}/audit-volatile.conf ${D}${sysconfdir}/tmpfiles.d/audit.conf
+        install -D -m 0644 ${UNPACKDIR}/audit-volatile.conf ${D}${sysconfdir}/tmpfiles.d/audit.conf
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
-        install -D -m 0755 ${WORKDIR}/auditd ${D}/etc/init.d/auditd
+        install -D -m 0755 ${UNPACKDIR}/auditd ${D}/etc/init.d/auditd
         rm -rf ${D}${libdir}/systemd
     fi
 

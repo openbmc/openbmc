@@ -54,17 +54,20 @@ debug() {
 }
 
 # Prints a message and start a endless loop
+# Force reboot if init_fatal_reboot bootparam is set
 fatal() {
-    echo $1 >/dev/console
-    echo >/dev/console
+	echo $1 >/dev/console
+	echo >/dev/console
 
-    if [ -n "$bootparam_init_fatal_sh" ]; then
-        sh
-    else
-	while [ "true" ]; do
-		sleep 3600
-	done
-    fi
+	if [ -n "$bootparam_init_fatal_reboot" ]; then
+		reboot -f
+	elif [ -n "$bootparam_init_fatal_sh" ]; then
+		sh
+	else
+		while [ "true" ]; do
+			sleep 3600
+		done
+	fi
 }
 
 # Variables shared amoung modules

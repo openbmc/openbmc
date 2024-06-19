@@ -24,6 +24,6 @@ S = "${WORKDIR}/git"
 
 do_install:append() {
   install -d ${D}${datadir}/applications
-  install -m644 ${WORKDIR}/polkit-gnome-authentication-agent-1.desktop \
+  install -m644 ${UNPACKDIR}/polkit-gnome-authentication-agent-1.desktop \
       ${D}${datadir}/applications
 }

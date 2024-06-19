@@ -1,11 +1,5 @@
 ARMFILESPATHS := "${THISDIR}/files:"
 
-COMPATIBLE_MACHINE:generic-arm64 = "generic-arm64"
-FILESEXTRAPATHS:prepend:generic-arm64 = "${ARMFILESPATHS}"
-SRC_URI:append:generic-arm64 = " \
-    file://generic-arm64-kmeta;type=kmeta;destsuffix=generic-arm64-kmeta \
-    "
-
 FILESEXTRAPATHS:prepend:qemuarm64-secureboot = "${ARMFILESPATHS}"
 SRC_URI:append:qemuarm64-secureboot = " \
     file://tee.cfg \

@@ -4,6 +4,8 @@ Date:   Mon Nov 18 18:43:15 2019 +0100
 
     Backport of the NEWS file from version 1.6.0
 
+Upstream-Status: Inappropriate [Test artefact]
+
 diff --git a/doc/NEWS b/doc/NEWS
 index 69793fc..fd49b1c 100644
 --- a/doc/NEWS

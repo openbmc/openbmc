@@ -2,6 +2,7 @@ PACKAGECONFIG ??= "drm"
 
 PACKAGECONFIG[drm] = ",,libdrm"
 PACKAGECONFIG[fbdev] = ",,"
+PACKAGECONFIG[gridnav] = ",,"
 PACKAGECONFIG[sdl] = ",,virtual/libsdl2 libsdl2-image"
 
 # Add libdrm include if drm is selected in PACKAGECONFIG
@@ -14,6 +15,7 @@ LVGL_CONFIG_USE_EVDEV = "${@bb.utils.contains_any('PACKAGECONFIG', 'drm fbdev', 
 LVGL_CONFIG_USE_FBDEV = "${@bb.utils.contains('PACKAGECONFIG', 'fbdev', '1', '0', d)}"
 
 LVGL_CONFIG_USE_SDL = "${@bb.utils.contains('PACKAGECONFIG', 'sdl', '1', '0', d)}"
+
 LVGL_CONFIG_SDL_FULLSCREEN ?= "0"
 
 LVGL_CONFIG_LV_MEM_CUSTOM ?= "0"
@@ -25,6 +27,8 @@ LVGL_CONFIG_LV_LOG_LEVEL  ?= "LV_LOG_LEVEL_WARN"
 LVGL_CONFIG_LV_LOG_PRINTF ?= "0"
 
 LVGL_CONFIG_LV_USE_FONT_COMPRESSED ?= "0"
+
+LVGL_CONFIG_LV_USE_GRIDNAV = "${@bb.utils.contains('PACKAGECONFIG', 'gridnav', '1', '0', d)}"
 
 LVGL_CONFIG_LV_THEME_DEFAULT_DARK ?= "0"
 
@@ -70,6 +74,7 @@ do_configure:append() {
         -e "s|^([[:space:]]*#define LV_LOG_PRINTF[[:space:]]).*|\1${LVGL_CONFIG_LV_LOG_PRINTF}|" \
         \
         -e "s|^([[:space:]]*#define LV_USE_FONT_COMPRESSED[[:space:]]).*|\1${LVGL_CONFIG_LV_USE_FONT_COMPRESSED}|" \
+        -e "s|^([[:space:]]*#define LV_USE_GRIDNAV[[:space:]]).*|\1${LVGL_CONFIG_LV_USE_GRIDNAV}|" \
         -e "s|^([[:space:]]*#define LV_THEME_DEFAULT_DARK[[:space:]]).*|\1${LVGL_CONFIG_LV_THEME_DEFAULT_DARK}|" \
         \
         -i "${S}/lv_conf.h"

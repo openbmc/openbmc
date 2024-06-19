@@ -1,4 +1,4 @@
-From 4b0efc18e0d91967a3db11d9ef0595a5a76ad67a Mon Sep 17 00:00:00 2001
+From 19279e08417124b4567fafdf9300b779ce1a1e1c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:30:32 +0400
 Subject: [PATCH] gcc: armv4: pass fix-v4bx to linker to support EABI.
@@ -18,7 +18,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/gcc/config/arm/linux-eabi.h b/gcc/config/arm/linux-eabi.h
-index dce7f59eeea..27402c629c6 100644
+index 335cb4c3607..1d5235075cb 100644
 --- a/gcc/config/arm/linux-eabi.h
 +++ b/gcc/config/arm/linux-eabi.h
 @@ -88,10 +88,14 @@

@@ -18,7 +18,7 @@ TOOLCHAIN_TEST_HOST_PORT ??= "2222"
 do_check[nostamp] = "1"
 do_check[network] = "1"
 do_check:append () {
-    chmod 0755 ${WORKDIR}/check-test-wrapper
+    chmod 0755 ${UNPACKDIR}/check-test-wrapper
 
     oe_runmake -i \
         QEMU_SYSROOT="${RECIPE_SYSROOT}" \
@@ -26,7 +26,7 @@ do_check:append () {
         SSH_HOST="${TOOLCHAIN_TEST_HOST}" \
         SSH_HOST_USER="${TOOLCHAIN_TEST_HOST_USER}" \
         SSH_HOST_PORT="${TOOLCHAIN_TEST_HOST_PORT}" \
-        test-wrapper="${WORKDIR}/check-test-wrapper ${TOOLCHAIN_TEST_TARGET}" \
+        test-wrapper="${UNPACKDIR}/check-test-wrapper ${TOOLCHAIN_TEST_TARGET}" \
         check
 }
 

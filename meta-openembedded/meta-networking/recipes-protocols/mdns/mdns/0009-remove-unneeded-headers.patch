@@ -1,4 +1,4 @@
-From 1d7e71e72c597ffcc19c04373a477d1fbd3ad955 Mon Sep 17 00:00:00 2001
+From 05cb409ce213f35798c02faf2032d4846a84b48e Mon Sep 17 00:00:00 2001
 From: Beniamin Sandu <beniaminsandu@gmail.com>
 Date: Thu, 15 Jun 2023 17:02:58 +0000
 Subject: [PATCH] remove unneeded headers
@@ -14,10 +14,10 @@ Signed-off-by: Beniamin Sandu <beniaminsandu@gmail.com>
  mDNSPosix/mbedtls.c | 2 --
  1 file changed, 2 deletions(-)
 
-Index: mDNSResponder/mDNSPosix/mbedtls.c
-===================================================================
---- mDNSResponder.orig/mDNSPosix/mbedtls.c
-+++ mDNSResponder/mDNSPosix/mbedtls.c
+diff --git a/mDNSPosix/mbedtls.c b/mDNSPosix/mbedtls.c
+index a73681b6d528..ab8f8c772c00 100644
+--- a/mDNSPosix/mbedtls.c
++++ b/mDNSPosix/mbedtls.c
 @@ -38,10 +38,8 @@
  #include <mbedtls/sha256.h>
  #include <mbedtls/base64.h>

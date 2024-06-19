@@ -14,11 +14,11 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00010.html]
 
-diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
-index a5f21a1..f884824 100644
---- a/build-aux/ltmain.in
-+++ b/build-aux/ltmain.in
-@@ -2381,8 +2381,14 @@ func_mode_install ()
+Index: libtool-2.5.0/build-aux/ltmain.in
+===================================================================
+--- libtool-2.5.0.orig/build-aux/ltmain.in
++++ libtool-2.5.0/build-aux/ltmain.in
+@@ -2382,8 +2382,14 @@ func_mode_install ()
  	func_append dir "$objdir"
  
  	if test -n "$relink_command"; then
@@ -34,6 +34,3 @@ index a5f21a1..f884824 100644
  
  	  # Don't allow the user to place us outside of our expected
  	  # location b/c this prevents finding dependent libraries that
--- 
-2.25.1
-

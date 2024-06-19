@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import shutil
 
+from oeqa.core.decorator import OETestTag
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_var, get_bb_vars, runCmd
 
@@ -42,3 +43,18 @@ IMAGE_FSTYPES = "tar.bz2"
                     native_sysroot = native_sysroot, target_sys = target_sys)
             self.assertIn(".gnu_debugdata", r.output)
 
+    @OETestTag("runqemu")
+    def test_minidebuginfo_qemu(self):
+        """
+        Test minidebuginfo inside a qemu.
+        This runs test_systemd_coredump_minidebuginfo and other minidebuginfo runtime tests which may be added in the future.
+        """
+
+        self.write_config("""
+DISTRO_FEATURES:append = " minidebuginfo"
+INIT_MANAGER = "systemd"
+IMAGE_CLASSES += "testimage"
+TEST_SUITES = "ping ssh systemd"
+        """)
+        bitbake('core-image-minimal')
+        bitbake('-c testimage core-image-minimal')

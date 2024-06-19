@@ -37,7 +37,7 @@ PACKAGECONFIG[glx] = "-Dglx=enabled,-Dglx=disabled,virtual/${MLPREFIX}libgl libx
 PACKAGECONFIG[wayland] = "-Dwayland=enabled,-Dwayland=disabled,virtual/${MLPREFIX}egl wayland wayland-native wayland-protocols"
 
 # wants gbm.pc egl.pc
-PACKAGECONFIG[gbm] = "-Dgbm=enabled,-Dgbm=disabled,virtual/${MLPREFIX}egl virtual/${MLPREFIX}libgbm udev"
+PACKAGECONFIG[gbm] = "-Dgbm=enabled,-Dgbm=disabled,virtual/${MLPREFIX}egl virtual/${MLPREFIX}libgbm libdrm"
 
 # wants egl.pc
 PACKAGECONFIG[x11-egl] = "-Dx11_egl=enabled,-Dx11_egl=disabled,virtual/${MLPREFIX}egl libxcb"

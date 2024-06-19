@@ -1,4 +1,4 @@
-From e213ed33a28704f6f538df41a91b7ce95594a4f8 Mon Sep 17 00:00:00 2001
+From 20a110ade91c73f4cb3883a3a9676708a93ca786 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Oct 2019 18:12:54 +0800
 Subject: [PATCH] start lvm2-monitor.service after tmp.mount
@@ -19,7 +19,7 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/lvm2_monitoring_systemd_red_hat.service.in b/scripts/lvm2_monitoring_systemd_red_hat.service.in
-index c0c96e3..2a99a37 100644
+index c0c96e316..2a99a379d 100644
 --- a/scripts/lvm2_monitoring_systemd_red_hat.service.in
 +++ b/scripts/lvm2_monitoring_systemd_red_hat.service.in
 @@ -2,7 +2,7 @@
@@ -31,6 +31,3 @@ index c0c96e3..2a99a37 100644
  Before=local-fs-pre.target shutdown.target
  DefaultDependencies=no
  Conflicts=shutdown.target
--- 
-2.25.1
-

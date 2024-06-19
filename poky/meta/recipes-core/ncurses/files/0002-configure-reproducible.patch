@@ -1,4 +1,4 @@
-From ec87e53066a9942e9aaba817d71268342f5e83b9 Mon Sep 17 00:00:00 2001
+From 63cf58044f4ab3297c5a2d0e132e87ebfa80c753 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 16 Aug 2017 14:45:27 +0800
 Subject: [PATCH] configure: reproducible
@@ -13,16 +13,15 @@ Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
 Rebase to 6.1
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  configure | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index 421cf859..a1b7840d 100755
+index 488d93fc..005d44e2 100755
 --- a/configure
 +++ b/configure
-@@ -5072,7 +5072,7 @@ else
+@@ -5129,7 +5129,7 @@ else
  		;;
  	(*)
  		cf_cv_ar_flags=unknown

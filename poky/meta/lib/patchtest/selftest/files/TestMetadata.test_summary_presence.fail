@@ -1,46 +1,42 @@
-From e29da5faa74409be394caa09d9f3b7b60f8592b9 Mon Sep 17 00:00:00 2001
-From: Daniela Plascencia <daniela.plascencia@linux.intel.com>
-Date: Thu, 23 Feb 2017 10:34:27 -0600
-Subject: [PATCH] meta: adding hello-yocto recipe
+From f4b72cc24f5e2a290a8637775c4d41c16d5d83aa Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 31 May 2024 11:03:47 -0400
+Subject: [PATCH] selftest-hello: add selftest-hello-extra
 
-This is a sample recipe
+This should fail the test_summary_presence test.
 
-Signed-off-by: Daniela Plascencia <daniela.plascencia@linux.intel.com>
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- meta/recipes-devtools/hello-world/hello-world/hello_world.c |  5 +++++
- meta/recipes-devtools/hello-world/hello-world_1.0.bb        | 12 ++++++++++++
- 2 files changed, 17 insertions(+)
- create mode 100644 meta/recipes-devtools/hello-world/hello-world/hello_world.c
- create mode 100644 meta/recipes-devtools/hello-world/hello-world_1.0.bb
+ .../selftest-hello-extra_1.0.bb               | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+ create mode 100644 meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
 
-diff --git a/meta/recipes-devtools/hello-world/hello-world/hello_world.c b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
 new file mode 100644
-index 0000000000..0d59f57d4c
+index 00000000000..2dc352d479e
 --- /dev/null
-+++ b/meta/recipes-devtools/hello-world/hello-world/hello_world.c
-@@ -0,0 +1,5 @@
-+#include <stdio.h>
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello-extra_1.0.bb
+@@ -0,0 +1,20 @@
++DESCRIPTION = "Simple helloworld application -- selftest variant"
++SECTION = "examples"
++LICENSE = "MIT"
++LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 +
-+int main(){
-+    printf("Hello World\n");
-+}
-diff --git a/meta/recipes-devtools/hello-world/hello-world_1.0.bb b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
-new file mode 100644
-index 0000000000..c4e1359217
---- /dev/null
-+++ b/meta/recipes-devtools/hello-world/hello-world_1.0.bb
-@@ -0,0 +1,12 @@
-+LICENSE = "CLOSED"
++SRC_URI = "file://helloworld.c"
 +
-+SRC_URI += "file://hello_world.c"
++S = "${WORKDIR}/sources"
++UNPACKDIR = "${S}"
 +
-+do_compile(){
-+    ${CC} -o hello_world ../hello_world.c
++do_compile() {
++	${CC} ${CFLAGS} ${LDFLAGS} helloworld.c -o helloworld
 +}
 +
-+do_install(){
-+    install -d ${D}${bindir}
-+    install -m +x hello_world ${D}${bindir}/hello_world
++do_install() {
++	install -d ${D}${bindir}
++	install -m 0755 helloworld ${D}${bindir}
 +}
---
-2.11.0
++
++BBCLASSEXTEND = "native nativesdk"
+-- 
+2.45.1
+

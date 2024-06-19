@@ -1,0 +1,27 @@
+From 75fa1fa5bd5ef2350390564245fd0984209ac092 Mon Sep 17 00:00:00 2001
+From: akallabeth <akallabeth@posteo.net>
+Date: Mon, 4 Jul 2022 14:34:46 +0200
+Subject: [PATCH] Fixed compilation warnings
+
+Upstream-Status: Backport [https://github.com/FreeRDP/FreeRDP/commit/2da280b8a1748052b70b3f5a1ef0d8e932c33adc]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ client/X11/xf_graphics.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/X11/xf_graphics.c b/client/X11/xf_graphics.c
+index 5aa1fd48b..fe81e0ed9 100644
+--- a/client/X11/xf_graphics.c
++++ b/client/X11/xf_graphics.c
+@@ -438,7 +438,7 @@ static BOOL xf_Pointer_New(rdpContext* context, rdpPointer* pointer)
+ 
+ #endif
+ fail:
+-	WLog_DBG(TAG, "%s: %ld", __func__, rc ? pointer : -1);
++	WLog_DBG(TAG, "%s: %p", __func__, rc ? pointer : NULL);
+ 	return rc;
+ }
+ 
+-- 
+2.45.0
+

@@ -243,6 +243,7 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     cloc \
     icon-slicer \
     cscope \
+    dbd-mariadb \
     dmalloc \
     ${@bb.utils.contains("PACKAGE_CLASSES", "package_rpm", "dnf-plugin-tui", "", d)} \
     doxygen \
@@ -287,7 +288,6 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     openocd \
     pax-utils \
     ipc-run \
-    libdbd-mysql-perl \
     libdbi-perl \
     libdev-checklib-perl \
     libio-pty-perl \
@@ -511,7 +511,7 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     libsdl2-net \
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl", "libsdl2-ttf", "", d)} \
     libsdl \
-    ${@bb.utils.contains("DISTRO_FEATURES", "wayland", "lv-drivers lvgl lv-lib-png", "", d)} \
+    lvgl \
     ttf-arphic-uming \
     ttf-droid-sans ttf-droid-sans-mono ttf-droid-sans-fallback ttf-droid-sans-japanese ttf-droid-serif \
     ttf-abyssinica \
@@ -611,6 +611,7 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     xcursorgen \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 pam", "xscreensaver", "", d)} \
     yad \
+    ydotool \
     parallel-deqp-runner \
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl", "opengl-es-cts", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl vulkan", "vulkan-cts", "", d)} \
@@ -687,7 +688,6 @@ RDEPENDS:packagegroup-meta-oe-multimedia ="\
 RDEPENDS:packagegroup-meta-oe-navigation ="\
     geos \
     ${@bb.utils.contains("DISTRO_FEATURES", "bluz4", "gpsd-machine-conf gpsd", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "orrery", "", d)} \
     geoclue \
     libspatialite \
     proj \
@@ -742,7 +742,6 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     exiv2 \
     libnice \
     c-periphery \
-    fmt \
     function2 \
     gd \
     gflags \

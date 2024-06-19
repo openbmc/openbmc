@@ -1,4 +1,4 @@
-From 9487b1d6136ea09cce4792d59d0170c712575550 Mon Sep 17 00:00:00 2001
+From c6fc577e9e89dc16d3e971aa165602746232de4c Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Sat, 20 Aug 2022 09:04:14 -0700
 Subject: [PATCH] Avoid hardcoded build paths into ppc libgcc

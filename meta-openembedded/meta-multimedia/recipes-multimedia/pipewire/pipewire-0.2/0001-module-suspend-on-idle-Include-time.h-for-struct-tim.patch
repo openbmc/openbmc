@@ -1,0 +1,43 @@
+From b1d911fdab4a583f276d18395037d90bfc305109 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 20 May 2024 18:12:23 -0700
+Subject: [PATCH] module-suspend-on-idle: Include time.h for struct timespec
+ decl
+
+This is flagged as error with gcc-14 on musl targets
+
+In file included from ../git/src/pipewire/loop.h:27,
+                 from ../git/src/pipewire/core.h:44,
+                 from ../git/src/modules/module-suspend-on-idle.c:26:
+../git/spa/include/spa/support/loop.h:184:37: warning: 'struct timespec' declared inside parameter list will not be visible outside of this definition or declaration
+  184 |                              struct timespec *value,
+      |                                     ^~~~~~~~
+../git/src/modules/module-suspend-on-idle.c: In function 'node_state_changed':
+../git/src/modules/module-suspend-on-idle.c:110:69: error: passing argument 2 of 'main_loop->utils->update_timer' from incompatible pointer type [-Wincompatible-pointer-types]
+  110 |                 pw_loop_update_timer(main_loop, info->idle_timeout, &value, NULL, false);
+      |                                                                     ^~~~~~
+      |                                                                     |
+      |                                                                     struct timespec *
+
+Upstream-Status: Inappropriate [Fixed in latest pipewire differently]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/modules/module-suspend-on-idle.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/modules/module-suspend-on-idle.c b/src/modules/module-suspend-on-idle.c
+index e5c1fcb30..4dba3be71 100644
+--- a/src/modules/module-suspend-on-idle.c
++++ b/src/modules/module-suspend-on-idle.c
+@@ -20,6 +20,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <errno.h>
++#include <time.h>
+ 
+ #include "config.h"
+ 
+-- 
+2.45.1
+

@@ -1,5 +1,8 @@
 DESCRIPTION = "Trusted Services SPMC test SPs"
 
+# spm test SP only supports opteesp.
+TS_ENV = 'opteesp'
+
 require ts-sp-common.inc
 
 SP_UUID = "${SPM_TEST${SP_INDEX}_UUID}"

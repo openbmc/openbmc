@@ -1,3 +1,5 @@
+Upstream-Status: Inappropriate [Test artefact]
+
 diff --git a/Makefile.am b/Makefile.am
 index 432a9b4..bbf7c74 100644
 --- a/Makefile.am
