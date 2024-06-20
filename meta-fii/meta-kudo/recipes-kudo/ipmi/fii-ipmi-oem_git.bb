@@ -11,7 +11,7 @@ DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd libgpiod"
 inherit meson pkgconfig
 
 SRC_URI = "git://github.com/openbmc/foxconn-ipmi-oem.git;branch=master;protocol=https"
-SRCREV = "40553244bd6131be9c3395f212bed39e44932651"
+SRCREV = "c2663f1c98ad690e150736896bcfdca6a15f391a"
 
 FILES:${PN}:append = " ${libdir}/ipmid-providers"
 FILES:${PN}:append = " ${libdir}/host-ipmid"
