@@ -11,16 +11,10 @@ EXTRA_OEMESON = " \
         "
 
 SYSTEMD_SERVICE:${PN} += " \
-  dhcp4@.service \
-  dhcp6@.service \
   ncsid@.service \
   nic-hostful@.target \
   nic-hostless@.target \
   update-ra-gw@.service \
-  update-ra-neighbor@.service \
-  update-ra-neighbor@.timer \
-  update-static-neighbors@.service \
-  update-static-neighbors@.timer \
   "
 
 DEPENDS += " \
