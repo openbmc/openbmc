@@ -14,3 +14,33 @@ export CHASSIS_INTF_NAME="xyz.openbmc_project.State.Chassis"
 export CHASSIS_PROPERTY_NAME="CurrentPowerState"
 export CHASSIS_ON_PROPERTY="xyz.openbmc_project.State.Chassis.PowerState.On"
 export CHASSIS_OFF_PROPERTY="xyz.openbmc_project.State.Chassis.PowerState.Off"
+
+gpio_get()
+{
+  RETRY=3
+  while [ $RETRY -gt 0 ]
+  do
+    if gpioget "$1" "$2"
+    then
+      return 0
+    fi
+    RETRY=$((RETRY-1))
+    sleep 0.5
+  done
+  echo "gpioget failed"
+}
+
+gpio_set()
+{
+  RETRY=3
+  while [ $RETRY -gt 0 ]
+  do
+    if gpioset "$1" "$2"
+    then
+      return 0
+    fi
+    RETRY=$((RETRY-1))
+    sleep 0.5
+  done
+  echo "gpioset failed"
+}

@@ -21,14 +21,14 @@ chassis-power-off()
         busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}0" au.com.CodeConstruct.MCTP.Endpoint Remove
         busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}2" au.com.CodeConstruct.MCTP.Endpoint Remove
         sleep 1
-        if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
+        if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
         then
                 echo "Failed to set slot$1 power off"
         fi
         sleep 1
 
         # Check chassis status after doing 12V off
-        chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+        chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
         if [ "$chassis_status" == "$STATE_OFF" ]
         then
                 busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
@@ -40,7 +40,7 @@ chassis-power-off()
         fi
 }
 
-if ! chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
+if ! chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
     echo "Failed to get chassis status"
     exit 1
 fi

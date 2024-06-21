@@ -23,26 +23,24 @@ chassis-power-cycle()
 
     if [ "$CHASSIS_ID" -le 8  ]
     then
-        chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+        chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
         if [ "$chassis_status" == "$STATE_ON" ]
         then
-            busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}0" au.com.CodeConstruct.MCTP.Endpoint Remove
-            busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}2" au.com.CodeConstruct.MCTP.Endpoint Remove
             sleep 1
-            if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
+            if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
             then
                 echo "Failed to set slot$1 power off"
             fi
-            sleep 10
+            sleep 20
         fi
-        if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
+        if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
         then
             echo "Failed to set slot$1 power on"
         fi
         sleep 2
 
         # Check chassis status after doing 12V cycle
-        chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+        chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
         if [ "$chassis_status" == "$STATE_ON" ]
         then
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
@@ -62,7 +60,7 @@ chassis-power-cycle()
 if [ "$1" == 0 ]
 then
     echo "Starting sled cycle..."
-    if ! gpioset "$GPIOCHIP_IO_EXP_SLED_PWR_CTRL" "$IO_EXP_SLED_CYCLE"=1
+    if ! gpio_set "$GPIOCHIP_IO_EXP_SLED_PWR_CTRL" "$IO_EXP_SLED_CYCLE"=1
     then
         echo "Failed to do sled cycle"
     fi

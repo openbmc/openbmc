@@ -14,7 +14,7 @@ GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-
 EID=$((CHASSIS_ID * 10))
 
 get_host_status() {
-    if ! host_status=$(gpioget "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT"); then
+    if ! host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT"); then
         echo "Failed to get host status"
         exit 1
     fi
@@ -53,5 +53,5 @@ if [ "$host_status" != "$STATE_ON" ]; then
     fi
 fi
 
-echo "Host power cycle success"
+echo "Host$1 power cycle success"
 exit 0;

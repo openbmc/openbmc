@@ -13,5 +13,5 @@ if ! pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x04 -m "$EID"
 then
     echo "Failed to set host$1 power reset"
 else
-    echo "Host is power reset"
+    echo "Host$1 is power reset"
 fi

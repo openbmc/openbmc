@@ -17,26 +17,26 @@ IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 # Server 12v power on
 chassis-power-on()
 {
-    if ! gpioset "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
+    if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
     then
         echo "Failed to set slot$1 power on"
     fi
     sleep 1
 
     # Check chassis status after doing 12V on
-    chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+    chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
     if [ "$chassis_status" == "$STATE_ON" ]
     then
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
-        echo "Chassis is power on"
+        echo "Chassis$1 is power on"
     else
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
-        echo "Chassis is power off"
+        echo "Chassis$1 is power off"
         exit 0;
     fi
 }
 
-if ! chassis_status=$(gpioget "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
+if ! chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
     echo "Failed to get chassis status"
     exit 1
 fi
@@ -47,6 +47,6 @@ then
     /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
     exit 0;
 else
-    echo "Chassis is already on"
+    echo "Chassis$1 is already on"
     exit 0;
 fi
