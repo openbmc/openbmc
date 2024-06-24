@@ -4,7 +4,7 @@ HOMEPAGE = "http://github.com/openbmc/pam-ipmi"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 DEPENDS += "openssl libpam"
-SRCREV = "e4b13e6725abb178f62ee897fe1c0e81b06a9431"
+SRCREV = "d9c11abd92db59a4559c71eadbb8e07fcf09dcd4"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
