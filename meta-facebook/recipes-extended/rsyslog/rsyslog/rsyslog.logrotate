@@ -10,14 +10,3 @@
         systemctl restart rsyslog 2> /dev/null || true
     endscript
 }
-
-# Keep up to four 64k files for redfish (256k total)
-/var/log/redfish
-{
-    rotate 3
-    size 64k
-    missingok
-    postrotate
-        systemctl restart rsyslog 2> /dev/null || true
-    endscript
-}
