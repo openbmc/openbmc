@@ -32,7 +32,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
                 ]
             }
         ]
@@ -70,7 +70,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
                 ]
             }
         ]
@@ -108,7 +108,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
                 ]
             }
         ]
@@ -146,7 +146,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
                 ]
             }
         ]
@@ -184,7 +184,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
                 ]
             }
         ]
@@ -222,7 +222,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/board/Mt_Mitchell_Motherboard"
                 ]
             }
         ]

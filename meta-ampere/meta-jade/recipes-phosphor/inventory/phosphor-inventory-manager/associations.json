@@ -23,7 +23,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
                 ]
             },
             {
@@ -61,7 +61,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
                 ]
             },
             {
@@ -99,7 +99,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
                 ]
             },
             {
@@ -137,7 +137,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
                 ]
             },
             {
@@ -175,7 +175,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
                 ]
             },
             {
@@ -213,7 +213,7 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/inventory/system/chassis"
+                    "/xyz/openbmc_project/inventory/system/chassis/Mt_Jade"
                 ]
             },
             {
