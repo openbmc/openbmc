@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-catalina/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+if ! host_power_on; then
+   phosphor_log_err "host power on failed"
+   exit 1
+fi
+
+phosphor_log_info "host power on success"
+exit 0

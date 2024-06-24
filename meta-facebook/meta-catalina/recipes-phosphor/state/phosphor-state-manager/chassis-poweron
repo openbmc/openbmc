@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-catalina/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+if ! chassis_power_on; then
+   phosphor_log_err "chassis power on failed"
+   exit 1
+fi
+
+phosphor_log_info "chassis power on success"
+exit 0

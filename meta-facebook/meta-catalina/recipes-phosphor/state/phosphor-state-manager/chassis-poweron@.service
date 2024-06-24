@@ -1,0 +1,10 @@
+[Unit]
+Description=power on chassis:%i
+Before=obmc-chassis-poweron@%i.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/chassis-poweron %i
+
+[Install]
+RequiredBy=obmc-chassis-poweron@%i.target

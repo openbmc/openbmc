@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-catalina/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+if ! host_graceful_power_off; then
+   phosphor_log_err "host graceful power off failed"
+   exit 1
+fi
+
+phosphor_log_info "host graceful power off success"
+exit 0

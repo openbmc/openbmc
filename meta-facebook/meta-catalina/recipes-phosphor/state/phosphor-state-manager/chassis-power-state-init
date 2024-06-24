@@ -1,0 +1,16 @@
+#!/bin/bash
+
+busctl set-property \
+    xyz.openbmc_project.State.Chassis0 \
+    /xyz/openbmc_project/state/chassis0 \
+    xyz.openbmc_project.State.Chassis \
+    CurrentPowerState s \
+    xyz.openbmc_project.State.Chassis.PowerState.On
+
+busctl set-property \
+    xyz.openbmc_project.State.Chassis0 \
+    /xyz/openbmc_project/state/chassis0 \
+    xyz.openbmc_project.State.Chassis \
+    CurrentPowerStatus s \
+    xyz.openbmc_project.State.Chassis.PowerStatus.Good
+

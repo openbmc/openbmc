@@ -1,0 +1,10 @@
+[Unit]
+Description=Chassis Power Cycle: %i
+Before=obmc-chassis-powercycle@%i.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/chassis-powercycle %i
+
+[Install]
+RequiredBy=obmc-chassis-powercycle@%i.target

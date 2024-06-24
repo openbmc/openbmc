@@ -1,0 +1,153 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+phosphor_log() {
+    busctl call \
+        xyz.openbmc_project.Logging \
+        /xyz/openbmc_project/logging \
+        xyz.openbmc_project.Logging.Create \
+        Create "ssa{ss}" "$1" "$2" 0
+}
+
+phosphor_log_err() {
+    local msg=$1
+    local logErr="xyz.openbmc_project.Logging.Entry.Level.Error"
+    phosphor_log "$msg" "$logErr"
+}
+
+phosphor_log_info() {
+    local msg=$1
+    local logInfo="xyz.openbmc_project.Logging.Entry.Level.Informational"
+    phosphor_log "$msg" "$logInfo"
+}
+
+chassis_power_cycle_ltc4287()
+{
+    if ! i2cset -f -y 20 0x42 0xfd 0x04; then
+        echo "48V HSC1 set reboot delay failed"
+        return 1
+    fi
+
+    if ! i2cset -f -y 20 0x43 0xfd 0x04; then
+        echo "48V HSC2 set reboot delay failed"
+        return 1
+    fi
+
+    if ! i2cset -f -y 20 0x42 0xfd 0x0c; then
+        echo "48V HSC1 set reboot bit failed"
+        return 1
+    fi
+
+    if ! i2cset -f -y 20 0x43 0xfd 0x0c; then
+        echo "48V HSC2 set reboot bit failed"
+        return 1
+    fi
+
+    return 0
+}
+
+chassis_power_cycle()
+{
+    chassis_power_cycle_ltc4287
+    return $?
+}
+
+chassis_power_on()
+{
+    # MB stabdby power should enabled by before BMC ready
+    # So only do checking here.
+    if [ "$(chassis_power_status)" != "on" ]; then
+        return 1
+    fi
+    return 0
+}
+
+chassis_power_status()
+{
+    if [ "$(get_gpio "STBY_POWER_PG_3V3")" -eq 1 ]; then
+        echo "on"
+    else
+        echo "off"
+    fi
+}
+
+host_power_on()
+{
+    if [ "$(host_power_status)" == "off" ]; then
+        press_host_power_button 1
+        if ! wait_host_power_on; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
+host_force_power_off()
+{
+    if [ "$(host_power_status)" == "on" ]; then
+        press_host_power_button 6
+        if ! wait_host_power_off; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
+host_graceful_power_off()
+{
+    if [ "$(host_power_status)" == "on" ]; then
+        press_host_power_button 1
+        if ! wait_host_power_off; then
+            return 1
+        fi
+    fi
+    return 0
+}
+
+host_power_status()
+{
+    if [ "$(get_gpio "host0-ready")" -eq 1 ]; then
+        echo "on"
+    else
+        echo "off"
+    fi
+}
+
+press_host_power_button()
+{
+    local press_delay_sec="$1"
+    set_gpio "SYS_BMC_PWRBTN_R_N" 1
+    set_gpio "SYS_BMC_PWRBTN_R_N" 0
+    sleep "$press_delay_sec"
+    set_gpio "SYS_BMC_PWRBTN_R_N" 1
+}
+
+wait_host_power_change()
+{
+    local exp_val="$1"
+    local count=0
+    until [ $count -gt 10 ]
+    do
+        sleep 1
+        if [ "$(host_power_status)" == "$exp_val" ]; then
+            return 0
+        fi
+        ((count++))
+    done
+
+    return 1
+}
+
+wait_host_power_on()
+{
+    wait_host_power_change "on"
+    return $?
+}
+
+wait_host_power_off()
+{
+    wait_host_power_change "off"
+    return $?
+}

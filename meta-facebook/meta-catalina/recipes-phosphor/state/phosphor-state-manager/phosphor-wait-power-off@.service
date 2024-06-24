@@ -1,0 +1,19 @@
+[Unit]
+Description=Wait for Power%i to turn off
+Before=obmc-power-off@%i.target
+Wants=obmc-power-stop@%i.target
+Before=obmc-power-stop@%i.target
+Wants=obmc-power-stop-pre@%i.target
+After=obmc-power-stop-pre@%i.target
+Conflicts=obmc-chassis-poweron@%i.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# This is wrong, but at least gives us something since we're not using
+# skeleton.
+ExecStart=sleep 10
+ExecStart=/bin/rm -f /run/openbmc/host@%i-request
+
+[Install]
+RequiredBy=obmc-host-stop@%i.target
