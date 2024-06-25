@@ -21,34 +21,13 @@
         {
           "ParamName": "P0",
           "Desc": {
-            "Name": "BCM0_Input_Power",
-            "SensorType": "power"
-          }
-        },
-        {
-          "ParamName": "P1",
-          "Desc": {
-            "Name": "BCM1_Input_Power",
-            "SensorType": "power"
-          }
-        },
-        {
-          "ParamName": "P2",
-          "Desc": {
-            "Name": "BCM2_Input_Power",
-            "SensorType": "power"
-          }
-        },
-        {
-          "ParamName": "P3",
-          "Desc": {
-            "Name": "BCM3_Input_Power",
+            "Name": "P380V_INPUT_POWER_TOTAL",
             "SensorType": "power"
           }
         }
       ]
     },
-    "Expression": "sumIgnoreNaN(P0, P1, P2, P3)"
+    "Expression": "P0"
   },
   {
     "Desc": {
