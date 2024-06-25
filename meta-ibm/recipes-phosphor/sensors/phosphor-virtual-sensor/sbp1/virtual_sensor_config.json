@@ -2089,5 +2089,2673 @@
       ]
     },
     "Expression": "sumIgnoreNaN(P0, P1, P2, P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD01_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD01_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD01_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD01_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD01_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD02_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD02_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD02_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD02_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD02_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD03_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD03_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD03_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD03_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD03_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD04_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD04_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD04_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD04_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD04_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD05_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD05_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD05_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD05_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD05_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD06_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD06_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD06_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD06_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD06_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD07_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD07_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD07_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD07_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD07_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD08_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD08_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD08_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD08_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD08_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD09_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD09_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD09_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD09_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD09_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD10_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD10_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD10_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD10_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD10_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD11_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD11_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD11_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD11_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD11_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD12_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD12_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD12_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD12_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD12_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD13_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD13_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD13_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD13_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD13_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD14_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD14_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD14_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD14_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD14_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD15_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD15_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD15_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD15_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD15_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD16_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD16_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD16_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD16_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD16_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD17_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD17_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD17_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD17_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD17_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD18_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD18_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD18_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD18_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD18_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD19_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD19_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD19_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD19_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD19_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD20_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD20_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD20_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD20_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD20_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD21_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD21_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD21_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD21_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD21_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD22_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD22_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD22_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD22_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD22_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD23_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD23_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD23_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD23_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD23_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD24_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD24_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD24_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD24_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD24_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD25_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD25_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD25_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD25_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD25_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD26_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD26_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD26_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD26_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD26_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD27_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD27_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD27_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD27_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD27_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD28_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD28_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD28_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD28_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD28_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD29_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD29_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD29_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD29_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD29_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD30_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD30_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD30_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD30_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD30_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD31_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD31_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD31_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD31_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD31_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_RSSD32_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_RSSD32_P12V_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_RSSD32_P12V_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        },
+        {
+          "ParamName": "P2",
+          "Desc": {
+            "Name": "SSB_RSSD32_P3V3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P3",
+          "Desc": {
+            "Name": "SSB_RSSD32_P3V3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "sumIgnoreNaN(P0 * P1, P2 * P3)"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN1_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN1_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN1_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN2_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN2_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN2_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN3_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN3_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN3_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN4_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN4_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN4_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN5_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN5_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN5_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN6_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN6_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN6_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN7_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN7_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN7_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN8_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN8_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN8_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN9_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN9_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN9_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN10_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN10_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN10_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN11_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN11_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN11_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN12_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN12_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN12_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN13_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN13_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN13_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN14_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN14_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN14_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN15_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN15_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN15_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN16_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN16_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN16_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN17_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN17_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN17_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN18_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN18_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN18_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN19_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN19_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN19_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN20_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN20_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN20_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN21_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN21_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN21_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN22_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN22_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN22_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN23_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN23_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN23_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_FAN24_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_FAN24_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_FAN24_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_SSD1_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_SSD1_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_SSD1_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_SSD2_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_SSD2_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_SSD2_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_AUX_P3V3_PCH_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_AUX_P3V3_PCH_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_AUX_P3V3_PCH_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
+  },
+  {
+    "Desc": {
+      "Name": "SSB_AUX_PVDRV_Output_Power",
+      "SensorType": "power"
+    },
+    "Associations": [
+      [
+        "chassis",
+        "all_sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ],
+      [
+        "inventory",
+        "sensors",
+        "/xyz/openbmc_project/inventory/system/board/IBM_SBP1_Baseboard"
+      ]
+    ],
+    "Params": {
+      "DbusParam": [
+        {
+          "ParamName": "P0",
+          "Desc": {
+            "Name": "SSB_AUX_PVDRV_Output_Current",
+            "SensorType": "current"
+          }
+        },
+        {
+          "ParamName": "P1",
+          "Desc": {
+            "Name": "SSB_AUX_PVDRV_Output_Voltage",
+            "SensorType": "voltage"
+          }
+        }
+      ]
+    },
+    "Expression": "P0 * P1"
   }
 ]
