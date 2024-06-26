@@ -75,7 +75,7 @@ RPROVIDES:${PN}-version += " \
     virtual-obmc-image-manager \
 "
 
-FILES:${PN}-version += "${bindir}/phosphor-version-software-manager ${exec_prefix}/lib/tmpfiles.d/software.conf"
+FILES:${PN}-version += "${bindir}/phosphor-version-software-manager ${exec_prefix}/lib/tmpfiles.d/software.conf ${bindir}/phosphor-software-manager "
 FILES:${PN}-download-mgr += "${bindir}/phosphor-download-manager"
 FILES:${PN}-updater += " \
     ${bindir}/phosphor-image-updater \
@@ -100,7 +100,10 @@ ALLOW_EMPTY:${PN} = "1"
 
 PACKAGE_BEFORE_PN += "${SOFTWARE_MGR_PACKAGES}"
 DBUS_PACKAGES = "${SOFTWARE_MGR_PACKAGES}"
-DBUS_SERVICE:${PN}-version += "xyz.openbmc_project.Software.Version.service"
+DBUS_SERVICE:${PN}-version += " \
+    xyz.openbmc_project.Software.Version.service \
+    ${@bb.utils.contains('PACKAGECONFIG', 'software-update-dbus-interface', 'xyz.openbmc_project.Software.Manager.service', '', d)} \
+"
 DBUS_SERVICE:${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 DBUS_SERVICE:${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 DBUS_SERVICE:${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
