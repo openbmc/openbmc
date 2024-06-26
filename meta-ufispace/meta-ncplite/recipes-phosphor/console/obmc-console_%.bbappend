@@ -10,8 +10,8 @@ OBMC_CONSOLE_HOST_TTY:ncplite = "ttyS3"
 
 do_install:append() {
     install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/uart-routing.sh -D ${D}${sbindir}/uart-routing.sh
+    install -m 0755 ${UNPACKDIR}/uart-routing.sh -D ${D}${sbindir}/uart-routing.sh
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0755 ${WORKDIR}/use-socket.conf.in -D ${D}${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf
+    install -m 0755 ${UNPACKDIR}/use-socket.conf.in -D ${D}${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf
 }

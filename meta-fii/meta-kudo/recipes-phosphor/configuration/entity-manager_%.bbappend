@@ -5,5 +5,5 @@ SRC_URI:append:kudo = " \
     "
 
 do_install:append:kudo () {
-    install -m 0644 -D ${WORKDIR}/blacklist.json ${D}${datadir}/${PN}/blacklist.json
+    install -m 0644 -D ${UNPACKDIR}/blacklist.json ${D}${datadir}/${PN}/blacklist.json
 }

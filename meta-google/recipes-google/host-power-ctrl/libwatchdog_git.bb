@@ -12,5 +12,5 @@ RDEPENDS:${PN} = "bash"
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/libwatchdog.sh ${D}${libexecdir}/
+    install -m 0755 ${UNPACKDIR}/libwatchdog.sh ${D}${libexecdir}/
 }

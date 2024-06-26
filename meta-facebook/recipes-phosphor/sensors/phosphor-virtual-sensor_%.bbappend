@@ -13,6 +13,6 @@ do_install:append() {
     # Install the ones from our meta-layer.
     install -d ${D}${datadir}/phosphor-virtual-sensor
     for s in ${SENSOR_CONFIGS}; do
-        install -m 0644 ${WORKDIR}/$s ${D}${datadir}/phosphor-virtual-sensor
+        install -m 0644 ${UNPACKDIR}/$s ${D}${datadir}/phosphor-virtual-sensor
     done
 }

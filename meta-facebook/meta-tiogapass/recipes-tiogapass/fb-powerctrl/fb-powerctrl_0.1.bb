@@ -19,7 +19,8 @@ SYSTEMD_SERVICE:${PN}:append = " \
     host-poweroff.service \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -d ${D}/usr/sbin

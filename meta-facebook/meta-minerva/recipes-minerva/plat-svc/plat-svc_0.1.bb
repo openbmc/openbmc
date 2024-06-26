@@ -22,7 +22,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/minerva-early-sys-init ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/minerva-fan-status-monitor ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/minerva-early-sys-init ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/minerva-fan-status-monitor ${D}${libexecdir}
 }
 

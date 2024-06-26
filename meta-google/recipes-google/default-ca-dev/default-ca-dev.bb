@@ -9,6 +9,6 @@ FILES:${PN} = "${sysconfdir}/ssl/certs/authority/*"
 
 do_install(){
     install -d ${D}${sysconfdir}/ssl/certs/authority
-    install -m 0644 -D ${WORKDIR}/certs/authority/* \
+    install -m 0644 -D ${UNPACKDIR}/certs/authority/* \
                        ${D}${sysconfdir}/ssl/certs/authority
 }

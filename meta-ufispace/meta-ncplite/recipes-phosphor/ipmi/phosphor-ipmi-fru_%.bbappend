@@ -30,5 +30,5 @@ SYSTEMD_LINK:${PN}:append:ncplite := " ${@compose_list(d, 'FMT', 'EEPROMS_ESCAPE
 
 do_install:append:ncplite() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/ncplite-obmc-read-eeprom@.service ${D}${systemd_system_unitdir}/obmc-read-eeprom@.service
+    install -m 0644 ${UNPACKDIR}/ncplite-obmc-read-eeprom@.service ${D}${systemd_system_unitdir}/obmc-read-eeprom@.service
 }

@@ -6,7 +6,7 @@ SRC_URI:append = " \
 
 do_install:append() {
     install -m 0644 \
-        ${WORKDIR}/coredump.conf \
+        ${UNPACKDIR}/coredump.conf \
         -D -t ${D}${sysconfdir}/systemd
 }
 

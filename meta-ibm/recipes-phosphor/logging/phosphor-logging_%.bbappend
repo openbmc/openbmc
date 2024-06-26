@@ -18,9 +18,9 @@ PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, pdata libekb pdbg ipl"
 
 do_install:append:p10bmc() {
     install -d ${D}/${datadir}/phosphor-logging/pels
-    install -m 0644 ${WORKDIR}/com.ibm.Hardware.Chassis.Model.Rainier2U_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Rainier2U_dev_callouts.json
-    install -m 0644 ${WORKDIR}/com.ibm.Hardware.Chassis.Model.Rainier4U_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Rainier4U_dev_callouts.json
-    install -m 0644 ${WORKDIR}/com.ibm.Hardware.Chassis.Model.Everest_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Everest_dev_callouts.json
-    install -m 0644 ${WORKDIR}/com.ibm.Hardware.Chassis.Model.Bonnell_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Bonnell_dev_callouts.json
+    install -m 0644 ${UNPACKDIR}/com.ibm.Hardware.Chassis.Model.Rainier2U_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Rainier2U_dev_callouts.json
+    install -m 0644 ${UNPACKDIR}/com.ibm.Hardware.Chassis.Model.Rainier4U_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Rainier4U_dev_callouts.json
+    install -m 0644 ${UNPACKDIR}/com.ibm.Hardware.Chassis.Model.Everest_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Everest_dev_callouts.json
+    install -m 0644 ${UNPACKDIR}/com.ibm.Hardware.Chassis.Model.Bonnell_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Bonnell_dev_callouts.json
     ln -s ./com.ibm.Hardware.Chassis.Model.Rainier4U_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/com.ibm.Hardware.Chassis.Model.Rainier1S4U_dev_callouts.json
 }

@@ -9,5 +9,5 @@ SRC_URI += " \
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/yosemite4-common-functions ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/yosemite4-common-functions ${D}${libexecdir}
 }

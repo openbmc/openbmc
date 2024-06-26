@@ -19,11 +19,11 @@ FILES:${PN} += "${sysconfdir_native}/systemd/network/00-bmc-usb0.network"
 
 do_install() {
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/usb_network.sh ${D}${libexecdir}/${PN}/usb_network.sh
+    install -m 0755 ${UNPACKDIR}/usb_network.sh ${D}${libexecdir}/${PN}/usb_network.sh
 
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/usb_network.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/usb_network.service ${D}${systemd_unitdir}/system
 
     install -d ${D}${sysconfdir_native}/systemd/network/
-    install -m 0644 ${WORKDIR}/00-bmc-usb0.network ${D}${sysconfdir_native}/systemd/network
+    install -m 0644 ${UNPACKDIR}/00-bmc-usb0.network ${D}${sysconfdir_native}/systemd/network
 }

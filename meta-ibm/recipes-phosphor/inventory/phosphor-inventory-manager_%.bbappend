@@ -16,15 +16,15 @@ SRC_URI:append:p10bmc = " \
 
 do_install:append:ibm-ac-server() {
     install -d ${D}${base_datadir}
-    install -m 0755 ${WORKDIR}/associations.json ${D}${base_datadir}/associations.json
+    install -m 0755 ${UNPACKDIR}/associations.json ${D}${base_datadir}/associations.json
 }
 
 do_install:append:p10bmc() {
     install -d ${D}${base_datadir}
-    install -m 0755 ${WORKDIR}/ibm,rainier-2u_associations.json ${D}${base_datadir}/ibm,rainier-2u_associations.json
-    install -m 0755 ${WORKDIR}/ibm,rainier-4u_associations.json ${D}${base_datadir}/ibm,rainier-4u_associations.json
-    install -m 0755 ${WORKDIR}/ibm,everest_associations.json ${D}${base_datadir}/ibm,everest_associations.json
-    install -m 0755 ${WORKDIR}/ibm,blueridge-2u_associations.json ${D}${base_datadir}/ibm,blueridge-2u_associations.json
-    install -m 0755 ${WORKDIR}/ibm,blueridge-4u_associations.json ${D}${base_datadir}/ibm,blueridge-4u_associations.json
-    install -m 0755 ${WORKDIR}/ibm,fuji_associations.json ${D}${base_datadir}/ibm,fuji_associations.json
+    install -m 0755 ${UNPACKDIR}/ibm,rainier-2u_associations.json ${D}${base_datadir}/ibm,rainier-2u_associations.json
+    install -m 0755 ${UNPACKDIR}/ibm,rainier-4u_associations.json ${D}${base_datadir}/ibm,rainier-4u_associations.json
+    install -m 0755 ${UNPACKDIR}/ibm,everest_associations.json ${D}${base_datadir}/ibm,everest_associations.json
+    install -m 0755 ${UNPACKDIR}/ibm,blueridge-2u_associations.json ${D}${base_datadir}/ibm,blueridge-2u_associations.json
+    install -m 0755 ${UNPACKDIR}/ibm,blueridge-4u_associations.json ${D}${base_datadir}/ibm,blueridge-4u_associations.json
+    install -m 0755 ${UNPACKDIR}/ibm,fuji_associations.json ${D}${base_datadir}/ibm,fuji_associations.json
 }

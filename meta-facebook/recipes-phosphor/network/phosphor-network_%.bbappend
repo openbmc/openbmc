@@ -8,5 +8,5 @@ FILES:${PN}:append = " ${systemd_unitdir}/network/01-bmc-eth.network"
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/network/
-    install -m 0644 ${WORKDIR}/01-bmc-eth.network ${D}${systemd_unitdir}/network/01-bmc-eth.network
+    install -m 0644 ${UNPACKDIR}/01-bmc-eth.network ${D}${systemd_unitdir}/network/01-bmc-eth.network
 }

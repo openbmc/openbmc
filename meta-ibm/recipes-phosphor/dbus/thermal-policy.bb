@@ -11,7 +11,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI:append:ibm-ac-server = " file://thermal-policy.yaml"
 
 do_install:ibm-ac-server() {
-        install -D ${WORKDIR}/thermal-policy.yaml ${D}${config_dir}/thermal-policy.yaml
+        install -D ${UNPACKDIR}/thermal-policy.yaml ${D}${config_dir}/thermal-policy.yaml
 }
 
 

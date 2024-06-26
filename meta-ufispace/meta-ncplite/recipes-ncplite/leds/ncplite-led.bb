@@ -17,10 +17,10 @@ SRC_URI += " file://ncplite-led.sh \
 
 do_install() {
     install -d ${D}${libexecdir}/{BPN}
-    install -m 0755 ${WORKDIR}/ncplite-led.sh ${D}${libexecdir}/{BPN}
+    install -m 0755 ${UNPACKDIR}/ncplite-led.sh ${D}${libexecdir}/{BPN}
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/ncplite-led.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/ncplite-led.service ${D}${systemd_system_unitdir}
 }
 
 SYSTEMD_PACKAGES = "${PN}"

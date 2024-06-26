@@ -24,7 +24,7 @@ FILES:${PN}:append:s6q = "${@bb.utils.contains('MACHINE_FEATURES', 'bonding',\
 
 do_install:append:s6q() {
     install -d ${D}${sysconfdir}/systemd/resolved.conf.d/
-    install -m 0644 ${WORKDIR}/s6q-resolv.conf \
+    install -m 0644 ${UNPACKDIR}/s6q-resolv.conf \
         ${D}${sysconfdir}/systemd/resolved.conf.d/
     install -d ${D}${sysconfdir}/systemd/network/
     install -d ${D}${sysconfdir}/systemd/network/00-bmc-eth0.network.d/
@@ -32,13 +32,13 @@ do_install:append:s6q() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'bonding', 'true', 'false', d)};
     then
         install -d ${D}${sysconfdir}/systemd/network/00-bmc-bond0.network.d/
-        install -m 0644 ${WORKDIR}/bond-eth0.conf \
+        install -m 0644 ${UNPACKDIR}/bond-eth0.conf \
             ${D}${sysconfdir}/systemd/network/00-bmc-eth0.network.d/
-        install -m 0644 ${WORKDIR}/bond-eth1.conf \
+        install -m 0644 ${UNPACKDIR}/bond-eth1.conf \
             ${D}${sysconfdir}/systemd/network/00-bmc-eth1.network.d/
-        install -m 0644 ${WORKDIR}/10-bmc-bond0.netdev \
+        install -m 0644 ${UNPACKDIR}/10-bmc-bond0.netdev \
             ${D}${sysconfdir}/systemd/network/
-        install -m 0644 ${WORKDIR}/bond0.conf \
+        install -m 0644 ${UNPACKDIR}/bond0.conf \
             ${D}${sysconfdir}/systemd/network/00-bmc-bond0.network.d/
     else
         echo -e "[Network]\nLinkLocalAddressing=ipv6" > \

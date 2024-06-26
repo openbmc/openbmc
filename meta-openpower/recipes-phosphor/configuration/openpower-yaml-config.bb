@@ -12,7 +12,8 @@ SRC_URI = " \
     file://ipmi-occ-active-sensor-mrw.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -m 0644 -D ipmi-fru-properties-mrw.yaml \

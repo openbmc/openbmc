@@ -35,8 +35,8 @@ python do_patch:ibm-ac-server() {
     else:
         auxVer = commit + "0000"
 
-    workdir = d.getVar('WORKDIR', True)
-    file = os.path.join(workdir, 'dev_id.json')
+    unpackdir = d.getVar('UNPACKDIR', True)
+    file = os.path.join(unpackdir, 'dev_id.json')
 
     # Update dev_id.json with the auxiliary firmware revision
     with open(file, "r+") as jsonFile:

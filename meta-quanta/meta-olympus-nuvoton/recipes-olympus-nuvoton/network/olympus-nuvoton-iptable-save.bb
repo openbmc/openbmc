@@ -9,9 +9,10 @@ inherit allarch systemd
 SRC_URI = "file://phosphor-save-iptable-rules.service"
 SYSTEMD_SERVICE:${PN} = "phosphor-save-iptable-rules.service"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 do_install() {
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/phosphor-save-iptable-rules.service \
+    install -m 0644 ${UNPACKDIR}/phosphor-save-iptable-rules.service \
         ${D}${systemd_unitdir}/system
 }

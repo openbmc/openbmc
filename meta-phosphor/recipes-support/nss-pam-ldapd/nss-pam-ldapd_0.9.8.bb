@@ -32,12 +32,12 @@ EXTRA_OECONF = "\
         "
 
 do_install:append() {
-        install -D -m 0755 ${WORKDIR}/nslcd.init ${D}${sysconfdir}/init.d/nslcd
+        install -D -m 0755 ${UNPACKDIR}/nslcd.init ${D}${sysconfdir}/init.d/nslcd
         sed -i -e 's/^uid nslcd/# uid nslcd/;' ${D}${sysconfdir}/nslcd.conf
         sed -i -e 's/^gid nslcd/# gid nslcd/;' ${D}${sysconfdir}/nslcd.conf
         sed -i -e 's/^base dc=example,dc=com/base ${LDAP_DN}/;' ${D}${sysconfdir}/nslcd.conf
         install -d ${D}${systemd_system_unitdir}
-        install -m 0644 ${WORKDIR}/nslcd.service ${D}${systemd_system_unitdir}
+        install -m 0644 ${UNPACKDIR}/nslcd.service ${D}${systemd_system_unitdir}
 }
 
 RDEPENDS:${PN} += "nscd"

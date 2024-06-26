@@ -11,7 +11,8 @@ SRC_URI = " \
     file://ethanolx-ipmi-sensors.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     cat ethanolx-ipmi-fru.yaml > fru-read.yaml

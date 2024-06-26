@@ -20,12 +20,12 @@ inherit obmc-phosphor-systemd
 
 do_install:append() {
     install -d ${D}/${datadir}/phosphor-ipmi-flash
-    install -m 0644 ${WORKDIR}/config-bmc.json \
+    install -m 0644 ${UNPACKDIR}/config-bmc.json \
         ${D}${datadir}/phosphor-ipmi-flash/
-    install -m 0644 ${WORKDIR}/config-bios.json \
+    install -m 0644 ${UNPACKDIR}/config-bios.json \
         ${D}${datadir}/phosphor-ipmi-flash/
-    install -m 0644 ${WORKDIR}/config-bmccpld.json \
+    install -m 0644 ${UNPACKDIR}/config-bmccpld.json \
         ${D}${datadir}/phosphor-ipmi-flash/
-    install -m 0644 ${WORKDIR}/config-mbcpld.json \
+    install -m 0644 ${UNPACKDIR}/config-mbcpld.json \
         ${D}${datadir}/phosphor-ipmi-flash/
 }

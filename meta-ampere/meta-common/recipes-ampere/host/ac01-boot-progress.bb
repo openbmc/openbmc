@@ -29,7 +29,7 @@ SYSTEMD_SERVICE:${PN} += "${HOST_ON_RESET_HOSTTMPL}"
 
 do_install () {
     install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/ampere_boot_progress.sh ${D}${sbindir}/
-    install -m 0755 ${WORKDIR}/dimm_train_fail_log.sh ${D}${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_boot_progress.sh ${D}${sbindir}/
+    install -m 0755 ${UNPACKDIR}/dimm_train_fail_log.sh ${D}${sbindir}/
 }
 

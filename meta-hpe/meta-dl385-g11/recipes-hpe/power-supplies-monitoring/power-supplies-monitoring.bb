@@ -16,15 +16,15 @@ do_install:append() {
   install -d ${D}${sysconfdir}/system/
   install -d ${D}/usr/share/gpios
   install -d ${D}/usr/bin
-  install -m 0644 ${WORKDIR}/psu1.json ${D}/usr/share/gpios/psu1.json
-  install -m 0644 ${WORKDIR}/psu2.json ${D}/usr/share/gpios/psu2.json
-  install -m 0644 ${WORKDIR}/psu2-monitoring.service ${D}${sysconfdir}/system/psu2-monitoring.service
-  install -m 0644 ${WORKDIR}/psu1-monitoring.service ${D}${sysconfdir}/system/psu1-monitoring.service
-  install -m 0644 ${WORKDIR}/psu2up.service ${D}${sysconfdir}/system/psu2up.service
-  install -m 0644 ${WORKDIR}/psu1up.service ${D}${sysconfdir}/system/psu1up.service
-  install -m 0644 ${WORKDIR}/psu1down.service ${D}${sysconfdir}/system/psu1down.service
-  install -m 0644 ${WORKDIR}/psu1down.service ${D}${sysconfdir}/system/psu1down.service
-  install -m 0755 ${WORKDIR}/psus-manager.sh ${D}/usr/bin/psus-manager.sh
-  install -m 0755 ${WORKDIR}/startMonitoring1.sh ${D}/usr/bin/startMonitoring1.sh
-  install -m 0755 ${WORKDIR}/startMonitoring2.sh ${D}/usr/bin/startMonitoring2.sh
+  install -m 0644 ${UNPACKDIR}/psu1.json ${D}/usr/share/gpios/psu1.json
+  install -m 0644 ${UNPACKDIR}/psu2.json ${D}/usr/share/gpios/psu2.json
+  install -m 0644 ${UNPACKDIR}/psu2-monitoring.service ${D}${sysconfdir}/system/psu2-monitoring.service
+  install -m 0644 ${UNPACKDIR}/psu1-monitoring.service ${D}${sysconfdir}/system/psu1-monitoring.service
+  install -m 0644 ${UNPACKDIR}/psu2up.service ${D}${sysconfdir}/system/psu2up.service
+  install -m 0644 ${UNPACKDIR}/psu1up.service ${D}${sysconfdir}/system/psu1up.service
+  install -m 0644 ${UNPACKDIR}/psu1down.service ${D}${sysconfdir}/system/psu1down.service
+  install -m 0644 ${UNPACKDIR}/psu1down.service ${D}${sysconfdir}/system/psu1down.service
+  install -m 0755 ${UNPACKDIR}/psus-manager.sh ${D}/usr/bin/psus-manager.sh
+  install -m 0755 ${UNPACKDIR}/startMonitoring1.sh ${D}/usr/bin/startMonitoring1.sh
+  install -m 0755 ${UNPACKDIR}/startMonitoring2.sh ${D}/usr/bin/startMonitoring2.sh
 }

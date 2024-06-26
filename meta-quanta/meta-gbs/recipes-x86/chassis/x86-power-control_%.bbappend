@@ -10,5 +10,5 @@ RDEPENDS:${PN}:append:gbs = " gbs-hotswap-power-cycle"
 
 do_install:append:gbs() {
     install -d ${D}${datadir}/${PN}
-    install -m 0644 ${WORKDIR}/power-config-host0.json ${D}${datadir}/${PN}
+    install -m 0644 ${UNPACKDIR}/power-config-host0.json ${D}${datadir}/${PN}
 }

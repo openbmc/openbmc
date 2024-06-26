@@ -16,7 +16,7 @@ do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         if ${@bb.utils.contains('PACKAGECONFIG', 'libjitterentropy', 'true', 'false', d)}; then
             install -d ${D}${systemd_system_unitdir}/rngd.service.d
-            install -m 644 ${WORKDIR}/10-nice.conf \
+            install -m 644 ${UNPACKDIR}/10-nice.conf \
                 ${D}${systemd_system_unitdir}/rngd.service.d
         fi
     fi

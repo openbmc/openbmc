@@ -7,6 +7,6 @@ do_install:append:gbs() {
     rm -rf ${D}${datadir}/${PN}/*
 
     install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.LED.GroupManager.service.d
-    install -D -m 0644 ${WORKDIR}/service-override.conf \
+    install -D -m 0644 ${UNPACKDIR}/service-override.conf \
       ${D}${systemd_system_unitdir}/xyz.openbmc_project.LED.GroupManager.service.d/
 }

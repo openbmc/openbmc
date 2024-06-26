@@ -27,10 +27,10 @@ KCS_DEVICE ?= "ipmi_kcs1"
 
 do_install:append() {
 
-  sed ${WORKDIR}/disable-ipmi-kcs.service.in \
+  sed ${UNPACKDIR}/disable-ipmi-kcs.service.in \
         -e "s#@KCS_DEV@#${KCS_DEVICE}#" \
-        > ${WORKDIR}/disable-ipmi-kcs.service
+        > ${UNPACKDIR}/disable-ipmi-kcs.service
 
   install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/disable-ipmi-kcs.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/disable-ipmi-kcs.service ${D}${systemd_system_unitdir}
 }

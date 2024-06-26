@@ -7,7 +7,8 @@ GBMC_ETHER_MAP ?= ""
 
 inherit systemd
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 FILES:${PN} += "${systemd_unitdir}"
 
@@ -24,11 +25,11 @@ do_install() {
   do
     devaddr="$(echo "${str}" | cut -d'|' -f1)"
     devname="$(echo "${str}" | cut -d'|' -f2)"
-    echo "[Match]" > ${WORKDIR}/30-netdev-${devname}.link
-    echo "Path=*-${devaddr}" >> ${WORKDIR}/30-netdev-${devname}.link
-    echo "[Link]"  >> ${WORKDIR}/30-netdev-${devname}.link
-    echo "Name=${devname}" >> ${WORKDIR}/30-netdev-${devname}.link
-    install -m0644 ${WORKDIR}/30-netdev-${devname}.link ${netdir}
+    echo "[Match]" > ${UNPACKDIR}/30-netdev-${devname}.link
+    echo "Path=*-${devaddr}" >> ${UNPACKDIR}/30-netdev-${devname}.link
+    echo "[Link]"  >> ${UNPACKDIR}/30-netdev-${devname}.link
+    echo "Name=${devname}" >> ${UNPACKDIR}/30-netdev-${devname}.link
+    install -m0644 ${UNPACKDIR}/30-netdev-${devname}.link ${netdir}
   done
 }
 

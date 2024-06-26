@@ -5,5 +5,5 @@ FILES:${PN} = "${datadir}/swampd/config.json /usr/share/swampd/* /usr/bin/swampd
 
 do_install:append(){
   install -d ${D}${datadir}/swampd
-  install -m 0644 -D ${WORKDIR}/config.json ${D}${datadir}/swampd/
+  install -m 0644 -D ${UNPACKDIR}/config.json ${D}${datadir}/swampd/
 }

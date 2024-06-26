@@ -12,10 +12,10 @@ RDEPENDS:${PN} += "bash"
 
 do_install:append() {
         install -d ${D}${libexecdir}/${PN}/
-        install -m 0755 ${WORKDIR}/nvme-json-rewrite ${D}${libexecdir}/${PN}/
+        install -m 0755 ${UNPACKDIR}/nvme-json-rewrite ${D}${libexecdir}/${PN}/
 
         install -d ${D}${sysconfdir}/nvme
-        install -m 0644 -D ${WORKDIR}/nvme_config.json ${D}${sysconfdir}/nvme
+        install -m 0644 -D ${UNPACKDIR}/nvme_config.json ${D}${sysconfdir}/nvme
 }
 
 SYSTEMD_OVERRIDE:${PN}:append = " \

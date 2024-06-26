@@ -6,7 +6,7 @@ SRC_URI:append = " file://daytonax-baseboard.json \
 do_install:append() {
      rm -f ${D}${datadir}/entity-manager/configurations/*.json
      install -d ${D}${datadir}/entity-manager/configurations
-     install -m 0444 ${WORKDIR}/daytonax-baseboard.json ${D}${datadir}/entity-manager/configurations
-     install -m 0444 ${WORKDIR}/daytonax-chassis.json ${D}${datadir}/entity-manager/configurations
+     install -m 0444 ${UNPACKDIR}/daytonax-baseboard.json ${D}${datadir}/entity-manager/configurations
+     install -m 0444 ${UNPACKDIR}/daytonax-chassis.json ${D}${datadir}/entity-manager/configurations
 }
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"

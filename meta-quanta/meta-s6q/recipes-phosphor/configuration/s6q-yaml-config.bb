@@ -12,7 +12,8 @@ SRC_URI = " \
     file://ipmi-inventory-sensors.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -m 0644 -D ipmi-fru.yaml ${D}${datadir}/${BPN}/ipmi-fru-read.yaml

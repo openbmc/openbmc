@@ -20,7 +20,7 @@ inherit meson pkgconfig
 do_install:append() {
     install -d ${D}${sysconfdir}/nbd-proxy/
     install -m 0644 ${NBD_PROXY_CONFIG_JSON} ${D}${sysconfdir}/nbd-proxy/config.json
-    install -m 0755 ${WORKDIR}/state_hook ${D}${sysconfdir}/nbd-proxy/state
+    install -m 0755 ${UNPACKDIR}/state_hook ${D}${sysconfdir}/nbd-proxy/state
 }
 
 FILES:${PN} += "${sysconfdir}/nbd-proxy/state"

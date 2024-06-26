@@ -6,7 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 FILENAME = "Poleg_bootblock_${PV}.bin"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 SRCREV = "cac8f0ed8c6e875148ec37b657fcbdd1058c2c69"
 SRC_URI = " \
@@ -20,7 +21,7 @@ SRC_URI[bin.sha256sum] = "1bc367032b2ac76190064256a306993a0405de2a2af5b4fad2c549
 inherit deploy
 
 do_deploy () {
-	install -D -m 644 ${WORKDIR}/${FILENAME} ${DEPLOYDIR}/Poleg_bootblock.bin
+	install -D -m 644 ${UNPACKDIR}/${FILENAME} ${DEPLOYDIR}/Poleg_bootblock.bin
 }
 
 addtask deploy before do_build after do_compile

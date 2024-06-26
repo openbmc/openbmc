@@ -9,7 +9,8 @@ SRC_URI = " \
     file://bletchley-ipmi-fru.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -m 0644 -D bletchley-ipmi-fru.yaml \

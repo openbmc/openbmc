@@ -4,5 +4,5 @@ SRC_URI += " \
 "
 
 do_install:append() {
-    install -m 0644 -D ${WORKDIR}/virtual_sensor_config.json ${D}${datadir}/phosphor-virtual-sensor/
+    install -m 0644 -D ${UNPACKDIR}/virtual_sensor_config.json ${D}${datadir}/phosphor-virtual-sensor/
 }

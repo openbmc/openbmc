@@ -10,11 +10,11 @@ SRC_URI:append = " \
 
 do_install:append() {
     install -m 0644 \
-        ${WORKDIR}/00-bmc-eth0.4004.0.network \
-        ${WORKDIR}/00-bmc-eth0.4004.1.network \
-        ${WORKDIR}/00-bmc-eth0.0.network \
-        ${WORKDIR}/00-bmc-eth0.1.network \
-        ${WORKDIR}/eth0.4004.netdev \
+        ${UNPACKDIR}/00-bmc-eth0.4004.0.network \
+        ${UNPACKDIR}/00-bmc-eth0.4004.1.network \
+        ${UNPACKDIR}/00-bmc-eth0.0.network \
+        ${UNPACKDIR}/00-bmc-eth0.1.network \
+        ${UNPACKDIR}/eth0.4004.netdev \
         -D -t ${D}${sysconfdir}/systemd/network
 }
 

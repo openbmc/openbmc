@@ -14,7 +14,7 @@ PACKAGECONFIG:append:ibm-ac-server = " monitor"
 PACKAGECONFIG:append:p10bmc = " monitor-ng"
 
 do_install:append:df-openpower(){
-    install -D ${WORKDIR}/psu.json ${D}${datadir}/phosphor-power/psu.json
+    install -D ${UNPACKDIR}/psu.json ${D}${datadir}/phosphor-power/psu.json
 }
 FILES:${PN}:append:df-openpower = " ${datadir}/phosphor-power/psu.json"
 

@@ -12,10 +12,10 @@ SRC_URI:append = "file://led-config.yaml \
 
 do_install:append () {
     install -d ${D}/${datadir}/phosphor-dbus-monitor
-    install -m 0644 ${WORKDIR}/led-config.yaml \
+    install -m 0644 ${UNPACKDIR}/led-config.yaml \
         ${D}/${datadir}/phosphor-dbus-monitor/led-config.yaml
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}
 }
 
 FILES:${PN}:append = " ${datadir}/phosphor-dbus-monitor/led-config.yaml ${systemd_system_unitdir}/*"

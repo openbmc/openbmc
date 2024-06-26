@@ -7,12 +7,13 @@ inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} += "i2c-tools"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 SRC_URI += "file://avsbus-control.sh"
 
 do_install() {
         install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/avsbus-control.sh \
+        install -m 0755 ${UNPACKDIR}/avsbus-control.sh \
             ${D}${bindir}/avsbus-control.sh
 }
 

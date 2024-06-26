@@ -15,10 +15,10 @@ SRC_URI = " file://inventory-log.sh \
 
 do_install() {
     install -d ${D}${libexecdir}/${BPN}
-    install -m 0755 ${WORKDIR}/inventory-log.sh ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/inventory-log.sh ${D}${libexecdir}/${BPN}
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/inventory-log.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/inventory-log.service ${D}${systemd_system_unitdir}
 }
 
 SYSTEMD_PACKAGES = "${PN}"

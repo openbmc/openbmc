@@ -17,8 +17,8 @@ SRC_URI:append:minerva = " \
 
 do_install:append:minerva() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
 }

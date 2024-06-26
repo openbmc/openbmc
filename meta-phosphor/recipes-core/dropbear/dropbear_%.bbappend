@@ -11,7 +11,7 @@ SRC_URI += "file://dropbearkey.service \
            "
 
 do_configure:append() {
-    install -m 0644 ${WORKDIR}/localoptions.h ${B}
+    install -m 0644 ${UNPACKDIR}/localoptions.h ${B}
 }
 
 # pull in OpenSSH's /usr/libexec/sftp-server so we don't have to rely
@@ -21,10 +21,10 @@ RDEPENDS:${PN} += "openssh-sftp-server"
 # Add service to migrate the dropbear keys from /var/lib to /etc.
 do_install:append() {
     install -d ${D}${base_libdir}/systemd/system
-    install -m 0644 ${WORKDIR}/dropbear-migrate-key-location.service \
+    install -m 0644 ${UNPACKDIR}/dropbear-migrate-key-location.service \
         ${D}${base_libdir}/systemd/system
 
     install -d ${D}${libexecdir}/${BPN}
-    install -m 0755 ${WORKDIR}/migrate-key-location ${D}${libexecdir}/${BPN}
+    install -m 0755 ${UNPACKDIR}/migrate-key-location ${D}${libexecdir}/${BPN}
 }
 SYSTEMD_SERVICE:${PN}:append = " dropbear-migrate-key-location.service"

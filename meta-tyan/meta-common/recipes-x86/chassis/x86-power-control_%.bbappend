@@ -7,5 +7,5 @@ RDEPENDS:${PN}:append = " bash"
 
 do_install:append() {
     install -d ${D}${datadir}/${PN}
-    install -m 0644 ${WORKDIR}/power-config-host0.json ${D}${datadir}/${PN}
+    install -m 0644 ${UNPACKDIR}/power-config-host0.json ${D}${datadir}/${PN}
 }

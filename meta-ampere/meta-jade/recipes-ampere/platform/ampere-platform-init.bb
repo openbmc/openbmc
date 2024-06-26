@@ -23,8 +23,8 @@ SYSTEMD_SERVICE:${PN} = "ampere-platform-init.service"
 
 do_install () {
     install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/ampere_platform_init.sh ${D}${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_platform_init.sh ${D}${sbindir}/
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/ampere-platform-init.service ${D}${systemd_unitdir}/system
-    install -m 0755 ${WORKDIR}/mtjade_platform_gpios_init.sh ${D}${sbindir}/platform_gpios_init.sh
+    install -m 0644 ${UNPACKDIR}/ampere-platform-init.service ${D}${systemd_unitdir}/system
+    install -m 0755 ${UNPACKDIR}/mtjade_platform_gpios_init.sh ${D}${sbindir}/platform_gpios_init.sh
 }

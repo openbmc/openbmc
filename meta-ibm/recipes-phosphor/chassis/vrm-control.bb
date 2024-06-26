@@ -9,14 +9,15 @@ inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} += "i2c-tools bash"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 SRC_URI:append:ibm-ac-server = " file://ir35221-unbind-bind.sh"
 SRC_URI:append:ibm-ac-server = " file://vrm-control.sh"
 
 do_install:ibm-ac-server() {
         install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/ir35221-unbind-bind.sh ${D}${bindir}/ir35221-unbind-bind.sh
-        install -m 0755 ${WORKDIR}/vrm-control.sh ${D}${bindir}/vrm-control.sh
+        install -m 0755 ${UNPACKDIR}/ir35221-unbind-bind.sh ${D}${bindir}/ir35221-unbind-bind.sh
+        install -m 0755 ${UNPACKDIR}/vrm-control.sh ${D}${bindir}/vrm-control.sh
 }
 
 TMPL = "vrm-control@.service"

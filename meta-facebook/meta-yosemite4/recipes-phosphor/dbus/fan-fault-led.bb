@@ -24,18 +24,18 @@ SRC_URI:append = " \
 "
 
 do_install() {
-    install -D ${WORKDIR}/board-0-fan-0.yaml ${D}${config_dir}/board-0-fan-0.yaml
-    install -D ${WORKDIR}/board-0-fan-1.yaml ${D}${config_dir}/board-0-fan-1.yaml
-    install -D ${WORKDIR}/board-0-fan-4.yaml ${D}${config_dir}/board-0-fan-4.yaml
-    install -D ${WORKDIR}/board-0-fan-5.yaml ${D}${config_dir}/board-0-fan-5.yaml
-    install -D ${WORKDIR}/board-0-fan-8.yaml ${D}${config_dir}/board-0-fan-8.yaml
-    install -D ${WORKDIR}/board-0-fan-9.yaml ${D}${config_dir}/board-0-fan-9.yaml
-    install -D ${WORKDIR}/board-1-fan-10.yaml ${D}${config_dir}/board-1-fan-10.yaml
-    install -D ${WORKDIR}/board-1-fan-11.yaml ${D}${config_dir}/board-1-fan-11.yaml
-    install -D ${WORKDIR}/board-1-fan-2.yaml ${D}${config_dir}/board-1-fan-2.yaml
-    install -D ${WORKDIR}/board-1-fan-3.yaml ${D}${config_dir}/board-1-fan-3.yaml
-    install -D ${WORKDIR}/board-1-fan-6.yaml ${D}${config_dir}/board-1-fan-6.yaml
-    install -D ${WORKDIR}/board-1-fan-7.yaml ${D}${config_dir}/board-1-fan-7.yaml
+    install -D ${UNPACKDIR}/board-0-fan-0.yaml ${D}${config_dir}/board-0-fan-0.yaml
+    install -D ${UNPACKDIR}/board-0-fan-1.yaml ${D}${config_dir}/board-0-fan-1.yaml
+    install -D ${UNPACKDIR}/board-0-fan-4.yaml ${D}${config_dir}/board-0-fan-4.yaml
+    install -D ${UNPACKDIR}/board-0-fan-5.yaml ${D}${config_dir}/board-0-fan-5.yaml
+    install -D ${UNPACKDIR}/board-0-fan-8.yaml ${D}${config_dir}/board-0-fan-8.yaml
+    install -D ${UNPACKDIR}/board-0-fan-9.yaml ${D}${config_dir}/board-0-fan-9.yaml
+    install -D ${UNPACKDIR}/board-1-fan-10.yaml ${D}${config_dir}/board-1-fan-10.yaml
+    install -D ${UNPACKDIR}/board-1-fan-11.yaml ${D}${config_dir}/board-1-fan-11.yaml
+    install -D ${UNPACKDIR}/board-1-fan-2.yaml ${D}${config_dir}/board-1-fan-2.yaml
+    install -D ${UNPACKDIR}/board-1-fan-3.yaml ${D}${config_dir}/board-1-fan-3.yaml
+    install -D ${UNPACKDIR}/board-1-fan-6.yaml ${D}${config_dir}/board-1-fan-6.yaml
+    install -D ${UNPACKDIR}/board-1-fan-7.yaml ${D}${config_dir}/board-1-fan-7.yaml
 }
 
 FILES:${PN}:append = " \

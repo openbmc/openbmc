@@ -13,7 +13,8 @@ SRC_URI = " \
     file://romulus-ipmi-sensors.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     cat romulus-ipmi-fru.yaml romulus-ipmi-fru-bmc.yaml > fru-read.yaml

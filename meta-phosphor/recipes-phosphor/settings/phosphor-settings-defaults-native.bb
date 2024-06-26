@@ -8,7 +8,8 @@ SRC_URI += "file://defaults.yaml"
 SRC_URI += "file://host-template.yaml"
 
 SETTINGS_HOST_TEMPLATES:append = " host-template.yaml"
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit phosphor-settings-manager
 inherit native

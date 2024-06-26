@@ -14,7 +14,8 @@ RDEPENDS:${PN} += "libsystemd"
 FILESEXTRAPATHS:prepend := "${THISDIR}/transformers-init:"
 SRC_URI += "file://transformers-init.sh"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
         install -d ${D}${sbindir}

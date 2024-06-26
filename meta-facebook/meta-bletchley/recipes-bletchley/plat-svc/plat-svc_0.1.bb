@@ -23,8 +23,8 @@ SYSTEMD_SERVICE:${PN}:append = " \
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/bletchley-early-sys-init ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/bletchley-host-state-monitor ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/bletchley-early-sys-init ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/bletchley-host-state-monitor ${D}${libexecdir}
 }
 
 SYSTEMD_OVERRIDE:${PN} += "bletchley-sys-init.conf:bletchley-sys-init.service.d/bletchley-sys-init.conf"

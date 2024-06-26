@@ -8,7 +8,7 @@ SRC_URI = "file://mori.sh"
 
 do_install () {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/mori.sh ${D}${bindir}/mori.sh
+    install -m 0755 ${UNPACKDIR}/mori.sh ${D}${bindir}/mori.sh
 }
 
 RDEPENDS:${PN}:append = " bash"

@@ -15,10 +15,10 @@ SRC_URI = " file://detect-gpio-present.sh \
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/detect-gpio-present.sh ${D}${bindir}/
+    install -m 0755 ${UNPACKDIR}/detect-gpio-present.sh ${D}${bindir}/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/detect-gpio-present.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/detect-gpio-present.service ${D}${systemd_system_unitdir}
 }
 
 SYSTEMD_PACKAGES = "${PN}"

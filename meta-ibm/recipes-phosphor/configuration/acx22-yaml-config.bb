@@ -20,7 +20,8 @@ DEPENDS = " \
     openpower-yaml-config \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 ACx22_IPMI_EXTRA_FRU_READ_YAMLS:ibm-ac-server = " \
     acx22-ipmi-fru-bmc.yaml \

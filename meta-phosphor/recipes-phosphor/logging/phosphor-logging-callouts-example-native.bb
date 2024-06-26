@@ -6,7 +6,8 @@ PR = "r1"
 
 SRC_URI += "file://callouts.yaml"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit phosphor-logging
 inherit native

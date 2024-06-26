@@ -8,7 +8,8 @@ RDEPENDS:${PN} += "bash"
 SRC_URI += " \
         file://mdio-util \
 "
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
         install -d ${D}${sbindir}

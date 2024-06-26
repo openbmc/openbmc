@@ -44,5 +44,5 @@ do_install:append() {
         install ${SRC}/inventory ${DEST}
 
         install -d ${D}/${nonarch_base_libdir}/udev/rules.d/
-        install -m0644 ${WORKDIR}/70-op-vpd.rules ${D}/${nonarch_base_libdir}/udev/rules.d/
+        install -m0644 ${UNPACKDIR}/70-op-vpd.rules ${D}/${nonarch_base_libdir}/udev/rules.d/
 }

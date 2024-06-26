@@ -16,6 +16,6 @@ SYSTEMD_PACKAGES = "${PN}"
 
 do_install () {
     install -d ${D}${sbindir}
-    install -m 0755 ${WORKDIR}/kudo.sh ${D}${sbindir}/kudo.sh
-    install -m 0755 ${WORKDIR}/kudo-ras.sh ${D}${sbindir}/kudo-ras.sh
+    install -m 0755 ${UNPACKDIR}/kudo.sh ${D}${sbindir}/kudo.sh
+    install -m 0755 ${UNPACKDIR}/kudo-ras.sh ${D}${sbindir}/kudo-ras.sh
 }

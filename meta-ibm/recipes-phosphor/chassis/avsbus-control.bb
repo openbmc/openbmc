@@ -8,7 +8,8 @@ inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} += "i2c-tools"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 SRC_URI:append:witherspoon = " file://avsbus-enable.sh"
 SRC_URI:append:witherspoon = " file://avsbus-disable.sh"

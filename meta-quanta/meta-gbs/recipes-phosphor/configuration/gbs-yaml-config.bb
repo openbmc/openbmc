@@ -12,7 +12,8 @@ SRC_URI = " \
     file://gbs-ipmi-inventory-sensors.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -m 0644 -D gbs-ipmi-fru.yaml \

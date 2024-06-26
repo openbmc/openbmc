@@ -7,5 +7,5 @@ SYSTEMD_LINK:${PN}-regulators += " ../${REGS_CONF_SVC}:xyz.openbmc_project.Chass
 do_install:append() {
     PR_CFGDIR=${D}/${datadir}/phosphor-regulators
     install -d "$PR_CFGDIR"
-    install -m 0644 ${WORKDIR}/config.json "$PR_CFGDIR"
+    install -m 0644 ${UNPACKDIR}/config.json "$PR_CFGDIR"
 }

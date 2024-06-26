@@ -15,12 +15,12 @@ SYSTEMD_SERVICE:${PN}:append:mori = " \
 
 do_install:append:mori() {
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/mori_uart_mux_ctrl.sh \
+    install -m 0755 ${UNPACKDIR}/mori_uart_mux_ctrl.sh \
         ${D}${libexecdir}/${PN}/mori_uart_mux_ctrl.sh
-    install -m 0644 ${WORKDIR}/host_console_uart_config.service \
+    install -m 0644 ${UNPACKDIR}/host_console_uart_config.service \
         ${D}${systemd_unitdir}/system
     # Overwrite base package's obmc-console@.service with our own
-    install -m 0644 ${WORKDIR}/${BPN}@.service \
+    install -m 0644 ${UNPACKDIR}/${BPN}@.service \
         ${D}${systemd_unitdir}/system/${BPN}@.service
 }
 

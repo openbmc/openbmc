@@ -29,18 +29,18 @@ RDEPENDS:${PN}:append = " bash"
 
 do_install:append () {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/power-ctrl-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-ctrl-init ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_SERVICE:${PN}-bmc:append = "power-ctrl-init.service"

@@ -13,10 +13,10 @@ inherit systemd
 
 do_install() {
   install -d ${D}${datadir}/phosphor-ipmi-flash
-  install -m 0644 ${WORKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
+  install -m 0644 ${UNPACKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
   install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/noverify-bmc-update.service ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/noverify-bmc-verify.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/noverify-bmc-update.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/noverify-bmc-verify.service ${D}${systemd_system_unitdir}
 }
 
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"

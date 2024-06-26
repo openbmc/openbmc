@@ -11,6 +11,6 @@ FILES:${PN} = " \
 
 do_install() {
     install -d ${D}${datadir}/ipmi-entity-association
-    install -m 0644 -D ${WORKDIR}/entity_association_map.json \
+    install -m 0644 -D ${UNPACKDIR}/entity_association_map.json \
         ${D}${datadir}/ipmi-entity-association/entity_association_map.json
 }

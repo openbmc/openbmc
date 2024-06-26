@@ -47,11 +47,11 @@ SYSTEMD_SERVICE:${PN} += " \
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/host_*.sh ${D}${bindir}/
+    install -m 0755 ${UNPACKDIR}/host_*.sh ${D}${bindir}/
 
     install -d ${D}${datadir}/gpio-host-pwr
-    install -m 0755 ${WORKDIR}/lib.sh ${D}${datadir}/gpio-host-pwr/
+    install -m 0755 ${UNPACKDIR}/lib.sh ${D}${datadir}/gpio-host-pwr/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 }

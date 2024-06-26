@@ -10,7 +10,8 @@ PROVIDES += "virtual/phosphor-ipmi-sensor-inventory"
 
 SRC_URI += "file://config.yaml"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
 	DEST=${D}${sensor_datadir}

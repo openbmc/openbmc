@@ -25,5 +25,5 @@ RDEPENDS:${PN} += "i2c-tools"
 
 do_install() {
         install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/zaius_avsbus.sh ${D}${bindir}/zaius_avsbus.sh
+        install -m 0755 ${UNPACKDIR}/zaius_avsbus.sh ${D}${bindir}/zaius_avsbus.sh
 }

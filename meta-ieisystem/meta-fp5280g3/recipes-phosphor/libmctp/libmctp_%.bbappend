@@ -7,5 +7,5 @@ SRC_URI:append = " \
 
 do_install:append() {
     install -d ${D}${sysconfdir}/default
-    install -m 0644 ${WORKDIR}/mctp ${D}${sysconfdir}/default/mctp
+    install -m 0644 ${UNPACKDIR}/mctp ${D}${sysconfdir}/default/mctp
 }

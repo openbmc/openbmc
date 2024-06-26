@@ -4,5 +4,5 @@ FILES:${PN}:append:kudo = " ${datadir}/binaryblob/config.json"
 
 do_install:append:kudo() {
     install -d ${D}${datadir}/binaryblob/
-    install ${WORKDIR}/config.json ${D}${datadir}/binaryblob/config.json
+    install ${UNPACKDIR}/config.json ${D}${datadir}/binaryblob/config.json
 }

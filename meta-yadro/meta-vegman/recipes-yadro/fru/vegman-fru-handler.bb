@@ -8,7 +8,8 @@ SYSTEMD_SERVICE:${PN} = " \
     "
 
 RDEPENDS:${PN} = "bash u-boot-fw-utils"
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 SRC_URI = " \
         file://baseboard-fru-handler.sh \
         file://baseboard-fru-handler.service \

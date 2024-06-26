@@ -8,14 +8,15 @@ inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} += "i2c-tools bash"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 SRC_URI += "file://vrm-control.sh \
             file://vrm.sh"
 
 do_install() {
         install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/vrm.sh ${D}${bindir}/vrm.sh
-        install -m 0755 ${WORKDIR}/vrm-control.sh ${D}${bindir}/vrm-control.sh
+        install -m 0755 ${UNPACKDIR}/vrm.sh ${D}${bindir}/vrm.sh
+        install -m 0755 ${UNPACKDIR}/vrm-control.sh ${D}${bindir}/vrm-control.sh
 }
 
 TMPL = "vrm-control@.service"

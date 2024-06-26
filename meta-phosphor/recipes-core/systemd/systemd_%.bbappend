@@ -36,7 +36,7 @@ FILES:${PN}:append = " \
 
 do_install:append() {
     install -d -m 0755 ${D}${systemd_unitdir}/system.conf.d/
-    install -m 0644 ${WORKDIR}/40-hardware-watchdog.conf ${D}${systemd_unitdir}/system.conf.d/
+    install -m 0644 ${UNPACKDIR}/40-hardware-watchdog.conf ${D}${systemd_unitdir}/system.conf.d/
 }
 
 # udev is added to the USERADD_PACKAGES due to some 'render' group

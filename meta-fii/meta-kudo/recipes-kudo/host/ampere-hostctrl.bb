@@ -7,7 +7,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 inherit systemd
 inherit obmc-phosphor-systemd
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere_power_util.sh \
@@ -69,5 +70,5 @@ SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_MONITOR_INSTANCES')}
 
 do_install() {
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/ampere_power_util.sh ${D}${libexecdir}/${PN}/ampere_power_util.sh
+    install -m 0755 ${UNPACKDIR}/ampere_power_util.sh ${D}${libexecdir}/${PN}/ampere_power_util.sh
 }

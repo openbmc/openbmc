@@ -11,7 +11,8 @@ SRC_URI:olympus-nuvoton = " \
     file://olympus-nuvoton-ipmi-sensors.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install:olympus-nuvoton() {
     install -m 0644 -D olympus-nuvoton-ipmi-fru-properties.yaml \

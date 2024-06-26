@@ -16,5 +16,5 @@ SYSTEMD_SERVICE:${PN}:append = " \
 
 do_install:append() {
     # Install the console client configurations
-    install -m 0644 ${WORKDIR}/client.*.conf ${D}${sysconfdir}/${BPN}
+    install -m 0644 ${UNPACKDIR}/client.*.conf ${D}${sysconfdir}/${BPN}
 }

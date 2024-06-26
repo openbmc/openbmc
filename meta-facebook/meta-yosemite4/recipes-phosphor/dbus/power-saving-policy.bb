@@ -16,10 +16,10 @@ SRC_URI:append = " \
 "
 
 do_install() {
-    install -D ${WORKDIR}/nic-1.yaml ${D}${config_dir}/nic-1.yaml
-    install -D ${WORKDIR}/nic-2.yaml ${D}${config_dir}/nic-2.yaml
-    install -D ${WORKDIR}/nic-3.yaml ${D}${config_dir}/nic-3.yaml
-    install -D ${WORKDIR}/nic-4.yaml ${D}${config_dir}/nic-4.yaml
+    install -D ${UNPACKDIR}/nic-1.yaml ${D}${config_dir}/nic-1.yaml
+    install -D ${UNPACKDIR}/nic-2.yaml ${D}${config_dir}/nic-2.yaml
+    install -D ${UNPACKDIR}/nic-3.yaml ${D}${config_dir}/nic-3.yaml
+    install -D ${UNPACKDIR}/nic-4.yaml ${D}${config_dir}/nic-4.yaml
 }
 
 FILES:${PN}:append = " \

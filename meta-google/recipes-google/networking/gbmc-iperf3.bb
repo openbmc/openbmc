@@ -14,7 +14,7 @@ SYSTEMD_SERVICE:${PN} += "iperf3.service"
 do_install() {
   # Install service definitions
   install -d -m 0755 ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/iperf3.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/iperf3.service ${D}${systemd_system_unitdir}
 }
 
 # Allow IPERF3 to run on the gbmcbr node on DEV builds

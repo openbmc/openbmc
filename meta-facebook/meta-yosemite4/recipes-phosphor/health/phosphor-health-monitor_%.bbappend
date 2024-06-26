@@ -20,7 +20,7 @@ SYSTEMD_AUTO_ENABLE = "enable"
 
 do_install:append:() {
     install -d ${D}${datadir}/phosphor-health-monitor
-    install -m 0644 ${WORKDIR}/clean-up-filesystem.service ${D}${systemd_system_unitdir}/clean-up-filesystem.service
+    install -m 0644 ${UNPACKDIR}/clean-up-filesystem.service ${D}${systemd_system_unitdir}/clean-up-filesystem.service
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/clean-up-filesystem ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/clean-up-filesystem ${D}${libexecdir}/${PN}/
 }

@@ -5,6 +5,6 @@ SRC_URI:append = " file://ethanolx-baseboard.json \
 do_install:append() {
      rm -f ${D}${datadir}/entity-manager/configurations/*.json
      install -d ${D}${datadir}/entity-manager/configurations
-     install -m 0444 ${WORKDIR}/ethanolx-baseboard.json ${D}${datadir}/entity-manager/configurations
-     install -m 0444 ${WORKDIR}/ethanolx-chassis.json ${D}${datadir}/entity-manager/configurations
+     install -m 0444 ${UNPACKDIR}/ethanolx-baseboard.json ${D}${datadir}/entity-manager/configurations
+     install -m 0444 ${UNPACKDIR}/ethanolx-chassis.json ${D}${datadir}/entity-manager/configurations
 }

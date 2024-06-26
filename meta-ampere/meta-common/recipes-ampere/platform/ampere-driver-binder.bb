@@ -8,7 +8,8 @@ inherit systemd
 inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} = "bash"
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 SRC_URI = " \
            file://ampere-power-on-driver-binder@.service \

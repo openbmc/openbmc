@@ -4,5 +4,5 @@ SRC_URI:append = " \
     "
 
 do_install:append() {
-     install -m 0444 ${WORKDIR}/blacklist.json -D -t ${D}${datadir}/entity-manager
+     install -m 0444 ${UNPACKDIR}/blacklist.json -D -t ${D}${datadir}/entity-manager
 }

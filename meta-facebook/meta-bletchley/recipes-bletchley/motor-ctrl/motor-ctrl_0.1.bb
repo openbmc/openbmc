@@ -11,7 +11,8 @@ RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "mdio-tools"
 RDEPENDS:${PN} += "bletchley-common-functions"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 SRC_URI += " \
     file://motor-ctrl \
     file://motor-init \
@@ -20,11 +21,11 @@ SRC_URI += " \
 
 do_install() {
         install -d ${D}${sbindir}
-        install -m 0755 ${WORKDIR}/power-ctrl ${D}${sbindir}
+        install -m 0755 ${UNPACKDIR}/power-ctrl ${D}${sbindir}
 
         install -d ${D}${libexecdir}
-        install -m 0755 ${WORKDIR}/motor-ctrl ${D}${libexecdir}
-        install -m 0755 ${WORKDIR}/motor-init ${D}${libexecdir}
+        install -m 0755 ${UNPACKDIR}/motor-ctrl ${D}${libexecdir}
+        install -m 0755 ${UNPACKDIR}/motor-init ${D}${libexecdir}
 }
 
 TGT = "${SYSTEMD_DEFAULT_TARGET}"

@@ -97,18 +97,18 @@ RDEPENDS:${PN}:append = " bash"
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
 }
 SYSTEMD_OVERRIDE:${PN}-discover += "discover-sys-init.conf:phosphor-discover-system-state@0.service.d/discover-sys-init.conf"
 SYSTEMD_OVERRIDE:${PN}-systemd-target-monitor += "phosphor-state-manager-init.conf:phosphor-systemd-target-monitor.service.d/phosphor-state-manager-init.conf"

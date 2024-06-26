@@ -8,6 +8,6 @@ FILES:${PN} += " \
 "
 
 do_install:append () {
-    install -D -m 0644 ${WORKDIR}/obmc-ikvm.service ${D}${systemd_system_unitdir}
-    install -D -m 0755 ${WORKDIR}/create_usbhid.sh ${D}${bindir}
+    install -D -m 0644 ${UNPACKDIR}/obmc-ikvm.service ${D}${systemd_system_unitdir}
+    install -D -m 0755 ${UNPACKDIR}/create_usbhid.sh ${D}${bindir}
 }

@@ -11,7 +11,7 @@ do_install:append() {
         "${D}${sysconfdir}/nsswitch.conf"
     install -d ${D}/srv
     install -d ${D}/${libdir}/sysctl.d
-    install -D -m 644 ${WORKDIR}/50-rp_filter.conf ${D}/${libdir}/sysctl.d/50-rp_filter.conf
+    install -D -m 644 ${UNPACKDIR}/50-rp_filter.conf ${D}/${libdir}/sysctl.d/50-rp_filter.conf
 }
 
 RDEPENDS:${PN}:append:df-obmc-ubi-fs = " preinit-mounts"

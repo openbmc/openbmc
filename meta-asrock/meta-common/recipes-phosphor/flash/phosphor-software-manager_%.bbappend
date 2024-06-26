@@ -6,9 +6,9 @@ RDEPENDS:${PN} += "bash libgpiod"
 
 do_install:append() {
     install -d ${D}/${sbindir}
-    install -m 0755 ${WORKDIR}/bios-update.sh ${D}/${sbindir}/
-    if [ -e ${WORKDIR}/bios-update ]; then
+    install -m 0755 ${UNPACKDIR}/bios-update.sh ${D}/${sbindir}/
+    if [ -e ${UNPACKDIR}/bios-update ]; then
         install -d ${D}${sysconfdir}/default
-        install -m 0644 ${WORKDIR}/bios-update ${D}${sysconfdir}/default
+        install -m 0644 ${UNPACKDIR}/bios-update ${D}${sysconfdir}/default
     fi
 }

@@ -14,11 +14,11 @@ SRC_URI += " \
             file://user/ \
            "
 
-SOCSEC_SIGN_KEY ?= "${WORKDIR}/rsa_oem_dss_key.pem"
+SOCSEC_SIGN_KEY ?= "${UNPACKDIR}/rsa_oem_dss_key.pem"
 SOCSEC_SIGN_ALGO ?= "RSA4096_SHA512"
 SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false --rsa_key_order=big"
 
-OTPTOOL_USER_DIR ?= "${WORKDIR}/user"
+OTPTOOL_USER_DIR ?= "${UNPACKDIR}/user"
 
 inherit socsec-sign
 inherit otptool
@@ -32,6 +32,6 @@ do_compile:append() {
     if [ -n "${UBOOT_ENV}" ]
     then
         # Generate redundant environment image
-        ${B}/tools/mkenvimage -r -s ${UBOOT_ENV_SIZE} -o ${WORKDIR}/${UBOOT_ENV_BINARY} ${WORKDIR}/${UBOOT_ENV_TXT}
+        ${B}/tools/mkenvimage -r -s ${UBOOT_ENV_SIZE} -o ${WORKDIR}/${UBOOT_ENV_BINARY} ${UNPACKDIR}/${UBOOT_ENV_TXT}
     fi
 }

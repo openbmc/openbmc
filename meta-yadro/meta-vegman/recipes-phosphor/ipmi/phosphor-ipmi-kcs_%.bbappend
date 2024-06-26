@@ -7,5 +7,5 @@ SYSTEMD_SERVICE:${PN}:append = " ${PN}@${SMM_DEVICE}.service "
 SRC_URI += "file://99-ipmi-kcs.rules"
 
 do_install:append() {
-    install -m 0644 ${WORKDIR}/99-ipmi-kcs.rules -D -t ${D}${nonarch_base_libdir}/udev/rules.d/
+    install -m 0644 ${UNPACKDIR}/99-ipmi-kcs.rules -D -t ${D}${nonarch_base_libdir}/udev/rules.d/
 }

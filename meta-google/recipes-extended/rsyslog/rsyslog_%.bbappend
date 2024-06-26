@@ -14,6 +14,6 @@ FILES:${PN}:append:gbmc = "\
 # Set ForwardToSyslog=no
 # Disable forward journal to socket since that is not being used.
 do_install:append:gbmc() {
-  install -D -m0644 ${WORKDIR}/journald.conf \
+  install -D -m0644 ${UNPACKDIR}/journald.conf \
     ${D}${systemd_unitdir}/journald.conf.d/99-${PN}.conf
 }

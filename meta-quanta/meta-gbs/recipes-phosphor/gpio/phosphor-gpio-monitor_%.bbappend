@@ -30,5 +30,5 @@ SYSTEMD_ENVIRONMENT_FILE:${PN}-presence:gbs = " ${@compose_list(d, 'GBS_PRESENT_
 
 do_install:append:gbs() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/phosphor-gpio-presence@.service.replace ${D}${systemd_system_unitdir}/phosphor-gpio-presence@.service
+    install -m 0644 ${UNPACKDIR}/phosphor-gpio-presence@.service.replace ${D}${systemd_system_unitdir}/phosphor-gpio-presence@.service
 }

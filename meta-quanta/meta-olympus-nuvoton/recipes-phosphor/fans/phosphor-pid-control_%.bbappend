@@ -15,15 +15,15 @@ SYSTEMD_SERVICE:${PN}:append:olympus-nuvoton = " fan-reboot-control.service"
 
 do_install:append:olympus-nuvoton() {
     install -d ${D}/${bindir}
-    install -m 0755 ${WORKDIR}/fan-full-speed.sh ${D}/${bindir}
+    install -m 0755 ${UNPACKDIR}/fan-full-speed.sh ${D}/${bindir}
 
     install -d ${D}${datadir}/swampd
-    install -m 0644 -D ${WORKDIR}/config-olympus-nuvoton.json \
+    install -m 0644 -D ${UNPACKDIR}/config-olympus-nuvoton.json \
         ${D}${datadir}/swampd/config.json
 
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/phosphor-pid-control.service \
+    install -m 0644 ${UNPACKDIR}/phosphor-pid-control.service \
         ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/fan-reboot-control.service \
+    install -m 0644 ${UNPACKDIR}/fan-reboot-control.service \
         ${D}${systemd_unitdir}/system
 }

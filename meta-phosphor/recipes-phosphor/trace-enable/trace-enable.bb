@@ -5,7 +5,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 SRC_URI += " file://trace-enable"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 SYSTEMD_SERVICE:${PN} = "trace-enable.service"
 
 inherit obmc-phosphor-systemd
@@ -19,7 +20,7 @@ do_install:append() {
     echo >> ${D}${sysconfdir}/trace-events.conf
     chmod 0644 ${D}${sysconfdir}/trace-events.conf
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/trace-enable ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/trace-enable ${D}${libexecdir}
 }
 
 RDEPENDS:${PN} = " \

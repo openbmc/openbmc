@@ -30,8 +30,8 @@ SRC_URI:append:kudo = " \
 
 do_install:append:kudo() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/xyz.openbmc_project.State.Chassis@.service ${D}${systemd_system_unitdir}/xyz.openbmc_project.State.Chassis@.service
-    install -m 0644 ${WORKDIR}/xyz.openbmc_project.State.Host@.service ${D}${systemd_system_unitdir}/xyz.openbmc_project.State.Host@.service
+    install -m 0644 ${UNPACKDIR}/xyz.openbmc_project.State.Chassis@.service ${D}${systemd_system_unitdir}/xyz.openbmc_project.State.Chassis@.service
+    install -m 0644 ${UNPACKDIR}/xyz.openbmc_project.State.Host@.service ${D}${systemd_system_unitdir}/xyz.openbmc_project.State.Host@.service
     rm -f ${D}${systemd_system_unitdir}/phosphor-reset-host-check@.service
     rm -f ${D}${systemd_system_unitdir}/phosphor-reset-host-running@.service
 }

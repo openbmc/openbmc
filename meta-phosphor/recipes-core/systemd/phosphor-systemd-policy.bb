@@ -9,8 +9,8 @@ SRC_URI += "file://service-restart-policy.conf"
 SRC_URI += "file://journald-maxlevel-policy.conf"
 
 do_install() {
-        install -m 644 -D ${WORKDIR}/service-restart-policy.conf ${D}${systemd_unitdir}/system.conf.d/service-restart-policy.conf
-        install -m 644 -D ${WORKDIR}/journald-maxlevel-policy.conf ${D}${systemd_unitdir}/journald.conf.d/journald-maxlevel-policy.conf
+        install -m 644 -D ${UNPACKDIR}/service-restart-policy.conf ${D}${systemd_unitdir}/system.conf.d/service-restart-policy.conf
+        install -m 644 -D ${UNPACKDIR}/journald-maxlevel-policy.conf ${D}${systemd_unitdir}/journald.conf.d/journald-maxlevel-policy.conf
 }
 
 FILES:${PN} += "${systemd_unitdir}/system.conf.d/service-restart-policy.conf"

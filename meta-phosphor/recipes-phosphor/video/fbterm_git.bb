@@ -21,5 +21,5 @@ inherit obmc-phosphor-systemd
 do_install() {
     oe_runmake 'DESTDIR=${D}' install-exec
     install -d ${D}${sysconfdir}/
-    install -m 0644 ${WORKDIR}/fb.modes ${D}${sysconfdir}/
+    install -m 0644 ${UNPACKDIR}/fb.modes ${D}${sysconfdir}/
 }

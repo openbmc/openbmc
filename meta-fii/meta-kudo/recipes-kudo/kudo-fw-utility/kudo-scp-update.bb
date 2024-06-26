@@ -31,10 +31,10 @@ SYSTEMD_SERVICE:${PN} += " \
 
 do_install () {
     install -d ${D}${datadir}/phosphor-ipmi-flash
-    install -m 0644 ${WORKDIR}/config-scp.json ${D}${datadir}/phosphor-ipmi-flash
-    install -m 0644 ${WORKDIR}/config-scpback.json ${D}${datadir}/phosphor-ipmi-flash
+    install -m 0644 ${UNPACKDIR}/config-scp.json ${D}${datadir}/phosphor-ipmi-flash
+    install -m 0644 ${UNPACKDIR}/config-scpback.json ${D}${datadir}/phosphor-ipmi-flash
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/phosphor-ipmi-flash-scp-update.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/phosphor-ipmi-flash-scpback-update.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/phosphor-ipmi-flash-scp-update.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/phosphor-ipmi-flash-scpback-update.service ${D}${systemd_system_unitdir}
 }

@@ -13,10 +13,10 @@ SRC_URI += "file://usb_network.service \
 
 do_install() {
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/usb_network.service ${D}${systemd_unitdir}/system
+    install -m 0644 ${UNPACKDIR}/usb_network.service ${D}${systemd_unitdir}/system
 
     install -d ${D}${sysconfdir_native}/systemd/network/
-    install -m 0644 ${WORKDIR}/00-bmc-usb0.network ${D}${sysconfdir_native}/systemd/network
+    install -m 0644 ${UNPACKDIR}/00-bmc-usb0.network ${D}${sysconfdir_native}/systemd/network
 }
 
 NATIVE_SYSTEMD_SUPPORT = "1"

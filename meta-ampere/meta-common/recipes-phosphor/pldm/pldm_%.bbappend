@@ -9,7 +9,7 @@ SRC_URI:remove = "file://pldm-softpoweroff"
 
 do_install:append() {
     install -d ${D}/${datadir}/pldm
-    install ${WORKDIR}/host_eid ${D}/${datadir}/pldm/
+    install ${UNPACKDIR}/host_eid ${D}/${datadir}/pldm/
     LINK="${D}${systemd_unitdir}/obmc-host-shutdown@0.target.wants/pldmSoftPowerOff.service"
     rm -f $LINK
     LINK="${D}${systemd_unitdir}/obmc-host-warm-reboot@0.target.wants/pldmSoftPowerOff.service"

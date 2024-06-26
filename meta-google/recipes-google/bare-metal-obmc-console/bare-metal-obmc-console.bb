@@ -26,7 +26,7 @@ SYSTEMD_SERVICE:${PN} = " \
 
 do_install:append() {
   install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/disable-obmc-console.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/disable-obmc-console.service ${D}${systemd_system_unitdir}
   install -d -m0755 ${D}${libexecdir}
-  install -m0755 ${WORKDIR}/disable_obmc_console.sh ${D}${libexecdir}/
+  install -m0755 ${UNPACKDIR}/disable_obmc_console.sh ${D}${libexecdir}/
 }

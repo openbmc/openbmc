@@ -17,5 +17,5 @@ SYSTEMD_SERVICE:${PN}:append = " board-type-checker-fpb.service"
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/board-type-checker-fpb ${D}${libexecdir}/
+    install -m 0755 ${UNPACKDIR}/board-type-checker-fpb ${D}${libexecdir}/
 }

@@ -10,5 +10,5 @@ RDEPENDS:${PN} = "bash"
 
 do_install() {
     install -d ${D}${datadir}/gpio-ctrl
-    install -m 0755 ${WORKDIR}/lib.sh ${D}${datadir}/gpio-ctrl/
+    install -m 0755 ${UNPACKDIR}/lib.sh ${D}${datadir}/gpio-ctrl/
 }

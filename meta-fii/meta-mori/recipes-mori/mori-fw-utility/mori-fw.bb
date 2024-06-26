@@ -19,12 +19,12 @@ inherit systemd obmc-phosphor-systemd
 do_install () {
     install -d ${D}${bindir}
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/mori-fw.sh ${D}${bindir}/mori-fw.sh
-    install -m 0755 ${WORKDIR}/mori-fw-ver.sh \
+    install -m 0755 ${UNPACKDIR}/mori-fw.sh ${D}${bindir}/mori-fw.sh
+    install -m 0755 ${UNPACKDIR}/mori-fw-ver.sh \
         ${D}${libexecdir}/${PN}/mori-fw-ver.sh
-    install -m 0755 ${WORKDIR}/mori-lib.sh ${D}${libexecdir}/${PN}/mori-lib.sh
+    install -m 0755 ${UNPACKDIR}/mori-lib.sh ${D}${libexecdir}/${PN}/mori-lib.sh
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/mori-fw-ver.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/mori-fw-ver.service ${D}${systemd_system_unitdir}
 }
 
 RDEPENDS:${PN}:append = " libsystemd bash"

@@ -21,19 +21,19 @@ FILES:${PN}:append:gbmc = " ${systemd_system_unitdir}/host-console-journal.servi
 
 do_install:append:gbmc() {
   install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/serial-to-bmc@.service \
+  install -m 0644 ${UNPACKDIR}/serial-to-bmc@.service \
     ${D}${systemd_system_unitdir}
 
   sed "s,@HOST_TTY@,${OBMC_CONSOLE_HOST_TTY}," \
-    ${WORKDIR}/serial-to-host@.service.in \
+    ${UNPACKDIR}/serial-to-host@.service.in \
     >${D}${systemd_system_unitdir}/serial-to-host@.service
 
   sed 's,@HOST_TTY@,${OBMC_CONSOLE_HOST_TTY},' \
-    ${WORKDIR}/host-console-journal.service.in \
+    ${UNPACKDIR}/host-console-journal.service.in \
     >${D}${systemd_system_unitdir}/host-console-journal.service
 
   install -d ${D}${bindir}
-  install -m0755 ${WORKDIR}/host-console-filtered.sh ${D}${bindir}/
+  install -m0755 ${UNPACKDIR}/host-console-filtered.sh ${D}${bindir}/
 }
 
 pkg_postinst:${PN}:append:gbmc () {

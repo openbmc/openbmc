@@ -12,5 +12,5 @@ RDEPENDS:${PN} = "bash"
 
 do_install() {
     install -d ${D}/usr/sbin
-    install -m 0755 ${WORKDIR}/ampere_add_redfishevent.sh ${D}/${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_add_redfishevent.sh ${D}/${sbindir}/
 }

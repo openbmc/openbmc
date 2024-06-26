@@ -21,5 +21,5 @@ FILES:${PN} += "${sysconfdir}/nftables"
 do_install:append() {
   nftables_dir=${D}${sysconfdir}/nftables
   install -d -m0755 "$nftables_dir"
-  install -m0644 ${WORKDIR}/50-dhcp-done.rules $nftables_dir/
+  install -m0644 ${UNPACKDIR}/50-dhcp-done.rules $nftables_dir/
 }

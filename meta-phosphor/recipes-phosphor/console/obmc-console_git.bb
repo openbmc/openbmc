@@ -40,7 +40,7 @@ do_install:append() {
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
 
         if ${@bb.utils.contains('PACKAGECONFIG', 'ssh', 'true', 'false', d)} ; then
-                install -m 0644 ${WORKDIR}/dropbear.env ${D}${sysconfdir}/${BPN}/
+                install -m 0644 ${UNPACKDIR}/dropbear.env ${D}${sysconfdir}/${BPN}/
         fi
 
         # If the OBMC_CONSOLE_TTYS variable is used without the default OBMC_CONSOLE_HOST_TTY
@@ -50,8 +50,8 @@ do_install:append() {
                 rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
                 for CONSOLE in ${OBMC_CONSOLE_TTYS}
                 do
-                        if test -f "${WORKDIR}/server.${CONSOLE}.conf" ; then
-                                install -m 0644 ${WORKDIR}/server.${CONSOLE}.conf ${D}${sysconfdir}/${BPN}/
+                        if test -f "${UNPACKDIR}/server.${CONSOLE}.conf" ; then
+                                install -m 0644 ${UNPACKDIR}/server.${CONSOLE}.conf ${D}${sysconfdir}/${BPN}/
                         else
                                 bberror "Must provide port specific config files when using OBMC_CONSOLE_TTYS" \
                                         "Missing server.${CONSOLE}.conf"
@@ -61,16 +61,16 @@ do_install:append() {
                 # Port specific config file is prioritized over generic conf file.
                 # If port specific config file is not present and generic "obmc-console.conf"
                 # exists, it will be used.
-                if test -f "${WORKDIR}/server.${OBMC_CONSOLE_TTYS}.conf" ; then
+                if test -f "${UNPACKDIR}/server.${OBMC_CONSOLE_TTYS}.conf" ; then
                         # Remove the upstream-provided server configuration
                         rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
                         # Install the package-provided new-style configuration
-                        install -m 0644 ${WORKDIR}/server.${OBMC_CONSOLE_TTYS}.conf ${D}${sysconfdir}/${BPN}/
-                elif test -f "${WORKDIR}/${BPN}.conf"; then
+                        install -m 0644 ${UNPACKDIR}/server.${OBMC_CONSOLE_TTYS}.conf ${D}${sysconfdir}/${BPN}/
+                elif test -f "${UNPACKDIR}/${BPN}.conf"; then
                         # Remove the upstream-provided server configuration
                         rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
                         # Install the old-style server configuration
-                        install -m 0644 ${WORKDIR}/${BPN}.conf ${D}${sysconfdir}/
+                        install -m 0644 ${UNPACKDIR}/${BPN}.conf ${D}${sysconfdir}/
                         # Link the custom configuration to the required location
                         ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_TTYS}.conf
                 else

@@ -16,9 +16,9 @@ SYSTEMD_SERVICE:${PN} += " \
 
 do_install:append() {
     install -d ${D}/usr/share/pldm/bios
-    install -m 0644 ${WORKDIR}/boot_config_setting_attrs.json ${D}/usr/share/pldm/bios/boot_config_setting_attrs.json
+    install -m 0644 ${UNPACKDIR}/boot_config_setting_attrs.json ${D}/usr/share/pldm/bios/boot_config_setting_attrs.json
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/pldm_nic_power_cycle ${D}${libexecdir}/${PN}/
-    install -m 0644 ${WORKDIR}/pldm_nic_power_cycle@.service ${D}${systemd_system_unitdir}
+    install -m 0755 ${UNPACKDIR}/pldm_nic_power_cycle ${D}${libexecdir}/${PN}/
+    install -m 0644 ${UNPACKDIR}/pldm_nic_power_cycle@.service ${D}${systemd_system_unitdir}
 }

@@ -16,10 +16,10 @@ SRC_URI = " file://hotswap-power-cycle.service \
 
 do_install() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/hotswap-power-cycle.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/hotswap-power-cycle.service ${D}${systemd_system_unitdir}
 
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/tray_powercycle.sh ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/tray_powercycle.sh ${D}${bindir}
 }
 
 SYSTEMD_PACKAGES = "${PN}"

@@ -3,7 +3,7 @@ DEPENDS:append:gbs = " gbs-yaml-config"
 FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
 SRC_URI:append:gbs = " file://gbs-ipmid-whitelist.conf"
 
-WHITELIST_CONF:gbs = "${WORKDIR}/gbs-ipmid-whitelist.conf"
+WHITELIST_CONF:gbs = "${UNPACKDIR}/gbs-ipmid-whitelist.conf"
 
 EXTRA_OEMESON:append:gbs = " \
      -Dsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/gbs-yaml-config/ipmi-sensors.yaml \

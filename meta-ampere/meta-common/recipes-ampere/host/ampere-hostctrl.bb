@@ -8,7 +8,8 @@ inherit systemd
 inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} = "bash"
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 SRC_URI = " \
            file://ampere-host-force-reset@.service \
@@ -59,5 +60,5 @@ SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_CHECK_BMC_REBOOT_HOSTFMT', '
 
 do_install() {
     install -d ${D}/usr/sbin
-    install -m 0755 ${WORKDIR}/ampere_host_check.sh ${D}/${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_host_check.sh ${D}/${sbindir}/
 }

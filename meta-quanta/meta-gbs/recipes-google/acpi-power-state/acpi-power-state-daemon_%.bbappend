@@ -29,16 +29,16 @@ FILES:${PN}:append:gbs = " \
 do_install:append:gbs() {
     install -d ${D}${bindir}
 
-    install -m 0755 ${WORKDIR}/gbs-set-failsafe.sh ${D}${bindir}/.
-    install -m 0755 ${WORKDIR}/gbs-set-boot-failsafe.sh ${D}${bindir}/.
-    install -m 0755 ${WORKDIR}/gbs-check-host-state.sh ${D}${bindir}/.
+    install -m 0755 ${UNPACKDIR}/gbs-set-failsafe.sh ${D}${bindir}/.
+    install -m 0755 ${UNPACKDIR}/gbs-set-boot-failsafe.sh ${D}${bindir}/.
+    install -m 0755 ${UNPACKDIR}/gbs-check-host-state.sh ${D}${bindir}/.
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/gbs-host-s0-set-failsafe.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/gbs-host-s5-set-failsafe.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/gbs-host-set-boot-failsafe@.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/gbs-check-host-state.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/gbs-host-ready.target ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/gbs-host-s0-set-failsafe.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/gbs-host-s5-set-failsafe.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/gbs-host-set-boot-failsafe@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/gbs-check-host-state.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/gbs-host-ready.target ${D}${systemd_system_unitdir}
 }
 
 pkg_postinst:${PN}:append() {

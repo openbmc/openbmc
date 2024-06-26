@@ -27,7 +27,7 @@ inherit autotools pkgconfig
 
 do_install:append() {
         install -d ${D}${sysconfdir}/default
-        install -m 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/mctp
+        install -m 0644 ${UNPACKDIR}/default ${D}${sysconfdir}/default/mctp
 }
 
 CONFFILES:${PN} = "${sysconfdir}/default/mctp"

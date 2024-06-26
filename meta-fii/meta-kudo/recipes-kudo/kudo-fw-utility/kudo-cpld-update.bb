@@ -31,9 +31,9 @@ SYSTEMD_SERVICE:${PN} += " \
 
 do_install () {
     install -d ${D}${datadir}/phosphor-ipmi-flash
-    install -m 0644 ${WORKDIR}/config-bmccpld.json ${D}${datadir}/phosphor-ipmi-flash
-    install -m 0644 ${WORKDIR}/config-mbcpld.json ${D}${datadir}/phosphor-ipmi-flash
+    install -m 0644 ${UNPACKDIR}/config-bmccpld.json ${D}${datadir}/phosphor-ipmi-flash
+    install -m 0644 ${UNPACKDIR}/config-mbcpld.json ${D}${datadir}/phosphor-ipmi-flash
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/phosphor-ipmi-flash-bmccpld-update.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/phosphor-ipmi-flash-mbcpld-update.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/phosphor-ipmi-flash-bmccpld-update.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/phosphor-ipmi-flash-mbcpld-update.service ${D}${systemd_system_unitdir}
 }

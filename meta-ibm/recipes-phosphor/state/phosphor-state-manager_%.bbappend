@@ -35,6 +35,6 @@ FILES:${PN}-bmc:append = " ${sysconfdir}/phosphor-service-monitor-default.json"
 SRC_URI:append = " file://phosphor-service-monitor-default.json"
 do_install:append() {
     install -d ${D}${sysconfdir}/phosphor-systemd-target-monitor
-    install -m 0644 ${WORKDIR}/phosphor-service-monitor-default.json \
+    install -m 0644 ${UNPACKDIR}/phosphor-service-monitor-default.json \
         ${D}${sysconfdir}/phosphor-systemd-target-monitor/
 }

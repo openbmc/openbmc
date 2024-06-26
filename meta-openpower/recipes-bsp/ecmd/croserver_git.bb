@@ -30,7 +30,7 @@ do_install() {
     install -m 0755 out_obj/lib/server1p ${D}${bindir}/croserver
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/croserver.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/croserver.service ${D}${systemd_system_unitdir}/
 }
 
 FILES:${PN} += "${systemd_system_unitdir}/croserver.service"

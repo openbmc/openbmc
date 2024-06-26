@@ -23,5 +23,5 @@ SYSTEMD_SERVICE:${PN}:append:p10bmc = " first-boot-disable-ipmi-net.service"
 
 do_install:append:p10bmc() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/first-boot-disable-ipmi-net.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/first-boot-disable-ipmi-net.service ${D}${systemd_system_unitdir}/
 }

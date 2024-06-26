@@ -25,19 +25,19 @@ do_install() {
             exit 1
         fi
         if [ -n "${signing_key}" ]; then
-            openssl pkey -in "${signing_key}" -pubout -out ${WORKDIR}/publickey
+            openssl pkey -in "${signing_key}" -pubout -out ${UNPACKDIR}/publickey
             idir="${D}${sysconfdir}/activationdata/${SIGNING_KEY_TYPE}"
         elif [ -n "${SIGNING_PUBLIC_KEY}" ]; then
-            cp "${SIGNING_PUBLIC_KEY}" ${WORKDIR}/publickey
+            cp "${SIGNING_PUBLIC_KEY}" ${UNPACKDIR}/publickey
             idir="${D}${sysconfdir}/activationdata/${SIGNING_PUBLIC_KEY_TYPE}"
         else
             echo "No SIGNING_KEY or SIGNING_PUBLIC_KEY defined, expecting one"
             exit 1
         fi
-        echo HashType=RSA-SHA256 > "${WORKDIR}/hashfunc"
+        echo HashType=RSA-SHA256 > "${UNPACKDIR}/hashfunc"
         install -d ${idir}
-        install -m 644 ${WORKDIR}/publickey ${idir}
-        install -m 644 ${WORKDIR}/hashfunc ${idir}
+        install -m 644 ${UNPACKDIR}/publickey ${idir}
+        install -m 644 ${UNPACKDIR}/hashfunc ${idir}
 }
 
 FILES:${PN} += "${sysconfdir}/activationdata/"

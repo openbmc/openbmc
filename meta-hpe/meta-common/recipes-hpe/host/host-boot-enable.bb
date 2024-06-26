@@ -16,5 +16,5 @@ SRC_URI += "file://host-boot-enable.sh"
 
 do_install() {
 	install -d ${D}${bindir}
-	install -m 0755 ${WORKDIR}/host-boot-enable.sh ${D}${bindir}
+	install -m 0755 ${UNPACKDIR}/host-boot-enable.sh ${D}${bindir}
 }

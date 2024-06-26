@@ -8,10 +8,10 @@ SRC_URI:append = " \
 do_install:append() {
 
     install -m 644 -D \
-        ${WORKDIR}/journald-size-policy.conf \
+        ${UNPACKDIR}/journald-size-policy.conf \
         ${D}${systemd_unitdir}/journald.conf.d/journald-size-policy.conf
 
     install -m 644 -D \
-        ${WORKDIR}/journald-storage-policy.conf \
+        ${UNPACKDIR}/journald-storage-policy.conf \
         ${D}/${systemd_unitdir}/journald.conf.d/journald-storage-policy.conf
 }

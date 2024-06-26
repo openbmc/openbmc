@@ -5,7 +5,8 @@ PR = "r1"
 
 SRC_URI += "file://config.yaml"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit phosphor-ipmi-host
 inherit native

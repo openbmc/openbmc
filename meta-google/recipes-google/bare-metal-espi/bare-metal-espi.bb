@@ -25,5 +25,5 @@ SYSTEMD_SERVICE:${PN} = " \
 
 do_install:append() {
   install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/disable-espi.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/disable-espi.service ${D}${systemd_system_unitdir}
 }

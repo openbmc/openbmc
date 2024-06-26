@@ -15,10 +15,10 @@ SRC_URI = " file://boot-status-led.sh \
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/boot-status-led.sh ${D}${bindir}/
+    install -m 0755 ${UNPACKDIR}/boot-status-led.sh ${D}${bindir}/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/boot-status-led.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/boot-status-led.service ${D}${systemd_system_unitdir}
 }
 
 SYSTEMD_PACKAGES = "${PN}"

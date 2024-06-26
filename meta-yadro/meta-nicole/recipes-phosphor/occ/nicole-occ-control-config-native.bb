@@ -11,7 +11,8 @@ PROVIDES += "virtual/openpower-occ-control-config-native"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://occ_sensor.yaml"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 do_install() {
     install -d ${YAML_DEST}/
     install ${S}/occ_sensor.yaml ${YAML_DEST}/

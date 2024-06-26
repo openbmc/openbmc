@@ -42,16 +42,16 @@ do_compile:append() {
         -DM_BMC_USB_IFACE="${BMC_USB_IFACE}" \
         -DM_BMC_USB_BIND_DEV="${BMC_USB_ECM_BIND_DEV}" \
         -DM_SCRIPT_INSTALL_DIR="${bindir}" \
-        ${WORKDIR}/usb_network.service.m4 > ${WORKDIR}/usb_network.service
+        ${UNPACKDIR}/usb_network.service.m4 > ${WORKDIR}/usb_network.service
   fi
 }
 
 do_install:append() {
   install -d ${D}/${bindir}
-  install -m 0755 ${WORKDIR}/usb_network.sh ${D}/${bindir}
+  install -m 0755 ${UNPACKDIR}/usb_network.sh ${D}/${bindir}
 
   if [ -n "${BMC_USB_ECM_PRODUCT_ID}" ]; then
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/usb_network.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/usb_network.service ${D}${systemd_system_unitdir}
   fi
 }

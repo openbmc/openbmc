@@ -41,7 +41,7 @@ EXTRA_ENTITY_MANAGER_PACKAGES = " \
     "
 
 do_install:append() {
-    install -D ${WORKDIR}/blocklist.json ${D}${datadir}/${BPN}/blacklist.json
+    install -D ${UNPACKDIR}/blocklist.json ${D}${datadir}/${BPN}/blacklist.json
 }
 
 FILES:${PN} += " \

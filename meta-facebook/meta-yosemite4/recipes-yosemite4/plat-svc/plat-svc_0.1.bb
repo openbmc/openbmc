@@ -22,7 +22,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/yosemite4-early-sys-init ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/yosemite4-schematic-init ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/yosemite4-early-sys-init ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/yosemite4-schematic-init ${D}${libexecdir}
 }
 

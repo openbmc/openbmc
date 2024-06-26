@@ -57,8 +57,8 @@ SYSTEMD_LINK:${PN}-ncplite += "${@compose_list_zip(d, 'CHASSIS_HOST_OFF_FMT', 'O
 
 do_install:append() {
     install -d ${D}${sbindir}
-    install -m 0744 ${WORKDIR}/host-control ${D}${sbindir}/
-    install -m 0744 ${WORKDIR}/chassis-control ${D}${sbindir}/
+    install -m 0744 ${UNPACKDIR}/host-control ${D}${sbindir}/
+    install -m 0744 ${UNPACKDIR}/chassis-control ${D}${sbindir}/
 }
 
 FILES:${PN} += "${systemd_system_unitdir}/*"

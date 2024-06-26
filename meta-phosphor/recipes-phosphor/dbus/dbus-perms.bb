@@ -12,7 +12,7 @@ inherit dbus-dir
 
 do_install:append() {
         install -d ${D}${dbus_system_confdir}
-        install -m 0644 ${WORKDIR}/org.openbmc.conf \
+        install -m 0644 ${UNPACKDIR}/org.openbmc.conf \
                 ${D}${dbus_system_confdir}
 }
 

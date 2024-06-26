@@ -19,5 +19,5 @@ SYSTEMD_LINK:${PN}-monitor:append = " ../phosphor-multi-gpio-monitor.service:mul
 
 do_install:append() {
     install -d ${D}/usr/sbin
-    install -m 0755 ${WORKDIR}/ampere_overtemp.sh ${D}/${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_overtemp.sh ${D}/${sbindir}/
 }

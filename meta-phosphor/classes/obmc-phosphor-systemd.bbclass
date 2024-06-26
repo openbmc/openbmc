@@ -334,7 +334,7 @@ do_install:append() {
         [ -z "${_INSTALL_SD_UNITS}" ] || \
                 install -d ${D}${systemd_system_unitdir}
         for s in ${_INSTALL_SD_UNITS}; do
-                install -m 0644 ${WORKDIR}/$s \
+                install -m 0644 ${UNPACKDIR}/$s \
                         ${D}${systemd_system_unitdir}/$s
                 sed -i -e 's,@BASE_BINDIR@,${base_bindir},g' \
                         -e 's,@BINDIR@,${bindir},g' \

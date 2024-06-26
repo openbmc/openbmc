@@ -14,13 +14,13 @@ do_install:append () {
     override_dir=${D}${systemd_system_unitdir}/mctpd.service.d
     install -d ${D}${systemd_system_unitdir}/mctpd.service.d
 
-    install -m 0644 ${WORKDIR}/setup-eid.conf \
+    install -m 0644 ${UNPACKDIR}/setup-eid.conf \
               ${override_dir}/setup-eid.conf
 
     install -d ${D}${libexecdir}/mctp
 
-    install -m 0755 ${WORKDIR}/setup-local-eid \
+    install -m 0755 ${UNPACKDIR}/setup-local-eid \
               ${D}${libexecdir}/mctp/
-    install -m 0755 ${WORKDIR}/setup-bic-eid \
+    install -m 0755 ${UNPACKDIR}/setup-bic-eid \
               ${D}${libexecdir}/mctp/
 }

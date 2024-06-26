@@ -22,8 +22,8 @@ RDEPENDS:${PN} += " \
 
 do_install() {
   install -d ${D}${libexecdir}
-  install -m0755 ${WORKDIR}/nft-configure.sh ${D}${libexecdir}/
+  install -m0755 ${UNPACKDIR}/nft-configure.sh ${D}${libexecdir}/
 
   install -d ${D}${systemd_system_unitdir}
-  install -m0644 ${WORKDIR}/nftables.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${UNPACKDIR}/nftables.service ${D}${systemd_system_unitdir}/
 }

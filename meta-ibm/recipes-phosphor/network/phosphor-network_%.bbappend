@@ -37,13 +37,13 @@ PACKAGECONFIG:append:p10bmc = " hyp-nw-config"
 
 install_network_configuration(){
     install -d ${D}${datadir}/network/
-    install -m 0644 ${WORKDIR}/ibm-basic-eth-map.json ${D}${datadir}/network/config.json
+    install -m 0644 ${UNPACKDIR}/ibm-basic-eth-map.json ${D}${datadir}/network/config.json
 }
 
 do_install:append() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/ncsi-netlink-ifindex ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/ncsi-wait-and-set-speed ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/ncsi-netlink-ifindex ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/ncsi-wait-and-set-speed ${D}${libexecdir}
 }
 
 SRC_URI:append:p10bmc = " file://ibm-basic-eth-map.json"

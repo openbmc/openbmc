@@ -9,7 +9,8 @@ PROVIDES += "virtual/phosphor-led-manager-config-native"
 
 SRC_URI += "file://led.yaml"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     SRC=${S}

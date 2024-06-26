@@ -35,7 +35,7 @@ EXTRA_OEMESON = " \
 
 do_install:append() {
         install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/of-name-to-eeprom.sh ${D}${bindir}
+        install -m 0755 ${UNPACKDIR}/of-name-to-eeprom.sh ${D}${bindir}
 }
 
 RDEPENDS:${PN} += "bash"

@@ -15,6 +15,6 @@ SRC_URI += "file://phosphor-softpoweroff \
            "
 
 do_install:append:ncplite (){
-    install -m 0755 ${WORKDIR}/phosphor-softpoweroff ${D}/${bindir}/phosphor-softpoweroff
-    install -m 0644 ${WORKDIR}/${SOFT_SVC} ${D}${systemd_unitdir}/system/${SOFT_SVC}
+    install -m 0755 ${UNPACKDIR}/phosphor-softpoweroff ${D}/${bindir}/phosphor-softpoweroff
+    install -m 0644 ${UNPACKDIR}/${SOFT_SVC} ${D}${systemd_unitdir}/system/${SOFT_SVC}
 }

@@ -13,6 +13,6 @@ AMPERE_SOFTPOWEROFF_TMPL = "ampere.xyz.openbmc_project.Ipmi.Internal.SoftPowerOf
 do_install:append(){
     install -d ${D}${includedir}/phosphor-ipmi-host
     install -m 0644 -D ${S}/selutility.hpp ${D}${includedir}/phosphor-ipmi-host
-    install -m 0755 ${WORKDIR}/ampere-phosphor-softpoweroff ${D}/${bindir}/phosphor-softpoweroff
-    install -m 0644 ${WORKDIR}/${AMPERE_SOFTPOWEROFF_TMPL} ${D}${systemd_unitdir}/system/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service
+    install -m 0755 ${UNPACKDIR}/ampere-phosphor-softpoweroff ${D}/${bindir}/phosphor-softpoweroff
+    install -m 0644 ${UNPACKDIR}/${AMPERE_SOFTPOWEROFF_TMPL} ${D}${systemd_unitdir}/system/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service
 }

@@ -12,7 +12,7 @@ SRC_URI += " \
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/check-ipv6-ll ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/check-ipv6-ll ${D}${libexecdir}
 }
 
 NCSI_ETH_INTF ?= "eth0"

@@ -17,12 +17,12 @@ SRC_URI = " file://detect-sled-present \
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/detect-sled-present ${D}${bindir}/
+    install -m 0755 ${UNPACKDIR}/detect-sled-present ${D}${bindir}/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/detect-sled-present@.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/bletchley-sled-insertion@.target ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/bletchley-sled-removal@.target ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/detect-sled-present@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/bletchley-sled-insertion@.target ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/bletchley-sled-removal@.target ${D}${systemd_system_unitdir}
 }
 
 TGT = "${SYSTEMD_DEFAULT_TARGET}"

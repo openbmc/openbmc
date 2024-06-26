@@ -8,7 +8,7 @@ inherit update-alternatives
 
 do_install() {
         install -d ${D}/${base_sbindir}
-        install -m 0755 ${WORKDIR}/init ${D}/${base_sbindir}/preinit-mounts
+        install -m 0755 ${UNPACKDIR}/init ${D}/${base_sbindir}/preinit-mounts
 }
 
 RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_base-utils}"

@@ -5,7 +5,8 @@ PR = "r1"
 
 SRC_URI = "file://zone_conditions.yaml"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit allarch
 inherit phosphor-fan

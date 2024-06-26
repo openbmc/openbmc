@@ -8,5 +8,5 @@ SRC_URI += " \
 
 do_install:append() {
     install -d ${D}/etc/security
-    install -m 0644 ${WORKDIR}/pwquality.conf ${D}/etc/security
+    install -m 0644 ${UNPACKDIR}/pwquality.conf ${D}/etc/security
 }

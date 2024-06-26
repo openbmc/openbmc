@@ -16,7 +16,7 @@ inherit pkgconfig
 do_install() {
         oe_runmake install DESTDIR=${D}
         install -d ${D}${sysconfdir}/default/obmc/gpio/
-        install -m 0644 ${WORKDIR}/gpio_defs.json ${D}/${sysconfdir}/default/obmc/gpio/
+        install -m 0644 ${UNPACKDIR}/gpio_defs.json ${D}/${sysconfdir}/default/obmc/gpio/
 }
 
 # Ensure the library is not in the dev package

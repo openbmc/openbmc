@@ -8,6 +8,6 @@ SRC_URI:append:yosemitev2 = " file://power-config-host4.json"
 
 do_install:append:yosemitev2() {
     install -m 0755 -d ${D}/${datadir}/${BPN}
-    install -m 0644 -D ${WORKDIR}/*.json \
+    install -m 0644 -D ${UNPACKDIR}/*.json \
                    ${D}/${datadir}/${BPN}/
 }

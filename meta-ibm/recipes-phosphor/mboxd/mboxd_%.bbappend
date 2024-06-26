@@ -10,5 +10,5 @@ SRC_URI:append:df-openpower-ubi-fs = " file://check_pnor_format.sh"
 
 do_install:append:df-openpower-ubi-fs() {
 	install -d ${D}${bindir}
-	install -m 0755 ${WORKDIR}/check_pnor_format.sh ${D}${bindir}/check_pnor_format.sh
+	install -m 0755 ${UNPACKDIR}/check_pnor_format.sh ${D}${bindir}/check_pnor_format.sh
 }

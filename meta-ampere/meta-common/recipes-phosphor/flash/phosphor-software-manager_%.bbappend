@@ -10,5 +10,5 @@ RDEPENDS:${PN} += "bash"
 
 do_install:append() {
     install -d ${D}/usr/sbin
-    install -m 0755 ${WORKDIR}/firmware_update.sh ${D}/usr/sbin/firmware_update.sh
+    install -m 0755 ${UNPACKDIR}/firmware_update.sh ${D}/usr/sbin/firmware_update.sh
 }

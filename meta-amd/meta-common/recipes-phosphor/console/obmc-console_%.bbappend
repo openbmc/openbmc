@@ -17,7 +17,7 @@ do_install:append() {
 
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
-        install -m 0644 ${WORKDIR}/*.conf ${D}${sysconfdir}/${BPN}/
+        install -m 0644 ${UNPACKDIR}/*.conf ${D}${sysconfdir}/${BPN}/
 }
 
 EXTRA_OECONF:append = " --enable-concurrent-servers"

@@ -17,10 +17,10 @@ SRC_URI += " \
 do_install() {
     # Install keys into image.
     install -d -m 0755 ${D}${datadir}/google-key
-    install -m 0644 ${WORKDIR}/platforms_gbmc_secure.gpg ${D}${datadir}/google-key/prod.key
-    install -m 0644 ${WORKDIR}/platforms_gbmc_bringup.gpg ${D}${datadir}/google-key/dev.key
+    install -m 0644 ${UNPACKDIR}/platforms_gbmc_secure.gpg ${D}${datadir}/google-key/prod.key
+    install -m 0644 ${UNPACKDIR}/platforms_gbmc_bringup.gpg ${D}${datadir}/google-key/dev.key
 
     # Install the verification helper
     install -d -m 0755 ${D}${bindir}
-    install -m 0755 ${WORKDIR}/verify-bmc-image.sh ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/verify-bmc-image.sh ${D}${bindir}
 }

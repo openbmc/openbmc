@@ -30,8 +30,8 @@ FILES:${PN}-presence += " \
 
 do_install:append() {
     install -d ${D}${sbindir}
-    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-monitor.json ${D}${datadir}/${PN}/
-    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
-    install -m 0755 ${WORKDIR}/ampere_scp_failover.sh ${D}${sbindir}/
-    install -m 0755 ${WORKDIR}/ampere_psu_reset_hotswap.sh ${D}${sbindir}/
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json ${D}${datadir}/${PN}/
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/ampere_scp_failover.sh ${D}${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_psu_reset_hotswap.sh ${D}${sbindir}/
 }

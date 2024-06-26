@@ -161,7 +161,7 @@ do_install:append() {
                 [ -z "${_DEFAULT_DBUS_CONFIGS}" ] || \
                 install -d ${D}${dbus_system_confdir}
         for c in ${_INSTALL_DBUS_CONFIGS}; do
-                install -m 0644 ${WORKDIR}/$c \
+                install -m 0644 ${UNPACKDIR}/$c \
                         ${D}${dbus_system_confdir}$c
         done
         # install the dbus activation files
@@ -169,7 +169,7 @@ do_install:append() {
                 [ -z "${_DEFAULT_DBUS_ACTIVATIONS}" ] || \
                 install -d ${D}${dbus_system_servicesdir}
         for s in ${_INSTALL_DBUS_ACTIVATIONS}; do
-                install -m 0644 ${WORKDIR}/$s\
+                install -m 0644 ${UNPACKDIR}/$s\
                         ${D}${dbus_system_servicesdir}$s
         done
 }

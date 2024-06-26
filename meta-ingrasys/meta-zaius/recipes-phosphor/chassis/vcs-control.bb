@@ -25,5 +25,5 @@ RDEPENDS:${PN} += "bash i2c-tools"
 
 do_install() {
         install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/zaius_vcs.sh ${D}${bindir}/zaius_vcs.sh
+        install -m 0755 ${UNPACKDIR}/zaius_vcs.sh ${D}${bindir}/zaius_vcs.sh
 }

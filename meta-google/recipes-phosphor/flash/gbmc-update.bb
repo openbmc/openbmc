@@ -16,5 +16,5 @@ RDEPENDS:${PN} += "tar"
 
 do_install() {
     install -d ${D}${datadir}/gbmc-br-dhcp
-    install -m 0644 ${WORKDIR}/40-gbmc-upgrade.sh ${D}${datadir}/gbmc-br-dhcp/
+    install -m 0644 ${UNPACKDIR}/40-gbmc-upgrade.sh ${D}${datadir}/gbmc-br-dhcp/
 }

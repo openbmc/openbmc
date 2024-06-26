@@ -22,24 +22,24 @@ FILES:${PN}-monitor += " \
 
 do_configure:prepend() {
         mkdir -p ${S}/control/config_files/${MACHINE}
-        cp ${WORKDIR}/events.json ${S}/control/config_files/${MACHINE}/events.json
-        cp ${WORKDIR}/fans.json ${S}/control/config_files/${MACHINE}/fans.json
-        cp ${WORKDIR}/groups.json ${S}/control/config_files/${MACHINE}/groups.json
-        cp ${WORKDIR}/zones.json ${S}/control/config_files/${MACHINE}/zones.json
+        cp ${UNPACKDIR}/events.json ${S}/control/config_files/${MACHINE}/events.json
+        cp ${UNPACKDIR}/fans.json ${S}/control/config_files/${MACHINE}/fans.json
+        cp ${UNPACKDIR}/groups.json ${S}/control/config_files/${MACHINE}/groups.json
+        cp ${UNPACKDIR}/zones.json ${S}/control/config_files/${MACHINE}/zones.json
 
         mkdir -p ${S}/monitor/config_files/${MACHINE}
-        cp ${WORKDIR}/monitor.json ${S}/monitor/config_files/${MACHINE}/config.json
+        cp ${UNPACKDIR}/monitor.json ${S}/monitor/config_files/${MACHINE}/config.json
 
         mkdir -p ${S}/presence/config_files/${MACHINE}
-        cp ${WORKDIR}/presence.json ${S}/presence/config_files/${MACHINE}/config.json
+        cp ${UNPACKDIR}/presence.json ${S}/presence/config_files/${MACHINE}/config.json
 }
 
 do_install:append() {
   install -d ${D}${bindir}
-  install -m 0755 ${WORKDIR}/ampere_set_fan_max_speed.sh ${D}${bindir}/ampere_set_fan_max_speed.sh
+  install -m 0755 ${UNPACKDIR}/ampere_set_fan_max_speed.sh ${D}${bindir}/ampere_set_fan_max_speed.sh
   install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/phosphor-fan-monitor@.service ${D}${systemd_system_unitdir}
-  install -m 0644 ${WORKDIR}/phosphor-fan-control@.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/phosphor-fan-monitor@.service ${D}${systemd_system_unitdir}
+  install -m 0644 ${UNPACKDIR}/phosphor-fan-control@.service ${D}${systemd_system_unitdir}
 }
 
 

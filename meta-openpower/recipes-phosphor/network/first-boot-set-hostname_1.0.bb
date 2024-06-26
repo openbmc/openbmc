@@ -12,7 +12,8 @@ SYSTEMD_SERVICE:${PN} = "first-boot-set-hostname.service"
 
 SRC_URI = "file://${BPN}.sh file://${BPN}.service"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 do_install() {
     sed "s/{MACHINE}/${MACHINE}/" -i ${BPN}.sh
     install -d ${D}${bindir} ${D}${systemd_system_unitdir}

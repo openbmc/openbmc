@@ -102,14 +102,14 @@ ethernet_bridge_install() {
   if [ -z "${GBMC_BRIDGE_INTFS}"]; then
     return
   fi
-  cat /dev/null > ${WORKDIR}/-ether-bridge.network
-  echo "[Match]" >> ${WORKDIR}/-ether-bridge.network
-  echo "Name=${GBMC_BRIDGE_INTFS}" >>  ${WORKDIR}/-ether-bridge.network
-  echo "[Network]" >> ${WORKDIR}/-ether-bridge.network
-  echo "Bridge=gbmcbr" >> ${WORKDIR}/-ether-bridge.network
+  cat /dev/null > ${UNPACKDIR}/-ether-bridge.network
+  echo "[Match]" >> ${UNPACKDIR}/-ether-bridge.network
+  echo "Name=${GBMC_BRIDGE_INTFS}" >>  ${UNPACKDIR}/-ether-bridge.network
+  echo "[Network]" >> ${UNPACKDIR}/-ether-bridge.network
+  echo "Bridge=gbmcbr" >> ${UNPACKDIR}/-ether-bridge.network
 
   install -d ${D}/${sysconfdir}/systemd/network
-  install -m 0644 ${WORKDIR}/-ether-bridge.network ${D}/${sysconfdir}/systemd/network/
+  install -m 0644 ${UNPACKDIR}/-ether-bridge.network ${D}/${sysconfdir}/systemd/network/
 }
 
 do_install() {
@@ -124,63 +124,63 @@ do_install() {
       addr="$addr[Address]\nAddress=${GBMC_ULA_PREFIX}:$eui64/64\nPreferredLifetime=0\n"
       addr="$addr[Address]\nAddress=fe80::$eui64/64\nPreferredLifetime=0\n"
     done
-    sed -i "s,@ADDR@,$addr," ${WORKDIR}/-bmc-gbmcbr.network.in
+    sed -i "s,@ADDR@,$addr," ${UNPACKDIR}/-bmc-gbmcbr.network.in
   else
-    sed -i '/@ADDR@/d' ${WORKDIR}/-bmc-gbmcbr.network.in
+    sed -i '/@ADDR@/d' ${UNPACKDIR}/-bmc-gbmcbr.network.in
   fi
 
   ethernet_bridge_install
 
-  install -m0644 ${WORKDIR}/-bmc-gbmcbr.netdev $netdir/
-  install -m0644 ${WORKDIR}/-bmc-gbmcbr.network.in $netdir/-bmc-gbmcbr.network
-  install -m0644 ${WORKDIR}/-bmc-gbmcbrdummy.netdev $netdir/
-  install -m0644 ${WORKDIR}/-bmc-gbmcbrdummy.network $netdir/
-  install -m0644 ${WORKDIR}/+-bmc-gbmcbrusb.network $netdir/
+  install -m0644 ${UNPACKDIR}/-bmc-gbmcbr.netdev $netdir/
+  install -m0644 ${UNPACKDIR}/-bmc-gbmcbr.network.in $netdir/-bmc-gbmcbr.network
+  install -m0644 ${UNPACKDIR}/-bmc-gbmcbrdummy.netdev $netdir/
+  install -m0644 ${UNPACKDIR}/-bmc-gbmcbrdummy.network $netdir/
+  install -m0644 ${UNPACKDIR}/+-bmc-gbmcbrusb.network $netdir/
 
   nftables_dir=${D}${sysconfdir}/nftables
   install -d -m0755 "$nftables_dir"
-  install -m0644 ${WORKDIR}/50-gbmc-br.rules $nftables_dir/
-  install -m0644 ${WORKDIR}/50-gbmc-br-cn-redirect.rules $nftables_dir/
+  install -m0644 ${UNPACKDIR}/50-gbmc-br.rules $nftables_dir/
+  install -m0644 ${UNPACKDIR}/50-gbmc-br-cn-redirect.rules $nftables_dir/
 
   mondir=${D}${datadir}/gbmc-ip-monitor
   install -d -m0755 "$mondir"
-  install -m0644 ${WORKDIR}/gbmc-br-ula.sh "$mondir"/
-  install -m0644 ${WORKDIR}/gbmc-br-from-ra.sh "$mondir"/
-  install -m0644 ${WORKDIR}/gbmc-br-gw-src.sh "$mondir"/
-  install -m0644 ${WORKDIR}/gbmc-br-nft.sh "$mondir"/
+  install -m0644 ${UNPACKDIR}/gbmc-br-ula.sh "$mondir"/
+  install -m0644 ${UNPACKDIR}/gbmc-br-from-ra.sh "$mondir"/
+  install -m0644 ${UNPACKDIR}/gbmc-br-gw-src.sh "$mondir"/
+  install -m0644 ${UNPACKDIR}/gbmc-br-nft.sh "$mondir"/
 
   install -d -m0755 ${D}${libexecdir}
-  install -m0755 ${WORKDIR}/gbmc-br-hostname.sh ${D}${libexecdir}/
-  install -m0755 ${WORKDIR}/gbmc-br-dhcp.sh ${D}${libexecdir}/
-  install -m0755 ${WORKDIR}/gbmc-br-dhcp-term.sh ${D}${libexecdir}/
+  install -m0755 ${UNPACKDIR}/gbmc-br-hostname.sh ${D}${libexecdir}/
+  install -m0755 ${UNPACKDIR}/gbmc-br-dhcp.sh ${D}${libexecdir}/
+  install -m0755 ${UNPACKDIR}/gbmc-br-dhcp-term.sh ${D}${libexecdir}/
   install -d -m0755 ${D}${systemd_system_unitdir}
-  install -m0644 ${WORKDIR}/gbmc-br-hostname.service ${D}${systemd_system_unitdir}/
-  install -m0644 ${WORKDIR}/gbmc-br-dhcp@.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${UNPACKDIR}/gbmc-br-hostname.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${UNPACKDIR}/gbmc-br-dhcp@.service ${D}${systemd_system_unitdir}/
   wantdir=${D}${systemd_system_unitdir}/multi-user.target.wants
   install -d -m0755 $wantdir
   ln -sv ../gbmc-br-dhcp@.service $wantdir/gbmc-br-dhcp@gbmcbr.service
-  install -m0644 ${WORKDIR}/gbmc-br-dhcp-term.service ${D}${systemd_system_unitdir}/
-  install -m0644 ${WORKDIR}/gbmc-br-load-ip.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${UNPACKDIR}/gbmc-br-dhcp-term.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${UNPACKDIR}/gbmc-br-load-ip.service ${D}${systemd_system_unitdir}/
   install -d -m0755 ${D}${datadir}/gbmc-br-dhcp
 
   sed -e 's,@COORDINATED_POWERCYCLE@,${GBMC_COORDINATED_POWERCYCLE},' \
       -e 's,@UPGRADE_REBOOT@,${GBMC_NETBOOT_UPGRADE_REBOOT},' \
-    ${WORKDIR}/50-gbmc-psu-hardreset.sh.in >${WORKDIR}/50-gbmc-psu-hardreset.sh
-  install -m0644 ${WORKDIR}/50-gbmc-psu-hardreset.sh ${D}${datadir}/gbmc-br-dhcp/
-  install -m0644 ${WORKDIR}/51-gbmc-reboot.sh ${D}${datadir}/gbmc-br-dhcp/
+    ${UNPACKDIR}/50-gbmc-psu-hardreset.sh.in >${UNPACKDIR}/50-gbmc-psu-hardreset.sh
+  install -m0644 ${UNPACKDIR}/50-gbmc-psu-hardreset.sh ${D}${datadir}/gbmc-br-dhcp/
+  install -m0644 ${UNPACKDIR}/51-gbmc-reboot.sh ${D}${datadir}/gbmc-br-dhcp/
 
-  install -m0644 ${WORKDIR}/gbmc-br-lib.sh ${D}${datadir}/
+  install -m0644 ${UNPACKDIR}/gbmc-br-lib.sh ${D}${datadir}/
 
   install -d ${D}/${bindir}
-  install -m0755 ${WORKDIR}/gbmc-start-dhcp.sh ${D}${bindir}/
+  install -m0755 ${UNPACKDIR}/gbmc-start-dhcp.sh ${D}${bindir}/
 
-  sed 's,@IP_OFFSET@,${GBMC_BR_FIXED_OFFSET},' ${WORKDIR}/gbmc-br-ra.sh.in >${WORKDIR}/gbmc-br-ra.sh
-  install -m0755 ${WORKDIR}/gbmc-br-ra.sh ${D}${libexecdir}/
-  install -m0644 ${WORKDIR}/gbmc-br-ra.service ${D}${systemd_system_unitdir}/
+  sed 's,@IP_OFFSET@,${GBMC_BR_FIXED_OFFSET},' ${UNPACKDIR}/gbmc-br-ra.sh.in >${UNPACKDIR}/gbmc-br-ra.sh
+  install -m0755 ${UNPACKDIR}/gbmc-br-ra.sh ${D}${libexecdir}/
+  install -m0644 ${UNPACKDIR}/gbmc-br-ra.service ${D}${systemd_system_unitdir}/
 }
 
 do_rm_work:prepend() {
   # HACK: Work around broken do_rm_work not properly calling rm with `--`
   # It doesn't like filenames that start with `-`
-  rm -rf -- ${WORKDIR}/-*
+  rm -rf -- ${UNPACKDIR}/-*
 }

@@ -16,5 +16,5 @@ SRC_URI += " \
 
 do_install () {
     install -d ${D}${datadir}/phosphor-ipmi-flash
-    install -m 0644 ${WORKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
+    install -m 0644 ${UNPACKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
 }

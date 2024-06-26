@@ -33,7 +33,7 @@ IGPS_SCRIPT_BASE = "${S}/py_scripts/ImageGeneration"
 BB_BIN = "arbel_a35_bootblock"
 BB_BIN .= "${@'_no_tip.bin' if d.getVar("TIP_IMAGE") != 'True' else '.bin'}"
 
-do_configure[dirs] = "${WORKDIR}"
+do_configure[dirs] = "${UNPACKDIR}"
 do_configure() {
     KEY_FOLDER=${IGPS_SCRIPT_BASE}/keys/openssl
     CSV_FOLDER=${IGPS_SCRIPT_BASE}/inputs/registers
@@ -52,7 +52,7 @@ do_configure() {
     # change customized settings for XML and key setting
     if [ -n "${IGPS_SETTINGS}" ];then
         cd ${S}
-        python3 ${IGPS_SCRIPT_BASE}/config_replacer.py ${WORKDIR}/${IGPS_SETTINGS}
+        python3 ${IGPS_SCRIPT_BASE}/config_replacer.py ${UNPACKDIR}/${IGPS_SETTINGS}
     fi
 }
 

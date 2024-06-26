@@ -40,5 +40,5 @@ pkg_prerm:${PN}:p10bmc () {
 # Install lamp test override json
 do_install:append:p10bmc() {
     install -d ${D}${datadir}/${BPN}/
-    install -m 0644 ${WORKDIR}/lamp-test-led-overrides.json ${D}${datadir}/${BPN}/
+    install -m 0644 ${UNPACKDIR}/lamp-test-led-overrides.json ${D}${datadir}/${BPN}/
 }

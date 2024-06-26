@@ -7,7 +7,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 inherit systemd
 inherit obmc-phosphor-systemd
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 SRC_URI = " \
           file://ampere_gpio_utils.sh \
@@ -39,6 +40,6 @@ SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'CHASSIS_POWEROFF_FMT', 'OBMC_CHAS
 
 do_install() {
     install -d ${D}/usr/sbin
-    install -m 0755 ${WORKDIR}/ampere_gpio_utils.sh ${D}/${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_gpio_utils.sh ${D}/${sbindir}/
 }
 

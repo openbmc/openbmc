@@ -19,7 +19,7 @@ inherit systemd
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/uart-render-controller.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/uart-render-controller.service ${D}${systemd_system_unitdir}/
 }
 
 RDEPENDS:${PN} += "fbterm"

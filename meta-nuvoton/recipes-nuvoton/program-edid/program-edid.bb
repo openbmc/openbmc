@@ -20,13 +20,13 @@ SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/edid/program_edid"
 FILES:${PN} += "/usr/share/edid/edid.bin"
 
 do_compile() {
-    json2edid ${WORKDIR}/edid.json ${WORKDIR}/edid.bin
+    json2edid ${UNPACKDIR}/edid.json ${UNPACKDIR}/edid.bin
 }
 
 do_install() {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/program-edid.sh ${D}${bindir}/
+    install -m 0755 ${UNPACKDIR}/program-edid.sh ${D}${bindir}/
     install -d ${D}${datadir}/edid
-    install -m 0644 -D ${WORKDIR}/edid.bin \
+    install -m 0644 -D ${UNPACKDIR}/edid.bin \
         ${D}${datadir}/edid/edid.bin
 }

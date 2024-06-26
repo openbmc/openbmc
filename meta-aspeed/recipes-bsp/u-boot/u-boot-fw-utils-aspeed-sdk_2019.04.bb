@@ -30,7 +30,7 @@ do_install () {
 	ln -sf fw_printenv ${D}${base_sbindir}/fw_setenv
 
 	install -d ${D}${sysconfdir}
-	install -m 644 ${WORKDIR}/${ENV_CONFIG_FILE} ${D}${sysconfdir}/fw_env.config
+	install -m 644 ${UNPACKDIR}/${ENV_CONFIG_FILE} ${D}${sysconfdir}/fw_env.config
 }
 
 do_install:class-cross () {

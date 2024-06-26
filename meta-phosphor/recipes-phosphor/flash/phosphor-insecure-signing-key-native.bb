@@ -12,5 +12,5 @@ inherit native
 do_install() {
         bbplain "Using an insecure image signing key!"
         install -d ${D}${datadir}
-        install -m 400 ${WORKDIR}/OpenBMC.priv ${D}${datadir}
+        install -m 400 ${UNPACKDIR}/OpenBMC.priv ${D}${datadir}
 }

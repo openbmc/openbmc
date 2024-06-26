@@ -11,7 +11,7 @@ FILESEXTRAPATHS:prepend:s6q := "${THISDIR}/${BPN}:"
 SRC_URI += "file://config.yaml"
 
 do_install() {
-        install -D ${WORKDIR}/config.yaml ${D}${config_dir}/config.yaml
+        install -D ${UNPACKDIR}/config.yaml ${D}${config_dir}/config.yaml
 }
 
 FILES:${PN} += "${config_dir}/config.yaml"

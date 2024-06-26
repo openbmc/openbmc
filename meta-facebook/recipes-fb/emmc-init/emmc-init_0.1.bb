@@ -15,7 +15,7 @@ SRC_URI += " \
 
 do_install:append() {
     install -d ${D}${libexecdir}/emmc-init
-    install -m 0755 ${WORKDIR}/emmc-init ${D}${libexecdir}/emmc-init
+    install -m 0755 ${UNPACKDIR}/emmc-init ${D}${libexecdir}/emmc-init
 }
 
 SYSTEMD_SERVICE:${PN} += "emmc-init.service"

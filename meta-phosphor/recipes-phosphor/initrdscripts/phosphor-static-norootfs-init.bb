@@ -17,7 +17,8 @@ SRC_URI += "\
         [ 'file://' + x for x in d.getVar('SOURCE_FILES', True).split()])} \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 NOROOTFS_PERSISTENT_DIRS = "\
     var \

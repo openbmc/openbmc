@@ -25,14 +25,14 @@ do_install:append() {
     sed -i '/pam_systemd.so/d' ${D}${sysconfdir}/pam.d/common-session
 
     install -d ${D}/etc/security
-    install -m 0644 ${WORKDIR}/faillock.conf ${D}/etc/security
-    install -m 0644 ${WORKDIR}/pwhistory.conf ${D}/etc/security
+    install -m 0644 ${UNPACKDIR}/faillock.conf ${D}/etc/security
+    install -m 0644 ${UNPACKDIR}/pwhistory.conf ${D}/etc/security
 
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/convert-pam-configs.sh ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/convert-pam-configs.sh ${D}${bindir}
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/convert-pam-configs.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/convert-pam-configs.service ${D}${systemd_system_unitdir}
 }
 
 RDEPENDS:${PN}-runtime += "libpwquality \

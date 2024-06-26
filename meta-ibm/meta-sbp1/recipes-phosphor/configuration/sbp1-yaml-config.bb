@@ -10,7 +10,8 @@ SRC_URI:sbp1 = " \
     file://sbp1-ipmi-fru-properties.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install:sbp1() {
     install -m 0644 -D sbp1-ipmi-fru.yaml \

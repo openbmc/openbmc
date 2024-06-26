@@ -19,13 +19,13 @@ SRC_URI = "file://gbs-sysinit.sh \
 
 do_install () {
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/gbs-sysinit.sh ${D}${bindir}/
+    install -m 0755 ${UNPACKDIR}/gbs-sysinit.sh ${D}${bindir}/
 
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/gbs-gpio-common.sh ${D}${libexecdir}/
+    install -m 0755 ${UNPACKDIR}/gbs-gpio-common.sh ${D}${libexecdir}/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/gbs-sysinit.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/gbs-sysinit.service ${D}${systemd_system_unitdir}
 }
 
 SYSTEMD_PACKAGES = "${PN}"

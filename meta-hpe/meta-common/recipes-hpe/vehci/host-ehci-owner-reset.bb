@@ -40,5 +40,5 @@ SRC_URI += "file://host-ehci-owner-reset@.service"
 
 do_install() {
 	install -d ${D}${bindir}
-	install -m 755 ${WORKDIR}/udc-reconnect.sh ${D}${bindir}
+	install -m 755 ${UNPACKDIR}/udc-reconnect.sh ${D}${bindir}
 }

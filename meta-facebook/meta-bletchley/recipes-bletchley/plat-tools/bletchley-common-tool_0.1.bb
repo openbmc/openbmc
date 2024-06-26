@@ -15,11 +15,11 @@ SRC_URI += " \
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/bletchley-system-state-init ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/bletchley-system-state-init ${D}${libexecdir}
 
     install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/bletchley-usbmux-util ${D}${bindir}
-    install -m 0755 ${WORKDIR}/bletchley-net-util ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/bletchley-usbmux-util ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/bletchley-net-util ${D}${bindir}
 }
 
 

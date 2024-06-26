@@ -20,11 +20,11 @@ install_concurrent_console_config() {
         ln -sr ${D}/dev/null ${D}${sysconfdir}/${BPN}/client.2200.conf
 
         # We need to populate console-id for remaining consoles
-        install -m 0644 ${WORKDIR}/client.2201.conf ${D}${sysconfdir}/${BPN}/
+        install -m 0644 ${UNPACKDIR}/client.2201.conf ${D}${sysconfdir}/${BPN}/
 
         # Install configuration for remaining servers - the base recipe
         # installs the configuration for the first.
-        install -m 0644 ${WORKDIR}/server.ttyVUART1.conf ${D}${sysconfdir}/${BPN}/
+        install -m 0644 ${UNPACKDIR}/server.ttyVUART1.conf ${D}${sysconfdir}/${BPN}/
 }
 
 SRC_URI:append:p10bmc = " file://client.2201.conf"

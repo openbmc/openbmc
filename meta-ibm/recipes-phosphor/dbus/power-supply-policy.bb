@@ -11,7 +11,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI += "file://power-supply-policy.yaml"
 
 do_install() {
-        install -D ${WORKDIR}/power-supply-policy.yaml ${D}${config_dir}/power-supply-policy.yaml
+        install -D ${UNPACKDIR}/power-supply-policy.yaml ${D}${config_dir}/power-supply-policy.yaml
 }
 
 FILES:${PN} += "${config_dir}/power-supply-policy.yaml"

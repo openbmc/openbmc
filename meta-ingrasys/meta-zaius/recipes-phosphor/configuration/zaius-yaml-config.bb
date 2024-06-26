@@ -11,7 +11,8 @@ SRC_URI = " \
     file://zaius-ipmi-sensors.yaml \
     "
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
     install -m 0644 -D zaius-ipmi-fru-properties.yaml \

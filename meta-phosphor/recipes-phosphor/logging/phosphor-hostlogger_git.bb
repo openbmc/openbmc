@@ -40,7 +40,7 @@ DEFAULT_SERVICE = "hostlogger@${DEFAULT_INSTANCE}.service"
 # Multi-host mode setup - list of configuration files to install, can be added
 # via SRC_URI in a bbappend. The file name is the name of the service instance,
 # which should match the corresponding instance of the obmc-console service.
-CUSTOM_CONFIGS = "${@custom_configs('${WORKDIR}')}"
+CUSTOM_CONFIGS = "${@custom_configs('${UNPACKDIR}')}"
 CUSTOM_SERVICES = "${@custom_services('${CUSTOM_CONFIGS}')}"
 # Gets list of custom config files in a directory
 def custom_configs(workdir):
@@ -54,7 +54,7 @@ do_install:append() {
   # Install config files
   if [ -n "${CUSTOM_CONFIGS}" ]; then
     for CONFIG_FILE in ${CUSTOM_CONFIGS}; do
-        install -Dm 0644 ${WORKDIR}/${CONFIG_FILE} \
+        install -Dm 0644 ${UNPACKDIR}/${CONFIG_FILE} \
                      ${D}${sysconfdir}/hostlogger/${CONFIG_FILE}
     done
   else

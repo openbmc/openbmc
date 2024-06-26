@@ -6,12 +6,13 @@ PR = "r1"
 
 SRC_URI += "file://mmc-init.sh"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 inherit allarch
 
 do_install() {
-    install -m 0755 ${WORKDIR}/mmc-init.sh ${D}/init
+    install -m 0755 ${UNPACKDIR}/mmc-init.sh ${D}/init
     install -d ${D}/dev
     mknod -m 622 ${D}/dev/console c 5 1
 }

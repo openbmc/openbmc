@@ -52,7 +52,7 @@ EXTRA_OEMESON = " \
 
 do_install:append() {
     install -d ${D}${exec_prefix}/lib/tmpfiles.d
-    install -m 644 ${WORKDIR}/coretemp.conf ${D}${exec_prefix}/lib/tmpfiles.d/
+    install -m 644 ${UNPACKDIR}/coretemp.conf ${D}${exec_prefix}/lib/tmpfiles.d/
 }
 do_install[postfuncs] += "install_dreport"
 do_install[postfuncs] += "install_dreport_conf_file"

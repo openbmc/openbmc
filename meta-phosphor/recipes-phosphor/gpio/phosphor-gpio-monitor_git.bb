@@ -49,5 +49,5 @@ PACKAGE_BEFORE_PN += "${GPIO_PACKAGES}"
 
 do_install:append() {
     install -d ${D}${datadir}/phosphor-gpio-monitor/
-    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json ${D}${datadir}/${PN}/
 }

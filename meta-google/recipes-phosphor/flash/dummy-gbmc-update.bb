@@ -16,8 +16,8 @@ SYSTEMD_SERVICE:${PN} += "dummy-verify.service"
 
 do_install() {
     install -d ${D}${datadir}/phosphor-ipmi-flash
-    install -m 0644 ${WORKDIR}/config-dummy.json ${D}${datadir}/phosphor-ipmi-flash
+    install -m 0644 ${UNPACKDIR}/config-dummy.json ${D}${datadir}/phosphor-ipmi-flash
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/dummy-verify.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/dummy-verify.service ${D}${systemd_system_unitdir}
 }

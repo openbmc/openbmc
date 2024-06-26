@@ -30,7 +30,7 @@ PACKAGECONFIG[root-user-mgmt] = "-Droot_user_mgmt=enabled, -Droot_user_mgmt=disa
 
 do_install:append() {
   install -d ${D}${libexecdir}
-  install -m 0755 ${WORKDIR}/upgrade_hostconsole_group.sh ${D}${libexecdir}/upgrade_hostconsole_group.sh
+  install -m 0755 ${UNPACKDIR}/upgrade_hostconsole_group.sh ${D}${libexecdir}/upgrade_hostconsole_group.sh
 }
 
 FILES:phosphor-ldap += " \

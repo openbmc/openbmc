@@ -11,7 +11,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 SRC_URI += "file://snmp-config.yaml"
 
 do_install() {
-        install -D ${WORKDIR}/snmp-config.yaml ${D}${config_dir}/snmp-config.yaml
+        install -D ${UNPACKDIR}/snmp-config.yaml ${D}${config_dir}/snmp-config.yaml
 }
 
 FILES:${PN} += "${config_dir}/snmp-config.yaml"
