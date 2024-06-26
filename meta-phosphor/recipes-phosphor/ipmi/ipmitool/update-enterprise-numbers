@@ -33,6 +33,7 @@ ENTERPRISES = {
     51974: "Raptor Computing Systems, LLC",
     52538: "Ampere Computing",
     52893: "Inspur Power Systems Co.,Ltd.",
+    61847: "IEIT SYSTEMS Co.，Ltd.",
 }
 
 HEADER = """\
