@@ -5,7 +5,7 @@ Subject: [PATCH] otptool: Define value_start in `rev_id` path
 
 See https://github.com/AspeedTech-BMC/socsec/pull/18
 
-Upstream-Status: Accepted
+Upstream-Status: Backport [next release]
 Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
 ---
  socsec/otptool.py | 1 +
@@ -21,5 +21,5 @@ index efeab96dbd96..97da143723dd 100755
                  bit_length = info['bit_length']
 +                value_start = info['value_start']
                  offset_value = int(value, 16) - value_start
- 
+
                  if offset_value < 0 or offset_value > bit_length:
