@@ -17,6 +17,8 @@ PACKAGECONFIG[ubifs_layout] = "-Dbmc-layout=ubi"
 PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
 PACKAGECONFIG[static-dual-image] = "-Dbmc-static-dual-image=enabled, -Dbmc-static-dual-image=disabled"
+PACKAGECONFIG[software-update-dbus-interface] = "-Dsoftware-update-dbus-interface=enabled, -Dsoftware-update-dbus-interface=disabled"
+
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
