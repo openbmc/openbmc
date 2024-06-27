@@ -1,5 +1,3 @@
-DEPENDS:append = " inventory-cleanup"
-
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 PACKAGECONFIG:append = " associations"
 SRC_URI:append = " file://associations.json"
