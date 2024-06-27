@@ -11,6 +11,7 @@ EXTRA_OEMESON:append = " \
 EXTRA_OEMESON:append:p10bmc = " \
     -Dkvm=disabled \
     -Dvm-websocket=disabled \
+    -Dredfish-allow-deprecated-power-thermal=disabled \
 "
 PACKAGECONFIG:remove:p10bmc = "mutual-tls-auth"
 
