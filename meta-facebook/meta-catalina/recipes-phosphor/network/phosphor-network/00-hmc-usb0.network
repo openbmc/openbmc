@@ -1,0 +1,13 @@
+[Match]
+Driver=cdc_ether
+
+[Link]
+Name=usb0
+
+[Network]
+DHCP=false
+LinkLocalAddressing=no
+IPv6AcceptRA=false
+
+[Address]
+Address=172.31.13.241/24
