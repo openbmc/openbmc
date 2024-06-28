@@ -1,7 +1,8 @@
 require u-boot-common-nuvoton_${PV}.inc
+require recipes-bsp/u-boot/u-boot-configure.inc
 
 SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
-DEPENDS = "mtd-utils bison-native"
+DEPENDS += "mtd-utils bison-native"
 RDEPENDS:${PN} = "udev-nuvoton-mtd-partitions"
 
 PROVIDES += "u-boot-fw-utils"
@@ -15,7 +16,6 @@ EXTRA_OEMAKE:class-cross = 'ARCH=${TARGET_ARCH} CC="${CC} ${CFLAGS} ${LDFLAGS}" 
 inherit uboot-config
 
 do_compile () {
-  oe_runmake ${UBOOT_MACHINE}
   oe_runmake envtools
 }
 
