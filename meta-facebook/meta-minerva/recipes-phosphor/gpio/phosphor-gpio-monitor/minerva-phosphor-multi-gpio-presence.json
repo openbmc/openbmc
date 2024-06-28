@@ -1,0 +1,233 @@
+[
+    {
+        "Name": "PRSNT_MTIA_BLADE0",
+        "LineName": "PRSNT_MTIA_BLADE0_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE0"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE1",
+        "LineName": "PRSNT_MTIA_BLADE1_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE1"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE2",
+        "LineName": "PRSNT_MTIA_BLADE2_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE2"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE3",
+        "LineName": "PRSNT_MTIA_BLADE3_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE3"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE4",
+        "LineName": "PRSNT_MTIA_BLADE4_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE4"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE5",
+        "LineName": "PRSNT_MTIA_BLADE5_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE5"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE6",
+        "LineName": "PRSNT_MTIA_BLADE6_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE6"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE7",
+        "LineName": "PRSNT_MTIA_BLADE7_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE7"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE8",
+        "LineName": "PRSNT_MTIA_BLADE8_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE8"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE9",
+        "LineName": "PRSNT_MTIA_BLADE9_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE9"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE10",
+        "LineName": "PRSNT_MTIA_BLADE10_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE10"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE11",
+        "LineName": "PRSNT_MTIA_BLADE11_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE11"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE12",
+        "LineName": "PRSNT_MTIA_BLADE12_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE12"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE13",
+        "LineName": "PRSNT_MTIA_BLADE13_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE13"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE14",
+        "LineName": "PRSNT_MTIA_BLADE14_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE14"
+    },
+    {
+        "Name": "PRSNT_MTIA_BLADE15",
+        "LineName": "PRSNT_MTIA_BLADE15_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE15"
+    },
+    {
+        "Name": "PRSNT_NW_BLADE0",
+        "LineName": "PRSNT_NW_BLADE0_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE0"
+    },
+    {
+        "Name": "PRSNT_NW_BLADE1",
+        "LineName": "PRSNT_NW_BLADE1_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE1"
+    },
+    {
+        "Name": "PRSNT_NW_BLADE2",
+        "LineName": "PRSNT_NW_BLADE2_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE2"
+    },
+    {
+        "Name": "PRSNT_NW_BLADE3",
+        "LineName": "PRSNT_NW_BLADE3_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE3"
+    },
+    {
+        "Name": "PRSNT_NW_BLADE4",
+        "LineName": "PRSNT_NW_BLADE4_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE4"
+    },
+    {
+        "Name": "PRSNT_NW_BLADE5",
+        "LineName": "PRSNT_NW_BLADE5_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE5"
+    },
+    {
+        "Name": "PRSNT_FCB_TOP_0",
+        "LineName": "PRSNT_FCB_TOP_0_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_TOP_0"
+    },
+    {
+        "Name": "PRSNT_FCB_TOP_1",
+        "LineName": "PRSNT_FCB_TOP_1_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_TOP_1"
+    },
+    {
+        "Name": "PRSNT_FCB_MIDDLE_0",
+        "LineName": "PRSNT_FCB_MIDDLE_0_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_MIDDLE_0"
+    },
+    {
+        "Name": "PRSNT_FCB_MIDDLE_1",
+        "LineName": "PRSNT_FCB_MIDDLE_1_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_MIDDLE_1"
+    },
+    {
+        "Name": "PRSNT_FCB_BOTTOM_0",
+        "LineName": "PRSNT_FCB_BOTTOM_0_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_BOTTOM_0"
+    },
+    {
+        "Name": "PRSNT_FCB_BOTTOM_1",
+        "LineName": "PRSNT_FCB_BOTTOM_1_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_BOTTOM_1"
+    },
+    {
+        "Name": "PRSNT_CABLE_CARTRIDGE_TOP",
+        "LineName": "CMM_CABLE_CARTRIDGE_PRSNT_TOP_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_CABLE_CARTRIDGE_TOP"
+    },
+    {
+        "Name": "PRSNT_CABLE_CARTRIDGE_BOT",
+        "LineName": "CMM_CABLE_CARTRIDGE_PRSNT_BOT_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_CABLE_CARTRIDGE_BOT"
+    },
+    {
+        "Name": "PRSNT_BCB_CABLE_BOT",
+        "LineName": "BOT_BCB_CABLE_PRSNT_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_BCB_CABLE_BOT"
+    },
+    {
+        "Name": "PRSNT_BCB_CABLE_TOP",
+        "LineName": "TOP_BCB_CABLE_PRSNT_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_BCB_CABLE_TOP"
+    },
+    {
+        "Name": "CR_TOGGLE_BOOT",
+        "LineName": "CR_TOGGLE_BOOT_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/CR_TOGGLE_BOOT"
+    }
+]

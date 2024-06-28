@@ -5,6 +5,11 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
 "
 
+# Monitor gpio presence status
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-gpio-monitor-presence \
+"
+
 # Temporarily add plat-svc for gpio initialization
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     plat-svc \

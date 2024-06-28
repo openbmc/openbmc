@@ -1,7 +1,7 @@
 [Unit]
-Description=RPU ready Assert
+Description=%i Assert
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "RPU ready assert" "AALC" "RPU"
+ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i assert" "AALC" "%i"
 SyslogIdentifier=rpu-ready-assert

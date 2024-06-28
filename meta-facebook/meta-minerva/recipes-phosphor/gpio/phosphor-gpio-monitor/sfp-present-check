@@ -1,9 +1,0 @@
-#!/bin/bash
-# shellcheck source=meta-facebook/meta-minerva/recipes-minerva/plat-tool/files/minerva-common-functions
-source /usr/libexec/minerva-common-functions
-
-if [ "$1" == "0" ]; then
-    set_gpio MGMT_SFP_TX_DIS 0
-else
-    set_gpio MGMT_SFP_TX_DIS 1
-fi

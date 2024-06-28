@@ -1,7 +1,0 @@
-[Unit]
-Description=MGMT SFP Present Assert
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/sfp-present-check 0
-SyslogIdentifier=sfp-present-assert

@@ -1,7 +1,0 @@
-[Unit]
-Description=%i Cable Present Assert
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i cable present assert" "CABLE" "%i"
-SyslogIdentifier=%i-cable-present-assert
