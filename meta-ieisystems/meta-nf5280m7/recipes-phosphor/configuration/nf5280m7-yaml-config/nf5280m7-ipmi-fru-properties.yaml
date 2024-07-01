@@ -1,0 +1,85 @@
+/system:
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+/system/chassis:
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+/system/chassis/motherboard:
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp0:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp1:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp2:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp3:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp4:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp5:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp6:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
+
+/system/chassis/hddbp7:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'true'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'

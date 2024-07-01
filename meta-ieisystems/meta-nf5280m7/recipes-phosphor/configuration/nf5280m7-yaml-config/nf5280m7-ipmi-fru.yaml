@@ -1,0 +1,356 @@
+0:
+    /system:
+        entityID: 6
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                    IPMIFruProperty: Mfg Date
+                    IPMIFruSection: Product
+                Manufacturer:
+                    IPMIFruProperty: Manufacturer
+                    IPMIFruSection: Product
+                Model:
+                    IPMIFruProperty: Model Number
+                    IPMIFruSection: Product
+                PartNumber:
+                    IPMIFruProperty: Part Number
+                    IPMIFruSection: Product
+                SerialNumber:
+                    IPMIFruProperty: Serial Number
+                    IPMIFruSection: Product
+            xyz.openbmc_project.Inventory.Decorator.AssetTag:
+                AssetTag:
+                    IPMIFruProperty: Asset Tag
+                    IPMIFruSection: Product
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                Version:
+                    IPMIFruProperty: Version
+                    IPMIFruSection: Product
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Name
+            xyz.openbmc_project.Inventory.Decorator.VendorInformation:
+                FRUFileID:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Product
+                CustomField1:
+                    IPMIFruProperty: Custom Field 1
+                    IPMIFruSection: Product
+                CustomField2:
+                    IPMIFruProperty: Custom Field 2
+                    IPMIFruSection: Product
+                CustomField3:
+                    IPMIFruProperty: Custom Field 3
+                    IPMIFruSection: Product
+            xyz.openbmc_project.Inventory.Item.System:
+    /system/chassis/motherboard:
+        entityID: 7
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                    IPMIFruProperty: Mfg Date
+                    IPMIFruSection: Board
+                Manufacturer:
+                    IPMIFruProperty: Manufacturer
+                    IPMIFruSection: Board
+                PartNumber:
+                    IPMIFruProperty: Part Number
+                    IPMIFruSection: Board
+                SerialNumber:
+                    IPMIFruProperty: Serial Number
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.VendorInformation:
+                FRUFileID:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+                CustomField1:
+                    IPMIFruProperty: Custom Field 1
+                    IPMIFruSection: Board
+                CustomField2:
+                    IPMIFruProperty: Custom Field 2
+                    IPMIFruSection: Board
+                CustomField3:
+                    IPMIFruProperty: Custom Field 3
+                    IPMIFruSection: Board
+    /system/chassis:
+        entityID: 7
+        entityInstance: 2
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                SerialNumber:
+                    IPMIFruProperty: Serial Number
+                    IPMIFruSection: Chassis
+                PartNumber:
+                    IPMIFruProperty: Part Number
+                    IPMIFruSection: Chassis
+                Model:
+                    IPMIFruProperty: Type
+                    IPMIFruSection: Chassis
+            xyz.openbmc_project.Inventory.Decorator.VendorInformation:
+                CustomField1:
+                    IPMIFruProperty: Custom Field 1
+                    IPMIFruSection: Chassis
+                CustomField2:
+                    IPMIFruProperty: Custom Field 2
+                    IPMIFruSection: Chassis
+                CustomField3:
+                    IPMIFruProperty: Custom Field 3
+                    IPMIFruSection: Chassis
+9:
+    /system/chassis/hddbp0:
+        entityID: 17
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+10:
+    /system/chassis/hddbp1:
+        entityID: 18
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+11:
+    /system/chassis/hddbp2:
+        entityID: 19
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+12:
+    /system/chassis/hddbp3:
+        entityID: 20
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+13:
+    /system/chassis/hddbp4:
+        entityID: 21
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+14:
+    /system/chassis/hddbp5:
+        entityID: 22
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+15:
+    /system/chassis/hddbp6:
+        entityID: 23
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+16:
+    /system/chassis/hddbp7:
+        entityID: 24
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                BuildDate:
+                   IPMIFruProperty: Mfg Date
+                   IPMIFruSection: Board
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Board
+                PartNumber:
+                   IPMIFruProperty: Part Number
+                   IPMIFruSection: Board
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Item:
+                 PrettyName:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Board
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                 Version:
+                    IPMIFruProperty: FRU File ID
+                    IPMIFruSection: Board
+30:
+    /xyz/openbmc_project/sensors/power/PSU0:
+        entityID: 25
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Product
+                PartNumber:
+                   IPMIFruProperty: Model Number
+                   IPMIFruSection: Product
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Product
+                Model:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Product
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                Version:
+                    IPMIFruProperty: Version
+                    IPMIFruSection: Product
+31:
+    /xyz/openbmc_project/sensors/power/PSU1:
+        entityID: 26
+        entityInstance: 1
+        interfaces:
+            xyz.openbmc_project.Inventory.Decorator.Asset:
+                SerialNumber:
+                   IPMIFruProperty: Serial Number
+                   IPMIFruSection: Product
+                PartNumber:
+                   IPMIFruProperty: Model Number
+                   IPMIFruSection: Product
+                Manufacturer:
+                   IPMIFruProperty: Manufacturer
+                   IPMIFruSection: Product
+                Model:
+                    IPMIFruProperty: Name
+                    IPMIFruSection: Product
+            xyz.openbmc_project.Inventory.Decorator.Revision:
+                Version:
+                    IPMIFruProperty: Version
+                    IPMIFruSection: Product
