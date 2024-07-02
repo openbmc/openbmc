@@ -31,7 +31,8 @@ echo "Bios upgrade started at $(date)"
 
 #Power off host server.
 echo "Power off host server"
-power_off
+obmcutil poweroff
+
 sleep 15
 if [ "$(power_status)" != "off" ];
 then
