@@ -13,6 +13,7 @@ DEPENDS += " \
   boost \
   sdbusplus \
   systemd \
+  phosphor-dbus-interfaces \
   "
 SRCREV = "9c495c62baa219f3cc60935cd5a46657846d7232"
 PACKAGECONFIG ??= ""
