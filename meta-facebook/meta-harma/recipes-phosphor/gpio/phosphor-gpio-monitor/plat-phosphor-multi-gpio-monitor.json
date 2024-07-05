@@ -148,8 +148,8 @@
         "GpioNum": 92,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@leakage-detect-alert.service", "host-power-on.service"],
-            "FALLING": ["assert-gpio-log@leakage-detect-alert.service", "host-power-off.service"]
+            "RISING": ["deassert-gpio-log@leakage-detect-alert.service"],
+            "FALLING": ["assert-gpio-log@leakage-detect-alert.service"]
         },
         "Continue": true
     },
