@@ -1,4 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+PACKAGECONFIG:append = " host-gpio"
 
 CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
