@@ -8,7 +8,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "nlohmann-json"
-SRCREV = "3b2e5a9b2f56e37982add882c208e50a9d41d080"
+SRCREV = "81b2e2204a268b84df37bd1ea6d44dbc0bcfa171"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
