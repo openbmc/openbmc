@@ -36,7 +36,6 @@ git ls-files -- \
 echo "\
 meta-aspeed/recipes-aspeed/python/socsec/0001-otptool-Define-value_start-in-rev_id-path.patch
 meta-aspeed/recipes-bsp/u-boot/files/default-gcc.patch
-meta-bytedance/meta-g220a/recipes-kernel/linux/linux-aspeed/0005-ARM-dts-aspeed-Enable-g220a-uart-route.patch
 meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed-sdk/0001-board-aspeed-Add-Mux-for-yosemitev2.patch
 meta-facebook/meta-yosemitev2/recipes-bsp/u-boot/u-boot-aspeed-sdk/0002-spl-host-console-handle.patch
 meta-google/dynamic-layers/nuvoton-layer/recipes-bsp/images/npcm7xx-igps/0001-Set-FIU0_DRD_CFG-and-FIU_Clk_divider-for-gbmc-hoth.patch
