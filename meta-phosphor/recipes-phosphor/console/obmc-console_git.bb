@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 DEPENDS += "autoconf-archive-native \
             systemd \
            "
-SRCREV = "6925740d318e6c305463f3d430d2064da6102752"
+SRCREV = "498a4a81d93b0242cea5de929f00cade2b5fe9f2"
 PACKAGECONFIG ??= "udev ssh"
 PACKAGECONFIG[udev] = "-Dudev=enabled,-Dudev=disabled,udev"
 PACKAGECONFIG[concurrent-servers] = "-Dconcurrent-servers=true,-Dconcurrent-servers=false,"
