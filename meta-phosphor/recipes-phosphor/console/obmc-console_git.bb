@@ -4,13 +4,15 @@ HOMEPAGE = "http://github.com/openbmc/obmc-console"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 DEPENDS += "autoconf-archive-native \
+            iniparser \
             systemd \
            "
-SRCREV = "498a4a81d93b0242cea5de929f00cade2b5fe9f2"
+SRCREV = "ace05dccbbbf5a07ea2581fdf511078b6de6e0f6"
 PACKAGECONFIG ??= "udev ssh"
 PACKAGECONFIG[udev] = "-Dudev=enabled,-Dudev=disabled,udev"
 PACKAGECONFIG[concurrent-servers] = "-Dconcurrent-servers=true,-Dconcurrent-servers=false,"
 PACKAGECONFIG[ssh] = "-Dssh=enabled,-Dssh=disabled"
+EXTRA_OEMESON = "-Dtests=false"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
