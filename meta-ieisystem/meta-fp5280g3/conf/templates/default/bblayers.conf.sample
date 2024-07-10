@@ -14,6 +14,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openpower \
-  ##OEROOT##/meta-ieisystems \
-  ##OEROOT##/meta-ieisystems/meta-fp5280g3 \
+  ##OEROOT##/meta-ieisystem \
+  ##OEROOT##/meta-ieisystem/meta-fp5280g3 \
   "

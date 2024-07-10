@@ -14,7 +14,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-security \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-ieisystems \
-  ##OEROOT##/meta-ieisystems/meta-nf5280m7 \
+  ##OEROOT##/meta-ieisystem \
+  ##OEROOT##/meta-ieisystem/meta-nf5280m7 \
   "
 
