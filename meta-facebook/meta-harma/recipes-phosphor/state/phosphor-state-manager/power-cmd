@@ -12,7 +12,17 @@ power_status() {
     fi
 }
 
-# DC off
+# Force DC off
+force_power_off() {
+    if [ "$(power_status)" == "on" ]; then
+        set_gpio power-host-control 0
+        sleep 6
+        set_gpio power-host-control 1
+        sleep 1
+    fi
+}
+
+# Graceful DC off
 graceful_power_off() {
     if [ "$(power_status)" == "on" ]; then
         set_gpio power-host-control 0
@@ -22,16 +32,9 @@ graceful_power_off() {
 
         # wait host power off
         sleep 10
-    fi
-}
-
-# DC off
-force_power_off() {
-    if [ "$(power_status)" == "on" ]; then
-        set_gpio power-host-control 0
-        sleep 6
-        set_gpio power-host-control 1
-        sleep 1
+        if [ "$(power_status)" == "on" ]; then
+            force_power_off
+        fi
     fi
 }
 
