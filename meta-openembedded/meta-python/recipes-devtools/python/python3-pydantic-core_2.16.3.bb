@@ -36,12 +36,12 @@ RDEPENDS:${PN}-ptest += "\
 "
 
 do_install:append() {
-    for f in ${D}/${libdir}/${PYTHON_DIR}/site-packages/pydantic_core/_pydantic_core.*.so
+    for f in ${D}/${PYTHON_SITEPACKAGES_DIR}/pydantic_core/_pydantic_core.*.so
     do
         fname=`basename $f`
         lname=`echo $fname | sed 's/musl/gnu/'`
         if [ "$fname" != "$lname" ]; then
-            mv $f ${D}/${libdir}/${PYTHON_DIR}/site-packages/pydantic_core/$lname
+            mv $f ${D}/${PYTHON_SITEPACKAGES_DIR}/pydantic_core/$lname
         fi
     done
 }

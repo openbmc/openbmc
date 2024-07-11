@@ -23,7 +23,7 @@ TS_PLATFORM ?= "ts/mock"
 # FIP packaging is not supported yet
 SP_PACKAGING_METHOD ?= "embedded"
 
-SYSROOT_DIRS += "/usr/opteesp /usr/arm-linux"
+SYSROOT_DIRS += "/usr/${TS_ENV} /usr/opteesp /usr/arm-linux"
 
 # TS cmake files use find_file() to search through source code and build dirs.
 # Yocto cmake class limits CMAKE_FIND_ROOT_PATH and find_file() fails.
@@ -32,7 +32,6 @@ OECMAKE_EXTRA_ROOT_PATH = "${WORKDIR}/git/ ${WORKDIR}/build/"
 
 EXTRA_OECMAKE += '-DLIBGCC_LOCATE_CFLAGS="--sysroot=${STAGING_DIR_HOST}" \
                   -DCROSS_COMPILE="${TARGET_PREFIX}" \
-                  -DSP_PACKAGING_METHOD="${SP_PACKAGING_METHOD}" \
                   -DTS_PLATFORM="${TS_PLATFORM}" \
                  '
 export CROSS_COMPILE="${TARGET_PREFIX}"
@@ -40,15 +39,20 @@ export CROSS_COMPILE="${TARGET_PREFIX}"
 # Default TS installation path
 TS_INSTALL = "/usr/${TS_ENV}"
 
-# Use the Yocto cmake toolchain for arm-linux TS deployments and
-# the TS opteesp toolchain for opteesp TS deployments
-EXTRA_OECMAKE += "${@oe.utils.conditional('TS_ENV', 'opteesp', \
-                    '-DCMAKE_TOOLCHAIN_FILE=${S}/environments/${TS_ENV}/default_toolchain_file.cmake', \
-                    '-DTS_EXTERNAL_LIB_TOOLCHAIN_FILE=${WORKDIR}/toolchain.cmake', \
-                    d)} \
-                 "
+# Use the Yocto cmake toolchain for external components of the arm-linux TS deployments,
+# and the TS toolchain for opteesp and sp deployments
+def get_ts_toolchain_option(d):
+    ts_env=d.getVar('TS_ENV')
+    if ts_env == 'opteesp' or ts_env == 'sp':
+        return '-DCMAKE_TOOLCHAIN_FILE=${S}/environments/'+ts_env+'/default_toolchain_file.cmake'
+    if ts_env == 'arm-linux':
+        return '-DTS_EXTERNAL_LIB_TOOLCHAIN_FILE=${WORKDIR}/toolchain.cmake'
+    bb.error("Unkown value \"%s\" for TS_ENV." % (ts_env))
+    return ''
+
+EXTRA_OECMAKE += "${@get_ts_toolchain_option(d)}"
 
 # Paths to pre-built dependencies required by some TS SPs/tools
 EXTRA_OECMAKE += "-Dlibts_ROOT=${STAGING_DIR_HOST}${TS_INSTALL}/lib/cmake/libts/ \
-                  -DNEWLIB_INSTALL_DIR=${STAGING_DIR_HOST}${TS_INSTALL}/newlib \
+                  -DNEWLIB_INSTALL_DIR=${STAGING_DIR_HOST}/usr/opteesp/newlib \
                  "

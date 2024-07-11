@@ -5,7 +5,7 @@ Subject: [PATCH 1/2] libbb: sockaddr2str: ensure only printable characters are
  returned for the hostname part
 
 CVE: CVE-2022-28391
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.busybox.net/show_bug.cgi?id=15001]
 Signed-off-by: Ariadne Conill <ariadne@dereferenced.org>
 Signed-off-by: Steve Sakoman <steve@sakoman.com>
 ---

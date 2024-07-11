@@ -381,7 +381,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
             self.taints[tid] = taint
             logger.warning("%s is tainted from a forced run" % tid)
 
-        return
+        return set(dep for _, dep in self.runtaskdeps[tid])
 
     def get_taskhash(self, tid, deps, dataCaches):
 
@@ -726,10 +726,13 @@ class SignatureGeneratorUniHashMixIn(object):
             return result
 
         if self.max_parallel <= 1 or len(queries) <= 1:
-            # No parallelism required. Make the query serially with the single client
+            # No parallelism required. Make the query using a single client
             with self.client() as client:
-                for tid, args in queries.items():
-                    query_result[tid] = client.get_unihash(*args)
+                keys = list(queries.keys())
+                unihashes = client.get_unihash_batch(queries[k] for k in keys)
+
+                for idx, k in enumerate(keys):
+                    query_result[k] = unihashes[idx]
         else:
             with self.client_pool() as client_pool:
                 query_result = client_pool.get_unihashes(queries)

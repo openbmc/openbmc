@@ -17,6 +17,8 @@ S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig python3targetconfig
 
+CVE_PRODUCT = "libtorrent"
+
 EXTRA_OECMAKE = "-DCMAKE_BUILD_TYPE=Release"
 
 PACKAGECONFIG ??= "python3"

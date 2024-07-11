@@ -16,6 +16,7 @@ PACKAGECONFIG[readline] = "--with-readline,--without-readline,readline"
 PACKAGECONFIG[mpfr] = "--with-mpfr,--without-mpfr, mpfr"
 
 SRC_URI = "${GNU_MIRROR}/gawk/gawk-${PV}.tar.gz \
+           file://0001-m4-readline-add-missing-includes.patch \
            file://run-ptest \
            "
 

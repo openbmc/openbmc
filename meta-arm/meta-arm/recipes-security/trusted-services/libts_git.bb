@@ -10,8 +10,8 @@ SRC_URI += "file://tee-udev.rules \
 
 OECMAKE_SOURCEPATH="${S}/deployments/libts/${TS_ENV}"
 
-DEPENDS           += "arm-ffa-tee arm-ffa-user"
-RRECOMMENDS:${PN} += "arm-ffa-tee"
+DEPENDS           += "arm-tstee arm-ffa-user"
+RRECOMMENDS:${PN} += "arm-tstee"
 
 # Unix group name for dev/tee* ownership.
 TEE_GROUP_NAME ?= "teeclnt"

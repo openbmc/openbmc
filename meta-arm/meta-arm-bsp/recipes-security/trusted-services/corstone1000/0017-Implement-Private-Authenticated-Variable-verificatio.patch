@@ -1,0 +1,292 @@
+From a172c6e8269915db1b25e2749bae06dc0220cfb8 Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Thu, 11 Apr 2024 13:48:14 +0200
+Subject: [PATCH 3/3] Implement Private Authenticated Variable verification
+
+Refactor the implementation to only use the PK, KEK, DB authentication
+chain for boot variables, and implement the self authentication for
+private authenticated variables.
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/27957]
+---
+ .../backend/uefi_variable_store.c             | 126 +++++++++++++++---
+ .../smm_variable/backend/variable_index.c     |   1 +
+ .../smm_variable/backend/variable_index.h     |   2 +
+ .../config/default-opteesp/CMakeLists.txt     |   2 +-
+ .../config/default-sp/CMakeLists.txt          |   2 +-
+ 5 files changed, 112 insertions(+), 21 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.c b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+index 1384d0def..97c43dc74 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+@@ -75,15 +75,25 @@ static efi_status_t verify_var_by_key_var(const efi_data_map *new_var,
+ 					  const efi_data_map *key_store_var,
+ 					  const uint8_t *hash_buffer, size_t hash_len);
+ 
++static bool isPrivateAuthVar(SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var);
++
+ static efi_status_t authenticate_variable(const struct uefi_variable_store *context,
+-					  EFI_TIME *timestamp,
+-					  SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var);
++					  EFI_TIME *timestamp, uint8_t (*fingerprint)[FINGERPRINT_SIZE],
++					  bool new_variable, SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var);
+ 
+ static efi_status_t authenticate_secure_boot_variable(const struct uefi_variable_store *context,
+ 						      efi_data_map* var_map,
+ 						      uint8_t* hash_buffer,
+ 						      size_t hash_len,
+ 						      uint64_t max_variable_size);
++
++static efi_status_t authenticate_private_variable(const struct uefi_variable_store *context,
++						  efi_data_map* var_map,
++						  uint8_t* hash_buffer,
++						  size_t hash_len,
++						  uint64_t max_variable_size,
++						  bool new_variable,
++						  uint8_t (*fingerprint)[FINGERPRINT_SIZE]);
+ #endif
+ 
+ static efi_status_t store_variable_data(const struct uefi_variable_store *context,
+@@ -205,6 +215,7 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ {
+ 	bool should_sync_index = false;
+ 	EFI_TIME timestamp = { 0 };
++	uint8_t fingerprint[FINGERPRINT_SIZE] = { 0 };
+ 
+ 	/* Validate incoming request */
+ 	efi_status_t status = check_name_terminator(var->Name, var->NameSize);
+@@ -233,8 +244,9 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 			return EFI_OUT_OF_RESOURCES;
+ 	}
+ 
+-	/* Save the timestamp into a buffer, which can be overwritten by the authentication function */
++	/* Save the timestamp and fingerprints into a buffer, which can be overwritten by the authentication function */
+ 	memcpy(&timestamp, &info->metadata.timestamp, sizeof(EFI_TIME));
++	memcpy(&fingerprint, &info->metadata.fingerprint, FINGERPRINT_SIZE);
+ 
+ 	/* Control access */
+ 	status = check_access_permitted_on_set(context, info, var);
+@@ -251,7 +263,8 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 			if (info->metadata.attributes &
+ 			    EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
+ 				status = authenticate_variable(
+-					context, &timestamp, (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
++					context, &timestamp, &fingerprint, false,
++					(SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
+ 
+ 				if (status != EFI_SUCCESS)
+ 					return status;
+@@ -337,7 +350,8 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 			 */
+ 			if (var->Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
+ 				status = authenticate_variable(
+-					context, &timestamp, (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
++					context, &timestamp, &fingerprint, true,
++					(SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)var);
+ 
+ 				if (status != EFI_SUCCESS)
+ 					return status;
+@@ -372,6 +386,7 @@ efi_status_t uefi_variable_store_set_variable(const struct uefi_variable_store *
+ 		/* Store any variable data to the storage backend with the updated metadata */
+ 		if (info->is_variable_set && (status == EFI_SUCCESS)) {
+ 			memcpy(&info->metadata.timestamp, &timestamp, sizeof(EFI_TIME));
++			memcpy(&info->metadata.fingerprint, &fingerprint, FINGERPRINT_SIZE);
+ 			status = store_variable_data(context, info, var);
+ 		}
+ 	}
+@@ -1030,15 +1045,6 @@ select_verification_keys(const efi_data_map new_var, EFI_GUID global_variable_gu
+ 		create_smm_variable(&(allowed_key_store_variables[1]),
+ 				    sizeof(EFI_KEY_EXCHANGE_KEY_NAME), maximum_variable_size,
+ 				    (uint8_t *)EFI_KEY_EXCHANGE_KEY_NAME, &global_variable_guid);
+-	} else {
+-		/*
+-		 * Any other variable is considered Private Authenticated Variable.
+-		 * These are verified by db
+-		 */
+-		create_smm_variable(&(allowed_key_store_variables[0]),
+-				    sizeof(EFI_IMAGE_SECURITY_DATABASE), maximum_variable_size,
+-				    (uint8_t *)EFI_IMAGE_SECURITY_DATABASE,
+-				    &security_database_guid);
+ 	}
+ 
+ 	return EFI_SUCCESS;
+@@ -1114,13 +1120,39 @@ static efi_status_t verify_var_by_key_var(const efi_data_map *new_var,
+ 	return EFI_SECURITY_VIOLATION;
+ }
+ 
+-/* Basic verification of the authentication header of the new variable.
++static bool isPrivateAuthVar(SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var)
++{
++	if (compare_name_to_key_store_name(var->Name,
++					   var->NameSize, EFI_PLATFORM_KEY_NAME,
++					   sizeof(EFI_PLATFORM_KEY_NAME)) ||
++		 compare_name_to_key_store_name(
++			   var->Name, var->NameSize,
++			   EFI_KEY_EXCHANGE_KEY_NAME, sizeof(EFI_KEY_EXCHANGE_KEY_NAME)) ||
++		 compare_name_to_key_store_name(
++			 var->Name, var->NameSize,
++			 EFI_IMAGE_SECURITY_DATABASE, sizeof(EFI_IMAGE_SECURITY_DATABASE)) ||
++		 compare_name_to_key_store_name(
++			 var->Name, var->NameSize,
++			 EFI_IMAGE_SECURITY_DATABASE1, sizeof(EFI_IMAGE_SECURITY_DATABASE1)) ||
++		 compare_name_to_key_store_name(
++			 var->Name, var->NameSize,
++			 EFI_IMAGE_SECURITY_DATABASE2, sizeof(EFI_IMAGE_SECURITY_DATABASE2)) ||
++		 compare_name_to_key_store_name(
++			 var->Name, var->NameSize,
++			 EFI_IMAGE_SECURITY_DATABASE3, sizeof(EFI_IMAGE_SECURITY_DATABASE3)))
++		return false;
++
++	return true;
++}
++
++/*
++ * Basic verification of the authentication header of the new variable.
+  * First finds the key variable responsible for the authentication of the new variable,
+  * then verifies it.
+  */
+ static efi_status_t authenticate_variable(const struct uefi_variable_store *context,
+-					  EFI_TIME *timestamp,
+-					  SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var)
++					  EFI_TIME *timestamp, uint8_t (*fingerprint)[FINGERPRINT_SIZE],
++					  bool new_variable, SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *var)
+ {
+ 	efi_status_t status = EFI_SUCCESS;
+ 	EFI_GUID pkcs7_guid = EFI_CERT_TYPE_PKCS7_GUID;
+@@ -1192,8 +1224,13 @@ static efi_status_t authenticate_variable(const struct uefi_variable_store *cont
+ 		status = EFI_SECURITY_VIOLATION;
+ 	}
+ 
+-	/* Run Secure Boot related authentication steps */
+-	status = authenticate_secure_boot_variable(context, &var_map, (uint8_t*) &hash_buffer, hash_len, variable_info.MaximumVariableSize);
++	if (isPrivateAuthVar(var)) {
++		/* Run Private Authenticated Variable related authentication steps */
++		status = authenticate_private_variable(context, &var_map, (uint8_t*) &hash_buffer, hash_len, variable_info.MaximumVariableSize, new_variable, fingerprint);
++	} else {
++		/* Run Secure Boot related authentication steps */
++		status = authenticate_secure_boot_variable(context, &var_map, (uint8_t*) &hash_buffer, hash_len, variable_info.MaximumVariableSize);
++	}
+ 
+ 	/* Remove the authentication header from the variable if the authentication is successful */
+ 	if (status == EFI_SUCCESS) {
+@@ -1340,6 +1377,57 @@ end:
+ 
+ 	return status;
+ }
++
++static efi_status_t authenticate_private_variable(const struct uefi_variable_store *context,
++						  efi_data_map* var_map,
++						  uint8_t* hash_buffer,
++						  size_t hash_len,
++						  uint64_t max_variable_size,
++						  bool new_variable,
++						  uint8_t (*fingerprint)[FINGERPRINT_SIZE])
++{
++	efi_status_t status = EFI_SUCCESS;
++	uint8_t new_fingerprint[PSA_HASH_MAX_SIZE] = { 0 };
++
++	/* Verify the signature of the variable */
++	if (verify_pkcs7_signature(
++		var_map->efi_auth_descriptor->AuthInfo.CertData,
++		var_map->efi_auth_descriptor_certdata_len, hash_buffer,
++		hash_len, NULL, 0) == 0)
++		status = EFI_SUCCESS;
++	else
++		return EFI_SECURITY_VIOLATION;
++
++	/**
++	 * UEFI: Page 254
++	 * CN of the signing certificate’s Subject and the hash of the tbsCertificate of the top-level issuer certificate
++	 * (or the signing certificate itself if no other certificates are present or the certificate chain is of length 1)
++	 * in SignedData.certificates is registered for use in subsequent verifications of this variable. Implementations
++	 * may store just a single hash of these two elements to reduce storage requirements.
++	 */
++	if (get_uefi_priv_auth_var_fingerprint_handler(var_map->efi_auth_descriptor->AuthInfo.CertData,
++						       var_map->efi_auth_descriptor_certdata_len,
++						       (uint8_t*)&new_fingerprint)) {
++		EMSG("Failed to querry variable fingerprint input");
++		return EFI_SECURITY_VIOLATION;
++	}
++
++	/*
++	 * The hash is SHA256 so only 32 bytes contain non zero values.
++	 * Use only that part to decrease metadata size.
++	 */
++	if (!new_variable) {
++		if (memcmp(&new_fingerprint, fingerprint, FINGERPRINT_SIZE)) {
++			EMSG("Fingerprint verification failed");
++			return EFI_SECURITY_VIOLATION;
++		}
++	} else {
++		/* Save fingerprint */
++		memcpy(fingerprint, &new_fingerprint, FINGERPRINT_SIZE);
++	}
++
++	return status;
++}
+ #endif
+ 
+ static efi_status_t store_variable_data(const struct uefi_variable_store *context,
+diff --git a/components/service/uefi/smm_variable/backend/variable_index.c b/components/service/uefi/smm_variable/backend/variable_index.c
+index f4194d2d3..7f2fbe0ba 100644
+--- a/components/service/uefi/smm_variable/backend/variable_index.c
++++ b/components/service/uefi/smm_variable/backend/variable_index.c
+@@ -199,6 +199,7 @@ static struct variable_entry *add_entry(const struct variable_index *context, co
+ 			info->metadata.uid = generate_uid(context, guid, name_size, name);
+ 			info->metadata.guid = *guid;
+ 			memset(&info->metadata.timestamp, 0, sizeof(EFI_TIME));
++			memset(&info->metadata.fingerprint, 0, sizeof(FINGERPRINT_SIZE));
+ 			info->metadata.attributes = 0;
+ 			info->metadata.name_size = name_size;
+ 			memcpy(info->metadata.name, name, name_size);
+diff --git a/components/service/uefi/smm_variable/backend/variable_index.h b/components/service/uefi/smm_variable/backend/variable_index.h
+index 7eef7b86b..726bc985a 100644
+--- a/components/service/uefi/smm_variable/backend/variable_index.h
++++ b/components/service/uefi/smm_variable/backend/variable_index.h
+@@ -24,6 +24,7 @@ extern "C" {
+  * Implementation limits
+  */
+ #define VARIABLE_INDEX_MAX_NAME_SIZE (64)
++#define FINGERPRINT_SIZE             (32)
+ 
+ /**
+  * \brief variable_metadata structure definition
+@@ -33,6 +34,7 @@ extern "C" {
+ struct variable_metadata {
+ 	EFI_GUID guid;
+ 	EFI_TIME timestamp;
++	uint8_t fingerprint[FINGERPRINT_SIZE];
+ 	size_t name_size;
+ 	int16_t name[VARIABLE_INDEX_MAX_NAME_SIZE];
+ 	uint32_t attributes;
+diff --git a/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt b/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt
+index 0e281a377..d3df61ded 100644
+--- a/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt
++++ b/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt
+@@ -42,7 +42,7 @@ set(SP_BOOT_ORDER "8" CACHE STRING "Boot order of the SP")
+ add_platform(TARGET "smm-gateway")
+ 
+ # SMM variable and RPC caller settings
+-set(SMM_GATEWAY_MAX_UEFI_VARIABLES 40 CACHE STRING "Maximum UEFI variable count")
++set(SMM_GATEWAY_MAX_UEFI_VARIABLES 35 CACHE STRING "Maximum UEFI variable count")
+ set(SMM_RPC_CALLER_SESSION_SHARED_MEMORY_SIZE 2*4096 CACHE STRING "RPC caller buffer size in SMMGW")
+ if (UEFI_AUTH_VAR)
+ set(SMM_SP_HEAP_SIZE 64*1024 CACHE STRING "SMM gateway SP heap size")
+diff --git a/deployments/smm-gateway/config/default-sp/CMakeLists.txt b/deployments/smm-gateway/config/default-sp/CMakeLists.txt
+index 8df9256e4..bb97cf8e3 100644
+--- a/deployments/smm-gateway/config/default-sp/CMakeLists.txt
++++ b/deployments/smm-gateway/config/default-sp/CMakeLists.txt
+@@ -47,7 +47,7 @@ set(SP_BOOT_ORDER "8" CACHE STRING "Boot order of the SP")
+ add_platform(TARGET "smm-gateway")
+ 
+ # SMM variable and RPC caller settings
+-set(SMM_GATEWAY_MAX_UEFI_VARIABLES 40 CACHE STRING "Maximum UEFI variable count")
++set(SMM_GATEWAY_MAX_UEFI_VARIABLES 35 CACHE STRING "Maximum UEFI variable count")
+ set(SMM_RPC_CALLER_SESSION_SHARED_MEMORY_SIZE 2*4096 CACHE STRING "RPC caller buffer size in SMMGW")
+ if (UEFI_AUTH_VAR)
+ set(SMM_SP_HEAP_SIZE 64*1024 CACHE STRING "SMM gateway SP heap size")
+-- 
+2.25.1
+

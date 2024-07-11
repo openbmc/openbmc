@@ -1,0 +1,37 @@
+From b3bca013007a4a66703573d243e433f22e1e6684 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 15 May 2024 16:55:09 +0800
+Subject: [PATCH] target.h: define proper macro for ppc/ppc64
+
+Fix error:
+third_party/boringssl-with-bazel/src/include/openssl/target.h:74:2: error: #error "Unknown target CPU"
+third_party/boringssl-with-bazel/src/include/openssl/bn.h:172:2: error: #error "Must define either OPENSSL_32_BIT or OPENSSL_64_BIT"
+third_party/boringssl-with-bazel/src/include/openssl/bn.h:230:44: error: 'BN_ULONG' has not been declared
+
+BN_ULONG will be defined after set proper OPENSSL_32_BIT or OPENSSL_64_BIT
+
+Upstream-Status: Pending
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ third_party/boringssl-with-bazel/src/include/openssl/target.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/third_party/boringssl-with-bazel/src/include/openssl/target.h b/third_party/boringssl-with-bazel/src/include/openssl/target.h
+index 29b1dc6..d779813 100644
+--- a/third_party/boringssl-with-bazel/src/include/openssl/target.h
++++ b/third_party/boringssl-with-bazel/src/include/openssl/target.h
+@@ -54,6 +54,10 @@
+ #define OPENSSL_32_BIT
+ #elif defined(__myriad2__)
+ #define OPENSSL_32_BIT
++#elif defined(__PPC64__)
++#define OPENSSL_64_BIT
++#elif defined(__PPC__)
++#define OPENSSL_32_BIT
+ #else
+ // The list above enumerates the platforms that BoringSSL supports. For these
+ // platforms we keep a reasonable bar of not breaking them: automated test
+-- 
+2.25.1
+

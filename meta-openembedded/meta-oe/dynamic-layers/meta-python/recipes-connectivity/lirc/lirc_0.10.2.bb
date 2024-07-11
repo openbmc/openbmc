@@ -101,7 +101,7 @@ FILES:${PN} += "${systemd_unitdir}/system/lircd.service"
 FILES:${PN} += "${systemd_unitdir}/system/lircd.socket"
 FILES:${PN} += "${libdir}/tmpfiles.d/lirc.conf"
 FILES:${PN}-dbg += "${libdir}/lirc/plugins/.debug"
-FILES:${PN}-python += "${bindir}/irdb-get ${bindir}/irtext2udp ${bindir}/lircd-setup ${bindir}/pronto2lirc ${libdir}/python*/site-packages"
+FILES:${PN}-python += "${bindir}/irdb-get ${bindir}/irtext2udp ${bindir}/lircd-setup ${bindir}/pronto2lirc ${PYTHON_SITEPACKAGES_DIR}"
 
 INITSCRIPT_PACKAGES = "lirc lirc-exec"
 INITSCRIPT_NAME:lirc-exec = "lircexec"

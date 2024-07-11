@@ -1,4 +1,4 @@
-From 9d3b374e75692da3d1d05344a1693c85a3098f47 Mon Sep 17 00:00:00 2001
+From 325a4cde99a00b84116ab7111d27e6973f3c5026 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 26 Jan 2023 20:29:46 +0100
 Subject: [PATCH] meson.build: allow (a subset of) tests in cross compile
@@ -19,10 +19,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  2 files changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 8a16c8f..7c8b20f 100644
+index 3eb3fcc..dc7e790 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -369,10 +369,10 @@ subdir('gdk-pixbuf')
+@@ -390,10 +390,10 @@ subdir('gdk-pixbuf')
  # i18n
  subdir('po')
  
@@ -37,7 +37,7 @@ index 8a16c8f..7c8b20f 100644
  endif
  
 diff --git a/tests/meson.build b/tests/meson.build
-index 28c2525..c45e765 100644
+index 3781066..911b5fb 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -4,7 +4,7 @@
@@ -49,7 +49,7 @@ index 28c2525..c45e765 100644
    # Resources; we cannot use gnome.compile_resources() here, because we need to
    # override the environment in order to use the utilities we just built instead
    # of the system ones
-@@ -166,9 +166,11 @@ endif
+@@ -164,9 +164,11 @@ endif
  test_deps = gdk_pixbuf_deps + [ gdkpixbuf_dep, ]
  test_args = [ '-k' ]
  test_env = environment()

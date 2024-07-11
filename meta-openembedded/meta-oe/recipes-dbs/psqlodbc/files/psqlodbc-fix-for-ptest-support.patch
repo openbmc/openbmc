@@ -19,8 +19,6 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  test/runsuite.c     | 20 ++++++++++----------
  3 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/test/Makefile.in b/test/Makefile.in
-index 3f9a9af..09406ae 100644
 --- a/test/Makefile.in
 +++ b/test/Makefile.in
 @@ -19,7 +19,7 @@ CPPFLAGS = @CPPFLAGS@ -I..	# config.h
@@ -32,8 +30,6 @@ index 3f9a9af..09406ae 100644
  
  all: $(TESTBINS) runsuite reset-db
  
-diff --git a/test/odbcini-gen.sh b/test/odbcini-gen.sh
-index 2eaba35..6555cdb 100755
 --- a/test/odbcini-gen.sh
 +++ b/test/odbcini-gen.sh
 @@ -6,7 +6,7 @@
@@ -45,6 +41,15 @@ index 2eaba35..6555cdb 100755
  driver=${drvr}.so
  if test ! -e $driver ; then
  	driver=${drvr}.dll
+@@ -16,7 +16,7 @@ if test ! -e $driver ; then
+ 	fi
+ fi
+ 
+-drvra=../.libs/psqlodbca
++drvra=@LIBDIR@/psqlodbca
+ drivera=${drvra}.so
+ if test ! -e $drivera ; then
+ 	drivera=${drvra}.dll
 @@ -52,10 +52,10 @@ Driver          = PostgreSQL Unicode
  Trace           = No
  TraceFile               =
@@ -59,8 +64,6 @@ index 2eaba35..6555cdb 100755
  ReadOnly                = No
  RowVersioning           = No
  ShowSystemTables                = No
-diff --git a/test/runsuite.c b/test/runsuite.c
-index 3be5732..cd842dc 100644
 --- a/test/runsuite.c
 +++ b/test/runsuite.c
 @@ -55,7 +55,7 @@ bailout(const char *fmt, ...)
@@ -72,7 +75,7 @@ index 3be5732..cd842dc 100644
  {
  	const char *basename;
  #ifdef WIN32
-@@ -69,7 +69,7 @@ parse_argument(const char *in, char *testname, char *binname)
+@@ -69,7 +69,7 @@ parse_argument(const char *in, char *tes
  	if (strchr(in, DIR_SEP) == NULL)
  	{
  		strcpy(testname, in);
@@ -90,7 +93,7 @@ index 3be5732..cd842dc 100644
  		if (runtest(binname, testname, i, inputdir) != 0)
  			failures++;
  	}
-@@ -161,29 +161,29 @@ runtest(const char *binname, const char *testname, int testno, const char *input
+@@ -161,29 +161,29 @@ runtest(const char *binname, const char
  #ifndef WIN32
  	snprintf(cmdline, sizeof(cmdline),
  			 "ODBCSYSINI=. ODBCINSTINI=./odbcinst.ini ODBCINI=./odbc.ini "

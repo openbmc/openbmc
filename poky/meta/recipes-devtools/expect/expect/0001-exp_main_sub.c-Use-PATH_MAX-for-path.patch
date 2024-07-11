@@ -10,7 +10,7 @@ Aborted (core dumped)
 
 Use PATH_MAX to fix the problem.
 
-Upstream-Status: Pending [Upstream seems dead]
+Upstream-Status: Inactive-Upstream [no activity since 2018; cvs server went read-only]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---

@@ -16,3 +16,5 @@ inherit pypi setuptools3
 RDEPENDS:${PN} += "\
     python3-stringold \
     "
+
+BBCLASSEXTEND = "native nativesdk"

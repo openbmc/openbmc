@@ -21,5 +21,3 @@ EXTRA_OECMAKE = "-DUDEV_RULES_DIR=${nonarch_base_libdir}/udev/rules.d -DBUILD_EX
 PACKAGE_BEFORE_PN = "${PN}-tools"
 
 FILES:${PN}-tools = "${bindir}/fido2-*"
-
-BBCLASSEXTEND = "native nativesdk"

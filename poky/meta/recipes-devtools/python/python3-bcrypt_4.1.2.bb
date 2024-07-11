@@ -33,5 +33,4 @@ RDEPENDS:${PN}:class-target += "\
     python3-cffi \
     python3-ctypes \
     python3-shell \
-    python3-six \
 "

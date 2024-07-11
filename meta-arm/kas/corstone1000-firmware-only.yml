@@ -4,6 +4,8 @@ header:
 
 local_conf_header:
   firmwarebuild: |
+    BBMULTICONFIG:remove = "firmware"
+
     # Need to ensure the rescue linux options are selected
     OVERRIDES .= ":firmware"
 

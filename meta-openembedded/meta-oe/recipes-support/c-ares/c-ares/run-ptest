@@ -1,7 +1,3 @@
 #!/bin/sh
+./arestest --gtest_filter=-*.Live* --gtest_print_time=0 | sed -E  '/^\[ RUN/d ; s/\[       OK \]/PASS: / ; s/\[ DISABLED \]/SKIP: / ; s/\[ FAILED \]/FAIL: /'
 
-if ./arestest --gtest_filter=-*.Live*; then
-	echo "PASS: c-ares"
-else
-	echo "FAIL: c-ares"
-fi

@@ -1,0 +1,23 @@
+From c5050ac84c8a3cc3ff8c7e558f8c2fdb57f410d9 Mon Sep 17 00:00:00 2001
+From: Joshua Lock <josh@linux.intel.com>
+Date: Mon, 29 Jul 2013 15:02:34 -0700
+Subject: [PATCH] install-info uses symbols from zlib so must link against it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joshua Lock <josh@linux.intel.com>
+
+---
+ install-info/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/install-info/Makefile.am b/install-info/Makefile.am
+index 9bcff71..68247f9 100644
+--- a/install-info/Makefile.am
++++ b/install-info/Makefile.am
+@@ -33,4 +33,4 @@ AM_CPPFLAGS = 					\
+   -I$(top_srcdir)/gnulib/lib			\
+   -I$(top_builddir)/gnulib/lib			\
+   -DLOCALEDIR=\"$(localedir)\"
+-LDADD = $(top_builddir)/gnulib/lib/libgnu.a $(LIBINTL) $(LIBTHREAD)
++LDADD = $(top_builddir)/gnulib/lib/libgnu.a $(LIBINTL) $(LIBTHREAD) -lz

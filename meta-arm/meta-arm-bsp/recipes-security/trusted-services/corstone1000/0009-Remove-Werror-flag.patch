@@ -1,0 +1,84 @@
+From 6d140b21c22dda58f596bb513a1cd6bc08e914eb Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Wed, 3 Apr 2024 10:18:16 +0100
+Subject: [PATCH] Remove Werror flag
+
+Remove Werror flag due to compilation issues for TS in yocto
+
+Upstream-Status: Inappropriate [Only for meta-arm]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ deployments/smm-gateway/config/default-opteesp/CMakeLists.txt | 1 -
+ deployments/smm-gateway/config/default-sp/CMakeLists.txt      | 1 -
+ environments/arm-linux/default_toolchain_file.cmake           | 2 +-
+ environments/linux-pc/default_toolchain_file.cmake            | 2 +-
+ environments/opteesp/default_toolchain_file.cmake             | 2 +-
+ 5 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt b/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt
+index 5521467..88048a2 100644
+--- a/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt
++++ b/deployments/smm-gateway/config/default-opteesp/CMakeLists.txt
+@@ -99,7 +99,6 @@ target_compile_definitions(smm-gateway PRIVATE
+ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+ 	target_compile_options(smm-gateway PRIVATE
+ 		-std=c11
+-		-Werror
+ 	)
+ 
+ endif()
+diff --git a/deployments/smm-gateway/config/default-sp/CMakeLists.txt b/deployments/smm-gateway/config/default-sp/CMakeLists.txt
+index ca563c0..4b43653 100644
+--- a/deployments/smm-gateway/config/default-sp/CMakeLists.txt
++++ b/deployments/smm-gateway/config/default-sp/CMakeLists.txt
+@@ -97,7 +97,6 @@ target_compile_definitions(smm-gateway PRIVATE
+ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+ 	target_compile_options(smm-gateway PRIVATE
+ 		-std=c11
+-		-Werror
+ 	)
+ 
+ endif()
+diff --git a/environments/arm-linux/default_toolchain_file.cmake b/environments/arm-linux/default_toolchain_file.cmake
+index 1da144e..6909db6 100644
+--- a/environments/arm-linux/default_toolchain_file.cmake
++++ b/environments/arm-linux/default_toolchain_file.cmake
+@@ -19,7 +19,7 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
+ 
+ set(TS_DEBUG_INFO_FLAGS "-fdiagnostics-show-option -gdwarf-2" CACHE STRING "Compiler flags to add debug information.")
+ set(TS_MANDATORY_AARCH_FLAGS "-mstrict-align -march=armv8-a+crc -DARM64=1" CACHE STRING "Compiler flags configuring architecture specific ")
+-set(TS_WARNING_FLAGS "-Wall -Werror" CACHE STRING "Compiler flags affecting generating warning messages.")
++set(TS_WARNING_FLAGS "-Wall" CACHE STRING "Compiler flags affecting generating warning messages.")
+ set(TS_MANDATORY_LINKER_FLAGS "" CACHE STRING "Linker flags needed for correct builds.")
+ 
+ # Set flags affecting all build types
+diff --git a/environments/linux-pc/default_toolchain_file.cmake b/environments/linux-pc/default_toolchain_file.cmake
+index 58f29bc..e23bb79 100644
+--- a/environments/linux-pc/default_toolchain_file.cmake
++++ b/environments/linux-pc/default_toolchain_file.cmake
+@@ -11,7 +11,7 @@ include_guard(GLOBAL)
+ 
+ set(TS_DEBUG_INFO_FLAGS "-fdiagnostics-show-option -gdwarf-2" CACHE STRING "Compiler flags to add debug information.")
+ set(TS_MANDATORY_AARCH_FLAGS "" CACHE STRING "Compiler flags configuring architecture specific ")
+-set(TS_WARNING_FLAGS "-Wall -Werror" CACHE STRING "Compiler flags affecting generating warning messages.")
++set(TS_WARNING_FLAGS "-Wall" CACHE STRING "Compiler flags affecting generating warning messages.")
+ set(TS_MANDATORY_LINKER_FLAGS "" CACHE STRING "Linker flags needed for correct builds.")
+ 
+ # Set flags affecting all build types
+diff --git a/environments/opteesp/default_toolchain_file.cmake b/environments/opteesp/default_toolchain_file.cmake
+index 43c19c5..90a9418 100644
+--- a/environments/opteesp/default_toolchain_file.cmake
++++ b/environments/opteesp/default_toolchain_file.cmake
+@@ -21,7 +21,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE True)
+ 
+ set(TS_DEBUG_INFO_FLAGS "-fdiagnostics-show-option -gdwarf-2" CACHE STRING "Compiler flags to add debug information.")
+ set(TS_MANDATORY_AARCH_FLAGS "-fpic -mstrict-align -march=armv8-a+crc" CACHE STRING "Compiler flags configuring architecture specific ")
+-set(TS_WARNING_FLAGS "-Wall -Werror" CACHE STRING "Compiler flags affecting generating warning messages.")
++set(TS_WARNING_FLAGS "-Wall" CACHE STRING "Compiler flags affecting generating warning messages.")
+ set(TS_MANDATORY_LINKER_FLAGS "-pie -Wl,--as-needed -Wl,--sort-section=alignment -zmax-page-size=4096"
+ 	CACHE STRING "Linker flags needed for correct builds.")
+ 
+-- 
+2.25.1
+
+

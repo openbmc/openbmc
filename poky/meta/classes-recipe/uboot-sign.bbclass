@@ -367,7 +367,7 @@ do_uboot_assemble_fitimage() {
 			done
 
 			for binary in ${UBOOT_BINARIES}; do
-				k=$(expr $j + 1);
+				k=$(expr $k + 1);
 				if [ $k -eq $i ]; then
 					break;
 				fi

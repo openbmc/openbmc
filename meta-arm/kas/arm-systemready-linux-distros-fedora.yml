@@ -1,0 +1,7 @@
+header:
+  version: 16
+  includes:
+    - kas/arm-systemready-firmware.yml
+
+target:
+  - arm-systemready-linux-distros-fedora

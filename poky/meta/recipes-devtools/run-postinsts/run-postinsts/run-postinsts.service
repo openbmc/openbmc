@@ -7,7 +7,7 @@ Before=sysinit.target
 [Service]
 Type=oneshot
 ExecStart=#SBINDIR#/run-postinsts
-ExecStartPost=#BASE_BINDIR#/systemctl --no-reload disable run-postinsts.service
+ExecStartPost=#BASE_BINDIR#/systemctl disable run-postinsts.service
 RemainAfterExit=yes
 TimeoutSec=0
 

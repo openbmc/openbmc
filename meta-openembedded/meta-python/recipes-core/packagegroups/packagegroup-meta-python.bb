@@ -450,7 +450,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-webcolors \
     python3-webencodings \
     python3-websocket-client \
-    python3-websockets \
     python3-werkzeug \
     python3-werkzeug \
     python3-whoosh \

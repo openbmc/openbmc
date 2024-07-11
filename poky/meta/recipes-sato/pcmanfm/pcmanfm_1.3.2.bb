@@ -27,6 +27,8 @@ inherit autotools pkgconfig features_check mime-xdg
 REQUIRED_DISTRO_FEATURES = "x11"
 
 EXTRA_OECONF = "--with-gtk=3"
+# GCC 14 finds extra incompatible pointer type warnings which are treated as errors
+CFLAGS += "-Wno-error=incompatible-pointer-types"
 
 do_install:append () {
 	install -d ${D}/${datadir}

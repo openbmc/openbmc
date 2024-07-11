@@ -661,7 +661,18 @@ def _extract_source(srctree, keep_temp, devbranch, sync, config, basepath, works
         srctree_localdir = os.path.join(srctree, 'oe-local-files')
 
         if sync:
-            bb.process.run('git fetch file://' + srcsubdir + ' ' + devbranch + ':' + devbranch, cwd=srctree)
+            try:
+                logger.info('Backing up current %s branch as branch: %s.bak' % (devbranch, devbranch))
+                bb.process.run('git branch -f ' + devbranch + '.bak', cwd=srctree)
+
+                # Use git fetch to update the source with the current recipe
+                # To be able to update the currently checked out branch with
+                # possibly new history (no fast-forward) git needs to be told
+                # that's ok
+                logger.info('Syncing source files including patches to git branch: %s' % devbranch)
+                bb.process.run('git fetch --update-head-ok --force file://' + srcsubdir + ' ' + devbranch + ':' + devbranch, cwd=srctree)
+            except bb.process.ExecutionError as e:
+                raise DevtoolError("Error when syncing source files to local checkout: %s" % str(e))
 
             # Move the oe-local-files directory to srctree.
             # As oe-local-files is not part of the constructed git tree,
@@ -893,7 +904,10 @@ def modify(args, config, basepath, workspace):
                 (stdout, _) = bb.process.run('git rev-list --reverse %s..HEAD' % initial_revs["."], cwd=srctree)
                 commits["."] = stdout.split()
                 check_commits = True
-                (stdout, _) = bb.process.run('git submodule --quiet foreach --recursive  \'echo `git rev-parse devtool-base` $PWD\'', cwd=srctree)
+                try:
+                    (stdout, _) = bb.process.run('git submodule --quiet foreach --recursive  \'echo `git rev-parse devtool-base` $PWD\'', cwd=srctree)
+                except bb.process.ExecutionError:
+                    stdout = ""
                 for line in stdout.splitlines():
                     (rev, submodule_path) = line.split()
                     submodule = os.path.relpath(submodule_path, srctree)
@@ -1452,8 +1466,10 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
          1. updated - files that already exist in SRCURI
          2. added - new files files that don't exist in SRCURI
          3  removed - files that exist in SRCURI but not in exported files
-      In each dict the key is the 'basepath' of the URI and value is the
-      absolute path to the existing file in recipe space (if any).
+       In each dict the key is the 'basepath' of the URI and value is:
+         - for updated and added dicts, a dict with 1 optionnal key:
+           - 'path': the absolute path to the existing file in recipe space (if any)
+         - for removed dict, the absolute path to the existing file in recipe space
     """
     import oe.recipeutils
 
@@ -1535,9 +1551,9 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
                 origpath = existing_files.pop(fname)
                 workpath = os.path.join(local_files_dir, fname)
                 if not filecmp.cmp(origpath, workpath):
-                    updated[fname] = origpath
+                    updated[fname] = {'path' : origpath}
             elif fname != '.gitignore':
-                added[fname] = None
+                added[fname] = {}
 
         workdir = rd.getVar('WORKDIR')
         s = rd.getVar('S')
@@ -1554,7 +1570,7 @@ def _export_local_files(srctree, rd, destdir, srctreebase):
                     if os.path.exists(fpath):
                         origpath = existing_files.pop(fname)
                         if not filecmp.cmp(origpath, fpath):
-                            updated[fpath] = origpath
+                            updated[fpath] = {'path' : origpath}
 
         removed = existing_files
     return (updated, added, removed)
@@ -1640,7 +1656,8 @@ def _update_recipe_srcrev(recipename, workspace, srctree, rd, appendlayerdir, wi
                     redirect_output=dry_run_outdir)
         else:
             files_dir = _determine_files_dir(rd)
-            for basepath, path in upd_f.items():
+            for basepath, param in upd_f.items():
+                path = param['path']
                 logger.info('Updating file %s%s' % (basepath, dry_run_suffix))
                 if os.path.isabs(basepath):
                     # Original file (probably with subdir pointing inside source tree)
@@ -1650,7 +1667,8 @@ def _update_recipe_srcrev(recipename, workspace, srctree, rd, appendlayerdir, wi
                     _move_file(os.path.join(local_files_dir, basepath), path,
                                dry_run_outdir=dry_run_outdir, base_outdir=recipedir)
                 update_srcuri= True
-            for basepath, path in new_f.items():
+            for basepath, param in new_f.items():
+                path = param['path']
                 logger.info('Adding new file %s%s' % (basepath, dry_run_suffix))
                 _move_file(os.path.join(local_files_dir, basepath),
                            os.path.join(files_dir, basepath),
@@ -1772,7 +1790,8 @@ def _update_recipe_patch(recipename, workspace, srctree, rd, appendlayerdir, wil
         else:
             # Update existing files
             files_dir = _determine_files_dir(rd)
-            for basepath, path in upd_f.items():
+            for basepath, param in upd_f.items():
+                path = param['path']
                 logger.info('Updating file %s' % basepath)
                 if os.path.isabs(basepath):
                     # Original file (probably with subdir pointing inside source tree)
@@ -1806,7 +1825,7 @@ def _update_recipe_patch(recipename, workspace, srctree, rd, appendlayerdir, wil
                            dry_run_outdir=dry_run_outdir, base_outdir=recipedir)
                 updatefiles = True
             # Add any new files
-            for basepath, path in new_f.items():
+            for basepath, param in new_f.items():
                 logger.info('Adding new file %s%s' % (basepath, dry_run_suffix))
                 _move_file(os.path.join(local_files_dir, basepath),
                            os.path.join(files_dir, basepath),

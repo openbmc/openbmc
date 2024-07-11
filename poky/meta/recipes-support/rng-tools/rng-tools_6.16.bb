@@ -67,3 +67,7 @@ do_install:append() {
             ${D}${systemd_system_unitdir}/rng-tools.service
     fi
 }
+
+# libargp detection fails
+# http://errors.yoctoproject.org/Errors/Details/766951/
+CFLAGS += "-Wno-error=incompatible-pointer-types"

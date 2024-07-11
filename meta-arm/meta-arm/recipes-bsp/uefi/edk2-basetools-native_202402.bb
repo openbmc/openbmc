@@ -12,6 +12,8 @@ LIC_FILES_CHKSUM = "file://License.txt;md5=2b415520383f7964e96700ae12b4570a"
 
 SRCREV = "edc6681206c1a8791981a2f911d2fb8b3d2f5768"
 
+UPSTREAM_CHECK_GITTAGREGEX = "^edk2-stable(?P<pver>\d+)$"
+
 S = "${WORKDIR}/git"
 
 inherit native

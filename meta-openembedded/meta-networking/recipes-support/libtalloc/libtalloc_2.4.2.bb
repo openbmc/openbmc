@@ -53,7 +53,7 @@ PACKAGES += "pytalloc pytalloc-dev"
 
 RPROVIDES:${PN}-dbg += "pytalloc-dbg"
 
-FILES:pytalloc = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/* \
+FILES:pytalloc = "${PYTHON_SITEPACKAGES_DIR}/* \
                   ${libdir}/libpytalloc-util.so.2 \
                   ${libdir}/libpytalloc-util.so.2.1.1 \
                  "

@@ -5,7 +5,7 @@ distro: poky
 
 defaults:
   repos:
-    branch: master
+    branch: scarthgap
 
 repos:
   meta-arm:
@@ -16,14 +16,14 @@ repos:
 
   poky:
     url: https://git.yoctoproject.org/git/poky
-    # commit: 2e9c2a2381105f1306bcbcb54816cbc5d8110eff
+    commit: c5df9c829a549ca002c36afd6bdf23639831502e
     layers:
       meta:
       meta-poky:
 
   meta-openembedded:
     url: https://git.openembedded.org/meta-openembedded
-    # commit: 1750c66ae8e4268c472c0b2b94748a59d6ef866d
+    commit: 6de0ab744341ad61b0661aa28d78dc6767ce0786
     layers:
       meta-oe:
       meta-python:
@@ -31,7 +31,7 @@ repos:
 
   meta-secure-core:
     url: https://github.com/wind-river/meta-secure-core.git
-    # commit: e29165a1031dcf601edbed1733cedd64826672a5
+    commit: 13cb4867fb1245581c80da3b94b72c4b4f15d67e
     layers:
       meta-secure-core-common:
       meta-signing-key:

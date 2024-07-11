@@ -1,39 +1,47 @@
-From 56feaa90d070a5011f380d3ae47c01643b9fafe0 Mon Sep 17 00:00:00 2001
+From 86aa3f2333a9b8e6f1c631e6d5cb7296b6e8380b Mon Sep 17 00:00:00 2001
 From: Rui Costa <rui.ms.costa@ctw.bmwgroup.com>
 Date: Fri, 22 Mar 2024 13:27:38 +0000
-Subject: [PATCH 2/2] Add package configuration files
+Subject: [PATCH] Add package configuration files
 
 Upstream-Status: Pending
+
 ---
- lang/c++/CMakeLists.txt            | 35 +++++++++++++++++++++++++++---
- lang/c++/cmake/AvroCppConfig.cmake |  5 +++++
- 2 files changed, 37 insertions(+), 3 deletions(-)
+ lang/c++/CMakeLists.txt            | 45 ++++++++++++++++++++++++------
+ lang/c++/cmake/AvroCppConfig.cmake |  5 ++++
+ 2 files changed, 42 insertions(+), 8 deletions(-)
  create mode 100644 lang/c++/cmake/AvroCppConfig.cmake
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d94ba42d3..2e5a394cb 100644
+index d94ba42d3..4748b111d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -140,12 +140,16 @@ set (CPACK_PACKAGE_FILE_NAME "avrocpp-${AVRO_VERSION_MAJOR}")
+@@ -140,14 +140,18 @@ set (CPACK_PACKAGE_FILE_NAME "avrocpp-${AVRO_VERSION_MAJOR}")
 
  include (CPack)
 
 -install (TARGETS avrocpp avrocpp_s
+-    LIBRARY DESTINATION lib
+-    ARCHIVE DESTINATION lib
+-    RUNTIME DESTINATION lib)
+-
+-install (TARGETS avrogencpp RUNTIME DESTINATION bin)
+-
+-install (DIRECTORY api/ DESTINATION include/avro
 +install (TARGETS avrocpp
 +    EXPORT AvroCppTargets
-     LIBRARY DESTINATION lib
-     ARCHIVE DESTINATION lib
--    RUNTIME DESTINATION lib)
-+    RUNTIME DESTINATION lib
++    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
 +    INCLUDES DESTINATION include)
-
--install (TARGETS avrogencpp RUNTIME DESTINATION bin)
++
 +install (TARGETS avrogencpp
 +    EXPORT AvroCppTargets
-+    RUNTIME DESTINATION bin)
-
- install (DIRECTORY api/ DESTINATION include/avro
++    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
++
++install (DIRECTORY api/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/avro
      FILES_MATCHING PATTERN *.hh)
+
+ if (NOT CMAKE_BUILD_TYPE)
 @@ -155,3 +159,28 @@ if (NOT CMAKE_BUILD_TYPE)
        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
        FORCE)
@@ -52,7 +60,7 @@ index d94ba42d3..2e5a394cb 100644
 +    COPYONLY
 +)
 +
-+set(ConfigPackageLocation lib/cmake/avrocpp)
++set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/avrocpp)
 +install(EXPORT AvroCppTargets
 +    FILE AvroCppTargets.cmake
 +    NAMESPACE AvroCpp::
@@ -74,6 +82,3 @@ index 000000000..deb8aaa31
 +    COMPONENTS filesystem iostreams program_options regex system)
 +
 +include("${CMAKE_CURRENT_LIST_DIR}/AvroCppTargets.cmake")
---
-2.44.0
-

@@ -15,7 +15,8 @@ do_install[noexec] = "1"
 FIRMWARE_BINARIES ?= ""
 
 do_deploy() {
-    firmware_loc="${TMPDIR}_${MACHINE}/deploy/images/${MACHINE}"
+    firmware_loc=$(echo "${TMPDIR}" | sed "s/${TCLIBC}/musl/")
+    firmware_loc="${firmware_loc}_${MACHINE}/deploy/images/${MACHINE}"
     for firmware in ${FIRMWARE_BINARIES}; do
         echo "cp -av ${firmware_loc}/${firmware} ${DEPLOYDIR}/"
         cp -av "${firmware_loc}/${firmware}" ${DEPLOYDIR}/

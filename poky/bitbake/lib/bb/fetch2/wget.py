@@ -108,7 +108,8 @@ class Wget(FetchMethod):
 
         fetchcmd = self.basecmd
 
-        localpath = os.path.join(d.getVar("DL_DIR"), ud.localfile) + ".tmp"
+        dldir = os.path.realpath(d.getVar("DL_DIR"))
+        localpath = os.path.join(dldir, ud.localfile) + ".tmp"
         bb.utils.mkdirhier(os.path.dirname(localpath))
         fetchcmd += " -O %s" % shlex.quote(localpath)
 
@@ -128,11 +129,20 @@ class Wget(FetchMethod):
         uri = ud.url.split(";")[0]
         if os.path.exists(ud.localpath):
             # file exists, but we didnt complete it.. trying again..
-            fetchcmd += d.expand(" -c -P ${DL_DIR} '%s'" % uri)
+            fetchcmd += " -c -P " + dldir + " '" + uri + "'"
         else:
-            fetchcmd += d.expand(" -P ${DL_DIR} '%s'" % uri)
+            fetchcmd += " -P " + dldir + " '" + uri + "'"
 
         self._runwget(ud, d, fetchcmd, False)
+
+        # Sanity check since wget can pretend it succeed when it didn't
+        # Also, this used to happen if sourceforge sent us to the mirror page
+        if not os.path.exists(localpath):
+            raise FetchError("The fetch command returned success for url %s but %s doesn't exist?!" % (uri, localpath), uri)
+
+        if os.path.getsize(localpath) == 0:
+            os.remove(localpath)
+            raise FetchError("The fetch of %s resulted in a zero size file?! Deleting and failing since this isn't right." % (uri), uri)
 
         # Try and verify any checksum now, meaning if it isn't correct, we don't remove the
         # original file, which might be a race (imagine two recipes referencing the same
@@ -142,15 +152,6 @@ class Wget(FetchMethod):
         # Remove the ".tmp" and move the file into position atomically
         # Our lock prevents multiple writers but mirroring code may grab incomplete files
         os.rename(localpath, localpath[:-4])
-
-        # Sanity check since wget can pretend it succeed when it didn't
-        # Also, this used to happen if sourceforge sent us to the mirror page
-        if not os.path.exists(ud.localpath):
-            raise FetchError("The fetch command returned success for url %s but %s doesn't exist?!" % (uri, ud.localpath), uri)
-
-        if os.path.getsize(ud.localpath) == 0:
-            os.remove(ud.localpath)
-            raise FetchError("The fetch of %s resulted in a zero size file?! Deleting and failing since this isn't right." % (uri), uri)
 
         return True
 

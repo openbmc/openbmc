@@ -45,6 +45,7 @@ BUILD_OPTIMIZATION:append = " -O2"
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'selinux smack', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd libmount', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'soup3', '', d)} \
     glib \
     gpgme \
     curl \
@@ -192,6 +193,7 @@ RDEPENDS:${PN}-ptest += " \
     diffutils \
     findutils \
     grep \
+    locale-base-en-us \
     python3-core \
     python3-multiprocessing \
     strace \

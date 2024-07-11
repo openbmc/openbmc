@@ -7,4 +7,8 @@ if ! lsmod | grep -q sctp && ! modprobe sctp 2>/dev/null; then
 fi
 
 cmake  -E cmake_echo_color --cyan "Running tests..."
-ctest --force-new-ctest-process
+if ctest --force-new-ctest-process ; then
+        echo "PASS: freediameter"
+else
+        echo "FAIL: freediameter"
+fi

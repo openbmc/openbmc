@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 23 Mar 2017 13:44:41 +0200
 Subject: [PATCH] Resolve string formatting issues.
 
-Upstream-Status: Inappropriate [upstream seems dead]
+Upstream-Status: Inactive-Upstream [no activity since 2018; cvs server went read-only]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  exp_clib.c | 4 ++--

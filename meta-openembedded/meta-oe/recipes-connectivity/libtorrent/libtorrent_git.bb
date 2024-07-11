@@ -13,7 +13,11 @@ SRCREV = "e60f222241319aaae482789517ad00ae9344bd13"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
+CVE_STATUS[CVE-2009-1760] = "backported-patch: patched in our product"
+
 S = "${WORKDIR}/git"
+
+CVE_PRODUCT = ""
 
 PACKAGECONFIG ??= "instrumentation aligned"
 

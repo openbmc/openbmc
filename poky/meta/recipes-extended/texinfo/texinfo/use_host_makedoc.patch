@@ -1,0 +1,26 @@
+From 81ccd162b869c20e450073fa834b5cabbea8e3d4 Mon Sep 17 00:00:00 2001
+From: Saul Wold <sgw@linux.intel.com>
+Date: Mon, 29 Jul 2013 15:02:34 -0700
+Subject: [PATCH] texinfo: Update to 5.1
+
+Upstream-Status: Inappropriate [cross build specific]
+
+Signed-off-by: Saul Wold <sgw@linux.intel.com>
+
+---
+ info/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/info/Makefile.am b/info/Makefile.am
+index 35596b1..cae1421 100644
+--- a/info/Makefile.am
++++ b/info/Makefile.am
+@@ -69,7 +69,7 @@ cmd_sources = $(srcdir)/session.c $(srcdir)/echo-area.c $(srcdir)/infodoc.c \
+ # more than once.
+ funs.h: makedoc$(EXEEXT) $(cmd_sources)
+ 	rm -f $(generated_sources)
+-	$(top_builddir)/$(native_tools)/info/makedoc $(cmd_sources)
++	makedoc $(cmd_sources)
+ 
+ # The following hack is necessary to hint make before the automatic
+ # dependencies are built.

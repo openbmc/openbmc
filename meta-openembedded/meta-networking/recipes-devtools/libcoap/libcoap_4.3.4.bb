@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1978dbc41673ab1c20e64b287c8317bc"
 
 SRC_URI = "git://github.com/obgm/libcoap.git;branch=main;protocol=https \
            file://run-ptest \
+           file://CVE-2024-0962.patch \
            "
 SRCREV = "5fd2f89ef068214130e5d60b7087ef48711fa615"
 

@@ -37,4 +37,4 @@ BBCLASSEXTEND = "native nativesdk"
 PACKAGES =+ "${PN}-python ftdi-eeprom"
 
 FILES:ftdi-eeprom = "${bindir}/ftdi_eeprom"
-FILES:${PN}-python = "${libdir}/${PYTHON_DIR}/site-packages/"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/"

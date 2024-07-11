@@ -1,0 +1,31 @@
+From a8aeaafd6c26d6bc3066164d12aabc5cb754fe1c Mon Sep 17 00:00:00 2001
+From: Ali Can Ozaslan <ali.oezaslan@arm.com>
+Date: Wed, 15 May 2024 12:12:15 +0000
+Subject: [PATCH] CC312: alignment of cc312 differences between fvp and mps3
+ corstone1000 platforms
+
+Configures CC312 mps3 model same as predefined cc312 FVP 
+configuration while keeping debug ports closed.
+
+Signed-off-by: Ali Can Ozaslan <ali.oezaslan@arm.com>
+
+Upstream-Status: Inappropriate [Requires an aligment cc3xx with mps3 hw and fvp sw models]
+
+---
+ lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c b/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c
+index 31e4332be..4d7e6fa61 100644
+--- a/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c
++++ b/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c
+@@ -207,6 +207,9 @@ CClibRetCode_t CC_LibInit(CCRndContext_t *rndContext_ptr, CCRndWorkBuff_t  *rndW
+         goto InitErr2;
+     }
+ 
++    /* configuring secure debug to align cc312 with corstone 1000 */
++    CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(HOST_RGF,HOST_DCU_EN0), 0xffffe7fc);
++
+     /* turn off the DFA since Cerberus doen't support it */
+     reg = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_AO_LOCK_BITS));
+     CC_REG_FLD_SET(0, HOST_AO_LOCK_BITS, HOST_FORCE_DFA_ENABLE, reg, 0x0);

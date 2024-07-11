@@ -7,6 +7,7 @@
 # ptests which take less than ~30s each
 
 PTESTS_FAST_META_NETWORKING = "\
+    freediameter \
     geoip \
     libcoap \
     libldb \
@@ -27,7 +28,6 @@ PTESTS_SLOW_META_NETWORKING = "\
 "
 
 PTESTS_PROBLEMS_META_NETWORKING = "\
-    freediameter \
     geoip-perl \
     libtevent \
     lksctp-tools \

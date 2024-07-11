@@ -31,7 +31,7 @@ ERROR: scons install execution failed.
   and the installed paths (including the paths inside libserf*.pc)
   look correct
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [removes block of code rather than fixing the problem in that block]
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 

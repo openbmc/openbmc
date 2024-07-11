@@ -112,18 +112,22 @@ IMAGE_CMD:btrfs () {
 }
 
 oe_mksquashfs () {
-    local comp=$1
-    local suffix=$2
+    local comp=$1; shift
+    local extra_imagecmd="$@"
+
+    if [ "$comp" = "zstd" ]; then
+        suffix="zst"
+    fi
 
     # Use the bitbake reproducible timestamp instead of the hardcoded squashfs one
     export SOURCE_DATE_EPOCH=$(stat -c '%Y' ${IMAGE_ROOTFS})
-    mksquashfs ${IMAGE_ROOTFS} ${IMGDEPLOYDIR}/${IMAGE_NAME}.squashfs${comp:+-}${suffix:-$comp} ${EXTRA_IMAGECMD} -noappend ${comp:+-comp }$comp
+    mksquashfs ${IMAGE_ROOTFS} ${IMGDEPLOYDIR}/${IMAGE_NAME}.squashfs${comp:+-}${suffix:-$comp} -noappend ${comp:+-comp }$comp $extra_imagecmd
 }
-IMAGE_CMD:squashfs = "oe_mksquashfs"
-IMAGE_CMD:squashfs-xz = "oe_mksquashfs xz"
-IMAGE_CMD:squashfs-lzo = "oe_mksquashfs lzo"
-IMAGE_CMD:squashfs-lz4 = "oe_mksquashfs lz4"
-IMAGE_CMD:squashfs-zst = "oe_mksquashfs zstd zst"
+IMAGE_CMD:squashfs = "oe_mksquashfs '' ${EXTRA_IMAGECMD}"
+IMAGE_CMD:squashfs-xz = "oe_mksquashfs xz ${EXTRA_IMAGECMD}"
+IMAGE_CMD:squashfs-lzo = "oe_mksquashfs lzo ${EXTRA_IMAGECMD}"
+IMAGE_CMD:squashfs-lz4 = "oe_mksquashfs lz4 ${EXTRA_IMAGECMD}"
+IMAGE_CMD:squashfs-zst = "oe_mksquashfs zstd ${EXTRA_IMAGECMD}"
 
 IMAGE_CMD:erofs = "mkfs.erofs ${EXTRA_IMAGECMD} ${IMGDEPLOYDIR}/${IMAGE_NAME}.erofs ${IMAGE_ROOTFS}"
 IMAGE_CMD:erofs-lz4 = "mkfs.erofs -zlz4 ${EXTRA_IMAGECMD} ${IMGDEPLOYDIR}/${IMAGE_NAME}.erofs-lz4 ${IMAGE_ROOTFS}"

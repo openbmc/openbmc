@@ -18,7 +18,7 @@ SRC_URI = "git://github.com/storaged-project/libblockdev;branch=3.1.x-devel;prot
 SRCREV = "68aaff5556afe26be749c29a2b7cbd714dce3050"
 S = "${WORKDIR}/git"
 
-FILES:${PN} += "${libdir}/python3.*/site-packages"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 
 PACKAGECONFIG ??= "python3 lvm lvm-dbus dm parted fs escrow btrfs crypto mdraid mpath nvdimm tools"
 PACKAGECONFIG[python3] = "--with-python3, --without-python3,,python3"

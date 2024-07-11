@@ -16,7 +16,6 @@ SRC_URI_KMETA = "file://arm-platforms-kmeta;type=kmeta;name=arm-platforms-kmeta;
 SRC_URI:append:fvp-base = " ${SRC_URI_KMETA}"
 SRC_URI:append:juno = " ${SRC_URI_KMETA}"
 SRC_URI:append:n1sdp = " ${SRC_URI_KMETA}"
-SRCREV:arm-platforms-kmeta = "6147e82375aa9df8f2a162d42ea6406c79c854c5"
 
 #
 # Corstone1000 KMACHINE
@@ -38,6 +37,13 @@ SRC_URI:append:corstone1000 = " ${@bb.utils.contains('MACHINE_FEATURES', \
                                                             '', \
                                                              d)}"
 
+SRC_URI:append:corstone1000 = " \
+    file://extsys.cfg \
+    file://0001-remoteproc-Add-Arm-remoteproc-driver.patch \
+    file://0002-arm64-dts-Add-corstone1000-external-system-device-no.patch \
+    file://0003-dt-bindings-remoteproc-Add-Arm-remoteproc.patch \
+    "
+
 # Default kernel features not needed for corstone1000
 # otherwise the extra kernel modules will increase the rootfs size
 # corstone1000 has limited flash memory constraints
@@ -49,8 +55,14 @@ KERNEL_FEATURES:corstone1000 = ""
 #
 COMPATIBLE_MACHINE:fvp-base = "fvp-base"
 KMACHINE:fvp-base = "fvp"
-FILESEXTRAPATHS:prepend:fvp-base := "${ARMBSPFILESPATHS}"
-SRC_URI:append:fvp-base = " file://0001-arm64-dts-fvp-Enable-virtio-rng-support.patch"
+FILESEXTRAPATHS:prepend:fvp-base := "${ARMBSPFILESPATHS}:${ARMFILESPATHS}"
+SRC_URI:append:fvp-base = " \
+    file://0001-arm64-dts-fvp-Enable-virtio-rng-support.patch \
+    file://tee.cfg \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'ts-smm-gateway', \
+                         'file://no-strict-devmem.cfg', '' , d)} \
+"
+
 
 #
 # Juno KMACHINE
@@ -101,3 +113,10 @@ KCONFIG_MODE:sgi575 = "--alldefconfig"
 COMPATIBLE_MACHINE:tc = "(tc0|tc1)"
 KBUILD_DEFCONFIG:tc = "defconfig"
 KCONFIG_MODE:tc = "--alldefconfig"
+
+#
+# sbsa-ref KMACHINE
+#
+COMPATIBLE_MACHINE:sbsa-ref = "sbsa-ref"
+KBUILD_DEFCONFIG:sbsa-ref = "defconfig"
+KCONFIG_MODE:sbsa-ref = "--alldefconfig"

@@ -449,7 +449,7 @@ class PackageManager(object, metaclass=ABCMeta):
             return res
         return _append(uris, base_paths)
 
-def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencies):
+def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencies, include_self=False):
     """
     Go through our do_package_write_X dependencies and hardlink the packages we depend
     upon into the repo directory. This prevents us seeing other packages that may
@@ -486,14 +486,17 @@ def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencie
         bb.fatal("Couldn't find ourself in BB_TASKDEPDATA?")
     pkgdeps = set()
     start = [start]
-    seen = set(start)
+    if include_self:
+        seen = set()
+    else:
+        seen = set(start)
     # Support direct dependencies (do_rootfs -> do_package_write_X)
     # or indirect dependencies within PN (do_populate_sdk_ext -> do_rootfs -> do_package_write_X)
     while start:
         next = []
         for dep2 in start:
             for dep in taskdepdata[dep2][3]:
-                if taskdepdata[dep][0] != pn:
+                if include_self or taskdepdata[dep][0] != pn:
                     if "do_" + taskname in dep:
                         pkgdeps.add(dep)
                 elif dep not in seen:

@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=eed2e5088e1ac619c9a1c747da291d75"
 
 SRC_URI = " \
     https://curl.se/download/${BP}.tar.xz \
+    file://721941aadf4adf4f6aeb3f4c0ab489bb89610c36.patch \
     file://run-ptest \
     file://disable-tests \
     file://no-test-timeout.patch \
@@ -119,6 +120,7 @@ do_install_ptest() {
 
 RDEPENDS:${PN}-ptest += " \
 	bash \
+	locale-base-en-us \
 	perl-module-b \
 	perl-module-base \
 	perl-module-cwd \
@@ -134,7 +136,6 @@ RDEPENDS:${PN}-ptest += " \
 	perl-module-storable \
 	perl-module-time-hires \
 "
-RDEPENDS:${PN}-ptest:append:libc-glibc = " locale-base-en-us"
 
 PACKAGES =+ "lib${BPN}"
 

@@ -18,7 +18,7 @@ inherit autotools ptest
 LDEMULATION:mipsarchn32 = "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', 'elf32btsmipn32', 'elf32ltsmipn32', d)}"
 export LDEMULATION
 
-RDEPENDS:${PN}-ptest = "coreutils"
+RDEPENDS:${PN}-ptest += "coreutils ${PN}"
 
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}/tests

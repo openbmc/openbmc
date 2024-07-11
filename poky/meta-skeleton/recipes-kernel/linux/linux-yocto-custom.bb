@@ -7,7 +7,7 @@ SUMMARY = "An example kernel recipe that uses the linux-yocto and oe-core"
 #   To use linux-yocto-custom in your layer, copy this recipe (optionally
 #   rename it as well) and modify it appropriately for your machine. i.e.:
 #
-#     COMPATIBLE_MACHINE_yourmachine = "yourmachine"
+#     COMPATIBLE_MACHINE:yourmachine = "yourmachine"
 #
 #   You must also provide a Linux kernel configuration. The most direct
 #   method is to copy your .config to files/defconfig in your layer,

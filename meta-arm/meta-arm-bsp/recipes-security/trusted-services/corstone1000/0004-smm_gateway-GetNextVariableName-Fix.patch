@@ -1,0 +1,45 @@
+From 660658e9f974126fae15d9d8839415a76e8d6663 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 10 Apr 2024 09:16:47 +0200
+Subject: [PATCH 4/9] smm_gateway: GetNextVariableName Fix
+
+GetNextVariableName() should return EFI_BUFFER_TOO_SMALL
+when requested NameSize is smaller than the actual. It
+currently returns EFI_BUFFER_OUT_OF_RESOURCES due to setting
+max_name_len incorrectly. This change fixes the error by
+using clamping the maximum size to the NameSize requested by
+the client.
+
+Upstream-Status: Pending
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Gyorgy Szing <Gyorgy.Szing@arm.com>
+---
+ .../uefi/smm_variable/provider/smm_variable_provider.c      | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/provider/smm_variable_provider.c b/components/service/uefi/smm_variable/provider/smm_variable_provider.c
+index 1875397..ca3f7e5 100644
+--- a/components/service/uefi/smm_variable/provider/smm_variable_provider.c
++++ b/components/service/uefi/smm_variable/provider/smm_variable_provider.c
+@@ -176,16 +176,14 @@ static rpc_status_t get_next_variable_name_handler(void *context, struct rpc_req
+ 
+ 		if (resp_buf->size >= param_len) {
+ 			struct rpc_buffer *req_buf = &req->request;
+-			size_t max_name_len =
+-				resp_buf->size -
+-				SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME_NAME_OFFSET;
+ 
+ 			memmove(resp_buf->data, req_buf->data, param_len);
+ 
+ 			efi_status = uefi_variable_store_get_next_variable_name(
+ 				&this_instance->variable_store,
+ 				(SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *)resp_buf->data,
+-				max_name_len, &resp_buf->data_length);
++				((SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME*)resp_buf->data)->NameSize,
++				&resp_buf->data_length);
+ 		} else {
+ 			/* Reponse buffer not big enough */
+ 			efi_status = EFI_BAD_BUFFER_SIZE;
+-- 
+2.25.1
+

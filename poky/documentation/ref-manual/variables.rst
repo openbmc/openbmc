@@ -9771,6 +9771,12 @@ system and gives an overview of their function and contents.
       ``meta-poky/conf/templates/default/local.conf.sample`` in the
       :term:`Source Directory`.
 
+   :term:`USERADD_DEPENDS`
+      Specifies a list of recipes that create users / groups (via
+      :term:`USERADD_PARAM` / :term:`GROUPADD_PARAM`) which a recipe
+      depends upon. This ensures that those users / groups are available
+      when building a recipe.
+
    :term:`USERADD_ERROR_DYNAMIC`
       If set to ``error``, forces the OpenEmbedded build system to produce
       an error if the user identification (``uid``) and group

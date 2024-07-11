@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022-2023, Arm Limited.
+ # Copyright (c) 2022-2024, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -18,6 +18,25 @@ including without limitation, Your software or Your Hardware designed or
 intended for safety-critical applications. Should Your Software or Your Hardware
 prove defective, you assume the entire cost of all necessary servicing, repair
 or correction.
+
+***********************
+Release notes - 2024.06
+***********************
+
+Known Issues or Limitations
+---------------------------
+
+ - Use Ethernet over VirtIO due to lan91c111 Ethernet driver support dropped from U-Boot.
+ - Due to the performance uplimit of MPS3 FPGA and FVP, some Linux distros like Fedora Rawhide can not boot on Corstone-1000 (i.e. user may experience timeouts or boot hang).
+ - Corstone-1000 SoC on FVP doesn't have a secure debug peripheral. It does on the MPS3.
+ - See previous release notes for the known limitations regarding ACS tests.
+
+Platform Support
+-----------------
+ - This software release is tested on Corstone-1000 FPGA version AN550_v2
+   https://developer.arm.com/downloads/-/download-fpga-images
+ - This software release is tested on Corstone-1000 Fast Model platform (FVP) version 11.23_25
+   https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
 
 ***********************
 Release notes - 2023.11
@@ -213,7 +232,7 @@ Support
 -------
 For technical support email: support-subsystem-iot@arm.com
 
-For all security issues, contact Arm by email at arm-security@arm.com.
+For all security issues, contact Arm by email at psirt@arm.com.
 
 --------------
 

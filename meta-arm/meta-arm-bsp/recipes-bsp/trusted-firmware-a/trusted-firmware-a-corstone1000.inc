@@ -7,6 +7,8 @@ SRC_URI:append = " \
 	file://0001-Fix-FF-A-version-in-SPMC-manifest.patch \
 	file://0002-fix-corstone1000-pass-spsr-value-explicitly.patch \
 	file://0003-fix-spmd-remove-EL3-interrupt-registration.patch \
+	file://0004-fix-corstone1000-remove-unused-NS_SHARED_RAM-region.patch \
+	file://0005-fix-corstone1000-clean-the-cache-and-disable-interru.patch \
        "
 
 TFA_DEBUG = "1"

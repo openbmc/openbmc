@@ -1,0 +1,32 @@
+From 2368d07660a93a2c41d63f3ab6054ca4daeef820 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 17 Nov 2020 18:31:40 +0000
+Subject: [PATCH] template/Makefile.in: do not write host cross-cc items into
+ target config
+
+This helps reproducibility.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ template/Makefile.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/template/Makefile.in b/template/Makefile.in
+index 10dc826..940ee07 100644
+--- a/template/Makefile.in
++++ b/template/Makefile.in
+@@ -657,11 +657,11 @@ mjit_config.h:
+ 	echo '#endif'; \
+ 	quote MJIT_MIN_HEADER_NAME "$(MJIT_MIN_HEADER_NAME)"; \
+ 	sep=,; \
+-	quote "MJIT_CC_COMMON  " $(MJIT_CC); \
++	quote "MJIT_CC_COMMON  " ; \
+ 	quote "MJIT_CFLAGS      MJIT_ARCHFLAG" $(MJIT_CFLAGS); \
+ 	quote "MJIT_OPTFLAGS   " $(MJIT_OPTFLAGS); \
+ 	quote "MJIT_DEBUGFLAGS " $(MJIT_DEBUGFLAGS); \
+-	quote "MJIT_LDSHARED   " $(MJIT_LDSHARED); \
++	quote "MJIT_LDSHARED   " ; \
+ 	quote "MJIT_DLDFLAGS    MJIT_ARCHFLAG" $(MJIT_DLDFLAGS); \
+ 	quote "MJIT_LIBS       " $(LIBRUBYARG_SHARED); \
+ 	quote 'PRELOADENV       "@PRELOADENV@"'; \

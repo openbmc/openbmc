@@ -1,0 +1,28 @@
+From 78db43f80676f8038b35edd6674d22fb5ff85c12 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Mon, 27 May 2024 17:11:31 +0200
+Subject: [PATCH] corstone1000: Remove reset after capsule update
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/29065]
+---
+ .../target/arm/corstone1000/services/src/tfm_platform_system.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c b/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c
+index 41305ed966..1e837ce3b5 100644
+--- a/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c
++++ b/platform/ext/target/arm/corstone1000/services/src/tfm_platform_system.c
+@@ -28,9 +28,6 @@ enum tfm_platform_err_t tfm_platform_hal_ioctl(tfm_platform_ioctl_req_t request,
+ 
+         case IOCTL_CORSTONE1000_FWU_FLASH_IMAGES:
+             result = corstone1000_fwu_flash_image();
+-            if (!result) {
+-                NVIC_SystemReset();
+-            }
+             break;
+ 
+         case IOCTL_CORSTONE1000_FWU_HOST_ACK:
+-- 
+2.25.1
+

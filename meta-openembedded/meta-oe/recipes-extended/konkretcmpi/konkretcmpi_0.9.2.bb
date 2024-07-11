@@ -17,7 +17,7 @@ SRC_URI = "git://github.com/rnovacek/konkretcmpi.git;branch=master;protocol=http
 SRCREV = "ad28225e6eceff88417a60c1ba8896c8e40f21a7"
 S = "${WORKDIR}/git"
 
-inherit cmake
+inherit cmake python3-dir
 
 EXTRA_OECMAKE = "-DWITH_PYTHON=ON \
                  ${@oe.utils.conditional("libdir", "/usr/lib64", "-DLIB_SUFFIX=64", "", d)} \
@@ -34,6 +34,6 @@ PACKAGES =+ "${PN}-python"
 
 RPROVIDES:${PN}-dbg += "${PN}-python-dbg"
 
-FILES:${PN}-python = "${libdir}/python*/site-packages/konkretmof.py* ${libdir}/python*/site-packages/_konkretmof.so"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/konkretmof.py* ${PYTHON_SITEPACKAGES_DIR}/_konkretmof.so"
 
 BBCLASSEXTEND = "native"

@@ -3,6 +3,7 @@ DESCRIPTION = "Arm SystemReady Linux distro CD/DVD images and installation \
                target disk image"
 
 IMAGE_CLASSES:remove = "license_image testimage"
+BUILDHISTORY_FEATURES:remove = "image"
 
 INHIBIT_DEFAULT_DEPS = "1"
 COMPATIBLE_HOST = "aarch64-*"

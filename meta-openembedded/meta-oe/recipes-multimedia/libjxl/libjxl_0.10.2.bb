@@ -37,7 +37,3 @@ PACKAGECONFIG[gimp] = "-DJPEGXL_ENABLE_PLUGIN_GIMP210=ON,-DJPEGXL_ENABLE_PLUGIN_
 PACKAGECONFIG[mime] = "-DJPEGXL_ENABLE_PLUGIN_MIME=ON,-DJPEGXL_ENABLE_PLUGIN_MIME=OFF"
 
 FILES:${PN} += "${libdir}/gdk-pixbuf-2.0 ${datadir}"
-
-CXXFLAGS:append:arm = " -mfp16-format=ieee"
-# Option not supported with clang and its default format for __fp16 anyway with clang
-CXXFLAGS:remove:toolchain-clang = "-mfp16-format=ieee"

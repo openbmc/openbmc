@@ -3,7 +3,7 @@ LICENSE = "BSD-3-Clause"
 
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=bb63326febfb5fb909226c8e7ebcef5c"
 
-SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git;branch=master"
+SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git;branch=master;protocol=https"
 SRCREV = "d3b1a15d18542b2086e72bfdc3fc43f454772a3b"
 
 # boot-wrapper doesn't make releases

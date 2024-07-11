@@ -15,8 +15,8 @@ local_conf_header:
   initramfsetup: |
     # Telling the build system which image is responsible of the generation of the initramfs rootfs
     INITRAMFS_IMAGE_BUNDLE:firmware = "1"
-    INITRAMFS_IMAGE:firmware ?= "core-image-minimal"
-    IMAGE_FSTYPES:firmware:pn-core-image-minimal = "${INITRAMFS_FSTYPES}"
+    INITRAMFS_IMAGE:firmware ?= "corstone1000-recovery-image"
+    IMAGE_FSTYPES:firmware:pn-corstone1000-recovery-image = "${INITRAMFS_FSTYPES}"
     IMAGE_NAME_SUFFIX:firmware = ""
 
     # enable mdev/busybox for init
@@ -38,3 +38,12 @@ local_conf_header:
 
     # TS PSA API tests commands for crypto, its, ps and iat
     CORE_IMAGE_EXTRA_INSTALL += "packagegroup-ts-tests-psa"
+    CORE_IMAGE_EXTRA_INSTALL:firmware += "packagegroup-ts-tests-psa"
+
+    # external system firmware
+    CORE_IMAGE_EXTRA_INSTALL:firmware += "external-system-elf"
+
+  capsule: |
+    CAPSULE_EXTENSION = "uefi.capsule"
+    CAPSULE_FW_VERSION = "6"
+    CAPSULE_NAME = "${MACHINE}-v${CAPSULE_FW_VERSION}"

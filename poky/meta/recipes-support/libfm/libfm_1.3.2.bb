@@ -53,3 +53,7 @@ do_install:append () {
     rm -f ${D}${libdir}/libfm-extra.a
     rm -f ${D}${libdir}/libfm-extra.la
 }
+
+# http://errors.yoctoproject.org/Errors/Details/766924/
+# libfm-1.3.2/src/actions/action.c:2050:25: error: assignment to 'gchar **' {aka 'char **'} from incompatible pointer type 'const gchar * const*' {aka 'const char * const*'} [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

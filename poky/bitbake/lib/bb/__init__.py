@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-__version__ = "2.9.0"
+__version__ = "2.8.0"
 
 import sys
 if sys.version_info < (3, 8, 0):
@@ -36,6 +36,7 @@ class BBHandledException(Exception):
 
 import os
 import logging
+from collections import namedtuple
 
 
 class NullHandler(logging.Handler):
@@ -227,3 +228,14 @@ def deprecate_import(current, modulename, fromlist, renames = None):
 
         setattr(sys.modules[current], newname, newobj)
 
+TaskData = namedtuple("TaskData", [
+    "pn",
+    "taskname",
+    "fn",
+    "deps",
+    "provides",
+    "taskhash",
+    "unihash",
+    "hashfn",
+    "taskhash_deps",
+])

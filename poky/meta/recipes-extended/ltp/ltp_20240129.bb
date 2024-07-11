@@ -29,6 +29,7 @@ SRCREV = "68737d20556d37364c95776044b1119c0912a36a"
 SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=https \
            file://0001-Remove-OOM-tests-from-runtest-mm.patch \
            file://0001-scenario_groups-default-remove-connectors.patch \
+           file://0001-sched_stress-Use-time_t-instead-of-long-for-type.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -98,6 +99,7 @@ RDEPENDS:${PN} = "\
     gdb \
     gzip \
     iproute2 \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'iputils-ping6', '', d)} \
     ldd \
     libaio \
     logrotate \

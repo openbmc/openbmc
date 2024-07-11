@@ -8,17 +8,16 @@ Log the SELinux context at startup.
 Upstream-Status: Inappropriate [other]
 
 Note: unlikely to be any interest in this upstream
-
 ---
  configure.in  |  5 +++++
  server/core.c | 26 ++++++++++++++++++++++++++
  2 files changed, 31 insertions(+)
 
 diff --git a/configure.in b/configure.in
-index ea6cec3..92b74b7 100644
+index 352711a..f58620f 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -491,6 +491,11 @@ getloadavg
+@@ -514,6 +514,11 @@ gettid
  dnl confirm that a void pointer is large enough to store a long integer
  APACHE_CHECK_VOID_PTR_LEN
  
@@ -27,11 +26,11 @@ index ea6cec3..92b74b7 100644
 +   APR_ADDTO(AP_LIBS, [-lselinux])
 +])
 +
- AC_CACHE_CHECK([for gettid()], ac_cv_gettid,
- [AC_TRY_RUN(#define _GNU_SOURCE
- #include <unistd.h>
+ if test $ac_cv_func_gettid = no; then
+   # On Linux before glibc 2.30, gettid() is only usable via syscall()
+   AC_CACHE_CHECK([for gettid() via syscall], ap_cv_gettid,
 diff --git a/server/core.c b/server/core.c
-index 4da7209..d3ca25b 100644
+index 30b317e..81f145f 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -65,6 +65,10 @@
@@ -45,7 +44,7 @@ index 4da7209..d3ca25b 100644
  /* LimitRequestBody handling */
  #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
  #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 1<<30) /* 1GB */
-@@ -5126,6 +5130,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -5139,6 +5143,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
  #endif
  
@@ -74,3 +73,5 @@ index 4da7209..d3ca25b 100644
      return OK;
  }
  
+--
+2.40.0

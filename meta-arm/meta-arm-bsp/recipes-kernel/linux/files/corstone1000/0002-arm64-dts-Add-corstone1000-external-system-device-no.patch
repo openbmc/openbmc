@@ -1,0 +1,42 @@
+From 0122f194e4a6fb50750dadd08f2354e78d4dd79c Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 19 Feb 2024 16:18:37 +0000
+Subject: [PATCH 2/6] arm64: dts: Add corstone1000 external system device node
+
+add device tree node for the external system core in Corstone-1000
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20240301164227.339208-1-abdellatif.elkhlifi@arm.com/]
+---
+ arch/arm64/boot/dts/arm/corstone1000.dtsi | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/arm/corstone1000.dtsi b/arch/arm64/boot/dts/arm/corstone1000.dtsi
+index 6ad7829f9e28..67df642363e9 100644
+--- a/arch/arm64/boot/dts/arm/corstone1000.dtsi
++++ b/arch/arm64/boot/dts/arm/corstone1000.dtsi
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0 OR MIT
+ /*
+- * Copyright (c) 2022, Arm Limited. All rights reserved.
++ * Copyright 2022, 2024, Arm Limited and/or its affiliates <open-source-office@arm.com>
+  * Copyright (c) 2022, Linaro Limited. All rights reserved.
+  *
+  */
+@@ -157,5 +157,13 @@ mhu_seh1: mailbox@1b830000 {
+ 			secure-status = "okay";     /* secure-world-only */
+ 			status = "disabled";
+ 		};
++
++		extsys0: remoteproc@1a010310 {
++			compatible = "arm,corstone1000-extsys";
++			reg = <0x1a010310 0x4>,
++				<0x1a010314 0X4>;
++			reg-names = "reset-control", "reset-status";
++			firmware-name = "es_flashfw.elf";
++		};
+ 	};
+ };
+-- 
+2.25.1
+

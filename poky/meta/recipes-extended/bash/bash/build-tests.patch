@@ -4,7 +4,7 @@ Date: Wed, 19 Dec 2012 17:18:31 +0100
 Subject: [PATCH] Add 'ptest' target to Makefile, to run tests without checking
  dependencies.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [ptest specific]
 Signed-off-by: Anders Roxell <anders.roxell@enea.com>
 
 Rebase to 5.0

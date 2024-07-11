@@ -7,7 +7,7 @@ require trusted-services.inc
 SRC_URI += "git://sourceware.org/git/newlib-cygwin.git;name=newlib;protocol=https;branch=master;destsuffix=git/newlib \
 "
 
-# tag "newlib-0.4.1"
+# tag "newlib-4.1.0"
 SRCREV_newlib = "415fdd4279b85eeec9d54775ce13c5c412451e08"
 LIC_FILES_CHKSUM += "file://../newlib/COPYING.NEWLIB;md5=b8dda70da54e0efb49b1074f349d7749"
 

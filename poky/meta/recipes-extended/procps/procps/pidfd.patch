@@ -1,0 +1,42 @@
+From c8f625e085b8249cc009e8b19c3a19100217eb35 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 25 Apr 2024 13:33:15 +0000
+Subject: [PATCH] Fix pidfd_open detection
+
+This check for pidfd_open uses AC_CHECK_FUNC which just runs the specified code, but 
+src/pgrep.c checks HAVE_PIDFD_OPEN which will only be defined by AC_CHECK_FUNCS.
+
+Also pidfd_open is defined in sys/pidfd.h so that needs including.
+
+Upstream-Status: Submitted [https://gitlab.com/procps-ng/procps/-/merge_requests/229]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+
+diff --git a/configure.ac b/configure.ac
+index fec27e3f..024731c7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -170,7 +170,7 @@ AC_TRY_COMPILE([#include <errno.h>],
+ 		AC_MSG_RESULT(yes),
+ 		AC_MSG_RESULT(no))
+ 
+-AC_CHECK_FUNC([pidfd_open], [enable_pidwait=yes], [
++AC_CHECK_FUNCS([pidfd_open], [enable_pidwait=yes], [
+   AC_MSG_CHECKING([for __NR_pidfd_open])
+   AC_COMPILE_IFELSE([AC_LANG_SOURCE([
+ #include <sys/syscall.h>
+diff --git a/src/pgrep.c b/src/pgrep.c
+index d8e57dff..c5211aec 100644
+--- a/src/pgrep.c
++++ b/src/pgrep.c
+@@ -44,7 +44,9 @@
+
+ #ifdef ENABLE_PIDWAIT
+ #include <sys/epoll.h>
+-#ifndef HAVE_PIDFD_OPEN
++#ifdef HAVE_PIDFD_OPEN
++#include <sys/pidfd.h>
++#else
+ #include <sys/syscall.h>
+ #endif /* !HAVE_PIDFD_OPEN */
+ #endif

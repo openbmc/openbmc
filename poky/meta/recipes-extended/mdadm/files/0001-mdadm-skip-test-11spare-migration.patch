@@ -1,0 +1,43 @@
+From 1b83afa7c3121f819e72ea74883f8b6d61d6548e Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 6 Sep 2019 10:59:02 +0800
+Subject: [PATCH] mdadm: skip test 11spare-migration
+
+11spare-migration is a test series to check mdadm Monitor migrates spares
+according to rules in /etc/mdadm.conf defined by POLICY lines.
+
+[snip]
+for scan in no yes; do
+       for platform in 1.2 imsm; do
+               try
+       done
+done
+[snip]
+
+"try" includes near 20 sub testcase, so there are nearly 80 subcases need to run,
+so it will take long time than ptest-runner timeout limit, skip it as workaround.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ test | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/test b/test
+index 711a3c7..880dd1d 100755
+--- a/test
++++ b/test
+@@ -272,6 +272,9 @@ main() {
+ 	else
+ 		for script in $testdir/$prefix $testdir/$prefix*[^~]
+ 		do
++			if [ $script == "$testdir/11spare-migration" ];then
++				continue
++			fi
+ 			do_test $script
+ 		done
+ 	fi
+-- 
+2.7.4
+

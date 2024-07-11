@@ -40,6 +40,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/util-linux/v${MAJOR_VERSION}/util-lin
            file://avoid_parallel_tests.patch \
            file://0001-login-utils-include-libgen.h-for-basename-API.patch \
            file://fcntl-lock.c \
+           file://CVE-2024-28085-0001.patch \
+           file://CVE-2024-28085-0002.patch \
            "
 
 SRC_URI[sha256sum] = "7b6605e48d1a49f43cc4b4cfc59f313d0dd5402fa40b96810bd572e167dfed0f"

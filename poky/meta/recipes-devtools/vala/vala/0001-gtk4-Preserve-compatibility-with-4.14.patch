@@ -1,0 +1,39 @@
+From 17349020fb95454d06f827fd555b05248f10a370 Mon Sep 17 00:00:00 2001
+From: Rico Tzschichholz <ricotz@ubuntu.com>
+Date: Thu, 7 Mar 2024 17:56:05 +0100
+Subject: [PATCH] gtk4: Preserve compatibility with < 4.14
+
+Don't prefer new accessor methods for Calendar.day/month/year
+
+Fixes https://gitlab.gnome.org/GNOME/vala/issues/1531
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/vala/-/commit/e0c4ea8c4a0bbf859b5341a7465b395892789d9e]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ vapi/gtk4.vapi                 | 3 +++
+ vapi/metadata/Gtk-4.0.metadata | 5 +++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/vapi/gtk4.vapi b/vapi/gtk4.vapi
+index 49f8b2078..51ecea27d 100644
+--- a/vapi/gtk4.vapi
++++ b/vapi/gtk4.vapi
+@@ -7350,11 +7350,14 @@ namespace Gtk {
+ 		[Version (since = "4.14")]
+ 		public void set_year (int year);
+ 		public void unmark_day (uint day);
++		[NoAccessorMethod]
+ 		public int day { get; set; }
++		[NoAccessorMethod]
+ 		public int month { get; set; }
+ 		public bool show_day_names { get; set; }
+ 		public bool show_heading { get; set; }
+ 		public bool show_week_numbers { get; set; }
++		[NoAccessorMethod]
+ 		public int year { get; set; }
+ 		public signal void day_selected ();
+ 		public signal void next_month ();
+-- 
+2.44.0
+

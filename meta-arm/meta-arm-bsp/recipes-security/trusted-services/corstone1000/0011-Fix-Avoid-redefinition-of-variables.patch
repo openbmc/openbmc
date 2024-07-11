@@ -1,0 +1,28 @@
+From c7f2861e5c5ee209373a8dba15a608f78a97078b Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Wed, 10 Apr 2024 11:17:50 +0200
+Subject: [PATCH 1/3] Fix: Avoid redefinition of variables
+
+Remove variable redefinition which shadows the original one.
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/27954]
+---
+ .../service/uefi/smm_variable/client/cpp/smm_variable_client.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/components/service/uefi/smm_variable/client/cpp/smm_variable_client.cpp b/components/service/uefi/smm_variable/client/cpp/smm_variable_client.cpp
+index f71d0c864..d39448900 100644
+--- a/components/service/uefi/smm_variable/client/cpp/smm_variable_client.cpp
++++ b/components/service/uefi/smm_variable/client/cpp/smm_variable_client.cpp
+@@ -166,7 +166,6 @@ efi_status_t smm_variable_client::get_variable(const EFI_GUID &guid, const std::
+ 
+ 	if (call_handle) {
+ 		uint8_t *resp_buf;
+-		size_t resp_len;
+ 		service_status_t service_status;
+ 
+ 		SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *access_var =
+-- 
+2.25.1
+

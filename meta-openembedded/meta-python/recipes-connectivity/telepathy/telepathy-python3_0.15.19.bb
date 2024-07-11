@@ -20,14 +20,14 @@ SRC_URI[md5sum] = "f7ca25ab3c88874015b7e9728f7f3017"
 SRC_URI[sha256sum] = "244c0e1bf4bbd78ae298ea659fe10bf3a73738db550156767cc2477aedf72376"
 
 FILES:${PN} += "\
-    ${libdir}/python*/site-packages/telepathy/*.py \
-    ${libdir}/python*/site-packages/telepathy/*/*.py \
+    ${PYTHON_SITEPACKAGES_DIR}/telepathy/*.py \
+    ${PYTHON_SITEPACKAGES_DIR}/telepathy/*/*.py \
 "
 
 do_install:append () {
-    rm -fr ${D}${libdir}/python*/site-packages/telepathy/__pycache__
-    rm -fr ${D}${libdir}/python*/site-packages/telepathy/__pycache__
-    rm -fr ${D}${libdir}/python*/site-packages/telepathy/*/__pycache__
-    rm -fr ${D}${libdir}/python*/site-packages/telepathy/*/__pycache__
+    rm -fr ${D}${PYTHON_SITEPACKAGES_DIR}/telepathy/__pycache__
+    rm -fr ${D}${PYTHON_SITEPACKAGES_DIR}/telepathy/__pycache__
+    rm -fr ${D}${PYTHON_SITEPACKAGES_DIR}/telepathy/*/__pycache__
+    rm -fr ${D}${PYTHON_SITEPACKAGES_DIR}/telepathy/*/__pycache__
 }
 RDEPENDS:${PN} += "python3-dbus"

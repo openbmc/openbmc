@@ -315,13 +315,13 @@ class BBCooker:
                 dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
                 upstream = self.data.getVar("BB_HASHSERVE_UPSTREAM") or None
                 if upstream:
-                    import socket
                     try:
-                        sock = socket.create_connection(upstream.split(":"), 5)
-                        sock.close()
-                    except socket.error as e:
+                        with hashserv.create_client(upstream) as client:
+                            client.ping()
+                    except (ConnectionError, ImportError) as e:
                         bb.warn("BB_HASHSERVE_UPSTREAM is not valid, unable to connect hash equivalence server at '%s': %s"
                                  % (upstream, repr(e)))
+                        upstream = None
 
                 self.hashservaddr = "unix://%s/hashserve.sock" % self.data.getVar("TOPDIR")
                 self.hashserv = hashserv.create_server(
@@ -1459,7 +1459,6 @@ class BBCooker:
 
                     if t in task or getAllTaskSignatures:
                         try:
-                            rq.rqdata.prepare_task_hash(tid)
                             sig.append([pn, t, rq.rqdata.get_task_unihash(tid)])
                         except KeyError:
                             sig.append(self.getTaskSignatures(target, [t])[0])

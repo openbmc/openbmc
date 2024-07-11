@@ -101,7 +101,7 @@ PACKAGE_WRITE_DEPS += "qemu-native"
 
 PACKAGES =+ "${PN}-python ${PN}-perl ${PN}-demo"
 
-FILES:${PN}-python += "${libdir}/python*/site-packages/ ${libdir}/graphviz/python/"
+FILES:${PN}-python += "${PYTHON_SITEPACKAGES_DIR}/ ${libdir}/graphviz/python/"
 FILES:${PN}-perl += "${libdir}/perl5/*/vendor_perl/ ${libdir}/graphviz/perl/"
 FILES:${PN}-demo += "${datadir}/graphviz/demo/"
 

@@ -13,6 +13,7 @@ DEPENDS = "bison-native flex-native"
 DEPENDS:append:libc-musl = " fts"
 
 SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
+           file://0001-include-Makefile-install-systemd.h-by-default.patch \
 "
 UPSTREAM_CHECK_URI = "https://github.com/libcgroup/libcgroup/tags"
 

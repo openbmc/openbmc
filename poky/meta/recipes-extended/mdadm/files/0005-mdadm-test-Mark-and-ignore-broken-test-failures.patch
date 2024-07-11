@@ -1,0 +1,128 @@
+From feab1f72fcf032a4d21d0a69eb61b23a5ddb3352 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 22 Jun 2022 14:25:18 -0600
+Subject: [PATCH 5/6] mdadm/test: Mark and ignore broken test failures
+
+Add functionality to continue if a test marked as broken fails.
+
+To mark a test as broken, a file with the same name but with the suffix
+'.broken' should exist. The first line in the file will be printed with
+a KNOWN BROKEN message; the rest of the file can describe the how the
+test is broken.
+
+Also adds --skip-broken and --skip-always-broken to skip all the tests
+that have a .broken file or to skip all tests whose .broken file's first
+line contains the keyword always.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+
+Upstream-Status: Backport
+
+Reference to upstream patch:
+https://git.kernel.org/pub/scm/utils/mdadm/mdadm.git/commit/?id=28520bf114b3
+
+[OP: adjusted context for mdadm-4.2]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ test | 37 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 2 deletions(-)
+
+diff --git a/test b/test
+index 8f189d9..ee8fba1 100755
+--- a/test
++++ b/test
+@@ -10,6 +10,8 @@ devlist=
+ 
+ savelogs=0
+ exitonerror=1
++ctrl_c_error=0
++skipbroken=0
+ prefix='[0-9][0-9]'
+ 
+ # use loop devices by default if doesn't specify --dev
+@@ -35,6 +37,7 @@ die() {
+ 
+ ctrl_c() {
+ 	exitonerror=1
++	ctrl_c_error=1
+ }
+ 
+ # mdadm always adds --quiet, and we want to see any unexpected messages
+@@ -79,8 +82,21 @@ mdadm() {
+ do_test() {
+ 	_script=$1
+ 	_basename=`basename $_script`
++	_broken=0
++
+ 	if [ -f "$_script" ]
+ 	then
++		if [ -f "${_script}.broken" ]; then
++			_broken=1
++			_broken_msg=$(head -n1 "${_script}.broken" | tr -d '\n')
++			if [ "$skipbroken" == "all" ]; then
++				return
++			elif [ "$skipbroken" == "always" ] &&
++			     [[ "$_broken_msg" == *always* ]]; then
++				return
++			fi
++		fi
++
+ 		rm -f $targetdir/stderr
+ 		# this might have been reset: restore the default.
+ 		echo 2000 > /proc/sys/dev/raid/speed_limit_max
+@@ -97,10 +113,15 @@ do_test() {
+ 		else
+ 			save_log fail
+ 			_fail=1
++			if [ "$_broken" == "1" ]; then
++				echo "  (KNOWN BROKEN TEST: $_broken_msg)"
++			fi
+ 		fi
+ 		[ "$savelogs" == "1" ] &&
+ 			mv -f $targetdir/log $logdir/$_basename.log
+-		[ "$_fail" == "1" -a "$exitonerror" == "1" ] && exit 1
++		[ "$ctrl_c_error" == "1" ] && exit 1
++		[ "$_fail" == "1" -a "$exitonerror" == "1" \
++		  -a "$_broken" == "0" ] && exit 1
+ 	fi
+ }
+ 
+@@ -117,6 +138,8 @@ do_help() {
+ 		--logdir=directory          Directory to save all logfiles in
+ 		--save-logs                 Usually use with --logdir together
+ 		--keep-going | --no-error   Don't stop on error, ie. run all tests
++		--skip-broken               Skip tests that are known to be broken
++		--skip-always-broken        Skip tests that are known to always fail
+ 		--dev=loop|lvm|ram|disk     Use loop devices (default), LVM, RAM or disk
+ 		--disks=                    Provide a bunch of physical devices for test
+ 		--volgroup=name             LVM volume group for LVM test
+@@ -211,6 +234,12 @@ parse_args() {
+ 		--keep-going | --no-error )
+ 			exitonerror=0
+ 			;;
++		--skip-broken )
++			skipbroken=all
++			;;
++		--skip-always-broken )
++			skipbroken=always
++			;;
+ 		--disable-multipath )
+ 			unset MULTIPATH
+ 			;;
+@@ -275,7 +304,11 @@ main() {
+ 			if [ $script == "$testdir/11spare-migration" ];then
+ 				continue
+ 			fi
+-			do_test $script
++			case $script in
++			 *.broken) ;;
++			 *)
++			     do_test $script
++			 esac
+ 		done
+ 	fi
+ 
+-- 
+2.39.1
+

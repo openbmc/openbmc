@@ -22,7 +22,7 @@ PACKAGES =+ "\
 "
 
 FILES:${PN}-test += "\
-    ${libdir}/${PYTHON_DIR}/site-packages/*/tests \
+    ${PYTHON_SITEPACKAGES_DIR}/*/tests \
 "
 
 RDEPENDS:${PN} += "\

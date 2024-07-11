@@ -5,12 +5,73 @@
 
 import logging
 import socket
+import asyncio
 import bb.asyncrpc
 import json
 from . import create_async_client
 
 
 logger = logging.getLogger("hashserv.client")
+
+
+class Batch(object):
+    def __init__(self):
+        self.done = False
+        self.cond = asyncio.Condition()
+        self.pending = []
+        self.results = []
+        self.sent_count = 0
+
+    async def recv(self, socket):
+        while True:
+            async with self.cond:
+                await self.cond.wait_for(lambda: self.pending or self.done)
+
+                if not self.pending:
+                    if self.done:
+                        return
+                    continue
+
+            r = await socket.recv()
+            self.results.append(r)
+
+            async with self.cond:
+                self.pending.pop(0)
+
+    async def send(self, socket, msgs):
+        try:
+            # In the event of a restart due to a reconnect, all in-flight
+            # messages need to be resent first to keep to result count in sync
+            for m in self.pending:
+                await socket.send(m)
+
+            for m in msgs:
+                # Add the message to the pending list before attempting to send
+                # it so that if the send fails it will be retried
+                async with self.cond:
+                    self.pending.append(m)
+                    self.cond.notify()
+                    self.sent_count += 1
+
+                await socket.send(m)
+
+        finally:
+            async with self.cond:
+                self.done = True
+                self.cond.notify()
+
+    async def process(self, socket, msgs):
+        await asyncio.gather(
+            self.recv(socket),
+            self.send(socket, msgs),
+        )
+
+        if len(self.results) != self.sent_count:
+            raise ValueError(
+                f"Expected result count {len(self.results)}. Expected {self.sent_count}"
+            )
+
+        return self.results
 
 
 class AsyncClient(bb.asyncrpc.AsyncClient):
@@ -36,11 +97,27 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
             if become:
                 await self.become_user(become)
 
-    async def send_stream(self, mode, msg):
+    async def send_stream_batch(self, mode, msgs):
+        """
+        Does a "batch" process of stream messages. This sends the query
+        messages as fast as possible, and simultaneously attempts to read the
+        messages back. This helps to mitigate the effects of latency to the
+        hash equivalence server be allowing multiple queries to be "in-flight"
+        at once
+
+        The implementation does more complicated tracking using a count of sent
+        messages so that `msgs` can be a generator function (i.e. its length is
+        unknown)
+
+        """
+
+        b = Batch()
+
         async def proc():
+            nonlocal b
+
             await self._set_mode(mode)
-            await self.socket.send(msg)
-            return await self.socket.recv()
+            return await b.process(self.socket, msgs)
 
         return await self._send_wrapper(proc)
 
@@ -89,10 +166,15 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         self.mode = new_mode
 
     async def get_unihash(self, method, taskhash):
-        r = await self.send_stream(self.MODE_GET_STREAM, "%s %s" % (method, taskhash))
-        if not r:
-            return None
-        return r
+        r = await self.get_unihash_batch([(method, taskhash)])
+        return r[0]
+
+    async def get_unihash_batch(self, args):
+        result = await self.send_stream_batch(
+            self.MODE_GET_STREAM,
+            (f"{method} {taskhash}" for method, taskhash in args),
+        )
+        return [r if r else None for r in result]
 
     async def report_unihash(self, taskhash, method, outhash, unihash, extra={}):
         m = extra.copy()
@@ -115,8 +197,12 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         )
 
     async def unihash_exists(self, unihash):
-        r = await self.send_stream(self.MODE_EXIST_STREAM, unihash)
-        return r == "true"
+        r = await self.unihash_exists_batch([unihash])
+        return r[0]
+
+    async def unihash_exists_batch(self, unihashes):
+        result = await self.send_stream_batch(self.MODE_EXIST_STREAM, unihashes)
+        return [r == "true" for r in result]
 
     async def get_outhash(self, method, outhash, taskhash, with_unihash=True):
         return await self.invoke(
@@ -237,10 +323,12 @@ class Client(bb.asyncrpc.Client):
             "connect_tcp",
             "connect_websocket",
             "get_unihash",
+            "get_unihash_batch",
             "report_unihash",
             "report_unihash_equiv",
             "get_taskhash",
             "unihash_exists",
+            "unihash_exists_batch",
             "get_outhash",
             "get_stats",
             "reset_stats",

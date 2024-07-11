@@ -12,7 +12,9 @@ RDEPENDS:${PN} = "ncurses-terminfo-base"
 
 PV_MAJOR = "${@d.getVar('PV').split('.')[0]}"
 
-SRC_URI = "https://nano-editor.org/dist/v${PV_MAJOR}/nano-${PV}.tar.xz"
+SRC_URI = "https://nano-editor.org/dist/v${PV_MAJOR}/nano-${PV}.tar.xz \
+           file://CVE-2024-5742.patch \
+          "
 SRC_URI[sha256sum] = "86f3442768bd2873cec693f83cdf80b4b444ad3cc14760b74361474fc87a4526"
 
 UPSTREAM_CHECK_URI = "https://ftp.gnu.org/gnu/nano"

@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+./sdbus-c++-unit-tests 2>&1 && echo "PASS: sdbus-c++-unit-tests" || echo "FAIL: sdbus-c++-unit-tests"
+
+./sdbus-c++-integration-tests 2>&1 && echo "PASS: sdbus-c++-integration-tests" || echo "FAIL: sdbus-c++-integration-tests"

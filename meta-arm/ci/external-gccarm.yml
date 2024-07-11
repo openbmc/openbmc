@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
 header:
   version: 14
 
@@ -6,6 +8,6 @@ local_conf_header:
     SKIP_RECIPE[gcc-cross-arm] = "Using external toolchain"
     TCMODE = "external-arm"
     EXTERNAL_TOOLCHAIN = "${TOPDIR}/toolchains/${TARGET_ARCH}"
-    # Temporary workaround for a number binaries in the toolchains that are using 32bit timer API
-    # This must be done here instead of the recipe because of all the libraries in the toolchain have the issue
-    INSANE_SKIP:append = " 32bit-time"
+    # Disable ptest as this pulls target compilers, which don't
+    # work with external toolchain currently
+    DISTRO_FEATURES:remove = "ptest"

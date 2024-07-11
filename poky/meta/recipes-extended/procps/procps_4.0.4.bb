@@ -14,6 +14,7 @@ inherit autotools gettext pkgconfig update-alternatives
 
 SRC_URI = "git://gitlab.com/procps-ng/procps.git;protocol=https;branch=master \
            file://sysctl.conf \
+           file://pidfd.patch \
            "
 SRCREV = "4ddcef2fd843170c8e2d59a83042978f41037a2b"
 

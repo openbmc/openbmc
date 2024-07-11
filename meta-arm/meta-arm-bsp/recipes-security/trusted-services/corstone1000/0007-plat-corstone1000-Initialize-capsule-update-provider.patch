@@ -1,78 +1,106 @@
-From b5b31064959665f4cc616733be3d989ae4356636 Mon Sep 17 00:00:00 2001
-From: Emekcan Aras <emekcan.aras@arm.com>
-Date: Sun, 18 Jun 2023 16:05:27 +0100
-Subject: [PATCH] plat: corstone1000: Initialize capsule update provider
+From 925a07093fa571ee1d2f2e59affcd2c52f1d5b54 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 29 Nov 2023 15:40:21 +0100
+Subject: [PATCH 7/8] plat: corstone1000: Initialize capsule update provider
 
 Initializes the capsule update service provider in se-proxy-sp.c deployment
 for corstone1000.
 
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
 Upstream-Status: Inappropriate [Design is to revisted]
-
 ---
- deployments/se-proxy/env/commonsp/se_proxy_sp.c |  3 +++
- .../infra/corstone1000/service_proxy_factory.c  | 17 +++++++++++++++++
- .../se-proxy/infra/service_proxy_factory.h      |  1 +
- 3 files changed, 21 insertions(+)
+ .../se-proxy/env/commonsp/se_proxy_sp.c       | 14 +++++++++-
+ .../corstone1000/service_proxy_factory.c      | 28 +++++++++++++++++++
+ .../se-proxy/infra/service_proxy_factory.h    |  1 +
+ 3 files changed, 42 insertions(+), 1 deletion(-)
 
 diff --git a/deployments/se-proxy/env/commonsp/se_proxy_sp.c b/deployments/se-proxy/env/commonsp/se_proxy_sp.c
-index 45fcb385..dc2a9d49 100644
+index 155e94863..a0eb03b6f 100644
 --- a/deployments/se-proxy/env/commonsp/se_proxy_sp.c
 +++ b/deployments/se-proxy/env/commonsp/se_proxy_sp.c
-@@ -77,6 +77,9 @@ void __noreturn sp_main(struct ffa_init_info *init_info)
+@@ -39,7 +39,7 @@ void __noreturn sp_main(union ffa_boot_info *boot_info)
+ 		goto fatal_error;
  	}
- 	rpc_demux_attach(&rpc_demux, SE_PROXY_INTERFACE_ID_ATTEST, rpc_iface);
+ 
+-	rpc_status = ts_rpc_endpoint_sp_init(&rpc_endpoint, 4, 16);
++	rpc_status = ts_rpc_endpoint_sp_init(&rpc_endpoint, 5, 16);
+ 	if (rpc_status != RPC_SUCCESS) {
+ 		EMSG("Failed to initialize RPC endpoint: %d", rpc_status);
+ 		goto fatal_error;
+@@ -94,6 +94,18 @@ void __noreturn sp_main(union ffa_boot_info *boot_info)
+ 		goto fatal_error;
+ 	}
  
 +	rpc_iface = capsule_update_proxy_create();
-+	rpc_demux_attach(&rpc_demux, SE_PROXY_INTERFACE_ID_CAPSULE_UPDATE, rpc_iface);
++	if (!rpc_iface) {
++		EMSG("Failed to create Capsule Update proxy");
++		goto fatal_error;
++	}
++
++	rpc_status = ts_rpc_endpoint_sp_add_service(&rpc_endpoint, rpc_iface);
++	if (rpc_status != RPC_SUCCESS) {
++		EMSG("Failed to add service to RPC endpoint: %d", rpc_status);
++		goto fatal_error;
++	}
 +
  	/* End of boot phase */
  	result = sp_msg_wait(&req_msg);
  	if (result != SP_RESULT_OK) {
 diff --git a/deployments/se-proxy/infra/corstone1000/service_proxy_factory.c b/deployments/se-proxy/infra/corstone1000/service_proxy_factory.c
-index bacab1de..32d88c97 100644
+index b3b93cfd6..fc179b3c1 100644
 --- a/deployments/se-proxy/infra/corstone1000/service_proxy_factory.c
 +++ b/deployments/se-proxy/infra/corstone1000/service_proxy_factory.c
-@@ -14,6 +14,7 @@
+@@ -11,6 +11,7 @@
+ #include <rpc/rss_comms/caller/sp/rss_comms_caller.h>
+ #include <service/attestation/provider/attest_provider.h>
+ #include <service/attestation/provider/serializer/packed-c/packedc_attest_provider_serializer.h>
++#include <service/capsule_update/provider/capsule_update_provider.h>
  #include <service/crypto/factory/crypto_provider_factory.h>
  #include <service/secure_storage/frontend/secure_storage_provider/secure_storage_provider.h>
- #include <trace.h>
-+#include <service/capsule_update/provider/capsule_update_provider.h>
+ #include "service/secure_storage/frontend/secure_storage_provider/secure_storage_uuid.h"
+@@ -129,3 +130,30 @@ struct rpc_service_interface *its_proxy_create(void)
  
- /* backends */
- #include <service/crypto/backend/psa_ipc/crypto_ipc_backend.h>
-@@ -94,3 +95,19 @@ struct rpc_interface *its_proxy_create(void)
- 
- 	return secure_storage_provider_init(&its_provider, backend);
+ 	return secure_storage_provider_init(&its_provider, backend, &its_uuid);
  }
 +
-+struct rpc_interface *capsule_update_proxy_create(void)
++struct rpc_service_interface *capsule_update_proxy_create(void)
 +{
 +	static struct capsule_update_provider capsule_update_provider;
-+	static struct rpc_caller *capsule_update_caller;
++	static struct secure_storage_ipc capsule_update_backend;
++	rpc_status_t rpc_status = RPC_ERROR_INTERNAL;
 +
-+	capsule_update_caller = psa_ipc_caller_init(&psa_ipc);
++	/* Static objects for proxy instance */
++	static struct rpc_caller_interface rss_comms = { 0 };
++	static struct rpc_caller_session rpc_session = { 0 };
 +
-+	if (!capsule_update_caller)
-+	return NULL;
++	rpc_status = rss_comms_caller_init(&rss_comms);
++	if (rpc_status != RPC_SUCCESS)
++		return NULL;
 +
-+	capsule_update_provider.client.caller = capsule_update_caller;
++	rpc_status = rpc_caller_session_open(&rpc_session, &rss_comms, &dummy_uuid, 0, 0);
++	if (rpc_status != RPC_SUCCESS)
++		return NULL;
++
++
++	capsule_update_provider.client.session = &rpc_session;
++	capsule_update_provider.client.rpc_status = RPC_SUCCESS;
++	capsule_update_provider.client.service_info.supported_encodings = 0;
++	capsule_update_provider.client.service_info.max_payload = 4096;
 +
 +	return capsule_update_provider_init(&capsule_update_provider);
 +}
-+
 diff --git a/deployments/se-proxy/infra/service_proxy_factory.h b/deployments/se-proxy/infra/service_proxy_factory.h
-index 298d407a..02aa7fe2 100644
+index caaea79ed..b981754b7 100644
 --- a/deployments/se-proxy/infra/service_proxy_factory.h
 +++ b/deployments/se-proxy/infra/service_proxy_factory.h
-@@ -17,6 +17,7 @@ struct rpc_interface *attest_proxy_create(void);
- struct rpc_interface *crypto_proxy_create(void);
- struct rpc_interface *ps_proxy_create(void);
- struct rpc_interface *its_proxy_create(void);
-+struct rpc_interface *capsule_update_proxy_create(void);
+@@ -17,6 +17,7 @@ struct rpc_service_interface *attest_proxy_create(void);
+ struct rpc_service_interface *crypto_proxy_create(void);
+ struct rpc_service_interface *ps_proxy_create(void);
+ struct rpc_service_interface *its_proxy_create(void);
++struct rpc_service_interface *capsule_update_proxy_create(void);
  
  #ifdef __cplusplus
  }
 -- 
-2.17.1
+2.25.1
 

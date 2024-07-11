@@ -76,6 +76,10 @@ PACKAGECONFIG[gstreamer] = "-Dmedia-gstreamer=enabled,-Dmedia-gstreamer=disabled
 PACKAGECONFIG[tracker] = "-Dtracker=enabled,-Dtracker=disabled,tracker,tracker-miners"
 PACKAGECONFIG[vulkan] = "-Dvulkan=enabled,-Dvulkan=disabled, vulkan-loader vulkan-headers shaderc-native"
 
+# Disable int-conversion warning as error until [1] is fixed
+# [1] https://gitlab.gnome.org/GNOME/gtk/-/issues/6033
+CFLAGS:append = " -Wno-error=int-conversion"
+
 LIBV = "4.0.0"
 
 FILES:${PN}:append = " \

@@ -298,7 +298,7 @@ def package_qa_check_libdir(d):
                         try:
                             elf.open()
                             messages.append("%s: found library in wrong location: %s" % (package, rel_path))
-                        except (oe.qa.NotELFFileError):
+                        except (oe.qa.NotELFFileError, FileNotFoundError):
                             pass
                 if exec_re.match(rel_path):
                     if libdir not in rel_path and libexecdir not in rel_path:
@@ -307,7 +307,7 @@ def package_qa_check_libdir(d):
                         try:
                             elf.open()
                             messages.append("%s: found library in wrong location: %s" % (package, rel_path))
-                        except (oe.qa.NotELFFileError):
+                        except (oe.qa.NotELFFileError, FileNotFoundError):
                             pass
 
     if messages:

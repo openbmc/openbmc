@@ -1,6 +1,0 @@
-header:
-  version: 14
-  includes:
-    - ci/base.yml
-
-machine: generic-arm64

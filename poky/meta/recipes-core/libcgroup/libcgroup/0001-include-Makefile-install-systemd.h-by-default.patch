@@ -1,0 +1,37 @@
+From 592dcdcf243576bd2517d3da9bc18990de08e37e Mon Sep 17 00:00:00 2001
+From: Kamalesh Babulal <kamalesh.babulal@oracle.com>
+Date: Mon, 27 Nov 2023 20:07:33 +0530
+Subject: [PATCH 1/1] include/Makefile: install systemd.h by default
+
+Install systemd.h header file by default, as we have stub and defined
+versions of the systemd functions for both non-systemd and systemd
+enabled configurations.  This will help packagers to ship package
+without systemd support (--enable-systemd=no).
+
+Signed-off-by: Kamalesh Babulal <kamalesh.babulal@oracle.com>
+Signed-off-by: Tom Hromatka <tom.hromatka@oracle.com>
+
+Upstream-Status: Backport [https://github.com/libcgroup/libcgroup/commit/592dcdcf243576bd2517d3da9bc18990de08e37e]
+
+Signed-off-by: Adriaan Schmidt <adriaan.schmidt@siemens.com>
+---
+ include/Makefile.am | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/include/Makefile.am b/include/Makefile.am
+index 23cebaac..4cb05529 100644
+--- a/include/Makefile.am
++++ b/include/Makefile.am
+@@ -2,8 +2,4 @@
+ nobase_include_HEADERS = libcgroup.h libcgroup/error.h libcgroup/init.h \
+ 			 libcgroup/groups.h libcgroup/tasks.h \
+ 			 libcgroup/iterators.h libcgroup/config.h \
+-			 libcgroup/log.h libcgroup/tools.h
+-
+-if WITH_SYSTEMD
+-nobase_include_HEADERS += libcgroup/systemd.h
+-endif
++			 libcgroup/log.h libcgroup/tools.h libcgroup/systemd.h
+-- 
+2.39.2
+

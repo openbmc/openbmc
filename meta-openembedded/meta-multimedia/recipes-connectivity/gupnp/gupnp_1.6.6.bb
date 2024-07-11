@@ -8,6 +8,8 @@ DEPENDS = "e2fsprogs gssdp libsoup-3.0 libxml2"
 inherit gnomebase pkgconfig vala gobject-introspection
 
 SRC_URI[archive.sha256sum] = "c9dc50e8c78b3792d1b0e6c5c5f52c93e9345d3dae2891e311a993a574f5a04f"
+SRC_URI += "file://0001-gupnp-enums.c.template-use-basename-instead-of-filen.patch"
+
 
 SYSROOT_PREPROCESS_FUNCS += "gupnp_sysroot_preprocess"
 

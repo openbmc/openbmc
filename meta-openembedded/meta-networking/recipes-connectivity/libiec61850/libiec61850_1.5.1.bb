@@ -33,6 +33,6 @@ RDEPENDS:${PN}-python = " python3-core "
 RDEPENDS:${PN} = " python3-core "
 
 FILES:${PN} += " \
-    ${libdir}/${PYTHON_DIR}/site-packages/iec61850.py \
-    ${libdir}/${PYTHON_DIR}/site-packages/_iec61850.so \
+    ${PYTHON_SITEPACKAGES_DIR}/iec61850.py \
+    ${PYTHON_SITEPACKAGES_DIR}/_iec61850.so \
 "

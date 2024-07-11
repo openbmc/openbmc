@@ -44,8 +44,8 @@ EXTRA_OECONF = " \
 
 EXTRA_OEMAKE = " \
         PYTHON=python3 \
-        pythondir=${libdir}/python${PYTHON_BASEVERSION}/site-packages \
-        pyexecdir=${libdir}/python${PYTHON_BASEVERSION}/site-packages \
+        pythondir=${PYTHON_SITEPACKAGES_DIR} \
+        pyexecdir=${PYTHON_SITEPACKAGES_DIR} \
         STDINC='${STAGING_INCDIR}' \
         "
 

@@ -3,6 +3,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://tipclog/tipc.h;endline=35;md5=985b6ea8735818511d276c1b466cce98"
 
 SRC_URI = "git://git.code.sf.net/p/tipc/tipcutils;branch=master \
+           file://tipcutils.conf \
            file://0001-include-sys-select.h-for-FD_-definitions.patch \
            file://0002-replace-non-standard-uint-with-unsigned-int.patch \
            file://0001-multicast_blast-tipcc-Fix-struct-type-for-TIPC_GROUP.patch \
@@ -11,7 +12,7 @@ SRC_URI = "git://git.code.sf.net/p/tipc/tipcutils;branch=master \
 SRCREV = "7ab2211b87414ba240b0b2e4af219c1057c9cf9a"
 PV = "2.2.0+git"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig systemd
 
 DEPENDS += "libdaemon"
 
@@ -41,7 +42,15 @@ do_install:append() {
     install -d ${D}${sysconfdir}
     cp -R --no-dereference --preserve=mode,links -v ${S}/scripts/etc/* ${D}${sysconfdir}/
     chown -R root:root ${D}${sysconfdir}
+
+    # Install systemd related configuration file
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${sysconfdir}/modules-load.d
+        install -m 0644 ${WORKDIR}/tipcutils.conf ${D}${sysconfdir}/modules-load.d
+    fi
 }
+
+SYSTEMD_SERVICE:${PN} = ""
 
 PACKAGES += "${PN}-demos"
 FILES:${PN}-dbg += "/opt/tipcutils/demos/*/.debug /opt/tipcutils/ptts/.debug"

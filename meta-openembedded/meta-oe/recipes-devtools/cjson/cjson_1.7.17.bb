@@ -24,6 +24,11 @@ do_install_ptest() {
         sed s#${B}#${PTEST_PATH}# ${B}/CTestTestfile.cmake > ${D}${PTEST_PATH}/CTestTestfile.cmake
         sed s#${B}#${PTEST_PATH}# ${B}/tests/CTestTestfile.cmake > ${D}${PTEST_PATH}/tests/CTestTestfile.cmake
         sed s#${B}#${PTEST_PATH}# ${B}/fuzzing/CTestTestfile.cmake > ${D}${PTEST_PATH}/fuzzing/CTestTestfile.cmake
+        # The cmake files also contain full paths to original CMakeLists.txt file in _BACKTRACE_TRIPLES property;
+        # these are not needed for successful ptests as we don't install the CMakeLists.txt files anyway.
+        sed -i s#${S}#${PTEST_PATH}#g ${D}${PTEST_PATH}/CTestTestfile.cmake
+        sed -i s#${S}#${PTEST_PATH}#g ${D}${PTEST_PATH}/tests/CTestTestfile.cmake
+        sed -i s#${S}#${PTEST_PATH}#g ${D}${PTEST_PATH}/fuzzing/CTestTestfile.cmake
         # install test artifacts
         install ${B}/cJSON_test ${D}${PTEST_PATH}
         install ${B}/tests/cjson_add ${B}/tests/*_tests ${B}/tests/parse_*  ${B}/tests/print_*  ${B}/tests/readme_examples ${D}${PTEST_PATH}/tests/

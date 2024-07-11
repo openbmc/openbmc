@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
+header:
+  version: 14
+  includes:
+    - ci/base.yml
+
+repos:
+  poky:
+    layers:
+      meta-yocto-bsp:
+
+local_conf_header:
+  bootloader: |
+    # If running genericarm64 in a qemu we need to manually build the bootloader
+    EXTRA_IMAGEDEPENDS += "virtual/bootloader"
+
+machine: genericarm64

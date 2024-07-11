@@ -1,0 +1,66 @@
+From 451a9b9c3874872d575693fc7733fae02690a7d3 Mon Sep 17 00:00:00 2001
+From: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
+Date: Tue, 29 Nov 2016 13:43:24 -0600
+Subject: [PATCH] dont-depend-on-help2man
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
+
+---
+ doc/Makefile.am |  2 +-
+ man/Makefile.am | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index 407a38c..6b5ff3e 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -55,7 +55,7 @@ refcard_files = refcard/Makefile refcard/txicmdcheck \
+ # Include our texinfo.tex, not Automake's.
+ EXTRA_DIST = epsf.tex texinfo.tex \
+              fdl.texi \
+-	     $(man_MANS) $(TXI_XLATE) \
++	     $(TXI_XLATE) \
+              $(refcard_files) \
+              gendocs.chapter/gendocs_template \
+ 	     texinfo-tex-test.texi texinfo-tex-test.WIDOWs \
+diff --git a/man/Makefile.am b/man/Makefile.am
+index d0cd72c..a19e52a 100644
+--- a/man/Makefile.am
++++ b/man/Makefile.am
+@@ -11,27 +11,27 @@
+ # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ 
+ # These are generated using help2man.
+-man_MANS = install-info.1 makeinfo.1 texindex.1 texi2dvi.1
++#man_MANS = install-info.1 makeinfo.1 texindex.1 texi2dvi.1
+ 
+ # These require the build in info/, thus can't do if we failed to find a
+ # terminal library.
+ if HAVE_TERMLIBS
+-man_MANS += info.1
++#man_MANS += info.1
+ endif
+ 
+ # These are hand-written.
+-man_MANS += info.5 texinfo.5
++#man_MANS += info.5 texinfo.5
+ 
+-man_MANS += pod2texi.1
++#man_MANS += pod2texi.1
+ 
+ pod2texi.1: $(top_srcdir)/Pod-Simple-Texinfo/pod2texi.pl
+ 	$(POD2MAN) $(top_srcdir)/Pod-Simple-Texinfo/pod2texi.pl >"$@"
+ 
+ 
+ # These are just .so's to the common program.
+-man_MANS += texi2any.1 texi2pdf.1 pdftexi2dvi.1
++#man_MANS += texi2any.1 texi2pdf.1 pdftexi2dvi.1
+ 
+-EXTRA_DIST = $(man_MANS) ginfo.h2m
++EXTRA_DIST = ginfo.h2m
+ 
+ # Maintainers should be able to regenerate.
+ MAINTAINERCLEANFILES = $(man_MANS)

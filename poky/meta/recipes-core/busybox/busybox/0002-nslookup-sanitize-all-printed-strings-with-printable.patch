@@ -8,7 +8,7 @@ Otherwise, terminal sequences can be injected, which enables various terminal in
 attacks from DNS results.
 
 CVE: CVE-2022-28391
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.busybox.net/show_bug.cgi?id=15001]
 Signed-off-by: Ariadne Conill <ariadne@dereferenced.org>
 Signed-off-by: Steve Sakoman <steve@sakoman.com>
 ---

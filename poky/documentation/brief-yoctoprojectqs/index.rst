@@ -251,10 +251,16 @@ an entire Linux distribution, including the toolchain, from source.
       To use such mirrors, uncomment the below lines in your ``conf/local.conf``
       file in the :term:`Build Directory`::
 
-         BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
+         BB_HASHSERVE_UPSTREAM = "wss://hashserv.yoctoproject.org/ws"
          SSTATE_MIRRORS ?= "file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH"
          BB_HASHSERVE = "auto"
          BB_SIGNATURE_HANDLER = "OEEquivHash"
+
+      The hash equivalence server needs the websockets python module version 9.1
+      or later. Debian GNU/Linux 12 (Bookworm) and later, Fedora, CentOS Stream
+      9 and later, and Ubuntu 22.04 (LTS) and later, all have a recent enough
+      package. Other supported distributions need to get the module some other
+      place than their package feed, e.g. via ``pip``.
 
 #. **Start the Build:** Continue with the following command to build an OS
    image for the target, which is ``core-image-sato`` in this example:

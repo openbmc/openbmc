@@ -1,0 +1,82 @@
+From c62e728bb86981219984c8b39819fb8926a41e10 Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Fri, 19 Apr 2024 18:25:23 +0200
+Subject: [PATCH 3/3] Fix error handling of variable index loading
+
+If loading of the variable index from Protected Storage fails, SmmGW
+will silently continue with empty variable store. This is a serious
+fault and a potential security risk.
+Change the code to produce a log output when this happens and stop
+loading the SP.
+
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/28300]
+---
+ .../backend/uefi_variable_store.c             | 28 ++++++++++++++-----
+ 1 file changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.c b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+index caf6698aa..c1691dc8f 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+@@ -27,7 +27,7 @@
+ #include "service/crypto/client/psa/crypto_client.h"
+ #endif
+ 
+-static void load_variable_index(struct uefi_variable_store *context);
++static efi_status_t load_variable_index(struct uefi_variable_store *context);
+ 
+ static efi_status_t sync_variable_index(const struct uefi_variable_store *context);
+ 
+@@ -165,8 +165,10 @@ efi_status_t uefi_variable_store_init(struct uefi_variable_store *context, uint3
+ 
+ 		/* Load the variable index with NV variable info from the persistent store */
+ 		if (context->index_sync_buffer) {
+-			load_variable_index(context);
+-			purge_orphan_index_entries(context);
++			status = load_variable_index(context);
++
++			if (status == EFI_SUCCESS)
++				purge_orphan_index_entries(context);
+ 		}
+ 	}
+ 
+@@ -571,7 +573,7 @@ efi_status_t uefi_variable_store_get_var_check_property(
+ 	return status;
+ }
+ 
+-static void load_variable_index(struct uefi_variable_store *context)
++static efi_status_t load_variable_index(struct uefi_variable_store *context)
+ {
+ 	struct storage_backend *persistent_store = context->persistent_store.storage_backend;
+ 
+@@ -583,11 +585,23 @@ static void load_variable_index(struct uefi_variable_store *context)
+ 			SMM_VARIABLE_INDEX_STORAGE_UID, 0, context->index_sync_buffer_size,
+ 			context->index_sync_buffer, &data_len);
+ 
+-		if (psa_status == PSA_SUCCESS) {
+-			variable_index_restore(&context->variable_index, data_len,
+-					       context->index_sync_buffer);
++		switch(psa_status) {
++			case PSA_SUCCESS:
++				(void) variable_index_restore(&context->variable_index, data_len,
++							      context->index_sync_buffer);
++				break;
++
++			case PSA_ERROR_DOES_NOT_EXIST:
++				IMSG("Index variable does not exist in NV store, continuing with empty index");
++				break;
++
++			default:
++				EMSG("Loading variable index failed: %d", psa_status);
++				return EFI_LOAD_ERROR;
+ 		}
+ 	}
++
++	return EFI_SUCCESS;
+ }
+ 
+ static efi_status_t sync_variable_index(const struct uefi_variable_store *context)
+-- 
+2.25.1
+

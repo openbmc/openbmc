@@ -17,3 +17,5 @@ SRC_URI[sha256sum] = "5730590be0271364a5bddd9e245c9cc0fb710c4cbacbdd95264a3122d2
 DEPENDS = "curl"
 
 inherit pypi setuptools3
+
+BBCLASSEXTEND  += "native nativesdk"

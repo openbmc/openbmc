@@ -1,0 +1,41 @@
+From e9ed388e760ec33dcf9e72c639946c0d0abeec26 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 19 Jun 2024 12:57:39 +0000
+Subject: [PATCH] Fix C99 problems
+
+Backport some fixes from upstream to fix configure checks that fail with GCC 14.1.
+
+Upstream-Status: Backport [devel branch]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ aclocal.m4   | 3 +++
+ configure.ac | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index cc97bd4..7423b99 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -238,6 +238,9 @@ AC_CACHE_VAL(bash_cv_dup2_broken,
+ #include <sys/types.h>
+ #include <fcntl.h>
+ #include <stdlib.h>
++#ifdef HAVE_UNISTD_H
++# include <unistd.h>
++#endif /* HAVE_UNISTD_H */
+ int
+ main()
+ {
+diff --git a/configure.ac b/configure.ac
+index a3b5bd7..2a38c6b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -842,7 +842,7 @@ AC_CHECK_DECLS([strtold], [
+ 	[AC_COMPILE_IFELSE(
+ 		[AC_LANG_PROGRAM(
+ 		[[#include <stdlib.h>]],
+-		[[long double r; char *foo, bar; r = strtold(foo, &bar);]]
++		[[long double r; char *foo, *bar; r = strtold(foo, &bar);]]
+ 	)],
+ 	[bash_cv_strtold_broken=no],[bash_cv_strtold_broken=yes])
+         ]

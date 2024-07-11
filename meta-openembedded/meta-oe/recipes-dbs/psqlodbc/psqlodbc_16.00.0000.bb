@@ -58,5 +58,5 @@ do_install_ptest() {
 FILES:${PN} += "${libdir}"
 
 # The tests need a local PostgreSQL server running
-RDEPENDS:${PN}-ptest = "postgresql"
-
+RDEPENDS:${PN}-ptest += "psqlodbc postgresql diffutils"
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils locale-base-en-us glibc-gconv glibc-charmaps"

@@ -116,3 +116,7 @@ INSANE_SKIP:${PN} = "dev-so"
 INSANE_SKIP:${PN}-cxx = "dev-so"
 
 BBCLASSEXTEND = "native nativesdk"
+
+# many configure tests are failing with gcc-14
+CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
+BUILD_CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"

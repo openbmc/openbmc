@@ -286,10 +286,13 @@ class DevtoolTestCase(OESelftestTestCase):
         else:
             self.skipTest('No tap devices found - you must set up tap devices with scripts/runqemu-gen-tapdevs before running this test')
 
-    def _test_devtool_add_git_url(self, git_url, version, pn, resulting_src_uri):
+    def _test_devtool_add_git_url(self, git_url, version, pn, resulting_src_uri, srcrev=None):
         self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
-        result = runCmd('devtool add --version %s %s %s' % (version, pn, git_url))
+        command = 'devtool add --version %s %s %s' % (version, pn, git_url)
+        if srcrev :
+            command += ' --srcrev %s' %srcrev
+        result = runCmd(command)
         self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'), 'Workspace directory not created')
         # Check the recipe name is correct
         recipefile = get_bb_var('FILE', pn)
@@ -479,11 +482,12 @@ class DevtoolAddTests(DevtoolBase):
 
     def test_devtool_add_git_style2(self):
         version = 'v3.1.0'
+        srcrev = 'v3.1.0'
         pn = 'mbedtls'
         # this will trigger reformat_git_uri with branch parameter in url
         git_url = "'git://git@github.com/ARMmbed/mbedtls.git;protocol=https'"
-        resulting_src_uri = "gitsm://git@github.com/ARMmbed/mbedtls.git;protocol=https;branch=master"
-        self._test_devtool_add_git_url(git_url, version, pn, resulting_src_uri)
+        resulting_src_uri = "git://git@github.com/ARMmbed/mbedtls.git;protocol=https;branch=master"
+        self._test_devtool_add_git_url(git_url, version, pn, resulting_src_uri, srcrev)
 
     def test_devtool_add_library(self):
         # Fetch source
@@ -748,6 +752,25 @@ class DevtoolModifyTests(DevtoolBase):
         result = runCmd('devtool reset mdadm')
         result = runCmd('devtool status')
         self.assertNotIn('mdadm', result.output)
+
+    def test_devtool_modify_go(self):
+        import oe.path
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory(prefix='devtoolqa') as tempdir:
+            self.track_for_cleanup(self.workspacedir)
+            self.add_command_to_tearDown('bitbake -c clean go-helloworld')
+            self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+            result = runCmd('devtool modify go-helloworld -x %s' % tempdir)
+            self.assertExists(
+                oe.path.join(tempdir, 'src', 'golang.org', 'x', 'example', 'go.mod'),
+                             'Extracted source could not be found'
+            )
+            self.assertExists(
+                oe.path.join(self.workspacedir, 'conf', 'layer.conf'),
+                'Workspace directory not created'
+            )
+            matches = glob.glob(oe.path.join(self.workspacedir, 'appends', 'go-helloworld_*.bbappend'))
+            self.assertTrue(matches, 'bbappend not created %s' % result.output)
 
     def test_devtool_buildclean(self):
         def assertFile(path, *paths):
@@ -1405,14 +1428,30 @@ class DevtoolUpdateTests(DevtoolBase):
         runCmd('echo "Bar" > new-file', cwd=tempdir)
         runCmd('git add new-file', cwd=tempdir)
         runCmd('git commit -m "Add new file"', cwd=tempdir)
-        self.add_command_to_tearDown('cd %s; git clean -fd .; git checkout .' %
-                                     os.path.dirname(recipefile))
         runCmd('devtool update-recipe %s' % testrecipe)
         expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
                            (' M', '.*/makedevs/makedevs.c$'),
                            ('??', '.*/makedevs/new-local$'),
                            ('??', '.*/makedevs/0001-Add-new-file.patch$')]
         self._check_repo_status(os.path.dirname(recipefile), expected_status)
+        # Now try to update recipe in another layer, so first, clean it
+        runCmd('cd %s; git clean -fd .; git checkout .' % os.path.dirname(recipefile))
+        # Create a temporary layer and add it to bblayers.conf
+        self._create_temp_layer(templayerdir, True, 'templayer')
+        # Update recipe in templayer
+        result = runCmd('devtool update-recipe %s -a %s' % (testrecipe, templayerdir))
+        self.assertNotIn('WARNING:', result.output)
+        # Check recipe is still clean
+        self._check_repo_status(os.path.dirname(recipefile), [])
+        splitpath = os.path.dirname(recipefile).split(os.sep)
+        appenddir = os.path.join(templayerdir, splitpath[-2], splitpath[-1])
+        bbappendfile = self._check_bbappend(testrecipe, recipefile, appenddir)
+        patchfile = os.path.join(appenddir, testrecipe, '0001-Add-new-file.patch')
+        new_local_file = os.path.join(appenddir, testrecipe, 'new_local')
+        local_file = os.path.join(appenddir, testrecipe, 'makedevs.c')
+        self.assertExists(patchfile, 'Patch file 0001-Add-new-file.patch not created')
+        self.assertExists(local_file, 'File makedevs.c not created')
+        self.assertExists(patchfile, 'File new_local not created')
 
     def test_devtool_update_recipe_local_files_2(self):
         """Check local source files support when oe-local-files is in Git"""
@@ -1753,6 +1792,8 @@ class DevtoolExtractTests(DevtoolBase):
         # Definitions
         testrecipe = 'mdadm'
         testfile = '/sbin/mdadm'
+        if "usrmerge" in get_bb_var('DISTRO_FEATURES'):
+            testfile = '/usr/sbin/mdadm'
         testimage = 'oe-selftest-image'
         testcommand = '/sbin/mdadm --help'
         # Build an image to run

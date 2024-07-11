@@ -1,10 +1,10 @@
-DISTRO : "4.3"
-DISTRO_NAME_NO_CAP : "nanbield"
-DISTRO_NAME : "Nanbield"
-DISTRO_NAME_NO_CAP_MINUS_ONE : "mickledore"
-DISTRO_NAME_NO_CAP_LTS : "kirkstone"
-YOCTO_DOC_VERSION : "4.3"
-DISTRO_REL_TAG : "yocto-4.3"
+DISTRO : "5.0"
+DISTRO_NAME_NO_CAP : "scarthgap"
+DISTRO_NAME : "Scarthgap"
+DISTRO_NAME_NO_CAP_MINUS_ONE : "nanbield"
+DISTRO_NAME_NO_CAP_LTS : "scarthgap"
+YOCTO_DOC_VERSION : "5.0"
+DISTRO_REL_TAG : "yocto-5.0"
 DOCCONF_VERSION : "dev"
 BITBAKE_SERIES : ""
 YOCTO_DL_URL : "https://downloads.yoctoproject.org"
@@ -12,18 +12,18 @@ YOCTO_AB_URL : "https://autobuilder.yoctoproject.org"
 YOCTO_RELEASE_DL_URL : "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;"
 UBUNTU_HOST_PACKAGES_ESSENTIAL : "gawk wget git diffstat unzip texinfo gcc \
      build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
-     xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
-     python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1
+     xz-utils debianutils iputils-ping python3-git python3-jinja2 \
+     python3-subunit zstd liblz4-tool file locales libacl1
      \n\   $ sudo locale-gen en_US.UTF-8"
 FEDORA_HOST_PACKAGES_ESSENTIAL : "gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
      ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
      python3-pexpect findutils which file cpio python python3-pip xz python3-GitPython \
-     python3-jinja2 SDL-devel rpcgen mesa-libGL-devel perl-FindBin perl-File-Compare \
+     python3-jinja2 rpcgen perl-FindBin perl-File-Compare \
      perl-File-Copy perl-locale zstd lz4 hostname glibc-langpack-en libacl"
 OPENSUSE_HOST_PACKAGES_ESSENTIAL : "python gcc gcc-c++ git chrpath make wget python-xml \
      diffstat makeinfo python-curses patch socat python3 python3-curses tar python3-pip \
-     python3-pexpect xz which python3-Jinja2 Mesa-libEGL1 libSDL-devel rpcgen Mesa-dri-devel \
+     python3-pexpect xz which python3-Jinja2 rpcgen \
      zstd lz4 bzip2 gzip hostname libacl1
      \n\   $ sudo pip3 install GitPython"
 ALMALINUX_HOST_PACKAGES_ESSENTIAL : "-y epel-release
@@ -33,8 +33,8 @@ ALMALINUX_HOST_PACKAGES_ESSENTIAL : "-y epel-release
      \n\   $ sudo dnf install gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath ccache \
      socat perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python3-pip \
-     python3-GitPython python3-jinja2 python3-pexpect xz which SDL-devel \
-     rpcgen mesa-libGL-devel zstd lz4 cpio glibc-langpack-en libacl"
+     python3-GitPython python3-jinja2 python3-pexpect xz which \
+     rpcgen zstd lz4 cpio glibc-langpack-en libacl"
 PIP3_HOST_PACKAGES_DOC : "$ sudo pip3 install sphinx sphinx_rtd_theme pyyaml"
 MIN_PYTHON_VERSION : "3.8.0"
 MIN_TAR_VERSION : "1.28"
