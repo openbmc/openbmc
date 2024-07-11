@@ -229,5 +229,19 @@
         "ActiveLow": true,
         "Bias": "DISABLE",
         "Inventory": "/system/board/Minerva_CMM/CR_TOGGLE_BOOT"
+    },
+    {
+        "Name": "IT_GEAR_RPU_LINK",
+        "LineName": "IT_GEAR_RPU_LINK_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/IT_GEAR_RPU_LINK"
+    },
+    {
+        "Name": "IT_GEAR_RPU_LINK_SPARE",
+        "LineName": "IT_GEAR_RPU_LINK_SPARE_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/IT_GEAR_RPU_LINK_SPARE"
     }
 ]

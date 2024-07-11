@@ -834,5 +834,27 @@
             "RISING": ["leak-detect-deassert@chassis-leak-sensor-1.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "IT_GEAR_LEAK",
+        "ChipId": "2",
+        "GpioNum": 204,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@it-gear-leak.service"],
+            "RISING": ["leak-detect-assert@it-gear-leak.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_GEAR_LEAK_SPARE",
+        "ChipId": "2",
+        "GpioNum": 248,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@it-gear-leak-spare.service"],
+            "RISING": ["leak-detect-assert@it-gear-leak-spare.service"]
+        },
+        "Continue": true
     }
 ]
