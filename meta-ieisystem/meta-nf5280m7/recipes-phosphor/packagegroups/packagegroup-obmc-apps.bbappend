@@ -37,6 +37,5 @@ RDEPENDS:${PN}-flash = " \
 SUMMARY:${PN}-system = "IEI System"
 RDEPENDS:${PN}-system = " \
         entity-manager \
-        iei-ipmi-oem \
         ipmitool \
         "

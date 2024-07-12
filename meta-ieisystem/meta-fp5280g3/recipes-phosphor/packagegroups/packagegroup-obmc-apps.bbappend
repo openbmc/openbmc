@@ -13,7 +13,6 @@ RDEPENDS:${PN}-extras:append = " \
         phosphor-virtual-sensor \
         libmctp \
         tzdata-core \
-        iei-ipmi-oem \
         "
 
 RDEPENDS:${PN}-devtools:append = " \
