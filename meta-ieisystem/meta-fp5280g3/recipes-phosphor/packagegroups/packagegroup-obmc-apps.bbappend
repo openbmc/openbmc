@@ -14,7 +14,3 @@ RDEPENDS:${PN}-extras:append = " \
         libmctp \
         tzdata-core \
         "
-
-RDEPENDS:${PN}-devtools:append = " \
-        ipmitool \
-        "
