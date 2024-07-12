@@ -22,7 +22,7 @@ if [ -z "$target_pwm" ]; then
   exit 1
 fi
 
-zone_num="$(busctl tree xyz.openbmc_project.State.FanCtrl | grep -c zone)"
+zone_num="$(busctl tree xyz.openbmc_project.State.FanCtrl | grep -c -E 'zone[0-9]$')"
 result=0
 
 for (( i = 0; i < zone_num; i++ )); do
