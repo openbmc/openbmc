@@ -141,7 +141,7 @@ KERNEL_CLASSES:append = " obmc-phosphor-kernel-version"
 # their own organization(s).
 OBMC_ORG_YAML_SUBDIRS += " org/freedesktop xyz/openbmc_project"
 
-PREFERRED_VERSION_libgpiod = "1.6.4"
+PREFERRED_VERSION_libgpiod = "1.6.5"
 
 # Enable SBOM: https://docs.yoctoproject.org/next/dev-manual/sbom.html
 INHERIT += "create-spdx"
