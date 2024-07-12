@@ -7,7 +7,7 @@ DEPENDS += "autoconf-archive-native \
             iniparser \
             systemd \
            "
-SRCREV = "ace05dccbbbf5a07ea2581fdf511078b6de6e0f6"
+SRCREV = "e3f1aa1ec8cecd58aa8f67702bd587c2989f787e"
 PACKAGECONFIG ??= "udev ssh"
 PACKAGECONFIG[udev] = "-Dudev=enabled,-Dudev=disabled,udev"
 PACKAGECONFIG[concurrent-servers] = "-Dconcurrent-servers=true,-Dconcurrent-servers=false,"
