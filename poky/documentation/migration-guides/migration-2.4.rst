@@ -91,8 +91,6 @@ occurred:
 Removed Recipes
 ---------------
 
-The following recipes have been removed:
-
 -  ``acpitests``: This recipe is not maintained.
 
 -  ``autogen-native``: No longer required by Grub, oe-core, or
@@ -213,8 +211,6 @@ recipes you might have. This will avoid breakage in post 2.4 releases.
 Package QA Changes
 ------------------
 
-The following package QA changes took place:
-
 -  The "unsafe-references-in-scripts" QA check has been removed.
 
 -  If you refer to ``${COREBASE}/LICENSE`` within
@@ -228,8 +224,6 @@ The following package QA changes took place:
 
 ``README`` File Changes
 -----------------------
-
-The following are changes to ``README`` files:
 
 -  The main Poky ``README`` file has been moved to the ``meta-poky``
    layer and has been renamed ``README.poky``. A symlink has been
@@ -245,8 +239,6 @@ The following are changes to ``README`` files:
 
 Miscellaneous Changes
 ---------------------
-
-The following are additional changes:
 
 -  The ``ROOTFS_PKGMANAGE_BOOTSTRAP`` variable and any references to it
    have been removed. You should remove this variable from any custom

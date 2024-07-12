@@ -66,7 +66,7 @@ Follow these steps to locate and hand-install the toolchain:
       poky-glibc-x86_64-core-image-sato-core2-64-qemux86-64-toolchain-&DISTRO;.sh
 
 #. *Run the Installer:* Be sure you have execution privileges and run
-   the installer. Following is an example from the ``Downloads``
+   the installer. Here is an example from the ``Downloads``
    directory::
 
       $ ~/Downloads/poky-glibc-x86_64-core-image-sato-core2-64-qemux86-64-toolchain-&DISTRO;.sh
@@ -165,12 +165,12 @@ build the SDK installer. Follow these steps:
          variable inside your ``local.conf`` file before building the
          SDK installer. Doing so ensures that the eventual SDK
          installation process installs the appropriate library packages
-         as part of the SDK. Following is an example using ``libc``
+         as part of the SDK. Here is an example using ``libc``
          static development libraries: TOOLCHAIN_TARGET_TASK:append = "
          libc-staticdev"
 
 #. *Run the Installer:* You can now run the SDK installer from
-   ``tmp/deploy/sdk`` in the :term:`Build Directory`. Following is an example::
+   ``tmp/deploy/sdk`` in the :term:`Build Directory`. Here is an example::
 
       $ cd poky/build/tmp/deploy/sdk
       $ ./poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
@@ -235,7 +235,7 @@ Follow these steps to extract the root filesystem:
    This script is located in the top-level directory in which you
    installed the toolchain (e.g. ``poky_sdk``).
 
-   Following is an example based on the toolchain installed in the
+   Here is an example based on the toolchain installed in the
    ":ref:`sdk-manual/appendix-obtain:locating pre-built sdk installers`" section::
 
       $ source poky_sdk/environment-setup-core2-64-poky-linux
@@ -243,7 +243,7 @@ Follow these steps to extract the root filesystem:
 #. *Extract the Root Filesystem:* Use the ``runqemu-extract-sdk``
    command and provide the root filesystem image.
 
-   Following is an example command that extracts the root filesystem
+   Here is an example command that extracts the root filesystem
    from a previously built root filesystem image that was downloaded
    from the :yocto_dl:`Index of Releases </releases/yocto/yocto-&DISTRO;/machines/>`.
    This command extracts the root filesystem into the ``core2-64-sato``

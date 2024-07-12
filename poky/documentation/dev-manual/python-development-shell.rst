@@ -35,7 +35,7 @@ system were executing them. Consequently, working this way can be
 helpful when debugging a build or preparing software to be used with the
 OpenEmbedded build system.
 
-Following is an example that uses ``pydevshell`` on a target named
+Here is an example that uses ``pydevshell`` on a target named
 ``matchbox-desktop``::
 
    $ bitbake matchbox-desktop -c pydevshell

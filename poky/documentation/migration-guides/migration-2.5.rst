@@ -87,8 +87,6 @@ The following recipes have been removed:
 Scripts and Tools Changes
 -------------------------
 
-The following are changes to scripts and tools:
-
 -  ``yocto-bsp``, ``yocto-kernel``, and ``yocto-layer``: The
    ``yocto-bsp``, ``yocto-kernel``, and ``yocto-layer`` scripts
    previously shipped with poky but not in OpenEmbedded-Core have been
@@ -118,8 +116,6 @@ The following are changes to scripts and tools:
 
 BitBake Changes
 ---------------
-
-The following are BitBake changes:
 
 -  The ``--runall`` option has changed. There are two different
    behaviors people might want:
@@ -153,7 +149,7 @@ The following are BitBake changes:
 Python and Python 3 Changes
 ---------------------------
 
-The following are auto-packaging changes to Python and Python 3:
+Here are auto-packaging changes to Python and Python 3:
 
 The script-managed ``python-*-manifest.inc`` files that were previously
 used to generate Python and Python 3 packages have been replaced with a
@@ -186,8 +182,6 @@ change please see :yocto_git:`this commit
 
 Miscellaneous Changes
 ---------------------
-
-The following are additional changes:
 
 -  The :ref:`ref-classes-kernel` class supports building packages for multiple kernels.
    If your kernel recipe or ``.bbappend`` file mentions packaging at

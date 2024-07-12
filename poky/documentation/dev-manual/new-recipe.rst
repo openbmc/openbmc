@@ -100,7 +100,7 @@ command::
 
 Running ``recipetool create -o OUTFILE`` creates the base recipe and
 locates it properly in the layer that contains your source files.
-Following are some syntax examples:
+Here are some syntax examples:
 
  - Use this syntax to generate a recipe based on source. Once generated,
    the recipe resides in the existing source code layer::
@@ -1232,7 +1232,7 @@ inherit the :ref:`ref-classes-autotools` class, which contains the definitions
 of all the steps needed to build an Autotool-based application. The result of
 the build is automatically packaged. And, if the application uses NLS for
 localization, packages with local information are generated (one package per
-language). Following is one example: (``hello_2.3.bb``)::
+language). Here is one example: (``hello_2.3.bb``)::
 
    SUMMARY = "GNU Helloworld application"
    SECTION = "examples"
@@ -1285,7 +1285,7 @@ Splitting an Application into Multiple Packages
 You can use the variables :term:`PACKAGES` and :term:`FILES` to split an
 application into multiple packages.
 
-Following is an example that uses the ``libxpm`` recipe. By default,
+Here is an example that uses the ``libxpm`` recipe. By default,
 this recipe generates a single package that contains the library along
 with a few binaries. You can modify the recipe to split the binaries
 into separate packages::
@@ -1510,7 +1510,7 @@ in the BitBake User Manual.
       when you make the assignment, but this is not generally needed.
 
 -  *Quote All Assignments ("value"):* Use double quotes around values in
-   all variable assignments (e.g. ``"value"``). Following is an example::
+   all variable assignments (e.g. ``"value"``). Here is an example::
 
       VAR1 = "${OTHERVAR}"
       VAR2 = "The version is ${PV}"

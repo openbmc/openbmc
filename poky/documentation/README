@@ -151,6 +151,20 @@ dependencies in a virtual environment:
  $ pipenv install
  $ pipenv run make html
 
+Style checking the Yocto Project documentation
+==============================================
+
+The project is starting to use Vale (https://vale.sh/)
+to validate the text style.
+
+To install Vale:
+
+ $ pip install vale
+
+To run Vale:
+
+ $ make stylecheck
+
 Sphinx theme and CSS customization
 ==================================
 

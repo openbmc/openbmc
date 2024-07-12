@@ -104,7 +104,7 @@ contains directories for specific machines such as ``qemuarm`` and
 defaults, see the ``meta/recipes-bsp/formfactor/files/config`` file
 found in the same area.
 
-Following is an example for "qemuarm" machine::
+Here is an example for "qemuarm" machine::
 
    HAVE_TOUCHSCREEN=1
    HAVE_KEYBOARD=1

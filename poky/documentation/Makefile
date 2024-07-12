@@ -5,6 +5,9 @@
 # from the environment for the first two.
 SPHINXOPTS    ?= -W --keep-going -j auto
 SPHINXBUILD   ?= sphinx-build
+# Release notes are excluded because they contain contributor names and commit messages which can't be modified
+VALEOPTS      ?= --no-wrap --glob '!migration-guides/release-notes-*.rst'
+VALEDOCS      ?= .
 SOURCEDIR     = .
 IMAGEDIRS     = */svg
 BUILDDIR      = _build
@@ -20,7 +23,7 @@ endif
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: all help Makefile clean publish epub latexpdf
+.PHONY: all help Makefile clean stylecheck publish epub latexpdf
 
 publish: Makefile html singlehtml
 	rm -rf $(BUILDDIR)/$(DESTDIR)/
@@ -44,7 +47,15 @@ PNGs := $(foreach dir, $(IMAGEDIRS), $(patsubst %.svg,%.png,$(wildcard $(SOURCED
 	$(SVG2PNG) --export-filename=$@ $<
 
 clean:
-	@rm -rf $(BUILDDIR) $(PNGs) $(PDFs) poky.yaml sphinx-static/switchers.js
+	@rm -rf $(BUILDDIR) $(PNGs) $(PDFs) poky.yaml sphinx-static/switchers.js releases.rst
+
+stylecheck:
+	vale sync
+	vale $(VALEOPTS) $(VALEDOCS)
+
+stylecheck:
+	vale sync
+	vale $(VALEOPTS) $(VALEDOCS)
 
 epub: $(PNGs)
 	$(SOURCEDIR)/set_versions.py

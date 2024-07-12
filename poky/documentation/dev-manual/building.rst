@@ -160,7 +160,7 @@ Follow these steps to set up and execute multiple configuration builds:
    The location for these multiconfig configuration files is specific.
    They must reside in the current :term:`Build Directory` in a sub-directory of
    ``conf`` named ``multiconfig`` or within a layer's ``conf`` directory
-   under a directory named ``multiconfig``. Following is an example that defines
+   under a directory named ``multiconfig``. Here is an example that defines
    two configuration files for the "x86" and "arm" multiconfigs:
 
    .. image:: figures/multiconfig_files.png
@@ -775,10 +775,9 @@ your tunings to best consider build times and package feed maintenance.
       in the script for information on how to use the tool.
 
    -  *BitBake's "-S printdiff" Option:* Using this option causes
-      BitBake to try to establish the closest signature match it can
-      (e.g. in the shared state cache) and then run ``bitbake-diffsigs``
-      over the matches to determine the stamps and delta where these two
-      stamp trees diverge.
+      BitBake to try to establish the most recent signature match
+      (e.g. in the shared state cache) and then compare matched signatures
+      to determine the stamps and delta where these two stamp trees diverge.
 
 Building Software from an External Source
 =========================================

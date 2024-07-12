@@ -1,0 +1,107 @@
+From e824d0d0c219bc6da767f13f90c5b00eefe929f0 Mon Sep 17 00:00:00 2001
+From: Simon Glass <sjg@chromium.org>
+Date: Sat, 23 Sep 2023 14:50:15 -0600
+Subject: [PATCH] bootstd: Scan all bootdevs in a boot_targets entry
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When the boot_targets environment variable is used with the distro-boot
+scripts, each device is included individually. For example, if there
+are three mmc devices, then we will have something like:
+
+   boot_targets="mmc0 mmc1 mmc2"
+
+In contrast, standard boot supports specifying just the uclass, i.e.:
+
+   boot_targets="mmc"
+
+The intention is that this should scan all MMC devices, but in fact it
+currently only scans the first.
+
+Update the logic to handle this case, without required BOOTSTD_FULL to
+be enabled.
+
+I believe at least three people reported this, but I found two.
+
+Signed-off-by: Simon Glass <sjg@chromium.org>
+Reported-by: Date Huang <tjjh89017@hotmail.com>
+Reported-by: Vincent Stehlé <vincent.stehle@arm.com>
+---
+Upstream-Status: Backport [v2024.01 e824d0d0c219bc6da767f13f90c5b00eefe929f0]
+
+ boot/bootdev-uclass.c |  3 ++-
+ boot/bootflow.c       | 21 +++++++++++++++++++--
+ test/boot/bootdev.c   | 10 ++++++++++
+ 3 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/boot/bootdev-uclass.c b/boot/bootdev-uclass.c
+index 974ddee5d2..44ae98a926 100644
+--- a/boot/bootdev-uclass.c
++++ b/boot/bootdev-uclass.c
+@@ -469,10 +469,11 @@ int bootdev_find_by_label(const char *label, struct udevice **devp,
+ 			 * if no sequence number was provided, we must scan all
+ 			 * bootdevs for this media uclass
+ 			 */
+-			if (IS_ENABLED(CONFIG_BOOTSTD_FULL) && seq == -1)
++			if (seq == -1)
+ 				method_flags |= BOOTFLOW_METHF_SINGLE_UCLASS;
+ 			if (method_flagsp)
+ 				*method_flagsp = method_flags;
++			log_debug("method flags %x\n", method_flags);
+ 			return 0;
+ 		}
+ 		log_debug("- no device in %s\n", media->name);
+diff --git a/boot/bootflow.c b/boot/bootflow.c
+index 6ef62e1d18..e03932e65a 100644
+--- a/boot/bootflow.c
++++ b/boot/bootflow.c
+@@ -260,8 +260,25 @@ static int iter_incr(struct bootflow_iter *iter)
+ 		} else {
+ 			log_debug("labels %p\n", iter->labels);
+ 			if (iter->labels) {
+-				ret = bootdev_next_label(iter, &dev,
+-							 &method_flags);
++				/*
++				 * when the label is "mmc" we want to scan all
++				 * mmc bootdevs, not just the first. See
++				 * bootdev_find_by_label() where this flag is
++				 * set up
++				 */
++				if (iter->method_flags & BOOTFLOW_METHF_SINGLE_UCLASS) {
++					uclass_next_device(&dev);
++					log_debug("looking for next device %s: %s\n",
++						  iter->dev->name,
++						  dev ? dev->name : "<none>");
++				} else {
++					dev = NULL;
++				}
++				if (!dev) {
++					log_debug("looking at next label\n");
++					ret = bootdev_next_label(iter, &dev,
++								 &method_flags);
++				}
+ 			} else {
+ 				ret = bootdev_next_prio(iter, &dev);
+ 				method_flags = 0;
+diff --git a/test/boot/bootdev.c b/test/boot/bootdev.c
+index 6b29213416..c5f14a7a13 100644
+--- a/test/boot/bootdev.c
++++ b/test/boot/bootdev.c
+@@ -221,6 +221,16 @@ static int bootdev_test_order(struct unit_test_state *uts)
+ 	ut_asserteq_str("mmc2.bootdev", iter.dev_used[1]->name);
+ 	bootflow_iter_uninit(&iter);
+ 
++	/* Make sure it scans a bootdevs in each target */
++	ut_assertok(env_set("boot_targets", "mmc spi"));
++	ut_asserteq(0, bootflow_scan_first(NULL, NULL, &iter, 0, &bflow));
++	ut_asserteq(-ENODEV, bootflow_scan_next(&iter, &bflow));
++	ut_asserteq(3, iter.num_devs);
++	ut_asserteq_str("mmc2.bootdev", iter.dev_used[0]->name);
++	ut_asserteq_str("mmc1.bootdev", iter.dev_used[1]->name);
++	ut_asserteq_str("mmc0.bootdev", iter.dev_used[2]->name);
++	bootflow_iter_uninit(&iter);
++
+ 	return 0;
+ }
+ BOOTSTD_TEST(bootdev_test_order, UT_TESTF_DM | UT_TESTF_SCAN_FDT);

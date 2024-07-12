@@ -142,7 +142,7 @@ Python changes
   classes should be updated to inherit ``setuptools*`` equivalents instead.
   
 - The Python package build process is now based on `wheels <https://pythonwheels.com/>`__.
-  Here are the new Python packaging classes that should be used:
+  The new Python packaging classes that should be used are
   :ref:`ref-classes-python_flit_core`, :ref:`ref-classes-python_setuptools_build_meta`
   and :ref:`ref-classes-python_poetry_core`.
 

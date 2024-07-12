@@ -1,0 +1,46 @@
+From 45b3fae4675dc1d4ee2d7aefa19d85ee4f891377 Mon Sep 17 00:00:00 2001
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Date: Sat, 25 Nov 2023 15:33:58 -0600
+Subject: [PATCH] neighbour: Fix __randomize_layout crash in struct neighbour
+
+Previously, one-element and zero-length arrays were treated as true
+flexible arrays, even though they are actually "fake" flex arrays.
+The __randomize_layout would leave them untouched at the end of the
+struct, similarly to proper C99 flex-array members.
+
+However, this approach changed with commit 1ee60356c2dc ("gcc-plugins:
+randstruct: Only warn about true flexible arrays"). Now, only C99
+flexible-array members will remain untouched at the end of the struct,
+while one-element and zero-length arrays will be subject to randomization.
+
+Fix a `__randomize_layout` crash in `struct neighbour` by transforming
+zero-length array `primary_key` into a proper C99 flexible-array member.
+
+Fixes: 1ee60356c2dc ("gcc-plugins: randstruct: Only warn about true flexible arrays")
+Closes: https://lore.kernel.org/linux-hardening/20231124102458.GB1503258@e124191.cambridge.arm.com/
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Tested-by: Joey Gouly <joey.gouly@arm.com>
+Link: https://lore.kernel.org/r/ZWJoRsJGnCPdJ3+2@work
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+Upstream-Status: Backport
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+
+---
+ include/net/neighbour.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+index 07022bb0d44d..0d28172193fa 100644
+--- a/include/net/neighbour.h
++++ b/include/net/neighbour.h
+@@ -162,7 +162,7 @@ struct neighbour {
+ 	struct rcu_head		rcu;
+ 	struct net_device	*dev;
+ 	netdevice_tracker	dev_tracker;
+-	u8			primary_key[0];
++	u8			primary_key[];
+ } __randomize_layout;
+ 
+ struct neigh_ops {

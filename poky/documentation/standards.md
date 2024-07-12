@@ -5,6 +5,21 @@ documentation is created.
 
 It is currently a work in progress.
 
+## Automatic style validation
+
+There is an ongoing effort to automate style validation
+through the [Vale](https://vale.sh/). To try it, run:
+
+    $ make stylecheck
+
+Note that this just applies to text. Therefore, the syntax
+conventions described below still apply.
+
+If you wish to add a new word to an "accept.txt" file
+(./styles/config/vocabularies/<Vocab>/accept.txt),
+make sure the spelling and capitalization matches
+what Wikipedia or the project defining this word uses.
+
 ## Text standards
 
 ### Bulleted lists

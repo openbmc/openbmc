@@ -470,9 +470,29 @@ You can run this task using BitBake as follows::
 
    $ bitbake -c cleanall recipe
 
-Typically, you would not normally use the :ref:`ref-tasks-cleanall` task. Do so only
-if you want to start fresh with the :ref:`ref-tasks-fetch`
-task.
+You should never use the :ref:`ref-tasks-cleanall` task in a normal
+scenario. If you want to start fresh with the :ref:`ref-tasks-fetch` task,
+use instead::
+
+  $ bitbake -f -c fetch recipe
+
+.. note::
+
+   The reason to prefer ``bitbake -f -c fetch`` is that the
+   :ref:`ref-tasks-cleanall` task would break in some cases, such as::
+
+      $ bitbake -c fetch    recipe
+      $ bitbake -c cleanall recipe-native
+      $ bitbake -c unpack   recipe
+
+   because after step 1 there is a stamp file for the
+   :ref:`ref-tasks-fetch` task of ``recipe``, and it won't be removed at
+   step 2 because step 2 uses a different work directory. So the unpack task
+   at step 3 will try to extract the downloaded archive and fail as it has
+   been deleted in step 2.
+
+   Note that this also applies to BitBake from concurrent processes when a
+   shared download directory (:term:`DL_DIR`) is setup.
 
 .. _ref-tasks-cleansstate:
 
@@ -493,6 +513,18 @@ You can run this task using BitBake as follows::
 When you run the :ref:`ref-tasks-cleansstate` task, the OpenEmbedded build system
 no longer uses any sstate. Consequently, building the recipe from
 scratch is guaranteed.
+
+.. note::
+
+   Using :ref:`ref-tasks-cleansstate` with a shared :term:`SSTATE_DIR` is
+   not recommended because it could trigger an error during the build of a
+   separate BitBake instance. This is because the builds check sstate "up
+   front" but download the files later, so it if is deleted in the
+   meantime, it will cause an error but not a total failure as it will
+   rebuild it.
+
+   The reliable and preferred way to force a new build is to use ``bitbake
+   -f`` instead.
 
 .. note::
 

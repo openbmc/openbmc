@@ -170,7 +170,7 @@ You can use the ``oe-pkgdata-util`` command-line utility to query
 various package-related information. When you use the utility, you must
 use it to view information on packages that have already been built.
 
-Following are a few of the available ``oe-pkgdata-util`` subcommands.
+Here are a few of the available ``oe-pkgdata-util`` subcommands.
 
 .. note::
 
@@ -339,7 +339,10 @@ BitBake has determined by doing the following:
    :term:`BB_BASEHASH_IGNORE_VARS`
    information.
 
-There is also a ``bitbake-diffsigs`` command for comparing two
+Debugging signature construction and unexpected task executions
+===============================================================
+
+There is a ``bitbake-diffsigs`` command for comparing two
 ``siginfo`` or ``sigdata`` files. This command can be helpful when
 trying to figure out what changed between two versions of a task. If you
 call ``bitbake-diffsigs`` with just one file, the command behaves like
@@ -356,8 +359,12 @@ BitBake command-line options::
 .. note::
 
    Two common values for `SIGNATURE_HANDLER` are "none" and "printdiff", which
-   dump only the signature or compare the dumped signature with the cached one,
-   respectively.
+   dump only the signature or compare the dumped signature with the most recent one,
+   respectively. "printdiff" will try to establish the most recent
+   signature match (e.g. in the sstate cache) and then
+   compare the matched signatures to determine the stamps and delta
+   where these two stamp trees diverge. This can be used to determine why
+   tasks need to be re-run in situations where that is not expected.
 
 Using BitBake with either of these options causes BitBake to dump out
 ``sigdata`` files in the ``stamps`` directory for every task it would
@@ -608,7 +615,7 @@ logs, keep in mind the goal is to have informative logs while keeping
 the console as "silent" as possible. Also, if you want status messages
 in the log, use the "debug" loglevel.
 
-Following is an example written in Python. The code handles logging for
+Here is an example written in Python. The code handles logging for
 a function that determines the number of tasks needed to be run. See the
 ":ref:`ref-tasks-listtasks`"
 section for additional information::
@@ -636,7 +643,7 @@ logs, you have the same goals --- informative with minimal console output.
 The syntax you use for recipes written in Bash is similar to that of
 recipes written in Python described in the previous section.
 
-Following is an example written in Bash. The code logs the progress of
+Here is an example written in Bash. The code logs the progress of
 the ``do_my_function`` function::
 
    do_my_function() {
@@ -1221,7 +1228,7 @@ Here are some other tips that you might find useful:
                "$@"
       }
 
-   Following are some usage examples::
+   Here are some usage examples::
 
       $ g FOO # Search recursively for "FOO"
       $ g -i foo # Search recursively for "foo", ignoring case

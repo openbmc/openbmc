@@ -21,7 +21,7 @@ BBCLASSEXTEND = "${@' '.join(['mcextend:'+x for x in d.getVar('PTESTS').split()]
 IMAGE_OVERHEAD_FACTOR = "1.0"
 IMAGE_ROOTFS_EXTRA_SPACE = "324288"
 IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-mdadm = "1524288"
-IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-strace = "1024288"
+IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-strace = "1524288"
 IMAGE_ROOTFS_EXTRA_SPACE:virtclass-mcextend-lttng-tools = "1524288"
 
 # tar-ptest in particular needs more space

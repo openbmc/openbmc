@@ -365,7 +365,7 @@ Perform the following steps to install Toaster:
 
       /etc/apache2/conf.d/toaster.conf
 
-    Following is a sample Apache configuration for Toaster you can follow:
+    Here is a sample Apache configuration for Toaster you can follow:
 
     .. code-block:: apache
 
@@ -495,7 +495,7 @@ The Toaster web interface allows you to do the following:
 Toaster Web Interface Videos
 ----------------------------
 
-Following are several videos that show how to use the Toaster GUI:
+Here are several videos that show how to use the Toaster GUI:
 
 -  *Build Configuration:* This
    `video <https://www.youtube.com/watch?v=qYgDZ8YzV6w>`__ overviews and

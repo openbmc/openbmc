@@ -1,0 +1,18 @@
+Set the max-time timeout to 600 so the timeout is 10 minutes instead of 13 seconds.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/tests/servers.pm b/tests/servers.pm
+index d4472d509..aeab62c47 100644
+--- a/tests/servers.pm
++++ b/tests/servers.pm
+@@ -120,7 +120,7 @@ my $sshdverstr;  # for socks server, ssh daemon version string
+ my $sshderror;   # for socks server, ssh daemon version error
+ my %doesntrun;    # servers that don't work, identified by pidfile
+ my %PORT = (nolisten => 47); # port we use for a local non-listening service
+-my $server_response_maxtime=13;
++my $server_response_maxtime=600;
+ my $httptlssrv = find_httptlssrv();
+ my %run;          # running server
+ my %runcert;      # cert file currently in use by an ssl running server

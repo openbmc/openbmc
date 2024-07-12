@@ -25,7 +25,7 @@ SRC_URI = "https://www.gnupg.org/ftp/gcrypt/gnutls/v${SHRT_VER}/gnutls-${PV}.tar
            file://Add-ptest-support.patch \
            "
 
-SRC_URI[sha256sum] = "ba8b9e15ae20aba88f44661978f5b5863494316fe7e722ede9d069fe6294829c"
+SRC_URI[sha256sum] = "f74fc5954b27d4ec6dfbb11dea987888b5b124289a3703afcada0ee520f4173e"
 
 inherit autotools texinfo pkgconfig gettext lib_package gtk-doc ptest
 

@@ -205,9 +205,14 @@ history, see the
    The OpenEmbedded build system does not maintain :term:`PR` information as
    part of the shared state (sstate) packages. If you maintain an sstate
    feed, it's expected that either all your building systems that
-   contribute to the sstate feed use a shared PR Service, or you do not
-   run a PR Service on any of your building systems. Having some systems
-   use a PR Service while others do not leads to obvious problems.
+   contribute to the sstate feed use a shared PR service, or you do not
+   run a PR service on any of your building systems.
+
+   That's because if you had multiple machines sharing a PR service but
+   not their sstate feed, you could end up with "diverging" hashes for
+   the same output artefacts. When presented to the share PR service,
+   each would be considered as new and would increase the revision
+   number, causing many unnecessary package upgrades.
 
    For more information on shared state, see the
    ":ref:`overview-manual/concepts:shared state cache`"
@@ -365,7 +370,7 @@ For more examples that show how to use ``do_split_packages``, see the
 directory of the ``poky`` :ref:`source repository <overview-manual/development-environment:yocto project source repositories>`. You can
 also find examples in ``meta/classes-recipe/kernel.bbclass``.
 
-Following is a reference that shows ``do_split_packages`` mandatory and
+Here is a reference that shows ``do_split_packages`` mandatory and
 optional arguments::
 
    Mandatory arguments
@@ -606,6 +611,13 @@ do not define these variables, then manual steps as described in the
 subsequent sections are necessary to configure the target. You should
 set these variables before building the image in order to produce a
 correctly configured image.
+
+.. note::
+
+   Your image will need enough free storage space to run package upgrades,
+   especially if many of them need to be downloaded at the same time.
+   You should make sure images are created with enough free space
+   by setting the :term:`IMAGE_ROOTFS_EXTRA_SPACE` variable.
 
 When your build is complete, your packages reside in the
 ``${TMPDIR}/deploy/packageformat`` directory. For example, if
@@ -1123,7 +1135,7 @@ The ``devtool edit-recipe`` command lets you take a look at the recipe::
    ...
    LICENSE:${PN}-vary = "MIT"
 
-Here are three key points in the previous example:
+Three key points in the previous example are:
 
 -  :term:`SRC_URI` uses the NPM
    scheme so that the NPM fetcher is used.

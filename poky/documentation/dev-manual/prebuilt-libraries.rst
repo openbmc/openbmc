@@ -148,8 +148,8 @@ recipe. By default, ``libfoo.so`` gets packaged into ``${PN}-dev``, which
 triggers a QA warning that a non-symlink library is in a ``-dev`` package,
 and binaries in the same recipe link to the library in ``${PN}-dev``,
 which triggers more QA warnings. To solve this problem, you need to package the
-unversioned library into ``${PN}`` where it belongs. The following are the abridged
-default :term:`FILES` variables in ``bitbake.conf``::
+unversioned library into ``${PN}`` where it belongs. The abridged
+default :term:`FILES` variables in ``bitbake.conf`` are::
 
    SOLIBS = ".so.*"
    SOLIBSDEV = ".so"

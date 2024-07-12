@@ -66,7 +66,7 @@ The SDK development environment consists of the following:
 
 In summary, the extensible and standard SDK share many features.
 However, the extensible SDK has powerful development tools to help you
-more quickly develop applications. Following is a table that summarizes
+more quickly develop applications. Here is a table that summarizes
 the primary differences between the standard and extensible SDK types
 when considering which to build:
 

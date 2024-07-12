@@ -311,7 +311,7 @@ timestamp when it needs to look for an image. Minimally, through the use
 of options, you must provide either a machine name, a virtual machine
 image (``*wic.vmdk``), or a kernel image (``*.bin``).
 
-Following is the command-line help output for the ``runqemu`` command::
+Here is the command-line help output for the ``runqemu`` command::
 
    $ runqemu --help
 
@@ -353,7 +353,7 @@ Following is the command-line help output for the ``runqemu`` command::
 ``runqemu`` Command-Line Options
 ================================
 
-Following is a description of ``runqemu`` options you can provide on the
+Here is a description of ``runqemu`` options you can provide on the
 command line:
 
 .. note::

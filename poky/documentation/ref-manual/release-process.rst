@@ -14,7 +14,7 @@ Major and Minor Release Cadence
 
 The Yocto Project delivers major releases (e.g. &DISTRO;) using a six
 month cadence roughly timed each April and October of the year.
-Following are examples of some major YP releases with their codenames
+Here are examples of some major YP releases with their codenames
 also shown. See the ":ref:`ref-manual/release-process:major release codenames`"
 section for information on codenames used with major releases.
 
@@ -29,8 +29,8 @@ major holidays in various geographies.
 
 The Yocto project delivers minor (point) releases on an unscheduled
 basis and are usually driven by the accumulation of enough significant
-fixes or enhancements to the associated major release. Following are
-some example past point releases:
+fixes or enhancements to the associated major release.
+Some example past point releases are:
 
   - 4.1.3
   - 4.0.8
@@ -175,7 +175,7 @@ consists of the following pieces:
    piece of software. The test allows the packages to be run within a
    target image.
 
--  ``oe-selftest``: Tests combination BitBake invocations. These tests
+-  ``oe-selftest``: Tests combinations of BitBake invocations. These tests
    operate outside the OpenEmbedded build system itself. The
    ``oe-selftest`` can run all tests by default or can run selected
    tests or test suites.

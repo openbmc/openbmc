@@ -27,7 +27,7 @@ Specifying the ``LIC_FILES_CHKSUM`` Variable
 --------------------------------------------
 
 The :term:`LIC_FILES_CHKSUM` variable contains checksums of the license text
-in the source code for the recipe. Following is an example of how to
+in the source code for the recipe. Here is an example of how to
 specify :term:`LIC_FILES_CHKSUM`::
 
    LIC_FILES_CHKSUM = "file://COPYING;md5=xxxx \

@@ -392,7 +392,7 @@ and BusyBox. It could have been called "kconfig" too.
 ``compress_doc``
 ================
 
-Enables compression for man pages and info pages. This class is intended
+Enables compression for manual and info pages. This class is intended
 to be inherited globally. The default compression mechanism is gz (gzip)
 but you can select an alternative mechanism by setting the
 :term:`DOC_COMPRESS` variable.
@@ -664,7 +664,7 @@ information about using :ref:`ref-classes-devshell`.
 The :ref:`ref-classes-devupstream` class uses
 :term:`BBCLASSEXTEND` to add a variant of the
 recipe that fetches from an alternative URI (e.g. Git) instead of a
-tarball. Following is an example::
+tarball. Here is an example::
 
    BBCLASSEXTEND = "devupstream:target"
    SRC_URI:class-devupstream = "git://git.example.com/example;branch=main"
@@ -1217,8 +1217,8 @@ Please keep in mind that the QA checks
 are meant to detect real or potential problems in the packaged
 output. So exercise caution when disabling these checks.
 
-Here are the tests you can list with the :term:`WARN_QA` and
-:term:`ERROR_QA` variables:
+The tests you can list with the :term:`WARN_QA` and
+:term:`ERROR_QA` variables are:
 
 -  ``already-stripped:`` Checks that produced binaries have not
    already been stripped prior to the build system extracting debug
@@ -3217,7 +3217,7 @@ information.
 The :ref:`ref-classes-uboot-sign` class provides support for U-Boot verified boot.
 It is intended to be inherited from U-Boot recipes.
 
-Here are variables used by this class:
+The variables used by this class are:
 
 -  :term:`SPL_MKIMAGE_DTCOPTS`: DTC options for U-Boot ``mkimage`` when
    building the FIT image.
