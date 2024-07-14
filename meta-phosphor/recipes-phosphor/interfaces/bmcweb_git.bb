@@ -13,7 +13,7 @@ DEPENDS = " \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
 "
-SRCREV = "ac1e1246464e28fe4313ba936a6b8f64ec65bb12"
+SRCREV = "f51d863523b7bfec5c45b0a847178b5d853404d9"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https"
@@ -32,13 +32,13 @@ PACKAGECONFIG ??= "mutual-tls-auth"
 PACKAGECONFIG[insecure-redfish-expand]="-Dinsecure-enable-redfish-query=enabled"
 PACKAGECONFIG[mutual-tls-auth]="-Dmutual-tls-auth=enabled,-Dmutual-tls-auth=disabled"
 
-MUTUAL_TLS_PARSING="username"
+MUTUAL_TLS_PARSING="CommonName"
 
 EXTRA_OEMESON = " \
     --buildtype=minsize \
     -Dtests=${@bb.utils.contains('PTEST_ENABLED', '1', 'enabled', 'disabled', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'mutual-tls-auth', \
-        '-Dmutual-tls-common-name-parsing=' + d.getVar('MUTUAL_TLS_PARSING', True), \
+        '-Dmutual-tls-common-name-parsing-default=' + d.getVar('MUTUAL_TLS_PARSING', True), \
         '', d)} \
 "
 
