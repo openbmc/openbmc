@@ -16,6 +16,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
         '', d)} \
     curl \
     dbus-top \
+    iproute2 \
     jq \
     strace \
     tcpdump \
