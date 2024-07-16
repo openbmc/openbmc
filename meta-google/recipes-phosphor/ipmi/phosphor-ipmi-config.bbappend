@@ -62,7 +62,7 @@ do_install:append:gbmc() {
 
   # Set entity-map.json to empty json for gBMC by default.
   # Each system will override it if needed.
-  if [[ "${ENTITY_MAPPING}" != "default" ]]; then
+  if [ "${ENTITY_MAPPING}" != "default" ]; then
     echo "[]" > ${D}${datadir}/ipmi-providers/entity-map.json
   fi
 }
