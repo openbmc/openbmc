@@ -9,6 +9,5 @@ RDEPENDS:${PN}-extras:append = " \
         srvcfg-manager \
         biosconfig-manager \
         phosphor-host-postd \
-        phosphor-virtual-sensor \
         libmctp \
         "

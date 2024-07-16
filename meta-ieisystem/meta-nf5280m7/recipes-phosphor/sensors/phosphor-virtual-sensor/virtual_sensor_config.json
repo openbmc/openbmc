@@ -1,0 +1,131 @@
+[
+    {
+        "Desc": {
+            "Name": "Total_Power",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/chassis"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "P1",
+                    "Desc": {
+                        "Name": "PSU0_PIN",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P2",
+                    "Desc": {
+                        "Name": "PSU1_PIN",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P3",
+                    "Desc": {
+                        "Name": "PSU2_PIN",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "P4",
+                    "Desc": {
+                        "Name": "PSU3_PIN",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "(P1 > 0 ? P1:0) + (P2 > 0 ? P2:0) + (P3 > 0 ? P3:0) + (P4 > 0 ? P4:0)"
+    },
+    {
+        "Desc": {
+            "Name": "GPU_Temp",
+            "SensorType": "temperature",
+            "MinValue": -128,
+            "MaxValue": 127
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "n0",
+                    "Desc": {
+                        "Name": "R_PCIE0_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n1",
+                    "Desc": {
+                        "Name": "R_PCIE1_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n2",
+                    "Desc": {
+                        "Name": "R_PCIE2_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n3",
+                    "Desc": {
+                        "Name": "R_PCIE3_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n4",
+                    "Desc": {
+                        "Name": "R_PCIE4_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n5",
+                    "Desc": {
+                        "Name": "R_PCIE5_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n6",
+                    "Desc": {
+                        "Name": "R_PCIE6_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n7",
+                    "Desc": {
+                        "Name": "R_PCIE7_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n8",
+                    "Desc": {
+                        "Name": "R_PCIE8_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "n9",
+                    "Desc": {
+                        "Name": "R_PCIE9_GPU_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0,n0, n1, n2, n3,n4,n5,n6,n7,n8,n9)"
+    }
+]
