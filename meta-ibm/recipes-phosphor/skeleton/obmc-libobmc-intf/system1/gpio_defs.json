@@ -20,6 +20,11 @@
             "name": "POWER_BUTTON",
             "pin": "X6",
             "direction": "in"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "F0",
+            "direction": "in"
         }
     ]
 }
