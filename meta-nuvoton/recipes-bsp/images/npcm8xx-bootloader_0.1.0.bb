@@ -16,10 +16,7 @@ SRCREV = "518d3f58f4f157373a5b1aaebaf22f80bb13d0d9"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = " \
-    npcm8xx-tip-fw npcm8xx-bootblock trusted-firmware-a optee-os \
-    u-boot-nuvoton npcm7xx-bingo-native openssl-native \
-"
+DEPENDS = "npcm7xx-bingo-native openssl-native"
 inherit obmc-phosphor-utils
 inherit python3native deploy
 FILE_FMT = "file://{}"
@@ -59,6 +56,10 @@ do_configure() {
     fi
 }
 
+do_compile[depends] += " \
+    npcm8xx-tip-fw:do_deploy npcm8xx-bootblock:do_deploy \
+    trusted-firmware-a:do_deploy optee-os:do_deploy \
+    u-boot-nuvoton:do_deploy"
 do_compile() {
     # copy Openbmc built images
     cd ${DEPLOY_DIR_IMAGE}
