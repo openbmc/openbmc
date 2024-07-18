@@ -5,15 +5,23 @@
 # Provide source directive to shellcheck.
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
 #IO 0:7 input port for showing slot 1:8 power status
 #IO 8:16 output port for controlling slot 1:8 power status
 CHASSIS_ID=$1
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 #IO_EXP_BIC_PWR_CTRL=32
+IO_EXP_SLOT_12V_STATUS=$((CHASSIS_ID + 23))
 
 GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
 #GPIOCHIP_IO_EXP_BIC_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$IO_EXP_SLOT_PWR_STATUS-00$IO_EXP_BIC_PWR_CTRL_ADDR/"*gpiochip*)
+GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL=$(basename "/sys/bus/i2c/devices/$MANAGEMENT_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLED_PWR_CTRL_ADDR/"*gpiochip*)
+
+check_nuvoton_board
+is_nuvoton_board=$?
 
 # Server 12v power off
 chassis-power-off()
@@ -47,6 +55,14 @@ fi
 
 if [ "$chassis_status" == "$STATE_ON" ]
 then
+        if [ "$is_nuvoton_board" -eq "1" ]
+        then
+                # inform management CPLD that the slot is 12V off
+                if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL" "$IO_EXP_SLOT_12V_STATUS"=0
+                then
+                        echo "Failed to inform management CPLD that slot$1 is 12V off"
+                fi
+        fi
         chassis-power-off
         exit 0;
 else
