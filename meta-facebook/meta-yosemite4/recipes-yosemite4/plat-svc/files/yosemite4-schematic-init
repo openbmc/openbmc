@@ -3,13 +3,23 @@
 source /usr/libexec/yosemite4-common-functions
 
 # probe devices behind mux for management board cpld
+mgm_stage=$(get_product_version Management_Board)
 
-stage=$(busctl introspect xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice/Medusa_Board | grep '.PRODUCT_VERSION' | awk -F\" '{print $2}')
+if [ -z "$mgm_stage" ]; then
+    echo "Failed to check management board fru info, all CPLD I/O expender are keeping default setting"
+elif [ "$mgm_stage" = "DVT" ] || [ "$mgm_stage" = "EVT" ]; then
+    echo pca9506 "0x20" > /sys/bus/i2c/devices/i2c-13/new_device
+    echo pca9506 "0x21" > /sys/bus/i2c/devices/i2c-13/new_device
+    echo pca9506 "0x22" > /sys/bus/i2c/devices/i2c-13/new_device
+    echo pca9506 "0x23" > /sys/bus/i2c/devices/i2c-13/new_device
+fi
 
 # set initial value for pca9555 i/o pins on medusa board
-if [ -z "$stage" ]; then
+medusa_stage=$(get_product_version Medusa_Board)
+
+if [ -z "$medusa_stage" ]; then
     echo "Failed to check medusa board fru info, all I/O pins are keeping default input"
-elif [ "$stage" = "POC" ]; then
+elif [ "$medusa_stage" = "POC" ]; then
     set_gpio P48V_OCP_GPIO1       0
     set_gpio P48V_OCP_GPIO2       0
     set_gpio P48V_OCP_GPIO3       0

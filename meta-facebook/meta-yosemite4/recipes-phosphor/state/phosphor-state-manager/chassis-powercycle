@@ -16,9 +16,15 @@ IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 IO_EXP_SLED_CYCLE=12
 #IO_EXP_BIC_PWR_CTRL=32
 IO_EXP_SLOT_12V_STATUS=$((CHASSIS_ID + 23))
+MANAGEMENT_BOARD_VERSION=$(get_product_version Management_Board)
 
 GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
-GPIOCHIP_IO_EXP_SLED_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$MANAGEMENT_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLED_PWR_CTRL_ADDR/"*gpiochip*)
+if [ -z "$MANAGEMENT_BOARD_VERSION" ]; then
+    echo "Failed to check management board fru info, sled cycle keep default setting"
+elif [ "$MANAGEMENT_BOARD_VERSION" = "DVT" ] || [ "$MANAGEMENT_BOARD_VERSION" = "EVT" ]; then
+    GPIOCHIP_IO_EXP_SLED_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$MANAGEMENT_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLED_PWR_CTRL_ADDR/"*gpiochip*)
+fi
+
 #GPIOCHIP_IO_EXP_BIC_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$IO_EXP_SLOT_PWR_STATUS-00$IO_EXP_BIC_PWR_CTRL_ADDR/"*gpiochip*)
 
 is_nuvoton_board="$(check_nuvoton_board)"
@@ -88,10 +94,21 @@ chassis-power-cycle()
     exit 1;
 }
 
+sled-cycle()
+{
+    if [ -z "$MANAGEMENT_BOARD_VERSION" ]; then
+        set_gpio FM_BMC_SLED_CYCLE_R 1
+    elif [ "$MANAGEMENT_BOARD_VERSION" = "DVT" ] || [ "$MANAGEMENT_BOARD_VERSION" = "EVT" ]; then
+        gpio_set "$GPIOCHIP_IO_EXP_SLED_PWR_CTRL" "$IO_EXP_SLED_CYCLE"=1
+    else
+        set_gpio FM_BMC_SLED_CYCLE_R 1
+    fi
+}
+
 if [ "$1" == 0 ]
 then
     echo "Starting sled cycle..."
-    if ! gpio_set "$GPIOCHIP_IO_EXP_SLED_PWR_CTRL" "$IO_EXP_SLED_CYCLE"=1
+    if ! sled-cycle
     then
         echo "Failed to do sled cycle"
     fi
