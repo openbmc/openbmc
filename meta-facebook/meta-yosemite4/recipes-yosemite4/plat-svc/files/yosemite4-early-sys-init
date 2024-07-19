@@ -13,6 +13,17 @@ enable_all_fan_input()
     done
 }
 
+set_sd_bic_interface_to_i3c()
+{
+    for host_bus in $(seq 0 7);
+    do
+      GPIOCHIP=$(basename /sys/bus/i2c/devices/"$host_bus"-0023/*gpiochip*)
+      if [ "$GPIOCHIP" != "*gpiochip*" ]; then
+        gpioset "$GPIOCHIP" 24=1
+      fi
+    done
+}
+
 # probe devices behind mux for management board cpld
 
 rev_id_gpiochip=$(basename "/sys/bus/i2c/devices/13-0020/"*gpiochip*)
@@ -57,5 +68,11 @@ fi
 
 # Enable all fan input as early as possible
 enable_all_fan_input
+
+if [ "$is_nuvoton_board" -eq "1" ]
+then
+    # Set interface to SD BIC to I3C for Nuvoton BMC
+    set_sd_bic_interface_to_i3c
+fi
 
 exit 0
