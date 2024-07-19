@@ -25,7 +25,9 @@ chassis-power-on()
 {
     if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
     then
-        echo "Failed to set slot$1 power on"
+        msg="Failed to set slot$1 power on"
+        echo "${msg}"
+        add_sel "${msg}"
     fi
     sleep 1
 
@@ -42,10 +44,12 @@ chassis-power-on()
             fi
         fi
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
-        echo "Chassis$1 is power on"
+        echo "Chassis$CHASSIS_ID is power on"
     else
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
-        echo "Chassis$1 is power off"
+        msg="Failed to power on Chassis$CHASSIS_ID, Chassis$CHASSIS_ID is power off"
+        echo "${msg}"
+        add_sel "${msg}"
         exit 0;
     fi
 }

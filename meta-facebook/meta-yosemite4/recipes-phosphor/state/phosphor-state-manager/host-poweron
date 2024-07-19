@@ -48,6 +48,8 @@ then
     echo "Host$1 power on success"
     exit 0;
 else
-    echo "Failed to set host$1 power on"
+    msg="Failed to set host$1 power on"
+    echo "${msg}"
+    add_sel "${msg}"
     exit 1
 fi

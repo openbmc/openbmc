@@ -34,7 +34,9 @@ if [ "$host_status" == "$STATE_ON" ]; then
     get_host_status
 
     if [ "$host_status" != "$STATE_OFF" ]; then
-        echo "Do power cycle fail, fail to set host$CHASSIS_ID power off"
+        msg="Do power cycle fail, fail to set host$CHASSIS_ID power off"
+        echo "${msg}"
+        add_sel "${msg}"
         exit 1
     fi
 fi
@@ -48,10 +50,14 @@ if [ "$host_status" != "$STATE_ON" ]; then
     get_host_status
 
     if [ "$host_status" != "$STATE_ON" ]; then
-        echo "Do power cycle, failed to set host$CHASSIS_ID power on"
+        msg="Do power cycle, failed to set host$CHASSIS_ID power on"
+        echo "${msg}"
+        add_sel "${msg}"
         exit 1
     fi
 fi
 
-echo "Host$1 power cycle success"
+msg="Host$1 power cycle success"
+echo "${msg}"
+add_sel "${msg}"
 exit 0;

@@ -30,7 +30,9 @@ chassis-power-off()
         sleep 1
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
         then
-                echo "Failed to set slot$1 power off"
+                msg="Failed to set slot$CHASSIS_ID power off"
+                echo "${msg}"
+                add_sel "${msg}"
         fi
         sleep 1
 
@@ -42,7 +44,9 @@ chassis-power-off()
                 echo "Chassis$CHASSIS_ID is power off"
         else
                 busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
-                echo "Chassis$CHASSIS_ID is power on"
+                msg="Failed to power off Chassis$CHASSIS_ID, Chassis$CHASSIS_ID is power on"
+                echo "${msg}"
+                add_sel "${msg}"
                 exit 0;
         fi
 }

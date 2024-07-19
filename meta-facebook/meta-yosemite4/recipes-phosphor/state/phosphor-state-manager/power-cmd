@@ -44,3 +44,13 @@ gpio_set()
   done
   echo "gpioset failed"
 }
+
+add_sel()
+{
+  MESSAGE="$*"
+
+  busctl call \
+    xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
+    xyz.openbmc_project.Logging.Entry.Level.Error 0
+}

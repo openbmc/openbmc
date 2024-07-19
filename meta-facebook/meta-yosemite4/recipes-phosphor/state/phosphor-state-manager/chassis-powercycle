@@ -43,13 +43,17 @@ chassis-power-cycle()
             sleep 1
             if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
             then
-                echo "Failed to set slot$1 power off"
+                msg="Failed to set slot$CHASSIS_ID power off"
+                echo "${msg}"
+                add_sel "${msg}"
             fi
             sleep 20
         fi
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
         then
-            echo "Failed to set slot$1 power on"
+            msg="Failed to set slot$CHASSIS_ID power on"
+            echo "${msg}"
+            add_sel "${msg}"
         fi
         sleep 2
 
@@ -67,10 +71,15 @@ chassis-power-cycle()
             fi
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
             /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
-            echo "Chassis$CHASSIS_ID cycle success"
+            msg="Chassis$CHASSIS_ID cycle success"
+            echo "${msg}"
+            add_sel "${msg}"
             exit 0;
         else
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
+            msg="Chassis$CHASSIS_ID cycle failed, Chassis$CHASSIS_ID is power off"
+            echo "${msg}"
+            add_sel "${msg}"
             exit 1;
         fi
     fi

@@ -46,6 +46,8 @@ then
     echo "Host$1 power off success"
     exit 0;
 else
-    echo "Failed to set host$1 power off"
+    msg="Failed to set host$1 power off"
+    echo "${msg}"
+    add_sel "${msg}"
     exit 1
 fi
