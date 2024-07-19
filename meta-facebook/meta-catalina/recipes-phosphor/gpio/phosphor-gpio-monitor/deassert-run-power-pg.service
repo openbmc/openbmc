@@ -1,0 +1,8 @@
+[Unit]
+Description=Deassert RUN_POWER_PG
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/catalina-gpio-monitor RUN_POWER_PG deassert
+
+SyslogIdentifier=deassert-run-power-pg
