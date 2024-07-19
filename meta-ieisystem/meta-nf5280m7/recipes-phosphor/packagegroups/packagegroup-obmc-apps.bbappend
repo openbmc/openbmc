@@ -36,5 +36,4 @@ RDEPENDS:${PN}-flash = " \
 
 SUMMARY:${PN}-system = "IEI System"
 RDEPENDS:${PN}-system = " \
-        entity-manager \
         "
