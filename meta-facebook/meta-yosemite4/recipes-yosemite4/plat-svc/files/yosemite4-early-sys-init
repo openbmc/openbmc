@@ -2,8 +2,7 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
 source /usr/libexec/yosemite4-common-functions
 
-check_nuvoton_board
-is_nuvoton_board=$?
+is_nuvoton_board="$(check_nuvoton_board)"
 
 enable_all_fan_input()
 {
@@ -58,7 +57,7 @@ set_gpio NIC1_MAIN_PWR_EN 1
 set_gpio NIC2_MAIN_PWR_EN 1
 set_gpio NIC3_MAIN_PWR_EN 1
 
-if [ "$is_nuvoton_board" -ne "1" ]
+if [ -z "$is_nuvoton_board" ]
 then
     # short-term set gpio v0~v3 to input pin for slot5~8 reset button
     mknod -m 660 /dev/mem c 1 1
@@ -69,7 +68,7 @@ fi
 # Enable all fan input as early as possible
 enable_all_fan_input
 
-if [ "$is_nuvoton_board" -eq "1" ]
+if [ -n "$is_nuvoton_board" ]
 then
     # Set interface to SD BIC to I3C for Nuvoton BMC
     set_sd_bic_interface_to_i3c

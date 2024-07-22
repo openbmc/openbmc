@@ -18,8 +18,7 @@ IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 IO_EXP_SLOT_12V_STATUS=$((CHASSIS_ID + 23))
 
-check_nuvoton_board
-is_nuvoton_board=$?
+is_nuvoton_board="$(check_nuvoton_board)"
 
 # Server 12v power on
 chassis-power-on()
@@ -34,7 +33,7 @@ chassis-power-on()
     chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
     if [ "$chassis_status" == "$STATE_ON" ]
     then
-        if [ "$is_nuvoton_board" -eq "1" ]
+        if [ -n "$is_nuvoton_board" ]
         then
             # inform management CPLD that the slot is 12V off
             if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL" "$IO_EXP_SLOT_12V_STATUS"=1

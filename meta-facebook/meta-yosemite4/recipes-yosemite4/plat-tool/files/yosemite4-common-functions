@@ -22,9 +22,7 @@ set_gpio()
 
 check_nuvoton_board()
 {
-    check_nuvoton=$(grep nuvoton /sys/firmware/devicetree/base/compatible)
-    if [ "$check_nuvoton" != "" ]; then
-        return 1
-    fi
+    set +e
+    grep nuvoton /sys/firmware/devicetree/base/compatible
     return 0
 }

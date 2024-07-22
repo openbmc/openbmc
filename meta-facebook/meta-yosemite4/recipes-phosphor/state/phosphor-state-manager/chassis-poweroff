@@ -20,8 +20,7 @@ GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_
 #GPIOCHIP_IO_EXP_BIC_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$IO_EXP_SLOT_PWR_STATUS-00$IO_EXP_BIC_PWR_CTRL_ADDR/"*gpiochip*)
 GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL=$(basename "/sys/bus/i2c/devices/$MANAGEMENT_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLED_PWR_CTRL_ADDR/"*gpiochip*)
 
-check_nuvoton_board
-is_nuvoton_board=$?
+is_nuvoton_board="$(check_nuvoton_board)"
 
 # Server 12v power off
 chassis-power-off()
@@ -55,7 +54,7 @@ fi
 
 if [ "$chassis_status" == "$STATE_ON" ]
 then
-        if [ "$is_nuvoton_board" -eq "1" ]
+        if [ -n "$is_nuvoton_board" ]
         then
                 # inform management CPLD that the slot is 12V off
                 if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL" "$IO_EXP_SLOT_12V_STATUS"=0
