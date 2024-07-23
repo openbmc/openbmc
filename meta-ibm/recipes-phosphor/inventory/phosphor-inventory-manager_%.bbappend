@@ -9,6 +9,9 @@ SRC_URI:append:p10bmc = " \
     file://ibm,rainier-2u_associations.json \
     file://ibm,rainier-4u_associations.json \
     file://ibm,everest_associations.json \
+    file://ibm,blueridge-2u_associations.json \
+    file://ibm,blueridge-4u_associations.json \
+    file://ibm,fuji_associations.json \
     "
 
 do_install:append:ibm-ac-server() {
@@ -21,4 +24,7 @@ do_install:append:p10bmc() {
     install -m 0755 ${WORKDIR}/ibm,rainier-2u_associations.json ${D}${base_datadir}/ibm,rainier-2u_associations.json
     install -m 0755 ${WORKDIR}/ibm,rainier-4u_associations.json ${D}${base_datadir}/ibm,rainier-4u_associations.json
     install -m 0755 ${WORKDIR}/ibm,everest_associations.json ${D}${base_datadir}/ibm,everest_associations.json
+    install -m 0755 ${WORKDIR}/ibm,blueridge-2u_associations.json ${D}${base_datadir}/ibm,blueridge-2u_associations.json
+    install -m 0755 ${WORKDIR}/ibm,blueridge-4u_associations.json ${D}${base_datadir}/ibm,blueridge-4u_associations.json
+    install -m 0755 ${WORKDIR}/ibm,fuji_associations.json ${D}${base_datadir}/ibm,fuji_associations.json
 }
