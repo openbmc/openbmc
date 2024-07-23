@@ -313,5 +313,27 @@
                 "slot-hsc-fault@8.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "INT_SMB_BMC_SLOT1_4_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 100,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-power-fault@14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INT_SMB_BMC_SLOT5_8_BMC_N",
+        "ChipId": "0",
+        "GpioNum": 137,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-power-fault@58.service"]
+        },
+        "Continue": true
     }
 ]
