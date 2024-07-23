@@ -31,19 +31,19 @@ CHIPS:witherspoon-tacoma = " \
                "
 
 CHIPS:p10bmc = " \
-               bus@1e78a000/i2c-bus@200/power-supply@68 \
-               bus@1e78a000/i2c-bus@200/power-supply@69 \
-               bus@1e78a000/i2c-bus@200/power-supply@6a \
-               bus@1e78a000/i2c-bus@200/power-supply@6d \
-               bus@1e78a000/i2c-bus@200/power-supply@6b \
-               bus@1e78a000/i2c-bus@200/power-supply@5a \
-               bus@1e78a000/i2c-bus@200/power-supply@5b \
-               bus@1e78a000/i2c-bus@400/max31785@52 \
-               bus@1e78a000/i2c-bus@400/max31785b@52 \
-               bus@1e78a000/i2c-bus@780/i2c-mux@70/i2c@3/max31785@52 \
+               1e78a200.i2c-bus/i2c-3/3-0068 \
+               1e78a200.i2c-bus/i2c-3/3-0069 \
+               1e78a200.i2c-bus/i2c-3/3-006a \
+               1e78a200.i2c-bus/i2c-3/3-006d \
+               1e78a200.i2c-bus/i2c-3/3-006b \
+               1e78a200.i2c-bus/i2c-3/3-005a \
+               1e78a200.i2c-bus/i2c-3/3-005b \
+               1e78a400.i2c-bus/i2c-7/7-0052 \
+               1e78a780.i2c-bus/i2c-14/i2c-30/30-0052 \
                "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
+ITEMSFMT:p10bmc = "devices/platform/ahb/ahb--apb/ahb--apb--bus@1e78a000/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 
 OCCS = " \
@@ -63,3 +63,4 @@ PACKAGECONFIG:append:ibm-ac-server = " max31785-msl"
 SYSTEMD_ENVIRONMENT_FILE:max31785-msl:append:ibm-ac-server = " obmc/hwmon-max31785/max31785.conf"
 SYSTEMD_LINK:max31785-msl:append:ibm-ac-server = " ../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"
 
+PACKAGECONFIG:append:p10bmc = " use-dev-path"
