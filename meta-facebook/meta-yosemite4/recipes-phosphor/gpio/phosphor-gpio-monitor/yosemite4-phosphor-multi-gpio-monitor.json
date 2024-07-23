@@ -225,5 +225,93 @@
                 "slot-hot-plug@8.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT1_N",
+        "ChipId": "0",
+        "GpioNum": 104,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT2_N",
+        "ChipId": "0",
+        "GpioNum": 105,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT3_N",
+        "ChipId": "0",
+        "GpioNum": 106,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT4_N",
+        "ChipId": "0",
+        "GpioNum": 107,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT5_N",
+        "ChipId": "0",
+        "GpioNum": 201,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT6_N",
+        "ChipId": "0",
+        "GpioNum": 185,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT7_N",
+        "ChipId": "0",
+        "GpioNum": 186,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_HSC_SERVER_SLOT8_N",
+        "ChipId": "0",
+        "GpioNum": 8,
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "slot-hsc-fault@8.service"]
+        },
+        "Continue": true
     }
 ]

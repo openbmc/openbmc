@@ -1,0 +1,36 @@
+#!/bin/bash
+
+dec_to_hex() {
+    local decimal=$1
+    local hex=""
+    local digits="0123456789ABCDEF"
+
+    while [ "$decimal" -gt 0 ]; do
+        remainder=$((decimal % 16))
+        hex="${digits:remainder:1}$hex"
+        decimal=$((decimal / 16))
+    done
+
+    # ensure the length of $hex >= 4
+    while [ ${#hex} -lt 4 ]; do
+        hex="0$hex"
+    done
+
+    echo "0x${hex:-0}"
+}
+
+i2c_bus=$(($1 - 1))
+
+#i2ctransfer to get STATUS_WORD
+read -r LOW_BYTE HIGH_BYTE <<< "$(i2ctransfer -f -y $i2c_bus w1@0x40 0x79 r2)"
+STATUS_WORD=$((LOW_BYTE | (HIGH_BYTE << 8) ))
+STATUS_WORD=$(dec_to_hex $STATUS_WORD)
+
+#Add event log
+MESSAGE="SLOT$1 HSC Fault"
+ARG="STATUS_WORD"
+
+busctl call \
+    xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
+    xyz.openbmc_project.Logging.Entry.Level.Error 1 "$ARG" "$STATUS_WORD"

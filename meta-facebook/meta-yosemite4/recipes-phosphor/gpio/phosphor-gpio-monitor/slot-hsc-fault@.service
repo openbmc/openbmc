@@ -1,0 +1,7 @@
+[Unit]
+Description=slot hsc-fault:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/slot-hsc-fault %i
+SyslogIdentifier=slot-hsc-fault%i
