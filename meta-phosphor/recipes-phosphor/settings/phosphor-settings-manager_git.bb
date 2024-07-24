@@ -43,7 +43,7 @@ python do_merge_settings () {
     import subprocess
 
     # TODO: Perform the merge in a temporary directory?
-    workdir = d.getVar('WORKDIR', True)
+    workdir = d.getVar('UNPACKDIR', True)
     nativedir = d.getVar('STAGING_DIR_NATIVE', True)
     settingsdir = d.getVar('settings_datadir', True)
     settingsdir = settingsdir[1:]
