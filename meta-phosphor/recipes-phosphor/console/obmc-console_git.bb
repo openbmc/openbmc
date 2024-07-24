@@ -6,8 +6,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 DEPENDS += "autoconf-archive-native \
             iniparser \
             systemd \
+            libgpiod \
            "
-SRCREV = "e3f1aa1ec8cecd58aa8f67702bd587c2989f787e"
+SRCREV = "8fee42423c97581eaf2c318aa9124abb007e5d70"
 PACKAGECONFIG ??= "udev ssh"
 PACKAGECONFIG[udev] = "-Dudev=enabled,-Dudev=disabled,udev"
 PACKAGECONFIG[concurrent-servers] = "-Dconcurrent-servers=true,-Dconcurrent-servers=false,"
