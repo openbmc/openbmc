@@ -1,6 +1,7 @@
 [Unit]
-Wants=xyz.openbmc_project.State.Host@0.service
-After=xyz.openbmc_project.State.Host@0.service
+Wants=mapper-wait@-xyz-openbmc_project-state-host0.service
+After=mapper-wait@-xyz-openbmc_project-state-host0.service
+
 
 [Service]
 Type=oneshot
