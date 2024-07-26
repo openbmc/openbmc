@@ -1,0 +1,6 @@
+---
+/xyz/openbmc_project/state/chassis0:
+    - Interface: xyz.openbmc_project.State.PowerOnHours
+      Properties:
+          POHCounter:
+              Default: 0
