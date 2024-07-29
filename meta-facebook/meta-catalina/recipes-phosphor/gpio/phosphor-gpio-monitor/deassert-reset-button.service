@@ -1,5 +1,5 @@
 [Unit]
-Description=Deassert RUN_POWER_PG
+Description=Deassert ID_RST_BTN_BMC_N
 
 [Service]
 Type=oneshot

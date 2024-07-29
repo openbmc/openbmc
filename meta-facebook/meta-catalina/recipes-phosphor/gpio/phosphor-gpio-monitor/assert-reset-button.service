@@ -1,5 +1,5 @@
 [Unit]
-Description=Assert RUN_POWER_PG
+Description=Assert ID_RST_BTN_BMC_N
 
 [Service]
 Type=oneshot

@@ -29,7 +29,7 @@ do_ID_RST_BTN_BMC_N_change()
 }
 
 case $LINENAME in
-    "RUN_POWER_PG")
+    "RUN_POWER_PG" | "ID_RST_BTN_BMC_N")
         FUNC_NAME="do_${LINENAME}_change"
         "$FUNC_NAME"
         ;;
