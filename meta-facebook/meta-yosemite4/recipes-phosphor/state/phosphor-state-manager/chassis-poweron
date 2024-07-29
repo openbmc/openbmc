@@ -37,10 +37,10 @@ chassis-power-on()
     then
         if [ -n "$is_nuvoton_board" ]
         then
-            # inform management CPLD that the slot is 12V off
+            # inform management CPLD that the slot is 12V on
             if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL" "$IO_EXP_SLOT_12V_STATUS"=1
             then
-                echo "Failed to inform management CPLD that slot$1 is 12V off"
+                echo "Failed to inform management CPLD that slot$1 is 12V on"
             fi
         fi
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
