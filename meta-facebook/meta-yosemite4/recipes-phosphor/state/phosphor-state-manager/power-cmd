@@ -54,3 +54,20 @@ add_sel()
     xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
     xyz.openbmc_project.Logging.Entry.Level.Error 0
 }
+
+get_ac_on_status()
+{
+  RETRY=20
+  while [ $RETRY -gt 0 ]
+  do
+    if [ "$(gpio_get "$1" "$2")" == "$STATE_ON" ]
+    then
+      echo "$STATE_ON"
+      return 0
+    fi
+    RETRY=$((RETRY-1))
+    sleep 1
+  done
+  echo "$STATE_OFF"
+}
+

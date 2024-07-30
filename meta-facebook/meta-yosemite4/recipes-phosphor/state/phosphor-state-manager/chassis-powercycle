@@ -64,7 +64,7 @@ chassis-power-cycle()
         sleep 2
 
         # Check chassis status after doing 12V cycle
-        chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+        chassis_status=$(get_ac_on_status "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
         if [ "$chassis_status" == "$STATE_ON" ]
         then
             if [ -n "$is_nuvoton_board" ]
