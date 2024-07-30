@@ -1,5 +1,7 @@
 [Unit]
 Description=Rescan WF BIC's EID for slot %i
+After=rescan-fru-device@%i.service
+Requires=rescan-fru-device@%i.service
 
 [Service]
 Type=oneshot
