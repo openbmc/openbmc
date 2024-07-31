@@ -8,20 +8,21 @@ with the Manageability Control Processor (MCP) over PLDM over MCTP over UART.
 
 ## Diagram
 
+
 ```
-    AP debug console
-          |
-+---------------------+
-|  Neoverse RD-N2 FVP |
-|                     |                    PLDM over
-+-----+       +-------+                    MCTP over                +--------------------------+
-| SCP |       |  MCP  | (terminal_0) ------- UART ----- (terminal_1)| /dev/ttyAMA1   Base FVP  |--- redfish
-+-----+-------+-------+                                             +--------------------------+
-   |              |                                                              |
-   |           debug console                                              FVP debug console
-   |          (terminal_uart_mcp)                                           (terminal_0)
-debug console
-(terminal_uart_scp)
+                                                                           AP debug console
+                                                                                 |
+                                                                       +-----------------------+
+         +--------------------------+                                  |  Neoverse RD-N2 FVP   |
+         |         Base FVP         |             PLDM over            |                       |
+         |                          |             MCTP over            +-------+       +-------+
+redfish--|             /dev/ttyAMA1 |-------------- UART --------------|  MCP  |       |  SCP  |
+         +--------------------------+ (terminal_1)        (terminal_0) +-------+-------+-------+
+                      |                                                    |                |
+               FVP debug console                                           |             debug console
+                 (terminal_0)                                              |             (terminal_uart_scp)
+                                                                     debug console
+                                                                     (terminal_uart_mcp)
 ```
 
 ## Features
@@ -54,9 +55,9 @@ debug console
 
 ## References
 
-- SCP FW for MCP https://gitlab.arm.com/firmware/SCP-firmware
+- SCP FW for MCP https://gitlab.arm.com/infra-solutions/reference-design/platsw/scp-firmware/-/tree/refinfra-satmc?ref_type=heads
 - Base FVP Download https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms
 - Neoverse FVP Download https://developer.arm.com/downloads/-/arm-ecosystem-fvps
 - PLDM + MCTP Specifications https://www.dmtf.org/standards/pmci
-- Neoverse System Architecture https://developer.arm.com/documentation/102759/relc/Hardware-and-topology/System-architecture?lang=en
-- Other FVP SW Docs https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-docs/
+- Neoverse System Architecture https://developer.arm.com/documentation/102099/0003/Technical-overview?lang=en
+- Other FVP SW Docs https://neoverse-reference-design.docs.arm.com/en/latest/index.html
