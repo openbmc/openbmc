@@ -5,3 +5,6 @@ sleep 5
 
 # Set Host Power Off
 obmcutil poweroff
+
+# Turn off the power Led
+systemctl start obmc-led-group-stop@power_on.service
