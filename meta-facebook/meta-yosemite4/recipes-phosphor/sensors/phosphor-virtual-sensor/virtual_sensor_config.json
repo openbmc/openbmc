@@ -757,5 +757,785 @@
             ]
         },
         "Expression": "MB_FIO_TEMP_80 - (Fan_PWM == 100 ? -0.2 : (Fan_PWM >=90 ? -0.1 : (Fan_PWM >=70 ? 0.4 : (Fan_PWM >=50 ? 0.5 : (Fan_PWM >=30 ? 0.6 : 0)))))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_48VHSC0_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 94,
+            "CriticalHigh": 71.5,
+            "WarningHigh": 68.25
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC0_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC0_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.012 + 0.05), (hsc_current2 * 0.302 - 0.15))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_48VHSC0_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 4512,
+            "CriticalHigh": 3432,
+            "WarningHigh": 3276
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC0_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC0_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 * 1.01 + 7), (hsc_input_power2 * 0.3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_48VHSC1_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 94,
+            "CriticalHigh": 71.5,
+            "WarningHigh": 68.25
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC1_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC1_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.012 + 0.05), (hsc_current2 * 0.302 - 0.15))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_48VHSC1_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 4512,
+            "CriticalHigh": 3432,
+            "WarningHigh": 3276
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC1_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_48VHSC1_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 * 1.01 + 7), (hsc_input_power2 * 0.3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB1_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB1_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB1_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB2_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB2_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB2_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB3_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB3_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB3_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB4_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB4_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB4_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB5_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB5_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB5_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB6_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB6_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB6_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB7_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB7_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB7_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB8_12VHSC_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 90,
+            "CriticalHigh": 87.956,
+            "WarningHigh": 83.958
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_current1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB8_12VHSC_CURR_A_1",
+                        "SensorType": "current"
+                    }
+                },
+                {
+                    "ParamName": "hsc_current2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB8_12VHSC_CURR_A_2",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_current1 * 1.02), (hsc_current2 * 0.505))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB1_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB1_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB1_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB2_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB2_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB2_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB3_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB3_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB3_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB4_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB4_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB4_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB5_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB5_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB5_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB6_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB6_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB6_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB7_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB7_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB7_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "Calibrated_MEDUSA_MB8_12VHSC_INPUT_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
+        "Threshold": {
+            "HardShutdownHigh": 1125,
+            "CriticalHigh": 1099.45,
+            "WarningHigh": 1049.47
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_input_power1",
+                    "Desc": {
+                        "Name": "MEDUSA_MB8_12VHSC_INPUT_PWR_W_1",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_input_power2",
+                    "Desc": {
+                        "Name": "MEDUSA_MB8_12VHSC_INPUT_PWR_W_2",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
     }
 ]
