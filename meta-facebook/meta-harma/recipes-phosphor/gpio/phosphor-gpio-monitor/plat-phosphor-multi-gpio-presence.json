@@ -33,5 +33,12 @@
         "ActiveLow": true,
         "Bias": "DISABLE",
         "Inventory": "/system/board/Harma_MB/presence_asic_modules_1"
+    },
+    {
+        "Name": "presence-post-card",
+        "LineName": "presence-post-card",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Harma_MB/presence_post_card"
     }
 ]

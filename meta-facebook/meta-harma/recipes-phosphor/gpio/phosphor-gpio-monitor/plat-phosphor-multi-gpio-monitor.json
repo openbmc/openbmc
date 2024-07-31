@@ -23,17 +23,6 @@
         "Continue": true
     },
     {
-        "Name": "presence-post-card",
-        "ChipId": "0",
-        "GpioNum": 206,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-gpio-log@presence-post-card.service"],
-            "FALLING": ["assert-gpio-log@presence-post-card.service"]
-        },
-        "Continue": true
-    },
-    {
         "Name": "ac-power-button",
         "ChipId": "1",
         "GpioNum": 0,
