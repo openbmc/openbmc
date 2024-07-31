@@ -43,6 +43,7 @@ FILES:${PN} += " \
 "
 
 USERADD_PACKAGES = "${PN} phosphor-ldap"
+RDEPENDS:${PN}:append:df-google-authenticator-libpam = " pam-google-authenticator google-authenticator-libpam"
 
 PACKAGE_BEFORE_PN = "phosphor-ldap"
 DBUS_PACKAGES = "${USERADD_PACKAGES}"
