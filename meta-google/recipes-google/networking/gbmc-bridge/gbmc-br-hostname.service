@@ -1,0 +1,8 @@
+[Unit]
+Before=systemd-networkd.service
+
+[Service]
+ExecStart=/usr/libexec/gbmc-br-hostname.sh
+
+[Install]
+WantedBy=multi-user.target
