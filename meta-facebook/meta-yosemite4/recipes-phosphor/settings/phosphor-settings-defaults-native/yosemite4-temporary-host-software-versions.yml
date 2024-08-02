@@ -70,7 +70,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_ab_asci1:
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_ab_asic1:
   - Interface: "xyz.openbmc_project.Software.Version"
     Properties:
       Version:
@@ -78,7 +78,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_cd_asci1:
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_cd_asic1:
   - Interface: "xyz.openbmc_project.Software.Version"
     Properties:
       Version:
@@ -86,7 +86,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_ab_asci2:
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_ab_asic2:
   - Interface: "xyz.openbmc_project.Software.Version"
     Properties:
       Version:
@@ -94,7 +94,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_cd_asci2:
+/xyz/openbmc_project/software/host{}/Wailua_Falls_vr_pvddq_cd_asic2:
   - Interface: "xyz.openbmc_project.Software.Version"
     Properties:
       Version:
