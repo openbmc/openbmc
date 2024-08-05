@@ -228,8 +228,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT1_N",
-        "ChipId": "0",
-        "GpioNum": 104,
+        "LineName": "FLT_HSC_SERVER_SLOT1_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -239,8 +238,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT2_N",
-        "ChipId": "0",
-        "GpioNum": 105,
+        "LineName": "FLT_HSC_SERVER_SLOT2_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -250,8 +248,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT3_N",
-        "ChipId": "0",
-        "GpioNum": 106,
+        "LineName": "FLT_HSC_SERVER_SLOT3_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -261,8 +258,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT4_N",
-        "ChipId": "0",
-        "GpioNum": 107,
+        "LineName": "FLT_HSC_SERVER_SLOT4_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -272,8 +268,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT5_N",
-        "ChipId": "0",
-        "GpioNum": 201,
+        "LineName": "FLT_HSC_SERVER_SLOT5_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -283,8 +278,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT6_N",
-        "ChipId": "0",
-        "GpioNum": 185,
+        "LineName": "FLT_HSC_SERVER_SLOT6_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -294,8 +288,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT7_N",
-        "ChipId": "0",
-        "GpioNum": 186,
+        "LineName": "FLT_HSC_SERVER_SLOT7_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -305,8 +298,7 @@
     },
     {
         "Name": "FLT_HSC_SERVER_SLOT8_N",
-        "ChipId": "0",
-        "GpioNum": 8,
+        "LineName": "FLT_HSC_SERVER_SLOT8_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -316,8 +308,7 @@
     },
     {
         "Name": "INT_SMB_BMC_SLOT1_4_BMC_N",
-        "ChipId": "0",
-        "GpioNum": 100,
+        "LineName": "INT_SMB_BMC_SLOT1_4_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
@@ -327,8 +318,7 @@
     },
     {
         "Name": "INT_SMB_BMC_SLOT5_8_BMC_N",
-        "ChipId": "0",
-        "GpioNum": 137,
+        "LineName": "INT_SMB_BMC_SLOT5_8_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
