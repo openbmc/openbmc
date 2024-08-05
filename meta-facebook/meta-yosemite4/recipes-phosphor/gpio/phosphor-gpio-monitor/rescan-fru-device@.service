@@ -1,7 +1,5 @@
 [Unit]
 Description=Rescan FruDevice for slot %i
-After=probe-slot-device@%i.service
-Requires=probe-slot-device@%i.service
 
 [Service]
 Type=oneshot
