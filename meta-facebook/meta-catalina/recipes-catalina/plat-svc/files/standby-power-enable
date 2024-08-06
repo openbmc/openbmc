@@ -55,8 +55,7 @@ bind_i2c_muxes()
     echo "0-0077" > /sys/bus/i2c/drivers/pca954x/bind
 
     # HDD Board I2C Mux, i2c48 - i2c55
-    echo "33-0070" > /sys/bus/i2c/drivers/pca954x/bind
-
+    echo "30-0070" > /sys/bus/i2c/drivers/pca954x/bind
 }
 
 bind_gpio_expanders()
@@ -91,6 +90,8 @@ bind_fru_eeproms()
     echo "29-0050" /sys/bus/i2c/drivers/at24/bind
     # IO Mezz 1 FRU
     echo "41-0050" /sys/bus/i2c/drivers/at24/bind
+    # HDD Board FRU
+    echo "54-0052" /sys/bus/i2c/drivers/at24/bind
 }
 
 reset_host_usb()
