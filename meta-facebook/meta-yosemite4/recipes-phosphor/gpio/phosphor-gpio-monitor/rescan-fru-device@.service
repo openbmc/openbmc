@@ -1,7 +1,0 @@
-[Unit]
-Description=Rescan FruDevice for slot %i
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/rescan-fru-device %i
-SyslogIdentifier=rescan-fru-device%i

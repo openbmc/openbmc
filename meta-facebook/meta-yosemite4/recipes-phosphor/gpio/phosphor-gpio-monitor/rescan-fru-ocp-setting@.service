@@ -1,0 +1,7 @@
+[Unit]
+Description=Rescan FruDevice for slot and set HSC OCP values %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/rescan-fru-ocp-setting %i
+SyslogIdentifier=rescan-fru-ocp-settinge%i

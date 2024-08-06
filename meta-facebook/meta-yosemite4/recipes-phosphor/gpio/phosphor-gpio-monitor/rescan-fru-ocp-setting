@@ -1,0 +1,34 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
+bus=$(($1 + 15))
+
+# rescan eeprom for fru information
+busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScanBus q $bus
+# wait for fru device to be ready
+sleep 10
+# check if Wailua Falls is present
+wailua_falls_present=$(busctl tree xyz.openbmc_project.FruDevice | grep Wailua_Falls)
+# set 48V/12V HSC OCP values
+if [ -n "$wailua_falls_present" ]; then
+    set_gpio P48V_OCP_GPIO1       0
+    set_gpio P48V_OCP_GPIO2       0
+    set_gpio P48V_OCP_GPIO3       0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO1        1
+    set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       1
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+else
+    set_gpio P48V_OCP_GPIO1       1
+    set_gpio P48V_OCP_GPIO2       0
+    set_gpio P48V_OCP_GPIO3       0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO2        1
+    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       1
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+fi
