@@ -5,7 +5,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
-SRCREV = "20bab74865ba955921eb0e4e427c84e37e1c8916"
+SRCREV = "40efe6724862a5fe493c1b672e43b81463343b45"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
