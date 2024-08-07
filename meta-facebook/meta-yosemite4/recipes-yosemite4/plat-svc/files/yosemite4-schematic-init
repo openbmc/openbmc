@@ -2,6 +2,10 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
 source /usr/libexec/yosemite4-common-functions
 
+# wait for entity manager
+mapper wait /xyz/openbmc_project/inventory/system/board/Yosemite_4_Management_Board
+mapper wait /xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board
+
 # probe devices behind mux for management board cpld
 mgm_stage=$(get_product_version Management_Board)
 

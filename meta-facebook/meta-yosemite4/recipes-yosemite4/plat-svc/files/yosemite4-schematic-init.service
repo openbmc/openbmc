@@ -1,7 +1,7 @@
 [Unit]
 Description=Yosemite4 Schematic Init
-After=xyz.openbmc_project.FruDevice.service
-Requires=xyz.openbmc_project.FruDevice.service
+After=xyz.openbmc_project.EntityManager.service
+Requires=xyz.openbmc_project.EntityManager.service
 
 [Service]
 Type=oneshot
