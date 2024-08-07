@@ -15,83 +15,27 @@
 
 [ ! -e /usr/share/gbmc-br-lib.sh ] && exit
 
-# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
-source /usr/share/network/lib.sh || exit
 # shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
 source /usr/share/gbmc-br-lib.sh || exit
 
-NCSI_IF='@NCSI_IF@'
-
-old_pfx=
-old_fqdn=
-old_rtr=
-
-set_host() {
-  [[ -n "$host" && -n "$domain" && -n "$hextet" ]] || return
-
-  local fqdn="$host-n$hextet.$domain"
-  [ "$fqdn" != "$old_fqdn" ] || return
-  old_fqdn="$fqdn"
-
-  echo "Found hostname $fqdn" >&2
-  hostnamectl set-hostname "$fqdn" || true
+update_fqdn() {
+  hostnamectl set-hostname "$1" || true
 }
 
-set_net() {
-  [[ -n "$pfx" && -n "$rtr" ]] || return
-  [[ "$pfx" != "$old_pfx" || "$rtr" != "$old_rtr" ]] || return
-  old_pfx="$pfx"
-  old_rtr="$rtr"
-
-  echo "Found prefix $pfx from $rtr" >&2
-
+update_pfx() {
   # We no longer need NCSId if we are in this configuration
   systemctl stop --no-block ncsid@"$NCSI_IF" || true
 
   # Save the IP address for the interface
-  gbmc_br_set_ip "$pfx" || true
+  gbmc_br_set_ip "$1" || true
 
   # DHCP Relay workaround until alternate source port is supported
   # TODO: Remove this once internal relaying cleanups land
   gbmc-ncsi-smartnic-wa.sh || true
 }
 
-w=60
-while true; do
-  start=$SECONDS
-  while read -r line; do
-    # `script` terminates all lines with a CRLF, remove it
-    line="${line:0:-1}"
-    if [ -z "$line" ]; then
-      hextet=
-      pfx=
-      host=
-      domain=
-    elif [[ "$line" =~ ^Prefix' '*:' '*(.*)/([0-9]+)$ ]]; then
-      t_pfx="${BASH_REMATCH[1]}"
-      t_pfx_len="${BASH_REMATCH[2]}"
-      ip_to_bytes t_pfx_b "$t_pfx" || continue
-      (( t_pfx_len == 76 && (t_pfx_b[8] & 0xfd) == 0xfd )) || continue
-      (( t_pfx_b[9] |= 1 ))
-      hextet="fd$(printf '%02x' "${t_pfx_b[9]}")"
-      pfx="$(ip_bytes_to_str t_pfx_b)"
-    elif [[ "$line" =~ ^'DNS search list'' '*:' '*([^.]+)(.*[.]google[.]com)' '*$ ]]; then
-      # Ideally, we use PCRE and with lookahead and can do this in a single regex
-      #   ^([a-zA-Z0-9-]+(?=-n[a-fA-F0-9]{1,4})|[a-zA-Z0-9-]+(?!-n[a-fA-F0-9]{1,4}))[^.]*[.]((?:[a-zA-Z0-9]*[.])*google[.]com)$
-      # Instead we do multiple steps to extract the needed info
-      host="${BASH_REMATCH[1]}"
-      domain="${BASH_REMATCH[2]#.}"
-      if [[ "$host" =~ (-n[a-fA-F0-9]{1,4})$ ]]; then
-        host="${host%"${BASH_REMATCH[1]}"}"
-      fi
-    elif [[ "$line" =~ ^from' '(.*)$ ]]; then
-      rtr="${BASH_REMATCH[1]}"
-      set_net || true
-      set_host || true
-    fi
-  done < <(exec script -q -c "rdisc6 -d -m $NCSI_IF -w $(( w * 1000 ))" /dev/null 2>/dev/null)
-  # If rdisc6 exits early we still want to wait the full `w` time before
-  # starting again.
-  (( timeout = start + w - SECONDS ))
-  sleep $(( timeout < 0 ? 0 : timeout ))
-done
+RA_IF=@NCSI_IF@
+IP_OFFSET=1
+
+# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-ip-from-ra.sh
+source /usr/share/gbmc-ip-from-ra.sh || exit

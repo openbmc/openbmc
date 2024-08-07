@@ -19,6 +19,7 @@ SRC_URI += " \
   file://gbmc-br-ensure-ra.service \
   file://gbmc-br-hostname.sh \
   file://gbmc-br-hostname.service \
+  file://gbmc-ip-from-ra.sh \
   file://gbmc-br-gw-src.sh \
   file://gbmc-br-nft.sh \
   file://gbmc-br-dhcp.sh \
@@ -36,6 +37,7 @@ FILES:${PN}:append = " \
   ${datadir}/gbmc-ip-monitor \
   ${datadir}/gbmc-br-dhcp \
   ${datadir}/gbmc-br-lib.sh \
+  ${datadir}/gbmc-ip-from-ra.sh \
   ${systemd_unitdir}/network \
   ${sysconfdir}/nftables \
   "
@@ -139,6 +141,7 @@ do_install() {
   install -m0644 ${WORKDIR}/50-gbmc-psu-hardreset.sh ${D}${datadir}/gbmc-br-dhcp/
 
   install -m0644 ${WORKDIR}/gbmc-br-lib.sh ${D}${datadir}/
+  install -m0644 ${WORKDIR}/gbmc-ip-from-ra.sh ${D}${datadir}/
 
   install -d ${D}/${bindir}
   install -m0755 ${WORKDIR}/gbmc-start-dhcp.sh ${D}${bindir}/
