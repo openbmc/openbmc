@@ -4,7 +4,7 @@ HOMEPAGE = "http://github.com/openbmc/phosphor-ipmi-ethstats"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 DEPENDS += "phosphor-ipmi-host"
-SRCREV = "472df7ed943c0583e4b4cb888a01231795bd3dbe"
+SRCREV = "efbdace1f928d3e32f468ee1184e7212ef8f9c52"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
