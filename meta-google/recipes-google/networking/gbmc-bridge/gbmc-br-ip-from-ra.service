@@ -1,0 +1,13 @@
+[Unit]
+Description=gBMC Bridge RA Discovery
+After=network.target
+StartLimitIntervalSec=10
+StartLimitBurst=3
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/usr/libexec/gbmc-br-ip-from-ra.sh
+
+[Install]
+WantedBy=multi-user.target

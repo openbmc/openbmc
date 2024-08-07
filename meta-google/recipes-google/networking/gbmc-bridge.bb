@@ -20,6 +20,8 @@ SRC_URI += " \
   file://gbmc-br-hostname.sh \
   file://gbmc-br-hostname.service \
   file://gbmc-ip-from-ra.sh \
+  file://gbmc-br-ip-from-ra.sh.in \
+  file://gbmc-br-ip-from-ra.service \
   file://gbmc-br-gw-src.sh \
   file://gbmc-br-nft.sh \
   file://gbmc-br-dhcp.sh \
@@ -57,9 +59,17 @@ SYSTEMD_SERVICE:${PN} += " \
   gbmc-br-dhcp.service \
   gbmc-br-dhcp-term.service \
   gbmc-br-load-ip.service \
+  ${@"gbmc-br-ip-from-ra.service" if d.getVar('GBMC_BR_FIXED_OFFSET') != "" else ""} \
   "
 
 GBMC_BR_MAC_ADDR ?= ""
+
+# Enables the assignment of IP address and hostname by discovering the
+# machine name and BMC prefix from another BMC on the bridge network.
+# This is intended only to be used when there is a single expansion tray
+# on the BMC network. If more than one machine uses this feature with the
+# same offset in the same machine network, it will collide with others.
+GBMC_BR_FIXED_OFFSET ?= ""
 
 # Generated via https://cd34.com/rfc4193/ based on a MAC from a machine I own
 # and we allocated it downstream. Intended to only be used within a complete
@@ -145,6 +155,12 @@ do_install() {
 
   install -d ${D}/${bindir}
   install -m0755 ${WORKDIR}/gbmc-start-dhcp.sh ${D}${bindir}/
+
+  if [ -n "${GBMC_BR_FIXED_OFFSET}" ]; then
+    sed 's,@IP_OFFSET@,${GBMC_BR_FIXED_OFFSET},' ${WORKDIR}/gbmc-br-ip-from-ra.sh.in >${WORKDIR}/gbmc-br-ip-from-ra.sh
+    install -m0755 ${WORKDIR}/gbmc-br-ip-from-ra.sh ${D}${libexecdir}/
+    install -m0644 ${WORKDIR}/gbmc-br-ip-from-ra.service ${D}${systemd_system_unitdir}/
+  fi
 }
 
 do_rm_work:prepend() {
