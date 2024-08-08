@@ -33,6 +33,7 @@ while true; do
       pfx=
       host=
       domain=
+      lifetime=-1
     elif [[ "$line" =~ ^Prefix' '*:' '*(.*)/([0-9]+)$ ]]; then
       t_pfx="${BASH_REMATCH[1]}"
       t_pfx_len="${BASH_REMATCH[2]}"
@@ -42,6 +43,8 @@ while true; do
       (( t_pfx_b[9] |= IP_OFFSET ))
       hextet="fd$(printf '%02x' "${t_pfx_b[9]}")"
       pfx="$(ip_bytes_to_str t_pfx_b)"
+    elif [[ "$line" =~ ^'Router lifetime'' '*:' '*([0-9]+)' '+ ]]; then
+      lifetime="${BASH_REMATCH[1]}"
     elif [[ "$line" =~ ^'DNS search list'' '*:' '*([^.]+)(.*[.]google[.]com)' '*$ ]]; then
       # Ideally, we use PCRE and with lookahead and can do this in a single regex
       #   ^([a-zA-Z0-9-]+(?=-n[a-fA-F0-9]{1,4})|[a-zA-Z0-9-]+(?!-n[a-fA-F0-9]{1,4}))[^.]*[.]((?:[a-zA-Z0-9]*[.])*google[.]com)$
@@ -52,6 +55,8 @@ while true; do
         host="${host%"${BASH_REMATCH[1]}"}"
       fi
     elif [[ "$line" =~ ^from' '(.*)$ ]]; then
+      # We only want to accept info from gateway providing routers
+      (( lifetime > 0 )) || continue
       rtr="${BASH_REMATCH[1]}"
       if [[ -n $pfx && $pfx != "$old_pfx" ]]; then
         echo "Updating PFX($pfx) from $rtr" >&2
