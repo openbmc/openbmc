@@ -1,8 +1,11 @@
 #!/bin/bash
 
-read_mux_dev() {
+read_i2c_dev() {
+  local bus="$1"
+  local addr="$2"
+
   for _ in {1..3}; do
-    if /usr/sbin/i2cget -f -y "$1" "$2" 2>/dev/null; then
+    if /usr/sbin/i2cget -f -y "$bus" "$addr" 2>/dev/null; then
       return 0
     fi
   done
@@ -10,13 +13,21 @@ read_mux_dev() {
 }
 
 probe_sitv_pttv_mux() {
-  if read_mux_dev 9 0x71; then
+  if read_i2c_dev 9 0x71; then
     echo pca9546 0x71 > /sys/bus/i2c/devices/i2c-9/new_device
   else
     echo pca9546 0x71 > /sys/bus/i2c/devices/i2c-11/new_device
   fi
 }
 
-probe_sitv_pttv_mux
+set_hsc_sample_rate() {
+  if read_i2c_dev 4 0x44; then
+     # set ltc4287 sample to 4096/1.16s
+     i2cset -f -y 4 0x44 0xD9 0x8b
+  fi
+}
 
+
+probe_sitv_pttv_mux
+set_hsc_sample_rate
 exit 0
