@@ -1,23 +1,40 @@
 #bin/sh
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
+is_nuvoton_board="$(check_nuvoton_board)"
 
 # Create /dev/mem
 if [ ! -c /dev/mem ]; then
     /bin/mknod /dev/mem c 1 1
 fi
 
-# Disable FMC_WDT2
-FMC_WDT2_CTRL_VAL=$(/sbin/devmem 0x1e620064)
-FMC_WDT2_CTRL_VAL=$((16#${FMC_WDT2_CTRL_VAL#"0x"}))
-SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
-/sbin/devmem 0x1e620064 32 "$SET_VAL"
+if [ -z "$is_nuvoton_board" ]
+then
+    # Disable FMC_WDT2
+    FMC_WDT2_CTRL_VAL=$(/sbin/devmem 0x1e620064)
+    FMC_WDT2_CTRL_VAL=$((16#${FMC_WDT2_CTRL_VAL#"0x"}))
+    SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
+    /sbin/devmem 0x1e620064 32 "$SET_VAL"
+else
+    # Read INTCR2.WDC register, 0 for primary, 1 for alternate.
+    INTRC2_WDC_VAL=$(/sbin/devmem 0xf0800060)
+fi
 
 # Detect boot flash source
 SLOT_FILE="/run/media/slot"
 mkdir -p "$(dirname "${SLOT_FILE}")"
-if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
-    echo "1" > "$SLOT_FILE"
+echo "0" > "$SLOT_FILE"
+
+if [ -z "$is_nuvoton_board" ]
+    then
+    if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
+        echo "1" > "$SLOT_FILE"
+    fi
 else
-    echo "0" > "$SLOT_FILE"
+    if [ "$((INTRC2_WDC_VAL & 0x00200000))" != "0" ]; then
+        echo "1" > "$SLOT_FILE"
+    fi
 fi
 
 exit 0
