@@ -9,7 +9,7 @@ DEPENDS = "boost \
            sdbusplus \
            valijson \
 "
-SRCREV = "23ef45d6f5f037fc667412732f1ba8e297be0d0e"
+SRCREV = "30cee2d9f6423cb3636a1c537b983ca672bdbf5c"
 PACKAGECONFIG ??= "ipmi-fru"
 PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
 PACKAGECONFIG[validate-json] = "-Dvalidate-json=true, \
