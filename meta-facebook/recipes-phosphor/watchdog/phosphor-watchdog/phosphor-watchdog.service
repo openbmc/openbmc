@@ -5,7 +5,7 @@ Description=Phosphor Watchdog
 ExecStart=/usr/bin/env phosphor-watchdog --continue --service=xyz.openbmc_project.Watchdog \
          --path=/xyz/openbmc_project/watchdog/host0 \
          --action_target=xyz.openbmc_project.State.Watchdog.Action.HardReset=phosphor-watchdog-host-reset.service \
-         --action_target=xyz.openbmc_project.State.Watchdog.Action.PowerOff=host-phosphor-watchdog-host-poweroff.service \
+         --action_target=xyz.openbmc_project.State.Watchdog.Action.PowerOff=phosphor-watchdog-host-poweroff.service \
          --action_target=xyz.openbmc_project.State.Watchdog.Action.PowerCycle=phosphor-watchdog-host-cycle.service \
 
 SyslogIdentifier=phosphor-watchdog
