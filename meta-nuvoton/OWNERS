@@ -3,8 +3,3 @@ owners:
 
 reviewers:
 - dphadke@linux.microsoft.com
-
-matchers:
-- partial_regex: recipes-kernel
-  owners:
-  - andrew@codeconstruct.com.au
