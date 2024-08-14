@@ -18,5 +18,45 @@
             "FALLING": ["deassert-reset-button.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "LEAK0_DETECT_R",
+        "LineName": "LEAK0_DETECT_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-gpio-log@LEAK0_DETECT_R.service"],
+            "FALLING": ["deassert-gpio-log@LEAK0_DETECT_R.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK1_DETECT_R",
+        "LineName": "LEAK1_DETECT_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-gpio-log@LEAK1_DETECT_R.service"],
+            "FALLING": ["deassert-gpio-log@LEAK1_DETECT_R.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK2_DETECT_R",
+        "LineName": "LEAK2_DETECT_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-gpio-log@LEAK2_DETECT_R.service"],
+            "FALLING": ["deassert-gpio-log@LEAK2_DETECT_R.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK3_DETECT_R",
+        "LineName": "LEAK3_DETECT_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-gpio-log@LEAK3_DETECT_R.service"],
+            "FALLING": ["deassert-gpio-log@LEAK3_DETECT_R.service"]
+        },
+        "Continue": true
     }
 ]

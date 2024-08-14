@@ -8,6 +8,27 @@ GPIO_LOW=0
 LINENAME="$1"
 STATE="$2"
 
+logging()
+{
+    MESSAGE="$1"
+    SEVERITY="$2"
+    busctl call \
+        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+        xyz.openbmc_project.Logging.Create Create "ssa{ss}" \
+        "$MESSAGE" "$SEVERITY" 0
+}
+
+log_error()
+{
+    logging "$1" "xyz.openbmc_project.Logging.Entry.Level.Error"
+}
+
+log_info()
+{
+    logging "$1" "xyz.openbmc_project.Logging.Entry.Level.Informational"
+}
+
+
 do_RUN_POWER_PG_change()
 {
     if [ "$STATE" = "assert" ]; then
@@ -28,10 +49,40 @@ do_ID_RST_BTN_BMC_N_change()
     fi
 }
 
+do_leak_detect_change()
+{
+    if [ "$STATE" = "assert" ]; then
+        LOG_MSG="leak has been detected"
+    else
+        LOG_MSG="leak has been recoverd"
+    fi
+
+    case "$LINENAME" in
+        "LEAK0_DETECT_R" | "LEAK2_DETECT_R")
+            LOG_MSG="A large $LOG_MSG at location $LINENAME"
+            ;;
+        "LEAK1_DETECT_R" | "LEAK3_DETECT_R")
+            LOG_MSG="A small $LOG_MSG at location $LINENAME"
+            ;;
+        *)
+            return 0
+            ;;
+    esac
+
+    if [ "$STATE" = "assert" ]; then
+        log_error "$LOG_MSG"
+    else
+        log_info "$LOG_MSG"
+    fi
+}
+
 case $LINENAME in
     "RUN_POWER_PG" | "ID_RST_BTN_BMC_N")
         FUNC_NAME="do_${LINENAME}_change"
         "$FUNC_NAME"
+        ;;
+    "LEAK0_DETECT_R" | "LEAK1_DETECT_R" | "LEAK2_DETECT_R" | "LEAK3_DETECT_R")
+        do_leak_detect_change
         ;;
     *)
         echo "Unknown LINENAME = $LINENAME"

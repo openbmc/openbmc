@@ -1,0 +1,8 @@
+[Unit]
+Description=Deassert %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/catalina-gpio-monitor %i deassert
+
+SyslogIdentifier=deassert-%i

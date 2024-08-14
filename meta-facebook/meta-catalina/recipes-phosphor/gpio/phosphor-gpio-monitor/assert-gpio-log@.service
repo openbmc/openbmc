@@ -1,0 +1,8 @@
+[Unit]
+Description=%i GPIO Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/catalina-gpio-monitor %i assert
+
+SyslogIdentifier=%i-gpio-assert
