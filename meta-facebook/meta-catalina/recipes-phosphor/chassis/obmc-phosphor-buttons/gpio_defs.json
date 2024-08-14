@@ -1,0 +1,10 @@
+{
+        "gpio_definitions": [
+            {
+                "name": "HOST_SELECTOR",
+                "group_gpio_config" : [],
+                "max_position" : 1,
+                "host_selector_map" : {}
+            }
+        ]
+}
