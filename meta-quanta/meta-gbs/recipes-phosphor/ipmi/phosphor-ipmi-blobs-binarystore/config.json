@@ -1,6 +1,6 @@
 [{
   "blobBaseId": "/skm/hss/",
-  "sysFilePath": "/sys/class/i2c-adapter/i2c-5/5-0050/eeprom",
+  "sysFilePath": "/sys/bus/i2c/devices/5-0050/eeprom",
   "offsetBytes": 256,
   "maxSizeBytes": 512
 }]
