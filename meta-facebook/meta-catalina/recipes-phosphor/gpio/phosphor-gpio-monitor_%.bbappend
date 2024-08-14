@@ -25,6 +25,8 @@ do_install:append:() {
     install -d ${D}${libexecdir}/${PN}
 
     install -m 0644 ${WORKDIR}/phosphor-multi-gpio-monitor.json \
-                    ${D}${datadir}/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json
+                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
+    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json \
+                    ${D}${datadir}/${PN}/phosphor-multi-gpio-presence.json
     install -m 0755 ${WORKDIR}/catalina-gpio-monitor ${D}${libexecdir}/${PN}/catalina-gpio-monitor
 }

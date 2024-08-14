@@ -1,0 +1,99 @@
+[
+    {
+        "Name": "Fan0",
+        "LineName": "FAN_0_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan0"
+    },
+    {
+        "Name": "Fan1",
+        "LineName": "FAN_1_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan1"
+    },
+    {
+        "Name": "Fan2",
+        "LineName": "FAN_2_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan2"
+    },
+    {
+        "Name": "Fan3",
+        "LineName": "FAN_3_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan3"
+    },
+    {
+        "Name": "Fan4",
+        "LineName": "FAN_4_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan4"
+    },
+    {
+        "Name": "Fan5",
+        "LineName": "FAN_5_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan5"
+    },
+    {
+        "Name": "Fan6",
+        "LineName": "FAN_6_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan6"
+    },
+    {
+        "Name": "Fan6",
+        "LineName": "FAN_7_PRESENT_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/Fan7"
+    },
+    {
+        "Name": "LeakCable0",
+        "LineName": "PRSNT_CHASSIS0_LEAK_CABLE_R_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/compute_tray/cable/LeakCable0",
+        "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
+    },
+    {
+        "Name": "LeakCable1",
+        "LineName": "PRSNT_CHASSIS1_LEAK_CABLE_R_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/compute_tray/cable/LeakCable1",
+        "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
+    },
+    {
+        "Name": "LeakCable2",
+        "LineName": "PRSNT_CHASSIS2_LEAK_CABLE_R_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/compute_tray/cable/LeakCable2",
+        "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
+    },
+    {
+        "Name": "LeakCable3",
+        "LineName": "PRSNT_CHASSIS3_LEAK_CABLE_R_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/compute_tray/cable/LeakCable3",
+        "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
+    },
+    {
+        "Name": "OSFPPowerCable",
+        "LineName": "PRSNT_OSFP_POWER_CABLE_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/compute_tray/cable/OSFPPowerCable",
+        "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
+    },
+    {
+        "Name": "HDDPowerCable",
+        "LineName": "PRSNT_HDDBD_POWER_CABLE_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/compute_tray/cable/HDDPowerCable",
+        "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
+    },
+    {
+        "Name": "FIORJ45Cable",
+        "LineName": "PRSNT_RJ45_FIO_N_R",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/compute_tray/cable/FIORJ45Cable",
+        "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
+    }
+]
