@@ -1,0 +1,7 @@
+[Unit]
+Description=slot-disable-i3c-hub:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/disable-i3c-hub %i
+SyslogIdentifier=slot-disable-i3c-hub %i
