@@ -7,7 +7,7 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "sdbusplus"
 DEPENDS += "cli11"
 PROVIDES += "virtual/obmc-host-ipmi-hw"
-SRCREV = "baabadfb356a838d93616e678c60eb5a945981a3"
+SRCREV = "7ead0d3d83fa3b54c44c4a9f931defe626b5714b"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
