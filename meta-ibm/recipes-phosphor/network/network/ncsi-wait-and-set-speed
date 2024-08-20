@@ -22,7 +22,7 @@ do
     echo "attempt number $i: setting $netIface to 1 gigabit"
     rc=0
     # package 0, channel 0, oem command, see Intel I210 datasheet section 10.6.3.10.1
-    /usr/libexec/ncsi-netlink-ifindex "$netIface" -p 0 -c 0 -o 00000157200001 || rc=$?
+    /usr/libexec/ncsi-netlink-ifindex "$netIface" -p 0 -c 0 -o 5000000157200001 || rc=$?
     if [ $rc -ne 0 ]; then
         echo "error code is $rc setting $netIface to 1 gigabit, sleep and retry"
         sleep 5
