@@ -325,5 +325,25 @@
                 "slot-power-fault@58.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "INT_FANBOARD1_IOEXP_N",
+        "LineName": "INT_FANBOARD1_IOEXP_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "fan-board-efuse-fault@1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INT_FANBOARD0_IOEXP_N",
+        "LineName": "INT_FANBOARD0_IOEXP_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "fan-board-efuse-fault@0.service"]
+        },
+        "Continue": true
     }
 ]

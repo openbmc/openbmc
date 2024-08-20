@@ -1,0 +1,48 @@
+#!/bin/bash
+
+log_message() {
+    local MESSAGE="Fan board $1 eFuse fault"
+    local COMBINED_INFO="eFuse$2"
+
+    busctl call \
+        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
+        "xyz.openbmc_project.Logging.Entry.Level.Error" 1 "FAULT" "$COMBINED_INFO"
+}
+
+
+
+# if $1 == 0, fan board 0 IOE is at i2c-30 0x22.
+# if $1 == 1, fan board 1 IOE is at i2c-31 0x22.
+
+if [ "$1" -eq 0 ]; then
+    i2c_bus=30
+    ioe_addr=0x22
+    fan_board=0
+elif [ "$1" -eq 1 ]; then
+    i2c_bus=31
+    ioe_addr=0x22
+    fan_board=1
+else
+    echo "Invalid input. Please provide 0 or 1."
+    exit 1
+fi
+
+
+# i2ctranster to check which slot got interrupt
+read -r INT_BYTE <<< "$(i2ctransfer -f -y $i2c_bus w1@$ioe_addr 0 r1)"
+INT_BYTE=$((INT_BYTE >> 2))
+
+# Traverse INT_BYTE
+count=0
+EFUSE_RANGE=6
+while [ $count -lt $EFUSE_RANGE ]
+do
+    fault=$(( (INT_BYTE >> count) & 1 ))
+    # if fault[i] == 0, means efuse_x got fault
+    if [ $fault -eq 0 ]; then
+        log_message $fan_board $count
+    fi
+
+    count=$((count + 1))
+done

@@ -1,0 +1,7 @@
+[Unit]
+Description=fan board power-fault:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/fan-board-efuse-fault %i
+SyslogIdentifier=fan-board-efuse-fault%i
