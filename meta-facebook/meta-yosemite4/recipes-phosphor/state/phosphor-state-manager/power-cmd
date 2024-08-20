@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
 export STATE_OFF=0
 export STATE_ON=1
 export STATE_UNKNOWN=-1
-export MANAGEMENT_BOARD_IO_EXP_BUS_NUM="13"
+export MANAGEMENT_BOARD_IO_EXP_BUS_NUM="34"
 export SPIDER_BOARD_IO_EXP_BUS_NUM="28"
 export IO_EXP_SLOT_PWR_CTRL_ADDR="21"
 export IO_EXP_SLED_PWR_CTRL_ADDR="21"
@@ -14,6 +17,11 @@ export CHASSIS_INTF_NAME="xyz.openbmc_project.State.Chassis"
 export CHASSIS_PROPERTY_NAME="CurrentPowerState"
 export CHASSIS_ON_PROPERTY="xyz.openbmc_project.State.Chassis.PowerState.On"
 export CHASSIS_OFF_PROPERTY="xyz.openbmc_project.State.Chassis.PowerState.Off"
+
+MANAGEMENT_BOARD_VERSION=$(get_product_version Management_Board)
+if [ "$MANAGEMENT_BOARD_VERSION" = "DVT" ] || [ "$MANAGEMENT_BOARD_VERSION" = "EVT" ]; then
+  MANAGEMENT_BOARD_IO_EXP_BUS_NUM="13"
+fi
 
 gpio_get()
 {
