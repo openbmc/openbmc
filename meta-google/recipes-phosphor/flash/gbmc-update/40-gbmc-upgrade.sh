@@ -27,6 +27,14 @@ else
   echo 'Failed to find GBMC machine type from /etc/os-release' >&2
 fi
 
+move_emmc_images(){
+ # Create the destination directory if it doesn't exist
+ mkdir -p /run/emmc-images-tmpdir/
+
+ # Find the directory containing 'emmc-' files within $tmpdir and move all files to emmc-images-tmpdir/
+ find "$tmpdir" -type f -name "emmc-*" -exec mv {} /run/emmc-images-tmpdir/ ;
+}
+
 gbmc_upgrade_dl_unpack() {
   if [ -z "${bootfile_url-}" ]; then
     echo "bootfile_url is empty" >&2
@@ -77,6 +85,7 @@ gbmc_upgrade_dl_unpack() {
     (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
     sleep $stime
   done
+  move_emmc_images # call move emmc images to move all images away from directory
 }
 
 gbmc_upgrade_hook() {
