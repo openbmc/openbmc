@@ -1,0 +1,8 @@
+[Unit]
+Description=Deassert Uart Switch Button
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/deassert-uart-switch-button
+
+SyslogIdentifier=deassert-uart-switch-button

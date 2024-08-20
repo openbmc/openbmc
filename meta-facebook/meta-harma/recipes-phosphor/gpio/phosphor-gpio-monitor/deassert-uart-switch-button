@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+uart_lsb=$(get_gpio "uart-switch-lsb")
+uart_msb=$(get_gpio "uart-switch-msb")
+uart_lsb=$((1 - uart_lsb))
+uart_msb=$((1 - uart_msb))
+
+uart_sel=$((uart_msb+(uart_lsb<<1)))
+
+set_postcode_leds() {
+    num=$1
+    for i in {0..7}; do
+        bit_value=$(( (num >> i) & 1 ))
+        set_gpio "led-postcode-$i" $bit_value
+    done
+}
+
+set_postcode_leds "$uart_sel"
+
+exit 0

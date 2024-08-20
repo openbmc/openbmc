@@ -1,13 +1,23 @@
 [
     {
-        "Name": "reset-button",
+        "Name": "reset-cause-platrst",
         "ChipId": "0",
-        "GpioNum": 122,
+        "GpioNum": 16,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@reset-button.service","deassert-reset-button.service"],
-            "FALLING": ["assert-gpio-log@reset-button.service","assert-reset-button.service"]
-
+            "RISING": ["deassert-gpio-log@reset-cause-platrst.service"],
+            "FALLING": ["assert-gpio-log@reset-cause-platrst.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "power-hsc-good",
+        "ChipId": "0",
+        "GpioNum": 21,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["host-power-on.service"],
+            "FALLING": ["host-power-off.service"]
         },
         "Continue": true
     },
@@ -23,12 +33,69 @@
         "Continue": true
     },
     {
+        "Name": "reset-button",
+        "ChipId": "0",
+        "GpioNum": 122,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-gpio-log@reset-button.service","deassert-reset-button.service"],
+            "FALLING": ["assert-gpio-log@reset-button.service","assert-reset-button.service"]
+
+        },
+        "Continue": true
+    },
+    {
+        "Name": "uart-switch-button",
+        "ChipId": "0",
+        "GpioNum": 135,
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING": ["deassert-uart-switch-button.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "ac-power-button",
         "ChipId": "1",
         "GpioNum": 0,
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": ["assert-gpio-log@ac-power-button.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "power-host-good",
+        "ChipId": "2",
+        "GpioNum": 60,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-power-good.service", "deassert-gpio-log@power-host-good.service"],
+            "FALLING": ["assert-power-good.service", "assert-gpio-log@power-host-good.service"]
+
+        },
+        "Continue": true
+    },
+    {
+        "Name": "post-end-n",
+        "ChipId": "2",
+        "GpioNum": 66,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-post-end.service"],
+            "FALLING": ["assert-post-end.service"]
+
+        },
+        "Continue": true
+    },
+    {
+        "Name": "leakage-detect-alert",
+        "ChipId": "0",
+        "GpioNum": 92,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-gpio-log@leakage-detect-alert.service"],
+            "FALLING": ["assert-gpio-log@leakage-detect-alert.service"]
         },
         "Continue": true
     },
@@ -75,29 +142,6 @@
         "Continue": true
     },
     {
-        "Name": "reset-cause-platrst",
-        "ChipId": "0",
-        "GpioNum": 16,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-gpio-log@reset-cause-platrst.service"],
-            "FALLING": ["assert-gpio-log@reset-cause-platrst.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "power-host-good",
-        "ChipId": "2",
-        "GpioNum": 60,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-power-good.service", "deassert-gpio-log@power-host-good.service"],
-            "FALLING": ["assert-power-good.service", "assert-gpio-log@power-host-good.service"]
-
-        },
-        "Continue": true
-    },
-    {
         "Name": "reset-cause-pcie",
         "ChipId": "2",
         "GpioNum": 182,
@@ -116,40 +160,6 @@
         "Targets": {
             "RISING": ["deassert-gpio-log@pvdd11-ocp-alert.service"],
             "FALLING": ["assert-gpio-log@pvdd11-ocp-alert.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "post-end-n",
-        "ChipId": "2",
-        "GpioNum": 66,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-post-end.service"],
-            "FALLING": ["assert-post-end.service"]
-
-        },
-        "Continue": true
-    },
-    {
-        "Name": "leakage-detect-alert",
-        "ChipId": "0",
-        "GpioNum": 92,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-gpio-log@leakage-detect-alert.service"],
-            "FALLING": ["assert-gpio-log@leakage-detect-alert.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "power-hsc-good",
-        "ChipId": "0",
-        "GpioNum": 21,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["host-power-on.service"],
-            "FALLING": ["host-power-off.service"]
         },
         "Continue": true
     }

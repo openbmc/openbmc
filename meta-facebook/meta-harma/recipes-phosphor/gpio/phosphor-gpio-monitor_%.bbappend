@@ -16,6 +16,8 @@ SRC_URI += "file://assert-gpio-log@.service \
             file://deassert-power-good.service \
             file://deassert-reset-button \
             file://deassert-reset-button.service \
+            file://deassert-uart-switch-button \
+            file://deassert-uart-switch-button.service \
             file://host-power-off \
             file://host-power-off.service \
             file://host-power-on \
@@ -38,6 +40,7 @@ SYSTEMD_SERVICE:${PN} += " \
     deassert-power-good.service \
     deassert-post-end.service \
     deassert-reset-button.service \
+    deassert-uart-switch-button.service \
     multi-gpios-sys-init.service \
     "
 
@@ -68,6 +71,8 @@ do_install:append:() {
 
     install -m 0755 ${WORKDIR}/assert-power-good ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/deassert-power-good ${D}${libexecdir}/${PN}/
+
+    install -m 0755 ${WORKDIR}/deassert-uart-switch-button ${D}${libexecdir}/${PN}/
 
     install -m 0755 ${WORKDIR}/host-power-off ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-power-on ${D}${libexecdir}/${PN}/
