@@ -7,7 +7,7 @@ LICENSE = "BSL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 
 SRC_URI = "git://github.com/boostorg/build;protocol=https;branch=master"
-SRCREV = "8d86b9a85407d73d6e8c631771f18c2a237d2d71"
+SRCREV = "4a52d8c06635435b64e31a56eaf7ca5dc912a71d"
 PE = "1"
 
 UPSTREAM_CHECK_GITTAGREGEX = "boost-(?P<pver>(\d+(\.\d+)+))"
@@ -21,7 +21,7 @@ do_compile() {
 }
 
 do_install() {
-    HOME=/var/run ./b2 install --prefix=${prefix} staging-prefix=${D}${prefix}
+    HOME=/var/run ./b2 install --prefix=${D}${prefix}
 }
 
 # The build is either release mode (pre-stripped) or debug (-O0).

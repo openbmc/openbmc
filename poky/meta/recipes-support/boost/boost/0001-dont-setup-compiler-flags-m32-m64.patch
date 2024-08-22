@@ -1,4 +1,4 @@
-From bbb0845c0a79238fb2e84cca41826a0944b6ce7e Mon Sep 17 00:00:00 2001
+From 7130850d74863d1e9a0ae3e85462f1466bdf6d88 Mon Sep 17 00:00:00 2001
 From: Anuj Mittal <anuj.mittal@intel.com>
 Date: Thu, 14 Nov 2019 10:13:53 +0800
 Subject: [PATCH] dont setup compiler flags -m32/-m64
@@ -9,14 +9,14 @@ Upstream-Status: Inappropriate [OE-specific]
 
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
 ---
- tools/build/src/tools/gcc.jam | 14 --------------
- 1 file changed, 14 deletions(-)
+ tools/build/src/tools/gcc.jam | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index 493a43e6d..42dccbdfe 100644
+index ed7e39baf..90513f84a 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
-@@ -360,20 +360,6 @@ local rule compile-link-flags ( * )
+@@ -377,22 +377,6 @@ local rule compile-link-flags ( * )
      compile-link-flags <link>shared/<target-os>$(non-windows) : -fPIC ;
  }
  
@@ -29,6 +29,8 @@ index 493a43e6d..42dccbdfe 100644
 -    compile-link-flags <target-os>hpux/<address-model>64 : -mlp64 ;
 -
 -    local generic-os = [ set.difference $(all-os) : aix hpux ] ;
+-    compile-link-flags <target-os>$(generic-os)/<architecture>s390x/<address-model>32 : -m31 ;
+-    compile-link-flags <target-os>$(generic-os)/<architecture>s390x/<address-model>64 : -m64 ;
 -    local arch = power sparc x86 ;
 -    compile-link-flags <target-os>$(generic-os)/<architecture>$(arch)/<address-model>32 : -m32 ;
 -    compile-link-flags <target-os>$(generic-os)/<architecture>$(arch)/<address-model>64 : -m64 ;
