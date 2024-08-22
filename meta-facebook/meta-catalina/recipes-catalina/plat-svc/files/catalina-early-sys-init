@@ -7,16 +7,16 @@ source /usr/libexec/fb-common-functions
 
 # Workaround
 # rebind PDB i2c mux
-echo 1-0070 > /sys/bus/i2c/drivers/pca954x/bind
+bind_i2c_device pca954x 1-0070
 # rebind PDB Fan IC
-echo 18-0021 > /sys/bus/i2c/drivers/max31790/bind
-echo 18-0027 > /sys/bus/i2c/drivers/max31790/bind
+bind_i2c_device max31790 18-0021
+bind_i2c_device max31790 18-0027
 # rebind PDB FRU
-echo 21-0054 > /sys/bus/i2c/drivers/at24/bind
+bind_i2c_device at24 21-0054
+bind_i2c_device at24 21-0054
 # rebind OSFP FRU
-echo 22-0051 > /sys/bus/i2c/drivers/at24/bind
+bind_i2c_device at24 22-0051
 # rebind FIO FRU
-echo 23-0053 > /sys/bus/i2c/drivers/at24/bind
-
+bind_i2c_device at24 23-0053
 
 exit 0

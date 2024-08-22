@@ -37,3 +37,15 @@ set_gpio()
     echo " success"
     return 0
 }
+
+bind_i2c_device()
+{
+    DRIVER_NAME="$1"
+    DEV_BUS_ADDR="$2"
+    DRIVER_DIR_PATH="/sys/bus/i2c/drivers/${DRIVER_NAME}"
+    DRIVER_BIND_PATH="${DRIVER_DIR_PATH}/bind"
+    if [ ! -L "${DRIVER_DIR_PATH}/${DEV_BUS_ADDR}" ]; then
+        echo "bind_i2c_device: $DRIVER_NAME, $DEV_BUS_ADDR"
+        echo "${DEV_BUS_ADDR}" > "${DRIVER_BIND_PATH}"
+    fi
+}
