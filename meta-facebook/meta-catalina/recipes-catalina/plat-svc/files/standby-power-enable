@@ -96,9 +96,9 @@ bind_fru_eeproms()
 
 reset_host_usb()
 {
-    set_gpio "USB_HUB_RESET_L" "$GPIO_LOW"
+    set_gpio "USB2_HUB_RESET_L" "$GPIO_LOW"
     sleep 1
-    set_gpio "USB_HUB_RESET_L" "$GPIO_HIGH"
+    set_gpio "USB2_HUB_RESET_L" "$GPIO_HIGH"
 }
 
 rebind_hmc_usb_network()
@@ -147,7 +147,6 @@ set_gpio "stby_power_gd_cpld" "$GPIO_HIGH"
 bind_i2c_muxes
 bind_gpio_expanders
 
-set_gpio "BMC_12V_CTRL" "$GPIO_HIGH"
 reset_host_usb
 
 set_gpio "HMC_PGOOD" "$GPIO_HIGH"
