@@ -1,0 +1,12 @@
+[Unit]
+Description=Update current Host FW version
+After=xyz.openbmc_project.Software.Version.service
+Wants=xyz.openbmc_project.Software.Version.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/bin/bash /usr/sbin/bios-version.sh
+
+[Install]
+WantedBy=multi-user.target
