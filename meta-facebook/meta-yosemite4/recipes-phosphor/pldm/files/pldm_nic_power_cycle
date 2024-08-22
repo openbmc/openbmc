@@ -1,0 +1,81 @@
+#!/bin/sh
+
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+. /usr/libexec/yosemite4-common-functions
+
+NIC0_GPIO="EN_NIC0_POWER_BMC_R"
+NIC1_GPIO="EN_NIC1_POWER_BMC_R"
+NIC2_GPIO="EN_NIC2_POWER_BMC_R"
+NIC3_GPIO="EN_NIC3_POWER_BMC_R"
+CONTROL_GPIO=0
+
+if [ "$1" -eq "0" ]; then
+    CONTROL_GPIO=$NIC0_GPIO
+elif [ "$1" -eq "1" ]; then
+    CONTROL_GPIO=$NIC1_GPIO
+elif [ "$1" -eq "2" ]; then
+    CONTROL_GPIO=$NIC2_GPIO
+elif [ "$1" -eq "3" ]; then
+    CONTROL_GPIO=$NIC3_GPIO
+else
+    echo "Invalid NIC number!"
+    exit 1
+fi
+
+corresponding_slot1=$((2*$1+1))
+corresponding_slot2=$((2*$1+2))
+
+# DC power off the corresponding slot
+mfg-tool power-control -p $corresponding_slot1 -a off -s runtime
+mfg-tool power-control -p $corresponding_slot2 -a off -s runtime
+
+# Power off NIC card
+i=1
+while [ "$i" -lt 3 ]
+do
+    set_gpio "$CONTROL_GPIO" 0
+    ret=$?
+    if [ $ret -eq 0 ]; then
+        break
+    fi
+
+    if [ "$i" -eq "3" ]; then
+        echo "Control NIC $1 power off failed!"
+        exit 1
+    fi
+    i=$((i+1))
+done
+
+sleep 1
+
+# Power on NIC card
+i=1
+while [ "$i" -lt 3 ]
+do
+    set_gpio "$CONTROL_GPIO" 1
+    ret=$?
+    if [ $ret -eq 0 ]; then
+        break
+    fi
+
+    if [ "$i" -eq "3" ]; then
+        echo "Control NIC $1 power on failed!"
+        exit 1
+    fi
+    i=$((i+1))
+done
+
+# Wait NIC power on
+sleep 5
+
+# DC power on the corresponding slot
+mfg-tool power-control -p $corresponding_slot1 -a on -s runtime
+mfg-tool power-control -p $corresponding_slot2 -a on -s runtime
+
+# Reconfig network interface
+net_index=$(($1-1))
+if [ "$1" -eq 1 ] || [ "$1" -eq 2 ]; then
+    /usr/libexec/phosphor-gpio-monitor/reconfig-net-interface eth"$net_index"
+fi
+
+exit 0
