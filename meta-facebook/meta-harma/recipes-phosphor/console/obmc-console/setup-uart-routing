@@ -7,6 +7,3 @@ connect_uart_route() {
 
 connect_uart_route "uart1" "uart4"
 connect_uart_route "io1" "uart2"
-
-# Enable UART4/ttyS2 flow contorl
-stty -F /dev/ttyS2 crtscts
