@@ -5,32 +5,41 @@ power_on:
 status_ok:
     status_green:
         Action: 'On'
+        Priority: 'Blink'
     status_amber:
         Action: 'Off'
+        Priority: 'Blink'
 
 status_degraded:
     status_green:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
+        Priority: 'Blink'
     status_amber:
         Action: 'Off'
+        Priority: 'Blink'
 
 status_non_critical:
     status_green:
         Action: 'Off'
+        Priority: 'Blink'
     status_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
+        Priority: 'Blink'
 
 status_critical:
     status_green:
         Action: 'Off'
+        Priority: 'Blink'
     status_amber:
         Action: 'On'
+        Priority: 'Blink'
 
 enclosure_identify:
     identify:
         Action: 'On'
+        Priority: 'Blink'
 

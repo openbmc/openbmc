@@ -1,493 +1,656 @@
 bmc_booted:
     LED_BMC_READY:
         Action: 'On'
+        Priority: 'Blink'
     LED_ID_DWR_FRNT_P:
         Action: 'Off'
+        Priority: 'Blink'
     LED_ID_DWR_BACK_P:
         Action: 'Off'
+        Priority: 'Blink'
 
 led_id_dwr:
     LED_ID_DWR_FRNT_P:
         Action: 'On'
+        Priority: 'Blink'
     LED_ID_DWR_BACK_P:
         Action: 'On'
+        Priority: 'Blink'
 
 led_pwr_dwr:
     LED_PWR_DWR_FRNT:
         Action: 'On'
+        Priority: 'Blink'
     LED_PWR_DWR_BACK:
         Action: 'On'
+        Priority: 'Blink'
 
 led_id_tpm:
     LED_ID_TPM:
         Action: 'On'
+        Priority: 'Blink'
 led_id_bat:
     LED_ID_BAT:
         Action: 'On'
+        Priority: 'Blink'
 led_id_mgmt_port2:
     LED_ID_MGMT_PORT2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_mgmt_port1:
     LED_ID_MGMT_PORT1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_nic1_port1:
     LED_ID_NIC1_PORT1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_nic1_port2:
     LED_ID_NIC1_PORT2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_nic2_port1:
     LED_ID_NIC2_PORT1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_nic2_port2:
     LED_ID_NIC2_PORT2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_m2_ssd2:
     LED_ID_M2_SSD2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_m2_ssd1:
     LED_ID_M2_SSD1:
         Action: 'On'
+        Priority: 'Blink'
 
 led_id_cpu0:
     LED_ID_CPU0:
         Action: 'On'
+        Priority: 'Blink'
 led_id_cpu1:
     LED_ID_CPU1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_cpu2:
     LED_ID_CPU2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_cpu3:
     LED_ID_CPU3:
         Action: 'On'
+        Priority: 'Blink'
 
 
 led_id_dimm_c0a1:
     LED_ID_DIMM_C0A1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0a2:
     LED_ID_DIMM_C0A2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0b1:
     LED_ID_DIMM_C0B1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0b2:
     LED_ID_DIMM_C0B2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0c1:
     LED_ID_DIMM_C0C1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0c2:
     LED_ID_DIMM_C0C2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0d1:
     LED_ID_DIMM_C0D1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0d2:
     LED_ID_DIMM_C0D2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0e1:
     LED_ID_DIMM_C0E1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0e2:
     LED_ID_DIMM_C0E2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0f1:
     LED_ID_DIMM_C0F1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0f2:
     LED_ID_DIMM_C0F2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0g1:
     LED_ID_DIMM_C0G1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0g2:
     LED_ID_DIMM_C0G2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0h1:
     LED_ID_DIMM_C0H1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c0h2:
     LED_ID_DIMM_C0H2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1a1:
     LED_ID_DIMM_C1A1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1a2:
     LED_ID_DIMM_C1A2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1b1:
     LED_ID_DIMM_C1B1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1b2:
     LED_ID_DIMM_C1B2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1c1:
     LED_ID_DIMM_C1C1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1c2:
     LED_ID_DIMM_C1C2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1d1:
     LED_ID_DIMM_C1D1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1d2:
     LED_ID_DIMM_C1D2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1e1:
     LED_ID_DIMM_C1E1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1e2:
     LED_ID_DIMM_C1E2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1f1:
     LED_ID_DIMM_C1F1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1f2:
     LED_ID_DIMM_C1F2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1g1:
     LED_ID_DIMM_C1G1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1g2:
     LED_ID_DIMM_C1G2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1h1:
     LED_ID_DIMM_C1H1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c1h2:
     LED_ID_DIMM_C1H2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2a1:
     LED_ID_DIMM_C2A1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2a2:
     LED_ID_DIMM_C2A2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2b1:
     LED_ID_DIMM_C2B1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2b2:
     LED_ID_DIMM_C2B2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2c1:
     LED_ID_DIMM_C2C1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2c2:
     LED_ID_DIMM_C2C2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2d1:
     LED_ID_DIMM_C2D1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2d2:
     LED_ID_DIMM_C2D2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2e1:
     LED_ID_DIMM_C2E1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2e2:
     LED_ID_DIMM_C2E2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2f1:
     LED_ID_DIMM_C2F1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2f2:
     LED_ID_DIMM_C2F2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2g1:
     LED_ID_DIMM_C2G1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2g2:
     LED_ID_DIMM_C2G2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2h1:
     LED_ID_DIMM_C2H1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c2h2:
     LED_ID_DIMM_C2H2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3a1:
     LED_ID_DIMM_C3A1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3a2:
     LED_ID_DIMM_C3A2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3b1:
     LED_ID_DIMM_C3B1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3b2:
     LED_ID_DIMM_C3B2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3c1:
     LED_ID_DIMM_C3C1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3c2:
     LED_ID_DIMM_C3C2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3d1:
     LED_ID_DIMM_C3D1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3d2:
     LED_ID_DIMM_C3D2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3e1:
     LED_ID_DIMM_C3E1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3e2:
     LED_ID_DIMM_C3E2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3f1:
     LED_ID_DIMM_C3F1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3f2:
     LED_ID_DIMM_C3F2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3g1:
     LED_ID_DIMM_C3G1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3g2:
     LED_ID_DIMM_C3G2:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3h1:
     LED_ID_DIMM_C3H1:
         Action: 'On'
+        Priority: 'Blink'
 led_id_dimm_c3h2:
     LED_ID_DIMM_C3H2:
         Action: 'On'
+        Priority: 'Blink'
 
 led_id_rssd01:
     LED_ID_RSSD01:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd02:
     LED_ID_RSSD02:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd03:
     LED_ID_RSSD03:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd04:
     LED_ID_RSSD04:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd05:
     LED_ID_RSSD05:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd06:
     LED_ID_RSSD06:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd07:
     LED_ID_RSSD07:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd08:
     LED_ID_RSSD08:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd09:
     LED_ID_RSSD09:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd10:
     LED_ID_RSSD10:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd11:
     LED_ID_RSSD11:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd12:
     LED_ID_RSSD12:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd13:
     LED_ID_RSSD13:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd14:
     LED_ID_RSSD14:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd15:
     LED_ID_RSSD15:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd16:
     LED_ID_RSSD16:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd17:
     LED_ID_RSSD17:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd18:
     LED_ID_RSSD18:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd19:
     LED_ID_RSSD19:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd20:
     LED_ID_RSSD20:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd21:
     LED_ID_RSSD21:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd22:
     LED_ID_RSSD22:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd23:
     LED_ID_RSSD23:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd24:
     LED_ID_RSSD24:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd25:
     LED_ID_RSSD25:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd26:
     LED_ID_RSSD26:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd27:
     LED_ID_RSSD27:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd28:
     LED_ID_RSSD28:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd29:
     LED_ID_RSSD29:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd30:
     LED_ID_RSSD30:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd31:
     LED_ID_RSSD31:
         Action: 'On'
+        Priority: 'Blink'
 led_id_rssd32:
     LED_ID_RSSD32:
         Action: 'On'
+        Priority: 'Blink'
 
 led_id_fan_asm01:
     LED_ID_FAN_ASM01:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm02:
     LED_ID_FAN_ASM02:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm03:
     LED_ID_FAN_ASM03:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm04:
     LED_ID_FAN_ASM04:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm05:
     LED_ID_FAN_ASM05:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm06:
     LED_ID_FAN_ASM06:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm07:
     LED_ID_FAN_ASM07:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm08:
     LED_ID_FAN_ASM08:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm09:
     LED_ID_FAN_ASM09:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm10:
     LED_ID_FAN_ASM10:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm11:
     LED_ID_FAN_ASM11:
         Action: 'On'
+        Priority: 'Blink'
 led_id_fan_asm12:
     LED_ID_FAN_ASM12:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd01_power:
     rssd01_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd02_power:
     rssd02_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd03_power:
     rssd03_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd04_power:
     rssd04_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd05_power:
     rssd05_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd06_power:
     rssd06_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd07_power:
     rssd07_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd08_power:
    rssd08_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd09_power:
     rssd09_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd10_power:
     rssd10_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd11_power:
     rssd11_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd12_power:
     rssd12_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd13_power:
     rssd13_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd14_power:
     rssd14_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd15_power:
     rssd15_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd16_power:
     rssd16_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd17_power:
     rssd17_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd18_power:
     rssd18_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd19_power:
     rssd19_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd20_power:
     rssd20_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd21_power:
     rssd21_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd22_power:
     rssd22_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd23_power:
     rssd23_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd24_power:
     rssd24_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd25_power:
     rssd25_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd26_power:
     rssd26_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd27_power:
     rssd27_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd28_power:
     rssd28_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd29_power:
     rssd29_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd30_power:
     rssd30_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd31_power:
     rssd31_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_rssd32_power:
     rssd32_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_m2_ssb_ssd1_power:
     m2_ssb_ssd1_power_green:
         Action: 'On'
+        Priority: 'Blink'
 led_m2_ssb_ssd2_power:
     m2_ssb_ssd2_power_green:
         Action: 'On'
+        Priority: 'Blink'

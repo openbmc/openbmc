@@ -6,6 +6,7 @@
                 {
                     "Name" : "bmc_heartbeat_n",
                     "Action" : "Blink",
+                    "Priority" : "Blink",
                     "DutyOn" : 50,
                     "Period" : 1000
                 }
@@ -17,6 +18,7 @@
                 {
                     "Name": "fm_id_led_n",
                     "Action": "Blink",
+                    "Priority" : "Blink",
                     "DutyOn": 50,
                     "Period": 250
                 }

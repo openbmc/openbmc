@@ -6,6 +6,7 @@
                 {
                     "Name" : "heartbeat",
                     "Action" : "Blink",
+                    "Priority" : "Blink",
                     "DutyOn" : 50,
                     "Period" : 1000
                 }
@@ -17,6 +18,7 @@
                 {
                     "Name": "system-fault",
                     "Action": "Blink",
+                    "Priority" : "Blink",
                     "DutyOn": 50,
                     "Period": 250
                 }

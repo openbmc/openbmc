@@ -4,24 +4,28 @@
 bmc_booted:
     sys_log_id:
         Action: 'On'
+        Priority: 'Blink'
 
 enclosure_fault:
     sys_log_id:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
+        Priority: 'Blink'
 
 enclosure_identify:
     sys_log_id:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 enclosure_identify_blink:
     sys_log_id:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 #====================
 # Fan 0
@@ -29,14 +33,18 @@ enclosure_identify_blink:
 fan0_fault:
     fan0_amber:
         Action: 'On'
+        Priority: 'Blink'
     fan0_blue:
         Action: 'Off'
+        Priority: 'Blink'
 
 fan0_good:
     fan0_amber:
         Action: 'Off'
+        Priority: 'Blink'
     fan0_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 #====================
 # Fan 1
@@ -44,14 +52,18 @@ fan0_good:
 fan1_fault:
     fan1_amber:
         Action: 'On'
+        Priority: 'Blink'
     fan1_blue:
         Action: 'Off'
+        Priority: 'Blink'
 
 fan1_good:
     fan1_amber:
         Action: 'Off'
+        Priority: 'Blink'
     fan1_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 #====================
 # Fan 2
@@ -59,14 +71,18 @@ fan1_good:
 fan2_fault:
     fan2_amber:
         Action: 'On'
+        Priority: 'Blink'
     fan2_blue:
         Action: 'Off'
+        Priority: 'Blink'
 
 fan2_good:
     fan2_amber:
         Action: 'Off'
+        Priority: 'Blink'
     fan2_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 #====================
 # Fan 3
@@ -74,14 +90,18 @@ fan2_good:
 fan3_fault:
     fan3_amber:
         Action: 'On'
+        Priority: 'Blink'
     fan3_blue:
         Action: 'Off'
+        Priority: 'Blink'
 
 fan3_good:
     fan3_amber:
         Action: 'Off'
+        Priority: 'Blink'
     fan3_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 #====================
 # Sled 1
@@ -89,22 +109,26 @@ fan3_good:
 sled1_fault:
     sled1_amber:
         Action: 'On'
+        Priority: 'Blink'
 
 sled1_good:
     sled1_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 sled1_identify:
     sled1_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 sled1_identify_blink:
     sled1_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 #====================
 # Sled 2
@@ -112,22 +136,26 @@ sled1_identify_blink:
 sled2_fault:
     sled2_amber:
         Action: 'On'
+        Priority: 'Blink'
 
 sled2_good:
     sled2_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 sled2_identify:
     sled2_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 sled2_identify_blink:
     sled2_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 #====================
 # Sled 3
@@ -135,22 +163,26 @@ sled2_identify_blink:
 sled3_fault:
     sled3_amber:
         Action: 'On'
+        Priority: 'Blink'
 
 sled3_good:
     sled3_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 sled3_identify:
     sled3_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 sled3_identify_blink:
     sled3_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 #====================
 # Sled 4
@@ -158,22 +190,26 @@ sled3_identify_blink:
 sled4_fault:
     sled4_amber:
         Action: 'On'
+        Priority: 'Blink'
 
 sled4_good:
     sled4_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 sled4_identify:
     sled4_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 sled4_identify_blink:
     sled4_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 #====================
 # Sled 5
@@ -181,22 +217,26 @@ sled4_identify_blink:
 sled5_fault:
     sled5_amber:
         Action: 'On'
+        Priority: 'Blink'
 
 sled5_good:
     sled5_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 sled5_identify:
     sled5_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 sled5_identify_blink:
     sled5_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 #====================
 # Sled 6
@@ -204,19 +244,23 @@ sled5_identify_blink:
 sled6_fault:
     sled6_amber:
         Action: 'On'
+        Priority: 'Blink'
 
 sled6_good:
     sled6_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 sled6_identify:
     sled6_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'
 
 sled6_identify_blink:
     sled6_amber:
         Action: 'Blink'
         DutyOn: 50
         Period: 400
+        Priority: 'Blink'

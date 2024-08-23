@@ -9,34 +9,43 @@ bmc_booted:
 status_ok:
     platform_status_green:
         Action: 'Off'
+        Priority: 'Blink'
     platform_status_red:
         Action: 'Off'
+        Priority: 'Blink'
 
 status_degraded:
     platform_status_green:
         Action: 'Off'
+        Priority: 'Blink'
     platform_status_red:
         Action: 'Blink'
         DutyOn: 25
         Period: 2000
+        Priority: 'Blink'
 
 status_non_critical:
     platform_status_green:
         Action: 'Off'
+        Priority: 'Blink'
     platform_status_red:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
+        Priority: 'Blink'
 
 status_critical:
     platform_status_green:
         Action: 'Off'
+        Priority: 'Blink'
     platform_status_red:
         Action: 'On'
+        Priority: 'Blink'
 
 enclosure_identify:
     platform_indicator_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 #
 # May be asserted through IPMI or RedFish.
@@ -44,12 +53,14 @@ enclosure_identify:
 enclosure_identify_blink:
     platform_indicator_blue:
         Action: 'On'
+        Priority: 'Blink'
 
 #
 # Asserted while firmware is flashing
 firmware_flashing:
     platform_indicator_blue:
         Action: 'Blink'
+        Priority: 'Blink'
 
 #
 # Power button indication
@@ -57,26 +68,34 @@ firmware_flashing:
 power_standby:
     platform_power_green:
         Action: 'On'
+        Priority: 'Blink'
     platform_power_red:
         Action: 'On'
+        Priority: 'Blink'
 
 power_sequence:
     platform_power_green:
         Action: 'Blink'
         DutyOn: 50
         Period: 1000
+        Priority: 'Blink'
     platform_power_red:
         Action: 'Off'
+        Priority: 'Blink'
 
 power_on:
     platform_power_green:
         Action: 'On'
+        Priority: 'Blink'
     platform_power_red:
         Action: 'Off'
+        Priority: 'Blink'
 
 power_failure:
     platform_power_green:
         Action: 'Off'
+        Priority: 'Blink'
     platform_power_red:
         Action: 'On'
+        Priority: 'Blink'
 
