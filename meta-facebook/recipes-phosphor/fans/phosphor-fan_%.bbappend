@@ -48,7 +48,7 @@ pkg_postinst:${PN}-sensor-monitor() {
     ln -s $TARGET $LINK
 }
 
-pkg_postinst:${PN}-sensor-monitor:harma() {
+pkg_postinst:${PN}-sensor-monitor:fb-compute-singlehost() {
     rm -f $D$systemd_system_unitdir/obmc-chassis-hard-poweroff@0.target.requires/obmc-chassis-poweroff@.target
 }
 
