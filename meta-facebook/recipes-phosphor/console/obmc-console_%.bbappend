@@ -13,6 +13,14 @@ SERVER_CONFS = "${@ ' '.join([ f'file://server.{i}.conf' for i in d.getVar('OBMC
 SRC_URI:append = " ${SERVER_CONFS}"
 SRC_URI:append = " file://client.conf "
 
+OBMC_SOL_ROUTING ?= ""
+
 do_install:append() {
   install -m 0644 ${WORKDIR}/client.conf ${D}${sysconfdir}/${BPN}/client.conf
+}
+
+do_install:prepend() {
+    if [ -f "${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf" ]; then
+        sed -i "s/\"OBMC_SOL_ROUTING\"/${OBMC_SOL_ROUTING}/g" ${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf
+    fi
 }
