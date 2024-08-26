@@ -25,7 +25,7 @@ SRC_URI += " \
   file://gbmc-br-gw-src.sh \
   file://gbmc-br-nft.sh \
   file://gbmc-br-dhcp.sh \
-  file://50-gbmc-psu-hardreset.sh \
+  file://50-gbmc-psu-hardreset.sh.in \
   file://gbmc-br-dhcp.service \
   file://gbmc-br-dhcp-term.sh \
   file://gbmc-br-dhcp-term.service \
@@ -75,6 +75,9 @@ GBMC_BR_FIXED_OFFSET ?= ""
 # and we allocated it downstream. Intended to only be used within a complete
 # system of multiple network endpoints.
 GBMC_ULA_PREFIX = "fdb5:0481:10ce:0"
+
+# coordinated powercycle
+GBMC_COORDINATED_POWERCYCLE ?= "true"
 
 def mac_to_eui64(mac):
   if not mac:
@@ -148,6 +151,8 @@ do_install() {
   install -m0644 ${WORKDIR}/gbmc-br-dhcp-term.service ${D}${systemd_system_unitdir}/
   install -m0644 ${WORKDIR}/gbmc-br-load-ip.service ${D}${systemd_system_unitdir}/
   install -d -m0755 ${D}${datadir}/gbmc-br-dhcp
+
+  sed 's,@COORDINATED_POWERCYCLE@,${GBMC_COORDINATED_POWERCYCLE},' ${WORKDIR}/50-gbmc-psu-hardreset.sh.in >${WORKDIR}/50-gbmc-psu-hardreset.sh
   install -m0644 ${WORKDIR}/50-gbmc-psu-hardreset.sh ${D}${datadir}/gbmc-br-dhcp/
 
   install -m0644 ${WORKDIR}/gbmc-br-lib.sh ${D}${datadir}/

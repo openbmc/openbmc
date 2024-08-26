@@ -17,6 +17,8 @@
 
 gbmc_psu_hardreset_needed=
 
+COORDINATED_POWERCYCLE=@COORDINATED_POWERCYCLE@
+
 gbmc_psu_hardreset_hook() {
   # We don't always need a powercycle, allow skipping
   if [ -z "${gbmc_psu_hardreset_needed-}" ]; then
@@ -24,8 +26,13 @@ gbmc_psu_hardreset_hook() {
     return 0
   fi
 
-  echo "Powercycling" >&2
-  update-dhcp-status 'POWERCYCLE' "netboot powercycle"
+  if [ "${COORDINATED_POWERCYCLE}" == "true" ]; then
+    echo "Requesting powercyce" >&2
+    update-dhcp-status 'POWERCYCLE' "netboot powercycle" || return
+  else
+    echo "Powercycling" >&2
+    systemctl start gbmc-psu-hardreset.target || return
+  fi
 
   # Ensure that we don't continue the DHCP process while waiting for the
   # powercycle.
