@@ -26,8 +26,8 @@ gbmc_psu_hardreset_hook() {
     return 0
   fi
 
-  if [ "${COORDINATED_POWERCYCLE}" == "true" ]; then
-    echo "Requesting powercyce" >&2
+  if [[ "${COORDINATED_POWERCYCLE}" == "true" ]]; then
+    echo "Requesting powercycle" >&2
     update-dhcp-status 'POWERCYCLE' "netboot powercycle" || return
   else
     echo "Powercycling" >&2
