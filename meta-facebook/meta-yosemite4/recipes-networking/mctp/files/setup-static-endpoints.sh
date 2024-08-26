@@ -5,7 +5,7 @@
 # gpioget is not possible.
 
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-networking/mctp/files/nic-gpio-addrs.sh
-. /usr/share/mctp/nic-gpio-addrs.sh
+. /usr/libexec/mctp/nic-gpio-addrs.sh
 
 # Setup slot1 NIC
 gpio_val=$(devmem "$PRSNT_NIC0" "$WIDTH")
