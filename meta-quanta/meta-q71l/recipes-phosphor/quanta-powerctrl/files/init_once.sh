@@ -12,7 +12,7 @@ function set_gpio_active_low() {
   echo "$2" > "/sys/class/gpio/gpio$1/direction"
 }
 
-GPIO_BASE=$(cat /sys/devices/platform/ahb/ahb:apb/1e780000.gpio/gpio/*/base)
+GPIO_BASE=$(cat /sys/devices/platform/ahb/1e780000.apb/1e780000.gpio/gpio/*/base)
 
 # FM_BMC_READY_N, GPIO Q4, active low
 set_gpio_active_low $((GPIO_BASE + 128 + 4)) high

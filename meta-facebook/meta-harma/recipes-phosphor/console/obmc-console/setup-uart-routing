@@ -1,8 +1,8 @@
 #!/bin/bash
 
 connect_uart_route() {
-  echo -ne "$1" > /sys/devices/platform/ahb/ahb:apb/1e789000.lpc/1e789098.uart-routing/"$2"
-  echo -ne "$2" > /sys/devices/platform/ahb/ahb:apb/1e789000.lpc/1e789098.uart-routing/"$1"
+  echo -ne "$1" > /sys/devices/platform/ahb/1e780000.apb/1e789000.lpc/1e789098.uart-routing/"$2"
+  echo -ne "$2" > /sys/devices/platform/ahb/1e780000.apb/1e789000.lpc/1e789098.uart-routing/"$1"
 }
 
 connect_uart_route "uart1" "uart4"

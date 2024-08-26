@@ -9996,7 +9996,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-11/11-0064": {
+        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-11/11-0064": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Common.Device.Error.ReadFailure",
@@ -10017,7 +10017,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0068": {
+        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0068": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Common.Device.Error.ReadFailure",
@@ -10038,70 +10038,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0069": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Common.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0060F",
-            "ComponentInstance": 0,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from power supply 0",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-11/11-0064": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Common.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0059F",
-            "ComponentInstance": null,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the power sequencer chip on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0068": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Common.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0060F",
-            "ComponentInstance": 1,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from power supply 1",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0069": {
+        "xyz.openbmc_project.Common.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0069": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Common.Device.Error.ReadFailure",
@@ -17094,7 +17031,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0052": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0052": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17115,7 +17052,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0068": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0068": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17136,7 +17073,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0069": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0069": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17157,7 +17094,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0076": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0076": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17178,7 +17115,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0077": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0077": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17199,7 +17136,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-4/4-0070": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-4/4-0070": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17220,7 +17157,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-4/4-0071": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-4/4-0071": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17241,7 +17178,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-5/5-0070": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-5/5-0070": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -17262,196 +17199,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-9/9-004a": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0056F",
-            "ComponentInstance": null,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the PCIE temperature sensor on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0052": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0057F",
-            "ComponentInstance": null,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the fan control device on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0068": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0060F",
-            "ComponentInstance": 1,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from power supply 1",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0069": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0060F",
-            "ComponentInstance": 0,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from power supply 0",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0076": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0053F",
-            "ComponentInstance": null,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the ambient temperature sensor on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0077": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0052F",
-            "ComponentInstance": null,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the ambient temperature sensor on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-4/4-0070": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0054F",
-            "ComponentInstance": 0,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the CPU 0 VDD/VCS VRM on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-4/4-0071": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0055F",
-            "ComponentInstance": 1,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the CPU 1 VDN/VDDR VRM on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-5/5-0070": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0054F",
-            "ComponentInstance": 1,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to read from the CPU 1 VDD/VCS VRM on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-9/9-004a": {
+        "xyz.openbmc_project.Sensor.Device.Error.ReadFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-9/9-004a": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.ReadFailure",
@@ -19572,28 +19320,7 @@
             "UserAction": null,
             "VMMigrationFlag": null
         },
-        "xyz.openbmc_project.Sensor.Device.Error.WriteFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0052": {
-            "AffectedLEDs": null,
-            "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
-            "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.WriteFailure",
-            "CallHomeCandidate": false,
-            "CommonEventID": "FQPSPCR0058F",
-            "ComponentInstance": null,
-            "DateAdded": null,
-            "DateReviewed": null,
-            "EventType": "Communication Failure/Timeout",
-            "Internal": false,
-            "LengthyDescription": null,
-            "LogSource": "BMC",
-            "Message": "Failed to write to the fan control device on the system backplane",
-            "ReferencedInventory": "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-            "RelatedEventIDs": {},
-            "Serviceable": false,
-            "Severity": "Warning",
-            "UserAction": null,
-            "VMMigrationFlag": null
-        },
-        "xyz.openbmc_project.Sensor.Device.Error.WriteFailure||/sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c-bus/i2c-3/3-0052": {
+        "xyz.openbmc_project.Sensor.Device.Error.WriteFailure||/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0052": {
             "AffectedLEDs": null,
             "AffectedSubsystem": "Systems Management - Core / Virtual Appliance",
             "BMCMessageID": "xyz.openbmc_project.Sensor.Device.Error.WriteFailure",

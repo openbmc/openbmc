@@ -5,45 +5,45 @@ SRC_URI:append:ibm-ac-server = " \
            "
 
 CHIPS:witherspoon = " \
-               bus@1e78a000/i2c-bus@100/max31785@52 \
-               bus@1e78a000/i2c-bus@100/power-supply@68 \
-               bus@1e78a000/i2c-bus@100/power-supply@69 \
-               bus@1e78a000/i2c-bus@100/bmp280@77 \
-               bus@1e78a000/i2c-bus@100/dps310@76 \
-               bus@1e78a000/i2c-bus@140/ir35221@70 \
-               bus@1e78a000/i2c-bus@140/ir35221@71 \
-               bus@1e78a000/i2c-bus@180/ir35221@70 \
-               bus@1e78a000/i2c-bus@180/ir35221@71 \
-               bus@1e78a000/i2c-bus@380/tmp275@4a \
+               bus@1e78a000/i2c@100/max31785@52 \
+               bus@1e78a000/i2c@100/power-supply@68 \
+               bus@1e78a000/i2c@100/power-supply@69 \
+               bus@1e78a000/i2c@100/bmp280@77 \
+               bus@1e78a000/i2c@100/dps310@76 \
+               bus@1e78a000/i2c@140/ir35221@70 \
+               bus@1e78a000/i2c@140/ir35221@71 \
+               bus@1e78a000/i2c@180/ir35221@70 \
+               bus@1e78a000/i2c@180/ir35221@71 \
+               bus@1e78a000/i2c@380/tmp275@4a \
                "
 
 CHIPS:witherspoon-tacoma = " \
-               bus@1e78a000/i2c-bus@200/max31785@52 \
-               bus@1e78a000/i2c-bus@200/power-supply@68 \
-               bus@1e78a000/i2c-bus@200/power-supply@69 \
-               bus@1e78a000/i2c-bus@200/bmp280@77 \
-               bus@1e78a000/i2c-bus@200/dps310@76 \
-               bus@1e78a000/i2c-bus@280/ir35221@70 \
-               bus@1e78a000/i2c-bus@280/ir35221@71 \
-               bus@1e78a000/i2c-bus@300/ir35221@70 \
-               bus@1e78a000/i2c-bus@300/ir35221@71 \
-               bus@1e78a000/i2c-bus@500/tmp275@4a \
+               bus@1e78a000/i2c@200/max31785@52 \
+               bus@1e78a000/i2c@200/power-supply@68 \
+               bus@1e78a000/i2c@200/power-supply@69 \
+               bus@1e78a000/i2c@200/bmp280@77 \
+               bus@1e78a000/i2c@200/dps310@76 \
+               bus@1e78a000/i2c@280/ir35221@70 \
+               bus@1e78a000/i2c@280/ir35221@71 \
+               bus@1e78a000/i2c@300/ir35221@70 \
+               bus@1e78a000/i2c@300/ir35221@71 \
+               bus@1e78a000/i2c@500/tmp275@4a \
                "
 
 CHIPS:p10bmc = " \
-               1e78a200.i2c-bus/i2c-3/3-0068 \
-               1e78a200.i2c-bus/i2c-3/3-0069 \
-               1e78a200.i2c-bus/i2c-3/3-006a \
-               1e78a200.i2c-bus/i2c-3/3-006d \
-               1e78a200.i2c-bus/i2c-3/3-006b \
-               1e78a200.i2c-bus/i2c-3/3-005a \
-               1e78a200.i2c-bus/i2c-3/3-005b \
-               1e78a400.i2c-bus/i2c-7/7-0052 \
-               1e78a780.i2c-bus/i2c-14/i2c-30/30-0052 \
+               1e78a200.i2c/i2c-3/3-0068 \
+               1e78a200.i2c/i2c-3/3-0069 \
+               1e78a200.i2c/i2c-3/3-006a \
+               1e78a200.i2c/i2c-3/3-006d \
+               1e78a200.i2c/i2c-3/3-006b \
+               1e78a200.i2c/i2c-3/3-005a \
+               1e78a200.i2c/i2c-3/3-005b \
+               1e78a400.i2c/i2c-7/7-0052 \
+               1e78a780.i2c/i2c-14/i2c-30/30-0052 \
                "
 
-ITEMSFMT = "ahb/apb/{0}.conf"
-ITEMSFMT:p10bmc = "devices/platform/ahb/ahb--apb/ahb--apb--bus@1e78a000/{0}.conf"
+ITEMSFMT = "ahb/apb@1e780000/{0}.conf"
+ITEMSFMT:p10bmc = "devices/platform/ahb/1e780000.apb/1e780000.apb--bus@1e78a000/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 
 OCCS = " \
