@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI:append:fb-compute-multihost = " file://phosphor-multi-gpio-monitor.json"
 SRC_URI:append:fb-compute-multihost = " file://obmc-ipmb-rescan-fru.service"
-SRC_URI:append:fb-compute-multihost = " file://ipmb-rescan-fru.sh"
+SRC_URI:append:fb-compute-multihost = " file://ipmb-rescan-fru"
 
 RDEPENDS:${PN} += "bash"
 
@@ -24,6 +24,6 @@ do_install:append:fb-compute-multihost() {
                     ${D}${systemd_system_unitdir}
 
     install -d ${D}${libexecdir}/phosphor-gpio-monitor
-    install -m 0755 ${WORKDIR}/ipmb-rescan-fru.sh ${D}${libexecdir}/phosphor-gpio-monitor/
+    install -m 0755 ${WORKDIR}/ipmb-rescan-fru ${D}${libexecdir}/phosphor-gpio-monitor/
 }
 FILES:${PN} += "${systemd_system_unitdir}/obmc-ipmb-rescan-fru.service"

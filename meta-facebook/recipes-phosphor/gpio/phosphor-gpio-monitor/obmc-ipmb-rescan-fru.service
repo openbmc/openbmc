@@ -3,4 +3,4 @@ Description=ipmb based rescan the slots fru service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/ipmb-rescan-fru.sh
+ExecStart=/usr/libexec/phosphor-gpio-monitor/ipmb-rescan-fru

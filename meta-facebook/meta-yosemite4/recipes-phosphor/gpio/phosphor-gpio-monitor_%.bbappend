@@ -3,7 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 inherit obmc-phosphor-systemd systemd
 
 SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
-            file://configure-nic-mctp-endpoint.sh \
+            file://configure-nic-mctp-endpoint \
             file://setup-nic-endpoint-slot@.service \
             file://remove-nic-endpoint-slot@.service \
             file://set-button-sled.service \
@@ -78,5 +78,5 @@ do_install:append:() {
     install -m 0755 ${WORKDIR}/enable-i3c-hub ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/disable-i3c-hub ${D}${libexecdir}/${PN}/
     install -d ${D}/${bindir}
-    install -m 0755 ${WORKDIR}/configure-nic-mctp-endpoint.sh ${D}/${bindir}/
+    install -m 0755 ${WORKDIR}/configure-nic-mctp-endpoint ${D}/${bindir}/
 }

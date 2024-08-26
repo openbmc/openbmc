@@ -4,4 +4,4 @@ Description=Flash Host Bios image %I to Host
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/usr/sbin/bios-update.sh /tmp/images/%i
+ExecStart=/usr/sbin/bios-update /tmp/images/%i

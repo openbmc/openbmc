@@ -4,8 +4,8 @@
 # the gpio pin is occupied by gpio-monitor, read the value from
 # gpioget is not possible.
 
-# shellcheck source=meta-facebook/meta-yosemite4/recipes-networking/mctp/files/nic-gpio-addrs.sh
-. /usr/libexec/mctp/nic-gpio-addrs.sh
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-networking/mctp/files/nic-gpio-addrs
+. /usr/libexec/mctp/nic-gpio-addrs
 
 # Setup slot1 NIC
 gpio_val=$(devmem "$PRSNT_NIC0" "$WIDTH")
