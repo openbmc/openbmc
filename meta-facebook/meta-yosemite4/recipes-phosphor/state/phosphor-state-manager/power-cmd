@@ -17,6 +17,12 @@ export CHASSIS_INTF_NAME="xyz.openbmc_project.State.Chassis"
 export CHASSIS_PROPERTY_NAME="CurrentPowerState"
 export CHASSIS_ON_PROPERTY="xyz.openbmc_project.State.Chassis.PowerState.On"
 export CHASSIS_OFF_PROPERTY="xyz.openbmc_project.State.Chassis.PowerState.Off"
+export HOST_BUS_NAME="xyz.openbmc_project.State.Host"
+export HOST_OBJ_PATH="/xyz/openbmc_project/state/host"
+export HOST_INTF_NAME="xyz.openbmc_project.State.Host"
+export HOST_PROPERTY_NAME="CurrentHostState"
+export HOST_ON_PROPERTY="xyz.openbmc_project.State.Host.HostState.Running"
+export HOST_OFF_PROPERTY="xyz.openbmc_project.State.Host.HostState.Off"
 
 MANAGEMENT_BOARD_VERSION=$(get_product_version Management_Board)
 if [ "$MANAGEMENT_BOARD_VERSION" = "DVT" ] || [ "$MANAGEMENT_BOARD_VERSION" = "EVT" ]; then

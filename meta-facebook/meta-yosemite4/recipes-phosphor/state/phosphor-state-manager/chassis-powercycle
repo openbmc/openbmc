@@ -146,6 +146,9 @@ chassis-power-cycle()
                 echo "${msg}"
                 add_sel "${msg}"
             fi
+            # Set chassis power state off
+            busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
+
             sleep 20
         fi
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
@@ -169,6 +172,9 @@ chassis-power-cycle()
                 fi
             fi
             enable_i3c_hub
+
+            # Wait for standby sensors to be ready
+            sleep 2
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
             /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
             msg="Chassis$CHASSIS_ID cycle success"

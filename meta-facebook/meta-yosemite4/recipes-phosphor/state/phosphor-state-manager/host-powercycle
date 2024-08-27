@@ -27,6 +27,10 @@ get_host_status
 if [ "$host_status" == "$STATE_ON" ]; then
     # Set state effecter state: Entity ID 0x0000 for host power control, 0x2 for power off
     pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x02 -m "$EID"
+
+    # Set host state to off
+    busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
+
     # Wait for the host to power off
     sleep 10s
 
@@ -34,6 +38,7 @@ if [ "$host_status" == "$STATE_ON" ]; then
     get_host_status
 
     if [ "$host_status" != "$STATE_OFF" ]; then
+        busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
         msg="Do power cycle fail, fail to set host$CHASSIS_ID power off"
         echo "${msg}"
         add_sel "${msg}"
@@ -55,6 +60,9 @@ if [ "$host_status" != "$STATE_ON" ]; then
         add_sel "${msg}"
         exit 1
     fi
+
+    # Set host state to on
+    busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
 fi
 
 msg="Host$1 power cycle success"

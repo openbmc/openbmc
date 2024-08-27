@@ -91,6 +91,9 @@ chassis-power-on()
             fi
         fi
         enable_i3c_hub
+
+        # Wait for standby sensors to be ready
+        sleep 2
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
         echo "Chassis$CHASSIS_ID is power on"
     else
