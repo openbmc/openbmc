@@ -57,8 +57,11 @@ gbmc_br_nft_hook() {
     if (( ip_bytes[8] != 0xfd )); then
       return 0
     fi
+
+    (( ip_bytes[9] &= 0xf0 ))
+
     local i
-    for (( i=9; i<16; i++ )); do
+    for (( i=10; i<16; i++ )); do
       ip_bytes["$i"]=0
     done
     pfx="$(ip_bytes_to_str ip_bytes)/76"
