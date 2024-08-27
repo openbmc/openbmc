@@ -1,191 +1,167 @@
 fan0_ok:
+    Priority: 1
     fan0_blue:
         Action: "On"
-        Priority: 'Blink'
     fan0_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan0_fail:
+    Priority: 2
     fan0_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan0_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan1_ok:
+    Priority: 10
     fan1_blue:
         Action: "On"
-        Priority: 'Blink'
     fan1_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan1_fail:
+    Priority: 11
     fan1_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan1_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan2_ok:
+    Priority: 20
     fan2_blue:
         Action: "On"
-        Priority: 'Blink'
     fan2_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan2_fail:
+    Priority: 21
     fan2_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan2_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan3_ok:
+    Priority: 30
     fan3_blue:
         Action: "On"
-        Priority: 'Blink'
     fan3_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan3_fail:
+    Priority: 31
     fan3_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan3_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan4_ok:
+    Priority: 40
     fan4_blue:
         Action: "On"
-        Priority: 'Blink'
     fan4_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan4_fail:
+    Priority: 41
     fan4_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan4_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan5_ok:
+    Priority: 50
     fan5_blue:
         Action: "On"
-        Priority: 'Blink'
     fan5_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan5_fail:
+    Priority: 51
     fan5_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan5_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan6_ok:
+    Priority: 60
     fan6_blue:
         Action: "On"
-        Priority: 'Blink'
     fan6_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan6_fail:
+    Priority: 61
     fan6_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan6_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan7_ok:
+    Priority: 70
     fan7_blue:
         Action: "On"
-        Priority: 'Blink'
     fan7_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan7_fail:
+    Priority: 71
     fan7_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan7_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan8_ok:
+    Priority: 80
     fan8_blue:
         Action: "On"
-        Priority: 'Blink'
     fan8_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan8_fail:
+    Priority: 81
     fan8_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan8_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan9_ok:
+    Priority: 90
     fan9_blue:
         Action: "On"
-        Priority: 'Blink'
     fan9_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan9_fail:
+    Priority: 91
     fan9_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan9_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan10_ok:
+    Priority: 100
     fan10_blue:
         Action: "On"
-        Priority: 'Blink'
     fan10_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan10_fail:
+    Priority: 101
     fan10_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan10_amber:
         Action: "On"
-        Priority: 'Blink'
 
 fan11_ok:
+    Priority: 110
     fan11_blue:
         Action: "On"
-        Priority: 'Blink'
     fan11_amber:
         Action: "Off"
-        Priority: 'Blink'
 
 fan11_fail:
+    Priority: 111
     fan11_blue:
         Action: "Off"
-        Priority: 'Blink'
     fan11_amber:
         Action: "On"
-        Priority: 'Blink'
