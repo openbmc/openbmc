@@ -103,8 +103,9 @@
         "Name": "irq-uv-detect-alert",
         "ChipId": "2",
         "GpioNum": 174,
-        "EventMon": "FALLING",
+        "EventMon": "BOTH",
         "Targets": {
+            "RISING": ["deassert-gpio-log@irq-uv-detect-alert.service"],
             "FALLING": ["assert-gpio-log@irq-uv-detect-alert.service"]
         },
         "Continue": true
