@@ -1,0 +1,7 @@
+[Unit]
+Description=Check %i interrupt
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/check-interrupt %i
+SyslogIdentifier=check-interrupt%i

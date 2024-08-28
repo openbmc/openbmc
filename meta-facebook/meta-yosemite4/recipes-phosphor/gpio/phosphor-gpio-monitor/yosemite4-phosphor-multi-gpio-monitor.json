@@ -352,7 +352,7 @@
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
-                "slot-power-fault@14.service"]
+                "check-interrupt@slot1-slot4.service"]
         },
         "Continue": true
     },
@@ -362,7 +362,7 @@
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": [
-                "slot-power-fault@58.service"]
+                "check-interrupt@slot5-slot8.service"]
         },
         "Continue": true
     },

@@ -1,7 +1,0 @@
-[Unit]
-Description=slot power-fault:%i
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/slot-power-fault %i
-SyslogIdentifier=slot-power-fault%i
