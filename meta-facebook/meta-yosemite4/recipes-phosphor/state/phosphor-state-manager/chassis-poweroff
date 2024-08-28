@@ -25,9 +25,6 @@ is_nuvoton_board="$(check_nuvoton_board)"
 # Server 12v power off
 chassis-power-off()
 {
-        busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}0" au.com.CodeConstruct.MCTP.Endpoint Remove
-        busctl call xyz.openbmc_project.MCTP "/xyz/openbmc_project/mctp/1/${CHASSIS_ID}2" au.com.CodeConstruct.MCTP.Endpoint Remove
-        sleep 1
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
         then
                 msg="Failed to set slot$CHASSIS_ID power off"
