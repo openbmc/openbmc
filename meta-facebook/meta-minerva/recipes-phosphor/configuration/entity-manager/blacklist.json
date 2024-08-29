@@ -1,0 +1,28 @@
+{
+    "buses": [
+        {
+          "bus": 16,
+          "addresses": [ "0x51"]
+        },
+        {
+          "bus": 17,
+          "addresses": [ "0x51"]
+        },
+        {
+          "bus": 18,
+          "addresses": [ "0x51"]
+        },
+        {
+          "bus": 19,
+          "addresses": [ "0x51"]
+        },
+        {
+          "bus": 20,
+          "addresses": [ "0x51"]
+        },
+        {
+          "bus": 21,
+          "addresses": [ "0x51"]
+        }
+    ]
+}
