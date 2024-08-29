@@ -42,10 +42,34 @@
         "Inventory": "/system/chassis/Catalina/Fan6"
     },
     {
-        "Name": "Fan6",
+        "Name": "Fan7",
         "LineName": "FAN_7_PRESENT_N",
         "ActiveLow": true,
         "Inventory": "/system/chassis/Catalina/Fan7"
+    },
+    {
+        "Name": "NIC0",
+        "LineName": "HP_LVC3_OCP_V3_1_PRSNT2_PLD_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/NIC0"
+    },
+    {
+        "Name": "NIC1",
+        "LineName": "HP_LVC3_OCP_V3_2_PRSNT2_PLD_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/NIC1"
+    },
+    {
+        "Name": "HostTpm",
+        "LineName": "FM_TPM_PRSNT_0_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/HostTpm"
+    },
+    {
+        "Name": "BmcTpm",
+        "LineName": "FM_TPM_PRSNT_1_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/BmcTpm"
     },
     {
         "Name": "LeakCable0",
@@ -77,7 +101,7 @@
     },
     {
         "Name": "OSFPPowerCable",
-        "LineName": "PRSNT_OSFP_POWER_CABLE_N",
+        "LineName": "PRSNT_OSFP0_POWER_CABLE_N",
         "ActiveLow": true,
         "Inventory": "/system/chassis/compute_tray/cable/OSFPPowerCable",
         "ExtraInterfaces": ["xyz.openbmc_project.Inventory.Item.Cable"]
