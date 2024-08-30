@@ -6,10 +6,11 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=a6a4edad4aed50f39a66d098d74b265b"
 DEPENDS = "boost \
            dbus \
            nlohmann-json \
+           phosphor-logging \
            sdbusplus \
            valijson \
 "
-SRCREV = "fc2152a87fa35709bec4f82f1af21e7bc5f758fe"
+SRCREV = "2ec1f15f33d83e9bddb5e3318a6d94d4a92ddc90"
 PACKAGECONFIG ??= "ipmi-fru"
 PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
 PACKAGECONFIG[validate-json] = "-Dvalidate-json=true, \
