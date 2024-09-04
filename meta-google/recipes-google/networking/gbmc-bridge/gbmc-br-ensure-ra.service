@@ -1,5 +1,0 @@
-[Service]
-ExecStart=/usr/libexec/gbmc-br-ensure-ra.sh
-
-[Install]
-WantedBy=multi-user.target

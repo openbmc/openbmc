@@ -15,8 +15,6 @@ SRC_URI += " \
   file://50-gbmc-br.rules \
   file://gbmc-br-ula.sh \
   file://gbmc-br-from-ra.sh \
-  file://gbmc-br-ensure-ra.sh \
-  file://gbmc-br-ensure-ra.service \
   file://gbmc-br-hostname.sh \
   file://gbmc-br-hostname.service \
   file://gbmc-br-ra.sh.in \
@@ -54,7 +52,6 @@ RDEPENDS:${PN}:append = " \
   "
 
 SYSTEMD_SERVICE:${PN} += " \
-  gbmc-br-ensure-ra.service \
   gbmc-br-hostname.service \
   gbmc-br-dhcp.service \
   gbmc-br-dhcp-term.service \
@@ -141,12 +138,10 @@ do_install() {
   install -m0644 ${WORKDIR}/gbmc-br-nft.sh "$mondir"/
 
   install -d -m0755 ${D}${libexecdir}
-  install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.sh ${D}${libexecdir}/
   install -m0755 ${WORKDIR}/gbmc-br-hostname.sh ${D}${libexecdir}/
   install -m0755 ${WORKDIR}/gbmc-br-dhcp.sh ${D}${libexecdir}/
   install -m0755 ${WORKDIR}/gbmc-br-dhcp-term.sh ${D}${libexecdir}/
   install -d -m0755 ${D}${systemd_system_unitdir}
-  install -m0644 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
   install -m0644 ${WORKDIR}/gbmc-br-hostname.service ${D}${systemd_system_unitdir}/
   install -m0644 ${WORKDIR}/gbmc-br-dhcp.service ${D}${systemd_system_unitdir}/
   install -m0644 ${WORKDIR}/gbmc-br-dhcp-term.service ${D}${systemd_system_unitdir}/
