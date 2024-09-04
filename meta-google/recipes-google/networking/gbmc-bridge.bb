@@ -26,6 +26,7 @@ SRC_URI += " \
   file://gbmc-br-nft.sh \
   file://gbmc-br-dhcp.sh \
   file://50-gbmc-psu-hardreset.sh.in \
+  file://51-gbmc-reboot.sh \
   file://gbmc-br-dhcp.service \
   file://gbmc-br-dhcp-term.sh \
   file://gbmc-br-dhcp-term.service \
@@ -154,6 +155,7 @@ do_install() {
 
   sed 's,@COORDINATED_POWERCYCLE@,${GBMC_COORDINATED_POWERCYCLE},' ${WORKDIR}/50-gbmc-psu-hardreset.sh.in >${WORKDIR}/50-gbmc-psu-hardreset.sh
   install -m0644 ${WORKDIR}/50-gbmc-psu-hardreset.sh ${D}${datadir}/gbmc-br-dhcp/
+  install -m0644 ${WORKDIR}/51-gbmc-reboot.sh ${D}${datadir}/gbmc-br-dhcp/
 
   install -m0644 ${WORKDIR}/gbmc-br-lib.sh ${D}${datadir}/
   install -m0644 ${WORKDIR}/gbmc-ip-from-ra.sh ${D}${datadir}/
