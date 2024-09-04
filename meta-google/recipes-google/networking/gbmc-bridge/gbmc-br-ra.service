@@ -7,7 +7,7 @@ StartLimitBurst=3
 [Service]
 Restart=always
 RestartSec=5
-ExecStart=/usr/libexec/gbmc-br-ip-from-ra.sh
+ExecStart=/usr/libexec/gbmc-br-ra.sh
 
 [Install]
 WantedBy=multi-user.target

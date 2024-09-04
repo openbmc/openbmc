@@ -16,17 +16,27 @@
 # shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
 source /usr/share/gbmc-br-lib.sh || exit
 
+update_rtr() {
+  true
+}
+
 update_fqdn() {
-  hostnamectl set-hostname "$1" || true
+  (( IP_OFFSET == 0 )) && return
+  default_update_fqdn "$@"
 }
 
 update_pfx() {
-  # Save the IP address for the interface
-  gbmc_br_set_ip "$1" || true
+  local pfx="$1"
+  (( IP_OFFSET == 0 )) && return
+  gbmc_br_set_ip "$pfx" || true
+  echo "IP $pfx set on $RA_IF" >&2
 }
 
 RA_IF=gbmcbr
 IP_OFFSET=@IP_OFFSET@
+# Use the lowest priority, except for kernel RA discovered routes.
+# We want closer NICs to provide a default route if existing.
+ROUTE_METRIC=1000
 
-# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-ip-from-ra.sh
-source /usr/share/gbmc-ip-from-ra.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-ra.sh
+source /usr/share/gbmc-ra.sh || exit
