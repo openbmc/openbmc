@@ -52,6 +52,9 @@ machine() {
         name=${cfg##*/}
         name=${name%.conf}
         tmpl=${cfg%/machine/*.conf}
+        vendor=${cfg%%/*}
+        vendor=${vendor##meta-}
+        vendor=${vendor%%-openbmc}
 
         if [ "$tmpl" = "poky/meta/conf" ]; then
             # This is a QEMU machine, use phosphor defaults.
@@ -82,7 +85,7 @@ machine() {
                 return
             fi
         else
-            echo "${name}"
+            echo "${vendor}/${name}"
         fi
     done
 
@@ -92,7 +95,22 @@ machine() {
 if [ -z "$1" ]; then
     echo Target machine must be specified. Use one of:
     echo
-    machine | sort | sed "s/qemu[^[:space:]]*//" | "${COLUMN[@]}"
+    machine | sed "/qemu[^[:space:]]*/d" | sed "s#.*/##" | sort -h | "${COLUMN[@]}"
+    exit
+fi
+
+if [ "$1" == "machines" ]; then
+    vendors=""
+    for m in $(machine | sort -h | sed "/qemu[^[:space:]]*/d"); do
+        vendor=${m%%/*}
+        machine=${m##*/}
+
+        if [[ ! "$vendors" =~ -$vendor- ]]; then
+            vendors="$vendors -$vendor-"
+            echo "* $vendor"
+        fi
+        echo "  * $machine"
+    done
     exit
 fi
 
