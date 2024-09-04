@@ -17,8 +17,8 @@ SRC_URI += " \
   ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.network'} \
   file://50-gbmc-ncsi.rules.in \
   ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.service.in'} \
-  file://gbmc-ncsi-ip-from-ra.service.in \
-  file://gbmc-ncsi-ip-from-ra.sh.in \
+  file://gbmc-ncsi-ra.service.in \
+  file://gbmc-ncsi-ra.sh \
   file://gbmc-ncsi-smartnic-wa.sh.in \
   file://gbmc-ncsi-sslh.socket.in \
   file://gbmc-ncsi-sslh.service \
@@ -38,11 +38,11 @@ RDEPENDS:${PN} += " \
   bash \
   ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'dhcp-relay'} \
   gbmc-ip-monitor \
+  gbmc-net-common \
   ncsid \
   network-sh \
   nftables-systemd \
   sslh \
-  ndisc6-rdisc6 \
   "
 
 FILES:${PN} += " \
@@ -56,7 +56,7 @@ SYSTEMD_SERVICE:${PN} += " \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
   gbmc-ncsi-set-nicenabled.service \
-  gbmc-ncsi-ip-from-ra.service \
+  gbmc-ncsi-ra.service \
   ${@'' if d.getVar('GBMC_NCSI_IF_OLD') == '' else 'gbmc-ncsi-old.service'} \
   ${@'' if d.getVar('GBMC_NCSI_PURGE_ETC') == '' else 'gbmc-ncsi-purge.service'} \
   "
@@ -151,13 +151,11 @@ do_install:append() {
       >${D}${systemd_system_unitdir}/gbmc-ncsi-purge.service
   fi
 
-  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-ip-from-ra.service.in \
-    >${WORKDIR}/gbmc-ncsi-ip-from-ra.service
-  install -m0644 ${WORKDIR}/gbmc-ncsi-ip-from-ra.service ${D}${systemd_system_unitdir}
-  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-ip-from-ra.sh.in \
-    >${WORKDIR}/gbmc-ncsi-ip-from-ra.sh
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-ra.service.in \
+    >${WORKDIR}/gbmc-ncsi-ra.service
+  install -m0644 ${WORKDIR}/gbmc-ncsi-ra.service ${D}${systemd_system_unitdir}
   install -d -m0755 ${D}${libexecdir}
-  install -m0755 ${WORKDIR}/gbmc-ncsi-ip-from-ra.sh ${D}${libexecdir}/
+  install -m0755 ${WORKDIR}/gbmc-ncsi-ra.sh ${D}${libexecdir}/
 
   sed -e "s,@NCSI_IF@,$if_name,g" -e "s,@GBMC_NCSI_DHCP_RELAY@,${GBMC_NCSI_DHCP_RELAY},g" \
     ${WORKDIR}/gbmc-ncsi-smartnic-wa.sh.in >${WORKDIR}/gbmc-ncsi-smartnic-wa.sh

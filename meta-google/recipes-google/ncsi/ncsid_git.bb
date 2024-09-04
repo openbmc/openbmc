@@ -14,7 +14,6 @@ SYSTEMD_SERVICE:${PN} += " \
   ncsid@.service \
   nic-hostful@.target \
   nic-hostless@.target \
-  update-ra-gw@.service \
   "
 
 DEPENDS += " \
@@ -31,3 +30,9 @@ RDEPENDS:${PN} += " \
   ndisc6-rdisc6 \
   systemd \
   "
+
+# TODO: Remove when package is bumped to formally delete this service
+do_install:append() {
+  rm ${D}${systemd_system_unitdir}/update-ra-gw@.service
+  rm ${D}${libexecdir}/update_ra_gw.sh
+}

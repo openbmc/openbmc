@@ -1,0 +1,15 @@
+[Unit]
+Description=RA Gateway Updater
+Wants=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
+After=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
+After=ncsid@NCSI_IF@.service
+StartLimitIntervalSec=1min
+StartLimitBurst=5
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/usr/libexec/gbmc-ncsi-ra.sh @NCSI_IF@
+
+[Install]
+WantedBy=multi-user.target
