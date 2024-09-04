@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+obmc_dir=${script_dir}/../../
+
+cd "$obmc_dir"
+
+cat > meta-phosphor/docs/supported-machines.md << EOF
+# Supported machines
+
+The following machine product or codenames have some code which has been
+contributed to the project for support.  The specific level of functionality
+supported is unknown and has no level of warranty, promise of future
+development, or bug-fix guarantee.
+
+Systems which are actively developed and maintained by vendors are often
+covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
+
+## List
+
+EOF
+
+./setup machines >> meta-phosphor/docs/supported-machines.md
