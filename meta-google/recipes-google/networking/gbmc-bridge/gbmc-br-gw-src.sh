@@ -31,6 +31,11 @@ gbmc_br_set_router() {
       break
     fi
   done
+  # Make becoming a router sticky, if we ever have a default route we are
+  # always treated as a router. Otherwise, we end up reloading unnecessarily
+  # a number of times. The reload causes the network configuration to be
+  # reappplied with packet drops for a short amount of time.
+  [[ -z $defgw ]] && return
   [[ $defgw == "$gbmc_br_gw_defgw" ]] && return
   gbmc_br_gw_defgw="$defgw"
 
