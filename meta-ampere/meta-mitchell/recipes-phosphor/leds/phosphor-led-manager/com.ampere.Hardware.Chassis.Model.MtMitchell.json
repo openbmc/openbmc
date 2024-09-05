@@ -15,7 +15,7 @@
 					"Action": "Blink",
 					"DutyOn": 50,
 					"Period": 2000,
-					"Priority": "On"
+					"Priority": "Blink"
 				}
 			]
 		},
@@ -25,25 +25,14 @@
 			]
 		},
 		{
-			"group": "systemFault",
-			"members": [
-				{
-					"Name": "led_fault",
-					"Action": "On",
-					"DutyOn": 50,
-					"Period": 0,
-					"Priority": "Blink"
-				}
-			]
-		},
-		{
 			"group": "enclosure_identify",
 			"members": [
 				{
 					"Name": "led_identify",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -54,7 +43,8 @@
 					"Name": "led_identify",
 					"Action": "Blink",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -65,13 +55,15 @@
 					"Name": "led_fan_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				},
 				{
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -82,13 +74,15 @@
 					"Name": "led_fan_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				},
 				{
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -99,13 +93,15 @@
 					"Name": "led_fan_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				},
 				{
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -116,13 +112,15 @@
 					"Name": "led_fan_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				},
 				{
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -133,13 +131,15 @@
 					"Name": "led_fan_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				},
 				{
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -150,13 +150,15 @@
 					"Name": "led_fan_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				},
 				{
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -167,13 +169,15 @@
 					"Name": "led_psu_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				},
 				{
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -184,7 +188,8 @@
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -195,7 +200,8 @@
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		},
@@ -206,7 +212,8 @@
 					"Name": "led_fault",
 					"Action": "On",
 					"DutyOn": 50,
-					"Period": 1000
+					"Period": 1000,
+					"Priority": "On"
 				}
 			]
 		}
