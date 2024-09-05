@@ -86,11 +86,27 @@ EOF
     fi
   done
 
-  # Ensure that systemd-networkd performs a reconfiguration as it doesn't
-  # currently check the mtime of drop-in files.
-  touch -c /etc/systemd/network/*-bmc-@NCSI_IF@.network
+  # Remove all old ncsi neighbor proxied entries, since we solely
+  # manage all of these entries and we don't want any that are stale
+  local entry
+  while read -r entry; do
+    ip -6 neigh del proxy ${entry%% *} dev @NCSI_IF@ || true
+  done < <(ip -6 neigh show proxy dev @NCSI_IF@)
 
-  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+  local st=0
+  if [ -n "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
+    sysctl net.ipv6.conf.@NCSI_IF@.proxy_ndp=1 >/dev/null || st=$?
+    ip -6 neigh add proxy $pfx dev @NCSI_IF@ || st=$?
+    ip -6 neigh add proxy $stateless_pfx dev @NCSI_IF@ || st=$?
+    if [ -n "$host_pfx" ]; then
+      ip -6 neigh add proxy $host_pfx dev @NCSI_IF@ || st=$?
+    fi
+    if [ -n "$stateless_ip" ]; then
+      ip -6 neigh add proxy $stateless_ip dev @NCSI_IF@ || st=$?
+    fi
+  fi
+
+  if (( st != 0 )); then
     networkctl reload && networkctl reconfigure @NCSI_IF@
   fi
 
