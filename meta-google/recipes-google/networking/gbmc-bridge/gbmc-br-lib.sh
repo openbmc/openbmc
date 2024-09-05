@@ -91,11 +91,11 @@ gbmc_br_reload_ip() {
 Address=$pfx/128
 [IPv6Prefix]
 Prefix=$stateless_pfx/80
-PreferredLifetimeSec=60
-ValidLifetimeSec=60
+PreferredLifetimeSec=120
+ValidLifetimeSec=120
 [IPv6RoutePrefix]
 Route=$pfx/80
-LifetimeSec=60
+LifetimeSec=120
 [Route]
 Destination=$stateless_pfx/76
 Type=unreachable

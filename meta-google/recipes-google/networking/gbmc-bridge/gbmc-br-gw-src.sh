@@ -40,7 +40,7 @@ gbmc_br_set_router() {
     local file
     for file in "${files[@]}"; do
       mkdir -p "$(dirname "$file")"
-      printf '[IPv6SendRA]\nRouterLifetimeSec=30\n' >"$file"
+      printf '[IPv6SendRA]\nRouterLifetimeSec=120\n' >"$file"
     done
   else
     rm -f "${files[@]}"
