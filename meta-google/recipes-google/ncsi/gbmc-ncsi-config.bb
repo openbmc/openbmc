@@ -5,18 +5,18 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit systemd
 
-GBMC_NCSI_DHCP_RELAY ??= "${@'' if int(d.getVar('FLASH_SIZE')) < 65536 else '1'}"
+GBMC_DHCP_RELAY ??= "${@'' if int(d.getVar('FLASH_SIZE')) < 65536 else '1'}"
 GBMC_NCSI_IF_OLD ??= ""
 GBMC_NCSI_PURGE_ETC ??= ""
 GBMC_NCSI_DHCP_IMPERSONATE_HOST ??= "1"
 
 SRC_URI += " \
-  ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrncsidhcp.netdev'} \
-  ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrncsidhcp.network'} \
-  ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.netdev'} \
-  ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.network'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrncsidhcp.netdev'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrncsidhcp.network'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.netdev'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.network'} \
   file://50-gbmc-ncsi.rules.in \
-  ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.service.in'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.service.in'} \
   file://gbmc-ncsi-ra.service.in \
   file://gbmc-ncsi-ra.sh \
   file://gbmc-ncsi-smartnic-wa.sh.in \
@@ -36,7 +36,7 @@ S = "${WORKDIR}"
 
 RDEPENDS:${PN} += " \
   bash \
-  ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'dhcp-relay'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'dhcp-relay'} \
   gbmc-ip-monitor \
   gbmc-net-common \
   ncsid \
@@ -52,7 +52,7 @@ FILES:${PN} += " \
   "
 
 SYSTEMD_SERVICE:${PN} += " \
-  ${@'' if d.getVar('GBMC_NCSI_DHCP_RELAY') != '1' else 'gbmc-ncsi-dhcrelay.service'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'gbmc-ncsi-dhcrelay.service'} \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
   gbmc-ncsi-set-nicenabled.service \
@@ -74,7 +74,7 @@ do_install:append() {
   echo "net.ipv6.conf.$if_name.dad_transmits=0" \
     >>${D}${sysconfdir}/sysctl.d/25-gbmc-ncsi.conf
 
-  if [ "${GBMC_NCSI_DHCP_RELAY}" = 1 ]; then
+  if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
     install -d -m0755 ${D}${systemd_unitdir}/network
     install -m0644 ${WORKDIR}/-bmc-gbmcbrncsidhcp.netdev \
       ${D}${systemd_unitdir}/network/
@@ -136,7 +136,7 @@ do_install:append() {
   sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-set-nicenabled.service.in \
     >${D}${systemd_system_unitdir}/gbmc-ncsi-set-nicenabled.service
 
-  if [ "${GBMC_NCSI_DHCP_RELAY}" = "1" ]; then
+  if [ "${GBMC_DHCP_RELAY}" = "1" ]; then
     sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-dhcrelay.service.in \
       >${D}${systemd_system_unitdir}/gbmc-ncsi-dhcrelay.service
   fi
@@ -157,7 +157,7 @@ do_install:append() {
   install -d -m0755 ${D}${libexecdir}
   install -m0755 ${WORKDIR}/gbmc-ncsi-ra.sh ${D}${libexecdir}/
 
-  sed -e "s,@NCSI_IF@,$if_name,g" -e "s,@GBMC_NCSI_DHCP_RELAY@,${GBMC_NCSI_DHCP_RELAY},g" \
+  sed -e "s,@NCSI_IF@,$if_name,g" -e "s,@GBMC_DHCP_RELAY@,${GBMC_DHCP_RELAY},g" \
     ${WORKDIR}/gbmc-ncsi-smartnic-wa.sh.in >${WORKDIR}/gbmc-ncsi-smartnic-wa.sh
   install -d -m0755 ${D}${bindir}
   install -m0755 ${WORKDIR}/gbmc-ncsi-smartnic-wa.sh ${D}${bindir}/

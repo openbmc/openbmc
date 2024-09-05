@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HAS_DHCRELAY='@GBMC_NCSI_DHCP_RELAY@'
+HAS_DHCRELAY='@GBMC_DHCP_RELAY@'
 
 if [ "$HAS_DHCRELAY" = 1 ]; then
   override=/run/systemd/system/gbmc-ncsi-dhcrelay.service.d/10-nosp.conf
