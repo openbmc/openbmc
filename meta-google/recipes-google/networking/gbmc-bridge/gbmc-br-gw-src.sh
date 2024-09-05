@@ -18,8 +18,7 @@
 # shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
 
-gbmc_br_gw_src_ip_stateful=
-gbmc_br_gw_src_ip_stateless=
+declare -A gbmc_br_gw_src_ips=()
 declare -A gbmc_br_gw_src_routes=()
 gbmc_br_gw_defgw=
 
@@ -52,15 +51,33 @@ gbmc_br_set_router() {
 }
 
 gbmc_br_gw_src_update() {
-  local gbmc_br_gw_src_ip="${gbmc_br_gw_src_ip_stateful:-$gbmc_br_gw_src_ip_stateless}"
-  [[ -n $gbmc_br_gw_src_ip ]] || return
+  # Pick the shortest address, we always want to use the most root level
+  # The order of preference looks roughly like
+  #   1. Root /64 address (2620:15c:2c3:aaae::/64)
+  #      This is generally used by the OOB RJ45 port and is our primary preference
+  #   2. BMC subordonate root (2620:15c:2c3:aaae:fd01::/80)
+  #      From the NIC over NCSI with the /64 shared with the CN
+  #   3. BMC stateless (2620:15c:2c3:aaae:fd00:3c8d:20dc:263e/80)
+  #      From the NIC, but derived from the MAC and typically never used
+  #
+  local new_src=
+  local new_len=16
+  local ip
+  for ip in "${!gbmc_br_gw_src_ips[@]}"; do
+    local ip_len="${gbmc_br_gw_src_ips["$ip"]}"
+    if (( ip_len < new_len )); then
+      new_src="$ip"
+      new_len="$ip_len"
+    fi
+  done
+  (( new_len >= 16 )) && return
 
   local route
   for route in "${!gbmc_br_gw_src_routes[@]}"; do
-    [[ $route != *" src $gbmc_br_gw_src_ip "* ]] || continue
-    echo "gBMC Bridge Updating GW source [$gbmc_br_gw_src_ip]: $route" >&2
+    [[ $route != *" src $new_src "* ]] || continue
+    echo "gBMC Bridge Updating GW source [$new_src]: $route" >&2
     # shellcheck disable=SC2086
-    ip route change $route src "$gbmc_br_gw_src_ip" && \
+    ip route change $route src "$new_src" && \
       unset 'gbmc_br_gw_src_routes[$route]'
   done
 }
@@ -83,8 +100,8 @@ gbmc_br_gw_src_hook() {
       gbmc_br_gw_src_update
       gbmc_br_set_router
     fi
-  # Match only global IP addresses on the bridge that match the BMC stateless
-  # prefix (<mpfx>:fd00:). So 2002:af4:3480:2248:fd00:6345:3069:9186 would be
+  # Match only global IP addresses on the bridge that are non-ULA addresses.
+  # So 2002:af4:3480:2248:fd00:6345:3069:9186 would be
   # matched as the preferred source IP for outoging traffic.
   elif [[ $change == addr && $intf == gbmcbr && $scope == global ]] &&
        [[ $fam == inet6 && $flags != *tentative* ]]; then
@@ -93,22 +110,23 @@ gbmc_br_gw_src_hook() {
       echo "gBMC Bridge Ensure RA Invalid IP: $ip" >&2
       return 1
     fi
-    # Ignore ULAs and non-gBMC addresses
-    if (( (ip_bytes[0] & 0xfe) == 0xfc || ip_bytes[8] != 0xfd )); then
+    # Ignore ULAs
+    if (( (ip_bytes[0] & 0xfe) == 0xfc )); then
       return 0
     fi
-    if (( (ip_bytes[9] & 0xf) != 0 )); then
-      local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateful
-    else
-      local -n gbmc_br_gw_src_ip=gbmc_br_gw_src_ip_stateless
+    if [[ $action == add ]]; then
+      local i=0
+      local non_zero=0
+      for (( i=0; i<16; ++i )); do
+        if (( ip_bytes[i] != 0 )); then
+          non_zero="$i"
+        fi
+      done
+      gbmc_br_gw_src_ips["$ip"]="$non_zero"
+    elif [[ $action == del ]]; then
+      unset 'gbmc_br_gw_src_ips[$ip]'
     fi
-    if [[ $action == add && $ip != "$gbmc_br_gw_src_ip" ]]; then
-      gbmc_br_gw_src_ip="$ip"
-      gbmc_br_gw_src_update
-    fi
-    if [[ $action == del && $ip == "$gbmc_br_gw_src_ip" ]]; then
-      gbmc_br_gw_src_ip=
-    fi
+    gbmc_br_gw_src_update
   fi
 }
 
