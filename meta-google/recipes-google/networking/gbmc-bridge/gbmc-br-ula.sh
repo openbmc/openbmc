@@ -18,53 +18,81 @@
 # shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
 
-gbmc_br_ula_init=
-gbmc_br_ula_mac=
+declare -A gbmc_br_ulas=()
 
-gbmc_br_ula_update() {
-  [[ -n $gbmc_br_ula_init ]] || return
+# BITs set for address suffixes
+GBMC_BR_ULA_SFX_HAS_LL=1
+GBMC_BR_ULA_SFX_HAS_ULA=2
 
-  echo "gBMC Bridge ULA MAC: ${gbmc_br_ula_mac:-(deleted)}" >&2
-
-  local addr=
-  contents='[Network]'$'\n'
-  if [[ -n $gbmc_br_ula_mac ]]; then
-    local sfx
-    if sfx="$(mac_to_eui64 "$gbmc_br_ula_mac")" &&
-       addr="$(ip_pfx_concat "fdb5:0481:10ce::/64" "$sfx")"; then
-      contents+="Address=$addr"$'\n'
+gbmc_br_ula_cleanup() {
+  local addr
+  for addr in "${!gbmc_br_ulas[@]}"; do
+    local val="${gbmc_br_ulas["$addr"]}"
+    if (( val & GBMC_BR_ULA_SFX_HAS_LL == 0 )); then
+      echo "Removing Stale ULA: $addr" >&2
+      ip addr del "$addr"/64 dev gbmcbr || true
     fi
-  fi
-
-  local netfile
-  for netfile in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/60-ula.conf; do
-    mkdir -p "$(dirname "$netfile")"
-    printf '%s' "$contents" >"$netfile"
   done
+}
 
-  # Ensure that systemd-networkd performs a reconfiguration as it doesn't
-  # currently check the mtime of drop-in files.
-  touch -c /lib/systemd/network/*-bmc-gbmcbr.network
+gbmc_br_ula_is_ll() {
+  # shellcheck disable=SC2178
+  local -n bytes="$1"
+  (( bytes[0] == 0xfe && bytes[1] == 0x80 && bytes[2] == 0x00 &&
+     bytes[3] == 0x00 && bytes[4] == 0x00 && bytes[5] == 0x00 &&
+     bytes[6] == 0x00 && bytes[7] == 0x00 ))
+}
 
-  if [[ $(systemctl is-active systemd-networkd) != inactive ]]; then
-    networkctl reload
-    networkctl reconfigure gbmcbr
-  fi
+gbmc_br_ula_is_ula() {
+  # shellcheck disable=SC2178
+  local -n bytes="$1"
+  (( bytes[0] == 0xfd && bytes[1] == 0xb5 && bytes[2] == 0x04 &&
+     bytes[3] == 0x81 && bytes[4] == 0x10 && bytes[5] == 0xce &&
+     bytes[6] == 0x00 && bytes[7] == 0x00 ))
 }
 
 gbmc_br_ula_hook() {
   # shellcheck disable=SC2154
   if [[ $change == init ]]; then
-    gbmc_br_ula_init=1
-    gbmc_br_ula_update
-  elif [[ $change == link && $intf == gbmcbr ]]; then
-    if [[ $action == add && $mac != "$gbmc_br_ula_mac" ]]; then
-      gbmc_br_ula_mac="$mac"
-      gbmc_br_ula_update
+    gbmc_br_ula_cleanup
+  elif [[ $change == addr && $intf == gbmcbr && $fam == inet6 ]]; then
+    local pfx_bytes=()
+    ip_to_bytes pfx_bytes "$ip" || return
+    local val=0
+    if gbmc_br_ula_is_ll pfx_bytes; then
+      val="$GBMC_BR_ULA_SFX_HAS_LL"
+    elif gbmc_br_ula_is_ula pfx_bytes; then
+      val="$GBMC_BR_ULA_SFX_HAS_ULA"
+    else
+      return 0
     fi
-    if [[ $action == del && $mac == "$gbmc_br_ula_mac" ]]; then
-      gbmc_br_ula_mac=
-      gbmc_br_ula_update
+    # Force all addresses into what they would be as a ULA so that we can
+    # store bits about the assigned addresses on the interface
+    pfx_bytes[0]=0xfd
+    pfx_bytes[1]=0xb5
+    pfx_bytes[2]=0x04
+    pfx_bytes[3]=0x81
+    pfx_bytes[4]=0x10
+    pfx_bytes[5]=0xce
+    addr="$(ip_bytes_to_str pfx_bytes)"
+    local old=${gbmc_br_ulas["$addr"]-0}
+    if [[ $action == add ]]; then
+      val=$((old | val))
+    elif [[ $action == del ]]; then
+      val=$((old & ~val))
+    fi
+    gbmc_br_ulas["$addr"]=$val
+    if (( val == GBMC_BR_ULA_SFX_HAS_LL )); then
+      # We have a link local address but no ULA, so we need to add the ULA
+      echo "Adding ULA: $addr" >&2
+      ip addr replace "$addr"/64 dev gbmcbr
+    elif (( val == GBMC_BR_ULA_SFX_HAS_ULA )); then
+      # We have a ULA without a link local, so we should not longer have this ULA
+      echo "Removing ULA: $addr" >&2
+      ip addr del "$addr"/64 dev gbmcbr || true
+    elif (( val == 0 )); then
+      # Cleanup the map if we no longer have any addresses for the suffix
+      unset 'gbmc_br_ulas[$addr]'
     fi
   fi
 }
