@@ -1,0 +1,22 @@
+#
+# /etc/pam.d/common-auth - authentication settings common to all services
+#
+# This file is included from other service-specific PAM config files,
+# and should contain a list of the authentication modules that define
+# the central authentication scheme for use on the system
+# (e.g., /etc/shadow, LDAP, Kerberos, etc.).  The default is to use the
+# traditional Unix authentication mechanisms.
+
+# here are the per-package modules (the "Primary" block)
+# Try for local user first, and then try for ldap
+auth required pam_google_authenticator.so forward_pass nullok
+auth    [success=3 default=ignore]          pam_unix.so quiet
+-auth   [success=2 default=ignore]          pam_ldap.so ignore_unknown_user ignore_authinfo_unavail
+# Control gets here when no authentication module succeeds.  Increment the
+# failure tally and return failure status to PAM.
+auth    [default=die]                   pam_faillock.so authfail
+auth    requisite                       pam_deny.so
+# Control gets here when authentication succeeds.  Check if the user is locked
+# out due to consecutive authentication failures and return status accordingly.
+auth    required                        pam_faillock.so authsucc
+# and here are more per-package modules (the "Additional" block)
