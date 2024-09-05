@@ -1,0 +1,99 @@
+#!/bin/bash
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[[ -n ${gbmc_nic_neigh_lib-} ]] && return
+
+# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
+source /usr/share/network/lib.sh || exit
+
+gbmc_nic_neigh_intfs=(@IFS@)
+gbmc_nic_neigh_addr=
+
+gbmc_nic_neigh_set() {
+  local act="$1"
+  local ip="$2"
+
+  echo "gBMC NIC Neigh $act $ip: ${gbmc_nic_neigh_intfs[*]}" >&2
+
+  local intf
+  local failed_intfs=()
+  for intf in "${gbmc_nic_neigh_intfs[@]}"; do
+    # In case we don't have a base network file, make one
+    # this is intentionally 00- as it will not preceed /etc/systemd/network/00-*
+    # or /lib/systemd/network/-* files.
+    local file=/run/systemd/network/00-bmc-$intf.network
+    printf '[Match]\nName=%s\n[Network]\nDHCP=false\nIPv6AcceptRA=false\nLinkLocalAddressing=yes' \
+      "$intf" >"$file"
+
+    # Override any existing gateway information within files
+    # Make sure we cover `00-*` and `-*` files
+    for file in /run/systemd/network/{00,}-bmc-"$intf".network; do
+      mkdir -p "$file.d"
+      if [[ "$act" == add ]]; then
+        printf '[Network]\nIPv6ProxyNDP=yes\nIPv6ProxyNDPAddress=%s\n' \
+          "$ip" >"$file.d"/10-nic-neigh.conf
+      else
+        rm -f "$file.d"/10-nic-neigh.conf
+      fi
+    done
+
+    sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null && \
+      ip -6 neigh "$act" proxy "$ip" dev "$intf" || \
+      failed_intfs+=("$intf")
+  done
+  [[ "$act" == del ]] && return
+  if (( "${#failed_intfs[@]}" > 0 )); then
+    networkctl reload || true
+  fi
+  for intf in "${failed_intfs[@]}"; do
+    networkctl reconfigure "$intf" || true
+  done
+}
+
+gbmc_nic_neigh_hook() {
+  # shellcheck disable=SC2154
+  if [[ $change == addr && $intf == gbmcbr && $scope == global ]] &&
+       [[ $fam == inet6 && $flags != *tentative* ]]; then
+    local ip_bytes=()
+    if ! ip_to_bytes ip_bytes "$ip"; then
+      echo "gBMC Bridge Ensure RA Invalid IP: $ip" >&2
+      return 1
+    fi
+    # Ignore ULAs
+    if (( (ip_bytes[0] & 0xfe) == 0xfc )); then
+      return 0
+    fi
+    # Addresses must be /64 to the upstack switch
+    for (( i = 8; i < 16; ++i )); do
+      if (( ip_bytes[i] != 0 )); then
+        return 0
+      fi
+    done
+    if [[ $action == add && "$gbmc_nic_neigh_addr" != "$ip" ]]; then
+      if [ -n "$gbmc_nic_neigh_addr" ]; then
+        gbmc_nic_neigh_set del "$gbmc_nic_neigh_addr"
+      fi
+      gbmc_nic_neigh_addr="$ip"
+      gbmc_nic_neigh_set add "$ip"
+    elif [[ $action == del && "$gbmc_nic_neigh_addr" == "$ip"  ]]; then
+      gbmc_nic_neigh_addr=
+      gbmc_nic_neigh_set del "$ip"
+    fi
+  fi
+}
+
+GBMC_IP_MONITOR_HOOKS+=(gbmc_nic_neigh_hook)
+
+gbmc_nic_neigh_lib=1

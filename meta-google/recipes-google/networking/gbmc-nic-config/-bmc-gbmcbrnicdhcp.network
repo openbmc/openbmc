@@ -1,0 +1,4 @@
+[Match]
+Name=gbmcbrnicdhcp
+[Network]
+Bridge=gbmcbr

@@ -1,0 +1,8 @@
+[Match]
+Name=@IF@
+[Network]
+DHCP=false
+IPv6AcceptRA=false
+LLMNR=false
+MulticastDNS=false
+LinkLocalAddressing=ipv6

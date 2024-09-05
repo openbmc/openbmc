@@ -1,0 +1,13 @@
+[Unit]
+Description=gBMC DHCP Relay Agent Daemon
+After=network.target
+StartLimitIntervalSec=10
+StartLimitBurst=3
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/usr/sbin/dhcrelay -d --no-pid -l gbmcnicdhcp @UPPERS@
+
+[Install]
+WantedBy=multi-user.target

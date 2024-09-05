@@ -1,0 +1,8 @@
+table inet filter {
+    chain nic_dhcp_input {
+        type filter hook input priority 0; policy drop;
+        iifname != gbmcnicdhcp accept
+        ip6 nexthdr icmpv6 accept
+        udp dport 547 accept
+    }
+}

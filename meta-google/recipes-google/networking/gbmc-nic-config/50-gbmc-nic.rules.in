@@ -1,0 +1,19 @@
+table inet filter {
+    chain @IF@_input {
+        type filter hook input priority 0; policy drop;
+        iifname != @IF@ accept
+        ct state established accept
+        udp dport 547 accept
+        jump gbmc_br_pub_input
+    }
+    chain gbmc_br_pub_input {
+        ip6 nexthdr icmpv6 accept
+    }
+    chain @IF@_forward {
+        type filter hook forward priority 0; policy drop;
+        iifname != @IF@ accept
+        oifname != gbmcbr drop
+        ip6 daddr fdb5:0481:10ce::/64 drop
+        ip6 saddr fdb5:0481:10ce::/64 drop
+    }
+}

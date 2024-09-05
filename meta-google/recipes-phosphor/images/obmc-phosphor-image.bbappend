@@ -17,6 +17,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbmc:dev = " gbmc-dev-ssh-key"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
   '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else " gbmc-ncsi-config"}'
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
+  '${@"" if not d.getVar("GBMC_EXT_NICS") else " gbmc-nic-config"}'
+OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
   '${@"" if not d.getVar("GBMC_MAC_EEPROM_OF_NAME") else " gbmc-mac-config"}'
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
   '${@"" if not d.getVar("GBMC_ETHER_MAP") else " gbmc-nic-rename"}'
