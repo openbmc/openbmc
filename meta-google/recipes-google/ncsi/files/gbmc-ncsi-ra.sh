@@ -18,10 +18,6 @@ IP_OFFSET=1
 # NCSI is known to be closer to the ToR than bridge routes. Prefer over bridge routes.
 ROUTE_METRIC=900
 
-has_bridge=1
-# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
-source /usr/share/gbmc-br-lib.sh || has_bridge=
-
 update_rtr() {
   busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/"$RA_IF" \
     xyz.openbmc_project.Network.EthernetInterface DefaultGateway6 s "" || true
@@ -36,11 +32,10 @@ ncsi_is_active() {
 }
 
 update_fqdn() {
-  # We only do this for smartNICs (which don't use NCSI)
-  ncsi_is_active && return
-
-  default_update_fqdn "$@"
+  true
 }
+
+old_ncsi_pfx=
 
 update_pfx() {
   local pfx="$1"
@@ -54,15 +49,28 @@ update_pfx() {
   # We no longer need NCSId if we are in this configuration
   systemctl stop --no-block ncsid@"$RA_IF" || true
 
-  # Save the IP address for the interface
-  if [ -n "$has_bridge" ]; then
-    gbmc_br_set_ip "$1" || true
-    echo "IP $pfx set on $RA_IF" >&2
-  fi
-
   # DHCP Relay workaround until alternate source port is supported
   # TODO: Remove this once internal relaying cleanups land
   gbmc-ncsi-smartnic-wa.sh || true
+
+  # Override any existing address information within files
+  # Make sure we cover `00-*` and `-*` files
+  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network; do
+    mkdir -p "$file.d"
+    printf '[Network]\nAddress=%s/128' \
+      "$pfx" >"$file.d"/10-ncsi-addr.conf
+  done
+
+  # Don't force networkd to reload as this can break phosphor-networkd
+  # Fall back to reload only if ip link commands fail
+  if [ -n "$old_ncsi_pfx" ]; then
+    ip -6 addr del "$old_ncsi_pfx/128" dev gbmcbr || true
+  fi
+  ip -6 addr replace "$pfx/128" dev gbmcbr || \
+    (networkctl reload && networkctl reconfigure gbmcbr) || true
+  old_ncsi_pfx=$pfx
+
+  echo "Set NCSI addr $pfx on gbmcbr" >&2
 }
 
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-ra.sh
