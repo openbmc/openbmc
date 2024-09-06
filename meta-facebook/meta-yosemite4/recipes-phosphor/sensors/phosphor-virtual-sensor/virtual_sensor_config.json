@@ -480,7 +480,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_10",
+            "Name": "Calibrated_Sentinel_Dome_Slot_1_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -505,7 +505,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_10",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_10",
+                        "Name": "Sentinel_Dome_Slot_1_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -515,7 +515,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_20",
+            "Name": "Calibrated_Sentinel_Dome_Slot_2_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -540,7 +540,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_20",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_20",
+                        "Name": "Sentinel_Dome_Slot_2_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -550,7 +550,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_30",
+            "Name": "Calibrated_Sentinel_Dome_Slot_3_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -575,7 +575,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_30",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_30",
+                        "Name": "Sentinel_Dome_Slot_3_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -585,7 +585,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_40",
+            "Name": "Calibrated_Sentinel_Dome_Slot_4_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -610,7 +610,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_40",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_40",
+                        "Name": "Sentinel_Dome_Slot_4_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -620,7 +620,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_50",
+            "Name": "Calibrated_Sentinel_Dome_Slot_5_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -645,7 +645,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_50",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_50",
+                        "Name": "Sentinel_Dome_Slot_5_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -655,7 +655,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_60",
+            "Name": "Calibrated_Sentinel_Dome_Slot_6_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -680,7 +680,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_60",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_60",
+                        "Name": "Sentinel_Dome_Slot_6_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -690,7 +690,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_70",
+            "Name": "Calibrated_Sentinel_Dome_Slot_7_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -715,7 +715,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_70",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_70",
+                        "Name": "Sentinel_Dome_Slot_7_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -725,7 +725,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MB_FIO_TEMP_C_3_80",
+            "Name": "Calibrated_Sentinel_Dome_Slot_8_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -750,7 +750,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_80",
                     "Desc": {
-                        "Name": "MB_FIO_TEMP_C_3_80",
+                        "Name": "Sentinel_Dome_Slot_8_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
