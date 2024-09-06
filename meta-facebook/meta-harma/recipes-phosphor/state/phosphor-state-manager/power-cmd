@@ -5,7 +5,7 @@ source /usr/libexec/fb-common-functions
 
 # Power Good Status
 power_status() {
-    if [ "$(get_gpio "host0-ready")" -eq 1 ]; then
+    if [ "$(get_gpio "host0-ready")" -eq 1 ] && [ "$(get_gpio "power-card-enable")" -eq 0 ] ; then
         echo "on"
     else
         echo "off"

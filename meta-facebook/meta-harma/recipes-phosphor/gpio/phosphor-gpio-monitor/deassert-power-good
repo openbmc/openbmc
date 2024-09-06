@@ -1,9 +1,18 @@
 #!/bin/bash
 
-# Set Host Power Status Running
-busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Running
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
 
-systemctl start obmc-led-group-start@power_on.service
+# Set Host Power Status Running
+if [ "$(get_gpio "power-card-enable")" -eq 0 ]; then
+    busctl set-property xyz.openbmc_project.State.Host0 \
+    /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host \
+    CurrentHostState s \
+    xyz.openbmc_project.State.Host.HostState.Running
+
+    systemctl start obmc-led-group-start@power_on.service
+fi
 
 # The hardware disables the multiplexer in standby
 # to prevent sending a command by mistake to the retimer when it boots up.

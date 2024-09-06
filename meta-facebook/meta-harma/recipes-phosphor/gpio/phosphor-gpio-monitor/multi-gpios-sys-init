@@ -4,7 +4,7 @@
 source /usr/libexec/fb-common-functions
 
 host_led_init() {
-  if [ "$(get_gpio power-host-good)" -eq 1 ]; then
+  if [ "$(get_gpio "power-host-good")" -eq 1 ] && [ "$(get_gpio "power-card-enable")" -eq 0 ]; then
     systemctl start obmc-led-group-start@power_on.service
   else
     systemctl start obmc-led-group-stop@power_on.service

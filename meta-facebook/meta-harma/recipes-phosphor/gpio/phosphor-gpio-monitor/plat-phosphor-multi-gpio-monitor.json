@@ -5,8 +5,8 @@
         "GpioNum": 16,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@reset-cause-platrst.service"],
-            "FALLING": ["assert-gpio-log@reset-cause-platrst.service"]
+            "RISING": ["deassert-gpio-log@0_reset-cause-platrst.service"],
+            "FALLING": ["assert-gpio-log@0_reset-cause-platrst.service"]
         },
         "Continue": true
     },
@@ -27,8 +27,8 @@
         "GpioNum": 120,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@power-button.service"],
-            "FALLING": ["assert-gpio-log@power-button.service"]
+            "RISING": ["deassert-gpio-log@0_power-button.service"],
+            "FALLING": ["assert-gpio-log@0_power-button.service"]
         },
         "Continue": true
     },
@@ -38,9 +38,8 @@
         "GpioNum": 122,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@reset-button.service","deassert-reset-button.service"],
-            "FALLING": ["assert-gpio-log@reset-button.service","assert-reset-button.service"]
-
+            "RISING": ["deassert-gpio-log@0_reset-button.service","deassert-reset-button.service"],
+            "FALLING": ["assert-gpio-log@0_reset-button.service","assert-reset-button.service"]
         },
         "Continue": true
     },
@@ -60,7 +59,7 @@
         "GpioNum": 0,
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": ["assert-gpio-log@ac-power-button.service"]
+            "FALLING": ["assert-gpio-log@1_ac-power-button.service"]
         },
         "Continue": true
     },
@@ -70,8 +69,8 @@
         "GpioNum": 60,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-power-good.service", "deassert-gpio-log@power-host-good.service"],
-            "FALLING": ["assert-power-good.service", "assert-gpio-log@power-host-good.service"]
+            "RISING": ["deassert-power-good.service", "deassert-gpio-log@2_power-host-good.service"],
+            "FALLING": ["assert-power-good.service", "assert-gpio-log@2_power-host-good.service"]
 
         },
         "Continue": true
@@ -94,8 +93,8 @@
         "GpioNum": 92,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@leakage-detect-alert.service"],
-            "FALLING": ["assert-gpio-log@leakage-detect-alert.service"]
+            "RISING": ["deassert-gpio-log@0_leakage-detect-alert.service"],
+            "FALLING": ["assert-gpio-log@0_leakage-detect-alert.service"]
         },
         "Continue": true
     },
@@ -105,8 +104,8 @@
         "GpioNum": 174,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@irq-uv-detect-alert.service"],
-            "FALLING": ["assert-gpio-log@irq-uv-detect-alert.service"]
+            "RISING": ["deassert-gpio-log@2_irq-uv-detect-alert.service"],
+            "FALLING": ["assert-gpio-log@2_irq-uv-detect-alert.service"]
         },
         "Continue": true
     },
@@ -116,8 +115,8 @@
         "GpioNum": 176,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@irq-hsc-alert.service"],
-            "FALLING": ["assert-gpio-log@irq-hsc-alert.service"]
+            "RISING": ["deassert-gpio-log@2_irq-hsc-alert.service"],
+            "FALLING": ["assert-gpio-log@2_irq-hsc-alert.service"]
         },
         "Continue": true
     },
@@ -127,8 +126,8 @@
         "GpioNum": 178,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@cpu0-prochot-alert.service"],
-            "FALLING": ["assert-gpio-log@cpu0-prochot-alert.service"]
+            "RISING": ["deassert-gpio-log@2_cpu0-prochot-alert.service"],
+            "FALLING": ["assert-gpio-log@2_cpu0-prochot-alert.service"]
         },
         "Continue": true
     },
@@ -138,7 +137,7 @@
         "GpioNum": 180,
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": ["assert-gpio-log@cpu0-thermtrip-alert.service"]
+            "FALLING": ["assert-gpio-log@2_cpu0-thermtrip-alert.service"]
         },
         "Continue": true
     },
@@ -148,8 +147,8 @@
         "GpioNum": 182,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@reset-cause-pcie.service"],
-            "FALLING": ["assert-gpio-log@reset-cause-pcie.service"]
+            "RISING": ["deassert-gpio-log@2_reset-cause-pcie.service"],
+            "FALLING": ["assert-gpio-log@2_reset-cause-pcie.service"]
         },
         "Continue": true
     },
@@ -159,8 +158,8 @@
         "GpioNum": 184,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@pvdd11-ocp-alert.service"],
-            "FALLING": ["assert-gpio-log@pvdd11-ocp-alert.service"]
+            "RISING": ["deassert-gpio-log@2_pvdd11-ocp-alert.service"],
+            "FALLING": ["assert-gpio-log@2_pvdd11-ocp-alert.service"]
         },
         "Continue": true
     }

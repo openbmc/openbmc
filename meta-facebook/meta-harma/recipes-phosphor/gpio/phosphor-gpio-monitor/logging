@@ -1,10 +1,26 @@
 #!/bin/bash
 
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
 MESSAGE=$1
 ARG=$2
 VAL=$3
 
-busctl call \
+# remove prefix from 0_reset-cause-platrst to reset-cause-platrst
+loginfo="${MESSAGE#*_}"
+
+# get gpio chip id
+number="${MESSAGE%%_*}"
+
+# get assert or deassert message
+action=$(echo "$MESSAGE" | awk '{print $NF}')
+
+gpio_msg="${VAL#*_}"
+
+if [ "$(get_gpio "power-card-enable")" -eq 0 ] || [ "$number" -ne 2 ] || [ "$action" == "assert" ]; then
+    busctl call \
     xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
-    xyz.openbmc_project.Logging.Entry.Level.Error 1 "$ARG" "$VAL"
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$loginfo" \
+    xyz.openbmc_project.Logging.Entry.Level.Error 1 "$ARG" "$gpio_msg"
+fi
