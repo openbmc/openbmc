@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set_slot_not_present()
+{
+    # check if the file "/tmp/gpio/PRSNT_SB_SLOT"${index}"_N" is exist
+    local slot_presence_file="/tmp/gpio/PRSNT_SB_SLOT${1}_N"
+    if [ ! -f "$slot_presence_file" ]; then
+        mkdir -p /tmp/gpio
+    fi
+
+    # set slot presence to 1
+    echo 1 > "$slot_presence_file"
+}
+
+set_slot_power_off()
+{
+    CHASSIS_ID="$1"
+    # since the sled is removed, directly set the host and chassis power state to off
+    busctl set-property "xyz.openbmc_project.State.Host$CHASSIS_ID" \
+        "/xyz/openbmc_project/state/host$CHASSIS_ID" \
+        "xyz.openbmc_project.State.Host" "RequestedHostTransition" \
+        s "xyz.openbmc_project.State.Host.Transition.Off"
+    busctl set-property "xyz.openbmc_project.State.Chassis$CHASSIS_ID" \
+        "/xyz/openbmc_project/state/chassis$CHASSIS_ID" \
+        "xyz.openbmc_project.State.Chassis" "RequestedPowerTransition" \
+        s "xyz.openbmc_project.State.Chassis.Transition.Off"
+}
+
+slot_unplug()
+{
+    local unplugged_slot=$1
+
+    set_slot_not_present "$unplugged_slot"
+    set_slot_power_off "$unplugged_slot"
+
+    echo "Slot ${unplugged_slot} unplugged."
+
+    exit 0
+}
+
+slot_unplug "$1"

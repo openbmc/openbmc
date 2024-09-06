@@ -152,10 +152,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@1.service"
+                "disable-i3c-hub@1.service",
+                "slot-unplug@1.service"
             ],
             "FALLING": [
-                "slot-hot-plug@1.service"
+                "slot-hot-plug@1.service",
+                "slot-plug-in@1.service"
             ]
         },
         "Continue": true
@@ -166,10 +168,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@2.service"
+                "disable-i3c-hub@2.service",
+                "slot-unplug@2.service"
             ],
             "FALLING": [
-                "slot-hot-plug@2.service"
+                "slot-hot-plug@2.service",
+                "slot-plug-in@2.service"
             ]
         },
         "Continue": true
@@ -180,10 +184,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@3.service"
+                "disable-i3c-hub@3.service",
+                "slot-unplug@3.service"
             ],
             "FALLING": [
-                "slot-hot-plug@3.service"
+                "slot-hot-plug@3.service",
+                "slot-plug-in@3.service"
             ]
         },
         "Continue": true
@@ -194,10 +200,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@4.service"
+                "disable-i3c-hub@4.service",
+                "slot-unplug@4.service"
             ],
             "FALLING": [
-                "slot-hot-plug@4.service"
+                "slot-hot-plug@4.service",
+                "slot-plug-in@4.service"
             ]
         },
         "Continue": true
@@ -208,10 +216,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@5.service"
+                "disable-i3c-hub@5.service",
+                "slot-unplug@5.service"
             ],
             "FALLING": [
-                "slot-hot-plug@5.service"
+                "slot-hot-plug@5.service",
+                "slot-plug-in@5.service"
             ]
         },
         "Continue": true
@@ -222,10 +232,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@6.service"
+                "disable-i3c-hub@6.service",
+                "slot-unplug@6.service"
             ],
             "FALLING": [
-                "slot-hot-plug@6.service"
+                "slot-hot-plug@6.service",
+                "slot-plug-in@6.service"
             ]
         },
         "Continue": true
@@ -236,10 +248,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@7.service"
+                "disable-i3c-hub@7.service",
+                "slot-unplug@7.service"
             ],
             "FALLING": [
-                "slot-hot-plug@7.service"
+                "slot-hot-plug@7.service",
+                "slot-plug-in@7.service"
             ]
         },
         "Continue": true
@@ -250,10 +264,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "disable-i3c-hub@8.service"
+                "disable-i3c-hub@8.service",
+                "slot-unplug@8.service"
             ],
             "FALLING": [
-                "slot-hot-plug@8.service"
+                "slot-hot-plug@8.service",
+                "slot-plug-in@8.service"
             ]
         },
         "Continue": true

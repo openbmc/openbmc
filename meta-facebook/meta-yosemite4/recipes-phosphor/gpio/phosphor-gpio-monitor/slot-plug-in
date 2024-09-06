@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set_slot_present()
+{
+    # check if the file "/tmp/gpio/PRSNT_SB_SLOT"${index}"_N" is exist
+    local slot_presence_file="/tmp/gpio/PRSNT_SB_SLOT${1}_N"
+    if [ ! -f "$slot_presence_file" ]; then
+        mkdir -p /tmp/gpio
+    fi
+
+    # set slot presence to 0
+    echo 0 > "$slot_presence_file"
+}
+
+set_slot_power_on()
+{
+    CHASSIS_ID="$1"
+    # since the sled is plug-in, set the chassis power state to on
+    busctl set-property "xyz.openbmc_project.State.Chassis$CHASSIS_ID" \
+        "/xyz/openbmc_project/state/chassis$CHASSIS_ID" \
+        "xyz.openbmc_project.State.Chassis" "RequestedPowerTransition" \
+        s "xyz.openbmc_project.State.Chassis.Transition.On"
+}
+
+slot_plug_in()
+{
+    local plugin_slot=$1
+
+    set_slot_present "$plugin_slot"
+    set_slot_power_on "$plugin_slot"
+
+    echo "Slot ${plugin_slot} plugin."
+
+    exit 0
+}
+
+slot_plug_in "$1"

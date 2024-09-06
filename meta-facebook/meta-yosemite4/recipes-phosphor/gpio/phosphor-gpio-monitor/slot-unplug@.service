@@ -1,0 +1,7 @@
+[Unit]
+Description=slot-unplug %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/slot-unplug %i
+SyslogIdentifier=slot-unplug %i

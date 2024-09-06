@@ -1,0 +1,7 @@
+[Unit]
+Description=slot-plug-in %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/slot-plug-in %i
+SyslogIdentifier=slot-plug-in %i
