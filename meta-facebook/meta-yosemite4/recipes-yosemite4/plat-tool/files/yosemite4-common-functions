@@ -34,3 +34,11 @@ get_product_version()
     PRODUCT_VERSION=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/board/Yosemite_4_"$FRU_NAME" xyz.openbmc_project.Inventory.Decorator.Revision Version| awk -F\" '{print $2}')
     echo "$PRODUCT_VERSION"
 }
+
+get_product_model()
+{
+    local FRU_NAME=$1
+    local PRODUCT_MODEL
+    PRODUCT_MODEL=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/board/Yosemite_4_"$FRU_NAME" xyz.openbmc_project.Inventory.Decorator.Asset Model| awk -F\" '{print $2}')
+    echo "$PRODUCT_MODEL"
+}
