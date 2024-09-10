@@ -22,6 +22,8 @@ gbmc_ncsi_br_deprecated_ips_lastip=
 gbmc_ncsi_br_deprecated_ips_lastncsi=
 gbmc_ncsi_br_deprecated_ips_confncsi=
 
+GBMC_NCSI_ROUTE_TABLE=900
+
 gbmc_ncsi_br_deprecated_ips_update() {
   [ -n "$gbmc_ncsi_br_deprecated_ips_init" ] || return
   [ "$gbmc_ncsi_br_deprecated_ips_confip" != "$gbmc_ncsi_br_deprecated_ips_lastip" ] || \
@@ -62,6 +64,10 @@ IPv6ProxyNDPAddress=$pfx
 IPv6ProxyNDPAddress=$stateless_pfx
 ${host_pfx:+IPv6ProxyNDPAddress=}$host_pfx
 ${stateless_ip:+IPv6ProxyNDPAddress=}$stateless_ip
+[RoutingPolicyRule]
+From=$pfx/76
+Table=$GBMC_NCSI_ROUTE_TABLE
+Priority=$GBMC_NCSI_ROUTE_TABLE
 EOF
     read -r -d '' nfcontents <<EOF
 table inet filter {
@@ -92,6 +98,7 @@ EOF
   while read -r entry; do
     ip -6 neigh del proxy ${entry%% *} dev @NCSI_IF@ || true
   done < <(ip -6 neigh show proxy dev @NCSI_IF@)
+  ip -6 rule del pref $GBMC_NCSI_ROUTE_TABLE 2>/dev/null || true
 
   local st=0
   if [ -n "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
@@ -104,6 +111,8 @@ EOF
     if [ -n "$stateless_ip" ]; then
       ip -6 neigh add proxy $stateless_ip dev @NCSI_IF@ || st=$?
     fi
+    ip -6 rule add pref $GBMC_NCSI_ROUTE_TABLE from $pfx/76 \
+      lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
   fi
 
   if (( st != 0 )); then

@@ -17,12 +17,23 @@ RA_IF=$1
 IP_OFFSET=1
 # NCSI is known to be closer to the ToR than bridge routes. Prefer over bridge routes.
 ROUTE_METRIC=900
+ROUTE_TABLE=900
 
 update_rtr() {
   busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/"$RA_IF" \
     xyz.openbmc_project.Network.EthernetInterface DefaultGateway6 s "" || true
 
   default_update_rtr "$@"
+
+  # Add additional gateway information
+  for file in /run/systemd/network/{00,}-bmc-$RA_IF.network; do
+    mkdir -p "$file.d"
+    printf '[Route]\nGateway=%s\nGatewayOnLink=true\nTable=%d' \
+      "$rtr" "$ROUTE_TABLE" >"$file.d"/10-gateway-table.conf
+  done
+
+  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" table "$ROUTE_TABLE" || \
+    networkctl reload && networkctl reconfigure "$RA_IF"
 }
 
 ncsi_is_active() {
