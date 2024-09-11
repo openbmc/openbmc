@@ -46,3 +46,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-power-control \
 "
+
+# Enable mbpoll for communication with the smart valve by modbus command
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    mbpoll \
+"
