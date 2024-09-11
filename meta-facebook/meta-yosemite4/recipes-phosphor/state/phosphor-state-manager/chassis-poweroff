@@ -22,9 +22,57 @@ GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL=$(basename "/sys/bus/i2c/devices/$MANAGEMEN
 
 is_nuvoton_board="$(check_nuvoton_board)"
 
+disable_i3c_hub()
+{
+    local target_slot="$CHASSIS_ID"
+    local hub_path
+    local offset_file
+    local access_file
+    local current_port
+    local mask=1
+
+    echo "Do 12V off disable i3c hub"
+    if [ "$target_slot" -lt 5 ]; then
+        hub_path="/sys/kernel/debug/i3c-hub-0-*/reg"
+        echo "Slot$target_slot on i3c hub 0."
+    else
+        hub_path="/sys/kernel/debug/i3c-hub-1-*/reg"
+        echo "Slot$target_slot on i3c hub 1."
+    fi
+
+    for file in $hub_path/{offset,access}; do
+        if [[ $file == *"/offset" ]]; then
+            offset_file="$file"
+        elif [[ $file == *"/access" ]]; then
+            access_file="$file"
+        fi
+    done
+
+    echo "Unlock i3c hub register."
+    echo 16 > "$offset_file"
+    echo 105 > "$access_file"
+
+    echo "Disable slot${target_slot} i3c port."
+    echo 18 > "$offset_file"
+    current_port=$(cat "$access_file")
+    if [ "$target_slot" -gt 4 ]; then
+        ((target_slot=target_slot-4))
+    fi
+    mask=$((mask << (--target_slot)))
+    mask=$((~mask))
+    current_port=$((current_port & mask))
+    echo $current_port > "$access_file"
+    cat "$access_file"
+
+    echo "Lock i3c hub register."
+    echo 16 > "$offset_file"
+    echo 0 > "$access_file"
+}
+
 # Server 12v power off
 chassis-power-off()
 {
+        disable_i3c_hub
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
         then
                 msg="Failed to set slot$CHASSIS_ID power off"
