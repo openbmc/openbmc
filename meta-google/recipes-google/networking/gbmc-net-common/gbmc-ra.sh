@@ -15,6 +15,8 @@
 
 # shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 : "${RA_IF:?No RA interface set}"
 : "${IP_OFFSET=?1}"
@@ -55,7 +57,7 @@ default_update_rtr() {
   # Fall back to reload only if ip link commands fail
   (ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric "$ROUTE_METRIC" && \
     ip -6 neigh replace "$rtr" dev "$RA_IF" lladdr "$mac") || \
-    (networkctl reload && networkctl reconfigure "$RA_IF") || true
+    gbmc_net_networkd_reload "$RA_IF" || true
 
   echo "Set router $rtr on $RA_IF" >&2
 }

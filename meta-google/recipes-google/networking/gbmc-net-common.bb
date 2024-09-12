@@ -4,6 +4,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI += " \
+  file://gbmc-net-lib.sh \
   file://gbmc-ra.sh \
   "
 S = "${WORKDIR}"
@@ -20,6 +21,7 @@ RDEPENDS:${PN}:append = " \
 
 do_install() {
   install -d -m0755 ${D}${datadir}
+  install -m0644 ${S}/gbmc-net-lib.sh ${D}${datadir}/
   install -m0644 ${S}/gbmc-ra.sh ${D}${datadir}/
 }
 

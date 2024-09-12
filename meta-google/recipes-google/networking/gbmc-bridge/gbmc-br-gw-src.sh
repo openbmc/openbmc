@@ -17,6 +17,8 @@
 
 # shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 declare -A gbmc_br_gw_src_ips=()
 declare -A gbmc_br_gw_src_routes=()
@@ -50,9 +52,8 @@ gbmc_br_set_router() {
     rm -f "${files[@]}"
   fi
 
-  if [[ $(systemctl is-active systemd-networkd) != inactive ]]; then
-    networkctl reload && networkctl reconfigure gbmcbr
-  fi
+  # shellcheck disable=SC2119
+  gbmc_net_networkd_reload
 }
 
 gbmc_br_gw_src_update() {

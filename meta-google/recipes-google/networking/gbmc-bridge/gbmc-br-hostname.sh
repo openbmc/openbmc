@@ -12,7 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
+
 oldname=
 while read -r _; do
   # Don't bother parsing the output, just read the final hostname
@@ -27,5 +30,6 @@ while read -r _; do
     printf '%s' "$contents" >"$netfile"
    done
 
-  networkctl reload && networkctl reconfigure gbmcbr
+  # shellcheck disable=SC2119
+  gbmc_net_networkd_reload
 done < <(dbus-monitor --system "type='signal',interface='org.freedesktop.DBus.Properties',member='PropertiesChanged',arg0='org.freedesktop.hostname1'")

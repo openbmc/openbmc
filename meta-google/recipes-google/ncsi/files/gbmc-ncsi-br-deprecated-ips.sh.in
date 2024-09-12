@@ -15,6 +15,7 @@
 [ -n "${gbmc_ncsi_br_deprecated_ips_lib-}" ] && return
 
 source /usr/share/network/lib.sh || exit
+source /usr/share/gbmc-net-lib.sh || exit
 
 gbmc_ncsi_br_deprecated_ips_init=
 gbmc_ncsi_br_deprecated_ips_confip=
@@ -115,9 +116,7 @@ EOF
       lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
   fi
 
-  if (( st != 0 )); then
-    networkctl reload && networkctl reconfigure @NCSI_IF@
-  fi
+  (( st == 0 )) || gbmc_net_networkd_reload @NCSI_IF@
 
   local rfile=/run/nftables/40-gbmc-ncsi-br.rules
   mkdir -p -m 755 "$(dirname "$rfile")"

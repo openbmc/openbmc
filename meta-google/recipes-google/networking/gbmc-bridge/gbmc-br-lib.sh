@@ -15,9 +15,10 @@
 
 [ -n "${gbmc_br_lib_init-}" ] && return
 
-# SC can't find this path during repotest
-# shellcheck disable=SC1091
+# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 # A list of functions which get executed for each configured IP.
 # These are configured by the files included below.
@@ -49,16 +50,10 @@ gbmc_br_run_hooks() {
   done
 }
 
-gbmc_br_reload() {
-  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
-    networkctl reload && networkctl reconfigure gbmcbr
-  fi
-}
-
 gbmc_br_no_ip() {
   echo "Runtime removing gbmcbr IP" >&2
   rm -f /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-public.conf
-  gbmc_br_reload
+  gbmc_net_networkd_reload gbmcbr
 }
 
 gbmc_br_reload_ip() {
@@ -109,7 +104,7 @@ EOF
     printf '%s' "$contents" >"$file"
   done
 
-  gbmc_br_reload
+  gbmc_net_networkd_reload gbmcbr
 }
 
 gbmc_br_set_ip() {

@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
+
 RA_IF=$1
 IP_OFFSET=1
 # NCSI is known to be closer to the ToR than bridge routes. Prefer over bridge routes.
@@ -33,7 +36,7 @@ update_rtr() {
   done
 
   ip -6 route replace default via "$rtr" onlink dev "$RA_IF" table "$ROUTE_TABLE" || \
-    networkctl reload && networkctl reconfigure "$RA_IF"
+    gbmc_net_networkd_reload "$RA_IF"
 }
 
 ncsi_is_active() {
@@ -78,7 +81,7 @@ update_pfx() {
     ip -6 addr del "$old_ncsi_pfx/128" dev gbmcbr || true
   fi
   ip -6 addr replace "$pfx/128" dev gbmcbr || \
-    (networkctl reload && networkctl reconfigure gbmcbr) || true
+    gbmc_net_networkd_reload gbmcbr || true
   old_ncsi_pfx=$pfx
 
   echo "Set NCSI addr $pfx on gbmcbr" >&2
