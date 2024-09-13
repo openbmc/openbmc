@@ -1,0 +1,7 @@
+[Unit]
+Description=Flash Host Bios firmware image %I to Host
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/libexec/bios-update.sh /tmp/images/%i
