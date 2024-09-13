@@ -12,12 +12,39 @@ read_i2c_dev() {
   return 1
 }
 
-probe_sitv_pttv_mux() {
+probe_dev() {
+  echo ina230 0x45 > /sys/bus/i2c/devices/i2c-22/new_device
+  echo ina230 0x45 > /sys/bus/i2c/devices/i2c-23/new_device
+
   if read_i2c_dev 9 0x71; then
     echo pca9546 0x71 > /sys/bus/i2c/devices/i2c-9/new_device
-  else
+  elif read_i2c_dev 11 0x71; then
     echo pca9546 0x71 > /sys/bus/i2c/devices/i2c-11/new_device
+  else
+    return
   fi
+
+  echo adc128d818 0x1d > /sys/bus/i2c/devices/i2c-36/new_device
+  echo ina238 0x44 > /sys/bus/i2c/devices/i2c-36/new_device
+  echo ina238 0x45 > /sys/bus/i2c/devices/i2c-36/new_device
+  echo MCP9600 0x60 > /sys/bus/i2c/devices/i2c-34/new_device
+  echo MCP9600 0x62 > /sys/bus/i2c/devices/i2c-34/new_device
+  echo MCP9600 0x63 > /sys/bus/i2c/devices/i2c-34/new_device
+  echo MCP9600 0x64 > /sys/bus/i2c/devices/i2c-34/new_device
+  echo MCP9600 0x65 > /sys/bus/i2c/devices/i2c-34/new_device
+  echo MCP9600 0x66 > /sys/bus/i2c/devices/i2c-34/new_device
+  echo MCP9600 0x67 > /sys/bus/i2c/devices/i2c-34/new_device
+  echo MCP9600 0x64 > /sys/bus/i2c/devices/i2c-35/new_device
+  echo MCP9600 0x65 > /sys/bus/i2c/devices/i2c-35/new_device
+  echo MCP9600 0x66 > /sys/bus/i2c/devices/i2c-35/new_device
+  echo tmp75 0x49 > /sys/bus/i2c/devices/i2c-36/new_device
+  echo tmp75 0x4A > /sys/bus/i2c/devices/i2c-36/new_device
+  echo tmp75 0x4B > /sys/bus/i2c/devices/i2c-36/new_device
+  echo tmp75 0x4C > /sys/bus/i2c/devices/i2c-36/new_device
+  echo tmp75 0x49 > /sys/bus/i2c/devices/i2c-37/new_device
+  echo tmp75 0x4A > /sys/bus/i2c/devices/i2c-37/new_device
+  echo tmp75 0x4B > /sys/bus/i2c/devices/i2c-37/new_device
+  echo tmp75 0x4C > /sys/bus/i2c/devices/i2c-37/new_device
 }
 
 set_hsc_sample_rate() {
@@ -28,6 +55,6 @@ set_hsc_sample_rate() {
 }
 
 
-probe_sitv_pttv_mux
+probe_dev
 set_hsc_sample_rate
 exit 0
