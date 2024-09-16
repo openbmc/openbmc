@@ -7,9 +7,11 @@ LogRateLimitIntervalSec=120
 LogRateLimitBurst=100
 
 [Service]
+Environment="RP_FLAG=-rp 3967"
+EnvironmentFile=-/run/gbmc-ncsi-dhcrelay.env
 Restart=always
 RestartSec=5
-ExecStart=/usr/sbin/dhcrelay -d --no-pid -rp 3967 -l gbmcncsidhcp -u ff02::1:2%%@NCSI_IF@
+ExecStart=/usr/sbin/dhcrelay -d --no-pid $RP_FLAG -l gbmcncsidhcp -u ff02::1:2%%@NCSI_IF@
 
 [Install]
 WantedBy=multi-user.target
