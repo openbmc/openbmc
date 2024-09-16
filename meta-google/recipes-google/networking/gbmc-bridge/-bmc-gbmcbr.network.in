@@ -13,3 +13,11 @@ DHCPv6Client=false
 RouteMetric=1056
 [IPv6SendRA]
 RouterLifetimeSec=0
+[RoutingPolicyRule]
+To=fdb5:481:10ce::/64
+Table=main
+Priority=500
+[RoutingPolicyRule]
+To=fe80::/64
+Table=main
+Priority=500
