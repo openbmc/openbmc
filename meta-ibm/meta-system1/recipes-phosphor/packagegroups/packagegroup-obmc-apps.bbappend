@@ -22,6 +22,7 @@ RDEPENDS:${PN}-chassis = " \
         phosphor-post-code-manager \
         phosphor-host-postd        \
         phosphor-skeleton-control-power \
+        phosphor-ipmi-ipmb \
 "
 
 SUMMARY:${PN}-flash = "System1 Flash"
