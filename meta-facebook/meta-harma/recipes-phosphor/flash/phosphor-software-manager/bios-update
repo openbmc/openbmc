@@ -29,11 +29,13 @@ set_gpio_to_cpu()
 
 echo "Bios upgrade started at $(date)"
 
-#Power off host server.
-echo "Power off host server by force off"
-obmcutil chassisoff
+# Power off the host server using a graceful shutdown.
+# If the server does not power off,
+# it will then perform a forced shutdown
+echo "Power off host server"
+obmcutil poweroff
 
-sleep 10
+sleep 25
 if [ "$(power_status)" != "off" ];
 then
     echo "Host server didn't power off"

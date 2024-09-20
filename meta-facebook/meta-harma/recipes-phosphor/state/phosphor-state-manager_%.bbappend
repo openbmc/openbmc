@@ -30,42 +30,32 @@ CHASSIS_DEFAULT_TARGETS:append = " \
     obmc-chassis-poweroff@{}.target.requires/obmc-powered-off@{}.service \
     "
 
-# Harma Chassis off is host force off
-CHASSIS_DEFAULT_TARGETS:append = " \
-    obmc-chassis-hard-poweroff@{}.target.requires/host-force-poweroff@{}.service \
-    "
-
 # Host Config
+# Host Reset
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
+    obmc-host-warm-reboot@{}.target.wants/pldmSoftPowerOff.service \
+    obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
+    obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     "
 
-# TODO: Remove it when 69903 applied.
+# Host On/Off
 HOST_DEFAULT_TARGETS:append = " \
     obmc-host-startmin@{}.target.requires/host-poweron@{}.service \
     "
 
-# TODO: Remove it when 69903 applied.
 HOST_DEFAULT_TARGETS:append = " \
     obmc-host-shutdown@{}.target.requires/host-graceful-poweroff@{}.service \
-    obmc-host-warm-reboot@{}.target.requires/host-graceful-poweroff@{}.service \
     "
 
-# TODO: Remove it when 69903 applied.
-HOST_DEFAULT_TARGETS:append = " \
-    obmc-host-stop@{}.target.requires/host-force-poweroff@{}.service \
-    "
-
-# TODO: Remove it when 69903 applied.
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-shutdown@{}.target.wants/host-poweroff@{}.service \
     obmc-host-start@{}.target.wants/host-poweron@{}.service \
-    obmc-host-reboot@{}.target.wants/host-powercycle@{}.service \
-    obmc-host-force-warm-reboot@{}.target.wants/host-powerreset@{}.service \
     "
 
-# TODO:  Remove when 69903 applied.
+# Host Cycle
 HOST_DEFAULT_TARGETS:remove = " \
+    obmc-host-reboot@{}.target.wants/host-powercycle@{}.service \
     obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.service \
     "
 
@@ -87,12 +77,12 @@ SRC_URI:append = " \
     file://chassis-poweroff@.service \
     file://chassis-poweron \
     file://chassis-poweron@.service \
-    file://host-force-poweroff \
-    file://host-force-poweroff@.service \
     file://host-graceful-poweroff \
     file://host-graceful-poweroff@.service \
     file://host-poweron \
     file://host-poweron@.service \
+    file://host-powerreset \
+    file://host-powerreset@.service \
     file://power-cmd \
     file://phosphor-wait-power-off@.service \
     file://discover-sys-init.conf \
@@ -110,9 +100,9 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
 }
