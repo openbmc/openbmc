@@ -126,6 +126,25 @@ try_wget() {
 	fi
 }
 
+fast_clear_rwfs() {
+	args="-mindepth 1"
+	while read -r line; do
+		# excluding all whitelisted file/dir and their parent dir.
+		line="${1}${line}"
+		args="$args ! -path $line/*"
+		while [ "$line" != "$1" ]; do
+			args="$args ! -path $line"
+			line="$(dirname "$line")"
+		done
+	done < $whitelist
+	# remove everything not in the whitelist.
+	# e.g. the whitelist contains a single entry /a/b, the
+	# follow command will be generated:
+	# find /run/initramfs/rw/cow -mindepth 1 ! -path /run/initramfs/rw/cow/a/b/* ! -path /run/initramfs/rw/cow/a/b ! -path /run/initramfs/rw/cow/a -exec rm -rf {} +
+	args="$args -exec rm -rf {} +"
+	echo "$args" | xargs find "$1"
+}
+
 debug_takeover() {
 	echo "$@"
 
@@ -191,6 +210,7 @@ optfile=/run/initramfs/init-options
 optbase=/run/initramfs/init-options-base
 urlfile=/run/initramfs/init-download-url
 update=/run/initramfs/update
+whitelist=/run/initramfs/whitelist
 
 if test -e /${optfile##*/}
 then
@@ -321,12 +341,28 @@ then
 		else
 			echo "No files will be selected for save."
 		fi
-		$update --no-restore-files $do_save
-		echo "Clearing read-write overlay filesystem."
-		flash_eraseall "/dev/$rwfs"
-		echo "Restoring saved files to read-write overlay filesystem."
-		touch $trigger
-		$update --no-save-files --clean-saved-files
+		imglist=$(echo $image*)
+		slowclean=1
+		if test "$imglist" = "$trigger" -a $do_save = "--save-files"
+		then
+			# if only rwfs flag is found
+			echo "Fast clearing read-write overlay filesystem."
+			if mount "$rwdev" "$rwdir" -t "$rwfst" -o "$rwopts"; then
+				fast_clear_rwfs $upper && slowclean=0
+				umount $rwdir
+			fi
+		fi
+
+		if test "$slowclean" = "1"
+		then
+			# for in-place update, use the same workflow as before
+			$update --no-restore-files $do_save
+			echo "Clearing read-write overlay filesystem."
+			flash_eraseall "/dev/$rwfs"
+			echo "Restoring saved files to read-write overlay filesystem."
+			touch $trigger
+			$update --no-save-files --clean-saved-files
+		fi
 	else
 		$update --clean-saved-files $do_save
 	fi
