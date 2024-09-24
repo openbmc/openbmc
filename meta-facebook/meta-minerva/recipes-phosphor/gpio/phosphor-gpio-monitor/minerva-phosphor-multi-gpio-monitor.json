@@ -1,19 +1,8 @@
 [
     {
-        "Name": "PWRGD_MTIA_BLADE0_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 56,
-        "EventMon": "BOTH",
-        "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-0.service"],
-            "RISING": ["power-good-deassert@mtia-blade-0.service"]
-        },
-        "Continue": true
-    },
-    {
         "Name": "PWRGD_MTIA_BLADE1_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 58,
+        "GpioNum": 56,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-1.service"],
@@ -24,7 +13,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE2_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 60,
+        "GpioNum": 58,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-2.service"],
@@ -35,7 +24,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE3_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 62,
+        "GpioNum": 60,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-3.service"],
@@ -46,7 +35,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE4_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 64,
+        "GpioNum": 62,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-4.service"],
@@ -57,7 +46,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE5_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 66,
+        "GpioNum": 64,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-5.service"],
@@ -68,7 +57,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE6_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 68,
+        "GpioNum": 66,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-6.service"],
@@ -79,7 +68,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE7_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 70,
+        "GpioNum": 68,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-7.service"],
@@ -90,7 +79,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE8_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 72,
+        "GpioNum": 70,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-8.service"],
@@ -101,7 +90,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE9_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 74,
+        "GpioNum": 72,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-9.service"],
@@ -112,7 +101,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE10_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 76,
+        "GpioNum": 74,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-10.service"],
@@ -123,7 +112,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE11_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 78,
+        "GpioNum": 76,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-11.service"],
@@ -134,7 +123,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE12_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 80,
+        "GpioNum": 78,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-12.service"],
@@ -145,7 +134,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE13_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 82,
+        "GpioNum": 80,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-13.service"],
@@ -156,7 +145,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE14_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 84,
+        "GpioNum": 82,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-14.service"],
@@ -167,7 +156,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE15_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 86,
+        "GpioNum": 84,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@mtia-blade-15.service"],
@@ -176,20 +165,20 @@
         "Continue": true
     },
     {
-        "Name": "PWRGD_NW_BLADE0_PWROK_N",
+        "Name": "PWRGD_MTIA_BLADE16_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 88,
+        "GpioNum": 86,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@network-blade-0.service"],
-            "RISING": ["power-good-deassert@network-blade-0.service"]
+            "FALLING": ["power-good-assert@mtia-blade-16.service"],
+            "RISING": ["power-good-deassert@mtia-blade-16.service"]
         },
         "Continue": true
     },
     {
         "Name": "PWRGD_NW_BLADE1_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 90,
+        "GpioNum": 88,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@network-blade-1.service"],
@@ -200,7 +189,7 @@
     {
         "Name": "PWRGD_NW_BLADE2_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 92,
+        "GpioNum": 90,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@network-blade-2.service"],
@@ -211,7 +200,7 @@
     {
         "Name": "PWRGD_NW_BLADE3_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 94,
+        "GpioNum": 92,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@network-blade-3.service"],
@@ -222,7 +211,7 @@
     {
         "Name": "PWRGD_NW_BLADE4_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 96,
+        "GpioNum": 94,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@network-blade-4.service"],
@@ -233,7 +222,7 @@
     {
         "Name": "PWRGD_NW_BLADE5_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 98,
+        "GpioNum": 96,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@network-blade-5.service"],
@@ -242,86 +231,86 @@
         "Continue": true
     },
     {
-        "Name": "PWRGD_FCB_TOP_0_PWROK_N",
+        "Name": "PWRGD_NW_BLADE6_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 98,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@network-blade-6.service"],
+            "RISING": ["power-good-deassert@network-blade-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_FCB_1_N",
         "ChipId": "2",
         "GpioNum": 100,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-top-0.service"],
-            "RISING": ["power-good-deassert@fcb-top-0.service"]
+            "FALLING": ["power-good-assert@fcb-1.service"],
+            "RISING": ["power-good-deassert@fcb-1.service"]
         },
         "Continue": true
     },
     {
-        "Name": "PWRGD_FCB_TOP_1_PWROK_N",
+        "Name": "PWRGD_FCB_2_N",
         "ChipId": "2",
         "GpioNum": 102,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-top-1.service"],
-            "RISING": ["power-good-deassert@fcb-top-1.service"]
+            "FALLING": ["power-good-assert@fcb-2.service"],
+            "RISING": ["power-good-deassert@fcb-2.service"]
         },
         "Continue": true
     },
     {
-        "Name": "PWRGD_FCB_MIDDLE_0_PWROK_N",
+        "Name": "PWRGD_FCB_3_N",
         "ChipId": "2",
         "GpioNum": 104,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-mid-0.service"],
-            "RISING": ["power-good-deassert@fcb-mid-0.service"]
+            "FALLING": ["power-good-assert@fcb-3.service"],
+            "RISING": ["power-good-deassert@fcb-3.service"]
         },
         "Continue": true
     },
     {
-        "Name": "PWRGD_FCB_MIDDLE_1_PWROK_N",
+        "Name": "PWRGD_FCB_4_N",
         "ChipId": "2",
         "GpioNum": 106,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-mid-1.service"],
-            "RISING": ["power-good-deassert@fcb-mid-1.service"]
+            "FALLING": ["power-good-assert@fcb-4.service"],
+            "RISING": ["power-good-deassert@fcb-4.service"]
         },
         "Continue": true
     },
     {
-        "Name": "PWRGD_FCB_BOTTOM_0_PWROK_N",
+        "Name": "PWRGD_FCB_6_N",
         "ChipId": "2",
         "GpioNum": 108,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-bot-0.service"],
-            "RISING": ["power-good-deassert@fcb-bot-0.service"]
+            "FALLING": ["power-good-assert@fcb-6.service"],
+            "RISING": ["power-good-deassert@fcb-6.service"]
         },
         "Continue": true
     },
     {
-        "Name": "PWRGD_FCB_BOTTOM_1_PWROK_N",
+        "Name": "PWRGD_FCB_5_N",
         "ChipId": "2",
         "GpioNum": 110,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-bot-1.service"],
-            "RISING": ["power-good-deassert@fcb-bot-1.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "LEAK_DETECT_MTIA_BLADE0_N",
-        "ChipId": "2",
-        "GpioNum": 112,
-        "EventMon": "BOTH",
-        "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-0.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-0.service"]
+            "FALLING": ["power-good-assert@fcb-5.service"],
+            "RISING": ["power-good-deassert@fcb-5.service"]
         },
         "Continue": true
     },
     {
         "Name": "LEAK_DETECT_MTIA_BLADE1_N",
         "ChipId": "2",
-        "GpioNum": 114,
+        "GpioNum": 112,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-1.service"],
@@ -332,7 +321,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE2_N",
         "ChipId": "2",
-        "GpioNum": 116,
+        "GpioNum": 114,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-2.service"],
@@ -343,7 +332,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE3_N",
         "ChipId": "2",
-        "GpioNum": 118,
+        "GpioNum": 116,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-3.service"],
@@ -354,7 +343,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE4_N",
         "ChipId": "2",
-        "GpioNum": 120,
+        "GpioNum": 118,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-4.service"],
@@ -365,7 +354,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE5_N",
         "ChipId": "2",
-        "GpioNum": 122,
+        "GpioNum": 120,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-5.service"],
@@ -376,7 +365,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE6_N",
         "ChipId": "2",
-        "GpioNum": 124,
+        "GpioNum": 122,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-6.service"],
@@ -387,7 +376,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE7_N",
         "ChipId": "2",
-        "GpioNum": 126,
+        "GpioNum": 124,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-7.service"],
@@ -398,7 +387,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE8_N",
         "ChipId": "2",
-        "GpioNum": 128,
+        "GpioNum": 126,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-8.service"],
@@ -409,7 +398,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE9_N",
         "ChipId": "2",
-        "GpioNum": 130,
+        "GpioNum": 128,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-9.service"],
@@ -420,7 +409,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE10_N",
         "ChipId": "2",
-        "GpioNum": 132,
+        "GpioNum": 130,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-10.service"],
@@ -431,7 +420,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE11_N",
         "ChipId": "2",
-        "GpioNum": 134,
+        "GpioNum": 132,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-11.service"],
@@ -442,7 +431,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE12_N",
         "ChipId": "2",
-        "GpioNum": 136,
+        "GpioNum": 134,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-12.service"],
@@ -453,7 +442,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE13_N",
         "ChipId": "2",
-        "GpioNum": 138,
+        "GpioNum": 136,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-13.service"],
@@ -464,7 +453,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE14_N",
         "ChipId": "2",
-        "GpioNum": 140,
+        "GpioNum": 138,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-14.service"],
@@ -475,7 +464,7 @@
     {
         "Name": "LEAK_DETECT_MTIA_BLADE15_N",
         "ChipId": "2",
-        "GpioNum": 142,
+        "GpioNum": 140,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@mtia-blade-15.service"],
@@ -484,20 +473,20 @@
         "Continue": true
     },
     {
-        "Name": "LEAK_DETECT_NW_BLADE0_N",
+        "Name": "LEAK_DETECT_MTIA_BLADE16_N",
         "ChipId": "2",
-        "GpioNum": 144,
+        "GpioNum": 142,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@network-blade-0.service"],
-            "RISING": ["leak-detect-deassert@network-blade-0.service"]
+            "FALLING": ["leak-detect-assert@mtia-blade-16.service"],
+            "RISING": ["leak-detect-deassert@mtia-blade-16.service"]
         },
         "Continue": true
     },
     {
         "Name": "LEAK_DETECT_NW_BLADE1_N",
         "ChipId": "2",
-        "GpioNum": 146,
+        "GpioNum": 144,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@network-blade-1.service"],
@@ -508,7 +497,7 @@
     {
         "Name": "LEAK_DETECT_NW_BLADE2_N",
         "ChipId": "2",
-        "GpioNum": 148,
+        "GpioNum": 146,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@network-blade-2.service"],
@@ -519,7 +508,7 @@
     {
         "Name": "LEAK_DETECT_NW_BLADE3_N",
         "ChipId": "2",
-        "GpioNum": 150,
+        "GpioNum": 148,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@network-blade-3.service"],
@@ -530,7 +519,7 @@
     {
         "Name": "LEAK_DETECT_NW_BLADE4_N",
         "ChipId": "2",
-        "GpioNum": 152,
+        "GpioNum": 150,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@network-blade-4.service"],
@@ -541,7 +530,7 @@
     {
         "Name": "LEAK_DETECT_NW_BLADE5_N",
         "ChipId": "2",
-        "GpioNum": 154,
+        "GpioNum": 152,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-assert@network-blade-5.service"],
@@ -550,20 +539,20 @@
         "Continue": true
     },
     {
-        "Name": "PWRGD_MTIA_BLADE0_HSC_PWROK_N",
+        "Name": "LEAK_DETECT_NW_BLADE6_N",
         "ChipId": "2",
-        "GpioNum": 156,
+        "GpioNum": 154,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-0.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-0.service"]
+            "FALLING": ["leak-detect-assert@network-blade-6.service"],
+            "RISING": ["leak-detect-deassert@network-blade-6.service"]
         },
         "Continue": true
     },
     {
         "Name": "PWRGD_MTIA_BLADE1_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 158,
+        "GpioNum": 156,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-1.service"],
@@ -574,7 +563,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE2_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 160,
+        "GpioNum": 158,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-2.service"],
@@ -585,7 +574,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE3_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 162,
+        "GpioNum": 160,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-3.service"],
@@ -596,7 +585,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE4_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 164,
+        "GpioNum": 162,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-4.service"],
@@ -607,7 +596,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE5_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 166,
+        "GpioNum": 164,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-5.service"],
@@ -618,7 +607,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE6_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 168,
+        "GpioNum": 166,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-6.service"],
@@ -629,7 +618,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE7_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 170,
+        "GpioNum": 168,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-7.service"],
@@ -640,7 +629,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE8_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 172,
+        "GpioNum": 170,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-8.service"],
@@ -651,7 +640,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE9_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 174,
+        "GpioNum": 172,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-9.service"],
@@ -662,7 +651,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE10_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 176,
+        "GpioNum": 174,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-10.service"],
@@ -673,7 +662,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE11_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 178,
+        "GpioNum": 176,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-11.service"],
@@ -684,7 +673,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE12_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 180,
+        "GpioNum": 178,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-12.service"],
@@ -695,7 +684,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE13_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 182,
+        "GpioNum": 180,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-13.service"],
@@ -706,7 +695,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE14_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 184,
+        "GpioNum": 182,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-14.service"],
@@ -717,7 +706,7 @@
     {
         "Name": "PWRGD_MTIA_BLADE15_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 186,
+        "GpioNum": 184,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@mtia-blade-15.service"],
@@ -726,20 +715,20 @@
         "Continue": true
     },
     {
-        "Name": "PWRGD_NW_BLADE0_HSC_PWROK_N",
+        "Name": "PWRGD_MTIA_BLADE16_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 188,
+        "GpioNum": 186,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@network-blade-0.service"],
-            "RISING": ["ac-power-good-deassert@network-blade-0.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-16.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-16.service"]
         },
         "Continue": true
     },
     {
         "Name": "PWRGD_NW_BLADE1_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 190,
+        "GpioNum": 188,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@network-blade-1.service"],
@@ -750,7 +739,7 @@
     {
         "Name": "PWRGD_NW_BLADE2_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 192,
+        "GpioNum": 190,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@network-blade-2.service"],
@@ -761,7 +750,7 @@
     {
         "Name": "PWRGD_NW_BLADE3_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 194,
+        "GpioNum": 192,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@network-blade-3.service"],
@@ -772,7 +761,7 @@
     {
         "Name": "PWRGD_NW_BLADE4_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 196,
+        "GpioNum": 194,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@network-blade-4.service"],
@@ -783,11 +772,22 @@
     {
         "Name": "PWRGD_NW_BLADE5_HSC_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 198,
+        "GpioNum": 196,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["ac-power-good-assert@network-blade-5.service"],
             "RISING": ["ac-power-good-deassert@network-blade-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NW_BLADE6_HSC_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 198,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["ac-power-good-assert@network-blade-6.service"],
+            "RISING": ["ac-power-good-deassert@network-blade-6.service"]
         },
         "Continue": true
     },

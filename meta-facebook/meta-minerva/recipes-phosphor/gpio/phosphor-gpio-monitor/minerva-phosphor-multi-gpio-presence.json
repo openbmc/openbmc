@@ -1,12 +1,5 @@
 [
     {
-        "Name": "PRSNT_MTIA_BLADE0",
-        "LineName": "PRSNT_MTIA_BLADE0_N",
-        "ActiveLow": true,
-        "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE0"
-    },
-    {
         "Name": "PRSNT_MTIA_BLADE1",
         "LineName": "PRSNT_MTIA_BLADE1_N",
         "ActiveLow": true,
@@ -112,11 +105,11 @@
         "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE15"
     },
     {
-        "Name": "PRSNT_NW_BLADE0",
-        "LineName": "PRSNT_NW_BLADE0_N",
+        "Name": "PRSNT_MTIA_BLADE16",
+        "LineName": "PRSNT_MTIA_BLADE16_N",
         "ActiveLow": true,
         "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE0"
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_MTIA_BLADE16"
     },
     {
         "Name": "PRSNT_NW_BLADE1",
@@ -154,46 +147,53 @@
         "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE5"
     },
     {
-        "Name": "PRSNT_FCB_TOP_0",
-        "LineName": "PRSNT_FCB_TOP_0_N",
+        "Name": "PRSNT_NW_BLADE6",
+        "LineName": "PRSNT_NW_BLADE6_N",
         "ActiveLow": true,
         "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_TOP_0"
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_NW_BLADE6"
     },
     {
-        "Name": "PRSNT_FCB_TOP_1",
-        "LineName": "PRSNT_FCB_TOP_1_N",
+        "Name": "PRSNT_FCB_1",
+        "LineName": "PRSNT_FCB_1_N",
         "ActiveLow": true,
         "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_TOP_1"
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_1"
     },
     {
-        "Name": "PRSNT_FCB_MIDDLE_0",
-        "LineName": "PRSNT_FCB_MIDDLE_0_N",
+        "Name": "PRSNT_FCB_2",
+        "LineName": "PRSNT_FCB_2_N",
         "ActiveLow": true,
         "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_MIDDLE_0"
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_2"
     },
     {
-        "Name": "PRSNT_FCB_MIDDLE_1",
-        "LineName": "PRSNT_FCB_MIDDLE_1_N",
+        "Name": "PRSNT_FCB_3",
+        "LineName": "PRSNT_FCB_3_N",
         "ActiveLow": true,
         "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_MIDDLE_1"
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_3"
     },
     {
-        "Name": "PRSNT_FCB_BOTTOM_0",
-        "LineName": "PRSNT_FCB_BOTTOM_0_N",
+        "Name": "PRSNT_FCB_4",
+        "LineName": "PRSNT_FCB_4_N",
         "ActiveLow": true,
         "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_BOTTOM_0"
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_4"
     },
     {
-        "Name": "PRSNT_FCB_BOTTOM_1",
-        "LineName": "PRSNT_FCB_BOTTOM_1_N",
+        "Name": "PRSNT_FCB_5",
+        "LineName": "PRSNT_FCB_5_N",
         "ActiveLow": true,
         "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_BOTTOM_1"
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_5"
+    },
+    {
+        "Name": "PRSNT_FCB_6",
+        "LineName": "PRSNT_FCB_6_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_CMM/PRSNT_FCB_6"
     },
     {
         "Name": "PRSNT_CABLE_CARTRIDGE_TOP",
