@@ -52,6 +52,9 @@ then
     fi
     chown root:kmem /dev/mem
     devmem 0x1e78008c 32 0x19000000
+
+    # adjust the i2c clock duty cycle for bus 11
+    devmem 0x1E78A604 32 0x00487006
 fi
 
 # Enable all fan input as early as possible
