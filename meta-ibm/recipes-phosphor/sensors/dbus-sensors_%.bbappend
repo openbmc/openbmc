@@ -24,5 +24,7 @@ PACKAGECONFIG:sbp1 = " \
 PACKAGECONFIG:system1 = " \
     adcsensor \
     hwmontempsensor \
+    fansensor \
+    psusensor \
     intelcpusensor \
     "
