@@ -55,7 +55,7 @@ bind_i2c_muxes()
     bind_i2c_device pca954x 0-0077
 
     # HDD Board I2C Mux, i2c48 - i2c55
-    bind_i2c_device pca954x 30-0070
+    bind_i2c_device pca954x 5-0070
 }
 
 bind_gpio_expanders()
