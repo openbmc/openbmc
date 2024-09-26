@@ -301,7 +301,7 @@
     },
     {
         "Desc": {
-            "Name": "SYSTEM_AIRFLOW",
+            "Name": "SYSTEM_AIRFLOW_CFM",
             "SensorType": "airflow"
         },
         "Params": {
@@ -309,168 +309,168 @@
                 {
                     "ParamName": "P1",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_TACH_IL",
+                        "Name": "FANBOARD0_FAN0_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P2",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_TACH_OL",
+                        "Name": "FANBOARD0_FAN0_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P3",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN1_TACH_IL",
+                        "Name": "FANBOARD0_FAN1_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P4",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN1_TACH_OL",
+                        "Name": "FANBOARD0_FAN1_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P5",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN2_TACH_IL",
+                        "Name": "FANBOARD1_FAN2_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P6",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN2_TACH_OL",
+                        "Name": "FANBOARD1_FAN2_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P7",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN3_TACH_IL",
+                        "Name": "FANBOARD1_FAN3_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P8",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN3_TACH_OL",
+                        "Name": "FANBOARD1_FAN3_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P9",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN4_TACH_IL",
+                        "Name": "FANBOARD0_FAN4_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P10",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN4_TACH_OL",
+                        "Name": "FANBOARD0_FAN4_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P11",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN5_TACH_IL",
+                        "Name": "FANBOARD0_FAN5_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P12",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN5_TACH_OL",
+                        "Name": "FANBOARD0_FAN5_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P13",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN6_TACH_IL",
+                        "Name": "FANBOARD1_FAN6_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P14",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN6_TACH_OL",
+                        "Name": "FANBOARD1_FAN6_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P15",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN7_TACH_IL",
+                        "Name": "FANBOARD1_FAN7_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P16",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN7_TACH_OL",
+                        "Name": "FANBOARD1_FAN7_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P17",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN8_TACH_IL",
+                        "Name": "FANBOARD0_FAN8_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P18",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN8_TACH_OL",
+                        "Name": "FANBOARD0_FAN8_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P19",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN9_TACH_IL",
+                        "Name": "FANBOARD0_FAN9_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P20",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN9_TACH_OL",
+                        "Name": "FANBOARD0_FAN9_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P21",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN10_TACH_IL",
+                        "Name": "FANBOARD1_FAN10_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P22",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN10_TACH_OL",
+                        "Name": "FANBOARD1_FAN10_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P23",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN11_TACH_IL",
+                        "Name": "FANBOARD1_FAN11_TACH_IL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 },
                 {
                     "ParamName": "P24",
                     "Desc": {
-                        "Name": "FANBOARD1_FAN11_TACH_OL",
+                        "Name": "FANBOARD1_FAN11_TACH_OL_SPEED_RPM",
                         "SensorType": "fan_tach"
                     }
                 }
@@ -498,7 +498,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -533,7 +533,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -568,7 +568,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -603,7 +603,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -638,7 +638,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -673,7 +673,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -708,7 +708,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -743,7 +743,7 @@
                 {
                     "ParamName": "Fan_PWM",
                     "Desc": {
-                        "Name": "FANBOARD0_FAN0_PWM",
+                        "Name": "FANBOARD0_FAN0_PWM_TACH_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
@@ -782,14 +782,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC0_CURR_A_1",
+                        "Name": "MEDUSA_48VHSC0_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC0_CURR_A_2",
+                        "Name": "MEDUSA_48VHSC0_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -821,14 +821,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC0_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_48VHSC0_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC0_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_48VHSC0_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -860,14 +860,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC1_CURR_A_1",
+                        "Name": "MEDUSA_48VHSC1_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC1_CURR_A_2",
+                        "Name": "MEDUSA_48VHSC1_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -899,14 +899,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC1_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_48VHSC1_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_48VHSC1_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_48VHSC1_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -938,14 +938,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB1_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB1_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB1_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB1_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -977,14 +977,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB2_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB2_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB2_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB2_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -1016,14 +1016,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB3_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB3_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB3_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB3_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -1055,14 +1055,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB4_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB4_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB4_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB4_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -1094,14 +1094,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB5_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB5_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB5_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB5_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -1133,14 +1133,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB6_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB6_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB6_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB6_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -1172,14 +1172,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB7_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB7_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB7_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB7_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -1211,14 +1211,14 @@
                 {
                     "ParamName": "hsc_current1",
                     "Desc": {
-                        "Name": "MEDUSA_MB8_12VHSC_CURR_A_1",
+                        "Name": "MEDUSA_MB8_12VHSC_1_CURR_A",
                         "SensorType": "current"
                     }
                 },
                 {
                     "ParamName": "hsc_current2",
                     "Desc": {
-                        "Name": "MEDUSA_MB8_12VHSC_CURR_A_2",
+                        "Name": "MEDUSA_MB8_12VHSC_2_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -1250,14 +1250,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB1_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB1_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB1_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB1_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -1289,14 +1289,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB2_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB2_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB2_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB2_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -1328,14 +1328,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB3_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB3_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB3_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB3_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -1367,14 +1367,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB4_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB4_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB4_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB4_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -1406,14 +1406,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB5_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB5_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB5_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB5_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -1445,14 +1445,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB6_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB6_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB6_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB6_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -1484,14 +1484,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB7_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB7_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB7_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB7_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
@@ -1523,14 +1523,14 @@
                 {
                     "ParamName": "hsc_input_power1",
                     "Desc": {
-                        "Name": "MEDUSA_MB8_12VHSC_INPUT_PWR_W_1",
+                        "Name": "MEDUSA_MB8_12VHSC_INPUT_1_PWR_W",
                         "SensorType": "power"
                     }
                 },
                 {
                     "ParamName": "hsc_input_power2",
                     "Desc": {
-                        "Name": "MEDUSA_MB8_12VHSC_INPUT_PWR_W_2",
+                        "Name": "MEDUSA_MB8_12VHSC_INPUT_2_PWR_W",
                         "SensorType": "power"
                     }
                 }
