@@ -2,6 +2,11 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI:append = " \
     file://minerva-fan.yaml \
+    file://minerva-temporary-software-versions.yml \
+"
+
+SETTINGS_BMC_TEMPLATES:append = " \
+    minerva-temporary-software-versions.yml \
 "
 
 do_install:append() {
