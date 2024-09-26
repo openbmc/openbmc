@@ -24,6 +24,16 @@ do_install() {
         install -m 0755 ${WORKDIR}/obmc-init.sh ${D}/init
         install -m 0755 ${WORKDIR}/obmc-shutdown.sh ${D}/shutdown
         install -m 0755 ${WORKDIR}/obmc-update.sh ${D}/update
+
+        # verify white list entries
+        # each entry should have no '//', '/./', '/../' or trailing '/', '/.', '/..'
+        while read -r f
+        do
+                if test $(realpath -L -m ${WORKDIR}$f) != ${WORKDIR}$f
+                then
+                        bberror "Bad whitelist entry ${f}."
+                fi
+        done < ${WORKDIR}/whitelist
         install -m 0644 ${WORKDIR}/whitelist ${D}/whitelist
         install -d ${D}/dev
         mknod -m 622 ${D}/dev/console c 5 1

@@ -173,22 +173,11 @@ then
 
 	while read -r f
 	do
-		# Entries shall start with /, no trailing /.. or embedded /../
-		if test "/${f#/}" != "$f" -o "${f%/..}" != "${f#*/../}"
-		then
-			echo 1>&2 "WARNING: Skipping bad whitelist entry $f."
-			continue
-		fi
 		if ! test -e "$upper/$f"
 		then
 			continue
 		fi
 		d="$save/$f"
-		while test "${d%/}" != "${d%/.}"
-		do
-			d="${d%/.}"
-			d="${d%/}"
-		done
 		mkdir -p "${d%/*}"
 		cp -rp "$upper/$f" "${d%/*}/"
 	done < $whitelist
