@@ -92,14 +92,21 @@ machine() {
     [ -n "$target" ] && echo "No such machine!" >&2 && return 1
 }
 
+# Determine if we've been sourced or executed; "exit" vs "return" is different.
+if [ -z "$ZSH_NAME" ] && [ "$(basename -- "$0")" = "setup" ]; then
+    EXIT_CMD="exit"
+else
+    EXIT_CMD="return"
+fi
+
 if [ -z "$1" ]; then
     echo Target machine must be specified. Use one of:
     echo
     machine | sed "/qemu[^[:space:]]*/d" | sed "s#.*/##" | sort -h | "${COLUMN[@]}"
-    exit
+    ${EXIT_CMD} 1
 fi
 
-if [ "$1" == "machines" ]; then
+if [ "machines" = "$1" ]; then
     vendors=""
     for m in $(machine | sort -h | sed "/qemu[^[:space:]]*/d"); do
         vendor=${m%%/*}
@@ -111,7 +118,7 @@ if [ "$1" == "machines" ]; then
         fi
         echo "  * $machine"
     done
-    exit
+    ${EXIT_CMD}
 fi
 
 if [ -z "$ZSH_NAME" ] && [ "$(basename -- "$0")" = "setup" ]; then
