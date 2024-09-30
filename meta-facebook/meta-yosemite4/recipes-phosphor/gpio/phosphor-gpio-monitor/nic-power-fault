@@ -1,0 +1,88 @@
+#!/bin/bash
+
+hex_to_binary ()
+{
+    case $1 in
+    "0")
+    echo "0000"
+    ;;
+    "1")
+    echo "0001"
+    ;;
+    "2")
+    echo "0010"
+    ;;
+    "3")
+    echo "0011"
+    ;;
+    "4")
+    echo "0100"
+    ;;
+    "5")
+    echo "0101"
+    ;;
+    "6")
+    echo "0110"
+    ;;
+    "7")
+    echo "0111"
+    ;;
+    "8")
+    echo "1000"
+    ;;
+    "9")
+    echo "1001"
+    ;;
+    "a")
+    echo "1010"
+    ;;
+    "b")
+    echo "1011"
+    ;;
+    "c")
+    echo "1100"
+    ;;
+    "d")
+    echo "1101"
+    ;;
+    "e")
+    echo "1110"
+    ;;
+    "f")
+    echo "1111"
+    ;;
+    esac
+}
+
+hex_string_to_binary ()
+{
+    hex_string=$1
+    len=${#hex_string}
+    if [ "$len" != "4" ]
+    then
+        return 1
+    fi
+
+    h1=$(hex_to_binary "${hex_string:2:1}")
+    h2=$(hex_to_binary "${hex_string:3:1}")
+    echo "$h1$h2"
+}
+
+# i2ctranster to get CPLD IOE (0x25) addr 0x01 (port1, power fault)
+read -r FAULT_BYTE <<< "$(i2ctransfer -f -y 28 w1@0x25 0x01 r1)"
+
+# convert hex to binary
+FAULT_BIN=$(hex_string_to_binary "$FAULT_BYTE")
+
+# check bit 0~3: NICx_power_fault
+for i in 7 6 5 4; do
+    if [ "${FAULT_BIN:$i:1}" -ne "0" ]; then
+        nic=$((7-i))
+        MESSAGE="NIC$nic Power Fault"
+
+        busctl call \
+        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
+        xyz.openbmc_project.Logging.Entry.Level.Error 1 "$MESSAGE" "1"
+    fi
+done

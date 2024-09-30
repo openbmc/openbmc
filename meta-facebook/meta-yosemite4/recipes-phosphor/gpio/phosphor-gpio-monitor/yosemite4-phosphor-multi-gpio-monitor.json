@@ -385,5 +385,15 @@
                 "fan-board-efuse-fault@0.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "ALT_SMB_BMC_CPLD2_N",
+        "LineName": "ALT_SMB_BMC_CPLD2_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "nic-power-fault@0.service"]
+        },
+        "Continue": true
     }
 ]

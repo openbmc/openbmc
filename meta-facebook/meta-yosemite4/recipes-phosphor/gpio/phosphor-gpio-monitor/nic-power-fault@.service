@@ -1,0 +1,7 @@
+[Unit]
+Description=nic-power-fault
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/nic-power-fault
+SyslogIdentifier=nic-power-fault
