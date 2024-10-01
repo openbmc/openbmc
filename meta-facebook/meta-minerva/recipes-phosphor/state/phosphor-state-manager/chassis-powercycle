@@ -44,7 +44,7 @@ compute-blade-hsc-power-control() {
         return 1
     fi
 
-    for i in {0..15}
+    for i in {1..16}
     do
         set_gpio "PWREN_MTIA_BLADE${i}_HSC_EN_N" $val
     done
@@ -60,7 +60,7 @@ network-blade-hsc-power-control() {
         return 1
     fi
     
-    for i in {0..5}
+    for i in {1..6}
     do
         set_gpio "PWREN_NW_BLADE${i}_HSC_EN_N" $val
     done
@@ -79,8 +79,6 @@ then
     compute-blade-hsc-power-control "off"
     network-blade-hsc-power-control "off"
     sleep 0.2 # 200ms
-    compute-blade-hsc-power-control "on"
-    network-blade-hsc-power-control "on"
     cmm-hsc-power-cycle
 else
     echo "Invalid CMM Cycle"
