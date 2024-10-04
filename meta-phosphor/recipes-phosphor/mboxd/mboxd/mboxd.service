@@ -7,7 +7,8 @@ After=xyz.openbmc_project.Control.Host.service
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/env mboxd --flash {FLASH_SIZE} --window-size 1M --window-num {WINDOW_NUM}
+EnvironmentFile=-/etc/default/mboxd
+ExecStart=/usr/bin/env mboxd --flash {FLASH_SIZE} --window-size 1M --window-num {WINDOW_NUM} $MBOXD_ARGS
 SyslogIdentifier=mboxd
 
 [Install]
