@@ -5,4 +5,4 @@ Description=Ampere service for flashing the Host firmware image
 Type=oneshot
 RemainAfterExit=no
 ExecStart=/usr/sbin/firmware_update.sh /tmp/images/%I
-TimeoutSec=300
+TimeoutSec=600
