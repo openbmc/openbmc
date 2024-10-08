@@ -575,7 +575,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -610,7 +610,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -645,7 +645,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -680,7 +680,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -715,7 +715,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -750,7 +750,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -785,7 +785,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -820,7 +820,7 @@
             ]
         ],
         "Threshold": {
-            "CriticalHigh": 40
+            "CriticalHigh": 45
         },
         "Params": {
             "DbusParam": [
@@ -858,8 +858,8 @@
         ],
         "Threshold": {
             "HardShutdownHigh": 94,
-            "CriticalHigh": 71.5,
-            "WarningHigh": 68.25
+            "CriticalHigh": 86.9,
+            "WarningHigh": 82.95
         },
         "Params": {
             "DbusParam": [
@@ -897,8 +897,8 @@
         ],
         "Threshold": {
             "HardShutdownHigh": 4512,
-            "CriticalHigh": 3432,
-            "WarningHigh": 3276
+            "CriticalHigh": 4171.2,
+            "WarningHigh": 3981.6
         },
         "Params": {
             "DbusParam": [
@@ -936,8 +936,8 @@
         ],
         "Threshold": {
             "HardShutdownHigh": 94,
-            "CriticalHigh": 71.5,
-            "WarningHigh": 68.25
+            "CriticalHigh": 86.9,
+            "WarningHigh": 82.95
         },
         "Params": {
             "DbusParam": [
@@ -975,8 +975,8 @@
         ],
         "Threshold": {
             "HardShutdownHigh": 4512,
-            "CriticalHigh": 3432,
-            "WarningHigh": 3276
+            "CriticalHigh": 4171.2,
+            "WarningHigh": 3981.6
         },
         "Params": {
             "DbusParam": [
