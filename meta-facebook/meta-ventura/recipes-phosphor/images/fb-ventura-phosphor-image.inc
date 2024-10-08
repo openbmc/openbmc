@@ -23,3 +23,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor-presence \
 "
+
+# Enable logger for sensor threshold event monitor
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+	phosphor-sel-logger \
+"
