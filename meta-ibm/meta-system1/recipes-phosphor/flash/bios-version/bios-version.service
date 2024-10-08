@@ -2,11 +2,13 @@
 Description=Update current Host FW version
 After=xyz.openbmc_project.Software.Version.service
 Wants=xyz.openbmc_project.Software.Version.service
+Wants=pch-standby.service
+After=pch-standby.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/bin/bash /usr/sbin/bios-version.sh
+ExecStart=/bin/bash /usr/libexec/bios-version.sh
 
 [Install]
 WantedBy=multi-user.target

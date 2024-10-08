@@ -10,17 +10,23 @@ RDEPENDS:${PN} += "bash flashrom"
 SRC_URI += " \
     file://bios-version.sh \
     file://bios-version.service \
+    file://pch-standby.service \
+    file://pch-standby-check.sh \
     "
 
 do_install:append() {
-    install -d ${D}/${sbindir}
-    install -m 0755 ${WORKDIR}/bios-version.sh ${D}/${sbindir}/
+    install -d ${D}${libexecdir}
+    install -m 0755 ${WORKDIR}/bios-version.sh ${D}${libexecdir}/
+    install -m 0755 ${WORKDIR}/pch-standby-check.sh ${D}${libexecdir}/
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/bios-version.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/pch-standby.service ${D}${systemd_system_unitdir}/
 }
 
 SYSTEMD_SERVICE:${PN} += "bios-version.service"
+SYSTEMD_SERVICE:${PN} += "pch-standby.service"
 
-FILES:${PN} += "${systemd_system_unitdir}/bios-version.service ${sbindir}/bios-version.sh"
+FILES:${PN} += "${systemd_system_unitdir}/bios-version.service ${libexecdir}/bios-version.sh"
+FILES:${PN} += "${systemd_system_unitdir}/pch-standby.service ${libexecdir}/pch-standby-check.sh"
 

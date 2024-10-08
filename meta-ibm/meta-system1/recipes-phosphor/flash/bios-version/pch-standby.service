@@ -1,0 +1,10 @@
+[Unit]
+Description=Wait for PCH Standby Power Sequence Completion
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/pch-standby-check.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

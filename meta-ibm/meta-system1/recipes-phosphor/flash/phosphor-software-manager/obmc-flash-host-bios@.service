@@ -1,5 +1,7 @@
 [Unit]
 Description=Flash Host Bios firmware image %I to Host
+Wants=pch-standby.service
+After=pch-standby.service
 
 [Service]
 Type=oneshot
