@@ -9,3 +9,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     ftdi-eeprom \
 "
+
+# Enable mbpoll for communicate with smart valve by modbus command
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    mbpoll \
+"
