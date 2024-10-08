@@ -4,6 +4,13 @@
             "Name": "Virtual_FANBOARD0_48V_FAN0_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -29,6 +36,13 @@
             "Name": "Virtual_FANBOARD0_48V_FAN1_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -54,6 +68,13 @@
             "Name": "Virtual_FANBOARD1_48V_FAN2_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -79,6 +100,13 @@
             "Name": "Virtual_FANBOARD1_48V_FAN3_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -104,6 +132,13 @@
             "Name": "Virtual_FANBOARD0_48V_FAN4_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -129,6 +164,13 @@
             "Name": "Virtual_FANBOARD0_48V_FAN5_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -154,6 +196,13 @@
             "Name": "Virtual_FANBOARD1_48V_FAN6_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -179,6 +228,13 @@
             "Name": "Virtual_FANBOARD1_48V_FAN7_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -204,6 +260,13 @@
             "Name": "Virtual_FANBOARD0_48V_FAN8_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -229,6 +292,13 @@
             "Name": "Virtual_FANBOARD0_48V_FAN9_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -254,6 +324,13 @@
             "Name": "Virtual_FANBOARD1_48V_FAN10_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -279,6 +356,13 @@
             "Name": "Virtual_FANBOARD1_48V_FAN11_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
