@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Deassert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i deassert" "AALC" "%i"
+SyslogIdentifier=rpu-ready-deassert

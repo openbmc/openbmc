@@ -14,3 +14,12 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     mbpoll \
 "
+# Monitor the GPIO on the system and take action.
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-gpio-monitor \
+"
+
+# Monitor gpio presence status
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-gpio-monitor-presence \
+"

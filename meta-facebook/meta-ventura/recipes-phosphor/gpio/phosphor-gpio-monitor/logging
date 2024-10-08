@@ -1,0 +1,9 @@
+#!/bin/bash
+
+MESSAGE=$1
+ARG=$2
+VAL=$3
+
+busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
+    xyz.openbmc_project.Logging.Entry.Level.Error 1 "$ARG" "$VAL"

@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Power Good Status Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i power good assert" "BLADE" "%i"
+SyslogIdentifier=%i-power-good-assert

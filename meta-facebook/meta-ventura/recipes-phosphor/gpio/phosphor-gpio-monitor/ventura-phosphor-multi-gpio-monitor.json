@@ -1,0 +1,1025 @@
+[
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY1_N",
+        "ChipId": "2",
+        "GpioNum": 94,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-1.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY2_N",
+        "ChipId": "2",
+        "GpioNum": 96,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-2.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY3_N",
+        "ChipId": "2",
+        "GpioNum": 98,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-3.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY4_N",
+        "ChipId": "2",
+        "GpioNum": 100,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-4.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY5_N",
+        "ChipId": "2",
+        "GpioNum": 102,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-5.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY6_N",
+        "ChipId": "2",
+        "GpioNum": 104,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-6.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY7_N",
+        "ChipId": "2",
+        "GpioNum": 106,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-7.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY8_N",
+        "ChipId": "2",
+        "GpioNum": 108,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-8.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY9_N",
+        "ChipId": "2",
+        "GpioNum": 110,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-9.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY10_N",
+        "ChipId": "2",
+        "GpioNum": 112,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-10.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-10.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY11_N",
+        "ChipId": "2",
+        "GpioNum": 114,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-11.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-11.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY12_N",
+        "ChipId": "2",
+        "GpioNum": 116,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-12.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-12.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY13_N",
+        "ChipId": "2",
+        "GpioNum": 118,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-13.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-13.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY14_N",
+        "ChipId": "2",
+        "GpioNum": 120,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-14.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY15_N",
+        "ChipId": "2",
+        "GpioNum": 122,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-15.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-15.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY16_N",
+        "ChipId": "2",
+        "GpioNum": 124,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-16.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-16.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY17_N",
+        "ChipId": "2",
+        "GpioNum": 126,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-17.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-17.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_COMPUTE_TRAY18_N",
+        "ChipId": "2",
+        "GpioNum": 128,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-compute-tray-18.service"],
+            "RISING": ["leak-detect-deassert@small-leak-compute-tray-18.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY1_N",
+        "ChipId": "2",
+        "GpioNum": 130,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-1.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY2_N",
+        "ChipId": "2",
+        "GpioNum": 132,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-2.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY3_N",
+        "ChipId": "2",
+        "GpioNum": 134,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-3.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY4_N",
+        "ChipId": "2",
+        "GpioNum": 136,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-4.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY5_N",
+        "ChipId": "2",
+        "GpioNum": 138,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-5.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY6_N",
+        "ChipId": "2",
+        "GpioNum": 140,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-6.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY7_N",
+        "ChipId": "2",
+        "GpioNum": 142,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-7.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY8_N",
+        "ChipId": "2",
+        "GpioNum": 144,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-8.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMALL_LEAK_NVS_TRAY9_N",
+        "ChipId": "2",
+        "GpioNum": 146,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@small-leak-nvs-tray-9.service"],
+            "RISING": ["leak-detect-deassert@small-leak-nvs-tray-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY1_N",
+        "ChipId": "2",
+        "GpioNum": 148,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-1.service"],
+            "RISING": ["power-good-deassert@compute-tray-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY2_N",
+        "ChipId": "2",
+        "GpioNum": 150,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-2.service"],
+            "RISING": ["power-good-deassert@compute-tray-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY3_N",
+        "ChipId": "2",
+        "GpioNum": 152,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-3.service"],
+            "RISING": ["power-good-deassert@compute-tray-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY4_N",
+        "ChipId": "2",
+        "GpioNum": 154,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-4.service"],
+            "RISING": ["power-good-deassert@compute-tray-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY5_N",
+        "ChipId": "2",
+        "GpioNum": 156,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-5.service"],
+            "RISING": ["power-good-deassert@compute-tray-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY6_N",
+        "ChipId": "2",
+        "GpioNum": 158,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-6.service"],
+            "RISING": ["power-good-deassert@compute-tray-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY7_N",
+        "ChipId": "2",
+        "GpioNum": 160,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-7.service"],
+            "RISING": ["power-good-deassert@compute-tray-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY8_N",
+        "ChipId": "2",
+        "GpioNum": 162,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-8.service"],
+            "RISING": ["power-good-deassert@compute-tray-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY9_N",
+        "ChipId": "2",
+        "GpioNum": 164,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-9.service"],
+            "RISING": ["power-good-deassert@compute-tray-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY10_N",
+        "ChipId": "2",
+        "GpioNum": 166,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-10.service"],
+            "RISING": ["power-good-deassert@compute-tray-10.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY11_N",
+        "ChipId": "2",
+        "GpioNum": 168,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-11.service"],
+            "RISING": ["power-good-deassert@compute-tray-11.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY12_N",
+        "ChipId": "2",
+        "GpioNum": 170,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-12.service"],
+            "RISING": ["power-good-deassert@compute-tray-12.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY13_N",
+        "ChipId": "2",
+        "GpioNum": 172,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-13.service"],
+            "RISING": ["power-good-deassert@compute-tray-13.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY14_N",
+        "ChipId": "2",
+        "GpioNum": 174,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-14.service"],
+            "RISING": ["power-good-deassert@compute-tray-14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY15_N",
+        "ChipId": "2",
+        "GpioNum": 176,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-15.service"],
+            "RISING": ["power-good-deassert@compute-tray-15.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY16_N",
+        "ChipId": "2",
+        "GpioNum": 178,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-16.service"],
+            "RISING": ["power-good-deassert@compute-tray-16.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY17_N",
+        "ChipId": "2",
+        "GpioNum": 180,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-17.service"],
+            "RISING": ["power-good-deassert@compute-tray-17.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_COMPUTE_TRAY18_N",
+        "ChipId": "2",
+        "GpioNum": 182,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@compute-tray-18.service"],
+            "RISING": ["power-good-deassert@compute-tray-18.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY1_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 184,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-1.service"],
+            "RISING": ["power-good-deassert@nvs-tray-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY2_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 186,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-2.service"],
+            "RISING": ["power-good-deassert@nvs-tray-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY3_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 188,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-3.service"],
+            "RISING": ["power-good-deassert@nvs-tray-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY4_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 190,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-4.service"],
+            "RISING": ["power-good-deassert@nvs-tray-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY5_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 192,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-5.service"],
+            "RISING": ["power-good-deassert@nvs-tray-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY6_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 194,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-6.service"],
+            "RISING": ["power-good-deassert@nvs-tray-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY7_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 196,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-7.service"],
+            "RISING": ["power-good-deassert@nvs-tray-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY8_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 198,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-8.service"],
+            "RISING": ["power-good-deassert@nvs-tray-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_NVS_TRAY9_PWROK_N",
+        "ChipId": "2",
+        "GpioNum": 200,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["power-good-assert@nvs-tray-9.service"],
+            "RISING": ["power-good-deassert@nvs-tray-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY1_N",
+        "ChipId": "2",
+        "GpioNum": 202,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-1.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY2_N",
+        "ChipId": "2",
+        "GpioNum": 204,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-2.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY3_N",
+        "ChipId": "2",
+        "GpioNum": 206,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-3.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY4_N",
+        "ChipId": "2",
+        "GpioNum": 208,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-4.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY5_N",
+        "ChipId": "2",
+        "GpioNum": 210,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-5.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY6_N",
+        "ChipId": "2",
+        "GpioNum": 212,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-6.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY7_N",
+        "ChipId": "2",
+        "GpioNum": 214,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-7.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY8_N",
+        "ChipId": "2",
+        "GpioNum": 216,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-8.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY9_N",
+        "ChipId": "2",
+        "GpioNum": 218,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-9.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY10_N",
+        "ChipId": "2",
+        "GpioNum": 220,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-10.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-10.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY11_N",
+        "ChipId": "2",
+        "GpioNum": 222,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-11.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-11.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY12_N",
+        "ChipId": "2",
+        "GpioNum": 224,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-12.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-12.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY13_N",
+        "ChipId": "2",
+        "GpioNum": 226,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-13.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-13.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY14_N",
+        "ChipId": "2",
+        "GpioNum": 228,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-14.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY15_N",
+        "ChipId": "2",
+        "GpioNum": 230,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-15.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-15.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY16_N",
+        "ChipId": "2",
+        "GpioNum": 232,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-16.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-16.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY17_N",
+        "ChipId": "2",
+        "GpioNum": 234,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-17.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-17.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_COMPUTE_TRAY18_N",
+        "ChipId": "2",
+        "GpioNum": 236,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-compute-tray-18.service"],
+            "RISING": ["leak-detect-deassert@leak-compute-tray-18.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY1_N",
+        "ChipId": "2",
+        "GpioNum": 238,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-1.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY2_N",
+        "ChipId": "2",
+        "GpioNum": 240,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-2.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY3_N",
+        "ChipId": "2",
+        "GpioNum": 242,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-3.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY4_N",
+        "ChipId": "2",
+        "GpioNum": 244,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-4.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY5_N",
+        "ChipId": "2",
+        "GpioNum": 246,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-5.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY6_N",
+        "ChipId": "2",
+        "GpioNum": 248,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-6.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY7_N",
+        "ChipId": "2",
+        "GpioNum": 250,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-7.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY8_N",
+        "ChipId": "2",
+        "GpioNum": 252,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-8.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK_DETECT_NVS_TRAY9_N",
+        "ChipId": "2",
+        "GpioNum": 254,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-assert@leak-nvs-tray-9.service"],
+            "RISING": ["leak-detect-deassert@leak-nvs-tray-9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK0_DETECT",
+        "ChipId": "2",
+        "GpioNum": 34,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@leak0_detect.service"],
+            "RISING": ["leak-detect-assert@leak0_detect.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK1_DETECT",
+        "ChipId": "2",
+        "GpioNum": 36,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@leak1_detect.service"],
+            "RISING": ["leak-detect-assert@leak1_detect.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK2_DETECT",
+        "ChipId": "2",
+        "GpioNum": 38,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@leak2_detect.service"],
+            "RISING": ["leak-detect-assert@leak2_detect.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "AALC_RPU_READY",
+        "ChipId": "2",
+        "GpioNum": 32,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["rpu-ready-deassert@rpu_ready.service"],
+            "RISING": ["rpu-ready-assert@rpu_ready.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_READY_PLD_R",
+        "ChipId": "2",
+        "GpioNum": 30,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@rpu0_ready.service"],
+            "RISING": ["leak-detect-assert@rpu0_ready.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_READY_SPARE_PLD_R",
+        "ChipId": "2",
+        "GpioNum": 28,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@rpu0_ready_spare.service"],
+            "RISING": ["leak-detect-assert@rpu0_ready_spare.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_2_READY_PLD_R",
+        "ChipId": "2",
+        "GpioNum": 26,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@rpu1_ready.service"],
+            "RISING": ["leak-detect-assert@rpu1_ready.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_2_READY_SPARE_PLD_R",
+        "ChipId": "2",
+        "GpioNum": 24,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@rpu1_ready_spare.service"],
+            "RISING": ["leak-detect-assert@rpu1_ready_spare.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP",
+        "ChipId": "2",
+        "GpioNum": 22,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@it_stop_pump0.service"],
+            "RISING": ["leak-detect-assert@it_stop_pump0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP_SPARE",
+        "ChipId": "2",
+        "GpioNum": 20,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@it_stop_pump0_spare.service"],
+            "RISING": ["leak-detect-assert@it_stop_pump0_spare.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP_2",
+        "ChipId": "2",
+        "GpioNum": 18,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@it_stop_pump1.service"],
+            "RISING": ["leak-detect-assert@it_stop_pump1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP_SPARE",
+        "ChipId": "2",
+        "GpioNum": 16,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@it_stop_pump1_spare.service"],
+            "RISING": ["leak-detect-assert@it_stop_pump1_spare.service"]
+        },
+        "Continue": true
+    }
+]

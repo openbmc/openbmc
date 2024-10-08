@@ -1,0 +1,191 @@
+[
+    {
+        "Name": "PRSNT_COMPUTE_TRAY1",
+        "LineName": "PRSNT_COMPUTE_TRAY1_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY1"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY2",
+        "LineName": "PRSNT_COMPUTE_TRAY2_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY2"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY3",
+        "LineName": "PRSNT_COMPUTE_TRAY3_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY3"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY4",
+        "LineName": "PRSNT_COMPUTE_TRAY4_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY4"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY5",
+        "LineName": "PRSNT_COMPUTE_TRAY5_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY5"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY6",
+        "LineName": "PRSNT_COMPUTE_TRAY6_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY6"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY7",
+        "LineName": "PRSNT_COMPUTE_TRAY7_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY7"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY8",
+        "LineName": "PRSNT_COMPUTE_TRAY8_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY8"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY9",
+        "LineName": "PRSNT_COMPUTE_TRAY9_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY9"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY10",
+        "LineName": "PRSNT_COMPUTE_TRAY10_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY10"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY11",
+        "LineName": "PRSNT_COMPUTE_TRAY11_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY11"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY12",
+        "LineName": "PRSNT_COMPUTE_TRAY12_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY12"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY13",
+        "LineName": "PRSNT_COMPUTE_TRAY13_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY13"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY14",
+        "LineName": "PRSNT_COMPUTE_TRAY14_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY14"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY15",
+        "LineName": "PRSNT_COMPUTE_TRAY15_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY15"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY16",
+        "LineName": "PRSNT_COMPUTE_TRAY16_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY16"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY17",
+        "LineName": "PRSNT_COMPUTE_TRAY17_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY17"
+    },
+    {
+        "Name": "PRSNT_COMPUTE_TRAY18",
+        "LineName": "PRSNT_COMPUTE_TRAY18_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_COMPUTE_TRAY18"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY1",
+        "LineName": "PRSNT_NVS_TRAY1_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY1"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY2",
+        "LineName": "PRSNT_NVS_TRAY2_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY2"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY3",
+        "LineName": "PRSNT_NVS_TRAY3_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY3"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY4",
+        "LineName": "PRSNT_NVS_TRAY4_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY4"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY5",
+        "LineName": "PRSNT_NVS_TRAY5_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY5"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY6",
+        "LineName": "PRSNT_NVS_TRAY6_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY6"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY7",
+        "LineName": "PRSNT_NVS_TRAY7_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY7"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY8",
+        "LineName": "PRSNT_NVS_TRAY8_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY8"
+    },
+    {
+        "Name": "PRSNT_NVS_TRAY9",
+        "LineName": "PRSNT_NVS_TRAY9_N",
+        "ActiveLow": true,
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Ventura_RMC/PRSNT_NVS_TRAY9"
+    }
+]
