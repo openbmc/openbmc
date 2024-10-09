@@ -46,6 +46,7 @@ HOST_DEFAULT_TARGETS:append = " \
 
 HOST_DEFAULT_TARGETS:append = " \
     obmc-host-shutdown@{}.target.requires/host-graceful-poweroff@{}.service \
+    obmc-host-stop@{}.target.requires/host-force-poweroff@{}.service \
     "
 
 HOST_DEFAULT_TARGETS:remove = " \
@@ -77,6 +78,8 @@ SRC_URI:append = " \
     file://chassis-poweroff@.service \
     file://chassis-poweron \
     file://chassis-poweron@.service \
+    file://host-force-poweroff \
+    file://host-force-poweroff@.service \
     file://host-graceful-poweroff \
     file://host-graceful-poweroff@.service \
     file://host-poweron \
@@ -100,6 +103,7 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/

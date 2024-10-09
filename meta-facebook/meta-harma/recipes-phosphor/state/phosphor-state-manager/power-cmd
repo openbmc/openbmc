@@ -32,9 +32,6 @@ graceful_power_off() {
 
         # wait host power off
         sleep 10
-        if [ "$(power_status)" == "on" ]; then
-            force_power_off
-        fi
     fi
 }
 
