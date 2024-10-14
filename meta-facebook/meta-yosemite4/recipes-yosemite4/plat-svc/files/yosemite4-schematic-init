@@ -56,13 +56,4 @@ else
     set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
     set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
 fi
-
-# check adc device on medusa board
-medusa_model=$(get_product_model Medusa_Board)
-if [ "$medusa_model" = "Medusa Board ADC-RNS-ISL 12VHSC-ADI 48VHSC-INF" ]; then
-    echo 11-0044 > /sys/bus/i2c/drivers/isl28022/bind
-else
-    echo 11-0044 > /sys/bus/i2c/drivers/ina238/bind
-fi
-
 exit 0
