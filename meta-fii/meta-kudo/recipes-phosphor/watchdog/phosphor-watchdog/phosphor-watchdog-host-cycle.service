@@ -4,5 +4,5 @@ Description=Watchdog power state power hotswap
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/usr/sbin/kudo.sh rst hotswap
+ExecStart=echo "Watchdog PowerCycle Action happened (no ops)"
 SyslogIdentifier=phosphor-watchdog

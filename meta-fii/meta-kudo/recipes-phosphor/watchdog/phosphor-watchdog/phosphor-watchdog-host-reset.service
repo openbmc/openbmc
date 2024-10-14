@@ -4,5 +4,5 @@ Description=Watchdog power state reset system
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/usr/libexec/ampere-hostctrl/ampere_power_util.sh mb host_reset
+ExecStart=echo "Watchdog HardReset Action Happened (no ops)"
 SyslogIdentifier=phosphor-watchdog
