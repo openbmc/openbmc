@@ -20,8 +20,6 @@ kgetopt ()
 
 fslist="proc sys dev run"
 rodir=/mnt/rofs
-mmcdev="/dev/mmcblk0"
-rwfsdev="/dev/disk/by-partlabel/rwfs"
 
 cd /
 
@@ -36,24 +34,6 @@ mount sys sys -tsysfs
 mount proc proc -tproc
 mount tmpfs run -t tmpfs -o mode=755,nodev
 
-# Wait up to 5s for the mmc device to appear. Continue even if the count is
-# exceeded. A failure will be caught later like in the mount command.
-count=0
-while [ $count -lt 5 ]; do
-    if [ -e "${mmcdev}" ]; then
-        break
-    fi
-    sleep 1
-    count=$((count + 1))
-done
-
-# Move the secondary GPT to the end of the device if needed. Look for the GPT
-# header signature "EFI PART" located 512 bytes from the end of the device.
-if ! tail -c 512 "${mmcdev}" | hexdump -C -n 8 | grep -q "EFI PART"; then
-    sgdisk -e "${mmcdev}"
-    partprobe
-fi
-
 # There eMMC GPT labels for the rootfs are rofs-a and rofs-b, and the label for
 # the read-write partition is rwfs. Run udev to make the partition labels show
 # up. Mounting by label allows for partition numbers to change if needed.
@@ -64,6 +44,41 @@ udevadm settle --timeout=10
 # so kill the one we started above now that we have the needed
 # devices loaded
 udevadm control --exit
+
+# Get device sector size
+rwfsdev="/dev/disk/by-partlabel/rwfs"
+diskPartition=$(basename "$(readlink -f ${rwfsdev})")
+blkdevname=$(basename "$(dirname "$(realpath "/sys/class/block/${diskPartition}")")")
+blkdev="/dev/${blkdevname}"
+sector_size=$(cat "/sys/class/block/${blkdevname}/queue/hw_sector_size")
+
+# Check if any variable is missing, print error and drop to shell
+# Print the values for debugging
+echo "diskPartition: $diskPartition blkdev: $blkdev sector_size: $sector_size"
+
+if [ -z "$diskPartition" ] || [ -z "$blkdev" ] || [ -z "$sector_size" ]; then
+    echo "Error: diskPartition, blkdev, or sector_size is missing!"
+    /bin/sh
+fi
+
+# Wait up to 5s for the mmc device to appear. Continue even if the count is
+# exceeded. A failure will be caught later like in the mount command.
+count=0
+while [ $count -lt 5 ]; do
+    if [ -e "${blkdev}" ]; then
+        break
+    fi
+    echo "waiting for $blkdev"
+    sleep 1
+    count=$((count + 1))
+done
+
+# Move the secondary GPT to the end of the device if needed. Look for the GPT
+# header signature "EFI PART" located sector_size bytes from the end of the device.
+if ! tail -c "${sector_size}" "${blkdev}" | hexdump -C -n 8 | grep -q "EFI PART"; then
+    sgdisk -e "${blkdev}"
+    partprobe
+fi
 
 mkdir -p $rodir
 if ! mount /dev/disk/by-partlabel/"$(kgetopt root=PARTLABEL)" $rodir -t ext4 -o ro; then

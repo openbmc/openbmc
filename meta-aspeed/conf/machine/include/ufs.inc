@@ -1,0 +1,7 @@
+MACHINE_FEATURES:append = " mf-ufs"
+MACHINEOVERRIDES .= ":mf-ufs"
+
+# Use WIC_SECTOR_SIZE and WIC_BLOCK_SIZE to define the sizes for UFS storage.
+WIC_SECTOR_SIZE ?= "4096"
+WIC_BLOCK_SIZE ?= "4096"
+WICVARS:append = " WIC_SECTOR_SIZE WIC_BLOCK_SIZE"

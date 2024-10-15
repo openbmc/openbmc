@@ -1,0 +1,18 @@
+# short-description: Create an image for AST2700 Boot from UFS
+# long-description: Creates an UFS image for the User Data Area that can
+# be used with the Aspeed SoC family.
+#
+#  --- - ----- -------- -------- -------- -------- ------ -------
+# |GPT| | env | boot-a | boot-b | rofs-a | rofs-b | rwfs |GPT-sec|
+#  --- - ----- -------- -------- -------- -------- ------ -------
+#       ^ 1MB   24MB     24MB     160MB    160MB   16MB
+
+
+bootloader --ptable gpt
+
+part --align 4 --fixed-size 1M --source rawcopy --sourceparams="file=${DEPLOY_DIR_IMAGE}/u-boot-env.bin"
+part --fstype=ext4 --fixed-size 24M --source bootimg-partition --label boot-a --mkfs-extraopts "-b ${WIC_BLOCK_SIZE}"
+part --fstype=ext4 --fixed-size 24M --source bootimg-partition --label boot-b --mkfs-extraopts "-b ${WIC_BLOCK_SIZE}"
+part --fstype=ext4 --fixed-size 160M --source rootfs --label rofs-a --mkfs-extraopts "-b ${WIC_BLOCK_SIZE}"
+part --fstype=ext4 --fixed-size 160M --source rootfs --label rofs-b --mkfs-extraopts "-b ${WIC_BLOCK_SIZE}"
+part --fstype=ext4 --fixed-size 16M --label rwfs --mkfs-extraopts "-b ${WIC_BLOCK_SIZE}"
