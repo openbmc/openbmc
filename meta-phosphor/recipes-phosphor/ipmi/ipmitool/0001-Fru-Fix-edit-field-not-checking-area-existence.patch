@@ -63,6 +63,8 @@ change, the last 8 bytes of the FRU would be truncated which would
 result in the checksum of the final FRU area being lost which would thus
 trigger this FRU write failure.
 
+Upstream-Status: Pending
+
 Signed-off-by: Alex Schendel <alex.schendel@intel.com>
 Signed-off-by: Zhikui Ren <zhikui.ren@intel.com>
 ---

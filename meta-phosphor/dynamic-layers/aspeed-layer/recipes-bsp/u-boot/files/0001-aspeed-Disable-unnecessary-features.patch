@@ -6,6 +6,8 @@ Subject: [PATCH] aspeed: Disable unnecessary features
 Adjust board_init() to disable hardware features that we don't need
 available during normal BMC operation.
 
+Upstream-Status: Pending
+
 Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
 ---
  arch/arm/include/asm/arch-aspeed/regs-lpc.h  | 29 +++++++++++

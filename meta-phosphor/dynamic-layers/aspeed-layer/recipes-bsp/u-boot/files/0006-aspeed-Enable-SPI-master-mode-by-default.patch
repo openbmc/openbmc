@@ -10,6 +10,8 @@ It makes the SPI interface mode setting is not correct.
 
 This patch will enable the SPI master mode by default.
 
+Upstream-Status: Pending
+
 Signed-off-by: Chanh Nguyen <chanh@os.amperecomputing.com>
 ---
  board/aspeed/ast-g5/ast-g5.c | 3 +++

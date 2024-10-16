@@ -3,6 +3,8 @@ From: Patrick Williams <patrick@stwcx.xyz>
 Date: Fri, 21 Jul 2017 16:30:01 -0500
 Subject: [PATCH 2/4] config/ast-common: hack bootopts
 
+Upstream-Status: Pending
+
 Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
 ---
  include/configs/ast-common.h | 3 +++

@@ -3,6 +3,8 @@ From: Benjamin Fair <benjaminfair@google.com>
 Date: Wed, 23 Oct 2019 14:23:08 -0700
 Subject: [PATCH] Adjust paths for use with Bitbake
 
+Upstream-Status: Pending
+
 Signed-off-by: Benjamin Fair <benjaminfair@google.com>
 ---
  ImageGeneration/inputs/mergedBootBlockAndUboot.xml     | 10 +++++-----

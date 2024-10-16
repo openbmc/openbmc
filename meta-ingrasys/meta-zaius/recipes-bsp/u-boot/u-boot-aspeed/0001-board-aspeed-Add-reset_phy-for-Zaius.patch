@@ -7,6 +7,8 @@ The Broadcom PHY for the Zaius BMC requires a hard reset after RGMII
 clocks are enabled. Add reset_phy() implementation and configure it to
 be called.
 
+Upstream-Status: Pending
+
 Signed-off-by: Xo Wang <xow@google.com>
 ---
  board/aspeed/ast-g5/ast-g5.c | 19 +++++++++++++++++++

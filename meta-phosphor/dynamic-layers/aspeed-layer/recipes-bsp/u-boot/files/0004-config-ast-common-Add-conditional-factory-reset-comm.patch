@@ -8,6 +8,8 @@ mounted the rwfs. However, the variable to determine whether or not to
 do the reset is stored in the u-boot env. This is tricky to access
 before rwfs is mounted except in u-boot. So, check it before every boot.
 
+Upstream-Status: Pending
+
 Signed-off-by: Edward A. James <eajames@us.ibm.com>
 ---
  include/configs/ast-common.h | 6 +++++-

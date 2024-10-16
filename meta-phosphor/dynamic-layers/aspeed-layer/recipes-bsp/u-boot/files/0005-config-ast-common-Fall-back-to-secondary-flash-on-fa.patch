@@ -4,6 +4,8 @@ Date: Fri, 20 Apr 2018 13:29:58 +0930
 Subject: [PATCH] config/ast-common: Fall-back to secondary flash on failed
  bootm
 
+Upstream-Status: Pending
+
 Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
 ---
  include/configs/ast-common.h | 4 +++-

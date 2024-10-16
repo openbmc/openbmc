@@ -1,3 +1,5 @@
+Upstream-Status: Pending
+
 diff --git a/meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-init.sh b/meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-init.sh
 index 2a32d26ffc..a8cc76d440 100644
 --- a/obmc-init.sh

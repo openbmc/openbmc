@@ -5,6 +5,8 @@ Subject: [PATCH 1/4] configs/ast: Add redundnant env
 
 Configure ast chips to run redundant u-boot environments.
 
+Upstream-Status: Pending
+
 Signed-off-by: Edward A. James <eajames@us.ibm.com>
 ---
  include/configs/ast-common.h | 5 ++++-

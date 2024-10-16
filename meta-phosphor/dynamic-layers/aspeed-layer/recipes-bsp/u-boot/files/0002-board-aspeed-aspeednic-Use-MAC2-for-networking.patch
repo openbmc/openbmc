@@ -5,6 +5,8 @@ Subject: [PATCH 2/2] board/aspeed, aspeednic: Use MAC2 for networking
 
 Enable and select MAC2 for aspeednic.
 
+Upstream-Status: Pending
+
 Signed-off-by: Xo Wang <xow@google.com>
 ---
  drivers/net/aspeednic.c       | 4 ++--

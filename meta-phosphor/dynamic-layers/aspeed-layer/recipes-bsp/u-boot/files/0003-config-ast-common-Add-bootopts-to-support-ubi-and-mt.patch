@@ -4,6 +4,8 @@ Date: Wed, 9 Aug 2017 14:11:56 -0500
 Subject: [PATCH 3/4] config/ast-common: Add bootopts to support ubi and mtd
  partitioning
 
+Upstream-Status: Pending
+
 Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
 ---
  include/configs/ast-common.h | 19 +++++++++++++++++--

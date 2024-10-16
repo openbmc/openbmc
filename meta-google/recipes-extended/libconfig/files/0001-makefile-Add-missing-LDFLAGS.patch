@@ -3,6 +3,8 @@ From: "William A. Kennington III" <wak@google.com>
 Date: Thu, 28 May 2020 22:51:47 -0700
 Subject: [PATCH] makefile: Add missing LDFLAGS
 
+Upstream-Status: Pending
+
 ---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
