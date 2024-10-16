@@ -42,7 +42,7 @@ do_compile:append() {
         -DM_BMC_USB_IFACE="${BMC_USB_IFACE}" \
         -DM_BMC_USB_BIND_DEV="${BMC_USB_ECM_BIND_DEV}" \
         -DM_SCRIPT_INSTALL_DIR="${bindir}" \
-        ${UNPACKDIR}/usb_network.service.m4 > ${WORKDIR}/usb_network.service
+        ${UNPACKDIR}/usb_network.service.m4 > ${UNPACKDIR}/usb_network.service
   fi
 }
 

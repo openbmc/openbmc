@@ -16,11 +16,11 @@ SRC_URI:append = " file://client.conf "
 OBMC_SOL_ROUTING ?= ""
 
 do_install:append() {
-  install -m 0644 ${WORKDIR}/client.conf ${D}${sysconfdir}/${BPN}/client.conf
+  install -m 0644 ${UNPACKDIR}/client.conf ${D}${sysconfdir}/${BPN}/client.conf
 }
 
 do_install:prepend() {
-    if [ -f "${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf" ]; then
-        sed -i "s/\"OBMC_SOL_ROUTING\"/${OBMC_SOL_ROUTING}/g" ${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf
+    if [ -f "${UNPACKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf" ]; then
+        sed -i "s/\"OBMC_SOL_ROUTING\"/${OBMC_SOL_ROUTING}/g" ${UNPACKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf
     fi
 }

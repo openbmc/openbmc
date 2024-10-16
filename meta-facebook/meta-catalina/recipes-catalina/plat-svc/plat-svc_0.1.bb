@@ -21,6 +21,6 @@ SYSTEMD_SERVICE:${PN}:append = " \
 do_install() {
     CATALINA_LIBEXECDIR="${D}${libexecdir}/catalina"
     install -d ${CATALINA_LIBEXECDIR}
-    install -m 0755 ${WORKDIR}/catalina-early-sys-init ${CATALINA_LIBEXECDIR}
-    install -m 0755 ${WORKDIR}/standby-power-enable ${CATALINA_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/catalina-early-sys-init ${CATALINA_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/standby-power-enable ${CATALINA_LIBEXECDIR}
 }

@@ -5,6 +5,6 @@ SRC_URI += "\
     "
 
 do_install:append() {
-    install -m 0644 -D ${WORKDIR}/blacklist.json ${D}${datadir}/${PN}/blacklist.json
+    install -m 0644 -D ${UNPACKDIR}/blacklist.json ${D}${datadir}/${PN}/blacklist.json
 }
 

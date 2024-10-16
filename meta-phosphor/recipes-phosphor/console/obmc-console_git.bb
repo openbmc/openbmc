@@ -22,6 +22,7 @@ SRC_URI += "file://${BPN}.conf"
 SRC_URI += "file://dropbear.env"
 
 S = "${WORKDIR}/git"
+UNPACKDIR = "${WORKDIR}/sources-unpack"
 SYSTEMD_SERVICE:${PN} += " obmc-console@.service"
 
 # Include ssh service if `ssh` is in PACKAGECONFIG.

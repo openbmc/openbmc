@@ -7,7 +7,8 @@ SRC_URI += " \
   file://gbmc-net-lib.sh \
   file://gbmc-ra.sh \
   "
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 FILES:${PN} += " \
   ${datadir}/ \
@@ -21,7 +22,7 @@ RDEPENDS:${PN}:append = " \
 
 do_install() {
   install -d -m0755 ${D}${datadir}
-  install -m0644 ${S}/gbmc-net-lib.sh ${D}${datadir}/
-  install -m0644 ${S}/gbmc-ra.sh ${D}${datadir}/
+  install -m0644 ${UNPACKDIR}/gbmc-net-lib.sh ${D}${datadir}/
+  install -m0644 ${UNPACKDIR}/gbmc-ra.sh ${D}${datadir}/
 }
 

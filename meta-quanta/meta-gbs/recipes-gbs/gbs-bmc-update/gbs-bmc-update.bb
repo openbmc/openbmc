@@ -10,6 +10,9 @@ SRC_URI = " file://phosphor-ipmi-flash-bmc-verify.service \
             file://config-bmc.json \
           "
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
 
 PROVIDES += "virtual/bmc-update"

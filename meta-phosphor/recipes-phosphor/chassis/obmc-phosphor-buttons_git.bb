@@ -19,6 +19,7 @@ PR = "r1"
 SRC_URI = "git://github.com/openbmc/phosphor-buttons.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
+
 SYSTEMD_PACKAGES = "${BUTTON_PACKAGES}"
 SYSTEMD_SERVICE:${PN}-signals = "xyz.openbmc_project.Chassis.Buttons.service"
 SYSTEMD_SERVICE:${PN}-handler = "phosphor-button-handler.service"

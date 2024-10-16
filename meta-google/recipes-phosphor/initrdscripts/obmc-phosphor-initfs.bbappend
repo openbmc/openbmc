@@ -5,7 +5,7 @@ FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
 SRC_URI:append:gbmc:dev = " file://whitelist.dev"
 
 do_install:append:gbmc:dev() {
-    cat ${WORKDIR}/whitelist.dev >>${D}/whitelist
+    cat ${UNPACKDIR}/whitelist.dev >>${D}/whitelist
 }
 
 SRC_URI:append:gbmc:dev = " file://rwfs-clean-dev.patch"

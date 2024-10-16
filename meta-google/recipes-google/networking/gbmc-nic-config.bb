@@ -22,7 +22,8 @@ SRC_URI += " \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcnicdhcp.network'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-nic-dhcrelay.service.in'} \
   "
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 FILES:${PN} += " \
   ${systemd_unitdir}/network \
@@ -49,30 +50,30 @@ do_install() {
   install -d -m0755 $wantdir
 
   install -d -m0755 ${D}${libexecdir}
-  install -m0755 ${WORKDIR}/gbmc-nic-ra.sh ${D}${libexecdir}/
-  install -m0644 ${WORKDIR}/gbmc-nic-ra@.service $unitdir/
+  install -m0755 ${UNPACKDIR}/gbmc-nic-ra.sh ${D}${libexecdir}/
+  install -m0644 ${UNPACKDIR}/gbmc-nic-ra@.service $unitdir/
 
   mondir=${D}${datadir}/gbmc-ip-monitor
   install -d -m0755 $mondir
-  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${WORKDIR}/gbmc-nic-neigh.sh.in \
+  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${UNPACKDIR}/gbmc-nic-neigh.sh.in \
     >$mondir/gbmc-nic-neigh.sh
 
   uppers=
   for intf in ${GBMC_EXT_NICS}; do
-    sed "s,@IF@,$intf,g" <${WORKDIR}/50-gbmc-nic.rules.in >$nftdir/50-gbmc-$intf.rules
-    sed "s,@IF@,$intf,g" <${WORKDIR}/-bmc-nic.network.in >$netdir/-bmc-$intf.network
+    sed "s,@IF@,$intf,g" <${UNPACKDIR}/50-gbmc-nic.rules.in >$nftdir/50-gbmc-$intf.rules
+    sed "s,@IF@,$intf,g" <${UNPACKDIR}/-bmc-nic.network.in >$netdir/-bmc-$intf.network
     uppers="$uppers -u ff02::1:2%%$intf"
     ln -sv ../gbmc-nic-ra@.service $wantdir/gbmc-nic-ra@$intf.service
   done
 
   if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
-    install -m0644 ${WORKDIR}/-bmc-gbmcbrnicdhcp.network $netdir/
-    install -m0644 ${WORKDIR}/-bmc-gbmcbrnicdhcp.netdev $netdir/
-    install -m0644 ${WORKDIR}/-bmc-gbmcnicdhcp.network $netdir/
-    install -m0644 ${WORKDIR}/-bmc-gbmcnicdhcp.netdev $netdir/
-    install -m0644 ${WORKDIR}/50-gbmc-nic.rules $nftdir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrnicdhcp.network $netdir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrnicdhcp.netdev $netdir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcnicdhcp.network $netdir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcnicdhcp.netdev $netdir/
+    install -m0644 ${UNPACKDIR}/50-gbmc-nic.rules $nftdir/
 
-    sed "s,@UPPERS@,$uppers,g" <${WORKDIR}/gbmc-nic-dhcrelay.service.in \
+    sed "s,@UPPERS@,$uppers,g" <${UNPACKDIR}/gbmc-nic-dhcrelay.service.in \
       >$unitdir/gbmc-nic-dhcrelay.service
     ln -sv ../gbmc-nic-dhcrelay.service $wantdir/
   fi

@@ -20,13 +20,13 @@ gbmc_add_channel() {
   local chan="$1"
   local intf="$2"
 
-  jq --slurpfile ecfg ${WORKDIR}/gbmc_eth_config.json --arg CHAN "$chan" --arg INTF "$intf" \
-    '. + {$CHAN: ($ecfg[0] + {"name": $INTF})}' $config_json >${WORKDIR}/tmp-config.json
-  mv ${WORKDIR}/tmp-config.json $config_json
+  jq --slurpfile ecfg ${UNPACKDIR}/gbmc_eth_config.json --arg CHAN "$chan" --arg INTF "$intf" \
+    '. + {$CHAN: ($ecfg[0] + {"name": $INTF})}' $config_json >${UNPACKDIR}/tmp-config.json
+  mv ${UNPACKDIR}/tmp-config.json $config_json
 
-  jq --slurpfile ecfg ${WORKDIR}/gbmc_eth_access.json --arg CHAN "$chan" \
-    '. + {$CHAN: $ecfg[0]}' $access_json >${WORKDIR}/tmp-access.json
-  mv ${WORKDIR}/tmp-access.json $access_json
+  jq --slurpfile ecfg ${UNPACKDIR}/gbmc_eth_access.json --arg CHAN "$chan" \
+    '. + {$CHAN: $ecfg[0]}' $access_json >${UNPACKDIR}/tmp-access.json
+  mv ${UNPACKDIR}/tmp-access.json $access_json
 }
 
 # Replace a channel in config.json to add gbmcbr reporting

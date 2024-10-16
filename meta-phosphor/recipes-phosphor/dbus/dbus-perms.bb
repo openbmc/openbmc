@@ -7,6 +7,9 @@ PR = "r1"
 
 SRC_URI += "file://org.openbmc.conf"
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 inherit allarch
 inherit dbus-dir
 

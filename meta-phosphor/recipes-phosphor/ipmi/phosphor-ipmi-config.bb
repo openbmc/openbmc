@@ -15,6 +15,9 @@ SRC_URI = " \
     file://cs_privilege_levels.json \
     "
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 inherit allarch
 
 do_fetch[noexec] = "1"

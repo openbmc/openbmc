@@ -29,14 +29,14 @@ do_install:append:() {
     install -d ${D}${datadir}/${PN}
     install -d ${D}${libexecdir}/${PN}
 
-    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-monitor.json \
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
-    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json \
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-presence.json
-    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-monitor.json \
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-evt.json
-    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json \
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-presence-evt.json
-    install -m 0755 ${WORKDIR}/catalina-gpio-monitor ${D}${libexecdir}/${PN}/catalina-gpio-monitor
-    install -m 0755 ${WORKDIR}/prepare-serv-json ${D}${libexecdir}/${PN}/prepare-serv-json
+    install -m 0755 ${UNPACKDIR}/catalina-gpio-monitor ${D}${libexecdir}/${PN}/catalina-gpio-monitor
+    install -m 0755 ${UNPACKDIR}/prepare-serv-json ${D}${libexecdir}/${PN}/prepare-serv-json
 }

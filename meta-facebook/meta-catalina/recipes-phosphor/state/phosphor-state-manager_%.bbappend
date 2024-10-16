@@ -120,16 +120,16 @@ HARD_OFF_INSTFMT_CTRL=""
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${WORKDIR}/chassis-power-state-init ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-power-state-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-host += "chassis-power-state-init.conf:xyz.openbmc_project.State.Host@0.service.d/chassis-power-state-init.conf"

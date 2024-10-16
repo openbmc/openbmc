@@ -138,7 +138,7 @@ do_install:append() {
     >${D}${systemd_system_unitdir}/gbmc-ncsi-set-nicenabled.service
 
   if [ "${GBMC_DHCP_RELAY}" = "1" ]; then
-    sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-dhcrelay.service.in \
+    sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-dhcrelay.service.in \
       >${D}${systemd_system_unitdir}/gbmc-ncsi-dhcrelay.service
   fi
 
@@ -152,8 +152,8 @@ do_install:append() {
       >${D}${systemd_system_unitdir}/gbmc-ncsi-purge.service
   fi
 
-  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-ra.service.in \
-    >${WORKDIR}/gbmc-ncsi-ra.service
+  sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-ra.service.in \
+    >${UNPACKDIR}/gbmc-ncsi-ra.service
   install -m0644 ${UNPACKDIR}/gbmc-ncsi-ra.service ${D}${systemd_system_unitdir}
   install -d -m0755 ${D}${libexecdir}
   install -m0755 ${UNPACKDIR}/gbmc-ncsi-ra.sh ${D}${libexecdir}/
