@@ -4,9 +4,7 @@ Description=Power Cycle Host Server
 [Service]
 Type=oneshot
 
-ExecStart=busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Off"
 ExecStart=busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RestartCause s xyz.openbmc_project.State.Host.RestartCause.WatchdogTimer
-ExecStart=sleep 6
-ExecStart=busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.On"
+ExecStart=busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Reboot"
 
 SyslogIdentifier=phosphor-watchdog
