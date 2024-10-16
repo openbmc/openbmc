@@ -37,7 +37,7 @@ python do_merge_sensor_config () {
     import subprocess
 
     # TODO: Perform the merge in a temporary directory?
-    workdir = d.getVar('WORKDIR', True)
+    workdir = d.getVar('UNPACKDIR', True)
     nativedir = d.getVar('STAGING_DIR_NATIVE', True)
     sensoryamldir = d.getVar('sensor_yamldir', True)
     cmd = []
