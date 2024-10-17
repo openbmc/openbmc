@@ -1,0 +1,9 @@
+[Unit]
+Description=Handle chassis poweron failure for instance %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/chassis-poweron-failure %i
+
+[Install]
+WantedBy=multi-user.target

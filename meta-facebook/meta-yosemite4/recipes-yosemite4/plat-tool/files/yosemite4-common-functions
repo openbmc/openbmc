@@ -20,6 +20,26 @@ set_gpio()
     return 0
 }
 
+get_gpio()
+{
+    local NET_NAME=$1
+    local ret=2
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "get_gpio: can not find gpio, $NET_NAME"
+        return 2
+    fi
+
+    echo -n "get_gpio: get $NET_NAME"
+    if ! ret=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"); then
+        echo " failed"
+        return 2
+    fi
+
+    echo " success"
+    return "${ret}"
+}
+
 check_nuvoton_board()
 {
     set +e

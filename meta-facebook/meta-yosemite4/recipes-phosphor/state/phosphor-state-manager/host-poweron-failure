@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Handle host power state for chassis poweron failure.
+CHASSIS_ID=$1
+
+# Stop obmc-host-startmin@{}.target to avoid chassis-state-manager to set power state to On.
+/bin/systemctl stop obmc-host-startmin@"${CHASSIS_ID}".target
+
+# Set host power state to Off.
+/bin/sh -c "busctl set-property $(mapper get-service /xyz/openbmc_project/state/host"${CHASSIS_ID}") \
+    /xyz/openbmc_project/state/host${CHASSIS_ID} \
+    xyz.openbmc_project.State.Host CurrentHostState \
+    s xyz.openbmc_project.State.Host.HostState.Off"

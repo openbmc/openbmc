@@ -1,0 +1,9 @@
+[Unit]
+Description=Handle host poweron failure for instance %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/host-poweron-failure %i
+
+[Install]
+WantedBy=multi-user.target

@@ -1,5 +1,6 @@
 [Unit]
 Description=power on chassis:%i
+OnFailure=chassis-poweron-failure@%i.service
 
 [Service]
 Type=oneshot

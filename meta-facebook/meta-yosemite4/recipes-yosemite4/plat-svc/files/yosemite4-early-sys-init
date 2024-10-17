@@ -43,6 +43,14 @@ set_sd_bic_interface_to_i3c()
     done
 }
 
+# get present status of slot 1~8 and keep in /tmp/gpio/PRSNT_SB_SLOT{1~8}_N
+mkdir -p /tmp/gpio
+for slot in {1..8}
+do
+  get_gpio PRSNT_SB_SLOT"${slot}"_N
+  echo "$?" > /tmp/gpio/PRSNT_SB_SLOT"${slot}"_N
+done
+
 # set initial value for GPIO output pins
 set_gpio EN_P5V_USB_CPLD_R    1
 set_gpio EN_NIC0_POWER_BMC_R  1

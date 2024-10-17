@@ -29,16 +29,20 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
 SRC_URI:append = " \
     file://chassis-poweroff@.service \
     file://chassis-poweron@.service \
+    file://chassis-poweron-failure@.service \
     file://chassis-powercycle@.service \
     file://host-poweroff@.service \
     file://host-poweron@.service \
+    file://host-poweron-failure@.service \
     file://host-powercycle@.service \
     file://host-powerreset@.service \
     file://chassis-poweroff \
     file://chassis-poweron \
+    file://chassis-poweron-failure \
     file://chassis-powercycle \
     file://host-poweroff \
     file://host-poweron \
+    file://host-poweron-failure \
     file://host-powercycle \
     file://host-powerreset \
     file://power-cmd \
@@ -55,9 +59,11 @@ do_install:append() {
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${WORKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/chassis-poweron-failure ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/host-poweron-failure ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/

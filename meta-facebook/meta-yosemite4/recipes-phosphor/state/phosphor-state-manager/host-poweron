@@ -24,6 +24,17 @@ then
     exit 0;
 fi
 
+# Check if PRSNT_SB_SLOT{1~8}_N is exist, if not exist, continues power-on process
+if [ ! -f "/tmp/gpio/PRSNT_SB_SLOT${1}_N" ]; then
+    echo "PRSNT_SB_SLOT${1}_N is not exist, continue power-on process"
+else
+    slot_presence=$(cat /tmp/gpio/PRSNT_SB_SLOT"${1}"_N)
+    if [ "$slot_presence" -ne 0 ]; then
+        echo "Host$1 is not present, skip power-on process"
+        exit 1
+    fi
+fi
+
 # Need to ensure that the mctp connection is complete so that pldmtool can set up successfully.
 /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID"
 

@@ -25,6 +25,17 @@ then
     exit 0;
 fi
 
+# Check if PRSNT_SB_SLOT{1~8}_N is exist, if not exist, continues power-off process
+if [ ! -f "/tmp/gpio/PRSNT_SB_SLOT${1}_N" ]; then
+    echo "PRSNT_SB_SLOT${1}_N is not exist, continue power-off process"
+else
+    slot_presence=$(cat /tmp/gpio/PRSNT_SB_SLOT"${1}"_N)
+    if [ "$slot_presence" -ne 0 ]; then
+        echo "Host$1 is not present, skip power-off process"
+        exit 1
+    fi
+fi
+
 # Set state effecter state: Entity ID 0x0000 for host power control, 0x2 for power off
 EID=$(($1*10))
 pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x02 -m "$EID"

@@ -1,6 +1,7 @@
 [Unit]
 Description=power on host:%i
 Conflicts=chassis-powercycle@%i.service
+OnFailure=host-poweron-failure@%i.service
 
 [Service]
 Type=oneshot

@@ -117,6 +117,18 @@ then
                         echo "Failed to inform management CPLD that slot$1 is 12V off"
                 fi
         fi
+
+        # Check if PRSNT_SB_SLOT{1~8}_N is exist, if not exist, continues power-off process
+        if [ ! -f "/tmp/gpio/PRSNT_SB_SLOT${1}_N" ]; then
+            echo "PRSNT_SB_SLOT${1}_N is not exist, continue power-off process"
+        else
+            slot_presence=$(cat /tmp/gpio/PRSNT_SB_SLOT"${1}"_N)
+            if [ "$slot_presence" -ne 0 ]; then
+                echo "Chassis$1 is not present, skip power-off process"
+                exit 1
+            fi
+        fi
+
         chassis-power-off
         exit 0;
 else
