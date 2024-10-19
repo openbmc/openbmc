@@ -32,9 +32,6 @@ bind_i2c_device max31790 18-0021
 bind_i2c_device max31790 18-0027
 # rebind PDB FRU
 bind_i2c_device at24 21-0054
-bind_i2c_device at24 21-0054
-# rebind OSFP FRU
-bind_i2c_device at24 22-0051
 # rebind FIO FRU
 bind_i2c_device at24 23-0053
 
