@@ -1,7 +1,7 @@
 [
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD0_48V_FAN0_PWR_W",
+            "Name": "VIRTUAL_FANBOARD0_48V_FAN0_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -33,7 +33,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD0_48V_FAN1_PWR_W",
+            "Name": "VIRTUAL_FANBOARD0_48V_FAN1_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -65,7 +65,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD1_48V_FAN2_PWR_W",
+            "Name": "VIRTUAL_FANBOARD1_48V_FAN2_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -97,7 +97,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD1_48V_FAN3_PWR_W",
+            "Name": "VIRTUAL_FANBOARD1_48V_FAN3_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -129,7 +129,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD0_48V_FAN4_PWR_W",
+            "Name": "VIRTUAL_FANBOARD0_48V_FAN4_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -161,7 +161,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD0_48V_FAN5_PWR_W",
+            "Name": "VIRTUAL_FANBOARD0_48V_FAN5_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -193,7 +193,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD1_48V_FAN6_PWR_W",
+            "Name": "VIRTUAL_FANBOARD1_48V_FAN6_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -225,7 +225,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD1_48V_FAN7_PWR_W",
+            "Name": "VIRTUAL_FANBOARD1_48V_FAN7_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -257,7 +257,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD0_48V_FAN8_PWR_W",
+            "Name": "VIRTUAL_FANBOARD0_48V_FAN8_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -289,7 +289,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD0_48V_FAN9_PWR_W",
+            "Name": "VIRTUAL_FANBOARD0_48V_FAN9_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -321,7 +321,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD1_48V_FAN10_PWR_W",
+            "Name": "VIRTUAL_FANBOARD1_48V_FAN10_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -353,7 +353,7 @@
     },
     {
         "Desc": {
-            "Name": "Virtual_FANBOARD1_48V_FAN11_PWR_W",
+            "Name": "VIRTUAL_FANBOARD1_48V_FAN11_PWR_W",
             "SensorType": "power"
         },
         "Associations": [
@@ -564,7 +564,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_1_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_1_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -589,7 +589,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_10",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_1_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_1_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -599,7 +599,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_2_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_2_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -624,7 +624,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_20",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_2_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_2_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -634,7 +634,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_3_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_3_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -659,7 +659,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_30",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_3_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_3_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -669,7 +669,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_4_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_4_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -694,7 +694,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_40",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_4_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_4_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -704,7 +704,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_5_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_5_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -729,7 +729,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_50",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_5_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_5_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -739,7 +739,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_6_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_6_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -764,7 +764,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_60",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_6_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_6_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -774,7 +774,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_7_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_7_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -799,7 +799,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_70",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_7_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_7_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -809,7 +809,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_Sentinel_Dome_Slot_8_MB_FIO_TEMP_C",
+            "Name": "CALIBRATED_SENTINEL_DOME_SLOT_8_MB_FIO_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -834,7 +834,7 @@
                 {
                     "ParamName": "MB_FIO_TEMP_80",
                     "Desc": {
-                        "Name": "Sentinel_Dome_Slot_8_MB_FIO_TEMP_C",
+                        "Name": "SENTINEL_DOME_SLOT_8_MB_FIO_TEMP_C",
                         "SensorType": "temperature"
                     }
                 }
@@ -844,7 +844,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_48VHSC0_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_48VHSC0_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -883,7 +883,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_48VHSC0_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_48VHSC0_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -922,7 +922,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_48VHSC1_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_48VHSC1_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -961,7 +961,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_48VHSC1_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_48VHSC1_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1000,7 +1000,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB1_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB1_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1039,7 +1039,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB2_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB2_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1078,7 +1078,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB3_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB3_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1117,7 +1117,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB4_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB4_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1156,7 +1156,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB5_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB5_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1195,7 +1195,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB6_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB6_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1234,7 +1234,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB7_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB7_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1273,7 +1273,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB8_12VHSC_CURR_A",
+            "Name": "CALIBRATED_MEDUSA_MB8_12VHSC_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
             "MinValue": "0"
@@ -1312,7 +1312,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB1_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB1_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1351,7 +1351,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB2_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB2_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1390,7 +1390,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB3_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB3_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1429,7 +1429,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB4_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB4_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1468,7 +1468,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB5_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB5_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1507,7 +1507,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB6_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB6_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1546,7 +1546,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB7_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB7_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
@@ -1585,7 +1585,7 @@
     },
     {
         "Desc": {
-            "Name": "Calibrated_MEDUSA_MB8_12VHSC_INPUT_PWR_W",
+            "Name": "CALIBRATED_MEDUSA_MB8_12VHSC_INPUT_PWR_W",
             "SensorType": "power",
             "MaxValue": "3000",
             "MinValue": "0"
