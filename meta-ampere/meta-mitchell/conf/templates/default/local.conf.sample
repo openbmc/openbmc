@@ -12,7 +12,7 @@
 #
 # Machine Selection
 #
-MACHINE ??= "mtmitchell"
+MACHINE ??= "mtmitchell-dcscm"
 
 #
 # Where to place downloads
