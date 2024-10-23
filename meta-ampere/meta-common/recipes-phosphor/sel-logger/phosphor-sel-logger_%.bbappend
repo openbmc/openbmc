@@ -1,1 +1,1 @@
-PACKAGECONFIG:append = " log-threshold"
+PACKAGECONFIG:append = " log-threshold log-alarm"
