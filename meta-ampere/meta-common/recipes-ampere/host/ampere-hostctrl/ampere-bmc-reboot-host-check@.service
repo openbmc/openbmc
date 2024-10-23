@@ -10,6 +10,6 @@ Conflicts=obmc-chassis-poweroff@%i.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c "if [ $(busctl get-property `mapper get-service /xyz/openbmc_project/state/host0` /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState | grep -i '\.Running' | wc -l) != 0 ]; then exit 0; fi"
+ExecStart=/bin/sh -c "if [ $(busctl get-property `mapper get-service /xyz/openbmc_project/state/host0` /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState | grep -i "\\.Running" | wc -l) != 0 ]; then exit 0; fi"
 
 
