@@ -8,12 +8,15 @@ disable_i3c_hub()
     local access_file
     local current_port
     local mask=1
+    local i3c_hub_lock
 
     if [ "$unplugged_slot" -lt 5 ]; then
         hub_path="/sys/kernel/debug/i3c-hub-0-*/reg"
+        i3c_hub_lock="/tmp/i3c-hub0.lock"
         echo "Slot $unplugged_slot on i3c hub 0."
     else
         hub_path="/sys/kernel/debug/i3c-hub-1-*/reg"
+        i3c_hub_lock="/tmp/i3c-hub1.lock"
         echo "Slot $unplugged_slot on i3c hub 1."
     fi
 
@@ -25,24 +28,27 @@ disable_i3c_hub()
         fi
     done
 
-    echo "Unlock i3c hub register."
-    echo 16 > "$offset_file"
-    echo 105 > "$access_file"
+    {
+        flock -x 100
+        echo "Unlock i3c hub register."
+        echo 16 > "$offset_file"
+        echo 105 > "$access_file"
 
-    echo "Disable slot${unplugged_slot} i3c port."
-    echo 18 > "$offset_file"
-    current_port=$(cat "$access_file")
-    if [ "$unplugged_slot" -gt 4 ]; then
-        ((unplugged_slot=unplugged_slot-4))
-    fi
-    mask=$((mask << (--unplugged_slot)))
-    mask=$((~mask))
-    current_port=$((current_port & mask))
-    echo $current_port > "$access_file"
+        echo "Disable slot${unplugged_slot} i3c port."
+        echo 18 > "$offset_file"
+        current_port=$(cat "$access_file")
+        if [ "$unplugged_slot" -gt 4 ]; then
+            ((unplugged_slot=unplugged_slot-4))
+        fi
+        mask=$((mask << (--unplugged_slot)))
+        mask=$((~mask))
+        current_port=$((current_port & mask))
+        echo $current_port > "$access_file"
 
-    echo "Lock i3c hub register."
-    echo 16 > "$offset_file"
-    echo 0 > "$access_file"
+        echo "Lock i3c hub register."
+        echo 16 > "$offset_file"
+        echo 0 > "$access_file"
+    } 100>$i3c_hub_lock
 
     exit 0
 }
