@@ -2,6 +2,17 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
 source /usr/libexec/yosemite4-common-functions
 
+# We observed that the rescan service would be execute during BMC
+# boot up, and the entity-manager might remove and add inventories
+# again. It caused pldmd fail to get inventories sometimes.
+# Therefore, we temporary add bmc-ready check before we clarify the
+# and fix entity-manager unexpected behavior.
+bmc_ready=$(busctl get-property xyz.openbmc_project.State.BMC /xyz/openbmc_project/state/bmc0 xyz.openbmc_project.State.BMC CurrentBMCState | awk '{print $2}' | tr -d '"')
+if [ "$bmc_ready" != "xyz.openbmc_project.State.BMC.BMCState.Ready" ]; then
+    echo "BMC is not ready, exiting..."
+    exit 0
+fi
+
 bus=$(($1 + 15))
 
 # rescan eeprom for fru information
