@@ -20,42 +20,363 @@
         "Continue": true
     },
     {
-        "Name": "LEAK0_DETECT_R",
-        "LineName": "LEAK0_DETECT_R",
-        "EventMon": "BOTH",
+        "Name": "wSequence_Latch_State_N",
+        "LineName": "wSequence_Latch_State_N",
+        "EventMon": "FALLING",
         "Targets": {
-            "RISING": ["assert-gpio-log@LEAK0_DETECT_R.service"],
-            "FALLING": ["deassert-gpio-log@LEAK0_DETECT_R.service"]
+            "FALLING": ["assert-gpio-log@wSequence_Latch_State_N.service"]
         },
         "Continue": true
     },
     {
-        "Name": "LEAK1_DETECT_R",
-        "LineName": "LEAK1_DETECT_R",
-        "EventMon": "BOTH",
+        "Name": "wP12V_N1N2_RUNTIME_FLT_N",
+        "LineName": "wP12V_N1N2_RUNTIME_FLT_N",
+        "EventMon": "FALLING",
         "Targets": {
-            "RISING": ["assert-gpio-log@LEAK1_DETECT_R.service"],
-            "FALLING": ["deassert-gpio-log@LEAK1_DETECT_R.service"]
+            "FALLING": ["assert-gpio-log@wP12V_N1N2_RUNTIME_FLT_N.service"]
         },
         "Continue": true
     },
     {
-        "Name": "LEAK2_DETECT_R",
-        "LineName": "LEAK2_DETECT_R",
-        "EventMon": "BOTH",
+        "Name": "wP12V_FAN_RUNTIME_FLT_N",
+        "LineName": "wP12V_FAN_RUNTIME_FLT_N",
+        "EventMon": "FALLING",
         "Targets": {
-            "RISING": ["assert-gpio-log@LEAK2_DETECT_R.service"],
-            "FALLING": ["deassert-gpio-log@LEAK2_DETECT_R.service"]
+            "FALLING": ["assert-gpio-log@wP12V_FAN_RUNTIME_FLT_N.service"]
         },
         "Continue": true
     },
     {
-        "Name": "LEAK3_DETECT_R",
-        "LineName": "LEAK3_DETECT_R",
-        "EventMon": "BOTH",
+        "Name": "wHost_PERST_SEQPWR_FLT_N",
+        "LineName": "wHost_PERST_SEQPWR_FLT_N",
+        "EventMon": "FALLING",
         "Targets": {
-            "RISING": ["assert-gpio-log@LEAK3_DETECT_R.service"],
-            "FALLING": ["deassert-gpio-log@LEAK3_DETECT_R.service"]
+            "FALLING": ["assert-gpio-log@wHost_PERST_SEQPWR_FLT_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_AUX_RUNTIME_FLT_N",
+        "LineName": "wP12V_AUX_RUNTIME_FLT_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_AUX_RUNTIME_FLT_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_N1N2_SEQPWR_FLT_N",
+        "LineName": "wP12V_N1N2_SEQPWR_FLT_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_N1N2_SEQPWR_FLT_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_FAN_SEQPWR_FLT_N",
+        "LineName": "wP12V_FAN_SEQPWR_FLT_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_FAN_SEQPWR_FLT_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_AUX_SEQPWR_FLT_N",
+        "LineName": "wP12V_AUX_SEQPWR_FLT_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_AUX_SEQPWR_FLT_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_RUNTIME_FLT_NIC1_N",
+        "LineName": "wP12V_RUNTIME_FLT_NIC1_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_RUNTIME_FLT_NIC1_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wAUX_RUNTIME_FLT_NIC1_N",
+        "LineName": "wAUX_RUNTIME_FLT_NIC1_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wAUX_RUNTIME_FLT_NIC1_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_SEQPWR_FLT_NIC1_N",
+        "LineName": "wP12V_SEQPWR_FLT_NIC1_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_SEQPWR_FLT_NIC1_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wAUX_SEQPWR_FLT_NIC1_N",
+        "LineName": "wAUX_SEQPWR_FLT_NIC1_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wAUX_SEQPWR_FLT_NIC1_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_RUNTIME_FLT_NIC0_N",
+        "LineName": "wP12V_RUNTIME_FLT_NIC0_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_RUNTIME_FLT_NIC0_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wAUX_RUNTIME_FLT_NIC0_N",
+        "LineName": "wAUX_RUNTIME_FLT_NIC0_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wAUX_RUNTIME_FLT_NIC0_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP12V_SEQPWR_FLT_NIC0_N",
+        "LineName": "wP12V_SEQPWR_FLT_NIC0_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wP12V_SEQPWR_FLT_NIC0_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wAUX_SEQPWR_FLT_NIC0_N",
+        "LineName": "wAUX_SEQPWR_FLT_NIC0_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@wAUX_SEQPWR_FLT_NIC0_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_P12V_NIC1_FLTB_R_N",
+        "LineName": "FM_P12V_NIC1_FLTB_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@FM_P12V_NIC1_FLTB_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_P3V3_NIC1_FAULT_R_N",
+        "LineName": "FM_P3V3_NIC1_FAULT_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@FM_P3V3_NIC1_FAULT_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_P12V_NIC0_FLTB_R_N",
+        "LineName": "FM_P12V_NIC0_FLTB_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@FM_P12V_NIC0_FLTB_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_P3V3_NIC0_FAULT_R_N",
+        "LineName": "FM_P3V3_NIC0_FAULT_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@FM_P3V3_NIC0_FAULT_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P48V_HS2_FAULT_N_PLD",
+        "LineName": "P48V_HS2_FAULT_N_PLD",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P48V_HS2_FAULT_N_PLD.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P48V_HS1_FAULT_N_PLD",
+        "LineName": "P48V_HS1_FAULT_N_PLD",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P48V_HS1_FAULT_N_PLD.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_AUX_FAN_OC_PLD_N",
+        "LineName": "P12V_AUX_FAN_OC_PLD_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P12V_AUX_FAN_OC_PLD_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_AUX_FAN_FAULT_PLD_N",
+        "LineName": "P12V_AUX_FAN_FAULT_PLD_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P12V_AUX_FAN_FAULT_PLD_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_SYS_THROTTLE_N",
+        "LineName": "FM_SYS_THROTTLE_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@FM_SYS_THROTTLE_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "OCP_V3_2_PWRBRK_FROM_HOST_ISO_P",
+        "LineName": "OCP_V3_2_PWRBRK_FROM_HOST_ISO_P",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@OCP_V3_2_PWRBRK_FROM_HOST_ISO_P.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "OCP_SFF_PWRBRK_FROM_HOST_ISO_PL",
+        "LineName": "OCP_SFF_PWRBRK_FROM_HOST_ISO_PL",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@OCP_SFF_PWRBRK_FROM_HOST_ISO_PL.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_AUX_PSU_SMB_ALERT_R_L",
+        "LineName": "P12V_AUX_PSU_SMB_ALERT_R_L",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P12V_AUX_PSU_SMB_ALERT_R_L.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_SCM_SENSE_ALERT_R_N",
+        "LineName": "P12V_SCM_SENSE_ALERT_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P12V_SCM_SENSE_ALERT_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_AUX_NIC1_SENSE_ALERT_R_N",
+        "LineName": "P12V_AUX_NIC1_SENSE_ALERT_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P12V_AUX_NIC1_SENSE_ALERT_R_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_AUX_NIC0_SENSE_ALERT_R_N",
+        "LineName": "P12V_AUX_NIC0_SENSE_ALERT_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P12V_AUX_NIC0_SENSE_ALERT_R_N.service"]
+        },
+        "Continue": true
+    },
+
+    {
+        "Name": "NODEB_PSU_SMB_ALERT_R_L",
+        "LineName": "NODEB_PSU_SMB_ALERT_R_L",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@NODEB_PSU_SMB_ALERT_R_L.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "NODEA_PSU_SMB_ALERT_R_L",
+        "LineName": "NODEA_PSU_SMB_ALERT_R_L",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@NODEA_PSU_SMB_ALERT_R_L.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P12V_AUX_FAN_ALERT_PLD_N",
+        "LineName": "P12V_AUX_FAN_ALERT_PLD_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P12V_AUX_FAN_ALERT_PLD_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P52V_SENSE_ALERT_PLD_N",
+        "LineName": "P52V_SENSE_ALERT_PLD_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@P52V_SENSE_ALERT_PLD_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CHASSIS3_LEAK_Q_N_PLD",
+        "LineName": "CHASSIS3_LEAK_Q_N_PLD",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@CHASSIS3_LEAK_Q_N_PLD.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CHASSIS2_LEAK_Q_N_PLD",
+        "LineName": "CHASSIS2_LEAK_Q_N_PLD",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@CHASSIS2_LEAK_Q_N_PLD.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CHASSIS1_LEAK_Q_N_PLD",
+        "LineName": "CHASSIS1_LEAK_Q_N_PLD",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@CHASSIS1_LEAK_Q_N_PLD.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CHASSIS0_LEAK_Q_N_PLD",
+        "LineName": "CHASSIS0_LEAK_Q_N_PLD",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@CHASSIS0_LEAK_Q_N_PLD.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "SMB_RJ45_FIO_TMP_ALERT",
+        "LineName": "SMB_RJ45_FIO_TMP_ALERT",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": ["assert-gpio-log@SMB_RJ45_FIO_TMP_ALERT.service"]
         },
         "Continue": true
     }

@@ -12,6 +12,7 @@ RDEPENDS:${PN}:append = " bash"
 FILES:${PN} += "${systemd_system_unitdir}/*"
 
 SYSTEMD_SERVICE:${PN}-monitor += " \
+    assert-gpio-log@.service \
     assert-reset-button.service \
     assert-run-power-pg.service \
     deassert-reset-button.service \

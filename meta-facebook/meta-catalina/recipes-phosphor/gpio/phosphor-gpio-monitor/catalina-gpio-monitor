@@ -49,43 +49,122 @@ do_ID_RST_BTN_BMC_N_change()
     fi
 }
 
-do_leak_detect_change()
+do_gpio_assert_log()
 {
-    if [ "$STATE" = "assert" ]; then
-        LOG_MSG="leak has been detected"
+    LOG_MSG=""
+
+    # PDB CPLD IOEXP, 14-0010, Port 0
+    if [ "$LINENAME" = "wSequence_Latch_State_N" ]; then
+        LOG_MSG="Sequence entering latch state by RMC"
+    elif [ "$LINENAME" = "wP12V_N1N2_RUNTIME_FLT_N" ]; then
+        LOG_MSG="NODEA_NODEB_PWOK_PLD_ISO_R runtime error"
+    elif [ "$LINENAME" = "wP12V_FAN_RUNTIME_FLT_N" ]; then
+        LOG_MSG="PWRGD_P12V_AUX_FAN_PLD runtime error"
+    elif [ "$LINENAME" = "wP12V_AUX_RUNTIME_FLT_N" ]; then
+        LOG_MSG="PWRGD_P12V_AUX_PLD_ISO_R runtime error"
+    elif [ "$LINENAME" = "wHost_PERST_SEQPWR_FLT_N" ]; then
+        LOG_MSG="OCP_SFF_PERST_FROM_HOST_ISO_PLD_N or OCP_V3_2_PERST_FROM_HOST_ISO_PLD_N timeout, FSM stop at state 0x01"
+    elif [ "$LINENAME" = "wP12V_N1N2_SEQPWR_FLT_N" ]; then
+        LOG_MSG="NODEA_NODEB_PWOK_PLD_ISO_R timeout, FSM stop at state 0x03"
+    elif [ "$LINENAME" = "wP12V_FAN_SEQPWR_FLT_N" ]; then
+        LOG_MSG="PWRGD_P12V_AUX_FAN_PLD timeout, FSM stop at state 0x05"
+    elif [ "$LINENAME" = "wP12V_AUX_SEQPWR_FLT_N" ]; then
+        LOG_MSG="PWRGD_P12V_AUX_PLD_ISO_R timeout, FSM stop at state 0x07"
+
+    # PDB CPLD IOEXP, 14-0010, Port 1
+    elif [ "$LINENAME" = "wP12V_RUNTIME_FLT_NIC1_N" ]; then
+        LOG_MSG="NIC1 FM_OCP_V3_2_PWR_GOOD_PLD runtime error"
+    elif [ "$LINENAME" = "wAUX_RUNTIME_FLT_NIC1_N" ]; then
+        LOG_MSG="NIC1 HP_LVC3_OCP_V3_2_PWRGD_PLD runtime error"
+    elif [ "$LINENAME" = "wP12V_SEQPWR_FLT_NIC1_N" ]; then
+        LOG_MSG="NIC1 FM_OCP_V3_2_PWR_GOOD_PLD timeout, FSM stop at state 0x03"
+    elif [ "$LINENAME" = "wAUX_SEQPWR_FLT_NIC1_N" ]; then
+        LOG_MSG="NIC1 HP_LVC3_OCP_V3_2_PWRGD_PLD timeout, FSM stop at state 0x05"
+    elif [ "$LINENAME" = "wP12V_RUNTIME_FLT_NIC0_N" ]; then
+        LOG_MSG="NIC0 FM_OCP_SFF_PWR_GOOD_PLD runtime error"
+    elif [ "$LINENAME" = "wAUX_RUNTIME_FLT_NIC0_N" ]; then
+        LOG_MSG="NIC0 HP_LVC3_OCP_V3_1_PWRGD_PLD runtime error"
+    elif [ "$LINENAME" = "wP12V_SEQPWR_FLT_NIC0_N" ]; then
+        LOG_MSG="NIC0 FM_OCP_SFF_PWR_GOOD_PLD timeout, FSM stop at state 0x03"
+    elif [ "$LINENAME" = "wAUX_SEQPWR_FLT_NIC0_N" ]; then
+        LOG_MSG="NIC0 HP_LVC3_OCP_V3_1_PWRGD_PLD timeout, FSM stop at state 0x05"
+
+    # PDB CPLD IOEXP 14-0011, Port 0
+    elif [ "$LINENAME" = "FM_P12V_NIC1_FLTB_R_N" ]; then
+        LOG_MSG="NIC1 P12V_AUX Efuse fault"
+    elif [ "$LINENAME" = "FM_P3V3_NIC1_FAULT_R_N" ]; then
+        LOG_MSG="NIC1 P3V3_AUX Efuse fault"
+    elif [ "$LINENAME" = "FM_P12V_NIC0_FLTB_R_N" ]; then
+        LOG_MSG="NIC0 P12V_AUX Efuse fault"
+    elif [ "$LINENAME" = "FM_P3V3_NIC0_FAULT_R_N" ]; then
+        LOG_MSG="NIC0 P3V3_AUX Efuse fault"
+    elif [ "$LINENAME" = "P48V_HS2_FAULT_N_PLD" ]; then
+        LOG_MSG="Hotswap Controller 2 fault"
+    elif [ "$LINENAME" = "P48V_HS1_FAULT_N_PLD" ]; then
+        LOG_MSG="Hotswap Controller 1 fault"
+    elif [ "$LINENAME" = "P12V_AUX_FAN_OC_PLD_N" ]; then
+        LOG_MSG="P12V_AUX_FAN VR OC fault"
+    elif [ "$LINENAME" = "P12V_AUX_FAN_FAULT_PLD_N" ]; then
+        LOG_MSG="P12V_AUX_FAN VR fault"
+
+    # PDB CPLD IOEXP 14-0011, Port 1
+    elif [ "$LINENAME" = "FM_SYS_THROTTLE_N" ]; then
+        LOG_MSG="System throttle"
+    elif [ "$LINENAME" = "OCP_V3_2_PWRBRK_FROM_HOST_ISO_PLD_N" ]; then
+        LOG_MSG="NIC1 PWRBRK from Host"
+    elif [ "$LINENAME" = "OCP_SFF_PWRBRK_FROM_HOST_ISO_PLD_N" ]; then
+        LOG_MSG="NIC0 PWRBRK from Host"
+
+    # PDB CPLD IOEXP 14-0012, Port 0
+    elif [ "$LINENAME" = "P12V_AUX_PSU_SMB_ALERT_R_L" ]; then
+        LOG_MSG="P12V_AUX VR alert"
+    elif [ "$LINENAME" = "P12V_SCM_SENSE_ALERT_R_N" ]; then
+        LOG_MSG="P12V_BMC power monitor alert"
+    elif [ "$LINENAME" = "P12V_AUX_NIC1_SENSE_ALERT_R_N" ]; then
+        LOG_MSG="P12V_AUX_NIC1 power monitor alert"
+    elif [ "$LINENAME" = "P12V_AUX_NIC0_SENSE_ALERT_R_N" ]; then
+        LOG_MSG="P12V_AUX_NIC0 power monitor alert"
+    elif [ "$LINENAME" = "NODEB_PSU_SMB_ALERT_R_L" ]; then
+        LOG_MSG="CPU1 P12V_N2_VOUT VR alert"
+    elif [ "$LINENAME" = "NODEA_PSU_SMB_ALERT_R_L" ]; then
+        LOG_MSG="CPU0 P12V_N1_VOUT VR alert"
+    elif [ "$LINENAME" = "P12V_AUX_FAN_ALERT_PLD_N" ]; then
+        LOG_MSG="FAN P12V_AUX_FAN VR alert"
+    elif [ "$LINENAME" = "P52V_SENSE_ALERT_PLD_N" ]; then
+        LOG_MSG="P52V busbar power monitor alert"
+
+    # PDB CPLD IOEXP 14-0012, Port 1
+    elif [ "$LINENAME" = "CHASSIS3_LEAK_Q_N_PLD" ]; then
+        LOG_MSG="Large leakage alert, leak cable 3"
+    elif [ "$LINENAME" = "CHASSIS2_LEAK_Q_N_PLD" ]; then
+        LOG_MSG="Small leakage alert, leak cable 2"
+    elif [ "$LINENAME" = "CHASSIS1_LEAK_Q_N_PLD" ]; then
+        LOG_MSG="Large leakage alert, leak cable 1"
+    elif [ "$LINENAME" = "CHASSIS0_LEAK_Q_N_PLD" ]; then
+        LOG_MSG="Small leakage alert, leak cable 0"
+    elif [ "$LINENAME" = "" ]; then
+        LOG_MSG=""
+    elif [ "$LINENAME" = "SMB_RJ45_FIO_TMP_ALERT" ]; then
+        LOG_MSG="FIO board tempreture sensor alert"
     else
-        LOG_MSG="leak has been recoverd"
+        echo "Unexpected LINENAME = $LINENAME, assert"
+        return 1
     fi
 
-    case "$LINENAME" in
-        "LEAK0_DETECT_R" | "LEAK2_DETECT_R")
-            LOG_MSG="A large $LOG_MSG at location $LINENAME"
-            ;;
-        "LEAK1_DETECT_R" | "LEAK3_DETECT_R")
-            LOG_MSG="A small $LOG_MSG at location $LINENAME"
-            ;;
-        *)
-            return 0
-            ;;
-    esac
-
-    if [ "$STATE" = "assert" ]; then
-        log_error "$LOG_MSG"
-    else
-        log_info "$LOG_MSG"
-    fi
+    log_error "${LOG_MSG}"
 }
 
 case $LINENAME in
-    "RUN_POWER_PG" | "ID_RST_BTN_BMC_N")
-        FUNC_NAME="do_${LINENAME}_change"
-        "$FUNC_NAME"
+    "RUN_POWER_PG")
+        do_RUN_POWER_PG_change
         ;;
-    "LEAK0_DETECT_R" | "LEAK1_DETECT_R" | "LEAK2_DETECT_R" | "LEAK3_DETECT_R")
-        do_leak_detect_change
+    "ID_RST_BTN_BMC_N")
+        do_ID_RST_BTN_BMC_N_change
         ;;
     *)
-        echo "Unknown LINENAME = $LINENAME"
-        exit 1
-        ;;
+        if [ "$STATE" = "assert" ]; then
+            do_gpio_assert_log
+        elif [ "$STATE" = "deassert" ]; then
+            do_gpio_deassert_log
+        fi
 esac
