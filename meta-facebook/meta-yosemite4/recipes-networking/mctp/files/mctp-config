@@ -17,10 +17,13 @@ do
 done
 
 # The NICs are on the i2c bus24 to bus27.
+# Set the MTU to ETH_MIN_MTU, in range.
+
 busnum=24
 while [ $busnum -le 27 ]
 do
     mctp link set mctpi2c${busnum} up
+    mctp link set mctpi2c${busnum} mtu 68
     mctp addr add ${localEid} dev mctpi2c${busnum}
     busnum=$((busnum+1))
 done
