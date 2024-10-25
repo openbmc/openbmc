@@ -78,7 +78,7 @@ then
 
     compute-blade-hsc-power-control "off"
     network-blade-hsc-power-control "off"
-    sleep 0.2 # 200ms
+    sleep 15 # sleep 15 seconds to make sure all blades' signal is returned to CMM
     cmm-hsc-power-cycle
 else
     echo "Invalid CMM Cycle"
