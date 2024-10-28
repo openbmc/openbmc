@@ -1,16 +1,16 @@
 {
-  "1" : {
-    "access_mode" : "always_available",
-    "user_auth_disabled" : false,
-    "per_msg_auth_disabled" : false,
-    "alerting_disabled" : false,
-    "priv_limit" : "priv-admin"
-  },
-  "2" : {
-    "access_mode" : "always_available",
-    "user_auth_disabled" : false,
-    "per_msg_auth_disabled" : false,
-    "alerting_disabled" : false,
-    "priv_limit" : "priv-admin"
-  }
+    "1": {
+        "access_mode": "always_available",
+        "user_auth_disabled": false,
+        "per_msg_auth_disabled": false,
+        "alerting_disabled": false,
+        "priv_limit": "priv-admin"
+    },
+    "2": {
+        "access_mode": "always_available",
+        "user_auth_disabled": false,
+        "per_msg_auth_disabled": false,
+        "alerting_disabled": false,
+        "priv_limit": "priv-admin"
+    }
 }

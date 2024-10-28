@@ -1,8 +1,5 @@
 {
-    "inlet": [
-    ],
-    "baseboard": [
-    ],
-    "cpu": [
-    ]
+    "inlet": [],
+    "baseboard": [],
+    "cpu": []
 }

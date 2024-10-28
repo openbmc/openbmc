@@ -7,7 +7,7 @@
     "FlushEntireSELUponRollOver": 0,
     "RecordLevelSELFlushUponRollOver": 0,
     "NumberOfSELEntries": 200,
-    "TempMonitoringSamplingFreq":0,
+    "TempMonitoringSamplingFreq": 0,
     "PowerMgmtDeviceSlaveAddress": 0,
     "BMCChannelNumber": 0,
     "DeviceRivision": 0,
