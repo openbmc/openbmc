@@ -26,5 +26,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 
 # Enable logger for sensor threshold event monitor
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
-	phosphor-sel-logger \
+    phosphor-sel-logger \
 "
