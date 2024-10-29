@@ -13,7 +13,6 @@ PACKAGES = " \
         ${PN}-extras \
         ${PN}-devtools \
         ${PN}-fan-control \
-        ${PN}-fru-ipmi \
         ${PN}-health-monitor \
         ${PN}-host-state-mgmt \
         ${PN}-ikvm \
@@ -91,11 +90,6 @@ SUMMARY:${PN}-fan-control = "Fan control"
 RDEPENDS:${PN}-fan-control = " \
         ${VIRTUAL-RUNTIME_obmc-fan-control} \
         phosphor-fan-monitor \
-        "
-
-SUMMARY:${PN}-fru-ipmi = "Support for EEPROMS with IPMI FRU"
-RDEPENDS:${PN}-fru-ipmi = " \
-        fru-device \
         "
 
 SUMMARY:${PN}-health-monitor = "Support for health monitoring"

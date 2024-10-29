@@ -44,4 +44,8 @@ FILES:${PN} += " \
     "
 FILES:fru-device = "${bindir}/fru-device ${datadir}/${BPN}/blacklist.json"
 
+RRECOMMENDS:${PN} = " \
+    ${@bb.utils.contains('PACKAGECONFIG', 'ipmi-fru', 'fru-device', '', d)} \
+    "
+
 PACKAGE_BEFORE_PN = "${EXTRA_ENTITY_MANAGER_PACKAGES}"
