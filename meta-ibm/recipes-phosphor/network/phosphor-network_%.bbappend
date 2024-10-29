@@ -6,6 +6,7 @@ RDEPENDS:${PN} += "bash"
 
 OBMC_NETWORK_INTERFACES ?= "eth0"
 OBMC_NETWORK_INTERFACES:append:p10bmc = " eth1"
+OBMC_NETWORK_INTERFACES:append:system1 = " eth1 eth2"
 
 FAILOVER_TMPL = "ncsi-failover@.service"
 LINKSPEED_TMPL = "ncsi-linkspeed@.service"

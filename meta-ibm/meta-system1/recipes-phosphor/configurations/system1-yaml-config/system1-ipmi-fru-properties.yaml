@@ -13,3 +13,11 @@
         Cached: 'true'
     xyz.openbmc_project.Inventory.Item:
         Present: 'true'
+
+/system/chassis/motherboard/bmc/ethernet2:
+    xyz.openbmc_project.Inventory.Decorator.Replaceable:
+        FieldReplaceable: 'false'
+    xyz.openbmc_project.Inventory.Decorator.Cacheable:
+        Cached: 'true'
+    xyz.openbmc_project.Inventory.Item:
+        Present: 'true'
