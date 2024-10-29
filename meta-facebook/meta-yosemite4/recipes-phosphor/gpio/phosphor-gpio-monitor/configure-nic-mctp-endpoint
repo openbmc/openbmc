@@ -7,7 +7,7 @@ set_TMP421_sensor_enabled() {
     enabled_value=$1
 
     for nic_id in 0 1 2 3; do
-        busctl set-property xyz.openbmc_project.HwmonTempSensor /xyz/openbmc_project/sensors/temperature/NIC_${nic_id}_TEMP_C xyz.openbmc_project.Object.Enable Enabled b "$enabled_value" 2> /dev/null
+        busctl set-property xyz.openbmc_project.HwmonTempSensor /xyz/openbmc_project/sensors/temperature/NIC${nic_id}_TEMP_C xyz.openbmc_project.Object.Enable Enabled b "$enabled_value" 2> /dev/null
     done
 }
 
