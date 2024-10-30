@@ -3,7 +3,6 @@
 # Provide source directive to shellcheck.
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
-CHASSIS_ID=$1
 
 CHASSIS_BUS=$(($1 - 1))
 IO_EXP_P0_PWRGD_R_OUT=18
@@ -37,12 +36,22 @@ else
     fi
 fi
 
-# Need to ensure that the mctp connection is complete so that pldmtool can set up successfully.
-/usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID"
-
-# Set state effecter state: Entity ID 0x0000 for host power control, 0x1 for power on
 EID=$(($1*10))
-pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x01 -m "$EID"
+MAX_RETRY=12
+count=0
+
+while [ $count -lt $MAX_RETRY ]; do
+    # Set state effecter state: Entity ID 0x0000 for host power control, 0x1 for power on
+    resp=$(pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x01 -m "$EID" | grep "39 00 $")
+    # check BIC response with success return code
+    if [ -n "$resp" ]; then
+        break;
+    else
+        echo "Waiting EID $EID $count"
+    fi
+    sleep 5;
+    count=$((count + 1))
+done
 
 # Host power ON will trigger the BIC to configure the server board CPLD register and set the power sequence.
 # Power Sequence:
