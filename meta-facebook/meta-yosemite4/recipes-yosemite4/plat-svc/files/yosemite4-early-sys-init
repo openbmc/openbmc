@@ -34,6 +34,13 @@ set_all_fan_pwm_80_percent() {
 
 set_sd_bic_interface_to_i3c()
 {
+    if [ -z "$is_nuvoton_board" ]
+    then
+      # enable hot-join for I3C devices
+      echo "1" > /sys/bus/i3c/devices/i3c-0/hotjoin
+      echo "1" > /sys/bus/i3c/devices/i3c-1/hotjoin
+    fi
+
     for host_bus in $(seq 0 7);
     do
       GPIOCHIP=$(basename /sys/bus/i2c/devices/"$host_bus"-0023/*gpiochip*)
@@ -88,10 +95,7 @@ enable_all_fan_input
 # Set all fan PWM to 80%
 set_all_fan_pwm_80_percent
 
-if [ -n "$is_nuvoton_board" ]
-then
-    # Set interface to SD BIC to I3C for Nuvoton BMC
-    set_sd_bic_interface_to_i3c
-fi
+# Set interface to SD BIC to I3C for BMC
+set_sd_bic_interface_to_i3c
 
 exit 0
