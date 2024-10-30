@@ -1,0 +1,45 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "PGOOD",
+            "power_up_outs": [
+                {"name": "OCP_MAIN_PWREN", "polarity": true},
+                {"name": "BMC_SYS_PSON_L", "polarity": false}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "PGOOD",
+            "pin": "H3",
+            "direction": "in"
+        },
+        {
+            "name": "BMC_SYS_PSON_L",
+            "pin": "F2",
+            "direction": "out"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "I6",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "L4",
+            "direction": "both"
+        },
+        {
+            "name": "OCP_MAIN_PWREN",
+            "pin": "W1",
+            "direction": "out"
+        },
+        {
+            "name": "ID_BTN",
+            "pin": "S2",
+            "direction": "both"
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+[
+    {
+        "Name": "REBOOT_ACK",
+        "LineName": "host0-reboot-ack-n",
+        "EventMon": "FALLING",
+        "Target": "obmc-host-force-warm-reboot@0.target",
+        "Continue": true
+    },
+    {
+        "Name": "SHUTDOWN_ACK",
+        "LineName": "host0-shd-ack-n",
+        "EventMon": "FALLING",
+        "Target": "ampere-host-shutdown-ack@0.service",
+        "Continue": true
+    },
+    {
+        "Name": "S0_OVERTEMP",
+        "LineName": "s0-overtemp-n",
+        "EventMon": "FALLING",
+        "Target": "ampere_overtemp@0.service",
+        "Continue": true
+    },
+    {
+        "Name": "S0_HIGHTEMP",
+        "LineName": "s0-hightemp-n",
+        "EventMon": "BOTH",
+        "Targets": {
+          "FALLING": ["ampere_hightemp_start@0.service"],
+          "RISING": ["ampere_hightemp_stop@0.service"]
+        },
+        "Continue": true
+    }
+]

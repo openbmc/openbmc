@@ -1,0 +1,20 @@
+[
+    {
+        "Name": "CPU01",
+        "LineName": "presence-cpu0",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/motherboard/cpu0"
+    },
+    {
+        "Name": "PSU1",
+        "LineName": "presence-ps0",
+        "ActiveLow": true,
+        "Inventory": "/system/powersupply/PowerSupply0"
+    },
+    {
+        "Name": "PSU2",
+        "LineName": "presence-ps1",
+        "ActiveLow": true,
+        "Inventory": "/system/powersupply/PowerSupply1"
+    }
+]
