@@ -30,6 +30,10 @@ gpioset $(gpiofind spi-nor-access)=0       # Deassert BMC access SPI-NOR pin
 gpioset $(gpiofind host0-special-boot)=0   # Deassert SPECIAL_BOOT GPIO pin
 gpioset $(gpiofind cpu-bios-recover)=0     # BIOS recovery enable from BMC
 gpioset $(gpiofind nmi-n)=0                # Per HW design, default state should be Low
+gpioset $(gpiofind uart1-mode0)=0          # Set UART Mux to BMC
+gpioset $(gpiofind uart2-mode0)=0
+gpioset $(gpiofind uart1-mode1)=1
+gpioset $(gpiofind uart2-mode1)=1
 
 # When BMC is rebooted, because PSON_L has pull up to P3V3_STB, it changes its
 # value to HIGH. Add code to check P3V3_STB and recover PSON_L to correct state
