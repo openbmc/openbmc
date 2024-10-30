@@ -1,14 +1,27 @@
 #!/bin/bash
 
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
 # Handle chassis and host power state for chassis poweron failure.
 
 CHASSIS_ID=$1
+IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 
-# Stop obmc-chassis-poweron.target to avoid chassis-state-manager to set power state to On.
-/bin/systemctl stop obmc-chassis-poweron@"${CHASSIS_ID}".target
+GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
 
-# Set chassis power state to Off.
-/bin/sh -c "busctl set-property $(mapper get-service /xyz/openbmc_project/state/chassis"${CHASSIS_ID}") \
-    /xyz/openbmc_project/state/chassis${CHASSIS_ID} \
-    xyz.openbmc_project.State.Chassis CurrentPowerState \
-    s xyz.openbmc_project.State.Chassis.PowerState.Off"
+chassis_status=$(get_ac_on_status "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+if [ "$chassis_status" == "$STATE_OFF" ]
+then
+    # Stop obmc-chassis-poweron.target to avoid chassis-state-manager to set power state to On.
+    /bin/systemctl stop obmc-chassis-poweron@"${CHASSIS_ID}".target
+
+    # Set chassis power state to Off.
+    /bin/sh -c "busctl set-property $(mapper get-service /xyz/openbmc_project/state/chassis"${CHASSIS_ID}") \
+        /xyz/openbmc_project/state/chassis${CHASSIS_ID} \
+        xyz.openbmc_project.State.Chassis CurrentPowerState \
+        s xyz.openbmc_project.State.Chassis.PowerState.Off"
+fi

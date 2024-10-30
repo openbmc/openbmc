@@ -1,13 +1,25 @@
 #!/bin/bash
 
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
 # Handle host power state for chassis poweron failure.
 CHASSIS_ID=$1
+IO_EXP_P0_PWRGD_R_OUT=18
+IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 
-# Stop obmc-host-startmin@{}.target to avoid chassis-state-manager to set power state to On.
-/bin/systemctl stop obmc-host-startmin@"${CHASSIS_ID}".target
+GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$IO_EXP_SLOT_PWR_STATUS-0023/"*gpiochip*)
 
-# Set host power state to Off.
-/bin/sh -c "busctl set-property $(mapper get-service /xyz/openbmc_project/state/host"${CHASSIS_ID}") \
-    /xyz/openbmc_project/state/host${CHASSIS_ID} \
-    xyz.openbmc_project.State.Host CurrentHostState \
-    s xyz.openbmc_project.State.Host.HostState.Off"
+host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")
+if [ "$host_status" != "$STATE_ON" ]
+then
+    # Stop obmc-host-startmin@{}.target to avoid chassis-state-manager to set power state to On.
+    /bin/systemctl stop obmc-host-startmin@"${CHASSIS_ID}".target
+
+    # Set host power state to Off.
+    /bin/sh -c "busctl set-property $(mapper get-service /xyz/openbmc_project/state/host"${CHASSIS_ID}") \
+        /xyz/openbmc_project/state/host${CHASSIS_ID} \
+        xyz.openbmc_project.State.Host CurrentHostState \
+        s xyz.openbmc_project.State.Host.HostState.Off"
+fi

@@ -1,0 +1,6 @@
+[Unit]
+Description=Check chassis%i i3c hub
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/check-i3c-hub %i

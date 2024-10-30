@@ -4,6 +4,7 @@ Description=power off host:%i
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/phosphor-state-manager/host-poweroff %i
+Conflicts=chassis-powercycle@%i.service chassis-poweroff@%i.service chassis-poweron@%i.service host-powercycle@%i.service host-poweron@%i.service host-powerreset@%i.service
 
 [Install]
 WantedBy=obmc-host-shutdown@%i.target

@@ -1,5 +1,6 @@
 [Unit]
 Description=Host Power Reset: %i
+Conflicts=chassis-powercycle@%i.service chassis-poweroff@%i.service chassis-poweron@%i.service host-powercycle@%i.service host-poweroff@%i.service host-poweron@%i.service
 
 [Service]
 Type=oneshot

@@ -36,6 +36,7 @@ SRC_URI:append = " \
     file://host-poweron-failure@.service \
     file://host-powercycle@.service \
     file://host-powerreset@.service \
+    file://check-i3c-hub@.service \
     file://chassis-poweroff \
     file://chassis-poweron \
     file://chassis-poweron-failure \
@@ -49,6 +50,7 @@ SRC_URI:append = " \
     file://wait-until-mctp-connection-done \
     file://rescan-cxl-eid \
     file://wait-until-mctp-EID-remove \
+    file://check-i3c-hub \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -71,6 +73,7 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/wait-until-mctp-connection-done ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/wait-until-mctp-EID-remove ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/rescan-cxl-eid ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/check-i3c-hub ${D}${libexecdir}/${PN}/
 }
 
 FILES:${PN} += " ${systemd_system_unitdir}/*.service"
