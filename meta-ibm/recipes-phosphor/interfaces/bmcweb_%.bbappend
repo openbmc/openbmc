@@ -14,6 +14,11 @@ EXTRA_OEMESON:append:p10bmc = " \
     -Dredfish-allow-deprecated-power-thermal=disabled \
     -Dhypervisor-computer-system=enabled \
 "
+
+EXTRA_OEMESON:append:system1 = " \
+    -Dredfish-allow-deprecated-power-thermal=disabled \
+"
+
 PACKAGECONFIG:remove:p10bmc = "mutual-tls-auth"
 
 EXTRA_OEMESON:append:witherspoon-tacoma = " \
