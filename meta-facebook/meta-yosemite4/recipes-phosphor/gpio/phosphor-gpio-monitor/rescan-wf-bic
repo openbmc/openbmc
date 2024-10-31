@@ -3,6 +3,7 @@
 sd_eid=$(($1 * 10))
 wf_eid=$(($1 * 10 + 2))
 count=0
+busnum=$(($1 - 1))
 
 # We found one corner case is that if the rescan-wf-bic script checks a WF
 # slot and not probe MCTP EID yet, and then go to the workaround to probe
@@ -20,7 +21,7 @@ sleep 30
 # should ensure that it only executes if the Wf EID has truly not been probed.
 # Check if we got WF BIC's EID
 while [ $count -lt 12 ]; do
-    busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$wf_eid" xyz.openbmc_project.MCTP.Endpoint EID
+    busctl get-property au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/"$wf_eid" xyz.openbmc_project.MCTP.Endpoint EID
     isMctpConnect=$?;
     echo $isMctpConnect
     if [ $isMctpConnect -eq 0 ]; then
@@ -49,7 +50,7 @@ while [ $count -lt 3 ]; do
     # 02 means WF BIC ready, otherwise 01.
     if [ "$wf_ready" == "02" ]; then
         echo "WF BIC ready (status: $wf_ready), count=$count"
-        busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/BIC
+        busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} au.com.codeconstruct.MCTP.BusOwner1 SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/BIC
         status=$?
         if [ $status -ne 0 ]; then
             echo "call MCTP method SetupEndpointByConfigPath probe EID $wf_eid failed."

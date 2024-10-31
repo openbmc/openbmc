@@ -4,7 +4,7 @@ EID=$(($1*10))
 count=0
 
 while [ $count -lt 12 ]; do
-    busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$EID" xyz.openbmc_project.MCTP.Endpoint EID
+    busctl get-property au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/"$EID" xyz.openbmc_project.MCTP.Endpoint EID
     isMctpConnect=$?;
     echo $isMctpConnect
     if [ $isMctpConnect -eq 0 ]; then

@@ -5,6 +5,7 @@ sleep 30
 
 wf_eid=$(($1 * 10 + 2))
 count=0
+busnum=$(($1 - 1))
 
 # retry getting EID to maximum 60 seconds
 while [ $count -lt 15 ]; do
@@ -20,13 +21,13 @@ while [ $count -lt 15 ]; do
     cxl2_ready=$(echo "$rx_data" | awk '{print substr($10,1,2)}')
 
     if [ "$cxl1_ready" == "01" ]; then
-        if ! busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL1; then
+        if ! busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} au.com.codeconstruct.MCTP.BusOwner1 SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL1; then
             continue
         fi
     fi
 
     if [ "$cxl2_ready" == "01" ]; then
-        if ! busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL2; then
+        if ! busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} au.com.codeconstruct.MCTP.BusOwner1 SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL2; then
             continue
         fi
     fi

@@ -49,12 +49,12 @@ sleep 2
 if [ "$action" = "add" ]; then
     set_nic_sensors_enabled "false"
     echo "Adding MCTP endpoint for slot $slot"
-    busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP AssignEndpointStatic sayy "mctpi2c${bus}" 1 0x32 "$eid"
+    busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/"mctpi2c${bus}" au.com.codeconstruct.MCTP.BusOwner1 AssignEndpointStatic ayy 1 0x32 "$eid"
 
     sleep 3
     set_nic_sensors_enabled "true"
 elif [ "$action" = "remove" ]; then
     echo "Removing MCTP endpoint for slot $slot"
-    busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/${eid} au.com.CodeConstruct.MCTP.Endpoint Remove
+    busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/${eid} au.com.codeconstruct.MCTP.Endpoint1 Remove
 fi
 

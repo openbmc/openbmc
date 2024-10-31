@@ -25,11 +25,11 @@ retry_command() {
 }
 
 command="
-    busctl call xyz.openbmc_project.MCTP \
-    /xyz/openbmc_project/mctp \
-    au.com.CodeConstruct.MCTP \
+    busctl call au.com.codeconstruct.MCTP1 \
+    /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} \
+    au.com.codeconstruct.MCTP.BusOwner1 \
     LearnEndpoint \
-    say mctpi2c${busnum} 1 ${bic_addr}"
+    ay 1 ${bic_addr}"
 
 if ! retry_command "$command"; then
     echo "Failed to busctl call after $maxRetries attempts."
