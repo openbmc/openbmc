@@ -24,9 +24,9 @@ if [ "$HAS_DHCRELAY" = 1 ]; then
   systemctl restart --no-block gbmc-ncsi-dhcrelay
 fi
 
-echo 'INTF=@NCSI_IF@' >/run/gbmc-br-dhcp.env
-systemctl reset-failed gbmc-br-dhcp
-systemctl restart --no-block gbmc-br-dhcp
+echo '@NCSI_IF@' >>/run/gbmc-br-dhcp-intfs
+systemctl reset-failed gbmc-br-dhcp@@NCSI_IF@
+systemctl restart --no-block gbmc-br-dhcp@@NCSI_IF@
 
 read -r -d '' contents <<EOF
 table inet filter {

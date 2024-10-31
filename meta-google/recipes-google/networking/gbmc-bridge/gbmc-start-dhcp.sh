@@ -13,10 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-systemctl stop gbmc-br-dhcp
+systemctl stop gbmc-br-dhcp@'*'
 
 # stop dhcp term service to prevent race condition
 systemctl is-active --quiet gbmc-br-dhcp-term && systemctl stop gbmc-br-dhcp-term
 
 # start the dhcp service
-systemctl start gbmc-br-dhcp
+for intf in gbmcbr $(cat /run/gbmc-br-dhcp-intfs 2>/dev/null); do
+  systemctl start gbmc-br-dhcp@"$intf"
+done

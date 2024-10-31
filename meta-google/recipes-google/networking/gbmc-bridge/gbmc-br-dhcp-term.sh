@@ -65,7 +65,7 @@ get_dhcp_unit_json() {
 while true; do
   json="$(get_dhcp_unit_json)" || exit
   last_ms="$(echo "$json" | jq -r '.data[0].StateChangeTimestampMonotonic.data')"
-  if pid="$(cat /run/gbmc-br-dhcp.pid 2>/dev/null)"; then
+  if pid="$(cat /run/gbmc-br-dhcp.pid 2>/dev/null)" && [ -n "$pid" ]; then
     # If the DHCP configuration process is running, wait for it to finish
     echo "DHCP still running ($pid), waiting" >&2
     while [[ -e /proc/$pid ]]; do

@@ -24,7 +24,7 @@ SRC_URI += " \
   file://gbmc-br-dhcp.sh \
   file://50-gbmc-psu-hardreset.sh.in \
   file://51-gbmc-reboot.sh \
-  file://gbmc-br-dhcp.service \
+  file://gbmc-br-dhcp@.service \
   file://gbmc-br-dhcp-term.sh \
   file://gbmc-br-dhcp-term.service \
   file://gbmc-br-lib.sh \
@@ -37,6 +37,7 @@ FILES:${PN}:append = " \
   ${datadir}/gbmc-ip-monitor \
   ${datadir}/gbmc-br-dhcp \
   ${datadir}/gbmc-br-lib.sh \
+  ${systemd_system_unitdir} \
   ${systemd_unitdir}/network \
   ${sysconfdir}/nftables \
   "
@@ -53,7 +54,6 @@ RDEPENDS:${PN}:append = " \
 
 SYSTEMD_SERVICE:${PN} += " \
   gbmc-br-hostname.service \
-  gbmc-br-dhcp.service \
   gbmc-br-dhcp-term.service \
   gbmc-br-load-ip.service \
   gbmc-br-ra.service \
@@ -143,7 +143,10 @@ do_install() {
   install -m0755 ${WORKDIR}/gbmc-br-dhcp-term.sh ${D}${libexecdir}/
   install -d -m0755 ${D}${systemd_system_unitdir}
   install -m0644 ${WORKDIR}/gbmc-br-hostname.service ${D}${systemd_system_unitdir}/
-  install -m0644 ${WORKDIR}/gbmc-br-dhcp.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${WORKDIR}/gbmc-br-dhcp@.service ${D}${systemd_system_unitdir}/
+  wantdir=${D}${systemd_system_unitdir}/multi-user.target.wants
+  install -d -m0755 $wantdir
+  ln -sv ../gbmc-br-dhcp@.service $wantdir/gbmc-br-dhcp@gbmcbr.service
   install -m0644 ${WORKDIR}/gbmc-br-dhcp-term.service ${D}${systemd_system_unitdir}/
   install -m0644 ${WORKDIR}/gbmc-br-load-ip.service ${D}${systemd_system_unitdir}/
   install -d -m0755 ${D}${datadir}/gbmc-br-dhcp
