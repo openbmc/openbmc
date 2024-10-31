@@ -12,7 +12,7 @@ ExecStartPost=sleep 3
 ExecStartPost=mctp link set mctpserial0 up
 ExecStartPost=mctp addr add 8 dev mctpserial0
 ExecStartPost=mctp route add 18 via mctpserial0
-ExecStartPost=busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpoint say mctpserial0 0
+ExecStartPost=busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpserial0 au.com.codeconstruct.MCTP.BusOwner1 SetupEndpoint ay 0
 
 [Install]
 WantedBy=mctpd.service
