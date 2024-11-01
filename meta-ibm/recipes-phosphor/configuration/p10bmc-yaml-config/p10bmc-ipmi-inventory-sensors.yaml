@@ -1,0 +1,370 @@
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm0:
+  sensorID: 0x01
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm1:
+  sensorID: 0x02
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm2:
+  sensorID: 0x03
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm3:
+  sensorID: 0x04
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm4:
+  sensorID: 0x05
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm5:
+  sensorID: 0x06
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm6:
+  sensorID: 0x07
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm7:
+  sensorID: 0x08
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm8:
+  sensorID: 0x09
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm9:
+  sensorID: 0x0A
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm10:
+  sensorID: 0x0B
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm11:
+  sensorID: 0x0C
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm12:
+  sensorID: 0x0D
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm13:
+  sensorID: 0x0E
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm14:
+  sensorID: 0x0F
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm15:
+  sensorID: 0x10
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm16:
+  sensorID: 0x11
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm17:
+  sensorID: 0x12
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm18:
+  sensorID: 0x13
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm19:
+  sensorID: 0x14
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm20:
+  sensorID: 0x15
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm21:
+  sensorID: 0x16
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm22:
+  sensorID: 0x17
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm23:
+  sensorID: 0x18
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm24:
+  sensorID: 0x19
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm25:
+  sensorID: 0x1A
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm26:
+  sensorID: 0x1B
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm27:
+  sensorID: 0x1C
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm28:
+  sensorID: 0x1D
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm29:
+  sensorID: 0x1E
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm30:
+  sensorID: 0x1F
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm31:
+  sensorID: 0x20
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm32:
+  sensorID: 0x21
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm33:
+  sensorID: 0x22
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm34:
+  sensorID: 0x23
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm35:
+  sensorID: 0x24
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm36:
+  sensorID: 0x25
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm37:
+  sensorID: 0x26
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm38:
+  sensorID: 0x27
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm39:
+  sensorID: 0x28
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm40:
+  sensorID: 0x29
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm41:
+  sensorID: 0x2A
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm42:
+  sensorID: 0x2B
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm43:
+  sensorID: 0x2C
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm44:
+  sensorID: 0x2D
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm45:
+  sensorID: 0x2E
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm46:
+  sensorID: 0x2F
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm47:
+  sensorID: 0x30
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm48:
+  sensorID: 0x31
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm49:
+  sensorID: 0x32
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm50:
+  sensorID: 0x33
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm51:
+  sensorID: 0x34
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm52:
+  sensorID: 0x35
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm53:
+  sensorID: 0x36
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm54:
+  sensorID: 0x37
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm55:
+  sensorID: 0x38
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm56:
+  sensorID: 0x39
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm57:
+  sensorID: 0x3A
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm58:
+  sensorID: 0x3B
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm59:
+  sensorID: 0x3C
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm60:
+  sensorID: 0x3D
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm61:
+  sensorID: 0x3E
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm62:
+  sensorID: 0x3F
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dimm63:
+  sensorID: 0x40
+  sensorType: 0x0C
+  eventReadingType: 0x6F
+  offset: 0x04
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0:
+  sensorID: 0x41
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu1:
+  sensorID: 0x42
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0:
+  sensorID: 0x43
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1:
+  sensorID: 0x44
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm2/cpu0:
+  sensorID: 0x45
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm2/cpu1:
+  sensorID: 0x46
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm3/cpu0:
+  sensorID: 0x47
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm3/cpu1:
+  sensorID: 0x48
+  sensorType: 0x07
+  eventReadingType: 0x6F
+  offset: 0x08
+/xyz/openbmc_project/inventory/system/chassis/motherboard:
+  sensorID: 0x49
+  sensorType: 0xC7
+  eventReadingType: 0x03
+  offset: 0x00
+/xyz/openbmc_project/inventory/system:
+  sensorID: 0x4A
+  sensorType: 0x12
+  eventReadingType: 0x6F
+  offset: 0x02

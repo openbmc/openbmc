@@ -11,5 +11,7 @@ EXTRA_OEMESON:ibm-ac-server = " \
     "
 
 EXTRA_OEMESON:p10bmc = " \
+    -Dsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/p10bmc-yaml-config/ipmi-sensors.yaml \
+    -Dinvsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/p10bmc-yaml-config/ipmi-inventory-sensors.yaml \
     -Dfru-yaml-gen=${STAGING_DIR_HOST}${datadir}/p10bmc-yaml-config/ipmi-fru-read.yaml \
     "
