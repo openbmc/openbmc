@@ -55,7 +55,7 @@ sleep $((60 * wait_min))
 get_dhcp_unit_json() {
   busctl -j call \
     org.freedesktop.systemd1 \
-    /org/freedesktop/systemd1/unit/gbmc_2dbr_2ddhcp_2eservice \
+    /org/freedesktop/systemd1/unit/system_2dgbmc_5cx2dbr_5cx2ddhcp_2eslice \
     org.freedesktop.DBus.Properties \
     GetAll s org.freedesktop.systemd1.Unit
 }
@@ -103,4 +103,4 @@ while true; do
 done
 
 echo "Stopping DHCP processing" >&2
-systemctl stop --no-block gbmc-br-dhcp
+systemctl stop --no-block gbmc-br-dhcp@'*'
