@@ -3,6 +3,52 @@
 # shellcheck disable=SC2154
 # shellcheck disable=SC2046
 
+function fan_controller_init() {
+    # Check the ADT7462 driver binded before
+    ADT7462=/sys/bus/i2c/drivers/adt7462/8-005c
+    if [ -d "$ADT7462" ]; then
+        echo "Unbind the ADT7462 driver"
+        echo 8-005c > /sys/bus/i2c/drivers/adt7462/unbind
+        sleep 1
+    fi
+
+    # Set Maximum PWM duty cycle, Max PWM register 0x2c
+    i2cset -f -y 0x08 0x5c 0x2c 0xff
+
+    # Set High frequency mode 0x04, register configuration 0x02
+    val=$(i2cget -f -y 0x08 0x5c 0x02)
+    val=$((val | 0x04))
+    i2cset -f -y 0x08 0x5c 0x02 $val
+
+    # Enable TACH, register 0x07
+    i2cset -f -y 0x08 0x5c 0x07 0xff
+
+    # Set PWM Manual mode
+    for i in $(seq 0 $((4 - 1)))
+    do
+        # PWM configuration register 0x21
+        reg_pwm_cfg=$((0x21 + i))
+        val=$(i2cget -f -y 0x08 0x5c $reg_pwm_cfg)
+        val=$((val | 0xe0))
+        i2cset -f -y 0x08 0x5c $reg_pwm_cfg $val
+    done
+
+    # Setup complete 0x20, register configuration 0x01
+    val=$(i2cget -f -y 0x08 0x5c 0x01)
+    val=$((val | 0x20))
+    i2cset -f -y 0x08 0x5c 0x01 $val
+
+    # Bind ADT7462 driver
+    echo "Bind the ADT7462 driver"
+    echo 8-005c > /sys/bus/i2c/drivers/adt7462/bind
+
+    echo "Set default FAN speed to 60%"
+    for filename in /sys/class/hwmon/*/pwm[0-9]
+    do
+        echo 153 > "$filename"
+    done
+}
+
 # Setting default value for device sel and mux
 bootstatus=$(cat /sys/class/watchdog/watchdog0/bootstatus)
 if [ "$bootstatus" == '32' ]; then
@@ -49,6 +95,8 @@ else
 fi
 
 gpioset $(gpiofind host0-sysreset-n)=1
+
+fan_controller_init
 
 # Bind RTC if /dev/rtc0 is not available
 if [[ ! -e /dev/rtc0 ]]; then
