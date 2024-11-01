@@ -1,0 +1,23 @@
+[
+    {
+        "Desc":
+        {
+            "Config": "D-Bus",
+            "Type": "Maximum"
+        }
+    },
+    {
+        "Desc":
+        {
+            "Config": "D-Bus",
+            "Type": "Minimum"
+        }
+    },
+    {
+        "Desc":
+        {
+            "Config": "D-Bus",
+            "Type": "Sum"
+        }
+    }
+]
