@@ -60,6 +60,23 @@
         ]
     },
     {
+        "name": "zone0_cores",
+        "service": "xyz.openbmc_project.PSUSensor",
+        "members": [
+            "/xyz/openbmc_project/sensors/temperature/S0_SOC_Temp",
+            "/xyz/openbmc_project/sensors/temperature/S1_SOC_Temp"
+        ]
+    },
+    {
+        "name": "zone0_dimms",
+        "members": [
+            "/xyz/openbmc_project/sensors/temperature/S0_DIMMG0_Temp",
+            "/xyz/openbmc_project/sensors/temperature/S0_DIMMG1_Temp",
+            "/xyz/openbmc_project/sensors/temperature/S1_DIMMG0_Temp",
+            "/xyz/openbmc_project/sensors/temperature/S1_DIMMG1_Temp"
+        ]
+    },
+    {
         "name": "zone0_ocp",
         "members": [
             "/xyz/openbmc_project/sensors/temperature/OCP_Temp"
