@@ -2,6 +2,25 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+config_fan()
+{
+    # set fan target to possibile maximum fan speed 34560 rpm
+    if find /sys/bus/i2c/devices/*/hwmon/*/fan*_target -print -quit 2>/dev/null | grep -q .; then
+        for file in /sys/bus/i2c/devices/*/hwmon/*/fan*_target
+        do
+            echo 34560 > "${file}"
+        done
+    fi
+
+    # set fan enable
+    if find /sys/bus/i2c/devices/*/hwmon/*/fan*_enable -print -quit 2>/dev/null | grep -q .; then
+        for file in /sys/bus/i2c/devices/*/hwmon/*/fan*_enable
+        do
+            echo 1 > "${file}"
+        done
+    fi
+}
+
 # Enable standby power and bind i2c components
 /usr/libexec/catalina/standby-power-enable
 
@@ -18,5 +37,8 @@ bind_i2c_device at24 21-0054
 bind_i2c_device at24 22-0051
 # rebind FIO FRU
 bind_i2c_device at24 23-0053
+
+# Set fan target and enable all fan input as early as possible
+config_fan
 
 exit 0
