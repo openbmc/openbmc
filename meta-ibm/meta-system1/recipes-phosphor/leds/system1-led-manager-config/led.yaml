@@ -1,0 +1,146 @@
+bmc_booted:
+    power_on_led_pca955x:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'On'
+
+power_on:
+    power_on_led_pca955x:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+enclosure_identify:
+    enclosure_id_led_pca955x:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+rear_enclosure_identify:
+    led-rear-enc-id0:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+rear_enclosure_fault:
+    led-rear-enc-fault0:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+system_attention_indicator:
+    attention_led_pca955x:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+fan0_fault:
+    led-fan0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+fan1_fault:
+    led-fan0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+        
+fan2_fault:
+    led-fan0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+fan3_fault:
+    led-fan0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+fan4_fault:
+    led-fan0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+fan5_fault:
+    led-fan0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+fan6_fault:
+    led-fan0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+powersupply0_fault:
+    cffps1-58:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+powersupply1_fault:
+    cffps1-59:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+powersupply2_fault:
+    cffps1-5a:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+powersupply3_fault:
+    cffps1-5b:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+nvme_drive0_fault:
+    led-nvmed0-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+nvme_drive1_fault:
+    led-nvmed01-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+nvme_drive2_fault:
+    led-nvmed2-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
+
+nvme_drive3_fault:
+    led-nvmed3-fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'On'
