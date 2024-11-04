@@ -29,7 +29,7 @@ S = "${WORKDIR}/git"
 SYSTEMD_PACKAGES = "${PN} ${EXTRA_ENTITY_MANAGER_PACKAGES}"
 SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.EntityManager.service"
 SYSTEMD_SERVICE:fru-device = "xyz.openbmc_project.FruDevice.service"
-SYSTEMD_SERVICE:devicetree-vpd = "devicetree-vpd-parserd.service"
+SYSTEMD_SERVICE:devicetree-vpd = "devicetree-vpd-parser.service"
 SYSTEMD_AUTO_ENABLE:fru-device:ibm-power-cpu = "disable"
 
 inherit pkgconfig meson systemd python3native
@@ -48,7 +48,7 @@ FILES:${PN} += " \
     ${datadir}/dbus-1/system-services/xyz.openbmc_project.EntityManager.service \
     "
 FILES:fru-device = "${bindir}/fru-device ${datadir}/${BPN}/blacklist.json"
-FILES:devicetree-vpd = "${bindir}/devicetree-vpd-parserd"
+FILES:devicetree-vpd = "${bindir}/devicetree-vpd-parser"
 
 RRECOMMENDS:${PN} = " \
     ${@bb.utils.contains('PACKAGECONFIG', 'ipmi-fru', 'fru-device', '', d)} \
