@@ -77,6 +77,12 @@ set_gpio FM_88E6393X_BIN_UPDATE_EN_N 1
 set_gpio WATER_VALVE_CLOSED_N 1
 set_gpio BMC_READY 1
 
+# The workaround is to disable GPIO passthrough,
+# which is enabled by a hardware strap pin that is active high.
+# This design is intended for a debug presence pin,
+# so the default value is pulled high.
+devmem 0x1e6e251c 32 0
+
 power_on_led_init
 
 exit 0
