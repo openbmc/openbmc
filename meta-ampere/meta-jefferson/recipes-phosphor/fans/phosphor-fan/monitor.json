@@ -1,0 +1,76 @@
+{
+    "fans": [
+        {
+            "inventory": "/system/board/Mt_Jefferson_Motherboard/FAN0",
+            "allowed_out_of_range_time": 12,
+            "deviation": 25,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 30,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                    "name": "FAN0",
+                    "has_target": true,
+                    "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                    "target_path": "/xyz/openbmc_project/control/fanpwm/PWM0",
+                    "factor": 90,
+                    "offset": 0
+                }
+            ]
+        },
+        {
+            "inventory": "/system/board/Mt_Jefferson_Motherboard/FAN1",
+            "allowed_out_of_range_time": 12,
+            "deviation": 25,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 30,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                    "name": "FAN1",
+                    "has_target": true,
+                    "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                    "target_path": "/xyz/openbmc_project/control/fanpwm/PWM1",
+                    "factor": 90,
+                    "offset": 0
+                }
+            ]
+        },
+        {
+            "inventory": "/system/board/Mt_Jefferson_Motherboard/FAN2",
+            "allowed_out_of_range_time": 12,
+            "deviation": 25,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 30,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                    "name": "FAN2",
+                    "has_target": true,
+                    "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                    "target_path": "/xyz/openbmc_project/control/fanpwm/PWM2",
+                    "factor": 90,
+                    "offset": 0
+                }
+            ]
+        },
+        {
+            "inventory": "/system/board/Mt_Jefferson_Motherboard/FAN3",
+            "allowed_out_of_range_time": 12,
+            "deviation": 25,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 30,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                    "name": "FAN3",
+                    "has_target": true,
+                    "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                    "target_path": "/xyz/openbmc_project/control/fanpwm/PWM3",
+                    "factor": 90,
+                    "offset": 0
+                }
+            ]
+        }
+    ]
+}

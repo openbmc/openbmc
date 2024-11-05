@@ -1,0 +1,7 @@
+[
+    {
+        "name": "Power State",
+        "service": "xyz.openbmc_project.State.Chassis0",
+        "members": ["/xyz/openbmc_project/state/chassis0"]
+    }
+]

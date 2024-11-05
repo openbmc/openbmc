@@ -1,0 +1,10 @@
+[
+    {
+        "name": "0",
+        "poweron_target": 153,
+        "default_ceiling": 255,
+        "default_floor": 64,
+        "increase_delay": 1,
+        "decrease_interval": 5
+    }
+]

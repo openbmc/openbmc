@@ -1,0 +1,15 @@
+[Unit]
+Description=Phosphor-Pid-Control Margin-based Fan Control Daemon
+After=obmc-chassis-poweron@0.target xyz.openbmc_project.fansensor.service
+Conflicts=obmc-chassis-powered-off@0.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/swampd
+ExecReload=/bin/kill -HUP $MAINPID
+RestartSec=5
+StartLimitInterval=0
+Type=simple
+
+[Install]
+WantedBy=obmc-chassis-poweron@0.target

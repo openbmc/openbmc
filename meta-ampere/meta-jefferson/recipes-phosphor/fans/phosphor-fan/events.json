@@ -1,0 +1,42 @@
+[
+    {
+        "name": "Power off",
+        "groups": [
+            {
+                "name": "Power State",
+                "interface": "xyz.openbmc_project.State.Chassis",
+                "property": { "name": "CurrentPowerState" }
+            }
+        ],
+        "triggers": [
+            {
+                "class": "init",
+                "method": "get_properties"
+            },
+            {
+                "class": "poweroff",
+                "method": "get_properties"
+            },
+            {
+                "class": "signal",
+                "signal": "properties_changed"
+            }
+        ],
+        "actions": [
+            {
+                "name": "override_fan_target",
+                "groups": [
+                    {
+                        "name": "Power State",
+                        "interface": "xyz.openbmc_project.State.Chassis",
+                        "property": { "name": "CurrentPowerState" }
+                    }
+                ],
+                "count": 1,
+                "state": "xyz.openbmc_project.State.Chassis.PowerState.Off",
+                "fans": ["FAN0", "FAN1", "FAN2", "FAN3"],
+                "target": 26
+            }
+        ]
+    }
+]

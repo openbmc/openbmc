@@ -1,0 +1,54 @@
+[
+    {
+        "name": "FAN0",
+        "path": "/system/board/Mt_Jefferson_Motherboard/FAN0",
+        "methods": [
+            {
+                "type": "tach",
+                "sensors": "FAN0"
+            }
+        ],
+        "rpolicy": {
+            "type": "anyof"
+        }
+    },
+    {
+        "name": "FAN1",
+        "path": "/system/board/Mt_Jefferson_Motherboard/FAN1",
+        "methods": [
+            {
+                "type": "tach",
+                "sensors": "FAN1"
+            }
+        ],
+        "rpolicy": {
+            "type": "anyof"
+        }
+    },
+    {
+        "name": "FAN2",
+        "path": "/system/board/Mt_Jefferson_Motherboard/FAN2",
+        "methods": [
+            {
+                "type": "tach",
+                "sensors": "FAN2"
+            }
+        ],
+        "rpolicy": {
+            "type": "anyof"
+        }
+    },
+    {
+        "name": "FAN3",
+        "path": "/system/board/Mt_Jefferson_Motherboard/FAN3",
+        "methods": [
+            {
+                "type": "tach",
+                "sensors": "FAN3"
+            }
+        ],
+        "rpolicy": {
+            "type": "anyof"
+        }
+    }
+]
