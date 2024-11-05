@@ -1621,5 +1621,93 @@
             ]
         },
         "Expression": "ifNan((hsc_input_power1 + 2.5), (hsc_input_power2 * 0.505 + 3))"
+    },
+    {
+        "Desc": {
+            "Name": "SYSTEM_PLATFORM_INPUT_PWR_W",
+            "SensorType": "power"
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc_48V0_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_HSC0_48V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_48V1_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_HSC1_48V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_48V1_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_HSC1_48V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot1_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB1_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot2_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB2_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot3_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB3_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot4_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB4_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot5_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB5_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot6_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB6_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot7_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB7_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "hsc_slot8_power",
+                    "Desc": {
+                        "Name": "CALIBRATED_MEDUSA_MB8_HSC_12V_INPUT_PWR_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "hsc_48V0_power + hsc_48V1_power - hsc_slot1_power - hsc_slot2_power - hsc_slot3_power - hsc_slot4_power - hsc_slot5_power - hsc_slot6_power - hsc_slot7_power - hsc_slot8_power"
     }
 ]
