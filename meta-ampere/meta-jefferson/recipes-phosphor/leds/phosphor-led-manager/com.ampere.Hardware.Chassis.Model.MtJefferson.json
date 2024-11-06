@@ -47,6 +47,102 @@
 					"Priority": "On"
 				}
 			]
+		},
+		{
+			"group": "fan0_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
+		},
+		{
+			"group": "fan1_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
+		},
+		{
+			"group": "fan2_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
+		},
+		{
+			"group": "fan3_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
+		},
+		{
+			"group": "psu_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
+		},
+		{
+			"group": "ras_ue_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
+		},
+		{
+			"group": "overtemp_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
+		},
+		{
+			"group": "gpio_fault",
+			"members": [
+				{
+					"Name": "led_fault",
+					"Action": "On",
+					"DutyOn": 50,
+					"Period": 1000,
+					"Priority": "On"
+				}
+			]
 		}
 	]
 }
