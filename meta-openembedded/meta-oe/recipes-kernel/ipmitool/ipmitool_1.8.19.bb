@@ -21,7 +21,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9aa91e13d644326bf281924212862184"
 
 DEPENDS = "openssl readline ncurses"
-SRCREV = "ab5ce5baff097ebb6e2a17a171858be213ee68d3"
+SRCREV = "bf774149ae7f74c12164a5b021b23520c5ca4016"
 SRC_URI = "git://codeberg.org/ipmitool/ipmitool;protocol=https;branch=master \
            ${IANA_ENTERPRISE_NUMBERS} \
            file://0001-csv-revision-Drop-the-git-revision-info.patch \
