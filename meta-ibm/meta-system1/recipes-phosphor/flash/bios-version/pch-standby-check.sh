@@ -16,7 +16,7 @@ GPIO_LINE=$(echo "$GPIO_PIN" | cut -d' ' -f2)  # Extract line offset
 while true; do
     GPIO_VALUE=$(gpioget "$GPIO_CHIP" "$GPIO_LINE")
 
-    if [ "$GPIO_VALUE" -eq 1 ]; then
+    if [ "$GPIO_VALUE" -eq 0 ]; then
         echo "PCH Standby Power Sequence Complete"
         exit 0
     else
