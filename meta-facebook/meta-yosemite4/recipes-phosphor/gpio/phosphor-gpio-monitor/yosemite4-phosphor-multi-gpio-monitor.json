@@ -13,7 +13,7 @@
         "LineName": "PWRGD_SLOT1_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@1.service", "rescan-fru-ocp-setting@1.service", "rescan-wf-bic@1.service"],
+            "RISING": ["probe-slot-device@1.service", "en-i3c-hub-scan-fru@1.service", "rescan-wf-bic@1.service"],
             "FALLING": ["rescan-fru-ocp-setting@1.service"]
         },
         "Continue": true
@@ -23,7 +23,7 @@
         "LineName": "PWRGD_SLOT2_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@2.service", "rescan-fru-ocp-setting@2.service", "rescan-wf-bic@2.service"],
+            "RISING": ["probe-slot-device@2.service", "en-i3c-hub-scan-fru@2.service", "rescan-wf-bic@2.service"],
             "FALLING": ["rescan-fru-ocp-setting@2.service"]
         },
         "Continue": true
@@ -33,7 +33,7 @@
         "LineName": "PWRGD_SLOT3_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@3.service", "rescan-fru-ocp-setting@3.service", "rescan-wf-bic@3.service"],
+            "RISING": ["probe-slot-device@3.service", "en-i3c-hub-scan-fru@3.service", "rescan-wf-bic@3.service"],
             "FALLING": ["rescan-fru-ocp-setting@3.service"]
         },
         "Continue": true
@@ -43,7 +43,7 @@
         "LineName": "PWRGD_SLOT4_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@4.service", "rescan-fru-ocp-setting@4.service", "rescan-wf-bic@4.service"],
+            "RISING": ["probe-slot-device@4.service", "en-i3c-hub-scan-fru@4.service", "rescan-wf-bic@4.service"],
             "FALLING": ["rescan-fru-ocp-setting@4.service"]
         },
         "Continue": true
@@ -53,7 +53,7 @@
         "LineName": "PWRGD_SLOT5_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@5.service", "rescan-fru-ocp-setting@5.service", "rescan-wf-bic@5.service"],
+            "RISING": ["probe-slot-device@5.service", "en-i3c-hub-scan-fru@5.service", "rescan-wf-bic@5.service"],
             "FALLING": ["rescan-fru-ocp-setting@5.service"]
         },
         "Continue": true
@@ -63,7 +63,7 @@
         "LineName": "PWRGD_SLOT6_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@6.service", "rescan-fru-ocp-setting@6.service", "rescan-wf-bic@6.service"],
+            "RISING": ["probe-slot-device@6.service", "en-i3c-hub-scan-fru@6.service", "rescan-wf-bic@6.service"],
             "FALLING": ["rescan-fru-ocp-setting@6.service"]
         },
         "Continue": true
@@ -73,7 +73,7 @@
         "LineName": "PWRGD_SLOT7_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@7.service", "rescan-fru-ocp-setting@7.service", "rescan-wf-bic@7.service"],
+            "RISING": ["probe-slot-device@7.service", "en-i3c-hub-scan-fru@7.service", "rescan-wf-bic@7.service"],
             "FALLING": ["rescan-fru-ocp-setting@7.service"]
         },
         "Continue": true
@@ -83,7 +83,7 @@
         "LineName": "PWRGD_SLOT8_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@8.service", "rescan-fru-ocp-setting@8.service", "rescan-wf-bic@8.service"],
+            "RISING": ["probe-slot-device@8.service", "en-i3c-hub-scan-fru@8.service", "rescan-wf-bic@8.service"],
             "FALLING": ["rescan-fru-ocp-setting@8.service"]
         },
         "Continue": true
@@ -155,8 +155,7 @@
                 "disable-i3c-hub@1.service"
             ],
             "FALLING": [
-                "slot-hot-plug@1.service",
-                "enable-i3c-hub@1.service"
+                "slot-hot-plug@1.service"
             ]
         },
         "Continue": true
@@ -170,8 +169,7 @@
                 "disable-i3c-hub@2.service"
             ],
             "FALLING": [
-                "slot-hot-plug@2.service",
-                "enable-i3c-hub@2.service"
+                "slot-hot-plug@2.service"
             ]
         },
         "Continue": true
@@ -185,8 +183,7 @@
                 "disable-i3c-hub@3.service"
             ],
             "FALLING": [
-                "slot-hot-plug@3.service",
-                "enable-i3c-hub@3.service"
+                "slot-hot-plug@3.service"
             ]
         },
         "Continue": true
@@ -200,8 +197,7 @@
                 "disable-i3c-hub@4.service"
             ],
             "FALLING": [
-                "slot-hot-plug@4.service",
-                "enable-i3c-hub@4.service"
+                "slot-hot-plug@4.service"
             ]
         },
         "Continue": true
@@ -215,8 +211,7 @@
                 "disable-i3c-hub@5.service"
             ],
             "FALLING": [
-                "slot-hot-plug@5.service",
-                "enable-i3c-hub@5.service"
+                "slot-hot-plug@5.service"
             ]
         },
         "Continue": true
@@ -230,8 +225,7 @@
                 "disable-i3c-hub@6.service"
             ],
             "FALLING": [
-                "slot-hot-plug@6.service",
-                "enable-i3c-hub@6.service"
+                "slot-hot-plug@6.service"
             ]
         },
         "Continue": true
@@ -245,8 +239,7 @@
                 "disable-i3c-hub@7.service"
             ],
             "FALLING": [
-                "slot-hot-plug@7.service",
-                "enable-i3c-hub@7.service"
+                "slot-hot-plug@7.service"
             ]
         },
         "Continue": true
@@ -260,8 +253,7 @@
                 "disable-i3c-hub@8.service"
             ],
             "FALLING": [
-                "slot-hot-plug@8.service",
-                "enable-i3c-hub@8.service"
+                "slot-hot-plug@8.service"
             ]
         },
         "Continue": true

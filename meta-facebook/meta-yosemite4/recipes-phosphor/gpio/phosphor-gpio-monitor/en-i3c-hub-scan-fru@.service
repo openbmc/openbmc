@@ -1,0 +1,7 @@
+[Unit]
+Description=slot-en-i3c-hub-scan-fru:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/en-i3c-hub-scan-fru %i
+SyslogIdentifier=slot-en-i3c-hub-scan-fru %i

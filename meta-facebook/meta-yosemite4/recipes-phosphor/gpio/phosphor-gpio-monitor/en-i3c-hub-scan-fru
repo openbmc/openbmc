@@ -1,0 +1,101 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
+enable_i3c_hub()
+{
+    local target_slot="$1"
+    local hub_path
+    local offset_file
+    local access_file
+    local current_port
+    local mask=1
+    local i3c_hub_lock
+
+    echo "Do 12V on enable i3c-hub"
+    sleep 1
+    if [ "$target_slot" -lt 5 ]; then
+        hub_path="/sys/kernel/debug/i3c-hub-0-*/reg"
+        i3c_hub_lock="/tmp/i3c-hub0.lock"
+        echo "Slot${target_slot} on i3c hub 0."
+    else
+        hub_path="/sys/kernel/debug/i3c-hub-1-*/reg"
+        i3c_hub_lock="/tmp/i3c-hub1.lock"
+        echo "Slot${target_slot} on i3c hub 1."
+    fi
+
+    for file in $hub_path/{offset,access}; do
+        if [[ $file == *"/offset" ]]; then
+            offset_file="$file"
+        elif [[ $file == *"/access" ]]; then
+            access_file="$file"
+        fi
+    done
+
+    {
+        flock -x 100
+        echo "Unlock i3c hub register."
+        echo 16 > "$offset_file"
+        echo 105 > "$access_file"
+
+        echo "Enable slot${target_slot} i3c port."
+        echo 18 > "$offset_file"
+        current_port=$(cat "$access_file")
+        if [ "$target_slot" -gt 4 ]; then
+            ((target_slot=target_slot-4))
+        fi
+        mask=$((mask << (--target_slot)))
+        current_port=$((current_port | mask))
+        echo $current_port > "$access_file"
+        cat "$access_file"
+
+        echo "Lock i3c hub register."
+        echo 16 > "$offset_file"
+        echo 0 > "$access_file"
+    } 100>$i3c_hub_lock
+}
+
+# We observed that the rescan service would be execute during BMC
+# boot up, and the entity-manager might remove and add inventories
+# again. It caused pldmd fail to get inventories sometimes.
+# Therefore, we temporary add bmc-ready check before we clarify the
+# and fix entity-manager unexpected behavior.
+bmc_ready=$(busctl get-property xyz.openbmc_project.State.BMC /xyz/openbmc_project/state/bmc0 xyz.openbmc_project.State.BMC CurrentBMCState | awk '{print $2}' | tr -d '"')
+if [ "$bmc_ready" != "xyz.openbmc_project.State.BMC.BMCState.Ready" ]; then
+    echo "BMC is not ready, exiting..."
+    exit 0
+fi
+
+bus=$(($1 + 15))
+
+enable_i3c_hub "$1"
+sleep 2.5
+
+# rescan eeprom for fru information
+busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScanBus q $bus
+# wait for fru device to be ready
+sleep 10
+# check if Wailua Falls is present
+wailua_falls_present=$(busctl tree xyz.openbmc_project.FruDevice | grep Wailua_Falls)
+# set 48V/12V HSC OCP values
+if [ -n "$wailua_falls_present" ]; then
+    set_gpio P48V_OCP_GPIO1       0
+    set_gpio P48V_OCP_GPIO2       0
+    set_gpio P48V_OCP_GPIO3       0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO1        1
+    set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       1
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+else
+    set_gpio P48V_OCP_GPIO1       1
+    set_gpio P48V_OCP_GPIO2       0
+    set_gpio P48V_OCP_GPIO3       0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
+    set_gpio HSC_OCP_SLOT_ODD_GPIO2        1
+    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       1
+    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+fi
