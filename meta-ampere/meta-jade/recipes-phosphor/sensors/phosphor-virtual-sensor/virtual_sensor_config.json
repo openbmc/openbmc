@@ -2,8 +2,7 @@
     {
         "Desc":
         {
-            "Config": "D-Bus",
-            "Type": "Maximum"
+            "Config": "D-Bus"
         }
     },
     {

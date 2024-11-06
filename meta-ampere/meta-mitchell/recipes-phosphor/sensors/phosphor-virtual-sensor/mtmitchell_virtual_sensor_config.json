@@ -2,15 +2,7 @@
     {
         "Desc":
         {
-            "Config": "D-Bus",
-            "Type": "Minimum"
-        }
-    },
-    {
-        "Desc":
-        {
-            "Config": "D-Bus",
-            "Type": "Maximum"
+            "Config": "D-Bus"
         }
     },
     {
