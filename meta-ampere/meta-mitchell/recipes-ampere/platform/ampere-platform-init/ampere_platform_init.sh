@@ -85,10 +85,6 @@ if [ "$bootstatus" == '32' ]; then
     for gpioName in "${output_low_gpios_in_ac[@]}"; do
         gpioset $(gpiofind "$gpioName")=0
     done
-    echo "CONFIGURE: gpio pins to input after AC power"
-    for gpioName in "${input_gpios_in_ac[@]}"; do
-        gpioget $(gpiofind "$gpioName")
-    done
 fi
 
 # =======================================================
@@ -100,10 +96,6 @@ done
 echo "CONFIGURE: gpio pins to output low"
 for gpioName in "${output_low_gpios_in_bmc_reboot[@]}"; do
     gpioset $(gpiofind "$gpioName")=0
-done
-echo "CONFIGURE: gpio pins to input"
-for gpioName in "${input_gpios_in_bmc_reboot[@]}"; do
-    gpioget $(gpiofind "$gpioName")
 done
 
 socket-based-fan-conf-update
