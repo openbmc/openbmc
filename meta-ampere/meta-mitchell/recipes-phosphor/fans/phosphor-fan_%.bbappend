@@ -5,7 +5,8 @@ PACKAGECONFIG:append = " json"
 SRC_URI:append = " \
                   file://events.json \
                   file://fans.json \
-                  file://groups.json \
+                  file://groups_1p.json \
+                  file://groups_2p.json \
                   file://zones.json \
                   file://monitor.json \
                   file://presence.json \
@@ -16,7 +17,7 @@ SRC_URI:append = " \
 
 MITCHELL_COMPAT_NAME = "com.ampere.Hardware.Chassis.Model.MtMitchell"
 
-CONTROL_CONFIGS = "events.json fans.json zones.json groups.json"
+CONTROL_CONFIGS = "events.json fans.json zones.json groups_2p.json groups_1p.json"
 
 do_install:append () {
         install -d ${D}${systemd_system_unitdir}
@@ -34,6 +35,9 @@ do_install:append () {
                 install -m 0644 ${WORKDIR}/${CONTROL_CONFIG} \
                         ${D}${datadir}/phosphor-fan-presence/control/${MITCHELL_COMPAT_NAME}
         done
+
+        install -m 0644 ${WORKDIR}/groups_2p.json \
+               ${D}${datadir}/phosphor-fan-presence/control/${MITCHELL_COMPAT_NAME}/groups.json
 
         install -m 0644 ${WORKDIR}/monitor.json \
                 ${D}${datadir}/phosphor-fan-presence/monitor/${MITCHELL_COMPAT_NAME}/config.json
