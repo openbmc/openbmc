@@ -1,7 +1,7 @@
 [Unit]
 Description=Disable obmc console
-BindsTo=gbmc-bare-metal-active.target
-Before=gbmc-bare-metal-active.target disable-ipmi-kcs.service
+BindsTo=gbmc-bare-metal-active@0.target
+Before=gbmc-bare-metal-active@0.target disable-ipmi-kcs.service
 
 [Service]
 Type=oneshot
@@ -10,4 +10,4 @@ ExecStart=/usr/libexec/disable_obmc_console.sh
 ExecStop=/usr/libexec/disable_obmc_console.sh -r
 
 [Install]
-WantedBy=gbmc-bare-metal-active.target
+WantedBy=gbmc-bare-metal-active@0.target

@@ -1,7 +1,7 @@
 [Unit]
 Description=Disable eSPI bus
-BindsTo=gbmc-bare-metal-active.target
-Before=gbmc-bare-metal-active.target
+BindsTo=gbmc-bare-metal-active@0.target
+Before=gbmc-bare-metal-active@0.target
 
 [Service]
 Type=oneshot
@@ -10,4 +10,4 @@ ExecStart=/usr/libexec/npcm7xx-espi-control -d
 ExecStop=/usr/libexec/npcm7xx-espi-control
 
 [Install]
-WantedBy=gbmc-bare-metal-active.target
+WantedBy=gbmc-bare-metal-active@0.target
