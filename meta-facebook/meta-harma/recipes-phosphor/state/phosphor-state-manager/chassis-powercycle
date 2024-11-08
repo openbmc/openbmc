@@ -34,5 +34,19 @@ chassis-power-cycle() {
     fi
 }
 
-echo "Starting Chassis Power Cycle"
-chassis-power-cycle
+aegis-power-cycle() {
+  i2cset -y 11 0x21 0x00 0xfe
+  sleep 3
+  i2cset -y 11 0x21 0x00 0xff
+}
+
+ChassisNumber=$1
+
+if [ "$ChassisNumber" == 0 ]
+then
+  echo "Starting Chassis Power Cycle"
+  chassis-power-cycle
+else
+  echo "Starting Aegis Power Cycle"
+  aegis-power-cycle
+fi
