@@ -1,0 +1,22 @@
+[
+    {
+        "Name": "RUN_POWER_PG",
+        "LineName": "RUN_POWER_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-run-power-pg.service"],
+            "FALLING": ["deassert-run-power-pg.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ID_RST_BTN_BMC_N",
+        "LineName": "ID_RST_BTN_BMC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-reset-button.service"],
+            "FALLING": ["deassert-reset-button.service"]
+        },
+        "Continue": true
+    }
+]

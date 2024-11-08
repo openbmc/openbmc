@@ -4,7 +4,11 @@ inherit obmc-phosphor-systemd systemd
 
 SRC_URI += " \
     file://catalina-gpio-monitor \
+    file://prepare-serv-json \
     file://phosphor-multi-gpio-monitor.json \
+    file://phosphor-multi-gpio-presence.json \
+    file://phosphor-multi-gpio-monitor-evt.json \
+    file://phosphor-multi-gpio-presence-evt.json \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -29,5 +33,10 @@ do_install:append:() {
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
     install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-presence.json
+    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-monitor.json \
+                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-evt.json
+    install -m 0644 ${WORKDIR}/phosphor-multi-gpio-presence.json \
+                    ${D}${datadir}/${PN}/phosphor-multi-gpio-presence-evt.json
     install -m 0755 ${WORKDIR}/catalina-gpio-monitor ${D}${libexecdir}/${PN}/catalina-gpio-monitor
+    install -m 0755 ${WORKDIR}/prepare-serv-json ${D}${libexecdir}/${PN}/prepare-serv-json
 }

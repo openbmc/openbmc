@@ -1,0 +1,14 @@
+[
+    {
+        "Name": "HostTpm",
+        "LineName": "FM_TPM_PRSNT_0_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/HostTpm"
+    },
+    {
+        "Name": "BmcTpm",
+        "LineName": "FM_TPM_PRSNT_1_N",
+        "ActiveLow": true,
+        "Inventory": "/system/chassis/Catalina/BmcTpm"
+    }
+]

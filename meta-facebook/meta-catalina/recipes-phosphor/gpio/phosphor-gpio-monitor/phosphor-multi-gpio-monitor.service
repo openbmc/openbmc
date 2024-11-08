@@ -1,0 +1,8 @@
+[Unit]
+Description=Phosphor Multi GPIO monitor
+After=xyz.openbmc_project.EntityManager.service
+
+[Service]
+Restart=no
+ExecStartPre=/usr/libexec/phosphor-gpio-monitor/prepare-serv-json phosphor-multi-gpio-monitor
+ExecStart=/usr/bin/phosphor-multi-gpio-monitor --config /var/lib/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json

@@ -1,0 +1,68 @@
+#!/bin/bash
+
+CONFIG_DIR="/usr/share/phosphor-gpio-monitor"
+MULTI_MONITOR_DEFAULT_CONF="${CONFIG_DIR}/phosphor-multi-gpio-monitor.json"
+MULTI_MONITOR_EVT_CONF="${CONFIG_DIR}/phosphor-multi-gpio-monitor-evt.json"
+MULTI_PRESENCE_DEFAULT_CONF="${CONFIG_DIR}/phosphor-multi-gpio-presence.json"
+MULTI_PRESENCE_EVT_CONF="${CONFIG_DIR}/phosphor-multi-gpio-presence-evt.json"
+
+SERV_JSON_DIR="/var/lib/phosphor-gpio-monitor"
+MULTI_MONITOR_SERV_JSON="${SERV_JSON_DIR}/phosphor-multi-gpio-monitor.json"
+MULTI_PRESENCE_SERV_JSON="${SERV_JSON_DIR}/phosphor-multi-gpio-presence.json"
+
+prepare_multi_gpio_monitor()
+{
+    if [ -L "${MULTI_MONITOR_SERV_JSON}" ]; then
+        echo "remove ${MULTI_MONITOR_SERV_JSON}"
+        rm "${MULTI_MONITOR_SERV_JSON}"
+    fi
+
+    case "$1" in
+        "EVT")
+            ln -s "${MULTI_MONITOR_EVT_CONF}" "${MULTI_MONITOR_SERV_JSON}" 
+            ;;
+        *)
+            ln -s "${MULTI_MONITOR_DEFAULT_CONF}" "${MULTI_MONITOR_SERV_JSON}" 
+    esac
+}
+
+prepare_multi_gpio_presence()
+{
+    if [ -L "${MULTI_PRESENCE_SERV_JSON}" ]; then
+        echo "remove ${MULTI_PRESENCE_SERV_JSON}"
+        rm "${MULTI_PRESENCE_SERV_JSON}"
+    fi
+    case "$1" in
+        "EVT")
+            ln -s "${MULTI_PRESENCE_EVT_CONF}" "${MULTI_PRESENCE_SERV_JSON}" 
+            ;;
+        *)
+            ln -s "${MULTI_PRESENCE_DEFAULT_CONF}" "${MULTI_PRESENCE_SERV_JSON}"
+            ;;
+    esac
+}
+
+for i in $(seq 1 30)
+do
+    if mapper get-service /xyz/openbmc_project/inventory/system/board/Catalina_PDB; then
+    	PDB_HW_REV="$(busctl get-property xyz.openbmc_project.EntityManager  /xyz/openbmc_project/inventory/system/board/Catalina_PDB xyz.openbmc_project.Inventory.Decorator.Revision Version | awk '{print $2}' | tr -d '"')"
+		break
+	fi
+	echo "/xyz/openbmc_project/inventory/system/board/Catalina_PDB not available, retry $i"
+	sleep 2
+done
+
+echo "PDB_HW_REV: ${PDB_HW_REV}"
+
+if [ ! -d "${SERV_JSON_DIR}" ]; then
+    mkdir "${SERV_JSON_DIR}"
+fi
+
+case "$1" in
+    "phosphor-multi-gpio-monitor")
+        prepare_multi_gpio_monitor "${PDB_HW_REV}"
+        ;;
+    "phosphor-multi-gpio-presence")
+        prepare_multi_gpio_presence "${PDB_HW_REV}"
+        ;;
+esac
