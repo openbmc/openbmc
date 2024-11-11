@@ -31,6 +31,8 @@ SRC_URI += "file://assert-gpio-log@.service \
             file://multi-gpios-sys-init.service \
             file://plat-phosphor-multi-gpio-monitor.json \
             file://plat-phosphor-multi-gpio-presence.json \
+            file://fan-reload \
+            file://fan-reload.service \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -47,6 +49,7 @@ SYSTEMD_SERVICE:${PN} += " \
     deassert-uart-switch-button.service \
     multi-gpios-sys-init.service \
     device-reinitial@.service \
+    fan-reload.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -85,6 +88,8 @@ do_install:append:() {
     install -m 0755 ${UNPACKDIR}/auto-power ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/auto-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/auto-poweron ${D}${libexecdir}/${PN}/
+
+    install -m 0755 ${UNPACKDIR}/fan-reload ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"

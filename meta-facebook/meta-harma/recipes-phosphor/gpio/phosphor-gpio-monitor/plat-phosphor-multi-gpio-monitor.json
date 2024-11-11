@@ -185,5 +185,27 @@
             "FALLING": ["assert-gpio-log@2_pvdd11-ocp-alert.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "fcb1-activate",
+        "ChipId": "3",
+        "GpioNum": 13,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-gpio-log@3_fcb1-activate.service"],
+            "FALLING": ["assert-gpio-log@3_fcb1-activate.service", "fan-reload.service" ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "fcb0-activate",
+        "ChipId": "4",
+        "GpioNum": 13,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-gpio-log@4_fcb0-activate.service"],
+            "FALLING": ["assert-gpio-log@4_fcb0-activate.service", "fan-reload.service"]
+        },
+        "Continue": true
     }
 ]

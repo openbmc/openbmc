@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sleep 1
+
+# Reload FAN PID service when fan board plug in.
+systemctl reload phosphor-pid-control.service
