@@ -11,6 +11,7 @@ inherit systemd
 SRC_URI += " \
   file://50-gbmc-nic.rules \
   file://50-gbmc-nic.rules.in \
+  file://10-dhcp4.conf \
   file://-bmc-nic.network.in \
   file://gbmc-nic-neigh.sh.in \
   file://gbmc-nic-ra.sh \
@@ -77,3 +78,7 @@ do_install() {
   fi
 }
 
+do_install:append:local() {
+  install -d -m0755 $netdir/-bmc-front.network.d
+  install -m0644 ${WORKDIR}/10-dhcp4.conf $netdir/-bmc-front.network.d/10-dhcp4.conf
+}

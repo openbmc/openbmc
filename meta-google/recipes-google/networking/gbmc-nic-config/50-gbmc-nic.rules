@@ -4,5 +4,6 @@ table inet filter {
         iifname != gbmcnicdhcp accept
         ip6 nexthdr icmpv6 accept
         udp dport 547 accept
+        udp dport 68 accept
     }
 }
