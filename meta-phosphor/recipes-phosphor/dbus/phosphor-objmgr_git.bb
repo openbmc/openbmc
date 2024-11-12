@@ -9,7 +9,7 @@ DEPENDS += "libtinyxml2"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "cli11"
-SRCREV = "cf72403d7ef358974c18ff5257f5e763151952ec"
+SRCREV = "ea0e5d27a869a88ab40617675d2af4e6b9fbed92"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
