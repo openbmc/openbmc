@@ -87,6 +87,9 @@ def mac_to_eui64(mac):
   idx = range(0, len(b)-1, 2)
   return ':'.join([format((b[i] << 8) + b[i+1], '04x') for i in idx])
 
+def macs_to_eui64(macs):
+  return ' '.join([mac_to_eui64(mac) for mac in macs.split(' ')])
+
 GBMC_BRIDGE_INTFS ?= ""
 
 ethernet_bridge_install() {
@@ -109,9 +112,13 @@ do_install() {
   install -d -m0755 $netdir
 
   if [ ! -z "${GBMC_BR_MAC_ADDR}" ]; then
-    sfx='${@mac_to_eui64(GBMC_BR_MAC_ADDR)}'
-    addr="[Address]\nAddress=${GBMC_ULA_PREFIX}:$sfx/64\nPreferredLifetime=0\n"
-    addr="$addr[Address]\nAddress=fe80::$sfx/64\nPreferredLifetime=0"
+    eui64_list="${@macs_to_eui64(d.getVar('GBMC_BR_MAC_ADDR'))}"
+    addr=""
+    for eui64 in $eui64_list
+    do
+      addr="$addr[Address]\nAddress=${GBMC_ULA_PREFIX}:$eui64/64\nPreferredLifetime=0\n"
+      addr="$addr[Address]\nAddress=fe80::$eui64/64\nPreferredLifetime=0\n"
+    done
     sed -i "s,@ADDR@,$addr," ${WORKDIR}/-bmc-gbmcbr.network.in
   else
     sed -i '/@ADDR@/d' ${WORKDIR}/-bmc-gbmcbr.network.in
