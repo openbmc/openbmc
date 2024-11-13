@@ -18,6 +18,7 @@ PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
 PACKAGECONFIG[static-dual-image] = "-Dbmc-static-dual-image=enabled, -Dbmc-static-dual-image=disabled"
 PACKAGECONFIG[software-update-dbus-interface] = "-Dsoftware-update-dbus-interface=enabled, -Dsoftware-update-dbus-interface=disabled"
+PACKAGECONFIG ?= "software-update-dbus-interface"
 
 PV = "1.0+git${SRCPV}"
 PR = "r1"
@@ -101,11 +102,12 @@ ALLOW_EMPTY:${PN} = "1"
 PACKAGE_BEFORE_PN += "${SOFTWARE_MGR_PACKAGES}"
 DBUS_PACKAGES = "${SOFTWARE_MGR_PACKAGES}"
 DBUS_SERVICE:${PN}-version += " \
-    xyz.openbmc_project.Software.Version.service \
-    ${@bb.utils.contains('PACKAGECONFIG', 'software-update-dbus-interface', 'xyz.openbmc_project.Software.Manager.service', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'software-update-dbus-interface', 'xyz.openbmc_project.Software.Manager.service', 'xyz.openbmc_project.Software.Version.service', d)} \
 "
 DBUS_SERVICE:${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
-DBUS_SERVICE:${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
+DBUS_SERVICE:${PN}-updater += " \
+    ${@bb.utils.contains('PACKAGECONFIG', 'software-update-dbus-interface', '', 'xyz.openbmc_project.Software.BMC.Updater.service', d)} \
+"
 DBUS_SERVICE:${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
 
 pkg_postinst:${PN}-side-switch() {
