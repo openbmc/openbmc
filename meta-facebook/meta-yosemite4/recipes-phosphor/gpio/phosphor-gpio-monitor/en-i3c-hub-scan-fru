@@ -69,7 +69,7 @@ fi
 bus=$(($1 + 15))
 
 enable_i3c_hub "$1"
-sleep 2.5
+sleep 5.5
 
 # rescan eeprom for fru information
 busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScanBus q $bus
