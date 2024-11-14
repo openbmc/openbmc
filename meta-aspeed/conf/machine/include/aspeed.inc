@@ -24,18 +24,6 @@ MACHINE_FEATURES += "hw-rng"
 
 MACHINEOVERRIDES =. "aspeed:"
 
-SERIAL_CONSOLES ?= "115200;ttyS4"
-
-DEFAULTTUNE:aspeed-g5 ?= "arm1176jzs"
-DEFAULTTUNE:aspeed-g6 ?= "armv7ahf-vfpv4d16"
-
-UBOOT_ENTRYPOINT:aspeed-g4 ?= "0x40001000"
-UBOOT_ENTRYPOINT:aspeed-g5 ?= "0x80001000"
-UBOOT_ENTRYPOINT:aspeed-g6 ?= "0x80001000"
-UBOOT_LOADADDRESS:aspeed-g4 ?= "0x40001000"
-UBOOT_LOADADDRESS:aspeed-g5 ?= "0x80001000"
-UBOOT_LOADADDRESS:aspeed-g6 ?= "0x80001000"
-
 # runqemu support
 EXTRA_IMAGEDEPENDS += "qemu-helper-native"
 IMAGE_CLASSES += "qemuboot"
@@ -48,11 +36,3 @@ QB_RNG = ""
 QB_NETWORK_DEVICE = "-net nic,netdev=net0"
 # Boot from drive
 QB_DEFAULT_KERNEL = "none"
-# runqemu overrides default memory size
-QB_MEM = "-m 512"
-
-QB_MACHINE:aspeed-g4 = "-machine palmetto-bmc"
-QB_MACHINE:aspeed-g5 = "-machine ast2500-evb"
-QB_MACHINE:aspeed-g6 = "-machine ast2600-evb"
-QB_MEM:aspeed-g5 = "-m 1G"
-QB_MEM:aspeed-g6 = "-m 1G"
