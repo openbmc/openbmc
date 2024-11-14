@@ -78,14 +78,6 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/Harma_MB_bios:
-- Interface: "xyz.openbmc_project.Software.Version"
-  Properties:
-      Version:
-        Default: '""'
-      Purpose:
-        Default: Version::VersionPurpose::Other
-
 /xyz/openbmc_project/software/chassis/Nic_nic0:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
@@ -94,3 +86,98 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_bic:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_osfp_p3v3:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v85_pvdd:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v75_pvdd_ch_n:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v75_pvdd_ch_s:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v75_trvdd_zonea:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v75_trvdd_zoneb:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p1v1_vddc_hbm0_2_4:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v9_trvdd_zonea:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v9_trvdd_zoneb:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p1v1_vddc_hbm1_3_5:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/Minerva_Aegis_vr_cpu_p0v8_vdda_pcie:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
