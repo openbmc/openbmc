@@ -844,6 +844,73 @@
     },
     {
         "Desc": {
+            "Name": "SENTINEL_DOME_SLOT_PRESENT_PERCENTAGE",
+            "SensorType": "utilization"
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "MB_FIO_TEMP_10",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_1_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_20",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_2_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_30",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_3_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_40",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_4_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_50",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_5_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_60",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_6_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_70",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_7_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FIO_TEMP_80",
+                    "Desc": {
+                        "Name": "SENTINEL_DOME_SLOT_8_MB_FIO_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "sum(ifNan(MB_FIO_TEMP_10, 0) == 0 ? 0 : 1, ifNan(MB_FIO_TEMP_20, 0) == 0 ? 0 : 1, ifNan(MB_FIO_TEMP_30, 0) == 0 ? 0 : 1, ifNan(MB_FIO_TEMP_40, 0) == 0 ? 0 : 1, ifNan(MB_FIO_TEMP_50, 0) == 0 ? 0 : 1, ifNan(MB_FIO_TEMP_60, 0) == 0 ? 0 : 1, ifNan(MB_FIO_TEMP_70, 0) == 0 ? 0 : 1, ifNan(MB_FIO_TEMP_80, 0) == 0 ? 0 : 1) / 8 * 100"
+    },
+    {
+        "Desc": {
             "Name": "CALIBRATED_MEDUSA_HSC0_48V_CURR_A",
             "SensorType": "current",
             "MaxValue": "255",
