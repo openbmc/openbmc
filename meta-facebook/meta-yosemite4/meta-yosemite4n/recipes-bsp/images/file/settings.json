@@ -5,5 +5,9 @@
         "FIU1_CLK_DIVIDER": "0",
         "FIU3_CLK_DIVIDER": "0",
         "BAUD_RATE": "57600"
+    },
+    "BootBlockAndHeader.xml":
+    {
+        "BAUD_RATE": "57600"
     }
 }
