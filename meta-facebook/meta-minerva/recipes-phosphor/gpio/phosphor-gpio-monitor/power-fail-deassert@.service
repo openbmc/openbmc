@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Power Fail Deassert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i power fail deassert" "SOURCE" "%i"
+SyslogIdentifier=%i-power-fail-deassert

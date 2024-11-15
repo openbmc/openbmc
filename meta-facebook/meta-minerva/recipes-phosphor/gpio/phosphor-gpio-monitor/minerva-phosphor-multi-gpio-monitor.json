@@ -856,5 +856,735 @@
             "RISING": ["leak-detect-assert@it-gear-leak-spare.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "P12V_INA230_ALERT",
+        "LineName": "P12V_INA230_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@p12v-ina230-alert.service"],
+            "FALLING": ["power-fail-assert@p12v-ina230-alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P24V_INA230_ALERT",
+        "LineName": "P24V_INA230_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@p24v-ina230-alert.service"],
+            "FALLING": ["power-fail-assert@p24v-ina230-alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P48V_HSC_ALERT",
+        "LineName": "P48V_HSC_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@p48v-hsc-alert.service"],
+            "FALLING": ["power-fail-assert@p48v-hsc-alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P1V05_PWR_FAIL",
+        "LineName": "P1V05_PWR_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@p1v05.service"],
+            "FALLING": ["power-fail-deassert@p1v05.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P1V5_PWR_FAIL",
+        "LineName": "P1V5_PWR_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@p1v5.service"],
+            "FALLING": ["power-fail-deassert@p1v5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P24V_PWR_FAIL",
+        "LineName": "P24V_PWR_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@p24v.service"],
+            "FALLING": ["power-fail-deassert@p24v.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "P24V_SM_PWR_FAIL",
+        "LineName": "P24V_SM_PWR_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@p24v-smart-valve.service"],
+            "FALLING": ["power-fail-deassert@p24v-smart-valve.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN1_ALERT",
+        "LineName": "INA238_FAN1_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan1_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan1_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN2_ALERT",
+        "LineName": "INA238_FAN2_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan2_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan2_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN3_ALERT",
+        "LineName": "INA238_FAN3_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan3_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan3_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN4_ALERT",
+        "LineName": "INA238_FAN4_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan4_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan4_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN5_ALERT",
+        "LineName": "INA238_FAN5_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan5_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan5_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN6_ALERT",
+        "LineName": "INA238_FAN6_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan6_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan6_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN7_ALERT",
+        "LineName": "INA238_FAN7_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan7_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan7_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN8_ALERT",
+        "LineName": "INA238_FAN8_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan8_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan8_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN9_ALERT",
+        "LineName": "INA238_FAN9_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan9_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan9_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN10_ALERT",
+        "LineName": "INA238_FAN10_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan10_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan10_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN11_ALERT",
+        "LineName": "INA238_FAN11_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan11_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan11_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN12_ALERT",
+        "LineName": "INA238_FAN12_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan12_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan12_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN13_ALERT",
+        "LineName": "INA238_FAN13_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan13_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan13_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN14_ALERT",
+        "LineName": "INA238_FAN14_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan14_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan14_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN15_ALERT",
+        "LineName": "INA238_FAN15_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan15_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan15_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN16_ALERT",
+        "LineName": "INA238_FAN16_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan16_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan16_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN17_ALERT",
+        "LineName": "INA238_FAN17_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan17_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan17_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN18_ALERT",
+        "LineName": "INA238_FAN18_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan18_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan18_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN19_ALERT",
+        "LineName": "INA238_FAN19_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan19_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan19_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN20_ALERT",
+        "LineName": "INA238_FAN20_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan20_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan20_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN21_ALERT",
+        "LineName": "INA238_FAN21_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan21_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan21_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN22_ALERT",
+        "LineName": "INA238_FAN22_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan22_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan22_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN23_ALERT",
+        "LineName": "INA238_FAN23_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan23_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan23_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "INA238_FAN24_ALERT",
+        "LineName": "INA238_FAN24_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-deassert@ina238_fan24_alert.service"],
+            "FALLING": ["power-fail-assert@ina238_fan24_alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN1_POWER_FAIL",
+        "LineName": "FAN1_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan1.service"],
+            "FALLING": ["power-fail-deassert@fan1.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN2_POWER_FAIL",
+        "LineName": "FAN2_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan2.service"],
+            "FALLING": ["power-fail-deassert@fan2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN3_POWER_FAIL",
+        "LineName": "FAN3_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan3.service"],
+            "FALLING": ["power-fail-deassert@fan3.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN4_POWER_FAIL",
+        "LineName": "FAN4_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan4.service"],
+            "FALLING": ["power-fail-deassert@fan4.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN5_POWER_FAIL",
+        "LineName": "FAN5_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan5.service"],
+            "FALLING": ["power-fail-deassert@fan5.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN6_POWER_FAIL",
+        "LineName": "FAN6_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan6.service"],
+            "FALLING": ["power-fail-deassert@fan6.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN7_POWER_FAIL",
+        "LineName": "FAN7_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan7.service"],
+            "FALLING": ["power-fail-deassert@fan7.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN8_POWER_FAIL",
+        "LineName": "FAN8_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan8.service"],
+            "FALLING": ["power-fail-deassert@fan8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN9_POWER_FAIL",
+        "LineName": "FAN9_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan9.service"],
+            "FALLING": ["power-fail-deassert@fan9.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN10_POWER_FAIL",
+        "LineName": "FAN10_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan10.service"],
+            "FALLING": ["power-fail-deassert@fan10.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN11_POWER_FAIL",
+        "LineName": "FAN11_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan11.service"],
+            "FALLING": ["power-fail-deassert@fan11.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN12_POWER_FAIL",
+        "LineName": "FAN12_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan12.service"],
+            "FALLING": ["power-fail-deassert@fan12.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN13_POWER_FAIL",
+        "LineName": "FAN13_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan13.service"],
+            "FALLING": ["power-fail-deassert@fan13.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN14_POWER_FAIL",
+        "LineName": "FAN14_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan14.service"],
+            "FALLING": ["power-fail-deassert@fan14.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN15_POWER_FAIL",
+        "LineName": "FAN15_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan15.service"],
+            "FALLING": ["power-fail-deassert@fan15.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN16_POWER_FAIL",
+        "LineName": "FAN16_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan16.service"],
+            "FALLING": ["power-fail-deassert@fan16.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN17_POWER_FAIL",
+        "LineName": "FAN17_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan17.service"],
+            "FALLING": ["power-fail-deassert@fan17.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN18_POWER_FAIL",
+        "LineName": "FAN18_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan18.service"],
+            "FALLING": ["power-fail-deassert@fan18.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN19_POWER_FAIL",
+        "LineName": "FAN19_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan19.service"],
+            "FALLING": ["power-fail-deassert@fan19.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN20_POWER_FAIL",
+        "LineName": "FAN20_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan20.service"],
+            "FALLING": ["power-fail-deassert@fan20.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN21_POWER_FAIL",
+        "LineName": "FAN21_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan21.service"],
+            "FALLING": ["power-fail-deassert@fan21.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN22_POWER_FAIL",
+        "LineName": "FAN22_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan22.service"],
+            "FALLING": ["power-fail-deassert@fan22.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN23_POWER_FAIL",
+        "LineName": "FAN23_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan23.service"],
+            "FALLING": ["power-fail-deassert@fan23.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAN24_POWER_FAIL",
+        "LineName": "FAN24_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fan24.service"],
+            "FALLING": ["power-fail-deassert@fan24.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_1_P1V0_POWER_FAIL",
+        "LineName": "FCB_1_P1V0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_1_p1v0.service"],
+            "FALLING": ["power-fail-deassert@fcb_1_p1v0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_2_P1V0_POWER_FAIL",
+        "LineName": "FCB_2_P1V0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_2_p1v0.service"],
+            "FALLING": ["power-fail-deassert@fcb_2_p1v0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_3_P1V0_POWER_FAIL",
+        "LineName": "FCB_3_P1V0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_3_p1v0.service"],
+            "FALLING": ["power-fail-deassert@fcb_3_p1v0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_4_P1V0_POWER_FAIL",
+        "LineName": "FCB_4_P1V0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_4_p1v0.service"],
+            "FALLING": ["power-fail-deassert@fcb_4_p1v0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_5_P1V0_POWER_FAIL",
+        "LineName": "FCB_5_P1V0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_5_p1v0.service"],
+            "FALLING": ["power-fail-deassert@fcb_5_p1v0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_6_P1V0_POWER_FAIL",
+        "LineName": "FCB_6_P1V0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_6_p1v0.service"],
+            "FALLING": ["power-fail-deassert@fcb_6_p1v0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_1_P1V8_POWER_FAIL",
+        "LineName": "FCB_1_P1V8_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_1_p1v8.service"],
+            "FALLING": ["power-fail-deassert@fcb_1_p1v8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_2_P1V8_POWER_FAIL",
+        "LineName": "FCB_2_P1V8_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_2_p1v8.service"],
+            "FALLING": ["power-fail-deassert@fcb_2_p1v8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_3_P1V8_POWER_FAIL",
+        "LineName": "FCB_3_P1V8_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_3_p1v8.service"],
+            "FALLING": ["power-fail-deassert@fcb_3_p1v8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_4_P1V8_POWER_FAIL",
+        "LineName": "FCB_4_P1V8_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_4_p1v8.service"],
+            "FALLING": ["power-fail-deassert@fcb_4_p1v8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_5_P1V8_POWER_FAIL",
+        "LineName": "FCB_5_P1V8_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_5_p1v8.service"],
+            "FALLING": ["power-fail-deassert@fcb_5_p1v8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_6_P1V8_POWER_FAIL",
+        "LineName": "FCB_6_P1V8_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_6_p1v8.service"],
+            "FALLING": ["power-fail-deassert@fcb_6_p1v8.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_1_P48V_ZONE0_POWER_FAIL",
+        "LineName": "FCB_1_P48V_ZONE0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_1_p48v_zone0.service"],
+            "FALLING": ["power-fail-deassert@fcb_1_p48v_zone0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_2_P48V_ZONE0_POWER_FAIL",
+        "LineName": "FCB_2_P48V_ZONE0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_2_p48v_zone0.service"],
+            "FALLING": ["power-fail-deassert@fcb_2_p48v_zone0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_3_P48V_ZONE0_POWER_FAIL",
+        "LineName": "FCB_3_P48V_ZONE0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_3_p48v_zone0.service"],
+            "FALLING": ["power-fail-deassert@fcb_3_p48v_zone0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_4_P48V_ZONE0_POWER_FAIL",
+        "LineName": "FCB_4_P48V_ZONE0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_4_p48v_zone0.service"],
+            "FALLING": ["power-fail-deassert@fcb_4_p48v_zone0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_5_P48V_ZONE0_POWER_FAIL",
+        "LineName": "FCB_5_P48V_ZONE0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_5_p48v_zone0.service"],
+            "FALLING": ["power-fail-deassert@fcb_5_p48v_zone0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FCB_6_P48V_ZONE0_POWER_FAIL",
+        "LineName": "FCB_6_P48V_ZONE0_POWER_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-fail-assert@fcb_6_p48v_zone0.service"],
+            "FALLING": ["power-fail-deassert@fcb_6_p48v_zone0.service"]
+        },
+        "Continue": true
     }
 ]
