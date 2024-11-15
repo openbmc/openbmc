@@ -3,6 +3,7 @@ Description=Catalina Early System Init
 Before=phosphor-multi-gpio-monitor.service
 Before=phosphor-multi-gpio-presence.service
 Before=phosphor-pid-control.service
+Before=xyz.openbmc_project.FruDevice.service
 Before=xyz.openbmc_project.EntityManager.service
 Before=xyz.openbmc_project.fansensor.service
 Before=systemd-networkd.service
