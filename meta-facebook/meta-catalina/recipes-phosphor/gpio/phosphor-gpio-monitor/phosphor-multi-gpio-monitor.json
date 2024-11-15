@@ -371,6 +371,16 @@
         "Continue": true
     },
     {
+        "Name": "FM_MAIN_PWREN_RMC_EN_ISO_R",
+        "LineName": "FM_MAIN_PWREN_RMC_EN_ISO_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-gpio-log@FM_MAIN_PWREN_RMC_EN_ISO_R.service"],
+            "FALLING": ["assert-gpio-log@FM_MAIN_PWREN_RMC_EN_ISO_R.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "CHASSIS3_LEAK_Q_N_PLD",
         "LineName": "CHASSIS3_LEAK_Q_N_PLD",
         "EventMon": "BOTH",

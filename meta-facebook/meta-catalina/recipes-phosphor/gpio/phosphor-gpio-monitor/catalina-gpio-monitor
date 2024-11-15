@@ -134,6 +134,9 @@ do_gpio_assert_log()
         LOG_MSG="P52V busbar power monitor alert assert"
 
     # PDB CPLD IOEXP 14-0012, Port 1
+    elif [ "$LINENAME" = "FM_MAIN_PWREN_RMC_EN_ISO_R" ]; then
+        LOG_MSG="RMC main power disabled"
+        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Off"
     elif [ "$LINENAME" = "CHASSIS3_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Large leakage alert assert, leak cable 3"
     elif [ "$LINENAME" = "CHASSIS2_LEAK_Q_N_PLD" ]; then
@@ -237,6 +240,8 @@ do_gpio_deassert_log()
         LOG_MSG="P52V busbar power monitor alert deassert"
 
     # PDB CPLD IOEXP 14-0012, Port 1
+    elif [ "$LINENAME" = "FM_MAIN_PWREN_RMC_EN_ISO_R" ]; then
+        LOG_MSG="RMC main power enabled"
     elif [ "$LINENAME" = "CHASSIS3_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Large leakage alert deassert, leak cable 3"
     elif [ "$LINENAME" = "CHASSIS2_LEAK_Q_N_PLD" ]; then

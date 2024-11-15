@@ -23,6 +23,65 @@ phosphor_log_info() {
     phosphor_log "$msg" "$logInfo"
 }
 
+get_pdb_cpld_ver()
+{
+    local pdb_cpld_ver=""
+
+    pdb_cpld_ver="$(busctl get-property xyz.openbmc_project.Settings /xyz/openbmc_project/software/chassis/Catalina_PDB_cpld xyz.openbmc_project.Software.Version Version | awk '{print $2}' | tr -d '"')"
+    if [ "$pdb_cpld_ver" != "" ]; then
+        # Use the version record on settings service if avilable
+        echo "$pdb_cpld_ver"
+        return 0
+    fi
+
+    # Try i2ctransfer to get cpld version, echo empty string if failed
+    if ! pdb_cpld_ver="$(i2ctransfer -y -f 14 w4@0x40 0xc0 0x00 0x00 0x00 r4)"; then
+        echo ""
+        return 1
+    fi
+
+    echo "$pdb_cpld_ver" | awk '{printf "%02x%02x%02x%02x\n", $1, $2, $3, $4}'
+    return 0
+}
+
+is_rmc_main_power_disable()
+{
+    local pdb_cpld_ver=""
+    local reg_val=""
+
+    if ! pdb_cpld_ver="$(get_pdb_cpld_ver)"; then
+        # unable to get pdb cpld version
+        # assume rmc main power is enabled
+        echo "[DEBUG] unable to get pdb cpld version"
+        return 1
+    fi
+
+    if (( $((16#$pdb_cpld_ver)) < 0x10000 )); then
+        # unable to check rmc main power state with pdb cpld version less than 0x10000
+        # assume rmc main power is enabled
+        echo "[DEBUG] pdb cpld version less than 0x10000"
+        return 1
+    fi
+
+    if ! reg_val="$(i2ctransfer -y -f 14 w1@0x1e 0x0d r1)"; then
+        # failed to get rmc main power state from cpld register
+        # assume rmc main power is enabled
+        echo "[DEBUG] failed to get rmc main power state from cpld register"
+        return 1
+    fi
+
+    # check bit[3]
+    # 1: rmc main power disabled
+    # 0: rmc main power enabled
+    if (( (reg_val & 0x08) == 0 )); then
+        echo "[DEBUG] rmc main power is enabled"
+        return 1
+    fi
+
+    echo "[DEBUG] rmc main power is disabled"
+    return 0
+}
+
 chassis_power_cycle_ltc4287()
 {
     if ! i2cset -f -y 20 0x42 0xfd 0x04; then
@@ -75,6 +134,12 @@ chassis_power_status()
 
 host_power_on()
 {
+    if is_rmc_main_power_disable; then
+        # Sleep for 10 seconds to avoid rapid consecutive retries
+        sleep 10
+        return 2
+    fi
+
     if [ "$(host_power_status)" == "off" ]; then
         press_host_power_button 1
         if ! wait_host_power_on; then

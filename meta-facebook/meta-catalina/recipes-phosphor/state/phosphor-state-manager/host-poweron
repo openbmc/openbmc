@@ -4,7 +4,11 @@
 source /usr/libexec/phosphor-state-manager/power-cmd
 
 if ! host_power_on; then
-   phosphor_log_err "host power on failed"
+   log_msg="host power on failed"
+   if [ "$?" = "2" ]; then
+      log_msg="${log_msg}, rmc main power is disabled"
+   fi
+   phosphor_log_err "$log_msg"
    exit 1
 fi
 
