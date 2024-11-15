@@ -4,12 +4,12 @@ sd_eid=$(($1 * 10))
 wf_eid=$(($1 * 10 + 2))
 
 # It takes about 6 seconds for setting up MCTP endpoint after slot plugged-in
-sleep 10
+sleep 30
 # Check if we got WF BIC's EID
-wf_eid=$(($1 * 10 + 2))
 busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$wf_eid" xyz.openbmc_project.MCTP.Endpoint EID
 status=$?
 if [ $status -eq 0 ]; then
+    echo "WF BIC's EID $wf_eid found successfully"
     exit 0
 fi
 
@@ -18,6 +18,7 @@ while [ $count -lt 3 ]; do
     # Check WF BIC status
     output=$(pldmtool raw -m "$sd_eid" -d 0x80 0x02 0x3A 0x4c 0xff)
     status=$?
+    echo "Check pldm raw command output: $output"
     if [ $status -ne 0 ]; then
         echo "Error executing pldmtool command"
         exit 1
@@ -28,9 +29,17 @@ while [ $count -lt 3 ]; do
     wf_ready=$(echo "$rx_data" | tail -n 1)
     # 02 means WF BIC ready, otherwise 01.
     if [ "$wf_ready" == "02" ]; then
+        echo "WF BIC ready (status: $wf_ready), count=$count"
         busctl call xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp au.com.CodeConstruct.MCTP SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/BIC
+        status=$?
+        if [ $status -ne 0 ]; then
+            echo "call MCTP method SetupEndpointByConfigPath probe EID $wf_eid failed."
+        else
+            echo "call MCTP method SetupEndpointByConfigPath probe EID $wf_eid succeeded."
+        fi
         break
     else
+        echo "WF BIC not ready (status: $wf_ready), count=$count"
         count=$((count + 1))
         sleep 2
     fi
