@@ -1,4 +1,35 @@
-#bin/sh
+#!/bin/sh
+
+set_pdb_cpld_leak_config()
+{
+    if ! GPIOCHIP_NUM="$(basename "$(ls -d /sys/bus/i2c/devices/14-0014/gpiochip*)")"; then
+        echo "can not find gpiochip number"
+        return 1
+    fi
+
+    GPIOPIN_NUM_LEAK_0="8"
+    GPIOPIN_NUM_LEAK_1="9"
+    GPIOPIN_NUM_LEAK_2="10"
+    GPIOPIN_NUM_LEAK_3="11"
+
+    case "$1" in
+        0)
+            gpioset "${GPIOCHIP_NUM}" "${GPIOPIN_NUM_LEAK_0}"=1 "${GPIOPIN_NUM_LEAK_1}"=0 "${GPIOPIN_NUM_LEAK_2}"=0 "${GPIOPIN_NUM_LEAK_3}"=0
+            ;;
+        1)
+            gpioset "${GPIOCHIP_NUM}" "${GPIOPIN_NUM_LEAK_0}"=0 "${GPIOPIN_NUM_LEAK_1}"=1 "${GPIOPIN_NUM_LEAK_2}"=0 "${GPIOPIN_NUM_LEAK_3}"=0
+            ;;
+        2)
+            gpioset "${GPIOCHIP_NUM}" "${GPIOPIN_NUM_LEAK_0}"=0 "${GPIOPIN_NUM_LEAK_1}"=0 "${GPIOPIN_NUM_LEAK_2}"=1 "${GPIOPIN_NUM_LEAK_3}"=0
+            ;;
+        3)
+            gpioset "${GPIOCHIP_NUM}" "${GPIOPIN_NUM_LEAK_0}"=0 "${GPIOPIN_NUM_LEAK_1}"=0 "${GPIOPIN_NUM_LEAK_2}"=0 "${GPIOPIN_NUM_LEAK_3}"=1
+            ;;
+        default)
+            echo "invalid pdb leak config: ${LEAK_CONFIG}"
+            ;;
+    esac
+}
 
 # Create /dev/mem
 if [ ! -c /dev/mem ]; then
@@ -6,8 +37,7 @@ if [ ! -c /dev/mem ]; then
 fi
 
 # Disable FMC_WDT2
-FMC_WDT2_CTRL_VAL=$(/sbin/devmem 0x1e620064)
-FMC_WDT2_CTRL_VAL=$((16#${FMC_WDT2_CTRL_VAL#"0x"}))
+FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
 SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
 /sbin/devmem 0x1e620064 32 "$SET_VAL"
 
@@ -18,6 +48,34 @@ if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
     echo "1" > "$SLOT_FILE"
 else
     echo "0" > "$SLOT_FILE"
+fi
+
+# Set PDB CPLD leak event config
+PLAT_CONFIG_FILE="/mnt/data/catalina-platform-config.json"
+if PDB_CPLD_VER=$(/usr/sbin/i2ctransfer -y -f 14 w4@0x40 0xc0 0x00 0x00 0x00 r4); then
+    PDB_CPLD_VER="$(echo "$PDB_CPLD_VER" | awk '{printf "%02x%02x%02x%02x\n", $1, $2, $3, $4}')"
+    echo "PDB CPLD version: $PDB_CPLD_VER"
+    PDB_CPLD_VER_DEC=$(printf "%d" "0x$PDB_CPLD_VER")
+
+    if [ "$PDB_CPLD_VER_DEC" -lt 65536 ]; then
+        echo "PDB CPLD version not support leak event configuration..."
+        echo "Skip leak event configuration"
+    else
+        PDB_LEAK_CONFIG="$(jq '.PDB_LEAK_CONFIG' ${PLAT_CONFIG_FILE})"
+        case "${PDB_LEAK_CONFIG}" in
+            0|1|2|3)
+                echo "Get PDB leak config setting = ${PDB_LEAK_CONFIG}"
+                ;;
+            *)
+                PDB_LEAK_CONFIG=0
+                echo "No PDB leak config available, use default config ${PDB_LEAK_CONFIG}"
+                ;;
+        esac
+        set_pdb_cpld_leak_config "${PDB_LEAK_CONFIG}"
+    fi
+else
+    echo "Unable to get PDB CPLD version..."
+    echo "Skip leak event configuration"
 fi
 
 exit 0
