@@ -36,7 +36,7 @@ check_fcb_fan_status()
 {
     local fcb_num=$1
 
-    if ! [[ $fcb_num =~ ^[0-5]$ ]]; then
+    if ! [[ $fcb_num =~ ^[1-6]$ ]]; then
         echo "$FAN_STATUS_UNKNOWN"
         return 1
     fi
@@ -44,12 +44,13 @@ check_fcb_fan_status()
     local service="xyz.openbmc_project.FanSensor"
     local interface="xyz.openbmc_project.Sensor.Threshold.Critical"
     local property_list=("CriticalAlarmHigh" "CriticalAlarmLow")
-    local fan_name_prefix=("FCB_BOT_0" "FCB_BOT_1" "FCB_MID_0" "FCB_MID_1" "FCB_TOP_0" "FCB_TOP_1")
     local in_out=("IL" "OL")
 
     for index in {0..7}
     do
-        local object_path="/xyz/openbmc_project/sensors/fan_tach/${fan_name_prefix[$fcb_num]}_FAN$((index / 2))_TACH_${in_out[$((index % 2))]}_SPEED_RPM"
+        local fan_number=$((((fcb_num - 1) * 4) + (index / 2) + 1))
+        local io_index=$((index % 2))
+        local object_path="/xyz/openbmc_project/sensors/fan_tach/FCB_${fcb_num}_FAN_${fan_number}_TACH_${in_out[$io_index]}_SPEED_RPM"
         for property in "${property_list[@]}"; do
             tach_alarm=$(busctl get-property "$service" "$object_path" "$interface" "$property" | cut -d ' ' -f2)
             if [ "$tach_alarm" = "true" ]; then
@@ -57,6 +58,13 @@ check_fcb_fan_status()
                 return 0
             fi
         done
+        # Check FCB whether is AC off
+        local operation_interface="xyz.openbmc_project.State.Decorator.OperationalStatus"
+        functional=$(busctl get-property "$service" "$object_path" "$operation_interface" Functional | awk '{print $NF}')
+        if [ "$functional" = "false" ]; then
+            echo "$FAN_STATUS_ABNORMAL"
+            return 0
+        fi
     done
 
     echo "$FAN_STATUS_NORMAL"
@@ -68,13 +76,16 @@ pre_status=$FAN_STATUS_UNKNOWN
 while true
 do
     fan_status=$FAN_STATUS_NORMAL
-    # Get the FCBs' presence status from the CMM CPLD
-    fcb_prsnt_reg=$(i2cget -f -y 0x00 0x15 0x01)
 
-    for i in {0..5}
+    # FCB1 ~ FCB6
+    for i in {1..6}
     do
         # Check the presence of each FCB
-        if (( (fcb_prsnt_reg & (1 << i)) != 0 )); then
+        presence=$(busctl get-property xyz.openbmc_project.Inventory.Manager \
+                /xyz/openbmc_project/inventory/system/board/Minerva_CMM/PRSNT_FCB_"${i}" \
+                xyz.openbmc_project.Inventory.Item Present | awk '{print $NF}')
+
+        if [ "$presence" != "true" ]; then
             fan_status=$FAN_STATUS_ABNORMAL
             break
         else
