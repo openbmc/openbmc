@@ -243,5 +243,149 @@
         "ActiveLow": true,
         "Bias": "DISABLE",
         "Inventory": "/system/board/Minerva_CMM/IT_GEAR_RPU_LINK_SPARE"
+    },
+    {
+        "Name": "FAN1",
+        "LineName": "FAN1_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN1"
+    },
+    {
+        "Name": "FAN2",
+        "LineName": "FAN2_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN2"
+    },
+    {
+        "Name": "FAN3",
+        "LineName": "FAN3_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN3"
+    },
+    {
+        "Name": "FAN4",
+        "LineName": "FAN4_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN4"
+    },
+    {
+        "Name": "FAN5",
+        "LineName": "FAN5_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN5"
+    },
+    {
+        "Name": "FAN6",
+        "LineName": "FAN6_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN6"
+    },
+    {
+        "Name": "FAN7",
+        "LineName": "FAN7_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN7"
+    },
+    {
+        "Name": "FAN8",
+        "LineName": "FAN8_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN8"
+    },
+    {
+        "Name": "FAN9",
+        "LineName": "FAN9_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN9"
+    },
+    {
+        "Name": "FAN10",
+        "LineName": "FAN10_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN10"
+    },
+    {
+        "Name": "FAN11",
+        "LineName": "FAN11_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN11"
+    },
+    {
+        "Name": "FAN12",
+        "LineName": "FAN12_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN12"
+    },
+    {
+        "Name": "FAN13",
+        "LineName": "FAN13_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN13"
+    },
+    {
+        "Name": "FAN14",
+        "LineName": "FAN14_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN14"
+    },
+    {
+        "Name": "FAN15",
+        "LineName": "FAN15_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN15"
+    },
+    {
+        "Name": "FAN16",
+        "LineName": "FAN16_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN16"
+    },
+    {
+        "Name": "FAN17",
+        "LineName": "FAN17_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN17"
+    },
+    {
+        "Name": "FAN18",
+        "LineName": "FAN18_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN18"
+    },
+    {
+        "Name": "FAN19",
+        "LineName": "FAN19_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN19"
+    },
+    {
+        "Name": "FAN20",
+        "LineName": "FAN20_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN20"
+    },
+    {
+        "Name": "FAN21",
+        "LineName": "FAN21_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN21"
+    },
+    {
+        "Name": "FAN22",
+        "LineName": "FAN22_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN22"
+    },
+    {
+        "Name": "FAN23",
+        "LineName": "FAN23_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN23"
+    },
+    {
+        "Name": "FAN24",
+        "LineName": "FAN24_PRSNT",
+        "Bias": "DISABLE",
+        "Inventory": "/system/board/Minerva_Fan_Board/FAN24"
     }
 ]
