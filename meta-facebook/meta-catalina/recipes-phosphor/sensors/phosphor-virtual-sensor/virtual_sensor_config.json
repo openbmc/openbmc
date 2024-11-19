@@ -1,2 +1,110 @@
 [
+    {
+        "Desc": {
+            "Name": "VIRTUAL_PDB_P48V_HSC1_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc1_curr",
+                    "Desc": {
+                        "Name": "PDB_P48V_HSC1_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0, (0.9418 * hsc1_curr) - 0.1819)"
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_PDB_P48V_HSC1_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc1_pwr",
+                    "Desc": {
+                        "Name": "PDB_P48V_HSC1_PWR_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0, (0.941 * hsc1_pwr) - 8.9115)"
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_PDB_P48V_HSC2_CURR_A",
+            "SensorType": "current",
+            "MaxValue": "255",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc2_curr",
+                    "Desc": {
+                        "Name": "PDB_P48V_HSC2_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0, (0.94885 * hsc2_curr) - 0.274)"
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_PDB_P48V_HSC2_PWR_W",
+            "SensorType": "power",
+            "MaxValue": "3000",
+            "MinValue": "0"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "hsc2_pwr",
+                    "Desc": {
+                        "Name": "PDB_P48V_HSC2_PWR_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0, (0.94865 * hsc2_pwr) - 13.862)"
+    }
 ]
