@@ -15,7 +15,8 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * ethanolx
 * ampere
   * mtjade
-  * mtmitchell
+  * mtjefferson
+  * mtmitchell-dcscm
 * asrock
   * e3c246d4i
   * e3c256d4i
