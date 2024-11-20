@@ -77,6 +77,11 @@ GBMC_ULA_PREFIX = "fdb5:0481:10ce:0"
 # coordinated powercycle
 GBMC_COORDINATED_POWERCYCLE ?= "true"
 
+# Allow machines to upgrade all netboot warm reboots into powercyles in case
+# they have stability issues performing them. We prefer machines avoid this
+# setting and fix any outstanding issues.
+GBMC_NETBOOT_UPGRADE_REBOOT ?= ""
+
 def mac_to_eui64(mac):
   if not mac:
     return ''
@@ -158,7 +163,9 @@ do_install() {
   install -m0644 ${WORKDIR}/gbmc-br-load-ip.service ${D}${systemd_system_unitdir}/
   install -d -m0755 ${D}${datadir}/gbmc-br-dhcp
 
-  sed 's,@COORDINATED_POWERCYCLE@,${GBMC_COORDINATED_POWERCYCLE},' ${WORKDIR}/50-gbmc-psu-hardreset.sh.in >${WORKDIR}/50-gbmc-psu-hardreset.sh
+  sed -e 's,@COORDINATED_POWERCYCLE@,${GBMC_COORDINATED_POWERCYCLE},' \
+      -e 's,@UPGRADE_REBOOT@,${GBMC_NETBOOT_UPGRADE_REBOOT},' \
+    ${WORKDIR}/50-gbmc-psu-hardreset.sh.in >${WORKDIR}/50-gbmc-psu-hardreset.sh
   install -m0644 ${WORKDIR}/50-gbmc-psu-hardreset.sh ${D}${datadir}/gbmc-br-dhcp/
   install -m0644 ${WORKDIR}/51-gbmc-reboot.sh ${D}${datadir}/gbmc-br-dhcp/
 

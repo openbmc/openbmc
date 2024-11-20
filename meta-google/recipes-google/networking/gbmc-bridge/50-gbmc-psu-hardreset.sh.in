@@ -17,9 +17,14 @@
 
 gbmc_psu_hardreset_needed=
 
+UPGRADE_REBOOT=@UPGRADE_REBOOT@
 COORDINATED_POWERCYCLE=@COORDINATED_POWERCYCLE@
 
 gbmc_psu_hardreset_hook() {
+  if [ -n "${gbmc_reboot_needed-}" ] && [ -n "${UPGRADE_REBOOT}" ]; then
+    update-dhcp-status 'ONGOING' "upgrade bmc reboot into powercycle"
+    gbmc_psu_hardreset_needed=1
+  fi
   # We don't always need a powercycle, allow skipping
   if [ -z "${gbmc_psu_hardreset_needed-}" ]; then
     echo "Skipping tray powercycle" >&2
