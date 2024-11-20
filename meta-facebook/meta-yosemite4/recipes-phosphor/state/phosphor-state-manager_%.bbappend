@@ -48,6 +48,7 @@ SRC_URI:append = " \
     file://power-cmd \
     file://wait-until-mctp-connection-done \
     file://rescan-cxl-eid \
+    file://wait-until-mctp-EID-remove \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -68,6 +69,7 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/power-cmd ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/wait-until-mctp-connection-done ${D}${libexecdir}/${PN}/
+    install -m 0755 ${WORKDIR}/wait-until-mctp-EID-remove ${D}${libexecdir}/${PN}/
     install -m 0755 ${WORKDIR}/rescan-cxl-eid ${D}${libexecdir}/${PN}/
 }
 

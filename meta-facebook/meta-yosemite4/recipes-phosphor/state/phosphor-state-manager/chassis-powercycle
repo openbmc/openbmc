@@ -105,11 +105,13 @@ chassis-power-cycle()
                 msg="Failed to set slot$CHASSIS_ID power off"
                 echo "${msg}"
                 add_sel "${msg}"
+            else
+                echo "Succeed to set slot$CHASSIS_ID power off"
             fi
             # Set chassis power state off
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
-
             sleep 20
+            /usr/libexec/phosphor-state-manager/wait-until-mctp-EID-remove "$CHASSIS_ID" "36"
         fi
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
         then

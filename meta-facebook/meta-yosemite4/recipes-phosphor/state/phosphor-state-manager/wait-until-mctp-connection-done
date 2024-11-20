@@ -8,11 +8,13 @@ while [ $count -lt 12 ]; do
     isMctpConnect=$?;
     echo $isMctpConnect
     if [ $isMctpConnect -eq 0 ]; then
+        echo "MCTP ETD $EID connection successfully."
         exit 0;
     fi
+    echo "MCTP EID $EID not connection yet."
     sleep 5;
     count=$((count + 1))
 done
 
-echo "timeout waiting for MCTP connection"
+echo "timeout waiting for MCTP EID $EID connection."
 exit 1

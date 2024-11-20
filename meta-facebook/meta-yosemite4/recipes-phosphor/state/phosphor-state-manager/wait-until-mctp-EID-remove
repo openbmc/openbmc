@@ -1,0 +1,62 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <slot> <max_attempts>"
+    exit 1
+fi
+
+SLOT=$1
+MAX_ATTEMPTS=$2
+
+SD_EID=$((SLOT * 10))
+WF_EID=$((SLOT * 10 + 2))
+count=0
+
+echo "Starting MCTP EID check for SLOT: $SLOT"
+echo "Checking SD_EID: $SD_EID and WF_EID: $WF_EID"
+echo "Maximum attempts: $MAX_ATTEMPTS"
+
+while [ $count -lt "$MAX_ATTEMPTS" ]; do
+    sd_output=$(busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$SD_EID" xyz.openbmc_project.MCTP.Endpoint EID 2>&1)
+    wf_output=$(busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$WF_EID" xyz.openbmc_project.MCTP.Endpoint EID 2>&1)
+
+    echo "Slot $SLOT attempt $((count + 1)) times:"
+    echo "SD Output: $sd_output"
+    echo "WF Output: $wf_output"
+
+    sd_removed=false
+    wf_removed=false
+
+    if [[ $sd_output == *"Unknown object"* ]]; then
+        echo "SD EID $SD_EID is removed."
+        sd_removed=true
+    else
+        echo "SD EID $SD_EID is still present."
+    fi
+
+    if [[ $wf_output == *"Unknown object"* ]]; then
+        echo "WF EID $WF_EID is removed."
+        wf_removed=true
+    else
+        echo "WF EID $WF_EID is still present."
+    fi
+
+    if $sd_removed && $wf_removed; then
+        echo "Both SD EID $SD_EID and WF EID $WF_EID are removed successfully."
+        exit 0
+    fi
+
+    if ! $sd_removed; then
+        echo "SD EID $SD_EID not removed yet."
+    fi
+    if ! $wf_removed; then
+        echo "WF EID $WF_EID not removed yet."
+    fi
+
+    echo "Retrying in 5 seconds..."
+    sleep 5
+    count=$((count + 1))
+done
+
+echo "Timeout waiting for MCTP EID $SD_EID and $WF_EID removal"
+exit 1
