@@ -27,6 +27,7 @@ inherit obmc-phosphor-systemd
 EXTRA_OEMESON = " \
         -Dtests=disabled \
         ${PSU_VERSION_UTIL} \
+        ${PSU_MODEL_UTIL} \
         ${PSU_VERSION_COMPARE_UTIL} \
         ${PSU_UPDATE_SERVICE} \
         "
@@ -39,9 +40,12 @@ RDEPENDS:${PN} += "phosphor-power"
 ## The psutils here comes from phosphor-power repo where
 ## * PSU_VERSION_UTIL accepts a PSU inventory path and returns the PSU
 ##   firmware version string
+## * PSU_MODEL_UTIL accepts a PSU inventory path and returns the PSU
+##   model string
 ## * PSU_VERSION_COMPARE_UTIL accepts several PSU inventory paths and return
 ##   the newest version string
 PSU_VERSION_UTIL ?= "-DPSU_VERSION_UTIL='/usr/bin/psutils --raw --get-version'"
+PSU_MODEL_UTIL ?= "-DPSU_MODEL_UTIL='/usr/bin/psutils --raw --get-model'"
 PSU_VERSION_COMPARE_UTIL ?= "-DPSU_VERSION_COMPARE_UTIL='/usr/bin/psutils --raw --compare'"
 ## The psu-update@.service from repo is an example service that only prints a log and fails
 ## Override it in a machine layer to invoke the psu update util
