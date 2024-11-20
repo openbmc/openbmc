@@ -168,6 +168,7 @@ done
 meta-phosphor/scripts/generate-machine-list
 if ! git --no-pager diff --exit-code ; then
     echo "Changes to supported-machines.md necessary due to new meta-layer support."
+    exit 1
 fi
 
 echo "Repo test passed"
