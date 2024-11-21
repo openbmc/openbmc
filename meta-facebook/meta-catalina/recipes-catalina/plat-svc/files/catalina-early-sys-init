@@ -4,13 +4,25 @@ source /usr/libexec/fb-common-functions
 
 config_fan()
 {
-    # set fan target to possibile maximum fan speed 34560 rpm
-    if find /sys/bus/i2c/devices/*/hwmon/*/fan*_target -print -quit 2>/dev/null | grep -q .; then
-        for file in /sys/bus/i2c/devices/*/hwmon/*/fan*_target
+    # Set fan tack sample count for each tach channel to highest value to avoid
+    # wrong fan tach reading.
+    #
+    # FanX_Dynamics
+    # - register offset: 0x08 (tach1) - 0x0d (tach6)
+    # |------------------------ -----------------------------------------------|
+    # | bit[7:5]         | 000b | 001b | 010b | 011b | 110b | 101b, 110b, 111b |
+    # |------------------------------------------------------------------------|
+    # | tach sample count|  1   |  2   |  4   |  8   |  16  |  32              |
+    # |------------------------------------------------------------------------|
+    for addr in "0x21" "0x27"
+    do
+        for offset in $(seq 0x08 0x0d)
         do
-            echo 34560 > "${file}"
+            fan_dynam_val=$(printf "%d" "$(i2cget -y -f 18 "$addr" "$offset")")
+            fan_dynam_val=$((fan_dynam_val | 0xe0))
+            i2cset -y -f 18 "$addr" "$offset" "$fan_dynam_val"
         done
-    fi
+    done
 
     # set fan enable
     if find /sys/bus/i2c/devices/*/hwmon/*/fan*_enable -print -quit 2>/dev/null | grep -q .; then
