@@ -6,24 +6,23 @@ set -e
 # host firmware update
 #
 # Find the GPIO pin associated with "pch-ready"
-GPIO_PIN=$(gpiofind "pch-ready")
+# and read the value
+PCH_READY_GPIO_PIN=$(gpiofind "pch-ready")
 
-if [ -z "${GPIO_PIN}" ]; then
+if [ -z "${PCH_READY_GPIO_PIN}" ]; then
     echo "gpio 'pch-ready' not found in device tree. Exiting."
     exit 0
 fi
 
-# Read the value of the GPIO pin
-GPIO_CHIP=$(echo "$GPIO_PIN" | cut -d' ' -f1) # Extract gpiochip
-GPIO_LINE=$(echo "$GPIO_PIN" | cut -d' ' -f2) # Extract line offset
-GPIO_VALUE=$(gpioget "$GPIO_CHIP" "$GPIO_LINE")
+read -r PCH_READY_GPIO_CHIP PCH_READY_GPIO_LINE <<< "$PCH_READY_GPIO_PIN"
+GPIO_VALUE=$(gpioget "$PCH_READY_GPIO_CHIP" "$PCH_READY_GPIO_LINE")
 
 if [ "${GPIO_VALUE}" != "0" ]; then
     echo "PCH is not on standby. Exiting host firmware version read."
     exit 0
 fi
 
-IMAGE_FILE=$(find "$1" -name "*.FD")
+IMAGE_FILE=$(find "$1" -name "*.rom")
 
 IPMB_OBJ="xyz.openbmc_project.Ipmi.Channel.Ipmb"
 IPMB_PATH="/xyz/openbmc_project/Ipmi/Channel/Ipmb"
@@ -69,18 +68,57 @@ me_reset() {
     busctl call "$IPMB_OBJ" "$IPMB_PATH" "$IPMB_INTF" sendRequest yyyyay "${ME_CMD_RESET[@]}"
 }
 
-reset_and_cleanup_env() {
-    echo "Reset ME and disable GPIO"
-    me_reset
-    sleep 5
-    # Disable flash-write-override
-    gpioset "${gpiochip}" "${gpio_line}=0"
+configure_flash_env() {
+    # 1. Assert PCH RESET
+    # 2. Enable/Disable FM_FLASH_SEC_OVRD
+    # 3. De-assert PCH RESET
+    local action="$1"
+    if [ "$action" == "enable" ]; then
+        echo "Asserting PCH RESET and enabling flash write override"
+        gpioset "${PCH_RESET_GPIO_CHIP}" "${PCH_RESET_GPIO_LINE}=0"
+        gpioset "${FLASH_OVERRIDE_GPIO_CHIP}" "${FLASH_OVERRIDE_GPIO_LINE}=1"
+        gpioset "${PCH_RESET_GPIO_CHIP}" "${PCH_RESET_GPIO_LINE}=1"
+        sleep 2
+    elif [ "$action" == "disable" ]; then
+        echo "Disabling flash write override and resetting PCH RESET"
+        gpioset "${PCH_RESET_GPIO_CHIP}" "${PCH_RESET_GPIO_LINE}=0"
+        gpioset "${FLASH_OVERRIDE_GPIO_CHIP}" "${FLASH_OVERRIDE_GPIO_LINE}=0"
+        gpioset "${PCH_RESET_GPIO_CHIP}" "${PCH_RESET_GPIO_LINE}=1"
+    else
+        echo "Invalid action specified for configure_flash_env. Use 'enable' or 'disable'."
+        exit 1
+    fi
 }
 
-# Enable flash-write-override
-gpio_info="$(gpiofind flash-write-override)"
-read -r gpiochip gpio_line <<< "$gpio_info"
-gpioset "${gpiochip}" "${gpio_line}=1"
+cleanup_env() {
+    # Disable flash protection and clean up
+    configure_flash_env "disable"
+}
+
+reset_and_cleanup_env() {
+    echo "Reset ME and disable flash-write-override GPIO"
+    me_reset
+    sleep 5
+    cleanup_env
+}
+
+
+PCH_RESET_GPIO_PIN=$(gpiofind "pch-reset")
+if [ -z "${PCH_RESET_GPIO_PIN}" ]; then
+    echo "gpio 'pch-ready' not found in device tree. Exiting."
+    exit 0
+fi
+read -r PCH_RESET_GPIO_CHIP PCH_RESET_GPIO_LINE <<< "$PCH_RESET_GPIO_PIN"
+
+FLASH_OVERRIDE_GPIO_PIN="$(gpiofind flash-write-override)"
+if [ -z "${FLASH_OVERRIDE_GPIO_PIN}" ]; then
+    echo "gpio 'flash-write-override' not found in device tree. Exiting."
+    exit 0
+fi
+read -r FLASH_OVERRIDE_GPIO_CHIP FLASH_OVERRIDE_GPIO_LINE <<< "$FLASH_OVERRIDE_GPIO_PIN"
+
+configure_flash_env "enable"
+sleep 2
 
 me_wait_poweron
 
