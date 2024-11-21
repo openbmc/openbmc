@@ -18,6 +18,9 @@ SRC_URI += "file://assert-gpio-log@.service \
             file://deassert-reset-button.service \
             file://deassert-uart-switch-button \
             file://deassert-uart-switch-button.service \
+            file://device-reinitial \
+            file://device-reinitial.service \
+            file://device-util \
             file://host-power-off \
             file://host-power-off.service \
             file://host-power-on \
@@ -42,6 +45,7 @@ SYSTEMD_SERVICE:${PN} += " \
     deassert-reset-button.service \
     deassert-uart-switch-button.service \
     multi-gpios-sys-init.service \
+    device-reinitial.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -71,6 +75,9 @@ do_install:append:() {
 
     install -m 0755 ${UNPACKDIR}/assert-power-good ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-power-good ${D}${libexecdir}/${PN}/
+
+    install -m 0755 ${UNPACKDIR}/device-reinitial ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/device-util ${D}${libexecdir}/${PN}/
 
     install -m 0755 ${UNPACKDIR}/deassert-uart-switch-button ${D}${libexecdir}/${PN}/
 

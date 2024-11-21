@@ -3,9 +3,24 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+check_valid_sgpio() {
+    sgpio_vaild0=$(gpioget 2 146)
+    sgpio_vaild1=$(gpioget 2 198)
+    sgpio_vaild2=$(gpioget 2 18)
+
+    if [[ "$sgpio_vaild0" == "0" && "$sgpio_vaild1" == "0" && "$sgpio_vaild2" == "1" ]]; then
+        return 0  # true
+    else
+        return 1  # false
+    fi
+}
+
 # Power Good Status
 power_status() {
-    if [ "$(get_gpio "host0-ready")" -eq 1 ] && [ "$(get_gpio "power-card-enable")" -eq 0 ] ; then
+    check_valid_sgpio
+    valid_sgpio=$?
+
+    if [ "$(get_gpio "host0-ready")" -eq 1 ] && [ "$valid_sgpio" -eq 0 ] ; then
         echo "on"
     else
         echo "off"

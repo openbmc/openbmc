@@ -1,0 +1,93 @@
+#!/bin/bash
+
+SYSFS_I2C_ROOT="/sys/bus/i2c"
+SYSFS_I2C_DEVICES="${SYSFS_I2C_ROOT}/devices"
+SYSFS_I2C_DRIVERS="${SYSFS_I2C_ROOT}/drivers"
+
+i2c_bind_driver() {
+
+  driver_name="$1"
+  i2c_device="$2"
+  driver_dir="${SYSFS_I2C_DRIVERS}/${driver_name}"
+
+  if [ -n "$3" ]; then
+    retries="$3"
+  else
+    retries=1
+  fi
+
+  if [ ! -d "${driver_dir}" ]; then
+    echo "unable to locate i2c driver ${driver_name} in sysfs"
+    return 1
+  fi
+
+  retry=0
+  while [ "$retry" -lt "$retries" ]; do
+    if echo "${i2c_device}" > "${driver_dir}/bind"; then
+      return 0
+    fi
+
+    usleep 50000  # sleep for 50 milliseconds
+    retry=$((retry + 1))
+  done
+
+  return 1
+}
+
+rebind_i2c_dev() {
+  dev="$1-00$2"
+  dri=$3
+
+  if [ ! -L "${SYSFS_I2C_DEVICES}/$dev/driver" ]; then
+    if i2c_bind_driver "$dri" "$dev" >/dev/null; then
+      echo "rebind $dev to driver $dri successfully"
+    else
+      echo "rebind $dev to driver $dri fail"
+    fi
+
+  fi
+}
+
+mb_power_lose_reprobe() {
+  # Mux
+  echo "Bind Mux..."
+  rebind_i2c_dev  3 70 "pca954x"
+  rebind_i2c_dev  6 70 "pca954x"
+  rebind_i2c_dev 13 70 "pca954x"
+
+  echo "Bind Fru..."
+  rebind_i2c_dev  1 50 "at24"
+  rebind_i2c_dev  4 52 "at24"
+  rebind_i2c_dev  9 52 "at24"
+  rebind_i2c_dev 11 52 "at24"
+  rebind_i2c_dev 15 50 "at24"
+  rebind_i2c_dev 15 56 "at24"
+  rebind_i2c_dev 29 54 "at24"
+
+  # Sensors
+  echo "Bind MB Sensors..."
+
+  # MB_E1S
+  rebind_i2c_dev 22 45 ina2xx
+  rebind_i2c_dev 23 45 ina2xx
+
+  # MB VR_CPU_VCORE0_SOC, VR_CPU_VCORE1_SOC, VR_CPU_PVDD11
+  # (isl69260/xdpe152c)
+  rebind_i2c_dev 28 61 isl68137
+  rebind_i2c_dev 28 62 isl68137
+  rebind_i2c_dev 28 63 isl68137
+  rebind_i2c_dev 28 64 xdpe152c4
+  rebind_i2c_dev 28 66 xdpe152c4
+  rebind_i2c_dev 28 68 xdpe152c4
+  # MB_RETIMER_TEMP_C
+  rebind_i2c_dev 12 24 pt5161l
+  rebind_i2c_dev 21 24 pt5161l
+
+  # MB SBRMI, SBTSI, CPU & DIMM
+  rebind_i2c_dev  7 3c sbrmi
+  rebind_i2c_dev  7 4c sbrti
+
+  # MB Voltage Monitor
+  rebind_i2c_dev 29 1d adc128d818
+  rebind_i2c_dev 29 1f adc128d818
+}

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/gpio/phosphor-gpio-monitor/device-util
+source /usr/libexec/phosphor-gpio-monitor/device-util
+
 read_i2c_dev() {
   local bus="$1"
   local addr="$2"
@@ -13,17 +16,30 @@ read_i2c_dev() {
 }
 
 probe_dev() {
-  echo ina230 0x45 > /sys/bus/i2c/devices/i2c-22/new_device
-  echo ina230 0x45 > /sys/bus/i2c/devices/i2c-23/new_device
+
+  # MB Voltage Monitor
+  # Set adc128d818 in2 max. value to prevent
+  # psusensor[1011]: Failure assert/deassert
+  # from continuously triggering.
+  i2cset -f -y 29 0x1d 0x2e 0xff
+  i2cset -f -y 29 0x1f 0x2e 0xff
 
   if read_i2c_dev 9 0x71; then
+    # EVT PTTV or SITV
     echo pca9546 0x71 > /sys/bus/i2c/devices/i2c-9/new_device
   elif read_i2c_dev 11 0x71; then
+    # DVT PTTV or SITV
     echo pca9546 0x71 > /sys/bus/i2c/devices/i2c-11/new_device
   else
+    # Aegis board
     return
   fi
 
+
+  # Set adc128d818 in2 max. value to prevent
+  # psusensor[1011]: Failure assert/deassert
+  # from continuously triggering.
+  i2cset -f -y 36 0x1d 0x2e 0xff
   echo adc128d818 0x1d > /sys/bus/i2c/devices/i2c-36/new_device
   echo ina238 0x44 > /sys/bus/i2c/devices/i2c-36/new_device
   echo ina238 0x45 > /sys/bus/i2c/devices/i2c-36/new_device
@@ -54,6 +70,10 @@ set_hsc_sample_rate() {
   fi
 }
 
+# If the motherboard power recovers before the GPIO monitor starts,
+# we can't detect the standby power transition from low to high.
+# Thus, we add mb_power_lose_reprobe to ensure the motherboard device is ready
+mb_power_lose_reprobe
 
 probe_dev
 set_hsc_sample_rate

@@ -1,0 +1,11 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/gpio/phosphor-gpio-monitor/device-util
+source /usr/libexec/phosphor-gpio-monitor/device-util
+
+
+mb_power_lose_reprobe
+
+busctl call xyz.openbmc_project.FruDevice \
+  /xyz/openbmc_project/FruDevice \
+  xyz.openbmc_project.FruDeviceManager \
+  ReScan

@@ -16,8 +16,15 @@
         "GpioNum": 21,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["host-power-on.service"],
-            "FALLING": ["host-power-off.service"]
+            "RISING": [
+                "deassert-gpio-log@0_power-hsc-good.service",
+                "host-power-on.service",
+                "device-reinitial.service"
+            ],
+            "FALLING": [
+                "assert-gpio-log@0_power-hsc-good.service",
+                "host-power-off.service"
+            ]
         },
         "Continue": true
     },

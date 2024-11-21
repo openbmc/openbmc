@@ -1,0 +1,8 @@
+[Unit]
+Description=Device Reinitial
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/device-reinitial
+
+SyslogIdentifier=device-reinitial

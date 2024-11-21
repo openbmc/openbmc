@@ -1,5 +1,7 @@
 [Unit]
 Description=Host power on assertion
+After=device-reinitial.service
+Wants=device-reinitial.service
 
 [Service]
 Type=oneshot
