@@ -1,0 +1,8 @@
+[Unit]
+Description=Assert CPU_BOOT_DONE
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/catalina-gpio-monitor CPU_BOOT_DONE assert
+
+SyslogIdentifier=assert-cpu-boot-done

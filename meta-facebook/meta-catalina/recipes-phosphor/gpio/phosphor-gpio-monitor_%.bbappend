@@ -16,12 +16,15 @@ RDEPENDS:${PN}:append = " bash"
 FILES:${PN} += "${systemd_system_unitdir}/*"
 
 SYSTEMD_SERVICE:${PN}-monitor += " \
+    assert-cpu-boot-done.service \
     assert-gpio-log@.service \
     assert-reset-button.service \
     assert-run-power-pg.service \
+    deassert-cpu-boot-done.service \
     deassert-gpio-log@.service \
     deassert-reset-button.service \
     deassert-run-power-pg.service \
+    catalina-host-ready.target \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"

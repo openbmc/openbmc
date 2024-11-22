@@ -1,5 +1,15 @@
 [
     {
+        "Name": "CPU_BOOT_DONE",
+        "LineName": "CPU_BOOT_DONE",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-cpu-boot-done.service"],
+            "FALLING": ["deassert-cpu-boot-done.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "RUN_POWER_PG",
         "LineName": "RUN_POWER_PG",
         "EventMon": "BOTH",

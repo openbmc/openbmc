@@ -49,6 +49,17 @@ do_ID_RST_BTN_BMC_N_change()
     fi
 }
 
+do_CPU_BOOT_DONE_change()
+{
+    if [ "$STATE" = "assert" ]; then
+        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby
+        systemctl start catalina-host-ready.target
+    else
+        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Inactive
+        systemctl stop catalina-host-ready.target
+    fi
+}
+
 do_gpio_assert_log()
 {
     LOG_MSG=""
@@ -266,6 +277,9 @@ case $LINENAME in
         ;;
     "ID_RST_BTN_BMC_N")
         do_ID_RST_BTN_BMC_N_change
+        ;;
+    "CPU_BOOT_DONE")
+        do_CPU_BOOT_DONE_change
         ;;
     *)
         if [ "$STATE" = "assert" ]; then
