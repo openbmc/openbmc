@@ -86,3 +86,7 @@ for i in 7 6 5 4; do
         xyz.openbmc_project.Logging.Entry.Level.Error 1 "$MESSAGE" "1"
     fi
 done
+
+# Send a high pulse to CPLD IOE 0x23 port2 bit4 "ALT_CPLD2_R_N" to do recovery
+i2ctransfer -f -y 28 w2@0x23 0xa 0x10
+i2ctransfer -f -y 28 w2@0x23 0xa 0x0
