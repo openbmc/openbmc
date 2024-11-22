@@ -51,12 +51,17 @@ gbmc_upgrade_dl_unpack() {
   # We want to allow 2 images and a small amount of metadata (2*64+2)M
   local max_mb=$((2*64 + 2))
   ulimit -f $((max_mb * 1024 * 1024 / 512)) || return
-  timeout=$((SECONDS + 300))
-  stime=5
+  local deadline=600
+  local timeout=$((SECONDS + deadline))
+  local retry=0
+
+  local stime=5
   while true; do
     local st=()
-    update-dhcp-status 'ONGOING' "downloading and unpacking from ${bootfile_url}, remaining time $(( timeout - SECONDS ))"
-    curl -LSsk --max-time $((timeout - SECONDS)) "$bootfile_url" |
+    # give a chance to retry the curl if it stuck until the maximum timeout
+    single_deadline=$(( deadline / 3 ))
+    update-dhcp-status 'ONGOING' "downloading and unpacking from ${bootfile_url}, retry ${retry}, deadline ${single_deadline} sec"
+    curl -LSsk --max-time ${single_deadline} "$bootfile_url" |
       tar "${tflags[@]}" --wildcards --warning=none -xC "$tmpdir" "${GBMC_UPGRADE_UNPACK_FILES[@]}" 2>"$tmpdir"/tarerr \
       && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
     # Curl failures should continue
@@ -72,10 +77,12 @@ gbmc_upgrade_dl_unpack() {
     fi
     if (( SECONDS + stime >= timeout )); then
       echo 'Timed out fetching image' >&2
+      update-dhcp-status 'ONGOING' "Image fetching timeout, netboot failed"
       return 1
     fi
     (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
     sleep $stime
+    (( retry = retry + 1 ))
   done
 }
 
