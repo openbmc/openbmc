@@ -110,9 +110,9 @@ do_gpio_assert_log()
     # PDB CPLD IOEXP 14-0011, Port 1
     elif [ "$LINENAME" = "FM_SYS_THROTTLE_N" ]; then
         LOG_MSG="System throttle"
-    elif [ "$LINENAME" = "OCP_V3_2_PWRBRK_FROM_HOST_ISO_PLD_N" ]; then
+    elif [ "$LINENAME" = "OCP_V3_2_PWRBRK_FROM_HOST_ISO_P" ]; then
         LOG_MSG="NIC1 PWRBRK from Host"
-    elif [ "$LINENAME" = "OCP_SFF_PWRBRK_FROM_HOST_ISO_PLD_N" ]; then
+    elif [ "$LINENAME" = "OCP_SFF_PWRBRK_FROM_HOST_ISO_PL" ]; then
         LOG_MSG="NIC0 PWRBRK from Host"
 
     # PDB CPLD IOEXP 14-0012, Port 0
@@ -142,8 +142,6 @@ do_gpio_assert_log()
         LOG_MSG="Large leakage alert, leak cable 1"
     elif [ "$LINENAME" = "CHASSIS0_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Small leakage alert, leak cable 0"
-    elif [ "$LINENAME" = "" ]; then
-        LOG_MSG=""
     elif [ "$LINENAME" = "SMB_RJ45_FIO_TMP_ALERT" ]; then
         LOG_MSG="FIO board tempreture sensor alert"
     else
