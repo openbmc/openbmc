@@ -84,6 +84,11 @@ disable_i3c_hub()
 chassis-power-cycle()
 {
     CHASSIS_ID=$1
+    chassis_power_cycle_lock="/tmp/chassis_power_cycle.lock"
+
+    exec 200>"$chassis_power_cycle_lock"
+    flock -x 200
+    trap 'flock -u 200' EXIT
 
     if [ "$CHASSIS_ID" -le 8  ]
     then
@@ -141,17 +146,20 @@ chassis-power-cycle()
             msg="Chassis$CHASSIS_ID cycle success"
             echo "${msg}"
             add_sel "${msg}"
+            flock -u 200
             exit 0;
         else
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
             msg="Chassis$CHASSIS_ID cycle failed, Chassis$CHASSIS_ID is power off"
             echo "${msg}"
             add_sel "${msg}"
+            flock -u 200
             exit 1;
         fi
     fi
 
     echo "Invalid slot id"
+    flock -u 200
     exit 1;
 }
 
