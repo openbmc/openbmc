@@ -403,5 +403,85 @@
                 "nic-power-fault@0.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT1_BMC_N",
+        "LineName": "FM_RESBTN_SLOT1_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@1.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT2_BMC_N",
+        "LineName": "FM_RESBTN_SLOT2_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@2.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT3_BMC_N",
+        "LineName": "FM_RESBTN_SLOT3_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@3.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT4_BMC_N",
+        "LineName": "FM_RESBTN_SLOT4_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@4.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT5_BMC_N",
+        "LineName": "FM_RESBTN_SLOT5_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@5.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT6_BMC_N",
+        "LineName": "FM_RESBTN_SLOT6_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@6.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT7_BMC_N",
+        "LineName": "FM_RESBTN_SLOT7_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@7.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RESBTN_SLOT8_BMC_N",
+        "LineName": "FM_RESBTN_SLOT8_BMC_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "obmc-host-reboot@8.target"]
+        },
+        "Continue": true
     }
 ]
