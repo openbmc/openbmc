@@ -1,0 +1,9 @@
+[Unit]
+Description=Chassis%i Power Cycle
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/chassis-powercycle %i
+
+[Install]
+WantedBy=obmc-chassis-powercycle@%i.target

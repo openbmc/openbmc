@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Ventura RMC Sled Power Cycle
+
+rmc-hsc-power-cycle() {
+    # LTC4287 MFR_REBOOT_CONTROL (FDh) Read/Write
+    # [3]:
+    #       REBOOT 0 Write a 1 to reboot.
+    # [2:0]
+    #       RBT_DL 100 Configures Auto-Reboot turn-on Delay (tDL(RBT)) after the REBOOT bit is set to 1
+    #       RBT_DL[2:0] DELAY
+    #       000 0.580 s
+    #       001 1.16 s
+    #       010 2.32 s
+    #       011 4.64 s
+    #       100 9.28 s
+    #       101 18.6 s
+    #       110 37.1 s
+    #       111 74.2 s
+    ret1=$(i2cset -y -f 10 0x44 0xfd 0x00)
+    ret2=$(i2cset -y -f 10 0x44 0xfd 0x0b)
+
+    if { [ "$ret1" -ne 0 ] || [ "$ret2" -ne 0 ]; }; then
+        return 1
+    else
+        return 0
+    fi
+
+}
+
+# RMC Sled Power Cycle
+if [ "$1" == 0 ]
+then
+    echo "Staring RMC Sled Power Cycle"
+    rmc-hsc-power-cycle
+else
+    echo "Invalid RMC Cycle"
+    exit 1
+fi
