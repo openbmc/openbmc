@@ -946,7 +946,7 @@
                 }
             ]
         },
-        "Expression": "ifNan((hsc_current1 * 1.012 + 0.05), (hsc_current2 * 0.302 - 0.15))"
+        "Expression": "max(0, ifNan((hsc_current1 * 1.012 + 0.05), (hsc_current2 * 0.302 - 0.15)))"
     },
     {
         "Desc": {
@@ -1024,7 +1024,7 @@
                 }
             ]
         },
-        "Expression": "ifNan((hsc_current1 * 1.012 + 0.05), (hsc_current2 * 0.302 - 0.15))"
+        "Expression": "max(0, ifNan((hsc_current1 * 1.012 + 0.05), (hsc_current2 * 0.302 - 0.15)))"
     },
     {
         "Desc": {
