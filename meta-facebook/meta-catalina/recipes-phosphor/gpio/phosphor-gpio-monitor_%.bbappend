@@ -19,6 +19,7 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
     assert-gpio-log@.service \
     assert-reset-button.service \
     assert-run-power-pg.service \
+    deassert-gpio-log@.service \
     deassert-reset-button.service \
     deassert-run-power-pg.service \
     "
