@@ -103,7 +103,9 @@ gbmc_ip_monitor_parse_line() {
     action=add
     pfx_re='^\[LINK\](Deleted )?[0-9]+:[[:space:]]*'
     intf_re='([^:]+):[[:space:]]+'
-    if ! [[ "$line" =~ ${pfx_re}${intf_re} ]]; then
+    carrier_re='state[[:space:]]+([^ ]+)[[:space:]]'
+    combined_re="${pfx_re}${intf_re}.*${carrier_re}"
+    if ! [[ "$line" =~ ${combined_re} ]]; then
       echo "Failed to parse link: $line" >&2
       return 1
     fi
@@ -111,6 +113,7 @@ gbmc_ip_monitor_parse_line() {
       action=del
     fi
     intf="${BASH_REMATCH[2]}"
+    carrier="${BASH_REMATCH[3]}"
     read -ra data || return
     mac="${data[1]}"
   elif [[ "$line" == '[DEFER]'* ]]; then

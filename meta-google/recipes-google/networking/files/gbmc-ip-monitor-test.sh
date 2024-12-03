@@ -171,6 +171,7 @@ testParseLinkAdd() {
   expect_streq "$action" 'add'
   expect_streq "$intf" 'eno2'
   expect_streq "$mac" 'aa:aa:aa:aa:aa:aa'
+  expect_streq "$carrier" 'UP'
 }
 
 testParseLinkDel() {
@@ -180,6 +181,7 @@ testParseLinkDel() {
   expect_streq "$action" 'del'
   expect_streq "$intf" 'eno2'
   expect_streq "$mac" 'aa:aa:aa:aa:aa:aa'
+  expect_streq "$carrier" 'UP'
 }
 
 main
