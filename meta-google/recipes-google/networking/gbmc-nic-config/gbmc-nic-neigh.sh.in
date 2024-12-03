@@ -83,6 +83,13 @@ gbmc_nic_neigh_hook() {
       gbmc_nic_neigh_addr=
       gbmc_nic_neigh_set del "$ip"
     fi
+  elif [[ $change == link && $action == add && $carrier == UP && -n $gbmc_nic_neigh_addr ]]; then
+    local gbmcintf
+    for gbmcintf in "${gbmc_nic_neigh_intfs[@]}"; do
+      if [[ $intf == "$gbmcintf" ]]; then
+	ip neigh replace proxy "$gbmc_nic_neigh_addr" dev "$intf"
+      fi
+    done
   fi
 }
 
