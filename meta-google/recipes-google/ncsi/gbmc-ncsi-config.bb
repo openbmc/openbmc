@@ -95,6 +95,7 @@ do_install:append() {
   echo 'LLMNR=false' >>"$netdir"/gbmc-ncsi.conf
   echo 'MulticastDNS=false' >>"$netdir"/gbmc-ncsi.conf
   echo 'LinkLocalAddressing=ipv6' >>"$netdir"/gbmc-ncsi.conf
+  echo 'IgnoreCarrierLoss=yes' >>"$netdir"/gbmc-ncsi.conf
 
   nftdir=${D}${sysconfdir}/nftables
   install -d -m0755 "$nftdir"

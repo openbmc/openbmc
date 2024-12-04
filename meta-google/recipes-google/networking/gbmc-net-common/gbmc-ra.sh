@@ -42,7 +42,7 @@ default_update_rtr() {
   # this is intentionally 00- as it will not preceed /etc/systemd/network/00-*
   # or /lib/systemd/network/-* files.
   local file=/run/systemd/network/00-bmc-$RA_IF.network
-  printf '[Match]\nName=%s\n[Network]\nDHCP=false\nIPv6AcceptRA=false\nLinkLocalAddressing=yes' \
+  printf '[Match]\nName=%s\n[Network]\nDHCP=false\nIPv6AcceptRA=false\nLinkLocalAddressing=yes\nIgnoreCarrierLoss=yes' \
     "$RA_IF" >"$file"
 
   # Override any existing gateway information within files

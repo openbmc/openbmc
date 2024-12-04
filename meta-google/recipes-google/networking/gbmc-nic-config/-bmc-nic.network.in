@@ -6,3 +6,4 @@ IPv6AcceptRA=false
 LLMNR=false
 MulticastDNS=false
 LinkLocalAddressing=ipv6
+IgnoreCarrierLoss=yes
