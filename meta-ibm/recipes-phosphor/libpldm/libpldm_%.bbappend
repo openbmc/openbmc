@@ -1,1 +1,2 @@
-PACKAGECONFIG:append = " oem-ibm"
+LIBPLDM_OEM := "ibm"
+PACKAGECONFIG:append = " oem"
