@@ -56,4 +56,34 @@ else
     set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
     set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
 fi
+
+mapper wait /xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0
+
+fsc_source=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_0 xyz.openbmc_project.Inventory.Decorator.Asset Model | awk '{print $4}')
+# enable watchdog timeout for fan board 0
+
+if [ "$fsc_source" = "FSC-MAX" ]; then
+    i2cset -f -y 30 0x20 0x0 0x24
+    i2cset -f -y 30 0x2f 0x0 0x24
+elif [ "$fsc_source" = "FSC-NCT" ]; then
+    i2cset -f -y 30 0x21 0x2A 0x80
+    i2cset -f -y 30 0x23 0x2A 0x80
+else
+    echo "Failed to check fan board 0 fru info, watchdog timeout is keeping default setting"
+fi
+
+mapper wait /xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1
+
+fsc_source=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_1 xyz.openbmc_project.Inventory.Decorator.Asset Model | awk '{print $4}')
+# enable watchdog timeout for fan board 1
+
+if [ "$fsc_source" = "FSC-MAX" ]; then
+    i2cset -f -y 31 0x20 0x0 0x24
+    i2cset -f -y 31 0x2f 0x0 0x24
+elif [ "$fsc_source" = "FSC-NCT" ]; then
+    i2cset -f -y 31 0x21 0x2A 0x80
+    i2cset -f -y 31 0x23 0x2A 0x80
+else
+    echo "Failed to check fan board 1 fru info, watchdog timeout is keeping default setting"
+fi
 exit 0
