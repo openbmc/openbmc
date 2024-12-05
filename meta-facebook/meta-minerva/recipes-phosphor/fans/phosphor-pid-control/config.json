@@ -1,0 +1,691 @@
+{
+    "sensors": [
+        {
+            "name": "FCB_1_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FCB_1_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FCB_2_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FCB_3_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FCB_4_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FCB_5_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FCB_6_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_1_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_1_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_2_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_2_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_3_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_3_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_4_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_4_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_5_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_5_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_6_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_6_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_7_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_7_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_8_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_8_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_9_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_9_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_10_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_10_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_11_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_11_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_12_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_12_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_13_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_13_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_14_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_14_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_15_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_15_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_16_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_16_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_17_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_17_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_18_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_18_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_19_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_19_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_20_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_20_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_21_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_21_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_22_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_22_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_23_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_23_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_24_TACH_IL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_24_TACH_IL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_1_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_1_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_2_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_2_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_3_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_3_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_1_FAN_4_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_1_FAN_4_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_1_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_5_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_5_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_6_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_6_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_7_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_7_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_2_FAN_8_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_2_FAN_8_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_9_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_9_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_10_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_10_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_11_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_11_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_3_FAN_12_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_12_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_13_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_13_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_14_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_14_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_15_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_15_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_4_FAN_16_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_4_FAN_16_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_4_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_17_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_17_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_18_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_18_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_19_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_19_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_5_FAN_20_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_5_FAN_20_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_5_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_21_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_21_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_22_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_22_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_23_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_23_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FCB_6_FAN_24_TACH_OL_SPEED_RPM",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_6_FAN_24_TACH_OL_SPEED_RPM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_6_FAN_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        }
+    ],
+
+    "zones": [
+        {
+            "id": 0,
+            "failsafePercent": 85.0,
+            "minThermalOutput": 0.0,
+            "cycleTimeBaseMS": 1000,
+            "updateThermalsTimeMS": 1000,
+            "accumulateSetPoint": true,
+            "pids": [
+                {
+                    "name": "Upper Fan Zone",
+                    "type": "fan",
+                    "inputs": [
+                        "FCB_1_FAN_1_TACH_IL_SPEED_RPM",
+                        "FCB_1_FAN_1_TACH_OL_SPEED_RPM",
+                        "FCB_1_FAN_2_TACH_IL_SPEED_RPM",
+                        "FCB_1_FAN_2_TACH_OL_SPEED_RPM",
+                        "FCB_1_FAN_3_TACH_IL_SPEED_RPM",
+                        "FCB_1_FAN_3_TACH_OL_SPEED_RPM",
+                        "FCB_1_FAN_4_TACH_IL_SPEED_RPM",
+                        "FCB_1_FAN_4_TACH_OL_SPEED_RPM",
+                        "FCB_2_FAN_5_TACH_IL_SPEED_RPM",
+                        "FCB_2_FAN_5_TACH_OL_SPEED_RPM",
+                        "FCB_2_FAN_6_TACH_IL_SPEED_RPM",
+                        "FCB_2_FAN_6_TACH_OL_SPEED_RPM",
+                        "FCB_2_FAN_7_TACH_IL_SPEED_RPM",
+                        "FCB_2_FAN_7_TACH_OL_SPEED_RPM",
+                        "FCB_2_FAN_8_TACH_IL_SPEED_RPM",
+                        "FCB_2_FAN_8_TACH_OL_SPEED_RPM"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "Stepwise_Upper_Zone_TEMP",
+                    "type": "stepwise",
+                    "inputs": [
+                        "FCB_1_TEMP_C",
+                        "FCB_2_TEMP_C"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 60
+                        },
+                        "output": {
+                            "0": 20
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 2
+                    }
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "failsafePercent": 85.0,
+            "minThermalOutput": 0.0,
+            "cycleTimeBaseMS": 1000,
+            "updateThermalsTimeMS": 1000,
+            "accumulateSetPoint": true,
+            "pids": [
+                {
+                    "name": "Middle Fan Zone",
+                    "type": "fan",
+                    "inputs": [
+                        "FCB_3_FAN_9_TACH_IL_SPEED_RPM",
+                        "FCB_3_FAN_9_TACH_OL_SPEED_RPM",
+                        "FCB_3_FAN_10_TACH_IL_SPEED_RPM",
+                        "FCB_3_FAN_10_TACH_OL_SPEED_RPM",
+                        "FCB_3_FAN_11_TACH_IL_SPEED_RPM",
+                        "FCB_3_FAN_11_TACH_OL_SPEED_RPM",
+                        "FCB_3_FAN_12_TACH_IL_SPEED_RPM",
+                        "FCB_3_FAN_12_TACH_OL_SPEED_RPM",
+                        "FCB_4_FAN_13_TACH_IL_SPEED_RPM",
+                        "FCB_4_FAN_13_TACH_OL_SPEED_RPM",
+                        "FCB_4_FAN_14_TACH_IL_SPEED_RPM",
+                        "FCB_4_FAN_14_TACH_OL_SPEED_RPM",
+                        "FCB_4_FAN_15_TACH_IL_SPEED_RPM",
+                        "FCB_4_FAN_15_TACH_OL_SPEED_RPM",
+                        "FCB_4_FAN_16_TACH_IL_SPEED_RPM",
+                        "FCB_4_FAN_16_TACH_OL_SPEED_RPM"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "Stepwise_Middle_Zone_TEMP",
+                    "type": "stepwise",
+                    "inputs": [
+                        "FCB_3_TEMP_C",
+                        "FCB_4_TEMP_C"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 60
+                        },
+                        "output": {
+                            "0": 20
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 2
+                    }
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "failsafePercent": 85.0,
+            "minThermalOutput": 0.0,
+            "cycleTimeBaseMS": 1000,
+            "updateThermalsTimeMS": 1000,
+            "accumulateSetPoint": true,
+            "pids": [
+                {
+                    "name": "Bottom Fan Zone",
+                    "type": "fan",
+                    "inputs": [
+                        "FCB_5_FAN_17_TACH_IL_SPEED_RPM",
+                        "FCB_5_FAN_17_TACH_OL_SPEED_RPM",
+                        "FCB_5_FAN_18_TACH_IL_SPEED_RPM",
+                        "FCB_5_FAN_18_TACH_OL_SPEED_RPM",
+                        "FCB_5_FAN_19_TACH_IL_SPEED_RPM",
+                        "FCB_5_FAN_19_TACH_OL_SPEED_RPM",
+                        "FCB_5_FAN_20_TACH_IL_SPEED_RPM",
+                        "FCB_5_FAN_20_TACH_OL_SPEED_RPM",
+                        "FCB_6_FAN_21_TACH_IL_SPEED_RPM",
+                        "FCB_6_FAN_21_TACH_OL_SPEED_RPM",
+                        "FCB_6_FAN_22_TACH_IL_SPEED_RPM",
+                        "FCB_6_FAN_22_TACH_OL_SPEED_RPM",
+                        "FCB_6_FAN_23_TACH_IL_SPEED_RPM",
+                        "FCB_6_FAN_23_TACH_OL_SPEED_RPM",
+                        "FCB_6_FAN_24_TACH_IL_SPEED_RPM",
+                        "FCB_6_FAN_24_TACH_OL_SPEED_RPM"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "Stepwise_Bottom_Zone_TEMP",
+                    "type": "stepwise",
+                    "inputs": [
+                        "FCB_5_TEMP_C",
+                        "FCB_6_TEMP_C"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 60
+                        },
+                        "output": {
+                            "0": 20
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 2
+                    }
+                }
+            ]
+        }
+    ]
+}
