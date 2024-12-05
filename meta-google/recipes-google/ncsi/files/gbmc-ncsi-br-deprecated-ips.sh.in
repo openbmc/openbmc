@@ -22,8 +22,19 @@ gbmc_ncsi_br_deprecated_ips_confip=
 gbmc_ncsi_br_deprecated_ips_lastip=
 gbmc_ncsi_br_deprecated_ips_lastncsi=
 gbmc_ncsi_br_deprecated_ips_confncsi=
-
+gbmc_ncsi_br_depracated_ips_savedconf=()
 GBMC_NCSI_ROUTE_TABLE=900
+
+gbmc_ncsi_br_deprecated_ips_add_neighs() {
+  local st=0
+  sysctl net.ipv6.conf.@NCSI_IF@.proxy_ndp=1 >/dev/null || st=$?
+  for ip in "${gbmc_ncsi_br_depracated_ips_savedconf[@]}"; do
+    ip -6 neigh replace proxy $ip dev @NCSI_IF@ || st=$?
+  done
+  ip -6 rule replace pref $GBMC_NCSI_ROUTE_TABLE from $pfx/76 \
+      lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
+  return $st
+}
 
 gbmc_ncsi_br_deprecated_ips_update() {
   [ -n "$gbmc_ncsi_br_deprecated_ips_init" ] || return
@@ -101,23 +112,19 @@ EOF
   done < <(ip -6 neigh show proxy dev @NCSI_IF@)
   ip -6 rule del pref $GBMC_NCSI_ROUTE_TABLE 2>/dev/null || true
 
-  local st=0
   if [ -n "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
-    sysctl net.ipv6.conf.@NCSI_IF@.proxy_ndp=1 >/dev/null || st=$?
-    ip -6 neigh add proxy $pfx dev @NCSI_IF@ || st=$?
-    ip -6 neigh add proxy $stateless_pfx dev @NCSI_IF@ || st=$?
+    # Clear saved configuration
+    gbmc_ncsi_br_depracated_ips_savedconf=()
+    gbmc_ncsi_br_depracated_ips_savedconf+=("$pfx")
+    gbmc_ncsi_br_depracated_ips_savedconf+=("$stateless_pfx")
     if [ -n "$host_pfx" ]; then
-      ip -6 neigh add proxy $host_pfx dev @NCSI_IF@ || st=$?
+      gbmc_ncsi_br_depracated_ips_savedconf+=("$host_pfx")
     fi
     if [ -n "$stateless_ip" ]; then
-      ip -6 neigh add proxy $stateless_ip dev @NCSI_IF@ || st=$?
+      gbmc_ncsi_br_depracated_ips_savedconf+=("$stateless_ip")
     fi
-    ip -6 rule add pref $GBMC_NCSI_ROUTE_TABLE from $pfx/76 \
-      lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
   fi
-
-  (( st == 0 )) || gbmc_net_networkd_reload @NCSI_IF@
-
+  gbmc_ncsi_br_deprecated_ips_add_neighs || gbmc_net_networkd_reload @NCSI_IF@
   local rfile=/run/nftables/40-gbmc-ncsi-br.rules
   mkdir -p -m 755 "$(dirname "$rfile")"
   if [ -z "$nfcontents" ]; then
@@ -167,6 +174,9 @@ gbmc_ncsi_br_deprecated_ips_hook() {
     else
       gbmc_ncsi_br_deprecated_ips_lastncsi=
       gbmc_ip_monitor_defer
+    fi
+    if [[ "$carrier" == 'UP' ]]; then
+      gbmc_ncsi_br_deprecated_ips_add_neighs
     fi
   fi
 }
