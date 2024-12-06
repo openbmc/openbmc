@@ -30,6 +30,8 @@ SRC_URI += " \
   file://50-gbmc-ncsi-clear-ip.sh.in \
   file://gbmc-ncsi-old.service.in \
   file://gbmc-ncsi-purge.service.in \
+  file://00-bmc-ncsi.network.in \
+  file://00-ncsi.conf \
   "
 
 S = "${WORKDIR}/sources"
@@ -75,8 +77,9 @@ do_install:append() {
   echo "net.ipv6.conf.$if_name.dad_transmits=0" \
     >>${D}${sysconfdir}/sysctl.d/25-gbmc-ncsi.conf
 
+  install -d -m0755 ${D}${systemd_unitdir}/network
+
   if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
-    install -d -m0755 ${D}${systemd_unitdir}/network
     install -m0644 ${UNPACKDIR}/-bmc-gbmcbrncsidhcp.netdev \
       ${D}${systemd_unitdir}/network/
     install -m0644 ${UNPACKDIR}/-bmc-gbmcbrncsidhcp.network \
@@ -87,15 +90,10 @@ do_install:append() {
       ${D}${systemd_unitdir}/network/
   fi
 
-  netdir=${D}${systemd_unitdir}/network/00-bmc-$if_name.network.d
-  install -d -m0755 "$netdir"
-  echo '[Network]' >>"$netdir"/gbmc-ncsi.conf
-  echo 'DHCP=false' >>"$netdir"/gbmc-ncsi.conf
-  echo 'IPv6AcceptRA=false' >>"$netdir"/gbmc-ncsi.conf
-  echo 'LLMNR=false' >>"$netdir"/gbmc-ncsi.conf
-  echo 'MulticastDNS=false' >>"$netdir"/gbmc-ncsi.conf
-  echo 'LinkLocalAddressing=ipv6' >>"$netdir"/gbmc-ncsi.conf
-  echo 'IgnoreCarrierLoss=yes' >>"$netdir"/gbmc-ncsi.conf
+  netfile=${D}${systemd_unitdir}/network/00-bmc-$if_name.network
+  sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/00-bmc-ncsi.network.in >$netfile
+  install -d -m0755 $netfile.d
+  install -m0644 ${UNPACKDIR}/00-ncsi.conf $netfile.d/
 
   nftdir=${D}${sysconfdir}/nftables
   install -d -m0755 "$nftdir"
