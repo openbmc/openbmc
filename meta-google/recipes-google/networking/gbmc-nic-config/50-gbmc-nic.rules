@@ -3,6 +3,7 @@ table inet filter {
         type filter hook input priority 0; policy drop;
         iifname != gbmcnicdhcp accept
         ip6 nexthdr icmpv6 accept
+        icmp type echo-request accept
         udp dport 547 accept
         udp dport 68 accept
     }
