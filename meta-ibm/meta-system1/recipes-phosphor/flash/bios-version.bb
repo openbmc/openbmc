@@ -16,12 +16,12 @@ SRC_URI += " \
 
 do_install:append() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/bios-version.sh ${D}${libexecdir}/
-    install -m 0755 ${WORKDIR}/pch-standby-check.sh ${D}${libexecdir}/
+    install -m 0755 ${UNPACKDIR}/bios-version.sh ${D}${libexecdir}/
+    install -m 0755 ${UNPACKDIR}/pch-standby-check.sh ${D}${libexecdir}/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/bios-version.service ${D}${systemd_system_unitdir}/
-    install -m 0644 ${WORKDIR}/pch-standby.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/bios-version.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/pch-standby.service ${D}${systemd_system_unitdir}/
 }
 
 SYSTEMD_SERVICE:${PN} += "bios-version.service"

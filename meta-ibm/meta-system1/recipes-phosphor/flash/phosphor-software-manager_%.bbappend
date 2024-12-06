@@ -6,5 +6,5 @@ RDEPENDS:${PN} += "bash flashrom bios-version phosphor-ipmi-ipmb"
 
 do_install:append() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${WORKDIR}/bios-update.sh ${D}${libexecdir}/
+    install -m 0755 ${UNPACKDIR}/bios-update.sh ${D}${libexecdir}/
 }
