@@ -12,6 +12,7 @@
         "xyz.openbmc_project.Settings.service",
         "xyz.openbmc_project.Software.BMC.Updater.service",
         "xyz.openbmc_project.Software.Download.service",
+        "xyz.openbmc_project.Software.Manager.service",
         "xyz.openbmc_project.Software.Version.service",
         "xyz.openbmc_project.State.BMC.service",
         "xyz.openbmc_project.State.Chassis@0.service",
