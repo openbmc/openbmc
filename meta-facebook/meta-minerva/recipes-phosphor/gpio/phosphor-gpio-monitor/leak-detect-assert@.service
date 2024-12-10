@@ -3,5 +3,5 @@ Description=%i Leak Detect Assert
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i leak detect assert" "BLADE" "%i"
+ExecStart=/usr/bin/log-create xyz.openbmc_project.State.Leak.Detector.LeakDetectedCritical --json "{\"DETECTOR_NAME\": \"/xyz/openbmc_project/state/leak/detector/%i\"}"
 SyslogIdentifier=%i-leak-detect-assert

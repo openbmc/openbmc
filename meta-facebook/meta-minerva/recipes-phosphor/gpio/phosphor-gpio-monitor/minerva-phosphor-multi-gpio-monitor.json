@@ -313,8 +313,8 @@
         "GpioNum": 112,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-1.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-1.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade1.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade1.service"]
         },
         "Continue": true
     },
@@ -324,8 +324,8 @@
         "GpioNum": 114,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-2.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-2.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade2.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade2.service"]
         },
         "Continue": true
     },
@@ -335,8 +335,8 @@
         "GpioNum": 116,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-3.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-3.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade3.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade3.service"]
         },
         "Continue": true
     },
@@ -346,8 +346,8 @@
         "GpioNum": 118,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-4.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-4.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade4.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade4.service"]
         },
         "Continue": true
     },
@@ -357,8 +357,8 @@
         "GpioNum": 120,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-5.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-5.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade5.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade5.service"]
         },
         "Continue": true
     },
@@ -368,8 +368,8 @@
         "GpioNum": 122,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-6.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-6.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade6.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade6.service"]
         },
         "Continue": true
     },
@@ -379,8 +379,8 @@
         "GpioNum": 124,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-7.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-7.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade7.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade7.service"]
         },
         "Continue": true
     },
@@ -390,8 +390,8 @@
         "GpioNum": 126,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-8.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-8.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade8.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade8.service"]
         },
         "Continue": true
     },
@@ -401,8 +401,8 @@
         "GpioNum": 128,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-9.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-9.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade9.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade9.service"]
         },
         "Continue": true
     },
@@ -412,8 +412,8 @@
         "GpioNum": 130,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-10.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-10.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade10.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade10.service"]
         },
         "Continue": true
     },
@@ -423,8 +423,8 @@
         "GpioNum": 132,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-11.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-11.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade11.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade11.service"]
         },
         "Continue": true
     },
@@ -434,8 +434,8 @@
         "GpioNum": 134,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-12.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-12.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade12.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade12.service"]
         },
         "Continue": true
     },
@@ -445,8 +445,8 @@
         "GpioNum": 136,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-13.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-13.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade13.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade13.service"]
         },
         "Continue": true
     },
@@ -456,8 +456,8 @@
         "GpioNum": 138,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-14.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-14.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade14.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade14.service"]
         },
         "Continue": true
     },
@@ -467,8 +467,8 @@
         "GpioNum": 140,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-15.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-15.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade15.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade15.service"]
         },
         "Continue": true
     },
@@ -478,8 +478,8 @@
         "GpioNum": 142,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@mtia-blade-16.service"],
-            "RISING": ["leak-detect-deassert@mtia-blade-16.service"]
+            "FALLING": ["leak-detect-assert@ComputeBlade16.service"],
+            "RISING": ["leak-detect-deassert@ComputeBlade16.service"]
         },
         "Continue": true
     },
@@ -489,8 +489,8 @@
         "GpioNum": 144,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@network-blade-1.service"],
-            "RISING": ["leak-detect-deassert@network-blade-1.service"]
+            "FALLING": ["leak-detect-assert@NetworkBlade1.service"],
+            "RISING": ["leak-detect-deassert@NetworkBlade1.service"]
         },
         "Continue": true
     },
@@ -500,8 +500,8 @@
         "GpioNum": 146,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@network-blade-2.service"],
-            "RISING": ["leak-detect-deassert@network-blade-2.service"]
+            "FALLING": ["leak-detect-assert@NetworkBlade2.service"],
+            "RISING": ["leak-detect-deassert@NetworkBlade2.service"]
         },
         "Continue": true
     },
@@ -511,8 +511,8 @@
         "GpioNum": 148,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@network-blade-3.service"],
-            "RISING": ["leak-detect-deassert@network-blade-3.service"]
+            "FALLING": ["leak-detect-assert@NetworkBlade3.service"],
+            "RISING": ["leak-detect-deassert@NetworkBlade3.service"]
         },
         "Continue": true
     },
@@ -522,8 +522,8 @@
         "GpioNum": 150,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@network-blade-4.service"],
-            "RISING": ["leak-detect-deassert@network-blade-4.service"]
+            "FALLING": ["leak-detect-assert@NetworkBlade4.service"],
+            "RISING": ["leak-detect-deassert@NetworkBlade4.service"]
         },
         "Continue": true
     },
@@ -533,8 +533,8 @@
         "GpioNum": 152,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@network-blade-5.service"],
-            "RISING": ["leak-detect-deassert@network-blade-5.service"]
+            "FALLING": ["leak-detect-assert@NetworkBlade5.service"],
+            "RISING": ["leak-detect-deassert@NetworkBlade5.service"]
         },
         "Continue": true
     },
@@ -544,8 +544,8 @@
         "GpioNum": 154,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@network-blade-6.service"],
-            "RISING": ["leak-detect-deassert@network-blade-6.service"]
+            "FALLING": ["leak-detect-assert@NetworkBlade6.service"],
+            "RISING": ["leak-detect-deassert@NetworkBlade6.service"]
         },
         "Continue": true
     },
@@ -819,8 +819,8 @@
         "GpioNum": 234,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@chassis-leak-sensor-0.service"],
-            "RISING": ["leak-detect-deassert@chassis-leak-sensor-0.service"]
+            "FALLING": ["leak-detect-assert@UpperManifoldDripTray.service"],
+            "RISING": ["leak-detect-deassert@UpperManifoldDripTray.service"]
         },
         "Continue": true
     },
@@ -830,8 +830,8 @@
         "GpioNum": 236,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-assert@chassis-leak-sensor-1.service"],
-            "RISING": ["leak-detect-deassert@chassis-leak-sensor-1.service"]
+            "FALLING": ["leak-detect-assert@LowerManifoldDripTray.service"],
+            "RISING": ["leak-detect-deassert@LowerManifoldDripTray.service"]
         },
         "Continue": true
     },
@@ -841,8 +841,8 @@
         "GpioNum": 204,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-deassert@it-gear-leak.service"],
-            "RISING": ["leak-detect-assert@it-gear-leak.service"]
+            "FALLING": ["leak-detect-deassert@ITGearMain.service"],
+            "RISING": ["leak-detect-assert@ITGearMain.service"]
         },
         "Continue": true
     },
@@ -852,8 +852,8 @@
         "GpioNum": 248,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-deassert@it-gear-leak-spare.service"],
-            "RISING": ["leak-detect-assert@it-gear-leak-spare.service"]
+            "FALLING": ["leak-detect-deassert@ITGearSpare.service"],
+            "RISING": ["leak-detect-assert@ITGearSpare.service"]
         },
         "Continue": true
     },
