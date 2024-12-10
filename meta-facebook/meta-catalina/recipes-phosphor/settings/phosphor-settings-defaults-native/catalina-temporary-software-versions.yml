@@ -181,3 +181,11 @@
         Default: '""'
       Purpose:
         Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/HGX_pcieswitchconfig_0:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
