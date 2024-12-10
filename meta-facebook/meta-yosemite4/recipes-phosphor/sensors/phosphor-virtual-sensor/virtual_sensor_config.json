@@ -1694,6 +1694,13 @@
             "Name": "SYSTEM_PLATFORM_INPUT_PWR_W",
             "SensorType": "power"
         },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
