@@ -54,6 +54,9 @@ PACKAGECONFIG[only-allow-boot-when-bmc-ready] = "-Donly-allow-boot-when-bmc-read
 # Enable host state GPIO
 PACKAGECONFIG[host-gpio] = "-Dhost-gpios=enabled,-Dhost-gpios=disabled,gpioplus"
 
+# Check firmware updating before do BMC/Chassis/Host transition
+PACKAGECONFIG[check-fwupdate-before-do-transition] = "-Dcheck-fwupdate-before-do-transition=enabled,-Dcheck-fwupdate-before-do-transition=disabled"
+
 # The host-check function will check if the host is running
 # after a BMC reset.
 # The reset-sensor-states function will reset the host
@@ -266,6 +269,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OB
 SYSTEMD_LINK[vardeps] += "OBMC_CHASSIS_INSTANCES OBMC_HOST_INSTANCES"
 
 SRC_URI = "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "d01e1eaab0ad671b54592e0306ede50bcbb9906e"
+SRCREV = "9f38152abf80aba2f0177cb55729ff107f54947d"
 
 S = "${WORKDIR}/git"
