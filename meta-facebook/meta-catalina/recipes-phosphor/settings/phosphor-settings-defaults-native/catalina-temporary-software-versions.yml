@@ -46,6 +46,14 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
+/xyz/openbmc_project/software/chassis/Catalina_HDD_cpld:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
 /xyz/openbmc_project/software/chassis/nic0:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
