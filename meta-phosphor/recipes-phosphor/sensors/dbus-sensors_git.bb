@@ -11,7 +11,7 @@ DEPENDS = " \
     phosphor-logging \
     sdbusplus \
     "
-SRCREV = "560e6af7b1f74e9c020a0f82817f9d926e0c4f72"
+SRCREV = "5c05da4731853f9fea95c59360f91d3ebf6c74a9"
 PACKAGECONFIG ??= " \
     adcsensor \
     exitairtempsensor \
@@ -28,6 +28,7 @@ PACKAGECONFIG:append:df-mctp = "\
     mctpreactor \
     "
 PACKAGECONFIG[adcsensor] = "-Dadc=enabled, -Dadc=disabled"
+PACKAGECONFIG[cablemonitor] = "-Dcable-monitor=enabled, -Dcable-monitor=disabled"
 PACKAGECONFIG[exitairtempsensor] = "-Dexit-air=enabled, -Dexit-air=disabled"
 PACKAGECONFIG[external] = "-Dexternal=enabled, -Dexternal=disabled"
 PACKAGECONFIG[fansensor] = "-Dfan=enabled, -Dfan=disabled"
@@ -48,6 +49,9 @@ SRC_URI = "git://github.com/openbmc/dbus-sensors.git;branch=master;protocol=http
 
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'adcsensor', \
                                                'xyz.openbmc_project.adcsensor.service', \
+                                               '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'cablemonitor', \
+                                               'xyz.openbmc_project.cablemonitor.service', \
                                                '', d)}"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'exitairtempsensor', \
                                                'xyz.openbmc_project.exitairsensor.service', \
