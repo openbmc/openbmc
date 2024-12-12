@@ -11,7 +11,7 @@ DEPENDS = "boost \
            valijson \
            phosphor-dbus-interfaces \
 "
-SRCREV = "9effc3664a1c8b7840b32d4bcc215c8671b93ba7"
+SRCREV = "17962f456961b16e89ac9f7aac14a5548e3fdbdb"
 PACKAGECONFIG ??= "ipmi-fru"
 
 PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
