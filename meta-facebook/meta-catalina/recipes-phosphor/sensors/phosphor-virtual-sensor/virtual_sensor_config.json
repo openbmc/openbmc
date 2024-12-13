@@ -3,8 +3,8 @@
         "Desc": {
             "Name": "VIRTUAL_PDB_P48V_HSC1_CURR_A",
             "SensorType": "current",
-            "MaxValue": "255",
-            "MinValue": "0"
+            "MaxValue": 255,
+            "MinValue": 0
         },
         "Associations": [
             [
@@ -30,8 +30,8 @@
         "Desc": {
             "Name": "VIRTUAL_PDB_P48V_HSC1_PWR_W",
             "SensorType": "power",
-            "MaxValue": "3000",
-            "MinValue": "0"
+            "MaxValue": 3000,
+            "MinValue": 0
         },
         "Associations": [
             [
@@ -57,8 +57,8 @@
         "Desc": {
             "Name": "VIRTUAL_PDB_P48V_HSC2_CURR_A",
             "SensorType": "current",
-            "MaxValue": "255",
-            "MinValue": "0"
+            "MaxValue": 255,
+            "MinValue": 0
         },
         "Associations": [
             [
@@ -84,8 +84,8 @@
         "Desc": {
             "Name": "VIRTUAL_PDB_P48V_HSC2_PWR_W",
             "SensorType": "power",
-            "MaxValue": "3000",
-            "MinValue": "0"
+            "MaxValue": 3000,
+            "MinValue": 0
         },
         "Associations": [
             [
