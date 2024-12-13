@@ -1,0 +1,37 @@
+From 6fa1b6d3f72caf6d0cf61752b522dc19fb9933b7 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 30 Aug 2024 10:44:17 +0200
+Subject: [PATCH] gcab-enums.c.etemplate: include @basename@ instead of full
+ path from @filename@
+
+* fixes:
+  ERROR: QA Issue: File /usr/src/debug/gcab/1.6/libgcab/gcab-enums.c in package gcab-src contains reference to TMPDIR [buildpaths]
+
+lib32-gcab/1.6/package $ grep -R styhead .
+./usr/src/debug/lib32-gcab/1.6/libgcab/gcab-enums.c:#include "WORKDIR/build/../gcab-1.6/libgcab/gcab-file.h"
+./usr/src/debug/lib32-gcab/1.6/libgcab/gcab-enums.c:#include "WORKDIR/build/../gcab-1.6/libgcab/gcab-folder.h"
+
+glib-mkenum supports also @basename@ since 2.22 which would avoid this QA issue
+  @filename@            name of current input file
+  @basename@            base name of the current input file (Since: 2.22)
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+Upstream-Status: Pending
+
+ libgcab/gcab-enums.c.etemplate | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgcab/gcab-enums.c.etemplate b/libgcab/gcab-enums.c.etemplate
+index 194b1e0..2e85824 100644
+--- a/libgcab/gcab-enums.c.etemplate
++++ b/libgcab/gcab-enums.c.etemplate
+@@ -21,7 +21,7 @@
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-#include "@filename@"
++#include "@basename@"
+ /*** END file-production ***/
+ 
+ 

@@ -6,22 +6,22 @@ Release notes for Yocto-4.0.18 (Kirkstone)
 Security Fixes in Yocto-4.0.18
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  curl: Fix :cve:`2024-2398`
--  expat: fix :cve:`2023-52426` and :cve:`2024-28757`
--  libssh2: fix :cve:`2023-48795`
--  ncurses: Fix :cve:`2023-50495`
--  nghttp2: Fix :cve:`2024-28182` and :cve:`2023-44487`
--  openssh: Ignore :cve:`2023-51767`
--  openssl: Fix :cve:`2024-2511`
--  perl: Ignore :cve:`2023-47100`
--  python3-cryptography: Fix :cve:`2024-26130`
--  python3-urllib3: Fix :cve:`2023-45803`
--  qemu: Fix :cve:`2023-6683`
+-  curl: Fix :cve_nist:`2024-2398`
+-  expat: fix :cve_nist:`2023-52426` and :cve_nist:`2024-28757`
+-  libssh2: fix :cve_nist:`2023-48795`
+-  ncurses: Fix :cve_nist:`2023-50495`
+-  nghttp2: Fix :cve_nist:`2024-28182` and :cve_nist:`2023-44487`
+-  openssh: Ignore :cve_nist:`2023-51767`
+-  openssl: Fix :cve_nist:`2024-2511`
+-  perl: Ignore :cve_nist:`2023-47100`
+-  python3-cryptography: Fix :cve_nist:`2024-26130`
+-  python3-urllib3: Fix :cve_nist:`2023-45803`
+-  qemu: Fix :cve_nist:`2023-6683`
 -  ruby: fix :cve_mitre:`2024-27281`
--  rust: Ignore :cve:`2024-24576`
--  tiff: Fix :cve:`2023-52356` and :cve:`2023-6277`
--  xserver-xorg: Fix :cve:`2024-31080` and :cve:`2024-31081`
--  xwayland: Fix :cve:`2023-6816`, :cve:`2024-0408` and :cve:`2024-0409`
+-  rust: Ignore :cve_nist:`2024-24576`
+-  tiff: Fix :cve_nist:`2023-52356` and :cve_nist:`2023-6277`
+-  xserver-xorg: Fix :cve_nist:`2024-31080` and :cve_nist:`2024-31081`
+-  xwayland: Fix :cve_nist:`2023-6816`, :cve_nist:`2024-0408` and :cve_nist:`2024-0409`
 
 
 Fixes in Yocto-4.0.18
@@ -31,7 +31,7 @@ Fixes in Yocto-4.0.18
 -  common-licenses: backport LGPL-3.0-with-zeromq-exception license
 -  contributor-guide: add notes for tests
 -  contributor-guide: be more specific about meta-* trees
--  cups: fix typo in :cve:`2023-32360` backport patch
+-  cups: fix typo in :cve_nist:`2023-32360` backport patch
 -  cve-update-nvd2-native: Add an age threshold for incremental update
 -  cve-update-nvd2-native: Fix CVE configuration update
 -  cve-update-nvd2-native: Fix typo in comment

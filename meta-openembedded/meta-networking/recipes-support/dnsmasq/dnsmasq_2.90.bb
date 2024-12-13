@@ -12,7 +12,6 @@ DEPENDS += "gettext-native"
 #at least versions 2.69 and prior are moved to the archive folder on the server
 SRC_URI = "http://www.thekelleys.org.uk/dnsmasq/${@['archive/', ''][float(d.getVar('PV').split('.')[1]) > 69]}dnsmasq-${PV}.tar.gz \
            file://init \
-           file://dnsmasq.conf \
            file://dnsmasq-resolvconf.service \
            file://dnsmasq-noresolvconf.service \
            file://dnsmasq-resolved.conf \
@@ -25,8 +24,13 @@ INITSCRIPT_NAME = "dnsmasq"
 INITSCRIPT_PARAMS = "defaults"
 
 # dnsmasq defaults
-PACKAGECONFIG ?= "auth dhcp dhcp6 dumpfile inotify ipset loop script tftp"
+PACKAGECONFIG ?= "\
+    auth dhcp dumpfile inotify ipset loop script tftp \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'dhcp6', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'rtc', '', 'broken-rtc', d)} \
+"
 
+# see src/config.h
 PACKAGECONFIG[auth] = "-DHAVE_AUTH,-DNO_AUTH"
 PACKAGECONFIG[broken-rtc] = "-DHAVE_BROKEN_RTC,"
 PACKAGECONFIG[conntrack] = "-DHAVE_CONNTRACK,,libnetfilter-conntrack"
@@ -81,7 +85,7 @@ do_install () {
                "MANDIR=${D}${mandir}" \
                install-i18n
     install -d ${D}${sysconfdir}/ ${D}${sysconfdir}/init.d ${D}${sysconfdir}/dnsmasq.d
-    install -m 644 ${UNPACKDIR}/dnsmasq.conf ${D}${sysconfdir}/
+    install -m 644 ${S}/dnsmasq.conf.example ${D}${sysconfdir}/dnsmasq.conf
     install -m 755 ${UNPACKDIR}/init ${D}${sysconfdir}/init.d/dnsmasq
 
     install -d ${D}${systemd_unitdir}/system

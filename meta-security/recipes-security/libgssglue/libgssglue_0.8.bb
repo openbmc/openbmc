@@ -21,11 +21,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=56871e72a5c475289c0d5e4ba3f2ee3a \
                     file://src/oid_ops.c;beginline=378;endline=398;md5=72457a5cdc0354cb5c25c8b150326364\
 "
 
-SRC_URI = "${DEBIAN_MIRROR}/main/libg/${BPN}/${BPN}_${PV}.orig.tar.gz \
+SRC_URI = "git://gitlab.com/gsasl/libgssglue.git;protocol=https;branch=master \
            file://libgssglue-canon-name.patch  \
 "
+SRCREV = "c8b4b2936b854a7d4f7ef12e30d6f519b30dec87"
 
-SRC_URI[sha256sum] = "a2bb183e946f6e30562a2a856950a2916c9b6d42c34d67a8400e4efc28917746"
+S = "${WORKDIR}/git"
 
 inherit autotools-brokensep
 

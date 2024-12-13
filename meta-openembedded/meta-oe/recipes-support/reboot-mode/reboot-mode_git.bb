@@ -8,6 +8,9 @@ SRCREV = "84831b20512abd9033414ca5f5a023f333525335"
 
 S = "${WORKDIR}/git"
 
+# Upstream repo has not made releases/tags after 1.0.0
+UPSTREAM_CHECK_COMMITS = "1"
+
 do_compile() {
     ${CC} ${CFLAGS} ${LDFLAGS} ${S}/reboot-mode.c -o ${B}/reboot-mode
 }

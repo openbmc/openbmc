@@ -7,6 +7,7 @@ DEPENDS = "sqlite3"
 
 SRC_URI = "https://dist.opendnssec.org/source/softhsm-2.6.1.tar.gz \
            file://0001-avoid-unnecessary-check-for-sqlite3-binary.patch \
+           file://0002-Prevent-accessing-of-global-c-objects-once-they-are-.patch \
 "
 SRC_URI[sha256sum] = "61249473054bcd1811519ef9a989a880a7bdcc36d317c9c25457fc614df475f2"
 

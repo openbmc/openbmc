@@ -1,4 +1,4 @@
-From 194e199ce08acc2192f6a63420ff24d9064666e5 Mon Sep 17 00:00:00 2001
+From 640b191b9566a6c18af73bf9cc4b9366a76acf62 Mon Sep 17 00:00:00 2001
 From: Yi Fan Yu <yifan.yu@windriver.com>
 Date: Sat, 27 Mar 2021 19:18:25 -0400
 Subject: [PATCH] tests: disable the check for inotify
@@ -20,10 +20,10 @@ Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tests/diag.sh b/tests/diag.sh
-index 6cd60ea88..7424f48c5 100755
+index f4f3d86..497bb17 100755
 --- a/tests/diag.sh
 +++ b/tests/diag.sh
-@@ -2672,7 +2672,7 @@ case $1 in
+@@ -2950,7 +2950,7 @@ case $1 in
  		fi
  		;;
  	'check-inotify') # Check for inotify/fen support 
@@ -32,7 +32,7 @@ index 6cd60ea88..7424f48c5 100755
  			echo [inotify mode]
  		elif [ -n "$(find /usr/include/sys/ -name 'port.h' -print -quit)" ]; then
  			grep -qF "PORT_SOURCE_FILE" < /usr/include/sys/port.h
-@@ -2687,7 +2687,7 @@ case $1 in
+@@ -2965,7 +2965,7 @@ case $1 in
  		fi
  		;;
  	'check-inotify-only') # Check for ONLY inotify support 
@@ -41,6 +41,3 @@ index 6cd60ea88..7424f48c5 100755
  			echo [inotify mode]
  		else
  			echo [inotify not supported, skipping...]
--- 
-2.29.2
-

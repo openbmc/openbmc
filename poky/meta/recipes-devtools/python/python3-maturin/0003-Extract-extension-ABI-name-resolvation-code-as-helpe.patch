@@ -1,0 +1,98 @@
+From fa64426f3a98a0455721c23ec86bd2240708b45e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?=
+ <vesa.jaaskelainen@vaisala.com>
+Date: Sun, 1 Sep 2024 15:55:07 +0300
+Subject: [PATCH 3/5] Extract extension ABI name resolvation code as helper
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This commit introduces helper InterpreterConfig.get_python_target_env()
+that can be used to determine the extension ABI python uses in
+`ext_suffix` for this architecture.
+
+Upstream-Status: Backport [https://github.com/PyO3/maturin/commit/fa64426f3a98a0455721c23ec86bd2240708b45e]
+
+Signed-off-by: Vesa Jääskeläinen <vesa.jaaskelainen@vaisala.com>
+---
+ src/python_interpreter/config.rs | 19 ++-----------------
+ src/target.rs                    | 20 ++++++++++++++++++++
+ 2 files changed, 22 insertions(+), 17 deletions(-)
+
+diff --git a/src/python_interpreter/config.rs b/src/python_interpreter/config.rs
+index 5736aedc..938e9955 100644
+--- a/src/python_interpreter/config.rs
++++ b/src/python_interpreter/config.rs
+@@ -48,17 +48,7 @@ impl InterpreterConfig {
+             return None;
+         }
+         let python_ext_arch = target.get_python_ext_arch(python_impl);
+-        // See https://github.com/pypa/auditwheel/issues/349
+-        let target_env = match python_impl {
+-            CPython => {
+-                if python_version >= (3, 11) {
+-                    target.target_env().to_string()
+-                } else {
+-                    target.target_env().to_string().replace("musl", "gnu")
+-                }
+-            }
+-            PyPy | GraalPy => "gnu".to_string(),
+-        };
++        let target_env = target.get_python_target_env(python_impl, python_version);
+         match (target.target_os(), python_impl) {
+             (Os::Linux, CPython) => {
+                 let abiflags = if python_version < (3, 8) {
+@@ -294,12 +284,7 @@ impl InterpreterConfig {
+         };
+         let file_ext = if target.is_windows() { "pyd" } else { "so" };
+         let ext_suffix = if target.is_linux() || target.is_macos() {
+-            // See https://github.com/pypa/auditwheel/issues/349
+-            let target_env = if (major, minor) >= (3, 11) {
+-                target.target_env().to_string()
+-            } else {
+-                target.target_env().to_string().replace("musl", "gnu")
+-            };
++            let target_env = target.get_python_target_env(interpreter_kind, (major, minor));
+             match interpreter_kind {
+                 InterpreterKind::CPython => ext_suffix.unwrap_or_else(|| {
+                     // Eg: .cpython-38-x86_64-linux-gnu.so
+diff --git a/src/target.rs b/src/target.rs
+index 84bae559..ad8ebaba 100644
+--- a/src/target.rs
++++ b/src/target.rs
+@@ -1,5 +1,6 @@
+ use crate::cross_compile::is_cross_compiling;
+ use crate::python_interpreter::InterpreterKind;
++use crate::python_interpreter::InterpreterKind::{CPython, GraalPy, PyPy};
+ use crate::PlatformTag;
+ use anyhow::{anyhow, bail, format_err, Result};
+ use platform_info::*;
+@@ -384,6 +385,25 @@ impl Target {
+         }
+     }
+ 
++    /// Returns the environment python uses in `ext_suffix` for this architecture.
++    pub fn get_python_target_env(
++        &self,
++        python_impl: InterpreterKind,
++        python_version: (usize, usize),
++    ) -> String {
++        match python_impl {
++            CPython => {
++                // For musl handling see https://github.com/pypa/auditwheel/issues/349
++                if python_version >= (3, 11) {
++                    self.target_env().to_string()
++                } else {
++                    self.target_env().to_string().replace("musl", "gnu")
++                }
++            }
++            PyPy | GraalPy => "gnu".to_string(),
++        }
++    }
++
+     /// Returns the name python uses in `sys.platform` for this os
+     pub fn get_python_os(&self) -> &str {
+         match self.os {
+-- 
+2.34.1
+

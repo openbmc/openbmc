@@ -1,0 +1,28 @@
+From d005c0123b2f929b918359a53ffe61d7ca2212a0 Mon Sep 17 00:00:00 2001
+From: Lalit Maganti <lalitm@google.com>
+Date: Wed, 14 Aug 2024 11:56:47 +0100
+Subject: [PATCH] traced: fix missing include
+
+Change-Id: Ib9ce8ce5b057e89fa451ccef228228d607b36793
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+Upstream-Status: Backport [https://github.com/google/perfetto/commit/d005c0123b2f929b918359a53ffe61d7ca2212a0]
+
+ src/traced/probes/sys_stats/sys_stats_data_source.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/traced/probes/sys_stats/sys_stats_data_source.h b/src/traced/probes/sys_stats/sys_stats_data_source.h
+index e09cd8a2ca..7e4749bdcd 100644
+--- a/src/traced/probes/sys_stats/sys_stats_data_source.h
++++ b/src/traced/probes/sys_stats/sys_stats_data_source.h
+@@ -21,6 +21,7 @@
+ 
+ #include <map>
+ #include <memory>
++#include <optional>
+ #include <string>
+ 
+ #include "perfetto/ext/base/paged_memory.h"
+-- 
+2.43.0
+

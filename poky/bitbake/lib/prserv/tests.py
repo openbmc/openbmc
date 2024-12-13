@@ -84,6 +84,8 @@ class FunctionTests(unittest.TestCase):
         self.assertEqual(increase_revision("1.0"), "1.1")
         self.assertEqual(increase_revision("1.1.1"), "1.1.2")
         self.assertEqual(increase_revision("1.1.1.3"), "1.1.1.4")
+        self.assertEqual(increase_revision("9"), "10")
+        self.assertEqual(increase_revision("1.9"), "1.10")
         self.assertRaises(ValueError, increase_revision, "1.a")
         self.assertRaises(ValueError, increase_revision, "1.")
         self.assertRaises(ValueError, increase_revision, "")

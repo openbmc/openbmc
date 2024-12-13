@@ -34,7 +34,7 @@ def increase_revision(ver):
          logger.critical("Unable to increase revision value %s: %s" % (ver, e))
          raise e
 
-    return ".".join(fields[0:-1] + list(str(val + 1)))
+    return ".".join(fields[0:-1] + [ str(val + 1) ])
 
 def _revision_greater_or_equal(rev1, rev2):
     """Compares x.y.z revision numbers, using integer comparison

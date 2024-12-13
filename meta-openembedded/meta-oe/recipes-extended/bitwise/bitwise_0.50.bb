@@ -18,6 +18,7 @@ SRC_URI = "https://github.com/mellowcandle/bitwise/releases/download/v${PV}/bitw
 SRC_URI[sha256sum] = "806271fa5bf31de0600315e8720004a8f529954480e991ca84a9868dc1cae97e"
 
 UPSTREAM_CHECK_URI = "https://github.com/mellowcandle/bitwise/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/${BPN}-v${PV}"
 

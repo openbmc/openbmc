@@ -18,6 +18,8 @@ SRC_URI = "http://grsecurity.net/stable/${BP}.tar.gz \
            "
 SRC_URI[sha256sum] = "2459290f367a47c8a1ce4ea2ec08359799ea33dc15ed4436439596ce88284fb9"
 
+UPSTREAM_CHECK_URI = "https://grsecurity.net/download"
+
 S = "${WORKDIR}/gradm"
 
 inherit autotools-brokensep

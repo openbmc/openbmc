@@ -19,7 +19,7 @@ SRC_URI[sha256sum] = "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b
 # to PREMIRRORS so it is also searched automatically.
 PREMIRRORS:append = " https://zlib.net/ https://zlib.net/fossils/"
 
-CFLAGS += "-D_REENTRANT"
+CFLAGS += "-D_REENTRANT -fPIE"
 
 RDEPENDS:${PN}-ptest += "make"
 
@@ -47,4 +47,6 @@ do_install_ptest() {
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_STATUS[CVE-2023-45853] = "not-applicable-config: we don't build minizip"
-CVE_STATUS[CVE-2023-6992] = "cpe-incorrect: this CVE is for cloudflare zlib"
+
+# Adding 'CVE_PRODUCT' to avoid false detection of CVEs
+CVE_PRODUCT = "zlib:zlib gnu:zlib"

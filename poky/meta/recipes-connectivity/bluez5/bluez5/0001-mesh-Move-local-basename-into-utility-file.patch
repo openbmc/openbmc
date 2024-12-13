@@ -1,0 +1,114 @@
+From e64c2e70a74da452b0ee147350c4ce93e1db8d2f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Sep 2024 15:11:01 -0700
+Subject: [PATCH v2] mesh: Move local basename into utility file
+
+Defining an override via a missing.h can prove difficult when a file
+needs to use basename and dirname both the APIs and needs to include
+libgen.h for them, in such situations there will be signature clash
+for basename function.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-bluetooth/20240917031745.1641153-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+v2: Remove reference to missing.h in Makefile.mesh
+
+ Makefile.mesh           |  2 +-
+ mesh/mesh-config-json.c |  3 +--
+ mesh/missing.h          | 21 ---------------------
+ mesh/rpl.c              |  3 +--
+ mesh/util.c             | 10 ++++++++++
+ mesh/util.h             |  5 +++++
+ 6 files changed, 18 insertions(+), 26 deletions(-)
+ delete mode 100644 mesh/missing.h
+
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -28,7 +28,6 @@
+ #include <ell/ell.h>
+ #include <json-c/json.h>
+ 
+-#include "mesh/missing.h"
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+ #include "mesh/mesh-config.h"
+@@ -2708,7 +2707,7 @@ void mesh_config_destroy_nvm(struct mesh
+ 	if (!hex2str(cfg->uuid, 16, uuid, sizeof(uuid)))
+ 		return;
+ 
+-	node_name = basename(node_dir);
++	node_name = mesh_basename(node_dir);
+ 
+ 	/* Make sure path name of node follows expected guidelines */
+ 	if (strcmp(node_name, uuid))
+--- a/mesh/missing.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-// SPDX-License-Identifier: LGPL-2.1-or-later
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2024  Khem Raj <raj.khem@gmail.com>
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-#if !HAVE_DECL_BASENAME
+-#include <string.h>
+-static inline const char *basename(const char *path)
+-{
+-  const char *base = strrchr(path, '/');
+-
+-  return base ? base + 1 : path;
+-}
+-#endif
+--- a/mesh/rpl.c
++++ b/mesh/rpl.c
+@@ -24,7 +24,6 @@
+ 
+ #include <ell/ell.h>
+ 
+-#include "mesh/missing.h"
+ #include "mesh/mesh-defs.h"
+ 
+ #include "mesh/node.h"
+@@ -147,7 +146,7 @@ static void get_entries(const char *iv_p
+ 	if (!dir)
+ 		return;
+ 
+-	iv_txt = basename(iv_path);
++	iv_txt = mesh_basename(iv_path);
+ 	if (sscanf(iv_txt, "%08x", &iv_index) != 1) {
+ 		closedir(dir);
+ 		return;
+--- a/mesh/util.c
++++ b/mesh/util.c
+@@ -161,3 +161,13 @@ void enable_debug(void)
+ 	debug_enabled = true;
+ 	l_debug_enable("*");
+ }
++
++#if !HAVE_DECL_BASENAME
++#include <string.h>
++const char *mesh_basename(const char *path)
++{
++	const char *base = strrchr(path, '/');
++
++	return base ? base + 1 : path;
++}
++#endif
+--- a/mesh/util.h
++++ b/mesh/util.h
+@@ -16,3 +16,8 @@ void print_packet(const char *label, con
+ int create_dir(const char *dir_name);
+ void del_path(const char *path);
+ void enable_debug(void);
++#if !HAVE_DECL_BASENAME
++const char *mesh_basename(const char *path);
++#else
++#define mesh_basename basename
++#endif

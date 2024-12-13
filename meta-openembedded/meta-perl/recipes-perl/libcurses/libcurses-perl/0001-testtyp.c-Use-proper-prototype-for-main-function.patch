@@ -17,24 +17,22 @@ int
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- testtyp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ testtyp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/testtyp.c b/testtyp.c
-index 949c3d4..4042f73 100644
+index 469cc48..6a48a77 100644
 --- a/testtyp.c
 +++ b/testtyp.c
-@@ -7,7 +7,8 @@
- #define _XOPEN_SOURCE_EXTENDED 1  /* We expect wide character functions */
- 
+@@ -10,6 +10,7 @@
  #include "c-config.h"
--
+ 
+ int
 -main() {
-+int
 +main(int argc, char *argv[]) {
    typedef SYM c_sym_t;
 +  return 0;
  }
 -- 
-2.37.3
+2.34.1
 

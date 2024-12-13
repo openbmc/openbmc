@@ -1,0 +1,41 @@
+From 395cd70a8c28a4ea408a227d745fe20ed8af9105 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 10 Sep 2024 18:11:40 -0700
+Subject: [PATCH] Fix instances of
+ -Wmissing-template-arg-list-after-template-kw.
+
+Clang has a new warning that requires a template argument list after using
+the template keyword. Remove uses of the template keyword when we're not
+specifying types.
+
+See https://github.com/llvm/llvm-project/issues/94194 for the upstream
+clang changes
+
+Upstream-Status: Submitted [https://github.com/USCiLab/cereal/pull/835]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/cereal/types/tuple.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/cereal/types/tuple.hpp b/include/cereal/types/tuple.hpp
+index 80c68075..5c79eca9 100644
+--- a/include/cereal/types/tuple.hpp
++++ b/include/cereal/types/tuple.hpp
+@@ -95,7 +95,7 @@ namespace cereal
+       template <class Archive, class ... Types> inline
+       static void apply( Archive & ar, std::tuple<Types...> & tuple )
+       {
+-        serialize<Height - 1>::template apply( ar, tuple );
++        serialize<Height - 1>::apply( ar, tuple );
+         ar( CEREAL_NVP_(tuple_element_name<Height - 1>::c_str(),
+             std::get<Height - 1>( tuple )) );
+       }
+@@ -116,7 +116,7 @@ namespace cereal
+   template <class Archive, class ... Types> inline
+   void CEREAL_SERIALIZE_FUNCTION_NAME( Archive & ar, std::tuple<Types...> & tuple )
+   {
+-    tuple_detail::serialize<std::tuple_size<std::tuple<Types...>>::value>::template apply( ar, tuple );
++    tuple_detail::serialize<std::tuple_size<std::tuple<Types...>>::value>::apply( ar, tuple );
+   }
+ } // namespace cereal
+ 

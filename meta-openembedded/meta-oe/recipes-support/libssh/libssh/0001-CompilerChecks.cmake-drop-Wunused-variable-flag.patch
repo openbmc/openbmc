@@ -1,0 +1,37 @@
+From 98a330971f4344619b698d4603a45bd31d6935d9 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Sun, 15 Sep 2024 20:31:55 +0800
+Subject: [PATCH] CompilerChecks.cmake: drop -Wunused-variable flag
+
+Drop -Wunused-variable flag to fix build with clang:
+
+libssh/0.11.1/git/src/threads/libgcrypt.c:29:1: error: unused variable 'gcry_threads_pthread' [-Werror,-Wunused-variable]
+   29 | GCRY_THREAD_OPTION_PTHREAD_IMPL;
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+libssh/0.11.1/recipe-sysroot/usr/include/gcrypt.h:217:33: note: expanded from macro 'GCRY_THREAD_OPTION_PTHREAD_IMPL'
+  217 |   static struct gcry_thread_cbs gcry_threads_pthread = {                \
+      |                                 ^~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CompilerChecks.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CompilerChecks.cmake b/CompilerChecks.cmake
+index 9719e699..ec15fa2a 100644
+--- a/CompilerChecks.cmake
++++ b/CompilerChecks.cmake
+@@ -48,7 +48,7 @@ if (UNIX)
+     add_c_compiler_flag("-Werror=implicit-int" SUPPORTED_COMPILER_FLAGS)
+     add_c_compiler_flag("-Wint-conversion" SUPPORTED_COMPILER_FLAGS)
+     add_c_compiler_flag("-Werror=int-conversion" SUPPORTED_COMPILER_FLAGS)
+-    add_c_compiler_flag("-Werror=unused-variable" SUPPORTED_COMPILER_FLAGS)
++    #add_c_compiler_flag("-Werror=unused-variable" SUPPORTED_COMPILER_FLAGS)
+ 
+     check_c_compiler_flag("-Wformat" REQUIRED_FLAGS_WFORMAT)
+     if (REQUIRED_FLAGS_WFORMAT)
+-- 
+2.25.1
+

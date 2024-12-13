@@ -1,0 +1,58 @@
+From d001f12d428f7adaeaadee5263a22c797c99d67b Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 30 Aug 2024 11:42:27 +0200
+Subject: [PATCH] aclocal.m4: don't use full path of $with_curl in xerces-c.pc
+
+* fixes:
+  ERROR: QA Issue: File /usr/lib32/pkgconfig/xerces-c.pc in package lib32-libxerces-c-dev contains reference to TMPDIR [buildpaths]
+
+* xerces-c was blacklisted due to tmpdir since 2016:
+  https://git.openembedded.org/meta-openembedded/commit/?id=1af196e42c811947bb483df30bfce758adee83d1
+
+* then sed call:
+  sed -i -e 's:-L${STAGING_DIR}/lib:-L\$\{libdir\}:g' ${B}/xerces-c.pc
+  was added to do_install:append and blacklist dropped in:
+  https://git.openembedded.org/meta-openembedded/commit/?id=87b9efff79e62f569525e4760adc594d0d9ac476
+
+* sed call was adjusted in:
+  https://git.openembedded.org/meta-openembedded/commit/?id=87c9e9537dc43468a6aaf706853b784ce6de14e0
+  sed -i s:-L${STAGING_LIBDIR}::g ${B}/xerces-c.pc
+
+* but it was still failing in some cases, e.g. with multilib where libdir is /usr/lib64, so the sed call is:
+  sed -i s:-L{WORKDIR}/recipe-sysroot/usr/lib64::g ${WORKDIR}/build/xerces-c.pc
+  but the actual xerces-c.pc file still has:
+
+  Libs: -L${libdir} -lxerces-c
+  Libs.private: -L${WORKDIR}/recipe-sysroot/usr/lib -lcurl
+
+  because this aclocal was always hardcoding "lib" (appended to --with-curl
+  value which is passed together with ${prefix}) and not respecting the libdir value:
+  PACKAGECONFIG[curl] = "--with-curl=${STAGING_DIR_TARGET}${prefix},--with-curl=no,curl"
+  PACKAGECONFIG[icu] = "--with-icu=${STAGING_DIR_TARGET}${prefix},--with-icu=no,icu"
+
+* xerces-c supports CMake since 2017:
+  https://github.com/apache/xerces-c/commit/2606b2924c3e2bf0cf50f72b79378721b6bcf04e
+  switching from autotools to CMake would probably resolve some of this as well
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+Upstream-Status: Pending [It would be better to just switch to CMake]
+
+ m4/xerces_curl_prefix.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/m4/xerces_curl_prefix.m4 b/m4/xerces_curl_prefix.m4
+index d1d015c..7928bdc 100644
+--- a/m4/xerces_curl_prefix.m4
++++ b/m4/xerces_curl_prefix.m4
+@@ -39,8 +39,8 @@ AC_DEFUN([XERCES_CURL_PREFIX],
+ 			curl_libs=`$curl_config --libs`
+ 		else
+ 			if test -n "$with_curl"; then
+-				curl_flags="-I$with_curl/include"
+-				curl_libs="-L$with_curl/lib -lcurl"
++				curl_flags=""
++				curl_libs="-lcurl"
+ 			else
+ 				# Default compiler paths.
+ 				#

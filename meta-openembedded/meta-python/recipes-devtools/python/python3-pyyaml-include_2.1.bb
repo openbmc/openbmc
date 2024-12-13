@@ -23,6 +23,9 @@ RDEPENDS:${PN} += " \
     python3-pyyaml \
 "
 RDEPENDS:${PN}-ptest += " \
+    python3-fsspec \
+    python3-aiohttp \
+    python3-requests \
     python3-pytest \
     python3-unittest-automake-output \
 "

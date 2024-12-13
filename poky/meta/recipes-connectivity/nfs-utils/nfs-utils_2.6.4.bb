@@ -62,7 +62,7 @@ EXTRA_OECONF = "--with-statduser=rpcuser \
                 --with-rpcgen=${HOSTTOOLS_DIR}/rpcgen \
                "
 
-LDFLAGS:append = " -lsqlite3 -levent"
+LDFLAGS += "-lsqlite3 -levent"
 
 PACKAGECONFIG ??= "tcp-wrappers \
     ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} \

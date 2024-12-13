@@ -6,19 +6,19 @@ Release notes for Yocto-4.3.2 (Nanbield)
 Security Fixes in Yocto-4.3.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  avahi: Fix :cve:`2023-1981`, :cve:`2023-38469`, :cve:`2023-38470`, :cve:`2023-38471`, :cve:`2023-38472` and :cve:`2023-38473`
--  curl: Fix :cve:`2023-46218`
--  ghostscript: Fix :cve:`2023-46751`
--  grub: fix :cve:`2023-4692` and :cve:`2023-4693`
+-  avahi: Fix :cve_nist:`2023-1981`, :cve_nist:`2023-38469`, :cve_nist:`2023-38470`, :cve_nist:`2023-38471`, :cve_nist:`2023-38472` and :cve_nist:`2023-38473`
+-  curl: Fix :cve_nist:`2023-46218`
+-  ghostscript: Fix :cve_nist:`2023-46751`
+-  grub: fix :cve_nist:`2023-4692` and :cve_nist:`2023-4693`
 -  gstreamer1.0: Fix :cve_mitre:`2023-44446`
--  linux-yocto/6.1: Ignore :cve_mitre:`2023-39197`, :cve:`2023-39198`, :cve:`2023-5090`, :cve:`2023-5633`, :cve:`2023-6111`, :cve:`2023-6121` and :cve:`2023-6176`
--  linux-yocto/6.5: Ignore :cve:`2022-44034`, :cve_mitre:`2023-39197`, :cve:`2023-39198`, :cve:`2023-5972`, :cve:`2023-6039`, :cve:`2023-6111` and :cve:`2023-6176`
--  perl: fix :cve:`2023-47100`
--  python3-urllib3: Fix :cve:`2023-45803`
--  rust: Fix :cve:`2023-40030`
--  vim: Fix :cve:`2023-48231`, :cve:`2023-48232`, :cve:`2023-48233`, :cve:`2023-48234`, :cve:`2023-48235`, :cve:`2023-48236` and :cve:`2023-48237`
--  xserver-xorg: Fix :cve:`2023-5367` and :cve:`2023-5380`
--  xwayland: Fix :cve:`2023-5367`
+-  linux-yocto/6.1: Ignore :cve_mitre:`2023-39197`, :cve_nist:`2023-39198`, :cve_nist:`2023-5090`, :cve_nist:`2023-5633`, :cve_nist:`2023-6111`, :cve_nist:`2023-6121` and :cve_nist:`2023-6176`
+-  linux-yocto/6.5: Ignore :cve_nist:`2022-44034`, :cve_mitre:`2023-39197`, :cve_nist:`2023-39198`, :cve_nist:`2023-5972`, :cve_nist:`2023-6039`, :cve_nist:`2023-6111` and :cve_nist:`2023-6176`
+-  perl: fix :cve_nist:`2023-47100`
+-  python3-urllib3: Fix :cve_nist:`2023-45803`
+-  rust: Fix :cve_nist:`2023-40030`
+-  vim: Fix :cve_nist:`2023-48231`, :cve_nist:`2023-48232`, :cve_nist:`2023-48233`, :cve_nist:`2023-48234`, :cve_nist:`2023-48235`, :cve_nist:`2023-48236` and :cve_nist:`2023-48237`
+-  xserver-xorg: Fix :cve_nist:`2023-5367` and :cve_nist:`2023-5380`
+-  xwayland: Fix :cve_nist:`2023-5367`
 
 
 Fixes in Yocto-4.3.2

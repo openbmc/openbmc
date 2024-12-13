@@ -1,4 +1,4 @@
-From 6fae7afeb713a60755e17443964e46190bb97ede Mon Sep 17 00:00:00 2001
+From 4f2a54c468c448efdd44813273893ec9c541deaf Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Mar 2017 23:37:05 -0800
 Subject: [PATCH] binutils-cross: Do not generate linker script directories
@@ -22,10 +22,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 25 deletions(-)
 
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index 365c0e778cc..b0893fda3c5 100755
+index 5d2eb737efc..ad225b0071d 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
-@@ -229,31 +229,6 @@ append_to_lib_path()
+@@ -244,31 +244,6 @@ append_to_lib_path()
    fi
  }
  

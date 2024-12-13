@@ -24,3 +24,8 @@ DEPENDS = "libxpm jpeg libx11 virtual/libgl"
 RDEPENDS:${PN} = "bash"
 
 EXTRA_OECONF = "--with-extra-inc=${S}/lib" 
+
+do_compile:append() {
+    sed -i -e 's|${B}|.|' ${B}/fd2ps/fd2ps
+    sed -i -e 's|${B}|.|' ${B}/fdesign/fdesign
+}

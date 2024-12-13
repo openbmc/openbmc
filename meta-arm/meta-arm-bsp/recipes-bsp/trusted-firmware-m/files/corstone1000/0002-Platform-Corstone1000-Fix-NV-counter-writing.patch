@@ -1,0 +1,69 @@
+From 47c54e8e79df52f40057c3d4be9411447d2787c2 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <Emekcan.Aras@arm.com>
+Date: Wed, 21 Feb 2024 07:44:25 +0000
+Subject: [PATCH 2/9] Platform: Corstone1000: Fix NV counter writing
+
+The BL1 writes the PLAT_NV_COUNTER_BL1_0 NV counter directly without
+updating the private metadata. Because of this the update_nv_counters()
+function should not update the PLAT_NV_COUNTER_BL1_0 from the metadata.
+
+The tfm_plat_set_nv_counter() had a typo and wrote the
+priv_metadata->nv_counter[FWU_BL2_NV_COUNTER] to every NV counter.
+
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [47c54e8e79df52f40057c3d4be9411447d2787c2]
+---
+ .../corstone1000/fw_update_agent/fwu_agent.c   | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index 9a9926a3d..b2f31e166 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -1120,12 +1120,13 @@ static enum fwu_agent_error_t update_nv_counters(
+ 
+     FWU_LOG_MSG("%s: enter\n\r", __func__);
+ 
+-    for (int i = 0; i <= FWU_MAX_NV_COUNTER_INDEX; i++) {
++    /* The FWU_BL2_NV_COUNTER (0) is not mirrored in the private metadata. It is
++     * directly updated in the bl1_2_validate_image_at_addr() function, in
++     * tfm/bl1/bl1_2/main.c.
++     * Because of this, the index starts from FWU_TFM_NV_COUNTER (1). */
++    for (int i = FWU_TFM_NV_COUNTER; i <= FWU_MAX_NV_COUNTER_INDEX; i++) {
+ 
+         switch (i) {
+-            case FWU_BL2_NV_COUNTER:
+-                tfm_nv_counter_i = PLAT_NV_COUNTER_BL1_0;
+-                break;
+             case FWU_TFM_NV_COUNTER:
+                 tfm_nv_counter_i = PLAT_NV_COUNTER_BL2_0;
+                 break;
+@@ -1140,18 +1141,21 @@ static enum fwu_agent_error_t update_nv_counters(
+         err = tfm_plat_read_nv_counter(tfm_nv_counter_i,
+                         sizeof(security_cnt), (uint8_t *)&security_cnt);
+         if (err != TFM_PLAT_ERR_SUCCESS) {
++            FWU_LOG_MSG("%s: couldn't read NV counter\n\r", __func__);
+             return FWU_AGENT_ERROR;
+         }
+ 
+         if (priv_metadata->nv_counter[i] < security_cnt) {
++            FWU_LOG_MSG("%s: staged NV counter is smaller than current value\n\r", __func__);
+             return FWU_AGENT_ERROR;
+         } else if (priv_metadata->nv_counter[i] > security_cnt) {
+-            FWU_LOG_MSG("%s: updaing index = %u nv counter = %u->%u\n\r",
++            FWU_LOG_MSG("%s: updating index = %u nv counter = %u->%u\n\r",
+                         __func__, i, security_cnt,
+-                        priv_metadata->nv_counter[FWU_BL2_NV_COUNTER]);
++                        priv_metadata->nv_counter[i]);
+             err = tfm_plat_set_nv_counter(tfm_nv_counter_i,
+-                                    priv_metadata->nv_counter[FWU_BL2_NV_COUNTER]);
++                                    priv_metadata->nv_counter[i]);
+             if (err != TFM_PLAT_ERR_SUCCESS) {
++                FWU_LOG_MSG("%s: couldn't write NV counter\n\r", __func__);
+                 return FWU_AGENT_ERROR;
+             }
+         }
+-- 
+2.25.1
+

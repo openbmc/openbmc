@@ -912,11 +912,62 @@ the analysis and package splitting process use several areas:
    execute on a system and it generates code for yet another machine
    (e.g. :ref:`ref-classes-cross-canadian` recipes).
 
-The :term:`FILES` variable defines the
-files that go into each package in
-:term:`PACKAGES`. If you want
-details on how this is accomplished, you can look at
-:yocto_git:`package.bbclass </poky/tree/meta/classes-global/package.bbclass>`.
+Packages for a recipe are listed in the :term:`PACKAGES` variable. The
+:oe_git:`bitbake.conf </openembedded-core/tree/meta/conf/bitbake.conf>`
+configuration file defines the following default list of packages::
+
+  PACKAGES = "${PN}-src ${PN}-dbg ${PN}-staticdev ${PN}-dev ${PN}-doc ${PN}-locale ${PACKAGE_BEFORE_PN} ${PN}"
+
+Each of these packages contains a default list of files defined with the
+:term:`FILES` variable. For example, the package ``${PN}-dev`` represents files
+useful to the development of applications depending on ``${PN}``. The default
+list of files for ``${PN}-dev``, also defined in :oe_git:`bitbake.conf
+</openembedded-core/tree/meta/conf/bitbake.conf>`, is defined as follows::
+
+  FILES:${PN}-dev = "${includedir} ${FILES_SOLIBSDEV} ${libdir}/*.la \
+                  ${libdir}/*.o ${libdir}/pkgconfig ${datadir}/pkgconfig \
+                  ${datadir}/aclocal ${base_libdir}/*.o \
+                  ${libdir}/${BPN}/*.la ${base_libdir}/*.la \
+                  ${libdir}/cmake ${datadir}/cmake"
+
+The paths in this list must be *absolute* paths from the point of view of the
+root filesystem on the target, and must *not* make a reference to the variable
+:term:`D` or any :term:`WORKDIR` related variable. A correct example would be::
+
+  ${sysconfdir}/foo.conf
+
+.. note::
+
+   The list of files for a package is defined using the override syntax by
+   separating :term:`FILES` and the package name by a semi-colon (``:``).
+
+A given file can only ever be in one package. By iterating from the leftmost to
+rightmost package in :term:`PACKAGES`, each file matching one of the patterns
+defined in the corresponding :term:`FILES` definition is included in the
+package.
+
+.. note::
+
+  To find out which package installs a file, the ``oe-pkgdata-util``
+  command-line utility can be used::
+
+    $ oe-pkgdata-util find-path '/etc/fstab'
+    base-files: /etc/fstab
+
+  For more information on the ``oe-pkgdata-util`` utility, see the section
+  :ref:`dev-manual/debugging:Viewing Package Information with
+  \`\`oe-pkgdata-util\`\`` of the Yocto Project Development Tasks Manual.
+
+To add a custom package variant of the ``${PN}`` recipe named
+``${PN}-extra`` (name is arbitrary), one can add it to the
+:term:`PACKAGE_BEFORE_PN` variable::
+
+  PACKAGE_BEFORE_PN += "${PN}-extra"
+
+Alternatively, a custom package can be added by adding it to the
+:term:`PACKAGES` variable using the prepend operator (``=+``)::
+
+  PACKAGES =+ "${PN}-extra"
 
 Depending on the type of packages being created (RPM, DEB, or IPK), the
 :ref:`do_package_write_* <ref-tasks-package_write_deb>`

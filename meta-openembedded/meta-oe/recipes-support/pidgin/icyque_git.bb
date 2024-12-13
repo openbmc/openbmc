@@ -12,6 +12,9 @@ inherit pkgconfig
 SRC_URI = "git://github.com/EionRobb/icyque;branch=master;protocol=https"
 SRCREV = "513fc162d5d1a201c2b044e2b42941436d1069d5"
 
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 do_compile() {

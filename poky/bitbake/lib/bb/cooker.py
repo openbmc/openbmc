@@ -17,7 +17,7 @@ import threading
 from io import StringIO, UnsupportedOperation
 from contextlib import closing
 from collections import defaultdict, namedtuple
-import bb, bb.exceptions, bb.command
+import bb, bb.command
 from bb import utils, data, parse, event, cache, providers, taskdata, runqueue, build
 import queue
 import signal
@@ -281,7 +281,6 @@ class BBCooker:
         self.databuilder = bb.cookerdata.CookerDataBuilder(self.configuration, False)
         self.databuilder.parseBaseConfiguration()
         self.data = self.databuilder.data
-        self.data_hash = self.databuilder.data_hash
         self.extraconfigdata = {}
 
         eventlog = self.data.getVar("BB_DEFAULT_EVENTLOG")
@@ -369,6 +368,11 @@ class BBCooker:
 
         if not clean:
             bb.parse.BBHandler.cached_statements = {}
+
+        # If writes were made to any of the data stores, we need to recalculate the data
+        # store cache
+        if hasattr(self, "databuilder"):
+            self.databuilder.calc_datastore_hashes()
 
     def parseConfiguration(self):
         self.updateCacheSync()
@@ -1338,7 +1342,7 @@ class BBCooker:
         self.buildSetVars()
         self.reset_mtime_caches()
 
-        bb_caches = bb.cache.MulticonfigCache(self.databuilder, self.data_hash, self.caches_array)
+        bb_caches = bb.cache.MulticonfigCache(self.databuilder, self.databuilder.data_hash, self.caches_array)
 
         layername = self.collections[mc].calc_bbfile_priority(fn)[2]
         infos = bb_caches[mc].parse(fn, self.collections[mc].get_file_appends(fn), layername)
@@ -2097,7 +2101,6 @@ class Parser(multiprocessing.Process):
         except Exception as exc:
             tb = sys.exc_info()[2]
             exc.recipe = filename
-            exc.traceback = list(bb.exceptions.extract_traceback(tb, context=3))
             return True, None, exc
         # Need to turn BaseExceptions into Exceptions here so we gracefully shutdown
         # and for example a worker thread doesn't just exit on its own in response to
@@ -2112,7 +2115,7 @@ class CookerParser(object):
         self.mcfilelist = mcfilelist
         self.cooker = cooker
         self.cfgdata = cooker.data
-        self.cfghash = cooker.data_hash
+        self.cfghash = cooker.databuilder.data_hash
         self.cfgbuilder = cooker.databuilder
 
         # Accounting statistics
@@ -2298,8 +2301,12 @@ class CookerParser(object):
             return False
         except ParsingFailure as exc:
             self.error += 1
-            logger.error('Unable to parse %s: %s' %
-                     (exc.recipe, bb.exceptions.to_string(exc.realexception)))
+
+            exc_desc = str(exc)
+            if isinstance(exc, SystemExit) and not isinstance(exc.code, str):
+                exc_desc = 'Exited with "%d"' % exc.code
+
+            logger.error('Unable to parse %s: %s' % (exc.recipe, exc_desc))
             self.shutdown(clean=False)
             return False
         except bb.parse.ParseError as exc:
@@ -2308,20 +2315,33 @@ class CookerParser(object):
             self.shutdown(clean=False, eventmsg=str(exc))
             return False
         except bb.data_smart.ExpansionError as exc:
+            def skip_frames(f, fn_prefix):
+                while f and f.tb_frame.f_code.co_filename.startswith(fn_prefix):
+                    f = f.tb_next
+                return f
+
             self.error += 1
             bbdir = os.path.dirname(__file__) + os.sep
-            etype, value, _ = sys.exc_info()
-            tb = list(itertools.dropwhile(lambda e: e.filename.startswith(bbdir), exc.traceback))
+            etype, value, tb = sys.exc_info()
+
+            # Remove any frames where the code comes from bitbake. This
+            # prevents deep (and pretty useless) backtraces for expansion error
+            tb = skip_frames(tb, bbdir)
+            cur = tb
+            while cur:
+                cur.tb_next = skip_frames(cur.tb_next, bbdir)
+                cur = cur.tb_next
+
             logger.error('ExpansionError during parsing %s', value.recipe,
                          exc_info=(etype, value, tb))
             self.shutdown(clean=False)
             return False
         except Exception as exc:
             self.error += 1
-            etype, value, tb = sys.exc_info()
+            _, value, _ = sys.exc_info()
             if hasattr(value, "recipe"):
                 logger.error('Unable to parse %s' % value.recipe,
-                            exc_info=(etype, value, exc.traceback))
+                            exc_info=sys.exc_info())
             else:
                 # Most likely, an exception occurred during raising an exception
                 import traceback

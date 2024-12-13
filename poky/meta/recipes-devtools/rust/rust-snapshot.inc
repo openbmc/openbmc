@@ -4,47 +4,56 @@
 ## The exact (previous) version that has been used is specified in the source tarball.
 ## The version is replicated here.
 
-SNAPSHOT_VERSION = "1.74.0"
+SNAPSHOT_VERSION = "1.78.0"
 
-SRC_URI[cargo-snapshot-aarch64.sha256sum] = "a18dc9132cf76ccba90bcbb53b56a4d37ebfb34845f61e79f7b5d4710a269647"
-SRC_URI[rust-std-snapshot-aarch64.sha256sum] = "c5ad01692bc08ce6f4db2ac815be63498b45013380c71f22b3d33bf3be767270"
-SRC_URI[rustc-snapshot-aarch64.sha256sum] = "a49bb365481913ead305658e7e9dc621da7895036b840fb57b1bc85c721d07e6"
+SRC_URI[cargo-snapshot-aarch64.sha256sum] = "5173f84a07d4cc6b19f27eda7464999c5886232ce8e54bf61b06617635d43fb9"
+SRC_URI[clippy-snapshot-aarch64.sha256sum] = "086367aa83ea8c30ce41fb6c097ae6ebdc92363fb1ce8ee9f01d44cafa625f61"
+SRC_URI[rust-std-snapshot-aarch64.sha256sum] = "66cf114dcd8056a596bf169f824ff95ff1837bc065daaafdbcaa02ce92903304"
+SRC_URI[rustc-snapshot-aarch64.sha256sum] = "e0450bef5537e6b0bb82872e9f837c3b3f6397cc8eba6f53211481c82426e1ce"
 
-SRC_URI[cargo-snapshot-i686.sha256sum] = "9f5b5226a69f95950a381ec5bb15dde7a90865a6df8aa0b470082a40d42d9f38"
-SRC_URI[rust-std-snapshot-i686.sha256sum] = "69757b72def9c433753e8bb575c817fc1ba389cf1a9c25276db1491ec025e495"
-SRC_URI[rustc-snapshot-i686.sha256sum] = "7a2bc1bf7e51942d32e82f461eacebe7f929c3eec210dcb7dc6624efd997d7da"
+SRC_URI[cargo-snapshot-i686.sha256sum] = "472230d0a04c6a2db80671549cb970176299817883dafbffb15c993f5aeaa909"
+SRC_URI[clippy-snapshot-i686.sha256sum] = "1abc63d39850194580c22f998ff14aade2601f7cfc2465cf68828dcfc9d5536d"
+SRC_URI[rust-std-snapshot-i686.sha256sum] = "9e5e02311853354c1540e1b4da6c1686616cea9d3a233c033023f36d950977c0"
+SRC_URI[rustc-snapshot-i686.sha256sum] = "8ba9c213e5daaf08a13c5787a4ea0d7ae8d1e7004126de2b8dc6a6dcd798becd"
 
-SRC_URI[cargo-snapshot-loongarch64.sha256sum] = "77d6d55122150d8fc56d31fb166fd1b2ae48bff7376459c1b0030727fc604998"
-SRC_URI[rust-std-snapshot-loongarch64.sha256sum] = "13b85a882e912d0d8b3228feb5c263d34ec353d483c9defbd3e6bba38935553b"
-SRC_URI[rustc-snapshot-loongarch64.sha256sum] = "703e8c81f9ca3100fc459db92fd5899de62cf77393f334f98159cd97feb11633"
+SRC_URI[cargo-snapshot-loongarch64.sha256sum] = "fabe8c461fb87eff8bdf7845fca7051c5dc6e46da4dc6b3023c90efc7d7bd918"
+SRC_URI[clippy-snapshot-loongarch64.sha256sum] = "d9366b69bd41673bccd7617c2f3fe6a1cdd478fda407c7d9fda0021e33deb825"
+SRC_URI[rust-std-snapshot-loongarch64.sha256sum] = "9f5dc7bfd8602a594157d04c480fb74804a3cdd9b77f46202e289a546af7c846"
+SRC_URI[rustc-snapshot-loongarch64.sha256sum] = "9f19f781cdfa51f5e8b540602a6a07d45ab5f2e063a86af6177625ecf9d79358"
 
-SRC_URI[cargo-snapshot-powerpc.sha256sum] = "08ea8a345839f34d26f21b94ed6d458e6a38513999f7ddc05175c371983e6deb"
-SRC_URI[rust-std-snapshot-powerpc.sha256sum] = "458ee056fbeccf1cf96c20506654e5e9104c4e8f23d46cd4bb9b97ff5b3f4d55"
-SRC_URI[rustc-snapshot-powerpc.sha256sum] = "d4095cbe26ec197274dae9409e68843653e8c08c0b79e8cd74e72d9907e99816"
+SRC_URI[cargo-snapshot-powerpc.sha256sum] = "3d73d16f1b7c4aaf53e6d9ac6d04586c60698b0c2c793c55585b0234f75d247d"
+SRC_URI[clippy-snapshot-powerpc.sha256sum] = "f9b0d7ac6bdd26b678201d068f8777df5fdc7f524602f73eff54c7e8a5844892"
+SRC_URI[rust-std-snapshot-powerpc.sha256sum] = "4ac9958386c4225b14f8e6281dd64a2b00d5db32c5b336fac137c7c729df25a0"
+SRC_URI[rustc-snapshot-powerpc.sha256sum] = "33bbd45416ce00f2e21073ebcef8668575a3955189c85a13172bf5f5750e00ef"
 
-SRC_URI[cargo-snapshot-powerpc64.sha256sum] = "696863642318f139634e6856f5e946ea970318ce79d4d9b1595871a70a662a89"
-SRC_URI[rust-std-snapshot-powerpc64.sha256sum] = "7ec56629b7d887753ce3a895fb73b77d2d395acac30207c2b69237ef63279872"
-SRC_URI[rustc-snapshot-powerpc64.sha256sum] = "ca162463db262df9d646687386a1c19f15c8ca9bf1f29eea94f2a8a6d7a6102d"
+SRC_URI[cargo-snapshot-powerpc64.sha256sum] = "271e121aa1324d37d2bd650217256a792ed387af4b14df0b2757ba22dab50ee5"
+SRC_URI[clippy-snapshot-powerpc64.sha256sum] = "53294b52155bb320570dd125e58b07ee3a0cb35e47a33716b3561d1751ccc538"
+SRC_URI[rust-std-snapshot-powerpc64.sha256sum] = "303e3533e72099d4f0a1d5c2f31c68ef93b3a3ef8af5d36773eac394f920fb22"
+SRC_URI[rustc-snapshot-powerpc64.sha256sum] = "338299628336aa97e6d2f30b5d3c4beaf78038f1e1347a378cbbf80d02a461ea"
 
-SRC_URI[cargo-snapshot-powerpc64le.sha256sum] = "2eccd404aabe5137a8e45b6173c27d08862a0e674d5866be71aff1434f271d50"
-SRC_URI[rust-std-snapshot-powerpc64le.sha256sum] = "785956d68855de18546c87d6d06cd2505cb8a10edba84327bf2b448420a31d55"
-SRC_URI[rustc-snapshot-powerpc64le.sha256sum] = "8727b1a92e88ac1ce05198ee185dac86553edd7f50b726781c9ab64544b59809"
+SRC_URI[cargo-snapshot-powerpc64le.sha256sum] = "b58d7e61fb36295ebd0a09242e292c7bc4fa24fc189aa285b6e266263f356316"
+SRC_URI[clippy-snapshot-powerpc64le.sha256sum] = "5b2b621b79a7635d5670bc17d992f6a0bff0e153b6629fdd501a08cf0df7b126"
+SRC_URI[rust-std-snapshot-powerpc64le.sha256sum] = "117a01afab9d4c6e39bc32b57f8a4b9ad8d693869dde0c52fa51a6ec05eaab8b"
+SRC_URI[rustc-snapshot-powerpc64le.sha256sum] = "45ba3091f9f17abfb01d0c03c87e8de33f0a210aefbdb007905dbf6cfba8590d"
 
-SRC_URI[cargo-snapshot-riscv64gc.sha256sum] = "5b224e465e006b5fe959ad64d0df0540c4318ba4e39edd89794d520eef60b026"
-SRC_URI[rust-std-snapshot-riscv64gc.sha256sum] = "2a500156825dde03a53c965e5764a440b1ebce973b8a31f21e8bd8104271d56e"
-SRC_URI[rustc-snapshot-riscv64gc.sha256sum] = "f4f27f1c40208b61ea7e61f9edf2de1787aea78a1edb7fe15bceb20de5c7a4a3"
+SRC_URI[cargo-snapshot-riscv64gc.sha256sum] = "fc3fda5412f2b1a53c6a3fe6c0a98864d50eac8c63e9b38383085abad6487e3b"
+SRC_URI[clippy-snapshot-riscv64gc.sha256sum] = "44745c59092bc449b0338ab6788eb0b2a6d5ad382224fe1ba1017931ebb6e6dc"
+SRC_URI[rust-std-snapshot-riscv64gc.sha256sum] = "e5d0e1e532f4ca4656d971c4301e87cbcd571daeffd7830b1d02055f95bdaca6"
+SRC_URI[rustc-snapshot-riscv64gc.sha256sum] = "6925c93e4b5b21e37b27aed7723cdd6da317eec3f06f86fb0e5be868f58ea052"
 
-SRC_URI[cargo-snapshot-s390x.sha256sum] = "06267377c811271d6e4ba6feea1d4b84a9f4c5c8d1dbd46092d0a0595f24e9b6"
-SRC_URI[rust-std-snapshot-s390x.sha256sum] = "35142541b88a1244c8225c64ee18585446d7e67841a9335ccaa95acf2d34dde5"
-SRC_URI[rustc-snapshot-s390x.sha256sum] = "41eae7788549aec58a6980ae6222d3330a01a37d1e7856d087a4e9c8a19aa890"
+SRC_URI[cargo-snapshot-s390x.sha256sum] = "59da021df10c62786d33bc6b186a7d1114f788bebcd09f0dd323032fad2f7f5d"
+SRC_URI[clippy-snapshot-s390x.sha256sum] = "1a5542ac30cbcfb15512aba2d53b30dd8835058514085067bbcf7c938c05b79e"
+SRC_URI[rust-std-snapshot-s390x.sha256sum] = "aee53a0a04fb44c95b9aa6217c5483113e1f67fa595dea6fdcbbbd72826e729b"
+SRC_URI[rustc-snapshot-s390x.sha256sum] = "1f458a0b3b947d78d50c67b16bb68e8528cb71d52a7021c3b1652b5f9004c40b"
 
-SRC_URI[cargo-snapshot-x86_64.sha256sum] = "f219386d4569c40b660518e99267afff428c13bf980bda7a614c8d4038d013f6"
-SRC_URI[rust-std-snapshot-x86_64.sha256sum] = "548413213012e2f62b08ed8a913a51210ae7402619027224580176031f2789ea"
-SRC_URI[rustc-snapshot-x86_64.sha256sum] = "7d464be2ae0d6ce69f056d1ea9a8ce2b3b1d537418caea216fdd303903972181"
+SRC_URI[cargo-snapshot-x86_64.sha256sum] = "f8aacf7a101eb10dc000b8bf26de90a9d0ce678d02ccf70430ed20dd31ecec6b"
+SRC_URI[clippy-snapshot-x86_64.sha256sum] = "b15184ba6078dd7976f06239a258313a96de2677b37e4c560779cf7f261c3ee5"
+SRC_URI[rust-std-snapshot-x86_64.sha256sum] = "95aece42a336f237c5bac5c5d9aca051b7f0bd3e6a64fb3c5828e6d0d3af2e8c"
+SRC_URI[rustc-snapshot-x86_64.sha256sum] = "3994971e5923716d54e4b574ce238f04c4e20cda03990670f7cc3f87d36e5499"
 
-SRC_URI[rust-std-snapshot-i586.sha256sum] = "bd4502462c5e2b2617b23f28862e544f14c4d02658f6d331f0cfbbba914aa4c0"
+SRC_URI[rust-std-snapshot-i586.sha256sum] = "c119866af24c91108d34267e24886ad90fd8784edfdfd0d36c64013b06974f71"
 
-SRC_URI[rust-std-snapshot-sparc64.sha256sum] = "68e96875ca7fc6ed0e023fcf752f28b95e9cc7d9881af4e8e167259fdaec7168"
+SRC_URI[rust-std-snapshot-sparc64.sha256sum] = "7e158a16f733844975e65090b07706596401719bd3f5aca44da9f98fb3c11b04"
 
 SRC_URI += " \
     ${RUST_DIST_SERVER}/dist/${RUST_STD_SNAPSHOT}.tar.xz;name=rust-std-snapshot-${RUST_BUILD_ARCH};subdir=rust-snapshot-components \

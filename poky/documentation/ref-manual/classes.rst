@@ -159,27 +159,38 @@ software that includes bash-completion data.
 ``bin_package``
 ===============
 
-The :ref:`ref-classes-bin-package` class is a helper class for recipes that extract the
-contents of a binary package (e.g. an RPM) and install those contents
-rather than building the binary from source. The binary package is
-extracted and new packages in the configured output package format are
-created. Extraction and installation of proprietary binaries is a good
-example use for this class.
+The :ref:`ref-classes-bin-package` class is a helper class for recipes, that
+disables the :ref:`ref-tasks-configure` and :ref:`ref-tasks-compile` tasks and
+copies the content of the :term:`S` directory into the :term:`D` directory. This
+is useful for installing binary packages (e.g. RPM packages) by passing the
+package in the :term:`SRC_URI` variable and inheriting this class.
+
+For RPMs and other packages that do not contain a subdirectory, you should set
+the :term:`SRC_URI` option ``subdir`` to :term:`BP` so that the contents are
+extracted to the directory expected by the default value of :term:`S`. For
+example::
+
+   SRC_URI = "https://example.com/downloads/somepackage.rpm;subdir=${BP}"
+
+This class can also be used for tarballs. For example::
+
+   SRC_URI = "file://somepackage.tar.xz;subdir=${BP}"
+
+The :ref:`ref-classes-bin-package` class will copy the extracted content of the
+tarball from :term:`S` to :term:`D`.
+
+This class assumes that the content of the package as installed in :term:`S`
+mirrors the expected layout once installed on the target, which is generally the
+case for binary packages. For example, an RPM package for a library would
+usually contain the ``usr/lib`` directory, and should be extracted to
+``${S}/usr/lib/<library>.so.<version>`` to be installed in :term:`D` correctly.
 
 .. note::
 
-   For RPMs and other packages that do not contain a subdirectory, you
-   should specify an appropriate fetcher parameter to point to the
-   subdirectory. For example, if BitBake is using the Git fetcher (``git://``),
-   the "subpath" parameter limits the checkout to a specific subpath
-   of the tree. Here is an example where ``${BP}`` is used so that the files
-   are extracted into the subdirectory expected by the default value of
-   :term:`S`::
-
-      SRC_URI = "git://example.com/downloads/somepackage.rpm;branch=main;subpath=${BP}"
-
-   See the ":ref:`bitbake-user-manual/bitbake-user-manual-fetching:fetchers`" section in the BitBake User Manual for
-   more information on supported BitBake Fetchers.
+   The extraction of the package passed in :term:`SRC_URI` is not handled by the
+   :ref:`ref-classes-bin-package` class, but rather by the appropriate
+   :ref:`fetcher <bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
+   depending on the file extension.
 
 .. _ref-classes-binconfig:
 
@@ -1461,12 +1472,11 @@ The tests you can list with the :term:`WARN_QA` and
 -  ``patch-fuzz:`` Checks for fuzz in patch files that may allow
    them to apply incorrectly if the underlying code changes.
 
--  ``patch-status-core:`` Checks that the Upstream-Status is specified
-   and valid in the headers of patches for recipes in the OE-Core layer.
+-  ``patch-status:`` Checks that the ``Upstream-Status`` is specified and valid
+   in the headers of patches for recipes.
 
--  ``patch-status-noncore:`` Checks that the Upstream-Status is specified
-   and valid in the headers of patches for recipes in layers other than
-   OE-Core.
+-  ``pep517-backend:`` checks that a recipe inheriting
+   :ref:`ref-classes-setuptools3` has a PEP517-compliant backend.
 
 -  ``perllocalpod:`` Checks for ``perllocal.pod`` being erroneously
    installed and packaged by a recipe.
@@ -2048,6 +2058,14 @@ and the target. All common parts of the recipe are automatically shared.
 
 Disables packaging tasks for those recipes and classes where packaging
 is not needed.
+
+.. _ref-classes-nospdx:
+
+``nospdx``
+==========
+
+The :ref:`ref-classes-nospdx` allows a recipe to opt out of SPDX
+generation provided by :ref:`ref-classes-create-spdx`.
 
 .. _ref-classes-npm:
 
@@ -2728,6 +2746,23 @@ commit, and log. From the information, report files using a JSON format
 are created and stored in
 ``${``\ :term:`LOG_DIR`\ ``}/error-report``.
 
+.. _ref-classes-retain:
+
+``retain``
+==========
+
+The :ref:`ref-classes-retain` class can be used to create a tarball of the work
+directory for a recipe when one of its tasks fails, or any other nominated
+directories. It is useful in cases where the environment in which builds are run
+is ephemeral or otherwise inaccessible for examination during debugging.
+
+To enable, add the following to your configuration::
+
+   INHERIT += "retain"
+
+The class can be disabled for specific recipes using the :term:`RETAIN_ENABLED`
+variable.
+
 .. _ref-classes-rm-work:
 
 ``rm_work``
@@ -2914,15 +2949,6 @@ in the :ref:`ref-classes-setuptools3` class and inherit this class instead.
 ============
 
 The :ref:`ref-classes-sign_rpm` class supports generating signed RPM packages.
-
-.. _ref-classes-siteconfig:
-
-``siteconfig``
-==============
-
-The :ref:`ref-classes-siteconfig` class provides functionality for handling site
-configuration. The class is used by the :ref:`ref-classes-autotools` class to
-accelerate the :ref:`ref-tasks-configure` task.
 
 .. _ref-classes-siteinfo:
 
@@ -3488,6 +3514,31 @@ This class is enabled by default because it is inherited by the
 
 The :ref:`ref-classes-vala` class supports recipes that need to build software written
 using the Vala programming language.
+
+.. _ref-classes-vex:
+
+``vex``
+========
+
+The :ref:`ref-classes-vex` class is used to generate metadata needed by external
+tools to check for vulnerabilities, for example CVEs. It can be used as a
+replacement for :ref:`ref-classes-cve-check`.
+
+In order to use this class, inherit the class in the ``local.conf`` file and it
+will add the ``generate_vex`` task for every recipe::
+
+   INHERIT += "vex"
+
+If an image is built it will generate a report in :term:`DEPLOY_DIR_IMAGE` for
+all the packages used, it will also generate a file for all recipes used in the
+build.
+
+Variables use the ``CVE_CHECK`` prefix to keep compatibility with the
+:ref:`ref-classes-cve-check` class.
+
+Example usage::
+
+   bitbake -c generate_vex openssl
 
 .. _ref-classes-waf:
 

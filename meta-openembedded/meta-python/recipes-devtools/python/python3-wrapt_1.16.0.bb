@@ -12,7 +12,9 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
+# python3-misc for 'this' module
 RDEPENDS:${PN}-ptest += " \
+	python3-misc \
 	python3-pytest \
 	python3-unittest-automake-output \
 "

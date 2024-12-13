@@ -13,7 +13,8 @@ SRC_URI = "git://github.com/besser82/libxcrypt.git;branch=${SRCBRANCH};protocol=
 SRCREV = "f531a36aa916a22ef2ce7d270ba381e264250cbf"
 SRCBRANCH ?= "master"
 
-SRC_URI += "file://fix_cflags_handling.patch"
+SRC_URI += "file://fix_cflags_handling.patch \
+            file://configure-c99.patch"
 
 PROVIDES = "virtual/crypt"
 

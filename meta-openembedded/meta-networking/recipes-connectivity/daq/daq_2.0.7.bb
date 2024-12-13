@@ -8,12 +8,12 @@ PARALLEL_MAKE = ""
 
 DEPENDS = "libpcap libpcre libdnet bison-native libnetfilter-queue"
 
-SRC_URI = "http://fossies.org/linux/misc/daq-${PV}.tar.gz \
+SRC_URI = "https://www.snort.org/downloads/snort/${BPN}-${PV}.tar.gz;downloadfilename=${BPN}-${PV}_snort_org.tar.gz \
            file://disable-run-test-program-while-cross-compiling.patch \
            file://0001-correct-the-location-of-unistd.h.patch \
            file://daq-fix-incompatible-pointer-type-error.patch \
            "
-SRC_URI[sha256sum] = "bdc4e5a24d1ea492c39ee213a63c55466a2e8114b6a9abed609927ae13a7705e"
+SRC_URI[sha256sum] = "d1f6709bc5dbddee3fdf170cdc1e49fb926e2031d4869ecf367a8c47efc87279"
 # these 2 create undeclared dependency on libdnet and libnetfilter-queue from meta-networking
 # this error from test-dependencies script:
 # daq/daq/latest lost dependency on  libdnet libmnl libnetfilter-queue libnfnetlink

@@ -6,4 +6,8 @@ SRC_URI[sha256sum] = "81d5b8baba60c255b519ccd31a691f9bc064223ff196709d41119bde81
 
 PYPI_PACKAGE = "yamlpath"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta
+
+DEPENDS += " \
+    python3-setuptools-scm-native \
+"

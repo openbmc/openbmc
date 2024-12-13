@@ -1,0 +1,70 @@
+From dc9fd53be9d69c4a6bc67d9de951b8f2a92abade Mon Sep 17 00:00:00 2001
+From: Jerome Forissier <jerome.forissier@linaro.org>
+Date: Fri, 14 Jun 2024 17:51:22 +0200
+Subject: [PATCH 1/2] arm64.h: fix compile error with Clang
+
+Clang 18.1.6 fails to compile OP-TEE OS with the following error:
+
+   CC      out/arm/core/arch/arm/kernel/vfp.o
+ In file included from core/arch/arm/kernel/vfp.c:6:
+ In file included from core/arch/arm/include/arm.h:137:
+ core/arch/arm/include/arm64.h:455:1: error: expected readable system register
+   455 | DEFINE_U32_REG_READWRITE_FUNCS(fpcr)
+       | ^
+ core/arch/arm/include/arm64.h:436:3: note: expanded from macro 'DEFINE_U32_REG_READWRITE_FUNCS'
+   436 |                 DEFINE_U32_REG_READ_FUNC(reg)   \
+       |                 ^
+ core/arch/arm/include/arm64.h:430:3: note: expanded from macro 'DEFINE_U32_REG_READ_FUNC'
+   430 |                 DEFINE_REG_READ_FUNC_(reg, uint32_t, reg)
+       |                 ^
+ core/arch/arm/include/arm64.h:417:15: note: expanded from macro 'DEFINE_REG_READ_FUNC_'
+   417 |         asm volatile("mrs %0, " #asmreg : "=r" (val64));        \
+       |                      ^
+ <inline asm>:1:10: note: instantiated into assembly here
+     1 |         mrs x8, fpcr
+       |                 ^
+
+...and similar ones for fpcr write, as well as fpsr read and write.
+
+Clang 12.0.0 does not have any problem with this code which makes me
+think that it's a Clang/LLVM issue.
+
+Work around the problem by using the coded system register identifiers
+S3_3_c4_c4_0 and S3_3_c4_c4_1 instead of fpcr and fpsr, respectively.
+The values 3-3-4-4-0 and 3-3-4-4-1 are taken from the Arm ARM sections
+C.5.2.8 and C.5.2.9.
+
+Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+Acked-by: Joakim Bech <joakim.bech@linaro.org>
+Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+Upstream-Status: Backport
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+
+---
+ core/arch/arm/include/arm64.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/core/arch/arm/include/arm64.h b/core/arch/arm/include/arm64.h
+index 28922631f637..c72b5cd7bbd3 100644
+--- a/core/arch/arm/include/arm64.h
++++ b/core/arch/arm/include/arm64.h
+@@ -452,8 +452,15 @@ static inline __noprof void write_##reg(type val)		\
+ 
+ DEFINE_U32_REG_READWRITE_FUNCS(cpacr_el1)
+ DEFINE_U32_REG_READWRITE_FUNCS(daif)
++#ifdef __clang__
++DEFINE_REG_READ_FUNC_(fpcr, uint32_t, S3_3_c4_c4_0)
++DEFINE_REG_WRITE_FUNC_(fpcr, uint32_t, S3_3_c4_c4_0)
++DEFINE_REG_READ_FUNC_(fpsr, uint32_t, S3_3_c4_c4_1)
++DEFINE_REG_WRITE_FUNC_(fpsr, uint32_t, S3_3_c4_c4_1)
++#else
+ DEFINE_U32_REG_READWRITE_FUNCS(fpcr)
+ DEFINE_U32_REG_READWRITE_FUNCS(fpsr)
++#endif
+ 
+ DEFINE_U32_REG_READ_FUNC(ctr_el0)
+ #define read_ctr() read_ctr_el0()
+-- 
+2.39.5
+

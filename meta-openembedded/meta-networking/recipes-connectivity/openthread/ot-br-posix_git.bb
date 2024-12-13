@@ -29,11 +29,15 @@ inherit pkgconfig cmake systemd
 #    for (uint8_t i = 0;; i++)
 CXXFLAGS:append:libc-musl:toolchain-clang = " -Wno-error=sign-compare -Wno-error=unused-but-set-variable"
 
+LDFLAGS:append:riscv32 = " -latomic"
+
 EXTRA_OECMAKE = "-DBUILD_TESTING=OFF \
                  -DOTBR_DBUS=ON \
                  -DOTBR_REST=ON \
                  -DOTBR_WEB=OFF \
                  -DCMAKE_LIBRARY_PATH=${libdir} \
+                 -DOT_POSIX_PRODUCT_CONFIG=${sysconfdir}/openthread.conf.example \
+                 -DOT_POSIX_FACTORY_CONFIG=${sysconfdir}/openthread.conf.example \
                  -DOTBR_MDNS=avahi \
                  -DOTBR_BACKBONE_ROUTER=ON \
                  -DOTBR_BORDER_ROUTING=ON \
@@ -63,3 +67,7 @@ RCONFLICTS:${PN} = "ot-daemon"
 
 FILES:${PN} += "${systemd_unitdir}/*"
 FILES:${PN} += "${datadir}/*"
+
+# http://errors.yoctoproject.org/Errors/Details/766903/
+# git/third_party/openthread/repo/src/core/border_router/routing_manager.hpp:615:11: error: 'ot::BorderRouter::RoutingManager::DiscoveredPrefixTable' declared with greater visibility than the type of its field 'ot::BorderRouter::RoutingManager::DiscoveredPrefixTable::mEntryTimer' [-Werror=attributes]
+CXXFLAGS += "-Wno-error=attributes"

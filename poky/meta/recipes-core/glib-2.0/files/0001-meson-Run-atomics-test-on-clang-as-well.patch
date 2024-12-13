@@ -1,4 +1,4 @@
-From f04ea29f9f96892ada81bd0acfcef70183138229 Mon Sep 17 00:00:00 2001
+From de3eabf9295816b4b4eb7428dee504fd505e723d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 12 Oct 2019 17:46:26 -0700
 Subject: [PATCH] meson: Run atomics test on clang as well
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 257afb5..5caa6e6 100644
+index b995ebc..a907736 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -2024,7 +2024,7 @@ atomicdefine = '''
+@@ -2021,7 +2021,7 @@ atomicdefine = '''
  # We know that we can always use real ("lock free") atomic operations with MSVC
  if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl' or cc.links(atomictest, name : 'atomic ops')
    have_atomic_lock_free = true

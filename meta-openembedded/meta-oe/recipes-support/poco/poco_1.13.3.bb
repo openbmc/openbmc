@@ -8,12 +8,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4267f48fc738f50380cbeeb76f95cebc"
 # These dependencies are required by Foundation
 DEPENDS = "libpcre2 zlib"
 
-SRC_URI = "git://github.com/pocoproject/poco.git;branch=master-unused;protocol=https \
-           file://0001-Use-std-atomic-int-instead-of-std-atomic-bool.patch \
+SRC_URI = "git://github.com/pocoproject/poco.git;branch=poco-1.13.3;protocol=https \
            file://0001-cppignore.lnx-Ignore-PKCS12-and-testLaunch-test.patch \
            file://run-ptest \
            "
-SRCREV = "d6bd48a94c5f03e3c69cac1b024fdad5120e3a7b"
+SRCREV = "7f848d25aa0461d3beeff1189dc61b48ffe8e2f4"
 
 UPSTREAM_CHECK_GITTAGREGEX = "poco-(?P<pver>\d+(\.\d+)+)"
 

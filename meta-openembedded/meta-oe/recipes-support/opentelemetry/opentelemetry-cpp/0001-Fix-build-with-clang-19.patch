@@ -1,0 +1,56 @@
+From 1a5b4035e4cb75b87c716b4ebd5ffe32cd604c6e Mon Sep 17 00:00:00 2001
+From: "Sergey A. Osokin" <osa@FreeBSD.org.ru>
+Date: Sun, 8 Sep 2024 17:14:25 -0400
+Subject: [PATCH] Fix build with clang 19
+
+Please see https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=281359
+for details.
+
+Upstream-Status: Submitted [https://github.com/open-telemetry/opentelemetry-cpp/pull/3055]
+Credit:	Dimitry Andric <dim@FreeBSD.org>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ api/include/opentelemetry/logs/event_logger.h       | 2 +-
+ api/include/opentelemetry/logs/logger.h             | 2 +-
+ api/include/opentelemetry/logs/logger_type_traits.h | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/api/include/opentelemetry/logs/event_logger.h b/api/include/opentelemetry/logs/event_logger.h
+index b5c94a70..5892e041 100644
+--- a/api/include/opentelemetry/logs/event_logger.h
++++ b/api/include/opentelemetry/logs/event_logger.h
+@@ -66,7 +66,7 @@ class EventLogger
+     nostd::unique_ptr<LogRecord> log_record = delegate_logger->CreateLogRecord();
+ 
+     IgnoreTraitResult(
+-        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(
++        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set<>(
+             log_record.get(), std::forward<ArgumentType>(args))...);
+ 
+     EmitEvent(event_name, std::move(log_record));
+diff --git a/api/include/opentelemetry/logs/logger.h b/api/include/opentelemetry/logs/logger.h
+index dc09a0c2..19da3942 100644
+--- a/api/include/opentelemetry/logs/logger.h
++++ b/api/include/opentelemetry/logs/logger.h
+@@ -73,7 +73,7 @@ class Logger
+     }
+ 
+     IgnoreTraitResult(
+-        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(
++        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set<>(
+             log_record.get(), std::forward<ArgumentType>(args))...);
+ 
+     EmitLogRecord(std::move(log_record));
+diff --git a/api/include/opentelemetry/logs/logger_type_traits.h b/api/include/opentelemetry/logs/logger_type_traits.h
+index 48613513..f140a545 100644
+--- a/api/include/opentelemetry/logs/logger_type_traits.h
++++ b/api/include/opentelemetry/logs/logger_type_traits.h
+@@ -166,7 +166,7 @@ struct LogRecordSetterTrait
+                 * = nullptr>
+   inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
+   {
+-    return LogRecordSetterTrait<common::KeyValueIterable>::template Set(
++    return LogRecordSetterTrait<common::KeyValueIterable>::template Set<>(
+         log_record, std::forward<ArgumentType>(arg));
+   }
+ 

@@ -1,0 +1,105 @@
+From 4a84e9857d83f684bf53d616942a393ce558a328 Mon Sep 17 00:00:00 2001
+From: Morten Welinder <terra@gnome.org>
+Date: Wed, 3 Jul 2024 19:18:15 -0400
+Subject: [PATCH] Compilation: attempt fixes for libxml 2.13
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libgsf/-/commit/5d4bb55095d3d6ef793c1908a88504183e28644c]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac         |  1 +
+ gsf/gsf-input-http.c | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index fceb776..7c2f946 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -238,6 +238,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <glib/gstdio.h>]], [[(void)g_chown("/
+ 		AC_MSG_RESULT(yes)],
+ 	       [AC_MSG_RESULT(no)])
+ AC_CHECK_FUNCS(g_date_time_new_from_iso8601 g_date_time_format_iso8601)
++AC_CHECK_FUNCS(xmlNanoHTTPOpen xmlNanoHTTPClose)
+ CFLAGS=$SAVE_CFLAGS
+ LIBS=$SAVE_LIBS
+ 
+diff --git a/gsf/gsf-input-http.c b/gsf/gsf-input-http.c
+index bdde3c8..03f4045 100644
+--- a/gsf/gsf-input-http.c
++++ b/gsf/gsf-input-http.c
+@@ -23,7 +23,10 @@
+ #include <gsf/gsf-input-http.h>
+ #include <gsf/gsf.h>
+ 
++#ifdef HAVE_XMLNANOHTTPOPEN
++// It's going away, so make it conditional
+ #include <libxml/nanohttp.h>
++#endif
+ 
+ struct _GsfInputHTTP {
+         GsfInput input;
+@@ -74,7 +77,9 @@ gsf_input_http_finalize (GObject *obj_input)
+ 	input->content_type = NULL;
+ 
+         if (input->ctx) {
++#ifdef HAVE_XMLNANOHTTPCLOSE
+                 xmlNanoHTTPClose ((gpointer) input->ctx);
++#endif
+                 input->ctx = NULL;
+         }
+ 
+@@ -215,6 +220,7 @@ gsf_input_http_get_content_type (GsfInputHTTP *input)
+         return content_type;
+ }
+ 
++#ifdef HAVE_XMLNANOHTTPOPEN
+ static GsfInput *
+ make_local_copy (gpointer *ctx)
+ {
+@@ -254,6 +260,7 @@ make_local_copy (gpointer *ctx)
+ 
+ 	return copy;
+ }
++#endif
+ 
+ /**
+  * gsf_input_http_new:
+@@ -265,6 +272,7 @@ make_local_copy (gpointer *ctx)
+ GsfInput *
+ gsf_input_http_new (gchar const * url, GError **error G_GNUC_UNUSED)
+ {
++#ifdef HAVE_XMLNANOHTTPOPEN
+         GObject *obj;
+ 	GsfInput *input;
+         gpointer ctx;
+@@ -293,6 +301,10 @@ gsf_input_http_new (gchar const * url, GError **error G_GNUC_UNUSED)
+         GSF_INPUT_HTTP (obj)->ctx = ctx;
+ 
+         return GSF_INPUT (obj);
++#else
++        g_return_val_if_fail(url != NULL, NULL);
++	return NULL;
++#endif
+ }
+ 
+ static GsfInput *
+@@ -304,6 +316,7 @@ gsf_input_http_dup (GsfInput *src, GError **err)
+ static guint8 const *
+ gsf_input_http_read (GsfInput *input, size_t num_bytes, guint8 *buffer)
+ {
++#ifdef HAVE_XMLNANOHTTPOPEN
+         int nread;
+         size_t total_read;
+         gpointer ctx = GSF_INPUT_HTTP (input)->ctx;
+@@ -324,6 +337,12 @@ gsf_input_http_read (GsfInput *input, size_t num_bytes, guint8 *buffer)
+                         return NULL;
+         }
+         return buffer;
++#else
++	(void)input;
++	(void)num_bytes;
++	(void)buffer;
++	return NULL;
++#endif
+ }
+ 
+ static gboolean

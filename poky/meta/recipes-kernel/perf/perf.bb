@@ -14,10 +14,7 @@ PACKAGECONFIG ??= "python tui libunwind libtraceevent"
 PACKAGECONFIG[dwarf] = ",NO_DWARF=1"
 PACKAGECONFIG[perl] = ",NO_LIBPERL=1,perl"
 PACKAGECONFIG[python] = ",NO_LIBPYTHON=1,python3 python3-setuptools-native"
-# gui support was added with kernel 3.6.35
-# since 3.10 libnewt was replaced by slang
-# to cover a wide range of kernel we add both dependencies
-PACKAGECONFIG[tui] = ",NO_NEWT=1,libnewt slang"
+PACKAGECONFIG[tui] = ",NO_SLANG=1,slang"
 PACKAGECONFIG[libunwind] = ",NO_LIBUNWIND=1 NO_LIBDW_DWARF_UNWIND=1,libunwind"
 PACKAGECONFIG[libnuma] = ",NO_LIBNUMA=1"
 PACKAGECONFIG[bfd] = ",NO_LIBBFD=1"
@@ -69,7 +66,6 @@ include ${@bb.utils.contains('PACKAGECONFIG', 'perl', 'perf-perl.inc', '', d)}
 inherit kernelsrc
 
 S = "${WORKDIR}/${BP}"
-SPDX_S = "${S}/tools/perf"
 
 # The LDFLAGS is required or some old kernels fails due missing
 # symbols and this is preferred than requiring patches to every old
@@ -79,11 +75,10 @@ LDFLAGS="-ldl -lutil"
 # Perf's build system adds its own optimization flags for most TUs,
 # overriding the flags included here. But for some, perf does not add
 # any -O option, so ensure the distro's chosen optimization gets used
-# for those. Since ${SELECTED_OPTIMIZATION} always includes
-# ${DEBUG_FLAGS} which in turn includes ${DEBUG_PREFIX_MAP}, this also
-# ensures perf is built with appropriate -f*-prefix-map options,
+# for those. Also include ${DEBUG_PREFIX_MAP} which nsures perf is
+# built with appropriate -f*-prefix-map options,
 # avoiding the 'buildpaths' QA warning.
-TARGET_CC_ARCH += "${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH += "${SELECTED_OPTIMIZATION} ${DEBUG_PREFIX_MAP}"
 
 EXTRA_OEMAKE = '\
     V=1 \

@@ -48,7 +48,7 @@ OpenEmbedded/Yocto distributions and layer stacks, such as:
 
 This layer is officially approved as part of the `Yocto Project Compatible
 Layers Program`. You can find details of that on the official Yocto Project
-[website](https://www.yoctoproject.org/software-overview/layers/?searchTerm=meta-raspberrypi).
+[website](https://www.yoctoproject.org/development/yocto-project-compatible-layers/).
 
 ## Dependencies
 
@@ -81,7 +81,7 @@ a section as follows:
 local_conf_header:
   rpi-specific: |
     ENABLE_I2C = "1"
-    RPI_EXTRA_CONFIG = "dtoverlay=pi3-disable-bt"
+    RPI_EXTRA_CONFIG = "dtoverlay=disable-bt"
 ```
 
 To configure the machine, you have to update the `machine` variable.

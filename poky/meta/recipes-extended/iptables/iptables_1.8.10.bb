@@ -14,6 +14,7 @@ SRC_URI = "http://netfilter.org/projects/iptables/files/iptables-${PV}.tar.xz \
            file://ip6tables.service \
            file://ip6tables.rules \
            file://0001-configure-Add-option-to-enable-disable-libnfnetlink.patch \
+           file://0002-nft-ruleparse-Add-missing-braces-around-ternary.patch \
            "
 SRC_URI[sha256sum] = "5cc255c189356e317d070755ce9371eb63a1b783c34498fb8c30264f3cc59c9c"
 
@@ -75,6 +76,8 @@ do_install:append() {
         ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables 
         ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables-save
         ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables-restore
+        # ethertypes is provided by the netbase package
+        rm -f ${D}${sysconfdir}/ethertypes
     fi
 }
 

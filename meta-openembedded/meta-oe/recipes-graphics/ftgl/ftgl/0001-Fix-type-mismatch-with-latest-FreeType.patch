@@ -1,0 +1,33 @@
+From d11219b681a080c71e33c51c9404c28b134e1745 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 21 Aug 2024 13:50:34 -0700
+Subject: [PATCH] Fix type mismatch with latest FreeType
+
+This change is intrumented due to a type change in freetype [1] with release 2.13.3
+
+Fixes
+| ../../git/src/FTVectoriser.cpp:171:15: error: cannot initialize a variable of type 'char *' with an rvalue of type 'unsigned char *'
+|   171 |         char* tagList = &outline.tags[startIndex];
+|       |               ^         ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[1] https://gitlab.freedesktop.org/freetype/freetype/-/commit/044d142be7b6a93b6940367a1bc5847451ff4775
+
+Upstream-Status: Submitted [https://github.com/HamzaM3/ftgl/pull/1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/FTVectoriser.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/FTVectoriser.cpp b/src/FTVectoriser.cpp
+index 26e7da8..3610215 100644
+--- a/src/FTVectoriser.cpp
++++ b/src/FTVectoriser.cpp
+@@ -168,7 +168,7 @@ void FTVectoriser::ProcessContours()
+     for(int i = 0; i < ftContourCount; ++i)
+     {
+         FT_Vector* pointList = &outline.points[startIndex];
+-        char* tagList = &outline.tags[startIndex];
++        char* tagList = (char*)&outline.tags[startIndex];
+ 
+         endIndex = outline.contours[i];
+         contourLength =  (endIndex - startIndex) + 1;

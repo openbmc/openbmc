@@ -1,0 +1,39 @@
+From cfe9f4d6b0a5d10a15e10e987d528c5c513a42f1 Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Tue, 19 Dec 2023 11:00:11 +0100
+Subject: [PATCH] configure: Only text the makecontext signature we need
+
+The test/explicit-bzero.c test uses a start routine without any
+arguments.  There is no need for the multi-argument version.
+
+This avoids a build failure with glibc and future compilers.
+The GNU C library declares the makecontext callback of
+type void (*) (void), so no cast is needed.  On other systems,
+the type may be the (currently distinct) type void (*) (),
+but given that this only affects the ability to execute a test,
+no further machinery is added here to detect that different type.
+
+Upstream-Status: Submitted [https://github.com/besser82/libxcrypt/pull/178/]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ configure.ac | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 016997c..4b8afd8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -303,13 +303,11 @@ AS_IF([test $ac_cv_header_ucontext_h = yes],
+ #include <ucontext.h>
+ static int x;
+ static void fn1(void) {}
+-static void fn2(int a, int b) { x = a - b; }
+ ]], [[
+   ucontext_t uc1, uc2;
+   if (getcontext(&uc1)) return 1;
+   if (setcontext(&uc1)) return 1;
+   makecontext(&uc1, fn1, 0);
+-  makecontext(&uc2, fn2, 2, 1, 1);
+   if (swapcontext(&uc1, &uc2)) return 1;
+   return x;
+ ]])],

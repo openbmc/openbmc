@@ -8,7 +8,7 @@ stub components are added to provide a starting point for an
 implementation. The capsule update service provider is integrated
 into the se-proxy/common deployment.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [Trusted-Services Design needs to be followed]
 Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
 Signed-off-by: Julian Hall <julian.hall@arm.com>
 Change-Id: I0d4049bb4de5af7ca80806403301692507085d28

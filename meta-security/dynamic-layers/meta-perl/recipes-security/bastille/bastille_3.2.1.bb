@@ -83,11 +83,11 @@ do_install () {
 	install -m 0644 Bastille/AccountSecurity.pm    ${D}${libdir}/Bastille
 	install -m 0644 Bastille/Apache.pm    ${D}${libdir}/Bastille
 	install -m 0644 Bastille/API.pm    ${D}${libdir}/Bastille
-	install -m 0644 ${WORKDIR}/AccountPermission.pm    ${D}${libdir}/Bastille/API
-	install -m 0644 ${WORKDIR}/FileContent.pm    ${D}${libdir}/Bastille/API
-	install -m 0644 ${WORKDIR}/HPSpecific.pm    ${D}${libdir}/Bastille/API
-	install -m 0644 ${WORKDIR}/ServiceAdmin.pm    ${D}${libdir}/Bastille/API
-	install -m 0644 ${WORKDIR}/Miscellaneous.pm    ${D}${libdir}/Bastille/API
+	install -m 0644 ${UNPACKDIR}/AccountPermission.pm    ${D}${libdir}/Bastille/API
+	install -m 0644 ${UNPACKDIR}/FileContent.pm    ${D}${libdir}/Bastille/API
+	install -m 0644 ${UNPACKDIR}/HPSpecific.pm    ${D}${libdir}/Bastille/API
+	install -m 0644 ${UNPACKDIR}/ServiceAdmin.pm    ${D}${libdir}/Bastille/API
+	install -m 0644 ${UNPACKDIR}/Miscellaneous.pm    ${D}${libdir}/Bastille/API
 	install -m 0644 Bastille/BootSecurity.pm    ${D}${libdir}/Bastille
 	install -m 0644 Bastille/ConfigureMiscPAM.pm    ${D}${libdir}/Bastille
 	install -m 0644 Bastille/DisableUserTools.pm    ${D}${libdir}/Bastille
@@ -138,7 +138,7 @@ do_install () {
 	install -m 0644 OSMap/OSX.bastille    ${D}${datadir}/Bastille/OSMap
 	install -m 0644 OSMap/OSX.system    ${D}${datadir}/Bastille/OSMap
 
-	install -m 0644 ${WORKDIR}/config ${D}${sysconfdir}/Bastille/config
+	install -m 0644 ${UNPACKDIR}/config ${D}${sysconfdir}/Bastille/config
 
 	for file in `cat Modules.txt` ; do
 		install -m 0644 Questions/$file.txt ${D}${datadir}/Bastille/Questions

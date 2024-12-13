@@ -1,4 +1,4 @@
-From 82da570396a6835e7208c8bb508220524b3a07c7 Mon Sep 17 00:00:00 2001
+From 3f5ac862051e1c77dcca3e63a912f43d66ccdb6f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:39:54 +0000
 Subject: [PATCH] handle sysroot support for nativesdk-gcc
@@ -46,7 +46,7 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  8 files changed, 95 insertions(+), 73 deletions(-)
 
 diff --git a/gcc/c-family/c-opts.cc b/gcc/c-family/c-opts.cc
-index be3058dca63..0be85374760 100644
+index f4dced8d826..911aeb68d2d 100644
 --- a/gcc/c-family/c-opts.cc
 +++ b/gcc/c-family/c-opts.cc
 @@ -1542,8 +1542,8 @@ add_prefixed_path (const char *suffix, incpath_kind chain)

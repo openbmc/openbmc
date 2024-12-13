@@ -25,7 +25,7 @@ REQUIRED_DISTRO_FEATURES = "ima"
 do_install () {
     install -d ${D}/${sysconfdir}/ima
     install -d ${D}/init.d
-    install ${WORKDIR}/ima  ${D}/init.d/20-ima
+    install ${UNPACKDIR}/ima  ${D}/init.d/20-ima
 
     sed -i "s/@@FORCE_IMA@@/${IMA_FORCE}/g" ${D}/init.d/20-ima
 }

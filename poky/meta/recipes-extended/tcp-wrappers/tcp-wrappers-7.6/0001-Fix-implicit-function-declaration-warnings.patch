@@ -5,7 +5,7 @@ Subject: [PATCH] Fix implicit-function-declaration warnings
 
 These are seen with clang-15+
 
-Upstream-Status: Inappropriate [upstream is dead]
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  hosts_access.c | 3 +++

@@ -56,8 +56,16 @@ PV = "${EAT_VER_MAIN}"
 BINV = "${EAT_VER_GCC}"
 
 SRC_URI = "file://SUPPORTED"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
+        # do_copy_locale expects SUPPORTED to be in WORKDIR, but recent
+        # changes have made it so that the source/unpack location is no
+        # longer WORKDIR and cannot be pointed to be such.  So, do this
+        # copy manually here
+        install -m 0644 ${UNPACKDIR}/SUPPORTED ${WORKDIR}/SUPPORTED
+
 	# Add stubs for files OE-core expects
 	install -d ${S}/nscd/
 	touch  ${S}/nscd/nscd.init

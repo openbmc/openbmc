@@ -1,0 +1,27 @@
+From ecf124ab2e488a71741fe443ff4863f7ed172968 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 2 Jul 2024 22:18:47 -0700
+Subject: [PATCH 25/27] include signal.h to avoid the 'undeclared' error
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/pidref.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/basic/pidref.h b/src/basic/pidref.h
+index 9920ebb9b3..2fdd4ff50f 100644
+--- a/src/basic/pidref.h
++++ b/src/basic/pidref.h
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
+ #pragma once
+ 
++#include <signal.h>
+ #include "macro.h"
+ 
+ /* An embeddable structure carrying a reference to a process. Supposed to be used when tracking processes continuously. */
+-- 
+2.45.1
+

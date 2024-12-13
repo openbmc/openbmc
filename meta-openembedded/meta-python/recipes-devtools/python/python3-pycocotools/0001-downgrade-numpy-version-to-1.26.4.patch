@@ -1,0 +1,26 @@
+From 7222a8b9b6e05b89116ca14644aa8db79eecd3c6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 24 Aug 2024 00:19:23 -0700
+Subject: [PATCH] downgrade numpy version to 1.26.4+
+
+We can drop it when OE-core upgrades numpy to 2.x
+
+Upstream-Status: Inappropriate [OE workaround]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 1bfbd91..cbee520 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,7 +1,7 @@
+ [build-system]
+ requires = [
+     "cython>=0.27.3",
+-    "numpy>=2.0.0rc1",
++    "numpy>=1.26.4",
+     "setuptools>=43.0.0",
+     "wheel",
+ ]

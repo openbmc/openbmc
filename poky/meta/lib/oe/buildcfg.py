@@ -52,7 +52,7 @@ def get_metadata_git_remote_url(path, remote):
 
 def get_metadata_git_describe(path):
     try:
-        describe, _ = bb.process.run('git describe --tags', cwd=path)
+        describe, _ = bb.process.run('git describe --tags --dirty', cwd=path)
     except bb.process.ExecutionError:
         return ""
     return describe.strip()

@@ -216,7 +216,7 @@
     },
     "core": {
         "summary": "Python interpreter and core modules",
-        "rdepends": [],
+        "rdepends": ["compression"],
         "files": [
             "${bindir}/python${PYTHON_MAJMIN}",
             "${bindir}/python${PYTHON_MAJMIN}.real",

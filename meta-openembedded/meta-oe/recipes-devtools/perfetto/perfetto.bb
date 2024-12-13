@@ -1,16 +1,17 @@
 LICENSE = "Apache-2.0 & BSD-3-Clause & MIT & Zlib"
 
-LIC_FILES_CHKSUM = "file://LICENSE;md5=f87516e0b698007e9e75a1fe1012b390 \
+LIC_FILES_CHKSUM = "file://LICENSE;md5=d2572d98547d43906b53615f856a8c2d \
                     file://buildtools/libcxx/LICENSE.TXT;md5=55d89dd7eec8d3b4204b680e27da3953 \
                     file://buildtools/libcxxabi/LICENSE.TXT;md5=7b9334635b542c56868400a46b272b1e \
                     file://buildtools/libunwind/LICENSE.TXT;md5=f66970035d12f196030658b11725e1a1 \
                     file://buildtools/protobuf/LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b \
-                    file://buildtools/zlib/LICENSE;md5=f09575dbfb09420642318b413159496f \
+                    file://buildtools/zlib/LICENSE;md5=8c75f2b4df47a77f9445315a9500cd1c \
                     file://debian/copyright;md5=4e08364c82141f181de69d0a2b89d612 \
                     file://python/LICENSE;md5=c602a632c34ade9c78a976734077bce7"
 
+# Dependencies from perfetto/tools/install-build-deps
 SRC_URI:append = " \
-           git://github.com/protocolbuffers/protobuf.git;branch=3.9.x;protocol=https;destsuffix=git/buildtools/protobuf;name=protobuf \
+           git://github.com/protocolbuffers/protobuf.git;branch=main;protocol=https;destsuffix=git/buildtools/protobuf;name=protobuf \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxx.git;protocol=https;destsuffix=git/buildtools/libcxx;branch=main;name=libcxx \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxxabi.git;protocol=https;destsuffix=git/buildtools/libcxxabi;branch=main;name=libcxxabi \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libunwind.git;protocol=https;destsuffix=git/buildtools/libunwind;branch=main;name=libunwind \
@@ -22,25 +23,28 @@ SRC_URI:append = " \
            git://android.googlesource.com/platform/bionic.git;branch=master;protocol=https;destsuffix=git/buildtools/bionic;name=bionic \
            git://android.googlesource.com/platform/external/zlib.git;branch=master;protocol=https;destsuffix=git/buildtools/zlib;name=zlib \
            git://android.googlesource.com/platform/external/lzma.git;branch=master;protocol=https;destsuffix=git/buildtools/lzma;name=lzma \
+           git://android.googlesource.com/platform/external/zstd.git;branch=master;protocol=https;destsuffix=git/buildtools/zstd;name=zstd \
            https://storage.googleapis.com/perfetto/gn-linux64-1968-0725d782;subdir=git/buildtools/;name=gn \
            \
            file://0001-Remove-check_build_deps-build-steps.patch \
-           file://0001-Add-missing-header-cstdint-for-uintXX_t-types.patch"
+           file://0002-traced-fix-missing-include.patch \
+           "
 
-SRCREV_bionic = "4b0e16bc72a82a63c699977376a7d6eadca1b206"
+SRCREV_bionic = "a0d0355105cb9d4a4b5384897448676133d7b8e2"
 SRCREV_core = "9e6cef7f07d8c11b3ea820938aeb7ff2e9dbaa52"
 SRCREV_lzma = "7851dce6f4ca17f5caa1c93a4e0a45686b1d56c3"
 SRCREV_libprocinfo = "fd214c13ededecae97a3b15b5fccc8925a749a84"
 SRCREV_logging = "7b36b566c9113fc703d68f76e8f40c0c2432481c"
-SRCREV_unwinding = "d66882575ebe3700d6a6b10185f3aee28acc1051"
-SRCREV_protobuf = "6a59a2ad1f61d9696092f79b6d74368b4d7970a3"
+SRCREV_unwinding = "4b59ea8471e89d01300481a92de3230b79b6d7c7"
+SRCREV_protobuf = "f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c"
 SRCREV_libbase = "78f1c2f83e625bdf66d55b48bdb3a301c20d2fb3"
-SRCREV_libcxx = "f8571eaba606bde2eb8cd34b30104ca33e7c207e"
-SRCREV_libcxxabi = "8dd405113a4f3694e910b79785dd7fb7535a888a"
-SRCREV_libunwind = "aabcd8753678f1536e15eb6385a948470debdae4"
-SRCREV_zlib = "5c85a2da4c13eda07f69d81a1579a5afddd35f59"
+SRCREV_libcxx = "852bc6746f45add53fec19f3a29280e69e358d44"
+SRCREV_libcxxabi = "a37a3aa431f132b02a58656f13984d51098330a2"
+SRCREV_libunwind = "419b03c0b8f20d6da9ddcb0d661a94a97cdd7dad"
+SRCREV_zlib = "6d3f6aa0f87c9791ca7724c279ef61384f331dfd"
+SRCREV_zstd = "77211fcc5e08c781734a386402ada93d0d18d093"
 
-SRCREV_FORMAT .="_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib"
+SRCREV_FORMAT .="_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib_zstd"
 
 SRC_URI[gn.sha256sum] = "f706aaa0676e3e22f5fc9ca482295d7caee8535d1869f99efa2358177b64f5cd"
 
@@ -96,8 +100,8 @@ do_configure () {
 
     ARGS=$ARGS" target_os=\"linux\""
     ARGS=$ARGS" target_cpu=\"$arch\""
-    ARGS=$ARGS" target_cc=\"$CC_BIN ${TUNE_CCARGS}\""
-    ARGS=$ARGS" target_cxx=\"$CXX_BIN -std=c++11 ${TUNE_CCARGS}\""
+    ARGS=$ARGS" target_cc=\"$CC_BIN ${TUNE_CCARGS} ${DEBUG_PREFIX_MAP}\""
+    ARGS=$ARGS" target_cxx=\"$CXX_BIN ${TUNE_CCARGS} ${DEBUG_PREFIX_MAP}\""
     ARGS=$ARGS" target_strip=\"$STRIP_BIN\"" #
     ARGS=$ARGS" target_sysroot=\"${RECIPE_SYSROOT}\""
     ARGS=$ARGS" target_linker=\"$CC_BIN ${TUNE_CCARGS} ${LDFLAGS}\""

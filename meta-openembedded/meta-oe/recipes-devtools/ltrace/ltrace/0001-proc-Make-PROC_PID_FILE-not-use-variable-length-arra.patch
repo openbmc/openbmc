@@ -1,0 +1,34 @@
+From f2f6082cb112cf3b8a6a5bfc989e4a4f6a1bff27 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 3 Sep 2024 20:41:20 +0000
+Subject: [PATCH] proc: Make PROC_PID_FILE not use variable length array
+
+This helps in compiling with clang which is not happy about VLA
+
+| ../../../git/sysdeps/linux-gnu/proc.c:70:3: error: variable length array folded to constant array as an extension [-Werror,-Wgnu-folding-constant]
+|    70 |                 PROC_PID_FILE(proc_exe, "/proc/%d/exe", pid);
+|       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+| ../../../git/sysdeps/linux-gnu/proc.c:59:11: note: expanded from macro 'PROC_PID_FILE'
+|    59 |         char VAR[strlen(FORMAT) + 6];           \
+|       |                  ^~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/linux-gnu/proc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sysdeps/linux-gnu/proc.c b/sysdeps/linux-gnu/proc.c
+index b954997..f37e4e8 100644
+--- a/sysdeps/linux-gnu/proc.c
++++ b/sysdeps/linux-gnu/proc.c
+@@ -56,7 +56,8 @@
+ #define	MAX_DELAY	100000	/* 100000 microseconds = 0.1 seconds */
+ 
+ #define PROC_PID_FILE(VAR, FORMAT, PID)		\
+-	char VAR[strlen(FORMAT) + 6];		\
++	enum { buflen_ ## VAR = strlen(FORMAT)};		\
++	char VAR[buflen_ ## VAR + 6];		\
+ 	sprintf(VAR, FORMAT, PID)
+ 
+ /*

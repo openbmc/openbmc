@@ -135,3 +135,7 @@ RDEPENDS:${PN}-python = "python3"
 
 FILES:${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/RRDs/.debug \
     ${PYTHON_SITEPACKAGES_DIR}/.debug"
+
+# http://errors.yoctoproject.org/Errors/Details/766911/
+# rrd_tune.c:239:35: error: passing argument 3 of 'optparse_init' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

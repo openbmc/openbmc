@@ -27,3 +27,27 @@ CFLAGS += "-fno-lto"
 CFLAGS:append:toolchain-clang = " -Wno-error=implicit-function-declaration -Wno-error=deprecated-non-prototype -Wno-error=implicit-int"
 
 LDFLAGS += "-fno-lto"
+
+# http://errors.yoctoproject.org/Errors/Details/766887/
+# dhry_1.c:101:3: error: implicit declaration of function 'strcpy' [-Wimplicit-function-declaration]
+# dhry_1.c:149:5: error: implicit declaration of function 'Proc_5' [-Wimplicit-function-declaration]
+# dhry_1.c:150:5: error: implicit declaration of function 'Proc_4' [-Wimplicit-function-declaration]
+# dhry_1.c:156:19: error: implicit declaration of function 'Func_2'; did you mean 'Func_1'? [-Wimplicit-function-declaration]
+# dhry_1.c:162:7: error: implicit declaration of function 'Proc_7' [-Wimplicit-function-declaration]
+# dhry_1.c:167:5: error: implicit declaration of function 'Proc_8' [-Wimplicit-function-declaration]
+# dhry_1.c:169:5: error: implicit declaration of function 'Proc_1' [-Wimplicit-function-declaration]
+# dhry_1.c:176:9: error: implicit declaration of function 'Proc_6' [-Wimplicit-function-declaration]
+# dhry_1.c:187:5: error: implicit declaration of function 'Proc_2' [-Wimplicit-function-declaration]
+# dhry_1.c:287:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_1.c:303:3: error: implicit declaration of function 'Proc_3'; did you mean 'Proc_1'? [-Wimplicit-function-declaration]
+# dhry_1.c:321:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_1.c:344:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_1.c:359:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_1.c:371:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_1.c:73:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_2.c:164:9: error: implicit declaration of function 'strcmp' [-Wimplicit-function-declaration]
+# dhry_2.c:30:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_2.c:39:9: error: implicit declaration of function 'Func_3' [-Wimplicit-function-declaration]
+# dhry_2.c:64:1: error: return type defaults to 'int' [-Wimplicit-int]
+# dhry_2.c:84:1: error: return type defaults to 'int' [-Wimplicit-int]
+CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"

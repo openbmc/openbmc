@@ -1,3 +1,8 @@
+From 25a26c52c320e699b37a7ad1f4f045bc8aa4cb00 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard@openedhand.com>
+Date: Sun, 27 May 2007 21:04:11 +0000
+Subject: [PATCH] perl: 5.8.7 -> 5.8.8 (from OE)
+
 Upstream-Status: Inappropriate [embedded specific]
 
 Allow the location that .so files are searched for for dynamic
@@ -6,12 +11,15 @@ us to load .so's from the host system while building for the target
 system.
 
 Update by Nitin A Kamble <nitin.a.kamble@intel.com> 2011/04/21
+---
+ dist/XSLoader/XSLoader_pm.PL | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-Index: perl-5.24.1/dist/XSLoader/XSLoader_pm.PL
-===================================================================
---- perl-5.24.1.orig/dist/XSLoader/XSLoader_pm.PL
-+++ perl-5.24.1/dist/XSLoader/XSLoader_pm.PL
-@@ -52,6 +52,24 @@ sub load {
+diff --git a/dist/XSLoader/XSLoader_pm.PL b/dist/XSLoader/XSLoader_pm.PL
+index ff5ca31..0d50803 100644
+--- a/dist/XSLoader/XSLoader_pm.PL
++++ b/dist/XSLoader/XSLoader_pm.PL
+@@ -32,6 +32,24 @@ sub load {
      my ($caller, $modlibname) = caller();
      my $module = $caller;
  

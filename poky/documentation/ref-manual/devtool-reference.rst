@@ -24,7 +24,7 @@ The ``devtool`` command line is organized similarly to Git in that it
 has a number of sub-commands for each function. You can run
 ``devtool --help`` to see all the commands::
 
-   $ devtool -h
+   $ devtool --help
    NOTE: Starting bitbake server...
    usage: devtool [--basepath BASEPATH] [--bbpath BBPATH] [-d] [-q] [--color COLOR] [-h] <subcommand> ...
 
@@ -50,6 +50,7 @@ has a number of sub-commands for each function. You can run
        search                Search available recipes
      Working on a recipe in the workspace:
        build                 Build a recipe
+       ide-sdk               Setup the SDK and configure the IDE
        rename                Rename a recipe file in the workspace
        edit-recipe           Edit a recipe file
        find-recipe           Find a recipe file
@@ -63,17 +64,11 @@ has a number of sub-commands for each function. You can run
        build-image           Build image including workspace recipe packages
      Advanced:
        create-workspace      Set up workspace in an alternative location
+       import                Import exported tar archive into workspace
+       export                Export workspace into a tar archive
        extract               Extract the source for an existing recipe
        sync                  Synchronize the source tree for an existing recipe
        menuconfig            Alter build-time configuration for a recipe
-       import                Import exported tar archive into workspace
-       export                Export workspace into a tar archive
-     other:
-       selftest-reverse      Reverse value (for selftest)
-       pluginfile            Print the filename of this plugin
-       bbdir                 Print the BBPATH directory of this plugin
-       count                 How many times have this plugin been registered.
-       multiloaded           How many times have this plugin been initialized
    Use devtool <subcommand> --help to get help on a specific command
 
 As directed in the general help output, you can
@@ -82,8 +77,8 @@ using ``--help``::
 
    $ devtool add --help
    NOTE: Starting bitbake server...
-   usage: devtool add [-h] [--same-dir | --no-same-dir] [--fetch URI] [--npm-dev] [--version VERSION] [--no-git] [--srcrev SRCREV | --autorev] [--srcbranch SRCBRANCH] [--binary] [--also-native] [--src-subdir SUBDIR] [--mirrors]
-                      [--provides PROVIDES]
+   usage: devtool add [-h] [--same-dir | --no-same-dir] [--fetch URI] [--npm-dev] [--no-pypi] [--version VERSION] [--no-git] [--srcrev SRCREV | --autorev]
+                      [--srcbranch SRCBRANCH] [--binary] [--also-native] [--src-subdir SUBDIR] [--mirrors] [--provides PROVIDES]
                       [recipename] [srctree] [fetchuri]
 
    Adds a new recipe to the workspace to build a specified source tree. Can optionally fetch a remote URI and unpack it to create the source tree.
@@ -99,6 +94,7 @@ using ``--help``::
      --no-same-dir         Force build in a separate build directory
      --fetch URI, -f URI   Fetch the specified URI and extract it to create the source tree (deprecated - pass as positional argument instead)
      --npm-dev             For npm, also fetch devDependencies
+     --no-pypi             Do not inherit pypi class
      --version VERSION, -V VERSION
                            Version to use within recipe (PV)
      --no-git, -g          If fetching source, do not set up source tree as a git repository
@@ -467,6 +463,20 @@ Here is an example that resets the workspace directory that contains the
    NOTE: Leaving source tree /home/scottrif/poky/build/workspace/sources/mtr as-is; if you no longer need it then please delete it manually
    $
 
+.. _devtool-finish-working-on-a-recipe:
+
+Finish Working on a Recipe
+==========================
+
+Use the ``devtool finish`` command to push any committed changes to the
+specified recipe in the specified layer and remove it from your workspace.
+
+This is roughly equivalent to the ``devtool update-recipe`` command followed by
+the ``devtool reset`` command. The changes must have been committed to the git
+repository created by ``devtool``. Here is an example::
+
+  $ devtool finish recipe /path/to/custom/layer
+
 .. _devtool-building-your-recipe:
 
 Building Your Recipe
@@ -618,3 +628,43 @@ a match.
 
 When you use the ``devtool search`` command, you must supply a keyword.
 The command uses the keyword when searching for a match.
+
+Alternatively, the ``devtool find-recipe`` command can be used to search for
+recipe files instead of recipe names. Likewise, you must supply a keyword.
+
+.. _devtool-get-the-configure-script-help:
+
+Get Information on Recipe Configuration Scripts
+===============================================
+
+Use the ``devtool configure-help`` command to get help on the configuration
+script options for a given recipe. You must supply the recipe name to the
+command. For example, it shows the output of ``./configure --help`` for
+:ref:`autotools <ref-classes-autotools>`-based recipes.
+
+The ``configure-help`` command will also display the configuration options
+currently in use, including the ones passed through the :term:`EXTRA_OECONF`
+variable.
+
+.. _devtool-generate-an-ide-configuration-for-a-recipe:
+
+Generate an IDE Configuration for a Recipe
+==========================================
+
+The ``devtool ide-sdk`` automatically creates an IDE configuration and SDK to
+work on a given recipe. Depending on the ``--mode`` parameter, different types
+of SDKs are generated:
+
+-  ``modified`` mode: this creates an SDK and generates an IDE configuration in
+   the workspace directory.
+
+-  ``shared`` mode: this creates a cross-compiling toolchain and the
+   corresponding shared sysroot directories of the supplied recipe(s).
+
+The ``--target`` option can be used to specify a ``username@hostname`` string
+and create a remote debugging configuration for the recipe. Similarly to
+``devtool deploy-target``, it requires an SSH server running on the target.
+
+For further details on the ``devtool ide-sdk`` command, see the
+":doc:`/sdk-manual/extensible`" chapter in the Yocto Project Application
+Development and the Extensible Software Development Kit (eSDK) manual.

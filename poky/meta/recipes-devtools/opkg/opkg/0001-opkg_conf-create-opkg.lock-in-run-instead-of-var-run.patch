@@ -1,4 +1,4 @@
-From a4628a6171f393add9a2b287483ca39bb72b4dd6 Mon Sep 17 00:00:00 2001
+From 82b29dcfe3033d8285890bf46e58f464d9944196 Mon Sep 17 00:00:00 2001
 From: Jonathan Liu <net147@gmail.com>
 Date: Mon, 21 Sep 2015 20:23:23 +1000
 Subject: [PATCH] opkg_conf: create opkg.lock in /run instead of /var/run
@@ -17,10 +17,10 @@ Signed-off-by: Jonathan Liu <net147@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libopkg/opkg_conf.h b/libopkg/opkg_conf.h
-index 7bca948..5a1bc44 100644
+index 3fa6ca9..b12672e 100644
 --- a/libopkg/opkg_conf.h
 +++ b/libopkg/opkg_conf.h
-@@ -40,7 +40,7 @@ extern "C" {
+@@ -42,7 +42,7 @@ extern "C" {
  #define OPKG_CONF_DEFAULT_STATUS_FILE   VARDIR "/lib/opkg/status"
  #define OPKG_CONF_DEFAULT_CACHE_DIR     VARDIR "/cache/opkg"
  #define OPKG_CONF_DEFAULT_CONF_FILE_DIR SYSCONFDIR "/opkg"
@@ -29,6 +29,3 @@ index 7bca948..5a1bc44 100644
  
  /* In case the config file defines no dest */
  #define OPKG_CONF_DEFAULT_DEST_NAME "root"
--- 
-2.5.0
-

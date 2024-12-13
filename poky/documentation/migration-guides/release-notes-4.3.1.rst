@@ -6,14 +6,14 @@ Release notes for Yocto-4.3.1 (Nanbield)
 Security Fixes in Yocto-4.3.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  libsndfile1: Fix :cve:`2022-33065`
--  libxml2: Ignore :cve:`2023-45322`
--  linux-yocto/6.1: Ignore :cve:`2020-27418`, :cve:`2023-31085`, :cve_mitre:`2023-34324`, :cve:`2023-39189`, :cve:`2023-39192`, :cve:`2023-39193`, :cve:`2023-39194`, :cve:`2023-4244`, :cve:`2023-42754`, :cve:`2023-42756`, :cve:`2023-44466`, :cve:`2023-4563`, :cve:`2023-45862`, :cve:`2023-45863`, :cve:`2023-45871`, :cve:`2023-45898`, :cve:`2023-4732`, :cve:`2023-5158`, :cve:`2023-5197` and :cve:`2023-5345`
--  linux-yocto/6.5: Ignore :cve:`2020-27418`, :cve:`2023-1193`, :cve:`2023-39191`, :cve:`2023-39194`, :cve:`2023-40791`, :cve:`2023-44466`, :cve:`2023-45862`, :cve:`2023-45863`, :cve:`2023-4610` and :cve:`2023-4732`
--  openssl: Fix :cve:`2023-5363`
--  pixman: Ignore :cve:`2023-37769`
--  vim: Fix :cve:`2023-46246`
--  zlib: Ignore :cve:`2023-45853`
+-  libsndfile1: Fix :cve_nist:`2022-33065`
+-  libxml2: Ignore :cve_nist:`2023-45322`
+-  linux-yocto/6.1: Ignore :cve_nist:`2020-27418`, :cve_nist:`2023-31085`, :cve_mitre:`2023-34324`, :cve_nist:`2023-39189`, :cve_nist:`2023-39192`, :cve_nist:`2023-39193`, :cve_nist:`2023-39194`, :cve_nist:`2023-4244`, :cve_nist:`2023-42754`, :cve_nist:`2023-42756`, :cve_nist:`2023-44466`, :cve_nist:`2023-4563`, :cve_nist:`2023-45862`, :cve_nist:`2023-45863`, :cve_nist:`2023-45871`, :cve_nist:`2023-45898`, :cve_nist:`2023-4732`, :cve_nist:`2023-5158`, :cve_nist:`2023-5197` and :cve_nist:`2023-5345`
+-  linux-yocto/6.5: Ignore :cve_nist:`2020-27418`, :cve_nist:`2023-1193`, :cve_nist:`2023-39191`, :cve_nist:`2023-39194`, :cve_nist:`2023-40791`, :cve_nist:`2023-44466`, :cve_nist:`2023-45862`, :cve_nist:`2023-45863`, :cve_nist:`2023-4610` and :cve_nist:`2023-4732`
+-  openssl: Fix :cve_nist:`2023-5363`
+-  pixman: Ignore :cve_nist:`2023-37769`
+-  vim: Fix :cve_nist:`2023-46246`
+-  zlib: Ignore :cve_nist:`2023-45853`
 
 
 Fixes in Yocto-4.3.1

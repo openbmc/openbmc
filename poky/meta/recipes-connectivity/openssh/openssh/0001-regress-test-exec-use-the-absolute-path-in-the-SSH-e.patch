@@ -1,0 +1,35 @@
+From fb762172fb678fe29327b667f8fe7380962a4540 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <jose.quaresma@foundries.io>
+Date: Mon, 15 Jul 2024 18:43:08 +0100
+Subject: [PATCH] regress/test-exec: use the absolute path in the SSH env
+
+The SSHAGENT_BIN was changed in [1] to SSH_BIN but
+the last one don't use the absolute path and consequently
+the function increase_datafile_size can loops forever
+if the binary not found.
+
+[1] https://github.com/openssh/openssh-portable/commit/a68f80f2511f0e0c5cef737a8284cc2dfabad818
+
+Upstream-Status: Submitted [https://github.com/openssh/openssh-portable/pull/510]
+
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
+---
+ regress/test-exec.sh | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/regress/test-exec.sh b/regress/test-exec.sh
+index 7afc2807..175f554b 100644
+--- a/regress/test-exec.sh
++++ b/regress/test-exec.sh
+@@ -175,6 +175,11 @@ if [ "x$TEST_SSH_OPENSSL" != "x" ]; then
+ fi
+ 
+ # Path to sshd must be absolute for rexec
++case "$SSH" in
++/*) ;;
++*) SSH=`which $SSH` ;;
++esac
++
+ case "$SSHD" in
+ /*) ;;
+ *) SSHD=`which $SSHD` ;;

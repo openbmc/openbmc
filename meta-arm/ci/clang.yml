@@ -10,12 +10,3 @@ repos:
 local_conf_header:
   toolchain: |
     TOOLCHAIN = "clang"
-    PREFERRED_PROVIDER_llvm = "clang"
-    PREFERRED_PROVIDER_llvm-native = "clang-native"
-    PREFERRED_PROVIDER_nativesdk-llvm = "nativesdk-clang"
-    PROVIDES:pn-clang = "llvm"
-    PROVIDES:pn-clang-native = "llvm-native"
-    PROVIDES:pn-nativesdk-clang = "nativesdk-llvm"
-    # This is needed to stop bitbake getting confused about what clang/llvm is
-    # being used, see https://github.com/kraj/meta-clang/pull/766
-    BBMASK += "/meta/recipes-devtools/llvm/llvm.*\.bb"

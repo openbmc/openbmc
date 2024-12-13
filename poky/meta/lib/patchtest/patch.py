@@ -14,22 +14,12 @@ import utils
 logger = logging.getLogger('patchtest')
 
 class PatchTestPatch(object):
-    MERGE_STATUS_INVALID = 'INVALID'
-    MERGE_STATUS_NOT_MERGED = 'NOTMERGED'
-    MERGE_STATUS_MERGED_SUCCESSFULL = 'PASS'
-    MERGE_STATUS_MERGED_FAIL = 'FAIL'
-    MERGE_STATUS = (MERGE_STATUS_INVALID,
-                    MERGE_STATUS_NOT_MERGED,
-                    MERGE_STATUS_MERGED_SUCCESSFULL,
-                    MERGE_STATUS_MERGED_FAIL)
-
     def __init__(self, path, forcereload=False):
         self._path = path
         self._forcereload = forcereload
 
         self._contents = None
         self._branch = None
-        self._merge_status = PatchTestPatch.MERGE_STATUS_NOT_MERGED
 
     @property
     def contents(self):
@@ -51,12 +41,3 @@ class PatchTestPatch(object):
         if not self._branch:
             self._branch = utils.get_branch(self._path)
         return self._branch
-
-    def setmergestatus(self, status):
-        self._merge_status = status
-
-    def getmergestatus(self):
-        return self._merge_status
-
-    merge_status = property(getmergestatus, setmergestatus)
-

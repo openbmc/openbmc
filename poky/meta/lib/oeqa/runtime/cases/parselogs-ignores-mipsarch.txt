@@ -1,2 +1,8 @@
 # These should be reviewed to see if they are still needed
 cacheinfo: Failed to find cpu0 device node
+
+# 6.10 restructures sysctl registration such that mips
+# registers an empty table and generates harmless warnings:
+#   failed when register_sysctl_sz sched_fair_sysctls to kernel
+#   failed when register_sysctl_sz sched_core_sysctls to kernel
+failed when register_sysctl_sz sched

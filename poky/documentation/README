@@ -142,7 +142,15 @@ To run Vale:
 
  $ make stylecheck
 
-Link checking the Yocto Project documentation
+Style checking the whole documentation might take some time and generate a
+lot of warnings/errors, thus one can run Vale on a subset of files or
+directories:
+
+  $ make stylecheck VALEDOCS=<file>
+  $ make stylecheck VALEDOCS="<file1> <file2>"
+  $ make stylecheck VALEDOCS=<dir>
+
+Lint checking the Yocto Project documentation
 =============================================
 
 To fix errors which are not reported by Sphinx itself,
@@ -155,6 +163,14 @@ To install sphinx-lint:
 To run sphinx-lint:
 
  $ make sphinx-lint
+
+Lint checking the whole documentation might take some time and generate a
+lot of warnings/errors, thus one can run sphinx-lint on a subset of files
+or directories:
+
+  $ make sphinx-lint SPHINXLINTDOCS=<file>
+  $ make sphinx-lint SPHINXLINTDOCS="<file1> <file2>"
+  $ make sphinx-lint SPHINXLINTDOCS=<dir>
 
 Sphinx theme and CSS customization
 ==================================

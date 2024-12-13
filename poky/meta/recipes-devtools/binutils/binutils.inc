@@ -18,7 +18,7 @@ inherit autotools gettext multilib_header pkgconfig texinfo
 FILES:${PN} = " \
 	${bindir}/${TARGET_PREFIX}* \
 	${libdir}/lib*.so.* \
-	${libdir}/bfd-plugins/lib*.so \
+	${libdir}/bfd-plugins/lib*${SOLIBSDEV} \
 	${libdir}/lib*-${PV}*.so \
 	${prefix}/${TARGET_SYS}/bin/* \
         ${bindir}/embedspu"

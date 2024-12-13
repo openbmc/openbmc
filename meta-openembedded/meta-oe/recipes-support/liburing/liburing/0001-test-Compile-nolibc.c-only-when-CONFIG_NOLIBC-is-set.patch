@@ -1,0 +1,43 @@
+From 7ea4e55a91e6d5564c6de762c2d1afc78ff9cfd3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Sep 2024 22:58:38 +0000
+Subject: [PATCH] test: Compile nolibc.c only when CONFIG_NOLIBC is set
+
+building nolibc.c fails for non nolibc targets
+
+Fixes
+In file included from nolibc.c:33:
+./../src/lib.h:20:2: error: "This arch doesn't support building liburing without libc"
+   20 | #error "This arch doesn't support building liburing without libc"
+      |  ^
+1 error generated.
+
+Upstream-Status: Backport [https://github.com/axboe/liburing/commit/a182f62c01f981cd9dd508ec952fbc975b263e3d]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/test/Makefile b/test/Makefile
+index 0538a75..0dfecb8 100644
+--- a/test/Makefile
++++ b/test/Makefile
+@@ -126,7 +126,6 @@ test_srcs := \
+ 	msg-ring-overflow.c \
+ 	multicqes_drain.c \
+ 	no-mmap-inval.c \
+-	nolibc.c \
+ 	nop-all-sizes.c \
+ 	nop.c \
+ 	ooo-file-unreg.c \
+@@ -221,6 +220,10 @@ test_srcs := \
+ all_targets :=
+ include ../Makefile.quiet
+ 
++ifeq ($(CONFIG_NOLIBC),y)
++	test_srcs += nolibc.c
++endif
++
+ ifdef CONFIG_HAVE_STATX
+ 	test_srcs += statx.c
+ else ifdef CONFIG_HAVE_GLIBC_STATX

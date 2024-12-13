@@ -37,6 +37,7 @@ SYSTEMD_AUTO_ENABLE = "enable"
 export EXTRA_OEMAKE = ""
 
 CFPROTECTION ?= "-fcf-protection=full"
+CFPROTECTION:riscv32 = ""
 CFPROTECTION:riscv64 = ""
 CFPROTECTION:arm = ""
 CFPROTECTION:aarch64 = ""

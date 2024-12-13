@@ -1,0 +1,41 @@
+From 825444522d698991be04bbfa683a7cf785c6f72c Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 2 Oct 2024 00:06:34 +0800
+Subject: [PATCH] elflink.c: include libgen.h for basename
+
+Basename prototype has been removed from string.h from latest musl[1].
+Compilers e.g. clang-18 flags the absense of prototype as error.
+Therefore include libgen.h for providing it.
+
+elflink.c: In function 'get_shared_file_name':
+elflink.c:363:19: error: implicit declaration of function 'basename' [-Wimplicit-function-declaration]
+  363 |         binary2 = basename(binary);
+      |                   ^~~~~~~~
+elflink.c:363:17: error: assignment to 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+  363 |         binary2 = basename(binary);
+      |                 ^
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ elflink.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/elflink.c b/elflink.c
+index 278d338..0e78d61 100644
+--- a/elflink.c
++++ b/elflink.c
+@@ -38,6 +38,7 @@
+ #include <limits.h>
+ #include <elf.h>
+ #include <dlfcn.h>
++#include <libgen.h>
+ 
+ #include "version.h"
+ #include "hugetlbfs.h"
+-- 
+2.25.1
+

@@ -13,7 +13,7 @@ SRCREV = "d51ad395436d4d1dcc3ca46e1519ffeb475bf651"
 
 S = "${WORKDIR}/git"
 
-LDFLAGS:append = " -pthread"
+LDFLAGS += "-pthread"
 
 inherit autotools gettext pkgconfig bash-completion
 

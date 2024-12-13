@@ -8,4 +8,4 @@ part / --source rootfs --fstype=ext4 --label root --align 1024 --use-uuid
 
 part swap --size 44 --label swap --fstype=swap --use-uuid
 
-bootloader --ptable gpt --timeout=5 --append="rootfstype=ext4 ip=dhcp"
+bootloader --ptable gpt --timeout=5 --append="rootwait rootfstype=ext4 ip=dhcp"

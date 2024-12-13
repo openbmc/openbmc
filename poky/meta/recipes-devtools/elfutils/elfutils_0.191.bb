@@ -66,42 +66,40 @@ do_compile_ptest() {
 PTEST_PARALLEL_MAKE = ""
 
 do_install_ptest() {
-	if [ ${PTEST_ENABLED} = "1" ]; then
-		# copy the files which needed by the cases
-		TEST_FILES="strip strip.o addr2line elfcmp objdump readelf size.o nm.o nm elflint elfcompress elfclassify stack unstrip srcfiles"
-		install -d -m 755                       ${D}${PTEST_PATH}/src
-		install -d -m 755                       ${D}${PTEST_PATH}/lib
-		install -d -m 755                       ${D}${PTEST_PATH}/libelf
-		install -d -m 755                       ${D}${PTEST_PATH}/libdw
-		install -d -m 755                       ${D}${PTEST_PATH}/libdwfl
-		install -d -m 755                       ${D}${PTEST_PATH}/libdwelf
-		install -d -m 755                       ${D}${PTEST_PATH}/libasm
-		install -d -m 755                       ${D}${PTEST_PATH}/libcpu
-		install -d -m 755                       ${D}${PTEST_PATH}/libebl
-		for test_file in ${TEST_FILES}; do
-			if [ -f ${B}/src/${test_file} ]; then
-				cp -r ${B}/src/${test_file} ${D}${PTEST_PATH}/src
-			fi
-		done
-		cp ${D}${libdir}/libelf-${PV}.so ${D}${PTEST_PATH}/libelf/libelf.so
-		cp ${D}${libdir}/libdw-${PV}.so ${D}${PTEST_PATH}/libdw/libdw.so
-		cp ${D}${libdir}/libasm-${PV}.so ${D}${PTEST_PATH}/libasm/libasm.so
-		cp ${B}/libcpu/libcpu.a ${D}${PTEST_PATH}/libcpu/
-		cp ${B}/libebl/libebl.a ${D}${PTEST_PATH}/libebl/
-		cp ${B}/lib/libeu.a ${D}${PTEST_PATH}/lib/
-		cp ${S}/libelf/*.h             ${D}${PTEST_PATH}/libelf/
-		cp ${S}/libdw/*.h              ${D}${PTEST_PATH}/libdw/
-		cp ${S}/libdwfl/*.h            ${D}${PTEST_PATH}/libdwfl/
-		cp ${S}/libdwelf/*.h           ${D}${PTEST_PATH}/libdwelf/
-		cp ${S}/libasm/*.h             ${D}${PTEST_PATH}/libasm/
-		cp -r ${S}/tests/                       ${D}${PTEST_PATH}
-		cp -r ${B}/tests/*                      ${D}${PTEST_PATH}/tests
-		cp -r ${B}/config.h                     ${D}${PTEST_PATH}
-		cp -r ${B}/backends                     ${D}${PTEST_PATH}
-		cp -r ${B}/debuginfod                   ${D}${PTEST_PATH}
-		sed -i '/^Makefile:/c Makefile:'        ${D}${PTEST_PATH}/tests/Makefile
-		find ${D}${PTEST_PATH} -type f -name *.[hoc] | xargs -i rm {}
-	fi
+	# copy the files which needed by the cases
+	TEST_FILES="strip strip.o addr2line elfcmp objdump readelf size.o nm.o nm elflint elfcompress elfclassify stack unstrip srcfiles"
+	install -d -m 755                       ${D}${PTEST_PATH}/src
+	install -d -m 755                       ${D}${PTEST_PATH}/lib
+	install -d -m 755                       ${D}${PTEST_PATH}/libelf
+	install -d -m 755                       ${D}${PTEST_PATH}/libdw
+	install -d -m 755                       ${D}${PTEST_PATH}/libdwfl
+	install -d -m 755                       ${D}${PTEST_PATH}/libdwelf
+	install -d -m 755                       ${D}${PTEST_PATH}/libasm
+	install -d -m 755                       ${D}${PTEST_PATH}/libcpu
+	install -d -m 755                       ${D}${PTEST_PATH}/libebl
+	for test_file in ${TEST_FILES}; do
+		if [ -f ${B}/src/${test_file} ]; then
+			cp -r ${B}/src/${test_file} ${D}${PTEST_PATH}/src
+		fi
+	done
+	cp ${D}${libdir}/libelf-${PV}.so ${D}${PTEST_PATH}/libelf/libelf.so
+	cp ${D}${libdir}/libdw-${PV}.so ${D}${PTEST_PATH}/libdw/libdw.so
+	cp ${D}${libdir}/libasm-${PV}.so ${D}${PTEST_PATH}/libasm/libasm.so
+	cp ${B}/libcpu/libcpu.a ${D}${PTEST_PATH}/libcpu/
+	cp ${B}/libebl/libebl.a ${D}${PTEST_PATH}/libebl/
+	cp ${B}/lib/libeu.a ${D}${PTEST_PATH}/lib/
+	cp ${S}/libelf/*.h             ${D}${PTEST_PATH}/libelf/
+	cp ${S}/libdw/*.h              ${D}${PTEST_PATH}/libdw/
+	cp ${S}/libdwfl/*.h            ${D}${PTEST_PATH}/libdwfl/
+	cp ${S}/libdwelf/*.h           ${D}${PTEST_PATH}/libdwelf/
+	cp ${S}/libasm/*.h             ${D}${PTEST_PATH}/libasm/
+	cp -r ${S}/tests/                       ${D}${PTEST_PATH}
+	cp -r ${B}/tests/*                      ${D}${PTEST_PATH}/tests
+	cp -r ${B}/config.h                     ${D}${PTEST_PATH}
+	cp -r ${B}/backends                     ${D}${PTEST_PATH}
+	cp -r ${B}/debuginfod                   ${D}${PTEST_PATH}
+	sed -i '/^Makefile:/c Makefile:'        ${D}${PTEST_PATH}/tests/Makefile
+	find ${D}${PTEST_PATH} -type f -name *.[hoc] | xargs -i rm {}
 }
 
 EXTRA_OEMAKE:class-native = ""

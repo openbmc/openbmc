@@ -6,30 +6,30 @@ Release notes for Yocto-4.0.12 (Kirkstone)
 Security Fixes in Yocto-4.0.12
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  bind: Fix :cve:`2023-2828` and :cve:`2023-2911`
--  cups: Fix :cve:`2023-34241`
--  curl: Added :cve:`2023-28320` Follow-up patch
--  dbus: Fix :cve:`2023-34969`
--  dmidecode: fix :cve:`2023-30630`
--  ghostscript: fix :cve:`2023-36664`
--  go: fix :cve_mitre:`2023-24531`, :cve:`2023-24536`, :cve:`2023-29400`, :cve:`2023-29402`, :cve:`2023-29404`, :cve:`2023-29405` and :cve:`2023-29406`
--  libarchive: Ignore :cve:`2023-30571`
--  libcap: Fix :cve:`2023-2602` and :cve:`2023-2603`
--  libjpeg-turbo: Fix :cve:`2023-2804`
--  libpcre2: Fix :cve:`2022-41409`
--  libtiff: fix :cve:`2023-26965`
--  libwebp: Fix :cve:`2023-1999`
--  libx11: Fix :cve:`2023-3138`
--  libxpm: Fix :cve:`2022-44617`
--  ninja: Ignore :cve:`2021-4336`
--  openssh: Fix :cve:`2023-38408`
--  openssl: Fix :cve:`2023-2975`, :cve:`2023-3446` and :cve:`2023-3817`
--  perl: Fix :cve:`2023-31486`
--  python3: Ignore :cve:`2023-36632`
--  qemu: Fix :cve:`2023-0330`, :cve_mitre:`2023-2861`, :cve_mitre:`2023-3255` and :cve_mitre:`2023-3301`
--  sqlite3: Fix :cve:`2023-36191`
--  tiff: Fix :cve:`2023-0795`, :cve:`2023-0796`, :cve:`2023-0797`, :cve:`2023-0798`, :cve:`2023-0799`, :cve:`2023-25433`, :cve:`2023-25434` and :cve:`2023-25435`
--  vim: :cve:`2023-2609` and :cve:`2023-2610`
+-  bind: Fix :cve_nist:`2023-2828` and :cve_nist:`2023-2911`
+-  cups: Fix :cve_nist:`2023-34241`
+-  curl: Added :cve_nist:`2023-28320` Follow-up patch
+-  dbus: Fix :cve_nist:`2023-34969`
+-  dmidecode: fix :cve_nist:`2023-30630`
+-  ghostscript: fix :cve_nist:`2023-36664`
+-  go: fix :cve_mitre:`2023-24531`, :cve_nist:`2023-24536`, :cve_nist:`2023-29400`, :cve_nist:`2023-29402`, :cve_nist:`2023-29404`, :cve_nist:`2023-29405` and :cve_nist:`2023-29406`
+-  libarchive: Ignore :cve_nist:`2023-30571`
+-  libcap: Fix :cve_nist:`2023-2602` and :cve_nist:`2023-2603`
+-  libjpeg-turbo: Fix :cve_nist:`2023-2804`
+-  libpcre2: Fix :cve_nist:`2022-41409`
+-  libtiff: fix :cve_nist:`2023-26965`
+-  libwebp: Fix :cve_nist:`2023-1999`
+-  libx11: Fix :cve_nist:`2023-3138`
+-  libxpm: Fix :cve_nist:`2022-44617`
+-  ninja: Ignore :cve_nist:`2021-4336`
+-  openssh: Fix :cve_nist:`2023-38408`
+-  openssl: Fix :cve_nist:`2023-2975`, :cve_nist:`2023-3446` and :cve_nist:`2023-3817`
+-  perl: Fix :cve_nist:`2023-31486`
+-  python3: Ignore :cve_nist:`2023-36632`
+-  qemu: Fix :cve_nist:`2023-0330`, :cve_mitre:`2023-2861`, :cve_mitre:`2023-3255` and :cve_mitre:`2023-3301`
+-  sqlite3: Fix :cve_nist:`2023-36191`
+-  tiff: Fix :cve_nist:`2023-0795`, :cve_nist:`2023-0796`, :cve_nist:`2023-0797`, :cve_nist:`2023-0798`, :cve_nist:`2023-0799`, :cve_nist:`2023-25433`, :cve_nist:`2023-25434` and :cve_nist:`2023-25435`
+-  vim: :cve_nist:`2023-2609` and :cve_nist:`2023-2610`
 
 
 Fixes in Yocto-4.0.12

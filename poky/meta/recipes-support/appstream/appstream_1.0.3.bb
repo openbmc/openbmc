@@ -27,6 +27,8 @@ GIDOCGEN_MESON_OPTION = "apidocs"
 SRC_URI = " \
 	https://www.freedesktop.org/software/appstream/releases/AppStream-${PV}.tar.xz \
 	file://0001-remove-hardcoded-path.patch \
+	file://0002-Do-not-build-qt-tests.patch \
+	file://0003-Fix-PACKAGE_PREFIX_DIR-in-qt-cmake-AppStreamQtConfig.patch \
 "
 SRC_URI[sha256sum] = "5ab6f6cf644e7875a9508593962e56bb430f4e59ae0bf03be6be7029deb6baa4"
 
@@ -36,9 +38,16 @@ PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
 PACKAGECONFIG[systemd] = "-Dsystemd=true,-Dsystemd=false,systemd"
 PACKAGECONFIG[stemming] = "-Dstemming=true,-Dstemming=false,libstemmer"
+PACKAGECONFIG[qt6] = "-Dqt=true,-Dqt=false,qtbase"
 
 FILES:${PN} += "${datadir}"
 
 EXTRA_OEMESON += "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '-Dvapi=true', '-Dvapi=false', d)}"
 
 BBCLASSEXTEND = "native"
+
+# Fix meson not finding the Qt build tools in cross-compilation
+# setups. See: https://github.com/mesonbuild/meson/issues/13018
+do_configure:prepend:class-target() {
+    export PATH=${STAGING_DIR_NATIVE}${libexecdir}:$PATH
+}

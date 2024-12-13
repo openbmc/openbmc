@@ -1,0 +1,200 @@
+From d0797fe4bce357d419d2f1f8a3cfe2f8e71ebfdb Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 29 Jul 2024 14:23:02 +0000
+Subject: [PATCH] Fix: scsi: sd: Atomic write support added in 6.11-rc1
+
+See upstream commit:
+
+    commit bf4ae8f2e6407a779c0368eb0f3e047a8333be17
+    Author: John Garry <john.g.garry@oracle.com>
+    Date:   Thu Jun 20 12:53:57 2024 +0000
+
+        scsi: sd: Atomic write support
+
+        Support is divided into two main areas:
+        - reading VPD pages and setting sdev request_queue limits
+        - support WRITE ATOMIC (16) command and tracing
+
+        The relevant block limits VPD page need to be read to allow the block layer
+        request_queue atomic write limits to be set. These VPD page limits are
+        described in sbc4r22 section 6.6.4 - Block limits VPD page.
+
+        There are five limits of interest:
+        - MAXIMUM ATOMIC TRANSFER LENGTH
+        - ATOMIC ALIGNMENT
+        - ATOMIC TRANSFER LENGTH GRANULARITY
+        - MAXIMUM ATOMIC TRANSFER LENGTH WITH BOUNDARY
+        - MAXIMUM ATOMIC BOUNDARY SIZE
+
+        MAXIMUM ATOMIC TRANSFER LENGTH is the maximum length for a WRITE ATOMIC
+        (16) command. It will not be greater than the device MAXIMUM TRANSFER
+        LENGTH.
+
+        ATOMIC ALIGNMENT and ATOMIC TRANSFER LENGTH GRANULARITY are the minimum
+        alignment and length values for an atomic write in terms of logical blocks.
+
+        Unlike NVMe, SCSI does not specify an LBA space boundary, but does specify
+        a per-IO boundary granularity. The maximum boundary size is specified in
+        MAXIMUM ATOMIC BOUNDARY SIZE. When used, this boundary value is set in the
+        WRITE ATOMIC (16) ATOMIC BOUNDARY field - layout for the WRITE_ATOMIC_16
+        command can be found in sbc4r22 section 5.48. This boundary value is the
+        granularity size at which the device may atomically write the data. A value
+        of zero in WRITE ATOMIC (16) ATOMIC BOUNDARY field means that all data must
+        be atomically written together.
+
+        MAXIMUM ATOMIC TRANSFER LENGTH WITH BOUNDARY is the maximum atomic write
+        length if a non-zero boundary value is set.
+
+        For atomic write support, the WRITE ATOMIC (16) boundary is not of much
+        interest, as the block layer expects each request submitted to be executed
+        be atomically written together.
+
+        MAXIMUM ATOMIC TRANSFER LENGTH WITH BOUNDARY is the maximum atomic write
+        length if a non-zero boundary value is set.
+
+        For atomic write support, the WRITE ATOMIC (16) boundary is not of much
+        interest, as the block layer expects each request submitted to be executed
+        atomically. However, the SCSI spec does leave itself open to a quirky
+        scenario where MAXIMUM ATOMIC TRANSFER LENGTH is zero, yet MAXIMUM ATOMIC
+        TRANSFER LENGTH WITH BOUNDARY and MAXIMUM ATOMIC BOUNDARY SIZE are both
+        non-zero. This case will be supported.
+
+        To set the block layer request_queue atomic write capabilities, sanitize
+        the VPD page limits and set limits as follows:
+        - atomic_write_unit_min is derived from granularity and alignment values.
+          If no granularity value is not set, use physical block size
+        - atomic_write_unit_max is derived from MAXIMUM ATOMIC TRANSFER LENGTH. In
+          the scenario where MAXIMUM ATOMIC TRANSFER LENGTH is zero and boundary
+          limits are non-zero, use MAXIMUM ATOMIC BOUNDARY SIZE for
+          atomic_write_unit_max. New flag scsi_disk.use_atomic_write_boundary is
+          set for this scenario.
+        - atomic_write_boundary_bytes is set to zero always
+
+        SCSI also supports a WRITE ATOMIC (32) command, which is for type 2
+        protection enabled. This is not going to be supported now, so check for
+        T10_PI_TYPE2_PROTECTION when setting any request_queue limits.
+
+        To handle an atomic write request, add support for WRITE ATOMIC (16)
+        command in handler sd_setup_atomic_cmnd(). Flag use_atomic_write_boundary
+        is checked here for encoding ATOMIC BOUNDARY field.
+
+        Trace info is also added for WRITE_ATOMIC_16 command.
+
+Upstream-Status: Backport
+
+Change-Id: Ie072002fe2184615c72531ac081a324ef18cfb03
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/scsi.h | 98 ++++++++++++++++++++++++++-
+ 1 file changed, 97 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/scsi.h b/include/instrumentation/events/scsi.h
+index 52c0ebd..54ba3ee 100644
+--- a/include/instrumentation/events/scsi.h
++++ b/include/instrumentation/events/scsi.h
+@@ -16,7 +16,103 @@
+ 
+ #define scsi_opcode_name(opcode)	{ opcode, #opcode }
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,7,0) \
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,11,0))
++
++#define show_opcode_name(val)					\
++	__print_symbolic(val,					\
++		scsi_opcode_name(TEST_UNIT_READY),		\
++		scsi_opcode_name(REZERO_UNIT),			\
++		scsi_opcode_name(REQUEST_SENSE),		\
++		scsi_opcode_name(FORMAT_UNIT),			\
++		scsi_opcode_name(READ_BLOCK_LIMITS),		\
++		scsi_opcode_name(REASSIGN_BLOCKS),		\
++		scsi_opcode_name(INITIALIZE_ELEMENT_STATUS),	\
++		scsi_opcode_name(READ_6),			\
++		scsi_opcode_name(WRITE_6),			\
++		scsi_opcode_name(SEEK_6),			\
++		scsi_opcode_name(READ_REVERSE),			\
++		scsi_opcode_name(WRITE_FILEMARKS),		\
++		scsi_opcode_name(SPACE),			\
++		scsi_opcode_name(INQUIRY),			\
++		scsi_opcode_name(RECOVER_BUFFERED_DATA),	\
++		scsi_opcode_name(MODE_SELECT),			\
++		scsi_opcode_name(RESERVE),			\
++		scsi_opcode_name(RELEASE),			\
++		scsi_opcode_name(COPY),				\
++		scsi_opcode_name(ERASE),			\
++		scsi_opcode_name(MODE_SENSE),			\
++		scsi_opcode_name(START_STOP),			\
++		scsi_opcode_name(RECEIVE_DIAGNOSTIC),		\
++		scsi_opcode_name(SEND_DIAGNOSTIC),		\
++		scsi_opcode_name(ALLOW_MEDIUM_REMOVAL),		\
++		scsi_opcode_name(SET_WINDOW),			\
++		scsi_opcode_name(READ_CAPACITY),		\
++		scsi_opcode_name(READ_10),			\
++		scsi_opcode_name(WRITE_10),			\
++		scsi_opcode_name(SEEK_10),			\
++		scsi_opcode_name(POSITION_TO_ELEMENT),		\
++		scsi_opcode_name(WRITE_VERIFY),			\
++		scsi_opcode_name(VERIFY),			\
++		scsi_opcode_name(SEARCH_HIGH),			\
++		scsi_opcode_name(SEARCH_EQUAL),			\
++		scsi_opcode_name(SEARCH_LOW),			\
++		scsi_opcode_name(SET_LIMITS),			\
++		scsi_opcode_name(PRE_FETCH),			\
++		scsi_opcode_name(READ_POSITION),		\
++		scsi_opcode_name(SYNCHRONIZE_CACHE),		\
++		scsi_opcode_name(LOCK_UNLOCK_CACHE),		\
++		scsi_opcode_name(READ_DEFECT_DATA),		\
++		scsi_opcode_name(MEDIUM_SCAN),			\
++		scsi_opcode_name(COMPARE),			\
++		scsi_opcode_name(COPY_VERIFY),			\
++		scsi_opcode_name(WRITE_BUFFER),			\
++		scsi_opcode_name(READ_BUFFER),			\
++		scsi_opcode_name(UPDATE_BLOCK),			\
++		scsi_opcode_name(READ_LONG),			\
++		scsi_opcode_name(WRITE_LONG),			\
++		scsi_opcode_name(CHANGE_DEFINITION),		\
++		scsi_opcode_name(WRITE_SAME),			\
++		scsi_opcode_name(UNMAP),			\
++		scsi_opcode_name(READ_TOC),			\
++		scsi_opcode_name(LOG_SELECT),			\
++		scsi_opcode_name(LOG_SENSE),			\
++		scsi_opcode_name(XDWRITEREAD_10),		\
++		scsi_opcode_name(MODE_SELECT_10),		\
++		scsi_opcode_name(RESERVE_10),			\
++		scsi_opcode_name(RELEASE_10),			\
++		scsi_opcode_name(MODE_SENSE_10),		\
++		scsi_opcode_name(PERSISTENT_RESERVE_IN),	\
++		scsi_opcode_name(PERSISTENT_RESERVE_OUT),	\
++		scsi_opcode_name(VARIABLE_LENGTH_CMD),		\
++		scsi_opcode_name(REPORT_LUNS),			\
++		scsi_opcode_name(MAINTENANCE_IN),		\
++		scsi_opcode_name(MAINTENANCE_OUT),		\
++		scsi_opcode_name(MOVE_MEDIUM),			\
++		scsi_opcode_name(EXCHANGE_MEDIUM),		\
++		scsi_opcode_name(READ_12),			\
++		scsi_opcode_name(WRITE_12),			\
++		scsi_opcode_name(WRITE_VERIFY_12),		\
++		scsi_opcode_name(SEARCH_HIGH_12),		\
++		scsi_opcode_name(SEARCH_EQUAL_12),		\
++		scsi_opcode_name(SEARCH_LOW_12),		\
++		scsi_opcode_name(READ_ELEMENT_STATUS),		\
++		scsi_opcode_name(SEND_VOLUME_TAG),		\
++		scsi_opcode_name(WRITE_LONG_2),			\
++		scsi_opcode_name(READ_16),			\
++		scsi_opcode_name(WRITE_16),			\
++		scsi_opcode_name(VERIFY_16),			\
++		scsi_opcode_name(WRITE_SAME_16),		\
++		scsi_opcode_name(ZBC_OUT),			\
++		scsi_opcode_name(ZBC_IN),			\
++		scsi_opcode_name(SERVICE_ACTION_IN_16),		\
++		scsi_opcode_name(READ_32),			\
++		scsi_opcode_name(WRITE_32),			\
++		scsi_opcode_name(WRITE_SAME_32),		\
++		scsi_opcode_name(ATA_16),			\
++		scsi_opcode_name(WRITE_ATOMIC_16),		\
++		scsi_opcode_name(ATA_12))
++
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,7,0)  \
+ 	|| LTTNG_SLE_KERNEL_RANGE(4,4,9,36,0,0, 4,5,0,0,0,0))
+ 
+ #define show_opcode_name(val)					\

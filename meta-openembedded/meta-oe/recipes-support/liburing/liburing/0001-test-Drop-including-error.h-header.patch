@@ -1,0 +1,27 @@
+From 684bcb2a8795fd399d6c164e51459a2785057b1c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Sep 2024 09:56:42 -0700
+Subject: [PATCH 1/2] test: Drop including error.h header
+
+There is no error APIs being used in this test, therefore
+drop including it, this also makes it portable to musl
+systems which do not have error.h
+
+Upstream-Status: Submitted [https://github.com/axboe/liburing/pull/1233]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/init-mem.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/test/init-mem.c b/test/init-mem.c
+index 6f9a02a..f512190 100644
+--- a/test/init-mem.c
++++ b/test/init-mem.c
+@@ -13,7 +13,6 @@
+ #include <netinet/udp.h>
+ #include <arpa/inet.h>
+ #include <net/if.h>
+-#include <error.h>
+ 
+ #include "liburing.h"
+ #include "helpers.h"

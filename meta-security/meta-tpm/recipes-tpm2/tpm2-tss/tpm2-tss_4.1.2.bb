@@ -4,7 +4,7 @@ LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=500b2e742befc3da00684d8a1d5fd9da"
 SECTION = "tpm"
 
-DEPENDS = "autoconf-archive-native libgcrypt openssl"
+DEPENDS = "autoconf-archive-native openssl"
 
 SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN}-${PV}.tar.gz \
            file://fixup_hosttools.patch \
@@ -91,7 +91,5 @@ FILES:${PN} = "\
     ${sysconfdir}/tmpfiles.d \
     ${sysconfdir}/tpm2-tss \
     ${sysconfdir}/sysusers.d"
-
-RDEPENDS:libtss2 = "libgcrypt"
 
 BBCLASSEXTEND = "native nativesdk"

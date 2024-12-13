@@ -395,7 +395,7 @@ one CVE is fixed, separate them using spaces.
 CVE Examples
 ------------
 
-This should be the header of patch that fixes :cve:`2015-8370` in GRUB2::
+This should be the header of patch that fixes :cve_nist:`2015-8370` in GRUB2::
 
    grub2: Fix CVE-2015-8370
 

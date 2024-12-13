@@ -55,7 +55,7 @@ DEPENDS = "nasm-native acpica-native ovmf-native util-linux-native"
 EDK_TOOLS_DIR="edk2_basetools"
 
 # OVMF has trouble building with the default optimization of -O2.
-BUILD_OPTIMIZATION="-pipe"
+BUILD_OPTIMIZATION = ""
 
 # OVMF supports IA only, although it could conceivably support ARM someday.
 COMPATIBLE_HOST:class-target='(i.86|x86_64).*'
@@ -223,6 +223,7 @@ do_compile:class-target() {
 
 do_install:class-native() {
     install -d ${D}/${bindir}/edk2_basetools
+    find ${S}/BaseTools -name \*.pyc -exec rm -rf \{\} \;
     cp -r ${S}/BaseTools ${D}/${bindir}/${EDK_TOOLS_DIR}
 }
 

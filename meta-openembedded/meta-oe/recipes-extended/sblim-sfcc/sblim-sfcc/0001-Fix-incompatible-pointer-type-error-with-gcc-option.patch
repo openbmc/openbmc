@@ -1,0 +1,72 @@
+From 5151163d6f4d4de0699d1e85c54fbe2cb5b55460 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Thu, 27 Jun 2024 01:51:36 +0000
+Subject: Fix incompatible pointer type error with gcc option 
+ -Wincompatible-pointer-types
+
+| ../../sblim-sfcc-2.2.8/TEST/v2test_ec.c: In function 'main':
+| ../../sblim-sfcc-2.2.8/TEST/v2test_ec.c:86:31: error: passing argument 1 of 'showClass' from incompatible pointer type [-Wincompatible-pointer-types]
+|    86 |           showClass(data.value.cls);
+|       |                     ~~~~~~~~~~^~~~
+|       |                               |
+|       |                               CIMCClass * {aka struct _CIMCClass *}
+| In file included from ../../sblim-sfcc-2.2.8/TEST/v2test_ec.c:7:
+| ../../sblim-sfcc-2.2.8/TEST/show.h:9:34: note: expected 'CMPIConstClass *' {aka 'struct _CMPIConstClass *'} but argument is of type 'CIMCClass *' {aka 'struct _CIMCClass *'}
+|     9 | void showClass( CMPIConstClass * in_class );
+|       |                 ~~~~~~~~~~~~~~~~~^~~~~~~~
+
+| ../../sblim-sfcc-2.2.8/TEST/v2test_ein.c: In function 'main':
+| ../../sblim-sfcc-2.2.8/TEST/v2test_ein.c:96:36: error: passing argument 1 of 'showObjectPath' from incompatible pointer type [-Wincompatible-pointer-types]
+|    96 |           showObjectPath(data.value.ref);
+|       |                          ~~~~~~~~~~^~~~
+|       |                                    |
+|       |                                    CIMCObjectPath * {aka struct _CIMCObjectPath *}
+| In file included from ../../sblim-sfcc-2.2.8/TEST/v2test_ein.c:7:
+| ../../sblim-sfcc-2.2.8/TEST/show.h:7:39: note: expected 'CMPIObjectPath *' {aka 'struct _CMPIObjectPath *'} but argument is of type 'CIMCObjectPath *' {aka 'struct _CIMCObjectPath *'}
+|     7 | void showObjectPath( CMPIObjectPath * objectpath );
+|       |                      ~~~~~~~~~~~~~~~~~^~~~~~~~~~
+| make[2]: *** [Makefile:1110: v2test_ein.o] Error 1
+| make[2]: *** Waiting for unfinished jobs....
+| ../../sblim-sfcc-2.2.8/TEST/v2test_im.c: In function 'main':
+| ../../sblim-sfcc-2.2.8/TEST/v2test_im.c:82:40: warning: '%s' directive argument is null [-Wformat-overflow=]
+|    82 |     printf( "invokeMethod() rc=%d, msg=%s\n",
+|       |                                        ^~
+
+Upstream-Status: Backport
+[https://github.com/kkaempf/sblim-sfcc/commit/881fccbaf19e26cbef3da1bebe2b42b3a9de1147#diff-ad9eeee99837ead0f29c70cd5f3956178dc3d51bd79618affd53d72a31404d5f]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ TEST/v2test_ec.c  | 2 +-
+ TEST/v2test_ein.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/TEST/v2test_ec.c b/TEST/v2test_ec.c
+index 940ca57..72a93a5 100644
+--- a/TEST/v2test_ec.c
++++ b/TEST/v2test_ec.c
+@@ -83,7 +83,7 @@ int main()
+        count = enm->ft->hasNext(enm, NULL) ;
+        while (count > 0) {
+           data = enm->ft->getNext(enm, NULL);
+-          showClass(data.value.cls);          
++          showClass((CMPIConstClass *)data.value.cls);          
+           /*
+            * see if we have any more
+            */
+diff --git a/TEST/v2test_ein.c b/TEST/v2test_ein.c
+index ede95c1..c9d1152 100644
+--- a/TEST/v2test_ein.c
++++ b/TEST/v2test_ein.c
+@@ -93,7 +93,7 @@ int count = 0;
+        	  
+           data = enm->ft->getNext(enm, NULL);
+ 
+-          showObjectPath(data.value.ref);
++          showObjectPath((CMPIObjectPath *)data.value.ref);
+           /*
+            * see if we have any more
+            */
+-- 
+2.34.1
+

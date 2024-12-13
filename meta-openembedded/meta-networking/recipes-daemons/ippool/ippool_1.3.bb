@@ -42,7 +42,7 @@ inherit systemd
 DEPENDS = "readline ppp ncurses gzip-native rpcsvc-proto-native libtirpc"
 RDEPENDS:${PN} = "rpcbind"
 
-EXTRA_OEMAKE = "CC='${CC}' AS='${AS}' LD='${LD}' AR='${AR}' NM='${NM}' STRIP='${STRIP}'"
+EXTRA_OEMAKE = "CC='${CC} ${CFLAGS}' AS='${AS}' LD='${LD} ${LDFLAGS}' AR='${AR}' NM='${NM}' STRIP='${STRIP}'"
 EXTRA_OEMAKE += "PPPD_VERSION=${PPPD_VERSION} SYS_LIBDIR=${libdir}"
 # enable self tests
 EXTRA_OEMAKE += "IPPOOL_TEST=y"
@@ -52,12 +52,7 @@ CPPFLAGS += "${SELECTED_OPTIMIZATION} -I${STAGING_INCDIR}/tirpc"
 SYSTEMD_SERVICE:${PN} = "ippool.service"
 
 do_compile:prepend() {
-    # fix the CFLAGS= and CPPFLAGS= in main Makefile, to have the extra CFLAGS in env
-    sed -i -e "s/^CFLAGS=/CFLAGS+=/" ${S}/Makefile
-    sed -i -e "s/^CPPFLAGS=/CPPFLAGS+=/" ${S}/Makefile
-
     sed -i -e "s:-I/usr/include/pppd:-I=/usr/include/pppd:" ${S}/pppd/Makefile
-
 }
 
 

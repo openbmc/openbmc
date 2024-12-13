@@ -13,6 +13,9 @@ SRC_URI = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-6_5_1
           "
 SRC_URI[sha256sum] = "739be290a38229aaa5b5150e6ea55ce427e80970f0ace4c5040ac46644526f41"
 
+UPSTREAM_CHECK_URI = "https://github.com/DOCGroup/ACE_TAO/releases"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+
 COMPATIBLE_HOST:libc-musl = "null"
 
 S = "${WORKDIR}/ACE_wrappers"
@@ -37,5 +40,3 @@ do_install() {
 
     rm -r ${D}/usr/share
 }
-
-UPSTREAM_CHECK_URI = "https://github.com/DOCGroup/ACE_TAO/releases"

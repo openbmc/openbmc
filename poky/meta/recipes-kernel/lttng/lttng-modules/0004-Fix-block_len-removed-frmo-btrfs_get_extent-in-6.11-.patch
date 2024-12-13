@@ -1,0 +1,44 @@
+From 974125ab11a7f0b4df5658cdac26dc5cf9fdbc87 Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 29 Jul 2024 14:12:47 +0000
+Subject: [PATCH] Fix: block_len removed frmo btrfs_get_extent in 6.11-rc1
+
+See upstream commit:
+
+    commit e28b851ed9b232c3b84cb8d0fedbdfa8ca881386
+    Author: Qu Wenruo <wqu@suse.com>
+    Date:   Tue Apr 30 07:53:05 2024 +0930
+
+        btrfs: remove extent_map::block_len member
+
+        The extent_map::block_len is either extent_map::len (non-compressed
+        extent) or extent_map::disk_num_bytes (compressed extent).
+
+        Since we already have sanity checks to do the cross-checks between the
+        new and old members, we can drop the old extent_map::block_len now.
+
+        For most call sites, they can manually select extent_map::len or
+        extent_map::disk_num_bytes, since most if not all of them have checked
+        if the extent is compressed.
+
+Upstream-Status: Backport
+
+Change-Id: Ib03fc685b4e876bf4e53afdd28ca9826342a0e4e
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/btrfs.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index dfad19c..28320d8 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -192,7 +192,6 @@ LTTNG_TRACEPOINT_EVENT(btrfs_get_extent,
+ 		ctf_integer(u64, start, map->start)
+ 		ctf_integer(u64, len, map->len)
+ 		ctf_integer(u64, block_start, map->block_start)
+-		ctf_integer(u64, block_len, map->block_len)
+ 		ctf_integer(unsigned int, flags, map->flags)
+ 		ctf_integer(int, refs, refcount_read(&map->refs))
+ 		ctf_integer(unsigned int, compress_type, extent_map_compression(map))

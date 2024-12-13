@@ -1,4 +1,4 @@
-From 3a164d9f17591a545d1eafa629b486d4a1563722 Mon Sep 17 00:00:00 2001
+From e7918dbd4a02be2a474534da3f1e565931a5e632 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Thu, 16 Feb 2023 21:53:25 +0000
 Subject: [PATCH] Patch in the paths to the SBSA test suite
@@ -10,7 +10,7 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/ShellPkg/ShellPkg.dsc b/ShellPkg/ShellPkg.dsc
-index dd0d88603f11..91710c0795dc 100644
+index 557b0ec0f3d6..85b3f4fc65d0 100644
 --- a/ShellPkg/ShellPkg.dsc
 +++ b/ShellPkg/ShellPkg.dsc
 @@ -23,6 +23,8 @@

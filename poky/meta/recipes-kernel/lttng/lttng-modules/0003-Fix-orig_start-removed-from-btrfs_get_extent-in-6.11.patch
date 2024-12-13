@@ -1,0 +1,64 @@
+From 1e4cc8d271117af9262e28a5dd19790a0917818c Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 29 Jul 2024 14:11:36 +0000
+Subject: [PATCH] Fix: orig_start removed from btrfs_get_extent in 6.11-rc1
+
+See upstream commit:
+
+    commit 4aa7b5d1784f510c0f42afc1d74efb41947221d7
+    Author: Qu Wenruo <wqu@suse.com>
+    Date:   Tue Apr 30 07:53:04 2024 +0930
+
+        btrfs: remove extent_map::orig_start member
+
+        Since we have extent_map::offset, the old extent_map::orig_start is just
+        extent_map::start - extent_map::offset for non-hole/inline extents.
+
+        And since the new extent_map::offset is already verified by
+        validate_extent_map() while the old orig_start is not, let's just remove
+        the old member from all call sites.
+
+Upstream-Status: Backport
+
+Change-Id: I025a30d49b3e3ddc37d7846acc191ebbdf2ff19e
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/btrfs.h | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index c0c746e..dfad19c 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -177,7 +177,29 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__inode, btrfs_inode_evict,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,8,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,11,0))
++
++LTTNG_TRACEPOINT_EVENT(btrfs_get_extent,
++
++	TP_PROTO(const struct btrfs_root *root, const struct btrfs_inode *inode,
++		const struct extent_map *map),
++
++	TP_ARGS(root, inode, map),
++
++	TP_FIELDS(
++		ctf_integer(u64, root_objectid, root->root_key.objectid)
++		ctf_integer(u64, ino, btrfs_ino(inode))
++		ctf_integer(u64, start, map->start)
++		ctf_integer(u64, len, map->len)
++		ctf_integer(u64, block_start, map->block_start)
++		ctf_integer(u64, block_len, map->block_len)
++		ctf_integer(unsigned int, flags, map->flags)
++		ctf_integer(int, refs, refcount_read(&map->refs))
++		ctf_integer(unsigned int, compress_type, extent_map_compression(map))
++	)
++)
++
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,8,0))
+ 
+ LTTNG_TRACEPOINT_EVENT(btrfs_get_extent,
+ 

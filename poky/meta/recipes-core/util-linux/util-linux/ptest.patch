@@ -1,24 +1,23 @@
-From d0a69ce80c579cbb7627a2f20e8b92e006a8d8ad Mon Sep 17 00:00:00 2001
+From f9be73c3e2b0a4f0923950dcb058be85d3ee8ed7 Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Thu, 3 Dec 2015 04:08:00 +0100
 Subject: [PATCH] Define TESTS variable
 
 Signed-off-by: Tudor Florea <tudor.florea@enea.com>
 Upstream-Status: Pending
-
 ---
  Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index effbb02..7d2bd1e 100644
+index 50ab8d0..7e2340d 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -57,6 +57,7 @@ systemdsystemunit_DATA =
+@@ -64,6 +64,7 @@ tmpfiles_DATA =
  dist_bashcompletion_DATA =
  check_PROGRAMS =
  dist_check_SCRIPTS =
 +TESTS = $(check_PROGRAMS)
  
- PATHFILES =
- ADOCFILES_COMMON =
+ BUILT_SOURCES =
+ 

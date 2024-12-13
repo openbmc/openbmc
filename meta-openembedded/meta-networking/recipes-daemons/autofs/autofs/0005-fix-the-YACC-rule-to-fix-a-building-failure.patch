@@ -1,0 +1,71 @@
+From 40318f4f6109d9810b7cb31518a7879ae7632f58 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Mon, 18 May 2015 16:28:36 +0800
+Subject: [PATCH] fix the YACC rule to fix a building failure
+
+The original rule will create the header file twice, one is that the header
+file as the object file is created, other time is when create the C source file.
+since YACC always has "-d" parameter.
+
+This lead to a race when compile amd_tok.o, the header file maybe rewritten.
+  |----------------------
+  |amd_tok.l:359:10: error: 'RBRACKET' undeclared (first use in this function)
+  |  ")" { return RBRACKET; }
+  |          ^
+  |../Makefile.rules:64: recipe for target 'amd_tok.o' failed
+  |----------------------
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ daemon/Makefile  | 3 ++-
+ lib/Makefile     | 3 ++-
+ modules/Makefile | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/daemon/Makefile b/daemon/Makefile
+index 3af38e6..2a7ffe9 100644
+--- a/daemon/Makefile
++++ b/daemon/Makefile
+@@ -44,7 +44,8 @@ automount: $(OBJS) $(AUTOFS_LIB)
+ master_tok.c: master_tok.l
+ 	$(LEX) -o$@ -Pmaster_ $?
+ 
+-master_parse.tab.c master_parse.tab.h: master_parse.y
++master_parse.tab.h: master_parse.tab.c
++master_parse.tab.c: master_parse.y
+ 	$(YACC) -v -d -p master_ -b master_parse $?
+ 
+ master_tok.o: master_tok.c master_parse.tab.h
+diff --git a/lib/Makefile b/lib/Makefile
+index d18c67b..51445fd 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -35,7 +35,8 @@ libautofs.so: $(OBJS)
+ nss_tok.c: nss_tok.l
+ 	$(LEX) -o$@ -Pnss_ $?
+ 
+-nss_parse.tab.c nss_parse.tab.h: nss_parse.y
++nss_parse.tab.h: nss_parse.tab.c
++nss_parse.tab.c: nss_parse.y
+ 	$(YACC) -v -d -p nss_ -b nss_parse $?
+ 
+ nss_tok.o: nss_tok.c nss_parse.tab.h
+diff --git a/modules/Makefile b/modules/Makefile
+index 6908da0..00dd7ce 100644
+--- a/modules/Makefile
++++ b/modules/Makefile
+@@ -105,7 +105,8 @@ amd_tok.c: amd_tok.l
+ 
+ amd_tok.o: amd_tok.c amd_parse.tab.h
+ 
+-amd_parse.tab.c amd_parse.tab.h: amd_parse.y
++amd_parse.tab.h: amd_parse.tab.c
++amd_parse.tab.c: amd_parse.y
+ 	$(YACC) -v -d -p amd_ -b amd_parse $?
+ 
+ amd_parse.tab.o: amd_parse.tab.c amd_parse.tab.h
+-- 
+2.25.1
+

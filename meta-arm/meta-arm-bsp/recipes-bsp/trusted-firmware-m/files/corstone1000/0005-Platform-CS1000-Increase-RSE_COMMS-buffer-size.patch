@@ -1,0 +1,38 @@
+From 85e7e9f52177c9617b8554fbacac34c8c591f549 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Fri, 5 Jul 2024 21:18:08 +0200
+Subject: [PATCH 5/9] Platform: CS1000: Increase RSE_COMMS buffer size
+
+This was needed because the UEFI variable index size was increased in
+the Host side software stack. The RSE_COMMS buffer has to be increased
+to accomodate the bigger messages.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [85e7e9f52177c9617b8554fbacac34c8c591f549]
+---
+ .../ext/target/arm/corstone1000/rse_comms/rse_comms.h    | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h b/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h
+index 41e5c2bc3..720a60b62 100644
+--- a/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h
++++ b/platform/ext/target/arm/corstone1000/rse_comms/rse_comms.h
+@@ -15,8 +15,13 @@
+ extern "C" {
+ #endif
+ 
+-/* size suits to fit the largest message too (EFI variables) */
+-#define RSE_COMMS_PAYLOAD_MAX_SIZE (0x2100)
++/*
++ * The size suits to fit the largest message too (EFI variables)
++ * This size is defined by the Host's software stack.
++ * The size was chosen by monitoring the messages that are coming
++ * from the Trusted Services SE Proxy partition.
++ */
++#define RSE_COMMS_PAYLOAD_MAX_SIZE (0x43C0)
+ 
+ /*
+  * Allocated for each client request.
+-- 
+2.25.1
+

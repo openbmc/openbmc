@@ -14,6 +14,7 @@ DEPENDS = "autoconf-archive-native glib-2.0 kmod udev libnvme"
 
 SRC_URI = "git://github.com/storaged-project/libblockdev;branch=3.1.x-devel;protocol=https \
            file://0001-fix-pythondir-for-multilib-when-cross-compiling.patch \
+           file://0001-libext2fs-unused-parameters-fix.patch \
            "
 SRCREV = "68aaff5556afe26be749c29a2b7cbd714dce3050"
 S = "${WORKDIR}/git"

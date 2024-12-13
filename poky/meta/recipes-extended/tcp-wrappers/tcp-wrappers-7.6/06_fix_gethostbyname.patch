@@ -1,4 +1,4 @@
-Upstream-Status: Backport
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 * Mon Feb  5 2001 Preston Brown <pbrown@redhat.com>
 - fix gethostbyname to work better with dot "." notation (#16949)

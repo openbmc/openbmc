@@ -9,6 +9,9 @@ DEPENDS = "libcdio"
 SRC_URI = "${GNU_MIRROR}/libcdio/${BP}.tar.bz2"
 SRC_URI[sha256sum] = "33b1cf305ccfbfd03b43936975615000ce538b119989c4bec469577570b60e8a"
 
+UPSTREAM_CHECK_URI = "https://github.com/rocky/libcdio-paranoia/releases"
+UPSTREAM_CHECK_REGEX = "release-(?P<pver>\d+(\.\d+)+\+\d+(\.\d+)+)"
+
 inherit autotools pkgconfig
 
 PACKAGES += "${PN}-utils"

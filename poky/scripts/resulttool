@@ -15,6 +15,9 @@
 # To report test report, execute the below
 #     $ resulttool report <source_dir>
 #
+# To create a unit test report in JUnit XML format, execute the below
+#     $ resulttool junit <json_file>
+#
 # To perform regression file analysis, execute the below
 #     $ resulttool regression-file <base_result_file> <target_result_file>
 #
@@ -43,6 +46,7 @@ import resulttool.regression
 import resulttool.report
 import resulttool.manualexecution
 import resulttool.log
+import resulttool.junit
 logger = scriptutils.logger_create('resulttool')
 
 def main():
@@ -61,6 +65,7 @@ def main():
     resulttool.regression.register_commands(subparsers)
     resulttool.report.register_commands(subparsers)
     resulttool.log.register_commands(subparsers)
+    resulttool.junit.register_commands(subparsers)
 
     args = parser.parse_args()
     if args.debug:

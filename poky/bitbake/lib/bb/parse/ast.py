@@ -240,14 +240,16 @@ class ExportFuncsNode(AstNode):
                 data.setVar(func, sentinel + "    " + calledfunc + "\n", parsing=True)
 
 class AddTaskNode(AstNode):
-    def __init__(self, filename, lineno, func, before, after):
+    def __init__(self, filename, lineno, tasks, before, after):
         AstNode.__init__(self, filename, lineno)
-        self.func = func
+        self.tasks = tasks
         self.before = before
         self.after = after
 
     def eval(self, data):
-        bb.build.addtask(self.func, self.before, self.after, data)
+        tasks = self.tasks.split()
+        for task in tasks:
+            bb.build.addtask(task, self.before, self.after, data)
 
 class DelTaskNode(AstNode):
     def __init__(self, filename, lineno, tasks):
@@ -348,21 +350,11 @@ def handlePythonMethod(statements, filename, lineno, funcname, modulename, body)
 def handleExportFuncs(statements, filename, lineno, m, classname):
     statements.append(ExportFuncsNode(filename, lineno, m.group(1), classname))
 
-def handleAddTask(statements, filename, lineno, m):
-    func = m.group("func")
-    before = m.group("before")
-    after = m.group("after")
-    if func is None:
-        return
+def handleAddTask(statements, filename, lineno, tasks, before, after):
+    statements.append(AddTaskNode(filename, lineno, tasks, before, after))
 
-    statements.append(AddTaskNode(filename, lineno, func, before, after))
-
-def handleDelTask(statements, filename, lineno, m):
-    func = m.group(1)
-    if func is None:
-        return
-
-    statements.append(DelTaskNode(filename, lineno, func))
+def handleDelTask(statements, filename, lineno, tasks):
+    statements.append(DelTaskNode(filename, lineno, tasks))
 
 def handleBBHandlers(statements, filename, lineno, m):
     statements.append(BBHandlerNode(filename, lineno, m.group(1)))

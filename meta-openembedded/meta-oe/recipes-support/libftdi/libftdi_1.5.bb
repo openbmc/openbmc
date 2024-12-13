@@ -14,6 +14,8 @@ DEPENDS = "libusb1 python3 swig-native"
 SRC_URI = "http://www.intra2net.com/en/developer/${BPN}/download/${BPN}1-${PV}.tar.bz2"
 SRC_URI[sha256sum] = "7c7091e9c86196148bd41177b4590dccb1510bfe6cea5bf7407ff194482eb049"
 
+UPSTREAM_CHECK_URI = "http://www.intra2net.com/en/developer/libftdi/download.php"
+
 S = "${WORKDIR}/${BPN}1-${PV}"
 
 inherit cmake binconfig pkgconfig python3native

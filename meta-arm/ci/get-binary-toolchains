@@ -2,7 +2,7 @@
 set -u -e
 
 BASENAME=arm-gnu-toolchain
-VER=${VER:-13.2.Rel1}
+VER=${VER:-13.3.rel1}
 HOST_ARCH=${HOST_ARCH:-$(uname -m)}
 
 # Use the standard kas container locations if nothing is passed into the script

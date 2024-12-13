@@ -6,17 +6,17 @@ Release notes for Yocto-4.0.4 (Kirkstone)
 Security Fixes in Yocto-4.0.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  binutils : fix :cve:`2022-38533`
--  curl: fix :cve:`2022-35252`
--  sqlite: fix :cve:`2022-35737`
--  grub2: fix :cve:`2021-3695`, :cve:`2021-3696`, :cve:`2021-3697`, :cve:`2022-28733`, :cve:`2022-28734` and :cve:`2022-28735`
--  u-boot: fix :cve:`2022-30552` and :cve:`2022-33967`
--  libxml2: Ignore :cve:`2016-3709`
--  libtiff: fix :cve:`2022-34526`
--  zlib: fix :cve:`2022-37434`
--  gnutls: fix :cve:`2022-2509`
--  u-boot: fix :cve:`2022-33103`
--  qemu: fix :cve:`2021-3507`, :cve:`2021-3929`, :cve:`2021-4158`, :cve:`2022-0216` and :cve:`2022-0358`
+-  binutils : fix :cve_nist:`2022-38533`
+-  curl: fix :cve_nist:`2022-35252`
+-  sqlite: fix :cve_nist:`2022-35737`
+-  grub2: fix :cve_nist:`2021-3695`, :cve_nist:`2021-3696`, :cve_nist:`2021-3697`, :cve_nist:`2022-28733`, :cve_nist:`2022-28734` and :cve_nist:`2022-28735`
+-  u-boot: fix :cve_nist:`2022-30552` and :cve_nist:`2022-33967`
+-  libxml2: Ignore :cve_nist:`2016-3709`
+-  libtiff: fix :cve_nist:`2022-34526`
+-  zlib: fix :cve_nist:`2022-37434`
+-  gnutls: fix :cve_nist:`2022-2509`
+-  u-boot: fix :cve_nist:`2022-33103`
+-  qemu: fix :cve_nist:`2021-3507`, :cve_nist:`2021-3929`, :cve_nist:`2021-4158`, :cve_nist:`2022-0216` and :cve_nist:`2022-0358`
 
 
 Fixes in Yocto-4.0.4

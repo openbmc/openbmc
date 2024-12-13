@@ -14,6 +14,9 @@ SRC_URI = "http://downloads.sourceforge.net/openobex/${BP}-Source.tar.gz \
 SRC_URI[md5sum] = "157a9d1b2ed220203f7084db906de73c"
 SRC_URI[sha256sum] = "d40fb48e0a0eea997b3e582774b29f793919a625d54b87182e31a3f3d1c989a3"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/openobex/files/obexftp/"
+UPSTREAM_CHECK_REGEX = "${BPN}/(?P<pver>\d+(\.\d+)+)"
+
 inherit cmake pkgconfig
 
 OECMAKE_GENERATOR = "Unix Makefiles"

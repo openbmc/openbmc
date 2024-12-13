@@ -101,12 +101,12 @@ python () {
     # The "doc" varflag is special, we don't want to see it here
     ubootconfigflags.pop('doc', None)
     ubootconfig = (d.getVar('UBOOT_CONFIG') or "").split()
+    recipename = d.getVar("PN")
 
     if not ubootmachine and not ubootconfig:
-        PN = d.getVar("PN")
         FILE = os.path.basename(d.getVar("FILE"))
         bb.debug(1, "To build %s, see %s for instructions on \
-                 setting up your machine config" % (PN, FILE))
+                 setting up your machine config" % (recipename, FILE))
         raise bb.parse.SkipRecipe("Either UBOOT_MACHINE or UBOOT_CONFIG must be set in the %s machine configuration." % d.getVar("MACHINE"))
 
     if ubootmachine and ubootconfig:
@@ -140,9 +140,12 @@ python () {
             if not found:
                 raise bb.parse.SkipRecipe("The selected UBOOT_CONFIG key %s has no match in %s." % (ubootconfig, ubootconfigflags.keys()))
 
-            if len(ubootconfig) == 1:
-                d.setVar('KCONFIG_CONFIG_ROOTDIR', os.path.join(d.getVar("B"), d.getVar("UBOOT_MACHINE").strip()))
-            else:
-                # Disable menuconfig for multiple configs
-                d.setVar('KCONFIG_CONFIG_ENABLE_MENUCONFIG', "false")
+            # This recipe might be inherited e.g. by the kernel recipe via kernel-fitimage.bbclass
+            # Ensure the uboot specific menuconfig settings do not leak into other recipes
+            if 'u-boot' in recipename:
+                if len(ubootconfig) == 1:
+                    d.setVar('KCONFIG_CONFIG_ROOTDIR', os.path.join(d.getVar("B"), d.getVar("UBOOT_MACHINE").strip()))
+                else:
+                    # Disable menuconfig for multiple configs
+                    d.setVar('KCONFIG_CONFIG_ENABLE_MENUCONFIG', "false")
 }

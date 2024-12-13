@@ -28,3 +28,7 @@ do_install () {
         'SYSCONFDIR=${D}${sysconfdir}' 'mandir=${D}${mandir}' \
         install
 }
+
+# http://errors.yoctoproject.org/Errors/Details/766888/
+# ncftp/3.2.7/ncftp-3.2.7/config.h:358:28: error: passing argument 2 of 'select' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

@@ -7,6 +7,9 @@ SRC_URI = "http://kr.archive.ubuntu.com/ubuntu/pool/main/j/jquery/${BPN}_${PV}~d
 
 SRC_URI[sha256sum] = "e04d192c2356e9d4c2b2c7d83fde9408713212b53c4d106e5b9e46c1a56da33b"
 
+UPSTREAM_CHECK_URI = "http://kr.archive.ubuntu.com/ubuntu/pool/main/j/jquery/"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+
 JQUERYDIR = "${datadir}/javascript/jquery"
 JQUERYDOCDIR = "${docdir}/libjs-jquery"
 

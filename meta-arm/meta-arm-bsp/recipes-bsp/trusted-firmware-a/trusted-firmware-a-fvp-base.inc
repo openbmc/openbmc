@@ -7,7 +7,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/:${THISDIR}/files/fvp-base"
 
 SRC_URI:append = " \
-    file://0001-fdts-fvp-base-Add-stdout-path-and-virtio-net-and-rng.patch \
     file://optee_spmc_maifest.dts;subdir=git/plat/arm/board/fvp/fdts \
 "
 

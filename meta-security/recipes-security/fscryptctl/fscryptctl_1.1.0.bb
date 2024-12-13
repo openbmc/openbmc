@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 SRCREV = "7c80c73c084ce9ea49a03b814dac7a82fd7b4c23"
 SRC_URI = "git://github.com/google/fscryptctl.git;branch=master;protocol=https"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 do_compile:prepend() {
     sed -i 's/fscryptctl\.1//g' ${S}/Makefile

@@ -13,6 +13,8 @@ GITHUB_BASE_URI = "https://github.com/ivmai/libatomic_ops/releases"
 
 SRC_URI[sha256sum] = "d305207fe207f2b3fb5cb4c019da12b44ce3fcbc593dfd5080d867b1a2419b51"
 
+CVE_PRODUCT = "libatomic_ops"
+
 S = "${WORKDIR}/libatomic_ops-${PV}"
 
 ALLOW_EMPTY:${PN} = "1"

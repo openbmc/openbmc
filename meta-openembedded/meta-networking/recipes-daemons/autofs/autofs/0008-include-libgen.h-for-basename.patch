@@ -1,0 +1,59 @@
+From c754222ce955c893e8e3ad75d8c73835950d1931 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 25 Mar 2024 12:04:03 -0700
+Subject: [PATCH] include libgen.h for basename
+
+basename prototype has been removed from string.h from latest musl [1]
+compilers e.g. clang-18 flags the absense of prototype as error. therefore
+include libgen.h for providing it.
+
+[1] https://git.musl-libc.org/cgit/musl/commit/?id=725e17ed6dff4d0cd22487bb64470881e86a92e7
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ daemon/automount.c    | 1 +
+ daemon/master.c       | 1 +
+ modules/lookup_file.c | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/daemon/automount.c b/daemon/automount.c
+index 6cb3b1b..efc2680 100644
+--- a/daemon/automount.c
++++ b/daemon/automount.c
+@@ -21,6 +21,7 @@
+ 
+ #include <dirent.h>
+ #include <getopt.h>
++#include <libgen.h>
+ #include <signal.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/daemon/master.c b/daemon/master.c
+index f2c11e9..1455e40 100644
+--- a/daemon/master.c
++++ b/daemon/master.c
+@@ -21,6 +21,7 @@
+ #include <string.h>
+ #include <memory.h>
+ #include <limits.h>
++#include <libgen.h>
+ #include <signal.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+diff --git a/modules/lookup_file.c b/modules/lookup_file.c
+index 99f2e21..4914395 100644
+--- a/modules/lookup_file.c
++++ b/modules/lookup_file.c
+@@ -15,6 +15,7 @@
+ 
+ #include <stdio.h>
+ #include <malloc.h>
++#include <libgen.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <time.h>
+-- 
+2.25.1
+

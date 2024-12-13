@@ -1,4 +1,4 @@
-From 6c403e3ccaae3bb3fd9d0ad220ed8ea98b2b1354 Mon Sep 17 00:00:00 2001
+From 365fb8ebbefaa3c642e18e3c3a16eeccfa0dcc82 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 7 Apr 2021 00:16:07 -0700
 Subject: [PATCH] Enforce using good old BFD linker
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
-index 1bf62362b611..2b41be8d5a44 100755
+index c34ecfd557c5..153d097a2688 100755
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
 @@ -747,7 +747,7 @@ DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-

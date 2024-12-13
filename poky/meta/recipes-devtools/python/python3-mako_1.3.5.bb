@@ -16,6 +16,7 @@ SRC_URI[sha256sum] = "48dbc20568c1d276a2698b36d968fa76161bf127194907ea6fc594fa81
 
 RDEPENDS:${PN} = "python3-html \
                   python3-markupsafe \
+                  python3-misc \
                   python3-netclient \
                   python3-pygments \
                   python3-threading \

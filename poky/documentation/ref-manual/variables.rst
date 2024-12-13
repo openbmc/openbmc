@@ -13,7 +13,7 @@ system and gives an overview of their function and contents.
 :term:`K <KARCH>` :term:`L <LABELS>` :term:`M <MACHINE>`
 :term:`N <NATIVELSBSTRING>` :term:`O <OBJCOPY>` :term:`P`
 :term:`R <RANLIB>` :term:`S` :term:`T`
-:term:`U <UBOOT_CONFIG>` :term:`V <VOLATILE_LOG_DIR>`
+:term:`U <UBOOT_CONFIG>` :term:`V <VIRTUAL-RUNTIME>`
 :term:`W <WARN_QA>` :term:`X <XSERVER>`
 
 .. glossary::
@@ -1678,8 +1678,20 @@ system and gives an overview of their function and contents.
          variable only in certain contexts (e.g. when building for kernel
          and kernel module recipes).
 
+   :term:`CVE_CHECK_CREATE_MANIFEST`
+      Specifies whether to create a CVE manifest to place in the deploy
+      directory. The default is "1".
+
    :term:`CVE_CHECK_IGNORE`
       This variable is deprecated and should be replaced by :term:`CVE_STATUS`.
+
+   :term:`CVE_CHECK_MANIFEST_JSON`
+      Specifies the path to the CVE manifest in JSON format. See
+      :term:`CVE_CHECK_CREATE_MANIFEST`.
+
+   :term:`CVE_CHECK_MANIFEST_JSON_SUFFIX`
+      Allows to modify the JSON manifest suffix. See
+      :term:`CVE_CHECK_MANIFEST_JSON`.
 
    :term:`CVE_CHECK_REPORT_PATCHED`
       Specifies whether or not the :ref:`ref-classes-cve-check`
@@ -1876,6 +1888,13 @@ system and gives an overview of their function and contents.
          The bias provided by :term:`DEFAULT_PREFERENCE` is weak and is overridden
          by :term:`BBFILE_PRIORITY` if that variable is different between two
          layers that contain different versions of the same recipe.
+
+   :term:`DEFAULT_TIMEZONE`
+      Specifies the time zone set in the image.
+
+      This variable causes the ``tzdata`` package to configure
+      ``${sysconfdir}/localtime`` accordingly. Valid values are all files
+      found in ``/usr/share/zoneinfo`` like ``CET`` or ``Asia/Baku``.
 
    :term:`DEFAULTTUNE`
       The default CPU and Application Binary Interface (ABI) tunings (i.e.
@@ -2507,6 +2526,13 @@ system and gives an overview of their function and contents.
       external tools. See the :ref:`ref-classes-kernel-yocto` class in
       ``meta/classes-recipe`` to see how the variable is used.
 
+   :term:`EXTERNAL_KERNEL_DEVICETREE`
+      When inheriting :ref:`ref-classes-kernel-fitimage` and a
+      :term:`PREFERRED_PROVIDER` for ``virtual/dtb`` set to ``devicetree``, the
+      variable :term:`EXTERNAL_KERNEL_DEVICETREE` can be used to specify a
+      directory containing one or more compiled device tree or device tree
+      overlays to use.
+
    :term:`KERNEL_LOCALVERSION`
       This variable allows to append a string to the version
       of the kernel image. This corresponds to the ``CONFIG_LOCALVERSION``
@@ -2981,26 +3007,32 @@ system and gives an overview of their function and contents.
       :ref:`ref-tasks-patch` task as well.
 
    :term:`FILESYSTEM_PERMS_TABLES`
-      Allows you to define your own file permissions settings table as part
+      Allows you to define your own file permissions settings tables as part
       of your configuration for the packaging process. For example, suppose
       you need a consistent set of custom permissions for a set of groups
       and users across an entire work project. It is best to do this in the
       packages themselves but this is not always possible.
 
       By default, the OpenEmbedded build system uses the ``fs-perms.txt``,
-      which is located in the ``meta/files`` folder in the :term:`Source Directory`.
-      If you create your own file
-      permissions setting table, you should place it in your layer or the
-      distro's layer.
+      ``fs-perms-volatile-log.txt`` and ``fs-perms-volatile-tmp.txt`` which are
+      located in the ``meta/files`` folder in the :term:`Source Directory`. If
+      you create your own permission setting table files, you should place
+      those in your layer.
 
-      You define the :term:`FILESYSTEM_PERMS_TABLES` variable in the
-      ``conf/local.conf`` file, which is found in the :term:`Build Directory`,
-      to point to your custom ``fs-perms.txt``. You can specify more than a
-      single file permissions setting table. The paths you specify to these
-      files must be defined within the :term:`BBPATH` variable.
+      You can override the value of :term:`FILESYSTEM_PERMS_TABLES` variable
+      in your distribution configuration file to point to your custom
+      permission table files. You can specify one or more file permissions
+      setting tables. The paths that you specify to these files must be defined
+      within the :term:`BBPATH` variable.
 
-      For guidance on how to create your own file permissions settings
-      table file, examine the existing ``fs-perms.txt``.
+      In order to disable the volatile log, which is enabled by default, one
+      can remove the ``files/fs-perms-volatile-log.txt`` value from
+      ``FILESYSTEM_PERMS_TABLES``. Similarly, in order to disable the volatile
+      tmp, one can remove the ``files/fs-perms-volatile-tmp.txt`` value.
+
+      For guidance on how to define your own file permissions settings
+      tables, examine the existing ``fs-perms.txt``,
+      ``fs-perms-volatile-log.txt`` and ``fs-perms-volatile-tmp.txt`` files.
 
    :term:`FIT_ADDRESS_CELLS`
       Specifies the value of the ``#address-cells`` value for the
@@ -3778,6 +3810,25 @@ system and gives an overview of their function and contents.
       clear the value of this variable (set the value to ""). For example,
       this is typically cleared in :term:`Initramfs` image recipes.
 
+   :term:`IMAGE_OUTPUT_MANIFEST`
+      When inheriting the :ref:`ref-classes-image` class directly or through the
+      :ref:`ref-classes-core-image` class, the :term:`IMAGE_OUTPUT_MANIFEST`
+      points to a manifest ``json`` file that lists what images were created by
+      various image creation tasks (as defined by the :term:`IMAGE_FSTYPES`
+      variable). It is set in the :ref:`ref-classes-image` class as follows::
+
+          IMAGE_OUTPUT_MANIFEST = "${IMAGE_OUTPUT_MANIFEST_DIR}/manifest.json"
+
+   :term:`IMAGE_OUTPUT_MANIFEST_DIR`
+      When inheriting the :ref:`ref-classes-image` class directly or through the
+      :ref:`ref-classes-core-image` class, the :term:`IMAGE_OUTPUT_MANIFEST_DIR` points to
+      a directory that stores a manifest ``json`` file that lists what
+      images were created by various image creation tasks (as defined by the
+      :term:`IMAGE_FSTYPES` variable). It is set in the :ref:`ref-classes-image`
+      class as follows::
+
+          IMAGE_OUTPUT_MANIFEST_DIR = "${WORKDIR}/deploy-image-output-manifest"
+
    :term:`IMAGE_OVERHEAD_FACTOR`
       Defines a multiplier that the build system applies to the initial
       image size for cases when the multiplier times the returned disk
@@ -3964,6 +4015,7 @@ system and gives an overview of their function and contents.
       - wic.bz2
       - wic.gz
       - wic.lzma
+      - wic.zst
 
       For more information about these types of images, see
       ``meta/classes-recipe/image_types*.bbclass`` in the :term:`Source Directory`.
@@ -3987,6 +4039,16 @@ system and gives an overview of their function and contents.
       Recipes inheriting the :ref:`ref-classes-image` class should copy
       files to be deployed into :term:`IMGDEPLOYDIR`, and the class will take
       care of copying them into :term:`DEPLOY_DIR_IMAGE` afterwards.
+
+   :term:`IMGMANIFESTDIR`
+      When inheriting the :ref:`ref-classes-image` class directly or through the
+      :ref:`ref-classes-core-image` class, the :term:`IMGMANIFESTDIR` setting
+      points to a temporary area that stores manifest ``json`` files, that list
+      what images were created by various images creation tasks (as defined by
+      the :term:`IMAGE_FSTYPES` variable). It is set in the
+      :ref:`ref-classes-image` class as follows::
+
+          IMGMANIFESTDIR = "${WORKDIR}/image-task-manifest"
 
    :term:`INCOMPATIBLE_LICENSE`
       Specifies a space-separated list of license names (as they would
@@ -5705,6 +5767,13 @@ system and gives an overview of their function and contents.
    :term:`OPKG_MAKE_INDEX_EXTRA_PARAMS`
       Specifies extra parameters for the ``opkg-make-index`` command.
 
+   :term:`OPKGBUILDCMD`
+      The variable :term:`OPKGBUILDCMD` specifies the command used to build opkg
+      packages when using the :ref:`ref-classes-package_ipk` class. It is
+      defined in :ref:`ref-classes-package_ipk` as::
+
+          OPKGBUILDCMD ??= 'opkg-build -Z zstd -a "${ZSTD_DEFAULTS}"'
+
    :term:`OVERLAYFS_ETC_DEVICE`
       When the :ref:`ref-classes-overlayfs-etc` class is
       inherited, specifies the device to be mounted for the read/write
@@ -6815,6 +6884,11 @@ system and gives an overview of their function and contents.
       service <dev-manual/packages:working with a pr service>`. You can
       set :term:`PRSERV_HOST` to other values to use a remote PR service.
 
+   :term:`PRSERV_UPSTREAM`
+      This variable can be used to specify an upstream PR server for the local
+      PR server to connect to, in the form of ``host:port``.
+
+      This makes it possible to implement local fixes to an upstream package.
 
    :term:`PSEUDO_IGNORE_PATHS`
       A comma-separated (without spaces) list of path prefixes that should be ignored
@@ -7086,7 +7160,11 @@ system and gives an overview of their function and contents.
       The default value is ``"${WORKDIR}/recipe-sysroot-native"``.
       Do not modify it.
 
-   :term:`RECIPE_UPDATE_EXTRA_TASKS`
+   :term:`RECIPE_UPGRADE_EXTRA_TASKS`
+      When upgrading a recipe with ``devtool upgrade``, the variable
+      :term:`RECIPE_UPGRADE_EXTRA_TASKS` specifies a space-delimited list of
+      tasks to run after the new sources have been unpacked.
+
       For some recipes, after the new source has been unpacked, additional tasks
       may need to be run during an upgrade. A good example of this is recipes
       which inherit :ref:`ref-classes-cargo-update-recipe-crates`, where the
@@ -7116,6 +7194,41 @@ system and gives an overview of their function and contents.
 
       If both :term:`REQUIRED_VERSION` and :term:`PREFERRED_VERSION` are set
       for the same recipe, the :term:`REQUIRED_VERSION` value applies.
+
+   :term:`RETAIN_DIRS_ALWAYS`
+      When inheriting the :ref:`ref-classes-retain` class, this variable holds
+      space-separated recipe-specific directories to always save in a tarball
+      whether the recipe build has failed or not.
+
+   :term:`RETAIN_DIRS_FAILURE`
+      When inheriting the :ref:`ref-classes-retain` class, this variable holds
+      space-separated recipe-specific directories to save in a tarball on
+      failure of the recipe's build.
+
+   :term:`RETAIN_DIRS_GLOBAL_ALWAYS`
+      When inheriting the :ref:`ref-classes-retain` class, this variable holds
+      space-separated directories that are not specific to a recipe to save in a
+      tarball whether the build has failed or not.
+
+   :term:`RETAIN_DIRS_GLOBAL_FAILURE`
+      When inheriting the :ref:`ref-classes-retain` class, this variable holds
+      space-separated directories that are not specific to a recipe to save in a
+      tarball on build failure.
+
+   :term:`RETAIN_ENABLED`
+      Disables the creation of a tarball of the work directory done by the
+      :ref:`ref-classes-retain` class. Can be set to specific recipes to disable
+      the class when the class was inherited globally with :term:`INHERIT`.
+
+   :term:`RETAIN_OUTDIR`
+      When inheriting the :ref:`ref-classes-retain` class, this variable
+      specifies the directory where to save the tarball of the work directory.
+      The default directory is ``${TMPDIR}/retain``.
+
+   :term:`RETAIN_TARBALL_SUFFIX`
+      When inheriting the :ref:`ref-classes-retain` class, this variable
+      specifies the suffix of the tarball of the work directory. The default
+      suffix is ``${DATETIME}.tar.gz``.
 
    :term:`RM_WORK_EXCLUDE`
       With :ref:`ref-classes-rm-work` enabled, this variable
@@ -7765,6 +7878,53 @@ system and gives an overview of their function and contents.
          If you add an inappropriate variable to this list, the software
          might break at runtime if the interface of the recipe was changed
          after the other had been built.
+
+   :term:`SIGGEN_LOCKEDSIGS`
+     The list of locked tasks, with the form::
+
+       SIGGEN_LOCKEDSIGS += "<package>:<task>:<signature>"
+
+     If ``<signature>`` exists for the specified ``<task>`` and ``<package>``
+     in the sstate cache, BitBake will use the cached output instead of
+     rebuilding the ``<task>``. If it does not exist, BitBake will build the
+     ``<task>`` and the sstate cache will be used next time.
+
+     Example::
+
+       SIGGEN_LOCKEDSIGS += "bc:do_compile:09772aa4532512baf96d433484f27234d4b7c11dd9cda0d6f56fa1b7ce6f25f0"
+
+     You can obtain the signature of all the tasks for the recipe ``bc`` using::
+
+       bitbake -S none bc
+
+     Then you can look at files in ``build/tmp/stamps/<arch>/bc`` and look for
+     files like: ``<PV>.do_compile.sigdata.09772aa4532512baf96d433484f27234d4b7c11dd9cda0d6f56fa1b7ce6f25f0``.
+
+     Alternatively, you can also use :doc:`bblock </dev-manual/bblock>` to
+     generate this line for you.
+
+   :term:`SIGGEN_LOCKEDSIGS_TASKSIG_CHECK`
+     Specifies the debug level of task signature check. 3 levels are supported:
+
+     * ``info``: displays a "Note" message to remind the user that a task is locked
+       and the current signature matches the locked one.
+     * ``warn``: displays a "Warning" message if a task is locked and the current
+       signature does not match the locked one.
+     * ``error``: same as warn but displays an "Error" message and aborts.
+
+   :term:`SIGGEN_LOCKEDSIGS_TYPES`
+     Allowed overrides for :term:`SIGGEN_LOCKEDSIGS`. This is mainly used
+     for architecture specific locks. A common value for
+     :term:`SIGGEN_LOCKEDSIGS_TYPES` is ``${PACKAGE_ARCHS}``::
+
+       SIGGEN_LOCKEDSIGS_TYPES += "${PACKAGE_ARCHS}"
+
+       SIGGEN_LOCKEDSIGS_core2-64 += "bc:do_compile:09772aa4532512baf96d433484f27234d4b7c11dd9cda0d6f56fa1b7ce6f25f0"
+       SIGGEN_LOCKEDSIGS_cortexa57 += "bc:do_compile:12178eb6d55ef602a8fe638e49862fd247e07b228f0f08967697b655bfe4bb61"
+
+     Here, the ``do_compile`` task from ``bc`` will be locked only for
+     ``core2-64`` and ``cortexa57`` but not for other architectures such as
+     ``mips32r2``.
 
    :term:`SITEINFO_BITS`
       Specifies the number of bits for the target system CPU. The value
@@ -8577,6 +8737,35 @@ system and gives an overview of their function and contents.
              /sysroot-only \
              "
 
+      Consider the following example in which you need to manipulate this variable.
+      Assume you have a recipe ``A`` that provides a shared library ``.so.*`` that is
+      installed into a custom folder other than "``${libdir}``"
+      or "``${base_libdir}``", let's say "``/opt/lib``".
+
+      .. note::
+
+         This is not a recommended way to deal with shared libraries, but this
+         is just to show the usefulness of setting :term:`SYSROOT_DIRS`.
+
+      When a recipe ``B`` :term:`DEPENDS` on ``A``, it means what is in
+      :term:`SYSROOT_DIRS` will be copied from :term:`D` of the recipe ``A``
+      into ``B``'s :term:`SYSROOT_DESTDIR` that is "``${WORKDIR}/sysroot-destdir``".
+
+      Now, since ``/opt/lib`` is not in :term:`SYSROOT_DIRS`, it will never be copied to
+      ``A``'s :term:`RECIPE_SYSROOT`, which is "``${WORKDIR}/recipe-sysroot``". So,
+      the linking process will fail.
+
+      To fix this, you need to add ``/opt/lib`` to :term:`SYSROOT_DIRS`::
+
+         SYSROOT_DIRS:append = " /opt/lib"
+
+      .. note::
+         Even after setting ``/opt/lib`` to :term:`SYSROOT_DIRS`, the linking process will still fail
+         because the linker does not know that location, since :term:`TARGET_LDFLAGS`
+         doesn't contain it (if your recipe is for the target). Therefore, so you should add::
+
+            TARGET_LDFLAGS:append = " -L${RECIPE_SYSROOT}/opt/lib"
+
    :term:`SYSROOT_DIRS_IGNORE`
       Directories that are not staged into the sysroot by the
       :ref:`ref-tasks-populate_sysroot` task. You
@@ -8599,35 +8788,6 @@ system and gives an overview of their function and contents.
              ${datadir}/terminfo \
              ${libdir}/${BPN}/ptest \
              "
-
-      Consider the following example in which you need to manipulate this variable.
-      Assume you have a recipe ``A`` that provides a shared library ``.so.*`` that is
-      installed into a custom folder other than "``${libdir}``"
-      or "``${base_libdir}``", let's say "``/opt/lib``".
-
-      .. note::
-
-         This is not a recommended way to deal with shared libraries, but this
-         is just to show the usefulness of setting :term:`SYSROOT_DIRS`.
-
-      When a recipe ``B`` :term:`DEPENDS` on ``A``, it means what is in
-      :term:`SYSROOT_DIRS` will be copied from :term:`D` of the recipe ``B``
-      into ``B``'s :term:`SYSROOT_DESTDIR` that is "``${WORKDIR}/sysroot-destdir``".
-
-      Now, since ``/opt/lib`` is not in :term:`SYSROOT_DIRS`, it will never be copied to
-      ``A``'s :term:`RECIPE_SYSROOT`, which is "``${WORKDIR}/recipe-sysroot``". So,
-      the linking process will fail.
-
-      To fix this, you need to add ``/opt/lib`` to :term:`SYSROOT_DIRS`::
-
-         SYSROOT_DIRS:append = " /opt/lib"
-
-      .. note::
-         Even after setting ``/opt/lib`` to :term:`SYSROOT_DIRS`, the linking process will still fail
-         because the linker does not know that location, since :term:`TARGET_LDFLAGS`
-         doesn't contain it (if your recipe is for the target). Therefore, so you should add::
-
-            TARGET_LDFLAGS:append = " -L${RECIPE_SYSROOT}/opt/lib"
 
    :term:`SYSROOT_DIRS_NATIVE`
       Extra directories staged into the sysroot by the
@@ -8935,19 +9095,6 @@ system and gives an overview of their function and contents.
 
       You can select "glibc", "musl", "newlib", or "baremetal".
 
-   :term:`TCLIBCAPPEND`
-      Specifies a suffix to be appended onto the :term:`TMPDIR` value. The
-      suffix identifies the ``libc`` variant for building. When you are
-      building for multiple variants with the same :term:`Build Directory`,
-      this mechanism ensures that output for different ``libc`` variants is
-      kept separate to avoid potential conflicts.
-
-      In the ``defaultsetup.conf`` file, the default value of
-      :term:`TCLIBCAPPEND` is "-${TCLIBC}". However, distros such as poky,
-      which normally only support one ``libc`` variant, set
-      :term:`TCLIBCAPPEND` to "" in their distro configuration file resulting
-      in no suffix being applied.
-
    :term:`TCMODE`
       Specifies the toolchain selector. :term:`TCMODE` controls the
       characteristics of the generated packages and images by telling the
@@ -9206,6 +9353,11 @@ system and gives an overview of their function and contents.
       ":ref:`dev-manual/runtime-testing:performing automated runtime testing`"
       section in the Yocto Project Development Tasks Manual and the
       ":ref:`ref-classes-testimage`" section.
+
+   :term:`TESTIMAGE_FAILED_QA_ARTIFACTS`
+      When using the :ref:`ref-classes-testimage` class, the variable
+      :term:`TESTIMAGE_FAILED_QA_ARTIFACTS`  lists space-separated paths on the
+      target to retrieve onto the host.
 
    :term:`THISDIR`
       The directory in which the file BitBake is currently parsing is
@@ -9974,26 +10126,6 @@ system and gives an overview of their function and contents.
       image definition::
 
          PACKAGE_INSTALL = "${INITRAMFS_SCRIPTS} ${VIRTUAL-RUNTIME_base-utils} base-passwd"
-
-   :term:`VOLATILE_LOG_DIR`
-      Specifies the persistence of the target's ``/var/log`` directory,
-      which is used to house postinstall target log files.
-
-      By default, :term:`VOLATILE_LOG_DIR` is set to "yes", which means the
-      file is not persistent. You can override this setting by setting the
-      variable to "no" to make the log directory persistent.
-
-   :term:`VOLATILE_TMP_DIR`
-      Specifies the persistence of the target's ``/tmp`` directory.
-
-      By default, :term:`VOLATILE_TMP_DIR` is set to "yes", in which case
-      ``/tmp`` links to a directory which resides in RAM in a ``tmpfs``
-      filesystem.
-
-      If instead, you want the ``/tmp`` directory to be persistent, set the
-      variable to "no" to make it a regular directory in the root filesystem.
-
-      This supports both sysvinit and systemd based systems.
 
    :term:`WARN_QA`
       Specifies the quality assurance checks whose failures are reported as

@@ -1,4 +1,4 @@
-From 580ef6cae2d353f3aa5d5c52d6614bdc1df50f08 Mon Sep 17 00:00:00 2001
+From b66c973e004e0c458ef275b41ac2d8d9ff33d29f Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 23 Dec 2013 13:38:34 +0000
 Subject: [PATCH] e2fsprogs: silence debugfs
@@ -8,16 +8,15 @@ filesystems at rootfs time.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-
 ---
  debugfs/debugfs.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/debugfs/debugfs.c b/debugfs/debugfs.c
-index 9b6321dc..8ebf3ddb 100644
+index 909c1df3..0842369e 100644
 --- a/debugfs/debugfs.c
 +++ b/debugfs/debugfs.c
-@@ -2516,7 +2516,7 @@ static int source_file(const char *cmd_file, int ss_idx)
+@@ -2529,7 +2529,7 @@ static int source_file(const char *cmd_file, int ss_idx)
  		cp = strchr(buf, '\r');
  		if (cp)
  			*cp = 0;

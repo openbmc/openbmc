@@ -1,0 +1,107 @@
+From 42a97ee7100ad158d4b1ba6133ea13cc864a567f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?=
+ <vesa.jaaskelainen@vaisala.com>
+Date: Sun, 1 Sep 2024 09:23:10 +0300
+Subject: [PATCH 1/5] Extract extension architecture name resolvation code as
+ helper
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This commit introduces helper InterpreterConfig.get_python_ext_arch() that
+can be used to determine the extension architecture name python uses in
+`ext_suffix` for this architecture.
+
+Upstream-Status: Backport [https://github.com/PyO3/maturin/commit/42a97ee7100ad158d4b1ba6133ea13cc864a567f]
+
+Signed-off-by: Vesa Jääskeläinen <vesa.jaaskelainen@vaisala.com>
+---
+ src/python_interpreter/config.rs | 18 ++++++------------
+ src/target.rs                    | 16 ++++++++++++++++
+ 2 files changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/src/python_interpreter/config.rs b/src/python_interpreter/config.rs
+index 912f9218..d76606f2 100644
+--- a/src/python_interpreter/config.rs
++++ b/src/python_interpreter/config.rs
+@@ -47,15 +47,7 @@ impl InterpreterConfig {
+             // Python 2 is not supported
+             return None;
+         }
+-        let python_arch = if matches!(target.target_arch(), Arch::Armv6L | Arch::Armv7L) {
+-            "arm"
+-        } else if matches!(target.target_arch(), Arch::Powerpc64Le) && python_impl == PyPy {
+-            "ppc_64"
+-        } else if matches!(target.target_arch(), Arch::X86) && python_impl == PyPy {
+-            "x86"
+-        } else {
+-            target.get_python_arch()
+-        };
++        let python_ext_arch = target.get_python_ext_arch(python_impl);
+         // See https://github.com/pypa/auditwheel/issues/349
+         let target_env = match python_impl {
+             CPython => {
+@@ -77,7 +69,7 @@ impl InterpreterConfig {
+                 let ldversion = format!("{}{}{}", major, minor, abiflags);
+                 let ext_suffix = format!(
+                     ".cpython-{}-{}-linux-{}.so",
+-                    ldversion, python_arch, target_env
++                    ldversion, python_ext_arch, target_env
+                 );
+                 Some(Self {
+                     major,
+@@ -90,7 +82,8 @@ impl InterpreterConfig {
+             }
+             (Os::Linux, PyPy) => {
+                 let abi_tag = format!("pypy{}{}-{}", major, minor, PYPY_ABI_TAG);
+-                let ext_suffix = format!(".{}-{}-linux-{}.so", abi_tag, python_arch, target_env);
++                let ext_suffix =
++                    format!(".{}-{}-linux-{}.so", abi_tag, python_ext_arch, target_env);
+                 Some(Self {
+                     major,
+                     minor,
+@@ -204,7 +197,8 @@ impl InterpreterConfig {
+             }
+             (Os::Emscripten, CPython) => {
+                 let ldversion = format!("{}{}", major, minor);
+-                let ext_suffix = format!(".cpython-{}-{}-emscripten.so", ldversion, python_arch);
++                let ext_suffix =
++                    format!(".cpython-{}-{}-emscripten.so", ldversion, python_ext_arch);
+                 Some(Self {
+                     major,
+                     minor,
+diff --git a/src/target.rs b/src/target.rs
+index dc7df0cf..84bae559 100644
+--- a/src/target.rs
++++ b/src/target.rs
+@@ -1,4 +1,5 @@
+ use crate::cross_compile::is_cross_compiling;
++use crate::python_interpreter::InterpreterKind;
+ use crate::PlatformTag;
+ use anyhow::{anyhow, bail, format_err, Result};
+ use platform_info::*;
+@@ -368,6 +369,21 @@ impl Target {
+         }
+     }
+ 
++    /// Returns the extension architecture name python uses in `ext_suffix` for this architecture.
++    pub fn get_python_ext_arch(&self, python_impl: InterpreterKind) -> &str {
++        if matches!(self.target_arch(), Arch::Armv6L | Arch::Armv7L) {
++            "arm"
++        } else if matches!(self.target_arch(), Arch::Powerpc64Le)
++            && python_impl == InterpreterKind::PyPy
++        {
++            "ppc_64"
++        } else if matches!(self.target_arch(), Arch::X86) && python_impl == InterpreterKind::PyPy {
++            "x86"
++        } else {
++            self.get_python_arch()
++        }
++    }
++
+     /// Returns the name python uses in `sys.platform` for this os
+     pub fn get_python_os(&self) -> &str {
+         match self.os {
+-- 
+2.34.1
+

@@ -378,7 +378,6 @@ class SStateHashSameSigs(SStateBase):
         self.write_config("""
 MACHINE = "qemux86"
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
-TCLIBCAPPEND = ""
 BUILD_ARCH = "x86_64"
 BUILD_OS = "linux"
 SDKMACHINE = "x86_64"
@@ -390,7 +389,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         self.write_config("""
 MACHINE = "qemux86"
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
-TCLIBCAPPEND = ""
 BUILD_ARCH = "i686"
 BUILD_OS = "linux"
 SDKMACHINE = "i686"
@@ -426,7 +424,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
 
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-TCLIBCAPPEND = \"\"
 NATIVELSBSTRING = \"DistroA\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
@@ -434,7 +431,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         bitbake("core-image-weston -S none")
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-TCLIBCAPPEND = \"\"
 NATIVELSBSTRING = \"DistroB\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
@@ -463,17 +459,17 @@ class SStateHashSameSigs2(SStateBase):
 
         configA = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86-64\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
         #OLDEST_KERNEL is arch specific so set to a different value here for testing
         configB = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemuarm\"
 OLDEST_KERNEL = \"3.3.0\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
+ERROR_QA:append = " somenewoption"
+WARN_QA:append = " someotheroption"
 """
         self.sstate_common_samesigs(configA, configB, allarch=True)
 
@@ -484,7 +480,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
 
         configA = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86-64\"
 require conf/multilib.conf
 MULTILIBS = \"multilib:lib32\"
@@ -493,7 +488,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
         configB = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemuarm\"
 require conf/multilib.conf
 MULTILIBS = \"\"
@@ -511,7 +505,6 @@ class SStateHashSameSigs3(SStateBase):
 
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
@@ -522,7 +515,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         bitbake("world meta-toolchain -S none")
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86copy\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
@@ -559,7 +551,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
 
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
@@ -570,7 +561,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         bitbake("binutils-native  -S none")
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86copy\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
@@ -598,7 +588,6 @@ class SStateHashSameSigs4(SStateBase):
 
         self.write_config("""
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
-TCLIBCAPPEND = ""
 BB_NUMBER_THREADS = "${@oe.utils.cpu_count()}"
 PARALLEL_MAKE = "-j 1"
 DL_DIR = "${TOPDIR}/download1"
@@ -613,7 +602,6 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         bitbake("world meta-toolchain -S none")
         self.write_config("""
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
-TCLIBCAPPEND = ""
 BB_NUMBER_THREADS = "${@oe.utils.cpu_count()+1}"
 PARALLEL_MAKE = "-j 2"
 DL_DIR = "${TOPDIR}/download2"
@@ -724,7 +712,6 @@ class SStateFindSiginfo(SStateBase):
         """
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstates-findsiginfo\"
-TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86-64\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
@@ -933,8 +920,7 @@ class SStateCheckObjectPresence(SStateBase):
         # these get influnced by IMAGE_FSTYPES tweaks in yocto-autobuilder-helper's config.json (on x86-64)
         # additionally, they depend on noexec (thus, absent stamps) package, install, etc. image tasks,
         # which makes tracing other changes difficult
-        exceptions += ["{}.*create_spdx".format(t) for t in targets.split()]
-        exceptions += ["{}.*create_runtime_spdx".format(t) for t in targets.split()]
+        exceptions += ["{}.*create_.*spdx".format(t) for t in targets.split()]
 
         output_l = output.splitlines()
         for l in output_l:
@@ -977,7 +963,7 @@ class SStateMirrors(SStateCheckObjectPresence):
             self.config_sstate(True)
             self.append_config("""
 MACHINE = "{}"
-BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
+BB_HASHSERVE_UPSTREAM = "hashserv.yoctoproject.org:8686"
 SSTATE_MIRRORS ?= "file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH"
 """.format(machine))
         else:
@@ -992,12 +978,10 @@ MACHINE = "{}"
 
     def test_cdn_mirror_qemux86_64(self):
         exceptions = []
-        self.run_test("qemux86-64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions, ignore_errors = True)
         self.run_test("qemux86-64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
 
     def test_cdn_mirror_qemuarm64(self):
         exceptions = []
-        self.run_test("qemuarm64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions, ignore_errors = True)
         self.run_test("qemuarm64", "core-image-minimal core-image-full-cmdline core-image-sato-sdk", exceptions)
 
     def test_local_cache_qemux86_64(self):

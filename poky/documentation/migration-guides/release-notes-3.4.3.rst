@@ -6,12 +6,12 @@ Release notes for 3.4.3 (honister)
 Security Fixes in 3.4.3
 ~~~~~~~~~~~~~~~~~~~~~~~
 
--  ghostscript: fix :cve:`2021-3781`
--  ghostscript: fix :cve:`2021-45949`
--  tiff: Add backports for two CVEs from upstream (:cve:`2022-0561` & :cve:`2022-0562`)
--  gcc : Fix :cve:`2021-46195`
+-  ghostscript: fix :cve_nist:`2021-3781`
+-  ghostscript: fix :cve_nist:`2021-45949`
+-  tiff: Add backports for two CVEs from upstream (:cve_nist:`2022-0561` & :cve_nist:`2022-0562`)
+-  gcc : Fix :cve_nist:`2021-46195`
 -  virglrenderer: fix `CVE-2022-0135 <https://security-tracker.debian.org/tracker/CVE-2022-0135>`__ and `CVE-2022-0175 <https://security-tracker.debian.org/tracker/CVE-2022-0175>`__
--  binutils: Add fix for :cve:`2021-45078`
+-  binutils: Add fix for :cve_nist:`2021-45078`
 
 
 Fixes in 3.4.3

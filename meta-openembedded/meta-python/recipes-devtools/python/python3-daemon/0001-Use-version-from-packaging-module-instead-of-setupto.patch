@@ -1,0 +1,44 @@
+From b7418ab4a3232431373bf0680c6b74fef06910de Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 Aug 2024 22:44:08 -0700
+Subject: [PATCH] Use version from packaging module instead of setuptools extern
+
+Fixes build problems when using PEP-575 build backend
+
+
+Drop the patch on upgrading to >= 3.0.2
+
+Upstream-Status: Backport [https://pagure.io/fork/khemraj/python-daemon/c/3bbc46967d35cd7e05677018bdc9d552efaeea3e?branch=main]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test_version.py | 2 +-
+ version.py      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test_version.py b/test_version.py
+index c43cd36..d0a124d 100644
+--- a/test_version.py
++++ b/test_version.py
+@@ -23,7 +23,7 @@ import docutils.writers
+ import setuptools
+ import setuptools.command
+ import setuptools.dist
+-from setuptools.extern.packaging.version import InvalidVersion
++from packaging.version import InvalidVersion
+ import testscenarios
+ import testtools
+ 
+diff --git a/version.py b/version.py
+index 20d3ef3..fbdc462 100644
+--- a/version.py
++++ b/version.py
+@@ -36,7 +36,7 @@ import setuptools.command.build
+ import setuptools.command.build_py
+ import setuptools.command.egg_info
+ import setuptools.dist
+-import setuptools.extern.packaging.version
++import packaging.version
+ 
+ 
+ def ensure_class_bases_begin_with(namespace, class_name, base_class):

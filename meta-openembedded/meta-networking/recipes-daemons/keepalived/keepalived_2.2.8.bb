@@ -11,6 +11,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "http://www.keepalived.org/software/${BP}.tar.gz \
+           file://0001-configure.ac-Do-not-emit-compiler-flags-into-object-.patch \
            "
 SRC_URI[sha256sum] = "85882eb62974f395d4c631be990a41a839594a7e62fbfebcb5649a937a7a1bb6"
 UPSTREAM_CHECK_URI = "https://github.com/acassen/keepalived/releases"
@@ -29,6 +30,10 @@ PACKAGECONFIG[systemd] = "--with-init=systemd --with-systemdsystemunitdir=${syst
 EXTRA_OEMAKE = "initdir=${sysconfdir}/init.d"
 
 export EXTRA_CFLAGS = "${CFLAGS}"
+
+do_configure:append() {
+    sed -i -e 's|${WORKDIR}|<scrubbed>|g' ${B}/lib/config.h
+}
 
 do_install:append() {
     if [ -f ${D}${sysconfdir}/init.d/${BPN} ]; then

@@ -53,9 +53,11 @@ TFM_SIGN_PRIVATE_KEY = "${libdir}/tfm-scripts/root-RSA-3072_1.pem"
 RE_IMAGE_OFFSET = "0x1000"
 
 # Offsets for the .nopt image generation
-TFM_OFFSET = "102400"
-FIP_OFFSET = "479232"
-KERNEL_OFFSET = "2576384"
+# These offset values have to be aligned with those in
+# meta-arm/meta-arm-bsp/wic/corstone1000-flash-firmware.wks.in
+TFM_OFFSET = "147456"
+FIP_OFFSET = "475136"
+KERNEL_OFFSET = "2572288"
 
 do_sign_images() {
     # Sign TF-A BL2

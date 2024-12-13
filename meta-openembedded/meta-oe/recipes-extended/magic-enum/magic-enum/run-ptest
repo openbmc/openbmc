@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2024 Bosch Sicherheitssysteme GmbH
+#
+# SPDX-License-Identifier: MIT
+
+fail_count=0
+all_count=0
+
+for test_suite in tests/test_*
+do
+    if "./$test_suite"
+    then
+        echo "PASS: $test_suite"
+    else
+        echo "FAIL: $test_suite"
+        fail_count=$((fail_count + 1))
+    fi
+    all_count=$((all_count + 1))
+done
+
+if [ $fail_count -eq 0 ]
+then
+    echo "PASS: All $all_count tests passed"
+else
+    echo "FAIL: $fail_count of $all_count tests failed"
+fi

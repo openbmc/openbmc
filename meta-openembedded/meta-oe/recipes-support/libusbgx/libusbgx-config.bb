@@ -4,6 +4,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 
 SRC_URI = "file://usbgx.default"
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 

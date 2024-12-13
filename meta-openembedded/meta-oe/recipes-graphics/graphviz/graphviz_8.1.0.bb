@@ -30,6 +30,9 @@ SRC_URI:append:class-nativesdk = "\
 "
 SRC_URI[sha256sum] = "d593695fdaa8a19297523b679ad13d3ef2027b0b7f14cc2bc23e77969ed81565"
 
+UPSTREAM_CHECK_URI = "https://graphviz.org/download/"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+
 PACKAGECONFIG ??= "librsvg"
 PACKAGECONFIG[librsvg] = "--with-librsvg,--without-librsvg,librsvg"
 

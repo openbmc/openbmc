@@ -1,7 +1,7 @@
 Compile warning fixes from Debian
 
 Signed-off-by: Adrian Bunk <bunk@stusta.de>
-Upstream-Status: Inappropriate [upstream is dead]
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 --- a/options.c
 +++ b/options.c

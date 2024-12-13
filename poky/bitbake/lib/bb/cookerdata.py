@@ -254,9 +254,16 @@ class CookerDataBuilder(object):
         self.data = self.basedata
         self.mcdata = {}
 
+    def calc_datastore_hashes(self):
+        data_hash = hashlib.sha256()
+        data_hash.update(self.data.get_hash().encode('utf-8'))
+        multiconfig = (self.data.getVar("BBMULTICONFIG") or "").split()
+        for config in multiconfig:
+            data_hash.update(self.mcdata[config].get_hash().encode('utf-8'))
+        self.data_hash = data_hash.hexdigest()
+
     def parseBaseConfiguration(self, worker=False):
         mcdata = {}
-        data_hash = hashlib.sha256()
         try:
             self.data = self.parseConfigurationFiles(self.prefiles, self.postfiles)
 
@@ -279,7 +286,6 @@ class CookerDataBuilder(object):
                 bb.event.fire(bb.event.ConfigParsed(), self.data)
 
             bb.parse.init_parser(self.data)
-            data_hash.update(self.data.get_hash().encode('utf-8'))
             mcdata[''] = self.data
 
             multiconfig = (self.data.getVar("BBMULTICONFIG") or "").split()
@@ -289,11 +295,9 @@ class CookerDataBuilder(object):
                 parsed_mcdata = self.parseConfigurationFiles(self.prefiles, self.postfiles, config)
                 bb.event.fire(bb.event.ConfigParsed(), parsed_mcdata)
                 mcdata[config] = parsed_mcdata
-                data_hash.update(parsed_mcdata.get_hash().encode('utf-8'))
             if multiconfig:
                 bb.event.fire(bb.event.MultiConfigParsed(mcdata), self.data)
 
-            self.data_hash = data_hash.hexdigest()
         except bb.data_smart.ExpansionError as e:
             logger.error(str(e))
             raise bb.BBHandledException()
@@ -328,6 +332,7 @@ class CookerDataBuilder(object):
         for mc in mcdata:
             self.mcdata[mc] = bb.data.createCopy(mcdata[mc])
         self.data = self.mcdata['']
+        self.calc_datastore_hashes()
 
     def reset(self):
         # We may not have run parseBaseConfiguration() yet

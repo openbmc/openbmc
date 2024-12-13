@@ -19,3 +19,8 @@ EXTRA_OECONF += "--with-jpeg-prefix=${STAGING_INCDIR} \
                  --without-cdk \
 "
 
+INSANE_SKIP:${PN} = "already-stripped"
+
+do_install:append() {
+	sed -i -e 's#${RECIPE_SYSROOT}##g' ${D}${bindir}/gphoto2
+}

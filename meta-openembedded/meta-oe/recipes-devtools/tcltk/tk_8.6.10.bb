@@ -26,6 +26,9 @@ SRC_URI = "\
 SRC_URI[md5sum] = "602a47ad9ecac7bf655ada729d140a94"
 SRC_URI[sha256sum] = "63df418a859d0a463347f95ded5cd88a3dd3aaa1ceecaeee362194bc30f3e386"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/tcl/files/Tcl/"
+UPSTREAM_CHECK_REGEX = "Tcl/(?P<pver>\d+(\.\d+)+)/"
+
 S = "${WORKDIR}/${BPN}${PV}/unix"
 
 DEBUG_PREFIX_MAP += "-fdebug-prefix-map=${S}/../=${TARGET_DBGSRC_DIR}/.."

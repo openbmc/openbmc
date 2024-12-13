@@ -3,7 +3,7 @@ From: Emekcan Aras <Emekcan.Aras@arm.com>
 Date: Wed, 3 Apr 2024 16:05:07 +0100
 Subject: [PATCH] increase tzdram size
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://github.com/OP-TEE/optee_os/commit/258b72d242cd1a8ae56c87f9572a0624084785c7]
 Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
 Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 ---

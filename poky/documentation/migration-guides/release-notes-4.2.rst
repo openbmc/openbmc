@@ -38,7 +38,7 @@ New Features / Enhancements in 4.2
 
 -  New variables:
 
-   -  :term:`VOLATILE_TMP_DIR` allows to specify
+   -  ``VOLATILE_TMP_DIR`` allows to specify
       whether ``/tmp`` should be on persistent storage
       or in RAM.
 
@@ -348,39 +348,39 @@ The following corrections have been made to the :term:`LICENSE` values set by re
 Security Fixes in 4.2
 ~~~~~~~~~~~~~~~~~~~~~
 
-- binutils: :cve:`2022-4285`, :cve_mitre:`2023-25586`
-- curl: :cve:`2022-32221`, :cve:`2022-35260`, :cve:`2022-42915`, :cve:`2022-42916`
-- epiphany: :cve:`2023-26081`
-- expat: :cve:`2022-43680`
-- ffmpeg: :cve:`2022-3964`, :cve:`2022-3965`
-- git: :cve:`2022-39260`, :cve:`2022-41903`, :cve:`2022-23521`, :cve:`2022-41953` (ignored)
-- glibc: :cve:`2023-25139` (ignored)
-- go: :cve:`2023-24532`, :cve:`2023-24537`
-- grub2: :cve:`2022-2601`, :cve:`2022-3775`, :cve_mitre:`2022-28736`
-- inetutils: :cve:`2019-0053`
-- less: :cve:`2022-46663`
-- libarchive: :cve:`2022-36227`
-- libinput: :cve:`2022-1215`
-- libpam: :cve:`2022-28321`
-- libpng: :cve:`2019-6129`
-- libx11: :cve:`2022-3554`
-- openssh: :cve:`2023-28531`
-- openssl: :cve:`2022-3358`, :cve:`2022-3786`, :cve:`2022-3602`, :cve:`2022-3996`, :cve:`2023-0286`, :cve:`2022-4304`, :cve:`2022-4203`, :cve:`2023-0215`, :cve:`2022-4450`, :cve:`2023-0216`, :cve:`2023-0217`, :cve:`2023-0401`, :cve:`2023-0464`
-- ppp: :cve:`2022-4603`
-- python3-cryptography{-vectors}: :cve:`2022-3602`, :cve:`2022-3786`, :cve:`2023-23931`
+- binutils: :cve_nist:`2022-4285`, :cve_mitre:`2023-25586`
+- curl: :cve_nist:`2022-32221`, :cve_nist:`2022-35260`, :cve_nist:`2022-42915`, :cve_nist:`2022-42916`
+- epiphany: :cve_nist:`2023-26081`
+- expat: :cve_nist:`2022-43680`
+- ffmpeg: :cve_nist:`2022-3964`, :cve_nist:`2022-3965`
+- git: :cve_nist:`2022-39260`, :cve_nist:`2022-41903`, :cve_nist:`2022-23521`, :cve_nist:`2022-41953` (ignored)
+- glibc: :cve_nist:`2023-25139` (ignored)
+- go: :cve_nist:`2023-24532`, :cve_nist:`2023-24537`
+- grub2: :cve_nist:`2022-2601`, :cve_nist:`2022-3775`, :cve_mitre:`2022-28736`
+- inetutils: :cve_nist:`2019-0053`
+- less: :cve_nist:`2022-46663`
+- libarchive: :cve_nist:`2022-36227`
+- libinput: :cve_nist:`2022-1215`
+- libpam: :cve_nist:`2022-28321`
+- libpng: :cve_nist:`2019-6129`
+- libx11: :cve_nist:`2022-3554`
+- openssh: :cve_nist:`2023-28531`
+- openssl: :cve_nist:`2022-3358`, :cve_nist:`2022-3786`, :cve_nist:`2022-3602`, :cve_nist:`2022-3996`, :cve_nist:`2023-0286`, :cve_nist:`2022-4304`, :cve_nist:`2022-4203`, :cve_nist:`2023-0215`, :cve_nist:`2022-4450`, :cve_nist:`2023-0216`, :cve_nist:`2023-0217`, :cve_nist:`2023-0401`, :cve_nist:`2023-0464`
+- ppp: :cve_nist:`2022-4603`
+- python3-cryptography{-vectors}: :cve_nist:`2022-3602`, :cve_nist:`2022-3786`, :cve_nist:`2023-23931`
 - python3: :cve_mitre:`2022-37460`
-- qemu: :cve:`2022-3165`
-- rust: :cve:`2022-46176`
-- rxvt-unicode: :cve:`2022-4170`
-- screen: :cve:`2023-24626`
-- shadow: :cve:`2023-29383`, :cve:`2016-15024` (ignored)
-- sudo: :cve:`2022-43995`
-- systemd: :cve:`2022-4415` (ignored)
-- tar: :cve:`2022-48303`
-- tiff: :cve:`2022-3599`, :cve:`2022-3597`, :cve:`2022-3626`, :cve:`2022-3627`, :cve:`2022-3570`, :cve:`2022-3598`, :cve:`2022-3970`, :cve:`2022-48281`
-- vim: :cve:`2022-3352`, :cve:`2022-4141`, :cve:`2023-0049`, :cve:`2023-0051`, :cve:`2023-0054`, :cve:`2023-0288`, :cve:`2023-1127`, :cve:`2023-1170`, :cve:`2023-1175`, :cve:`2023-1127`, :cve:`2023-1170`, :cve:`2023-1175`, :cve:`2023-1264`, :cve:`2023-1355`, :cve:`2023-0433`, :cve:`2022-47024`, :cve:`2022-3705`
-- xdg-utils: :cve:`2022-4055`
-- xserver-xorg: :cve:`2022-3550`, :cve:`2022-3551`, :cve:`2023-1393`, :cve:`2023-0494`, :cve:`2022-3553` (ignored)
+- qemu: :cve_nist:`2022-3165`
+- rust: :cve_nist:`2022-46176`
+- rxvt-unicode: :cve_nist:`2022-4170`
+- screen: :cve_nist:`2023-24626`
+- shadow: :cve_nist:`2023-29383`, :cve_nist:`2016-15024` (ignored)
+- sudo: :cve_nist:`2022-43995`
+- systemd: :cve_nist:`2022-4415` (ignored)
+- tar: :cve_nist:`2022-48303`
+- tiff: :cve_nist:`2022-3599`, :cve_nist:`2022-3597`, :cve_nist:`2022-3626`, :cve_nist:`2022-3627`, :cve_nist:`2022-3570`, :cve_nist:`2022-3598`, :cve_nist:`2022-3970`, :cve_nist:`2022-48281`
+- vim: :cve_nist:`2022-3352`, :cve_nist:`2022-4141`, :cve_nist:`2023-0049`, :cve_nist:`2023-0051`, :cve_nist:`2023-0054`, :cve_nist:`2023-0288`, :cve_nist:`2023-1127`, :cve_nist:`2023-1170`, :cve_nist:`2023-1175`, :cve_nist:`2023-1127`, :cve_nist:`2023-1170`, :cve_nist:`2023-1175`, :cve_nist:`2023-1264`, :cve_nist:`2023-1355`, :cve_nist:`2023-0433`, :cve_nist:`2022-47024`, :cve_nist:`2022-3705`
+- xdg-utils: :cve_nist:`2022-4055`
+- xserver-xorg: :cve_nist:`2022-3550`, :cve_nist:`2022-3551`, :cve_nist:`2023-1393`, :cve_nist:`2023-0494`, :cve_nist:`2022-3553` (ignored)
 
 Recipe Upgrades in 4.2
 ~~~~~~~~~~~~~~~~~~~~~~

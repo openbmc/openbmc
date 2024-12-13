@@ -1,4 +1,4 @@
-From a73fff1fcf0def4ce93964f1b63fe3ad0967259d Mon Sep 17 00:00:00 2001
+From 322972384e0795be339252f7cf9a318dc759b51e Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Fri, 18 Feb 2022 09:44:26 +0000
 Subject: [PATCH] cpan/Sys-Syslog/Makefile.PL: Fix _PATH_LOG for deterministic
@@ -31,6 +31,3 @@ index d09ba69..d44e58c 100644
  
  # if possible, generate the code that handles the constants with 
  # ExtUtils::Constant, otherwise use cached copy in fallback/
--- 
-2.31.1
-

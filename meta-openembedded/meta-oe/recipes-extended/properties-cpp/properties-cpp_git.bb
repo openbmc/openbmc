@@ -11,6 +11,9 @@ PV = "0.0.1+git"
 SRCREV = "45863e849b39c4921d6553e6d27e267a96ac7d77"
 SRC_URI = "git://github.com/lib-cpp/${BPN}.git;branch=master;protocol=https"
 
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 do_configure:prepend() {

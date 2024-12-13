@@ -1,0 +1,324 @@
+From 9b806483d804ab335f7161fdd6248ae3e7ae3bde Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 9 Aug 2024 13:50:05 -0700
+Subject: [PATCH 2/2] network_tests: Include iomanip system header
+
+Latest gcc-14/clang-18 needs this header for setfill and setw
+
+Upstream-Status: Submitted [https://github.com/COVESA/vsomeip/pull/751]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../network_tests/big_payload_tests/big_payload_test_service.hpp | 1 +
+ test/network_tests/cpu_load_tests/cpu_load_test_service.cpp      | 1 +
+ test/network_tests/e2e_tests/e2e_profile_04_test_client.hpp      | 1 +
+ test/network_tests/e2e_tests/e2e_profile_04_test_service.hpp     | 1 +
+ test/network_tests/e2e_tests/e2e_profile_07_test_client.hpp      | 1 +
+ test/network_tests/e2e_tests/e2e_profile_07_test_service.hpp     | 1 +
+ test/network_tests/e2e_tests/e2e_test_client.hpp                 | 1 +
+ test/network_tests/e2e_tests/e2e_test_service.hpp                | 1 +
+ test/network_tests/event_tests/event_test_service.cpp            | 1 +
+ .../header_factory_tests/header_factory_test_client.hpp          | 1 +
+ .../header_factory_tests/header_factory_test_service.hpp         | 1 +
+ test/network_tests/npdu_tests/npdu_test_client.hpp               | 1 +
+ test/network_tests/npdu_tests/npdu_test_service.hpp              | 1 +
+ test/network_tests/payload_tests/payload_test_client.hpp         | 1 +
+ test/network_tests/payload_tests/payload_test_service.hpp        | 1 +
+ .../restart_routing_tests/restart_routing_test_client.hpp        | 1 +
+ .../restart_routing_tests/restart_routing_test_service.hpp       | 1 +
+ .../routing_tests/external_local_routing_test_service.hpp        | 1 +
+ test/network_tests/routing_tests/local_routing_test_client.hpp   | 1 +
+ test/network_tests/routing_tests/local_routing_test_service.hpp  | 1 +
+ .../second_address_tests/second_address_test_service.cpp         | 1 +
+ test/network_tests/security_tests/security_test_client.hpp       | 1 +
+ test/network_tests/security_tests/security_test_service.hpp      | 1 +
+ .../suspend_resume_tests/suspend_resume_test_service.cpp         | 1 +
+ 24 files changed, 24 insertions(+)
+
+diff --git a/test/network_tests/big_payload_tests/big_payload_test_service.hpp b/test/network_tests/big_payload_tests/big_payload_test_service.hpp
+index 44af28a9..101b6758 100644
+--- a/test/network_tests/big_payload_tests/big_payload_test_service.hpp
++++ b/test/network_tests/big_payload_tests/big_payload_test_service.hpp
+@@ -14,6 +14,7 @@
+ #include <condition_variable>
+ #include <functional>
+ #include <queue>
++#include <iomanip>
+ 
+ #include "big_payload_test_globals.hpp"
+ #include <vsomeip/internal/logger.hpp>
+diff --git a/test/network_tests/cpu_load_tests/cpu_load_test_service.cpp b/test/network_tests/cpu_load_tests/cpu_load_test_service.cpp
+index 3d935e39..a98f3edf 100644
+--- a/test/network_tests/cpu_load_tests/cpu_load_test_service.cpp
++++ b/test/network_tests/cpu_load_tests/cpu_load_test_service.cpp
+@@ -13,6 +13,7 @@
+ #include <functional>
+ #include <numeric>
+ #include <cmath> // for isfinite
++#include <iomanip>
+ 
+ #include "cpu_load_test_globals.hpp"
+ #include <vsomeip/internal/logger.hpp>
+diff --git a/test/network_tests/e2e_tests/e2e_profile_04_test_client.hpp b/test/network_tests/e2e_tests/e2e_profile_04_test_client.hpp
+index ad002913..82d5e7e2 100644
+--- a/test/network_tests/e2e_tests/e2e_profile_04_test_client.hpp
++++ b/test/network_tests/e2e_tests/e2e_profile_04_test_client.hpp
+@@ -14,6 +14,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <atomic>
++#include <iomanip>
+ 
+ class e2e_profile_04_test_client {
+ public:
+diff --git a/test/network_tests/e2e_tests/e2e_profile_04_test_service.hpp b/test/network_tests/e2e_tests/e2e_profile_04_test_service.hpp
+index 25617917..17852b85 100644
+--- a/test/network_tests/e2e_tests/e2e_profile_04_test_service.hpp
++++ b/test/network_tests/e2e_tests/e2e_profile_04_test_service.hpp
+@@ -17,6 +17,7 @@
+ #include <condition_variable>
+ #include <mutex>
+ #include <thread>
++#include <iomanip>
+ 
+ class e2e_profile_04_test_service {
+ public:
+diff --git a/test/network_tests/e2e_tests/e2e_profile_07_test_client.hpp b/test/network_tests/e2e_tests/e2e_profile_07_test_client.hpp
+index 9b10a589..30d889b5 100644
+--- a/test/network_tests/e2e_tests/e2e_profile_07_test_client.hpp
++++ b/test/network_tests/e2e_tests/e2e_profile_07_test_client.hpp
+@@ -14,6 +14,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <atomic>
++#include <iomanip>
+ 
+ class e2e_profile_07_test_client {
+ public:
+diff --git a/test/network_tests/e2e_tests/e2e_profile_07_test_service.hpp b/test/network_tests/e2e_tests/e2e_profile_07_test_service.hpp
+index ad6488a5..ea1cc05c 100644
+--- a/test/network_tests/e2e_tests/e2e_profile_07_test_service.hpp
++++ b/test/network_tests/e2e_tests/e2e_profile_07_test_service.hpp
+@@ -17,6 +17,7 @@
+ #include <condition_variable>
+ #include <mutex>
+ #include <thread>
++#include <iomanip>
+ 
+ class e2e_profile_07_test_service {
+ public:
+diff --git a/test/network_tests/e2e_tests/e2e_test_client.hpp b/test/network_tests/e2e_tests/e2e_test_client.hpp
+index 10f49784..c253f101 100644
+--- a/test/network_tests/e2e_tests/e2e_test_client.hpp
++++ b/test/network_tests/e2e_tests/e2e_test_client.hpp
+@@ -18,6 +18,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <atomic>
++#include <iomanip>
+ 
+ class e2e_test_client {
+ public:
+diff --git a/test/network_tests/e2e_tests/e2e_test_service.hpp b/test/network_tests/e2e_tests/e2e_test_service.hpp
+index 7fd1c5a9..e839aacb 100644
+--- a/test/network_tests/e2e_tests/e2e_test_service.hpp
++++ b/test/network_tests/e2e_tests/e2e_test_service.hpp
+@@ -16,6 +16,7 @@
+ #include <thread>
+ #include <mutex>
+ #include <condition_variable>
++#include <iomanip>
+ 
+ class e2e_test_service {
+ public:
+diff --git a/test/network_tests/event_tests/event_test_service.cpp b/test/network_tests/event_tests/event_test_service.cpp
+index 3728a827..d1f117e2 100644
+--- a/test/network_tests/event_tests/event_test_service.cpp
++++ b/test/network_tests/event_tests/event_test_service.cpp
+@@ -10,6 +10,7 @@
+ #include <thread>
+ #include <map>
+ #include <atomic>
++#include <iomanip>
+ 
+ #include <gtest/gtest.h>
+ 
+diff --git a/test/network_tests/header_factory_tests/header_factory_test_client.hpp b/test/network_tests/header_factory_tests/header_factory_test_client.hpp
+index 79461b69..b72bbdca 100644
+--- a/test/network_tests/header_factory_tests/header_factory_test_client.hpp
++++ b/test/network_tests/header_factory_tests/header_factory_test_client.hpp
+@@ -14,6 +14,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <functional>
++#include <iomanip>
+ 
+ #include "../someip_test_globals.hpp"
+ #include <common/vsomeip_app_utilities.hpp>
+diff --git a/test/network_tests/header_factory_tests/header_factory_test_service.hpp b/test/network_tests/header_factory_tests/header_factory_test_service.hpp
+index 7879946a..a553adde 100644
+--- a/test/network_tests/header_factory_tests/header_factory_test_service.hpp
++++ b/test/network_tests/header_factory_tests/header_factory_test_service.hpp
+@@ -13,6 +13,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <functional>
++#include <iomanip>
+ 
+ #include "../someip_test_globals.hpp"
+ #include <common/vsomeip_app_utilities.hpp>
+diff --git a/test/network_tests/npdu_tests/npdu_test_client.hpp b/test/network_tests/npdu_tests/npdu_test_client.hpp
+index 2f469d40..7f615f14 100644
+--- a/test/network_tests/npdu_tests/npdu_test_client.hpp
++++ b/test/network_tests/npdu_tests/npdu_test_client.hpp
+@@ -15,6 +15,7 @@
+ #include <condition_variable>
+ #include <functional>
+ #include <map>
++#include <iomanip>
+ 
+ #include "../npdu_tests/npdu_test_globals.hpp"
+ #include "../someip_test_globals.hpp"
+diff --git a/test/network_tests/npdu_tests/npdu_test_service.hpp b/test/network_tests/npdu_tests/npdu_test_service.hpp
+index bef06806..1caae785 100644
+--- a/test/network_tests/npdu_tests/npdu_test_service.hpp
++++ b/test/network_tests/npdu_tests/npdu_test_service.hpp
+@@ -15,6 +15,7 @@
+ #include <functional>
+ #include <chrono>
+ #include <deque>
++#include <iomanip>
+ 
+ class npdu_test_service
+ {
+diff --git a/test/network_tests/payload_tests/payload_test_client.hpp b/test/network_tests/payload_tests/payload_test_client.hpp
+index 1bab6ba6..1754320c 100644
+--- a/test/network_tests/payload_tests/payload_test_client.hpp
++++ b/test/network_tests/payload_tests/payload_test_client.hpp
+@@ -15,6 +15,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <functional>
++#include <iomanip>
+ 
+ #include "../someip_test_globals.hpp"
+ #include <common/vsomeip_app_utilities.hpp>
+diff --git a/test/network_tests/payload_tests/payload_test_service.hpp b/test/network_tests/payload_tests/payload_test_service.hpp
+index 7d3c01d5..06dbb684 100644
+--- a/test/network_tests/payload_tests/payload_test_service.hpp
++++ b/test/network_tests/payload_tests/payload_test_service.hpp
+@@ -13,6 +13,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <functional>
++#include <iomanip>
+ 
+ #include "../someip_test_globals.hpp"
+ #include <common/vsomeip_app_utilities.hpp>
+diff --git a/test/network_tests/restart_routing_tests/restart_routing_test_client.hpp b/test/network_tests/restart_routing_tests/restart_routing_test_client.hpp
+index 8a7c9e70..6a758318 100644
+--- a/test/network_tests/restart_routing_tests/restart_routing_test_client.hpp
++++ b/test/network_tests/restart_routing_tests/restart_routing_test_client.hpp
+@@ -19,6 +19,7 @@
+ #include <condition_variable>
+ #include <atomic>
+ #include <future>
++#include <iomanip>
+ 
+ class routing_restart_test_client {
+ public:
+diff --git a/test/network_tests/restart_routing_tests/restart_routing_test_service.hpp b/test/network_tests/restart_routing_tests/restart_routing_test_service.hpp
+index 7660b8fc..1fe4d86c 100644
+--- a/test/network_tests/restart_routing_tests/restart_routing_test_service.hpp
++++ b/test/network_tests/restart_routing_tests/restart_routing_test_service.hpp
+@@ -16,6 +16,7 @@
+ #include <thread>
+ #include <mutex>
+ #include <condition_variable>
++#include <iomanip>
+ 
+ class routing_restart_test_service {
+ public:
+diff --git a/test/network_tests/routing_tests/external_local_routing_test_service.hpp b/test/network_tests/routing_tests/external_local_routing_test_service.hpp
+index 2499bc84..b1e2dfd8 100644
+--- a/test/network_tests/routing_tests/external_local_routing_test_service.hpp
++++ b/test/network_tests/routing_tests/external_local_routing_test_service.hpp
+@@ -13,6 +13,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <functional>
++#include <iomanip>
+ 
+ #include "../someip_test_globals.hpp"
+ #include <common/vsomeip_app_utilities.hpp>
+diff --git a/test/network_tests/routing_tests/local_routing_test_client.hpp b/test/network_tests/routing_tests/local_routing_test_client.hpp
+index 09af0bf0..69ee6bfc 100644
+--- a/test/network_tests/routing_tests/local_routing_test_client.hpp
++++ b/test/network_tests/routing_tests/local_routing_test_client.hpp
+@@ -14,6 +14,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <functional>
++#include <iomanip>
+ 
+ #include "../someip_test_globals.hpp"
+ #include <common/vsomeip_app_utilities.hpp>
+diff --git a/test/network_tests/routing_tests/local_routing_test_service.hpp b/test/network_tests/routing_tests/local_routing_test_service.hpp
+index 109dade4..932423d8 100644
+--- a/test/network_tests/routing_tests/local_routing_test_service.hpp
++++ b/test/network_tests/routing_tests/local_routing_test_service.hpp
+@@ -13,6 +13,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <functional>
++#include <iomanip>
+ 
+ #include "../someip_test_globals.hpp"
+ #include <common/vsomeip_app_utilities.hpp>
+diff --git a/test/network_tests/second_address_tests/second_address_test_service.cpp b/test/network_tests/second_address_tests/second_address_test_service.cpp
+index fc9d0a28..3ffa493f 100644
+--- a/test/network_tests/second_address_tests/second_address_test_service.cpp
++++ b/test/network_tests/second_address_tests/second_address_test_service.cpp
+@@ -9,6 +9,7 @@
+ #include <sstream>
+ #include <thread>
+ #include <map>
++#include <iomanip>
+ 
+ #include <gtest/gtest.h>
+ #include <vsomeip/vsomeip.hpp>
+diff --git a/test/network_tests/security_tests/security_test_client.hpp b/test/network_tests/security_tests/security_test_client.hpp
+index ab3d98b8..bd331138 100644
+--- a/test/network_tests/security_tests/security_test_client.hpp
++++ b/test/network_tests/security_tests/security_test_client.hpp
+@@ -18,6 +18,7 @@
+ #include <mutex>
+ #include <condition_variable>
+ #include <atomic>
++#include <iomanip>
+ 
+ class security_test_client {
+ public:
+diff --git a/test/network_tests/security_tests/security_test_service.hpp b/test/network_tests/security_tests/security_test_service.hpp
+index 87fb94fd..1f227072 100644
+--- a/test/network_tests/security_tests/security_test_service.hpp
++++ b/test/network_tests/security_tests/security_test_service.hpp
+@@ -16,6 +16,7 @@
+ #include <thread>
+ #include <mutex>
+ #include <condition_variable>
++#include <iomanip>
+ 
+ class security_test_service {
+ public:
+diff --git a/test/network_tests/suspend_resume_tests/suspend_resume_test_service.cpp b/test/network_tests/suspend_resume_tests/suspend_resume_test_service.cpp
+index 6f099ce7..dc9df239 100644
+--- a/test/network_tests/suspend_resume_tests/suspend_resume_test_service.cpp
++++ b/test/network_tests/suspend_resume_tests/suspend_resume_test_service.cpp
+@@ -7,6 +7,7 @@
+ #include <mutex>
+ #include <thread>
+ #include <atomic>
++#include <iomanip>
+ 
+ #include <gtest/gtest.h>
+ 

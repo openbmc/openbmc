@@ -21,3 +21,5 @@ EXTRA_OECMAKE = " \
 
 # Headers only so PN is empty
 RDEPENDS:${PN}-dev = ""
+
+BBCLASSEXTEND += "native nativesdk"

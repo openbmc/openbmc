@@ -1,0 +1,40 @@
+Fixes build issues
+
+Upstream-Status: Inappropriate [next version has many changes to configure.ac]
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Index: aide-0.18.8/configure.ac
+===================================================================
+--- aide-0.18.8.orig/configure.ac
++++ aide-0.18.8/configure.ac
+@@ -14,6 +14,7 @@ dnl The name of the configure h-file.
+ AC_CONFIG_HEADERS(include/config.h)
+ 
+ dnl Checks for programs.
++m4_pattern_allow([AC_MSG_ERROR])
+ AC_PROG_CC
+ if test "x$ac_cv_prog_cc_c99" = xno; then
+     AC_MSG_ERROR([AIDE needs a C99 compatible compiler])
+@@ -246,6 +247,7 @@ if test "$aide_static_choice" != "yes";
+ fi
+ 
+ dnl This macro is new in autoconf-2.13
++m4_pattern_allow([AC_DEFINE])
+ AC_SEARCH_LIBS(syslog, bsd socket inet, [AC_DEFINE(HAVE_SYSLOG,1,[syslog available?])])
+ AC_CHECK_FUNCS(vsyslog)
+ 
+@@ -320,14 +322,10 @@ fi
+ AC_CHECK_HEADERS(syslog.h inttypes.h fcntl.h ctype.h)
+ 
+ AIDE_PKG_CHECK_MANDATORY(pcre2, PCRE2, libpcre2-8)
+-
+ AC_MSG_CHECKING(for pthread for multithreading)
+ AC_ARG_WITH([pthread], AS_HELP_STRING([--with-pthread], [use pthread for multithreading (default: yes)]), [with_pthread=$withval], [with_pthread=yes])
+ AC_MSG_RESULT([$with_pthread])
+ compoptionstring="${compoptionstring}use pthread: $with_pthread\\n"
+-AS_IF([test x"$with_pthread" = xyes], [
+-    AX_PTHREAD([AC_DEFINE(WITH_PTHREAD,1,[use pthread])], [AC_MSG_ERROR([AIDE requires pthread])])
+-])
+ 
+ AIDE_PKG_CHECK(zlib, zlib compression, yes, ZLIB, zlib)
+ 

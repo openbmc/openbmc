@@ -67,3 +67,8 @@ do_install:append() {
 }
 
 FILES:${PN} += "${nonarch_libdir}/tmpfiles.d"
+
+# http://errors.yoctoproject.org/Errors/Details/766898/
+# lib/flow.c:213:48: error: initialization of 'const struct arp_eth_header *' from incompatible pointer type 'struct arp_header *' [-Wincompatible-pointer-types]
+# lib/backtrace.c:126:32: error: passing argument 1 of 'backtrace' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

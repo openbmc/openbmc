@@ -12,4 +12,4 @@ SRCNAME = "spidev"
 
 SRC_URI[sha256sum] = "14dbc37594a4aaef85403ab617985d3c3ef464d62bc9b769ef552db53701115b"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta

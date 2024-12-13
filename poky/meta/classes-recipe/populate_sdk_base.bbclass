@@ -4,9 +4,16 @@
 # SPDX-License-Identifier: MIT
 #
 
+SDK_CLASSES += "${@bb.utils.contains("IMAGE_CLASSES", "testimage", "testsdk", "", d)}"
+inherit_defer ${SDK_CLASSES}
+
 PACKAGES = ""
 
-inherit image-postinst-intercepts image-artifact-names
+# This exists as an optimization for SPDX processing to only run in image and
+# SDK processing context.  This class happens to be common to these usages.
+SPDX_MULTILIB_SSTATE_ARCHS = "${@all_multilib_tune_values(d, 'SSTATE_ARCHS')}"
+
+inherit image-postinst-intercepts image-artifact-names nopackages
 
 # Wildcards specifying complementary packages to install for every package that has been explicitly
 # installed into the rootfs
@@ -385,6 +392,6 @@ do_populate_sdk[file-checksums] += "${TOOLCHAIN_SHAR_REL_TMPL}:True \
 do_populate_sdk[dirs] = "${PKGDATA_DIR} ${TOPDIR}"
 do_populate_sdk[depends] += "${@' '.join([x + ':do_populate_sysroot' for x in d.getVar('SDK_DEPENDS').split()])}  ${@d.getVarFlag('do_rootfs', 'depends', False)}"
 do_populate_sdk[rdepends] = "${@' '.join([x + ':do_package_write_${IMAGE_PKGTYPE} ' + x + ':do_packagedata' for x in d.getVar('SDK_RDEPENDS').split()])}"
-do_populate_sdk[recrdeptask] += "do_packagedata do_package_write_rpm do_package_write_ipk do_package_write_deb"
+do_populate_sdk[recrdeptask] += "do_packagedata do_package_write_rpm do_package_write_ipk do_package_write_deb do_package_qa"
 do_populate_sdk[file-checksums] += "${POSTINST_INTERCEPT_CHECKSUMS}"
 addtask populate_sdk

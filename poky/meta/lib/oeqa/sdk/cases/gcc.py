@@ -26,6 +26,10 @@ class GccCompileTest(OESDKTestCase):
                     os.path.join(self.tc.sdk_dir, f))
 
     def setUp(self):
+        libc = self.td.get("TCLIBC")
+        if libc in [ 'newlib' ]:
+            raise unittest.SkipTest("GccCompileTest class: SDK doesn't contain a supported C library")
+
         machine = self.td.get("MACHINE")
         if not (self.tc.hasHostPackage("packagegroup-cross-canadian-%s" % machine) or
                 self.tc.hasHostPackage("^gcc-", regex=True)):

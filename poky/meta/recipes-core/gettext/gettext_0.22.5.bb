@@ -145,7 +145,6 @@ do_compile_ptest() {
 }
 
 do_install_ptest() {
-    if [ ${PTEST_ENABLED} = "1" ]; then
         mkdir -p                                        ${D}${PTEST_PATH}/tests
         mkdir -p                                        ${D}${PTEST_PATH}/src
         mkdir -p                                        ${D}${PTEST_PATH}/po
@@ -178,7 +177,6 @@ do_install_ptest() {
         chmod 0755 ${D}${PTEST_PATH}/tests/lang-vala ${D}${PTEST_PATH}/tests/plural-1 ${D}${PTEST_PATH}/tests/xgettext-tcl-4 \
                    ${D}${PTEST_PATH}/tests/xgettext-vala-1  ${D}${PTEST_PATH}/tests/xgettext-po-2 ${D}${PTEST_PATH}/tests/xgettext-vala-6
         sed -i -e 's|${DEBUG_PREFIX_MAP}||g' ${D}${PTEST_PATH}/tests/init-env
-    fi
 }
 
 RDEPENDS:${PN}-ptest += "make xz bash gawk autoconf locale-base-de-de locale-base-fr-fr"
@@ -207,8 +205,5 @@ RRECOMMENDS:${PN}-ptest:append:libc-glibc = "\
     locale-base-de-de.iso-8859-1 \
     locale-base-fr-fr.iso-8859-1 \
 "
-
-INSANE_SKIP:${PN}-ptest += "ldflags"
-INSANE_SKIP:${PN}-ptest += "rpaths"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -9,6 +9,8 @@ SRC_URI = "http://www.mcternan.me.uk/mscgen/software/${BPN}-src-${PV}.tar.gz"
 SRC_URI[md5sum] = "65c90fb5150d7176b65b793f0faa7377"
 SRC_URI[sha256sum] = "3c3481ae0599e1c2d30b7ed54ab45249127533ab2f20e768a0ae58d8551ddc23"
 
+UPSTREAM_CHECK_URI = "https://www.mcternan.me.uk//mscgen/"
+
 DEPENDS = "gd "
 
 inherit autotools gettext pkgconfig

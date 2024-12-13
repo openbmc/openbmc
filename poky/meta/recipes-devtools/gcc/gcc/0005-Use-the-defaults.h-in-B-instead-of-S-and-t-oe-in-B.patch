@@ -1,4 +1,4 @@
-From fd3f513fa7e4f63a2b28b31ed5a4ddf8f5c543c0 Mon Sep 17 00:00:00 2001
+From d145dd6dec6863aa303503643b2d3ed470936dd0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:17:25 +0400
 Subject: [PATCH] Use the defaults.h in ${B} instead of ${S}, and t-oe in ${B}
@@ -39,10 +39,10 @@ index a74761b7ab3..956437df95b 100644
  TM_MULTILIB_CONFIG=@TM_MULTILIB_CONFIG@
  TM_MULTILIB_EXCEPTIONS_CONFIG=@TM_MULTILIB_EXCEPTIONS_CONFIG@
 diff --git a/gcc/configure b/gcc/configure
-index 3c346acbce0..3870d6e9b6d 100755
+index d3fa80408f4..f2706f94062 100755
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -15155,8 +15155,8 @@ for f in $tm_file; do
+@@ -15161,8 +15161,8 @@ for f in $tm_file; do
         tm_include_list="${tm_include_list} $f"
         ;;
      defaults.h )
@@ -54,10 +54,10 @@ index 3c346acbce0..3870d6e9b6d 100755
      * )
         tm_file_list="${tm_file_list} \$(srcdir)/config/$f"
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index 4d8123085b8..15670de1706 100644
+index 2760b6c540c..3f972dea24f 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -2383,8 +2383,8 @@ for f in $tm_file; do
+@@ -2390,8 +2390,8 @@ for f in $tm_file; do
         tm_include_list="${tm_include_list} $f"
         ;;
      defaults.h )

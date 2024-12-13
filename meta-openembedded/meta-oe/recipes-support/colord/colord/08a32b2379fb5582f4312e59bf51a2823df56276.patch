@@ -1,0 +1,28 @@
+From 08a32b2379fb5582f4312e59bf51a2823df56276 Mon Sep 17 00:00:00 2001
+From: Richard Hughes <richard@hughsie.com>
+Date: Mon, 29 Jan 2024 10:37:11 +0000
+Subject: [PATCH] Fix writing to the database with ProtectSystem=strict
+
+Fixes https://github.com/hughsie/colord/issues/166
+
+Upstream-Status: Backport [https://github.com/hughsie/colord/commit/08a32b2379fb5582f4312e59bf51a2823df56276]
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ data/colord.service.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/data/colord.service.in b/data/colord.service.in
+index 6825d944..c358dc4b 100644
+--- a/data/colord.service.in
++++ b/data/colord.service.in
+@@ -17,6 +17,10 @@ ProtectControlGroups=true
+ RestrictRealtime=true
+ RestrictAddressFamilies=AF_UNIX
+ 
++ConfigurationDirectory=colord
++StateDirectory=colord
++CacheDirectory=colord
++
+ # drop all capabilities
+ CapabilityBoundingSet=~CAP_SETUID CAP_SETGID CAP_SETPCAP CAP_SYS_ADMIN CAP_SYS_PTRACE CAP_CHOWN CAP_FSETID CAP_SETFCAP CAP_DAC_OVERRIDE CAP_DAC_READ_SEARCH CAP_FOWNER CAP_IPC_OWNER CAP_NET_ADMIN CAP_SYS_RAWIO CAP_SYS_TIME CAP_AUDIT_CONTROL CAP_AUDIT_READ CAP_AUDIT_WRITE CAP_KILL CAP_MKNOD CAP_NET_BIND_SERVICE CAP_NET_BROADCAST CAP_NET_RAW CAP_SYS_NICE CAP_SYS_RESOURCE CAP_MAC_ADMIN CAP_MAC_OVERRIDE CAP_SYS_BOOT CAP_LINUX_IMMUTABLE CAP_IPC_LOCK CAP_SYS_CHROOT CAP_BLOCK_SUSPEND CAP_LEASE CAP_SYS_PACCT CAP_SYS_TTY_CONFIG CAP_WAKE_ALARM
+ 

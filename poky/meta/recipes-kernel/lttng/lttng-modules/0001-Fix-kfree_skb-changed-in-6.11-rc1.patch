@@ -1,0 +1,62 @@
+From a06c63b0360cbe1a7c8073461b9cf088234875f7 Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 29 Jul 2024 14:01:18 +0000
+Subject: [PATCH] Fix: kfree_skb changed in 6.11-rc1
+
+See upstream commit:
+
+    commit c53795d48ee8f385c6a9e394651e7ee914baaeba
+    Author: Yan Zhai <yan@cloudflare.com>
+    Date:   Mon Jun 17 11:09:04 2024 -0700
+
+        net: add rx_sk to trace_kfree_skb
+
+        skb does not include enough information to find out receiving
+        sockets/services and netns/containers on packet drops. In theory
+        skb->dev tells about netns, but it can get cleared/reused, e.g. by TCP
+        stack for OOO packet lookup. Similarly, skb->sk often identifies a local
+        sender, and tells nothing about a receiver.
+
+        Allow passing an extra receiving socket to the tracepoint to improve
+        the visibility on receiving drops.
+
+Upstream-Status: Backport
+
+Change-Id: I33c8ce1a48006456f198ab1592f733b55be01016
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/skb.h | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/skb.h b/include/instrumentation/events/skb.h
+index 9f1047c..5556ab6 100644
+--- a/include/instrumentation/events/skb.h
++++ b/include/instrumentation/events/skb.h
+@@ -40,7 +40,25 @@ LTTNG_TRACEPOINT_ENUM(skb_drop_reason,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0) \
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,11,0))
++LTTNG_TRACEPOINT_EVENT_MAP(kfree_skb,
++
++	skb_kfree,
++
++	TP_PROTO(struct sk_buff *skb, void *location,
++		enum skb_drop_reason reason, struct sock *rx_sk),
++
++	TP_ARGS(skb, location, reason, rx_sk),
++
++	TP_FIELDS(
++		ctf_integer_hex(void *, skbaddr, skb)
++		ctf_integer_hex(void *, location, location)
++		ctf_integer_network(unsigned short, protocol, skb->protocol)
++		ctf_enum(skb_drop_reason, uint8_t, reason, reason)
++		ctf_integer_hex(void *, rx_skaddr, rx_sk)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,17,0) \
+ 	|| LTTNG_KERNEL_RANGE(5,15,58, 5,16,0) \
+ 	|| LTTNG_RHEL_KERNEL_RANGE(5,14,0,70,0,0, 5,15,0,0,0,0) \
+ 	|| LTTNG_RHEL_KERNEL_RANGE(4,18,0,477,10,1, 4,19,0,0,0,0))

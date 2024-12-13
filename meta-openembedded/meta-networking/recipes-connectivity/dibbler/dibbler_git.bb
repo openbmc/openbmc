@@ -41,3 +41,7 @@ FILES:${PN}-client = "${sbindir}/${PN}-client"
 FILES:${PN}-relay = "${sbindir}/${PN}-relay"
 FILES:${PN}-requestor = "${sbindir}/${PN}-requestor"
 FILES:${PN}-server = "${sbindir}/${PN}-server"
+
+# http://errors.yoctoproject.org/Errors/Details/766880/
+# git/Port-linux/interface.c:118:18: error: assignment to '__caddr_t' {aka 'char *'} from incompatible pointer type 'struct ethtool_value *' [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

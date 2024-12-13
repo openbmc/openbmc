@@ -15,7 +15,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 inherit autotools-brokensep  useradd
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 
 OSSEC_DIR="/var/ossec"

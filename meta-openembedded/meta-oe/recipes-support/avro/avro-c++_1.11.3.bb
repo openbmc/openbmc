@@ -20,3 +20,8 @@ S = "${WORKDIR}/git/lang/c++"
 inherit cmake pkgconfig
 
 BBCLASSEXTEND = "native nativesdk"
+
+# http://errors.yoctoproject.org/Errors/Details/766913/
+# avro-c++/1.11.3/git/lang/c++/impl/Compiler.cc:304:18: error: possibly dangling reference to a temporary [-Werror=dangling-reference]
+# avro-c++/1.11.3/git/lang/c++/impl/Compiler.cc:370:18: error: possibly dangling reference to a temporary [-Werror=dangling-reference]
+CXXFLAGS += "-Wno-error=dangling-reference"

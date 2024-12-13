@@ -8,6 +8,7 @@ SRC_URI = "https://github.com/AlDanial/cloc/releases/download/v${PV}/${BP}.tar.g
 SRC_URI[sha256sum] = "5fe0b159eb75718df7308a4f61470eaddf82170733929999e37a3fbb4651cf8a"
 
 UPSTREAM_CHECK_URI = "https://github.com/AlDanial/${BPN}/releases"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

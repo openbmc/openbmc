@@ -14,7 +14,7 @@ class LocalesTest(OESelftestTestCase):
         features = []
         features.append('EXTRA_IMAGE_FEATURES = "empty-root-password allow-empty-password allow-root-login"')
         features.append('IMAGE_INSTALL:append = " glibc-utils localedef"')
-        features.append('GLIBC_GENERATE_LOCALES = "en_US.UTF-8 fr_FR.UTF-8"')
+        features.append('GLIBC_GENERATE_LOCALES = "en_US.UTF-8 fr_FR.UTF-8 en_US.ISO-8859-1 de_DE.UTF-8 fr_FR.ISO-8859-1 zh_HK.BIG5-HKSCS tr_TR.UTF-8"')
         features.append('IMAGE_LINGUAS:append = " en-us fr-fr"')
         if binary_enabled:
             features.append('ENABLE_BINARY_LOCALE_GENERATION = "1"')

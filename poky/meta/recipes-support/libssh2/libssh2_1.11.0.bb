@@ -10,6 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=24a33237426720395ebb1dd1349ca225"
 SRC_URI = "http://www.libssh2.org/download/${BP}.tar.gz \
            file://run-ptest \
            file://CVE-2023-48795.patch \
+           file://0001-disable-DSA-by-default.patch \
            "
 
 SRC_URI[sha256sum] = "3736161e41e2693324deb38c26cfdc3efe6209d634ba4258db1cecff6a5ad461"
@@ -31,7 +32,7 @@ PACKAGECONFIG[gcrypt] = "--with-crypto=libgcrypt --with-libgcrypt-prefix=${STAGI
 BBCLASSEXTEND = "native nativesdk"
 
 # required for ptest on documentation
-RDEPENDS:${PN}-ptest = "bash man-db openssh util-linux-col"
+RDEPENDS:${PN}-ptest = "bash man-db openssh"
 RDEPENDS:${PN}-ptest:append:libc-glibc = " locale-base-en-us"
 
 do_compile_ptest() {

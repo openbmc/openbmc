@@ -1,0 +1,26 @@
+From f6c5cba59444ecda9bbc22b8e8e57fd1015a688d Mon Sep 17 00:00:00 2001
+From: Huzaifa Sidhpurwala <huzaifas@fedoraproject.org>
+Date: Tue, 15 Oct 2013 20:02:58 -0400
+Subject: [PATCH] fix memleak on tar_open() failure
+
+Authored by Huzaifa Sidhpurwala <huzaifas@fedoraproject.org>.
+
+Upstream-Status: Backport [https://repo.or.cz/libtar.git/commit/36629a41208375f5105427e98078127551692028]
+
+Signed-off-by: Katariina Lounento <katariina.lounento@vaisala.com>
+---
+ lib/handle.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/handle.c b/lib/handle.c
+index 33a262c..002d23c 100644
+--- a/lib/handle.c
++++ b/lib/handle.c
+@@ -82,6 +82,7 @@ tar_open(TAR **t, const char *pathname, tartype_t *type,
+ 	(*t)->fd = (*((*t)->type->openfunc))(pathname, oflags, mode);
+ 	if ((*t)->fd == -1)
+ 	{
++		libtar_hash_free((*t)->h, NULL);
+ 		free(*t);
+ 		return -1;
+ 	}

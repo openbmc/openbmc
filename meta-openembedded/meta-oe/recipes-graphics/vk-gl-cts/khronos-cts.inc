@@ -3,20 +3,19 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRC_URI = "\
 	git://github.com/KhronosGroup/VK-GL-CTS.git;protocol=https;name=vk-gl-cts;nobranch=1 \
-	git://github.com/google/amber;protocol=https;destsuffix=git/external/amber/src;name=amber;branch=main \
-	git://github.com/KhronosGroup/glslang.git;protocol=https;destsuffix=git/external/glslang/src;name=glslang;branch=main \
-	git://github.com/KhronosGroup/SPIRV-Headers.git;protocol=https;destsuffix=git/external/spirv-headers/src;name=spirv-headers;branch=main \
-	git://github.com/KhronosGroup/SPIRV-Tools.git;protocol=https;destsuffix=git/external/spirv-tools/src;name=spirv-tools;branch=main \
-        git://github.com/open-source-parsers/jsoncpp.git;protocol=https;destsuffix=git/external/jsoncpp/src;name=jsoncpp;branch=master \
-        git://github.com/KhronosGroup/Vulkan-Docs.git;protocol=https;destsuffix=git/external/vulkan-docs/src;name=vulkan-docs;branch=main \
-        https://raw.githubusercontent.com/baldurk/renderdoc/v1.1/renderdoc/api/app/renderdoc_app.h;subdir=git/external/renderdoc/src;name=renderdoc \
-        git://github.com/Igalia/ESExtractor.git;protocol=https;destsuffix=git/external/ESExtractor/src;name=ESExtractor;branch=main \
-        git://github.com/Igalia/vk_video_samples.git;protocol=https;destsuffix=git/external/nvidia-video-samples/src;name=video-parser;nobranch=1 \
+	git://github.com/google/amber;protocol=https;destsuffix=git/external/amber/src;name=amber;nobranch=1 \
+	git://github.com/KhronosGroup/glslang.git;protocol=https;destsuffix=git/external/glslang/src;name=glslang;nobranch=1 \
+	git://github.com/KhronosGroup/SPIRV-Headers.git;protocol=https;destsuffix=git/external/spirv-headers/src;name=spirv-headers;nobranch=1 \
+	git://github.com/KhronosGroup/SPIRV-Tools.git;protocol=https;destsuffix=git/external/spirv-tools/src;name=spirv-tools;nobranch=1 \
+	git://github.com/open-source-parsers/jsoncpp.git;protocol=https;destsuffix=git/external/jsoncpp/src;name=jsoncpp;nobranch=1 \
+	git://github.com/KhronosGroup/Vulkan-Docs.git;protocol=https;destsuffix=git/external/vulkan-docs/src;name=vulkan-docs;nobranch=1 \
+	git://github.com/KhronosGroup/Vulkan-ValidationLayers.git;protocol=https;destsuffix=git/external/vulkan-validationlayers/src;name=vulkan-validationlayers;nobranch=1 \
+	git://github.com/Igalia/ESExtractor.git;protocol=https;destsuffix=git/external/ESExtractor/src;name=ESExtractor;nobranch=1 \
+	git://github.com/Igalia/vk_video_samples.git;protocol=https;destsuffix=git/external/nvidia-video-samples/src;name=video-parser;nobranch=1 \
+	https://raw.githubusercontent.com/baldurk/renderdoc/v1.1/renderdoc/api/app/renderdoc_app.h;subdir=git/external/renderdoc/src;name=renderdoc \
 "
 
-S = "${WORKDIR}/git"
-
-SRCREV_FORMAT = "vk-gl-cts_amber_glslang_spirv-headers_spirv-tools_jsoncpp_vulkan-docs"
+SRCREV_FORMAT = "vk-gl-cts_amber_glslang_spirv-headers_spirv-tools_jsoncpp_video-parser_vulkan-docs_vulkan-validationlayers"
 
 S = "${WORKDIR}/git"
 
@@ -27,7 +26,7 @@ ANY_OF_DISTRO_FEATURES += "opengl vulkan"
 DEPENDS += "python3-lxml-native libpng zlib virtual/libgles2 qemu-native"
 
 SRC_URI += " \
-            file://0001-vulkancts-Include-missing-cstdint.patch \
+            file://0001-cmake-Define-WAYLAND_SCANNER-and-WAYLAND_PROTOCOLS_D.patch \
             file://0001-use-library-sonames-for-linking.patch \
 "
 
@@ -39,7 +38,7 @@ DEPENDS:append:libc-musl = " libexecinfo"
 SRC_URI:append:toolchain-clang = "\
 	file://fix-clang-private-operator.patch \
 "
-
+EXTRA_OECMAKE += "-DUPDATE_DEPS=OFF"
 EXTRA_OECMAKE:prepend:class-target = "-DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/qemuwrapper -DWAYLAND_SCANNER=${STAGING_BINDIR_NATIVE}/wayland-scanner -DWAYLAND_PROTOCOLS_DIR=${STAGING_DATADIR}/wayland-protocols -DAMBER_DISABLE_WERROR=ON"
 
 # The best thing for the user to do is to not specify any of the following
@@ -81,3 +80,11 @@ python __anonymous() {
 CTSDIR = "/usr/lib/${BPN}"
 
 FILES:${PN} += "${CTSDIR}"
+
+# does not work with libc++-19 due
+# error: implicit instantiation of undefined template 'std::char_traits<unsigned int>'
+TOOLCHAIN = "gcc"
+
+# Validation-layers requires access during configure as it fetches validation-headers
+# and bunch of other packages from khronos github
+do_configure[network] = "1"

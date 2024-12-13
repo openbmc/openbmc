@@ -8,6 +8,10 @@ PV = "0.0.0+git"
 SRC_URI = "git://github.com/alban/dbus-daemon-proxy;branch=master;protocol=https \
            file://0001-dbus-daemon-proxy-Return-DBUS_HANDLER_RESULT_NOT_YET.patch \
            "
+
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 inherit pkgconfig

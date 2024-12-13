@@ -17,6 +17,7 @@ EXTRA_OECONF_PATHS = "\
 EXTRA_OECONF:append:linuxstdbase = " --enable-clocale=gnu"
 EXTRA_OECONF:append = " --cache-file=${B}/config.cache"
 EXTRA_OECONF:append:libc-newlib = " --with-newlib --with-target-subdir"
+EXTRA_OECONF:append:libc-picolibc = " --with-newlib --with-target-subdir"
 EXTRA_OECONF:append:libc-baremetal = " --with-target-subdir"
 
 # Disable ifuncs for libatomic on arm conflicts -march/-mcpu
@@ -27,6 +28,7 @@ DISABLE_STATIC:class-nativesdk ?= ""
 
 # Newlib does not support symbol versioning on libsdtcc++
 SYMVERS_CONF:libc-newlib = ""
+SYMVERS_CONF:libc-picolibc = ""
 
 # Building with thumb enabled on armv6t fails
 ARM_INSTRUCTION_SET:armv6 = "arm"
@@ -47,6 +49,7 @@ RUNTIMETARGET = "${RUNTIMELIBSSP} libstdc++-v3 libgomp libatomic ${RUNTIMELIBITM
 "
 # Only build libstdc++ for newlib
 RUNTIMETARGET:libc-newlib = "libstdc++-v3"
+RUNTIMETARGET:libc-picolibc = "libstdc++-v3"
 
 # libiberty
 # libgfortran needs separate recipe due to libquadmath dependency
@@ -289,6 +292,7 @@ do_check[prefuncs] += "extend_recipe_sysroot"
 do_check[prefuncs] += "check_prepare"
 do_check[dirs] = "${WORKDIR}/dejagnu ${B}"
 do_check[nostamp] = "1"
+do_check[network] = "1"
 do_check() {
     export DEJAGNU="${WORKDIR}/dejagnu/site.exp"
 

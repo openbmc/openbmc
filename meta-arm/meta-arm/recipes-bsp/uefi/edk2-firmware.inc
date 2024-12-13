@@ -3,6 +3,8 @@ DESCRIPTION = "UEFI EDK2 Firmware for Arm reference platforms"
 HOMEPAGE = "https://github.com/tianocore/edk2"
 LICENSE = "BSD-2-Clause-Patent"
 
+CVE_PRODUCT = "tianocore:edk2"
+
 PROVIDES = "virtual/bootloader"
 
 # EDK2

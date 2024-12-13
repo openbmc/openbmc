@@ -6,29 +6,29 @@ Release notes for 3.4.2 (honister)
 Security Fixes in 3.4.2
 ~~~~~~~~~~~~~~~~~~~~~~~
 
--  tiff: backport fix for :cve:`2022-22844`
--  glibc : Fix :cve:`2021-3999`
--  glibc : Fix :cve:`2021-3998`
--  glibc : Fix :cve:`2022-23219`
--  glibc : Fix :cve:`2022-23218`
--  lighttpd: backport a fix for :cve:`2022-22707`
--  speex: fix :cve:`2020-23903`
--  linux-yocto/5.10: amdgpu: updates for :cve:`2021-42327`
--  libsndfile1: fix :cve:`2021-4156`
+-  tiff: backport fix for :cve_nist:`2022-22844`
+-  glibc : Fix :cve_nist:`2021-3999`
+-  glibc : Fix :cve_nist:`2021-3998`
+-  glibc : Fix :cve_nist:`2022-23219`
+-  glibc : Fix :cve_nist:`2022-23218`
+-  lighttpd: backport a fix for :cve_nist:`2022-22707`
+-  speex: fix :cve_nist:`2020-23903`
+-  linux-yocto/5.10: amdgpu: updates for :cve_nist:`2021-42327`
+-  libsndfile1: fix :cve_nist:`2021-4156`
 -  xserver-xorg: whitelist two CVEs
--  grub2: fix :cve:`2021-3981`
+-  grub2: fix :cve_nist:`2021-3981`
 -  xserver-xorg: update :term:`CVE_PRODUCT`
--  binutils: :cve:`2021-42574`
--  gcc: Fix :cve:`2021-42574`
--  gcc: Fix :cve:`2021-35465`
+-  binutils: :cve_nist:`2021-42574`
+-  gcc: Fix :cve_nist:`2021-42574`
+-  gcc: Fix :cve_nist:`2021-35465`
 -  cve-extra-exclusions: add db CVEs to exclusion list
--  gcc: Add :cve:`2021-37322` to the list of CVEs to ignore
--  bind: fix :cve:`2021-25219`
--  openssh: fix :cve:`2021-41617`
--  ncurses: fix :cve:`2021-39537`
--  vim: fix :cve:`2021-3968` and :cve:`2021-3973`
--  vim: fix :cve:`2021-3927` and :cve:`2021-3928`
--  gmp: fix :cve:`2021-43618`
+-  gcc: Add :cve_nist:`2021-37322` to the list of CVEs to ignore
+-  bind: fix :cve_nist:`2021-25219`
+-  openssh: fix :cve_nist:`2021-41617`
+-  ncurses: fix :cve_nist:`2021-39537`
+-  vim: fix :cve_nist:`2021-3968` and :cve_nist:`2021-3973`
+-  vim: fix :cve_nist:`2021-3927` and :cve_nist:`2021-3928`
+-  gmp: fix :cve_nist:`2021-43618`
 
 Fixes in 3.4.2
 ~~~~~~~~~~~~~~

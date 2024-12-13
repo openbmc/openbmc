@@ -1,0 +1,34 @@
+From 34021e84d03e2becb88e6c28e8e4867e82a81da5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Sep 2024 17:40:03 -0700
+Subject: [PATCH] selftests: timers: Fix clock_adjtime for newer 32-bit arches
+
+Newer 32-bit architectures e.g. riscv32 are using 64-bit time_t
+from get go, they have not wired __NR_clock_adjtime at all
+valid-adjtimex testcase fails to compile on such architectures.
+if this condition is found then use 64-bit adjtime syscall
+
+Upstream-Status: Submitted [https://patchwork.kernel.org/project/linux-kselftest/patch/20240918004731.3295870-1-raj.khem@gmail.com/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: John Stultz <jstultz@google.com>
+Cc: Shuah Khan <shuah@kernel.org>
+---
+ tools/testing/selftests/timers/valid-adjtimex.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tools/testing/selftests/timers/valid-adjtimex.c b/tools/testing/selftests/timers/valid-adjtimex.c
+index d500884801d8..ff4ff8b1d127 100644
+--- a/tools/testing/selftests/timers/valid-adjtimex.c
++++ b/tools/testing/selftests/timers/valid-adjtimex.c
+@@ -39,7 +39,11 @@
+ #include <sys/syscall.h>
+ int clock_adjtime(clockid_t id, struct timex *tx)
+ {
++#if !defined(__NR_clock_adjtime) && defined(__NR_clock_adjtime64)
++	return syscall(__NR_clock_adjtime64, id, tx);
++#else
+ 	return syscall(__NR_clock_adjtime, id, tx);
++#endif
+ }
+ 
+ 

@@ -20,10 +20,12 @@ RDEPENDS:${PN} += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
+    python3-attrs \
     python3-pyopenssl \
     python3-pyasn1-modules \
     python3-pytest \
     python3-service-identity \
+    python3-six \
     python3-unittest-automake-output \
 "
 

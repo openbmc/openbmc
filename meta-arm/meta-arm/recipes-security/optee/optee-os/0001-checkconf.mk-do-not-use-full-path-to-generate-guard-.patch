@@ -1,0 +1,45 @@
+From c8a2a6529dc3ff609281ef4fe5c5bc949c805b5c Mon Sep 17 00:00:00 2001
+From: Rasmus Villemoes <rasmus.villemoes@prevas.dk>
+Date: Thu, 6 Jun 2024 11:42:46 +0200
+Subject: [PATCH] checkconf.mk: do not use full path to generate guard symbol
+ in conf.h
+
+The combination of building with -g3 (which emits definitions of all
+defined preprocessor macros to the debug info) and using a full path
+to define the name of this preprocessor guard means that the output is
+not binary reproducible across different build hosts. For example, in
+my Yocto build, the string
+
+  __home_ravi_yocto_tmp_glibc_work_stm32mp135fdk_oe_linux_gnueabi_optee_os_stm32mp_3_19_0_stm32mp_r1_1_build_stm32mp135f_dk_include_generated_conf_h_
+
+appears in several build artifacts. Another developer or buildbot
+would not build in some /home/ravi/... directory.
+
+In order to increase binary reproducibility, only use the path sans
+the $(out-dir)/ prefix of the conf.h file.
+
+Reviewed-by: Jens Wiklander <jens.wiklander@linaro.org>
+Signed-off-by: Rasmus Villemoes <rasmus.villemoes@prevas.dk>
+---
+ mk/checkconf.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+Upstream-Status: Backport [c8a2a6529dc3ff609281ef4fe5c5bc949c805b5c]
+
+diff --git a/mk/checkconf.mk b/mk/checkconf.mk
+index 449b1c2b8..bb08d6b15 100644
+--- a/mk/checkconf.mk
++++ b/mk/checkconf.mk
+@@ -17,7 +17,8 @@ define check-conf-h
+ 	cnf='$(strip $(foreach var,				\
+ 		$(call cfg-vars-by-prefix,$1),			\
+ 		$(call cfg-make-define,$(var))))';		\
+-	guard="_`echo $@ | tr -- -/.+ _`_";			\
++	guardpath="$(patsubst $(out-dir)/%,%,$@)"		\
++	guard="_`echo "$${guardpath}" | tr -- -/.+ _`_";	\
+ 	mkdir -p $(dir $@);					\
+ 	echo "#ifndef $${guard}" >$@.tmp;			\
+ 	echo "#define $${guard}" >>$@.tmp;			\
+-- 
+2.34.1
+

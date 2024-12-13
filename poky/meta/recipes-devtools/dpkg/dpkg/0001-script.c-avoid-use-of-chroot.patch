@@ -1,0 +1,88 @@
+From 5e5f06d396fe631990474ba6df83428987855365 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 26 Aug 2015 16:25:45 +0300
+Subject: [PATCH] script.c: avoid use of chroot
+
+Our pre/postinsts expect $D to be set when running in a sysroot and
+don't expect a chroot. This matches up our system expectations with what
+dpkg does.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+RP 2011/12/07
+ALIMON 2016/05/26
+ALIMON 2017/02/21
+KKang 2019/02/20
+
+Refresh to apply on top of v1.22.10.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ src/main/script.c | 52 +++--------------------------------------------
+ 1 file changed, 3 insertions(+), 49 deletions(-)
+
+diff --git a/src/main/script.c b/src/main/script.c
+index e9aee0bf9..181e7c710 100644
+--- a/src/main/script.c
++++ b/src/main/script.c
+@@ -97,57 +97,11 @@ static const char *
+ maintscript_pre_exec(struct command *cmd)
+ {
+ 	const char *instdir = dpkg_fsys_get_dir();
+-	const char *admindir = dpkg_db_get_dir();
+-	const char *changedir;
+-	size_t instdirlen = strlen(instdir);
+ 
+-	if (instdirlen > 0 && in_force(FORCE_SCRIPT_CHROOTLESS))
+-		changedir = instdir;
+-	else
+-		changedir = "/";
+-
+-	if (instdirlen > 0 && !in_force(FORCE_SCRIPT_CHROOTLESS)) {
+-		int rc;
+-
+-		if (strncmp(admindir, instdir, instdirlen) != 0)
+-			ohshit(_("admindir must be inside instdir for dpkg to work properly"));
+-		if (setenv("DPKG_ADMINDIR", admindir + instdirlen, 1) < 0)
+-			ohshite(_("unable to setenv for subprocesses"));
+-		if (setenv("DPKG_ROOT", "", 1) < 0)
+-			ohshite(_("unable to setenv for subprocesses"));
+-
+-		rc = chroot(instdir);
+-		if (rc && in_force(FORCE_NON_ROOT) && errno == EPERM)
+-			ohshit(_("not enough privileges to change root "
+-			         "directory with --force-not-root, consider "
+-			         "using --force-script-chrootless?"));
+-		else if (rc)
+-			ohshite(_("failed to chroot to '%.250s'"), instdir);
+-	}
+-	/* Switch to a known good directory to give the maintainer script
+-	 * a saner environment, also needed after the chroot(). */
+-	if (chdir(changedir))
+-		ohshite(_("failed to chdir to '%.255s'"), changedir);
+-	if (debug_has_flag(dbg_scripts)) {
+-		struct varbuf args = VARBUF_INIT;
+-		const char **argv = cmd->argv;
+-
+-		while (*++argv) {
+-			varbuf_add_char(&args, ' ');
+-			varbuf_add_str(&args, *argv);
+-		}
+-		debug(dbg_scripts, "fork/exec %s (%s )", cmd->filename,
+-		      varbuf_str(&args));
+-		varbuf_destroy(&args);
++        if (*instdir) {
++                setenv("D", instdir, 1);
+ 	}
+-	if (instdirlen == 0 || in_force(FORCE_SCRIPT_CHROOTLESS))
+-		return cmd->filename;
+-
+-	if (strlen(cmd->filename) < instdirlen)
+-		internerr("maintscript name '%s' length < instdir length %zd",
+-		          cmd->filename, instdirlen);
+-
+-	return cmd->filename + instdirlen;
++	return cmd->filename;
+ }
+ 
+ /**

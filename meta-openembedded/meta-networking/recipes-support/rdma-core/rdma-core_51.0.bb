@@ -8,6 +8,7 @@ RDEPENDS:${PN} = "bash perl"
 SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=master;protocol=https \
            file://0001-cmake-Allow-SYSTEMCTL_BIN-to-be-overridden-from-envi.patch \
            file://0001-include-libgen.h-for-basename.patch \
+           file://0001-librdmacm-Use-overloadable-function-attribute-with-c.patch \
 "
 SRCREV = "6cd09097ad2eebde9a7fa3d3bb09a2cea6e3c2d6"
 S = "${WORKDIR}/git"

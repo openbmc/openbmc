@@ -21,6 +21,10 @@ ARPWATCH_GID ?= "arpwatch"
 APRWATCH_FROM ?= "root "
 ARPWATH_REPLY ?= "${ARPWATCH_UID}"
 
+# many configure tests are failing with gcc-14
+CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
+BUILD_CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
+
 PACKAGECONFIG ??= ""
 
 PACKAGECONFIG[email] = "-with-watcher=email=${APRWATCH_FROM} --with-watchee=email=${ARPWATH_REPLY}, , postfix, postfix postfix-cfg"
@@ -60,9 +64,9 @@ do_install () {
     install -d ${D}/var/lib/arpwatch
 
     oe_runmake install DESTDIR=${D}
-    install -m 644 ${WORKDIR}/arpwatch.conf  ${D}${sysconfdir}
-    install -m 655 ${WORKDIR}/arpwatch_init  ${D}${sysconfdir}/init.d/arpwatch
-    install -m 644 ${WORKDIR}/arpwatch.default  ${D}${sysconfdir}/default
+    install -m 644 ${UNPACKDIR}/arpwatch.conf  ${D}${sysconfdir}
+    install -m 655 ${UNPACKDIR}/arpwatch_init  ${D}${sysconfdir}/init.d/arpwatch
+    install -m 644 ${UNPACKDIR}/arpwatch.default  ${D}${sysconfdir}/default
 }
 
 INITSCRIPT_NAME = "arpwatch"

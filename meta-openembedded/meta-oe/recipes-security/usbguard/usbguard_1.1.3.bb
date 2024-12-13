@@ -27,6 +27,8 @@ EXTRA_OECONF += "\
     --with-bundled-pegtl \
 "
 
+LDFLAGS:append:riscv32 = " -latomic"
+
 PACKAGECONFIG ?= "\
     openssl \
     ${@bb.utils.filter('DISTRO_FEATURES', 'polkit', d)} \

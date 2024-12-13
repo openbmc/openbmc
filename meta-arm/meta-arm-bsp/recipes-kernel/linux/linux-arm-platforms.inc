@@ -35,13 +35,21 @@ SRC_URI:append:corstone1000 = " ${@bb.utils.contains('MACHINE_FEATURES', \
                                                             'file://corstone1000_kernel_debug.cfg', \
                                                             '', \
                                                              d)}"
-
 SRC_URI:append:corstone1000 = " \
-    file://extsys.cfg \
-    file://0001-remoteproc-Add-Arm-remoteproc-driver.patch \
-    file://0002-arm64-dts-Add-corstone1000-external-system-device-no.patch \
-    file://0003-dt-bindings-remoteproc-Add-Arm-remoteproc.patch \
-    "
+    ${@bb.utils.contains( \
+              'MACHINE_FEATURES', \
+              'corstone1000-extsys', \
+              ' \
+		  file://extsys.cfg \
+		  file://0001-remoteproc-Add-Arm-remoteproc-driver.patch \
+		  file://0002-arm64-dts-Add-corstone1000-external-system-device-no.patch \
+		  file://0003-dt-bindings-remoteproc-Add-Arm-remoteproc.patch \
+              ', \
+              '', \
+              d \
+        ) \
+    } \
+"
 
 # Default kernel features not needed for corstone1000
 # otherwise the extra kernel modules will increase the rootfs size

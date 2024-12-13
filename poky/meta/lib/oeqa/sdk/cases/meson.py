@@ -18,6 +18,10 @@ class MesonTest(OESDKTestCase):
     Test that Meson builds correctly.
     """
     def setUp(self):
+        libc = self.td.get("TCLIBC")
+        if libc in [ 'newlib' ]:
+            raise unittest.SkipTest("MesonTest class: SDK doesn't contain a supported C library")
+
         if not (self.tc.hasHostPackage("nativesdk-meson") or
                 self.tc.hasHostPackage("meson-native")):
             raise unittest.SkipTest("MesonTest: needs meson")

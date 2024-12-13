@@ -1,0 +1,51 @@
+From 1e8fbb6da4e5ee44fe24c078aae1930d759f0ba3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Sep 2024 05:29:13 +0000
+Subject: [PATCH] cmake: Add check for 64bit builtin atomics
+
+Compilers for some architectures e.g. RISCV32 do not have 64bit atomics
+therefore, its important to deduce that and use it to pass right flags to
+compiler to use them, e.g. h2o module
+
+Fixes
+nection.c.o): in function `h2o_create_connection':
+| /usr/src/debug/netdata/1.47.1/src/web/server/h2o/libh2o/include/h2o.h:1917:(.text.create_conn+0x5e): undefined reference to `__sync_add_and_fetch_8'
+| collect2: error: ld returned 1 exit status
+
+Upstream-Status: Submitted [https://github.com/netdata/netdata/pull/18565]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+Index: netdata-v1.47.1/CMakeLists.txt
+===================================================================
+--- netdata-v1.47.1.orig/CMakeLists.txt
++++ netdata-v1.47.1/CMakeLists.txt
+@@ -448,6 +448,15 @@ int main() {
+ }
+ " HAVE_BUILTIN_ATOMICS)
+ 
++check_cxx_source_compiles("
++#include <stdint.h>
++int main(void) {
++        uint64_t a;
++        __sync_add_and_fetch(&a, 1);
++        return 0;
++}
++" ARCH_SUPPORTS_64BIT_ATOMICS)
++
+ check_c_source_compiles("
+ void my_printf(char const *s, ...) __attribute__((format(gnu_printf, 1, 2)));
+ int main() { return 0; }
+@@ -523,6 +532,10 @@ if(OS_FREEBSD OR OS_MACOS)
+         set(HAVE_BUILTIN_ATOMICS True)
+ endif()
+ 
++if (ENABLE_H2O AND NOT ARCH_SUPPORTS_64BIT_ATOMICS)
++       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DH2O_NO_64BIT_ATOMICS")
++endif (NOT ARCH_SUPPORTS_64BIT_ATOMICS)
++
+ # openssl/crypto
+ set(ENABLE_OPENSSL True)
+ pkg_check_modules(TLS IMPORTED_TARGET openssl)

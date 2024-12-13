@@ -13,6 +13,7 @@ SRC_URI = "http://github.com/zeromq/libzmq/releases/download/v${PV}/zeromq-${PV}
 SRC_URI[sha256sum] = "6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43"
 
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/libzmq/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+\.\d+\.\d+)"
 
 inherit cmake ptest pkgconfig
 

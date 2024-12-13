@@ -1,4 +1,4 @@
-From 0671715ae6d411b5d2d4c53fee42a6e9fe2562c2 Mon Sep 17 00:00:00 2001
+From 875975598d5a1000b8c8ad7596178d0a64f9e0cb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 31 Jan 2023 22:03:38 -0800
 Subject: [PATCH] aarch64: Fix include paths when S != B
@@ -28,7 +28,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/aarch64/aarch64.h b/gcc/config/aarch64/aarch64.h
-index 45e901cda64..591062d4b39 100644
+index 4fa1dfc7906..63c9a832d1c 100644
 --- a/gcc/config/aarch64/aarch64.h
 +++ b/gcc/config/aarch64/aarch64.h
 @@ -170,9 +170,9 @@ enum class aarch64_feature : unsigned char {

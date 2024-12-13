@@ -482,19 +482,6 @@ def get_multilib_datastore(variant, d):
         localdata.setVar("MLPREFIX", "")
     return localdata
 
-class ImageQAFailed(Exception):
-    def __init__(self, description, name=None, logfile=None):
-        self.description = description
-        self.name = name
-        self.logfile=logfile
-
-    def __str__(self):
-        msg = 'Function failed: %s' % self.name
-        if self.description:
-            msg = msg + ' (%s)' % self.description
-
-        return msg
-
 def sh_quote(string):
     import shlex
     return shlex.quote(string)

@@ -23,3 +23,5 @@ do_rootfs[noexec] = "1"
 do_image[noexec] = "1"
 do_image_complete[noexec] = "1"
 do_build[depends] = ""
+
+IMAGE_CLASSES:remove = "create-spdx-image-3.0"

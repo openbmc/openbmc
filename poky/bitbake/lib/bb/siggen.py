@@ -878,7 +878,7 @@ def clean_checksum_file_path(file_checksum_tuple):
     f, cs = file_checksum_tuple
     if "/./" in f:
         return "./" + f.split("/./")[1]
-    return f
+    return os.path.basename(f)
 
 def dump_this_task(outfile, d):
     import bb.parse

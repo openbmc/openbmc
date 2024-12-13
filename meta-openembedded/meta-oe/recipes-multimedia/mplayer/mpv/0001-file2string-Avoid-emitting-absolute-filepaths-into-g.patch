@@ -1,0 +1,33 @@
+From 9878681df9919d28da3e4c6cc706e264abd9df92 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2024 17:54:15 -0700
+Subject: [PATCH] file2string: Avoid emitting absolute filepaths into generated
+ sources
+
+These sources are bundled into src packages to be distributed and leaking
+buildpaths results in violating reproducibility norms.
+
+Upstream-Status: Submitted [https://github.com/mpv-player/mpv/pull/14763]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ TOOLS/file2string.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/TOOLS/file2string.py b/TOOLS/file2string.py
+index 5b1c4a95d1..39c1122a35 100755
+--- a/TOOLS/file2string.py
++++ b/TOOLS/file2string.py
+@@ -22,10 +22,10 @@
+ # License along with mpv.  If not, see <http://www.gnu.org/licenses/>.
+ #
+ 
+-import sys
++import os, sys
+ 
+ def file2string(infilename, infile, outfile):
+-    outfile.write("// Generated from %s\n\n" % infilename)
++    outfile.write("// Generated from %s\n\n" % os.path.basename(infilename))
+ 
+     conv = ["\\%03o" % c for c in range(256)]
+     safe_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" \

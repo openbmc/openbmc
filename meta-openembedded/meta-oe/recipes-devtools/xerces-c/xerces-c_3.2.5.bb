@@ -9,7 +9,9 @@ SECTION =  "libs"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRC_URI = "http://archive.apache.org/dist/xerces/c/3/sources/${BP}.tar.bz2"
+SRC_URI = "http://archive.apache.org/dist/xerces/c/3/sources/${BP}.tar.bz2 \
+    file://0001-aclocal.m4-don-t-use-full-path-of-with_curl-in-xerce.patch \
+"
 SRC_URI[sha256sum] = "1db4028c9b7f1f778efbf4a9462d65e13f9938f2c22f9e9994e12c49ba97e252"
 
 inherit autotools
@@ -17,10 +19,6 @@ inherit autotools
 PACKAGECONFIG ??= "curl icu"
 PACKAGECONFIG[curl] = "--with-curl=${STAGING_DIR_TARGET}${prefix},--with-curl=no,curl"
 PACKAGECONFIG[icu] = "--with-icu=${STAGING_DIR_TARGET}${prefix},--with-icu=no,icu"
-
-do_install:prepend () {
-    sed -i s:-L${STAGING_LIBDIR}::g ${B}/xerces-c.pc
-}
 
 PACKAGES = "libxerces-c \
     libxerces-c-dev \

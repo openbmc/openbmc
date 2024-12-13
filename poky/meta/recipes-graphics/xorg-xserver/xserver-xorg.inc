@@ -176,4 +176,4 @@ python populate_packages:prepend() {
     d.appendVar("RPROVIDES:" + pn, " " + get_abi("video"))
 }
 
-CVE_STATUS[CVE-2023-5574] = "${@bb.utils.contains('PACKAGECONFIG', 'xvfb', '', 'not-applicable-config: specific to Xvfb', d)}"
+CVE_STATUS[CVE-2023-5574] = "${@bb.utils.contains('PACKAGECONFIG', 'xvfb', 'unpatched', 'not-applicable-config: specific to Xvfb', d)}"

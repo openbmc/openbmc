@@ -1,0 +1,45 @@
+From 96e0e3ed49a0e00573fa5907ae80e6d262cb7644 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 9 Sep 2024 23:01:06 +0800
+Subject: [PATCH] Avoid conflicts between sys/mount.h and linux/mount.h
+
+linux/fs.h includes linux/mount.h and this include file is unused so
+do not include it and avoid conflict too with glibc 2.36+ see [1]
+
+[1] https://sourceware.org/glibc/wiki/Release/2.36#Usage_of_.3Clinux.2Fmount.h.3E_and_.3Csys.2Fmount.h.3E
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ modules/parse_amd.c | 1 -
+ modules/parse_sun.c | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/modules/parse_amd.c b/modules/parse_amd.c
+index fb6b1b7..d86adf1 100644
+--- a/modules/parse_amd.c
++++ b/modules/parse_amd.c
+@@ -27,7 +27,6 @@
+ #include <sys/utsname.h>
+ #include <netinet/in.h>
+ #include <sys/mount.h>
+-#include <linux/fs.h>
+ 
+ #define MODULE_PARSE
+ #include "automount.h"
+diff --git a/modules/parse_sun.c b/modules/parse_sun.c
+index a5351fd..8509781 100644
+--- a/modules/parse_sun.c
++++ b/modules/parse_sun.c
+@@ -30,7 +30,6 @@
+ #include <sys/utsname.h>
+ #include <netinet/in.h>
+ #include <sys/mount.h>
+-#include <linux/fs.h>
+ 
+ #define MODULE_PARSE
+ #include "automount.h"
+-- 
+2.25.1
+

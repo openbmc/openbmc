@@ -1,4 +1,4 @@
-From 3cce8716c6c3ae2e0c835caeac3780ec35090b2d Mon Sep 17 00:00:00 2001
+From e27de983ef70257ca1fd7f5096eea41613612ecf Mon Sep 17 00:00:00 2001
 From: Serhey Popovych <serhe.popovych@gmail.com>
 Date: Tue, 11 Dec 2018 05:44:20 -0500
 Subject: [PATCH 2/2] ldso: Use syslibdir and libdir as default pathes to
@@ -36,10 +36,10 @@ index 466d9afd..d2f458fa 100644
  
  LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
 diff --git a/ldso/dynlink.c b/ldso/dynlink.c
-index cc677952..b0e8815b 100644
+index 324aa859..7d3ab44c 100644
 --- a/ldso/dynlink.c
 +++ b/ldso/dynlink.c
-@@ -29,6 +29,8 @@
+@@ -35,6 +35,8 @@ static size_t ldso_page_size;
  #define realloc __libc_realloc
  #define free __libc_free
  
@@ -48,7 +48,7 @@ index cc677952..b0e8815b 100644
  static void error_impl(const char *, ...);
  static void error_noop(const char *, ...);
  static void (*error)(const char *, ...) = error_noop;
-@@ -1097,7 +1099,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+@@ -1159,7 +1161,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
  					sys_path = "";
  				}
  			}
@@ -58,5 +58,5 @@ index cc677952..b0e8815b 100644
  		}
  		pathname = buf;
 -- 
-2.37.2
+2.43.0
 

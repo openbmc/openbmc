@@ -2,7 +2,7 @@ DESCRIPTION = "gvfs is a userspace virtual filesystem"
 LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=05df38dd77c35ec8431f212410a3329e"
 
-inherit gnomebase gsettings bash-completion gettext upstream-version-is-even features_check useradd
+inherit gnomebase gsettings bash-completion gettext upstream-version-is-even features_check
 
 DEPENDS += "\
     dbus \
@@ -77,16 +77,7 @@ PACKAGECONFIG[fuse] = "-Dfuse=true, -Dfuse=false, fuse3"
 # libcdio-paranoia recipe doesn't exist yet
 PACKAGECONFIG[cdda] = "-Dcdda=true, -Dcdda=false, libcdio-paranoia"
 
-USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 polkitd"
-
 do_install:append() {
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'polkit', 'true', 'false', d)}; then
-        # Fix up permissions on polkit rules.d to work with rpm4 constraints
-        chmod 700 ${D}${datadir}/polkit-1/rules.d
-        chown polkitd:root ${D}${datadir}/polkit-1/rules.d
-    fi
-
     # After rebuilds (not from scracth) it can happen that the executables in
     # libexec ar missing executable permission flag. Not sure but it came up
     # during transition to meson. Looked into build files and logs but could

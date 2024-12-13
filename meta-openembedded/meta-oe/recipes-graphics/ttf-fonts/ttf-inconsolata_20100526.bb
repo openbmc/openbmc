@@ -8,7 +8,8 @@ LIC_FILES_CHKSUM = "file://${UNPACKDIR}/OFL.txt;md5=969851e3a70122069a4d9ee61dd5
 SRC_URI = "http://levien.com/type/myfonts/Inconsolata.otf \
     file://OFL.txt"
 
-S = "${UNPACKDIR}/ttf-inconsolata-${PV}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 FILES:${PN} = "${datadir}/fonts/truetype/Inconsolata.ttf \
     ${datadir}/doc/ttf-inconsolata/*"

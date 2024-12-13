@@ -12,11 +12,9 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  nmap-update/Makefile.in | 2 +-
  2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/ncat/Makefile.in b/ncat/Makefile.in
-index cfd306d..2166e08 100644
 --- a/ncat/Makefile.in
 +++ b/ncat/Makefile.in
-@@ -163,11 +163,11 @@ $(NSOCKDIR)/libnsock.a: $(NSOCKDIR)/Makefile
+@@ -162,11 +162,11 @@ $(NSOCKDIR)/libnsock.a: $(NSOCKDIR)/Make
  
  install: $(TARGET)
  	@echo Installing Ncat;
@@ -30,19 +28,3 @@ index cfd306d..2166e08 100644
  		$(INSTALL) -c -m 644 $(DATAFILES) $(DESTDIR)$(pkgdatadir)/; \
  	fi
  	$(INSTALL) -c -m 644 docs/$(TARGET).1 $(DESTDIR)$(mandir)/man1/$(TARGET).1
-diff --git a/nmap-update/Makefile.in b/nmap-update/Makefile.in
-index 89ff928..93f48d8 100644
---- a/nmap-update/Makefile.in
-+++ b/nmap-update/Makefile.in
-@@ -37,7 +37,7 @@ $(NBASELIB):
- 	cd $(NBASEDIR) && $(MAKE)
- 
- install: nmap-update
--	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(bindir) $(DESTDIR)$(mandir)/man1
-+	mkdir -p -m 755 $(DESTDIR)$(bindir) $(DESTDIR)$(mandir)/man1
- 	$(INSTALL) -c -m 755 nmap-update $(DESTDIR)$(bindir)
- 	$(STRIP) -x $(DESTDIR)$(bindir)/nmap-update
- 	$(INSTALL) -c -m 644 ../docs/nmap-update.1 $(DESTDIR)$(mandir)/man1/
--- 
-1.9.1
-

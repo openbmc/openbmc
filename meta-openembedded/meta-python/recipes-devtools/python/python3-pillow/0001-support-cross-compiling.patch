@@ -1,4 +1,4 @@
-From cd09b6f68aa49c72e9a9bb0765e8c666238a7b7e Mon Sep 17 00:00:00 2001
+From 5b28d19d6513cc3eb3105d3f917df352283f3c5e Mon Sep 17 00:00:00 2001
 From: Leon Anavi <leon.anavi@konsulko.com>
 Date: Mon, 11 Jan 2021 13:25:12 +0000
 Subject: [PATCH] support cross compiling
@@ -12,10 +12,10 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index cbc2641c..302bc6e7 100755
+index 0abfaaddc..557420a6b 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -123,7 +123,7 @@ _LIB_IMAGING = (
+@@ -129,7 +129,7 @@ _LIB_IMAGING = (
      "codec_fd",
  )
  
@@ -24,7 +24,7 @@ index cbc2641c..302bc6e7 100755
  
  
  class DependencyException(Exception):
-@@ -408,12 +408,12 @@ class pil_build_ext(build_ext):
+@@ -508,12 +508,12 @@ class pil_build_ext(build_ext):
                      _add_directory(library_dirs, match.group(1))
  
          # include, rpath, if set as environment variables:
@@ -39,6 +39,3 @@ index cbc2641c..302bc6e7 100755
              if k in os.environ:
                  for d in os.environ[k].split(os.path.pathsep):
                      _add_directory(library_dirs, d)
--- 
-2.17.1
-

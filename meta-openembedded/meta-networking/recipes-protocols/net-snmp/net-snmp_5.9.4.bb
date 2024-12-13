@@ -73,6 +73,7 @@ CACHED_CONFIGUREVARS = " \
     lt_cv_shlibpath_overrides_runpath=yes \
     ac_cv_path_UNAMEPROG=${base_bindir}/uname \
     ac_cv_path_PSPROG=${base_bindir}/ps \
+    ac_cv_ps_flags="-e" \
     ac_cv_file__etc_printcap=no \
     NETSNMP_CONFIGURE_OPTIONS= \
 "

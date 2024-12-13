@@ -1,0 +1,27 @@
+From 5fe5dae674e259bcdd57b9c6a0004111ab0700ce Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Jun 2018 19:25:57 -0700
+Subject: [PATCH] include stddef.h for ptrdiff_t
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ morecore.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/morecore.c b/morecore.c
+index 405c566..0edccd2 100644
+--- a/morecore.c
++++ b/morecore.c
+@@ -19,6 +19,7 @@
+ 
+ #define _GNU_SOURCE
+ 
++#include <stddef.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <malloc.h>
+-- 
+2.25.1
+

@@ -36,7 +36,7 @@ UPSTREAM_CHECK_URI = "https://www.sourceware.org/pub/bzip2/"
 
 PACKAGES =+ "libbz2"
 
-CFLAGS:append = " -fPIC -fpic -Winline -fno-strength-reduce -D_FILE_OFFSET_BITS=64"
+CFLAGS += "-fPIC -fpic -Winline -fno-strength-reduce -D_FILE_OFFSET_BITS=64"
 
 inherit autotools update-alternatives ptest relative_symlinks
 
@@ -65,6 +65,8 @@ do_install_ptest () {
 FILES:libbz2 = "${libdir}/lib*${SOLIBS}"
 
 RDEPENDS:${PN}-ptest += "make bash"
+
+CVE_PRODUCT = "bzip:bzip2"
 
 PROVIDES:append:class-native = " bzip2-replacement-native"
 BBCLASSEXTEND = "native nativesdk"

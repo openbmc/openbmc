@@ -457,7 +457,7 @@ def _parse_proc_disk_stat_log(file):
     not sda1, sda2 etc. The format of relevant lines should be:
     {major minor name rio rmerge rsect ruse wio wmerge wsect wuse running use aveq}
     """
-    disk_regex_re = re.compile ('^([hsv]d.|mtdblock\d|mmcblk\d|cciss/c\d+d\d+.*)$')
+    disk_regex_re = re.compile (r'^([hsv]d.|mtdblock\d|mmcblk\d|cciss/c\d+d\d+.*)$')
 
     # this gets called an awful lot.
     def is_relevant_line(linetokens):
@@ -594,8 +594,8 @@ def _parse_pressure_logs(file, filename):
 # [    0.039993] calling  migration_init+0x0/0x6b @ 1
 # [    0.039993] initcall migration_init+0x0/0x6b returned 1 after 0 usecs
 def _parse_dmesg(writer, file):
-    timestamp_re = re.compile ("^\[\s*(\d+\.\d+)\s*]\s+(.*)$")
-    split_re = re.compile ("^(\S+)\s+([\S\+_-]+) (.*)$")
+    timestamp_re = re.compile (r"^\[\s*(\d+\.\d+)\s*]\s+(.*)$")
+    split_re = re.compile (r"^(\S+)\s+([\S\+_-]+) (.*)$")
     processMap = {}
     idx = 0
     inc = 1.0 / 1000000
@@ -640,7 +640,7 @@ def _parse_dmesg(writer, file):
 #               print "foo: '%s' '%s' '%s'" % (type, func, rest)
         if type == "calling":
             ppid = kernel.pid
-            p = re.match ("\@ (\d+)", rest)
+            p = re.match (r"\@ (\d+)", rest)
             if p is not None:
                 ppid = float (p.group(1)) // 1000
 #                               print "match: '%s' ('%g') at '%s'" % (func, ppid, time_ms)
@@ -742,7 +742,7 @@ def get_num_cpus(headers):
     cpu_model = headers.get("system.cpu")
     if cpu_model is None:
         return 1
-    mat = re.match(".*\\((\\d+)\\)", cpu_model)
+    mat = re.match(r".*\\((\\d+)\\)", cpu_model)
     if mat is None:
         return 1
     return max (int(mat.group(1)), 1)

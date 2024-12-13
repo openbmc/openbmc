@@ -22,7 +22,7 @@ SRC_URI = " \
     "
 
 SRCREV = "e69cb5047946818e6a9df326851483bb075a5cfe"
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 PARALLEL_MAKE = ""
 
@@ -74,6 +74,8 @@ do_compile () {
 }
 
 do_install () {
+    sed -i -e 's#${RECIPE_SYSROOT}##g' ${B}/libraries/libapparmor/swig/perl/libapparmor_wrap.c
+
     oe_runmake -C ${B}/libraries/libapparmor DESTDIR="${D}" install
     oe_runmake -C ${B}/binutils DESTDIR="${D}" install
     oe_runmake -C ${B}/utils DESTDIR="${D}" install
@@ -102,6 +104,9 @@ do_install () {
     fi
     chown root:root -R ${D}/${sysconfdir}/apparmor.d
     chown root:root -R ${D}/${datadir}/apparmor
+
+    find ${D}${libdir}/perl5/ -type f -name ".packlist" -delete
+    find ${D}${PYTHON_SITEPACKAGES_DIR}/LibAppArmor/ -type f -name "_LibAppArmor*.so" -delete
 }
 
 #Building ptest on arm fails.

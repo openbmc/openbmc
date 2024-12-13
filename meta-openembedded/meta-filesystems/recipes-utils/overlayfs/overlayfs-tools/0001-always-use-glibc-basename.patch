@@ -1,0 +1,38 @@
+From 2fa94fc7adf05fae46204f4665216c8b019010f3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 5 Jul 2024 23:16:38 -0700
+Subject: [PATCH 1/2] always use glibc basename()
+
+There is a use of basename() which expects it to be GNU version of
+basename, which is not available in other libcs e.g. musl on Linux
+therefore provide a version for such cases
+
+Upstream-Status: Submitted [https://github.com/kmxz/overlayfs-tools/pull/26]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ main.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/main.c b/main.c
+index 7b669eb..ea0f5a5 100644
+--- a/main.c
++++ b/main.c
+@@ -30,6 +30,18 @@ bool brief;
+ bool ignore;
+ extern char *program_name;
+ 
++#ifndef __GLIBC__
++/*
++ * GNU basename implementation
++ */
++static const char *__basename(const char *filename) {
++    char *p = strrchr(filename, '/');
++    return p ? p + 1 : filename;
++}
++
++#define basename(x) __basename(x)
++#endif
++
+ void print_help(const char *program) {
+     printf("Usage: %s command options\n", program);
+     puts("");

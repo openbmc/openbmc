@@ -1,6 +1,6 @@
-From 4fa437782261c0da785d4574ad3a03700f624e66 Mon Sep 17 00:00:00 2001
+From 9f5afd99cce93e68996deb2b5fa7c32737d279fe Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
-Date: Tue, 19 Sep 2023 02:56:09 +0000
+Date: Tue, 16 Jul 2024 17:54:29 +0800
 Subject: [PATCH] cmake: remove build flags
 
 Don't generate the build host related info and reemove the build flags
@@ -11,11 +11,10 @@ Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
  config/cmake/libhdf5.settings.cmake.in | 18 +++++++++---------
- src/H5make_libsettings.c               | 17 -----------------
- 2 files changed, 9 insertions(+), 26 deletions(-)
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/config/cmake/libhdf5.settings.cmake.in b/config/cmake/libhdf5.settings.cmake.in
-index f60f0de..f4433c0 100644
+index deb07ed..6f255c4 100644
 --- a/config/cmake/libhdf5.settings.cmake.in
 +++ b/config/cmake/libhdf5.settings.cmake.in
 @@ -23,23 +23,23 @@ Linking Options:
@@ -28,7 +27,7 @@ index f60f0de..f4433c0 100644
                       AM_LDFLAGS: @AM_LDFLAGS@
                  Extra libraries: @LINK_LIBS@
 -                       Archiver: @CMAKE_AR@
--                       AR_FLAGS: 
+-                       AR_FLAGS:
 -                         Ranlib: @CMAKE_RANLIB@
 +                       Archiver:
 +                       AR_FLAGS:
@@ -63,34 +62,6 @@ index f60f0de..f4433c0 100644
                     H5 C++ Flags: @HDF5_CMAKE_CXX_FLAGS@
                     AM C++ Flags: @AM_CXXFLAGS@
               Shared C++ Library: @H5_ENABLE_SHARED_LIB@
-diff --git a/src/H5make_libsettings.c b/src/H5make_libsettings.c
-index 2661288..7c0f84f 100644
---- a/src/H5make_libsettings.c
-+++ b/src/H5make_libsettings.c
-@@ -205,23 +205,6 @@ information about the library build configuration\n";
-     fprintf(rawoutstream, "/* Generated automatically by H5make_libsettings -- do not edit */\n\n\n");
-     fputs(FileHeader, rawoutstream); /*the copyright notice--see top of this file */
- 
--    fprintf(rawoutstream, " *\n * Created:\t\t%s %2d, %4d\n", month_name[tm->tm_mon], tm->tm_mday,
--            1900 + tm->tm_year);
--    if (pwd || real_name[0] || host_name[0]) {
--        fprintf(rawoutstream, " *\t\t\t");
--        if (real_name[0])
--            fprintf(rawoutstream, "%s <", real_name);
--#ifdef H5_HAVE_GETPWUID
--        if (pwd)
--            fputs(pwd->pw_name, rawoutstream);
--#endif
--        if (host_name[0])
--            fprintf(rawoutstream, "@%s", host_name);
--        if (real_name[0])
--            fprintf(rawoutstream, ">");
--        fputc('\n', rawoutstream);
--    }
--
-     fprintf(rawoutstream, " *\n * Purpose:\t\t");
- 
-     for (s = purpose; *s; s++) {
 -- 
-2.35.5
+2.25.1
 

@@ -18,8 +18,8 @@ LICENSE_FLAGS = "synaptics-killswitch"
 SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bookworm;protocol=https \
     file://0001-Default-43455-firmware-to-standard-variant.patch \
 "
-SRCREV = "223ccf3a3ddb11b3ea829749fbbba4d65b380897"
-PV = "20230625-2+rpt2"
+SRCREV = "4b356e134e8333d073bd3802d767a825adec3807"
+PV = "20230625-2+rpt3"
 S = "${WORKDIR}/git"
 
 inherit allarch

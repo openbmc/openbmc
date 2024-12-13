@@ -1,4 +1,4 @@
-From c79222a9a5e3425c55e150edc0b7ac59c573aa2f Mon Sep 17 00:00:00 2001
+From 0387d71516c978899cfd556ca512f530a212b4a9 Mon Sep 17 00:00:00 2001
 From: Phil Blundell <pb@pbcl.net>
 Date: Mon, 24 Sep 2012 07:24:51 +0100
 Subject: [PATCH] util-linux: Ensure that ${sbindir} is respected
@@ -9,16 +9,15 @@ fix the test, the [ ] syntax was getting eaten by autoconf
 Signed-off-by: Phil Blundell <pb@pbcl.net>
 Signed-off-by: Saul Wold <sgw@linux.intel.com
 Upstream-Status: Inappropriate [configuration]
-
 ---
  configure.ac | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 36c24b4..890212f 100644
+index 23594ff..651ef2b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -102,7 +102,10 @@ AC_SUBST([runstatedir])
+@@ -110,7 +110,10 @@ AC_SUBST([runstatedir])
  usrbin_execdir='${exec_prefix}/bin'
  AC_SUBST([usrbin_execdir])
  

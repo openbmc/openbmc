@@ -9,7 +9,6 @@ TOOLCHAIN:qemuarm-secureboot = "gcc"
 FILESEXTRAPATHS:prepend:qemuarm64-secureboot := "${THISDIR}/files:"
 SRC_URI:append:qemuarm64-secureboot = " \
             file://0001-Add-spmc_manifest-for-qemu.patch \
-            file://0001-bl31_runtime-revert-usage-of-plat_ic_has_interrupt_t.patch \
         "
 
 TFA_PLATFORM:qemuarm64-secureboot = "qemu"

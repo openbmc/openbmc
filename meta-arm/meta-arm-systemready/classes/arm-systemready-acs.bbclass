@@ -29,7 +29,7 @@ IMAGE_POSTPROCESS_COMMAND += "write_image_test_data; "
 python do_deploy() {
     deploydir = d.getVar('DEPLOYDIR')
     suffix = d.getVar('IMAGE_DEPLOY_SUFFIX')
-    imgfile = os.path.join(d.getVar('WORKDIR'), d.getVar('IMAGE_FILENAME'))
+    imgfile = os.path.join(d.getVar('UNPACKDIR'), d.getVar('IMAGE_FILENAME'))
     deployfile = os.path.join(deploydir, d.getVar('IMAGE_NAME') + suffix)
     linkfile = os.path.join(deploydir, d.getVar('IMAGE_LINK_NAME') + suffix)
 
@@ -47,14 +47,14 @@ python do_deploy() {
 
     # Copy the report.txt to DEPLOYDIR
     # The machine-specific implementation can optionally put the report file in
-    # ${WORKDIR}/report.txt. If there is no such file present, use the template.
-    workdir = d.getVar('WORKDIR')
-    report_file = os.path.join(workdir, "report.txt")
+    # ${UNPACKDIR}/report.txt. If there is no such file present, use the template.
+    unpackdir = d.getVar('UNPACKDIR')
+    report_file = os.path.join(unpackdir, "report.txt")
     report_file_dest = os.path.join(deploydir, "report.txt")
     if os.path.exists(report_file):
         report_file_to_copy = report_file
     else:
-        report_file_to_copy = os.path.join(workdir, "systemready-ir-template",
+        report_file_to_copy = os.path.join(unpackdir, "systemready-ir-template",
                                             "report.txt")
     shutil.copyfile(report_file_to_copy, report_file_dest)
 

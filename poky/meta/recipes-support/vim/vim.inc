@@ -14,13 +14,12 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d1a651ab770b45d41c0f8cb5a8ca930e"
 
 SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https \
            file://disable_acl_header_check.patch \
-           file://vim-add-knob-whether-elf.h-are-checked.patch \
            file://0001-src-Makefile-improve-reproducibility.patch \
            file://no-path-adjust.patch \
            "
 
-PV .= ".0114"
-SRCREV = "fcaed6a70faf73bff3e5405ada556d726024f866"
+PV .= ".0764"
+SRCREV = "51b62387be93c65fa56bbabe1c3c1ea5df187641"
 
 # Do not consider .z in x.y.z, as that is updated with every commit
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+)\.0"
@@ -128,7 +127,6 @@ FILES:${PN}-data = "${datadir}/${BPN}"
 # We do not want to complain if perl or gawk are not on the target.
 #
 FILES:${PN}-tools = "${datadir}/${BPN}/${VIMDIR}/tools"
-INSANE_SKIP:${PN}-tools = "file-rdeps"
 
 FILES:${PN}-common = " \
     ${datadir}/${BPN}/${VIMDIR}/*.vim \

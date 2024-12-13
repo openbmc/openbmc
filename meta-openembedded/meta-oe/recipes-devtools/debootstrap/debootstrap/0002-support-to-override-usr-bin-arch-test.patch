@@ -1,7 +1,7 @@
-From f0420b201f2fb5286ccf5657faa6b38cd2680e10 Mon Sep 17 00:00:00 2001
+From 3fee46c7e50f432fbd5c97c60b918d71c91f1adc Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 8 Apr 2021 14:08:06 +0800
-Subject: [PATCH 2/2] support to override /usr/bin/arch-test
+Subject: [PATCH] support to override /usr/bin/arch-test
 
 Upstream-Status: Submitted [https://salsa.debian.org/installer-team/debootstrap/-/merge_requests/55]
 
@@ -11,12 +11,12 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/debootstrap b/debootstrap
-index 9b9e58d..a3cf3af 100755
+index 552c8d6..11a9465 100755
 --- a/debootstrap
 +++ b/debootstrap
 @@ -51,6 +51,10 @@ INRELEASE_PATH=""
+ 
  DEF_MIRROR="http://deb.debian.org/debian"
- DEF_HTTPS_MIRROR="https://deb.debian.org/debian"
  
 +if [ -z "$ARCH_TEST" ]; then
 +	ARCH_TEST="/usr/bin/arch-test"
@@ -25,7 +25,7 @@ index 9b9e58d..a3cf3af 100755
  # set $CONTAINER
  detect_container
  
-@@ -645,12 +649,12 @@ fi
+@@ -661,12 +665,12 @@ fi
  
  ###########################################################################
  
@@ -43,5 +43,5 @@ index 9b9e58d..a3cf3af 100755
  		ret=3
  	fi
 -- 
-2.17.1
+2.25.1
 

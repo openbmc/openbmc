@@ -11,9 +11,8 @@ inherit gettext autotools-brokensep update-rc.d systemd
 SRC_URI = "git://git.code.sf.net/p/minidlna/git;branch=master;module=git \
            file://minidlna-daemon.init.d \
            file://minidlna.service \
-           file://0001-Update-Gettext-version.patch \
            file://0001-configure-Check-for-clock_gettime-seprately-from-__N.patch \
-           file://0001-configure.ac-drop-non-standard-checks.patch \
+           file://0001-Add-compatibility-with-FFMPEG-7.0.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -21,6 +20,10 @@ S = "${WORKDIR}/git"
 # This remove "--exclude=autopoint" option from autoreconf argument to avoid
 # configure.ac:30: error: required file './ABOUT-NLS' not found
 EXTRA_AUTORECONF = ""
+
+# Reproducibility: force os-name and os-version to constants to avoid host
+# related build differences
+EXTRA_OECONF = "--with-os-name='${DISTRO_NAME}' --with-os-version=''"
 
 do_install:append(){
     install -d ${D}${sysconfdir}

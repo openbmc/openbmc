@@ -1,4 +1,4 @@
-From 089ee95b342e79af09258b45c888a13b35fadf26 Mon Sep 17 00:00:00 2001
+From 56d41f0cc6a806d2e8d7dcbfb4cca4cd37fba835 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:58:54 +0000
 Subject: [PATCH] binutils-crosssdk: Generate relocatable SDKs
@@ -34,10 +34,10 @@ index b43ae841a6c..6101a95195b 100644
    Output_section_data* odata = new Output_data_const(interp, len, 1);
  
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index d6ceb3fe4f5..365c0e778cc 100755
+index a726b158161..5d2eb737efc 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
-@@ -298,6 +298,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
+@@ -315,6 +315,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
  LD_FLAG=r
  DATA_ALIGNMENT=${DATA_ALIGNMENT_r}
  DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
@@ -45,7 +45,7 @@ index d6ceb3fe4f5..365c0e778cc 100755
  ( echo "/* Script for -r */"
    source_sh ${CUSTOMIZER_SCRIPT}
    source_sh ${srcdir}/scripttempl/${SCRIPT_NAME}.sc
-@@ -306,10 +307,12 @@ DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
+@@ -323,10 +324,12 @@ DEFAULT_DATA_ALIGNMENT="ALIGN(${SEGMENT_SIZE})"
  LD_FLAG=u
  DATA_ALIGNMENT=${DATA_ALIGNMENT_u}
  CONSTRUCTING=" "
@@ -59,10 +59,10 @@ index d6ceb3fe4f5..365c0e778cc 100755
  DATA_ALIGNMENT=${DATA_ALIGNMENT_}
  RELOCATING=" "
 diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
-index fae7c2ad71c..7fe37eb1874 100644
+index 54716110b61..da17fe5cbce 100644
 --- a/ld/scripttempl/elf.sc
 +++ b/ld/scripttempl/elf.sc
-@@ -150,8 +150,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
+@@ -152,8 +152,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
      DATA_SEGMENT_RELRO_END=". = DATA_SEGMENT_RELRO_END (${SEPARATE_GOTPLT-0}, .);"
    fi
  fi

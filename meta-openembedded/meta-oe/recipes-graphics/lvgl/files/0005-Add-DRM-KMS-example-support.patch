@@ -13,7 +13,7 @@ To use DRM/KMS support, adjust lv_conf.h as follows:
 LV_USE_LINUX_FBDEV=0
 LV_USE_LINUX_DRM=1
 
-Upstream-Status: Submitted [https://github.com/lvgl/lv_port_linux_frame_buffer/pull/47]
+Upstream-Status: Backport [a0f03515bd7417a0d100058b133c3e8d69be9451]
 Signed-off-by: Marek Vasut <marex@denx.de>
 ---
  CMakeLists.txt | 5 ++++-

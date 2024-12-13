@@ -7,7 +7,7 @@ Accounting needs."
 
 HOMEPAGE = "http://www.freediameter.net"
 
-DEPENDS = "flex bison cmake-native libgcrypt gnutls libidn2 lksctp-tools virtual/kernel bison-native"
+DEPENDS = "flex-native bison-native cmake-native libgcrypt gnutls libidn2 lksctp-tools virtual/kernel bison-native"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -23,6 +23,7 @@ SRC_URI = "git://github.com/freeDiameter/freeDiameter;protocol=https;branch=mast
     file://freeDiameter.conf \
     file://install_test.patch \
     file://0001-tests-use-EXTENSIONS_DIR.patch \
+    file://0001-bison-flex-Add-flags-for-carrying-user-specified-par.patch \
     "
 
 S = "${WORKDIR}/git"
@@ -49,6 +50,8 @@ EXTRA_OECMAKE = " \
     -DEXTENSIONS_DIR:PATH=${libdir}/${fd_pkgname} \
     -DINSTALL_TEST_SUFFIX:PATH=${PTEST_PATH}-tests \
     -DCMAKE_SKIP_RPATH:BOOL=ON \
+    -DFLEX_TARGET_ARG_COMPILE_FLAGS='--noline' \
+    -DBISON_TARGET_ARG_COMPILE_FLAGS='--no-lines' \
 "
 # INSTALL_LIBRARY_SUFFIX is relative to CMAKE_INSTALL_PREFIX
 # specify it on cmd line will fix the SET bug in CMakeList.txt
@@ -107,15 +110,13 @@ EOF
     # create self cert
     openssl req -x509 -config ${STAGING_DIR_NATIVE}/etc/ssl/openssl.cnf -newkey rsa:4096 -sha256 -nodes -out ${D}${sysconfdir}/freeDiameter/${FD_PEM} -keyout ${D}${sysconfdir}/freeDiameter/${FD_KEY} -days 3650 -subj '/CN=${FD_HOSTNAME}.${FD_REALM}'
     openssl dhparam -out ${D}${sysconfdir}/freeDiameter/${FD_DH_PEM} 1024
-
-    find ${B} \( -name "*.c" -o -name "*.h" \) -exec sed -i -e 's#${UNPACKDIR}##g' {} \;
 }
 
 do_install_ptest() {
     mv ${D}${PTEST_PATH}-tests/* ${D}${PTEST_PATH}/
     rmdir ${D}${PTEST_PATH}-tests
     install -m 0644 ${B}/tests/CTestTestfile.cmake ${D}${PTEST_PATH}/
-    sed -i -e 's#${UNPACKDIR}##g' ${D}${PTEST_PATH}/CTestTestfile.cmake
+    sed -i -e 's#${WORKDIR}##g' ${D}${PTEST_PATH}/CTestTestfile.cmake
     sed -i "/^set_tests_properties/d" ${D}${PTEST_PATH}/CTestTestfile.cmake
 }
 

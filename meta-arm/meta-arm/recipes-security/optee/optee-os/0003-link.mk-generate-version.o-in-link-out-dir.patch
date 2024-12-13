@@ -1,0 +1,70 @@
+From 8f100f355e645376729086edbace8f01cf7aa3b4 Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@linaro.org>
+Date: Thu, 1 Aug 2024 14:04:55 +0000
+Subject: [PATCH 3/3] link.mk: generate version.o in link-out-dir
+
+When source code is piped to compiler, then the
+current working directory is left into debug
+data. If the working directory is not the output
+directory, then mappings which strip absolute output
+directory paths don't work.
+
+Removes absolute build time paths from version.o
+debug info.
+
+Reviewed-by: Jerome Forissier <jerome.forissier@linaro.org>
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+---
+ core/arch/arm/kernel/link.mk   | 5 +++--
+ core/arch/riscv/kernel/link.mk | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+Upstream-Status: Backport
+
+diff --git a/core/arch/arm/kernel/link.mk b/core/arch/arm/kernel/link.mk
+index 377a82b65..d1d527224 100644
+--- a/core/arch/arm/kernel/link.mk
++++ b/core/arch/arm/kernel/link.mk
+@@ -163,14 +163,15 @@ CORE_CC_VERSION = `$(CCcore) -v 2>&1 | grep "version " | sed 's/ *$$//'`
+ define gen-version-o
+ 	$(call update-buildcount,$(link-out-dir)/.buildcount)
+ 	@$(cmd-echo-silent) '  GEN     $(link-out-dir)/version.o'
+-	$(q)echo -e "const char core_v_str[] =" \
++	$(q)cd $(link-out-dir) && \
++		echo -e "const char core_v_str[] =" \
+ 		"\"$(TEE_IMPL_VERSION) \"" \
+ 		"\"($(CORE_CC_VERSION)) \"" \
+ 		"\"#$(BUILD_COUNT_STR) \"" \
+ 		"\"$(DATE_STR) \"" \
+ 		"\"$(CFG_KERN_LINKER_ARCH)\";\n" \
+ 		| $(CCcore) $(version-o-cflags) \
+-			-xc - -c -o $(link-out-dir)/version.o
++			-xc - -c -o version.o
+ endef
+ $(link-out-dir)/version.o:
+ 	$(call gen-version-o)
+diff --git a/core/arch/riscv/kernel/link.mk b/core/arch/riscv/kernel/link.mk
+index 1fff0a379..6511586e2 100644
+--- a/core/arch/riscv/kernel/link.mk
++++ b/core/arch/riscv/kernel/link.mk
+@@ -74,14 +74,15 @@ CORE_CC_VERSION = `$(CCcore) -v 2>&1 | grep "version " | sed 's/ *$$//'`
+ define gen-version-o
+ 	$(call update-buildcount,$(link-out-dir)/.buildcount)
+ 	@$(cmd-echo-silent) '  GEN     $(link-out-dir)/version.o'
+-	$(q)echo -e "const char core_v_str[] =" \
++	$(q)cd $(link-out-dir) && \
++		echo -e "const char core_v_str[] =" \
+ 		"\"$(TEE_IMPL_VERSION) \"" \
+ 		"\"($(CORE_CC_VERSION)) \"" \
+ 		"\"#$(BUILD_COUNT_STR) \"" \
+ 		"\"$(DATE_STR) \"" \
+ 		"\"$(CFG_KERN_LINKER_ARCH)\";\n" \
+ 		| $(CCcore) $(version-o-cflags) \
+-			-xc - -c -o $(link-out-dir)/version.o
++			-xc - -c -o version.o
+ endef
+ 
+ $(link-out-dir)/version.o:
+-- 
+2.34.1
+

@@ -22,6 +22,9 @@ SRC_URI = "\
 SRCREV = "07413cce72e19520af55dfcbc765484f5ab41dd9"
 PV = "1.0.1+git"
 
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig

@@ -1,4 +1,4 @@
-From 7ff4eba20b5c4fc7365e5ee0dfb775ed29bdd5ce Mon Sep 17 00:00:00 2001
+From c815368a3e41dd3f639eb8fd82d21bc0bab55d1e Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Wed, 1 Nov 2017 09:23:41 -0400
 Subject: [PATCH] stunnel: fix compile error when openssl disable des support
@@ -17,10 +17,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  2 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/src/common.h b/src/common.h
-index 2b4869f..180d31a 100644
+index f112cf9..8d4be01 100644
 --- a/src/common.h
 +++ b/src/common.h
-@@ -492,7 +492,9 @@ extern char *sys_errlist[];
+@@ -496,7 +496,9 @@ extern char *sys_errlist[];
  #ifndef OPENSSL_NO_MD4
  #include <openssl/md4.h>
  #endif /* !defined(OPENSSL_NO_MD4) */
@@ -31,19 +31,19 @@ index 2b4869f..180d31a 100644
  #include <openssl/dh.h>
  #if OPENSSL_VERSION_NUMBER<0x10100000L
 diff --git a/src/protocol.c b/src/protocol.c
-index cfe6d3b..3936aea 100644
+index c8c65ea..b071b06 100644
 --- a/src/protocol.c
 +++ b/src/protocol.c
-@@ -81,7 +81,7 @@ NOEXPORT void ldap_client_middle(CLI *);
- 
+@@ -82,7 +82,7 @@ NOEXPORT void ldap_client_middle(CLI *);
  NOEXPORT void connect_server_early(CLI *);
+ NOEXPORT const char *connect_client_init(SERVICE_OPTIONS *);
  NOEXPORT void connect_client_middle(CLI *);
 -#ifndef OPENSSL_NO_MD4
 +#if !defined(OPENSSL_NO_MD4) && !defined(OPENSSL_NO_DES)
  NOEXPORT void ntlm(CLI *);
  NOEXPORT char *ntlm1(void);
  NOEXPORT char *ntlm3(char *, char *, char *, char *);
-@@ -1331,7 +1331,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
+@@ -1334,7 +1334,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
      fd_printf(c, c->remote_fd.fd, "Host: %s", c->opt->protocol_host);
      if(c->opt->protocol_username && c->opt->protocol_password) {
          if(!strcasecmp(c->opt->protocol_authentication, "ntlm")) {
@@ -52,7 +52,7 @@ index cfe6d3b..3936aea 100644
              ntlm(c);
  #else
              s_log(LOG_ERR, "NTLM authentication is not available");
-@@ -1374,7 +1374,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
+@@ -1377,7 +1377,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
      str_free(line);
  }
  
@@ -61,6 +61,3 @@ index cfe6d3b..3936aea 100644
  
  /*
   * NTLM code is based on the following documentation:
--- 
-2.34.1
-

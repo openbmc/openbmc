@@ -1,0 +1,50 @@
+From b845e79532c9c28c0108bf556171093236460251 Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 29 Jul 2024 14:14:24 +0000
+Subject: [PATCH] Fix: block_start removed from btrfs_get_extent in 6.11-rc1
+
+See upstream commit:
+
+    commit c77a8c61002e91d859e118008fd495efbe1d9373
+    Author: Qu Wenruo <wqu@suse.com>
+    Date:   Tue Apr 30 07:53:06 2024 +0930
+
+        btrfs: remove extent_map::block_start member
+
+        The member extent_map::block_start can be calculated from
+        extent_map::disk_bytenr + extent_map::offset for regular extents.
+        And otherwise just extent_map::disk_bytenr.
+
+        And this is already validated by the validate_extent_map().  Now we can
+        remove the member.
+
+        However there is a special case in btrfs_create_dio_extent() where we
+        for NOCOW/PREALLOC ordered extents cannot directly use the resulting
+        btrfs_file_extent, as btrfs_split_ordered_extent() cannot handle them
+        yet.
+
+        So for that call site, we pass file_extent->disk_bytenr +
+        file_extent->num_bytes as disk_bytenr for the ordered extent, and 0 for
+        offset.
+
+Upstream-Status: Backport
+
+Change-Id: I2e3245bb0d1f5263e902659aa05848d5e231909b
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/btrfs.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index 28320d8..8fb6866 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -191,7 +191,6 @@ LTTNG_TRACEPOINT_EVENT(btrfs_get_extent,
+ 		ctf_integer(u64, ino, btrfs_ino(inode))
+ 		ctf_integer(u64, start, map->start)
+ 		ctf_integer(u64, len, map->len)
+-		ctf_integer(u64, block_start, map->block_start)
+ 		ctf_integer(unsigned int, flags, map->flags)
+ 		ctf_integer(int, refs, refcount_read(&map->refs))
+ 		ctf_integer(unsigned int, compress_type, extent_map_compression(map))

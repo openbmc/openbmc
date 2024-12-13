@@ -22,7 +22,7 @@ def load_json_file(f):
 def write_json_file(f, json_data):
     os.makedirs(os.path.dirname(f), exist_ok=True)
     with open(f, 'w') as filedata:
-        filedata.write(json.dumps(json_data, sort_keys=True, indent=4))
+        filedata.write(json.dumps(json_data, sort_keys=True, indent=1))
 
 class ManualTestRunner(object):
 

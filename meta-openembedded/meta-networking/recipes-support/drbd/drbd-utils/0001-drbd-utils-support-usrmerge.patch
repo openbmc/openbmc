@@ -1,4 +1,4 @@
-From 264ae7b062ac52a5545a8a562b51001f7ce7369d Mon Sep 17 00:00:00 2001
+From 9109f15f5b8ae142823194b9ef50c392615fe38d Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 21 Apr 2022 17:22:35 +0800
 Subject: [PATCH] drbd-utils: support usermerge
@@ -16,15 +16,14 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  scripts/drbd.service                     |  6 +++---
  scripts/drbd@.service                    |  6 +++---
  scripts/ocf.ra@.service                  |  4 ++--
- user/v83/Makefile.in                     | 14 +++++++-------
  user/v84/Makefile.in                     | 14 +++++++-------
- 10 files changed, 32 insertions(+), 32 deletions(-)
+ 9 files changed, 25 insertions(+), 25 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index f1d69ea3..3289ac7d 100644
+index d3ec5ff1..910232b1 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -183,7 +183,7 @@ AC_ARG_WITH(tmpfilesdir,
+@@ -178,7 +178,7 @@ AC_ARG_WITH(tmpfilesdir,
  AC_SUBST(tmpfilesdir)
  
  # set default early
@@ -34,10 +33,10 @@ index f1d69ea3..3289ac7d 100644
     test x"$with_udev" = xyes ; then
  	if test x"$PKG_CONFIG" != x; then
 diff --git a/scripts/Makefile.in b/scripts/Makefile.in
-index aca15a22..a1cd2ffe 100644
+index 15a26f37..ff028310 100644
 --- a/scripts/Makefile.in
 +++ b/scripts/Makefile.in
-@@ -91,11 +91,11 @@ ifeq ($(subst both,systemd,$(initscripttype)),systemd)
+@@ -90,11 +90,11 @@ ifeq ($(subst both,systemd,$(initscripttype)),systemd)
  	install -d $(DESTDIR)$(systemdunitdir)
  	install -m 644 $(SYSTEMD_UNITS) $(DESTDIR)$(systemdunitdir)/
  	install -m 644 $(SYSTEMD_TEMPLATES) $(DESTDIR)$(systemdunitdir)/
@@ -137,37 +136,6 @@ index 9c2268a6..1666c482 100644
 -ExecStopPost=/lib/drbd/scripts/ocf.ra.wrapper.sh stop %n
 +ExecStart=@nonarch_libdir@/drbd/scripts/ocf.ra.wrapper.sh start-and-monitor %n
 +ExecStopPost=@nonarch_libdir@/drbd/scripts/ocf.ra.wrapper.sh stop %n
-diff --git a/user/v83/Makefile.in b/user/v83/Makefile.in
-index 08cfe574..4c4971b6 100644
---- a/user/v83/Makefile.in
-+++ b/user/v83/Makefile.in
-@@ -96,19 +96,19 @@ install:
- ifeq ($(WITH_83_SUPPORT),yes)
- 	install -d $(DESTDIR)$(localstatedir)/lib/drbd
- 	install -d $(DESTDIR)$(localstatedir)/lock
--	install -d $(DESTDIR)/lib/drbd/
-+	install -d $(DESTDIR)/${nonarch_libdir}/drbd/
- 	if getent group haclient > /dev/null 2> /dev/null ; then		\
--		install -g haclient -m 4750 drbdsetup-83 $(DESTDIR)/lib/drbd/ ;	\
--		install -m 755 drbdadm-83 $(DESTDIR)/lib/drbd/ ;		\
-+		install -g haclient -m 4750 drbdsetup-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ;	\
-+		install -m 755 drbdadm-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ;		\
- 	else									\
--		install -m 755 drbdsetup-83 $(DESTDIR)/lib/drbd/ ;		\
--		install -m 755 drbdadm-83 $(DESTDIR)/lib/drbd/ ; 		\
-+		install -m 755 drbdsetup-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ;		\
-+		install -m 755 drbdadm-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ; 		\
- 	fi
- endif
- 
- uninstall:
--	rm -f $(DESTDIR)/lib/drbd/drbdsetup-83
--	rm -f $(DESTDIR)/lib/drbd/drbdadm-83
-+	rm -f $(DESTDIR)/${nonarch_libdir}/drbd/drbdsetup-83
-+	rm -f $(DESTDIR)/${nonarch_libdir}/drbd/drbdadm-83
- 
- .PHONY: install uninstall clean distclean
- ../../configure:
 diff --git a/user/v84/Makefile.in b/user/v84/Makefile.in
 index 0fcefc5f..81f7d5ec 100644
 --- a/user/v84/Makefile.in
@@ -199,3 +167,6 @@ index 0fcefc5f..81f7d5ec 100644
  
  spell:
  	for f in drbdadm_adjust.c drbdadm_main.c drbdadm_parser.c drbdadm_usage_cnt.c drbdsetup.c drbdtool_common.c; do \
+-- 
+2.25.1
+

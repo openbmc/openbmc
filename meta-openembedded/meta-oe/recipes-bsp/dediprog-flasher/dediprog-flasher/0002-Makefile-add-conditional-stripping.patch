@@ -1,0 +1,39 @@
+From dac9d0ea5c419049c9ab0a5ba90d15d77a3271b0 Mon Sep 17 00:00:00 2001
+From: Tymoteusz Burak <tymoteusz.burak@3mdeb.com>
+Date: Mon, 22 Jul 2024 13:02:59 +0000
+Subject: [PATCH] Makefile: add conditional stripping
+Upstream-Status: Submitted [https://github.com/DediProgSW/SF100Linux/pull/88]
+
+This patch introduces a `NOSTRIP` conditional flag to the `install`
+target in the Makefile. The purpose of this flag is to allow the
+disabling of binary stripping during installation. This is
+particularly useful in development environments, such as BitBake,
+which handle stripping internally.
+
+When `NOSTRIP` is set to `1`, the `strip` command will be skipped
+during the installation process, preventing potential conflicts or
+redundant operations.
+
+Signed-off-by: Tymoteusz Burak <tymoteusz.burak@3mdeb.com>
+
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 139e5c0..8b33320 100644
+--- a/Makefile
++++ b/Makefile
+@@ -58,7 +58,9 @@ install: $(PROGRAM)
+ 	[ $(shell id -u) -eq 0 ] || (echo "Error: install needs root privileges" && false)
+ 	install -v -o 0 -g 0 -m 755 -d $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/DediProg
+ 	echo -n "install: " && install -v -o 0 -g 0 -m 0755 $(PROGRAM) $(DESTDIR)$(PREFIX)/bin/$(PROGRAM)
++ifneq ($(NOSTRIP),1)
+ 	strip $(DESTDIR)$(PREFIX)/bin/$(PROGRAM)
++endif
+ 	install -v -o 0 -g 0 -m 755 -d $(DESTDIR)$(PREFIX)/share/DediProg
+ 	echo -n "install: " && install -v -o 0 -g 0 -m 0644 ChipInfoDb.dedicfg $(DESTDIR)$(PREFIX)/share/DediProg/ChipInfoDb.dedicfg
+ 	install -v -o 0 -g 0 -m 755 -d $(DESTDIR)/etc/udev/rules.d
+-- 
+2.30.2
+

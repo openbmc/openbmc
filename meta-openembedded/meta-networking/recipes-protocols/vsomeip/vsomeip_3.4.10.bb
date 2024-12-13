@@ -13,6 +13,8 @@ SRC_URI = "git://github.com/GENIVI/${BPN}.git;branch=master;protocol=https;name=
            file://0003-Do-not-build-external-gtest.patch \
            file://0004-Do-not-specify-PIE-flag-explicitly.patch \
            file://0005-test-common-CMakeLists.txt-add-missing-link-with-dlt.patch \
+           file://0001-Update-to-C-17-560.patch \
+           file://0002-network_tests-Include-iomanip-system-header.patch \
           "
 
 SRCREV = "02c199dff8aba814beebe3ca417fd991058fe90c"

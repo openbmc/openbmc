@@ -103,16 +103,21 @@ have reached their End of Life (EOL) won't receive such updates.
 
 This started with version 3.1 ("Dunfell"), released in April 2020, which
 the project initially committed to supporting for two years, but this duration
-was later extended to four years. Similarly, the following :term:`LTS` release,
-version 4.0 ("Kirkstone"), was released two years later in May 2022 and the
-project committed to supporting it for four years too.
+was later extended to four years.
 
-Therefore, a new :term:`LTS` release is made every two years and is supported
-for four years. This offers more stability to project users and leaves more
-time to upgrade to the following :term:`LTS` release.
+A new :term:`LTS` release is made every two years and is supported for four
+years. This offers more stability to project users and leaves more time to
+upgrade to the following :term:`LTS` release.
+
+The currently supported :term:`LTS` releases are:
+
+-  Version 5.0 ("Scarthgap"), released in April 2024 and supported until April 2028.
+-  Version 4.0 ("Kirkstone"), released in May 2022 and supported until May 2026.
 
 See :yocto_wiki:`/Stable_Release_and_LTS` for details about the management
 of stable and :term:`LTS` releases.
+
+This documentation was built for the &DISTRO_NAME; release.
 
 .. image:: svg/releases.*
    :width: 100%

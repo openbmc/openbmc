@@ -12,7 +12,7 @@ problem.
 Also fixed:
 Fatal error: can't create shared/hosts_access.o: No such file or directory
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---

@@ -11,7 +11,7 @@ has caused a long string of different issues for us.
 
 As a result, patch this to a behaviour which works for us.
 
-Upstream-Status: Pending [need to talk to upstream to see if they'll take one or both fixes]
+Upstream-Status: Submitted [https://github.com/python/cpython/issues/120492; need to first talk to upstream to see if they'll take one or both fixes]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 ---

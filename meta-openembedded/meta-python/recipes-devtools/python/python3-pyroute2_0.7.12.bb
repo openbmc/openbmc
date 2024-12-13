@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=dccbff78d7d79ae7e53953d43445c6e6 \
 
 SRC_URI[sha256sum] = "54d226fc3ff2732f49bac9b26853c50c9d05be05a4d9daf09c7cf6d77301eff3"
 
-inherit setuptools3 pypi ptest
+inherit python_setuptools_build_meta pypi ptest
 
 RDEPENDS:${PN} += " \
     python3-ctypes \

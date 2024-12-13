@@ -11,3 +11,5 @@ inherit autotools
 
 SRC_URI[md5sum] = "9e4ec55201be0be71ffbc56d38b42b57"
 SRC_URI[sha256sum] = "004fb6cd43102918b6302cf537a2db7ceadda04aef2e0906ddf230f820dad34f"
+
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/acpitool/files/acpitool/"

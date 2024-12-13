@@ -15,6 +15,7 @@ PV = "0.1.0+git"
 
 SRC_URI = " \
            git://github.com/e2tools/e2tools;protocol=https;branch=master \
+           file://0001-Disable-portability-warning-as-error.patch \
            file://run-ptest \
 "
 
@@ -24,41 +25,14 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig ptest
 
-do_configure:prepend() {
-    git -C "${WORKDIR}/git" reset --hard HEAD
-
-    # To install ptest for this package, special configuration needs to be
-    # done before do_configure(). So, do_configure_ptest() which is scheduled
-    # after do_configure() cannot be used.
-
-    # We only do special configuration if we are installing ptest for this
-    # package.
-    if [ "${@d.getVar('PTEST_ENABLED')}" -eq "1" ]; then
-        # Since we guarantee run-time dependency when installing the ptest for
-        # this package, we do not need the check macros under section "checks
-        # for programs" in "configure.ac". Plus, these check macros set the
-        # ouput variables to incorrect values as these checks are performed on
-        # the host environment. Still, we need these variables outputted from
-        # these check macros. So, we insert the following lines to manually
-        # set these output variables to the correct value in "configure.ac".
-
-        # Note that HAVE_DD_COMMAND and HAVE_MKE2FS_COMMAND are only ever used
-        # in tests/Makefile-files which determines whether to include the test
-        # cases. As for output variables CHMOD, DD, and MKE2FS, they only
-        # point to the programs which test cases need to run. Since these
-        # commands are guaranteed to be present due to RDEPENDS and are
-        # guaranteed to be accessible under PATH environment variable on the
-        # target, we only need to specify the name of these programs.
-
-        perl -i -0777 -pe 's/(^dnl\s*=+\s*^dnl\s*Checks for compiler flags\s*^dnl\s*=+)/
-AC_SUBST([CHMOD], 'chmod')
-AC_SUBST([DD], 'dd')
-AC_SUBST([MKE2FS], 'mke2fs')
-AM_CONDITIONAL([HAVE_DD_COMMAND], [true])
-AM_CONDITIONAL([HAVE_MKE2FS_COMMAND], [true])
-\1/ms' "${WORKDIR}/git/configure.ac"
-    fi
-}
+# Otherwise these tools will be detected from build host and
+# assumptions will go wrong, Fun of cross compiling
+EXTRA_OECONF += "\
+                ac_cv_path_MKE2FS=${base_sbindir}/mke2fs \
+                ac_cv_path_CHMOD=${base_bindir}/chmod \
+                ac_cv_path_DD=${base_bindir}/dd \
+                ac_cv_path_GREP=${base_bindir}/grep \
+                "
 
 do_install_ptest() {
     rm -rf "${D}${PTEST_PATH}/*"
@@ -67,7 +41,7 @@ do_install_ptest() {
     cp -r "${S}" "${D}${PTEST_PATH}"
     rm -rf ${D}${PTEST_PATH}/build/config.log ${D}${PTEST_PATH}/build/autom4te.cache \
         ${D}${PTEST_PATH}/git/.git ${D}${PTEST_PATH}/git/autom4te.cache
-    sed -i -e 's;${RECIPE_SYSROOT};;g' ${D}${PTEST_PATH}/build/config.status
+    sed -i -e 's;${TMPDIR};;g' ${D}${PTEST_PATH}/build/config.status
 }
 
 RDEPENDS:${PN}-ptest += "bash coreutils e2fsprogs e2tools gawk make perl"

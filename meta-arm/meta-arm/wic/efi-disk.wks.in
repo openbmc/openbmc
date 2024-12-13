@@ -2,10 +2,10 @@
 # long-description: Creates a partitioned EFI disk image that the user
 # can directly dd to boot media.
 
-part /boot --source bootimg-efi --sourceparams="loader=${EFI_PROVIDER}" --label boot --active --align 1024 --use-uuid
+part /boot --source bootimg-efi --sourceparams="loader=${EFI_PROVIDER},dtb=${KERNEL_DTB_NAME}" --label boot --active --align 1024 --use-uuid
 
 part / --source rootfs --fstype=ext4 --label root --align 1024 --use-uuid
 
 part swap --size 44 --label swap --fstype=swap --use-uuid
 
-bootloader --ptable gpt --timeout=5 --append="rootwait rootfstype=ext4"
+bootloader --ptable gpt --timeout=5 --append="rootwait rootfstype=ext4 console=${KERNEL_CONSOLE}"

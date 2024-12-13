@@ -1,0 +1,31 @@
+From 805ce4d40c5aaae12aa73452ff07babe8eb43a62 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Fri, 28 Sep 2018 00:38:50 +0200
+Subject: [PATCH] Do not ask cmake to export binaries - they don't make it
+ dependants sysroots
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ src/bin/jp2/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/bin/jp2/CMakeLists.txt b/src/bin/jp2/CMakeLists.txt
+index 26156bcb..9eff04aa 100644
+--- a/src/bin/jp2/CMakeLists.txt
++++ b/src/bin/jp2/CMakeLists.txt
+@@ -64,7 +64,6 @@ foreach(exe opj_decompress opj_compress opj_dump)
+   endif()
+   # Install exe
+   install(TARGETS ${exe}
+-    EXPORT OpenJPEGTargets
+     DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications
+   )
+   if(OPJ_USE_DSYMUTIL)
+-- 
+2.25.1
+

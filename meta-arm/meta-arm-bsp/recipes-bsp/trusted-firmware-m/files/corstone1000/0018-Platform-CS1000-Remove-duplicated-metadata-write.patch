@@ -1,0 +1,61 @@
+From 60793058794f0ac8ea35a69b2dddf97ccba1acdb Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Thu, 5 Sep 2024 21:29:07 +0200
+Subject: [PATCH 2/5] Platform: CS1000: Remove duplicated metadata write
+
+The metadata replica_2 was written twice which is not needed.
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../corstone1000/fw_update_agent/fwu_agent.c  | 28 -------------------
+ 1 file changed, 28 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index d0028a56d8..2b69447dc5 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -499,20 +499,6 @@ static enum fwu_agent_error_t metadata_write(
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  FWU_METADATA_REPLICA_2_OFFSET, sizeof(struct fwu_metadata));
+-
+-    ret = FWU_METADATA_FLASH_DEV.EraseSector(FWU_METADATA_REPLICA_2_OFFSET);
+-    if (ret != ARM_DRIVER_OK) {
+-        return FWU_AGENT_ERROR;
+-    }
+-
+-    ret = FWU_METADATA_FLASH_DEV.ProgramData(FWU_METADATA_REPLICA_2_OFFSET,
+-                                p_metadata, sizeof(struct fwu_metadata));
+-    if (ret < 0 || ret != sizeof(struct fwu_metadata)) {
+-        return FWU_AGENT_ERROR;
+-    }
+-
+     FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
+                   p_metadata->active_index, p_metadata->previous_active_index);
+     return FWU_AGENT_SUCCESS;
+@@ -569,20 +555,6 @@ static enum fwu_agent_error_t metadata_write(
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  FWU_METADATA_REPLICA_2_OFFSET, sizeof(struct fwu_metadata));
+-
+-    ret = FWU_METADATA_FLASH_DEV.EraseSector(FWU_METADATA_REPLICA_2_OFFSET);
+-    if (ret != ARM_DRIVER_OK) {
+-        return FWU_AGENT_ERROR;
+-    }
+-
+-    ret = FWU_METADATA_FLASH_DEV.ProgramData(FWU_METADATA_REPLICA_2_OFFSET,
+-                                p_metadata, sizeof(struct fwu_metadata));
+-    if (ret < 0 || ret != sizeof(struct fwu_metadata)) {
+-        return FWU_AGENT_ERROR;
+-    }
+-
+     FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
+                   p_metadata->active_index, p_metadata->previous_active_index);
+     return FWU_AGENT_SUCCESS;
+-- 
+2.25.1
+

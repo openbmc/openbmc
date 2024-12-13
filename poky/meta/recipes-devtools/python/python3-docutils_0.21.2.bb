@@ -11,4 +11,12 @@ inherit pypi python_setuptools_build_meta
 RDEPENDS:${PN} += " \
                    python3-pprint \
 "
+
+do_install:append() {
+	# Make sure we use /usr/bin/env python3
+	for PYTHSCRIPT in `grep -rIl '^#!.*python' ${D}`; do
+		sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' $PYTHSCRIPT
+	done
+}
+
 BBCLASSEXTEND = "native nativesdk"

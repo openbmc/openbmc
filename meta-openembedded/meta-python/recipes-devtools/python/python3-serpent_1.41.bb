@@ -9,8 +9,10 @@ inherit pypi ptest setuptools3
 SRC_URI += " \
     file://run-ptest \
 "
-
+# python3-misc for timeit.py
 RDEPENDS:${PN}-ptest += " \
+    python3-attrs \
+    python3-misc \
     python3-pytest \
     python3-pytz \
     python3-unittest-automake-output \

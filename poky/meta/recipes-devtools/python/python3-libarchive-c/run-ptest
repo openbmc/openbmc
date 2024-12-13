@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# export needed to set the locale to support accentuated and non-latin chars in tests
+export LC_ALL=en_US.UTF-8
+
+pytest --automake

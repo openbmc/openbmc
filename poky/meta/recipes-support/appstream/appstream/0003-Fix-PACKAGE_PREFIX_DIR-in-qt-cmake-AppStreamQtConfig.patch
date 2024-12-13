@@ -1,0 +1,51 @@
+From c36b6226479a20ebd910f355deddb9d5c7571213 Mon Sep 17 00:00:00 2001
+From: Marc Ferland <marc.ferland@sonatest.com>
+Date: Mon, 29 Jul 2024 09:35:51 -0400
+Subject: [PATCH] Fix PACKAGE_PREFIX_DIR in qt/cmake/AppStreamQtConfig.cmake.in
+
+PACKAGE_PREFIX_DIR points to an invalid directory. This breaks
+librairies linking to appstream-qt.
+
+For example, when building the 'discover' package from the meta-kde
+layer we get the following build error:
+
+| CMake Error in libdiscover/CMakeLists.txt:
+|   Imported target "AppStreamQt" includes non-existent path
+|
+|     "/path/to/build/tmp/work/core2-64-poky-linux/discover/6.1.3/recipe-sysroot/include/"
+|
+|   in its INTERFACE_INCLUDE_DIRECTORIES.  Possible reasons include:
+|
+|   * The path was deleted, renamed, or moved to another location.
+|
+|   * An install or uninstall procedure did not complete successfully.
+|
+|   * The installation package was faulty and references files it does not
+|   provide.
+
+The path above should've been:
+
+    /path/to/build/tmp/work/core2-64-poky-linux/discover/6.1.3/recipe-sysroot/usr/include/
+
+instead of:
+
+    /path/to/build/tmp/work/core2-64-poky-linux/discover/6.1.3/recipe-sysroot/include/
+
+Upstream-Status: Inappropriate [upstream ticket https://github.com/ximion/appstream/issues/643]
+
+Signed-off-by: Marc Ferland <marc.ferland@sonatest.com>
+---
+ qt/cmake/AppStreamQtConfig.cmake.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qt/cmake/AppStreamQtConfig.cmake.in b/qt/cmake/AppStreamQtConfig.cmake.in
+index 63df65f2..5ab2d0ec 100644
+--- a/qt/cmake/AppStreamQtConfig.cmake.in
++++ b/qt/cmake/AppStreamQtConfig.cmake.in
+@@ -1,5 +1,5 @@
+ 
+-get_filename_component(PACKAGE_PREFIX_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../../" ABSOLUTE)
++get_filename_component(PACKAGE_PREFIX_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
+ 
+ # Use original install prefix when loaded through a "/usr move"
+ # cross-prefix symbolic link such as /lib -> /usr/lib.

@@ -1,0 +1,8 @@
+psci: failed to boot CPU1 (-95)
+CPU1: failed to boot: -95
+psci: failed to boot CPU2 (-95)
+CPU2: failed to boot: -95
+psci: failed to boot CPU3 (-95)
+CPU3: failed to boot: -95
+ARM FF-A: Notification setup failed -95, not enabled
+ARM FF-A: Failed to register driver sched callback -95

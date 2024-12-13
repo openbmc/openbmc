@@ -1,0 +1,105 @@
+From ebc84d7b60c1ed3398e9f600fe3dc8406500bd35 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Wed, 1 May 2024 09:16:33 +0100
+Subject: [PATCH] armv8: generic_timer: Use event stream for udelay
+
+Polling cntpct_el0 in a tight loop for delays is inefficient.
+This is particularly apparent on Arm FVPs, which do not simulate
+real time, meaning that a 1s sleep can take a couple of orders
+of magnitude longer to execute in wall time.
+
+If running at EL2 or above (where CNTHCTL_EL2 is available), enable
+the cntpct_el0 event stream temporarily and use wfe to implement
+the delay more efficiently. The event period is chosen as a
+trade-off between efficiency and the fact that Arm FVPs do not
+typically simulate real time.
+
+This is only implemented for Armv8 boards, where an architectural
+timer exists, and only enabled by default for the ARCH_VEXPRESS64
+board family.
+
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ arch/arm/cpu/armv8/Kconfig         |  8 ++++++++
+ arch/arm/cpu/armv8/generic_timer.c | 27 +++++++++++++++++++++++++++
+ arch/arm/include/asm/system.h      |  6 ++++--
+ 3 files changed, 39 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/cpu/armv8/Kconfig b/arch/arm/cpu/armv8/Kconfig
+index 9f0fb369f773..199335cd6040 100644
+--- a/arch/arm/cpu/armv8/Kconfig
++++ b/arch/arm/cpu/armv8/Kconfig
+@@ -191,6 +191,14 @@ config ARMV8_EA_EL3_FIRST
+ 	  Exception handling at all exception levels for External Abort and
+ 	  SError interrupt exception are taken in EL3.
+ 
++config ARMV8_UDELAY_EVENT_STREAM
++	bool "Use the event stream for udelay"
++	default y if ARCH_VEXPRESS64
++	help
++	  Use the event stream provided by the AArch64 architectural timer for
++	  delays. This is more efficient than the default polling
++	  implementation.
++
+ menuconfig ARMV8_CRYPTO
+ 	bool "ARM64 Accelerated Cryptographic Algorithms"
+ 
+diff --git a/arch/arm/cpu/armv8/generic_timer.c b/arch/arm/cpu/armv8/generic_timer.c
+index e4aa5a474553..1de7ec596fc7 100644
+--- a/arch/arm/cpu/armv8/generic_timer.c
++++ b/arch/arm/cpu/armv8/generic_timer.c
+@@ -114,3 +114,30 @@ ulong timer_get_boot_us(void)
+ 
+ 	return val / get_tbclk();
+ }
++
++#if CONFIG_IS_ENABLED(ARMV8_UDELAY_EVENT_STREAM)
++void __udelay(unsigned long usec)
++{
++	u64 target = get_ticks() + usec_to_tick(usec);
++
++	/* At EL2 or above, use the event stream to avoid polling CNTPCT_EL0 so often */
++	if (current_el() >= 2) {
++		u32 cnthctl_val;
++		const u8 event_period = 0x7;
++
++		asm volatile("mrs %0, cnthctl_el2" : "=r" (cnthctl_val));
++		asm volatile("msr cnthctl_el2, %0" : : "r"
++			(cnthctl_val | CNTHCTL_EL2_EVNT_EN | CNTHCTL_EL2_EVNT_I(event_period)));
++
++		while (get_ticks() + (1ULL << event_period) <= target)
++			wfe();
++
++		/* Reset the event stream */
++		asm volatile("msr cnthctl_el2, %0" : : "r" (cnthctl_val));
++	}
++
++	/* Fall back to polling CNTPCT_EL0 */
++	while (get_ticks() <= target)
++		;
++}
++#endif
+diff --git a/arch/arm/include/asm/system.h b/arch/arm/include/asm/system.h
+index 51123c296843..7e30cac32a09 100644
+--- a/arch/arm/include/asm/system.h
++++ b/arch/arm/include/asm/system.h
+@@ -69,8 +69,10 @@
+ /*
+  * CNTHCTL_EL2 bits definitions
+  */
+-#define CNTHCTL_EL2_EL1PCEN_EN	(1 << 1)  /* Physical timer regs accessible   */
+-#define CNTHCTL_EL2_EL1PCTEN_EN	(1 << 0)  /* Physical counter accessible      */
++#define CNTHCTL_EL2_EVNT_EN	BIT(2)	     /* Enable the event stream       */
++#define CNTHCTL_EL2_EVNT_I(val)	((val) << 4) /* Event stream trigger bits     */
++#define CNTHCTL_EL2_EL1PCEN_EN	(1 << 1)     /* Physical timer regs accessible */
++#define CNTHCTL_EL2_EL1PCTEN_EN	(1 << 0)     /* Physical counter accessible   */
+ 
+ /*
+  * HCR_EL2 bits definitions
+-- 
+2.30.2
+

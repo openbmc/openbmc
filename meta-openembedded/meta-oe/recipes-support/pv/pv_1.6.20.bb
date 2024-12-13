@@ -11,7 +11,7 @@ SRC_URI = "https://www.ivarch.com/programs/sources/${BP}.tar.bz2 \
 SRC_URI[sha256sum] = "e831951eff0718fba9b1ef286128773b9d0e723e1fbfae88d5a3188814fdc603"
 
 UPSTREAM_CHECK_URI = "http://www.ivarch.com/programs/pv.shtml"
-UPSTREAM_CHECK_REGEX = "pv-(?P<pver>\d+(\.\d+)+).tar.bz2"
+UPSTREAM_CHECK_REGEX = "pv-(?P<pver>\d+(\.\d+)+).tar"
 
 inherit autotools ptest
 

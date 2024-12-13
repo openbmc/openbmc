@@ -1,0 +1,32 @@
+From 9ad120283f4b61b97da67f18a95bb3b4f1e8a3b9 Mon Sep 17 00:00:00 2001
+From: Carlos Alberto Lopez Perez <clopez@igalia.com>
+Date: Wed, 24 Jul 2024 15:51:05 +0100
+Subject: [PATCH] meson: Do not invoke the commands to update the icon caches
+ when cross-building
+
+This does not have any useful efect when cross-building and it requires
+the cross-builder environment to have gtk4-native built in order to invoke
+gtk-update-icon-cache program.
+
+Upstream-Status: Pending
+Signed-off-by: Carlos Alberto Lopez Perez <clopez@igalia.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 3d3d8b5..da622f1 100644
+--- a/meson.build
++++ b/meson.build
+@@ -250,7 +250,7 @@ configure_file(
+   configuration: config_h
+ )
+ 
+-if get_option('gtk') and gnome.found()
++if get_option('gtk') and gnome.found() and not meson.is_cross_build()
+   gnome.post_install(
+       gtk_update_icon_cache: true,
+     update_desktop_database: true
+-- 
+2.39.2
+

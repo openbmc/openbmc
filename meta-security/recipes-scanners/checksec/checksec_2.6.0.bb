@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=879b2147c754bc040c29e9c3b84da836"
 SRCREV = "2753ebb89fcdc96433ae8a4c4e5a49214a845be2"
 SRC_URI = "git://github.com/slimm609/checksec.sh;branch=main;protocol=https"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 do_install() {
     install -d ${D}${bindir}

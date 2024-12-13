@@ -1,5 +1,7 @@
-SUMMARY = "C bindings for apps which will manipulate JSON data"
-DESCRIPTION = "JSON-C implements a reference counting object model that allows you to easily construct JSON objects in C."
+SUMMARY = "A JSON implementation in C"
+DESCRIPTION = "JSON-C implements a reference counting object model that allows \
+you to easily construct JSON objects in C, output them as JSON formatted strings \
+and parse JSON formatted strings back into the C representation of JSON objects."
 HOMEPAGE = "https://github.com/json-c/json-c/wiki"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=de54b60fbbc35123ba193fea8ee216f2"

@@ -1,4 +1,4 @@
-From 5079e678ce2a81416088c04f9123cd8207d5def2 Mon Sep 17 00:00:00 2001
+From 09a6df0d32e2177406ed391e536c0c7c4b503c5d Mon Sep 17 00:00:00 2001
 From: Christian Hofstaedtler <zeha@debian.org>
 Date: Tue, 10 Oct 2017 15:04:34 -0300
 Subject: [PATCH] rdoc: build reproducible documentation

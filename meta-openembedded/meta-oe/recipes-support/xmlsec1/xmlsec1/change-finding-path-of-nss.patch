@@ -1,4 +1,4 @@
-From 9c861646e034b1c80fafd389279b0a7da90a8ba7 Mon Sep 17 00:00:00 2001
+From b43fa6bf612ee59db57573b39e357b6ca96d48b6 Mon Sep 17 00:00:00 2001
 From: Yulong Pei <Yulong.pei@windriver.com>
 Date: Wed, 21 Jul 2010 22:33:43 +0800
 Subject: [PATCH] change finding path of nss and nspr
@@ -8,16 +8,15 @@ Upstream-Status: Pending
 Signed-off-by: Yulong Pei <Yulong.pei@windriver.com>
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
-
 ---
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index ce8a278..51621d6 100644
+index 8add879..7f137c0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -935,7 +935,7 @@ NSS_PACKAGE=mozilla-nss
+@@ -933,7 +933,7 @@ NSS_PACKAGE=mozilla-nss
  NSPR_INCLUDE_MARKER="nspr/nspr.h"
  NSPR_LIB_MARKER="libnspr4$shrext"
  NSPR_LIBS_LIST="-lnspr4 -lplds4 -lplc4"

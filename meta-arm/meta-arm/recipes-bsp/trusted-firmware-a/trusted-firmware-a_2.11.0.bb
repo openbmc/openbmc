@@ -16,4 +16,5 @@ LIC_FILES_CHKSUM_MBEDTLS = "file://mbedtls/LICENSE;md5=379d5819937a6c2f1ef1630d3
 # continue to boot also without TPM
 SRC_URI += "\
     file://0001-qemu_measured_boot.c-ignore-TPM-error-and-continue-w.patch \
+    file://0001-fix-zynqmp-handle-secure-SGI-at-EL1-for-OP-TEE.patch \
 "

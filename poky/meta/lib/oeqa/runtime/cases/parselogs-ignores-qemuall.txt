@@ -13,6 +13,14 @@ FBIOPUT_VSCREENINFO failed, double buffering disabled
 # pci 0000:00:00.0: [Firmware Bug]: reg 0x20: invalid BAR (can't size)
 # pci 0000:00:00.0: [Firmware Bug]: reg 0x24: invalid BAR (can't size)
 invalid BAR (can't size)
+# 6.10+ the invalid BAR warnings are of this format:
+# pci 0000:00:00.0: [Firmware Bug]: BAR 0: invalid; can't size
+# pci 0000:00:00.0: [Firmware Bug]: BAR 1: invalid; can't size
+# pci 0000:00:00.0: [Firmware Bug]: BAR 2: invalid; can't size
+# pci 0000:00:00.0: [Firmware Bug]: BAR 3: invalid; can't size
+# pci 0000:00:00.0: [Firmware Bug]: BAR 4: invalid; can't size
+# pci 0000:00:00.0: [Firmware Bug]: BAR 5: invalid; can't size
+invalid; can't size
 
 # These should be reviewed to see if they are still needed
 wrong ELF class

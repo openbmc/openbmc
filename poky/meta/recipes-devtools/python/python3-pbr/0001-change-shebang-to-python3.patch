@@ -1,4 +1,4 @@
-From 09bd8368bf0d5385663a10eeb890131481681bdd Mon Sep 17 00:00:00 2001
+From df0a8c56f03004738599e06a7b5a1d2b67189848 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 23 Apr 2020 09:28:58 +0000
 Subject: [PATCH] change shebang to python3
@@ -12,10 +12,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/pbr/tests/test_integration.py b/pbr/tests/test_integration.py
-index 8e96f21..b07cbe3 100644
+index cb4b5e5..4cbfb19 100644
 --- a/pbr/tests/test_integration.py
 +++ b/pbr/tests/test_integration.py
-@@ -150,7 +150,7 @@ class TestInstallWithoutPbr(base.BaseTestCase):
+@@ -171,7 +171,7 @@ class TestInstallWithoutPbr(base.BaseTestCase):
          pkgs = {
              'pkgTest': {
                  'setup.py': textwrap.dedent("""\
@@ -25,10 +25,10 @@ index 8e96f21..b07cbe3 100644
                      setuptools.setup(
                          name = 'pkgTest',
 diff --git a/pbr/tests/test_packaging.py b/pbr/tests/test_packaging.py
-index 07be547..f6a9412 100644
+index dddf7ae..bec03ce 100644
 --- a/pbr/tests/test_packaging.py
 +++ b/pbr/tests/test_packaging.py
-@@ -206,7 +206,7 @@ class CreatePackages(fixtures.Fixture):
+@@ -219,7 +219,7 @@ class CreatePackages(fixtures.Fixture):
  
      defaults = {
          'setup.py': textwrap.dedent(six.u("""\
@@ -37,6 +37,3 @@ index 07be547..f6a9412 100644
              import setuptools
              setuptools.setup(
                  setup_requires=['pbr'],
--- 
-2.24.1
-

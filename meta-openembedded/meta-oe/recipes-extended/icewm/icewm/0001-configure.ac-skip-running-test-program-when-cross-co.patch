@@ -1,4 +1,4 @@
-From c2a67c1f62175ab061bc03d10dd766f968c6a097 Mon Sep 17 00:00:00 2001
+From 06207b1340963e77f2e5d08ebf9727180ad86a36 Mon Sep 17 00:00:00 2001
 From: Naveen Saini <naveen.kumar.saini@intel.com>
 Date: Fri, 2 Aug 2019 10:41:26 +0800
 Subject: [PATCH] configure.ac: skip running test program when cross-compiling
@@ -7,12 +7,14 @@ Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
 ---
- configure.ac | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ configure.ac | 19 ++-----------------
+ 1 file changed, 2 insertions(+), 17 deletions(-)
 
+diff --git a/configure.ac b/configure.ac
+index c4a9b02..3f5a792 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -160,7 +160,7 @@ AC_CHECK_FUNCS([backtrace_symbols_fd mem
+@@ -151,7 +151,7 @@ AC_CHECK_FUNCS([backtrace_symbols_fd memrchr sysctl sysctlbyname])
  AC_FUNC_SELECT_ARGTYPES
  
  AC_MSG_CHECKING([for strlcpy])
@@ -21,7 +23,7 @@ Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
                 char a[2];
                 if (strlcpy(a, "yes", 2) != 3)
                     return 1;]])],
-@@ -176,7 +176,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#includ
+@@ -167,7 +167,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
                ])
  
  AC_MSG_CHECKING([for strlcat])
@@ -30,7 +32,7 @@ Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
                 char a[4] = "no";
                 if (strlcat(a, "yes", 4) != 5)
                     return 1;]])],
-@@ -191,21 +191,6 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#includ
+@@ -182,21 +182,6 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
                             [Define to 1 if you have the strlcat function.])
                ])
  

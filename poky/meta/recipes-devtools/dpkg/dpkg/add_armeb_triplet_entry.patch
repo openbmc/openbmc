@@ -1,13 +1,11 @@
-From 1c3a109df54b6092fa85a1fe2b7771e3b959655f Mon Sep 17 00:00:00 2001
+From 8ded32a35287a840de7e505c66e76cccd9edbac6 Mon Sep 17 00:00:00 2001
 From: "Krishnanjanappa, Jagadeesh"
  <jagadeesh.krishnanjanappa@caviumnetworks.com>
 Date: Wed, 8 Apr 2015 18:08:14 +0530
-Subject: [PATCH] dpkg: add triplet entry to fix build error for armeb
+Subject: [PATCH] add armeb triplet entry into triplettable.
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-
-[PATCH] add armeb triplet entry into triplettable.
 
 Cross-compling dpkg application for armeb fails with below error
 during configure task,
@@ -27,7 +25,7 @@ the required combination of "gnueabi-linux-armeb" was not found in
 the triplettable file thereby returning dpkg_arch as
 empty in configure script.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 
 Signed-off-by: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>

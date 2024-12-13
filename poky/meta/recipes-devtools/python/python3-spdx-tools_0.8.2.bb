@@ -8,7 +8,9 @@ SRC_URI[sha256sum] = "aea4ac9c2c375e7f439b1cef5ff32ef34914c083de0f61e08ed67cd3d9
 
 BBCLASSEXTEND = "native nativesdk"
 
-inherit setuptools3 pypi
+inherit pypi python_setuptools_build_meta
+
+DEPENDS += "python3-setuptools-scm-native"
 
 # Dependency required for pyspdxtools : python3-click
 # Dependencies required for conversion to spdx3 : python3-semantic-version, python3-ply

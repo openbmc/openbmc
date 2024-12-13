@@ -32,4 +32,4 @@ EXTRA_OEMESON += " \
 	-Dwith-usb-ids-path=${datadir}/hwdata/usb.ids \
 "
 
-RDEPENDS:${PN} = "hwdata"
+RDEPENDS:${PN} = "hwdata osinfo-db"

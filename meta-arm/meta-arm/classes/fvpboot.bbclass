@@ -24,10 +24,8 @@ FVP_CONSOLES[default] ?= "${FVP_CONSOLE}"
 # Arbitrary extra arguments
 FVP_EXTRA_ARGS ?= ""
 # Bitbake variables to pass to the FVP environment
-FVP_ENV_PASSTHROUGH ?= "FASTSIM_DISABLE_TA ARMLMD_LICENSE_FILE"
+FVP_ENV_PASSTHROUGH ?= "ARMLMD_LICENSE_FILE"
 FVP_ENV_PASSTHROUGH[vardeps] = "${FVP_ENV_PASSTHROUGH}"
-# Disable timing annotation by default
-FASTSIM_DISABLE_TA ?= "1"
 
 EXTRA_IMAGEDEPENDS += "${FVP_PROVIDER}"
 

@@ -11,6 +11,8 @@ SRC_URI = " \
 "
 SRC_URI[sha256sum] = "56c932549852cddcfafdab3820b0200c7742675be92179e59e6215b340e26467"
 
+UPSTREAM_CHECK_URI = "http://www.fftw.org/download.html"
+
 inherit autotools pkgconfig ptest
 
 # we had multiple recipes in the past

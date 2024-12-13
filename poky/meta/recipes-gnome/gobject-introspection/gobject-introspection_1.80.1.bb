@@ -26,7 +26,8 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 
 MULTILIB_SCRIPTS = "${PN}:${bindir}/g-ir-annotation-tool ${PN}:${bindir}/g-ir-scanner"
 
-DEPENDS += " libffi zlib python3 flex-native bison-native"
+# setuptools are required to provide distutils to build the tools
+DEPENDS += " libffi zlib python3 python3-setuptools flex-native bison-native"
 DEPENDS:append:class-native = " glib-2.0"
 DEPENDS:append:class-target = " glib-2.0-initial"
 
@@ -169,6 +170,15 @@ gi_package_preprocess() {
 
 SSTATE_SCAN_FILES += "g-ir-scanner-qemuwrapper g-ir-scanner-wrapper g-ir-compiler-wrapper g-ir-scanner-lddwrapper Gio-2.0.gir postinst-ldsoconf-${PN}"
 
+PACKAGES =+ "\
+    ${PN}-tools \
+"
+
+FILES:${PN}-tools = "\
+    ${bindir} \
+    ${libdir}/gobject-introspection/giscanner \
+"
+
 # .typelib files are needed at runtime and so they go to the main package
 FILES:${PN}:append = " ${libdir}/girepository-*/*.typelib"
 
@@ -190,7 +200,15 @@ FILES:${PN}-dev:append = " ${datadir}/gobject-introspection-1.0/tests/*.c \
 FILES:${PN}-dbg += "${libdir}/gobject-introspection/giscanner/.debug/"
 FILES:${PN}-staticdev += "${libdir}/gobject-introspection/giscanner/*.a"
 
+# glib-2.0 is required for libgirepository
+RDEPENDS:${PN} = "glib-2.0"
+
 # setuptools can be removed when upstream removes all uses of distutils
-RDEPENDS:${PN} = "python3-pickle python3-xml python3-setuptools glib-2.0"
+RDEPENDS:${PN}-tools = "\
+    glib-2.0 \
+    python3-pickle \
+    python3-setuptools \
+    python3-xml \
+"
 
 BBCLASSEXTEND = "native"

@@ -1,0 +1,47 @@
+From fb8bf1c1b1d0bf8e9bc637c0e67219fab1a9eb03 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Aug 2024 15:24:57 -0700
+Subject: [PATCH] libopts.m4: accept POSIX_SHELL from the environment during
+ the configure step
+
+This lets us set it to the canonical path /bin/bash, even on systems
+where both /bin/bash and /usr/bin/bash are available, and therefore
+which(1) might return /usr/bin/bash (depending on PATH order).
+
+Both copies of libopts.m4 are marked as generated files, but the files
+from which they were generated do not seem to be present in the sharutils
+package. This change is equivalent to part of a 2016 autogen commit
+<https://git.savannah.gnu.org/cgit/autogen.git/commit/?id=db064b9a>.
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/autogen.git/commit/?id=db064b9a]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libopts/m4/libopts.m4 | 1 +
+ m4/libopts.m4         | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/libopts/m4/libopts.m4 b/libopts/m4/libopts.m4
+index 1a896d9..3b88426 100644
+--- a/libopts/m4/libopts.m4
++++ b/libopts/m4/libopts.m4
+@@ -114,6 +114,7 @@ AC_DEFUN([INVOKE_LIBOPTS_MACROS_FIRST],[
+   AC_PROG_SED
+   [while :
+   do
++      test -x "$POSIX_SHELL" && break
+       POSIX_SHELL=`which bash`
+       test -x "$POSIX_SHELL" && break
+       POSIX_SHELL=`which dash`
+diff --git a/m4/libopts.m4 b/m4/libopts.m4
+index c7ba4f3..a1127e1 100644
+--- a/m4/libopts.m4
++++ b/m4/libopts.m4
+@@ -114,6 +114,7 @@ AC_DEFUN([INVOKE_LIBOPTS_MACROS_FIRST],[
+   AC_PROG_SED
+   [while :
+   do
++      test -x "$POSIX_SHELL" && break
+       POSIX_SHELL=`which bash`
+       test -x "$POSIX_SHELL" && break
+       POSIX_SHELL=`which dash`

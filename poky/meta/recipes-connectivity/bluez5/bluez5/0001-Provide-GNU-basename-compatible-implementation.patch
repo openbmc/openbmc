@@ -1,0 +1,147 @@
+From 44e24350aae771daa93e5a85378856f91358688f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 26 Aug 2024 09:55:03 -0700
+Subject: [PATCH] Provide GNU basename compatible implementation
+
+Call to basename() relies on a GNU extension
+to take a const char * vs a char *. Let's define
+a trivial helper function to ensure compatibility
+with musl.
+
+Fixes Issue: https://github.com/bluez/bluez/issues/843
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-bluetooth/20240826173844.2918630-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac            | 11 ++++++++++-
+ mesh/mesh-config-json.c |  4 +++-
+ mesh/missing.h          | 21 +++++++++++++++++++++
+ mesh/rpl.c              |  1 +
+ tools/hex2hcd.c         |  1 +
+ tools/missing.h         | 21 +++++++++++++++++++++
+ 6 files changed, 57 insertions(+), 2 deletions(-)
+ create mode 100644 mesh/missing.h
+ create mode 100644 tools/missing.h
+
+diff --git a/configure.ac b/configure.ac
+index a7fb51f..254f1a7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,7 +70,16 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
+ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 			AC_MSG_ERROR(dynamic linking loader is required))
+ 
+-AC_CHECK_HEADERS(linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h sys/random.h)
++AC_CHECK_HEADERS(string.h linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h sys/random.h)
++
++# basename may be only available in libgen.h with the POSIX behavior,
++# not desired here
++AC_CHECK_DECLS([basename], [],
++				AC_MSG_WARN([GNU basename extension not found]),
++				[#define _GNU_SOURCE 1
++				 #include <string.h>
++				 ])
++
+ 
+ PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28)
+ 
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index c198627..e3b0a18 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -28,6 +28,7 @@
+ #include <ell/ell.h>
+ #include <json-c/json.h>
+ 
++#include "mesh/missing.h"
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+ #include "mesh/mesh-config.h"
+@@ -2694,7 +2695,8 @@ bool mesh_config_load_nodes(const char *cfgdir_name, mesh_config_node_func_t cb,
+ 
+ void mesh_config_destroy_nvm(struct mesh_config *cfg)
+ {
+-	char *node_dir, *node_name;
++	char *node_dir;
++	const char* node_name;
+ 	char uuid[33];
+ 
+ 	if (!cfg)
+diff --git a/mesh/missing.h b/mesh/missing.h
+new file mode 100644
+index 0000000..eaf3281
+--- /dev/null
++++ b/mesh/missing.h
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024  Khem Raj <raj.khem@gmail.com>
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++#if !HAVE_DECL_BASENAME
++#include <string.h>
++static inline const char *basename(const char *path)
++{
++  const char *base = strrchr(path, '/');
++
++  return base ? base + 1 : path;
++}
++#endif
+diff --git a/mesh/rpl.c b/mesh/rpl.c
+index fb225dd..2fa17d7 100644
+--- a/mesh/rpl.c
++++ b/mesh/rpl.c
+@@ -24,6 +24,7 @@
+ 
+ #include <ell/ell.h>
+ 
++#include "mesh/missing.h"
+ #include "mesh/mesh-defs.h"
+ 
+ #include "mesh/node.h"
+diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
+index e6dca5a..452ab2b 100644
+--- a/tools/hex2hcd.c
++++ b/tools/hex2hcd.c
+@@ -24,6 +24,7 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <sys/stat.h>
++#include "tools/missing.h"
+ 
+ static ssize_t process_record(int fd, const char *line, uint16_t *upper_addr)
+ {
+diff --git a/tools/missing.h b/tools/missing.h
+new file mode 100644
+index 0000000..eaf3281
+--- /dev/null
++++ b/tools/missing.h
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024  Khem Raj <raj.khem@gmail.com>
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++#if !HAVE_DECL_BASENAME
++#include <string.h>
++static inline const char *basename(const char *path)
++{
++  const char *base = strrchr(path, '/');
++
++  return base ? base + 1 : path;
++}
++#endif

@@ -286,6 +286,10 @@ post_relocate="$target_sdk_dir/post-relocate-setup.sh"
 if [ -e "$post_relocate" ]; then
 	$SUDO_EXEC sed -e "s:@SDKPATH@:$target_sdk_dir:g" -i $post_relocate
 	$SUDO_EXEC /bin/sh $post_relocate "$target_sdk_dir" "@SDKPATH@"
+	if [ $? -ne 0 ]; then
+		echo "Executing $post_relocate failed"
+		exit 1
+	fi
 	$SUDO_EXEC rm -f $post_relocate
 fi
 

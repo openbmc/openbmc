@@ -34,3 +34,10 @@ PACKAGES += "libflac libflac++"
 FILES:${PN} = "${bindir}/*"
 FILES:libflac = "${libdir}/libFLAC.so.*"
 FILES:libflac++ = "${libdir}/libFLAC++.so.*"
+
+do_install:append() {
+    # make the links in documentation relative to avoid buildpaths reproducibility problem
+    sed -i "s#${S}/include#${includedir}#g" ${D}${docdir}/flac/FLAC.tag ${D}${docdir}/flac/api/*.html
+    # there is also one root path without trailing slash
+    sed -i "s#${S}#/#g" ${D}${docdir}/flac/api/*.html
+}

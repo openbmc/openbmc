@@ -50,6 +50,9 @@ SRC_URI = "https://github.com/linux-test-project/lcov/releases/download/v${PV}/l
 SRC_URI[md5sum] = "bfee0cef50d7b7bd1df03bfadf68dcef"
 SRC_URI[sha256sum] = "987031ad5528c8a746d4b52b380bc1bffe412de1f2b9c2ba5224995668e3240b"
 
+UPSTREAM_CHECK_URI = "https://github.com/linux-test-project/lcov/releases"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+
 do_install() {
     oe_runmake install PREFIX=${D}${prefix} CFG_DIR=${D}${sysconfdir} LCOV_PERL_PATH="/usr/bin/env perl"
 }

@@ -1,0 +1,26 @@
+From c64dfdc6ec5bc752aafd1ac16a380f47602197c4 Mon Sep 17 00:00:00 2001
+From: Chris Frey <cdfrey@foursquare.net>
+Date: Thu, 24 Oct 2013 17:58:47 -0400
+Subject: [PATCH] Added stdlib.h for malloc() in lib/decode.c
+
+Authored by Chris Frey <cdfrey@foursquare.net>.
+
+Upstream-Status: Backport [https://repo.or.cz/libtar.git/commit/20aa09bd7775094a2beb0f136c2c7d9e9fd6c7e6]
+
+Signed-off-by: Katariina Lounento <katariina.lounento@vaisala.com>
+---
+ lib/decode.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/decode.c b/lib/decode.c
+index edb2185..35312be 100644
+--- a/lib/decode.c
++++ b/lib/decode.c
+@@ -13,6 +13,7 @@
+ #include <internal.h>
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <sys/param.h>
+ #include <pwd.h>
+ #include <grp.h>

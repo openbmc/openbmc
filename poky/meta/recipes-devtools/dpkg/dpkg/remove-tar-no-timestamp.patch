@@ -1,4 +1,4 @@
-From add92699ca1397205e1d7b46c3ab43de06b9a6c7 Mon Sep 17 00:00:00 2001
+From 7d69de114aa696cfb5e31b491a657ca6b6cbbbd5 Mon Sep 17 00:00:00 2001
 From: Constantin Musca <constantinx.musca@intel.com>
 Date: Tue, 28 Aug 2012 17:02:40 +0300
 Subject: [PATCH] busybox-1.19.4 tar utility doesn't support
@@ -12,7 +12,7 @@ Upstream-Status: Inappropriate [configuration]
  1 file changed, 1 deletion(-)
 
 diff --git a/src/deb/extract.c b/src/deb/extract.c
-index 8b78a7eab..fd7595808 100644
+index 08b281564..c35a182ee 100644
 --- a/src/deb/extract.c
 +++ b/src/deb/extract.c
 @@ -338,7 +338,6 @@ extracthalf(const char *debar, const char *dir,

@@ -9,6 +9,7 @@ SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.xz
 SRC_URI[sha256sum] = "72a951cb0ad622785a8962801f005a3a412736c7e7e3ce152f176287c52fe062"
 
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools pkgconfig
 

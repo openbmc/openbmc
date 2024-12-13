@@ -26,4 +26,7 @@ inherit setuptools3
 RREPLACES:${PN} = "bmap-tools"
 RCONFLICTS:${PN} = "bmap-tools"
 
+# Poetry backend appears incomplete, upstream has moved to hatch
+INSANE_SKIP = "pep517-backend"
+
 BBCLASSEXTEND = "native nativesdk"

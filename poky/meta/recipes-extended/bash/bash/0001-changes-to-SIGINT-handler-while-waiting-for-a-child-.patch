@@ -1,4 +1,4 @@
-From 721d5be99eb37d31e48bd66d61808a66a4c5ab84 Mon Sep 17 00:00:00 2001
+From e4b9493ae4923595ec3ca67f85322129fb3056cf Mon Sep 17 00:00:00 2001
 From: Chet Ramey <chet.ramey@case.edu>
 Date: Mon, 30 Oct 2023 12:16:07 -0400
 Subject: [PATCH] changes to SIGINT handler while waiting for a child; skip
@@ -20,10 +20,10 @@ Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
  6 files changed, 43 insertions(+), 32 deletions(-)
 
 diff --git a/general.c b/general.c
-index 85c5a8b6..65e2ee06 100644
+index bda39f4..94a5339 100644
 --- a/general.c
 +++ b/general.c
-@@ -262,8 +262,9 @@ legal_number (string, result)
+@@ -264,8 +264,9 @@ legal_number (string, result)
    if (errno || ep == string)
      return 0;	/* errno is set on overflow or underflow */
  
@@ -36,7 +36,7 @@ index 85c5a8b6..65e2ee06 100644
  
    /* If *string is not '\0' but *ep is '\0' on return, the entire string
 diff --git a/jobs.c b/jobs.c
-index 6b986ed7..262d78de 100644
+index d3e4ab0..903cf9c 100644
 --- a/jobs.c
 +++ b/jobs.c
 @@ -2718,6 +2718,10 @@ wait_for_background_pids (ps)
@@ -96,7 +96,7 @@ index 6b986ed7..262d78de 100644
        waiting_for_child = 0;
        if (old_sigint_handler == SIG_IGN)
  	set_signal_handler (SIGINT, old_sigint_handler);
-@@ -4136,7 +4144,7 @@ set_job_status_and_cleanup (job)
+@@ -4141,7 +4149,7 @@ set_job_status_and_cleanup (job)
  		 SIGINT (if we reset the sighandler to the default).
  		 In this case, we have to fix things up.  What a crock. */
  	      if (temp_handler == trap_handler && signal_is_trapped (SIGINT) == 0)
@@ -106,7 +106,7 @@ index 6b986ed7..262d78de 100644
  	      if (temp_handler == SIG_DFL)
  		termsig_handler (SIGINT);	/* XXX */
 diff --git a/tests/redir.right b/tests/redir.right
-index 8db10414..9e1403c8 100644
+index 8db1041..9e1403c 100644
 --- a/tests/redir.right
 +++ b/tests/redir.right
 @@ -154,10 +154,10 @@ foo
@@ -123,7 +123,7 @@ index 8db10414..9e1403c8 100644
 +./redir11.sub: line 77: 42: No such file or directory
  42
 diff --git a/tests/redir11.sub b/tests/redir11.sub
-index d417cdb6..ca9854cd 100644
+index d417cdb..ca9854c 100644
 --- a/tests/redir11.sub
 +++ b/tests/redir11.sub
 @@ -34,6 +34,8 @@ a=4 b=7 ss=4 declare -i ss
@@ -136,7 +136,7 @@ index d417cdb6..ca9854cd 100644
  a=4 echo foo 2>&1 >&$(foo) | { grep -q 'Bad file' || echo 'redir11 bad 3'; }
  a=1 echo foo 2>&1 >&$(foo) | { grep -q 'Bad file' || echo 'redir11 bad 4'; }
 diff --git a/tests/type.right b/tests/type.right
-index bbc228e8..e0a66745 100644
+index bbc228e..c0c1c8b 100644
 --- a/tests/type.right
 +++ b/tests/type.right
 @@ -24,15 +24,15 @@ func ()
@@ -164,7 +164,7 @@ index bbc228e8..e0a66745 100644
  builtin is a shell builtin
  /bin/sh
 diff --git a/tests/type.tests b/tests/type.tests
-index fd39c18a..ddc15407 100644
+index fd39c18..ddc1540 100644
 --- a/tests/type.tests
 +++ b/tests/type.tests
 @@ -25,8 +25,6 @@ type -r ${THIS_SH}
@@ -221,6 +221,3 @@ index fd39c18a..ddc15407 100644
  type m
  
  hash -r
--- 
-2.35.5
-

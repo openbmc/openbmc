@@ -220,34 +220,34 @@ Other license-related notes:
 Security Fixes in 3.4
 ~~~~~~~~~~~~~~~~~~~~~
 
--  apr: :cve:`2021-35940`
--  aspell: :cve:`2019-25051`
--  avahi: :cve:`2021-3468`, :cve:`2021-36217`
--  binutils: :cve:`2021-20197`
--  bluez: :cve:`2021-3658`
--  busybox: :cve:`2021-28831`
--  cairo: :cve:`2020-35492`
--  cpio: :cve:`2021-38185`
--  expat: :cve:`2013-0340`
--  ffmpeg: :cve:`2020-20446`, :cve:`2020-22015`, :cve:`2020-22021`, :cve:`2020-22033`, :cve:`2020-22019`, :cve:`2021-33815`, :cve:`2021-38171`, :cve:`2020-20453`
--  glibc: :cve:`2021-33574`, :cve:`2021-38604`
--  inetutils: :cve:`2021-40491`
--  libgcrypt: :cve:`2021-40528`
--  linux-yocto/5.10, 5.14: :cve:`2021-3653`, :cve:`2021-3656`
--  lz4: :cve:`2021-3520`
--  nettle: :cve:`2021-20305`
--  openssl: :cve:`2021-3711`, :cve:`2021-3712`
--  perl: :cve:`2021-36770`
--  python3: :cve:`2021-29921`
--  python3-pip: :cve:`2021-3572`
--  qemu: :cve:`2020-27821`, :cve:`2020-29443`, :cve:`2020-35517`, :cve:`2021-3392`, :cve:`2021-3409`, :cve:`2021-3416`, :cve:`2021-3527`, :cve:`2021-3544`, :cve:`2021-3545`, :cve:`2021-3546`, :cve:`2021-3682`, :cve:`2021-20181`, :cve:`2021-20221`, :cve:`2021-20257`, :cve:`2021-20263`
--  rpm: :cve:`2021-3421`, :cve:`2021-20271`
--  rsync: :cve:`2020-14387`
--  util-linux: :cve:`2021-37600`
--  vim: :cve:`2021-3770`, :cve:`2021-3778`
--  wpa-supplicant: :cve:`2021-30004`
--  xdg-utils: :cve:`2020-27748`
--  xserver-xorg: :cve:`2021-3472`
+-  apr: :cve_nist:`2021-35940`
+-  aspell: :cve_nist:`2019-25051`
+-  avahi: :cve_nist:`2021-3468`, :cve_nist:`2021-36217`
+-  binutils: :cve_nist:`2021-20197`
+-  bluez: :cve_nist:`2021-3658`
+-  busybox: :cve_nist:`2021-28831`
+-  cairo: :cve_nist:`2020-35492`
+-  cpio: :cve_nist:`2021-38185`
+-  expat: :cve_nist:`2013-0340`
+-  ffmpeg: :cve_nist:`2020-20446`, :cve_nist:`2020-22015`, :cve_nist:`2020-22021`, :cve_nist:`2020-22033`, :cve_nist:`2020-22019`, :cve_nist:`2021-33815`, :cve_nist:`2021-38171`, :cve_nist:`2020-20453`
+-  glibc: :cve_nist:`2021-33574`, :cve_nist:`2021-38604`
+-  inetutils: :cve_nist:`2021-40491`
+-  libgcrypt: :cve_nist:`2021-40528`
+-  linux-yocto/5.10, 5.14: :cve_nist:`2021-3653`, :cve_nist:`2021-3656`
+-  lz4: :cve_nist:`2021-3520`
+-  nettle: :cve_nist:`2021-20305`
+-  openssl: :cve_nist:`2021-3711`, :cve_nist:`2021-3712`
+-  perl: :cve_nist:`2021-36770`
+-  python3: :cve_nist:`2021-29921`
+-  python3-pip: :cve_nist:`2021-3572`
+-  qemu: :cve_nist:`2020-27821`, :cve_nist:`2020-29443`, :cve_nist:`2020-35517`, :cve_nist:`2021-3392`, :cve_nist:`2021-3409`, :cve_nist:`2021-3416`, :cve_nist:`2021-3527`, :cve_nist:`2021-3544`, :cve_nist:`2021-3545`, :cve_nist:`2021-3546`, :cve_nist:`2021-3682`, :cve_nist:`2021-20181`, :cve_nist:`2021-20221`, :cve_nist:`2021-20257`, :cve_nist:`2021-20263`
+-  rpm: :cve_nist:`2021-3421`, :cve_nist:`2021-20271`
+-  rsync: :cve_nist:`2020-14387`
+-  util-linux: :cve_nist:`2021-37600`
+-  vim: :cve_nist:`2021-3770`, :cve_nist:`2021-3778`
+-  wpa-supplicant: :cve_nist:`2021-30004`
+-  xdg-utils: :cve_nist:`2020-27748`
+-  xserver-xorg: :cve_nist:`2021-3472`
 
 Recipe Upgrades in 3.4
 ~~~~~~~~~~~~~~~~~~~~~~

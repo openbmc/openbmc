@@ -1,5 +1,5 @@
 DESCRIPTION = "Trusted Firmware-A"
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-2-Clause & BSD-3-Clause & MIT & Apache-2.0"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

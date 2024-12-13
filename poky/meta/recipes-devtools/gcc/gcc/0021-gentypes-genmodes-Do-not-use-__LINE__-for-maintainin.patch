@@ -1,4 +1,4 @@
-From a9bb04b7cf02b2f2d16f68733488f9e48fc7e7a9 Mon Sep 17 00:00:00 2001
+From 33eb17881ca90cff733070c5b630501fb0a8bd58 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 10 Mar 2020 08:26:53 -0700
 Subject: [PATCH] gentypes/genmodes: Do not use __LINE__ for maintaining

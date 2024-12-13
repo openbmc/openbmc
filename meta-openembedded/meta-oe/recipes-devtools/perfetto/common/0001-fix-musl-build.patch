@@ -1,0 +1,40 @@
+From 485c21940eb0100a33b7efea40a83e7f79e765f8 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Sun, 22 Sep 2024 20:17:52 +0200
+Subject: [PATCH] fix musl build
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+Upstream-Status: Pending
+
+ sdk/perfetto.cc   | 1 -
+ src/base/utils.cc | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/sdk/perfetto.cc b/sdk/perfetto.cc
+index b10dd5aa92..2eb90f0d15 100644
+--- a/sdk/perfetto.cc
++++ b/sdk/perfetto.cc
+@@ -6558,7 +6558,6 @@ std::optional<int32_t> GetTimezoneOffsetMins() {
+ 
+ #if PERFETTO_BUILDFLAG(PERFETTO_OS_LINUX) || \
+     PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
+-#include <linux/prctl.h>
+ #include <sys/prctl.h>
+ 
+ #ifndef PR_GET_TAGGED_ADDR_CTRL
+diff --git a/src/base/utils.cc b/src/base/utils.cc
+index 0d9318c136..419c7dbc1a 100644
+--- a/src/base/utils.cc
++++ b/src/base/utils.cc
+@@ -40,7 +40,6 @@
+ 
+ #if PERFETTO_BUILDFLAG(PERFETTO_OS_LINUX) || \
+     PERFETTO_BUILDFLAG(PERFETTO_OS_ANDROID)
+-#include <linux/prctl.h>
+ #include <sys/prctl.h>
+ 
+ #ifndef PR_GET_TAGGED_ADDR_CTRL
+-- 
+2.43.0
+

@@ -1,0 +1,48 @@
+From b684f4cc25821b6e86a58576f864e4b12dfdfecc Mon Sep 17 00:00:00 2001
+From: Rasmus Villemoes <rasmus.villemoes@prevas.dk>
+Date: Sat, 5 Jun 2021 22:57:51 +0200
+Subject: [PATCH] only apply search path logic to relative pathnames
+
+Adding any directory to the search path via cfg_add_searchpath breaks
+lookup of absolute paths. So change the logic in cfg_searchpath() to
+ignore the search path when the given filename is absolute, and merely
+check that for existence.
+
+This is technically an ABI change, but the current behaviour is quite
+unusual and unexpected.
+
+Upstream-Status: Backport [https://github.com/libconfuse/libconfuse/pull/155]
+
+Signed-off-by: Rasmus Villemoes <rasmus.villemoes@prevas.dk>
+---
+ src/confuse.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/confuse.c b/src/confuse.c
+index 2ea0254..19b56e3 100644
+--- a/src/confuse.c
++++ b/src/confuse.c
+@@ -1746,12 +1746,20 @@ DLLIMPORT char *cfg_searchpath(cfg_searchpath_t *p, const char *file)
+ 		return NULL;
+ 	}
+ 
++	if (file[0] == '/') {
++		fullpath = strdup(file);
++		if (!fullpath)
++			return NULL;
++		goto check;
++	}
++
+ 	if ((fullpath = cfg_searchpath(p->next, file)) != NULL)
+ 		return fullpath;
+ 
+ 	if ((fullpath = cfg_make_fullpath(p->dir, file)) == NULL)
+ 		return NULL;
+ 
++check:
+ #ifdef HAVE_SYS_STAT_H
+ 	err = stat((const char *)fullpath, &st);
+ 	if ((!err) && S_ISREG(st.st_mode))
+-- 
+2.31.1
+

@@ -20,6 +20,9 @@ SRC_URI += "\
             file://COPYING \
             "
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS = "libcap"
 
@@ -30,7 +33,7 @@ do_populate_lic[depends] = "${PN}:do_configure"
 
 
 EXTRA_OEMAKE = '\
-                CC="${CC}" 'CFLAGS=-Wall ${LDFLAGS}' \
+                CC="${CC}" 'CFLAGS=-Wall ${LDFLAGS}'  \
                '
 
 # If we build under STAGING_KERNEL_DIR, source will not be put
@@ -49,13 +52,21 @@ do_configure:prepend() {
 		cp -r ${STAGING_KERNEL_DIR}/include/linux/bits.h ${S}
 		cp -r ${STAGING_KERNEL_DIR}/include/linux/const.h ${S}
 	fi
+	if [ -f "${STAGING_KERNEL_DIR}/tools/include/linux/build_bug.h" ]; then
+		cp -r ${STAGING_KERNEL_DIR}/tools/include/linux/build_bug.h ${S}
+	fi
+	cp -r ${STAGING_KERNEL_DIR}/tools/include/linux/compiler.h ${S}
+	cp -r ${STAGING_KERNEL_DIR}/tools/include/linux/compiler_types.h ${S}
+	cp -r ${STAGING_KERNEL_DIR}/tools/include/linux/compiler-gcc.h ${S}
 	cp -r ${STAGING_KERNEL_DIR}/tools/power/x86/turbostat/* ${S}
-	cp -r ${UNPACKDIR}/COPYING ${S}
 }
 
 
 do_compile() {
 	sed -i 's#<linux/bits.h>#"bits.h"#' msr-index.h
+	sed -i 's#<linux/compiler.h>#"compiler.h"#' build_bug.h
+	sed -i 's#<linux/compiler_types.h>#"compiler_types.h"#' compiler.h
+	sed -i 's#<linux/compiler-gcc.h>#"compiler-gcc.h"#' compiler_types.h
 	'TMPCHECK='grep "<vdso/const.h>" bits.h'' || true
 	if [ -n $TMPCHECK ]; then
 		sed -i 's#<vdso/const.h>#"const.h"#' bits.h
@@ -64,8 +75,15 @@ do_compile() {
 		sed -i 's#<linux/const.h>#"const.h"#' bits.h
 		sed -i -e 's#<uapi/linux/const.h>#<linux/const.h>#' -e 's#_LINUX_CONST_H#_LINUX_CONST_H_KERNEL#' const.h
 	fi
+	echo '#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))' >> msr-index.h
+	echo "#define BIT(x) (1 << (x))" > bits.h
+	echo "#define BIT_ULL(nr) (1ULL << (nr))" >> bits.h
+	echo "#define GENMASK(h, l) (((~0UL) << (l)) & (~0UL >> (sizeof(long) * 8 - 1 - (h))))" >> bits.h
+	echo "#define GENMASK_ULL(h, l) (((~0ULL) << (l)) & (~0ULL >> (sizeof(long long) * 8 - 1 - (h))))" >> bits.h
+
 	sed -i 's#MSRHEADER#"msr-index.h"#' turbostat.c
 	sed -i 's#INTEL_FAMILY_HEADER#"intel-family.h"#' turbostat.c
+	sed -i 's#BUILD_BUG_HEADER#"build_bug.h"#' turbostat.c
 	sed -i 's#\$(CC) \$(CFLAGS) \$< -o \$(BUILD_OUTPUT)/\$@#\$(CC) \$(CFLAGS) \$(LDFLAGS) \$< -o \$(BUILD_OUTPUT)/\$@#' Makefile
 	oe_runmake STAGING_KERNEL_DIR=${STAGING_KERNEL_DIR}
 }

@@ -1,0 +1,38 @@
+From 796f1b5cfca595ba4e11ca9dab5c2c46c0710d95 Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Tue, 19 Aug 2014 11:31:35 +0800
+Subject: [PATCH] using pkg-config to detect krb5
+
+Upstream-Status: Pending
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
+update patch to 5.1.5
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 76a38f4..1bb1a52 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -214,7 +214,14 @@ PKG_CHECK_MODULES([XML], [libxml-2.0], [
+   AC_DEFINE(LIBXML2_WORKAROUND, 1, [Use libxml2 tsd usage workaround])
+ ], [HAVE_LIBXML=0])
+ 
+-AF_CHECK_KRB5()
++PKG_CHECK_MODULES(KRB5, [krb5], [
++  HAVE_KRB5=1
++  SAVE_CFLAGS=$CFLAGS
++  SAVE_LIBS=$LIBS
++  CFLAGS="$CFLAGS $KRB5_FLAGS"
++  LIBS="$LIBS $KRB5_LIBS"
++  AC_CHECK_FUNCS([krb5_principal_get_realm])
++], [HAVE_KRB5=0])
+ 
+ AC_SEARCH_LIBS([versionsort],[])
+ if test "$ac_cv_search_versionsort" = "no"; then
+-- 
+2.25.1
+

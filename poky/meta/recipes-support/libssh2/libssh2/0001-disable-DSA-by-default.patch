@@ -1,0 +1,173 @@
+From 124ab98ed2f3ea6478dd04c7b6947720fef385d3 Mon Sep 17 00:00:00 2001
+From: Viktor Szakats <commit@vsz.me>
+Date: Tue, 30 Jul 2024 20:00:05 +0200
+Subject: [PATCH] disable DSA by default
+
+Also:
+- add `LIBSSH2_DSA_ENABLE` to enable it explicitly.
+- test the above option in CI.
+- say 'deprecated' in docs and public header.
+- disable DSA in the CI server config.
+  (OpenSSH 9.8 no longer builds with it by default)
+  https://www.openssh.com/txt/release-9.8
+  Patch-by: Jose Quaresma
+- disable more DSA code when not enabled.
+
+Fixes #1433
+Closes #1435
+
+Upstream-Status: Backport [https://github.com/libssh2/libssh2/commit/b7ab0faa70567a789419798fe079f5678ad4e156]
+
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
+---
+ docs/libssh2_knownhost_add.3     |  2 +-
+ docs/libssh2_knownhost_addc.3    |  2 +-
+ docs/libssh2_session_hostkey.3   |  2 +-
+ include/libssh2.h                |  4 ++--
+ src/hostkey.c                    |  4 ++++
+ src/knownhost.c                  | 16 ++++++++++------
+ tests/openssh_server/sshd_config |  2 +-
+ 7 files changed, 20 insertions(+), 12 deletions(-)
+
+diff --git a/docs/libssh2_knownhost_add.3 b/docs/libssh2_knownhost_add.3
+index d0af2b6d..2b529c2e 100644
+--- a/docs/libssh2_knownhost_add.3
++++ b/docs/libssh2_knownhost_add.3
+@@ -50,7 +50,7 @@ LIBSSH2_KNOWNHOST_KEYENC_RAW or LIBSSH2_KNOWNHOST_KEYENC_BASE64.
+ 
+ The key is using one of these algorithms:
+ LIBSSH2_KNOWNHOST_KEY_RSA1, LIBSSH2_KNOWNHOST_KEY_SSHRSA or
+-LIBSSH2_KNOWNHOST_KEY_SSHDSS.
++LIBSSH2_KNOWNHOST_KEY_SSHDSS (deprecated).
+ 
+ \fIstore\fP should point to a pointer that gets filled in to point to the
+ known host data after the addition. NULL can be passed if you do not care about
+diff --git a/docs/libssh2_knownhost_addc.3 b/docs/libssh2_knownhost_addc.3
+index 21367e11..f15f6ea9 100644
+--- a/docs/libssh2_knownhost_addc.3
++++ b/docs/libssh2_knownhost_addc.3
+@@ -55,7 +55,7 @@ LIBSSH2_KNOWNHOST_KEYENC_RAW or LIBSSH2_KNOWNHOST_KEYENC_BASE64.
+ 
+ The key is using one of these algorithms:
+ LIBSSH2_KNOWNHOST_KEY_RSA1, LIBSSH2_KNOWNHOST_KEY_SSHRSA or
+-LIBSSH2_KNOWNHOST_KEY_SSHDSS.
++LIBSSH2_KNOWNHOST_KEY_SSHDSS (deprecated).
+ 
+ \fIstore\fP should point to a pointer that gets filled in to point to the
+ known host data after the addition. NULL can be passed if you do not care about
+diff --git a/docs/libssh2_session_hostkey.3 b/docs/libssh2_session_hostkey.3
+index d57c7eab..0f0ee4c7 100644
+--- a/docs/libssh2_session_hostkey.3
++++ b/docs/libssh2_session_hostkey.3
+@@ -14,7 +14,7 @@ Returns a pointer to the current host key, the value \fIlen\fP points to will
+ get the length of the key.
+ 
+ The value \fItype\fP points to the type of hostkey which is one of:
+-LIBSSH2_HOSTKEY_TYPE_RSA, LIBSSH2_HOSTKEY_TYPE_DSS, or
++LIBSSH2_HOSTKEY_TYPE_RSA, LIBSSH2_HOSTKEY_TYPE_DSS (deprecated), or
+ LIBSSH2_HOSTKEY_TYPE_UNKNOWN.
+ 
+ .SH RETURN VALUE
+diff --git a/include/libssh2.h b/include/libssh2.h
+index 97ac5898..4c1faa53 100644
+--- a/include/libssh2.h
++++ b/include/libssh2.h
+@@ -470,7 +470,7 @@ typedef struct _LIBSSH2_POLLFD {
+ /* Hostkey Types */
+ #define LIBSSH2_HOSTKEY_TYPE_UNKNOWN            0
+ #define LIBSSH2_HOSTKEY_TYPE_RSA                1
+-#define LIBSSH2_HOSTKEY_TYPE_DSS                2
++#define LIBSSH2_HOSTKEY_TYPE_DSS                2  /* deprecated */
+ #define LIBSSH2_HOSTKEY_TYPE_ECDSA_256          3
+ #define LIBSSH2_HOSTKEY_TYPE_ECDSA_384          4
+ #define LIBSSH2_HOSTKEY_TYPE_ECDSA_521          5
+@@ -1094,7 +1094,7 @@ libssh2_knownhost_init(LIBSSH2_SESSION *session);
+ #define LIBSSH2_KNOWNHOST_KEY_SHIFT        18
+ #define LIBSSH2_KNOWNHOST_KEY_RSA1         (1<<18)
+ #define LIBSSH2_KNOWNHOST_KEY_SSHRSA       (2<<18)
+-#define LIBSSH2_KNOWNHOST_KEY_SSHDSS       (3<<18)
++#define LIBSSH2_KNOWNHOST_KEY_SSHDSS       (3<<18)  /* deprecated */
+ #define LIBSSH2_KNOWNHOST_KEY_ECDSA_256    (4<<18)
+ #define LIBSSH2_KNOWNHOST_KEY_ECDSA_384    (5<<18)
+ #define LIBSSH2_KNOWNHOST_KEY_ECDSA_521    (6<<18)
+diff --git a/src/hostkey.c b/src/hostkey.c
+index f3823676..a5e07029 100644
+--- a/src/hostkey.c
++++ b/src/hostkey.c
+@@ -1346,9 +1346,11 @@ static int hostkey_type(const unsigned char *hostkey, size_t len)
+     static const unsigned char rsa[] = {
+         0, 0, 0, 0x07, 's', 's', 'h', '-', 'r', 's', 'a'
+     };
++#if LIBSSH2_DSA
+     static const unsigned char dss[] = {
+         0, 0, 0, 0x07, 's', 's', 'h', '-', 'd', 's', 's'
+     };
++#endif
+     static const unsigned char ecdsa_256[] = {
+         0, 0, 0, 0x13, 'e', 'c', 'd', 's', 'a', '-', 's', 'h', 'a', '2', '-',
+         'n', 'i', 's', 't', 'p', '2', '5', '6'
+@@ -1371,8 +1373,10 @@ static int hostkey_type(const unsigned char *hostkey, size_t len)
+     if(!memcmp(rsa, hostkey, 11))
+         return LIBSSH2_HOSTKEY_TYPE_RSA;
+ 
++#if LIBSSH2_DSA
+     if(!memcmp(dss, hostkey, 11))
+         return LIBSSH2_HOSTKEY_TYPE_DSS;
++#endif
+ 
+     if(len < 15)
+         return LIBSSH2_HOSTKEY_TYPE_UNKNOWN;
+diff --git a/src/knownhost.c b/src/knownhost.c
+index c2231180..afa96508 100644
+--- a/src/knownhost.c
++++ b/src/knownhost.c
+@@ -773,18 +773,20 @@ static int hostline(LIBSSH2_KNOWNHOSTS *hosts,
+         }
+         key_type_len = key - key_type_name;
+ 
+-        if(!strncmp(key_type_name, "ssh-dss", key_type_len))
+-            key_type = LIBSSH2_KNOWNHOST_KEY_SSHDSS;
+-        else if(!strncmp(key_type_name, "ssh-rsa", key_type_len))
+-            key_type = LIBSSH2_KNOWNHOST_KEY_SSHRSA;
++        if(!strncmp(key_type_name, "ssh-ed25519", key_type_len))
++            key_type = LIBSSH2_KNOWNHOST_KEY_ED25519;
+         else if(!strncmp(key_type_name, "ecdsa-sha2-nistp256", key_type_len))
+             key_type = LIBSSH2_KNOWNHOST_KEY_ECDSA_256;
+         else if(!strncmp(key_type_name, "ecdsa-sha2-nistp384", key_type_len))
+             key_type = LIBSSH2_KNOWNHOST_KEY_ECDSA_384;
+         else if(!strncmp(key_type_name, "ecdsa-sha2-nistp521", key_type_len))
+             key_type = LIBSSH2_KNOWNHOST_KEY_ECDSA_521;
+-        else if(!strncmp(key_type_name, "ssh-ed25519", key_type_len))
+-            key_type = LIBSSH2_KNOWNHOST_KEY_ED25519;
++        else if(!strncmp(key_type_name, "ssh-rsa", key_type_len))
++            key_type = LIBSSH2_KNOWNHOST_KEY_SSHRSA;
++#if LIBSSH2_DSA
++        else if(!strncmp(key_type_name, "ssh-dss", key_type_len))
++            key_type = LIBSSH2_KNOWNHOST_KEY_SSHDSS;
++#endif
+         else
+             key_type = LIBSSH2_KNOWNHOST_KEY_UNKNOWN;
+ 
+@@ -1020,10 +1022,12 @@ knownhost_writeline(LIBSSH2_KNOWNHOSTS *hosts,
+         key_type_name = "ssh-rsa";
+         key_type_len = 7;
+         break;
++#if LIBSSH2_DSA
+     case LIBSSH2_KNOWNHOST_KEY_SSHDSS:
+         key_type_name = "ssh-dss";
+         key_type_len = 7;
+         break;
++#endif
+     case LIBSSH2_KNOWNHOST_KEY_ECDSA_256:
+         key_type_name = "ecdsa-sha2-nistp256";
+         key_type_len = 19;
+diff --git a/tests/openssh_server/sshd_config b/tests/openssh_server/sshd_config
+index 1069566f..5cd2b898 100644
+--- a/tests/openssh_server/sshd_config
++++ b/tests/openssh_server/sshd_config
+@@ -1,4 +1,4 @@
+ HostKeyAlgorithms +ssh-rsa
+-PubkeyAcceptedKeyTypes +ssh-rsa,ssh-dss,ssh-rsa-cert-v01@openssh.com
++PubkeyAcceptedKeyTypes +ssh-rsa,ssh-rsa-cert-v01@openssh.com
+ MACs +hmac-sha1,hmac-sha1-96,hmac-sha2-256,hmac-sha2-512,hmac-md5,hmac-md5-96,umac-64@openssh.com,umac-128@openssh.com,hmac-sha1-etm@openssh.com,hmac-sha1-96-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-md5-etm@openssh.com,hmac-md5-96-etm@openssh.com,umac-64-etm@openssh.com,umac-128-etm@openssh.com
+ Ciphers +3des-cbc,aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com

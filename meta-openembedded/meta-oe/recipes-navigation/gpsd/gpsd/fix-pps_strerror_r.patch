@@ -1,0 +1,51 @@
+From c72a489e2eb13296c7b514b7341033114abf430a Mon Sep 17 00:00:00 2001
+From: Miroslav Lichvar <mlichvar@redhat.com>
+Date: Mon, 22 Apr 2024 11:31:24 +0200
+Subject: [PATCH 1/2] SConscript: provide variable names to MergeFlags
+
+If the scons MergeFlags() function is provided with a list of
+compiler/linker options, it needs to guess what options belong where. If
+it doesn't recognize an option, it is silently ignored. There are also
+ambiguous options that could be both in CFLAGS and LINKFLAGS (e.g. -spec).
+
+Provide MergeFlags() with a dict instead of list to avoid the guesswork
+in order to pass all options, even if some are not recognized by scons.
+Switch LDFLAGS to LINKFLAGS for better compatibility with existing
+scripts.
+
+Upstream-Status: Submitted [https://gitlab.com/gpsd/gpsd/-/merge_requests/406]
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+
+---
+ SConscript | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/SConscript b/SConscript
+index dab481654..ee90d87c4 100644
+--- a/SConscript
++++ b/SConscript
+@@ -585,8 +585,8 @@ env['SC_PYTHON'] = sys.executable  # Path to SCons Python
+ # explicitly quote them or (better yet) use the "=" form of GNU option
+ # settings.
+ #
+-# Scons also uses different internal names than most other build-systems.
+-# So we rely on MergeFlags/ParseFlags to do the right thing for us.
++# Scons also uses different internal names than most other build-systems,
++# e.g. it uses LINKFLAGS instead of LDFLAGS.
+ #
+ # scons uses gcc, or clang, to link. Thus LDFLAGS does not serve its
+ # traditional function of providing arguments to ln. LDFLAGS set in the
+@@ -618,7 +618,10 @@ for i in ["ARFLAGS",
+           "SHLINKFLAGS",
+           ]:
+     if i in os.environ:
+-        env.MergeFlags(Split(os.getenv(i)))
++        t = i
++        if t == "LDFLAGS":
++            t = "LINKFLAGS"
++        env.MergeFlags({t: Split(os.getenv(i))})
+ 
+ 
+ # Keep scan-build options in the environment
+-- 
+GitLab

@@ -1,0 +1,36 @@
+From 939a39a0705ed2571fe5b842a9d5f80036f71a12 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Fri, 2 Aug 2024 22:02:55 +0200
+Subject: [PATCH 9/9] Platform: CS1000: Fix Bank offsets
+
+The BANK_0_PARTITION_OFFSET and BANK_1_PARTITION_OFFSET are used for
+erasing the banks during capsule update. The fwu_agent erases the flash
+using them as starting addresses. The BL2 (MCUBoot) should also
+be erased during capsule update.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [939a39a0705ed2571fe5b842a9d5f80036f71a12]
+---
+ .../ext/target/arm/corstone1000/partition/flash_layout.h    | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index 07b4cdea7..f42dda809 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -109,10 +109,8 @@
+ #define FWU_PRIVATE_METADATA_REPLICA_2_OFFSET   (FWU_PRIVATE_METADATA_REPLICA_1_OFFSET + \
+                                                  FWU_METADATA_FLASH_SECTOR_SIZE)
+ 
+-#define BANK_0_PARTITION_OFFSET         (SE_BL2_BANK_0_OFFSET + \
+-                                         SE_BL2_PARTITION_SIZE)
+-#define BANK_1_PARTITION_OFFSET         (SE_BL2_BANK_1_OFFSET + \
+-                                         SE_BL2_PARTITION_SIZE)
++#define BANK_0_PARTITION_OFFSET         (SE_BL2_BANK_0_OFFSET)
++#define BANK_1_PARTITION_OFFSET         (SE_BL2_BANK_1_OFFSET)
+ 
+ /* BL1: mcuboot flashmap configurations */
+ #define FLASH_AREA_8_ID                 (1)
+-- 
+2.25.1
+

@@ -1,0 +1,39 @@
+From fa6227d92725af5ae17b8435c0d50d92ff7a575c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Aug 2024 19:32:25 -0700
+Subject: [PATCH] bison/flex: Add flags for carrying user specified parameters
+
+This helps in passing cmdline to flex and bison e.g. to remove lines
+from generated output to avoid absolute paths
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/Modules/CMakeUserUseBison.cmake | 1 +
+ cmake/Modules/CMakeUserUseFlex.cmake  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/cmake/Modules/CMakeUserUseBison.cmake b/cmake/Modules/CMakeUserUseBison.cmake
+index 9257545..b61bd0e 100644
+--- a/cmake/Modules/CMakeUserUseBison.cmake
++++ b/cmake/Modules/CMakeUserUseBison.cmake
+@@ -52,6 +52,7 @@ IF(BISON_EXECUTABLE)
+        OUTPUT "${OUTFILE}" "${HEADER}"
+        COMMAND "${BISON_EXECUTABLE}"
+        ARGS "--name-prefix=${PREFIX}"
++       "${BISON_TARGET_ARG_COMPILE_FLAGS}"
+        "--defines"
+        "--output-file=${OUTFILE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}"
+diff --git a/cmake/Modules/CMakeUserUseFlex.cmake b/cmake/Modules/CMakeUserUseFlex.cmake
+index 7d0394f..1221dca 100644
+--- a/cmake/Modules/CMakeUserUseFlex.cmake
++++ b/cmake/Modules/CMakeUserUseFlex.cmake
+@@ -39,6 +39,7 @@ IF(FLEX_EXECUTABLE)
+       OUTPUT "${OUTFILE}"
+       COMMAND "${FLEX_EXECUTABLE}"
+       ARGS "-P${PREFIX}"
++      "${FLEX_TARGET_ARG_COMPILE_FLAGS}"
+       "-o${OUTFILE}"
+       "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}"
+       DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")

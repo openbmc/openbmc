@@ -1,0 +1,37 @@
+From 2026b08bce7fe87b5964f7912e1eef30f04922c1 Mon Sep 17 00:00:00 2001
+From: Phil Sutter <phil@nwl.cc>
+Date: Fri, 26 Jan 2024 18:43:10 +0100
+Subject: [PATCH] nft: ruleparse: Add missing braces around ternary
+
+The expression evaluated the sum before the ternay, consequently not
+adding target->size if tgsize was zero.
+
+Identified by ASAN for a simple rule using standard target:
+| # ebtables -A INPUT -s de:ad:be:ef:0:00 -j RETURN
+| # ebtables -D INPUT -s de:ad:be:ef:0:00 -j RETURN
+| =================================================================
+| ==18925==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x603000000120 at pc 0x7f627a4c75c5 bp 0x7ffe882b5180 sp 0x7ffe882b4928
+| READ of size 8 at 0x603000000120 thread T0
+| [...]
+
+Upstream-Status: Backport [2026b08bce7fe87b5964f7912e1eef30f04922c1]
+
+Fixes: 2a6eee89083c8 ("nft-ruleparse: Introduce nft_create_target()")
+Signed-off-by: Phil Sutter <phil@nwl.cc>
+---
+ iptables/nft-ruleparse.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/iptables/nft-ruleparse.c b/iptables/nft-ruleparse.c
+index 0bbdf44faf..3b1cbe4fa1 100644
+--- a/iptables/nft-ruleparse.c
++++ b/iptables/nft-ruleparse.c
+@@ -94,7 +94,7 @@ __nft_create_target(struct nft_xt_ctx *ctx, const char *name, size_t tgsize)
+ 	if (!target)
+ 		return NULL;
+ 
+-	size = XT_ALIGN(sizeof(*target->t)) + tgsize ?: target->size;
++	size = XT_ALIGN(sizeof(*target->t)) + (tgsize ?: target->size);
+ 
+ 	target->t = xtables_calloc(1, size);
+ 	target->t->u.target_size = size;

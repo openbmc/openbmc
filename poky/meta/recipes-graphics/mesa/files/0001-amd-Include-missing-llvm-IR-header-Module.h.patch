@@ -1,0 +1,41 @@
+From 777d69cf15b80ab1f109a4936d6e4801c4b0e0f3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 1 Jul 2024 23:09:29 -0700
+Subject: [PATCH] amd: Include missing llvm IR header Module.h
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With LLVM-19, Module.h header is not being pulled, which results in
+compile errors e.g.
+
+src/amd/llvm/ac_llvm_helper.cpp:102:10: error: no matching function for call to ‘unwrap(LLVMOpaqueModule*&)’
+  102 |    unwrap(module)->setTargetTriple(TM->getTargetTriple().getTriple());
+      |    ~~~~~~^~~~~~~~
+In file included from /mnt/b/yoe/master/build/tmp/work/x86_64-linux/mesa-native/24.0.7/recipe-sysroot-native/usr/include/llvm/IR/Type.h:18,
+                 from /mnt/b/yoe/master/build/tmp/work/x86_64-linux/mesa-native/24.0.7/recipe-sysroot-native/usr/include/llvm/IR/DerivedTypes.h:23,
+                 from /mnt/b/yoe/master/build/tmp/work/x86_64-linux/mesa-native/24.0.7/recipe-sysroot-native/usr/include/llvm/IR/InstrTypes.h:26,
+                 from /mnt/b/yoe/master/build/tmp/work/x86_64-linux/mesa-native/24.0.7/recipe-sysroot-native/usr/include/llvm/Analysis/TargetLibraryInfo.h:14,
+                 from ../mesa-24.0.7/src/amd/llvm/ac_llvm_helper.cpp:8:
+
+Its getting the definition from llvm/IR/Type.h instead of Module.h and caused
+confusion to compiler
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/29993]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/amd/llvm/ac_llvm_helper.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/amd/llvm/ac_llvm_helper.cpp b/src/amd/llvm/ac_llvm_helper.cpp
+index 5d065279ad1..af4a50f8409 100644
+--- a/src/amd/llvm/ac_llvm_helper.cpp
++++ b/src/amd/llvm/ac_llvm_helper.cpp
+@@ -8,6 +8,7 @@
+ #include <llvm/Analysis/TargetLibraryInfo.h>
+ #include <llvm/IR/IRBuilder.h>
+ #include <llvm/IR/LegacyPassManager.h>
++#include <llvm/IR/Module.h>
+ #include <llvm/IR/Verifier.h>
+ #include <llvm/Target/TargetMachine.h>
+ #include <llvm/MC/MCSubtargetInfo.h>

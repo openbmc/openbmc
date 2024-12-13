@@ -19,6 +19,10 @@ class CMakeTest(OESDKTestCase):
     """
 
     def setUp(self):
+        libc = self.td.get("TCLIBC")
+        if libc in [ 'newlib' ]:
+            raise unittest.SkipTest("CMakeTest class: SDK doesn't contain a supported C library")
+
         if not (self.tc.hasHostPackage("nativesdk-cmake") or
                 self.tc.hasHostPackage("cmake-native")):
             raise unittest.SkipTest("CMakeTest: needs cmake")

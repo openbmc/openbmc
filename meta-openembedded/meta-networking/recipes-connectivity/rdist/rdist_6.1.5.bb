@@ -38,7 +38,7 @@ DEPENDS = "bison-native"
 
 inherit autotools-brokensep
 
-EXTRA_OEMAKE = "BIN_GROUP=root MAN_GROUP=root RDIST_MODE=755 RDISTD_MODE=755 MAN_MODE=644"
+EXTRA_OEMAKE = "CPPFLAGS='${CFLAGS}' BIN_GROUP=root MAN_GROUP=root RDIST_MODE=755 RDISTD_MODE=755 MAN_MODE=644"
 
 # http://errors.yoctoproject.org/Errors/Details/186972/
 COMPATIBLE_HOST:libc-musl = 'null'

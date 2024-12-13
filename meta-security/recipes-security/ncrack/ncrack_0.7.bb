@@ -13,6 +13,6 @@ DEPENDS = "openssl zlib"
 
 inherit autotools-brokensep
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 INSANE_SKIP:${PN} = "already-stripped"

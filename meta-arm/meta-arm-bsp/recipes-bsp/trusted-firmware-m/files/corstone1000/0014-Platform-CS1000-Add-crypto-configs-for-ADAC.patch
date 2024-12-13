@@ -1,0 +1,41 @@
+From 8d6ed0ac3b1eee4b1e279993ec351e9bd80b68dc Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 31 Jul 2024 13:38:27 +0200
+Subject: [PATCH] Platform: CS1000: Add crypto configs for ADAC
+
+The psa_adac_psa_crypto target needs the MBEDTLS_CONFIG_FILE and
+MBEDTLS_PSA_CRYPTO_CONFIG_FILE defines in order to build correctly.
+The default crypto config files are used here.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/31132]
+---
+ platform/ext/target/arm/corstone1000/CMakeLists.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 530c4059d..3709bf3ec 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -412,6 +412,18 @@ if (${PLATFORM_PSA_ADAC_SECURE_DEBUG})
+         PRIVATE
+             platform_bl2
+     )
++
++    target_compile_definitions(psa_adac_psa_crypto
++        PRIVATE
++            MBEDTLS_CONFIG_FILE="${CMAKE_SOURCE_DIR}/lib/ext/mbedcrypto/mbedcrypto_config/tfm_mbedcrypto_config_default.h"
++            MBEDTLS_PSA_CRYPTO_CONFIG_FILE="${CMAKE_SOURCE_DIR}/lib/ext/mbedcrypto/mbedcrypto_config/crypto_config_default.h"
++    )
++
++    target_link_libraries(psa_adac_psa_crypto
++        PRIVATE
++            psa_crypto_library_config
++    )
++
+ endif()
+ 
+ find_package(Python3)
+-- 
+2.25.1
+

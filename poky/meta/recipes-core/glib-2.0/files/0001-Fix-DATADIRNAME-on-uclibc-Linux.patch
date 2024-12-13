@@ -1,4 +1,4 @@
-From 55c49c51d8db5af15132653003d2b65a5215eebf Mon Sep 17 00:00:00 2001
+From 1d88f52c42a0ed469cb5976f5788b4ba25bb14f9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 15 Mar 2014 22:42:29 -0700
 Subject: [PATCH] Fix DATADIRNAME on uclibc/Linux

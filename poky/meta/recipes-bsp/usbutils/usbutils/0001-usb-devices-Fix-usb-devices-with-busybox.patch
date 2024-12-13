@@ -1,0 +1,37 @@
+From da155d965a34b5c5770dc30fa52eb7ef405f3a30 Mon Sep 17 00:00:00 2001
+From: Teresa Remmet <t.remmet@phytec.de>
+Date: Thu, 5 Sep 2024 08:37:48 +0200
+Subject: [PATCH] usb-devices: Fix usb-devices with busybox
+
+The busybox find command is missing the -printf parameter leading to
+the error:
+
+find: unrecognized: -printf
+
+Replace the parameter with sed.
+
+This patch was originally created by Daniel Fancsali.
+
+Upstream-Status: Backport [https://github.com/gregkh/usbutils/commit/da155d965a34b5c5770dc30fa52eb7ef405f3a30]
+
+Signed-off-by: Teresa Remmet <t.remmet@phytec.de>
+---
+ usb-devices | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usb-devices b/usb-devices
+index 5f60ad5a1ed0..51f48b4ad628 100755
+--- a/usb-devices
++++ b/usb-devices
+@@ -192,7 +192,7 @@ if [ ! -d /sys/bus ]; then
+ 	exit 1
+ fi
+ 
+-for device in $(find /sys/bus/usb/devices -name 'usb*' -printf '%f\n' | sort -V)
++for device in $(find /sys/bus/usb/devices -name 'usb*' | sed -E 's#^.*/##g' | sort -V)
+ do
+ 	print_device "/sys/bus/usb/devices/$device" 0 0 0
+ done
+-- 
+2.34.1
+

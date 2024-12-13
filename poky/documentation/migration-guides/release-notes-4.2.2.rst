@@ -6,21 +6,21 @@ Release notes for Yocto-4.2.2 (Mickledore)
 Security Fixes in Yocto-4.2.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  binutils: Fix :cve:`2023-1972`
--  cups: Fix :cve:`2023-32324`
--  curl: Fix :cve:`2023-28319`, :cve:`2023-28320`, :cve:`2023-28321` and :cve:`2023-28322`
--  dbus: Fix :cve:`2023-34969`
--  git: Fix :cve:`2023-25652` and :cve:`2023-29007`
--  git: Ignore :cve:`2023-25815`
--  libwebp: Fix :cve:`2023-1999`
--  libxml2: Fix :cve:`2023-28484` and :cve:`2023-29469`
--  libxpm: Fix :cve:`2022-44617`
--  ninja: Ignore :cve:`2021-4336`
--  openssl: Fix :cve:`2023-0464`, :cve:`2023-0465`, :cve:`2023-0466`, :cve:`2023-1255` and :cve:`2023-2650`
--  perl: Fix :cve:`2023-31484` and :cve:`2023-31486`
--  sysstat: Fix :cve:`2023-33204`
--  tiff: Fix :cve_mitre:`2023-25434`, :cve:`2023-26965` and :cve:`2023-2731`
--  vim: Fix :cve:`2023-2426`
+-  binutils: Fix :cve_nist:`2023-1972`
+-  cups: Fix :cve_nist:`2023-32324`
+-  curl: Fix :cve_nist:`2023-28319`, :cve_nist:`2023-28320`, :cve_nist:`2023-28321` and :cve_nist:`2023-28322`
+-  dbus: Fix :cve_nist:`2023-34969`
+-  git: Fix :cve_nist:`2023-25652` and :cve_nist:`2023-29007`
+-  git: Ignore :cve_nist:`2023-25815`
+-  libwebp: Fix :cve_nist:`2023-1999`
+-  libxml2: Fix :cve_nist:`2023-28484` and :cve_nist:`2023-29469`
+-  libxpm: Fix :cve_nist:`2022-44617`
+-  ninja: Ignore :cve_nist:`2021-4336`
+-  openssl: Fix :cve_nist:`2023-0464`, :cve_nist:`2023-0465`, :cve_nist:`2023-0466`, :cve_nist:`2023-1255` and :cve_nist:`2023-2650`
+-  perl: Fix :cve_nist:`2023-31484` and :cve_nist:`2023-31486`
+-  sysstat: Fix :cve_nist:`2023-33204`
+-  tiff: Fix :cve_mitre:`2023-25434`, :cve_nist:`2023-26965` and :cve_nist:`2023-2731`
+-  vim: Fix :cve_nist:`2023-2426`
 
 
 Fixes in Yocto-4.2.2

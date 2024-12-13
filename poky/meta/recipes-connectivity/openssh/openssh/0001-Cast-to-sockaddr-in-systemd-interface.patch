@@ -1,0 +1,30 @@
+From a3068c6edb81c0b0b9a2ced82e8632c79314e409 Mon Sep 17 00:00:00 2001
+From: Darren Tucker <dtucker@dtucker.net>
+Date: Sun, 7 Jul 2024 18:46:19 +1000
+Subject: [PATCH] Cast to sockaddr * in systemd interface.
+
+Fixes build with musl libx.  bz#3707.
+
+Upstream-Status: Backport [https://github.com/openssh/openssh-portable/commit/8b664df75966e5aed8dabea00b8838303d3488b8]
+
+Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
+---
+ openbsd-compat/port-linux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/openbsd-compat/port-linux.c b/openbsd-compat/port-linux.c
+index 4c024c6d2..8adfec5a7 100644
+--- a/openbsd-compat/port-linux.c
++++ b/openbsd-compat/port-linux.c
+@@ -366,7 +366,7 @@ ssh_systemd_notify(const char *fmt, ...)
+ 		error_f("socket \"%s\": %s", path, strerror(errno));
+ 		goto out;
+ 	}
+-	if (connect(fd, &addr, sizeof(addr)) != 0) {
++	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+ 		error_f("socket \"%s\" connect: %s", path, strerror(errno));
+ 		goto out;
+ 	}
+-- 
+2.45.2
+

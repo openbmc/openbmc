@@ -1068,6 +1068,7 @@ class RecipetoolTests(RecipetoolBase):
 
         d = DataConnectorCopy
         d.getVar = Mock(return_value=commonlicdir)
+        d.expand = Mock(side_effect=lambda x: x)
 
         srctree = tempfile.mkdtemp(prefix='recipetoolqa')
         self.track_for_cleanup(srctree)

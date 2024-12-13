@@ -1,0 +1,29 @@
+From e5580e392b8764e1e6509c5a4ed13fb2ce7566b9 Mon Sep 17 00:00:00 2001
+From: Andrey Zhizhikin <andrey.z@gmail.com>
+Date: Mon, 27 Jan 2020 17:27:55 +0000
+Subject: [PATCH] huge_page_setup_helper: use python3 interpreter
+
+Setup helper script is already prepared to be used with python3, use the
+interpreter explicitly. This removes dependency to python2 and will not
+fail the QA check.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Andrey Zhizhikin <andrey.z@gmail.com>
+---
+ huge_page_setup_helper.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/huge_page_setup_helper.py b/huge_page_setup_helper.py
+index 01fc8dc..79a88ca 100755
+--- a/huge_page_setup_helper.py
++++ b/huge_page_setup_helper.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/env python3
+ 
+ #
+ # Tool to set up Linux large page support with minimal effort
+-- 
+2.25.1
+

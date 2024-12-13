@@ -1,0 +1,28 @@
+From dc970a868a4c2d7e2051b533e0a3588ef1d35530 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Dani=C3=ABl=20van=20Eeden?= <git@myname.nl>
+Date: Mon, 26 Aug 2024 10:17:01 +0200
+Subject: [PATCH] Fix building on Fedora 40 with GCC 14.2.1
+
+Upstream-Status: Backport [https://github.com/perl5-dbi/dbi/commit/d6e2bf13ac6043f5b0a9a147805b4915bd70e631]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ DBI.xs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/DBI.xs b/DBI.xs
+index 747e341..9b1d136 100644
+--- a/DBI.xs
++++ b/DBI.xs
+@@ -1106,7 +1106,7 @@ dbih_inner(pTHX_ SV *orv, const char *what)
+     if (!SvMAGICAL(ohv)) {
+         if (!what)
+             return NULL;
+-        if (!hv_fetch(ohv,"_NO_DESTRUCT_WARN",17,0))
++        if (!hv_fetch((HV*)ohv,"_NO_DESTRUCT_WARN",17,0))
+ 	    sv_dump(orv);
+         croak("%s handle %s is not a DBI handle (has no magic)",
+                 what, neatsvpv(orv,0));
+-- 
+2.46.0
+

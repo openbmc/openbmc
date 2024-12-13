@@ -93,3 +93,5 @@ SYSTEMD_SERVICE:${PN} = "td-agent-bit.service"
 
 EXTRA_OECMAKE += "-DCMAKE_DEBUG_SRCDIR=${TARGET_DBGSRC_DIR}/"
 TARGET_CC_ARCH += " ${SELECTED_OPTIMIZATION}"
+
+SKIP_RECIPE[fluentbit] ?= "It is not reproducible. QA Issue: File /usr/bin/.debug/td-agent-bit in package fluentbit-dbg contains reference to TMPDIR [buildpaths]"

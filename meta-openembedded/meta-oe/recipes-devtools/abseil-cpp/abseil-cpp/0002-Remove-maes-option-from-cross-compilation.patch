@@ -1,20 +1,19 @@
-From d25cf3b9aa873595a19e197cc29ab46c0093bff1 Mon Sep 17 00:00:00 2001
+From a573ccd57e713486e7d8e782d6b3b34fde01ff9e Mon Sep 17 00:00:00 2001
 From: Sinan Kaya <sinan.kaya@microsoft.com>
 Date: Mon, 3 Feb 2020 03:25:57 +0000
-Subject: [PATCH 2/3] Remove maes option from cross-compilation
+Subject: [PATCH] Remove maes option from cross-compilation
 
----
 Upstream-Status: Pending
-
+---
  absl/copts/GENERATED_AbseilCopts.cmake | 4 ----
  absl/copts/GENERATED_copts.bzl         | 4 ----
  2 files changed, 8 deletions(-)
 
 diff --git a/absl/copts/GENERATED_AbseilCopts.cmake b/absl/copts/GENERATED_AbseilCopts.cmake
-index a4ab1aa2041e..23b9253c1f00 100644
+index da2282fe..5e0e8dfd 100644
 --- a/absl/copts/GENERATED_AbseilCopts.cmake
 +++ b/absl/copts/GENERATED_AbseilCopts.cmake
-@@ -158,7 +158,3 @@ list(APPEND ABSL_RANDOM_HWAES_ARM64_FLAGS
+@@ -229,7 +229,3 @@ list(APPEND ABSL_RANDOM_HWAES_ARM64_FLAGS
  list(APPEND ABSL_RANDOM_HWAES_MSVC_X64_FLAGS
  )
  
@@ -23,10 +22,10 @@ index a4ab1aa2041e..23b9253c1f00 100644
 -    "-msse4.1"
 -)
 diff --git a/absl/copts/GENERATED_copts.bzl b/absl/copts/GENERATED_copts.bzl
-index a6efc98e11d4..1e847f769501 100644
+index b9e0071e..0072008c 100644
 --- a/absl/copts/GENERATED_copts.bzl
 +++ b/absl/copts/GENERATED_copts.bzl
-@@ -159,7 +159,3 @@ ABSL_RANDOM_HWAES_ARM64_FLAGS = [
+@@ -230,7 +230,3 @@ ABSL_RANDOM_HWAES_ARM64_FLAGS = [
  ABSL_RANDOM_HWAES_MSVC_X64_FLAGS = [
  ]
  
@@ -35,5 +34,5 @@ index a6efc98e11d4..1e847f769501 100644
 -    "-msse4.1",
 -]
 -- 
-2.36.1
+2.25.1
 

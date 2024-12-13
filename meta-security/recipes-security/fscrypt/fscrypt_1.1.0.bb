@@ -20,12 +20,12 @@ inherit go goarch features_check
 
 REQUIRED_DISTRO_FEATURES = "pam"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 do_compile() {
 	export GOARCH=${TARGET_GOARCH}
 	export GOROOT="${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/go"
-	export GOPATH="${WORKDIR}/git"
+	export GOPATH="${UNPACKDIR}/git"
 
 	# Pass the needed cflags/ldflags so that cgo
 	# can find the needed headers files and libraries

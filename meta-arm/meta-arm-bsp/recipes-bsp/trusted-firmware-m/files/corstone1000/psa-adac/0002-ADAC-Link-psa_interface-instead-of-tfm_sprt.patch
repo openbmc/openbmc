@@ -1,0 +1,35 @@
+From af71103845498eef4f859deba4b904a195f2817f Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Mon, 22 Jul 2024 17:33:23 +0200
+Subject: [PATCH] ADAC: Link psa_interface instead of tfm_sprt
+
+The tfm_sprt brings in other functionalities that are not needed for
+the Secure Debug.
+
+The printf() override in tfm_sp_log_raw.c can cause problems because
+it calls tfm_hal_output_sp_log() which triggers an SVC. The SVC calls
+tfm_hal_output_spm_log which relies on an SPM, which might not be
+initialized at that point.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ psa_crypto/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/psa_crypto/CMakeLists.txt b/psa_crypto/CMakeLists.txt
+index 3e70624..58d95f7 100644
+--- a/psa_crypto/CMakeLists.txt
++++ b/psa_crypto/CMakeLists.txt
+@@ -18,7 +18,7 @@ target_sources(psa_adac_psa_crypto
+ target_link_libraries(psa_adac_psa_crypto
+     PRIVATE
+         psa_adac_config
+-        tfm_sprt
++        psa_interface
+ )
+ 
+ target_link_libraries(trusted-firmware-m-psa-adac
+-- 
+2.25.1
+

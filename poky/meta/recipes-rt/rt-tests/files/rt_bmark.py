@@ -284,7 +284,7 @@ def run_cyclictest_once():
         avg_cnt = 0
 
         for line in res.splitlines():
-                m = rex.search(line)
+                m = rex.search(line.decode('utf-8'))
                 if m is not None:
                         minlist.append(int(m.group(2)))
                         maxlist.append(int(m.group(4)))

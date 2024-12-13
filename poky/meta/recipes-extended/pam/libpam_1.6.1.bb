@@ -37,7 +37,7 @@ EXTRA_OECONF = "--includedir=${includedir}/security \
                 --disable-doc \
 		--disable-prelude"
 
-CFLAGS:append = " -fPIC "
+CFLAGS += "-fPIC "
 
 S = "${WORKDIR}/Linux-PAM-${PV}"
 
@@ -155,7 +155,7 @@ do_install() {
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
 		echo "session optional pam_systemd.so" >> ${D}${sysconfdir}/pam.d/common-session
 	fi
-	if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','false','true',d)}; then
+	if [ "${base_libdir}" != "${libdir}" ]; then
 		install -d ${D}/${libdir}/
 		mv ${D}/${base_libdir}/pkgconfig ${D}/${libdir}/
 	fi

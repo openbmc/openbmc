@@ -1,4 +1,4 @@
-From 5074ab3425e5f1e01fd9cfa2d9b7300ea1b3f38f Mon Sep 17 00:00:00 2001
+From d1f0389e699e64f3e329c0ce509f79d969a76114 Mon Sep 17 00:00:00 2001
 From: Paul Eggleton <paul.eggleton@linux.intel.com>
 Date: Tue, 17 Jul 2012 11:27:39 +0100
 Subject: [PATCH] apache2: bump up the core size limit if CoreDumpDirectory is
@@ -16,10 +16,10 @@ Note: upstreaming was discussed but there are competing desires;
  1 file changed, 19 insertions(+)
 
 diff --git a/server/core.c b/server/core.c
-index 090e397..3020090 100644
+index 843b973..3b50100 100644
 --- a/server/core.c
 +++ b/server/core.c
-@@ -5107,6 +5107,25 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -5143,6 +5143,25 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
      apr_pool_cleanup_register(pconf, NULL, ap_mpm_end_gen_helper,
                                apr_pool_cleanup_null);
@@ -45,6 +45,3 @@ index 090e397..3020090 100644
      return OK;
  }
  
--- 
-2.25.1
-

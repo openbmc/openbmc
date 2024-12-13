@@ -1,5 +1,5 @@
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=f87516e0b698007e9e75a1fe1012b390"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=d2572d98547d43906b53615f856a8c2d"
 
 require perfetto.inc
 

@@ -15,6 +15,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}/${PV}/${BP}-Source.tar.gz \
 SRC_URI[md5sum] = "f6e0b6cb7dcfd731460a7e9a91429a3a"
 SRC_URI[sha256sum] = "158860aaea52f0fce0c8e4b64550daaae06df2689e05834697b7e8c7d73dd4fc"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/openobex/files/openobex/"
+UPSTREAM_CHECK_REGEX = "${BPN}/(?P<pver>\d+(\.\d+)+)"
+
 S = "${WORKDIR}/${BP}-Source"
 
 inherit cmake pkgconfig

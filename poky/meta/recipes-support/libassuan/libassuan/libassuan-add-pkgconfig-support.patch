@@ -1,6 +1,7 @@
-Add pkgconfig support to libassuan.
-This patch is rejected by upstream for the reason below:
-They think pkgconfig adds no portability and maintaining them is not worthwhile.
+From 9d28122b7e7ae3f17364e1ab97355cf5eaf14cb8 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Wed, 7 Aug 2024 11:36:26 -0400
+Subject: [PATCH] libassuan: add pkgconfig support
 
 Upstream-Status: Denied
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
@@ -8,18 +9,23 @@ Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
 
 forward ported to 2.4.4
 Signed-off-by: Armin Kuster <akuster@mvista.com>
+
+Refactor to apply on top of 3.0.1, including reformatting as an mbox for
+easier use.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- src/libassuan.m4 | 81 ++----------------------------------------------
- 1 file changed, 3 insertions(+), 78 deletions(-)
+ src/libassuan.m4 | 82 ++----------------------------------------------
+ 1 file changed, 3 insertions(+), 79 deletions(-)
 
 diff --git a/src/libassuan.m4 b/src/libassuan.m4
-index df50484..380a48a 100644
+index 2e98b39..404796f 100644
 --- a/src/libassuan.m4
 +++ b/src/libassuan.m4
-@@ -17,27 +17,6 @@ dnl Returns ok set to yes or no.
- dnl
+@@ -103,27 +103,6 @@ dnl
  AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
- [ AC_REQUIRE([AC_CANONICAL_HOST])
+ [ AC_REQUIRE([AC_CANONICAL_HOST])dnl
+   AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
 -  AC_ARG_WITH(libassuan-prefix,
 -              AS_HELP_STRING([--with-libassuan-prefix=PFX],
 -                             [prefix where LIBASSUAN is installed (optional)]),
@@ -31,7 +37,7 @@ index df50484..380a48a 100644
 -  fi
 -
 -  use_gpgrt_config=""
--  if test x"${LIBASSUAN_CONFIG}" = x -a x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
 -    if $GPGRT_CONFIG libassuan --exists; then
 -      LIBASSUAN_CONFIG="$GPGRT_CONFIG libassuan"
 -      AC_MSG_NOTICE([Use gpgrt-config as libassuan-config])
@@ -44,7 +50,7 @@ index df50484..380a48a 100644
  
    tmp=ifelse([$1], ,1:0.9.2,$1)
    if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
-@@ -47,59 +26,11 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+@@ -133,60 +112,11 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
      req_libassuan_api=0
      min_libassuan_version="$tmp"
    fi
@@ -90,6 +96,7 @@ index df50484..380a48a 100644
 -
 -  if test $ok = yes; then
 -    AC_MSG_RESULT([yes ($libassuan_config_version)])
+-    AC_DEFINE(LIBASSUAN_API_REQUESTED, $req_libassuan_api, Requested API version for libassuan)
 -  else
 -    AC_MSG_RESULT(no)
 -  fi
@@ -106,7 +113,7 @@ index df50484..380a48a 100644
        if test "$tmp" -gt 0 ; then
          AC_MSG_CHECKING([LIBASSUAN API version])
          if test "$req_libassuan_api" -eq "$tmp" ; then
-@@ -115,9 +46,7 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+@@ -204,9 +134,7 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
    if test $ok = yes; then
      if test x"$host" != x ; then
        if test -z "$use_gpgrt_config"; then
@@ -117,7 +124,7 @@ index df50484..380a48a 100644
        fi
        if test x"$libassuan_config_host" != xnone ; then
          if test x"$libassuan_config_host" != x"$host" ; then
-@@ -159,12 +88,8 @@ dnl
+@@ -248,12 +176,8 @@ dnl
  AC_DEFUN([AM_PATH_LIBASSUAN],
  [ _AM_PATH_LIBASSUAN_COMMON($1)
    if test $ok = yes; then
@@ -131,5 +138,5 @@ index df50484..380a48a 100644
    fi
    AC_SUBST(LIBASSUAN_CFLAGS)
 -- 
-2.25.1
+2.39.2
 

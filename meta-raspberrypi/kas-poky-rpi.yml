@@ -12,7 +12,7 @@ repos:
   poky:
     url: https://git.yoctoproject.org/git/poky
     path: layers/poky
-    refspec: master
+    branch: master
     layers:
       meta:
       meta-poky:
@@ -21,7 +21,7 @@ repos:
   meta-openembedded:
     url: http://git.openembedded.org/meta-openembedded
     path: layers/meta-openembedded
-    refspec: master
+    branch: master
     layers:
       meta-oe:
       meta-python:
@@ -31,7 +31,7 @@ repos:
   meta-qt5:
     url: https://github.com/meta-qt5/meta-qt5/
     path: layers/meta-qt5
-    refspec: master
+    branch: master
 
 bblayers_conf_header:
   standard: |

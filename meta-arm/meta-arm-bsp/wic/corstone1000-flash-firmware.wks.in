@@ -15,9 +15,11 @@ part --source empty --size 4k --align 4 --offset 24k --part-name="Bkup-FWU-Metad
 part --source empty --size 4k --align 4 --offset 28k --part-name="private_metadata_replica_2" --uuid 3CC3B456-DEC8-4CE3-BC5C-965483CE4828 --part-type ECB55DC3-8AB7-4A84-AB56-EB0A9974DB42
 part --source empty --size 4k --align 4 --offset 32k --part-name="private_metadata_replica_2" --uuid DCE9C503-8DFD-4DCB-8889-647E49641552 --part-type ECB55DC3-8AB7-4A84-AB56-EB0A9974DB42
 
-part --source rawcopy --size 100k --sourceparams="file=bl2_signed.bin" --offset 36k --align 4 --part-name="bl2_primary" --uuid 9A3A8FBF-55EF-439C-80C9-A3F728033929 --part-type 64BD8ADB-02C0-4819-8688-03AB4CAB0ED9
+# The size has to be aligned to TF-M's SE_BL2_PARTITION_SIZE (tfm/platform/ext/target/arm/corstone1000/partition/flash_layout.h)
+part --source rawcopy --size 144k --sourceparams="file=bl2_signed.bin" --offset 36k --align 4 --part-name="bl2_primary" --uuid 9A3A8FBF-55EF-439C-80C9-A3F728033929 --part-type 64BD8ADB-02C0-4819-8688-03AB4CAB0ED9
 
-part --source rawcopy --size 368k --sourceparams="file=tfm_s_signed.bin" --align 4 --part-name="tfm_primary" --uuid 07F9616C-1233-439C-ACBA-72D75421BF70 --part-type D763C27F-07F6-4FF0-B2F3-060CB465CD4E
+# The size has to be aligned to TF-M's TFM_PARTITION_SIZE (tfm/platform/ext/target/arm/corstone1000/partition/flash_layout.h)
+part --source rawcopy --size 320k --sourceparams="file=tfm_s_signed.bin" --align 4 --part-name="tfm_primary" --uuid 07F9616C-1233-439C-ACBA-72D75421BF70 --part-type D763C27F-07F6-4FF0-B2F3-060CB465CD4E
 
 # Rawcopy of the FIP binary
 part --source rawcopy --size 2 --sourceparams="file=signed_fip-corstone1000.bin" --align 4 --part-name="FIP_A" --uuid B9C7AC9D-40FF-4675-956B-EEF4DE9DF1C5 --part-type B5EB19BD-CF56-45E8-ABA7-7ADB228FFEA7
@@ -26,8 +28,9 @@ part --source rawcopy --size 2 --sourceparams="file=signed_fip-corstone1000.bin"
 part --source rawcopy --size 12 --sourceparams="file=Image.gz-initramfs-${MACHINE}.bin" --align 4 --part-name="kernel_primary" --uuid BF7A6142-0662-47FD-9434-6A8811980816 --part-type 8197561D-6124-46FC-921E-141CC5745B05
 
 
-part --source empty --size 100k --offset 16488k --align 4 --part-name="bl2_secondary" --uuid 3F0C49A4-48B7-4D1E-AF59-3E4A3CE1BA9F --part-type 64BD8ADB-02C0-4819-8688-03AB4CAB0ED9
-part --source empty --size 368k --align 4 --part-name="tfm_secondary" --uuid 009A6A12-64A6-4F0F-9882-57CD79A34A3D --part-type D763C27F-07F6-4FF0-B2F3-060CB465CD4E
+# The offset has to be aligned to TF-M's SE_BL2_BANK_1_OFFSET define (tfm/platform/ext/target/arm/corstone1000/partition/flash_layout.h)
+part --source empty --size 144k --offset 16392k --align 4 --part-name="bl2_secondary" --uuid 3F0C49A4-48B7-4D1E-AF59-3E4A3CE1BA9F --part-type 64BD8ADB-02C0-4819-8688-03AB4CAB0ED9
+part --source empty --size 320k --align 4 --part-name="tfm_secondary" --uuid 009A6A12-64A6-4F0F-9882-57CD79A34A3D --part-type D763C27F-07F6-4FF0-B2F3-060CB465CD4E
 part --source empty --size 2 --align 4 --part-name="FIP_B" --uuid 9424E370-7BC9-43BB-8C23-71EE645E1273 --part-type B5EB19BD-CF56-45E8-ABA7-7ADB228FFEA7
 part --source empty --size 12 --align 4 --part-name="kernel_secondary" --uuid A2698A91-F9B1-4629-9188-94E4520808F8 --part-type 8197561D-6124-46FC-921E-141CC5745B05
 

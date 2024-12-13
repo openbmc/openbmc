@@ -13,6 +13,7 @@ DEPENDS = " \
     gjs \
     gnome-autoar \
     gnome-desktop \
+    gnome-control-center \
     polkit \
     pipewire \
     libsoup-3.0 \

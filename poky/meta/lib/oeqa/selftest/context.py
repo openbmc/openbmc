@@ -117,8 +117,11 @@ class OESelftestTestContext(OETestContext):
                     newbblayers += 'BBLAYERS = "%s"\n' % ' '.join(bblayers_abspath)
                     f.write(newbblayers)
 
+        # Rewrite builddir paths seen in environment variables
         for e in os.environ:
-            if builddir + "/" in os.environ[e]:
+            # Rewrite paths that absolutely point inside builddir
+            # (e.g $builddir/conf/ would be rewritten but not $builddir/../bitbake/)
+            if builddir + "/" in os.environ[e] and builddir + "/" in os.path.abspath(os.environ[e]):
                 os.environ[e] = os.environ[e].replace(builddir + "/", newbuilddir + "/")
             if os.environ[e].endswith(builddir):
                 os.environ[e] = os.environ[e].replace(builddir, newbuilddir)

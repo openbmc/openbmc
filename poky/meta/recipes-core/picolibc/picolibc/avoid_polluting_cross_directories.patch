@@ -1,0 +1,119 @@
+Upstream-Status: Pending
+
+Picolibc uses its own specs file: picolibc.specs to facilitate compilation, this
+needs to be passed down to GCC via the -specs argument.
+
+Using this specs file overrides some of the default options our toolchain was
+built with, in this case, they modify the include_dir and lib_dir paths used for
+compilation, their intention was to add support for -picolibc-prefix and
+-picolibc-buildtype arguments via the C preprocessor.
+
+-isystem %{-picolibc-prefix=*:%*/include/; -picolibc-buildtype=*:/usr/include/%*; :/usr/include} %(picolibc_cpp)
+
+This had the unwanted effect of defaulting to /usr/include for include_dir if
+those arguments are not being passed, this works fine for their flow but for us
+it pollutes the include directories with paths from the host. The same effect is
+applicable for lib_dir and for the c runtime file.
+
+Our toolchain relies on --sysroot to avoid using any paths from the host, here we
+manually add support for a third possible argument: -sysroot , if this is passed
+then the paths used by the compiler will be relative to the path passed by the
+--sysroot= cmdline argument, setting back the behavior that we intended in the
+first place.
+
+
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandro@enedino.org>
+
+Index: git/meson.build
+===================================================================
+--- git.orig/meson.build
++++ git/meson.build
+@@ -622,12 +622,13 @@ else
+ #
+ picolibc_prefix_format = '-picolibc-prefix=*:@0@'
+ picolibc_buildtype_format = '-picolibc-buildtype=*:@0@'
++sysroot_format = '-sysroot=*:@0@'
+ gen_format = '@0@'
+ 
+ #
+ # How to glue the three options together
+ #
+-specs_option_format = '%{@0@; @1@; :@2@}'
++specs_option_format = '%{@0@; @1@; @2@; :@3@}'
+ 
+ #
+ # Build the -isystem value
+@@ -639,10 +640,13 @@ isystem_prefix = picolibc_prefix_format.
+ buildtype_include_dir = specs_prefix_format.format(get_option('includedir') / '%*')
+ isystem_buildtype = picolibc_buildtype_format.format(buildtype_include_dir)
+ 
++sysroot_include_dir = '%*'
++isystem_sysroot = sysroot_format.format(sysroot_include_dir)
++
+ gen_include_dir = specs_prefix_format.format(get_option('includedir'))
+ isystem_gen = gen_format.format(gen_include_dir)
+ 
+-specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_gen)
++specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_sysroot, isystem_gen)
+ 
+ #
+ # Build the non-multilib -L value
+@@ -654,10 +658,13 @@ lib_prefix = picolibc_prefix_format.form
+ buildtype_lib_dir = specs_prefix_format.format(get_option('libdir') / '%*')
+ lib_buildtype = picolibc_buildtype_format.format(buildtype_lib_dir)
+ 
++sysroot_lib_dir = '%*'
++lib_sysroot = sysroot_format.format(sysroot_lib_dir)
++
+ gen_lib_dir = specs_prefix_format.format(get_option('libdir'))
+ lib_gen = gen_format.format(gen_lib_dir)
+ 
+-specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib_gen)
++specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib_sysroot, lib_gen)
+ 
+ #
+ # Build the non-multilib *startfile options
+@@ -669,6 +676,9 @@ crt0_prefix = picolibc_prefix_format.for
+ buildtype_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*' / crt0_expr)
+ crt0_buildtype = picolibc_buildtype_format.format(buildtype_crt0_path)
+ 
++sysroot_crt0_path = '%*' + '/' + get_option('libdir') + '/' + '%*' + '/' + crt0_expr
++crt0_sysroot = picolibc_buildtype_format.format(sysroot_crt0_path)
++
+ gen_crt0_path = specs_prefix_format.format(get_option('libdir') / crt0_expr)
+ crt0_gen = gen_format.format(gen_crt0_path)
+ 
+@@ -686,10 +696,13 @@ if enable_multilib
+   buildtype_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%*/%M')
+   multilib_buildtype = picolibc_buildtype_format.format(buildtype_multilib_dir)
+ 
++  sysroot_multilib_dir = '%*' + '/' + get_option('libdir') + '/' + '%*/%M'
++  multilib_sysroot = sysroot_format.format(sysroot_multilib_dir)
++  
+   gen_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%M')
+   multilib_gen = gen_format.format(gen_multilib_dir)
+ 
+-  specs_multilibpath = '-L' + specs_option_format.format(multilib_prefix, multilib_buildtype, multilib_gen)
++  specs_multilibpath = '-L' + specs_option_format.format(multilib_prefix, multilib_buildtype, multilib_sysroot, multilib_gen)
+ 
+   #
+   # Prepend the multilib -L option to the non-multilib option
+@@ -705,6 +718,9 @@ if enable_multilib
+   buildtype_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*/%M' / crt0_expr)
+   crt0_buildtype = picolibc_buildtype_format.format(buildtype_multilib_crt0_path)
+ 
++  sysroot_multilib_crt0_path = '%*' + prefix + '/' + get_option('libdir') + '/' + '/%M' + '/' + crt0_expr
++  crt0_sysroot = sysroot_format.format(sysroot_multilib_crt0_path)
++  
+   gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
+   crt0_gen = gen_format.format(gen_multilib_crt0_path)
+ endif
+@@ -714,7 +730,7 @@ endif
+ # above. As there's only one value, it's either the
+ # multilib path or the non-multilib path
+ #
+-specs_startfile = specs_option_format.format(crt0_prefix, crt0_buildtype, crt0_gen)
++specs_startfile = specs_option_format.format(crt0_prefix, crt0_buildtype, crt0_sysroot, crt0_gen)
+ endif
+ 
+ specs_data = configuration_data()

@@ -1,0 +1,38 @@
+From c7de6834f0cd92b7341ab17a5c6996f3fbd40140 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 21 Jun 2024 22:16:47 -0700
+Subject: [PATCH]  librdmacm: Use overloadable function attribute with clang
+
+ This is to fix build warnings seen with upcoming clang19 and
+ glibc 2.40, since glibc 2.40 has improved fortyfying this
+ function with clang, it ends up with build errors like below
+
+librdmacm/preload.c:796:9: error: at most one overload for a given name may lack the 'overloadable' attribute
+|   796 | ssize_t recvfrom(int socket, void *buf, size_t len, int flags,
+|       |         ^
+| /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux/rdma-core/51.0/recipe-sysroot/usr/include/sys/socket.h:163:16: note: previous unmarked overload of function is here
+|   163 | extern ssize_t recvfrom (int __fd, void *__restrict __buf, size_t __n,
+|       |                ^
+
+Upstream-Status: Submitted [https://github.com/linux-rdma/rdma-core/pull/1475]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ librdmacm/preload.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+--- a/librdmacm/preload.c
++++ b/librdmacm/preload.c
+@@ -792,8 +792,11 @@ ssize_t recv(int socket, void *buf, size
+ 	return (fd_fork_get(socket, &fd) == fd_rsocket) ?
+ 		rrecv(fd, buf, len, flags) : real.recv(fd, buf, len, flags);
+ }
+-
+-ssize_t recvfrom(int socket, void *buf, size_t len, int flags,
++ssize_t
++#if defined(__clang__) && defined(__GLIBC__)
++__attribute__((overloadable))
++#endif
++recvfrom(int socket, void *buf, size_t len, int flags,
+ 		 struct sockaddr *src_addr, socklen_t *addrlen)
+ {
+ 	int fd;

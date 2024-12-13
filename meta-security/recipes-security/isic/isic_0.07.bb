@@ -17,11 +17,15 @@ SRC_URI = "http://prdownloads.sourceforge.net/isic/${BPN}-${PV}.tgz \
 SRC_URI[md5sum] = "29f70c9bde9aa9128b8f7e66a315f9a4"
 SRC_URI[sha256sum] = "e033c53e03e26a4c72b723e2a5a1c433ee70eb4d23a1ba0d7d7e14ee1a80429d"
 
-S="${WORKDIR}/${BPN}-${PV}"
+S="${UNPACKDIR}/${BPN}-${PV}"
 
 inherit autotools-brokensep
 
 EXTRA_OECONF += "--with-libnet-dir=${STAGING_DIR_HOST}${libdir} "
+
+# many configure tests are failing with gcc-14
+CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
+BUILD_CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
 
 do_configure () {
     oe_runconf

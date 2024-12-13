@@ -1,4 +1,4 @@
-From 47e53916e3112391d8bff2b2257dcec0a2426d66 Mon Sep 17 00:00:00 2001
+From 508c79dbef580e52b1c47026dfe2fe5ae7be4d56 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 10 Mar 2022 21:21:33 -0800
 Subject: [PATCH] Only generate an RPATH entry if LD_RUN_PATH is not empty
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index 187b359af86..ad792f02d63 100644
+index e49c0217ae2..069f2263c81 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
 @@ -1130,6 +1130,9 @@ ldelf_handle_dt_needed (struct elf_link_hash_table *htab,

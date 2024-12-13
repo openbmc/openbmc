@@ -76,19 +76,19 @@ def _rename_recipe_dirs(oldpv, newpv, path):
                         bb.utils.rename(os.path.join(path, oldfile),
                               os.path.join(path, newfile))
 
-def _rename_recipe_file(oldrecipe, bpn, oldpv, newpv, path):
+def _rename_recipe_file(oldrecipe, pn, oldpv, newpv, path):
     oldrecipe = os.path.basename(oldrecipe)
     if oldrecipe.endswith('_%s.bb' % oldpv):
-        newrecipe = '%s_%s.bb' % (bpn, newpv)
+        newrecipe = '%s_%s.bb' % (pn, newpv)
         if oldrecipe != newrecipe:
             shutil.move(os.path.join(path, oldrecipe), os.path.join(path, newrecipe))
     else:
         newrecipe = oldrecipe
     return os.path.join(path, newrecipe)
 
-def _rename_recipe_files(oldrecipe, bpn, oldpv, newpv, path):
+def _rename_recipe_files(oldrecipe, pn, oldpv, newpv, path):
     _rename_recipe_dirs(oldpv, newpv, path)
-    return _rename_recipe_file(oldrecipe, bpn, oldpv, newpv, path)
+    return _rename_recipe_file(oldrecipe, pn, oldpv, newpv, path)
 
 def _write_append(rc, srctreebase, srctree, same_dir, no_same_dir, revs, copied, workspace, d):
     """Writes an append file"""
@@ -335,19 +335,19 @@ def _add_license_diff_to_recipe(path, diff):
 def _create_new_recipe(newpv, checksums, srcrev, srcbranch, srcsubdir_old, srcsubdir_new, workspace, tinfoil, rd, license_diff, new_licenses, srctree, keep_failure):
     """Creates the new recipe under workspace"""
 
-    bpn = rd.getVar('BPN')
-    path = os.path.join(workspace, 'recipes', bpn)
+    pn = rd.getVar('PN')
+    path = os.path.join(workspace, 'recipes', pn)
     bb.utils.mkdirhier(path)
     copied, _ = oe.recipeutils.copy_recipe_files(rd, path, all_variants=True)
     if not copied:
-        raise DevtoolError('Internal error - no files were copied for recipe %s' % bpn)
+        raise DevtoolError('Internal error - no files were copied for recipe %s' % pn)
     logger.debug('Copied %s to %s' % (copied, path))
 
     oldpv = rd.getVar('PV')
     if not newpv:
         newpv = oldpv
     origpath = rd.getVar('FILE')
-    fullpath = _rename_recipe_files(origpath, bpn, oldpv, newpv, path)
+    fullpath = _rename_recipe_files(origpath, pn, oldpv, newpv, path)
     logger.debug('Upgraded %s => %s' % (origpath, fullpath))
 
     newvalues = {}
@@ -534,14 +534,14 @@ def _generate_license_diff(old_licenses, new_licenses):
             diff = diff + line
     return diff
 
-def _run_recipe_update_extra_tasks(pn, rd, tinfoil):
+def _run_recipe_upgrade_extra_tasks(pn, rd, tinfoil):
     tasks = []
-    for task in (rd.getVar('RECIPE_UPDATE_EXTRA_TASKS') or '').split():
-        logger.info('Running extra recipe update task: %s' % task)
+    for task in (rd.getVar('RECIPE_UPGRADE_EXTRA_TASKS') or '').split():
+        logger.info('Running extra recipe upgrade task: %s' % task)
         res = tinfoil.build_targets(pn, task, handle_events=True)
 
         if not res:
-            raise DevtoolError('Running extra recipe update task %s for %s failed' % (task, pn))
+            raise DevtoolError('Running extra recipe upgrade task %s for %s failed' % (task, pn))
 
 def upgrade(args, config, basepath, workspace):
     """Entry point for the devtool 'upgrade' subcommand"""
@@ -610,7 +610,7 @@ def upgrade(args, config, basepath, workspace):
             license_diff = _generate_license_diff(old_licenses, new_licenses)
             rf, copied = _create_new_recipe(args.version, checksums, args.srcrev, srcbranch, srcsubdir1, srcsubdir2, config.workspace_path, tinfoil, rd, license_diff, new_licenses, srctree, args.keep_failure)
         except (bb.process.CmdError, DevtoolError) as e:
-            recipedir = os.path.join(config.workspace_path, 'recipes', rd.getVar('BPN'))
+            recipedir = os.path.join(config.workspace_path, 'recipes', rd.getVar('PN'))
             _upgrade_error(e, recipedir, srctree, args.keep_failure)
         standard._add_md5(config, pn, os.path.dirname(rf))
 
@@ -618,7 +618,7 @@ def upgrade(args, config, basepath, workspace):
                         copied, config.workspace_path, rd)
         standard._add_md5(config, pn, af)
 
-        _run_recipe_update_extra_tasks(pn, rd, tinfoil)
+        _run_recipe_upgrade_extra_tasks(pn, rd, tinfoil)
 
         update_unlockedsigs(basepath, workspace, args.fixed_setup, [pn])
 
@@ -654,18 +654,28 @@ def latest_version(args, config, basepath, workspace):
     return 0
 
 def check_upgrade_status(args, config, basepath, workspace):
+    def _print_status(recipe):
+        print("{:25} {:15} {:15} {} {} {}".format(   recipe['pn'],
+                                                               recipe['cur_ver'],
+                                                               recipe['status'] if recipe['status'] != 'UPDATE' else (recipe['next_ver'] if not recipe['next_ver'].endswith("new-commits-available") else "new commits"),
+                                                               recipe['maintainer'],
+                                                               recipe['revision'] if recipe['revision'] != 'N/A' else "",
+                                                               "cannot be updated due to: %s" %(recipe['no_upgrade_reason']) if recipe['no_upgrade_reason'] else ""))
     if not args.recipe:
         logger.info("Checking the upstream status for all recipes may take a few minutes")
     results = oe.recipeutils.get_recipe_upgrade_status(args.recipe)
-    for result in results:
-        # pn, update_status, current, latest, maintainer, latest_commit, no_update_reason
-        if args.all or result[1] != 'MATCH':
-            print("{:25} {:15} {:15} {} {} {}".format(   result[0],
-                                                               result[2],
-                                                               result[1] if result[1] != 'UPDATE' else (result[3] if not result[3].endswith("new-commits-available") else "new commits"),
-                                                               result[4],
-                                                               result[5] if result[5] != 'N/A' else "",
-                                                               "cannot be updated due to: %s" %(result[6]) if result[6] else ""))
+    for recipegroup in results:
+        upgrades = [r for r in recipegroup if r['status'] != 'MATCH']
+        currents = [r for r in recipegroup if r['status'] == 'MATCH']
+        if len(upgrades) > 1:
+            print("These recipes need to be upgraded together {")
+        for r in upgrades:
+            _print_status(r)
+        if len(upgrades) > 1:
+            print("}")
+        for r in currents:
+            if args.all:
+                _print_status(r)
 
 def register_commands(subparsers, context):
     """Register devtool subcommands from this plugin"""

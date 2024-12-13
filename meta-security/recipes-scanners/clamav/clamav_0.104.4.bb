@@ -21,7 +21,7 @@ SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/0.104;protocol=https \
     file://headers_fixup.patch \
     file://oe_cmake_fixup.patch \
 "
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 LEAD_SONAME = "libclamav.so"
 SO_VER = "9.6.0"
@@ -58,9 +58,9 @@ do_install:append () {
     install -d -o ${PN} -g ${CLAMAV_GID} ${D}/${localstatedir}/lib/clamav
     install -d ${D}${sysconfdir}/clamav ${D}${sysconfdir}/default/volatiles
 
-    install -m 644 ${WORKDIR}/clamd.conf ${D}/${prefix}/${sysconfdir}
-    install -m 644 ${WORKDIR}/freshclam.conf ${D}/${prefix}/${sysconfdir}
-    install -m 0644 ${WORKDIR}/volatiles.03_clamav  ${D}${sysconfdir}/default/volatiles/03_clamav
+    install -m 644 ${UNPACKDIR}/clamd.conf ${D}/${prefix}/${sysconfdir}
+    install -m 644 ${UNPACKDIR}/freshclam.conf ${D}/${prefix}/${sysconfdir}
+    install -m 0644 ${UNPACKDIR}/volatiles.03_clamav  ${D}${sysconfdir}/default/volatiles/03_clamav
     sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${libdir}/pkgconfig/libclamav.pc
     rm ${D}/${libdir}/libclamav.so
     if [ "${INSTALL_CLAMAV_CVD}" = "1" ]; then
@@ -71,7 +71,7 @@ do_install:append () {
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
         install -d ${D}${sysconfdir}/tmpfiles.d
-        install -m 0644 ${WORKDIR}/tmpfiles.clamav ${D}${sysconfdir}/tmpfiles.d/clamav.conf
+        install -m 0644 ${UNPACKDIR}/tmpfiles.clamav ${D}${sysconfdir}/tmpfiles.d/clamav.conf
     fi
     oe_multilib_header clamav-types.h
 }

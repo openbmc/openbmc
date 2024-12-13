@@ -1,0 +1,11 @@
+header:
+  version: 16
+
+env:
+  DISTRO_UNATTENDED_INST_TESTS:
+  # The full testimage run typically takes around 12-24h on fvp-base.
+  TEST_OVERALL_TIMEOUT: "${@ 24*60*60}"
+  
+local_conf_header:
+  systemready-unattended-inst: |
+    TESTIMAGE_AUTO = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "1", "", d)}"

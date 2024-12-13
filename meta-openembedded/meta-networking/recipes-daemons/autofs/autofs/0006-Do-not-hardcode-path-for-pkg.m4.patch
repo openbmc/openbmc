@@ -1,0 +1,31 @@
+From 349cc55c4cb7c7b2f5e7de937e11f3c581028b23 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 24 Aug 2018 06:24:36 +0000
+Subject: [PATCH] Do not hardcode path for pkg.m4
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+update patch to version 5.1.6
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1bb1a52..4cebbd2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -12,7 +12,7 @@ define([AC_CACHE_SAVE], )dnl
+ AC_INIT(.autofs-5.1.9)
+ 
+ # for pkg-config macros
+-m4_include([/usr/share/aclocal/pkg.m4])
++m4_include([pkg.m4])
+ 
+ #
+ # autofs installs by default in /usr
+-- 
+2.25.1
+

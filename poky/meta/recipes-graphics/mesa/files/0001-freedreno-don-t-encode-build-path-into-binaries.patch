@@ -1,0 +1,78 @@
+From 027ac36756cc75eea9ed4fee135a351af30b35fd Mon Sep 17 00:00:00 2001
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 16 Jul 2024 12:32:47 +0300
+Subject: [PATCH] freedreno: don't encode build path into binaries
+
+Encoding build-specific path into installed binaries is generally
+frowned upon. It harms the reproducibility of the build and e.g.
+OpenEmbedded now considers that to be an error.
+
+Instead of hardcoding rnn_src_path into the RNN_DEF_PATH define specify
+it manually when running the tests.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/30206]
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+---
+ src/freedreno/afuc/meson.build   | 4 ++++
+ src/freedreno/decode/meson.build | 4 +++-
+ src/freedreno/meson.build        | 2 +-
+ 3 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/freedreno/afuc/meson.build b/src/freedreno/afuc/meson.build
+index bb7cebf5a748..351cc31ef2de 100644
+--- a/src/freedreno/afuc/meson.build
++++ b/src/freedreno/afuc/meson.build
+@@ -56,6 +56,7 @@ if with_tests
+   asm_fw = custom_target('afuc_test.fw',
+     output: 'afuc_test.fw',
+     command: [asm, '-g', '6', files('../.gitlab-ci/traces/afuc_test.asm'), '@OUTPUT@'],
++    env: {'RNN_PATH': rnn_src_path},
+   )
+   test('afuc-asm',
+     diff,
+@@ -120,6 +122,7 @@ if cc.sizeof('size_t') > 4
+     disasm_fw = custom_target('afuc_test.asm',
+       output: 'afuc_test.asm',
+       command: [disasm, '-u', files('../.gitlab-ci/reference/afuc_test.fw'), '-g', '630'],
++      env: {'RNN_PATH': rnn_src_path},
+       capture: true
+     )
+     test('afuc-disasm',
+diff --git a/src/freedreno/decode/meson.build b/src/freedreno/decode/meson.build
+index 469eeb4eb597..dfa1c12d0d9f 100644
+--- a/src/freedreno/decode/meson.build
++++ b/src/freedreno/decode/meson.build
+@@ -194,6 +194,7 @@ if dep_lua.found() and dep_libarchive.found()
+       log = custom_target(name + '.log',
+         output: name + '.log',
+         command: [cffdump, '--unit-test', args, files('../.gitlab-ci/traces/' + name + '.rd.gz')],
++        env: {'RNN_PATH': rnn_src_path},
+         capture: true,
+       )
+       test('cffdump-' + name,
+@@ -247,7 +248,8 @@ if with_tests
+       output: name + '.log',
+       command: [crashdec, args, files('../.gitlab-ci/traces/' + name + '.devcore')],
+       capture: true,
+-      env: {'GALLIUM_DUMP_CPU': 'false'},
++      env: {'GALLIUM_DUMP_CPU': 'false',
++            'RNN_PATH': rnn_src_path},
+     )
+ 
+     test('crashdec-' + name,
+diff --git a/src/freedreno/meson.build b/src/freedreno/meson.build
+index 98e49b8fcf0e..145e72597eb9 100644
+--- a/src/freedreno/meson.build
++++ b/src/freedreno/meson.build
+@@ -6,7 +6,7 @@ inc_freedreno_rnn = include_directories('rnn')
+ 
+ rnn_src_path = dir_source_root + '/src/freedreno/registers'
+ rnn_install_path = get_option('datadir') + '/freedreno/registers'
+-rnn_path = rnn_src_path + ':' + get_option('prefix') + '/' + rnn_install_path
++rnn_path = get_option('prefix') + '/' + rnn_install_path
+ 
+ dep_lua = dependency('lua54', 'lua53', 'lua52', 'lua', required: false,
+                      allow_fallback: true, version: '>=5.2')
+-- 
+2.39.2
+

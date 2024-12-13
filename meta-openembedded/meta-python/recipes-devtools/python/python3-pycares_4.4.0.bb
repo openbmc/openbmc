@@ -10,7 +10,7 @@ SRC_URI[sha256sum] = "f47579d508f2f56eddd16ce72045782ad3b1b3b678098699e2b6a1b307
 
 PYPI_PACKAGE = "pycares"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta
 
 DEPENDS += "python3-cffi-native"
 

@@ -18,10 +18,11 @@ RP 2011/11/16
 
 Updated by: Robert Yang <liezhi.yang@windriver.com>
 
-diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
---- a/build-aux/ltmain.in
-+++ b/build-aux/ltmain.in
-@@ -2355,7 +2355,7 @@ func_mode_install ()
+Index: libtool-2.5.2/build-aux/ltmain.in
+===================================================================
+--- libtool-2.5.2.orig/build-aux/ltmain.in
++++ libtool-2.5.2/build-aux/ltmain.in
+@@ -2381,7 +2381,7 @@ func_mode_install ()
  	dir=$func_dirname_result
  	func_append dir "$objdir"
  
@@ -29,8 +30,8 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
 +	if test "$fast_install" = no && test -n "$relink_command"; then
  	  # Strip any trailing slash from the destination.
  	  func_stripname '' '/' "$libdir"
-	  destlibdir=$func_stripname_result
-@@ -2394,7 +2394,7 @@ func_mode_install ()
+ 	  destlibdir=$func_stripname_result
+@@ -2419,7 +2419,7 @@ func_mode_install ()
  	  shift
  
  	  srcname=$realname
@@ -39,7 +40,7 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
  
  	  # Install the shared library and build the symlinks.
  	  func_show_eval "$install_shared_prog $dir/$srcname $destdir/$realname" \
-@@ -6162,15 +6162,15 @@ func_mode_link ()
+@@ -6276,17 +6276,17 @@ func_mode_link ()
  	    # Hardcode the library path.
  	    # Skip directories that are in the system default run-time
  	    # search path.
@@ -48,7 +49,9 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
 -	    *)
 -	      case "$compile_rpath " in
 -	      *" $absdir "*) ;;
--	      *) func_append compile_rpath " $absdir" ;;
+-	      *) case $absdir in
+-                 "$progdir/"*) func_append compile_rpath " $absdir" ;;
+-		 esac
 -	      esac
 -	      ;;
 -	    esac
@@ -57,14 +60,16 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
 +	    #*)
 +	    #  case "$compile_rpath " in
 +	    #  *" $absdir "*) ;;
-+	    #  *) func_append compile_rpath " $absdir" ;;
++	    #  *) case $absdir in
++            #     "$progdir/"*) func_append compile_rpath " $absdir" ;;
++	#	 esac
 +	    #  esac
 +	    #  ;;
 +	    #esac
  	    case " $sys_lib_dlsearch_path " in
  	    *" $libdir "*) ;;
  	    *)
-@@ -6236,15 +6236,15 @@ func_mode_link ()
+@@ -6352,17 +6352,17 @@ func_mode_link ()
  	    # Hardcode the library path.
  	    # Skip directories that are in the system default run-time
  	    # search path.
@@ -73,7 +78,9 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
 -	    *)
 -	      case "$compile_rpath " in
 -	      *" $absdir "*) ;;
--	      *) func_append compile_rpath " $absdir" ;;
+-	      *) case $absdir in
+-                 "$progdir/"*) func_append compile_rpath " $absdir" ;;
+-		 esac
 -	      esac
 -	      ;;
 -	    esac
@@ -82,14 +89,16 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
 +	    #*)
 +	    #  case "$compile_rpath " in
 +	    #  *" $absdir "*) ;;
-+	    #  *) func_append compile_rpath " $absdir" ;;
++	    #  *) case $absdir in
++            #     "$progdir/"*) func_append compile_rpath " $absdir" ;;
++	#	 esac
 +	    #  esac
 +	    #  ;;
 +	    #esac
  	    case " $sys_lib_dlsearch_path " in
  	    *" $libdir "*) ;;
  	    *)
-@@ -6590,8 +6590,8 @@ func_mode_link ()
+@@ -6705,8 +6705,8 @@ func_mode_link ()
  		  eval libdir=`$SED -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
  		  test -z "$libdir" && \
  		    func_fatal_error "'$deplib' is not a valid libtool archive"

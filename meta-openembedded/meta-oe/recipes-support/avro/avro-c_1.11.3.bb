@@ -15,3 +15,9 @@ SRC_URI = "git://github.com/apache/avro;branch=${BRANCH};protocol=https \
 S = "${WORKDIR}/git/lang/c"
 
 inherit cmake pkgconfig
+
+# http://errors.yoctoproject.org/Errors/Details/766902/
+# avro-c/1.11.3/git/lang/c/examples/quickstop.c:123:61: error: passing argument 3 of 'first_value.iface->get_string' from incompatible pointer type [-Wincompatible-pointer-types]
+# avro-c/1.11.3/git/lang/c/examples/quickstop.c:127:60: error: passing argument 3 of 'last_value.iface->get_string' from incompatible pointer type [-Wincompatible-pointer-types]
+# avro-c/1.11.3/git/lang/c/examples/quickstop.c:131:61: error: passing argument 3 of 'phone_value.iface->get_string' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

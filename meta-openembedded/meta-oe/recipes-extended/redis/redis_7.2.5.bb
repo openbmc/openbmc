@@ -68,3 +68,5 @@ INITSCRIPT_NAME = "redis-server"
 INITSCRIPT_PARAMS = "defaults 87"
 
 SYSTEMD_SERVICE:${PN} = "redis.service"
+
+CVE_STATUS[CVE-2022-3734] = "not-applicable-platform: CVE only applies for Windows."

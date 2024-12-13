@@ -39,7 +39,7 @@ file://${COMMON_LICENSE_DIR}/Unicode-DFS-2016;md5=907371994d651afe53e98adc278246
 file://${COMMON_LICENSE_DIR}/Unicode-TOU;md5=666362dc5dba74f477af0f44fb85bd22 \
 file://${COMMON_LICENSE_DIR}/Zlib;md5=87f239f408daca8a157858e192597633 \
 "
-IMAGE_CLASSES:remove = "license_image"
+IMAGE_CLASSES:remove = "license_image create-spdx-image-3.0"
 
 COMPATIBLE_MACHINE = "(fvp-.+|.+-fvp)"
 
@@ -57,5 +57,7 @@ SRC_URI = " \
 SRC_URI[acs-img.sha256sum] = "ea52f84dab44bde97de3e2d2224d883acaae35724dd8e2bdfb125de49040f9b3"
 # Revision pointing to v2023.04 tag
 SRCREV_sr-ir-template = "c714db178ddf72e5ae5017f15421095297d5bf0e"
+
+S = "${WORKDIR}/sources-unpack"
 
 inherit arm-systemready-acs

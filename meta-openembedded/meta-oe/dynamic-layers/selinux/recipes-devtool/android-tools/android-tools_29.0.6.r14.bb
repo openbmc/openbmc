@@ -68,6 +68,7 @@ COMPATIBLE_HOST:powerpc64le = "(null)"
 
 inherit systemd
 
+SYSTEMD_PACKAGES = "${PN}-adbd"
 SYSTEMD_SERVICE:${PN}-adbd = "android-tools-adbd.service"
 
 # Find libbsd headers during native builds
@@ -189,7 +190,7 @@ FILES:${PN} += "${libdir}/android ${libdir}/android/*"
 BBCLASSEXTEND = "native"
 
 android_tools_enable_devmode() {
-    touch ${IMAGE_ROOTFS}/var/usb-debugging-enabled
+    touch ${IMAGE_ROOTFS}/etc/usb-debugging-enabled
 }
 
 ROOTFS_POSTPROCESS_COMMAND_${PN}-adbd += "${@bb.utils.contains("USB_DEBUGGING_ENABLED", "1", "android_tools_enable_devmode;", "", d)}"

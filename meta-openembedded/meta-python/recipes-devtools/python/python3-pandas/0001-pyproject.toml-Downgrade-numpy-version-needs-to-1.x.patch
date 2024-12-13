@@ -1,0 +1,27 @@
+From d81d95274d84ac51fc02e0fa91affc7f3cbefccb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 24 Aug 2024 10:21:43 -0700
+Subject: [PATCH] pyproject.toml: Downgrade numpy version needs to 1.x
+
+Drop it when numpy is upgraded to 2.x or newer in core
+
+Upstream-Status: Inappropriate [OE workaround]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 5158d60..d3daa78 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -8,7 +8,7 @@ requires = [
+     "Cython>=3.0.5",  # Note: sync with setup.py, environment.yml and asv.conf.json
+     # Force numpy higher than 2.0rc1, so that built wheels are compatible
+     # with both numpy 1 and 2
+-    "numpy>=2.0.0rc1",
++    "numpy>=1.24.0",
+     "versioneer[toml]"
+ ]
+ 

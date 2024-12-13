@@ -13,6 +13,7 @@ SRC_URI = "https://github.com/zeux/${BPN}/releases/download/v${PV}/${BP}.tar.gz"
 SRC_URI[sha256sum] = "2f10e276870c64b1db6809050a75e11a897a8d7456c4be5c6b2e35a11168a015"
 
 UPSTREAM_CHECK_URI = "https://github.com/zeux/${BPN}/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
 
 inherit cmake
 

@@ -34,6 +34,7 @@ EXTRA_OECONF += "\
 EXTRA_OECONF:append:libc-baremetal = " --without-headers"
 EXTRA_OECONF:remove:libc-baremetal = "--enable-threads=posix"
 EXTRA_OECONF:remove:libc-newlib = "--enable-threads=posix"
+EXTRA_OECONF:remove:libc-picolibc = "--enable-threads=posix"
 
 EXTRA_OECONF_PATHS = "\
     --with-gxx-include-dir=/not/exist${target_includedir}/c++/${BINV} \
@@ -62,19 +63,8 @@ do_compile () {
 	export CXXFLAGS_FOR_TARGET="${TARGET_CXXFLAGS}"
 	export LDFLAGS_FOR_TARGET="${TARGET_LDFLAGS}"
 
-	# Prevent native/host sysroot path from being used in configargs.h header,
-	# as it will be rewritten when used by other sysroots preventing support
-	# for gcc plugins
-	oe_runmake configure-gcc
-	sed -i 's@${STAGING_DIR_TARGET}@/host@g' ${B}/gcc/configargs.h
-	sed -i 's@${STAGING_DIR_HOST}@/host@g' ${B}/gcc/configargs.h
-
-	# Prevent sysroot/workdir paths from being used in checksum-options.
-	# checksum-options is used to generate a checksum which is embedded into
-	# the output binary.
-	oe_runmake TARGET-gcc=checksum-options all-gcc
-	sed -i 's@${DEBUG_PREFIX_MAP}@@g' ${B}/gcc/checksum-options
-	sed -i 's@${STAGING_DIR_HOST}@/host@g' ${B}/gcc/checksum-options
+	remove_sysroot_paths_from_configargs '/host'
+	remove_sysroot_paths_from_checksum_options '${STAGING_DIR_HOST}' '/host'
 
 	oe_runmake all-host configure-target-libgcc
 	(cd ${B}/${TARGET_SYS}/libgcc; oe_runmake enable-execute-stack.c unwind.h md-unwind-support.h sfp-machine.h gthr-default.h)
@@ -120,7 +110,7 @@ do_install () {
 	cp ${S}/libquadmath/quadmath.h ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/
 	cp ${S}/libquadmath/quadmath_weak.h ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/
 
-	find ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include-fixed -type f -not -name "README" -not -name limits.h -not -name syslimits.h | xargs rm -f
+	cleanup_installed_include_fixed
 
 	# install LTO linker plugins where binutils tools can find it
 	install -d ${D}${libdir}/bfd-plugins

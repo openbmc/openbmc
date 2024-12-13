@@ -29,7 +29,6 @@ RDEPENDS:${PN}:append:class-target = "\
     python3-json \
     python3-logging \
     python3-netclient \
-    python3-pathlib2 \
     python3-pprint \
     python3-shell \
 "

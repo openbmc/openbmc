@@ -32,3 +32,7 @@ inherit autotools pkgconfig
 EXTRA_OEMAKE += "ROOTPREFIX=${root_prefix}"
 
 FILES:${PN} += "${nonarch_base_libdir}/firmware"
+
+# http://errors.yoctoproject.org/Errors/Details/766901/
+# linux-atm-2.5.2/src/led/conn.c:414:57: error: passing argument 3 of 'accept' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

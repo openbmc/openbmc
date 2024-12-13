@@ -16,6 +16,7 @@ SRC_URI = " \
     file://fix-menu-generation.patch \
 "
 SRC_URI[sha256sum] = "824e099928aab2fb628f0fa4870ef7bba10b95581e47c2d8fa216709a0f399b3"
+UPSTREAM_CHECK_URI="https://launchpad.net/openbox-xdgmenu/"
 
 inherit pkgconfig features_check
 # depends on openbox, which is X11-only

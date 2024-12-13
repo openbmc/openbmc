@@ -1,4 +1,4 @@
-From 87745a6cad0f7819ac8f8d3826f5e228ebd843c5 Mon Sep 17 00:00:00 2001
+From 8fba2fe012648efb526d17688c8ed3e5e72f715c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 2 Feb 2023 16:39:26 -0800
 Subject: [PATCH] Include missing <cstdint>
@@ -16,7 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/daemon/xml/CurrentConfigXML.h b/daemon/xml/CurrentConfigXML.h
-index 0b239fd..d9047e3 100644
+index 0b239fdb1d70..d9047e3bc080 100644
 --- a/daemon/xml/CurrentConfigXML.h
 +++ b/daemon/xml/CurrentConfigXML.h
 @@ -1,6 +1,7 @@
@@ -27,6 +27,3 @@ index 0b239fd..d9047e3 100644
  #include <set>
  #include <string>
  
--- 
-2.39.1
-

@@ -4,7 +4,7 @@
  # SPDX-License-Identifier: MIT
 
 ######################
-Software architecture
+Software Architecture
 ######################
 
 
@@ -20,7 +20,7 @@ Corstone-1000 software plus hardware reference solution is PSA Level-2 ready
 certified (`PSA L2 Ready`_) as well as System Ready IR certified(`SRIR cert`_).
 More information on the Corstone-1000 subsystem product and design can be
 found at:
-`Arm corstone1000 Software`_ and `Arm corstone1000 Technical Overview`_.
+`Arm Corstone-1000 Software`_ and `Arm Corstone-1000 Technical Overview`_.
 
 This readme explicitly focuses on the software part of the solution and
 provides internal details on the software components. The reference
@@ -57,7 +57,7 @@ TrustedFirmware-M(`TF-M`_) as runtime software. The software design on
 Secure Enclave follows Firmware Framework for M class
 processor (`FF-M`_) specification.
 
-The Host System is based on ARM Cotex-A35 processor with standardized
+The Host System is based on ARM Cortex-A35 processor with standardized
 peripherals to allow for the booting of a Linux OS. The Cortex-A35 has
 the TrustZone technology that allows secure and non-secure security
 states in the processor. The software design in the Host System follows
@@ -213,15 +213,18 @@ Image (the initramfs bundle). The new images are accepted in the form of a UEFI 
 
 When Firmware update is triggered, U-Boot verifies the capsule by checking the
 capsule signature, version number and size. Then it signals the Secure Enclave
-that can start writing UEFI capsule into the flash. Once this operation finishes
-,Secure Enclave resets the entire system.
+that can start writing UEFI capsule into the flash.
+
+Once this operation finishes, Secure Enclave resets the entire system.
 The Metadata Block in the flash has the below firmware update state machine.
 TF-M runs an OTA service that is responsible for accepting and updating the
 images in the flash. The communication between the UEFI Capsule update
 subsystem and the OTA service follows the same data path explained above.
 The OTA service writes the new images to the passive bank after successful
 capsule verification. It changes the state of the system to trial state and
-triggers the reset. Boot loaders in Secure Enclave and Host read the Metadata
+triggers the reset.
+
+Boot loaders in Secure Enclave and Host read the Metadata
 block to get the information on the boot bank. In the successful trial stage,
 the acknowledgment from the host moves the state of the system from trial to
 regular. Any failure in the trial stage or system hangs leads to a system
@@ -258,17 +261,17 @@ calls are forwarded to the Secure Enclave as explained above.
 ***************
 References
 ***************
-`ARM corstone1000 Search`_
+`ARM Corstone-1000 Search`_
 
 `Arm security features`_
 
 --------------
 
-*Copyright (c) 2022-2023, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2024, Arm Limited. All rights reserved.*
 
-.. _Arm corstone1000 Technical Overview: https://developer.arm.com/documentation/102360/0000
-.. _Arm corstone1000 Software: https://developer.arm.com/Tools%20and%20Software/Corstone-1000%20Software
-.. _Arm corstone1000 Search: https://developer.arm.com/search#q=corstone-1000
+.. _Arm Corstone-1000 Technical Overview: https://developer.arm.com/documentation/102360/0000
+.. _Arm Corstone-1000 Software: https://developer.arm.com/Tools%20and%20Software/Corstone-1000%20Software
+.. _Arm Corstone-1000 Search: https://developer.arm.com/search#q=corstone-1000
 .. _Arm security features: https://www.arm.com/architecture/security-features/platform-security
 .. _linux repo: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/
 .. _FF-A: https://developer.arm.com/documentation/den0077/latest

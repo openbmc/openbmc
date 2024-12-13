@@ -9,6 +9,8 @@ DEPENDS = "zlib"
 
 SRC_URI = "https://www.cairographics.org/releases/${BP}.tar.gz \
            file://0001-ARM-qemu-related-workarounds-in-cpu-features-detecti.patch \
+           file://0001-pixman-combine-float.c-fix-inlining-failed-in-call-t.patch \
+           file://865e6ce00bb79a6b925ed4c2c436e1533e4472aa.patch \
            "
 SRC_URI[sha256sum] = "ea1480efada2fd948bc75366f7c349e1c96d3297d09a3fe62626e38e234a625e"
 

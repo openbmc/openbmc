@@ -1,0 +1,31 @@
+From 372d6e9e5827486841ffe15a1b050569fff762b6 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 10 Apr 2024 09:17:39 +0200
+Subject: [PATCH 5/8] Fix psa-api-crypto-test no 243
+
+Enable MbedTLS ECP DP SECP521R1 ECC algorithm to pass
+PSA-API tests's `psa-api-crypto-test` number 243 as it is
+required for Corstone-1000.
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/31177/1]
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ platform/providers/arm/corstone1000/platform.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/platform/providers/arm/corstone1000/platform.cmake b/platform/providers/arm/corstone1000/platform.cmake
+index d944acf..e811c25 100644
+--- a/platform/providers/arm/corstone1000/platform.cmake
++++ b/platform/providers/arm/corstone1000/platform.cmake
+@@ -14,6 +14,7 @@ target_compile_definitions(${TGT} PRIVATE
+ 	SMM_VARIABLE_INDEX_STORAGE_UID=0x787
+ 	PLAT_RSS_COMMS_PAYLOAD_MAX_SIZE=0x2080
+ 	COMMS_MHU_MSG_SIZE=0x3500
++	MBEDTLS_ECP_DP_SECP521R1_ENABLED
+ )
+ 
+ get_property(_platform_driver_dependencies TARGET ${TGT}
+-- 
+2.25.1
+

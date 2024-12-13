@@ -13,47 +13,41 @@ Upstream-Status: Pending
  src/samples/CMakeLists.txt | 4 ++--
  2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/cmake/CMakeLists.txt b/cmake/CMakeLists.txt
-index a9f8908..7eadc60 100644
 --- a/cmake/CMakeLists.txt
 +++ b/cmake/CMakeLists.txt
-@@ -11,7 +11,7 @@ export(EXPORT ${package_name}
-     FILE "${CMAKE_CURRENT_BINARY_DIR}/${package_name}Targets.cmake"
-     NAMESPACE ${package_name}::)
+@@ -34,7 +34,7 @@ export(EXPORT ${package_name}
+ )
  
--install(EXPORT ${package_name} DESTINATION lib/cmake/${package_name}
-+install(EXPORT ${package_name} DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}
-     FILE ${package_name}Targets.cmake
-     NAMESPACE ${package_name}::)
- 
-@@ -19,4 +19,4 @@ install(FILES
-     "${CMAKE_CURRENT_BINARY_DIR}/${package_name}Config.cmake"
-     FindPahoMqttC.cmake
-     "${CMAKE_CURRENT_BINARY_DIR}/${package_name}ConfigVersion.cmake"
--    DESTINATION lib/cmake/${package_name})
-+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name})
-diff --git a/src/samples/CMakeLists.txt b/src/samples/CMakeLists.txt
-index 3ca0a75..c915cd5 100644
---- a/src/samples/CMakeLists.txt
-+++ b/src/samples/CMakeLists.txt
-@@ -71,7 +71,7 @@ endforeach()
+ install(EXPORT ${package_name}
+-  DESTINATION lib/cmake/${package_name}
++  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}
+   FILE ${package_name}Targets.cmake
+   NAMESPACE ${package_name}::
+ )
+@@ -42,5 +42,5 @@ install(EXPORT ${package_name}
+ install(FILES
+   "${CMAKE_CURRENT_BINARY_DIR}/${package_name}Config.cmake"
+   "${CMAKE_CURRENT_BINARY_DIR}/${package_name}ConfigVersion.cmake"
+-  DESTINATION lib/cmake/${package_name}
++  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name}
+ )
+--- a/examples/CMakeLists.txt
++++ b/examples/CMakeLists.txt
+@@ -65,7 +65,7 @@ endforeach()
  
  ## install binaries
  install(TARGETS ${EXECUTABLES} EXPORT PahoMqttCppSamples
--  RUNTIME DESTINATION bin
-+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+-    RUNTIME DESTINATION bin
++    RUNTIME DESTINATION {CMAKE_INSTALL_BINDIR}
  )
  
  ## Build the SSL/TLS samples, if selected
-@@ -89,7 +89,7 @@ if(PAHO_WITH_SSL)
-   endforeach()
+@@ -80,7 +80,7 @@ if(PAHO_WITH_SSL)
+     endforeach()
  
-   install(TARGETS ${SSL_EXECUTABLES} EXPORT PahoMqttCppSamples
--    RUNTIME DESTINATION bin
-+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-   )
+     install(TARGETS ${SSL_EXECUTABLES} EXPORT PahoMqttCppSamples
+-        RUNTIME DESTINATION bin
++        RUNTIME DESTINATION {CMAKE_INSTALL_BINDIR}
+     )
  endif()
  
--- 
-2.34.1
-

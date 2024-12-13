@@ -25,10 +25,11 @@ RDEPENDS:${PN} += "\
     python3-shell \
     python3-tomlkit \
     "
-
+# python3-misc for timeit.py
 RDEPENDS:${PN}-ptest += " \
     python3-core \
     python3-git \
+    python3-misc \
     python3-py \
     python3-pytest \
     python3-pytest-benchmark \

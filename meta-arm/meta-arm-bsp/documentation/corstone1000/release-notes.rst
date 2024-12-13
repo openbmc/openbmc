@@ -20,6 +20,12 @@ prove defective, you assume the entire cost of all necessary servicing, repair
 or correction.
 
 ***********************
+Release notes - 2024.11
+***********************
+
+The same notes as the 2024.06 release still apply.
+
+***********************
 Release notes - 2024.06
 ***********************
 

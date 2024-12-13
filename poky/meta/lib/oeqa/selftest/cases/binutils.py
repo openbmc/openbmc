@@ -33,7 +33,7 @@ class BinutilsCrossSelfTest(OESelftestTestCase, OEPTestResultTestCase):
         features.append('CHECK_TARGETS = "{0}"'.format(suite))
         self.write_config("\n".join(features))
 
-        recipe = "binutils-cross-testsuite"
+        recipe = "binutils-testsuite"
         bb_vars = get_bb_vars(["B", "TARGET_SYS", "T"], recipe)
         builddir, target_sys, tdir = bb_vars["B"], bb_vars["TARGET_SYS"], bb_vars["T"]
 

@@ -18,8 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 #include <sys/socket.h>
+#include <sys/xattr.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <string.h>

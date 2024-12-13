@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export TEST_SSH_SSH=ssh
 export TEST_SHELL=sh
 export SKIP_UNIT=1
 

@@ -1,4 +1,4 @@
-From 59d4c190eae11c93b26cca5a7b005a17dadc8248 Mon Sep 17 00:00:00 2001
+From 9cf8ac4e6fcecb33af377e1a322f4841ed4e30ce Mon Sep 17 00:00:00 2001
 From: Brett Warren <brett.warren@arm.com>
 Date: Wed, 23 Sep 2020 09:27:34 +0100
 Subject: [PATCH] optee: enable clang support
@@ -10,13 +10,12 @@ compiler-rt. This is mitigated by including the variable as ammended.
 Upstream-Status: Pending
 ChangeId: 8ba69a4b2eb8ebaa047cb266c9aa6c2c3da45701
 Signed-off-by: Brett Warren <brett.warren@arm.com>
-
 ---
  mk/clang.mk | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mk/clang.mk b/mk/clang.mk
-index a045beee8..1ebe2f702 100644
+index a045beee8482..1ebe2f702dcd 100644
 --- a/mk/clang.mk
 +++ b/mk/clang.mk
 @@ -30,7 +30,7 @@ comp-cflags-warns-clang := -Wno-language-extension-token \

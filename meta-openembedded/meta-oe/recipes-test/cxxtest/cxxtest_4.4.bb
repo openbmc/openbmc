@@ -8,6 +8,8 @@ SRC_URI = "http://downloads.sourceforge.net/project/cxxtest/cxxtest/${PV}/${BP}.
 SRC_URI[md5sum] = "c3cc3355e2ac64e34c215f28e44cfcec"
 SRC_URI[sha256sum] = "1c154fef91c65dbf1cd4519af7ade70a61d85a923b6e0c0b007dc7f4895cf7d8"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/p/cxxtest/activity/"
+
 inherit setuptools3
 
 SETUPTOOLS_SETUP_PATH = "${S}/python"

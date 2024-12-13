@@ -1,0 +1,89 @@
+From edbee9832475347183a841a8fd5be71f74e10392 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Wed, 23 Oct 2013 15:04:22 +0200
+Subject: [PATCH] decode: avoid using a static buffer in th_get_pathname()
+
+A solution suggested by Chris Frey:
+https://lists.feep.net:8080/pipermail/libtar/2013-October/000377.html
+
+Note this can break programs that expect sizeof(TAR) to be fixed.
+
+Authored by Kamil Dudka <kdudka@redhat.com>.
+
+Upstream-Status: Backport [https://repo.or.cz/libtar.git/commit/ec613af2e9371d7a3e1f7c7a6822164a4255b4d1]
+
+Signed-off-by: Katariina Lounento <katariina.lounento@vaisala.com>
+---
+ lib/decode.c | 24 +++++++++++++++++-------
+ lib/handle.c |  1 +
+ lib/libtar.h |  3 +++
+ 3 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/lib/decode.c b/lib/decode.c
+index c16ea2d..edb2185 100644
+--- a/lib/decode.c
++++ b/lib/decode.c
+@@ -26,20 +26,30 @@
+ char *
+ th_get_pathname(TAR *t)
+ {
+-	static TLS_THREAD char filename[MAXPATHLEN];
+-
+ 	if (t->th_buf.gnu_longname)
+ 		return t->th_buf.gnu_longname;
+ 
+-	if (t->th_buf.prefix[0] != '\0')
++	/* allocate the th_pathname buffer if not already */
++	if (t->th_pathname == NULL)
++	{
++		t->th_pathname = malloc(MAXPATHLEN * sizeof(char));
++		if (t->th_pathname == NULL)
++			/* out of memory */
++			return NULL;
++	}
++
++	if (t->th_buf.prefix[0] == '\0')
++	{
++		snprintf(t->th_pathname, MAXPATHLEN, "%.100s", t->th_buf.name);
++	}
++	else
+ 	{
+-		snprintf(filename, sizeof(filename), "%.155s/%.100s",
++		snprintf(t->th_pathname, MAXPATHLEN, "%.155s/%.100s",
+ 			 t->th_buf.prefix, t->th_buf.name);
+-		return filename;
+ 	}
+ 
+-	snprintf(filename, sizeof(filename), "%.100s", t->th_buf.name);
+-	return filename;
++	/* will be deallocated in tar_close() */
++	return t->th_pathname;
+ }
+ 
+ 
+diff --git a/lib/handle.c b/lib/handle.c
+index 002d23c..a19c046 100644
+--- a/lib/handle.c
++++ b/lib/handle.c
+@@ -122,6 +122,7 @@ tar_close(TAR *t)
+ 		libtar_hash_free(t->h, ((t->oflags & O_ACCMODE) == O_RDONLY
+ 					? free
+ 					: (libtar_freefunc_t)tar_dev_free));
++	free(t->th_pathname);
+ 	free(t);
+ 
+ 	return i;
+diff --git a/lib/libtar.h b/lib/libtar.h
+index 7fc4d03..08a8e0f 100644
+--- a/lib/libtar.h
++++ b/lib/libtar.h
+@@ -85,6 +85,9 @@ typedef struct
+ 	int options;
+ 	struct tar_header th_buf;
+ 	libtar_hash_t *h;
++
++	/* introduced in libtar 1.2.21 */
++	char *th_pathname;
+ }
+ TAR;
+ 

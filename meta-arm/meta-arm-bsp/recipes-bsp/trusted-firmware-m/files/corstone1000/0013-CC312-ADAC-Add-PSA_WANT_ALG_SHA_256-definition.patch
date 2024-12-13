@@ -1,0 +1,42 @@
+From 756cfad0cc05e7f4c02faa74aea14962aa54420c Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 31 Jul 2024 13:38:09 +0200
+Subject: [PATCH 2/3] CC312: ADAC: Add PSA_WANT_ALG_SHA_256 definition
+
+The bl2_mbedcrypto_config is linked to the psa_adac_cc312 target so
+the MCUBOOT_PSA_CRYPTO_CONFIG_FILEPATH and
+MCUBOOT_MBEDCRYPTO_CONFIG_FILEPATH configs are used for the ADAC driver
+too. The MCUBOOT_USE_PSA_CRYPTO is OFF by default, that means the
+MCUBOOT_PSA_CRYPTO_CONFIG_FILEPATH is not included during the build so
+the PSA_WANT_ALG_SHA_256 is not defined for the ADAC driver. Because
+of this, the PSA_HASH_MAX_SIZE is not set correctly for the sources
+of the psa_adac_cc312 target. This caused runtime issues.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/31131]
+---
+ platform/ext/accelerator/cc312/psa-adac/CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/platform/ext/accelerator/cc312/psa-adac/CMakeLists.txt b/platform/ext/accelerator/cc312/psa-adac/CMakeLists.txt
+index cb0553b40a..d7f5a54f3c 100644
+--- a/platform/ext/accelerator/cc312/psa-adac/CMakeLists.txt
++++ b/platform/ext/accelerator/cc312/psa-adac/CMakeLists.txt
+@@ -1,5 +1,5 @@
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2020-2023, Arm Limited. All rights reserved.
++# Copyright (c) 2020-2024, Arm Limited. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -32,6 +32,7 @@ target_compile_options(psa_adac_cc312
+         -DCC_IOT
+         -DUSE_MBEDTLS_CRYPTOCELL
+         -D_INTERNAL_CC_NO_RSA_SCHEME_15_SUPPORT
++        -DPSA_WANT_ALG_SHA_256
+ )
+ 
+ target_link_libraries(psa_adac_cc312
+-- 
+2.25.1
+

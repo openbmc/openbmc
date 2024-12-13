@@ -6,25 +6,25 @@ Release notes for Yocto-4.0.7 (Kirkstone)
 Security Fixes in Yocto-4.0.7
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  binutils: Fix :cve:`2022-4285`
--  curl: Fix :cve:`2022-43551` and :cve_mitre:`2022-43552`
--  ffmpeg: Fix :cve:`2022-3109` and :cve:`2022-3341`
--  go: Fix :cve:`2022-41715` and :cve:`2022-41717`
--  libX11: Fix :cve:`2022-3554` and :cve:`2022-3555`
--  libarchive: Fix :cve:`2022-36227`
--  libksba: Fix :cve:`2022-47629`
--  libpng: Fix :cve:`2019-6129`
--  libxml2: Fix :cve:`2022-40303` and :cve:`2022-40304`
--  openssl: Fix :cve:`2022-3996`
--  python3: Fix :cve:`2022-45061`
--  python3-git: Fix :cve:`2022-24439`
--  python3-setuptools: Fix :cve:`2022-40897`
--  python3-wheel: Fix :cve:`2022-40898`
--  qemu: Fix :cve:`2022-4144`
--  sqlite: Fix :cve:`2022-46908`
--  systemd: Fix :cve:`2022-45873`
--  vim: Fix :cve:`2023-0049`, :cve:`2023-0051`, :cve:`2023-0054` and :cve:`2023-0088`
--  webkitgtk: Fix :cve:`2022-32886`, :cve_mitre:`2022-32891` and :cve:`2022-32912`
+-  binutils: Fix :cve_nist:`2022-4285`
+-  curl: Fix :cve_nist:`2022-43551` and :cve_mitre:`2022-43552`
+-  ffmpeg: Fix :cve_nist:`2022-3109` and :cve_nist:`2022-3341`
+-  go: Fix :cve_nist:`2022-41715` and :cve_nist:`2022-41717`
+-  libX11: Fix :cve_nist:`2022-3554` and :cve_nist:`2022-3555`
+-  libarchive: Fix :cve_nist:`2022-36227`
+-  libksba: Fix :cve_nist:`2022-47629`
+-  libpng: Fix :cve_nist:`2019-6129`
+-  libxml2: Fix :cve_nist:`2022-40303` and :cve_nist:`2022-40304`
+-  openssl: Fix :cve_nist:`2022-3996`
+-  python3: Fix :cve_nist:`2022-45061`
+-  python3-git: Fix :cve_nist:`2022-24439`
+-  python3-setuptools: Fix :cve_nist:`2022-40897`
+-  python3-wheel: Fix :cve_nist:`2022-40898`
+-  qemu: Fix :cve_nist:`2022-4144`
+-  sqlite: Fix :cve_nist:`2022-46908`
+-  systemd: Fix :cve_nist:`2022-45873`
+-  vim: Fix :cve_nist:`2023-0049`, :cve_nist:`2023-0051`, :cve_nist:`2023-0054` and :cve_nist:`2023-0088`
+-  webkitgtk: Fix :cve_nist:`2022-32886`, :cve_mitre:`2022-32891` and :cve_nist:`2022-32912`
 
 
 Fixes in Yocto-4.0.7
@@ -39,7 +39,7 @@ Fixes in Yocto-4.0.7
 -  busybox: always start do_compile with orig config files
 -  busybox: rm temporary files if do_compile was interrupted
 -  cairo: fix CVE patches assigned wrong CVE number
--  cairo: update patch for :cve:`2019-6461` with upstream solution
+-  cairo: update patch for :cve_nist:`2019-6461` with upstream solution
 -  classes/create-spdx: Add SPDX_PRETTY option
 -  classes: image: Set empty weak default IMAGE_LINGUAS
 -  combo-layer: add sync-revs command

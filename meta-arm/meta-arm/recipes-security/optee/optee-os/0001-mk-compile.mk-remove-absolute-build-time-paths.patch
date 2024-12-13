@@ -1,0 +1,53 @@
+From 29b84ae5b277b85cd7244acde077694e6643fcde Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@linaro.org>
+Date: Thu, 18 Jul 2024 07:54:18 +0000
+Subject: [PATCH] mk/compile.mk: remove absolute build time paths
+
+Some generated files get a __FILE_ID__ which include absolute
+build time paths. Remove the paths and use plain file name.
+Fixes yocto QA check.
+
+Problem/bug:
+
+$ strings ../image/lib/firmware/tee.elf | grep mikko
+__FILE_ID__
+_home_mikko_build_core_ta_pub_key_c
+__FILE_ID__
+_home_mikko_build_core_ldelf_hex_c
+__FILE_ID__
+_home_mikko_build_core_early_ta_fd02c9da_306c_48c7_a49c_bbd827ae86ee_c
+
+With this patch:
+
+$ strings ../image/lib/firmware/tee.elf | grep mikko
+$ strings ../image/lib/firmware/tee.elf | grep FILE_ID | egrep \
+"core_ta_pub_key_c|core_ldelf_hex_c|core_early_ta_fd02c9da_306c_4"
+__FILE_ID__ core_ta_pub_key_c
+__FILE_ID__ core_ldelf_hex_c
+__FILE_ID__ core_early_ta_fd02c9da_306c_48c7_a49c_bbd827ae86ee_c
+
+Reviewed-by: Jens Wiklander <jens.wiklander@linaro.org>
+Acked-by: Jerome Forissier <jerome.forissier@linaro.org>
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+---
+ mk/compile.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Upstream-Status: Backport
+
+diff --git a/mk/compile.mk b/mk/compile.mk
+index b3d807ba4..338535bf3 100644
+--- a/mk/compile.mk
++++ b/mk/compile.mk
+@@ -120,7 +120,7 @@ comp-cppflags-$2 = $$(filter-out $$(CPPFLAGS_REMOVE) $$(cppflags-remove) \
+ 		      $$(addprefix -I,$$(incdirs-$2)) \
+ 		      $$(cppflags$$(comp-sm-$2)) \
+ 		      $$(cppflags-lib$$(comp-lib-$2)) $$(cppflags-$2)) \
+-		      -D__FILE_ID__=$$(subst -,_,$$(subst /,_,$$(subst .,_,$1)))
++		      -D__FILE_ID__=$$(subst -,_,$$(subst /,_,$$(subst .,_,$$(patsubst $$(out-dir)/%,%,$1))))
+ 
+ comp-flags-$2 += -MD -MF $$(comp-dep-$2) -MT $$@
+ comp-flags-$2 += $$(comp-cppflags-$2)
+-- 
+2.34.1
+

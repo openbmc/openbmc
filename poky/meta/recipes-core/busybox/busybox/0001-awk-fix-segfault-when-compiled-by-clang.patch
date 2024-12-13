@@ -1,0 +1,41 @@
+From e1a68741067167dc4837e0a26d3d5c318a631fc7 Mon Sep 17 00:00:00 2001
+From: Ron Yorston <rmy@pobox.com>
+Date: Fri, 19 Jan 2024 15:41:17 +0000
+Subject: [PATCH] awk: fix segfault when compiled by clang
+
+A 32-bit build of BusyBox using clang segfaulted in the test
+"awk assign while assign".  Specifically, on line 7 of the test
+input where the adjustment of the L.v pointer when the Fields
+array was reallocated
+
+   	L.v += Fields - old_Fields_ptr;
+
+was out by 4 bytes.
+
+Rearrange to code so both gcc and clang generate code that works.
+
+Signed-off-by: Ron Yorston <rmy@pobox.com>
+Signed-off-by: Bernhard Reutner-Fischer <rep.dot.nop@gmail.com>
+
+Upstream-Status: Backport [https://git.busybox.net/busybox/commit/?id=5dcc443dba039b305a510c01883e9f34e42656ae]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ editors/awk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/editors/awk.c b/editors/awk.c
+index aa485c782..0981c6735 100644
+--- a/editors/awk.c
++++ b/editors/awk.c
+@@ -2935,7 +2935,7 @@ static var *evaluate(node *op, var *res)
+ 			if (old_Fields_ptr) {
+ 				//if (old_Fields_ptr != Fields)
+ 				//	debug_printf_eval("L.v moved\n");
+-				L.v += Fields - old_Fields_ptr;
++				L.v = Fields + (L.v - old_Fields_ptr);
+ 			}
+ 			if (opinfo & OF_STR2) {
+ 				R.s = getvar_s(R.v);
+-- 
+2.30.2
+

@@ -33,7 +33,7 @@ DEPENDS = " \
     upower \
 "
 
-inherit gtk-icon-cache pkgconfig gnomebase gsettings gettext upstream-version-is-even bash-completion features_check useradd
+inherit gtk-icon-cache pkgconfig gnomebase gsettings gettext upstream-version-is-even bash-completion features_check
 
 REQUIRED_DISTRO_FEATURES += "opengl polkit pulseaudio systemd x11"
 
@@ -51,16 +51,6 @@ PACKAGECONFIG[malcontent] = "-Dmalcontent=true,-Dmalcontent=false,malcontent,mal
 EXTRA_OEMESON += "-Doe_sysroot=${STAGING_DIR_HOST}"
 
 export XDG_DATA_DIRS = "${STAGING_DATADIR}"
-
-USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 polkitd"
-
-do_install:append() {
-    if [ -d ${D}${datadir}/polkit-1/rules.d ]; then
-        chmod 700 ${D}${datadir}/polkit-1/rules.d
-        chown polkitd:root ${D}${datadir}/polkit-1/rules.d
-    fi
-}
 
 PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
 

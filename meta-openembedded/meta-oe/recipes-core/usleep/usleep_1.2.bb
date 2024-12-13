@@ -32,3 +32,7 @@ ALTERNATIVE_LINK_NAME[usleep] = "${base_bindir}/usleep"
 
 ALTERNATIVE:${PN}-doc = "usleep.1"
 ALTERNATIVE_LINK_NAME[usleep.1] = "${mandir}/man1/usleep.1"
+
+# http://errors.yoctoproject.org/Errors/Details/766900/
+# usleep.c:47:43: error: passing argument 3 of 'poptGetContext' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

@@ -1,0 +1,36 @@
+From 4a7d4d6e45c68708ec95335b0f11d6596b23095a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 22 Aug 2024 15:31:16 +0800
+Subject: [PATCH] fix compile failure with musl
+
+```
+../../gnupg-2.5.0/scd/app.c:379:3: error: implicit declaration of function 'write'; did you mean 'fwrite'? [-Wimplicit-function-declaration]
+  379 |   write (card_list_lock.notify_pipe[1], "", 1);
+      |   ^~~~~
+      |   fwrite
+```
+To access the Posix low level file interface such as open, read,
+write and close, should include <unistd.h>.
+
+Upstream-Status: Backport [https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=commit;h=1d5cfa9b7fd22e1c46eeed5fa9fed2af6f81d34f]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ scd/app.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scd/app.c b/scd/app.c
+index 926ab79..7bf58a2 100644
+--- a/scd/app.c
++++ b/scd/app.c
+@@ -23,6 +23,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <npth.h>
++#include <unistd.h>
+ 
+ #include "scdaemon.h"
+ #include "../common/exechelp.h"
+-- 
+2.27.0
+

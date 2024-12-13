@@ -1,7 +1,7 @@
-From 260ebd15e16cd86b9b58e5c5f3a496b3853ca46d Mon Sep 17 00:00:00 2001
+From a02355bdc8cde1115daf101675cdfb707d337bf1 Mon Sep 17 00:00:00 2001
 From: Joshua Watt <JPEWhacker@gmail.com>
 Date: Mon, 17 Jun 2019 10:47:23 -0500
-Subject: [PATCH 2/2] Constant: Fix up shebang
+Subject: [PATCH] Constant: Fix up shebang
 
 The instructions indicate that the script should be explicitly passed to
 "perl -x", so automatically setting the #! to be ^X is unnecessary and
@@ -15,7 +15,7 @@ Upstream-Status: Submitted [https://rt.cpan.org/Public/Bug/Display.html?id=12986
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/cpan/ExtUtils-Constant/lib/ExtUtils/Constant/XS.pm b/cpan/ExtUtils-Constant/lib/ExtUtils/Constant/XS.pm
-index 14eb809714..d4d074e121 100644
+index 14eb809..d4d074e 100644
 --- a/cpan/ExtUtils-Constant/lib/ExtUtils/Constant/XS.pm
 +++ b/cpan/ExtUtils-Constant/lib/ExtUtils/Constant/XS.pm
 @@ -219,7 +219,7 @@ sub dogfood {
@@ -27,6 +27,3 @@ index 14eb809714..d4d074e121 100644
  use ExtUtils::Constant qw (constant_types C_constant XS_constant);
  
  EOT
--- 
-2.21.0
-

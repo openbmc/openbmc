@@ -53,3 +53,10 @@ ALLOW_EMPTY:${PN} = "1"
 
 PARALLEL_MAKE = ""
 
+# http://errors.yoctoproject.org/Errors/Details/766915/
+# unix.c:235:21: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:1002:15: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:1163:15: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:1428:40: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:2254:33: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

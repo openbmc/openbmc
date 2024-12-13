@@ -1,0 +1,44 @@
+From 79b76433f4b6f2f14914817b7e8ac0db1df39250 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 21 Jun 2018 19:58:53 -0700
+Subject: [PATCH] include limits.h for PATH_MAX
+
+Fixes
+
+error: 'PATH_MAX' undeclared
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ hugeadm.c                | 1 +
+ tests/gethugepagesizes.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/hugeadm.c b/hugeadm.c
+index 79a4867..65d5136 100644
+--- a/hugeadm.c
++++ b/hugeadm.c
+@@ -33,6 +33,7 @@
+ #include <grp.h>
+ #include <pwd.h>
+ #include <fcntl.h>
++#include <limits.h>
+ 
+ #include <sys/stat.h>
+ #include <sys/types.h>
+diff --git a/tests/gethugepagesizes.c b/tests/gethugepagesizes.c
+index 5777265..990db69 100644
+--- a/tests/gethugepagesizes.c
++++ b/tests/gethugepagesizes.c
+@@ -29,6 +29,7 @@
+ #include <fcntl.h>
+ #include <stdarg.h>
+ #include <hugetlbfs.h>
++#include <limits.h>
+ 
+ #include "hugetests.h"
+ 
+-- 
+2.25.1
+

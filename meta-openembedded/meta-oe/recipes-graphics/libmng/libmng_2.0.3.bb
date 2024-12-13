@@ -13,6 +13,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz"
 SRC_URI[md5sum] = "7e9a12ba2a99dff7e736902ea07383d4"
 SRC_URI[sha256sum] = "cf112a1fb02f5b1c0fce5cab11ea8243852c139e669c44014125874b14b7dfaa"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/libmng/files/libmng-devel/"
+UPSTREAM_CHECK_REGEX = "libmng-devel/(?P<pver>\d+(\.\d+)+)"
+
 inherit autotools-brokensep pkgconfig
 
 PACKAGECONFIG ??= "jpeg"

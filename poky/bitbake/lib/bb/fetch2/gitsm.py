@@ -147,6 +147,19 @@ class GitSM(Git):
 
         return submodules != []
 
+    def call_process_submodules(self, ud, d, extra_check, subfunc):
+        # If we're using a shallow mirror tarball it needs to be
+        # unpacked temporarily so that we can examine the .gitmodules file
+        if ud.shallow and os.path.exists(ud.fullshallow) and extra_check:
+            tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
+            try:
+                runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=tmpdir)
+                self.process_submodules(ud, tmpdir, subfunc, d)
+            finally:
+                shutil.rmtree(tmpdir)
+        else:
+            self.process_submodules(ud, ud.clonedir, subfunc, d)
+
     def need_update(self, ud, d):
         if Git.need_update(self, ud, d):
             return True
@@ -164,15 +177,7 @@ class GitSM(Git):
                 logger.error('gitsm: submodule update check failed: %s %s' % (type(e).__name__, str(e)))
                 need_update_result = True
 
-        # If we're using a shallow mirror tarball it needs to be unpacked
-        # temporarily so that we can examine the .gitmodules file
-        if ud.shallow and os.path.exists(ud.fullshallow) and not os.path.exists(ud.clonedir):
-            tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
-            runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=tmpdir)
-            self.process_submodules(ud, tmpdir, need_update_submodule, d)
-            shutil.rmtree(tmpdir)
-        else:
-            self.process_submodules(ud, ud.clonedir, need_update_submodule, d)
+        self.call_process_submodules(ud, d, not os.path.exists(ud.clonedir), need_update_submodule)
 
         if need_update_list:
             logger.debug('gitsm: Submodules requiring update: %s' % (' '.join(need_update_list)))
@@ -195,16 +200,7 @@ class GitSM(Git):
                 raise
 
         Git.download(self, ud, d)
-
-        # If we're using a shallow mirror tarball it needs to be unpacked
-        # temporarily so that we can examine the .gitmodules file
-        if ud.shallow and os.path.exists(ud.fullshallow) and self.need_update(ud, d):
-            tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
-            runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=tmpdir)
-            self.process_submodules(ud, tmpdir, download_submodule, d)
-            shutil.rmtree(tmpdir)
-        else:
-            self.process_submodules(ud, ud.clonedir, download_submodule, d)
+        self.call_process_submodules(ud, d, self.need_update(ud, d), download_submodule)
 
     def unpack(self, ud, destdir, d):
         def unpack_submodules(ud, url, module, modpath, workdir, d):
@@ -263,14 +259,6 @@ class GitSM(Git):
             newfetch = Fetch([url], d, cache=False)
             urldata.extend(newfetch.expanded_urldata())
 
-        # If we're using a shallow mirror tarball it needs to be unpacked
-        # temporarily so that we can examine the .gitmodules file
-        if ud.shallow and os.path.exists(ud.fullshallow) and ud.method.need_update(ud, d):
-            tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
-            subprocess.check_call("tar -xzf %s" % ud.fullshallow, cwd=tmpdir, shell=True)
-            self.process_submodules(ud, tmpdir, add_submodule, d)
-            shutil.rmtree(tmpdir)
-        else:
-            self.process_submodules(ud, ud.clonedir, add_submodule, d)
+        self.call_process_submodules(ud, d, ud.method.need_update(ud, d), add_submodule)
 
         return urldata

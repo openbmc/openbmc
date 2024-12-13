@@ -1,0 +1,55 @@
+From bfb177d2745d19cb56a27c438f4925d6397fbf0b Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 29 Jul 2024 14:08:32 +0000
+Subject: [PATCH] Fix: ext4_da_reserve_space changed in 6.11-rc1
+
+See upstream commit:
+
+    commit 0d66b23d79c750276f791411d81a524549a64852
+    Author: Zhang Yi <yi.zhang@huawei.com>
+    Date:   Fri May 17 20:40:02 2024 +0800
+
+        ext4: make ext4_da_reserve_space() reserve multi-clusters
+
+        Add 'nr_resv' parameter to ext4_da_reserve_space(), which indicates the
+        number of clusters wants to reserve, make it reserve multiple clusters
+        at a time.
+
+Upstream-Status: Backport
+
+Change-Id: Ib1ce8c3023d53a6d22ec444a435fdb3c871f64c5
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/ext4.h | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/ext4.h b/include/instrumentation/events/ext4.h
+index 4131803..9f1d4b1 100644
+--- a/include/instrumentation/events/ext4.h
++++ b/include/instrumentation/events/ext4.h
+@@ -821,7 +821,23 @@ LTTNG_TRACEPOINT_EVENT(ext4_da_update_reserve_space,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,13,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,11,0))
++LTTNG_TRACEPOINT_EVENT(ext4_da_reserve_space,
++	TP_PROTO(struct inode *inode, int nr_resv),
++
++	TP_ARGS(inode, nr_resv),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, inode->i_sb->s_dev)
++		ctf_integer(ino_t, ino, inode->i_ino)
++		ctf_integer(__u64, i_blocks, inode->i_blocks)
++		ctf_integer(__u64, nr_resv, nr_resv)
++		ctf_integer(int, reserved_data_blocks,
++				EXT4_I(inode)->i_reserved_data_blocks)
++		ctf_integer(TP_MODE_T, mode, inode->i_mode)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,13,0))
+ LTTNG_TRACEPOINT_EVENT(ext4_da_reserve_space,
+ 	TP_PROTO(struct inode *inode),
+ 

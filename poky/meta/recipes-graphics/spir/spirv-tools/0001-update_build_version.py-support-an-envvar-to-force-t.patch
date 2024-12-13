@@ -1,0 +1,43 @@
+From 39b6385454d705128e684ed779ba9620e2ead1e2 Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Thu, 1 Aug 2024 18:58:04 +0200
+Subject: [PATCH] update_build_version.py: support an envvar to force the
+ description
+
+FORCED_BUILD_VERSION_DESCRIPTION envvar can be used to force a version
+description instead of resorting to git describe which can change for a
+given commit if multiple lightweight commits point ot it.
+
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+Upstream-Status: Backport [https://github.com/KhronosGroup/SPIRV-Tools/commit/bc4060ed274ad9749c20daced96d6f0518d6418e]
+---
+ utils/update_build_version.py | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/utils/update_build_version.py b/utils/update_build_version.py
+index bb66e18a..9115cab1 100755
+--- a/utils/update_build_version.py
++++ b/utils/update_build_version.py
+@@ -24,9 +24,10 @@
+ #  - The software version deduced from the given CHANGES file.
+ #  - A longer string with the project name, the software version number, and
+ #    git commit information for the CHANGES file's directory.  The commit
+-#    information is the output of "git describe" if that succeeds, or "git
+-#    rev-parse HEAD" if that succeeds, or otherwise a message containing the
+-#    phrase "unknown hash".
++#    information is the content of the FORCED_BUILD_VERSION_DESCRIPTION
++#    environement variable is it exists, else the output of "git describe" if
++#    that succeeds, or "git rev-parse HEAD" if that succeeds, or otherwise a
++#    message containing the phrase "unknown hash".
+ # The string contents are escaped as necessary.
+ 
+ import datetime
+@@ -150,7 +151,7 @@ def main():
+       sys.exit(1)
+ 
+     repo_path = os.path.dirname(changes_file_path)
+-    description = describe(repo_path)
++    description = os.getenv("FORCED_BUILD_VERSION_DESCRIPTION", describe(repo_path))
+     content = OUTPUT_FORMAT.format(version_tag=version, description=description)
+ 
+     # Escape file content.

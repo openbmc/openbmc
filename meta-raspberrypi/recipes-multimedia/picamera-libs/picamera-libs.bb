@@ -11,6 +11,7 @@ S = "${RPIFW_S}"
 do_install(){
     install -m 0755 -d ${D}${libdir}
     install -m 0755 ${S}/opt/vc/lib/*.so ${D}${libdir}
+    rm -f ${D}${libdir}/libGLES* ${D}${libdir}/libEGL* ${D}${libdir}/libWFC.so ${D}${libdir}/libOpenVG.so
 }
 
 FILES:${PN} = "${libdir}"

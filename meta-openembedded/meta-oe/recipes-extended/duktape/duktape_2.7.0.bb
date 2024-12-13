@@ -11,6 +11,8 @@ inherit ptest
 
 SRC_URI[sha256sum] = "90f8d2fa8b5567c6899830ddef2c03f3c27960b11aca222fa17aa7ac613c2890"
 
+UPSTREAM_CHECK_URI = "https://duktape.org/download"
+
 EXTRA_OEMAKE = "INSTALL_PREFIX='${prefix}' DESTDIR='${D}' LIBDIR='/${baselib}'"
 
 do_compile () {

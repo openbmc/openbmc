@@ -23,6 +23,11 @@ EXTRA_OECMAKE:append:class-target = " -DFLATBUFFERS_FLATC_EXECUTABLE=${STAGING_B
 
 inherit cmake python3native
 
+rm_flatc_cmaketarget_for_target() {
+    rm -f "${SYSROOT_DESTDIR}/${libdir}/cmake/flatbuffers/FlatcTargets.cmake"
+}
+SYSROOT_PREPROCESS_FUNCS:class-target += "rm_flatc_cmaketarget_for_target"
+
 FILES:${PN}-compiler = "${bindir}"
 
 BBCLASSEXTEND = "native nativesdk"

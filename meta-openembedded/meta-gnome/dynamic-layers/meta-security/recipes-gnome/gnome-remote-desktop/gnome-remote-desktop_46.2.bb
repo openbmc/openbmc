@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 GNOMEBASEBUILDCLASS = "meson"
 
-inherit gnomebase gettext gsettings features_check useradd
+inherit gnomebase gettext gsettings features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl polkit"
 
@@ -35,16 +35,6 @@ PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false,pipewire-native wireplumber-n
 PACKAGECONFIG[vnc] = "-Dvnc=true,-Dvnc=false,libvncserver"
 PACKAGECONFIG[rdp] = "-Drdp=true,-Drdp=false,freerdp3 fuse3 libxkbcommon"
 PACKAGECONFIG[systemd] = "-Dsystemd=true,-Dsystemd=false,systemd"
-
-USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 polkitd"
-
-do_install:append() {
-    if [ -d ${D}${datadir}/polkit-1/rules.d ]; then
-        chmod 700 ${D}${datadir}/polkit-1/rules.d
-        chown polkitd:root ${D}${datadir}/polkit-1/rules.d
-    fi
-}
 
 PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
 FILES:${PN} += "${systemd_user_unitdir} ${systemd_system_unitdir} ${datadir} ${libdir}/sysusers.d ${libdir}/tmpfiles.d"

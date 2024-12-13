@@ -6,12 +6,15 @@ DEPENDS = "libgfortran"
 
 SRC_URI = "file://hello.f95"
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 # These set flags that Fortran doesn't support
 SECURITY_CFLAGS = ""
 SECURITY_LDFLAGS = ""
 
 do_compile() {
-	${FC} ${LDFLAGS} ${UNPACKDIR}/hello.f95 -o ${B}/fortran-hello
+	${FC} ${LDFLAGS} hello.f95 -o ${B}/fortran-hello
 }
 
 do_install() {

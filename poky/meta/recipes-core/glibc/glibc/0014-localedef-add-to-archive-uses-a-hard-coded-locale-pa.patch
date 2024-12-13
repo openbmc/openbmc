@@ -1,4 +1,4 @@
-From f4b1d6429298c0f8a2aa29ff559eb2093ea0188f Mon Sep 17 00:00:00 2001
+From ccac9ff221fa08dbe330ae75a570da33edaaac4e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:42:06 -0700
 Subject: [PATCH] localedef --add-to-archive uses a hard-coded locale path

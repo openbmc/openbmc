@@ -1,4 +1,4 @@
-Upstream-Status: Backport
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 --- tcp-wrappers-7.6-ipv6.1.orig/safe_finger.c
 +++ tcp-wrappers-7.6-ipv6.1/safe_finger.c

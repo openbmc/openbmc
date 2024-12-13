@@ -1,0 +1,84 @@
+From b18a3c183d20812933d192d4b0d622b11ef2bf29 Mon Sep 17 00:00:00 2001
+From: Peter Hoyes <Peter.Hoyes@arm.com>
+Date: Wed, 1 May 2024 09:16:32 +0100
+Subject: [PATCH] arm: Move sev() and wfe() definitions to common Arm header
+ file
+
+The sev() and wfe() asm macros are currently defined only for
+mach-exynos. As these are common Arm instructions, move them to the
+common asm/system.h header file, for both Armv7 and Armv8, so they
+can be used by other machines.
+
+wfe may theoretically trigger a context switch if an interrupt occurs
+so add a memory barrier to this call.
+
+Signed-off-by: Peter Hoyes <Peter.Hoyes@arm.com>
+Reviewed-by: Andre Przywara<andre.przywara@arm.com>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ arch/arm/include/asm/system.h              |  9 +++++++++
+ arch/arm/mach-exynos/include/mach/system.h | 19 -------------------
+ 2 files changed, 9 insertions(+), 19 deletions(-)
+
+diff --git a/arch/arm/include/asm/system.h b/arch/arm/include/asm/system.h
+index 43f7503571d7..51123c296843 100644
+--- a/arch/arm/include/asm/system.h
++++ b/arch/arm/include/asm/system.h
+@@ -154,6 +154,13 @@ enum dcache_option {
+ 	"wfi" : : : "memory");		\
+ 	})
+ 
++#define wfe()				\
++	({asm volatile(			\
++	"wfe" : : : "memory");		\
++	})
++
++#define sev() asm volatile("sev")
++
+ static inline unsigned int current_el(void)
+ {
+ 	unsigned long el;
+@@ -369,6 +376,8 @@ void switch_to_hypervisor_ret(void);
+ 
+ #ifdef __ARM_ARCH_7A__
+ #define wfi() __asm__ __volatile__ ("wfi" : : : "memory")
++#define wfe() __asm__ __volatile__ ("wfe" : : : "memory")
++#define sev() __asm__ __volatile__ ("sev")
+ #else
+ #define wfi()
+ #endif
+diff --git a/arch/arm/mach-exynos/include/mach/system.h b/arch/arm/mach-exynos/include/mach/system.h
+index 5d0bebac5733..0aed4c3e2bf6 100644
+--- a/arch/arm/mach-exynos/include/mach/system.h
++++ b/arch/arm/mach-exynos/include/mach/system.h
+@@ -36,25 +36,6 @@ struct exynos5_sysreg {
+ 
+ #define USB20_PHY_CFG_HOST_LINK_EN	(1 << 0)
+ 
+-/*
+- * This instruction causes an event to be signaled to all cores
+- * within a multiprocessor system. If SEV is implemented,
+- * WFE must also be implemented.
+- */
+-#define sev() __asm__ __volatile__ ("sev\n\t" : : );
+-/*
+- * If the Event Register is not set, WFE suspends execution until
+- * one of the following events occurs:
+- * - an IRQ interrupt, unless masked by the CPSR I-bit
+- * - an FIQ interrupt, unless masked by the CPSR F-bit
+- * - an Imprecise Data abort, unless masked by the CPSR A-bit
+- * - a Debug Entry request, if Debug is enabled
+- * - an Event signaled by another processor using the SEV instruction.
+- * If the Event Register is set, WFE clears it and returns immediately.
+- * If WFE is implemented, SEV must also be implemented.
+- */
+-#define wfe() __asm__ __volatile__ ("wfe\n\t" : : );
+-
+ /* Move 0xd3 value to CPSR register to enable SVC mode */
+ #define svc32_mode_en() __asm__ __volatile__				\
+ 			("@ I&F disable, Mode: 0x13 - SVC\n\t"		\
+-- 
+2.30.2
+

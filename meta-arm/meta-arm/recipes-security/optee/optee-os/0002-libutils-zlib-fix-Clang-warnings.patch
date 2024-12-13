@@ -1,0 +1,64 @@
+From 47d5e6cbd61a38d1c31538e6b1775b901273fdec Mon Sep 17 00:00:00 2001
+From: Jerome Forissier <jerome.forissier@linaro.org>
+Date: Fri, 14 Jun 2024 18:40:53 +0200
+Subject: [PATCH 2/2] libutils, zlib: fix Clang warnings
+
+Clang 18.1.6 reports the following warnings:
+
+   CC      out/arm/ldelf-lib/libutils/isoc/bget_malloc.o
+ In file included from lib/libutils/isoc/bget_malloc.c:127:
+ lib/libutils/isoc/bget.c:607:7: warning: a function definition without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+   607 | void *bget(requested_align, hdr_size, requested_size, poolset)
+       |       ^
+
+And same with lib/zlib/{adler32.c,inffast.c,inflate.c,zutil.c}.
+
+In addition, zutil.c causes:
+
+  CC      out/arm/core/lib/zlib/zutil.o
+core/lib/zlib/zutil.c:28:33: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   28 | const char * ZEXPORT zlibVersion()
+      |                                 ^
+      |                                  void
+
+Add -Wno-deprecated-non-prototype to libutils' bget_malloc.c to silence
+the first series, and simply remove -Wstrict-prototypes (added by
+default by mk/compile.mk) when building zlib.
+
+Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+Acked-by: Joakim Bech <joakim.bech@linaro.org>
+Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+Upstream-Status: Backport
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+
+---
+ core/lib/zlib/sub.mk     | 2 ++
+ lib/libutils/isoc/sub.mk | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/core/lib/zlib/sub.mk b/core/lib/zlib/sub.mk
+index d4f225dfbfc4..399544d02e20 100644
+--- a/core/lib/zlib/sub.mk
++++ b/core/lib/zlib/sub.mk
+@@ -6,3 +6,5 @@ srcs-y += inftrees.c
+ srcs-y += zutil.c
+ cflags-remove-y += -Wold-style-definition
+ cflags-remove-y += -Wswitch-default
++cflags-remove-y += -Wstrict-prototypes
++cflags-y += $(call cc-option,-Wno-deprecated-non-prototype)
+diff --git a/lib/libutils/isoc/sub.mk b/lib/libutils/isoc/sub.mk
+index ef1ca5da8cf0..705090211627 100644
+--- a/lib/libutils/isoc/sub.mk
++++ b/lib/libutils/isoc/sub.mk
+@@ -3,6 +3,7 @@ global-incdirs-y += include
+ srcs-y += bget_malloc.c
+ cflags-remove-bget_malloc.c-y += -Wold-style-definition -Wredundant-decls
+ cflags-bget_malloc.c-y += -Wno-sign-compare -Wno-cast-align
++cflags-bget_malloc.c-y += $(call cc-option,-Wno-deprecated-non-prototype)
+ ifeq ($(sm),core)
+ cflags-remove-bget_malloc.c-y += $(cflags_kasan)
+ endif
+-- 
+2.39.5
+

@@ -1,0 +1,29 @@
+From 887bd1b60720f02e937c57568d7ef4d3df4b00e8 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 24 Jun 2024 11:27:30 +0800
+Subject: [PATCH] CMakeLists.txt: fix installation directory for systemd unit
+ file
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fdeda6eb4..77645ecd4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -637,7 +637,7 @@ if(NOT WIN32)
+ 			configure_file("oscap-remediate.service.in" "oscap-remediate.service" @ONLY)
+ 			install(FILES
+ 				${CMAKE_CURRENT_BINARY_DIR}/oscap-remediate.service
+-				DESTINATION ${CMAKE_INSTALL_PREFIX}/${SYSTEMD_UNITDIR}
++				DESTINATION ${SYSTEMD_UNITDIR}
+ 			)
+ 		endif()
+ 	endif()
+-- 
+2.25.1
+

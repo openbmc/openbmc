@@ -24,6 +24,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-flexcache \
     python3-flexparser \
     python3-freezegun \
+    python3-fsspec \
     python3-geojson \
     python3-google-auth-oauthlib \
     python3-gpiod \
@@ -74,6 +75,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-tomlkit \
     python3-trustme \
     python3-typeguard \
+    python3-tzdata \
     python3-ujson \
     python3-u-msgpack-python \
     python3-unidiff \

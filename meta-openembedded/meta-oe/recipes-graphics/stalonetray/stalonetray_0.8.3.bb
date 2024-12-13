@@ -11,6 +11,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2"
 SRC_URI[md5sum] = "ae95dbbacc2620e032acea8abab8c9ef"
 SRC_URI[sha256sum] = "36548a588b2d466913423245dda6ffb6313132cd0cec635a117d37b3dab5fd4c"
 
+UPSTREAM_CHECK_REGEX = "files/v(?P<pver>\d+(\.\d+)+)"
+
 inherit autotools features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"

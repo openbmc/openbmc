@@ -1,4 +1,4 @@
-From d479020609329cdc7fa3675bc3daf072401fefae Mon Sep 17 00:00:00 2001
+From aea8ba15afba280c9bc5ae22828fae4eed09db41 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 15 Jan 2023 00:16:25 -0800
 Subject: [PATCH] Define alignof using _Alignof when using C11 or newer

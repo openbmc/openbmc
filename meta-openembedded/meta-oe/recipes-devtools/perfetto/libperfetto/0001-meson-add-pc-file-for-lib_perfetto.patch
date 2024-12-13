@@ -1,0 +1,53 @@
+From 027f90dc9386ec08f2a5107025683e5fed6f3444 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 17 Oct 2022 19:20:53 +0200
+Subject: [PATCH] meson: add PC file for lib_perfetto
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+Upstream-Status: Pending
+
+ meson.build | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 8fb1e26275..3ef3ebf27d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -19,8 +19,11 @@
+ project(
+     'perfetto',
+     ['cpp'],
++    version: '47.0'
+ )
+ 
++soversion = meson.project_version()
++
+ fs = import('fs')
+ 
+ if not fs.is_dir('sdk')
+@@ -35,8 +38,9 @@ if host_machine.system() == 'android'
+   deps_perfetto += cpp.find_library('log')
+ endif
+ 
+-lib_perfetto = static_library(
++lib_perfetto = shared_library(
+     'perfetto',
++    version: soversion,
+     sources: 'sdk/perfetto.cc',
+     dependencies: deps_perfetto,
+     install: true,
+@@ -50,6 +54,10 @@ dir_perfetto_trace = join_paths(meson.current_source_dir(),
+ 
+ install_data(dir_perfetto_trace / 'perfetto_trace.proto')
+ 
++install_headers('sdk/perfetto.h')
++pkg = import('pkgconfig')
++pkg.generate(lib_perfetto)
++
+ dep_perfetto = declare_dependency(
+     link_with: lib_perfetto,
+     include_directories: inc_perfetto,
+-- 
+2.43.0
+

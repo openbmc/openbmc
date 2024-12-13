@@ -1,4 +1,4 @@
-From ea179d83b0aa62719d90748cd1fb260f40055f15 Mon Sep 17 00:00:00 2001
+From 9cc13bdcb71cd16d2873637c491e07c01de9a3ea Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Mon, 13 Jun 2022 22:44:28 +0800
 Subject: [PATCH] configure.ac: eliminate build path from openvpn --version
@@ -31,10 +31,10 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 2f5f6bc..eddcbc5 100644
+index df16c43..623ca65 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1377,7 +1377,7 @@ if test "${enable_async_push}" = "yes"; then
+@@ -1463,7 +1463,7 @@ if test "${enable_async_push}" = "yes"; then
  	esac
  fi
  
@@ -43,6 +43,3 @@ index 2f5f6bc..eddcbc5 100644
  AC_DEFINE_UNQUOTED([CONFIGURE_DEFINES], ["`echo ${CONFIGURE_DEFINES}`"], [Configuration settings])
  
  TAP_WIN_COMPONENT_ID="PRODUCT_TAP_WIN_COMPONENT_ID"
--- 
-2.25.1
-

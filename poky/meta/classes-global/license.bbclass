@@ -18,8 +18,14 @@ LICENSE_CREATE_PACKAGE ??= "0"
 LICENSE_PACKAGE_SUFFIX ??= "-lic"
 LICENSE_FILES_DIRECTORY ??= "${datadir}/licenses/"
 
+LICENSE_DEPLOY_PATHCOMPONENT = "${SSTATE_PKGARCH}"
+LICENSE_DEPLOY_PATHCOMPONENT:class-cross = "native"
+LICENSE_DEPLOY_PATHCOMPONENT:class-native = "native"
+# Ensure the *value* of SSTATE_PKGARCH is captured as it is used in the output paths
+LICENSE_DEPLOY_PATHCOMPONENT[vardepvalue] += "${LICENSE_DEPLOY_PATHCOMPONENT}"
+
 addtask populate_lic after do_patch before do_build
-do_populate_lic[dirs] = "${LICSSTATEDIR}/${PN}"
+do_populate_lic[dirs] = "${LICSSTATEDIR}/${LICENSE_DEPLOY_PATHCOMPONENT}/${PN}"
 do_populate_lic[cleandirs] = "${LICSSTATEDIR}"
 
 python do_populate_lic() {
@@ -29,7 +35,7 @@ python do_populate_lic() {
     lic_files_paths = find_license_files(d)
 
     # The base directory we wrangle licenses to
-    destdir = os.path.join(d.getVar('LICSSTATEDIR'), d.getVar('SSTATE_PKGARCH'), d.getVar('PN'))
+    destdir = os.path.join(d.getVar('LICSSTATEDIR'), d.getVar('LICENSE_DEPLOY_PATHCOMPONENT'), d.getVar('PN'))
     copy_license_files(lic_files_paths, destdir)
     info = get_recipe_info(d)
     with open(os.path.join(destdir, "recipeinfo"), "w") as f:
@@ -39,7 +45,7 @@ python do_populate_lic() {
 }
 
 PSEUDO_IGNORE_PATHS .= ",${@','.join(((d.getVar('COMMON_LICENSE_DIR') or '') + ' ' + (d.getVar('LICENSE_PATH') or '') + ' ' + d.getVar('COREBASE') + '/meta/COPYING').split())}"
-# it would be better to copy them in do_install:append, but find_license_filesa is python
+# it would be better to copy them in do_install:append, but find_license_files is python
 python perform_packagecopy:prepend () {
     enabled = oe.data.typed_value('LICENSE_CREATE_PACKAGE', d)
     if d.getVar('CLASSOVERRIDE') == 'class-target' and enabled:
@@ -149,14 +155,14 @@ def find_license_files(d):
             # and "with exceptions" being *
             # we'll just strip out the modifier and put
             # the base license.
-            find_license(node.s.replace("+", "").replace("*", ""))
+            find_licenses(node.s.replace("+", "").replace("*", ""))
             self.generic_visit(node)
 
         def visit_Constant(self, node):
-            find_license(node.value.replace("+", "").replace("*", ""))
+            find_licenses(node.value.replace("+", "").replace("*", ""))
             self.generic_visit(node)
 
-    def find_license(license_type):
+    def find_licenses(license_type):
         try:
             bb.utils.mkdirhier(gen_lic_dest)
         except:

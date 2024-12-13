@@ -6,23 +6,23 @@ Release notes for Yocto-4.1.4 (Langdale)
 Security Fixes in Yocto-4.1.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  cve-extra-exclusions/linux-yocto: Ignore :cve:`2020-27784`, :cve:`2021-3669`, :cve:`2021-3759`, :cve:`2021-4218`, :cve:`2022-0480`, :cve:`2022-1184`, :cve:`2022-1462`, :cve:`2022-2308`, :cve:`2022-2327`, :cve:`2022-26365`, :cve:`2022-2663`, :cve:`2022-2785`, :cve:`2022-3176`, :cve:`2022-33740`, :cve:`2022-33741`, :cve:`2022-33742`, :cve:`2022-3526`, :cve:`2022-3563`, :cve:`2022-3621`, :cve:`2022-3623`, :cve:`2022-3624`, :cve:`2022-3625`, :cve:`2022-3629`, :cve:`2022-3630`, :cve:`2022-3633`, :cve:`2022-3635`, :cve:`2022-3636`, :cve:`2022-3637`, :cve:`2022-3646` and :cve:`2022-3649`
--  cve-extra-exclusions/linux-yocto 5.15: Ignore :cve:`2022-3435`, :cve:`2022-3534`, :cve:`2022-3564`, :cve:`2022-3564`, :cve:`2022-3619`, :cve:`2022-3640`, :cve:`2022-42895`, :cve:`2022-42896`, :cve:`2022-4382`, :cve:`2023-0266` and :cve:`2023-0394`
--  epiphany: Fix :cve:`2023-26081`
--  git: Ignore :cve:`2023-22743`
--  go: Fix :cve:`2022-41722`, :cve:`2022-41723`, :cve:`2022-41724`, :cve:`2022-41725` and :cve:`2023-24532`
--  harfbuzz: Fix :cve:`2023-25193`
--  libmicrohttpd: Fix :cve:`2023-27371`
--  libxml2: Fix :cve:`2022-40303` and :cve:`2022-40304`
--  openssl: Fix :cve:`2023-0464`, :cve:`2023-0465` and :cve:`2023-0466`
--  python3-setuptools: Fix :cve:`2022-40897`
--  qemu: Fix :cve:`2022-4144`
--  screen: Fix :cve:`2023-24626`
--  shadow: Ignore :cve:`2016-15024`
--  tiff: Fix :cve:`2022-48281`, :cve:`2023-0795`, :cve:`2023-0796`, :cve:`2023-0797`, :cve:`2023-0798`, :cve:`2023-0799`, :cve:`2023-0800`, :cve:`2023-0801`, :cve:`2023-0802`, :cve:`2023-0803` and :cve:`2023-0804`
--  vim: Fix :cve:`2023-1127`, :cve:`2023-1170`, :cve:`2023-1175`, :cve:`2023-1264` and :cve:`2023-1355`
--  xdg-utils: Fix :cve:`2022-4055`
--  xserver-xorg: Fix for :cve:`2023-1393`
+-  cve-extra-exclusions/linux-yocto: Ignore :cve_nist:`2020-27784`, :cve_nist:`2021-3669`, :cve_nist:`2021-3759`, :cve_nist:`2021-4218`, :cve_nist:`2022-0480`, :cve_nist:`2022-1184`, :cve_nist:`2022-1462`, :cve_nist:`2022-2308`, :cve_nist:`2022-2327`, :cve_nist:`2022-26365`, :cve_nist:`2022-2663`, :cve_nist:`2022-2785`, :cve_nist:`2022-3176`, :cve_nist:`2022-33740`, :cve_nist:`2022-33741`, :cve_nist:`2022-33742`, :cve_nist:`2022-3526`, :cve_nist:`2022-3563`, :cve_nist:`2022-3621`, :cve_nist:`2022-3623`, :cve_nist:`2022-3624`, :cve_nist:`2022-3625`, :cve_nist:`2022-3629`, :cve_nist:`2022-3630`, :cve_nist:`2022-3633`, :cve_nist:`2022-3635`, :cve_nist:`2022-3636`, :cve_nist:`2022-3637`, :cve_nist:`2022-3646` and :cve_nist:`2022-3649`
+-  cve-extra-exclusions/linux-yocto 5.15: Ignore :cve_nist:`2022-3435`, :cve_nist:`2022-3534`, :cve_nist:`2022-3564`, :cve_nist:`2022-3564`, :cve_nist:`2022-3619`, :cve_nist:`2022-3640`, :cve_nist:`2022-42895`, :cve_nist:`2022-42896`, :cve_nist:`2022-4382`, :cve_nist:`2023-0266` and :cve_nist:`2023-0394`
+-  epiphany: Fix :cve_nist:`2023-26081`
+-  git: Ignore :cve_nist:`2023-22743`
+-  go: Fix :cve_nist:`2022-41722`, :cve_nist:`2022-41723`, :cve_nist:`2022-41724`, :cve_nist:`2022-41725` and :cve_nist:`2023-24532`
+-  harfbuzz: Fix :cve_nist:`2023-25193`
+-  libmicrohttpd: Fix :cve_nist:`2023-27371`
+-  libxml2: Fix :cve_nist:`2022-40303` and :cve_nist:`2022-40304`
+-  openssl: Fix :cve_nist:`2023-0464`, :cve_nist:`2023-0465` and :cve_nist:`2023-0466`
+-  python3-setuptools: Fix :cve_nist:`2022-40897`
+-  qemu: Fix :cve_nist:`2022-4144`
+-  screen: Fix :cve_nist:`2023-24626`
+-  shadow: Ignore :cve_nist:`2016-15024`
+-  tiff: Fix :cve_nist:`2022-48281`, :cve_nist:`2023-0795`, :cve_nist:`2023-0796`, :cve_nist:`2023-0797`, :cve_nist:`2023-0798`, :cve_nist:`2023-0799`, :cve_nist:`2023-0800`, :cve_nist:`2023-0801`, :cve_nist:`2023-0802`, :cve_nist:`2023-0803` and :cve_nist:`2023-0804`
+-  vim: Fix :cve_nist:`2023-1127`, :cve_nist:`2023-1170`, :cve_nist:`2023-1175`, :cve_nist:`2023-1264` and :cve_nist:`2023-1355`
+-  xdg-utils: Fix :cve_nist:`2022-4055`
+-  xserver-xorg: Fix for :cve_nist:`2023-1393`
 
 
 Fixes in Yocto-4.1.4

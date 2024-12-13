@@ -1,4 +1,4 @@
-From 7f7facb85bd65adec24230fe8ca7f6a9863a1fd0 Mon Sep 17 00:00:00 2001
+From e6267676addd27f3c02667116185211d711ef940 Mon Sep 17 00:00:00 2001
 From: Christopher Larson <chris_larson@mentor.com>
 Date: Thu, 5 May 2016 10:59:07 -0700
 Subject: [PATCH] Obey LDFLAGS for the link of libruby

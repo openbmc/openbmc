@@ -1,10 +1,10 @@
-From b139e03ac2f72e644e547c7ee9b1514383af4d97 Mon Sep 17 00:00:00 2001
+From 972086935d6c7f6e603004fd7f94bd13a65f470c Mon Sep 17 00:00:00 2001
 From: Andrei Dinu <andrei.adrianx.dinu@intel.com>
 Date: Wed, 30 Jan 2013 15:22:04 +0200
 Subject: [PATCH] When /etc/ld.so.cache is writeable by user running bitbake
- then it creates invalid cache (in my case libstdc++.so
- cannot be found after building zlib(-native) and I have to
- call touch */libstdc++.so && /sbin/ldconfig to fix it.
+ then it creates invalid cache (in my case libstdc++.so cannot be found after
+ building zlib(-native) and I have to call touch */libstdc++.so &&
+ /sbin/ldconfig to fix it.
 
 So remove ldconfig call from make install-libs
 
@@ -15,11 +15,11 @@ Upstream-Status: Inappropriate [disable feature]
 Signed-off-by: Scott Garman <scott.a.garman@intel.com>
 Signed-off-by: Andrei Dinu <andrei.adrianx.dinu@intel.com>
 ---
- lib/Makefile.elf-lib |    3 ---
+ lib/Makefile.elf-lib | 3 ---
  1 file changed, 3 deletions(-)
 
 diff --git a/lib/Makefile.elf-lib b/lib/Makefile.elf-lib
-index 78479d3..4a4a5ac 100644
+index f850f3dd..cc1e6a70 100644
 --- a/lib/Makefile.elf-lib
 +++ b/lib/Makefile.elf-lib
 @@ -50,8 +50,6 @@ install-shlibs install:: $(ELF_LIB) installdirs-elf-lib $(DEP_INSTALL_SYMLINK)
@@ -39,6 +39,3 @@ index 78479d3..4a4a5ac 100644
  
  clean::
  	$(RM) -rf elfshared
--- 
-1.7.9.5
-
