@@ -5,8 +5,6 @@ DISTRO_CODENAME ?= "scarthgap"
 
 DISTROOVERRIDES .= ":openbmc-phosphor"
 
-TCLIBCAPPEND = ""
-
 QEMU_TARGETS ?= "arm aarch64 i386 riscv32 riscv64 ppc64le x86_64"
 
 PREMIRRORS ??= "\
