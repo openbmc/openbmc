@@ -64,7 +64,7 @@ class TestLayerDetailsPage(SeleniumTestCase):
                            args=(self.project.pk,
                                  self.imported_layer_version.pk))
 
-    def _edit_layerdetails(self):
+    def test_edit_layerdetails_page(self):
         """ Edit all the editable fields for the layer refresh the page and
         check that the new values exist"""
 
@@ -100,24 +100,17 @@ class TestLayerDetailsPage(SeleniumTestCase):
                             (self.initial_values, value))
 
             # Make sure the input visible beofre sending keys
-            self.wait_until_visible("#layer-git input[type=text]")
+            self.wait_until_clickable("#layer-git input[type=text]")
             inputs.send_keys("-edited")
 
         # Save the new values
         for save_btn in self.find_all(".change-btn"):
             save_btn.click()
 
-        try:
-            self.wait_until_visible("#save-changes-for-switch", poll=3)
-            btn_save_chg_for_switch = self.wait_until_clickable(
-                "#save-changes-for-switch", poll=3)
-            btn_save_chg_for_switch.click()
-        except ElementClickInterceptedException:
-            self.skipTest(
-                "save-changes-for-switch click intercepted. Element not visible or maybe covered by another element.")
-        except TimeoutException:
-            self.skipTest(
-                "save-changes-for-switch is not clickable within the specified timeout.")
+        self.wait_until_visible("#save-changes-for-switch")
+        btn_save_chg_for_switch = self.wait_until_clickable(
+            "#save-changes-for-switch")
+        btn_save_chg_for_switch.click()
 
         self.wait_until_visible("#edit-layer-source")
 
@@ -147,17 +140,10 @@ class TestLayerDetailsPage(SeleniumTestCase):
         new_dir = "/home/test/my-meta-dir"
         dir_input.send_keys(new_dir)
 
-        try:
-            self.wait_until_visible("#save-changes-for-switch", poll=3)
-            btn_save_chg_for_switch = self.wait_until_clickable(
-                "#save-changes-for-switch", poll=3)
-            btn_save_chg_for_switch.click()
-        except ElementClickInterceptedException:
-            self.skipTest(
-                "save-changes-for-switch click intercepted. Element not properly visible or maybe behind another element.")
-        except TimeoutException:
-            self.skipTest(
-                "save-changes-for-switch is not clickable within the specified timeout.")
+        self.wait_until_visible("#save-changes-for-switch")
+        btn_save_chg_for_switch = self.wait_until_clickable(
+            "#save-changes-for-switch")
+        btn_save_chg_for_switch.click()
 
         self.wait_until_visible("#edit-layer-source")
 
@@ -168,12 +154,6 @@ class TestLayerDetailsPage(SeleniumTestCase):
                         "Expected %s in the dir value for layer directory" %
                         new_dir)
 
-    def test_edit_layerdetails_page(self):
-        try:
-            self._edit_layerdetails()
-        except ElementClickInterceptedException:
-            self.skipTest(
-                "ElementClickInterceptedException occured. Element not visible or maybe covered by another element.")
 
     def test_delete_layer(self):
         """ Delete the layer """
@@ -211,6 +191,7 @@ class TestLayerDetailsPage(SeleniumTestCase):
         self.get(self.url)
 
         # Add the layer
+        self.wait_until_clickable("#add-remove-layer-btn")
         self.click("#add-remove-layer-btn")
 
         notification = self.wait_until_visible("#change-notification-msg")
@@ -218,12 +199,17 @@ class TestLayerDetailsPage(SeleniumTestCase):
         expected_text = "You have added 1 layer to your project: %s" % \
             self.imported_layer_version.layer.name
 
-        self.assertTrue(expected_text in notification.text,
+        self.assertIn(expected_text, notification.text,
                         "Expected notification text %s not found was "
                         " \"%s\" instead" %
                         (expected_text, notification.text))
 
+        hide_button = self.find('#hide-alert')
+        hide_button.click()
+        self.wait_until_not_visible('#change-notification')
+
         # Remove the layer
+        self.wait_until_clickable("#add-remove-layer-btn")
         self.click("#add-remove-layer-btn")
 
         notification = self.wait_until_visible("#change-notification-msg")
@@ -231,7 +217,7 @@ class TestLayerDetailsPage(SeleniumTestCase):
         expected_text = "You have removed 1 layer from your project: %s" % \
             self.imported_layer_version.layer.name
 
-        self.assertTrue(expected_text in notification.text,
+        self.assertIn(expected_text, notification.text,
                         "Expected notification text %s not found was "
                         " \"%s\" instead" %
                         (expected_text, notification.text))

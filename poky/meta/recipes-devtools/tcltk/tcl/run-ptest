@@ -1,9 +1,8 @@
 #!/bin/sh
 
-# clock.test needs a timezone to be set
-export TZ="Europe/London"
-export TCL_LIBRARY=library
+export TCL_LIBRARY=/usr/lib/tcl/ptest/library
 export ERROR_ON_FAILURES=1
+export LANG=en-US.UTF-8
 
 # Some tests are overly strict with timings and fail on loaded systems.
 SKIP=""
@@ -15,8 +14,12 @@ SKIP="$SKIP cmdMZ-6.6"
 SKIP="$SKIP exit-1.\*"
 # 15407 15421
 SKIP="$SKIP \*io-46.1"
+# io-13.6 explicitly says it can fail on slow/loaded machines
+SKIP="$SKIP io-13.6"
 # 14825
 SKIP="$SKIP socket-\* socket_inet-\*"
+# tries to access google.com
+SKIP="$SKIP httpProxy-\*"
 
 for i in tests/*.test; do
     i=$(basename $i)

@@ -53,11 +53,6 @@ class WgetProgressHandler(bb.progress.LineFilterProgressHandler):
 class Wget(FetchMethod):
     """Class to fetch urls via 'wget'"""
 
-    # CDNs like CloudFlare may do a 'browser integrity test' which can fail
-    # with the standard wget/urllib User-Agent, so pretend to be a modern
-    # browser.
-    user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0"
-
     def check_certs(self, d):
         """
         Should certificates be checked?
@@ -87,7 +82,7 @@ class Wget(FetchMethod):
         if not ud.localfile:
             ud.localfile = d.expand(urllib.parse.unquote(ud.host + ud.path).replace("/", "."))
 
-        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 30"
+        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 100"
 
         if ud.type == 'ftp' or ud.type == 'ftps':
             self.basecmd += " --passive-ftp"
@@ -244,7 +239,12 @@ class Wget(FetchMethod):
                         fetch.connection_cache.remove_connection(h.host, h.port)
                     raise urllib.error.URLError(err)
                 else:
-                    r = h.getresponse()
+                    try:
+                        r = h.getresponse()
+                    except TimeoutError as e:
+                        if fetch.connection_cache:
+                            fetch.connection_cache.remove_connection(h.host, h.port)
+                        raise TimeoutError(e)
 
                 # Pick apart the HTTPResponse object to get the addinfourl
                 # object initialized properly.
@@ -351,7 +351,7 @@ class Wget(FetchMethod):
                 # Some servers (FusionForge, as used on Alioth) require that the
                 # optional Accept header is set.
                 r.add_header("Accept", "*/*")
-                r.add_header("User-Agent", self.user_agent)
+                r.add_header("User-Agent", "bitbake/{}".format(bb.__version__))
                 def add_basic_auth(login_str, request):
                     '''Adds Basic auth to http request, pass in login:password as string'''
                     import base64
@@ -371,7 +371,7 @@ class Wget(FetchMethod):
                 except (FileNotFoundError, netrc.NetrcParseError):
                     pass
 
-                with opener.open(r, timeout=30) as response:
+                with opener.open(r, timeout=100) as response:
                     pass
             except (urllib.error.URLError, ConnectionResetError, TimeoutError) as e:
                 if try_again:
@@ -458,7 +458,7 @@ class Wget(FetchMethod):
         f = tempfile.NamedTemporaryFile()
         with tempfile.TemporaryDirectory(prefix="wget-index-") as workdir, tempfile.NamedTemporaryFile(dir=workdir, prefix="wget-listing-") as f:
             fetchcmd = self.basecmd
-            fetchcmd += " -O " + f.name + " --user-agent='" + self.user_agent + "' '" + uri + "'"
+            fetchcmd += " -O " + f.name + " '" + uri + "'"
             try:
                 self._runwget(ud, d, fetchcmd, True, workdir=workdir)
                 fetchresult = f.read()

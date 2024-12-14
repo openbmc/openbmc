@@ -1,0 +1,85 @@
+From 7e5b986cb7797a6535fe2471b9a5fb7c00821f51 Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Sun, 13 Oct 2024 01:00:10 +0200
+Subject: [PATCH] gimptool: allow default CC override
+
+From: Yoann Congal <yoann.congal@smile.fr>
+
+In OE, CC contains sysroot path. Storing CC in binary then leads to
+non-reproducibility.
+
+This commit add a new configure option "--with-default-cc='cmd'" for
+force the CC stored in gimptool to a reproducible value.
+
+Upstream-Status: Inappropriate [does not apply on master (upstream has moved to meson)]
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ app-tools/Makefile.am |  2 +-
+ configure.ac          | 13 +++++++++++++
+ tools/Makefile.am     |  2 +-
+ tools/gimptool.c      |  2 +-
+ 4 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/app-tools/Makefile.am b/app-tools/Makefile.am
+index a7cd4ce..81a3a00 100644
+--- a/app-tools/Makefile.am
++++ b/app-tools/Makefile.am
+@@ -67,7 +67,7 @@ AM_CPPFLAGS = \
+ 	-DMANDIR=\""$(mandir)"\"				\
+ 	-DGIMPPLUGINDIR=\""$(gimpplugindir)"\"			\
+ 	-DGIMPDATADIR=\""$(gimpdatadir)"\"			\
+-	-DCC=\""$(CC)"\"					\
++	-DDEFAULT_CC=\""@DEFAULT_CC@"\"				\
+ 	-DGIMPDIR=\""$(gimpdir)"\"				\
+ 	-DGIMP_PLUGIN_VERSION=\""$(GIMP_PLUGIN_VERSION)"\"	\
+ 	-I$(top_srcdir)						\
+diff --git a/configure.ac b/configure.ac
+index a88b7cc..d90b6db 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2457,6 +2457,19 @@ fi
+ AM_CONDITIONAL(DESKTOP_DATADIR, test "x$with_desktop_dir" != xno)
+ AC_SUBST(DESKTOP_DATADIR)
+ 
++######################
++# Determine default CC
++######################
++
++AC_ARG_WITH(default-cc, [ --with-default-cc="cmd" default CC to print in gimptool (default=CC)])
++
++if test "x$with_default_cc" != x; then
++  DEFAULT_CC=$with_default_cc
++else
++  DEFAULT_CC=CC
++fi
++
++AC_SUBST(DEFAULT_CC)
+ 
+ #####################
+ # Check for XML tools
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index 420b9b1..ccabde8 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -87,7 +87,7 @@ AM_CPPFLAGS = \
+ 	-DMANDIR=\""$(mandir)"\"				\
+ 	-DGIMPPLUGINDIR=\""$(gimpplugindir)"\"			\
+ 	-DGIMPDATADIR=\""$(gimpdatadir)"\"			\
+-	-DCC=\""$(CC)"\"					\
++	-DDEFAULT_CC=\""@DEFAULT_CC@"\"				\
+ 	-DGIMPDIR=\""$(gimpdir)"\"				\
+ 	-DGIMP_PLUGIN_VERSION=\""$(GIMP_PLUGIN_VERSION)"\"	\
+ 	-I$(top_srcdir)						\
+diff --git a/tools/gimptool.c b/tools/gimptool.c
+index 21fc043..bbf3fa5 100644
+--- a/tools/gimptool.c
++++ b/tools/gimptool.c
+@@ -280,7 +280,7 @@ find_out_env_flags (void)
+   else if (msvc_syntax)
+     env_cc = "cl -MD";
+   else
+-    env_cc = CC;
++    env_cc = DEFAULT_CC;
+ 
+   if (g_ascii_strncasecmp (env_cc, "cl", 2)    == 0 &&
+       g_ascii_strncasecmp (env_cc, "clang", 5) != 0)

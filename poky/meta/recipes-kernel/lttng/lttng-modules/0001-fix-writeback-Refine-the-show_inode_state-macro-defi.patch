@@ -1,0 +1,68 @@
+From 4610de285daf887262a58683d8597668de62e676 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Thu, 17 Oct 2024 16:59:07 -0400
+Subject: [PATCH] fix: writeback: Refine the show_inode_state() macro
+ definition (v6.12)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See upstream commit :
+
+  commit 459ca85ae1feff78d1518344df88bb79a092780c
+  Author: Julian Sun <sunjunchao2870@gmail.com>
+  Date:   Wed Aug 28 16:13:59 2024 +0800
+
+    writeback: Refine the show_inode_state() macro definition
+
+    Currently, the show_inode_state() macro only prints
+    part of the state of inode->i_state. Let’s improve it
+    to display more of its state.
+
+Upstream-Status: Backport [commit 4610de285daf887262a58]
+
+Change-Id: Idaebd56f5775205f8a5c76e117c5ab65f7f1754b
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/instrumentation/events/writeback.h | 24 +++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/writeback.h b/include/instrumentation/events/writeback.h
+index c4510b44..cad01994 100644
+--- a/include/instrumentation/events/writeback.h
++++ b/include/instrumentation/events/writeback.h
+@@ -71,7 +71,29 @@ static inline struct backing_dev_info *lttng_inode_to_bdi(struct inode *inode)
+  * changed by an upstream kernel, the fact that we have a redefinition here
+  * will generate a compiler warning.
+  */
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,9,0) || \
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,12,0))
++#define show_inode_state(state)					\
++	__print_flags(state, "|",				\
++		{I_DIRTY_SYNC,		"I_DIRTY_SYNC"},	\
++		{I_DIRTY_DATASYNC,	"I_DIRTY_DATASYNC"},	\
++		{I_DIRTY_PAGES,		"I_DIRTY_PAGES"},	\
++		{I_NEW,			"I_NEW"},		\
++		{I_WILL_FREE,		"I_WILL_FREE"},		\
++		{I_FREEING,		"I_FREEING"},		\
++		{I_CLEAR,		"I_CLEAR"},		\
++		{I_SYNC,		"I_SYNC"},		\
++		{I_DIRTY_TIME,		"I_DIRTY_TIME"},	\
++		{I_REFERENCED,		"I_REFERENCED"},	\
++		{I_LINKABLE,		"I_LINKABLE"},		\
++		{I_WB_SWITCH,		"I_WB_SWITCH"},		\
++		{I_OVL_INUSE,		"I_OVL_INUSE"},		\
++		{I_CREATING,		"I_CREATING"},		\
++		{I_DONTCACHE,		"I_DONTCACHE"},		\
++		{I_SYNC_QUEUED,		"I_SYNC_QUEUED"},	\
++		{I_PINNING_NETFS_WB,	"I_PINNING_NETFS_WB"},	\
++		{I_LRU_ISOLATING,	"I_LRU_ISOLATING"}	\
++	)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,9,0) || \
+ 	LTTNG_KERNEL_RANGE(4,14,218, 4,15,0) ||			\
+ 	LTTNG_KERNEL_RANGE(4,19,172, 4,20,0) ||			\
+ 	LTTNG_KERNEL_RANGE(5,4,94, 5,5,0) ||			\
+-- 
+2.39.2
+

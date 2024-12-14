@@ -9,6 +9,7 @@ inherit pypi setuptools3 ptest
 
 SRC_URI += " \
 	file://run-ptest \
+        file://py3.13.patch \
 "
 
 RDEPENDS:${PN}-ptest += " \

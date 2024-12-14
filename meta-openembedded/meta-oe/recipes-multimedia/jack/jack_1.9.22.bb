@@ -43,7 +43,7 @@ do_install:append() {
 	fi
 }
 
-PACKAGES =+ "libjack jack-server jack-utils"
+PACKAGES =+ "libjack jack-server"
 
 RDEPENDS:jack-dev:remove = "${PN} (= ${EXTENDPKGV})"
 
@@ -53,7 +53,6 @@ FILES:jack-server = " \
     ${bindir}/jackdbus \
     ${bindir}/jackd \
 "
-FILES:jack-utils = "${bindir}/*"
 
 FILES:${PN}-doc += " ${datadir}/jack-audio-connection-kit/reference/html/*"
 

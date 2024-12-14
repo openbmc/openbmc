@@ -1,7 +1,7 @@
-From dc3652c0abcdf8573fd044907b19d8eda7ca1124 Mon Sep 17 00:00:00 2001
+From 33393507ba8209f0d6b85b391c525b4c70807275 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 3 Jul 2023 12:33:16 +0000
-Subject: [PATCH] [liftoff] Correct function signatures
+Subject: [PATCH] Correct function signatures
 
 Fixes builds on mips where clang reports an error
 ../deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h:661:5: error: no matching member function for call to 'Move'
@@ -13,15 +13,15 @@ Upstream-Status: Submitted [https://chromium-review.googlesource.com/c/v8/v8/+/3
 Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
 ---
  deps/v8/src/wasm/baseline/liftoff-assembler.h               | 6 +++---
- deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h | 2 +-
- deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h | 2 +-
+ .../src/wasm/baseline/mips64/liftoff-assembler-mips64-inl.h | 2 +-
+ .../src/wasm/baseline/riscv/liftoff-assembler-riscv64-inl.h | 2 +-
  3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/deps/v8/src/wasm/baseline/liftoff-assembler.h b/deps/v8/src/wasm/baseline/liftoff-assembler.h
-index aef63c64..f2a11b01 100644
+index 7cb2f500..713d16db 100644
 --- a/deps/v8/src/wasm/baseline/liftoff-assembler.h
 +++ b/deps/v8/src/wasm/baseline/liftoff-assembler.h
-@@ -717,7 +717,7 @@ class LiftoffAssembler : public MacroAssembler {
+@@ -681,7 +681,7 @@ class LiftoffAssembler : public MacroAssembler {
    void FinishCall(const ValueKindSig*, compiler::CallDescriptor*);
  
    // Move {src} into {dst}. {src} and {dst} must be different.
@@ -30,7 +30,7 @@ index aef63c64..f2a11b01 100644
  
    // Parallel register move: For a list of tuples <dst, src, kind>, move the
    // {src} register of kind {kind} into {dst}. If {src} equals {dst}, ignore
-@@ -884,8 +884,8 @@ class LiftoffAssembler : public MacroAssembler {
+@@ -851,8 +851,8 @@ class LiftoffAssembler : public MacroAssembler {
    inline void MoveStackValue(uint32_t dst_offset, uint32_t src_offset,
                               ValueKind);
  
@@ -41,11 +41,24 @@ index aef63c64..f2a11b01 100644
  
    inline void Spill(int offset, LiftoffRegister, ValueKind);
    inline void Spill(int offset, WasmValue);
-diff --git a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
-index 96cba24c..53e1842d 100644
---- a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
-+++ b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
-@@ -592,7 +592,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
+diff --git a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64-inl.h b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64-inl.h
+index bd59f162..56b4d70c 100644
+--- a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64-inl.h
++++ b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64-inl.h
+@@ -672,7 +672,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
+     pinned.set(dst_op.rm());
+     LiftoffRegister tmp = kScratchReg2;
+     // Save original value.
+-    Move(tmp, src, type.value_type());
++    Move(tmp, src, type.value_type().kind());
+ 
+     src = tmp;
+     pinned.set(tmp);
+diff --git a/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64-inl.h b/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64-inl.h
+index a3c94af0..456e5334 100644
+--- a/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64-inl.h
++++ b/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64-inl.h
+@@ -452,7 +452,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
      pinned.set(dst_op.rm());
      LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
      // Save original value.
@@ -54,18 +67,3 @@ index 96cba24c..53e1842d 100644
  
      src = tmp;
      pinned.set(tmp);
-diff --git a/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h b/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h
-index 1d6ae09e..397e82b2 100644
---- a/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h
-+++ b/deps/v8/src/wasm/baseline/riscv/liftoff-assembler-riscv64.h
-@@ -286,7 +286,7 @@ void LiftoffAssembler::Store(Register dst_addr, Register offset_reg,
-     pinned.set(dst_op.rm());
-     LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
-     // Save original value.
--    Move(tmp, src, type.value_type());
-+    Move(tmp, src, type.value_type().kind());
- 
-     src = tmp;
-     pinned.set(tmp);
---
-2.40.0

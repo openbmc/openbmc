@@ -9,6 +9,7 @@ inherit autotools-brokensep
 DEPENDS += "alsa-lib chrpath-replacement-native"
 
 SRC_URI = "git://github.com/festvox/flite.git;protocol=https;branch=master"
+SRC_URI += "file://0001-Remove-defining-const-as-nothing.patch"
 
 SRCREV = "e9e2e37c329dbe98bfeb27a1828ef9a71fa84f88"
 
@@ -25,3 +26,5 @@ do_install:append() {
 }
 # | make[1]: *** No rule to make target 'flite_voice_list.c', needed by 'all'.  Stop.
 PARALLEL_MAKE = ""
+
+CLEANBROKEN = "1"

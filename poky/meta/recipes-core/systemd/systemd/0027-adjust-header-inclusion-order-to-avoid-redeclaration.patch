@@ -1,0 +1,76 @@
+From cf94d43572770007f95b832f477aa5a03624a1e5 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 2 Jul 2024 23:23:57 -0700
+Subject: [PATCH 27/27] adjust header inclusion order to avoid redeclaration
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/network/netdev/wireguard.c    | 2 +-
+ src/network/networkd-bridge-mdb.c | 3 ++-
+ src/network/networkd-route.c      | 6 +++---
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/network/netdev/wireguard.c b/src/network/netdev/wireguard.c
+index 94b659fd23..a78ad5762d 100644
+--- a/src/network/netdev/wireguard.c
++++ b/src/network/netdev/wireguard.c
+@@ -5,9 +5,9 @@
+ 
+ /* Make sure the net/if.h header is included before any linux/ one */
+ #include <net/if.h>
++#include <netinet/in.h>
+ //#include <linux/if_arp.h>
+ #include <linux/ipv6_route.h>
+-#include <netinet/in.h>
+ #include <sys/ioctl.h>
+ 
+ #include "sd-resolve.h"
+diff --git a/src/network/networkd-bridge-mdb.c b/src/network/networkd-bridge-mdb.c
+index 7ff4a18846..fe1a9cf888 100644
+--- a/src/network/networkd-bridge-mdb.c
++++ b/src/network/networkd-bridge-mdb.c
+@@ -2,7 +2,6 @@
+ 
+ /* Make sure the net/if.h header is included before any linux/ one */
+ #include <net/if.h>
+-#include <linux/if_bridge.h>
+ 
+ #include "netlink-util.h"
+ #include "networkd-bridge-mdb.h"
+@@ -13,6 +12,8 @@
+ #include "string-util.h"
+ #include "vlan-util.h"
+ 
++#include <linux/if_bridge.h>
++
+ #define STATIC_BRIDGE_MDB_ENTRIES_PER_NETWORK_MAX 1024U
+ 
+ /* remove MDB entry. */
+diff --git a/src/network/networkd-route.c b/src/network/networkd-route.c
+index d596fd81e6..0dc0d2a7a3 100644
+--- a/src/network/networkd-route.c
++++ b/src/network/networkd-route.c
+@@ -1,8 +1,5 @@
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
+ 
+-#include <linux/ipv6_route.h>
+-#include <linux/nexthop.h>
+-
+ #include "alloc-util.h"
+ #include "event-util.h"
+ #include "netlink-util.h"
+@@ -20,6 +17,9 @@
+ #include "vrf.h"
+ #include "wireguard.h"
+ 
++#include <linux/ipv6_route.h>
++#include <linux/nexthop.h>
++
+ static Route* route_detach_impl(Route *route) {
+         assert(route);
+         assert(!!route->network + !!route->manager + !!route->wireguard <= 1);
+-- 
+2.45.1
+

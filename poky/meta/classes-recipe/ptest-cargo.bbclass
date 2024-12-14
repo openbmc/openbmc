@@ -12,10 +12,10 @@ python do_compile_ptest_cargo() {
     import subprocess
     import json
 
-    cargo = bb.utils.which(d.getVar("PATH"), d.getVar("CARGO", True))
-    cargo_build_flags = d.getVar("CARGO_BUILD_FLAGS", True)
-    rust_flags = d.getVar("RUSTFLAGS", True)
-    manifest_path = d.getVar("CARGO_MANIFEST_PATH", True)
+    cargo = bb.utils.which(d.getVar("PATH"), d.getVar("CARGO"))
+    cargo_build_flags = d.getVar("CARGO_BUILD_FLAGS")
+    rust_flags = d.getVar("RUSTFLAGS")
+    manifest_path = d.getVar("CARGO_MANIFEST_PATH")
     project_manifest_path = os.path.normpath(manifest_path)
     manifest_dir = os.path.dirname(manifest_path)
 
@@ -66,7 +66,7 @@ python do_compile_ptest_cargo() {
     if not test_bins:
         bb.fatal("Unable to find any test binaries")
 
-    cargo_test_binaries_file = d.getVar('CARGO_TEST_BINARIES_FILES', True)
+    cargo_test_binaries_file = d.getVar('CARGO_TEST_BINARIES_FILES')
     bb.note(f"Found {len(test_bins)} tests, write their paths into {cargo_test_binaries_file}")
     with open(cargo_test_binaries_file, "w") as f:
         for test_bin in test_bins:
@@ -77,10 +77,10 @@ python do_compile_ptest_cargo() {
 python do_install_ptest_cargo() {
     import shutil
 
-    dest_dir = d.getVar("D", True)
-    pn = d.getVar("PN", True)
-    ptest_path = d.getVar("PTEST_PATH", True)
-    cargo_test_binaries_file = d.getVar('CARGO_TEST_BINARIES_FILES', True)
+    dest_dir = d.getVar("D")
+    pn = d.getVar("PN")
+    ptest_path = d.getVar("PTEST_PATH")
+    cargo_test_binaries_file = d.getVar('CARGO_TEST_BINARIES_FILES')
     rust_test_args = d.getVar('RUST_TEST_ARGS') or ""
 
     ptest_dir = os.path.join(dest_dir, ptest_path.lstrip('/'))

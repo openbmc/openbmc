@@ -1,4 +1,4 @@
-From 34c0d3263f3e0b366a2320e0823f46673f7ba928 Mon Sep 17 00:00:00 2001
+From 3603cf181b69ab1e0077dcd8a124e669dcb9dd9c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 17 Jan 2017 14:07:17 +0200
 Subject: [PATCH] When cross-installing, execute package scriptlets without
@@ -29,10 +29,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/lib/rpmscript.c b/lib/rpmscript.c
-index 3f6313278..57689bb68 100644
+index 097c9055a..060fd8124 100644
 --- a/lib/rpmscript.c
 +++ b/lib/rpmscript.c
-@@ -448,8 +448,7 @@ exit:
+@@ -447,8 +447,7 @@ exit:
  	Fclose(out);	/* XXX dup'd STDOUT_FILENO */
  
      if (fn) {
@@ -42,7 +42,7 @@ index 3f6313278..57689bb68 100644
  	free(fn);
      }
      free(mline);
-@@ -483,7 +482,13 @@ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
+@@ -482,7 +481,13 @@ rpmRC rpmScriptRun(rpmScript script, int arg1, int arg2, FD_t scriptFd,
  
      if (rc != RPMRC_FAIL) {
  	if (script_type & RPMSCRIPTLET_EXEC) {

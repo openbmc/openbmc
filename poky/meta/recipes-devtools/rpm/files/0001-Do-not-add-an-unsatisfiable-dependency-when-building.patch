@@ -1,4 +1,4 @@
-From 86e585cc0dd06dfa20f584af8b59d52a59accb45 Mon Sep 17 00:00:00 2001
+From dc40261464de1a1799704967906f5bd113b53793 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 9 Jan 2017 18:52:11 +0200
 Subject: [PATCH] Do not add an unsatisfiable dependency when building rpms in
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 4 deletions(-)
 
 diff --git a/build/pack.c b/build/pack.c
-index f7dac6d9a..f382c7da0 100644
+index eb9c7b3f1..fb1f1bed8 100644
 --- a/build/pack.c
 +++ b/build/pack.c
-@@ -711,10 +711,6 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
+@@ -712,10 +712,6 @@ static rpmRC packageBinary(rpmSpec spec, Package pkg, const char *cookie, int ch
  	headerPutBin(pkg->header, RPMTAG_SOURCEPKGID, spec->sourcePkgId,16);
      }
  

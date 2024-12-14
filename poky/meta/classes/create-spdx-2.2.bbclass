@@ -8,6 +8,14 @@ inherit spdx-common
 
 SPDX_VERSION = "2.2"
 
+SPDX_ORG ??= "OpenEmbedded ()"
+SPDX_SUPPLIER ??= "Organization: ${SPDX_ORG}"
+SPDX_SUPPLIER[doc] = "The SPDX PackageSupplier field for SPDX packages created from \
+    this recipe. For SPDX documents create using this class during the build, this \
+    is the contact information for the person or organization who is doing the \
+    build."
+
+
 def get_namespace(d, name):
     import uuid
     namespace_uuid = uuid.uuid5(uuid.NAMESPACE_DNS, d.getVar("SPDX_UUID_NAMESPACE"))
@@ -30,11 +38,16 @@ def recipe_spdx_is_native(d, recipe):
       a.annotator == "Tool: %s - %s" % (d.getVar("SPDX_TOOL_NAME"), d.getVar("SPDX_TOOL_VERSION")) and
       a.comment == "isNative" for a in recipe.annotations)
 
-def convert_license_to_spdx(lic, document, d, existing={}):
+def get_json_indent(d):
+    if d.getVar("SPDX_PRETTY") == "1":
+        return 2
+    return None
+
+
+def convert_license_to_spdx(lic, license_data, document, d, existing={}):
     from pathlib import Path
     import oe.spdx
 
-    license_data = d.getVar("SPDX_LICENSE_DATA")
     extracted = {}
 
     def add_extracted_license(ident, name):
@@ -105,6 +118,7 @@ def convert_license_to_spdx(lic, document, d, existing={}):
 def add_package_files(d, doc, spdx_pkg, topdir, get_spdxid, get_types, *, archive=None, ignore_dirs=[], ignore_top_level_dirs=[]):
     from pathlib import Path
     import oe.spdx
+    import oe.spdx_common
     import hashlib
 
     source_date_epoch = d.getVar("SOURCE_DATE_EPOCH")
@@ -157,7 +171,7 @@ def add_package_files(d, doc, spdx_pkg, topdir, get_spdxid, get_types, *, archiv
                     ))
 
                 if "SOURCE" in spdx_file.fileTypes:
-                    extracted_lics = extract_licenses(filepath)
+                    extracted_lics = oe.spdx_common.extract_licenses(filepath)
                     if extracted_lics:
                         spdx_file.licenseInfoInFiles = extracted_lics
 
@@ -215,7 +229,8 @@ def add_package_sources_from_debug(d, package_doc, spdx_package, package, packag
                     debugsrc_path = search / debugsrc.replace('/usr/src/kernel/', '')
                 else:
                     debugsrc_path = search / debugsrc.lstrip("/")
-                if not debugsrc_path.exists():
+                # We can only hash files below, skip directories, links, etc.
+                if not os.path.isfile(debugsrc_path):
                     continue
 
                 file_sha256 = bb.utils.sha256_file(debugsrc_path)
@@ -248,14 +263,15 @@ def collect_dep_recipes(d, doc, spdx_recipe):
     from pathlib import Path
     import oe.sbom
     import oe.spdx
+    import oe.spdx_common
 
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
-    package_archs = d.getVar("SSTATE_ARCHS").split()
+    package_archs = d.getVar("SPDX_MULTILIB_SSTATE_ARCHS").split()
     package_archs.reverse()
 
     dep_recipes = []
 
-    deps = get_spdx_deps(d)
+    deps = oe.spdx_common.get_spdx_deps(d)
 
     for dep_pn, dep_hashfn, in_taskhash in deps:
         # If this dependency is not calculated in the taskhash skip it.
@@ -295,7 +311,7 @@ def collect_dep_recipes(d, doc, spdx_recipe):
 
     return dep_recipes
 
-collect_dep_recipes[vardepsexclude] = "SSTATE_ARCHS"
+collect_dep_recipes[vardepsexclude] = "SPDX_MULTILIB_SSTATE_ARCHS"
 
 def collect_dep_sources(d, dep_recipes):
     import oe.sbom
@@ -338,15 +354,6 @@ def add_download_packages(d, doc, recipe):
             if f.type == "file":
                 continue
 
-            uri = f.type
-            proto = getattr(f, "proto", None)
-            if proto is not None:
-                uri = uri + "+" + proto
-            uri = uri + "://" + f.host + f.path
-
-            if f.method.supports_srcrev():
-                uri = uri + "@" + f.revisions[name]
-
             if f.method.supports_checksum(f):
                 for checksum_id in CHECKSUM_LIST:
                     if checksum_id.upper() not in oe.spdx.SPDXPackage.ALLOWED_CHECKSUMS:
@@ -361,22 +368,30 @@ def add_download_packages(d, doc, recipe):
                     c.checksumValue = expected_checksum
                     package.checksums.append(c)
 
-            package.downloadLocation = uri
+            package.downloadLocation = oe.spdx_common.fetch_data_to_uri(f, name)
             doc.packages.append(package)
             doc.add_relationship(doc, "DESCRIBES", package)
             # In the future, we might be able to do more fancy dependencies,
             # but this should be sufficient for now
             doc.add_relationship(package, "BUILD_DEPENDENCY_OF", recipe)
 
+def get_license_list_version(license_data, d):
+    # Newer versions of the SPDX license list are SemVer ("MAJOR.MINOR.MICRO"),
+    # but SPDX 2 only uses "MAJOR.MINOR".
+    return ".".join(license_data["licenseListVersion"].split(".")[:2])
+
 
 python do_create_spdx() {
     from datetime import datetime, timezone
     import oe.sbom
     import oe.spdx
+    import oe.spdx_common
     import uuid
     from pathlib import Path
     from contextlib import contextmanager
     import oe.cve_check
+
+    license_data = oe.spdx_common.load_spdx_license_data(d)
 
     @contextmanager
     def optional_tarfile(name, guard, mode="w"):
@@ -409,7 +424,7 @@ python do_create_spdx() {
     doc.documentNamespace = get_namespace(d, doc.name)
     doc.creationInfo.created = creation_time
     doc.creationInfo.comment = "This document was created by analyzing recipe files during the build."
-    doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
+    doc.creationInfo.licenseListVersion = get_license_list_version(license_data, d)
     doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
     doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
     doc.creationInfo.creators.append("Person: N/A ()")
@@ -428,7 +443,7 @@ python do_create_spdx() {
 
     license = d.getVar("LICENSE")
     if license:
-        recipe.licenseDeclared = convert_license_to_spdx(license, doc, d)
+        recipe.licenseDeclared = convert_license_to_spdx(license, license_data, doc, d)
 
     summary = d.getVar("SUMMARY")
     if summary:
@@ -465,10 +480,10 @@ python do_create_spdx() {
 
     add_download_packages(d, doc, recipe)
 
-    if process_sources(d) and include_sources:
+    if oe.spdx_common.process_sources(d) and include_sources:
         recipe_archive = deploy_dir_spdx / "recipes" / (doc.name + ".tar.zst")
         with optional_tarfile(recipe_archive, archive_sources) as archive:
-            spdx_get_src(d)
+            oe.spdx_common.get_patched_src(d)
 
             add_package_files(
                 d,
@@ -513,7 +528,7 @@ python do_create_spdx() {
             package_doc.documentNamespace = get_namespace(d, package_doc.name)
             package_doc.creationInfo.created = creation_time
             package_doc.creationInfo.comment = "This document was created by analyzing packages created during the build."
-            package_doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
+            package_doc.creationInfo.licenseListVersion = get_license_list_version(license_data, d)
             package_doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
             package_doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
             package_doc.creationInfo.creators.append("Person: N/A ()")
@@ -526,7 +541,7 @@ python do_create_spdx() {
             spdx_package.SPDXID = oe.sbom.get_package_spdxid(pkg_name)
             spdx_package.name = pkg_name
             spdx_package.versionInfo = d.getVar("PV")
-            spdx_package.licenseDeclared = convert_license_to_spdx(package_license, package_doc, d, found_licenses)
+            spdx_package.licenseDeclared = convert_license_to_spdx(package_license, license_data, package_doc, d, found_licenses)
             spdx_package.supplier = d.getVar("SPDX_SUPPLIER")
 
             package_doc.packages.append(spdx_package)
@@ -569,12 +584,16 @@ addtask do_create_spdx_setscene
 
 do_create_spdx[dirs] = "${SPDXWORK}"
 do_create_spdx[cleandirs] = "${SPDXDEPLOY} ${SPDXWORK}"
-do_create_spdx[depends] += "${PATCHDEPENDENCY}"
+do_create_spdx[depends] += " \
+    ${PATCHDEPENDENCY} \
+    ${@create_spdx_source_deps(d)} \
+"
 
 python do_create_runtime_spdx() {
     from datetime import datetime, timezone
     import oe.sbom
     import oe.spdx
+    import oe.spdx_common
     import oe.packagedata
     from pathlib import Path
 
@@ -584,9 +603,11 @@ python do_create_runtime_spdx() {
 
     creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    providers = collect_package_providers(d)
+    license_data = oe.spdx_common.load_spdx_license_data(d)
+
+    providers = oe.spdx_common.collect_package_providers(d)
     pkg_arch = d.getVar("SSTATE_PKGARCH")
-    package_archs = d.getVar("SSTATE_ARCHS").split()
+    package_archs = d.getVar("SPDX_MULTILIB_SSTATE_ARCHS").split()
     package_archs.reverse()
 
     if not is_native:
@@ -620,7 +641,7 @@ python do_create_runtime_spdx() {
             runtime_doc.documentNamespace = get_namespace(localdata, runtime_doc.name)
             runtime_doc.creationInfo.created = creation_time
             runtime_doc.creationInfo.comment = "This document was created by analyzing package runtime dependencies."
-            runtime_doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
+            runtime_doc.creationInfo.licenseListVersion = get_license_list_version(license_data, d)
             runtime_doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
             runtime_doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
             runtime_doc.creationInfo.creators.append("Person: N/A ()")
@@ -692,7 +713,7 @@ python do_create_runtime_spdx() {
             oe.sbom.write_doc(d, runtime_doc, pkg_arch, "runtime", spdx_deploy, indent=get_json_indent(d))
 }
 
-do_create_runtime_spdx[vardepsexclude] += "OVERRIDES SSTATE_ARCHS"
+do_create_runtime_spdx[vardepsexclude] += "OVERRIDES SPDX_MULTILIB_SSTATE_ARCHS"
 
 addtask do_create_runtime_spdx after do_create_spdx before do_build do_rm_work
 SSTATETASKS += "do_create_runtime_spdx"
@@ -765,6 +786,7 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
     import os
     import oe.spdx
     import oe.sbom
+    import oe.spdx_common
     import io
     import json
     from datetime import timezone, datetime
@@ -772,8 +794,10 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
     import tarfile
     import bb.compress.zstd
 
-    providers = collect_package_providers(d)
-    package_archs = d.getVar("SSTATE_ARCHS").split()
+    license_data = oe.spdx_common.load_spdx_license_data(d)
+
+    providers = oe.spdx_common.collect_package_providers(d)
+    package_archs = d.getVar("SPDX_MULTILIB_SSTATE_ARCHS").split()
     package_archs.reverse()
 
     creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -785,7 +809,7 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
     doc.documentNamespace = get_namespace(d, doc.name)
     doc.creationInfo.created = creation_time
     doc.creationInfo.comment = "This document was created by analyzing the source of the Yocto recipe during the build."
-    doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
+    doc.creationInfo.licenseListVersion = get_license_list_version(license_data, d)
     doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
     doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
     doc.creationInfo.creators.append("Person: N/A ()")
@@ -925,4 +949,4 @@ def combine_spdx(d, rootfs_name, rootfs_deploydir, rootfs_spdxid, packages, spdx
 
             tar.addfile(info, fileobj=index_str)
 
-combine_spdx[vardepsexclude] += "BB_NUMBER_THREADS SSTATE_ARCHS"
+combine_spdx[vardepsexclude] += "BB_NUMBER_THREADS SPDX_MULTILIB_SSTATE_ARCHS"

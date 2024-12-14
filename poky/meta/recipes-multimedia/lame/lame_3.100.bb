@@ -17,7 +17,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/lame/lame-${PV}.tar.gz \
 SRC_URI[md5sum] = "83e260acbe4389b54fe08e0bdbf7cddb"
 SRC_URI[sha256sum] = "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig sourceforge-releases
 
 PACKAGES += "libmp3lame libmp3lame-dev"
 FILES:${PN} = "${bindir}/lame"

@@ -712,42 +712,6 @@ class RecipeModified:
                     binaries.append(abs_name[d_len:])
         return sorted(binaries)
 
-    def gen_delete_package_dirs(self):
-        """delete folders of package tasks
-
-        This is a workaround for and issue with recipes having their sources
-        downloaded as file://
-        This likely breaks pseudo like:
-        path mismatch [3 links]: ino 79147802 db
-        .../build/tmp/.../cmake-example/1.0/package/usr/src/debug/
-                             cmake-example/1.0-r0/oe-local-files/cpp-example-lib.cpp
-        .../build/workspace/sources/cmake-example/oe-local-files/cpp-example-lib.cpp
-        Since the files are anyway outdated lets deleted them (also from pseudo's db) to workaround this issue.
-        """
-        cmd_lines = ['#!/bin/sh']
-
-        # Set up the appropriate environment
-        newenv = dict(os.environ)
-        for varvalue in self.fakerootenv.split():
-            if '=' in varvalue:
-                splitval = varvalue.split('=', 1)
-                newenv[splitval[0]] = splitval[1]
-
-        # Replicate the environment variables from bitbake
-        for var, val in newenv.items():
-            if not RecipeModified.is_valid_shell_variable(var):
-                continue
-            cmd_lines.append('%s="%s"' % (var, val))
-            cmd_lines.append('export %s' % var)
-
-        # Delete the folders
-        pkg_dirs = ' '.join([os.path.join(self.workdir, d) for d in [
-            "package", "packages-split", "pkgdata", "sstate-install-package", "debugsources.list", "*.spec"]])
-        cmd = "%s rm -rf %s" % (self.fakerootcmd, pkg_dirs)
-        cmd_lines.append('%s || { "%s failed"; exit 1; }' % (cmd, cmd))
-
-        return self.write_script(cmd_lines, 'delete_package_dirs')
-
     def gen_deploy_target_script(self, args):
         """Generate a script which does what devtool deploy-target does
 
@@ -784,8 +748,6 @@ class RecipeModified:
     def gen_install_deploy_script(self, args):
         """Generate a script which does install and deploy"""
         cmd_lines = ['#!/bin/bash']
-
-        cmd_lines.append(self.gen_delete_package_dirs())
 
         # . oe-init-build-env $BUILDDIR
         # Note: Sourcing scripts with arguments requires bash
@@ -1015,7 +977,7 @@ def register_commands(subparsers, context):
                                            help='Setup the SDK and configure the IDE')
     parser_ide_sdk.add_argument(
         'recipenames', nargs='+', help='Generate an IDE configuration suitable to work on the given recipes.\n'
-        'Depending on the --mode paramter different types of SDKs and IDE configurations are generated.')
+        'Depending on the --mode parameter different types of SDKs and IDE configurations are generated.')
     parser_ide_sdk.add_argument(
         '-m', '--mode', type=DevtoolIdeMode, default=DevtoolIdeMode.modified,
         help='Different SDK types are supported:\n'

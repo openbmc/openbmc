@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://version.h;beginline=1;endline=6;md5=2e7c59cb9e57e356a
 
 DEPENDS += "groff-native"
 
-inherit autotools-brokensep
+inherit autotools-brokensep sourceforge-releases
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/setserial/${BPN}-${PV}.tar.gz \
            file://add_stdlib.patch \

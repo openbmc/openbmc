@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
+# UEFI Secure Boot: A mechanism to ensure that only trusted software is executed
+# during the boot process.
+
+header:
+  version: 14
+  includes:
+    - ci/meta-openembedded.yml
+    - ci/meta-secure-core.yml
+
+local_conf_header:
+  uefi_secureboot: |
+    SBSIGN_KEYS_DIR = "${TOPDIR}/sbkeys"
+    BB_ENV_PASSTHROUGH_ADDITIONS = "SBSIGN_KEYS_DIR"
+
+    # Detected by passing kernel parameter
+    QB_KERNEL_ROOT = ""
+
+    # kernel is in the image, should not be loaded separately
+    QB_DEFAULT_KERNEL = "none"
+
+    WKS_FILE = "efi-disk.wks.in"
+    KERNEL_IMAGETYPE = "Image"
+
+    MACHINE_FEATURES:append = " efi uefi-secureboot uefi-http-boot uefi-capsule-updates"
+
+    EFI_PROVIDER = "systemd-boot"
+
+    # Use systemd as the init system
+    INIT_MANAGER = "systemd"
+
+    IMAGE_INSTALL:append = " systemd systemd-boot util-linux coreutils"
+
+    TEST_SUITES:append = " uefi_secureboot uki"
+
+    IMAGE_CLASSES += "uki"
+
+    IMAGE_CLASSES += "sbsign"
+    UKI_SB_KEY = "${SBSIGN_KEY}"
+    UKI_SB_CERT = "${SBSIGN_CERT}"
+    QB_KERNEL_ROOT = ""
+    IMAGE_BOOT_FILES:remove = "Image"
+
+    INITRAMFS_IMAGE = "core-image-initramfs-boot"
+    # not for initramfs image recipe
+    IMAGE_CLASSES:remove:pn-core-image-initramfs-boot = "uki"
+    IMAGE_CLASSES:remove:pn-core-image-initramfs-boot = "sbsign"
+    IMAGE_CLASSES:remove:pn-core-image-initramfs-boot = "testimage"
+    IMAGE_FEATURES:remove:pn-core-image-initramfs-boot = "ssh-server-dropbear"
+    CORE_IMAGE_EXTRA_INSTALL:remove:pn-core-image-initramfs-boot = "ssh-pregen-hostkeys"

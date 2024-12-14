@@ -1,0 +1,41 @@
+From adb206946721a4f5bd1190ab9c975bab4373e35c Mon Sep 17 00:00:00 2001
+From: Changaco <changaco@changaco.oy.lc>
+Date: Fri, 27 Sep 2024 11:51:22 +0200
+Subject: [PATCH] update a test failing with new libarchive versions
+
+fixes #130
+
+Upstream-Status: Submitted [https://github.com/Changaco/python-libarchive-c/pull/131]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/test_entry.py | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_entry.py b/tests/test_entry.py
+index 419cecb..34543a5 100644
+--- a/tests/test_entry.py
++++ b/tests/test_entry.py
+@@ -9,7 +9,7 @@
+ 
+ import pytest
+ 
+-from libarchive import memory_reader, memory_writer
++from libarchive import ArchiveError, memory_reader, memory_writer
+ from libarchive.entry import ArchiveEntry, ConsumedArchiveEntry, PassedArchiveEntry
+ 
+ from . import data_dir, get_entries, get_tarinfos
+@@ -64,7 +64,13 @@ def test_check_ArchiveEntry_against_TarInfo():
+ 
+ 
+ def test_check_archiveentry_using_python_testtar():
+-    check_entries(join(data_dir, 'testtar.tar'))
++    # This test behaves differently depending on the libarchive version:
++    # 3.5, 3.6 and presumably all future versions reject the archive as damaged,
++    # whereas older versions accepted it.
++    try:
++        check_entries(join(data_dir, 'testtar.tar'))
++    except ArchiveError as e:
++        assert e.msg == "Damaged tar archive"
+ 
+ 
+ def test_check_archiveentry_with_unicode_and_binary_entries_tar():

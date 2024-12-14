@@ -17,9 +17,11 @@ inherit meson pkgconfig ptest
 SRC_URI += " \
 	file://run-ptest \
 "
-
+#python3-compile for filecmp module
 RDEPENDS:${PN}-ptest += " \
+        python3-compile \
         python3-pytest \
+        python3-unittest-automake-output \
         bash \
         fuse \
 "
@@ -27,4 +29,5 @@ RDEPENDS:${PN}-ptest += " \
 do_install_ptest() {
         install -d ${D}${PTEST_PATH}/test
         cp -rf ${S}/test/* ${D}${PTEST_PATH}/test/
+        ln -sf ${bindir}/sshfs ${D}${PTEST_PATH}/sshfs
 }

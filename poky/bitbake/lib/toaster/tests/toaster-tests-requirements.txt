@@ -5,3 +5,5 @@ pytest-env==1.1.0
 pytest-html==4.0.2
 pytest-metadata==3.0.0
 pytest-order==1.1.0
+requests
+

@@ -1,0 +1,50 @@
+From cb5355da9b47166253dbe5ab3215e433b55068d1 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 26 Jul 2024 17:18:30 +0800
+Subject: [PATCH] CMakeLists.txt: set libdir to ${CMAKE_INSTALL_FULL_LIBDIR} in
+ macros
+
+There is a patch in oe-core[1] to avoid hardcoded paths in macros. It
+tries to use libdir to expand %_libdir in macros.in. However, in
+upstream commit[2], libdir for macros in CMakeLists.txt is set to
+${prefix}/=LIB=, which causes %_libdir to expand to ${prefix}/=LIB=
+instead of the correct path in the final macros.
+
+On target:
+$ rpm --showrc | grep _libdir
+[snip]
+-13: _libdir    ${prefix}/=LIB=
+[snip]
+
+This also causes %__pkgconfig_path in fileattrs/pkgconfig.attr to become
+an invalid regular expression when building rpm packages. This results a
+warning in log.do_package_write_rpm in all packages:
+
+Warning: Ignoring invalid regular expression ^((${prefix}/=LIB=|usr/share)/pkgconfig/.*.pc|usr/bin/pkg-config)$
+
+Set libdir to ${CMAKE_INSTALL_FULL_LIBDIR} instead of ${prefix}/=LIB= to
+make sure it is expanded to the correct path in macros.
+
+[1] https://git.openembedded.org/openembedded-core/tree/meta/recipes-devtools/rpm/files/0001-Do-not-hardcode-lib-rpm-as-the-installation-path-for.patch
+[2] https://github.com/rpm-software-management/rpm/commit/d2abb7a48760418aacd7f17c8b64e39c25ca50c9
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 08dabffd3..1b7661139 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -96,7 +96,7 @@ function(makemacros)
+ 	set(sysconfdir "${CMAKE_INSTALL_FULL_SYSCONFDIR}")
+ 	set(sharedstatedir "${CMAKE_INSTALL_FULL_SHAREDSTATEDIR}")
+ 	set(localstatedir "${CMAKE_INSTALL_FULL_LOCALSTATEDIR}")
+-	set(libdir "\${prefix}/=LIB=")
++	set(libdir "${CMAKE_INSTALL_FULL_LIBDIR}")
+ 	set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
+ 	set(oldincludedir "${CMAKE_INSTALL_FULL_OLDINCLUDEDIR}")
+ 	set(infodir "\${prefix}/${CMAKE_INSTALL_INFODIR}")

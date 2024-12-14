@@ -1,0 +1,38 @@
+From 3a53a6ad7b91770a8514082e411e277c03764eb0 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Wed, 9 Aug 2023 17:16:03 +0100
+Subject: [PATCH] Revert ADAC cert and token version
+
+Align ADAC certificate versions with versions in secure-debug-manager
+[1] repository. The versions of the certificate and token are checked
+during the authentication process. The debugger connection is refused
+if there is a mismatch between the sent certificate/token and expected
+certificate/token versions.
+
+[1] https://github.com/ARM-software/secure-debug-manager/tree/master
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Upstream-Status: Inappropriate [Add newer dummy token and cert]
+---
+ psa-adac/core/include/psa_adac.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/psa-adac/core/include/psa_adac.h b/psa-adac/core/include/psa_adac.h
+index b190992..6c3feb2 100644
+--- a/psa-adac/core/include/psa_adac.h
++++ b/psa-adac/core/include/psa_adac.h
+@@ -30,8 +30,8 @@ extern "C" {
+  *
+  * Current version numbers for certificate and token format.
+  */
+-#define ADAC_CERT_MAJOR 1u
+-#define ADAC_CERT_MINOR 0u
++#define ADAC_CERT_MAJOR 0u
++#define ADAC_CERT_MINOR 1u
+ #define ADAC_TOKEN_MAJOR 1u
+ #define ADAC_TOKEN_MINOR 0u
+ 
+-- 
+2.25.1
+
+

@@ -1,0 +1,48 @@
+From 3018aa9822c680663ebd19542bcd757dc9baf20a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 8 Sep 2024 20:16:49 -0700
+Subject: [PATCH] Fix undeclared function errors
+
+e.g.
+
+ipmi-sel-string-supermicro-x10dimm-common.c:87:14: error: call to undeclared function 'sel_string_output_supermicro_dimm_event_d
+    |    87 |   if ((ret = sel_string_output_supermicro_dimm_event_data2_event_data3 (ctx,
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/freeipmi-devel/2024-09/msg00001.html]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ipmi-sensors/ipmi-sensors-oem-intel.c               | 1 +
+ libfreeipmi/sel/ipmi-sel-string-supermicro-common.h | 9 +++++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/ipmi-sensors/ipmi-sensors-oem-intel.c b/ipmi-sensors/ipmi-sensors-oem-intel.c
+index 5e0f373..872a730 100644
+--- a/ipmi-sensors/ipmi-sensors-oem-intel.c
++++ b/ipmi-sensors/ipmi-sensors-oem-intel.c
+@@ -36,6 +36,7 @@
+ #include "ipmi-sensors-oem-intel-s2600jf.h"
+ #include "ipmi-sensors-oem-intel-quanta-qssc-s4r.h"
+ #include "ipmi-sensors-oem-intel-node-manager.h"
++#include "ipmi-sensors-oem-intel-s2600wp.h"
+ 
+ #include "freeipmi-portability.h"
+ #include "pstdout.h"
+diff --git a/libfreeipmi/sel/ipmi-sel-string-supermicro-common.h b/libfreeipmi/sel/ipmi-sel-string-supermicro-common.h
+index 5785f2b..9e29bd6 100644
+--- a/libfreeipmi/sel/ipmi-sel-string-supermicro-common.h
++++ b/libfreeipmi/sel/ipmi-sel-string-supermicro-common.h
+@@ -39,4 +39,13 @@ int sel_string_output_supermicro_overheat_event_data1_class_oem (ipmi_sel_ctx_t
+                                                                  unsigned int *wlen,
+                                                                  struct ipmi_sel_system_event_record_data *system_event_record_data);
+ 
++int sel_string_output_supermicro_dimm_event_data2_event_data3 (ipmi_sel_ctx_t ctx,
++                                                               struct ipmi_sel_entry *sel_entry,
++                                                               uint8_t sel_record_type,
++                                                               char *buf,
++                                                               unsigned int buflen,
++                                                               unsigned int flags,
++                                                               unsigned int *wlen,
++                                                               struct ipmi_sel_system_event_record_data *system_event_record_data,
++                                                               int *oem_rv);
+ #endif /* IPMI_SEL_STRING_SUPERMICRO_COMMON_H */

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-SSTATE_VERSION = "12"
+SSTATE_VERSION = "14"
 
 SSTATE_ZSTD_CLEVEL ??= "8"
 
@@ -103,7 +103,6 @@ SSTATECREATEFUNCS[vardeps] = "SSTATE_SCAN_FILES"
 SSTATEPOSTCREATEFUNCS = ""
 SSTATEPREINSTFUNCS = ""
 SSTATEPOSTUNPACKFUNCS = "sstate_hardcode_path_unpack"
-SSTATEPOSTINSTFUNCS = ""
 EXTRA_STAGING_FIXMES ?= "HOSTTOOLS_DIR"
 
 # Check whether sstate exists for tasks that support sstate and are in the
@@ -161,7 +160,10 @@ python () {
     d.setVar('SSTATETASKS', " ".join(unique_tasks))
     for task in unique_tasks:
         d.prependVarFlag(task, 'prefuncs', "sstate_task_prefunc ")
-        d.appendVarFlag(task, 'postfuncs', " sstate_task_postfunc")
+        # Generally sstate should be last, execpt for buildhistory functions
+        postfuncs = (d.getVarFlag(task, 'postfuncs') or "").split()
+        newpostfuncs = [p for p in postfuncs if "buildhistory" not in p] + ["sstate_task_postfunc"] + [p for p in postfuncs if "buildhistory" in p]
+        d.setVarFlag(task, 'postfuncs', " ".join(newpostfuncs))
         d.setVarFlag(task, 'network', '1')
         d.setVarFlag(task + "_setscene", 'network', '1')
 }
@@ -349,15 +351,10 @@ def sstate_install(ss, d):
         prepdir(dest)
         bb.utils.rename(src, dest)
 
-    for postinst in (d.getVar('SSTATEPOSTINSTFUNCS') or '').split():
-        # All hooks should run in the SSTATE_INSTDIR
-        bb.build.exec_func(postinst, d, (sstateinst,))
-
     for lock in locks:
         bb.utils.unlockfile(lock)
 
-sstate_install[vardepsexclude] += "SSTATE_ALLOW_OVERLAP_FILES SSTATE_MANMACH SSTATE_MANFILEPREFIX"
-sstate_install[vardeps] += "${SSTATEPOSTINSTFUNCS}"
+sstate_install[vardepsexclude] += "SSTATE_ALLOW_OVERLAP_FILES SSTATE_MANMACH SSTATE_MANFILEPREFIX STAMP"
 
 def sstate_installpkg(ss, d):
     from oe.gpg_sign import get_signer
@@ -644,15 +641,6 @@ def sstate_package(ss, d):
 
     tmpdir = d.getVar('TMPDIR')
 
-    fixtime = False
-    if ss['task'] == "package":
-        fixtime = True
-
-    def fixtimestamp(root, path):
-        f = os.path.join(root, path)
-        if os.lstat(f).st_mtime > sde:
-            os.utime(f, (sde, sde), follow_symlinks=False)
-
     sstatebuild = d.expand("${WORKDIR}/sstate-build-%s/" % ss['task'])
     sde = int(d.getVar("SOURCE_DATE_EPOCH") or time.time())
     d.setVar("SSTATE_CURRTASK", ss['task'])
@@ -667,8 +655,6 @@ def sstate_package(ss, d):
         # to sstate tasks but there aren't many of these so better just avoid them entirely.
         for walkroot, dirs, files in os.walk(state[1]):
             for file in files + dirs:
-                if fixtime:
-                    fixtimestamp(walkroot, file)
                 srcpath = os.path.join(walkroot, file)
                 if not os.path.islink(srcpath):
                     continue
@@ -690,11 +676,6 @@ def sstate_package(ss, d):
         bb.utils.mkdirhier(plain)
         bb.utils.mkdirhier(pdir)
         bb.utils.rename(plain, pdir)
-        if fixtime:
-            fixtimestamp(pdir, "")
-            for walkroot, dirs, files in os.walk(pdir):
-                for file in files + dirs:
-                    fixtimestamp(walkroot, file)
 
     d.setVar('SSTATE_BUILDDIR', sstatebuild)
     d.setVar('SSTATE_INSTDIR', sstatebuild)
@@ -727,7 +708,7 @@ def sstate_package(ss, d):
 
     return
 
-sstate_package[vardepsexclude] += "SSTATE_SIG_KEY"
+sstate_package[vardepsexclude] += "SSTATE_SIG_KEY SSTATE_PKG"
 
 def pstaging_fetch(sstatefetch, d):
     import bb.fetch2
@@ -863,8 +844,7 @@ python sstate_create_and_sign_package () {
         from tempfile import TemporaryDirectory
         with TemporaryDirectory(dir=sstate_pkg.parent) as tmp_dir:
             tmp_pkg = Path(tmp_dir) / sstate_pkg.name
-            d.setVar("TMP_SSTATE_PKG", str(tmp_pkg))
-            bb.build.exec_func('sstate_archive_package', d)
+            sstate_archive_package(tmp_pkg, d)
 
             from oe.gpg_sign import get_signer
             signer = get_signer(d, 'local')
@@ -884,8 +864,7 @@ python sstate_create_and_sign_package () {
         from tempfile import NamedTemporaryFile
         with NamedTemporaryFile(prefix=sstate_pkg.name, dir=sstate_pkg.parent) as tmp_pkg_fd:
             tmp_pkg = tmp_pkg_fd.name
-            d.setVar("TMP_SSTATE_PKG", str(tmp_pkg))
-            bb.build.exec_func('sstate_archive_package',d)
+            sstate_archive_package(tmp_pkg, d)
             update_file(tmp_pkg, sstate_pkg)
             # update_file() may have renamed tmp_pkg, which must exist when the
             # NamedTemporaryFile() context handler ends.
@@ -893,32 +872,33 @@ python sstate_create_and_sign_package () {
 
 }
 
-# Shell function to generate a sstate package from a directory
-# set as SSTATE_BUILDDIR. Will be run from within SSTATE_BUILDDIR.
+# Function to generate a sstate package from the current directory.
 # The calling function handles moving the sstate package into the final
 # destination.
-sstate_archive_package () {
-	OPT="-cS"
-	ZSTD="zstd -${SSTATE_ZSTD_CLEVEL} -T${ZSTD_THREADS}"
-	# Use pzstd if available
-	if [ -x "$(command -v pzstd)" ]; then
-		ZSTD="pzstd -${SSTATE_ZSTD_CLEVEL} -p ${ZSTD_THREADS}"
-	fi
+def sstate_archive_package(sstate_pkg, d):
+    import subprocess
 
-	# Need to handle empty directories
-	if [ "$(ls -A)" ]; then
-		set +e
-		tar -I "$ZSTD" $OPT -f ${TMP_SSTATE_PKG} *
-		ret=$?
-		if [ $ret -ne 0 ] && [ $ret -ne 1 ]; then
-			exit 1
-		fi
-		set -e
-	else
-		tar -I "$ZSTD" $OPT --file=${TMP_SSTATE_PKG} --files-from=/dev/null
-	fi
-	chmod 0664 ${TMP_SSTATE_PKG}
-}
+    cmd = [
+        "tar",
+        "-I", d.expand("pzstd -${SSTATE_ZSTD_CLEVEL} -p${ZSTD_THREADS}"),
+        "-cS",
+        "-f", sstate_pkg,
+    ]
+
+    # tar refuses to create an empty archive unless told explicitly
+    files = sorted(os.listdir("."))
+    if not files:
+        files = ["--files-from=/dev/null"]
+
+    try:
+        subprocess.run(cmd + files, check=True)
+    except subprocess.CalledProcessError as e:
+        # Ignore error 1 as this is caused by files changing
+        # (link count increasing from hardlinks being created).
+        if e.returncode != 1:
+            raise
+
+    os.chmod(sstate_pkg, 0o664)
 
 
 python sstate_report_unihash() {

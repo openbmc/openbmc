@@ -28,14 +28,12 @@ python () {
     if bb.data.inherits_class('native', d) or bb.data.inherits_class('cross', d):
         return
 
-    for entry in (d.getVar("MULTILIB_SCRIPTS", False) or "").split():
-        pkg, script = entry.split(":")
-        epkg = d.expand(pkg)
-        escript = d.expand(script)
-        scriptname = os.path.basename(escript)
-        d.appendVar("ALTERNATIVE:" + epkg, " " + scriptname + " ")
-        d.setVarFlag("ALTERNATIVE_LINK_NAME", scriptname, escript)
-        d.setVarFlag("ALTERNATIVE_TARGET", scriptname, escript + "-${MULTILIB_SUFFIX}")
-        d.appendVar("multilibscript_rename",  "\n	mv ${PKGD}" + escript + " ${PKGD}" + escript + "-${MULTILIB_SUFFIX}")
-        d.appendVar("FILES:" + epkg, " " + escript + "-${MULTILIB_SUFFIX}")
+    for entry in (d.getVar("MULTILIB_SCRIPTS") or "").split():
+        pkg, script = entry.split(":", 1)
+        scriptname = os.path.basename(script)
+        d.appendVar("ALTERNATIVE:" + pkg, " " + scriptname + " ")
+        d.setVarFlag("ALTERNATIVE_LINK_NAME", scriptname, script)
+        d.setVarFlag("ALTERNATIVE_TARGET", scriptname, script + "-${MULTILIB_SUFFIX}")
+        d.appendVar("multilibscript_rename",  "\n	mv ${PKGD}" + script + " ${PKGD}" + script + "-${MULTILIB_SUFFIX}")
+        d.appendVar("FILES:" + pkg, " " + script + "-${MULTILIB_SUFFIX}")
 }

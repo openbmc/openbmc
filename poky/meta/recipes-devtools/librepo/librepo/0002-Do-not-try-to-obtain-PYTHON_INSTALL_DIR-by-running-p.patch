@@ -1,4 +1,4 @@
-From 76052aa40c61580869472fd3f009a4ab1620b998 Mon Sep 17 00:00:00 2001
+From e86f562d3cc6cea3e19c4bab77ffa2902f634615 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:05:36 +0200
 Subject: [PATCH] Do not try to obtain PYTHON_INSTALL_DIR by running python.

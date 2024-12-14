@@ -45,9 +45,11 @@ if [ -d "$mountpoint" ]; then
 
     # Fast version of calculating `dirname ${spec}`/.`basename ${spec}`-work
     overlay_workdir="${spec%/*}/.${spec##*/}-work"
-    mkdir "${overlay_workdir}"
+    if [ "$MOUNT_COPYBIND_AVOID_OVERLAYFS" != 1 ]; then
+        mkdir "${overlay_workdir}"
+    fi
 
-    # Try to mount using overlay, which is must faster than copying files.
+    # Try to mount using overlay, which is much faster than copying files.
     # If that fails, fall back to slower copy.
     if command -v selinuxenabled > /dev/null 2>&1; then
         if selinuxenabled; then
@@ -55,6 +57,7 @@ if [ -d "$mountpoint" ]; then
         fi
     fi
     if [ "$MOUNT_COPYBIND_AVOID_OVERLAYFS" = 1 ] || ! mount -t overlay overlay -olowerdir="$mountpoint",upperdir="$spec",workdir="$overlay_workdir""$mountcontext" "$mountpoint" > /dev/null 2>&1; then
+        rm -rf "$overlay_workdir"
 
         if [ "$specdir_existed" != "yes" ]; then
             cp -aPR "$mountpoint"/. "$spec/"

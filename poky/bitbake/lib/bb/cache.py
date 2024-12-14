@@ -28,7 +28,7 @@ import shutil
 
 logger = logging.getLogger("BitBake.Cache")
 
-__cache_version__ = "155"
+__cache_version__ = "156"
 
 def getCacheFile(path, filename, mc, data_hash):
     mcspec = ''
@@ -441,7 +441,7 @@ class Cache(object):
         else:
             symlink = os.path.join(self.cachedir, "bb_cache.dat")
 
-        if os.path.exists(symlink):
+        if os.path.exists(symlink) or os.path.islink(symlink):
             bb.utils.remove(symlink)
         try:
             os.symlink(os.path.basename(self.cachefile), symlink)
@@ -779,25 +779,6 @@ class MulticonfigCache(Mapping):
         for k in self.__caches:
             yield k
 
-def init(cooker):
-    """
-    The Objective: Cache the minimum amount of data possible yet get to the
-    stage of building packages (i.e. tryBuild) without reparsing any .bb files.
-
-    To do this, we intercept getVar calls and only cache the variables we see
-    being accessed. We rely on the cache getVar calls being made for all
-    variables bitbake might need to use to reach this stage. For each cached
-    file we need to track:
-
-    * Its mtime
-    * The mtimes of all its dependencies
-    * Whether it caused a parse.SkipRecipe exception
-
-    Files causing parsing errors are evicted from the cache.
-
-    """
-    return Cache(cooker.configuration.data, cooker.configuration.data_hash)
-
 
 class CacheData(object):
     """
@@ -865,6 +846,16 @@ class MultiProcessCache(object):
     def create_cachedata(self):
         data = [{}]
         return data
+
+    def clear_cache(self):
+        if not self.cachefile:
+            bb.fatal("Can't clear invalid cachefile")
+
+        self.cachedata = self.create_cachedata()
+        self.cachedata_extras = self.create_cachedata()
+        with bb.utils.fileslocked([self.cachefile + ".lock"]):
+            bb.utils.remove(self.cachefile)
+            bb.utils.remove(self.cachefile + "-*")
 
     def save_extras(self):
         if not self.cachefile:

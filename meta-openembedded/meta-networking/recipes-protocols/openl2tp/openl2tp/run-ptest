@@ -30,9 +30,7 @@ else
 fi
 
 #read -p "Please input the network interface you use to test(such as eth0, em1 etc):" ETH_TEST
-echo "Please input the network interface you use to test(such as eth0, em1 etc):"
-read ETH_TEST > /dev/null
-
+ETH_TEST=`ip route get 8.8.8.8 | awk -- '{print $5}'`
 if [ x"$ETH_TEST" = x ]; then
     exit_cus "The network interface cannot be null" 1
 fi
@@ -73,7 +71,7 @@ lsmod | grep l2tp_ppp > /dev/null || exit_cus "FAIL: Load module l2tp_ppp" 2
 
 # start openl2tpd
 ps aux | grep openl2tpd | grep -v grep > /dev/null && killall openl2tpd > /dev/null
-ppp_path=`rpm -ql openl2tp | grep ppp_null.so`
+ppp_path=`find / -name ppp_null.so`
 echo "test it here"
 /usr/sbin/openl2tpd -d all -D -f -p ${ppp_path} &  > /dev/null
 
@@ -95,3 +93,4 @@ else
 fi
 
 restore_file
+ps aux | grep openl2tpd | grep -v grep > /dev/null && killall openl2tpd > /dev/null

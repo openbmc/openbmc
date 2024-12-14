@@ -1,0 +1,37 @@
+From bb129aac12c5aa6e2dd371244b042baa82aff014 Mon Sep 17 00:00:00 2001
+From: Purushottam Choudhary <purushottam27.kumar@lge.com>
+Date: Tue, 8 Oct 2024 11:47:21 +0530
+Subject: [PATCH] vrend: Fix int-conversion fatal build error with GCC-14
+
+Getting below error int conversion during compilation as one the
+platforms where EGLNativeDisplayType is an int instead of a pointer.
+
+| ../git/src/vrend_winsys_egl.c: In function 'virgl_egl_init':
+| ../git/src/vrend_winsys_egl.c:364:62: error: passing argument 2 of 'egl->funcs.epoxy_eglGetPlatformDisplay' makes pointer from
+|   364 |                                                              (EGLNativeDisplayType)egl->gbm->device, NULL);
+|       |                                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|       |                                                              |
+|       |                                                              int
+| ../git/src/vrend_winsys_egl.c:364:62: note: expected 'void *' but argument is of type 'int'
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/virgl/virglrenderer/-/commit/464deabe4d1bfce6b8f414ab0945d9a62b66ddd4]
+
+Signed-off-by: Purushottam Choudhary <purushottam27.kumar@lge.com>
+Part-of: <https://gitlab.freedesktop.org/virgl/virglrenderer/-/merge_requests/1440>
+---
+ src/vrend_winsys_egl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vrend_winsys_egl.c b/src/vrend_winsys_egl.c
+index 9d9f410c..8750f6b2 100644
+--- a/src/vrend_winsys_egl.c
++++ b/src/vrend_winsys_egl.c
+@@ -361,7 +361,7 @@ struct virgl_egl *virgl_egl_init(EGLNativeDisplayType display_id, bool surfacele
+ #ifdef ENABLE_GBM
+       else
+          egl->egl_display = egl->funcs.eglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR,
+-                                                             (EGLNativeDisplayType)egl->gbm->device, NULL);
++                                                             (EGLNativeDisplayType*)egl->gbm->device, NULL);
+ #endif
+    } else {
+ #ifdef ENABLE_GBM

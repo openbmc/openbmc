@@ -6,7 +6,7 @@ Subject: [PATCH] fix(fbdev): set resolution prior to buffer
 Otherwise it ends up with using the default value 800x480 and may fail
 at lv_display_set_buffers due to incorrect resolution.
 
-Upstream-Status: Submitted [https://github.com/lvgl/lvgl/pull/6004]
+Upstream-Status: Backport [29662d1c357c15135d076a2a924b9ef056c82120]
 Signed-off-by: Jaeyoon Jung <jaeyoon.jung@lge.com>
 ---
 

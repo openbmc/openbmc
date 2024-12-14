@@ -1,0 +1,73 @@
+Do not use curl-config
+
+Sourced from
+https://bugs.gentoo.org/552474
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/configure.ac
++++ b/configure.ac
+@@ -596,49 +596,12 @@ else
+   PKG_CHECK_MODULES([XSLT], [libxslt > $libxslt_min_version], [have_libxslt=1], [have_libxslt=0])
+ fi
+ 
+-dnl curl
+-AC_ARG_WITH(curl-config, [  --with-curl-config=PATH   Location of libcurl curl-config []], curl_config="$withval", curl_config="")
+-
+-if test "X$curl_config" != "Xno" ; then
+-  if test "X$curl_config" != "X" ; then
+-    AC_MSG_CHECKING(for $curl_config)
+-
+-    if test -f $curl_config ; then
+-      CURL_CONFIG=$curl_config
+-      AC_MSG_RESULT(yes)
+-    else
+-      AC_MSG_RESULT(no - searching PATH)
+-    fi
+-  fi
+-  if test "X$CURL_CONFIG" = "X" ; then
+-    AC_CHECK_PROGS(CURL_CONFIG, curl-config)
+-  fi
+-fi
+-
+ libcurl_source=no
+-if test "X$CURL_CONFIG" != "X"; then
+-  LIBCURL_CFLAGS=`$CURL_CONFIG --cflags`
+-  LIBCURL_LIBS=`$CURL_CONFIG --libs`
+-
+-  CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
+-  LIBS="$LIBS $LIBCURL_LIBS"
+-  AC_CHECK_HEADER(curl/curl.h)
+-  AC_CHECK_FUNC(curl_easy_init, have_curl_easy_init=yes, have_curl_easy_init=no)
+-
+-  AC_MSG_CHECKING(for libcurl via curl-config)
+-  if test $have_curl_easy_init = yes; then
+-    libcurl_source="curl-config"
+-    LIBCURL_VERSION=`$CURL_CONFIG --version | sed -e 's/^libcurl *//'`
+-  fi
+-  CPPFLAGS="$oCPPFLAGS"
+-  LIBS="$oLIBS"
+-else
+-  PKG_CHECK_MODULES([LIBCURL],[libcurl],[
+-    LIBCURL_VERSION=`$PKG_CONFIG libcurl --modversion`
+-    libcurl_source="pkg-config"
+-  ], [:])
+-  AC_MSG_CHECKING(for libcurl via pkg-config)
+-fi
++PKG_CHECK_MODULES([LIBCURL],[libcurl],[
++  LIBCURL_VERSION=`$PKG_CONFIG libcurl --modversion`
++  libcurl_source="pkg-config"
++], [:])
++AC_MSG_CHECKING(for libcurl via pkg-config)
+ 
+ if test "$libcurl_source" = "no"; then
+   AC_MSG_RESULT(no - not found)
+@@ -1033,7 +996,7 @@ need_libcurl=0
+ need_libxml_www=0
+ need_libfetch=0
+ 
+-if test "X$CURL_CONFIG" != X; then
++if test "$libcurl_source" != "no"; then
+   CPPFLAGS="$CPPFLAGS $LIBCURL_CFLAGS"
+   LIBS="$LIBS $LIBCURL_LIBS"
+   AC_CHECK_HEADER(curl/curl.h)

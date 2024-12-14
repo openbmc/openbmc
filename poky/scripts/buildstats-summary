@@ -87,7 +87,11 @@ def main(argv=None) -> int:
     )
 
     parser.add_argument(
-        "buildstats", metavar="BUILDSTATS", help="Buildstats file", type=pathlib.Path
+        "buildstats",
+        metavar="BUILDSTATS",
+        nargs="?",
+        type=pathlib.Path,
+        help="Buildstats file, or latest if not specified",
     )
     parser.add_argument(
         "--sort",
@@ -115,6 +119,16 @@ def main(argv=None) -> int:
     )
 
     args = parser.parse_args(argv)
+
+    # If a buildstats file wasn't specified, try to find the last one
+    if not args.buildstats:
+        try:
+            builddir = pathlib.Path(os.environ["BUILDDIR"])
+            buildstats_dir = builddir / "tmp" / "buildstats"
+            args.buildstats = sorted(buildstats_dir.iterdir())[-1]
+        except KeyError:
+            print("Build environment has not been configured, cannot find buildstats")
+            return 1
 
     bs = read_buildstats(args.buildstats)
     dump_buildstats(args, bs)

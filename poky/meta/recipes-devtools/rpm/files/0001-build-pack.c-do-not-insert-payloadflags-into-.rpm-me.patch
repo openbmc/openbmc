@@ -1,4 +1,4 @@
-From ae4fdd8e8d052835973e6ff4b7550f93bde30a98 Mon Sep 17 00:00:00 2001
+From e688eb54fd54d65181e94b854b3568d99cbf3a24 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 31 Aug 2021 10:37:05 +0200
 Subject: [PATCH] build/pack.c: do not insert payloadflags into .rpm metadata
@@ -14,7 +14,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/build/pack.c b/build/pack.c
-index f382c7da0..0889dd993 100644
+index fb1f1bed8..45885a6ac 100644
 --- a/build/pack.c
 +++ b/build/pack.c
 @@ -330,7 +330,7 @@ static char *getIOFlags(Package pkg)

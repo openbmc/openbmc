@@ -1,0 +1,37 @@
+From 7d76513b82a67e117d195a1b5a0d6c2e8591488b Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 10 Oct 2024 13:58:38 +0800
+Subject: [PATCH] tests: Remove blocking_adaptation.cpp
+
+The test failed to build with clang as below.
+../../../asio-1.30.2/src/tests/../../include/asio/execution/blocking_adaptation.hpp:216:13: error: call to 'query' is ambiguous
+  216 |             conditional_t<true, T, P>::query(static_cast<P&&>(p))
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../../../asio-1.30.2/src/tests/../../include/asio/execution/blocking_adaptation.hpp:213:29: note: in instantiation of exception specification for 'query<asio::execution::detail::blocking_adaptation::allowed_t<>>' requested here
+  213 |       static constexpr auto query(P&& p)
+      |
+
+We can add the case back once the above build failure resolved then.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/tests/Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/tests/Makefile.am b/src/tests/Makefile.am
+index 04f8a03..eab2d56 100644
+--- a/src/tests/Makefile.am
++++ b/src/tests/Makefile.am
+@@ -68,7 +68,6 @@ check_PROGRAMS = \
+ 	unit/error \
+ 	unit/execution/any_executor \
+ 	unit/execution/blocking \
+-	unit/execution/blocking_adaptation \
+ 	unit/execution/context_as \
+ 	unit/execution/executor \
+ 	unit/execution/invocable_archetype \
+-- 
+2.34.1
+

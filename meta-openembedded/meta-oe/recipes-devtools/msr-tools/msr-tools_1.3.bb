@@ -5,7 +5,6 @@ LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=11;md5=678a3928c85604242
 SECTION = "devel"
 
 SRC_URI = "https://01.org/sites/default/files/downloads/msr-tools/msr-tools-${PV}.zip"
-SRC_URI[md5sum] = "67d18527f64fd707c9b7a79f13d19fd5"
 SRC_URI[sha256sum] = "f9457b5340f5f274da4239a461f0db6b514142b40461559d9c6150f05aab1d1e"
 
 S = "${WORKDIR}/msr-tools-master"

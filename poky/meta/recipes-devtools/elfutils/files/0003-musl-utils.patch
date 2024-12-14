@@ -1,4 +1,4 @@
-From aab5985a29bd7ab6e0b06eaab190b42a04e10f70 Mon Sep 17 00:00:00 2001
+From b1c956cd739f364c4a80381578ddaba43e36903b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:19:48 +0800
 Subject: [PATCH] musl-utils
@@ -56,7 +56,7 @@ index f771b92..263de62 100644
  ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
  
 diff --git a/src/strip.c b/src/strip.c
-index 6436443..1608496 100644
+index 403e0f6..738e948 100644
 --- a/src/strip.c
 +++ b/src/strip.c
 @@ -45,6 +45,13 @@

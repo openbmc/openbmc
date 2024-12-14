@@ -1,0 +1,111 @@
+From ddd4abdb3893e284a35303e4a5ac7b6ad2ed8320 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Tue, 16 Jul 2024 21:04:49 +0200
+Subject: [PATCH] Platform: CS1000: Increase BL2 partition size
+
+Enabling secure debug increases the BL2 code size considerably. This
+patch increases the BL2 partition size to enable secure debug feature
+on Corstone-1000. The TF-M partition size has to be decreased for this.
+The RAM_MPU_REGION_BLOCK_1_SIZE had to be aligned with the changes to
+fully cover the S_DATA.
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/30406]
+---
+ .../ext/target/arm/corstone1000/CMakeLists.txt     |  9 ++++++---
+ .../target/arm/corstone1000/create-flash-image.sh  | 14 ++++++++------
+ .../arm/corstone1000/partition/flash_layout.h      |  4 ++--
+ 3 files changed, 16 insertions(+), 11 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index b13dc26c0e..3ba26e0de7 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -44,10 +44,13 @@ target_compile_definitions(platform_region_defs
+         # The RAM MPU Region block sizes are calculated manually. The RAM has to be covered
+         # with the MPU regions. These regions also have to be the power of 2 and
+         # the start addresses have to be aligned to these sizes. The sizes can be calculated
+-        # from the S_DATA_START and S_DATA_SIZE defines.
+-        RAM_MPU_REGION_BLOCK_1_SIZE=0x4000
++        # from the S_DATA_START and S_DATA_SIZE defines the following way:
++        # S_DATA_SIZE = RAM_MPU_REGION_BLOCK_1_SIZE + RAM_MPU_REGION_BLOCK_2_SIZE
++        # And the following constraints have to be taken:
++        # S_DATA_START % RAM_MPU_REGION_BLOCK_1_SIZE = 0
++        # (S_DATA_START + RAM_MPU_REGION_BLOCK_1_SIZE) % RAM_MPU_REGION_BLOCK_2_SIZE = 0
++        RAM_MPU_REGION_BLOCK_1_SIZE=0x10000
+         RAM_MPU_REGION_BLOCK_2_SIZE=0x20000
+-
+ )
+ #========================= Platform common defs ===============================#
+ 
+diff --git a/platform/ext/target/arm/corstone1000/create-flash-image.sh b/platform/ext/target/arm/corstone1000/create-flash-image.sh
+index a6be61384f..06f0d1ec9a 100755
+--- a/platform/ext/target/arm/corstone1000/create-flash-image.sh
++++ b/platform/ext/target/arm/corstone1000/create-flash-image.sh
+@@ -1,6 +1,6 @@
+ #!/bin/bash
+ #-------------------------------------------------------------------------------
+-# Copyright (c) 2023, Arm Limited. All rights reserved.
++# Copyright (c) 2023-2024, Arm Limited. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -65,6 +65,8 @@ FWU_METADATA_TYPE_UUID="8A7A84A0-8387-40F6-AB41-A8B9A5A60D23"
+ PRIVATE_METADATA_TYPE_UUID="ECB55DC3-8AB7-4A84-AB56-EB0A9974DB42"
+ SE_BL2_TYPE_UUID="64BD8ADB-02C0-4819-8688-03AB4CAB0ED9"
+ TFM_TYPE_UUID="D763C27F-07F6-4FF0-B2F3-060CB465CD4E"
++SE_BL2_PARTITION_SIZE="+144k"
++TFM_S_PARTITION_SIZE="+320K"
+ 
+ # Create the image
+ rm -f $IMAGE
+@@ -81,10 +83,10 @@ sgdisk  --mbrtogpt \
+         --new=3:48:+4K --typecode=3:$FWU_METADATA_TYPE_UUID --partition-guid=3:$(uuidgen) --change-name=3:'Bkup-FWU-Metadata' \
+         --new=4:56:+4K --typecode=4:$PRIVATE_METADATA_TYPE_UUID --partition-guid=4:$(uuidgen) --change-name=4:'private_metadata_replica_1' \
+         --new=5:64:+4k --typecode=5:$PRIVATE_METADATA_TYPE_UUID --partition-guid=5:$(uuidgen) --change-name=5:'private_metadata_replica_2' \
+-        --new=6:72:+100k --typecode=6:$SE_BL2_TYPE_UUID --partition-guid=6:$(uuidgen) --change-name=6:'bl2_primary' \
+-        --new=7:272:+368K --typecode=7:$TFM_TYPE_UUID --partition-guid=7:$(uuidgen) --change-name=7:'tfm_primary' \
+-        --new=8:32784:+100k --typecode=8:$SE_BL2_TYPE_UUID --partition-guid=8:$(uuidgen) --change-name=8:'bl2_secondary' \
+-        --new=9:32984:+368K --typecode=9:$TFM_TYPE_UUID --partition-guid=9:$(uuidgen) --change-name=9:'tfm_secondary' \
++        --new=6:72:$SE_BL2_PARTITION_SIZE --typecode=6:$SE_BL2_TYPE_UUID --partition-guid=6:$(uuidgen) --change-name=6:'bl2_primary' \
++        --new=7:360:$TFM_S_PARTITION_SIZE --typecode=7:$TFM_TYPE_UUID --partition-guid=7:$(uuidgen) --change-name=7:'tfm_primary' \
++        --new=8:32784:$SE_BL2_PARTITION_SIZE --typecode=8:$SE_BL2_TYPE_UUID --partition-guid=8:$(uuidgen) --change-name=8:'bl2_secondary' \
++        --new=9:33072:$TFM_S_PARTITION_SIZE --typecode=9:$TFM_TYPE_UUID --partition-guid=9:$(uuidgen) --change-name=9:'tfm_secondary' \
+         --new=10:65496:65501  --partition-guid=10:$(uuidgen) --change-name=10:'reserved_2' \
+         $IMAGE
+ 
+@@ -93,7 +95,7 @@ sgdisk  --mbrtogpt \
+ # Write partitions
+ # conv=notrunc avoids truncation to keep the geometry of the image.
+ dd if=$BIN_DIR/bl2_signed.bin of=${IMAGE}  seek=72 conv=notrunc
+-dd if=$BIN_DIR/tfm_s_signed.bin of=${IMAGE} seek=272 conv=notrunc
++dd if=$BIN_DIR/tfm_s_signed.bin of=${IMAGE} seek=360 conv=notrunc
+ 
+ # Print the gpt table
+ sgdisk -p $IMAGE
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index 9fc1d9fa63..73c430ce57 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -92,7 +92,7 @@
+ #define FLASH_DEV_NAME_BL1              FLASH_DEV_NAME
+ 
+ /* Static Configurations of the Flash */
+-#define SE_BL2_PARTITION_SIZE           (0x18000)    /* 96 KB */
++#define SE_BL2_PARTITION_SIZE           (0x24000)    /* 144 KB */
+ #define SE_BL2_BANK_0_OFFSET            (0x9000)  /* 72nd LBA */
+ #define SE_BL2_BANK_1_OFFSET            (0x1002000)  /* 32784th LBA */
+ 
+@@ -137,7 +137,7 @@
+ 
+ /* Bank configurations */
+ #define BANK_PARTITION_SIZE             (0xFE0000)   /* 15.875 MB */
+-#define TFM_PARTITION_SIZE              (0x5C000)    /* 368 KB */
++#define TFM_PARTITION_SIZE              (0x50000)    /* 320 KB */
+ 
+ /************************************************************/
+ /* Bank : Images flash offsets are with respect to the bank */
+-- 
+2.25.1
+

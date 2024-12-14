@@ -66,6 +66,7 @@ PACKAGECONFIG[sysfs] = "--enable-sysfs,--disable-sysfs,sysfsutils,"
 PACKAGECONFIG[libgcrypt] = "--enable-encryption,--disable-encryption,libgcrypt,"
 PACKAGECONFIG[non32bit] = "--enable-non32bit-int,--disable-non32bit-int,,"
 PACKAGECONFIG[snmp-bc] = "--enable-snmp_bc,--disable-snmp_bc"
+PACKAGECONFIG[ov-rest] = "--enable-ov_rest,--disable-ov_rest,curl rabbitmq-c json-c"
 
 export DISTRO
 

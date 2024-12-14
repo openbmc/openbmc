@@ -1,0 +1,71 @@
+From 07ddc4b9b7a6fec73cdc295baba353944857212e Mon Sep 17 00:00:00 2001
+From: Sui Chen <suichen6@gmail.com>
+Date: Mon, 13 Jun 2022 17:46:49 +0000
+Subject: [PATCH] Remove "check_build_deps" build steps
+
+When building with Bitbake, we want Bitbake to manage our dependencies,
+so we remove the "check_build_deps" steps from Perfetto.
+
+Also setting "is_cross_compiling" to true, so that the host-side tools
+(such as protoc) will always be generated using the native toolchain,
+rather than the Bitbake-generated one.
+
+Signed-off-by: Sui Chen <suichen6@gmail.com>
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+Upstream-Status: Pending
+
+ gn/BUILD.gn                  |  1 -
+ gn/standalone/BUILD.gn       | 12 ++++++------
+ gn/standalone/BUILDCONFIG.gn |  5 +++--
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/gn/BUILD.gn b/gn/BUILD.gn
+index ed055ee700..ea79979ec5 100644
+--- a/gn/BUILD.gn
++++ b/gn/BUILD.gn
+@@ -117,7 +117,6 @@ group("default_deps") {
+   deps = [ ":gen_buildflags" ]
+   if (perfetto_build_standalone) {
+     public_deps = [
+-      "//gn/standalone:check_build_deps",
+       "//gn/standalone/libc++:deps",
+       "//gn/standalone/sanitizers:deps",
+     ]
+diff --git a/gn/standalone/BUILD.gn b/gn/standalone/BUILD.gn
+index 36fb6371a5..f7bc97b1a6 100644
+--- a/gn/standalone/BUILD.gn
++++ b/gn/standalone/BUILD.gn
+@@ -469,10 +469,10 @@ config("android_liblog") {
+ }
+ 
+ # Checks that tools/install-build-deps has been run since it last changed.
+-perfetto_check_build_deps("check_build_deps") {
+-  args = []
+-}
++#perfetto_check_build_deps("check_build_deps") {
++#  args = []
++#}
+ 
+-perfetto_check_build_deps("check_build_deps_android") {
+-  args = [ "--android" ]
+-}
++#perfetto_check_build_deps("check_build_deps_android") {
++#  args = [ "--android" ]
++#}
+diff --git a/gn/standalone/BUILDCONFIG.gn b/gn/standalone/BUILDCONFIG.gn
+index 05ed548f9d..94db724b2b 100644
+--- a/gn/standalone/BUILDCONFIG.gn
++++ b/gn/standalone/BUILDCONFIG.gn
+@@ -59,8 +59,9 @@ declare_args() {
+   # the ossfuzz sanitizer overrides this to true. In that config the
+   # host/target cpu and arch are identical, but we want to build only the
+   # targets with the sanitizer/fuzzer flags
+-  is_cross_compiling =
+-      target_cpu != host_cpu || target_os != host_os || target_triplet != ""
++
++  # for Bitbake build
++  is_cross_compiling = true
+ }
+ default_configs = [
+   "//gn/standalone:default",

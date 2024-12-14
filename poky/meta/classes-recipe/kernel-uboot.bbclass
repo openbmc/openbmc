@@ -41,6 +41,8 @@ uboot_prep_kimage() {
 			gzip -9 linux.bin
 		elif [ "${linux_comp}" = "lzo" ] ; then
 			lzop -9 linux.bin
+		elif [ "${linux_comp}" = "lzma" ] ; then
+			xz --format=lzma -f -6 linux.bin
 		fi
 		mv -f "linux.bin${linux_suffix}" linux.bin
 	fi

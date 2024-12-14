@@ -9,12 +9,11 @@ SRC_URI[sha256sum] = "9737e0c24cabb8bc9d48bf8c57c3df2a70f8cdd96b70c50290803286f9
 
 PYPI_PACKAGE = "python-pkcs11"
 
-inherit pypi setuptools3
+inherit pypi setuptools3 cython
 
 BBCLASSEXTEND = "native"
 
 DEPENDS += " \
-    python3-cython-native \
     python3-setuptools-scm-native \
     python3 \
 "

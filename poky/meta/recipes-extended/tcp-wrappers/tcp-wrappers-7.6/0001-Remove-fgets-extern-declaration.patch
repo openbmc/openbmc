@@ -6,7 +6,7 @@ Subject: [PATCH] Remove fgets() extern declaration
 These sources already include <stdio.h> which should bring the correct
 declaration
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  hosts_access.c | 1 -

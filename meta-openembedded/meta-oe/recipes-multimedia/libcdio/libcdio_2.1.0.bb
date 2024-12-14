@@ -9,7 +9,6 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.bz2 \
            file://Drop-LIBCDIO_SOURCE_PATH-by-dropping-STRIP_FROM_PATH.patch \
            "
 
-SRC_URI[md5sum] = "aa7629e8f73662a762f64c444b901055"
 SRC_URI[sha256sum] = "8550e9589dbd594bfac93b81ecf129b1dc9d0d51e90f9696f1b2f9b2af32712b"
 
 inherit autotools pkgconfig

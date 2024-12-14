@@ -1,24 +1,24 @@
 require ${BPN}.inc
 
 DEPENDS = " \
-    ${BPN}-native gperf-native \
-    glib-2.0 json-glib gtk4 libxml2 icu \
-    dbus db virtual/libiconv zlib libsoup-3.0 libical nss libsecret \
+    ${BPN}-native cairo gperf-native \
+    glib-2.0 json-glib gtk+3 gtk4 libxml2 icu \
+    dbus db virtual/libiconv zlib libsoup nspr libical nss libsecret \
 "
 
-inherit pkgconfig gsettings gobject-introspection features_check gtk-doc gettext perlnative vala
+inherit pkgconfig gsettings gobject-introspection mime-xdg features_check gtk-doc gettext perlnative vala
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 REQUIRED_DISTRO_FEATURES = "opengl"
 
-SRC_URI += " \
-    file://0001-cmake-Do-not-export-CC-into-gir-compiler.patch \
-    file://0001-CMakeLists.txt-Remove-TRY_RUN-for-iconv.patch \
-    file://0002-CMakeLists.txt-remove-CHECK_C_SOURCE_RUNS-check.patch \
-    file://0003-contact-Replace-the-Novell-sample-contact-with-somet.patch \
-    file://0004-call-native-helpers.patch \
-    file://iconv-detect.h \
-"
+SRC_URI += "file://0001-cmake-Do-not-export-CC-into-gir-compiler.patch \
+           file://0001-CMakeLists.txt-Remove-TRY_RUN-for-iconv.patch \
+           file://0002-CMakeLists.txt-remove-CHECK_C_SOURCE_RUNS-check.patch \
+           file://0003-contact-Replace-the-Novell-sample-contact-with-somet.patch \
+           file://0004-call-native-helpers.patch \
+           file://0001-data-CMakeLists.txt-dont-create-automatic-google-log.patch \
+           file://iconv-detect.h \
+           "
 
 LKSTRFTIME = "HAVE_LKSTRFTIME=ON"
 LKSTRFTIME:libc-musl = "HAVE_LKSTRFTIME=OFF"
@@ -42,7 +42,7 @@ EXTRA_OECMAKE:append:class-target = " -DG_IR_SCANNER=${STAGING_BINDIR}/g-ir-scan
 PACKAGECONFIG ?= "goa oauth"
 
 PACKAGECONFIG[canberra] = "-DENABLE_CANBERRA=ON,-DENABLE_CANBERRA=OFF,libcanberra"
-PACKAGECONFIG[oauth]    = "-DENABLE_OAUTH2_WEBKITGTK4=ON -DENABLE_OAUTH2_WEBKITGTK=OFF,-DENABLE_OAUTH2_WEBKITGTK4=OFF -DENABLE_OAUTH2_WEBKITGTK=OFF,webkitgtk json-glib"
+PACKAGECONFIG[oauth]    = "-DENABLE_OAUTH2_WEBKITGTK4=ON -DENABLE_OAUTH2_WEBKITGTK=ON,-DENABLE_OAUTH2_WEBKITGTK4=OFF -DENABLE_OAUTH2_WEBKITGTK=OFF,webkitgtk json-glib"
 PACKAGECONFIG[goa]    = "-DENABLE_GOA=ON,-DENABLE_GOA=OFF,gnome-online-accounts"
 PACKAGECONFIG[kerberos]    = "-DWITH_KRB5=ON,-DWITH_KRB5=OFF,krb5"
 # BROKEN: due missing pkg-config in openldap eds' cmake finds host-libs when

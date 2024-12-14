@@ -1,0 +1,55 @@
+From 0c97d5eacae4f584313c9251e585bb0246cceffc Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 22 Nov 2024 22:52:31 +0100
+Subject: [PATCH] tests/egl/spec: make egl_ext_surface_compression conditional
+ to X11
+
+Otherwise, this error occurs:
+| In file included from /srv/storage/alex/yocto/build-64/workspace/sources/piglit/tests/egl/spec/egl_ext_surface_compression/create_surface.c:28:
+| /srv/storage/alex/yocto/build-64/workspace/sources/piglit/tests/egl/spec/egl_ext_surface_compression/../../egl-util.h:12:10: fatal error: X11/Xlib.h: No such file or directory
+|    12 | #include <X11/Xlib.h>
+|       |          ^~~~~~~~~~~~
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/974]
+Co-developed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ .../spec/egl_ext_surface_compression/CMakeLists.gles3.txt   | 6 ++++--
+ tests/egl/spec/egl_ext_surface_compression/create_surface.c | 1 -
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt b/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt
+index d9540bcfde27..01a70164f444 100644
+--- a/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt
++++ b/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt
+@@ -2,10 +2,12 @@ link_libraries(
+ 	piglitutil_${piglit_target_api}
+ )
+ 
+-piglit_add_executable(egl_ext_surface_compression-create ../../egl-util.c
++if (PIGLIT_HAS_WAYLAND)
++piglit_add_executable(egl_ext_surface_compression-create
+ 	../../egl-wayland.c create_surface.c)
++endif (PIGLIT_HAS_WAYLAND)
+ 
+-piglit_add_executable(egl_ext_surface_compression-image ../../egl-util.c
++piglit_add_executable(egl_ext_surface_compression-image
+ 	image_storage.c)
+ 
+ # vim: ft=cmake:
+diff --git a/tests/egl/spec/egl_ext_surface_compression/create_surface.c b/tests/egl/spec/egl_ext_surface_compression/create_surface.c
+index e3d55d4331fb..35f13fd007b4 100644
+--- a/tests/egl/spec/egl_ext_surface_compression/create_surface.c
++++ b/tests/egl/spec/egl_ext_surface_compression/create_surface.c
+@@ -25,7 +25,6 @@
+ #include "piglit-util.h"
+ #include "piglit-util-egl.h"
+ #include "piglit-util-gl.h"
+-#include "../../egl-util.h"
+ #include "../../egl-wayland.h"
+ 
+ static enum piglit_result
+-- 
+2.39.5
+

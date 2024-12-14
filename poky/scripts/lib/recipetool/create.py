@@ -960,7 +960,7 @@ def handle_license_vars(srctree, lines_before, handled, extravalues, d):
         # Someone else has already handled the license vars, just return their value
         return lichandled[0][1]
 
-    licvalues = guess_license(srctree, d)
+    licvalues = find_licenses(srctree, d)
     licenses = []
     lic_files_chksum = []
     lic_unknown = []
@@ -1216,13 +1216,7 @@ def crunch_license(licfile):
         lictext = ''
     return md5val, lictext
 
-def guess_license(srctree, d):
-    import bb
-    md5sums = get_license_md5sums(d)
-
-    crunched_md5sums = crunch_known_licenses(d)
-
-    licenses = []
+def find_license_files(srctree):
     licspecs = ['*LICEN[CS]E*', 'COPYING*', '*[Ll]icense*', 'LEGAL*', '[Ll]egal*', '*GPL*', 'README.lic*', 'COPYRIGHT*', '[Cc]opyright*', 'e[dp]l-v10']
     skip_extensions = (".html", ".js", ".json", ".svg", ".ts", ".go")
     licfiles = []
@@ -1235,11 +1229,22 @@ def guess_license(srctree, d):
                     fullpath = os.path.join(root, fn)
                     if not fullpath in licfiles:
                         licfiles.append(fullpath)
+
+    return licfiles
+
+def match_licenses(licfiles, srctree, d):
+    import bb
+    md5sums = get_license_md5sums(d)
+
+    crunched_md5sums = crunch_known_licenses(d)
+
+    licenses = []
     for licfile in sorted(licfiles):
-        md5value = bb.utils.md5_file(licfile)
+        resolved_licfile = d.expand(licfile)
+        md5value = bb.utils.md5_file(resolved_licfile)
         license = md5sums.get(md5value, None)
         if not license:
-            crunched_md5, lictext = crunch_license(licfile)
+            crunched_md5, lictext = crunch_license(resolved_licfile)
             license = crunched_md5sums.get(crunched_md5, None)
             if lictext and not license:
                 license = 'Unknown'
@@ -1249,13 +1254,19 @@ def guess_license(srctree, d):
         if license:
             licenses.append((license, os.path.relpath(licfile, srctree), md5value))
 
+    return licenses
+
+def find_licenses(srctree, d):
+    licfiles = find_license_files(srctree)
+    licenses = match_licenses(licfiles, srctree, d)
+
     # FIXME should we grab at least one source file with a license header and add that too?
 
     return licenses
 
 def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn='${PN}'):
     """
-    Given a list of (license, path, md5sum) as returned by guess_license(),
+    Given a list of (license, path, md5sum) as returned by match_licenses(),
     a dict of package name to path mappings, write out a set of
     package-specific LICENSE values.
     """
@@ -1283,6 +1294,14 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
         outlines.append('LICENSE:%s = "%s"' % (pkgname, license))
         outlicenses[pkgname] = licenses
     return outlicenses
+
+def generate_common_licenses_chksums(common_licenses, d):
+    lic_files_chksums = []
+    for license in tidy_licenses(common_licenses):
+        licfile = '${COMMON_LICENSE_DIR}/' + license
+        md5value = bb.utils.md5_file(d.expand(licfile))
+        lic_files_chksums.append('file://%s;md5=%s' % (licfile, md5value))
+    return lic_files_chksums
 
 def read_pkgconfig_provides(d):
     pkgdatadir = d.getVar('PKGDATA_DIR')
@@ -1418,4 +1437,3 @@ def register_commands(subparsers):
     parser_create.add_argument('--devtool', action="store_true", help=argparse.SUPPRESS)
     parser_create.add_argument('--mirrors', action="store_true", help='Enable PREMIRRORS and MIRRORS for source tree fetching (disabled by default).')
     parser_create.set_defaults(func=create_recipe)
-

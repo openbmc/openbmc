@@ -29,8 +29,7 @@ def cli_from_config(config, terminal_choice):
         if terminal_choice != "none" and name:
             # TODO if raw mode
             # cli.extend(["--parameter", f"{terminal}.mode=raw"])
-            # TODO put name into terminal title
-            cli.extend(["--parameter", f"{terminal}.terminal_command={terminals[terminal_choice].command}"])
+            cli.extend(["--parameter", f"{terminal}.terminal_command={terminals[terminal_choice].command.format(name=name)}"])
         else:
             # Disable terminal
             cli.extend(["--parameter", f"{terminal}.start_telnet=0"])
@@ -134,8 +133,14 @@ class FVPRunner:
         for console in self._pexpects:
             import pexpect
             # Ensure pexpect logs all remaining output to the logfile
-            console.expect(pexpect.EOF, timeout=5.0)
-            console.close()
+            try:
+                console.expect(pexpect.EOF, timeout=30.0)
+            except pexpect.TIMEOUT:
+                pexpect_logfile = ""
+                if console.logfile is not None:
+                    pexpect_logfile = f" ({console.logfile})"
+                self._logger.debug(f"Unable to get EOF on pexpect spawn obj{pexpect_logfile}.")
+            console.close(force=True)
 
         if self._fvp_process and self._fvp_process.returncode and \
                 self._fvp_process.returncode > 0:

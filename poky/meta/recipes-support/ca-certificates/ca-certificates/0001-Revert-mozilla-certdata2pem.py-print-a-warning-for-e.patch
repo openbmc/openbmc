@@ -19,7 +19,7 @@ diff --git a/debian/changelog b/debian/changelog
 index 531e4d0..4006509 100644
 --- a/debian/changelog
 +++ b/debian/changelog
-@@ -37,7 +37,6 @@ ca-certificates (20211004) unstable; urgency=low
+@@ -120,7 +120,6 @@ ca-certificates (20211004) unstable; urgency=low
      - "Trustis FPS Root CA"
      - "Staat der Nederlanden Root CA - G3"
    * Blacklist expired root certificate "DST Root CA X3" (closes: #995432)
@@ -37,9 +37,9 @@ index 4434b7a..5c6ba24 100644
  Build-Depends: debhelper-compat (= 13), po-debconf
 -Build-Depends-Indep: python3, openssl, python3-cryptography
 +Build-Depends-Indep: python3, openssl
- Standards-Version: 4.5.0.2
+ Standards-Version: 4.6.2
+ Rules-Requires-Root: no
  Vcs-Git: https://salsa.debian.org/debian/ca-certificates.git
- Vcs-Browser: https://salsa.debian.org/debian/ca-certificates
 diff --git a/mozilla/certdata2pem.py b/mozilla/certdata2pem.py
 index ede23d4..7d796f1 100644
 --- a/mozilla/certdata2pem.py
@@ -66,8 +66,8 @@ index ede23d4..7d796f1 100644
          if not obj['CKA_LABEL'] in trust or not trust[obj['CKA_LABEL']]:
              continue
 -
--        cert = x509.load_der_x509_certificate(obj['CKA_VALUE'])
--        if cert.not_valid_after < datetime.datetime.now():
+-        cert = x509.load_der_x509_certificate(bytes(obj['CKA_VALUE']))
+-        if cert.not_valid_after < datetime.datetime.utcnow():
 -            print('!'*74)
 -            print('Trusted but expired certificate found: %s' % obj['CKA_LABEL'])
 -            print('!'*74)

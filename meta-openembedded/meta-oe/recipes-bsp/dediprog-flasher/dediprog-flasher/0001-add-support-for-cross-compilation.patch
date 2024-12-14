@@ -1,0 +1,21 @@
+Author: Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+Date:   Fri Jul 5 16:39:13 2024 +0200
+Upstream-Status: Submitted [https://github.com/DediProgSW/SF100Linux/pull/86]
+
+    Makefile: allow overriding CC
+    
+    Signed-off-by: Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+
+diff --git a/Makefile b/Makefile
+index 139e5c0c3c3c..226303a6921e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -12,7 +12,7 @@ endif
+ endif
+ 
+ PROGRAM = dpcmd
+-CC      = gcc
++CC     ?= gcc
+ PREFIX ?= /usr/local
+ 
+ PKG_CONFIG ?= pkg-config

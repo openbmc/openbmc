@@ -1,4 +1,4 @@
-From 29c2a0c18b0c773128bf62c611b4c53fe4471105 Mon Sep 17 00:00:00 2001
+From d8972ff7fa0a30e199144ba135223bf561874e01 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Tue, 16 Jan 2024 09:59:26 +0100
 Subject: [PATCH] rpmio/rpmglob.c: avoid using GLOB_BRACE if undefined by C
@@ -16,7 +16,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 6 insertions(+)
 
 diff --git a/rpmio/rpmglob.c b/rpmio/rpmglob.c
-index 243568766..43c27074a 100644
+index eb439cad8..1eef0b851 100644
 --- a/rpmio/rpmglob.c
 +++ b/rpmio/rpmglob.c
 @@ -33,6 +33,12 @@

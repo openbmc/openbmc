@@ -1,0 +1,65 @@
+From 18b9079ddbc149d6b99c922630c246812e4d8ae7 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Wed, 16 Oct 2024 16:48:40 +0200
+Subject: [PATCH] [3.13] gh-125444: Fix illegal instruction for older Arm
+ architectures (GH-125574) (GH-125595)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On Arm v5 it is not possible to get the thread ID via c13 register
+hence the illegal instruction. The c13 register started to provide
+thread ID since Arm v6K architecture variant. Other variants of
+Arm v6 (T2, Z and base) don’t provide the thread ID via c13.
+For the sake of simplicity we group v5 and v6 together and
+consider that instructions for Arm v7 only.
+(cherry picked from commit feda9aa73ab95d17a291db22c416146f8e70edeb)
+
+Co-authored-by: Diego Russo <diego.russo@arm.com>
+
+Upstream-Status: Backport [https://github.com/python/cpython/commit/18b9079ddbc149d6b99c922630c246812e4d8ae7]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Include/internal/mimalloc/mimalloc/prim.h                     | 4 ++--
+ Include/object.h                                              | 2 +-
+ .../2024-10-16-12-12-39.gh-issue-125444.9tG2X6.rst            | 1 +
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Core_and_Builtins/2024-10-16-12-12-39.gh-issue-125444.9tG2X6.rst
+
+diff --git a/Include/internal/mimalloc/mimalloc/prim.h b/Include/internal/mimalloc/mimalloc/prim.h
+index 8a60d528458e6c..322ab29e6b41c2 100644
+--- a/Include/internal/mimalloc/mimalloc/prim.h
++++ b/Include/internal/mimalloc/mimalloc/prim.h
+@@ -151,9 +151,9 @@ static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
+ // If you test on another platform and it works please send a PR :-)
+ // see also https://akkadia.org/drepper/tls.pdf for more info on the TLS register.
+ #elif defined(__GNUC__) && ( \
+-           (defined(__GLIBC__)   && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
++           (defined(__GLIBC__)   && (defined(__x86_64__) || defined(__i386__) || (defined(__arm__) && __ARM_ARCH >= 7) || defined(__aarch64__))) \
+         || (defined(__APPLE__)   && (defined(__x86_64__) || defined(__aarch64__))) \
+-        || (defined(__BIONIC__)  && (defined(__x86_64__) || defined(__i386__) || defined(__arm__) || defined(__aarch64__))) \
++        || (defined(__BIONIC__)  && (defined(__x86_64__) || defined(__i386__) || (defined(__arm__) && __ARM_ARCH >= 7) || defined(__aarch64__))) \
+         || (defined(__FreeBSD__) && (defined(__x86_64__) || defined(__i386__) || defined(__aarch64__))) \
+         || (defined(__OpenBSD__) && (defined(__x86_64__) || defined(__i386__) || defined(__aarch64__))) \
+       )
+diff --git a/Include/object.h b/Include/object.h
+index 78aa7ad0f459ff..b53f9acfebdb0c 100644
+--- a/Include/object.h
++++ b/Include/object.h
+@@ -259,7 +259,7 @@ _Py_ThreadId(void)
+     __asm__("movq %%gs:0, %0" : "=r" (tid));  // x86_64 macOSX uses GS
+ #elif defined(__x86_64__)
+    __asm__("movq %%fs:0, %0" : "=r" (tid));  // x86_64 Linux, BSD uses FS
+-#elif defined(__arm__)
++#elif defined(__arm__) && __ARM_ARCH >= 7
+     __asm__ ("mrc p15, 0, %0, c13, c0, 3\nbic %0, %0, #3" : "=r" (tid));
+ #elif defined(__aarch64__) && defined(__APPLE__)
+     __asm__ ("mrs %0, tpidrro_el0" : "=r" (tid));
+diff --git a/Misc/NEWS.d/next/Core_and_Builtins/2024-10-16-12-12-39.gh-issue-125444.9tG2X6.rst b/Misc/NEWS.d/next/Core_and_Builtins/2024-10-16-12-12-39.gh-issue-125444.9tG2X6.rst
+new file mode 100644
+index 00000000000000..13c1e745edf8d5
+--- /dev/null
++++ b/Misc/NEWS.d/next/Core_and_Builtins/2024-10-16-12-12-39.gh-issue-125444.9tG2X6.rst
+@@ -0,0 +1 @@
++Fix illegal instruction for older Arm architectures. Patch by Diego Russo, testing by Ross Burton.

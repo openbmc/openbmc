@@ -743,7 +743,7 @@ def _exec_task(fn, task, d, quieterr):
 
         if quieterr:
             if not handled:
-                logger.warning(repr(exc))
+                logger.warning(str(exc))
             event.fire(TaskFailedSilent(task, fn, logfn, localdata), localdata)
         else:
             errprinted = errchk.triggered
@@ -752,7 +752,7 @@ def _exec_task(fn, task, d, quieterr):
             if verboseStdoutLogging or handled:
                 errprinted = True
             if not handled:
-                logger.error(repr(exc))
+                logger.error(str(exc))
             event.fire(TaskFailed(task, fn, logfn, localdata, errprinted), localdata)
         return 1
 
@@ -932,9 +932,13 @@ def add_tasks(tasklist, d):
     # don't assume holding a reference
     d.setVar('_task_deps', task_deps)
 
+def ensure_task_prefix(name):
+    if name[:3] != "do_":
+        name = "do_" + name
+    return name
+
 def addtask(task, before, after, d):
-    if task[:3] != "do_":
-        task = "do_" + task
+    task = ensure_task_prefix(task)
 
     d.setVarFlag(task, "task", 1)
     bbtasks = d.getVar('__BBTASKS', False) or []
@@ -946,19 +950,20 @@ def addtask(task, before, after, d):
     if after is not None:
         # set up deps for function
         for entry in after.split():
+            entry = ensure_task_prefix(entry)
             if entry not in existing:
                 existing.append(entry)
     d.setVarFlag(task, "deps", existing)
     if before is not None:
         # set up things that depend on this func
         for entry in before.split():
+            entry = ensure_task_prefix(entry)
             existing = d.getVarFlag(entry, "deps", False) or []
             if task not in existing:
                 d.setVarFlag(entry, "deps", [task] + existing)
 
 def deltask(task, d):
-    if task[:3] != "do_":
-        task = "do_" + task
+    task = ensure_task_prefix(task)
 
     bbtasks = d.getVar('__BBTASKS', False) or []
     if task in bbtasks:
@@ -1023,3 +1028,9 @@ def tasksbetween(task_start, task_end, d):
         chain.pop()
     follow_chain(task_start, task_end)
     return outtasks
+
+def listtasks(d):
+    """
+    Return the list of tasks in the current recipe.
+    """
+    return tuple(d.getVar('__BBTASKS', False) or ())

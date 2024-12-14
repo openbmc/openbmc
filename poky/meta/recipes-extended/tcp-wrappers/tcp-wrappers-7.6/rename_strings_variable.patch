@@ -1,6 +1,6 @@
 STRINGS name conflicts with variable for strings tools (e.g. i586-oe-linux-strings)
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 

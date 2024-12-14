@@ -1,7 +1,7 @@
-From 7a46f43682641436464579d8bf76c382e71ea557 Mon Sep 17 00:00:00 2001
+From 69ee17207574ca032c3cb46a3db99736de3eedf8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 25 May 2020 23:22:55 -0700
-Subject: [PATCH 12/12] add explicit dependency on libraries
+Subject: [PATCH] add explicit dependency on libraries
 
 [snip]
 gcc/i686-overc-linux/10.1.0/ld: cannot find -lmpathpersist
@@ -24,10 +24,10 @@ Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index 065249c2..0444c2ea 100644
+index 690dc050..b775f949 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -90,6 +90,7 @@ libmultipath: libmpathutil
+@@ -93,6 +93,7 @@ libmultipath: libmpathutil
  libmpathpersist libmpathvalid multipath multipathd: libmultipath
  libmultipath/prioritizers libmultipath/checkers libmultipath/foreign: libmultipath
  mpathpersist multipathd:  libmpathpersist

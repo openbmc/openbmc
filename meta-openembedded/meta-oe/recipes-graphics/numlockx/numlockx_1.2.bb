@@ -7,7 +7,6 @@ DEPENDS = "virtual/libx11 libxtst"
 
 SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/numlockx/numlockx-${PV}.tar.gz/be9109370447eae23f6f3f8527bb1a67/numlockx-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "be9109370447eae23f6f3f8527bb1a67"
 SRC_URI[sha256sum] = "e468eb9121c94c9089dc6a287eeb347e900ce04a14be37da29d7696cbce772e4"
 
 inherit autotools features_check

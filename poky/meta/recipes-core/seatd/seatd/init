@@ -15,7 +15,7 @@ killproc() {
 
 case "$1" in
   start)
-        seatd -g video -n 1 > /tmp/seatd-start-notify &
+        seatd -g seat -n 1 > /tmp/seatd-start-notify &
         [ -s /tmp/seatd-start-notify ] && exit 0
         sleep 0.1
         [ -s /tmp/seatd-start-notify ] && exit 0

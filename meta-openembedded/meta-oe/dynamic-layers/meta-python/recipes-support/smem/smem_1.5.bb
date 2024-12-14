@@ -12,7 +12,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 HG_CHANGESET = "98273ce331bb"
 SRC_URI = "https://selenic.com/repo/${BPN}/archive/${HG_CHANGESET}.tar.bz2;downloadfilename=${BP}.tar.bz2 \
            file://0001-smem-fix-support-for-source-option-python3.patch"
-SRC_URI[md5sum] = "51c3989779360f42b42ef46b2831be3a"
 SRC_URI[sha256sum] = "161131c686a6d9962a0e96912526dd46308e022d62e3f8acaed5a56fda8e08ce"
 
 UPSTREAM_CHECK_URI = "https://selenic.com/repo/smem/tags"

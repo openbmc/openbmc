@@ -1,0 +1,97 @@
+From 6ac0d4ce58c1a957c5f086e8c32268fdfc3ea531 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Thu, 26 Oct 2023 11:46:04 +0100
+Subject: [PATCH 1/9] Platform: Corstone1000: Align capsule UEFI structs
+
+The UEFI capsules are generated using the U-Boot mkeficapsule tool.
+U-Boot uses packed struct for the UEFI and FMP structures, see [1].
+The structs have to be aligned in the TF-M side parser to avoid
+crashes.
+
+[1] https://github.com/u-boot/u-boot/blob/u-boot-2023.07.y/include/efi_api.h#L245
+
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [6ac0d4ce58c1a957c5f086e8c32268fdfc3ea531]
+---
+ .../fw_update_agent/uefi_capsule_parser.c       | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c
+index c706c040a..44566e08d 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/uefi_capsule_parser.c
+@@ -1,10 +1,11 @@
+ /*
+- * Copyright (c) 2021, Arm Limited. All rights reserved.
++ * Copyright (c) 2021-2024, Arm Limited. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+  */
+ 
++#include "cmsis_compiler.h"
+ #include "uefi_capsule_parser.h"
+ #include "fwu_agent.h"
+ #include <string.h>
+@@ -29,21 +30,21 @@ Update Capsule Structure (UEFI spec 2.9 1004)
+             Payload n (item_offset[embedded_driver_count + payload_item_count -1])
+ */
+ 
+-typedef struct {
++typedef __PACKED_STRUCT {
+     struct efi_guid         capsule_guid;
+     uint32_t                header_size;
+     uint32_t                flags;
+     uint32_t                capsule_image_size;
+ } efi_capsule_header_t;
+ 
+-typedef struct {
++typedef __PACKED_STRUCT {
+     uint32_t                version;
+     uint16_t                embedded_driver_count;
+     uint16_t                payload_item_count;
+     uint64_t                item_offset_list[];
+ } efi_firmware_management_capsule_header_t;
+ 
+-typedef struct {
++typedef __PACKED_STRUCT {
+     uint32_t                version;
+     struct efi_guid         update_image_type_id;
+     uint8_t                 update_image_index;
+@@ -54,7 +55,7 @@ typedef struct {
+     uint64_t                image_capsule_support; //introduced in v3
+ } efi_firmware_management_capsule_image_header_t;
+ 
+-typedef struct {
++typedef __PACKED_STRUCT {
+     uint32_t                signature;
+     uint32_t                header_size;
+     uint32_t                fw_version;
+@@ -63,20 +64,20 @@ typedef struct {
+ 
+ #define ANYSIZE_ARRAY 0
+ 
+-typedef struct {
++typedef __PACKED_STRUCT {
+     uint32_t                dwLength;
+     uint16_t                wRevision;
+     uint16_t                wCertificateType;
+     uint8_t                 bCertificate[ANYSIZE_ARRAY];
+ } WIN_CERTIFICATE;
+ 
+-typedef struct {
++typedef __PACKED_STRUCT {
+     WIN_CERTIFICATE         hdr;
+     struct efi_guid         cert_type;
+     uint8_t                 cert_data[ANYSIZE_ARRAY];
+ } win_certificate_uefi_guid_t;
+ 
+-typedef struct {
++typedef __PACKED_STRUCT {
+     uint64_t                    monotonic_count;
+     win_certificate_uefi_guid_t   auth_info;
+ } efi_firmware_image_authentication_t;
+-- 
+2.25.1
+

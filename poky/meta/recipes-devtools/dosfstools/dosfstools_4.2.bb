@@ -13,6 +13,8 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
           "
 SRC_URI[sha256sum] = "64926eebf90092dca21b14259a5301b7b98e7b1943e8a201c7d726084809b527"
 
+SRC_URI += "file://source-date-epoch.patch"
+
 inherit autotools gettext pkgconfig update-alternatives github-releases
 
 EXTRA_OECONF = "--enable-compat-symlinks --without-iconv"

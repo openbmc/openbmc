@@ -446,6 +446,7 @@ def fileslocked(files, *args, **kwargs):
     try:
         yield
     finally:
+        locks.reverse()
         for lock in locks:
             bb.utils.unlockfile(lock)
 

@@ -15,8 +15,10 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/dbus-cplusplus/dbus-c++/${PV}/${BP}.tar
            file://0004-use-POSIX-poll.h-instead-of-sys-poll.h.patch \
            file://0001-pipe.c-Use-a-string-instead-of-char.patch \
            "
-SRC_URI[md5sum] = "e752116f523fa88ef041e63d3dee4de2"
 SRC_URI[sha256sum] = "bc11ac297b3cb010be904c72789695543ee3fdf3d75cdc8225fd371385af4e61"
+
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/dbus-cplusplus/files"
+UPSTREAM_CHECK_REGEX = "libdbus-c---(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools pkgconfig
 

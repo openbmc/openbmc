@@ -5,8 +5,9 @@ LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
 SRC_URI = "http://downloads.sourceforge.net/project/cxxtest/cxxtest/${PV}/${BP}.tar.gz"
-SRC_URI[md5sum] = "c3cc3355e2ac64e34c215f28e44cfcec"
 SRC_URI[sha256sum] = "1c154fef91c65dbf1cd4519af7ade70a61d85a923b6e0c0b007dc7f4895cf7d8"
+
+UPSTREAM_CHECK_URI = "https://sourceforge.net/p/cxxtest/activity/"
 
 inherit setuptools3
 

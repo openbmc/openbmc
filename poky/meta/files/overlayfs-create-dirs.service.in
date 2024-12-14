@@ -1,5 +1,5 @@
 [Unit]
-Description=Overlayfs directories setup
+Description=Overlayfs directories setup {LOWERDIR}
 Requires={DATA_MOUNT_UNIT}
 After={DATA_MOUNT_UNIT}
 DefaultDependencies=no

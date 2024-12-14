@@ -12,11 +12,9 @@ Signed-off-by: Dan McGregor <dan.mcgregor@vecima.com>
  tests/functional/w/wrong_import_order.txt | 22 +++++++++++-----------
  1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/tests/functional/w/wrong_import_order.txt b/tests/functional/w/wrong_import_order.txt
-index 068d2140d..9594ff9e0 100644
 --- a/tests/functional/w/wrong_import_order.txt
 +++ b/tests/functional/w/wrong_import_order.txt
-@@ -3,14 +3,14 @@ wrong-import-order:14:0:14:10::"standard import ""sys"" should be placed before
+@@ -3,14 +3,14 @@ wrong-import-order:14:0:14:10::"standard
  wrong-import-order:15:0:15:15::"standard import ""datetime"" should be placed before third party imports ""six"", ""astroid.are_exclusive""":UNDEFINED
  wrong-import-order:18:0:18:22::"third party import ""totally_missing"" should be placed before local import ""package.Class""":UNDEFINED
  wrong-import-order:20:0:20:14::"third party import ""astroid"" should be placed before local imports ""package.Class"", "".package""":UNDEFINED

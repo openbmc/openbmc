@@ -45,14 +45,14 @@ EXTRA_OECONF = " \
 "
 
 # pread() is in POSIX.1-2001 so any reasonable system must surely support it
-CFLAGS:append = " -DUSE_PREAD"
+CFLAGS += "-DUSE_PREAD"
 
 # Provide column meta-data API
-CFLAGS:append = " -DSQLITE_ENABLE_COLUMN_METADATA"
+CFLAGS += "-DSQLITE_ENABLE_COLUMN_METADATA"
 
 # Unless SQLITE_BYTEORDER is predefined, the code falls back to build time
 # huristics, which are not always correct
-CFLAGS:append = " ${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-DSQLITE_BYTEORDER=1234', '-DSQLITE_BYTEORDER=4321', d)}"
+CFLAGS += "${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-DSQLITE_BYTEORDER=1234', '-DSQLITE_BYTEORDER=4321', d)}"
 
 PACKAGES = "lib${BPN} lib${BPN}-dev lib${BPN}-doc ${PN}-dbg lib${BPN}-staticdev ${PN}"
 

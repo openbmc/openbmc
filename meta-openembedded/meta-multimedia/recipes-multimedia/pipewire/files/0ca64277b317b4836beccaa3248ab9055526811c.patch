@@ -1,0 +1,46 @@
+From 0ca64277b317b4836beccaa3248ab9055526811c Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Mon, 30 Sep 2024 10:06:30 +0200
+Subject: [PATCH] spa: initialize all fields explicitly
+
+Patch by Petar Popovic
+
+Fixes #4325
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/pipewire/pipewire/-/commit/0ca64277b317b4836beccaa3248ab9055526811c]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ spa/include/spa/pod/builder.h | 2 +-
+ spa/include/spa/pod/parser.h  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spa/include/spa/pod/builder.h b/spa/include/spa/pod/builder.h
+index 0564d94ea2..6d3e9d54af 100644
+--- a/spa/include/spa/pod/builder.h
++++ b/spa/include/spa/pod/builder.h
+@@ -49,7 +49,7 @@ struct spa_pod_builder {
+ 	struct spa_callbacks callbacks;
+ };
+ 
+-#define SPA_POD_BUILDER_INIT(buffer,size)  ((struct spa_pod_builder){ (buffer), (size), 0, {0}, {0} })
++#define SPA_POD_BUILDER_INIT(buffer,size)  ((struct spa_pod_builder){ (buffer), (size), 0, {0,0,NULL},{NULL,NULL}})
+ 
+ static inline void
+ spa_pod_builder_get_state(struct spa_pod_builder *builder, struct spa_pod_builder_state *state)
+diff --git a/spa/include/spa/pod/parser.h b/spa/include/spa/pod/parser.h
+index 083f911713..4c1e72acce 100644
+--- a/spa/include/spa/pod/parser.h
++++ b/spa/include/spa/pod/parser.h
+@@ -33,7 +33,7 @@ struct spa_pod_parser {
+ 	struct spa_pod_parser_state state;
+ };
+ 
+-#define SPA_POD_PARSER_INIT(buffer,size)  ((struct spa_pod_parser){ (buffer), (size), 0, {0} })
++#define SPA_POD_PARSER_INIT(buffer,size)  ((struct spa_pod_parser){ (buffer), (size), 0, {0,0,NULL}})
+ 
+ static inline void spa_pod_parser_init(struct spa_pod_parser *parser,
+ 				       const void *data, uint32_t size)
+-- 
+GitLab
+

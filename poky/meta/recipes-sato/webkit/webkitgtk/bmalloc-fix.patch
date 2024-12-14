@@ -1,0 +1,36 @@
+From 6ab7d3f7d8d0d8e1ab401d0fb13f60bbc64279a2 Mon Sep 17 00:00:00 2001
+From: Thomas Klausner <wiz@gatalith.at>
+Date: Thu, 7 Nov 2024 11:54:30 -0800
+Subject: [PATCH] bmalloc: Build problem in bmalloc when X11/X.h is in the same
+ namespace https://bugs.webkit.org/show_bug.cgi?id=282693
+
+This avoids a build problem when the X11/X.h is included,
+which defines Success to '0'.
+
+Reviewed by Fujii Hironori.
+
+* Source/bmalloc/bmalloc/EligibilityResult.h:
+
+Canonical link: https://commits.webkit.org/286295@main
+Upstream-Status: Backport [https://github.com/WebKit/WebKit/commit/6ab7d3f7d8d0d8e1ab401d0fb13f60bbc64279a2]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Source/bmalloc/bmalloc/EligibilityResult.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Source/bmalloc/bmalloc/EligibilityResult.h b/Source/bmalloc/bmalloc/EligibilityResult.h
+index ead7dbb52c07a..48f9e5bfe8a80 100644
+--- a/Source/bmalloc/bmalloc/EligibilityResult.h
++++ b/Source/bmalloc/bmalloc/EligibilityResult.h
+@@ -29,6 +29,11 @@
+ 
+ #if !BUSE(LIBPAS)
+ 
++/* avoid conflict with symbol from X11 headers */
++#ifdef Success
++#undef Success
++#endif
++
+ namespace bmalloc {
+ 
+ enum class EligibilityKind {

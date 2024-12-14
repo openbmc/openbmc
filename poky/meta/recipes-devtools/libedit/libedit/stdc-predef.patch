@@ -1,13 +1,21 @@
+From 32918b3a91d9fe4719bba78a44ec3262a2994e68 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 31 Jul 2019 10:48:19 -0700
+Subject: [PATCH] libedit: Move from meta-oe
+
 __STDC_ISO_10646__ is defined in stdc-predef.h
 therefore include it to see if its there on a platform
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/chartype.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Index: libedit-20160903-3.1/src/chartype.h
-===================================================================
---- libedit-20160903-3.1.orig/src/chartype.h
-+++ libedit-20160903-3.1/src/chartype.h
+diff --git a/src/chartype.h b/src/chartype.h
+index bcdb293..92327d3 100644
+--- a/src/chartype.h
++++ b/src/chartype.h
 @@ -29,6 +29,7 @@
  #ifndef _h_chartype_f
  #define _h_chartype_f

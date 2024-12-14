@@ -1,4 +1,4 @@
-From 2db1f5bc941e4b4cd1721e361a47cfe288b07a76 Mon Sep 17 00:00:00 2001
+From 3138d70ce8f521d03120e7789e93ebe290ece101 Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Thu, 1 Feb 2024 14:07:03 +0000
 Subject: [PATCH] Fix SIGSEGV during DumpStateLog()
@@ -13,10 +13,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mDNSShared/mDNSDebug.c b/mDNSShared/mDNSDebug.c
-index 7a4ca19eff6d..d449dde320f6 100644
+index b531fcea2bb9..1e8d9b10afbc 100644
 --- a/mDNSShared/mDNSDebug.c
 +++ b/mDNSShared/mDNSDebug.c
-@@ -71,7 +71,7 @@ mDNSlocal void LogMsgWithLevelv(os_log_t category, os_log_type_t level, const ch
+@@ -72,7 +72,7 @@ mDNSlocal void LogMsgWithLevelv(os_log_t category, os_log_type_t level, const ch
  mDNSlocal void LogMsgWithLevelv(const char *category, mDNSLogLevel_t level, const char *format, va_list args)
  {
      // Do not print the logs if the log category is MDNS_LOG_CATEGORY_DISABLED.

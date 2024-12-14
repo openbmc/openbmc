@@ -1,4 +1,4 @@
-From 443d15b91d4e4979d92405610303797663f31102 Mon Sep 17 00:00:00 2001
+From 980eadecc128bbbe1233e5d89268be24d14e1873 Mon Sep 17 00:00:00 2001
 From: echo <fei.geng@windriver.com>
 Date: Tue, 28 Apr 2009 03:11:06 +0000
 Subject: [PATCH] Fix perl install directory to /usr/bin
@@ -16,10 +16,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index 4df3ff3..4eeb609 100644
+index 4ce0fee..0362f52 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -903,10 +903,7 @@ AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${rel_sysconfdir}/${progname}.conf",
+@@ -936,10 +936,7 @@ AC_DEFINE_UNQUOTED(SERVER_CONFIG_FILE, "${rel_sysconfdir}/${progname}.conf",
  AC_DEFINE_UNQUOTED(AP_TYPES_CONFIG_FILE, "${rel_sysconfdir}/mime.types",
  	[Location of the MIME types config file, relative to the Apache root directory])
  
@@ -31,6 +31,3 @@ index 4df3ff3..4eeb609 100644
  AC_SUBST(perlbin)
  
  dnl If we are running on BSD/OS, we need to use the BSD .include syntax.
--- 
-2.25.1
-

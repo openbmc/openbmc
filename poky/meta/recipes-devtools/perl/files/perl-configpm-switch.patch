@@ -1,4 +1,4 @@
-From c25d460a2f00e9af25087d40447fe1a81c89710c Mon Sep 17 00:00:00 2001
+From 7a48538a7e8614a3342151b646d2105c0cb0cdd9 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sun, 27 May 2007 21:04:11 +0000
 Subject: [PATCH] perl: 5.8.7 -> 5.8.8 (from OE)
@@ -14,7 +14,6 @@ values would be valid for the host only.
 
 Upstream-Status: Inappropriate [native]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  configpm | 18 ++++++++++++++++--
  1 file changed, 16 insertions(+), 2 deletions(-)

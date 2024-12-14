@@ -98,6 +98,22 @@ file://${COMMON_LICENSE_DIR}/OPUBL-1.0;md5=99367d4750dbf0ae6cc74209ddd52f6d \
 
 ARM_SYSTEMREADY_LINUX_DISTRO_INSTALL_SIZE = "6144"
 
+TEST_SUITES = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "arm_systemready_fedora_unattended", "", d)}"
+
+ISO_LABEL = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "Fedora-S-dvd-aarch64-39", "", d)}"
+BOOT_CATALOG = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "boot.catalog", "", d)}"
+BOOT_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "EFI/BOOT/BOOTAA64.EFI", "", d)}"
+EFI_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "images/efiboot.img", "", d)}"
+
 PV = "39.1.5"
 SRC_URI = "https://download.fedoraproject.org/pub/fedora/linux/releases/39/Server/aarch64/iso/Fedora-Server-dvd-aarch64-39-1.5.iso;unpack=0;downloadfilename=${ISO_IMAGE_NAME}.iso"
 SRC_URI[sha256sum] = "d19dc2a39758155fa53e6fd555d0d173ccc8175b55dea48002d499f39cb30ce0"
+
+modifyiso() {
+    UNATTENDED_CONF_DIR="${THISDIR}/unattended-boot-conf/Fedora"
+    
+    cp "${UNATTENDED_CONF_DIR}/ks.cfg" ${EXTRACTED_ISO_TEMP_DIR}
+    sed -i 's/set default="1"/set default="0"/g' "${EXTRACTED_ISO_TEMP_DIR}/EFI/BOOT/grub.cfg"
+    sed -i 's/set timeout=60/set timeout=0/g' "${EXTRACTED_ISO_TEMP_DIR}/EFI/BOOT/grub.cfg"
+    sed -i '0,/vmlinuz/s/vmlinuz/& inst.ks=hd:LABEL=Fedora-S-dvd-aarch64-39:\/ks.cfg/' "${EXTRACTED_ISO_TEMP_DIR}/EFI/BOOT/grub.cfg"
+}

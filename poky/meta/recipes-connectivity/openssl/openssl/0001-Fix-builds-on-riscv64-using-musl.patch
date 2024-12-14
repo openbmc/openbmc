@@ -1,0 +1,36 @@
+From 9131291716073c4ea65a29575880a9d796c22ed6 Mon Sep 17 00:00:00 2001
+From: Matt Caswell <matt@openssl.org>
+Date: Wed, 23 Oct 2024 14:57:20 +0100
+Subject: [PATCH] Fix builds on riscv64 using musl
+
+Some environments using musl are reported to have the hwprobe.h include
+file but not have the __NR_riscv_hwprobe define.
+
+Fixes #25772
+
+Upstream-Status: Backport [https://github.com/openssl/openssl/pull/25787]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/crypto/riscv_arch.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/include/crypto/riscv_arch.h b/include/crypto/riscv_arch.h
+index 4b3573f..8858427 100644
+--- a/include/crypto/riscv_arch.h
++++ b/include/crypto/riscv_arch.h
+@@ -15,7 +15,14 @@
+ 
+ # if defined(OPENSSL_SYS_LINUX) && !defined(FIPS_MODULE)
+ #  if __has_include(<asm/hwprobe.h>)
+-#   define OSSL_RISCV_HWPROBE
++#   include <sys/syscall.h>
++#   /*
++     * Some environments using musl are reported to have the hwprobe.h include
++     * file but not have the __NR_riscv_hwprobe define.
++     */
++#   ifdef __NR_riscv_hwprobe
++#    define OSSL_RISCV_HWPROBE
++#   endif
+ #  endif
+ # endif
+ 

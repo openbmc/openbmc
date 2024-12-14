@@ -33,8 +33,6 @@ KNOWN_NON_REPRO_META_OE = " \
     hdf5-dbg \
     hdf5-src \
     hdf5-staticdev \
-    hplip \
-    hplip-dbg \
     jpnevulator-doc \
     jsonrpc-dev \
     kpatch-build \

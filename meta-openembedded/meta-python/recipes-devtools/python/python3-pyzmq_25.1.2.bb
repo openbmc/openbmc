@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "\
     file://LICENSE.LESSER;md5=0e99bfbdd8b9d33b0221986fe3be89ed \
 "
 
-DEPENDS = "python3-packaging-native python3-cython-native python3-setuptools-scm-native zeromq"
+DEPENDS = "python3-packaging-native python3-setuptools-scm-native zeromq"
 
 SRC_URI:append = " \
     file://club-rpath-out.patch \
@@ -15,7 +15,7 @@ SRC_URI:append = " \
 "
 SRC_URI[sha256sum] = "93f1aa311e8bb912e34f004cf186407a4e90eec4f0ecc0efd26056bf7eda0226"
 
-inherit pypi pkgconfig python_setuptools_build_meta ptest
+inherit pypi pkgconfig python_setuptools_build_meta ptest cython
 
 PACKAGES =+ "\
     ${PN}-test \

@@ -77,7 +77,7 @@ def find_template(template_name, templates):
         for t in templates:
             if t["templatename"] == template_name:
                 return t
-        print("Configuration {} is not one of {}, please try again.".format(tempalte_name, [t["templatename"] for t in templates]))
+        print("Configuration {} is not one of {}, please try again.".format(template_name, [t["templatename"] for t in templates]))
         return None
 
 def setup_build_env(args):
@@ -102,9 +102,9 @@ def setup_build_env(args):
 
     cmd = "TEMPLATECONF={} {}".format(template["templatepath"], cmd_base)
     if not no_shell:
-        cmd = cmd + " && {}".format(os.environ['SHELL'])
+        cmd = cmd + " && {}".format(os.environ.get('SHELL','bash'))
     print("Running:", cmd)
-    subprocess.run(cmd, shell=True, executable=os.environ['SHELL'])
+    subprocess.run(cmd, shell=True, executable=os.environ.get('SHELL','bash'))
 
 parser = argparse.ArgumentParser(description="A script that discovers available build configurations and sets up a build environment based on one of them. Run without arguments to choose one interactively.")
 parser.add_argument("--layerlist", default=defaultlayers(), help='Where to look for available layers (as written out by setup-layers script) (default is {}).'.format(defaultlayers()))

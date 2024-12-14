@@ -1,0 +1,32 @@
+From 972bf711ad884607409c225f9338bf25206e29e8 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 31 Jul 2024 15:56:51 +0200
+Subject: [PATCH] Fix psa_key_handle_t initialization
+
+If the MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER macro is defined in the
+mbedcrypto configuration header file then the psa_key_handle_t is a
+struct. In this case, it is defined in the used configuration header
+so the struct cannot be initialized with -1.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ psa_crypto/adac_crypto_psa_mac.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/psa_crypto/adac_crypto_psa_mac.c b/psa_crypto/adac_crypto_psa_mac.c
+index 046fef7..93ab8f9 100644
+--- a/psa_crypto/adac_crypto_psa_mac.c
++++ b/psa_crypto/adac_crypto_psa_mac.c
+@@ -198,7 +198,7 @@ psa_status_t psa_adac_verify_mac(uint8_t key_type,
+                                  size_t mac_size)
+ {
+     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+-    psa_key_handle_t handle = -1;
++    psa_key_handle_t handle = {0};
+     psa_status_t ret = PSA_ERROR_NOT_SUPPORTED;
+     psa_key_type_t type = 0;
+     size_t bits = 0;
+-- 
+2.25.1
+

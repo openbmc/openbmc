@@ -1,4 +1,4 @@
-From c67102307f25c5f4d238c736e90519e56a76ae79 Mon Sep 17 00:00:00 2001
+From 199b376e585d5362a1f51ea20e45dcc3bdb7d6aa Mon Sep 17 00:00:00 2001
 From: Stefan Agner <stefan@agner.ch>
 Date: Fri, 23 Jun 2023 10:10:00 +0200
 Subject: [PATCH] Handle interface without `ifa_addr`
@@ -15,10 +15,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
-index 0c9dd2582660..c3ead26799e6 100644
+index 4c835a8c253c..e1e27b1de3b2 100644
 --- a/mDNSPosix/mDNSPosix.c
 +++ b/mDNSPosix/mDNSPosix.c
-@@ -1895,6 +1895,7 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+@@ -1927,6 +1927,7 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
  	    continue;
  
          if ((ifa_loop4 == NULL) &&
@@ -26,7 +26,7 @@ index 0c9dd2582660..c3ead26799e6 100644
              ((*ifi)->ifa_addr->sa_family == AF_INET) &&
              ((*ifi)->ifa_flags & IFF_UP) &&
              ((*ifi)->ifa_flags & IFF_LOOPBACK))
-@@ -1903,7 +1904,8 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
+@@ -1935,7 +1936,8 @@ mDNSlocal void InterfaceChangeCallback(int fd, void *context)
              continue;
          }
  

@@ -9,7 +9,7 @@ standards-conformance and safety."
 HOMEPAGE = "http://www.musl-libc.org/"
 LICENSE = "MIT"
 SECTION = "libs"
-LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=b03f1cc25363d094011f8f4fd8bcfb68"
+LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=0c2904cdc34777fb4067732bae145506"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -32,3 +32,9 @@ COMPATIBLE_HOST:riscv32 = "null"
 B = "${WORKDIR}/build"
 
 do_configure[cleandirs] = "${B}"
+
+python () {
+    multilibs = d.getVar("MULTILIBS")
+    if multilibs:
+        raise bb.parse.SkipRecipe("musl is not compatible with multilibs")
+}

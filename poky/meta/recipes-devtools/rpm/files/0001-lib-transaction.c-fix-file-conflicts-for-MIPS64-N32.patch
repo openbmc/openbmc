@@ -1,4 +1,4 @@
-From b04ecb793a3c859985eead5e261785b27a4c4a20 Mon Sep 17 00:00:00 2001
+From ad530868e37f09e9236c085d25a834304750704b Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 7 May 2020 17:40:58 +0800
 Subject: [PATCH] lib/transaction.c: fix file conflicts for MIPS64 N32
@@ -32,7 +32,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/lib/transaction.c b/lib/transaction.c
-index 70d2587ac..b89b30060 100644
+index 5e4414d2a..b1c55bd44 100644
 --- a/lib/transaction.c
 +++ b/lib/transaction.c
 @@ -400,7 +400,18 @@ static int handleColorConflict(rpmts ts,

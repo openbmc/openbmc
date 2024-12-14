@@ -1,24 +1,24 @@
-From fb24c3e3539b5743d398a429a302a3886186f261 Mon Sep 17 00:00:00 2001
+From 632632508daf8bb3a5800dac937ffc33c6d85973 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Thu, 16 Jun 2022 11:46:31 +0000
-Subject: [PATCH 3/3] Remove neon option from cross compilation
+Subject: [PATCH] Remove neon option from cross compilation
 
 Not every arm platform supports neon instructions, so do not enforce
 them.
 
-Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
----
 Upstream-Status: Pending
 
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
  absl/copts/GENERATED_AbseilCopts.cmake | 4 ----
  absl/copts/GENERATED_copts.bzl         | 4 ----
  2 files changed, 8 deletions(-)
 
 diff --git a/absl/copts/GENERATED_AbseilCopts.cmake b/absl/copts/GENERATED_AbseilCopts.cmake
-index 23b9253c1f00..5d112a97f3e4 100644
+index 5e0e8dfd..57cfc4d3 100644
 --- a/absl/copts/GENERATED_AbseilCopts.cmake
 +++ b/absl/copts/GENERATED_AbseilCopts.cmake
-@@ -147,10 +147,6 @@ list(APPEND ABSL_MSVC_TEST_FLAGS
+@@ -218,10 +218,6 @@ list(APPEND ABSL_MSVC_TEST_FLAGS
      "/DNOMINMAX"
  )
  
@@ -30,10 +30,10 @@ index 23b9253c1f00..5d112a97f3e4 100644
      "-march=armv8-a+crypto"
  )
 diff --git a/absl/copts/GENERATED_copts.bzl b/absl/copts/GENERATED_copts.bzl
-index 1e847f769501..3e10db204faf 100644
+index 0072008c..72840fda 100644
 --- a/absl/copts/GENERATED_copts.bzl
 +++ b/absl/copts/GENERATED_copts.bzl
-@@ -148,10 +148,6 @@ ABSL_MSVC_TEST_FLAGS = [
+@@ -219,10 +219,6 @@ ABSL_MSVC_TEST_FLAGS = [
      "/DNOMINMAX",
  ]
  
@@ -45,5 +45,5 @@ index 1e847f769501..3e10db204faf 100644
      "-march=armv8-a+crypto",
  ]
 -- 
-2.36.1
+2.25.1
 

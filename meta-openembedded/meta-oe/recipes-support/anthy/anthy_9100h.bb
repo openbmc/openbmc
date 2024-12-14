@@ -14,8 +14,10 @@ SRC_URI = "http://osdn.dl.sourceforge.jp/anthy/37536/anthy-9100h.tar.gz \
 SRC_URI:append:class-target = " file://target-helpers.patch"
 SRC_URI:append:class-native = " file://native-helpers.patch"
 
-SRC_URI[md5sum] = "1f558ff7ed296787b55bb1c6cf131108"
 SRC_URI[sha256sum] = "d256f075f018b4a3cb0d165ed6151fda4ba7db1621727e0eb54569b6e2275547"
+
+UPSTREAM_CHECK_URI = "https://osdn.net/projects/anthy/releases/"
+UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>(\d+)+(\w*))"
 
 DEPENDS:class-target = "anthy-native"
 RDEPENDS:${PN}:class-target = "libanthy0"

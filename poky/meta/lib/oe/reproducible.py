@@ -47,7 +47,7 @@ import bb
 # 2. If there is a git checkout, use the last git commit timestamp.
 #    Git does not preserve file timestamps on checkout.
 #
-# 3. Use the mtime of "known" files such as NEWS, CHANGLELOG, ...
+# 3. Use the mtime of "known" files such as NEWS, CHANGELOG, ...
 #    This works for well-kept repositories distributed via tarball.
 #
 # 4. Use the modification time of the youngest file in the source tree, if

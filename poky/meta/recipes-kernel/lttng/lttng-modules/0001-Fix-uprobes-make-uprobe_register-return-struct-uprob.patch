@@ -1,0 +1,160 @@
+From 9b96303d2382c767eb1f507d934bcc3fe225d74c Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Thu, 17 Oct 2024 11:56:02 -0400
+Subject: [PATCH] Fix: uprobes: make uprobe_register() return struct uprobe *
+ (v6.12)
+
+See upstream commits :
+
+  commit 3c83a9ad0295eb63bdeb81d821b8c3b9417fbcac
+  Author: Oleg Nesterov <oleg@redhat.com>
+  Date:   Thu Aug 1 15:27:34 2024 +0200
+
+    uprobes: make uprobe_register() return struct uprobe *
+
+    This way uprobe_unregister() and uprobe_apply() can use "struct uprobe *"
+    rather than inode + offset. This simplifies the code and allows to avoid
+    the unnecessary find_uprobe() + put_uprobe() in these functions.
+
+    TODO: uprobe_unregister() still needs get_uprobe/put_uprobe to ensure that
+    this uprobe can't be freed before up_write(&uprobe->register_rwsem).
+
+  commit 04b01625da130c7521b768996cd5e48052198b97
+  Author: Peter Zijlstra <peterz@infradead.org>
+  Date:   Tue Sep 3 10:46:00 2024 -0700
+
+    perf/uprobe: split uprobe_unregister()
+
+    With uprobe_unregister() having grown a synchronize_srcu(), it becomes
+    fairly slow to call. Esp. since both users of this API call it in a
+    loop.
+
+    Peel off the sync_srcu() and do it once, after the loop.
+
+    We also need to add uprobe_unregister_sync() into uprobe_register()'s
+    error handling path, as we need to be careful about returning to the
+    caller before we have a guarantee that partially attached consumer won't
+    be called anymore. This is an unlikely slow path and this should be
+    totally fine to be slow in the case of a failed attach.
+
+  commit e04332ebc8ac128fa551e83f1161ab1c094d13a9
+  Author: Oleg Nesterov <oleg@redhat.com>
+  Date:   Thu Aug 1 15:27:28 2024 +0200
+
+    uprobes: kill uprobe_register_refctr()
+
+    It doesn't make any sense to have 2 versions of _register(). Note that
+    trace_uprobe_enable(), the only user of uprobe_register(), doesn't need
+    to check tu->ref_ctr_offset to decide which one should be used, it could
+    safely pass ref_ctr_offset == 0 to uprobe_register_refctr().
+
+    Add this argument to uprobe_register(), update the callers, and kill
+    uprobe_register_refctr().
+
+Upstream-Status: Backport [commit 9b96303d]
+
+Change-Id: I8d1f9a5db1f19c2bc2029709ae36f82e86f6fe58
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/lttng/events-internal.h |  1 +
+ include/wrapper/uprobes.h       |  7 ++++++-
+ src/probes/lttng-uprobes.c      | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/include/lttng/events-internal.h b/include/lttng/events-internal.h
+index a91a659e..8633608d 100644
+--- a/include/lttng/events-internal.h
++++ b/include/lttng/events-internal.h
+@@ -42,6 +42,7 @@ struct lttng_krp;				/* Kretprobe handling */
+ struct lttng_uprobe_handler {
+ 	struct lttng_kernel_event_common *event;
+ 	loff_t offset;
++	struct uprobe *uprobe;
+ 	struct uprobe_consumer up_consumer;
+ 	struct list_head node;
+ };
+diff --git a/include/wrapper/uprobes.h b/include/wrapper/uprobes.h
+index 9cbbe3b2..52b72d53 100644
+--- a/include/wrapper/uprobes.h
++++ b/include/wrapper/uprobes.h
+@@ -18,9 +18,14 @@
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(3,5,0))
+ #include <linux/uprobes.h>
++/*
++ * No wrappers for >= 6.12, the API has changed too much, the version checks
++ * are inlined in 'src/probes/lttng-uprobes.c'.
++ */
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,12,0))
+ 
+ /* Use kallsym lookup for version before 3.9. */
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(3,9,0))
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(3,9,0))
+ 
+ static inline
+ int wrapper_uprobe_register(struct inode *inode, loff_t offset, struct uprobe_consumer *uc)
+diff --git a/src/probes/lttng-uprobes.c b/src/probes/lttng-uprobes.c
+index f70218be..5be83cdb 100644
+--- a/src/probes/lttng-uprobes.c
++++ b/src/probes/lttng-uprobes.c
+@@ -233,8 +233,16 @@ int lttng_uprobes_add_callsite(struct lttng_uprobe *uprobe,
+ 		goto register_error;
+ 	}
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,12,0))
++	ret = 0;
++	uprobe_handler->uprobe = uprobe_register(uprobe->inode,
++		      uprobe_handler->offset, 0, &uprobe_handler->up_consumer);
++	if (IS_ERR(uprobe_handler->uprobe))
++		ret = -1;
++#else
+ 	ret = wrapper_uprobe_register(uprobe->inode,
+ 		      uprobe_handler->offset, &uprobe_handler->up_consumer);
++#endif
+ 	if (ret) {
+ 		printk(KERN_WARNING "LTTng: Error registering probe on inode %lu "
+ 		       "and offset 0x%llx\n", uprobe->inode->i_ino,
+@@ -330,15 +338,39 @@ void lttng_uprobes_unregister(struct inode *inode, struct list_head *head)
+ {
+ 	struct lttng_uprobe_handler *iter, *tmp;
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,12,0))
++	/*
++	 * Iterate over the list of handler, unregister each uprobe.
++	 */
++	list_for_each_entry(iter, head, node) {
++		uprobe_unregister_nosync(iter->uprobe, &iter->up_consumer);
++		iter->uprobe = NULL;
++	}
++
++	/*
++	 * Call synchronize_srcu() on uprobes_srcu.
++	 */
++	uprobe_unregister_sync();
++
+ 	/*
+ 	 * Iterate over the list of handler, remove each handler from the list
+ 	 * and free the struct.
+ 	 */
++	list_for_each_entry_safe(iter, tmp, head, node) {
++		list_del(&iter->node);
++		kfree(iter);
++	}
++#else
++	/*
++	 * Iterate over the list of handler, unregister each uprobe, remove
++	 * each handler from the list and free the struct.
++	 */
+ 	list_for_each_entry_safe(iter, tmp, head, node) {
+ 		wrapper_uprobe_unregister(inode, iter->offset, &iter->up_consumer);
+ 		list_del(&iter->node);
+ 		kfree(iter);
+ 	}
++#endif
+ }
+ 
+ void lttng_uprobes_unregister_event(struct lttng_kernel_event_recorder *event_recorder)
+-- 
+2.39.2
+

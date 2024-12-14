@@ -1,0 +1,33 @@
+From 43ec36c0e3fbfd4191b18465a0554f4c1acf58d6 Mon Sep 17 00:00:00 2001
+From: Andrej Valek <andrej.v@skyrain.eu>
+Date: Wed, 16 Oct 2024 09:09:55 +0200
+Subject: [PATCH] syslogd: fix wrong OPT_locallog flag detection
+
+The OPT_locallog was set on "option_mask32" but checked on local
+"opts" variable. While this flag it's used on multiple places can't be
+has to be used with "option_mask32". Without this change syslogd
+is more-less unusable while no messages are logged locally.
+
+Upstream-Status: Submitted [https://lists.busybox.net/pipermail/busybox/2024-October/090969.html]
+
+Signed-off-by: Andrej Valek <andrej.v@skyrain.eu>
+---
+ sysklogd/syslogd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sysklogd/syslogd.c b/sysklogd/syslogd.c
+index 7558051f0..fa03aa280 100644
+--- a/sysklogd/syslogd.c
++++ b/sysklogd/syslogd.c
+@@ -1179,7 +1179,7 @@ int syslogd_main(int argc UNUSED_PARAM, char **argv)
+ 			}
+ 		}
+ #endif
+-		if (!ENABLE_FEATURE_REMOTE_LOG || (opts & OPT_locallog)) {
++		if (!ENABLE_FEATURE_REMOTE_LOG || (option_mask32 & OPT_locallog)) {
+ 			recvbuf[sz] = '\0'; /* ensure it *is* NUL terminated */
+ 			split_escape_and_log(recvbuf, sz);
+ 		}
+-- 
+2.34.1
+

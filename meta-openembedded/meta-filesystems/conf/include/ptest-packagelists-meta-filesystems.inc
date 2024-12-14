@@ -8,11 +8,10 @@
 
 PTESTS_FAST_META_FILESYSTEMS = "\
     e2tools \
-    fuse3 \
 "
 
 PTESTS_SLOW_META_FILESYSTEMS = "\
+    sshfs-fuse \
 "
 PTESTS_PROBLEMS_META_FILESYSTEMS = "\
-    sshfs-fuse \
 "

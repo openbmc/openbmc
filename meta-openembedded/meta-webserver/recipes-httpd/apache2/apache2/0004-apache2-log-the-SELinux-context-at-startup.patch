@@ -1,4 +1,4 @@
-From e47cc405eadcbe37a579c375e824e20a5c53bfad Mon Sep 17 00:00:00 2001
+From b31cf12566e806e9e9c3aa01029f6bae3ada0729 Mon Sep 17 00:00:00 2001
 From: Paul Eggleton <paul.eggleton@linux.intel.com>
 Date: Tue, 17 Jul 2012 11:27:39 +0100
 Subject: [PATCH] Log the SELinux context at startup.
@@ -14,7 +14,7 @@ Note: unlikely to be any interest in this upstream
  2 files changed, 31 insertions(+)
 
 diff --git a/configure.in b/configure.in
-index 352711a..f58620f 100644
+index 6319903..bffd8a1 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -514,6 +514,11 @@ gettid
@@ -30,7 +30,7 @@ index 352711a..f58620f 100644
    # On Linux before glibc 2.30, gettid() is only usable via syscall()
    AC_CACHE_CHECK([for gettid() via syscall], ap_cv_gettid,
 diff --git a/server/core.c b/server/core.c
-index 30b317e..81f145f 100644
+index 3b50100..e0c7c7f 100644
 --- a/server/core.c
 +++ b/server/core.c
 @@ -65,6 +65,10 @@
@@ -44,7 +44,7 @@ index 30b317e..81f145f 100644
  /* LimitRequestBody handling */
  #define AP_LIMIT_REQ_BODY_UNSET         ((apr_off_t) -1)
  #define AP_DEFAULT_LIMIT_REQ_BODY       ((apr_off_t) 1<<30) /* 1GB */
-@@ -5139,6 +5143,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
+@@ -5162,6 +5166,28 @@ static int core_post_config(apr_pool_t *pconf, apr_pool_t *plog, apr_pool_t *pte
      }
  #endif
  
@@ -73,5 +73,3 @@ index 30b317e..81f145f 100644
      return OK;
  }
  
---
-2.40.0

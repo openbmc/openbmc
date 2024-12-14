@@ -1,0 +1,82 @@
+From 61ef40f2bc418ce072828ad1939eaa40f981e76e Mon Sep 17 00:00:00 2001
+From: Nitin A Kamble <nitin.a.kamble@intel.com>
+Date: Fri, 13 Aug 2010 12:24:00 -0700
+Subject: [PATCH 2/5] tcl: fix a build issue
+
+Upstream-Status: Inappropriate [upstream does not support installed tests]
+---
+ unix/Makefile.in | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/unix/Makefile.in b/unix/Makefile.in
+index 6e74458..bd0b818 100644
+--- a/unix/Makefile.in
++++ b/unix/Makefile.in
+@@ -918,7 +918,7 @@ tcltest-real:
+ test: test-tcl test-packages
+ 
+ test-tcl: ${TCLTEST_EXE}
+-	$(SHELL_ENV) ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl $(TESTFLAGS)
++	$(SHELL_ENV) ${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl $(TESTFLAGS)
+ 
+ gdb-test: ${TCLTEST_EXE}
+ 	$(SHELL_ENV) $(GDB) --args ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl \
+@@ -928,15 +928,14 @@ lldb-test: ${TCLTEST_EXE}
+ 	$(SHELL_ENV) $(LLDB) -- ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl \
+ 		$(TESTFLAGS) -singleproc 1
+ 
+-
+ # Useful target to launch a built tcltest with the proper path,...
+ runtest: ${TCLTEST_EXE}
+-	$(SHELL_ENV) ./${TCLTEST_EXE}
++	$(SHELL_ENV) ${TCLTEST_EXE}
+ 
+ # Useful target for running the test suite with an unwritable current
+ # directory...
+ ro-test: ${TCLTEST_EXE}
+-	echo 'exec chmod -w .;package require tcltest;tcltest::temporaryDirectory /tmp;source ../tests/all.tcl;exec chmod +w .' | $(SHELL_ENV) ./${TCLTEST_EXE}
++	echo 'exec chmod -w .;package require tcltest;tcltest::temporaryDirectory /tmp;source ../tests/all.tcl;exec chmod +w .' | $(SHELL_ENV) ${TCLTEST_EXE}
+ 
+ # The following target generates the shared libraries in dltest/ that are used
+ # for testing; they are included as part of the "tcltest" target (via the
+@@ -954,17 +953,17 @@ dltest.marker: ${STUB_LIB_FILE}
+ # This target can be used to run tclsh from the build directory
+ # via `make shell SCRIPT=/tmp/foo.tcl`
+ shell: ${TCL_EXE}
+-	$(SHELL_ENV) ./${TCL_EXE} $(SCRIPT)
++	$(SHELL_ENV) ${TCL_EXE} $(SCRIPT)
+ 
+ # This target can be used to run tclsh inside either gdb or insight
+ gdb: ${TCL_EXE}
+-	$(SHELL_ENV) $(GDB) ./${TCL_EXE}
++	$(SHELL_ENV) $(GDB) ${TCL_EXE}
+ 
+ lldb: ${TCL_EXE}
+ 	$(SHELL_ENV) $(LLDB) ./${TCL_EXE}
+ 
+ valgrind: ${TCL_EXE} ${TCLTEST_EXE}
+-	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ./${TCLTEST_EXE} \
++	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ${TCLTEST_EXE} \
+ 		$(TOP_DIR)/tests/all.tcl -singleproc 1 -constraints valgrind \
+ 		$(TESTFLAGS)
+ 
+@@ -990,13 +989,13 @@ valgrind_each: $(addprefix testresults/valgrind/,$(addsuffix .success,$(notdir\
+ 
+ 
+ valgrindshell: ${TCL_EXE}
+-	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ./${TCL_EXE} $(SCRIPT)
++	$(SHELL_ENV) $(VALGRIND) $(VALGRINDARGS) ${TCL_EXE} $(SCRIPT)
+ 
+ trace-shell: ${TCL_EXE}
+-	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ./${TCL_EXE} $(SCRIPT)
++	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ${TCL_EXE} $(SCRIPT)
+ 
+ trace-test: ${TCLTEST_EXE}
+-	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl -singleproc 1 $(TESTFLAGS)
++	$(SHELL_ENV) ${TRACE} $(TRACE_OPTS) ${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl -singleproc 1 $(TESTFLAGS)
+ 
+ #--------------------------------------------------------------------------
+ # Installation rules
+-- 
+2.39.5
+

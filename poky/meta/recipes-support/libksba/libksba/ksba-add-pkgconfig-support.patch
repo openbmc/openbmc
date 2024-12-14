@@ -1,4 +1,4 @@
-From ca8174aa81d7bf364b33f7254a9e887735c4996d Mon Sep 17 00:00:00 2001
+From 46c0582d1087220e9404a14a851085b8f29773c4 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 3 Dec 2012 18:17:31 +0800
 Subject: [PATCH] libksba: add pkgconfig support
@@ -10,19 +10,20 @@ This patch is rejected by upstream for the reason below:
 They think pkgconfig adds no portability and maintaining them is not worthwhile.
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
-
 ---
- src/ksba.m4 | 90 +++--------------------------------------------------
- 1 file changed, 4 insertions(+), 86 deletions(-)
+ src/ksba.m4 | 93 +++--------------------------------------------------
+ 1 file changed, 5 insertions(+), 88 deletions(-)
 
 diff --git a/src/ksba.m4 b/src/ksba.m4
-index 452c245..aa96255 100644
+index 80f0d38..8f8761a 100644
 --- a/src/ksba.m4
 +++ b/src/ksba.m4
-@@ -23,37 +23,6 @@ dnl with a changed API.
+@@ -107,39 +107,7 @@ dnl this features allows to prevent build against newer versions of libksba
+ dnl with a changed API.
  dnl
  AC_DEFUN([AM_PATH_KSBA],
- [ AC_REQUIRE([AC_CANONICAL_HOST])
+-[ AC_REQUIRE([AC_CANONICAL_HOST])dnl
+-  AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
 -  dnl --with-libksba-prefix=PFX is the preferred name for this option,
 -  dnl since that is consistent with how our three siblings use the directory/
 -  dnl package name in --with-$dir_name-prefix=PFX.
@@ -54,10 +55,11 @@ index 452c245..aa96255 100644
 -  if test -z "$use_gpgrt_config"; then
 -    AC_PATH_PROG(KSBA_CONFIG, ksba-config, no)
 -  fi
++[ AC_REQUIRE([AC_CANONICAL_HOST])
  
    tmp=ifelse([$1], ,1:1.0.0,$1)
    if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
-@@ -64,56 +33,13 @@ AC_DEFUN([AM_PATH_KSBA],
+@@ -150,56 +118,13 @@ AC_DEFUN([AM_PATH_KSBA],
       min_ksba_version="$tmp"
    fi
  
@@ -117,7 +119,7 @@ index 452c245..aa96255 100644
          if test "$tmp" -gt 0 ; then
             AC_MSG_CHECKING([KSBA API version])
             if test "$req_ksba_api" -eq "$tmp" ; then
-@@ -126,14 +52,8 @@ AC_DEFUN([AM_PATH_KSBA],
+@@ -212,14 +137,8 @@ AC_DEFUN([AM_PATH_KSBA],
       fi
    fi
    if test $ok = yes; then
@@ -133,7 +135,7 @@ index 452c245..aa96255 100644
      if test x"$libksba_config_host" != xnone ; then
        if test x"$libksba_config_host" != x"$host" ; then
    AC_MSG_WARN([[
-@@ -147,8 +67,6 @@ AC_DEFUN([AM_PATH_KSBA],
+@@ -233,8 +152,6 @@ AC_DEFUN([AM_PATH_KSBA],
        fi
      fi
    else

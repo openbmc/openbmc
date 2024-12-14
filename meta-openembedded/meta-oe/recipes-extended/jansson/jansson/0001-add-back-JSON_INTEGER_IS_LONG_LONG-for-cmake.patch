@@ -1,0 +1,51 @@
+From 521d37abc0ed1178a39298d06d80d8d0e2a43e28 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 10 Sep 2024 00:48:00 -0700
+Subject: [PATCH] add back JSON_INTEGER_IS_LONG_LONG for cmake
+
+For autotools, JSON_INTEGER_IS_LONG_LONG is defined, but for
+cmake, it's not. This means such macro, which is also documented,
+is not consistent across different build systems. This is not
+good, so add it for cmake.
+
+This patch refers 8b975abca1055d40637c90b1dc4585af1d7df76c and is
+part of it. So the upstream-status is marked as 'oe specific'.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ CMakeLists.txt               | 1 +
+ cmake/jansson_config.h.cmake | 4 +---
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 39b9ad3..0e95a94 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -193,6 +193,7 @@ endif ()
+ # detect what to use for the 64 bit type.
+ # Note: I will prefer long long if I can get it, as that is what the automake system aimed for.
+ if (NOT DEFINED JSON_INT_T)
++   set (JSON_INTEGER_IS_LONG_LONG 1)
+    if (HAVE_LONG_LONG_INT AND (LONG_LONG_INT EQUAL 8))
+       set (JSON_INT_T "long long")
+    elseif (HAVE_INT64_T)
+diff --git a/cmake/jansson_config.h.cmake b/cmake/jansson_config.h.cmake
+index 2f248cb..bec64da 100644
+--- a/cmake/jansson_config.h.cmake
++++ b/cmake/jansson_config.h.cmake
+@@ -21,9 +21,7 @@
+ #define JANSSON_USING_CMAKE
+ #endif
+ 
+-/* Note: when using cmake, JSON_INTEGER_IS_LONG_LONG is not defined nor used,
+- * as we will also check for __int64 etc types.
+- * (the definition was used in the automake system) */
++#cmakedefine JSON_INTEGER_IS_LONG_LONG 1
+ 
+ /* Bring in the cmake-detected defines */
+ #cmakedefine HAVE_STDINT_H 1
+-- 
+2.42.0
+

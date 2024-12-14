@@ -8,7 +8,7 @@ generate_key() {
     mkdir -p "$DIR"
     rm -f ${FILE}.tmp
     ssh-keygen -q -f "${FILE}.tmp" -N '' -t $TYPE
-
+    chmod go-rwx "$FILE.tmp"
     # Atomically rename file public key
     mv -f "${FILE}.tmp.pub" "${FILE}.pub"
 

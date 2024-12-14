@@ -4,16 +4,14 @@ XXX: need to work out a better fix.
 
 Signed-off-by: Dexuan Cui <dexuan.cui@intel.com>
 
-diff -Nru webmin-1.570.orig//net/net-lib.pl webmin-1.570/net/net-lib.pl
---- webmin-1.570.orig//net/net-lib.pl	2011-10-03 09:01:48.000000000 +0800
-+++ webmin-1.570/net/net-lib.pl	2011-10-28 13:52:56.138873664 +0800
-@@ -21,7 +21,8 @@
- 	do "$gconfig{'os_type'}-9.1-ALL-lib.pl";
+--- a/net/net-lib.pl
++++ b/net/net-lib.pl
+@@ -38,7 +38,7 @@ elsif ($gconfig{'os_type'} eq 'debian-li
+ 	$net_mode = "netplan";
  	}
  else {
 -	do "$gconfig{'os_type'}-lib.pl";
-+	#do "$gconfig{'os_type'}-lib.pl";
 +	do "debian-linux-lib.pl";
+ 	$net_mode = $gconfig{'os_type'};
  	}
  
- # list_hosts()

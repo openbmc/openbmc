@@ -1,0 +1,34 @@
+From 4e0ab7af882fcf498fd8beb4024ea024e6464cef Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Wed, 14 Aug 2024 14:33:50 +0000
+Subject: [PATCH] corstone1000: purge remoteproc DTS node
+
+Purge remoteproc DTS node
+This is done to remove the remote proc node from the DTS passed
+to Linux from U-Boot because the device tree binding for remoteproc
+has not been upstreamed yet. Existence of remoteproc DTS node in Linux 
+is causing dt-schema test for SystemReady-IR v2.0 certification to fail.
+
+Upstream-Status: Pending
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ board/armltd/corstone1000/corstone1000.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
+index ef74dc9032..d474fce1b2 100644
+--- a/board/armltd/corstone1000/corstone1000.c
++++ b/board/armltd/corstone1000/corstone1000.c
+@@ -30,8 +30,7 @@ DT_NON_COMPLIANT_PURGE_LIST(foo) = {
+ 	{ .node_path = "/soc/mhu@1b010000" },
+ 	{ .node_path = "/soc/mhu@1b020000" },
+ 	{ .node_path = "/soc/mhu@1b030000" },
+-	{ .node_path = "/soc/client" },
+-	{ .node_path = "/soc/extsys@1A010310" },
++	{ .node_path = "/soc/remoteproc@1a010310" },
+ };
+ 
+ #define CORSTONE1000_KERNEL_PARTS 2
+-- 
+2.34.1
+

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+ptestdir=$(dirname "$(readlink -f "$0")")
+testbin="gpio-sysfs-compat-tests"
+
+modprobe gpio-sim
+modprobe configfs
+
+mountpoint -q /sys/kernel/config
+if [ "$?" -ne "0" ]; then
+	mount -t configfs configfs /sys/kernel/config
+fi
+
+cd $ptestdir/tests
+
+./$testbin -v --gpio-class @mountpoint@ --chown-user gpio-test > ./$testbin.out 2>&1
+if [ $? -ne 0 ]; then
+	echo "FAIL: $testbin"
+else
+	echo "PASS: $testbin"
+fi

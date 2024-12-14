@@ -1,7 +1,7 @@
 SUMMARY = "MIME::Charset - Charset Information for MIME."
 DESCRIPTION = "MIME::Charset provides information about character sets used for MIME \
 messages on Internet."
-HOMEPAGE = "http://search.cpan.org/~nezumi/MIME-Charset-${PV}/"
+HOMEPAGE = "https://metacpan.org/release/NEZUMI/MIME-Charset-1.013.1"
 SECTION = "libs"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"

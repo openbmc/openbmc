@@ -1,0 +1,78 @@
+From 20870e9cd4f5a211fe94f484f707269ee1abd947 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 22 Nov 2022 18:48:27 +0800
+Subject: [PATCH 4/5] tcl: update the header location
+
+Lets install the include header and private header files into
+usr/include/tcl8.6 when version of tcl is 8.6.x
+
+Upstream-Status: Inappropriate [Configuration Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmai.com>
+
+Fixed the TCL_INCLUDE_SPEC
+
+Also update the header location in tcl.pc to correct the header
+location in case some package such python3 which use pkg-config
+to detect tcl doesn't find the header.
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ unix/Makefile.in  | 2 +-
+ unix/configure.ac | 4 ++--
+ unix/tcl.pc.in    | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/unix/Makefile.in b/unix/Makefile.in
+index bd0b818..ddf2b67 100644
+--- a/unix/Makefile.in
++++ b/unix/Makefile.in
+@@ -57,7 +57,7 @@ SCRIPT_INSTALL_DIR	= $(INSTALL_ROOT)$(TCL_LIBRARY)
+ MODULE_INSTALL_DIR	= $(SCRIPT_INSTALL_DIR)/../tcl9
+ 
+ # Directory in which to install the include file tcl.h:
+-INCLUDE_INSTALL_DIR	= $(INSTALL_ROOT)$(includedir)
++INCLUDE_INSTALL_DIR	= $(INSTALL_ROOT)$(includedir)/tcl$(VERSION)
+ 
+ # Path to the private tcl header dir:
+ PRIVATE_INCLUDE_DIR	= @PRIVATE_INCLUDE_DIR@
+diff --git a/unix/configure.ac b/unix/configure.ac
+index b6d2506..72a8b0d 100644
+--- a/unix/configure.ac
++++ b/unix/configure.ac
+@@ -754,7 +754,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
+ eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
+ 
+ test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+-PRIVATE_INCLUDE_DIR='$(includedir)'
++PRIVATE_INCLUDE_DIR='$(includedir)/tcl$(VERSION)'
+ HTML_DIR='$(DISTDIR)/html'
+ 
+ # Note:  in the following variable, it's important to use the absolute
+@@ -921,7 +921,7 @@ TCL_BUILD_STUB_LIB_PATH="`pwd`/${TCL_STUB_LIB_FILE}"
+ TCL_STUB_LIB_PATH="${TCL_STUB_LIB_DIR}/${TCL_STUB_LIB_FILE}"
+ 
+ # Install time header dir can be set via --includedir
+-eval "TCL_INCLUDE_SPEC=\"-I${includedir}\""
++eval "TCL_INCLUDE_SPEC=\"-I${includedir}/tcl${VERSION}\""
+ 
+ #------------------------------------------------------------------------
+ # tclConfig.sh refers to this by a different name
+diff --git a/unix/tcl.pc.in b/unix/tcl.pc.in
+index 9c6da82..8aa5ae8 100644
+--- a/unix/tcl.pc.in
++++ b/unix/tcl.pc.in
+@@ -3,7 +3,7 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ libdir=@libdir@
+-includedir=@includedir@
++includedir=@includedir@/tcl@PACKAGE_VERSION@
+ libfile=@TCL_LIB_FILE@
+ 
+ Name: Tool Command Language
+-- 
+2.39.5
+

@@ -1,0 +1,87 @@
+From a7efb3e62bbd0af86737f5ecb72d3a8e2a8c3b54 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kacper=20Michaj=C5=82ow?= <kasper93@gmail.com>
+Date: Sun, 13 Oct 2024 19:18:11 +0200
+Subject: [PATCH] build: fix dynamic generation of mpv.desktop file protocols
+
+Running cross-compiled binaries may be possible, but the runtime
+environment must be configured correctly. In some configurations, an
+exe_wrapper needs to be used, and in all cases, the library path must be
+set correctly for the given binary. Fortunately, Meson handles all of
+this if cross-compilation is configured correctly.
+
+Fix this by having Meson run the mpv binary directly, instead of as a
+subprocess of a Python script. This ensures that the environment is
+properly set for running host binaries, if possible.
+
+Fixes: #15075
+Fixes: 056b03f9ed05607786427da8f336e3ef819b3a1e
+
+Upstream-Status: Submitted [https://github.com/mpv-player/mpv/pull/15075]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ TOOLS/gen-mpv-desktop.py | 17 +++++++----------
+ meson.build              |  9 +++++++--
+ 2 files changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/TOOLS/gen-mpv-desktop.py b/TOOLS/gen-mpv-desktop.py
+index 7bbb33e5be..2c45a7038e 100755
+--- a/TOOLS/gen-mpv-desktop.py
++++ b/TOOLS/gen-mpv-desktop.py
+@@ -21,23 +21,28 @@
+ #
+ 
+ import sys
+-from subprocess import check_output
+ 
+ if __name__ == "__main__":
+-    with open(sys.argv[1], "r", encoding="UTF-8") as f:
++    with open(sys.argv[1], encoding="UTF-8") as f:
+         next(f)
+         mpv_desktop = dict([line.split("=", 1) for line in f])
+ 
+     if not mpv_desktop["X-KDE-Protocols"]:
+         raise ValueError("Missing X-KDE-Protocols entry in mpv.desktop file")
+ 
+-    mpv_protocols = check_output([sys.argv[2], "--no-config", "--list-protocols"], encoding="UTF-8")
+-    mpv_protocols = set(line.strip(" :/") for line in mpv_protocols.splitlines() if "://" in line)
++    with open(sys.argv[2], encoding="UTF-8") as mpv_protocols:
++        mpv_protocols = {
++            line.strip(" :/")
++            for line in mpv_protocols.read().splitlines()
++            if "://" in line
++        }
++
+     if len(mpv_protocols) == 0:
+         raise ValueError("Unable to parse any protocols from mpv '--list-protocols'")
+ 
+     protocol_list = set(mpv_desktop["X-KDE-Protocols"].strip().split(","))
+-    mpv_desktop["X-KDE-Protocols"] = ",".join(sorted(mpv_protocols & protocol_list)) + "\n"
++    compatible_protocols = sorted(mpv_protocols & protocol_list)
++    mpv_desktop["X-KDE-Protocols"] = ",".join(compatible_protocols) + "\n"
+ 
+     with open(sys.argv[3], "w", encoding="UTF-8") as f:
+         f.write("[Desktop Entry]" + "\n")
+diff --git a/meson.build b/meson.build
+index b7bcb1b0ba..c2004b748c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1830,11 +1830,16 @@ if get_option('cplayer')
+ 
+     if not win32 and not darwin
+         if meson.can_run_host_binaries()
++            mpv_protocols = custom_target('mpv_protocols',
++                output: 'mpv_protocols',
++                command: [mpv, '--no-config','--list-protocols'],
++                capture: true,
++            )
+             mpv_desktop_path = join_paths(source_root, 'etc', 'mpv.desktop')
+             custom_target('mpv.desktop',
+-                depends: mpv,
++                input: mpv_protocols,
+                 output: 'mpv.desktop',
+-                command: [mpv_desktop, mpv_desktop_path, mpv.full_path(), '@OUTPUT@'],
++               command: [mpv_desktop, mpv_desktop_path, '@INPUT@', '@OUTPUT@'],
+                 install: true,
+                 install_dir: join_paths(datadir, 'applications'),
+             )

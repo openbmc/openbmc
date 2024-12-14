@@ -6,16 +6,16 @@ Release notes for Yocto-4.0.8 (Kirkstone)
 Security Fixes in Yocto-4.0.8
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  apr-util: Fix :cve:`2022-25147`
--  apr: Fix :cve:`2022-24963`, :cve:`2022-28331` and :cve:`2021-35940`
--  bind: Fix :cve:`2022-3094`, :cve:`2022-3736` and :cve:`2022-3924`
--  git: Ignore :cve:`2022-41953`
--  git: Fix :cve:`2022-23521` and :cve:`2022-41903`
--  libgit2: Fix :cve:`2023-22742`
--  ppp: Fix :cve:`2022-4603`
--  python3-certifi: Fix :cve:`2022-23491`
--  sudo: Fix :cve:`2023-22809`
--  tar: Fix :cve:`2022-48303`
+-  apr-util: Fix :cve_nist:`2022-25147`
+-  apr: Fix :cve_nist:`2022-24963`, :cve_nist:`2022-28331` and :cve_nist:`2021-35940`
+-  bind: Fix :cve_nist:`2022-3094`, :cve_nist:`2022-3736` and :cve_nist:`2022-3924`
+-  git: Ignore :cve_nist:`2022-41953`
+-  git: Fix :cve_nist:`2022-23521` and :cve_nist:`2022-41903`
+-  libgit2: Fix :cve_nist:`2023-22742`
+-  ppp: Fix :cve_nist:`2022-4603`
+-  python3-certifi: Fix :cve_nist:`2022-23491`
+-  sudo: Fix :cve_nist:`2023-22809`
+-  tar: Fix :cve_nist:`2022-48303`
 
 
 Fixes in Yocto-4.0.8

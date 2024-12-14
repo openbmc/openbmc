@@ -1,0 +1,91 @@
+From 0db4af09f1bf4456527b5f6ec60fc1305e770c4c Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 9 Jul 2024 15:19:35 +0100
+Subject: [PATCH] configure.ac: improve fts checks
+
+The current code checks explicitly for musl and if so uses pkg-config to
+find fts-standalone. This is suboptimal because musl may not be the only
+libc to need a standalone fts implementation, and fts-standalone is an
+old gentoo-specific name[1] so libabigail won't build on any other system
+against musl.
+
+Instead, use AC_SEARCH_LIBS to look for fts_open in libc then libfts. Do
+this before the check for behaviour just in case someone has a standalone
+and broken implementation.  I assume that the standalone fts is installed
+on the standard search path, which should be a fair assumption.
+
+As we're not using pkg-config anymore the required link flags are now in
+LIBS, so remove all instances of FTS_CFLAGS and FTS_LIBS.
+
+[1] https://gitweb.gentoo.org/repo/gentoo.git/commit/sys-libs/fts-standalone?id=a403fe6c61d1aaeecd58d521f3def2f6d3513449
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/libabigail/2024q3/005973.html]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ configure.ac      | 9 ++++-----
+ src/Makefile.am   | 4 ++--
+ tools/Makefile.am | 2 --
+ 3 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e118a9c0..0aff2ec2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -281,6 +281,10 @@ fi
+ 
+ AC_SUBST(VISIBILITY_FLAGS)
+ 
++# glibc and BSD include fts into their libc, but musl does not so check if we
++# need to explicitly link to the standalone musl-fts.
++AC_SEARCH_LIBS([fts_open], [fts])
++
+ dnl Older glibc had a broken fts that didn't work with Large File Systems.
+ dnl We want the version that can handler LFS, but include workaround if we
+ dnl get a bad one. Add define to CFLAGS (not AC_DEFINE it) since we need to
+@@ -295,11 +299,6 @@ AS_IF([test "x$ac_cv_bad_fts" = "xyes"],
+       [CFLAGS="$CFLAGS -DBAD_FTS=1",
+        CXXFLAGS="$CXXFLAGS -DBAD_FTS=1"])
+ 
+-dnl On musl, we need to find fts-standalone
+-AS_CASE(
+-  [${host_os}], [*-musl*], [
+-    PKG_CHECK_MODULES([FTS], [fts-standalone])
+-])
+ 
+ dnl Check for dependency: libelf, libdw, libebl (elfutils)
+ dnl Note that we need to use at least elfutils 0.159 but
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 3044c136..1c98bf84 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -52,12 +52,12 @@ if BTF_READER
+ libabigail_la_SOURCES += abg-btf-reader.cc
+ endif
+ 
+-libabigail_la_LIBADD = $(DEPS_LIBS) $(FTS_LIBS)
++libabigail_la_LIBADD = $(DEPS_LIBS)
+ libabigail_la_LDFLAGS = -lpthread -Wl,--as-needed -no-undefined -version-info $(LIBABIGAIL_SO_CURRENT):$(LIBABIGAIL_SO_REVISION):$(LIBABIGAIL_SO_AGE)
+ 
+ CUSTOM_MACROS = -DABIGAIL_ROOT_SYSTEM_LIBDIR=\"${libdir}\"
+ 
+ AM_CPPFLAGS=\
+-$(CUSTOM_MACROS) $(DEPS_CPPFLAGS) $(FTS_CFLAGS) \
++$(CUSTOM_MACROS) $(DEPS_CPPFLAGS) \
+ -Wall -I$(abs_top_srcdir) -I$(abs_top_srcdir)/include \
+ -I$(abs_top_builddir)/include -I$(abs_top_builddir)
+diff --git a/tools/Makefile.am b/tools/Makefile.am
+index cbb5ce10..ea2d300c 100644
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -41,8 +41,6 @@ abicompatdir = $(bindir)
+ 
+ abipkgdiff_SOURCES = abipkgdiff.cc
+ abipkgdiffdir = $(bindir)
+-abipkgdiff_CPPFLAGS = $(FTS_CFLAGS)
+-abipkgdiff_LDADD = $(FTS_LIBS)
+ abipkgdiff_LDFLAGS = $(abs_top_builddir)/src/libabigail.la -pthread
+ 
+ kmidiff_SOURCES = kmidiff.cc
+-- 
+2.34.1
+

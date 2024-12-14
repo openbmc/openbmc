@@ -1,0 +1,56 @@
+From 0cf439c243dfdb6eee6133ee87172235a42e59c9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 14 Sep 2024 22:04:06 +0000
+Subject: [PATCH] cmake: Do not use -mrelax-all with clang on RISCV64
+
+This option causes clang 19+ to crash on riscv64
+
+For RISC-V -mrelax-all causes the assembler stage to convert
+all conditional branches into
+
+  bcc reg, reg, tmplabel
+  jmp target
+tmplabel:
+
+Unconditional jmp can reach targets a lot further than a conditional branch.
+Unfortunately, jmp also has a limited range so sometimes needs to be
+converted to an indirect jump which requires a scratch register.
+We do all branch relaxation early for RISC-V during the compilation
+stage so we can allocate the scratch register.
+
+If the assembler also does branch relaxation it will increase the size
+of the function and may cause unconditional jmps to go out of range.
+If this happens, linking will fail.
+
+Upstream-Status: Submitted [https://github.com/libjxl/libjxl/pull/3826]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 2 +-
+ CONTRIBUTORS   | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8b2ccb57..39bee096 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -335,7 +335,7 @@ else ()
+ 
+   # Machine flags.
+   add_compile_options(-funwind-tables)
+-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
++  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT CMAKE_SYSTEM_PROCESSOR MATCHES "riscv")
+     add_compile_options("SHELL:-Xclang -mrelax-all")
+   endif()
+   if (CXX_CONSTRUCTOR_ALIASES_SUPPORTED)
+diff --git a/CONTRIBUTORS b/CONTRIBUTORS
+index 848096f9..a88c6157 100644
+--- a/CONTRIBUTORS
++++ b/CONTRIBUTORS
+@@ -10,6 +10,7 @@ Iulia-Maria Comșa
+ Jan Wassenberg
+ Jon Sneyers
+ Jyrki Alakuijala
++Khem Raj
+ Krzysztof Potempa
+ Lode Vandevenne
+ Luca Versari

@@ -1,0 +1,43 @@
+From 4eb26927eebebfc4df8789ba69f60f3c28b8ba33 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 2 Jul 2024 23:36:23 -0700
+Subject: [PATCH] jpeg-compressor: Reorder stdio.h include location
+
+Current, location ends up with compile errors with clang and glibc 2.40
+fortified headers
+
+| /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux/renderdoc/1.33/recipe-sysroot/usr/include/bits/stdio2.h:128:13: error: use of undeclared identifier '__builtin___vfprintf_chk'; did you mean '__builtin___sprintf_chk'?
+|   128 |   int __r = __builtin___vfprintf_chk (__stream, __USE_FORTIFY_LEVEL - 1,
+|       |             ^
+| /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux/renderdoc/1.33/recipe-sysroot/usr/include/bits/stdio2.h:128:39: error: cannot initialize a parameter of type 'char *' with an lvalue of type 'FILE *const __restrict' (aka 'jpge::_IO_FILE *const __restrict')
+|   128 |   int __r = __builtin___vfprintf_chk (__stream, __USE_FORTIFY_LEVEL - 1,
+|       |                                       ^~~~~~~~
+
+This re-ordering ensures that fortified function prototypes are used correctly.
+
+Upstream-Status: Submitted [https://github.com/baldurk/renderdoc/pull/3369]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ renderdoc/3rdparty/jpeg-compressor/jpge.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/renderdoc/3rdparty/jpeg-compressor/jpge.cpp b/renderdoc/3rdparty/jpeg-compressor/jpge.cpp
+index 74d9d1006..d58e41664 100644
+--- a/renderdoc/3rdparty/jpeg-compressor/jpge.cpp
++++ b/renderdoc/3rdparty/jpeg-compressor/jpge.cpp
+@@ -10,6 +10,7 @@
+ 
+ #include "jpge.h"
+ 
++#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ 
+@@ -897,7 +898,6 @@ bool jpeg_encoder::process_scanline(const void* pScanline)
+ }
+ 
+ // Higher level wrappers/examples (optional).
+-#include <stdio.h>
+ 
+ class cfile_stream : public output_stream
+ {

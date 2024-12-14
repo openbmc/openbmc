@@ -200,6 +200,7 @@ class TestAllBuildsPage(SeleniumTestCase):
 
         # should see a rebuild button for non-command-line builds
         self.wait_until_visible('#allbuildstable tbody tr')
+        self.wait_until_visible('.rebuild-btn')
         selector = 'div[data-latest-build-result="%s"] .rebuild-btn' % build1.id
         run_again_button = self.find_all(selector)
         self.assertEqual(len(run_again_button), 1,
@@ -224,7 +225,7 @@ class TestAllBuildsPage(SeleniumTestCase):
 
         url = reverse('all-builds')
         self.get(url)
-        self.wait_until_visible('#allbuildstable', poll=3)
+        self.wait_until_visible('#allbuildstable')
 
         # get the project name cells from the table
         cells = self.find_all('#allbuildstable td[class="project"]')
@@ -257,7 +258,7 @@ class TestAllBuildsPage(SeleniumTestCase):
 
         url = reverse('all-builds')
         self.get(url)
-        self.wait_until_visible('#allbuildstable', poll=3)
+        self.wait_until_visible('#allbuildstable')
 
         # test recent builds area for successful build
         element = self._get_build_time_element(build1)
@@ -452,7 +453,7 @@ class TestAllBuildsPage(SeleniumTestCase):
         def test_show_rows(row_to_show, show_row_link):
             # Check that we can show rows == row_to_show
             show_row_link.select_by_value(str(row_to_show))
-            self.wait_until_visible('#allbuildstable tbody tr', poll=3)
+            self.wait_until_visible('#allbuildstable tbody tr')
             # check at least some rows are visible
             self.assertTrue(
                 len(self.find_all('#allbuildstable tbody tr')) > 0

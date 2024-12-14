@@ -20,6 +20,12 @@ prove defective, you assume the entire cost of all necessary servicing, repair
 or correction.
 
 ***********************
+Release notes - 2024.11
+***********************
+
+The same notes as the 2024.06 release still apply.
+
+***********************
 Release notes - 2024.06
 ***********************
 
@@ -37,6 +43,16 @@ Platform Support
    https://developer.arm.com/downloads/-/download-fpga-images
  - This software release is tested on Corstone-1000 Fast Model platform (FVP) version 11.23_25
    https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
+
+SystemReady IR v2.0 Certification Milestone
+-------------------------------------------
+
+As of this release, Corstone-1000 has achieved `SystemReady IR v2.0 certification <https://www.arm.com/architecture/system-architectures/systemready-certification-program/ve>`__.
+This milestone confirms compliance with the SystemReady IR requirements, ensuring broader compatibility and reliability for deployment.
+
+Applied patch `313ad2a0e600 <https://git.yoctoproject.org/meta-arm/commit/?h=scarthgap&id=313ad2a0e600655d9bfbe53646e356372ff02644>`__ to address compatibility requirements for SystemReady IR v2.0.
+
+This update is included in tag `CORSTONE1000-2024.06-systemready-ir-v2.0 <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2024.06-systemready-ir-v2.0>`__ and builds on the `CORSTONE1000-2024.06` release.
 
 ***********************
 Release notes - 2023.11

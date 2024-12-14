@@ -1,2 +1,3 @@
 # Start watchdog at boot time? 0 or 1
 run_watchdog=1
+watchdog_module=none

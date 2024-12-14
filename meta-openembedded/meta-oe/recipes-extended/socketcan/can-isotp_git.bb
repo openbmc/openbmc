@@ -5,6 +5,8 @@ PV = "1.0+git"
 
 SRC_URI = "git://github.com/hartkopp/can-isotp.git;protocol=https;branch=master"
 
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"
 

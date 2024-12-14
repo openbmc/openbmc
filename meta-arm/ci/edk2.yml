@@ -15,5 +15,3 @@ local_conf_header:
 
     QB_DEFAULT_BIOS = "QEMU_EFI.fd"
     WKS_FILE ?= "efi-disk.wks.in"
-  failing_tests: |
-    TEST_SUITES:remove = "xorg"

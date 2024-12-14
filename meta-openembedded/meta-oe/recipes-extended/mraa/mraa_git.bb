@@ -41,11 +41,11 @@ FILES:${PN}-utils = "${bindir}/"
 # will result in only the python bindings being built/packaged.
 # Note: 'nodejs' is disabled by default because the bindings
 # generation currently fails with nodejs (>v7.x).
-BINDINGS ??= "python"
+BINDINGS ??= ""
 
 # nodejs isn't available for armv4/armv5 architectures
-BINDINGS:armv4 ??= "python"
-BINDINGS:armv5 ??= "python"
+BINDINGS:armv4 ??= ""
+BINDINGS:armv5 ??= ""
 
 PACKAGECONFIG ??= "${@bb.utils.contains('PACKAGES', 'node-${PN}', 'nodejs', '', d)} \
  ${@bb.utils.contains('PACKAGES', 'python3-${PN}', 'python', '', d)}"

@@ -1,7 +1,7 @@
-From f93248d8e3598ccdc42b6d639107917c9cda268c Mon Sep 17 00:00:00 2001
+From bd65cdc704666dd4153779c74cdbb2cac6efea71 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 26 Sep 2019 16:29:48 +0800
-Subject: [PATCH 06/12] RH: add wwids from kernel cmdline mpath.wwids with -A
+Subject: [PATCH] RH: add wwids from kernel cmdline mpath.wwids with -A
 
 This patch adds another option to multipath, "-A", which reads
 /proc/cmdline for mpath.wwid=<WWID> options, and adds any wwids it finds
@@ -27,7 +27,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  2 files changed, 45 insertions(+)
 
 diff --git a/libmultipath/wwids.c b/libmultipath/wwids.c
-index 591cd09b..b01f1b85 100644
+index aac18c04..68f8e373 100644
 --- a/libmultipath/wwids.c
 +++ b/libmultipath/wwids.c
 @@ -439,3 +439,47 @@ int unmark_failed_wwid(const char *wwid)
@@ -79,7 +79,7 @@ index 591cd09b..b01f1b85 100644
 +       return ret;
 +}
 diff --git a/libmultipath/wwids.h b/libmultipath/wwids.h
-index 0c6ee54d..e32a0b0e 100644
+index ee47ad9f..1ed0d85e 100644
 --- a/libmultipath/wwids.h
 +++ b/libmultipath/wwids.h
 @@ -17,6 +17,7 @@ int remember_wwid(char *wwid);

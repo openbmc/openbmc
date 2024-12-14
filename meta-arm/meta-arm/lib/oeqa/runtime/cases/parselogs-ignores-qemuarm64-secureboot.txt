@@ -1,0 +1,3 @@
+optee: Failed to initialize async notifications: -95
+ARM FF-A: Failed to register driver sched callback -95
+ARM FF-A: Notification setup failed -95, not enabled

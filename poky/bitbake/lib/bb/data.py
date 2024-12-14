@@ -293,7 +293,7 @@ def build_dependencies(key, keys, mod_funcs, shelldeps, varflagsexcl, ignored_va
         if key in mod_funcs:
             exclusions = set()
             moddep = bb.codeparser.modulecode_deps[key]
-            value = handle_contains("", moddep[3], exclusions, d)
+            value = handle_contains(moddep[4], moddep[3], exclusions, d)
             return frozenset((moddep[0] | keys & moddep[1]) - ignored_vars), value
 
         if key[-1] == ']':

@@ -28,8 +28,7 @@
 # of the executable from argv[0] and emulate the corresponding program, so
 # multiple copies of this script will exist under different names.
 
-import sys, os, argparse
-
+import sys, argparse
 
 this_binary = sys.argv[0].split("/")[-1]
 
@@ -38,7 +37,8 @@ stub_msg = """
 This stand-in version of %s is not yet fully capable of emulating
 the real version from the GNU texinfo suite. If you see this message, file a
 bug report with details on the recipe that failed.
-""" % this_binary
+Invoked as %s
+""" % (this_binary, sys.argv)
 
 # Autotools setups query the version, so this is actually necessary. Some of
 # them (lookin' at you, glibc) actually look for the substring "GNU texinfo,"

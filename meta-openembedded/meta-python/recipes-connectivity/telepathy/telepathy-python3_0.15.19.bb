@@ -16,7 +16,6 @@ S = "${WORKDIR}/telepathy-python-${PV}"
 
 inherit autotools python3native
 
-SRC_URI[md5sum] = "f7ca25ab3c88874015b7e9728f7f3017"
 SRC_URI[sha256sum] = "244c0e1bf4bbd78ae298ea659fe10bf3a73738db550156767cc2477aedf72376"
 
 FILES:${PN} += "\

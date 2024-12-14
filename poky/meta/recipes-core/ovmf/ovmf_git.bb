@@ -26,8 +26,8 @@ SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0004-reproducible.patch \
            "
 
-PV = "edk2-stable202402"
-SRCREV = "edc6681206c1a8791981a2f911d2fb8b3d2f5768"
+PV = "edk2-stable202411"
+SRCREV = "0f3867fa6ef0553e26c42f7d71ff6bdb98429742"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 CVE_PRODUCT = "edk2"
@@ -55,7 +55,7 @@ DEPENDS = "nasm-native acpica-native ovmf-native util-linux-native"
 EDK_TOOLS_DIR="edk2_basetools"
 
 # OVMF has trouble building with the default optimization of -O2.
-BUILD_OPTIMIZATION="-pipe"
+BUILD_OPTIMIZATION = ""
 
 # OVMF supports IA only, although it could conceivably support ARM someday.
 COMPATIBLE_HOST:class-target='(i.86|x86_64).*'
@@ -223,6 +223,7 @@ do_compile:class-target() {
 
 do_install:class-native() {
     install -d ${D}/${bindir}/edk2_basetools
+    find ${S}/BaseTools -name \*.pyc -exec rm -rf \{\} \;
     cp -r ${S}/BaseTools ${D}/${bindir}/${EDK_TOOLS_DIR}
 }
 

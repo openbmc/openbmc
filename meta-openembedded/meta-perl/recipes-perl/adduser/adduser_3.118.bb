@@ -11,7 +11,6 @@ SRC_URI = "https://launchpad.net/debian/+archive/primary/+sourcefiles/adduser/${
            file://0001-adduser-set-default-shell-with-sbin-nologin.patch \
 "
 
-SRC_URI[md5sum] = "44ba2475ebdaafc9613236bdda321c97"
 SRC_URI[sha256sum] = "3e9eea661c9aac6b2c791bfcc1de3a9c6a422d45c8f3d38ed417737ed3166ffc"
 
 S = "${WORKDIR}/${BPN}"

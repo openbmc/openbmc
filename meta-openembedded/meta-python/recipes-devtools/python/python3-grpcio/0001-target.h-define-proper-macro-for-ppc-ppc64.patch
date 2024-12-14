@@ -1,4 +1,4 @@
-From b3bca013007a4a66703573d243e433f22e1e6684 Mon Sep 17 00:00:00 2001
+From e2c78c555ab3d9509c4ade511e2f711eb7188626 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Wed, 15 May 2024 16:55:09 +0800
 Subject: [PATCH] target.h: define proper macro for ppc/ppc64
@@ -18,7 +18,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/third_party/boringssl-with-bazel/src/include/openssl/target.h b/third_party/boringssl-with-bazel/src/include/openssl/target.h
-index 29b1dc6..d779813 100644
+index 2760f52..e743402 100644
 --- a/third_party/boringssl-with-bazel/src/include/openssl/target.h
 +++ b/third_party/boringssl-with-bazel/src/include/openssl/target.h
 @@ -54,6 +54,10 @@
@@ -32,6 +32,3 @@ index 29b1dc6..d779813 100644
  #else
  // The list above enumerates the platforms that BoringSSL supports. For these
  // platforms we keep a reasonable bar of not breaking them: automated test
--- 
-2.25.1
-

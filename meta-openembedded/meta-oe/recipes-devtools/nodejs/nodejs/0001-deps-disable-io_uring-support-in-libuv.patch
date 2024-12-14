@@ -1,0 +1,52 @@
+From 2bb296f169f86dbb04ee47e9a0dc1e3ee13d4f73 Mon Sep 17 00:00:00 2001
+From: Jason Schonberg <schonm@gmail.com>
+Date: Thu, 7 Mar 2024 12:55:56 -0500
+Subject: [PATCH] Update to nodejs 20.11.1
+
+Upstream-Status: Inappropriate [embedded specific]
+---
+ ...ps-disable-io_uring-support-in-libuv.patch | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch
+
+diff --git a/meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch b/meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch
+new file mode 100644
+index 00000000..5ac711fb
+--- /dev/null
++++ b/meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch
+@@ -0,0 +1,35 @@
++From 9838be9c710ab4249df86726fa390232a3b6a6e7 Mon Sep 17 00:00:00 2001
++From: Changqing Li <changqing.li@windriver.com>
++Date: Fri, 1 Mar 2024 15:46:11 +0800
++Subject: [PATCH] deps: disable io_uring support in libuv
++
++Refer [1], Pseudo fails to intercept some of the syscalls when io_uring
++enabled. Refer [2], always disable io_uring support in libuv to fix
++issue in [1].
++
++[1] https://git.openembedded.org/meta-openembedded/commit/?id=d08453978c31ee41d28206c6ff198d7d9d701d88
++[2] https://github.com/nodejs/node/commit/686da19abb
++
++Upstream-Status: Inappropriate [oe-specific]
++
++Signed-off-by: Changqing Li <changqing.li@windriver.com>
++---
++ deps/uv/src/unix/linux.c | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/deps/uv/src/unix/linux.c b/deps/uv/src/unix/linux.c
++index 0c997185..7508409d 100644
++--- a/deps/uv/src/unix/linux.c
+++++ b/deps/uv/src/unix/linux.c
++@@ -433,7 +433,7 @@ static int uv__use_io_uring(void) {
++   if (use == 0) {
++     /* Disable io_uring by default due to CVE-2024-22017. */
++     val = getenv("UV_USE_IO_URING");
++-    use = val != NULL && atoi(val) ? 1 : -1;
+++    use = 0;
++     atomic_store_explicit(&use_io_uring, use, memory_order_relaxed);
++   }
++ 
++-- 
++2.25.1
++

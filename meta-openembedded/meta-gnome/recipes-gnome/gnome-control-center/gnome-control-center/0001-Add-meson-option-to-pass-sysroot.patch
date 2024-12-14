@@ -13,7 +13,7 @@ Upstream-Status: Inappropriate [OE specific]
  3 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/meson_options.txt b/meson_options.txt
-index b2302bf..5b9baf5 100644
+index 9aeeed313..6097263a6 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -1,3 +1,4 @@
@@ -22,28 +22,29 @@ index b2302bf..5b9baf5 100644
  option('documentation', type: 'boolean', value: false, description: 'build documentation')
  option('location-services', type: 'feature', value: 'enabled', description: 'build with location services')
 diff --git a/panels/background/meson.build b/panels/background/meson.build
-index 6ced050..df1f808 100644
+index 8f9cbecdf..17f17d395 100644
 --- a/panels/background/meson.build
 +++ b/panels/background/meson.build
-@@ -24,7 +24,7 @@ common_sources += gnome.mkenums_simple(
- 
- enums = 'gdesktop-enums-types'
- enums_header = files(
--  gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h'
-+  get_option('oe_sysroot') + gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h'
+@@ -23,7 +23,7 @@ common_sources += gnome.mkenums_simple(
  )
  
- common_sources += gnome.mkenums(
+ gdesktop_enums_header = files(
+-  gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h'
++  get_option('oe_sysroot') + gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
+ )
+ 
+ common_sources += gnome.mkenums_simple(
 diff --git a/panels/system/meson.build b/panels/system/meson.build
-index 4fee822..979332a 100644
+index bbe004837..92e809fbe 100644
 --- a/panels/system/meson.build
 +++ b/panels/system/meson.build
-@@ -73,7 +73,7 @@ sources += gnome.compile_resources(
+@@ -68,7 +68,7 @@ sources += gnome.compile_resources(
  )
  
- enums_header = files(
--  gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
+ gdesktop_enums_header = files(
+-  gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h'
 +  get_option('oe_sysroot') + gsettings_desktop_dep.get_variable(pkgconfig: 'prefix') + '/include/gsettings-desktop-schemas/gdesktop-enums.h',
-   'datetime/cc-datetime-page.h'
  )
+ 
+ sources += gnome.mkenums_simple(
  

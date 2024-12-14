@@ -317,7 +317,7 @@ class DevtoolBase(DevtoolTestCase):
         cls.sstate_conf  = 'SSTATE_DIR = "%s"\n' % cls.devtool_sstate
         cls.sstate_conf += ('SSTATE_MIRRORS += "file://.* file:///%s/PATH"\n'
                             % cls.original_sstate)
-        cls.sstate_conf += ('BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"\n')
+        cls.sstate_conf += ('BB_HASHSERVE_UPSTREAM = "hashserv.yoctoproject.org:8686"\n')
 
     @classmethod
     def tearDownClass(cls):
@@ -2017,7 +2017,7 @@ class DevtoolUpgradeTests(DevtoolBase):
             newlines = f.readlines()
         self.assertEqual(desiredlines, newlines)
 
-    def test_devtool_upgrade_recipe_update_extra_tasks(self):
+    def test_devtool_upgrade_recipe_upgrade_extra_tasks(self):
         # Check preconditions
         self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         self.track_for_cleanup(self.workspacedir)
@@ -2585,11 +2585,6 @@ class DevtoolIdeSdkTests(DevtoolBase):
         i_and_d_script_path = os.path.join(
             self._workspace_scripts_dir(recipe_name), i_and_d_script)
         self.assertExists(i_and_d_script_path)
-        del_script = "delete_package_dirs_" + recipe_id
-        del_script_path = os.path.join(
-            self._workspace_scripts_dir(recipe_name), del_script)
-        self.assertExists(del_script_path)
-        runCmd(del_script_path, cwd=tempdir)
 
     def _devtool_ide_sdk_qemu(self, tempdir, qemu, recipe_name, example_exe):
         """Verify deployment and execution in Qemu system work for one recipe.

@@ -5,13 +5,13 @@ is transmitted. Sometimes real knowledge about a mime-type is need.\
 \n\
 This module maintains a set of MIME::Type objects, which each describe \
 one known mime type."
-HOMEPAGE = "http://search.cpan.org/~markov/MIME-Types-${PV}"
+HOMEPAGE = "https://metacpan.org/release/MARKOV/MIME-Types-2.26"
 SECTION = "libraries"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://META.yml;beginline=11;endline=11;md5=963ce28228347875ace682de56eef8e8"
 
-SRC_URI = "http://search.cpan.org/CPAN/authors/id/M/MA/MARKOV/MIME-Types-${PV}.tar.gz \
+SRC_URI = "${CPAN_MIRROR}/authors/id/M/MA/MARKOV/MIME-Types-${PV}.tar.gz \
            file://run-ptest \
           "
 SRC_URI[sha256sum] = "bc738483cb4cdb47d61e85fe9304fa929aa9ab927e3171ec2ba2ab1cd7cefdff"

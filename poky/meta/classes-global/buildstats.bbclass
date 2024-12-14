@@ -276,7 +276,7 @@ addhandler run_buildstats
 run_buildstats[eventmask] = "bb.event.BuildStarted bb.event.BuildCompleted bb.event.HeartbeatEvent bb.build.TaskStarted bb.build.TaskSucceeded bb.build.TaskFailed"
 
 python runqueue_stats () {
-    import buildstats
+    import oe.buildstats
     from bb import event, runqueue
     # We should not record any samples before the first task has started,
     # because that's the first activity shown in the process chart.
@@ -286,7 +286,7 @@ python runqueue_stats () {
     # closed when the build is done.
     system_stats = d.getVar('_buildstats_system_stats', False)
     if not system_stats and isinstance(e, (bb.runqueue.sceneQueueTaskStarted, bb.runqueue.runQueueTaskStarted)):
-        system_stats = buildstats.SystemStats(d)
+        system_stats = oe.buildstats.SystemStats(d)
         d.setVar('_buildstats_system_stats', system_stats)
     if system_stats:
         # Ensure that we sample at important events.

@@ -25,7 +25,7 @@ New Features / Enhancements in 4.0
 
      BB_SIGNATURE_HANDLER = "OEEquivHash"
      BB_HASHSERVE = "auto"
-     BB_HASHSERVE_UPSTREAM = "hashserv.yocto.io:8687"
+     BB_HASHSERVE_UPSTREAM = "hashserv.yoctoproject.org:8686"
      SSTATE_MIRRORS ?= "file://.* https://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
 
 - The Python package build process is now based on `wheels <https://pythonwheels.com/>`__
@@ -337,37 +337,37 @@ Other license-related notes:
 Security Fixes in 4.0
 ~~~~~~~~~~~~~~~~~~~~~
 
-- binutils: :cve:`2021-42574`, :cve:`2021-45078`
-- curl: :cve:`2021-22945`, :cve:`2021-22946`, :cve:`2021-22947`
-- epiphany: :cve:`2021-45085`, :cve:`2021-45086`, :cve:`2021-45087`, :cve:`2021-45088`
-- expat: :cve:`2021-45960`, :cve:`2021-46143`, :cve:`2022-22822`, :cve:`2022-22823`, :cve:`2022-22824`, :cve:`2022-22825`, :cve:`2022-22826`, :cve:`2022-22827`, :cve:`2022-23852`, :cve:`2022-23990`, :cve:`2022-25235`, :cve:`2022-25236`, :cve:`2022-25313`, :cve:`2022-25314`, :cve:`2022-25315`
-- ffmpeg: :cve:`2021-38114`
-- gcc: :cve:`2021-35465`, :cve:`2021-42574`, :cve:`2021-46195`, :cve:`2022-24765`
-- glibc: :cve:`2021-3998`, :cve:`2021-3999`, :cve:`2021-43396`, :cve:`2022-23218`, :cve:`2022-23219`
-- gmp: :cve:`2021-43618`
-- go: :cve:`2021-41771` and :cve:`2021-41772`
-- grub2: :cve:`2021-3981`
-- gzip: :cve:`2022-1271`
-- libarchive : :cve:`2021-31566`, :cve:`2021-36976`
-- libxml2: :cve:`2022-23308`
-- libxslt: :cve:`2021-30560`
-- lighttpd: :cve:`2022-22707`
-- linux-yocto/5.10: amdgpu: :cve:`2021-42327`
-- lua: :cve:`2021-43396`
-- openssl: :cve:`2021-4044`, :cve:`2022-0778`
-- qemu: :cve:`2022-1050`, :cve:`2022-26353`, :cve:`2022-26354`
-- rpm: :cve:`2021-3521`
-- seatd: :cve:`2022-25643`
-- speex: :cve:`2020-23903`
-- squashfs-tools: :cve:`2021-41072`
-- systemd: :cve:`2021-4034`
-- tiff: :cve:`2022-0561`, :cve:`2022-0562`, :cve:`2022-0865`, :cve:`2022-0891`, :cve:`2022-0907`, :cve:`2022-0908`, :cve:`2022-0909`, :cve:`2022-0924`, :cve:`2022-1056`, :cve:`2022-22844`
-- unzip: :cve:`2021-4217`
-- vim: :cve:`2021-3796`, :cve:`2021-3872`, :cve:`2021-3875`, :cve:`2021-3927`, :cve:`2021-3928`, :cve:`2021-3968`, :cve:`2021-3973`, :cve:`2021-4187`, :cve:`2022-0128`, :cve:`2022-0156`, :cve:`2022-0158`, :cve:`2022-0261`, :cve:`2022-0318`, :cve:`2022-0319`, :cve:`2022-0554`, :cve:`2022-0696`, :cve:`2022-0714`, :cve:`2022-0729`, :cve:`2022-0943`
-- virglrenderer: :cve:`2022-0135`, :cve:`2022-0175`
-- webkitgtk: :cve:`2022-22589`, :cve:`2022-22590`, :cve:`2022-22592`
-- xz: :cve:`2022-1271`
-- zlib: :cve:`2018-25032`
+- binutils: :cve_nist:`2021-42574`, :cve_nist:`2021-45078`
+- curl: :cve_nist:`2021-22945`, :cve_nist:`2021-22946`, :cve_nist:`2021-22947`
+- epiphany: :cve_nist:`2021-45085`, :cve_nist:`2021-45086`, :cve_nist:`2021-45087`, :cve_nist:`2021-45088`
+- expat: :cve_nist:`2021-45960`, :cve_nist:`2021-46143`, :cve_nist:`2022-22822`, :cve_nist:`2022-22823`, :cve_nist:`2022-22824`, :cve_nist:`2022-22825`, :cve_nist:`2022-22826`, :cve_nist:`2022-22827`, :cve_nist:`2022-23852`, :cve_nist:`2022-23990`, :cve_nist:`2022-25235`, :cve_nist:`2022-25236`, :cve_nist:`2022-25313`, :cve_nist:`2022-25314`, :cve_nist:`2022-25315`
+- ffmpeg: :cve_nist:`2021-38114`
+- gcc: :cve_nist:`2021-35465`, :cve_nist:`2021-42574`, :cve_nist:`2021-46195`, :cve_nist:`2022-24765`
+- glibc: :cve_nist:`2021-3998`, :cve_nist:`2021-3999`, :cve_nist:`2021-43396`, :cve_nist:`2022-23218`, :cve_nist:`2022-23219`
+- gmp: :cve_nist:`2021-43618`
+- go: :cve_nist:`2021-41771` and :cve_nist:`2021-41772`
+- grub2: :cve_nist:`2021-3981`
+- gzip: :cve_nist:`2022-1271`
+- libarchive : :cve_nist:`2021-31566`, :cve_nist:`2021-36976`
+- libxml2: :cve_nist:`2022-23308`
+- libxslt: :cve_nist:`2021-30560`
+- lighttpd: :cve_nist:`2022-22707`
+- linux-yocto/5.10: amdgpu: :cve_nist:`2021-42327`
+- lua: :cve_nist:`2021-43396`
+- openssl: :cve_nist:`2021-4044`, :cve_nist:`2022-0778`
+- qemu: :cve_nist:`2022-1050`, :cve_nist:`2022-26353`, :cve_nist:`2022-26354`
+- rpm: :cve_nist:`2021-3521`
+- seatd: :cve_nist:`2022-25643`
+- speex: :cve_nist:`2020-23903`
+- squashfs-tools: :cve_nist:`2021-41072`
+- systemd: :cve_nist:`2021-4034`
+- tiff: :cve_nist:`2022-0561`, :cve_nist:`2022-0562`, :cve_nist:`2022-0865`, :cve_nist:`2022-0891`, :cve_nist:`2022-0907`, :cve_nist:`2022-0908`, :cve_nist:`2022-0909`, :cve_nist:`2022-0924`, :cve_nist:`2022-1056`, :cve_nist:`2022-22844`
+- unzip: :cve_nist:`2021-4217`
+- vim: :cve_nist:`2021-3796`, :cve_nist:`2021-3872`, :cve_nist:`2021-3875`, :cve_nist:`2021-3927`, :cve_nist:`2021-3928`, :cve_nist:`2021-3968`, :cve_nist:`2021-3973`, :cve_nist:`2021-4187`, :cve_nist:`2022-0128`, :cve_nist:`2022-0156`, :cve_nist:`2022-0158`, :cve_nist:`2022-0261`, :cve_nist:`2022-0318`, :cve_nist:`2022-0319`, :cve_nist:`2022-0554`, :cve_nist:`2022-0696`, :cve_nist:`2022-0714`, :cve_nist:`2022-0729`, :cve_nist:`2022-0943`
+- virglrenderer: :cve_nist:`2022-0135`, :cve_nist:`2022-0175`
+- webkitgtk: :cve_nist:`2022-22589`, :cve_nist:`2022-22590`, :cve_nist:`2022-22592`
+- xz: :cve_nist:`2022-1271`
+- zlib: :cve_nist:`2018-25032`
 
 
 

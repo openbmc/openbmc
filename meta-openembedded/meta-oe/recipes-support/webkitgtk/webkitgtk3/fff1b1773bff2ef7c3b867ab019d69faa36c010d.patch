@@ -1,0 +1,33 @@
+From fff1b1773bff2ef7c3b867ab019d69faa36c010d Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@redhat.com>
+Date: Wed, 3 Jul 2024 13:36:54 -0700
+Subject: [PATCH] WebKitDOMEventTarget.h:95: Warning: WebKit2WebExtension:
+ invalid "scope" annotation: only valid on callback parameters
+ https://bugs.webkit.org/show_bug.cgi?id=276180
+
+Unreviewed build fix.
+
+Emmanuele recommends using (type gpointer) for the GCallback parameter
+of webkit_dom_event_target_remove_event_listener, since it won't be
+called and is therefore not functioning as a callback.
+
+* Source/WebKit/WebProcess/InjectedBundle/API/gtk/DOM/WebKitDOMEventTarget.h:
+
+Canonical link: https://commits.webkit.org/280639@main
+Upstream-Status: Backport [https://github.com/WebKit/WebKit/commit/fff1b1773bff2ef7c3b867ab019d69faa36c010d]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../InjectedBundle/API/gtk/DOM/WebKitDOMEventTarget.h           | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/Source/WebKit/WebProcess/InjectedBundle/API/gtk/DOM/WebKitDOMEventTarget.h
++++ b/Source/WebKit/WebProcess/InjectedBundle/API/gtk/DOM/WebKitDOMEventTarget.h
+@@ -92,7 +92,7 @@ WEBKIT_DEPRECATED gboolean  webkit_dom_e
+  * webkit_dom_event_target_remove_event_listener:
+  * @target: A #WebKitDOMEventTarget
+  * @event_name: A #gchar
+- * @handler: (scope call): A #GCallback
++ * @handler: (type gpointer): A #GCallback
+  * @use_capture: A #gboolean
+  *
+  * Returns: a #gboolean

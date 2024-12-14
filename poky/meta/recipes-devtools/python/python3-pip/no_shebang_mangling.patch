@@ -1,4 +1,4 @@
-From 2aa82aeb0783c5fa7777b32bfe1dd3da9ae8fc6e Mon Sep 17 00:00:00 2001
+From 5d0b54ea2aae600a2c3a2b6ec71acf99290640e7 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 23 Feb 2022 12:27:06 +0000
 Subject: [PATCH] python3-pip: Don't change shebang
@@ -13,10 +13,10 @@ Upstream-Status: Inappropriate [OE specific config]
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/pip/_vendor/distlib/scripts.py b/src/pip/_vendor/distlib/scripts.py
-index cfa45d2..313f499 100644
+index b1fc705..c030e98 100644
 --- a/src/pip/_vendor/distlib/scripts.py
 +++ b/src/pip/_vendor/distlib/scripts.py
-@@ -144,6 +144,8 @@ class ScriptMaker(object):
+@@ -155,6 +155,8 @@ class ScriptMaker(object):
          See also: http://www.in-ulm.de/~mascheck/various/shebang/#length
                    https://hg.mozilla.org/mozilla-central/file/tip/mach
          """
@@ -24,8 +24,8 @@ index cfa45d2..313f499 100644
 +            return b'#!/usr/bin/env python3'
          if os.name != 'posix':
              simple_shebang = True
-         else:
-@@ -362,7 +364,7 @@ class ScriptMaker(object):
+         elif getattr(sys, "cross_compiling", False):
+@@ -363,7 +365,7 @@ class ScriptMaker(object):
                  return
  
              match = FIRST_LINE_RE.match(first_line.replace(b'\r\n', b'\n'))

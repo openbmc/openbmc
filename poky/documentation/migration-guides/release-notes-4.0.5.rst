@@ -6,11 +6,11 @@ Release notes for Yocto-4.0.5 (Kirkstone)
 Security Fixes in Yocto-4.0.5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  qemu: fix :cve:`2021-3750`, :cve:`2021-3611` and :cve:`2022-2962`
--  binutils : fix :cve:`2022-38126`, :cve:`2022-38127` and :cve:`2022-38128`
--  tff: fix :cve:`2022-2867`, :cve:`2022-2868` and :cve:`2022-2869`
--  inetutils: fix :cve:`2022-39028`
--  go: fix :cve:`2022-27664`
+-  qemu: fix :cve_nist:`2021-3750`, :cve_nist:`2021-3611` and :cve_nist:`2022-2962`
+-  binutils : fix :cve_nist:`2022-38126`, :cve_nist:`2022-38127` and :cve_nist:`2022-38128`
+-  tff: fix :cve_nist:`2022-2867`, :cve_nist:`2022-2868` and :cve_nist:`2022-2869`
+-  inetutils: fix :cve_nist:`2022-39028`
+-  go: fix :cve_nist:`2022-27664`
 
 Fixes in Yocto-4.0.5
 ~~~~~~~~~~~~~~~~~~~~

@@ -1,0 +1,49 @@
+From a422ddf7f8805d34ff1fbb46d335993c9cd05ead Mon Sep 17 00:00:00 2001
+From: Einar Jon Gunnarsson <tolvupostur@gmail.com>
+Date: Fri, 10 May 2024 11:56:17 +0200
+Subject: [PATCH] media-ctl: Install media-ctl pkg-config files
+
+libv4l2subdev/libmediactl can not be used in projects without the
+pkg-config files. This adds them as well.
+
+Upstream-Status: Denied
+
+This is an add-on to the previous patch:
+0001-media-ctl-Install-media-ctl-header-and-library-files.patch
+so same restrictions apply.
+
+Signed-off-by: Einar Jon Gunnarsson <tolvupostur@gmail.com>
+---
+ utils/media-ctl/meson.build | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/utils/media-ctl/meson.build b/utils/media-ctl/meson.build
+index 40669b4c..6feba1af 100644
+--- a/utils/media-ctl/meson.build
++++ b/utils/media-ctl/meson.build
+@@ -38,6 +38,12 @@ libv4l2subdev = library('v4l2subdev',
+ 
+ dep_libv4l2subdev = declare_dependency(link_with : libv4l2subdev)
+ 
++pkg.generate(
++      libv4l2subdev,
++      name : 'libv4l2subdev',
++      version : meson.project_version(),
++      description : 'v4l2 subdev library')
++
+ media_ctl_sources = files(
+     'media-ctl.c',
+     'options.c',
+@@ -55,3 +61,9 @@ media_ctl = executable('media-ctl',
+                        dependencies : media_ctl_deps,
+                        install : true,
+                        include_directories : v4l2_utils_incdir)
++
++pkg.generate(
++     libmediactl,
++     name : 'libmediactl',
++     version : meson.project_version(),
++     description : 'v4l2 mediactl library')
+-- 
+2.43.5
+

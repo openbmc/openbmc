@@ -1,13 +1,13 @@
 Upstream-Status: Pending
 
---- cmake-3.25.2/src/cmake/__init__.py.old	2023-03-10 09:40:43.582315753 +0100
-+++ cmake-3.25.2/src/cmake/__init__.py	2023-03-10 09:41:38.030874047 +0100
-@@ -36,7 +36,7 @@
- 
- 
- def _program(name, args):
--    return subprocess.call([os.path.join(CMAKE_BIN_DIR, name)] + args, close_fds=False)
+--- cmake-3.25.2/src/cmake/__init__.py.old	2024-12-12 20:25:48.207389622 +0000
++++ cmake-3.25.2/src/cmake/__init__.py	2024-12-12 20:25:48.207389622 +0000
+@@ -44,7 +44,7 @@
+
+
+ def _program(name: str, args: Iterable[str]) -> int:
+-    return subprocess.call([os.path.join(CMAKE_BIN_DIR, name), *args], close_fds=False)
 +    return subprocess.call([name] + args, close_fds=False)
- 
- 
- def cmake():
+
+ def _program_exit(name: str, *args: str) -> NoReturn:
+     if sys.platform.startswith("win"):

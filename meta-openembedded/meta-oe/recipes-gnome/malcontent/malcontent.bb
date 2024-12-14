@@ -17,7 +17,7 @@ DEPENDS = " \
 
 GIR_MESON_OPTION = ""
 
-inherit  meson pkgconfig gobject-introspection gettext features_check useradd
+inherit  meson pkgconfig gobject-introspection gettext features_check
 
 REQUIRED_DISTRO_FEATURES = "pam polkit gobject-introspection"
 
@@ -25,15 +25,6 @@ PACKAGECONFIG ?= "ui"
 PACKAGECONFIG[ui] = ",,,malcontent-ui"
 
 EXTRA_OEMESON = "-Dui=disabled"
-
-USERADD_PACKAGES = "${PN}"
-USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 --shell /bin/nologin polkitd"
-
-do_install:append() {
-        # Fix up permissions on polkit rules.d to work with rpm4 constraints
-        chmod 700 ${D}/${datadir}/polkit-1/rules.d
-        chown polkitd:root ${D}/${datadir}/polkit-1/rules.d
-}
 
 FILES:${PN} += " \
 	${libdir}/security/pam_malcontent.so \

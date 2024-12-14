@@ -8,7 +8,6 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/iperf-${PV}.tar.gz \
            file://0001-Detect-bool-definition-considering-stdbool.h-being-p.patch \
 "
 
-SRC_URI[md5sum] = "31ea1c6d5cbf80b16ff3abe4288dad5e"
 SRC_URI[sha256sum] = "c88adec966096a81136dda91b4bd19c27aae06df4d45a7f547a8e50d723778ad"
 
 S = "${WORKDIR}/iperf-${PV}"

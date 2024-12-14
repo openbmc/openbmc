@@ -14,7 +14,6 @@ LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=003fa970662359a43ac2c2961108b0f1"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/F/FR/FREW/Sub-Exporter-Progressive-${PV}.tar.gz"
-SRC_URI[md5sum] = "72cf6acdd2a0a8b105821a4db98e4ebe"
 SRC_URI[sha256sum] = "d535b7954d64da1ac1305b1fadf98202769e3599376854b2ced90c382beac056"
 
 S = "${WORKDIR}/Sub-Exporter-Progressive-${PV}"

@@ -50,6 +50,8 @@ python_pep517_do_install () {
     fi
 
     nativepython3 -m installer ${INSTALL_WHEEL_COMPILE_BYTECODE} --interpreter "${USRBINPATH}/env ${PEP517_INSTALL_PYTHON}" --destdir=${D} ${PEP517_WHEEL_PATH}/*.whl
+
+    find ${D} -path *.dist-info/RECORD -delete
 }
 
 # A manual do_install that just uses unzip for bootstrapping purposes. Callers should DEPEND on unzip-native.

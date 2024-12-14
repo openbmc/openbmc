@@ -28,7 +28,6 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Artistic-1.0;md5=cda03bbdc3c195
     file://${COMMON_LICENSE_DIR}/LGPL-2.1-or-later;md5=2a4f4fd2128ea2f65047ee63fbca9f68 \
 "
 
-SRC_URI[md5sum] = "a6bc06b3f7749f7d77a2b1bd13402821"
 SRC_URI[sha256sum] = "16a29f7acaeec081bf0e7303ba5ee24fda1d21a1104669b837745f3ea61d6afa"
 
 S = "${WORKDIR}/Unix-Statgrab-${PV}"

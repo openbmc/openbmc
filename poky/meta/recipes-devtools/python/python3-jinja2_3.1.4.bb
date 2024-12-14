@@ -13,9 +13,11 @@ CVE_PRODUCT = "jinja2 jinja"
 CLEANBROKEN = "1"
 
 inherit pypi python_flit_core ptest
+UPSTREAM_CHECK_PYPI_PACKAGE = "Jinja2"
 
 SRC_URI += " \
 	file://run-ptest \
+	file://fix-3.13.patch \
 "
 
 do_install_ptest() {
@@ -26,7 +28,6 @@ do_install_ptest() {
 RDEPENDS:${PN}-ptest += " \
     python3-pytest \
     python3-unittest-automake-output \
-    python3-toml \
     python3-unixadmin \
 "
 

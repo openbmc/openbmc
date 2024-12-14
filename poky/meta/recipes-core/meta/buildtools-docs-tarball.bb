@@ -9,6 +9,7 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-python3-sphinx \
     nativesdk-python3-sphinx-rtd-theme \
     nativesdk-python3-pyyaml \
+    nativesdk-rsvg \
     "
 
 TOOLCHAIN_OUTPUTNAME = "${SDK_ARCH}-buildtools-docs-nativesdk-standalone-${DISTRO_VERSION}"

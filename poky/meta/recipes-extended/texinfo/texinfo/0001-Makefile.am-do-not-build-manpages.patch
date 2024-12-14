@@ -1,0 +1,29 @@
+From f7572109b64db9ea5aa44078eaad25ad2a2283f8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 28 Nov 2024 13:16:15 +0100
+Subject: [PATCH] Makefile.am: do not build manpages
+
+This requires help2man.
+
+Upstream-Status: Inappropriate [oe-core doesn't provide help2man]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index f733797..1013fcf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -66,7 +66,7 @@ if HOST_IS_WINDOWS
+ endif
+ endif
+   SUBDIRS += install-info po po_document tp Pod-Simple-Texinfo texindex util \
+-             doc man
++             doc
+   SUBDIRS += js
+ endif
+ 
+-- 
+2.39.5
+

@@ -72,8 +72,10 @@ def npm_pack(env, srcdir, workdir):
         j = json.load(f)
 
     # base does not really matter and is for documentation purposes
-    # only.  But the 'version' part must exist because other parts of
+    # only. But the 'version' part must exist because other parts of
     # the bbclass rely on it.
+    if 'version' not in j:
+        j['version'] = '0.0.0-unknown'
     base = j['name'].split('/')[-1]
     tarball = os.path.join(workdir, "%s-%s.tgz" % (base, j['version']));
 

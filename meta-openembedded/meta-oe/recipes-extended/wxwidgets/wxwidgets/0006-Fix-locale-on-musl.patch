@@ -1,0 +1,48 @@
+From 64d5d7f68cde208c6f8a5e0b71da93f98e4720f7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 12 Oct 2024 20:30:16 +0800
+Subject: [PATCH] Fix locale on musl
+
+these macro'd away functions don't exist in musl (yet)
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/wx/xlocale.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/include/wx/xlocale.h b/include/wx/xlocale.h
+index c433d25d05..794cf0b66b 100644
+--- a/include/wx/xlocale.h
++++ b/include/wx/xlocale.h
+@@ -33,6 +33,26 @@
+ #include "wx/crt.h"     // Includes wx/chartype.h, wx/wxcrt.h(wx/string.h)
+ #include "wx/intl.h"    // wxLanguage
+ 
++#ifndef strtol_l
++#define strtol_l(s, p, base, l) strtol(s, p, base)
++#endif
++
++#ifndef strtoul_l
++#define strtoul_l(s, p, base, l) strtoul(s, p, base)
++#endif
++
++#ifndef wcstod_l
++#define wcstod_l(s, p, l) wcstod(s, p)
++#endif
++
++#ifndef wcstol_l
++#define wcstol_l(s, p, base, l) wcstol(s, p, base)
++#endif
++
++#ifndef wcstoul_l
++#define wcstoul_l(s, p, base, l) wcstoul(s, p, base)
++#endif
++
+ // The platform-specific locale type
+ // If wxXLocale_t is not defined, then only "C" locale support is provided
+ #ifdef wxHAS_XLOCALE_SUPPORT
+-- 
+2.25.1
+

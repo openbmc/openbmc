@@ -39,3 +39,5 @@ FILES:${PN} += " \
 "
 
 RDEPENDS:${PN} += "yelp-xsl"
+
+CVE_STATUS[CVE-2008-3533] = "cpe-incorrect: The current version (42.2) is not affected. Fixed in 2.24."

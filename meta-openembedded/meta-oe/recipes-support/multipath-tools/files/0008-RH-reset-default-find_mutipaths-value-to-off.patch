@@ -1,7 +1,7 @@
-From fcba3e0d4c8448a2510025acb255c7335413bf56 Mon Sep 17 00:00:00 2001
+From 87e19d273c46fe78933627fc4e8046e3a76da47a Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 11:12:01 +0800
-Subject: [PATCH 08/12] RH: reset default find_mutipaths value to off
+Subject: [PATCH] RH: reset default find_mutipaths value to off
 
 Upstream has changed to default find_multipaths to "strict". For now
 Redhat will retain the previous default of "off".
@@ -17,10 +17,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libmultipath/defaults.h b/libmultipath/defaults.h
-index 64b633f2..a06a8a41 100644
+index 02f7e57c..98dd66f7 100644
 --- a/libmultipath/defaults.h
 +++ b/libmultipath/defaults.h
-@@ -23,7 +23,7 @@
+@@ -24,7 +24,7 @@
  #define DEFAULT_NO_PATH_RETRY	NO_PATH_RETRY_UNDEF
  #define DEFAULT_VERBOSITY	2
  #define DEFAULT_REASSIGN_MAPS	0

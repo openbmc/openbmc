@@ -375,3 +375,21 @@ require conf/distro/include/no-gplv3.inc
         self.assertGreater(result.status, 0, "Build should have failed if ${ is in the path")
         self.assertTrue(re.search("ERROR: Directory name /.* contains unexpanded bitbake variable. This may cause build failures and WORKDIR polution",
                                   result.output), msg = "mkdirhier with unexpanded variable should have failed: %s" % result.output)
+
+    def test_bb_env_bb_getvar_equality(self):
+        """ Test if "bitbake -e" output is identical to "bitbake-getvar" output for a variable set from an anonymous function
+        """
+        self.write_config('''INHERIT += "test_anon_func"
+TEST_SET_FROM_ANON_FUNC ?= ""''')
+
+        result_bb_e = runCmd('bitbake -e')
+        bb_e_var_match = re.search('^TEST_SET_FROM_ANON_FUNC="(?P<value>.*)"$', result_bb_e.output, re.MULTILINE)
+        self.assertTrue(bb_e_var_match, msg = "Can't find TEST_SET_FROM_ANON_FUNC value in \"bitbake -e\" output")
+        bb_e_var_value = bb_e_var_match.group("value")
+
+        result_bb_getvar = runCmd('bitbake-getvar TEST_SET_FROM_ANON_FUNC --value')
+        bb_getvar_var_value = result_bb_getvar.output.strip()
+        self.assertEqual(bb_e_var_value, bb_getvar_var_value,
+                         msg='''"bitbake -e" output differs from bitbake-getvar output for TEST_SET_FROM_ANON_FUNC (set from anonymous function)
+bitbake -e: "%s"
+bitbake-getvar: "%s"''' % (bb_e_var_value, bb_getvar_var_value))

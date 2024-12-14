@@ -16,13 +16,14 @@ DEPENDS = " \
     gexiv2 \
     gnome-online-accounts \
     gsettings-desktop-schemas \
+    itstool-native \
     libdazzle \
-    tracker \
+    tinysparql \
     libhandy \
     libportal \
 "
 
-RDEPENDS:${PN} = "tracker-miners"
+RDEPENDS:${PN} = "localsearch"
 
 
 inherit gnomebase gettext gnome-help features_check

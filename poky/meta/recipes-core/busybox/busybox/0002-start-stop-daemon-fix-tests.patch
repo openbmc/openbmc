@@ -1,0 +1,65 @@
+From 85fb09e278aff8f4b3e11d7ace0d1347f750487f Mon Sep 17 00:00:00 2001
+From: Andrej Valek <andrej.v@skyrain.eu>
+Date: Wed, 16 Oct 2024 10:11:01 +0200
+Subject: [PATCH] start-stop-daemon: fix tests
+
+- "/tmp" directory could be link to somewhere else, so deference it
+before comparing the expected path
+- run "start-stop-daemon with both -x and -a" test only if "/bin/false"
+is not a symlink.
+
+Upstream-Status: Submitted [https://lists.busybox.net/pipermail/busybox/2024-October/090968.html]
+
+Signed-off-by: Andrej Valek <andrej.v@skyrain.eu>
+---
+ testsuite/start-stop-daemon.tests | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/testsuite/start-stop-daemon.tests b/testsuite/start-stop-daemon.tests
+index e1e49ab5f..fd59859ef 100755
+--- a/testsuite/start-stop-daemon.tests
++++ b/testsuite/start-stop-daemon.tests
+@@ -6,24 +6,27 @@
+ 
+ # testing "test name" "cmd" "expected result" "file input" "stdin"
+ 
++# deference link to /tmp
++TMP_DIR="$(readlink -f /tmp)"
++
+ testing "start-stop-daemon -x without -a" \
+ 	'start-stop-daemon -S -x true 2>&1; echo $?' \
+ 	"0\n" \
+ 	"" ""
+ 
+ testing "start-stop-daemon -x with -d on existing directory" \
+-	'start-stop-daemon -S -d /tmp -x true 2>&1; echo $?' \
++	'start-stop-daemon -S -d $TMP_DIR -x true 2>&1; echo $?' \
+ 	"0\n" \
+ 	"" ""
+ 
+ testing "start-stop-daemon -x with -d on existing and check dir" \
+-	'output=$(start-stop-daemon -S -d /tmp -x pwd); echo $output' \
+-	"/tmp\n" \
++	'output=$(start-stop-daemon -S -d $TMP_DIR -x pwd); echo $output' \
++	"$TMP_DIR\n" \
+ 	"" ""
+ 
+ testing "start-stop-daemon -x with --chdir on existing and check dir" \
+-	'output=$(start-stop-daemon -S --chdir /tmp -x pwd); echo $output' \
+-	"/tmp\n" \
++	'output=$(start-stop-daemon -S --chdir $TMP_DIR -x pwd); echo $output' \
++	"$TMP_DIR\n" \
+ 	"" ""
+ 
+ testing "start-stop-daemon -a without -x" \
+@@ -48,6 +51,7 @@ testing "start-stop-daemon -x with -d on non-existing directory" \
+ #
+ # NB: this fails if /bin/false is a busybox symlink:
+ # busybox looks at argv[0] and says "qwerty: applet not found"
++test ! -L /bin/false && \
+ testing "start-stop-daemon with both -x and -a" \
+ 	'start-stop-daemon -S -x /bin/false -a qwerty false 2>&1; echo $?' \
+ 	"1\n" \
+-- 
+2.34.1
+

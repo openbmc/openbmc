@@ -1,4 +1,4 @@
-From 3359a87a71307336100b84e66b69bad385cd3cfc Mon Sep 17 00:00:00 2001
+From eee5daeb5b53b0c4a013aa5887a726434ec81600 Mon Sep 17 00:00:00 2001
 From: Martin Jansa <martin.jansa@gmail.com>
 Date: Mon, 6 May 2024 01:36:39 +0200
 Subject: [PATCH] crypto: use _Generic only if !defined(__cplusplus)
@@ -43,18 +43,17 @@ third_party/boringssl-with-bazel/src/ssl/../crypto/internal.h:1166:10: note: in 
  1166 |   return CRYPTO_GENERIC_ADDC(x, y, carry, out_carry);
       |          ^~~~~~~~~~~~~~~~~~~
 
+Upstream-Status: Submitted [https://boringssl-review.googlesource.com/c/boringssl/+/68227 crypto: use _Generic only if !defined(__cplusplus)]
 Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
 ---
-Upstream-Status: Submitted [https://boringssl-review.googlesource.com/c/boringssl/+/68227 crypto: use _Generic only if !defined(__cplusplus)]
-
  crypto/internal.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/internal.h b/crypto/internal.h
-index a77102d76..30d6826dd 100644
+index f93c2e5..2fca2fb 100644
 --- a/crypto/internal.h
 +++ b/crypto/internal.h
-@@ -1176,7 +1176,7 @@ static inline uint64_t CRYPTO_rotr_u64(uint64_t value, int shift) {
+@@ -1206,7 +1206,7 @@ static inline uint64_t CRYPTO_rotr_u64(uint64_t value, int shift) {
  
  // CRYPTO_addc_* returns |x + y + carry|, and sets |*out_carry| to the carry
  // bit. |carry| must be zero or one.
@@ -63,7 +62,7 @@ index a77102d76..30d6826dd 100644
  
  #define CRYPTO_GENERIC_ADDC(x, y, carry, out_carry) \
    (_Generic((x),                                    \
-@@ -1228,7 +1228,7 @@ static inline uint64_t CRYPTO_addc_u64(uint64_t x, uint64_t y, uint64_t carry,
+@@ -1258,7 +1258,7 @@ static inline uint64_t CRYPTO_addc_u64(uint64_t x, uint64_t y, uint64_t carry,
  
  // CRYPTO_subc_* returns |x - y - borrow|, and sets |*out_borrow| to the borrow
  // bit. |borrow| must be zero or one.

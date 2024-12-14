@@ -1,0 +1,161 @@
+From 5d10459b6b5182fcbc98240d9dace026c87a5037 Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Mon, 5 Aug 2024 15:41:34 -0400
+Subject: [PATCH] Fix: Build examples when rpath is stripped from in-build-tree
+ libs
+
+Observed issue
+==============
+
+Certain tool chains[1, 2] emit warnings or errors when building the
+example applications.
+
+```
+make[3]: Entering directory
+'/home/xxx/src/efficios/lttng/master/src/lttng-ust/doc/examples/easy-ust'
+CC       sample.o
+CC       tp.o
+CCLD     sample
+
+/usr/bin/ld: warning: liblttng-ust-common.so.1, needed by ../../../src/lib/lttng-ust/.libs/liblttng-ust.so, not found (try using -rpath or -rpath-link)
+/usr/bin/ld: warning: liblttng-ust-tracepoint.so.1, needed by ../../../src/lib/lttng-ust/.libs/liblttng-ust.so, not found (try using -rpath or -rpath-link)
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_add_fd_to_tracker'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_after_fork_child'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_common_ctor'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_tp_init'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_tp_probe_register_queue_release'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_cancelstate_disable_pop'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_synchronize_rcu'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_register_thread'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_tp_probe_prune_release_queue'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_cancelstate_disable_push'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_before_fork'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_lock_fd_tracker'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_trace_clock'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_has_sys_membarrier'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_unlock_fd_tracker'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_tp_exit'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_get_cpu_sym'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_common_alloc_tls'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_after_fork_parent'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_delete_fd_from_tracker'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_register'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_reader'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_urcu_gp'
+/usr/bin/ld: ../../../src/lib/lttng-ust/.libs/liblttng-ust.so: undefined reference to `lttng_ust_tp_probe_unregister_queue_release'
+collect2: error: ld returned 1 exit status
+```
+
+=== Reproducer ===
+
+The easiest way to consistently reproduce this type of build failure
+is to perform the following steps:
+
+```
+./configure
+make -j$(nproc)
+find . -iname '*.so' -exec chrpath -d {} \;
+make -C doc/examples clean
+make -j$(nproc)
+```
+
+As the examples are not built with libtool, finding the libraries to
+link against depends on the shared objects having an rpath.
+
+E.g.
+
+```
+$ chrpath src/lib/lttng-ust/.libs/liblttng-ust.so.1.0.0
+src/lib/lttng-ust/.libs/liblttng-ust.so.1.0.0: RUNPATH=/home/xxx/src/efficios/lttng/master/src/lttng-ust/src/lib/lttng-ust-common/.libs:/home/xxx/src/efficios/lttng/master/src/lttng-ust/src/lib/lttng-ust-tracepoint/.libs:/home/xxx/src/efficios/lttng/master/usr/lib
+```
+
+The current examples build with `-Wl,-rpath`  for `liblttng-ust`, but
+not the dependencies of `liblttng-ust` (which would normally be found
+via it's own rpath). If the `rpath` is stripped from
+`liblttng-ust.so`, or if the tool chain ignores `rpath` explicitly,
+then the build with fail.
+
+In the case of a yocto build environment as in GitHub#61[1], the
+following commands reproduced the warnings and the errors seen in the
+above test case.
+
+```
+git clone git://git.yoctoproject.org/poky && cd poky/
+. oe-init-build-env
+echo "PACKAGECONFIG:pn-lttng-ust = 'examples'" >>conf/local.conf
+bitbake lttng-ust
+```
+
+=== Solution ===
+
+Explicitly add library search paths and set linker rpath-link are set
+for both the standard and cmake examples. Similar changes were
+proposed for each of those parts respectively in GitHub#61[1] and GitHub#63[2].
+
+=== Known issues ===
+
+While the `rpath-link` for the second order library dependencies will
+allow the builds to complete, the examples will not work at
+runtime even when using `rpath`. From `man ld.so`, the rpaths in an
+executable or shared object are only considered for direct
+dependencies. Therefore, without setting `LD_LIBRARY_PATH` or
+installing the libraries test applications will fail as follows:
+
+```
+$ ./doc/examples/easy-ust/sample
+./doc/examples/easy-ust/sample: error while loading shared libraries: liblttng-ust-common.so.1: cannot open shared object file: No such file or directory
+```
+
+References
+==========
+
+[1]: https://github.com/lttng/lttng-ust/pull/61
+[2]: https://github.com/lttng/lttng-ust/pull/63
+
+Change-Id: I273ccddd0d0b7a1b57b9e09ddf48d8b5b41e6f8e
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+
+Upstream-Status: Backport [https://github.com/lttng/lttng-ust/commit/5d10459b6b5182fcbc98240d9dace026c87a5037]
+Signed-off-by: Bin Lan <bin.lan.cn@windriver.com>
+
+---
+ doc/examples/Makefile.am | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/doc/examples/Makefile.am b/doc/examples/Makefile.am
+index aebf63bd..79766ec0 100644
+--- a/doc/examples/Makefile.am
++++ b/doc/examples/Makefile.am
+@@ -169,7 +169,10 @@ all-local:
+ 				CFLAGS='$(CFLAGS)' \
+ 				AM_CFLAGS='$(AM_CFLAGS)' \
+ 				LDFLAGS="$(LDFLAGS)" \
+-				AM_LDFLAGS='$(AM_LDFLAGS) -L../../../src/lib/lttng-ust/.libs -Wl,-rpath="$(PWD)/../../src/lib/lttng-ust/.libs/" -Wl,-rpath-link="$(PWD)/../../src/lib/lttng-ust/.libs/"' \
++				AM_LDFLAGS='$(AM_LDFLAGS) -L../../../src/lib/lttng-ust/.libs -L../../../src/lib/lttng-ust-common/.libs -L../../../src/lib/lttng-ust-tracepoint/.libs \
++				-Wl,-rpath="$(abs_top_builddir)/src/lib/lttng-ust/.libs/" \
++				-Wl,-rpath-link="$(abs_top_builddir)/src/lib/lttng-ust-common/.libs/" \
++				-Wl,-rpath-link="$(abs_top_builddir)/src/lib/lttng-ust-tracepoint/.libs/"' \
+ 				LTTNG_GEN_TP_PATH="$$rel_src_subdir$(top_srcdir)/tools/" \
+ 				AM_V_P="$(AM_V_P)" \
+ 				AM_V_at="$(AM_V_at)" \
+@@ -222,10 +225,14 @@ all-local:
+ 					CXX="$(CXX)" \
+ 					$(CMAKE) \
+ 					-DCMAKE_INCLUDE_PATH="$(abs_top_srcdir)/include;$(abs_top_builddir)/include" \
+-					-DCMAKE_LIBRARY_PATH="$(abs_top_builddir)/src/lib/lttng-ust/.libs" \
++					-DCMAKE_LIBRARY_PATH="$(abs_top_builddir)/src/lib/lttng-ust/.libs;$(abs_top_builddir)/src/lib/lttng-ust-common/.libs;$(abs_top_builddir)/src/lib/lttng-ust-tracepoint/.libs" \
+ 					-DCMAKE_C_FLAGS="$(AM_CFLAGS) $(CPPFLAGS) $(CFLAGS)" \
+ 					-DCMAKE_CXX_FLAGS="$(AM_CXXFLAGS) $(CXXFLAGS) $(CPPFLAGS)" \
+-					-DCMAKE_EXE_LINKER_FLAGS="$(AM_LDFLAGS) $(LDFLAGS)" \
++					-DCMAKE_EXE_LINKER_FLAGS="$(AM_LDFLAGS) $(LDFLAGS) \
++					-L../../../src/lib/lttng-ust/.libs -L../../../src/lib/lttng-ust-common/.libs -L../../../src/lib/lttng-ust-tracepoint/.libs \
++					-Wl,-rpath=$(abs_top_builddir)/src/lib/lttng-ust/.libs/ \
++					-Wl,-rpath-link=$(abs_top_builddir)/src/lib/lttng-ust-common/.libs/ \
++					-Wl,-rpath-link=$(abs_top_builddir)/src/lib/lttng-ust-tracepoint/.libs/" \
+ 					.. && \
+ 				$(MAKE) \
+ 			) || exit 1; \
+-- 
+2.43.0
+

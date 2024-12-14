@@ -19,7 +19,7 @@ REQUIRED_DISTRO_FEATURES = "pam"
 
 SYSTEMD_SERVICE:${PN} = "wtmpdb-update-boot.service wtmpdb-rotate.service"
 
-EXTRA_OEMESON = " -Dpamlibdir=${libdir}"
+EXTRA_OEMESON = " -Dpamlibdir=${base_libdir}/security"
 
 do_install:append () {
       if [ -d ${D}${prefix}/lib/systemd -a ${D}${prefix}/lib != `dirname ${D}${systemd_unitdir}` ]; then
@@ -33,3 +33,4 @@ do_install:append () {
 FILES:${PN} += " ${systemd_system_unitdir} "
 FILES:${PN} += " ${libdir} "
 FILES:${PN} += " ${nonarch_libdir}/tmpfiles.d/* "
+FILES:${PN} += " ${base_libdir}/security/*.so "

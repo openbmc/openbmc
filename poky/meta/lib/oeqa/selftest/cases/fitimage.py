@@ -11,6 +11,51 @@ import re
 
 class FitImageTests(OESelftestTestCase):
 
+    def _setup_uboot_tools_native(self):
+        """build u-boot-tools-native and return RECIPE_SYSROOT_NATIVE"""
+        bitbake("u-boot-tools-native -c addto_recipe_sysroot")
+        return get_bb_var('RECIPE_SYSROOT_NATIVE', 'u-boot-tools-native')
+
+    def _verify_fit_image_signature(self, uboot_tools_sysroot_native, fitimage_path, dtb_path, conf_name=None):
+        """Verify the signature of a fit contfiguration
+
+        The fit_check_sign utility from u-boot-tools-native is called.
+        uboot-fit_check_sign -f fitImage -k $dtb_name -c conf-$dtb_name
+        """
+        fit_check_sign_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'uboot-fit_check_sign')
+        cmd = '%s -f %s -k %s' % (fit_check_sign_path, fitimage_path, dtb_path)
+        if conf_name:
+            cmd += ' -c %s' % conf_name
+        result = runCmd(cmd)
+        self.logger.debug("%s\nreturned: %s\n%s", cmd, str(result.status), result.output)
+        self.assertIn("Signature check OK", result.output)
+
+    @staticmethod
+    def _find_string_in_bin_file(file_path, search_string):
+        """find stings in a binary file
+
+        Shell equivalent: strings "$1" | grep "$2" | wc -l
+        return number of matches
+        """
+        found_positions = 0
+        with open(file_path, 'rb') as file:
+            byte = file.read(1)
+            current_position = 0
+            current_match = 0
+            while byte:
+                char = byte.decode('ascii', errors='ignore')
+                if char == search_string[current_match]:
+                    current_match += 1
+                    if current_match == len(search_string):
+                        found_positions += 1
+                        current_match = 0
+                else:
+                    current_match = 0
+                current_position += 1
+                byte = file.read(1)
+        return found_positions
+
+
     def test_fit_image(self):
         """
         Summary:     Check if FIT image and Image Tree Source (its) are built
@@ -53,10 +98,8 @@ FIT_DESC = "A model description"
         fitimage_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],
             "fitImage-%s-%s" % (bb_vars['INITRAMFS_IMAGE_NAME'], bb_vars['KERNEL_FIT_LINK_NAME']))
 
-        self.assertTrue(os.path.exists(fitimage_its_path),
-            "%s image tree source doesn't exist" % (fitimage_its_path))
-        self.assertTrue(os.path.exists(fitimage_path),
-            "%s FIT image doesn't exist" % (fitimage_path))
+        self.assertExists(fitimage_its_path, "%s image tree source doesn't exist" % (fitimage_its_path))
+        self.assertExists(fitimage_path, "%s FIT image doesn't exist" % (fitimage_path))
 
         # Check that the type, load address, entrypoint address and default
         # values for kernel and ramdisk in Image Tree Source are as expected.
@@ -108,19 +151,21 @@ FIT_DESC = "A model description"
         Author:      Paul Eggleton <paul.eggleton@microsoft.com> based upon
                      work by Usama Arif <usama.arif@arm.com>
         """
+        a_comment = "a smart comment"
         config = """
 # Enable creation of fitImage
 MACHINE = "beaglebone-yocto"
 KERNEL_IMAGETYPES += " fitImage "
-KERNEL_CLASSES = " kernel-fitimage test-mkimage-wrapper "
+KERNEL_CLASSES = " kernel-fitimage "
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
 UBOOT_SIGN_IMG_KEYNAME = "img-oe-selftest"
 UBOOT_SIGN_KEYNAME = "cfg-oe-selftest"
 FIT_SIGN_INDIVIDUAL = "1"
-UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
-"""
+UBOOT_MKIMAGE_SIGN_ARGS = "-c '%s'"
+""" % a_comment
+
         self.write_config(config)
 
         # fitImage is created as part of linux recipe
@@ -133,10 +178,8 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
         fitimage_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],
             "fitImage-%s.bin" % (bb_vars['KERNEL_FIT_LINK_NAME']))
 
-        self.assertTrue(os.path.exists(fitimage_its_path),
-            "%s image tree source doesn't exist" % (fitimage_its_path))
-        self.assertTrue(os.path.exists(fitimage_path),
-            "%s FIT image doesn't exist" % (fitimage_path))
+        self.assertExists(fitimage_its_path, "%s image tree source doesn't exist" % (fitimage_its_path))
+        self.assertExists(fitimage_path, "%s FIT image doesn't exist" % (fitimage_path))
 
         req_itspaths = [
             ['/', 'images', 'kernel-1'],
@@ -195,10 +238,8 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
                 self.assertEqual(value, reqvalue)
 
         # Dump the image to see if it really got signed
-        bitbake("u-boot-tools-native -c addto_recipe_sysroot")
-        result = runCmd('bitbake -e u-boot-tools-native | grep ^RECIPE_SYSROOT_NATIVE=')
-        recipe_sysroot_native = result.output.split('=')[1].strip('"')
-        dumpimage_path = os.path.join(recipe_sysroot_native, 'usr', 'bin', 'dumpimage')
+        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
+        dumpimage_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'dumpimage')
         result = runCmd('%s -l %s' % (dumpimage_path, fitimage_path))
         in_signed = None
         signed_sections = {}
@@ -224,17 +265,15 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
             value = values.get('Sign value', None)
             self.assertEqual(len(value), 512, 'Signature value for section %s not expected length' % signed_section)
 
-        # Check for UBOOT_MKIMAGE_SIGN_ARGS
-        result = runCmd('bitbake -e virtual/kernel | grep ^T=')
-        tempdir = result.output.split('=', 1)[1].strip().strip('')
-        result = runCmd('grep "a smart comment" %s/run.do_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'UBOOT_MKIMAGE_SIGN_ARGS value did not get used')
+        # Search for the string passed to mkimage: 1 kernel + 3 DTBs + config per DTB = 7 sections
+        # Looks like mkimage supports to add a comment but does not support to read it back.
+        found_comments = FitImageTests._find_string_in_bin_file(fitimage_path, a_comment)
+        self.assertEqual(found_comments, 7, "Expected 7 signed and commented section in the fitImage.")
 
-        # Check for evidence of test-mkimage-wrapper class
-        result = runCmd('grep "### uboot-mkimage wrapper message" %s/log.do_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'UBOOT_MKIMAGE did not work')
-        result = runCmd('grep "### uboot-mkimage signing wrapper message" %s/log.do_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'UBOOT_MKIMAGE_SIGN did not work')
+        # Verify the signature for all configurations = DTBs
+        for dtb in ['am335x-bone.dtb', 'am335x-boneblack.dtb', 'am335x-bonegreen.dtb']:
+            self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path,
+                                             os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], dtb), 'conf-' + dtb)
 
     def test_uboot_fit_image(self):
         """
@@ -287,10 +326,8 @@ FIT_SIGN_INDIVIDUAL = "1"
         fitimage_path = os.path.join(deploy_dir_image,
             "u-boot-fitImage-%s" % (machine,))
 
-        self.assertTrue(os.path.exists(fitimage_its_path),
-            "%s image tree source doesn't exist" % (fitimage_its_path))
-        self.assertTrue(os.path.exists(fitimage_path),
-            "%s FIT image doesn't exist" % (fitimage_path))
+        self.assertExists(fitimage_its_path, "%s image tree source doesn't exist" % (fitimage_its_path))
+        self.assertExists(fitimage_path, "%s FIT image doesn't exist" % (fitimage_path))
 
         # Check that the type, load address, entrypoint address and default
         # values for kernel and ramdisk in Image Tree Source are as expected.
@@ -351,7 +388,6 @@ UBOOT_ENTRYPOINT = "0x80080000"
 UBOOT_FIT_DESC = "A model description"
 KERNEL_IMAGETYPES += " fitImage "
 KERNEL_CLASSES = " kernel-fitimage "
-INHERIT += "test-mkimage-wrapper"
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
@@ -372,10 +408,8 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart U-Boot comment'"
         fitimage_path = os.path.join(deploy_dir_image,
             "u-boot-fitImage-%s" % (machine,))
 
-        self.assertTrue(os.path.exists(fitimage_its_path),
-            "%s image tree source doesn't exist" % (fitimage_its_path))
-        self.assertTrue(os.path.exists(fitimage_path),
-            "%s FIT image doesn't exist" % (fitimage_path))
+        self.assertExists(fitimage_its_path, "%s image tree source doesn't exist" % (fitimage_its_path))
+        self.assertExists(fitimage_path, "%s FIT image doesn't exist" % (fitimage_path))
 
         # Check that the type, load address, entrypoint address and default
         # values for kernel and ramdisk in Image Tree Source are as expected.
@@ -425,6 +459,7 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart U-Boot comment'"
                      work by Paul Eggleton <paul.eggleton@microsoft.com> and
                      Usama Arif <usama.arif@arm.com>
         """
+        a_comment = "a smart U-Boot comment"
         config = """
 # There's no U-boot deconfig with CONFIG_FIT_SIGNATURE yet, so we need at
 # least CONFIG_SPL_LOAD_FIT and CONFIG_SPL_OF_CONTROL set
@@ -434,7 +469,6 @@ SPL_BINARY = "MLO"
 # The kernel-fitimage class is a dependency even if we're only
 # creating/signing the U-Boot fitImage
 KERNEL_CLASSES = " kernel-fitimage"
-INHERIT += "test-mkimage-wrapper"
 # Enable creation and signing of the U-Boot fitImage
 UBOOT_FITIMAGE_ENABLE = "1"
 SPL_SIGN_ENABLE = "1"
@@ -446,17 +480,17 @@ UBOOT_LOADADDRESS = "0x80000000"
 UBOOT_DTB_LOADADDRESS = "0x82000000"
 UBOOT_ARCH = "arm"
 SPL_MKIMAGE_DTCOPTS = "-I dts -O dtb -p 2000"
-SPL_MKIMAGE_SIGN_ARGS = "-c 'a smart U-Boot comment'"
+SPL_MKIMAGE_SIGN_ARGS = "-c '%s'"
 UBOOT_EXTLINUX = "0"
 UBOOT_FIT_GENERATE_KEYS = "1"
 UBOOT_FIT_HASH_ALG = "sha256"
-"""
+""" % a_comment
+
         self.write_config(config)
 
         # The U-Boot fitImage is created as part of the U-Boot recipe
         bitbake("virtual/bootloader")
 
-        image_type = "core-image-minimal"
         deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
         machine = get_bb_var('MACHINE')
         fitimage_its_path = os.path.join(deploy_dir_image,
@@ -464,10 +498,8 @@ UBOOT_FIT_HASH_ALG = "sha256"
         fitimage_path = os.path.join(deploy_dir_image,
             "u-boot-fitImage-%s" % (machine,))
 
-        self.assertTrue(os.path.exists(fitimage_its_path),
-            "%s image tree source doesn't exist" % (fitimage_its_path))
-        self.assertTrue(os.path.exists(fitimage_path),
-            "%s FIT image doesn't exist" % (fitimage_path))
+        self.assertExists(fitimage_its_path, "%s image tree source doesn't exist" % (fitimage_its_path))
+        self.assertExists(fitimage_path, "%s FIT image doesn't exist" % (fitimage_path))
 
         req_itspaths = [
             ['/', 'images', 'uboot'],
@@ -516,10 +548,8 @@ UBOOT_FIT_HASH_ALG = "sha256"
                 self.assertEqual(value, reqvalue)
 
         # Dump the image to see if it really got signed
-        bitbake("u-boot-tools-native -c addto_recipe_sysroot")
-        result = runCmd('bitbake -e u-boot-tools-native | grep ^RECIPE_SYSROOT_NATIVE=')
-        recipe_sysroot_native = result.output.split('=')[1].strip('"')
-        dumpimage_path = os.path.join(recipe_sysroot_native, 'usr', 'bin', 'dumpimage')
+        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
+        dumpimage_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'dumpimage')
         result = runCmd('%s -l %s' % (dumpimage_path, fitimage_path))
         in_signed = None
         signed_sections = {}
@@ -542,16 +572,14 @@ UBOOT_FIT_HASH_ALG = "sha256"
             self.assertEqual(len(value), 512, 'Signature value for section %s not expected length' % signed_section)
 
         # Check for SPL_MKIMAGE_SIGN_ARGS
-        result = runCmd('bitbake -e virtual/bootloader | grep ^T=')
-        tempdir = result.output.split('=', 1)[1].strip().strip('')
-        result = runCmd('grep "a smart U-Boot comment" %s/run.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'SPL_MKIMAGE_SIGN_ARGS value did not get used')
+        # Looks like mkimage supports to add a comment but does not support to read it back.
+        found_comments = FitImageTests._find_string_in_bin_file(fitimage_path, a_comment)
+        self.assertEqual(found_comments, 2, "Expected 2 signed and commented section in the fitImage.")
 
-        # Check for evidence of test-mkimage-wrapper class
-        result = runCmd('grep "### uboot-mkimage wrapper message" %s/log.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'UBOOT_MKIMAGE did not work')
-        result = runCmd('grep "### uboot-mkimage signing wrapper message" %s/log.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'UBOOT_MKIMAGE_SIGN did not work')
+        # Verify the signature
+        self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path,
+                                         os.path.join(deploy_dir_image, 'u-boot-spl.dtb'))
+
 
     def test_sign_cascaded_uboot_fit_image(self):
         """
@@ -573,6 +601,7 @@ UBOOT_FIT_HASH_ALG = "sha256"
                      work by Paul Eggleton <paul.eggleton@microsoft.com> and
                      Usama Arif <usama.arif@arm.com>
         """
+        a_comment = "a smart cascaded U-Boot comment"
         config = """
 # There's no U-boot deconfig with CONFIG_FIT_SIGNATURE yet, so we need at
 # least CONFIG_SPL_LOAD_FIT and CONFIG_SPL_OF_CONTROL set
@@ -588,7 +617,7 @@ UBOOT_DTB_BINARY = "u-boot.dtb"
 UBOOT_ENTRYPOINT  = "0x80000000"
 UBOOT_LOADADDRESS = "0x80000000"
 UBOOT_MKIMAGE_DTCOPTS = "-I dts -O dtb -p 2000"
-UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart cascaded Kernel comment'"
+UBOOT_MKIMAGE_SIGN_ARGS = "-c '%s'"
 UBOOT_DTB_LOADADDRESS = "0x82000000"
 UBOOT_ARCH = "arm"
 SPL_MKIMAGE_DTCOPTS = "-I dts -O dtb -p 2000"
@@ -598,20 +627,18 @@ UBOOT_FIT_GENERATE_KEYS = "1"
 UBOOT_FIT_HASH_ALG = "sha256"
 KERNEL_IMAGETYPES += " fitImage "
 KERNEL_CLASSES = " kernel-fitimage "
-INHERIT += "test-mkimage-wrapper"
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
 UBOOT_SIGN_IMG_KEYNAME = "img-oe-selftest"
 UBOOT_SIGN_KEYNAME = "cfg-oe-selftest"
 FIT_SIGN_INDIVIDUAL = "1"
-"""
+""" % a_comment
         self.write_config(config)
 
         # The U-Boot fitImage is created as part of the U-Boot recipe
         bitbake("virtual/bootloader")
 
-        image_type = "core-image-minimal"
         deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
         machine = get_bb_var('MACHINE')
         fitimage_its_path = os.path.join(deploy_dir_image,
@@ -619,10 +646,8 @@ FIT_SIGN_INDIVIDUAL = "1"
         fitimage_path = os.path.join(deploy_dir_image,
             "u-boot-fitImage-%s" % (machine,))
 
-        self.assertTrue(os.path.exists(fitimage_its_path),
-            "%s image tree source doesn't exist" % (fitimage_its_path))
-        self.assertTrue(os.path.exists(fitimage_path),
-            "%s FIT image doesn't exist" % (fitimage_path))
+        self.assertExists(fitimage_its_path, "%s image tree source doesn't exist" % (fitimage_its_path))
+        self.assertExists(fitimage_path, "%s FIT image doesn't exist" % (fitimage_path))
 
         req_itspaths = [
             ['/', 'images', 'uboot'],
@@ -671,10 +696,8 @@ FIT_SIGN_INDIVIDUAL = "1"
                 self.assertEqual(value, reqvalue)
 
         # Dump the image to see if it really got signed
-        bitbake("u-boot-tools-native -c addto_recipe_sysroot")
-        result = runCmd('bitbake -e u-boot-tools-native | grep ^RECIPE_SYSROOT_NATIVE=')
-        recipe_sysroot_native = result.output.split('=')[1].strip('"')
-        dumpimage_path = os.path.join(recipe_sysroot_native, 'usr', 'bin', 'dumpimage')
+        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
+        dumpimage_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'dumpimage')
         result = runCmd('%s -l %s' % (dumpimage_path, fitimage_path))
         in_signed = None
         signed_sections = {}
@@ -697,17 +720,13 @@ FIT_SIGN_INDIVIDUAL = "1"
             self.assertEqual(len(value), 512, 'Signature value for section %s not expected length' % signed_section)
 
         # Check for SPL_MKIMAGE_SIGN_ARGS
-        result = runCmd('bitbake -e virtual/bootloader | grep ^T=')
-        tempdir = result.output.split('=', 1)[1].strip().strip('')
-        result = runCmd('grep "a smart cascaded U-Boot comment" %s/run.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'SPL_MKIMAGE_SIGN_ARGS value did not get used')
+        # Looks like mkimage supports to add a comment but does not support to read it back.
+        found_comments = FitImageTests._find_string_in_bin_file(fitimage_path, a_comment)
+        self.assertEqual(found_comments, 2, "Expected 2 signed and commented section in the fitImage.")
 
-        # Check for evidence of test-mkimage-wrapper class
-        result = runCmd('grep "### uboot-mkimage wrapper message" %s/log.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'UBOOT_MKIMAGE did not work')
-        result = runCmd('grep "### uboot-mkimage signing wrapper message" %s/log.do_uboot_assemble_fitimage' % tempdir, ignore_status=True)
-        self.assertEqual(result.status, 0, 'UBOOT_MKIMAGE_SIGN did not work')
-
+        # Verify the signature
+        self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path,
+                                         os.path.join(deploy_dir_image, 'u-boot-spl.dtb'))
 
 
     def test_initramfs_bundle(self):
@@ -755,24 +774,24 @@ FIT_HASH_ALG = "sha256"
         # fitImage is created as part of linux recipe
         bitbake("virtual/kernel")
 
-        image_type = get_bb_var('INITRAMFS_IMAGE')
-        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        machine = get_bb_var('MACHINE')
-        fitimage_its_path = os.path.join(deploy_dir_image,
-                    "fitImage-its-%s-%s-%s" % (image_type, machine, machine))
-        fitimage_path = os.path.join(deploy_dir_image,"fitImage")
+        bb_vars = get_bb_vars([
+            'DEPLOY_DIR_IMAGE',
+            'FIT_HASH_ALG',
+            'FIT_KERNEL_COMP_ALG',
+            'INITRAMFS_IMAGE',
+            'MACHINE',
+            'UBOOT_ARCH',
+            'UBOOT_ENTRYPOINT',
+            'UBOOT_LOADADDRESS',
+            'UBOOT_MKIMAGE_KERNEL_TYPE'
+            ],
+            'virtual/kernel')
+        fitimage_its_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],
+                    "fitImage-its-%s-%s-%s" % (bb_vars['INITRAMFS_IMAGE'], bb_vars['MACHINE'], bb_vars['MACHINE']))
+        fitimage_path = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'],"fitImage")
 
-        self.assertTrue(os.path.exists(fitimage_its_path),
-            "%s image tree source doesn't exist" % (fitimage_its_path))
-        self.assertTrue(os.path.exists(fitimage_path),
-            "%s FIT image doesn't exist" % (fitimage_path))
-
-        kernel_load = str(get_bb_var('UBOOT_LOADADDRESS'))
-        kernel_entry = str(get_bb_var('UBOOT_ENTRYPOINT'))
-        kernel_type = str(get_bb_var('UBOOT_MKIMAGE_KERNEL_TYPE'))
-        kernel_compression = str(get_bb_var('FIT_KERNEL_COMP_ALG'))
-        uboot_arch = str(get_bb_var('UBOOT_ARCH'))
-        fit_hash_alg = str(get_bb_var('FIT_HASH_ALG'))
+        self.assertExists(fitimage_its_path, "%s image tree source doesn't exist" % (fitimage_its_path))
+        self.assertExists(fitimage_path, "%s FIT image doesn't exist" % (fitimage_path))
 
         its_file = open(fitimage_its_path)
 
@@ -782,31 +801,31 @@ FIT_HASH_ALG = "sha256"
             'kernel-1 {',
             'description = "Linux kernel";',
             'data = /incbin/("linux.bin");',
-            'type = "' + kernel_type + '";',
-            'arch = "' + uboot_arch + '";',
+            'type = "' + str(bb_vars['UBOOT_MKIMAGE_KERNEL_TYPE']) + '";',
+            'arch = "' + str(bb_vars['UBOOT_ARCH']) + '";',
             'os = "linux";',
-            'compression = "' + kernel_compression + '";',
-            'load = <' + kernel_load + '>;',
-            'entry = <' + kernel_entry + '>;',
+            'compression = "' + str(bb_vars['FIT_KERNEL_COMP_ALG']) + '";',
+            'load = <' + str(bb_vars['UBOOT_LOADADDRESS']) + '>;',
+            'entry = <' + str(bb_vars['UBOOT_ENTRYPOINT']) + '>;',
             'hash-1 {',
-            'algo = "' + fit_hash_alg +'";',
+            'algo = "' + str(bb_vars['FIT_HASH_ALG']) +'";',
             '};',
             '};'
         ]
 
         node_str = exp_node_lines[0]
 
-        test_passed = False
-
         print ("checking kernel node\n")
+        self.assertIn(node_str, its_lines)
 
-        if node_str in its_lines:
-            node_start_idx = its_lines.index(node_str)
-            node = its_lines[node_start_idx:(node_start_idx + len(exp_node_lines))]
-            if node == exp_node_lines:
-                print("kernel node verified")
-            else:
-                self.assertTrue(test_passed == True,"kernel node does not match expectation")
+        node_start_idx = its_lines.index(node_str)
+        node = its_lines[node_start_idx:(node_start_idx + len(exp_node_lines))]
+
+        # Remove the absolute path. This refers to WORKDIR which is not always predictable.
+        re_data = re.compile(r'^data = /incbin/\(.*/linux\.bin"\);$')
+        node = [re.sub(re_data, 'data = /incbin/("linux.bin");', cfg_str) for cfg_str in node]
+
+        self.assertEqual(node, exp_node_lines, "kernel node does not match expectation")
 
         rx_configs = re.compile("^conf-.*")
         its_configs = list(filter(rx_configs.match, its_lines))
@@ -822,25 +841,14 @@ FIT_HASH_ALG = "sha256"
 
             node = its_lines[cfg_start_idx:line_idx]
             print("checking configuration " + cfg_str.rstrip(" {"))
-            rx_desc_line = re.compile("^description.*1 Linux kernel.*")
-            if len(list(filter(rx_desc_line.match, node))) != 1:
-                self.assertTrue(test_passed == True,"kernel keyword not found in the description line")
-                break
-            else:
-                print("kernel keyword found in the description line")
+            rx_desc_line = re.compile(r'^description = ".*Linux kernel.*')
+            self.assertEqual(len(list(filter(rx_desc_line.match, node))), 1, "kernel keyword not found in the description line")
 
-            if 'kernel = "kernel-1";' not in node:
-                self.assertTrue(test_passed == True,"kernel line not found")
-                break
-            else:
-                print("kernel line found")
+            self.assertIn('kernel = "kernel-1";', node)
 
-            rx_sign_line = re.compile("^sign-images.*kernel.*")
-            if len(list(filter(rx_sign_line.match, node))) != 1:
-                self.assertTrue(test_passed == True,"kernel hash not signed")
-                break
-            else:
-                print("kernel hash signed")
+            rx_sign_line = re.compile(r'^sign-images = .*kernel.*')
+            self.assertEqual(len(list(filter(rx_sign_line.match, node))), 1, "kernel hash not signed")
 
-            test_passed = True
-            self.assertTrue(test_passed == True,"Initramfs bundle test success")
+        # Verify the signature
+        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
+        self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path, os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], 'am335x-bone.dtb'))

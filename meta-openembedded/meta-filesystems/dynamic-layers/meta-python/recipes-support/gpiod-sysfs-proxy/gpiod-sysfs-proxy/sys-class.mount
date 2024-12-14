@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: CC0-1.0
+# SPDX-FileCopyrightText: 2024 Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+[Unit]
+Description=Overlay on top of /sys/class adding the gpio class directory
+Before=gpiod-sysfs-proxy.service
+After=run-gpio-sys.mount
+ConditionPathExists=!/sys/class/gpio
+
+[Mount]
+RuntimeDirectory=gpio/class/gpio
+DirectoryMode=0755
+What=overlay
+Where=/sys/class
+Type=overlay
+Options=upperdir=/run/gpio/class,lowerdir=/run/gpio/sys/class,workdir=/run/gpio/work,ro,nosuid,nodev,noexec,relatime

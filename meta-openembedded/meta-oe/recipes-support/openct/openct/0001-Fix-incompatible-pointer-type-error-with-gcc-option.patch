@@ -1,0 +1,65 @@
+From c4351058da555e1e6a2b4b15d913baee80f55865 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Thu, 27 Jun 2024 06:27:18 +0000
+Subject: Fix incompatible pointer type error with gcc option 
+ -Wincompatible-pointer-types
+
+| ../../../openct-0.6.20/src/ifd/ifdhandler.c: In function 'ifdhandler_run':
+| ../../../openct-0.6.20/src/ifd/ifdhandler.c:239:52: error: passing argument 2 of 'ifd_get_eventfd' from incompatible pointer type [-Wincompatible-pointer-types]
+|   239 |                 sock->fd = ifd_get_eventfd(reader, &sock->events);
+|       |                                                    ^~~~~~~~~~~~~
+|       |                                                    |
+|       |                                                    int *
+| In file included from ../../../openct-0.6.20/src/ifd/internal.h:17,
+|                  from ../../../openct-0.6.20/src/ifd/ifdhandler.c:7:
+| ../../../openct-0.6.20/src/include/openct/ifd.h:182:65: note: expected 'short int *' but argument is of type 'int *'
+|   182 | extern int                      ifd_get_eventfd(ifd_reader_t *, short *);
+|       |                                                                 ^~~~~~~
+
+| ../../../openct-0.6.20/src/ifd/process.c: In function 'do_memory_write':
+| ../../../openct-0.6.20/src/ifd/process.c:461:61: error: passing argument 4 of 'ct_tlv_get_opaque' from incompatible pointer type [-Wincompatible-pointer-types]
+|   461 |             || !ct_tlv_get_opaque(args, CT_TAG_DATA, &data, &data_len))
+|       |                                                             ^~~~~~~~~
+|       |                                                             |
+|       |                                                             unsigned int *
+| In file included from ../../../openct-0.6.20/src/ifd/process.c:20:
+| ../../../openct-0.6.20/src/include/openct/tlv.h:40:62: note: expected 'size_t *' {aka 'long unsigned int *'} but argument is of type 'unsigned int *'
+|    40 |                                 ifd_tag_t, unsigned char **, size_t *);
+
+Upstream-Status: Submitted
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ src/ifd/ifdhandler.c | 2 +-
+ src/ifd/process.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/ifd/ifdhandler.c b/src/ifd/ifdhandler.c
+index 12686c9..ebd1b53 100644
+--- a/src/ifd/ifdhandler.c
++++ b/src/ifd/ifdhandler.c
+@@ -236,7 +236,7 @@ static void ifdhandler_run(ifd_reader_t * reader)
+ 		sock->fd = -1;
+ 	}
+ 	else {
+-		sock->fd = ifd_get_eventfd(reader, &sock->events);
++		sock->fd = ifd_get_eventfd(reader, (short int *)&sock->events);
+ 	}
+ 	if (sock->fd == -1) {
+ 		ifd_debug(1, "events inactive for reader %s", reader->name);
+diff --git a/src/ifd/process.c b/src/ifd/process.c
+index 4563bdf..7088a76 100644
+--- a/src/ifd/process.c
++++ b/src/ifd/process.c
+@@ -458,7 +458,7 @@ static int do_memory_write(ifd_reader_t * reader, int unit,
+ 		return IFD_ERROR_INVALID_SLOT;
+ 
+ 	if (ct_tlv_get_int(args, CT_TAG_ADDRESS, &address) == 0
+-	    || !ct_tlv_get_opaque(args, CT_TAG_DATA, &data, &data_len))
++	    || !ct_tlv_get_opaque(args, CT_TAG_DATA, &data, (size_t *)&data_len))
+ 		return IFD_ERROR_MISSING_ARG;
+ 
+ 	rc = ifd_card_write_memory(reader, unit, address, data, data_len);
+-- 
+2.34.1
+

@@ -9,7 +9,6 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;md5=bd236e1f590973467a427bb354be0f46"
 
 inherit pypi setuptools3 ptest
 
-SRC_URI[md5sum] = "e05bdb60fa80f25bc60e73e0c6b7c5dc"
 SRC_URI[sha256sum] = "472872e096eb8df219c23f2689fc336668bdb43d194094b5cc1707e1640acfc8"
 
 RDEPENDS:${PN} += "python3-compression python3-io python3-pprint python3-shell"

@@ -1,4 +1,4 @@
-From 10b08af6c7dcb03f954da29b6c4f9636b8796f30 Mon Sep 17 00:00:00 2001
+From 7e00964de0ae27f868726413e46f27145807a50d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 15 Feb 2019 11:17:27 +0100
 Subject: [PATCH] Do not prefix executables with $bindir in pkg-config files
@@ -15,10 +15,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 13 insertions(+), 11 deletions(-)
 
 diff --git a/gio/meson.build b/gio/meson.build
-index 77cba7b..25d709e 100644
+index 76d67cd..0584ff5 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -883,17 +883,18 @@ libgio_dep = declare_dependency(link_with : libgio,
+@@ -885,17 +885,18 @@ libgio_dep = declare_dependency(link_with : libgio,
  pkg.generate(libgio,
    requires : ['glib-2.0', 'gobject-2.0'],
    variables : [
@@ -46,7 +46,7 @@ index 77cba7b..25d709e 100644
    version : glib_version,
    install_dir : glib_pkgconfigreldir,
 diff --git a/glib/meson.build b/glib/meson.build
-index d2efeba..5f5841d 100644
+index 9f1515b..a40e4f5 100644
 --- a/glib/meson.build
 +++ b/glib/meson.build
 @@ -447,9 +447,10 @@ pkg.generate(libglib,

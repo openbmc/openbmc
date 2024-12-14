@@ -38,7 +38,7 @@ NGINX_USER   ?= "www"
 EXTRA_OECONF = ""
 DISABLE_STATIC = ""
 
-PACKAGECONFIG ??= "ssl ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
+PACKAGECONFIG ??= "ssl fastcgi scgi uwsgi ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 
 PACKAGECONFIG[gunzip] = "--with-http_gunzip_module,,"
 PACKAGECONFIG[http2] = "--with-http_v2_module,,"
@@ -48,7 +48,9 @@ PACKAGECONFIG[ipv6] = "--with-ipv6,,"
 PACKAGECONFIG[webdav] = "--with-http_dav_module,,"
 PACKAGECONFIG[stream] = "--with-stream,,"
 PACKAGECONFIG[http-sub-module] = "--with-http_sub_module,,"
-
+PACKAGECONFIG[fastcgi] = ",--without-http_fastcgi_module,"
+PACKAGECONFIG[scgi] = ",--without-http_scgi_module,"
+PACKAGECONFIG[uwsgi] = ",--without-http_uwsgi_module,"
 PACKAGECONFIG[xslt] = "--with-http_xslt_module,,libxslt"
 
 do_configure () {
@@ -81,9 +83,9 @@ do_configure () {
     --error-log-path=${localstatedir}/log/nginx/error.log \
     --http-client-body-temp-path=/run/nginx/client_body_temp \
     --http-proxy-temp-path=/run/nginx/proxy_temp \
-    --http-fastcgi-temp-path=/run/nginx/fastcgi_temp \
-    --http-uwsgi-temp-path=/run/nginx/uwsgi_temp \
-    --http-scgi-temp-path=/run/nginx/scgi_temp \
+    ${@bb.utils.contains('PACKAGECONFIG', 'fastcgi', '--http-fastcgi-temp-path=/run/nginx/fastcgi_temp', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'scgi', '--http-scgi-temp-path=/run/nginx/scgi_temp', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'uwsgi', '--http-uwsgi-temp-path=/run/nginx/uwsgi_temp', '', d)} \
     --pid-path=/run/nginx/nginx.pid \
     --prefix=${prefix} \
     --with-threads \
@@ -131,6 +133,18 @@ do_install () {
 
     # cleanup configuration folder
     rm ${D}${sysconfdir}/nginx/*.default
+
+    # remove config files based on packageconfig
+    if ! [ "${@bb.utils.filter('PACKAGECONFIG', 'fastcgi', d)}" ]; then
+        rm -f ${D}${sysconfdir}/nginx/fastcgi.conf
+        rm -f ${D}${sysconfdir}/nginx/fastcgi_params
+    fi
+    if ! [ "${@bb.utils.filter('PACKAGECONFIG', 'scgi', d)}" ]; then
+        rm -f ${D}${sysconfdir}/nginx/scgi_params
+    fi
+    if ! [ "${@bb.utils.filter('PACKAGECONFIG', 'uwsgi', d)}" ]; then
+        rm -f ${D}${sysconfdir}/nginx/uwsgi_params
+    fi
 
     # add additional configuration folders
     install -d ${D}${sysconfdir}/nginx/modules-available

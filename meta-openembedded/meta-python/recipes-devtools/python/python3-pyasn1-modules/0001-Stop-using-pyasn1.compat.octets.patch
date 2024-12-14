@@ -1,0 +1,171 @@
+From d20c89d017a572755484b1bc41eac20285e68550 Mon Sep 17 00:00:00 2001
+From: Heiko Becker <mail@heiko-becker.de>
+Date: Wed, 25 Sep 2024 22:38:42 +0200
+Subject: [PATCH] Stop using pyasn1.compat.octets
+
+It was removed from pyasn1 in
+https://github.com/pyasn1/pyasn1/commit/6f770ba886a8931c35cb090a5c3a6d67f5a41bd9
+
+Fixes #19.
+
+Upstream-Status: Submitted [https://github.com/pyasn1/pyasn1-modules/pull/22]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/test_pem.py     | 3 +--
+ tests/test_rfc3770.py | 3 +--
+ tests/test_rfc4073.py | 3 +--
+ tests/test_rfc4334.py | 3 +--
+ tests/test_rfc5755.py | 3 +--
+ tests/test_rfc6032.py | 7 +++----
+ tests/test_rfc6120.py | 1 -
+ 7 files changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/tests/test_pem.py b/tests/test_pem.py
+index dbcca5a..e0fe334 100644
+--- a/tests/test_pem.py
++++ b/tests/test_pem.py
+@@ -7,7 +7,6 @@
+ import sys
+ import unittest
+ 
+-from pyasn1.compat.octets import ints2octs
+ from pyasn1_modules import pem
+ 
+ 
+@@ -93,7 +92,7 @@ GGbx7DI=
+             24, 102, 241, 236, 50
+         ]
+ 
+-        self.assertEqual(ints2octs(expected), binary)
++        self.assertEqual(bytes(expected), binary)
+ 
+ 
+ suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
+diff --git a/tests/test_rfc3770.py b/tests/test_rfc3770.py
+index 667ab24..93d4093 100644
+--- a/tests/test_rfc3770.py
++++ b/tests/test_rfc3770.py
+@@ -10,7 +10,6 @@ import unittest
+ 
+ from pyasn1.codec.der.decoder import decode as der_decoder
+ from pyasn1.codec.der.encoder import encode as der_encoder
+-from pyasn1.compat.octets import str2octs
+ 
+ from pyasn1_modules import pem
+ from pyasn1_modules import rfc5480
+@@ -79,7 +78,7 @@ DAlVlhox680Jxy5J8Pkx
+                 self.assertEqual(extn['extnValue'], der_encoder(extnValue))
+ 
+                 if extn['extnID'] == rfc3770.id_pe_wlanSSID:
+-                    self.assertIn(str2octs('Example'), extnValue)
++                    self.assertIn(b'Example', extnValue)
+ 
+                 if extn['extnID'] == rfc5280.id_ce_extKeyUsage:
+                     self.assertIn(rfc3770.id_kp_eapOverLAN, extnValue)
+diff --git a/tests/test_rfc4073.py b/tests/test_rfc4073.py
+index 4bd5e5f..3b516cc 100644
+--- a/tests/test_rfc4073.py
++++ b/tests/test_rfc4073.py
+@@ -10,7 +10,6 @@ import unittest
+ 
+ from pyasn1.codec.der.decoder import decode as der_decoder
+ from pyasn1.codec.der.encoder import encode as der_encoder
+-from pyasn1.compat.octets import str2octs
+ 
+ from pyasn1_modules import pem
+ from pyasn1_modules import rfc2634
+@@ -131,7 +130,7 @@ buWO3egPDL8Kf7tBhzjIKLw=
+ 
+             self.assertIn(next_ci['contentType'], rfc5652.cmsContentTypesMap)
+             self.assertEqual(rfc5652.id_data, next_ci['contentType'])
+-            self.assertIn(str2octs('Content-Type: text'), next_ci['content'])
++            self.assertIn(b'Content-Type: text', next_ci['content'])
+ 
+             for attr in ci['content']['attrs']:
+                 self.assertIn(attr['attrType'], rfc5652.cmsAttributesMap)
+diff --git a/tests/test_rfc4334.py b/tests/test_rfc4334.py
+index 9ba5fdf..e180d67 100644
+--- a/tests/test_rfc4334.py
++++ b/tests/test_rfc4334.py
+@@ -10,7 +10,6 @@ import unittest
+ 
+ from pyasn1.codec.der.decoder import decode as der_decoder
+ from pyasn1.codec.der.encoder import encode as der_encoder
+-from pyasn1.compat.octets import str2octs
+ 
+ from pyasn1_modules import pem
+ from pyasn1_modules import rfc5280
+@@ -67,7 +66,7 @@ DAlVlhox680Jxy5J8Pkx
+                 self.assertEqual(extn['extnValue'], der_encoder(extnValue))
+ 
+                 if extn['extnID'] == rfc4334.id_pe_wlanSSID:
+-                    self.assertIn( str2octs('Example'), extnValue)
++                    self.assertIn(b'Example', extnValue)
+             
+                 if extn['extnID'] == rfc5280.id_ce_extKeyUsage:
+                     self.assertIn(rfc4334.id_kp_eapOverLAN, extnValue)
+diff --git a/tests/test_rfc5755.py b/tests/test_rfc5755.py
+index cf4a05f..46908e2 100644
+--- a/tests/test_rfc5755.py
++++ b/tests/test_rfc5755.py
+@@ -10,7 +10,6 @@ import unittest
+ 
+ from pyasn1.codec.der.decoder import decode as der_decoder
+ from pyasn1.codec.der.encoder import encode as der_encoder
+-from pyasn1.compat.octets import str2octs
+ 
+ from pyasn1_modules import pem
+ from pyasn1_modules import rfc5280
+@@ -85,7 +84,7 @@ Q4eikPk4LQey
+             count += 1
+             if attr['type'] == rfc5755.id_aca_authenticationInfo:
+                 self.assertEqual(
+-                    str2octs('password'), attr['values'][0]['authInfo'])
++                    b'password', attr['values'][0]['authInfo'])
+ 
+         self.assertEqual(5, count)
+ 
+diff --git a/tests/test_rfc6032.py b/tests/test_rfc6032.py
+index 287bad8..2327416 100644
+--- a/tests/test_rfc6032.py
++++ b/tests/test_rfc6032.py
+@@ -10,7 +10,6 @@ import unittest
+ 
+ from pyasn1.codec.der.decoder import decode as der_decoder
+ from pyasn1.codec.der.encoder import encode as der_encoder
+-from pyasn1.compat.octets import str2octs
+ 
+ from pyasn1_modules import pem
+ from pyasn1_modules import rfc5652
+@@ -64,7 +63,7 @@ YIZIAWUCAQVCMRAEDnB0Zi1rZGMtODEyMzc0
+         self.assertFalse(rest)
+         self.assertTrue(keyid.prettyPrint())
+         self.assertEqual(attrVal0, der_encoder(keyid))
+-        self.assertEqual(str2octs('ptf-kdc-812374'), keyid)
++        self.assertEqual(b'ptf-kdc-812374', keyid)
+ 
+     def testOpenTypes(self):
+         substrate = pem.readBase64fromText(self.encrypted_key_pkg_pem_text)
+@@ -86,8 +85,8 @@ YIZIAWUCAQVCMRAEDnB0Zi1rZGMtODEyMzc0
+             self.assertNotEqual('0x', attr['attrValues'][0].prettyPrint()[:2])
+ 
+             if attr['attrType'] == rfc6032.id_aa_KP_contentDecryptKeyID:
+-                self.assertEqual(str2octs(
+-                    'ptf-kdc-812374'), attr['attrValues'][0])
++                self.assertEqual(
++                    b'ptf-kdc-812374', attr['attrValues'][0])
+ 
+ 
+ suite = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
+diff --git a/tests/test_rfc6120.py b/tests/test_rfc6120.py
+index bdedab8..a621745 100644
+--- a/tests/test_rfc6120.py
++++ b/tests/test_rfc6120.py
+@@ -10,7 +10,6 @@ import unittest
+ 
+ from pyasn1.codec.der.decoder import decode as der_decoder
+ from pyasn1.codec.der.encoder import encode as der_encoder
+-from pyasn1.compat.octets import str2octs
+ 
+ from pyasn1_modules import pem
+ from pyasn1_modules import rfc5280

@@ -26,8 +26,9 @@ PACKAGES =+ "lib${BPN}"
 FILES:lib${BPN} = "${libdir}/lib*${SOLIBS} ${sysconfdir}"
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE:${PN} = "setfattr"
+ALTERNATIVE:${PN} = "setfattr getfattr"
 ALTERNATIVE_TARGET[setfattr] = "${bindir}/setfattr"
+ALTERNATIVE_TARGET[getfattr] = "${bindir}/getfattr"
 
 PTEST_BUILD_HOST_FILES = "builddefs"
 PTEST_BUILD_HOST_PATTERN = "^RPM"
@@ -41,10 +42,13 @@ do_install_ptest() {
             -e 's:${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}::g' \
             -i ${D}${PTEST_PATH}/Makefile
 
-        sed -i "s|^srcdir =.*|srcdir = \.|g" ${D}${PTEST_PATH}/Makefile
-        sed -i "s|^abs_srcdir =.*|abs_srcdir = \.|g" ${D}${PTEST_PATH}/Makefile
-        sed -i "s|^abs_top_srcdir =.*|abs_top_srcdir = \.\.|g" ${D}${PTEST_PATH}/Makefile
-        sed -i "s|^Makefile:.*|Makefile:|g" ${D}${PTEST_PATH}/Makefile
+	sed -e "s|^srcdir =.*|srcdir = .|" \
+	    -e "s|^abs_srcdir =.*|abs_srcdir = .|" \
+	    -e "s|^abs_top_srcdir =.*|abs_top_srcdir = ..|" \
+	    -e "s|^Makefile:.*|Makefile:|" \
+	    -e "/^TEST_LOG_DRIVER =/s|(top_srcdir)|(top_builddir)|" \
+	    -i ${D}${PTEST_PATH}/Makefile
+
 	cp -rf ${S}/build-aux/ ${D}${PTEST_PATH}
 	cp -rf ${S}/test/ ${D}${PTEST_PATH}
 }

@@ -20,6 +20,9 @@ SRC_URI = "git://gitlab.com/ymorin/kconfig-frontends.git;protocol=https;branch=4
 
 SRCREV = "f22fce3a308be1c7790ebefc6bbedb33c5f7c86a"
 
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig

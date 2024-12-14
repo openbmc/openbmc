@@ -15,7 +15,6 @@ SRC_URI = " \
 "
 
 SRCREV = "215b53cf3b48ee761f4c40908b3874b2e5e95e9f"
-UPSTREAM_CHECK_COMMITS = "1"
 
 GO_IMPORT = "go.etcd.io/etcd/v3"
 GO_INSTALL = "src/${GO_IMPORT}/"

@@ -10,8 +10,10 @@ SHA1SUM = "0cef8205"
 SRC_URI = "https://assets.ubuntu.com/v1/${SHA1SUM}-ubuntu-font-family-${PV}.zip"
 
 
-SRC_URI[md5sum] = "c5a5059d6856b4ddf79d824dcaf5ad32"
 SRC_URI[sha256sum] = "61a2b342526fd552f19fef438bb9211a8212de19ad96e32a1209c039f1d68ecf"
+
+UPSTREAM_CHECK_URI = "https://repology.org/project/fonts:ubuntu/packages"
+UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/ubuntu-font-family-${PV}"
 

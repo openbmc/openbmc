@@ -1,0 +1,26 @@
+From 93f277f05cc71f69930bd680ac6eae5457b963f3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+Date: Sat, 16 Nov 2024 08:57:54 +0200
+Subject: [PATCH] lavc/h264dsp: move RISC-V fn pointers to .data.rel.ro
+
+This should fix PIC builds.
+
+Upstream-Status: Backport [https://github.com/FFmpeg/FFmpeg/commit/c3051d94a7939de93acd647d3a1719ce56c0c4f5]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libavcodec/riscv/h264dsp_rvv.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/riscv/h264dsp_rvv.S b/libavcodec/riscv/h264dsp_rvv.S
+index 422ac02..97c6708 100644
+--- a/libavcodec/riscv/h264dsp_rvv.S
++++ b/libavcodec/riscv/h264dsp_rvv.S
+@@ -176,7 +176,7 @@ endfunc
+ 
+         .global ff_h264_weight_funcs_8_rvv
+         .hidden ff_h264_weight_funcs_8_rvv
+-const ff_h264_weight_funcs_8_rvv
++const ff_h264_weight_funcs_8_rvv, relocate=1
+         .irp    w, 16, 8, 4, 2
+ #if __riscv_xlen == 32
+         .word   ff_h264_weight_pixels\w\()_8_rvv

@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import ast
 import os, struct, mmap
 
 class NotELFFileError(Exception):
@@ -186,6 +187,20 @@ def write_error(type, error, d):
         with open(logfile, "a+") as f:
             f.write("%s: %s [%s]\n" % (p, error, type))
 
+def handle_error_visitorcode(name, args):
+    execs = set()
+    contains = {}
+    warn = None
+    if isinstance(args[0], ast.Constant) and isinstance(args[0].value, str):
+        for i in ["ERROR_QA", "WARN_QA"]:
+            if i not in contains:
+                contains[i] = set()
+            contains[i].add(args[0].value)
+    else:
+        warn = args[0]
+        execs.add(name)
+    return contains, execs, warn
+
 def handle_error(error_class, error_msg, d):
     if error_class in (d.getVar("ERROR_QA") or "").split():
         write_error(error_class, error_msg, d)
@@ -198,12 +213,7 @@ def handle_error(error_class, error_msg, d):
     else:
         bb.note("QA Issue: %s [%s]" % (error_msg, error_class))
     return True
-
-def add_message(messages, section, new_msg):
-    if section not in messages:
-        messages[section] = new_msg
-    else:
-        messages[section] = messages[section] + "\n" + new_msg
+handle_error.visitorcode = handle_error_visitorcode
 
 def exit_with_message_if_errors(message, d):
     qa_fatal_errors = bb.utils.to_boolean(d.getVar("QA_ERRORS_FOUND"), False)

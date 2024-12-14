@@ -1,4 +1,4 @@
-From 71c194077bb907bfe423d3f3275f33a6c8ca0e74 Mon Sep 17 00:00:00 2001
+From 3f4f3e917950e286d5729ea949ca342995eb3c3e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 17 Nov 2023 14:26:32 +0100
 Subject: [PATCH] Lib/sysconfig.py: use prefix value from build configuration
@@ -9,16 +9,15 @@ native python.
 
 Upstream-Status: Inappropriate [oe-core cross builds]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
-
 ---
- Lib/sysconfig.py | 5 +++++
+ Lib/sysconfig/__init__.py | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 79c0510..91ebcb6 100644
---- a/Lib/sysconfig.py
-+++ b/Lib/sysconfig.py
-@@ -668,6 +668,11 @@ def _init_config_vars():
+diff --git a/Lib/sysconfig/__init__.py b/Lib/sysconfig/__init__.py
+index f8e1c7d..0882526 100644
+--- a/Lib/sysconfig/__init__.py
++++ b/Lib/sysconfig/__init__.py
+@@ -481,6 +481,11 @@ def _init_config_vars():
          _CONFIG_VARS['VPATH'] = sys._vpath
      if os.name == 'posix':
          _init_posix(_CONFIG_VARS)

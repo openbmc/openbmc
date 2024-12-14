@@ -1,0 +1,33 @@
+From 0644188a537a06bc6d04483b21e23b80987eb497 Mon Sep 17 00:00:00 2001
+From: Hieu Van Nguyen <hieu2.nguyen@lge.com>
+Date: Fri, 11 Oct 2024 04:21:21 +0000
+Subject: [PATCH] util/mtp-hotplug.c: Enable stack memory protection
+
+Use "return 0" instead of "exit(0)" at the end of main()
+function to enable checking for Stack Overflow at Runtime.
+
+Use "return 0" to let the program exit normally by returning from
+the main function. This allows the compiler to perform necessary
+cleanup operations, including stack canary checks.
+
+__stack_chk_fail function isn't being invoked when using exit(0) at
+the end of the main function
+$ objdump -T ./util/.libs/mtp-hotplug | grep __stack_chk_fail
+This return empty.
+---
+Upstream-Status: Backport [https://github.com/libmtp/libmtp/commit/e89dbb6ecf244936acc9a52aa4af9635bda5926a]
+
+ util/mtp-hotplug.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/mtp-hotplug.c b/util/mtp-hotplug.c
+index b5bc6da40f..db75cb38a1 100644
+--- a/util/mtp-hotplug.c
++++ b/util/mtp-hotplug.c
+@@ -301,5 +301,5 @@ int main (int argc, char **argv)
+     printf("\n");
+   }
+ 
+-  exit (0);
++  return 0;
+ }

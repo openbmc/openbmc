@@ -1,4 +1,4 @@
-From 4c5e6c280a2ab4d2009d3264e94286f5fe244d0b Mon Sep 17 00:00:00 2001
+From 067992f2d0b0ff6ca114031636eb0e1eac791892 Mon Sep 17 00:00:00 2001
 From: Paul Eggleton <paul.eggleton@linux.microsoft.com>
 Date: Tue, 16 Jun 2020 03:57:25 +0000
 Subject: [PATCH] build.c: ignore return of 1 from tar -cf
@@ -28,7 +28,7 @@ Signed-off-by: Paul Eggleton <paul.eggleton@microsoft.com>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/src/deb/build.c b/src/deb/build.c
-index 92aba9553..6436b33da 100644
+index 87bd4142e..e85fd7d0f 100644
 --- a/src/deb/build.c
 +++ b/src/deb/build.c
 @@ -481,6 +481,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,

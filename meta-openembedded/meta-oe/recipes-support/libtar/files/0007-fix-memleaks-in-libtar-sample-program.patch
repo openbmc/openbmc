@@ -1,0 +1,119 @@
+From e3888e452aee72e0d658185ac20e8e63bed1aff8 Mon Sep 17 00:00:00 2001
+From: Huzaifa Sidhpurwala <huzaifas@fedoraproject.org>
+Date: Tue, 15 Oct 2013 20:05:04 -0400
+Subject: [PATCH] fix memleaks in libtar sample program
+
+Authored by Huzaifa Sidhpurwala <huzaifas@fedoraproject.org>.
+
+Upstream-Status: Backport [https://repo.or.cz/libtar.git/commit/f3c711cf3054ff366a1a3500cdc8c64ecc2d2da6]
+
+Signed-off-by: Katariina Lounento <katariina.lounento@vaisala.com>
+---
+ libtar/libtar.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/libtar/libtar.c b/libtar/libtar.c
+index bb5644c..23f8741 100644
+--- a/libtar/libtar.c
++++ b/libtar/libtar.c
+@@ -253,6 +253,7 @@ extract(char *tarfile, char *rootdir)
+ 	if (tar_extract_all(t, rootdir) != 0)
+ 	{
+ 		fprintf(stderr, "tar_extract_all(): %s\n", strerror(errno));
++		tar_close(t);
+ 		return -1;
+ 	}
+ 
+@@ -270,12 +271,13 @@ extract(char *tarfile, char *rootdir)
+ 
+ 
+ void
+-usage()
++usage(void *rootdir)
+ {
+ 	printf("Usage: %s [-C rootdir] [-g] [-z] -x|-t filename.tar\n",
+ 	       progname);
+ 	printf("       %s [-C rootdir] [-g] [-z] -c filename.tar ...\n",
+ 	       progname);
++	free(rootdir);
+ 	exit(-1);
+ }
+ 
+@@ -292,6 +294,7 @@ main(int argc, char *argv[])
+ 	int c;
+ 	int mode = 0;
+ 	libtar_list_t *l;
++	int return_code = -2;
+ 
+ 	progname = basename(argv[0]);
+ 
+@@ -313,17 +316,17 @@ main(int argc, char *argv[])
+ 			break;
+ 		case 'c':
+ 			if (mode)
+-				usage();
++				usage(rootdir);
+ 			mode = MODE_CREATE;
+ 			break;
+ 		case 'x':
+ 			if (mode)
+-				usage();
++				usage(rootdir);
+ 			mode = MODE_EXTRACT;
+ 			break;
+ 		case 't':
+ 			if (mode)
+-				usage();
++				usage(rootdir);
+ 			mode = MODE_LIST;
+ 			break;
+ #ifdef HAVE_LIBZ
+@@ -332,7 +335,7 @@ main(int argc, char *argv[])
+ 			break;
+ #endif /* HAVE_LIBZ */
+ 		default:
+-			usage();
++			usage(rootdir);
+ 		}
+ 
+ 	if (!mode || ((argc - optind) < (mode == MODE_CREATE ? 2 : 1)))
+@@ -341,7 +344,7 @@ main(int argc, char *argv[])
+ 		printf("argc - optind == %d\tmode == %d\n", argc - optind,
+ 		       mode);
+ #endif
+-		usage();
++		usage(rootdir);
+ 	}
+ 
+ #ifdef DEBUG
+@@ -351,21 +354,25 @@ main(int argc, char *argv[])
+ 	switch (mode)
+ 	{
+ 	case MODE_EXTRACT:
+-		return extract(argv[optind], rootdir);
++		return_code = extract(argv[optind], rootdir);
++		break;
+ 	case MODE_CREATE:
+ 		tarfile = argv[optind];
+ 		l = libtar_list_new(LIST_QUEUE, NULL);
+ 		for (c = optind + 1; c < argc; c++)
+ 			libtar_list_add(l, argv[c]);
+-		return create(tarfile, rootdir, l);
++		return_code = create(tarfile, rootdir, l);
++		libtar_list_free(l, NULL);
++		break;
+ 	case MODE_LIST:
+-		return list(argv[optind]);
++		return_code = list(argv[optind]);
++		break;
+ 	default:
+ 		break;
+ 	}
+ 
+-	/* NOTREACHED */
+-	return -2;
++	free(rootdir);
++	return return_code;
+ }
+ 
+ 

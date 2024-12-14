@@ -8,11 +8,10 @@ LICENSE = "MIT"
 SECTION = "graphics"
 DEPENDS = "virtual/libgles3 virtual/libgles2 virtual/egl libdrm virtual/libgbm"
 
-LIC_FILES_CHKSUM = "file://kmscube.c;beginline=1;endline=23;md5=8b309d4ee67b7315ff7381270dd631fb"
+LIC_FILES_CHKSUM = "file://COPYING;md5=2a12bf7a66f5f663d75186bf01eb607b"
 
-SRCREV = "6ab022fdfcfedd28f4b5dbd8d3299414a367746f"
+SRCREV = "311eaaaa473d593c30d118799aa19ac4ad53cd65"
 SRC_URI = "git://gitlab.freedesktop.org/mesa/kmscube;branch=master;protocol=https \
-           file://0001-cube-gears-Change-header-file-to-GLES3-gl3.h.patch \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"

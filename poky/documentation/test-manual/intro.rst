@@ -380,7 +380,7 @@ with common tasks, including:
 -  *Running a bitbake invocation for a build:* Use
    ``oeqa.utils.commands.bitbake()``
 
--  *Running a command:* Use ``oeqa.utils.commandsrunCmd()``
+-  *Running a command:* Use ``oeqa.utils.commands.runCmd()``
 
 There is also a ``oeqa.utils.commands.runqemu()`` function for launching
 the ``runqemu`` command for testing things within a running, virtualized
@@ -458,7 +458,7 @@ the ``devtool build`` command within the eSDK.
 
 These tests are run against built SDKs. The tests can assume that an SDK
 has already been extracted and its environment file has been sourced. A
-simple example from ``meta/lib/oeqa/sdk/cases/python2.py`` contains the
+simple example from ``meta/lib/oeqa/sdk/cases/python.py`` contains the
 following::
 
    class Python3Test(OESDKTestCase):

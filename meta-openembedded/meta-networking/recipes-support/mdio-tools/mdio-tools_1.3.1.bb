@@ -6,4 +6,4 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig autotools
 
-RDEPENDS:${PN} = "kernel-module-mdio-netlink"
+RRECOMMENDS:${PN} = "kernel-module-mdio-netlink"

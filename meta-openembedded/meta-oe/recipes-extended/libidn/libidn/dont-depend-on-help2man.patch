@@ -1,9 +1,20 @@
+From e75f27cb1d70052fe2bb6cae5846b68f8ea7fa65 Mon Sep 17 00:00:00 2001
+From: Marko Lindqvist <cazfi74@gmail.com>
+Date: Sun, 29 Sep 2024 18:38:05 +0800
+Subject: [PATCH] dont depend on help2man
+
 Upstream-Status: Inappropriate [disable feature]
 
 Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
---- libidn-1.41.orig/doc/Makefile.am
-+++ libidn-1.41/doc/Makefile.am
-@@ -73,16 +73,9 @@ BUILT_SOURCES = example.txt example2.txt
+---
+ doc/Makefile.am | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index d63cafa..ba9aab4 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -70,16 +70,9 @@ BUILT_SOURCES = example.txt example2.txt example3.txt example4.txt example5.txt
  
  # Man pages.
  

@@ -1,0 +1,42 @@
+From b91e2227575744a70f05b8b12d2c78b0c651fb86 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jdmason@kudzu.us>
+Date: Wed, 4 Sep 2024 16:20:45 -0400
+Subject: [PATCH] Revert "ldso: fix non-functional fix to early dynamic
+ PAGE_SIZE access"
+
+This reverts commit 6f666231bf51703fadbef10460d462fb573548a1.
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Inappropriate
+---
+ ldso/dynlink.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/ldso/dynlink.c b/ldso/dynlink.c
+index 3b57c07fabcb..cc90efbd30bf 100644
+--- a/ldso/dynlink.c
++++ b/ldso/dynlink.c
+@@ -21,17 +21,15 @@
+ #include <sys/membarrier.h>
+ #include "pthread_impl.h"
+ #include "fork_impl.h"
+-#include "libc.h"
+ #include "dynlink.h"
+ 
+ static size_t ldso_page_size;
+-/* libc.h may have defined a macro for dynamic PAGE_SIZE already, but
+- * PAGESIZE is only defined if it's constant for the arch. */
+-#ifndef PAGESIZE
+-#undef PAGE_SIZE
++#ifndef PAGE_SIZE
+ #define PAGE_SIZE ldso_page_size
+ #endif
+ 
++#include "libc.h"
++
+ #define malloc __libc_malloc
+ #define calloc __libc_calloc
+ #define realloc __libc_realloc
+-- 
+2.39.2
+

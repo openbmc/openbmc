@@ -72,6 +72,54 @@ class CVECheck(OESelftestTestCase):
         self.assertEqual(convert_cve_version("6.2_rc8"), "6.2-rc8")
         self.assertEqual(convert_cve_version("6.2_rc31"), "6.2-rc31")
 
+    def test_product_match(self):
+        from oe.cve_check import has_cve_product_match
+
+        status = {}
+        status["detail"] = "ignored"
+        status["vendor"] = "*"
+        status["product"] = "*"
+        status["description"] = ""
+        status["mapping"] = ""
+
+        self.assertEqual(has_cve_product_match(status, "some_vendor:some_product"), True)
+        self.assertEqual(has_cve_product_match(status, "*:*"), True)
+        self.assertEqual(has_cve_product_match(status, "some_product"), True)
+        self.assertEqual(has_cve_product_match(status, "glibc"), True)
+        self.assertEqual(has_cve_product_match(status, "glibca"), True)
+        self.assertEqual(has_cve_product_match(status, "aglibc"), True)
+        self.assertEqual(has_cve_product_match(status, "*"), True)
+        self.assertEqual(has_cve_product_match(status, "aglibc glibc test:test"), True)
+
+        status["product"] = "glibc"
+        self.assertEqual(has_cve_product_match(status, "some_vendor:some_product"), False)
+        # The CPE in the recipe must be defined, no * accepted
+        self.assertEqual(has_cve_product_match(status, "*:*"), False)
+        self.assertEqual(has_cve_product_match(status, "*"), False)
+        self.assertEqual(has_cve_product_match(status, "some_product"), False)
+        self.assertEqual(has_cve_product_match(status, "glibc"), True)
+        self.assertEqual(has_cve_product_match(status, "glibca"), False)
+        self.assertEqual(has_cve_product_match(status, "aglibc"), False)
+        self.assertEqual(has_cve_product_match(status, "some_vendor:glibc"), True)
+        self.assertEqual(has_cve_product_match(status, "some_vendor:glibc test"), True)
+        self.assertEqual(has_cve_product_match(status, "test some_vendor:glibc"), True)
+
+        status["vendor"] = "glibca"
+        status["product"] = "glibc"
+        self.assertEqual(has_cve_product_match(status, "some_vendor:some_product"), False)
+        # The CPE in the recipe must be defined, no * accepted
+        self.assertEqual(has_cve_product_match(status, "*:*"), False)
+        self.assertEqual(has_cve_product_match(status, "*"), False)
+        self.assertEqual(has_cve_product_match(status, "some_product"), False)
+        self.assertEqual(has_cve_product_match(status, "glibc"), False)
+        self.assertEqual(has_cve_product_match(status, "glibca"), False)
+        self.assertEqual(has_cve_product_match(status, "aglibc"), False)
+        self.assertEqual(has_cve_product_match(status, "some_vendor:glibc"), False)
+        self.assertEqual(has_cve_product_match(status, "glibca:glibc"), True)
+        self.assertEqual(has_cve_product_match(status, "test:test glibca:glibc"), True)
+        self.assertEqual(has_cve_product_match(status, "test glibca:glibc"), True)
+        self.assertEqual(has_cve_product_match(status, "glibca:glibc test"), True)
+
 
     def test_recipe_report_json(self):
         config = """
@@ -217,9 +265,10 @@ CVE_CHECK_REPORT_PATCHED = "1"
             # m4 CVE should not be in logrotate
             self.assertNotIn("CVE-2008-1687", found_cves)
             # logrotate has both Patched and Ignored CVEs
+            detail = "version-not-in-range"
             self.assertIn("CVE-2011-1098", found_cves)
             self.assertEqual(found_cves["CVE-2011-1098"]["status"], "Patched")
-            self.assertEqual(len(found_cves["CVE-2011-1098"]["detail"]), 0)
+            self.assertEqual(found_cves["CVE-2011-1098"]["detail"], detail)
             self.assertEqual(len(found_cves["CVE-2011-1098"]["description"]), 0)
             detail = "not-applicable-platform"
             description = "CVE is debian, gentoo or SUSE specific on the way logrotate was installed/used"

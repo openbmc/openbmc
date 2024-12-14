@@ -14,7 +14,6 @@ UPSTREAM_CHECK_REGEX = "Version (?P<pver>\d+(\.\d+)+)"
 
 inherit autotools-brokensep pkgconfig
 
-SRC_URI[md5sum] = "15ec701205f91f21b1187f8b61e0d64f"
 SRC_URI[sha256sum] = "545166d6cac037744381d1e9cc5a5405094e7bfad16a411699bcff40bbb31ee7"
 
 PACKAGE_BEFORE_PN = "${PN}++"

@@ -1,0 +1,44 @@
+From f6cdb9f1c3dbef8ef695703a2a5fb4e92b2dd8a0 Mon Sep 17 00:00:00 2001
+From: Simon Barth <simon.barth@gmx.de>
+Date: Mon, 5 Aug 2024 19:35:16 +0200
+Subject: [PATCH] libdirect: remove use of keyword 'register'
+
+The 'register' keyword was removed in C++17 and is now unused and
+reserved. When compiling code that uses DirecthFB with C++17,
+compilation fails.
+
+Since modern compilers likely don't produce different code whether the
+'register' keyword is used or not, there shouldn't be any performance
+impact introduced by this change.
+
+Signed-off-by: Simon Barth <simon.barth@gmx.de>
+
+Upstream-Status: Submitted [https://github.com/deniskropp/DirectFB/pull/25]
+---
+ lib/direct/util.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/direct/util.h b/lib/direct/util.h
+index 2109b6ca1..734645796 100644
+--- a/lib/direct/util.h
++++ b/lib/direct/util.h
+@@ -220,7 +220,7 @@ void DIRECT_API direct_md5_sum( void *dst, const void *src, const int len );
+ static __inline__ int
+ direct_util_count_bits( unsigned int mask )
+ {
+-     register int ret = 0;
++     int ret = 0;
+ 
+      while (mask) {
+           ret += mask & 1;
+@@ -325,7 +325,7 @@ D_ICEIL(float f)
+ static __inline__ int
+ direct_log2( int val )
+ {
+-     register int ret = 0;
++     int ret = 0;
+ 
+      while (val >> ++ret);
+ 
+-- 
+2.25.1

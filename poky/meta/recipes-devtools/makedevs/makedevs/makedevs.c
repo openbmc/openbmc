@@ -36,6 +36,7 @@ static const char *const app_name = "makedevs";
 static const char *const memory_exhausted = "memory exhausted";
 static char default_rootdir[]=".";
 static char *rootdir = default_rootdir;
+static char *rootdir_prepend = default_rootdir;
 static int trace = 0;
 
 struct name_id {
@@ -201,7 +202,7 @@ static unsigned long convert2guid(char *id_buf, struct name_id *search_list)
 		// Check for bad user/group name
 		node = search_list;
 		while (node != NULL) {
-			if (!strncmp(node->name, id_buf, strlen(id_buf))) {
+			if (!strncmp(node->name, id_buf, MAX_ID_LEN)) {
 				fprintf(stderr, "WARNING: Bad user/group name %s detected\n", id_buf);
 				break;
 			}
@@ -211,12 +212,15 @@ static unsigned long convert2guid(char *id_buf, struct name_id *search_list)
 	} else {
 		node = search_list;
 		while (node != NULL) {
-			if (!strncmp(node->name, id_buf, strlen(id_buf)))
+			if (!strncmp(node->name, id_buf, MAX_ID_LEN))
 				return node->id;
 			node = node->next;
 		}
 		error_msg_and_die("No entry for %s in search list", id_buf);
 	}
+
+	// Unreachable, but avoid an error with -Werror=return-type
+	return 0;
 }
 
 static void free_list(struct name_id *list)
@@ -358,13 +362,13 @@ static void add_new_fifo(char *name, char *path, unsigned long uid,
 static int interpret_table_entry(char *line)
 {
 	char *name;
-	char usr_buf[MAX_ID_LEN];
-	char grp_buf[MAX_ID_LEN];
-	char path[4096], type;
+	char usr_buf[MAX_ID_LEN+1];
+	char grp_buf[MAX_ID_LEN+1];
+	char path[PATH_MAX], type;
 	unsigned long mode = 0755, uid = 0, gid = 0, major = 0, minor = 0;
 	unsigned long start = 0, increment = 1, count = 0;
 
-	if (0 > sscanf(line, "%4095s %c %lo %39s %39s %lu %lu %lu %lu %lu", path,
+	if (0 > sscanf(line, "%4095s %c %lo %40s %40s %lu %lu %lu %lu %lu", path,
 		    &type, &mode, usr_buf, grp_buf, &major, &minor, &start,
 		    &increment, &count))
 	{
@@ -379,8 +383,8 @@ static int interpret_table_entry(char *line)
 		error_msg_and_die("Device table entries require absolute paths");
 	}
 	name = xstrdup(path + 1);
-	/* prefix path with rootdir */
-	sprintf(path, "%s/%s", rootdir, name);
+	/* prefix path with rootdir_prepend */
+	sprintf(path, "%s/%s", rootdir_prepend, name);
 
 	/* XXX Why is name passed into all of the add_new_*() routines? */
 	switch (type) {
@@ -406,11 +410,11 @@ static int interpret_table_entry(char *line)
 
 			for (i = start; i < start + count; i++) {
 				sprintf(buf, "%s%d", name, i);
-				sprintf(path, "%s/%s%d", rootdir, name, i);
+				sprintf(path, "%s/%s%d", rootdir_prepend, name, i);
 				/* FIXME:  MKDEV uses illicit insider knowledge of kernel
 				 * major/minor representation...  */
 				rdev = MKDEV(major, minor + (i - start) * increment);
-				sprintf(path, "%s/%s\0", rootdir, buf);
+				sprintf(path, "%s/%s\0", rootdir_prepend, buf);
 				add_new_device(buf, path, uid, gid, mode, rdev);
 			}
 		} else {
@@ -541,12 +545,11 @@ int main(int argc, char **argv)
 			} else {
 				closedir(dir);
 			}
-			/* If "/" is specified, use "" because rootdir is always prepended to a
-			 * string that starts with "/" */
-			if (0 == strcmp(optarg, "/"))
-				rootdir = xstrdup("");
+			rootdir = xstrdup(optarg);
+			if (0 == strcmp(rootdir, "/"))
+				rootdir_prepend = xstrdup("");
 			else
-				rootdir = xstrdup(optarg);
+				rootdir_prepend = xstrdup(rootdir);
 			break;
 
 		case 't':

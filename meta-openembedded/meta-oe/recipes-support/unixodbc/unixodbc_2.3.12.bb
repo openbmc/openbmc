@@ -15,6 +15,7 @@ SRC_URI = "https://www.unixodbc.org/unixODBC-${PV}.tar.gz \
 "
 SRC_URI[sha256sum] = "f210501445ce21bf607ba51ef8c125e10e22dffdffec377646462df5f01915ec"
 
+UPSTREAM_CHECK_URI = "https://www.unixodbc.org/download.html"
 UPSTREAM_CHECK_REGEX = "unixODBC-(?P<pver>\d+(\.\d+)+)\.tar"
 
 inherit autotools-brokensep multilib_header qemu

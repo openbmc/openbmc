@@ -18,7 +18,6 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://0001-Fix-builds-with-recent-gettext.patch \
            file://0001-Remove-dead-paren_level-code.patch \
            "
-SRC_URI[md5sum] = "4764b6ac98f6654a35da117b8e5e8e14"
 SRC_URI[sha256sum] = "e77d68c0211515459b8812118d606812e300097cfac0b4e9fb3472664263bb8b"
 
 inherit autotools gettext texinfo

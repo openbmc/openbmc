@@ -1,0 +1,42 @@
+From 9abf6cd09c60f0be9a85c055dfdf43698f057f73 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 25 Sep 2024 13:47:37 +0800
+Subject: [PATCH] CMakeLists.txt: Make the test discovery occur on target
+
+Set DISCOVERY_MODE to PRE_TEST to delay test discovery until just
+prior to test execution on the target to fix the build failure as
+the default POST_BUILD behavior is not desirable in cross-compiling
+env.
+
+/build/tmp/work/core2-64-wrs-linux/rocksdb/9.0.0/build/env_basic_test: error while loading shared libraries: libgflags.so.2.2: cannot open shared object file: No such file or directory
+CMake Error at /build/tmp/work/core2-64-wrs-linux/rocksdb/9.0.0/recipe-sysroot-native/usr/share/cmake-3.30/Modules/GoogleTestAddTests.cmake:112 (message):
+  Error running test executable.
+
+    Path: '/build/tmp/work/core2-64-wrs-linux/rocksdb/9.0.0/build/env_basic_test'
+    Working directory: '/build/tmp/work/core2-64-wrs-linux/rocksdb/9.0.0/build'
+    Result: 127
+    Output:
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 403ad1243..f34397798 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1502,7 +1502,7 @@ if(WITH_TESTS)
+       )
+       target_link_libraries(${exename}${ARTIFACT_SUFFIX} testutillib${ARTIFACT_SUFFIX} testharness gtest ${THIRDPARTY_LIBS} ${ROCKSDB_LIB})
+       if(NOT "${exename}" MATCHES "db_sanity_test")
+-        gtest_discover_tests(${exename} DISCOVERY_TIMEOUT 120)
++        gtest_discover_tests(${exename} DISCOVERY_TIMEOUT 120 DISCOVERY_MODE PRE_TEST)
+         add_dependencies(rocksdb_check ${exename}${ARTIFACT_SUFFIX})
+       endif()
+   endforeach(sourcefile ${TESTS})
+-- 
+2.34.1
+

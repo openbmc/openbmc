@@ -1,0 +1,30 @@
+tests/df: Fix intermittent test failure
+
+The test writes to the disk and means the space used changes. If this
+crosses a number boundary, the heading spacing can change:
+
+-Filesystem     1024-blocks  Used Available Capacity Mounted on
++Filesystem     1024-blocks   Used Available Capacity Mounted on
+
+The test is to make sure the 1024 blocks element remains the same and
+the spacing doesn't matter. Therefore strip any duplicate spaces using tr.
+
+Submitted: https://github.com/coreutils/coreutils/pull/88
+Upstream-Status: Backport [https://github.com/coreutils/coreutils/commit/c5725c8c4bb21903490a48035286d0f94463642e]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: coreutils-9.5/tests/df/df-P.sh
+===================================================================
+--- coreutils-9.5.orig/tests/df/df-P.sh
++++ coreutils-9.5/tests/df/df-P.sh
+@@ -20,8 +20,8 @@
+ print_ver_ df
+ 
+ 
+-              df -P . > t1 || fail=1
+-BLOCK_SIZE=1M df -P . > t2 || fail=1
++              df -P . | tr -s ' ' > t1 || fail=1
++BLOCK_SIZE=1M df -P . | tr -s ' ' > t2 || fail=1
+ 
+ # Since file system utilization may be changing, compare only df's header line.
+ # That records the block size.  E.g., for "1M", it would be:

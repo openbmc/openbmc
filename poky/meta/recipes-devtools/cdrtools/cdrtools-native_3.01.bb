@@ -25,7 +25,7 @@ EXTRA_OEMAKE = "-e MAKEFLAGS= CPPOPTX='${CPPFLAGS}' COPTX='${CFLAGS}' C++OPTX='$
 # Stop failures when 'cc' can't be found
 export ac_cv_prog_CC = "${CC}"
 
-inherit native
+inherit sourceforge-releases native
 
 # Use -std=gnu89 to build with gcc-14 (https://bugs.gentoo.org/903876)
 # this needs to be after native inherit (which sets CFLAGS to BUILD_CFLAGS)

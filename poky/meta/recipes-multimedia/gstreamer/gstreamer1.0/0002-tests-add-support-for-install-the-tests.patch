@@ -1,4 +1,4 @@
-From 31dea17a1d5de0003719a875a1089df43a50219a Mon Sep 17 00:00:00 2001
+From 0efdfdf9e5055944a463eea43e5539aa7ea7206a Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 11 Apr 2021 19:48:13 +0100
 Subject: [PATCH] tests: add support for install the tests
@@ -19,10 +19,10 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  create mode 100644 tests/check/template.test.in
 
 diff --git a/meson.build b/meson.build
-index efcf189..c97d9a8 100644
+index 830a601..3f9fdce 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -624,6 +624,10 @@ if bashcomp_dep.found()
+@@ -645,6 +645,10 @@ if bashcomp_dep.found()
    endif
  endif
  
@@ -46,7 +46,7 @@ index 340fb58..5b87f68 100644
  # Feature options
  option('check', type : 'feature', value : 'auto', description : 'Build unit test libraries')
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index e9501fe..08f8fd8 100644
+index bf0021f..9a8c42c 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
 @@ -125,10 +125,16 @@ test_defines = [

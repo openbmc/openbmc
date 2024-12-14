@@ -1,0 +1,26 @@
+From 713c21880e25108bf0703433432acca58377cc7b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 27 Sep 2024 11:55:53 -0700
+Subject: [PATCH] Use a lambda function as deleter prototype in unique_ptr
+
+Fixes build with clang/libc++ 20+
+
+Upstream-Status: Submitted [https://jira.mariadb.org/browse/MDEV-35040]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ extra/mariabackup/backup_copy.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/extra/mariabackup/backup_copy.cc b/extra/mariabackup/backup_copy.cc
+index a328f5e0ec7..2ab04b78bce 100644
+--- a/extra/mariabackup/backup_copy.cc
++++ b/extra/mariabackup/backup_copy.cc
+@@ -1641,7 +1641,7 @@ is_aria_log_dir_file(const datadir_node_t &node)
+ bool
+ copy_back_aria_logs(const char *dstdir)
+ {
+-  std::unique_ptr<ds_ctxt_t, void (&)(ds_ctxt_t*)>
++  std::unique_ptr<ds_ctxt_t, std::function<void(ds_ctxt_t*)>>
+     ds_ctxt_aria_log_dir_path(ds_create(dstdir, DS_TYPE_LOCAL), ds_destroy);
+ 
+   datadir_node_t node;

@@ -36,6 +36,11 @@ RDEPENDS:${PN} += "\
     xfsprogs \
     acl \
     gawk \
+    util-linux-mkfs \
+    util-linux-mount \
+    util-linux-findmnt \
+    inetutils-hostname \
+    grep \
 "
 
 USERADD_PACKAGES = "${PN}"

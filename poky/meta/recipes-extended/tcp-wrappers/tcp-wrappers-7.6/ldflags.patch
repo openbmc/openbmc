@@ -1,4 +1,4 @@
-Upstream-Status: Backport
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 Index: tcp_wrappers_7.6.orig/Makefile
 ===================================================================

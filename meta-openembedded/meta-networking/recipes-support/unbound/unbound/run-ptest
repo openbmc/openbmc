@@ -1,0 +1,17 @@
+#!/bin/sh
+
+cd tests || exit 1
+retVal=0
+./unittest
+./testbound -s
+for x in ./testdata/*.rpl; do
+	output="$(./testbound -p $x -o -vvvvv 2>&1)"
+        if test $? -eq 0; then
+                echo "$x :Pass"
+        else
+                echo "$output"
+                echo "$x :Fail"
+                retVal=1
+        fi
+done
+exit $retVal

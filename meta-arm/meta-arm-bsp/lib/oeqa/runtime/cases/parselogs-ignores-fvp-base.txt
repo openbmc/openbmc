@@ -1,0 +1,1 @@
+basic-mmio-gpio: Failed to locate of_node [id: -2]

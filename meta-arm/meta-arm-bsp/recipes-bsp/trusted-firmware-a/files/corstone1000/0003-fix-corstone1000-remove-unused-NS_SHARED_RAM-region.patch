@@ -1,0 +1,92 @@
+From 19600e6718e1a5b2ac8ec27d471acdafce0e433e Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <Emekcan.Aras@arm.com>
+Date: Thu, 25 Apr 2024 11:30:58 +0100
+Subject: [PATCH] fix(corstone1000): remove unused NS_SHARED_RAM region
+
+After enabling additional features in Trusted Services, the size of BL32 image
+(OP-TEE + Trusted Services SPs) is larger now. To create more space in secure RAM 
+for BL32 image, this patch removes NS_SHARED_RAM region which is not currently used by
+corstone1000 platform.
+
+Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/30117/2]
+---
+ .../corstone1000/common/corstone1000_plat.c   |  1 -
+ .../common/include/platform_def.h             | 19 +------------------
+ 2 files changed, 1 insertion(+), 19 deletions(-)
+
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_plat.c b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+index ed3801caa..a9475859a 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_plat.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+@@ -23,7 +23,6 @@
+ 
+ const mmap_region_t plat_arm_mmap[] = {
+ 	ARM_MAP_SHARED_RAM,
+-	ARM_MAP_NS_SHARED_RAM,
+ 	ARM_MAP_NS_DRAM1,
+ 	CORSTONE1000_MAP_DEVICE,
+ 	CORSTONE1000_EXTERNAL_FLASH,
+diff --git a/plat/arm/board/corstone1000/common/include/platform_def.h b/plat/arm/board/corstone1000/common/include/platform_def.h
+index 442d187f0..18fce4486 100644
+--- a/plat/arm/board/corstone1000/common/include/platform_def.h
++++ b/plat/arm/board/corstone1000/common/include/platform_def.h
+@@ -90,9 +90,6 @@
+  *	partition size: 176 KB
+  *	content: BL2
+  *
+- * <ARM_NS_SHARED_RAM_BASE> = <ARM_TRUSTED_SRAM_BASE> + 1 MB
+- *	partition size: 512 KB
+- *	content: BL33 (u-boot)
+  */
+ 
+ /* DDR memory */
+@@ -117,11 +114,7 @@
+ /* The remaining Trusted SRAM is used to load the BL images */
+ #define TOTAL_SRAM_SIZE		(SZ_4M)  /* 4 MB */
+ 
+-/* Last 512KB of CVM is allocated for shared RAM as an example openAMP */
+-#define ARM_NS_SHARED_RAM_SIZE	(512 * SZ_1K)
+-
+ #define PLAT_ARM_TRUSTED_SRAM_SIZE	(TOTAL_SRAM_SIZE - \
+-					 ARM_NS_SHARED_RAM_SIZE - \
+ 					 ARM_SHARED_RAM_SIZE)
+ 
+ #define PLAT_ARM_MAX_BL2_SIZE	(180 * SZ_1K)  /* 180 KB */
+@@ -160,11 +153,6 @@
+ 
+ /* NS memory */
+ 
+-/* The last 512KB of the SRAM is allocated as shared memory */
+-#define ARM_NS_SHARED_RAM_BASE	(ARM_TRUSTED_SRAM_BASE + TOTAL_SRAM_SIZE - \
+-				 (PLAT_ARM_MAX_BL31_SIZE + \
+-				  PLAT_ARM_MAX_BL32_SIZE))
+-
+ #define BL33_BASE		ARM_DRAM1_BASE
+ #define PLAT_ARM_MAX_BL33_SIZE	(12 * SZ_1M)  /* 12 MB*/
+ #define BL33_LIMIT		(ARM_DRAM1_BASE + PLAT_ARM_MAX_BL33_SIZE)
+@@ -266,7 +254,7 @@
+ #define PLAT_ARM_TRUSTED_MAILBOX_BASE	ARM_TRUSTED_SRAM_BASE
+ #define PLAT_ARM_NSTIMER_FRAME_ID	U(1)
+ 
+-#define PLAT_ARM_NS_IMAGE_BASE		(ARM_NS_SHARED_RAM_BASE)
++#define PLAT_ARM_NS_IMAGE_BASE		(BL33_BASE)
+
+ #define PLAT_PHY_ADDR_SPACE_SIZE	(1ULL << 32)
+ #define PLAT_VIRT_ADDR_SPACE_SIZE	(1ULL << 32)
+@@ -295,11 +283,6 @@
+ 				ARM_SHARED_RAM_SIZE, \
+ 				MT_MEMORY | MT_RW | MT_SECURE)
+ 
+-#define ARM_MAP_NS_SHARED_RAM	MAP_REGION_FLAT( \
+-				ARM_NS_SHARED_RAM_BASE, \
+-				ARM_NS_SHARED_RAM_SIZE, \
+-				MT_MEMORY | MT_RW | MT_NS)
+-
+ #define ARM_MAP_NS_DRAM1	MAP_REGION_FLAT( \
+ 				ARM_NS_DRAM1_BASE, \
+ 				ARM_NS_DRAM1_SIZE, \
+-- 
+2.25.1
+
+

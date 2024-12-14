@@ -1,24 +1,43 @@
 #!/bin/sh
 
-testbins="gpiod-test gpio-tools-test.bash gpiod-cxx-test"
-
 ptestdir=$(dirname "$(readlink -f "$0")")
 cd $ptestdir/tests
+
+export GPIODBUS_TEST_DAEMON_PATH="$ptestdir/tests/gpio-manager"
+export PATH="$ptestdir/tests/:$PATH"
 
 # libgpiod v2 uses gpio-sim - a configfs-based testing module. We need to
 # make sure configfs is mounted before running any tests.
 modprobe configfs
 mountpoint /sys/kernel/config > /dev/null || mount -t configfs configfs /sys/kernel/config
 
-for testbin in $testbins; do
-	if test -e ./$testbin; then
-		./$testbin > ./$testbin.out 2>&1
-		if [ $? -ne 0 ]; then
-			echo "FAIL: $testbin"
-		else
-			echo "PASS: $testbin"
-		fi
+# Make sure the daemon is not running during tests.
+systemctl stop gpio-manager 2> /dev/null > /dev/null
+service gpio-manager stop 2> /dev/null > /dev/null
+
+run_one_test() {
+	testbin="$1"
+
+	./$testbin > ./$testbin.out 2>&1
+	if [ $? -ne 0 ]; then
+		echo "FAIL: $testbin"
 	else
-		echo "SKIP: $testbin"
+		echo "PASS: $testbin"
 	fi
-done
+}
+
+run_one_test gpiod-test
+run_one_test gpio-tools-test.bash
+run_one_test gpiod-cxx-test
+run_one_test gpiod-glib-test
+
+# Wait for the leftover uevents to be emitted before running DBus tests.
+udevadm settle
+run_one_test gpiodbus-test
+
+udevadm settle
+gpio-manager 2> /dev/null > /dev/null &
+GPIO_MANAGER_PID=$!
+run_one_test gpiocli-test.bash
+kill $GPIO_MANAGER_PID
+wait $GPIO_MANAGER_PID

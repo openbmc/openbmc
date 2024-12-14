@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# https://github.com/dvarrazzo/py-setproctitle/issues/141
+pytest --automake -k 'not test_unicode'

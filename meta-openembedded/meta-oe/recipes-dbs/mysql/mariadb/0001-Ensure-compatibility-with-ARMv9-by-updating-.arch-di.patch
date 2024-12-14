@@ -1,0 +1,44 @@
+From 1b0c05b53ede7decb3f4dfe6187f9573cab5e0ab Mon Sep 17 00:00:00 2001
+From: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
+Date: Mon, 2 Dec 2024 02:18:46 +0000
+Subject: [PATCH] Ensure compatibility with ARMv9 by updating .arch directive
+
+The pmem_cvap() function currently uses the '.arch armv8.2-a' directive
+for the 'dc cvap' instruction. This will cause build errors below when
+compiling for ARMv9 systems. Update the '.arch' directive to 'armv9.4-a'
+to ensure compatibility with ARMv9 architectures.
+
+{standard input}: Assembler messages:
+{standard input}:169: Error: selected processor does not support `retaa'
+{standard input}:286: Error: selected processor does not support `retaa'
+make[2]: *** [storage/innobase/CMakeFiles/innobase_embedded.dir/build.make:
+1644: storage/innobase/CMakeFiles/innobase_embedded.dir/sync/cache.cc.o]
+Error 1
+
+Upstream-Status: Submitted
+
+Signed-off-by: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
+---
+ storage/innobase/sync/cache.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/storage/innobase/sync/cache.cc b/storage/innobase/sync/cache.cc
+index 43d642d05b5..af2d1f3d221 100644
+--- a/storage/innobase/sync/cache.cc
++++ b/storage/innobase/sync/cache.cc
+@@ -82,7 +82,12 @@ static void pmem_cvap(const void* buf, size_t size)
+   for (uintptr_t u= uintptr_t(buf) & ~(CPU_LEVEL1_DCACHE_LINESIZE),
+          end= uintptr_t(buf) + size;
+        u < end; u+= CPU_LEVEL1_DCACHE_LINESIZE)
++#if defined __ARM_ARCH && __ARM_ARCH == 9
++    __asm__ __volatile__(".arch armv9.4-a\n dc cvap, %0" :: "r"(u) : "memory");
++#else
+     __asm__ __volatile__(".arch armv8.2-a\n dc cvap, %0" :: "r"(u) : "memory");
++#endif
++
+   __asm__ __volatile__("dmb ishst" ::: "memory");
+ }
+
+-- 
+2.43.0
+

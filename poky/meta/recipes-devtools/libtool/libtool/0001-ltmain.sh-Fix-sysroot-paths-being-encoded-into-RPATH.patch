@@ -1,0 +1,59 @@
+From 16354097285634daf0240d428bc49fba95c3a291 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 26 Nov 2024 09:57:35 +0000
+Subject: [PATCH 1/7] ltmain.sh: Fix sysroot paths being encoded into RPATHs
+
+There is a bug where RPATHs could end up containing sysroot values when
+cross compiling which is obviously incorrect. Strip out sysroot components
+from libdir when building RPATH values to avoid this.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00009.html]
+---
+ build-aux/ltmain.in | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index fa157775..c31faebd 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -7764,9 +7764,11 @@ func_mode_link ()
+ 	  test relink = "$opt_mode" || rpath=$compile_rpath$rpath
+ 	  for libdir in $rpath; do
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
++	      func_replace_sysroot "$libdir"
++	      libdir=$func_replace_sysroot_result
++	      func_stripname '=' '' "$libdir"
++	      libdir=$func_stripname_result
+ 	      if test -n "$hardcode_libdir_separator"; then
+-		func_replace_sysroot "$libdir"
+-		libdir=$func_replace_sysroot_result
+ 		if test -z "$hardcode_libdirs"; then
+ 		  hardcode_libdirs=$libdir
+ 		else
+@@ -8496,6 +8498,10 @@ func_mode_link ()
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++	  func_replace_sysroot "$libdir"
++	  libdir=$func_replace_sysroot_result
++	  func_stripname '=' '' "$libdir"
++	  libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs=$libdir
+@@ -8547,6 +8553,10 @@ func_mode_link ()
+       hardcode_libdirs=
+       for libdir in $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++	  func_replace_sysroot "$libdir"
++	  libdir=$func_replace_sysroot_result
++	  func_stripname '=' '' "$libdir"
++	  libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs=$libdir
+-- 
+2.39.5
+

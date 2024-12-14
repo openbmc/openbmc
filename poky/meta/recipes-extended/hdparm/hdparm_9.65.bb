@@ -8,7 +8,6 @@ LICENSE = "BSD-2-Clause & GPL-2.0-only & hdparm"
 LICENSE:${PN} = "BSD-2-Clause & hdparm"
 LICENSE:${PN}-dbg = "BSD-2-Clause & hdparm"
 LICENSE:wiper = "GPL-2.0-only"
-NO_GENERIC_LICENSE[hdparm] = "LICENSE.TXT"
 
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=495d03e50dc6c89d6a30107ab0df5b03 \
                     file://debian/copyright;md5=a82d7ba3ade9e8ec902749db98c592f3 \
@@ -27,6 +26,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/hdparm/${BP}.tar.gz \
            "
 
 SRC_URI[sha256sum] = "d14929f910d060932e717e9382425d47c2e7144235a53713d55a94f7de535a4b"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/hdparm/files/hdparm/"
 
 EXTRA_OEMAKE = 'STRIP="echo" LDFLAGS="${LDFLAGS}"'
 

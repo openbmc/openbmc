@@ -59,7 +59,7 @@ rootfs_run() {
 				fi
 			fi
 		fi
-		debug "Sleeping for $delay second(s) to wait root to settle..."
+		debug "Sleeping for $delay second(s) to wait for root to settle..."
 		sleep $delay
 		C=$(( $C + 1 ))
 	done

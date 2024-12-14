@@ -1,0 +1,48 @@
+From af8b26e7ffe69837197fb841e9a31230ae01c9cc Mon Sep 17 00:00:00 2001
+From: Andreas Fuchs <andreas.fuchs@infineon.com>
+Date: Mon, 22 May 2023 14:06:41 +0200
+Subject: [PATCH 1/2] Configure: Allow disabling of digest-sign operations
+
+Since the digest-sign operations perform the hash on the TPM and
+TPMs in general do not support SHA512, this can lead to errors.
+Depending on the use case, it might be preferable to not support
+restricted keys (via digest+sign) but to rely on ordinary keys
+only.
+
+Upstream-Status: Backport
+Signed-off-by: Andreas Fuchs <andreas.fuchs@infineon.com>
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ configure.ac | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d4a9356..b379042 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -116,13 +116,19 @@ PKG_CHECK_MODULES([CRYPTO], [libcrypto >= 1.0.2g],
+ PKG_CHECK_MODULES([TSS2_ESYS], [tss2-esys >= 2.3])
+ PKG_CHECK_MODULES([TSS2_MU], [tss2-mu])
+ PKG_CHECK_MODULES([TSS2_TCTILDR], [tss2-tctildr])
++
+ AC_CHECK_LIB([crypto], EC_KEY_METHOD_set_compute_key,
+       [AM_CONDITIONAL([HAVE_OPENSSL_ECDH], true)],
+       [AM_CONDITIONAL([HAVE_OPENSSL_ECDH], false)])
++
++AC_ARG_ENABLE([digestsign],
++              [AS_HELP_STRING([--disable-digestsign],
++                              [Disable support for digest and sign methods, helps with TPM unsupported hash algorithms.])],,
++              [enable_digestsign=yes])
+ AC_CHECK_LIB([crypto], EVP_PKEY_meth_set_digest_custom,
+-      [AM_CONDITIONAL([HAVE_OPENSSL_DIGEST_SIGN], true)],
++      [AM_CONDITIONAL([HAVE_OPENSSL_DIGEST_SIGN], [test "x$enable_digestsign" != "xno"])],
+       [AM_CONDITIONAL([HAVE_OPENSSL_DIGEST_SIGN], false)])
+-AS_IF([test "x$ac_cv_lib_crypto_EVP_PKEY_meth_set_digest_custom" = xyes],
++AS_IF([test "x$ac_cv_lib_crypto_EVP_PKEY_meth_set_digest_custom" = xyes && test "x$enable_digestsign" = "xyes"],
+       [AC_DEFINE([HAVE_OPENSSL_DIGEST_SIGN], [1],
+                  Have required functionality from OpenSSL to support digest and sign)])
+ 
+-- 
+2.43.0
+

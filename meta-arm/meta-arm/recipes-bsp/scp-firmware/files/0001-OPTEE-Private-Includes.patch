@@ -1,4 +1,4 @@
-From b298400a5783453f64d8bebbd92db2c84c4a49fd Mon Sep 17 00:00:00 2001
+From 8b4b14943de92a2c7f8b328c2de75771493b7d18 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Mon, 10 Jul 2023 14:09:16 +0100
 Subject: [PATCH] OPTEE Private Includes
@@ -11,14 +11,14 @@ For some reason this behaviour isn't deterministic, a ticket has been filed with
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
- module/optee/console/CMakeLists.txt | 2 +-
- module/optee/mbx/CMakeLists.txt     | 2 +-
+ product/optee/common/module/console/CMakeLists.txt | 2 +-
+ product/optee/common/module/mbx/CMakeLists.txt     | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/module/optee/console/CMakeLists.txt b/module/optee/console/CMakeLists.txt
+diff --git a/product/optee/common/module/console/CMakeLists.txt b/product/optee/common/module/console/CMakeLists.txt
 index aebb7cc79766..942aa98c85ff 100644
---- a/module/optee/console/CMakeLists.txt
-+++ b/module/optee/console/CMakeLists.txt
+--- a/product/optee/common/module/console/CMakeLists.txt
++++ b/product/optee/common/module/console/CMakeLists.txt
 @@ -14,7 +14,7 @@ target_include_directories(${SCP_MODULE_TARGET}
  # Those includes are needed for mutex definitnion that is used in optee_smt
  # notification
@@ -28,10 +28,10 @@ index aebb7cc79766..942aa98c85ff 100644
                                    "${SCP_OPTEE_DIR}/core/include/"
                                    "${SCP_OPTEE_DIR}/lib/libutils/ext/include/"
                                    "${SCP_OPTEE_DIR}/lib/libutee/include/")
-diff --git a/module/optee/mbx/CMakeLists.txt b/module/optee/mbx/CMakeLists.txt
+diff --git a/product/optee/common/module/mbx/CMakeLists.txt b/product/optee/common/module/mbx/CMakeLists.txt
 index 305fa42b7370..783a7970c2d5 100644
---- a/module/optee/mbx/CMakeLists.txt
-+++ b/module/optee/mbx/CMakeLists.txt
+--- a/product/optee/common/module/mbx/CMakeLists.txt
++++ b/product/optee/common/module/mbx/CMakeLists.txt
 @@ -15,7 +15,7 @@ target_include_directories(${SCP_MODULE_TARGET}
  # Those includes are needed for mutex defifitnion that is used in optee_smt
  # notification

@@ -1,4 +1,7 @@
-Fix issues in build scripts:
+From 171df10f86be6defb9e317ac62df8a7b0389b901 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 30 Mar 2022 17:39:33 +0800
+Subject: [PATCH] Fix issues in build scripts:
 
 * remove hardcode lib path from buildtools/config.py which is not suitable for
   cross build
@@ -15,10 +18,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/buildtools/config.py b/buildtools/config.py
-index c837e5d..d426005 100644
+index 94c216ec..b3ec3f2e 100644
 --- a/buildtools/config.py
 +++ b/buildtools/config.py
-@@ -312,8 +312,8 @@ class Configuration(object):
+@@ -336,8 +336,8 @@ class Configuration(object):
                  # wx-config doesn't output that for some reason.  For now, just
                  # add it unconditionally but we should really check if the lib is
                  # really found there or wx-config should be fixed.
@@ -30,10 +33,10 @@ index c837e5d..d426005 100644
              # Move the various -I, -D, etc. flags we got from the config scripts
              # into the distutils lists.
 diff --git a/setup.py b/setup.py
-index 64bec4b..fb29253 100644
+index fad5aba8..eade737b 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -130,7 +130,7 @@ class wx_build(orig_build):
+@@ -135,7 +135,7 @@ class wx_build(orig_build):
                  'message and the wxWidgets and Phoenix build steps in the future.\n')
  
              # Use the same Python that is running this script.
@@ -42,7 +45,7 @@ index 64bec4b..fb29253 100644
              cmd = ' '.join(cmd)
              runcmd(cmd)
  
-@@ -233,7 +233,7 @@ if haveWheel:
+@@ -238,7 +238,7 @@ if haveWheel:
  class wx_install(orig_install):
      def finalize_options(self):
          orig_install.finalize_options(self)

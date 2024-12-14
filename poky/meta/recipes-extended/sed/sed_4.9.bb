@@ -59,6 +59,7 @@ do_install_ptest() {
 	    -e 's:abs_srcdir =.*:abs_srcdir = ..:g' \
 	    -e 's:top_srcdir =.*:top_srcdir = ..:g' \
 	    -e 's:${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}::g' \
+	    -e "/^\(PL\|SH\)_LOG_DRIVER =/s|(top_srcdir)|(top_builddir)|" \
 	    -i ${D}${PTEST_PATH}/Makefile
 }
 

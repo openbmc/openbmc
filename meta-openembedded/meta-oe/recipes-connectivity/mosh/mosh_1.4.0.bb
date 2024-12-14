@@ -48,3 +48,4 @@ RDEPENDS:${PN}-server += "openssh-sshd"
 ARM_INSTRUCTION_SET = "arm"
 
 CXXFLAGS:append = " -std=c++17"
+LDFLAGS:append:riscv32 = " -latomic"

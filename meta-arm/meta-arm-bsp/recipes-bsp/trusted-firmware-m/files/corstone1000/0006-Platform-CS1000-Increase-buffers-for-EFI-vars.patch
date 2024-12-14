@@ -1,0 +1,42 @@
+From 8ca9620a000ba182ebb51c51f49e2b97622f3404 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 15 May 2024 22:37:51 +0200
+Subject: [PATCH 6/9] Platform: CS1000: Increase buffers for EFI vars
+
+The UEFI variables are stored in the Protected Storage. The size of
+the variables metadata have been increased in the Host software stack
+so the related buffer sizes have to be increased:
+
+- The PS_MAX_ASSET_SIZE needs to be big enough to store the variables.
+- The CRYPTO_ENGINE_BUF_SIZE needs to be increased because the encryption
+  of the bigger PS assets requires bigger buffer.
+- The CRYPTO_IOVEC_BUFFER_SIZE needs to be increased because the PS
+  assets are passed through the IOVEC buffer between the crypto and
+  PS partition during encryption.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [8ca9620a000ba182ebb51c51f49e2b97622f3404]
+---
+ platform/ext/target/arm/corstone1000/config_tfm_target.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/platform/ext/target/arm/corstone1000/config_tfm_target.h b/platform/ext/target/arm/corstone1000/config_tfm_target.h
+index 9522379cd..0b410dfd4 100644
+--- a/platform/ext/target/arm/corstone1000/config_tfm_target.h
++++ b/platform/ext/target/arm/corstone1000/config_tfm_target.h
+@@ -23,4 +23,12 @@
+ /* The maximum size of asset to be stored in the Internal Trusted Storage area. */
+ #define ITS_MAX_ASSET_SIZE   2048
+ 
++/* The maximum asset size to be stored in the Protected Storage */
++#define PS_MAX_ASSET_SIZE   2592
++
++/* This is needed to be able to process the EFI variables during PS writes. */
++#define CRYPTO_ENGINE_BUF_SIZE 0x5000
++
++/* This is also has to be increased to fit the EFI variables into the iovecs. */
++#define CRYPTO_IOVEC_BUFFER_SIZE    6000
+ #endif /* __CONFIG_TFM_TARGET_H__ */
+-- 
+2.25.1
+

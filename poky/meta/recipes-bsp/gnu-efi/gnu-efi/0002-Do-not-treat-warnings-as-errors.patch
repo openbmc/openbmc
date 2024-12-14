@@ -15,18 +15,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Make.defaults b/Make.defaults
-index 0068e31..b643285 100755
+index 1347aca..1834d1c 100755
 --- a/Make.defaults
 +++ b/Make.defaults
-@@ -190,7 +190,7 @@ CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Werror \
-            -funsigned-char -fshort-wchar -fno-strict-aliasing \
-            -ffreestanding -fno-stack-protector
+@@ -262,3 +262,3 @@ CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Werror \
  else
 -CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Wno-pointer-sign -Werror \
 +CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra -Wno-pointer-sign \
-            -funsigned-char -fshort-wchar -fno-strict-aliasing \
- 	   -ffreestanding -fno-stack-protector -fno-stack-check \
-            $(if $(findstring gcc,$(CC)),-fno-merge-all-constants,)
--- 
-2.25.1
-
+            -fno-strict-aliasing \

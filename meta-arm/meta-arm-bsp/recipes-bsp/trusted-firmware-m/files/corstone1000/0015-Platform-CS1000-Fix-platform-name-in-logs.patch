@@ -1,0 +1,27 @@
+From 8f0cd9710be508adab91d8b5ab5aa2d39e89c287 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 31 Jul 2024 19:57:33 +0200
+Subject: [PATCH] Platform: CS1000: Fix platform name in logs
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [c3fa68995b247c802589890c6ea3e721127b0c78]
+---
+ platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+index 8aacd877e4..f5baf08cb4 100644
+--- a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
++++ b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+@@ -192,7 +192,7 @@ int32_t boot_platform_post_init(void)
+         }
+ 
+         result = tfm_to_psa_adac_corstone1000_secure_debug(secure_debug_rotpk, 32);
+-        BOOT_LOG_INF("%s: dipda_secure_debug is a %s.\r\n", __func__,
++        BOOT_LOG_INF("%s: Corstone-1000 Secure Debug is a %s.\r\n", __func__,
+                 (result == 0) ? "success" : "failure");
+ 
+     }
+-- 
+2.25.1
+

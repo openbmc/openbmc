@@ -27,7 +27,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException, \
         StaleElementReferenceException, TimeoutException, \
-        SessionNotCreatedException
+        SessionNotCreatedException, WebDriverException
 
 def create_selenium_driver(cls,browser='chrome'):
     # set default browser string based on env (if available)
@@ -90,7 +90,7 @@ class Wait(WebDriverWait):
     Subclass of WebDriverWait with predetermined timeout and poll
     frequency. Also deals with a wider variety of exceptions.
     """
-    _TIMEOUT = 10
+    _TIMEOUT = 20
     _POLL_FREQUENCY = 0.5
 
     def __init__(self, driver, timeout=_TIMEOUT, poll=_POLL_FREQUENCY):
@@ -113,6 +113,9 @@ class Wait(WebDriverWait):
             except NoSuchElementException:
                 pass
             except StaleElementReferenceException:
+                pass
+            except WebDriverException:
+                # selenium.common.exceptions.WebDriverException: Message: unknown error: unhandled inspector error: {"code":-32000,"message":"Node with given id does not belong to the document"}
                 pass
 
             time.sleep(self._poll)
@@ -183,7 +186,7 @@ class SeleniumTestCaseBase(unittest.TestCase):
         self.driver.get(abs_url)
 
         try:  # Ensure page is loaded before proceeding
-            self.wait_until_visible("#global-nav", poll=3)
+            self.wait_until_visible("#global-nav")
         except NoSuchElementException:
             self.driver.implicitly_wait(3)
         except TimeoutException:
@@ -208,35 +211,42 @@ class SeleniumTestCaseBase(unittest.TestCase):
         """ Return the element which currently has focus on the page """
         return self.driver.switch_to.active_element
 
-    def wait_until_present(self, selector, poll=0.5):
+    def wait_until_present(self, selector, timeout=Wait._TIMEOUT):
         """ Wait until element matching CSS selector is on the page """
         is_present = lambda driver: self.find(selector)
         msg = 'An element matching "%s" should be on the page' % selector
-        element = Wait(self.driver, poll=poll).until(is_present, msg)
-        if poll > 2:
-            time.sleep(poll)  # element need more delay to be present
+        element = Wait(self.driver, timeout=timeout).until(is_present, msg)
         return element
 
-    def wait_until_visible(self, selector, poll=1):
+    def wait_until_visible(self, selector, timeout=Wait._TIMEOUT):
         """ Wait until element matching CSS selector is visible on the page """
         is_visible = lambda driver: self.find(selector).is_displayed()
         msg = 'An element matching "%s" should be visible' % selector
-        Wait(self.driver, poll=poll).until(is_visible, msg)
-        time.sleep(poll)  # wait for visibility to settle
+        Wait(self.driver, timeout=timeout).until(is_visible, msg)
         return self.find(selector)
 
-    def wait_until_clickable(self, selector, poll=1):
-        """ Wait until element matching CSS selector is visible on the page """
-        WebDriverWait(
-            self.driver,
-            Wait._TIMEOUT,
-            poll_frequency=poll
-        ).until(
-            EC.element_to_be_clickable((By.ID, selector.removeprefix('#')
-                                        )
-                                       )
-        )
+    def wait_until_not_visible(self, selector, timeout=Wait._TIMEOUT):
+        """ Wait until element matching CSS selector is not visible on the page """
+        is_visible = lambda driver: self.find(selector).is_displayed()
+        msg = 'An element matching "%s" should be visible' % selector
+        Wait(self.driver, timeout=timeout).until_not(is_visible, msg)
         return self.find(selector)
+
+    def wait_until_clickable(self, selector, timeout=Wait._TIMEOUT):
+        """ Wait until element matching CSS selector is visible on the page """
+        WebDriverWait(self.driver, timeout=timeout).until(lambda driver: self.driver.execute_script("return jQuery.active == 0"))
+        is_clickable = lambda driver: (self.find(selector).is_displayed() and self.find(selector).is_enabled())
+        msg = 'An element matching "%s" should be clickable' % selector
+        Wait(self.driver, timeout=timeout).until(is_clickable, msg)
+        return self.find(selector)
+
+    def wait_until_element_clickable(self, finder, timeout=Wait._TIMEOUT):
+        """ Wait until element is clickable """
+        WebDriverWait(self.driver, timeout=timeout).until(lambda driver: self.driver.execute_script("return jQuery.active == 0"))
+        is_clickable = lambda driver: (finder(driver).is_displayed() and finder(driver).is_enabled())
+        msg = 'A matching element never became be clickable'
+        Wait(self.driver, timeout=timeout).until(is_clickable, msg)
+        return finder(self.driver)
 
     def wait_until_focused(self, selector):
         """ Wait until element matching CSS selector has focus """

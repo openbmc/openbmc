@@ -1,4 +1,4 @@
-From e210458d125793915abce30420d866a30305c37a Mon Sep 17 00:00:00 2001
+From 874679725c443e5d73e3a33d1158ab25442c8a5f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 10 Jan 2017 14:11:30 +0200
 Subject: [PATCH] Do not read config files from $HOME
@@ -10,26 +10,26 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/lib/rpmrc.c b/lib/rpmrc.c
-index 9437a0ff1..483585ae4 100644
+index 5d778b8b7..dc8d42aeb 100644
 --- a/lib/rpmrc.c
 +++ b/lib/rpmrc.c
-@@ -459,8 +459,7 @@ static void setDefaults(void)
+@@ -485,8 +485,7 @@ static void setDefaults(void)
      if (!defrcfiles) {
  	defrcfiles = rstrscat(NULL, confdir, "/rpmrc", ":",
  				confdir, "/" RPM_VENDOR "/rpmrc", ":",
 -				SYSCONFDIR "/rpmrc", ":",
--			  	"~/.rpmrc", NULL);
+-				userrc, NULL);
 +				SYSCONFDIR "/rpmrc", NULL);
      }
  
- #ifndef MACROFILES
-@@ -472,8 +471,7 @@ static void setDefaults(void)
-   				confdir, "/" RPM_VENDOR "/macros", ":",
+     /* macrofiles may be pre-set from --macros */
+@@ -498,8 +497,7 @@ static void setDefaults(void)
+ 				confdir, "/" RPM_VENDOR "/macros", ":",
  				SYSCONFDIR "/rpm/macros.*", ":",
  				SYSCONFDIR "/rpm/macros", ":",
 -				SYSCONFDIR "/rpm/%{_target}/macros", ":",
--				"~/.rpmmacros", NULL);
+-				usermacros, NULL);
 +				SYSCONFDIR "/rpm/%{_target}/macros", NULL);
      }
- #else
-     macrofiles = MACROFILES;
+ 
+     free(usermacros);

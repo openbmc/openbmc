@@ -3,7 +3,7 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 5 Aug 2020 12:06:01 -0700
 Subject: [PATCH] libacpi: Fix build witth -fno-commom
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [last release before 2008, no vcs]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

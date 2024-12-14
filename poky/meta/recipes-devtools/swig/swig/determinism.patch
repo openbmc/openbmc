@@ -1,4 +1,4 @@
-From 28648b3873d83e26bd19b64ce2c0a41ced9292d3 Mon Sep 17 00:00:00 2001
+From 1cd6f0cc21fc977a710e8d30c3d2ebfee3c72dc0 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Mon, 1 Mar 2021 00:11:10 +0000
 Subject: [PATCH] swig: Fix reproducibility issue
@@ -13,12 +13,12 @@ RP 2021/3/1
  1 file changed, 1 deletion(-)
 
 diff --git a/Source/Modules/main.cxx b/Source/Modules/main.cxx
-index de0a512..ac9e825 100644
+index f68b609..0c2aba3 100644
 --- a/Source/Modules/main.cxx
 +++ b/Source/Modules/main.cxx
-@@ -638,7 +638,6 @@ static void getoptions(int argc, char *argv[]) {
+@@ -633,7 +633,6 @@ static void getoptions(int argc, char *argv[]) {
  	}
-       } else if (strcmp(argv[i], "-version") == 0) {
+       } else if (strcmp(argv[i], "-version") == 0 || strcmp(argv[1], "--version") == 0) {
  	fprintf(stdout, "\nSWIG Version %s\n", Swig_package_version());
 -	fprintf(stdout, "\nCompiled with %s [%s]\n", SWIG_CXX, SWIG_PLATFORM);
  	fprintf(stdout, "\nConfigured options: %cpcre\n",

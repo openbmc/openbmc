@@ -13,6 +13,9 @@ SRC_URI = "git://git.musl-libc.org/libc-bench;branch=master \
            file://0001-build-Do-not-override-ldflags-from-environment.patch \
            "
 
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 do_install () {

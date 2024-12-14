@@ -1,14 +1,22 @@
+From a4e22c7f2a519f24bc8aa89c6677017c0fe13679 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 18 Feb 2020 17:27:26 +0000
+Subject: [PATCH] perl: Fix encode module reproducibility issues
+
 The code is encoding host compiler parameters into target builds. Avoid
 this for our target builds (patch is target specific, not native)
 
 Upstream-Status: Inappropriate [Cross compile hack]
 RP 2020/2/18
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ cpan/Encode/bin/enc2xs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: perl-5.30.1/cpan/Encode/bin/enc2xs
-===================================================================
---- perl-5.30.1.orig/cpan/Encode/bin/enc2xs
-+++ perl-5.30.1/cpan/Encode/bin/enc2xs
+diff --git a/cpan/Encode/bin/enc2xs b/cpan/Encode/bin/enc2xs
+index 502ae39..7669b05 100644
+--- a/cpan/Encode/bin/enc2xs
++++ b/cpan/Encode/bin/enc2xs
 @@ -195,7 +195,7 @@ sub compiler_info {
      # above becomes false.
      my $sized  = $declaration && !($compat && !$pedantic);

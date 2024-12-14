@@ -1,4 +1,4 @@
-From 1dc7ef09c3c567c4adb09ccfd97e0e59c58edb9f Mon Sep 17 00:00:00 2001
+From 42f8019e62f392f5bc09c25e90cc63123eb764fe Mon Sep 17 00:00:00 2001
 From: Lucas Kanashiro <kanashiro@debian.org>
 Date: Fri, 1 Nov 2019 15:25:17 -0300
 Subject: [PATCH] Make gemspecs reproducible

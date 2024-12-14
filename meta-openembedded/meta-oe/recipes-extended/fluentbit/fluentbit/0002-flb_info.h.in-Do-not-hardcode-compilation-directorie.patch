@@ -1,4 +1,4 @@
-From 71dab751a27a2e582b711de22873065dd28f4b65 Mon Sep 17 00:00:00 2001
+From c8c9dd3aeb49ab2ec94c3ab081e2368736a5da20 Mon Sep 17 00:00:00 2001
 From: Paulo Neves <ptsneves@gmail.com>
 Date: Thu, 28 Jul 2022 11:42:31 +0200
 Subject: [PATCH] flb_info.h.in: Do not hardcode compilation directories
@@ -14,7 +14,7 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/fluent-bit/flb_info.h.in b/include/fluent-bit/flb_info.h.in
-index a89485c..2579afc 100644
+index 3a08f8051..aa6a48f29 100644
 --- a/include/fluent-bit/flb_info.h.in
 +++ b/include/fluent-bit/flb_info.h.in
 @@ -23,7 +23,7 @@

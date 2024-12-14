@@ -5,7 +5,11 @@ it requires libxml2 and python 2 at the same time, which can no longer be satisf
 LICENSE = "GPL-2.0-only & LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6 \
                     file://${COREBASE}/meta/files/common-licenses/LGPL-2.1-only;md5=1a6d268fd218675ffea8be556788b780"
+
 SRC_URI = "file://gnome-doc-utils.m4"
+
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 PROVIDES = "gnome-doc-utils"
 

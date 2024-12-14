@@ -1,4 +1,4 @@
-From d1bf23817afffd5917b74da6946e0c3b7e63e336 Mon Sep 17 00:00:00 2001
+From b3a64702fa1978463c01bd5d9fe711e4628aba1e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 28 Dec 2020 21:04:27 +0100
 Subject: [PATCH] bash: update 5.0 -> 5.1
@@ -9,7 +9,6 @@ as needed instead making it work like other autotools based projects.
 
 Upstream-Status: Inappropriate [OE configuration specific]
 RP 2021/1/20
-
 ---
  configure.ac | 43 -------------------------------------------
  1 file changed, 43 deletions(-)

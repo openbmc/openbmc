@@ -7,7 +7,6 @@
 #
 
 import string
-import random
 import pytest
 from django.urls import reverse
 from selenium.webdriver import Keys
@@ -18,51 +17,12 @@ from selenium.webdriver.common.by import By
 
 from .utils import get_projectId_from_url
 
-
-@pytest.mark.django_db
-@pytest.mark.order("last")
 class TestProjectConfig(SeleniumFunctionalTestCase):
     project_id = None
     PROJECT_NAME = 'TestProjectConfig'
     INVALID_PATH_START_TEXT = 'The directory path should either start with a /'
     INVALID_PATH_CHAR_TEXT = 'The directory path cannot include spaces or ' \
         'any of these characters'
-
-    def _create_project(self, project_name):
-        """ Create/Test new project using:
-          - Project Name: Any string
-          - Release: Any string
-          - Merge Toaster settings: True or False
-        """
-        self.get(reverse('newproject'))
-        self.wait_until_visible('#new-project-name', poll=2)
-        self.find("#new-project-name").send_keys(project_name)
-        select = Select(self.find("#projectversion"))
-        select.select_by_value('3')
-
-        # check merge toaster settings
-        checkbox = self.find('.checkbox-mergeattr')
-        if not checkbox.is_selected():
-            checkbox.click()
-
-        if self.PROJECT_NAME != 'TestProjectConfig':
-            # Reset project name if it's not the default one
-            self.PROJECT_NAME = 'TestProjectConfig'
-
-        self.find("#create-project-button").click()
-
-        try:
-            self.wait_until_visible('#hint-error-project-name', poll=2)
-            url = reverse('project', args=(TestProjectConfig.project_id, ))
-            self.get(url)
-            self.wait_until_visible('#config-nav', poll=3)
-        except TimeoutException:
-            self.wait_until_visible('#config-nav', poll=3)
-
-    def _random_string(self, length):
-        return ''.join(
-            random.choice(string.ascii_letters) for _ in range(length)
-        )
 
     def _get_config_nav_item(self, index):
         config_nav = self.find('#config-nav')
@@ -72,16 +32,14 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
         """ Navigate to project BitBake variables page """
         # check if the menu is displayed
         if TestProjectConfig.project_id is None:
-            self._create_project(project_name=self._random_string(10))
-            current_url = self.driver.current_url
-            TestProjectConfig.project_id = get_projectId_from_url(current_url)
-        else:
-            url = reverse('projectconf', args=(TestProjectConfig.project_id,))
-            self.get(url)
-        self.wait_until_visible('#config-nav', poll=3)
+            TestProjectConfig.project_id = self.create_new_project(self.PROJECT_NAME, '3', None, True)
+
+        url = reverse('projectconf', args=(TestProjectConfig.project_id,))
+        self.get(url)
+        self.wait_until_visible('#config-nav')
         bbv_page_link = self._get_config_nav_item(9)
         bbv_page_link.click()
-        self.wait_until_visible('#config-nav', poll=3)
+        self.wait_until_visible('#config-nav')
 
     def test_no_underscore_iamgefs_type(self):
         """
@@ -90,13 +48,13 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
         self._navigate_bbv_page()
         imagefs_type = "foo_bar"
 
-        self.wait_until_visible('#change-image_fstypes-icon', poll=2)
+        self.wait_until_visible('#change-image_fstypes-icon')
 
         self.click('#change-image_fstypes-icon')
 
         self.enter_text('#new-imagefs_types', imagefs_type)
 
-        element = self.wait_until_visible('#hintError-image-fs_type', poll=2)
+        element = self.wait_until_visible('#hintError-image-fs_type')
 
         self.assertTrue(("A valid image type cannot include underscores" in element.text),
                         "Did not find underscore error message")
@@ -110,7 +68,7 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
 
         imagefs_type = "btrfs"
 
-        self.wait_until_visible('#change-image_fstypes-icon', poll=2)
+        self.wait_until_visible('#change-image_fstypes-icon')
 
         self.click('#change-image_fstypes-icon')
 
@@ -129,21 +87,19 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
         """
         self._navigate_bbv_page()
 
-        self.wait_until_visible('#change-image_fstypes-icon', poll=2)
-
+        self.wait_until_visible('#change-image_fstypes-icon')
         self.click('#change-image_fstypes-icon')
 
         checkboxes_selector = '.fs-checkbox-fstypes'
 
-        self.wait_until_visible(checkboxes_selector, poll=2)
+        self.wait_until_visible(checkboxes_selector)
         checkboxes = self.find_all(checkboxes_selector)
 
         for checkbox in checkboxes:
             if checkbox.get_attribute("value") == "cpio":
                checkbox.click()
+               self.wait_until_visible('#new-imagefs_types')
                element = self.driver.find_element(By.ID, 'new-imagefs_types')
-
-               self.wait_until_visible('#new-imagefs_types', poll=2)
 
                self.assertTrue(("cpio" in element.get_attribute('value'),
                                "Imagefs not added into the textbox"))
@@ -160,20 +116,19 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
 
         # activate the input to edit download dir
         try:
-            change_dl_dir_btn = self.wait_until_visible('#change-dl_dir-icon', poll=2)
+            change_dl_dir_btn = self.wait_until_visible('#change-dl_dir-icon')
         except TimeoutException:
             # If download dir is not displayed, test is skipped
             change_dl_dir_btn = None
 
         if change_dl_dir_btn:
-            change_dl_dir_btn = self.wait_until_visible('#change-dl_dir-icon', poll=2)
             change_dl_dir_btn.click()
 
             # downloads dir path doesn't start with / or ${...}
-            input_field = self.wait_until_visible('#new-dl_dir', poll=2)
+            input_field = self.wait_until_visible('#new-dl_dir')
             input_field.clear()
             self.enter_text('#new-dl_dir', 'home/foo')
-            element = self.wait_until_visible('#hintError-initialChar-dl_dir', poll=2)
+            element = self.wait_until_visible('#hintError-initialChar-dl_dir')
 
             msg = 'downloads directory path starts with invalid character but ' \
                 'treated as valid'
@@ -183,7 +138,7 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
             self.driver.find_element(By.ID, 'new-dl_dir').clear()
             self.enter_text('#new-dl_dir', '/foo/bar a')
 
-            element = self.wait_until_visible('#hintError-dl_dir', poll=2)
+            element = self.wait_until_visible('#hintError-dl_dir')
             msg = 'downloads directory path characters invalid but treated as valid'
             self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
@@ -191,7 +146,7 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
             self.driver.find_element(By.ID,'new-dl_dir').clear()
             self.enter_text('#new-dl_dir', '${TOPDIR}/down foo')
 
-            element = self.wait_until_visible('#hintError-dl_dir', poll=2)
+            element = self.wait_until_visible('#hintError-dl_dir')
             msg = 'downloads directory path characters invalid but treated as valid'
             self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
@@ -219,10 +174,7 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
         self._navigate_bbv_page()
 
         try:
-            btn_chg_sstate_dir = self.wait_until_visible(
-                '#change-sstate_dir-icon',
-                poll=2
-            )
+            btn_chg_sstate_dir = self.wait_until_visible('#change-sstate_dir-icon')
             self.click('#change-sstate_dir-icon')
         except TimeoutException:
             # If sstate_dir is not displayed, test is skipped
@@ -230,10 +182,10 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
 
         if btn_chg_sstate_dir:  # Skip continuation if sstate_dir is not displayed
             # path doesn't start with / or ${...}
-            input_field = self.wait_until_visible('#new-sstate_dir', poll=2)
+            input_field = self.wait_until_visible('#new-sstate_dir')
             input_field.clear()
             self.enter_text('#new-sstate_dir', 'home/foo')
-            element = self.wait_until_visible('#hintError-initialChar-sstate_dir', poll=2)
+            element = self.wait_until_visible('#hintError-initialChar-sstate_dir')
 
             msg = 'sstate directory path starts with invalid character but ' \
                 'treated as valid'
@@ -243,7 +195,7 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
             self.driver.find_element(By.ID, 'new-sstate_dir').clear()
             self.enter_text('#new-sstate_dir', '/foo/bar a')
 
-            element = self.wait_until_visible('#hintError-sstate_dir', poll=2)
+            element = self.wait_until_visible('#hintError-sstate_dir')
             msg = 'sstate directory path characters invalid but treated as valid'
             self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
@@ -251,7 +203,7 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
             self.driver.find_element(By.ID,'new-sstate_dir').clear()
             self.enter_text('#new-sstate_dir', '${TOPDIR}/down foo')
 
-            element = self.wait_until_visible('#hintError-sstate_dir', poll=2)
+            element = self.wait_until_visible('#hintError-sstate_dir')
             msg = 'sstate directory path characters invalid but treated as valid'
             self.assertTrue((self.INVALID_PATH_CHAR_TEXT in element.text), msg)
 
@@ -275,13 +227,14 @@ class TestProjectConfig(SeleniumFunctionalTestCase):
         var_name, field, btn_id, input_id, value, save_btn, *_ = kwargs.values()
         """ Change bitbake variable value """
         self._navigate_bbv_page()
-        self.wait_until_visible(f'#{btn_id}', poll=2)
+        self.wait_until_visible(f'#{btn_id}')
         if kwargs.get('new_variable'):
             self.find(f"#{btn_id}").clear()
             self.enter_text(f"#{btn_id}", f"{var_name}")
         else:
             self.click(f'#{btn_id}')
-            self.wait_until_visible(f'#{input_id}', poll=2)
+
+        self.wait_until_visible(f'#{input_id}')
 
         if kwargs.get('is_select'):
             select = Select(self.find(f'#{input_id}'))

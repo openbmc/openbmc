@@ -81,7 +81,7 @@ class TestAllProjectsPage(SeleniumTestCase):
 
     def _get_row_for_project(self, project_name):
         """ Get the HTML row for a project, or None if not found """
-        self.wait_until_visible('#projectstable tbody tr', poll=3)
+        self.wait_until_visible('#projectstable tbody tr')
         rows = self.find_all('#projectstable tbody tr')
 
         # find the row with a project name matching the one supplied
@@ -236,7 +236,7 @@ class TestAllProjectsPage(SeleniumTestCase):
         self.get(url)
 
         # Chseck search box is present and works
-        self.wait_until_visible('#projectstable tbody tr', poll=3)
+        self.wait_until_visible('#projectstable tbody tr')
         search_box = self.find('#search-input-projectstable')
         self.assertTrue(search_box.is_displayed())
 
@@ -244,7 +244,7 @@ class TestAllProjectsPage(SeleniumTestCase):
         search_box.send_keys('test project 10')
         search_btn = self.find('#search-submit-projectstable')
         search_btn.click()
-        self.wait_until_visible('#projectstable tbody tr', poll=3)
+        self.wait_until_visible('#projectstable tbody tr')
         rows = self.find_all('#projectstable tbody tr')
         self.assertTrue(len(rows) == 1)
 
@@ -290,7 +290,7 @@ class TestAllProjectsPage(SeleniumTestCase):
                 )
         url = reverse('all-projects')
         self.get(url)
-        self.wait_until_visible('#projectstable tbody tr', poll=3)
+        self.wait_until_visible('#projectstable tbody tr')
 
         # Check edit column
         edit_column = self.find('#edit-columns-button')
@@ -313,7 +313,7 @@ class TestAllProjectsPage(SeleniumTestCase):
         def test_show_rows(row_to_show, show_row_link):
             # Check that we can show rows == row_to_show
             show_row_link.select_by_value(str(row_to_show))
-            self.wait_until_visible('#projectstable tbody tr', poll=3)
+            self.wait_until_visible('#projectstable tbody tr')
             # check at least some rows are visible
             self.assertTrue(
                 len(self.find_all('#projectstable tbody tr')) > 0
@@ -321,7 +321,7 @@ class TestAllProjectsPage(SeleniumTestCase):
 
         url = reverse('all-projects')
         self.get(url)
-        self.wait_until_visible('#projectstable tbody tr', poll=3)
+        self.wait_until_visible('#projectstable tbody tr')
 
         show_rows = self.driver.find_elements(
             By.XPATH,

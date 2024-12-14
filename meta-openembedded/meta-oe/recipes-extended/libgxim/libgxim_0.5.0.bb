@@ -16,7 +16,6 @@ SRC_URI = "https://bitbucket.org/tagoh/libgxim/downloads/${BPN}-${PV}.tar.bz2 \
            file://0003-Add-format-string-qualifier-to-fix-potential-securit.patch \
            "
 
-SRC_URI[md5sum] = "4bb1fa63d00eb224439d413591c29a6a"
 SRC_URI[sha256sum] = "75e20d1744139644f9951b78ea3910b162d3380302315cb4b3d0640f23694c79"
 
 LICENSE = "LGPL-2.0-or-later"

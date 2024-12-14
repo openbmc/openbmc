@@ -30,4 +30,4 @@ fi
 cd /home/builder/poky
 . ./oe-init-build-env
 
-matchbox-terminal&
+x-terminal-emulator &

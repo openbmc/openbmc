@@ -13,6 +13,8 @@ MIRRORS += "https://www.jwz.org/${BPN} https://ftp.osuosl.org/pub/blfs/conglomer
 
 SRC_URI[sha256sum] = "787014b29f0c5793ecc2d93e1109a049ff48ab0c29b851dab34f683ceef6b152"
 
+UPSTREAM_CHECK_URI = "https://www.jwz.org/xscreensaver/download.html"
+
 DEPENDS = "intltool-native libx11 libxext libxt libxft libxi glib-2.0-native bc-native libpam jpeg"
 # These are only needed as part of the stopgap screensaver implementation:
 RDEPENDS:${PN} = " \

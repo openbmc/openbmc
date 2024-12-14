@@ -1,0 +1,40 @@
+From c04839effba0538c982422275c5cda5947aa0e85 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 3 Feb 2015 14:24:58 +0000
+Subject: [PATCH 6/7] libtool: Fix tools path issues
+
+If for example you build on a machine with /bin/grep, then restore that sstate
+onto a machine with /usr/bin/grep, things will fail. Simply don't bother
+hardcoding paths.
+
+RP 2015/2/3
+
+Upstream-Status: Inappropriate
+---
+ libtoolize.in | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/libtoolize.in b/libtoolize.in
+index 6c15aa57..8beb670e 100644
+--- a/libtoolize.in
++++ b/libtoolize.in
+@@ -40,11 +40,11 @@
+ 
+ : ${AUTOCONF="autoconf"}
+ : ${AUTOMAKE="automake"}
+-: ${EGREP="@EGREP@"}
+-: ${FGREP="@FGREP@"}
+-: ${GREP="@GREP@"}
+-: ${LN_S="@LN_S@"}
+-: ${SED="@SED@"}
++: ${EGREP="egrep"}
++: ${FGREP="fgrep"}
++: ${GREP="grep"}
++: ${LN_S="ln -s"}
++: ${SED="sed"}
+ 
+ 
+ ## -------------------------- ##
+-- 
+2.39.5
+

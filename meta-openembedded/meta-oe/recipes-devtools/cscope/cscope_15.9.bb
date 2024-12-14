@@ -20,5 +20,4 @@ DEPENDS += "ncurses"
 
 SRC_URI = "http://downloads.sourceforge.net/project/cscope/cscope/v${PV}/${BP}.tar.gz"
 
-SRC_URI[md5sum] = "16f3cce078b6c0e42299def4028eea6f"
 SRC_URI[sha256sum] = "c5505ae075a871a9cd8d9801859b0ff1c09782075df281c72c23e72115d9f159"

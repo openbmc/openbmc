@@ -18,6 +18,10 @@ class GTK3Test(OESDKTestCase):
     Test that autotools and GTK+ 3 compiles correctly.
     """
     def setUp(self):
+        libc = self.td.get("TCLIBC")
+        if libc in [ 'newlib' ]:
+            raise unittest.SkipTest("GTK3Test class: SDK doesn't contain a supported C library")
+
         if not (self.tc.hasTargetPackage("gtk+3", multilib=True) or \
                 self.tc.hasTargetPackage("libgtk-3.0", multilib=True)):
             raise unittest.SkipTest("GalculatorTest class: SDK don't support gtk+3")

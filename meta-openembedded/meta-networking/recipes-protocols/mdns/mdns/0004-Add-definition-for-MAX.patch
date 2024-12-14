@@ -1,0 +1,24 @@
+From f0adca77472c9c1df6db14f2b03e66d78a577649 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Sat, 26 Oct 2024 13:24:45 +0000
+Subject: [PATCH] Add definition for MAX()
+
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ mDNSShared/uds_daemon.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/mDNSShared/uds_daemon.c b/mDNSShared/uds_daemon.c
+index e73bc1181b73..1d590a6a3580 100644
+--- a/mDNSShared/uds_daemon.c
++++ b/mDNSShared/uds_daemon.c
+@@ -89,6 +89,8 @@
+ 
+ #include "mdns_strict.h"
+ 
++#define MAX(A, B) (((A) > (B)) ? (A) : (B))
++
+ // User IDs 0-500 are system-wide processes, not actual users in the usual sense
+ // User IDs for real user accounts start at 501 and count up from there
+ #define SystemUID(X) ((X) <= 500)

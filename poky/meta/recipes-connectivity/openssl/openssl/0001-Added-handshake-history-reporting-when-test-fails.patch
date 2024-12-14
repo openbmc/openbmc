@@ -7,26 +7,19 @@ Upstream-Status: Submitted [https://github.com/openssl/openssl/pull/22481]
 
 Signed-off-by: William Lyu <William.Lyu@windriver.com>
 ---
- test/helpers/handshake.c | 139 +++++++++++++++++++++++++++++----------
+ test/helpers/handshake.c | 137 +++++++++++++++++++++++++++++----------
  test/helpers/handshake.h |  70 +++++++++++++++++++-
  test/ssl_test.c          |  44 +++++++++++++
- 3 files changed, 218 insertions(+), 35 deletions(-)
+ 3 files changed, 217 insertions(+), 34 deletions(-)
 
 diff --git a/test/helpers/handshake.c b/test/helpers/handshake.c
-index e0422469e4..ae2ad59dd4 100644
+index f611b3a..5703b48 100644
 --- a/test/helpers/handshake.c
 +++ b/test/helpers/handshake.c
-@@ -1,5 +1,5 @@
- /*
-- * Copyright 2016-2022 The OpenSSL Project Authors. All Rights Reserved.
-+ * Copyright 2016-2023 The OpenSSL Project Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License 2.0 (the "License").  You may not use
-  * this file except in compliance with the License.  You can obtain a copy
 @@ -24,6 +24,102 @@
  #include <netinet/sctp.h>
  #endif
-
+ 
 +/* Shamelessly copied from test/helpers/ssl_test_ctx.c */
 +/* Maps string names to various enumeration type */
 +typedef struct {
@@ -126,10 +119,10 @@ index e0422469e4..ae2ad59dd4 100644
  HANDSHAKE_RESULT *HANDSHAKE_RESULT_new(void)
  {
      HANDSHAKE_RESULT *ret;
-@@ -719,15 +815,6 @@ static void configure_handshake_ssl(SSL *server, SSL *client,
+@@ -725,15 +821,6 @@ static void configure_handshake_ssl(SSL *server, SSL *client,
          SSL_set_post_handshake_auth(client, 1);
  }
-
+ 
 -/* The status for each connection phase. */
 -typedef enum {
 -    PEER_SUCCESS,
@@ -142,10 +135,10 @@ index e0422469e4..ae2ad59dd4 100644
  /* An SSL object and associated read-write buffers. */
  typedef struct peer_st {
      SSL *ssl;
-@@ -1074,17 +1161,6 @@ static void do_shutdown_step(PEER *peer)
+@@ -1080,17 +1167,6 @@ static void do_shutdown_step(PEER *peer)
      }
  }
-
+ 
 -typedef enum {
 -    HANDSHAKE,
 -    RENEG_APPLICATION_DATA,
@@ -160,10 +153,10 @@ index e0422469e4..ae2ad59dd4 100644
  static int renegotiate_op(const SSL_TEST_CTX *test_ctx)
  {
      switch (test_ctx->handshake_mode) {
-@@ -1162,19 +1238,6 @@ static void do_connect_step(const SSL_TEST_CTX *test_ctx, PEER *peer,
+@@ -1168,19 +1244,6 @@ static void do_connect_step(const SSL_TEST_CTX *test_ctx, PEER *peer,
      }
  }
-
+ 
 -typedef enum {
 -    /* Both parties succeeded. */
 -    HANDSHAKE_SUCCESS,
@@ -180,10 +173,10 @@ index e0422469e4..ae2ad59dd4 100644
  /*
   * Determine the handshake outcome.
   * last_status: the status of the peer to have acted last.
-@@ -1539,6 +1602,10 @@ static HANDSHAKE_RESULT *do_handshake_internal(
-
+@@ -1545,6 +1608,10 @@ static HANDSHAKE_RESULT *do_handshake_internal(
+ 
      start = time(NULL);
-
+ 
 +    save_loop_history(&(ret->history),
 +                      phase, status, server.status, client.status,
 +                      client_turn_count, client_turn);
@@ -191,10 +184,10 @@ index e0422469e4..ae2ad59dd4 100644
      /*
       * Half-duplex handshake loop.
       * Client and server speak to each other synchronously in the same process.
-@@ -1560,6 +1627,10 @@ static HANDSHAKE_RESULT *do_handshake_internal(
+@@ -1566,6 +1633,10 @@ static HANDSHAKE_RESULT *do_handshake_internal(
                                        0 /* server went last */);
          }
-
+ 
 +        save_loop_history(&(ret->history),
 +                          phase, status, server.status, client.status,
 +                          client_turn_count, client_turn);
@@ -203,7 +196,7 @@ index e0422469e4..ae2ad59dd4 100644
          case HANDSHAKE_SUCCESS:
              client_turn_count = 0;
 diff --git a/test/helpers/handshake.h b/test/helpers/handshake.h
-index 78b03f9f4b..b9967c2623 100644
+index 78b03f9..b9967c2 100644
 --- a/test/helpers/handshake.h
 +++ b/test/helpers/handshake.h
 @@ -1,5 +1,5 @@
@@ -214,9 +207,9 @@ index 78b03f9f4b..b9967c2623 100644
   * Licensed under the Apache License 2.0 (the "License").  You may not use
   * this file except in compliance with the License.  You can obtain a copy
 @@ -12,6 +12,11 @@
-
+ 
  #include "ssl_test_ctx.h"
-
+ 
 +#define MAX_HANDSHAKE_HISTORY_ENTRY_BIT 4
 +#define MAX_HANDSHAKE_HISTORY_ENTRY (1 << MAX_HANDSHAKE_HISTORY_ENTRY_BIT)
 +#define MAX_HANDSHAKE_HISTORY_ENTRY_IDX_MASK \
@@ -228,7 +221,7 @@ index 78b03f9f4b..b9967c2623 100644
 @@ -22,6 +27,63 @@ typedef struct ctx_data_st {
      char *session_ticket_app_data;
  } CTX_DATA;
-
+ 
 +typedef enum {
 +    HANDSHAKE,
 +    RENEG_APPLICATION_DATA,
@@ -296,25 +289,25 @@ index 78b03f9f4b..b9967c2623 100644
 +    /* handshake loop history */
 +    HANDSHAKE_HISTORY history;
  } HANDSHAKE_RESULT;
-
+ 
  HANDSHAKE_RESULT *HANDSHAKE_RESULT_new(void);
 @@ -95,4 +159,8 @@ int configure_handshake_ctx_for_srp(SSL_CTX *server_ctx, SSL_CTX *server2_ctx,
                                      CTX_DATA *server2_ctx_data,
                                      CTX_DATA *client_ctx_data);
-
+ 
 +const char *handshake_connect_phase_name(connect_phase_t phase);
 +const char *handshake_status_name(handshake_status_t handshake_status);
 +const char *handshake_peer_status_name(peer_status_t peer_status);
 +
  #endif  /* OSSL_TEST_HANDSHAKE_HELPER_H */
 diff --git a/test/ssl_test.c b/test/ssl_test.c
-index ea608518f9..9d6b093c81 100644
+index ea60851..9d6b093 100644
 --- a/test/ssl_test.c
 +++ b/test/ssl_test.c
 @@ -26,6 +26,44 @@ static OSSL_LIB_CTX *libctx = NULL;
  /* Currently the section names are of the form test-<number>, e.g. test-15. */
  #define MAX_TESTCASE_NAME_LENGTH 100
-
+ 
 +static void print_handshake_history(const HANDSHAKE_HISTORY *history)
 +{
 +    size_t first_idx;

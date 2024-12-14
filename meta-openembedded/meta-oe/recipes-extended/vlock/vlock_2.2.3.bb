@@ -9,14 +9,13 @@ SECTION = "utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a17cb0a873d252440acfdf9b3d0e7fbf"
 
-SRC_URI = "${GENTOO_MIRROR}/${BP}.tar.gz \
+SRC_URI = "${GENTOO_MIRROR}/37/${BP}.tar.gz \
        file://disable_vlockrc.patch \
        file://vlock_pam_tally2_reset.patch \
        file://vlock-no_tally.patch \
        file://vlock_pam \
        "
 
-SRC_URI[md5sum] = "378175c7692a8f288e65fd4dbf8a38eb"
 SRC_URI[sha256sum] = "85aa5aed1ae49351378a0bd527a013078f0f969372a63164b1944174ae1a5e39"
 
 inherit autotools-brokensep update-alternatives

@@ -337,47 +337,47 @@ The following corrections have been made to the :term:`LICENSE` values set by re
 Security Fixes in 4.3
 ~~~~~~~~~~~~~~~~~~~~~
 
--  bind: :cve:`2023-2911`, :cve:`2023-2828`, :cve:`2023-3341`, :cve:`2023-4236`
--  binutils: :cve:`2023-1972`
--  connman: :cve:`2023-28488`
--  cups: :cve:`2023-32324`, :cve:`2023-34241`, :cve:`2023-4504`
--  dbus: :cve:`2023-34969`
--  dmidecode: :cve:`2023-30630`
--  dropbear: :cve:`2023-36328`
--  erofs-utils: :cve:`2023-33551`, :cve:`2023-33552`
--  gcc: :cve:`2023-4039`
--  ghostscript: :cve:`2023-28879`, :cve:`2023-36664`, :cve:`2023-38559;` ignore :cve:`2023-38560`
--  git: :cve:`2023-25652`, :cve:`2023-29007`
--  glibc: :cve:`2023-4527`, :cve:`2023-4806`
--  go: :cve:`2023-24537`, :cve:`2023-39325`
--  gstreamer: :cve:`2023-40475`, :cve:`2023-40476`
--  inetutils: :cve:`2023-40303`
--  libarchive: ignore :cve:`2023-30571`
--  librsvg: :cve:`2023-38633`
--  libwebp: :cve:`2023-1999`, :cve:`2023-4863`
--  libx11: :cve:`2023-3138`, :cve:`2023-43785`, :cve:`2023-43786`, :cve:`2023-43787`
--  libxml2: :cve:`2023-28484`, :cve:`2023-29469;` ignore disputed :cve:`2023-45322`
--  libxpm: :cve:`2023-43788`, :cve:`2023-43789`, :cve:`2022-44617`
+-  bind: :cve_nist:`2023-2911`, :cve_nist:`2023-2828`, :cve_nist:`2023-3341`, :cve_nist:`2023-4236`
+-  binutils: :cve_nist:`2023-1972`
+-  connman: :cve_nist:`2023-28488`
+-  cups: :cve_nist:`2023-32324`, :cve_nist:`2023-34241`, :cve_nist:`2023-4504`
+-  dbus: :cve_nist:`2023-34969`
+-  dmidecode: :cve_nist:`2023-30630`
+-  dropbear: :cve_nist:`2023-36328`
+-  erofs-utils: :cve_nist:`2023-33551`, :cve_nist:`2023-33552`
+-  gcc: :cve_nist:`2023-4039`
+-  ghostscript: :cve_nist:`2023-28879`, :cve_nist:`2023-36664`, :cve_nist:`2023-38559;` ignore :cve_nist:`2023-38560`
+-  git: :cve_nist:`2023-25652`, :cve_nist:`2023-29007`
+-  glibc: :cve_nist:`2023-4527`, :cve_nist:`2023-4806`
+-  go: :cve_nist:`2023-24537`, :cve_nist:`2023-39325`
+-  gstreamer: :cve_nist:`2023-40475`, :cve_nist:`2023-40476`
+-  inetutils: :cve_nist:`2023-40303`
+-  libarchive: ignore :cve_nist:`2023-30571`
+-  librsvg: :cve_nist:`2023-38633`
+-  libwebp: :cve_nist:`2023-1999`, :cve_nist:`2023-4863`
+-  libx11: :cve_nist:`2023-3138`, :cve_nist:`2023-43785`, :cve_nist:`2023-43786`, :cve_nist:`2023-43787`
+-  libxml2: :cve_nist:`2023-28484`, :cve_nist:`2023-29469;` ignore disputed :cve_nist:`2023-45322`
+-  libxpm: :cve_nist:`2023-43788`, :cve_nist:`2023-43789`, :cve_nist:`2022-44617`
 -  linux: update CVE exclusions
--  ncurses: :cve:`2023-29491`
--  nghttp2: :cve:`2023-44487`
--  ninja: ignore :cve:`2021-4336`, wrong ninja
--  openssh: :cve:`2023-38408`
--  openssl: :cve:`2023-2650`, :cve:`2023-1255`, :cve:`2023-0466`, :cve:`2023-0465`, :cve:`2023-0464`, :cve:`2023-3817`, :cve:`2023-3446`, :cve:`2023-2975`, :cve:`2023-4807`
--  perl: :cve:`2023-31484`, :cve:`2023-31486`
--  pixman: ignore :cve:`2023-37769`
--  procps: :cve:`2023-4016`
--  python3-git: :cve:`2023-41040`
--  python3: ignore :cve:`2023-36632`
--  python3-urllib3: :cve:`2023-43804`
--  qemu: :cve:`2023-40360`, :cve:`2023-42467;` ignore :cve:`2023-0664` (Windows-specific), ignore :cve:`2023-2680` (RHEL specific)
--  screen: :cve:`2023-24626`
--  shadow: :cve:`2023-29383`
--  sqlite3: ignore :cve:`2023-36191`
--  sysstat: :cve:`2023-33204`
--  tiff: :cve:`2022-4645`, :cve:`2023-2731`, :cve:`2023-26965`, :cve:`2023-40745`, :cve:`2023-41175`
--  vim: :cve:`2023-2426`, :cve:`2023-2609`, :cve:`2023-2610`, :cve:`2023-3896`, :cve:`2023-5441`, :cve:`2023-5535`
--  zlib: ignore :cve:`2023-45853`
+-  ncurses: :cve_nist:`2023-29491`
+-  nghttp2: :cve_nist:`2023-44487`
+-  ninja: ignore :cve_nist:`2021-4336`, wrong ninja
+-  openssh: :cve_nist:`2023-38408`
+-  openssl: :cve_nist:`2023-2650`, :cve_nist:`2023-1255`, :cve_nist:`2023-0466`, :cve_nist:`2023-0465`, :cve_nist:`2023-0464`, :cve_nist:`2023-3817`, :cve_nist:`2023-3446`, :cve_nist:`2023-2975`, :cve_nist:`2023-4807`
+-  perl: :cve_nist:`2023-31484`, :cve_nist:`2023-31486`
+-  pixman: ignore :cve_nist:`2023-37769`
+-  procps: :cve_nist:`2023-4016`
+-  python3-git: :cve_nist:`2023-41040`
+-  python3: ignore :cve_nist:`2023-36632`
+-  python3-urllib3: :cve_nist:`2023-43804`
+-  qemu: :cve_nist:`2023-40360`, :cve_nist:`2023-42467;` ignore :cve_nist:`2023-0664` (Windows-specific), ignore :cve_nist:`2023-2680` (RHEL specific)
+-  screen: :cve_nist:`2023-24626`
+-  shadow: :cve_nist:`2023-29383`
+-  sqlite3: ignore :cve_nist:`2023-36191`
+-  sysstat: :cve_nist:`2023-33204`
+-  tiff: :cve_nist:`2022-4645`, :cve_nist:`2023-2731`, :cve_nist:`2023-26965`, :cve_nist:`2023-40745`, :cve_nist:`2023-41175`
+-  vim: :cve_nist:`2023-2426`, :cve_nist:`2023-2609`, :cve_nist:`2023-2610`, :cve_nist:`2023-3896`, :cve_nist:`2023-5441`, :cve_nist:`2023-5535`
+-  zlib: ignore :cve_nist:`2023-45853`
 
 
 Recipe Upgrades in 4.3

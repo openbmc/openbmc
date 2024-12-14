@@ -1,6 +1,5 @@
 # short-description: This file is used in oe-selftest wic module to test efi plugin
-
-part /boot --source bootimg-efi --sourceparams="loader=systemd-boot,create-unified-kernel-image=true,initrd=${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES}" --active --align 1024 --use-uuid
-part / --source rootfs --fstype=ext4 --align 1024 --use-uuid
+part /boot --source bootimg-efi --sourceparams="loader=systemd-boot" --active --align 1024 --use-uuid
+part / --source rootfs --fstype=ext4 --align 1024 --use-uuid --label root
 
 bootloader  --timeout=0 --append="console=ttyS0,115200n8"

@@ -17,6 +17,7 @@ UPSTREAM_CHECK_REGEX = "protobuf/(?P<pver>\d+(\.\d+)+)/"
 DEPENDS += "protobuf"
 
 RDEPENDS:${PN} += " \
+    python3-ctypes \
     python3-datetime \
     python3-json \
     python3-logging \
@@ -34,4 +35,12 @@ DISTUTILS_INSTALL_ARGS += "--cpp_implementation"
 
 do_compile:prepend:class-native () {
     export KOKORO_BUILD_NUMBER="1"
+}
+
+do_install:append () {
+    # Remove useless and problematic .pth file. python3-protobuf is installed in the standard
+    # location of site packages. No need for such .pth file.
+    # NOTE: do not drop this removal until the following issue in upstream cpython is resolved:
+    # https://github.com/python/cpython/issues/122220
+    rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf-*-nspkg.pth
 }

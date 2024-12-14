@@ -13,7 +13,6 @@ SRC_URI = "https://releases.pagure.org/liberation-fonts/liberation-fonts-ttf-${P
            file://30-0-liberation-sans-narrow.conf \
 "
 
-SRC_URI[md5sum] = "134d8262145fc793c6af494dcace3e71"
 SRC_URI[sha256sum] = "61a7e2b6742a43c73e8762cdfeaf6dfcf9abdd2cfa0b099a9854d69bc4cfee5c"
 
 S = "${WORKDIR}/liberation-fonts-ttf-${PV}"

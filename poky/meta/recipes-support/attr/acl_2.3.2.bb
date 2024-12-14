@@ -52,10 +52,12 @@ do_install_ptest() {
             -e 's:${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}::g' \
             -i ${D}${PTEST_PATH}/Makefile
 
-        sed -i "s|^srcdir =.*|srcdir = \.|g" ${D}${PTEST_PATH}/Makefile
-        sed -i "s|^abs_srcdir =.*|abs_srcdir = \.|g" ${D}${PTEST_PATH}/Makefile
-        sed -i "s|^abs_top_srcdir =.*|abs_top_srcdir = \.\.|g" ${D}${PTEST_PATH}/Makefile
-        sed -i "s|^Makefile:.*|Makefile:|g" ${D}${PTEST_PATH}/Makefile
+        sed -e "s|^srcdir =.*|srcdir = .|" \
+	    -e "s|^abs_srcdir =.*|abs_srcdir = .|" \
+	    -e "s|^abs_top_srcdir =.*|abs_top_srcdir = ..|" \
+	    -e "s|^Makefile:.*|Makefile:|" \
+	    -e "/^TEST_LOG_DRIVER =/s|(top_srcdir)|(top_builddir)|" \
+	    -i ${D}${PTEST_PATH}/Makefile
 
         rm ${D}${PTEST_PATH}/.libs/libtestlookup.lai
 }

@@ -1,4 +1,4 @@
-From ec9fc4e6086e1dbe0ac2f94a8a088a571596a581 Mon Sep 17 00:00:00 2001
+From 69babef33b0ee4c60d8821797777b9affedd47da Mon Sep 17 00:00:00 2001
 From: Stefano Cappa <stefano.cappa.ks89@gmail.com>
 Date: Sun, 13 Jan 2019 01:50:52 +0100
 Subject: [PATCH] remove INCLUDEDIR to prevent build issues
@@ -6,13 +6,12 @@ Subject: [PATCH] remove INCLUDEDIR to prevent build issues
 Upstream-Status: Pending
 
 Signed-off-by: Stefano Cappa <stefano.cappa.ks89@gmail.com>
-
 ---
  configure | 5 -----
  1 file changed, 5 deletions(-)
 
 diff --git a/configure b/configure
-index 5237b0e2..7220718b 100755
+index 1a772b02..0f915b39 100755
 --- a/configure
 +++ b/configure
 @@ -26,7 +26,6 @@ BUILD=
@@ -23,7 +22,7 @@ index 5237b0e2..7220718b 100755
  DEBUG=
  FORK=
  STATIC=
-@@ -86,7 +85,6 @@ for x do
+@@ -89,7 +88,6 @@ for x do
  	--mandir) MANDIR=$var;;
  	--datadir) DATADIR=$var;;
  	--with-ccopts|CFLAGS) CFLAGS=$var;;
@@ -31,7 +30,7 @@ index 5237b0e2..7220718b 100755
  	CC) CC=$var;;
  	CPPFLAGS) CPPFLAGS=$var;;
  	PKG_CONFIG) PKG_CONFIG=$var;;
-@@ -343,9 +341,6 @@ if [ -n "$CPPFLAGS" ]; then
+@@ -346,9 +344,6 @@ if [ -n "$CPPFLAGS" ]; then
  	echo "CPPFLAGS=" >>$CONFIG_MK
  	echo "CPPFLAGS+=	$CPPFLAGS" >>$CONFIG_MK
  fi

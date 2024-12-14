@@ -18,5 +18,4 @@ S = "${WORKDIR}/DirectFB-examples-${PV}"
 
 inherit autotools pkgconfig
 
-SRC_URI[md5sum] = "8b60c867af295481c32a8c7fc5802307"
 SRC_URI[sha256sum] = "9a2104cc4da8123c8371813551b66b943198979f745cbebc034bb5e10844122a"

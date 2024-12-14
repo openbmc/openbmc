@@ -20,6 +20,9 @@ SRC_URI = "https://github.com/neutrinolabs/${BPN}/releases/download/v${PV}/${BPN
 
 SRC_URI[sha256sum] = "94017d30e475c6d7a24f651e16791551862ae46f82d8de62385e63393f5f93d0"
 
+UPSTREAM_CHECK_URI = "https://github.com/neutrinolabs/xrdp/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
+
 CFLAGS += " -Wno-deprecated-declarations"
 
 PACKAGECONFIG ??= ""

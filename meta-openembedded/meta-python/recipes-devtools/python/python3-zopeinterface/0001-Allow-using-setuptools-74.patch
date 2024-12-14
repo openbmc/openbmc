@@ -1,0 +1,24 @@
+From 5060ecfe6cff5110cbfbc781fc7342ad08fc6f90 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 23 Nov 2024 18:30:40 -0800
+Subject: [PATCH] Allow using setuptools > 74
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 17da486..7906a37 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -3,7 +3,7 @@
+ # https://github.com/zopefoundation/meta/tree/master/config/c-code
+ 
+ [build-system]
+-requires = ["setuptools<74"]
++requires = ["setuptools"]
+ build-backend = "setuptools.build_meta"
+ 
+ [tool.coverage.run]

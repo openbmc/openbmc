@@ -14,6 +14,7 @@ import os
 import sys
 import stat
 import errno
+import itertools
 import logging
 import re
 import bb
@@ -128,6 +129,7 @@ class RunQueueStats:
 # runQueue state machine
 runQueuePrepare = 2
 runQueueSceneInit = 3
+runQueueDumpSigs = 4
 runQueueRunning = 6
 runQueueFailed = 7
 runQueueCleanUp = 8
@@ -1588,14 +1590,19 @@ class RunQueue:
             self.rqdata.init_progress_reporter.next_stage()
             self.rqexe = RunQueueExecute(self)
 
-            dump = self.cooker.configuration.dump_signatures
-            if dump:
+            dumpsigs = self.cooker.configuration.dump_signatures
+            if dumpsigs:
                 self.rqdata.init_progress_reporter.finish()
-                if 'printdiff' in dump:
-                    invalidtasks = self.print_diffscenetasks()
-                self.dump_signatures(dump)
-                if 'printdiff' in dump:
-                    self.write_diffscenetasks(invalidtasks)
+                if 'printdiff' in dumpsigs:
+                    self.invalidtasks_dump = self.print_diffscenetasks()
+                self.state = runQueueDumpSigs
+
+        if self.state is runQueueDumpSigs:
+            dumpsigs = self.cooker.configuration.dump_signatures
+            retval = self.dump_signatures(dumpsigs)
+            if retval is False:
+                if 'printdiff' in dumpsigs:
+                    self.write_diffscenetasks(self.invalidtasks_dump)
                 self.state = runQueueComplete
 
         if self.state is runQueueSceneInit:
@@ -1686,33 +1693,42 @@ class RunQueue:
             bb.parse.siggen.dump_sigtask(taskfn, taskname, dataCaches[mc].stamp[taskfn], True)
 
     def dump_signatures(self, options):
-        if bb.cooker.CookerFeatures.RECIPE_SIGGEN_INFO not in self.cooker.featureset:
-            bb.fatal("The dump signatures functionality needs the RECIPE_SIGGEN_INFO feature enabled")
+        if not hasattr(self, "dumpsigs_launched"):
+            if bb.cooker.CookerFeatures.RECIPE_SIGGEN_INFO not in self.cooker.featureset:
+                bb.fatal("The dump signatures functionality needs the RECIPE_SIGGEN_INFO feature enabled")
 
-        bb.note("Writing task signature files")
+            bb.note("Writing task signature files")
 
-        max_process = int(self.cfgData.getVar("BB_NUMBER_PARSE_THREADS") or os.cpu_count() or 1)
-        def chunkify(l, n):
-            return [l[i::n] for i in range(n)]
-        tids = chunkify(list(self.rqdata.runtaskentries), max_process)
-        # We cannot use the real multiprocessing.Pool easily due to some local data
-        # that can't be pickled. This is a cheap multi-process solution.
-        launched = []
-        while tids:
-            if len(launched) < max_process:
-                p = Process(target=self._rq_dump_sigtid, args=(tids.pop(), ))
+            max_process = int(self.cfgData.getVar("BB_NUMBER_PARSE_THREADS") or os.cpu_count() or 1)
+            def chunkify(l, n):
+                return [l[i::n] for i in range(n)]
+            dumpsigs_tids = chunkify(list(self.rqdata.runtaskentries), max_process)
+
+            # We cannot use the real multiprocessing.Pool easily due to some local data
+            # that can't be pickled. This is a cheap multi-process solution.
+            self.dumpsigs_launched = []
+
+            for tids in dumpsigs_tids:
+                p = Process(target=self._rq_dump_sigtid, args=(tids, ))
                 p.start()
-                launched.append(p)
-            for q in launched:
-                # The finished processes are joined when calling is_alive()
-                if not q.is_alive():
-                    launched.remove(q)
-        for p in launched:
+                self.dumpsigs_launched.append(p)
+
+            return 1.0
+
+        for q in self.dumpsigs_launched:
+            # The finished processes are joined when calling is_alive()
+            if not q.is_alive():
+                self.dumpsigs_launched.remove(q)
+
+        if self.dumpsigs_launched:
+            return 1.0
+
+        for p in self.dumpsigs_launched:
                 p.join()
 
         bb.parse.siggen.dump_sigs(self.rqdata.dataCaches, options)
 
-        return
+        return False
 
     def print_diffscenetasks(self):
         def get_root_invalid_tasks(task, taskdepends, valid, noexec, visited_invalid):
@@ -2189,12 +2205,20 @@ class RunQueueExecute:
         if not hasattr(self, "sorted_setscene_tids"):
             # Don't want to sort this set every execution
             self.sorted_setscene_tids = sorted(self.rqdata.runq_setscene_tids)
+            # Resume looping where we left off when we returned to feed the mainloop
+            self.setscene_tids_generator = itertools.cycle(self.rqdata.runq_setscene_tids)
 
         task = None
         if not self.sqdone and self.can_start_task():
-            # Find the next setscene to run
-            for nexttask in self.sorted_setscene_tids:
+            loopcount = 0
+            # Find the next setscene to run, exit the loop when we've processed all tids or found something to execute
+            while loopcount < len(self.rqdata.runq_setscene_tids):
+                loopcount += 1
+                nexttask = next(self.setscene_tids_generator)
                 if nexttask in self.sq_buildable and nexttask not in self.sq_running and self.sqdata.stamps[nexttask] not in self.build_stamps.values() and nexttask not in self.sq_harddep_deferred:
+                    if nexttask in self.sq_deferred and self.sq_deferred[nexttask] not in self.runq_complete:
+                        # Skip deferred tasks quickly before the 'expensive' tests below - this is key to performant multiconfig builds
+                        continue
                     if nexttask not in self.sqdata.unskippable and self.sqdata.sq_revdeps[nexttask] and \
                             nexttask not in self.sq_needed_harddeps and \
                             self.sqdata.sq_revdeps[nexttask].issubset(self.scenequeue_covered) and \
@@ -2224,8 +2248,7 @@ class RunQueueExecute:
                         if t in self.runq_running and t not in self.runq_complete:
                             continue
                     if nexttask in self.sq_deferred:
-                        if self.sq_deferred[nexttask] not in self.runq_complete:
-                            continue
+                        # Deferred tasks that were still deferred were skipped above so we now need to process
                         logger.debug("Task %s no longer deferred" % nexttask)
                         del self.sq_deferred[nexttask]
                         valid = self.rq.validate_hashes(set([nexttask]), self.cooker.data, 0, False, summary=False)
@@ -2748,8 +2771,12 @@ class RunQueueExecute:
                 logger.debug2("%s was unavailable and is a hard dependency of %s so skipping" % (task, dep))
                 self.sq_task_failoutright(dep)
                 continue
+
+        # For performance, only compute allcovered once if needed
+        if self.sqdata.sq_deps[task]:
+            allcovered = self.scenequeue_covered | self.scenequeue_notcovered
         for dep in sorted(self.sqdata.sq_deps[task]):
-            if self.sqdata.sq_revdeps[dep].issubset(self.scenequeue_covered | self.scenequeue_notcovered):
+            if self.sqdata.sq_revdeps[dep].issubset(allcovered):
                 if dep not in self.sq_buildable:
                     self.sq_buildable.add(dep)
 
@@ -3303,7 +3330,7 @@ class runQueuePipe():
 
         start = len(self.queue)
         try:
-            self.queue.extend(self.input.read(102400) or b"")
+            self.queue.extend(self.input.read(512 * 1024) or b"")
         except (OSError, IOError) as e:
             if e.errno != errno.EAGAIN:
                 raise

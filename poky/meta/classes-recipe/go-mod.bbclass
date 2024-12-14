@@ -22,9 +22,13 @@ GOBUILDFLAGS:append = " -modcacherw"
 
 inherit go
 
+export GOMODCACHE = "${S}/pkg/mod"
+GO_MOD_CACHE_DIR = "${@os.path.relpath(d.getVar('GOMODCACHE'), d.getVar('WORKDIR'))}"
+do_unpack[cleandirs] += "${GOMODCACHE}"
+
 GO_WORKDIR ?= "${GO_IMPORT}"
 do_compile[dirs] += "${B}/src/${GO_WORKDIR}"
 
-export GOMODCACHE = "${B}/.mod"
-
-do_compile[cleandirs] += "${B}/.mod"
+# Make go install unpack the module zip files in the module cache directory
+# before the license directory is polulated with license files.
+addtask do_compile before do_populate_lic

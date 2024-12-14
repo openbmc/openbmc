@@ -61,7 +61,7 @@ do_install:append:class-native () {
 
 # The tests need to run as a non-root user, so pull in the ptest user
 DEPENDS:append:class-target = "${@bb.utils.contains('PTEST_ENABLED', '1', ' ptest-runner', '', d)}"
-PACKAGE_WRITE_DEPS += "ptest-runner"
+PACKAGE_WRITE_DEPS += "${@bb.utils.contains('PTEST_ENABLED', '1', 'ptest-runner', '', d)}"
 
 do_install_ptest() {
 	install ${UNPACKDIR}/test.sh ${D}${PTEST_PATH}

@@ -7,14 +7,13 @@ and variables to Perl values."
 
 SECTION = "libs"
 
-HOMEPAGE = "http://metapan.org/release/ExtUtils-ParseXS/"
+HOMEPAGE = "https://metacpan.org/release/SMUELLER/ExtUtils-ParseXS-3.35"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=120;endline=129;md5=eb858f0e3b1b0bee0c05b86a474ae2b6"
 
 SRCNAME = "ExtUtils-ParseXS"
 SRC_URI = "${CPAN_MIRROR}/authors/id/S/SM/SMUELLER/${SRCNAME}-${PV}.tar.gz"
-SRC_URI[md5sum] = "2ae41036d85e98e1369645724962dd16"
 SRC_URI[sha256sum] = "41def0511278a2a8ba9afa25ccab45b0453f75e7fd774e8644b5f9a57cc4ee1c"
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"

@@ -1,4 +1,4 @@
-From 285b5fbf1d6b25ff55d305c17edf4d327bf19dd3 Mon Sep 17 00:00:00 2001
+From cc3219f01501904daec28d48e450f628f644bc3c Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 5 Jul 2011 23:42:29 +0100
 Subject: [PATCH] chrpath: Ensure the package respects the docdir variable
@@ -27,6 +27,3 @@ index b50ad21..5f7e861 100644
  doc_DATA = AUTHORS COPYING ChangeLog INSTALL NEWS README
  
  bin_PROGRAMS = chrpath
--- 
-2.8.1
-

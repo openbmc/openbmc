@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python3 -mputao.unittest discover --top-level-directory . --start-directory tests

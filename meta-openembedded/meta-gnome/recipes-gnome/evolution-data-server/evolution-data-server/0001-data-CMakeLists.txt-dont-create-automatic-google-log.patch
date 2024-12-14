@@ -1,0 +1,39 @@
+From 9b949bd47ed9e5596a9d37c60aa947def9c41db9 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sun, 15 Sep 2024 22:31:49 +0200
+Subject: [PATCH] data/CMakeLists.txt: dont create automatic google login
+
+Inappropriate for cross-compiling
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ data/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/data/CMakeLists.txt b/data/CMakeLists.txt
+index 8fa642909..bb1b0c4da 100644
+--- a/data/CMakeLists.txt
++++ b/data/CMakeLists.txt
+@@ -29,7 +29,7 @@ add_icon_cache_files("${SHARE_INSTALL_PREFIX}" alarm_notify_icon)
+ # ********************************
+ 
+ set(OAUTH2_SCHEMES "x-scheme-handler/eds-oauth2;")
+-if(NOT WITH_GOOGLE_CLIENT_ID STREQUAL "")
++if(0)
+ 	set(CMAKE_REQUIRED_DEFINITIONS ${DATA_SERVER_CFLAGS})
+ 	set(CMAKE_REQUIRED_INCLUDES ${CMAKE_BINARY_DIR} ${DATA_SERVER_INCLUDE_DIRS})
+ 	set(CMAKE_REQUIRED_LIBRARIES ${DATA_SERVER_LDFLAGS})
+@@ -50,7 +50,7 @@ if(NOT WITH_GOOGLE_CLIENT_ID STREQUAL "")
+ 		set(OAUTH2_SCHEMES "x-scheme-handler/${_google_oauth2_scheme};${OAUTH2_SCHEMES}")
+ 	endif(NOT _google_oauth2_scheme STREQUAL "")
+ 	unset(_google_oauth2_scheme)
+-endif(NOT WITH_GOOGLE_CLIENT_ID STREQUAL "")
++endif(0)
+ 
+ configure_file(org.gnome.evolution-data-server.OAuth2-handler.desktop.in
+ 	org.gnome.evolution-data-server.OAuth2-handler.desktop.in
+-- 
+2.46.0
+

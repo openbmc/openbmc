@@ -7,6 +7,8 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI += "file://0003-fluid-CMakeLists.txt-Do-not-export-fluid-target.patch"
 
+UPSTREAM_CHECK_URI = "https://www.fltk.org/software.php"
+
 EXTRA_OECMAKE = " \
     -DOPTION_BUILD_SHARED_LIBS=ON \
     -DOPTION_USE_THREADS=ON \

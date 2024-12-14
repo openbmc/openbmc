@@ -12,7 +12,6 @@ inherit autotools pkgconfig
 
 DEPENDS = "libsdl2"
 
-SRC_URI[md5sum] = "5c1d9d1cfa63301b141cb5c0de2ea7c4"
 SRC_URI[sha256sum] = "15ce8a7e5a23dafe8177c8df6e6c79b6749a03fff1e8196742d3571657609d21"
 
 do_configure:prepend() {

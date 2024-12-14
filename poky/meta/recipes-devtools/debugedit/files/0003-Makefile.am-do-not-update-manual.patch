@@ -1,7 +1,7 @@
-From 4f0d7d2f4900ce8555e09854dc681278b7a3d9a9 Mon Sep 17 00:00:00 2001
+From b2715c3f4d28fab1c238086d9b5435e269b06301 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 23 Mar 2023 13:09:23 +0800
-Subject: [PATCH 3/3] Makefile.am: do not update manual
+Subject: [PATCH] Makefile.am: do not update manual
 
 The tarball ships these manuals, no need to re-generate them.
 We have local patches for debugedit.c and sepdebugcrcfix.c,
@@ -20,7 +20,7 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 30 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 98b2f20..f91deea 100644
+index c590edf..692e016 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -52,36 +52,6 @@ sepdebugcrcfix_LDADD = @LIBELF_LIBS@
@@ -58,8 +58,5 @@ index 98b2f20..f91deea 100644
 -	esac
 -
  noinst_HEADERS= tools/ansidecl.h \
- 		tools/hashtab.h \
- 		tools/md5.h \
--- 
-2.17.1
-
+ 		tools/hashtab.h
+ 

@@ -1,6 +1,6 @@
-From b0df1cb468264a9bb9113524f0e1318c456b2348 Mon Sep 17 00:00:00 2001
+From 3529df77cd20253ce2a9c1962d7a72058a04fd98 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 29 Mar 2018 15:12:17 +0800
+Date: Wed, 21 Aug 2024 20:03:29 -0700
 Subject: [PATCH] support pkgconfig
 
 Upstream-Status: Inappropriate [gnupg upstream will not take this, it has been tried with other components]
@@ -13,15 +13,17 @@ Refactored for 1.33
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
+Rebase to 1.50
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/gpg-error.m4 | 192 ++---------------------------------------------
- 1 file changed, 5 insertions(+), 187 deletions(-)
+ src/gpg-error.m4 | 200 ++---------------------------------------------
+ 1 file changed, 5 insertions(+), 195 deletions(-)
 
 diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
-index 7fa52b1..15a0859 100644
+index 2d24071..c561725 100644
 --- a/src/gpg-error.m4
 +++ b/src/gpg-error.m4
-@@ -15,187 +15,14 @@
+@@ -15,196 +15,14 @@
  dnl
  dnl Find gpg-error-config, for backward compatibility
  dnl
@@ -135,17 +137,16 @@ index 7fa52b1..15a0859 100644
 -  fi
 -
 -  if test -n "$gpgrt_libdir"; then
+-    # Add the --libdir option to GPGRT_CONFIG
 -    GPGRT_CONFIG="$GPGRT_CONFIG --libdir=$gpgrt_libdir"
--    if $GPGRT_CONFIG gpg-error >/dev/null 2>&1; then
--      GPG_ERROR_CONFIG="$GPGRT_CONFIG gpg-error"
--      AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
--      gpg_error_config_version=`$GPG_ERROR_CONFIG --modversion`
--    else
--      gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
+-    # Make sure if gpgrt-config really works, by testing config gpg-error
+-    if ! $GPGRT_CONFIG gpg-error --exists; then
+-      # If it doesn't work, clear the GPGRT_CONFIG variable.
 -      unset GPGRT_CONFIG
 -    fi
--  elif test "$GPG_ERROR_CONFIG" != "no"; then
--    gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
+-  else
+-    # GPGRT_CONFIG found but no suitable dir for --libdir found.
+-    # This is a failure.  Clear the GPGRT_CONFIG variable.
 -    unset GPGRT_CONFIG
 -  fi
 -])
@@ -155,17 +156,27 @@ index 7fa52b1..15a0859 100644
 -dnl
 -dnl Test for libgpg-error and define GPG_ERROR_CFLAGS, GPG_ERROR_LIBS,
 -dnl GPG_ERROR_MT_CFLAGS, and GPG_ERROR_MT_LIBS.  The _MT_ variants are
--dnl used for programs requireing real multi thread support.
+-dnl used for programs requiring real multi thread support.
 -dnl
 -dnl If a prefix option is not used, the config script is first
 -dnl searched in $SYSROOT/bin and then along $PATH.  If the used
 -dnl config script does not match the host specification the script
 -dnl is added to the gpg_config_script_warn variable.
 -dnl
--AC_DEFUN([AM_PATH_GPG_ERROR],[dnl
--AC_REQUIRE([AC_CANONICAL_HOST])dnl
--AC_REQUIRE([_AM_PATH_POSSIBLE_GPG_ERROR_CONFIG])dnl
--AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
+ AC_DEFUN([AM_PATH_GPG_ERROR],
+-[ AC_REQUIRE([AC_CANONICAL_HOST])dnl
+-  AC_REQUIRE([_AM_PATH_POSSIBLE_GPG_ERROR_CONFIG])dnl
+-  AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
+-  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-    GPG_ERROR_CONFIG="$GPGRT_CONFIG gpg-error"
+-    AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
+-    gpg_error_config_version=`$GPG_ERROR_CONFIG --modversion`
+-  elif test x"$GPG_ERROR_CONFIG" != x -a "$GPG_ERROR_CONFIG" != "no"; then
+-    gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
+-  else
+-    gpg_error_config_version="0.0"
+-  fi
+-
 -  min_gpg_error_version=ifelse([$1], ,1.33,$1)
 -  ok=no
 -  if test "$GPG_ERROR_CONFIG" != "no"; then
@@ -188,7 +199,6 @@ index 7fa52b1..15a0859 100644
 -    fi
 -  fi
 -  AC_MSG_CHECKING(for GPG Error - version >= $min_gpg_error_version)
-+AC_DEFUN([AM_PATH_GPG_ERROR],
 +[ AC_REQUIRE([AC_CANONICAL_HOST])
 +  min_gpg_error_version=ifelse([$1], ,0.0,$1)
 +  PKG_CHECK_MODULES(GPG_ERROR, [gpg-error >= $min_gpg_error_version], [ok=yes], [ok=no])
@@ -214,7 +224,7 @@ index 7fa52b1..15a0859 100644
      fi
      if test x"$gpg_error_config_host" != xnone ; then
        if test x"$gpg_error_config_host" != x"$host" ; then
-@@ -211,15 +38,6 @@ AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
+@@ -220,15 +38,7 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
        fi
      fi
    else
@@ -230,3 +240,4 @@ index 7fa52b1..15a0859 100644
 -  AC_SUBST(GPG_ERROR_MT_CFLAGS)
 -  AC_SUBST(GPG_ERROR_MT_LIBS)
  ])
++

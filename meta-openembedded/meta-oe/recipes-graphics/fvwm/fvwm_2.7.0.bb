@@ -72,6 +72,8 @@ EXTRA_OECONF = " \
     --without-xpm-library \
     ac_cv_func_mkstemp=no \
     has_safety_mkstemp=yes \
+    ac_cv_path_FVWM_CPP=cpp \
+    ac_cv_path_PERL=perl \
 "
 
 # show the exact commands in the log file
@@ -90,6 +92,7 @@ do_install:append() {
     sed -i -e 's:${STAGING_BINDIR_NATIVE}/perl-native/perl:${USRBINPATH}/env perl:g' ${D}${bindir}/fvwm-*
     sed -i -e 's:${STAGING_BINDIR_NATIVE}/perl-native/perl:${USRBINPATH}/env perl:g' ${D}${libexecdir}/fvwm/*/Fvwm*
     sed -i -e 's:${STAGING_BINDIR_NATIVE}/python3-native/python3:${USRBINPATH}/env python3:g' ${D}${bindir}/fvwm-menu-desktop
+    sed -i -e 's:${WORKDIR}::g' ${D}${bindir}/fvwm-bug
 }
 
 # the only needed packages (note: locale packages are automatically generated

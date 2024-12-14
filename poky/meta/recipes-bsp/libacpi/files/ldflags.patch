@@ -1,7 +1,6 @@
 libacpi: Remove QA warning: No GNU_HASH in the elf binary
 
-Upstream-Status: Inappropriate [other]
-  Useful within bitbake environment only.
+Upstream-Status: Inactive-Upstream [last release before 2008, no vcs]
 
 Signed-off-by: Muhammad Shakeel <muhammad_shakeel@mentor.com>
 

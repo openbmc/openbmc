@@ -24,12 +24,12 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  .../src/cargo/core/compiler/context/compilation_files.rs      | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/tools/cargo/src/cargo/core/compiler/context/compilation_files.rs b/src/tools/cargo/src/cargo/core/compiler/context/compilation_files.rs
+diff --git a/src/tools/cargo/src/cargo/core/compiler/build_runner/compilation_files.rs b/src/tools/cargo/src/cargo/core/compiler/build_runner/compilation_files.rs
 index d83dbf10c..b2ad8d9f3 100644
---- a/src/tools/cargo/src/cargo/core/compiler/context/compilation_files.rs
-+++ b/src/tools/cargo/src/cargo/core/compiler/context/compilation_files.rs
+--- a/src/tools/cargo/src/cargo/core/compiler/build_runner/compilation_files.rs
++++ b/src/tools/cargo/src/cargo/core/compiler/build_runner/compilation_files.rs
 @@ -652,7 +652,7 @@ fn hash_rustc_version(bcx: &BuildContext<'_, '_>, hasher: &mut StableHasher) {
-     if vers.pre.is_empty() || bcx.config.cli_unstable().separate_nightlies {
+     if vers.pre.is_empty() || bcx.gctx.cli_unstable().separate_nightlies {
          // For stable, keep the artifacts separate. This helps if someone is
          // testing multiple versions, to avoid recompiles.
 -        bcx.rustc().verbose_version.hash(hasher);

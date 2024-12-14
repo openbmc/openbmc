@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c 
 SRC_URI = "git://github.com/systemd/systemd-bootchart.git;protocol=https;branch=main \
            file://mips64.patch \
            file://no_lto.patch \
+           file://0001-Add-riscv32-support.patch \
 "
 
 SRC_URI:append:libc-musl = " \

@@ -259,6 +259,25 @@ Within the :term:`Build Directory`, is the ``tmp`` directory. To remove all the
 build output yet preserve any source code or downloaded files from
 previous builds, simply remove the ``tmp`` directory.
 
+Why isn't there a way to append bbclass files like bbappend for recipes?
+------------------------------------------------------------------------
+
+The Yocto Project has consciously chosen not to implement such functionality.
+Class code is designed to be shared and reused, and exposes some level of
+configuration to its users. We want to encourage people to share these changes
+so we can build the best classes.
+
+If the ``append`` functionality was available for classes, our evidence and
+experience suggest that people would create their custom changes in their
+layer instead of sharing and discussing the issues and/or limitations they
+encountered. This would lead to bizarre class interactions when new layers are
+included. We therefore consciously choose to have a natural pressure to share
+class code improvements or fixes.
+
+There are also technical considerations like which recipes a class append would
+apply to and how that would fit within the layer model. These are complications
+we think we can live without!
+
 Customizing generated images
 ============================
 

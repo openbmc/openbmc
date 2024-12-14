@@ -1,0 +1,29 @@
+From 6c86f8aea2a29c33af3f212afa9f0ea180822d1e Mon Sep 17 00:00:00 2001
+From: Thomas Perrot <thomas.perrot@bootlin.com>
+Date: Wed, 6 Nov 2024 21:02:54 +0100
+Subject: [PATCH] Remove strip option from executable build
+
+To improve debugging experience, OE tasks will strip binaries.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
+---
+ meson.build | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 88d4d53263ae..8a1f540836e0 100644
+--- a/meson.build
++++ b/meson.build
+@@ -73,7 +73,6 @@ project('taisei', 'c',
+
+         # You may want to change these for a debug build dir
+         'buildtype=release',
+-        'strip=true',
+         'b_lto=true',
+         'b_ndebug=if-release',
+     ]
+--
+2.47.0
+

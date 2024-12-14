@@ -1,0 +1,42 @@
+From 38ac9ed7a4f7e2dcedb3c13d807ad0575435bab4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 30 Oct 2024 14:37:12 -0700
+Subject: [PATCH] sched_attr: Do not define for glibc >= 2.41
+
+glibc 2.41+ has added [1] definitions for sched_setattr and sched_getattr functions
+and struct sched_attr. Therefore, it needs to be checked for here as well before
+defining sched_attr
+
+Define sched_attr conditionally on SCHED_ATTR_SIZE_VER0
+
+Fixes builds with glibc/trunk
+
+[1] https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=21571ca0d70302909cf72707b2a7736cf12190a0;hp=298bc488fdc047da37482f4003023cb9adef78f8
+
+Upstream-Status: Submitted [https://lists.linux.it/pipermail/ltp/2024-October/040678.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/lapi/sched.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/lapi/sched.h b/include/lapi/sched.h
+index 26fdb628d..e1c7ff011 100644
+--- a/include/lapi/sched.h
++++ b/include/lapi/sched.h
+@@ -15,6 +15,8 @@
+ #include "lapi/syscalls.h"
+ #include "lapi/sched.h"
+ 
++/* sched_attr is not defined in glibc < 2.41 */
++#ifndef SCHED_ATTR_SIZE_VER0
+ struct sched_attr {
+ 	uint32_t size;
+ 
+@@ -44,6 +46,7 @@ static inline int sched_getattr(pid_t pid, struct sched_attr *attr,
+ {
+ 	return syscall(__NR_sched_getattr, pid, attr, size, flags);
+ }
++#endif
+ 
+ #ifndef HAVE_CLONE3
+ struct clone_args {

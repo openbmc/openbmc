@@ -5,14 +5,18 @@ cd ${NFTABLESLIB}/ptest || exit 1
 
 LOG="${NFTABLESLIB}/ptest/nftables_ptest_$(date +%Y%m%d-%H%M%S).log"
 NFT=nft
-tests/shell/run-tests.sh -v | sed -E '/I: \[OK\]/ s/^/PASS: / ; /W: \[(CHK DUMP|VALGRIND|TAINTED|DUMP FAIL|FAILED)\]/ s/^/FAIL: /' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | tee -a "${LOG}"
+tests/shell/run-tests.sh -v | sed -E '/I: \[OK\]/ s/^/PASS: / ; /W: \[(CHK DUMP|VALGRIND|TAINTED|DUMP FAIL|FAILED)\]/ s/^/FAIL: / ; /I: \[SKIPPED\]/ s/^/SKIP: /' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | tee -a "${LOG}"
 
 passed=$(grep -c PASS: "${LOG}")
 failed=$(grep -c FAIL: "${LOG}")
-all=$((passed + failed))
+skiped=$(grep -c SKIP: "${LOG}")
+
+all=$((passed + failed + skiped))
 
 (   echo "=== Test Summary ==="
     echo "TOTAL: ${all}"
     echo "PASSED: ${passed}"
     echo "FAILED: ${failed}"
+    echo "SKIPED: ${skiped}"
+    echo "===================="
 ) | tee -a "${LOG}"

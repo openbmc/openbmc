@@ -11,66 +11,9 @@ import pytest
 from django.urls import reverse
 from selenium.webdriver.support.select import Select
 from tests.functional.functional_helpers import SeleniumFunctionalTestCase
-from orm.models import Project
 from selenium.webdriver.common.by import By
 
-
-@pytest.mark.django_db
-@pytest.mark.order("last")
 class TestCreateNewProject(SeleniumFunctionalTestCase):
-
-    def _create_test_new_project(
-        self,
-        project_name,
-        release,
-        release_title,
-        merge_toaster_settings,
-    ):
-        """ Create/Test new project using:
-          - Project Name: Any string
-          - Release: Any string
-          - Merge Toaster settings: True or False
-        """
-        self.get(reverse('newproject'))
-        self.wait_until_visible('#new-project-name', poll=3)
-        self.driver.find_element(By.ID,
-                                 "new-project-name").send_keys(project_name)
-
-        select = Select(self.find('#projectversion'))
-        select.select_by_value(release)
-
-        # check merge toaster settings
-        checkbox = self.find('.checkbox-mergeattr')
-        if merge_toaster_settings:
-            if not checkbox.is_selected():
-                checkbox.click()
-        else:
-            if checkbox.is_selected():
-                checkbox.click()
-
-        self.driver.find_element(By.ID, "create-project-button").click()
-
-        element = self.wait_until_visible('#project-created-notification', poll=3)
-        self.assertTrue(
-            self.element_exists('#project-created-notification'),
-            f"Project:{project_name} creation notification not shown"
-        )
-        self.assertTrue(
-            project_name in element.text,
-            f"New project name:{project_name} not in new project notification"
-        )
-        self.assertTrue(
-            Project.objects.filter(name=project_name).count(),
-            f"New project:{project_name} not found in database"
-        )
-
-        # check release
-        self.assertTrue(re.search(
-            release_title,
-            self.driver.find_element(By.XPATH,
-                                     "//span[@id='project-release-title']"
-                                     ).text),
-                        'The project release is not defined')
 
     def test_create_new_project_master(self):
         """ Test create new project using:
@@ -81,7 +24,7 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
         release = '3'
         release_title = 'Yocto Project master'
         project_name = 'projectmaster'
-        self._create_test_new_project(
+        self.create_new_project(
             project_name,
             release,
             release_title,
@@ -97,7 +40,7 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
         release = '1'
         release_title = 'Yocto Project 5.0 "Scarthgap"'
         project_name = 'projectscarthgap'
-        self._create_test_new_project(
+        self.create_new_project(
             project_name,
             release,
             release_title,
@@ -110,10 +53,10 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
           - Release: Yocto Project 4.0 "Kirkstone" (option value: 4)
           - Merge Toaster settings: True
         """
-        release = '4'
+        release = '5'
         release_title = 'Yocto Project 4.0 "Kirkstone"'
         project_name = 'projectkirkstone'
-        self._create_test_new_project(
+        self.create_new_project(
             project_name,
             release,
             release_title,
@@ -129,7 +72,7 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
         release = '2'
         release_title = 'Local Yocto Project'
         project_name = 'projectlocal'
-        self._create_test_new_project(
+        self.create_new_project(
             project_name,
             release,
             release_title,
@@ -172,8 +115,10 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
                                  "import-project-dir").send_keys(wrong_path)
         self.driver.find_element(By.ID, "create-project-button").click()
 
+        self.wait_until_visible('.alert-danger')
+
         # check error message
         self.assertTrue(self.element_exists('.alert-danger'),
-                        'Allert message not shown')
+                        'Alert message not shown')
         self.assertTrue(wrong_path in self.find('.alert-danger').text,
                         "Wrong path not in alert message")

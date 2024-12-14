@@ -79,7 +79,6 @@ PACKAGES =+ "${PN}-sdl \
              xf86-video-modesetting"
 
 SUMMARY:xf86-video-modesetting = "X.Org X server -- modesetting display driver"
-INSANE_SKIP:${MLPREFIX}xf86-video-modesetting = "xorg-driver-abi"
 
 XSERVER_RDEPENDS = "xkeyboard-config rgb xserver-xf86-config xkbcomp xf86-input-libinput"
 RDEPENDS:${PN} += "${XSERVER_RDEPENDS}"
@@ -149,31 +148,12 @@ do_install:append () {
         sed -i -e 's,${libdir}/xorg/modules,${prefix}/lib*/xorg/modules,' ${D}${mandir}/man5/xorg.conf.5
 }
 
-# Add runtime provides for the ABI versions of the video and input subsystems,
-# so that drivers can depend on the relevant version.
-python populate_packages:prepend() {
-    import subprocess
+require xserver-abi.inc
 
-    # Set PKG_CONFIG_PATH so pkg-config looks at the .pc files that are going
-    # into the new package, not the staged ones.
-    newenv = dict(os.environ)
-    newenv["PKG_CONFIG_PATH"] = d.expand("${PKGD}${libdir}/pkgconfig/")
-
-    def get_abi(name):
-        abis = {
-          "video": "abi_videodrv",
-          "input": "abi_xinput"
-        }
-        p = subprocess.Popen(args="pkg-config --variable=%s xorg-server" % abis[name],
-                             shell=True, env=newenv, stdout=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-        output = stdout.decode("utf-8").split(".")[0]
-        mlprefix = d.getVar('MLPREFIX') or ''
-        return "%sxorg-abi-%s-%s" % (mlprefix, name, output)
-
-    pn = d.getVar("PN")
-    d.appendVar("RPROVIDES:" + pn, " " + get_abi("input"))
-    d.appendVar("RPROVIDES:" + pn, " " + get_abi("video"))
+python add_xorg_abi_depends() {
+    _add_xorg_abi_depends(d, "videodrv", d.expand("${MLPREFIX}xf86-video-modesetting"))
 }
 
-CVE_STATUS[CVE-2023-5574] = "${@bb.utils.contains('PACKAGECONFIG', 'xvfb', '', 'not-applicable-config: specific to Xvfb', d)}"
+PACKAGEFUNCS =+ "add_xorg_abi_provides add_xorg_abi_depends"
+
+CVE_STATUS[CVE-2023-5574] = "${@bb.utils.contains('PACKAGECONFIG', 'xvfb', 'unpatched', 'not-applicable-config: specific to Xvfb', d)}"

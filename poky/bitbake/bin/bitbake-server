@@ -38,9 +38,9 @@ if xmlrpcinterface[0] == "None":
 with open('/dev/null', 'r') as si:
     os.dup2(si.fileno(), sys.stdin.fileno())
 
-so = open(logfile, 'a+')
-os.dup2(so.fileno(), sys.stdout.fileno())
-os.dup2(so.fileno(), sys.stderr.fileno())
+with open(logfile, 'a+') as so:
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(so.fileno(), sys.stderr.fileno())
 
 # Have stdout and stderr be the same so log output matches chronologically
 # and there aren't two seperate buffers

@@ -1,0 +1,29 @@
+From ed20aba335996d3aa97d99dfc122eb5a3a26ba1b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Nov 2024 11:06:01 -0700
+Subject: [PATCH] ffi: Insert a replacable anchor for find_library
+
+@@REPLACE_FIND_LIBRARY_API@@ must be sustituted from bitbake environment via
+recipe. This also helps in detecting changes to code from upstream in
+this area as this patch will fail to apply.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libarchive/ffi.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libarchive/ffi.py b/libarchive/ffi.py
+index 1fc321a..991f1b6 100644
+--- a/libarchive/ffi.py
++++ b/libarchive/ffi.py
+@@ -22,7 +22,7 @@ logger = logging.getLogger('libarchive')
+ 
+ page_size = mmap.PAGESIZE
+ 
+-libarchive_path = os.environ.get('LIBARCHIVE') or find_library('archive')
++libarchive_path = os.environ.get('LIBARCHIVE') or @@REPLACE_FIND_LIBRARY_API@@
+ libarchive = ctypes.cdll.LoadLibrary(libarchive_path)
+ 
+ 

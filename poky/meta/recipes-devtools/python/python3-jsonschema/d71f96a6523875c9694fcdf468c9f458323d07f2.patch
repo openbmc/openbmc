@@ -1,0 +1,44 @@
+From d71f96a6523875c9694fcdf468c9f458323d07f2 Mon Sep 17 00:00:00 2001
+From: Julian Berman <Julian@GrayVines.com>
+Date: Thu, 17 Oct 2024 09:36:35 -0400
+Subject: [PATCH] Fix the annotation for validator_for's default.
+
+This still doesn't seem to satisfy mypy, so tell it to be quiet.
+
+Upstream-Status: Backport [https://github.com/python-jsonschema/jsonschema/commit/d71f96a6523875c9694fcdf468c9f458323d07f2]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ jsonschema/validators.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/jsonschema/validators.py b/jsonschema/validators.py
+index 85c39160..b8ca3bd4 100644
+--- a/jsonschema/validators.py
++++ b/jsonschema/validators.py
+@@ -857,7 +857,7 @@ def extend(
+     version="draft2020-12",
+ )
+ 
+-_LATEST_VERSION = Draft202012Validator
++_LATEST_VERSION: type[Validator] = Draft202012Validator
+ 
+ 
+ class _RefResolver:
+@@ -1334,7 +1334,7 @@ def validate(instance, schema, cls=None, *args, **kwargs):  # noqa: D417
+ 
+ def validator_for(
+     schema,
+-    default: Validator | _utils.Unset = _UNSET,
++    default: type[Validator] | _utils.Unset = _UNSET,
+ ) -> type[Validator]:
+     """
+     Retrieve the validator class appropriate for validating the given schema.
+@@ -1396,7 +1396,7 @@ class is returned:
+     DefaultValidator = _LATEST_VERSION if default is _UNSET else default
+ 
+     if schema is True or schema is False or "$schema" not in schema:
+-        return DefaultValidator
++        return DefaultValidator  # type: ignore[return-value]
+     if schema["$schema"] not in _META_SCHEMAS and default is _UNSET:
+         warn(
+             (

@@ -1,4 +1,4 @@
-From 5604707bed4b4a4bc4658c7158a18c1774775775 Mon Sep 17 00:00:00 2001
+From f917ef5579257007bc02850e79769fe5ec48b2b7 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Sat, 6 May 2023 12:18:50 +0100
 Subject: [PATCH] In autobuilder testing we regularly see glib-networking ptest
@@ -12,7 +12,7 @@ FAIL: glib-networking/connection-openssl.test (Child process killed by signal 6)
 
 The test should probably retry in this situation so test a patch which does this.
 
-Upstream-Status: Pending [testing to see if patch resolves the issue]
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib-networking/-/merge_requests/253]
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 ---

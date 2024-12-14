@@ -452,3 +452,15 @@ def compare_signatures(old_sigs, curr_sigs):
             msg.extend(['      ' + line for line in output.splitlines()])
             msg.append('')
     return '\n'.join(msg)
+
+
+def get_git_toplevel(directory):
+    """
+    Try and find the top of the git repository that directory might be in.
+    Returns the top-level directory, or None.
+    """
+    cmd = ["git", "-C", directory, "rev-parse", "--show-toplevel"]
+    try:
+        return subprocess.check_output(cmd, text=True).strip()
+    except:
+        return None

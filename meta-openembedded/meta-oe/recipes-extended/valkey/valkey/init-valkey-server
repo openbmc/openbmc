@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          valkey-server
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     S 2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Redis, a key-value store
+# Description:       Redis is an open source, advanced key-value store.
+#                    http://valkey.io
+### END INIT INFO
+
+test -f /usr/bin/valkey-server || exit 0
+
+ARGS="/etc/valkey/valkey.conf"
+
+case "$1" in
+    start)
+	echo "Starting valkey-server..."
+        start-stop-daemon --start --quiet --exec /usr/bin/valkey-server -- $ARGS
+	;;
+    stop)
+        echo "Stopping valkey-server..."
+        start-stop-daemon --stop --quiet --exec /usr/bin/valkey-server
+	;;
+    restart)
+        echo "Stopping valkey-server..."
+        start-stop-daemon --stop --quiet --exec /usr/bin/valkey-server
+
+        # Since busybox implementation ignores --retry arguments repeatedly check
+        # if the process is still running and try another signal after a timeout,
+        # efectively simulating a stop with --retry=TERM/5/KILL/5 schedule.
+        waitAfterTerm=5000000 # us / 5000 ms / 5 s
+        waitAfterKill=5000000 # us / 5000 ms / 5 s
+        waitStep=100000 # us / 100 ms / 0.1 s
+        waited=0
+        start-stop-daemon --stop --test --quiet --exec /usr/bin/valkey-server
+        processOff=$?
+        while [ $processOff -eq 0 ] && [ $waited -le $waitAfterTerm ] ; do
+            usleep ${waitStep}
+            ((waited+=${waitStep}))
+            start-stop-daemon --stop --test --quiet --exec /usr/bin/valkey-server
+            processOff=$?
+        done
+        if [ $processOff -eq 0 ] ; then
+            start-stop-daemon --stop --signal KILL --exec /usr/bin/valkey-server
+            start-stop-daemon --stop --test --quiet --exec /usr/bin/valkey-server
+            processOff=$?
+        fi
+        waited=0
+        while [ $processOff -eq 0 ] && [ $waited -le $waitAfterKill ] ; do
+            usleep ${waitStep}
+            ((waited+=${waitStep}))
+            start-stop-daemon --stop --test --quiet --exec /usr/bin/valkey-server
+            processOff=$?
+        done
+        # Here $processOff will indicate if waiting and retrying according to
+        # the schedule ended in a successfull stop or not.
+
+	echo "Starting valkey-server..."
+        start-stop-daemon --start --quiet --exec /usr/bin/valkey-server -- $ARGS
+	;;
+    *)
+	echo "Usage: /etc/init.d/valkey-server {start|stop|restart}"
+	exit 1
+	;;
+esac
+
+exit 0
+

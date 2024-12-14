@@ -133,7 +133,13 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
 
   function get_docroot_url() {
     var url = window.location.href;
+    // Try to get the variable from documentation_options.js
     var root = DOCUMENTATION_OPTIONS.URL_ROOT;
+    if (root == null) {
+      // In recent versions of Sphinx, URL_ROOT was removed from
+      // documentation_options.js, so get it like searchtools.js does.
+      root = document.documentElement.dataset.content_root;
+    }
 
     var urlarray = url.split('/');
     // Trim off anything after '/'

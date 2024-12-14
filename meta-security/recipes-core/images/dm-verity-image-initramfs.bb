@@ -9,7 +9,7 @@ PACKAGE_INSTALL = " \
     cryptsetup \
     initramfs-module-dmverity \
     initramfs-module-udev \
-    lvm2-udevrules \
+    lvm2 \
     udev \
     util-linux-mount \
 "

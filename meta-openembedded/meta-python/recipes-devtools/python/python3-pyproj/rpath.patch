@@ -1,0 +1,18 @@
+Description: Don't set RPATH in libraries.
+Author: Bas Couwenberg <sebastic@debian.org>
+Forwarded: not-needed
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/setup.py
++++ b/setup.py
+@@ -193,9 +193,6 @@ def get_extension_modules():
+     ext_options = {
+         "include_dirs": include_dirs,
+         "library_dirs": library_dirs,
+-        "runtime_library_dirs": (
+-            library_dirs if os.name != "nt" and sys.platform != "cygwin" else None
+-        ),
+         "libraries": get_libraries(library_dirs),
+     }
+     # setup cythonized modules

@@ -1,9 +1,9 @@
-From 1d192b60fc43e24e1c2d6ff452dabeee7a227cc0 Mon Sep 17 00:00:00 2001
+From df6c641e3fc248d0c864e4e752c4609412067df7 Mon Sep 17 00:00:00 2001
 From: sweeaun <swee.aun.khor@intel.com>
 Date: Sun, 10 Sep 2017 00:14:15 -0700
 Subject: [PATCH] dpkg: Support muslx32 build
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 Changes made on ostable and tupletable to enable muslx32 build.
 
 Signed-off-by: sweeaun <swee.aun.khor@intel.com>

@@ -97,6 +97,11 @@ EXTRA_OECMAKE = " \
                 "
 
 PACKAGECONFIG ??= "civetweb libarchive rocksdb expression-language"
+
+# rocksdb is not compatible with libc-musl:powerpc & armv5
+PACKAGECONFIG:remove:libc-musl:powerpc = "rocksdb"
+PACKAGECONFIG:remove:armv5 = "rocksdb"
+
 PACKAGECONFIG[civetweb] = "-DDISABLE_CIVET=OFF,-DDISABLE_CIVET=ON"
 PACKAGECONFIG[openwsman] = "-DENABLE_OPENWSMAN=ON,-DENABLE_OPENWSMAN=OFF,libxml2"
 PACKAGECONFIG[libarchive] = "-DDISABLE_LIBARCHIVE=OFF,-DDISABLE_LIBARCHIVE=ON,libarchive"

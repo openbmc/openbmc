@@ -9,12 +9,12 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import sys
-import os
-import unittest
-import logging
-import traceback
 import json
+import logging
+import os
+import sys
+import traceback
+import unittest
 
 # Include current path so test cases can see it
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
@@ -22,15 +22,16 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 # Include patchtest library
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '../meta/lib/patchtest'))
 
-from data import PatchTestInput
+from patchtest_parser import PatchtestParser
 from repo import PatchTestRepo
 
-import utils
-logger = utils.logger_create('patchtest')
+logger = logging.getLogger("patchtest")
+loggerhandler = logging.StreamHandler()
+loggerhandler.setFormatter(logging.Formatter("%(message)s"))
+logger.addHandler(loggerhandler)
+logger.setLevel(logging.INFO)
 info = logger.info
 error = logger.error
-
-import repo
 
 def getResult(patch, mergepatch, logfile=None):
 
@@ -46,10 +47,10 @@ def getResult(patch, mergepatch, logfile=None):
         def startTestRun(self):
             # let's create the repo already, it can be used later on
             repoargs = {
-                'repodir': PatchTestInput.repodir,
-                'commit' : PatchTestInput.basecommit,
-                'branch' : PatchTestInput.basebranch,
-                'patch'  : patch,
+                "repodir": PatchtestParser.repodir,
+                "commit": PatchtestParser.basecommit,
+                "branch": PatchtestParser.basebranch,
+                "patch": patch,
             }
 
             self.repo_error    = False
@@ -57,7 +58,7 @@ def getResult(patch, mergepatch, logfile=None):
             self.test_failure  = False
 
             try:
-                self.repo = PatchTestInput.repo = PatchTestRepo(**repoargs)
+                self.repo = PatchtestParser.repo = PatchTestRepo(**repoargs)
             except:
                 logger.error(traceback.print_exc())
                 self.repo_error = True
@@ -128,7 +129,11 @@ def _runner(resultklass, prefix=None):
         loader.testMethodPrefix = prefix
 
     # create the suite with discovered tests and the corresponding runner
-    suite = loader.discover(start_dir=PatchTestInput.testdir, pattern=PatchTestInput.pattern, top_level_dir=PatchTestInput.topdir)
+    suite = loader.discover(
+        start_dir=PatchtestParser.testdir,
+        pattern=PatchtestParser.pattern,
+        top_level_dir=PatchtestParser.topdir,
+    )
     ntc = suite.countTestCases()
 
     # if there are no test cases, just quit
@@ -160,24 +165,31 @@ def run(patch, logfile=None):
     postmerge_resultklass = getResult(patch, True, logfile)
     postmerge_result = _runner(postmerge_resultklass, 'test')
 
-    print('----------------------------------------------------------------------\n')
-    if premerge_result == 2 and postmerge_result == 2:
-        logger.error('patchtest: No test cases found - did you specify the correct suite directory?')
-    if premerge_result == 1 or postmerge_result == 1:
-        logger.error('WARNING: patchtest: At least one patchtest caused a failure or an error - please check https://wiki.yoctoproject.org/wiki/Patchtest for further guidance')
-    else:
-        logger.info('OK: patchtest: All patchtests passed')
-    print('----------------------------------------------------------------------\n')
+    print_result_message(premerge_result, postmerge_result)
     return premerge_result or postmerge_result
+
+def print_result_message(preresult, postresult):
+    print("----------------------------------------------------------------------\n")
+    if preresult == 2 and postresult == 2:
+        logger.error(
+            "patchtest: No test cases found - did you specify the correct suite directory?"
+        )
+    if preresult == 1 or postresult == 1:
+        logger.error(
+            "WARNING: patchtest: At least one patchtest caused a failure or an error - please check https://wiki.yoctoproject.org/wiki/Patchtest for further guidance"
+        )
+    else:
+        logger.info("OK: patchtest: All patchtests passed")
+    print("----------------------------------------------------------------------\n")
 
 def main():
     tmp_patch = False
-    patch_path = PatchTestInput.patch_path
-    log_results = PatchTestInput.log_results
+    patch_path = PatchtestParser.patch_path
+    log_results = PatchtestParser.log_results
     log_path = None
     patch_list = None
 
-    git_status = os.popen("(cd %s && git status)" % PatchTestInput.repodir).read()
+    git_status = os.popen("(cd %s && git status)" % PatchtestParser.repodir).read()
     status_matches = ["Changes not staged for commit", "Changes to be committed"]
     if any([match in git_status for match in status_matches]):
         logger.error("patchtest: there are uncommitted changes in the target repo that would be overwritten. Please commit or restore them before running patchtest")
@@ -212,16 +224,16 @@ def main():
 if __name__ == '__main__':
     ret = 1
 
-    # Parse the command line arguments and store it on the PatchTestInput namespace
-    PatchTestInput.set_namespace()
+    # Parse the command line arguments and store it on the PatchtestParser namespace
+    PatchtestParser.set_namespace()
 
     # set debugging level
-    if PatchTestInput.debug:
+    if PatchtestParser.debug:
         logger.setLevel(logging.DEBUG)
 
     # if topdir not define, default it to testdir
-    if not PatchTestInput.topdir:
-        PatchTestInput.topdir = PatchTestInput.testdir
+    if not PatchtestParser.topdir:
+        PatchtestParser.topdir = PatchtestParser.testdir
 
     try:
         ret = main()

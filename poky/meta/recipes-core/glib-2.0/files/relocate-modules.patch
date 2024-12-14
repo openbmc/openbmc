@@ -1,4 +1,4 @@
-From 0133aeabd37a9137722abd86039d7d0797b5896f Mon Sep 17 00:00:00 2001
+From afe2c1e5854102c0e75f9e70a6569c9f2b6360d8 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Fri, 11 Mar 2016 15:35:55 +0000
 Subject: [PATCH] glib-2.0: relocate the GIO module directory for native builds
@@ -18,10 +18,10 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  1 file changed, 7 deletions(-)
 
 diff --git a/gio/giomodule.c b/gio/giomodule.c
-index 1e14955..3c09bb5 100644
+index aa6272f..26aebf7 100644
 --- a/gio/giomodule.c
 +++ b/gio/giomodule.c
-@@ -1259,11 +1259,6 @@ get_gio_module_dir (void)
+@@ -1263,11 +1263,6 @@ get_gio_module_dir (void)
        g_free (install_dir);
  #else
        module_dir = g_strdup (GIO_MODULE_DIR);
@@ -33,7 +33,7 @@ index 1e14955..3c09bb5 100644
  #include <dlfcn.h>
        {
          g_autofree gchar *path = NULL;
-@@ -1282,8 +1277,6 @@ get_gio_module_dir (void)
+@@ -1286,8 +1281,6 @@ get_gio_module_dir (void)
                }
            }
        }

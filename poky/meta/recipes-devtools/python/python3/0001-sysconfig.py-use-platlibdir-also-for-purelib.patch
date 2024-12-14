@@ -1,4 +1,4 @@
-From a5d429a0e1a4809c1ded7be7e45dcabeb82c53d8 Mon Sep 17 00:00:00 2001
+From bbcb17dc1ed283f41c8cd94d39f70898f0c45583 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sun, 12 Sep 2021 21:44:36 +0200
 Subject: [PATCH] sysconfig.py: use platlibdir also for purelib
@@ -8,21 +8,20 @@ is not correct.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
-
 ---
- Lib/sysconfig.py | 2 +-
+ Lib/sysconfig/__init__.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 122d441..79c0510 100644
---- a/Lib/sysconfig.py
-+++ b/Lib/sysconfig.py
-@@ -28,7 +28,7 @@ _INSTALL_SCHEMES = {
+diff --git a/Lib/sysconfig/__init__.py b/Lib/sysconfig/__init__.py
+index 80aef34..f8e1c7d 100644
+--- a/Lib/sysconfig/__init__.py
++++ b/Lib/sysconfig/__init__.py
+@@ -29,7 +29,7 @@ _INSTALL_SCHEMES = {
      'posix_prefix': {
-         'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
-         'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
--        'purelib': '{base}/lib/python{py_version_short}/site-packages',
-+        'purelib': '{base}/{platlibdir}/python{py_version_short}/site-packages',
-         'platlib': '{platbase}/{platlibdir}/python{py_version_short}/site-packages',
+         'stdlib': '{installed_base}/{platlibdir}/{implementation_lower}{py_version_short}{abi_thread}',
+         'platstdlib': '{platbase}/{platlibdir}/{implementation_lower}{py_version_short}{abi_thread}',
+-        'purelib': '{base}/lib/{implementation_lower}{py_version_short}{abi_thread}/site-packages',
++        'purelib': '{base}/{platlibdir}/{implementation_lower}{py_version_short}{abi_thread}/site-packages',
+         'platlib': '{platbase}/{platlibdir}/{implementation_lower}{py_version_short}{abi_thread}/site-packages',
          'include':
-             '{installed_base}/include/python{py_version_short}{abiflags}',
+             '{installed_base}/include/{implementation_lower}{py_version_short}{abiflags}',

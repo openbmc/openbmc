@@ -1,4 +1,4 @@
-From 671618df3e48619f0c7a5a3acd8982374a5e43db Mon Sep 17 00:00:00 2001
+From f84421d8ee06890e2c98c0f7c9ec6c73f88e77c3 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 12 Feb 2023 21:25:04 -0800
 Subject: [PATCH] zlib: Include unistd.h for open/close C APIs

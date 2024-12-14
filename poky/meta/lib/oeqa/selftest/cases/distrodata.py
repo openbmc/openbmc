@@ -20,10 +20,10 @@ class Distrodata(OESelftestTestCase):
         feature = 'LICENSE_FLAGS_ACCEPTED += " commercial"\n'
         self.write_config(feature)
 
-        pkgs = oe.recipeutils.get_recipe_upgrade_status()
+        pkggroups = oe.recipeutils.get_recipe_upgrade_status()
 
-        regressed_failures = [pkg[0] for pkg in pkgs if pkg[1] == 'UNKNOWN_BROKEN']
-        regressed_successes = [pkg[0] for pkg in pkgs if pkg[1] == 'KNOWN_BROKEN']
+        regressed_failures = [pkg['pn'] for pkgs in pkggroups for pkg in pkgs if pkg['status'] == 'UNKNOWN_BROKEN']
+        regressed_successes = [pkg['pn'] for pkgs in pkggroups for pkg in pkgs if pkg['status'] == 'KNOWN_BROKEN']
         msg = ""
         if len(regressed_failures) > 0:
             msg = msg + """
@@ -55,8 +55,8 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
             return False
 
         def is_maintainer_exception(entry):
-            exceptions = ["musl", "newlib", "linux-yocto", "linux-dummy", "mesa-gl", "libgfortran", "libx11-compose-data",
-                          "cve-update-nvd2-native",]
+            exceptions = ["musl", "newlib", "picolibc", "linux-yocto", "linux-dummy", "mesa-gl", "libgfortran", "libx11-compose-data",
+                          "cve-update-nvd2-native", "barebox"]
             for i in exceptions:
                  if i in entry:
                      return True
@@ -115,3 +115,15 @@ The list of oe-core recipes with maintainers is empty. This may indicate that th
                 self.fail("""
 Unable to find recipes for the following entries in maintainers.inc:
 """ + "\n".join(['%s' % i for i in missing_recipes]))
+
+    def test_common_include_recipes(self):
+        """
+        Summary:     Test that obtaining recipes that share includes between them returns a sane result
+        Expected:    At least cmake and qemu entries are present in the output
+        Product:     oe-core
+        Author:      Alexander Kanavin <alex.kanavin@gmail.com>
+        """
+        recipes = oe.recipeutils.get_common_include_recipes()
+
+        self.assertIn({'qemu-system-native', 'qemu', 'qemu-native'}, recipes)
+        self.assertIn({'cmake-native', 'cmake'}, recipes)

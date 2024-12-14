@@ -1,7 +1,7 @@
-From 49d0b0279f54ceb96878e8e72e828efbb84a534c Mon Sep 17 00:00:00 2001
+From 9f1075f82ecd39a9960f868eef890baf2ba36d4e Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Fri, 1 Mar 2024 11:45:10 +0800
-Subject: [PATCH 07/12] RH: warn on invalid regex instead of failing
+Subject: [PATCH] RH: warn on invalid regex instead of failing
 
 multipath.conf used to allow "*" as a match everything regular expression,
 instead of requiring ".*". Instead of erroring when the old style
@@ -23,7 +23,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 34 insertions(+), 6 deletions(-)
 
 diff --git a/libmultipath/dict.c b/libmultipath/dict.c
-index 5af036b7..e494419d 100644
+index a06a6138..a734ba9b 100644
 --- a/libmultipath/dict.c
 +++ b/libmultipath/dict.c
 @@ -189,6 +189,34 @@ set_str_noslash(vector strvec, void *ptr, const char *file, int line_nr)
@@ -61,7 +61,7 @@ index 5af036b7..e494419d 100644
  static int
  set_yes_no(vector strvec, void *ptr, const char *file, int line_nr)
  {
-@@ -1798,7 +1826,7 @@ ble_ ## option ## _handler (struct config *conf, vector strvec,		\
+@@ -1854,7 +1882,7 @@ ble_ ## option ## _handler (struct config *conf, vector strvec,		\
  	if (!conf->option)						\
  		return 1;						\
  									\
@@ -70,7 +70,7 @@ index 5af036b7..e494419d 100644
  	if (!buff)							\
  		return 1;						\
  									\
-@@ -1818,7 +1846,7 @@ ble_ ## option ## _ ## name ## _handler (struct config *conf, vector strvec, \
+@@ -1874,7 +1902,7 @@ ble_ ## option ## _ ## name ## _handler (struct config *conf, vector strvec, \
  	if (!conf->option)						\
  		return 1;						\
  									\
@@ -79,7 +79,7 @@ index 5af036b7..e494419d 100644
  	if (!buff)							\
  		return 1;						\
  									\
-@@ -1924,16 +1952,16 @@ device_handler(struct config *conf, vector strvec, const char *file,
+@@ -1980,16 +2008,16 @@ device_handler(struct config *conf, vector strvec, const char *file,
  	return 0;
  }
  

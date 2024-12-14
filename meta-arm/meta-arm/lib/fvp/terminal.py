@@ -53,7 +53,7 @@ class Terminals:
 terminals = Terminals()
 # TODO: option to switch between telnet and netcat
 connect_command = "telnet localhost %port"
-terminals.add_terminal(2, "tmux", f"tmux new-window -n \"%title\" \"{connect_command}\"")
-terminals.add_terminal(2, "gnome-terminal", f"gnome-terminal --window --title \"%title\" --command \"{connect_command}\"")
-terminals.add_terminal(1, "xterm", f"xterm -title \"%title\" -e {connect_command}")
+terminals.add_terminal(2, "tmux", f"tmux new-window -n \"{{name}} - %title\" \"{connect_command}\"")
+terminals.add_terminal(2, "gnome-terminal", f"gnome-terminal --window --title \"{{name}} - %title\" --command \"{connect_command}\"")
+terminals.add_terminal(1, "xterm", f"xterm -title \"{{name}} - %title\" -e {connect_command}")
 terminals.add_terminal(0, "none", None)

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cd tests
+for atest in tomlplusplus_* ; do
+    rm -rf tests.log
+    ./${atest} > tests.log 2>&1
+    if [ $? = 0 ] ; then
+        echo "PASS: ${atest}"
+    else
+        echo "FAIL: ${atest}"
+    fi
+done

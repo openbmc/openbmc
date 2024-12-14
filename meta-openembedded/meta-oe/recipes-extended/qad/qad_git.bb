@@ -14,6 +14,9 @@ SRC_URI = "git://gitlab.com/CodethinkLabs/qad/qad;branch=main;protocol=https \
 
 SRCREV = "ae0c099c1fdc0ca6f5d631cea6b302937122b362"
 
+# Upstream repo does not tag
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 PV = "0.0+git"
 

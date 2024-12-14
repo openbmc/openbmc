@@ -1,4 +1,4 @@
-From f01d9c24bb86bc47ad2453483518dbb25953cac7 Mon Sep 17 00:00:00 2001
+From 452b696ea3e1975ea30cf7a92678aa4b316e6300 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 10 Jan 2019 18:14:18 +0100
 Subject: [PATCH] rpmscript.c: change logging level around scriptlets to INFO
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/lib/rpmscript.c b/lib/rpmscript.c
-index 7b7e26606..1dcd23be5 100644
+index 4dc6466a8..6d3c19d01 100644
 --- a/lib/rpmscript.c
 +++ b/lib/rpmscript.c
-@@ -291,7 +291,7 @@ static char * writeScript(const char *cmd, const char *script)
+@@ -290,7 +290,7 @@ static char * writeScript(const char *cmd, const char *script)
      if (Ferror(fd))
  	goto exit;
  
@@ -26,7 +26,7 @@ index 7b7e26606..1dcd23be5 100644
  	static const char set_x[] = "set -x\n";
  	/* Assume failures will be caught by the write below */
  	Fwrite(set_x, sizeof(set_x[0]), sizeof(set_x)-1, fd);
-@@ -323,7 +323,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+@@ -322,7 +322,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
      char *mline = NULL;
      rpmRC rc = RPMRC_FAIL;
  
@@ -35,7 +35,7 @@ index 7b7e26606..1dcd23be5 100644
  
      if (script) {
  	fn = writeScript(*argvp[0], script);
-@@ -375,7 +375,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+@@ -374,7 +374,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
  		sname, strerror(errno));
  	goto exit;
      } else if (pid == 0) {/* Child */
@@ -44,7 +44,7 @@ index 7b7e26606..1dcd23be5 100644
  	       sname, *argvp[0], (unsigned)getpid());
  
  	fclose(in);
-@@ -418,7 +418,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
+@@ -417,7 +417,7 @@ static rpmRC runExtScript(rpmPlugins plugins, ARGV_const_t prefixes,
  	reaped = waitpid(pid, &status, 0);
      } while (reaped == -1 && errno == EINTR);
  

@@ -8,9 +8,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c4d720cdc9c6953091f65e8b01524bb4"
 SRC_URI += "file://0001-cython-Use-cythyon3-in-cmake-check.patch"
 SRC_URI[sha256sum] = "27f4de0ca2d2bce391ce87eaab84fe6f0bc059b306fd1702d5fe6549b66e1586"
 
-inherit cmake pkgconfig pypi python3native
+inherit cmake pkgconfig pypi python3native cython
 
-DEPENDS += "swig-native python3-cython-native python3-scikit-build-native gstreamer1.0 gstreamer1.0-plugins-base"
+DEPENDS += "swig-native python3-scikit-build-native gstreamer1.0 gstreamer1.0-plugins-base"
 
 EXTRA_OECMAKE += "-DBUILD_GSTREAMER=ON"
 

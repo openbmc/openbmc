@@ -153,7 +153,7 @@ index c883e2ff0a..c6ab6e2182 100644
 +	       return EFI_EXIT(ret);
 +
 +	image_info_version_size_var -= image_info_name_size_var;
-+	image_info->image_id_name = runner;
++	image_info->image_id_name = (u16*)runner;
 +	runner += image_info_name_size_var;
 +
 +        /* Consider changing the string modfication logic */
@@ -164,7 +164,7 @@ index c883e2ff0a..c6ab6e2182 100644
 +	if (ret != EFI_SUCCESS)
 +	        return EFI_EXIT(ret);
 +
-+	image_info->version_name = runner;
++	image_info->version_name = (u16*)runner;
 +
 +	*image_info_size = image_info_size_var;
 +

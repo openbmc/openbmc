@@ -1,0 +1,26 @@
+From c183aae97728e25e0822b14f5093f60cb4331207 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 12 Oct 2024 10:48:01 -0700
+Subject: [PATCH] gstd: Remove redundant rpaths
+
+This emits /usr/lib into binaries which are redundant
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gstd/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gstd/meson.build b/gstd/meson.build
+index b6aa588..8cdf810 100644
+--- a/gstd/meson.build
++++ b/gstd/meson.build
+@@ -18,7 +18,7 @@ executable(exe_name,
+   include_directories : [configinc, libgstd_inc_dir],
+   dependencies : [gstd_deps, lib_gstd_dep],
+   c_args: gst_c_args,
+-  install_rpath: get_option('prefix') + '/' + get_option('libdir'),
++  #install_rpath: get_option('prefix') + '/' + get_option('libdir'),
+ )
+ lib_gstd_dir = meson.current_build_dir()
+ 

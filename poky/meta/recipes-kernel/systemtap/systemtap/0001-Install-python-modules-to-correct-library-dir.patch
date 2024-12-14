@@ -1,4 +1,4 @@
-From 2ada22f05460223924efe54080cb4419e2b4c276 Mon Sep 17 00:00:00 2001
+From 18d088d10c1a0885fa25ac40591e38c8aa545c81 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 24 Feb 2017 17:53:02 +0200
 Subject: [PATCH] Install python modules to correct library dir.
@@ -19,7 +19,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/python/Makefile.am b/python/Makefile.am
-index a254480..578602f 100644
+index 13618dc2f..9d5cb7bcb 100644
 --- a/python/Makefile.am
 +++ b/python/Makefile.am
 @@ -8,6 +8,10 @@ AUTOMAKE_OPTIONS = subdir-objects
@@ -35,7 +35,7 @@ index a254480..578602f 100644
  pkglibexecpython_PYTHON =
 @@ -47,7 +51,7 @@ install-exec-local:
  if HAVE_PYTHON2_PROBES
- 	(cd $(srcdir); CFLAGS="$(AM_CPPFLAGS)" $(PYTHON) setup.py build \
+ 	(cd $(srcdir); CFLAGS="$(CFLAGS) $(AM_CPPFLAGS)" $(PYTHON) setup.py build \
           --build-base $(shell readlink -f $(builddir))/py2build \
 -	 install --prefix $(DESTDIR)$(prefix) \
 +	 install --root $(DESTDIR) --prefix $(prefix) --prefix $(prefix) --install-lib=${pythondir} \
@@ -44,13 +44,10 @@ index a254480..578602f 100644
           --verbose)
 @@ -55,7 +59,7 @@ endif
  if HAVE_PYTHON3_PROBES
- 	(cd $(srcdir); CFLAGS="$(AM_CPPFLAGS)" $(PYTHON3) setup.py build \
+ 	(cd $(srcdir); CFLAGS="$(CFLAGS) $(AM_CPPFLAGS)" $(PYTHON3) setup.py build \
           --build-base $(shell readlink -f $(builddir))/py3build \
 -	 install --prefix $(DESTDIR)$(prefix) \
 +	 install --root $(DESTDIR) --prefix $(prefix) --install-lib=${python3dir} \
  	 --single-version-externally-managed \
  	 --record $(shell readlink -f $(builddir))/py3build/install_files.txt \
           --verbose)
--- 
-2.7.4
-

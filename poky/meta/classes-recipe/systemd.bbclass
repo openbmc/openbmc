@@ -208,33 +208,28 @@ python systemd_populate_packages() {
 
 PACKAGESPLITFUNCS =+ "systemd_populate_packages"
 
-python rm_systemd_unitdir (){
-    import shutil
-    if not bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
-        systemd_unitdir = oe.path.join(d.getVar("D"), d.getVar('systemd_unitdir'))
-        if os.path.exists(systemd_unitdir):
-            shutil.rmtree(systemd_unitdir)
-        systemd_libdir = os.path.dirname(systemd_unitdir)
-        if (os.path.exists(systemd_libdir) and not os.listdir(systemd_libdir)):
-            os.rmdir(systemd_libdir)
+rm_systemd_unitdir() {
+	rm -rf ${D}${systemd_unitdir}
+	# Change into ${D} and use a relative path with rmdir -p to avoid
+	# having it remove ${D} if it becomes empty.
+	(cd ${D} && rmdir -p $(dirname ${systemd_unitdir#/}) 2>/dev/null || :)
 }
 
-python rm_sysvinit_initddir (){
-    import shutil
-    sysv_initddir = oe.path.join(d.getVar("D"), (d.getVar('INIT_D_DIR') or "/etc/init.d"))
+rm_sysvinit_initddir() {
+	local sysv_initddir=${INIT_D_DIR}
+	: ${sysv_initddir:=${sysconfdir}/init.d}
 
-    if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d) and \
-        not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d) and \
-        os.path.exists(sysv_initddir):
-        systemd_system_unitdir = oe.path.join(d.getVar("D"), d.getVar('systemd_system_unitdir'))
-
-        # If systemd_system_unitdir contains anything, delete sysv_initddir
-        if (os.path.exists(systemd_system_unitdir) and os.listdir(systemd_system_unitdir)):
-            shutil.rmtree(sysv_initddir)
+	# If systemd_system_unitdir contains anything, delete sysv_initddir
+	if [ "$(ls -A ${D}${systemd_system_unitdir} 2>/dev/null)" ]; then
+		rm -rf ${D}$sysv_initddir
+		rmdir -p $(dirname ${D}$sysv_initddir) 2>/dev/null || :
+	fi
 }
 
-do_install[postfuncs] += "${RMINITDIR} "
-RMINITDIR:class-target = " rm_sysvinit_initddir rm_systemd_unitdir "
-RMINITDIR:class-nativesdk = " rm_sysvinit_initddir rm_systemd_unitdir "
-RMINITDIR = ""
-
+do_install[postfuncs] += "${RMINITDIR}"
+RMINITDIR = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'rm_systemd_unitdir', d)} \
+    ${@'rm_sysvinit_initddir' if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d) and \
+                                 not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d) else ''} \
+"
+RMINITDIR:class-native = ""

@@ -1,4 +1,4 @@
-From 544d23dea91b2be793c805b9e4bce8cd1d28121f Mon Sep 17 00:00:00 2001
+From c22fc168dd00cdabcf24a54b4d9383a3f1a7b313 Mon Sep 17 00:00:00 2001
 From: Jason Wessel <jason.wessel@windriver.com>
 Date: Sat, 7 Dec 2019 09:59:22 -0800
 Subject: [PATCH] localedef: Add hardlink resolver from util-linux

@@ -25,6 +25,7 @@ PTESTS_FAST_META_NETWORKING = "\
 #    firewalld
 PTESTS_SLOW_META_NETWORKING = "\
     net-snmp \
+    openvpn \
 "
 
 PTESTS_PROBLEMS_META_NETWORKING = "\

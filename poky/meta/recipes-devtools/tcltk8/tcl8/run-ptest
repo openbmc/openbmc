@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# clock.test needs a timezone to be set
+export TZ="Europe/London"
+export TCL_LIBRARY=library
+export ERROR_ON_FAILURES=1
+
+# Some tests are overly strict with timings and fail on loaded systems.
+SKIP=""
+# 15321
+SKIP="$SKIP async-\* event-\*"
+# 14882
+SKIP="$SKIP cmdMZ-6.6"
+# 15081
+SKIP="$SKIP exit-1.\*"
+# 15407 15421
+SKIP="$SKIP \*io-46.1"
+# io-13.6 explicitly says it can fail on slow/loaded machines
+SKIP="$SKIP io-13.6"
+# 14825
+SKIP="$SKIP socket-\* socket_inet-\*"
+
+for i in tests/*.test; do
+    i=$(basename $i)
+    ./tcltest tests/all.tcl -file $i -skip "$SKIP"
+    if [ $? -eq 0 ]; then
+        echo "PASS: $i"
+    else
+        echo "FAIL: $i"
+    fi
+done

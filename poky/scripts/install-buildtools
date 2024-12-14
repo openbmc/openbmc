@@ -57,8 +57,8 @@ logger = scriptutils.logger_create(PROGNAME, stream=sys.stdout)
 
 DEFAULT_INSTALL_DIR = os.path.join(os.path.split(scripts_path)[0],'buildtools')
 DEFAULT_BASE_URL = 'https://downloads.yoctoproject.org/releases/yocto'
-DEFAULT_RELEASE = 'yocto-5.0.1'
-DEFAULT_INSTALLER_VERSION = '5.0.1'
+DEFAULT_RELEASE = 'yocto-5.1.1'
+DEFAULT_INSTALLER_VERSION = '5.1.1'
 DEFAULT_BUILDDATE = '202110XX'
 
 # Python version sanity check
@@ -127,7 +127,8 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Buildtools installation helper",
-        add_help=False)
+        add_help=False,
+        formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-u', '--url',
                         help='URL from where to fetch buildtools SDK installer, not '
                              'including filename (optional)\n'

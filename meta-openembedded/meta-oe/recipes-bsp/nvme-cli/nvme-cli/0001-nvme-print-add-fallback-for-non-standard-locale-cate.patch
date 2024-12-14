@@ -1,0 +1,39 @@
+From 9444ce03a27b8d423f8170cf75f56d48d8a0a659 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20N=C3=A9ri?= <dne+commits@rb67.eu>
+Date: Mon, 11 Nov 2024 23:06:03 +0100
+Subject: [PATCH] nvme-print: add fallback for non-standard locale category
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+LC_MEASUREMENT is a GNU (libc) extension - fall back to LC_ALL if it's
+not defined.
+
+Fixes build with musl libc
+
+Signed-off-by: Daniel Néri <dne+commits@rb67.eu>
+
+Upstream-Status: Backport [https://github.com/linux-nvme/nvme-cli/commit/9444ce03a27b8d423f8170cf75f56d48d8a0a659]
+Signed-off-by: Ryosuke Saito <ryosuke.saito@linaro.org>
+---
+ nvme-print.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/nvme-print.c b/nvme-print.c
+index 170e5c12fb22..5b1f2e827aef 100644
+--- a/nvme-print.c
++++ b/nvme-print.c
+@@ -797,6 +797,10 @@ static bool is_fahrenheit_country(const char *country)
+ 	return false;
+ }
+ 
++#ifndef LC_MEASUREMENT
++#define LC_MEASUREMENT LC_ALL
++#endif
++
+ static bool is_temperature_fahrenheit(void)
+ {
+ 	const char *locale, *underscore;
+-- 
+2.47.0
+

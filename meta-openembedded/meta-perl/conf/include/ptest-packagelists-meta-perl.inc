@@ -21,6 +21,7 @@ PTESTS_FAST_META_PERL = "\
     libterm-readkey-perl \
     libtest-nowarnings-perl \
     libtext-diff-perl \
+    liburi-perl \
 "
 
 PTESTS_SLOW_META_PERL = "\

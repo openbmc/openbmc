@@ -20,7 +20,6 @@ SRC_URI = "http://fallabs.com/tokyocabinet/${BP}.tar.gz \
            file://0001-configure-Fix-check-functions-for-AC_CHECK_LIB-test.patch \
 "
 
-SRC_URI[md5sum] = "fd03df6965f8f56dd5b8518ca43b4f5e"
 SRC_URI[sha256sum] = "a003f47c39a91e22d76bc4fe68b9b3de0f38851b160bbb1ca07a4f6441de1f90"
 
 DEPENDS = "bzip2 zlib"

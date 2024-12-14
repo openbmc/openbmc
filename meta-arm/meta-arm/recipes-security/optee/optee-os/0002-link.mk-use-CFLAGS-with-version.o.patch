@@ -1,0 +1,45 @@
+From f9207376ed58836bf748cc4cea0fcbf46624a709 Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@linaro.org>
+Date: Thu, 1 Aug 2024 14:03:11 +0000
+Subject: [PATCH 2/3] link.mk: use CFLAGS with version.o
+
+Should be used by all compilations.
+
+Reviewed-by: Jerome Forissier <jerome.forissier@linaro.org>
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+---
+ core/arch/arm/kernel/link.mk   | 2 +-
+ core/arch/riscv/kernel/link.mk | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+Upstream-Status: Backport
+
+diff --git a/core/arch/arm/kernel/link.mk b/core/arch/arm/kernel/link.mk
+index 49e9f4fa1..377a82b65 100644
+--- a/core/arch/arm/kernel/link.mk
++++ b/core/arch/arm/kernel/link.mk
+@@ -151,7 +151,7 @@ define update-buildcount
+ endef
+ 
+ # filter-out to workaround objdump warning
+-version-o-cflags = $(filter-out -g3,$(core-platform-cflags) \
++version-o-cflags = $(filter-out -g3,$(CFLAGS) $(core-platform-cflags) \
+ 			$(platform-cflags) $(cflagscore))
+ # SOURCE_DATE_EPOCH defined for reproducible builds
+ ifneq ($(SOURCE_DATE_EPOCH),)
+diff --git a/core/arch/riscv/kernel/link.mk b/core/arch/riscv/kernel/link.mk
+index 3d1000d15..1fff0a379 100644
+--- a/core/arch/riscv/kernel/link.mk
++++ b/core/arch/riscv/kernel/link.mk
+@@ -62,7 +62,7 @@ define update-buildcount
+ endef
+ 
+ # filter-out to workaround objdump warning
+-version-o-cflags = $(filter-out -g3,$(core-platform-cflags) \
++version-o-cflags = $(filter-out -g3,$(CFLAGS) $(core-platform-cflags) \
+ 			$(platform-cflags) $(cflagscore))
+ # SOURCE_DATE_EPOCH defined for reproducible builds
+ ifneq ($(SOURCE_DATE_EPOCH),)
+-- 
+2.34.1
+

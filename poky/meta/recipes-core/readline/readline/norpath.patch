@@ -6,11 +6,17 @@ Upstream-Status: Inappropriate
 
 RP 2012/2/23
 
-Index: readline-6.2/support/shobj-conf
-===================================================================
---- readline-6.2.orig/support/shobj-conf	2012-02-23 11:06:37.193179379 +0000
-+++ readline-6.2/support/shobj-conf	2012-02-23 11:06:50.049178918 +0000
-@@ -114,7 +114,7 @@
+Rebase to 8.2.13
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ support/shobj-conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/support/shobj-conf b/support/shobj-conf
+index cd7634d..029123a 100644
+--- a/support/shobj-conf
++++ b/support/shobj-conf
+@@ -128,7 +128,7 @@ linux*-*|gnu*-*|k*bsd*-gnu-*|midnightbsd*|freebsd*|dragonfly*)
  	SHOBJ_LD='${CC}'
  	SHOBJ_LDFLAGS='-shared -Wl,-soname,$@'
  
@@ -19,3 +25,6 @@ Index: readline-6.2/support/shobj-conf
  	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)$(SHLIB_MINOR)'
  	;;
  
+-- 
+2.27.0
+

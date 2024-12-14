@@ -3,40 +3,35 @@
 ## Introduction
 
 Patchtest is a test framework for community patches based on the standard
-unittest python module. As input, it needs tree elements to work properly:
-a patch in mbox format (either created with `git format-patch` or fetched
-from 'patchwork'), a test suite and a target repository.
+unittest python module. As input, it needs three elements to work properly:
+
+- a patch in mbox format (either created with `git format-patch` or fetched
+from 'patchwork')
+- a test suite
+- a target repository
 
 The first test suite intended to be used with patchtest is found in the
-openembedded-core repository [1] targeted for patches that get into the
+openembedded-core repository [1], targeted for patches that get into the
 openembedded-core mailing list [2]. This suite is also intended as a
 baseline for development of similar suites for other layers as needed.
 
-Patchtest can either run on a host or a guest machine, depending on which
-environment the execution needs to be done. If you plan to test your own patches
-(a good practice before these are sent to the mailing list), the easiest way is
-to install and execute on your local host; in the other hand, if automatic
-testing is intended, the guest method is strongly recommended. The guest
-method requires the use of the patchtest layer, in addition to the tools
-available in oe-core: https://git.yoctoproject.org/patchtest/
+Patchtest can either run on a host or a guest machine, depending on
+which environment you prefer. If you plan to test your own patches (a
+good practice before these are sent to the mailing list), the easiest
+way is to install and execute on your local host; in the other hand, if
+automatic testing is intended, the guest method is strongly recommended.
+The guest method requires the use of the patchtest layer, in addition to
+the tools available in oe-core: https://git.yoctoproject.org/patchtest/
 
 ## Installation
 
-As a tool for use with the Yocto Project, the [quick start guide](https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html) 
-contains the necessary prerequisites for a basic project. In addition,
-patchtest relies on the following Python modules:
-
-- boto3 (for sending automated results emails only)
-- git-pw>=2.5.0
-- jinja2
-- pylint
-- pyparsing>=3.0.9
-- unidiff
-
-These can be installed by running `pip install -r
-meta/lib/patchtest/requirements.txt`. Note that git-pw is not
-automatically added to the user's PATH; by default, it is installed at
-~/.local/bin/git-pw.
+As a tool for use with the Yocto Project, the [quick start
+guide](https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html)
+contains the necessary prerequisites. In addition, patchtest relies on
+several Python modules for parsing and analysis, which can be installed
+by running `pip install -r meta/lib/patchtest/requirements.txt`. Note
+that git-pw is not automatically added to the user's PATH; by default,
+it is installed at ~/.local/bin/git-pw.
 
 For git-pw (and therefore scripts such as patchtest-get--series) to work, you need
 to provide a Patchwork instance in your user's .gitconfig, like so (the project
@@ -123,13 +118,24 @@ The general flow of guest mode is:
    -device virtio-9p-pci,fsdev=test_mount,mount_tag=test_mount -smp 4 -m
    2048"`
 
-Patchtest runs as an initscript for the core-image-patchtest image and
+Patchtest is run by an initscript for the core-image-patchtest image and
 shuts down after completion, so there is no input required from a user
 during operation. Unlike in host mode, the guest is designed to
 automatically generate test result files, in the same directory as the
 targeted patch files but with .testresult as an extension. These contain
 the entire output of the patchtest run for each respective pass,
 including the PASS, FAIL, and SKIP indicators for each test run.
+
+### Running Patchtest Selftests
+
+Patchtest also includes selftests, which are currently in the form of
+several contrived patch files and a runner script found in
+`meta/lib/patchtest/selftest/`. In order to run these, the
+`meta-selftest` layer must be added to bblayers.conf. It is also
+recommended to set BB_SERVER_TIMEOUT (and thus enable memory-resident
+bitbake) in local.conf to reduce runtime, as the bitbake startup process
+will otherwise add to it significantly when restarted for each test
+patch.
 
 ## Contributing
 

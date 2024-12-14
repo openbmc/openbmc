@@ -1,0 +1,78 @@
+From 892225f5101b1131434d323c55e79a93dc189609 Mon Sep 17 00:00:00 2001
+From: Venture Research <tech@ventureresearch.com>
+Date: Fri, 8 Feb 2013 20:22:19 -0600
+Subject: [PATCH] lua: update Makefile to use environment build settings
+
+OE-specific parameters, instead of overriding all of these simply use
+the ones that are already passed in. Also configure for only Linux...
+
+Signed-off-by: Venture Research <tech@ventureresearch.com>
+
+Updated to work with 3.0.x
+
+Signed-off-by: Armin Kuster <akust808@gmail.com>
+
+updated to work wtih 6.2.1
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+Upstream-Status: Pending
+
+ deps/Makefile         |  1 -
+ deps/lua/Makefile     |  1 -
+ deps/lua/src/Makefile | 16 ++++++----------
+ 3 files changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/deps/Makefile b/deps/Makefile
+index f1e4bd6ce..b9e50d049 100644
+--- a/deps/Makefile
++++ b/deps/Makefile
+@@ -94,7 +94,6 @@ endif
+ # lua's Makefile defines AR="ar rcu", which is unusual, and makes it more
+ # challenging to cross-compile lua (and redis).  These defines make it easier
+ # to fit redis into cross-compilation environments, which typically set AR.
+-AR=ar
+ ARFLAGS=rc
+ 
+ lua: .make-prerequisites
+diff --git a/deps/lua/Makefile b/deps/lua/Makefile
+index 209a13244..72f4b2bf2 100644
+--- a/deps/lua/Makefile
++++ b/deps/lua/Makefile
+@@ -33,7 +33,6 @@ INSTALL_DATA= $(INSTALL) -m 0644
+ 
+ # Utilities.
+ MKDIR= mkdir -p
+-RANLIB= ranlib
+ 
+ # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
+ 
+diff --git a/deps/lua/src/Makefile b/deps/lua/src/Makefile
+index f3bba2f81..1555ec028 100644
+--- a/deps/lua/src/Makefile
++++ b/deps/lua/src/Makefile
+@@ -5,18 +5,14 @@
+ # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
+ 
+ # Your platform. See PLATS for possible values.
+-PLAT= none
++PLAT= linux
+ 
+-CC?= gcc
+-CFLAGS= -O2 -Wall $(MYCFLAGS)
+-AR= ar rcu
+-RANLIB= ranlib
+-RM= rm -f
+-LIBS= -lm $(MYLIBS)
+-
+-MYCFLAGS=
++MYCFLAGS=-DLUA_USE_LINUX
+ MYLDFLAGS=
+-MYLIBS=
++MYLIBS=-Wl,-E -ldl -lreadline -lhistory -lncurses
++
++CFLAGS += $(MYCFLAGS)
++LIBS += -lm $(MYLIBS)
+ 
+ # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
+ 

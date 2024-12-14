@@ -18,6 +18,13 @@ class PingTest(OERuntimeTestCase):
         output = ''
         count = 0
         self.assertNotEqual(len(self.target.ip), 0, msg="No target IP address set")
+
+        # If the target IP is localhost (because user-space networking is being used),
+        # then there's no point in pinging it.
+        if self.target.ip.startswith("127.0.0.") or self.target.ip in ("localhost", "::1"):
+            print("runtime/ping: localhost detected, not pinging")
+            return
+
         try:
             while count < 5:
                 cmd = 'ping -c 1 %s' % self.target.ip

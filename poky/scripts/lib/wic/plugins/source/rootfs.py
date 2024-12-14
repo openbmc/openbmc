@@ -41,7 +41,7 @@ class RootfsPlugin(SourcePlugin):
         # Disallow climbing outside of parent directory using '..',
         # because doing so could be quite disastrous (we will delete the
         # directory, or modify a directory outside OpenEmbedded).
-        full_path = os.path.realpath(os.path.join(rootfs_dir, path))
+        full_path = os.path.abspath(os.path.join(rootfs_dir, path))
         if not full_path.startswith(os.path.realpath(rootfs_dir)):
             logger.error("%s: Must point inside the rootfs: %s" % (cmd, path))
             sys.exit(1)

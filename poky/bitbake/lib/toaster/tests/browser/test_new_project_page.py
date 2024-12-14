@@ -47,7 +47,7 @@ class TestNewProjectPage(SeleniumTestCase):
 
         url = reverse('newproject')
         self.get(url)
-        self.wait_until_visible('#new-project-name', poll=3)
+        self.wait_until_visible('#new-project-name')
         self.enter_text('#new-project-name', project_name)
 
         select = Select(self.find('#projectversion'))
@@ -58,7 +58,7 @@ class TestNewProjectPage(SeleniumTestCase):
         # We should get redirected to the new project's page with the
         # notification at the top
         element = self.wait_until_visible(
-            '#project-created-notification', poll=3)
+            '#project-created-notification')
 
         self.assertTrue(project_name in element.text,
                         "New project name not in new project notification")
@@ -79,7 +79,7 @@ class TestNewProjectPage(SeleniumTestCase):
 
         url = reverse('newproject')
         self.get(url)
-        self.wait_until_visible('#new-project-name', poll=3)
+        self.wait_until_visible('#new-project-name')
 
         self.enter_text('#new-project-name', project_name)
 
@@ -89,12 +89,10 @@ class TestNewProjectPage(SeleniumTestCase):
         radio = self.driver.find_element(By.ID, 'type-new')
         radio.click()
 
-        self.click("#create-project-button")
-
-        self.wait_until_present('#hint-error-project-name', poll=3)
+        self.wait_until_visible('#hint-error-project-name')
         element = self.find('#hint-error-project-name')
 
-        self.assertTrue(("Project names must be unique" in element.text),
+        self.assertIn("Project names must be unique", element.text,
                         "Did not find unique project name error message")
 
         # Try and click it anyway, if it submits we'll have a new project in

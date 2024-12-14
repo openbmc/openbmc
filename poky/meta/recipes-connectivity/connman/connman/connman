@@ -18,7 +18,7 @@ do_start() {
 }
 
 do_stop() {
-	start-stop-daemon --stop --name connmand --quiet
+	start-stop-daemon --stop --oknodo --name connmand --quiet
 }
 
 case "$1" in

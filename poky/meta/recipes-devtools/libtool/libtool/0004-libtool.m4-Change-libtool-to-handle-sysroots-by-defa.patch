@@ -1,0 +1,43 @@
+From 3bb376ff4832e2bd1aaee5530b4b926e3f7407c0 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Sat, 14 Sep 2013 09:01:38 +0000
+Subject: [PATCH 4/7] libtool.m4: Change libtool to handle sysroots by default
+
+Rather than using no sysroot by default, always query gcc to obtain the sysroot.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Inappropriate [Upstream are unlikely to accept this change of default]
+---
+ m4/libtool.m4 | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 8d323b3e..3650c87c 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -1288,18 +1288,18 @@ dnl lt_sysroot will always be passed unquoted.  We quote it here
+ dnl in case the user passed a directory name.
+ lt_sysroot=
+ case $with_sysroot in #(
+- yes)
++ no)
+    if test yes = "$GCC"; then
+      # Trim trailing / since we'll always append absolute paths and we want
+      # to avoid //, if only for less confusing output for the user.
+      lt_sysroot=`$CC --print-sysroot 2>/dev/null | $SED 's:/\+$::'`
+    fi
+    ;; #(
++ yes|''|/)
++   ;; #(
+  /*)
+    lt_sysroot=`echo "$with_sysroot" | $SED -e "$sed_quote_subst"`
+    ;; #(
+- no|'')
+-   ;; #(
+  *)
+    AC_MSG_RESULT([$with_sysroot])
+    AC_MSG_ERROR([The sysroot must be an absolute path.])
+-- 
+2.39.5
+

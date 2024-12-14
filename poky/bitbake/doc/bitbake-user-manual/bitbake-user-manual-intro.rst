@@ -349,40 +349,84 @@ Usage and syntax
 Following is the usage and syntax for BitBake::
 
    $ bitbake -h
-   Usage: bitbake [options] [recipename/target recipe:do_task ...]
+   usage: bitbake [-s] [-e] [-g] [-u UI] [--version] [-h] [-f] [-c CMD]
+                  [-C INVALIDATE_STAMP] [--runall RUNALL] [--runonly RUNONLY]
+                  [--no-setscene] [--skip-setscene] [--setscene-only] [-n] [-p]
+                  [-k] [-P] [-S SIGNATURE_HANDLER] [--revisions-changed]
+                  [-b BUILDFILE] [-D] [-l DEBUG_DOMAINS] [-v] [-q]
+                  [-w WRITEEVENTLOG] [-B BIND] [-T SERVER_TIMEOUT]
+                  [--remote-server REMOTE_SERVER] [-m] [--token XMLRPCTOKEN]
+                  [--observe-only] [--status-only] [--server-only] [-r PREFILE]
+                  [-R POSTFILE] [-I EXTRA_ASSUME_PROVIDED]
+                  [recipename/target ...]
 
-       Executes the specified task (default is 'build') for a given set of target recipes (.bb files).
-       It is assumed there is a conf/bblayers.conf available in cwd or in BBPATH which
-       will provide the layer, BBFILES and other configuration information.
+   It is assumed there is a conf/bblayers.conf available in cwd or in BBPATH
+   which will provide the layer, BBFILES and other configuration information.
 
-   Options:
-     --version             show program's version number and exit
-     -h, --help            show this help message and exit
-     -b BUILDFILE, --buildfile=BUILDFILE
-                           Execute tasks from a specific .bb recipe directly.
-                           WARNING: Does not handle any dependencies from other
-                           recipes.
+   General options:
+     recipename/target     Execute the specified task (default is 'build') for
+                           these target recipes (.bb files).
+     -s, --show-versions   Show current and preferred versions of all recipes.
+     -e, --environment     Show the global or per-recipe environment complete
+                           with information about where variables were
+                           set/changed.
+     -g, --graphviz        Save dependency tree information for the specified
+                           targets in the dot syntax.
+     -u UI, --ui UI        The user interface to use (knotty, ncurses, taskexp,
+                           taskexp_ncurses or teamcity - default knotty).
+     --version             Show programs version and exit.
+     -h, --help            Show this help message and exit.
+
+   Task control options:
+     -f, --force           Force the specified targets/task to run (invalidating
+                           any existing stamp file).
+     -c CMD, --cmd CMD     Specify the task to execute. The exact options
+                           available depend on the metadata. Some examples might
+                           be 'compile' or 'populate_sysroot' or 'listtasks' may
+                           give a list of the tasks available.
+     -C INVALIDATE_STAMP, --clear-stamp INVALIDATE_STAMP
+                           Invalidate the stamp for the specified task such as
+                           'compile' and then run the default task for the
+                           specified target(s).
+     --runall RUNALL       Run the specified task for any recipe in the taskgraph
+                           of the specified target (even if it wouldn't otherwise
+                           have run).
+     --runonly RUNONLY     Run only the specified task within the taskgraph of
+                           the specified targets (and any task dependencies those
+                           tasks may have).
+     --no-setscene         Do not run any setscene tasks. sstate will be ignored
+                           and everything needed, built.
+     --skip-setscene       Skip setscene tasks if they would be executed. Tasks
+                           previously restored from sstate will be kept, unlike
+                           --no-setscene.
+     --setscene-only       Only run setscene tasks, don't run any real tasks.
+
+   Execution control options:
+     -n, --dry-run         Don't execute, just go through the motions.
+     -p, --parse-only      Quit after parsing the BB recipes.
      -k, --continue        Continue as much as possible after an error. While the
                            target that failed and anything depending on it cannot
                            be built, as much as possible will be built before
                            stopping.
-     -f, --force           Force the specified targets/task to run (invalidating
-                           any existing stamp file).
-     -c CMD, --cmd=CMD     Specify the task to execute. The exact options
-                           available depend on the metadata. Some examples might
-                           be 'compile' or 'populate_sysroot' or 'listtasks' may
-                           give a list of the tasks available.
-     -C INVALIDATE_STAMP, --clear-stamp=INVALIDATE_STAMP
-                           Invalidate the stamp for the specified task such as
-                           'compile' and then run the default task for the
-                           specified target(s).
-     -r PREFILE, --read=PREFILE
-                           Read the specified file before bitbake.conf.
-     -R POSTFILE, --postread=POSTFILE
-                           Read the specified file after bitbake.conf.
-     -v, --verbose         Enable tracing of shell tasks (with 'set -x'). Also
-                           print bb.note(...) messages to stdout (in addition to
-                           writing them to ${T}/log.do_&lt;task&gt;).
+     -P, --profile         Profile the command and save reports.
+     -S SIGNATURE_HANDLER, --dump-signatures SIGNATURE_HANDLER
+                           Dump out the signature construction information, with
+                           no task execution. The SIGNATURE_HANDLER parameter is
+                           passed to the handler. Two common values are none and
+                           printdiff but the handler may define more/less. none
+                           means only dump the signature, printdiff means
+                           recursively compare the dumped signature with the most
+                           recent one in a local build or sstate cache (can be
+                           used to find out why tasks re-run when that is not
+                           expected)
+     --revisions-changed   Set the exit code depending on whether upstream
+                           floating revisions have changed or not.
+     -b BUILDFILE, --buildfile BUILDFILE
+                           Execute tasks from a specific .bb recipe directly.
+                           WARNING: Does not handle any dependencies from other
+                           recipes.
+
+   Logging/output control options:
      -D, --debug           Increase the debug level. You can specify this more
                            than once. -D sets the debug level to 1, where only
                            bb.debug(1, ...) messages are printed to stdout; -DD
@@ -392,65 +436,47 @@ Following is the usage and syntax for BitBake::
                            -D only affects output to stdout. All debug messages
                            are written to ${T}/log.do_taskname, regardless of the
                            debug level.
+     -l DEBUG_DOMAINS, --log-domains DEBUG_DOMAINS
+                           Show debug logging for the specified logging domains.
+     -v, --verbose         Enable tracing of shell tasks (with 'set -x'). Also
+                           print bb.note(...) messages to stdout (in addition to
+                           writing them to ${T}/log.do_<task>).
      -q, --quiet           Output less log message data to the terminal. You can
                            specify this more than once.
-     -n, --dry-run         Don't execute, just go through the motions.
-     -S SIGNATURE_HANDLER, --dump-signatures=SIGNATURE_HANDLER
-                           Dump out the signature construction information, with
-                           no task execution. The SIGNATURE_HANDLER parameter is
-                           passed to the handler. Two common values are none and
-                           printdiff but the handler may define more/less. none
-                           means only dump the signature, printdiff means compare
-                           the dumped signature with the cached one.
-     -p, --parse-only      Quit after parsing the BB recipes.
-     -s, --show-versions   Show current and preferred versions of all recipes.
-     -e, --environment     Show the global or per-recipe environment complete
-                           with information about where variables were
-                           set/changed.
-     -g, --graphviz        Save dependency tree information for the specified
-                           targets in the dot syntax.
-     -I EXTRA_ASSUME_PROVIDED, --ignore-deps=EXTRA_ASSUME_PROVIDED
-                           Assume these dependencies don't exist and are already
-                           provided (equivalent to ASSUME_PROVIDED). Useful to
-                           make dependency graphs more appealing
-     -l DEBUG_DOMAINS, --log-domains=DEBUG_DOMAINS
-                           Show debug logging for the specified logging domains
-     -P, --profile         Profile the command and save reports.
-     -u UI, --ui=UI        The user interface to use (knotty, ncurses, taskexp or
-                           teamcity - default knotty).
-     --token=XMLRPCTOKEN   Specify the connection token to be used when
-                           connecting to a remote server.
-     --revisions-changed   Set the exit code depending on whether upstream
-                           floating revisions have changed or not.
-     --server-only         Run bitbake without a UI, only starting a server
-                           (cooker) process.
-     -B BIND, --bind=BIND  The name/address for the bitbake xmlrpc server to bind
-                           to.
-     -T SERVER_TIMEOUT, --idle-timeout=SERVER_TIMEOUT
-                           Set timeout to unload bitbake server due to
-                           inactivity, set to -1 means no unload, default:
-                           Environment variable BB_SERVER_TIMEOUT.
-     --no-setscene         Do not run any setscene tasks. sstate will be ignored
-                           and everything needed, built.
-     --skip-setscene       Skip setscene tasks if they would be executed. Tasks
-                           previously restored from sstate will be kept, unlike
-                           --no-setscene
-     --setscene-only       Only run setscene tasks, don't run any real tasks.
-     --remote-server=REMOTE_SERVER
-                           Connect to the specified server.
-     -m, --kill-server     Terminate any running bitbake server.
-     --observe-only        Connect to a server as an observing-only client.
-     --status-only         Check the status of the remote bitbake server.
-     -w WRITEEVENTLOG, --write-log=WRITEEVENTLOG
+     -w WRITEEVENTLOG, --write-log WRITEEVENTLOG
                            Writes the event log of the build to a bitbake event
                            json file. Use '' (empty string) to assign the name
                            automatically.
-     --runall=RUNALL       Run the specified task for any recipe in the taskgraph
-                           of the specified target (even if it wouldn't otherwise
-                           have run).
-     --runonly=RUNONLY     Run only the specified task within the taskgraph of
-                           the specified targets (and any task dependencies those
-                           tasks may have).
+
+   Server options:
+     -B BIND, --bind BIND  The name/address for the bitbake xmlrpc server to bind
+                           to.
+     -T SERVER_TIMEOUT, --idle-timeout SERVER_TIMEOUT
+                           Set timeout to unload bitbake server due to
+                           inactivity, set to -1 means no unload, default:
+                           Environment variable BB_SERVER_TIMEOUT.
+     --remote-server REMOTE_SERVER
+                           Connect to the specified server.
+     -m, --kill-server     Terminate any running bitbake server.
+     --token XMLRPCTOKEN   Specify the connection token to be used when
+                           connecting to a remote server.
+     --observe-only        Connect to a server as an observing-only client.
+     --status-only         Check the status of the remote bitbake server.
+     --server-only         Run bitbake without a UI, only starting a server
+                           (cooker) process.
+
+   Configuration options:
+     -r PREFILE, --read PREFILE
+                           Read the specified file before bitbake.conf.
+     -R POSTFILE, --postread POSTFILE
+                           Read the specified file after bitbake.conf.
+     -I EXTRA_ASSUME_PROVIDED, --ignore-deps EXTRA_ASSUME_PROVIDED
+                           Assume these dependencies don't exist and are already
+                           provided (equivalent to ASSUME_PROVIDED). Useful to
+                           make dependency graphs more appealing.
+
+..
+    Bitbake help output generated with "stty columns 80; bin/bitbake -h"
 
 .. _bitbake-examples:
 

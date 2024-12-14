@@ -11,6 +11,9 @@ SRC_URI = "https://github.com/msktutil/msktutil/releases/download/${PV}/${BP}.ta
            file://0001-configure.ac-Remove-native-include-path.patch"
 SRC_URI[sha256sum] = "f9686237c4e24414802415f4c8627c7343da365c5a3bcdef7a853fa3cd27b45d"
 
+UPSTREAM_CHECK_URI = "https://github.com/msktutil/msktutil/releases/"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+
 DEPENDS += "krb5 cyrus-sasl openldap"
 
 inherit autotools

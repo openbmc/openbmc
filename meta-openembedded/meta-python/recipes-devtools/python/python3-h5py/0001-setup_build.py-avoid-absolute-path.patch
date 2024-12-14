@@ -1,4 +1,4 @@
-From 6f8cee826ef9309c174aa97cb6af2ba532ed9dba Mon Sep 17 00:00:00 2001
+From 59d1cc34739a18a32d3250973af2357c41d8d156 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 28 Jan 2021 18:44:10 -0800
 Subject: [PATCH] setup_build.py: avoid absolute path
@@ -9,16 +9,15 @@ Upstream-Status: Submitted [https://github.com/h5py/h5py/pull/1803]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
-
 ---
  setup_build.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/setup_build.py b/setup_build.py
-index 78c6677..64db7f7 100644
+index a041fa6..4d44215 100644
 --- a/setup_build.py
 +++ b/setup_build.py
-@@ -21,7 +21,7 @@ from setup_configure import BuildConfig
+@@ -20,7 +20,7 @@ from setup_configure import BuildConfig
  
  
  def localpath(*args):

@@ -20,7 +20,6 @@ inherit autotools gettext
 
 EXTRA_OECONF += "PERL='${USRBINPATH}/env perl'"
 
-SRC_URI[md5sum] = "3acc242b829adacabcaf28533f049afd"
 SRC_URI[sha256sum] = "6d56bada6934d055b34b6c90399aa85975e66457ac5bf513427ae7fc77f5c0bb"
 
 RDEPENDS:${PN} = "perl"

@@ -94,6 +94,8 @@ SRC_URI = "git://github.com/xrmx/bootchart.git;branch=master;protocol=https \
            file://0001-collector-Allocate-space-on-heap-for-chunks.patch \
            file://0001-bootchartd.in-make-sure-only-one-bootchartd-process.patch \
            file://0001-Do-not-include-linux-fs.h.patch \
+           file://0001-Makefile-Let-bootchartd.conf-use-EARLY_.patch \
+           file://0002-Makefile-Add-n-to-gzip.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -129,18 +131,22 @@ do_install () {
     export DESTDIR="${D}"
     export LIBDIR="/${baselib}"
     export EARLY_PREFIX="${root_prefix}"
+    export MANDIR="${mandir}/man1"
+    export DOCDIR="${docdir}"
 
     oe_runmake install NO_PYTHON_COMPILE=1
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${UNPACKDIR}/bootchartd_stop.sh ${D}${sysconfdir}/init.d
 
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', 'true', 'false', d)}; then
+        mv ${D}${EARLY_PREFIX}${sysconfdir}/bootchartd.conf ${D}${sysconfdir}/bootchartd.conf
+        rmdir ${D}${EARLY_PREFIX}${sysconfdir}
+    fi
+
     echo 'EXIT_PROC="$EXIT_PROC matchbox-window-manager"' >> ${D}${sysconfdir}/bootchartd.conf
 
    # Use python 3 instead of python 2
    sed -i -e '1s,#!.*python.*,#!${USRBINPATH}/env python3,' ${D}${bindir}/pybootchartgui
-
-    # The timestamps embedded in compressed man pages is not reproducible
-    gzip -d ${D}${mandir}/man1/*.gz
 }
 
 PACKAGES =+ "pybootchartgui"

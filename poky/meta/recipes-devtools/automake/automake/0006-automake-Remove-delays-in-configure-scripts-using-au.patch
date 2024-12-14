@@ -1,0 +1,77 @@
+From b43c0ccd1d98a43c0ddcade40fa288e98d381420 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Mon, 7 Dec 2015 18:28:05 +0000
+Subject: [PATCH 6/6] automake: Remove delays in configure scripts using
+ automake
+
+By default automake puts "sleep 1" into the start of configure scripts
+which adds pointless delays to them. Rather than do this, lets just assume
+our systems are sane.
+
+RP
+2015/12/7
+Upstream-Status: Inappropriate
+---
+ m4/sanity.m4 | 48 +-----------------------------------------------
+ 1 file changed, 1 insertion(+), 47 deletions(-)
+
+diff --git a/m4/sanity.m4 b/m4/sanity.m4
+index c7f32da..f25625a 100644
+--- a/m4/sanity.m4
++++ b/m4/sanity.m4
+@@ -176,51 +176,5 @@ case $srcdir in
+     AC_MSG_ERROR([unsafe srcdir value: '$srcdir']);;
+ esac
+ 
+-# Do 'set' in a subshell so we don't clobber the current shell's
+-# arguments.  Must try -L first in case configure is actually a
+-# symlink; some systems play weird games with the mod time of symlinks
+-# (eg FreeBSD returns the mod time of the symlink's containing
+-# directory).
+-am_build_env_is_sane=no
+-am_has_slept=no
+-rm -f conftest.file
+-for am_try in 1 2; do
+-  echo "timestamp, slept: $am_has_slept" > conftest.file
+-  if (
+-    set X `ls -Lt "$srcdir/configure" conftest.file 2> /dev/null`
+-    if test "$[]*" = "X"; then
+-      # -L didn't work.
+-      set X `ls -t "$srcdir/configure" conftest.file`
+-    fi
+-    test "$[]2" = conftest.file
+-  ); then
+-    am_build_env_is_sane=yes
+-    break
+-  fi
+-  # Just in case.
+-  sleep "$am_cv_filesystem_timestamp_resolution"
+-  am_has_slept=yes
+-done
+-
+-AC_MSG_RESULT([$am_build_env_is_sane])
+-if test "$am_build_env_is_sane" = no; then
+-  AC_MSG_ERROR([newly created file is older than distributed files!
+-Check your system clock])
+-fi
+-
+-# If we didn't sleep, we still need to ensure time stamps of config.status and
+-# generated files are strictly newer.
+-am_sleep_pid=
+-AS_IF([test -e conftest.file || grep 'slept: no' conftest.file >/dev/null 2>&1],, [dnl
+-  ( sleep "$am_cv_filesystem_timestamp_resolution" ) &
+-  am_sleep_pid=$!
+-])
+-AC_CONFIG_COMMANDS_PRE(
+-  [AC_MSG_CHECKING([that generated files are newer than configure])
+-   if test -n "$am_sleep_pid"; then
+-     # Hide warnings about reused PIDs.
+-     wait $am_sleep_pid 2>/dev/null
+-   fi
+-   AC_MSG_RESULT([done])])
+-rm -f conftest.file
++AC_MSG_RESULT([yes])
+ ])
+-- 
+2.39.2
+

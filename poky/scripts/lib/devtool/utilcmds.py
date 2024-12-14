@@ -64,7 +64,7 @@ def configure_help(args, config, basepath, workspace):
         b = rd.getVar('B')
         s = rd.getVar('S')
         configurescript = os.path.join(s, 'configure')
-        confdisabled = 'noexec' in rd.getVarFlags('do_configure') or 'do_configure' not in (rd.getVar('__BBTASKS', False) or [])
+        confdisabled = 'noexec' in rd.getVarFlags('do_configure') or 'do_configure' not in (bb.build.listtasks(rd))
         configureopts = oe.utils.squashspaces(rd.getVar('CONFIGUREOPTS') or '')
         extra_oeconf = oe.utils.squashspaces(rd.getVar('EXTRA_OECONF') or '')
         extra_oecmake = oe.utils.squashspaces(rd.getVar('EXTRA_OECMAKE') or '')

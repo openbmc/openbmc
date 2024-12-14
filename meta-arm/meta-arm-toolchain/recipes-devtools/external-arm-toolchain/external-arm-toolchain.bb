@@ -56,8 +56,16 @@ PV = "${EAT_VER_MAIN}"
 BINV = "${EAT_VER_GCC}"
 
 SRC_URI = "file://SUPPORTED"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 do_install() {
+        # do_copy_locale expects SUPPORTED to be in WORKDIR, but recent
+        # changes have made it so that the source/unpack location is no
+        # longer WORKDIR and cannot be pointed to be such.  So, do this
+        # copy manually here
+        install -m 0644 ${UNPACKDIR}/SUPPORTED ${WORKDIR}/SUPPORTED
+
 	# Add stubs for files OE-core expects
 	install -d ${S}/nscd/
 	touch  ${S}/nscd/nscd.init
@@ -118,54 +126,80 @@ do_install() {
 	else
 		cp ${CP_ARGS} ${EXTERNAL_TOOLCHAIN}/${EAT_TARGET_SYS}/libc/lib/${linker_name} ${D}${base_libdir}/
 	fi
-	ln -sf ../../lib/librt.so.1 ${D}${libdir}/librt.so
-	ln -sf ../../lib/libcrypt.so.1 ${D}${libdir}/libcrypt.so
-	ln -sf ../../lib/libresolv.so.2 ${D}${libdir}/libresolv.so
-	ln -sf ../../lib/libnss_hesiod.so.2 ${D}${libdir}/libnss_hesiod.so
-	ln -sf ../../lib/libutil.so.1 ${D}${libdir}/libutil.so
-	ln -sf ../../lib/libBrokenLocale.so.1 ${D}${libdir}/libBrokenLocale.so
-	ln -sf ../../lib/libpthread.so.0 ${D}${libdir}/libpthread.so
-	ln -sf ../../lib/libthread_db.so.1 ${D}${libdir}/libthread_db.so
-	ln -sf ../../lib/libanl.so.1 ${D}${libdir}/libanl.so
-	ln -sf ../../lib/libdl.so.2 ${D}${libdir}/libdl.so
-	ln -sf ../../lib/libnss_db.so.2 ${D}${libdir}/libnss_db.so
-	ln -sf ../../lib/libnss_dns.so.2 ${D}${libdir}/libnss_dns.so
-	ln -sf ../../lib/libnss_files.so.2 ${D}${libdir}/libnss_files.so
-	ln -sf ../../lib/libnss_compat.so.2 ${D}${libdir}/libnss_compat.so
-	ln -sf ../../lib/libm.so.6 ${D}${libdir}/libm.so
-	ln -sf ../../lib/libc_malloc_debug.so.0 ${D}${libdir}/libc_malloc_debug.so
 
-	# remove potential .so duplicates from base_libdir
-	# for all symlinks created above in libdir
-	rm -f ${D}${base_libdir}/librt.so
-	rm -f ${D}${base_libdir}/libcrypt.so
-	rm -f ${D}${base_libdir}/libresolv.so
-	rm -f ${D}${base_libdir}/libnss_hesiod.so
-	rm -f ${D}${base_libdir}/libutil.so
-	rm -f ${D}${base_libdir}/libBrokenLocale.so
-	rm -f ${D}${base_libdir}/libpthread.so
-	rm -f ${D}${base_libdir}/libthread_db.so
-	rm -f ${D}${base_libdir}/libanl.so
-	rm -f ${D}${base_libdir}/libdl.so
-	rm -f ${D}${base_libdir}/libnss_db.so
-	rm -f ${D}${base_libdir}/libnss_dns.so
-	rm -f ${D}${base_libdir}/libnss_files.so
-	rm -f ${D}${base_libdir}/libnss_compat.so
-	rm -f ${D}${base_libdir}/libm.so
-
-	# Move these completely to ${libdir} and delete duplicates in ${base_libdir}
-	for lib in asan hwasan atomic gfortran gomp itm lsan sanitizer stdc++ tsan ubsan; do
-		if [ -e ${D}${base_libdir}/lib${lib}.spec ] ; then
-			mv ${D}${base_libdir}/lib${lib}.spec ${D}${libdir}
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', 'false', 'true', d)}; then
+		ln -sf ../../lib/librt.so.1 ${D}${libdir}/librt.so
+		ln -sf ../../lib/libcrypt.so.1 ${D}${libdir}/libcrypt.so
+		ln -sf ../../lib/libresolv.so.2 ${D}${libdir}/libresolv.so
+		ln -sf ../../lib/libnss_hesiod.so.2 ${D}${libdir}/libnss_hesiod.so
+		ln -sf ../../lib/libutil.so.1 ${D}${libdir}/libutil.so
+		ln -sf ../../lib/libBrokenLocale.so.1 ${D}${libdir}/libBrokenLocale.so
+		ln -sf ../../lib/libpthread.so.0 ${D}${libdir}/libpthread.so
+		ln -sf ../../lib/libthread_db.so.1 ${D}${libdir}/libthread_db.so
+		ln -sf ../../lib/libanl.so.1 ${D}${libdir}/libanl.so
+		ln -sf ../../lib/libdl.so.2 ${D}${libdir}/libdl.so
+		ln -sf ../../lib/libnss_db.so.2 ${D}${libdir}/libnss_db.so
+		ln -sf ../../lib/libnss_dns.so.2 ${D}${libdir}/libnss_dns.so
+		ln -sf ../../lib/libnss_files.so.2 ${D}${libdir}/libnss_files.so
+		ln -sf ../../lib/libnss_compat.so.2 ${D}${libdir}/libnss_compat.so
+		ln -sf ../../lib/libm.so.6 ${D}${libdir}/libm.so
+		ln -sf ../../lib/libc_malloc_debug.so.0 ${D}${libdir}/libc_malloc_debug.so
+		if [ -f ${D}${base_libdir}/libmvec.so.1 ]; then
+			ln -sf ../../lib/libmvec.so.1 ${D}${libdir}/libmvec.so
 		fi
-		if [ -e ${D}${base_libdir}/lib${lib}.a ] ; then
-			mv ${D}${base_libdir}/lib${lib}.a ${D}${libdir}
-		fi
-		rm -f ${D}${base_libdir}/lib${lib}*
-	done
 
-	# Clean up duplicate libs that are both in base_libdir and libdir
-	rm -f ${D}${libdir}/libgcc*
+		# remove potential .so duplicates from base_libdir
+		# for all symlinks created above in libdir
+		rm -f ${D}${base_libdir}/librt.so
+		rm -f ${D}${base_libdir}/libcrypt.so
+		rm -f ${D}${base_libdir}/libresolv.so
+		rm -f ${D}${base_libdir}/libnss_hesiod.so
+		rm -f ${D}${base_libdir}/libutil.so
+		rm -f ${D}${base_libdir}/libBrokenLocale.so
+		rm -f ${D}${base_libdir}/libpthread.so
+		rm -f ${D}${base_libdir}/libthread_db.so
+		rm -f ${D}${base_libdir}/libanl.so
+		rm -f ${D}${base_libdir}/libdl.so
+		rm -f ${D}${base_libdir}/libnss_db.so
+		rm -f ${D}${base_libdir}/libnss_dns.so
+		rm -f ${D}${base_libdir}/libnss_files.so
+		rm -f ${D}${base_libdir}/libnss_compat.so
+		rm -f ${D}${base_libdir}/libm.so
+		rm -f ${D}${base_libdir}/libmvec.so
+
+		# Move these completely to ${libdir} and delete duplicates in ${base_libdir}
+		for lib in asan hwasan atomic gfortran gomp itm lsan sanitizer stdc++ tsan ubsan; do
+			if [ -e ${D}${base_libdir}/lib${lib}.spec ] ; then
+				mv ${D}${base_libdir}/lib${lib}.spec ${D}${libdir}
+			fi
+			if [ -e ${D}${base_libdir}/lib${lib}.a ] ; then
+				mv ${D}${base_libdir}/lib${lib}.a ${D}${libdir}
+			fi
+			rm -f ${D}${base_libdir}/lib${lib}*
+		done
+
+		# Clean up duplicate libs that are both in base_libdir and libdir
+		rm -f ${D}${libdir}/libgcc*
+	else
+		ln -sf libcrypt.so.1 ${D}${libdir}/libcrypt.so
+		ln -sf libresolv.so.2 ${D}${libdir}/libresolv.so
+		ln -sf libnss_hesiod.so.2 ${D}${libdir}/libnss_hesiod.so
+		ln -sf libutil.so.1 ${D}${libdir}/libutil.so
+		ln -sf libBrokenLocale.so.1 ${D}${libdir}/libBrokenLocale.so
+		ln -sf libpthread.so.0 ${D}${libdir}/libpthread.so
+		ln -sf libthread_db.so.1 ${D}${libdir}/libthread_db.so
+		ln -sf libanl.so.1 ${D}${libdir}/libanl.so
+		ln -sf libdl.so.2 ${D}${libdir}/libdl.so
+		ln -sf libnss_db.so.2 ${D}${libdir}/libnss_db.so
+		ln -sf libnss_dns.so.2 ${D}${libdir}/libnss_dns.so
+		ln -sf libnss_files.so.2 ${D}${libdir}/libnss_files.so
+		ln -sf libnss_compat.so.2 ${D}${libdir}/libnss_compat.so
+		ln -sf libm.so.6 ${D}${libdir}/libm.so
+		ln -sf libc_malloc_debug.so.0 ${D}${libdir}/libc_malloc_debug.so
+		if [ -f ${D}${libdir}/libmvec.so.1 ]; then
+			ln -sf libmvec.so.1 ${D}${libdir}/libmvec.so
+		fi
+	fi
 
 	# Besides ld-${EAT_VER_LIBC}.so, other libs can have duplicates like lib*-${EAT_VER_LIBC}.so
 	# Only remove them if both are regular files and are identical
@@ -205,13 +239,13 @@ do_install() {
 	rm -rf ${D}${includedir}/rpcsvc/rquota.*
 
 	if [ -f ${D}${libdir}/libc.so ];then
-		sed -i -e "s# /${EAT_LIBDIR}/${EAT_TARGET_SYS}# ../../${EAT_LIBDIR}#g" -e "s# /usr/${EAT_LIBDIR}/# /usr/lib/#g" -e "s# /usr/${EAT_LIBDIR}/${EAT_TARGET_SYS}# .#g" -e "s# /${EAT_LIBDIR}/ld-linux# ../../${EAT_LIBDIR}/ld-linux#g" ${D}${libdir}/libc.so
+		sed -i -e "s# /usr/${EAT_LIBDIR}/# /usr/lib/#g" -e "s# /${EAT_LIBDIR}/ld-linux# ../../${base_libdir}/ld-linux#g" ${D}${libdir}/libc.so
 		sed -i -e "s# /${EAT_LIBDIR}/libc.so.6# /lib/libc.so.6#g" ${D}${libdir}/libc.so
-		sed -i -e "s# /lib# ../../lib#g" -e "s# /usr/lib# .#g" ${D}${libdir}/libc.so
+		sed -i -e "s# /lib# ../../${base_libdir}#g" -e "s# /usr/lib# .#g" ${D}${libdir}/libc.so
 	fi
 
 	if [ -f ${D}${base_libdir}/libc.so ];then
-		sed -i -e "s# /${EAT_LIBDIR}/${EAT_TARGET_SYS}# ../../lib#g" -e "s# /usr/${EAT_LIBDIR}/${EAT_TARGET_SYS}# .#g" -e "s# /${EAT_LIBDIR}/# /lib/#g" ${D}${base_libdir}/libc.so
+		sed -i -e "s# /${EAT_LIBDIR}/# /lib/#g" ${D}${base_libdir}/libc.so
 		if [ -f ${D}${base_libdir}/libc.so.6 ]; then
 			sed -i -e "s# /usr/${EAT_LIBDIR}/libc.so.6# /lib/libc.so.6#g" -e "s# /${EAT_LIBDIR}/libc.so.6# /lib/libc.so.6#g" ${D}${base_libdir}/libc.so.6
 		fi
@@ -527,7 +561,6 @@ FILES:${PN} += "\
 	${base_libdir}/ld*.so.* \
 	${base_libdir}/ld-*.so \
 	${base_libdir}/libpthread*.so.* \
-	${base_libdir}/libpthread*.so \
 	${base_libdir}/libpthread-*.so \
 	${base_libdir}/libresolv*.so.* \
 	${base_libdir}/libresolv-*.so \

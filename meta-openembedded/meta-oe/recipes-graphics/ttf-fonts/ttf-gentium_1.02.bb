@@ -32,5 +32,4 @@ FILES:${PN} = "${datadir}/fonts/truetype/GenI*.ttf \
                ${datadir}/fonts/truetype/GenR*.ttf \
                ${datadir}/doc/ttf-gentium/*"
 
-SRC_URI[md5sum] = "4c3e6ae586be277537ebb68f2a45b883"
 SRC_URI[sha256sum] = "4746c04c9a4ad9e0788a38e0a2f81919a630d8070ceabc89f156b6d41d8ceb37"

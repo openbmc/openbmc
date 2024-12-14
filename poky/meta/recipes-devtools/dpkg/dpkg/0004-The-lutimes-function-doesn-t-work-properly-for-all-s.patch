@@ -1,4 +1,4 @@
-From 80ad29d22f8ca4033a6a79a726580fee17bdade9 Mon Sep 17 00:00:00 2001
+From 0fc90a3ed01a7fce34de925979460638b8a57402 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 26 Aug 2015 16:27:45 +0300
 Subject: [PATCH] The lutimes function doesn't work properly for all systems.
@@ -11,10 +11,10 @@ Upstream-Status: Inappropriate [embedded specific]
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/main/archives.c b/src/main/archives.c
-index 7e399f922..ec3b6878f 100644
+index d7279e1f5..f9c6facc9 100644
 --- a/src/main/archives.c
 +++ b/src/main/archives.c
-@@ -491,8 +491,9 @@ tarobject_set_mtime(struct tar_entry *te, const char *path)
+@@ -490,8 +490,9 @@ tarobject_set_mtime(struct tar_entry *te, const char *path)
  
    if (te->type == TAR_FILETYPE_SYMLINK) {
  #ifdef HAVE_LUTIMES

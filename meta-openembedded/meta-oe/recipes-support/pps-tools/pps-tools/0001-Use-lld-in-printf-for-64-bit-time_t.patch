@@ -1,0 +1,59 @@
+From 6faed0a3b41fba4619fe4598a2834dfb4d2be7e4 Mon Sep 17 00:00:00 2001
+From: Matt Merhar <mattmerhar@protonmail.com>
+Date: Fri, 10 Nov 2023 17:21:51 -0500
+Subject: [PATCH] Use %lld in printf for 64-bit time_t
+
+musl 1.2.0 switched to use 64-bit time_t everywhere, including 32-bit
+architectures, causing garbage values to be printed from ppswatch and
+ppstest.
+
+Use the correct format string for the affected printf statements and
+explicitly cast to long long to avoid potential compatibility issues
+with 32-bit glibc.
+
+Upstream-Status: Backport [https://github.com/redlab-i/pps-tools/commit/6faed0a3b41fba4619fe4598a2834dfb4d2be7e4]
+
+Signed-off-by: Matt Merhar <mattmerhar@protonmail.com>
+---
+ ppstest.c  | 8 ++++----
+ ppswatch.c | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/ppstest.c b/ppstest.c
+index 0370794..c375a09 100644
+--- a/ppstest.c
++++ b/ppstest.c
+@@ -110,13 +110,13 @@ retry:
+ 	}
+ 
+ 	printf("source %d - "
+-	       "assert %ld.%09ld, sequence: %ld - "
+-	       "clear  %ld.%09ld, sequence: %ld\n",
++	       "assert %lld.%09ld, sequence: %ld - "
++	       "clear  %lld.%09ld, sequence: %ld\n",
+ 	       i,
+-	       infobuf.assert_timestamp.tv_sec,
++	       (long long)infobuf.assert_timestamp.tv_sec,
+ 	       infobuf.assert_timestamp.tv_nsec,
+ 	       infobuf.assert_sequence,
+-	       infobuf.clear_timestamp.tv_sec,
++	       (long long)infobuf.clear_timestamp.tv_sec,
+ 	       infobuf.clear_timestamp.tv_nsec, infobuf.clear_sequence);
+ 	fflush(stdout);
+ 
+diff --git a/ppswatch.c b/ppswatch.c
+index 5c6202b..15d7a77 100644
+--- a/ppswatch.c
++++ b/ppswatch.c
+@@ -148,7 +148,7 @@ int fetch_source(pps_handle_t handle, int avail_mode)
+ 	if (max_divergence < div)
+ 		max_divergence = div;
+ 	if (div >= margin) {
+-		printf("timestamp: %ld, sequence: %ld, offset: % 6ld\n", ts.tv_sec, seq, ts.tv_nsec);
++		printf("timestamp: %lld, sequence: %ld, offset: % 6ld\n", (long long)ts.tv_sec, seq, ts.tv_nsec);
+ 		fflush(stdout);
+ 		overflows++;
+ 		curr_unsync++;
+-- 
+2.47.1
+

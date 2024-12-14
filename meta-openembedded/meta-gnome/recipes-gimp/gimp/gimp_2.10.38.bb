@@ -49,6 +49,7 @@ SRC_URI = "https://download.gimp.org/pub/${BPN}/v${SHPV}/${BP}.tar.bz2 \
            file://0001-libtool-Do-not-add-build-time-library-paths-to-LD_LI.patch \
            file://0001-file-tiff-load-fix-mismatching-variable-type.patch \
            file://0001-metadata-shut-up-a-weird-warning.patch \
+           file://0001-gimptool-allow-default-CC-override.patch \
            "
 SRC_URI[sha256sum] = "50a845eec11c8831fe8661707950f5b8446e35f30edfb9acf98f85c1133f856e"
 
@@ -73,3 +74,28 @@ do_compile:prepend() {
 FILES:${PN}  += "${datadir}/metainfo"
 
 RDEPENDS:${PN} += "mypaint-brushes-1.0"
+
+
+# gimptool
+
+# gimptool needs a CC definition, use current CC without sysroot
+python __anonymous() {
+    import shlex
+    CC_WITHOUT_SYSROOT = shlex.join(filter(lambda x: not x.startswith("--sysroot="), shlex.split(d.getVar("CC"))))
+    d.setVar("CC_WITHOUT_SYSROOT", CC_WITHOUT_SYSROOT)
+}
+EXTRA_OECONF += "--with-default-cc='${CC_WITHOUT_SYSROOT}'"
+
+# Split gimptool in its own package
+PACKAGE_BEFORE_PN += "${PN}-gimptool"
+FILES:${PN}-gimptool += "${bindir}/gimptool-2.0"
+
+# gimptool depends on gimp .pc file being installed and tools to build the plugin.
+RDEPENDS:${PN}-gimptool += "${PN}-dev packagegroup-core-buildessential"
+INSANE_SKIP:${PN}-gimptool += "dev-deps"
+
+
+CVE_STATUS[CVE-2007-3741] = "not-applicable-platform: This only applies for Mandriva Linux"
+CVE_STATUS[CVE-2009-0581] = "cpe-incorrect: The current version (2.10.38) is not affected."
+CVE_STATUS[CVE-2009-0723] = "cpe-incorrect: The current version (2.10.38) is not affected."
+CVE_STATUS[CVE-2009-0733] = "cpe-incorrect: The current version (2.10.38) is not affected."

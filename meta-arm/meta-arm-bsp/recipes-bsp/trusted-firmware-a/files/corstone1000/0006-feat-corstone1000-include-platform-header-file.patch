@@ -1,0 +1,28 @@
+From 8070bf4a89492727b6da3fb7bdec61748eae1d7d Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Tue, 2 Jul 2024 12:49:12 +0000
+Subject: [PATCH] fix(corstone1000): include platform header file
+
+Include platform.h file in order to remove compiler warnings
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/29727]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ plat/arm/board/corstone1000/common/corstone1000_pm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_pm.c b/plat/arm/board/corstone1000/common/corstone1000_pm.c
+index 979243317..9babe5b11 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_pm.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_pm.c
+@@ -8,6 +8,7 @@
+ #include <plat/arm/common/plat_arm.h>
+ #include <platform_def.h>
+ #include <drivers/arm/gicv2.h>
++#include <plat/common/platform.h>
+ /*******************************************************************************
+  * Export the platform handlers via plat_arm_psci_pm_ops. The ARM Standard
+  * platform layer will take care of registering the handlers with PSCI.
+-- 
+2.34.1
+

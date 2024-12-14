@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1744b320500cc2e3112964d00cce7aa4"
 
 inherit pypi setuptools3
 
-SRC_URI[md5sum] = "d2a0e10437cfa5c2d09458a84fb58d05"
 SRC_URI[sha256sum] = "add82567c50c8bc648c14195bf544a5ce7c1f76761536956c3d2978970179ef3"
 
 PYPI_PACKAGE = "Keras_Preprocessing"

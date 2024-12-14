@@ -184,6 +184,9 @@ python multilib_virtclass_handler_global () {
     if variant:
         return
 
+    if bb.data.inherits_class('native', d):
+        return
+
     non_ml_recipes = d.getVar('NON_MULTILIB_RECIPES').split()
 
     if bb.data.inherits_class('kernel', d) or \

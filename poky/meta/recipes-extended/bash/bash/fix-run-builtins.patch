@@ -1,4 +1,4 @@
-From 0c4cab9594c96c2dc435a8d9724605824bcbf917 Mon Sep 17 00:00:00 2001
+From 15601c71b073a604ccda25c7f14f0bb12e9a3b28 Mon Sep 17 00:00:00 2001
 From: Dengke Du <dengke.du@windriver.com>
 Date: Tue, 19 Apr 2016 02:57:45 -0400
 Subject: [PATCH] fix run-builtins failed
@@ -16,10 +16,10 @@ Signed-off-by: Dengke Du <dengke.du@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/builtins.tests b/tests/builtins.tests
-index 9d77520..63f3af8 100644
+index 8eee43e..71c9eee 100644
 --- a/tests/builtins.tests
 +++ b/tests/builtins.tests
-@@ -109,7 +109,7 @@ esac
+@@ -124,7 +124,7 @@ esac
  
  # test options to exec
  (exec -a specialname ${THIS_SH} -c 'echo $0' )
@@ -28,6 +28,3 @@ index 9d77520..63f3af8 100644
  # test `clean' environment.  if /bin/sh is bash, and the script version of
  # printenv is run, there will be variables in the environment that bash
  # sets on startup.  Also test code that prefixes argv[0] with a dash.
--- 
-2.8.1
-

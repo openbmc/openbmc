@@ -7,6 +7,7 @@ DEPENDS = "glib-2.0"
 
 SRC_URI = "\
     ${GNOME_MIRROR}/gcab/${PV}/gcab-${PV}.tar.xz \
+    file://0001-gcab-enums.c.etemplate-include-basename-instead-of-f.patch \
     file://run-ptest \
 "
 SRC_URI[sha256sum] = "2f0c9615577c4126909e251f9de0626c3ee7a152376c15b5544df10fc87e560b"

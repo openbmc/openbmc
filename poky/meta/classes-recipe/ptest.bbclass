@@ -131,7 +131,7 @@ python () {
 }
 
 QARECIPETEST[missing-ptest] = "package_qa_check_missing_ptest"
-def package_qa_check_missing_ptest(pn, d, messages):
+def package_qa_check_missing_ptest(pn, d):
     # This checks that ptest package is actually included
     # in standard oe-core ptest images - only for oe-core recipes
     if not 'meta/recipes' in d.getVar('FILE') or not(d.getVar('PTEST_ENABLED') == "1"):

@@ -18,9 +18,8 @@ SRC_URI_EXT = "xz"
 
 SRC_URI[sha256sum] = "b7d8dc8d22ef9f15985a10b606ee4f2aad6828befa437359934647e88d331f23"
 
-EXTRA_OECONF = "ac_cv_path_MCOOKIE=${bindir}/mcookie"
-
-PACKAGECONFIG ??= "rxvt"
-PACKAGECONFIG[rxvt] = "--with-xterm=rxvt,,,rxvt-unicode"
+EXTRA_OECONF = "ac_cv_path_MCOOKIE=${bindir}/mcookie \
+                --with-xterm=x-terminal-emulator"
 
 RDEPENDS:${PN} += "util-linux-mcookie"
+RRECOMMENDS:${PN} += "virtual-x-terminal-emulator"

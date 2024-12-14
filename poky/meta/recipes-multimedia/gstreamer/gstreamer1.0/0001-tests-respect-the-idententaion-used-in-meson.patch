@@ -1,4 +1,4 @@
-From 381f50a27766c425af36a7203061716497e6603f Mon Sep 17 00:00:00 2001
+From bcf818265ae8b2eb668fffbbedb19c1162032c2a Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 11 Apr 2021 19:48:13 +0100
 Subject: [PATCH] tests: respect the idententaion used in meson
@@ -11,7 +11,7 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index 6540279..e9501fe 100644
+index 7d68212..bf0021f 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
 @@ -146,11 +146,11 @@ foreach t : core_tests

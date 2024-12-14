@@ -12,7 +12,6 @@ DEPENDS = "hostperl-runtime-native gzip-native bdftopcf-native"
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \
           file://use-no-name-option-for-gzip.patch \
           "
-SRC_URI[md5sum] = "1b6acbd221957e33c8a792ebfaf3a659"
 SRC_URI[sha256sum] = "d961c1b781627bf417f9b340693d64fc219e0113ad3a3af1a3424c7aa373ef79"
 
 inherit allarch fontcache

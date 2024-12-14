@@ -1,4 +1,4 @@
-From 73d6841d9ef2a8ac7bd63f9645a3efe8038dfdd4 Mon Sep 17 00:00:00 2001
+From 651310691a8a41ab3a766545c53b69e6e0c4f88d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 27 Feb 2017 09:43:30 +0200
 Subject: [PATCH] Do not hardcode "lib/rpm" as the installation path for
@@ -12,24 +12,24 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7808115c1..4a383ceba 100644
+index de0b578a6..9a3aba071 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -33,7 +33,7 @@ option(WITH_IMAEVM "Build with IMA support" OFF)
- option(WITH_FAPOLICYD "Build with fapolicyd support" ON)
- option(WITH_READLINE "Build with readline support" ON)
+@@ -41,7 +41,7 @@ option(WITH_LIBELF "Build with libelf support" ON)
+ option(WITH_LIBLZMA "Build with liblzma support" ON)
+ option(WITH_DOXYGEN "Build API docs with doxygen" OFF)
  
 -set(RPM_CONFIGDIR "${CMAKE_INSTALL_PREFIX}/lib/rpm" CACHE PATH "rpm home")
 +set(RPM_CONFIGDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/rpm" CACHE PATH "rpm home")
+ set(RPM_MACROSDIR "${RPM_CONFIGDIR}/macros.d")
  set(RPM_VENDOR "vendor" CACHE STRING "rpm vendor string")
  
- # Emulate libtool versioning. Before a public release:
 diff --git a/macros.in b/macros.in
-index b49ffaad4..3acbe78f6 100644
+index 4d3e8afdc..66e31320f 100644
 --- a/macros.in
 +++ b/macros.in
-@@ -969,7 +969,7 @@ Supplements:   (%{name} = %{version}-%{release} and langpacks-%{1})\
- %_sharedstatedir	%{_prefix}/com
+@@ -964,7 +964,7 @@ Supplements:   (%{name} = %{version}-%{release} and langpacks-%{1})\
+ %_sharedstatedir	%{_var}/lib
  %_localstatedir		%{_prefix}/var
  %_lib			lib
 -%_libdir		%{_exec_prefix}/%{_lib}

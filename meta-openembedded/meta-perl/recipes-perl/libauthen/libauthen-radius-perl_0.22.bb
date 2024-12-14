@@ -4,7 +4,7 @@ DESCRIPTION = "The Authen::Radius module provides a simple class that \
     Radius server. \
 "
 
-HOMEPAGE = "http://search.cpan.org/~manowar/RadiusPerl"
+HOMEPAGE = "https://metacpan.org/release/MANOWAR/RadiusPerl"
 SECTION = "libs"
 
 LICENSE = "Artistic-2.0"
@@ -12,11 +12,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=78ab6ea0cba1f1ec1680ebb149e3bc11"
 
 DEPENDS = "perl"
 
-SRC_URI = "http://search.cpan.org/CPAN/authors/id/M/MA/MANOWAR/RadiusPerl-${PV}.tar.gz \
+SRC_URI = "${CPAN_MIRROR}/authors/id/M/MA/MANOWAR/RadiusPerl-${PV}.tar.gz \
            file://test.pl-adjust-for-ptest.patch \
            file://run-ptest \
 "
-SRC_URI[md5sum] = "d1fe2d6ecf7ea99299e4e3a8f945aad8"
 SRC_URI[sha256sum] = "3b276506986ccaa4949d92b13ce053a0017ad11562a991cc753364923fe81ca7"
 
 S = "${WORKDIR}/Authen-Radius-${PV}"

@@ -17,6 +17,9 @@ SRC_URI = " \
            file://dev-zram0.swap \
 "
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 do_install () {
     # Install systemd related configuration file
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then

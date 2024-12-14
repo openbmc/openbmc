@@ -1,0 +1,56 @@
+From be694ba90aa2e0fed3a4e9b53ad7a61efd0430c5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 5 Jul 2024 23:18:07 -0700
+Subject: [PATCH 2/2] Change program_name to have const attribute
+
+This is how it is used in all places and it also avoids a const to
+non-const conversion warning
+
+Upstream-Status: Submitted [https://github.com/kmxz/overlayfs-tools/pull/26]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common.c | 2 +-
+ fsck.c   | 2 +-
+ main.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/common.c b/common.c
+index eaf24a8..a15b66f 100644
+--- a/common.c
++++ b/common.c
+@@ -29,7 +29,7 @@
+ #include "common.h"
+ #include "config.h"
+ 
+-char *program_name;
++const char *program_name;
+ 
+ /* #define DEBUG 1 */
+ #ifdef DEBUG
+diff --git a/fsck.c b/fsck.c
+index 4e513f5..285b9f1 100644
+--- a/fsck.c
++++ b/fsck.c
+@@ -46,7 +46,7 @@
+ #include "mount.h"
+ #include "overlayfs.h"
+ 
+-extern char *program_name;
++extern const char *program_name;
+ 
+ struct ovl_fs ofs = {};
+ int flags = 0;		/* user input option flags */
+diff --git a/main.c b/main.c
+index ea0f5a5..1a8b239 100644
+--- a/main.c
++++ b/main.c
+@@ -28,7 +28,7 @@
+ bool verbose;
+ bool brief;
+ bool ignore;
+-extern char *program_name;
++extern const char *program_name;
+ 
+ #ifndef __GLIBC__
+ /*

@@ -11,7 +11,7 @@ SRC_URI = "http://sourceforge.net/projects/whisker/files/libwhisker/${PV}/libwhi
 SRC_URI[md5sum] = "7cc1718dddde8f9a439d5622ae2f37eb"
 SRC_URI[sha256sum] = "f45a1cf2ad2637b29dd1b13d7221ea12e3923ea09d107ced446400f19070a42f"
 
-S = "${WORKDIR}/libwhisker2-2.5"
+S = "${UNPACKDIR}/libwhisker2-2.5"
 
 inherit cpan-base
 

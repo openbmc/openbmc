@@ -19,6 +19,8 @@ SRC_URI[TestFloat.sha256sum] = "6d4bdf0096b48a653aa59fc203a9e5fe18b5a58d7a1b7151
 SRC_URI[SoftFloat.md5sum] = "7dac954ea4aed0697cbfee800ba4f492"
 SRC_URI[SoftFloat.sha256sum] = "21130ce885d35c1fe73fc1e1bf2244178167e05c6747cad5f450cc991714c746"
 
+UPSTREAM_CHECK_URI = "http://www.jhauser.us/arithmetic/TestFloat.html"
+
 S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
 

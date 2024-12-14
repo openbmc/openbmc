@@ -8,6 +8,7 @@ import os
 import sys
 
 from oeqa.core.context import OETestContext, OETestContextExecutor
+from oeqa.core.target.serial import OESerialTarget
 from oeqa.core.target.ssh import OESSHTarget
 from oeqa.core.target.qemu import OEQemuTarget
 
@@ -60,7 +61,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
         runtime_group = self.parser.add_argument_group('runtime options')
 
         runtime_group.add_argument('--target-type', action='store',
-                default=self.default_target_type, choices=['simpleremote', 'qemu'],
+                default=self.default_target_type, choices=['simpleremote', 'qemu', 'serial'],
                 help="Target type of device under test, default: %s" \
                 % self.default_target_type)
         runtime_group.add_argument('--target-ip', action='store',
@@ -108,6 +109,8 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
             target = OESSHTarget(logger, target_ip, server_ip, **kwargs)
         elif target_type == 'qemu':
             target = OEQemuTarget(logger, server_ip, **kwargs)
+        elif target_type == 'serial':
+            target = OESerialTarget(logger, target_ip, server_ip, **kwargs)
         else:
             # XXX: This code uses the old naming convention for controllers and
             # targets, the idea it is to leave just targets as the controller
@@ -203,8 +206,15 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
 
         super(OERuntimeTestContextExecutor, self)._process_args(logger, args)
 
+        td = self.tc_kwargs['init']['td']
+
         target_kwargs = {}
+        target_kwargs['machine'] = td.get("MACHINE") or None
         target_kwargs['qemuboot'] = args.qemu_boot
+        target_kwargs['serialcontrol_cmd'] = td.get("TEST_SERIALCONTROL_CMD") or None
+        target_kwargs['serialcontrol_extra_args'] = td.get("TEST_SERIALCONTROL_EXTRA_ARGS") or ""
+        target_kwargs['serialcontrol_ps1'] = td.get("TEST_SERIALCONTROL_PS1") or None
+        target_kwargs['serialcontrol_connect_timeout'] = td.get("TEST_SERIALCONTROL_CONNECT_TIMEOUT") or None
 
         self.tc_kwargs['init']['target'] = \
                 OERuntimeTestContextExecutor.getTarget(args.target_type,

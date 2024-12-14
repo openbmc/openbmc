@@ -18,10 +18,12 @@ SRC_URI = " \
     file://openct.init \
     file://openct.sysconfig \
     file://openct.service \
+    file://0001-Fix-incompatible-pointer-type-error-with-gcc-option.patch \
 "
 
-SRC_URI[md5sum] = "a1da3358ab798f1cb9232f1dbababc21"
 SRC_URI[sha256sum] = "6cd3e2933d29eb1f875c838ee58b8071fd61f0ec8ed5922a86c01c805d181a68"
+
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/opensc/files/openct/"
 
 LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
@@ -82,3 +84,8 @@ do_install () {
 }
 
 BBCLASSEXTEND = "native"
+
+# http://errors.yoctoproject.org/Errors/Details/766890/
+# openct-0.6.20/src/ifd/ifdhandler.c:239:52: error: passing argument 2 of 'ifd_get_eventfd' from incompatible pointer type [-Wincompatible-pointer-types]
+# openct-0.6.20/src/ifd/process.c:461:61: error: passing argument 4 of 'ct_tlv_get_opaque' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

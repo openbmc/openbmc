@@ -1,4 +1,4 @@
-From 69a89e8f015802f61637fed0d3791d20a594f298 Mon Sep 17 00:00:00 2001
+From 99fcb71903cca8458bcd6c0d5b676619a9710dab Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Wed, 15 Mar 2023 16:51:58 +0800
 Subject: [PATCH] tests/CMakeLists.txt: do not search ssh/sshd commands on host
@@ -9,16 +9,15 @@ not required by unittests, we can skip the search.
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
-
 ---
  tests/CMakeLists.txt | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
-index f5c30061..885c926a 100644
+index 89b95d08..e481534c 100644
 --- a/tests/CMakeLists.txt
 +++ b/tests/CMakeLists.txt
-@@ -86,6 +86,7 @@ set(TEST_TARGET_LIBRARIES
+@@ -96,6 +96,7 @@ set(TEST_TARGET_LIBRARIES
  
  add_subdirectory(unittests)
  
@@ -26,11 +25,14 @@ index f5c30061..885c926a 100644
  # OpenSSH Capabilities are required for all unit tests
  find_program(SSH_EXECUTABLE NAMES ssh)
  if (SSH_EXECUTABLE)
-@@ -302,6 +303,7 @@ if (CLIENT_TESTING OR SERVER_TESTING)
+@@ -345,6 +346,7 @@ endif (WITH_PKCS11_URI)
+ file(COPY gss/kdcsetup.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/gss FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
  
-     message(STATUS "TORTURE_ENVIRONMENT=${TORTURE_ENVIRONMENT}")
- endif ()
+ message(STATUS "TORTURE_ENVIRONMENT=${TORTURE_ENVIRONMENT}")
 +endif ()
  
  configure_file(tests_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/tests_config.h)
  
+-- 
+2.25.1
+

@@ -29,7 +29,8 @@ QB_MEM = "-m 1024"
 #QB_MEM:virtclass-mcextend-<pn> = "-m 4096"
 # python3-scrypt ptests run into OOMs on RISCV64 qemu
 QB_MEM:virtclass-mcextend-python3-scrypt = "-m 2048"
-QB_MEM:virtclass-mcextend-python3-fastjsonschema = "-m 2048"
+# Needs atleast 5G to avoid OOMs
+QB_MEM:virtclass-mcextend-python3-fastjsonschema = "-m 5120"
 QB_MEM:virtclass-mcextend-python3-pillow = "-m 2048"
 
 TEST_SUITES = "ping ssh parselogs ptest"

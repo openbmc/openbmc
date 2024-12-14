@@ -1112,7 +1112,7 @@ def _get_recipe_upgrade_status(data):
     maintainer = data.getVar('RECIPE_MAINTAINER')
     no_upgrade_reason = data.getVar('RECIPE_NO_UPDATE_REASON')
 
-    return (pn, status, cur_ver, next_ver, maintainer, revision, no_upgrade_reason)
+    return {'pn':pn, 'status':status, 'cur_ver':cur_ver, 'next_ver':next_ver, 'maintainer':maintainer, 'revision':revision, 'no_upgrade_reason':no_upgrade_reason}
 
 def get_recipe_upgrade_status(recipes=None):
     pkgs_list = []
@@ -1154,6 +1154,7 @@ def get_recipe_upgrade_status(recipes=None):
         if not recipes:
             recipes = tinfoil.all_recipe_files(variants=False)
 
+        recipeincludes = {}
         for fn in recipes:
             try:
                 if fn.startswith("/"):
@@ -1178,8 +1179,65 @@ def get_recipe_upgrade_status(recipes=None):
 
             data_copy_list.append(data_copy)
 
+            recipeincludes[data.getVar('FILE')] = {'bbincluded':data.getVar('BBINCLUDED').split(),'pn':data.getVar('PN')}
+
     from concurrent.futures import ProcessPoolExecutor
     with ProcessPoolExecutor(max_workers=utils.cpu_count()) as executor:
         pkgs_list = executor.map(_get_recipe_upgrade_status, data_copy_list)
 
-    return pkgs_list
+    return _group_recipes(pkgs_list, _get_common_include_recipes(recipeincludes))
+
+def get_common_include_recipes():
+    with bb.tinfoil.Tinfoil() as tinfoil:
+        tinfoil.prepare(config_only=False)
+
+        recipes = tinfoil.all_recipe_files(variants=False)
+
+        recipeincludes = {}
+        for fn in recipes:
+            data = tinfoil.parse_recipe_file(fn)
+            recipeincludes[fn] = {'bbincluded':data.getVar('BBINCLUDED').split(),'pn':data.getVar('PN')}
+        return _get_common_include_recipes(recipeincludes)
+
+def _get_common_include_recipes(recipeincludes_all):
+        recipeincludes = {}
+        for fn,data in recipeincludes_all.items():
+            bbincluded_filtered = [i for i in data['bbincluded'] if os.path.dirname(i) == os.path.dirname(fn) and i != fn]
+            if bbincluded_filtered:
+                recipeincludes[data['pn']] = bbincluded_filtered
+
+        recipeincludes_inverted = {}
+        for k,v in recipeincludes.items():
+            for i in v:
+                recipeincludes_inverted.setdefault(i,set()).add(k)
+
+        recipeincludes_inverted_filtered = {k:v for k,v in recipeincludes_inverted.items() if len(v) > 1}
+
+        recipes_with_shared_includes = list()
+        for v in recipeincludes_inverted_filtered.values():
+            recipeset = v
+            for v1 in recipeincludes_inverted_filtered.values():
+                if recipeset.intersection(v1):
+                    recipeset.update(v1)
+            if recipeset not in recipes_with_shared_includes:
+                recipes_with_shared_includes.append(recipeset)
+
+        return recipes_with_shared_includes
+
+def _group_recipes(recipes, groups):
+    recipedict = {}
+    for r in recipes:
+        recipedict[r['pn']] = r
+
+    recipegroups = []
+    for g in groups:
+        recipeset = []
+        for r in g:
+            if r in recipedict.keys():
+                recipeset.append(recipedict[r])
+                del recipedict[r]
+        recipegroups.append(recipeset)
+
+    for r in recipedict.values():
+        recipegroups.append([r])
+    return recipegroups

@@ -1,4 +1,4 @@
-From e40def862bdeb10da295b15c5904fe2829d391c7 Mon Sep 17 00:00:00 2001
+From a921a92f334a2a30741b906c206e041cef2d904d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:24:50 +0200
 Subject: [PATCH] Set libsolv variables with pkg-config (cmake's own module
@@ -12,7 +12,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 6444c374..e99b28d0 100644
+index c6bd46a6..a6f14318 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -51,7 +51,8 @@ endif()

@@ -92,6 +92,11 @@ signing_pkcs11_tool() {
 }
 
 signing_import_prepare() {
+    # the $PN is used as 'label' in the softhsm, which is a "CK_UTF8CHAR
+    # paddedLabel[32]" in softhsm2-util.cpp, so it must not be longer.
+    LEN=$(echo -n ${PN} | wc -c)
+    test $LEN -le 32 || bbfatal "PN must not have a length greater than 32 chars."
+
     export _SIGNING_ENV_FILE_="${B}/meta-signing.env"
     rm -f "$_SIGNING_ENV_FILE_"
 
@@ -127,6 +132,36 @@ signing_import_cert_from_der() {
     local der="${2}"
 
     signing_pkcs11_tool --type cert --write-object "${der}" --label "${role}"
+}
+
+# signing_import_cert_chain_from_pem <role> <pem>
+#
+
+# Import a certificate *chain* from a PEM file to a role.
+# (e.g. multiple ones concatenated in one file)
+#
+# Due to limitations in the toolchain:
+#   signing class -> softhsm -> 'extract-cert'
+# the input certificate is split into a sequentially numbered list of roles,
+# starting at <role>_1
+#
+# (The limitations are the conversion step from x509 to a plain .der, and
+# extract-cert expecting a x509 and then producing only plain .der again)
+signing_import_cert_chain_from_pem() {
+    local role="${1}"
+    local pem="${2}"
+    local i=1
+
+    cat "${pem}" | \
+        while openssl x509 -inform pem -outform der -out ${B}/temp_${i}.der; do
+            signing_import_define_role "${role}_${i}"
+            signing_pkcs11_tool --type cert \
+                                --write-object  ${B}/temp_${i}.der \
+                                --label "${role}_${i}"
+            rm ${B}/temp_${i}.der
+            echo "imported ${pem} under role: ${role}_${i}"
+            i=$(awk "BEGIN {print $i+1}")
+        done
 }
 
 # signing_import_cert_from_pem <role> <pem>

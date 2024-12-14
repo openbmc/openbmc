@@ -1,4 +1,4 @@
-From 6dd80236a91a505b5753bb74e5f1b47330d8b16b Mon Sep 17 00:00:00 2001
+From 20ba7fd8939e97bec3d70a67c0aac76ddc67898d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
 Date: Tue, 21 Feb 2017 11:23:27 -0600
 Subject: [PATCH] dpkg-deb/build.c: Remove usage of --clamp-mtime in tar
@@ -27,7 +27,7 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/deb/build.c b/src/deb/build.c
-index 1f0c050ee..92aba9553 100644
+index a418dd122..87bd4142e 100644
 --- a/src/deb/build.c
 +++ b/src/deb/build.c
 @@ -504,7 +504,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,

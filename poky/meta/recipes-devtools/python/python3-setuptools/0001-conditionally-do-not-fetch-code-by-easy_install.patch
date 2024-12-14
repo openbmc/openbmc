@@ -1,26 +1,32 @@
-From 80fe63816eb3bfd1f5b6d354e1f2442805cff4e0 Mon Sep 17 00:00:00 2001
+From 00611eb8151825632bc36c189109626d9223037f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 17 Jul 2018 10:13:38 +0800
 Subject: [PATCH] conditionally do not fetch code by easy_install
 
-If var-NO_FETCH_BUILD is set, do not allow to fetch code from
-internet by easy_install.
+If NO_FETCH_BUILD is set, do not fetch code in easy_install. This avoids setup.py
+trying to fetch missing dependencies at build time.
 
-Upstream-Status: Inappropriate [oe specific]
+This is only used by the deprecated codepath as implemented by setuptools3.bbclass, so
+when that ever gets removed this patch can also be deleted.
 
+Upstream-Status: Denied [https://github.com/pypa/setuptools/issues/4735]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update to apply against v75.6.0.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
  setuptools/command/easy_install.py | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/setuptools/command/easy_install.py b/setuptools/command/easy_install.py
-index 858fb20..62bd853 100644
+index 66fe68f7a..8647c2082 100644
 --- a/setuptools/command/easy_install.py
 +++ b/setuptools/command/easy_install.py
-@@ -672,6 +672,11 @@ class easy_install(Command):
+@@ -673,6 +673,11 @@ class easy_install(Command):
              os.path.exists(tmpdir) and _rmtree(tmpdir)
  
-     def easy_install(self, spec, deps=False):
+     def easy_install(self, spec, deps: bool = False) -> Distribution | None:
 +        if os.environ.get('NO_FETCH_BUILD', None):
 +            log.error("ERROR: Do not try to fetch `%s' for building. "
 +                      "Please add its native recipe to DEPENDS." % spec)
@@ -29,3 +35,6 @@ index 858fb20..62bd853 100644
          with self._tmpdir() as tmpdir:
              if not isinstance(spec, Requirement):
                  if URL_SCHEME(spec):
+-- 
+2.39.5
+

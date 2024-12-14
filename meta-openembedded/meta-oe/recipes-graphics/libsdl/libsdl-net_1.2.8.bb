@@ -16,5 +16,4 @@ SRC_URI = " \
 
 S = "${WORKDIR}/SDL_net-${PV}"
 
-SRC_URI[md5sum] = "20e64e61d65662db66c379034f11f718"
 SRC_URI[sha256sum] = "5f4a7a8bb884f793c278ac3f3713be41980c5eedccecff0260411347714facb4"

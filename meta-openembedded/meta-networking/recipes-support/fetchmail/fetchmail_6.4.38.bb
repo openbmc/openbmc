@@ -16,13 +16,10 @@ SRC_URI[sha256sum] = "a6cb4ea863ac61d242ffb2db564a39123761578d3e40d71ce7b6f2905b
 
 inherit autotools gettext pkgconfig python3-dir python3native
 
-EXTRA_OECONF = "--with-ssl=${STAGING_DIR_HOST}${prefix}"
-
-INSANE_SKIP:${PN} = "already-stripped"
+EXTRA_OECONF = "--with-ssl=${STAGING_DIR_HOST}${prefix} --disable-rpath "
 
 do_install:append() {
     sed -i 's,${RECIPE_SYSROOT_NATIVE},,g' ${D}${bindir}/fetchmailconf
-    sed -i 's,${RECIPE_SYSROOT},,g' ${D}${bindir}/fetchmail
 }
 
 PACKAGES =+ "fetchmail-python"

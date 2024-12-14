@@ -1,4 +1,4 @@
-From cad852e0ed46a1c26607f9e7d17cc5974b05e38a Mon Sep 17 00:00:00 2001
+From 75a17814ee39346612a2ff582fe5466201fa56b3 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 15 Apr 2020 14:17:20 -0700
 Subject: [PATCH] Check for clang before checking gcc version
@@ -18,7 +18,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 670684d83d1..f9ba1c0a4f7 100755
+index 7823f2c3784..52b6a1318ae 100755
 --- a/configure
 +++ b/configure
 @@ -5432,7 +5432,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
@@ -31,10 +31,10 @@ index 670684d83d1..f9ba1c0a4f7 100755
  #endif
  int main() {}
 diff --git a/configure.ac b/configure.ac
-index 88b4800e298..6cd4530db56 100644
+index a390639bfa9..66b8de7d4fd 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1410,7 +1410,7 @@ if test "$GCC" = yes; then
+@@ -1411,7 +1411,7 @@ if test "$GCC" = yes; then
    AC_MSG_CHECKING([whether g++ accepts -static-libstdc++ -static-libgcc])
    AC_LANG_PUSH(C++)
    AC_LINK_IFELSE([AC_LANG_SOURCE([

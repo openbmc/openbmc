@@ -1,6 +1,6 @@
-From acc4750ffa79a5c2ef3c95cf31ef51352a68837b Mon Sep 17 00:00:00 2001
-From: Chen Qi <Qi.Chen@windriver.com>
-Date: Tue, 28 Feb 2023 13:43:51 +0800
+From 0d76b00111a112032eb8522791b70664100d4e0a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 26 Nov 2024 23:23:42 -0800
 Subject: [PATCH] autogen.sh: remove '-unknown' in version
 
 python setuptools >=66.0.0 treats '-unknown' as an invalid version.
@@ -13,20 +13,25 @@ Upstream-Status: Submitted [https://lists.gnupg.org/pipermail/gnupg-devel/2023-F
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 
+Rebase to 1.24.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  autogen.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/autogen.sh b/autogen.sh
-index 4e1665b..a55326d 100755
+index 9f912972..9f7559b4 100755
 --- a/autogen.sh
 +++ b/autogen.sh
-@@ -269,7 +269,7 @@ if [ "$myhost" = "find-version" ]; then
+@@ -271,7 +271,7 @@ if [ "$myhost" = "find-version" ]; then
      else
        ingit=no
        beta=yes
 -      tmp="-unknown"
 +      tmp=""
+       cid="0000000"
        rev="0000000"
        rvd="0"
-     fi
+-- 
+2.25.1
+

@@ -1,4 +1,4 @@
-From 99734381652602f76075017576a819c427ebb5f2 Mon Sep 17 00:00:00 2001
+From f491fff7d006954c1c51eb7a513a85bdbab0fe5a Mon Sep 17 00:00:00 2001
 From: Reiner Herrmann <reiner@reiner-h.de>
 Date: Tue, 10 Oct 2017 15:06:13 -0300
 Subject: [PATCH] lib/mkmf.rb: sort list of object files in generated Makefile

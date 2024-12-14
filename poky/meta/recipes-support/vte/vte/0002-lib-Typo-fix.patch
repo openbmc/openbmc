@@ -1,0 +1,25 @@
+From 6b7440996819c12ec32bfaf4e73b27baeb273207 Mon Sep 17 00:00:00 2001
+From: Christian Persch <chpe@src.gnome.org>
+Date: Thu, 5 Sep 2024 23:59:05 +0200
+Subject: [PATCH 2/3] lib: Typo fix
+
+Fixes: https://gitlab.gnome.org/GNOME/vte/-/issues/2816
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/vte/-/commit/e24087d953d9352c8bc46074e2662c80f9bfbc2d]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/vteinternal.hh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vteinternal.hh b/src/vteinternal.hh
+index 051e78c..b1adc19 100644
+--- a/src/vteinternal.hh
++++ b/src/vteinternal.hh
+@@ -1233,7 +1233,7 @@ public:
+         void reset_decoder();
+ 
+         void feed(std::string_view const& data,
+-                  bool start_processsing_ = true);
++                  bool start_processing_ = true);
+         void feed_child(char const* data,
+                         size_t length) { assert(data); feed_child({data, length}); }
+         void feed_child(std::string_view const& str);

@@ -21,7 +21,7 @@ do_install(){
     oe_runmake install DESTDIR=${D}
 }
 
-inherit update-alternatives
+inherit update-alternatives sourceforge-releases
 
 ALTERNATIVE:${PN} = "getty"
 ALTERNATIVE_LINK_NAME[getty] = "${base_sbindir}/getty"

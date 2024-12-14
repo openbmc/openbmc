@@ -1,0 +1,34 @@
+From 083cf39140cd894ea306b67411d6088c13a9e286 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Mon, 30 Jul 2018 17:00:01 +0000
+Subject: [PATCH 7/7] libtool: Fix problem with libtoolize in multilib
+
+Without this patch /usr/bin/libtoolize is different for each multilib
+since their host-triplets are different, despite there being no difference in
+the functionality of libtoolize itself.
+
+Ugly, but just patch this out. This fixes issues where libtool and
+libXX-libtool couldn't be installed into the same system.
+
+Upstream-Status: Inappropriate
+RP 2018/7/30
+---
+ libtoolize.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libtoolize.in b/libtoolize.in
+index 8beb670e..c89a093c 100644
+--- a/libtoolize.in
++++ b/libtoolize.in
+@@ -139,7 +139,7 @@ You must 'cd' to the top directory of your package before you run
+ When reporting a bug, please describe a test case to reproduce it and
+ include the following information:
+ 
+-       host-triplet:   @host_triplet@
++       host-triplet    <redacted>
+        version:        $progname $scriptversion
+        automake:       `($AUTOMAKE --version) 2>/dev/null |$SED 1q`
+        autoconf:       `($AUTOCONF --version) 2>/dev/null |$SED 1q`
+-- 
+2.39.5
+

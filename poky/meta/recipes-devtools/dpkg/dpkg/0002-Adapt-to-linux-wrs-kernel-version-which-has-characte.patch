@@ -1,4 +1,4 @@
-From 0cac67ce5920d6d0c9df4278bfa77da878a8a37a Mon Sep 17 00:00:00 2001
+From 6e88e8b7b6924751112966f329525956735de9b4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 26 Aug 2015 16:16:16 +0300
 Subject: [PATCH] Adapt to linux-wrs kernel version, which has character '_'
@@ -13,10 +13,10 @@ Upstream-Status: Inappropriate [embedded specific]
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/lib/dpkg/parsehelp.c b/lib/dpkg/parsehelp.c
-index 63a36f55c..81901bd5a 100644
+index a999b5e78..7be0378ab 100644
 --- a/lib/dpkg/parsehelp.c
 +++ b/lib/dpkg/parsehelp.c
-@@ -275,14 +275,12 @@ parseversion(struct dpkg_version *rversion, const char *string,
+@@ -291,14 +291,12 @@ parseversion(struct dpkg_version *rversion, const char *string,
    ptr = rversion->version;
    if (!*ptr)
      return dpkg_put_error(err, _("version number is empty"));

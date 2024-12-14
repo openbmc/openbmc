@@ -12,4 +12,6 @@ SRCREV = "3a8402c1de7c7747c95229db26d8d32fb85a7a52"
 
 S = "${WORKDIR}/git"
 
+CVE_PRODUCT = "rsyslog:libfastjson"
+
 inherit autotools

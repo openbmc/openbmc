@@ -1,0 +1,43 @@
+From 1a09bf71c2f541c2cfb44a00661051597bbd0b76 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 6 Aug 2024 21:42:43 -0700
+Subject: [PATCH] kexec.c: add MFD_NOEXEC_SEAL flag explicitly
+
+Add MFD_NOEXEC_SEAL to avoid kernel warning like below:
+
+  kexec[970]: memfd_create() called without MFD_EXEC or MFD_NOEXEC_SEAL set
+
+For old kernels, there will be no MFD_NOEXEC_SEAL definition, so fallback
+to define it to 0.
+
+Upstream-Status: Submitted [https://github.com/horms/kexec-tools/pull/7]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ kexec/kexec.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/kexec/kexec.c b/kexec/kexec.c
+index 4f51987..8f02595 100644
+--- a/kexec/kexec.c
++++ b/kexec/kexec.c
+@@ -60,6 +60,10 @@
+ #define KEXEC_LOADED_PATH "/sys/kernel/kexec_loaded"
+ #define KEXEC_CRASH_LOADED_PATH "/sys/kernel/kexec_crash_loaded"
+ 
++#ifndef MFD_NOEXEC_SEAL
++#define MFD_NOEXEC_SEAL 0
++#endif
++
+ unsigned long long mem_min = 0;
+ unsigned long long mem_max = ULONG_MAX;
+ unsigned long elfcorehdrsz = 0;
+@@ -657,7 +661,7 @@ static int copybuf_memfd(const char *kernel_buf, size_t size)
+ {
+ 	int fd, count;
+ 
+-	fd = memfd_create("kernel", MFD_ALLOW_SEALING);
++	fd = memfd_create("kernel", MFD_ALLOW_SEALING | MFD_NOEXEC_SEAL);
+ 	if (fd == -1)
+ 		return fd;
+ 

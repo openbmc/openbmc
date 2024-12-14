@@ -8,7 +8,6 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
            file://0001-Use-the-API-properly-in-the-example-format-security-.patch \
           "
 
-SRC_URI[md5sum] = "0d94919136e1d16b68427562e74cb3dd"
 SRC_URI[sha256sum] = "5991020192f52cc40fa852fbf6bbf5bd5db5d5d00aa9905c67f6f0eadeed48ea"
 
 PACKAGECONFIG ??= "expat"

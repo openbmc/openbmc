@@ -1,4 +1,4 @@
-From 79fd22c0def26eba130db98e312bb00fec32ac0a Mon Sep 17 00:00:00 2001
+From ed60c2ad3a7ed9762fcb6a304c7f60544606baef Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Tue, 4 Aug 2015 03:07:01 +0200
 Subject: [PATCH] Don't mess with CFLAGS and LDFLAGS when --with-minimal is
@@ -10,16 +10,15 @@ Upstream-Status: Inappropriate [config]
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 Signed-off-by: Tudor Florea <tudor.florea@enea.com>
-
 ---
  configure.ac | 2 --
  1 file changed, 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 695ce68..0f28b55 100644
+index e578b2b..3874124 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -414,8 +414,6 @@ AC_ARG_WITH(minimal,
+@@ -415,8 +415,6 @@ AC_ARG_WITH(minimal,
      AC_DEFINE(NO_FTP_USERS)
      AC_DEFINE(WITHOUT_ASCII)    
      AC_DEFINE(BORING_MODE)

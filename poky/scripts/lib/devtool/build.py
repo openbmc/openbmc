@@ -49,7 +49,7 @@ def build(args, config, basepath, workspace):
         rd = parse_recipe(config, tinfoil, args.recipename, appends=True, filter_workspace=False)
         if not rd:
             return 1
-        deploytask = 'do_deploy' in rd.getVar('__BBTASKS')
+        deploytask = 'do_deploy' in bb.build.listtasks(rd)
     finally:
         tinfoil.shutdown()
 

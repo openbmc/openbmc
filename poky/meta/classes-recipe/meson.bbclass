@@ -9,7 +9,6 @@ inherit python3native meson-routines qemu
 DEPENDS:append = " meson-native ninja-native"
 
 EXEWRAPPER_ENABLED:class-native = "False"
-EXEWRAPPER_ENABLED:class-nativesdk = "False"
 EXEWRAPPER_ENABLED ?= "${@bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'True', 'False', d)}"
 DEPENDS:append = "${@' qemu-native' if d.getVar('EXEWRAPPER_ENABLED') == 'True' else ''}"
 
@@ -127,7 +126,7 @@ cpp_link_args = ${@meson_array('BUILD_LDFLAGS', d)}
 EOF
 }
 
-do_write_config:append:class-target() {
+write_qemuwrapper() {
     # Write out a qemu wrapper that will be used as exe_wrapper so that meson
     # can run target helper binaries through that.
     qemu_binary="${@qemu_wrapper_cmdline(d, '$STAGING_DIR_HOST', ['$STAGING_DIR_HOST/${libdir}','$STAGING_DIR_HOST/${base_libdir}'])}"
@@ -143,6 +142,14 @@ unset LD_LIBRARY_PATH
 $qemu_binary "\$@"
 EOF
     chmod +x ${WORKDIR}/meson-qemuwrapper
+}
+
+do_write_config:append:class-target() {
+    write_qemuwrapper
+}
+
+do_write_config:append:class-nativesdk() {
+    write_qemuwrapper
 }
 
 # Tell externalsrc that changes to this file require a reconfigure

@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "c774416b10310156879443b81187d182d8d9ee499660380e645918b50b
 
 PYPI_PACKAGE = "pyelftools"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta
 
 BBCLASSEXTEND = "native"
 

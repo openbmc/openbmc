@@ -1,34 +1,21 @@
 # List of known non-reproducible package of the meta-networking layer
 # Please keep this list sorted
 KNOWN_NON_REPRO_META_NETWORKING = " \
-    blueman \
-    blueman-dbg \
-    blueman-src \
-    civetweb-dev \
+    babeld \
+    babeld-dbg \
     dhcp-relay-staticdev \
     ettercap-src \
-    fetchmail \
-    fetchmail-dbg \
     freediameter \
-    freediameter-src \
     freeradius \
     htpdate-doc \
-    keepalived \
-    keepalived-dbg \
     libbearssl-staticdev \
-    libfko3 \
-    libfko-client \
-    libfko-daemon \
-    libfko-dbg \
     libmosquitto1 \
     libowfat-staticdev \
     libruli-staticdev \
-    libsamba-util0 \
     mosquitto \
-    mosquitto-dbg \
     ncftp \
-    ncftp-dbg \
-    ncftp-src \
+    ncp \
+    ncp-dbg \
     ndisc6-dbg \
     ndisc6-misc \
     ndisc6-ndisc6 \
@@ -36,22 +23,14 @@ KNOWN_NON_REPRO_META_NETWORKING = " \
     ndisc6-rdnssd \
     ndisc6-rltraceroute6 \
     netsniff-ng-doc \
+    ntopng \
+    ntopng-dbg \
     ntpsec-src \
     openl2tp \
-    openl2tp-dbg \
-    ot-br-posix \
-    ot-br-posix-dbg \
+    opensaf \
     postfix-cfg \
-    proftpd \
-    proftpd-dbg \
-    proftpd-dev \
-    rdist \
-    rdist-dbg \
-    samba-dbg \
-    tayga \
-    tayga-dbg \
-    wolfssl \
-    wolfssl-dbg \
+    rp-pppoe \
+    udpcast-doc \
+    unbound-doc \
     znc \
-    znc-doc \
 "

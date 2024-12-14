@@ -1,4 +1,4 @@
-From 49caf586b80ba030a0ee4af9f6128ff2979ea636 Mon Sep 17 00:00:00 2001
+From 97229d19eca7d93d38ed7893640efe36a57e7bcb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
 Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
@@ -26,10 +26,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  8 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/elf/dl-cache.c b/elf/dl-cache.c
-index 85f3f179ed..cc55887c56 100644
+index 7c7dc58745..0147a281ad 100644
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
-@@ -352,6 +352,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
+@@ -336,6 +336,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
    return best;
  }
  
@@ -41,10 +41,10 @@ index 85f3f179ed..cc55887c56 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index c4a543fb00..27fb70f09b 100644
+index e149dd7e76..c99ce0ee45 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -117,8 +117,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
+@@ -106,8 +106,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
     gen-trusted-dirs.awk.  */
  #include "trusted-dirs.h"
  
@@ -111,7 +111,7 @@ index b64c54b53e..caf7001745 100644
  static error_t
  parse_opt (int key, char *arg, struct argp_state *state)
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 4f494b792e..d1c1252188 100644
+index 6352ba76c5..02316b8b16 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
 @@ -190,6 +190,7 @@ dso_name_valid_for_suid (const char *p)

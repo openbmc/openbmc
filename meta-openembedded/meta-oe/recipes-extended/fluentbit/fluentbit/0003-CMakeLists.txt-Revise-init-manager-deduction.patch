@@ -1,0 +1,38 @@
+From bf4e832544e8aa5866ef57859f95b71bd8811154 Mon Sep 17 00:00:00 2001
+From: Niko Mauno <niko.mauno@vaisala.com>
+Date: Mon, 21 Oct 2024 16:02:46 +0000
+Subject: [PATCH] CMakeLists.txt: Revise init manager deduction
+
+The init manager deduction is not cross-compile friendly, so replace
+the host specific condition checks with placeholders that can be
+replaced in Yocto recipe.
+
+Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
+
+Upstream-Status: Inappropriate [configuration]
+---
+ src/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 8404b65c1..0c7876058 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -540,7 +540,7 @@ if(FLB_BINARY)
+     set(SYSTEMD_UNITDIR  /lib/systemd/system)
+   endif()
+ 
+-  if(SYSTEMD_UNITDIR)
++  if(@INIT_MANAGER_IS_SYSTEMD@)
+     set(FLB_SYSTEMD_SCRIPT "${PROJECT_SOURCE_DIR}/init/${FLB_OUT_NAME}.service")
+     configure_file(
+       "${PROJECT_SOURCE_DIR}/init/systemd.in"
+@@ -548,7 +548,7 @@ if(FLB_BINARY)
+       )
+     install(FILES ${FLB_SYSTEMD_SCRIPT} COMPONENT binary DESTINATION ${SYSTEMD_UNITDIR})
+     install(DIRECTORY DESTINATION ${FLB_INSTALL_CONFDIR} COMPONENT binary)
+-  elseif(IS_DIRECTORY /usr/share/upstart)
++  elseif(@INIT_MANAGER_IS_UPSTART@)
+     set(FLB_UPSTART_SCRIPT "${PROJECT_SOURCE_DIR}/init/${FLB_OUT_NAME}.conf")
+     configure_file(
+       "${PROJECT_SOURCE_DIR}/init/upstart.in"

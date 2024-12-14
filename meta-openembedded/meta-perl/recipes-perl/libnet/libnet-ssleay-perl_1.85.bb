@@ -4,7 +4,7 @@ web pages on SSL servers (for symmetry, same API is offered for \
 accessing http servers, too), a sslcat() function for writing your own \
 clients, and finally access to the SSL api of SSLeay/OpenSSL package \
 so you can write servers or clients for more complicated applications."
-HOMEPAGE = "http://search.cpan.org/dist/Net-SSLeay/"
+HOMEPAGE = "https://metacpan.org/dist/Net-SSLeay"
 SECTION = "libs"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
@@ -23,11 +23,10 @@ RDEPENDS:${PN} += "\
     zlib \
 "
 
-SRC_URI = "http://search.cpan.org/CPAN/authors/id/M/MI/MIKEM/Net-SSLeay-${PV}.tar.gz \
+SRC_URI = "${CPAN_MIRROR}/authors/id/M/MI/MIKEM/Net-SSLeay-${PV}.tar.gz \
            file://no-exec-on-configure.patch \
            file://run-ptest \
           "
-SRC_URI[md5sum] = "d602bdce4e0531c6efc276e3e429ca69"
 SRC_URI[sha256sum] = "9d8188b9fb1cae3bd791979c20554925d5e94a138d00414f1a6814549927b0c8"
 
 S = "${WORKDIR}/Net-SSLeay-${PV}"

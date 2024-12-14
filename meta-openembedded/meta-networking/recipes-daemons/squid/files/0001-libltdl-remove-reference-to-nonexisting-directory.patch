@@ -1,0 +1,55 @@
+From a6638a007a42917fea4b03e5c30d9b7208c634c4 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Thu, 7 Nov 2024 22:04:40 +0100
+Subject: [PATCH] libltdl: remove reference to nonexisting directory
+
+Commit [1] removed directory libltdl/m4 from release tarball by merging
+all those files into libltdl/aclocal.m4, however makefiles still
+reference it causing following error in do_configure:
+
+| autoreconf: Entering directory 'libltdl'
+| autoreconf: configure.ac: not using Gettext
+| autoreconf: running: aclocal --system-acdir=WORKDIR/recipe-sysroot/usr/share/aclocal/ -I WORKDIR/squid-6.12/acinclude/ -I WORKDIR/recipe-sysroot-native/usr/share/aclocal/ --force -I m4
+| aclocal: error: couldn't open directory 'm4': No such file or directory
+| autoreconf: error: aclocal failed with exit status: 1
+
+Remove these invalid references.
+
+[1] https://github.com/squid-cache/squid/commit/b4addc2262e5bee37543f8d1ab9dd98337bafba3
+
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+Upstream-Status: Inappropriate [upstream ticket https://lists.squid-cache.org/pipermail/squid-users/2024-November/027244.html]
+---
+ libltdl/Makefile.am | 2 +-
+ libltdl/Makefile.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libltdl/Makefile.am b/libltdl/Makefile.am
+index aad98e2..8a9539b 100644
+--- a/libltdl/Makefile.am
++++ b/libltdl/Makefile.am
+@@ -29,7 +29,7 @@
+ ## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ #####
+ 
+-ACLOCAL_AMFLAGS = -I m4
++ACLOCAL_AMFLAGS =
+ AUTOMAKE_OPTIONS = foreign
+ AM_CPPFLAGS =
+ AM_LDFLAGS =
+diff --git a/libltdl/Makefile.in b/libltdl/Makefile.in
+index 9929557..c77df2e 100644
+--- a/libltdl/Makefile.in
++++ b/libltdl/Makefile.in
+@@ -448,7 +448,7 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-ACLOCAL_AMFLAGS = -I m4
++ACLOCAL_AMFLAGS =
+ AUTOMAKE_OPTIONS = foreign
+ 
+ # -I$(srcdir) is needed for user that built libltdl with a sub-Automake
+-- 
+2.30.2
+

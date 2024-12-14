@@ -49,7 +49,7 @@ RRECOMMENDS:${PN} = " \
     xfce4-verve-plugin \
     \
     ${@bb.utils.contains('DISTRO_FEATURES','polkit','xfce-polkit','',d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth gobject-introspection", "blueman", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "bluetooth gobject-introspection-data", "blueman", "", d)} \
     \
     thunar-media-tags-plugin \
     thunar-archive-plugin \

@@ -1,0 +1,27 @@
+From d19ad6cc086684ee74db250f5fd35227c98e678a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Thu, 6 Jun 2024 10:29:29 +0200
+Subject: [PATCH] Add new thread attributes from Python 3.13
+
+Does not fix https://github.com/eventlet/eventlet/issues/964 yet
+Upstream-Status: Backport [https://github.com/eventlet/eventlet/pull/965]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ eventlet/green/thread.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/eventlet/green/thread.py b/eventlet/green/thread.py
+index 053a1c3c6..384b3c290 100644
+--- a/eventlet/green/thread.py
++++ b/eventlet/green/thread.py
+@@ -118,3 +118,10 @@ def stack_size(size=None):
+ 
+ if hasattr(__thread, 'daemon_threads_allowed'):
+     daemon_threads_allowed = __thread.daemon_threads_allowed
++
++if hasattr(__thread, 'start_joinable_thread'):
++    start_joinable_thread = __thread.start_joinable_thread
++    _shutdown = __thread._shutdown
++    _make_thread_handle = __thread._make_thread_handle
++    _ThreadHandle = __thread._ThreadHandle
++    _get_main_thread_ident = __thread._get_main_thread_ident

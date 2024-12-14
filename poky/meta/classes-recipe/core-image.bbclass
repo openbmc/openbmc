@@ -26,11 +26,6 @@
 # - ssh-server-openssh  - SSH server (openssh)
 # - hwcodecs            - Install hardware acceleration codecs
 # - package-management  - installs package management tools and preserves the package manager database
-# - debug-tweaks        - makes an image suitable for development, e.g. allowing passwordless root logins
-#   - empty-root-password
-#   - allow-empty-password
-#   - allow-root-login
-#   - post-install-logging
 # - serial-autologin-root - with 'empty-root-password': autologin 'root' on the serial console
 # - dev-pkgs            - development packages (headers, etc.) for all installed packages in the rootfs
 # - dbg-pkgs            - debug symbol packages for all installed packages in the rootfs
@@ -42,6 +37,12 @@
 # - read-only-rootfs    - tweaks an image to support read-only rootfs
 # - stateless-rootfs    - systemctl-native not run, image populated by systemd at runtime
 # - splash              - bootup splash screen
+#
+# Features for development purposes (previously part of debug-tweaks):
+# - empty-root-password  - the root user has no password set
+# - allow-empty-password - users can have an empty password
+# - allow-root-login     - the root user can login
+# - post-install-logging - log the output of postinstall scriptlets
 #
 FEATURE_PACKAGES_weston = "packagegroup-core-weston"
 FEATURE_PACKAGES_x11 = "packagegroup-core-x11"

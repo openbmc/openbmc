@@ -1,4 +1,4 @@
-From c0c5241abdc113acbe6bcd960686cea414bce357 Mon Sep 17 00:00:00 2001
+From 348811a6f818408a31551d0830dcfe31c55d06a8 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 7 Feb 2022 10:13:15 +0100
 Subject: [PATCH] config.mak.uname: do not force RHEL-7 specific build settings
@@ -12,16 +12,15 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 Rebased for 2.45.1.
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
-
 ---
  config.mak.uname | 4 ----
  1 file changed, 4 deletions(-)
 
 diff --git a/config.mak.uname b/config.mak.uname
-index a7607a5..251057e 100644
+index d511216..3144228 100644
 --- a/config.mak.uname
 +++ b/config.mak.uname
-@@ -64,10 +64,6 @@ ifeq ($(uname_S),Linux)
+@@ -63,10 +63,6 @@ ifeq ($(uname_S),Linux)
  	PROCFS_EXECUTABLE_PATH = /proc/self/exe
  	HAVE_PLATFORM_PROCINFO = YesPlease
  	COMPAT_OBJS += compat/linux/procinfo.o
@@ -29,6 +28,6 @@ index a7607a5..251057e 100644
 -        ifneq ($(findstring .el7.,$(uname_R)),)
 -		BASIC_CFLAGS += -std=c99
 -        endif
+ 	LINK_FUZZ_PROGRAMS = YesPlease
  endif
  ifeq ($(uname_S),GNU/kFreeBSD)
- 	HAVE_ALLOCA_H = YesPlease

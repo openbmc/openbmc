@@ -58,7 +58,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
     import stat
 
     bad_licenses = (d.getVar("INCOMPATIBLE_LICENSE") or "").split()
-    bad_licenses = expand_wildcard_licenses(d, bad_licenses)
+    bad_licenses = oe.license.expand_wildcard_licenses(d, bad_licenses)
     pkgarchs = d.getVar("SSTATE_ARCHS").split()
     pkgarchs.reverse()
 
@@ -66,17 +66,17 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
     with open(license_manifest, "w") as license_file:
         for pkg in sorted(pkg_dic):
             remaining_bad_licenses = oe.license.apply_pkg_license_exception(pkg, bad_licenses, exceptions)
-            incompatible_licenses = incompatible_pkg_license(d, remaining_bad_licenses, pkg_dic[pkg]["LICENSE"])
+            incompatible_licenses = oe.license.incompatible_pkg_license(d, remaining_bad_licenses, pkg_dic[pkg]["LICENSE"])
             if incompatible_licenses:
                 bb.fatal("Package %s cannot be installed into the image because it has incompatible license(s): %s" %(pkg, ' '.join(incompatible_licenses)))
             else:
-                incompatible_licenses = incompatible_pkg_license(d, bad_licenses, pkg_dic[pkg]["LICENSE"])
+                incompatible_licenses = oe.license.incompatible_pkg_license(d, bad_licenses, pkg_dic[pkg]["LICENSE"])
                 if incompatible_licenses:
-                    oe.qa.handle_error('license-incompatible', "Including %s with incompatible license(s) %s into the image, because it has been allowed by exception list." %(pkg, ' '.join(incompatible_licenses)), d)
+                    oe.qa.handle_error('license-exception', "Including %s with incompatible license(s) %s into the image, because it has been allowed by exception list." %(pkg, ' '.join(incompatible_licenses)), d)
             try:
                 (pkg_dic[pkg]["LICENSE"], pkg_dic[pkg]["LICENSES"]) = \
                     oe.license.manifest_licenses(pkg_dic[pkg]["LICENSE"],
-                    remaining_bad_licenses, canonical_license, d)
+                    remaining_bad_licenses, oe.license.canonical_license, d)
             except oe.license.LicenseError as exc:
                 bb.fatal('%s: %s' % (d.getVar('P'), exc))
 
@@ -144,7 +144,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                 if not os.path.exists(pkg_license_dir ):
                     bb.fatal("Couldn't find license information for dependency %s" % pkg)
 
-                pkg_manifest_licenses = [canonical_license(d, lic) \
+                pkg_manifest_licenses = [oe.license.canonical_license(d, lic) \
                         for lic in pkg_dic[pkg]["LICENSES"]]
 
                 licenses = os.listdir(pkg_license_dir)
@@ -153,7 +153,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                     pkg_rootfs_license = os.path.join(pkg_rootfs_license_dir, lic)
 
                     if re.match(r"^generic_.*$", lic):
-                        generic_lic = canonical_license(d,
+                        generic_lic = oe.license.canonical_license(d,
                                 re.search(r"^generic_(.*)$", lic).group(1))
 
                         # Do not copy generic license into package if isn't
@@ -176,7 +176,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                         if not os.path.exists(pkg_rootfs_license):
                             os.symlink(os.path.join('..', generic_lic_file), pkg_rootfs_license)
                     else:
-                        if (oe.license.license_ok(canonical_license(d,
+                        if (oe.license.license_ok(oe.license.canonical_license(d,
                                 lic), bad_licenses) == False or
                                 os.path.exists(pkg_rootfs_license)):
                             continue

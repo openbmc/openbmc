@@ -6,12 +6,12 @@ TS_ENV = "arm-linux"
 require trusted-services.inc
 
 SRC_URI += "file://tee-udev.rules \
+            file://0001-Remove-TEE-driver-external-component.patch \
            "
 
 OECMAKE_SOURCEPATH="${S}/deployments/libts/${TS_ENV}"
 
-DEPENDS           += "arm-tstee arm-ffa-user"
-RRECOMMENDS:${PN} += "arm-tstee"
+DEPENDS           += "arm-ffa-user"
 
 # Unix group name for dev/tee* ownership.
 TEE_GROUP_NAME ?= "teeclnt"

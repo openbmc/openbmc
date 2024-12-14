@@ -142,3 +142,28 @@ class FileChecksumCache(MultiProcessCache):
 
         checksums.sort(key=operator.itemgetter(1))
         return checksums
+
+class RevisionsCache(MultiProcessCache):
+    cache_file_name = "local_srcrevisions.dat"
+    CACHE_VERSION = 1
+
+    def __init__(self):
+        MultiProcessCache.__init__(self)
+
+    def get_revs(self):
+        return self.cachedata[0]
+
+    def get_rev(self, k):
+        if k in self.cachedata_extras[0]:
+            return self.cachedata_extras[0][k]
+        if k in self.cachedata[0]:
+            return self.cachedata[0][k]
+        return None
+
+    def set_rev(self, k, v):
+        self.cachedata[0][k] = v
+        self.cachedata_extras[0][k] = v
+
+    def merge_data(self, source, dest):
+        for h in source[0]:
+            dest[0][h] = source[0][h]

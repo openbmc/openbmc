@@ -1,0 +1,37 @@
+From aec8c971e09a28a5f8cd655ccd2f0cf1b057d756 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 14 Nov 2024 07:35:11 +0000
+Subject: [PATCH 2/2] Makefile: Add -n to gzip
+
+To make the resulting files reproducible.
+
+-n --no-name
+    When compressing, do not save the original file name and timestamp by default.
+
+Upstream-Status: Submitted [https://github.com/xrmx/bootchart/pull/106]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 99a3ec7..87de486 100644
+--- a/Makefile
++++ b/Makefile
+@@ -107,9 +107,9 @@ install-docs:
+ 	install -m 644 -D README $(DESTDIR)$(DOCDIR)/README
+ 	install -m 644 -D README.pybootchart $(DESTDIR)$(DOCDIR)/README.pybootchart
+ 	mkdir -p $(DESTDIR)$(MANDIR)
+-	gzip -c bootchart2.1 > $(DESTDIR)$(MANDIR)/bootchart2.1.gz
+-	gzip -c bootchartd.1 > $(DESTDIR)$(MANDIR)/$(PROGRAM_PREFIX)bootchartd$(PROGRAM_SUFFIX).1.gz
+-	gzip -c pybootchartgui.1 > $(DESTDIR)$(MANDIR)/pybootchartgui.1.gz
++	gzip -n -c bootchart2.1 > $(DESTDIR)$(MANDIR)/bootchart2.1.gz
++	gzip -n -c bootchartd.1 > $(DESTDIR)$(MANDIR)/$(PROGRAM_PREFIX)bootchartd$(PROGRAM_SUFFIX).1.gz
++	gzip -n -c pybootchartgui.1 > $(DESTDIR)$(MANDIR)/pybootchartgui.1.gz
+ 
+ install-service:
+ 	mkdir -p $(DESTDIR)$(SYSTEMD_UNIT_DIR)
+-- 
+2.44.1
+

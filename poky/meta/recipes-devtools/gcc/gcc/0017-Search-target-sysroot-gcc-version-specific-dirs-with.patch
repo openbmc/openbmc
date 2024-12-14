@@ -1,4 +1,4 @@
-From cafcdfea0526dda5377a999dd9b1b8c805eafe0a Mon Sep 17 00:00:00 2001
+From b2d95de58356c242abfe35467c2366d4e4b842ce Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:41:45 +0000
 Subject: [PATCH] Search target sysroot gcc version specific dirs with

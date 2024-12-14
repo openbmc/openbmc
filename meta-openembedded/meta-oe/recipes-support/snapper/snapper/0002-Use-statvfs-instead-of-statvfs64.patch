@@ -1,0 +1,37 @@
+From 0b39f4484553c796cb300fb4933ea314e91d913b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 Oct 2024 07:55:23 -0700
+Subject: [PATCH 2/2] Use statvfs instead of statvfs64
+
+when using LFS64 these functions are same and also
+on 64bit systems they are same. musl is using 64bit off_t
+by default and does not define LFS64 variants of these functions
+and it ends up in build errors
+
+Taken from Alpine Linux: [https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/testing/snapper/statvfs64.patch]
+
+Upstream-Status: Submitted [https://github.com/openSUSE/snapper/pull/945]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ snapper/FileUtils.cc | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/snapper/FileUtils.cc b/snapper/FileUtils.cc
+index d4034279..4c8578a1 100644
+--- a/snapper/FileUtils.cc
++++ b/snapper/FileUtils.cc
+@@ -387,9 +387,9 @@ namespace snapper
+     std::pair<unsigned long long, unsigned long long>
+     SDir::statvfs() const
+     {
+-	struct statvfs64 fsbuf;
+-	if (fstatvfs64(dirfd, &fsbuf) != 0)
+-	    SN_THROW(IOErrorException(sformat("statvfs64 failed path:%s errno:%d (%s)", base_path.c_str(),
++	struct statvfs fsbuf;
++	if (fstatvfs(dirfd, &fsbuf) != 0)
++	    SN_THROW(IOErrorException(sformat("statvfs failed path:%s errno:%d (%s)", base_path.c_str(),
+ 					      errno, stringerror(errno).c_str())));
+ 
+ 	// f_bavail is used (not f_bfree) since df seems to do the

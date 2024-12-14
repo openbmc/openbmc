@@ -89,10 +89,6 @@ class BBLogFormatter(logging.Formatter):
             msg = logging.Formatter.format(self, record)
         if hasattr(record, 'bb_exc_formatted'):
             msg += '\n' + ''.join(record.bb_exc_formatted)
-        elif hasattr(record, 'bb_exc_info'):
-            etype, value, tb = record.bb_exc_info
-            formatted = bb.exceptions.format_exception(etype, value, tb, limit=5)
-            msg += '\n' + ''.join(formatted)
         return msg
 
     def colorize(self, record):

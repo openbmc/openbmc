@@ -40,11 +40,9 @@ Upstream-Status: Pending
  utils/CMakeLists.txt   | 10 +++++-----
  6 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index c6c757c..5f1c540 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -603,10 +603,10 @@ add_library(poppler ${poppler_SRCS})
+@@ -628,10 +628,10 @@ add_library(poppler ${poppler_SRCS} ${LI
  if (OpenJPEG_FOUND)
    # check if we can remove this when we depend on newer openjpeg versions, 2.5 seems fixed
    # target openjp2 may lack interface include directories
@@ -56,9 +54,7 @@ index c6c757c..5f1c540 100644
 +  target_include_directories(poppler  PRIVATE ${LCMS2_INCLUDE_DIR})
  endif()
  generate_export_header(poppler BASE_NAME poppler-private EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/poppler_private_export.h")
- set_target_properties(poppler PROPERTIES VERSION 127.0.0 SOVERSION 127)
-diff --git a/glib/CMakeLists.txt b/glib/CMakeLists.txt
-index 52e8687..08ab39a 100644
+ set_target_properties(poppler PROPERTIES
 --- a/glib/CMakeLists.txt
 +++ b/glib/CMakeLists.txt
 @@ -4,7 +4,7 @@ include_directories(
@@ -66,7 +62,7 @@ index 52e8687..08ab39a 100644
  
  include_directories(
 -  SYSTEM
-+  
++
    ${GLIB2_INCLUDE_DIRS}
    ${CAIRO_INCLUDE_DIRS}
  )
@@ -78,9 +74,7 @@ index 52e8687..08ab39a 100644
 +target_include_directories(poppler-glib  PRIVATE ${CAIRO_INCLUDE_DIRS})
  install(TARGETS poppler-glib RUNTIME DESTINATION bin LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
  
- install(FILES
-diff --git a/qt5/src/CMakeLists.txt b/qt5/src/CMakeLists.txt
-index 5db3a6c..f242d29 100644
+ if (ENABLE_NSS3)
 --- a/qt5/src/CMakeLists.txt
 +++ b/qt5/src/CMakeLists.txt
 @@ -45,11 +45,11 @@ if(MINGW AND BUILD_SHARED_LIBS)
@@ -97,8 +91,6 @@ index 5db3a6c..f242d29 100644
  endif()
  install(TARGETS poppler-qt5 RUNTIME DESTINATION bin LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
  
-diff --git a/qt6/src/CMakeLists.txt b/qt6/src/CMakeLists.txt
-index cd91975..6c42e12 100644
 --- a/qt6/src/CMakeLists.txt
 +++ b/qt6/src/CMakeLists.txt
 @@ -45,11 +45,11 @@ if(MINGW AND BUILD_SHARED_LIBS)
@@ -115,8 +107,6 @@ index cd91975..6c42e12 100644
  endif()
  install(TARGETS poppler-qt6 RUNTIME DESTINATION bin LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
  
-diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
-index afa1352..9bd3b9a 100644
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
 @@ -23,7 +23,7 @@ if (GTK_FOUND)
@@ -146,11 +136,9 @@ index afa1352..9bd3b9a 100644
    endif ()
  endif ()
  
-diff --git a/utils/CMakeLists.txt b/utils/CMakeLists.txt
-index 1c3ebcb..bc1840a 100644
 --- a/utils/CMakeLists.txt
 +++ b/utils/CMakeLists.txt
-@@ -16,7 +16,7 @@ add_executable(pdftoppm ${pdftoppm_SOURCES})
+@@ -18,7 +18,7 @@ add_executable(pdftoppm ${pdftoppm_SOURC
  target_link_libraries(pdftoppm ${common_libs})
  if(LCMS2_FOUND)
    target_link_libraries(pdftoppm ${LCMS2_LIBRARIES})
@@ -159,7 +147,7 @@ index 1c3ebcb..bc1840a 100644
  endif()
  install(TARGETS pdftoppm DESTINATION bin)
  install(FILES pdftoppm.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-@@ -37,10 +37,10 @@ if (HAVE_CAIRO)
+@@ -39,10 +39,10 @@ if (HAVE_CAIRO)
    add_definitions(${CAIRO_CFLAGS})
    add_executable(pdftocairo ${pdftocairo_SOURCES})
    target_link_libraries(pdftocairo ${CAIRO_LIBRARIES} Freetype::Freetype ${common_libs})
@@ -172,16 +160,16 @@ index 1c3ebcb..bc1840a 100644
    endif()
    install(TARGETS pdftocairo DESTINATION bin)
    install(FILES pdftocairo.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-@@ -99,7 +99,7 @@ if (ENABLE_NSS3)
-     pdfsig.cc
-   )
+@@ -109,7 +109,7 @@ if (ENABLE_SIGNATURES)
    add_executable(pdfsig ${pdfsig_SOURCES})
--  target_include_directories(pdfsig SYSTEM PRIVATE ${NSS3_INCLUDE_DIRS})
-+  target_include_directories(pdfsig  PRIVATE ${NSS3_INCLUDE_DIRS})
    target_link_libraries(pdfsig ${common_libs})
-   install(TARGETS pdfsig DESTINATION bin)
-   install(FILES pdfsig.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-@@ -114,7 +114,7 @@ add_executable(pdftops ${pdftops_SOURCES})
+   if (ENABLE_NSS3)
+-    target_include_directories(pdfsig SYSTEM PRIVATE ${NSS3_INCLUDE_DIRS})
++    target_include_directories(pdfsig PRIVATE ${NSS3_INCLUDE_DIRS})
+   endif()
+   if (Intl_FOUND)
+     target_link_libraries(pdfsig Intl::Intl)
+@@ -127,7 +127,7 @@ add_executable(pdftops ${pdftops_SOURCES
  target_link_libraries(pdftops ${common_libs})
  if(LCMS2_FOUND)
    target_link_libraries(pdftops ${LCMS2_LIBRARIES})

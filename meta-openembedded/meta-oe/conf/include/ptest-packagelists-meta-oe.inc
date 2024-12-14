@@ -7,9 +7,11 @@
 #
 # ptests which take less than ~30s each
 PTESTS_FAST_META_OE = "\
+    asio \
     cmocka \
     cunit \
     duktape \
+    fuse3 \
     function2 \
     fwupd \
     gcab \
@@ -17,13 +19,13 @@ PTESTS_FAST_META_OE = "\
     jq \
     leveldb \
     libcereal \
-    libee \
     libgpiod \
     libio-pty-perl \
     libmanette \
     librelp \
     libssh \
     libtinyxml2 \
+    libtoml11 \
     libxml++-5.0 \
     libyang \
     lmdb \
@@ -34,10 +36,11 @@ PTESTS_FAST_META_OE = "\
     nodejs \
     onig \
     oprofile \
+    pegtl \
     protobuf \
     pv \
-    python3-pefile \
     sdbus-c++ \
+    tomlplusplus \
     uthash \
     xmlsec1 \
     zeromq \
@@ -55,6 +58,7 @@ PTESTS_SLOW_META_OE = "\
     fftw \
     libusb-compat \
     rsyslog \
+    rocksdb \
     mariadb \
     poco \
     re2 \

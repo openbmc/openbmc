@@ -1,0 +1,37 @@
+From 3794ba29b66641ebecbd4dd3d9a2a2e8caeb690a Mon Sep 17 00:00:00 2001
+From: Ali Can Ozaslan <ali.oezaslan@arm.com>
+Date: Mon, 15 Jul 2024 13:03:24 +0000
+Subject: [PATCH 8/9] Platform: CS1000: Increase flash PS area size
+
+Previously, approximately only 2MB was used out of the 8MB SE Flash.
+The aim of this commit is to increase the size of PS storage in SE
+Flash.
+Increasing the size minimize the possibilities of it to run out
+of memory as it is not cleared on reset or reprogramming of the device.
+
+The FLASH_PS_AREA_SIZE is increased to 6MB so now 7MB of the SE Flash
+is used. The remaining 1MB is allocated for future uses.
+
+Signed-off-by: Ali Can Ozaslan <ali.oezaslan@arm.com>
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Backport [3794ba29b66641ebecbd4dd3d9a2a2e8caeb690a]
+---
+ platform/ext/target/arm/corstone1000/partition/flash_layout.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index a181a7168..07b4cdea7 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -192,7 +192,7 @@
+ 
+ #define FLASH_PS_AREA_OFFSET            (FLASH_ITS_AREA_OFFSET + \
+                                          FLASH_ITS_AREA_SIZE)
+-#define FLASH_PS_AREA_SIZE              (16 * SECURE_FLASH_SECTOR_SIZE)
++#define FLASH_PS_AREA_SIZE              (96 * SECURE_FLASH_SECTOR_SIZE)
+ 
+ /* OTP_definitions */
+ #define FLASH_OTP_NV_COUNTERS_AREA_OFFSET (FLASH_PS_AREA_OFFSET + \
+-- 
+2.25.1
+

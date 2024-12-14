@@ -1,0 +1,105 @@
+From 54b407fc74c9989c72ab7a571395d8793b409514 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Wed, 3 Jul 2024 16:38:22 +0200
+Subject: [PATCH] fwu: Use metadata v2
+
+The mdata structure was modified to use the v2 and did the minimal
+necessarry changes to make it build without errors. This way the 
+U-Boot metadata is aligned with the TF-A and TF-M structs.
+
+Upstream-Status: Inappropriate
+[This is done correctly upstream but using the upstream patches would
+require too many backported patches. The merge commit of the upstream
+changes is 7e52d6ccfb76e2afc2d183b357abe2a2e2f948cf.]
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+---
+ cmd/fwu_mdata.c       |  2 +-
+ include/fwu_mdata.h   | 17 ++++++++++++++++-
+ lib/fwu_updates/fwu.c |  8 ++++----
+ 3 files changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/cmd/fwu_mdata.c b/cmd/fwu_mdata.c
+index f04af27de6..73374dca8b 100644
+--- a/cmd/fwu_mdata.c
++++ b/cmd/fwu_mdata.c
+@@ -27,7 +27,7 @@ static void print_mdata(struct fwu_mdata *mdata)
+ 
+ 	printf("\tImage Info\n");
+ 	for (i = 0; i < CONFIG_FWU_NUM_IMAGES_PER_BANK; i++) {
+-		img_entry = &mdata->img_entry[i];
++		img_entry = &mdata->fw_desc.img_entry[i];
+ 		printf("\nImage Type Guid: %pUL\n",
+ 		       &img_entry->image_type_uuid);
+ 		printf("Location Guid: %pUL\n", &img_entry->location_uuid);
+diff --git a/include/fwu_mdata.h b/include/fwu_mdata.h
+index c61221a917..6a0eb7dce9 100644
+--- a/include/fwu_mdata.h
++++ b/include/fwu_mdata.h
+@@ -40,6 +40,16 @@ struct fwu_image_entry {
+ 	struct fwu_image_bank_info img_bank_info[CONFIG_FWU_NUM_BANKS];
+ } __packed;
+ 
++struct fwu_fw_store_desc {
++	uint8_t  num_banks;
++	uint8_t  reserved;
++	uint16_t num_images;
++	uint16_t img_entry_size;
++	uint16_t bank_info_entry_size;
++
++	struct fwu_image_entry img_entry[CONFIG_FWU_NUM_IMAGES_PER_BANK];
++} __packed;
++
+ /**
+  * struct fwu_mdata - FWU metadata structure for multi-bank updates
+  * @crc32: crc32 value for the FWU metadata
+@@ -60,8 +70,13 @@ struct fwu_mdata {
+ 	uint32_t version;
+ 	uint32_t active_index;
+ 	uint32_t previous_active_index;
++	uint32_t metadata_size;
++	uint16_t desc_offset;
++	uint16_t reserved1;
++	uint8_t  bank_state[4];
++	uint32_t reserved2;
+ 
+-	struct fwu_image_entry img_entry[CONFIG_FWU_NUM_IMAGES_PER_BANK];
++	struct fwu_fw_store_desc fw_desc;
+ } __packed;
+ 
+ #endif /* _FWU_MDATA_H_ */
+diff --git a/lib/fwu_updates/fwu.c b/lib/fwu_updates/fwu.c
+index 5313d07302..488c9cc661 100644
+--- a/lib/fwu_updates/fwu.c
++++ b/lib/fwu_updates/fwu.c
+@@ -131,7 +131,7 @@ static int in_trial_state(struct fwu_mdata *mdata)
+ 	struct fwu_image_bank_info *img_bank_info;
+ 
+ 	active_bank = mdata->active_index;
+-	img_entry = &mdata->img_entry[0];
++	img_entry = &mdata->fw_desc.img_entry[0];
+ 	for (i = 0; i < CONFIG_FWU_NUM_IMAGES_PER_BANK; i++) {
+ 		img_bank_info = &img_entry[i].img_bank_info[active_bank];
+ 		if (!img_bank_info->accepted) {
+@@ -418,8 +418,8 @@ int fwu_get_image_index(u8 *image_index)
+ 	 */
+ 	for (i = 0; i < CONFIG_FWU_NUM_IMAGES_PER_BANK; i++) {
+ 		if (!guidcmp(&image_type_id,
+-			     &mdata.img_entry[i].image_type_uuid)) {
+-			img_entry = &mdata.img_entry[i];
++			     &mdata.fw_desc.img_entry[i].image_type_uuid)) {
++			img_entry = &mdata.fw_desc.img_entry[i];
+ 			img_bank_info = &img_entry->img_bank_info[update_bank];
+ 			image_guid = &img_bank_info->image_uuid;
+ 			ret = fwu_plat_get_alt_num(dev, image_guid, &alt_num);
+@@ -512,7 +512,7 @@ static int fwu_clrset_image_accept(efi_guid_t *img_type_id, u32 bank, u8 action)
+ 	if (ret)
+ 		return ret;
+ 
+-	img_entry = &mdata.img_entry[0];
++	img_entry = &mdata.fw_desc.img_entry[0];
+ 	for (i = 0; i < CONFIG_FWU_NUM_IMAGES_PER_BANK; i++) {
+ 		if (!guidcmp(&img_entry[i].image_type_uuid, img_type_id)) {
+ 			img_bank_info = &img_entry[i].img_bank_info[bank];
+-- 
+2.25.1
+

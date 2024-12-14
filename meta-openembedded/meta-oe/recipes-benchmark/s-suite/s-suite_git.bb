@@ -6,6 +6,10 @@ SRCREV = "f97f1ae321d1fb8111a2c638075702ed2512ff07"
 PV = "3.6"
 SRC_URI = "git://github.com/Algodev-github/S.git;protocol=https;branch=master"
 
+# Current PV is not a git tag but a Readme content, track commits to detect
+# upstream updates
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 # installing in /opt/S-suite since the package has

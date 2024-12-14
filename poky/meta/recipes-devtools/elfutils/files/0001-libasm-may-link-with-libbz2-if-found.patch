@@ -1,4 +1,4 @@
-From 46d9d889a07fc9f9f089f800e5c0e895889c44ae Mon Sep 17 00:00:00 2001
+From 7bcee92c2006b7adad463be28cf4c3af21489cd2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 4 Oct 2017 22:30:46 -0700
 Subject: [PATCH] libasm may link with libbz2 if found
@@ -16,10 +16,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 853eda4..da7f3b4 100644
+index 3bcee3c..18eed9a 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -40,7 +40,7 @@ EXTRA_DIST += make-debug-archive.in
+@@ -46,7 +46,7 @@ EXTRA_DIST += make-debug-archive.in
  CLEANFILES += make-debug-archive
  
  if BUILD_STATIC
@@ -28,7 +28,7 @@ index 853eda4..da7f3b4 100644
  libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) -ldl -lpthread
  libelf = ../libelf/libelf.a -lz $(zstd_LIBS)
  if LIBDEBUGINFOD
-@@ -49,7 +49,7 @@ else
+@@ -55,7 +55,7 @@ else
  libdebuginfod =
  endif
  else

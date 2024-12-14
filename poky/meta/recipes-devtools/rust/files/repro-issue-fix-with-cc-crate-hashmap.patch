@@ -1,0 +1,57 @@
+rust: reproducibility issue fix with v1.80
+
+A few crates are using the updated version of the 'cc' crate and this is causing the generated object file names containing a unique hashmap id.
+By the following changes same hash values will be genarted even for diffrent build paths.
+
+Below are the links for detailed bug description & discusssion with upstream rust.
+https://github.com/rust-lang/cc-rs/pull/1277
+
+Upstream-Status: Submitted [https://github.com/rust-lang/cc-rs/pull/1277]
+Signed-off-by: Harish Sadineni <Harish.Sadineni@windriver.com>
+--- a/vendor/cc-1.0.97/src/command_helpers.rs
++++ b/vendor/cc-1.0.97/src/command_helpers.rs
+@@ -257,6 +257,7 @@
+ /// and store them in the output Object.
+ pub(crate) fn objects_from_files(files: &[Arc<Path>], dst: &Path) -> Result<Vec<Object>, Error> {
+     let mut objects = Vec::with_capacity(files.len());
++    let target_substring = ["rustc"];
+     for file in files {
+         let basename = file
+             .file_name()
+@@ -277,10 +278,29 @@
+             })?
+             .to_string_lossy();
+
++        // Function to find the position of the first occurrence of the target substring
++        fn find_target_position(s: &str, targets: &[&str]) -> Option<usize> {
++            let mut pos = None;
++            for target in targets {
++                if let Some(index) = s.rfind(target) {
++                     //If a target is found and pos is None, set it
++                         if pos.is_none() || index < pos.unwrap() {
++                             pos = Some(index);
++                         }
++                }
++            }
++            pos
++        }
++
++        let filtered_dirname = if let Some(pos) = find_target_position(&dirname, &target_substring) {
++            dirname[pos..].to_string()  //Keep everything from the target substring onwards
++        }  else {
++            dirname.to_string()  //If target substring is not found, keep the original dirname
++        };
+         // Hash the dirname. This should prevent conflicts if we have multiple
+         // object files with the same filename in different subfolders.
+         let mut hasher = hash_map::DefaultHasher::new();
+-        hasher.write(dirname.to_string().as_bytes());
++        hasher.write(filtered_dirname.as_bytes());
+         let obj = dst
+             .join(format!("{:016x}-{}", hasher.finish(), basename))
+             .with_extension("o");
+--- a/vendor/cc-1.0.97/.cargo-checksum.json
++++ b/vendor/cc-1.0.97/.cargo-checksum.json
+@@ -1 +1 @@
+-{"files":{"Cargo.toml":"5c15212a19ab7432d834b92cc7f6af9461c860fbaf2a756cda9b6f40d7b0e845","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397","README.md":"f1ddbede208a5b78333a25dac0a7598e678e9b601a7d99a791069bddaf180dfe","src/command_helpers.rs":"15afbc35930a5a53f00d74a8910cff35caeb5511c26642cffe5630377aced901","src/detect_compiler_family.c":"72903b91d7a28f49b39e7d730f4c9c4bb39fb901948fa1279cd08abf392f5a29","src/lib.rs":"d805931c886be881ed685c3f75b104e96068c4a7e51f48c9a304b3fdebcfdcda","src/parallel/async_executor.rs":"4ce24435fff6b6555b43fee042c16bd65d4150d0346567f246b9190d85b45983","src/parallel/job_token.rs":"352a0295c965c684904329d334f3b9889db3a9c3f201701f8db44e4d00e00515","src/parallel/mod.rs":"bd9c1334d17d138c281961c690b8d8118a2d6295a7d6cd7296826255436fa063","src/parallel/stderr.rs":"a2d18ba3f2e04deb9047ece9ab7ca5452d9a76b515afbe20a76307e31597f34b","src/target_info.rs":"342be00f6215e161d8163e272a2945bb9f52f171648e15e11d46800a73186955","src/tempfile.rs":"47a58e904ac07da6682004b5b615dc83250b253a8d3e8ba1b9bcaf6cdf4fd142","src/tool.rs":"b48a7a0efbeb24dc4ccdb4326583ef074e69c670330681a5be9d5c19492e5f96","src/windows/com.rs":"be1564756c9f3ef1398eafeed7b54ba610caba28e8f6258d28a997737ebf9535","src/windows/find_tools.rs":"06aaf9d6247f407cb6077c68d0c9469f64a098eda2222059e7400588e7e05f6a","src/windows/mod.rs":"42f1ad7fee35a17686b003e6aa520d3d1940d47d2f531d626e9ae0c48ba49005","src/windows/registry.rs":"c521b72c825e8095843e73482ffa810ed066ad8bb9f86e6db0c5c143c171aba1","src/windows/setup_config.rs":"754439cbab492afd44c9755abcbec1a41c9b2c358131cee2df13c0e996dbbec8","src/windows/vs_instances.rs":"76e3cee74b5fd38ddaf533bba11fe401667c50dda5f9d064099840893eaa7587","src/windows/winapi.rs":"250d51c1826d1a2329e9889dd9f058cfce253dbf2a678b076147c6cdb5db046c","src/windows/windows_sys.rs":"5a440eb39d8a0c176b66177e8753186797793bc5d7896292c408fb44c12dfed3"},"package":"099a5357d84c4c61eb35fc8eafa9a79a902c2f76911e5747ced4e032edd8d9b4"}
+\ No newline at end of file
++{"files":{"Cargo.toml":"5c15212a19ab7432d834b92cc7f6af9461c860fbaf2a756cda9b6f40d7b0e845","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397","README.md":"f1ddbede208a5b78333a25dac0a7598e678e9b601a7d99a791069bddaf180dfe","src/command_helpers.rs":"c2a9981b1c9f5430ac2a41f2953064f2383e4064feb281dc76915e4972d52226","src/detect_compiler_family.c":"72903b91d7a28f49b39e7d730f4c9c4bb39fb901948fa1279cd08abf392f5a29","src/lib.rs":"d805931c886be881ed685c3f75b104e96068c4a7e51f48c9a304b3fdebcfdcda","src/parallel/async_executor.rs":"4ce24435fff6b6555b43fee042c16bd65d4150d0346567f246b9190d85b45983","src/parallel/job_token.rs":"352a0295c965c684904329d334f3b9889db3a9c3f201701f8db44e4d00e00515","src/parallel/mod.rs":"bd9c1334d17d138c281961c690b8d8118a2d6295a7d6cd7296826255436fa063","src/parallel/stderr.rs":"a2d18ba3f2e04deb9047ece9ab7ca5452d9a76b515afbe20a76307e31597f34b","src/target_info.rs":"342be00f6215e161d8163e272a2945bb9f52f171648e15e11d46800a73186955","src/tempfile.rs":"47a58e904ac07da6682004b5b615dc83250b253a8d3e8ba1b9bcaf6cdf4fd142","src/tool.rs":"b48a7a0efbeb24dc4ccdb4326583ef074e69c670330681a5be9d5c19492e5f96","src/windows/com.rs":"be1564756c9f3ef1398eafeed7b54ba610caba28e8f6258d28a997737ebf9535","src/windows/find_tools.rs":"06aaf9d6247f407cb6077c68d0c9469f64a098eda2222059e7400588e7e05f6a","src/windows/mod.rs":"42f1ad7fee35a17686b003e6aa520d3d1940d47d2f531d626e9ae0c48ba49005","src/windows/registry.rs":"c521b72c825e8095843e73482ffa810ed066ad8bb9f86e6db0c5c143c171aba1","src/windows/setup_config.rs":"754439cbab492afd44c9755abcbec1a41c9b2c358131cee2df13c0e996dbbec8","src/windows/vs_instances.rs":"76e3cee74b5fd38ddaf533bba11fe401667c50dda5f9d064099840893eaa7587","src/windows/winapi.rs":"250d51c1826d1a2329e9889dd9f058cfce253dbf2a678b076147c6cdb5db046c","src/windows/windows_sys.rs":"5a440eb39d8a0c176b66177e8753186797793bc5d7896292c408fb44c12dfed3"},"package":"099a5357d84c4c61eb35fc8eafa9a79a902c2f76911e5747ced4e032edd8d9b4"}

@@ -88,7 +88,7 @@ class QemuTarget(BaseTarget):
 
     supported_image_fstypes = ['ext3', 'ext4', 'cpio.gz', 'wic']
 
-    def __init__(self, d, logger, image_fstype=None):
+    def __init__(self, d, logger, image_fstype=None, boot_patterns=None):
 
         import oe.types
 
@@ -141,7 +141,8 @@ class QemuTarget(BaseTarget):
                             dump_dir = dump_dir,
                             logger = logger,
                             tmpfsdir = d.getVar("RUNQEMU_TMPFS_DIR"),
-                            serial_ports = len(d.getVar("SERIAL_CONSOLES").split()))
+                            serial_ports = len(d.getVar("SERIAL_CONSOLES").split()),
+                            boot_patterns = boot_patterns)
 
         self.monitor_dumper = MonitorDumper(dump_monitor_cmds, dump_dir, self.runner)
         if (self.monitor_dumper):

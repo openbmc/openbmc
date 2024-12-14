@@ -1,4 +1,7 @@
-Fixes to make the perl build reproducible:
+From 5c4fd57daf125357262aa796057d7be8e78d378e Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 5 Feb 2020 23:54:02 +0000
+Subject: [PATCH] Fixes to make the perl build reproducible:
 
 a) Remove the \n from configure_attr.sh since it gets quoted differently depending on
    whether the shell is bash or dash which can cause the test result to be incorrect.
@@ -20,11 +23,14 @@ RP 2020/2/7
 
 Upstream-Status: Submitted [see links above]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
+---
+ cpan/Encode/Byte/Makefile.PL | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Index: perl-5.30.1/cpan/Encode/Byte/Makefile.PL
-===================================================================
---- perl-5.30.1.orig/cpan/Encode/Byte/Makefile.PL
-+++ perl-5.30.1/cpan/Encode/Byte/Makefile.PL
+diff --git a/cpan/Encode/Byte/Makefile.PL b/cpan/Encode/Byte/Makefile.PL
+index 6824bbb..4af4a50 100644
+--- a/cpan/Encode/Byte/Makefile.PL
++++ b/cpan/Encode/Byte/Makefile.PL
 @@ -171,7 +171,7 @@ sub postamble
      my $lengthsofar = length($str);
      my $continuator = '';

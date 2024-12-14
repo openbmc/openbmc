@@ -31,12 +31,6 @@ SECURITY_NO_PIE_CFLAGS ?= "${SECURITY_STACK_PROTECTOR} ${lcl_maybe_fortify} ${SE
 SECURITY_LDFLAGS ?= "-Wl,-z,relro,-z,now"
 SECURITY_X_LDFLAGS ?= "-Wl,-z,relro"
 
-# powerpc does not get on with pie for reasons not looked into as yet
-GCCPIE:powerpc = ""
-GLIBCPIE:powerpc = ""
-SECURITY_CFLAGS:remove:powerpc = "${SECURITY_PIE_CFLAGS}"
-SECURITY_CFLAGS:pn-libgcc:powerpc = ""
-
 SECURITY_CFLAGS:pn-glibc = ""
 SECURITY_CFLAGS:pn-glibc-testsuite = ""
 SECURITY_CFLAGS:pn-gcc-runtime = ""

@@ -1,0 +1,53 @@
+From 9426ac3d232e2f90c571979a2166c5e1328967d1 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <j.w.r.degoede@hhs.nl>
+Date: Tue, 15 Oct 2013 14:39:04 +0200
+Subject: [PATCH] Fix missing prototype compiler warnings
+
+Signed-off-by: Kamil Dudka <kdudka@redhat.com>
+
+Upstream-Status: Backport [https://repo.or.cz/libtar.git/commit/30e5556d1c9323e9f1887b28d42581c2954b53c9]
+
+Signed-off-by: Katariina Lounento <katariina.lounento@vaisala.com>
+---
+ lib/append.c  | 2 ++
+ lib/output.c  | 1 +
+ lib/wrapper.c | 1 +
+ 3 files changed, 4 insertions(+)
+
+diff --git a/lib/append.c b/lib/append.c
+index 13e1ace..e8bd89d 100644
+--- a/lib/append.c
++++ b/lib/append.c
+@@ -13,6 +13,8 @@
+ #include <internal.h>
+ 
+ #include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <sys/param.h>
+diff --git a/lib/output.c b/lib/output.c
+index a2db929..a5262ee 100644
+--- a/lib/output.c
++++ b/lib/output.c
+@@ -13,6 +13,7 @@
+ #include <internal.h>
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <pwd.h>
+ #include <grp.h>
+ #include <time.h>
+diff --git a/lib/wrapper.c b/lib/wrapper.c
+index 4cd0652..44cc435 100644
+--- a/lib/wrapper.c
++++ b/lib/wrapper.c
+@@ -13,6 +13,7 @@
+ #include <internal.h>
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <sys/param.h>
+ #include <dirent.h>
+ #include <errno.h>

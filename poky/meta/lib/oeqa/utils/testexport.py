@@ -60,17 +60,17 @@ def process_binaries(d, params):
     export_env = d.getVar("TEST_EXPORT_ONLY")
 
     def extract_binary(pth_to_pkg, dest_pth=None):
-        cpio_command = runCmd("which cpio")
-        rpm2cpio_command = runCmd("ls /usr/bin/rpm2cpio")
-        if (cpio_command.status != 0) and (rpm2cpio_command.status != 0):
-            bb.fatal("Either \"rpm2cpio\" or \"cpio\" tools are not available on your system."
+        tar_command = runCmd("which tar")
+        rpm2archive_command = runCmd("ls /usr/bin/rpm2archive")
+        if (tar_command.status != 0) and (rpm2archive_command.status != 0):
+            bb.fatal("Either \"rpm2archive\" or \"tar\" tools are not available on your system."
                     "All binaries extraction processes will not be available, crashing all related tests."
                     "Please install them according to your OS recommendations") # will exit here
         if dest_pth:
             os.chdir(dest_pth)
         else:
             os.chdir("%s" % os.sep)# this is for native package
-        extract_bin_command = runCmd("%s %s | %s -idm" % (rpm2cpio_command.output, pth_to_pkg, cpio_command.output)) # semi-hardcoded because of a bug on poky's rpm2cpio
+        extract_bin_command = runCmd("%s -n %s | %s xv" % (rpm2archive_command.output, pth_to_pkg, tar_command.output)) # semi-hardcoded because of a bug on poky's rpm2cpio
         return extract_bin_command
 
     if determine_if_poky_env(): # machine with poky environment

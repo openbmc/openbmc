@@ -1,0 +1,34 @@
+From 57d02c05184ae565ef8182c7151c1faa97d45b2b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 27 Nov 2024 16:28:49 +0100
+Subject: [PATCH] meson.build: do not force-disable introspection and vala in
+ cross builds
+
+It is entirely possible to make them work through qemu wrappers
+(and g-i has upstream support for it).
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1062]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 12cb44f..2dae10c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -160,9 +160,9 @@ endif
+ if host_system == 'windows'
+   build_gir = get_option('introspection').require(get_option('default_library') != 'static' and not meson.is_cross_build() and gi_dep.found())
+ else
+-  build_gir = get_option('introspection').require(not meson.is_cross_build() and gi_dep.found())
++  build_gir = get_option('introspection').require(gi_dep.found())
+ endif
+-build_vala = get_option('vala').require(not meson.is_cross_build() and vapigen_dep.found())
++build_vala = get_option('vala').require(vapigen_dep.found())
+ 
+ build_pixbuf_loader = get_option('pixbuf-loader').require(pixbuf_dep.found())
+ 
+-- 
+2.39.5
+

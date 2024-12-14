@@ -14,7 +14,7 @@ from collections import namedtuple
 from enum import Enum
 from html.parser import HTMLParser
 from recipetool.create import RecipeHandler, handle_license_vars
-from recipetool.create import guess_license, tidy_licenses, fixup_license
+from recipetool.create import find_licenses, tidy_licenses, fixup_license
 from recipetool.create import determine_from_url
 from urllib.error import URLError, HTTPError
 
@@ -624,7 +624,7 @@ class GoRecipeHandler(RecipeHandler):
 
         licenses = []
         lic_files_chksum = []
-        licvalues = guess_license(tmp_vendor_dir, d)
+        licvalues = find_licenses(tmp_vendor_dir, d)
         shutil.rmtree(tmp_vendor_dir)
 
         if licvalues:

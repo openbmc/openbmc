@@ -71,6 +71,7 @@ class Signing(OESelftestTestCase):
         """
         import oe.packagedata
 
+        self.skipTest('This test requires rpm-sequoia support in rpm')
         self.setup_gpg()
 
         package_classes = get_bb_var('PACKAGE_CLASSES')

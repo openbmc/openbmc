@@ -1,0 +1,44 @@
+From e3e8422333239c47ad613e2f41ee04244556d3be Mon Sep 17 00:00:00 2001
+From: Marko Lindqvist <cazfi74@gmail.com>
+Date: Mon, 7 Jan 2013 01:49:28 +0200
+Subject: [PATCH 3/7] libtool: remove help2man dependency
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.am | 17 -----------------
+ 1 file changed, 17 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 51c1fbdb..4962c3ad 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -408,23 +408,6 @@ $(notes_txt): $(notes_texi)
+ 	$(AM_V_GEN)$(MAKEINFO) -P '$(srcdir)/doc' --no-headers \
+ 	    $(MAKEINFOFLAGS) -o '$@' '$(notes_texi)'
+ 
+-dist_man1_MANS		= $(libtool_1) $(libtoolize_1)
+-MAINTAINERCLEANFILES	+= $(dist_man1_MANS)
+-update_mans = \
+-  PATH=".$(PATH_SEPARATOR)$$PATH"; export PATH; \
+-  $(HELP2MAN) --output='$@'
+-
+-# It's wrong to make distributed files (e.g. $(libtool_1)) rely on
+-# files created in the build tree, so instead we regenerate the
+-# manual pages if the sources for the build-tree files we want to
+-# run have changed.
+-$(libtool_1): $(ltmain_sh)
+-	$(AM_V_GEN)$(update_mans) -n 'Provide generalized library-building support services' --help-option=--help-all libtool
+-$(libtoolize_1): $(libtoolize_in)
+-	$(AM_V_GEN)$(update_mans) -n 'Prepare a package to use libtool' libtoolize
+-
+-
+-
+ ## ------------- ##
+ ## Installation. ##
+ ## ------------- ##
+-- 
+2.39.5
+

@@ -20,9 +20,18 @@ EXTRA_OECMAKE += '-DNEWLIB_SOURCE_DIR=${WORKDIR}/git/newlib \
 
 OECMAKE_SOURCEPATH = "${S}/deployments/newlib/${TS_ENV}/"
 
+# Silence compilation errors from GCC 14.1 due to stricter code validation
+export NEWLIB_CFLAGS_TARGET = "-Wno-implicit-function-declaration -Wno-int-conversion"
+
 # TS ships a patch that needs to be applied to newlib
 apply_ts_patch() {
-    ( cd ${WORKDIR}/git/newlib;    git stash; git branch -f bf_am; git am ${S}/external/newlib/*.patch; git reset bf_am )
+    set -ex
+    cd ${WORKDIR}/git/newlib
+    check_git_config
+    git stash
+    git branch -f bf_am
+    git am ${S}/external/newlib/*.patch
+    git reset bf_am
 }
 do_patch[postfuncs] += "apply_ts_patch"
 

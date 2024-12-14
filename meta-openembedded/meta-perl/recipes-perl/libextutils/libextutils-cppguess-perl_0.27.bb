@@ -6,7 +6,7 @@ It can generate the necessary options to the Module::Build constructor or \
 to ExtUtils::MakeMaker's WriteMakefile function."
 SECTION = "libs"
 
-HOMEPAGE = "http://search.cpan.org/~smueller/ExtUtils-CppGuess/"
+HOMEPAGE = "https://metacpan.org/pod/ExtUtils::CppGuess"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=81;endline=84;md5=84c0390b90ea8c6702ce659b67bed699"

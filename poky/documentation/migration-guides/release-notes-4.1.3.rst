@@ -6,24 +6,24 @@ Release notes for Yocto-4.1.3 (Langdale)
 Security Fixes in Yocto-4.1.3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  apr-util: Fix :cve:`2022-25147`
--  apr: Fix :cve:`2022-24963` and :cve:`2022-28331`
--  bind: Fix :cve:`2022-3094`, :cve:`2022-3736` and :cve:`2022-3924`
--  curl: Fix :cve:`2022-43551` and :cve:`2022-43552`
--  dbus: Fix :cve:`2022-42010`, :cve:`2022-42011` and :cve:`2022-42012`
--  git: Fix  :cve:`2022-23521`, :cve:`2022-39253`, :cve:`2022-39260` and :cve:`2022-41903`
--  git: Ignore :cve:`2022-41953`
--  go: Fix :cve:`2022-41717` and :cve:`2022-41720`
--  grub2: Fix :cve:`2022-2601` and :cve:`2022-3775`
--  less: Fix :cve:`2022-46663`
--  libarchive: Fix :cve:`2022-36227`
--  libksba: Fix :cve:`2022-47629`
--  openssl: Fix :cve:`2022-3996`
--  pkgconf: Fix :cve:`2023-24056`
--  ppp: Fix :cve:`2022-4603`
--  sudo: Fix :cve:`2023-22809`
--  tar: Fix :cve:`2022-48303`
--  vim: Fix :cve:`2023-0049`, :cve:`2023-0051`, :cve:`2023-0054`, :cve:`2023-0288`, :cve:`2023-0433` and :cve:`2023-0512`
+-  apr-util: Fix :cve_nist:`2022-25147`
+-  apr: Fix :cve_nist:`2022-24963` and :cve_nist:`2022-28331`
+-  bind: Fix :cve_nist:`2022-3094`, :cve_nist:`2022-3736` and :cve_nist:`2022-3924`
+-  curl: Fix :cve_nist:`2022-43551` and :cve_nist:`2022-43552`
+-  dbus: Fix :cve_nist:`2022-42010`, :cve_nist:`2022-42011` and :cve_nist:`2022-42012`
+-  git: Fix  :cve_nist:`2022-23521`, :cve_nist:`2022-39253`, :cve_nist:`2022-39260` and :cve_nist:`2022-41903`
+-  git: Ignore :cve_nist:`2022-41953`
+-  go: Fix :cve_nist:`2022-41717` and :cve_nist:`2022-41720`
+-  grub2: Fix :cve_nist:`2022-2601` and :cve_nist:`2022-3775`
+-  less: Fix :cve_nist:`2022-46663`
+-  libarchive: Fix :cve_nist:`2022-36227`
+-  libksba: Fix :cve_nist:`2022-47629`
+-  openssl: Fix :cve_nist:`2022-3996`
+-  pkgconf: Fix :cve_nist:`2023-24056`
+-  ppp: Fix :cve_nist:`2022-4603`
+-  sudo: Fix :cve_nist:`2023-22809`
+-  tar: Fix :cve_nist:`2022-48303`
+-  vim: Fix :cve_nist:`2023-0049`, :cve_nist:`2023-0051`, :cve_nist:`2023-0054`, :cve_nist:`2023-0288`, :cve_nist:`2023-0433` and :cve_nist:`2023-0512`
 -  xserver-xorg: Fix :cve_mitre:`2023-0494`
 -  xwayland: Fix :cve_mitre:`2023-0494`
 

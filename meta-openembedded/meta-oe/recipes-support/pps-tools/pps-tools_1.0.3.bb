@@ -5,7 +5,9 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 SRCREV = "c50cb7183e252b47308fa22f420e0a877277aa29"
-SRC_URI = "git://github.com/ago/pps-tools.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/ago/pps-tools.git;branch=master;protocol=https \
+           file://0001-Use-lld-in-printf-for-64-bit-time_t.patch \
+           "
 
 S = "${WORKDIR}/git"
 

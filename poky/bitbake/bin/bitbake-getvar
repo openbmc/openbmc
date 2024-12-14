@@ -16,6 +16,7 @@ bindir = os.path.dirname(__file__)
 topdir = os.path.dirname(bindir)
 sys.path[0:0] = [os.path.join(topdir, 'lib')]
 
+import bb.providers
 import bb.tinfoil
 
 if __name__ == "__main__":
@@ -40,10 +41,15 @@ if __name__ == "__main__":
     with bb.tinfoil.Tinfoil(tracking=True, setup_logging=not quiet) as tinfoil:
         if args.recipe:
             tinfoil.prepare(quiet=3 if quiet else 2)
-            d = tinfoil.parse_recipe(args.recipe)
+            try:
+                d = tinfoil.parse_recipe(args.recipe)
+            except bb.providers.NoProvider as e:
+                sys.exit(str(e))
         else:
             tinfoil.prepare(quiet=2, config_only=True)
-            d = tinfoil.config_data
+            # Expand keys and run anonymous functions to get identical result to
+            # "bitbake -e"
+            d = tinfoil.finalizeData()
 
         value = None
         if args.flag:

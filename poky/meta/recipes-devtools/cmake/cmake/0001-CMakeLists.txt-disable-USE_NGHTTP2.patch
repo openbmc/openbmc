@@ -1,4 +1,4 @@
-From 946011cbfd686fe6bd2cec94494f6b0c4394bb6c Mon Sep 17 00:00:00 2001
+From 80655318696091d27d131e8c4a48140e37e73366 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Wed, 28 Dec 2022 17:51:27 +0800
 Subject: [PATCH] CMakeLists.txt: disable USE_NGHTTP2
@@ -13,20 +13,24 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
 Adjust the patch to apply on top of v3.28.3.
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+
+Adjust the patch to apply on top of v3.30.1.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
  Utilities/cmcurl/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Utilities/cmcurl/CMakeLists.txt b/Utilities/cmcurl/CMakeLists.txt
-index 3dd24f1e..4a0f6773 100644
+index ef6c269e..ecaac497 100644
 --- a/Utilities/cmcurl/CMakeLists.txt
 +++ b/Utilities/cmcurl/CMakeLists.txt
-@@ -91,7 +91,7 @@ set(HTTP_ONLY OFF CACHE INTERNAL "Curl is not http-only")
- set(PICKY_COMPILER OFF CACHE INTERNAL "Enable picky compiler options")
- set(SHARE_LIB_OBJECT OFF)
+@@ -99,7 +99,7 @@ set(USE_ECH OFF)
+ set(USE_HTTPSRR OFF)
  set(USE_LIBIDN2 ON)
+ set(USE_LIBRTMP OFF)
 -set(USE_NGHTTP2 ON)
 +set(USE_NGHTTP2 OFF)
  set(USE_NGTCP2 OFF)
+ set(USE_OPENSSL_QUIC OFF)
  set(USE_QUICHE OFF)
- set(USE_WIN32_IDN OFF)

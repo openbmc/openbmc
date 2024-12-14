@@ -1,6 +1,6 @@
-From 7b3a00cb0fc27c896dd85c9afc474bd9c2aea30d Mon Sep 17 00:00:00 2001
-From: Richard Purdie <richard.purdie@linuxfoundation.org>
-Date: Fri, 10 May 2019 14:23:55 +0800
+From e4e75bee348d297bd8288e6fd7e99ab033cbb90c Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 26 Nov 2024 23:04:52 -0800
 Subject: [PATCH] pkgconfig
 
 Update gpgme to use pkgconfig instead of -config files since its
@@ -15,30 +15,31 @@ Rebase to 1.13.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase to 1.17.0
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
-
+Rebase to 1.24.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  configure.ac            |   1 +
  src/Makefile.am         |   4 +-
  src/gpgme-pthread.pc.in |  15 +++++
- src/gpgme.m4            | 119 +++-------------------------------------
+ src/gpgme.m4            | 118 +++-------------------------------------
  src/gpgme.pc.in         |   4 +-
- 5 files changed, 29 insertions(+), 114 deletions(-)
+ 5 files changed, 28 insertions(+), 114 deletions(-)
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index ae4c7da..df892c9 100644
+index 933fb150..08589a6b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1112,6 +1112,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -1160,6 +1160,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/gpgme-glib.pc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
 +AC_CONFIG_FILES(src/gpgme-pthread.pc)
  AC_CONFIG_FILES(lang/cpp/Makefile lang/cpp/src/Makefile)
  AC_CONFIG_FILES(lang/cpp/tests/Makefile)
- AC_CONFIG_FILES(lang/cpp/src/GpgmeppConfig-w32.cmake.in)
+ AC_CONFIG_FILES(lang/cpp/src/gpgmepp.pc)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index ca70950..bda5498 100644
+index 03708620..e716ce4d 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -20,11 +20,11 @@
@@ -57,7 +58,7 @@ index ca70950..bda5498 100644
  noinst_SCRIPTS = gpgme-config
 diff --git a/src/gpgme-pthread.pc.in b/src/gpgme-pthread.pc.in
 new file mode 100644
-index 0000000..074bbf6
+index 00000000..074bbf6e
 --- /dev/null
 +++ b/src/gpgme-pthread.pc.in
 @@ -0,0 +1,15 @@
@@ -77,19 +78,18 @@ index 0000000..074bbf6
 +Cflags: -I${includedir}
 +Requires: libassuan gpg-error
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index 8cc2898..0ff550e 100644
+index 5f689e18..249e8c98 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
-@@ -168,7 +168,7 @@ dnl config script does not match the host specification the script
- dnl is added to the gpg_config_script_warn variable.
+@@ -166,7 +166,6 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_GPGME],
--[ AC_REQUIRE([_AM_PATH_GPGME_CONFIG])dnl
-+[
+ [ AC_REQUIRE([AC_CANONICAL_HOST])dnl
+-  AC_REQUIRE([_AM_PATH_GPGME_CONFIG])dnl
    tmp=ifelse([$1], ,1:0.4.2,$1)
    if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
       req_gpgme_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
-@@ -178,36 +178,12 @@ AC_DEFUN([AM_PATH_GPGME],
+@@ -176,36 +175,12 @@ AC_DEFUN([AM_PATH_GPGME],
       min_gpgme_version="$tmp"
    fi
  
@@ -128,7 +128,7 @@ index 8cc2898..0ff550e 100644
          if test "$tmp" -gt 0 ; then
             if test "$req_gpgme_api" -ne "$tmp" ; then
               ok=no
-@@ -216,19 +192,11 @@ AC_DEFUN([AM_PATH_GPGME],
+@@ -214,19 +189,11 @@ AC_DEFUN([AM_PATH_GPGME],
       fi
    fi
    if test $ok = yes; then
@@ -148,7 +148,7 @@ index 8cc2898..0ff550e 100644
  ])
  
  dnl AM_PATH_GPGME_PTHREAD([MINIMUM-VERSION,
-@@ -236,9 +204,8 @@ dnl                       [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
+@@ -234,9 +201,8 @@ dnl                       [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
  dnl Test for libgpgme and define GPGME_PTHREAD_CFLAGS
  dnl  and GPGME_PTHREAD_LIBS.
  dnl
@@ -160,7 +160,7 @@ index 8cc2898..0ff550e 100644
    tmp=ifelse([$1], ,1:0.4.2,$1)
    if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
       req_gpgme_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
-@@ -248,40 +215,12 @@ AC_DEFUN([AM_PATH_GPGME_PTHREAD],[
+@@ -246,40 +212,12 @@ AC_DEFUN([AM_PATH_GPGME_PTHREAD],[
       min_gpgme_version="$tmp"
    fi
  
@@ -203,7 +203,7 @@ index 8cc2898..0ff550e 100644
          if test "$tmp" -gt 0 ; then
             if test "$req_gpgme_api" -ne "$tmp" ; then
               ok=no
-@@ -290,19 +229,11 @@ AC_DEFUN([AM_PATH_GPGME_PTHREAD],[
+@@ -288,19 +226,11 @@ AC_DEFUN([AM_PATH_GPGME_PTHREAD],[
       fi
    fi
    if test $ok = yes; then
@@ -223,7 +223,7 @@ index 8cc2898..0ff550e 100644
  ])
  
  
-@@ -321,36 +252,12 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+@@ -319,36 +249,12 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
       min_gpgme_version="$tmp"
    fi
  
@@ -262,7 +262,7 @@ index 8cc2898..0ff550e 100644
          if test "$tmp" -gt 0 ; then
             if test "$req_gpgme_api" -ne "$tmp" ; then
               ok=no
-@@ -359,17 +266,9 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+@@ -357,17 +263,9 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
       fi
    fi
    if test $ok = yes; then
@@ -281,7 +281,7 @@ index 8cc2898..0ff550e 100644
 -  AC_SUBST(GPGME_GLIB_LIBS)
  ])
 diff --git a/src/gpgme.pc.in b/src/gpgme.pc.in
-index 9ddef5c..932645b 100644
+index 9ddef5cd..932645be 100644
 --- a/src/gpgme.pc.in
 +++ b/src/gpgme.pc.in
 @@ -9,6 +9,6 @@ Name: gpgme
@@ -293,3 +293,6 @@ index 9ddef5c..932645b 100644
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lgpgme
  URL: https://www.gnupg.org/software/gpgme/index.html
+-- 
+2.25.1
+

@@ -1,0 +1,26 @@
+From f0d8240dbf594e6dfab31fd7d70ce340ac365a65 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 3 Nov 2024 15:50:50 -0800
+Subject: [PATCH] tcl.m4: Recognize tclsh9
+
+Add missing support to recognize tclsh9 as supported
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ config/tcl.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/tcl.m4 b/config/tcl.m4
+index 9de31a5..568fd45 100644
+--- a/config/tcl.m4
++++ b/config/tcl.m4
+@@ -4,7 +4,7 @@
+ 
+ 
+ AC_DEFUN([PGAC_PATH_TCLSH],
+-[PGAC_PATH_PROGS(TCLSH, [tclsh tcl tclsh8.6 tclsh86 tclsh8.5 tclsh85 tclsh8.4 tclsh84])
++[PGAC_PATH_PROGS(TCLSH, [tclsh tcl tclsh9.0 tclsh90 tclsh8.6 tclsh86 tclsh8.5 tclsh85 tclsh8.4 tclsh84])
+ AC_ARG_VAR(TCLSH, [Tcl interpreter program (tclsh)])dnl
+ if test x"$TCLSH" = x""; then
+   AC_MSG_ERROR([Tcl shell not found])

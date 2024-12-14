@@ -16,5 +16,4 @@ REQUIRED_DISTRO_FEATURES = "x11"
 # Remove runtime dependency on empty package ${PN}
 RDEPENDS:${PN}-dev = ""
 
-SRC_URI[md5sum] = "1b0cb67b6f2bd7c4abef17648b062896"
 SRC_URI[sha256sum] = "a3b06f5188fd9effd0799ae31352b3cd65cb913b964e2c1a923ffa9d3c08abbe"

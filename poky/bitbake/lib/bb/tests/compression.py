@@ -66,8 +66,8 @@ class CompressionTests(object):
 
 class LZ4Tests(CompressionTests, unittest.TestCase):
     def setUp(self):
-        if shutil.which("lz4c") is None:
-            self.skipTest("'lz4c' not found")
+        if shutil.which("lz4") is None:
+            self.skipTest("'lz4' not found")
         super().setUp()
 
     @contextlib.contextmanager

@@ -1,4 +1,4 @@
-From 6afaaf164ab9370204856961a92ad8ee523a8293 Mon Sep 17 00:00:00 2001
+From ffd285a567e69f1bba5d47c4c0bb493345678055 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 3 Mar 2023 13:24:58 +0100
 Subject: [PATCH] xorg-macros.m4.in: do not run AC_CANONICAL_HOST in manpage
@@ -15,7 +15,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 deletion(-)
 
 diff --git a/xorg-macros.m4.in b/xorg-macros.m4.in
-index 3b8b8e9..6541236 100644
+index b15daf1..2a526a4 100644
 --- a/xorg-macros.m4.in
 +++ b/xorg-macros.m4.in
 @@ -111,7 +111,6 @@ AC_SUBST(TRADITIONALCPPFLAGS)

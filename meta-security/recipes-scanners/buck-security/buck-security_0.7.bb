@@ -10,7 +10,7 @@ SRC_URI = "http://sourceforge.net/projects/buck-security/files/buck-security/buc
 SRC_URI[md5sum] = "611a3e9bb7ed8a8270aa15216c321c53"
 SRC_URI[sha256sum] = "c533c6631ec3554dd8d39d2d1c3ed44badbbf50810ebb75469c74639fa294b01"
 
-S = "${WORKDIR}/${BPN}_${PV}"
+S = "${UNPACKDIR}/${BPN}_${PV}"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

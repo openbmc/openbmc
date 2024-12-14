@@ -1,4 +1,4 @@
-From d48ec5e1a5fb7907520dee71b1d94045486a0c29 Mon Sep 17 00:00:00 2001
+From 9e95f8933bded10fdd664fc95492825347ec59a7 Mon Sep 17 00:00:00 2001
 From: Alexander Kamensky <alexander.kamensky42@gmail.com>
 Date: Thu, 12 Nov 2020 12:56:46 -0800
 Subject: [PATCH] arm64: kexec: disabled check if kaslr-seed dtb property was
@@ -34,10 +34,10 @@ Upstream-Status: Submitted [http://lists.infradead.org/pipermail/kexec/2020-Nove
  1 file changed, 1 insertion(+), 13 deletions(-)
 
 diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
-index ec6df4b..10238d9 100644
+index 9091f40..ea304f9 100644
 --- a/kexec/arch/arm64/kexec-arm64.c
 +++ b/kexec/arch/arm64/kexec-arm64.c
-@@ -503,7 +503,7 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
+@@ -504,7 +504,7 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
  	int len, range_len;
  	int nodeoffset;
  	int new_size;
@@ -46,7 +46,7 @@ index ec6df4b..10238d9 100644
  
  	result = fdt_check_header(dtb->buf);
  
-@@ -576,18 +576,6 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
+@@ -577,18 +577,6 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
  			return result;
  		}
  	} else {
@@ -65,6 +65,3 @@ index ec6df4b..10238d9 100644
  		/*
  		 * Invoke the getrandom system call with
  		 * GRND_NONBLOCK, to make sure we
--- 
-2.25.1
-

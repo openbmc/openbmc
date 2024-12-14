@@ -18,7 +18,7 @@ do_update_crates[depends] = "python3-native:do_populate_sysroot"
 do_update_crates[nostamp] = "1"
 do_update_crates[doc] = "Update the recipe by reading Cargo.lock and write in ${THISDIR}/${BPN}-crates.inc"
 
-RECIPE_UPDATE_EXTRA_TASKS += "do_update_crates"
+RECIPE_UPGRADE_EXTRA_TASKS += "do_update_crates"
 
 # The directory where to search for Cargo.lock files
 CARGO_LOCK_SRC_DIR ??= "${S}"

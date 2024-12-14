@@ -34,7 +34,7 @@ index 3663220..dce9789 100644
 -#ifdef HAVE_SYS_MMAN_H
 -#include <sys/mman.h>
 -#endif
--    int main()
+-    int main(int argc, const char *argv[])
 -    {
 -        int fd;
 -        void *m;

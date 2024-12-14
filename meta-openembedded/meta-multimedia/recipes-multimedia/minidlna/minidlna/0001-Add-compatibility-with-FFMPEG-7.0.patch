@@ -1,0 +1,49 @@
+From 92f8b94c697c225fb31062586f817c4fc3df8c2a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2024 13:22:33 -0700
+Subject: [PATCH] Add compatibility with FFMPEG 7.0
+
+channel_layout has been replaced with ch_layout
+
+Upstream-Status: Submitted [https://sourceforge.net/p/minidlna/git/merge-requests/59/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libav.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/libav.h b/libav.h
+index b69752c..a3153bd 100644
+--- a/libav.h
++++ b/libav.h
+@@ -58,6 +58,7 @@
+ #endif
+ 
+ #define USE_CODECPAR LIBAVFORMAT_VERSION_INT >= ((57<<16)+(50<<8)+100)
++#define USE_CH_LAYOUT (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57, 28, 100))
+ 
+ #ifndef FF_PROFILE_H264_BASELINE
+ #define FF_PROFILE_H264_BASELINE 66
+@@ -174,7 +175,11 @@ lav_get_interlaced(AVStream *s)
+ #define lav_codec_tag(s) s->codecpar->codec_tag
+ #define lav_sample_rate(s) s->codecpar->sample_rate
+ #define lav_bit_rate(s) s->codecpar->bit_rate
++#if USE_CH_LAYOUT
++#define lav_channels(s) s->codecpar->ch_layout.nb_channels
++#else
+ #define lav_channels(s) s->codecpar->channels
++#endif
+ #define lav_width(s) s->codecpar->width
+ #define lav_height(s) s->codecpar->height
+ #define lav_profile(s) s->codecpar->profile
+@@ -186,7 +191,11 @@ lav_get_interlaced(AVStream *s)
+ #define lav_codec_tag(s) s->codec->codec_tag
+ #define lav_sample_rate(s) s->codec->sample_rate
+ #define lav_bit_rate(s) s->codec->bit_rate
++#if USE_CH_LAYOUT
++#define lav_channels(s) s->codec->ch_layout.nb_channels
++#else
+ #define lav_channels(s) s->codec->channels
++#endif
+ #define lav_width(s) s->codec->width
+ #define lav_height(s) s->codec->height
+ #define lav_profile(s) s->codec->profile

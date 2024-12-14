@@ -18,5 +18,4 @@ FILES:ttf-liberation-mono  = "${datadir}/fonts/truetype/*Mono*"
 FILES:ttf-liberation-sans  = "${datadir}/fonts/truetype/*Sans*"
 FILES:ttf-liberation-serif = "${datadir}/fonts/truetype/*Serif*"
 
-SRC_URI[md5sum] = "77728078a17e39f7c242b42c3bf6feb8"
 SRC_URI[sha256sum] = "174cf27c57612971434ec8cc4a52bfd37bad8408e9b9219539c6d5113df6ff8f"

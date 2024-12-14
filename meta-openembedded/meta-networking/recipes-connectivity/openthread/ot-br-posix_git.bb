@@ -11,29 +11,31 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=87109e44b2fda96a8991f27684a7349c \
                     file://third_party/openthread/repo/LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
                     "
 DEPENDS = "autoconf-archive dbus readline avahi jsoncpp boost libnetfilter-queue protobuf protobuf-native"
-SRCREV = "a35cc682305bb2201c314472adf06a4960536750"
+SRCREV = "b041fa52daaa4dfbf6aa4665d8925c1be0350ca5"
 PV = "0.3.0+git"
 
 SRC_URI = "gitsm://github.com/openthread/ot-br-posix.git;protocol=https;branch=main \
            file://0001-otbr-agent.service.in-remove-pre-exec-hook-for-mdns-.patch \
            file://0001-cmake-Disable-nonnull-compare-warning-on-gcc.patch \
            file://default-cxx-std.patch \
-           file://musl-fixes.patch \
+           file://0001-fix-build-on-GCC-14-for-yocto.patch;patchdir=third_party/openthread/repo \
+           file://0001-Musl-build-fix.patch;patchdir=third_party/openthread/repo \
            "
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} = "otbr-agent.service"
 
 inherit pkgconfig cmake systemd
-# openthread/repo/src/cli/cli.cpp:1786:18: fatal error: variable 'i' set but not used [-Wunused-but-set-variable]
-#    for (uint8_t i = 0;; i++)
-CXXFLAGS:append:libc-musl:toolchain-clang = " -Wno-error=sign-compare -Wno-error=unused-but-set-variable"
+
+LDFLAGS:append:riscv32 = " -latomic"
 
 EXTRA_OECMAKE = "-DBUILD_TESTING=OFF \
                  -DOTBR_DBUS=ON \
                  -DOTBR_REST=ON \
                  -DOTBR_WEB=OFF \
                  -DCMAKE_LIBRARY_PATH=${libdir} \
+                 -DOT_POSIX_PRODUCT_CONFIG=${sysconfdir}/openthread.conf.example \
+                 -DOT_POSIX_FACTORY_CONFIG=${sysconfdir}/openthread.conf.example \
                  -DOTBR_MDNS=avahi \
                  -DOTBR_BACKBONE_ROUTER=ON \
                  -DOTBR_BORDER_ROUTING=ON \

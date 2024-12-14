@@ -45,6 +45,9 @@ do_install_ptest () {
 
 	 # Remove files with host-specific configuration for building native binaries
 	 rm ${D}${PTEST_PATH}/Makefile.config ${D}${PTEST_PATH}/xconfig.h ${D}${PTEST_PATH}/xconfig.sh
+
+         # create an empty file that is checked for existence by makerel test
+         touch ${D}${PTEST_PATH}/win32/Makefile
 }
 
 python populate_packages:prepend() {

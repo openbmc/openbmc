@@ -1,7 +1,7 @@
-From 28eb06047ebd2deaa8c7cd2bf6655ef6a469dc14 Mon Sep 17 00:00:00 2001
+From f5cbd5a4954b89857c9e397cacceda552484f5d5 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 10:01:56 +0800
-Subject: [PATCH 1/2] Add FAIL/PASS output to test output.
+Subject: [PATCH] Add FAIL/PASS output to test output.
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -16,10 +16,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/tests/run-all b/tests/run-all
-index 2882fe0..e21d026 100644
+index 1f74923..ba36a1f 100644
 --- a/tests/run-all
 +++ b/tests/run-all
-@@ -33,7 +33,16 @@ do
+@@ -57,7 +57,16 @@ do
  	case $x in
  	$0|run-minimal|run-gprof)	;;
  	*.orig|*~) ;;
@@ -37,6 +37,3 @@ index 2882fe0..e21d026 100644
  	esac
  done
  
--- 
-1.8.3.1
-

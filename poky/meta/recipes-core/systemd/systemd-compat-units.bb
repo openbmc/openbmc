@@ -26,7 +26,7 @@ SYSTEMD_DISABLED_SYSV_SERVICES = " \
   syslog.busybox \
 "
 
-pkg_postinst:${PN} () {
+pkg_postinst_ontarget:${PN} () {
 
 	test -d $D${sysconfdir}/init.d  ||  exit 0
 	cd $D${sysconfdir}/init.d

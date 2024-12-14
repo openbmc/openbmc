@@ -1,4 +1,4 @@
-From f4cf90b5a298d6a3199e8b4c07f520aaf593ce2b Mon Sep 17 00:00:00 2001
+From 38e38437e83ed961dc1fa6d5b534bbdaae5b535e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 9 Mar 2017 18:54:02 +0200
 Subject: [PATCH] Add a color setting for mips64_n32 binaries
@@ -11,10 +11,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 6 insertions(+)
 
 diff --git a/build/rpmfc.c b/build/rpmfc.c
-index 4b67a9bae..ed7e4e623 100644
+index 86dd36d14..df421a23f 100644
 --- a/build/rpmfc.c
 +++ b/build/rpmfc.c
-@@ -660,6 +660,7 @@ exit:
+@@ -716,6 +716,7 @@ static int rpmfcHelper(rpmfc fc, int *fnx, int nfn, const char *proto,
  static const struct rpmfcTokens_s rpmfcTokens[] = {
    { "directory",		RPMFC_INCLUDE },
  
@@ -22,8 +22,8 @@ index 4b67a9bae..ed7e4e623 100644
    { "ELF 32-bit",		RPMFC_ELF32|RPMFC_INCLUDE },
    { "ELF 64-bit",		RPMFC_ELF64|RPMFC_INCLUDE },
  
-@@ -1158,6 +1159,9 @@ static uint32_t getElfColor(const char *fn)
- 		color = RPMFC_ELF32;
+@@ -1258,6 +1259,9 @@ static uint32_t getElfColor(const char *fn)
+ 		color = 0;
  		break;
  	    }
 +            if (ehdr.e_machine == EM_MIPS || ehdr.e_machine == EM_MIPS_RS3_LE)

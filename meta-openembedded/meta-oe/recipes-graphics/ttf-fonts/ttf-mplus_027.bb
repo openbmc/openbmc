@@ -22,5 +22,4 @@ do_install() {
     install -m 0644 *.ttf ${D}${datadir}/fonts/ttf-mplus/
 }
 
-SRC_URI[md5sum] = "d1400184b51b3871e8d2fca6c50e18ae"
 SRC_URI[sha256sum] = "a20b9b9b03c2a6fb1e2137d29e8a6ce06406ba1e008906ea3c474dc048dc06a6"

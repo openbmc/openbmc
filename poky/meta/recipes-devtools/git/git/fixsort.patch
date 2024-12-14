@@ -1,13 +1,16 @@
-[PATCH] generate-configlist.sh: Fix determinism issue
+From 83ae059943d3efd824978a759bcfd894ce5085d4 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 17 Feb 2021 17:57:13 +0000
+Subject: [PATCH] [PATCH] generate-configlist.sh: Fix determinism issue
 
-Currently git binaries are not entirely reproducible, at least partly 
+Currently git binaries are not entirely reproducible, at least partly
 due to config-list.h differing in order depending on the system's
 locale settings. Under different locales, the entries:
 
 "sendemail.identity",
 "sendemail.<identity>.*",
 
-would differ in order for example and this leads to differences in 
+would differ in order for example and this leads to differences in
 the debug symbols for the binaries.
 
 This can be fixed by specifying the C locale for the sort in the
@@ -15,12 +18,15 @@ shell script generating the header.
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted [https://public-inbox.org/git/f029a942dd3d50d85e60bd37d8e454524987842f.camel@linuxfoundation.org/T/#u]
+---
+ generate-configlist.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: git-2.30.0/generate-configlist.sh
-===================================================================
---- git-2.30.0.orig/generate-configlist.sh
-+++ git-2.30.0/generate-configlist.sh
-@@ -9,7 +9,7 @@ static const char *config_name_list[] =
+diff --git a/generate-configlist.sh b/generate-configlist.sh
+index 8692fe5..e67ccac 100755
+--- a/generate-configlist.sh
++++ b/generate-configlist.sh
+@@ -9,7 +9,7 @@ static const char *config_name_list[] = {
  EOF
  	grep -h '^[a-zA-Z].*\..*::$' Documentation/*config.txt Documentation/config/*.txt |
  	sed '/deprecated/d; s/::$//; s/,  */\n/g' |

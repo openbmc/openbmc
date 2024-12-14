@@ -1,0 +1,38 @@
+From ef1aaeee984ab13dab5d46c73e9b207cbdf62c55 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Leonard=20G=C3=B6hrs?= <l.goehrs@pengutronix.de>
+Date: Wed, 20 Dec 2023 14:37:20 +0100
+Subject: [PATCH] CMakeLists: do not use vendored libcurl
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [upstream ticket https://github.com/nxp-imx/bcu/issues/17]
+
+Signed-off-by: Leonard Göhrs <l.goehrs@pengutronix.de>
+---
+ CMakeLists.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3475179..bfecdb0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -17,15 +17,16 @@ pkg_check_modules(LIBFTDI REQUIRED libftdi1)
+ pkg_check_modules(LIBYAML REQUIRED yaml-0.1)
+ pkg_check_modules(LIBOPENSSL REQUIRED openssl)
+ pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
++pkg_check_modules(LIBCURL REQUIRED libcurl)
+ project(bcu)
+-include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBFTDI_INCLUDE_DIRS}include ${PROJECT_SOURCE_DIR}/libftdi/src ${LIBYAML_INCLUDEDIR} ${PROJECT_SOURCE_DIR}/libcurl/include)
++include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBFTDI_INCLUDE_DIRS}include ${LIBYAML_INCLUDEDIR})
+ include_directories(${PROJECT_SOURCE_DIR})
+ 
+ message("operation system is ${CMAKE_SYSTEM}")
+ if (LINUX)
+         add_executable(bcu bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_https.c bcu_ftdi_eeprom.c)
+         link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
+-        target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} ${LIBYAML_LIBRARIES} ${PROJECT_SOURCE_DIR}/libcurl/build.bcu/lib/libcurl.a -lpthread -lssl -lcrypto -lm)
++        target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} ${LIBYAML_LIBRARIES} -lcurl -lpthread -lssl -lcrypto -lm)
+         execute_process( COMMAND ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR}
+                          COMMAND ${PROJECT_SOURCE_DIR}/build_libs.sh ${PROJECT_SOURCE_DIR})
+         install(TARGETS bcu DESTINATION bin)

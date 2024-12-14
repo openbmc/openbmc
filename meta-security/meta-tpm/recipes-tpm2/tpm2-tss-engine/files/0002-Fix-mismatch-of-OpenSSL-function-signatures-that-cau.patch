@@ -1,0 +1,78 @@
+From 766505bf5c943c614fd246d27d1e5cd66543250b Mon Sep 17 00:00:00 2001
+From: Matthias Gerstner <matthias.gerstner@suse.de>
+Date: Mon, 6 May 2024 16:07:54 +0200
+Subject: [PATCH 2/2] Fix mismatch of OpenSSL function signatures that cause
+ errors with gcc-14
+
+Building with gcc-14 fails with diagnostics like this:
+
+```
+src/tpm2-tss-engine-rsa.c:805:46: error: passing argument 2 of 'EVP_PKEY_meth_set_copy' from incompatible pointer type [-Wincompatible-pointer-types]
+  805 |     EVP_PKEY_meth_set_copy(pkey_rsa_methods, rsa_pkey_copy);
+      |                                              ^~~~~~~~~~~~~
+      |                                              |
+      |                                              int (*)(EVP_PKEY_CTX *, EVP_PKEY_CTX *) {aka int (*)(struct evp_pkey_ctx_st *, struct evp_pkey_ctx_st *)}
+/usr/include/openssl/evp.h:2005:36: note: expected 'int (*)(EVP_PKEY_CTX *, const EVP_PKEY_CTX *)' {aka 'int (*)(struct evp_pkey_ctx_st *, const struct evp_pkey_ctx_st *)'} but argument is of type 'int (*)(EVP_PKEY_CTX *, EVP_PKEY_CTX *)' {aka 'int (*)(struct evp_pkey_ctx_st *, struct evp_pkey_ctx_st *)'}
+```
+
+A look into OpenSSL upstream shows that these functions have always had const
+`src` parameters. Thus this error was simply not detected by earlier compiler
+versions.
+
+Upstream-Status: Backport
+
+Signed-off-by: Matthias Gerstner <matthias.gerstner@suse.de>
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ src/tpm2-tss-engine-ecc.c | 4 ++--
+ src/tpm2-tss-engine-rsa.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/tpm2-tss-engine-ecc.c b/src/tpm2-tss-engine-ecc.c
+index 9e72c85..f6b9c5a 100644
+--- a/src/tpm2-tss-engine-ecc.c
++++ b/src/tpm2-tss-engine-ecc.c
+@@ -52,7 +52,7 @@ EC_KEY_METHOD *ecc_methods = NULL;
+ #endif /* OPENSSL_VERSION_NUMBER < 0x10100000 */
+ 
+ #ifdef HAVE_OPENSSL_DIGEST_SIGN
+-static int (*ecdsa_pkey_orig_copy)(EVP_PKEY_CTX *dst, EVP_PKEY_CTX *src);
++static int (*ecdsa_pkey_orig_copy)(EVP_PKEY_CTX *dst, const EVP_PKEY_CTX *src);
+ static void (*ecdsa_pkey_orig_cleanup)(EVP_PKEY_CTX *ctx);
+ #endif /* HAVE_OPENSSL_DIGEST_SIGN */
+ 
+@@ -405,7 +405,7 @@ ecdsa_ec_key_sign(const unsigned char *dgst, int dgst_len, const BIGNUM *inv,
+ 
+ #ifdef HAVE_OPENSSL_DIGEST_SIGN
+ static int
+-ecdsa_pkey_copy(EVP_PKEY_CTX *dst, EVP_PKEY_CTX *src)
++ecdsa_pkey_copy(EVP_PKEY_CTX *dst, const EVP_PKEY_CTX *src)
+ {
+     if (ecdsa_pkey_orig_copy && !ecdsa_pkey_orig_copy(dst, src))
+         return 0;
+diff --git a/src/tpm2-tss-engine-rsa.c b/src/tpm2-tss-engine-rsa.c
+index 41de34e..e7260c2 100644
+--- a/src/tpm2-tss-engine-rsa.c
++++ b/src/tpm2-tss-engine-rsa.c
+@@ -49,7 +49,7 @@ RSA_METHOD *rsa_methods = NULL;
+ #endif /* OPENSSL_VERSION_NUMBER < 0x10100000 */
+ 
+ #ifdef HAVE_OPENSSL_DIGEST_SIGN
+-static int (*rsa_pkey_orig_copy)(EVP_PKEY_CTX *dst, EVP_PKEY_CTX *src);
++static int (*rsa_pkey_orig_copy)(EVP_PKEY_CTX *dst, const EVP_PKEY_CTX *src);
+ static void (*rsa_pkey_orig_cleanup)(EVP_PKEY_CTX *ctx);
+ #endif /* HAVE_OPENSSL_DIGEST_SIGN */
+ 
+@@ -637,7 +637,7 @@ RSA_METHOD rsa_methods = {
+ 
+ #ifdef HAVE_OPENSSL_DIGEST_SIGN
+ static int
+-rsa_pkey_copy(EVP_PKEY_CTX *dst, EVP_PKEY_CTX *src)
++rsa_pkey_copy(EVP_PKEY_CTX *dst, const EVP_PKEY_CTX *src)
+ {
+     if (rsa_pkey_orig_copy && !rsa_pkey_orig_copy(dst, src))
+         return 0;
+-- 
+2.43.0
+

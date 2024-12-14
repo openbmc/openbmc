@@ -1,0 +1,39 @@
+From 9f16cd0624641e489665415150792d9054af8a7a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 26 Nov 2024 09:57:39 +0000
+Subject: [PATCH 5/7] libtool: Check for static libs for internal compiler
+ libraries
+
+Libtool checks only for libraries linked as -l* when trying to
+find internal compiler libraries. Clang, however uses the absolute
+path to link its internal libraries e.g. compiler_rt. This patch
+handles clang's statically linked libraries when finding internal
+compiler libraries.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+https://crbug.com/749263
+https://debbugs.gnu.org/cgi/bugreport.cgi?bug=27866
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00016.html]
+---
+ m4/libtool.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 3650c87c..51493a10 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -7708,7 +7708,7 @@ if AC_TRY_EVAL(ac_compile); then
+   for p in `eval "$output_verbose_link_cmd"`; do
+     case $prev$p in
+ 
+-    -L* | -R* | -l*)
++    -L* | -R* | -l* | */libclang_rt.*.a)
+        # Some compilers place space between "-{L,R,l}" and the path.
+        # Remove the space.
+        if test x-L = x"$p" ||
+-- 
+2.39.5
+

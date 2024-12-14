@@ -1,42 +1,50 @@
-From eb6d6579150bf4684603ce377c51e90ad3bb8109 Mon Sep 17 00:00:00 2001
+From 0e2b652a0eff85798584116c905a2d6ad8f25d5f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 15 Nov 2020 15:32:39 -0800
 Subject: [PATCH] numpy/core: Define RISCV-32 support
 
 Helps compile on riscv32
 
-Upstream-Status: Submitted [https://github.com/numpy/numpy/pull/17780]
+Upstream-Status: Backport
+(https://github.com/numpy/numpy/pull/17780/commits/0e2b652a0eff85798584116c905a2d6ad8f25d5f)
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- numpy/core/include/numpy/npy_cpu.h    | 3 +++
- numpy/core/include/numpy/npy_endian.h | 1 +
- 2 files changed, 4 insertions(+)
+ numpy/_core/include/numpy/npy_cpu.h    | 9 +++++++--
+ numpy/_core/include/numpy/npy_endian.h | 1 +
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/numpy/core/include/numpy/npy_cpu.h b/numpy/core/include/numpy/npy_cpu.h
-index 78d229e..04be511 100644
---- a/numpy/core/include/numpy/npy_cpu.h
-+++ b/numpy/core/include/numpy/npy_cpu.h
-@@ -19,6 +19,7 @@
+diff --git a/numpy/_core/include/numpy/npy_cpu.h b/numpy/_core/include/numpy/npy_cpu.h
+index a19f8e6bbd..15f9f12931 100644
+--- a/numpy/_core/include/numpy/npy_cpu.h
++++ b/numpy/_core/include/numpy/npy_cpu.h
+@@ -18,6 +18,7 @@
+  *              NPY_CPU_ARCEL
   *              NPY_CPU_ARCEB
   *              NPY_CPU_RISCV64
-  *              NPY_CPU_LOONGARCH
 + *              NPY_CPU_RISCV32
+  *              NPY_CPU_LOONGARCH
   *              NPY_CPU_WASM
   */
- #ifndef NUMPY_CORE_INCLUDE_NUMPY_NPY_CPU_H_
-@@ -104,6 +105,8 @@
+@@ -102,8 +103,12 @@
+     #define NPY_CPU_ARCEL
+ #elif defined(__arc__) && defined(__BIG_ENDIAN__)
      #define NPY_CPU_ARCEB
- #elif defined(__riscv) && defined(__riscv_xlen) && __riscv_xlen == 64
-     #define NPY_CPU_RISCV64
-+#elif defined(__riscv) && defined(__riscv_xlen) && __riscv_xlen == 32
-+    #define NPY_CPU_RISCV32
+-#elif defined(__riscv) && defined(__riscv_xlen) && __riscv_xlen == 64
+-    #define NPY_CPU_RISCV64
++#elif defined(__riscv)
++    #if __riscv_xlen == 64
++	#define NPY_CPU_RISCV64
++    #elif __riscv_xlen == 32
++	#define NPY_CPU_RISCV32
++    #endif
  #elif defined(__loongarch__)
      #define NPY_CPU_LOONGARCH
  #elif defined(__EMSCRIPTEN__)
-diff --git a/numpy/core/include/numpy/npy_endian.h b/numpy/core/include/numpy/npy_endian.h
-index 5e58a7f..0926212 100644
---- a/numpy/core/include/numpy/npy_endian.h
-+++ b/numpy/core/include/numpy/npy_endian.h
+diff --git a/numpy/_core/include/numpy/npy_endian.h b/numpy/_core/include/numpy/npy_endian.h
+index 5e58a7f52c..09262120bf 100644
+--- a/numpy/_core/include/numpy/npy_endian.h
++++ b/numpy/_core/include/numpy/npy_endian.h
 @@ -49,6 +49,7 @@
              || defined(NPY_CPU_PPC64LE)       \
              || defined(NPY_CPU_ARCEL)         \
@@ -46,5 +54,5 @@ index 5e58a7f..0926212 100644
              || defined(NPY_CPU_WASM)
          #define NPY_BYTE_ORDER NPY_LITTLE_ENDIAN
 -- 
-2.20.1
+2.39.5
 

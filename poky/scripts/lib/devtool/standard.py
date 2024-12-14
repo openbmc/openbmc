@@ -18,7 +18,6 @@ import argparse_oe
 import scriptutils
 import errno
 import glob
-import filecmp
 from collections import OrderedDict
 from devtool import exec_build_env_command, setup_tinfoil, check_workspace_recipe, use_external_build, setup_git_repo, recipe_to_append, get_bbclassextend_targets, update_unlockedsigs, check_prerelease_version, check_git_repo_dirty, check_git_repo_op, DevtoolError
 from devtool import parse_recipe
@@ -814,10 +813,8 @@ def modify(args, config, basepath, workspace):
             staging_kbranch = get_staging_kbranch(srcdir)
             if (os.path.exists(srcdir) and os.listdir(srcdir)) and (kernelVersion in staging_kerVer and staging_kbranch == kbranch):
                 oe.path.copyhardlinktree(srcdir, srctree)
-                workdir = rd.getVar('WORKDIR')
                 unpackdir = rd.getVar('UNPACKDIR')
                 srcsubdir = rd.getVar('S')
-                localfilesdir = os.path.join(srctree, 'oe-local-files')
 
                 # Add locally copied files to gitignore as we add back to the metadata directly
                 local_files = oe.recipeutils.get_recipe_local_files(rd)
@@ -952,13 +949,6 @@ def modify(args, config, basepath, workspace):
                 f.write('EXTERNALSRC_BUILD:pn-%s = "%s"\n' % (pn, srctree))
 
             if bb.data.inherits_class('kernel', rd):
-                f.write('SRCTREECOVEREDTASKS = "do_validate_branches do_kernel_checkout '
-                        'do_fetch do_unpack do_kernel_configcheck"\n')
-                f.write('\ndo_patch[noexec] = "1"\n')
-                f.write('\ndo_configure:append() {\n'
-                        '    cp ${B}/.config ${S}/.config.baseline\n'
-                        '    ln -sfT ${B}/.config ${S}/.config.new\n'
-                        '}\n')
                 f.write('\ndo_kernel_configme:prepend() {\n'
                         '    if [ -e ${S}/.config ]; then\n'
                         '        mv ${S}/.config ${S}/.config.old\n'

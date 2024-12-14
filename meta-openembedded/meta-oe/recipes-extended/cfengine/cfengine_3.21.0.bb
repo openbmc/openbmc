@@ -22,7 +22,6 @@ SRC_URI = "https://cfengine-package-repos.s3.amazonaws.com/tarballs/${BPN}-commu
            file://0001-Fixed-with-libxml2-no-case-in-configure.ac.patch \
            file://set-path-of-default-config-file.patch \
            "
-#SRC_URI[md5sum] = "5318e40702bc66a3ece44ec4ad77712b"
 SRC_URI[sha256sum] = "911778ddb0a4e03a3ddfc8fc0f033136e1551849ea2dcbdb3f0f14359dfe3126"
 
 inherit autotools-brokensep systemd

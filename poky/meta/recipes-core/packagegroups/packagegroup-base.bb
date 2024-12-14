@@ -39,9 +39,6 @@ PACKAGES = ' \
             \
             '
 
-# Override by distro if needed
-VIRTUAL-RUNTIME_keymaps ?= "keymaps"
-
 #
 # packagegroup-base contain stuff needed for base system (machine related)
 #

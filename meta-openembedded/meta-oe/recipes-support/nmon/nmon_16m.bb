@@ -14,6 +14,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/nmon/lmon${PV}.c;name=lmon \
 SRC_URI[lmon.sha256sum] = "2bed4d45fdfdf1d1387ec91e139c04975d5f838e3e0d53c0fe2d803a707e5fc1"
 SRC_URI[doc.sha256sum] = "1f7f83afe62a7210be5e83cd24157adb854c14599efe0b377a7ecca933869278"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/nmon/files/"
+UPSTREAM_CHECK_REGEX = "lmon(?P<pver>.*).c"
+
 CFLAGS += "-D JFS -D GETUSER -Wall -D LARGEMEM"
 LDFLAGS += "-ltinfo -lncursesw -lm"
 ASNEEDED:pn-nmon = ""

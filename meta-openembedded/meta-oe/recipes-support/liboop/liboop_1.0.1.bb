@@ -7,7 +7,6 @@ SRC_URI = "http://ftp.lysator.liu.se/pub/liboop/liboop-${PV}.tar.gz \
            file://tcl_dev.patch \
 "
 
-SRC_URI[md5sum] = "f2b3dff17355fd9a6e2229caca8993f0"
 SRC_URI[sha256sum] = "56af16ad65e7397dadc8268e37ff6f67431db390c60c75e21a33e12b0e0d17e0"
 
 PACKAGECONFIG ?= ""

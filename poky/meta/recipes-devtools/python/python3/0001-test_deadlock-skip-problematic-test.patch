@@ -1,4 +1,4 @@
-From d7e3f26e7094fbe20e2271d75f18ac3b23a67f58 Mon Sep 17 00:00:00 2001
+From 5a44f74549b32395109342e9299510c32db71068 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Wed, 12 Jun 2024 10:29:03 -0400
 Subject: [PATCH] test_deadlock: skip problematic test
@@ -14,10 +14,10 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/Lib/test/test_concurrent_futures/test_deadlock.py b/Lib/test/test_concurrent_futures/test_deadlock.py
-index 1db4cd0099..fd07895a17 100644
+index 3c30c45..008d6c0 100644
 --- a/Lib/test/test_concurrent_futures/test_deadlock.py
 +++ b/Lib/test/test_concurrent_futures/test_deadlock.py
-@@ -90,6 +90,7 @@ def __reduce__(self):
+@@ -90,6 +90,7 @@ class ErrorAtUnpickle(object):
          return _raise_error_ignore_stderr, (UnpicklingError, )
  
  
@@ -25,6 +25,3 @@ index 1db4cd0099..fd07895a17 100644
  class ExecutorDeadlockTest:
      TIMEOUT = support.LONG_TIMEOUT
  
--- 
-2.45.2
-

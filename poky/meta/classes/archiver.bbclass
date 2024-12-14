@@ -339,7 +339,7 @@ python do_ar_mirror() {
     dl_dir = d.getVar('DL_DIR')
     mirror_exclusions = (d.getVar('ARCHIVER_MIRROR_EXCLUDE') or '').split()
     mirror_mode = d.getVarFlag('ARCHIVER_MODE', 'mirror')
-    have_mirror_tarballs = d.getVar('BB_GENERATE_MIRROR_TARBALLS')
+    have_mirror_tarballs = oe.types.boolean(d.getVar('BB_GENERATE_MIRROR_TARBALLS'))
 
     if mirror_mode == 'combined':
         destdir = d.getVar('ARCHIVER_COMBINED_MIRRORDIR')

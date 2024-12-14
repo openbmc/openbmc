@@ -20,7 +20,8 @@ SRC_URI = "git://github.com/emersion/xdg-desktop-portal-wlr.git;protocol=https;b
            file://0001-screencast-Fix-build-with-older-mesa.patch"
 
 S = "${WORKDIR}/git"
-SRCREV = "776113a4f014639c29d8de8fcb513493ef7b491f"
+PV .= "+git"
+SRCREV = "d9ada849aeca6137915de2df69beaef4e272cc1d"
 
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', 'basu', d)}"
 

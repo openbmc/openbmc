@@ -212,6 +212,8 @@ def compare_result(logger, base_name, target_name, base_result, target_result, d
 
     if base_result and target_result:
         for k in base_result:
+            if k in ['ptestresult.rawlogs', 'ptestresult.sections']:
+                continue
             base_testcase = base_result[k]
             base_status = base_testcase.get('status')
             if base_status:
@@ -422,6 +424,7 @@ def register_commands(subparsers):
                               help='(optional) filter the base results to this result ID')
     parser_build.add_argument('-t', '--target-result-id', default='',
                               help='(optional) filter the target results to this result ID')
+    parser_build.add_argument('-l', '--limit', default=REGRESSIONS_DISPLAY_LIMIT, help="Maximum number of changes to display per test. Can be set to 0 to print all changes")
 
     parser_build = subparsers.add_parser('regression-git', help='regression git analysis',
                                          description='regression analysis comparing base result set to target '

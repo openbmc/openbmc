@@ -1,0 +1,29 @@
+From 5798a250b465572d84a024389b173dc996690b03 Mon Sep 17 00:00:00 2001
+From: alperak <alperyasinak1@gmail.com>
+Date: Thu, 8 Aug 2024 12:56:31 +0300
+Subject: [PATCH] Use poetry-core for pyproject base build
+
+https://github.com/python-poetry/poetry-core#why-is-this-required
+
+Upstream-Status: Pending
+
+Signed-off-by: alperak <alperyasinak1@gmail.com>
+---
+ pyproject.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 6243bff..06bc409 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -15,5 +15,5 @@ python = "^3.6"
+ pyserial = "*"
+
+ [build-system]
+-requires = ["poetry>=0.12"]
+-build-backend = "poetry.masonry.api"
++requires = ["poetry-core>=0.12"]
++build-backend = "poetry.core.masonry.api"
+--
+2.25.1
+

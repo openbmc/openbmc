@@ -18,13 +18,14 @@ import warnings
 warnings.simplefilter("default")
 
 bindir = os.path.dirname(__file__)
+toolname = os.path.basename(__file__).split(".")[0]
 topdir = os.path.dirname(bindir)
 sys.path[0:0] = [os.path.join(topdir, 'lib')]
 
 import bb.tinfoil
 import bb.msg
 
-logger = bb.msg.logger_create('bitbake-layers', sys.stdout)
+logger = bb.msg.logger_create(toolname, sys.stdout)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -57,17 +58,18 @@ def main():
                          level=logger.getEffectiveLevel())
 
     plugins = []
-    tinfoil = bb.tinfoil.Tinfoil(tracking=True)
-    tinfoil.logger.setLevel(logger.getEffectiveLevel())
-    if global_args.force > 1:
-        bbpaths = []
-    else:
-        tinfoil.prepare(True)
-        bbpaths = tinfoil.config_data.getVar('BBPATH').split(':')
-    
-    try: 
+    with bb.tinfoil.Tinfoil(tracking=True) as tinfoil:
+        tinfoil.logger.setLevel(logger.getEffectiveLevel())
+
+        if global_args.force > 1:
+            bbpaths = []
+        else:
+            tinfoil.prepare(True)
+            bbpaths = tinfoil.config_data.getVar('BBPATH').split(':')
+
         for path in ([topdir] + bbpaths):
-            pluginpath = os.path.join(path, 'lib', 'bblayers')
+            pluginbasepath = {"bitbake-layers":'bblayers', 'bitbake-config-build':'bbconfigbuild'}[toolname]
+            pluginpath = os.path.join(path, 'lib', pluginbasepath)
             bb.utils.load_plugins(logger, plugins, pluginpath)
 
         registered = False
@@ -90,8 +92,6 @@ def main():
             tinfoil.config_data.enableTracking()
 
         return args.func(args)
-    finally:
-        tinfoil.shutdown()
 
 
 if __name__ == "__main__":

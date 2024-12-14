@@ -61,12 +61,12 @@ do_install () {
         install -m 644 ${S}/systemd-daemon/parsec.service ${D}${systemd_unitdir}/system
 
         install -d ${D}${libdir}/tmpfiles.d
-        install -m 644 ${WORKDIR}/parsec-tmpfiles.conf ${D}${libdir}/tmpfiles.d
+        install -m 644 ${UNPACKDIR}/parsec-tmpfiles.conf ${D}${libdir}/tmpfiles.d
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/init.d
-        install -m 755 ${WORKDIR}/parsec_init ${D}${sysconfdir}/init.d/parsec
+        install -m 755 ${UNPACKDIR}/parsec_init ${D}${sysconfdir}/init.d/parsec
         # Data dir
         install -d -m 700 -o parsec -g parsec "${D}${localstatedir}/lib/parsec"
     fi

@@ -35,13 +35,21 @@ SRC_URI:append:corstone1000 = " ${@bb.utils.contains('MACHINE_FEATURES', \
                                                             'file://corstone1000_kernel_debug.cfg', \
                                                             '', \
                                                              d)}"
-
 SRC_URI:append:corstone1000 = " \
-    file://extsys.cfg \
-    file://0001-remoteproc-Add-Arm-remoteproc-driver.patch \
-    file://0002-arm64-dts-Add-corstone1000-external-system-device-no.patch \
-    file://0003-dt-bindings-remoteproc-Add-Arm-remoteproc.patch \
-    "
+    ${@bb.utils.contains( \
+              'MACHINE_FEATURES', \
+              'corstone1000-extsys', \
+              ' \
+		  file://extsys.cfg \
+		  file://0001-remoteproc-Add-Arm-remoteproc-driver.patch \
+		  file://0002-arm64-dts-Add-corstone1000-external-system-device-no.patch \
+		  file://0003-dt-bindings-remoteproc-Add-Arm-remoteproc.patch \
+              ', \
+              '', \
+              d \
+        ) \
+    } \
+"
 
 # Default kernel features not needed for corstone1000
 # otherwise the extra kernel modules will increase the rootfs size
@@ -81,13 +89,6 @@ COMPATIBLE_MACHINE:musca-s1 = "(^$)"
 COMPATIBLE_MACHINE:sgi575 = "sgi575"
 KBUILD_DEFCONFIG:sgi575 = "defconfig"
 KCONFIG_MODE:sgi575 = "--alldefconfig"
-
-#
-# Total Compute (TC0/TC1) KMACHINE
-#
-COMPATIBLE_MACHINE:tc = "(tc0|tc1)"
-KBUILD_DEFCONFIG:tc = "defconfig"
-KCONFIG_MODE:tc = "--alldefconfig"
 
 #
 # sbsa-ref KMACHINE

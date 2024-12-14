@@ -1,4 +1,4 @@
-From 05be69910c99d739ce9246a3bb9426fa6d9f19d4 Mon Sep 17 00:00:00 2001
+From 838daab44918ef738402a2dd069537c6ac519305 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 8 Mar 2021 16:04:20 -0800
 Subject: [PATCH] gcc: poison-system-directories
@@ -61,7 +61,7 @@ index f3de4ba6776..3ce3113510b 100644
     optimizer and back end) to be checked for dynamic type safety at runtime.
     This is quite expensive. */
 diff --git a/gcc/configure b/gcc/configure
-index 266ab8f84b2..3c346acbce0 100755
+index abc8bfdc244..d3fa80408f4 100755
 --- a/gcc/configure
 +++ b/gcc/configure
 @@ -1050,6 +1050,7 @@ enable_maintainer_mode
@@ -81,7 +81,7 @@ index 266ab8f84b2..3c346acbce0 100755
    --enable-plugin         enable plugin support
    --enable-host-shared    build host code as shared libraries
    --enable-host-pie       build host code as PIE
-@@ -34020,6 +34023,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
+@@ -34028,6 +34031,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
  fi
  
  
@@ -105,10 +105,10 @@ index 266ab8f84b2..3c346acbce0 100755
  
  
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index a5aec1bc967..4d8123085b8 100644
+index 1d2cefa3f6a..2760b6c540c 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -7518,6 +7518,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
+@@ -7527,6 +7527,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
                  [specify that runtime libraries should be
                   installed in a compiler-specific directory])])
  
@@ -132,7 +132,7 @@ index a5aec1bc967..4d8123085b8 100644
  AC_SUBST(subdirs)
  AC_SUBST(srcdir)
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index 1006510fc6a..389155f8ed5 100644
+index f82f7d2817b..1da91813b0e 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
 @@ -391,6 +391,7 @@ Objective-C and Objective-C++ Dialects}.
@@ -143,7 +143,7 @@ index 1006510fc6a..389155f8ed5 100644
  -Wno-pragmas  -Wno-prio-ctor-dtor  -Wredundant-decls
  -Wrestrict  -Wno-return-local-addr  -Wreturn-type
  -Wno-scalar-storage-order  -Wsequence-point
-@@ -8860,6 +8861,14 @@ made up of data only and thus requires no special treatment.  But, for
+@@ -8861,6 +8862,14 @@ made up of data only and thus requires no special treatment.  But, for
  most targets, it is made up of code and thus requires the stack to be
  made executable in order for the program to work properly.
  

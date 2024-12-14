@@ -19,6 +19,8 @@ SRCREV = "b421f56d9ee31a966058d23bd23c966221c91396"
 
 S = "${WORKDIR}/git"
 
+CVE_PRODUCT = "rsyslog:librelp"
+
 inherit autotools pkgconfig ptest
 
 PACKAGECONFIG ?= "tls-openssl valgrind"
@@ -59,14 +61,16 @@ do_install_ptest() {
     # some tests need to write to this directory
     chmod 777 -R ${D}${PTEST_PATH}/${TESTDIR}
 
-    # do NOT need to rebuild Makefile or $(check_PROGRAMS)
-    sed -i 's/^Makefile:.*$/Makefile:/' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
-    sed -i 's/^check-TESTS:.*$/check-TESTS:/' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
-
-    # fix the srcdir, top_srcdir, abs_top_builddir
-    sed -i 's,^\(srcdir = \).*,\1${PTEST_PATH}/${TESTDIR},' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
-    sed -i 's,^\(top_srcdir = \).*,\1${PTEST_PATH}/${TESTDIR},' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
-    sed -i 's,^\(abs_top_builddir = \).*,\1${PTEST_PATH}/,' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
+	sed -e '# do NOT need to rebuild Makefile or $(check_PROGRAMS)' \
+		-e 's/^Makefile:.*$/Makefile:/' \
+		-e 's/^check-TESTS:.*$/check-TESTS:/' \
+		-e '# fix the srcdir, top_srcdir, abs_top_builddir' \
+		-e 's,^\(srcdir = \).*,\1${PTEST_PATH}/${TESTDIR},' \
+		-e 's,^\(top_srcdir = \).*,\1${PTEST_PATH}/${TESTDIR},' \
+		-e 's,^\(abs_top_builddir = \).*,\1${PTEST_PATH}/,' \
+		-e '# fix the path to test-driver' \
+		-e '/^SH_LOG_DRIVER =/s/(top_srcdir)/(top_builddir)/' \
+		-i ${D}${PTEST_PATH}/${TESTDIR}/Makefile
 
     # install test-driver
     install -m 644 ${S}/test-driver ${D}${PTEST_PATH}

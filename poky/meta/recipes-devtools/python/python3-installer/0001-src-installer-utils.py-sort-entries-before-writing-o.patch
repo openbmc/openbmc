@@ -1,0 +1,27 @@
+From 760ddf50ce559abd67bbdd31797267d00bcddfb3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 1 Oct 2024 19:22:11 +0200
+Subject: [PATCH] src/installer/utils.py: sort entries before writing out
+ RECORD file
+
+This helps build reproducibility.
+
+Upstream-Status: Submitted [https://github.com/pypa/installer/pull/245]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/installer/utils.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/installer/utils.py b/src/installer/utils.py
+index 3e601d6..073297c 100644
+--- a/src/installer/utils.py
++++ b/src/installer/utils.py
+@@ -207,7 +207,7 @@ def construct_record_file(
+         io.BytesIO(), encoding="utf-8", write_through=True, newline=""
+     )
+     writer = csv.writer(stream, delimiter=",", quotechar='"', lineterminator="\n")
+-    for scheme, record in records:
++    for scheme, record in sorted(records, key=lambda x: x[1].path):
+         writer.writerow(record.to_row(prefix_for_scheme(scheme)))
+     stream.seek(0)
+     return stream.detach()

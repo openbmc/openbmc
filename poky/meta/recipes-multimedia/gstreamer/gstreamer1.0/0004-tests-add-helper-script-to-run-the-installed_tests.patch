@@ -1,4 +1,4 @@
-From 506ff13a044439a170f770b6663a64c942ae0a05 Mon Sep 17 00:00:00 2001
+From 9bffd7eb9113f6535d8b82ca316e6f133241bd8d Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 2 May 2021 01:58:01 +0100
 Subject: [PATCH] tests: add helper script to run the installed_tests
@@ -18,7 +18,7 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  create mode 100755 tests/check/template.sh.in
 
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index 330abaa..5d383b1 100644
+index 6bb346a..fe57935 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
 @@ -185,6 +185,23 @@ foreach t : core_tests
@@ -59,7 +59,7 @@ index 0000000..cf7d31b
 +GST_PLUGIN_LOADING_WHITELIST="@GST_PLUGIN_LOADING_WHITELIST@"
 +GST_REGISTRY=@GST_REGISTRY@
 +GST_STATE_IGNORE_ELEMENTS="@GST_STATE_IGNORE_ELEMENTS@"
-+exec @TEST@
++exec @TEST@ "$@"
 diff --git a/tests/check/template.test.in b/tests/check/template.test.in
 index f701627..b74ef6a 100644
 --- a/tests/check/template.test.in

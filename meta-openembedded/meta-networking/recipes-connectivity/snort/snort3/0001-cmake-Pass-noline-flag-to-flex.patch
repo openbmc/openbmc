@@ -8,6 +8,7 @@ could be absolute build paths, since these files end up in dbg packages
 this can be flagged as a build/packaging warning.
 
 Upstream-Status: Pending
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  cmake/configure_options.cmake | 2 +-

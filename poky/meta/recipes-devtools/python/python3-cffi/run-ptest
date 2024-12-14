@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# test_passing_large_list often causes an OOM, skip for now
+
+# test_version verifies that versions match across the source tree, ignore
+# as we don't have a source tree
+pytest --automake -k 'not test_passing_large_list and not test_version'

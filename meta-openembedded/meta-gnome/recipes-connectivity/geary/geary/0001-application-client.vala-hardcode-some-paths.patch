@@ -1,0 +1,40 @@
+From 98243ca43e40116c22f7b867e32ad27ffd314505 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 16 Jul 2024 07:30:09 +0200
+Subject: [PATCH] application-client.vala: hardcode some paths
+
+Otherwise the build values will be stored in the binary and used if geary was not installed
+https://gitlab.gnome.org/GNOME/geary/-/blob/main/src/client/application/application-client.vala?ref_type=heads#L798
+https://gitlab.gnome.org/GNOME/geary/-/blob/main/src/client/application/application-client.vala?ref_type=heads#L365
+
+This breaks reproducibility
+WARNING: geary-46.0-r0 do_package_qa: QA Issue: File /usr/lib/geary/libgeary-client-46.0.so in package geary contains reference to TMPDIR [buildpaths]
+WARNING: geary-46.0-r0 do_package_qa: QA Issue: File /usr/lib/geary/.debug/libgeary-client-46.0.so in package geary-dbg contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ src/client/application/application-client.vala | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/client/application/application-client.vala b/src/client/application/application-client.vala
+index 51d0f632e..acc53a65f 100644
+--- a/src/client/application/application-client.vala
++++ b/src/client/application/application-client.vala
+@@ -39,9 +39,9 @@ public class Application.Client : Gtk.Application {
+ 
+     public const string VERSION = _VERSION;
+     public const string INSTALL_PREFIX = _INSTALL_PREFIX;
+-    public const string GSETTINGS_DIR = _GSETTINGS_DIR;
+-    public const string SOURCE_ROOT_DIR = _SOURCE_ROOT_DIR;
+-    public const string BUILD_ROOT_DIR = _BUILD_ROOT_DIR;
++    public const string GSETTINGS_DIR = "/usr/share/applications";
++    public const string SOURCE_ROOT_DIR = "/usr/src";
++    public const string BUILD_ROOT_DIR = "/usr/src";
+ 
+     // keep these in sync with meson_options.txt
+     public const string PROFILE_RELEASE = "release";
+-- 
+2.45.2
+

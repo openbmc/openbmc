@@ -12,7 +12,6 @@ SRC_URI = "http://0pointer.de/lennart/projects/ifplugd/ifplugd-${PV}.tar.gz \
 
 SRC_URI:append:libc-musl = " file://Fix-build-with-musl.patch"
 
-SRC_URI[md5sum] = "df6f4bab52f46ffd6eb1f5912d4ccee3"
 SRC_URI[sha256sum] = "474754ac4ab32d738cbf2a4a3e87ee0a2c71b9048a38bdcd7df1e4f9fd6541f0"
 
 inherit autotools update-rc.d pkgconfig

@@ -6,17 +6,17 @@ Release notes for Yocto-4.3.3 (Nanbield)
 Security Fixes in Yocto-4.3.3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  curl: Fix :cve:`2023-46219`
--  glibc: Ignore fixed :cve:`2023-0687` and :cve:`2023-5156`
--  linux-yocto/6.1: Ignore :cve:`2022-48619`, :cve:`2023-4610`, :cve:`2023-5178`, :cve:`2023-5972`, :cve:`2023-6040`, :cve:`2023-6531`, :cve:`2023-6546`, :cve:`2023-6622`, :cve:`2023-6679`, :cve:`2023-6817`, :cve:`2023-6931`, :cve:`2023-6932`, :cve:`2023-7192`, :cve:`2024-0193` and :cve:`2024-0443`
--  linux-yocto/6.1: Fix :cve:`2023-1193`, :cve_mitre:`2023-51779`, :cve:`2023-51780`, :cve:`2023-51781`, :cve:`2023-51782` and :cve:`2023-6606`
--  qemu: Fix :cve:`2023-3019`
--  shadow: Fix :cve:`2023-4641`
--  sqlite3: Fix :cve:`2024-0232`
--  sqlite3: drop obsolete CVE ignore :cve:`2023-36191`
--  sudo: Fix :cve:`2023-42456` and :cve:`2023-42465`
--  tiff: Fix :cve:`2023-6277`
--  xwayland: Fix :cve:`2023-6377` and :cve:`2023-6478`
+-  curl: Fix :cve_nist:`2023-46219`
+-  glibc: Ignore fixed :cve_nist:`2023-0687` and :cve_nist:`2023-5156`
+-  linux-yocto/6.1: Ignore :cve_nist:`2022-48619`, :cve_nist:`2023-4610`, :cve_nist:`2023-5178`, :cve_nist:`2023-5972`, :cve_nist:`2023-6040`, :cve_nist:`2023-6531`, :cve_nist:`2023-6546`, :cve_nist:`2023-6622`, :cve_nist:`2023-6679`, :cve_nist:`2023-6817`, :cve_nist:`2023-6931`, :cve_nist:`2023-6932`, :cve_nist:`2023-7192`, :cve_nist:`2024-0193` and :cve_nist:`2024-0443`
+-  linux-yocto/6.1: Fix :cve_nist:`2023-1193`, :cve_mitre:`2023-51779`, :cve_nist:`2023-51780`, :cve_nist:`2023-51781`, :cve_nist:`2023-51782` and :cve_nist:`2023-6606`
+-  qemu: Fix :cve_nist:`2023-3019`
+-  shadow: Fix :cve_nist:`2023-4641`
+-  sqlite3: Fix :cve_nist:`2024-0232`
+-  sqlite3: drop obsolete CVE ignore :cve_nist:`2023-36191`
+-  sudo: Fix :cve_nist:`2023-42456` and :cve_nist:`2023-42465`
+-  tiff: Fix :cve_nist:`2023-6277`
+-  xwayland: Fix :cve_nist:`2023-6377` and :cve_nist:`2023-6478`
 
 
 Fixes in Yocto-4.3.3

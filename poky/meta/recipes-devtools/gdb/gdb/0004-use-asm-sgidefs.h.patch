@@ -1,4 +1,4 @@
-From 04eba78ea6bd167b7eeef3af668c8f49888dc688 Mon Sep 17 00:00:00 2001
+From 91e294b399c8e3de2cbdd495309f31b6a218516d Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <amccurdy@gmail.com>
 Date: Sat, 30 Apr 2016 15:29:06 -0700
 Subject: [PATCH] use <asm/sgidefs.h>
@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
-index bfd1c72cba6..13dc9cdb703 100644
+index ca38caeacc2..2f044ca508a 100644
 --- a/gdb/mips-linux-nat.c
 +++ b/gdb/mips-linux-nat.c
-@@ -31,7 +31,7 @@
+@@ -30,7 +30,7 @@
  #include "gdb_proc_service.h"
  #include "gregset.h"
  

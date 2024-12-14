@@ -393,8 +393,8 @@ class RpmPM(PackageManager):
         # Strip file: prefix
         pkg_path = pkg_name[5:]
 
-        cpio_cmd = bb.utils.which(os.getenv("PATH"), "cpio")
-        rpm2cpio_cmd = bb.utils.which(os.getenv("PATH"), "rpm2cpio")
+        tar_cmd = bb.utils.which(os.getenv("PATH"), "tar")
+        rpm2archive_cmd = bb.utils.which(os.getenv("PATH"), "rpm2archive")
 
         if not os.path.isfile(pkg_path):
             bb.fatal("Unable to extract package for '%s'."
@@ -405,7 +405,7 @@ class RpmPM(PackageManager):
         os.chdir(tmp_dir)
 
         try:
-            cmd = "%s %s | %s -idmv" % (rpm2cpio_cmd, pkg_path, cpio_cmd)
+            cmd = "%s -n %s | %s xv" % (rpm2archive_cmd, pkg_path, tar_cmd)
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
         except subprocess.CalledProcessError as e:
             bb.utils.remove(tmp_dir, recurse=True)

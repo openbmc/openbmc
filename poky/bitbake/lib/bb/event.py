@@ -19,7 +19,6 @@ import sys
 import threading
 import traceback
 
-import bb.exceptions
 import bb.utils
 
 # This is the pid for which we should generate the event. This is set when
@@ -759,13 +758,7 @@ class LogHandler(logging.Handler):
 
     def emit(self, record):
         if record.exc_info:
-            etype, value, tb = record.exc_info
-            if hasattr(tb, 'tb_next'):
-                tb = list(bb.exceptions.extract_traceback(tb, context=3))
-            # Need to turn the value into something the logging system can pickle
-            record.bb_exc_info = (etype, value, tb)
-            record.bb_exc_formatted = bb.exceptions.format_exception(etype, value, tb, limit=5)
-            value = str(value)
+            record.bb_exc_formatted = traceback.format_exception(*record.exc_info)
             record.exc_info = None
         fire(record, None)
 

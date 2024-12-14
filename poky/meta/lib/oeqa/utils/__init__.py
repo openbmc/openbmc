@@ -97,3 +97,9 @@ def get_json_result_dir(d):
     if custom_json_result_dir:
         json_result_dir = custom_json_result_dir
     return json_result_dir
+
+def get_artefact_dir(d):
+    custom_json_result_dir = d.getVar("OEQA_ARTEFACT_DIR")
+    if custom_json_result_dir:
+        return custom_json_result_dir
+    return os.path.join(d.getVar("LOG_DIR"), 'oeqa-artefacts')

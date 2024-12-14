@@ -1,0 +1,49 @@
+From 86d3ebfc4da5ccbc82fdee4abaf2cbf758d82403 Mon Sep 17 00:00:00 2001
+From: Ting Liu <b28495@freescale.com>
+Date: Wed, 21 Aug 2013 15:44:57 +0800
+Subject: [PATCH] run_test.py: not use hard coded path ../obj/hugeadm
+
+Hard coded path makes the script impossible to run out of source tree.
+After 'make install', we can use hugeadm utility under DESTDIR.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Ting Liu <b28495@freescale.com>
+
+Update for 2.22.
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+
+Update to work for python3
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ tests/run_tests.py | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/tests/run_tests.py b/tests/run_tests.py
+index 4793262..6cd0241 100755
+--- a/tests/run_tests.py
++++ b/tests/run_tests.py
+@@ -250,9 +250,19 @@ def get_pagesizes():
+     Use libhugetlbfs' hugeadm utility to get a list of page sizes that have
+     active mount points and at least one huge page allocated to the pool.
+     """
++    local_env = os.environ.copy()
++    local_env["PATH"] = "../obj:%s" % local_env.get("PATH", "")
+     sizes = set()
+     out = ""
+-    (rc, out) = bash("../obj/hugeadm --page-sizes")
++    try:
++        p = subprocess.Popen("hugeadm --page-sizes", shell=True, env=local_env, stdout=subprocess.PIPE)
++        rc = p.wait()
++    except KeyboardInterrupt:
++        return sizes
++    except OSError:
++        return sizes
++    out = p.stdout.read().decode().strip()
++
+     if rc != 0 or out == "":
+         return sizes
+ 
+-- 
+2.25.1
+

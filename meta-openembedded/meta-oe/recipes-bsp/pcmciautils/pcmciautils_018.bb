@@ -15,7 +15,6 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/kernel/pcmcia/${BP}.tar.xz \
            file://lex_sys_types.patch \
 "
 
-SRC_URI[md5sum] = "885431c3cefb76ffdad8cb985134e996"
 SRC_URI[sha256sum] = "57c27be8f04ef4d535bcfa988567316cc57659fe69068327486dab53791e6558"
 
 inherit pkgconfig

@@ -2,17 +2,17 @@
 
 TEST_SSL=0 TEST_ASYNC=0 ./test.sh | sed -e 's/PASSED/PASS/g' -e 's/FAILED/FAIL/g' -e 's/SKIPPED/SKIP/g' | awk '
 {
-    if ($NF == "\033[0;32mPASS\033[0;0m" || $NF == "\033[0;31mFAIL\033[0;0m" || $NF == "\033[01;33mSKIP\033[0;0m") {
+    gsub(/\x1B\[[0-9;]*m/, "")
+    if ($NF == "PASS" || $NF == "FAIL" || $NF == "SKIP") {
         printf "%s: %s\n", $NF, $0
     } else {
         print
     }
-}'| awk '{
-    if ($NF == "\033[0;32mPASS\033[0;0m" || $NF == "\033[0;31mFAIL\033[0;0m" || $NF == "\033[01;33mSKIP\033[0;0m") {
+}' | awk '{
+    if ($NF == "PASS" || $NF == "FAIL" || $NF == "SKIP") {
         $NF = ""
         print $0
     } else {
-    print
-    }       
+        print
+    }
 }' | awk '{gsub(/:/,"",$NF)}1'
-

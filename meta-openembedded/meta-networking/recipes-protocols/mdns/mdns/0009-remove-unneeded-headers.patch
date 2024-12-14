@@ -1,4 +1,4 @@
-From 05cb409ce213f35798c02faf2032d4846a84b48e Mon Sep 17 00:00:00 2001
+From d15ee692af42163846be7517372f3ee098cdaf18 Mon Sep 17 00:00:00 2001
 From: Beniamin Sandu <beniaminsandu@gmail.com>
 Date: Thu, 15 Jun 2023 17:02:58 +0000
 Subject: [PATCH] remove unneeded headers
@@ -7,8 +7,7 @@ From a quick look, these seem to not be needed and having them
 breaks the build with mbedtls 3.x. Without them it builds fine
 on both 2.x and 3.x versions.
 
-Upstream-Status: Pending
-
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
 Signed-off-by: Beniamin Sandu <beniaminsandu@gmail.com>
 ---
  mDNSPosix/mbedtls.c | 2 --

@@ -1,2 +1,19 @@
 # These should be reviewed to see if they are still needed
 cacheinfo: Failed to find cpu0 device node
+
+# 6.10 restructures sysctl registration such that mips
+# registers an empty table and generates harmless warnings:
+#   failed when register_sysctl_sz sched_fair_sysctls to kernel
+#   failed when register_sysctl_sz sched_core_sysctls to kernel
+failed when register_sysctl_sz sched
+
+# With qemu 9.1.0
+# pci 0000:00:00.0: BAR 2: can't handle BAR above 4GB (bus address 0x1f00000010)
+# pci 0000:00:00.0: BAR 5: error updating (0x1105d034 != 0x0100d034)
+BAR 0: error updating
+BAR 1: error updating
+BAR 2: error updating
+BAR 3: error updating
+BAR 4: error updating
+BAR 5: error updating
+: can't handle BAR above 4GB

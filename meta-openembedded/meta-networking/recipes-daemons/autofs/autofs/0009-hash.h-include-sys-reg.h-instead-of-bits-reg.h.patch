@@ -1,0 +1,35 @@
+From 1a08bbed376c0dfa0ce2d12a93b34fb2d5620c05 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 10 Sep 2024 21:08:09 +0800
+Subject: [PATCH] hash.h: include <sys/reg.h> instead of <bits/reg.h>
+
+Fix build on musl:
+In file included from ../include/automount.h:25,
+                 from parse_subs.c:29:
+../include/hash.h:27:2: error: #error Wordsize not 32 or 64
+   27 | #error Wordsize not 32 or 64
+      |  ^~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ include/hash.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/hash.h b/include/hash.h
+index 0f1d7b5..f465ab8 100644
+--- a/include/hash.h
++++ b/include/hash.h
+@@ -6,7 +6,7 @@
+ #ifdef __GLIBC__
+ #include <bits/wordsize.h>
+ #else
+-#include <bits/reg.h>
++#include <sys/reg.h>
+ #endif
+ #include <linux/stddef.h>
+ #include <sys/types.h>
+-- 
+2.25.1
+

@@ -6,6 +6,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c9f7c009791eaa4b9ca90dc4c9538d24"
 SRC_URI = "https://github.com/pengutronix/microcom/releases/download/v${PV}/microcom-${PV}.tar.xz"
 SRC_URI[sha256sum] = "ef42184bb35c9762b3e9c70748696f7478efacad8412a88aaf2d9a6a500231a1"
 
+UPSTREAM_CHECK_URI = "${HOMEPAGE}/releases"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+
 DEPENDS = "readline"
 
 inherit autotools update-alternatives

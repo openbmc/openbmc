@@ -1,4 +1,4 @@
-From 37d058e841ba3bd89b5746cc5381afb014b11581 Mon Sep 17 00:00:00 2001
+From 5bf5aa6eae1fa3eed66893e51a1858ab481426b4 Mon Sep 17 00:00:00 2001
 From: Wentao Zhang <wentao.zhang@windriver.com>
 Date: Mon, 20 Mar 2023 13:39:52 +0800
 Subject: [PATCH] Update test_sysconfig for posix_user purelib
@@ -17,16 +17,15 @@ Update test_sysconfig.test_user_similar() for the posix_user scheme:
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Wentao Zhang <wentao.zhang@windriver.com>
-
 ---
  Lib/test/test_sysconfig.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
-index b6dbf3d..5672590 100644
+index 1ade492..4e94889 100644
 --- a/Lib/test/test_sysconfig.py
 +++ b/Lib/test/test_sysconfig.py
-@@ -372,7 +372,7 @@ class TestSysConfig(unittest.TestCase):
+@@ -414,7 +414,7 @@ class TestSysConfig(unittest.TestCase):
                  expected = os.path.normpath(global_path.replace(base, user, 1))
                  # bpo-44860: platlib of posix_user doesn't use sys.platlibdir,
                  # whereas posix_prefix does.
@@ -34,4 +33,4 @@ index b6dbf3d..5672590 100644
 +                if name == 'platlib' or name == 'purelib':
                      # Replace "/lib64/python3.11/site-packages" suffix
                      # with "/lib/python3.11/site-packages".
-                     py_version_short = sysconfig.get_python_version()
+                     py_version_abi = sysconfig._get_python_version_abi()

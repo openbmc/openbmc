@@ -8,6 +8,9 @@ SRC_URI = "https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/
            https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/23/Everything/source/SRPMS/c/${BPN}-${PV}.fc23.src.rpm;extract=ctapi-common.README"
 SRC_URI[sha256sum] = "87a74eb0a66055c34ba2c5c919e74f3211c5950ae1c2cbab967fdf4137f5de91"
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 do_compile() {
     install -pm 644 ${UNPACKDIR}/ctapi-common.LICENSE LICENSE
     install -pm 644 ${UNPACKDIR}/ctapi-common.README README

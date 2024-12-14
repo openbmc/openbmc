@@ -25,12 +25,13 @@ SRC_URI = "https://github.com/SSSD/sssd/releases/download/${PV}/${BP}.tar.gz \
            file://fix-ldblibdir.patch \
            file://musl_fixup.patch \
            file://0001-sssctl-add-error-analyzer.patch \
+           file://CVE-2023-3758.patch \
            "
 SRC_URI[sha256sum] = "827bc65d64132410e6dd3df003f04829d60387ec30e72b2d4e22d93bb6f762ba"
 
 UPSTREAM_CHECK_URI = "https://github.com/SSSD/${BPN}/releases"
 
-inherit autotools pkgconfig gettext python3-dir features_check systemd
+inherit autotools pkgconfig gettext python3native features_check systemd
 
 REQUIRED_DISTRO_FEATURES = "pam"
 
@@ -38,10 +39,10 @@ SSSD_UID ?= "root"
 SSSD_GID ?= "root"
 
 CACHED_CONFIGUREVARS = "ac_cv_member_struct_ldap_conncb_lc_arg=no \
-    ac_cv_prog_HAVE_PYTHON3=${PYTHON_DIR} \
+    ac_cv_prog_HAVE_PYTHON3=yes \
     "
 
-PACKAGECONFIG ?="nss autofs sudo infopipe"
+PACKAGECONFIG ?= "nss autofs sudo infopipe"
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
@@ -53,7 +54,7 @@ PACKAGECONFIG[manpages] = "--with-manpages, --with-manpages=no, libxslt-native d
 PACKAGECONFIG[nl] = "--with-libnl, --with-libnl=no, libnl"
 PACKAGECONFIG[nss] = ", ,nss,"
 PACKAGECONFIG[oidc_child] = "--with-oidc-child, --without-oidc-child"
-PACKAGECONFIG[python3] = "--with-python3-bindings, --without-python3-bindings"
+PACKAGECONFIG[python3] = "--with-python3-bindings, --without-python3-bindings python3dir=${PYTHON_SITEPACKAGES_DIR}, python3-setuptools-native"
 PACKAGECONFIG[samba] = "--with-samba, --with-samba=no, samba"
 PACKAGECONFIG[selinux] = "--with-selinux, --with-selinux=no --with-semanage=no, libselinux"
 PACKAGECONFIG[ssh] = "--with-ssh, --with-ssh=no, "
@@ -68,6 +69,7 @@ EXTRA_OECONF += " \
     --enable-pammoddir=${base_libdir}/security \
     --with-xml-catalog-path=${STAGING_ETCDIR_NATIVE}/xml/catalog \
     --with-pid-path=/run \
+    --with-os=fedora \
 "
 
 do_configure:prepend() {
@@ -87,9 +89,6 @@ do_install () {
     rmdir --ignore-fail-on-non-empty "${D}/${bindir}"
 
     install -d ${D}/${sysconfdir}/${BPN}
-    install -d ${D}/${PYTHON_SITEPACKAGES_DIR}
-    mv ${D}/${BPN}  ${D}/${PYTHON_SITEPACKAGES_DIR}
-
     install -m 600 ${UNPACKDIR}/${BPN}.conf ${D}/${sysconfdir}/${BPN}
 
     # /var/log/sssd needs to be created in runtime. Use rmdir to catch if
@@ -108,10 +107,13 @@ do_install () {
         echo "d ${SSSD_UID}:${SSSD_GID} 0755 ${localstatedir}/log/${BPN} none" > ${D}${sysconfdir}/default/volatiles/99_${BPN}
     fi
 
+    if ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'true', 'false', d)}; then
+        sed '1s,/usr/bin/python,/usr/bin/python3,' -i ${D}${sbindir}/sss_obfuscate
+    fi
+
     # Remove /run as it is created on startup
     rm -rf ${D}/run
 
-#    rm -fr ${D}/sssd
     rm -f ${D}${systemd_system_unitdir}/sssd-secrets.*
 }
 
@@ -141,7 +143,7 @@ SYSTEMD_SERVICE:${PN} = " \
 "
 SYSTEMD_AUTO_ENABLE = "disable"
 
-PACKAGES =+ "libsss-sudo"
+PACKAGES =+ "sssd-python libsss-sudo"
 ALLOW_EMPTY:libsss-sudo = "1"
 
 FILES:${PN} += "${base_libdir}/security/pam_sss*.so  \
@@ -153,6 +155,18 @@ FILES:${PN} += "${base_libdir}/security/pam_sss*.so  \
                 ${PYTHON_SITEPACKAGES_DIR}/sssd \
                 "
 
+FILES:${PN}-python = "${sbindir}/sss_obfuscate \
+                      ${PYTHON_SITEPACKAGES_DIR} \
+                      "
 FILES:libsss-sudo = "${libdir}/libsss_sudo.so"
 
-RDEPENDS:${PN} = "bind bind-utils dbus libldb libpam libsss-sudo"
+RDEPENDS:${PN} = "bind \
+                  bind-utils \
+                  dbus \
+                  libldb \
+                  libpam \
+                  libsss-sudo \
+                  python3-core \
+                  python3-logging \
+                  "
+RDEPENDS:${PN}-python = "python3-core"

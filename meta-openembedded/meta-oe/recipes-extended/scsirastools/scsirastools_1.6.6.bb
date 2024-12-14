@@ -14,7 +14,6 @@ SRC_URI = "http://prdownloads.sourceforge.net/scsirastools/scsirastools-${PV}.ta
            file://mdadm.patch;apply=no \
            file://print-format.patch \
 "
-SRC_URI[md5sum] = "6271a61b2ce40aaf33ef61775148cda1"
 SRC_URI[sha256sum] = "e7b997e75decb06a650c42c35cd63d0c94c34e39cf133c723337b0eeabbfdf6a"
 
 inherit autotools update-rc.d

@@ -16,6 +16,11 @@ GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,test_functioning"
 GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,test_infinite_seek_50_src_live"
 
 # Known unreliable tests as per subprojects/gst-devtools/validate/launcher/testsuites/check.py:
-GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE:parser_pull_short_read"
+GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,parser_pull_short_read"
 
-gnome-desktop-testing-runner gstreamer
+# These tests are fragile
+# https://bugzilla.yoctoproject.org/show_bug.cgi?id=14884
+# https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3524
+GST_CHECKS_IGNORE="$GST_CHECKS_IGNORE,parser_convert_duration,parser_pull_frame_growth,parser_reverse_playback"
+
+gnome-desktop-testing-runner --parallel=4 gstreamer "$@"

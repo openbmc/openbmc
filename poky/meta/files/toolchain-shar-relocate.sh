@@ -57,8 +57,8 @@ fi
 # replace the host perl with SDK perl.
 for replace in "$target_sdk_dir -maxdepth 1" "$native_sysroot"; do
 	$SUDO_EXEC find $replace -type f
-done | xargs -n100 file | grep ":.*\(ASCII\|script\|source\).*text" | \
-    awk -F': ' '{printf "\"%s\"\n", $1}' | \
+done | xargs -d '\n' -n100 file | \
+    awk -F': ' '{if (match($2, ".*(ASCII|script|source).*text")) {printf "\"%s\"\n", $1}}' | \
     grep -Fv -e "$target_sdk_dir/environment-setup-" \
              -e "$target_sdk_dir/relocate_sdk" \
              -e "$target_sdk_dir/post-relocate-setup" \

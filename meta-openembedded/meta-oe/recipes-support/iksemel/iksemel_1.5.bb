@@ -11,6 +11,9 @@ SRC_URI = "git://github.com/meduketto/iksemel.git;protocol=https;branch=master \
            file://fix-configure-option-parsing.patch \
            file://avoid-obsolete-gnutls-apis.patch"
 
+# The current PV is not a git tag but a README content
+UPSTREAM_CHECK_COMMITS = "1"
+
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig lib_package texinfo

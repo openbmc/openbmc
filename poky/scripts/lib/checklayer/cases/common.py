@@ -7,7 +7,7 @@ import glob
 import os
 import unittest
 import re
-from checklayer import get_signatures, LayerType, check_command, get_depgraph, compare_signatures
+from checklayer import get_signatures, LayerType, check_command, compare_signatures, get_git_toplevel
 from checklayer.case import OECheckLayerTestCase
 
 class CommonCheckLayer(OECheckLayerTestCase):
@@ -39,6 +39,38 @@ class CommonCheckLayer(OECheckLayerTestCase):
         # Check that there is an email address in the README
         email_regex = re.compile(r"[^@]+@[^@]+")
         self.assertTrue(email_regex.match(data))
+
+    def find_file_by_name(self, globs):
+        """
+        Utility function to find a file that matches the specified list of
+        globs, in either the layer directory itself or the repository top-level
+        directory.
+        """
+        directories = [self.tc.layer["path"]]
+        toplevel = get_git_toplevel(directories[0])
+        if toplevel:
+            directories.append(toplevel)
+
+        for path in directories:
+            for name in globs:
+                files = glob.glob(os.path.join(path, name))
+                if files:
+                    return sorted(files)[0]
+        return None
+
+    def test_security(self):
+        """
+        Test that the layer has a SECURITY.md (or similar) file, either in the
+        layer itself or at the top of the containing git repository.
+        """
+        if self.tc.layer["type"] == LayerType.CORE:
+            raise unittest.SkipTest("Core layer's SECURITY is top level")
+
+        filename = self.find_file_by_name(("SECURITY", "SECURITY.*"))
+        self.assertTrue(filename, msg="Layer doesn't contain a SECURITY.md file.")
+
+        size = os.path.getsize(filename)
+        self.assertGreater(size, 0, msg=f"{filename} has no content.")
 
     def test_parse(self):
         check_command('Layer %s failed to parse.' % self.tc.layer['name'],

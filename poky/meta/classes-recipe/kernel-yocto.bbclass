@@ -248,6 +248,9 @@ do_kernel_metadata() {
                 fi
 	done
 
+	# allow in-tree config fragments to be used in KERNEL_FEATURES
+	includes="$includes -I${S}/arch/${ARCH}/configs -I${S}/kernel/configs"
+
 	# expand kernel features into their full path equivalents
 	bsp_definition=$(spp ${includes} --find -DKMACHINE=${KMACHINE} -DKTYPE=${LINUX_KERNEL_TYPE})
 	if [ -z "$bsp_definition" ]; then
@@ -268,6 +271,9 @@ do_kernel_metadata() {
 	KERNEL_FEATURES_FINAL=""
 	if [ -n "${KERNEL_FEATURES}" ]; then
 		for feature in ${KERNEL_FEATURES}; do
+			feature_as_specified="$feature"
+			feature="$(echo $feature_as_specified | cut -d: -f1)"
+			feature_specifier="$(echo $feature_as_specified | cut -d: -f2)"
 			feature_found=f
 			for d in $includes; do
 				path_to_check=$(echo $d | sed 's/^-I//')
@@ -285,7 +291,7 @@ do_kernel_metadata() {
 				    bbfatal_log "Set KERNEL_DANGLING_FEATURES_WARN_ONLY to ignore this issue"
 				fi
 			else
-				KERNEL_FEATURES_FINAL="$KERNEL_FEATURES_FINAL $feature"
+				KERNEL_FEATURES_FINAL="$KERNEL_FEATURES_FINAL $feature_as_specified"
 			fi
 		done
         fi
@@ -561,6 +567,11 @@ python do_config_analysis() {
 
 python do_kernel_configcheck() {
     import re, string, sys, subprocess
+
+    audit_flag = d.getVar( "KMETA_AUDIT" )
+    if not audit_flag:
+       bb.note( "kernel config audit disabled, skipping .." )
+       return
 
     s = d.getVar('S')
 

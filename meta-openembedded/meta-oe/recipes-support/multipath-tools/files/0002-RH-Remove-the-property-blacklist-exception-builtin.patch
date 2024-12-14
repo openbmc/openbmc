@@ -1,7 +1,7 @@
-From bb6db01cc19940bb5162c1cc0c9b5f8e4c209822 Mon Sep 17 00:00:00 2001
+From e3449e163d7fe9bf1e188f0e28962f0659e9652d Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Fri, 1 Mar 2024 10:34:06 +0800
-Subject: [PATCH 02/12] RH: Remove the property blacklist exception builtin
+Subject: [PATCH] RH: Remove the property blacklist exception builtin
 
 Multipath set the default property blacklist exceptions to
 (ID_SCSI_VPD|ID_WWN).  This has the effect of blacklisting some internal
@@ -13,21 +13,19 @@ it.
 
 Signed-off-by: Benjamin Marzinski <bmarzins@redhat.com>
 
-Upsteam-Status: Pending
+Upstream-Status: Pending
 
 [OP: Rebase to 0.9.3]
 Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 
 Rebase to 0.9.8
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
-
-Upstream-Status: Pending
 ---
  libmultipath/blacklist.c | 16 +++++-----------
  1 file changed, 5 insertions(+), 11 deletions(-)
 
 diff --git a/libmultipath/blacklist.c b/libmultipath/blacklist.c
-index 75100b20..4fdaca76 100644
+index 17e1b54a..2cfb18b8 100644
 --- a/libmultipath/blacklist.c
 +++ b/libmultipath/blacklist.c
 @@ -221,15 +221,6 @@ setup_default_blist (struct config * conf)

@@ -13,7 +13,6 @@ inherit allarch fontcache
 # and causes hash build failures
 SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/paratype-pt-sans-fonts/PTSans.zip/c3f5a0e20a75cf628387510a720924a7/PTSans.zip"
 
-SRC_URI[md5sum] = "c3f5a0e20a75cf628387510a720924a7"
 SRC_URI[sha256sum] = "0164f824e03c32c99e8a225853ec168893a04a09ade132e93a674e85ae033b2e"
 
 S = "${UNPACKDIR}"

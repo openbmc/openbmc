@@ -1,4 +1,4 @@
-From bdf60ebbeb433a80e6cfcbde9d83d89564e79e20 Mon Sep 17 00:00:00 2001
+From 812dbb64f2805a3257ef9c9a61abbd10e0b3a08c Mon Sep 17 00:00:00 2001
 From: Joe Slater <jslater@windriver.com>
 Date: Mon, 26 Aug 2013 23:38:45 +0000
 Subject: [PATCH] dpkg: fix configuration issue for mips64
@@ -8,7 +8,7 @@ architecture for mips64, and possibly other arch's
 because of faulty code added to Arch.pm in the latest
 release from upstream.  We remove that code.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 
 Signed-off-by: Joe Slater <jslater@windriver.com>
 ---

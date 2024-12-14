@@ -1,0 +1,35 @@
+From 2af98d67e16e083c36e3193aefbda942399a455a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 23 Aug 2024 15:29:45 +0200
+Subject: [PATCH] CMakeLists.txt: do not obtain wayland-scanner path from
+ pkg-config
+
+cmake can only use target wayland-scanner.pc which (correctly) points to /usr/bin/wayland-scanner
+
+However in cross builds it should be using wayland-scanner from native sysroot,
+otherwise builds will break if wayland-scanner is not installed on the host
+distro.
+
+Upstream-Status: Inappropriate [yocto specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ CMakeLists.txt | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 73750f67e..8018a1bb7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -211,11 +211,7 @@ if(PIGLIT_USE_WAYLAND)
+ 		message(FATAL_ERROR "Failed to find wayland-protocols XML path")
+ 	endif()
+ 
+-	pkg_check_modules(WaylandScanner REQUIRED wayland-scanner)
+-	pkg_get_variable(WaylandScannerPath wayland-scanner wayland_scanner)
+-	if (NOT WaylandScannerPath)
+-		message(FATAL_ERROR "Failed to find wayland-scanner path from pkg-config")
+-	endif()
++	set(WaylandScannerPath wayland-scanner)
+ 	add_executable(WaylandScannerExe IMPORTED)
+ 	set_property(TARGET WaylandScannerExe PROPERTY IMPORTED_LOCATION ${WaylandScannerPath})
+ endif()

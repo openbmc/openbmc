@@ -80,7 +80,7 @@ def main():
     parser.add_argument(
         "-u",
         "--upstream",
-        default=os.environ.get("PRSERVER_UPSTREAM", None),
+        default=os.environ.get("PRSERV_UPSTREAM", None),
         help="Upstream PR service (host:port)",
     )
 

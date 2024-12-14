@@ -1,4 +1,4 @@
-From dc7f09c4f52638a70768c528d186da6f83dedc97 Mon Sep 17 00:00:00 2001
+From cc02206c156cb99c441e56a51639cd5ca64efae9 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 3 Oct 2017 10:45:55 +0300
 Subject: [PATCH] Do not hardcode python path into various tools
@@ -12,31 +12,31 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/gio/gdbus-2.0/codegen/gdbus-codegen.in b/gio/gdbus-2.0/codegen/gdbus-codegen.in
-index 67d3675..4e92a7a 100755
+index 877505e..49a1e8c 100755
 --- a/gio/gdbus-2.0/codegen/gdbus-codegen.in
 +++ b/gio/gdbus-2.0/codegen/gdbus-codegen.in
 @@ -1,4 +1,4 @@
--#!/usr/bin/env @PYTHON@
+-#!@PYTHON@
 +#!/usr/bin/env python3
  
  # GDBus - GLib D-Bus Library
  #
 diff --git a/gobject/glib-genmarshal.in b/gobject/glib-genmarshal.in
-index aa5af43..56e8e2e 100755
+index 0578b74..56e8e2e 100755
 --- a/gobject/glib-genmarshal.in
 +++ b/gobject/glib-genmarshal.in
 @@ -1,4 +1,4 @@
--#!/usr/bin/env @PYTHON@
+-#!@PYTHON@
 +#!/usr/bin/env python3
  
  # pylint: disable=too-many-lines, missing-docstring, invalid-name
  
 diff --git a/gobject/glib-mkenums.in b/gobject/glib-mkenums.in
-index e10b910..4b619f8 100755
+index 7e794e9..4b619f8 100755
 --- a/gobject/glib-mkenums.in
 +++ b/gobject/glib-mkenums.in
 @@ -1,4 +1,4 @@
--#!/usr/bin/env @PYTHON@
+-#!@PYTHON@
 +#!/usr/bin/env python3
  
  # If the code below looks horrible and unpythonic, do not panic.

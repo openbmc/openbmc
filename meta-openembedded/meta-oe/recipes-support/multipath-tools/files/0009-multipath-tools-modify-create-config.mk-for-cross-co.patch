@@ -1,7 +1,7 @@
-From 7452549e572b1c40aefe25524bf4bbbf34c952e5 Mon Sep 17 00:00:00 2001
+From c22c897e7c55fc0b8c5bdd113a0357654ee895ae Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 4 Jun 2019 11:39:39 +0800
-Subject: [PATCH 09/12] multipath-tools: modify create-config.mk for
+Subject: [PATCH] multipath-tools: modify create-config.mk for
  cross-compilation
 
 Do not look for systemd info on the host, and allow us to pass in CFLAGS
@@ -21,7 +21,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 4 deletions(-)
 
 diff --git a/create-config.mk b/create-config.mk
-index 4d318b96..a65975ba 100644
+index 8bd2c20c..40d2446a 100644
 --- a/create-config.mk
 +++ b/create-config.mk
 @@ -127,10 +127,6 @@ ifeq ($(ENABLE_DMEVENTS_POLL),0)

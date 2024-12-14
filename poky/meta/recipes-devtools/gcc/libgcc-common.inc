@@ -53,6 +53,11 @@ do_install:append:libc-newlib () {
 		rmdir ${D}${base_libdir}
 	fi
 }
+do_install:append:libc-picolibc () {
+	if [ "${base_libdir}" != "${libdir}" ]; then
+		rmdir ${D}${base_libdir}
+	fi
+}
 
 # No rpm package is actually created but -dev depends on it, avoid dnf error
 DEV_PKG_DEPENDENCY:libc-baremetal = ""

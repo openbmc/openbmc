@@ -5,6 +5,8 @@ require lvm2.inc
 
 DEPENDS += "autoconf-archive-native"
 
+inherit nopackages
+
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_install() {

@@ -111,9 +111,13 @@ class CachedPath(object):
             return True
         return False
 
+    # WARNING - this is not currently a drop in replacement since they return False
+    # rather than raise exceptions.
     def stat(self, path):
         return self.callstat(path)
 
+    # WARNING - this is not currently a drop in replacement since they return False
+    # rather than raise exceptions.
     def lstat(self, path):
         return self.calllstat(path)
 

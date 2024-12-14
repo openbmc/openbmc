@@ -7,6 +7,7 @@ SRC_URI[sha256sum] = "558284687d9b8aae1904e3d6051ad132dd4a8c0cf551b37ea4e7e42a31
 inherit pypi ptest python_setuptools_build_meta
 
 SRC_URI += " \
+    file://58f7d7fdb171f80ed6ce97e6ca4409723975c47f.patch \
 	file://run-ptest \
 "
 

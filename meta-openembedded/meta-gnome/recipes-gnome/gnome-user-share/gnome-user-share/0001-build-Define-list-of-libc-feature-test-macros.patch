@@ -1,0 +1,41 @@
+From 5f2e3fb82055ee1346eaa20fcca640fc802ae1c5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Sep 2024 03:19:24 +0000
+Subject: [PATCH] build: Define list of libc feature test macros
+
+_POSIX_C_SOURCE is needed since it uses kill() API
+and as per [1] it need it, without this the build fails
+particularly on musl systems with clang compiler
+
+./git/src/http.c:394:3: error: call to undeclared function 'kill'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+
+[1] https://man7.org/linux/man-pages/man2/kill.2.html
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gnome-user-share/-/merge_requests/27]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index ea2892e..72f3851 100644
+--- a/meson.build
++++ b/meson.build
+@@ -39,6 +39,17 @@ config_h.set_quoted('GNOMELOCALEDIR', user_share_prefix / user_share_localedir)
+ 
+ config_h.set_quoted('HTTPD_CONFIG_TEMPLATE', user_share_prefix / user_share_pkgdatadir / 'dav_user_%s.conf')
+ 
++#
++# OS/Compiler feature detection
++#
++feature_defines = [
++  ['_XOPEN_SOURCE', '700'], # POSIX.1–2001 (IEEE Std 1003.1-2001)
++]
++
++foreach f: feature_defines
++  config_h.set(f[0], f[1])
++endforeach
++
+ # compiler flags
+ common_flags = []
+ if get_option('buildtype').contains('debug')

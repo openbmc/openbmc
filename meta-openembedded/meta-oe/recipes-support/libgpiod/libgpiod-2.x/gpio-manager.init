@@ -1,0 +1,76 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:		gpio-manager
+# Required-Start:	$remote_fs $syslog
+# Required-Stop:	$remote_fs $syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:		1
+# Short-Description:	Centralized GPIO manager daemon
+### END INIT INFO
+#
+# -*- coding: utf-8 -*-
+# Debian init.d script for gpio-manager
+# Copyright (c) 2024 Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+# set -e
+
+# Source function library.
+. /etc/init.d/functions
+
+DAEMON=/usr/bin/gpio-manager
+NAME=gpio-manager
+PIDFILE=/var/run/gpio-manager/pid
+DESC="GPIO manager daemon"
+
+test -x $DAEMON || exit 0
+test "$ENABLED" != "0" || exit 0
+
+do_start()
+{
+	mkdir -p "`dirname $PIDFILE`"
+	if [ -e $PIDFILE ]; then
+		PIDDIR=/proc/$(cat $PIDFILE)
+		if [ -d ${PIDDIR} -a "$(readlink -f ${PIDDIR}/exe)" = "${DAEMON}" ]; then
+			echo "$DESC already started; not starting."
+		else
+			echo "Removing stale PID file $PIDFILE."
+			rm -f $PIDFILE
+		fi
+	fi
+
+	echo -n "Starting $DESC: "
+	start-stop-daemon --user gpio-manager --background --start --quiet --make-pidfile --pidfile $PIDFILE --exec $DAEMON
+	echo "$NAME."
+}
+
+do_stop()
+{
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE
+	echo "$NAME."
+	rm -f $PIDFILE
+}
+
+case "$1" in
+	start)
+		do_start
+	;;
+	stop)
+		do_stop
+	;;
+	status)
+		status $DAEMON
+		exit $?
+	;;
+	restart)
+		do_stop
+		sleep 1
+		do_start
+	;;
+	*)
+		echo "Usage: /etc/init.d/$NAME {start|stop|status|restart}" >&2
+		exit 1
+	;;
+esac
+
+exit 0

@@ -1,4 +1,4 @@
-From 131b88a81aba3d72d566bc8a9d968941a98e0007 Mon Sep 17 00:00:00 2001
+From ab25af06d6eed4dfb785b4593e38112f8f376230 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Sun, 31 Mar 2019 18:11:55 +0200
 Subject: [PATCH] CMakeLists.txt: Remove TRY_RUN for iconv
@@ -17,10 +17,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 11 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 1672daf..0b3e4e0 100644
+index 5ccbf9c..5dfe9ee 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -524,17 +524,6 @@ if(NOT HAVE_ICONV)
+@@ -569,17 +569,6 @@ if(NOT HAVE_ICONV)
  	message(FATAL_ERROR "You need to install a working iconv implementation, such as ftp://ftp.gnu.org/pub/gnu/libiconv")
  endif(NOT HAVE_ICONV)
  
@@ -38,6 +38,3 @@ index 1672daf..0b3e4e0 100644
  # ******************************
  # Backtraces for debugging
  # ******************************
--- 
-2.20.1
-

@@ -1,0 +1,72 @@
+From c34c65a3f5ddec22cb417872f90c2c9540a1847b Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 26 Nov 2018 11:17:41 +0800
+Subject: [PATCH] Always use devmapper
+
+Do not try to compute several _API_ make variables
+from host information when cross-compiling.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Aws Ismail <aws.ismail@windriver.com>
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+[OP: Rebase to 0.9.3]
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+
+Rebase to 0.9.8
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ create-config.mk | 36 ++++++++----------------------------
+ 1 file changed, 8 insertions(+), 28 deletions(-)
+
+diff --git a/create-config.mk b/create-config.mk
+index 40d2446a..f5eb2803 100644
+--- a/create-config.mk
++++ b/create-config.mk
+@@ -79,34 +79,14 @@ URCU_VERSION = $(shell \
+ 
+ DEFINES :=
+ 
+-ifneq ($(call check_func,dm_task_no_flush,$(devmapper_incdir)/libdevmapper.h),0)
+-	DEFINES += LIBDM_API_FLUSH
+-endif
+-
+-ifneq ($(call check_func,dm_task_get_errno,$(devmapper_incdir)/libdevmapper.h),0)
+-	DEFINES += LIBDM_API_GET_ERRNO
+-endif
+-
+-ifneq ($(call check_func,dm_task_set_cookie,$(devmapper_incdir)/libdevmapper.h),0)
+-	DEFINES += LIBDM_API_COOKIE
+-endif
+-
+-ifneq ($(call check_func,udev_monitor_set_receive_buffer_size,$(libudev_incdir)/libudev.h),0)
+-	DEFINES += LIBUDEV_API_RECVBUF
+-endif
+-
+-ifneq ($(call check_func,dm_task_deferred_remove,$(devmapper_incdir)/libdevmapper.h),0)
+-	DEFINES += LIBDM_API_DEFERRED
+-endif
+-
+-ifneq ($(call check_func,dm_hold_control_dev,$(devmapper_incdir)/libdevmapper.h),0)
+-	DEFINES += LIBDM_API_HOLD_CONTROL
+-endif
+-
+-ifneq ($(call check_var,ELS_DTAG_LNK_INTEGRITY,$(kernel_incdir)/scsi/fc/fc_els.h),0)
+-	DEFINES += FPIN_EVENT_HANDLER
+-	FPIN_SUPPORT = 1
+-endif
++DEFINES += LIBDM_API_FLUSH
++DEFINES += LIBDM_API_GET_ERRNO
++DEFINES += LIBDM_API_COOKIE
++DEFINES += LIBUDEV_API_RECVBUF
++DEFINES += LIBDM_API_DEFERRED
++DEFINES += LIBDM_API_HOLD_CONTROL
++DEFINES += FPIN_EVENT_HANDLER
++FPIN_SUPPORT = 1
+ 
+ libmount_h := $(shell $(PKG_CONFIG) --variable=includedir mount)/libmount/libmount.h
+ ifneq ($(call check_func,mnt_unref_cache,$(libmount_h)),0)
+-- 
+2.25.1
+

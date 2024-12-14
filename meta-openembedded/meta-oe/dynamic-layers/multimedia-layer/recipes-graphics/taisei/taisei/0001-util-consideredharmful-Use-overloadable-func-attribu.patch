@@ -1,0 +1,58 @@
+From 6f40a8cfbc4dd5ca4c3156338e8e35f25d4d4599 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 22 Nov 2024 01:16:25 -0800
+Subject: [PATCH] util/consideredharmful: Use overloadable func attribute with
+ clang
+
+When building with glibc HEAD, it has fortified headers with clang as well
+and clang reports errors e.g.
+
+| ../git/src/util/consideredharmful.h:33:7: error: redeclaration of 'strncat' must have the 'overloadable' attribute
+|    33 | char* strncat();
+|       |       ^
+| /mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux/taisei/1.4.2/recipe-sysroot/usr/include/bits/string_fortified.h:145:8: note: previous overload of function is here
+|   145 | __NTH (strncat (__fortify_clang_overload_arg (char *, __restrict, __dest),
+|       |        ^
+
+Upstream-Status: Submitted [https://github.com/taisei-project/taisei/pull/393]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/util/consideredharmful.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/util/consideredharmful.h
++++ b/src/util/consideredharmful.h
+@@ -8,6 +8,7 @@
+ 
+ #pragma once
+ #include "taisei.h"
++#include "util/compat.h"
+ 
+ #include <stdio.h>
+ 
+@@ -24,17 +25,23 @@ PRAGMA(GCC diagnostic ignored "-Wstrict-
+ // clang generates lots of these warnings with _FORTIFY_SOURCE
+ PRAGMA(GCC diagnostic ignored "-Wignored-attributes")
+ 
++#ifdef __GLIBC__
++#define OVERLOADABLE __attribute__((overloadable))
++#else
++#define OVERLOADABLE
++#endif
++
+ #undef fopen
+ attr_deprecated("Use vfs_open or SDL_RWFromFile instead")
+ FILE* fopen();
+ 
+ #undef strncat
+ attr_deprecated("This function likely doesn't do what you expect, use strlcat")
+-char* strncat();
++char* OVERLOADABLE strncat();
+ 
+ #undef strncpy
+ attr_deprecated("This function likely doesn't do what you expect, use strlcpy")
+-char* strncpy();
++char* OVERLOADABLE strncpy();
+ 
+ #undef errx
+ attr_deprecated("Use log_fatal instead")

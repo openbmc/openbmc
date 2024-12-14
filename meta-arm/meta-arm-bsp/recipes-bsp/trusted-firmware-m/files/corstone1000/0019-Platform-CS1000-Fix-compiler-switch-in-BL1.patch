@@ -1,0 +1,193 @@
+From 09827a44518b05a2cc58602dda18474973abfb83 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Thu, 5 Sep 2024 17:28:56 +0200
+Subject: [PATCH 3/5] Platform: CS1000: Fix compiler switch in BL1
+
+The fwu_agent.c used the "BL1" definition to check if the source file
+is building for the BL1 or for the TFM_S target.
+But the "BL1" definition is added to the build flags for every file
+that links against platform_region_defs, see
+tfm/cmake/spe-CMakeLists.cmake:
+
+target_compile_definitions(platform_region_defs
+    INTERFACE
+        $<$<BOOL:${BL1}>:BL1>
+       ....
+)
+
+This means the "#if BL1" condition was true for both cases.
+
+This commit:
+- Adds a new definition that is only added to the
+  platform_bl1_1 target.
+- Fixes the #elif with no expression error that came up.
+- Moves the partition table loading because previously it was not
+  loaded during the runtime TFM_S execution, only in BL2.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../target/arm/corstone1000/CMakeLists.txt    |  7 ++++
+ .../corstone1000/fw_update_agent/fwu_agent.c  | 33 +++++++++----------
+ 2 files changed, 23 insertions(+), 17 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 89db1732a9..f6880cba3c 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -144,6 +144,7 @@ target_sources(platform_s
+         partition/gpt.c
+         $<$<NOT:$<BOOL:${PLATFORM_DEFAULT_OTP}>>:${PLATFORM_DIR}/ext/accelerator/cc312/otp_cc312.c>
+         rse_comms_permissions_hal.c
++        platform.c
+ )
+ 
+ if (PLATFORM_IS_FVP)
+@@ -213,6 +214,12 @@ target_compile_definitions(platform_bl1_1
+         $<$<BOOL:${CRYPTO_HW_ACCELERATOR_OTP_PROVISIONING}>:CRYPTO_HW_ACCELERATOR_OTP_PROVISIONING>
+         MBEDTLS_CONFIG_FILE="${CMAKE_SOURCE_DIR}/lib/ext/mbedcrypto/mbedcrypto_config/tfm_mbedcrypto_config_default.h"
+         MBEDTLS_PSA_CRYPTO_CONFIG_FILE="${CMAKE_SOURCE_DIR}/lib/ext/mbedcrypto/mbedcrypto_config/crypto_config_default.h"
++
++        # This definition is only added to the bl1_main target. There are
++        # files that are shared between the BL1 and TFM_S targets. This flag
++        # can be used if the BL1 target needs different implementation than
++        # the TFM_S target.
++        BL1_BUILD
+ )
+ 
+ target_include_directories(platform_bl1_1_interface
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index 2b69447dc5..9890eeaf90 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -21,7 +21,7 @@
+ #include "uefi_fmp.h"
+ #include "uart_stdout.h"
+ #include "soft_crc.h"
+-#if !BL1
++#ifndef BL1_BUILD
+ #include "partition.h"
+ #include "platform.h"
+ #endif
+@@ -197,7 +197,7 @@ extern ARM_DRIVER_FLASH FWU_METADATA_FLASH_DEV;
+ 
+ #define HOST_ACK_TIMEOUT_SEC    (6 * 60) /* ~seconds, not exact */
+ 
+-#if BL1
++#ifdef BL1_BUILD
+ static enum fwu_agent_error_t private_metadata_read(
+         struct fwu_private_metadata* p_metadata)
+ {
+@@ -220,7 +220,7 @@ static enum fwu_agent_error_t private_metadata_read(
+ 
+     return FWU_AGENT_SUCCESS;
+ }
+-#elif
++#else
+ static enum fwu_agent_error_t private_metadata_read(
+         struct fwu_private_metadata* p_metadata)
+ {
+@@ -253,7 +253,7 @@ static enum fwu_agent_error_t private_metadata_read(
+ }
+ #endif
+ 
+-#if BL1
++#ifdef BL1_BUILD
+ static enum fwu_agent_error_t private_metadata_write(
+         struct fwu_private_metadata* p_metadata)
+ {
+@@ -280,7 +280,7 @@ static enum fwu_agent_error_t private_metadata_write(
+     FWU_LOG_MSG("%s: success\n\r", __func__);
+     return FWU_AGENT_SUCCESS;
+ }
+-#elif
++#else
+ static enum fwu_agent_error_t private_metadata_write(
+         struct fwu_private_metadata* p_metadata)
+ {
+@@ -339,7 +339,7 @@ static enum fwu_agent_error_t metadata_validate(struct fwu_metadata *p_metadata)
+     return FWU_AGENT_SUCCESS;
+ }
+ 
+-#if BL1
++#ifdef BL1_BUILD
+ static enum fwu_agent_error_t metadata_read_without_validation(struct fwu_metadata *p_metadata)
+ {
+     int ret;
+@@ -362,7 +362,7 @@ static enum fwu_agent_error_t metadata_read_without_validation(struct fwu_metada
+ 
+     return FWU_AGENT_SUCCESS;
+ }
+-#elif
++#else
+ static enum fwu_agent_error_t metadata_read_without_validation(struct fwu_metadata *p_metadata)
+ {
+     uuid_t metadata_uuid = FWU_METADATA_TYPE_UUID;
+@@ -396,7 +396,7 @@ static enum fwu_agent_error_t metadata_read_without_validation(struct fwu_metada
+ }
+ #endif
+ 
+-#if BL1
++#ifdef BL1_BUILD
+ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+ {
+     int ret;
+@@ -423,7 +423,7 @@ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+ 
+     return FWU_AGENT_SUCCESS;
+ }
+-#elif
++#else
+ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+ {
+     uuid_t metadata_uuid = FWU_METADATA_TYPE_UUID;
+@@ -461,7 +461,7 @@ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+ #endif
+ 
+ 
+-#if BL1
++#ifdef BL1_BUILD
+ static enum fwu_agent_error_t metadata_write(
+                         struct fwu_metadata *p_metadata)
+ {
+@@ -503,7 +503,7 @@ static enum fwu_agent_error_t metadata_write(
+                   p_metadata->active_index, p_metadata->previous_active_index);
+     return FWU_AGENT_SUCCESS;
+ }
+-#elif
++#else
+ static enum fwu_agent_error_t metadata_write(
+                         struct fwu_metadata *p_metadata)
+ {
+@@ -567,11 +567,15 @@ enum fwu_agent_error_t fwu_metadata_init(void)
+     enum fwu_agent_error_t ret;
+     ARM_FLASH_INFO* flash_info;
+ 
+-
+     if (is_initialized) {
+         return FWU_AGENT_SUCCESS;
+     }
+ 
++    #ifndef BL1_BUILD
++    plat_io_storage_init();
++    partition_init(PLATFORM_GPT_IMAGE);
++    #endif
++
+     /* Code assumes everything fits into a sector */
+     if (sizeof(struct fwu_metadata) > FWU_METADATA_FLASH_SECTOR_SIZE) {
+         return FWU_AGENT_ERROR;
+@@ -605,11 +609,6 @@ enum fwu_agent_error_t fwu_metadata_provision(void)
+ 
+     FWU_LOG_MSG("%s: enter\n\r", __func__);
+ 
+-#if !BL1
+-    plat_io_storage_init();
+-    partition_init(PLATFORM_GPT_IMAGE);
+-#endif
+-
+     ret = fwu_metadata_init();
+     if (ret) {
+         return ret;
+-- 
+2.25.1
+

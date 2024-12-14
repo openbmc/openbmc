@@ -150,12 +150,21 @@ class SystemdServiceTests(SystemdTest):
         t_thread.start()
         time.sleep(1)
 
-        status, output = self.target.run('pidof sleep')
+        status, sleep_pid = self.target.run('pidof sleep')
         # cause segfault on purpose
-        self.target.run('kill -SEGV %s' % output)
-        self.assertEqual(status, 0, msg = 'Not able to find process that runs sleep, output : %s' % output)
+        self.target.run('kill -SEGV %s' % sleep_pid)
+        self.assertEqual(status, 0, msg = 'Not able to find process that runs sleep, output : %s' % sleep_pid)
 
-        (status, output) = self.target.run('coredumpctl info')
+        # Give some time to systemd-coredump@.service to process the coredump
+        for x in range(20):
+            status, output = self.target.run('coredumpctl list %s' % sleep_pid)
+            if status == 0:
+                break
+            time.sleep(1)
+        else:
+            self.fail("Timed out waiting for coredump creation")
+
+        (status, output) = self.target.run('coredumpctl info %s' % sleep_pid)
         self.assertEqual(status, 0, msg='MiniDebugInfo Test failed: %s' % output)
         self.assertEqual('sleep_for_duration (busybox.nosuid' in output or 'xnanosleep (sleep.coreutils' in output,
                          True, msg='Call stack is missing minidebuginfo symbols (functions shown as "n/a"): %s' % output)

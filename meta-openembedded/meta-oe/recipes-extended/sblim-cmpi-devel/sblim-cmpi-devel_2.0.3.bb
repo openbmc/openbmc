@@ -10,8 +10,10 @@ SECTION = "Development/Libraries"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/sblim/${BP}.tar.bz2 \
            file://sblim-cmpi-devel-2.0.3-docdir.patch"
-SRC_URI[md5sum] = "b934616f88a848f17ca3cf1b9e792cbf"
 SRC_URI[sha256sum] = "1671cabff6b922b6fde897673d9fdafd56c9310f82a7eacc0547d596b9cdfea6"
+
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/sblim/files/development%20pkgs/sblim-cmpi-devel/"
+UPSTREAM_CHECK_REGEX = "${BPN}/(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools
 

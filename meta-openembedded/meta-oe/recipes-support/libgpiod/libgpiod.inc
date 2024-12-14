@@ -53,4 +53,3 @@ do_install_ptest() {
         install ${B}/tools/.libs/$(basename $tool) ${D}${PTEST_PATH}/tests/
     done
 }
-

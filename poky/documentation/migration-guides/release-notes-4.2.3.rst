@@ -6,24 +6,24 @@ Release notes for Yocto-4.2.3 (Mickledore)
 Security Fixes in Yocto-4.2.3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  bind: Fix :cve:`2023-2828` and :cve:`2023-2911`
--  cups: Fix :cve:`2023-34241`
--  dmidecode: Fix :cve:`2023-30630`
--  erofs-utils: Fix :cve:`2023-33551` and :cve:`2023-33552`
--  ghostscript: Fix :cve:`2023-36664`
+-  bind: Fix :cve_nist:`2023-2828` and :cve_nist:`2023-2911`
+-  cups: Fix :cve_nist:`2023-34241`
+-  dmidecode: Fix :cve_nist:`2023-30630`
+-  erofs-utils: Fix :cve_nist:`2023-33551` and :cve_nist:`2023-33552`
+-  ghostscript: Fix :cve_nist:`2023-36664`
 -  go: Fix :cve_mitre:`2023-24531`
--  libarchive: ignore :cve:`2023-30571`
--  libjpeg-turbo: Fix :cve:`2023-2804`
--  libx11: Fix :cve:`2023-3138`
--  ncurses: Fix :cve:`2023-29491`
--  openssh: Fix :cve:`2023-38408`
--  python3-certifi: Fix :cve:`2023-37920`
--  python3-requests: Fix :cve:`2023-32681`
--  python3: Ignore :cve:`2023-36632`
--  qemu: fix :cve:`2023-0330`, :cve_mitre:`2023-2861`, :cve_mitre:`2023-3255` and :cve_mitre:`2023-3301`
--  ruby: Fix :cve:`2023-36617`
--  vim: Fix :cve:`2023-2609` and :cve:`2023-2610`
--  webkitgtk: Fix :cve:`2023-27932` and :cve:`2023-27954`
+-  libarchive: ignore :cve_nist:`2023-30571`
+-  libjpeg-turbo: Fix :cve_nist:`2023-2804`
+-  libx11: Fix :cve_nist:`2023-3138`
+-  ncurses: Fix :cve_nist:`2023-29491`
+-  openssh: Fix :cve_nist:`2023-38408`
+-  python3-certifi: Fix :cve_nist:`2023-37920`
+-  python3-requests: Fix :cve_nist:`2023-32681`
+-  python3: Ignore :cve_nist:`2023-36632`
+-  qemu: fix :cve_nist:`2023-0330`, :cve_mitre:`2023-2861`, :cve_mitre:`2023-3255` and :cve_mitre:`2023-3301`
+-  ruby: Fix :cve_nist:`2023-36617`
+-  vim: Fix :cve_nist:`2023-2609` and :cve_nist:`2023-2610`
+-  webkitgtk: Fix :cve_nist:`2023-27932` and :cve_nist:`2023-27954`
 
 
 Fixes in Yocto-4.2.3

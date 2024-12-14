@@ -1,4 +1,4 @@
-From 039d5e652796b55f1132afa568c7432b6ed89afd Mon Sep 17 00:00:00 2001
+From 0a02e3b85176a5ce4dd98830bb65dac8596142e9 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Fri, 27 May 2022 17:05:44 +0100
 Subject: [PATCH] python3: Ensure stale empty python module directories don't
@@ -11,18 +11,17 @@ has caused a long string of different issues for us.
 
 As a result, patch this to a behaviour which works for us.
 
-Upstream-Status: Pending [need to talk to upstream to see if they'll take one or both fixes]
+Upstream-Status: Submitted [https://github.com/python/cpython/issues/120492; need to first talk to upstream to see if they'll take one or both fixes]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
-
 ---
  Lib/importlib/metadata/__init__.py | 9 ++++++++-
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/importlib/metadata/__init__.py b/Lib/importlib/metadata/__init__.py
-index 82e0ce1..969cac4 100644
+index 8ce62dd..a6ea6e9 100644
 --- a/Lib/importlib/metadata/__init__.py
 +++ b/Lib/importlib/metadata/__init__.py
-@@ -710,7 +710,14 @@ class Lookup:
+@@ -786,7 +786,14 @@ class Lookup:
          self.infos = FreezableDefaultDict(list)
          self.eggs = FreezableDefaultDict(list)
  

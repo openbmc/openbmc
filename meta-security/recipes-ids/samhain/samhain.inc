@@ -26,7 +26,7 @@ SRC_URI[sha256sum] = "ae6ee8eff3cb111b7fc14a57bcc258443dd0bcf1bfacfdf229935ed053
 UPSTREAM_CHECK_URI = "https://www.la-samhna.de/samhain/archive.html"
 UPSTREAM_CHECK_REGEX = "samhain_signed-(?P<pver>(\d+(\.\d+)+))\.tar"
 
-S = "${WORKDIR}/samhain-${PV}"
+S = "${UNPACKDIR}/samhain-${PV}"
 
 inherit autotools-brokensep update-rc.d pkgconfig systemd
 
@@ -65,7 +65,7 @@ EXTRA_OEMAKE:append:mips64 = " CPPFLAGS+=-DCONFIG_ARCH_MIPS64=1"
 
 do_unpack_samhain() {
     cd ${UNPACKDIR}
-    tar -xzvf samhain-${PV}.tar.gz -C ${WORKDIR}
+    tar -xzvf samhain-${PV}.tar.gz -C ${UNPACKDIR}
 }
 
 python do_unpack:append() {

@@ -1,7 +1,16 @@
-Use G_IR_SCANNER without passing additional environment
+From 0f9763c77dcf44b1061517539287c79a59a6aede Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 6 Mar 2022 18:16:31 +0100
+Subject: [PATCH] Use G_IR_SCANNER without passing additional environment
 
 Upstream-Status: Inappropriate [OE-specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/modules/GObjectIntrospection.cmake | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/cmake/modules/GObjectIntrospection.cmake b/cmake/modules/GObjectIntrospection.cmake
+index 9d2e6e7..3d8bb8c 100644
 --- a/cmake/modules/GObjectIntrospection.cmake
 +++ b/cmake/modules/GObjectIntrospection.cmake
 @@ -122,9 +122,7 @@ macro(gir_add_introspection gir)
@@ -15,7 +24,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  				${INTROSPECTION_SCANNER_ARGS}
  				--namespace=${_gir_namespace}
  				--nsversion=${_gir_version}
-@@ -240,7 +238,6 @@ macro(gir_add_introspection_simple gir_l
+@@ -240,7 +238,6 @@ macro(gir_add_introspection_simple gir_library pkg_export_prefix gir_library_ver
  		${_gir_identifies_prefixes}
  		${_gir_deps}
  		--add-include-path=${SHARE_INSTALL_PREFIX}/gir-1.0

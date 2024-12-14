@@ -8,7 +8,7 @@
 
 
 from time import sleep
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
 
 from orm.models import Build
@@ -36,7 +36,7 @@ def wait_until_build(test_instance, state):
             if 'failed' in str(build_state).lower():
                 break
         except NoSuchElementException:
-            continue
+            pass
         except TimeoutException:
             break
         start_time += 1
@@ -48,7 +48,6 @@ def wait_until_build_cancelled(test_instance):
     """
     timeout = 30
     start_time = 0
-    build = None
     while True:
         try:
             if start_time > timeout:
@@ -64,19 +63,17 @@ def wait_until_build_cancelled(test_instance):
             if 'failed' in str(build_state).lower():
                 break
             if 'cancelling' in str(build_state).lower():
-                # Change build state to cancelled
-                if not build:  # get build object only once
-                    build = Build.objects.last()
-                    build.outcome = Build.CANCELLED
-                    build.save()
+                pass
             if 'cancelled' in str(build_state).lower():
                 break
-        except NoSuchElementException:
-            continue
-        except StaleElementReferenceException:
-            continue
         except TimeoutException:
             break
+        except NoSuchElementException:
+            pass
+        except StaleElementReferenceException:
+            pass
+        except WebDriverException:
+            pass
         start_time += 1
         sleep(1) # take a breath and try again
 

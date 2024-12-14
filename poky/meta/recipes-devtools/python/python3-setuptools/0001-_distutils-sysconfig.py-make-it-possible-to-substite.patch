@@ -1,4 +1,4 @@
-From d393759315b189a738e4b6a2ce31dc18dbbfae29 Mon Sep 17 00:00:00 2001
+From a9f3483b492317959a35886308c31c078e350a35 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 11 May 2022 21:41:14 +0200
 Subject: [PATCH] _distutils/sysconfig.py: make it possible to substite the
@@ -20,19 +20,19 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/setuptools/_distutils/sysconfig.py b/setuptools/_distutils/sysconfig.py
-index a40a723..14f35e7 100644
+index 7ebe67687..8039021a8 100644
 --- a/setuptools/_distutils/sysconfig.py
 +++ b/setuptools/_distutils/sysconfig.py
-@@ -119,6 +119,8 @@ def get_python_inc(plat_specific=0, prefix=None):
+@@ -121,6 +121,8 @@ def get_python_inc(plat_specific=False, prefix=None):
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
      default_prefix = BASE_EXEC_PREFIX if plat_specific else BASE_PREFIX
 +    if os.environ.get('STAGING_INCDIR', ""):
 +        default_prefix = os.environ['STAGING_INCDIR'].rstrip('include')
      resolved_prefix = prefix if prefix is not None else default_prefix
-     try:
-         getter = globals()[f'_get_python_inc_{os.name}']
-@@ -238,7 +240,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+     # MinGW imitates posix like layout, but os.name != posix
+     os_name = "posix" if is_mingw() else os.name
+@@ -241,7 +243,13 @@ def get_python_lib(plat_specific=False, standard_lib=False, prefix=None):
  
      early_prefix = prefix
  
@@ -47,7 +47,7 @@ index a40a723..14f35e7 100644
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
          else:
-@@ -253,7 +261,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -256,7 +264,7 @@ def get_python_lib(plat_specific=False, standard_lib=False, prefix=None):
              # Pure Python
              libdir = "lib"
          implementation = 'pypy' if IS_PYPY else 'python'
@@ -56,3 +56,6 @@ index a40a723..14f35e7 100644
          return _posix_lib(standard_lib, libpython, early_prefix, prefix)
      elif os.name == "nt":
          if standard_lib:
+-- 
+2.39.2
+

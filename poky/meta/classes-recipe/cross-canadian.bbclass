@@ -36,7 +36,7 @@ python () {
     if d.getVar("MODIFYTOS") != "1":
         return
 
-    if d.getVar("TCLIBC") in [ 'baremetal', 'newlib' ]:
+    if d.getVar("TCLIBC") in [ 'baremetal', 'newlib', 'picolibc' ]:
         return
 
     tos = d.getVar("TARGET_OS")

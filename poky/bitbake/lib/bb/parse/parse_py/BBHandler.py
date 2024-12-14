@@ -23,8 +23,8 @@ __func_start_regexp__    = re.compile(r"(((?P<py>python(?=(\s|\()))|(?P<fr>faker
 __inherit_regexp__       = re.compile(r"inherit\s+(.+)" )
 __inherit_def_regexp__   = re.compile(r"inherit_defer\s+(.+)" )
 __export_func_regexp__   = re.compile(r"EXPORT_FUNCTIONS\s+(.+)" )
-__addtask_regexp__       = re.compile(r"addtask\s+(?P<func>\w+)\s*((before\s*(?P<before>((.*(?=after))|(.*))))|(after\s*(?P<after>((.*(?=before))|(.*)))))*")
-__deltask_regexp__       = re.compile(r"deltask\s+(.+)")
+__addtask_regexp__       = re.compile(r"addtask\s+([^#\n]+)(?P<comment>#.*|.*?)")
+__deltask_regexp__       = re.compile(r"deltask\s+([^#\n]+)(?P<comment>#.*|.*?)")
 __addhandler_regexp__    = re.compile(r"addhandler\s+(.+)" )
 __def_regexp__           = re.compile(r"def\s+(\w+).*:" )
 __python_func_regexp__   = re.compile(r"(\s+.*)|(^$)|(^#)" )
@@ -239,29 +239,38 @@ def feeder(lineno, s, fn, root, statements, eof=False):
 
     m = __addtask_regexp__.match(s)
     if m:
-        if len(m.group().split()) == 2:
-            # Check and warn for "addtask task1 task2"
-            m2 = re.match(r"addtask\s+(?P<func>\w+)(?P<ignores>.*)", s)
-            if m2 and m2.group('ignores'):
-                logger.warning('addtask ignored: "%s"' % m2.group('ignores'))
+        after = ""
+        before = ""
 
-        # Check and warn for "addtask task1 before task2 before task3", the
-        # similar to "after"
+        # This code splits on 'before' and 'after' instead of on whitespace so we can defer
+        # evaluation to as late as possible.
+        tasks = m.group(1).split(" before ")[0].split(" after ")[0]
+
+        for exp in m.group(1).split(" before "):
+            exp2 = exp.split(" after ")
+            if len(exp2) > 1:
+                after = after + " ".join(exp2[1:])
+
+        for exp in m.group(1).split(" after "):
+            exp2 = exp.split(" before ")
+            if len(exp2) > 1:
+                before = before + " ".join(exp2[1:])
+
+        # Check and warn for having task with a keyword as part of task name
         taskexpression = s.split()
-        for word in ('before', 'after'):
-            if taskexpression.count(word) > 1:
-                logger.warning("addtask contained multiple '%s' keywords, only one is supported" % word)
-
-        # Check and warn for having task with exprssion as part of task name
         for te in taskexpression:
             if any( ( "%s_" % keyword ) in te for keyword in bb.data_smart.__setvar_keyword__ ):
                 raise ParseError("Task name '%s' contains a keyword which is not recommended/supported.\nPlease rename the task not to include the keyword.\n%s" % (te, ("\n".join(map(str, bb.data_smart.__setvar_keyword__)))), fn)
-        ast.handleAddTask(statements, fn, lineno, m)
+
+        if tasks is not None:
+            ast.handleAddTask(statements, fn, lineno, tasks, before, after)
         return
 
     m = __deltask_regexp__.match(s)
     if m:
-        ast.handleDelTask(statements, fn, lineno, m)
+        task = m.group(1)
+        if task is not None:
+            ast.handleDelTask(statements, fn, lineno, task)
         return
 
     m = __addhandler_regexp__.match(s)

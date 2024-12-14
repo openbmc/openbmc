@@ -1,0 +1,73 @@
+From 9b5f3b09f76899eba510c2d8f3ed2b0f752a4d1b Mon Sep 17 00:00:00 2001
+From: Oscar Benjamin <oscar.j.benjamin@gmail.com>
+Date: Sat, 24 Aug 2024 08:30:31 +0100
+Subject: [PATCH] Output import-relative paths in generated C code. (GH-6341)
+
+When cython is run on a file that is not in the current working directory,
+it outputs filepaths that are either absolute or are basenames.
+It is not good to output absolute paths in the generated C code and
+basenames mess up coverage measurement.
+
+Upstream-Status: Backport [20bceea6b19ffc2f65b9fba2e4f737f09e5a2b20]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ Cython/Compiler/ExprNodes.py  | 8 +++++++-
+ Cython/Compiler/ModuleNode.py | 9 ++++++---
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/Cython/Compiler/ExprNodes.py b/Cython/Compiler/ExprNodes.py
+index a6bb1688e..0fbb15368 100644
+--- a/Cython/Compiler/ExprNodes.py
++++ b/Cython/Compiler/ExprNodes.py
+@@ -21,6 +21,7 @@ import re
+ import sys
+ import copy
+ import os.path
++import pathlib
+ import operator
+ 
+ from .Errors import (
+@@ -10072,7 +10073,12 @@ class CodeObjectNode(ExprNode):
+         func_name = code.get_py_string_const(
+             func.name, identifier=True, is_str=False, unicode_value=func.name)
+         # FIXME: better way to get the module file path at module init time? Encoding to use?
+-        file_path = StringEncoding.bytes_literal(func.pos[0].get_filenametable_entry().encode('utf8'), 'utf8')
++        file_path = func.pos[0].get_filenametable_entry()
++        if os.path.isabs(file_path):
++            file_path = func.pos[0].get_description()
++        # Always use / as separator
++        file_path = pathlib.Path(file_path).as_posix()
++        file_path = StringEncoding.bytes_literal(file_path.encode('utf-8'), 'utf8')
+         file_path_const = code.get_py_string_const(file_path, identifier=False, is_str=True)
+ 
+         # This combination makes CPython create a new dict for "frame.f_locals" (see GH #1836).
+diff --git a/Cython/Compiler/ModuleNode.py b/Cython/Compiler/ModuleNode.py
+index 43c6b5f07..8c29d6db7 100644
+--- a/Cython/Compiler/ModuleNode.py
++++ b/Cython/Compiler/ModuleNode.py
+@@ -13,6 +13,7 @@ from collections import defaultdict
+ import json
+ import operator
+ import os
++import pathlib
+ import re
+ import sys
+ 
+@@ -944,9 +945,11 @@ class ModuleNode(Nodes.Node, Nodes.BlockNode):
+             for source_desc in code.globalstate.filename_list:
+                 file_path = source_desc.get_filenametable_entry()
+                 if isabs(file_path):
+-                    file_path = basename(file_path)  # never include absolute paths
+-                escaped_filename = file_path.replace("\\", "\\\\").replace('"', r'\"')
+-                escaped_filename = as_encoded_filename(escaped_filename)
++                    # never include absolute paths
++                    file_path = source_desc.get_description()
++                # Always use / as separator
++                file_path = pathlib.Path(file_path).as_posix()
++                escaped_filename = as_encoded_filename(file_path)
+                 code.putln('%s,' % escaped_filename.as_c_string_literal())
+         else:
+             # Some C compilers don't like an empty array
+-- 
+2.34.1
+

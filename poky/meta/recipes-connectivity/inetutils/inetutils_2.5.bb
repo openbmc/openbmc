@@ -146,6 +146,7 @@ ALTERNATIVE:${PN}-traceroute = "traceroute"
 
 ALTERNATIVE:${PN}-hostname = "hostname"
 ALTERNATIVE_LINK_NAME[hostname]  = "${base_bindir}/hostname"
+ALTERNATIVE_PRIORITY[hostname] = "100"
 
 ALTERNATIVE:${PN}-doc = "hostname.1 dnsdomainname.1 logger.1 syslogd.8 \
                          tftpd.8 tftp.1 telnetd.8"

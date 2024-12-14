@@ -1,0 +1,52 @@
+From 1a063fee7ec1077e248ff97ebf1f92c5c5941a67 Mon Sep 17 00:00:00 2001
+From: Michael Cho <michael@michaelcho.dev>
+Date: Sat, 26 Oct 2024 10:29:53 -0400
+Subject: [PATCH] meson.build: support building with ICU 76
+
+ICU 76 decided to reduce overlinking[^1] thus `icu-i18n` will no longer
+add `icu-uc` when linking to shared libraries. This results in failure:
+```
+src/lib/icu/libicu.a.p/Converter.cxx.o: undefined reference to symbol 'ucnv_fromUnicode_76'
+```
+
+[^1]: https://github.com/unicode-org/icu/commit/199bc827021ffdb43b6579d68e5eecf54c7f6f56
+
+Upstream-Status: Backport [https://github.com/MusicPlayerDaemon/MPD/commit/1a063fee7ec1077e248ff97ebf1f92c5c5941a67]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/icu/meson.build | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/lib/icu/meson.build b/src/lib/icu/meson.build
+index 3ecc0a517..e6cf8cdce 100644
+--- a/src/lib/icu/meson.build
++++ b/src/lib/icu/meson.build
+@@ -1,5 +1,7 @@
+-icu_dep = dependency('icu-i18n', version: '>= 50', required: get_option('icu'))
+-conf.set('HAVE_ICU', icu_dep.found())
++icu_i18n_dep = dependency('icu-i18n', version: '>= 50', required: get_option('icu'))
++icu_uc_dep = dependency('icu-uc', version: '>= 50', required: get_option('icu'))
++have_icu = icu_i18n_dep.found() and icu_uc_dep.found()
++conf.set('HAVE_ICU', have_icu)
+ 
+ icu_sources = [
+   'Canonicalize.cxx',
+@@ -13,7 +15,7 @@ if is_windows
+ endif
+ 
+ iconv_dep = []
+-if icu_dep.found()
++if have_icu
+   icu_sources += [
+     'Init.cxx',
+     'Util.cxx',
+@@ -31,7 +33,8 @@ icu = static_library(
+   icu_sources,
+   include_directories: inc,
+   dependencies: [
+-    icu_dep,
++    icu_i18n_dep,
++    icu_uc_dep,
+     iconv_dep,
+     fmt_dep,
+   ],

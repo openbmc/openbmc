@@ -1,0 +1,36 @@
+From f53458e0b4cca0b0eedcd00b0e90b39d91228085 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 Jan 2013 19:53:10 -0800
+Subject: [PATCH] no bash
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ samples/auto.net | 2 +-
+ samples/auto.smb | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/samples/auto.net b/samples/auto.net
+index c5b145d..a09d56d 100755
+--- a/samples/auto.net
++++ b/samples/auto.net
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # This file must be executable to work! chmod 755!
+ 
+diff --git a/samples/auto.smb b/samples/auto.smb
+index f6d41d3..0d945ee 100755
+--- a/samples/auto.smb
++++ b/samples/auto.smb
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # This file must be executable to work! chmod 755!
+ 
+-- 
+2.25.1
+

@@ -1,4 +1,4 @@
-From 1c9e78dda91ba66fbd8fe02b66b6c603d08d3343 Mon Sep 17 00:00:00 2001
+From e3dc69aa987b379e247dde3fce479e43be6c81aa Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 30 Dec 2015 23:05:41 +0000
 Subject: [PATCH] add musleabi to known target tripets
@@ -8,7 +8,7 @@ Content-Transfer-Encoding: 8bit
 
 helps compiling dpkg for musl/arm-softfloat
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
 ---

@@ -1,4 +1,4 @@
-From 59ddfda14e3c9aa6286bb4c4c0748f7c1324a65a Mon Sep 17 00:00:00 2001
+From 16951b74971c7fd38fd036dac1410a9e53cbe736 Mon Sep 17 00:00:00 2001
 From: Chet Ramey <chet.ramey@case.edu>
 Date: Fri, 7 Apr 2023 00:28:46 -0700
 Subject: [PATCH] $(<nosuchfile) is no longer a fatal error with errexit
@@ -17,7 +17,7 @@ Signed-off-by: Zev Weiss <zev@bewilderbeest.net>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/builtins/evalstring.c b/builtins/evalstring.c
-index df3dd68e2a7e..6612081cd646 100644
+index 53a7c0b..c5075cc 100644
 --- a/builtins/evalstring.c
 +++ b/builtins/evalstring.c
 @@ -753,7 +753,7 @@ open_redir_file (r, fnp)
@@ -29,6 +29,3 @@ index df3dd68e2a7e..6612081cd646 100644
        free (fn);
        if (fnp)
  	*fnp = 0;
--- 
-2.40.0
-

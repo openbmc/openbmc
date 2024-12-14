@@ -6,7 +6,7 @@ form a standalone SDK."
 HOMEPAGE = "https://www.yoctoproject.org/"
 
 IMAGE_FEATURES += "dev-pkgs tools-sdk \
-	tools-debug eclipse-debug tools-profile tools-testapps debug-tweaks ssh-server-openssh"
+	tools-debug eclipse-debug tools-profile tools-testapps ssh-server-openssh"
 
 IMAGE_INSTALL += "kernel-devsrc"
 

@@ -1,3 +1,8 @@
+From d11685286144c2e5630545e435d11387b2908fd0 Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Wed, 14 Nov 2012 07:55:09 -0700
+Subject: [PATCH] bash: fix mkbuiltins build failure
+
 On hosts with FORTIFY_SOURCES, stringize support is required, as it's used by
 the macros to wrap functions (e.g. read and open in unistd.h). Those wrappers
 use the STRING() macro from unistd.h. A header in the bash sources overrides
@@ -13,14 +18,19 @@ stringize support, or to not define STRING() at all when FORTIFY_SOURCES is
 defined, letting the unistd.h one be used, instead.
 
 Upstream-Status: Pending
+---
+ builtins/mkbuiltins.c | 1 +
+ 1 file changed, 1 insertion(+)
 
---- bash-4.2.orig/builtins/mkbuiltins.c
-+++ bash-4.2/builtins/mkbuiltins.c
+diff --git a/builtins/mkbuiltins.c b/builtins/mkbuiltins.c
+index f505ebd..b5b2eed 100644
+--- a/builtins/mkbuiltins.c
++++ b/builtins/mkbuiltins.c
 @@ -28,6 +28,7 @@
  #  define HAVE_STDLIB_H
-
+ 
  #  define HAVE_RENAME
 +#  define HAVE_STRINGIZE
  #endif /* CROSS_COMPILING */
-
+ 
  #if defined (HAVE_UNISTD_H)

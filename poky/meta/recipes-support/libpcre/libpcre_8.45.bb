@@ -7,7 +7,8 @@ HOMEPAGE = "http://www.pcre.org"
 SECTION = "devel"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=b5d5d1a69a24ea2718263f1ff85a1c58"
-SRC_URI = "${SOURCEFORGE_MIRROR}/pcre/pcre-${PV}.tar.bz2 \
+SOURCEFORGE_PROJECT = "pcre"
+SRC_URI = "${SOURCEFORGE_MIRROR}/${SOURCEFORGE_PROJECT}/pcre-${PV}.tar.bz2 \
            file://run-ptest \
            file://Makefile \
            "
@@ -32,7 +33,7 @@ PACKAGECONFIG[jit] = "--enable-jit=auto,--disable-jit"
 
 BINCONFIG = "${bindir}/pcre-config"
 
-inherit autotools binconfig-disabled ptest
+inherit autotools binconfig-disabled ptest sourceforge-releases
 
 EXTRA_OECONF = "--enable-utf"
 

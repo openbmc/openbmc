@@ -6,10 +6,10 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files/corstone1000:"
 SRC_URI:append = " \
 	file://0001-Fix-FF-A-version-in-SPMC-manifest.patch \
 	file://0002-fix-corstone1000-pass-spsr-value-explicitly.patch \
-	file://0003-fix-spmd-remove-EL3-interrupt-registration.patch \
-	file://0004-fix-corstone1000-remove-unused-NS_SHARED_RAM-region.patch \
-	file://0005-fix-corstone1000-clean-the-cache-and-disable-interru.patch \
-	file://0006-feat-corstone1000-Add-multicore-support-for-FVP-plat.patch \
+	file://0003-fix-corstone1000-remove-unused-NS_SHARED_RAM-region.patch \
+	file://0004-fix-corstone1000-clean-the-cache-and-disable-interru.patch \
+	file://0005-feat-corstone1000-Add-multicore-support-for-FVP-plat.patch \
+	file://0006-feat-corstone1000-include-platform-header-file.patch \
        "
 
 TFA_DEBUG = "1"
@@ -26,13 +26,13 @@ TFA_SPMD_SPM_AT_SEL2 = "0"
 # BL2 loads BL32 (optee). So, optee needs to be built first:
 DEPENDS += "optee-os"
 
-# Note: Regarding the build option: LOG_LEVEL. 
+# Note: Regarding the build option: LOG_LEVEL.
 # There seems to be an issue when setting it
-# to 50 (LOG_LEVEL_VERBOSE), where the kernel 
+# to 50 (LOG_LEVEL_VERBOSE), where the kernel
 # tee driver sends yielding requests to OP-TEE
 # at a faster pace than OP-TEE processes them,
-# as the processing time is consumed by logging 
-# in TF-A. When this issue occurs, booting halts 
+# as the processing time is consumed by logging
+# in TF-A. When this issue occurs, booting halts
 # as soon as optee driver starts initialization.
 # Therefore, it's not currently recommended to
 # set LOG_LEVEL to 50 at all.

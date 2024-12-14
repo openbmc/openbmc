@@ -1,0 +1,252 @@
+From 7ada6547fcd1f649fadaa8021ff21e3e0f431459 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 14 Oct 2024 11:45:32 +0200
+Subject: [PATCH 1/4] libfdisk: make sure libblkid uses the same sector size
+
+Libfdisk uses libblkid to check for filesystems on the device. It
+makes sense for both libraries to share the logical sector size
+setting, as this setting can be modified by using the fdisk command
+line.
+
+We do not see this as an issue, as filesystem detection rarely depends
+on sector size (with the exception of some RAIDs). Additionally,
+libblkid is usually intelligent enough to check multiple locations
+independently of the current device's sector size setting.
+
+Addresses: https://github.com/util-linux/util-linux/pull/3235
+
+Upstream-Status: Submitted [https://github.com/util-linux/util-linux/pull/3237]
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ libfdisk/src/wipe.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libfdisk/src/wipe.c b/libfdisk/src/wipe.c
+index bb5f1bb38bf..f389ed4194a 100644
+--- a/libfdisk/src/wipe.c
++++ b/libfdisk/src/wipe.c
+@@ -133,6 +133,7 @@ int fdisk_do_wipe(struct fdisk_context *cxt)
+ 			DBG(WIPE, ul_debugobj(wp, "blkid_probe_set_device() failed [rc=%d]", rc));
+ 			return rc;
+ 		}
++		blkid_probe_set_sectorsize(pr, cxt->sector_size);
+ 
+ 		DBG(WIPE, ul_debugobj(wp, " wiping..."));
+ 		blkid_wipe_all(pr);
+@@ -176,6 +177,8 @@ int fdisk_check_collisions(struct fdisk_context *cxt)
+ 	free(cxt->collision);
+ 	cxt->collision = NULL;
+ 
++	blkid_probe_set_sectorsize(pr, cxt->sector_size);
++
+ 	blkid_probe_enable_superblocks(pr, 1);
+ 	blkid_probe_set_superblocks_flags(pr, BLKID_SUBLKS_TYPE |
+ 			                      BLKID_SUBLKS_BADCSUM);
+
+From 54f9a79301dcf492cab8e07134f96a921d367aa0 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 14 Oct 2024 15:47:03 +0200
+Subject: [PATCH 2/4] fdisk: (man) improve --sector-size description
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ disk-utils/fdisk.8.adoc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/disk-utils/fdisk.8.adoc b/disk-utils/fdisk.8.adoc
+index cb72b4a3ea5..5941aa34968 100644
+--- a/disk-utils/fdisk.8.adoc
++++ b/disk-utils/fdisk.8.adoc
+@@ -40,7 +40,7 @@ Note that *partx*(8) provides a rich interface for scripts to print disk layouts
+ == OPTIONS
+ 
+ *-b*, *--sector-size* _sectorsize_::
+-Specify the sector size of the disk. Valid values are 512, 1024, 2048, and 4096. (Recent kernels know the sector size. Use this option only on old kernels or to override the kernel's ideas.) Since util-linux-2.17, *fdisk* differentiates between logical and physical sector size. This option changes both sector sizes to _sectorsize_.
++Specify the sector size of the disk. Valid values are 512, 1024, 2048, and 4096. The kernel is aware of the sector size for regular block devices. Use this option only on very old kernels, when working with disk images, or to override the kernel's default sector size. Since util-linux-2.17, *fdisk* distinguishes between logical and physical sector size. This option changes both sector sizes to the specified _sectorsize_.
+ 
+ *-B*, *--protect-boot*::
+ Don't erase the beginning of the first disk sector when creating a new disk label. This feature is supported for GPT and MBR.
+
+From fd38ee2274f7a30393d3839dfce556260355c3fa Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 14 Oct 2024 15:48:46 +0200
+Subject: [PATCH 3/4] cfdisk: add --sector-size commanand line option
+
+* improves compatibility with fdisk
+* add ability to work with disk images where libfdisk defaults to 512
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ disk-utils/cfdisk.8.adoc |  3 +++
+ disk-utils/cfdisk.c      | 15 ++++++++++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/disk-utils/cfdisk.8.adoc b/disk-utils/cfdisk.8.adoc
+index 97fad621d12..759f39f0e1a 100644
+--- a/disk-utils/cfdisk.8.adoc
++++ b/disk-utils/cfdisk.8.adoc
+@@ -55,6 +55,9 @@ Use exclusive BSD lock for device or file it operates. The optional argument _mo
+ *-r*, *--read-only*::
+ Forced open in read-only mode.
+ 
++*-b*, *--sector-size* _sectorsize_::
++Specify the sector size of the disk. Valid values are 512, 1024, 2048, and 4096. The kernel is aware of the sector size for regular block devices. Use this option only on very old kernels, when working with disk images, or to override the kernel's default sector size. Since util-linux-2.17, *fdisk* distinguishes between logical and physical sector size. This option changes both sector sizes to the specified _sectorsize_.
++
+ *-z*, *--zero*::
+ Start with an in-memory zeroed partition table. This option does not zero the partition table on the disk; rather, it simply starts the program without reading the existing partition table. This option allows you to create a new partition table from scratch or from an *sfdisk*(8)-compatible script.
+ 
+diff --git a/disk-utils/cfdisk.c b/disk-utils/cfdisk.c
+index 2e0aada474a..bc1c87d83e4 100644
+--- a/disk-utils/cfdisk.c
++++ b/disk-utils/cfdisk.c
+@@ -2731,6 +2731,8 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	      _("     --lock[=<mode>]      use exclusive device lock (%s, %s or %s)\n"), "yes", "no", "nonblock");
+ 	fputs(_(" -r, --read-only          forced open cfdisk in read-only mode\n"), out);
+ 
++	fputs(_(" -b, --sector-size <size> physical and logical sector size\n"), out);
++
+ 	fputs(USAGE_SEPARATOR, out);
+ 	fprintf(out, USAGE_HELP_OPTIONS(26));
+ 
+@@ -2743,6 +2745,7 @@ int main(int argc, char *argv[])
+ 	const char *diskpath = NULL, *lockmode = NULL;
+ 	int rc, c, colormode = UL_COLORMODE_UNDEF;
+ 	int read_only = 0;
++	size_t user_ss = 0;
+ 	struct cfdisk _cf = { .lines_idx = 0 },
+ 		      *cf = &_cf;
+ 	enum {
+@@ -2752,6 +2755,7 @@ int main(int argc, char *argv[])
+ 		{ "color",   optional_argument, NULL, 'L' },
+ 		{ "lock",    optional_argument, NULL, OPT_LOCK },
+ 		{ "help",    no_argument,       NULL, 'h' },
++		{ "sector-size", required_argument, NULL, 'b' },
+ 		{ "version", no_argument,       NULL, 'V' },
+ 		{ "zero",    no_argument,	NULL, 'z' },
+ 		{ "read-only", no_argument,     NULL, 'r' },
+@@ -2763,8 +2767,15 @@ int main(int argc, char *argv[])
+ 	textdomain(PACKAGE);
+ 	close_stdout_atexit();
+ 
+-	while((c = getopt_long(argc, argv, "L::hVzr", longopts, NULL)) != -1) {
++	while((c = getopt_long(argc, argv, "b:L::hVzr", longopts, NULL)) != -1) {
+ 		switch(c) {
++		case 'b':
++			user_ss = strtou32_or_err(optarg,
++					_("invalid sector size argument"));
++			if (user_ss != 512 && user_ss != 1024 &&
++			    user_ss != 2048 && user_ss != 4096)
++				errx(EXIT_FAILURE, _("invalid sector size argument"));
++			break;
+ 		case 'h':
+ 			usage();
+ 			break;
+@@ -2803,6 +2814,8 @@ int main(int argc, char *argv[])
+ 	cf->cxt = fdisk_new_context();
+ 	if (!cf->cxt)
+ 		err(EXIT_FAILURE, _("failed to allocate libfdisk context"));
++	if (user_ss)
++		fdisk_save_user_sector_size(cf->cxt, user_ss, user_ss);
+ 
+ 	fdisk_set_ask(cf->cxt, ask_callback, (void *) cf);
+ 
+
+From ef7b76baa17ddb5414691fa8f49d61415c30871c Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 14 Oct 2024 15:50:40 +0200
+Subject: [PATCH 4/4] sfdisk: add --sector-size commanand line option
+
+* improves compatibility with fdisk
+* add ability to work with disk images where libfdisk defaults to 512
+
+Addresses: https://github.com/util-linux/util-linux/pull/3235
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ disk-utils/sfdisk.8.adoc |  5 ++++-
+ disk-utils/sfdisk.c      | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/disk-utils/sfdisk.8.adoc b/disk-utils/sfdisk.8.adoc
+index 26ccad5a3b2..ce9e97b7682 100644
+--- a/disk-utils/sfdisk.8.adoc
++++ b/disk-utils/sfdisk.8.adoc
+@@ -208,6 +208,9 @@ The default list of columns may be extended if _list_ is specified in the format
+ *-q*, *--quiet*::
+ Suppress extra info messages.
+ 
++*--sector-size* _sectorsize_::
++Specify the sector size of the disk. Valid values are 512, 1024, 2048, and 4096. The kernel is aware of the sector size for regular block devices. Use this option only on very old kernels, when working with disk images, or to override the kernel's default sector size. Since util-linux-2.17, *fdisk* distinguishes between logical and physical sector size. This option changes both sector sizes to the specified _sectorsize_.
++
+ *-u*, *--unit S*::
+ Deprecated option. Only the sector unit is supported. This option is not supported when using the *--show-size* command.
+ 
+@@ -256,7 +259,7 @@ Specify the maximal number of GPT partitions.
+ *grain*::
+ Specify minimal size in bytes used to calculate partitions alignment. The default is 1MiB and it's strongly recommended to use the default. Do not modify this variable if you're not sure.
+ *sector-size*::
+-Specify sector size. *sfdisk* always uses device sector size. Since version 2.39 *sfdisk* recalculates sizes from dump if the script and device sector size differ.
++Specifies the sector size used in the input. *sfdisk* always internally uses the device sector size provided by the kernel for the block device, or as specified by the user on the command line (see *--sector-size*). Starting with version 2.39, *sfdisk* recalculates sizes from the input if the *sector-size* header and device sector size are different.
+ 
+ Note that it is only possible to use header lines before the first partition is specified in the input.
+ 
+diff --git a/disk-utils/sfdisk.c b/disk-utils/sfdisk.c
+index cf402007b51..5e7c1d926e4 100644
+--- a/disk-utils/sfdisk.c
++++ b/disk-utils/sfdisk.c
+@@ -2155,6 +2155,8 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	      _("     --color[=<when>]      colorize output (%s, %s or %s)\n"), "auto", "always", "never");
+ 	fprintf(out,
+ 	        "                             %s\n", USAGE_COLORS_DEFAULT);
++	fputs(_("     --sector-size <size>  physical and logical sector size\n"), out);
++
+ 	fprintf(out,
+ 	      _("     --lock[=<mode>]       use exclusive device lock (%s, %s or %s)\n"), "yes", "no", "nonblock");
+ 	fputs(_(" -N, --partno <num>        specify partition number\n"), out);
+@@ -2191,6 +2193,7 @@ int main(int argc, char *argv[])
+ 	const char *outarg = NULL;
+ 	int rc = -EINVAL, c, longidx = -1, bytes = 0;
+ 	int colormode = UL_COLORMODE_UNDEF;
++	size_t user_ss = 0;
+ 	struct sfdisk _sf = {
+ 		.partno = -1,
+ 		.wipemode = WIPEMODE_AUTO,
+@@ -2217,6 +2220,7 @@ int main(int argc, char *argv[])
+ 		OPT_NOTELL,
+ 		OPT_RELOCATE,
+ 		OPT_LOCK,
++		OPT_SECTORSIZE
+ 	};
+ 
+ 	static const struct option longopts[] = {
+@@ -2246,6 +2250,7 @@ int main(int argc, char *argv[])
+ 		{ "output",  required_argument, NULL, 'o' },
+ 		{ "partno",  required_argument, NULL, 'N' },
+ 		{ "reorder", no_argument,       NULL, 'r' },
++		{ "sector-size", required_argument, NULL, OPT_SECTORSIZE },
+ 		{ "show-geometry", no_argument, NULL, 'g' },
+ 		{ "quiet",   no_argument,       NULL, 'q' },
+ 		{ "verify",  no_argument,       NULL, 'V' },
+@@ -2450,6 +2455,13 @@ int main(int argc, char *argv[])
+ 				sf->lockmode = optarg;
+ 			}
+ 			break;
++		case OPT_SECTORSIZE:
++			user_ss = strtou32_or_err(optarg,
++					_("invalid sector size argument"));
++			if (user_ss != 512 && user_ss != 1024 &&
++			    user_ss != 2048 && user_ss != 4096)
++				errx(EXIT_FAILURE, _("invalid sector size argument"));
++			break;
+ 		default:
+ 			errtryhelp(EXIT_FAILURE);
+ 		}
+@@ -2460,6 +2472,8 @@ int main(int argc, char *argv[])
+ 	sfdisk_init(sf);
+ 	if (bytes)
+ 		fdisk_set_size_unit(sf->cxt, FDISK_SIZEUNIT_BYTES);
++	if (user_ss)
++		fdisk_save_user_sector_size(sf->cxt, user_ss, user_ss);
+ 
+ 	if (outarg)
+ 		init_fields(NULL, outarg, NULL);

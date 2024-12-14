@@ -9,34 +9,33 @@ Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Stefan Agner <stefan.agner@toradex.com>
 ---
  configure.ac               | 2 ++
- systemd/rpcbind.service.in | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ systemd/rpcbind.service.in | 1 +
+ 2 files changed, 3 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 2dd9471..47a46c0 100644
+index 8f4cef3..4705413 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -69,5 +69,7 @@ AC_CHECK_HEADERS([nss.h rpcsvc/mount.h])
+@@ -86,5 +86,7 @@ AC_CHECK_HEADERS([nss.h])
  # 2 "evals" needed to expand variable names
  AC_SUBST([_sbindir])
  AC_CONFIG_COMMANDS_PRE([eval eval _sbindir=$sbindir])
 +AC_SUBST([_sysconfdir])
 +AC_CONFIG_COMMANDS_PRE([eval eval _sysconfdir=$sysconfdir])
  
- AC_OUTPUT([Makefile systemd/rpcbind.service])
+ AC_OUTPUT([Makefile systemd/rpcbind.service systemd/rpcbind.socket])
 diff --git a/systemd/rpcbind.service.in b/systemd/rpcbind.service.in
-index 7b1c74b..f45ee1e 100644
+index c892ca8..e0511bd 100644
 --- a/systemd/rpcbind.service.in
 +++ b/systemd/rpcbind.service.in
-@@ -11,7 +11,7 @@ Wants=rpcbind.target
- 
+@@ -12,6 +12,7 @@ Wants=rpcbind.target
  [Service]
  Type=notify
--# distro can provide a drop-in adding EnvironmentFile=-/??? if needed.
+ # distro can provide a drop-in adding EnvironmentFile=-/??? if needed.
 +EnvironmentFile=-@_sysconfdir@/rpcbind.conf
- ExecStart=@_sbindir@/rpcbind $RPCBIND_OPTIONS -w -f
+ ExecStart=@_sbindir@/rpcbind $RPCBIND_OPTIONS @warmstarts_opt@ -f
  
  [Install]
 -- 
-2.23.0
+2.34.1
 

@@ -1,4 +1,4 @@
-From 9c375e3fcf8ff778a5010a07a7da4b6a58adec7c Mon Sep 17 00:00:00 2001
+From 621c3fe47376fe3bb28625114613eb4f636cdba7 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Sun, 31 Mar 2019 19:11:31 +0200
 Subject: [PATCH] call native helpers
@@ -15,7 +15,7 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/addressbook/libebook-contacts/CMakeLists.txt b/src/addressbook/libebook-contacts/CMakeLists.txt
-index e9e3259..e749d1b 100644
+index 480e3f6..fc40b20 100644
 --- a/src/addressbook/libebook-contacts/CMakeLists.txt
 +++ b/src/addressbook/libebook-contacts/CMakeLists.txt
 @@ -25,7 +25,7 @@ target_link_libraries(gen-western-table
@@ -28,10 +28,10 @@ index e9e3259..e749d1b 100644
  )
  
 diff --git a/src/camel/CMakeLists.txt b/src/camel/CMakeLists.txt
-index be626a8..14ac8b8 100644
+index 59bc77a..c5da19c 100644
 --- a/src/camel/CMakeLists.txt
 +++ b/src/camel/CMakeLists.txt
-@@ -10,7 +10,7 @@ target_include_directories(camel-gen-tables PUBLIC
+@@ -20,7 +20,7 @@ target_include_directories(camel-gen-tables PUBLIC
  
  add_custom_command(
  	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/camel-mime-tables.c
@@ -40,6 +40,3 @@ index be626a8..14ac8b8 100644
  	DEPENDS camel-gen-tables
  )
  
--- 
-2.20.1
-

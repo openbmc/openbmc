@@ -10,7 +10,7 @@ the case, e.g. the lv_demo_fb uses encoded images which are of type
 LV_IMAGE_SRC_VARIABLE and instead of filename, come with a buffer of
 pixels. Handle the later using SDL_CreateRGBSurfaceFrom().
 
-Upstream-Status: Submitted [https://github.com/lvgl/lvgl/pull/5852]
+Upstream-Status: Backport [b339e67581864b2fb6bb8897735a1e110c324ddc]
 Signed-off-by: Marek Vasut <marex@denx.de>
 ---
  src/draw/sdl/lv_draw_sdl.c | 30 +++++++++++++++++++++++++++---

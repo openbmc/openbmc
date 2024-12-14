@@ -33,10 +33,6 @@ def mesonpy_get_args(d):
 
 PEP517_BUILD_OPTS = "-Cbuilddir='${B}' ${@mesonpy_get_args(d)}"
 
-# Python pyx -> c -> so build leaves absolute build paths in the code
-INSANE_SKIP:${PN} += "buildpaths"
-INSANE_SKIP:${PN}-src += "buildpaths"
-
 python_mesonpy_do_configure () {
     python_pep517_do_configure
 }

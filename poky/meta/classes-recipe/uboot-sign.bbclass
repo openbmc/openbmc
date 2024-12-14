@@ -338,7 +338,7 @@ uboot_assemble_fitimage_helper() {
 	binary="$2"
 
 	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a -n "${UBOOT_DTB_BINARY}" ] ; then
-		concat_dtb $type $binary
+		concat_dtb "$type" "$binary"
 	fi
 
 	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" -a -n "${SPL_DTB_BINARY}" ]; then
@@ -356,8 +356,9 @@ do_uboot_assemble_fitimage() {
 	fi
 
 	if [ -n "${UBOOT_CONFIG}" ]; then
-		unset i j k
+		unset i
 		for config in ${UBOOT_MACHINE}; do
+			unset j k
 			i=$(expr $i + 1);
 			for type in ${UBOOT_CONFIG}; do
 				j=$(expr $j + 1);

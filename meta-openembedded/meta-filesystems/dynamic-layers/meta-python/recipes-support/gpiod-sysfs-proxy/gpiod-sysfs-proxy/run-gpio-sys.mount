@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: CC0-1.0
+# SPDX-FileCopyrightText: 2024 Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+[Unit]
+Description=Remount of sysfs for gpiod-sysfs-proxy
+ConditionPathExists=!/sys/class/gpio
+
+[Mount]
+DirectoryMode=0700
+What=sysfs
+Where=/run/gpio/sys
+Type=sysfs
+Options=nosuid,nodev,noexec

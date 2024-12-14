@@ -11,5 +11,6 @@ TUNE_CCARGS:append = "${@bb.utils.contains('TUNE_FEATURES', 'riscv64nc', ' -marc
 
 # Fix: ld: unrecognized option '--hash-style=sysv'
 LINKER_HASH_STYLE:libc-newlib = ""
+LINKER_HASH_STYLE:libc-picolibc = ""
 # Fix: ld: unrecognized option '--hash-style=gnu'
 LINKER_HASH_STYLE:libc-baremetal = ""

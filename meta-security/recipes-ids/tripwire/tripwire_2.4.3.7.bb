@@ -19,7 +19,7 @@ SRC_URI = "\
 	file://run-ptest \
        "
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 inherit autotools-brokensep update-rc.d ptest
 
@@ -43,11 +43,11 @@ do_install () {
     install -m 0755 ${S}/bin/* ${D}${sbindir}
     install -m 0644 ${S}/lib/* ${D}${base_libdir}
     install -m 0644 ${S}/lib/* ${D}${localstatedir}/lib/${PN}
-    install -m 0755 ${WORKDIR}/tripwire.cron ${D}${sysconfdir}
-    install -m 0755 ${WORKDIR}/tripwire.sh ${D}${sysconfdir}/init.d/tripwire
-    install -m 0755 ${WORKDIR}/twinstall.sh ${D}${sysconfdir}/${PN}
-    install -m 0644 ${WORKDIR}/twpol-yocto.txt ${D}${sysconfdir}/${PN}/twpol.txt
-    install -m 0644 ${WORKDIR}/twcfg.txt ${D}${sysconfdir}/${PN}
+    install -m 0755 ${UNPACKDIR}/tripwire.cron ${D}${sysconfdir}
+    install -m 0755 ${UNPACKDIR}/tripwire.sh ${D}${sysconfdir}/init.d/tripwire
+    install -m 0755 ${UNPACKDIR}/twinstall.sh ${D}${sysconfdir}/${PN}
+    install -m 0644 ${UNPACKDIR}/twpol-yocto.txt ${D}${sysconfdir}/${PN}/twpol.txt
+    install -m 0644 ${UNPACKDIR}/twcfg.txt ${D}${sysconfdir}/${PN}
 
     install -m 0644 ${S}/man/man4/* ${D}${mandir}/man4
     install -m 0644 ${S}/man/man5/* ${D}${mandir}/man5
@@ -57,7 +57,7 @@ do_install () {
     install -m 0644 ${S}/policy/*txt ${D}${docdir}/${BPN}
     install -m 0644 ${S}/COPYING ${D}${docdir}/${BPN}
     install -m 0644 ${S}/TRADEMARK ${D}${docdir}/${BPN}
-    install -m 0644 ${WORKDIR}/tripwire.txt ${D}${docdir}/${BPN}
+    install -m 0644 ${UNPACKDIR}/tripwire.txt ${D}${docdir}/${BPN}
 }
 
 do_install_ptest:append () {

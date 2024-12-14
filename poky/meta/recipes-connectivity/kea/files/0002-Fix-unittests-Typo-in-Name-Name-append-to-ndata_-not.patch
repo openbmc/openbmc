@@ -1,0 +1,36 @@
+From b5f6cc6b3a2b2c35c9b9bb856861c502771079cc Mon Sep 17 00:00:00 2001
+From: Dimitry Andric <dimitry@unified-streaming.com>
+Date: Wed, 28 Aug 2024 22:32:44 +0200
+Subject: [PATCH 2/2] Fix unittests: * Typo in `Name::Name`: append to
+ `ndata_`, not `ndata` * In `Name::split`, use the correct iterators for
+ assigning
+
+Upstream-Status: Submitted [https://gitlab.isc.org/isc-projects/kea/-/merge_requests/2410]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/dns/name.cc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib/dns/name.cc b/src/lib/dns/name.cc
+index 085229b..47d9b8f 100644
+--- a/src/lib/dns/name.cc
++++ b/src/lib/dns/name.cc
+@@ -347,7 +347,7 @@ Name::Name(const char* namedata, size_t data_len, const Name* origin,
+         // Drop the last character of the data (the \0) and append a copy of
+         // the origin's data
+         ndata_.erase(ndata_.end() - 1);
+-        ndata_.insert(ndata.end(), origin->ndata_.begin(), origin->ndata_.end());
++        ndata_.insert(ndata_.end(), origin->ndata_.begin(), origin->ndata_.end());
+ 
+         // Do a similar thing with offsets. However, we need to move them
+         // so they point after the prefix we parsed before.
+@@ -662,7 +662,8 @@ Name::split(const unsigned int first, const unsigned int n) const {
+     // original name, and append the trailing dot explicitly.
+     //
+     retname.ndata_.reserve(retname.offsets_.back() + 1);
+-    retname.ndata_.assign(ndata_.data() + offsets_[first], ndata_.data() + retname.offsets_.back());
++    auto it = ndata_.data() + offsets_[first];
++    retname.ndata_.assign(it, it + retname.offsets_.back());
+     retname.ndata_.push_back(0);
+ 
+     retname.length_ = retname.ndata_.size();

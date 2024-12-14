@@ -10,7 +10,8 @@ BUGTRACKER = "http://sourceforge.net/p/acpid2/tickets/?source=navbar"
 SECTION = "base"
 LICENSE = "GPL-2.0-or-later"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/acpid2/acpid-${PV}.tar.xz \
+SOURCEFORGE_PROJECT = "acpid2"
+SRC_URI = "${SOURCEFORGE_MIRROR}/${SOURCEFORGE_PROJECT}/acpid-${PV}.tar.xz \
            file://init \
            file://acpid.service \
            file://0001-Replace-stat64-with-stat.patch \
@@ -18,7 +19,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/acpid2/acpid-${PV}.tar.xz \
 
 CVE_PRODUCT = "acpid2"
 
-inherit autotools update-rc.d systemd
+inherit autotools update-rc.d systemd sourceforge-releases
 
 INITSCRIPT_NAME = "acpid"
 INITSCRIPT_PARAMS = "defaults"

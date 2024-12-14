@@ -1,0 +1,48 @@
+From da22e9f4eec22163feab5a0a4488627ea992daa9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Sep 2024 23:58:36 +0000
+Subject: [PATCH] Add riscv32 support
+
+Add missing definitions for the RISC-V 32-bit architecture.
+
+Upstream-Status: Submitted [https://github.com/systemd/systemd-bootchart/pull/54]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac       | 1 +
+ src/architecture.h | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 5c9c20f..f977c78 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -45,6 +45,7 @@ SET_ARCH(IA32, i*86*)
+ SET_ARCH(MIPS, mips*)
+ SET_ARCH(AARCH64, aarch64*)
+ SET_ARCH(RISCV64, riscv64*)
++SET_ARCH(RISCV32, riscv32*)
+ 
+ AC_CHECK_SIZEOF(pid_t)
+ AC_CHECK_SIZEOF(uid_t)
+diff --git a/src/architecture.h b/src/architecture.h
+index cbf1795..f33cd00 100644
+--- a/src/architecture.h
++++ b/src/architecture.h
+@@ -58,6 +58,7 @@ enum {
+         ARCHITECTURE_TILEGX,
+         ARCHITECTURE_CRIS,
+         ARCHITECTURE_RISCV64,
++        ARCHITECTURE_RISCV32,
+ 	ARCHITECTURE_LOONGARCH,
+         _ARCHITECTURE_MAX,
+         _ARCHITECTURE_INVALID = -1
+@@ -151,6 +152,9 @@ int uname_architecture(void);
+ #elif defined(__riscv) && __riscv_xlen == 64
+ #  define native_architecture() ARCHITECTURE_RISCV64
+ #  define define LIB_ARCH_TUPLE "riscv64-linux-gnu"
++#elif defined(__riscv) && __riscv_xlen == 32
++#  define native_architecture() ARCHITECTURE_RISCV32
++#  define define LIB_ARCH_TUPLE "riscv32-linux-gnu"
+ #elif defined(__loongarch__) && __loongarch_grlen == 64
+ #  define native_architecture() ARCHITECTURE_LOONGARCH
+ #  define define LIB_ARCH_TUPLE "loongarch64-linux-gnu"

@@ -15,3 +15,7 @@ CFLAGS += "-D_GNU_SOURCE "
 do_install() {
     oe_runmake 'DESTDIR=${D}' 'PREFIX=${prefix}' install
 }
+
+# http://errors.yoctoproject.org/Errors/Details/766895/
+# ssmping.c:55:51: error: passing argument 3 of 'getsockname' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

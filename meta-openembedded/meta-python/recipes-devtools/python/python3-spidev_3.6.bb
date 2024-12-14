@@ -7,9 +7,9 @@ All code is GPLv2 licensed unless explicitly stated otherwise."
 HOMEPAGE = "http://github.com/doceme/py-spidev"
 SECTION = "devel/python"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=2077511c543a7c85245a516c47f4de78"
 SRCNAME = "spidev"
 
 SRC_URI[sha256sum] = "14dbc37594a4aaef85403ab617985d3c3ef464d62bc9b769ef552db53701115b"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta

@@ -633,6 +633,12 @@ class Tinfoil:
         fn = self.get_recipe_file(pn)
         return self.parse_recipe_file(fn)
 
+    def finalizeData(self):
+        """
+        Run anonymous functions and expand keys
+        """
+        return self._reconvert_type(self.run_command('finalizeData'), 'DataStoreConnectionHandle')
+
     def parse_recipe_file(self, fn, appends=True, appendlist=None, config_data=None):
         """
         Parse the specified recipe file (with or without bbappends)

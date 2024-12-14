@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: MIT
-import os
 import subprocess
 import time
 from oeqa.core.decorator import OETestTag
+from oeqa.core.decorator.data import skipIfArch
 from oeqa.core.case import OEPTestResultTestCase
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars, runqemu, Command
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
 from oeqa.utils.sshcontrol import SSHControl
 
 def parse_results(filename):
@@ -38,15 +38,9 @@ def parse_results(filename):
 @OETestTag("toolchain-user")
 @OETestTag("runqemu")
 class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
+
+    @skipIfArch(['mips', 'mips64'])
     def test_rust(self, *args, **kwargs):
-        # Disable Rust Oe-selftest
-        #self.skipTest("The Rust Oe-selftest is disabled.")
-
-        # Skip mips32 target since it is unstable with rust tests
-        machine = get_bb_var('MACHINE')
-        if machine == "qemumips":
-            self.skipTest("The mips32 target is skipped for Rust Oe-selftest.")
-
         # build remote-test-server before image build
         recipe = "rust"
         start_time = time.time()
@@ -66,132 +60,40 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
         # bless: First runs rustfmt to format the codebase,
         # then runs tidy checks.
         exclude_list =  [
-                            'compiler/rustc',
-                            'compiler/rustc_interface/src/tests.rs',
-                            'library/panic_abort',
-                            'library/panic_unwind',
-                            'library/test/src/stats/tests.rs',
-                            'src/bootstrap/builder/tests.rs',
+                            'src/bootstrap',
                             'src/doc/rustc',
                             'src/doc/rustdoc',
                             'src/doc/unstable-book',
                             'src/librustdoc',
                             'src/rustdoc-json-types',
-                            'src/tools/compiletest/src/common.rs',
+                            'src/tools/jsondoclint',
                             'src/tools/lint-docs',
+                            'src/tools/replace-version-placeholder',
                             'src/tools/rust-analyzer',
                             'src/tools/rustdoc-themes',
-                            'src/tools/tidy',
+                            'src/tools/rust-installer',
+                            'src/tools/suggest-tests',
                             'tests/assembly/asm/aarch64-outline-atomics.rs',
-                            'tests/codegen/abi-main-signature-32bit-c-int.rs',
-                            'tests/codegen/abi-repr-ext.rs',
-                            'tests/codegen/abi-x86-interrupt.rs',
-                            'tests/codegen/branch-protection.rs',
-                            'tests/codegen/catch-unwind.rs',
-                            'tests/codegen/cf-protection.rs',
-                            'tests/codegen/enum-bounds-check-derived-idx.rs',
-                            'tests/codegen/force-unwind-tables.rs',
-                            'tests/codegen/intrinsic-no-unnamed-attr.rs',
-                            'tests/codegen/issues/issue-103840.rs',
-                            'tests/codegen/issues/issue-47278.rs',
-                            'tests/codegen/issues/issue-73827-bounds-check-index-in-subexpr.rs',
-                            'tests/codegen/lifetime_start_end.rs',
-                            'tests/codegen/local-generics-in-exe-internalized.rs',
-                            'tests/codegen/match-unoptimized.rs',
-                            'tests/codegen/noalias-rwlockreadguard.rs',
-                            'tests/codegen/non-terminate/nonempty-infinite-loop.rs',
-                            'tests/codegen/noreturn-uninhabited.rs',
-                            'tests/codegen/repr-transparent-aggregates-3.rs',
-                            'tests/codegen/riscv-abi/call-llvm-intrinsics.rs',
-                            'tests/codegen/riscv-abi/riscv64-lp64f-lp64d-abi.rs',
-                            'tests/codegen/riscv-abi/riscv64-lp64d-abi.rs',
-                            'tests/codegen/sse42-implies-crc32.rs',
+                            'tests/codegen/issues/issue-122805.rs',
                             'tests/codegen/thread-local.rs',
-                            'tests/codegen/uninit-consts.rs',
-                            'tests/pretty/raw-str-nonexpr.rs',
+                            'tests/mir-opt/',
                             'tests/run-make',
                             'tests/run-make-fulldeps',
                             'tests/rustdoc',
                             'tests/rustdoc-json',
                             'tests/rustdoc-js-std',
-                            'tests/rustdoc-ui/cfg-test.rs',
-                            'tests/rustdoc-ui/check-cfg-test.rs',
-                            'tests/rustdoc-ui/display-output.rs',
-                            'tests/rustdoc-ui/doc-comment-multi-line-attr.rs',
-                            'tests/rustdoc-ui/doc-comment-multi-line-cfg-attr.rs',
-                            'tests/rustdoc-ui/doc-test-doctest-feature.rs',
-                            'tests/rustdoc-ui/doctest-multiline-crate-attribute.rs',
-                            'tests/rustdoc-ui/doctest-output.rs',
-                            'tests/rustdoc-ui/doc-test-rustdoc-feature.rs',
-                            'tests/rustdoc-ui/failed-doctest-compile-fail.rs',
-                            'tests/rustdoc-ui/issue-80992.rs',
-                            'tests/rustdoc-ui/issue-91134.rs',
-                            'tests/rustdoc-ui/nocapture-fail.rs',
-                            'tests/rustdoc-ui/nocapture.rs',
-                            'tests/rustdoc-ui/no-run-flag.rs',
-                            'tests/rustdoc-ui/run-directory.rs',
-                            'tests/rustdoc-ui/test-no_std.rs',
-                            'tests/rustdoc-ui/test-type.rs',
-                            'tests/rustdoc/unit-return.rs',
                             'tests/ui/abi/stack-probes-lto.rs',
                             'tests/ui/abi/stack-probes.rs',
-                            'tests/ui/array-slice-vec/subslice-patterns-const-eval-match.rs',
-                            'tests/ui/asm/x86_64/sym.rs',
-                            'tests/ui/associated-type-bounds/fn-apit.rs',
-                            'tests/ui/associated-type-bounds/fn-dyn-apit.rs',
-                            'tests/ui/associated-type-bounds/fn-wrap-apit.rs',
+                            'tests/ui/codegen/mismatched-data-layouts.rs',
                             'tests/ui/debuginfo/debuginfo-emit-llvm-ir-and-split-debuginfo.rs',
-                            'tests/ui/drop/dynamic-drop.rs',
-                            'tests/ui/empty_global_asm.rs',
-                            'tests/ui/functions-closures/fn-help-with-err.rs',
-                            'tests/ui/linkage-attr/issue-10755.rs',
-                            'tests/ui/macros/restricted-shadowing-legacy.rs',
-                            'tests/ui/process/nofile-limit.rs',
-                            'tests/ui/process/process-panic-after-fork.rs',
-                            'tests/ui/process/process-sigpipe.rs',
-                            'tests/ui/simd/target-feature-mixup.rs',
-                            'tests/ui/structs-enums/multiple-reprs.rs',
-                            'src/tools/jsondoclint',
-                            'src/tools/replace-version-placeholder',
-                            'tests/codegen/abi-efiapi.rs',
-                            'tests/codegen/abi-sysv64.rs',
-                            'tests/codegen/align-byval.rs',
-                            'tests/codegen/align-fn.rs',
-                            'tests/codegen/asm-powerpc-clobbers.rs',
-                            'tests/codegen/async-fn-debug-awaitee-field.rs',
-                            'tests/codegen/binary-search-index-no-bound-check.rs',
-                            'tests/codegen/call-metadata.rs',
-                            'tests/codegen/debug-column.rs',
-                            'tests/codegen/debug-limited.rs',
-                            'tests/codegen/debuginfo-generic-closure-env-names.rs',
-                            'tests/codegen/drop.rs',
-                            'tests/codegen/dst-vtable-align-nonzero.rs',
-                            'tests/codegen/enable-lto-unit-splitting.rs',
-                            'tests/codegen/enum/enum-u128.rs',
-                            'tests/codegen/fn-impl-trait-self.rs',
-                            'tests/codegen/inherit_overflow.rs',
-                            'tests/codegen/inline-function-args-debug-info.rs',
-                            'tests/codegen/intrinsics/mask.rs',
-                            'tests/codegen/intrinsics/transmute-niched.rs',
-                            'tests/codegen/issues/issue-73258.rs',
-                            'tests/codegen/issues/issue-75546.rs',
-                            'tests/codegen/issues/issue-77812.rs',
-                            'tests/codegen/issues/issue-98156-const-arg-temp-lifetime.rs',
-                            'tests/codegen/llvm-ident.rs',
-                            'tests/codegen/mainsubprogram.rs',
-                            'tests/codegen/move-operands.rs',
-                            'tests/codegen/repr/transparent-mips64.rs',
-                            'tests/mir-opt/',
-                            'tests/rustdoc-json',
-                            'tests/rustdoc-ui/doc-test-rustdoc-feature.rs',
-                            'tests/rustdoc-ui/no-run-flag.rs',
                             'tests/ui-fulldeps/',
-                            'tests/ui/numbers-arithmetic/u128.rs'
+                            'tests/ui/process/nofile-limit.rs',
+                            'tidyselftest'
                         ]
 
         exclude_fail_tests = " ".join([" --exclude " + item for item in exclude_list])
         # Add exclude_fail_tests with other test arguments
-        testargs =  exclude_fail_tests + " --doc --no-fail-fast --bless"
+        testargs =  exclude_fail_tests + " --no-fail-fast --bless"
 
         # wrap the execution with a qemu instance.
         # Tests are run with 512 tasks in parallel to execute all tests very quickly

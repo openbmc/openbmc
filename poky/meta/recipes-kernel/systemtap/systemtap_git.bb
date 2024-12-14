@@ -17,6 +17,7 @@ EXTRA_OECONF += "--with-libelf=${STAGING_DIR_TARGET} --without-rpm \
             --without-nss --without-avahi --without-dyninst \
             --disable-server --disable-grapher --enable-prologues \
             --with-python3 --without-python2-probes \
+            --with-extra-version="oe" \
             ac_cv_prog_have_javac=no \
             ac_cv_prog_have_jar=no "
 

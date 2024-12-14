@@ -15,7 +15,7 @@ oe_soinstall() {
 	        ;;
 	esac
 	install -m 755 $1 $2/$libname
-	sonamelink=`${READELF} -d $1 |grep 'Library soname:' |sed -e 's/.*\[\(.*\)\].*/\1/'`
+	sonamelink=`${OBJDUMP} -p $1 | grep SONAME | awk '{print $2}'`
 	if [ -z $sonamelink ]; then
 		bbfatal "oe_soinstall: $libname is missing ELF tag 'SONAME'."
 	fi
@@ -147,7 +147,7 @@ oe_libinstall() {
 		# special case hack for non-libtool .so.#.#.# links
 		baselibfile=`basename "$libfile"`
 		if (echo $baselibfile | grep -qE '^lib.*\.so\.[0-9.]*$'); then
-			sonamelink=`${READELF} -d $libfile |grep 'Library soname:' |sed -e 's/.*\[\(.*\)\].*/\1/'`
+			sonamelink=`${OBJDUMP} -p $libfile | grep SONAME | awk '{print $2}'`
 			solink=`echo $baselibfile | sed -e 's/\.so\..*/.so/'`
 			if [ -n "$sonamelink" -a x"$baselibfile" != x"$sonamelink" ]; then
 				__runcmd ln -sf $baselibfile $destpath/$sonamelink

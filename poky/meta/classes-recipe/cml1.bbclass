@@ -93,10 +93,9 @@ python do_diffconfig() {
 
     if isdiff:
         statement = 'diff --unchanged-line-format= --old-line-format= --new-line-format="%L" ' + configorig + ' ' + config + '>' + fragment
-        subprocess.call(statement, shell=True)
         # No need to check the exit code as we know it's going to be
         # non-zero, but that's what we expect.
-        shutil.copy(configorig, config)
+        subprocess.call(statement, shell=True)
 
         bb.plain("Config fragment has been dumped into:\n %s" % fragment)
     else:
@@ -113,3 +112,10 @@ do_showconfig() {
 }
 do_showconfig[nostamp] = "1"
 addtask showconfig after do_configure
+
+do_savedefconfig() {
+	bbplain "Saving defconfig to:\n${B}/defconfig"
+	oe_runmake -C ${B} savedefconfig
+}
+do_savedefconfig[nostamp] = "1"
+addtask savedefconfig after do_configure

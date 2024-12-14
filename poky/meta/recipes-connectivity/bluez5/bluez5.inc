@@ -18,6 +18,14 @@ PACKAGECONFIG ??= "obex-profiles \
     ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
     a2dp-profiles \
     avrcp-profiles \
+    bap-profiles \
+    bass-profiles \
+    mcp-profiles \
+    ccp-profiles \
+    vcp-profiles \
+    micp-profiles \
+    csip-profiles \
+    asha-profiles \
     network-profiles \
     hid-profiles \
     hog-profiles \
@@ -39,6 +47,14 @@ PACKAGECONFIG[network-profiles] = "--enable-network,--disable-network"
 PACKAGECONFIG[hid-profiles] = "--enable-hid,--disable-hid"
 PACKAGECONFIG[hog-profiles] = "--enable-hog,--disable-hog"
 PACKAGECONFIG[health-profiles] = "--enable-health,--disable-health"
+PACKAGECONFIG[bap-profiles] = "--enable-bap,--disable-bap"
+PACKAGECONFIG[bass-profiles] = "--enable-bass,--disable-bass"
+PACKAGECONFIG[mcp-profiles] = "--enable-mcp,--disable-mcp"
+PACKAGECONFIG[ccp-profiles] = "--enable-ccp,--disable-ccp"
+PACKAGECONFIG[vcp-profiles] = "--enable-vcp,--disable-vcp"
+PACKAGECONFIG[micp-profiles] = "--enable-micp,--disable-micp"
+PACKAGECONFIG[csip-profiles] = "--enable-csip,--disable-csip"
+PACKAGECONFIG[asha-profiles] = "--enable-asha,--disable-asha"
 PACKAGECONFIG[sixaxis] = "--enable-sixaxis,--disable-sixaxis"
 PACKAGECONFIG[tools] = "--enable-tools,--disable-tools"
 PACKAGECONFIG[threads] = "--enable-threads,--disable-threads"
@@ -51,10 +67,9 @@ PACKAGECONFIG[manpages] = "--enable-manpages,--disable-manpages,python3-docutils
 SRC_URI = "${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
            file://init \
            file://run-ptest \
-           ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'file://0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch', d)} \
            file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
            file://0001-test-gatt-Fix-hung-issue.patch \
-           file://0004-src-shared-util.c-include-linux-limits.h.patch \
+           file://0001-gdbus-define-MAX_INPUT-for-musl.patch \
            "
 S = "${WORKDIR}/bluez-${PV}"
 
@@ -87,18 +102,19 @@ do_install:append() {
 	install -d ${D}${INIT_D_DIR}
 	install -m 0755 ${UNPACKDIR}/init ${D}${INIT_D_DIR}/bluetooth
 
-	if [ -f ${D}/${sysconfdir}/init.d/bluetooth ]; then
-		sed -i -e 's#@LIBEXECDIR@#${libexecdir}#g' ${D}/${sysconfdir}/init.d/bluetooth
+	if [ -f ${D}${sysconfdir}/init.d/bluetooth ]; then
+		sed -i -e 's#@LIBEXECDIR@#${libexecdir}#g' ${D}${sysconfdir}/init.d/bluetooth
 	fi
 
 	# Install desired tools that upstream leaves in build area
 	for f in ${NOINST_TOOLS} ; do
-		install -m 755 ${B}/$f ${D}/${bindir}
+		install -m 755 ${B}/$f ${D}${bindir}
 	done
 
-	# Patch python tools to use Python 3; they should be source compatible, but
-	# still refer to Python 2 in the shebang
-	sed -i -e '1s,#!.*python.*,#!${bindir}/python3,' ${D}${libdir}/bluez/test/*
+	# Fix the /etc/bluetooth directory permissions when systemd is disabled
+	if ${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'false', 'true', d)}; then
+		chmod 0755 ${D}${sysconfdir}/bluetooth
+	fi
 }
 
 PACKAGES =+ "${PN}-testtools ${PN}-obex ${PN}-noinst-tools"

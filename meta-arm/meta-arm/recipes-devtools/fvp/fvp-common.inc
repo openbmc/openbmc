@@ -32,7 +32,7 @@ def get_real_pv(d):
 def get_fm_short_pv_url(d):
     # FVP versions are like 11.12_43
     pv = d.getVar("PV")
-    return "FM_%s_%s" % tuple(pv.split("."))[:2]
+    return "FM-%s.%s" % tuple(pv.split("."))[:2]
 
 
 # If PV is 1.2.3, VERSION=1.2, BUILD=3, PV_URL=1.2_3.

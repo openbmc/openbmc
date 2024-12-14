@@ -1,9 +1,9 @@
 SUMMARY = "Expression parser"
-HOMEPAGE = "https://github.com/ArashPartow/exprtk"
+HOMEPAGE = "https://www.partow.net/programming/exprtk/index.html"
 SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
-SRCREV = "f46bffcd6966d38a09023fb37ba9335214c9b959"
+SRCREV = "a4b17d543f072d2e3ba564e4bc5c3a0d2b05c338"
 
 SRC_URI = "git://github.com/ArashPartow/exprtk.git;branch=release;protocol=https"
 

@@ -67,7 +67,7 @@ def git_commit_data(repo, data_dir, branch, message, exclude, notes, log):
 
         # Remove files that are excluded
         if exclude:
-            repo.run_cmd(['rm', '--cached'] + [f for f in exclude], env_update)
+            repo.run_cmd(['rm', '--cached', '--ignore-unmatch'] + [f for f in exclude], env_update)
 
         tree = repo.run_cmd('write-tree', env_update)
 
@@ -146,7 +146,7 @@ def expand_tag_strings(repo, name_pattern, msg_subj_pattern, msg_body_pattern,
         keyws['tag_number'] = '{tag_number}'
         tag_re = format_str(name_pattern, keyws)
         # Replace parentheses for proper regex matching
-        tag_re = tag_re.replace('(', '\(').replace(')', '\)') + '$'
+        tag_re = tag_re.replace('(', r'\(').replace(')', r'\)') + '$'
         # Inject regex group pattern for 'tag_number'
         tag_re = tag_re.format(tag_number='(?P<tag_number>[0-9]{1,5})')
 
@@ -201,6 +201,8 @@ def gitarchive(data_dir, git_dir, no_create, bare, commit_msg_subject, commit_ms
             cmd.extend([push, branch_name] + notes_refs)
         log.info("Pushing data to remote")
         data_repo.run_cmd(cmd)
+
+    return tag_name
 
 # Container class for tester revisions
 TestedRev = namedtuple('TestedRev', 'commit commit_number tags')

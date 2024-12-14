@@ -9,18 +9,17 @@ do_listtasks[nostamp] = "1"
 python do_listtasks() {
     taskdescs = {}
     maxlen = 0
-    for e in d.keys():
-        if d.getVarFlag(e, 'task'):
-            maxlen = max(maxlen, len(e))
-            if e.endswith('_setscene'):
-                desc = "%s (setscene version)" % (d.getVarFlag(e[:-9], 'doc') or '')
-            else:
-                desc = d.getVarFlag(e, 'doc') or ''
-            taskdescs[e] = desc
+    for t in bb.build.listtasks(d):
+        maxlen = max(maxlen, len(t))
 
-    tasks = sorted(taskdescs.keys())
-    for taskname in tasks:
-        bb.plain("%s  %s" % (taskname.ljust(maxlen), taskdescs[taskname]))
+        if t.endswith('_setscene'):
+            desc = "%s (setscene version)" % (d.getVarFlag(t[:-9], 'doc') or '')
+        else:
+            desc = d.getVarFlag(t, 'doc') or ''
+        taskdescs[t] = desc
+
+    for task, doc in sorted(taskdescs.items()):
+        bb.plain("%s  %s" % (task.ljust(maxlen), doc))
 }
 
 CLEANFUNCS ?= ""

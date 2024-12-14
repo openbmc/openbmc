@@ -88,7 +88,7 @@ CACHED_CONFIGUREVARS += "ac_cv_path_PERL='/usr/bin/env perl'"
 # to -O2 but uses -O0 for some specific test apps etc. Passing our own flags
 # (via CFLAGS) means we interfere with that. Only pass DEBUG_FLAGS to it
 # which fixes build path issue in DWARF.
-SELECTED_OPTIMIZATION = "${DEBUG_FLAGS}"
+SELECTED_OPTIMIZATION = "${DEBUG_LEVELFLAG}"
 
 # Split out various helper scripts to separate packages to avoid the
 # main package depending on perl and python.

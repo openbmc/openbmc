@@ -1,4 +1,4 @@
-From d39779afc72d34f87f052097592008cc38e20615 Mon Sep 17 00:00:00 2001
+From 51694f72b7326d36e51214eb2af0be1d6831c7a4 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Sun, 24 Jul 2022 07:07:29 -0700
 Subject: [PATCH] Avoid hardcoded build time paths in the output binaries
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/support/Makefile b/support/Makefile
-index 362a51f882..56d2b37058 100644
+index aa57207bdc..3c66cec6c8 100644
 --- a/support/Makefile
 +++ b/support/Makefile
-@@ -228,9 +228,9 @@ libsupport-inhibit-o += .o
+@@ -229,9 +229,9 @@ libsupport-inhibit-o += .o
  endif
  
  CFLAGS-support_paths.c = \

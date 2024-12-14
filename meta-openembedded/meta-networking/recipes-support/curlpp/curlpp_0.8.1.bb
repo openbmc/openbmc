@@ -8,7 +8,8 @@ DEPENDS = "curl"
 DEPENDS:class-native = "curl-native"
 
 SRC_URI = "git://github.com/jpbarrette/curlpp.git;branch=master;protocol=https \
-           file://0001-curlpp-config.in-Remove-references-to-absolute-build.patch"
+           file://0001-curlpp-config.in-Remove-references-to-absolute-build.patch \
+           file://0002-fix-invalid-conversion-from-int-to-CURLoption.patch"
 
 SRCREV = "592552a165cc569dac7674cb7fc9de3dc829906f"
 

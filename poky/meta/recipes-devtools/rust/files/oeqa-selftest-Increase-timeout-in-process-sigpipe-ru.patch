@@ -1,0 +1,31 @@
+From b4524278985f517b0785b6f64a21380dcf1ff096 Mon Sep 17 00:00:00 2001
+From: Peter Tatrai <peter.tatrai.ext@siemens.com>
+Date: Mon, 4 Nov 2024 13:58:16 +0100
+Subject: [PATCH] oeqa/selftest: Increase timeout in process-sigpipe rust test
+
+This patch increases the timeout for the process-sigpipe rust test, which
+occasionally fails when the server is under heavy load. Increasing the timeout
+reduces the likelihood of false negatives under load.
+
+Fixes [YOCTO #15625]
+
+Upstream-Status: Inappropriate [OE testing specific]
+
+Signed-off-by: Peter Tatrai <peter.tatrai.ext@siemens.com>
+---
+ tests/ui/process/process-sigpipe.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/ui/process/process-sigpipe.rs b/tests/ui/process/process-sigpipe.rs
+index 11f363d62..c12d66016 100644
+--- a/tests/ui/process/process-sigpipe.rs
++++ b/tests/ui/process/process-sigpipe.rs
+@@ -23,7 +23,7 @@ use std::thread;
+ fn main() {
+     // Just in case `yes` doesn't check for EPIPE...
+     thread::spawn(|| {
+-        thread::sleep_ms(5000);
++        thread::sleep_ms(10000);
+         process::exit(1);
+     });
+     let output = process::Command::new("sh")

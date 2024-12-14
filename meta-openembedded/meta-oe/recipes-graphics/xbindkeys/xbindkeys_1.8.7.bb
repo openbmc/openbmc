@@ -12,7 +12,6 @@ inherit features_check autotools
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "http://www.nongnu.org/xbindkeys/xbindkeys-${PV}.tar.gz"
-SRC_URI[md5sum] = "b5e1a9668ba13ff8673836d1d965d951"
 SRC_URI[sha256sum] = "a29b86a8ec91d4abc83b420e547da27470847d0efe808aa6e75147aa0adb82f2"
 
 EXTRA_OECONF = "--disable-guile"

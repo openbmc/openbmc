@@ -483,7 +483,7 @@ typical usage of ``git send-email``::
    git send-email --to <mailing-list-address> *.patch
 
 Then, review each subject line and list of recipients carefully, and then
-and then allow the command to send each message.
+allow the command to send each message.
 
 You will see that ``git send-email`` will automatically copy the people listed
 in any commit tags such as ``Signed-off-by`` or ``Reported-by``.

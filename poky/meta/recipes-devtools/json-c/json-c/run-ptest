@@ -3,6 +3,8 @@
 # This script is used to run json-c test suites
 cd tests
 
+export USE_VALGRIND=0
+
 ret_val=0
 for i in test*.test; do
     # test_basic is not an own testcase, just

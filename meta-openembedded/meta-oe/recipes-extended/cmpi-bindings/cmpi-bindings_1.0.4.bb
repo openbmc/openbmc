@@ -21,7 +21,7 @@ inherit cmake python3targetconfig
 EXTRA_OECMAKE = "-DLIB='${baselib}' \
                  -DPYTHON_INCLUDE_PATH=${STAGING_INCDIR}/python${PYTHON_BASEVERSION} \
                  -DPYTHON_ABI=${PYTHON_ABI} \
-                 -DBUILD_PYTHON3=YES \
+                 -DBUILD_PYTHON3=NO \
                  -DPython3_SITE_DIR=${PYTHON_SITEPACKAGES_DIR} \
                  "
 
@@ -33,3 +33,7 @@ FILES:${PN} =+"${libdir}/cmpi/libpy3CmpiProvider.so ${PYTHON_SITEPACKAGES_DIR}/*
 FILES:${PN}-dbg =+ "${libdir}/cmpi/.debug/libpyCmpiProvider.so"
 
 BBCLASSEXTEND = "native"
+
+# http://errors.yoctoproject.org/Errors/Details/766910/
+# cmpi-bindings/1.0.4/git/swig/python/../../src/target_python.c:168:21: error: passing argument 1 of 'Py_SetProgramName' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

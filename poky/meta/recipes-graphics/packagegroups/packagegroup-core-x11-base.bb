@@ -8,8 +8,8 @@ REQUIRED_DISTRO_FEATURES = "x11"
 RDEPENDS:${PN} = "\
     packagegroup-core-x11-xserver \
     packagegroup-core-x11-utils \
-    matchbox-terminal \
     matchbox-wm \
     mini-x-session \
+    virtual-x-terminal-emulator \
     liberation-fonts \
     "

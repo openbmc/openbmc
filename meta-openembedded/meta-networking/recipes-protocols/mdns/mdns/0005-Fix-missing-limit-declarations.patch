@@ -1,0 +1,49 @@
+From cf216a6872139e435d5712787359b03022b51d2b Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alexk@zuma.ai>
+Date: Sat, 26 Oct 2024 13:26:09 +0000
+Subject: [PATCH] Fix missing `limit` declarations
+
+`put_attribute_tlvs` needs a limit setting which is missing, add it in.
+
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ mDNSShared/dnssd_clientstub.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/mDNSShared/dnssd_clientstub.c b/mDNSShared/dnssd_clientstub.c
+index fc93d162446a..a6cf45fa9856 100644
+--- a/mDNSShared/dnssd_clientstub.c
++++ b/mDNSShared/dnssd_clientstub.c
+@@ -2022,6 +2022,7 @@ DNSServiceErrorType DNSServiceRegisterInternal
+     ipc_msg_hdr *hdr;
+     DNSServiceErrorType err;
+     union { uint16_t s; u_char b[2]; } port = { portInNetworkByteOrder };
++    const uint8_t *limit;
+     (void)attr;
+ 
+     if (!sdRef || !regtype) return kDNSServiceErr_BadParam;
+@@ -2054,6 +2055,7 @@ DNSServiceErrorType DNSServiceRegisterInternal
+     if (!hdr) { DNSServiceRefDeallocate(*sdRef); *sdRef = NULL; return kDNSServiceErr_NoMemory; }
+     if (!callBack) hdr->ipc_flags |= IPC_FLAGS_NOREPLY;
+ 
++    limit = ptr + len;
+     put_flags(flags, &ptr);
+     put_uint32(interfaceIndex, &ptr);
+     put_string(name, &ptr);
+@@ -2334,6 +2336,7 @@ DNSServiceErrorType DNSServiceRegisterRecordInternal
+     ipc_msg_hdr *hdr = NULL;
+     DNSRecordRef rref = NULL;
+     DNSRecord **p;
++    const uint8_t *limit;
+     (void)attr;
+ 
+     // Verify that only one of the following flags is set.
+@@ -2389,6 +2392,7 @@ DNSServiceErrorType DNSServiceRegisterRecordInternal
+     hdr = create_hdr(reg_record_request, &len, &ptr, !(flags & kDNSServiceFlagsQueueRequest), sdRef);
+     if (!hdr) return kDNSServiceErr_NoMemory;
+ 
++    limit = ptr + len;
+     put_flags(flags, &ptr);
+     put_uint32(interfaceIndex, &ptr);
+     put_string(fullname, &ptr);

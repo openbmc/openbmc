@@ -1,4 +1,4 @@
-From eb158c97f19d473d01befe96359a7f93ae834517 Mon Sep 17 00:00:00 2001
+From 50e6b3a0fc7c083e6514a55ac93e5591aaeb787d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 19 Nov 2015 00:10:03 +0000
 Subject: [PATCH] Fix build on musl use realpath() API its available on all
@@ -10,7 +10,6 @@ However for Linux it should always work
 Upstream-Status: Inappropriate [Linux specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  src/killall5.c   | 4 ++--
  src/mountpoint.c | 1 +
@@ -18,10 +17,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/src/killall5.c b/src/killall5.c
-index a664954..9798423 100644
+index 34d656b..bc19d7f 100644
 --- a/src/killall5.c
 +++ b/src/killall5.c
-@@ -977,9 +977,9 @@ int matches(PROC *o, PROC *p)
+@@ -910,9 +910,9 @@ int matches(PROC *o, PROC *p)
  	char *oargv1, *pargv1;
  	if ((o->argv0 && p->argv0 && !strcmp(o->argv0,p->argv0))) {
  		if (o->argv1 && p->argv1) {
@@ -34,7 +33,7 @@ index a664954..9798423 100644
  			if (! strcmp(oargv1, pargv1)) {
  				ret = 1;
 diff --git a/src/mountpoint.c b/src/mountpoint.c
-index b24335e..5f20522 100644
+index 184b1f6..c55b0df 100644
 --- a/src/mountpoint.c
 +++ b/src/mountpoint.c
 @@ -23,6 +23,7 @@
@@ -46,7 +45,7 @@ index b24335e..5f20522 100644
  #include <unistd.h>
  #include <stdlib.h>
 diff --git a/src/wall.c b/src/wall.c
-index d3a2c70..00826e9 100644
+index e527613..1d363ca 100644
 --- a/src/wall.c
 +++ b/src/wall.c
 @@ -30,6 +30,7 @@
@@ -57,3 +56,6 @@ index d3a2c70..00826e9 100644
  #include "init.h"
  
  
+-- 
+2.25.1
+

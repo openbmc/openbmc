@@ -3,13 +3,18 @@ HOMEPAGE = "https://github.com/betamaxpy/betamax"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=61c15f0c146c5fb1a8ce8ba2f310d73c"
 
+PV .= "+git"
+
+SRCREV = "8f3d284103676a43d1481b5cffae96f3a601e0be"
 SRC_URI += " \
         file://run-ptest \
+        git://github.com/betamaxpy/betamax;protocol=https;branch=main \
         file://0001-Drop-ptests-fixtures-and-recorde_modes.patch \
 "
-SRC_URI[sha256sum] = "82316e1679bc6879e3c83318d016b54b7c9225ff08c4462de4813e22038d5f94"
 
-inherit pypi setuptools3 ptest
+S = "${WORKDIR}/git"
+
+inherit setuptools3 ptest
 
 RDEPENDS:${PN} += " \
     python3-requests \

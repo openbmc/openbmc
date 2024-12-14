@@ -1,0 +1,37 @@
+From d46b8720a6bccb345f6bdd7ee2f5c357e7eb227b Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Mon, 12 Aug 2024 11:27:36 -0400
+Subject: [PATCH] pyproject.toml: don't pin dependency versions
+
+Pandas will fail to build if the exact versions aren't found, but newer
+ones actually work. Since newer versions of pandas are adjusting the
+requires section of pyproject toml further, just patch it for us.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ pyproject.toml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index db9f055799..5158d60f59 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -2,10 +2,10 @@
+ # Minimum requirements for the build system to execute.
+ # See https://github.com/scipy/scipy/pull/12940 for the AIX issue.
+ requires = [
+-    "meson-python==0.13.1",
+-    "meson==1.2.1",
++    "meson-python>=0.13.1",
++    "meson>=1.2.1",
+     "wheel",
+-    "Cython==3.0.5",  # Note: sync with setup.py, environment.yml and asv.conf.json
++    "Cython>=3.0.5",  # Note: sync with setup.py, environment.yml and asv.conf.json
+     # Force numpy higher than 2.0rc1, so that built wheels are compatible
+     # with both numpy 1 and 2
+     "numpy>=2.0.0rc1",
+-- 
+2.39.2
+

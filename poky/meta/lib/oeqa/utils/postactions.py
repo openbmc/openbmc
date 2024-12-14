@@ -7,23 +7,20 @@
 # Run a set of actions after tests. The runner provides internal data
 # dictionary as well as test context to any action to run.
 
-from oeqa.utils import get_json_result_dir
-
-def create_artifacts_directory(d, tc):
-    import shutil
-
-    local_artifacts_dir = os.path.join(get_json_result_dir(d), "artifacts")
-    if os.path.isdir(local_artifacts_dir):
-        shutil.rmtree(local_artifacts_dir)
-
-    os.makedirs(local_artifacts_dir)
+import datetime
+import io
+import os
+import stat
+import subprocess
+import tempfile
+from oeqa.utils import get_artefact_dir
 
 ##################################################################
 # Host/target statistics
 ##################################################################
 
-def get_target_disk_usage(d, tc):
-    output_file = os.path.join(get_json_result_dir(d), "artifacts", "target_disk_usage.txt")
+def get_target_disk_usage(d, tc, artifacts_list, outputdir):
+    output_file = os.path.join(outputdir, "target_disk_usage.txt")
     try:
         (status, output) = tc.target.run('df -h')
         with open(output_file, 'w') as f:
@@ -32,10 +29,10 @@ def get_target_disk_usage(d, tc):
     except Exception as e:
         bb.warn(f"Can not get target disk usage: {e}")
 
-def get_host_disk_usage(d, tc):
+def get_host_disk_usage(d, tc, artifacts_list, outputdir):
     import subprocess
 
-    output_file = os.path.join(get_json_result_dir(d), "artifacts", "host_disk_usage.txt")
+    output_file = os.path.join(outputdir, "host_disk_usage.txt")
     try:
         with open(output_file, 'w') as f:
             output = subprocess.run(['df', '-hl'], check=True, text=True, stdout=f, env={})
@@ -61,25 +58,22 @@ def get_artifacts_list(target, raw_list):
 
     return result
 
-def retrieve_test_artifacts(target, artifacts_list, target_dir):
-    local_artifacts_dir = os.path.join(target_dir, "artifacts")
-    for artifact_path in artifacts_list:
-        if not os.path.isabs(artifact_path):
-            bb.warn(f"{artifact_path} is not an absolute path")
-            continue
-        try:
-            dest_dir = os.path.join(local_artifacts_dir, os.path.dirname(artifact_path[1:]))
-            os.makedirs(dest_dir, exist_ok=True)
-            target.copyFrom(artifact_path, dest_dir)
-        except Exception as e:
-            bb.warn(f"Can not retrieve {artifact_path} from test target: {e}")
-
-def list_and_fetch_failed_tests_artifacts(d, tc):
-    artifacts_list = get_artifacts_list(tc.target, d.getVar("TESTIMAGE_FAILED_QA_ARTIFACTS"))
+def list_and_fetch_failed_tests_artifacts(d, tc, artifacts_list, outputdir):
+    artifacts_list = get_artifacts_list(tc.target, artifacts_list)
     if not artifacts_list:
         bb.warn("Could not load artifacts list, skip artifacts retrieval")
-    else:
-        retrieve_test_artifacts(tc.target, artifacts_list, get_json_result_dir(d))
+        return
+    try:
+        # We need gnu tar for sparse files, not busybox
+        cmd = "tar --sparse -zcf - " + " ".join(artifacts_list)
+        (status, output) = tc.target.run(cmd, raw = True)
+        if status != 0 or not output:
+            raise Exception("Error while fetching compressed artifacts")
+        archive_name = os.path.join(outputdir, "tests_artifacts.tar.gz")
+        with open(archive_name, "wb") as f:
+            f.write(output)
+    except Exception as e:
+        bb.warn(f"Can not retrieve artifacts from test target: {e}")
 
 
 ##################################################################
@@ -87,12 +81,22 @@ def list_and_fetch_failed_tests_artifacts(d, tc):
 ##################################################################
 
 def run_failed_tests_post_actions(d, tc):
+    artifacts = d.getVar("TESTIMAGE_FAILED_QA_ARTIFACTS")
+    # Allow all the code to be disabled by having no artifacts set, e.g. for systems with no ssh support
+    if not artifacts:
+        return
+
+    outputdir = get_artefact_dir(d)
+    os.makedirs(outputdir, exist_ok=True)
+    datestr = datetime.datetime.now().strftime('%Y%m%d')
+    outputdir = tempfile.mkdtemp(prefix='oeqa-target-artefacts-%s-' % datestr, dir=outputdir)
+    os.chmod(outputdir, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+
     post_actions=[
-        create_artifacts_directory,
         list_and_fetch_failed_tests_artifacts,
         get_target_disk_usage,
         get_host_disk_usage
     ]
 
     for action in post_actions:
-        action(d, tc)
+        action(d, tc, artifacts, outputdir)

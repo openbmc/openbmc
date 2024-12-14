@@ -17,13 +17,13 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  1 file changed, 4 insertions(+), 86 deletions(-)
 
 diff --git a/src/libgcrypt.m4 b/src/libgcrypt.m4
-index cd4249e..e53a36f 100644
+index 353df81b6d..b195e22894 100644
 --- a/src/libgcrypt.m4
 +++ b/src/libgcrypt.m4
-@@ -29,41 +29,6 @@ dnl is added to the gpg_config_script_warn variable.
- dnl
+@@ -116,41 +116,6 @@ dnl
  AC_DEFUN([AM_PATH_LIBGCRYPT],
- [ AC_REQUIRE([AC_CANONICAL_HOST])
+ [ AC_REQUIRE([AC_CANONICAL_HOST])dnl
+   AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
 -  AC_ARG_WITH(libgcrypt-prefix,
 -            AS_HELP_STRING([--with-libgcrypt-prefix=PFX],
 -                           [prefix where LIBGCRYPT is installed (optional)]),
@@ -62,7 +62,7 @@ index cd4249e..e53a36f 100644
  
    tmp=ifelse([$1], ,1:1.2.0,$1)
    if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
-@@ -74,56 +39,13 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
+@@ -161,56 +126,13 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
       min_libgcrypt_version="$tmp"
    fi
  
@@ -122,7 +122,7 @@ index cd4249e..e53a36f 100644
          if test "$tmp" -gt 0 ; then
             AC_MSG_CHECKING([LIBGCRYPT API version])
             if test "$req_libgcrypt_api" -eq "$tmp" ; then
-@@ -136,11 +58,9 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
+@@ -223,11 +145,9 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
       fi
    fi
    if test $ok = yes; then
@@ -135,7 +135,7 @@ index cd4249e..e53a36f 100644
      else
        libgcrypt_config_host=`$LIBGCRYPT_CONFIG --variable=host 2>/dev/null || echo none`
      fi
-@@ -158,8 +78,6 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
+@@ -245,8 +165,6 @@ AC_DEFUN([AM_PATH_LIBGCRYPT],
        fi
      fi
    else
@@ -144,3 +144,6 @@ index cd4249e..e53a36f 100644
      ifelse([$3], , :, [$3])
    fi
    AC_SUBST(LIBGCRYPT_CFLAGS)
+-- 
+2.34.1
+

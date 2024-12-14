@@ -1,4 +1,4 @@
-From 50cea8fd3c07ab27da6edce865a49339f16f3b57 Mon Sep 17 00:00:00 2001
+From 468850b5d39435025633df14dda3d48651d9ec29 Mon Sep 17 00:00:00 2001
 From: Naveen Saini <naveen.kumar.saini@intel.com>
 Date: Tue, 18 Jun 2019 17:10:15 +0800
 Subject: [PATCH] Makefile: fix multilib build failure
@@ -6,20 +6,26 @@ Subject: [PATCH] Makefile: fix multilib build failure
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+
+Refresh to 5.13
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- Makefile | 50 +++++++++++++++++++++++++++-----------------------
- 1 file changed, 27 insertions(+), 23 deletions(-)
+ Makefile | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 8455415..4aa0786 100644
+index 337c53e..58e3779 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1,30 +1,34 @@
- # SPDX-License-Identifier: GPL-2.0
- PREFIX		?= /usr
- DESTDIR		?=
-+BASELIB		?=
+@@ -25,6 +25,7 @@ BINDIR ?=	/usr/bin
+ MANDIR ?=	/usr/share/man
+ SHRDIR ?=	/usr/share/pm-graph
+ LIBDIR ?=	/usr/lib
++BASELIB	?=
  
+ # Toolchain: what tools do we use, and what options do they need:
+ INSTALL = /usr/bin/install
+@@ -33,6 +34,9 @@ INSTALL_DATA  = ${INSTALL} -m 644
  all:
  	@echo "Nothing to build"
  
@@ -27,63 +33,34 @@ index 8455415..4aa0786 100644
 +	@echo "Nothing to clean"
 +
  install : uninstall
--	install -d  $(DESTDIR)$(PREFIX)/lib/pm-graph
--	install sleepgraph.py $(DESTDIR)$(PREFIX)/lib/pm-graph
--	install bootgraph.py $(DESTDIR)$(PREFIX)/lib/pm-graph
--	install -d  $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/cgskip.txt $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/freeze-callgraph.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/freeze.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/freeze-dev.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/standby-callgraph.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/standby.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/standby-dev.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/suspend-callgraph.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/suspend.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/suspend-dev.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
--	install -m 644 config/suspend-x2-proc.cfg $(DESTDIR)$(PREFIX)/lib/pm-graph/config
-+	install -d  $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph
-+	install sleepgraph.py $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph
-+	install bootgraph.py $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph
-+	install -d  $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/cgskip.txt $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/freeze-callgraph.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/freeze.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/freeze-dev.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/standby-callgraph.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/standby.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/standby-dev.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/suspend-callgraph.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/suspend.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/suspend-dev.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
-+	install -m 644 config/suspend-x2-proc.cfg $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config
+ 	$(INSTALL) -d  $(DESTDIR)$(LIBDIR)/pm-graph
+ 	$(INSTALL) sleepgraph.py $(DESTDIR)$(LIBDIR)/pm-graph
+@@ -54,10 +58,10 @@ install : uninstall
+ 	$(INSTALL) -d  $(DESTDIR)$(SHRDIR)
  
- 	install -d  $(DESTDIR)$(PREFIX)/bin
--	ln -s ../lib/pm-graph/bootgraph.py $(DESTDIR)$(PREFIX)/bin/bootgraph
--	ln -s ../lib/pm-graph/sleepgraph.py $(DESTDIR)$(PREFIX)/bin/sleepgraph
-+	ln -s ../$(BASELIB)/pm-graph/bootgraph.py $(DESTDIR)$(PREFIX)/bin/bootgraph
-+	ln -s ../$(BASELIB)/pm-graph/sleepgraph.py $(DESTDIR)$(PREFIX)/bin/sleepgraph
+ 	$(INSTALL) -d  $(DESTDIR)$(BINDIR)
+-	ln -s ../lib/pm-graph/bootgraph.py $(DESTDIR)$(BINDIR)/bootgraph
+-	ln -s ../lib/pm-graph/sleepgraph.py $(DESTDIR)$(BINDIR)/sleepgraph
+-	ln -s ../lib/pm-graph/netfix.py $(DESTDIR)$(BINDIR)/netfix
+-	$(DESTDIR)$(BINDIR)/netfix defconfig > $(DESTDIR)$(SHRDIR)/netfix.cfg
++	ln -s ../$(BASELIB)/pm-graph/bootgraph.py $(DESTDIR)$(BINDIR)/bootgraph
++	ln -s ../$(BASELIB)/pm-graph/sleepgraph.py $(DESTDIR)$(BINDIR)/sleepgraph
++	ln -s ../$(BASELIB)/pm-graph/netfix.py $(DESTDIR)$(BINDIR)/netfix
++	#$(DESTDIR)$(BINDIR)/netfix defconfig > $(DESTDIR)$(SHRDIR)/netfix.cfg
  
- 	install -d  $(DESTDIR)$(PREFIX)/share/man/man8
- 	install bootgraph.8 $(DESTDIR)$(PREFIX)/share/man/man8
-@@ -37,11 +41,11 @@ uninstall :
- 	rm -f $(DESTDIR)$(PREFIX)/bin/bootgraph
- 	rm -f $(DESTDIR)$(PREFIX)/bin/sleepgraph
+ 	$(INSTALL) -d  $(DESTDIR)$(MANDIR)/man8
+ 	$(INSTALL) bootgraph.8 $(DESTDIR)$(MANDIR)/man8
+@@ -90,8 +94,8 @@ hwcheck-install :
+ 	rm -f $(DESTDIR)$(LIBDIR)/pm-graph/hwcheck.py
+ 	$(INSTALL) tools/hwcheck.py $(DESTDIR)$(LIBDIR)/pm-graph
+ 	$(INSTALL) -d  $(DESTDIR)$(BINDIR)
+-	ln -s ../lib/pm-graph/hwcheck.py $(DESTDIR)$(BINDIR)/hwcheck
+-	$(DESTDIR)$(BINDIR)/hwcheck cronon
++	ln -s ../$(BASELIB)/pm-graph/hwcheck.py $(DESTDIR)$(BINDIR)/hwcheck
++	#$(DESTDIR)$(BINDIR)/hwcheck cronon
  
--	rm -f $(DESTDIR)$(PREFIX)/lib/pm-graph/config/*
--	if [ -d $(DESTDIR)$(PREFIX)/lib/pm-graph/config ] ; then \
--		rmdir $(DESTDIR)$(PREFIX)/lib/pm-graph/config; \
-+	rm -f $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config/*
-+	if [ -d $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config ] ; then \
-+		rmdir $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/config; \
- 	fi;
--	rm -f $(DESTDIR)$(PREFIX)/lib/pm-graph/*
--	if [ -d $(DESTDIR)$(PREFIX)/lib/pm-graph ] ; then \
--		rmdir $(DESTDIR)$(PREFIX)/lib/pm-graph; \
-+	rm -f $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph/*
-+	if [ -d $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph ] ; then \
-+		rmdir $(DESTDIR)$(PREFIX)/$(BASELIB)/pm-graph; \
- 	fi;
+ hwcheck-uninstall :
+ 	if [ -e $(DESTDIR)$(BINDIR)/hwcheck ] ; then \
 -- 
-2.17.1
+2.25.1
 

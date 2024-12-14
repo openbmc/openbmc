@@ -1,0 +1,33 @@
+From e92554e57b4aae242cb0416025883ccc2c539d2a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 2 Jun 2021 13:34:35 +0800
+Subject: [PATCH] do not hardcode the full path of dpkg
+
+While calling debootstrap in sdk, if host does not install dpkg package,
+the full path calling will fail
+
+Do not hardcode the full path of dpkg, then then sdk's dpkg will be used.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ debootstrap | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/debootstrap b/debootstrap
+index 11a9465..17ab05a 100755
+--- a/debootstrap
++++ b/debootstrap
+@@ -551,7 +551,7 @@ fi
+ 
+ if in_path dpkg && \
+      dpkg --print-architecture >/dev/null 2>&1; then
+-	HOST_ARCH=$(/usr/bin/dpkg --print-architecture)
++	HOST_ARCH=$(dpkg --print-architecture)
+ elif in_path udpkg && \
+      udpkg --print-architecture >/dev/null 2>&1; then
+ 	HOST_ARCH=$(/usr/bin/udpkg --print-architecture)
+-- 
+2.25.1
+

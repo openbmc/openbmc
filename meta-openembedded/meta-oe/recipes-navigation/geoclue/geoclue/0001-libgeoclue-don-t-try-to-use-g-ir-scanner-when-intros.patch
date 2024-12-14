@@ -8,10 +8,10 @@ Subject: [PATCH] libgeoclue: don't try to use g-ir-scanner when introspection
   http://errors.yoctoproject.org/Errors/Details/702778/
   geoclue/2.7.0-r0/recipe-sysroot/usr/bin/g-ir-scanner-wrapper: line 5: g-ir-scanner: command not found
 
-Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
----
 Upstream-Status: Pending
 
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
  libgeoclue/meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

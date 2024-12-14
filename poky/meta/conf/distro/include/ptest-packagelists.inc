@@ -28,22 +28,22 @@ PTESTS_FAST = "\
     json-c \
     json-glib \
     libconvert-asn1-perl \
+    libexif \
     libgpg-error\
     libnl \
     libpcre \
     libssh2 \
-    libtimedate-perl \
     libtest-fatal-perl \
     libtest-needs-perl \
     libtest-warnings-perl \
+    libtimedate-perl \
     libtry-tiny-perl \
-    liburi-perl \
     libusb1 \
     libxml-namespacesupport-perl \
-    libxml-perl \
     libxml-parser-perl \
-    libxml-sax-perl \
+    libxml-perl \
     libxml-sax-base-perl \
+    libxml-sax-perl \
     libxml-simple-perl \
     libxml2 \
     libxmlb \
@@ -53,25 +53,29 @@ PTESTS_FAST = "\
     m4 \
     nettle \
     opkg \
-    pango \
     popt \
     python3-atomicwrites \
     python3-attrs \
     python3-bcrypt \
     python3-calver \
     python3-hypothesis \
+    python3-idna \
     python3-jinja2 \
     python3-jsonpointer \
+    python3-libarchive-c \
     python3-license-expression \
     python3-mako \
     python3-markupsafe \
     python3-more-itertools \
+    python3-packaging \
     python3-pluggy \
+    python3-pefile \
     python3-pyasn1 \
     python3-pytz \
     python3-pyyaml \
     python3-rpds-py \
     python3-trove-classifiers \
+    python3-uritools \
     python3-wcwidth \
     python3-webcolors \
     qemu \
@@ -81,7 +85,6 @@ PTESTS_FAST = "\
     wayland \
     xz \
     zlib \
-    libexif \
 "
 PTESTS_FAST:append:libc-glibc = " glibc-y2038-tests"
 PTESTS_PROBLEMS:remove:libc-glibc = "glibc-y2038-tests"
@@ -106,22 +109,24 @@ PTESTS_SLOW = "\
     libevent \
     libgcrypt \
     libmodule-build-perl \
+    libseccomp \
     lttng-tools \
+    lz4 \
     openssh \
     openssl \
     parted \
     perl \
-    python3-cryptography \
     python3 \
+    python3-cffi \
     python3-click \
+    python3-cryptography \
     python3-xmltodict \
     strace \
     tar \
     tcl \
+    tcl8 \
     util-linux \
     valgrind \
-    lz4 \
-    libseccomp \
 "
 
 # python3 ptests hang on qemuriscv64

@@ -1,0 +1,101 @@
+From d998b9f75c79aab68255dace641dd30db239eff6 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Tue, 15 Oct 2013 19:48:41 -0400
+Subject: [PATCH] fix file descriptor leaks reported by cppcheck
+
+Bug: https://bugzilla.redhat.com/785760
+
+Authored by Kamil Dudka <kdudka@redhat.com>.
+
+Upstream-Status: Backport [https://repo.or.cz/libtar.git/commit/abd0274e6b2f708e9eaa29414b07b3f542cec694]
+
+Signed-off-by: Katariina Lounento <katariina.lounento@vaisala.com>
+---
+ lib/append.c    | 14 +++++++++-----
+ lib/extract.c   |  4 ++++
+ libtar/libtar.c |  3 +++
+ 3 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/lib/append.c b/lib/append.c
+index e8bd89d..ff58532 100644
+--- a/lib/append.c
++++ b/lib/append.c
+@@ -216,6 +216,7 @@ tar_append_regfile(TAR *t, const char *realname)
+ 	int filefd;
+ 	int i, j;
+ 	size_t size;
++	int rv = -1;
+ 
+ 	filefd = open(realname, O_RDONLY);
+ 	if (filefd == -1)
+@@ -234,25 +235,28 @@ tar_append_regfile(TAR *t, const char *realname)
+ 		{
+ 			if (j != -1)
+ 				errno = EINVAL;
+-			return -1;
++			goto fail;
+ 		}
+ 		if (tar_block_write(t, &block) == -1)
+-			return -1;
++			goto fail;
+ 	}
+ 
+ 	if (i > 0)
+ 	{
+ 		j = read(filefd, &block, i);
+ 		if (j == -1)
+-			return -1;
++			goto fail;
+ 		memset(&(block[i]), 0, T_BLOCKSIZE - i);
+ 		if (tar_block_write(t, &block) == -1)
+-			return -1;
++			goto fail;
+ 	}
+ 
++	/* success! */
++	rv = 0;
++fail:
+ 	close(filefd);
+ 
+-	return 0;
++	return rv;
+ }
+ 
+ 
+diff --git a/lib/extract.c b/lib/extract.c
+index 36357e7..9fc6ad5 100644
+--- a/lib/extract.c
++++ b/lib/extract.c
+@@ -228,13 +228,17 @@ tar_extract_regfile(TAR *t, char *realname)
+ 		{
+ 			if (k != -1)
+ 				errno = EINVAL;
++			close(fdout);
+ 			return -1;
+ 		}
+ 
+ 		/* write block to output file */
+ 		if (write(fdout, buf,
+ 			  ((i > T_BLOCKSIZE) ? T_BLOCKSIZE : i)) == -1)
++		{
++			close(fdout);
+ 			return -1;
++		}
+ 	}
+ 
+ 	/* close output file */
+diff --git a/libtar/libtar.c b/libtar/libtar.c
+index 9fa92b2..bb5644c 100644
+--- a/libtar/libtar.c
++++ b/libtar/libtar.c
+@@ -83,7 +83,10 @@ gzopen_frontend(char *pathname, int oflags, int mode)
+ 		return -1;
+ 
+ 	if ((oflags & O_CREAT) && fchmod(fd, mode))
++	{
++		close(fd);
+ 		return -1;
++	}
+ 
+ 	gzf = gzdopen(fd, gzoflags);
+ 	if (!gzf)

@@ -1,4 +1,4 @@
-From b86e57b68363d108fe77c6fd588a275d2696cabe Mon Sep 17 00:00:00 2001
+From 304f55a3e2689154d829938d29e43d808ca6298a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 10 Jan 2018 14:43:20 +0800
 Subject: [PATCH] src/Makefile.am: improve reproducibility
@@ -44,10 +44,10 @@ Signed-off-by: Joe Slater <jslater@windriver.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 18ec622..38d252d 100644
+index 86be533..721a401 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -108,9 +108,13 @@ version.c:  $(wget_SOURCES) ../lib/libgnu.a
+@@ -126,9 +126,13 @@ version.c:  $(wget_SOURCES) ../lib/libgnu.a
  	echo '#include "version.h"' >> $@
  	echo 'const char *version_string = "@VERSION@";' >> $@
  	echo 'const char *compilation_string = "'$(COMPILE)'";' \

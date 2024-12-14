@@ -225,36 +225,36 @@ The following corrections have been made to the :term:`LICENSE` values set by re
 Security Fixes in 4.1
 ~~~~~~~~~~~~~~~~~~~~~
 
-- bind: :cve:`2022-1183`, :cve:`2022-2795`, :cve:`2022-2881`, :cve:`2022-2906`, :cve:`2022-3080`, :cve:`2022-38178`
-- binutils: :cve:`2019-1010204`, :cve:`2022-38126`, :cve:`2022-38127`, :cve:`2022-38128`, :cve:`2022-38533`
-- busybox: :cve:`2022-30065`
-- connman: :cve:`2022-32292`, :cve:`2022-32293`
-- cups: :cve:`2022-26691`
-- e2fsprogs: :cve:`2022-1304`
-- expat: :cve:`2022-40674`
-- freetype: :cve:`2022-27404`
-- glibc: :cve:`2022-39046`
-- gnupg: :cve:`2022-34903`
-- grub2: :cve:`2021-3695`, :cve:`2021-3696`, :cve:`2021-3697`, :cve:`2022-28733`, :cve:`2022-28734`, :cve:`2022-28735`
-- inetutils: :cve:`2022-39028`
-- libtirpc: :cve:`2021-46828`
-- libxml2: :cve:`2016-3709` (ignored)
-- libxslt: :cve:`2022-29824` (not applicable)
-- linux-yocto/5.15: :cve:`2022-28796`
-- logrotate: :cve:`2022-1348`
-- lua: :cve:`2022-33099`
-- nasm: :cve:`2020-18974` (ignored)
-- ncurses: :cve:`2022-29458`
-- openssl: :cve:`2022-1292`, :cve:`2022-1343`, :cve:`2022-1434`, :cve:`2022-1473`, :cve:`2022-2068`, :cve:`2022-2274`, :cve:`2022-2097`
-- python3: :cve:`2015-20107` (ignored)
-- qemu: :cve:`2021-20255` (ignored), :cve:`2019-12067` (ignored), :cve:`2021-3507`, :cve:`2022-0216`, :cve:`2022-2962`, :cve:`2022-35414`
-- rpm: :cve:`2021-35937`, :cve:`2021-35938`, :cve:`2021-35939`
-- rsync: :cve:`2022-29154`
-- subversion: :cve:`2021-28544`, :cve:`2022-24070`
-- tiff: :cve:`2022-1210` (not applicable), :cve:`2022-1622`, :cve:`2022-1623` (invalid), :cve:`2022-2056`, :cve:`2022-2057`, :cve:`2022-2058`, :cve:`2022-2953`, :cve:`2022-34526`
-- unzip: :cve:`2022-0529`, :cve:`2022-0530`
-- vim: :cve:`2022-1381`, :cve:`2022-1420`, :cve:`2022-1621`, :cve:`2022-1629`, :cve:`2022-1674`, :cve:`2022-1733`, :cve:`2022-1735`, :cve:`2022-1769`, :cve:`2022-1771`, :cve:`2022-1785`, :cve:`2022-1796`, :cve:`2022-1927`, :cve:`2022-1942`, :cve:`2022-2257`, :cve:`2022-2264`, :cve:`2022-2284`, :cve:`2022-2285`, :cve:`2022-2286`, :cve:`2022-2287`, :cve:`2022-2816`, :cve:`2022-2817`, :cve:`2022-2819`, :cve:`2022-2845`, :cve:`2022-2849`, :cve:`2022-2862`, :cve:`2022-2874`, :cve:`2022-2889`, :cve:`2022-2980`, :cve:`2022-2946`, :cve:`2022-2982`, :cve:`2022-3099`, :cve:`2022-3134`, :cve:`2022-3234`, :cve:`2022-3278`
-- zlib: :cve:`2022-37434`
+- bind: :cve_nist:`2022-1183`, :cve_nist:`2022-2795`, :cve_nist:`2022-2881`, :cve_nist:`2022-2906`, :cve_nist:`2022-3080`, :cve_nist:`2022-38178`
+- binutils: :cve_nist:`2019-1010204`, :cve_nist:`2022-38126`, :cve_nist:`2022-38127`, :cve_nist:`2022-38128`, :cve_nist:`2022-38533`
+- busybox: :cve_nist:`2022-30065`
+- connman: :cve_nist:`2022-32292`, :cve_nist:`2022-32293`
+- cups: :cve_nist:`2022-26691`
+- e2fsprogs: :cve_nist:`2022-1304`
+- expat: :cve_nist:`2022-40674`
+- freetype: :cve_nist:`2022-27404`
+- glibc: :cve_nist:`2022-39046`
+- gnupg: :cve_nist:`2022-34903`
+- grub2: :cve_nist:`2021-3695`, :cve_nist:`2021-3696`, :cve_nist:`2021-3697`, :cve_nist:`2022-28733`, :cve_nist:`2022-28734`, :cve_nist:`2022-28735`
+- inetutils: :cve_nist:`2022-39028`
+- libtirpc: :cve_nist:`2021-46828`
+- libxml2: :cve_nist:`2016-3709` (ignored)
+- libxslt: :cve_nist:`2022-29824` (not applicable)
+- linux-yocto/5.15: :cve_nist:`2022-28796`
+- logrotate: :cve_nist:`2022-1348`
+- lua: :cve_nist:`2022-33099`
+- nasm: :cve_nist:`2020-18974` (ignored)
+- ncurses: :cve_nist:`2022-29458`
+- openssl: :cve_nist:`2022-1292`, :cve_nist:`2022-1343`, :cve_nist:`2022-1434`, :cve_nist:`2022-1473`, :cve_nist:`2022-2068`, :cve_nist:`2022-2274`, :cve_nist:`2022-2097`
+- python3: :cve_nist:`2015-20107` (ignored)
+- qemu: :cve_nist:`2021-20255` (ignored), :cve_nist:`2019-12067` (ignored), :cve_nist:`2021-3507`, :cve_nist:`2022-0216`, :cve_nist:`2022-2962`, :cve_nist:`2022-35414`
+- rpm: :cve_nist:`2021-35937`, :cve_nist:`2021-35938`, :cve_nist:`2021-35939`
+- rsync: :cve_nist:`2022-29154`
+- subversion: :cve_nist:`2021-28544`, :cve_nist:`2022-24070`
+- tiff: :cve_nist:`2022-1210` (not applicable), :cve_nist:`2022-1622`, :cve_nist:`2022-1623` (invalid), :cve_nist:`2022-2056`, :cve_nist:`2022-2057`, :cve_nist:`2022-2058`, :cve_nist:`2022-2953`, :cve_nist:`2022-34526`
+- unzip: :cve_nist:`2022-0529`, :cve_nist:`2022-0530`
+- vim: :cve_nist:`2022-1381`, :cve_nist:`2022-1420`, :cve_nist:`2022-1621`, :cve_nist:`2022-1629`, :cve_nist:`2022-1674`, :cve_nist:`2022-1733`, :cve_nist:`2022-1735`, :cve_nist:`2022-1769`, :cve_nist:`2022-1771`, :cve_nist:`2022-1785`, :cve_nist:`2022-1796`, :cve_nist:`2022-1927`, :cve_nist:`2022-1942`, :cve_nist:`2022-2257`, :cve_nist:`2022-2264`, :cve_nist:`2022-2284`, :cve_nist:`2022-2285`, :cve_nist:`2022-2286`, :cve_nist:`2022-2287`, :cve_nist:`2022-2816`, :cve_nist:`2022-2817`, :cve_nist:`2022-2819`, :cve_nist:`2022-2845`, :cve_nist:`2022-2849`, :cve_nist:`2022-2862`, :cve_nist:`2022-2874`, :cve_nist:`2022-2889`, :cve_nist:`2022-2980`, :cve_nist:`2022-2946`, :cve_nist:`2022-2982`, :cve_nist:`2022-3099`, :cve_nist:`2022-3134`, :cve_nist:`2022-3234`, :cve_nist:`2022-3278`
+- zlib: :cve_nist:`2022-37434`
 
 
 

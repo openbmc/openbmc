@@ -11,7 +11,6 @@ DEPENDS += "perl"
 
 SRC_URI = "https://cpan.metacpan.org/authors/id/N/NW/NWCLARK/PerlIO-gzip-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "0393eae5d0b23df6cf40ed44af7d711c"
 SRC_URI[sha256sum] = "4848679a3f201e3f3b0c5f6f9526e602af52923ffa471a2a3657db786bd3bdc5"
 
 S = "${WORKDIR}/PerlIO-gzip-${PV}"

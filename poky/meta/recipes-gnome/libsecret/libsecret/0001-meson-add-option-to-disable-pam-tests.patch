@@ -1,0 +1,80 @@
+From b90ecbdb4b91961a77a7cbb3a9b6a57128e2194b Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Tue, 3 Dec 2024 15:58:17 +0100
+Subject: [PATCH] meson: add option to disable pam tests
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/151/commits]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson_options.txt |  1 +
+ pam/meson.build   | 44 +++++++++++++++++++++++---------------------
+ 2 files changed, 24 insertions(+), 21 deletions(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index 936eff8..8fa2a4e 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -8,3 +8,4 @@ option('bashcompdir', type: 'string', value: '', description: 'Override default
+ option('bash_completion', type: 'feature', value: 'auto', description: 'Install bash completion files')
+ option('tpm2', type: 'boolean', value: false, description: 'With TPM2 Software Stack')
+ option('pam', type: 'boolean', value: false, description: 'Build PAM module')
++option('pam-tests', type: 'boolean', value: true, description: 'Build PAM Tests')
+diff --git a/pam/meson.build b/pam/meson.build
+index 8413b58..5155329 100644
+--- a/pam/meson.build
++++ b/pam/meson.build
+@@ -19,27 +19,29 @@ pam_gnome_keyring = shared_library('pam_gnome_keyring',
+ )
+ 
+ # pam tests
+-pam_wrapper = dependency('pam_wrapper', required: true)
+-libpamtest = dependency('libpamtest', required: true)
++if get_option('pam-tests')
++  pam_wrapper = dependency('pam_wrapper', required: true)
++  libpamtest = dependency('libpamtest', required: true)
+ 
+-subdir('servicedir')
++  subdir('servicedir')
+ 
+-test_bin = executable('pam_test',
+-  sources: [
+-    'test-pam.c',
+-  ],
+-  dependencies: [
+-    libpamtest,
+-    glib_deps,
+-  ],
+-)
++  test_bin = executable('pam_test',
++    sources: [
++      'test-pam.c',
++    ],
++    dependencies: [
++      libpamtest,
++      glib_deps,
++    ],
++  )
+ 
+-test('pam-test',
+-  test_bin,
+-  env: {
+-    'LD_PRELOAD': 'libpam_wrapper.so',
+-    'PAM_WRAPPER': '1',
+-    'PAM_WRAPPER_DEBUGLEVEL': '5',
+-    'PAM_WRAPPER_SERVICE_DIR': meson.current_build_dir() + '/servicedir',
+-  },
+-)
++  test('pam-test',
++    test_bin,
++    env: {
++      'LD_PRELOAD': 'libpam_wrapper.so',
++      'PAM_WRAPPER': '1',
++      'PAM_WRAPPER_DEBUGLEVEL': '5',
++      'PAM_WRAPPER_SERVICE_DIR': meson.current_build_dir() + '/servicedir',
++    },
++  )
++endif
+-- 
+2.47.0
+

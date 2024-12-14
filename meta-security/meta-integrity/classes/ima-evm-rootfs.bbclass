@@ -8,6 +8,13 @@ IMA_EVM_KEY_DIR ?= "IMA_EVM_KEY_DIR_NOT_SET"
 # using the example key directory.
 IMA_EVM_PRIVKEY ?= "${IMA_EVM_KEY_DIR}/privkey_ima.pem"
 
+# Additional option when signing. Allows to for example provide
+# --keyid <id> or --keyid-from-cert <filename>.
+IMA_EVM_PRIVKEY_KEYID_OPT ?= ""
+
+# Password for the private key
+IMA_EVM_EVMCTL_KEY_PASSWORD ?= ""
+
 # Public part of certificates (used for both IMA and EVM).
 # The default is okay when using the example key directory.
 IMA_EVM_X509 ?= "${IMA_EVM_KEY_DIR}/x509_ima.der"
@@ -18,11 +25,6 @@ IMA_EVM_X509 ?= "${IMA_EVM_KEY_DIR}/x509_ima.der"
 #
 # ima-local-ca.x509 is what ima-gen-local-ca.sh creates.
 IMA_EVM_ROOT_CA ?= "${IMA_EVM_KEY_DIR}/ima-local-ca.pem"
-
-# Sign all regular files by default.
-IMA_EVM_ROOTFS_SIGNED ?= ". -type f"
-# Hash nothing by default.
-IMA_EVM_ROOTFS_HASHED ?= ". -depth 0 -false"
 
 # Mount these file systems (identified via their mount point) with
 # the iversion flags (needed by IMA when allowing writing).
@@ -73,8 +75,11 @@ ima_evm_sign_rootfs () {
         exit 1
     fi
 
+    export EVMCTL_KEY_PASSWORD=${IMA_EVM_EVMCTL_KEY_PASSWORD}
+
     bbnote "IMA/EVM: Signing root filesystem at ${IMAGE_ROOTFS} with key ${IMA_EVM_PRIVKEY}"
-    evmctl sign --imasig ${evmctl_param} --portable -a sha256 --key ${IMA_EVM_PRIVKEY} -r "${IMAGE_ROOTFS}"
+    evmctl sign --imasig ${evmctl_param} --portable -a sha256 \
+        --key "${IMA_EVM_PRIVKEY}" ${IMA_EVM_PRIVKEY_KEYID_OPT} -r "${IMAGE_ROOTFS}"
 
     # check signing key and signature verification key
     evmctl ima_verify ${evmctl_param} --key "${IMA_EVM_X509}" "${IMAGE_ROOTFS}/lib/libc.so.6" || exit 1
@@ -87,7 +92,8 @@ ima_evm_sign_rootfs () {
         install "${IMA_EVM_POLICY}" ./${sysconfdir}/ima/ima-policy
 
         bbnote "IMA/EVM: Signing IMA policy with key ${IMA_EVM_PRIVKEY}"
-        evmctl sign --imasig ${evmctl_param} --portable -a sha256 --key "${IMA_EVM_PRIVKEY}" "${IMAGE_ROOTFS}/etc/ima/ima-policy"
+        evmctl sign --imasig ${evmctl_param} --portable -a sha256 \
+          --key "${IMA_EVM_PRIVKEY}" ${IMA_EVM_PRIVKEY_KEYID_OPT} "${IMAGE_ROOTFS}/etc/ima/ima-policy"
     fi
 
     # Optionally write the file names and ima and evm signatures into files

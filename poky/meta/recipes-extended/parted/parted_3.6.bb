@@ -35,13 +35,15 @@ do_install_ptest() {
 	cp ${B}/tests/Makefile $t/tests/
 	mkdir $t/lib
 	cp ${B}/lib/config.h $t/lib
-	sed -i "s|^VERSION.*|VERSION = ${PV}|g" $t/tests/Makefile
-	sed -i "s|^srcdir =.*|srcdir = \.|g" $t/tests/Makefile
-	sed -i "s|^abs_srcdir =.*|abs_srcdir = \.|g" $t/tests/Makefile
-	sed -i "s|^abs_top_srcdir =.*|abs_top_srcdir = "${PTEST_PATH}"|g" $t/tests/Makefile
-	sed -i "s|^abs_top_builddir =.*|abs_top_builddir = "${PTEST_PATH}"|g" $t/tests/Makefile
-	sed -i "s|^Makefile:.*|Makefile:|g" $t/tests/Makefile
-	sed -i "/^BUILDINFO.*$/d" $t/tests/Makefile
+	sed -e "s|^VERSION.*|VERSION = ${PV}|g" \
+	    -e "s|^srcdir =.*|srcdir = \.|g" \
+	    -e "s|^abs_srcdir =.*|abs_srcdir = \.|g" \
+	    -e "s|^abs_top_srcdir =.*|abs_top_srcdir = "${PTEST_PATH}"|g" \
+	    -e "s|^abs_top_builddir =.*|abs_top_builddir = "${PTEST_PATH}"|g" \
+	    -e "/^SH_LOG_DRIVER =/s|(top_srcdir)|(top_builddir)|" \
+	    -e "s|^Makefile:.*|Makefile:|g" \
+	    -e "/^BUILDINFO.*$/d" \
+	    -i $t/tests/Makefile
 	for i in print-align print-max print-flags dup-clobber duplicate fs-resize; \
 	  do cp ${B}/tests/.libs/$i $t/tests/; \
 	done

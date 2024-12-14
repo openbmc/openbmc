@@ -34,3 +34,4 @@ PACKAGES =+ "${PN}-python"
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR} ${datadir}"
 FILES:${PN}-python = "${nonarch_libdir}/${PYTHON_DIR}"
 
+CVE_STATUS[CVE-2022-43410] = "cpe-incorrect: The recipe used in the `meta-openembedded` is a different mercurial package compared to the one which has the CVE issue."

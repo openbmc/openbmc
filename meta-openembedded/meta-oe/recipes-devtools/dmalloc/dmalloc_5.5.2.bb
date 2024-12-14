@@ -28,7 +28,6 @@ SRC_URI = "http://dmalloc.com/releases/dmalloc-${PV}.tgz \
            file://0001-undefined-strdup-macro.patch \
 "
 
-SRC_URI[md5sum] = "f92e5606c23a8092f3d5694e8d1c932e"
 SRC_URI[sha256sum] = "d3be5c6eec24950cb3bd67dbfbcdf036f1278fae5fd78655ef8cdf9e911e428a"
 
 ARM_INSTRUCTION_SET = "arm"

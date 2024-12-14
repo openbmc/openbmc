@@ -1,0 +1,56 @@
+From 2e39a3cea7d03721298e90fad70560c541b092a5 Mon Sep 17 00:00:00 2001
+From: Thomas Devoogdt <thomas@devoogdt.com>
+Date: Sat, 16 Nov 2024 20:55:37 +0100
+Subject: [PATCH] cprof_encode_text.c: fix wrong pointer assignment
+
+Fix cprofiles build.
+
+Upstream-Status: Submitted [https://github.com/fluent/cprofiles/pull/3]
+
+Signed-off-by: Thomas Devoogdt <thomas@devoogdt.com>
+Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
+---
+ lib/cprofiles/src/cprof_encode_text.c | 6 +++---
+ lib/cprofiles/src/cprof_profile.c     | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/cprofiles/src/cprof_encode_text.c b/lib/cprofiles/src/cprof_encode_text.c
+index 218a72b5b..ab2d6247d 100644
+--- a/lib/cprofiles/src/cprof_encode_text.c
++++ b/lib/cprofiles/src/cprof_encode_text.c
+@@ -1909,7 +1909,7 @@ static int encode_cprof_resource_profiles(
+                 struct cprof_resource_profiles *instance) {
+     int result;
+     struct cfl_list             *iterator;
+-    struct cprof_scope_profile *scope_profile;
++    struct cprof_scope_profiles *scope_profiles;
+ 
+     result = encode_string(context,
+                             CFL_TRUE,
+@@ -1958,11 +1958,11 @@ static int encode_cprof_resource_profiles(
+ 
+         cfl_list_foreach(iterator,
+                          &instance->scope_profiles) {
+-            scope_profile = cfl_list_entry(
++            scope_profiles = cfl_list_entry(
+                                 iterator,
+                                 struct cprof_scope_profiles, _head);
+ 
+-            result = encode_cprof_scope_profiles(context, scope_profile);
++            result = encode_cprof_scope_profiles(context, scope_profiles);
+ 
+             if (result != CPROF_ENCODE_TEXT_SUCCESS) {
+                 return result;
+diff --git a/lib/cprofiles/src/cprof_profile.c b/lib/cprofiles/src/cprof_profile.c
+index 66d62b361..d059d0376 100644
+--- a/lib/cprofiles/src/cprof_profile.c
++++ b/lib/cprofiles/src/cprof_profile.c
+@@ -98,7 +98,7 @@ void cprof_profile_destroy(struct cprof_profile *instance)
+     struct cfl_list             *iterator_backup;
+     struct cprof_attribute_unit *attribute_unit;
+     struct cprof_value_type     *value_type;
+-    struct cprof_mapping        *location;
++    struct cprof_location        *location;
+     struct cprof_function       *function;
+     struct cfl_list             *iterator;
+     struct cprof_mapping        *mapping;

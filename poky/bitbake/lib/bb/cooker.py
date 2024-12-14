@@ -8,7 +8,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
-
+import enum
 import sys, os, glob, os.path, re, time
 import itertools
 import logging
@@ -17,7 +17,7 @@ import threading
 from io import StringIO, UnsupportedOperation
 from contextlib import closing
 from collections import defaultdict, namedtuple
-import bb, bb.exceptions, bb.command
+import bb, bb.command
 from bb import utils, data, parse, event, cache, providers, taskdata, runqueue, build
 import queue
 import signal
@@ -48,16 +48,15 @@ class CollectionError(bb.BBHandledException):
     Exception raised when layer configuration is incorrect
     """
 
-class state:
-    initial, parsing, running, shutdown, forceshutdown, stopped, error = list(range(7))
 
-    @classmethod
-    def get_name(cls, code):
-        for name in dir(cls):
-            value = getattr(cls, name)
-            if type(value) == type(cls.initial) and value == code:
-                return name
-        raise ValueError("Invalid status code: %s" % code)
+class State(enum.Enum):
+    INITIAL = 0,
+    PARSING = 1,
+    RUNNING = 2,
+    SHUTDOWN = 3,
+    FORCE_SHUTDOWN = 4,
+    STOPPED = 5,
+    ERROR = 6
 
 
 class SkippedPackage:
@@ -180,7 +179,7 @@ class BBCooker:
             pass
 
         self.command = bb.command.Command(self, self.process_server)
-        self.state = state.initial
+        self.state = State.INITIAL
 
         self.parser = None
 
@@ -226,23 +225,22 @@ class BBCooker:
             bb.warn("Cooker received SIGTERM, shutting down...")
         elif signum == signal.SIGHUP:
             bb.warn("Cooker received SIGHUP, shutting down...")
-        self.state = state.forceshutdown
+        self.state = State.FORCE_SHUTDOWN
         bb.event._should_exit.set()
 
     def setFeatures(self, features):
         # we only accept a new feature set if we're in state initial, so we can reset without problems
-        if not self.state in [state.initial, state.shutdown, state.forceshutdown, state.stopped, state.error]:
+        if not self.state in [State.INITIAL, State.SHUTDOWN, State.FORCE_SHUTDOWN, State.STOPPED, State.ERROR]:
             raise Exception("Illegal state for feature set change")
         original_featureset = list(self.featureset)
         for feature in features:
             self.featureset.setFeature(feature)
         bb.debug(1, "Features set %s (was %s)" % (original_featureset, list(self.featureset)))
-        if (original_featureset != list(self.featureset)) and self.state != state.error and hasattr(self, "data"):
+        if (original_featureset != list(self.featureset)) and self.state != State.ERROR and hasattr(self, "data"):
             self.reset()
 
     def initConfigurationData(self):
-
-        self.state = state.initial
+        self.state = State.INITIAL
         self.caches_array = []
 
         sys.path = self.orig_syspath.copy()
@@ -281,7 +279,6 @@ class BBCooker:
         self.databuilder = bb.cookerdata.CookerDataBuilder(self.configuration, False)
         self.databuilder.parseBaseConfiguration()
         self.data = self.databuilder.data
-        self.data_hash = self.databuilder.data_hash
         self.extraconfigdata = {}
 
         eventlog = self.data.getVar("BB_DEFAULT_EVENTLOG")
@@ -369,6 +366,11 @@ class BBCooker:
 
         if not clean:
             bb.parse.BBHandler.cached_statements = {}
+
+        # If writes were made to any of the data stores, we need to recalculate the data
+        # store cache
+        if hasattr(self, "databuilder"):
+            self.databuilder.calc_datastore_hashes()
 
     def parseConfiguration(self):
         self.updateCacheSync()
@@ -896,10 +898,11 @@ class BBCooker:
 
         depgraph = self.generateTaskDepTreeData(pkgs_to_build, task)
 
-        with open('pn-buildlist', 'w') as f:
-            for pn in depgraph["pn"]:
-                f.write(pn + "\n")
-        logger.info("PN build list saved to 'pn-buildlist'")
+        pns = depgraph["pn"].keys()
+        if pns:
+            with open('pn-buildlist', 'w') as f:
+                f.write("%s\n" % "\n".join(sorted(pns)))
+            logger.info("PN build list saved to 'pn-buildlist'")
 
         # Remove old format output files to ensure no confusion with stale data
         try:
@@ -952,13 +955,7 @@ class BBCooker:
                                                                         '\n  '.join(appends_without_recipes[mc])))
 
         if msgs:
-            msg = "\n".join(msgs)
-            warn_only = self.databuilder.mcdata[mc].getVar("BB_DANGLINGAPPENDS_WARNONLY", \
-                False) or "no"
-            if warn_only.lower() in ("1", "yes", "true"):
-                bb.warn(msg)
-            else:
-                bb.fatal(msg)
+            bb.fatal("\n".join(msgs))
 
     def handlePrefProviders(self):
 
@@ -1338,7 +1335,7 @@ class BBCooker:
         self.buildSetVars()
         self.reset_mtime_caches()
 
-        bb_caches = bb.cache.MulticonfigCache(self.databuilder, self.data_hash, self.caches_array)
+        bb_caches = bb.cache.MulticonfigCache(self.databuilder, self.databuilder.data_hash, self.caches_array)
 
         layername = self.collections[mc].calc_bbfile_priority(fn)[2]
         infos = bb_caches[mc].parse(fn, self.collections[mc].get_file_appends(fn), layername)
@@ -1399,11 +1396,11 @@ class BBCooker:
 
             msg = None
             interrupted = 0
-            if halt or self.state == state.forceshutdown:
+            if halt or self.state == State.FORCE_SHUTDOWN:
                 rq.finish_runqueue(True)
                 msg = "Forced shutdown"
                 interrupted = 2
-            elif self.state == state.shutdown:
+            elif self.state == State.SHUTDOWN:
                 rq.finish_runqueue(False)
                 msg = "Stopped build"
                 interrupted = 1
@@ -1473,12 +1470,12 @@ class BBCooker:
         def buildTargetsIdle(server, rq, halt):
             msg = None
             interrupted = 0
-            if halt or self.state == state.forceshutdown:
+            if halt or self.state == State.FORCE_SHUTDOWN:
                 bb.event._should_exit.set()
                 rq.finish_runqueue(True)
                 msg = "Forced shutdown"
                 interrupted = 2
-            elif self.state == state.shutdown:
+            elif self.state == State.SHUTDOWN:
                 rq.finish_runqueue(False)
                 msg = "Stopped build"
                 interrupted = 1
@@ -1573,7 +1570,7 @@ class BBCooker:
 
 
     def updateCacheSync(self):
-        if self.state == state.running:
+        if self.state == State.RUNNING:
             return
 
         if not self.baseconfig_valid:
@@ -1583,19 +1580,19 @@ class BBCooker:
 
     # This is called for all async commands when self.state != running
     def updateCache(self):
-        if self.state == state.running:
+        if self.state == State.RUNNING:
             return
 
-        if self.state in (state.shutdown, state.forceshutdown, state.error):
+        if self.state in (State.SHUTDOWN, State.FORCE_SHUTDOWN, State.ERROR):
             if hasattr(self.parser, 'shutdown'):
                 self.parser.shutdown(clean=False)
                 self.parser.final_cleanup()
             raise bb.BBHandledException()
 
-        if self.state != state.parsing:
+        if self.state != State.PARSING:
             self.updateCacheSync()
 
-        if self.state != state.parsing and not self.parsecache_valid:
+        if self.state != State.PARSING and not self.parsecache_valid:
             bb.server.process.serverlog("Parsing started")
             self.parsewatched = {}
 
@@ -1629,7 +1626,7 @@ class BBCooker:
             self.parser = CookerParser(self, mcfilelist, total_masked)
             self._parsecache_set(True)
 
-        self.state = state.parsing
+        self.state = State.PARSING
 
         if not self.parser.parse_next():
             collectlog.debug("parsing complete")
@@ -1639,7 +1636,7 @@ class BBCooker:
             self.handlePrefProviders()
             for mc in self.multiconfigs:
                 self.recipecaches[mc].bbfile_priority = self.collections[mc].collection_priorities(self.recipecaches[mc].pkg_fn, self.parser.mcfilelist[mc], self.data)
-            self.state = state.running
+            self.state = State.RUNNING
 
             # Send an event listing all stamps reachable after parsing
             # which the metadata may use to clean up stale data
@@ -1712,10 +1709,10 @@ class BBCooker:
 
     def shutdown(self, force=False):
         if force:
-            self.state = state.forceshutdown
+            self.state = State.FORCE_SHUTDOWN
             bb.event._should_exit.set()
         else:
-            self.state = state.shutdown
+            self.state = State.SHUTDOWN
 
         if self.parser:
             self.parser.shutdown(clean=False)
@@ -1725,7 +1722,7 @@ class BBCooker:
         if hasattr(self.parser, 'shutdown'):
             self.parser.shutdown(clean=False)
             self.parser.final_cleanup()
-        self.state = state.initial
+        self.state = State.INITIAL
         bb.event._should_exit.clear()
 
     def reset(self):
@@ -2097,7 +2094,6 @@ class Parser(multiprocessing.Process):
         except Exception as exc:
             tb = sys.exc_info()[2]
             exc.recipe = filename
-            exc.traceback = list(bb.exceptions.extract_traceback(tb, context=3))
             return True, None, exc
         # Need to turn BaseExceptions into Exceptions here so we gracefully shutdown
         # and for example a worker thread doesn't just exit on its own in response to
@@ -2112,7 +2108,7 @@ class CookerParser(object):
         self.mcfilelist = mcfilelist
         self.cooker = cooker
         self.cfgdata = cooker.data
-        self.cfghash = cooker.data_hash
+        self.cfghash = cooker.databuilder.data_hash
         self.cfgbuilder = cooker.databuilder
 
         # Accounting statistics
@@ -2298,8 +2294,12 @@ class CookerParser(object):
             return False
         except ParsingFailure as exc:
             self.error += 1
-            logger.error('Unable to parse %s: %s' %
-                     (exc.recipe, bb.exceptions.to_string(exc.realexception)))
+
+            exc_desc = str(exc)
+            if isinstance(exc, SystemExit) and not isinstance(exc.code, str):
+                exc_desc = 'Exited with "%d"' % exc.code
+
+            logger.error('Unable to parse %s: %s' % (exc.recipe, exc_desc))
             self.shutdown(clean=False)
             return False
         except bb.parse.ParseError as exc:
@@ -2308,20 +2308,33 @@ class CookerParser(object):
             self.shutdown(clean=False, eventmsg=str(exc))
             return False
         except bb.data_smart.ExpansionError as exc:
+            def skip_frames(f, fn_prefix):
+                while f and f.tb_frame.f_code.co_filename.startswith(fn_prefix):
+                    f = f.tb_next
+                return f
+
             self.error += 1
             bbdir = os.path.dirname(__file__) + os.sep
-            etype, value, _ = sys.exc_info()
-            tb = list(itertools.dropwhile(lambda e: e.filename.startswith(bbdir), exc.traceback))
+            etype, value, tb = sys.exc_info()
+
+            # Remove any frames where the code comes from bitbake. This
+            # prevents deep (and pretty useless) backtraces for expansion error
+            tb = skip_frames(tb, bbdir)
+            cur = tb
+            while cur:
+                cur.tb_next = skip_frames(cur.tb_next, bbdir)
+                cur = cur.tb_next
+
             logger.error('ExpansionError during parsing %s', value.recipe,
                          exc_info=(etype, value, tb))
             self.shutdown(clean=False)
             return False
         except Exception as exc:
             self.error += 1
-            etype, value, tb = sys.exc_info()
+            _, value, _ = sys.exc_info()
             if hasattr(value, "recipe"):
                 logger.error('Unable to parse %s' % value.recipe,
-                            exc_info=(etype, value, exc.traceback))
+                            exc_info=sys.exc_info())
             else:
                 # Most likely, an exception occurred during raising an exception
                 import traceback

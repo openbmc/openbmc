@@ -1,0 +1,6 @@
+# We need to explicitly bypass mesons sanity check to avoid early compiler errors
+# otherwise meson will try to compile AND run test applications:
+# ../git/meson.build:35:0: ERROR: Executables created by c compiler are not runnable...
+
+[properties]
+skip_sanity_check=true

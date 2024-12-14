@@ -6,7 +6,7 @@ Subject: [PATCH] fix(corstone1000): pass spsr value explicitly
 Passes spsr value for BL32 (OPTEE) explicitly between different boot
 stages.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/30116/2]
 Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
 ---
  .../corstone1000/common/corstone1000_bl2_mem_params_desc.c     | 3 ++-

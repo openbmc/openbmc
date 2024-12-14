@@ -1,6 +1,0 @@
-#! /bin/sh
-
-# workaround for https://gitlab.gnome.org/GNOME/pango/-/issues/668
-mkdir -p /usr/share/fonts/pango-private
-cp -rf /usr/libexec/installed-tests/pango/fonts/* /usr/share/fonts/pango-private
-gnome-desktop-testing-runner pango

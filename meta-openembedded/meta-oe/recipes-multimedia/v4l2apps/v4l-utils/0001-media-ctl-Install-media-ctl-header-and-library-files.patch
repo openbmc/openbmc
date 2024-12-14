@@ -1,0 +1,78 @@
+From 3867fcfa4389c7fa271705f1fd1d4bfb74bc1bd1 Mon Sep 17 00:00:00 2001
+From: Neel Gandhi <neel.gandhi@amd.com>
+Date: Wed, 5 Jun 2024 13:51:36 +0530
+Subject: [PATCH] media-ctl: Install media-ctl header and library files
+
+Install mediactl and v4l2subdev header and library
+files, which may be required by 3rd party applications
+to populate and control v4l2subdev device node tree
+
+Install of these files was removed in upstream commit
+0911dce53b08b0df3066be2c75f67e8a314d8729.
+
+Upstream-Status: Denied
+
+v4l-utils maintainers do not promise a stable API for this library, and
+do not currently have the time to do so. So exporting the API in this
+way is fine, as long as we understand that it will change and users of
+the API will need to adapt over time.
+
+Signed-off-by: Neel Gandhi <neel.gandhi@amd.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ utils/media-ctl/meson.build | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/utils/media-ctl/meson.build b/utils/media-ctl/meson.build
+index 3a7b0c9a..40669b4c 100644
+--- a/utils/media-ctl/meson.build
++++ b/utils/media-ctl/meson.build
+@@ -3,14 +3,24 @@ libmediactl_sources = files(
+     'mediactl-priv.h',
+ )
+ 
++libmediactl_api = files(
++    'mediactl.h',
++    'v4l2subdev.h',
++)
++
++install_headers(libmediactl_api, subdir: 'mediactl')
++
+ libmediactl_deps = [
+     dep_libudev,
+ ]
+ 
+-libmediactl = static_library('mediactl',
+-                             libmediactl_sources,
+-                             dependencies : libmediactl_deps,
+-                             include_directories : v4l2_utils_incdir)
++libmediactl = library('mediactl',
++                      libmediactl_sources,
++                      soversion: '0',
++                      version: '0.0.0',
++                      install : true,
++                      dependencies : libmediactl_deps,
++                      include_directories : v4l2_utils_incdir)
+ 
+ dep_libmediactl = declare_dependency(link_with : libmediactl)
+ 
+@@ -18,9 +28,13 @@ libv4l2subdev_sources = files('libv4l2subdev.c')
+ libv4l2subdev_sources += media_bus_format_names_h
+ libv4l2subdev_sources += media_bus_format_codes_h
+ 
+-libv4l2subdev = static_library('v4l2subdev',
+-                               libv4l2subdev_sources,
+-                               include_directories : v4l2_utils_incdir)
++libv4l2subdev = library('v4l2subdev',
++                        libv4l2subdev_sources,
++                        soversion: '0',
++                        version: '0.0.0',
++                        install : true,
++                        dependencies : dep_libmediactl,
++                        include_directories : v4l2_utils_incdir)
+ 
+ dep_libv4l2subdev = declare_dependency(link_with : libv4l2subdev)
+ 
+-- 
+2.34.1
+

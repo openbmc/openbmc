@@ -1,0 +1,35 @@
+From 9de5de85fa917af58e7bc9cdd88f8f7ef8da2ca9 Mon Sep 17 00:00:00 2001
+From: Natanael Copa <ncopa@alpinelinux.org>
+Date: Wed, 18 Sep 2024 16:19:37 -0700
+Subject: [PATCH] target/riscv/kvm: do not use non-portable strerrorname_np()
+
+strerrorname_np is non-portable and breaks building with musl libc.
+
+Use strerror(errno) instead, like we do other places.
+
+Upstream-Status: Submitted [https://mail.gnu.org/archive/html/qemu-stable/2023-12/msg00069.html]
+
+Cc: qemu-stable@nongnu.org
+Fixes: commit 082e9e4a58ba (target/riscv/kvm: improve 'init_multiext_cfg' error
+msg)
+Resolves: https://gitlab.com/qemu-project/qemu/-/issues/2041
+Buglink: https://gitlab.alpinelinux.org/alpine/aports/-/issues/15541
+Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
+---
+ target/riscv/kvm/kvm-cpu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/target/riscv/kvm/kvm-cpu.c b/target/riscv/kvm/kvm-cpu.c
+index f6e3156b8..fad9eb21c 100644
+--- a/target/riscv/kvm/kvm-cpu.c
++++ b/target/riscv/kvm/kvm-cpu.c
+@@ -1859,8 +1859,7 @@ static bool kvm_cpu_realize(CPUState *cs, Error **errp)
+     if (riscv_has_ext(&cpu->env, RVV)) {
+         ret = prctl(PR_RISCV_V_SET_CONTROL, PR_RISCV_V_VSTATE_CTRL_ON);
+         if (ret) {
+-            error_setg(errp, "Error in prctl PR_RISCV_V_SET_CONTROL, code: %s",
+-                       strerrorname_np(errno));
++            error_setg(errp, "Error in prctl PR_RISCV_V_SET_CONTROL, error %d", errno);
+             return false;
+         }
+     }

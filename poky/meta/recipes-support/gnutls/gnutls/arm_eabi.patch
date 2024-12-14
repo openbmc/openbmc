@@ -1,4 +1,4 @@
-From d17ae0ef31c3c186766a338e8c40c87d1b98820e Mon Sep 17 00:00:00 2001
+From 46b3079095c5ceb0dc742785853bbaf288f325c6 Mon Sep 17 00:00:00 2001
 From: Joe Slater <jslater@windriver.com>
 Date: Wed, 25 Jan 2017 13:52:59 -0800
 Subject: [PATCH] gnutls: account for ARM_EABI

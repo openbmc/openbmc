@@ -25,3 +25,4 @@ PACKAGECONFIG[inet6] = "--enable-inet6,--disable-inet6,"
 EXTRA_OECONF += "--disable-debug"
 
 CVE_VERSION = "0.9.5.0"
+CVE_STATUS[CVE-2019-20503] = "cpe-incorrect: The current version (0.9.5.0) is not affected by the CVE which affects versions at least earlier than 0.9.4.0"

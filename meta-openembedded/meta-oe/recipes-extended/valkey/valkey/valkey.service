@@ -1,0 +1,16 @@
+[Unit]
+Description=Valkey: an open source, in-memory data store
+After=network.target
+
+[Service]
+User=valkey
+Group=valkey
+ExecStart=/usr/bin/valkey-server /etc/valkey/valkey.conf
+ExecStop=/usr/bin/valkey-cli shutdown
+Restart=always
+LimitNOFILE=10032
+StateDirectory=valkey
+
+[Install]
+WantedBy=multi-user.target
+

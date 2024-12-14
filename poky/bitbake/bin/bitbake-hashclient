@@ -17,6 +17,7 @@ import warnings
 import netrc
 import json
 import statistics
+import textwrap
 warnings.simplefilter("default")
 
 try:
@@ -265,7 +266,19 @@ def main():
         print(f"Max time is:             {max(times):.3f}s")
         return 0
 
-    parser = argparse.ArgumentParser(description='Hash Equivalence Client')
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='Hash Equivalence Client',
+        epilog=textwrap.dedent(
+            """
+            Possible ADDRESS options are:
+                unix://PATH         Connect to UNIX domain socket at PATH
+                ws://HOST[:PORT]    Connect to websocket at HOST:PORT (default port is 80)
+                wss://HOST[:PORT]   Connect to secure websocket at HOST:PORT (default port is 443)
+                HOST:PORT           Connect to TCP server at HOST:PORT
+            """
+        ),
+    )
     parser.add_argument('--address', default=DEFAULT_ADDRESS, help='Server address (default "%(default)s")')
     parser.add_argument('--log', default='WARNING', help='Set logging level')
     parser.add_argument('--login', '-l', metavar="USERNAME", help="Authenticate as USERNAME")

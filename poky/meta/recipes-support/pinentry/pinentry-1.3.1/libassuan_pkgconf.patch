@@ -1,0 +1,170 @@
+From 1bf04756b90832494020c39661ea944a0b11204f Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster@mvista.com>
+Date: Thu, 22 May 2014 10:50:00 +0100
+Subject: [PATCH] libassuan: Improve pkgconfig support
+
+Convert to pkg-config support to match changes done to
+the libassuan recipe for libassuan.pc generation.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+---
+ configure.ac    |  4 +--
+ m4/libassuan.m4 | 94 ++++---------------------------------------------
+ 2 files changed, 9 insertions(+), 89 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4944f7c..f03cbb7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -264,8 +264,8 @@ if test "$have_libassuan" = "yes"; then
+                      [version of the libassuan library])
+ fi
+ 
+-COMMON_CFLAGS="$LIBASSUAN_CFLAGS $COMMON_CFLAGS"
+-COMMON_LIBS="$LIBASSUAN_LIBS $COMMON_LIBS"
++COMMON_CFLAGS="$LIBASSUAN_COMMON_CFLAGS $COMMON_CFLAGS"
++COMMON_LIBS="$LIBASSUAN_COMMON_LIBS $COMMON_LIBS"
+ 
+ 
+ dnl Checks for libsecmem.
+diff --git a/m4/libassuan.m4 b/m4/libassuan.m4
+index a2eb5d9..897f407 100644
+--- a/m4/libassuan.m4
++++ b/m4/libassuan.m4
+@@ -15,30 +15,8 @@ dnl
+ dnl Common code used for libassuan detection [internal]
+ dnl Returns ok set to yes or no.
+ dnl
+-AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+-[ AC_REQUIRE([AC_CANONICAL_HOST])
+-  AC_ARG_WITH(libassuan-prefix,
+-              AS_HELP_STRING([--with-libassuan-prefix=PFX],
+-                             [prefix where LIBASSUAN is installed (optional)]),
+-     libassuan_config_prefix="$withval", libassuan_config_prefix="")
+-  if test x$libassuan_config_prefix != x ; then
+-    if test x${LIBASSUAN_CONFIG+set} != xset ; then
+-      LIBASSUAN_CONFIG=$libassuan_config_prefix/bin/libassuan-config
+-    fi
+-  fi
+-
+-  use_gpgrt_config=""
+-  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-    if $GPGRT_CONFIG libassuan --exists; then
+-      LIBASSUAN_CONFIG="$GPGRT_CONFIG libassuan"
+-      AC_MSG_NOTICE([Use gpgrt-config as libassuan-config])
+-      use_gpgrt_config=yes
+-    fi
+-  fi
+-  if test -z "$use_gpgrt_config"; then
+-    AC_PATH_PROG(LIBASSUAN_CONFIG, libassuan-config, no)
+-  fi
+-
++AC_DEFUN([AM_PATH_LIBASSUAN_COMMON],
++[
+   tmp=ifelse([$1], ,1:0.9.2,$1)
+   if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
+     req_libassuan_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
+@@ -48,59 +26,11 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+     min_libassuan_version="$tmp"
+   fi
+ 
+-  AC_MSG_CHECKING(for LIBASSUAN - version >= $min_libassuan_version)
+-  ok=no
+-  if test "$LIBASSUAN_CONFIG" != "no"; then
+-    req_major=`echo $min_libassuan_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
+-    req_minor=`echo $min_libassuan_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
+-    req_micro=`echo $min_libassuan_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
+-
+-    if test -z "$use_gpgrt_config"; then
+-      libassuan_config_version=`$LIBASSUAN_CONFIG --version`
+-    else
+-      libassuan_config_version=`$LIBASSUAN_CONFIG --modversion`
+-    fi
+-    major=`echo $libassuan_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
+-    minor=`echo $libassuan_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
+-    micro=`echo $libassuan_config_version | \
+-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\3/'`
+-
+-    if test "$major" -gt "$req_major"; then
+-        ok=yes
+-    else
+-        if test "$major" -eq "$req_major"; then
+-            if test "$minor" -gt "$req_minor"; then
+-               ok=yes
+-            else
+-               if test "$minor" -eq "$req_minor"; then
+-                   if test "$micro" -ge "$req_micro"; then
+-                     ok=yes
+-                   fi
+-               fi
+-            fi
+-        fi
+-    fi
+-  fi
+-
+-  if test $ok = yes; then
+-    AC_MSG_RESULT([yes ($libassuan_config_version)])
+-    AC_DEFINE(LIBASSUAN_API_REQUESTED, $req_libassuan_api, Requested API version for libassuan)
+-  else
+-    AC_MSG_RESULT(no)
+-  fi
++  PKG_CHECK_MODULES(LIBASSUAN_COMMON, [libassuan >= $min_libassuan_version libassuan], [ok=yes], [ok=no])
+ 
+   if test $ok = yes; then
+     if test "$req_libassuan_api" -gt 0 ; then
+-      if test -z "$use_gpgrt_config"; then
+-        tmp=`$LIBASSUAN_CONFIG --api-version 2>/dev/null || echo 0`
+-      else
+-        tmp=`$LIBASSUAN_CONFIG --variable=api_version 2>/dev/null || echo 0`
+-      fi
++      tmp=`$PKG_CONFIG --variable=api_version libassuan 2>/dev/null || echo 0`
+       if test "$tmp" -gt 0 ; then
+         AC_MSG_CHECKING([LIBASSUAN API version])
+         if test "$req_libassuan_api" -eq "$tmp" ; then
+@@ -117,11 +47,7 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+ 
+   if test $ok = yes; then
+     if test x"$host" != x ; then
+-      if test -z "$use_gpgrt_config"; then
+-        libassuan_config_host=`$LIBASSUAN_CONFIG --host 2>/dev/null || echo none`
+-      else
+-        libassuan_config_host=`$LIBASSUAN_CONFIG --variable=host 2>/dev/null || echo none`
+-      fi
++      libassuan_config_host=`$PKG_CONFIG --host libassuan 2>/dev/null || echo 0`
+       if test x"$libassuan_config_host" != xnone ; then
+         if test x"$libassuan_config_host" != x"$host" ; then
+   AC_MSG_WARN([[
+@@ -144,7 +70,7 @@ dnl Test whether libassuan has at least MINIMUM-VERSION. This is
+ dnl used to test for features only available in newer versions.
+ dnl
+ AC_DEFUN([AM_CHECK_LIBASSUAN],
+-[ _AM_PATH_LIBASSUAN_COMMON($1)
++[ AM_PATH_LIBASSUAN_COMMON($1)
+   if test $ok = yes; then
+     ifelse([$2], , :, [$2])
+   else
+@@ -160,16 +86,10 @@ dnl                   [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
+ dnl Test for libassuan and define LIBASSUAN_CFLAGS and LIBASSUAN_LIBS
+ dnl
+ AC_DEFUN([AM_PATH_LIBASSUAN],
+-[ _AM_PATH_LIBASSUAN_COMMON($1)
++[ AM_PATH_LIBASSUAN_COMMON($1)
+   if test $ok = yes; then
+-    LIBASSUAN_CFLAGS=`$LIBASSUAN_CONFIG --cflags`
+-    LIBASSUAN_LIBS=`$LIBASSUAN_CONFIG --libs`
+     ifelse([$2], , :, [$2])
+   else
+-    LIBASSUAN_CFLAGS=""
+-    LIBASSUAN_LIBS=""
+     ifelse([$3], , :, [$3])
+   fi
+-  AC_SUBST(LIBASSUAN_CFLAGS)
+-  AC_SUBST(LIBASSUAN_LIBS)
+ ])

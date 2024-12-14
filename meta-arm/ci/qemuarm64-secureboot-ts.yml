@@ -8,8 +8,9 @@ header:
 local_conf_header:
   trusted_services: |
     TEST_SUITES:append = " trusted_services"
-    # Include TS Crypto, TS Protected Storage, TS Internal Trusted Storage and SMM-Gateway SPs into optee-os image
-    MACHINE_FEATURES:append = " arm-ffa ts-crypto ts-storage ts-its ts-smm-gateway"
+    # Include TS Crypto, TS Protected Storage, and TS Internal Trusted Storage and SPs into optee-os image
+    # FIXME - remove TS SMM Gateway due to QEMU v9.0.0 test failures
+    MACHINE_FEATURES:append = " arm-ffa ts-crypto ts-storage ts-its"
     # Include TS demo/test tools into image
     IMAGE_INSTALL:append = " packagegroup-ts-tests"
     # Include TS PSA Arch tests into image

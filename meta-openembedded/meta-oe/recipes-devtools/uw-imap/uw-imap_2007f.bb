@@ -19,7 +19,6 @@ SRC_URI = "https://fossies.org/linux/misc/old/imap-${PV}.tar.gz \
            file://uw-imap-fix-incompatible-pointer-types.patch \
            "
 
-SRC_URI[md5sum] = "2126fd125ea26b73b20f01fcd5940369"
 SRC_URI[sha256sum] = "53e15a2b5c1bc80161d42e9f69792a3fa18332b7b771910131004eb520004a28"
 
 S = "${WORKDIR}/imap-${PV}"
@@ -53,3 +52,10 @@ ALLOW_EMPTY:${PN} = "1"
 
 PARALLEL_MAKE = ""
 
+# http://errors.yoctoproject.org/Errors/Details/766915/
+# unix.c:235:21: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:1002:15: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:1163:15: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:1428:40: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+# unix.c:2254:33: error: passing argument 2 of 'utime' from incompatible pointer type [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

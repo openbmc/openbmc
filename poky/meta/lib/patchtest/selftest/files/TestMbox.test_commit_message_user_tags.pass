@@ -1,0 +1,66 @@
+From c9519f11502d5bb5c143ed43b4c981b6a211bdf9 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 31 May 2024 09:54:50 -0400
+Subject: [PATCH] selftest-hello: fix CVE-1234-56789
+
+This should pass the test_commit_message_user_tags test.
+
+CVE: CVE-1234-56789
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ .../files/0001-Fix-CVE-1234-56789.patch       | 26 +++++++++++++++++++
+ .../selftest-hello/selftest-hello_1.0.bb      |  4 ++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+ create mode 100644 meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch
+
+diff --git a/meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch b/meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch
+new file mode 100644
+index 00000000000..8a4f9329303
+--- /dev/null
++++ b/meta-selftest/recipes-test/selftest-hello/files/0001-Fix-CVE-1234-56789.patch
+@@ -0,0 +1,26 @@
++From b26a31186e6ee2eb1f506d5f2f9394d327a0df2f Mon Sep 17 00:00:00 2001
++From: Trevor Gamblin <tgamblin@baylibre.com>
++Date: Tue, 29 Aug 2023 14:08:20 -0400
++Subject: [PATCH] Fix CVE-NOT-REAL
++
++CVE: CVE-1234-56789
++Upstream-Status: Backport(http://example.com/example)
++
++Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
++---
++ strlen.c | 1 +
++ 1 file changed, 1 insertion(+)
++
++diff --git a/strlen.c b/strlen.c
++index 1788f38..83d7918 100644
++--- a/strlen.c
+++++ b/strlen.c
++
++int main() {
++
++	printf("%d\n", str_len(string1));
++	printf("%d\n", str_len(string2));
++	printf("CVE FIXED!!!\n");
++
++	return 0;
++}
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+index 2dc352d479e..d937759f157 100644
+--- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+@@ -3,7 +3,9 @@ SECTION = "examples"
+ LICENSE = "MIT"
+ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+ 
+-SRC_URI = "file://helloworld.c"
++SRC_URI = "file://helloworld.c \
++           file://0001-Fix-CVE-1234-56789.patch \
++	   "
+ 
+ S = "${WORKDIR}/sources"
+ UNPACKDIR = "${S}"
+-- 
+2.45.1
+

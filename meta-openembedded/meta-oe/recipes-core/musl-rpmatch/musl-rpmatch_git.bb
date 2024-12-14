@@ -7,6 +7,9 @@ SRC_URI = "gitsm://github.com/pullmoll/musl-rpmatch.git;protocol=https;branch=ma
 PV = "1.0+git"
 SRCREV = "46267b154987d3e1f25d3a75423faa62bb5ee342"
 
+# Upstream repo has not made releases/tags after 1.0
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit autotools
 
 S = "${WORKDIR}/git"

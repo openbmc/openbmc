@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=cfdcd51fa7d5808da4e74346ee394490"
 
 SRCNAME = "ptyprocess"
 
+SRC_URI += "file://a44312974bd9084aa568d2e18ce5b2a7e0e45983.patch"
 SRC_URI[sha256sum] = "5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220"
 
 inherit pypi python_flit_core

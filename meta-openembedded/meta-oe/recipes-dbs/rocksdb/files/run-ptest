@@ -1,0 +1,12 @@
+#!/bin/sh
+ptestdir=$(dirname "$(readlink -f "$0")")
+cd "$ptestdir"/tests || exit
+
+for test in *_test; do
+    if ./${test} >/dev/null 2>&1; then
+        echo "PASS: ${test}"
+    else
+        echo "FAIL: ${test}"
+    fi
+done
+

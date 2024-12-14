@@ -1,0 +1,969 @@
+From 7acb528db20c08d90f72fa317b8e1ccf4d270cdc Mon Sep 17 00:00:00 2001
+From: Matthew Russell <matthew.g.russell@gmail.com>
+Date: Wed, 10 Apr 2024 06:23:27 -0400
+Subject: [PATCH 1/2] Update to C++17 (#560)
+
+* Upgrading to C++17
+
+* Code Quality: Address compiler warnings
+
+- Fixing narrowing issues
+- Removing useless copies
+- Removing unused lines
+- unused-lambda-capture
+- Removes unused variables
+- Fix some casts (modernize c-style, or simply remove useless casts)
+- Explicitly deleting unused endpoint_impl copy and move constructors
+- Removing redundant std::bind
+- Improving const correctness
+- Moving thread init to constructor body
+- Moved check_routing_credentials_ inside vsomeip security section where it's used
+- Using =default destructor instead of empty destructor
+
+Thread init:
+Moving the initialization of these threads into the constructor body to
+ensure that they do not start with an incomplete "this".  As they
+capture this, it is possible that if the new thread begins before the
+object is fully constructed, the new thread might operate on
+uninitialized members of "this".
+
+* Attempting to fix syntax error on MSVC
+
+* Adjusting PR to conform to Covesa style
+
+* Using curly brace initialization
+
+* Using static_cast to narrow its_device.size() to a socklen_t
+
+* Avoided double integer promotion
+
+Upstream-Status: Backport [https://github.com/COVESA/vsomeip/pull/560]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Android.bp                                    |  2 +-
+ CMakeLists.txt                                | 11 ++-
+ examples/hello_world/hello_world_service.hpp  | 12 +--
+ .../configuration/include/internal.hpp.in     |  6 +-
+ .../include/internal_android.hpp              | 10 +--
+ .../configuration/src/configuration_impl.cpp  | 13 ++--
+ .../endpoints/include/endpoint_impl.hpp       |  3 +
+ .../local_server_endpoint_impl_receive_op.hpp |  4 +-
+ .../local_uds_client_endpoint_impl.hpp        |  2 +-
+ .../local_uds_server_endpoint_impl.hpp        |  2 +-
+ .../udp_server_endpoint_impl_receive_op.hpp   |  2 +-
+ .../endpoints/src/endpoint_manager_base.cpp   |  2 +-
+ .../src/local_uds_client_endpoint_impl.cpp    |  5 --
+ .../src/local_uds_server_endpoint_impl.cpp    |  6 --
+ .../src/tcp_client_endpoint_impl.cpp          |  2 +-
+ .../src/tcp_server_endpoint_impl.cpp          | 14 ++--
+ .../src/udp_client_endpoint_impl.cpp          |  2 +-
+ .../src/udp_server_endpoint_impl.cpp          |  4 +-
+ .../message/include/message_base_impl.hpp     |  2 -
+ implementation/message/src/deserializer.cpp   |  4 +-
+ .../plugin/src/plugin_manager_impl.cpp        |  2 +-
+ .../routing/src/routing_manager_base.cpp      | 10 +--
+ .../runtime/include/application_impl.hpp      |  4 +-
+ .../runtime/src/application_impl.cpp          |  7 +-
+ implementation/security/src/policy.cpp        |  4 +-
+ implementation/security/src/security.cpp      |  1 +
+ .../src/service_discovery_impl.cpp            | 34 +++++----
+ interface/vsomeip/constants.hpp               | 74 +++++++++----------
+ .../application_tests/application_test.cpp    |  1 +
+ tools/vsomeip_ctrl.cpp                        |  9 ++-
+ 30 files changed, 129 insertions(+), 125 deletions(-)
+
+diff --git a/Android.bp b/Android.bp
+index c6caa4de..f314f22b 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -30,9 +30,9 @@ libvsomeip_sd_srcs = [
+ 
+ cc_defaults {
+     name: "vsomeip_defaults",
++    cpp_std: "c++17",
+ 
+     cppflags: [
+-        "-std=c++14",
+         "-fexceptions",
+         "-Wno-non-virtual-dtor",
+         "-Wno-unused-const-variable",
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ab399a69..3d947055 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -64,6 +64,8 @@ if(NOT CMAKE_BUILD_TYPE)
+   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+ endif()
+ 
++set(CMAKE_CXX_STANDARD 17)
++
+ # OS
+ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+     set(DL_LIBRARY "dl")
+@@ -248,13 +250,13 @@ if (MSVC)
+     # add_definitions(-DVSOMEIP_DLL_COMPILATION) now it is controlled per target
+     SET(BOOST_WINDOWS_VERSION "0x600" CACHE STRING "Set the same Version as the Version with which Boost was built, otherwise there will be errors. (normaly 0x600 is for Windows 7 and 0x501 is for Windows XP)")
+     # Disable warning C4250 since it warns that the compiler is correctly following the C++ Standard. It's a "We-Are-Doing-Things-By-The-Book" notice, not a real warning.
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS -D_WIN32_WINNT=${BOOST_WINDOWS_VERSION} -DWIN32 -DBOOST_ASIO_DISABLE_IOCP /EHsc /std:c++14 /wd4250")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS -D_WIN32_WINNT=${BOOST_WINDOWS_VERSION} -DWIN32 -DBOOST_ASIO_DISABLE_IOCP /EHsc /wd4250")
+     set(USE_RT "")
+     link_directories(${Boost_LIBRARY_DIR_DEBUG})
+ elseif(${CMAKE_SYSTEM_NAME} MATCHES "QNX")
+     set(USE_RT "")
+ else()
+-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OS_CXX_FLAGS} -g ${OPTIMIZE} -std=c++14 ${NO_DEPRECATED} ${EXPORTSYMBOLS}")
++    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OS_CXX_FLAGS} -g ${OPTIMIZE} ${NO_DEPRECATED} ${EXPORTSYMBOLS}")
+     set(USE_RT "rt")
+ endif()
+ 
+@@ -268,6 +270,7 @@ list(SORT ${VSOMEIP_NAME}-cfg_SRC)
+ if (VSOMEIP_ENABLE_MULTIPLE_ROUTING_MANAGERS EQUAL 0)
+     add_library(${VSOMEIP_NAME}-cfg SHARED ${${VSOMEIP_NAME}-cfg_SRC})
+     set_target_properties (${VSOMEIP_NAME}-cfg PROPERTIES VERSION ${VSOMEIP_VERSION} SOVERSION ${VSOMEIP_MAJOR_VERSION})
++    target_compile_features(${VSOMEIP_NAME}-cfg PRIVATE cxx_std_17)
+     if (MSVC)
+         set_target_properties(${VSOMEIP_NAME}-cfg PROPERTIES COMPILE_DEFINITIONS "VSOMEIP_DLL_COMPILATION_PLUGIN")
+     endif()
+@@ -302,6 +305,7 @@ list(SORT ${VSOMEIP_NAME}_SRC)
+ 
+ add_library(${VSOMEIP_NAME} SHARED ${${VSOMEIP_NAME}_SRC})
+ set_target_properties (${VSOMEIP_NAME} PROPERTIES VERSION ${VSOMEIP_VERSION} SOVERSION ${VSOMEIP_MAJOR_VERSION})
++target_compile_features(${VSOMEIP_NAME} PRIVATE cxx_std_17)
+ if (MSVC)
+     set_target_properties(${VSOMEIP_NAME} PROPERTIES COMPILE_DEFINITIONS "VSOMEIP_DLL_COMPILATION")
+ else ()
+@@ -331,6 +335,7 @@ file(GLOB ${VSOMEIP_NAME}-sd_SRC
+ list(SORT ${VSOMEIP_NAME}-sd_SRC)
+ 
+ add_library(${VSOMEIP_NAME}-sd SHARED ${${VSOMEIP_NAME}-sd_SRC})
++target_compile_features(${VSOMEIP_NAME}-sd PRIVATE cxx_std_17)
+ set_target_properties (${VSOMEIP_NAME}-sd PROPERTIES VERSION ${VSOMEIP_VERSION} SOVERSION ${VSOMEIP_MAJOR_VERSION})
+ if (MSVC)
+     set_target_properties(${VSOMEIP_NAME}-sd PROPERTIES COMPILE_DEFINITIONS "VSOMEIP_DLL_COMPILATION_PLUGIN")
+@@ -348,6 +353,7 @@ file(GLOB_RECURSE ${VSOMEIP_NAME}-e2e_SRC
+ list(SORT ${VSOMEIP_NAME}-e2e_SRC)
+ 
+ add_library(${VSOMEIP_NAME}-e2e SHARED ${${VSOMEIP_NAME}-e2e_SRC})
++target_compile_features(${VSOMEIP_NAME}-e2e PRIVATE cxx_std_17)
+ set_target_properties (${VSOMEIP_NAME}-e2e PROPERTIES VERSION ${VSOMEIP_VERSION} SOVERSION ${VSOMEIP_MAJOR_VERSION})
+ if (MSVC)
+     set_target_properties(${VSOMEIP_NAME}-e2e PROPERTIES COMPILE_DEFINITIONS "VSOMEIP_DLL_COMPILATION_PLUGIN")
+@@ -375,6 +381,7 @@ file(GLOB_RECURSE ${VSOMEIP_COMPAT_NAME}_SRC
+ list(SORT ${VSOMEIP_COMPAT_NAME}_SRC)
+ 
+ add_library(${VSOMEIP_COMPAT_NAME} SHARED ${${VSOMEIP_COMPAT_NAME}_SRC})
++target_compile_features(${VSOMEIP_COMPAT_NAME} PRIVATE cxx_std_17)
+ set_target_properties (${VSOMEIP_COMPAT_NAME} PROPERTIES VERSION ${VSOMEIP_COMPAT_VERSION} SOVERSION ${VSOMEIP_COMPAT_MAJOR_VERSION})
+ if (MSVC)
+     set_target_properties(${VSOMEIP_COMPAT_NAME} PROPERTIES COMPILE_DEFINITIONS "VSOMEIP_DLL_COMPILATION_PLUGIN")
+diff --git a/examples/hello_world/hello_world_service.hpp b/examples/hello_world/hello_world_service.hpp
+index 7ac3b1e7..b04cacea 100644
+--- a/examples/hello_world/hello_world_service.hpp
++++ b/examples/hello_world/hello_world_service.hpp
+@@ -11,12 +11,12 @@
+ #if defined ANDROID || defined __ANDROID__
+ #include "android/log.h"
+ #define LOG_TAG "hello_world_service"
+-#define LOG_INF(...) fprintf(stdout, __VA_ARGS__), fprintf(stdout, "\n"), (void)__android_log_print(ANDROID_LOG_INFO, LOG_TAG, ##__VA_ARGS__)
+-#define LOG_ERR(...) fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n"), (void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, ##__VA_ARGS__)
++#define LOG_INF(...) std::fprintf(stdout, __VA_ARGS__), std::fprintf(stdout, "\n"), (void)__android_log_print(ANDROID_LOG_INFO, LOG_TAG, ##__VA_ARGS__)
++#define LOG_ERR(...) std::fprintf(stderr, __VA_ARGS__), std::fprintf(stderr, "\n"), (void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, ##__VA_ARGS__)
+ #else
+ #include <cstdio>
+-#define LOG_INF(...) fprintf(stdout, __VA_ARGS__), fprintf(stdout, "\n")
+-#define LOG_ERR(...) fprintf(stderr, __VA_ARGS__), fprintf(stderr, "\n")
++#define LOG_INF(...) std::fprintf(stdout, __VA_ARGS__), std::fprintf(stdout, "\n")
++#define LOG_ERR(...) std::fprintf(stderr, __VA_ARGS__), std::fprintf(stderr, "\n")
+ #endif
+ 
+ static vsomeip::service_t service_id = 0x1111;
+@@ -32,9 +32,9 @@ public:
+     hello_world_service() :
+                     rtm_(vsomeip::runtime::get()),
+                     app_(rtm_->create_application()),
+-                    stop_(false),
+-                    stop_thread_(std::bind(&hello_world_service::stop, this))
++                    stop_(false)
+     {
++        stop_thread_ = std::thread{&hello_world_service::stop, this};
+     }
+ 
+     ~hello_world_service()
+diff --git a/implementation/configuration/include/internal.hpp.in b/implementation/configuration/include/internal.hpp.in
+index 72c8d503..eff4efad 100644
+--- a/implementation/configuration/include/internal.hpp.in
++++ b/implementation/configuration/include/internal.hpp.in
+@@ -141,14 +141,14 @@ typedef enum {
+     IS_SUBSCRIBING
+ } subscription_state_e;
+ 
+-const std::uint32_t MESSAGE_SIZE_UNLIMITED = (std::numeric_limits<std::uint32_t>::max)();
++inline constexpr std::uint32_t MESSAGE_SIZE_UNLIMITED = (std::numeric_limits<std::uint32_t>::max)();
+ 
+-const std::uint32_t QUEUE_SIZE_UNLIMITED = (std::numeric_limits<std::uint32_t>::max)();
++inline constexpr std::uint32_t QUEUE_SIZE_UNLIMITED = (std::numeric_limits<std::uint32_t>::max)();
+ 
+ #define VSOMEIP_DEFAULT_NPDU_DEBOUNCING_NANO         2 * 1000 * 1000
+ #define VSOMEIP_DEFAULT_NPDU_MAXIMUM_RETENTION_NANO  5 * 1000 * 1000
+ 
+-const std::uint32_t MAX_RECONNECTS_UNLIMITED = (std::numeric_limits<std::uint32_t>::max)();
++inline constexpr std::uint32_t MAX_RECONNECTS_UNLIMITED = (std::numeric_limits<std::uint32_t>::max)();
+ 
+ const std::uint32_t ANY_UID = 0xFFFFFFFF;
+ const std::uint32_t ANY_GID = 0xFFFFFFFF;
+diff --git a/implementation/configuration/include/internal_android.hpp b/implementation/configuration/include/internal_android.hpp
+index f5425722..8757a85a 100644
+--- a/implementation/configuration/include/internal_android.hpp
++++ b/implementation/configuration/include/internal_android.hpp
+@@ -128,17 +128,17 @@ typedef enum {
+     IS_SUBSCRIBING
+ } subscription_state_e;
+ 
+-const std::uint32_t MESSAGE_SIZE_UNLIMITED = std::numeric_limits<std::uint32_t>::max();
++inline constexpr std::uint32_t MESSAGE_SIZE_UNLIMITED = std::numeric_limits<std::uint32_t>::max();
+ 
+-const std::uint32_t QUEUE_SIZE_UNLIMITED = std::numeric_limits<std::uint32_t>::max();
++inline constexpr std::uint32_t QUEUE_SIZE_UNLIMITED = std::numeric_limits<std::uint32_t>::max();
+ 
+ #define VSOMEIP_DEFAULT_NPDU_DEBOUNCING_NANO         2 * 1000 * 1000
+ #define VSOMEIP_DEFAULT_NPDU_MAXIMUM_RETENTION_NANO  5 * 1000 * 1000
+ 
+-const std::uint32_t MAX_RECONNECTS_UNLIMITED = std::numeric_limits<std::uint32_t>::max();
++inline constexpr std::uint32_t MAX_RECONNECTS_UNLIMITED = std::numeric_limits<std::uint32_t>::max();
+ 
+-const std::uint32_t ANY_UID = 0xFFFFFFFF;
+-const std::uint32_t ANY_GID = 0xFFFFFFFF;
++inline constexpr std::uint32_t ANY_UID = 0xFFFFFFFF;
++inline constexpr std::uint32_t ANY_GID = 0xFFFFFFFF;
+ 
+ enum class port_type_e {
+     PT_OPTIONAL,
+diff --git a/implementation/configuration/src/configuration_impl.cpp b/implementation/configuration/src/configuration_impl.cpp
+index ca1bd1dc..380b2906 100644
+--- a/implementation/configuration/src/configuration_impl.cpp
++++ b/implementation/configuration/src/configuration_impl.cpp
+@@ -333,7 +333,7 @@ bool configuration_impl::load(const std::string &_name) {
+ 
+     // Tell, if reading of configuration file(s) failed.
+     // (This may file if the logger configuration is incomplete/missing).
+-    for (auto f : its_failed)
++    for (const auto& f : its_failed)
+         VSOMEIP_WARNING << "Reading of configuration file \""
+             << f << "\" failed. Configuration may be incomplete.";
+ 
+@@ -342,7 +342,7 @@ bool configuration_impl::load(const std::string &_name) {
+ 
+     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+ 
+-    for (auto i : its_input) {
++    for (const auto& i : its_input) {
+         if (utility::is_file(i))
+             VSOMEIP_INFO << "Using configuration file: \"" << i << "\".";
+ 
+@@ -561,7 +561,7 @@ bool configuration_impl::load_data(const std::vector<configuration_element> &_el
+ 
+         if (is_logging_loaded_) {
+             logger::logger_impl::init(shared_from_this());
+-            for (auto w : its_warnings)
++            for (const auto& w : its_warnings)
+                 VSOMEIP_WARNING << w;
+         }
+     }
+@@ -3255,7 +3255,7 @@ void configuration_impl::trim(std::string &_s) {
+         std::find_if(
+             _s.begin(),
+             _s.end(),
+-            [](unsigned char ch) { return !std::isspace(ch); }
++            [](const auto ch) { return !std::isspace(ch); }
+         )
+     );
+ 
+@@ -3263,8 +3263,9 @@ void configuration_impl::trim(std::string &_s) {
+         std::find_if(
+             _s.rbegin(),
+             _s.rend(),
+-            [](unsigned char ch) { return !std::isspace(ch); }).base(),
+-            _s.end()
++            [](const auto ch) { return !std::isspace(ch); }
++        ).base(),
++        _s.end()
+     );
+ }
+ 
+diff --git a/implementation/endpoints/include/endpoint_impl.hpp b/implementation/endpoints/include/endpoint_impl.hpp
+index 9d2b303c..685eba4e 100644
+--- a/implementation/endpoints/include/endpoint_impl.hpp
++++ b/implementation/endpoints/include/endpoint_impl.hpp
+@@ -34,6 +34,9 @@ public:
+                   std::uint32_t _max_message_size,
+                   configuration::endpoint_queue_limit_t _queue_limit,
+                   const std::shared_ptr<configuration>& _configuration);
++    endpoint_impl(endpoint_impl<Protocol> const&) = delete;
++    endpoint_impl(endpoint_impl<Protocol> const&&) = delete;
++
+     virtual ~endpoint_impl();
+ 
+     void enable_magic_cookies();
+diff --git a/implementation/endpoints/include/local_server_endpoint_impl_receive_op.hpp b/implementation/endpoints/include/local_server_endpoint_impl_receive_op.hpp
+index 53f4769a..b1d8991d 100644
+--- a/implementation/endpoints/include/local_server_endpoint_impl_receive_op.hpp
++++ b/implementation/endpoints/include/local_server_endpoint_impl_receive_op.hpp
+@@ -25,8 +25,8 @@ struct storage :
+ {
+     socket_type_t &socket_;
+     receive_handler_t handler_;
+-    byte_t *buffer_;
+-    std::size_t length_;
++    byte_t *buffer_ = nullptr;
++    size_t length_;
+     uid_t uid_;
+     gid_t gid_;
+     size_t bytes_;
+diff --git a/implementation/endpoints/include/local_uds_client_endpoint_impl.hpp b/implementation/endpoints/include/local_uds_client_endpoint_impl.hpp
+index d7eede3f..e1e1aaa2 100644
+--- a/implementation/endpoints/include/local_uds_client_endpoint_impl.hpp
++++ b/implementation/endpoints/include/local_uds_client_endpoint_impl.hpp
+@@ -25,7 +25,7 @@ public:
+                                    const endpoint_type& _remote,
+                                    boost::asio::io_context &_io,
+                                    const std::shared_ptr<configuration>& _configuration);
+-    virtual ~local_uds_client_endpoint_impl();
++    virtual ~local_uds_client_endpoint_impl() = default;
+ 
+     void start();
+     void stop();
+diff --git a/implementation/endpoints/include/local_uds_server_endpoint_impl.hpp b/implementation/endpoints/include/local_uds_server_endpoint_impl.hpp
+index 1e78822d..a4ed2eb5 100644
+--- a/implementation/endpoints/include/local_uds_server_endpoint_impl.hpp
++++ b/implementation/endpoints/include/local_uds_server_endpoint_impl.hpp
+@@ -50,7 +50,7 @@ public:
+             const std::shared_ptr<configuration>& _configuration,
+             bool _is_routing_endpoint);
+ 
+-    virtual ~local_uds_server_endpoint_impl();
++    virtual ~local_uds_server_endpoint_impl() = default;
+ 
+     void start();
+     void stop();
+diff --git a/implementation/endpoints/include/udp_server_endpoint_impl_receive_op.hpp b/implementation/endpoints/include/udp_server_endpoint_impl_receive_op.hpp
+index 1e4f0fe0..35638cd7 100644
+--- a/implementation/endpoints/include/udp_server_endpoint_impl_receive_op.hpp
++++ b/implementation/endpoints/include/udp_server_endpoint_impl_receive_op.hpp
+@@ -35,7 +35,7 @@ struct storage :
+     socket_type_t &socket_;
+     endpoint_type_t &sender_;
+     receive_handler_t handler_;
+-    byte_t *buffer_;
++    byte_t *buffer_ = nullptr;
+     size_t length_;
+     std::uint8_t multicast_id_;
+     bool is_v4_;
+diff --git a/implementation/endpoints/src/endpoint_manager_base.cpp b/implementation/endpoints/src/endpoint_manager_base.cpp
+index 9dff9785..4e484454 100644
+--- a/implementation/endpoints/src/endpoint_manager_base.cpp
++++ b/implementation/endpoints/src/endpoint_manager_base.cpp
+@@ -38,7 +38,7 @@ std::shared_ptr<endpoint> endpoint_manager_base::create_local(client_t _client)
+     return create_local_unlocked(_client);
+ }
+ 
+-void endpoint_manager_base::remove_local(client_t _client) {
++void endpoint_manager_base::remove_local(const client_t _client) {
+     std::shared_ptr<endpoint> its_endpoint(find_local(_client));
+     if (its_endpoint) {
+         its_endpoint->register_error_handler(nullptr);
+diff --git a/implementation/endpoints/src/local_uds_client_endpoint_impl.cpp b/implementation/endpoints/src/local_uds_client_endpoint_impl.cpp
+index 0b7e261c..56c621db 100644
+--- a/implementation/endpoints/src/local_uds_client_endpoint_impl.cpp
++++ b/implementation/endpoints/src/local_uds_client_endpoint_impl.cpp
+@@ -40,12 +40,7 @@ local_uds_client_endpoint_impl::local_uds_client_endpoint_impl(
+     is_supporting_magic_cookies_ = false;
+ }
+ 
+-local_uds_client_endpoint_impl::~local_uds_client_endpoint_impl() {
+-
+-}
+-
+ bool local_uds_client_endpoint_impl::is_local() const {
+-
+     return true;
+ }
+ 
+diff --git a/implementation/endpoints/src/local_uds_server_endpoint_impl.cpp b/implementation/endpoints/src/local_uds_server_endpoint_impl.cpp
+index 948fe925..33876c56 100644
+--- a/implementation/endpoints/src/local_uds_server_endpoint_impl.cpp
++++ b/implementation/endpoints/src/local_uds_server_endpoint_impl.cpp
+@@ -104,17 +104,11 @@ local_uds_server_endpoint_impl::local_uds_server_endpoint_impl(
+ #endif
+ }
+ 
+-local_uds_server_endpoint_impl::~local_uds_server_endpoint_impl() {
+-
+-}
+-
+ bool local_uds_server_endpoint_impl::is_local() const {
+-
+     return true;
+ }
+ 
+ void local_uds_server_endpoint_impl::start() {
+-
+     std::lock_guard<std::mutex> its_lock(acceptor_mutex_);
+     if (acceptor_.is_open()) {
+         connection::ptr new_connection = connection::create(
+diff --git a/implementation/endpoints/src/tcp_client_endpoint_impl.cpp b/implementation/endpoints/src/tcp_client_endpoint_impl.cpp
+index f42d93d4..e6755157 100644
+--- a/implementation/endpoints/src/tcp_client_endpoint_impl.cpp
++++ b/implementation/endpoints/src/tcp_client_endpoint_impl.cpp
+@@ -178,7 +178,7 @@ void tcp_client_endpoint_impl::connect() {
+         std::string its_device(configuration_->get_device());
+         if (its_device != "") {
+             if (setsockopt(socket_->native_handle(),
+-                    SOL_SOCKET, SO_BINDTODEVICE, its_device.c_str(), (socklen_t)its_device.size()) == -1) {
++                    SOL_SOCKET, SO_BINDTODEVICE, its_device.c_str(), static_cast<socklen_t>(its_device.size())) == -1) {
+                 VSOMEIP_WARNING << "TCP Client: Could not bind to device \"" << its_device << "\"";
+             }
+         }
+diff --git a/implementation/endpoints/src/tcp_server_endpoint_impl.cpp b/implementation/endpoints/src/tcp_server_endpoint_impl.cpp
+index f83252ae..5aef72be 100644
+--- a/implementation/endpoints/src/tcp_server_endpoint_impl.cpp
++++ b/implementation/endpoints/src/tcp_server_endpoint_impl.cpp
+@@ -55,7 +55,7 @@ tcp_server_endpoint_impl::tcp_server_endpoint_impl(
+     std::string its_device(configuration_->get_device());
+     if (its_device != "") {
+         if (setsockopt(acceptor_.native_handle(),
+-                SOL_SOCKET, SO_BINDTODEVICE, its_device.c_str(), (socklen_t)its_device.size()) == -1) {
++                SOL_SOCKET, SO_BINDTODEVICE, its_device.c_str(), static_cast<socklen_t>(its_device.size())) == -1) {
+             VSOMEIP_WARNING << "TCP Server: Could not bind to device \"" << its_device << "\"";
+         }
+     }
+@@ -295,8 +295,8 @@ void tcp_server_endpoint_impl::accept_cbk(const connection::ptr& _connection,
+         auto its_ep = std::dynamic_pointer_cast<tcp_server_endpoint_impl>(
+                 shared_from_this());
+         its_timer->async_wait([its_timer, its_ep]
+-                               (const boost::system::error_code& _error) {
+-            if (!_error) {
++                               (const boost::system::error_code& _error_inner) {
++            if (!_error_inner) {
+                 its_ep->start();
+             }
+         });
+@@ -853,12 +853,12 @@ void tcp_server_endpoint_impl::connection::handle_recv_buffer_exception(
+             << std::setfill('0') << std::hex;
+ 
+     for (std::size_t i = 0; i < recv_buffer_size_ && i < 16; i++) {
+-        its_message << std::setw(2) << (int) (recv_buffer_[i]) << " ";
++        its_message << std::setw(2) << static_cast<int>(recv_buffer_[i]) << " ";
+     }
+ 
+     its_message << " Last 16 Bytes captured: ";
+     for (int i = 15; recv_buffer_size_ > 15 && i >= 0; i--) {
+-        its_message << std::setw(2) <<  (int) (recv_buffer_[static_cast<size_t>(i)]) << " ";
++        its_message << std::setw(2) <<  static_cast<int>(recv_buffer_[static_cast<size_t>(i)]) << " ";
+     }
+     VSOMEIP_ERROR << its_message.str();
+     recv_buffer_.clear();
+@@ -954,7 +954,7 @@ void tcp_server_endpoint_impl::print_status() {
+     std::lock_guard<std::mutex> its_lock(mutex_);
+     connections_t its_connections;
+     {
+-        std::lock_guard<std::mutex> its_lock(connections_mutex_);
++        std::lock_guard<std::mutex> its_lock_inner(connections_mutex_);
+         its_connections = connections_;
+     }
+ 
+@@ -1027,7 +1027,7 @@ void tcp_server_endpoint_impl::connection::wait_until_sent(const boost::system::
+         }
+     }
+     {
+-        std::lock_guard<std::mutex> its_lock(its_server->connections_mutex_);
++        std::lock_guard<std::mutex> its_lock_inner(its_server->connections_mutex_);
+         stop();
+     }
+     its_server->remove_connection(this);
+diff --git a/implementation/endpoints/src/udp_client_endpoint_impl.cpp b/implementation/endpoints/src/udp_client_endpoint_impl.cpp
+index d6952228..f52b2354 100644
+--- a/implementation/endpoints/src/udp_client_endpoint_impl.cpp
++++ b/implementation/endpoints/src/udp_client_endpoint_impl.cpp
+@@ -67,7 +67,7 @@ void udp_client_endpoint_impl::connect() {
+                     << get_address_port_remote();
+         }
+         socket_->set_option(boost::asio::socket_base::receive_buffer_size(
+-                udp_receive_buffer_size_), its_error);
++                static_cast<int>(udp_receive_buffer_size_)), its_error);
+         if (its_error) {
+             VSOMEIP_WARNING << "udp_client_endpoint_impl::connect: couldn't set "
+                     << "SO_RCVBUF: " << its_error.message()
+diff --git a/implementation/endpoints/src/udp_server_endpoint_impl.cpp b/implementation/endpoints/src/udp_server_endpoint_impl.cpp
+index 48e35c5d..587fb94c 100644
+--- a/implementation/endpoints/src/udp_server_endpoint_impl.cpp
++++ b/implementation/endpoints/src/udp_server_endpoint_impl.cpp
+@@ -72,7 +72,7 @@ udp_server_endpoint_impl::udp_server_endpoint_impl(
+     std::string its_device(configuration_->get_device());
+     if (its_device != "") {
+         if (setsockopt(unicast_socket_.native_handle(),
+-                SOL_SOCKET, SO_BINDTODEVICE, its_device.c_str(), (socklen_t)its_device.size()) == -1) {
++                SOL_SOCKET, SO_BINDTODEVICE, its_device.c_str(), static_cast<socklen_t>(its_device.size())) == -1) {
+             VSOMEIP_WARNING << "UDP Server: Could not bind to device \"" << its_device << "\"";
+         }
+     }
+@@ -108,7 +108,7 @@ udp_server_endpoint_impl::udp_server_endpoint_impl(
+     const int its_udp_recv_buffer_size =
+             configuration_->get_udp_receive_buffer_size();
+     unicast_socket_.set_option(boost::asio::socket_base::receive_buffer_size(
+-            its_udp_recv_buffer_size), ec);
++            static_cast<int>(its_udp_recv_buffer_size)), ec);
+ 
+     if (ec) {
+         VSOMEIP_WARNING << "udp_server_endpoint_impl: couldn't set "
+diff --git a/implementation/message/include/message_base_impl.hpp b/implementation/message/include/message_base_impl.hpp
+index acad2e89..2c953e98 100644
+--- a/implementation/message/include/message_base_impl.hpp
++++ b/implementation/message/include/message_base_impl.hpp
+@@ -6,8 +6,6 @@
+ #ifndef VSOMEIP_V3_MESSAGE_BASE_IMPL_HPP
+ #define VSOMEIP_V3_MESSAGE_BASE_IMPL_HPP
+ 
+-#include <boost/thread.hpp>
+-
+ #include <vsomeip/export.hpp>
+ #include <vsomeip/message.hpp>
+ 
+diff --git a/implementation/message/src/deserializer.cpp b/implementation/message/src/deserializer.cpp
+index 3c4eddfa..bfa723d3 100644
+--- a/implementation/message/src/deserializer.cpp
++++ b/implementation/message/src/deserializer.cpp
+@@ -115,8 +115,8 @@ bool deserializer::deserialize(std::string &_target, std::size_t _length) {
+     if (_length > remaining_ || _length > _target.capacity()) {
+         return false;
+     }
+-    _target.assign(position_, position_ + long(_length));
+-    position_ += long(_length);
++    _target.assign(position_, position_ + static_cast<std::vector<byte_t>::difference_type>(_length));
++    position_ += static_cast<std::vector<byte_t>::difference_type>(_length);
+     remaining_ -= _length;
+ 
+     return true;
+diff --git a/implementation/plugin/src/plugin_manager_impl.cpp b/implementation/plugin/src/plugin_manager_impl.cpp
+index bea96d01..23b7b892 100644
+--- a/implementation/plugin/src/plugin_manager_impl.cpp
++++ b/implementation/plugin/src/plugin_manager_impl.cpp
+@@ -164,7 +164,7 @@ bool plugin_manager_impl::unload_plugin(plugin_type_e _type) {
+         }
+     } else {
+         VSOMEIP_ERROR << "plugin_manager_impl::unload_plugin didn't find plugin"
+-                << " type:" << (int)_type;
++                << " type:" << static_cast<int>(_type);
+         return false;
+     }
+     return plugins_.erase(_type);
+diff --git a/implementation/routing/src/routing_manager_base.cpp b/implementation/routing/src/routing_manager_base.cpp
+index dde6b260..047e6566 100644
+--- a/implementation/routing/src/routing_manager_base.cpp
++++ b/implementation/routing/src/routing_manager_base.cpp
+@@ -1184,8 +1184,8 @@ void routing_manager_base::remove_local(client_t _client,
+         std::lock_guard<std::mutex> its_lock(local_services_mutex_);
+         // Finally remove all services that are implemented by the client.
+         std::set<std::pair<service_t, instance_t>> its_services;
+-        for (auto& s : local_services_) {
+-            for (auto& i : s.second) {
++        for (const auto& s : local_services_) {
++            for (const auto& i : s.second) {
+                 if (std::get<2>(i.second) == _client) {
+                     its_services.insert({ s.first, i.first });
+                     host_->on_availability(s.first, i.first, availability_state_e::AS_UNAVAILABLE,
+@@ -1202,9 +1202,9 @@ void routing_manager_base::remove_local(client_t _client,
+ 
+         // remove disconnected client from offer service history
+         std::set<std::tuple<service_t, instance_t, client_t>> its_clients;
+-        for (auto& s : local_services_history_) {
+-            for (auto& i : s.second) {
+-                for (auto& c : i.second) {
++        for (const auto& s : local_services_history_) {
++            for (const auto& i : s.second) {
++                for (const auto& c : i.second) {
+                     if (c == _client) {
+                         its_clients.insert(std::make_tuple(s.first, i.first, c));
+                     }
+diff --git a/implementation/runtime/include/application_impl.hpp b/implementation/runtime/include/application_impl.hpp
+index 67187a87..c647b531 100644
+--- a/implementation/runtime/include/application_impl.hpp
++++ b/implementation/runtime/include/application_impl.hpp
+@@ -309,7 +309,7 @@ private:
+     std::shared_ptr<sync_handler> get_next_handler();
+     void reschedule_availability_handler(const std::shared_ptr<sync_handler> &_handler);
+     bool has_active_dispatcher();
+-    bool is_active_dispatcher(const std::thread::id &_id);
++    bool is_active_dispatcher(const std::thread::id &_id) const;
+     void remove_elapsed_dispatchers();
+ 
+     void shutdown();
+@@ -436,7 +436,7 @@ private:
+     // Dispatcher threads that are running
+     std::set<std::thread::id> running_dispatchers_;
+     // Mutex to protect access to dispatchers_ & elapsed_dispatchers_
+-    std::mutex dispatcher_mutex_;
++    mutable std::mutex dispatcher_mutex_;
+ 
+     // Condition to wakeup the dispatcher thread
+     mutable std::condition_variable dispatcher_condition_;
+diff --git a/implementation/runtime/src/application_impl.cpp b/implementation/runtime/src/application_impl.cpp
+index aba906b7..db880b42 100644
+--- a/implementation/runtime/src/application_impl.cpp
++++ b/implementation/runtime/src/application_impl.cpp
+@@ -426,7 +426,8 @@ void application_impl::start() {
+             std::lock_guard<std::mutex> its_lock(dispatcher_mutex_);
+             is_dispatching_ = true;
+             auto its_main_dispatcher = std::make_shared<std::thread>(
+-                    std::bind(&application_impl::main_dispatch, shared_from_this()));
++                    &application_impl::main_dispatch, shared_from_this()
++            );
+             dispatchers_[its_main_dispatcher->get_id()] = its_main_dispatcher;
+         }
+ 
+@@ -1792,7 +1793,7 @@ void application_impl::main_dispatch() {
+             }
+         } else {
+             std::shared_ptr<sync_handler> its_handler;
+-            while (is_dispatching_  && is_active_dispatcher(its_id)
++            while (is_dispatching_ && is_active_dispatcher(its_id)
+                    && (its_handler = get_next_handler())) {
+                 its_lock.unlock();
+                 invoke_handler(its_handler);
+@@ -2048,7 +2049,7 @@ bool application_impl::has_active_dispatcher() {
+     return false;
+ }
+ 
+-bool application_impl::is_active_dispatcher(const std::thread::id &_id) {
++bool application_impl::is_active_dispatcher(const std::thread::id &_id) const {
+     while (is_dispatching_) {
+         if (dispatcher_mutex_.try_lock()) {
+             for (const auto &d : dispatchers_) {
+diff --git a/implementation/security/src/policy.cpp b/implementation/security/src/policy.cpp
+index 36341223..da0bbd86 100644
+--- a/implementation/security/src/policy.cpp
++++ b/implementation/security/src/policy.cpp
+@@ -175,7 +175,7 @@ policy::deserialize_ids(const byte_t * &_data, uint32_t &_size,
+         if (its_result == false)
+             return false;
+ 
+-        for (const auto i : its_instances)
++        for (const auto& i : its_instances)
+             its_ids += std::make_pair(i, its_methods);
+ 
+         its_array_length -= (its_current_size - _size);
+@@ -379,7 +379,7 @@ policy::serialize_interval_set(
+     uint32_t its_interval_set_size(0);
+     serialize_u32(its_interval_set_size, _data);
+ 
+-    for (const auto i : _intervals)
++    for (const auto& i : _intervals)
+         serialize_interval(i, _data);
+ 
+     its_interval_set_size = static_cast<uint32_t>(_data.size()
+diff --git a/implementation/security/src/security.cpp b/implementation/security/src/security.cpp
+index a3b6ab3f..19ff73da 100644
+--- a/implementation/security/src/security.cpp
++++ b/implementation/security/src/security.cpp
+@@ -14,6 +14,7 @@
+ #include "../../plugin/include/plugin_manager.hpp"
+ 
+ #include <array>
++#include <iomanip>
+ #include <tuple>
+ 
+ #ifndef _WIN32
+diff --git a/implementation/service_discovery/src/service_discovery_impl.cpp b/implementation/service_discovery/src/service_discovery_impl.cpp
+index de6e8467..c3880457 100644
+--- a/implementation/service_discovery/src/service_discovery_impl.cpp
++++ b/implementation/service_discovery/src/service_discovery_impl.cpp
+@@ -5,8 +5,10 @@
+ 
+ #include <vsomeip/constants.hpp>
+ 
+-#include <random>
++#include <chrono>
++#include <iomanip>
+ #include <forward_list>
++#include <random>
+ #include <thread>
+ 
+ #include <vsomeip/internal/logger.hpp>
+@@ -869,7 +871,7 @@ service_discovery_impl::create_eventgroup_entry(
+                 << std::setw(4) << _service << "."
+                 << std::setw(4) << _instance << "."
+                 << std::setw(4) << _eventgroup << "] "
+-                << (uint16_t) _reliability_type;
++                << static_cast<uint16_t>(_reliability_type);
+         return its_data;
+     }
+     std::shared_ptr<eventgroupentry_impl> its_entry, its_other;
+@@ -1074,7 +1076,7 @@ service_discovery_impl::insert_subscription_ack(
+     // Selective
+     if (_clients.size() > 1 || (*(_clients.begin())) != 0) {
+         auto its_selective_option = std::make_shared<selective_option_impl>();
+-        (void)its_selective_option->set_clients(_clients);
++        static_cast<void>(its_selective_option->set_clients(_clients));
+ 
+         its_data.options_.push_back(its_selective_option);
+     }
+@@ -1136,7 +1138,7 @@ service_discovery_impl::on_message(
+         static bool must_start_last_msg_received_timer(true);
+         boost::system::error_code ec;
+ 
+-        std::lock_guard<std::mutex> its_lock(last_msg_received_timer_mutex_);
++        std::lock_guard<std::mutex> its_lock_inner(last_msg_received_timer_mutex_);
+         if (0 < last_msg_received_timer_.cancel(ec) || must_start_last_msg_received_timer) {
+             must_start_last_msg_received_timer = false;
+             last_msg_received_timer_.expires_from_now(
+@@ -1272,7 +1274,7 @@ service_discovery_impl::on_message(
+         }
+ 
+         {
+-            std::unique_lock<std::recursive_mutex> its_lock(its_acknowledgement->get_lock());
++            std::unique_lock<std::recursive_mutex> its_lock_inner(its_acknowledgement->get_lock());
+             its_acknowledgement->complete();
+             // TODO: Check the following logic...
+             if (its_acknowledgement->has_subscription()) {
+@@ -1543,7 +1545,7 @@ service_discovery_impl::process_offerservice_serviceentry(
+                                     << std::setw(4) << _instance << "."
+                                     << std::setw(4) << eg << "]"
+                                     << " using reliability type:  "
+-                                    << std::setw(4) << (uint16_t) offer_type;
++                                    << std::setw(4) << static_cast<uint16_t>(offer_type);
+                         its_info->set_reliability(offer_type);
+                     }
+                 }
+@@ -1947,7 +1949,7 @@ service_discovery_impl::process_eventgroupentry(
+                     << ": SOME/IP length field in SubscribeEventGroup message header: ["
+                     << std::dec << _entry->get_owning_message()->get_someip_length()
+                     << "] bytes, is shorter than length of deserialized message: ["
+-                    << (uint32_t) _entry->get_owning_message()->get_length() << "] bytes. "
++                    << static_cast<uint32_t>(_entry->get_owning_message()->get_length()) << "] bytes. "
+                     << its_sender.to_string(ec) << " session: "
+                     << std::hex << std::setw(4) << std::setfill('0') << its_session;
+             return;
+@@ -2238,7 +2240,7 @@ service_discovery_impl::process_eventgroupentry(
+                 boost::system::error_code ec;
+                 VSOMEIP_WARNING << __func__
+                     << ": Unsupported eventgroup option ["
+-                    << std::hex << (int)its_option->get_type() << "] "
++                    << std::hex << static_cast<int>(its_option->get_type()) << "] "
+                     << its_sender.to_string(ec) << " session: "
+                     << std::hex << std::setw(4) << std::setfill('0') << its_session;
+                 if (its_ttl > 0) {
+@@ -2332,7 +2334,7 @@ service_discovery_impl::handle_eventgroup_subscription(
+                 << std::setw(4) << _instance << "."
+                 << std::setw(4) << _eventgroup << "]"
+                 << " not valid: Event configuration ("
+-                << (std::uint32_t)_info->get_reliability()
++                << static_cast<std::uint32_t>(_info->get_reliability())
+                 << ") does not match the provided endpoint options: "
+                 << _first_address.to_string(ec) << ":" << std::dec << _first_port << " "
+                 << _second_address.to_string(ec) << ":" << _second_port;
+@@ -2355,14 +2357,14 @@ service_discovery_impl::handle_eventgroup_subscription(
+         boost::system::error_code ec;
+         // TODO: Add session id
+         VSOMEIP_ERROR << __func__
+-                << ": Requested major version:[" << (uint32_t) _major
++                << ": Requested major version:[" << static_cast<uint32_t>(_major)
+                 << "] in subscription to service: ["
+                 << std::hex << std::setfill('0')
+                 << std::setw(4) << _service << "."
+                 << std::setw(4) << _instance << "."
+                 << std::setw(4) << _eventgroup << "]"
+                 << " does not match with services major version:["
+-                << (uint32_t) _info->get_major() << "] subscriber: "
++                << static_cast<uint32_t>(_info->get_major()) << "] subscriber: "
+                 << _first_address.to_string(ec) << ":" << std::dec << _first_port;
+         if (_ttl > 0) {
+             insert_subscription_ack(_acknowledgement, its_info, 0, nullptr, _clients);
+@@ -3107,8 +3109,8 @@ service_discovery_impl::move_offers_into_main_phase(
+     const auto its_timer = repetition_phase_timers_.find(_timer);
+     if (its_timer != repetition_phase_timers_.end()) {
+         for (const auto& its_service : its_timer->second) {
+-            for (const auto& instance : its_service.second) {
+-                instance.second->set_is_in_mainphase(true);
++            for (const auto& its_instance : its_service.second) {
++                its_instance.second->set_is_in_mainphase(true);
+             }
+         }
+         repetition_phase_timers_.erase(_timer);
+@@ -3125,7 +3127,7 @@ service_discovery_impl::stop_offer_service(
+     bool stop_offer_required(false);
+     // Delete from initial phase offers
+     {
+-        std::lock_guard<std::mutex> its_lock(collected_offers_mutex_);
++        std::lock_guard<std::mutex> its_lock_inner(collected_offers_mutex_);
+         if (collected_offers_.size()) {
+             auto its_service_it = collected_offers_.find(its_service);
+             if (its_service_it != collected_offers_.end()) {
+@@ -3147,7 +3149,7 @@ service_discovery_impl::stop_offer_service(
+ 
+     // Delete from repetition phase offers
+     {
+-        std::lock_guard<std::mutex> its_lock(repetition_phase_timers_mutex_);
++        std::lock_guard<std::mutex> its_lock_inner(repetition_phase_timers_mutex_);
+         for (auto rpt = repetition_phase_timers_.begin();
+                 rpt != repetition_phase_timers_.end();) {
+             auto its_service_it = rpt->second.find(its_service);
+@@ -3866,7 +3868,7 @@ reliability_type_e service_discovery_impl::get_eventgroup_reliability(
+                         << std::setw(4) << _instance << "."
+                         << std::setw(4) << _eventgroup << "]"
+                         << " using reliability type:  "
+-                        << std::setw(4) << (uint16_t) its_reliability;
++                        << std::setw(4) << static_cast<uint16_t>(its_reliability);
+             its_info->set_reliability(its_reliability);
+         }
+     } else {
+diff --git a/interface/vsomeip/constants.hpp b/interface/vsomeip/constants.hpp
+index 2b040c5e..2519b57f 100644
+--- a/interface/vsomeip/constants.hpp
++++ b/interface/vsomeip/constants.hpp
+@@ -13,54 +13,54 @@
+ 
+ namespace vsomeip_v3 {
+ 
+-const major_version_t DEFAULT_MAJOR = 0x00;
+-const minor_version_t DEFAULT_MINOR = 0x00000000;
+-const ttl_t DEFAULT_TTL = 0xFFFFFF; // "until next reboot"
++inline constexpr major_version_t DEFAULT_MAJOR = 0x00;
++inline constexpr minor_version_t DEFAULT_MINOR = 0x00000000;
++inline constexpr ttl_t DEFAULT_TTL = 0xFFFFFF; // "until next reboot"
+ 
+ const std::string DEFAULT_MULTICAST = "224.0.0.0";
+-const uint16_t DEFAULT_PORT = 30500;
+-const uint16_t ILLEGAL_PORT = 0xFFFF;
+-const uint16_t ANY_PORT = 0;
+-
+-const uint16_t NO_TRACE_FILTER_EXPRESSION = 0x0000;
+-
+-const service_t ANY_SERVICE = 0xFFFF;
+-const instance_t ANY_INSTANCE = 0xFFFF;
+-const eventgroup_t ANY_EVENTGROUP = 0xFFFF;
+-const method_t ANY_METHOD = 0xFFFF;
+-const major_version_t ANY_MAJOR = 0xFF;
+-const minor_version_t ANY_MINOR = 0xFFFFFFFF;
+-
+-const eventgroup_t DEFAULT_EVENTGROUP = 0x0001;
+-
+-const client_t ILLEGAL_CLIENT = 0x0000;
+-const method_t INVALID_METHOD = 0x0000;
+-
+-const byte_t MAGIC_COOKIE_CLIENT_MESSAGE = 0x00;
+-const byte_t MAGIC_COOKIE_SERVICE_MESSAGE = 0x80;
+-const length_t MAGIC_COOKIE_SIZE = 0x00000008;
+-const request_t MAGIC_COOKIE_REQUEST = 0xDEADBEEF;
+-const client_t MAGIC_COOKIE_CLIENT = 0xDEAD;
+-const protocol_version_t MAGIC_COOKIE_PROTOCOL_VERSION = 0x01;
+-const interface_version_t MAGIC_COOKIE_INTERFACE_VERSION = 0x01;
+-const message_type_e MAGIC_COOKIE_CLIENT_MESSAGE_TYPE =
++inline constexpr uint16_t DEFAULT_PORT = 30500;
++inline constexpr uint16_t ILLEGAL_PORT = 0xFFFF;
++inline constexpr uint16_t ANY_PORT = 0;
++
++inline constexpr uint16_t NO_TRACE_FILTER_EXPRESSION = 0x0000;
++
++inline constexpr service_t ANY_SERVICE = 0xFFFF;
++inline constexpr instance_t ANY_INSTANCE = 0xFFFF;
++inline constexpr eventgroup_t ANY_EVENTGROUP = 0xFFFF;
++inline constexpr method_t ANY_METHOD = 0xFFFF;
++inline constexpr major_version_t ANY_MAJOR = 0xFF;
++inline constexpr minor_version_t ANY_MINOR = 0xFFFFFFFF;
++
++inline constexpr eventgroup_t DEFAULT_EVENTGROUP = 0x0001;
++
++inline constexpr client_t ILLEGAL_CLIENT = 0x0000;
++inline constexpr method_t INVALID_METHOD = 0x0000;
++
++inline constexpr byte_t MAGIC_COOKIE_CLIENT_MESSAGE = 0x00;
++inline constexpr byte_t MAGIC_COOKIE_SERVICE_MESSAGE = 0x80;
++inline constexpr length_t MAGIC_COOKIE_SIZE = 0x00000008;
++inline constexpr request_t MAGIC_COOKIE_REQUEST = 0xDEADBEEF;
++inline constexpr client_t MAGIC_COOKIE_CLIENT = 0xDEAD;
++inline constexpr protocol_version_t MAGIC_COOKIE_PROTOCOL_VERSION = 0x01;
++inline constexpr interface_version_t MAGIC_COOKIE_INTERFACE_VERSION = 0x01;
++inline constexpr message_type_e MAGIC_COOKIE_CLIENT_MESSAGE_TYPE =
+         message_type_e::MT_REQUEST_NO_RETURN;
+-const message_type_e MAGIC_COOKIE_SERVICE_MESSAGE_TYPE =
++inline constexpr message_type_e MAGIC_COOKIE_SERVICE_MESSAGE_TYPE =
+         message_type_e::MT_NOTIFICATION;
+-const return_code_e MAGIC_COOKIE_RETURN_CODE = return_code_e::E_OK;
++inline constexpr return_code_e MAGIC_COOKIE_RETURN_CODE = return_code_e::E_OK;
+ 
+-const byte_t CLIENT_COOKIE[] = { 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
++inline constexpr byte_t CLIENT_COOKIE[] = { 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
+         0xDE, 0xAD, 0xBE, 0xEF, 0x01, 0x01, 0x01, 0x00 };
+ 
+-const byte_t SERVICE_COOKIE[] = { 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00, 0x00,
++inline constexpr byte_t SERVICE_COOKIE[] = { 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00, 0x00,
+         0x08, 0xDE, 0xAD, 0xBE, 0xEF, 0x01, 0x01, 0x02, 0x00 };
+ 
+-const event_t ANY_EVENT = 0xFFFF;
+-const client_t ANY_CLIENT = 0xFFFF;
++inline constexpr event_t ANY_EVENT = 0xFFFF;
++inline constexpr client_t ANY_CLIENT = 0xFFFF;
+ 
+-const int VSOMEIP_ALL = -1;
++inline constexpr int VSOMEIP_ALL = -1;
+ 
+-const pending_security_update_id_t DEFAULT_SECURITY_UPDATE_ID = 0x0;
++inline constexpr pending_security_update_id_t DEFAULT_SECURITY_UPDATE_ID = 0x0;
+ 
+ } // namespace vsomeip_v3
+ 
+diff --git a/test/network_tests/application_tests/application_test.cpp b/test/network_tests/application_tests/application_test.cpp
+index a4a1923d..c70b6cd5 100644
+--- a/test/network_tests/application_tests/application_test.cpp
++++ b/test/network_tests/application_tests/application_test.cpp
+@@ -3,6 +3,7 @@
+ // License, v. 2.0. If a copy of the MPL was not distributed with this
+ // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ 
++#include <atomic>
+ #include <thread>
+ #include <mutex>
+ #include <condition_variable>
+diff --git a/tools/vsomeip_ctrl.cpp b/tools/vsomeip_ctrl.cpp
+index 74510427..3e74a832 100644
+--- a/tools/vsomeip_ctrl.cpp
++++ b/tools/vsomeip_ctrl.cpp
+@@ -29,7 +29,6 @@ public:
+         instance_(_instance),
+         app_(vsomeip::runtime::get()->create_application("vsomeip_ctrl")),
+         wait_service_available_(true),
+-        send_thread_(std::bind(&vsomeip_sender::send, this)),
+         service_id_(0x0),
+         method_id_(0x0),
+         length_(0),
+@@ -39,6 +38,8 @@ public:
+         return_code_(vsomeip::return_code_e::E_UNKNOWN),
+         wait_for_answer_(true)
+     {
++        send_thread_ = std::thread{&vsomeip_sender::send, this};
++
+         if (user_message_.size() < VSOMEIP_PAYLOAD_POS) {
+             VSOMEIP_ERROR << "Provided message is to short, min. length "
+                     "is 16 Bytes, exiting.";
+@@ -117,11 +118,11 @@ public:
+             << std::setw(4) << _response->get_instance() << "]:";
+         VSOMEIP_INFO << "########## begin message";
+         VSOMEIP_INFO << std::hex << std::setw(4)  << std::setfill('0')
+-                << _response->get_service() 
++                << _response->get_service()
+                 << std::hex << std::setw(4) << std::setfill('0')
+                 << _response->get_method()
+                 << " # service id / instance id";
+-        VSOMEIP_INFO << std::hex << std::setw(8)  << std::setfill('0') 
++        VSOMEIP_INFO << std::hex << std::setw(8)  << std::setfill('0')
+                 << _response->get_length() << " # length";
+         VSOMEIP_INFO << std::hex << std::setw(4)  << std::setfill('0')
+                 << _response->get_client()
+@@ -243,7 +244,7 @@ private:
+         }
+ 
+         if (use_tcp_ && user_message_.size() > VSOMEIP_MAX_TCP_MESSAGE_SIZE) {
+-            VSOMEIP_WARNING << "Max allowed message size for TCP is " 
++            VSOMEIP_WARNING << "Max allowed message size for TCP is "
+                     << std::dec << VSOMEIP_MAX_TCP_MESSAGE_SIZE
+                     << ". Provided message size is: " << user_message_.size();
+         }

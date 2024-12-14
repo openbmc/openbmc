@@ -1,0 +1,47 @@
+From 5539442e5f5442606071afc5cf02642314ad13bb Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Wed, 17 Aug 2011 22:52:35 +0200
+Subject: [PATCH] tk 8.5.8: import from OE rev
+
+Patch by Sergei Golovan allows to find tclConfig.sh in /usr/share/tcltk/tcl8.5
+and tkConfig.sh in /usr/share/tcltk/tk8.5 where they are located in Debian
+installation.
+
+Upstream-Status: Pending
+---
+ unix/configure | 1 +
+ unix/tcl.m4    | 2 ++
+ 2 files changed, 3 insertions(+)
+
+Index: a/unix/configure
+===================================================================
+--- a/unix/configure.orig
++++ b/unix/configure
+@@ -1431,6 +1431,7 @@ echo "$as_me: error: ${with_tclconfig} d
+ 			`ls -d /usr/local/lib 2>/dev/null` \
+ 			`ls -d /usr/contrib/lib 2>/dev/null` \
+ 			`ls -d /usr/pkg/lib 2>/dev/null` \
++			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib 2>/dev/null` \
+ 			`ls -d /usr/lib64 2>/dev/null` \
+Index: a/unix/tcl.m4
+===================================================================
+--- a/unix/tcl.m4.orig
++++ b/unix/tcl.m4
+@@ -93,6 +93,7 @@ AC_DEFUN([SC_PATH_TCLCONFIG], [
+ 			`ls -d /usr/local/lib 2>/dev/null` \
+ 			`ls -d /usr/contrib/lib 2>/dev/null` \
+ 			`ls -d /usr/pkg/lib 2>/dev/null` \
++			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib 2>/dev/null` \
+ 			`ls -d /usr/lib64 2>/dev/null` \
+@@ -226,6 +227,7 @@ AC_DEFUN([SC_PATH_TKCONFIG], [
+ 			`ls -d /usr/local/lib 2>/dev/null` \
+ 			`ls -d /usr/contrib/lib 2>/dev/null` \
+ 			`ls -d /usr/pkg/lib 2>/dev/null` \
++			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib/tk8.6 2>/dev/null` \
+ 			`ls -d /usr/lib 2>/dev/null` \
+ 			`ls -d /usr/lib64 2>/dev/null` \

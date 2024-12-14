@@ -12,4 +12,4 @@ RDEPENDS:${PN} = "flatbuffers"
 
 inherit setuptools3
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

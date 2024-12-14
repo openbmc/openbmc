@@ -6,18 +6,18 @@ Release notes for Yocto-4.0.11 (Kirkstone)
 Security Fixes in Yocto-4.0.11
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  cups: Fix :cve:`2023-32324`
--  curl: Fix :cve:`2023-28319`, :cve:`2023-28320`, :cve:`2023-28321` and :cve:`2023-28322`
--  git: Ignore :cve:`2023-25815`
--  go: Fix :cve:`2023-24539` and :cve:`2023-24540`
--  nasm: Fix :cve:`2022-46457`
--  openssh: Fix :cve:`2023-28531`
--  openssl: Fix :cve:`2023-1255` and :cve:`2023-2650`
--  perl: Fix :cve:`2023-31484`
--  python3-requests: Fix for :cve:`2023-32681`
--  sysstat: Fix :cve:`2023-33204`
--  vim: Fix :cve:`2023-2426`
--  webkitgtk: fix :cve:`2022-42867`, :cve:`2022-46691`, :cve:`2022-46699` and :cve:`2022-46700`
+-  cups: Fix :cve_nist:`2023-32324`
+-  curl: Fix :cve_nist:`2023-28319`, :cve_nist:`2023-28320`, :cve_nist:`2023-28321` and :cve_nist:`2023-28322`
+-  git: Ignore :cve_nist:`2023-25815`
+-  go: Fix :cve_nist:`2023-24539` and :cve_nist:`2023-24540`
+-  nasm: Fix :cve_nist:`2022-46457`
+-  openssh: Fix :cve_nist:`2023-28531`
+-  openssl: Fix :cve_nist:`2023-1255` and :cve_nist:`2023-2650`
+-  perl: Fix :cve_nist:`2023-31484`
+-  python3-requests: Fix for :cve_nist:`2023-32681`
+-  sysstat: Fix :cve_nist:`2023-33204`
+-  vim: Fix :cve_nist:`2023-2426`
+-  webkitgtk: fix :cve_nist:`2022-42867`, :cve_nist:`2022-46691`, :cve_nist:`2022-46699` and :cve_nist:`2022-46700`
 
 
 Fixes in Yocto-4.0.11

@@ -12,6 +12,8 @@ SRC_URI = "${GNU_MIRROR}/groff/groff-${PV}.tar.gz \
            file://0001-Make-manpages-mulitlib-identical.patch \
            file://0001-build-Fix-Savannah-64681-webpage.ps-deps.patch \
            file://0001-build-meintro_fr.ps-depends-on-tbl.patch \
+           file://0001-hdtbl-Fix-Savannah-66316-missing-grn-dep.patch \
+           file://0001-contrib-hdtbl-hdtbl.am-Fix-race-issues-for-parallel-.patch \
            "
 
 SRC_URI[sha256sum] = "6b9757f592b7518b4902eb6af7e54570bdccba37a871fddb2d30ae3863511c13"

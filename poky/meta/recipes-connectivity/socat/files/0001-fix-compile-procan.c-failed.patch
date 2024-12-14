@@ -1,7 +1,7 @@
-From 4f887cc665c9a48b83e20ef4abe57afa7e365e0e Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@eng.windriver.com>
-Date: Tue, 5 Dec 2023 23:02:22 -0800
-Subject: [PATCH v2] fix compile procan.c failed
+From c4c3d5f2d4dfe8167205e8d20b4cb7a197706c16 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 27 Nov 2024 04:09:59 -0800
+Subject: [PATCH] fix compile procan.c failed
 
 1. Compile socat failed if out of tree build (build dir != source dir)
 ...
@@ -24,23 +24,23 @@ C source compile. Use first word of $(CC) to defeine marco CC
 [1] https://repo.or.cz/socat.git/commit/cd5673dbd0786c94e0b3ace7e35fab14c01e3185
 
 Upstream-Status: Submitted [socat@dest-unreach.org]
-Signed-off-by: Hongxu Jia <hongxu.jia@eng.windriver.com>
+
+Rebase to 1.8.0.1
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- Makefile.in | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ Makefile.in | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index c01b1a4..48dad69 100644
+index 631d31d..103d4d1 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -109,8 +109,8 @@ depend: $(CFILES) $(HFILES)
- socat: socat.o libxio.a
+@@ -110,7 +110,7 @@ socat: socat.o libxio.a
  	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ socat.o libxio.a $(CLIBS)
  
--procan.o: procan.c
--	$(CC) $(CFLAGS) -c -D CC=\"$(CC)\" -o $@ procan.c
-+procan.o: $(srcdir)/procan.c
-+	$(CC) $(CFLAGS) -c -D CC=\"$(firstword $(CC))\" -o $@ $(srcdir)/procan.c
+ procan.o: $(srcdir)/procan.c
+-	$(CC) $(CFLAGS) -c -D CC="\"$(CC)\"" -o $@ $(srcdir)/procan.c
++	$(CC) $(CFLAGS) -c -D CC="\"$(firstword $(CC))\"" -o $@ $(srcdir)/procan.c
  
  PROCAN_OBJS=procan_main.o procan.o procan-cdefs.o hostan.o error.o sycls.o sysutils.o utils.o vsnprintf_r.o snprinterr.o
  procan: $(PROCAN_OBJS)
@@ -58,5 +58,5 @@ index c01b1a4..48dad69 100644
  	$(INSTALL) -m 755 filan $(DESTDIR)$(BINDEST)
  	mkdir -p $(DESTDIR)$(MANDEST)/man1
 -- 
-2.42.0
+2.25.1
 

@@ -1,0 +1,40 @@
+From 9b5182d4781bcd6fb37a4030faf325965fde3e93 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 28 Nov 2024 20:32:17 +0100
+Subject: [PATCH] meson: correct check for existence of two preprocessor
+ defines
+
+sizeof is meant for *types*, and in case of cross compiling
+the test program produced by it has incorrect syntax
+  __NR_keyctl something;
+and will always fail to compile.
+
+* meson.build: Use cc.get_define() instead of cc.sizeof() to check for
+preprocessor symbols.
+
+Co-authored-by: Dmitry V. Levin <ldv@strace.io>
+Upstream-Status: Backport [https://github.com/linux-pam/linux-pam/pull/861]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index f6a7dafe9..307fed0aa 100644
+--- a/meson.build
++++ b/meson.build
+@@ -198,12 +198,12 @@ foreach ident: check_functions
+   endif
+ endforeach
+ 
+-enable_pam_keyinit = cc.sizeof('__NR_keyctl', prefix: '#include <sys/syscall.h>') > 0
++enable_pam_keyinit = cc.get_define('__NR_keyctl', prefix: '#include <sys/syscall.h>') != ''
+ 
+ if get_option('mailspool') != ''
+   cdata.set_quoted('PAM_PATH_MAILDIR', get_option('mailspool'))
+ else
+-  have = cc.sizeof('_PATH_MAILDIR', prefix: '#include <paths.h>') > 0
++  have = cc.get_define('_PATH_MAILDIR', prefix: '#include <paths.h>') != ''
+   cdata.set('PAM_PATH_MAILDIR', have ? '_PATH_MAILDIR' : '"/var/spool/mail"')
+ endif
+ 

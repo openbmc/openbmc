@@ -1,0 +1,49 @@
+From b48e34c436eb59877b0fe75ba3bf724c0de4dc36 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <toscano.pino@tiscali.it>
+Date: Sat, 7 Sep 2024 09:40:49 +0200
+Subject: [PATCH] migrate-catalogs: properly use time_t for localtime()
+
+Commit ed219c771bc0c63e1a7847e44c81f43223454eac changed the type of the
+'date' variable from 'time_t' to 'long', to ensure the right type is
+handled by sscanf(). The problem is that, in case 'time_t' is not the
+same as 'long', the wrong pointer is passed to localtime(), and more
+strict build flags (such as the defaults of GCC 14) cause the build to
+fail on such setups.
+
+The ideal fix in this case would be to switch back the 'date' variable
+to 'time_t' and use the right format specifier for it in sscanf();
+however, since this is an helper to convert very old format, this
+additional code is not much worth it. Hence, use a simpler fix: in case
+a date timestamp was read from the file, set it to a new 'time_t'
+variable which is then used for localtime(). Since 'time_t' is big at
+least as much as 'long', there is no precision/value loss.
+
+There should be no behaviour change.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gthumb/-/commit/283c9483afd1215378c8b9871f51cd61770e53e7]
+---
+ gthumb/main-migrate-catalogs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gthumb/main-migrate-catalogs.c b/gthumb/main-migrate-catalogs.c
+index 75f5cb11d..e194ed19f 100644
+--- a/gthumb/main-migrate-catalogs.c
++++ b/gthumb/main-migrate-catalogs.c
+@@ -308,12 +308,13 @@ migration_for_each_file (GFile     *file,
+ 				sscanf (line, "%d", &date_scope);
+ 
+ 				if ((date > 0) && (date_scope >= 1) && (date_scope <= 3)) {
++					time_t	     date_as_time = date;
+ 					struct tm   *tm;
+ 					GthDateTime *dt;
+ 					char        *exif_date;
+ 					char        *op;
+ 
+-					tm = localtime (&date);
++					tm = localtime (&date_as_time);
+ 					dt = gth_datetime_new ();
+ 					gth_datetime_from_struct_tm (dt, tm);
+ 					exif_date = gth_datetime_to_exif_date (dt);
+-- 
+GitLab
+

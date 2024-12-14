@@ -32,6 +32,5 @@ do_packagedata[noexec] = "1"
 deltask package_write_ipk
 deltask package_write_deb
 deltask package_write_rpm
-deltask do_deploy_archives 
 
 BBCLASSEXTEND = "native"

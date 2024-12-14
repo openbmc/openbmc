@@ -1,4 +1,4 @@
-From 0e441712d0e366a0384ff3fa879f5a2d2607c24f Mon Sep 17 00:00:00 2001
+From 2b19b36409b8de0621b9aeb0d13748e947a5bbfb Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 24 Jul 2013 17:07:22 +0800
 Subject: [PATCH] pidof: add -m option
@@ -14,7 +14,6 @@ Upstream-Status: Backport
 Imported patch from: https://bugzilla.redhat.com/attachment.cgi?id=658166
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  man/pidof.8    |  6 +++++
  src/killall5.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++---
@@ -45,17 +44,17 @@ index 6866cb3..a87d878 100644
  .TP
  .B 0
 diff --git a/src/killall5.c b/src/killall5.c
-index b0728fa..72289e3 100644
+index 6f7528a..34d656b 100644
 --- a/src/killall5.c
 +++ b/src/killall5.c
 @@ -121,6 +121,7 @@ typedef struct _s_nfs
  
  /* List of processes. */
- PROC *plist;
-+PROC *olist;
+ PROC *plist = NULL;
++PROC *olist = NULL;
  
  /* List of processes to omit. */
- OMIT *omit;
+ OMIT *omit = NULL;
 @@ -356,6 +357,20 @@ static void clear_mnt(void)
  	}
  }
@@ -85,7 +84,7 @@ index b0728fa..72289e3 100644
  	struct dirent	*d;
  	char		path[PATH_MAX+1];
  	char		buf[PATH_MAX+1];
-@@ -670,6 +686,17 @@ int readproc()
+@@ -671,6 +687,17 @@ int readproc()
  		p->next = plist;
  		plist = p;
  		p->pid = pid;
@@ -103,7 +102,7 @@ index b0728fa..72289e3 100644
  	}
  	closedir(dir);
  
-@@ -870,6 +897,26 @@ PIDQ_HEAD *pidof(char *prog)
+@@ -877,6 +904,26 @@ PIDQ_HEAD *pidof(char *prog)
  	return q;
  }
  
@@ -130,7 +129,7 @@ index b0728fa..72289e3 100644
  /* Give usage message and exit. */
  void usage(void)
  {
-@@ -920,6 +967,7 @@ void nsyslog(int pri, char *fmt, ...)
+@@ -927,6 +974,7 @@ void nsyslog(int pri, char *fmt, ...)
  #define PIDOF_OMIT	0x02
  #define PIDOF_NETFS	0x04
  #define PIDOF_QUIET     0x08
@@ -138,7 +137,7 @@ index b0728fa..72289e3 100644
  
  /*
   *	Pidof functionality.
-@@ -937,6 +985,7 @@ int main_pidof(int argc, char **argv)
+@@ -944,6 +992,7 @@ int main_pidof(int argc, char **argv)
  	char		tmp[512];
          char            sep = ' ';
  
@@ -146,7 +145,7 @@ index b0728fa..72289e3 100644
  	omit = (OMIT*)0;
  	nlist = (NFS*)0;
  	opterr = 0;
-@@ -944,7 +993,7 @@ int main_pidof(int argc, char **argv)
+@@ -951,7 +1000,7 @@ int main_pidof(int argc, char **argv)
  	if ((token = getenv("PIDOF_NETFS")) && (strcmp(token,"no") != 0))
  		flags |= PIDOF_NETFS;
  
@@ -155,7 +154,7 @@ index b0728fa..72289e3 100644
  		case '?':
  			nsyslog(LOG_ERR,"invalid options on command line!\n");
  			closelog();
-@@ -995,6 +1044,9 @@ int main_pidof(int argc, char **argv)
+@@ -1002,6 +1051,9 @@ int main_pidof(int argc, char **argv)
                  case 'z':
                          list_dz_processes = TRUE;
                          break;
@@ -165,7 +164,7 @@ index b0728fa..72289e3 100644
  		case 'n':
  			flags |= PIDOF_NETFS;
  			break;
-@@ -1026,10 +1078,13 @@ int main_pidof(int argc, char **argv)
+@@ -1033,10 +1085,13 @@ int main_pidof(int argc, char **argv)
  			pid_t spid = 0;
  			while ((p = get_next_from_pid_q(q))) {
  				if ((flags & PIDOF_OMIT) && omit) {
@@ -181,7 +180,7 @@ index b0728fa..72289e3 100644
  					}
  
  					/*
-@@ -1071,6 +1126,7 @@ int main_pidof(int argc, char **argv)
+@@ -1078,6 +1133,7 @@ int main_pidof(int argc, char **argv)
  		printf("\n");
          }
  
@@ -189,3 +188,6 @@ index b0728fa..72289e3 100644
  	clear_mnt();
  
  	closelog();
+-- 
+2.25.1
+

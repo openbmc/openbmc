@@ -57,21 +57,30 @@ LVM2_PACKAGECONFIG:append:class-target = " \
 "
 
 PACKAGECONFIG[dbus] = "--enable-dbus-service,--disable-dbus-service,,python3-dbus python3-pyudev"
-PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev,${PN}-udevrules"
+PACKAGECONFIG[udev] = "--enable-udev_sync --enable-udev_rules --with-udevdir=${nonarch_base_libdir}/udev/rules.d,--disable-udev_sync --disable-udev_rules,udev,"
 
 PACKAGES =+ "libdevmapper"
 FILES:libdevmapper = " \
     ${libdir}/libdevmapper.so.* \
     ${sbindir}/dmsetup \
     ${sbindir}/dmstats \
+    ${nonarch_base_libdir}/udev/rules.d/10-dm.rules \
+    ${nonarch_base_libdir}/udev/rules.d/13-dm-disk.rules \
+    ${nonarch_base_libdir}/udev/rules.d/95-dm-notify.rules \
 "
 
 FILES:${PN} += " \
     ${libdir}/device-mapper/*.so \
-    ${systemd_system_unitdir}/lvm2-pvscan@.service \
+    ${systemd_system_unitdir} \
     ${PYTHON_SITEPACKAGES_DIR}/lvmdbusd \
     ${datadir}/dbus-1/system-services/com.redhat.lvmdbus1.service \
+    ${nonarch_base_libdir}/udev/rules.d/11-dm-lvm.rules \
+    ${nonarch_base_libdir}/udev/rules.d/69-dm-lvm.rules \
 "
+# Remove /lib/udev from FILES:${PN} so that any new rules files that are added
+# upstream will have to be explicitly added to either FILES:${PN} or
+# FILES:libdevmapper.
+FILES:${PN}:remove = "${nonarch_base_libdir}/udev"
 
 FILES:${PN}-scripts = " \
     ${sbindir}/blkdeactivate \
@@ -79,11 +88,8 @@ FILES:${PN}-scripts = " \
     ${sbindir}/lvmconf \
     ${sbindir}/lvmdump \
 "
-# Specified explicitly for the udev rules, just in case that it does not get picked
-# up automatically:
-FILES:${PN}-udevrules = "${nonarch_base_libdir}/udev/rules.d"
+
 RDEPENDS:${PN} = "bash"
-RDEPENDS:${PN}-udevrules = "libdevmapper"
 RDEPENDS:${PN}:append:class-target = " libdevmapper"
 RDEPENDS:${PN}:append:class-nativesdk = " libdevmapper"
 

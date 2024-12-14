@@ -1,4 +1,4 @@
-From ef47e6199986c4951e681ed74f064042db1ae2e1 Mon Sep 17 00:00:00 2001
+From 4c68d7aa739ebd997db43d73cf2a43b776969c89 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 15 Dec 2021 21:47:53 -0800
 Subject: [PATCH] tzselect.ksh: Use /bin/sh default shell interpreter
@@ -16,7 +16,7 @@ Cc: Paul Eggert <eggert@cs.ucla.edu>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/timezone/tzselect.ksh b/timezone/tzselect.ksh
-index 18fce27e24..cc08efb0fb 100755
+index 38941bbc55..588bcb9f06 100755
 --- a/timezone/tzselect.ksh
 +++ b/timezone/tzselect.ksh
 @@ -1,4 +1,4 @@

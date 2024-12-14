@@ -20,26 +20,6 @@ inherit_defer ${XORGBUILDCLASS}
 # depends on virtual/xserver
 REQUIRED_DISTRO_FEATURES = "x11"
 
-# FIXME: We don't want to include the libtool archives (*.la) from modules
-# directory, as they serve no useful purpose. Upstream should fix Makefile.am
-do_install:append() {
-	find ${D}${libdir}/xorg/modules -regex ".*\.la$" | xargs rm -f --
-}
-
-# Function to add the relevant ABI dependency to drivers, which should be called
-# from a PACKAGEFUNC.
-def _add_xorg_abi_depends(d, name):
-    # Map of ABI names exposed in the dependencies to pkg-config variables
-    abis = {
-      "video": "abi_videodrv",
-      "input": "abi_xinput"
-    }
-
-    output = os.popen("pkg-config xorg-server --variable=%s" % abis[name]).read()
-    mlprefix = d.getVar('MLPREFIX') or ''
-    abi = "%sxorg-abi-%s-%s" % (mlprefix, name, output.split(".")[0])
-
-    pn = d.getVar("PN")
-    d.appendVar('RDEPENDS:' + pn, ' ' + abi)
-
 SECURITY_LDFLAGS = "${SECURITY_X_LDFLAGS}"
+
+require recipes-graphics/xorg-xserver/xserver-abi.inc

@@ -81,7 +81,6 @@ SYSTEMD_PACKAGES = "${PN}-bin"
 SYSTEMD_SERVICE:${PN}-bin = "saslauthd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-SRC_URI[md5sum] = "a7f4e5e559a0e37b3ffc438c9456e425"
 SRC_URI[sha256sum] = "8fbc5136512b59bb793657f36fadda6359cae3b08f01fd16b3d406f1345b7bc3"
 
 PACKAGES =+ "${PN}-bin"

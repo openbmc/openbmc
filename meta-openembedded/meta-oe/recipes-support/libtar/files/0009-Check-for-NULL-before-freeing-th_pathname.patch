@@ -1,0 +1,30 @@
+From bc8ec7d940d7ffc870638521bd134098d2efa5df Mon Sep 17 00:00:00 2001
+From: Chris Frey <cdfrey@foursquare.net>
+Date: Thu, 24 Oct 2013 17:55:12 -0400
+Subject: [PATCH] Check for NULL before freeing th_pathname
+
+Thanks to Harald Koch for pointing out that AIX 4 and 5 still need this.
+
+Authored by Chris Frey <cdfrey@foursquare.net>.
+
+Upstream-Status: Backport [https://repo.or.cz/libtar.git/commit/495d0c0eabc5648186e7d58ad54b508d14af38f4]
+
+Signed-off-by: Katariina Lounento <katariina.lounento@vaisala.com>
+---
+ lib/handle.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/handle.c b/lib/handle.c
+index a19c046..28a7dc2 100644
+--- a/lib/handle.c
++++ b/lib/handle.c
+@@ -122,7 +122,8 @@ tar_close(TAR *t)
+ 		libtar_hash_free(t->h, ((t->oflags & O_ACCMODE) == O_RDONLY
+ 					? free
+ 					: (libtar_freefunc_t)tar_dev_free));
+-	free(t->th_pathname);
++	if (t->th_pathname != NULL)
++		free(t->th_pathname);
+ 	free(t);
+ 
+ 	return i;

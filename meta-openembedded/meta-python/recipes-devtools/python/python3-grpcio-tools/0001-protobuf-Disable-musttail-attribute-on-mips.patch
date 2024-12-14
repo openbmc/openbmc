@@ -1,4 +1,4 @@
-From 64d737318656286f69ddc5ad654072785ddcbbed Mon Sep 17 00:00:00 2001
+From 028a02fa7f03a3bcd590624d32b09100129e096a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 16 Sep 2022 19:09:15 -0700
 Subject: [PATCH] protobuf: Disable musttail attribute on mips
@@ -9,12 +9,14 @@ Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
- third_party/protobuf/src/google/protobuf/port_def.inc | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ third_party/protobuf/src/google/protobuf/port_def.inc | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/third_party/protobuf/src/google/protobuf/port_def.inc b/third_party/protobuf/src/google/protobuf/port_def.inc
+index 2b13718..8875e3e 100644
 --- a/third_party/protobuf/src/google/protobuf/port_def.inc
 +++ b/third_party/protobuf/src/google/protobuf/port_def.inc
-@@ -298,6 +298,7 @@
+@@ -242,6 +242,7 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
  #error PROTOBUF_TAILCALL was previously defined
  #endif
  #if ABSL_HAVE_CPP_ATTRIBUTE(clang::musttail) && !defined(__arm__) &&  \

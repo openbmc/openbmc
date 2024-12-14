@@ -7,7 +7,7 @@ Whereas Module::Build has over 6,700 lines of code; this module has less than \
 120, yet supports the features needed by most distributions."
 SECTION = "libs"
 
-HOMEPAGE = "http://search.cpan.org/~leont/Module-Build-Tiny/"
+HOMEPAGE = "https://metacpan.org/release/LEONT/Module-Build-Tiny-0.048"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2b9e8b5e2bd19fcc97ac84b78a271a64"
@@ -20,6 +20,13 @@ SRC_URI[sha256sum] = "79a73e506fb7badabdf79137a45c6c5027daaf6f9ac3dcfb9d4ffcce92
 S = "${WORKDIR}/Module-Build-Tiny-${PV}"
 
 inherit cpan_build ptest-perl
+
+do_install:append() {
+  sed -i \
+    -e 's|${TMPDIR}||g' \
+    `find ${D}/usr/lib/perl5 -type f -name .packlist`
+}
+
 
 RDEPENDS:${PN} += " \
     libextutils-config-perl \

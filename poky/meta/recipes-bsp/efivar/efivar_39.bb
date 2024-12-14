@@ -11,7 +11,6 @@ SRC_URI = "git://github.com/rhinstaller/efivar.git;branch=main;protocol=https \
            file://0001-docs-do-not-build-efisecdb-manpage.patch \
            "
 SRCREV = "c47820c37ac26286559ec004de07d48d05f3308c"
-PV .= "+39+git"
 
 S = "${WORKDIR}/git"
 

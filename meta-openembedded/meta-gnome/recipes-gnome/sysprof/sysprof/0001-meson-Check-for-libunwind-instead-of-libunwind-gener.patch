@@ -1,30 +1,32 @@
-From 19188367bee87b0084ab34869455155da5cb1731 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Wed, 13 Apr 2022 08:47:39 -0700
+From 779bbfebcd414a2cb4ab73ff1c4eb987cfdab456 Mon Sep 17 00:00:00 2001
+From: Pablo Saavedra <psaavedra@igalia.com>
+Date: Mon, 11 Nov 2024 13:05:15 +0100
 Subject: [PATCH] meson: Check for libunwind instead of libunwind-generic
 
 This helps it to use llvm unwinder since libunwind-generic is specific
 to nongnu libunwind.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/sysprof/-/merge_requests/95]
+
+Original-by: Khem Raj <raj.khem@gmail.com>
+Modified-by: Pablo Saavedra <psaavedra@igalia.com>
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Pablo Saavedra <psaavedra@igalia.com>
 ---
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 2835782..0fdb39a 100644
+index 96c1d09..86b9df4 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -81,7 +81,7 @@ config_h.set10('HAVE_POLKIT_AGENT', polkit_agent_dep.found())
+@@ -107,7 +107,7 @@ polkit_dep = dependency('polkit-gobject-1', version: polkit_req_version, require
  config_h.set10('HAVE_POLKIT', polkit_dep.found())
  
- if get_option('libunwind')
--  libunwind_dep = dependency('libunwind-generic')
-+  libunwind_dep = dependency('libunwind')
+ if need_libsysprof
+-  libunwind_dep = dependency('libunwind-generic', required: true)
++  libunwind_dep = dependency('libunwind', required: true)
    config_h.set('ENABLE_LIBUNWIND', libunwind_dep.found())
-   config_h.set('HAVE_UNW_SET_CACHE_SIZE', libunwind_dep.found() and cc.has_header_symbol('libunwind.h', 'unw_set_cache_size', dependencies: [libunwind_dep]))
- endif
--- 
-2.35.2
-
+   config_h.set('HAVE_UNW_SET_CACHE_SIZE',
+                cc.has_header_symbol('libunwind.h',

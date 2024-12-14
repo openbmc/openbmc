@@ -1,4 +1,4 @@
-From 7be8ec59a53e93c2bd453b3ba2d63d1b300ef11f Mon Sep 17 00:00:00 2001
+From c4f6cb380471b5e5478ae6f7f8c5604a6a64ec1c Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@fujitsu.com>
 Date: Mon, 23 May 2022 10:44:43 +0900
 Subject: [PATCH] Creating .hmac file should be excuted in target environment,

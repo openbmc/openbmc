@@ -1,4 +1,4 @@
-From d7143dc4e75c8bcc5cc4c852a4b972942b7e4d07 Mon Sep 17 00:00:00 2001
+From 7cc1c8cfcc620dec284204be0ae4416fd9fed95d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 20 Jan 2017 13:33:05 +0200
 Subject: [PATCH] Add support for prefixing /etc from RPM_ETCCONFIGDIR
@@ -10,21 +10,21 @@ from target rootfs instead of its own native sysroot.
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
- lib/rpmrc.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ lib/rpmrc.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
 diff --git a/lib/rpmrc.c b/lib/rpmrc.c
-index 483585ae4..ea858c290 100644
+index dc8d42aeb..3f2996850 100644
 --- a/lib/rpmrc.c
 +++ b/lib/rpmrc.c
-@@ -456,10 +456,14 @@ const char * lookupInDefaultTable(const char * name,
- static void setDefaults(void)
- {
-     const char *confdir = rpmConfigDir();
+@@ -481,11 +481,14 @@ static void setDefaults(void)
+ 	    userrc = xstrdup(oldrc);
+ 	}
+     }
 +    const char *etcconfdir = getenv("RPM_ETCCONFIGDIR");
 +    if (etcconfdir == NULL)
 +        etcconfdir = "";
-+
+ 
      if (!defrcfiles) {
  	defrcfiles = rstrscat(NULL, confdir, "/rpmrc", ":",
  				confdir, "/" RPM_VENDOR "/rpmrc", ":",
@@ -32,11 +32,11 @@ index 483585ae4..ea858c290 100644
 +				etcconfdir, SYSCONFDIR "/rpmrc", NULL);
      }
  
- #ifndef MACROFILES
-@@ -469,9 +473,9 @@ static void setDefaults(void)
+     /* macrofiles may be pre-set from --macros */
+@@ -495,9 +498,9 @@ static void setDefaults(void)
  				confdir, "/platform/%{_target}/macros", ":",
  				confdir, "/fileattrs/*.attr", ":",
-   				confdir, "/" RPM_VENDOR "/macros", ":",
+ 				confdir, "/" RPM_VENDOR "/macros", ":",
 -				SYSCONFDIR "/rpm/macros.*", ":",
 -				SYSCONFDIR "/rpm/macros", ":",
 -				SYSCONFDIR "/rpm/%{_target}/macros", NULL);
@@ -44,9 +44,9 @@ index 483585ae4..ea858c290 100644
 +				etcconfdir, SYSCONFDIR "/rpm/macros", ":",
 +				etcconfdir, SYSCONFDIR "/rpm/%{_target}/macros", NULL);
      }
- #else
-     macrofiles = MACROFILES;
-@@ -1115,7 +1119,11 @@ static void read_auxv(void)
+ 
+     free(usermacros);
+@@ -1142,7 +1145,11 @@ static void read_auxv(void)
   */
  static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
  {
@@ -59,7 +59,7 @@ index 483585ae4..ea858c290 100644
      static struct utsname un;
      char * chptr;
      canonEntry canon;
-@@ -1435,6 +1443,7 @@ static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
+@@ -1462,6 +1469,7 @@ static void defaultMachine(rpmrcCtx ctx, const char ** arch, const char ** os)
  
      if (arch) *arch = un.machine;
      if (os) *os = un.sysname;

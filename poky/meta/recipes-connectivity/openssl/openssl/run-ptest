@@ -1,12 +1,19 @@
 #!/bin/sh
 
-set -e
+set -eu
 
-# Optional arguments are 'list' to lists all tests, or the test name (base name
-# ie test_evp, not 03_test_evp.t).
+# Optional arguments are 'list' to lists the tests, or the test name (base name
+# ie test_evp, not 03_test_evp.t). Without any arguments we run all tests.
+
+if test $# -gt 0; then
+    TESTS=$*
+else
+    # Skip test_symbol_presence as this is for developers
+    TESTS="alltests -test_symbol_presence"
+fi
 
 export TOP=.
-# OPENSSL_ENGINES is relative from the test binaries
-export OPENSSL_ENGINES=../engines
+# Run four jobs in parallel
+export HARNESS_JOBS=4
 
-{ HARNESS_JOBS=4 perl ./test/run_tests.pl $* || echo "FAIL: openssl" ; } | sed -u -r -e '/(.*) \.*.ok/ s/^/PASS: /g' -r -e '/Dubious(.*)/ s/^/FAIL: /g' -e '/(.*) \.*.skipped: (.*)/ s/^/SKIP: /g'
+{ perl ./test/run_tests.pl $TESTS || echo "FAIL: openssl" ; } | sed -u -r -e '/(.*) \.*.ok/ s/^/PASS: /g' -r -e '/Dubious(.*)/ s/^/FAIL: /g' -e '/(.*) \.*.skipped: (.*)/ s/^/SKIP: /g'

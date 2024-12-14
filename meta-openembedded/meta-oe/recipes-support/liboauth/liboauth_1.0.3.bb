@@ -12,7 +12,6 @@ DEPENDS = "curl openssl"
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BP}.tar.gz \
            file://0001-Support-OpenSSL-1.1.0.patch \
            "
-SRC_URI[md5sum] = "689b46c2b3ab1a39735ac33f714c4f7f"
 SRC_URI[sha256sum] = "0df60157b052f0e774ade8a8bac59d6e8d4b464058cc55f9208d72e41156811f"
 
 inherit autotools pkgconfig

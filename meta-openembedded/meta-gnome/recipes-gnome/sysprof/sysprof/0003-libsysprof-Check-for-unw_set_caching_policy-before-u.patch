@@ -1,0 +1,32 @@
+From 68425b541e88f9f03a418cfda052b46b2a185e4e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 25 Jul 2024 20:18:17 -0700
+Subject: [PATCH] libsysprof: Check for unw_set_caching_policy before using
+
+llvm libunwind does not implement unw_cache_* functions yet
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/sysprof/-/merge_requests/95]
+
+Original-by: Khem Raj <raj.khem@gmail.com>
+Modified-by: Pablo Saavedra <psaavedra@igalia.com>
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Pablo Saavedra <psaavedra@igalia.com>
+---
+ src/preload/backtrace-helper.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/preload/backtrace-helper.h b/src/preload/backtrace-helper.h
+index ac4f8e9..e60032d 100644
+--- a/src/preload/backtrace-helper.h
++++ b/src/preload/backtrace-helper.h
+@@ -26,7 +26,9 @@
+ static void
+ backtrace_init (void)
+ {
++# ifdef UNW_CACHE_PER_THREAD
+   unw_set_caching_policy (unw_local_addr_space, UNW_CACHE_PER_THREAD);
++#endif
+ #ifdef HAVE_UNW_SET_CACHE_SIZE
+   unw_set_cache_size (unw_local_addr_space, 1024, 0);
+ #endif

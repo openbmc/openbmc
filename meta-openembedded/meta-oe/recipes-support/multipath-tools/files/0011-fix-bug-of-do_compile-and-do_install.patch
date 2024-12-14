@@ -1,7 +1,7 @@
-From 949070286692dfff89213792571da233fe82e440 Mon Sep 17 00:00:00 2001
+From 698361847e6fae321bc277a5fc518b2bd55751b8 Mon Sep 17 00:00:00 2001
 From: Wang Mingyu <wangmy@cn.fujitsu.com>
 Date: Sun, 10 May 2020 21:22:53 +0800
-Subject: [PATCH 11/12] fix bug of do_compile and do_install
+Subject: [PATCH] fix bug of do_compile and do_install
 
 when multiple processes make run in parallel,
 because of dependency error will occur.
@@ -18,10 +18,10 @@ Upstream-Status: Pending
  1 file changed, 10 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index 4df5f161..065249c2 100644
+index f06f7faa..690dc050 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -91,6 +91,16 @@ libmpathpersist libmpathvalid multipath multipathd: libmultipath
+@@ -94,6 +94,16 @@ libmpathpersist libmpathvalid multipath multipathd: libmultipath
  libmultipath/prioritizers libmultipath/checkers libmultipath/foreign: libmultipath
  mpathpersist multipathd:  libmpathpersist
  

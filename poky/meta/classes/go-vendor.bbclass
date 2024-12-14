@@ -156,7 +156,7 @@ python do_go_vendor() {
                 shutil.copy2(rootdirLicese, subdirLicense)
 
     # Copy vendor manifest
-    modules_txt_src = os.path.join(d.getVar('WORKDIR'), "modules.txt")
+    modules_txt_src = os.path.join(d.getVar('UNPACKDIR'), "modules.txt")
     bb.debug(1, "cp %s --> %s" % (modules_txt_src, vendor_dir))
     shutil.copy2(modules_txt_src, vendor_dir)
 

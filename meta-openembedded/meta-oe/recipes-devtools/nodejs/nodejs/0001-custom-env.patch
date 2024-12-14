@@ -1,0 +1,18 @@
+From 9c1a31afdcf368f794b9f5378cb3fe759570f905 Mon Sep 17 00:00:00 2001
+From: Jason Schonberg <schonm@gmail.com>
+Date: Tue, 30 Apr 2024 21:48:33 -0400
+Subject: [PATCH] Update to nodejs 22.0.0
+
+Upstream-Status: Inappropriate [embedded specific]
+---
+ test/fixtures/run-script/node_modules/.bin/custom-env | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/fixtures/run-script/node_modules/.bin/custom-env b/test/fixtures/run-script/node_modules/.bin/custom-env
+index e6f291c6..1430f2e9 100755
+--- a/test/fixtures/run-script/node_modules/.bin/custom-env
++++ b/test/fixtures/run-script/node_modules/.bin/custom-env
+@@ -1,2 +1,2 @@
+-#!/bin/bash
++#!/bin/sh
+ echo "$CUSTOM_ENV"

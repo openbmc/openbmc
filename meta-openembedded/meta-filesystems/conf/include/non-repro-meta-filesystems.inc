@@ -3,7 +3,4 @@
 KNOWN_NON_REPRO_META_FILESYSTEMS = " \
     e2tools-ptest \
     xfsprogs-doc \
-    zfs \
-    zfs-dbg \
-    zfs-dev \
 "

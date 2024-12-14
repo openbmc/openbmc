@@ -24,6 +24,11 @@ When sending single patches, please use something like:
 You are encouraged to fork the mirror on GitHub https://github.com/openembedded/meta-openembedded
 to share your patches, this is preferred for patch sets consisting of more than one patch.
 
+Note, it is discouraged to send patches via GitHub pull request system. Such
+patches get less attention from developers and can be mishandled or not
+reviewed properly. Please use emails instead. For exemple, you can use
+'git request-pull' to generate an email referencing your git repository.
+
 Other services like GitLab, repo.or.cz or self-hosted setups are of course accepted as well,
 'git fetch <remote>' works the same on all of them. We recommend GitHub because it is free, easy
 to use, has been proven to be reliable and has a really good web GUI.

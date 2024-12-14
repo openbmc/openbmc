@@ -14,8 +14,8 @@ SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git;protocol=git;
            file://makefile-remove-ldflags.patch \
            file://0001-gcov_merge.py-scov_merge.py-switch-to-python3.patch \
           "
-SRCREV = "025014dedca39d2b8a57a82e52286e72e157d73a"
-PV = "20222810+git"
+SRCREV = "9d11fc3e05eae7b454efeb5941beded56f80445b"
+PV = "20230601+git"
 
 RDEPENDS:${PN} = "mcelog mce-inject dialog bash"
 

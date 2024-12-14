@@ -15,13 +15,12 @@ SRC_URI = "git://sourceware.org/git/lvm2.git;branch=main \
            file://0005-do-not-build-manual.patch \
            file://0006-start-lvm2-monitor.service-after-tmp.mount.patch \
            file://reproducible-build.patch \
-           file://0001-configure.ac-check-egrep.patch \
            file://0001-include-libgen.h-for-basename.patch \
            "
 
-SRCREV = "90ec2cd92f6367c431dd8dae55d0cbe7e196734f"
+SRCREV = "f87a6ad6d6f7cde0170fd479a45ee5b0a1c63d52"
 S = "${WORKDIR}/git"
-PV = "2.03.24"
+PV = "2.03.28"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\_\d+)+)"
 

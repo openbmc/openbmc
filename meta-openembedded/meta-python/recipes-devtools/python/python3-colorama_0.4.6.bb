@@ -1,6 +1,6 @@
 SUMMARY = "Cross-platform colored terminal text."
 HOMEPAGE = "https://github.com/tartley/colorama"
-LICENSE = "BSD-2-Clause"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=b4936429a56a652b84c5c01280dcaa26"
 
 inherit pypi python_setuptools_build_meta

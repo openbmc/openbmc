@@ -21,6 +21,9 @@ do_compile() {
 
 inherit kernel-arch deploy nopackages
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 do_deploy() {
     install -d ${DEPLOYDIR}
     install -m 0644 boot.scr ${DEPLOYDIR}

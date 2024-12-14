@@ -1,0 +1,41 @@
+From a3e25b6aa9775c43336e30d3b350f54c085a32c8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 20 Feb 2024 18:44:23 -0800
+Subject: [PATCH] rpi: Use malloc instead of variable length arrays
+
+Clang-18+ diagnoses this as error
+
+| ../git/src/ipa/rpi/controller/rpi/alsc.cpp:499:10: error: variable length arrays in C++ are a Clang extension [-Werror,-Wvla-cxx-extension]     |   499 |         int xLo[X], xHi[X];
+|       |                 ^
+
+Upstream-Status: Denied [https://lists.libcamera.org/pipermail/libcamera-devel/2024-February/040536.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ipa/rpi/controller/rpi/alsc.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/ipa/rpi/controller/rpi/alsc.cpp b/src/ipa/rpi/controller/rpi/alsc.cpp
+index 67029fc3..6eca9fb7 100644
+--- a/src/ipa/rpi/controller/rpi/alsc.cpp
++++ b/src/ipa/rpi/controller/rpi/alsc.cpp
+@@ -496,8 +496,8 @@ void resampleCalTable(const Array2D<double> &calTableIn,
+ 	 * Precalculate and cache the x sampling locations and phases to save
+ 	 * recomputing them on every row.
+ 	 */
+-	int xLo[X], xHi[X];
+-	double xf[X];
++	int *xLo = (int *)malloc(X * sizeof(int)), *xHi = (int *)malloc(X * sizeof(int));
++	double *xf = (double *)malloc(X * sizeof(double));
+ 	double scaleX = cameraMode.sensorWidth /
+ 			(cameraMode.width * cameraMode.scaleX);
+ 	double xOff = cameraMode.cropX / (double)cameraMode.sensorWidth;
+@@ -539,6 +539,9 @@ void resampleCalTable(const Array2D<double> &calTableIn,
+ 			*(out++) = above * (1 - yf) + below * yf;
+ 		}
+ 	}
++	free(xf);
++	free(xHi);
++	free(xLo);
+ }
+ 
+ /* Calculate chrominance statistics (R/G and B/G) for each region. */

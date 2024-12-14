@@ -1,0 +1,34 @@
+From a7721cf4f412fbe18fe15127bea7b1457b99f684 Mon Sep 17 00:00:00 2001
+From: Marc Ferland <marc.ferland@sonatest.com>
+Date: Fri, 26 Jul 2024 15:41:00 -0400
+Subject: [PATCH] Do not build qt/tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes the following build failure:
+
+| In file included from /home/marc/mnt/yocto-kde/build/tmp/work/x86_64-linux/appstream-native/1.0.3/recipe-sysroot-native/usr/include/QtTest/QtTest:11,
+|                  from ../AppStream-1.0.3/qt/tests/asqt-pool-test.cpp:21:
+| ../AppStream-1.0.3/qt/tests/asqt-pool-test.cpp: In function ‘int main(int, char**)’:
+| ../AppStream-1.0.3/qt/tests/asqt-pool-test.cpp:117:1: error: expected primary-expression before ‘)’ token
+|   117 | QTEST_MAIN(PoolReadTest)
+|       | ^~~~~~~~~~
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Marc Ferland <marc.ferland@sonatest.com>
+---
+ qt/meson.build | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/qt/meson.build b/qt/meson.build
+index 1909bcf7..c3ca20fb 100644
+--- a/qt/meson.build
++++ b/qt/meson.build
+@@ -148,5 +148,3 @@ install_data (
+ 
+ # end of Qt version loop
+ endforeach
+-
+-subdir('tests/')

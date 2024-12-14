@@ -18,8 +18,12 @@ DEPENDS = "libusb1 gettext-native"
 DEPENDS:append:class-target = " ${BPN}-native"
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz"
-SRC_URI:append:class-target = " file://0001-Use-native-mtp-hotplug.patch"
+SRC_URI:append:class-target = " file://0001-Use-native-mtp-hotplug.patch \
+                                file://0002-util-mtp-hotplug.c-Enable-stack-memory-protection.patch"
 SRC_URI[sha256sum] = "f4c1ceb3df020a6cb851110f620c14fe399518c494ed252039cbfb4e34335135"
+
+UPSTREAM_CHECK_URI = "https://github.com/libmtp/libmtp/releases"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools pkgconfig lib_package
 

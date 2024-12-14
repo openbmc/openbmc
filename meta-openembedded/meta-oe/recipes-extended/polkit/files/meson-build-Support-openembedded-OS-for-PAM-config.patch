@@ -1,0 +1,48 @@
+From 7c89b88f0f81ad220d08d69d212c14c6eeefb647 Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Tue, 3 Sep 2024 12:17:42 +0200
+Subject: [PATCH] meson.build: Support "openembedded" OS for PAM config
+
+In Openembedded, same as Suse/Solaris: PAM files are common-*:
+* PAM_FILE_INCLUDE_AUTH: common-auth
+* PAM_FILE_INCLUDE_ACCOUNT: common-account
+* PAM_FILE_INCLUDE_PASSWORD: common-password
+* PAM_FILE_INCLUDE_SESSION: common-session
+See OE-Core libpam recipe.
+
+NB: This is also the same config as Debian but its not mentioned in the
+code.
+
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+Upstream-Status: Backport [https://github.com/polkit-org/polkit/commit/1d4f7f4d9f3d74fb2649c96faa8677416c1aefc2]
+---
+ meson.build       | 2 +-
+ meson_options.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 302c189..a55f2d6 100644
+--- a/meson.build
++++ b/meson.build
+@@ -311,7 +311,7 @@ endif
+ 
+ pam_include = get_option('pam_include')
+ if pam_include == ''
+-  if ['suse', 'solaris'].contains(os_type)
++  if ['suse', 'solaris', 'openembedded'].contains(os_type)
+     pam_conf = {
+       'PAM_FILE_INCLUDE_AUTH': 'common-auth',
+       'PAM_FILE_INCLUDE_ACCOUNT': 'common-account',
+diff --git a/meson_options.txt b/meson_options.txt
+index c2e4a6c..14d7a50 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -6,7 +6,7 @@ option('polkitd_user', type: 'string', value: 'polkitd', description: 'User for
+ option('polkitd_uid', type: 'string', value: '-', description: 'Fixed UID for user running polkitd (polkitd)')
+ 
+ option('authfw', type: 'combo', choices: ['pam', 'shadow', 'bsdauth'], value: 'pam', description: 'Authentication framework (pam/shadow)')
+-option('os_type', type: 'combo', choices: ['redhat', 'suse', 'gentoo', 'pardus', 'solaris', 'netbsd', 'lfs', ''], value: '', description: 'distribution or OS')
++option('os_type', type: 'combo', choices: ['redhat', 'suse', 'gentoo', 'pardus', 'solaris', 'netbsd', 'lfs', 'openembedded', ''], value: '', description: 'distribution or OS')
+ 
+ option('pam_include', type: 'string', value: '', description: 'pam file to include')
+ option('pam_module_dir', type: 'string', value: '', description: 'directory to install PAM security module')

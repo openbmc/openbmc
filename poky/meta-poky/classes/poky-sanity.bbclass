@@ -1,8 +1,8 @@
 # Provide some extensions to sanity.bbclass to handle poky-specific conf file upgrades
 
 python poky_update_bblayersconf() {
-    current_version = int(d.getVar('POKY_BBLAYERS_CONF_VERSION', True) or -1)
-    latest_version = int(d.getVar('REQUIRED_POKY_BBLAYERS_CONF_VERSION', True) or -1)
+    current_version = int(d.getVar('POKY_BBLAYERS_CONF_VERSION') or -1)
+    latest_version = int(d.getVar('REQUIRED_POKY_BBLAYERS_CONF_VERSION') or -1)
     if current_version == -1 or latest_version == -1:
         # one or the other missing => malformed configuration
         raise NotImplementedError("You need to update bblayers.conf manually for this version transition")
@@ -11,7 +11,7 @@ python poky_update_bblayersconf() {
 
     # check for out of date templateconf.cfg file
     lines = []
-    fn = os.path.join(d.getVar('TOPDIR', True), 'conf/templateconf.cfg')
+    fn = os.path.join(d.getVar('TOPDIR'), 'conf/templateconf.cfg')
 
     lines = sanity_conf_read(fn)
     index, meta_yocto_line = sanity_conf_find_line(r'^meta-yocto/', lines)

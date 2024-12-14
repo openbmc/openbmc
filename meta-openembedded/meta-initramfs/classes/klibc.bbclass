@@ -9,7 +9,7 @@ CC:append:armv7ve = " ${@' -mfloat-abi=${TUNE_CCARGS_MFLOAT}' if (d.getVar('TUNE
 CC:append:armv7a = " ${@' -mfloat-abi=${TUNE_CCARGS_MFLOAT}' if (d.getVar('TUNE_CCARGS_MFLOAT') != '') else ''}"
 
 # klcc uses own optimizations by default. See klcc(1) man file.
-export CFLAGS="${TUNE_CCARGS}"
+export CFLAGS="${TUNE_CCARGS} ${DEBUG_PREFIX_MAP}"
 export CPPFLAGS="${TUNE_CCARGS}"
 export LDFLAGS="${TUNE_CCARGS}"
 

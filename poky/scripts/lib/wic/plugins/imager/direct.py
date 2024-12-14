@@ -321,7 +321,15 @@ class PartitionedImage():
         self.partitions = partitions
         self.partimages = []
         # Size of a sector used in calculations
-        self.sector_size = SECTOR_SIZE
+        sector_size_str = get_bitbake_var('WIC_SECTOR_SIZE')
+        if sector_size_str is not None:
+            try:
+                self.sector_size = int(sector_size_str)
+            except ValueError:
+                self.sector_size = SECTOR_SIZE
+        else:
+            self.sector_size = SECTOR_SIZE
+
         self.native_sysroot = native_sysroot
         num_real_partitions = len([p for p in self.partitions if not p.no_table])
         self.extra_space = extra_space
@@ -508,7 +516,8 @@ class PartitionedImage():
         logger.debug("Added '%s' partition, sectors %d-%d, size %d sectors",
                      parttype, start, end, size)
 
-        cmd = "parted -s %s unit s mkpart %s" % (device, parttype)
+        cmd = "export PARTED_SECTOR_SIZE=%d; parted -s %s unit s mkpart %s" % \
+                     (self.sector_size, device, parttype)
         if fstype:
             cmd += " %s" % fstype
         cmd += " %d %d" % (start, end)
@@ -527,8 +536,8 @@ class PartitionedImage():
             os.ftruncate(sparse.fileno(), min_size)
 
         logger.debug("Initializing partition table for %s", device)
-        exec_native_cmd("parted -s %s mklabel %s" % (device, ptable_format),
-                        self.native_sysroot)
+        exec_native_cmd("export PARTED_SECTOR_SIZE=%d; parted -s %s mklabel %s" %
+                        (self.sector_size, device, ptable_format), self.native_sysroot)
 
     def _write_disk_guid(self):
         if self.ptable_format in ('gpt', 'gpt-hybrid'):
@@ -538,7 +547,8 @@ class PartitionedImage():
                 self.disk_guid = uuid.uuid4()
 
             logger.debug("Set disk guid %s", self.disk_guid)
-            sfdisk_cmd = "sfdisk --disk-id %s %s" % (self.path, self.disk_guid)
+            sfdisk_cmd = "sfdisk --sector-size %s --disk-id %s %s" % \
+                        (self.sector_size, self.path, self.disk_guid)
             exec_native_cmd(sfdisk_cmd, self.native_sysroot)
 
     def create(self):
@@ -613,45 +623,44 @@ class PartitionedImage():
                 partition_label = part.part_name if part.part_name else part.label
                 logger.debug("partition %d: set name to %s",
                              part.num, partition_label)
-                exec_native_cmd("sgdisk --change-name=%d:%s %s" % \
-                                         (part.num, partition_label,
-                                          self.path), self.native_sysroot)
-
+                exec_native_cmd("sfdisk --sector-size %s --part-label %s %d %s" % \
+                                         (self.sector_size, self.path, part.num,
+                                          partition_label), self.native_sysroot)
             if part.part_type:
                 logger.debug("partition %d: set type UID to %s",
                              part.num, part.part_type)
-                exec_native_cmd("sgdisk --typecode=%d:%s %s" % \
-                                         (part.num, part.part_type,
-                                          self.path), self.native_sysroot)
+                exec_native_cmd("sfdisk --sector-size %s --part-type %s %d %s" % \
+                                         (self.sector_size, self.path, part.num,
+                                          part.part_type), self.native_sysroot)
 
             if part.uuid and self.ptable_format in ("gpt", "gpt-hybrid"):
                 logger.debug("partition %d: set UUID to %s",
                              part.num, part.uuid)
-                exec_native_cmd("sgdisk --partition-guid=%d:%s %s" % \
-                                (part.num, part.uuid, self.path),
+                exec_native_cmd("sfdisk --sector-size %s --part-uuid %s %d %s" % \
+                                (self.sector_size, self.path, part.num, part.uuid),
                                 self.native_sysroot)
 
             if part.active:
                 flag_name = "legacy_boot" if self.ptable_format in ('gpt', 'gpt-hybrid') else "boot"
                 logger.debug("Set '%s' flag for partition '%s' on disk '%s'",
                              flag_name, part.num, self.path)
-                exec_native_cmd("parted -s %s set %d %s on" % \
-                                (self.path, part.num, flag_name),
+                exec_native_cmd("export PARTED_SECTOR_SIZE=%d; parted -s %s set %d %s on" % \
+                                (self.sector_size, self.path, part.num, flag_name),
                                 self.native_sysroot)
                 if self.ptable_format == 'gpt-hybrid' and part.mbr:
-                    exec_native_cmd("parted -s %s set %d %s on" % \
-                                    (mbr_path, hybrid_mbr_part_num, "boot"),
+                    exec_native_cmd("export PARTED_SECTOR_SIZE=%d; parted -s %s set %d %s on" % \
+                                    (self.sector_size, mbr_path, hybrid_mbr_part_num, "boot"),
                                     self.native_sysroot)
             if part.system_id:
-                exec_native_cmd("sfdisk --part-type %s %s %s" % \
-                                (self.path, part.num, part.system_id),
+                exec_native_cmd("sfdisk --sector-size %s --part-type %s %s %s" % \
+                                (self.sector_size, self.path, part.num, part.system_id),
                                 self.native_sysroot)
 
             if part.hidden and self.ptable_format == "gpt":
                 logger.debug("Set hidden attribute for partition '%s' on disk '%s'",
                              part.num, self.path)
-                exec_native_cmd("sfdisk --part-attrs %s %s RequiredPartition" % \
-                                (self.path, part.num),
+                exec_native_cmd("sfdisk --sector-size %s --part-attrs %s %s RequiredPartition" % \
+                                (self.sector_size, self.path, part.num),
                                 self.native_sysroot)
 
         if self.ptable_format == "gpt-hybrid":
@@ -664,7 +673,8 @@ class PartitionedImage():
             # create with an arbitrary type, then change it to the correct type
             # with sfdisk
             self._create_partition(mbr_path, "primary", "fat32", 1, GPT_OVERHEAD)
-            exec_native_cmd("sfdisk --part-type %s %d 0xee" % (mbr_path, hybrid_mbr_part_num),
+            exec_native_cmd("sfdisk --sector-size %s --part-type %s %d 0xee" % \
+                            (self.sector_size, mbr_path, hybrid_mbr_part_num),
                             self.native_sysroot)
 
             # Copy hybrid MBR

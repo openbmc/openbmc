@@ -17,7 +17,6 @@ CPAN_AUTHOR = "DAGOLDEN"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/D/DA/${CPAN_AUTHOR}/${CPAN_PACKAGE}-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "6c6a174861fd160e8d5871a86df00baf"
 SRC_URI[sha256sum] = "b4f3f63b80f680a421332d8851ddbe5a8e72fcaa74d5d1d98f3c8cc4a3ece293"
 
 S = "${WORKDIR}/${CPAN_PACKAGE}-${PV}"

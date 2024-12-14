@@ -321,7 +321,22 @@ class ProcessServer():
                     bb.warn('Ignoring invalid BB_SERVER_TIMEOUT=%s, must be a float specifying seconds.' % self.timeout)
                 seendata = True
 
-            ready = self.idle_commands(.1, fds)
+            if not self.idle:
+                self.idle = threading.Thread(target=self.idle_thread)
+                self.idle.start()
+            elif self.idle and not self.idle.is_alive():
+                serverlog("Idle thread terminated, main thread exiting too")
+                bb.error("Idle thread terminated, main thread exiting too")
+                self.quit = True
+
+            nextsleep = 1.0
+            if self.xmlrpc:
+                nextsleep = self.xmlrpc.get_timeout(nextsleep)
+            try:
+                ready = select.select(fds,[],[],nextsleep)[0]
+            except InterruptedError:
+                # Ignore EINTR
+                ready = []
 
         if self.idle:
             self.idle.join()
@@ -424,7 +439,7 @@ class ProcessServer():
                 self.idle_cond.notify_all()
 
         while not self.quit:
-            nextsleep = 0.1
+            nextsleep = 1.0
             fds = []
 
             with bb.utils.lock_timeout(self._idlefuncsLock):
@@ -462,7 +477,7 @@ class ProcessServer():
 
             # Create new heartbeat event?
             now = time.time()
-            if bb.event._heartbeat_enabled and now >= self.next_heartbeat:
+            if items and bb.event._heartbeat_enabled and now >= self.next_heartbeat:
                 # We might have missed heartbeats. Just trigger once in
                 # that case and continue after the usual delay.
                 self.next_heartbeat += self.heartbeat_seconds
@@ -484,31 +499,6 @@ class ProcessServer():
 
             if nextsleep is not None:
                 select.select(fds,[],[],nextsleep)[0]
-
-    def idle_commands(self, delay, fds=None):
-        nextsleep = delay
-        if not fds:
-            fds = []
-
-        if not self.idle:
-            self.idle = threading.Thread(target=self.idle_thread)
-            self.idle.start()
-        elif self.idle and not self.idle.is_alive():
-            serverlog("Idle thread terminated, main thread exiting too")
-            bb.error("Idle thread terminated, main thread exiting too")
-            self.quit = True
-
-        if nextsleep is not None:
-            if self.xmlrpc:
-                nextsleep = self.xmlrpc.get_timeout(nextsleep)
-            try:
-                return select.select(fds,[],[],nextsleep)[0]
-            except InterruptedError:
-                # Ignore EINTR
-                return []
-        else:
-            return select.select(fds,[],[],0)[0]
-
 
 class ServerCommunicator():
     def __init__(self, connection, recv):

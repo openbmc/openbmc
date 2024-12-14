@@ -3,6 +3,7 @@ import enum
 import pathlib
 import pexpect
 import os
+import time
 
 from oeqa.core.target.ssh import OESSHTarget
 from fvp import runner
@@ -127,9 +128,19 @@ class OEFVPTarget(OESSHTarget):
         def call_pexpect(terminal, *args, **kwargs):
             attr = getattr(self.terminals[terminal], name)
             if callable(attr):
-                return attr(*args, **kwargs)
+                self.logger.debug(f"Calling {name} on {terminal} : with arguments -> {args}  :  {kwargs}")
+                start_time = time.monotonic()  # Record the start time
+
+                attr = getattr(self.terminals[terminal], name)
+                result = attr(*args, **kwargs)
+
+                end_time = time.monotonic()  # Record the end time
+                elapsed_time = end_time - start_time
+                self.logger.debug(f"Execution time for result: [ {result} ] - elapsed_time: {elapsed_time} seconds")
             else:
-                return attr
+                result = attr
+
+            return result
 
         return call_pexpect
 

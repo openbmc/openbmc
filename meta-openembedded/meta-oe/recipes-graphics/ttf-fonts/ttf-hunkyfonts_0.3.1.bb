@@ -15,5 +15,4 @@ FONT_PACKAGES = "ttf-hunky-sans ttf-hunky-serif"
 FILES:ttf-hunky-sans = "${datadir}/fonts/truetype/HunkySans*.ttf"
 FILES:ttf-hunky-serif = "${datadir}/fonts/truetype/HunkySerif*.ttf"
 
-SRC_URI[md5sum] = "b933312967842e5737b5415fa22d682a"
 SRC_URI[sha256sum] = "3fc528737ccd12ec3c09c4a91447d241d3c5bceeeb4d24b7f2c29b15c9735328"

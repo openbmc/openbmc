@@ -1,0 +1,370 @@
+From 5fd2662e1f20b5c645ff0755e84424bae303fa45 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Mon, 9 Sep 2024 09:42:58 +0200
+Subject: [PATCH] Platform: CS1000: Validate both metadata replicas
+
+According to the [1] both metadata replica integrity should be checked
+during the update agent initialization, and if one of the replica is
+corrupted then it should be fixed by copying the other replica.
+
+This commit:
+- Adds the integrity check and correction to the
+  corstone1000_fwu_host_ack() function. This function is called when
+  the Host core has booted.
+- Updates the metadata_read() function so both replica can be read.
+- Adds metadata_write_replica() function to write metadata replicas
+  separately.
+
+[1] https://developer.arm.com/documentation/den0118/a/?lang=en
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ .../corstone1000/fw_update_agent/fwu_agent.c  | 167 ++++++++++++------
+ .../corstone1000/fw_update_agent/fwu_agent.h  |   7 +
+ 2 files changed, 119 insertions(+), 55 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index 92b918c67..aad6208e0 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -395,20 +395,33 @@ static enum fwu_agent_error_t metadata_read_without_validation(struct fwu_metada
+ #endif
+ 
+ #ifdef BL1_BUILD
+-static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
++static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata, uint8_t replica_num)
+ {
+     int ret;
++    uint32_t replica_offset = 0;
+ 
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  FWU_METADATA_REPLICA_1_OFFSET, sizeof(struct fwu_metadata));
++    FWU_LOG_MSG("%s: enter\n\r", __func__);
+ 
+     if (!p_metadata) {
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    ret = FWU_METADATA_FLASH_DEV.ReadData(FWU_METADATA_REPLICA_1_OFFSET,
+-                                p_metadata, sizeof(struct fwu_metadata));
+-    if (ret < 0 || ret != sizeof(struct fwu_metadata)) {
++    if (replica_num == 1) {
++        replica_offset = FWU_METADATA_REPLICA_1_OFFSET;
++    } else if (replica_num == 2) {
++        replica_offset = FWU_METADATA_REPLICA_2_OFFSET;
++    } else {
++        FWU_LOG_MSG("%s: replica_num must be 1 or 2\n\r", __func__);
++        return FWU_AGENT_ERROR;
++    }
++
++    FWU_LOG_MSG("%s: flash addr = %u, size = %d\n\r", __func__,
++                  replica_offset, sizeof(*p_metadata));
++
++
++    ret = FWU_METADATA_FLASH_DEV.ReadData(replica_offset,
++                                p_metadata, sizeof(*p_metadata));
++    if (ret < 0 || ret != sizeof(*p_metadata)) {
+         return FWU_AGENT_ERROR;
+     }
+ 
+@@ -422,17 +435,27 @@ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+     return FWU_AGENT_SUCCESS;
+ }
+ #else
+-static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
++static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata, uint8_t replica_num)
+ {
+     uuid_t metadata_uuid = FWU_METADATA_TYPE_UUID;
+     partition_entry_t *part;
+     int ret;
+ 
++    FWU_LOG_MSG("%s: enter\n\r", __func__);
++
+     if (!p_metadata) {
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    part = get_partition_entry_by_type(&metadata_uuid);
++    if (replica_num == 1) {
++        part = get_partition_entry_by_type(&metadata_uuid);
++    } else if (replica_num == 2) {
++        part = get_partition_replica_by_type(&metadata_uuid);
++    } else {
++        FWU_LOG_MSG("%s: replica_num must be 1 or 2\n\r", __func__);
++        return FWU_AGENT_ERROR;
++    }
++
+     if (!part) {
+         FWU_LOG_MSG("%s: FWU metadata partition not found\n\r", __func__);
+         return FWU_AGENT_ERROR;
+@@ -461,39 +484,38 @@ static enum fwu_agent_error_t metadata_read(struct fwu_metadata *p_metadata)
+ 
+ #ifdef BL1_BUILD
+ static enum fwu_agent_error_t metadata_write(
+-                        struct fwu_metadata *p_metadata)
++                        struct fwu_metadata *p_metadata, uint8_t replica_num)
+ {
+     int ret;
++    uint32_t replica_offset = 0;
+ 
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  FWU_METADATA_REPLICA_1_OFFSET, sizeof(struct fwu_metadata));
++    FWU_LOG_MSG("%s: enter\n\r", __func__);
+ 
+     if (!p_metadata) {
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    ret = FWU_METADATA_FLASH_DEV.EraseSector(FWU_METADATA_REPLICA_1_OFFSET);
+-    if (ret != ARM_DRIVER_OK) {
+-        return FWU_AGENT_ERROR;
+-    }
+-
+-    ret = FWU_METADATA_FLASH_DEV.ProgramData(FWU_METADATA_REPLICA_1_OFFSET,
+-                                p_metadata, sizeof(struct fwu_metadata));
+-    if (ret < 0 || ret != sizeof(struct fwu_metadata)) {
++    if (replica_num == 1) {
++        replica_offset = FWU_METADATA_REPLICA_1_OFFSET;
++    } else if (replica_num == 2) {
++        replica_offset = FWU_METADATA_REPLICA_2_OFFSET;
++    } else {
++        FWU_LOG_MSG("%s: replica_num must be 1 or 2\n\r", __func__);
+         return FWU_AGENT_ERROR;
+     }
+ 
+     FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  FWU_METADATA_REPLICA_2_OFFSET, sizeof(struct fwu_metadata));
++                  replica_offset, sizeof(*p_metadata));
+ 
+-    ret = FWU_METADATA_FLASH_DEV.EraseSector(FWU_METADATA_REPLICA_2_OFFSET);
++
++    ret = FWU_METADATA_FLASH_DEV.EraseSector(replica_offset);
+     if (ret != ARM_DRIVER_OK) {
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    ret = FWU_METADATA_FLASH_DEV.ProgramData(FWU_METADATA_REPLICA_2_OFFSET,
+-                                p_metadata, sizeof(struct fwu_metadata));
+-    if (ret < 0 || ret != sizeof(struct fwu_metadata)) {
++    ret = FWU_METADATA_FLASH_DEV.ProgramData(replica_offset,
++                                p_metadata, sizeof(*p_metadata));
++    if (ret < 0 || ret != sizeof(*p_metadata)) {
+         return FWU_AGENT_ERROR;
+     }
+ 
+@@ -503,7 +525,7 @@ static enum fwu_agent_error_t metadata_write(
+ }
+ #else
+ static enum fwu_agent_error_t metadata_write(
+-                        struct fwu_metadata *p_metadata)
++                        struct fwu_metadata *p_metadata, uint8_t replica_num)
+ {
+     uuid_t metadata_uuid = FWU_METADATA_TYPE_UUID;
+     partition_entry_t *part;
+@@ -513,7 +535,15 @@ static enum fwu_agent_error_t metadata_write(
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    part = get_partition_entry_by_type(&metadata_uuid);
++    if (replica_num == 1) {
++        part = get_partition_entry_by_type(&metadata_uuid);
++    } else if (replica_num == 2) {
++        part = get_partition_replica_by_type(&metadata_uuid);
++    } else {
++        FWU_LOG_MSG("%s: replica_num must be 1 or 2\n\r", __func__);
++        return FWU_AGENT_ERROR;
++    }
++
+     if (!part) {
+         FWU_LOG_MSG("%s: FWU metadata partition not found\n\r", __func__);
+         return FWU_AGENT_ERROR;
+@@ -533,32 +563,51 @@ static enum fwu_agent_error_t metadata_write(
+         return FWU_AGENT_ERROR;
+     }
+ 
+-    part = get_partition_replica_by_type(&metadata_uuid);
+-    if (!part) {
+-        FWU_LOG_MSG("%s: FWU metadata replica partition not found\n\r", __func__);
+-        return FWU_AGENT_ERROR;
+-    }
++    FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
++                  p_metadata->active_index, p_metadata->previous_active_index);
++    return FWU_AGENT_SUCCESS;
++}
++#endif
+ 
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  part->start, sizeof(struct fwu_metadata));
++static enum fwu_agent_error_t metadata_write_both_replica(
++                        struct fwu_metadata *p_metadata)
++{
++    enum fwu_agent_error_t ret = FWU_AGENT_ERROR;
+ 
+-    ret = FWU_METADATA_FLASH_DEV.EraseSector(part->start);
+-    if (ret != ARM_DRIVER_OK) {
+-        return FWU_AGENT_ERROR;
++    ret = metadata_write(&_metadata, 1);
++    if (ret) {
++        return ret;
+     }
+ 
+-    ret = FWU_METADATA_FLASH_DEV.ProgramData(part->start,
+-                                p_metadata, sizeof(struct fwu_metadata));
+-    if (ret < 0 || ret != sizeof(struct fwu_metadata)) {
+-        return FWU_AGENT_ERROR;
++    ret = metadata_write(&_metadata, 2);
++    if (ret) {
++        return ret;
+     }
+ 
+-    FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
+-                  p_metadata->active_index, p_metadata->previous_active_index);
+     return FWU_AGENT_SUCCESS;
+ }
+-#endif
+ 
++enum fwu_agent_error_t fwu_metadata_check_and_correct_integrity(void)
++{
++    enum fwu_agent_error_t ret_replica_1 = FWU_AGENT_ERROR;
++    enum fwu_agent_error_t ret_replica_2 = FWU_AGENT_ERROR;
++
++    /* Check integrity of both metadata replica */
++    ret_replica_1 = metadata_read(&_metadata, 1);
++    ret_replica_2 = metadata_read(&_metadata, 2);
++
++    if (ret_replica_1 != FWU_AGENT_SUCCESS && ret_replica_2 != FWU_AGENT_SUCCESS) {
++        return FWU_AGENT_ERROR;
++    } else if (ret_replica_1 == FWU_AGENT_SUCCESS && ret_replica_2 != FWU_AGENT_SUCCESS) {
++        metadata_read(&_metadata, 1);
++        metadata_write(&_metadata, 2);
++    } else if (ret_replica_1 != FWU_AGENT_SUCCESS && ret_replica_2 == FWU_AGENT_SUCCESS) {
++        metadata_read(&_metadata, 2);
++        metadata_write(&_metadata, 1);
++    }
++
++    return FWU_AGENT_SUCCESS;
++}
+ 
+ enum fwu_agent_error_t fwu_metadata_init(void)
+ {
+@@ -617,8 +666,8 @@ enum fwu_agent_error_t fwu_metadata_provision(void)
+      * had a firmware data?. If yes, then don't initialize
+      * metadata
+      */
+-    metadata_read(&_metadata);
+-    if(_metadata.active_index < 2 || _metadata.previous_active_index <2){
++    metadata_read(&_metadata, 1);
++    if(_metadata.active_index < 2 || _metadata.previous_active_index < 2){
+     	if(_metadata.active_index ^ _metadata.previous_active_index)
+     		return FWU_AGENT_SUCCESS;
+     }
+@@ -652,13 +701,13 @@ enum fwu_agent_error_t fwu_metadata_provision(void)
+     _metadata.crc_32 = crc32((uint8_t *)&_metadata.version,
+                              sizeof(struct fwu_metadata) - sizeof(uint32_t));
+ 
+-    ret = metadata_write(&_metadata);
++    ret = metadata_write_both_replica(&_metadata);
+     if (ret) {
+         return ret;
+     }
+ 
+-    memset(&_metadata, 0, sizeof(struct fwu_metadata));
+-    ret = metadata_read(&_metadata);
++    memset(&_metadata, 0, sizeof(_metadata));
++    ret = metadata_read(&_metadata, 1);
+     if (ret) {
+         return ret;
+     }
+@@ -825,7 +874,7 @@ static enum fwu_agent_error_t flash_full_capsule(
+     metadata->crc_32 = crc32((uint8_t *)&metadata->version,
+                               sizeof(struct fwu_metadata) - sizeof(uint32_t));
+ 
+-    ret = metadata_write(metadata);
++    ret = metadata_write_both_replica(metadata);
+     if (ret) {
+         return ret;
+     }
+@@ -852,7 +901,7 @@ enum fwu_agent_error_t corstone1000_fwu_flash_image(void)
+ 
+     Select_Write_Mode_For_Shared_Flash();
+ 
+-    if (metadata_read(&_metadata)) {
++    if (metadata_read(&_metadata, 1)) {
+         ret =  FWU_AGENT_ERROR;
+         goto out;
+     }
+@@ -938,7 +987,7 @@ static enum fwu_agent_error_t accept_full_capsule(
+     metadata->crc_32 = crc32((uint8_t *)&metadata->version,
+                               sizeof(struct fwu_metadata) - sizeof(uint32_t));
+ 
+-    ret = metadata_write(metadata);
++    ret = metadata_write_both_replica(metadata);
+     if (ret) {
+         return ret;
+     }
+@@ -1034,7 +1083,7 @@ static enum fwu_agent_error_t fwu_select_previous(
+     metadata->crc_32 = crc32((uint8_t *)&metadata->version,
+                               sizeof(struct fwu_metadata) - sizeof(uint32_t));
+ 
+-    ret = metadata_write(metadata);
++    ret = metadata_write_both_replica(metadata);
+     if (ret) {
+         return ret;
+     }
+@@ -1064,7 +1113,7 @@ void bl1_get_active_bl2_image(uint32_t *offset)
+         FWU_ASSERT(0);
+     }
+ 
+-    if (metadata_read(&_metadata)) {
++    if (metadata_read(&_metadata, 1)) {
+         FWU_ASSERT(0);
+     }
+ 
+@@ -1203,9 +1252,17 @@ enum fwu_agent_error_t corstone1000_fwu_host_ack(void)
+         return FWU_AGENT_ERROR;
+     }
+ 
++    /* This cannot be added to the fwu_metadata_init() because that function is
++     * called before the logging is enabled by TF-M. */
++    ret = fwu_metadata_check_and_correct_integrity();
++    if (ret = FWU_AGENT_SUCCESS) {
++        FWU_LOG_MSG("fwu_metadata_check_and_correct_integrity failed\r\n");
++        return ret;
++    }
++
+     Select_Write_Mode_For_Shared_Flash();
+ 
+-    if (metadata_read(&_metadata)) {
++    if (metadata_read(&_metadata, 1)) {
+         ret = FWU_AGENT_ERROR;
+         goto out;
+     }
+@@ -1315,7 +1372,7 @@ void host_acknowledgement_timer_to_reset(void)
+         FWU_ASSERT(0);
+     }
+ 
+-    if (metadata_read(&_metadata)) {
++    if (metadata_read(&_metadata, 1)) {
+         FWU_ASSERT(0);
+     }
+ 
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+index 701f20558..78e104277 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.h
+@@ -70,4 +70,11 @@ enum fwu_nv_counter_index_t {
+ enum fwu_agent_error_t fwu_stage_nv_counter(enum fwu_nv_counter_index_t index,
+         uint32_t img_security_cnt);
+ 
++/*
++ * Check if both metadata replica is valid by calculating and comparing crc32.
++ * If one of the replica is corrupted then update it with the valid replica.
++ * If both of the replicas are corrupted then the correction is not possible.
++ */
++enum fwu_agent_error_t fwu_metadata_check_and_correct_integrity(void);
++
+ #endif /* FWU_AGENT_H */
+-- 
+2.25.1
+

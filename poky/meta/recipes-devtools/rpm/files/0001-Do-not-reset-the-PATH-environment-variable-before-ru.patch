@@ -1,4 +1,4 @@
-From a8fe7a7a2e41c9f127ed26407d57076babcb89e8 Mon Sep 17 00:00:00 2001
+From 4cf76bb57d3480420e734da99a5c839ac3a9976a Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 20 Jan 2017 13:32:06 +0200
 Subject: [PATCH] Do not reset the PATH environment variable before running
@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/rpmscript.c b/lib/rpmscript.c
-index 57689bb68..7b7e26606 100644
+index 060fd8124..4dc6466a8 100644
 --- a/lib/rpmscript.c
 +++ b/lib/rpmscript.c
-@@ -252,7 +252,7 @@ static void doScriptExec(ARGV_const_t argv, ARGV_const_t prefixes,
+@@ -251,7 +251,7 @@ static void doScriptExec(ARGV_const_t argv, ARGV_const_t prefixes,
  	if (ipath && ipath[5] != '%')
  	    path = ipath;
  

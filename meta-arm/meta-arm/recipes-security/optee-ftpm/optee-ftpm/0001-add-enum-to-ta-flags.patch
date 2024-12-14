@@ -1,4 +1,4 @@
-From cd7b41b30cf157338cfd5cda3c0f6f33164ad16d Mon Sep 17 00:00:00 2001
+From 2bb67529a8b6096fadd3dd0cf740beded9a01432 Mon Sep 17 00:00:00 2001
 From: Maxim Uvarov <maxim.uvarov@linaro.org>
 Date: Fri, 17 Apr 2020 12:05:53 +0100
 Subject: [PATCH] add enum to ta flags
@@ -13,7 +13,7 @@ Signed-off-by: Maxim Uvarov <maxim.uvarov@linaro.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Samples/ARM32-FirmwareTPM/optee_ta/fTPM/user_ta_header_defines.h b/Samples/ARM32-FirmwareTPM/optee_ta/fTPM/user_ta_header_defines.h
-index 92c33c1..e83619d 100644
+index 92c33c169320..e83619d55d3c 100644
 --- a/Samples/ARM32-FirmwareTPM/optee_ta/fTPM/user_ta_header_defines.h
 +++ b/Samples/ARM32-FirmwareTPM/optee_ta/fTPM/user_ta_header_defines.h
 @@ -44,7 +44,7 @@

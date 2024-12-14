@@ -5,5 +5,5 @@ header:
 
 # Add universally helpful features when testing boards
 local_conf_header:
-  debug: |
-    EXTRA_IMAGE_FEATURES:append = " debug-tweaks"
+  rootlogin: |
+    EXTRA_IMAGE_FEATURES:append = " allow-empty-password empty-root-password allow-root-login"

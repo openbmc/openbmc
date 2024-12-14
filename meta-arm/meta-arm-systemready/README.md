@@ -83,18 +83,18 @@ Currently, this layer only supports
 To build the firmware for Arm SystemReady on the supported machines (take the
 `fvp-base` machine as an example):
 
-    kas build kas/fvp-base.yml:kas/arm-systemready-firmware.yml
+    ARM_FVP_EULA_ACCEPT=1 kas build kas/fvp-base.yml:kas/arm-systemready-firmware.yml
 
 
 To run the Arm SystemReady ACS tests on the supported machines (take running
 Arm SystemReady IR on the `fvp-base` machine as an example):
 
-    kas build kas/fvp-base.yml:kas/arm-systemready-ir-acs.yml
+    ARM_FVP_EULA_ACCEPT=1 kas build kas/fvp-base.yml:kas/arm-systemready-ir-acs.yml
 
 To run the Linux distributions installation on the supported machines (take
 installing openSUSE on the `fvp-base` machine as an example):
 
-    kas build kas/fvp-base.yml:kas/arm-systemready-linux-distros-opensuse.yml
+    ARM_FVP_EULA_ACCEPT=1 kas build kas/fvp-base.yml:kas/arm-systemready-linux-distros-opensuse.yml
 
     kas shell \
         kas/fvp-base.yml:kas/arm-systemready-linux-distros-opensuse.yml \

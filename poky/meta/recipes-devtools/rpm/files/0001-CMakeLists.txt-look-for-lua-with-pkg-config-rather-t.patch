@@ -1,4 +1,4 @@
-From c39a074ff3c4d21c100d387661c7d725b5eae7b0 Mon Sep 17 00:00:00 2001
+From 99d02b8e8ce2c93c10a7924cd7571b76b0f45eb1 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 29 Nov 2023 14:06:15 +0100
 Subject: [PATCH] CMakeLists.txt: look for lua with pkg-config rather than
@@ -13,15 +13,15 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 4a383ceba..ed847c09a 100644
+index 9a3aba071..08dabffd3 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -190,7 +190,7 @@ set(REQFUNCS
+@@ -196,7 +196,7 @@ set(REQFUNCS
  )
  
  find_package(PkgConfig REQUIRED)
 -find_package(Lua 5.2 REQUIRED)
 +pkg_check_modules(LUA REQUIRED IMPORTED_TARGET lua>=5.2)
  find_package(ZLIB REQUIRED)
- find_package(BZip2)
- find_package(Iconv)
+ if (WITH_BZIP2)
+     find_package(BZip2 REQUIRED)

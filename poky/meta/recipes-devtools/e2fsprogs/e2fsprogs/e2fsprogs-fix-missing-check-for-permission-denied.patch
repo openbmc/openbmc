@@ -1,4 +1,4 @@
-From 5bc75654690a2d916190168b865770a7c93e65dd Mon Sep 17 00:00:00 2001
+From 1c7078fda6d23f1d80b0d95ac3e908364749e188 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Wed, 10 Aug 2016 11:19:44 +0800
 Subject: [PATCH] Fix missing check for permission denied.
@@ -13,7 +13,6 @@ Upstream-Status: Pending
 Written-by: Henrik Wallin <henrik.b.wallin@ericsson.com>
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
-
 ---
  lib/support/profile.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -10,7 +10,6 @@ SRC_URI = "http://www.cypherpunks.ca/otr/${BP}.tar.gz \
            file://0001-tests-Include-missing-sys-socket.h-header.patch \
 "
 
-SRC_URI[md5sum] = "dac5a8778a35f674c046ddf5d97e4d81"
 SRC_URI[sha256sum] = "8b3b182424251067a952fb4e6c7b95a21e644fbb27fbd5f8af2b2ed87ca419f5"
 
 inherit autotools pkgconfig

@@ -1,0 +1,41 @@
+From a32e7195a4fc1c9d890f9e22a795443d01dc1e8f Mon Sep 17 00:00:00 2001
+From: Anusmita Dutta Mazumder <anusmita.duttamazumder@arm.com>
+Date: Tue, 2 Apr 2024 13:04:56 +0000
+Subject: [PATCH 03/10] platform: corstone1000: add unique guid for mps3
+
+This patch sets unique GUID for Corstone1000 FVP and MPS3
+
+Upstream-Status: Inappropriate [Redesign of Capsule update interface is required]
+Signed-off-by: Anusmita Dutta Mazumder <anusmita.duttamazumder@arm.com>
+---
+ .../target/arm/corstone1000/fw_update_agent/fwu_agent.c   | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+index 003ab9faf8..5768df19b8 100644
+--- a/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
++++ b/platform/ext/target/arm/corstone1000/fw_update_agent/fwu_agent.c
+@@ -113,13 +113,19 @@ enum fwu_agent_state_t {
+ };
+ 
+ struct efi_guid full_capsule_image_guid = {
++#if PLATFORM_IS_FVP
+     .time_low = 0x989f3a4e,
+     .time_mid = 0x46e0,
+     .time_hi_and_version = 0x4cd0,
+     .clock_seq_and_node = {0x98, 0x77, 0xa2, 0x5c, 0x70, 0xc0, 0x13, 0x29}
++#else
++    .time_low = 0xdf1865d1,
++    .time_mid = 0x90fb,
++    .time_hi_and_version = 0x4d59,
++    .clock_seq_and_node = {0x9c, 0x38, 0xc9, 0xf2, 0xc1, 0xbb, 0xa8, 0xcc}
++#endif
+ };
+ 
+-
+ #define IMAGE_ACCEPTED          (1)
+ #define IMAGE_NOT_ACCEPTED      (0)
+ #define BANK_0                  (0)
+-- 
+2.25.1
+

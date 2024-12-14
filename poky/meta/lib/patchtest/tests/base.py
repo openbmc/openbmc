@@ -8,20 +8,23 @@ import unittest
 import logging
 import json
 import unidiff
-from data import PatchTestInput
+from patchtest_parser import PatchtestParser
 import mailbox
+import patchtest_patterns
 import collections
 import sys
 import os
 import re
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'pyparsing'))
+logger = logging.getLogger("patchtest")
+debug = logger.debug
+info = logger.info
+warn = logger.warn
+error = logger.error
 
-logger = logging.getLogger('patchtest')
-debug=logger.debug
-info=logger.info
-warn=logger.warn
-error=logger.error
+Commit = collections.namedtuple(
+    "Commit", ["author", "subject", "commit_message", "shortlog", "payload"]
+)
 
 Commit = collections.namedtuple('Commit', ['author', 'subject', 'commit_message', 'shortlog', 'payload'])
 
@@ -33,10 +36,6 @@ class PatchtestOEError(Exception):
 
 class Base(unittest.TestCase):
     # if unit test fails, fail message will throw at least the following JSON: {"id": <testid>}
-
-    endcommit_messages_regex = re.compile(r'\(From \w+-\w+ rev:|(?<!\S)Signed-off-by|(?<!\S)---\n')
-    patchmetadata_regex   = re.compile(r'-{3} \S+|\+{3} \S+|@{2} -\d+,\d+ \+\d+,\d+ @{2} \S+')
-
 
     @staticmethod
     def msg_to_commit(msg):
@@ -50,7 +49,7 @@ class Base(unittest.TestCase):
     @staticmethod
     def commit_message(payload):
         commit_message = payload.__str__()
-        match = Base.endcommit_messages_regex.search(payload)
+        match = patchtest_patterns.endcommit_messages_regex.search(payload)
         if match:
             commit_message = payload[:match.start()]
         return commit_message
@@ -66,13 +65,15 @@ class Base(unittest.TestCase):
     def setUpClass(cls):
 
         # General objects: mailbox.mbox and patchset
-        cls.mbox = mailbox.mbox(PatchTestInput.repo.patch)
+        cls.mbox = mailbox.mbox(PatchtestParser.repo.patch.path)
 
         # Patch may be malformed, so try parsing it
         cls.unidiff_parse_error = ''
         cls.patchset = None
         try:
-            cls.patchset = unidiff.PatchSet.from_filename(PatchTestInput.repo.patch, encoding=u'UTF-8')
+            cls.patchset = unidiff.PatchSet.from_filename(
+                PatchtestParser.repo.patch.path, encoding="UTF-8"
+            )
         except unidiff.UnidiffParseError as upe:
             cls.patchset = []
             cls.unidiff_parse_error = str(upe)
@@ -149,7 +150,7 @@ class Metadata(Base):
 
         # import relevant libraries
         try:
-            scripts_path = os.path.join(PatchTestInput.repodir, 'scripts', 'lib')
+            scripts_path = os.path.join(PatchtestParser.repodir, "scripts", "lib")
             if scripts_path not in sys.path:
                 sys.path.insert(0, scripts_path)
             import scriptpath
@@ -224,11 +225,23 @@ class Metadata(Base):
         for patch in patchset:
             if patch.path.endswith('.bb') or patch.path.endswith('.bbappend') or patch.path.endswith('.inc'):
                 if patch.is_added_file:
-                    added_paths.append(os.path.join(os.path.abspath(PatchTestInput.repodir), patch.path))
+                    added_paths.append(
+                        os.path.join(
+                            os.path.abspath(PatchtestParser.repodir), patch.path
+                        )
+                    )
                 elif patch.is_modified_file:
-                    modified_paths.append(os.path.join(os.path.abspath(PatchTestInput.repodir), patch.path))
+                    modified_paths.append(
+                        os.path.join(
+                            os.path.abspath(PatchtestParser.repodir), patch.path
+                        )
+                    )
                 elif patch.is_removed_file:
-                    removed_paths.append(os.path.join(os.path.abspath(PatchTestInput.repodir), patch.path))
+                    removed_paths.append(
+                        os.path.join(
+                            os.path.abspath(PatchtestParser.repodir), patch.path
+                        )
+                    )
 
         data = cls.tinfoil.cooker.recipecaches[''].pkg_fn.items()
 

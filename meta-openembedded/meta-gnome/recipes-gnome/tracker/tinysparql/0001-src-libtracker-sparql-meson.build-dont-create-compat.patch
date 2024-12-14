@@ -1,0 +1,32 @@
+From 0dfdbeef174c18e846b98af816a9675c12a42845 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 20 Sep 2024 16:43:44 +0200
+Subject: [PATCH] src/libtracker-sparql/meson.build: dont create compatibility
+ symlinks
+
+Using the sh script will cause package_qa error:
+Exception: Exception: KeyError: 'getpwuid(): uid not found: 1000'
+Path /home/flk/poky/build-hypr/tmp/work/corei7-64-poky-linux/tinysparql/3.8.0/sstate-build-package/package/usr/lib/libtracker-sparql-3.0.so is owned by uid 1000, gid 100, which doesn't match any user/group on target. This may be due to host contamination.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ src/libtracker-sparql/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libtracker-sparql/meson.build b/src/libtracker-sparql/meson.build
+index 5eccb92fc..6ed7c2b1f 100644
+--- a/src/libtracker-sparql/meson.build
++++ b/src/libtracker-sparql/meson.build
+@@ -247,6 +247,6 @@ endif
+ 
+ tracker_sparql_uninstalled_dir = meson.current_build_dir()
+ 
+-meson.add_install_script('symlink-libtracker-sparql.sh', get_option('libdir'), meson.current_build_dir())
++#meson.add_install_script('symlink-libtracker-sparql.sh', get_option('libdir'), meson.current_build_dir())
+ 
+ meson.override_dependency('tinysparql-3.0', tracker_sparql_dep)
+-- 
+2.46.0
+

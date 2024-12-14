@@ -1,0 +1,27 @@
+From 502aa4ab4bbc790fb2999ff2b5f10dabd7085190 Mon Sep 17 00:00:00 2001
+From: "deepan.shivap" <deepan.shivap@lge.com>
+Date: Mon, 2 Dec 2024 23:12:17 +0900
+Subject: [PATCH] Musl build fix
+
+usage of getaddrinfo_a creates dependency on libanl, which is  specific
+to glibc.
+
+Upstream-Status: Pending
+Signed-off-by: deepan.shivap <deepan.shivap@lge.com>
+---
+ src/posix/platform/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/posix/platform/CMakeLists.txt b/src/posix/platform/CMakeLists.txt
+index b4ac241f5..7b2028e45 100644
+--- a/src/posix/platform/CMakeLists.txt
++++ b/src/posix/platform/CMakeLists.txt
+@@ -175,7 +175,7 @@ target_link_libraries(openthread-posix
+ )
+ 
+ option(OT_TARGET_OPENWRT "enable openthread posix for OpenWRT" OFF)
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND NOT OT_TARGET_OPENWRT)
++if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND NOT OT_TARGET_OPENWRT AND NOT OT_TARGET_MUSL)
+     target_compile_definitions(ot-posix-config
+         INTERFACE "OPENTHREAD_POSIX_CONFIG_NAT64_AIL_PREFIX_ENABLE=1"
+     )

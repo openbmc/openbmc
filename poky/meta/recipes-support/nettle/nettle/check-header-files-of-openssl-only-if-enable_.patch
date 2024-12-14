@@ -1,4 +1,4 @@
-From ffee6b5f6204a0210f717968ec6ce514d70acca1 Mon Sep 17 00:00:00 2001
+From 5f7cdd2b878298577accade43a38e1a0951d17b4 Mon Sep 17 00:00:00 2001
 From: Haiqing Bai <Haiqing.Bai@windriver.com>
 Date: Fri, 9 Dec 2016 15:23:17 +0800
 Subject: [PATCH] nettle: check header files of openssl only if
@@ -15,22 +15,32 @@ refactored for 3.4. pending not in as of 3.4
 
 Signed-off-by: Armin Kuster <akuster@mvista.com>
 
-Index: nettle-3.4/configure.ac
-===================================================================
---- nettle-3.4.orig/configure.ac
-+++ nettle-3.4/configure.ac
-@@ -185,9 +185,11 @@ AC_HEADER_TIME
+Refactor for 3.10.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ configure.ac | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4f27e663..673c1492 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -197,9 +197,11 @@ AC_TYPE_SIZE_T
  AC_CHECK_SIZEOF(long)
  AC_CHECK_SIZEOF(size_t)
  
--AC_CHECK_HEADERS([openssl/evp.h openssl/ecdsa.h],,
+-AC_CHECK_HEADERS([openssl/evp.h openssl/ec.h openssl/rsa.h],,
 -[enable_openssl=no
 - break])
 +if test "x$enable_openssl" = "xyes"; then
-+  AC_CHECK_HEADERS([openssl/evp.h openssl/ecdsa.h],,
++  AC_CHECK_HEADERS([openssl/evp.h openssl/ec.h openssl/rsa.h],,
 +  [enable_openssl=no
 +   break])
 +fi
  
  # For use by the testsuite
  AC_CHECK_HEADERS([valgrind/memcheck.h])
+-- 
+2.39.2
+

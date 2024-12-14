@@ -3,18 +3,18 @@ require conf/machine/include/arm/armv8a/tune-cortexa35.inc
 MACHINEOVERRIDES =. "corstone1000:"
 
 # TF-M
-PREFERRED_VERSION_trusted-firmware-m ?= "2.0.%"
+PREFERRED_VERSION_trusted-firmware-m ?= "2.1.%"
 
 # TF-A
 TFA_PLATFORM = "corstone1000"
-PREFERRED_VERSION_trusted-firmware-a ?= "2.10.%"
+PREFERRED_VERSION_trusted-firmware-a ?= "2.11.%"
 PREFERRED_VERSION_tf-a-tests ?= "2.10.%"
 
 TFA_BL2_BINARY = "bl2-corstone1000.bin"
 TFA_FIP_BINARY = "fip-corstone1000.bin"
 
 # optee
-PREFERRED_VERSION_optee-os ?= "4.1.%"
+PREFERRED_VERSION_optee-os ?= "4.3.%"
 
 # Trusted Services
 TS_PLATFORM = "arm/corstone1000"
@@ -34,7 +34,7 @@ IMAGE_CMD:wic[vardeps] += "GRUB_LINUX_APPEND"
 
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
-PREFERRED_VERSION_linux-yocto ?= "6.6.%"
+PREFERRED_VERSION_linux-yocto ?= "6.10.%"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_IMAGETYPE:firmware = "Image.gz"
 # add FF-A support in the kernel

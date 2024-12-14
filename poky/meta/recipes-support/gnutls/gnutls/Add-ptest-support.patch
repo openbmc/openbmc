@@ -1,4 +1,4 @@
-From bfa70adcbda4e505cf2e597907852e78e0439ee2 Mon Sep 17 00:00:00 2001
+From 6abc86acecff5a30173eb78a971ec5b65f77e1de Mon Sep 17 00:00:00 2001
 From: Ravineet Singh <ravineet.a.singh@est.tech>
 Date: Tue, 10 Jan 2023 16:11:10 +0100
 Subject: [PATCH] gnutls: add ptest support
@@ -26,10 +26,10 @@ index 843193f..816b09f 100644
  
  include $(top_srcdir)/cligen/cligen.mk
 diff --git a/configure.ac b/configure.ac
-index 934377e..4406eae 100644
+index 1744813..efb9e34 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1213,6 +1213,8 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
+@@ -1226,6 +1226,8 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
  
  AM_CONDITIONAL(NEEDS_LIBRT, test "$gnutls_needs_librt" = "yes")
  
@@ -39,10 +39,10 @@ index 934377e..4406eae 100644
  
  hw_features=
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index e39a3b3..861dd63 100644
+index 189d068..8430b05 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -663,6 +663,12 @@ SH_LOG_COMPILER = $(SHELL)
+@@ -668,6 +668,12 @@ SH_LOG_COMPILER = $(SHELL)
  AM_VALGRINDFLAGS = --suppressions=$(srcdir)/suppressions.valgrind
  LOG_COMPILER = $(LOG_VALGRIND)
  

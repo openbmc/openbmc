@@ -20,4 +20,10 @@ S = "${WORKDIR}/git"
 
 FILES:${PN} += "${libdir}/xorg/modules/*"
 
-INSANE_SKIP:${PN} += "xorg-driver-abi"
+require recipes-graphics/xorg-xserver/xserver-abi.inc
+
+python add_xorg_abi_depends() {
+    _add_xorg_abi_depends(d, "xinput")
+    _add_xorg_abi_depends(d, "videodrv")
+}
+PACKAGEFUNCS =+ "add_xorg_abi_depends"

@@ -8,12 +8,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c71b653a0f608a58cdc5693ae57126bc"
 DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-rtsp-server json-glib libdaemon libsoup-2.4 jansson"
 
 SRCBRANCH ?= "master"
-SRCREV = "a011affa67f240cbc7aaff5b00fdfd6124bdaece"
-SRC_URI = "git://git@github.com/RidgeRun/gstd-1.x.git;protocol=https;branch=${SRCBRANCH}"
+SRCREV = "dac03d5e4102080a8f3ef274a6a6583455962095"
+SRC_URI = "git://git@github.com/RidgeRun/gstd-1.x.git;protocol=https;branch=${SRCBRANCH} \
+           file://0001-gstd-Remove-redundant-rpaths.patch"
 S = "${WORKDIR}/git"
 
 # Remove the +really when upstream version is > 1.0
-PV = "1.0+really0.15.0"
+PV = "1.0+really0.15.2"
 
 GTKDOC_MESON_OPTION = "enable-gtk-doc"
 

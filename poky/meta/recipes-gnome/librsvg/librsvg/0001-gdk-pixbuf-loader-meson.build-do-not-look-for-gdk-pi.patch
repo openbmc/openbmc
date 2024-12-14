@@ -1,0 +1,28 @@
+From 57f98688e46b128f7767479ef373e8cb5e3304b8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 27 Nov 2024 16:34:06 +0100
+Subject: [PATCH] gdk-pixbuf-loader/meson.build: do not look for
+ gdk-pixbuf-query-loaders
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1061]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ gdk-pixbuf-loader/meson.build | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/gdk-pixbuf-loader/meson.build b/gdk-pixbuf-loader/meson.build
+index 5081844..4ae58c6 100644
+--- a/gdk-pixbuf-loader/meson.build
++++ b/gdk-pixbuf-loader/meson.build
+@@ -36,8 +36,6 @@ pixbuf_thumbnailer = configure_file(
+   install_dir: get_option('datadir') / 'thumbnailers'
+ )
+ 
+-gdk_pixbuf_query_loaders = find_program(pixbuf_dep.get_variable(pkgconfig: 'gdk_pixbuf_query_loaders', default_value: 'gdk-pixbuf-query-loaders'))
+-
+ pixbufloader_svg_install_args = [
+   '--gdk-pixbuf-moduledir',
+   pixbuf_dep.get_variable(pkgconfig: 'gdk_pixbuf_moduledir', pkgconfig_define: ['prefix', prefix]),
+-- 
+2.39.5
+

@@ -13,7 +13,7 @@ def open(*args, **kwargs):
 
 class LZ4File(bb.compress._pipecompress.PipeFile):
     def get_compress(self):
-        return ["lz4c", "-z", "-c"]
+        return ["lz4", "-z", "-c"]
 
     def get_decompress(self):
-        return ["lz4c", "-d", "-c"]
+        return ["lz4", "-d", "-c"]

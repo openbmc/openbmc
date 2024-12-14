@@ -1,0 +1,84 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:             gpiod-sysfs-proxy
+# Required-Start:       $remote_fs $syslog
+# Required-Stop:        $remote_fs $syslog
+# Default-Start:        2 3 4 5
+# Default-Stop:         1
+# Short-Description:    User-space, libgpiod-based compatibility layer for linux GPIO sysfs interface.
+### END INIT INFO
+#
+# -*- coding: utf-8 -*-
+# Debian init.d script for gpiod-sysfs-proxy
+# Copyright (c) 2024 Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+# set -e
+
+# Source function library.
+. /etc/init.d/functions
+
+PROG="/usr/bin/gpiod-sysfs-proxy"
+NAME="gpiod-sysfs-proxy"
+DESC="/sys/class/gpio compatibility layer"
+MOUNTPOINT="@mountpoint@"
+
+test -x $PROG || exit 0
+
+do_start()
+{
+	echo -n "Starting $DESC: "
+
+	if [ "$MOUNTPOINT" = "/sys/class/gpio" ] && [ ! -e /sys/class/gpio ]; then
+		mkdir -p /run/gpio/sys /run/gpio/class/gpio /run/gpio/work
+		mount -t sysfs sysfs /run/gpio/sys -o nosuid,nodev,noexec
+		# Bail out if overlayfs is not available
+		set -e
+		mount -t overlay overlay /sys/class \
+-o upperdir=/run/gpio/class,lowerdir=/run/gpio/sys/class,workdir=/run/gpio/work,nosuid,nodev,noexec,relatime,ro
+		set +e
+	else
+		mkdir -p $MOUNTPOINT
+	fi
+
+	$PROG $MOUNTPOINT -o nonempty -o allow_other -o default_permissions -o entry_timeout=0 -f | logger -i $NAME &
+	echo "done"
+}
+
+do_stop()
+{
+	echo -n "Stopping $DESC: "
+
+	umount $MOUNTPOINT
+
+	mountpoint -q /sys/class
+	if [ "$?" = "0" ]; then
+		umount /sys/class
+		umount /run/gpio/sys
+		rm -rf /run/gpio
+	fi
+	echo "done"
+}
+
+case "$1" in
+	start)
+		do_start
+	;;
+	stop)
+		do_stop
+	;;
+	status)
+		status $PROG
+		exit $?
+	;;
+	restart)
+		do_stop
+		sleep 1
+		do_start
+	;;
+	*)
+		echo "Usage: /etc/init.d/$NAME {start|stop|status|restart}" >&2
+		exit 1
+	;;
+esac
+
+exit 0

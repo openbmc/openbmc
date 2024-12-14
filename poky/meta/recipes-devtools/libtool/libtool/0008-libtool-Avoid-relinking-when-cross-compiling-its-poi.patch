@@ -1,0 +1,126 @@
+From 78eac8c99451681f4c403b3ea727ee61651a3c1a Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 16 Nov 2011 16:58:34 +0000
+Subject: [PATCH] libtool: Avoid relinking when cross compiling, its pointless
+
+There is no point in having "executable" binaries in the .libs
+directory linked with different rpaths to the target which
+could concivably be run on the build system when cross compiling.
+
+This patch removes the extra rpaths ($compile_rpath) so that the
+output from the "link" stage can be used on the target. We can then
+avoid having to "relink" during the install stage.
+
+This saves some build time (do_install is over 2 minutes faster for
+pulseaudio).
+
+This patch also removes an annoying "seems to be moved" warning
+which is totally bogus in the sysroot case.
+
+Upstream-Status: Inappropriate [upstream are unlikely to take a patch like this]
+
+RP 2011/11/16
+
+Updated by: Robert Yang <liezhi.yang@windriver.com>
+---
+ build-aux/ltmain.in | 56 ++++++++++++++++++++++-----------------------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index fa157775..816ea5a0 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -2513,7 +2513,7 @@ func_mode_install ()
+ 	dir=$func_dirname_result
+ 	func_append dir "$objdir"
+ 
+-	if test -n "$relink_command"; then
++	if test "$fast_install" = no && test -n "$relink_command"; then
+ 	  # Strip any trailing slash from the destination.
+ 	  func_stripname '' '/' "$libdir"
+ 	  destlibdir=$func_stripname_result
+@@ -2552,7 +2552,7 @@ func_mode_install ()
+ 	  shift
+ 
+ 	  srcname=$realname
+-	  test -n "$relink_command" && srcname=${realname}T
++	  test "$fast_install" = no && test -n "$relink_command" && srcname="$realname"T
+ 
+ 	  # Install the shared library and build the symlinks.
+ 	  func_show_eval "$install_shared_prog $dir/$srcname $destdir/$realname" \
+@@ -6411,18 +6411,18 @@ func_mode_link ()
+ 	    # Hardcode the library path.
+ 	    # Skip directories that are in the system default run-time
+ 	    # search path.
+-	    case " $sys_lib_dlsearch_path " in
+-	    *" $absdir "*) ;;
+-	    *)
+-	      case "$compile_rpath$compile_rpath_tail " in
+-	      *" $absdir "*) ;;
+-	      *) case $absdir in
+-                 "$progdir/"*) func_append compile_rpath " $absdir" ;;
+-                 *) func_append compile_rpath_tail " $absdir" ;;
+-		 esac
+-	      esac
+-	      ;;
+-	    esac
++	    #case " $sys_lib_dlsearch_path " in
++	    #*" $absdir "*) ;;
++	    #*)
++	    #  case "$compile_rpath$compile_rpath_tail " in
++	    #  *" $absdir "*) ;;
++	    #  *) case $absdir in
++            #     "$progdir/"*) func_append compile_rpath " $absdir" ;;
++            #     *) func_append compile_rpath_tail " $absdir" ;;
++	#	 esac
++	    #  esac
++	    #  ;;
++	    #esac
+ 	    case " $sys_lib_dlsearch_path " in
+ 	    *" $libdir "*) ;;
+ 	    *)
+@@ -6488,18 +6488,18 @@ func_mode_link ()
+ 	    # Hardcode the library path.
+ 	    # Skip directories that are in the system default run-time
+ 	    # search path.
+-	    case " $sys_lib_dlsearch_path " in
+-	    *" $absdir "*) ;;
+-	    *)
+-	      case "$compile_rpath$compile_rpath_tail " in
+-	      *" $absdir "*) ;;
+-	      *) case $absdir in
+-                 "$progdir/"*) func_append compile_rpath " $absdir" ;;
+-                 *) func_append compile_rpath_tail " $absdir" ;;
+-		 esac
+-	      esac
+-	      ;;
+-	    esac
++	    #case " $sys_lib_dlsearch_path " in
++	    #*" $absdir "*) ;;
++	    #*)
++	    #  case "$compile_rpath$compile_rpath_tail " in
++	    #  *" $absdir "*) ;;
++	    #  *) case $absdir in
++            #     "$progdir/"*) func_append compile_rpath " $absdir" ;;
++            #     *) func_append compile_rpath_tail " $absdir" ;;
++	#	 esac
++	    #  esac
++	    #  ;;
++	    #esac
+ 	    case " $sys_lib_dlsearch_path " in
+ 	    *" $libdir "*) ;;
+ 	    *)
+@@ -6843,8 +6843,8 @@ func_mode_link ()
+ 		  eval libdir=`$SED -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
+ 		  test -z "$libdir" && \
+ 		    func_fatal_error "'$deplib' is not a valid libtool archive"
+-		  test "$absdir" != "$libdir" && \
+-		    func_warning "'$deplib' seems to be moved"
++		  #test "$absdir" != "$libdir" && \
++		  #  func_warning "'$deplib' seems to be moved"
+ 
+ 		  path=-L$absdir
+ 		fi
+-- 
+2.39.5
+

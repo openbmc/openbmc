@@ -16,14 +16,14 @@ repos:
 
   poky:
     url: https://git.yoctoproject.org/git/poky
-    # commit: 2e9c2a2381105f1306bcbcb54816cbc5d8110eff
+    # commit: 5465094be9a61a1639e1dab6d2b4ebea2bee7440
     layers:
       meta:
       meta-poky:
 
   meta-openembedded:
     url: https://git.openembedded.org/meta-openembedded
-    # commit: 1750c66ae8e4268c472c0b2b94748a59d6ef866d
+    # commit: 461d85a1831318747af5abe86da193bcde3fd9b4
     layers:
       meta-oe:
       meta-python:
@@ -31,7 +31,7 @@ repos:
 
   meta-secure-core:
     url: https://github.com/wind-river/meta-secure-core.git
-    # commit: e29165a1031dcf601edbed1733cedd64826672a5
+    # commit: 59d7e90542947c342098863b9998693ac79352b0
     layers:
       meta-secure-core-common:
       meta-signing-key:

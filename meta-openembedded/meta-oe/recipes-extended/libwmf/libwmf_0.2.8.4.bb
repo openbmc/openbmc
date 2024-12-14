@@ -24,6 +24,13 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/wvware/${BPN}/${PV}/${BPN}-${PV}.tar.gz;name=ta
 SRC_URI[tarball.md5sum] = "d1177739bf1ceb07f57421f0cee191e0"
 SRC_URI[tarball.sha256sum] = "5b345c69220545d003ad52bfd035d5d6f4f075e65204114a9e875e84895a7cf8"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/wvware/files/libwmf/"
+UPSTREAM_CHECK_REGEX = "${BPN}/(?P<pver>\d+(\.\d+)+)"
+
+do_install:append() {
+    sed -i -e 's@${RECIPE_SYSROOT}@@g' ${D}${bindir}/libwmf-config
+}
+
 FILES:${PN}-dbg += "${libdir}/gtk-2.0/2.10.0/loaders/.debug"
 FILES:${PN}-dev += "${libdir}/gtk-2.0/2.10.0/loaders/*.la"
 FILES:${PN}-staticdev += "${libdir}/gtk-2.0/2.10.0/loaders/*.a"

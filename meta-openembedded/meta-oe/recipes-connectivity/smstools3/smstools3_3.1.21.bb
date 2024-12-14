@@ -11,7 +11,6 @@ SRC_URI = "http://smstools3.kekekasvi.com/packages/${BP}.tar.gz \
            file://0001-Make-extern-declarations-to-avoid-duplicate-var-defi.patch \
            "
 
-SRC_URI[md5sum] = "6a9f038fb38a49cc3a4f8f14a88fb8af"
 SRC_URI[sha256sum] = "a26ba4c02b16f6cf13177bffca6c9230dc5fefaeba8e3030cd4e4905f6a92084"
 
 

@@ -1,4 +1,4 @@
-From d49f6a135762ec1f1831d0e80b8df2a4269b0a66 Mon Sep 17 00:00:00 2001
+From 74dad3295f2b8dc06b7e6bb876bc4541e927ef47 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 1 May 2019 16:37:48 +0100
 Subject: [PATCH] Changes to allow ptest to run standalone on target:
@@ -21,7 +21,7 @@ Upstream-Status: Inappropriate [oe specific]
  3 files changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index bbe8673..488712b 100644
+index f191488..426a68f 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -49,7 +49,7 @@ AC_COPYRIGHT([Copyright (C) 1996-2024 The elfutils developers.])
@@ -34,20 +34,20 @@ index bbe8673..488712b 100644
  
  AM_SILENT_RULES([yes])
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index ee49d07..3bd8e58 100644
+index 865a604..eed9bd4 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -852,3 +852,5 @@ check: check-am coverage
+@@ -893,3 +893,5 @@ check: check-am coverage
  coverage:
  	-$(srcdir)/coverage.sh
  endif
 +oecheck:
 +	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 diff --git a/tests/test-subr.sh b/tests/test-subr.sh
-index 411e5f2..a638ff9 100644
+index ea80cbe..7632d20 100644
 --- a/tests/test-subr.sh
 +++ b/tests/test-subr.sh
-@@ -91,12 +91,6 @@ installed_testrun()
+@@ -92,12 +92,6 @@ installed_testrun()
    program="$1"
    shift
    case "$program" in

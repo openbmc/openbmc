@@ -1,4 +1,4 @@
-From 47ee5cc5501289205d3e8e9f27ea9daf18cebac1 Mon Sep 17 00:00:00 2001
+From afc085af7b6b935a5e14fc3f40db47df02ca3af2 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
 Date: Sat, 9 Nov 2019 14:45:30 +0000
 Subject: [PATCH] v8: don't override ARM CFLAGS
@@ -28,10 +28,10 @@ Signed-off-by: André Draszik <git@andred.net>
  1 file changed, 2 insertions(+), 50 deletions(-)
 
 diff --git a/tools/v8_gypfiles/toolchain.gypi b/tools/v8_gypfiles/toolchain.gypi
-index 264b3e478e..0b41848145 100644
+index 9d1b0987..4df15e60 100644
 --- a/tools/v8_gypfiles/toolchain.gypi
 +++ b/tools/v8_gypfiles/toolchain.gypi
-@@ -211,31 +211,7 @@
+@@ -203,31 +203,7 @@
          'target_conditions': [
            ['_toolset=="host"', {
              'conditions': [
@@ -64,7 +64,7 @@ index 264b3e478e..0b41848145 100644
                  # Host not built with an Arm CXX compiler (simulator build).
                  'conditions': [
                    [ 'arm_float_abi=="hard"', {
-@@ -254,31 +230,7 @@
+@@ -246,31 +222,7 @@
            }],  # _toolset=="host"
            ['_toolset=="target"', {
              'conditions': [
@@ -97,6 +97,3 @@ index 264b3e478e..0b41848145 100644
                  # Target not built with an Arm CXX compiler (simulator build).
                  'conditions': [
                    [ 'arm_float_abi=="hard"', {
--- 
-2.20.1
-

@@ -25,4 +25,8 @@ EXTRA_OECMAKE += "-DCOMPILE_TESTS=NO -DCOMPILE_STUBGEN=NO -DCOMPILE_EXAMPLES=NO 
                   -DCMAKE_LIBRARY_PATH=${libdir} \
 "
 
+do_install:append() {
+	sed -i -e 's#${RECIPE_SYSROOT}##g' ${D}${libdir}/libjson-rpc-cpp/cmake/libjson-rpc-cppTargets.cmake
+}
+
 FILES:${PN}-dev += "${libdir}/libjson-rpc-cpp/cmake"

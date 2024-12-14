@@ -20,8 +20,8 @@ class MetaIDE(OESelftestTestCase):
         bitbake('meta-ide-support')
         bitbake('build-sysroots -c build_native_sysroot')
         bitbake('build-sysroots -c build_target_sysroot')
-        bb_vars = get_bb_vars(['MULTIMACH_TARGET_SYS', 'DEPLOY_DIR_IMAGE', 'COREBASE'])
-        cls.environment_script = 'environment-setup-%s' % bb_vars['MULTIMACH_TARGET_SYS']
+        bb_vars = get_bb_vars(['MACHINE_ARCH', 'TARGET_VENDOR', 'TARGET_OS', 'DEPLOY_DIR_IMAGE', 'COREBASE'])
+        cls.environment_script = 'environment-setup-%s%s-%s' % (bb_vars['MACHINE_ARCH'], bb_vars['TARGET_VENDOR'], bb_vars['TARGET_OS'])
         cls.deploydir = bb_vars['DEPLOY_DIR_IMAGE']
         cls.environment_script_path = '%s/%s' % (cls.deploydir, cls.environment_script)
         cls.corebasedir = bb_vars['COREBASE']

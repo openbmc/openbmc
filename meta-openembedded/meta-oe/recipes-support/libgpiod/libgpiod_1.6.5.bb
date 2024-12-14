@@ -7,7 +7,7 @@ SRC_URI += "file://0001-bindings-cxx-disable-tests.patch"
 
 SRC_URI[sha256sum] = "ae280f697bf035a1fb780c9972e5c81d0d2712b7ab6124fb3fba24619daa72bc"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-1.x:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}-1.x:"
 
 inherit python3native
 

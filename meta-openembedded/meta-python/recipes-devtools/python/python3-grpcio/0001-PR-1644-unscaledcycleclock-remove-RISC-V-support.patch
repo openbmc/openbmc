@@ -1,4 +1,4 @@
-From 7335a36d0b5c1c597566f9aa3f458a5b6817c3b4 Mon Sep 17 00:00:00 2001
+From ee0e37b02d0d28279e103653688bf7203275ec47 Mon Sep 17 00:00:00 2001
 From: aurel32 <aurelien@aurel32.net>
 Date: Fri, 22 Mar 2024 14:21:13 -0700
 Subject: [PATCH] PR #1644: unscaledcycleclock: remove RISC-V support
@@ -77,6 +77,3 @@ index 5e232c1..83552fc 100644
  #define ABSL_INTERNAL_UNSCALED_CYCLECLOCK_FREQUENCY_IS_CPU_FREQUENCY
  #endif
  #endif
--- 
-2.44.0
-

@@ -38,7 +38,7 @@ Index: openssl-3.0.4/Configurations/unix-Makefile.tmpl
 ===================================================================
 --- openssl-3.0.4.orig/Configurations/unix-Makefile.tmpl
 +++ openssl-3.0.4/Configurations/unix-Makefile.tmpl
-@@ -472,13 +472,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lfl
+@@ -502,13 +502,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
                           '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
  BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
  
@@ -67,7 +67,7 @@ Index: openssl-3.0.4/crypto/build.info
 ===================================================================
 --- openssl-3.0.4.orig/crypto/build.info
 +++ openssl-3.0.4/crypto/build.info
-@@ -109,7 +109,7 @@ DEFINE[../libcrypto]=$UPLINKDEF
+@@ -115,7 +115,7 @@ DEFINE[../libcrypto]=$UPLINKDEF
  
  DEPEND[info.o]=buildinf.h
  DEPEND[cversion.o]=buildinf.h

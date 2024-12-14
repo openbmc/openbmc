@@ -11,10 +11,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
 SECTION = "console/network"
 DEPENDS = ""
 
-SRC_URI = "http://www.ohse.de/uwe/releases/lrzsz-${PV}.tar.gz \
+SRC_URI = "https://www.ohse.de/uwe/releases/lrzsz-${PV}.tar.gz \
            file://autotools-update.patch \
-	   file://autotools.patch \
-	   file://makefile.patch \
+           file://autotools.patch \
+           file://makefile.patch \
            file://lrzsz-check-locale.h.patch \
            file://cve-2018-10195.patch \
            file://include.patch \

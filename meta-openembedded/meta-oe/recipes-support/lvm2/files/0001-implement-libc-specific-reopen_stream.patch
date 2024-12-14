@@ -1,4 +1,4 @@
-From a86919ed5468f3c152114446c189b00f5f656d59 Mon Sep 17 00:00:00 2001
+From e2f24ea066e6dfb9f13f623009034acbf4ae8818 Mon Sep 17 00:00:00 2001
 From: Dengke Du <dengke.du@windriver.com>
 Date: Tue, 25 Oct 2016 11:49:40 +0000
 Subject: [PATCH] implement libc specific reopen_stream
@@ -21,7 +21,7 @@ Upstream-Status: Pending
  2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/lib/log/log.c b/lib/log/log.c
-index 7b88252f0..e1720098a 100644
+index eafb3ef1c..ff3d751bf 100644
 --- a/lib/log/log.c
 +++ b/lib/log/log.c
 @@ -165,6 +165,7 @@ static void _check_and_replace_standard_log_streams(FILE *old_stream, FILE *new_
@@ -45,10 +45,10 @@ index 7b88252f0..e1720098a 100644
  void init_log_fn(lvm2_log_fn_t log_fn)
  {
 diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
-index 3fd23a521..c2ee39905 100644
+index 1b2f7f47c..e0674d42d 100644
 --- a/tools/lvmcmdline.c
 +++ b/tools/lvmcmdline.c
-@@ -3380,7 +3380,7 @@ static int _check_standard_fds(void)
+@@ -3378,7 +3378,7 @@ static int _check_standard_fds(void)
  	int err = is_valid_fd(STDERR_FILENO);
  
  	if (!is_valid_fd(STDIN_FILENO) &&
@@ -57,7 +57,7 @@ index 3fd23a521..c2ee39905 100644
  		if (err)
  			perror("stdin stream open");
  		else
-@@ -3390,7 +3390,7 @@ static int _check_standard_fds(void)
+@@ -3388,7 +3388,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDOUT_FILENO) &&
@@ -66,7 +66,7 @@ index 3fd23a521..c2ee39905 100644
  		if (err)
  			perror("stdout stream open");
  		/* else no stdout */
-@@ -3398,7 +3398,7 @@ static int _check_standard_fds(void)
+@@ -3396,7 +3396,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDERR_FILENO) &&

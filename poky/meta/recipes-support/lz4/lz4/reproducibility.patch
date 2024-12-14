@@ -1,0 +1,33 @@
+lib/Makefile: Fix static library reproducibility
+
+The static library contents varies depending of the order of the object files on disk meaning
+it isn't reproducible.
+
+To avoid this, use the SRCFILES values which are already sorted, mapped to the object names
+instead.
+
+
+Upstream-Status: Submitted [https://github.com/lz4/lz4/pull/1497]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: git/lib/Makefile
+===================================================================
+--- git.orig/lib/Makefile
++++ git/lib/Makefile
+@@ -55,6 +55,7 @@ CFLAGS   = $(DEBUGFLAGS) $(USERCFLAGS)
+ ALLFLAGS = $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
+ 
+ SRCFILES := $(sort $(wildcard *.c))
++OBJFILES = $(SRCFILES:.c=.o)
+ 
+ include ../Makefile.inc
+ 
+@@ -102,7 +103,7 @@ liblz4.a: $(SRCFILES)
+ ifeq ($(BUILD_STATIC),yes)  # can be disabled on command line
+ 	@echo compiling static library
+ 	$(COMPILE.c) $^
+-	$(AR) rcs $@ *.o
++	$(AR) rcs $@ $(OBJFILES)
+ endif
+ 
+ ifeq ($(WINBASED),yes)

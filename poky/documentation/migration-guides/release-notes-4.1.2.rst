@@ -6,18 +6,18 @@ Release notes for Yocto-4.1.2 (Langdale)
 Security Fixes in Yocto-4.1.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  sudo: Fix :cve:`2022-43995`
--  binutils: Fix :cve:`2022-4285`
--  cairo: update patch for :cve:`2019-6461` with upstream solution
--  expat: Fix :cve:`2022-43680`
--  ffmpeg: Fix :cve:`2022-3964` and :cve:`2022-3965`
--  grub: Fix :cve:`2022-28736`
--  libarchive: Fix :cve:`2022-36227`
--  libpam: Fix :cve:`2022-28321`
--  libpng: Fix :cve:`2019-6129`
--  ruby: Fix :cve:`2022-28738` and :cve:`2022-28739`
--  tiff: Fix :cve:`2022-3970`
--  vim: Fix :cve:`2022-4141`
+-  sudo: Fix :cve_nist:`2022-43995`
+-  binutils: Fix :cve_nist:`2022-4285`
+-  cairo: update patch for :cve_nist:`2019-6461` with upstream solution
+-  expat: Fix :cve_nist:`2022-43680`
+-  ffmpeg: Fix :cve_nist:`2022-3964` and :cve_nist:`2022-3965`
+-  grub: Fix :cve_nist:`2022-28736`
+-  libarchive: Fix :cve_nist:`2022-36227`
+-  libpam: Fix :cve_nist:`2022-28321`
+-  libpng: Fix :cve_nist:`2019-6129`
+-  ruby: Fix :cve_nist:`2022-28738` and :cve_nist:`2022-28739`
+-  tiff: Fix :cve_nist:`2022-3970`
+-  vim: Fix :cve_nist:`2022-4141`
 
 
 Fixes in Yocto-4.1.2

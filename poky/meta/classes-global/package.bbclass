@@ -447,10 +447,6 @@ def gen_packagevar(d, pkgvars="PACKAGEVARS"):
     for p in pkgs:
         for v in vars:
             ret.append(v + ":" + p)
-
-        # Ensure that changes to INCOMPATIBLE_LICENSE re-run do_package for
-        # affected recipes.
-        ret.append('_exclude_incompatible-%s' % p)
     return " ".join(ret)
 
 
@@ -476,7 +472,7 @@ python do_package () {
     # cache.  This is useful if an item this class depends on changes in a
     # way that the output of this class changes.  rpmdeps is a good example
     # as any change to rpmdeps requires this to be rerun.
-    # PACKAGE_BBCLASS_VERSION = "5"
+    # PACKAGE_BBCLASS_VERSION = "6"
 
     # Init cachedpath
     global cpath

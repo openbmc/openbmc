@@ -10,7 +10,6 @@ network."
 SECTION = "System Environment/Daemons"
 
 SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/${BPN}/${BP}.tar.gz/be2a88f8ccddf2a40ac484cb3294fedc/${BP}.tar.gz"
-SRC_URI[md5sum] = "be2a88f8ccddf2a40ac484cb3294fedc"
 SRC_URI[sha256sum] = "4d6145d435a5d8b567b9798620f57f9b0a464078a1deba267958f168fbe776e6"
 
 SRC_URI += "file://0001-rarpd.8-add-man-file.patch \

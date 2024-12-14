@@ -1,0 +1,91 @@
+From e4552b9c5dbe8816266f332c5e20796d46eb5b16 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 18 Sep 2023 02:47:55 +0200
+Subject: [PATCH] tracker: fix reproducibility issue
+
+Tracker's design seems to be strictly for non-cross builds and leaks buildpaths into the
+binaries at various places. Avoid this to improve binary reproducibility.
+
+todo: Some of these paths may need to be adjusted to make the test environment work
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build                        | 6 +++---
+ src/libtracker-common/meson.build  | 4 ++--
+ src/libtracker-http/tracker-http.c | 2 +-
+ src/libtracker-sparql/meson.build  | 4 ++--
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 8552c6d..d72ff52 100644
+--- a/meson.build
++++ b/meson.build
+@@ -333,7 +333,7 @@ have_rtld_noload = cc.has_header_symbol('dlfcn.h', 'RTLD_NOLOAD')
+ conf.set('HAVE_RTLD_NOLOAD', have_rtld_noload)
+ 
+ # Config that goes in some other generated files (.desktop, .service, etc)
+-conf.set('abs_top_builddir', meson.current_build_dir())
++conf.set('abs_top_builddir', '/usr/src/debug/tracker')
+ conf.set('libexecdir', join_paths(get_option('prefix'), get_option('libexecdir')))
+ 
+ configure_file(input: 'config.h.meson.in',
+@@ -372,8 +372,8 @@ subdir('docs')
+ subdir('utils')
+ 
+ test_c_args = tracker_c_args + [
+-    '-DTOP_BUILDDIR="@0@"'.format(build_root),
+-    '-DTOP_SRCDIR="@0@"'.format(source_root),
++    '-DTOP_BUILDDIR="@0@/"'.format('/usr/src/debug/tracker'),
++    '-DTOP_SRCDIR="@0@/"'.format('/usr/src/debug/tracker'),
+ ]
+ 
+ tracker_uninstalled_cli_dir = join_paths(meson.current_build_dir(), 'src', 'tracker')
+diff --git a/src/libtracker-common/meson.build b/src/libtracker-common/meson.build
+index 72c2ae0..12218c8 100644
+--- a/src/libtracker-common/meson.build
++++ b/src/libtracker-common/meson.build
+@@ -51,10 +51,10 @@ libtracker_common = static_library('tracker-common',
+   dependencies: [tracker_common_dependencies, gmodule],
+   c_args: [
+     '-DPRIVATE_LIBDIR="@0@"'.format(tracker_internal_libs_dir),
+-    '-DBUILD_LIBDIR="@0@"'.format(meson.current_build_dir()),
++    '-DBUILD_LIBDIR="@0@"'.format('/usr/src/debug/tracker'),
+     # Global build root is required to detect noinst situations (tests/introspection),
+     # event when built as a subproject
+-    '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
++    '-DBUILDROOT="@0@"'.format('/usr/src/debug/tracker'),
+   ] + tracker_c_args,
+   include_directories: [configinc, srcinc],
+   gnu_symbol_visibility: 'hidden',
+diff --git a/src/libtracker-http/tracker-http.c b/src/libtracker-http/tracker-http.c
+index dd82e99..cb3f1f7 100644
+--- a/src/libtracker-http/tracker-http.c
++++ b/src/libtracker-http/tracker-http.c
+@@ -53,7 +53,7 @@ ensure_types (void)
+ 
+ 		current_dir = g_get_current_dir ();
+ 
+-		if (g_strcmp0 (current_dir, BUILDROOT) == 0) {
++		if (0) {
+ 			/* Detect in-build runtime of this code, this may happen
+ 			 * building introspection information or running tests.
+ 			 * We want the in-tree modules to be loaded then.
+diff --git a/src/libtracker-sparql/meson.build b/src/libtracker-sparql/meson.build
+index 5eccb92..161f6ea 100644
+--- a/src/libtracker-sparql/meson.build
++++ b/src/libtracker-sparql/meson.build
+@@ -102,10 +102,10 @@ libtracker_sparql_private = static_library('tracker-sparql-private',
+     c_args: [
+ 	'-include', 'libtracker-sparql/tracker-private.h',
+         '-DPRIVATE_LIBDIR="@0@"'.format(tracker_internal_libs_dir),
+-        '-DBUILD_LIBDIR="@0@"'.format(meson.current_build_dir()),
++        '-DBUILD_LIBDIR="@0@"'.format('/usr/src/debug/tracker'),
+         # Global build root is required to detect noinst situations (tests/introspection),
+         # event when built as a subproject
+-        '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
++        '-DBUILDROOT="@0@"'.format('/usr/src/debug/tracker'),
+     ] + tracker_c_args,
+ 
+     dependencies: [libtracker_sparql_dependencies],

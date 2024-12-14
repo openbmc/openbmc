@@ -55,4 +55,9 @@ FILES:jpeg-tools = "${bindir}/*"
 DESCRIPTION:libturbojpeg = "A SIMD-accelerated JPEG codec which provides only TurboJPEG APIs"
 FILES:libturbojpeg = "${libdir}/libturbojpeg.so.*"
 
+do_install:append() {
+    # The binaries have RUNPATH=$libdir, which is redundant
+    chrpath -d ${D}/${bindir}/* ${D}${libdir}/*${SOLIBS}
+}
+
 BBCLASSEXTEND = "native nativesdk"

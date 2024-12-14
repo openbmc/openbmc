@@ -29,5 +29,4 @@ do_install:append() {
     install -m 0644 ${S}/README ${D}${datadir}/doc/ttf-sazanami-mincho
 }
 
-SRC_URI[md5sum] = "ceef10579a75c92483171f3bd7f77df2"
 SRC_URI[sha256sum] = "3467ce2f70a9a3fbbf8d4d97355a2f334a6351baa6722251403637a8cbebf6b7"

@@ -12,6 +12,7 @@ import os
 import sys
 import unittest
 import hashlib
+import subprocess
 
 from glob import glob
 from shutil import rmtree, copy
@@ -457,7 +458,7 @@ part /etc --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path bin/ --r
             wicimg = wicout[0]
 
             # verify partition size with wic
-            res = runCmd("parted -m %s unit b p 2>/dev/null" % wicimg)
+            res = runCmd("parted -m %s unit b p" % wicimg, stderr=subprocess.PIPE)
 
             # parse parted output which looks like this:
             # BYT;\n
@@ -478,16 +479,16 @@ part /etc --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path bin/ --r
 
             # Test partition 1, should contain the normal root directories, except
             # /usr.
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % \
-                             os.path.join(self.resultdir, "selftest_img.part1"))
+            res = runCmd("debugfs -R 'ls -p' %s" % \
+                             os.path.join(self.resultdir, "selftest_img.part1"), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertIn("etc", files)
             self.assertNotIn("usr", files)
 
             # Partition 2, should contain common directories for /usr, not root
             # directories.
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % \
-                             os.path.join(self.resultdir, "selftest_img.part2"))
+            res = runCmd("debugfs -R 'ls -p' %s" % \
+                             os.path.join(self.resultdir, "selftest_img.part2"), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertNotIn("etc", files)
             self.assertNotIn("usr", files)
@@ -495,15 +496,15 @@ part /etc --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path bin/ --r
 
             # Partition 3, should contain the same as partition 2, including the bin
             # directory, but not the files inside it.
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % \
-                             os.path.join(self.resultdir, "selftest_img.part3"))
+            res = runCmd("debugfs -R 'ls -p' %s" % \
+                             os.path.join(self.resultdir, "selftest_img.part3"), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertNotIn("etc", files)
             self.assertNotIn("usr", files)
             self.assertIn("share", files)
             self.assertIn("bin", files)
-            res = runCmd("debugfs -R 'ls -p bin' %s 2>/dev/null" % \
-                             os.path.join(self.resultdir, "selftest_img.part3"))
+            res = runCmd("debugfs -R 'ls -p bin' %s" % \
+                             os.path.join(self.resultdir, "selftest_img.part3"), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertIn(".", files)
             self.assertIn("..", files)
@@ -541,13 +542,13 @@ part /part2 --source rootfs --ondisk mmcblk0 --fstype=ext4 --include-path %s"""
             part2 = glob(os.path.join(self.resultdir, 'temp-*.direct.p2'))[0]
 
             # Test partition 1, should not contain 'test-file'
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part1))
+            res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertNotIn('test-file', files)
             self.assertEqual(True, files_own_by_root(res.output))
 
             # Test partition 2, should contain 'test-file'
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part2))
+            res = runCmd("debugfs -R 'ls -p' %s" % (part2), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertIn('test-file', files)
             self.assertEqual(True, files_own_by_root(res.output))
@@ -576,12 +577,12 @@ part / --source rootfs  --fstype=ext4 --include-path %s --include-path core-imag
 
             part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
 
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part1))
+            res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertIn('test-file', files)
             self.assertEqual(True, files_own_by_root(res.output))
 
-            res = runCmd("debugfs -R 'ls -p /export/etc/' %s 2>/dev/null" % (part1))
+            res = runCmd("debugfs -R 'ls -p /export/etc/' %s" % (part1), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertIn('passwd', files)
             self.assertEqual(True, files_own_by_root(res.output))
@@ -668,7 +669,7 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
                                        % (wks_file, self.resultdir))
 
                 for part in glob(os.path.join(self.resultdir, 'temp-*.direct.p*')):
-                    res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part))
+                    res = runCmd("debugfs -R 'ls -p' %s" % (part), stderr=subprocess.PIPE)
                     self.assertEqual(True, files_own_by_root(res.output))
 
                 config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "%s"\n' % wks_file
@@ -678,7 +679,7 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
 
                 # check each partition for permission
                 for part in glob(os.path.join(tmpdir, 'temp-*.direct.p*')):
-                    res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part))
+                    res = runCmd("debugfs -R 'ls -p' %s" % (part), stderr=subprocess.PIPE)
                     self.assertTrue(files_own_by_root(res.output)
                         ,msg='Files permission incorrect using wks set "%s"' % test)
 
@@ -706,7 +707,7 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
 
             part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
 
-            res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part1))
+            res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
             files = extract_files(res.output)
             self.assertIn('passwd', files)
 
@@ -741,7 +742,7 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
         bitbake('base-files -c do_install')
         bf_fstab = os.path.join(get_bb_var('D', 'base-files'), 'etc', 'fstab')
         self.assertEqual(True, os.path.exists(bf_fstab))
-        bf_fstab_md5sum = runCmd('md5sum %s 2>/dev/null' % bf_fstab).output.split(" ")[0]
+        bf_fstab_md5sum = runCmd('md5sum %s ' % bf_fstab).output.split(" ")[0]
 
         try:
             no_fstab_update_path = os.path.join(self.resultdir, 'test-no-fstab-update')
@@ -757,7 +758,7 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
             part_fstab_md5sum = []
             for i in range(1, 3):
                 part = glob(os.path.join(self.resultdir, 'temp-*.direct.p') + str(i))[0]
-                part_fstab = runCmd("debugfs -R 'cat etc/fstab' %s 2>/dev/null" % (part))
+                part_fstab = runCmd("debugfs -R 'cat etc/fstab' %s" % (part), stderr=subprocess.PIPE)
                 part_fstab_md5sum.append(hashlib.md5((part_fstab.output + "\n\n").encode('utf-8')).hexdigest())
 
             # '/etc/fstab' in partition 2 should contain the same stock fstab file
@@ -839,6 +840,61 @@ bootloader --ptable gpt""")
         finally:
             os.remove(wks_file)
 
+    def test_wic_sector_size(self):
+        """Test generation image sector size"""
+ 
+        oldpath = os.environ['PATH']
+        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
+
+        try:
+            # Add WIC_SECTOR_SIZE into config
+            config = 'WIC_SECTOR_SIZE = "4096"\n'\
+                     'WICVARS:append = " WIC_SECTOR_SIZE"\n'
+            self.append_config(config)
+            bitbake('core-image-minimal')
+
+            # Check WIC_SECTOR_SIZE apply to bitbake variable
+            wic_sector_size_str = get_bb_var('WIC_SECTOR_SIZE', 'core-image-minimal')
+            wic_sector_size = int(wic_sector_size_str)
+            self.assertEqual(4096, wic_sector_size)
+
+            self.logger.info("Test wic_sector_size: %d \n" % wic_sector_size)
+
+            with NamedTemporaryFile("w", suffix=".wks") as wks:
+                wks.writelines(
+                    ['bootloader --ptable gpt\n',
+                     'part --fstype ext4 --source rootfs --label rofs-a --mkfs-extraopts "-b 4096"\n',
+                     'part --fstype ext4 --source rootfs --use-uuid --mkfs-extraopts "-b 4096"\n'])
+                wks.flush()
+                cmd = "wic create %s -e core-image-minimal -o %s" % (wks.name, self.resultdir)
+                runCmd(cmd)
+                wksname = os.path.splitext(os.path.basename(wks.name))[0]
+                images = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
+                self.assertEqual(1, len(images))
+
+            sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
+            # list partitions
+            result = runCmd("wic ls %s -n %s" % (images[0], sysroot))
+            self.assertEqual(3, len(result.output.split('\n')))
+
+            # verify partition size with wic
+            res = runCmd("export PARTED_SECTOR_SIZE=%d; parted -m %s unit b p" % (wic_sector_size, images[0]),
+                         stderr=subprocess.PIPE)
+
+            # parse parted output which looks like this:
+            # BYT;\n
+            # /var/tmp/wic/build/tmpgjzzefdd-202410281021-sda.direct:78569472B:file:4096:4096:gpt::;\n
+            # 1:139264B:39284735B:39145472B:ext4:rofs-a:;\n
+            # 2:39284736B:78430207B:39145472B:ext4:primary:;\n
+            disk_info = res.output.splitlines()[1]
+            # Check sector sizes
+            sector_size_logical = int(disk_info.split(":")[3])
+            sector_size_physical = int(disk_info.split(":")[4])
+            self.assertEqual(wic_sector_size, sector_size_logical, "Logical sector size is not %d." % wic_sector_size)
+            self.assertEqual(wic_sector_size, sector_size_physical, "Physical sector size is not %d." % wic_sector_size)
+
+        finally:
+            os.environ['PATH'] = oldpath
 
 class Wic2(WicTestCase):
 
@@ -939,7 +995,8 @@ class Wic2(WicTestCase):
         bitbake('wic-image-minimal')
         self.remove_config(config)
 
-        with runqemu('wic-image-minimal', ssh=False, runqemuparams='nographic') as qemu:
+        runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'wic-image-minimal') or ""
+        with runqemu('wic-image-minimal', ssh=False, runqemuparams='%s nographic' % (runqemu_params)) as qemu:
             cmd = "mount | grep '^/dev/' | cut -f1,3 -d ' ' | egrep -c -e '/dev/sda1 /boot' " \
                   "-e '/dev/root /|/dev/sda2 /' -e '/dev/sda3 /media' -e '/dev/sda4 /mnt'"
             status, output = qemu.run_serial(cmd)
@@ -959,8 +1016,9 @@ class Wic2(WicTestCase):
         bitbake('core-image-minimal ovmf')
         self.remove_config(config)
 
+        runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'core-image-minimal') or ""
         with runqemu('core-image-minimal', ssh=False,
-                     runqemuparams='nographic ovmf', image_fstype='wic') as qemu:
+                     runqemuparams='%s nographic ovmf' % (runqemu_params), image_fstype='wic') as qemu:
             cmd = "grep sda. /proc/partitions  |wc -l"
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
@@ -1000,8 +1058,8 @@ class Wic2(WicTestCase):
             native_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "wic-tools")
 
         # verify partition size with wic
-        res = runCmd("parted -m %s unit kib p 2>/dev/null" % wicimg,
-                     native_sysroot=native_sysroot)
+        res = runCmd("parted -m %s unit kib p" % wicimg,
+                     native_sysroot=native_sysroot, stderr=subprocess.PIPE)
 
         # parse parted output which looks like this:
         # BYT;\n
@@ -1154,8 +1212,9 @@ class Wic2(WicTestCase):
         bitbake('core-image-minimal-mtdutils')
         self.remove_config(config)
 
+        runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'core-image-minimal-mtdutils') or ""
         with runqemu('core-image-minimal-mtdutils', ssh=False,
-                     runqemuparams='nographic', image_fstype='wic') as qemu:
+                     runqemuparams='%s nographic' % (runqemu_params), image_fstype='wic') as qemu:
             cmd = "grep sda. /proc/partitions  |wc -l"
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
@@ -1177,6 +1236,10 @@ class Wic2(WicTestCase):
             self.assertEqual(1, len(out))
 
     def test_rawcopy_plugin(self):
+        config = 'IMAGE_FSTYPES = "ext4"\n'
+        self.append_config(config)
+        self.assertEqual(0, bitbake('core-image-minimal').status)
+        self.remove_config(config)
         self._rawcopy_plugin('ext4')
 
     def test_rawcopy_plugin_unpack(self):
@@ -1214,8 +1277,9 @@ class Wic2(WicTestCase):
         bitbake('core-image-minimal')
         self.remove_config(config)
 
+        runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'core-image-minimal') or ""
         with runqemu('core-image-minimal', ssh=False,
-                     runqemuparams='nographic', image_fstype='wic') as qemu:
+                     runqemuparams='%s nographic' % (runqemu_params), image_fstype='wic') as qemu:
             # Check that we have ONLY two /dev/sda* partitions (/boot and /)
             cmd = "grep sda. /proc/partitions | wc -l"
             status, output = qemu.run_serial(cmd)
@@ -1288,24 +1352,46 @@ class Wic2(WicTestCase):
     @skipIfNotArch(['i586', 'i686', 'x86_64'])
     @OETestTag("runqemu")
     def test_efi_plugin_unified_kernel_image_qemu(self):
-        """Test efi plugin's Unified Kernel Image feature in qemu"""
-        config = 'IMAGE_FSTYPES = "wic"\n'\
-                 'INITRAMFS_IMAGE = "core-image-minimal-initramfs"\n'\
-                 'WKS_FILE = "test_efi_plugin.wks"\n'\
-                 'MACHINE_FEATURES:append = " efi"\n'
+        """Test Unified Kernel Image feature in qemu without systemd in initramfs or rootfs"""
+        config = """
+# efi firmware must load systemd-boot, not grub
+EFI_PROVIDER = "systemd-boot"
+
+# image format must be wic, needs esp partition for firmware etc
+IMAGE_FSTYPES:pn-core-image-base:append = " wic"
+WKS_FILE = "test_efi_plugin.wks"
+
+# efi, uki and systemd features must be enabled
+MACHINE_FEATURES:append = " efi"
+DISTRO_FEATURES_NATIVE:append = " systemd"
+IMAGE_CLASSES:append:pn-core-image-base = " uki"
+
+# uki embeds also an initrd, no systemd or udev
+INITRAMFS_IMAGE = "core-image-initramfs-boot"
+
+# runqemu must not load kernel separately, it's in the uki
+QB_KERNEL_ROOT = ""
+QB_DEFAULT_KERNEL = "none"
+
+# boot command line provided via uki, not via bootloader
+UKI_CMDLINE = "rootwait root=LABEL=root console=${KERNEL_CONSOLE}"
+
+"""
         self.append_config(config)
-        bitbake('core-image-minimal core-image-minimal-initramfs ovmf')
+        bitbake('core-image-base ovmf')
+        runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'core-image-base') or ""
+        uki_filename = get_bb_var('UKI_FILENAME', 'core-image-base')
         self.remove_config(config)
 
-        with runqemu('core-image-minimal', ssh=False,
-                     runqemuparams='nographic ovmf', image_fstype='wic') as qemu:
-            # Check that /boot has EFI bootx64.efi (required for EFI)
-            cmd = "ls /boot/EFI/BOOT/bootx64.efi | wc -l"
+        with runqemu('core-image-base', ssh=False,
+                     runqemuparams='%s nographic ovmf' % (runqemu_params), image_fstype='wic') as qemu:
+            # Check that /boot has EFI boot*.efi (required for EFI)
+            cmd = "ls /boot/EFI/BOOT/boot*.efi | wc -l"
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, '1')
-            # Check that /boot has EFI/Linux/linux.efi (required for Unified Kernel Images auto detection)
-            cmd = "ls /boot/EFI/Linux/linux.efi | wc -l"
+            # Check that /boot has EFI/Linux/${UKI_FILENAME} (required for Unified Kernel Images auto detection)
+            cmd = "ls /boot/EFI/Linux/%s | wc -l" % (uki_filename)
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, '1')
@@ -1314,6 +1400,80 @@ class Wic2(WicTestCase):
             status, output = qemu.run_serial(cmd)
             self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
             self.assertEqual(output, '0')
+
+    @skipIfNotArch(['aarch64'])
+    @OETestTag("runqemu")
+    def test_efi_plugin_plain_systemd_boot_qemu_aarch64(self):
+        """Test plain systemd-boot in qemu with systemd"""
+        config = """
+INIT_MANAGER = "systemd"
+EFI_PROVIDER = "systemd-boot"
+
+# image format must be wic, needs esp partition for firmware etc
+IMAGE_FSTYPES:pn-core-image-base:append = " wic"
+WKS_FILE = "test_efi_plugin_plain_systemd-boot.wks"
+
+INITRAMFS_IMAGE = "core-image-initramfs-boot"
+
+# to configure runqemu
+IMAGE_CLASSES += "qemuboot"
+# u-boot efi firmware
+QB_DEFAULT_BIOS = "u-boot.bin"
+# need to use virtio, scsi not supported by u-boot by default
+QB_DRIVE_TYPE = "/dev/vd"
+
+# disable kvm, breaks boot
+QEMU_USE_KVM = ""
+
+IMAGE_CLASSES:remove = 'testimage'
+"""
+        self.append_config(config)
+        bitbake('core-image-base u-boot')
+        runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'core-image-base') or ""
+
+        with runqemu('core-image-base', ssh=False,
+                     runqemuparams='%s nographic' % (runqemu_params), image_fstype='wic') as qemu:
+            # Check that /boot has EFI boot*.efi (required for EFI)
+            cmd = "ls /boot/EFI/BOOT/boot*.efi | wc -l"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '1')
+            # Check that boot.conf exists
+            cmd = "cat /boot/loader/entries/boot.conf"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+        self.remove_config(config)
+
+    @skipIfNotArch(['i586', 'i686', 'x86_64'])
+    @OETestTag("runqemu")
+    def test_efi_plugin_plain_systemd_boot_qemu_x86(self):
+        """Test plain systemd-boot to systemd in qemu"""
+        config = """
+INIT_MANAGER = "systemd"
+EFI_PROVIDER = "systemd-boot"
+
+# image format must be wic, needs esp partition for firmware etc
+IMAGE_FSTYPES:pn-core-image-base:append = " wic"
+WKS_FILE = "test_efi_plugin_plain_systemd-boot.wks"
+
+INITRAMFS_IMAGE = "core-image-initramfs-boot"
+"""
+        self.append_config(config)
+        bitbake('core-image-base ovmf')
+        runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'core-image-base') or ""
+        self.remove_config(config)
+
+        with runqemu('core-image-base', ssh=False,
+                     runqemuparams='%s nographic ovmf' % (runqemu_params), image_fstype='wic') as qemu:
+            # Check that /boot has EFI boot*.efi (required for EFI)
+            cmd = "ls /boot/EFI/BOOT/boot*.efi | wc -l"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '1')
+            # Check that boot.conf exists
+            cmd = "cat /boot/loader/entries/boot.conf"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
 
     def test_fs_types(self):
         """Test filesystem types for empty and not empty partitions"""
@@ -1446,8 +1606,8 @@ class Wic2(WicTestCase):
             os.rename(image_path, image_path + '.bak')
             os.rename(new_image_path, image_path)
 
-            # Check if it boots in qemu
-            with runqemu('core-image-minimal', ssh=False, runqemuparams='nographic') as qemu:
+            runqemu_params = get_bb_var('TEST_RUNQEMUPARAMS', 'core-image-minimal') or ""
+            with runqemu('core-image-minimal', ssh=False, runqemuparams='%s nographic' % (runqemu_params)) as qemu:
                 cmd = "ls /etc/"
                 status, output = qemu.run_serial('true')
                 self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))

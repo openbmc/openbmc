@@ -146,7 +146,7 @@ metadata, as extra layers can define their own:
 
 -  *directfb:* Include DirectFB support.
 
--  *ext2:* Include tools for supporting for devices with internal
+-  *ext2:* Include tools for supporting devices with internal
    HDD/Microdrive for storing files (instead of Flash only devices).
 
 -  *gobject-introspection-data:* Include data to support
@@ -196,6 +196,10 @@ metadata, as extra layers can define their own:
 -  *pci:* Include PCI bus support.
 
 -  *pcmcia:* Include PCMCIA/CompactFlash support.
+
+-  *pni-names:* Enable generation of persistent network interface names, i.e.
+   the system tries hard to have the same but unique names for the network
+   interfaces even after a reinstall.
 
 -  *polkit:* Include :wikipedia:`Polkit <Polkit>` support.
 
@@ -323,8 +327,9 @@ The image features available for all images are:
 
    .. note::
 
-      To make the ``/var/log`` directory on the target persistent, use the
-      :term:`VOLATILE_LOG_DIR` variable by setting it to "no".
+      To make the ``/var/log`` directory on the target persistent, remove the
+      ``files/fs-perms-volatile-log.txt`` value from
+      :term:`FILESYSTEM_PERMS_TABLES`.
 
 -  *ptest-pkgs:* Installs ptest packages for all ptest-enabled recipes.
 

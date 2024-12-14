@@ -1,0 +1,27 @@
+From 5b1b04356f3efc08ae279cafc6ee86df11f10c9a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Aug 2024 23:13:02 -0700
+Subject: [PATCH] configure.ac: Do not emit compiler flags into object files
+
+They contain options which have absolute paths in them e.g. --sysroot
+therefore do not record them and make build reproducible
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -1013,8 +1013,7 @@ if test "$enable_hardening" != no; then
+ 	  "-Wp,-D_FORTIFY_SOURCE=$FORTIFY_SOURCE" \
+ 	  "-fexceptions" \
+ 	  "-fstack-protector-strong" \
+-	  "--param=ssp-buffer-size=4" \
+-	  "-grecord-gcc-switches"
++	  "--param=ssp-buffer-size=4"
+   do
+     AC_MSG_CHECKING([for $FLAG support])
+     CFLAGS="$CFLAGS $FLAG"

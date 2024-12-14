@@ -1,0 +1,103 @@
+From 7e6295f14ea057562a235fbf6762d867e739a181 Mon Sep 17 00:00:00 2001
+From: Niko Mauno <niko.mauno@vaisala.com>
+Date: Sun, 29 Sep 2024 12:00:00 +0000
+Subject: [PATCH] lib: Do not use private makefile targets in CMakelists.txt
+
+By extending the scope of changes introduced in commit
+fc325524d50fe179b76f127243ab9e03ddbdaaa4
+("build: CMakeLists.txt Do not use private makefile targets (#5819)")
+we mitigate the following error produced by BitBake in Yocto
+
+  ERROR: fluentbit-3.1.9-r0 do_package_qa: QA Issue: File /usr/bin/fluent-bit in package fluentbit contains reference to TMPDIR [buildpaths]
+  ERROR: fluentbit-3.1.9-r0 do_package_qa: Fatal QA errors were found, failing task.
+
+stemming from
+
+  $ strings packages-split/fluentbit/usr/bin/fluent-bit
+  ...
+  $(subst /yocto/upstream/build/tmp/work/cortexa57-poky-linux/fluentbit/3.1.9/git/,,$(abspath $<))
+  ...
+
+Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
+
+Upstream-Status: Submitted [https://github.com/fluent/fluent-bit/pull/9450]
+---
+ lib/cfl/CMakeLists.txt      | 8 ++------
+ lib/cmetrics/CMakeLists.txt | 8 ++------
+ lib/ctraces/CMakeLists.txt  | 8 ++------
+ lib/monkey/CMakeLists.txt   | 4 +---
+ 4 files changed, 7 insertions(+), 21 deletions(-)
+
+diff --git a/lib/cfl/CMakeLists.txt b/lib/cfl/CMakeLists.txt
+index 2193cb29c..e2a5cba37 100644
+--- a/lib/cfl/CMakeLists.txt
++++ b/lib/cfl/CMakeLists.txt
+@@ -40,12 +40,8 @@ if(NOT MSVC)
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+ endif()
+ 
+-# Define __FILENAME__ consistently across Operating Systems
+-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__='\"$$(subst ${CMAKE_SOURCE_DIR}/,,$$(abspath $$<))\"'")
+-else()
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+-endif()
++# Define __FILENAME__
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+ 
+ 
+ 
+diff --git a/lib/cmetrics/CMakeLists.txt b/lib/cmetrics/CMakeLists.txt
+index 18582997d..8f7176dd6 100644
+--- a/lib/cmetrics/CMakeLists.txt
++++ b/lib/cmetrics/CMakeLists.txt
+@@ -60,12 +60,8 @@ if(NOT MSVC)
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+ endif()
+ 
+-# Define __CMT_FILENAME__ consistently across Operating Systems
+-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__='\"$$(subst ${CMAKE_SOURCE_DIR}/,,$$(abspath $$<))\"'")
+-else()
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__=__FILE__")
+-endif()
++# Define __CMT_FILENAME__
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__=__FILE__")
+ 
+ # Configuration options
+ option(CMT_DEV                       "Enable development mode"                   No)
+diff --git a/lib/ctraces/CMakeLists.txt b/lib/ctraces/CMakeLists.txt
+index e47ba022d..0ddfd5f97 100644
+--- a/lib/ctraces/CMakeLists.txt
++++ b/lib/ctraces/CMakeLists.txt
+@@ -30,12 +30,8 @@ set(CTR_VERSION_MINOR  5)
+ set(CTR_VERSION_PATCH  7)
+ set(CTR_VERSION_STR "${CTR_VERSION_MAJOR}.${CTR_VERSION_MINOR}.${CTR_VERSION_PATCH}")
+ 
+-# Define __FILENAME__ consistently across Operating Systems
+-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__='\"$$(subst ${CMAKE_SOURCE_DIR}/,,$$(abspath $$<))\"'")
+-else()
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+-endif()
++# Define __FILENAME__
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+ 
+ # Configuration options
+ option(CTR_DEV             "Enable development mode"                   No)
+diff --git a/lib/monkey/CMakeLists.txt b/lib/monkey/CMakeLists.txt
+index 028240bcc..b386cb726 100644
+--- a/lib/monkey/CMakeLists.txt
++++ b/lib/monkey/CMakeLists.txt
+@@ -15,10 +15,8 @@ include(GNUInstallDirs)
+ # Set default compiler options
+ if (NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall -Wextra")
+-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__='\"$$(subst ${CMAKE_SOURCE_DIR}/,,$$(abspath \$$<))\"'")
+-else()
+-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+ endif()
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+ 
+ # Monkey Version
+ set(MK_VERSION_MAJOR  1)

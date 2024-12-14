@@ -1,4 +1,4 @@
-From 708c765ffb41ecc734316f69043583312fe444bd Mon Sep 17 00:00:00 2001
+From 04fd678939ad0c21f57222c48305bfa29c8f6cf3 Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Tue, 15 May 2018 17:17:01 +0800
 Subject: [PATCH] diffstat: fix wrong evaluation of CC
@@ -12,16 +12,15 @@ be included in CC. And then CC will be wrongly filtered.
 So comment out CF_CC_ENV_FLAGS from function CF_PROG_CC.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
-
 ---
  aclocal.m4 | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/aclocal.m4 b/aclocal.m4
-index d4bd283..1b653c4 100644
+index 1c653ea..8f0540d 100644
 --- a/aclocal.m4
 +++ b/aclocal.m4
-@@ -1522,7 +1522,7 @@ CF_GCC_VERSION
+@@ -1584,7 +1584,7 @@ CF_GCC_VERSION
  CF_ACVERSION_CHECK(2.52,
  	[AC_PROG_CC_STDC],
  	[CF_ANSI_CC_REQD])

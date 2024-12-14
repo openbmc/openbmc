@@ -240,3 +240,34 @@ class BitbakeLayers(OESelftestTestCase):
         self.assertEqual(first_desc_2, '', "Describe not cleared: '{}'".format(first_desc_2))
         self.assertEqual(second_rev_2, second_rev_1, "Revision should not be updated: '{}'".format(second_rev_2))
         self.assertEqual(second_desc_2, second_desc_1, "Describe should not be updated: '{}'".format(second_desc_2))
+
+class BitbakeConfigBuild(OESelftestTestCase):
+    def test_enable_disable_fragments(self):
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_VARIABLE'), None)
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_ANOTHER_VARIABLE'), None)
+
+        runCmd('bitbake-config-build enable-fragment selftest/test-fragment')
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_VARIABLE'), 'somevalue')
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_ANOTHER_VARIABLE'), None)
+
+        runCmd('bitbake-config-build enable-fragment selftest/more-fragments-here/test-another-fragment')
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_VARIABLE'), 'somevalue')
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_ANOTHER_VARIABLE'), 'someothervalue')
+
+        fragment_metadata_command = "bitbake-getvar -f {} --value {}"
+        result = runCmd(fragment_metadata_command.format("selftest/test-fragment", "BB_CONF_FRAGMENT_SUMMARY"))
+        self.assertIn("This is a configuration fragment intended for testing in oe-selftest context", result.output)
+        result = runCmd(fragment_metadata_command.format("selftest/test-fragment", "BB_CONF_FRAGMENT_DESCRIPTION"))
+        self.assertIn("It defines a variable that can be checked inside the test.", result.output)
+        result = runCmd(fragment_metadata_command.format("selftest/more-fragments-here/test-another-fragment", "BB_CONF_FRAGMENT_SUMMARY"))
+        self.assertIn("This is a second configuration fragment intended for testing in oe-selftest context", result.output)
+        result = runCmd(fragment_metadata_command.format("selftest/more-fragments-here/test-another-fragment", "BB_CONF_FRAGMENT_DESCRIPTION"))
+        self.assertIn("It defines another variable that can be checked inside the test.", result.output)
+
+        runCmd('bitbake-config-build disable-fragment selftest/test-fragment')
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_VARIABLE'), None)
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_ANOTHER_VARIABLE'), 'someothervalue')
+
+        runCmd('bitbake-config-build disable-fragment selftest/more-fragments-here/test-another-fragment')
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_VARIABLE'), None)
+        self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_ANOTHER_VARIABLE'), None)

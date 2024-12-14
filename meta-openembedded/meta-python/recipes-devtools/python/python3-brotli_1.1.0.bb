@@ -8,10 +8,10 @@ PYPI_PACKAGE = "Brotli"
 
 SRC_URI[sha256sum] = "81de08ac11bcb85841e440c13611c00b67d3bf82698314928d0b676362546724"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta
 
-RDEPENDS:${PN} = "\
-  python3-cffi \
+RDEPENDS:${PN} += " \
+	python3-cffi \
 "
 
 BBCLASSEXTEND = "native nativesdk"

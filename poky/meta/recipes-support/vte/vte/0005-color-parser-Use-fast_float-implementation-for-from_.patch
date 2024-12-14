@@ -1,0 +1,102 @@
+From 08b90d0a5bf8ceb68dd1b4e9ded0f8a2b5287a6e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 4 Oct 2024 21:22:52 -0700
+Subject: [PATCH 5/5] color-parser: Use fast_float implementation for
+ from_chars
+
+Removed dependency on c++ runtime to provide it.
+
+Fixes: https://gitlab.gnome.org/GNOME/vte/-/issues/2823
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/vte/-/issues/2823#note_2239888]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/color-parser.cc | 12 ++++++------
+ src/termprops.hh    | 12 ++++++------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/src/color-parser.cc b/src/color-parser.cc
+index 02ec5d3a..42c51966 100644
+--- a/src/color-parser.cc
++++ b/src/color-parser.cc
+@@ -17,7 +17,7 @@
+ 
+ #include "color-parser.hh"
+ #include "color.hh"
+-
++#include "fast_float.hh"
+ #include <algorithm>
+ #include <cctype>
+ #include <charconv>
+@@ -298,7 +298,7 @@ parse_csslike(std::string const& spec) noexcept
+                 auto value = uint64_t{};
+                 auto const start = spec.c_str() + 1;
+                 auto const end = spec.c_str() + spec.size();
+-                auto const rv = std::from_chars(start, end, value, 16);
++                auto const rv = fast_float::from_chars(start, end, value, 16);
+                 if (rv.ec != std::errc{} || rv.ptr != end)
+                         return std::nullopt;
+ 
+@@ -424,7 +424,7 @@ parse_x11like(std::string const& spec) noexcept
+                 auto value = uint64_t{};
+                 auto const start = spec.c_str() + 1;
+                 auto const end = spec.c_str() + spec.size();
+-                auto const rv = std::from_chars(start, end, value, 16);
++                auto const rv = fast_float::from_chars(start, end, value, 16);
+                 if (rv.ec != std::errc{} || rv.ptr != end)
+                         return std::nullopt;
+ 
+@@ -447,13 +447,13 @@ parse_x11like(std::string const& spec) noexcept
+                 // Note that the length check above makes sure that @r, @g, @b,
+                 // don't exceed @bits.
+                 auto r = UINT64_C(0), b = UINT64_C(0), g = UINT64_C(0);
+-                auto rv = std::from_chars(start, end, r, 16);
++                auto rv = fast_float::from_chars(start, end, r, 16);
+                 if (rv.ec != std::errc{} || rv.ptr == end || *rv.ptr != '/')
+                         return std::nullopt;
+-                rv = std::from_chars(rv.ptr + 1, end, g, 16);
++                rv = fast_float::from_chars(rv.ptr + 1, end, g, 16);
+                 if (rv.ec != std::errc{} || rv.ptr == end || *rv.ptr != '/')
+                         return std::nullopt;
+-                rv = std::from_chars(rv.ptr + 1, end, b, 16);
++                rv = fast_float::from_chars(rv.ptr + 1, end, b, 16);
+                 if (rv.ec != std::errc{} || rv.ptr != end)
+                         return std::nullopt;
+ 
+diff --git a/src/termprops.hh b/src/termprops.hh
+index 0d3f0f4c..a10fc7d1 100644
+--- a/src/termprops.hh
++++ b/src/termprops.hh
+@@ -17,6 +17,7 @@
+ 
+ #include <glib.h>
+ 
++#include "fast_float.hh"
+ #include "fwd.hh"
+ #include "uuid.hh"
+ #include "color.hh"
+@@ -355,8 +356,8 @@ inline std::optional<TermpropValue>
+ parse_termprop_integral(std::string_view const& str) noexcept
+ {
+         auto v = T{};
+-        if (auto [ptr, err] = std::from_chars(std::begin(str),
+-                                              std::end(str),
++        if (auto [ptr, err] = fast_float::from_chars(str.data(),
++                                              str.data()+str.size(),
+                                               v);
+             err == std::errc() && ptr == std::end(str)) {
+                 if constexpr (std::is_unsigned_v<T>) {
+@@ -389,10 +390,9 @@ inline std::optional<TermpropValue>
+ parse_termprop_floating(std::string_view const& str) noexcept
+ {
+         auto v = T{};
+-        if (auto [ptr, err] = std::from_chars(std::begin(str),
+-                                              std::end(str),
+-                                              v,
+-                                              std::chars_format::general);
++        if (auto [ptr, err] = fast_float::from_chars(str.data(),
++                                              str.data() + str.size(),
++                                              v);
+             err == std::errc() &&
+             ptr == std::end(str) &&
+             std::isfinite(v)) {

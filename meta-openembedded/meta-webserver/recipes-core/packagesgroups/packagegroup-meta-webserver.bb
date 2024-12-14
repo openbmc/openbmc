@@ -21,7 +21,6 @@ RDEPENDS:packagegroup-meta-webserver = "\
 RDEPENDS:packagegroup-meta-webserver-http = "\
     apache-websocket \
     apache2 \
-    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "cherokee", "", d)} \
     hiawatha \
     monkey \
     nginx \

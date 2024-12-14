@@ -1,0 +1,29 @@
+From 406e841b3e011e1090f23dba12b12cdd9ec4707e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 24 Aug 2024 15:19:35 -0700
+Subject: [PATCH] wfs: Cover xmlNanoHTTPCleanup with LIBXML_HTTP_ENABLED
+
+libxml2 has deprecated internal http support [1]
+
+[1] https://www.gaia-gis.it/fossil/libspatialite/tktview?name=7c452740fe
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/wfs/wfs_in.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/wfs/wfs_in.c b/src/wfs/wfs_in.c
+index 1cfe39d..41ad2ab 100644
+--- a/src/wfs/wfs_in.c
++++ b/src/wfs/wfs_in.c
+@@ -4638,7 +4638,9 @@ SPATIALITE_DECLARE void
+ reset_wfs_http_connection (void)
+ {
+ /* Resets the libxml2 "nano HTTP": useful when changing the HTTP_PROXY settings */
++#ifdef LIBXML_HTTP_ENABLED
+     xmlNanoHTTPCleanup ();
++#endif
+ }
+ 
+ #else /* LIBXML2 isn't enabled */

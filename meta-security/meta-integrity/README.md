@@ -95,6 +95,8 @@ the image, enable image signing in the local.conf like this:
 
     IMA_EVM_KEY_DIR = "${INTEGRITY_BASE}/data/debug-keys"
     IMA_EVM_PRIVKEY = "${IMA_EVM_KEY_DIR}/privkey_ima.pem"
+    IMA_EVM_EVMCTL_KEY_PASSWORD = "<optional private key password>"
+    IMA_EVM_PRIVKEY_KEYID_OPT = "<options to use while signing>"
     IMA_EVM_X509 = "${IMA_EVM_KEY_DIR}/x509_ima.der"
     IMA_EVM_ROOT_CA = "${IMA_EVM_KEY_DIR}/ima-local-ca.pem"
 
@@ -153,12 +155,7 @@ ima-evm-rootfs.bbclass:
     IMA_EVM_KEY_DIR = "<full path>"
     IMA_EVM_PRIVKEY = "<some other path/privkey_ima.pem>"
 
-By default, the entire file system gets signed. When using a policy which
-does not require that, the set of files to be labelled can be chosen
-by overriding the default "find" expression, for example like this:
-
-    IMA_EVM_ROOTFS_FILES = "usr sbin bin lib -type f"
-
+By default, the entire file system gets signed.
 
 2. Usage
 ========
