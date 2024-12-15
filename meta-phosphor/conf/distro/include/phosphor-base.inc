@@ -75,9 +75,11 @@ INIT_MANAGER = "systemd"
 # /root, but we should switch it back (and maybe adjust in another commit).
 ROOT_HOME = "/home/root"
 
-# We want to persist /var/log, which is likely to be used for
-# obmc-console and/or journald.
-VOLATILE_LOG_DIR = "no"
+# We generally want to persist /var/log, which is likely to be used for
+# obmc-console and/or journald, unless PHOSPHOR_VOLATILE_VARLOG is set.
+FILESYSTEM_PERMS_TABLES:remove = " \
+        ${@bb.utils.contains("PHOSPHOR_VOLATILE_VARLOG", "1", "", "files/fs-perms-volatile-log.txt", d)} \
+        "
 
 DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
         bluez5 \
