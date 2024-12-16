@@ -6,6 +6,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 TMPL_OFF = "avsbus-disable@.service"
 TMPL_ON = "avsbus-enable@.service"
 INSTFMT_OFF = "avsbus-disable@{0}.service"
