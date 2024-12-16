@@ -13,6 +13,7 @@ RDEPENDS:${PN} += "bletchley-common-functions"
 
 S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
+
 SRC_URI += " \
     file://motor-ctrl \
     file://motor-init \

@@ -9,6 +9,9 @@ UNPACKDIR = "${S}"
 
 inherit obmc-phosphor-systemd
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 SRC_URI = "file://set-current-host-state@.service \
           "
 

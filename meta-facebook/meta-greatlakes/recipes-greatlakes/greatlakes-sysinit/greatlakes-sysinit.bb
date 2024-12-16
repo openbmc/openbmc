@@ -7,6 +7,9 @@ inherit pkgconfig
 inherit systemd
 inherit obmc-phosphor-systemd
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 RDEPENDS:${PN} += "bash"
 
 SRC_URI += " \
