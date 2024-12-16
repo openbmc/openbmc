@@ -19,6 +19,11 @@
                     "Name": "power_blue",
                     "Action": "On",
                     "Priority": "On"
+                },
+                {
+                    "Name": "bmc_ready_noled",
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },

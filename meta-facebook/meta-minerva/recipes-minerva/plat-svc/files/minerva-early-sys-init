@@ -76,7 +76,6 @@ set_gpio FM_MDIO_SW_SEL 0
 set_gpio FM_88E6393X_BIN_UPDATE_EN_N 1
 # 0: open the valve, 1: close the valve
 set_gpio WATER_VALVE_CLOSED_N 0
-set_gpio BMC_READY 1
 
 # The workaround is to disable GPIO passthrough,
 # which is enabled by a hardware strap pin that is active high.
