@@ -1,4 +1,4 @@
-From e12074b4d195188a9fc2dc46858c70cd2e80c5da Mon Sep 17 00:00:00 2001
+From 5d9f8fbaf54c8176dc127e821e0206d8ec0d18c9 Mon Sep 17 00:00:00 2001
 From: Sergey Solomin <sergey.solomin@us.ibm.com>
 Date: Tue, 6 Sep 2016 15:36:43 -0500
 Subject: [PATCH] 4 byte read support 466
@@ -10,10 +10,10 @@ Upstream-Status: Pending
  1 file changed, 34 insertions(+)
 
 diff --git a/tools/i2cdump.c b/tools/i2cdump.c
-index b638c3d..6af44a8 100644
+index d315e2f..3a55a95 100644
 --- a/tools/i2cdump.c
 +++ b/tools/i2cdump.c
-@@ -25,6 +25,7 @@
+@@ -20,6 +20,7 @@
  #include <string.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -21,7 +21,7 @@ index b638c3d..6af44a8 100644
  #include <unistd.h>
  #include <linux/i2c.h>
  #include <linux/i2c-dev.h>
-@@ -33,6 +34,8 @@
+@@ -28,6 +29,8 @@
  #include "util.h"
  #include "../version.h"
  
@@ -30,33 +30,33 @@ index b638c3d..6af44a8 100644
  static void help(void)
  {
  	fprintf(stderr,
-@@ -46,6 +49,7 @@ static void help(void)
- 		"    s (SMBus block, deprecated)\n"
+@@ -40,6 +43,7 @@ static void help(void)
+ 		"    W (word on even register addresses)\n"
  		"    i (I2C block)\n"
  		"    c (consecutive byte)\n"
 +		"    d (double word)\n"
  		"    Append p for SMBus PEC\n");
  }
  
-@@ -187,6 +191,9 @@ int main(int argc, char *argv[])
- 	} else if (!strncmp(argv[flags+3], "c", 1)) {
+@@ -171,6 +175,9 @@ int main(int argc, char *argv[])
+ 	} else if (!strncmp(argv[optind+2], "c", 1)) {
  		size = I2C_SMBUS_BYTE;
- 		pec = argv[flags+3][1] == 'p';
-+	} else if (!strncmp(argv[flags+3], "d", 1)) {
+ 		pec = argv[optind+2][1] == 'p';
++	} else if (!strncmp(argv[optind+3], "d", 1)) {
 +		size = I2C_SMBUS_DWORD;
-+		pec = argv[flags+3][1] == 'p';
- 	} else if (!strcmp(argv[flags+3], "i"))
++		pec = argv[optind+3][1] == 'p';
+ 	} else if (!strcmp(argv[optind+2], "i"))
  		size = I2C_SMBUS_I2C_BLOCK_DATA;
  	else {
-@@ -289,6 +296,7 @@ int main(int argc, char *argv[])
- 			size == I2C_SMBUS_BLOCK_DATA ? "smbus block" :
+@@ -257,6 +264,7 @@ int main(int argc, char *argv[])
+ 			"%s\n", filename, address,
  			size == I2C_SMBUS_I2C_BLOCK_DATA ? "i2c block" :
  			size == I2C_SMBUS_BYTE ? "byte consecutive read" :
 +			size == I2C_SMBUS_DWORD ? "double word" :
  			size == I2C_SMBUS_BYTE_DATA ? "byte" : "word");
  		if (pec)
  			fprintf(stderr, "PEC checking enabled.\n");
-@@ -317,6 +325,32 @@ int main(int argc, char *argv[])
+@@ -281,6 +289,32 @@ int main(int argc, char *argv[])
  		}
  	}
  
@@ -87,8 +87,8 @@ index b638c3d..6af44a8 100644
 +	}
 +
  	/* See Winbond w83781d data sheet for bank details */
- 	if (bank && size != I2C_SMBUS_BLOCK_DATA) {
+ 	if (bank) {
  		res = i2c_smbus_read_byte_data(file, bankreg);
 -- 
-2.39.3
+2.44.2
 
