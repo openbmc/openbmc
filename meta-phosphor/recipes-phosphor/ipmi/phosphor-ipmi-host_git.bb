@@ -14,6 +14,9 @@ inherit obmc-phosphor-systemd
 inherit phosphor-ipmi-host
 inherit python3native
 
+ERROR_QA:remove = "buildpaths"
+WARNING_QA:append = "buildpaths"
+
 def ipmi_whitelists(d):
     whitelists = d.getVar(
         'VIRTUAL-RUNTIME_phosphor-ipmi-providers', True) or ''
