@@ -82,7 +82,7 @@ do
     do
         # Check the presence of each FCB
         presence=$(busctl get-property xyz.openbmc_project.Inventory.Manager \
-                /xyz/openbmc_project/inventory/system/board/Minerva_CMM/PRSNT_FCB_"${i}" \
+                /xyz/openbmc_project/inventory/system/board/Minerva_CMM/FCB_"${i}" \
                 xyz.openbmc_project.Inventory.Item Present | awk '{print $NF}')
 
         if [ "$presence" != "true" ]; then
