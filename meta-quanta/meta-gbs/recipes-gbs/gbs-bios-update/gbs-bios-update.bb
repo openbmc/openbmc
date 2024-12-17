@@ -11,9 +11,6 @@ DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-flash"
 RDEPENDS:${PN} += "bash"
 
-PROVIDES += "virtual/bios-update"
-RPROVIDES:${PN} += "virtual/bios-update"
-
 SRC_URI += " file://bios-verify.sh \
              file://bios-update.sh \
              file://phosphor-ipmi-flash-bios-verify.service \

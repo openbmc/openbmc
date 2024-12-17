@@ -7,9 +7,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
-PROVIDES += "virtual/bmc-update"
-RPROVIDES:${PN} += "virtual/bmc-update"
-
 RDEPENDS:${PN} += " \
   bash \
   gbmc-update \

@@ -15,9 +15,6 @@ UNPACKDIR = "${S}"
 
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
 
-PROVIDES += "virtual/bmc-update"
-RPROVIDES:${PN} += "virtual/bmc-update"
-
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-flash"
 RDEPENDS:${PN} = "bash"
@@ -32,7 +29,6 @@ do_install() {
     install -d ${D}${datadir}/phosphor-ipmi-flash
     install -m 0644 ${UNPACKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
 }
-
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "phosphor-ipmi-flash-bmc-verify.service"

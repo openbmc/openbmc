@@ -8,9 +8,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit systemd
 inherit obmc-phosphor-systemd
 
-PROVIDES:append = " virtual/bios-update"
-RPROVIDES:${PN}:append = " virtual/bios-update"
-
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-flash"
 RDEPENDS:${PN} += "libsystemd"

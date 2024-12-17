@@ -34,7 +34,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-led-manager-faultmonitor"
 # Required for the front port. Part of obmc-console
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " obmc-console"
 # Required from packagegroup-gbs-apps
-OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " virtual/bios-update"
+OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " ${VIRTUAL-RUNTIME_bios-update}"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " x86-power-control"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-pid-control"
 # Required for phosphor-ipmi-kcs

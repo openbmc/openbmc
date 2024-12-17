@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 DEPENDS += "phosphor-ipmi-flash"
 RDEPENDS:${PN} += "bash"
-RPROVIDES:${PN} += "virtual/bmc-update"
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
 
 SRC_URI += " \

@@ -9,8 +9,6 @@ SRC_URI:append = " file://config-bmc.json \
                    file://config-mbcpld.json \
                  "
 
-RPROVIDES:${PN}:append = " virtual/bmc-update \
-                         "
 SYSTEMD_SERVICE:${PN}:append = " phosphor-ipmi-flash-bios-update.service \
                                  phosphor-ipmi-flash-bmccpld-update.service \
                                  phosphor-ipmi-flash-mbcpld-update.service \
