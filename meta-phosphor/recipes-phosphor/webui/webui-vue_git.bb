@@ -44,6 +44,8 @@ do_compile () {
     cd ${S}
     rm -rf node_modules
     npm --loglevel info --proxy=${http_proxy} --https-proxy=${https_proxy} install
+    # vue-cli-plugin-i18n isn't needed in build and causes a segv in node 22.12.
+    npm uninstall vue-cli-plugin-i18n
     npm run build ${EXTRA_OENPM}
 }
 do_install () {
