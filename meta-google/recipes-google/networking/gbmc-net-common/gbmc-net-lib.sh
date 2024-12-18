@@ -16,16 +16,22 @@
 [ -n "${gbmc_net_lib_init-}" ] && return
 
 gbmc_net_networkd_reload() {
-  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
-    echo "Reloading networkd + reconfiguring ($*) from $(caller 0)" >&2
-    networkctl reload || return
-    local st=0
-    local intf
-    for intf in "$@"; do
-      networkctl reconfigure "$intf" || st=$?
-    done
-    return $st
-  fi
+  local retry=0
+  while true; do
+    (( retry = retry + 1 ))
+    (( retry <= 3 )) || return 1
+    # sleep 3s if not first time
+    (( retry == 1 )) || sleep 3
+    if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+      echo "Reloading networkd + reconfiguring ($*) from $(caller 0), time $retry" >&2
+      networkctl reload || continue
+      local intf
+      for intf in "$@"; do
+        networkctl reconfigure "$intf" || continue 2
+      done
+    fi
+    return 0
+  done
 }
 
 gbmc_net_lib_init=1
