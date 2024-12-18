@@ -32,6 +32,6 @@ do_compile:append() {
     if [ -n "${UBOOT_ENV}" ]
     then
         # Generate redundant environment image
-        ${B}/tools/mkenvimage -r -s ${UBOOT_ENV_SIZE} -o ${WORKDIR}/${UBOOT_ENV_BINARY} ${UNPACKDIR}/${UBOOT_ENV_TXT}
+        ${B}/tools/mkenvimage -r -s ${UBOOT_ENV_SIZE} -o ${B}/${UBOOT_ENV_BINARY} ${UNPACKDIR}/${UBOOT_ENV_TXT}
     fi
 }
