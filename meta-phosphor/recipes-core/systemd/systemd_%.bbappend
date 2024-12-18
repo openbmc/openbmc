@@ -36,6 +36,16 @@ FILES:${PN}:append = " \
 do_install:append() {
     install -d -m 0755 ${D}${systemd_unitdir}/system.conf.d/
     install -m 0644 ${UNPACKDIR}/40-hardware-watchdog.conf ${D}${systemd_unitdir}/system.conf.d/
+
+    # A number of udev devices would unlikely be present on a BMC and have large
+    # helper executables associated with them.  Delete both the helpers and the
+    # rules.
+    for f in cdrom_id dmi_memory_id fido_id iocost v4l_id; do
+        rm ${D}${libdir}/udev/${f}
+    done
+    for f in 60-cdrom_id.rules 70-memory.rules 60-fido-id.rules 90-iocost.rules 60-persistent-v4l.rules; do
+        rm ${D}${libdir}/udev/rules.d/${f}
+    done
 }
 
 # udev is added to the USERADD_PACKAGES due to some 'render' group
