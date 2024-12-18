@@ -31,8 +31,6 @@ gbmc_ncsi_br_deprecated_ips_add_neighs() {
   for ip in "${gbmc_ncsi_br_depracated_ips_savedconf[@]}"; do
     ip -6 neigh replace proxy $ip dev @NCSI_IF@ || st=$?
   done
-  ip -6 rule replace pref $GBMC_NCSI_ROUTE_TABLE from $pfx/76 \
-      lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
   return $st
 }
 
@@ -111,6 +109,8 @@ EOF
     ip -6 neigh del proxy ${entry%% *} dev @NCSI_IF@ || true
   done < <(ip -6 neigh show proxy dev @NCSI_IF@)
   ip -6 rule del pref $GBMC_NCSI_ROUTE_TABLE 2>/dev/null || true
+  ip -6 rule add pref $GBMC_NCSI_ROUTE_TABLE from $pfx/76 \
+      lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
 
   if [ -n "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
     # Clear saved configuration
