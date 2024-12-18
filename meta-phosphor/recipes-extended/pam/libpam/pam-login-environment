@@ -1,0 +1,11 @@
+# Set idle (tty) session timeout
+# default time out set in libpam_%.bbappend
+
+# bash
+TMOUT=@DEFAULT_TTY_IDLE_TIMEOUT@
+
+# bourne
+TIMEOUT=@DEFAULT_TTY_IDLE_TIMEOUT@
+
+# ash
+ASH_IDLE_TIMEOUT=@DEFAULT_TTY_IDLE_TIMEOUT@

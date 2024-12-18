@@ -7,7 +7,8 @@ inherit obmc-phosphor-image
 
 # The /etc/version file is misleading and not useful.  Remove it.
 # Users should instead rely on /etc/os-release.
-ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version"
+# Additionally set the pam login environment variables
+ROOTFS_POSTPROCESS_COMMAND += "remove_etc_version ; set_pam_login_environment ;"
 
 IMAGE_LINGUAS = ""
 IMAGE_FEATURES += " \
@@ -62,4 +63,34 @@ OVERLAYFS_ETC_FSTYPE = "not_a_fs_type"
 OVERLAYFS_ETC_DEVICE = "/dev/null"
 python create_overlayfs_etc_preinit:append() {
     os.unlink(preinitPath)
+}
+
+# Note - this cannot be done in install:append because the file
+# we are modifying comes from the shadow package, and adding a
+# DEPENDS on shadow creates a circular dependency.
+
+# 15 minutes
+DEFAULT_TTY_IDLE_TIMEOUT ?= "900"
+
+set_pam_login_environment() {
+    # Modify the pam login service to support variables, specifically,
+    # Add a reference to load /etc/default/pam-login-environmnt for controlling
+    # autologout on inactivity
+    TTYENV_STRING="session  required  pam_env.so readenv=1 envfile=/etc/default/pam-login-environment user_readenv=0"
+    PAM_LOGIN_FILE="${IMAGE_ROOTFS}${sysconfdir}/pam.d/login"
+    pam_tty=$(grep -v "^${TTYENV_STRING}" ${PAM_LOGIN_FILE})
+    if [ -n "${pam_tty}" ]
+    then
+        echo >> ${PAM_LOGIN_FILE}
+        echo "# Set TTY Specific variables including TMOUT" >> ${PAM_LOGIN_FILE}
+        echo "${TTYENV_STRING}" >> ${PAM_LOGIN_FILE}
+    fi
+
+    # set the DEFAULT_TTY_IDLE_TIMEOUT
+    PAM_LOGIN_ENV="${IMAGE_ROOTFS}${sysconfdir}/default/pam-login-environment"
+    pam_env=$(grep -v "@DEFAULT_TTY_IDLE_TIMEOUT@" ${PAM_LOGIN_ENV})
+    if [ -n "${pam_env}" ]
+    then
+        sed -i "s/@DEFAULT_TTY_IDLE_TIMEOUT@/${DEFAULT_TTY_IDLE_TIMEOUT}/" ${PAM_LOGIN_ENV}
+    fi
 }

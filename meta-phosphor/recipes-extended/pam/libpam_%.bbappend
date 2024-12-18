@@ -7,6 +7,7 @@ SRC_URI += " file://pam.d/common-password \
              file://pam.d/common-session \
              file://faillock.conf \
              file://pwhistory.conf \
+             file://pam-login-environment \
             "
 
 do_install:append() {
@@ -17,8 +18,10 @@ do_install:append() {
     sed -i '/pam_systemd.so/d' ${D}${sysconfdir}/pam.d/common-session
 
     install -d ${D}/etc/security
+    install -d ${D}/etc/default
     install -m 0644 ${UNPACKDIR}/faillock.conf ${D}/etc/security
     install -m 0644 ${UNPACKDIR}/pwhistory.conf ${D}/etc/security
+    install -m 0644 ${UNPACKDIR}/pam-login-environment ${D}/etc/default
 }
 
 RDEPENDS:${PN}-runtime += "libpwquality \
