@@ -3,9 +3,9 @@
   group: path
   members:
       - meta: PATH
-        path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_IL
+        path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_INLET_SPEED_RPM
       - meta: PATH
-        path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_OL
+        path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_OUTLET_SPEED_RPM
 
 - name: current fan critical alarm property
   class: group
