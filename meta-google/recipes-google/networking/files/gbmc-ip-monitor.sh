@@ -91,7 +91,7 @@ gbmc_ip_monitor_parse_line() {
     change=route
     action=add
     if ! [[ "$line" =~ ^\[ROUTE\](Deleted )?(.*)$ ]]; then
-      echo "Failed to parse link: $line" >&2
+      echo "Failed to parse route: $line" >&2
       return 1
     fi
     if [ -n "${BASH_REMATCH[1]}" ]; then
