@@ -127,6 +127,7 @@ IMAGE_INSTALL:append = " dbus-broker libnss-systemd"
 # make sense on a BMC anyway.
 BAD_RECOMMENDATIONS += "udev-hwdb"
 BAD_RECOMMENDATIONS += "shared-mime-info"
+BAD_RECOMMENDATIONS += "systemd-mime"
 
 # e2fsprogs isn't needed on a BMC without MMC, where it gets explicitly added
 BAD_RECOMMENDATIONS += "e2fsprogs-e2fsck"
