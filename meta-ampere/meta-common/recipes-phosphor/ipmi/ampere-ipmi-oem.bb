@@ -15,7 +15,7 @@ LIBRARY_NAMES = "libzampoemcmds.so"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/ampere-ipmi-oem.git;branch=master;protocol=https"
-SRCREV = "ee2e1df6ca5fd87b401d4eb15b80224f3025a612"
+SRCREV = "27374f6ab65a93357435b5977414a76292d8c32b"
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 NETIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
