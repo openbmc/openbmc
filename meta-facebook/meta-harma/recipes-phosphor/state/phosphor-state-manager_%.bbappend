@@ -25,18 +25,18 @@ CHASSIS_DEFAULT_TARGETS:append = " \
     obmc-chassis-poweron@{}.target.requires/chassis-poweron@{}.service \
     obmc-chassis-powercycle@{}.target.requires/chassis-powercycle@{}.service \
     "
-# TODO: Remove it when 69903 commit
-CHASSIS_DEFAULT_TARGETS:append = " \
-    obmc-chassis-poweroff@{}.target.requires/obmc-powered-off@{}.service \
-    "
 
 # Host Config
 # Host Reset
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
-    obmc-host-warm-reboot@{}.target.wants/pldmSoftPowerOff.service \
+    obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
     obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
     obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
+    "
+
+HOST_DEFAULT_TARGETS:append = " \
+    obmc-host-warm-reboot@{}.target.wants/host-powerreset@{}.service \
     "
 
 # Host On/Off
