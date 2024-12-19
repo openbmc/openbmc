@@ -8,7 +8,7 @@ SRC_URI:append = " \
 do_install:append() {
     # Install the configurations
     install -m 0755 -d ${D}${sysconfdir}/${BPN}
-    install -m 0644 ${WORKDIR}/*.conf ${D}${sysconfdir}/${BPN}/
+    install -m 0644 ${UNPACKDIR}/*.conf ${D}${sysconfdir}/${BPN}/
 
     # Remove upstream-provided default configuration
     rm -f ${D}${sysconfdir}/${BPN}/ttyVUART0.conf

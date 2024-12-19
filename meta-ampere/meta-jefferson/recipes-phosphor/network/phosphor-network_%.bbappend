@@ -7,5 +7,5 @@ FILES:${PN} += "${datadir}/network/*.json"
 
 do_install:append() {
     install -d ${D}${datadir}/network/
-    install -m 0644 ${WORKDIR}/config.json ${D}${datadir}/network/
+    install -m 0644 ${UNPACKDIR}/config.json ${D}${datadir}/network/
 }

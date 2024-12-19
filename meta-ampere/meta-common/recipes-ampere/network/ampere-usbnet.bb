@@ -6,6 +6,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 DEPENDS += "systemd"
 RDEPENDS:${PN} += "libsystemd bash"
 
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
+
 inherit allarch systemd
 
 SRC_URI += "file://ampere-usbnet.service \

@@ -3,9 +3,9 @@ FILESEXTRAPATHS:prepend:= "${THISDIR}/${PN}:"
 inherit obmc-phosphor-systemd
 
 SRC_URI:append = " \
-                  file://${PN}.service \
+                  file://${BPN}.service \
                  "
 
 do_install:append() {
-    install -m 644 ${WORKDIR}/${PN}.service ${D}${systemd_system_unitdir}
+    install -m 644 ${UNPACKDIR}/${BPN}.service ${D}${systemd_system_unitdir}
 }

@@ -23,12 +23,12 @@ do_install:append () {
 
     for CONTROL_CONFIG in ${CONTROL_CONFIGS}
     do
-        install -m 0644 ${WORKDIR}/${CONTROL_CONFIG} \
+        install -m 0644 ${UNPACKDIR}/${CONTROL_CONFIG} \
             ${D}${datadir}/phosphor-fan-presence/control/${COMPAT_NAME}
     done
 
-    install -m 0644 ${WORKDIR}/monitor.json \
+    install -m 0644 ${UNPACKDIR}/monitor.json \
         ${D}${datadir}/phosphor-fan-presence/monitor/${COMPAT_NAME}/config.json
-    install -m 0644 ${WORKDIR}/presence.json \
+    install -m 0644 ${UNPACKDIR}/presence.json \
         ${D}${datadir}/phosphor-fan-presence/presence/${COMPAT_NAME}/config.json
 }
