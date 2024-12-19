@@ -126,7 +126,7 @@ function log_redfish_biosboot_ok_event()
 MESSAGE=
 PRIORITY=2
 SEVERITY=
-REDFISH_MESSAGE_ID=OpenBMC.0.1.BIOSBoot.OK
+REDFISH_MESSAGE_ID=OpenBMC.0.1.BIOSBoot
 REDFISH_MESSAGE_ARGS="UEFI firmware booting done"
 EOF
 }
@@ -139,7 +139,7 @@ function log_redfish_bios_panic_event()
 MESSAGE=
 PRIORITY=2
 SEVERITY=
-REDFISH_MESSAGE_ID=OpenBMC.0.1.BIOSFirmwarePanicReason.Warning
+REDFISH_MESSAGE_ID=OpenBMC.0.1.BIOSFirmwarePanicReason
 REDFISH_MESSAGE_ARGS=${boot_state_str}
 EOF
 }

@@ -27,5 +27,5 @@ else
 	gpioset $(gpiofind i2c-backup-sel)=1
 
 	# Log event
-	ampere_add_redfishevent.sh OpenBMC.0.1.GeneralFirmwareSecurityViolation.Critical "SCP Authentication failure"
+	ampere_add_redfishevent.sh OpenBMC.0.1.GeneralFirmwareSecurityViolation "SCP Authentication failure"
 fi

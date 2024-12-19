@@ -3,4 +3,4 @@ Description=Ampere Computing LLC HighTempt event
 
 [Service]
 Restart=no
-ExecStart=/usr/sbin/ampere_add_redfishevent.sh OpenBMC.0.1.AmpereEvent.Warning "CPU%i HighTemp asserted"
+ExecStart=/usr/sbin/ampere_add_redfishevent.sh OpenBMC.0.1.AmpereWarning "CPU%i HighTemp asserted"
