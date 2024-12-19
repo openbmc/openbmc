@@ -4,7 +4,7 @@ and provides it on D-Bus"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7becf906c8f8d03c237bad13bc3dac53"
 DEPENDS = "boost sdbusplus libpeci"
-SRCREV = "39c664c9d849214cb5a2f938ef9bce7074741270"
+SRCREV = "264ae8e51ad8d3db19e3f0512c97baffcda425f8"
 PV = "0.1+git${SRCPV}"
 
 PACKAGECONFIG ??= ""
