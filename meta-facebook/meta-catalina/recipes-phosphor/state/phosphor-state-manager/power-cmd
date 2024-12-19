@@ -171,6 +171,17 @@ host_graceful_power_off()
     return 0
 }
 
+host_power_reset()
+{
+    if [ "$(host_power_status)" == "on" ]; then
+        set_gpio "RST_BMC_RSTBTN_OUT_N" 1
+        set_gpio "RST_BMC_RSTBTN_OUT_N" 0
+        sleep 1
+        set_gpio "RST_BMC_RSTBTN_OUT_N" 1
+    fi
+    return 0
+}
+
 host_power_status()
 {
     if [ "$(get_gpio "host0-ready")" -eq 1 ]; then
@@ -193,7 +204,7 @@ wait_host_power_change()
 {
     local exp_val="$1"
     local count=0
-    until [ $count -gt 10 ]
+    until [ $count -gt 20 ]
     do
         sleep 1
         if [ "$(host_power_status)" == "$exp_val" ]; then

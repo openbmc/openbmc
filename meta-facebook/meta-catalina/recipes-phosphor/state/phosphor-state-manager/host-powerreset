@@ -3,5 +3,5 @@
 # shellcheck source=meta-facebook/meta-catalina/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
-host_graceful_power_off
+host_power_reset
 exit 0

@@ -4,9 +4,7 @@
 source /usr/libexec/phosphor-state-manager/power-cmd
 
 if ! chassis_power_cycle; then
-   phosphor_log_err "chassis power cycle failed"
-   exit 1
+    exit 1
 fi
 
-phosphor_log_info "chassis power cycle success"
 exit 0

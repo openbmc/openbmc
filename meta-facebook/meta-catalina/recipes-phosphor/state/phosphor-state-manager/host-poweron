@@ -12,5 +12,4 @@ if ! host_power_on; then
    exit 1
 fi
 
-phosphor_log_info "host power on success"
 exit 0
