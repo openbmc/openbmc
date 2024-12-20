@@ -28,3 +28,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-sel-logger \
 "
+
+# Temporarily add plat-svc for gpio initialization
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    plat-svc \
+"
