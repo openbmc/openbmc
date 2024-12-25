@@ -1,9 +1,19 @@
 #!/bin/bash
 
+#Meta request Quanta thermal team set fixed PWM to 70% before fan table finished.
+set_fan_pwm_fixed()
+{
+    echo $((255 * 70/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm1
+    echo $((255 * 70/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm3
+    echo $((255 * 70/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm4
+    echo $((255 * 70/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm6
+}
+
 power_on_led_init() {
     systemctl start obmc-led-group-start@power_on.service
 }
 
+set_fan_pwm_fixed
 power_on_led_init
 
 exit 0
