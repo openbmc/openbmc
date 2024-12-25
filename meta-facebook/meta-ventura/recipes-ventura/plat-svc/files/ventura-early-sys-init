@@ -21,8 +21,47 @@ power_on_led_init() {
     systemctl start obmc-led-group-start@power_on.service
 }
 
+mdio_setting_for_marvell_chip()
+{
+    # Enable 802.1Q mode with secure mode (0x03) on port 0/2/9
+    mdio 1* 0x00 0x08 0x2c80
+    mdio 1* 0x02 0x08 0x2c80
+    mdio 1* 0x09 0x08 0x2c80
+
+    # Table 67: Default Port VLAN ID & Priority (Offset: 0x07
+    # Set default VID
+    # Port 2 = 10
+    # Port 9 = 20
+    mdio 1* 0x02 0x07 0x000a
+    mdio 1* 0x09 0x07 0x0014
+    sleep 1
+    # Setting VLAN Table Unit (VTU)
+    # Vid = 10
+    mdio 1* 0x1b 0x02 0x0000
+    mdio 1* 0x1b 0x03 0x0000
+    mdio 1* 0x1b 0x06 0x100a
+    # Port 0 = 2 (egress tagged)
+    # Port 2 = 1 (egress untagged)
+    mdio 1* 0x1b 0x07 0xffde
+    mdio 1* 0x1b 0x08 0x003f
+    mdio 1* 0x1b 0x05 0xb000
+
+    sleep 3
+    # Setting VLAN Table Unit (VTU)
+    # Vid = 2
+    mdio 1* 0x1b 0x02 0x0000
+    mdio 1* 0x1b 0x03 0x0000
+    mdio 1* 0x1b 0x06 0x1014
+    # Port 0 = 2 (egress tagged)
+    # Port 9 = 1 (egress untagged)
+    mdio 1* 0x1b 0x07 0xfffe
+    mdio 1* 0x1b 0x08 0x0037
+    mdio 1* 0x1b 0x05 0xb000
+}
+
 set_fan_pwm_fixed
 set_bmc_ready
 power_on_led_init
+mdio_setting_for_marvell_chip
 
 exit 0
