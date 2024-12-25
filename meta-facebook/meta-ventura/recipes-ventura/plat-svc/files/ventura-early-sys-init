@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 88E6393X PWRGD gpio number
+CHIP_PWRGD=100
+
 set_bmc_ready()
 {
     local bmc_ready="/sys/class/leds/bmc_ready_noled/brightness"
@@ -58,6 +61,14 @@ mdio_setting_for_marvell_chip()
     mdio 1* 0x1b 0x08 0x0037
     mdio 1* 0x1b 0x05 0xb000
 }
+
+# Change the i2c path to the eeprom to the 88E6393X
+set_gpio FM_88E6393X_BIN_UPDATE_EN_N 1
+# Sleep 2s
+sleep 2s
+# Enable the pwrgd to the 88E6393X
+# Temp setting by gpio group and number directly, need to discuss whether need to define in the DTS (long term solution)
+gpioset 0 "$CHIP_PWRGD"=1
 
 set_fan_pwm_fixed
 set_bmc_ready
