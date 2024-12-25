@@ -1,5 +1,13 @@
 #!/bin/bash
 
+set_bmc_ready()
+{
+    local bmc_ready="/sys/class/leds/bmc_ready_noled/brightness"
+    echo 1 > ${bmc_ready}
+
+    return 0
+}
+
 #Meta request Quanta thermal team set fixed PWM to 70% before fan table finished.
 set_fan_pwm_fixed()
 {
@@ -14,6 +22,7 @@ power_on_led_init() {
 }
 
 set_fan_pwm_fixed
+set_bmc_ready
 power_on_led_init
 
 exit 0
