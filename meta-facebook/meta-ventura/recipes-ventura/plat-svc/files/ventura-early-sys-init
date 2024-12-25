@@ -1,0 +1,9 @@
+#!/bin/bash
+
+power_on_led_init() {
+    systemctl start obmc-led-group-start@power_on.service
+}
+
+power_on_led_init
+
+exit 0

@@ -1,0 +1,11 @@
+[Unit]
+Description=Ventura Early System Init
+Before=phosphor-pid-control.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/ventura-early-sys-init
+SyslogIdentifier=Ventura Early Init
+
+[Install]
+WantedBy=multi-user.target

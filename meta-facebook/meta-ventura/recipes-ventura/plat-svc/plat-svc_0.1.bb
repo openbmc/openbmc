@@ -8,13 +8,18 @@ RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "fb-common-functions"
 
 SRC_URI += " \
+    file://ventura-sys-init.service \
+    file://ventura-early-sys-init \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " \
+    ventura-sys-init.service \
     "
 
 do_install() {
     VENTURA_LIBEXECDIR="${D}${libexecdir}/ventura"
     install -d ${VENTURA_LIBEXECDIR}
+
+    install -m 0755 ${UNPACKDIR}/ventura-early-sys-init ${VENTURA_LIBEXECDIR}
 }
