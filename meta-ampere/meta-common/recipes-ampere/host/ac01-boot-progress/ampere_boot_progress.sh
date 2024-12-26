@@ -6,10 +6,19 @@ uefi_code=00000000
 
 function set_postcode()
 {
+	local bg=$1
+	local boot_list=()
+	bg=${bg:2}
+	while [[ -n "$bg" ]]; do
+		boot_stage=${bg:0:2}
+		boot_list+=($((16#$boot_stage)))
+		bg=${bg:2}
+	done
 	# shellcheck disable=SC2086
 	busctl set-property xyz.openbmc_project.State.Boot.Raw \
 		/xyz/openbmc_project/state/boot/raw0 \
-		xyz.openbmc_project.State.Boot.Raw Value \(tay\) "$1" 0
+		xyz.openbmc_project.State.Boot.Raw Value \(ayay\) \
+		"${#boot_list[@]}" "${boot_list[@]}" 0
 }
 
 function update_boot_progress_last_state_time()
