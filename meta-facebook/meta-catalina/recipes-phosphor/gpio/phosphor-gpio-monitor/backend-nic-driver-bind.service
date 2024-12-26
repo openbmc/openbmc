@@ -1,0 +1,8 @@
+[Unit]
+Description=Bind backend NIC thermal driver 
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/phosphor-gpio-monitor/backend-nic-driver-bind
+
+SyslogIdentifier=backend-nic-driver-bind

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+BE_NIC_I2C_LIST="\
+24-001f \
+26-001f \
+36-001f \
+38-001f \
+"
+
+MAX_RETRY_COUNT=30
+ALL_DONE=true
+
+for i in $(seq 1 "$MAX_RETRY_COUNT")
+do
+    ALL_DONE=true
+    echo "Attempt $i of $MAX_RETRY_COUNT..."
+
+    for dev in $BE_NIC_I2C_LIST
+    do
+        DEVICE_PATH="/sys/bus/i2c/drivers/tmp421/$dev"
+        if [ ! -L "$DEVICE_PATH" ]; then
+            if ! echo "$dev" > /sys/bus/i2c/drivers/tmp421/bind; then
+                echo "$dev: failed to bind device"
+                ALL_DONE=false
+            fi
+        else
+            echo "$dev: already bind, skip"
+        fi
+    done
+
+    if [ $ALL_DONE = true ]; then
+        break
+    fi
+
+    sleep 1
+done
+
+if [ $ALL_DONE = false ]; then
+    echo "Failed to bind all devices after $MAX_RETRY_COUNT attempts"
+    exit 1
+else
+    echo "All devices successfully bind"
+fi
+
+exit 0

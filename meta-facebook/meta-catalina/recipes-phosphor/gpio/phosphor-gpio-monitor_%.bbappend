@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 inherit obmc-phosphor-systemd systemd
 
 SRC_URI += " \
+    file://backend-nic-driver-bind \
     file://catalina-gpio-monitor \
     file://prepare-serv-json \
     file://phosphor-multi-gpio-monitor.json \
@@ -24,6 +25,7 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
     deassert-gpio-log@.service \
     deassert-reset-button.service \
     deassert-run-power-pg.service \
+    backend-nic-driver-bind.service \
     catalina-host-ready.target \
     "
 
@@ -41,6 +43,7 @@ do_install:append:() {
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-evt.json
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-presence.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-presence-evt.json
+    install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${D}${libexecdir}/${PN}/backend-nic-driver-bind
     install -m 0755 ${UNPACKDIR}/catalina-gpio-monitor ${D}${libexecdir}/${PN}/catalina-gpio-monitor
     install -m 0755 ${UNPACKDIR}/prepare-serv-json ${D}${libexecdir}/${PN}/prepare-serv-json
 }
