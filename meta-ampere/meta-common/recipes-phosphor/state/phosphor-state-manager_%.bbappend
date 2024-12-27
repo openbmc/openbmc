@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG:append = " host-gpio"
+PACKAGECONFIG:append = " host-gpio check-fwupdate-before-do-transition"
 EXTRA_OEMESON:append = " \
                          -Dboot-count-max-allowed=1 \
                        "
