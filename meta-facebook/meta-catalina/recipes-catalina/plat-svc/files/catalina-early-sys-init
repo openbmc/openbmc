@@ -22,6 +22,12 @@ config_fan()
             fan_dynam_val=$((fan_dynam_val | 0xe0))
             i2cset -y -f 18 "$addr" "$offset" "$fan_dynam_val"
         done
+
+        # after manual set FanX_Dynamics, needs to rebind driver to ensure
+        # driver get correct setitngs
+        bus_addr="$(printf "18-%04x" $addr)"
+        echo "$bus_addr" > /sys/bus/i2c/drivers/max31790/unbind
+        echo "$bus_addr" > /sys/bus/i2c/drivers/max31790/bind
     done
 
     # set fan enable
