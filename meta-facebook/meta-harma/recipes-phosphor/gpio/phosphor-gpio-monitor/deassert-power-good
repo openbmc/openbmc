@@ -10,10 +10,12 @@ valid_sgpio=$?
 
 # Set Host Power Status Running
 if [ "$valid_sgpio" -eq 0 ]; then
-    busctl set-property xyz.openbmc_project.State.Host0 \
-    /xyz/openbmc_project/state/host0 \
-    xyz.openbmc_project.State.Host \
-    CurrentHostState s \
+    busctl set-property \
+        xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition s \
+        xyz.openbmc_project.State.Host.Transition.On
     xyz.openbmc_project.State.Host.HostState.Running
 
     systemctl start obmc-led-group-start@power_on.service

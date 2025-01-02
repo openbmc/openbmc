@@ -1,6 +1,13 @@
 #!/bin/bash
 
 # Set Host Power Status Off
+busctl set-property \
+    xyz.openbmc_project.State.Host0 \
+    /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host \
+    RequestedHostTransition s \
+    xyz.openbmc_project.State.Host.Transition.Off
+
 busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Off
 
 systemctl start obmc-led-group-stop@power_on.service
