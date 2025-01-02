@@ -52,13 +52,15 @@ check_i3c_hub_status()
         current_port=$(cat "$access_file")
         if [ "$target_slot" -gt 4 ]; then
             ((slot=target_slot-4))
+        else
+            slot=$target_slot
         fi
 
         check_bit=$(( (current_port >> (--slot)) & 1 ))
         if [ $check_bit -eq 0 ]; then
             if [ "$option" = "on" ]; then
                 echo "Enable slot${target_slot} i3c port."
-                mask=$((mask << (--slot)))
+                mask=$((mask << slot))
                 current_port=$((current_port | mask))
                 echo $current_port > "$access_file"
                 cat "$access_file"
@@ -66,7 +68,7 @@ check_i3c_hub_status()
         else
             if [ "$option" = "off" ]; then
                 echo "Disable slot${target_slot} i3c port."
-                mask=$((mask << (--slot)))
+                mask=$((mask << slot))
                 mask=$((~mask))
                 current_port=$((current_port & mask))
                 echo $current_port > "$access_file"
