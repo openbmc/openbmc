@@ -6,7 +6,6 @@ SRC_URI += "file://clean-up-filesystem \
             file://clean-up-filesystem.service \
             "
 CPU_CRIT_TGT = ""
-MEM_CRIT_TGT = ""
 STORAGE_CRIT_TGT = "clean-up-filesystem.service"
 
 RDEPENDS:${PN}:append = " bash"
