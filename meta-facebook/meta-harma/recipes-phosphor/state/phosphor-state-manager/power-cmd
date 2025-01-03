@@ -46,7 +46,13 @@ graceful_power_off() {
         sleep 1
 
         # wait host power off
-        sleep 10
+        for i in $(seq 1 10)
+        do
+            sleep 1
+            if [ "$(power_status)" == "off" ]; then
+               break
+            fi
+        done
     fi
 }
 
