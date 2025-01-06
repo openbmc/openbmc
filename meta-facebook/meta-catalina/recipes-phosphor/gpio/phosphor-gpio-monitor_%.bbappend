@@ -10,6 +10,7 @@ SRC_URI += " \
     file://phosphor-multi-gpio-presence.json \
     file://phosphor-multi-gpio-monitor-evt.json \
     file://phosphor-multi-gpio-presence-evt.json \
+    file://set-uart-select-led \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -21,10 +22,12 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
     assert-gpio-log@.service \
     assert-reset-button.service \
     assert-run-power-pg.service \
+    assert-uart-select-led.service \
     deassert-cpu-boot-done.service \
     deassert-gpio-log@.service \
     deassert-reset-button.service \
     deassert-run-power-pg.service \
+    deassert-uart-select-led.service \
     backend-nic-driver-bind.service \
     catalina-host-ready.target \
     "
@@ -46,4 +49,5 @@ do_install:append:() {
     install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${D}${libexecdir}/${PN}/backend-nic-driver-bind
     install -m 0755 ${UNPACKDIR}/catalina-gpio-monitor ${D}${libexecdir}/${PN}/catalina-gpio-monitor
     install -m 0755 ${UNPACKDIR}/prepare-serv-json ${D}${libexecdir}/${PN}/prepare-serv-json
+    install -m 0755 ${UNPACKDIR}/set-uart-select-led ${D}${libexecdir}/${PN}/set-uart-select-led
 }

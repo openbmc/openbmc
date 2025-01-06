@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+# UART_MUX_SEL = 0 --> BMC UART
+# UART_MUX_SEL = 1 --> Host UART
+
+UART_MUX_SEL_STATE="$1"
+
+set_postcode_leds() {
+    num=$1
+    for i in {0..7}; do
+        bit_value=$(( (num >> i) & 1 ))
+        set_gpio "LED_POSTCODE_$i" $bit_value
+    done
+}
+
+set_postcode_leds "$UART_MUX_SEL_STATE"
+
+exit 0

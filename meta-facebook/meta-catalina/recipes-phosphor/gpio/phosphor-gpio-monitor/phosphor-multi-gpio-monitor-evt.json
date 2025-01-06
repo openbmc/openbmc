@@ -28,5 +28,15 @@
             "FALLING": ["deassert-reset-button.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "UART_MUX_SEL",
+        "LineName": "UART_MUX_SEL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-uart-select-led.service"],
+            "FALLING": ["deassert-uart-select-led.service"]
+        },
+        "Continue": true
     }
 ]

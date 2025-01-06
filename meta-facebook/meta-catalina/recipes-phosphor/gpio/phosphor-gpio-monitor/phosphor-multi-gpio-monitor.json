@@ -30,6 +30,16 @@
         "Continue": true
     },
     {
+        "Name": "UART_MUX_SEL",
+        "LineName": "UART_MUX_SEL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-uart-select-led.service"],
+            "FALLING": ["deassert-uart-select-led.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "wSequence_Latch_State_N",
         "LineName": "wSequence_Latch_State_N",
         "EventMon": "BOTH",
