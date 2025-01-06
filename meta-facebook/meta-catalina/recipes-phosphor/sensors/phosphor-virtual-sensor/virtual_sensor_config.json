@@ -1,9 +1,9 @@
 [
     {
         "Desc": {
-            "Name": "VIRTUAL_PDB_P48V_HSC1_CURR_A",
-            "SensorType": "current",
-            "MaxValue": 255,
+            "Name": "SYSTEM_AIRFLOW_CFM",
+            "SensorType": "airflow",
+            "MaxValue": 40000,
             "MinValue": 0
         },
         "Associations": [
@@ -16,95 +16,68 @@
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "hsc1_curr",
+                    "ParamName": "FAN0_PWM",
                     "Desc": {
-                        "Name": "PDB_P48V_HSC1_CURR_A",
-                        "SensorType": "current"
+                        "Name": "FAN0_PWM",
+                        "SensorType": "fan_pwm"
                     }
-                }
-            ]
-        },
-        "Expression": "max(0, (0.9418 * hsc1_curr) - 0.1819)"
-    },
-    {
-        "Desc": {
-            "Name": "VIRTUAL_PDB_P48V_HSC1_PWR_W",
-            "SensorType": "power",
-            "MaxValue": 3000,
-            "MinValue": 0
-        },
-        "Associations": [
-            [
-                "chassis",
-                "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
-            ]
-        ],
-        "Params": {
-            "DbusParam": [
+                },
                 {
-                    "ParamName": "hsc1_pwr",
+                    "ParamName": "FAN1_PWM",
                     "Desc": {
-                        "Name": "PDB_P48V_HSC1_PWR_W",
-                        "SensorType": "power"
+                        "Name": "FAN1_PWM",
+                        "SensorType": "fan_pwm"
                     }
-                }
-            ]
-        },
-        "Expression": "max(0, (0.941 * hsc1_pwr) - 8.9115)"
-    },
-    {
-        "Desc": {
-            "Name": "VIRTUAL_PDB_P48V_HSC2_CURR_A",
-            "SensorType": "current",
-            "MaxValue": 255,
-            "MinValue": 0
-        },
-        "Associations": [
-            [
-                "chassis",
-                "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
-            ]
-        ],
-        "Params": {
-            "DbusParam": [
+                },
                 {
-                    "ParamName": "hsc2_curr",
+                    "ParamName": "FAN2_PWM",
                     "Desc": {
-                        "Name": "PDB_P48V_HSC2_CURR_A",
-                        "SensorType": "current"
+                        "Name": "FAN2_PWM",
+                        "SensorType": "fan_pwm"
                     }
-                }
-            ]
-        },
-        "Expression": "max(0, (0.94885 * hsc2_curr) - 0.274)"
-    },
-    {
-        "Desc": {
-            "Name": "VIRTUAL_PDB_P48V_HSC2_PWR_W",
-            "SensorType": "power",
-            "MaxValue": 3000,
-            "MinValue": 0
-        },
-        "Associations": [
-            [
-                "chassis",
-                "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
-            ]
-        ],
-        "Params": {
-            "DbusParam": [
+                },
                 {
-                    "ParamName": "hsc2_pwr",
+                    "ParamName": "FAN3_PWM",
                     "Desc": {
-                        "Name": "PDB_P48V_HSC2_PWR_W",
-                        "SensorType": "power"
+                        "Name": "FAN3_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FAN4_PWM",
+                    "Desc": {
+                        "Name": "FAN4_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FAN5_PWM",
+                    "Desc": {
+                        "Name": "FAN5_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FAN6_PWM",
+                    "Desc": {
+                        "Name": "FAN6_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FAN7_PWM",
+                    "Desc": {
+                        "Name": "FAN7_PWM",
+                        "SensorType": "fan_pwm"
                     }
                 }
             ]
         },
-        "Expression": "max(0, (0.94865 * hsc2_pwr) - 13.862)"
+        "Expression": [
+            "max(6.95927258, ",
+            "((2.825758 * (avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM)^2)) + ",
+            "(91.27348 * avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM)) - ",
+            "2.196333))"
+        ]
     }
 ]
