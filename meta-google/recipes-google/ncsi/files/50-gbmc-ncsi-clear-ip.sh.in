@@ -14,18 +14,18 @@
 
 [ -n "${gbmc_ncsi_clear_ip-}" ] && return
 
-source /usr/libexec/ncsid_lib.sh || exit
-
 gbmc_ncsi_clear_ip_hook() {
   local ip="${1-}"
 
   # We only want to clear our IPs if we are assigning a new IP
   [ -z "$ip" ] && return
 
+  # Only attempt to delete if the file exists
+  [ ! -e /etc/systemd/network/00-bmc-@NCSI_IF@.network ] && return
+
   echo "Removing Persistent NCSI IPs" >&2
-  SetStatic xyz.openbmc_project.Network '@NCSI_IF@' 2>/dev/null || true
-  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '0.0.0.0' '0' 2>/dev/null || true
-  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '::' '0' 2>/dev/null || true
+  rm /etc/systemd/network/00-bmc-@NCSI_IF@.network || return
+  networkctl reload || return
 }
 
 GBMC_BR_LIB_SET_IP_HOOKS+=(gbmc_ncsi_clear_ip_hook)
