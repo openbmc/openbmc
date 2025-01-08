@@ -1,9 +1,7 @@
 [Unit]
 Description=Set NICEnabled property to true
-Wants=xyz.openbmc_project.Network.service
-After=xyz.openbmc_project.Network.service
-Wants=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
-After=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
+Requires=gbmc-ncsi-networkd-wait.target
+After=gbmc-ncsi-networkd-wait.target
 StartLimitIntervalSec=10
 StartLimitBurst=3
 

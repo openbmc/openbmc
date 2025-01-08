@@ -1,7 +1,7 @@
 [Unit]
 Description=RA Gateway Updater
-Wants=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
-After=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
+Wants=gbmc-ncsi-networkd-wait.target
+After=gbmc-ncsi-networkd-wait.target
 After=ncsid@@NCSI_IF@.service
 StartLimitIntervalSec=1min
 StartLimitBurst=5

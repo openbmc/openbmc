@@ -1,0 +1,8 @@
+# Used as a layer of indirection to allow some systems to remove
+# phosphor-networkd entirely, but not wait forever for the non-existent
+# DBus object.
+[Unit]
+Requires=xyz.openbmc_project.Network.service
+After=xyz.openbmc_project.Network.service
+Wants=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
+After=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service

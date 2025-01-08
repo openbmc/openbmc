@@ -26,6 +26,7 @@ SRC_URI += " \
   file://gbmc-ncsi-br-pub-addr.sh.in \
   file://gbmc-ncsi-br-deprecated-ips.sh.in \
   file://gbmc-ncsi-set-nicenabled.service.in \
+  file://gbmc-ncsi-networkd-wait.target.in \
   file://gbmc-ncsi-alias.service.in \
   file://50-gbmc-ncsi-clear-ip.sh.in \
   file://gbmc-ncsi-old.service.in \
@@ -135,6 +136,9 @@ do_install:append() {
 
   sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-set-nicenabled.service.in \
     >${D}${systemd_system_unitdir}/gbmc-ncsi-set-nicenabled.service
+
+  sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-networkd-wait.target.in  \
+    >${D}${systemd_system_unitdir}/gbmc-ncsi-networkd-wait.target
 
   if [ "${GBMC_DHCP_RELAY}" = "1" ]; then
     sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-dhcrelay.service.in \
