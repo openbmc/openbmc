@@ -30,9 +30,3 @@ RDEPENDS:${PN} += " \
   ndisc6-rdisc6 \
   systemd \
   "
-
-# TODO: Remove when package is bumped to formally delete this service
-do_install:append() {
-  rm ${D}${systemd_system_unitdir}/update-ra-gw@.service
-  rm ${D}${libexecdir}/update_ra_gw.sh
-}
