@@ -1,39 +1,109 @@
 #!/bin/bash
 
-# CXL need about 30 seconds to boot up. Wait 30 seconds then start polling CXLs status.
+# Function to check if an EID is already set
+check_eid() {
+    local eid="$1"
+    busctl get-property au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" xyz.openbmc_project.MCTP.Endpoint EID >/dev/null 2>&1
+    return $?
+}
+
+# Function to set up EID for CXL1 or CXL2
+setup_eid() {
+    local slot_number="$1"
+    local cxl_type="$2"
+    busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} au.com.codeconstruct.MCTP.BusOwner1 SetupEndpointByConfigPath s "/xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_${slot_number}/${cxl_type}" >/dev/null 2>&1
+    return $?
+}
+
+# Function to check readiness and setup EID
+check_and_setup_eid() {
+    local eid="$1"
+    local ready_flag="$2"
+    local slot_number="$3"
+    local cxl_type="$4"
+
+    if [ "$ready_flag" == "01" ]; then
+        echo "${cxl_type} EID ${eid} is ready; attempting setup."
+        if setup_eid "$slot_number" "$cxl_type"; then
+            echo "${cxl_type} EID $eid setup was successful."
+        else
+            echo "${cxl_type} EID $eid setup failed."
+        fi
+    else
+        echo "${cxl_type} EID $eid is not ready for setup."
+    fi
+}
+
+# Output message based on the final status of CXL EIDs, called at the end
+output_final_status() {
+    local cxl1_status="$1"
+    local cxl2_status="$2"
+    local slot="$3"
+
+    if [ "$cxl1_status" == "yes" ] && [ "$cxl2_status" == "yes" ]; then
+        echo "Both CXL EIDs established successfully for slot $slot."
+        exit 0
+    elif [ "$cxl1_status" == "no" ] && [ "$cxl2_status" == "no" ]; then
+        echo "Failed to establish both CXL1 and CXL2 EIDs for slot $slot."
+    elif [ "$cxl1_status" == "no" ]; then
+        echo "Failed to establish CXL1 EID for slot $slot."
+    else
+        echo "Failed to establish CXL2 EID for slot $slot."
+    fi
+    exit 1
+}
+
+# Main script execution starts here
+wf_eid=$(($1 * 10 + 2))
+busnum=$(($1 - 1))
+cxl1_eid=$(($1 * 10 + 4))
+cxl2_eid=$(($1 * 10 + 5))
+
 sleep 30
 
-wf_eid=$(($1 * 10 + 2))
-count=0
-busnum=$(($1 - 1))
+# Initial EID check for 1 minute
+cxl1_status="no"
+cxl2_status="no"
 
-# retry getting EID to maximum 60 seconds
-while [ $count -lt 15 ]; do
-    count=$((count + 1))
-    sleep 2
+for _ in $(seq 1 12); do
+    if [ "$cxl1_status" == "no" ] && check_eid "$cxl1_eid"; then
+        cxl1_status="yes"
+        echo "CXL1 EID $cxl1_eid found successfully."
+    fi
 
+    if [ "$cxl2_status" == "no" ] && check_eid "$cxl2_eid"; then
+        cxl2_status="yes"
+        echo "CXL2 EID $cxl2_eid found successfully."
+    fi
+
+    if [ "$cxl1_status" == "yes" ] && [ "$cxl2_status" == "yes" ]; then
+        # Both EIDs found, no need to retry
+        output_final_status "yes" "yes" "$1"
+    fi
+
+    sleep 5
+done
+
+
+# Retry to establish CXL EID connections, max 10 minutes
+for _ in $(seq 1 40); do
     output=$(pldmtool raw -m "$wf_eid" -d 0x80 0x02 0x3A 0x04 0x01)
-
     rx_line=$(echo "$output" | grep "Rx:")
     rx_data=$(echo "$rx_line" | awk '{print $4,$5,$6,$7,$8,$9,$10,$11,$12,$13}')
+    echo "Slot $1 PLDM tool raw command received data: $rx_data"
 
     cxl1_ready=$(echo "$rx_data" | awk '{print substr($7,1,2)}')
     cxl2_ready=$(echo "$rx_data" | awk '{print substr($10,1,2)}')
 
-    if [ "$cxl1_ready" == "01" ]; then
-        if ! busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} au.com.codeconstruct.MCTP.BusOwner1 SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL1; then
-            continue
-        fi
+    [ "$cxl1_status" == "no" ] && check_and_setup_eid "$cxl1_eid" "$cxl1_ready" "$1" "CXL1"
+    [ "$cxl2_status" == "no" ] && check_and_setup_eid "$cxl2_eid" "$cxl2_ready" "$1" "CXL2"
+
+    if check_eid "$cxl1_eid" && check_eid "$cxl2_eid"; then
+        output_final_status "yes" "yes" "$1"
     fi
 
-    if [ "$cxl2_ready" == "01" ]; then
-        if ! busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} au.com.codeconstruct.MCTP.BusOwner1 SetupEndpointByConfigPath s /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$1"/CXL2; then
-            continue
-        fi
-    fi
-
-    if [ "$cxl1_ready" == "01" ] && [ "$cxl2_ready" == "01" ]; then
-        break
-    fi
-
+    sleep 15
 done
+
+# Final output if retries fail
+output_final_status "$(check_eid "$cxl1_eid" && echo "yes" || echo "no")" "$(check_eid "$cxl2_eid" && echo "yes" || echo "no")" "$1"
