@@ -78,9 +78,8 @@ GBMC_ULA_PREFIX = "fdb5:0481:10ce:0"
 GBMC_COORDINATED_POWERCYCLE ?= "true"
 
 # Allow machines to upgrade all netboot warm reboots into powercyles in case
-# they have stability issues performing them. We prefer machines avoid this
-# setting and fix any outstanding issues.
-GBMC_NETBOOT_UPGRADE_REBOOT ?= ""
+# they have stability issues performing them. Disable this feature by default.
+GBMC_NETBOOT_UPGRADE_REBOOT ?= "0"
 
 def mac_to_eui64(mac):
   if not mac:
