@@ -6,3 +6,7 @@ FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 PACKAGECONFIG:append = " delay-host-control monitor-use-host-state"
 PACKAGECONFIG[delay-host-control] = "-Ddelay-host-control=150"
 PACKAGECONFIG[monitor-use-host-state] = "-Dmonitor-use-host-state=enabled"
+
+do_install:append () {
+        rm -f ${D}${bindir}/fanctl
+}
