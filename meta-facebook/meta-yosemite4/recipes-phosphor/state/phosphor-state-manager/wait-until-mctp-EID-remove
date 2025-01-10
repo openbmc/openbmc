@@ -17,8 +17,8 @@ echo "Checking SD_EID: $SD_EID and WF_EID: $WF_EID"
 echo "Maximum attempts: $MAX_ATTEMPTS"
 
 while [ $count -lt "$MAX_ATTEMPTS" ]; do
-    sd_output=$(busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$SD_EID" xyz.openbmc_project.MCTP.Endpoint EID 2>&1)
-    wf_output=$(busctl get-property xyz.openbmc_project.MCTP /xyz/openbmc_project/mctp/1/"$WF_EID" xyz.openbmc_project.MCTP.Endpoint EID 2>&1)
+    sd_output=$(busctl get-property au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/"$SD_EID" xyz.openbmc_project.MCTP.Endpoint EID 2>&1)
+    wf_output=$(busctl get-property au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/"$WF_EID" xyz.openbmc_project.MCTP.Endpoint EID 2>&1)
 
     echo "Slot $SLOT attempt $((count + 1)) times:"
     echo "SD Output: $sd_output"
