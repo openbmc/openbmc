@@ -7,7 +7,7 @@ DEPENDS += " \
         sdbusplus \
         systemd \
         "
-SRCREV = "e2e4dde12e2fa9c8856e291dd6c7405a8fa4164f"
+SRCREV = "7f154004885f4e98bd8d0aa6f66259c117b95a4c"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
@@ -23,6 +23,10 @@ inherit python3native
 # Markdown files are installed into /usr/share/phosphor-dbus-interfaces so
 # add them to the 'doc' subpackage.
 FILES:${PN}-doc += "${datadir}/${BPN}"
+
+# Create separate packages for Redfish registry.
+PACKAGES:append = " ${PN}-redfish-registry"
+FILES:${PN}-redfish-registry += "${datadir}/redfish-registry/${BPN}"
 
 # Process OBMC_ORG_YAML_SUBDIRS to create Meson config options.
 # ex. xyz/openbmc_project -> -Ddata_xyz_openbmc_project=true
