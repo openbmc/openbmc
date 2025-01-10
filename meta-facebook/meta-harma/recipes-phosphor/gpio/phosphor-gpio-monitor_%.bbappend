@@ -9,6 +9,11 @@ SRC_URI += "file://assert-gpio-log@.service \
             file://assert-power-good.service \
             file://assert-reset-button \
             file://assert-reset-button.service \
+            file://auto-power \
+            file://auto-poweroff \
+            file://auto-poweroff@.service \
+            file://auto-poweron \
+            file://auto-poweron@.service \
             file://deassert-gpio-log@.service \
             file://deassert-post-end \
             file://deassert-post-end.service \
@@ -19,12 +24,8 @@ SRC_URI += "file://assert-gpio-log@.service \
             file://deassert-uart-switch-button \
             file://deassert-uart-switch-button.service \
             file://device-reinitial \
-            file://device-reinitial.service \
+            file://device-reinitial@.service \
             file://device-util \
-            file://host-power-off \
-            file://host-power-off.service \
-            file://host-power-on \
-            file://host-power-on.service \
             file://logging \
             file://multi-gpios-sys-init \
             file://multi-gpios-sys-init.service \
@@ -45,7 +46,7 @@ SYSTEMD_SERVICE:${PN} += " \
     deassert-reset-button.service \
     deassert-uart-switch-button.service \
     multi-gpios-sys-init.service \
-    device-reinitial.service \
+    device-reinitial@.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -81,8 +82,9 @@ do_install:append:() {
 
     install -m 0755 ${UNPACKDIR}/deassert-uart-switch-button ${D}${libexecdir}/${PN}/
 
-    install -m 0755 ${UNPACKDIR}/host-power-off ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-power-on ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/auto-power ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/auto-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/auto-poweron ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"

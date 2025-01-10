@@ -17,13 +17,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "deassert-gpio-log@0_power-hsc-good.service",
-                "host-power-on.service",
-                "device-reinitial.service"
+                "auto-poweron@0_auto-poweron.service",
+                "device-reinitial@0_auto-poweron.service"
             ],
             "FALLING": [
-                "assert-gpio-log@0_power-hsc-good.service",
-                "host-power-off.service"
+                "auto-poweroff@0_auto-poweroff.service"
             ]
         },
         "Continue": true
@@ -67,6 +65,24 @@
         "EventMon": "FALLING",
         "Targets": {
             "FALLING": ["assert-gpio-log@1_ac-power-button.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "auto-power-on",
+        "ChipId": "2",
+        "GpioNum": 22,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "deassert-gpio-log@2_power-hsc-good.service",
+                "auto-poweron@2_auto-poweron.service",
+                "device-reinitial@2_auto-poweron.service"
+            ],
+            "FALLING": [
+                "assert-gpio-log@2_power-hsc-good.service",
+                "auto-poweroff@2_auto-poweroff.service"
+            ]
         },
         "Continue": true
     },

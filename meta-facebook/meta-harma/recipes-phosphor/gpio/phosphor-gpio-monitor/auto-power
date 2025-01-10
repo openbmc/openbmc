@@ -1,0 +1,40 @@
+#!/bin/bash
+
+check-auto-power-condition() {
+    # Define the fixed prefix of the FRU path
+    FRU_PREFIX="/xyz/openbmc_project/FruDevice/Minerva_PDB"
+
+    # Dynamically search for a matching path that starts with the prefix
+    FRU_PATH=$(busctl tree xyz.openbmc_project.FruDevice | grep "$FRU_PREFIX" | awk '{print $2}')
+
+    # Retrieve the BOARD_FRU_VERSION_ID property value for the matched path
+    if [ -n "$FRU_PATH" ]; then
+        FRU_VERSION=$(busctl get-property xyz.openbmc_project.FruDevice "$FRU_PATH" xyz.openbmc_project.FruDevice BOARD_FRU_VERSION_ID | sed -n 's/.*FRU Ver //p')
+    else
+        FRU_VERSION=""
+    fi
+
+    # Simple version comparison without bc
+    if [ -n "$FRU_VERSION" ]; then
+        FRU_VERSION_INT=$(echo "$FRU_VERSION" | awk -F. '{printf "%d%02d\n", $1, $2}')
+    else
+        FRU_VERSION_INT=""
+    fi
+
+    THRESHOLD_INT=$(echo "0.02" | awk -F. '{printf "%d%02d\n", $1, $2}')
+
+    MESSAGE=$1
+    number="${MESSAGE%%_*}"
+
+    echo "FRU_PATH: $FRU_PATH, FRU_VERSION: $FRU_VERSION, FRU_VERSION_INT: $FRU_VERSION_INT, number: $number"
+    # This is a workaround for DVT1 to avoid SGPIO bouncing during CPLD power recovery.
+    # In DVT1, auto power on/off is triggered by direct GPIO21 (GPIOC6), but this pin cannot change in DVT2
+    # because the standby power will not be lost.
+
+    # If the version and number conditions are met and the file exists
+    if [ -n "$FRU_VERSION_INT" ] && [ "$FRU_VERSION_INT" -le "$THRESHOLD_INT" ] && [ "$number" -eq 2 ]; then
+        return 1
+    fi
+
+    return 0
+}

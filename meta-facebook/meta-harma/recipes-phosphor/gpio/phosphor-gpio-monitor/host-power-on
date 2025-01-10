@@ -1,9 +1,0 @@
-#!/bin/bash
-
-sleep 1
-
-# Set Host Power On
-obmcutil poweron
-
-# Turn on the power Led
-systemctl start obmc-led-group-start@power_on.service

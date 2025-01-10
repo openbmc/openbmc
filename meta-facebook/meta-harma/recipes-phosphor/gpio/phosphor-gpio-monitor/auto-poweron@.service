@@ -1,0 +1,10 @@
+[Unit]
+Description=auto power on
+After=device-reinitial@.service
+Wants=device-reinitial@.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/auto-poweron %i
+
+SyslogIdentifier=auto-power-on

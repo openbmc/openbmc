@@ -1,0 +1,8 @@
+[Unit]
+Description=auto power off
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/auto-poweroff %i
+
+SyslogIdentifier=auto-poweroff

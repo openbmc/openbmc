@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/gpio/phosphor-gpio-monitor/auto-power
+source /usr/libexec/phosphor-gpio-monitor/auto-power
+
+# End the script if the FRU version is DVT1 and triggered by SGPIO18
+if ! check-auto-power-condition "$1"; then
+    exit 0
+fi
+
+# To avoid AC cycle triggering this script
+sleep 5
+
+# Set Host Power Off
+obmcutil poweroff
+
+# Turn off the power LED
+systemctl start obmc-led-group-stop@power_on.service
