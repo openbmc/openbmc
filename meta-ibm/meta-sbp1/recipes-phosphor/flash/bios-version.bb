@@ -14,10 +14,10 @@ SRC_URI += " \
 
 do_install:append() {
     install -d ${D}/${sbindir}
-    install -m 0755 ${WORKDIR}/bios-version.sh ${D}/${sbindir}/
+    install -m 0755 ${UNPACKDIR}/bios-version.sh ${D}/${sbindir}/
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/bios-version.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/bios-version.service ${D}${systemd_system_unitdir}/
 }
 
 SYSTEMD_SERVICE:${PN} += "bios-version.service"
