@@ -82,6 +82,20 @@ is_rmc_main_power_disable()
     return 0
 }
 
+chassis_power_cycle_xdp710()
+{
+    i2cset -f -y 20 0x13 0xec
+    ret1=$?
+
+    i2cset -f -y 20 0x1c 0xec
+    ret2=$?
+
+    if [ "$ret1" -ne 0 ] || [ "$ret2" -ne 0 ]; then
+        return 1
+    fi
+    return 0
+}
+
 chassis_power_cycle_ltc4287()
 {
     if ! i2cset -f -y 20 0x42 0xfd 0x04; then
@@ -109,8 +123,32 @@ chassis_power_cycle_ltc4287()
 
 chassis_power_cycle()
 {
-    chassis_power_cycle_ltc4287
-    return $?
+    # There are two HSCs on the PDB board, and the BMC uses the i2cset command
+    # to power cycle them one by one. Occasionally, the BMC logs a fault during
+    # the AC cycle, which is caused by a small time gap between the power cycles
+    # of the two HSCs.
+    # To prevent false alerts from the GPIO monitor due to this gap, we will add
+    # a workaround to stop the GPIO monitor before initiating the chassis power
+    # cycle.
+    systemctl stop phosphor-multi-gpio-monitor.service
+
+    if [ "$(i2cdetect -y -q 20 0x13 0x13 | grep "10:" | awk '{print $2}')" != "--" ]; then
+        # run 2nd source power cycle if 20-0013 exist
+        chassis_power_cycle_xdp710
+        ret=$?
+    else
+        # run main source power cycle
+        chassis_power_cycle_ltc4287
+        ret=$?
+    fi
+
+    sleep 5
+
+    # Restart gpio monitor service in case chassis power cycle failed.
+    # Normally, we should not run into this line.    
+    systemctl start phosphor-multi-gpio-monitor.service
+
+    return $ret
 }
 
 chassis_power_on()
