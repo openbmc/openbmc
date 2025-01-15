@@ -3,7 +3,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 inherit systemd
 inherit obmc-phosphor-systemd
 
-RDEPENDS:${PN}-monitor += "bash"
 RDEPENDS:${PN} += "bash"
 
 SRC_URI += " \

@@ -4,6 +4,8 @@ SRC_URI += " \
            file://ampere_overtemp.sh \
            "
 
+RDEPENDS:${PN}-monitor:append = " bash"
+
 SYSTEMD_SERVICE:${PN}-monitor += " \
                                   ampere-host-shutdown-ack@.service \
                                   ampere_overtemp@.service \

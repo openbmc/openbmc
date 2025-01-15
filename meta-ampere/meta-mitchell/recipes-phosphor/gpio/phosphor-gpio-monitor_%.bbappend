@@ -1,7 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-RDEPENDS:${PN}-monitor += "bash"
-
 SRC_URI += " \
             file://phosphor-multi-gpio-monitor.json \
             file://phosphor-multi-gpio-presence.json \
