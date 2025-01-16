@@ -1,9 +1,9 @@
 {
     "sensors": [
         {
-            "name": "FIOBOARD_REMOTE_TEMP_C",
+            "name": "FIOBOARD_REMOTE_INLET_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/FIOBOARD_REMOTE_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FIOBOARD_REMOTE_INLET_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
@@ -205,7 +205,7 @@
                     "name": "Stepwise_Inlet",
                     "type": "stepwise",
                     "inputs": [
-                        "FIOBOARD_REMOTE_TEMP_C"
+                        "FIOBOARD_REMOTE_INLET_TEMP_C"
                     ],
                     "setpoint": 0.0,
                     "pid": {
