@@ -57,7 +57,7 @@ set_gpio power-config-asic-module-enable 1
 # SGPIO Out Bit-11
 set_gpio power-config-asic-power-good 1
 # SGPIO Out Bit-13
-set_gpio power-config-pdb-power-good 1
+set_gpio power-config-pdb-power-good 0
 # SGPIO Out Bit-15
 set_gpio smi-control-n 1
 # SGPIO Out Bit-17
@@ -157,3 +157,5 @@ devmem 0x1e6e251c 32 0
 # Initial Power status.
 host_led_init
 post_end_init
+
+exit 0
