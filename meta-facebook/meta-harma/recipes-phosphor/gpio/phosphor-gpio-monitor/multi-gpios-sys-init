@@ -22,7 +22,7 @@ post_end_init() {
      xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
      xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby;
      # Initial BIOS version after BMC reboot.
-     busctl set-property xyz.openbmc_project.Software.BMC.Updater \
+     busctl set-property xyz.openbmc_project.Software.Manager \
      /xyz/openbmc_project/software/bios_active \
      xyz.openbmc_project.Software.Version \
      Version s "$(jq -r '.sysfw_ver_server0' /var/lib/fb-ipmi-oem/appData.json)"
