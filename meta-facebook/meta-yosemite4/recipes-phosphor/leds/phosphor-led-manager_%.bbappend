@@ -1,8 +1,8 @@
-SYSTEMD_SERVICE:${PN}-faultmonitor:remove:yosemite4 = "obmc-fru-fault-monitor.service"
-SYSTEMD_LINK:${PN}:remove:yosemite4 = "../obmc-led-group-start@.service:multi-user.target.wants/obmc-led-group-start@bmc_booted.service"
-SYSTEMD_LINK:${PN}:remove:yosemite4 = "${@compose_list_zip(d, 'FMT', 'CHASSIS_TARGETS', 'STATES')}"
-SYSTEMD_LINK:${PN}:remove:yosemite4 = "${@compose_list(d, 'CHASSIS_LED_BLACKOUT_FMT', 'OBMC_CHASSIS_INSTANCES' )}"
-SYSTEMD_OVERRIDE:${PN}:remove:yosemite4 = "bmc_booted.conf:obmc-led-group-start@bmc_booted.service.d/bmc_booted.conf"
+SYSTEMD_SERVICE:${PN}-faultmonitor:remove = "obmc-fru-fault-monitor.service"
+SYSTEMD_LINK:${PN}:remove = "../obmc-led-group-start@.service:multi-user.target.wants/obmc-led-group-start@bmc_booted.service"
+SYSTEMD_LINK:${PN}:remove = "${@compose_list_zip(d, 'FMT', 'CHASSIS_TARGETS', 'STATES')}"
+SYSTEMD_LINK:${PN}:remove = "${@compose_list(d, 'CHASSIS_LED_BLACKOUT_FMT', 'OBMC_CHASSIS_INSTANCES' )}"
+SYSTEMD_OVERRIDE:${PN}:remove = "bmc_booted.conf:obmc-led-group-start@bmc_booted.service.d/bmc_booted.conf"
 
 FAN_INSTANCES="0 1 2 3 4 5 6 7 8 9 10 11"
 FAN_OK_START_INSTFMT="obmc-led-group-start@.service:obmc-led-group-start@fan{0}_ok.service"
