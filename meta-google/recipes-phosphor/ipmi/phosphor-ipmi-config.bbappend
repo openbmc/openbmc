@@ -59,12 +59,6 @@ do_install:append:gbmc() {
     gbmc_add_channel $entry
     IFS="$OLDIFS"
   done
-
-  # Set entity-map.json to empty json for gBMC by default.
-  # Each system will override it if needed.
-  if [ "${ENTITY_MAPPING}" != "default" ]; then
-    echo "[]" > ${D}${datadir}/ipmi-providers/entity-map.json
-  fi
 }
 
 python do_gbmc_version () {
