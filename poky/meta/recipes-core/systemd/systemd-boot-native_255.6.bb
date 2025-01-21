@@ -13,5 +13,3 @@ addtask install after do_unpack
 PACKAGES = "${PN}"
 
 FILES:${PN} = "${bindir}/ukify"
-
-RDEPENDS:${PN} += "python3-pefile-native"

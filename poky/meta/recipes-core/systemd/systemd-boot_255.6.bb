@@ -3,15 +3,15 @@ FILESEXTRAPATHS =. "${FILE_DIRNAME}/systemd:"
 
 require conf/image-uefi.conf
 
-DEPENDS = "libcap util-linux gperf-native python3-jinja2-native python3-pyelftools-native"
+DEPENDS = "intltool-native libcap util-linux gperf-native python3-jinja2-native python3-pyelftools-native"
 
 inherit meson pkgconfig gettext
 inherit deploy
 
-LDFLAGS =+ "${@ " ".join(d.getVar('LD').split()[1:])} "
+LDFLAGS:prepend = "${@ " ".join(d.getVar('LD').split()[1:])} "
 
 EFI_LD = "bfd"
-LDFLAGS += "-fuse-ld=${EFI_LD}"
+LDFLAGS:append = " -fuse-ld=${EFI_LD}"
 
 do_write_config[vardeps] += "EFI_LD"
 do_write_config:append() {
@@ -49,7 +49,7 @@ RDEPENDS:${PN} += "virtual-systemd-bootconf"
 
 CFLAGS:append:libc-musl = " -D__DEFINED_wchar_t"
 
-COMPATIBLE_HOST = "(aarch64.*|arm.*|x86_64.*|i.86.*|riscv.*)-linux"
+COMPATIBLE_HOST = "(aarch64.*|arm.*|x86_64.*|i.86.*)-linux"
 COMPATIBLE_HOST:x86-x32 = "null"
 
 do_install() {
