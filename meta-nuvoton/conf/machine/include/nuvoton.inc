@@ -14,3 +14,4 @@ IMAGE_FSTYPES:remove:df-phosphor-mmc = "mtd-static mtd-static-tar mtd-static-all
 
 MACHINEOVERRIDES .= ":nuvoton"
 MACHINE_EXTRA_RRECOMMENDS += "udev-nuvoton-mtd-partitions"
+MACHINE_FEATURES += "hw-rng"
