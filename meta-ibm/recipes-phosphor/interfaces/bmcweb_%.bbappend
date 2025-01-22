@@ -18,6 +18,9 @@ EXTRA_OEMESON:append:p10bmc = " \
 EXTRA_OEMESON:append:system1 = " \
     -Dredfish-allow-deprecated-power-thermal=disabled \
 "
+EXTRA_OEMESON:append:sbp1 = " \
+    -Dredfish-updateservice-use-dbus=disabled \
+"
 
 PACKAGECONFIG:remove:p10bmc = "mutual-tls-auth"
 
