@@ -43,4 +43,8 @@ do_write_config:append() {
         sed -i "/^\[built-in options\]\$/a$intf = false" ${WORKDIR}/meson.cross
     done
 }
-do_write_config[deptask] += "do_unpack"
+
+# The write-config needs to happen after the unpack and patch steps.
+# Unpack is what creates the original source.  Someone could apply patches to
+# the repository that affects meson.options.
+do_write_config[depends] += "${PN}:do_unpack ${PN}:do_patch"
