@@ -75,6 +75,10 @@ IPv6ProxyNDPAddress=$stateless_pfx
 ${host_pfx:+IPv6ProxyNDPAddress=}$host_pfx
 ${stateless_ip:+IPv6ProxyNDPAddress=}$stateless_ip
 [RoutingPolicyRule]
+To=$pfx/76
+Table=main
+Priority=$(( GBMC_NCSI_ROUTE_TABLE - 1 ))
+[RoutingPolicyRule]
 From=$pfx/76
 Table=$GBMC_NCSI_ROUTE_TABLE
 Priority=$GBMC_NCSI_ROUTE_TABLE
@@ -108,7 +112,9 @@ EOF
   while read -r entry; do
     ip -6 neigh del proxy ${entry%% *} dev @NCSI_IF@ || true
   done < <(ip -6 neigh show proxy dev @NCSI_IF@)
+  ip -6 rule del pref $(( GBMC_NCSI_ROUTE_TABLE - 1 )) table main 2>dev/null || true
   ip -6 rule del pref $GBMC_NCSI_ROUTE_TABLE 2>/dev/null || true
+  ip -6 rule add from all to "$pfx/76" pref 499 table main proto static || st=$?
   ip -6 rule add pref $GBMC_NCSI_ROUTE_TABLE from $pfx/76 \
       lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
 
@@ -125,6 +131,7 @@ EOF
     fi
   fi
   gbmc_ncsi_br_deprecated_ips_add_neighs || gbmc_net_networkd_reload @NCSI_IF@
+
   local rfile=/run/nftables/40-gbmc-ncsi-br.rules
   mkdir -p -m 755 "$(dirname "$rfile")"
   if [ -z "$nfcontents" ]; then
