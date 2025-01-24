@@ -1,6 +1,6 @@
 {
     "0": {
-        "name": "IPMB",
+        "name": "Ipmb",
         "is_valid": true,
         "active_sessions": 0,
         "channel_info": {
