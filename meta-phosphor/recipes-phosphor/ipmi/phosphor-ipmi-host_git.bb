@@ -31,6 +31,7 @@ PACKAGECONFIG ??= " \
     i2c-allowlist \
     libuserlayer \
     softoff \
+    ${@bb.utils.contains('OBMC_ORG_YAML_SUBDIRS', 'org/open_power', 'open-power', '', d)} \
     "
 PACKAGECONFIG[allowlist] = "-Dipmi-whitelist=enabled,-Dipmi-whitelist=disabled"
 PACKAGECONFIG[boot-flag-safe-mode] = "-Dboot-flag-safe-mode-support=enabled,-Dboot-flag-safe-mode-support=disabled"
@@ -40,6 +41,7 @@ PACKAGECONFIG[entity-manager-decorators] = "-Dentity-manager-decorators=enabled,
 PACKAGECONFIG[hybrid-sensors] = "-Dhybrid-sensors=enabled,-Dhybrid-sensors=disabled"
 PACKAGECONFIG[i2c-allowlist] = "-Di2c-whitelist-check=enabled,-Di2c-whitelist-check=disabled"
 PACKAGECONFIG[libuserlayer] = "-Dlibuserlayer=enabled,-Dlibuserlayer=disabled"
+PACKAGECONFIG[open-power] = "-Dopen-power=enabled,-Dopen-power=disabled"
 PACKAGECONFIG[sensors-cache] = "-Dsensors-cache=enabled,-Dsensors-cache=disabled"
 PACKAGECONFIG[softoff] = "-Dsoftoff=enabled,-Dsoftoff=disabled"
 PACKAGECONFIG[transport-oem] = "-Dtransport-oem=enabled,-Dtransport-oem=disabled"
