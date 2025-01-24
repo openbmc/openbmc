@@ -1,0 +1,32 @@
+# LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+LCONF_VERSION = "8"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-filesystems \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-aspeed \
+  ##OEROOT##/meta-nvidia \
+  ##OEROOT##/meta-nvidia/meta-gb200nvl-obmc \
+"
+
+BBLAYERS_NON_REMOVABLE ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/meta-openembedded/meta-oe \
+  ##OEROOT##/meta-openembedded/meta-networking \
+  ##OEROOT##/meta-openembedded/meta-filesystems \
+  ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-phosphor \
+  ##OEROOT##/meta-aspeed \
+  ##OEROOT##/meta-nvidia \
+  ##OEROOT##/meta-nvidia/meta-gb200nvl-obmc \
+"

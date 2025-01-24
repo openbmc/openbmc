@@ -73,6 +73,8 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
 * inventec
   * starscream
   * transformers
+* nvidia
+  * gb200nvl-obmc
 * qualcomm
   * qcom-dc-scm-v1
 * quanta
