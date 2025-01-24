@@ -20,7 +20,7 @@ HOSTIPMI_PROVIDER_LIBRARY += "libhiomap.so"
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://github.com/openbmc/openpower-host-ipmi-flash;branch=master;protocol=https"
-SRCREV = "91f5e37e6f390a5389de4e3a35f664db768ec4c9"
+SRCREV = "e3de942a3754f9a2d0b810bb6f36846d741088a1"
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
