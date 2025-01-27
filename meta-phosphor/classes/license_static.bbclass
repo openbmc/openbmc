@@ -61,4 +61,4 @@ python do_populate_static_lic() {
         bb.warn("Static licenses not copied because 'COPY_LIC_DIRS' is disabled.")
 }
 
-ROOTFS_POSTPROCESS_COMMAND:append = "do_populate_static_lic; "
+ROOTFS_POSTPROCESS_COMMAND:append = " do_populate_static_lic"
