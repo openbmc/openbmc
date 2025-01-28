@@ -7,4 +7,4 @@ update_root_user_groups () {
     fi
 }
 # Add root user to the needed groups
-ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'allow-root-login' ], "update_root_user_groups; ", "", d)}'
+ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'allow-root-login' ], "update_root_user_groups", "", d)}'

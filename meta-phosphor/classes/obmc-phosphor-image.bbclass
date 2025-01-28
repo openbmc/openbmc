@@ -104,5 +104,5 @@ enable_ldap_nsswitch() {
         "${IMAGE_ROOTFS}${sysconfdir}/nsswitch.conf"
 }
 
-ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('IMAGE_FEATURES', 'obmc-user-mgmt-ldap', 'enable_ldap_nsswitch ;', '', d)}"
+ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('IMAGE_FEATURES', 'obmc-user-mgmt-ldap', 'enable_ldap_nsswitch', '', d)}"
 
