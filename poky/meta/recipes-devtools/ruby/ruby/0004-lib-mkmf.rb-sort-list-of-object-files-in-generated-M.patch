@@ -1,4 +1,4 @@
-From f491fff7d006954c1c51eb7a513a85bdbab0fe5a Mon Sep 17 00:00:00 2001
+From 0887facc4ca5bcb0280b025b35bbc18528e52914 Mon Sep 17 00:00:00 2001
 From: Reiner Herrmann <reiner@reiner-h.de>
 Date: Tue, 10 Oct 2017 15:06:13 -0300
 Subject: [PATCH] lib/mkmf.rb: sort list of object files in generated Makefile
@@ -17,10 +17,10 @@ Signed-off-by: Reiner Herrmann <reiner@reiner-h.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/mkmf.rb b/lib/mkmf.rb
-index 6da7dde..3af30a9 100644
+index 768a152..f16cdd8 100644
 --- a/lib/mkmf.rb
 +++ b/lib/mkmf.rb
-@@ -2368,7 +2368,7 @@ LOCAL_LIBS = #{$LOCAL_LIBS}
+@@ -2480,7 +2480,7 @@ LOCAL_LIBS = #{$LOCAL_LIBS}
  LIBS = #{$LIBRUBYARG} #{$libs} #{$LIBS}
  ORIG_SRCS = #{orig_srcs.collect(&File.method(:basename)).join(' ')}
  SRCS = $(ORIG_SRCS) #{(srcs - orig_srcs).collect(&File.method(:basename)).join(' ')}

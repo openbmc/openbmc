@@ -1,4 +1,4 @@
-From c06d8a8990c996cbb854508a944202ba70ba7a7c Mon Sep 17 00:00:00 2001
+From 145a0f3919f6884c377a9e6b8a03de707feb45fe Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 3 Mar 2022 20:10:04 -0800
 Subject: [PATCH] cmake: Do not export CC into gir compiler
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/cmake/modules/GObjectIntrospectionMacros.cmake b/cmake/modules/GObjectIntrospectionMacros.cmake
-index 83aff931..d7d3f898 100644
+index 83aff93..d7d3f89 100644
 --- a/cmake/modules/GObjectIntrospectionMacros.cmake
 +++ b/cmake/modules/GObjectIntrospectionMacros.cmake
 @@ -50,8 +50,7 @@ macro(gir_add_introspections introspections_girs)
@@ -28,6 +28,3 @@ index 83aff931..d7d3f898 100644
                ${GObjectIntrospection_SCANNER_ARGS}
                --namespace=${_gir_namespace}
                --nsversion=${_gir_version}
--- 
-2.35.1
-

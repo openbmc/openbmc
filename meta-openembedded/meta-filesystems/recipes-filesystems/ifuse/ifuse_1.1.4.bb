@@ -1,7 +1,7 @@
 SUMMARY = "A fuse filesystem to access the contents of an iPhone or iPod Touch"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6ab17b41640564434dda85c06b7124f7"
-HOMEPAGE ="http://www.libimobiledevice.org/"
+HOMEPAGE = "http://www.libimobiledevice.org/"
 
 DEPENDS = "fuse libimobiledevice"
 

@@ -10,10 +10,10 @@ SRC_URI[sha256sum] = "8e1c8e72d0845ad2b32a47ab11a719bc2e41165ec101fd4d3fe9e92aa3
 
 inherit pypi
 
-PYPI_PACKAGE="rarfile"
+PYPI_PACKAGE = "rarfile"
 
 RDEPENDS:${PN} += "\
-    p7zip \
+    7zip \
     python3-core \
     python3-datetime \
     python3-crypt \

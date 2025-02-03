@@ -19,6 +19,7 @@ SRC_URI = "git://github.com/COVESA/${BPN}.git;protocol=https;branch=master \
            file://0004-Modify-systemd-config-directory.patch \
            file://544.patch \
            file://567.patch \
+           file://0001-CMakeLists-txt-make-DLT_WatchdogSec-can-be-set-by-user.patch \
            "
 SRCREV = "0f2d4cfffada6f8448a2cb27995b38eb4271044f"
 

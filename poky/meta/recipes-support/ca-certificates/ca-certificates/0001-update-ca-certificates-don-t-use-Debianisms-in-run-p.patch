@@ -1,3 +1,8 @@
+From 348163df412e53b1b7ec3e81ae5f22caa0227c37 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Mon, 6 Jul 2015 15:19:41 +0100
+Subject: [PATCH] ca-certificates: remove Debianism in run-parts invocation
+
 ca-certificates is a package from Debian, but some host distros such as Fedora
 have a leaner run-parts provided by cron which doesn't support --verbose or the
  -- separator between arguments and paths.
@@ -9,7 +14,6 @@ This solves errors such as
 | [...]/usr/sbin/update-ca-certificates: line 230: Not a directory: --: command not found
 | E: Not a directory: -- exited with code 127.
 
-
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 Signed-off-by: Maciej Borzecki <maciej.borzecki@rndity.com>
@@ -17,10 +21,10 @@ Signed-off-by: Maciej Borzecki <maciej.borzecki@rndity.com>
  sbin/update-ca-certificates | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 
-Index: git/sbin/update-ca-certificates
-===================================================================
---- git.orig/sbin/update-ca-certificates
-+++ git/sbin/update-ca-certificates
+diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
+index 36cdd9a..2d3e1fe 100755
+--- a/sbin/update-ca-certificates
++++ b/sbin/update-ca-certificates
 @@ -202,9 +202,7 @@ if [ -d "$HOOKSDIR" ]
  then
  

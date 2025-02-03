@@ -4,9 +4,9 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f09eb47206614a4954c51db8a94840fa"
 
 PYPI_PACKAGE = "Django"
-inherit pypi
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
-UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)/"
+inherit pypi
 
 FILES:${PN} += "${datadir}/django"
 

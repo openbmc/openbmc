@@ -1,0 +1,44 @@
+From 54b6e10aea2b0fb52782c3a71f06654a89b46bff Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 25 Feb 2019 15:00:06 +0800
+Subject: [PATCH 06/26] add missing FTW_ macros for musl
+
+This is to avoid build failures like below for musl.
+
+  locale-util.c:296:24: error: 'FTW_STOP' undeclared
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/missing_type.h    | 4 ++++
+ src/test/test-recurse-dir.c | 1 +
+ 2 files changed, 5 insertions(+)
+
+diff --git a/src/basic/missing_type.h b/src/basic/missing_type.h
+index fc33b76ec1..34a36d83f0 100644
+--- a/src/basic/missing_type.h
++++ b/src/basic/missing_type.h
+@@ -14,3 +14,7 @@
+ #ifndef __GLIBC__
+ typedef int (*comparison_fn_t)(const void *, const void *);
+ #endif
++
++#ifndef FTW_CONTINUE
++#define FTW_CONTINUE 0
++#endif
+diff --git a/src/test/test-recurse-dir.c b/src/test/test-recurse-dir.c
+index 8684d064ec..70fc2b5376 100644
+--- a/src/test/test-recurse-dir.c
++++ b/src/test/test-recurse-dir.c
+@@ -8,6 +8,7 @@
+ #include "recurse-dir.h"
+ #include "strv.h"
+ #include "tests.h"
++#include "missing_type.h"
+ 
+ static char **list_nftw = NULL;
+ 
+-- 
+2.34.1
+

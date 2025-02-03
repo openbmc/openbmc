@@ -32,6 +32,16 @@ bbnote() {
 	fi
 }
 
+# Notify the user of a noteworthy condition.
+# Output: logs console
+bbverbnote() {
+        if [ -p ${LOGFIFO} ]; then
+                printf "%b\0" "bbverbnote $*" > ${LOGFIFO}
+        else
+            echo "NOTE: $*"
+        fi
+}
+
 # Print a warning to the log. Warnings are non-fatal, and do not
 # indicate a build failure.
 # Output: logs console

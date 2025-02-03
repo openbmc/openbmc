@@ -70,7 +70,7 @@ python do_go_vendor() {
     if os.path.exists(vendor_dir):
         # Nothing to do except re-establish link to actual vendor folder
         if not os.path.exists(linkname):
-            os.symlink(vendor_dir, linkname)
+            oe.path.relsymlink(vendor_dir, linkname)
         return
 
     bb.utils.mkdirhier(vendor_dir)
@@ -201,11 +201,15 @@ python do_go_vendor() {
     for vendored_name, replaced_path in replaced_paths.items():
         symlink_target = os.path.join(source_dir, *['src', go_import, replaced_path])
         symlink_name = os.path.join(vendor_dir, vendored_name)
+        relative_symlink_target = os.path.relpath(symlink_target, os.path.dirname(symlink_name))
         bb.debug(1, "vendored name %s, symlink name %s" % (vendored_name, symlink_name))
-        os.symlink(symlink_target, symlink_name)
+
+        os.makedirs(os.path.dirname(symlink_name), exist_ok=True)
+        os.symlink(relative_symlink_target, symlink_name)
 
     # Create a symlink to the actual directory
-    os.symlink(vendor_dir, linkname)
+    relative_vendor_dir = os.path.relpath(vendor_dir, os.path.dirname(linkname))
+    os.symlink(relative_vendor_dir, linkname)
 }
 
 addtask go_vendor before do_patch after do_unpack

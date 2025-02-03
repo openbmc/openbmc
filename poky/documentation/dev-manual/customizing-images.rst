@@ -62,8 +62,7 @@ To understand how these features work, the best reference is
 :ref:`meta/classes-recipe/image.bbclass <ref-classes-image>`.
 This class lists out the available
 :term:`IMAGE_FEATURES` of which most map to package groups while some, such
-as ``debug-tweaks`` and ``read-only-rootfs``, resolve as general
-configuration settings.
+as ``read-only-rootfs``, resolve as general configuration settings.
 
 In summary, the file looks at the contents of the :term:`IMAGE_FEATURES`
 variable and then maps or configures the feature accordingly. Based on

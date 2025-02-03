@@ -1,0 +1,57 @@
+From 2d6beb620896a59cfd685b51a19057e5c5c4ab41 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 19 Dec 2024 11:54:54 +0800
+Subject: [PATCH] Set RPM_PLUGINDIR in top level CMakeLists.txt
+
+We have in macros.in:
+  %__plugindir          @RPM_PLUGINDIR@
+
+This means, if RPM_PLUGINDIR is not set, %__plugindir will be empty.
+This in turn results in error message when running 'dnf'.
+
+e.g.,
+dnf --help >/dev/null
+error: /usr/lib64/rpm/macros: line 1183: Macro %__plugindir has empty body
+error: /usr/lib64/rpm/macros: line 1183: Macro %__plugindir has empty body
+
+So we should move this directory setting into the top level CMakeLists.txt.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm/pull/3496]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ CMakeLists.txt         | 3 +++
+ plugins/CMakeLists.txt | 3 ---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 758ba73f4..e694b9650 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -453,6 +453,9 @@ if (ENABLE_PYTHON)
+ 	add_subdirectory(python)
+ endif()
+ 
++set(RPM_PLUGINDIR ${CMAKE_INSTALL_FULL_LIBDIR}/rpm-plugins
++       CACHE PATH "rpm plugin directory")
++
+ if (ENABLE_PLUGINS)
+ 	add_subdirectory(plugins)
+ endif()
+diff --git a/plugins/CMakeLists.txt b/plugins/CMakeLists.txt
+index a44056fe3..6e61a7c20 100644
+--- a/plugins/CMakeLists.txt
++++ b/plugins/CMakeLists.txt
+@@ -42,9 +42,6 @@ if (HAVE_UNSHARE)
+ 	add_library(unshare MODULE unshare.c)
+ endif()
+ 
+-set(RPM_PLUGINDIR ${CMAKE_INSTALL_FULL_LIBDIR}/rpm-plugins
+-	CACHE PATH "rpm plugin directory")
+-
+ get_property(plugins DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+ foreach(plugin ${plugins})
+ 	target_link_libraries(${plugin} PRIVATE librpmio librpm ${Intl_LIBRARIES})
+-- 
+2.25.1
+

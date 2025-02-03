@@ -2,7 +2,7 @@
 
 # clock.test needs a timezone to be set
 export TZ="Europe/London"
-export TCL_LIBRARY=library
+export TCL_LIBRARY=@libdir@/tcl8/ptest/library
 export ERROR_ON_FAILURES=1
 
 # Some tests are overly strict with timings and fail on loaded systems.

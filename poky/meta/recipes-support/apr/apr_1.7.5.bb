@@ -135,4 +135,4 @@ do_install_ptest() {
 	cp ${S}/test/tryread $t/
 }
 
-export CONFIG_SHELL="/bin/bash"
+export CONFIG_SHELL = "/bin/bash"

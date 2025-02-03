@@ -1,4 +1,4 @@
-From 0a3222338efc108c831fbdd719a47d35f4b0adcd Mon Sep 17 00:00:00 2001
+From f9f019049a9bb09471e8303d4510afae07f225c8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Aug 2021 06:49:25 +0000
 Subject: [PATCH] aio_linux: Check if syscall exists before using it
@@ -10,19 +10,17 @@ tpool/aio_linux.cc:63:20: error: '__NR_io_getevents' was not declared in this sc
       |                    ^~~~~~~~~~~~~~~~~
       |                    io_getevents
 
-Upstream-Staus: Pending
+Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
  tpool/aio_linux.cc | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/tpool/aio_linux.cc b/tpool/aio_linux.cc
-index 4abc213..da75411 100644
+index 507c6b92..a6adf1af 100644
 --- a/tpool/aio_linux.cc
 +++ b/tpool/aio_linux.cc
-@@ -58,6 +58,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 - 1301 USA*/
+@@ -59,6 +59,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 - 1301 USA*/
  */
  static int my_getevents(io_context_t ctx, long min_nr, long nr, io_event *ev)
  {
@@ -30,7 +28,7 @@ index 4abc213..da75411 100644
    int saved_errno= errno;
    int ret= syscall(__NR_io_getevents, reinterpret_cast<long>(ctx),
                     min_nr, nr, ev, 0);
-@@ -67,6 +68,9 @@ static int my_getevents(io_context_t ctx, long min_nr, long nr, io_event *ev)
+@@ -68,6 +69,9 @@ static int my_getevents(io_context_t ctx, long min_nr, long nr, io_event *ev)
      errno= saved_errno;
    }
    return ret;
@@ -40,6 +38,3 @@ index 4abc213..da75411 100644
  }
  
  
--- 
-2.29.2
-

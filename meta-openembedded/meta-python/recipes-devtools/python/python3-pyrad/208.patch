@@ -1,0 +1,51 @@
+From d17438da2008f48aa13cc95a626c990bf645799a Mon Sep 17 00:00:00 2001
+From: Luca Barbieri <lucabarb@gmail.com>
+Date: Wed, 8 Jan 2025 10:35:22 +0100
+Subject: [PATCH 1/2] Fix pyproject.toml format
+
+Fix pyproject format to correctly build with poetry-core 2.0.0
+Upstream-Status: Submitted [https://github.com/pyradius/pyrad/pull/208]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -2,16 +2,16 @@
+ requires = ["poetry-core>=1.0.0"]
+ build-backend = "poetry.core.masonry.api"
+ 
+-[tool.poetry]
++[project]
+ name = "pyrad"
+ version= "2.4"
+ readme = "README.rst"
+ license = "BSD-3-Clause"
+ description="RADIUS tools"
+ authors = [
+-  "Istvan Ruzman <istvan@ruzman.eu>",
+-  "Christian Giese <developer@gicnet.de>",
+-]
++  { name = "Istvan Ruzman", email = "istvan@ruzman.eu" },
++  { name = "Christian Giese", email = "developer@gicnet.de" },
++ ]
+ keywords = ["AAA", "accounting", "authentication", "authorization", "RADIUS"]
+ classifiers = [
+     "Development Status :: 6 - Mature",
+@@ -28,7 +28,7 @@ include = [
+   "example/*"
+ ]
+ 
+-[tool.poetry.urls]
++[project.urls]
+ repository = "https://github.com/pyradius/pyrad"
+ 
+ [tool.poetry.dependencies]
+@@ -36,5 +36,5 @@ python = "^2.7 || ^3.6"
+ six = "^1.15.0"
+ netaddr = "^0.8"
+ 
+-[tool.poetry.dev-dependencies]
++[tool.poetry.group.dev.dependencies]
+ nose = "^0.10.0b1"

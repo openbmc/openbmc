@@ -64,7 +64,7 @@ DEPENDS += "\
     os-release \
     systemd-boot \
     systemd-boot-native \
-    virtual/${TARGET_PREFIX}binutils \
+    virtual/cross-binutils \
     virtual/kernel \
 "
 

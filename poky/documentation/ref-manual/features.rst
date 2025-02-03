@@ -207,7 +207,7 @@ metadata, as extra layers can define their own:
 
 -  *ptest:* Enables building the package tests where supported by
    individual recipes. For more information on package tests, see the
-   ":ref:`dev-manual/packages:testing packages with ptest`" section
+   ":ref:`test-manual/ptest:testing packages with ptest`" section
    in the Yocto Project Development Tasks Manual.
 
 -  *pulseaudio:* Include support for
@@ -285,31 +285,24 @@ The image features available for all images are:
 -  *dbg-pkgs:* Installs debug symbol packages for all packages installed
    in a given image.
 
--  *debug-tweaks:* Makes an image suitable for development (e.g. allows
-   root logins, logins without passwords ---including root ones, and enables
-   post-installation logging). See the ``allow-empty-password``,
-   ``allow-root-login``, ``empty-root-password``, and ``post-install-logging``
-   features in this list for additional information.
-
 -  *dev-pkgs:* Installs development packages (headers and extra library
    links) for all packages installed in a given image.
 
 -  *doc-pkgs:* Installs documentation packages for all packages
    installed in a given image.
 
--  *empty-root-password:* This feature or ``debug-tweaks`` is required if
-   you want to allow root login with an empty password. If these features
-   are not present in :term:`IMAGE_FEATURES`, a non-empty password is
-   forced in ``/etc/passwd`` and ``/etc/shadow`` if such files exist.
+-  *empty-root-password:* This feature can be used if you want to allow root
+   login with an empty password. If this feature is not present in
+   :term:`IMAGE_FEATURES`, a non-empty password is forced in ``/etc/passwd`` and
+   ``/etc/shadow`` if such files exist.
 
    .. note::
        ``empty-root-password`` doesn't set an empty root password by itself.
        You get an initial empty root password thanks to the
        :oe_git:`base-passwd </openembedded-core/tree/meta/recipes-core/base-passwd/>`
        and :oe_git:`shadow </openembedded-core/tree/meta/recipes-extended/shadow/>`
-       recipes, and the presence of ``empty-root-password`` or ``debug-tweaks``
-       just disables the mechanism which forces an non-empty password for the
-       root user.
+       recipes, and the presence of ``empty-root-password`` just disables the
+       mechanism which forces an non-empty password for the root user.
 
 -  *lic-pkgs:* Installs license packages for all packages installed in a
    given image.

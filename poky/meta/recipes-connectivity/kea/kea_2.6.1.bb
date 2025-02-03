@@ -19,6 +19,7 @@ SRC_URI = "http://ftp.isc.org/isc/kea/${PV}/${BP}.tar.gz \
            file://0001-src-lib-log-logger_unittest_support.cc-do-not-write-.patch \
            file://0001-Replace-Name-NameString-with-vector-of-uint8_t.patch \
            file://0002-Fix-unittests-Typo-in-Name-Name-append-to-ndata_-not.patch \
+           file://0001-Update-asiolink-for-boost-1.87.patch \
            "
 SRC_URI[sha256sum] = "d2ce14a91c2e248ad2876e29152d647bcc5e433bc68dafad0ee96ec166fcfad1"
 

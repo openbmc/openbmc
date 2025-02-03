@@ -169,6 +169,7 @@ def _get_uri(rd):
 
 def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, keep_temp, tinfoil, rd):
     """Extract sources of a recipe with a new version"""
+    import oe.patch
 
     def __run(cmd):
         """Simple wrapper which calls _run with srctree as cwd"""

@@ -25,7 +25,7 @@ index 11f363d62..c12d66016 100644
      // Just in case `yes` doesn't check for EPIPE...
      thread::spawn(|| {
 -        thread::sleep_ms(5000);
-+        thread::sleep_ms(10000);
++        thread::sleep_ms(50000);
          process::exit(1);
      });
      let output = process::Command::new("sh")

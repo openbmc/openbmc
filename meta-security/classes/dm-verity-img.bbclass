@@ -46,6 +46,9 @@ DM_VERITY_IMAGE_HASH_BLOCK_SIZE ?= "4096"
 # Should we store the hash data on a separate device/partition?
 DM_VERITY_SEPARATE_HASH ?= "0"
 
+# Additional arguments for veritysetup
+DM_VERITY_SETUP_ARGS ?= ""
+
 # These are arch specific.  We could probably intelligently auto-assign these?
 # Take x86-64 values as defaults. No impact on functionality currently.
 # See SD_GPT_ROOT_X86_64 and SD_GPT_ROOT_X86_64_VERITY in the spec.
@@ -60,8 +63,8 @@ DEPENDS += "bc-native"
 # convert it to some better format. Let's drop the first line (doesn't contain
 # any useful info) and feed the rest to a script.
 process_verity() {
-    local ENV="${STAGING_VERITY_DIR}/${IMAGE_BASENAME}.$TYPE.verity.env"
-    local WKS_INC="${STAGING_VERITY_DIR}/${IMAGE_BASENAME}.$TYPE.wks.in"
+    local ENV="${STAGING_VERITY_DIR}/${DM_VERITY_IMAGE}.$TYPE.verity.env"
+    local WKS_INC="${STAGING_VERITY_DIR}/${DM_VERITY_IMAGE}.$TYPE.wks.in"
     rm -f $ENV
 
     # Each line contains a key and a value string delimited by ':'. Read the
@@ -146,6 +149,7 @@ verity_setup() {
     cp -a $INPUT $OUTPUT
 
     SETUP_ARGS=" \
+        ${DM_VERITY_SETUP_ARGS} \
         --data-block-size=${DM_VERITY_IMAGE_DATA_BLOCK_SIZE} \
         --hash-block-size=${DM_VERITY_IMAGE_HASH_BLOCK_SIZE} \
         $HASH_OFFSET format $OUTPUT $OUTPUT_HASH \

@@ -4,7 +4,7 @@
 require musl.inc
 inherit linuxloader
 
-SRCREV = "047a16398b29d2702a41a0d6d15370d54b9d723c"
+SRCREV = "61399d4bd02ae1ec03068445aa7ffe9174466bfd"
 
 BASEVER = "1.2.5"
 
@@ -20,8 +20,8 @@ S = "${WORKDIR}/git"
 
 PROVIDES += "virtual/libc virtual/libiconv virtual/libintl virtual/crypt"
 
-DEPENDS = "virtual/${TARGET_PREFIX}binutils \
-           virtual/${TARGET_PREFIX}gcc \
+DEPENDS = "virtual/cross-binutils \
+           virtual/cross-cc \
            libgcc-initial \
            linux-libc-headers \
            bsd-headers \
@@ -30,7 +30,7 @@ DEPENDS = "virtual/${TARGET_PREFIX}binutils \
 GLIBC_LDSO = "${@get_glibc_loader(d)}"
 MUSL_LDSO_ARCH = "${@get_musl_loader_arch(d)}"
 
-export CROSS_COMPILE="${TARGET_PREFIX}"
+export CROSS_COMPILE = "${TARGET_PREFIX}"
 
 LDFLAGS += "-Wl,-soname,libc.so"
 

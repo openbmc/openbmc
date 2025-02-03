@@ -9,7 +9,7 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "add82567c50c8bc648c14195bf544a5ce7c1f76761536956c3d2978970179ef3"
 
 PYPI_PACKAGE = "Keras_Preprocessing"
-PYPI_SRC_URI = "https://files.pythonhosted.org/packages/5e/f1/b44337faca48874333769a29398fe4666686733c8880aa160b9fd5dfe600/Keras_Preprocessing-${PV}.tar.gz"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 BBCLASSEXTEND = "native"
 

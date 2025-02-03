@@ -9,6 +9,6 @@ PACKAGES = "packagegroup-security-vtpm"
 
 SUMMARY:packagegroup-security-vtpm = "Security Software vTPM support"
 RDEPENDS:packagegroup-security-vtpm = " \
-    libtpm \
+    libtpms \
     swtpm \
     "		

@@ -129,3 +129,5 @@ pkg_postrm:${PN} () {
 }
 
 CONFFILES:${PN} = "${sysconfdir}/default/dropbear"
+
+FILES:${PN} += "${systemd_system_unitdir}/dropbearkey.service"

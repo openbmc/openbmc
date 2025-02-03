@@ -13,41 +13,32 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for xfce4-panel 4.18.3.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for xfce4-panel 4.20.0.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
- plugins/actions/actions.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ plugins/actions/actions.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/plugins/actions/actions.c b/plugins/actions/actions.c
-index e1f1fa7..440f430 100644
+index 5e58078..b16d38e 100644
 --- a/plugins/actions/actions.c
 +++ b/plugins/actions/actions.c
-@@ -977,12 +977,12 @@ actions_plugin_actions_allowed (void)
-   GError          *error = NULL;
+@@ -1054,11 +1054,11 @@ actions_plugin_actions_allowed (ActionsPlugin *plugin)
+       g_free (path);
+     }
  
-   /* check for commands we use */
 -  path = g_find_program_in_path ("dm-tool");
 +  path = g_find_program_in_path ("lxdm");
    if (path != NULL)
-     PANEL_SET_FLAG (allow_mask, ACTION_TYPE_SWITCH_USER);
+     {
+       PANEL_SET_FLAG (allow_mask, ACTION_TYPE_SWITCH_USER);
+-      plugin->switch_user_cmd = "dm-tool switch-to-greeter";
++      plugin->switch_user_cmd = "lxdm -c USER_SWITCH";
+     }
    else
-   {
--    /* check for gdmflexiserver if dm-tool is not present */
-+    /* check for gdmflexiserver if lxdm is not present */
-     g_free (path);
-     path = g_find_program_in_path ("gdmflexiserver");
-     if (path != NULL)
-@@ -1099,9 +1099,9 @@ actions_plugin_action_activate (GtkWidget      *widget,
-       break;
- 
-     case ACTION_TYPE_SWITCH_USER:
--      path = g_find_program_in_path ("dm-tool");
-+      path = g_find_program_in_path ("lxdm");
-       if (path != NULL)
--        succeed = g_spawn_command_line_async ("dm-tool switch-to-greeter", &error);
-+        succeed = g_spawn_command_line_async ("lxdm -c USER_SWITCH", &error);
-       else
-         succeed = g_spawn_command_line_async ("gdmflexiserver", &error);
-       g_free (path);
+     {
 -- 
 2.8.1
-

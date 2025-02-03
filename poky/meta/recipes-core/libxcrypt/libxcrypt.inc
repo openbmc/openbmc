@@ -9,12 +9,11 @@ LIC_FILES_CHKSUM = "file://LICENSING;md5=c0a30e2b1502c55a7f37e412cd6c6a4b \
 
 inherit autotools pkgconfig
 
-SRC_URI = "git://github.com/besser82/libxcrypt.git;branch=${SRCBRANCH};protocol=https"
-SRCREV = "f531a36aa916a22ef2ce7d270ba381e264250cbf"
+SRC_URI = "git://github.com/besser82/libxcrypt.git;branch=${SRCBRANCH};protocol=https \
+           file://fix_cflags_handling.patch \
+           "
+SRCREV = "e5714d1f0a477f91ce3986fa63651c7710f0e183"
 SRCBRANCH ?= "master"
-
-SRC_URI += "file://fix_cflags_handling.patch \
-            file://configure-c99.patch"
 
 PROVIDES = "virtual/crypt"
 

@@ -12,7 +12,7 @@ ${SAMBA_MIRROR}    http://mirror.internode.on.net/pub/samba \n \
 ${SAMBA_MIRROR}    http://www.mirrorservice.org/sites/ftp.samba.org \n \
 "
 
-export PYTHONHASHSEED="1"
+export PYTHONHASHSEED = "1"
 
 SRC_URI = "${SAMBA_MIRROR}/stable/samba-${PV}.tar.gz \
            file://smb.conf \
@@ -69,7 +69,7 @@ SYSTEMD_AUTO_ENABLE:${PN}-ad-dc = "disable"
 
 #cross_compile cannot use preforked process, since fork process earlier than point subproces.popen
 #to cross Popen
-export WAF_NO_PREFORK="yes"
+export WAF_NO_PREFORK = "yes"
 
 # Use krb5. Build active domain controller.
 #
@@ -95,16 +95,16 @@ PACKAGECONFIG[libbsd] = "--with-libbsd,--without-libbsd,libbsd"
 PACKAGECONFIG[ad-dc] = "--with-experimental-mit-ad-dc,--without-ad-dc,python3-markdown python3-dnspython,"
 PACKAGECONFIG[mitkrb5] = "--with-system-mitkrb5 --with-system-mitkdc=/usr/sbin/krb5kdc,,krb5,"
 
-SAMBA4_IDMAP_MODULES="idmap_ad,idmap_rid,idmap_adex,idmap_hash,idmap_tdb2"
-SAMBA4_PDB_MODULES="pdb_tdbsam,${@bb.utils.contains('PACKAGECONFIG', 'ldap', 'pdb_ldap,', '', d)}pdb_ads,pdb_smbpasswd,pdb_wbc_sam,pdb_samba4"
-SAMBA4_AUTH_MODULES="auth_unix,auth_wbc,auth_server,auth_netlogond,auth_script,auth_samba4"
-SAMBA4_MODULES="${SAMBA4_IDMAP_MODULES},${SAMBA4_PDB_MODULES},${SAMBA4_AUTH_MODULES}"
+SAMBA4_IDMAP_MODULES = "idmap_ad,idmap_rid,idmap_adex,idmap_hash,idmap_tdb2"
+SAMBA4_PDB_MODULES = "pdb_tdbsam,${@bb.utils.contains('PACKAGECONFIG', 'ldap', 'pdb_ldap,', '', d)}pdb_ads,pdb_smbpasswd,pdb_wbc_sam,pdb_samba4"
+SAMBA4_AUTH_MODULES = "auth_unix,auth_wbc,auth_server,auth_netlogond,auth_script,auth_samba4"
+SAMBA4_MODULES = "${SAMBA4_IDMAP_MODULES},${SAMBA4_PDB_MODULES},${SAMBA4_AUTH_MODULES}"
 
 # These libraries are supposed to replace others supplied by packages, but decorate the names of
 # .so files so there will not be a conflict.  This is not done consistantly, so be very careful
 # when adding to this list.
 #
-SAMBA4_LIBS="heimdal,NONE"
+SAMBA4_LIBS = "heimdal,NONE"
 
 EXTRA_OECONF += "--enable-fhs \
                  --with-piddir=/run \

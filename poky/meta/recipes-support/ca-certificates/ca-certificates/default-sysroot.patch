@@ -1,13 +1,21 @@
+From 50aadd3eb1c4be43d3decdeb60cede2de5a687be Mon Sep 17 00:00:00 2001
+From: Christopher Larson <chris_larson@mentor.com>
+Date: Fri, 23 Aug 2013 12:26:14 -0700
+Subject: [PATCH] ca-certificates: add recipe (version 20130610)
+
 Upstream-Status: Pending
 
 update-ca-certificates: find SYSROOT relative to its own location
 
 This makes the script relocatable.
+---
+ sbin/update-ca-certificates | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-Index: git/sbin/update-ca-certificates
-===================================================================
---- git.orig/sbin/update-ca-certificates
-+++ git/sbin/update-ca-certificates
+diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
+index 2d3e1fe..f7d0dbf 100755
+--- a/sbin/update-ca-certificates
++++ b/sbin/update-ca-certificates
 @@ -66,6 +66,39 @@ do
    shift
  done

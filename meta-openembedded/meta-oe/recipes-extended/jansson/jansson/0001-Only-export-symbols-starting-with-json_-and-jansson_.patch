@@ -1,0 +1,30 @@
+From e5c38614fb7e0bdbcaec6db6133fa62cfed62818 Mon Sep 17 00:00:00 2001
+From: Jaeyoon Jung <jaeyoon.jung@lge.com>
+Date: Wed, 15 Jan 2025 22:11:54 +0900
+Subject: [PATCH] Only export symbols starting with "json_" and "jansson_" for
+ cmake
+
+It's already done by the commit 7c707a7 and bcb6b6f, but not for cmake.
+This makes symbols in the same visibility as built with libtool.
+
+Upstream-Status: Submitted [https://github.com/akheron/jansson/pull/704]
+Signed-off-by: Jaeyoon Jung <jaeyoon.jung@lge.com>
+---
+
+ CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3394236..52b9934 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -325,6 +325,9 @@ if(JANSSON_BUILD_SHARED_LIBS)
+ # some linkers may only support --version-script
+       file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/jansson.sym" "JANSSON_${JANSSON_SOVERSION} {
+     global:
++          json_*;
++          jansson_*;
++    local:
+           *;
+ };
+ ")

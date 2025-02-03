@@ -8,12 +8,9 @@ DEPENDS += "flex-native bison-native"
 PACKAGECONFIG[docs] = ",,xmlto-native,"
 
 PV = "1.3.0+git"
-# v1.3.0
-SRCREV = "ba463d3c26c0ece2e797b8d6381b161633b5971a"
+# v1.3.0-87
+SRCREV = "121ab150b3577b666c79a79f4a511798d7ad2432"
 SRC_URI = "git://github.com/yasm/yasm.git;branch=master;protocol=https \
-           file://0001-Do-not-use-AC_HEADER_STDC.patch \
-           file://CVE-2023-31975.patch \
-           file://CVE-2023-37732.patch \
            file://0001-yasm-Set-build-date-to-SOURCE_DATE_EPOCH.patch \
            file://0002-yasm-Use-BUILD_DATE-for-reproducibility.patch \
 "
@@ -33,3 +30,6 @@ do_configure:prepend() {
      sed -i -e "s/^echo \"\/\* generated \$ac_cv_stdint_message \*\/\" >>\$ac_stdint$"// ${S}/m4/ax_create_stdint_h.m4
 }
 
+CVE_STATUS_GROUPS += "CVE_STATUS_HASH_UPDATE"
+CVE_STATUS_HASH_UPDATE = "CVE-2021-33454 CVE-2023-31975 CVE-2023-37732"
+CVE_STATUS_HASH_UPDATE[status] = "fixed-version: patched in current git hash"

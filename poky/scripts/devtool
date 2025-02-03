@@ -7,19 +7,17 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import dataclasses
 import sys
 import os
 import argparse
 import glob
 import re
 import configparser
-import subprocess
 import logging
 
-basepath = ''
-workspace = {}
-config = None
-context = None
+# This can be removed once our minimum is Python 3.9: https://docs.python.org/3/whatsnew/3.9.html#type-hinting-generics-in-standard-collections
+from typing import List
 
 
 scripts_path = os.path.dirname(os.path.realpath(__file__))
@@ -30,16 +28,16 @@ import scriptutils
 import argparse_oe
 logger = scriptutils.logger_create('devtool')
 
-plugins = []
 
-
-class ConfigHandler(object):
+class ConfigHandler:
+    basepath = None
     config_file = ''
     config_obj = None
     init_path = ''
     workspace_path = ''
 
-    def __init__(self, filename):
+    def __init__(self, basepath, filename):
+        self.basepath = basepath
         self.config_file = filename
         self.config_obj = configparser.ConfigParser()
 
@@ -47,7 +45,7 @@ class ConfigHandler(object):
         try:
             ret = self.config_obj.get(section, option)
         except (configparser.NoOptionError, configparser.NoSectionError):
-            if default != None:
+            if default is not None:
                 ret = default
             else:
                 raise
@@ -59,14 +57,14 @@ class ConfigHandler(object):
 
             if self.config_obj.has_option('General', 'init_path'):
                 pth = self.get('General', 'init_path')
-                self.init_path = os.path.join(basepath, pth)
+                self.init_path = os.path.join(self.basepath, pth)
                 if not os.path.exists(self.init_path):
                     logger.error('init_path %s specified in config file cannot be found' % pth)
                     return False
         else:
             self.config_obj.add_section('General')
 
-        self.workspace_path = self.get('General', 'workspace_path', os.path.join(basepath, 'workspace'))
+        self.workspace_path = self.get('General', 'workspace_path', os.path.join(self.basepath, 'workspace'))
         return True
 
 
@@ -81,27 +79,29 @@ class ConfigHandler(object):
             self.config_obj.add_section(section)
         self.config_obj.set(section, option, value)
 
+
+@dataclasses.dataclass
 class Context:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+    fixed_setup: bool
+    config: ConfigHandler
+    pluginpaths: List[str]
 
 
-def read_workspace():
-    global workspace
+def read_workspace(basepath, context):
     workspace = {}
-    if not os.path.exists(os.path.join(config.workspace_path, 'conf', 'layer.conf')):
+    if not os.path.exists(os.path.join(context.config.workspace_path, 'conf', 'layer.conf')):
         if context.fixed_setup:
             logger.error("workspace layer not set up")
             sys.exit(1)
         else:
-            logger.info('Creating workspace layer in %s' % config.workspace_path)
-            _create_workspace(config.workspace_path, config, basepath)
+            logger.info('Creating workspace layer in %s' % context.config.workspace_path)
+            _create_workspace(context.config.workspace_path, basepath)
     if not context.fixed_setup:
-        _enable_workspace_layer(config.workspace_path, config, basepath)
+        _enable_workspace_layer(context.config.workspace_path, context.config, basepath)
 
-    logger.debug('Reading workspace in %s' % config.workspace_path)
+    logger.debug('Reading workspace in %s' % context.config.workspace_path)
     externalsrc_re = re.compile(r'^EXTERNALSRC(:pn-([^ =]+))? *= *"([^"]*)"$')
-    for fn in glob.glob(os.path.join(config.workspace_path, 'appends', '*.bbappend')):
+    for fn in glob.glob(os.path.join(context.config.workspace_path, 'appends', '*.bbappend')):
         with open(fn, 'r') as f:
             pnvalues = {}
             pn = None
@@ -112,7 +112,7 @@ def read_workspace():
                     pn = res.group(2) or recipepn
                     # Find the recipe file within the workspace, if any
                     bbfile = os.path.basename(fn).replace('.bbappend', '.bb').replace('%', '*')
-                    recipefile = glob.glob(os.path.join(config.workspace_path,
+                    recipefile = glob.glob(os.path.join(context.config.workspace_path,
                                                         'recipes',
                                                         recipepn,
                                                         bbfile))
@@ -126,13 +126,15 @@ def read_workspace():
             if pnvalues:
                 if not pn:
                     raise DevtoolError("Found *.bbappend in %s, but could not determine EXTERNALSRC:pn-*. "
-                            "Maybe still using old syntax?" % config.workspace_path)
+                            "Maybe still using old syntax?" % context.config.workspace_path)
                 if not pnvalues.get('srctreebase', None):
                     pnvalues['srctreebase'] = pnvalues['srctree']
                 logger.debug('Found recipe %s' % pnvalues)
                 workspace[pn] = pnvalues
 
-def create_workspace(args, config, basepath, workspace):
+    return workspace
+
+def create_workspace(args, config, basepath, _workspace):
     if args.layerpath:
         workspacedir = os.path.abspath(args.layerpath)
     else:
@@ -140,12 +142,12 @@ def create_workspace(args, config, basepath, workspace):
     layerseries = None
     if args.layerseries:
         layerseries = args.layerseries
-    _create_workspace(workspacedir, config, basepath, layerseries)
+    _create_workspace(workspacedir, basepath, layerseries)
     if not args.create_only:
         _enable_workspace_layer(workspacedir, config, basepath)
 
-def _create_workspace(workspacedir, config, basepath, layerseries=None):
-    import bb
+def _create_workspace(workspacedir, basepath, layerseries=None):
+    import bb.utils
 
     confdir = os.path.join(workspacedir, 'conf')
     if os.path.exists(os.path.join(confdir, 'layer.conf')):
@@ -190,7 +192,7 @@ def _create_workspace(workspacedir, config, basepath, layerseries=None):
 
 def _enable_workspace_layer(workspacedir, config, basepath):
     """Ensure the workspace layer is in bblayers.conf"""
-    import bb
+    import bb.utils
     bblayers_conf = os.path.join(basepath, 'conf', 'bblayers.conf')
     if not os.path.exists(bblayers_conf):
         logger.error('Unable to find bblayers.conf')
@@ -209,14 +211,8 @@ def _enable_workspace_layer(workspacedir, config, basepath):
 
 
 def main():
-    global basepath
-    global config
-    global context
-
     if sys.getfilesystemencoding() != "utf-8":
         sys.exit("Please use a locale setting which supports utf-8.\nPython can't change the filesystem locale after loading so we need a utf-8 when python starts or things won't work.")
-
-    context = Context(fixed_setup=False)
 
     # Default basepath
     basepath = os.path.dirname(os.path.abspath(__file__))
@@ -242,21 +238,23 @@ def main():
     elif global_args.quiet:
         logger.setLevel(logging.ERROR)
 
+    is_fixed_setup = False
+
     if global_args.basepath:
         # Override
         basepath = global_args.basepath
         if os.path.exists(os.path.join(basepath, '.devtoolbase')):
-            context.fixed_setup = True
+            is_fixed_setup = True
     else:
         pth = basepath
         while pth != '' and pth != os.sep:
             if os.path.exists(os.path.join(pth, '.devtoolbase')):
-                context.fixed_setup = True
+                is_fixed_setup = True
                 basepath = pth
                 break
             pth = os.path.dirname(pth)
 
-        if not context.fixed_setup:
+        if not is_fixed_setup:
             basepath = os.environ.get('BUILDDIR')
             if not basepath:
                 logger.error("This script can only be run after initialising the build environment (e.g. by using oe-init-build-env)")
@@ -264,10 +262,9 @@ def main():
 
     logger.debug('Using basepath %s' % basepath)
 
-    config = ConfigHandler(os.path.join(basepath, 'conf', 'devtool.conf'))
+    config = ConfigHandler(basepath, os.path.join(basepath, 'conf', 'devtool.conf'))
     if not config.read():
         return -1
-    context.config = config
 
     bitbake_subdir = config.get('General', 'bitbake_subdir', '')
     if bitbake_subdir:
@@ -289,6 +286,7 @@ def main():
     scriptutils.logger_setup_color(logger, global_args.color)
 
     if global_args.bbpath is None:
+        import bb
         try:
             tinfoil = setup_tinfoil(config_only=True, basepath=basepath)
             try:
@@ -300,7 +298,10 @@ def main():
 
     # Search BBPATH first to allow layers to override plugins in scripts_path
     pluginpaths = [os.path.join(path, 'lib', 'devtool') for path in global_args.bbpath.split(':') + [scripts_path]]
-    context.pluginpaths = pluginpaths
+
+    context = Context(fixed_setup=is_fixed_setup, config=config, pluginpaths=pluginpaths)
+
+    plugins = []
     for pluginpath in pluginpaths:
         scriptutils.load_plugins(logger, plugins, pluginpath)
 
@@ -331,9 +332,9 @@ def main():
     args = parser.parse_args(unparsed_args, namespace=global_args)
 
     try:
+        workspace = {}
         if not getattr(args, 'no_workspace', False):
-            read_workspace()
-
+            workspace = read_workspace(basepath, context)
         ret = args.func(args, config, basepath, workspace)
     except DevtoolError as err:
         if str(err):
@@ -341,6 +342,7 @@ def main():
         ret = err.exitcode
     except argparse_oe.ArgumentUsageError as ae:
         parser.error_subcommand(ae.message, ae.subcommand)
+        ret = 2
 
     return ret
 

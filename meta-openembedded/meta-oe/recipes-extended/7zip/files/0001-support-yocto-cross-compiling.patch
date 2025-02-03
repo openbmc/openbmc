@@ -1,0 +1,53 @@
+From fd0d54f96576a8ff572bb7c7d28df6b097f99a30 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 18 Dec 2024 16:38:11 +0800
+Subject: [PATCH] support yocto cross compiling
+
+Remove -s from $LFLAGS_STRIP, do not strip binary to workaournd
+Yocto build warning
+...
+WARNING: 7zip-native-24.09-r0 do_populate_sysroot: File 'tmp/work/x86_64-linux/
+7zip-native/24.09/recipe-sysroot-native/usr/lib/7z.so' from 7zip-native was already stripped,
+this will prevent future debugging!
+...
+
+Apply CC, CXX from environments
+
+Upstream-Status: Inappropriate [Yocto specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ CPP/7zip/7zip_gcc.mak | 2 +-
+ CPP/7zip/var_gcc.mak  | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+--- a/CPP/7zip/7zip_gcc.mak
++++ b/CPP/7zip/7zip_gcc.mak
+@@ -45,7 +45,7 @@ CFLAGS_DEBUG = -g
+ else
+ CFLAGS_DEBUG = -DNDEBUG
+ ifneq ($(CC), $(CROSS_COMPILE)clang)
+-LFLAGS_STRIP = -s
++LFLAGS_STRIP =
+ endif
+ endif
+ 
+--- a/CPP/7zip/var_gcc.mak
++++ b/CPP/7zip/var_gcc.mak
+@@ -6,7 +6,5 @@ IS_ARM64=
+ CROSS_COMPILE=
+ MY_ARCH=
+ USE_ASM=
+-CC=$(CROSS_COMPILE)gcc
+-CXX=$(CROSS_COMPILE)g++
+ 
+ # -march=armv8-a+crc+crypto
+--- a/CPP/7zip/var_clang.mak
++++ b/CPP/7zip/var_clang.mak
+@@ -6,6 +6,4 @@ IS_ARM64=
+ CROSS_COMPILE=
+ MY_ARCH=
+ USE_ASM=
+-CC=$(CROSS_COMPILE)clang
+-CXX=$(CROSS_COMPILE)clang++
+ USE_CLANG=1

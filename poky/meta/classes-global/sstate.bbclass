@@ -646,6 +646,7 @@ def sstate_package(ss, d):
     d.setVar("SSTATE_CURRTASK", ss['task'])
     bb.utils.remove(sstatebuild, recurse=True)
     bb.utils.mkdirhier(sstatebuild)
+    exit = False
     for state in ss['dirs']:
         if not os.path.exists(state[1]):
             continue
@@ -664,8 +665,11 @@ def sstate_package(ss, d):
                 if not link.startswith(tmpdir):
                     continue
                 bb.error("sstate found an absolute path symlink %s pointing at %s. Please replace this with a relative link." % (srcpath, link))
+                exit = True
         bb.debug(2, "Preparing tree %s for packaging at %s" % (state[1], sstatebuild + state[0]))
         bb.utils.rename(state[1], sstatebuild + state[0])
+    if exit:
+        bb.fatal("Failing task due to absolute path symlinks")
 
     workdir = d.getVar('WORKDIR')
     sharedworkdir = os.path.join(d.getVar('TMPDIR'), "work-shared")

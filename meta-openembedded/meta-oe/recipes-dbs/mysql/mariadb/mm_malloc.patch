@@ -1,5 +1,15 @@
-Upstream-Status: Pending
+From 76e4c3e8d001eaaabd0fb34c136b81b82830c420 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Jun 2021 22:48:07 -0700
+Subject: [PATCH] mariadb: Fix build with clang/musl
 
+Upstream-Status: Pending
+---
+ storage/rocksdb/rocksdb/port/jemalloc_helper.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/storage/rocksdb/rocksdb/port/jemalloc_helper.h b/storage/rocksdb/rocksdb/port/jemalloc_helper.h
+index f6f72f8c..b9657cf3 100644
 --- a/storage/rocksdb/rocksdb/port/jemalloc_helper.h
 +++ b/storage/rocksdb/rocksdb/port/jemalloc_helper.h
 @@ -5,7 +5,7 @@

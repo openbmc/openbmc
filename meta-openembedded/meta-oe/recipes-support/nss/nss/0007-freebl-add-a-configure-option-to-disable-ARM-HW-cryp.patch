@@ -1,0 +1,60 @@
+From 781a21fa9b0d8d8d6df0de45e3c9dc3f3e74be8f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 18 Dec 2019 12:29:50 +0100
+Subject: [PATCH] freebl: add a configure option to disable ARM HW crypto
+
+Not all current hardware supports it, particularly anything
+prior to armv8 does not.
+
+Upstream-Status: Pending
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ nss/lib/freebl/Makefile | 3 +++
+ nss/lib/freebl/gcm.c    | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/nss/lib/freebl/Makefile b/nss/lib/freebl/Makefile
+index 0ebfc92..3ee7623 100644
+--- a/nss/lib/freebl/Makefile
++++ b/nss/lib/freebl/Makefile
+@@ -142,6 +142,8 @@ endif
+         endif
+     endif
+ endif
++ifdef NSS_USE_ARM_HW_CRYPTO
++    DEFINES += -DNSS_USE_ARM_HW_CRYPTO
+ ifeq ($(CPU_ARCH),aarch64)
+     ifdef CC_IS_CLANG
+         DEFINES += -DUSE_HW_AES -DUSE_HW_SHA1 -DUSE_HW_SHA2
+@@ -183,6 +185,7 @@ endif
+         endif
+     endif
+ endif
++endif
+ 
+ ifeq (,$(filter-out WINNT,$(OS_TARGET)))
+ ifndef USE_64
+diff --git a/nss/lib/freebl/gcm.c b/nss/lib/freebl/gcm.c
+index d728867..8b4de1d 100644
+--- a/nss/lib/freebl/gcm.c
++++ b/nss/lib/freebl/gcm.c
+@@ -18,6 +18,7 @@
+ 
+ #include <limits.h>
+ 
++#ifdef NSS_USE_ARM_HW_CRYPTO
+ /* old gcc doesn't support some poly64x2_t intrinsic */
+ #if defined(__aarch64__) && defined(IS_LITTLE_ENDIAN) && \
+     (defined(__clang__) || defined(__GNUC__) && __GNUC__ > 6)
+@@ -27,6 +28,7 @@
+ /* We don't test on big endian platform, so disable this on big endian. */
+ #define USE_ARM_GCM
+ #endif
++#endif
+ 
+ /* Forward declarations */
+ SECStatus gcm_HashInit_hw(gcmHashContext *ghash);
+-- 
+2.25.1
+

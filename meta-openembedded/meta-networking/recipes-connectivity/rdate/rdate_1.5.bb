@@ -5,7 +5,7 @@ DESCRIPTION = "The rdate utility retrieves the date and time from \
   time of the machine that you queried. \
 "
 
-HOMEPAGE= "https://www.aelius.com/njh/rdate/"
+HOMEPAGE = "https://www.aelius.com/njh/rdate/"
 SECTION = "Applications/System"
 
 LICENSE = "GPL-2.0-only"

@@ -1,0 +1,32 @@
+From 8ca35649c33d0d2fcdcd573ce6a9edd91c77e4da Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 7 Jan 2025 18:56:19 +0100
+Subject: [PATCH] src/libgit2/CMakeLists.txt: install cmake files into
+ configured libdir
+
+libdir can be something else than /usr/lib, e.g. /usr/lib64 or similar.
+
+Upstream-Status: Submitted [https://github.com/libgit2/libgit2/pull/7004]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/libgit2/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libgit2/CMakeLists.txt b/src/libgit2/CMakeLists.txt
+index a7d3c7ca4..16b3a23d9 100644
+--- a/src/libgit2/CMakeLists.txt
++++ b/src/libgit2/CMakeLists.txt
+@@ -119,11 +119,11 @@ configure_file(config.cmake.in
+ install(FILES
+ 	"${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake"
+ 	"${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake"
+-	DESTINATION "lib/cmake/${PROJECT_NAME}")
++	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+ install(
+ 	EXPORT ${LIBGIT2_TARGETS_EXPORT_NAME}
+ 	NAMESPACE "${PROJECT_NAME}::"
+-	DESTINATION "lib/cmake/${PROJECT_NAME}")
++	DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+ 
+ # Install
+ 

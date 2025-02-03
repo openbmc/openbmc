@@ -17,5 +17,6 @@ SRC_URI[sha256sum] = "0c561f0d29eea5b55cf29b9264a3241999ffdb74c6b6e8c4ccc0bd2c93
 inherit pypi python_poetry_core
 
 PYPI_PACKAGE = "pytest_lazy_fixtures"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 RDEPENDS:${PN} = "python3-pytest"

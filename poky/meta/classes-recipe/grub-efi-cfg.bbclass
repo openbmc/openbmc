@@ -23,6 +23,7 @@ GRUB_TIMEOUT ?= "10"
 GRUB_OPTS ?= "serial --unit=0 --speed=115200 --word=8 --parity=no --stop=1"
 
 GRUB_ROOT ?= "${ROOT}"
+GRUB_TITLE ?= ""
 APPEND ?= ""
 
 # Uses MACHINE specific KERNEL_IMAGETYPE
@@ -91,10 +92,15 @@ python build_efi_cfg() {
         if not overrides:
             bb.fatal('OVERRIDES not defined')
 
+        localdata.need_overrides()
         localdata.setVar('OVERRIDES', 'grub_' + label + ':' + overrides)
 
         for btype in btypes:
-            cfgfile.write('\nmenuentry \'%s%s\'{\n' % (label, btype[0]))
+            title = localdata.getVar('GRUB_TITLE')
+            if not title or len(title) == 0:
+                title = label
+
+            cfgfile.write('\nmenuentry \'%s%s\'{\n' % (title, btype[0]))
             lb = label
             if label == "install":
                 lb = "install-efi"

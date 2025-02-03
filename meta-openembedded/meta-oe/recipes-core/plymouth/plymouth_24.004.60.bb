@@ -11,8 +11,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 SRC_URI = " \
     http://www.freedesktop.org/software/plymouth/releases/${BPN}-${PV}.tar.xz \
     file://0001-Make-full-path-to-systemd-tty-ask-password-agent-con.patch \
-    file://0001-plymouth-start-service-in-add-related-kernel-paramet.patch \
-    file://0001-plymouth-Add-the-retain-splash-option.patch \
     file://0001-Drop-libdl-references.patch \
     file://0001-Avoid-linking-to-plymouth_logo_file.patch \
     file://0001-Make-themes-build-optional.patch \

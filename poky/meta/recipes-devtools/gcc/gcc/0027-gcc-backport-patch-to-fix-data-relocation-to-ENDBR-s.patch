@@ -1,0 +1,447 @@
+From 4e7735a8d87559bbddfe3a985786996e22241f8d Mon Sep 17 00:00:00 2001
+From: liuhongt <hongtao.liu@intel.com>
+Date: Mon, 12 Aug 2024 14:35:31 +0800
+Subject: [PATCH] Move ix86_align_loops into a separate pass and insert the
+ pass after pass_endbr_and_patchable_area.
+
+gcc/ChangeLog:
+
+	PR target/116174
+	* config/i386/i386.cc (ix86_align_loops): Move this to ..
+	* config/i386/i386-features.cc (ix86_align_loops): .. here.
+	(class pass_align_tight_loops): New class.
+	(make_pass_align_tight_loops): New function.
+	* config/i386/i386-passes.def: Insert pass_align_tight_loops
+	after pass_insert_endbr_and_patchable_area.
+	* config/i386/i386-protos.h (make_pass_align_tight_loops): New
+	declare.
+
+gcc/testsuite/ChangeLog:
+
+	* gcc.target/i386/pr116174.c: New test.
+
+(cherry picked from commit c3c83d22d212a35cb1bfb8727477819463f0dcd8)
+
+Upstream-Status: Backport [https://gcc.gnu.org/git/?p=gcc.git;a=patch;h=4e7735a8d87559bbddfe3a985786996e22241f8d]
+
+Signed-off-by: Bin Lan <bin.lan.cn@windriver.com>
+---
+ gcc/config/i386/i386-features.cc         | 191 +++++++++++++++++++++++
+ gcc/config/i386/i386-passes.def          |   3 +
+ gcc/config/i386/i386-protos.h            |   1 +
+ gcc/config/i386/i386.cc                  | 146 -----------------
+ gcc/testsuite/gcc.target/i386/pr116174.c |  12 ++
+ 5 files changed, 207 insertions(+), 146 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.target/i386/pr116174.c
+
+diff --git a/gcc/config/i386/i386-features.cc b/gcc/config/i386/i386-features.cc
+index e3e004d55267..7de19d423637 100644
+--- a/gcc/config/i386/i386-features.cc
++++ b/gcc/config/i386/i386-features.cc
+@@ -3253,6 +3253,197 @@ make_pass_remove_partial_avx_dependency (gcc::context *ctxt)
+   return new pass_remove_partial_avx_dependency (ctxt);
+ }
+ 
++/* When a hot loop can be fit into one cacheline,
++   force align the loop without considering the max skip.  */
++static void
++ix86_align_loops ()
++{
++  basic_block bb;
++
++  /* Don't do this when we don't know cache line size.  */
++  if (ix86_cost->prefetch_block == 0)
++    return;
++
++  loop_optimizer_init (AVOID_CFG_MODIFICATIONS);
++  profile_count count_threshold = cfun->cfg->count_max / param_align_threshold;
++  FOR_EACH_BB_FN (bb, cfun)
++    {
++      rtx_insn *label = BB_HEAD (bb);
++      bool has_fallthru = 0;
++      edge e;
++      edge_iterator ei;
++
++      if (!LABEL_P (label))
++	continue;
++
++      profile_count fallthru_count = profile_count::zero ();
++      profile_count branch_count = profile_count::zero ();
++
++      FOR_EACH_EDGE (e, ei, bb->preds)
++	{
++	  if (e->flags & EDGE_FALLTHRU)
++	    has_fallthru = 1, fallthru_count += e->count ();
++	  else
++	    branch_count += e->count ();
++	}
++
++      if (!fallthru_count.initialized_p () || !branch_count.initialized_p ())
++	continue;
++
++      if (bb->loop_father
++	  && bb->loop_father->latch != EXIT_BLOCK_PTR_FOR_FN (cfun)
++	  && (has_fallthru
++	      ? (!(single_succ_p (bb)
++		   && single_succ (bb) == EXIT_BLOCK_PTR_FOR_FN (cfun))
++		 && optimize_bb_for_speed_p (bb)
++		 && branch_count + fallthru_count > count_threshold
++		 && (branch_count > fallthru_count * param_align_loop_iterations))
++	      /* In case there'no fallthru for the loop.
++		 Nops inserted won't be executed.  */
++	      : (branch_count > count_threshold
++		 || (bb->count > bb->prev_bb->count * 10
++		     && (bb->prev_bb->count
++			 <= ENTRY_BLOCK_PTR_FOR_FN (cfun)->count / 2)))))
++	{
++	  rtx_insn* insn, *end_insn;
++	  HOST_WIDE_INT size = 0;
++	  bool padding_p = true;
++	  basic_block tbb = bb;
++	  unsigned cond_branch_num = 0;
++	  bool detect_tight_loop_p = false;
++
++	  for (unsigned int i = 0; i != bb->loop_father->num_nodes;
++	       i++, tbb = tbb->next_bb)
++	    {
++	      /* Only handle continuous cfg layout. */
++	      if (bb->loop_father != tbb->loop_father)
++		{
++		  padding_p = false;
++		  break;
++		}
++
++	      FOR_BB_INSNS (tbb, insn)
++		{
++		  if (!NONDEBUG_INSN_P (insn))
++		    continue;
++		  size += ix86_min_insn_size (insn);
++
++		  /* We don't know size of inline asm.
++		     Don't align loop for call.  */
++		  if (asm_noperands (PATTERN (insn)) >= 0
++		      || CALL_P (insn))
++		    {
++		      size = -1;
++		      break;
++		    }
++		}
++
++	      if (size == -1 || size > ix86_cost->prefetch_block)
++		{
++		  padding_p = false;
++		  break;
++		}
++
++	      FOR_EACH_EDGE (e, ei, tbb->succs)
++		{
++		  /* It could be part of the loop.  */
++		  if (e->dest == bb)
++		    {
++		      detect_tight_loop_p = true;
++		      break;
++		    }
++		}
++
++	      if (detect_tight_loop_p)
++		break;
++
++	      end_insn = BB_END (tbb);
++	      if (JUMP_P (end_insn))
++		{
++		  /* For decoded icache:
++		     1. Up to two branches are allowed per Way.
++		     2. A non-conditional branch is the last micro-op in a Way.
++		  */
++		  if (onlyjump_p (end_insn)
++		      && (any_uncondjump_p (end_insn)
++			  || single_succ_p (tbb)))
++		    {
++		      padding_p = false;
++		      break;
++		    }
++		  else if (++cond_branch_num >= 2)
++		    {
++		      padding_p = false;
++		      break;
++		    }
++		}
++
++	    }
++
++	  if (padding_p && detect_tight_loop_p)
++	    {
++	      emit_insn_before (gen_max_skip_align (GEN_INT (ceil_log2 (size)),
++						    GEN_INT (0)), label);
++	      /* End of function.  */
++	      if (!tbb || tbb == EXIT_BLOCK_PTR_FOR_FN (cfun))
++		break;
++	      /* Skip bb which already fits into one cacheline.  */
++	      bb = tbb;
++	    }
++	}
++    }
++
++  loop_optimizer_finalize ();
++  free_dominance_info (CDI_DOMINATORS);
++}
++
++namespace {
++
++const pass_data pass_data_align_tight_loops =
++{
++  RTL_PASS, /* type */
++  "align_tight_loops", /* name */
++  OPTGROUP_NONE, /* optinfo_flags */
++  TV_MACH_DEP, /* tv_id */
++  0, /* properties_required */
++  0, /* properties_provided */
++  0, /* properties_destroyed */
++  0, /* todo_flags_start */
++  0, /* todo_flags_finish */
++};
++
++class pass_align_tight_loops : public rtl_opt_pass
++{
++public:
++  pass_align_tight_loops (gcc::context *ctxt)
++    : rtl_opt_pass (pass_data_align_tight_loops, ctxt)
++  {}
++
++  /* opt_pass methods: */
++  bool gate (function *) final override
++    {
++      return optimize && optimize_function_for_speed_p (cfun);
++    }
++
++  unsigned int execute (function *) final override
++    {
++      timevar_push (TV_MACH_DEP);
++#ifdef ASM_OUTPUT_MAX_SKIP_ALIGN
++      ix86_align_loops ();
++#endif
++      timevar_pop (TV_MACH_DEP);
++      return 0;
++    }
++}; // class pass_align_tight_loops
++
++} // anon namespace
++
++rtl_opt_pass *
++make_pass_align_tight_loops (gcc::context *ctxt)
++{
++  return new pass_align_tight_loops (ctxt);
++}
++
+ /* This compares the priority of target features in function DECL1
+    and DECL2.  It returns positive value if DECL1 is higher priority,
+    negative value if DECL2 is higher priority and 0 if they are the
+diff --git a/gcc/config/i386/i386-passes.def b/gcc/config/i386/i386-passes.def
+index 7d96766f7b96..e500f15c9971 100644
+--- a/gcc/config/i386/i386-passes.def
++++ b/gcc/config/i386/i386-passes.def
+@@ -31,5 +31,8 @@ along with GCC; see the file COPYING3.  If not see
+   INSERT_PASS_BEFORE (pass_cse2, 1, pass_stv, true /* timode_p */);
+ 
+   INSERT_PASS_BEFORE (pass_shorten_branches, 1, pass_insert_endbr_and_patchable_area);
++  /* pass_align_tight_loops must be after pass_insert_endbr_and_patchable_area.
++     PR116174.  */
++  INSERT_PASS_BEFORE (pass_shorten_branches, 1, pass_align_tight_loops);
+ 
+   INSERT_PASS_AFTER (pass_combine, 1, pass_remove_partial_avx_dependency);
+diff --git a/gcc/config/i386/i386-protos.h b/gcc/config/i386/i386-protos.h
+index 46214a63974d..36c7b1aed42b 100644
+--- a/gcc/config/i386/i386-protos.h
++++ b/gcc/config/i386/i386-protos.h
+@@ -419,6 +419,7 @@ extern rtl_opt_pass *make_pass_insert_endbr_and_patchable_area
+   (gcc::context *);
+ extern rtl_opt_pass *make_pass_remove_partial_avx_dependency
+   (gcc::context *);
++extern rtl_opt_pass *make_pass_align_tight_loops (gcc::context *);
+ 
+ extern bool ix86_has_no_direct_extern_access;
+ 
+diff --git a/gcc/config/i386/i386.cc b/gcc/config/i386/i386.cc
+index 6f89891d3cb5..288c69467d62 100644
+--- a/gcc/config/i386/i386.cc
++++ b/gcc/config/i386/i386.cc
+@@ -23444,150 +23444,6 @@ ix86_split_stlf_stall_load ()
+     }
+ }
+ 
+-/* When a hot loop can be fit into one cacheline,
+-   force align the loop without considering the max skip.  */
+-static void
+-ix86_align_loops ()
+-{
+-  basic_block bb;
+-
+-  /* Don't do this when we don't know cache line size.  */
+-  if (ix86_cost->prefetch_block == 0)
+-    return;
+-
+-  loop_optimizer_init (AVOID_CFG_MODIFICATIONS);
+-  profile_count count_threshold = cfun->cfg->count_max / param_align_threshold;
+-  FOR_EACH_BB_FN (bb, cfun)
+-    {
+-      rtx_insn *label = BB_HEAD (bb);
+-      bool has_fallthru = 0;
+-      edge e;
+-      edge_iterator ei;
+-
+-      if (!LABEL_P (label))
+-	continue;
+-
+-      profile_count fallthru_count = profile_count::zero ();
+-      profile_count branch_count = profile_count::zero ();
+-
+-      FOR_EACH_EDGE (e, ei, bb->preds)
+-	{
+-	  if (e->flags & EDGE_FALLTHRU)
+-	    has_fallthru = 1, fallthru_count += e->count ();
+-	  else
+-	    branch_count += e->count ();
+-	}
+-
+-      if (!fallthru_count.initialized_p () || !branch_count.initialized_p ())
+-	continue;
+-
+-      if (bb->loop_father
+-	  && bb->loop_father->latch != EXIT_BLOCK_PTR_FOR_FN (cfun)
+-	  && (has_fallthru
+-	      ? (!(single_succ_p (bb)
+-		   && single_succ (bb) == EXIT_BLOCK_PTR_FOR_FN (cfun))
+-		 && optimize_bb_for_speed_p (bb)
+-		 && branch_count + fallthru_count > count_threshold
+-		 && (branch_count > fallthru_count * param_align_loop_iterations))
+-	      /* In case there'no fallthru for the loop.
+-		 Nops inserted won't be executed.  */
+-	      : (branch_count > count_threshold
+-		 || (bb->count > bb->prev_bb->count * 10
+-		     && (bb->prev_bb->count
+-			 <= ENTRY_BLOCK_PTR_FOR_FN (cfun)->count / 2)))))
+-	{
+-	  rtx_insn* insn, *end_insn;
+-	  HOST_WIDE_INT size = 0;
+-	  bool padding_p = true;
+-	  basic_block tbb = bb;
+-	  unsigned cond_branch_num = 0;
+-	  bool detect_tight_loop_p = false;
+-
+-	  for (unsigned int i = 0; i != bb->loop_father->num_nodes;
+-	       i++, tbb = tbb->next_bb)
+-	    {
+-	      /* Only handle continuous cfg layout. */
+-	      if (bb->loop_father != tbb->loop_father)
+-		{
+-		  padding_p = false;
+-		  break;
+-		}
+-
+-	      FOR_BB_INSNS (tbb, insn)
+-		{
+-		  if (!NONDEBUG_INSN_P (insn))
+-		    continue;
+-		  size += ix86_min_insn_size (insn);
+-
+-		  /* We don't know size of inline asm.
+-		     Don't align loop for call.  */
+-		  if (asm_noperands (PATTERN (insn)) >= 0
+-		      || CALL_P (insn))
+-		    {
+-		      size = -1;
+-		      break;
+-		    }
+-		}
+-
+-	      if (size == -1 || size > ix86_cost->prefetch_block)
+-		{
+-		  padding_p = false;
+-		  break;
+-		}
+-
+-	      FOR_EACH_EDGE (e, ei, tbb->succs)
+-		{
+-		  /* It could be part of the loop.  */
+-		  if (e->dest == bb)
+-		    {
+-		      detect_tight_loop_p = true;
+-		      break;
+-		    }
+-		}
+-
+-	      if (detect_tight_loop_p)
+-		break;
+-
+-	      end_insn = BB_END (tbb);
+-	      if (JUMP_P (end_insn))
+-		{
+-		  /* For decoded icache:
+-		     1. Up to two branches are allowed per Way.
+-		     2. A non-conditional branch is the last micro-op in a Way.
+-		  */
+-		  if (onlyjump_p (end_insn)
+-		      && (any_uncondjump_p (end_insn)
+-			  || single_succ_p (tbb)))
+-		    {
+-		      padding_p = false;
+-		      break;
+-		    }
+-		  else if (++cond_branch_num >= 2)
+-		    {
+-		      padding_p = false;
+-		      break;
+-		    }
+-		}
+-
+-	    }
+-
+-	  if (padding_p && detect_tight_loop_p)
+-	    {
+-	      emit_insn_before (gen_max_skip_align (GEN_INT (ceil_log2 (size)),
+-						    GEN_INT (0)), label);
+-	      /* End of function.  */
+-	      if (!tbb || tbb == EXIT_BLOCK_PTR_FOR_FN (cfun))
+-		break;
+-	      /* Skip bb which already fits into one cacheline.  */
+-	      bb = tbb;
+-	    }
+-	}
+-    }
+-
+-  loop_optimizer_finalize ();
+-  free_dominance_info (CDI_DOMINATORS);
+-}
+-
+ /* Implement machine specific optimizations.  We implement padding of returns
+    for K8 CPUs and pass to avoid 4 jumps in the single 16 byte window.  */
+ static void
+@@ -23611,8 +23467,6 @@ ix86_reorg (void)
+ #ifdef ASM_OUTPUT_MAX_SKIP_ALIGN
+       if (TARGET_FOUR_JUMP_LIMIT)
+ 	ix86_avoid_jump_mispredicts ();
+-
+-      ix86_align_loops ();
+ #endif
+     }
+ }
+diff --git a/gcc/testsuite/gcc.target/i386/pr116174.c b/gcc/testsuite/gcc.target/i386/pr116174.c
+new file mode 100644
+index 000000000000..8877d0b51af1
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/pr116174.c
+@@ -0,0 +1,12 @@
++/* { dg-do compile { target *-*-linux* } } */
++/* { dg-options "-O2 -fcf-protection=branch" } */
++
++char *
++foo (char *dest, const char *src)
++{
++  while ((*dest++ = *src++) != '\0')
++    /* nothing */;
++  return --dest;
++}
++
++/* { dg-final { scan-assembler "\t\.cfi_startproc\n\tendbr(32|64)\n" } } */
+-- 
+2.43.5

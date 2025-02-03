@@ -1,4 +1,4 @@
-From 95708ff427c12b58e53fab225a08c811ca358394 Mon Sep 17 00:00:00 2001
+From 0d5d6a14f6e9c2ff8998ebb3acbefcad6221952f Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Wed, 3 May 2023 22:27:10 +0200
 Subject: [PATCH] CMakeLists.txt: respect ${CMAKE_INSTALL_LIBDIR} for multilib
@@ -29,11 +29,11 @@ Upstream-Status: Pending
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5be774d..6b4fd25 100644
+index 1b94d2e..a295403 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -7,11 +7,11 @@ project(libnfs
- set(SOVERSION 11.2.0 CACHE STRING "" FORCE)
+ set(SOVERSION 16.2.0 CACHE STRING "" FORCE)
  
  set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH "Installation directory for binaries")
 -set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH "Installation directory for libraries")
@@ -48,10 +48,10 @@ index 5be774d..6b4fd25 100644
  option(BUILD_SHARED_LIBS "Build shared libraries" ON)
  option(ENABLE_TESTS "Build and run test programs" OFF)
 diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
-index 88ba7b8..5ff89dc 100644
+index 987b735..9b2032f 100644
 --- a/lib/CMakeLists.txt
 +++ b/lib/CMakeLists.txt
-@@ -23,5 +23,5 @@ set_target_properties(nfs PROPERTIES
+@@ -24,5 +24,5 @@ set_target_properties(nfs PROPERTIES
  
  install(TARGETS nfs EXPORT libnfs
                      RUNTIME DESTINATION bin

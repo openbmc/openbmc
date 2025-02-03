@@ -1,4 +1,4 @@
-From fcb0166c5e991fcf62797b19bea39983214289cb Mon Sep 17 00:00:00 2001
+From 1343e4ee17bb3f72e6b244706cacbeb16463c5d7 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 14 Oct 2021 15:57:36 +0800
 Subject: [PATCH] nativesdk-libcap: Raise the size of arrays containing dl
@@ -19,7 +19,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libcap/execable.h b/libcap/execable.h
-index 7a2d247..682e0ee 100644
+index 89e61a3..22518dd 100644
 --- a/libcap/execable.h
 +++ b/libcap/execable.h
 @@ -23,7 +23,7 @@

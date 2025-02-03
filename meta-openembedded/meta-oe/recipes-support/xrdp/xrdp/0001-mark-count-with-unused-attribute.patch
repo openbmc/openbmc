@@ -1,4 +1,4 @@
-From 492f74dbea1d9a15fbc3e870e78ab52e7fc5583b Mon Sep 17 00:00:00 2001
+From 23638d0ec23c2658a4e98321c20a4a2ac9294fb2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 31 Aug 2022 20:19:32 -0700
 Subject: [PATCH] mark count with unused attribute
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/sesman/chansrv/chansrv.c b/sesman/chansrv/chansrv.c
-index 4452d998..b818bff3 100644
+index d66310b..eeb5921 100644
 --- a/sesman/chansrv/chansrv.c
 +++ b/sesman/chansrv/chansrv.c
 @@ -195,7 +195,7 @@ check_timeout(void)
@@ -24,8 +24,5 @@ index 4452d998..b818bff3 100644
 -    int count;
 +    int count __attribute__((unused));
      tui32 now;
- 
+     UNUSED_VAR(count);
      LOG_DEVEL(LOG_LEVEL_DEBUG, "check_timeout:");
--- 
-2.37.3
-

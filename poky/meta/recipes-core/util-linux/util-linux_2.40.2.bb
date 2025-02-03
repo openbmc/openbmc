@@ -59,7 +59,8 @@ python util_linux_libpackages() {
 
 PACKAGESPLITFUNCS =+ "util_linux_libpackages"
 
-PACKAGES_DYNAMIC = "^${PN}-.*"
+PACKAGES_DYNAMIC = "^${PN}(?!.*-native)-.*"
+PACKAGES_DYNAMIC:class-native = "^${BPN}-.*-native"
 
 UTIL_LINUX_LIBDIR = "${libdir}"
 UTIL_LINUX_LIBDIR:class-target = "${base_libdir}"
@@ -129,7 +130,8 @@ FILES:${PN}-runuser = "${sysconfdir}/pam.d/runuser*"
 FILES:${PN}-su = "${sysconfdir}/pam.d/su-l"
 CONFFILES:${PN}-su = "${sysconfdir}/pam.d/su-l"
 FILES:${PN}-lastlog2 += "${base_libdir}/security/pam_lastlog2.so \
-                         ${nonarch_libdir}/tmpfiles.d/lastlog2.conf"
+                         ${nonarch_libdir}/tmpfiles.d/lastlog2.conf \
+                         ${sysconfdir}/default/volatiles/99_lastlog2"
 FILES:${PN}-pylibmount = "${PYTHON_SITEPACKAGES_DIR}/libmount/pylibmount.so \
                           ${PYTHON_SITEPACKAGES_DIR}/libmount/__init__.* \
                           ${PYTHON_SITEPACKAGES_DIR}/libmount/__pycache__/*"
@@ -221,6 +223,12 @@ do_install:append:class-target () {
 			install -d ${D}${nonarch_libdir}/tmpfiles.d
 			install -m 0644 ${S}/misc-utils/lastlog2-tmpfiles.conf.in \
 				${D}${nonarch_libdir}/tmpfiles.d/lastlog2.conf
+		fi
+
+		if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+			install -d ${D}${sysconfdir}/default/volatiles
+			echo "d root root 0755 /var/lib/lastlog none" \
+				> ${D}${sysconfdir}/default/volatiles/99_lastlog2
 		fi
 	fi
 }

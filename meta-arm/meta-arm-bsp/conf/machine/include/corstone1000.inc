@@ -34,7 +34,7 @@ IMAGE_CMD:wic[vardeps] += "GRUB_LINUX_APPEND"
 
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
-PREFERRED_VERSION_linux-yocto ?= "6.10.%"
+PREFERRED_VERSION_linux-yocto ?= "6.12.%"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_IMAGETYPE:firmware = "Image.gz"
 # add FF-A support in the kernel
@@ -63,3 +63,6 @@ ARM_SYSTEMREADY_FIRMWARE = "${FIRMWARE_DEPLOYMENT}:do_deploy \
                             corstone1000-esp-image:do_image_complete \
                            "
 ARM_SYSTEMREADY_ACS_CONSOLE ?= "default"
+
+# Workaround IMAGE_ROOTFS_EXTRA_SPACE being ignored when images are repacked
+IMAGE_ROOTFS_EXTRA_ARGS += "--extra-space ${@${IMAGE_ROOTFS_EXTRA_SPACE}}K"

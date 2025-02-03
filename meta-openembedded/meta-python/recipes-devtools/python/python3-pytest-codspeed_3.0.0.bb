@@ -9,4 +9,6 @@ SRC_URI[sha256sum] = "c5b80100ea32dd44079bb2db298288763eb8fe859eafa1650a8711bd2c
 inherit pypi python_hatchling
 
 PYPI_PACKAGE = "pytest_codspeed"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
+
 RDEPENDS:${PN} = "python3-cffi python3-filelock python3-pytest"

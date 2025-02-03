@@ -265,6 +265,3 @@ INSANE_SKIP:${PN} = "already-stripped"
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_PRODUCT = "openssl:openssl"
-
-CVE_VERSION_SUFFIX = "alphabetical"
-

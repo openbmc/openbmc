@@ -55,6 +55,7 @@ VALGRIND:riscv32 = ""
 VALGRIND:powerpc = "${@bb.utils.contains('TARGET_FPU', 'soft', '', 'valgrind', d)}"
 VALGRIND:linux-gnux32 = ""
 VALGRIND:linux-gnun32 = ""
+VALGRIND:loongarch64 = ""
 
 RDEPENDS:${PN} = "\
     ${PROFILETOOLS} \

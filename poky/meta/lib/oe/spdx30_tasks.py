@@ -135,7 +135,7 @@ def add_package_files(
     topdir,
     get_spdxid,
     get_purposes,
-    license_data,
+    license_data=None,
     *,
     archive=None,
     ignore_dirs=[],
@@ -169,7 +169,10 @@ def add_package_files(
             )
             spdx_files.add(spdx_file)
 
-            if oe.spdx30.software_SoftwarePurpose.source in file_purposes:
+            if (
+                oe.spdx30.software_SoftwarePurpose.source in file_purposes
+                and license_data is not None
+            ):
                 objset.scan_declared_licenses(spdx_file, filepath, license_data)
 
             if archive is not None:
@@ -524,7 +527,7 @@ def create_spdx(d):
     build_objset.new_relationship(
         source_files,
         oe.spdx30.RelationshipType.hasConcludedLicense,
-        [recipe_spdx_license],
+        [oe.sbom30.get_element_link_id(recipe_spdx_license)],
     )
 
     dep_sources = {}
@@ -1072,25 +1075,45 @@ def create_image_spdx(d):
         for image in task["images"]:
             image_filename = image["filename"]
             image_path = image_deploy_dir / image_filename
-            a = objset.add_root(
-                oe.spdx30.software_File(
-                    _id=objset.new_spdxid("image", image_filename),
-                    creationInfo=objset.doc.creationInfo,
-                    name=image_filename,
-                    verifiedUsing=[
-                        oe.spdx30.Hash(
-                            algorithm=oe.spdx30.HashAlgorithm.sha256,
-                            hashValue=bb.utils.sha256_file(image_path),
-                        )
-                    ],
+            if os.path.isdir(image_path):
+                a = add_package_files(
+                        d,
+                        objset,
+                        image_path,
+                        lambda file_counter: objset.new_spdxid(
+                            "imagefile", str(file_counter)
+                        ),
+                        lambda filepath: [],
+                        license_data=None,
+                        ignore_dirs=[],
+                        ignore_top_level_dirs=[],
+                        archive=None,
                 )
-            )
-            set_purposes(
-                d, a, "SPDX_IMAGE_PURPOSE:%s" % imagetype, "SPDX_IMAGE_PURPOSE"
-            )
-            set_timestamp_now(d, a, "builtTime")
+                artifacts.extend(a)
+            else:
+                a = objset.add_root(
+                    oe.spdx30.software_File(
+                        _id=objset.new_spdxid("image", image_filename),
+                        creationInfo=objset.doc.creationInfo,
+                        name=image_filename,
+                        verifiedUsing=[
+                            oe.spdx30.Hash(
+                                algorithm=oe.spdx30.HashAlgorithm.sha256,
+                                hashValue=bb.utils.sha256_file(image_path),
+                            )
+                        ],
+                    )
+                )
 
-            artifacts.append(a)
+                artifacts.append(a)
+
+            for a in artifacts:
+                set_purposes(
+                    d, a, "SPDX_IMAGE_PURPOSE:%s" % imagetype, "SPDX_IMAGE_PURPOSE"
+                )
+
+                set_timestamp_now(d, a, "builtTime")
+
 
         if artifacts:
             objset.new_scoped_relationship(

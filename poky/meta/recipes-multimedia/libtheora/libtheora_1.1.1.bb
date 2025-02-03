@@ -9,6 +9,7 @@ DEPENDS = "libogg"
 
 
 SRC_URI = "http://downloads.xiph.org/releases/theora/libtheora-${PV}.tar.bz2 \
+           file://autoreconf.patch \
            file://no-docs.patch"
 
 SRC_URI[md5sum] = "292ab65cedd5021d6b7ddd117e07cd8e"

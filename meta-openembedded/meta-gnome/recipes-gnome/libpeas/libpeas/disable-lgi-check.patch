@@ -1,0 +1,37 @@
+From c9bb8f5c730745b48eb86404d0297ebc15bf9fa7 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 16 Dec 2024 12:22:49 +0100
+Subject: [PATCH] meson
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build | 11 +++++----------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index a8100af..0fb15d2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -209,14 +209,9 @@ if lua_found
+     else
+         lua_prg = lua51_prg
+     endif
+-    lua_lgi_check = run_command(lua_prg, ['-e', 'print(require("lgi")._VERSION)'])
+-    if lua_lgi_check.returncode() == 0
+-        lua_lgi_ver = lua_lgi_check.stdout().strip()
+-        if lua_lgi_ver.version_compare(lua_lgi_req)
+-            lua51_lgi_dep = declare_dependency(version: lua_lgi_ver)
+-            lua_lgi_found = true
+-        endif
+-    endif
++    lua_lgi_ver = '0.9.0'
++    lua_lgi_found = true
++    lua51_lgi_dep = declare_dependency(version: lua_lgi_ver)
+     message('lua-lgi version: ' + lua_lgi_ver)
+ endif
+ 
+-- 
+2.47.0
+

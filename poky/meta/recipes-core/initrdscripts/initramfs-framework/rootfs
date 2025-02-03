@@ -33,9 +33,11 @@ rootfs_run() {
 			elif [ "`echo ${bootparam_root} | cut -c1-6`" = "LABEL=" ]; then
 				root_label=`echo $bootparam_root | cut -c7-`
 				bootparam_root="/dev/disk/by-label/$root_label"
+			elif echo "${bootparam_root}" | grep -q '^ubi[0-9]\+:'; then
+				bootparam_rootfstype="ubifs"
 			fi
 
-			if [ -e "$bootparam_root" ]; then
+			if [ -e "$bootparam_root" ] || [ -n "$bootparam_rootfstype" ]; then
 				flags=""
 				if [ -n "$bootparam_ro" ] && ! echo "$bootparam_rootflags" | grep -w -q "ro"; then
 					if [  -n "$bootparam_rootflags" ]; then
@@ -49,6 +51,7 @@ rootfs_run() {
 				if [ -n "$bootparam_rootfstype" ]; then
 					flags="$flags -t$bootparam_rootfstype"
 				fi
+				debug "mount $flags $bootparam_root $ROOTFS_DIR"
 				mount $flags $bootparam_root $ROOTFS_DIR
 				if mountpoint -q $ROOTFS_DIR; then
 					break

@@ -1,7 +1,7 @@
-From 61ef40f2bc418ce072828ad1939eaa40f981e76e Mon Sep 17 00:00:00 2001
+From 363d9d8fb329b26d1e59ece7f269a7a28e6722c5 Mon Sep 17 00:00:00 2001
 From: Nitin A Kamble <nitin.a.kamble@intel.com>
 Date: Fri, 13 Aug 2010 12:24:00 -0700
-Subject: [PATCH 2/5] tcl: fix a build issue
+Subject: [PATCH] tcl: fix a build issue
 
 Upstream-Status: Inappropriate [upstream does not support installed tests]
 ---
@@ -9,10 +9,10 @@ Upstream-Status: Inappropriate [upstream does not support installed tests]
  1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/unix/Makefile.in b/unix/Makefile.in
-index 6e74458..bd0b818 100644
+index 2de7b2f..b5f9ab7 100644
 --- a/unix/Makefile.in
 +++ b/unix/Makefile.in
-@@ -918,7 +918,7 @@ tcltest-real:
+@@ -912,7 +912,7 @@ tcltest-real:
  test: test-tcl test-packages
  
  test-tcl: ${TCLTEST_EXE}
@@ -21,7 +21,7 @@ index 6e74458..bd0b818 100644
  
  gdb-test: ${TCLTEST_EXE}
  	$(SHELL_ENV) $(GDB) --args ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl \
-@@ -928,15 +928,14 @@ lldb-test: ${TCLTEST_EXE}
+@@ -922,15 +922,14 @@ lldb-test: ${TCLTEST_EXE}
  	$(SHELL_ENV) $(LLDB) -- ./${TCLTEST_EXE} $(TOP_DIR)/tests/all.tcl \
  		$(TESTFLAGS) -singleproc 1
  
@@ -39,7 +39,7 @@ index 6e74458..bd0b818 100644
  
  # The following target generates the shared libraries in dltest/ that are used
  # for testing; they are included as part of the "tcltest" target (via the
-@@ -954,17 +953,17 @@ dltest.marker: ${STUB_LIB_FILE}
+@@ -948,17 +947,17 @@ dltest.marker: ${STUB_LIB_FILE}
  # This target can be used to run tclsh from the build directory
  # via `make shell SCRIPT=/tmp/foo.tcl`
  shell: ${TCL_EXE}
@@ -60,7 +60,7 @@ index 6e74458..bd0b818 100644
  		$(TOP_DIR)/tests/all.tcl -singleproc 1 -constraints valgrind \
  		$(TESTFLAGS)
  
-@@ -990,13 +989,13 @@ valgrind_each: $(addprefix testresults/valgrind/,$(addsuffix .success,$(notdir\
+@@ -984,13 +983,13 @@ valgrind_each: $(addprefix testresults/valgrind/,$(addsuffix .success,$(notdir\
  
  
  valgrindshell: ${TCL_EXE}
@@ -77,6 +77,3 @@ index 6e74458..bd0b818 100644
  
  #--------------------------------------------------------------------------
  # Installation rules
--- 
-2.39.5
-

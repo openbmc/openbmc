@@ -38,7 +38,7 @@ uboot_prep_kimage() {
     fi
 }
 
-DEPENDS:append = " u-boot-tools-native dtc-native virtual/${TARGET_PREFIX}binutils"
+DEPENDS:append = " u-boot-tools-native dtc-native virtual/cross-binutils"
 
 # Description string
 FIT_DESC ?= "Kernel fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"

@@ -7,6 +7,8 @@ SRC_URI[md5sum] = "89b1a6865c61bae67a32417517612ee6"
 SRC_URI[sha256sum] = "3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0"
 
 PYPI_PACKAGE = "PySocks"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
+
 inherit pypi setuptools3
 
 RDEPENDS:${PN}:class-target += "\

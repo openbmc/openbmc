@@ -14,15 +14,15 @@ diff --git a/Makefile.in b/Makefile.in
 index 9434cbd..8da7d1f 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -163,7 +163,7 @@ install-modules: $(DESTDIR)$(libexecdir) $(DESTDIR)$(sysconfdir)
+@@ -170,7 +170,7 @@ install-modules: $(DESTDIR)$(libexecdir) $(DESTDIR)$(sysconfdir)
  	test -z "$(SHARED_MODULE_OBJS)" -a -z "$(SHARED_MODULE_DIRS)" -a -z "$(STATIC_MODULE_DIRS)" || (cd modules/ && $(MAKE) install)
  
  install-utils: $(DESTDIR)$(sbindir) $(DESTDIR)$(bindir)
 -	cd contrib/ && $(MAKE) install-utils
 +	cd contrib/ && $(MAKE) DESTDIR=${DESTDIR} install-utils
-	$(INSTALL_BIN)  $(top_builddir)/ftpcount $(DESTDIR)$(bindir)/ftpcount
-	$(INSTALL_BIN)  $(top_builddir)/ftpdctl  $(DESTDIR)$(bindir)/ftpdctl
-	$(INSTALL_SBIN) $(top_builddir)/ftpscrub $(DESTDIR)$(sbindir)/ftpscrub
+ 	$(INSTALL_BIN)  $(top_builddir)/ftpcount $(DESTDIR)$(bindir)/ftpcount
+ 	$(INSTALL_BIN)  $(top_builddir)/ftpdctl  $(DESTDIR)$(bindir)/ftpdctl
+ 	$(INSTALL_SBIN) $(top_builddir)/ftpscrub $(DESTDIR)$(sbindir)/ftpscrub
 diff --git a/contrib/Makefile.in b/contrib/Makefile.in
 index d1a31af..65d2abc 100644
 --- a/contrib/Makefile.in

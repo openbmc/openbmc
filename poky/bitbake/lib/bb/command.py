@@ -421,15 +421,30 @@ class CommandsSync:
         return command.cooker.recipecaches[mc].pkg_dp
     getDefaultPreference.readonly = True
 
+
     def getSkippedRecipes(self, command, params):
+        """
+        Get the map of skipped recipes for the specified multiconfig/mc name (`params[0]`).
+
+        Invoked by `bb.tinfoil.Tinfoil.get_skipped_recipes`
+
+        :param command: Internally used parameter.
+        :param params: Parameter array. params[0] is multiconfig/mc name. If not given, then default mc '' is assumed.
+        :return: Dict whose keys are virtualfns and values are `bb.cooker.SkippedPackage`
+        """
+        try:
+            mc = params[0]
+        except IndexError:
+            mc = ''
+
         # Return list sorted by reverse priority order
         import bb.cache
         def sortkey(x):
             vfn, _ = x
-            realfn, _, mc = bb.cache.virtualfn2realfn(vfn)
-            return (-command.cooker.collections[mc].calc_bbfile_priority(realfn)[0], vfn)
+            realfn, _, item_mc = bb.cache.virtualfn2realfn(vfn)
+            return -command.cooker.collections[item_mc].calc_bbfile_priority(realfn)[0], vfn
 
-        skipdict = OrderedDict(sorted(command.cooker.skiplist.items(), key=sortkey))
+        skipdict = OrderedDict(sorted(command.cooker.skiplist_by_mc[mc].items(), key=sortkey))
         return list(skipdict.items())
     getSkippedRecipes.readonly = True
 

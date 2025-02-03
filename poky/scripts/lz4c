@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Wrapper to intercept legacy lz4c arguments and convert to lz4.
+args=()
+while [ $# -ne 0 ]; do
+    case ${1} in
+        -c0)
+            args+=(-0)
+            ;;
+        -c1)
+            args+=(-9)
+            ;;
+        -c2|-hc)
+            args+=(-12)
+            ;;
+        -y)
+            args+=(--force)
+            ;;
+        *)
+            args+=("${1}")
+            ;;
+    esac
+    shift
+done
+
+exec lz4 "${args[@]}"

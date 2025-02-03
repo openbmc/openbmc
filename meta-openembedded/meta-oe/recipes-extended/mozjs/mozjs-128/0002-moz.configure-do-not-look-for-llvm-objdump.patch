@@ -1,0 +1,43 @@
+From 1a5331f1997788e9a25bbc2b10eb14e2ee418be9 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 1 Oct 2021 13:01:10 +0200
+Subject: [PATCH] moz.configure: do not look for llvm-objdump
+
+This avoid dragging in a dependency that isn't even needed
+for js builds.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ moz.configure | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/moz.configure b/moz.configure
+index 804b9a375a..402e79e3b3 100755
+--- a/moz.configure
++++ b/moz.configure
+@@ -390,15 +390,15 @@ def plain_llvm_or_prefixed(name, llvm_name=None):
+     return plain_llvm_or_prefixed
+ 
+ 
+-llvm_objdump = check_prog(
+-    "LLVM_OBJDUMP",
+-    llvm_tool("llvm-objdump"),
+-    what="llvm-objdump",
+-    when="--enable-compile-environment",
+-    paths=clang_search_path,
+-)
+-
+-add_old_configure_assignment("LLVM_OBJDUMP", llvm_objdump)
++#llvm_objdump = check_prog(
++#    "LLVM_OBJDUMP",
++#    llvm_tool("llvm-objdump"),
++#    what="llvm-objdump",
++#    when="--enable-compile-environment",
++#    paths=clang_search_path,
++#)
++#
++#add_old_configure_assignment("LLVM_OBJDUMP", llvm_objdump)
+ 
+ 
+ def validate_readelf(path):

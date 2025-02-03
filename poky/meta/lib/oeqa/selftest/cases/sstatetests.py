@@ -367,13 +367,7 @@ class SStateCacheManagement(SStateBase):
         self.run_test_sstate_cache_management_script('m4', global_config,  target_config, ignore_patterns=['populate_lic'])
 
 class SStateHashSameSigs(SStateBase):
-    def test_sstate_32_64_same_hash(self):
-        """
-        The sstate checksums for both native and target should not vary whether
-        they're built on a 32 or 64 bit system. Rather than requiring two different
-        build machines and running a builds, override the variables calling uname()
-        manually and check using bitbake -S.
-        """
+    def sstate_hashtest(self, sdkmachine):
 
         self.write_config("""
 MACHINE = "qemux86"
@@ -391,10 +385,10 @@ MACHINE = "qemux86"
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
 BUILD_ARCH = "i686"
 BUILD_OS = "linux"
-SDKMACHINE = "i686"
+SDKMACHINE = "%s"
 PACKAGE_CLASSES = "package_rpm package_ipk package_deb"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
-""")
+""" % sdkmachine)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
         bitbake("core-image-weston -S none")
 
@@ -414,6 +408,20 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         self.maxDiff = None
         self.assertCountEqual(files1, files2)
 
+    def test_sstate_32_64_same_hash(self):
+        """
+        The sstate checksums for both native and target should not vary whether
+        they're built on a 32 or 64 bit system. Rather than requiring two different
+        build machines and running a builds, override the variables calling uname()
+        manually and check using bitbake -S.
+        """
+        self.sstate_hashtest("i686")
+
+    def test_sstate_sdk_arch_same_hash(self):
+        """
+        Similarly, test an arm SDK has the same hashes
+        """
+        self.sstate_hashtest("aarch64")
 
     def test_sstate_nativelsbstring_same_hash(self):
         """

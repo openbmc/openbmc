@@ -1,6 +1,6 @@
 require libgcc-common.inc
 
-DEPENDS = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}g++ virtual/${MLPREFIX}libc"
+DEPENDS = "virtual/cross-cc virtual/cross-c++ virtual/${MLPREFIX}libc"
 
 do_install:append:class-target () {
 	if [ "${TCLIBC}" != "glibc" ]; then

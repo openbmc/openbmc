@@ -35,6 +35,7 @@ EXTRA_OECONF = " \
     --with-cockpit-ws-instance-group=${COCKPIT_WS_USER_GROUP} \
     --disable-doc \
     --with-systemdunitdir=${systemd_system_unitdir} \
+    --with-pamdir=${base_libdir}/security \
 "
 
 PACKAGECONFIG ??= " \
@@ -154,8 +155,8 @@ FILES:${PN}-ws = " \
     ${systemd_system_unitdir}/system-cockpithttps.slice \
     ${libdir}/tmpfiles.d/cockpit-tempfiles.conf \
     ${sbindir}/remotectl \
-    ${libdir}/security/pam_ssh_add.so \
-    ${libdir}/security/pam_cockpit_cert.so \
+    ${base_libdir}/security/pam_ssh_add.so \
+    ${base_libdir}/security/pam_cockpit_cert.so \
     ${libexecdir}/cockpit-ws \
     ${libexecdir}/cockpit-wsinstance-factory \
     ${libexecdir}/cockpit-tls \

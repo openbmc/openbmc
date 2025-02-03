@@ -1,7 +1,7 @@
-From 40ae40de3db990a7e56694f24fc625b1b71a98f7 Mon Sep 17 00:00:00 2001
+From fab8c573d06340868f070446118673b1c23584c5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 5 Sep 2015 06:31:47 +0000
-Subject: [PATCH 02/27] implment systemd-sysv-install for OE
+Subject: [PATCH 02/26] implment systemd-sysv-install for OE
 
 Use update-rc.d for enabling/disabling and status command
 to check the status of the sysv service
@@ -39,5 +39,5 @@ index cb58d8243b..000bdf6165 100755
      *)
          usage ;;
 -- 
-2.45.1
+2.34.1
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export TCL_LIBRARY=/usr/lib/tcl/ptest/library
+export TCL_LIBRARY=@libdir@/tcl/ptest/library
 export ERROR_ON_FAILURES=1
 export LANG=en-US.UTF-8
 

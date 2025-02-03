@@ -13,6 +13,7 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
            file://netifnames.patch \
            file://init \
            file://local.rules \
+           file://0001-random-util.c-sync-dev_urandom-implementation-to-sys.patch \
            "
 
 SRC_URI[sha256sum] = "8da4319102f24abbf7fff5ce9c416af848df163b29590e666d334cc1927f006f"

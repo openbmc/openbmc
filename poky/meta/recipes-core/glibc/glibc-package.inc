@@ -26,6 +26,7 @@ INSANE_SKIP:${PN}-dev += "staticdev"
 INSANE_SKIP:${MLPREFIX}ldso:append = " dev-so libdir"
 
 FILES:${PN} = "${libc_baselibs} ${libexecdir}/* ${sysconfdir}/ld.so.conf"
+CONFFILES:${PN} = "${sysconfdir}/ld.so.conf"
 RRECOMMENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', '${MLPREFIX}ldconfig', '', d)}"
 FILES:ldconfig = "${base_sbindir}/ldconfig"
 FILES:ldd = "${bindir}/ldd"
@@ -292,7 +293,7 @@ pkg_postinst:nscd () {
 		fi
 	fi
 }
-CONFFILES:nscd="${sysconfdir}/nscd.conf"
+CONFFILES:nscd = "${sysconfdir}/nscd.conf"
 
 SYSTEMD_PACKAGES = "nscd"
 SYSTEMD_SERVICE:nscd = "nscd.service"

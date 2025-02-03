@@ -1,19 +1,13 @@
 SUMMARY = "ZNC, an advanced IRC bouncer"
 SECTION = "net"
-LICENSE = "GPL-2.0-only"
+LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 DEPENDS = "openssl zlib icu"
 
-SRC_URI = "git://github.com/znc/znc.git;name=znc;branch=master;protocol=https \
-           git://github.com/jimloco/Csocket.git;destsuffix=git/third_party/Csocket;name=Csocket;branch=master;protocol=https \
-          "
-SRCREV_znc = "bf253640d33d03331310778e001fb6f5aba2989e"
-SRCREV_Csocket = "e8d9e0bb248c521c2c7fa01e1c6a116d929c41b4"
+SRC_URI = "gitsm://github.com/znc/znc.git;branch=master;protocol=https"
 
-# This constructs a composite revision based on multiple SRCREV's.
-#
-SRCREV_FORMAT = "znc_Csocket"
+SRCREV = "bf253640d33d03331310778e001fb6f5aba2989e"
 
 S = "${WORKDIR}/git"
 

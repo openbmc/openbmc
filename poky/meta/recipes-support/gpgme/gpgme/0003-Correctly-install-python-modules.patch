@@ -1,4 +1,4 @@
-From 8c850aa109c42d0c193bccc7af45dbc2689b23f6 Mon Sep 17 00:00:00 2001
+From 548d84c703a747c41a02e1d0ff6ad4c193a34a5c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 30 Jan 2018 15:28:49 +0800
 Subject: [PATCH] Correctly install python modules
@@ -12,13 +12,12 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 Rebase to 1.10.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  lang/python/Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index 68b98e8..bbb9111 100644
+index a6fd639..136e979 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
 @@ -97,6 +97,7 @@ install-exec-local:

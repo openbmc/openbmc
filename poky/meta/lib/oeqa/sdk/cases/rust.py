@@ -31,6 +31,7 @@ class RustCompileTest(OESDKTestCase):
             raise unittest.SkipTest("RustCompileTest class: SDK doesn't contain a Rust cross-canadian toolchain")
 
     def test_cargo_build(self):
+        self._run('cd %s/hello; cargo add zstd' % (self.tc.sdk_dir))
         self._run('cd %s/hello; cargo build' % self.tc.sdk_dir)
 
 class RustHostCompileTest(OESDKTestCase):
@@ -52,5 +53,6 @@ class RustHostCompileTest(OESDKTestCase):
 
     def test_cargo_build(self):
         sdksys = self.td.get("SDK_SYS")
+        self._run('cd %s/hello; cargo add zstd' % (self.tc.sdk_dir))
         self._run('cd %s/hello; cargo build --target %s-gnu' % (self.tc.sdk_dir, sdksys))
         self._run('cd %s/hello; cargo run --target %s-gnu' % (self.tc.sdk_dir, sdksys))

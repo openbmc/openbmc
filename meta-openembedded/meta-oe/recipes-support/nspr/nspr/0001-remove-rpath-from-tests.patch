@@ -1,0 +1,35 @@
+From 63eb483f7feb05917402731d8f21b396630ef202 Mon Sep 17 00:00:00 2001
+From: Andrei Gherzan <andrei@gherzan.ro>
+Date: Thu, 9 Feb 2012 00:03:38 +0200
+Subject: [PATCH] remove rpath from tests
+
+Avoid QA warnings by removing hardcoded rpath from binaries.
+
+[...]
+WARNING: QA Issue: package nspr contains bad RPATH {builddir}/tmp/work/armv5te-poky-linux-gnueabi/nspr-4.8.9-r1/nspr-4.8.9/mozilla/nsprpub/pr/tests/../../dist/lib
+in file {builddir}/tmp/work/armv5te-poky-linux-gnueabi/nspr-4.8.9-r1/packages-split/nspr/usr/lib/nspr/tests/multiwait
+[...]
+
+Upstream-Status: Pending
+
+Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
+---
+ pr/tests/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pr/tests/Makefile.in b/pr/tests/Makefile.in
+index 20e2f99..56c73e1 100644
+--- a/pr/tests/Makefile.in
++++ b/pr/tests/Makefile.in
+@@ -260,7 +260,7 @@ ifeq ($(OS_ARCH), SunOS)
+ endif # SunOS
+ 
+ ifeq (,$(filter-out Linux GNU GNU_%,$(OS_ARCH)))
+-    LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)
++    LDOPTS += -Xlinker
+     ifeq ($(USE_PTHREADS),1)
+         EXTRA_LIBS = -lpthread
+     endif
+-- 
+2.25.1
+

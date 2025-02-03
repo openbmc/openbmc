@@ -17,6 +17,7 @@ S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
 
 MOUNT_BASE = "/run/media"
+MOUNT_GROUP ?= "disk"
 
 do_install() {
     install -d ${D}${sysconfdir}/udev/rules.d
@@ -31,9 +32,11 @@ do_install() {
     install -d ${D}${sysconfdir}/udev/scripts/
 
     install -m 0755 ${S}/mount.sh ${D}${sysconfdir}/udev/scripts/mount.sh
-    sed -i 's|@systemd_unitdir@|${systemd_unitdir}|g' ${D}${sysconfdir}/udev/scripts/mount.sh
-    sed -i 's|@base_sbindir@|${base_sbindir}|g' ${D}${sysconfdir}/udev/scripts/mount.sh
-    sed -i 's|@MOUNT_BASE@|${MOUNT_BASE}|g' ${D}${sysconfdir}/udev/scripts/mount.sh
+    sed -e 's|@systemd_unitdir@|${systemd_unitdir}|g' \
+        -e 's|@base_sbindir@|${base_sbindir}|g' \
+        -e 's|@MOUNT_BASE@|${MOUNT_BASE}|g' \
+        -e 's|@MOUNT_GROUP@|${MOUNT_GROUP}|g' \
+        -i ${D}${sysconfdir}/udev/scripts/mount.sh
 
     install -m 0755 ${S}/network.sh ${D}${sysconfdir}/udev/scripts
 }

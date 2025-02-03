@@ -367,3 +367,13 @@ check_git_config() {
 		git config --local user.name "${PATCH_GIT_USER_NAME}"
 	fi
 }
+
+# Sets fixed git committer and author for reproducible commits
+reproducible_git_committer_author() {
+	export GIT_COMMITTER_NAME="${PATCH_GIT_USER_NAME}"
+	export GIT_COMMITTER_EMAIL="${PATCH_GIT_USER_EMAIL}"
+	export GIT_COMMITTER_DATE="$(date -d @${SOURCE_DATE_EPOCH})"
+	export GIT_AUTHOR_NAME="${PATCH_GIT_USER_NAME}"
+	export GIT_AUTHOR_EMAIL="${PATCH_GIT_USER_EMAIL}"
+	export GIT_AUTHOR_DATE="$(date -d @${SOURCE_DATE_EPOCH})"
+}

@@ -5,8 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=d98d089889e14b227732d45dac3aacc4"
 SRC_URI[sha256sum] = "79d2ee1e436cf570bccb7d916533fa18757a2f18c290accffab1b9a0b684666b"
 
 PYPI_PACKAGE = "flask_wtf"
-UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/Flask-WTF"
-UPSTREAM_CHECK_REGEX = "/Flask-WTF/(?P<pver>(\d+[\.\-_]*)+)"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_hatchling
 

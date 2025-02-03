@@ -98,8 +98,35 @@ file://${COMMON_LICENSE_DIR}/OPL-1.0;md5=acdf1e4398bd93dc137e271c50316324 \
 file://${COMMON_LICENSE_DIR}/PD;md5=b3597d12946881e13cb3b548d1173851 \
 "
 
-PV = "12.4.0"
-# netinst, DVD-1
-ISO_TYPE = "netinst"
-SRC_URI = "https://cdimage.debian.org/mirror/cdimage/archive/${PV}/arm64/iso-cd/debian-${PV}-arm64-${ISO_TYPE}.iso;unpack=0;downloadfilename=${ISO_IMAGE_NAME}.iso"
-SRC_URI[sha256sum] = "d32d2c63350a932dc0d9d45665985b41413f9e01efc0eacbea981d435f553d3d"
+PV = "12.8.0"
+SRC_URI = "\
+    https://cdimage.debian.org/mirror/cdimage/archive/12.8.0/arm64/iso-dvd/debian-12.8.0-arm64-DVD-1.iso;unpack=0;downloadfilename=${ISO_IMAGE_NAME}.iso;name=debian_iso_image \
+    file://unattended-boot-conf/Debian/preseed.cfg \
+    "
+SRC_URI[debian_iso_image.sha256sum] = "8891fe48bb5a58ae54176eaa6440059bf852044d6b9ae77219e78f9ef8d65149"
+
+TEST_SUITES = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "arm_systemready_debian_unattended", "", d)}"
+
+ISO_LABEL = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "debian-12.8.0-arm64-1", "", d)}"
+BOOT_CATALOG = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "boot.catalog", "", d)}"
+BOOT_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "EFI/boot/bootaa64.efi", "", d)}"
+EFI_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "boot/grub/efi.img", "", d)}"
+
+modifyiso() {
+    UNATTENDED_CONF_DIR="${UNPACKDIR}/unattended-boot-conf/Debian"
+
+    # Append the preseed.cfg file to the initrd
+    gunzip ${EXTRACTED_ISO_TEMP_DIR}/install.a64/initrd.gz
+    (cd ${UNATTENDED_CONF_DIR} && echo preseed.cfg | cpio -H newc -o -A -F ${EXTRACTED_ISO_TEMP_DIR}/install.a64/initrd)
+    gzip ${EXTRACTED_ISO_TEMP_DIR}/install.a64/initrd
+
+    #GRUB
+    # Disable timeout
+    sed -i '/^insmod gzio/ a set timeout=0' ${EXTRACTED_ISO_TEMP_DIR}/boot/grub/grub.cfg
+
+    # Update default menu entry to select automated install
+    sed -i '/^set timeout/ a set default="2>5"' ${EXTRACTED_ISO_TEMP_DIR}/boot/grub/grub.cfg
+
+    # Update kernel boot parameters to enable more text based console output
+    sed -i 's|linux    /install.a64/vmlinuz  auto=true priority=critical --- quiet|linux    /install.a64/vmlinuz auto=true priority=critical DEBIAN_FRONTEND=text --- nomodeset|g' ${EXTRACTED_ISO_TEMP_DIR}/boot/grub/grub.cfg
+}

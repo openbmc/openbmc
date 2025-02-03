@@ -3,4 +3,8 @@ header:
   includes:
     - kas-security-base.yml
 
+local_conf_header:
+  ptest: |
+      DISTRO_FEATURES:append = " ptest"
+
 machine: qemux86

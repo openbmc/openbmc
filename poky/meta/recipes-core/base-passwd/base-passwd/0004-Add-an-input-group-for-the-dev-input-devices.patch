@@ -1,4 +1,4 @@
-From 662da5251f3f9634c583eeccc8242a05393d37be Mon Sep 17 00:00:00 2001
+From ef6d3257ca8308feeff40272a18e87ca7e2dc81b Mon Sep 17 00:00:00 2001
 From: Darren Hart <dvhart@linux.intel.com>
 Date: Fri, 29 Apr 2022 13:32:28 +0000
 Subject: [PATCH] Add an input group for the /dev/input/* devices

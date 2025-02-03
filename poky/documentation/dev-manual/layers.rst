@@ -470,11 +470,23 @@ corresponding recipe file. For example, the append file
 means the original recipe and append filenames are version
 number-specific. If the corresponding recipe is renamed to update to a
 newer version, you must also rename and possibly update the
-corresponding ``.bbappend`` as well. During the build process, BitBake
-displays an error on starting if it detects a ``.bbappend`` file that
-does not have a corresponding recipe with a matching name. See the
-:term:`BB_DANGLINGAPPENDS_WARNONLY`
-variable for information on how to handle this error.
+corresponding ``.bbappend`` as well.
+
+During the build process, BitBake displays an error on startup if it detects a
+``.bbappend`` file that does not have a corresponding recipe with a matching
+name. To handle these errors, the best practice is to rename the ``.bbappend``
+to match the original recipe version. This also gives you the opportunity to see
+if the ``.bbappend`` is still relevant for the new version of the recipe.
+
+Another method it to use the character ``%`` in the ``.bbappend`` filename. For
+example, to append information to every ``6.*`` minor versions of the recipe
+``someapp``, the ``someapp_6.%.bbappend`` file can be created. This way, an
+error will only be triggered if the ``someapp`` recipe has a major version
+update.
+
+Finally, another method to deal with these errors is to use the variable
+:term:`BBMASK`, especially in cases where modifying the ``.bbappend`` is not
+possible.
 
 Overlaying a File Using Your Layer
 ----------------------------------

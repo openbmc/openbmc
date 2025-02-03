@@ -49,7 +49,7 @@ do_install () {
 
 # avoid virtual/libc
 INHIBIT_DEFAULT_DEPS = "1"
-DEPENDS = "virtual/${HOST_PREFIX}gcc virtual/${HOST_PREFIX}compilerlibs"
+DEPENDS = "virtual/cross-cc virtual/compilerlibs"
 
 BBCLASSEXTEND = "nativesdk"
 

@@ -3,6 +3,7 @@ LICENSE = "ZPL-2.1"
 LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=e54fd776274c1b7423ec128974bd9d46"
 
 PYPI_PACKAGE = "zope.interface"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_setuptools_build_meta
 SRC_URI += "file://0001-Allow-using-setuptools-74.patch"

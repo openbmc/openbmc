@@ -10,9 +10,8 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
 
 update patch to version 8.0.12
 Signed-off-by: Claude Bing <cbing@cybernetics.com>
----
 Upstream-Status: Pending
-
+---
  build/Makefile.global | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 

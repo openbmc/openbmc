@@ -7,20 +7,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0f6d769bdcfacac3c1a1ffa568937fe0"
 
 SRC_URI[sha256sum] = "4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0"
 
-inherit pypi setuptools3 ptest
-
-SRC_URI += " \
-        file://run-ptest \
-"
-
-RDEPENDS:${PN}-ptest += " \
-       python3-pytest \
-       python3-unittest-automake-output \
-"
-
-do_install_ptest() {
-      install -d ${D}${PTEST_PATH}/tests
-        cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
-}
+inherit pypi setuptools3 ptest-python-pytest
 
 BBCLASSEXTEND = "native nativesdk"

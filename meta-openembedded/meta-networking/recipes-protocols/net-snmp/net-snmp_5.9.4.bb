@@ -268,12 +268,12 @@ RDEPENDS:${PN}-server-snmpd += "net-snmp-mibs"
 RDEPENDS:${PN}-server-snmptrapd += "net-snmp-server-snmpd ${PN}-lib-trapd"
 RDEPENDS:${PN}-server += "net-snmp-server-snmpd net-snmp-server-snmptrapd"
 RDEPENDS:${PN}-client += "net-snmp-mibs net-snmp-libs"
-RDEPENDS:${PN}-libs += "libpci \
-                        ${PN}-lib-netsnmp \
+RDEPENDS:${PN}-libs += "${PN}-lib-netsnmp \
                         ${PN}-lib-agent \
                         ${PN}-lib-helpers \
                         ${PN}-lib-mibs \
 "
+RDEPENDS:append:${PN}-libs:class-target = " libpci"
 RDEPENDS:${PN}-ptest += "perl \
                          perl-module-test \
                          perl-module-file-basename \

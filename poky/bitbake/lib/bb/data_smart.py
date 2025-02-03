@@ -827,6 +827,8 @@ class DataSmart(MutableMapping):
                 value = copy.copy(local_var[flag])
             elif flag == "_content" and "_defaultval" in local_var and not noweakdefault:
                 value = copy.copy(local_var["_defaultval"])
+            elif "_defaultval_flag_"+flag in local_var and not noweakdefault:
+                value = copy.copy(local_var["_defaultval_flag_"+flag])
 
 
         if flag == "_content" and local_var is not None and ":append" in local_var and not parsing:

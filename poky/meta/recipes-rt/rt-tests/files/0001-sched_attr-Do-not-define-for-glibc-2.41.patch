@@ -1,0 +1,44 @@
+From e1f5f9379a68471c9f5fb0859e87dd84001b0b6f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Jan 2025 15:03:59 -0800
+Subject: [PATCH] sched_attr: Do not define for glibc >= 2.41
+
+glibc 2.41+ has added [1] definitions for sched_setattr and sched_getattr functions
+and struct sched_attr. Therefore, it needs to be checked for here as well before
+defining sched_attr
+
+Define sched_attr conditionally on SCHED_ATTR_SIZE_VER0
+
+Fixes builds with glibc/trunk
+
+[1] https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=21571ca0d70302909cf72707b2a7736cf12190a0;hp=298bc488fdc047da37482f4003023cb9adef78f8
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-rt-users/20250128230838.2311298-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Clark Williams <williams@redhat.com>
+Cc: John Kacur <jkacur@redhat.com>
+Cc: rt-users <linux-rt-users@vger.kernel.org>
+---
+ src/include/rt-sched.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/include/rt-sched.h b/src/include/rt-sched.h
+index 80171c7..9cf0e3a 100644
+--- a/src/include/rt-sched.h
++++ b/src/include/rt-sched.h
+@@ -42,6 +42,8 @@
+ #define __NR_sched_getattr		275
+ #endif
+ 
++/* sched_attr is not defined in glibc < 2.41 */
++#ifndef SCHED_ATTR_SIZE_VER0
+ struct sched_attr {
+ 	uint32_t size;
+ 	uint32_t sched_policy;
+@@ -68,4 +70,6 @@ int sched_getattr(pid_t pid,
+ 		  unsigned int size,
+ 		  unsigned int flags);
+ 
++#endif /* SCHED_ATTR_SIZE_VER0 */
++
+ #endif /* __RT_SCHED_H__ */

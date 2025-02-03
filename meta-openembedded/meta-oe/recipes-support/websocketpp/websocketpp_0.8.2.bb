@@ -23,7 +23,7 @@ RDEPENDS:${PN}-dev = ""
 # TOOLCHAIN_TARGET_TASK:append = " websocketpp-dev"
 
 # tag 0.8.2
-SRCREV= "56123c87598f8b1dd471be83ca841ceae07f95ba"
+SRCREV = "56123c87598f8b1dd471be83ca841ceae07f95ba"
 
 S = "${WORKDIR}/git"
 
@@ -37,3 +37,5 @@ do_install:append() {
 	install -d ${D}${docdir}/${BPN}
 	cp -R ${S}/examples ${D}${docdir}/${BPN}
 }
+
+SKIP_RECIPE[websocketpp] ?= "Does not work with boost >= 1.87"

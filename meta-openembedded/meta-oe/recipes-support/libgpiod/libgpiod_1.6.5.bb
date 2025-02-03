@@ -14,10 +14,6 @@ inherit python3native
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,kmod udev glib-2.0 catch2"
 PACKAGECONFIG[python3] = "--enable-bindings-python,--disable-bindings-python,python3"
 
-# Always build tools - they don't have any additional
-# requirements over the library.
-EXTRA_OECONF = "--enable-tools"
-
 PACKAGES =+ "${PN}-python"
 FILES:${PN}-tools += "${bindir}/gpiofind"
 FILES:${PN}-ptest += " \

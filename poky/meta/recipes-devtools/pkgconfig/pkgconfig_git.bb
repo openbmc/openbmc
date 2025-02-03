@@ -46,9 +46,9 @@ FILES:${PN} += "${datadir}/aclocal/pkg.m4"
 # specifying an appropriate provide.
 RPROVIDES:${PN} += "pkgconfig(pkg-config)"
 
-# Install a pkg-config-native wrapper that will use the native sysroot instead
-# of the MACHINE sysroot, for using pkg-config when building native tools.
 do_install:append:class-native () {
+    # Install a pkg-config-native wrapper that will use the native sysroot instead
+    # of the MACHINE sysroot, for using pkg-config when building native tools.
     sed -e "s|@PATH_NATIVE@|${PKG_CONFIG_PATH}|" \
         -e "s|@LIBDIR_NATIVE@|${PKG_CONFIG_LIBDIR}|" \
         < ${UNPACKDIR}/pkg-config-native.in > ${B}/pkg-config-native
@@ -57,6 +57,15 @@ do_install:append:class-native () {
         -e "s|@LIBDIR_NATIVE@|${PKG_CONFIG_LIBDIR}|" \
         < ${UNPACKDIR}/pkg-config-esdk.in > ${B}/pkg-config-esdk
     install -m755 ${B}/pkg-config-esdk ${D}${bindir}/pkg-config-esdk
+}
+
+do_install:append:class-nativesdk () {
+    # Install a pkg-config-native wrapper that will use the native sysroot instead
+    # of the MACHINE sysroot, for using pkg-config when building native tools.
+    sed -e "s|@PATH_NATIVE@|\$OECORE_NATIVE_SYSROOT|" \
+        -e "s|@LIBDIR_NATIVE@|\$OECORE_NATIVE_SYSROOT/usr/lib/pkgconfig|" \
+        < ${UNPACKDIR}/pkg-config-native.in > ${B}/pkg-config-native
+    install -m755 ${B}/pkg-config-native ${D}${bindir}/pkg-config-native
 }
 
 pkgconfig_sstate_fixup_esdk () {

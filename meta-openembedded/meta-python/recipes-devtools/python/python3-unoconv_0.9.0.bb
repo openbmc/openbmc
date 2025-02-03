@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "308ebfd98e67d898834876348b27caf41470cd853fbe2681cc7dacd8fd
 
 inherit pypi setuptools3
 
-PYPI_PACKAGE="unoconv"
+PYPI_PACKAGE = "unoconv"
 
 RDEPENDS:${PN} += "\
     python3-setuptools \

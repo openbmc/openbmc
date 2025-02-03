@@ -1,4 +1,4 @@
-From 4ac5b555d058d4d489f25a3806a787b7b2465d09 Mon Sep 17 00:00:00 2001
+From 34713c3bba68cb94b373b750c1c8fcc0b04b2c45 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Wed, 27 Feb 2019 22:41:26 -0800
 Subject: [PATCH] support-files/CMakeLists.txt: fix do_populate_sysroot issue
@@ -10,16 +10,15 @@ ERROR: mariadb-native-10.3.13-r0 do_populate_sysroot: sstate found an absolute p
 Upstream-Status: Inappropriate [oe build specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
-
 ---
  support-files/CMakeLists.txt | 7 -------
  1 file changed, 7 deletions(-)
 
 diff --git a/support-files/CMakeLists.txt b/support-files/CMakeLists.txt
-index b5767432..56733de1 100644
+index ee1d420e..a99c0605 100644
 --- a/support-files/CMakeLists.txt
 +++ b/support-files/CMakeLists.txt
-@@ -165,12 +165,5 @@ IF(UNIX)
+@@ -245,12 +245,5 @@ IF(UNIX AND NOT WITHOUT_SERVER)
        INSTALL(FILES rpm/enable_encryption.preset DESTINATION ${INSTALL_SYSCONF2DIR}
                COMPONENT IniFiles)
      ENDIF()

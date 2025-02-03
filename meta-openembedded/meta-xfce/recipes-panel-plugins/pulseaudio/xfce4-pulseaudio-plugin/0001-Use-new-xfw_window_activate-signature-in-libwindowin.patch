@@ -1,0 +1,25 @@
+From 37d718444bc7e6039fb6abf2360b032a91ddc512 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Mon, 7 Oct 2024 09:57:59 +0200
+Subject: [PATCH] Use new xfw_window_activate() signature in libwindowing
+ 4.19.6
+
+Upstream-Status: Backport [https://gitlab.xfce.org/panel-plugins/xfce4-pulseaudio-plugin/-/merge_requests/63]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ panel-plugin/pulseaudio-mpris-player.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/panel-plugin/pulseaudio-mpris-player.c b/panel-plugin/pulseaudio-mpris-player.c
+index 1694b3f..b4582c5 100644
+--- a/panel-plugin/pulseaudio-mpris-player.c
++++ b/panel-plugin/pulseaudio-mpris-player.c
+@@ -291,7 +291,7 @@ pulseaudio_mpris_player_raise_wnck (PulseaudioMprisPlayer *player)
+     {
+       if (g_strcmp0 (player->player_label, xfw_window_get_name (lp->data)) == 0)
+         {
+-          xfw_window_activate (lp->data, g_get_monotonic_time () / 1000, NULL);
++          xfw_window_activate (lp->data, NULL, g_get_monotonic_time () / 1000, NULL);
+           break;
+         }
+     }

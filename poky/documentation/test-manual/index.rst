@@ -12,6 +12,8 @@ Yocto Project Test Environment Manual
 
    intro
    test-process
+   ptest
+   runtime-testing
    understand-autobuilder
    reproducible-builds
    yocto-project-compatible

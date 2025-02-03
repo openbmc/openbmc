@@ -1,0 +1,84 @@
+From f3302a865b230e021e9defbcea978ed1290a9b2f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 6 Dec 2024 18:01:16 +0100
+Subject: [PATCH] Fix a segfault in iterator of a ConfigParser section
+
+An iterator should return self on __iter__.
+
+So that this works:
+
+    >>> it1 = iter(sectObj)
+    >>> it2 = iter(it1)
+    >>> it1 is it2
+    True
+
+Previously, this iterator did not return self on __iter__, it was like this:
+
+    class PreserveOrderMapStringStringIterator(object):
+        ...
+        def __iter__(self):
+            return _common_types.PreserveOrderMapStringStringIterator___iter__(self)
+
+And that returned a new Python object.
+
+This fixes https://bugzilla.redhat.com/2330562 by avoiding a second iterator object.
+
+My SWIG skills are close to zero,
+perhaps this is not the best way to return self, but it seems to work.
+
+Upstream-Status: Backport
+(https://github.com/rpm-software-management/libdnf/commit/f3302a865b)
+
+Backport so that it works properly with Python 3.13.1.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+
+---
+ bindings/swig/common_types.i | 11 +++++++----
+ bindings/swig/conf.i         |  4 ----
+ 2 files changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/bindings/swig/common_types.i b/bindings/swig/common_types.i
+index c9ae798a..a1f90d9e 100644
+--- a/bindings/swig/common_types.i
++++ b/bindings/swig/common_types.i
+@@ -63,10 +63,6 @@ template<class T>
+ class Iterator {
+ public:
+     Iterator(typename T::iterator _cur, typename T::iterator _end) : cur(_cur), end(_end) {}
+-    Iterator* __iter__()
+-    {
+-      return this;
+-    }
+ 
+     typename T::iterator cur;
+     typename T::iterator end;
+@@ -165,3 +161,10 @@ EXTEND_TEMPLATE_PreserveOrderMapIterator(std::string, std::string)
+ EXTEND_TEMPLATE_PreserveOrderMapIterator(std::string, libdnf::PreserveOrderMap<std::string, std::string>)
+ 
+ %exception;  // beware this resets all exception handlers if you import this file after defining any
++
++%pythoncode %{
++def PreserveOrderMapStringStringIterator___iter__(self):
++    return self
++PreserveOrderMapStringStringIterator.__iter__ = PreserveOrderMapStringStringIterator___iter__
++del PreserveOrderMapStringStringIterator___iter__
++%}
+diff --git a/bindings/swig/conf.i b/bindings/swig/conf.i
+index b6a0ce88..2f77003f 100644
+--- a/bindings/swig/conf.i
++++ b/bindings/swig/conf.i
+@@ -71,10 +71,6 @@ template<class T>
+ class Iterator {
+ public:
+     Iterator(typename T::iterator _cur, typename T::iterator _end) : cur(_cur), end(_end) {}
+-    Iterator* __iter__()
+-    {
+-        return this;
+-    }
+ 
+     typename T::iterator cur;
+     typename T::iterator end;
+-- 
+2.39.5
+

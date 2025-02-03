@@ -6,6 +6,7 @@ from tempfile import mkstemp
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.runtime.decorator.package import OEHasPackage
+from oeqa.core.decorator.data import skipIfFeature
 
 
 class ClamavTest(OERuntimeTestCase):
@@ -43,11 +44,12 @@ class ClamavTest(OERuntimeTestCase):
         msg = 'File could not be copied. Output: %s' % output
         self.assertEqual(status, 0, msg=msg)
 
-        status, output = self.target.run('ping -c 1 database.clamav.net')
+        status, output = self.target.run('ping -c 1 database.clamav.net || curl http://database.clamav.net')
         msg = ('ping database.clamav.net failed: output is:\n%s' % output)
         self.assertEqual(status, 0, msg = msg)
 
     @OETestDepends(['clamav.ClamavTest.test_ping_clamav_net'])
+    @skipIfFeature('systemd','systemd in DISTRO_FEATURES means update job is already running')
     def test_freshclam_download(self):
         status, output = self.target.run('freshclam --show-progress')
         msg = ('freshclam : DB dowbload failed. '

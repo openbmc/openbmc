@@ -38,7 +38,7 @@ PRETTY_NAME = "${DISTRO_NAME} ${VERSION}"
 # the CPE.
 
 CPE_DISTRO ??= "${DISTRO}"
-CPE_NAME="cpe:/o:openembedded:${CPE_DISTRO}:${VERSION_ID}"
+CPE_NAME = "cpe:/o:openembedded:${CPE_DISTRO}:${VERSION_ID}"
 
 BUILD_ID ?= "${DATETIME}"
 BUILD_ID[vardepsexclude] = "DATETIME"

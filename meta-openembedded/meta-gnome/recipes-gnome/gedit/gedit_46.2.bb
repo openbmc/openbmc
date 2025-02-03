@@ -12,7 +12,7 @@ DEPENDS = " \
     gdk-pixbuf-native \
     gtk+3 \
     gsettings-desktop-schemas \
-    libpeas \
+    libpeas-1 \
     libsoup \
     gspell \
     tepl \

@@ -1,7 +1,7 @@
-From ca94c86736ca7917e6c50d09d6c6ba56ba139709 Mon Sep 17 00:00:00 2001
+From e5fd143f215f072404c544f694cb026a4231503e Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 21 Feb 2019 16:23:24 +0800
-Subject: [PATCH 01/27] binfmt: Don't install dependency links at install time
+Subject: [PATCH 01/26] binfmt: Don't install dependency links at install time
  for the binfmt services
 
 use [Install] blocks so that they get created when the service is enabled
@@ -25,7 +25,7 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/units/meson.build b/units/meson.build
-index b231341a1f..b613a188a4 100644
+index 96f4852741..0a3a4fee67 100644
 --- a/units/meson.build
 +++ b/units/meson.build
 @@ -156,7 +156,6 @@ units = [
@@ -75,5 +75,5 @@ index 318bf8efc2..6ef684861d 100644
 +[Install]
 +WantedBy=sysinit.target
 -- 
-2.45.1
+2.34.1
 

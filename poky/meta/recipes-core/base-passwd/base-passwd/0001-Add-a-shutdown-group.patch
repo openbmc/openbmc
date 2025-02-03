@@ -1,4 +1,4 @@
-From 03150b2575c5ec1ba30726d30d47303627e6fc60 Mon Sep 17 00:00:00 2001
+From 6bbd3d01d123b042167aa6dea30b5e8d9d4de4dc Mon Sep 17 00:00:00 2001
 From: Saul Wold <sgw@linux.intel.com>
 Date: Fri, 29 Apr 2022 13:32:27 +0000
 Subject: [PATCH] Add a shutdown group

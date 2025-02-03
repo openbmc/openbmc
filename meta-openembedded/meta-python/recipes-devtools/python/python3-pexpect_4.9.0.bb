@@ -10,8 +10,6 @@ SRC_URI[sha256sum] = "ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398
 
 inherit pypi setuptools3
 
-UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/pexpect"
-
 RDEPENDS:${PN} = "\
     python3-core \
     python3-io \

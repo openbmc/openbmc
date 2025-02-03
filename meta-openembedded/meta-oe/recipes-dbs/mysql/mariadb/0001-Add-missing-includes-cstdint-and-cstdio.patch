@@ -1,4 +1,4 @@
-From 68100b1f2243304289b9a9a35e8fb0e1bb0cf70f Mon Sep 17 00:00:00 2001
+From ef47f8f41722b90a86ace86f0f509b4775c2f725 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 24 Jan 2023 21:40:43 -0800
 Subject: [PATCH] Add missing includes <cstdint> and <cstdio>
@@ -66,19 +66,15 @@ index 6db11cc9..c26b6a21 100644
  #include "rocksdb/slice_transform.h"
  #include "rocksdb/slice.h"
  #include "util/string_util.h"
-
-diff --git a/util/string_util.h b/util/string_util.h
-index 55d106fff02..11178fd1d7b 100644
+diff --git a/storage/rocksdb/rocksdb/util/string_util.h b/storage/rocksdb/rocksdb/util/string_util.h
+index a761be66..064d059f 100644
 --- a/storage/rocksdb/rocksdb/util/string_util.h
 +++ b/storage/rocksdb/rocksdb/util/string_util.h
 @@ -6,6 +6,7 @@
-
+ 
  #pragma once
-
+ 
 +#include <cstdint>
  #include <sstream>
  #include <string>
  #include <unordered_map>
--- 
-2.25.1
-

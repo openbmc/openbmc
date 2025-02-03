@@ -5,11 +5,15 @@ HOMEPAGE = "http://www.sourceforge.net/projects/tinyxml"
 LICENSE = "Zlib"
 LIC_FILES_CHKSUM = "file://readme.txt;md5=f8f366f3370dda889f60faa7db162cf4"
 SECTION = "libs"
+CVE_PRODUCT = "tinyxml"
 
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/tinyxml/tinyxml_${@'${PV}'.replace('.', '_')}.tar.gz \
            file://enforce-use-stl.patch \
-           file://entity-encoding.patch"
+           file://entity-encoding.patch \
+           file://CVE-2021-42260.patch \
+           file://CVE-2023-34194.patch \
+"
 SRC_URI[sha256sum] = "15bdfdcec58a7da30adc87ac2b078e4417dbe5392f3afb719f9ba6d062645593"
 
 S = "${WORKDIR}/tinyxml"

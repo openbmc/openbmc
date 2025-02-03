@@ -1,4 +1,4 @@
-From 80be37351d995654f86b838f6b5ed47e8a90261b Mon Sep 17 00:00:00 2001
+From b6d8dbb7e930f5caa9e3e3c71706b0cf9eea7bb3 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Fri, 23 Sep 2022 12:05:17 +0800
 Subject: [PATCH] CMakeLists.txt: not include import_executables.cmake
@@ -14,10 +14,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 5 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f9e2b1b..34924ba 100644
+index 3828420c..ee38615a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -394,11 +394,6 @@ CHECK_LIBFMT()
+@@ -428,11 +428,6 @@ CHECK_LIBFMT()
  ADD_SUBDIRECTORY(tpool)
  CHECK_SYSTEMD()
  
@@ -29,6 +29,3 @@ index f9e2b1b..34924ba 100644
  #
  # Setup maintainer mode options. Platform checks are
  # not run with the warning options as to not perturb fragile checks
--- 
-2.25.1
-

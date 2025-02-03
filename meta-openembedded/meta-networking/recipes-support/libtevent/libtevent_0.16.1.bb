@@ -6,7 +6,7 @@ LICENSE = "LGPL-3.0-or-later"
 DEPENDS += "libtalloc libtirpc cmocka"
 RDEPENDS:python3-tevent = "python3"
 
-export PYTHONHASHSEED="1"
+export PYTHONHASHSEED = "1"
 export PYTHONARCHDIR = "${PYTHON_SITEPACKAGES_DIR}"
 
 SRC_URI = "https://samba.org/ftp/tevent/tevent-${PV}.tar.gz \
@@ -37,7 +37,7 @@ S = "${WORKDIR}/tevent-${PV}"
 
 # Cross_compile cannot use preforked process, since fork process earlier than point subproces.popen
 # to cross Popen
-export WAF_NO_PREFORK="yes"
+export WAF_NO_PREFORK = "yes"
 
 EXTRA_OECONF += "--disable-rpath \
                  --disable-rpath-install \

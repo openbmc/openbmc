@@ -1,0 +1,33 @@
+From ff508f2e6786df697876140f21855ecb92a3ed36 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 18 Aug 2023 12:25:11 +0200
+Subject: [PATCH] generic/tcl.h: use Tcl_WideInt for seconds in Tcl_Time
+
+This ensures the value will not overflow, particularly on 32 bit systems
+in 2038, where long will.
+
+This patch was proposed at https://core.tcl-lang.org/tcl/tktview/86dd172271
+Upstream was generally supportive of the fix, but they merged a much more
+elaborate version of it for tcl 9.x (released in 9.0.0), and declined
+to merge it into 8.x due to ABI breakage (sadly this change is in a public header).
+But we can carry the fix downstream.
+
+Upstream-Status: Inappropriate [see above]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ generic/tcl.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/generic/tcl.h b/generic/tcl.h
+index 3a4622e..6204c57 100644
+--- a/generic/tcl.h
++++ b/generic/tcl.h
+@@ -1418,7 +1418,7 @@ typedef enum {
+  */
+ 
+ typedef struct Tcl_Time {
+-    long sec;			/* Seconds. */
++    Tcl_WideInt sec;			/* Seconds. */
+     long usec;			/* Microseconds. */
+ } Tcl_Time;
+ 

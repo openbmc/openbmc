@@ -1,4 +1,4 @@
-From 0d76b00111a112032eb8522791b70664100d4e0a Mon Sep 17 00:00:00 2001
+From 1d0fa519ef017aef4821af49c59bad119e7f0d66 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 26 Nov 2024 23:23:42 -0800
 Subject: [PATCH] autogen.sh: remove '-unknown' in version
@@ -20,7 +20,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/autogen.sh b/autogen.sh
-index 9f912972..9f7559b4 100755
+index 9f91297..9f7559b 100755
 --- a/autogen.sh
 +++ b/autogen.sh
 @@ -271,7 +271,7 @@ if [ "$myhost" = "find-version" ]; then
@@ -32,6 +32,3 @@ index 9f912972..9f7559b4 100755
        cid="0000000"
        rev="0000000"
        rvd="0"
--- 
-2.25.1
-

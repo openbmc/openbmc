@@ -602,6 +602,28 @@ def drop_v14_cross_builds(d):
                 bb.utils.remove(stamp + "*")
                 bb.utils.remove(workdir, recurse = True)
 
+def check_cpp_toolchain(d):
+    """
+    it checks if the c++ compiling and linking to libstdc++ works properly in the native system
+    """
+    import shlex
+    import subprocess
+
+    cpp_code = """
+    #include <iostream>
+    int main() {
+        std::cout << "Hello, World!" << std::endl;
+        return 0;
+    }
+    """
+
+    cmd = shlex.split(d.getVar("BUILD_CXX")) + ["-x", "c++","-", "-o", "/dev/null", "-lstdc++"]
+    try:
+        subprocess.run(cmd, input=cpp_code, capture_output=True, text=True, check=True)
+        return None
+    except subprocess.CalledProcessError as e:
+        return f"An unexpected issue occurred during the C++ toolchain check: {str(e)}"
+
 def sanity_handle_abichanges(status, d):
     #
     # Check the 'ABI' of TMPDIR
@@ -760,8 +782,8 @@ def check_sanity_version_change(status, d):
     if not oes_bb_conf:
         status.addresult('You are not using the OpenEmbedded version of conf/bitbake.conf. This means your environment is misconfigured, in particular check BBPATH.\n')
 
-    # The length of TMPDIR can't be longer than 410
-    status.addresult(check_path_length(tmpdir, "TMPDIR", 410))
+    # The length of TMPDIR can't be longer than 400
+    status.addresult(check_path_length(tmpdir, "TMPDIR", 400))
 
     # Check that TMPDIR isn't located on nfs
     status.addresult(check_not_nfs(tmpdir, "TMPDIR"))
@@ -769,6 +791,9 @@ def check_sanity_version_change(status, d):
     # Check for case-insensitive file systems (such as Linux in Docker on
     # macOS with default HFS+ file system)
     status.addresult(check_case_sensitive(tmpdir, "TMPDIR"))
+
+    # Check if linking with lstdc++ is failing
+    status.addresult(check_cpp_toolchain(d))
 
 def sanity_check_locale(d):
     """

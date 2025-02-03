@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "1c39c6016c32bc48dd54561950ebd6836e1670f2ae46128f67cf49e789
 
 SRC_URI += "file://run-ptest"
 
-inherit pypi python_setuptools_build_meta ptest
+inherit pypi python_setuptools_build_meta ptest pkgconfig
 
 do_install_ptest() {
     cp -r ${S}/testing ${D}${PTEST_PATH}

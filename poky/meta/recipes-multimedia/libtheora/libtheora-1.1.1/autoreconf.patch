@@ -1,0 +1,42 @@
+From 859e58b440e64aeec446ae0a923a638e4203f408 Mon Sep 17 00:00:00 2001
+From: Tim Terriberry <tterribe@xiph.org>
+Date: Fri, 20 May 2011 20:41:50 +0000
+Subject: [PATCH] Make autoreconf -i -f work.
+
+Patch from David Schleef.
+
+svn path=/trunk/theora/; revision=17990
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ Makefile.am  | 2 ++
+ configure.ac | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d833491..369978d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,6 +2,8 @@
+ 
+ AUTOMAKE_OPTIONS = foreign 1.6 dist-zip dist-bzip2
+ 
++ACLOCAL_AMFLAGS=-I m4
++
+ if THEORA_ENABLE_EXAMPLES
+ EXAMPLES_DIR = examples
+ else
+diff --git a/configure.ac b/configure.ac
+index 8260bdf..d4feb86 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -61,7 +61,7 @@ AC_LIBTOOL_WIN32_DLL
+ AM_PROG_LIBTOOL
+ 
+ dnl Add parameters for aclocal
+-AC_SUBST(ACLOCAL_AMFLAGS, "-I m4")
++AC_CONFIG_MACRO_DIR([m4])
+ 
+ dnl Check for doxygen
+ AC_CHECK_PROG(HAVE_DOXYGEN, doxygen, true, false)

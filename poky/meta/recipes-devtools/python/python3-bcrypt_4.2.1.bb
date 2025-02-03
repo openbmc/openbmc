@@ -8,11 +8,7 @@ LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '-fuse-ld=bfd', '',
 
 SRC_URI[sha256sum] = "6765386e3ab87f569b276988742039baab087b2cdb01e809d74e74503c2faafe"
 
-inherit pypi python_setuptools3_rust ptest-cargo cargo-update-recipe-crates
-
-SRC_URI += " \
-	file://run-ptest \
-"
+inherit pypi python_setuptools3_rust cargo-update-recipe-crates ptest-python-pytest
 
 CARGO_SRC_DIR = "src/_bcrypt"
 

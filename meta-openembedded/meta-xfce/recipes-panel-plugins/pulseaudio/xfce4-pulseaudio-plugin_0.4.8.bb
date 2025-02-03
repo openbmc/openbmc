@@ -8,6 +8,7 @@ REQUIRED_DISTRO_FEATURES = "pulseaudio x11"
 
 DEPENDS += "dbus-glib pulseaudio"
 
+SRC_URI += "file://0001-Use-new-xfw_window_activate-signature-in-libwindowin.patch"
 SRC_URI[sha256sum] = "bd742b207c39c221e91c57c9c9be2839eb802d1b1ee01a02b7427cd02d3f0348"
 
 PACKAGECONFIG ??= "libnotify"

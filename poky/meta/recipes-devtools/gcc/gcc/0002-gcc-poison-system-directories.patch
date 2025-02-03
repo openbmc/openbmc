@@ -14,6 +14,7 @@ wants this to be a failure, they can add "-Werror=poison-system-directories".
 Upstream-Status: Inappropriate [OE configuration]
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: sunil dora <sunilkumar.dora@windriver.com>
 ---
  gcc/common.opt      |  4 ++++
  gcc/config.in       | 10 ++++++++++
@@ -21,8 +22,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  gcc/configure.ac    | 16 ++++++++++++++++
  gcc/doc/invoke.texi |  9 +++++++++
  gcc/gcc.cc          |  9 +++++++--
- gcc/incpath.cc      | 21 +++++++++++++++++++++
- 7 files changed, 86 insertions(+), 2 deletions(-)
+ gcc/incpath.cc      | 25 +++++++++++++++++++++++++
+ 7 files changed, 90 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/common.opt b/gcc/common.opt
 index ad348844775..df3992b420d 100644
@@ -159,10 +160,23 @@ index f82f7d2817b..1da91813b0e 100644
  @opindex Wno-float-equal
  @item -Wfloat-equal
 diff --git a/gcc/gcc.cc b/gcc/gcc.cc
-index 728332b8153..343e4915097 100644
+index 728332b8153..a63f128cb95 100644
 --- a/gcc/gcc.cc
 +++ b/gcc/gcc.cc
-@@ -1159,6 +1159,8 @@ proper position among the other output files.  */
+@@ -902,6 +902,12 @@ proper position among the other output files.  */
+ #define ASM_MAP ""
+ #endif
+ 
++#ifdef POISON_BY_DEFAULT
++#define POISON_IS_ERROR " -Werror=poison-system-directories"
++#else
++#define POISON_IS_ERROR
++#endif
++
+ /* Assembler options for compressed debug sections.  */
+ #if HAVE_LD_COMPRESS_DEBUG == 0
+ /* Reject if the linker cannot write compressed debug sections.  */
+@@ -1159,6 +1163,8 @@ proper position among the other output files.  */
     "%{fuse-ld=*:-fuse-ld=%*} " LINK_COMPRESS_DEBUG_SPEC \
     "%X %{o*} %{e*} %{N} %{n} %{r}\
      %{s} %{t} %{u*} %{z} %{Z} %{!nostdlib:%{!r:%{!nostartfiles:%S}}} \
@@ -171,22 +185,26 @@ index 728332b8153..343e4915097 100644
      %{static|no-pie|static-pie:} %@{L*} %(link_libgcc) " \
      VTABLE_VERIFICATION_SPEC " " SANITIZER_EARLY_SPEC " %o "" \
      %{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*:%*} 1):\
-@@ -1260,8 +1262,11 @@ static const char *cpp_unique_options =
- static const char *cpp_options =
+@@ -1261,7 +1267,7 @@ static const char *cpp_options =
  "%(cpp_unique_options) %1 %{m*} %{std*&ansi&trigraphs} %{W*&pedantic*} %{w}\
   %{f*} %{g*:%{%:debug-level-gt(0):%{g*}\
-- %{!fno-working-directory:-fworking-directory}}} %{O*}\
+  %{!fno-working-directory:-fworking-directory}}} %{O*}\
 - %{undef} %{save-temps*:-fpch-preprocess}";
-+ %{!fno-working-directory:-fworking-directory}}} %{O*}"
-+#ifdef POISON_BY_DEFAULT
-+ " -Werror=poison-system-directories"
-+#endif
-+ " %{undef} %{save-temps*:-fpch-preprocess}";
++ %{undef} %{save-temps*:-fpch-preprocess}" POISON_IS_ERROR;
  
  /* Pass -d* flags, possibly modifying -dumpdir, -dumpbase et al.
  
+@@ -1290,7 +1296,7 @@ static const char *cc1_options =
+  %{coverage:-fprofile-arcs -ftest-coverage}\
+  %{fprofile-arcs|fcondition-coverage|fprofile-generate*|coverage:\
+    %{!fprofile-update=single:\
+-     %{pthread:-fprofile-update=prefer-atomic}}}";
++     %{pthread:-fprofile-update=prefer-atomic}}}" POISON_IS_ERROR;
+ 
+ static const char *asm_options =
+ "%{-target-help:%:print-asm-header()} "
 diff --git a/gcc/incpath.cc b/gcc/incpath.cc
-index 64cdd2f4a1b..e572d98ab17 100644
+index 64cdd2f4a..89f42900d 100644
 --- a/gcc/incpath.cc
 +++ b/gcc/incpath.cc
 @@ -26,6 +26,7 @@
@@ -197,7 +215,18 @@ index 64cdd2f4a1b..e572d98ab17 100644
  
  /* Microsoft Windows does not natively support inodes.
     VMS has non-numeric inodes.  */
-@@ -399,6 +400,26 @@ merge_include_chains (const char *sysroot, cpp_reader *pfile, int verbose)
+@@ -273,6 +274,10 @@ remove_duplicates (cpp_reader *pfile, struct cpp_dir *head,
+			     cur->name, xstrerror (errno));
+	      reason = REASON_NOENT;
+	    }
++#ifdef ENABLE_POISON_SYSTEM_DIRECTORIES
++	  pcur = &cur->next;
++	  continue;
++#endif
+	}
+       else if (!S_ISDIR (st.st_mode))
+	cpp_error_with_line (pfile, CPP_DL_WARNING, 0, 0,
+@@ -399,6 +404,26 @@ merge_include_chains (const char *sysroot, cpp_reader *pfile, int verbose)
  	}
        fprintf (stderr, _("End of search list.\n"));
      }
@@ -224,3 +253,5 @@ index 64cdd2f4a1b..e572d98ab17 100644
  }
  
  /* Use given -I paths for #include "..." but not #include <...>, and
+--
+2.34.1

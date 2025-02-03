@@ -33,7 +33,7 @@ class ClassExtender(object):
             name = name.replace("-" + self.extname, "")
         if name.startswith("virtual/"):
             # Assume large numbers of dashes means a triplet is present and we don't need to convert
-            if name.count("-") >= 3 and name.endswith(("-go", "-binutils", "-gcc", "-g++")):
+            if name.count("-") >= 3 and name.endswith(("-go",)):
                 return name
             subs = name.split("/", 1)[1]
             if not subs.startswith(self.extname):

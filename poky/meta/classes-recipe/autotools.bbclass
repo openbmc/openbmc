@@ -52,7 +52,7 @@ export CC_FOR_BUILD = "${BUILD_CC}"
 export CFLAGS_FOR_BUILD = "${BUILD_CFLAGS}"
 
 export CXX_FOR_BUILD = "${BUILD_CXX}"
-export CXXFLAGS_FOR_BUILD="${BUILD_CXXFLAGS}"
+export CXXFLAGS_FOR_BUILD = "${BUILD_CXXFLAGS}"
 
 export LD_FOR_BUILD = "${BUILD_LD}"
 export LDFLAGS_FOR_BUILD = "${BUILD_LDFLAGS}"
@@ -134,17 +134,11 @@ EXTRACONFFUNCS ??= ""
 
 EXTRA_OECONF:append = " ${PACKAGECONFIG_CONFARGS}"
 
-do_configure[prefuncs] += "autotools_preconfigure autotools_aclocals ${EXTRACONFFUNCS}"
-do_compile[prefuncs] += "autotools_aclocals"
-do_install[prefuncs] += "autotools_aclocals"
+do_configure[prefuncs] += "autotools_preconfigure autotools_sitefiles ${EXTRACONFFUNCS}"
 do_configure[postfuncs] += "autotools_postconfigure"
 
-ACLOCALDIR = "${STAGING_DATADIR}/aclocal"
-ACLOCALEXTRAPATH = ""
-ACLOCALEXTRAPATH:class-target = " -I ${STAGING_DATADIR_NATIVE}/aclocal/"
-ACLOCALEXTRAPATH:class-nativesdk = " -I ${STAGING_DATADIR_NATIVE}/aclocal/"
-
-python autotools_aclocals () {
+# Tell autoconf to load the site defaults from siteinfo
+python autotools_sitefiles () {
     sitefiles, searched = siteinfo_get_files(d, sysrootcache=True)
     d.setVar("CONFIG_SITE", " ".join(sitefiles))
 }
@@ -171,8 +165,8 @@ autotools_do_configure() {
 	if [ -e ${AUTOTOOLS_SCRIPT_PATH}/configure.in -o -e ${AUTOTOOLS_SCRIPT_PATH}/configure.ac ]; then
 		olddir=`pwd`
 		cd ${AUTOTOOLS_SCRIPT_PATH}
-		mkdir -p ${ACLOCALDIR}
-		ACLOCAL="aclocal --system-acdir=${ACLOCALDIR}/"
+		# aclocal looks in the native sysroot by default, so tell it to also look in the target sysroot.
+		ACLOCAL="aclocal --aclocal-path=${STAGING_DATADIR}/aclocal/"
 		if [ x"${acpaths}" = xdefault ]; then
 			acpaths=
 			for i in `find ${AUTOTOOLS_SCRIPT_PATH} -ignore_readdir_race -maxdepth 2 -name \*.m4|grep -v 'aclocal.m4'| \
@@ -182,17 +176,11 @@ autotools_do_configure() {
 		else
 			acpaths="${acpaths}"
 		fi
-		acpaths="$acpaths ${ACLOCALEXTRAPATH}"
-		AUTOV=`automake --version | sed -e '1{s/.* //;s/\.[0-9]\+$//};q'`
-		automake --version
-		echo "AUTOV is $AUTOV"
-		if [ -d ${STAGING_DATADIR_NATIVE}/aclocal-$AUTOV ]; then
-			ACLOCAL="$ACLOCAL --automake-acdir=${STAGING_DATADIR_NATIVE}/aclocal-$AUTOV"
-		fi
 		# autoreconf is too shy to overwrite aclocal.m4 if it doesn't look
 		# like it was auto-generated.  Work around this by blowing it away
 		# by hand, unless the package specifically asked not to run aclocal.
 		if ! echo ${EXTRA_AUTORECONF} | grep -q "aclocal"; then
+			bbnote Removing existing aclocal.m4
 			rm -f aclocal.m4
 		fi
 		if [ -e configure.in ]; then
@@ -212,8 +200,8 @@ autotools_do_configure() {
 			cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${AUTOTOOLS_AUXDIR}/
 			if [ -d ${S}/po/ ]; then
 				cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/po/
-				if [ ! -e ${S}/po/remove-potcdate.sin ]; then
-					cp ${STAGING_DATADIR_NATIVE}/gettext/po/remove-potcdate.sin ${S}/po/
+				if [ ! -e ${S}/po/remove-potcdate.sed ]; then
+					cp ${STAGING_DATADIR_NATIVE}/gettext/po/remove-potcdate.sed ${S}/po/
 				fi
 			fi
 			PRUNE_M4="$PRUNE_M4 gettext.m4 iconv.m4 lib-ld.m4 lib-link.m4 lib-prefix.m4 nls.m4 po.m4 progtest.m4"

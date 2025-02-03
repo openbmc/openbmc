@@ -31,7 +31,7 @@ RDEPENDS:${PN} = "glibc libgcc sed bash"
 RDEPENDS:${PN}-ptest = "${PN}"
 DEPENDS += "sed"
 
-export oe_srcdir="${exec_prefix}/src/debug/glibc/${PV}/"
+export oe_srcdir = "${exec_prefix}/src/debug/glibc/${PV}/"
 
 # Just build tests for target - do not run them
 do_check:append () {

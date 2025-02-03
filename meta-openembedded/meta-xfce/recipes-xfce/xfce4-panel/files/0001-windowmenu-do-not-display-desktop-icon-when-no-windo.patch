@@ -17,27 +17,32 @@ Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 Rebase for xfce4-panel 4.18.3.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for xfce4-panel 4.20.0.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
  plugins/windowmenu/windowmenu.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/plugins/windowmenu/windowmenu.c b/plugins/windowmenu/windowmenu.c
-index be7dea4..2f432b0 100644
+index 9a73f29..eab0547 100644
 --- a/plugins/windowmenu/windowmenu.c
 +++ b/plugins/windowmenu/windowmenu.c
-@@ -262,7 +262,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
+@@ -266,7 +266,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
    g_signal_connect (G_OBJECT (plugin->button), "toggled",
-       G_CALLBACK (window_menu_plugin_menu), plugin);
+                     G_CALLBACK (window_menu_plugin_menu), plugin);
  
 -  plugin->icon = gtk_image_new_from_icon_name ("user-desktop", GTK_ICON_SIZE_BUTTON);
 +  plugin->icon = gtk_image_new_from_icon_name (NULL, GTK_ICON_SIZE_BUTTON);
    gtk_container_add (GTK_CONTAINER (plugin->button), plugin->icon);
    gtk_widget_show (plugin->icon);
- 
-@@ -695,19 +695,19 @@ window_menu_plugin_active_window_changed (WnckScreen       *screen,
+ }
+@@ -706,19 +706,19 @@ window_menu_plugin_active_window_changed (XfwScreen *screen,
            /* skip 'fake' windows */
-           type = wnck_window_get_window_type (window);
-           if (type == WNCK_WINDOW_DESKTOP || type == WNCK_WINDOW_DOCK)
+           type = xfw_window_get_window_type (window);
+           if (type == XFW_WINDOW_TYPE_DESKTOP || type == XFW_WINDOW_TYPE_DOCK)
 -            goto show_desktop_icon;
 +            goto show_no_icon;
  
@@ -45,8 +50,8 @@ index be7dea4..2f432b0 100644
          }
        else
          {
--          show_desktop_icon:
-+          show_no_icon:
+-show_desktop_icon:
++show_no_icon:
  
            /* desktop is shown right now */
            icon_size = xfce_panel_plugin_get_icon_size (XFCE_PANEL_PLUGIN (plugin));

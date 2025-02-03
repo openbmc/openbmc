@@ -78,7 +78,7 @@ You must install essential host packages on your build host. The
 following command installs the host packages based on an Ubuntu
 distribution::
 
-   $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
+   $ sudo apt install &UBUNTU_DEBIAN_HOST_PACKAGES_ESSENTIAL;
 
 .. note::
 

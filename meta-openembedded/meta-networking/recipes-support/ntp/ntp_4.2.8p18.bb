@@ -55,6 +55,11 @@ CVE_STATUS_NTP = " \
 
 inherit autotools update-rc.d useradd systemd pkgconfig
 
+# For some reason this recipe reconfigures the nested configure.ac files in
+# do_compile because libtool.m4 is newer than aclocal.m4, and that then
+# doesn't know about the site configuration.
+do_compile[prefuncs] += "autotools_sitefiles"
+
 # The ac_cv_header_readline_history is to stop ntpdc depending on either
 # readline or curses
 EXTRA_OECONF += "--with-net-snmp-config=no \

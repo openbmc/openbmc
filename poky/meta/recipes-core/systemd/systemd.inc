@@ -15,8 +15,10 @@ LICENSE:libsystemd = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL2;md5=751419260aa954499f7abaabaa882bbe \
                     file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c"
 
-SRCREV = "a2240d1cf9f3515728186c2c98a6f4b64a40e4da"
-SRCBRANCH = "v256-stable"
+SRCREV = "47eea9ee9f46537bc18d6a64fa21fd9c50538e13"
+SRCBRANCH = "v257-stable"
 SRC_URI = "git://github.com/systemd/systemd.git;protocol=https;branch=${SRCBRANCH}"
 
 S = "${WORKDIR}/git"
+
+CVE_PRODUCT = "systemd"

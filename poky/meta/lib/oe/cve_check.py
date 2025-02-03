@@ -5,9 +5,11 @@
 #
 
 import collections
-import re
-import itertools
 import functools
+import itertools
+import os.path
+import re
+import oe.patch
 
 _Version = collections.namedtuple(
     "_Version", ["release", "patch_l", "pre_l", "pre_v"]
@@ -71,76 +73,132 @@ def _cmpkey(release, patch_l, pre_l, pre_v):
     return _release, _patch, _pre
 
 
+def parse_cve_from_filename(patch_filename):
+    """
+    Parses CVE ID from the filename
+
+    Matches the last "CVE-YYYY-ID" in the file name, also if written
+    in lowercase. Possible to have multiple CVE IDs in a single
+    file name, but only the last one will be detected from the file name.
+
+    Returns the last CVE ID foudn in the filename. If no CVE ID is found
+    an empty string is returned.
+    """
+    cve_file_name_match = re.compile(r".*(CVE-\d{4}-\d{4,})", re.IGNORECASE)
+
+    # Check patch file name for CVE ID
+    fname_match = cve_file_name_match.search(patch_filename)
+    return fname_match.group(1).upper() if fname_match else ""
+
+
+def parse_cves_from_patch_contents(patch_contents):
+    """
+    Parses CVE IDs from patch contents
+
+    Matches all CVE IDs contained on a line that starts with "CVE: ". Any
+    delimiter (',', '&', "and", etc.) can be used without any issues. Multiple
+    "CVE:" lines can also exist.
+
+    Returns a set of all CVE IDs found in the patch contents.
+    """
+    cve_ids = set()
+    cve_match = re.compile(r"CVE-\d{4}-\d{4,}")
+    # Search for one or more "CVE: " lines
+    for line in patch_contents.split("\n"):
+        if not line.startswith("CVE:"):
+            continue
+        cve_ids.update(cve_match.findall(line))
+    return cve_ids
+
+
+def parse_cves_from_patch_file(patch_file):
+    """
+    Parses CVE IDs associated with a particular patch file, using both the filename
+    and patch contents.
+
+    Returns a set of all CVE IDs found in the patch filename and contents.
+    """
+    cve_ids = set()
+    filename_cve = parse_cve_from_filename(patch_file)
+    if filename_cve:
+        bb.debug(2, "Found %s from patch file name %s" % (filename_cve, patch_file))
+        cve_ids.add(parse_cve_from_filename(patch_file))
+
+    # Remote patches won't be present and compressed patches won't be
+    # unpacked, so say we're not scanning them
+    if not os.path.isfile(patch_file):
+        bb.note("%s is remote or compressed, not scanning content" % patch_file)
+        return cve_ids
+
+    with open(patch_file, "r", encoding="utf-8") as f:
+        try:
+            patch_text = f.read()
+        except UnicodeDecodeError:
+            bb.debug(
+                1,
+                "Failed to read patch %s using UTF-8 encoding"
+                " trying with iso8859-1" % patch_file,
+            )
+            f.close()
+            with open(patch_file, "r", encoding="iso8859-1") as f:
+                patch_text = f.read()
+
+    cve_ids.update(parse_cves_from_patch_contents(patch_text))
+
+    if not cve_ids:
+        bb.debug(2, "Patch %s doesn't solve CVEs" % patch_file)
+    else:
+        bb.debug(2, "Patch %s solves %s" % (patch_file, ", ".join(sorted(cve_ids))))
+
+    return cve_ids
+
+
 def get_patched_cves(d):
     """
-    Get patches that solve CVEs using the "CVE: " tag.
+    Determines the CVE IDs that have been solved by either patches incuded within
+    SRC_URI or by setting CVE_STATUS.
+
+    Returns a dictionary with the CVE IDs as keys and an associated dictonary of
+    relevant metadata as the value.
     """
-
-    import re
-    import oe.patch
-
-    cve_match = re.compile(r"CVE:( CVE-\d{4}-\d+)+")
-
-    # Matches the last "CVE-YYYY-ID" in the file name, also if written
-    # in lowercase. Possible to have multiple CVE IDs in a single
-    # file name, but only the last one will be detected from the file name.
-    # However, patch files contents addressing multiple CVE IDs are supported
-    # (cve_match regular expression)
-    cve_file_name_match = re.compile(r".*(CVE-\d{4}-\d+)", re.IGNORECASE)
-
     patched_cves = {}
     patches = oe.patch.src_patches(d)
     bb.debug(2, "Scanning %d patches for CVEs" % len(patches))
+
+    # Check each patch file
     for url in patches:
         patch_file = bb.fetch.decodeurl(url)[2]
-
-        # Check patch file name for CVE ID
-        fname_match = cve_file_name_match.search(patch_file)
-        if fname_match:
-            cve = fname_match.group(1).upper()
-            patched_cves[cve] = {"abbrev-status": "Patched", "status": "fix-file-included", "resource": patch_file}
-            bb.debug(2, "Found %s from patch file name %s" % (cve, patch_file))
-
-        # Remote patches won't be present and compressed patches won't be
-        # unpacked, so say we're not scanning them
-        if not os.path.isfile(patch_file):
-            bb.note("%s is remote or compressed, not scanning content" % patch_file)
-            continue
-
-        with open(patch_file, "r", encoding="utf-8") as f:
-            try:
-                patch_text = f.read()
-            except UnicodeDecodeError:
-                bb.debug(1, "Failed to read patch %s using UTF-8 encoding"
-                        " trying with iso8859-1" %  patch_file)
-                f.close()
-                with open(patch_file, "r", encoding="iso8859-1") as f:
-                    patch_text = f.read()
-
-        # Search for one or more "CVE: " lines
-        text_match = False
-        for match in cve_match.finditer(patch_text):
-            # Get only the CVEs without the "CVE: " tag
-            cves = patch_text[match.start()+5:match.end()]
-            for cve in cves.split():
-                bb.debug(2, "Patch %s solves %s" % (patch_file, cve))
-                patched_cves[cve] = {"abbrev-status": "Patched", "status": "fix-file-included", "resource": patch_file}
-                text_match = True
-
-        if not fname_match and not text_match:
-            bb.debug(2, "Patch %s doesn't solve CVEs" % patch_file)
+        for cve_id in parse_cves_from_patch_file(patch_file):
+            if cve_id not in patched_cves:
+                patched_cves[cve_id] = {
+                    "abbrev-status": "Patched",
+                    "status": "fix-file-included",
+                    "resource": [patch_file],
+                }
+            else:
+                patched_cves[cve_id]["resource"].append(patch_file)
 
     # Search for additional patched CVEs
-    for cve in (d.getVarFlags("CVE_STATUS") or {}):
-        decoded_status = decode_cve_status(d, cve)
+    for cve_id in d.getVarFlags("CVE_STATUS") or {}:
+        decoded_status = decode_cve_status(d, cve_id)
         products = d.getVar("CVE_PRODUCT")
-        if has_cve_product_match(decoded_status, products) == True:
-            patched_cves[cve] = {
+        if has_cve_product_match(decoded_status, products):
+            if cve_id in patched_cves:
+                bb.warn(
+                    'CVE_STATUS[%s] = "%s" is overwriting previous status of "%s: %s"'
+                    % (
+                        cve_id,
+                        d.getVarFlag("CVE_STATUS", cve_id),
+                        patched_cves[cve_id]["abbrev-status"],
+                        patched_cves[cve_id]["status"],
+                    )
+                )
+            patched_cves[cve_id] = {
                 "abbrev-status": decoded_status["mapping"],
                 "status": decoded_status["detail"],
                 "justification": decoded_status["description"],
                 "affected-vendor": decoded_status["vendor"],
-                "affected-product": decoded_status["product"]
+                "affected-product": decoded_status["product"],
             }
 
     return patched_cves
@@ -253,7 +311,10 @@ def decode_cve_status(d, cve):
         description = status_split[4].strip()
     elif len(status_split) >= 2 and status_split[1].strip() == "cpe":
         # Malformed CPE
-        bb.warn('Invalid CPE information for CVE_STATUS[%s] = "%s", not setting CPE' % (detail, cve, status))
+        bb.warn(
+            'Invalid CPE information for CVE_STATUS[%s] = "%s", not setting CPE'
+            % (cve, status)
+        )
     else:
         # Other case: no CPE, the syntax is then:
         # detail: description
@@ -263,9 +324,13 @@ def decode_cve_status(d, cve):
     status_out["product"] = product
     status_out["description"] = description
 
-    status_mapping = d.getVarFlag("CVE_CHECK_STATUSMAP", status_out['detail'])
+    detail = status_out["detail"]
+    status_mapping = d.getVarFlag("CVE_CHECK_STATUSMAP", detail)
     if status_mapping is None:
-        bb.warn('Invalid detail "%s" for CVE_STATUS[%s] = "%s", fallback to Unpatched' % (detail, cve, status))
+        bb.warn(
+            'Invalid detail "%s" for CVE_STATUS[%s] = "%s", fallback to Unpatched'
+            % (detail, cve, status)
+        )
         status_mapping = "Unpatched"
     status_out["mapping"] = status_mapping
 

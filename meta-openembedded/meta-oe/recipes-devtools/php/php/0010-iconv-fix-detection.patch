@@ -20,7 +20,7 @@ diff --git a/build/php.m4 b/build/php.m4
 index 93551d9ca7..dba50825fb 100644
 --- a/build/php.m4
 +++ b/build/php.m4
-@@ -1919,7 +1919,8 @@ AC_DEFUN([PHP_SETUP_ICONV], [
+@@ -1945,7 +1945,8 @@ AC_DEFUN([PHP_SETUP_ICONV], [
    unset ICONV_DIR
  
    dnl Check libc first if no path is provided in --with-iconv.

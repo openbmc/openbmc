@@ -52,6 +52,7 @@ PACKAGECONFIG[ldap] = "--enable-openldap --with-libldap,--disable-openldap --wit
 PACKAGECONFIG[rrdtool] = "--enable-rrdtool,--disable-rrdtool,rrdtool"
 PACKAGECONFIG[rrdcached] = "--enable-rrdcached,--disable-rrdcached,rrdtool"
 PACKAGECONFIG[python] = "--enable-python,--disable-python"
+PACKAGECONFIG[dpdk] = "--with-libdpdk,--without-libdpdk,dpdk"
 
 EXTRA_OECONF = " \
                 ${FPLAYOUT} \

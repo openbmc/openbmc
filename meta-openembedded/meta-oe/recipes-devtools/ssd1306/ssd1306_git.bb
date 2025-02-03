@@ -1,4 +1,4 @@
-SUMMARY="SSD1306 OLED I2C drive"
+SUMMARY = "SSD1306 OLED I2C drive"
 DESCRIPTION = "SSD1306 OLED I2C driver working in Linux"
 HOMEPAGE = "https://github.com/armlabs/ssd1306_linux"
 SECTION = "console/utils"

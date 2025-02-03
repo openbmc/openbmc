@@ -9,11 +9,7 @@ PYPI_PACKAGE = "xmltodict"
 
 BBCLASSEXTEND = "native nativesdk"
 
-inherit pypi setuptools3 ptest
-
-SRC_URI += " \
-	file://run-ptest \
-"
+inherit pypi setuptools3 ptest-python-pytest
 
 RDEPENDS:${PN} += " \
 	python3-core \
@@ -21,11 +17,3 @@ RDEPENDS:${PN} += " \
 	python3-io \
 "
 
-RDEPENDS:${PN}-ptest += " \
-	python3-pytest \
-"
-
-do_install_ptest() {
-	install -d ${D}${PTEST_PATH}/tests
-	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
-}

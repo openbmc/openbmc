@@ -14,6 +14,8 @@ SRC_URI[archive.sha256sum] = "2749cc3c0cd7280b299518b1ddf5a5bcfe2d1100614519b687
 SRC_URI[patch.md5sum] = "997c764d3be11c9a51779d93facf1118"
 SRC_URI[patch.sha256sum] = "ac2ee23ec89ba2af51d2c6dd5b1b6bf9f8a9f813de251bc182941439a4053176"
 
+CVE_STATUS[CVE-2007-4460] = "patched: fix is included in debian patch"
+
 inherit autotools
 
 # Unlike other Debian packages, id3lib*.diff.gz contains another series of

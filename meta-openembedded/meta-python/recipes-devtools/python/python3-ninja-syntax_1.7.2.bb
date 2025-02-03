@@ -8,7 +8,6 @@ SRC_URI[sha256sum] = "342dc97b9e88a6495bae22953ee6063f91d2f03db6f727b62ba5c3092a
 inherit pypi setuptools3
 
 PYPI_PACKAGE = "ninja_syntax"
-UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/ninja_syntax/"
-UPSTREAM_CHECK_REGEX = "/ninja_syntax/(?P<pver>(\d+[\.\-_]*)+)"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 BBCLASSEXTEND = "native nativesdk"

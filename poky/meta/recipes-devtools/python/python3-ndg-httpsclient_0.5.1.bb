@@ -9,6 +9,7 @@ SRC_URI[sha256sum] = "d72faed0376ab039736c2ba12e30695e2788c4aa569c9c3e3d72131de2
 inherit pypi setuptools3 update-alternatives
 
 PYPI_PACKAGE = "ndg_httpsclient"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 DEPENDS += " \
     python3-pyopenssl \
@@ -23,8 +24,6 @@ RDEPENDS:${PN} += " \
 "
 
 BBCLASSEXTEND = "native nativesdk"
-
-UPSTREAM_CHECK_REGEX = ""
 
 ALTERNATIVE:${PN} = "ndg_httpclient"
 ALTERNATIVE_LINK_NAME[ndg_httpclient] = "${bindir}/ndg_httpclient"

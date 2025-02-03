@@ -234,6 +234,5 @@ PREMIRRORS = "\\
 
 class Poisoning(OESelftestTestCase):
     def test_poisoning(self):
-        res = bitbake("poison", ignore_status=True)
-        self.assertNotEqual(res.status, 0)
-        self.assertTrue("is unsafe for cross-compilation" in res.output)
+        # The poison recipe fails if the poisoning didn't work
+        bitbake("poison")

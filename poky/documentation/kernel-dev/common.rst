@@ -1562,16 +1562,9 @@ Here are some basic steps you can use to work with your own sources:
       changed.
 
    -  :term:`PV`: The default :term:`PV`
-      assignment is typically adequate. It combines the
-      :term:`LINUX_VERSION` with the Source Control Manager (SCM) revision
-      as derived from the :term:`SRCPV`
-      variable. The combined results are a string with the following
-      form::
-
-         3.19.11+git1+68a635bf8dfb64b02263c1ac80c948647cc76d5f_1+218bd8d2022b9852c60d32f0d770931e3cf343e2
-
-      While lengthy, the extra verbosity in :term:`PV` helps ensure you are
-      using the exact sources from which you intend to build.
+      assignment is typically adequate. It combines the value of
+      :term:`LINUX_VERSION` and the value ``+git`` which adds source control
+      information to :term:`PKGV` later during the packaging phase.
 
    -  :term:`COMPATIBLE_MACHINE`:
       A list of the machines supported by your new recipe. This variable

@@ -8,6 +8,7 @@ SRC_URI[sha256sum] = "1e859bd5c40fae9448642dd871adf459e5e2084186e8d2c2a79a824c97
 inherit pypi python_flit_core
 
 PYPI_PACKAGE = "pyproject_hooks"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 BBCLASSEXTEND = "native nativesdk"
 

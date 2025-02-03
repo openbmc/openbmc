@@ -19,6 +19,8 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "sysfsutils"
 
+CVE_PRODUCT = "kernel:bridge-utils"
+
 inherit autotools-brokensep update-alternatives
 
 ALTERNATIVE:${PN} = "brctl"

@@ -1,4 +1,4 @@
-From ee1421f7a7a9f31400ba992a5be52b88d20170c9 Mon Sep 17 00:00:00 2001
+From b12b01239909b6fb41adc64d3c0ed32795554369 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 10 May 2019 14:18:04 +0800
 Subject: [PATCH] Revert "build: Make gpgme.m4 use gpgrt-config with *.pc."
@@ -10,16 +10,15 @@ The oe-core does not support gpgrt-config, so revert it
 Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  src/gpgme.m4 | 54 ++++++++--------------------------------------------
  1 file changed, 8 insertions(+), 46 deletions(-)
 
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index f2906c1..8cc2898 100644
+index 4cfe899..5f689e1 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
-@@ -125,24 +125,10 @@ AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
+@@ -122,24 +122,10 @@ AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
       fi
    fi
  
@@ -46,7 +45,7 @@ index f2906c1..8cc2898 100644
    fi
    gpgme_version_major=`echo $gpgme_version | \
                 sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
-@@ -155,16 +141,12 @@ AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
+@@ -152,16 +138,12 @@ AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
  
  AC_DEFUN([_AM_PATH_GPGME_CONFIG_HOST_CHECK],
  [
@@ -65,7 +64,7 @@ index f2906c1..8cc2898 100644
  *** built for $gpgme_config_host and thus may not match the
  *** used host $host.
  *** You may want to use the configure option --with-gpgme-prefix
-@@ -225,11 +207,7 @@ AC_DEFUN([AM_PATH_GPGME],
+@@ -223,11 +205,7 @@ AC_DEFUN([AM_PATH_GPGME],
       # If we have a recent GPGME, we should also check that the
       # API is compatible.
       if test "$req_gpgme_api" -gt 0 ; then
@@ -78,7 +77,7 @@ index f2906c1..8cc2898 100644
          if test "$tmp" -gt 0 ; then
             if test "$req_gpgme_api" -ne "$tmp" ; then
               ok=no
-@@ -372,11 +350,7 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+@@ -370,11 +348,7 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
       # If we have a recent GPGME, we should also check that the
       # API is compatible.
       if test "$req_gpgme_api" -gt 0 ; then
@@ -91,7 +90,7 @@ index f2906c1..8cc2898 100644
          if test "$tmp" -gt 0 ; then
             if test "$req_gpgme_api" -ne "$tmp" ; then
               ok=no
-@@ -385,20 +359,8 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+@@ -383,20 +357,8 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
       fi
    fi
    if test $ok = yes; then

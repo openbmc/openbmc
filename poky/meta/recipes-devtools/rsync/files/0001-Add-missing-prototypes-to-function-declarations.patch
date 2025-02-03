@@ -1,4 +1,4 @@
-From 2beb35c34c45320144f37b12ef4d72fb8734280e Mon Sep 17 00:00:00 2001
+From 073caa67f2aa221de113a21f8105940421a2da90 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 29 Aug 2022 19:53:28 -0700
 Subject: [PATCH] Add missing prototypes to function declarations
@@ -15,21 +15,19 @@ Fixes errors like
 
 Upstream-Status: Submitted [https://lists.samba.org/archive/rsync/2022-August/032858.html]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
 ---
- checksum.c       | 2 +-
- exclude.c        | 2 +-
- hlink.c          | 3 +--
- lib/pool_alloc.c | 2 +-
- log.c            | 2 +-
- main.c           | 2 +-
- syscall.c        | 4 ++--
- zlib/crc32.c     | 2 +-
- zlib/trees.c     | 2 +-
- zlib/zutil.c     | 4 ++--
- 10 files changed, 12 insertions(+), 13 deletions(-)
+ checksum.c   | 2 +-
+ exclude.c    | 2 +-
+ log.c        | 2 +-
+ main.c       | 2 +-
+ zlib/crc32.c | 2 +-
+ zlib/trees.c | 2 +-
+ zlib/zutil.c | 4 ++--
+ 7 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/checksum.c b/checksum.c
-index cb21882..736818b 100644
+index 66e8089..b24b202 100644
 --- a/checksum.c
 +++ b/checksum.c
 @@ -779,7 +779,7 @@ static void verify_digest(struct name_num_item *nni, BOOL check_auth_list)
@@ -54,33 +52,6 @@ index 87edbcf..ae0de2f 100644
  {
  	if (partial_string_buf) {
  		if (partial_string_len)
-diff --git a/hlink.c b/hlink.c
-index 20291f2..5c26a6b 100644
---- a/hlink.c
-+++ b/hlink.c
-@@ -117,8 +117,7 @@ static void match_gnums(int32 *ndx_list, int ndx_count)
- 	struct ht_int32_node *node = NULL;
- 	int32 gnum, gnum_next;
- 
--	qsort(ndx_list, ndx_count, sizeof ndx_list[0], (int (*)()) hlink_compare_gnum);
--
-+	qsort(ndx_list, ndx_count, sizeof ndx_list[0], (int (*)(const void *, const void *)) hlink_compare_gnum);
- 	for (from = 0; from < ndx_count; from++) {
- 		file = hlink_flist->sorted[ndx_list[from]];
- 		gnum = F_HL_GNUM(file);
-diff --git a/lib/pool_alloc.c b/lib/pool_alloc.c
-index a1a7245..4eae062 100644
---- a/lib/pool_alloc.c
-+++ b/lib/pool_alloc.c
-@@ -9,7 +9,7 @@ struct alloc_pool
- 	size_t			size;		/* extent size		*/
- 	size_t			quantum;	/* allocation quantum	*/
- 	struct pool_extent	*extents;	/* top extent is "live" */
--	void			(*bomb)();	/* called if malloc fails */
-+	void			(*bomb)(const char *, const char *, int);	/* called if malloc fails */
- 	int			flags;
- 
- 	/* statistical data */
 diff --git a/log.c b/log.c
 index e4ba1cc..8482b71 100644
 --- a/log.c
@@ -95,7 +66,7 @@ index e4ba1cc..8482b71 100644
  	int options = LOG_PID;
  
 diff --git a/main.c b/main.c
-index 0c60b86..4bc664a 100644
+index 4f070ac..f59eaec 100644
 --- a/main.c
 +++ b/main.c
 @@ -246,7 +246,7 @@ void read_del_stats(int f)
@@ -107,22 +78,6 @@ index 0c60b86..4bc664a 100644
  {
  	char *gname;
  	uid_t uid;
-diff --git a/syscall.c b/syscall.c
-index d92074a..92ca86d 100644
---- a/syscall.c
-+++ b/syscall.c
-@@ -389,9 +389,9 @@ OFF_T do_lseek(int fd, OFF_T offset, int whence)
- {
- #ifdef HAVE_LSEEK64
- #if !SIZEOF_OFF64_T
--	OFF_T lseek64();
-+	OFF_T lseek64(int fd, OFF_T offset, int whence);
- #else
--	off64_t lseek64();
-+	off64_t lseek64(int fd, off64_t offset, int whence);
- #endif
- 	return lseek64(fd, offset, whence);
- #else
 diff --git a/zlib/crc32.c b/zlib/crc32.c
 index 05733f4..50c6c02 100644
 --- a/zlib/crc32.c

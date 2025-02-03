@@ -1,7 +1,7 @@
-From d705b1d666cb8713d86ea6fb2fc45c424128285a Mon Sep 17 00:00:00 2001
+From abdfa0fddeceab843ab6eabe31c7763c8719642b Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@cn.fujitsu.com>
 Date: Fri, 1 Dec 2017 10:24:50 +0900
-Subject: [PATCH] Added  req_distinguished_name in /etc/xrdp/openssl.conf,
+Subject: [PATCH] Added req_distinguished_name in /etc/xrdp/openssl.conf,
  otherwise, cert.pem can't be created.
 
 Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
@@ -30,6 +30,3 @@ index 09db6c2..f077d72 100644
  
  [v3_ca]
  # Extensions for a typical CA - PKIX recommendation.
--- 
-1.8.4.2
-

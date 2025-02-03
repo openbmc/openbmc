@@ -1,4 +1,4 @@
-From c58c503c532d20883a93ef778327c86dd6de24f6 Mon Sep 17 00:00:00 2001
+From 9d36ff90d3a488caa8cd7b3351e5a3bdc4229b1b Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 6 Mar 2020 21:04:05 +0000
 Subject: [PATCH] init-env.in: do not add C/CXX parameters
@@ -13,7 +13,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 4 deletions(-)
 
 diff --git a/gettext-tools/tests/init-env.in b/gettext-tools/tests/init-env.in
-index cc84ffd..b69c990 100644
+index 0968388..3d9a8a5 100644
 --- a/gettext-tools/tests/init-env.in
 +++ b/gettext-tools/tests/init-env.in
 @@ -3,10 +3,6 @@ top_builddir=../..
@@ -24,6 +24,6 @@ index cc84ffd..b69c990 100644
 -CFLAGS="@CFLAGS@"
 -CXX="@CXX@"
 -CXXFLAGS="@CXXFLAGS@"
+ OBJC="@OBJC@"
+ OBJCFLAGS="@OBJCFLAGS@"
  CPPFLAGS="@CPPFLAGS@"
- LDFLAGS="@LDFLAGS@"
- LTLIBINTL="@LTLIBINTL@"

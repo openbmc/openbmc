@@ -81,6 +81,7 @@ python errorreport_handler () {
             task = e.task
             taskdata={}
             log = e.data.getVar('BB_LOGFILE')
+            taskdata['recipe'] = e.data.expand("${PN}")
             taskdata['package'] = e.data.expand("${PF}")
             taskdata['task'] = task
             if log:

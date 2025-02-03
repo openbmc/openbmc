@@ -395,7 +395,7 @@ class Cache(object):
         # It will be used later for deciding whether we
         # need extra cache file dump/load support
         self.mc = mc
-        self.logger = PrefixLoggerAdapter("Cache: %s: " % (mc if mc else "default"), logger)
+        self.logger = PrefixLoggerAdapter("Cache: %s: " % (mc if mc else ''), logger)
         self.caches_array = caches_array
         self.cachedir = self.data.getVar("CACHE")
         self.clean = set()

@@ -1,4 +1,4 @@
-From f4edf72c76bc06fa92c61f6cb9163cc777912a1f Mon Sep 17 00:00:00 2001
+From f992d781e05b61489bdf5a2a9aee6cc616f1742a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 25 Jan 2022 20:29:14 -0800
 Subject: [PATCH] vm_dump.c: Define REG_S1 and REG_S2 for musl/riscv
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/vm_dump.c b/vm_dump.c
-index 444be4a..8a081a7 100644
+index 5873e52..9eb4db1 100644
 --- a/vm_dump.c
 +++ b/vm_dump.c
-@@ -39,6 +39,11 @@
+@@ -40,6 +40,11 @@
  
  #define MAX_POSBUF 128
  

@@ -1,0 +1,30 @@
+Recognise riscv64gc and riscv32gc as valid architectures
+
+Rust uses above for architecture in tuples
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/python/mozbuild/mozbuild/test/configure/test_toolchain_configure.py
++++ b/python/mozbuild/mozbuild/test/configure/test_toolchain_configure.py
+@@ -1327,6 +1327,10 @@ class LinuxCrossCompileToolchainTest(Bas
+         "mips-unknown-linux-gnu": big_endian + {"__mips__": 1},
+         "riscv32-unknown-linux-gnu": little_endian + {"__riscv": 1, "__riscv_xlen": 32},
+         "riscv64-unknown-linux-gnu": little_endian + {"__riscv": 1, "__riscv_xlen": 64},
++        "riscv32gc-unknown-linux-gnu": little_endian
++        + {"__riscv": 1, "__riscv_xlen": 32},
++        "riscv64gc-unknown-linux-gnu": little_endian
++        + {"__riscv": 1, "__riscv_xlen": 64},
+         "sh4-unknown-linux-gnu": little_endian + {"__sh__": 1},
+     }
+ 
+--- a/build/autoconf/config.sub
++++ b/build/autoconf/config.sub
+@@ -1236,7 +1236,7 @@ case $cpu-$vendor in
+ 			| powerpc | powerpc64 | powerpc64le | powerpcle | powerpcspe \
+ 			| pru \
+ 			| pyramid \
+-			| riscv | riscv32 | riscv32be | riscv64 | riscv64be \
++			| riscv | riscv32 | riscv32be | riscv32gc | riscv64 | riscv64be | riscv64gc \
+ 			| rl78 | romp | rs6000 | rx \
+ 			| s390 | s390x \
+ 			| score \

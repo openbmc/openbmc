@@ -1,4 +1,4 @@
-From aa8dfe0aafd0b53a6c5bac61b356ca92e1430a36 Mon Sep 17 00:00:00 2001
+From 33fd16b0b2c69ec1118bb605384e7e3b1a94eee0 Mon Sep 17 00:00:00 2001
 From: "Hongjun.Yang" <hongjun.yang@windriver.com>
 Date: Thu, 28 Jul 2016 12:36:15 +0800
 Subject: [PATCH] fix for ptest
@@ -15,7 +15,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index f4e54ea..a47ff14 100644
+index 5106676..3114998 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -22,7 +22,7 @@ AC_INIT([gettext],
@@ -28,7 +28,7 @@ index f4e54ea..a47ff14 100644
  dnl Override automake's tar command used for creating distributions.
  am__tar='${AMTAR} chf - --format=ustar --owner=root --group=root "$$tardir"'
 diff --git a/gettext-runtime/configure.ac b/gettext-runtime/configure.ac
-index 126d069..aa23232 100644
+index e128f5b..9f7447c 100644
 --- a/gettext-runtime/configure.ac
 +++ b/gettext-runtime/configure.ac
 @@ -22,7 +22,7 @@ AC_INIT([gettext-runtime],
@@ -41,7 +41,7 @@ index 126d069..aa23232 100644
  
  dnl Installation directories.
 diff --git a/gettext-tools/configure.ac b/gettext-tools/configure.ac
-index 3610ee3..6f56a23 100644
+index 3b1f461..14510a9 100644
 --- a/gettext-tools/configure.ac
 +++ b/gettext-tools/configure.ac
 @@ -22,7 +22,7 @@ AC_INIT([gettext-tools],

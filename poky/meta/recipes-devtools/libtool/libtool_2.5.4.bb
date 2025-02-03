@@ -12,8 +12,6 @@ SYSROOT_DIRS_IGNORE += " \
     ${datadir}/libtool/build-aux \
 "
 
-ACLOCALEXTRAPATH:class-target = ""
-
 inherit multilib_script
 
 MULTILIB_SCRIPTS = "${PN}:${bindir}/libtool"

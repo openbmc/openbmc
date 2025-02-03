@@ -1,0 +1,32 @@
+From 5bc2d175c6a31a3de04444e5e22af310799ab10d Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 27 Jan 2025 19:17:48 +0200
+Subject: [PATCH] builder.py: Check PYTHON_INCLUDE_DIR
+
+Use PYTHON_INCLUDE_DIR to find Python Interpreter and
+Development.Module.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Suggested-by: Stephan Kulow <stephan.kulow@siemens.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ src/scikit_build_core/builder/builder.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/scikit_build_core/builder/builder.py b/src/scikit_build_core/builder/builder.py
+index b19173f..f4fb2af 100644
+--- a/src/scikit_build_core/builder/builder.py
++++ b/src/scikit_build_core/builder/builder.py
+@@ -203,7 +203,7 @@ class Builder:
+         python_sabi_library = (
+             get_python_library(self.config.env, abi3=True) if limited_api else None
+         )
+-        python_include_dir = get_python_include_dir()
++        python_include_dir = os.getenv("PYTHON_INCLUDE_DIR") or get_python_include_dir()
+         numpy_include_dir = get_numpy_include_dir()
+ 
+         # Classic Find Python
+-- 
+2.39.5
+

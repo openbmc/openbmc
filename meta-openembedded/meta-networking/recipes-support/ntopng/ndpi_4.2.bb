@@ -5,7 +5,7 @@ inspection. Based on OpenDPI it includes ntop extensions"
 SECTION = "libdevel"
 DEPENDS = "libpcap json-c"
 RDEPENDS:${PN} += " libpcap"
-LICENSE = "GPL-3.0-only"
+LICENSE = "LGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b52f2d57d10c4f7ee67a7eb9615d5d24"
 
 SRCREV = "8b5c6af71b562549f8416b31803daae223e09f46"

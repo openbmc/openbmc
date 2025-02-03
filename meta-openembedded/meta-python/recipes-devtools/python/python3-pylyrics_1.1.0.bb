@@ -7,6 +7,7 @@ SRC_URI[sha256sum] = "c5f36e8ef0ed3b487a9242ce34c19f9684e418a5bbffd5d367dc1d1604
 
 PYPI_PACKAGE = "PyLyrics"
 PYPI_PACKAGE_EXT = "zip"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi setuptools3
 

@@ -10,5 +10,6 @@ DEPENDS = "python3-pytest-runner-native"
 SRC_URI[sha256sum] = "878fb5ab705442070e4dd1929bb5e2249511c0bcf2b0eeacf3bcd80875c82eff"
 
 PYPI_PACKAGE = "StrEnum"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_setuptools_build_meta

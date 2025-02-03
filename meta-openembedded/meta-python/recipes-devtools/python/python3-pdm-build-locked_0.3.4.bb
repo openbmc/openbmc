@@ -9,5 +9,6 @@ inherit pypi python_setuptools_build_meta
 DEPENDS += " python3-pdm-backend-native"
 
 PYPI_PACKAGE = "pdm_build_locked"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 BBCLASSEXTEND += "native nativesdk"

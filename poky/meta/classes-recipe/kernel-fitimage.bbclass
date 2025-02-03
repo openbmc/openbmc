@@ -5,6 +5,7 @@
 #
 
 inherit kernel-uboot kernel-artifact-names uboot-config
+require conf/image-fitimage.conf
 
 def get_fit_replacement_type(d):
     kerneltypes = d.getVar('KERNEL_IMAGETYPES') or ""
@@ -51,58 +52,6 @@ python __anonymous () {
         d.appendVarFlag('do_assemble_fitimage_initramfs', 'depends', ' virtual/dtb:do_populate_sysroot')
         d.setVar('EXTERNAL_KERNEL_DEVICETREE', "${RECIPE_SYSROOT}/boot/devicetree")
 }
-
-
-# Description string
-FIT_DESC ?= "Kernel fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"
-
-# Kernel fitImage Hash Algo
-FIT_HASH_ALG ?= "sha256"
-
-# Kernel fitImage Signature Algo
-FIT_SIGN_ALG ?= "rsa2048"
-
-# Kernel / U-Boot fitImage Padding Algo
-FIT_PAD_ALG ?= "pkcs-1.5"
-
-# Generate keys for signing Kernel fitImage
-FIT_GENERATE_KEYS ?= "0"
-
-# Size of private keys in number of bits
-FIT_SIGN_NUMBITS ?= "2048"
-
-# args to openssl genrsa (Default is just the public exponent)
-FIT_KEY_GENRSA_ARGS ?= "-F4"
-
-# args to openssl req (Default is -batch for non interactive mode and
-# -new for new certificate)
-FIT_KEY_REQ_ARGS ?= "-batch -new"
-
-# Standard format for public key certificate
-FIT_KEY_SIGN_PKCS ?= "-x509"
-
-# Sign individual images as well
-FIT_SIGN_INDIVIDUAL ?= "0"
-
-FIT_CONF_PREFIX ?= "conf-"
-FIT_CONF_PREFIX[doc] = "Prefix to use for FIT configuration node name"
-
-FIT_SUPPORTED_INITRAMFS_FSTYPES ?= "cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.zst cpio.gz ext2.gz cpio"
-
-# Allow user to select the default DTB for FIT image when multiple dtb's exists.
-FIT_CONF_DEFAULT_DTB ?= ""
-
-# length of address in number of <u32> cells
-# ex: 1 32bits address, 2 64bits address
-FIT_ADDRESS_CELLS ?= "1"
-
-# Keys used to sign individually image nodes.
-# The keys to sign image nodes must be different from those used to sign
-# configuration nodes, otherwise the "required" property, from
-# UBOOT_DTB_BINARY, will be set to "conf", because "conf" prevails on "image".
-# Then the images signature checking will not be mandatory and no error will be
-# raised in case of failure.
-# UBOOT_SIGN_IMG_KEYNAME = "dev2" # keys name in keydir (eg. "dev2.crt", "dev2.key")
 
 #
 # Emit the fitImage ITS header

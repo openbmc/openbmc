@@ -1,4 +1,4 @@
-From 57475742b0288b4ee53c01c59c3ab03c1ef7932e Mon Sep 17 00:00:00 2001
+From 59b2e28b34f332d12935af41dbe3140f5842e8d1 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 13 Apr 2017 16:40:27 +0300
 Subject: [PATCH] gpgme-config: skip all /lib* or /usr/lib* directories in
@@ -9,7 +9,6 @@ directory names than plain /lib or /usr/lib.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  src/gpgme-config.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

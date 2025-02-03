@@ -47,6 +47,8 @@ inherit autotools ptest pkgconfig useradd python3-dir manpages systemd
 
 CACHED_CONFIGUREVARS = "PGREP=/usr/bin/pgrep"
 
+EXTRA_OECONF += "--disable-libtool-linkdep-fixup"
+
 SYSTEMD_SERVICE:${PN} = "lttng-sessiond.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 

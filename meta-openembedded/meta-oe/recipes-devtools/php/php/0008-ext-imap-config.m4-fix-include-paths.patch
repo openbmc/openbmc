@@ -16,7 +16,7 @@ diff --git a/ext/imap/config.m4 b/ext/imap/config.m4
 index 5086a312d0..0e938bd544 100644
 --- a/ext/imap/config.m4
 +++ b/ext/imap/config.m4
-@@ -110,7 +110,7 @@ if test "$PHP_IMAP" != "no"; then
+@@ -122,7 +122,7 @@ if test "$PHP_IMAP" != "no"; then
      PHP_NEW_EXTENSION(imap, php_imap.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
      AC_DEFINE(HAVE_IMAP,1,[ ])
  
@@ -25,7 +25,7 @@ index 5086a312d0..0e938bd544 100644
        IMAP_INC_CHK()
        el[]IMAP_INC_CHK(/include/c-client)
        el[]IMAP_INC_CHK(/include/imap)
-@@ -199,13 +199,7 @@ if test "$PHP_IMAP" != "no"; then
+@@ -211,13 +211,7 @@ if test "$PHP_IMAP" != "no"; then
        AC_MSG_ERROR(Cannot find rfc822.h. Please check your c-client installation.)
      fi
  

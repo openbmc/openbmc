@@ -1,0 +1,29 @@
+From f2d8d96e8586772becd68593a5bd9e14632841af Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 7 Jan 2025 17:03:32 +0100
+Subject: [PATCH] lib/attr.h: use C23 attributes only with gcc >= 10
+
+These are not available on earlier versions and builds break there.
+
+Upstream-Status: Submitted [https://github.com/shadow-maint/shadow/pull/1172]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ lib/attr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/attr.h b/lib/attr.h
+index 02c7e252..290514d8 100644
+--- a/lib/attr.h
++++ b/lib/attr.h
+@@ -5,7 +5,7 @@
+ #include "config.h"
+ 
+ 
+-#if defined(__GNUC__)
++#if defined(__GNUC__) && (__GNUC__ >= 10)
+ # define MAYBE_UNUSED                [[gnu::unused]]
+ # define NORETURN                    [[gnu::__noreturn__]]
+ # define format_attr(type, fmt, va)  [[gnu::format(type, fmt, va)]]
+-- 
+2.45.2
+

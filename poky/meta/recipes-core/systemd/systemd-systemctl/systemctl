@@ -29,15 +29,15 @@ class SystemdFile():
 
     _clearable_keys = ['WantedBy']
 
-    def __init__(self, root, path, instance_unit_name):
+    def __init__(self, root, path, instance_unit_name, unit_type):
         self.sections = dict()
         self._parse(root, path)
         dirname = os.path.basename(path.name) + ".d"
         for location in locations:
-            files = (root / location / "system" / dirname).glob("*.conf")
+            files = (root / location / unit_type / dirname).glob("*.conf")
             if instance_unit_name:
                 inst_dirname = instance_unit_name + ".d"
-                files = chain(files, (root / location / "system" / inst_dirname).glob("*.conf"))
+                files = chain(files, (root / location / unit_type / inst_dirname).glob("*.conf"))
             for path2 in sorted(files):
                 self._parse(root, path2)
 
@@ -182,21 +182,22 @@ class SystemdUnitNotFoundError(Exception):
 
 
 class SystemdUnit():
-    def __init__(self, root, unit):
+    def __init__(self, root, unit, unit_type):
         self.root = root
         self.unit = unit
+        self.unit_type = unit_type
         self.config = None
 
     def _path_for_unit(self, unit):
         for location in locations:
-            path = self.root / location / "system" / unit
+            path = self.root / location / self.unit_type / unit
             if path.exists() or path.is_symlink():
                 return path
 
         raise SystemdUnitNotFoundError(self.root, unit)
 
     def _process_deps(self, config, service, location, prop, dirstem, instance):
-        systemdir = self.root / SYSCONFDIR / "systemd" / "system"
+        systemdir = self.root / SYSCONFDIR / "systemd" / self.unit_type
 
         target = ROOT / location.relative_to(self.root)
         try:
@@ -229,7 +230,7 @@ class SystemdUnit():
             # ignore aliases
             return
 
-        config = SystemdFile(self.root, path, instance_unit_name)
+        config = SystemdFile(self.root, path, instance_unit_name, self.unit_type)
         if instance == "":
             try:
                 default_instance = config.get('Install', 'DefaultInstance')[0]
@@ -250,14 +251,14 @@ class SystemdUnit():
                 try:
                      units_enabled.append(unit)
                      if also not in units_enabled:
-                        SystemdUnit(self.root, also).enable(units_enabled)
+                        SystemdUnit(self.root, also, self.unit_type).enable(units_enabled)
                 except SystemdUnitNotFoundError as e:
                     sys.exit("Error: Systemctl also enable issue with  %s (%s)" % (service, e.unit))
 
         except KeyError:
             pass
 
-        systemdir = self.root / SYSCONFDIR / "systemd" / "system"
+        systemdir = self.root / SYSCONFDIR / "systemd" / self.unit_type
         target = ROOT / path.relative_to(self.root)
         try:
             for dest in config.get('Install', 'Alias'):
@@ -268,15 +269,15 @@ class SystemdUnit():
             pass
 
     def mask(self):
-        systemdir = self.root / SYSCONFDIR / "systemd" / "system"
+        systemdir = self.root / SYSCONFDIR / "systemd" / self.unit_type
         add_link(systemdir / self.unit, "/dev/null")
 
 
-def collect_services(root):
+def collect_services(root, unit_type):
     """Collect list of service files"""
     services = set()
     for location in locations:
-        paths = (root / location / "system").glob("*")
+        paths = (root / location / unit_type).glob("*")
         for path in paths:
             if path.is_dir():
                 continue
@@ -285,16 +286,16 @@ def collect_services(root):
     return services
 
 
-def preset_all(root):
-    presets = Presets('system-preset', root)
-    services = collect_services(root)
+def preset_all(root, unit_type):
+    presets = Presets('{}-preset'.format(unit_type), root)
+    services = collect_services(root, unit_type)
 
     for service in services:
         state = presets.state(service)
 
         if state == "enable" or state is None:
             try:
-                SystemdUnit(root, service).enable()
+                SystemdUnit(root, service, unit_type).enable()
             except SystemdUnitNotFoundError:
                 sys.exit("Error: Systemctl preset_all issue in %s" % service)
 
@@ -320,6 +321,7 @@ def main():
     parser.add_argument('--preset-mode',
                         choices=['full', 'enable-only', 'disable-only'],
                         default='full')
+    parser.add_argument('--global', dest="opt_global", action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -336,16 +338,18 @@ def main():
         parser.print_help()
         return 0
 
+    unit_type = "user" if args.opt_global else "system"
+
     if command == "mask":
         for service in args.service:
             try:
-                SystemdUnit(root, service).mask()
+                SystemdUnit(root, service, unit_type).mask()
             except SystemdUnitNotFoundError as e:
                 sys.exit("Error: Systemctl main mask issue in %s (%s)" % (service, e.unit))
     elif command == "enable":
         for service in args.service:
             try:
-                SystemdUnit(root, service).enable()
+                SystemdUnit(root, service, unit_type).enable()
             except SystemdUnitNotFoundError as e:
                 sys.exit("Error: Systemctl main enable issue in %s (%s)" % (service, e.unit))
     elif command == "preset-all":
@@ -353,7 +357,7 @@ def main():
             sys.exit("Too many arguments.")
         if args.preset_mode != "enable-only":
             sys.exit("Only enable-only is supported as preset-mode.")
-        preset_all(root)
+        preset_all(root, unit_type)
     else:
         raise RuntimeError()
 

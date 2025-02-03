@@ -75,6 +75,59 @@ unset B[flag]
         self.assertEqual(d.getVarFlag("A","flag"), None)
         self.assertEqual(d.getVar("B"), "2")
 
+    defaulttest = """
+A = "set value"
+A ??= "default value"
+
+A[flag_set_vs_question] = "set flag"
+A[flag_set_vs_question] ?= "question flag"
+
+A[flag_set_vs_default] = "set flag"
+A[flag_set_vs_default] ??= "default flag"
+
+A[flag_question] ?= "question flag"
+
+A[flag_default] ??= "default flag"
+
+A[flag_question_vs_default] ?= "question flag"
+A[flag_question_vs_default] ??= "default flag"
+
+A[flag_default_vs_question] ??= "default flag"
+A[flag_default_vs_question] ?= "question flag"
+
+A[flag_set_question_default] = "set flag"
+A[flag_set_question_default] ?= "question flag"
+A[flag_set_question_default] ??= "default flag"
+
+A[flag_set_default_question] = "set flag"
+A[flag_set_default_question] ??= "default flag"
+A[flag_set_default_question] ?= "question flag"
+
+A[flag_set_twice] = "set flag first"
+A[flag_set_twice] = "set flag second"
+
+A[flag_question_twice] ?= "question flag first"
+A[flag_question_twice] ?= "question flag second"
+
+A[flag_default_twice] ??= "default flag first"
+A[flag_default_twice] ??= "default flag second"
+"""
+    def test_parse_defaulttest(self):
+        f = self.parsehelper(self.defaulttest)
+        d = bb.parse.handle(f.name, self.d)['']
+        self.assertEqual(d.getVar("A"), "set value")
+        self.assertEqual(d.getVarFlag("A","flag_set_vs_question"), "set flag")
+        self.assertEqual(d.getVarFlag("A","flag_set_vs_default"), "set flag")
+        self.assertEqual(d.getVarFlag("A","flag_question"), "question flag")
+        self.assertEqual(d.getVarFlag("A","flag_default"), "default flag")
+        self.assertEqual(d.getVarFlag("A","flag_question_vs_default"), "question flag")
+        self.assertEqual(d.getVarFlag("A","flag_default_vs_question"), "question flag")
+        self.assertEqual(d.getVarFlag("A","flag_set_question_default"), "set flag")
+        self.assertEqual(d.getVarFlag("A","flag_set_default_question"), "set flag")
+        self.assertEqual(d.getVarFlag("A","flag_set_twice"), "set flag second")
+        self.assertEqual(d.getVarFlag("A","flag_question_twice"), "question flag first")
+        self.assertEqual(d.getVarFlag("A","flag_default_twice"), "default flag second")
+
     exporttest = """
 A = "a"
 export B = "b"
@@ -348,3 +401,45 @@ EXPORT_FUNCTIONS do_compile do_compilepython
             self.assertIn("else", d.getVar("do_compilepython"))
             check_function_flags(d)
 
+    export_function_unclosed_tab = """
+do_compile () {
+       bb.note("Something")
+\t}
+"""
+    export_function_unclosed_space = """
+do_compile () {
+       bb.note("Something")
+ }
+"""
+    export_function_residue = """
+do_compile () {
+       bb.note("Something")
+}
+
+include \\
+"""
+
+    def test_unclosed_functions(self):
+        def test_helper(content, expected_error):
+            with tempfile.TemporaryDirectory() as tempdir:
+                recipename = tempdir + "/recipe_unclosed.bb"
+                with open(recipename, "w") as f:
+                    f.write(content)
+                    f.flush()
+                os.chdir(tempdir)
+                with self.assertRaises(bb.parse.ParseError) as error:
+                    bb.parse.handle(recipename, bb.data.createCopy(self.d))
+                self.assertIn(expected_error, str(error.exception))
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            test_helper(self.export_function_unclosed_tab, "Unparsed lines from unclosed function")
+            test_helper(self.export_function_unclosed_space, "Unparsed lines from unclosed function")
+            test_helper(self.export_function_residue, "Unparsed lines")
+
+            recipename_closed = tempdir + "/recipe_closed.bb"
+            with open(recipename_closed, "w") as in_file:
+                lines = self.export_function_unclosed_tab.split("\n")
+                lines[3] = "}"
+                in_file.write("\n".join(lines))
+                in_file.flush()
+            bb.parse.handle(recipename_closed, bb.data.createCopy(self.d))

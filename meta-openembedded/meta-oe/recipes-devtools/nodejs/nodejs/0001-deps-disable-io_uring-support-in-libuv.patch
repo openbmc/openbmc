@@ -1,52 +1,60 @@
-From 2bb296f169f86dbb04ee47e9a0dc1e3ee13d4f73 Mon Sep 17 00:00:00 2001
-From: Jason Schonberg <schonm@gmail.com>
-Date: Thu, 7 Mar 2024 12:55:56 -0500
-Subject: [PATCH] Update to nodejs 20.11.1
+From 79af9bd6ac1040f1fe3c6cab26b2d040ad907870 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 1 Mar 2024 15:46:11 +0800
+Subject: [PATCH] deps: disable io_uring support in libuv
 
-Upstream-Status: Inappropriate [embedded specific]
+Refer [1], Pseudo fails to intercept some of the syscalls when io_uring
+enabled. Refer [2], always disable io_uring support in libuv to fix
+issue in [1].
+
+[1] https://git.openembedded.org/meta-openembedded/commit/?id=d08453978c31ee41d28206c6ff198d7d9d701d88
+[2] https://github.com/nodejs/node/commit/686da19abb
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
 ---
- ...ps-disable-io_uring-support-in-libuv.patch | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
- create mode 100644 meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch
+ deps/uv/src/unix/linux.c | 29 +----------------------------
+ 1 file changed, 1 insertion(+), 28 deletions(-)
 
-diff --git a/meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch b/meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch
-new file mode 100644
-index 00000000..5ac711fb
---- /dev/null
-+++ b/meta-oe/recipes-devtools/nodejs/nodejs/0001-deps-disable-io_uring-support-in-libuv.patch
-@@ -0,0 +1,35 @@
-+From 9838be9c710ab4249df86726fa390232a3b6a6e7 Mon Sep 17 00:00:00 2001
-+From: Changqing Li <changqing.li@windriver.com>
-+Date: Fri, 1 Mar 2024 15:46:11 +0800
-+Subject: [PATCH] deps: disable io_uring support in libuv
-+
-+Refer [1], Pseudo fails to intercept some of the syscalls when io_uring
-+enabled. Refer [2], always disable io_uring support in libuv to fix
-+issue in [1].
-+
-+[1] https://git.openembedded.org/meta-openembedded/commit/?id=d08453978c31ee41d28206c6ff198d7d9d701d88
-+[2] https://github.com/nodejs/node/commit/686da19abb
-+
-+Upstream-Status: Inappropriate [oe-specific]
-+
-+Signed-off-by: Changqing Li <changqing.li@windriver.com>
-+---
-+ deps/uv/src/unix/linux.c | 2 +-
-+ 1 file changed, 1 insertion(+), 1 deletion(-)
-+
-+diff --git a/deps/uv/src/unix/linux.c b/deps/uv/src/unix/linux.c
-+index 0c997185..7508409d 100644
-+--- a/deps/uv/src/unix/linux.c
-++++ b/deps/uv/src/unix/linux.c
-+@@ -433,7 +433,7 @@ static int uv__use_io_uring(void) {
-+   if (use == 0) {
-+     /* Disable io_uring by default due to CVE-2024-22017. */
-+     val = getenv("UV_USE_IO_URING");
-+-    use = val != NULL && atoi(val) ? 1 : -1;
-++    use = 0;
-+     atomic_store_explicit(&use_io_uring, use, memory_order_relaxed);
-+   }
-+ 
-+-- 
-+2.25.1
-+
+diff --git a/deps/uv/src/unix/linux.c b/deps/uv/src/unix/linux.c
+index 803a9a9d3f0..a4735f56cf0 100644
+--- a/deps/uv/src/unix/linux.c
++++ b/deps/uv/src/unix/linux.c
+@@ -465,34 +465,7 @@ static int uv__use_io_uring(void) {
+   /* See https://github.com/libuv/libuv/issues/4283. */
+   return 0; /* Random SIGSEGV in signal handler. */
+ #else
+-  /* Ternary: unknown=0, yes=1, no=-1 */
+-  static _Atomic int use_io_uring;
+-  char* val;
+-  int use;
+-
+-  use = atomic_load_explicit(&use_io_uring, memory_order_relaxed);
+-
+-  if (use == 0) {
+-    use = uv__kernel_version() >=
+-#if defined(__hppa__)
+-    /* io_uring first supported on parisc in 6.1, functional in .51 */
+-    /* https://lore.kernel.org/all/cb912694-b1fe-dbb0-4d8c-d608f3526905@gmx.de/ */
+-    /* 6.1.51 */ 0x060133
+-#else
+-    /* Older kernels have a bug where the sqpoll thread uses 100% CPU. */
+-    /* 5.10.186 */ 0x050ABA
+-#endif
+-    ? 1 : -1;
+-
+-    /* But users can still enable it if they so desire. */
+-    val = getenv("UV_USE_IO_URING");
+-    if (val != NULL)
+-      use = atoi(val) ? 1 : -1;
+-
+-    atomic_store_explicit(&use_io_uring, use, memory_order_relaxed);
+-  }
+-
+-  return use > 0;
++  return 0; /* pseudo doesn't support io_uring https://bugzilla.yoctoproject.org/show_bug.cgi?id=15244 */
+ #endif
+ }
+ 

@@ -15,8 +15,6 @@ inherit pypi setuptools3 cython
 # No need to depend on self
 DEPENDS:remove = "python3-cython-native"
 
-UPSTREAM_CHECK_PYPI_PACKAGE = "Cython"
-
 do_install:append() {
     # rename scripts that would conflict with the Python 2 build of Cython
     mv ${D}${bindir}/cython ${D}${bindir}/cython3

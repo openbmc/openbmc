@@ -1,4 +1,4 @@
-From 2261f47bac78aa77934ca03980ed54d1d86116b9 Mon Sep 17 00:00:00 2001
+From bda8da622bd3f4d8b0e577387e988ce364b917c4 Mon Sep 17 00:00:00 2001
 From: Roy Li <rongqing.li@windriver.com>
 Date: Thu, 23 Jun 2016 16:26:43 +0800
 Subject: [PATCH] Ensure the XATTR_NAME_CAPS is defined when it is used

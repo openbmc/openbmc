@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 require malcontent.inc
 
-DEPENDS = " \
+DEPENDS += " \
 	malcontent \
 	accountsservice \
 	glib-2.0 \
@@ -16,6 +16,7 @@ DEPENDS = " \
 	libpam \
 	polkit \
 	appstream \
+	appstream-native \
 	flatpak \
 	libadwaita \
 	gtk4 \
@@ -40,7 +41,7 @@ do_install() {
 	ln -sf libmalcontent-ui-1.so.${PV} ${D}${libdir}/libmalcontent-ui-1.so.1
 	install -m 0755 ${B}/malcontent-control/malcontent-control ${D}${bindir}
 	install -m 0644 ${B}/malcontent-control/org.freedesktop.MalcontentControl.policy ${D}${datadir}/polkit-1/actions
-	install -m 0644 ${B}/malcontent-control/org.freedesktop.MalcontentControl.appdata.xml ${D}${datadir}/metainfo
+	install -m 0644 ${B}/malcontent-control/org.freedesktop.MalcontentControl.metainfo.xml ${D}${datadir}/metainfo
 	install -m 0644 ${B}/malcontent-control/org.freedesktop.MalcontentControl.desktop ${D}${datadir}/applications
 }
 

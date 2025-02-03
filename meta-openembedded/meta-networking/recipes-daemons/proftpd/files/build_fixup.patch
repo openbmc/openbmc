@@ -30,7 +30,7 @@ diff --git a/Makefile.in b/Makefile.in
 index 9434cbd..13f2e16 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -123,7 +123,6 @@ check: proftpd$(EXEEXT)
+@@ -129,7 +129,6 @@ check: proftpd$(EXEEXT)
  $(DESTDIR)$(localedir) $(DESTDIR)$(includedir) $(DESTDIR)$(includedir)/proftpd $(DESTDIR)$(libdir) $(DESTDIR)$(pkgconfigdir) $(DESTDIR)$(libdir)/proftpd $(DESTDIR)$(libexecdir) $(DESTDIR)$(localstatedir) $(DESTDIR)$(sysconfdir) $(DESTDIR)$(bindir) $(DESTDIR)$(sbindir) $(DESTDIR)$(mandir) $(DESTDIR)$(mandir)/man1 $(DESTDIR)$(mandir)/man5 $(DESTDIR)$(mandir)/man8:
  	@if [ ! -d $@ ]; then \
  		mkdir -p $@; \
@@ -38,18 +38,18 @@ index 9434cbd..13f2e16 100644
  		chmod 0755 $@; \
  	fi
  
-@@ -133,7 +132,6 @@ install-proftpd: proftpd$(EXEEXT) $(DESTDIR)$(includedir) $(DESTDIR)$(localstate
+@@ -139,7 +138,6 @@ install-proftpd: $(DESTDIR)$(includedir) $(DESTDIR)$(localstatedir) $(DESTDIR)$(
  		rm -f $(DESTDIR)$(sbindir)/in.proftpd ; \
  	fi
-	ln -s $(top_builddir)/proftpd $(DESTDIR)$(sbindir)/in.proftpd
+ 	ln -s $(top_builddir)/proftpd $(DESTDIR)$(sbindir)/in.proftpd
 -	-chown -h $(INSTALL_USER):$(INSTALL_GROUP) $(DESTDIR)$(sbindir)/in.proftpd
  
  install-libs: $(DESTDIR)$(libdir)/proftpd
  	cd lib/ && $(MAKE) install
-@@ -170,11 +168,11 @@ install-utils: $(DESTDIR)$(sbindir) $(DESTDIR)$(bindir)
-	$(INSTALL_SBIN) $(top_builddir)/ftpshut  $(DESTDIR)$(sbindir)/ftpshut
-	$(INSTALL_BIN)  $(top_builddir)/ftptop   $(DESTDIR)$(bindir)/ftptop
-	$(INSTALL_BIN)  $(top_builddir)/ftpwho   $(DESTDIR)$(bindir)/ftpwho
+@@ -177,11 +175,11 @@ install-utils: $(DESTDIR)$(sbindir) $(DESTDIR)$(bindir)
+ 	$(INSTALL_SBIN) $(top_builddir)/ftpshut  $(DESTDIR)$(sbindir)/ftpshut
+ 	$(INSTALL_BIN)  $(top_builddir)/ftptop   $(DESTDIR)$(bindir)/ftptop
+ 	$(INSTALL_BIN)  $(top_builddir)/ftpwho   $(DESTDIR)$(bindir)/ftpwho
 -	$(INSTALL) -o $(INSTALL_USER) -g $(INSTALL_GROUP) -m 0755 $(top_builddir)/src/prxs $(DESTDIR)$(bindir)/prxs
 +	$(INSTALL) -m 0755 $(top_builddir)/src/prxs $(DESTDIR)$(bindir)/prxs
  
@@ -64,7 +64,7 @@ diff --git a/configure b/configure
 index 0a51670..69fa130 100755
 --- a/configure
 +++ b/configure
-@@ -25116,7 +25116,7 @@ _ACEOF
+@@ -25683,7 +25683,7 @@ _ACEOF
  
  
  cat >>confdefs.h <<_ACEOF
@@ -73,7 +73,7 @@ index 0a51670..69fa130 100755
  _ACEOF
  
  
-@@ -25126,7 +25126,7 @@ _ACEOF
+@@ -25693,7 +25693,7 @@ _ACEOF
  
  
  cat >>confdefs.h <<_ACEOF
@@ -86,7 +86,7 @@ diff --git a/configure.in b/configure.in
 index 50561de..93cad3f 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -4059,8 +4059,8 @@ locale_dir="`eval echo ${locale_dir}`"
+@@ -4248,8 +4248,8 @@ locale_dir="`eval echo ${locale_dir}`"
  AC_DEFINE_UNQUOTED(PR_LOCALE_DIR, "`eval echo "${locale_dir}"`", [Define the locale directory])
  
  AC_DEFINE_UNQUOTED(PR_RUN_DIR, "`eval echo "${localstatedir}"`", [Define the run directory])

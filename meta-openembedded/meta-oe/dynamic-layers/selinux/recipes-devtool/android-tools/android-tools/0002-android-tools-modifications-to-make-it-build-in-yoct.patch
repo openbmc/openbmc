@@ -1,4 +1,4 @@
-From fe211cbc305a9316c1d4da2f086d6a50f1c92188 Mon Sep 17 00:00:00 2001
+From 194513bababa9707ec54bc7119613a0d5eca9f79 Mon Sep 17 00:00:00 2001
 From: Etienne Cordonnier <ecordonnier@snap.com>
 Date: Fri, 17 Mar 2023 10:33:11 +0100
 Subject: [PATCH] android-tools: modifications to make it build in yocto
@@ -12,26 +12,28 @@ Subject: [PATCH] android-tools: modifications to make it build in yocto
 
 Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
 
----
-Upstream-Status: Pending
+- fix warning: library search path "/usr/lib/p7zip" is unsafe for cross-compilation
 
+Upstream-Status: Pending
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
  debian/external/boringssl/libcrypto.mk         |  1 +
  debian/system/core/append2simg.mk              |  2 +-
  debian/system/core/fastboot.mk                 |  2 +-
  debian/system/core/img2simg.mk                 |  2 +-
- debian/system/core/libbacktrace.mk             |  8 ++++----
+ debian/system/core/libbacktrace.mk             | 10 ++++------
  debian/system/core/libbase.mk                  |  5 +++--
  debian/system/core/libcutils.mk                |  5 +++--
  debian/system/core/liblog.mk                   |  3 ++-
  debian/system/core/libsparse.mk                |  5 +++--
- debian/system/core/libutils.mk                 |  2 +-
+ debian/system/core/libutils.mk                 |  4 ++--
  debian/system/core/libziparchive.mk            |  5 +++--
  debian/system/core/simg2img.mk                 |  2 +-
  debian/system/core/simg2simg.mk                |  2 +-
  frameworks/native/libs/adbd_auth/adbd_auth.cpp |  2 ++
  system/core/adb/adb_listeners.cpp              | 12 ++++++------
  system/core/adb/transport_local.cpp            |  2 +-
- 16 files changed, 34 insertions(+), 26 deletions(-)
+ 16 files changed, 35 insertions(+), 29 deletions(-)
 
 diff --git a/debian/external/boringssl/libcrypto.mk b/debian/external/boringssl/libcrypto.mk
 index c0ea54f4..b3a77bfd 100644
@@ -85,7 +87,7 @@ index 11adf014..8baf5ba5 100644
    -llog \
    -lpthread \
 diff --git a/debian/system/core/libbacktrace.mk b/debian/system/core/libbacktrace.mk
-index e3411d76..86e69874 100644
+index e3411d76..e7dd984c 100644
 --- a/debian/system/core/libbacktrace.mk
 +++ b/debian/system/core/libbacktrace.mk
 @@ -1,4 +1,4 @@
@@ -94,9 +96,11 @@ index e3411d76..86e69874 100644
  
  NAME = libbacktrace
  
-@@ -83,10 +84,9 @@ CPPFLAGS += \
+@@ -81,12 +81,10 @@ CPPFLAGS += \
+   -Isystem/core/libunwindstack/include \
+ 
  LDFLAGS += \
-   -L/usr/lib/p7zip \
+-  -L/usr/lib/p7zip \
    -Ldebian/out/system/core \
 -  -Wl,-rpath=/usr/lib/p7zip \
 -  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
@@ -107,7 +111,7 @@ index e3411d76..86e69874 100644
    -lbase \
    -llog \
    -lpthread \
-@@ -101,7 +101,7 @@ endif
+@@ -101,7 +99,7 @@ endif
  build: $(OBJECTS_CXX) $(OBJECTS_ASSEMBLY) debian/out/external/libunwind/libunwind.a
  	mkdir -p debian/out/system/core
  	$(CXX) $^ -o debian/out/system/core/$(NAME).so.0 $(LDFLAGS)
@@ -216,7 +220,7 @@ index c2b2694c..2da12b8e 100644
  $(OBJECTS): %.o: %.cpp
  	$(CXX) -c -o $@ $< $(CXXFLAGS) $(CPPFLAGS)
 diff --git a/debian/system/core/libutils.mk b/debian/system/core/libutils.mk
-index c37b1d2d..332492c1 100644
+index c37b1d2d..0c748c8b 100644
 --- a/debian/system/core/libutils.mk
 +++ b/debian/system/core/libutils.mk
 @@ -1,4 +1,4 @@
@@ -373,3 +377,6 @@ index c7261860..5988ec4d 100644
      auto it = local_transports.find(adb_port);
      if (it == local_transports.end()) {
          return nullptr;
+-- 
+2.34.1
+

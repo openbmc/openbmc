@@ -7,18 +7,9 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=05f1e16a8e59ce3e9a979e881816c2ab"
 
 PYPI_PACKAGE := "python-intervals"
 
-SRC_URI += " \
-	file://run-ptest \
-"
+inherit pypi setuptools3 ptest-python-pytest
 
-inherit pypi setuptools3 ptest
-
-RDEPENDS:${PN}-ptest += " \
-    python3-pytest \
-    python3-unittest-automake-output \
-"
-
-do_install_ptest() {
+do_install_ptest:append () {
 	cp -f ${S}/test_intervals.py ${D}${PTEST_PATH}
 	cp -f ${S}/README.md ${D}${PTEST_PATH}
 }

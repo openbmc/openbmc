@@ -1,4 +1,4 @@
-From f446686c26c499e15ef17d495a93cfbc20e16090 Mon Sep 17 00:00:00 2001
+From 603e5862cca832ae925d0c92a8654a57caff5910 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 12 Apr 2016 15:51:54 +0100
 Subject: [PATCH] rsync: remove upstream's rebuild logic
@@ -13,12 +13,12 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  1 file changed, 54 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index a1253e5..a084935 100644
+index 7c75c26..1d13e8c 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -192,60 +192,6 @@ gensend: gen
- 	fi
- 	rsync -aic $(GENFILES) git-version.h $${SAMBA_HOST-samba.org}:/home/ftp/pub/rsync/generated-files/ || true
+@@ -184,60 +184,6 @@ conf: configure.sh config.h.in
+ .PHONY: gen
+ gen: conf proto.h man git-version.h
  
 -aclocal.m4: $(srcdir)/m4/*.m4
 -	aclocal -I $(srcdir)/m4

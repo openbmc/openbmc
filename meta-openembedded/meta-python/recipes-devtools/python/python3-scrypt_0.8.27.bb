@@ -7,22 +7,13 @@ SRC_URI += "file://0001-py-scrypt-remove-the-hard-coded-include-paths.patch"
 
 SRC_URI[sha256sum] = "a7b637848ed518c1ea2b31a9ecaaa3f49616598d8442de8706cf1f01fbabf0a7"
 
-inherit pypi ptest setuptools3 dos2unix
-
-SRC_URI += " \
-    file://run-ptest \
-"
-
-RDEPENDS:${PN}-ptest += " \
-    python3-pytest \
-    python3-unittest-automake-output \
-"
+inherit pypi ptest-python-pytest setuptools3 dos2unix
 
 RDEPENDS:${PN} += " \
     python3-ctypes \
 "
 
-do_install_ptest() {
+do_install_ptest:append() {
     install -d ${D}${PTEST_PATH}/tests
     cp -rf ${S}/scrypt/tests/* ${D}${PTEST_PATH}/tests/
 }

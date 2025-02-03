@@ -1,0 +1,27 @@
+From cbb5cc1022cc27edefc8eabbe21458cac9bda6fb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 23 Nov 2024 13:28:33 -0800
+Subject: [PATCH] Link with icu-uc to fix build with ICU-76
+
+Fixes
+https://bugzilla.mozilla.org/show_bug.cgi?id=1927380
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ js/moz.configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/moz.configure b/js/moz.configure
+index 593b93acee..2181dca34b 100644
+--- a/js/moz.configure
++++ b/js/moz.configure
+@@ -1305,7 +1305,7 @@ def enable_system_icu_option(enable_system_icu):
+     return enable_system_icu
+ 
+ 
+-system_icu = pkg_check_modules("MOZ_ICU", "icu-i18n >= 73.1", when="--with-system-icu")
++system_icu = pkg_check_modules("MOZ_ICU", "icu-i18n >= 73.1 icu-uc", when="--with-system-icu")
+ 
+ 
+ @depends(enable_system_icu_option)

@@ -247,8 +247,8 @@ index 6bf07ad3..5d645b86 100644
 +  have_shm_mmap_posix=yes
 +  PHP_CHECK_LIBRARY(rt, shm_unlink, [PHP_ADD_LIBRARY(rt,1,OPCACHE_SHARED_LIBADD)])
  
-   PHP_NEW_EXTENSION(opcache,
- 	ZendAccelerator.c \
+   AX_CHECK_COMPILE_FLAG([-Wno-implicit-fallthrough],
+     [PHP_OPCACHE_CFLAGS="$PHP_OPCACHE_CFLAGS -Wno-implicit-fallthrough"],,
 -- 
 2.40.0
 

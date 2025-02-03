@@ -1,0 +1,474 @@
+From d6118fde9c8a7c49f042bc9dc434f56910c23d9c Mon Sep 17 00:00:00 2001
+From: Jiaying Song <jiaying.song.cn@windriver.com>
+Date: Wed, 25 Dec 2024 13:35:59 +0800
+Subject: [PATCH] Replace tclsh with tclsh8 in the scripts used in the Expect
+ package
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+As can be seen from the following, since Expect uses tcl8, it is necessary to
+change tclsh to tclsh8 in the related scripts, otherwise they will not execute.
+
+pkgIndex.tcl :
+if {![package vsatisfies [package provide Tcl] 8.6]} {return}
+package ifneeded Expect 5.45.4 \
+    [list load [file join /usr/lib64 libexpect5.45.4.so]]
+
+Upstream-Status: Inactive-Upstream
+
+Signed-off-by: Jiaying Song <jiaying.song.cn@windriver.com>
+---
+ example/archie        | 2 +-
+ example/autoexpect    | 2 +-
+ example/autopasswd    | 2 +-
+ example/chess.exp     | 2 +-
+ example/cryptdir      | 2 +-
+ example/decryptdir    | 2 +-
+ example/dislocate     | 2 +-
+ example/dvorak        | 2 +-
+ example/ftp-inband    | 2 +-
+ example/ftp-rfc       | 2 +-
+ example/gethostbyaddr | 2 +-
+ example/kibitz        | 2 +-
+ example/lpunlock      | 2 +-
+ example/mkpasswd      | 2 +-
+ example/multixterm    | 2 +-
+ example/passmass      | 2 +-
+ example/read1char     | 2 +-
+ example/rftp          | 2 +-
+ example/rlogin-cwd    | 2 +-
+ example/robohunt      | 2 +-
+ example/rogue.exp     | 2 +-
+ example/telnet-cwd    | 2 +-
+ example/timed-read    | 2 +-
+ example/timed-run     | 2 +-
+ example/tknewsbiff    | 2 +-
+ example/tkpasswd      | 2 +-
+ example/tkterm        | 2 +-
+ example/unbuffer      | 2 +-
+ example/virterm       | 2 +-
+ example/weather       | 2 +-
+ example/xkibitz       | 2 +-
+ example/xpstat        | 2 +-
+ 32 files changed, 32 insertions(+), 32 deletions(-)
+
+diff --git a/example/archie b/example/archie
+index 0d5f43f..0e8d11e 100755
+--- a/example/archie
++++ b/example/archie
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/autoexpect b/example/autoexpect
+index 35e57ce..e5ea626 100755
+--- a/example/autoexpect
++++ b/example/autoexpect
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/autopasswd b/example/autopasswd
+index 1d095e2..b87dcd4 100755
+--- a/example/autopasswd
++++ b/example/autopasswd
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/chess.exp b/example/chess.exp
+index 7cbd8ff..450dd20 100755
+--- a/example/chess.exp
++++ b/example/chess.exp
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/cryptdir b/example/cryptdir
+index 84a155b..c7bfc02 100755
+--- a/example/cryptdir
++++ b/example/cryptdir
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/decryptdir b/example/decryptdir
+index 84a155b..c7bfc02 100755
+--- a/example/decryptdir
++++ b/example/decryptdir
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/dislocate b/example/dislocate
+index 9d34180..b366933 100755
+--- a/example/dislocate
++++ b/example/dislocate
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/dvorak b/example/dvorak
+index b5debc3..3789938 100755
+--- a/example/dvorak
++++ b/example/dvorak
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/ftp-inband b/example/ftp-inband
+index 5a28302..d3392f4 100755
+--- a/example/ftp-inband
++++ b/example/ftp-inband
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/ftp-rfc b/example/ftp-rfc
+index 4153b24..f02b3dc 100755
+--- a/example/ftp-rfc
++++ b/example/ftp-rfc
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/gethostbyaddr b/example/gethostbyaddr
+index 513a330..803b667 100755
+--- a/example/gethostbyaddr
++++ b/example/gethostbyaddr
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/kibitz b/example/kibitz
+index eacb139..7c73bf9 100755
+--- a/example/kibitz
++++ b/example/kibitz
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/lpunlock b/example/lpunlock
+index 2b7ea24..e42224b 100755
+--- a/example/lpunlock
++++ b/example/lpunlock
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/mkpasswd b/example/mkpasswd
+index 6016b56..c3e97f4 100755
+--- a/example/mkpasswd
++++ b/example/mkpasswd
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/multixterm b/example/multixterm
+index d0abfe7..82d6651 100755
+--- a/example/multixterm
++++ b/example/multixterm
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/passmass b/example/passmass
+index e3c18e6..8f396d3 100755
+--- a/example/passmass
++++ b/example/passmass
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/read1char b/example/read1char
+index 43a3df8..5f947fd 100644
+--- a/example/read1char
++++ b/example/read1char
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/rftp b/example/rftp
+index c5db679..ebbf4c5 100755
+--- a/example/rftp
++++ b/example/rftp
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/rlogin-cwd b/example/rlogin-cwd
+index b217373..80863e7 100755
+--- a/example/rlogin-cwd
++++ b/example/rlogin-cwd
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/robohunt b/example/robohunt
+index 853ce1e..0d70c87 100755
+--- a/example/robohunt
++++ b/example/robohunt
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/rogue.exp b/example/rogue.exp
+index 083acdf..fb6f9ca 100755
+--- a/example/rogue.exp
++++ b/example/rogue.exp
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/telnet-cwd b/example/telnet-cwd
+index bd16048..fa520f1 100755
+--- a/example/telnet-cwd
++++ b/example/telnet-cwd
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/timed-read b/example/timed-read
+index 8e63f0f..0a4ee7d 100755
+--- a/example/timed-read
++++ b/example/timed-read
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/timed-run b/example/timed-run
+index 80def48..a0a36ba 100755
+--- a/example/timed-run
++++ b/example/timed-run
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/tknewsbiff b/example/tknewsbiff
+index 9a2da4b..8d9db19 100755
+--- a/example/tknewsbiff
++++ b/example/tknewsbiff
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ package require Tk
+diff --git a/example/tkpasswd b/example/tkpasswd
+index 376c56a..cc4d816 100755
+--- a/example/tkpasswd
++++ b/example/tkpasswd
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ package require Tk
+diff --git a/example/tkterm b/example/tkterm
+index 16ee972..6c85c63 100755
+--- a/example/tkterm
++++ b/example/tkterm
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ package require Tk
+diff --git a/example/unbuffer b/example/unbuffer
+index ad5db7b..f6e42fd 100755
+--- a/example/unbuffer
++++ b/example/unbuffer
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/virterm b/example/virterm
+index bab254b..911c5bc 100755
+--- a/example/virterm
++++ b/example/virterm
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/weather b/example/weather
+index 4bd0e1b..8146359 100755
+--- a/example/weather
++++ b/example/weather
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/xkibitz b/example/xkibitz
+index b61a22f..5718976 100755
+--- a/example/xkibitz
++++ b/example/xkibitz
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+diff --git a/example/xpstat b/example/xpstat
+index ebbfbcf..067d57e 100755
+--- a/example/xpstat
++++ b/example/xpstat
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ # -*- tcl -*-
+ # The next line is executed by /bin/sh, but not tcl \
+-exec tclsh "$0" ${1+"$@"}
++exec tclsh8 "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
+-- 
+2.25.1
+

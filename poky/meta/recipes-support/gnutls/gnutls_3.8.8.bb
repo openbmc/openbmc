@@ -55,7 +55,7 @@ EXTRA_OECONF = " \
 "
 
 # Otherwise the tools try and use HOSTTOOLS_DIR/bash as a shell.
-export POSIX_SHELL="${base_bindir}/sh"
+export POSIX_SHELL = "${base_bindir}/sh"
 
 do_configure:prepend() {
 	for dir in . lib; do

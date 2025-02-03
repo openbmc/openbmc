@@ -14,7 +14,7 @@ EXTRA_OEMAKE = "\
     -C ${S}/tools/bpf/bpftool \
     O=${B} \
     CROSS=${TARGET_PREFIX} \
-    CC="${CC} ${DEBUG_PREFIX_MAP} -fdebug-prefix-map=${STAGING_KERNEL_DIR}=${KERNEL_SRC_PATH}" \
+    CC="${CC} ${DEBUG_PREFIX_MAP} -fdebug-prefix-map=${STAGING_KERNEL_DIR}=${KERNEL_SRC_PATH} ${CFLAGS}" \
     HOSTCC="${BUILD_CC} ${BUILD_CFLAGS}" \
     LD="${LD}" \
     AR=${AR} \

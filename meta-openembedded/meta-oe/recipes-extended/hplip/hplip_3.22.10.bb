@@ -1,5 +1,5 @@
 SUMMARY = "HP Linux Imaging and Printing"
-LICENSE="GPL-2.0-only"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=20f2c819499cc2063e9a7b07b408815c"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \

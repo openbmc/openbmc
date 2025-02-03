@@ -1,4 +1,4 @@
-From 9fce0689bc04506e5758444efa24ea99fe1ff5ef Mon Sep 17 00:00:00 2001
+From a956d17d2aa7fea53bab97715a8f98858e9b4a5c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 10 May 2019 14:30:36 +0800
 Subject: [PATCH] gpgme/lang/python: gpg-error-config should not be used
@@ -14,16 +14,15 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 Rebase to 1.13.0
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  lang/python/setup.py.in | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/lang/python/setup.py.in b/lang/python/setup.py.in
-index 6f36861..1d9058b 100755
+index d6f537e..695c02e 100755
 --- a/lang/python/setup.py.in
 +++ b/lang/python/setup.py.in
-@@ -169,9 +169,8 @@ class BuildExtFirstHack(build):
+@@ -173,9 +173,8 @@ class BuildExtFirstHack(build):
  
      def _generate_errors_i(self):
  

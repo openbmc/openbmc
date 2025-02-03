@@ -4,6 +4,12 @@
 BitBake Supported Release Manuals
 =================================
 
+****************************
+Release Series 5.1 (styhead)
+****************************
+
+- :yocto_docs:`BitBake 2.10 User Manual </bitbake/2.10/>`
+
 *******************************
 Release Series 5.0 (scarthgap)
 *******************************
@@ -15,12 +21,6 @@ Release Series 4.0 (kirkstone)
 ******************************
 
 - :yocto_docs:`BitBake 2.0 User Manual </bitbake/2.0/>`
-
-****************************
-Release Series 3.1 (dunfell)
-****************************
-
-- :yocto_docs:`BitBake 1.46 User Manual </bitbake/1.46/>`
 
 ================================
 BitBake Outdated Release Manuals
@@ -62,10 +62,11 @@ Release Series 3.2 (gatesgarth)
 
 - :yocto_docs:`BitBake 1.48 User Manual </bitbake/1.48/>`
 
-*******************************************
-Release Series 3.1 (dunfell first versions)
-*******************************************
+****************************
+Release Series 3.1 (dunfell)
+****************************
 
+- :yocto_docs:`BitBake 1.46 User Manual </bitbake/1.46/>`
 - :yocto_docs:`3.1 BitBake User Manual </3.1/bitbake-user-manual/bitbake-user-manual.html>`
 - :yocto_docs:`3.1.1 BitBake User Manual </3.1.1/bitbake-user-manual/bitbake-user-manual.html>`
 - :yocto_docs:`3.1.2 BitBake User Manual </3.1.2/bitbake-user-manual/bitbake-user-manual.html>`

@@ -91,3 +91,4 @@ CONFFILES:${PN} = "${sysconfdir}/monkey/monkey.conf \
                    "
 
 CVE_STATUS[CVE-2013-2183] = "cpe-incorrect: Current version (1.6.9) is not affected. Issue was addressed in version 1.3.0"
+CVE_STATUS[CVE-2013-1771] = "not-applicable-platform: this is gentoo specific CVE"

@@ -20,12 +20,12 @@ DEPENDS = "kmod udev json-c keyutils iniparser libtraceevent libtracefs"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OEMESON += "-Ddestructive=enabled -Diniparserdir=${STAGING_INCDIR}/iniparser"
+EXTRA_OEMESON += "-Diniparserdir=${STAGING_INCDIR}/iniparser"
 
 PACKAGECONFIG ??= "tests ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)}"
 PACKAGECONFIG[systemd] = "-Dsystemd=enabled,-Dsystemd=disabled,systemd"
-PACKAGECONFIG[tests] = "-Dtest=enabled, -Dtest=disabled,"
-PACKAGECONFIG[docs] = "-Ddocs=enabled -Dasciidoctor=enabled,-Ddocs=disabled -Dasciidoctor=disabled, asciidoc-native"
+PACKAGECONFIG[tests] = "-Dtest=enabled -Ddestructive=enabled, -Dtest=disabled,"
+PACKAGECONFIG[docs] = "-Ddocs=enabled -Dasciidoctor=disabled,-Ddocs=disabled, asciidoc-native xmlto-native"
 
 SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
 SYSTEMD_SERVICE:${PN} = "ndctl-monitor.service daxdev-reconfigure@.service"

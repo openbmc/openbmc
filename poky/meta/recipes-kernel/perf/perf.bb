@@ -71,12 +71,12 @@ S = "${WORKDIR}/${BP}"
 # The LDFLAGS is required or some old kernels fails due missing
 # symbols and this is preferred than requiring patches to every old
 # supported kernel.
-LDFLAGS="-ldl -lutil"
+LDFLAGS = "-ldl -lutil"
 
 # Perf's build system adds its own optimization flags for most TUs,
 # overriding the flags included here. But for some, perf does not add
 # any -O option, so ensure the distro's chosen optimization gets used
-# for those. Also include ${DEBUG_PREFIX_MAP} which nsures perf is
+# for those. Also include ${DEBUG_PREFIX_MAP} which ensures perf is
 # built with appropriate -f*-prefix-map options,
 # avoiding the 'buildpaths' QA warning.
 TARGET_CC_ARCH += "${SELECTED_OPTIMIZATION} ${DEBUG_PREFIX_MAP}"

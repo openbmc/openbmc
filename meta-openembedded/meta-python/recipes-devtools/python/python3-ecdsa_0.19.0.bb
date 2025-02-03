@@ -6,19 +6,13 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=66ffc5e30f76cbb5358fe54b645e5a1d"
 PYPI_PACKAGE = "ecdsa"
 SRC_URI[sha256sum] = "60eaad1199659900dd0af521ed462b793bbdf867432b3948e87416ae4caf6bf8"
 
-inherit pypi setuptools3 python3native ptest
-
-SRC_URI += " \
-	file://run-ptest \
-"
+inherit pypi setuptools3 python3native ptest-python-pytest
 
 RDEPENDS:${PN}-ptest += " \
 	python3-hypothesis \
-	python3-pytest \
-	python3-unittest-automake-output \
 "
 
-do_install_ptest() {
+do_install_ptest:append () {
 	install -d ${D}${PTEST_PATH}/tests
 	cp -rf ${S}/src/ecdsa/* ${D}${PTEST_PATH}/tests/
 }

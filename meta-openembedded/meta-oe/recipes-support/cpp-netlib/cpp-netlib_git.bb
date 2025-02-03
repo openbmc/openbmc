@@ -28,3 +28,5 @@ do_install:append() {
     sed -i -e 's|${RECIPE_SYSROOT}||g' ${D}${libdir}/cmake/cppnetlib/cppnetlibConfig.cmake
     sed -i -e 's|${RECIPE_SYSROOT}||g' ${D}${libdir}/cmake/cppnetlib/cppnetlibTargets-noconfig.cmake
 }
+
+SKIP_RECIPE[cpp-netlib] ?= "Does not work with boost >= 1.87"

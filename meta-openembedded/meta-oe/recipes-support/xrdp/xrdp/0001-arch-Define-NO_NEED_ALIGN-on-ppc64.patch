@@ -1,4 +1,4 @@
-From 5958db649855bfb2ada7c0ed22a00f839b9a1161 Mon Sep 17 00:00:00 2001
+From 71e8fd272a4609cf3b6a0802cee82e2861a1fa0c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 12 Mar 2021 21:40:35 -0800
 Subject: [PATCH] arch: Define NO_NEED_ALIGN on ppc64
@@ -10,10 +10,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/common/arch.h b/common/arch.h
-index 617feb5e..6edb39db 100644
+index ec0aa05..f574656 100644
 --- a/common/arch.h
 +++ b/common/arch.h
-@@ -85,7 +85,7 @@ typedef int bool_t;
+@@ -86,7 +86,7 @@ typedef int bool_t;
  #define NEED_ALIGN
  #elif defined(__x86__) || defined(__x86_64__) || \
        defined(__AMD64__) || defined(_M_IX86) || defined (_M_AMD64) || \
@@ -22,6 +22,3 @@ index 617feb5e..6edb39db 100644
        defined(__PPC__) || defined(__LITTLE_ENDIAN__) || \
        defined(__s390__) || defined (__s390x__) || \
        defined(__riscv)
--- 
-2.31.1
-

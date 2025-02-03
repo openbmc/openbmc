@@ -24,10 +24,10 @@ REQUIRED_DISTRO_FEATURES = "pam polkit gobject-introspection"
 PACKAGECONFIG ?= "ui"
 PACKAGECONFIG[ui] = ",,,malcontent-ui"
 
-EXTRA_OEMESON = "-Dui=disabled"
+EXTRA_OEMESON = "-Dui=disabled -Dpamlibdir=${base_libdir}/security"
 
 FILES:${PN} += " \
-	${libdir}/security/pam_malcontent.so \
+	${base_libdir}/security/pam_malcontent.so \
 	${datadir}/accountsservice \
 	${datadir}/help \
 	${datadir}/dbus-1 \

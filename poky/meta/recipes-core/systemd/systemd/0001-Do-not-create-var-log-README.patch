@@ -1,0 +1,30 @@
+From 425ad51e727058b48dd4580fd6afe7e51e96a28a Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Tue, 21 Jan 2025 05:02:00 +0100
+Subject: [PATCH] Do not create /var/log/README
+
+/var/log/README is a link to /usr/share/doc/systemd/README.logs. The
+latter is packaged in systemd-doc and likely not installed, which leaves
+/var/log/README as a dead link. Since /var/log/README is not very
+useful, just remove it.
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ tmpfiles.d/legacy.conf.in | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tmpfiles.d/legacy.conf.in b/tmpfiles.d/legacy.conf.in
+index b475500e58..650c91a8da 100644
+--- a/tmpfiles.d/legacy.conf.in
++++ b/tmpfiles.d/legacy.conf.in
+@@ -13,9 +13,6 @@
+ 
+ d /run/lock 0755 root root -
+ L /var/lock - - - - ../run/lock
+-{% if CREATE_LOG_DIRS %}
+-L$ /var/log/README - - - - ../..{{DOC_DIR}}/README.logs
+-{% endif %}
+ 
+ {% if HAVE_SYSV_COMPAT %}
+ # /run/lock/subsys is used for serializing SysV service execution, and

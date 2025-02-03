@@ -12,7 +12,7 @@ RDEPENDS:${PN} += " \
 "
 
 SRC_URI = "git://github.com/MostAwesomeDude/txWS.git;branch=master;protocol=https"
-SRCREV= "88cf6d9b9b685ffa1720644bd53c742afb10a414"
+SRCREV = "88cf6d9b9b685ffa1720644bd53c742afb10a414"
 
 S = "${WORKDIR}/git"
 

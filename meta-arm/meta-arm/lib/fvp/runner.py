@@ -56,7 +56,7 @@ class ConsolePortParser:
         while True:
             try:
                 line = next(self._lines).strip().decode(errors='ignore')
-                m = re.match(r"^(\S+): Listening for serial connection on port (\d+)$", line)
+                m = re.search(r"(\S+): Listening for serial connection on port (\d+)$", line)
                 if m:
                     matched_console = m.group(1)
                     matched_port = int(m.group(2))

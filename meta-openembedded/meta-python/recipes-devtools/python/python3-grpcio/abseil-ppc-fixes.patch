@@ -1,5 +1,5 @@
 From a2ec96a96ff7ba016e800212a942b9f29f255415 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
+From: Khem Raj <raj.khem@gmail.com> 
 Date: Sat, 13 Mar 2021 10:26:25 -0800
 Subject: [PATCH] An all-in-one patch that fixes several issues:
 
@@ -13,6 +13,7 @@ Sourced from void linux
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Xu Huan <xuhuan.fnst@fujitsu.com>
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  .../abseil-cpp/absl/base/internal/unscaledcycleclock.cc   | 4 ++--
  .../absl/base/internal/unscaledcycleclock_config.h        | 3 ++-
@@ -21,7 +22,7 @@ Signed-off-by: Xu Huan <xuhuan.fnst@fujitsu.com>
  4 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
-index 05e0e7b..f11fecb 100644
+index a0bf3a6..103b4f6 100644
 --- a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
 +++ b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
 @@ -20,7 +20,7 @@
@@ -43,17 +44,17 @@ index 05e0e7b..f11fecb 100644
  int64_t UnscaledCycleClock::Now() {
  #ifdef __GLIBC__
 diff --git a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h
-index 24b324a..5e232c1 100644
+index 43a3dab..196a853 100644
 --- a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h
 +++ b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock_config.h
 @@ -21,7 +21,8 @@
  
  // The following platforms have an implementation of a hardware counter.
  #if defined(__i386__) || defined(__x86_64__) || defined(__aarch64__) || \
--    defined(__powerpc__) || defined(__ppc__) || defined(__riscv) ||     \
+-    defined(__powerpc__) || defined(__ppc__) || defined(_M_IX86) ||     \
 +    ((defined(__powerpc__) || defined(__ppc__)) && defined(__GLIBC__)) || \
-+    defined(__riscv) ||     \
-     defined(_M_IX86) || (defined(_M_X64) && !defined(_M_ARM64EC))
++    defined(_M_IX86) ||     \
+     (defined(_M_X64) && !defined(_M_ARM64EC))
  #define ABSL_HAVE_UNSCALED_CYCLECLOCK_IMPLEMENTATION 1
  #else
 diff --git a/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc b/third_party/abseil-cpp/absl/debugging/internal/examine_stack.cc
@@ -96,3 +97,6 @@ index 3929b1b..23d5e50 100644
  #define ABSL_STACKTRACE_INL_HEADER \
    "absl/debugging/internal/stacktrace_powerpc-inl.inc"
  #elif defined(__aarch64__)
+-- 
+2.43.0
+

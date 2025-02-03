@@ -23,11 +23,9 @@ SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://0001-sql-CMakeLists.txt-fix-gen_lex_hash-not-found.patch \
            file://lfs64.patch \
            file://0001-Add-missing-includes-cstdint-and-cstdio.patch \
-           file://0001-Use-a-lambda-function-as-deleter-prototype-in-unique.patch \
            file://0001-Ensure-compatibility-with-ARMv9-by-updating-.arch-di.patch \
           "
-SRC_URI:append:libc-musl = " file://ppc-remove-glibc-dep.patch"
-SRC_URI[sha256sum] = "0a00180864cd016187c986faab8010de23a117b9a75f91d6456421f894e48d20"
+SRC_URI[sha256sum] = "96fbd2e6e93fb7e8b373eea75d85b6fea57c0e111a02090cbbefed52599dc77b"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/tags"
 
@@ -100,6 +98,9 @@ EXTRA_OECMAKE = "-DWITH_EMBEDDED_SERVER=ON \
                  -DCAT_EXECUTABLE=`which cat` \
                  -DSTACK_DIRECTION=1 \
                  -DHAVE_SYSTEM_LIBFMT_EXITCODE=0 \
+                 -DLSTAT_FOLLOWS_SLASHED_SYMLINK_EXITCODE=0 \
+                 -DSTAT_EMPTY_STRING_BUG_EXITCODE=0 \
+                 -DMASK_LONGDOUBLE_EXITCODE=0 \
                  -DCMAKE_AR:FILEPATH=${AR}"
 
 
@@ -192,7 +193,7 @@ do_install() {
         pam_so=$(find ${D} -name pam_user_map.so)
         if [ x"${pam_so}" != x ]; then
             pam_dir=$(dirname ${pam_so})
-            mv ${pam_dir} ${D}/${libdir}
+            mv ${pam_dir} ${D}/${base_libdir}
             rmdir --ignore-fail-on-non-empty ${pam_dir%security}
         fi
     fi
@@ -346,7 +347,7 @@ FILES:${PN}-server = "\
     ${sbindir}/mysqld \
     ${sbindir}/mariadbd \
     ${libdir}/plugin/*.so \
-    ${libdir}/security/*.so \
+    ${base_libdir}/security/*.so \
     ${libdir}/plugin/auth_pam_tool_dir/auth_pam_tool \
     ${datadir}/mysql/ \
     ${localstatedir}/mysql/ \

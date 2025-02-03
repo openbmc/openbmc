@@ -10,7 +10,7 @@ DEPENDS = " \
     gdk-pixbuf \
     gtk+3 \
     libhandy \
-    libpeas \
+    libpeas-1 \
     libportal \
     libexif \
     lcms \

@@ -12,7 +12,10 @@ SRC_URI = "http://www.ring.gr.jp/archives/net/mail/${BPN}/${BP}.tar.gz \
     file://from-debian-to-fix-compile-errors.patch \
     file://from-debian-to-modify-parameters.patch \
     file://from-debian-to-fix-man-file.patch \
-    file://man-file-mailstat.1-from-debian.patch"
+    file://man-file-mailstat.1-from-debian.patch \
+    file://CVE-2014-3618.patch \
+    file://CVE-2017-16844.patch \
+"
 SRC_URI[sha256sum] = "087c75b34dd33d8b9df5afe9e42801c9395f4bf373a784d9bc97153b0062e117"
 
 LICENSE = "GPL-2.0-only & Artistic-1.0"

@@ -43,6 +43,7 @@ do_install() {
     done
 
     cp -R --no-dereference --preserve=mode,links -v debian/config/brcm80211/cypress/* ${D}${nonarch_base_libdir}/firmware/cypress/
+    ln -s cyfmac43455-sdio-minimal.bin ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.bin
 
     rm ${D}${nonarch_base_libdir}/firmware/cypress/README.txt
 }

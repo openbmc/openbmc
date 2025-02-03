@@ -1,4 +1,4 @@
-From 7130850d74863d1e9a0ae3e85462f1466bdf6d88 Mon Sep 17 00:00:00 2001
+From b0728812241c048907e6f1ba168292cd9948347d Mon Sep 17 00:00:00 2001
 From: Anuj Mittal <anuj.mittal@intel.com>
 Date: Thu, 14 Nov 2019 10:13:53 +0800
 Subject: [PATCH] dont setup compiler flags -m32/-m64

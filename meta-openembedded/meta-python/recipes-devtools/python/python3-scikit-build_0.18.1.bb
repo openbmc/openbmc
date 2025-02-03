@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7c96d2b08b3cec6d3c67fb864d1fd8cc"
 DEPENDS = "python3-hatch-vcs-native python3-hatch-fancy-pypi-readme-native"
 
 PYPI_PACKAGE = "scikit_build"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_hatchling
 

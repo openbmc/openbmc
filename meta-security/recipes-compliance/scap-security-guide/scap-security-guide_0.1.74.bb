@@ -92,6 +92,6 @@ do_install_ptest() {
 FILES:${PN} += "${datadir}/xml ${datadir}/openscap"
 
 RDEPENDS:${PN} = "openscap"
-RDEPENDS:${PN}-ptest = "cmake grep sed bash git python3 python3-modules python3-mypy python3-pyyaml python3-yamlpath python3-xmldiff python3-json2html python3-pandas python3-openpyxl python3-pytest libxml2-utils libxslt-bin"
+RDEPENDS:${PN}-ptest = "cmake grep sed bash git python3 python3-modules python3-pyyaml python3-pytest libxml2-utils libxslt-bin"
 
 COMPATIBLE_HOST:libc-musl = "null"

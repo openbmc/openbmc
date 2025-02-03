@@ -1,4 +1,4 @@
-From 03406451d66a9d561d6e32a181248e5a0bd58d58 Mon Sep 17 00:00:00 2001
+From 022cf6956c647cc193fce2b0ccdf1308d3e208cd Mon Sep 17 00:00:00 2001
 From: Scott Garman <scott.a.garman@intel.com>
 Date: Fri, 29 Apr 2022 13:32:28 +0000
 Subject: [PATCH] Remove "*" for root since we do not have an /etc/shadow

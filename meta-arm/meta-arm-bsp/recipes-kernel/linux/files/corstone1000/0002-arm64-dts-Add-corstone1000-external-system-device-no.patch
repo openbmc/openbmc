@@ -6,7 +6,7 @@ Subject: [PATCH 2/6] arm64: dts: Add corstone1000 external system device node
 add device tree node for the external system core in Corstone-1000
 
 Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
-Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20240301164227.339208-1-abdellatif.elkhlifi@arm.com/]
+Upstream-Status: Denied [Agreement reached: https://lore.kernel.org/all/20241009094635.GA14639@e130802.arm.com/]
 ---
  arch/arm64/boot/dts/arm/corstone1000.dtsi | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)

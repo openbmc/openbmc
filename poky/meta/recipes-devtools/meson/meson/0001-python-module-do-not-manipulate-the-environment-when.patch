@@ -1,4 +1,4 @@
-From 4ff04d388baf9d31efa73a92c0124a8d45b65377 Mon Sep 17 00:00:00 2001
+From f264b7fd2c86edfd5db77da264e8bf05f5e2bfeb Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Nov 2018 14:24:26 +0100
 Subject: [PATCH] python module: do not manipulate the environment when calling
@@ -11,10 +11,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/mesonbuild/dependencies/python.py b/mesonbuild/dependencies/python.py
-index fff4aaa..1fde2f6 100644
+index 326e605..f5eb50f 100644
 --- a/mesonbuild/dependencies/python.py
 +++ b/mesonbuild/dependencies/python.py
-@@ -400,9 +400,6 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
+@@ -403,9 +403,6 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
                      empty.name = 'python'
                      return empty
  
@@ -24,7 +24,7 @@ index fff4aaa..1fde2f6 100644
                  try:
                      return PythonPkgConfigDependency(name, env, kwargs, installation, True)
                  finally:
-@@ -411,8 +408,7 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
+@@ -414,8 +411,7 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
                              os.environ[name] = value
                          elif name in os.environ:
                              del os.environ[name]

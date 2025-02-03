@@ -1,4 +1,4 @@
-From f92f657973997df30afdb0032c88ad3a14ead46b Mon Sep 17 00:00:00 2001
+From 360d41c1dd2d28d5102d66179095cedacaf5dc3a Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Fri, 23 Sep 2022 15:48:21 +0800
 Subject: [PATCH] sql/CMakeLists.txt: fix gen_lex_hash not found
@@ -15,10 +15,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 22 insertions(+), 8 deletions(-)
 
 diff --git a/sql/CMakeLists.txt b/sql/CMakeLists.txt
-index 241b482..27a3991 100644
+index 0195555e..507136cb 100644
 --- a/sql/CMakeLists.txt
 +++ b/sql/CMakeLists.txt
-@@ -60,11 +60,18 @@ ${CMAKE_BINARY_DIR}/sql
+@@ -64,11 +64,18 @@ ${CMAKE_BINARY_DIR}/sql
  ${CMAKE_SOURCE_DIR}/tpool
  )
  
@@ -41,7 +41,7 @@ index 241b482..27a3991 100644
  
  FIND_PACKAGE(BISON 2.4)
  
-@@ -372,11 +379,18 @@ IF(NOT CMAKE_CROSSCOMPILING OR DEFINED CMAKE_CROSSCOMPILING_EMULATOR)
+@@ -405,11 +412,18 @@ IF(NOT CMAKE_CROSSCOMPILING OR DEFINED CMAKE_CROSSCOMPILING_EMULATOR)
    ADD_EXECUTABLE(gen_lex_hash gen_lex_hash.cc)
  ENDIF()
  
@@ -64,6 +64,3 @@ index 241b482..27a3991 100644
  
  MYSQL_ADD_EXECUTABLE(mariadb-tzinfo-to-sql tztime.cc)
  SET_TARGET_PROPERTIES(mariadb-tzinfo-to-sql PROPERTIES COMPILE_FLAGS "-DTZINFO2SQL")
--- 
-2.25.1
-

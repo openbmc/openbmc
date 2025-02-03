@@ -187,6 +187,8 @@ def get_patched_src(d):
             bb.build.exec_func("do_unpack", d)
 
             if d.getVar("SRC_URI") != "":
+                if bb.data.inherits_class('dos2unix', d):
+                    bb.build.exec_func('do_convert_crlf_to_lf', d)
                 bb.build.exec_func("do_patch", d)
 
         # Copy source from work-share to spdx_workdir

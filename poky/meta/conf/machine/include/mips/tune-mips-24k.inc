@@ -22,15 +22,15 @@ TUNE_FEATURES:tune-mips32r2-24kec-m16 = "${TUNE_FEATURES:tune-mips32r2-24kec} mi
 
 MIPSPKGSFX_VARIANT:tune-mips32r2-24kc = "mips32r2-24kc"
 PACKAGE_EXTRA_ARCHS:tune-mips32r2-24kc = "${PACKAGE_EXTRA_ARCHS:tune-mips32r2-nf} mips32r2-24kc-nf"
-QEMU_EXTRAOPTIONS_mips32r2-24kc-nf = " -cpu 24Kc"
+QEMU_EXTRAOPTIONS:tune-mips32r2-24kc-nf = " -cpu 24Kc"
 
 MIPSPKGSFX_VARIANT:tune-mips32r2-24kec = "mips32r2-24kec"
 PACKAGE_EXTRA_ARCHS:tune-mips32r2-24kec = "${PACKAGE_EXTRA_ARCHS:tune-mips32r2-24kc} mips32r2-24kec-nf"
-QEMU_EXTRAOPTIONS_mips32r2-24kec-nf = " -cpu 24KEc"
+QEMU_EXTRAOPTIONS:tune-mips32r2-24kec-nf = " -cpu 24KEc"
 
 MIPSPKGSFX_VARIANT:tune-mips32r2-24kec-m16 = "mips32r2-24kec${MIPSPKGSFX_MIPS16E}"
 PACKAGE_EXTRA_ARCHS:tune-mips32r2-24kec-m16 = "${PACKAGE_EXTRA_ARCHS:tune-mips32r2-24kec} mips32r2-24kec-m16-nf"
-QEMU_EXTRAOPTIONS_mips32r2-24kec-m16-nf = " -cpu 24KEc"
+QEMU_EXTRAOPTIONS:tune-mips32r2-24kec-m16-nf = " -cpu 24KEc"
 
 
 # little endian: kc, kc+dsp=kec, kc+dsp+mips16e=kec-m16
@@ -40,12 +40,12 @@ TUNE_FEATURES:tune-mips32r2el-24kec-m16 = "${TUNE_FEATURES:tune-mips32r2el-24kec
 
 MIPSPKGSFX_VARIANT:tune-mips32r2el-24kc = "mips32r2el-24kc"
 PACKAGE_EXTRA_ARCHS:tune-mips32r2el-24kc = "${PACKAGE_EXTRA_ARCHS:tune-mips32r2el-nf} mips32r2el-24kc-nf"
-QEMU_EXTRAOPTIONS_mips32r2el-24kc-nf = " -cpu 24Kc"
+QEMU_EXTRAOPTIONS:tune-mips32r2el-24kc-nf = " -cpu 24Kc"
 
 MIPSPKGSFX_VARIANT:tune-mips32r2el-24kec = "mips32r2el-24kec"
 PACKAGE_EXTRA_ARCHS:tune-mips32r2el-24kec = "${PACKAGE_EXTRA_ARCHS:tune-mips32r2el-24kc} mips32r2el-24kec-nf"
-QEMU_EXTRAOPTIONS_mips32r2el-24kec-nf = " -cpu 24KEc"
+QEMU_EXTRAOPTIONS:tune-mips32r2el-24kec-nf = " -cpu 24KEc"
 
 MIPSPKGSFX_VARIANT:tune-mips32r2el-24kec-m16 = "mips32r2el-24kec${MIPSPKGSFX_MIPS16E}"
 PACKAGE_EXTRA_ARCHS:tune-mips32r2el-24kec-m16 = "${PACKAGE_EXTRA_ARCHS:tune-mips32r2el-24kec} mips32r2el-24kec-m16-nf"
-QEMU_EXTRAOPTIONS_mips32r2el-24kec-m16-nf = " -cpu 24KEc"
+QEMU_EXTRAOPTIONS:tune-mips32r2el-24kec-m16-nf = " -cpu 24KEc"

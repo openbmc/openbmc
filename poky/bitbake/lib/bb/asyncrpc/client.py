@@ -112,11 +112,16 @@ class AsyncClient(object):
             )
 
         async def connect_sock():
-            websocket = await websockets.connect(
-                uri,
-                ping_interval=None,
-                open_timeout=self.timeout,
-            )
+            try:
+                websocket = await websockets.connect(
+                    uri,
+                    ping_interval=None,
+                    open_timeout=self.timeout,
+                )
+            except asyncio.exceptions.TimeoutError:
+                raise ConnectionError("Timeout while connecting to websocket")
+            except (OSError, websockets.InvalidHandshake, websockets.InvalidURI) as exc:
+                raise ConnectionError(f"Could not connect to websocket: {exc}") from exc
             return WebsocketConnection(websocket, self.timeout)
 
         self._connect_sock = connect_sock

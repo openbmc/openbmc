@@ -1,4 +1,4 @@
-From 7938a5a760827aec737ea49d2f8719051abda188 Mon Sep 17 00:00:00 2001
+From 89a53d8d025fef4626006219f0f686982e215d97 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 31 Jan 2018 11:01:09 +0800
 Subject: [PATCH] fix build path issue
@@ -12,13 +12,12 @@ to use relative path.
 
 Upstream-Status: Submitted [gnupg-devel@gnupg.org]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
 ---
  lang/python/Makefile.am | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index bbb9111..cee499e 100644
+index 136e979..1495982 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
 @@ -96,8 +96,9 @@ install-exec-local:

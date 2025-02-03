@@ -29,7 +29,7 @@ SRC_URI[sha256sum] = "57dcd7a6b966ecd5bbd95e1d11173734691e16b68692fa59661cdae9b1
 
 DEPENDS = "bison-native flex-native libxml2-native virtual/crypt"
 
-EXTRA_OEMESON = "-Ddocs=disabled"
+EXTRA_OEMESON = "-Ddocs=disabled -Dsecuredir=${base_libdir}/security"
 
 S = "${WORKDIR}/Linux-PAM-${PV}"
 
@@ -45,7 +45,7 @@ FILES:${PN} = " \
     ${libdir}/lib*${SOLIBS} \
     ${nonarch_libdir}/tmpfiles.d/*.conf \
 "
-FILES:${PN}-dev += "${libdir}/security/*.la ${libdir}/*.la ${libdir}/lib*${SOLIBSDEV}"
+FILES:${PN}-dev += "${base_libdir}/security/*.la ${libdir}/*.la ${libdir}/lib*${SOLIBSDEV}"
 FILES:${PN}-runtime = "${sysconfdir} ${sbindir} ${nonarch_libdir}/systemd/system"
 FILES:${PN}-xtests = "${datadir}/Linux-PAM/xtests"
 
@@ -105,9 +105,9 @@ python populate_packages:prepend () {
 
     mlprefix = d.getVar('MLPREFIX') or ''
     dvar = d.expand('${WORKDIR}/package')
-    pam_libdir = d.expand('${libdir}/security')
+    pam_libdir = d.expand('${base_libdir}/security')
     pam_sbindir = d.expand('${sbindir}')
-    pam_filterdir = d.expand('${libdir}/security/pam_filter')
+    pam_filterdir = d.expand('${base_libdir}/security/pam_filter')
     pam_pkgname = mlprefix + 'pam-plugin%s'
 
     do_split_packages(d, pam_libdir, r'^pam(.*)\.so$', pam_pkgname,

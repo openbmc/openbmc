@@ -1,4 +1,4 @@
-From 24e2b0edc2612acefcc48414bb6f0aeb086061a9 Mon Sep 17 00:00:00 2001
+From c24181245bc502a384635d7f7f48f12863f84c2f Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Tue, 26 Feb 2019 23:57:06 -0800
 Subject: [PATCH] configure.cmake: fix valgrind
@@ -16,16 +16,15 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
-
 ---
  configure.cmake | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/configure.cmake b/configure.cmake
-index 3cfc4b31..d017b3b3 100644
+index 61f30a75..3e730082 100644
 --- a/configure.cmake
 +++ b/configure.cmake
-@@ -930,10 +930,9 @@ HAVE_GCC_C11_ATOMICS)
+@@ -881,10 +881,9 @@ ENDIF()
  
  IF(WITH_VALGRIND)
    SET(HAVE_valgrind 1)

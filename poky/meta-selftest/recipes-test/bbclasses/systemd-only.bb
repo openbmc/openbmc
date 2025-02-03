@@ -9,4 +9,4 @@ do_install() {
 
 SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
-EXCLUDE_FROM_WORLD="1"
+EXCLUDE_FROM_WORLD = "1"

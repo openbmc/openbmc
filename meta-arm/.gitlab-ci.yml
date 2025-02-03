@@ -48,8 +48,6 @@ stages:
     - echo DL_DIR = $DL_DIR
     - rm -rf $KAS_WORK_DIR
     - mkdir --verbose --parents $KAS_WORK_DIR $KAS_REPO_REF_DIR $SSTATE_DIR $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
-    # Must do this here, as it's the only way to make sure the toolchain is installed on the same builder
-    - ./ci/get-binary-toolchains $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
 
 # Generalised fragment to do a Kas build
 .build:
@@ -118,7 +116,7 @@ update-repos:
 # Available options for building are (VIRT _must_ be last for ssh override)
 #  DISTRO: [poky, poky-altcfg, poky-tiny]
 #  KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
-#  TOOLCHAINS: [gcc, clang, external-gccarm]
+#  TOOLCHAINS: [gcc, clang]
 #  TCLIBC: [glibc, musl]
 #  FIRMWARE: [u-boot, edk2]
 #  TS: [none, trusted-services]
@@ -296,7 +294,6 @@ qemuarm-secureboot:
         TCLIBC: [glibc, musl]
         TESTING: testimage
       - DISTRO: [poky, poky-altcfg]
-        TOOLCHAINS: external-gccarm
         TESTING: testimage
       - KERNEL: linux-yocto-dev
         TESTING: testimage

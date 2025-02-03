@@ -13,7 +13,7 @@ SRC_URI += " \
 
 SRC_URI[sha256sum] = "9e79019aba43cb4fda9e4d983f8e88ca0373adbb697ae9c6c43093218de28b54"
 
-inherit pypi python_mesonpy cython
+inherit pkgconfig pypi python_mesonpy cython
 
 DEPENDS += " \
     python3-numpy-native \

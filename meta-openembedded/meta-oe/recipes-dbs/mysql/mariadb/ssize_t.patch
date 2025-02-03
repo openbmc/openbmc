@@ -1,7 +1,16 @@
-ssize_t comes from sys/types.h therefore include it
+From cfa843c91a036d0926c76c6dec6fd2a1f38e4843 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 31 May 2021 21:55:00 -0700
+Subject: [PATCH] ssize_t comes from sys/types.h therefore include it
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ wsrep-lib/include/wsrep/gtid.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wsrep-lib/include/wsrep/gtid.hpp b/wsrep-lib/include/wsrep/gtid.hpp
+index 0d49c58d..d61a6585 100644
 --- a/wsrep-lib/include/wsrep/gtid.hpp
 +++ b/wsrep-lib/include/wsrep/gtid.hpp
 @@ -25,7 +25,7 @@

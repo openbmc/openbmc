@@ -130,7 +130,9 @@ the following types of tests:
       $ bitbake image -c testimage
 
    The tests use the :ref:`ref-classes-testimage`
-   class and the :ref:`ref-tasks-testimage` task.
+   class and the :ref:`ref-tasks-testimage` task. See the
+   :ref:`test-manual/runtime-testing:Performing Automated Runtime Testing`
+   section of the Yocto Project Test Environment Manual for more information.
 
 -  *Layer Testing:* The Autobuilder has the possibility to test whether
    specific layers work with the test of the system. The layers tested
@@ -140,7 +142,7 @@ the following types of tests:
 -  *Package Testing:* A Package Test (ptest) runs tests against packages
    built by the OpenEmbedded build system on the target machine. See the
    :ref:`Testing Packages With
-   ptest <dev-manual/packages:Testing Packages With ptest>` section
+   ptest <test-manual/ptest:Testing Packages With ptest>` section
    in the Yocto Project Development Tasks Manual and the
    ":yocto_wiki:`Ptest </Ptest>`" Wiki page for more
    information on Ptest.

@@ -1,4 +1,4 @@
-From a9fc13b2aee55655d58fcb77a3180fa99f96438a Mon Sep 17 00:00:00 2001
+From 38d47c53749c6f16d5d7993410b256116e0ee0b8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <andre.draszik@jci.com>
 Date: Wed, 28 Mar 2018 16:45:05 +0100
 Subject: [PATCH] update-ca-certificates: use relative symlinks from
@@ -45,7 +45,7 @@ Signed-off-by: André Draszik <andre.draszik@jci.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
-index 00f80c7..7e911a9 100755
+index f7d0dbf..97a589c 100755
 --- a/sbin/update-ca-certificates
 +++ b/sbin/update-ca-certificates
 @@ -29,6 +29,7 @@ CERTSDIR=$SYSROOT/usr/share/ca-certificates

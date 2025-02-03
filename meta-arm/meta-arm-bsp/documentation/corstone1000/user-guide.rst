@@ -150,7 +150,7 @@ The provided distribution is based on `BusyBox <https://www.busybox.net/>`__ and
 +-----------+----------------------------------------------------------------------------------------------+
 | bbappend  | ``$WORKSPACE/meta-arm/meta-arm-bsp/recipes-kernel/linux/linux-yocto_%.bbappend``             |
 +-----------+----------------------------------------------------------------------------------------------+
-| Recipe    | ``$WORKSPACE/poky/meta/recipes-kernel/linux/linux-yocto_6.10.bb``                            |
+| Recipe    | ``$WORKSPACE/poky/meta/recipes-kernel/linux/linux-yocto_6.12.bb``                            |
 +-----------+----------------------------------------------------------------------------------------------+
 | defconfig | ``$WORKSPACE/meta-arm/meta-arm-bsp/recipes-kernel/linux/files/corstone1000/defconfig``       |
 +-----------+----------------------------------------------------------------------------------------------+

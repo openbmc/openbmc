@@ -15,9 +15,9 @@ DEPENDS = "\
     nativesdk-mpfr \
     nativesdk-readline \
     nativesdk-zlib \
-    virtual/${HOST_PREFIX}gcc \
-    virtual/${HOST_PREFIX}binutils \
-    virtual/nativesdk-${HOST_PREFIX}compilerlibs \
+    virtual/nativesdk-cross-cc \
+    virtual/nativesdk-cross-binutils \
+    virtual/nativesdk-compilerlibs \
     virtual/nativesdk-libc"
 
 RDEPENDS:${PN} = "nativesdk-liblzma"

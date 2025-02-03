@@ -27,6 +27,7 @@ class IMACheck(OERuntimeTestCase):
 
 
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @skipIfNotFeature('integrity','Test requires "integrity" in DISTRO_FEATURES')
     def test_ima_enabled(self):
         ''' Test if IMA policy is loaded before systemd starts'''
 

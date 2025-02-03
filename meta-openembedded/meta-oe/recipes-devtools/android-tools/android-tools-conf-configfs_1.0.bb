@@ -36,3 +36,4 @@ FILES:${PN} += " \
 
 PROVIDES += "android-tools-conf"
 RPROVIDES:${PN} = "android-tools-conf"
+BBCLASSEXTEND = "native"

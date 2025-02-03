@@ -16,7 +16,7 @@ B = "${S}"
 inherit pkgconfig
 
 do_compile() {
-    ${S}/build-aux/luke
+    ${S}/build-aux/luke LUA_INCDIR=${STAGING_INCDIR}
 }
 
 do_install() {

@@ -9,6 +9,7 @@ DEPENDS = "python3-attrdict3-native python3-six-native wxwidgets-native \
            "
 
 PYPI_PACKAGE = "wxPython"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 SRC_URI += "file://add-back-option-build-base.patch \
            file://wxgtk-fixup-build-scripts.patch \

@@ -1,0 +1,93 @@
+From b310a0c2d3e4a1c12d579ad5c0266f1092a91340 Mon Sep 17 00:00:00 2001
+From: Christos Zoulas <christos@zoulas.com>
+Date: Wed, 27 Nov 2024 15:37:46 +0000
+Subject: [PATCH] Use +4 in default reset previous negative offset in magic in
+ zip entry
+
+Upstream-Status: Backport [https://github.com/file/file/commit/b310a0c2d3e4a1c12d579ad5c0266f1092a91340]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ magic/Magdir/archive | 50 +++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 24 deletions(-)
+
+diff --git a/magic/Magdir/archive b/magic/Magdir/archive
+index c8f440dc..b920f993 100644
+--- a/magic/Magdir/archive
++++ b/magic/Magdir/archive
+@@ -1,5 +1,5 @@
+ #------------------------------------------------------------------------------
+-# $File: archive,v 1.206 2024/11/26 19:39:14 christos Exp $
++# $File: archive,v 1.207 2024/11/27 15:37:46 christos Exp $
+ # archive:  file(1) magic for archive formats (see also "msdos" for self-
+ #           extracting compressed archives)
+ #
+@@ -1875,15 +1875,6 @@
+ >>>>>-22	string	PK\005\006
+ >>>>>>(-6.l-16)	string	APK\x20Sig\x20Block\x2042	\b, with APK Signing Block
+ 
+-# Keyman Compiled Package File (keyman.com)
+-# https://help.keyman.com/developer/current-version/reference/file-types/kmp
+-# Find start of central directory
+->>>(-6.l)	string		PK\001\002
+-# Scan central directory for string 'kmp.json', will suffice for a
+-# package containing about 150 files
+->>>>(-6.l)	search/9000	kmp.json	Keyman Compiled Package File
+-!:mime	application/vnd.keyman.kmp+zip
+-!:ext kmp
+ 
+ # Specialised zip formats which start with a member named 'mimetype'
+ # (stored uncompressed, with no 'extra field') containing the file's MIME type.
+@@ -2123,25 +2114,36 @@
+ #>30	search/100/b application/epub+zip	EPUB document
+ #!:mime application/epub+zip
+ 
+-# Generic zip archives (Greg Roelofs, c/o zip-bugs@wkuvx1.wku.edu)
+-#   Next line excludes specialized formats:
++# APK Signing Block
+ >(26.s+30)	leshort	!0xcafe
+ >>30	search/100/b !application/epub+zip
+->>>26    string          !\x8\0\0\0mimetype	Zip archive data
+-!:mime	application/zip
+->>>>4	beshort		x			\b, at least
+->>>>4	use		zipversion
+->>>>4	beshort		x			to extract
+->>>>8	beshort		x			\b, compression method=
+->>>>8	use		zipcompression
+->>>>0x161	string		WINZIP		\b, WinZIP self-extracting
+-# APK Signing Block
+->0	default	x
+->>-22	string	PK\005\006
+->>>(-6.l-16)	string	APK\x20Sig\x20Block\x2042	Android package (APK), with APK Signing Block
++>>>26    string          !\x8\0\0\0mimetype
++>>>>-22	string	PK\005\006
++>>>>>(-6.l-16)	string	APK\x20Sig\x20Block\x2042	Android package (APK), with APK Signing Block
+ !:mime	application/vnd.android.package-archive
+ !:ext	apk
+ 
++# Keyman Compiled Package File (keyman.com)
++# https://help.keyman.com/developer/current-version/reference/file-types/kmp
++# Find start of central directory
++>>>>>(-6.l)	string		PK\001\002
++# Scan central directory for string 'kmp.json', will suffice for a
++# package containing about 150 files
++>>>>>>(-6.l)	search/9000	kmp.json	Keyman Compiled Package File
++!:mime	application/vnd.keyman.kmp+zip
++!:ext kmp
++
++# Generic zip archives (Greg Roelofs, c/o zip-bugs@wkuvx1.wku.edu)
++#   Next line excludes specialized formats:
++>>>>+4	default		x
++>>>>>4	beshort		x			Zip archive data, at least
++!:mime	application/zip
++>>>>>4	use		zipversion
++>>>>>4	beshort		x			to extract
++>>>>>8	beshort		x			\b, compression method=
++>>>>>8	use		zipcompression
++>>>>>0x161	string		WINZIP		\b, WinZIP self-extracting
++
+ # Zip archives (Greg Roelofs, c/o zip-bugs@wkuvx1.wku.edu)
+ 0	string		PK\005\006	Zip archive data (empty)
+ !:mime application/zip
+-- 
+2.39.5
+

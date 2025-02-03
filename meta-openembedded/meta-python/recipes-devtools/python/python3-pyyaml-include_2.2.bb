@@ -7,17 +7,11 @@ SRCREV = "c5be2b7dfc4aaa91e44dbeb6fa42adc80936ef9d"
 
 SRC_URI = " \
             git://github.com/tanbro/pyyaml-include;protocol=https;branch=main \
-            file://run-ptest \
           "
 
 S = "${WORKDIR}/git"
 
-inherit python_setuptools_build_meta ptest
-
-do_install_ptest() {
-    install -d ${D}${PTEST_PATH}/tests
-    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
-}
+inherit python_setuptools_build_meta ptest-python-pytest
 
 RDEPENDS:${PN} += " \
     python3-pyyaml \
@@ -27,7 +21,5 @@ RDEPENDS:${PN}-ptest += " \
     python3-fsspec \
     python3-aiohttp \
     python3-requests \
-    python3-pytest \
-    python3-unittest-automake-output \
 "
 BBCLASSEXTEND = "native nativesdk"

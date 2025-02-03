@@ -8,7 +8,7 @@ require recipes-kernel/linux/linux-yocto.inc
 # CVE exclusions
 include recipes-kernel/linux/cve-exclusion_6.12.inc
 
-LINUX_VERSION ?= "6.12.3"
+LINUX_VERSION ?= "6.12.11"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "${@bb.utils.contains('ARCH', 'x86', 'elfutils-native', '', d)}"
@@ -17,8 +17,8 @@ DEPENDS += "openssl-native util-linux-native"
 KMETA = "kernel-meta"
 KCONF_BSP_AUDIT_LEVEL = "2"
 
-SRCREV_machine ?= "7160a4379dccf0e95526f1ab9be4ef704835074a"
-SRCREV_meta ?= "38b941ae2f4f28c0ba40b2ba6da466f6f5fe3ba0"
+SRCREV_machine ?= "807165b1ec1c73b5c1c30e9dd376e9b568e354bd"
+SRCREV_meta ?= "cbe89aee4d05e11b15a928dfbc216fbdbdf062d2"
 
 PV = "${LINUX_VERSION}+git"
 
@@ -28,6 +28,6 @@ SRC_URI = "git://git.yoctoproject.org/linux-yocto.git;branch=${KBRANCH};name=mac
 COMPATIBLE_MACHINE = "^(qemux86|qemux86-64|qemuarm64|qemuarm|qemuarmv5)$"
 
 # Functionality flags
-KERNEL_FEATURES:append:qemuall=" cfg/virtio.scc cfg/fs/ext4.scc"
+KERNEL_FEATURES:append:qemuall = " cfg/virtio.scc cfg/fs/ext4.scc"
 
 KERNEL_DEVICETREE:qemuarmv5 = "arm/versatile-pb.dtb"

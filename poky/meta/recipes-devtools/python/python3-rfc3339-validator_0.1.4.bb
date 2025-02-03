@@ -8,7 +8,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/python-rfc3339-validator:"
 SRC_URI[sha256sum] = "138a2abdf93304ad60530167e51d2dfb9549521a836871b88d7f4695d0022f6b"
 
 PYPI_PACKAGE = "rfc3339_validator"
-UPSTREAM_CHECK_REGEX = "/rfc3339-validator/(?P<pver>(\d+[\.\-_]*)+)/"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi setuptools3
 

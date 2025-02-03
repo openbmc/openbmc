@@ -1,7 +1,6 @@
 [Unit]
 Description=Overlayfs directories setup {LOWERDIR}
-Requires={DATA_MOUNT_UNIT}
-After={DATA_MOUNT_UNIT}
+RequiresMountsFor={DATA_MOUNT_POINT}
 DefaultDependencies=no
 
 [Service]

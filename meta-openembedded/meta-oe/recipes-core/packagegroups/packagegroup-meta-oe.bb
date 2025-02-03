@@ -385,7 +385,7 @@ RDEPENDS:packagegroup-meta-oe-extended = "\
     nicstat \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "openwsman", "", d)} \
     ostree \
-    p7zip \
+    7zip \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-plugin-ccreds pam-plugin-ldapdb pam-ssh-agent-auth", "", d)} \
     pegtl \
     ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "polkit-group-rule-datetime polkit-group-rule-network polkit", "", d)} \
@@ -444,7 +444,6 @@ RDEPENDS:packagegroup-meta-oe-gnome = "\
     gtkmm \
     gtkmm3 \
     libjcat \
-    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "libpeas", "", d)} \
     pyxdg \
 "
 
@@ -719,7 +718,6 @@ RDEPENDS:packagegroup-meta-oe-support = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "polkit gobject-introspection-data", "colord", "", d)} \
     consolation \
     c-periphery \
-    cpprest \
     ctapi-common \
     daemonize \
     daemontools \

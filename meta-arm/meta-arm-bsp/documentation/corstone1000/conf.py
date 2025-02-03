@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: <text>Copyright 2020-2024 Arm Limited and/or its
+# affiliates <open-source-office@arm.com></text>
+#
+# SPDX-License-Identifier: MIT
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -50,6 +55,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'docs/infra']
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+html_theme_options = {
+    'flyout_display': 'attached',
+}
 
 # Define the canonical URL if you are using a custom domain on Read the Docs
 html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")

@@ -4,7 +4,7 @@ SUMMARY = "A test suite for /dev/crypto device driver"
 
 DEPENDS += "openssl"
 
-EXTRA_OEMAKE='KERNEL_DIR="${STAGING_EXECPREFIXDIR}" PREFIX="${D}"'
+EXTRA_OEMAKE = 'KERNEL_DIR="${STAGING_EXECPREFIXDIR}" PREFIX="${D}"'
 
 do_compile() {
 	oe_runmake tests

@@ -1,4 +1,4 @@
-From 80655318696091d27d131e8c4a48140e37e73366 Mon Sep 17 00:00:00 2001
+From 8faeaefaf00f8d443511077b82624a8bd19cf725 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Wed, 28 Dec 2022 17:51:27 +0800
 Subject: [PATCH] CMakeLists.txt: disable USE_NGHTTP2

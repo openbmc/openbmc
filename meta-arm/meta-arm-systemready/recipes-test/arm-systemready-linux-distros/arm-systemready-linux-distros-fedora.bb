@@ -106,11 +106,14 @@ BOOT_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "EFI/BOOT/BOOT
 EFI_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "images/efiboot.img", "", d)}"
 
 PV = "39.1.5"
-SRC_URI = "https://download.fedoraproject.org/pub/fedora/linux/releases/39/Server/aarch64/iso/Fedora-Server-dvd-aarch64-39-1.5.iso;unpack=0;downloadfilename=${ISO_IMAGE_NAME}.iso"
-SRC_URI[sha256sum] = "d19dc2a39758155fa53e6fd555d0d173ccc8175b55dea48002d499f39cb30ce0"
+SRC_URI = "\
+    https://download.fedoraproject.org/pub/fedora/linux/releases/39/Server/aarch64/iso/Fedora-Server-dvd-aarch64-39-1.5.iso;unpack=0;downloadfilename=${ISO_IMAGE_NAME}.iso;name=fedora_iso_image \
+    file://unattended-boot-conf/Fedora/ks.cfg\
+    "
+SRC_URI[fedora_iso_image.sha256sum] = "d19dc2a39758155fa53e6fd555d0d173ccc8175b55dea48002d499f39cb30ce0"
 
 modifyiso() {
-    UNATTENDED_CONF_DIR="${THISDIR}/unattended-boot-conf/Fedora"
+    UNATTENDED_CONF_DIR="${UNPACKDIR}/unattended-boot-conf/Fedora"
     
     cp "${UNATTENDED_CONF_DIR}/ks.cfg" ${EXTRACTED_ISO_TEMP_DIR}
     sed -i 's/set default="1"/set default="0"/g' "${EXTRACTED_ISO_TEMP_DIR}/EFI/BOOT/grub.cfg"

@@ -17,3 +17,5 @@ SRCREV= "411a109150b270f23c8c97fa4ec9a0a4a98cdecf"
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig
+
+SKIP_RECIPE[cpprest] ?= "Needs websocketpp which does not yet work with boost >= 1.87"

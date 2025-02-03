@@ -1,4 +1,4 @@
-From 54bb95b9c4532f9cbe634dd43798ce37c93d6f50 Mon Sep 17 00:00:00 2001
+From e2e6880587d4ada13e815bf132f21b42a979a607 Mon Sep 17 00:00:00 2001
 From: Scott Garman <scott.a.garman@intel.com>
 Date: Fri, 29 Apr 2022 13:32:27 +0000
 Subject: [PATCH] Use /bin/sh instead of /bin/bash for the root user

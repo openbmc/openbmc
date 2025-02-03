@@ -1,7 +1,12 @@
+From 41b859a9df9611b7b3f6cbe28af47118d947080f Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Sun, 21 Feb 2021 09:45:48 +0000
+Subject: [PATCH] rsync: Fix a file sorting determinism issue
+
 The Makefile calls awk on a "*.c" glob. The results of this glob are sorted
 but the order depends on the locale settings, particularly whether
 "util.c" and "util2.c" sort before or after each other. In en_US.UTF-8
-they sort one way, in C, they sort the other. The sorting order changes 
+they sort one way, in C, they sort the other. The sorting order changes
 the output binaries. The behaviour also changes dependning on whether
 SHELL (/bin/sh) is dash or bash.
 
@@ -15,12 +20,15 @@ Upstream-Status: Backport [ish, see below]
 After discussion upstream renamed util.c to util1.c which avoids the problem
 in a different way. This patch can be dropped when we upgrade to include:
 https://github.com/WayneD/rsync/commit/d3085f7add38a5cf833a0b31cb0637ff46c80f8d
+---
+ Makefile.in | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Index: rsync-3.2.3/Makefile.in
-===================================================================
---- rsync-3.2.3.orig/Makefile.in
-+++ rsync-3.2.3/Makefile.in
-@@ -26,6 +26,11 @@ MKDIR_P=@MKDIR_P@
+diff --git a/Makefile.in b/Makefile.in
+index 1d13e8c..2c5cf99 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -27,6 +27,11 @@ MKDIR_P=@MKDIR_P@
  VPATH=$(srcdir)
  SHELL=/bin/sh
  

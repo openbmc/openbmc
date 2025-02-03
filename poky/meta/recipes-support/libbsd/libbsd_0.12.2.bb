@@ -15,20 +15,17 @@ HOMEPAGE = "https://libbsd.freedesktop.org/wiki/"
 # License: BSD-3-clause-author
 # License: BSD-3-clause-John-Birrell
 # License: BSD-3-clause-Regents
-# License: BSD-4-clause-Christopher-G-Demetriou
-# License: BSD-4-clause-Niels-Provos
 # License: BSD-5-clause-Peter-Wemm
 # License: Beerware
 # License: Expat
 # License: ISC
 # License: ISC-Original
 # License: public-domain
-# License: public-domain-Colin-Plumb
-LICENSE = "BSD-3-Clause & BSD-4-Clause & ISC & PD"
+LICENSE = "BSD-3-Clause & ISC & PD"
 LICENSE:${PN} = "BSD-3-Clause & ISC & PD"
 LICENSE:${PN}-dbg = "BSD-3-Clause & ISC & PD"
 LICENSE:${PN}-dev = "BSD-3-Clause & ISC & PD"
-LICENSE:${PN}-doc = "BSD-3-Clause & BSD-4-Clause & ISC & PD"
+LICENSE:${PN}-doc = "BSD-3-Clause & ISC & PD"
 LICENSE:${PN}-locale = "BSD-3-Clause & ISC & PD"
 LICENSE:${PN}-src = "BSD-3-Clause & ISC & PD"
 LICENSE:${PN}-staticdev = "BSD-3-Clause & ISC & PD"

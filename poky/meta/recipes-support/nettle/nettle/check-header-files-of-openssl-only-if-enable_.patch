@@ -1,4 +1,4 @@
-From 5f7cdd2b878298577accade43a38e1a0951d17b4 Mon Sep 17 00:00:00 2001
+From ec2ca7e505e6bfe1fff2a7d6e6bb39b60b93e19a Mon Sep 17 00:00:00 2001
 From: Haiqing Bai <Haiqing.Bai@windriver.com>
 Date: Fri, 9 Dec 2016 15:23:17 +0800
 Subject: [PATCH] nettle: check header files of openssl only if
@@ -23,7 +23,7 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 4f27e663..673c1492 100644
+index 7c003bb..779f7ff 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -197,9 +197,11 @@ AC_TYPE_SIZE_T
@@ -41,6 +41,3 @@ index 4f27e663..673c1492 100644
  
  # For use by the testsuite
  AC_CHECK_HEADERS([valgrind/memcheck.h])
--- 
-2.39.2
-

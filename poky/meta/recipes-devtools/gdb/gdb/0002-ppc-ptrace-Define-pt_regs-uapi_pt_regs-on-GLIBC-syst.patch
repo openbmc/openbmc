@@ -16,8 +16,8 @@ index b51e2278f4b..f1bc07df0e9 100644
 --- a/gdb/nat/ppc-linux.h
 +++ b/gdb/nat/ppc-linux.h
 @@ -18,7 +18,13 @@
- #ifndef NAT_PPC_LINUX_H
- #define NAT_PPC_LINUX_H
+ #ifndef GDB_NAT_PPC_LINUX_H
+ #define GDB_NAT_PPC_LINUX_H
  
 +#if !defined(__GLIBC__)
 +# define pt_regs uapi_pt_regs

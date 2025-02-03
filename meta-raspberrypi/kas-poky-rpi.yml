@@ -48,7 +48,7 @@ local_conf_header:
     USER_CLASSES = "buildstats"
     PATCHRESOLVE = "noop"
   debug-tweaks: |
-    EXTRA_IMAGE_FEATURES = "debug-tweaks"
+    IMAGE_FEATURES += "empty-root-password allow-empty-password allow-root-login post-install-logging"
   diskmon: |
     BB_DISKMON_DIRS = "\
         STOPTASKS,${TMPDIR},1G,100K \
@@ -59,3 +59,7 @@ local_conf_header:
         HALT,${DL_DIR},100M,1K \
         HALT,${SSTATE_DIR},100M,1K \
         HALT,/tmp,10M,1K"
+  license: |
+    # Uncomment next line to allow the license
+    # See: linux-firmware-rpidistro in docs/ipcompliance.md
+    #LICENSE_FLAGS_ACCEPTED = "synaptics-killswitch"

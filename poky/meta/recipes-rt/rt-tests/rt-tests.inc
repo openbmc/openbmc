@@ -1,5 +1,5 @@
-SRCREV = "5bd94923ffda2ab326d081926dbfc6775fb5050b"
-PV = "2.7"
+SRCREV = "f5b910a90b6f5ab0ef6df392e009ffe1429d53af"
+PV = "2.8"
 PE = "1"
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git;branch=main;protocol=https"

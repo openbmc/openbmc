@@ -1,0 +1,27 @@
+From f1ce79e51ae06aee550d86832070172772523633 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 7 Jan 2025 20:09:39 -0800
+Subject: [PATCH] meson.build: Enable PIC in x86 assembly code
+
+This is needed especially when using asm code and  nasm
+assembler to compile it.
+
+Upstream-Status: Submitted [https://github.com/cisco/openh264/pull/3831]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 5dbefa43..b5e2fabf 100644
+--- a/meson.build
++++ b/meson.build
+@@ -68,7 +68,7 @@ if ['linux', 'android', 'ios', 'darwin'].contains(system)
+   endif
+   if cpu_family == 'x86'
+     asm_format = asm_format32
+-    asm_args += ['-DX86_32', '-DHAVE_AVX2']
++    asm_args += ['-DX86_32', '-DX86_32_PICASM', '-DHAVE_AVX2']
+     add_project_arguments('-DHAVE_AVX2', language: 'cpp')
+     add_project_arguments('-DHAVE_AVX2', '-DX86_ASM', '-DX86_32_ASM', language: 'c')
+     asm_inc = join_paths(meson.current_source_dir(), 'codec', 'common', 'x86', '')

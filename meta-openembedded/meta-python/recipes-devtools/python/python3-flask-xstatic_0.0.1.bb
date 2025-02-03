@@ -7,6 +7,7 @@ SRC_URI[sha256sum] = "226ea8e97065a9488b59bfe5c94af4c6e2ea70a25052e301fb231a1381
 SRC_URI += "file://remove-pip-requires.patch"
 
 PYPI_PACKAGE = "Flask-XStatic"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 RDEPENDS:${PN} += "\
     python3-flask \

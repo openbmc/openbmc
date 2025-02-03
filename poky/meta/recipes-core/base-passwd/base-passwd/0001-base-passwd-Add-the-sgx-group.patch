@@ -1,4 +1,4 @@
-From 6ad8995014cc30c932a8b4dae066c56ae33a107f Mon Sep 17 00:00:00 2001
+From dbd66c0ab1fd134ecba2eb1c040445e20d92f79a Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alexk@zuma.ai>
 Date: Fri, 28 Jul 2023 10:28:57 +0100
 Subject: [PATCH] base-passwd: Add the sgx group

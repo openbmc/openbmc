@@ -1,4 +1,4 @@
-From a3368b38abfb703e730fc5462f42cc5d177d864d Mon Sep 17 00:00:00 2001
+From 5846ba594bedd66c8fd216cad6518f7be11b7a92 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 20 Dec 2019 16:54:05 +0100
 Subject: [PATCH] tests: do not run target executables
@@ -10,10 +10,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/tests/Makefile b/tests/Makefile
-index ecb7d1b..8950c73 100644
+index 3d03721..fbb1d78 100644
 --- a/tests/Makefile
 +++ b/tests/Makefile
-@@ -61,13 +61,11 @@ endif
+@@ -69,13 +69,11 @@ endif
  
  # unprivileged
  run_psx_test: psx_test

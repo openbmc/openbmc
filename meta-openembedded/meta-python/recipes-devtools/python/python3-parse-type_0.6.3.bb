@@ -9,6 +9,7 @@ SRC_URI += " \
 "
 
 PYPI_PACKAGE = "parse_type"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi ptest python_setuptools_build_meta
 

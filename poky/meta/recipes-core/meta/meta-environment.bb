@@ -70,7 +70,7 @@ do_install() {
 
 PN = "meta-environment-${MACHINE}"
 PACKAGES = "${PN}"
-FILES:${PN}= " \
+FILES:${PN} = " \
     ${SDKPATH}/* \
     "
 

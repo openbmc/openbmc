@@ -119,10 +119,7 @@ class GoMod(Wget):
             ('https', proxy, '/' + path, None, None, None))
         ud.parm['downloadfilename'] = path
 
-        # Set name parameter if sha256sum is set in recipe
-        name = f"{module}@{ud.parm['version']}"
-        if d.getVarFlag('SRC_URI', name + '.sha256sum'):
-            ud.parm['name'] = name
+        ud.parm['name'] = f"{module}@{ud.parm['version']}"
 
         # Set subdir for unpack
         ud.parm['subdir'] = os.path.join(moddir, 'cache/download',

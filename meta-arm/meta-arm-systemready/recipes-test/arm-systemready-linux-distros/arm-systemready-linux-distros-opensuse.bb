@@ -70,8 +70,11 @@ PV = "15.5"
 # possible value of ISO_TYPE: NET, DVD
 ISO_TYPE = "DVD"
 BUILD_NO = "491.1"
-SRC_URI = "https://download.opensuse.org/distribution/leap/${PV}/iso/openSUSE-Leap-${PV}-${ISO_TYPE}-aarch64-Build${BUILD_NO}-Media.iso;unpack=0;downloadfilename=${ISO_IMAGE_NAME}.iso"
-SRC_URI[sha256sum] = "456cc4f99b044429d8a89bd302c06e9e382d6ac4dc590139a7096ebb54f5357b"
+SRC_URI = "\
+    https://download.opensuse.org/distribution/leap/${PV}/iso/openSUSE-Leap-${PV}-${ISO_TYPE}-aarch64-Build${BUILD_NO}-Media.iso;unpack=0;downloadfilename=${ISO_IMAGE_NAME}.iso;name=opensuse_iso_image \
+    file://unattended-boot-conf/openSUSE/autoinst.xml \
+    "
+SRC_URI[opensuse_iso_image.sha256sum] = "456cc4f99b044429d8a89bd302c06e9e382d6ac4dc590139a7096ebb54f5357b"
 
 TEST_SUITES = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "arm_systemready_opensuse_unattended", "", d)}"
 
@@ -81,7 +84,7 @@ BOOT_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "EFI/BOOT/boot
 EFI_IMAGE = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "boot/aarch64/efi", "", d)}"
 
 modifyiso() {
-    UNATTENDED_CONF_DIR="${THISDIR}/unattended-boot-conf/openSUSE"
+    UNATTENDED_CONF_DIR="${UNPACKDIR}/unattended-boot-conf/openSUSE"
 
     #create installation configuration files, remove grub timeout, setup network
     cp "${UNATTENDED_CONF_DIR}/autoinst.xml" ${EXTRACTED_ISO_TEMP_DIR}

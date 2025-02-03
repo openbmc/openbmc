@@ -141,7 +141,7 @@ ALTERNATIVE:${PN}-telnetd = "telnetd"
 ALTERNATIVE_LINK_NAME[telnetd] = "${sbindir}/telnetd"
 ALTERNATIVE_TARGET[telnetd] = "${sbindir}/in.telnetd"
 
-ALTERNATIVE:${PN}-inetd= "inetd"
+ALTERNATIVE:${PN}-inetd = "inetd"
 ALTERNATIVE:${PN}-traceroute = "traceroute"
 
 ALTERNATIVE:${PN}-hostname = "hostname"

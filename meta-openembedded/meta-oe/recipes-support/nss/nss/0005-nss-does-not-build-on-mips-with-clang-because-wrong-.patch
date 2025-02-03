@@ -1,0 +1,35 @@
+From 5935755eef43ac7cb8f4567e7bed5892180f954c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 7 Mar 2020 08:34:02 -0800
+Subject: [PATCH] nss: does not build on mips with clang because wrong types
+ are used
+
+pqg.c:339:16: error: comparison of constant 18446744073709551615 with expression of type 'unsigned long' is always true [-Werror,-Wtautological-constant-out-of-range-compare]
+     if (addend < MP_DIGIT_MAX) {
+       ~~~~~~ ^ ~~~~~~~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ nss/lib/freebl/pqg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/nss/lib/freebl/pqg.c b/nss/lib/freebl/pqg.c
+index 62d46b5..8c8665d 100644
+--- a/nss/lib/freebl/pqg.c
++++ b/nss/lib/freebl/pqg.c
+@@ -326,8 +326,8 @@ generate_h_candidate(SECItem *hit, mp_int *H)
+ 
+ static SECStatus
+ addToSeed(const SECItem *seed,
+-          unsigned long addend,
+-          int seedlen, /* g in 186-1 */
++          unsigned long long  addend,
++          int                 seedlen, /* g in 186-1 */
+           SECItem *seedout)
+ {
+     mp_int s, sum, modulus, tmp;
+-- 
+2.25.1
+

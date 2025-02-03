@@ -1,0 +1,28 @@
+From 064f361f113e1e4496f40dd0a075f89d21bad5a3 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Tue, 28 Jan 2025 12:25:31 +0000
+Subject: [PATCH] api/python/config-default.toml: Debug
+
+Fixes do_package: QA Issue: [already-stripped]
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ api/python/config-default.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/api/python/config-default.toml b/api/python/config-default.toml
+index 519bc046..49477864 100644
+--- a/api/python/config-default.toml
++++ b/api/python/config-default.toml
+@@ -1,5 +1,5 @@
+ [lief.build]
+-type          = "Release"
++type          = "Debug"
+ cache         = true
+ ninja         = true
+ parallel-jobs = 0
+-- 
+2.39.5
+

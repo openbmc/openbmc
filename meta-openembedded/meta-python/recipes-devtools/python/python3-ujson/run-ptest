@@ -1,3 +1,0 @@
-#!/bin/sh
-
-FORCE_COLOR=1 pytest --automake --capture=no

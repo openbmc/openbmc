@@ -8,26 +8,15 @@ SRC_URI[sha256sum] = "974a623a338482b62e16d4eb705fb863ed33ec178680fc3e96ccdf0df6
 SRC_URI = " \
     git://github.com/dsoprea/pyinotify.git;branch=master;protocol=https \
     file://new-test-inotify.patch \
-    file://run-ptest \
 "
 
 SRCREV = "9be6a51d1660991562eefaaddefa757ca0e0e00f"
 
 S = "${WORKDIR}/git"
 
-inherit setuptools3 ptest
+inherit setuptools3 ptest-python-pytest
 
 RDEPENDS:${PN} += " \
     python3-ctypes \
     python3-logging \
 "
-
-RDEPENDS:${PN}-ptest += " \
-    python3-pytest \
-    python3-unittest-automake-output \
-"
-
-do_install_ptest() {
-    install -d ${D}${PTEST_PATH}/tests
-    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
-}

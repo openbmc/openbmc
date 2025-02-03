@@ -11,6 +11,7 @@ inherit pypi python_setuptools_build_meta
 SRC_URI[sha256sum] = "36218565eda0614c8cf44ef42cb9a5904ddf808e4516e99ddae111fc93c5a206"
 
 PYPI_PACKAGE = "luma_oled"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 RDEPENDS:${PN} += " \
 	python3-luma-core \

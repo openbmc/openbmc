@@ -1,4 +1,4 @@
-From f3c574b27000fd887cee84ab47adf23f767cbea1 Mon Sep 17 00:00:00 2001
+From 4dc0613e229f6b4a57beb00dde14ef319a2dcad8 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sat, 24 Aug 2024 15:32:25 +0200
 Subject: [PATCH] include/libnetlink.h: add missing include for htobe64

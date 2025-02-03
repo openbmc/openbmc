@@ -18,7 +18,7 @@ DEPENDS += "\
 RDEPENDS:${PN} += "gsettings-desktop-schemas"
 
 SRC_URI = "https://download.gnome.org/sources/${BPN}/${@gnome_verdir("${PV}")}/${BPN}-${PV}.tar.xz;name=archive"
-
+SRC_URI += "file://0001-nfs-Support-libnfs-6-backport-to-1.56.patch"
 SRC_URI[archive.sha256sum] = "86731ccec679648f8734e237b1de190ebdee6e4c8c0f56f454c31588e509aa10"
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"

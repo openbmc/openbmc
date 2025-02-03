@@ -41,8 +41,13 @@ PACKAGECONFIG[ssl] = "-DCIVETWEB_ENABLE_SSL=ON -DCIVETWEB_SSL_OPENSSL_API_1_1=OF
 PACKAGECONFIG[websockets] = "-DCIVETWEB_ENABLE_WEBSOCKETS=ON,-DCIVETWEB_ENABLE_WEBSOCKETS=OFF,"
 
 do_install:append() {
-    sed -i -e 's|${RECIPE_SYSROOT_NATIVE}||g' \
-        -e 's|${RECIPE_SYSROOT}||g' ${D}${libdir}/cmake/civetweb/civetweb-targets.cmake
+    sed -i -e 's|${RECIPE_SYSROOT_NATIVE}|\$\{CMAKE_SYSROOT\}|g' \
+        -e 's|${RECIPE_SYSROOT}|\$\{CMAKE_SYSROOT\}|g' ${D}${libdir}/cmake/civetweb/civetweb-targets.cmake
+}
+
+do_install:append:class-target() {
+    sed -i '/list(APPEND _cmake_import_check_files_for_civetweb::server "\${_IMPORT_PREFIX}\/bin\/civetweb" )/d' \
+        ${D}${libdir}/cmake/civetweb/civetweb-targets-noconfig.cmake
 }
 
 BBCLASSEXTEND = "native"

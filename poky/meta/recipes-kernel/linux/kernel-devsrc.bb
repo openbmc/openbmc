@@ -32,7 +32,7 @@ B = "${STAGING_KERNEL_BUILDDIR}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-KERNEL_BUILD_ROOT="${nonarch_base_libdir}/modules/"
+KERNEL_BUILD_ROOT = "${nonarch_base_libdir}/modules/"
 
 do_install() {
     kerneldir=${D}${KERNEL_BUILD_ROOT}${KERNEL_VERSION}

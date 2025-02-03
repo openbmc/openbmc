@@ -142,10 +142,10 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         # Ensure we list skipped recipes
         # We are largely guessing about PN, PV and the preferred version here,
         # but we have no choice since skipped recipes are not fully parsed
-        skiplist = list(self.tinfoil.cooker.skiplist.keys())
-        mcspec = 'mc:%s:' % mc
+        skiplist = list(self.tinfoil.cooker.skiplist_by_mc[mc].keys())
+
         if mc:
-            skiplist = [s[len(mcspec):] for s in skiplist if s.startswith(mcspec)]
+            skiplist = [s.removeprefix(f'mc:{mc}:') for s in skiplist]
 
         for fn in skiplist:
             recipe_parts = os.path.splitext(os.path.basename(fn))[0].split('_')
@@ -162,7 +162,7 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         def print_item(f, pn, ver, layer, ispref):
             if not selected_layer or layer == selected_layer:
                 if not bare and f in skiplist:
-                    skipped = ' (skipped: %s)' % self.tinfoil.cooker.skiplist[f].skipreason
+                    skipped = ' (skipped: %s)' % self.tinfoil.cooker.skiplist_by_mc[mc][f].skipreason
                 else:
                     skipped = ''
                 if show_filenames:
@@ -301,7 +301,7 @@ Lists recipes with the bbappends that apply to them as subitems.
             if self.show_appends_for_pn(pn, cooker_data, args.mc):
                 appends = True
 
-        if not args.pnspec and self.show_appends_for_skipped():
+        if not args.pnspec and self.show_appends_for_skipped(args.mc):
             appends = True
 
         if not appends:
@@ -317,9 +317,9 @@ Lists recipes with the bbappends that apply to them as subitems.
 
         return self.show_appends_output(filenames, best_filename)
 
-    def show_appends_for_skipped(self):
+    def show_appends_for_skipped(self, mc):
         filenames = [os.path.basename(f)
-                    for f in self.tinfoil.cooker.skiplist.keys()]
+                    for f in self.tinfoil.cooker.skiplist_by_mc[mc].keys()]
         return self.show_appends_output(filenames, None, " (skipped)")
 
     def show_appends_output(self, filenames, best_filename, name_suffix = ''):

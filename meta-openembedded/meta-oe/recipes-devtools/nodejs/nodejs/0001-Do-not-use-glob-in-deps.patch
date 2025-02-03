@@ -1,0 +1,22 @@
+// Revert the patch found here https://github.com/nodejs/node/commit/fe1dd26398e1887b96b2dc51ab59371ad4d6bc20?diff=unified&w=0
+// so that the dependencies are still explicitly enumerated.  That way we
+// can pick and choose which pieces to build and which to use existing system
+// packages for.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+
+--- a/Makefile	2025-01-11 14:37:29.059536707 -0500
++++ b/Makefile	2025-01-11 14:39:52.419867046 -0500
+@@ -171,7 +171,8 @@
+ 	$(warning '$@' target is a noop)
+ 
+ out/Makefile: config.gypi common.gypi common_node.gypi node.gyp \
+-	deps/*/*.gyp \
++	deps/uv/uv.gyp deps/llhttp/llhttp.gyp deps/zlib/zlib.gyp \
++	deps/simdutf/simdutf.gyp deps/ada/ada.gyp deps/nbytes/nbytes.gyp \
+ 	tools/v8_gypfiles/toolchain.gypi \
+ 	tools/v8_gypfiles/features.gypi \
+ 	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
+
+

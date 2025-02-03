@@ -1,0 +1,43 @@
+From 082ce10dd191f036f5a6e1fb31134e9736ba3643 Mon Sep 17 00:00:00 2001
+From: Antonios Christidis <a-christidis@ti.com>
+Date: Fri, 17 Jan 2025 15:05:39 -0600
+Subject: [PATCH] Create CMake option ENABLE_WERROR
+
+This creates an option that can be toggled on or off when configuring the project.
+By default, it's set to ON
+
+Upstream-Status: Pending
+Signed-off-by: Antonios Christidis <a-christidis@ti.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -19,6 +19,16 @@ add_definitions(-DCL_USE_DEPRECATED_OPEN
+ add_definitions(-DCL_USE_DEPRECATED_OPENCL_1_0_APIS=1)
+ add_definitions(-DCL_NO_EXTENSION_PROTOTYPES)
+ 
++option(ENABLE_WERROR "Enable warnings as errors" ON)
++
++if(ENABLE_WERROR)
++  if(MSVC)
++    add_compile_options(/WX)
++  else()
++    add_compile_options(-Werror)
++  endif()
++endif()
++
+ option(USE_CL_EXPERIMENTAL "Use Experimental definitions" OFF)
+ if(USE_CL_EXPERIMENTAL)
+   add_definitions(-DCL_EXPERIMENTAL)
+@@ -99,7 +109,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR "${CMAKE_C
+     add_cxx_flag_if_supported(-Wmisleading-indentation)
+     add_cxx_flag_if_supported(-Wunused-function)
+     add_cxx_flag_if_supported(-Wunused-variable)
+-    add_cxx_flag_if_supported(-Werror)
+     if(NOT CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo|MinSizeRel")
+         # Enable more warnings if not doing a release build.
+         add_cxx_flag_if_supported(-Wall)

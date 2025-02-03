@@ -513,7 +513,7 @@ or ::
 
    For more information on how to use the ``bmaptool``
    to flash a device with an image, see the
-   ":ref:`dev-manual/bmaptool:flashing images using \`\`bmaptool\`\``"
+   ":ref:`dev-manual/bmaptool:flashing images using \`bmaptool\``"
    section.
 
 Using a Modified Kickstart File
@@ -721,7 +721,7 @@ the existing kernel, and then inserts a new kernel:
 
    Once the new kernel is added back into the image, you can use the
    ``dd`` command or :ref:`bmaptool
-   <dev-manual/bmaptool:flashing images using \`\`bmaptool\`\`>`
+   <dev-manual/bmaptool:flashing images using \`bmaptool\`>` commands
    to flash your wic image onto an SD card or USB stick and test your
    target.
 

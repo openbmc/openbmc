@@ -44,9 +44,9 @@ PACKAGECONFIG ??= "blkid"
 
 PACKAGECONFIG[blkid] = "--enable-blkid=yes,--enable-blkid=no,util-linux"
 
-export DEBUG="-DNDEBUG"
-export BUILD_VERBOSE="1"
-export tagname="CC"
+export DEBUG = "-DNDEBUG"
+export BUILD_VERBOSE = "1"
+export tagname = "CC"
 
 EXTRA_OEMAKE = "DIST_ROOT='${D}'"
 

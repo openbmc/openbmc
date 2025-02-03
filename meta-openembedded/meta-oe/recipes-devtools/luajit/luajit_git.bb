@@ -9,7 +9,7 @@ SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
            "
 
 PV = "2.1"
-SRCREV = "c525bcb9024510cad9e170e12b6209aedb330f83"
+SRCREV = "19878ec05c239ccaf5f3d17af27670a963e25b8b"
 
 S = "${WORKDIR}/git"
 

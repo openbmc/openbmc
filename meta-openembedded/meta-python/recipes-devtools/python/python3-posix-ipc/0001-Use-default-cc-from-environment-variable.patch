@@ -1,0 +1,45 @@
+From 2db4d9974052e28f25252b3204a73dd25de1dd89 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sat, 25 Jan 2025 13:09:00 +0100
+Subject: [PATCH] Use default cc from environment variable
+
+In case the system uses a custom c compiler instead of cc
+(e.g. for cross-compiling), probing system features can
+fail or can misidentify the features due to the incorrect C compiler.
+
+Instead of using only "cc" for probing features, check if the CC environment
+variable has a custom C compiler set. If it is present, use that instead of
+"cc". If it is not present, fall back to "cc".
+
+Upstream-Status: Submitted [https://github.com/osvenskan/posix_ipc/pull/56]
+---
+ prober.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/prober.py b/prober.py
+index 48432b7..ace6d3b 100644
+--- a/prober.py
++++ b/prober.py
+@@ -52,14 +52,17 @@ def print_bad_news(value_name, default):
+ def does_build_succeed(filename, linker_options=""):
+     # Utility function that returns True if the file compiles and links
+     # successfully, False otherwise.
+-    # Two things to note here --
++    # Three things to note here --
+     #   - If there's a linker option like -lrt, it needs to come *after*
+     #     the specification of the C file or linking will fail on Ubuntu 11.10
+     #     (maybe because of the gcc version?)
+     #   - Some versions of Linux place the sem_xxx() functions in libpthread.
+     #     Rather than testing whether or not it's needed, I just specify it
+     #     everywhere since it's harmless to specify it when it's not needed.
+-    cmd = "cc -Wall -o ./prober/foo ./prober/%s %s -lpthread" % (filename, linker_options)
++    #   - In case the used C compiler is not cc, take it from the CC environment
++    #     variable
++    cc = os.getenv("CC", "cc")
++    cmd = "%s -Wall -o ./prober/foo ./prober/%s %s -lpthread" % (cc, filename, linker_options)
+ 
+     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
+ 
+-- 
+2.48.1
+

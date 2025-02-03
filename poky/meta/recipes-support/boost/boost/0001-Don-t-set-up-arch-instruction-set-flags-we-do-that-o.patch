@@ -1,4 +1,4 @@
-From f88354966fe3af33fd6d9ec889a8e3926b886a8a Mon Sep 17 00:00:00 2001
+From e2cc24d6d8b7b24a6d0a30c52c7ad69a001a0ad5 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 18 Dec 2018 15:42:57 +0100
 Subject: [PATCH] Don't set up arch/instruction-set flags, we do that

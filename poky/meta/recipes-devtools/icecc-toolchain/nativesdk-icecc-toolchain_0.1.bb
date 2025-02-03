@@ -14,7 +14,7 @@ SRC_URI = "\
 
 inherit nativesdk
 
-ENV_NAME="${DISTRO}-${TCLIBC}-${SDK_ARCH}-@TARGET_PREFIX@${DISTRO_VERSION}.tar.gz"
+ENV_NAME = "${DISTRO}-${TCLIBC}-${SDK_ARCH}-@TARGET_PREFIX@${DISTRO_VERSION}.tar.gz"
 
 do_compile() {
 }

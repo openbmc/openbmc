@@ -4,7 +4,7 @@ SUMMARY = "xcb-util-errors gives human readable names to error codes and event c
 
 DEPENDS += "xcb-util xorgproto"
 
-export PYTHON="python3"
+export PYTHON = "python3"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c90ee77011043c608617f5323a523726"

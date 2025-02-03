@@ -22,7 +22,7 @@
 RECIPE_MAINTAINER:pn-aircrack-ng = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER:pn-pcr-extend = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER:pn-tpm-quote-tools = "Armin Kuster <akuster808@gmail.com>"
-RECIPE_MAINTAINER:pn-libtpm = "Armin Kuster <akuster808@gmail.com>"
+RECIPE_MAINTAINER:pn-libtpms = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER:pn-trousers = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER:pn-swtpm = "Armin Kuster <akuster808@gmail.com>"
 RECIPE_MAINTAINER:pn-openssl-tpm-engine = "Armin Kuster <akuster808@gmail.com>"

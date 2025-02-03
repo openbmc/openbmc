@@ -17,10 +17,10 @@ SRCREV = "6c603565f36e9996d85045c8012cd04aba5f3708"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OECONF += "--disable-zypp --with-pam-security=${libdir}/security"
+EXTRA_OECONF += "--disable-zypp"
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'api-documentation systemd pam', d)}"
-PACKAGECONFIG[pam] = "--enable-pam,--disable-pam,libpam"
+PACKAGECONFIG[pam] = "--enable-pam --with-pam-security=${base_libdir}/security, --disable-pam,libpam"
 PACKAGECONFIG[systemd] = "--enable-systemd,--disable-systemd"
 PACKAGECONFIG[api-documentation] = "--enable-doc,--disable-doc,libxslt-native docbook-xsl-stylesheets-native"
 
@@ -35,7 +35,7 @@ do_install:append() {
 	install -m0644 ${S}/data/default-config ${D}${sysconfdir}/sysconfig/snapper
 }
 
-FILES:${PN} += "${libdir}/security ${nonarch_libdir} ${systemd_system_unitdir} ${datadir}"
+FILES:${PN} += "${base_libdir}/security ${nonarch_libdir} ${systemd_system_unitdir} ${datadir}"
 
 # bash is needed for the testsuite
 RDEPENDS:${PN} = "bash diffutils util-linux util-linux-mount"

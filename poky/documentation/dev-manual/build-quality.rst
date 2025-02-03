@@ -236,7 +236,7 @@ Here is an example of ``image-info.txt``:
    DISTRO_VERSION = 3.4+snapshot-a0245d7be08f3d24ea1875e9f8872aa6bbff93be
    USER_CLASSES = buildstats
    IMAGE_CLASSES = qemuboot qemuboot license_image
-   IMAGE_FEATURES = debug-tweaks
+   IMAGE_FEATURES = allow-empty-password empty-root-password allow-root-login post-install-logging
    IMAGE_LINGUAS =
    IMAGE_INSTALL = packagegroup-core-boot speex speexdsp
    BAD_RECOMMENDATIONS =

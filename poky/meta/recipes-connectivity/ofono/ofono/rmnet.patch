@@ -1,0 +1,45 @@
+From git@z Thu Jan  1 00:00:00 1970
+Subject: [PATCH] rmnet: Handle toolchains with old kernel headers
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Thu, 19 Dec 2024 13:47:15 +0000
+Message-Id: <e2b6a94dd9a3789e31dafadfc70c53b565d1db04.camel@linuxfoundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+The RMNET_FLAGS_*GRESS_MAP_CKSUMV5 defines were added to the kernel in
+5.14[1] and some toolchains use older headers, so add fallback defines
+in case they are needed.
+
+[1] linux b6e5d27e32ef6089d316ce7e1ecaf595584d4b84
+
+Upstream-Status: Submitted [https://lore.kernel.org/ofono/e2b6a94dd9a3789e31dafadfc70c53b565d1db04.camel@linuxfoundation.org/T/#u]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/rmnet.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/rmnet.c b/src/rmnet.c
+index 42b03249..9a7f52fb 100644
+--- a/src/rmnet.c
++++ b/src/rmnet.c
+@@ -27,6 +27,16 @@
+ #define MAX_MUX_IDS 254U
+ #define DEFAULT_MTU 1400U
+ 
++/*
++ * These were added in 5.14 so define them here if the toolchain's kernel headers are old.
++ */
++#ifndef RMNET_FLAGS_INGRESS_MAP_CKSUMV5
++#define RMNET_FLAGS_INGRESS_MAP_CKSUMV5 (1U << 4)
++#endif
++#ifndef RMNET_FLAGS_EGRESS_MAP_CKSUMV5
++#define RMNET_FLAGS_EGRESS_MAP_CKSUMV5 (1U << 5)
++#endif
++
+ struct rmnet_request {
+ 	uint32_t parent_ifindex;
+ 	rmnet_new_interfaces_func_t new_cb;
+-- 
+2.43.0
+

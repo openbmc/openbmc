@@ -12,8 +12,6 @@ SRC_URI[sha256sum] = "25b5d0b42fd000320bd7830b349e3b696435f3b329810427a6bcce6a54
 # Can't find required file: ../src/google/protobuf/descriptor.proto
 CLEANBROKEN = "1"
 
-UPSTREAM_CHECK_REGEX = "protobuf/(?P<pver>\d+(\.\d+)+)/"
-
 DEPENDS += "protobuf"
 
 RDEPENDS:${PN} += " \

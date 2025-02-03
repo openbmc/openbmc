@@ -7,6 +7,7 @@ SRC_URI += "file://0001-Allow-newer-version-of-wheel-and-setuptools.patch"
 SRC_URI[sha256sum] = "a8671ee4ea4a7095e2e0670e2215145ec1e3e0aa0737ff74d648ae4dc268b2b1"
 
 PYPI_PACKAGE = "PyChromecast"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_setuptools_build_meta
 

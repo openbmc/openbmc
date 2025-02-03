@@ -20,9 +20,11 @@ inherit module-base pkgconfig autotools bash-completion
 
 DEPENDS = "virtual/kernel zlib util-linux libtirpc openssl curl"
 
-PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd sysvinit', d)}"
+PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd sysvinit', d)} \
+                  ${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} \
+                 "
 
-PACKAGECONFIG[pam] = "--enable-pam --with-pamconfigsdir=${datadir}/pam-configs --with-pammoduledir=${libdir}/security, --disable-pam"
+PACKAGECONFIG[pam] = "--enable-pam --with-pamconfigsdir=${datadir}/pam-configs --with-pammoduledir=${base_libdir}/security, --disable-pam"
 PACKAGECONFIG[systemd] = "--enable-systemd,--disable-systemd,"
 PACKAGECONFIG[sysvinit] = "--enable-sysvinit,--disable-sysvinit,"
 
@@ -69,6 +71,8 @@ FILES:${PN} += "\
     ${bindir} \
     ${libexecdir}/${BPN} \
     ${libdir} \
+    ${datadir}/pam-configs \
+    ${base_libdir}/security \
 "
 
 FILES:${PN}-dev += "\

@@ -1,0 +1,58 @@
+From f68f2535e98231ab362b6bbbe7cc4718b2c72aa9 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 31 Dec 2024 10:25:15 +0800
+Subject: [PATCH] Fix build failure on x86_64
+
+When the target_cpu is x86_64, we should assume that the pkg uses 64bit,
+only if USE_N32 is set, we can assume that the pkg uses 32bit. It used a
+opposite logic before.
+
+Upstream-Status: Pending
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ configure.in | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 1a3e489..04419d9 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1590,28 +1590,24 @@ tools are selected during the Xcode/Developer Tools installation.])
+         PR_MD_ASFILES=os_Linux_ia64.s
+         ;;
+     x86_64)
+-        if test -n "$USE_64"; then
+-            PR_MD_ASFILES=os_Linux_x86_64.s
+-        elif test -n "$USE_X32"; then
++        if test -n "$USE_X32"; then
++            AC_DEFINE(i386)
+             PR_MD_ASFILES=os_Linux_x86_64.s
+             CC="$CC -mx32"
+             CXX="$CXX -mx32"
+         else
+-            AC_DEFINE(i386)
+-            PR_MD_ASFILES=os_Linux_x86.s
+-            CC="$CC -m32"
+-            CXX="$CXX -m32"
++            PR_MD_ASFILES=os_Linux_x86_64.s
+         fi
+         ;;
+     ppc|powerpc)
+         PR_MD_ASFILES=os_Linux_ppc.s
+         ;;
+     powerpc64)
+-        if test -n "$USE_64"; then
++        if test -n "$USE_N32"; then
++            PR_MD_ASFILES=os_Linux_ppc.s
++        else
+             CC="$CC -m64"
+             CXX="$CXX -m64"
+-        else
+-            PR_MD_ASFILES=os_Linux_ppc.s
+         fi
+         ;;
+     esac
+-- 
+2.25.1
+

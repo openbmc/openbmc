@@ -1,8 +1,7 @@
-From f69a01c5932af2d5ece6141e4424b14a2d645fd7 Mon Sep 17 00:00:00 2001
+From 822a73a5dec13549cb20e6c7338b059ece2ea95a Mon Sep 17 00:00:00 2001
 From: Richard Purdie <rpurdie@linux.intel.com>
 Date: Wed, 9 Dec 2009 23:59:44 +0000
-Subject: [PATCH 1/5] tcl: Add tcltk from OE.dev but with legacy staging
- function
+Subject: [PATCH] tcl: Add tcltk from OE.dev but with legacy staging function
 
 Upstream-Status: Pending
 ---
@@ -11,10 +10,10 @@ Upstream-Status: Pending
  2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/unix/Makefile.in b/unix/Makefile.in
-index 0ff1258..6e74458 100644
+index b72b0da..2de7b2f 100644
 --- a/unix/Makefile.in
 +++ b/unix/Makefile.in
-@@ -1027,7 +1027,10 @@ install-binaries: binaries
+@@ -1021,7 +1021,10 @@ install-binaries: binaries
  	done
  	@echo "Installing $(LIB_FILE) to $(DLL_INSTALL_DIR)/"
  	@@INSTALL_LIB@
@@ -27,7 +26,7 @@ index 0ff1258..6e74458 100644
  	@$(INSTALL_PROGRAM) ${TCL_EXE} "$(BIN_INSTALL_DIR)/tclsh$(VERSION)${EXE_SUFFIX}"
  	@echo "Installing tclConfig.sh to $(CONFIG_INSTALL_DIR)/"
 diff --git a/unix/tcl.m4 b/unix/tcl.m4
-index 99bc8bf..7e6e0da 100644
+index 4265832..49ad5ab 100644
 --- a/unix/tcl.m4
 +++ b/unix/tcl.m4
 @@ -1269,6 +1269,9 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
@@ -40,6 +39,3 @@ index 99bc8bf..7e6e0da 100644
  	    SHLIB_LD='${CC} ${CFLAGS} ${LDFLAGS} -shared'
  	    DL_OBJS="tclLoadDl.o"
  	    DL_LIBS="-ldl"
--- 
-2.39.5
-

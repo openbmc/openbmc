@@ -17,6 +17,7 @@ SRC_URI = "https://fossies.org/linux/misc/old/imap-${PV}.tar.gz \
            file://0001-Fix-Wincompatible-function-pointer-types.patch \
            file://uw-imap-newer-tls.patch \
            file://uw-imap-fix-incompatible-pointer-types.patch \
+           file://CVE-2018-19518.patch \
            "
 
 SRC_URI[sha256sum] = "53e15a2b5c1bc80161d42e9f69792a3fa18332b7b771910131004eb520004a28"

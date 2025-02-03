@@ -7,6 +7,8 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=17;endline=18;md5=2155d8ae21e7c231
 SRC_URI[sha256sum] = "d360bd31898f9df59f6faa786551065bba45b35e7ee3c39b381b4fbfef7392f4"
 
 PYPI_PACKAGE = "South"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
+
 inherit pypi setuptools3
 
 BBCLASSEXTEND = "native nativesdk"

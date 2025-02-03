@@ -21,8 +21,11 @@ SRC_URI[sha256sum] = "ee9b688b2ed8fa62551c54cb5dc31aaa05853e7dedbd9e1237c77894ea
 DEPENDS = "elfutils xxhash"
 DEPENDS:append:libc-musl = " musl-legacy-error"
 
-inherit pkgconfig autotools
+inherit pkgconfig autotools multilib_script
 
 RDEPENDS:${PN} += "bash elfutils-binutils"
 
 BBCLASSEXTEND = "native nativesdk"
+
+MULTILIB_SCRIPTS = "${PN}:${bindir}/find-debuginfo"
+

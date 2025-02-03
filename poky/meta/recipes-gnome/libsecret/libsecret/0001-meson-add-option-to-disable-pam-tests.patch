@@ -3,7 +3,7 @@ From: Markus Volk <f_l_k@t-online.de>
 Date: Tue, 3 Dec 2024 15:58:17 +0100
 Subject: [PATCH] meson: add option to disable pam tests
 
-Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/151/commits]
+Upstream-Status: Denied [https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/151]
 
 Signed-off-by: Markus Volk <f_l_k@t-online.de>
 ---

@@ -1,4 +1,7 @@
-memcached: add knob to detect whether hugetlbfs are checked
+From dfa90817a08f206f7e2dbba44d913968ae7f7d94 Mon Sep 17 00:00:00 2001
+From: Chong Lu <Chong.Lu@windriver.com>
+Date: Tue, 19 Aug 2014 17:38:32 +0800
+Subject: [PATCH] memcached: add knob to detect whether hugetlbfs are checked
 
 Add knob to detect whether hugetlbfs are checked or not.
 
@@ -6,12 +9,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
 ---
- configure.ac | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ configure.ac | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/configure.ac b/configure.ac
+index 6f2ef97..bd7dd96 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -488,8 +488,12 @@ if test "x$enable_static" = "xyes"; then
+@@ -559,8 +559,12 @@ if test "x$enable_static" = "xyes"; then
  fi
  
  dnl ----------------------------------------------------------------------------

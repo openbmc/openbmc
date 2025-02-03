@@ -11,6 +11,7 @@ SRC_URI = "git://github.com/rpm-software-management/libdnf;branch=dnf-4-master;p
            file://enable_test_data_dir_set.patch \
            file://0001-drop-FindPythonInstDir.cmake.patch \
            file://armarch.patch \
+           file://0001-Fix-a-segfault-in-iterator-of-a-ConfigParser-section.patch \
            "
 
 SRCREV = "79ed383cd5a822e6d8d9d549835383f5c5106204"

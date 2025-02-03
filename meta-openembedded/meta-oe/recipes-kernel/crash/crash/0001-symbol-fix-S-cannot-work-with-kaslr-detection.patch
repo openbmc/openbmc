@@ -1,0 +1,89 @@
+From 329bd56da28fc1b5b53a60ca2172643d2090435d Mon Sep 17 00:00:00 2001
+From: Tao Liu <ltao@redhat.com>
+Date: Fri, 13 Dec 2024 08:36:03 +0000
+Subject: [PATCH] symbol: fix -S cannot work with kaslr detection
+
+When kernel enabled the CONFIG_RANDOMIZE_BASE, crash needs to add "kaslr=auto"
+in crash command line to tell crash to decode the random address.
+But when with "-S" in command line, crash would bypass the kaslr option
+that cause symbol from kernel image is mismatch with ram on a live system.
+
+The fix is provided by Tao Liu <ltao@redhat.com> from crash-utility upstream,
+and not merged to crash master yet.
+
+Upstream-Status: Pending
+[https://lists.crash-utility.osci.io/archives/list/devel@lists.crash-utility.osci.io/thread/5OXNYPPU6GLLQKCWH7WBNBJXLNZ4EBZD/]
+
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ symbols.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/symbols.c b/symbols.c
+index a3cd0f3..6062d21 100644
+--- a/symbols.c
++++ b/symbols.c
+@@ -25,7 +25,7 @@
+ 
+ static void store_symbols(bfd *, int, void *, long, unsigned int);
+ static void store_sysmap_symbols(void);
+-static ulong relocate(ulong, char *, int);
++static ulong relocate(ulong, char *, int *);
+ static int relocate_force(ulong, char *);
+ static void kaslr_init(void);
+ static void strip_module_symbol_end(char *s);
+@@ -230,6 +230,7 @@ symtab_init(void)
+ 				DEBUGINFO_ERROR_MESSAGE1 :
+ 				DEBUGINFO_ERROR_MESSAGE2);
+ 		}
++		kt->flags |= RELOC_FORCE;
+ 		store_sysmap_symbols();
+ 		return;
+ 	} else if (LKCD_KERNTYPES())
+@@ -817,7 +818,7 @@ store_symbols(bfd *abfd, int dynamic, void *minisyms, long symcount,
+ 		    syminfo.type)) {
+ 			if (kt->flags & (RELOC_SET|RELOC_FORCE))
+ 				sp->value = relocate(syminfo.value,
+-					(char *)syminfo.name, !(first++));
++					(char *)syminfo.name, &first);
+ 			else
+ 				sp->value = syminfo.value;
+ 			sp->type = syminfo.type;
+@@ -893,9 +894,9 @@ store_sysmap_symbols(void)
+ 
+                 if (machdep->verify_symbol(name, syment.value, 
+ 		    syment.type)) {
+-			if (kt->flags & RELOC_SET)
++			if (kt->flags & (RELOC_SET|RELOC_FORCE))
+ 				sp->value = relocate(syment.value,
+-					syment.name, !(first++));
++					syment.name, &first);
+ 			else
+ 				sp->value = syment.value;
+                         sp->type = syment.type;
+@@ -924,7 +925,7 @@ store_sysmap_symbols(void)
+  *  are not as loaded into the kernel (not unity-mapped).
+  */
+ static ulong
+-relocate(ulong symval, char *symname, int first_symbol)
++relocate(ulong symval, char *symname, int *first_symbol)
+ {
+ 	if (XEN_HYPER_MODE()) {
+ 		kt->flags &= ~(RELOC_SET|RELOC_FORCE);
+@@ -937,9 +938,10 @@ relocate(ulong symval, char *symname, int first_symbol)
+ 		break;
+ 
+ 	case RELOC_FORCE:
+-		if (first_symbol && !relocate_force(symval, symname))
+-			kt->flags &= ~RELOC_FORCE;
+-		break;
++		if (!(*first_symbol) && relocate_force(symval, symname)) {
++			*first_symbol += 1;
++		}
++		return symval - kt->relocate;
+ 	}
+ 
+ 	if (machine_type("X86_64")) {
+-- 
+2.35.5
+

@@ -1,4 +1,4 @@
-From e9fcb2177fda228ac065d189240e2d992e86e5bf Mon Sep 17 00:00:00 2001
+From 3ea3eaf5bda21529fc8a8da3d8b07ebc3875ba7e Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Fri, 2 Aug 2024 09:48:43 -0400
 Subject: [PATCH] Makefile.in: Add target to only build tests (not run them)
@@ -21,7 +21,7 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  2 files changed, 5 insertions(+)
 
 diff --git a/Makefile.in b/Makefile.in
-index 2bf7f1e8..403a868a 100644
+index 71ad761..0f239f4 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -53,6 +53,9 @@ clean distclean mostlyclean maintainer-clean tags:
@@ -35,7 +35,7 @@ index 2bf7f1e8..403a868a 100644
  	true
  
 diff --git a/testsuite/Makefile.in b/testsuite/Makefile.in
-index 0699fa0d..8ac9983c 100644
+index 0699fa0..8ac9983 100644
 --- a/testsuite/Makefile.in
 +++ b/testsuite/Makefile.in
 @@ -137,6 +137,8 @@ $(TARGETS) $(EXTRA_TARGETS): testutils.$(OBJEXT) ../non-nettle.$(OBJEXT) \
@@ -47,6 +47,3 @@ index 0699fa0d..8ac9983c 100644
  check: $(TS_ALL) $(TS_ALL:sc-%=%)
  	TEST_SHLIB_DIR="$(TEST_SHLIB_DIR)" \
  	  srcdir="$(srcdir)" \
--- 
-2.39.2
-

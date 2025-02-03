@@ -1,4 +1,4 @@
-From b74950d4f06bbfb91b2e68044147a226c15f4639 Mon Sep 17 00:00:00 2001
+From 03700ec256789e02de20b58bca080c6fef592336 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <andre.draszik@jci.com>
 Date: Mon, 30 Sep 2019 16:57:01 +0100
 Subject: [PATCH] extmk: fix cross-compilation of external gems
@@ -16,10 +16,10 @@ Signed-off-by: André Draszik <andre.draszik@jci.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/ext/extmk.rb b/ext/extmk.rb
-index d9c2417..da14c49 100755
+index 8b6b365..3048f75 100755
 --- a/ext/extmk.rb
 +++ b/ext/extmk.rb
-@@ -428,8 +428,8 @@ else
+@@ -434,8 +434,8 @@ else
  end
  $ruby = [$ruby]
  $ruby << "-I'$(topdir)'"

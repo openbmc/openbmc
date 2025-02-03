@@ -6,7 +6,7 @@ LICENSE = "LGPL-3.0-or-later & LGPL-2.1-or-later & GPL-3.0-or-later"
 DEPENDS += "libtdb libtalloc libtevent popt cmocka"
 RDEPENDS:pyldb += "python3"
 
-export PYTHONHASHSEED="1"
+export PYTHONHASHSEED = "1"
 export PYTHONARCHDIR = "${PYTHON_SITEPACKAGES_DIR}"
 
 SRC_URI = "http://samba.org/ftp/ldb/ldb-${PV}.tar.gz \
@@ -42,7 +42,7 @@ S = "${WORKDIR}/ldb-${PV}"
 
 # Cross_compile cannot use preforked process, since fork process earlier than point subproces.popen
 # to cross Popen
-export WAF_NO_PREFORK="yes"
+export WAF_NO_PREFORK = "yes"
 
 EXTRA_OECONF += "--disable-rpath \
                  --disable-rpath-install \

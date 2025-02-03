@@ -43,10 +43,10 @@ local_conf_header:
     BB_TASK_IONICE_LEVEL = '2.7'
     BB_TASK_IONICE_LEVEL_task-testimage = '2.1'
     TEST_QEMUBOOT_TIMEOUT = "1500"
-    EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
     PACKAGE_CLASSES = "package_ipk"
 
     DISTRO_FEATURES:append = " security pam apparmor smack ima tpm tpm2"
+    DISTRO_FEATURES:remove = "ptest"
     MACHINE_FEATURES:append = " tpm tpm2"
 
   diskmon: |

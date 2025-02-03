@@ -39,7 +39,6 @@ Yocto Project Development Tasks Manual
    external-scm
    read-only-rootfs
    build-quality
-   runtime-testing
    debugging
    licenses
    security-subjects

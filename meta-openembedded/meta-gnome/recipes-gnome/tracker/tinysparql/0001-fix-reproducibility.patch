@@ -1,4 +1,4 @@
-From e4552b9c5dbe8816266f332c5e20796d46eb5b16 Mon Sep 17 00:00:00 2001
+From dd163864c5ee28e153e982e47502039dad2f3787 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Mon, 18 Sep 2023 02:47:55 +0200
 Subject: [PATCH] tracker: fix reproducibility issue
@@ -19,7 +19,7 @@ Signed-off-by: Markus Volk <f_l_k@t-online.de>
  4 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 8552c6d..d72ff52 100644
+index 3a624ad..8c02aad 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -333,7 +333,7 @@ have_rtld_noload = cc.has_header_symbol('dlfcn.h', 'RTLD_NOLOAD')
@@ -73,10 +73,10 @@ index dd82e99..cb3f1f7 100644
  			 * building introspection information or running tests.
  			 * We want the in-tree modules to be loaded then.
 diff --git a/src/libtracker-sparql/meson.build b/src/libtracker-sparql/meson.build
-index 5eccb92..161f6ea 100644
+index bafc2ac..859da3e 100644
 --- a/src/libtracker-sparql/meson.build
 +++ b/src/libtracker-sparql/meson.build
-@@ -102,10 +102,10 @@ libtracker_sparql_private = static_library('tracker-sparql-private',
+@@ -103,10 +103,10 @@ libtracker_sparql_private = static_library('tracker-sparql-private',
      c_args: [
  	'-include', 'libtracker-sparql/tracker-private.h',
          '-DPRIVATE_LIBDIR="@0@"'.format(tracker_internal_libs_dir),

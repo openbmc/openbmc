@@ -291,13 +291,13 @@ another example that specifies these types of files, see the
 
 Another way of specifying source is from an SCM. For Git repositories,
 you must specify :term:`SRCREV` and you should specify :term:`PV` to include
-the revision with :term:`SRCPV`. Here is an example from the recipe
-``meta/recipes-core/musl/gcompat_git.bb``::
+a ``+`` sign in its definition. Here is an example from the recipe
+:oe_git:`meta/recipes-sato/l3afpad/l3afpad_git.bb </openembedded-core/tree/meta/recipes-sato/l3afpad/l3afpad_git.bb>`::
 
-   SRC_URI = "git://git.adelielinux.org/adelie/gcompat.git;protocol=https;branch=current"
+   SRC_URI = "git://github.com/stevenhoneyman/l3afpad.git;branch=master;protocol=https"
 
-   PV = "1.0.0+1.1+git${SRCPV}"
-   SRCREV = "af5a49e489fdc04b9cf02547650d7aeaccd43793"
+   PV = "0.8.18.1.11+git"
+   SRCREV ="3cdccdc9505643e50f8208171d9eee5de11a42ff"
 
 If your :term:`SRC_URI` statement includes URLs pointing to individual files
 fetched from a remote server other than a version control system,

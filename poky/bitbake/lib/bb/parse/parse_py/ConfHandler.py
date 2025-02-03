@@ -43,6 +43,7 @@ __config_regexp__  = re.compile( r"""
     """, re.X)
 __include_regexp__ = re.compile( r"include\s+(.+)" )
 __require_regexp__ = re.compile( r"require\s+(.+)" )
+__includeall_regexp__ = re.compile( r"include_all\s+(.+)" )
 __export_regexp__ = re.compile( r"export\s+([a-zA-Z0-9\-_+.${}/~]+)$" )
 __unset_regexp__ = re.compile( r"unset\s+([a-zA-Z0-9\-_+.${}/~]+)$" )
 __unset_flag_regexp__ = re.compile( r"unset\s+([a-zA-Z0-9\-_+.${}/~]+)\[([a-zA-Z0-9\-_+.][a-zA-Z0-9\-_+.@]+)\]$" )
@@ -176,6 +177,11 @@ def feeder(lineno, s, fn, statements, baseconfig=False, conffile=True):
     m = __require_regexp__.match(s)
     if m:
         ast.handleInclude(statements, fn, lineno, m, True)
+        return
+
+    m = __includeall_regexp__.match(s)
+    if m:
+        ast.handleIncludeAll(statements, fn, lineno, m)
         return
 
     m = __export_regexp__.match(s)

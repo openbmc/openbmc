@@ -1,0 +1,27 @@
+From e39afec7e5a2f3a9de7202affab4d0340ba879d7 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 2 Jul 2024 22:18:47 -0700
+Subject: [PATCH 23/26] include signal.h to avoid the 'undeclared' error
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/basic/pidref.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/basic/pidref.h b/src/basic/pidref.h
+index 42ddf4e50b..b9cf53680f 100644
+--- a/src/basic/pidref.h
++++ b/src/basic/pidref.h
+@@ -3,6 +3,7 @@
+ 
+ typedef struct PidRef PidRef;
+ 
++#include <signal.h>
+ #include "macro.h"
+ #include "process-util.h"
+ 
+-- 
+2.34.1
+

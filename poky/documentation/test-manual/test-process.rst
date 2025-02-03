@@ -20,7 +20,7 @@ helps review and test patches and this is his testing tree).
 We have two broad categories of test builds, including "full" and
 "quick". On the Autobuilder, these can be seen as "a-quick" and
 "a-full", simply for ease of sorting in the UI. Use our Autobuilder
-:yocto_ab:`console view </typhoon/#/console>` to see where we manage most
+:yocto_ab:`console view </valkyrie/#/console>` to see where we manage most
 test-related items.
 
 Builds are triggered manually when the test branches are ready. The

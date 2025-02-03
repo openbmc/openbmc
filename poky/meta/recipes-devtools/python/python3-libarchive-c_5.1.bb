@@ -13,7 +13,7 @@ SRC_URI += " \
 
 PYPI_PACKAGE = "libarchive-c"
 
-inherit pypi setuptools3 ptest
+inherit pypi setuptools3 ptest-python-pytest
 
 SRC_URI[sha256sum] = "7bcce24ea6c0fa3bc62468476c6d2f6264156db2f04878a372027c10615a2721"
 
@@ -34,16 +34,12 @@ RDEPENDS:${PN} += "\
 
 RDEPENDS:${PN}-ptest += " \
         locale-base-en-us \
-        python3-pytest \
-        python3-unittest-automake-output \
 "
 
 BBCLASSEXTEND = "native"
 
-do_install_ptest() {
-    install -d ${D}${PTEST_PATH}/tests
+do_install_ptest:append() {
     install -d ${D}${PTEST_PATH}/libarchive
-    cp -r ${S}/tests/* ${D}${PTEST_PATH}/tests/
     cp ${S}/libarchive/* ${D}${PTEST_PATH}/libarchive/
     cp ${S}/README.rst ${D}${PTEST_PATH}/README.rst
 }

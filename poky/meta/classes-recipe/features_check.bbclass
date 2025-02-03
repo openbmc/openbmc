@@ -16,7 +16,7 @@
 
 
 python () {
-    if d.getVar('PARSE_ALL_RECIPES', False):
+    if bb.utils.to_boolean(d.getVar('PARSE_ALL_RECIPES', False)):
         return
 
     unused = True

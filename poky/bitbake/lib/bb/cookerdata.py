@@ -346,7 +346,7 @@ class CookerDataBuilder(object):
     def _findLayerConf(self, data):
         return findConfigFile("bblayers.conf", data)
 
-    def parseConfigurationFiles(self, prefiles, postfiles, mc = "default"):
+    def parseConfigurationFiles(self, prefiles, postfiles, mc = ""):
         data = bb.data.createCopy(self.basedata)
         data.setVar("BB_CURRENT_MC", mc)
 

@@ -22,6 +22,7 @@ SRC_URI = "git://github.com/crash-utility/${BPN}.git;branch=master;protocol=http
            file://0001-cross_add_configure_option.patch \
            file://donnot-extract-gdb-during-do-compile.patch \
            file://gdb_build_jobs_and_not_write_crash_target.patch \
+           file://0001-symbol-fix-S-cannot-work-with-kaslr-detection.patch \
            "
 SRCREV = "ceacceef7d13134d327719a624cfafed99e90f8a"
 

@@ -43,6 +43,21 @@ class IncludeNode(AstNode):
         else:
             bb.parse.ConfHandler.include(self.filename, s, self.lineno, data, False)
 
+class IncludeAllNode(AstNode):
+    def __init__(self, filename, lineno, what_file):
+        AstNode.__init__(self, filename, lineno)
+        self.what_file = what_file
+
+    def eval(self, data):
+        """
+        Include the file and evaluate the statements
+        """
+        s = data.expand(self.what_file)
+        logger.debug2("CONF %s:%s: including %s", self.filename, self.lineno, s)
+
+        for path in data.getVar("BBPATH").split(":"):
+            bb.parse.ConfHandler.include(self.filename, os.path.join(path, s), self.lineno, data, False)
+
 class ExportNode(AstNode):
     def __init__(self, filename, lineno, var):
         AstNode.__init__(self, filename, lineno)
@@ -137,7 +152,10 @@ class DataNode(AstNode):
 
         flag = None
         if 'flag' in groupd and groupd['flag'] is not None:
-            flag = groupd['flag']
+            if groupd["lazyques"]:
+                flag = "_defaultval_flag_"+groupd['flag']
+            else:
+                flag = groupd['flag']
         elif groupd["lazyques"]:
             flag = "_defaultval"
 
@@ -366,6 +384,9 @@ class AddFragmentsNode(AstNode):
 def handleInclude(statements, filename, lineno, m, force):
     statements.append(IncludeNode(filename, lineno, m.group(1), force))
 
+def handleIncludeAll(statements, filename, lineno, m):
+    statements.append(IncludeAllNode(filename, lineno, m.group(1)))
+
 def handleExport(statements, filename, lineno, m):
     statements.append(ExportNode(filename, lineno, m.group(1)))
 
@@ -419,6 +440,30 @@ def runAnonFuncs(d):
         code.append("%s(d)" % funcname)
     bb.utils.better_exec("\n".join(code), {"d": d})
 
+# Handle recipe level PREFERRED_PROVIDERs
+def handleVirtRecipeProviders(tasklist, d):
+    depends = (d.getVar("DEPENDS") or "").split()
+    virtprovs = (d.getVar("BB_RECIPE_VIRTUAL_PROVIDERS") or "").split()
+    newdeps = []
+    for dep in depends:
+        if dep in virtprovs:
+            newdep = d.getVar("PREFERRED_PROVIDER_" + dep)
+            if not newdep:
+                 bb.fatal("Error, recipe virtual provider PREFERRED_PROVIDER_%s not set" % dep)
+            newdeps.append(newdep)
+        else:
+            newdeps.append(dep)
+    d.setVar("DEPENDS", " ".join(newdeps))
+    for task in tasklist:
+        taskdeps = (d.getVarFlag(task, "depends") or "").split()
+        remapped = []
+        for entry in taskdeps:
+            r, t = entry.split(":")
+            if r in virtprovs:
+                r = d.getVar("PREFERRED_PROVIDER_" + r)
+            remapped.append("%s:%s" % (r, t))
+        d.setVarFlag(task, "depends", " ".join(remapped))
+
 def finalize(fn, d, variant = None):
     saved_handlers = bb.event.get_handlers().copy()
     try:
@@ -444,6 +489,7 @@ def finalize(fn, d, variant = None):
 
         tasklist = d.getVar('__BBTASKS', False) or []
         bb.event.fire(bb.event.RecipeTaskPreProcess(fn, list(tasklist)), d)
+        handleVirtRecipeProviders(tasklist, d)
         bb.build.add_tasks(tasklist, d)
 
         bb.parse.siggen.finalise(fn, d, variant)

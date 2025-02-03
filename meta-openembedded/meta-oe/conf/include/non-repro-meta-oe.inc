@@ -67,7 +67,6 @@ KNOWN_NON_REPRO_META_OE = " \
     minifi-cpp \
     minifi-cpp-dbg \
     minifi-cpp-src \
-    mozjs-115-src \
     mpv \
     mpv-dbg \
     nana \

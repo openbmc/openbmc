@@ -15,5 +15,6 @@ RDEPENDS:${PN} = "\
 inherit setuptools3 pypi
 
 PYPI_PACKAGE = "rouge_score"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 SRC_URI[sha256sum] = "c7d4da2683e68c9abf0135ef915d63a46643666f848e558a1b9f7ead17ff0f04"

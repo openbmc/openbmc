@@ -5,4 +5,4 @@ header:
 
 local_conf_header:
   alt: |
-      DISTRO_FEATURES:append = " systemd"
+      INIT_MANAGER = "systemd"

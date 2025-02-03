@@ -1,0 +1,30 @@
+From 173cdf607bf39c13eb4d4b0dadcb9dc6add76014 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 7 Jan 2025 09:54:07 +0100
+Subject: [PATCH] lib/igt_aux.c: address procps 4.0.5 compatibility
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/drm/igt-gpu-tools/-/issues/164]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ lib/igt_aux.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/igt_aux.c b/lib/igt_aux.c
+index 3407cc4f2..7028d3f57 100644
+--- a/lib/igt_aux.c
++++ b/lib/igt_aux.c
+@@ -1358,10 +1358,10 @@ static bool get_process_ids(struct igt_process *prcs)
+ 	prcs->comm = NULL;
+ 	prcs->stack = procps_pids_get(prcs->info, PIDS_FETCH_TASKS_ONLY);
+ 	if (prcs->stack) {
+-		prcs->tid = PIDS_VAL(EU_PID, s_int, prcs->stack, prcs->info);
+-		prcs->euid = PIDS_VAL(EU_EUID, s_int, prcs->stack, prcs->info);
+-		prcs->egid = PIDS_VAL(EU_EGID, s_int, prcs->stack, prcs->info);
+-		prcs->comm = PIDS_VAL(EU_CMD, str, prcs->stack, prcs->info);
++		prcs->tid = PIDS_VAL(EU_PID, s_int, prcs->stack);
++		prcs->euid = PIDS_VAL(EU_EUID, s_int, prcs->stack);
++		prcs->egid = PIDS_VAL(EU_EGID, s_int, prcs->stack);
++		prcs->comm = PIDS_VAL(EU_CMD, str, prcs->stack);
+ 	}
+ #endif
+ 	return prcs->tid != 0;

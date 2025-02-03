@@ -28,7 +28,7 @@ SRC_URI = "git://github.com/draios/sysdig.git;branch=dev;protocol=https;name=sys
            file://0099-cmake-Pass-PROBE_NAME-via-CFLAGS.patch \
            "
 SRCREV_sysdig = "4fb6288275f567f63515df0ff0a6518043ecfa9b"
-SRCREV_falco= "caa0e4d0044fdaaebab086592a97f0c7f32aeaa9"
+SRCREV_falco = "caa0e4d0044fdaaebab086592a97f0c7f32aeaa9"
 
 SRCREV_FORMAT = "sysdig_falco"
 

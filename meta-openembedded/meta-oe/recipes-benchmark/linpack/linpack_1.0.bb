@@ -2,7 +2,7 @@ DESCRIPTION = "LINPACK Benchmarks are a measure of a system's floating point com
 SUMMARY = "LINPACK is a software library for performing numerical linear algebra on digital computers"
 
 LICENSE = "PD"
-LIC_FILES_CHKSUM ="file://${UNPACKDIR}/linpacknew.c;beginline=1;endline=23;md5=aa025e3bc44190c71e4c5e3b084fed87"
+LIC_FILES_CHKSUM = "file://${UNPACKDIR}/linpacknew.c;beginline=1;endline=23;md5=aa025e3bc44190c71e4c5e3b084fed87"
 
 SRC_URI = "http://www.netlib.org/benchmark/linpackc.new;downloadfilename=linpacknew.c \
            file://0001-linpack-Define-DP-only-when-SP-is-not-defined.patch \

@@ -12,6 +12,5 @@ SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
            file://0005-Change-order-of-CFLAGS.patch \
            file://0006-Fix-invalid-sigprocmask-call.patch \
            file://0007-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch \
-           file://0001-Fix-Wenum-constexpr-conversion-in-enum-flags.h.patch \
            "
-SRC_URI[sha256sum] = "83350ccd35b5b5a0cba6b334c41294ea968158c573940904f00b92f76345314d"
+SRC_URI[sha256sum] = "c2cc5ccca029b7a7c3879ce8a96528fdfd056b4d884f2b0511e8f7bc723355c6"

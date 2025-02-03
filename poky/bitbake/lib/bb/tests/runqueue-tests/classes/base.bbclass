@@ -9,7 +9,7 @@ def stamptask(d):
     with open(stampname, "a+") as f:
         f.write(d.getVar("BB_UNIHASH") + "\n")
 
-    if d.getVar("BB_CURRENT_MC") != "default":
+    if d.getVar("BB_CURRENT_MC") != "":
         thistask = d.expand("${BB_CURRENT_MC}:${PN}:${BB_CURRENTTASK}")
     if thistask in d.getVar("SLOWTASKS").split():
         bb.note("Slowing task %s" % thistask)

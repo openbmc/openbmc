@@ -1,0 +1,39 @@
+From d6686206658aadc74d21a29c781320e2e13fe8f3 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 27 Jan 2025 17:05:53 +0000
+Subject: [PATCH] build-requirements.txt: Allow newer versions
+
+Allowing building with newer version
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ api/python/build-requirements.txt | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/api/python/build-requirements.txt b/api/python/build-requirements.txt
+index 4c9004ca..fe0d1055 100644
+--- a/api/python/build-requirements.txt
++++ b/api/python/build-requirements.txt
+@@ -1,10 +1,10 @@
+-tomli==2.0.1
+-scikit-build-core==0.9.8
++tomli>=2.0.1
++scikit-build-core>=0.9.8
+ # For Ninja: msvc.msvc14_get_vc_env
+-setuptools==70.2.0
++setuptools>=70.2.0
+ # For the "env" feature
+-pydantic==2.8.2
++pydantic>=2.8.2
+ # Implicit from scikit-build-core
+-pathspec==0.12.1
+-build==1.2.1
+-wheel==0.43.0
++pathspec>=0.12.1
++build>=1.2.1
++wheel>=0.43.0
+-- 
+2.39.5
+

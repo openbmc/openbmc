@@ -1,4 +1,4 @@
-From e1fc4b06dcb62e1c2d85ae99f39ef1a8860570e1 Mon Sep 17 00:00:00 2001
+From 2592a1d97c66f8bff4bae095b14cb774de3e80c9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 15 Jul 2021 12:33:13 -0700
 Subject: [PATCH] use closefrom() on linux and glibc 2.34+
@@ -8,7 +8,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Rebase to 1.17.0
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
-
 ---
  src/posix-io.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

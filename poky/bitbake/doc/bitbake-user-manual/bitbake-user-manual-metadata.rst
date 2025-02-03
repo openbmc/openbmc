@@ -976,13 +976,13 @@ go into ``bitbake.conf``, for example::
 ``addfragments`` takes three parameters:
 
 -  path prefix for fragment files inside the layer file tree that bitbake
-uses to construct full paths to the fragment files
+   uses to construct full paths to the fragment files
 
 -  name of variable that holds the list of enabled fragments in an
-active build
+   active build
 
 -  name of variable that contains a list of variable names containing
-fragment-specific metadata (such as descriptions)
+   fragment-specific metadata (such as descriptions)
 
 This allows listing enabled configuration fragments in ``OE_FRAGMENTS``
 variable like this::

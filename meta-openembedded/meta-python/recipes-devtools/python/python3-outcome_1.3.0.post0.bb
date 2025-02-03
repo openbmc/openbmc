@@ -7,16 +7,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=fa7b86389e58dd4087a8d2b833e5fe96 \
 
 SRC_URI[sha256sum] = "9dcf02e65f2971b80047b377468e72a268e15c0af3cf1238e6ff14f7f91143b8"
 
-inherit pypi setuptools3 ptest
-
-SRC_URI += " \
-	file://run-ptest \
-"
+inherit pypi setuptools3 ptest-python-pytest
 
 RDEPENDS:${PN}-ptest += " \
-	python3-pytest \
 	python3-pytest-asyncio \
-	python3-unittest-automake-output \
 	python3-outcome \
 "
 
@@ -27,8 +21,3 @@ RDEPENDS:${PN} += " \
 	python3-pytest \
 	python3-typing-extensions \
 "
-
-do_install_ptest() {
-	install -d ${D}${PTEST_PATH}/tests
-	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
-}

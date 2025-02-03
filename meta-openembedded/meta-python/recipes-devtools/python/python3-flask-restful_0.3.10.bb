@@ -11,5 +11,6 @@ SRC_URI[sha256sum] = "fe4af2ef0027df8f9b4f797aba20c5566801b6ade995ac63b588abf1a5
 inherit pypi setuptools3
 
 PYPI_PACKAGE = "Flask-RESTful"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 RDEPENDS:${PN} = "python3-flask"

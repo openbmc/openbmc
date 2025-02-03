@@ -1,0 +1,65 @@
+From e5a4487e2b757d0063148691c7d06ae1c7e15b9a Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Tue, 18 Jun 2024 11:52:43 +0100
+Subject: [PATCH] protobuf fix
+
+Upstream-Status: Pending (not yet submitted to upstream)
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+---
+ .../se-proxy/env/commonsp/se_proxy_sp.c       | 25 ++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/deployments/se-proxy/env/commonsp/se_proxy_sp.c b/deployments/se-proxy/env/commonsp/se_proxy_sp.c
+index a0eb03b6f..e2774c135 100644
+--- a/deployments/se-proxy/env/commonsp/se_proxy_sp.c
++++ b/deployments/se-proxy/env/commonsp/se_proxy_sp.c
+@@ -13,6 +13,7 @@
+ #include "trace.h"
+ #include "deployments/se-proxy/infra/service_proxy_factory.h"
+ #include "deployments/se-proxy/se_proxy_interfaces.h"
++#include <service/crypto/factory/crypto_provider_factory.h>
+ 
+ static bool sp_init(uint16_t *own_sp_id);
+ 
+@@ -39,7 +40,7 @@ void __noreturn sp_main(union ffa_boot_info *boot_info)
+ 		goto fatal_error;
+ 	}
+ 
+-	rpc_status = ts_rpc_endpoint_sp_init(&rpc_endpoint, 5, 16);
++	rpc_status = ts_rpc_endpoint_sp_init(&rpc_endpoint, 6, 16);
+ 	if (rpc_status != RPC_SUCCESS) {
+ 		EMSG("Failed to initialize RPC endpoint: %d", rpc_status);
+ 		goto fatal_error;
+@@ -129,6 +130,28 @@ void __noreturn sp_main(union ffa_boot_info *boot_info)
+ 		goto fatal_error;
+ 	}
+ 
++	struct rpc_service_interface *crypto_iface_protobuf = NULL;
++	struct crypto_provider *crypto_protobuf_provider = NULL;
++
++	crypto_protobuf_provider = crypto_protobuf_provider_factory_create();
++	if (!crypto_protobuf_provider) {
++		EMSG("Failed to create crypto protobuf provider factory");
++		goto fatal_error;
++	}
++
++	crypto_iface_protobuf = service_provider_get_rpc_interface(
++		&crypto_protobuf_provider->base_provider);
++	if (!crypto_iface_protobuf) {
++		EMSG("Failed to create service provider RPC interface");
++		goto fatal_error;
++	}
++
++	rpc_status = ts_rpc_endpoint_sp_add_service(&rpc_endpoint, crypto_iface_protobuf);
++	if (rpc_status != RPC_SUCCESS) {
++		EMSG("Failed to add service to RPC endpoint: %d", rpc_status);
++		goto fatal_error;
++	}
++
+	while (1) {
+		ts_rpc_endpoint_sp_receive(&rpc_endpoint, &req_msg, &resp_msg);
+
+-- 
+2.25.1
+
+

@@ -34,7 +34,7 @@ _revisions_cache = bb.checksum.RevisionsCache()
 
 logger = logging.getLogger("BitBake.Fetcher")
 
-CHECKSUM_LIST = [ "md5", "sha256", "sha1", "sha384", "sha512" ]
+CHECKSUM_LIST = [ "goh1", "md5", "sha256", "sha1", "sha384", "sha512" ]
 SHOWN_CHECKSUM_LIST = ["sha256"]
 
 class BBFetchException(Exception):
@@ -461,7 +461,7 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
                 for k in replacements:
                     uri_replace_decoded[loc] = uri_replace_decoded[loc].replace(k, replacements[k])
                 #bb.note("%s %s %s" % (regexp, uri_replace_decoded[loc], uri_decoded[loc]))
-                result_decoded[loc] = re.sub(regexp, uri_replace_decoded[loc], uri_decoded[loc], 1)
+                result_decoded[loc] = re.sub(regexp, uri_replace_decoded[loc], uri_decoded[loc], count=1)
             if loc == 2:
                 # Handle path manipulations
                 basename = None
@@ -1316,20 +1316,23 @@ class FetchData(object):
         self.setup = False
 
         def configure_checksum(checksum_id):
+            checksum_plain_name = "%ssum" % checksum_id
             if "name" in self.parm:
                 checksum_name = "%s.%ssum" % (self.parm["name"], checksum_id)
             else:
-                checksum_name = "%ssum" % checksum_id
-
-            setattr(self, "%s_name" % checksum_id, checksum_name)
+                checksum_name = checksum_plain_name
 
             if checksum_name in self.parm:
                 checksum_expected = self.parm[checksum_name]
-            elif self.type not in ["http", "https", "ftp", "ftps", "sftp", "s3", "az", "crate", "gs", "gomod"]:
+            elif checksum_plain_name in self.parm:
+                checksum_expected = self.parm[checksum_plain_name]
+                checksum_name = checksum_plain_name
+            elif self.type not in ["http", "https", "ftp", "ftps", "sftp", "s3", "az", "crate", "gs", "gomod", "npm"]:
                 checksum_expected = None
             else:
                 checksum_expected = d.getVarFlag("SRC_URI", checksum_name)
 
+            setattr(self, "%s_name" % checksum_id, checksum_name)
             setattr(self, "%s_expected" % checksum_id, checksum_expected)
 
         self.names = self.parm.get("name",'default').split(',')

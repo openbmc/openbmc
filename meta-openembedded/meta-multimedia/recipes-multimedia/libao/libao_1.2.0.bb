@@ -7,7 +7,7 @@ HOMEPAGE = "https://www.xiph.org/ao/"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-SRC_URI="http://downloads.xiph.org/releases/ao/${BP}.tar.gz"
+SRC_URI = "http://downloads.xiph.org/releases/ao/${BP}.tar.gz"
 SRC_URI[md5sum] = "9f5dd20d7e95fd0dd72df5353829f097"
 SRC_URI[sha256sum] = "03ad231ad1f9d64b52474392d63c31197b0bc7bd416e58b1c10a329a5ed89caf"
 

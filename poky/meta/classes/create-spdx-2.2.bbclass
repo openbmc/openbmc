@@ -75,11 +75,17 @@ def convert_license_to_spdx(lic, license_data, document, d, existing={}):
                     pass
             if extracted_info.extractedText is None:
                 # If it's not SPDX or PD, then NO_GENERIC_LICENSE must be set
-                filename = d.getVarFlag('NO_GENERIC_LICENSE', name)
+                entry = d.getVarFlag('NO_GENERIC_LICENSE', name).split(';')
+                filename = entry[0]
+                params = {i.split('=')[0]: i.split('=')[1] for i in entry[1:] if '=' in i}
+                beginline = int(params.get('beginline', 1))
+                endline = params.get('endline', None)
+                if endline:
+                    endline = int(endline)
                 if filename:
                     filename = d.expand("${S}/" + filename)
                     with open(filename, errors="replace") as f:
-                        extracted_info.extractedText = f.read()
+                        extracted_info.extractedText = "".join(line for idx, line in enumerate(f, 1) if beginline <= idx and idx <= (endline or idx))
                 else:
                     bb.fatal("Cannot find any text for license %s" % name)
 

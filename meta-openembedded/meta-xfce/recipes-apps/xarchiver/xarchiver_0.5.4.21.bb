@@ -30,4 +30,4 @@ do_configure:prepend() {
 
 FILES:${PN} += "${libdir}/thunar-archive-plugin"
 
-RRECOMMENDS:${PN} = "lzop zip tar bzip2 unzip xz p7zip"
+RRECOMMENDS:${PN} = "lzop zip tar bzip2 unzip xz 7zip"

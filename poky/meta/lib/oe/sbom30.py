@@ -267,7 +267,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
 
     def new_alias_id(self, obj, replace):
         unihash = self.d.getVar("BB_UNIHASH")
-        namespace = self.get_namespace() + "/"
+        namespace = self.get_namespace()
         if unihash not in obj._id:
             bb.warn(f"Unihash {unihash} not found in {obj._id}")
             return None
@@ -495,7 +495,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
             return []
 
         if not to:
-            to = [oe.spdx30.Element.NoneElement]
+            to = [oe.spdx30.IndividualElement.NoneElement]
 
         ret = []
 
@@ -589,12 +589,14 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
 
         file_licenses = set()
         for extracted_lic in oe.spdx_common.extract_licenses(filepath):
-            file_licenses.add(self.new_license_expression(extracted_lic, license_data))
+            lic = self.new_license_expression(extracted_lic, license_data)
+            self.set_element_alias(lic)
+            file_licenses.add(lic)
 
         self.new_relationship(
             [spdx_file],
             oe.spdx30.RelationshipType.hasDeclaredLicense,
-            file_licenses,
+            [oe.sbom30.get_element_link_id(lic_alias) for lic_alias in file_licenses],
         )
         spdx_file.extension.append(OELicenseScannedExtension())
 
@@ -855,6 +857,18 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         self.doc.import_ = sorted(imports.values(), key=lambda e: e.externalSpdxId)
         bb.debug(1, "Linking...")
         self.link()
+
+        # Manually go through all of the simplelicensing_customIdToUri DictionaryEntry
+        # items and resolve any aliases to actual objects.
+        for lic in self.foreach_type(oe.spdx30.simplelicensing_LicenseExpression):
+            for d in lic.simplelicensing_customIdToUri:
+                if d.value.startswith(OE_ALIAS_PREFIX):
+                    obj = self.find_by_id(d.value)
+                    if obj is not None:
+                        d.value = obj._id
+                    else:
+                        self.missing_ids.add(d.value)
+
         self.missing_ids -= set(imports.keys())
         return self.missing_ids
 

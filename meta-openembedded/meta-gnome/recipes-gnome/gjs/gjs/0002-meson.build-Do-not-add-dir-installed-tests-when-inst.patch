@@ -1,8 +1,13 @@
-From 29221ae42e424c6100b8c313d2b61801430c872d Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Andreas=20M=C3=BCller=20installed=5Ftests=20is=20false?=
- <schnitzeltony@gmail.com>
+From 6a70d3ac658988dda49d51ed8b46584b716a9c7c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Wed, 27 Oct 2021 20:04:02 +0200
 Subject: [PATCH] meson.build: Do not add dir installed-tests when
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: =?UTF-8?q?Andreas=20M=C3=BCller=20installed=5Ftests=20is=20false?=
+ <schnitzeltony@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -19,12 +24,12 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 3058e8c..06cf8da 100644
+index ac958d3..e773508 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -688,7 +688,9 @@ endif
- 
- ### Tests and test setups ######################################################
+@@ -654,7 +654,9 @@ gi_tests = subproject('gobject-introspection-tests',
+     default_options: ['werror=false', 'cairo=true',
+         'install_dir=@0@'.format(installed_tests_execdir)])
  
 -subdir('installed-tests')
 +if get_option('installed_tests')

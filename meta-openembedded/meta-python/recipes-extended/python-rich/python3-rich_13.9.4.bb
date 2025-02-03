@@ -2,7 +2,7 @@ SUMMARY = "Rich is a Python library for rich text and beautiful formatting in th
 DESCRIPTION = "The Rich API makes it easy to add color and style to terminal output. \
 Rich can also render pretty tables, progress bars, markdown, syntax highlighted source code, \
 tracebacks, and more."
-HOMEPAGE="https://github.com/Textualize/rich"
+HOMEPAGE = "https://github.com/Textualize/rich"
 SECTION = "devel/python"
 LICENSE = "MIT"
 

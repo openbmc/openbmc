@@ -43,7 +43,7 @@ an ``sdk`` image, perhaps one of::
 Alternatively,  you can add ``tools-profile`` to the :term:`EXTRA_IMAGE_FEATURES` line in
 your ``local.conf`` file::
 
-   EXTRA_IMAGE_FEATURES = "debug-tweaks tools-profile"
+   EXTRA_IMAGE_FEATURES:append = " tools-profile"
 
 If you use the ``tools-profile`` method, you don't need to build an sdk image ---
 the tracing and profiling tools will be included in non-sdk images as well e.g.::
@@ -69,7 +69,7 @@ packages (xxx-dbg) which you can manually install as needed.
 To generate debug info for packages, you can add ``dbg-pkgs`` to
 :term:`EXTRA_IMAGE_FEATURES` in ``local.conf``. For example::
 
-   EXTRA_IMAGE_FEATURES = "debug-tweaks tools-profile dbg-pkgs"
+   EXTRA_IMAGE_FEATURES:append = " dbg-pkgs"
 
 Additionally, in order to generate the right type of debug info, we also need to
 set :term:`PACKAGE_DEBUG_SPLIT_STYLE` in the ``local.conf`` file::

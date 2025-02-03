@@ -37,38 +37,26 @@ def foreach_dependencies(shrinkwrap, callback=None, dev=False):
     """
         Run a callback for each dependencies of a shrinkwrap file.
         The callback is using the format:
-            callback(name, params, deptree)
+            callback(name, data, location)
         with:
             name = the package name (string)
-            params = the package parameters (dictionary)
-            destdir = the destination of the package (string)
+            data = the package data (dictionary)
+            location = the location of the package (string)
     """
-    # For handling old style dependencies entries in shinkwrap files
-    def _walk_deps(deps, deptree):
-        for name in deps:
-            subtree = [*deptree, name]
-            _walk_deps(deps[name].get("dependencies", {}), subtree)
-            if callback is not None:
-                if deps[name].get("dev", False) and not dev:
-                    continue
-                elif deps[name].get("bundled", False):
-                    continue
-                destsubdirs = [os.path.join("node_modules", dep) for dep in subtree]
-                destsuffix = os.path.join(*destsubdirs)
-                callback(name, deps[name], destsuffix)
+    packages = shrinkwrap.get("packages")
+    if not packages:
+        raise FetchError("Invalid shrinkwrap file format")
 
-    # packages entry means new style shrinkwrap file, else use dependencies
-    packages = shrinkwrap.get("packages", None)
-    if packages is not None:
-        for package in packages:
-            if package != "":
-                name = package.split('node_modules/')[-1]
-                package_infos = packages.get(package, {})
-                if dev == False and package_infos.get("dev", False):
-                    continue
-                callback(name, package_infos, package)
-    else:
-        _walk_deps(shrinkwrap.get("dependencies", {}), [])
+    for location, data in packages.items():
+        # Skip empty main and local link target packages
+        if not location.startswith('node_modules/'):
+            continue
+        elif not dev and data.get("dev", False):
+            continue
+        elif data.get("inBundle", False):
+            continue
+        name = location.split('node_modules/')[-1]
+        callback(name, data, location)
 
 class NpmShrinkWrap(FetchMethod):
     """Class to fetch all package from a shrinkwrap file"""
@@ -95,12 +83,18 @@ class NpmShrinkWrap(FetchMethod):
             extrapaths = []
             unpack = True
 
-            integrity = params.get("integrity", None)
-            resolved = params.get("resolved", None)
-            version = params.get("version", resolved)
+            integrity = params.get("integrity")
+            resolved = params.get("resolved")
+            version = params.get("version")
+            link = params.get("link", False)
+
+            # Handle link sources
+            if link:
+                localpath = resolved
+                unpack = False
 
             # Handle registry sources
-            if is_semver(version) and integrity:
+            elif version and is_semver(version) and integrity:
                 # Handle duplicate dependencies without url
                 if not resolved:
                     return
@@ -128,10 +122,10 @@ class NpmShrinkWrap(FetchMethod):
                 extrapaths.append(resolvefile)
 
             # Handle http tarball sources
-            elif version.startswith("http") and integrity:
-                localfile = npm_localfile(os.path.basename(version))
+            elif resolved.startswith("http") and integrity:
+                localfile = npm_localfile(os.path.basename(resolved))
 
-                uri = URI(version)
+                uri = URI(resolved)
                 uri.params["downloadfilename"] = localfile
 
                 checksum_name, checksum_expected = npm_integrity(integrity)
@@ -141,28 +135,12 @@ class NpmShrinkWrap(FetchMethod):
 
                 localpath = os.path.join(d.getVar("DL_DIR"), localfile)
 
-            # Handle local tarball and link sources
-            elif version.startswith("file"):
-                localpath = version[5:]
-                if not version.endswith(".tgz"):
-                    unpack = False
+            # Handle local tarball sources
+            elif resolved.startswith("file"):
+                localpath = resolved[5:]
 
             # Handle git sources
-            elif version.startswith(("git", "bitbucket","gist")) or (
-                not version.endswith((".tgz", ".tar", ".tar.gz"))
-                and not version.startswith((".", "@", "/"))
-                and "/" in version
-            ):
-                if version.startswith("github:"):
-                    version = "git+https://github.com/" + version[len("github:"):]
-                elif version.startswith("gist:"):
-                    version = "git+https://gist.github.com/" + version[len("gist:"):]
-                elif version.startswith("bitbucket:"):
-                    version = "git+https://bitbucket.org/" + version[len("bitbucket:"):]
-                elif version.startswith("gitlab:"):
-                    version = "git+https://gitlab.com/" + version[len("gitlab:"):]
-                elif not version.startswith(("git+","git:")):
-                    version = "git+https://github.com/" + version
+            elif resolved.startswith("git"):
                 regex = re.compile(r"""
                     ^
                     git\+
@@ -174,10 +152,9 @@ class NpmShrinkWrap(FetchMethod):
                     $
                     """, re.VERBOSE)
 
-                match = regex.match(version)
-
+                match = regex.match(resolved)
                 if not match:
-                    raise ParameterError("Invalid git url: %s" % version, ud.url)
+                    raise ParameterError("Invalid git url: %s" % resolved, ud.url)
 
                 groups = match.groupdict()
 

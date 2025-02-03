@@ -1,4 +1,4 @@
-From c815368a3e41dd3f639eb8fd82d21bc0bab55d1e Mon Sep 17 00:00:00 2001
+From 71751d30ca6bdae6c62e41b8bdd20eb69cecd556 Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Wed, 1 Nov 2017 09:23:41 -0400
 Subject: [PATCH] stunnel: fix compile error when openssl disable des support
@@ -31,7 +31,7 @@ index f112cf9..8d4be01 100644
  #include <openssl/dh.h>
  #if OPENSSL_VERSION_NUMBER<0x10100000L
 diff --git a/src/protocol.c b/src/protocol.c
-index c8c65ea..b071b06 100644
+index 616a65f..5ccbcb0 100644
 --- a/src/protocol.c
 +++ b/src/protocol.c
 @@ -82,7 +82,7 @@ NOEXPORT void ldap_client_middle(CLI *);
@@ -43,7 +43,7 @@ index c8c65ea..b071b06 100644
  NOEXPORT void ntlm(CLI *);
  NOEXPORT char *ntlm1(void);
  NOEXPORT char *ntlm3(char *, char *, char *, char *);
-@@ -1334,7 +1334,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
+@@ -1391,7 +1391,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
      fd_printf(c, c->remote_fd.fd, "Host: %s", c->opt->protocol_host);
      if(c->opt->protocol_username && c->opt->protocol_password) {
          if(!strcasecmp(c->opt->protocol_authentication, "ntlm")) {
@@ -52,7 +52,7 @@ index c8c65ea..b071b06 100644
              ntlm(c);
  #else
              s_log(LOG_ERR, "NTLM authentication is not available");
-@@ -1377,7 +1377,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
+@@ -1434,7 +1434,7 @@ NOEXPORT void connect_client_middle(CLI *c) {
      str_free(line);
  }
  

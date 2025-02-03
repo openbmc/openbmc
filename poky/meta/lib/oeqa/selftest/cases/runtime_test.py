@@ -273,6 +273,8 @@ TEST_RUNQEMUPARAMS += " slirp"
         import subprocess, os
 
         distro = oe.lsb.distro_identifier()
+        # Merge request to address the issue on centos/rhel/derivatives:
+        # https://gitlab.com/cki-project/kernel-ark/-/merge_requests/3449
         if distro and (distro in ['debian-9', 'debian-10', 'centos-7', 'centos-8', 'centos-9', 'ubuntu-16.04', 'ubuntu-18.04'] or
             distro.startswith('almalinux') or distro.startswith('rocky')):
             self.skipTest('virgl headless cannot be tested with %s' %(distro))

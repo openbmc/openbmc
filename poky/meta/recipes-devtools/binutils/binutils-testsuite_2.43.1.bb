@@ -21,9 +21,9 @@ do_configure() {
 }
 
 # target depends
-DEPENDS += "virtual/${TARGET_PREFIX}binutils"
-DEPENDS += "virtual/${TARGET_PREFIX}gcc"
-DEPENDS += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlibs"
+DEPENDS += "virtual/cross-binutils"
+DEPENDS += "virtual/cross-cc"
+DEPENDS += "virtual/${MLPREFIX}compilerlibs"
 DEPENDS += "virtual/${MLPREFIX}libc"
 
 python check_prepare() {

@@ -2,7 +2,7 @@ SUMMARY = "X.Org font package creation/installation utilities"
 
 require xorg-font-common.inc
 
-LICENSE = "Unicode-TOU & BSD-4-Clause & BSD-2-Clause"
+LICENSE = "Unicode-TOU & MIT & X11 & BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2a9e705c00e463c8d294f90486852e06 \
                     file://ucs2any.c;endline=28;md5=8357dc567fc628bd12696f15b2a33bcb \
                     file://bdftruncate.c;endline=26;md5=4f82ffc101a1b165eae9c6998abff937 \

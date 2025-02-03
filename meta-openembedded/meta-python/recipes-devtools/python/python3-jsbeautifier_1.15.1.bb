@@ -8,7 +8,7 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "ebd733b560704c602d744eafc839db60a1ee9326e30a2a80c4adb8718adc1b24"
 
-PYPI_PACKAGE="jsbeautifier"
+PYPI_PACKAGE = "jsbeautifier"
 
 RDEPENDS:${PN} += "\
     python3-core \

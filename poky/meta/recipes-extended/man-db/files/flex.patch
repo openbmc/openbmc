@@ -1,0 +1,36 @@
+From d3f7c160bddf5d879c74e19e4f577882e8b22559 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 22 Jan 2025 14:16:48 +0000
+Subject: [PATCH] configure: check for shipped generated sources in source
+ directory
+
+The configure script fails if it can't find flex and the pregenerated
+source code isn't available, as is the case in builds from git whereas
+tarballs include the code.
+
+However this breaks with out-of-tree builds, where cwd during configure
+is the build directory not the source directory, and the pregenerated
+sources will always be inside the source directory.
+
+Upstream-Status: Submitted [https://gitlab.com/man-db/man-db/-/merge_requests/12]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7e9148fb..49a213fd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -380,7 +380,7 @@ dnl To add more decompressors just follow the scheme above.
+ dnl The "noyywrap" argument is new in Autoconf 2.70, but this also works
+ dnl fine with older versions that ignore the argument.
+ AC_PROG_LEX([noyywrap])
+-if test "$LEX" = ":" && (test ! -e src/lexgrog.c || test ! -e src/zsoelim.c)
++if test "$LEX" = ":" && (test ! -e $srcdir/src/lexgrog.c || test ! -e $srcdir/src/zsoelim.c)
+ then
+ 	AC_MSG_ERROR([flex is required when building from revision control])
+ fi
+-- 
+2.43.0
+

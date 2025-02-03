@@ -22,7 +22,7 @@ diff --git a/configure.ac b/configure.ac
 index 1eafd62a44..90c94323aa 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1289,7 +1289,7 @@ PHP_REMOVE_USR_LIB(LDFLAGS)
+@@ -1462,7 +1462,7 @@ PHP_REMOVE_USR_LIB(LDFLAGS)
  EXTRA_LDFLAGS="$EXTRA_LDFLAGS $PHP_LDFLAGS"
  EXTRA_LDFLAGS_PROGRAM="$EXTRA_LDFLAGS_PROGRAM $PHP_LDFLAGS"
  

@@ -8,7 +8,8 @@ SRC_URI[sha256sum] = "f5013484eaf7a20eb22d1821aaefe60b50cc329722372b5f8565d46d4a
 
 inherit pypi setuptools3
 
-PYPI_PACKAGE="Wand"
+PYPI_PACKAGE = "Wand"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 FILES:${PN}-doc += "${datadir}/README.rst"
 

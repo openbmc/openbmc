@@ -5,14 +5,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import os
-import subprocess
 import logging
-import glob
-import shutil
-import errno
-import sys
-import tempfile
 from devtool import DevtoolError
 from devtool import build_image
 

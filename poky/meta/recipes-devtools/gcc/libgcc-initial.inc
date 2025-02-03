@@ -29,7 +29,7 @@
 
 require libgcc-common.inc
 
-DEPENDS = "virtual/${TARGET_PREFIX}gcc"
+DEPENDS = "virtual/cross-cc"
 
 LICENSE = "GPL-3.0-with-GCC-exception"
 

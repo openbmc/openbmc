@@ -1,4 +1,4 @@
-From e4e75bee348d297bd8288e6fd7e99ab033cbb90c Mon Sep 17 00:00:00 2001
+From 108461f6c50b57ba73970dc977e7d4e9a02624df Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 26 Nov 2024 23:04:52 -0800
 Subject: [PATCH] pkgconfig
@@ -27,10 +27,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index 933fb150..08589a6b 100644
+index fe02bdf..6f33020 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1160,6 +1160,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -1179,6 +1179,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/gpgme-glib.pc
                  src/gpgme.h)
  AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
@@ -39,7 +39,7 @@ index 933fb150..08589a6b 100644
  AC_CONFIG_FILES(lang/cpp/tests/Makefile)
  AC_CONFIG_FILES(lang/cpp/src/gpgmepp.pc)
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 03708620..e716ce4d 100644
+index 0370862..e716ce4 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -20,11 +20,11 @@
@@ -58,7 +58,7 @@ index 03708620..e716ce4d 100644
  noinst_SCRIPTS = gpgme-config
 diff --git a/src/gpgme-pthread.pc.in b/src/gpgme-pthread.pc.in
 new file mode 100644
-index 00000000..074bbf6e
+index 0000000..074bbf6
 --- /dev/null
 +++ b/src/gpgme-pthread.pc.in
 @@ -0,0 +1,15 @@
@@ -78,7 +78,7 @@ index 00000000..074bbf6e
 +Cflags: -I${includedir}
 +Requires: libassuan gpg-error
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index 5f689e18..249e8c98 100644
+index 5f689e1..249e8c9 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
 @@ -166,7 +166,6 @@ dnl is added to the gpg_config_script_warn variable.
@@ -281,7 +281,7 @@ index 5f689e18..249e8c98 100644
 -  AC_SUBST(GPGME_GLIB_LIBS)
  ])
 diff --git a/src/gpgme.pc.in b/src/gpgme.pc.in
-index 9ddef5cd..932645be 100644
+index 9ddef5c..932645b 100644
 --- a/src/gpgme.pc.in
 +++ b/src/gpgme.pc.in
 @@ -9,6 +9,6 @@ Name: gpgme
@@ -293,6 +293,3 @@ index 9ddef5cd..932645be 100644
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lgpgme
  URL: https://www.gnupg.org/software/gpgme/index.html
--- 
-2.25.1
-

@@ -280,7 +280,9 @@ Follow these steps to create an :term:`Initramfs` image:
 #. *Create the Initramfs Image Recipe:* You can reference the
    ``core-image-minimal-initramfs.bb`` recipe found in the
    ``meta/recipes-core`` directory of the :term:`Source Directory`
-   as an example from which to work.
+   as an example from which to work. The ``core-image-minimal-initramfs`` recipe
+   is based on the :ref:`initramfs-framework <dev-manual/building:Customizing an
+   Initramfs using \`\`initramfs-framework\`\`>` recipe described below.
 
 #. *Decide if You Need to Bundle the Initramfs Image Into the Kernel
    Image:* If you want the :term:`Initramfs` image that is built to be bundled
@@ -307,6 +309,86 @@ Follow these steps to create an :term:`Initramfs` image:
    dependency of the kernel image, the :term:`Initramfs` image is built as well
    and bundled with the kernel image if you used the
    :term:`INITRAMFS_IMAGE_BUNDLE` variable described earlier.
+
+Customizing an Initramfs using ``initramfs-framework``
+------------------------------------------------------
+
+The ``core-image-minimal-initramfs.bb`` recipe found in
+:oe_git:`meta/recipes-core/images
+</openembedded-core/tree/meta/recipes-core/images>` uses the
+:oe_git:`initramfs-framework_1.0.bb
+</openembedded-core/tree/meta/recipes-core/initrdscripts/initramfs-framework_1.0.bb>`
+recipe as its base component. The goal of the ``initramfs-framework`` recipe is
+to provide the building blocks to build a customized :term:`Initramfs`.
+
+The ``initramfs-framework`` recipe relies on shell initialization scripts
+defined in :oe_git:`meta/recipes-core/initrdscripts/initramfs-framework
+</openembedded-core/tree/meta/recipes-core/initrdscripts/initramfs-framework>`. Since some of
+these scripts do not apply for all use cases, the ``initramfs-framework`` recipe
+defines different packages:
+
+-  ``initramfs-framework-base``: this package installs the basic components of
+   an :term:`Initramfs`, such as the ``init`` script or the ``/dev/console``
+   character special file. As this package is a runtime dependency of all
+   modules listed below, it is automatically pulled in when one of the modules
+   is installed in the image.
+-  ``initramfs-module-exec``: support for execution of applications.
+-  ``initramfs-module-mdev``: support for `mdev
+   <https://wiki.gentoo.org/wiki/Mdev>`__.
+-  ``initramfs-module-udev``: support for :wikipedia:`Udev <Udev>`.
+-  ``initramfs-module-e2fs``: support for :wikipedia:`ext4/ext3/ext2
+   <Extended_file_system>` filesystems.
+-  ``initramfs-module-nfsrootfs``: support for locating and mounting the root
+   partition via :wikipedia:`NFS <Network_File_System>`.
+-  ``initramfs-module-rootfs``: support for locating and mounting the root
+   partition.
+-  ``initramfs-module-debug``: dynamic debug support.
+-  ``initramfs-module-lvm``: :wikipedia:`LVM <Logical_volume_management>` rootfs support.
+-  ``initramfs-module-overlayroot``: support for mounting a read-write overlay
+   on top of a read-only root filesystem.
+
+In addition to the packages defined by the ``initramfs-framework`` recipe
+itself, the following packages are defined by the recipes present in
+:oe_git:`meta/recipes-core/initrdscripts </openembedded-core/tree/meta/recipes-core/initrdscripts>`:
+
+-  ``initramfs-module-install``: module to create and install a partition layout
+   on a selected block device.
+-  ``initramfs-module-install-efi``: module to create and install an EFI
+   partition layout on a selected block device.
+-  ``initramfs-module-setup-live``: module to start a shell in the
+   :term:`Initramfs` if ``root=/dev/ram0`` in passed in the `Kernel command-line
+   <https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html>`__
+   or the ``root=`` parameter was not passed.
+
+To customize the :term:`Initramfs`, you can add or remove packages listed
+earlier from the :term:`PACKAGE_INSTALL` variable with a :ref:`bbappend
+<dev-manual/layers:Appending Other Layers Metadata With Your Layer>` on the
+``core-image-minimal-initramfs`` recipe, or create a custom recipe for the
+:term:`Initramfs` taking ``core-image-minimal-initramfs`` as example.
+
+Custom scripts can be added to the :term:`Initramfs` by writing your own
+recipes. The recipes are conventionally named ``initramfs-module-<module name>``
+where ``<module name>`` is the name of the module. The recipe should set its
+:term:`RDEPENDS` package-specific variables to include
+``initramfs-framework-base`` and the other packages on which the module depends
+at runtime.
+
+The recipe must install shell initialization scripts in :term:`${D} <D>`\
+``/init.d`` and must follow the ``<number>-<script name>`` naming scheme where:
+
+-  ``<number>`` is a *two-digit* number that affects the execution order of the
+   script compared to others. For example, the script ``80-setup-live`` would be
+   executed after ``01-udev`` because 80 is greater than 01.
+
+   This number being two-digits is important here as the scripts are executed
+   alphabetically. For example, the script ``10-script`` would be executed
+   before the script ``8-script``, because ``1`` is inferior to ``8``.
+   Therefore, the script should be named ``08-script``.
+
+-  ``<script name>`` is the script name which you can choose freely.
+
+   If two script use the same ``<number>``, they are sorted alphabetically based
+   on ``<script name>``.
 
 Bundling an Initramfs Image From a Separate Multiconfig
 -------------------------------------------------------

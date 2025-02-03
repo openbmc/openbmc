@@ -1,0 +1,26 @@
+From 5f0572acdca120e11f6d810765d7a6a3c593fcbb Mon Sep 17 00:00:00 2001
+From: Victor Zverovich <viz@meta.com>
+Date: Sat, 18 Jan 2025 09:00:22 -0800
+Subject: [PATCH] Workaround a compilation error on gcc 9.4
+
+Upstream-Status: Backport [5f0572acdca120e11f6d810765d7a6a3c593fcbb]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ include/fmt/format.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/fmt/format.h b/include/fmt/format.h
+index 9cd523a9e6a5..4466b4f4d24b 100644
+--- a/include/fmt/format.h
++++ b/include/fmt/format.h
+@@ -227,7 +227,9 @@ FMT_CONSTEXPR inline void abort_fuzzing_if(bool condition) {
+ #if defined(FMT_USE_STRING_VIEW)
+ template <typename Char> using std_string_view = std::basic_string_view<Char>;
+ #else
+-template <typename T> struct std_string_view {};
++template <typename Char> struct std_string_view {
++  operator basic_string_view<Char>() const;
++};
+ #endif
+ 
+ template <typename Char, Char... C> struct string_literal {

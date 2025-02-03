@@ -60,7 +60,7 @@ bindir_progs = "arch basename chcon cksum comm csplit cut dir dircolors dirname 
 base_bindir_progs = "cat chgrp chmod chown cp date dd echo false hostname kill ln ls mkdir \
                      mknod mv pwd rm rmdir sleep stty sync touch true uname stat"
 
-sbindir_progs= "chroot"
+sbindir_progs = "chroot"
 
 # Split stdbuf into its own package, so one can include
 # coreutils-stdbuf without getting the rest of coreutils, but make
@@ -182,7 +182,9 @@ RDEPENDS:${PN}-ptest += "bash findutils gawk make perl perl-modules python3-core
 # may need tweaking if DEPENDS changes
 # Can't use ${PN}-dev here since flags with overrides and key expansion not supported
 RRECOMMENDS:coreutils-dev[nodeprrecs] = "1"
-RRECOMMENDS:${PN}-dev += "acl-dev attr-dev gmp-dev libcap-dev bash-dev findutils-dev gawk-dev shadow-dev"
+DEVDEPS = "acl-dev attr-dev gmp-dev libcap-dev bash-dev findutils-dev gawk-dev shadow-dev"
+DEVDEPS:class-native = ""
+RRECOMMENDS:${PN}-dev += "${DEVDEPS}"
 
 do_install_ptest () {
     install -d ${D}${PTEST_PATH}/tests

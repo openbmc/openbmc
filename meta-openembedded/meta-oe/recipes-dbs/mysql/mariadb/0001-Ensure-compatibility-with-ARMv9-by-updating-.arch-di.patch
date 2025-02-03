@@ -1,4 +1,4 @@
-From 1b0c05b53ede7decb3f4dfe6187f9573cab5e0ab Mon Sep 17 00:00:00 2001
+From 0b1ba174bd5148c0675b335fcebde767a56e10bb Mon Sep 17 00:00:00 2001
 From: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
 Date: Mon, 2 Dec 2024 02:18:46 +0000
 Subject: [PATCH] Ensure compatibility with ARMv9 by updating .arch directive
@@ -19,11 +19,11 @@ Upstream-Status: Submitted
 
 Signed-off-by: Ruiqiang Hao <Ruiqiang.Hao@windriver.com>
 ---
- storage/innobase/sync/cache.cc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ storage/innobase/sync/cache.cc | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/storage/innobase/sync/cache.cc b/storage/innobase/sync/cache.cc
-index 43d642d05b5..af2d1f3d221 100644
+index 43d642d0..c5e67709 100644
 --- a/storage/innobase/sync/cache.cc
 +++ b/storage/innobase/sync/cache.cc
 @@ -82,7 +82,12 @@ static void pmem_cvap(const void* buf, size_t size)
@@ -38,7 +38,4 @@ index 43d642d05b5..af2d1f3d221 100644
 +
    __asm__ __volatile__("dmb ishst" ::: "memory");
  }
-
--- 
-2.43.0
-
+ 

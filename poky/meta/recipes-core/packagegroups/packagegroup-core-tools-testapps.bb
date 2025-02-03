@@ -17,6 +17,7 @@ KEXECTOOLS:mipsarcho32 ?= ""
 KEXECTOOLS:nios2 ?= ""
 KEXECTOOLS:riscv64 ?= ""
 KEXECTOOLS:riscv32 ?= ""
+KEXECTOOLS:loongarch64 ?= ""
 
 # go does not support ppc32, only ppc64
 # https://github.com/golang/go/issues/22885
@@ -45,7 +46,6 @@ X11TOOLS = "\
     "
 
 RDEPENDS:${PN} = "\
-    blktool \
     ${KEXECTOOLS} \
     alsa-utils-amixer \
     alsa-utils-aplay \

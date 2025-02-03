@@ -9,9 +9,6 @@ inherit pypi python_hatchling
 
 DEPENDS += "python3-hatch-vcs-native"
 
-UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/PyHamcrest/"
-UPSTREAM_CHECK_REGEX = "/PyHamcrest/(?P<pver>(\d+[\.\-_]*)+)"
-
 RDEPENDS:${PN} += " \
     python3-asyncio \
     python3-numbers \

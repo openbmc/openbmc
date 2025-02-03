@@ -14,6 +14,8 @@ SRC_URI = "git://github.com/swagger-api/swagger-ui;branch=master;protocol=https"
 
 SRCREV = "3c7e281d97fd3e70b25f7ff4a001eabd56e375d7"
 
+CVE_STATUS[CVE-2016-1000229] = "fixed-version: fixed since 2.2.1"
+
 S = "${WORKDIR}/git"
 
 do_install() {

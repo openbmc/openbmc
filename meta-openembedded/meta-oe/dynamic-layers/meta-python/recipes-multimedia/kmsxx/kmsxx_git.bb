@@ -31,5 +31,5 @@ do_install:append() {
     fi
 }
 
-FILES:${PN} ="${bindir} ${libdir}"
+FILES:${PN} = "${bindir} ${libdir}"
 FILES:${PN}-python += "${PYTHON_SITEPACKAGES_DIR}/*"

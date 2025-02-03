@@ -1,4 +1,4 @@
-From cb43ec15b700b25f3c4fe44043a1a021aaf5b768 Mon Sep 17 00:00:00 2001
+From 630736f427c0a1bd0be0b5a2f6d51d63b2c4c9fd Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 18 Oct 2021 12:05:49 +0200
 Subject: [PATCH] Revert "mozilla/certdata2pem.py: print a warning for expired
@@ -16,10 +16,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  3 files changed, 1 insertion(+), 13 deletions(-)
 
 diff --git a/debian/changelog b/debian/changelog
-index 531e4d0..4006509 100644
+index 52d41ca..bdb2c8a 100644
 --- a/debian/changelog
 +++ b/debian/changelog
-@@ -120,7 +120,6 @@ ca-certificates (20211004) unstable; urgency=low
+@@ -138,7 +138,6 @@ ca-certificates (20211004) unstable; urgency=low
      - "Trustis FPS Root CA"
      - "Staat der Nederlanden Root CA - G3"
    * Blacklist expired root certificate "DST Root CA X3" (closes: #995432)
@@ -28,7 +28,7 @@ index 531e4d0..4006509 100644
   -- Julien Cristau <jcristau@debian.org>  Thu, 07 Oct 2021 17:12:47 +0200
  
 diff --git a/debian/control b/debian/control
-index 4434b7a..5c6ba24 100644
+index b5f2ab0..d0e830e 100644
 --- a/debian/control
 +++ b/debian/control
 @@ -3,7 +3,7 @@ Section: misc
@@ -41,7 +41,7 @@ index 4434b7a..5c6ba24 100644
  Rules-Requires-Root: no
  Vcs-Git: https://salsa.debian.org/debian/ca-certificates.git
 diff --git a/mozilla/certdata2pem.py b/mozilla/certdata2pem.py
-index ede23d4..7d796f1 100644
+index 4df86a2..7d796f1 100644
 --- a/mozilla/certdata2pem.py
 +++ b/mozilla/certdata2pem.py
 @@ -21,16 +21,12 @@
@@ -75,6 +75,3 @@ index ede23d4..7d796f1 100644
          bname = obj['CKA_LABEL'][1:-1].replace('/', '_')\
                                        .replace(' ', '_')\
                                        .replace('(', '=')\
--- 
-2.20.1
-

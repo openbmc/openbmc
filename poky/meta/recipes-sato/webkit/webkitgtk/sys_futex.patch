@@ -1,0 +1,16 @@
+Fix build on newer 32bit architectures with only 64bit time_t
+
+Upstream-Status: Submitted [https://chromium-review.googlesource.com/c/angle/angle/+/6108397]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/Source/ThirdParty/ANGLE/src/common/SimpleMutex.cpp
++++ b/Source/ThirdParty/ANGLE/src/common/SimpleMutex.cpp
+@@ -17,6 +17,9 @@
+ #        include <linux/futex.h>
+ #        include <sys/syscall.h>
+ #        include <unistd.h>
++#        if !defined(SYS_futex) && defined(SYS_futex_time64)
++#           define SYS_futex SYS_futex_time64
++#        endif
+ #    endif  // defined(ANGLE_PLATFORM_LINUX) || defined(ANGLE_PLATFORM_ANDROID)
+ 
+ #    if defined(ANGLE_PLATFORM_WINDOWS)

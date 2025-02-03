@@ -10,7 +10,7 @@ Execution Flow within the Autobuilder
 The "a-full" and "a-quick" targets are the usual entry points into the
 Autobuilder and it makes sense to follow the process through the system
 starting there. This is best visualized from the :yocto_ab:`Autobuilder
-Console view </typhoon/#/console>`.
+Console view </valkyrie/#/console>`.
 
 Each item along the top of that view represents some "target build" and
 these targets are all run in parallel. The 'full' build will trigger the

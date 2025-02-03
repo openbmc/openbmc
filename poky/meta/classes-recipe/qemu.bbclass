@@ -60,18 +60,5 @@ def qemu_run_binary(data, rootfs_path, binary):
 # this dance). For others (e.g. arm) a -cpu option is not necessary, since the
 # qemu-arm default CPU supports all required architecture levels.
 
-QEMU_OPTIONS = "-r ${OLDEST_KERNEL} ${@d.getVar("QEMU_EXTRAOPTIONS_%s" % d.getVar('PACKAGE_ARCH')) or ""}"
-QEMU_OPTIONS[vardeps] += "QEMU_EXTRAOPTIONS_${PACKAGE_ARCH}"
-
-QEMU_EXTRAOPTIONS_ppce500v2 = " -cpu e500v2"
-QEMU_EXTRAOPTIONS_ppce500mc = " -cpu e500mc"
-QEMU_EXTRAOPTIONS_ppce5500 = " -cpu e500mc"
-QEMU_EXTRAOPTIONS_ppc64e5500 = " -cpu e500mc"
-QEMU_EXTRAOPTIONS_ppce6500 = " -cpu e500mc"
-QEMU_EXTRAOPTIONS_ppc64e6500 = " -cpu e500mc"
-QEMU_EXTRAOPTIONS_ppc7400 = " -cpu 7400"
-QEMU_EXTRAOPTIONS_powerpc64le = " -cpu POWER9"
-# Some packages e.g. fwupd sets PACKAGE_ARCH = MACHINE_ARCH and uses meson which
-# needs right options to usermode qemu
-QEMU_EXTRAOPTIONS_qemuppc = " -cpu 7400"
-QEMU_EXTRAOPTIONS_qemuppc64 = " -cpu POWER9"
+QEMU_OPTIONS = "-r ${OLDEST_KERNEL} ${@d.getVar("QEMU_EXTRAOPTIONS:tune-%s" % d.getVar('TUNE_PKGARCH')) or ""}"
+QEMU_OPTIONS[vardeps] += "QEMU_EXTRAOPTIONS:tune-${TUNE_PKGARCH}"

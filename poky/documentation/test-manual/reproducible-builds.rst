@@ -91,13 +91,21 @@ run::
 
    oe-selftest -r reproducible.ReproducibleTests.test_reproducible_builds
 
-This defaults to including a ``world`` build so, if other layers are added, it would
-also run the tests for recipes in the additional layers. Different build targets
-can be defined using the :term:`OEQA_REPRODUCIBLE_TEST_TARGET` variable in ``local.conf``.
-The first build will be run using :ref:`Shared State <overview-manual/concepts:Shared State>` if
-available, the second build explicitly disables
-:ref:`Shared State <overview-manual/concepts:Shared State>` except for recipes defined in
-the :term:`OEQA_REPRODUCIBLE_TEST_SSTATE_TARGETS` variable, and builds on the
+This defaults to including a ``world`` build so, if other layers are added, it
+would also run the tests for recipes in the additional layers. Different build
+targets can be defined using the :term:`OEQA_REPRODUCIBLE_TEST_TARGET` variable
+in ``local.conf``. For example, running reproducibility tests for only the
+``python3-numpy`` recipe can be done by setting::
+
+   OEQA_REPRODUCIBLE_TEST_TARGET = "python3-numpy"
+
+in local.conf before running the ``oe-selftest`` command shown above.
+
+Reproducibility builds the target list twice. The first build will be run using
+:ref:`Shared State <overview-manual/concepts:Shared State>` if available, the
+second build explicitly disables :ref:`Shared State
+<overview-manual/concepts:Shared State>` except for recipes defined in the
+:term:`OEQA_REPRODUCIBLE_TEST_SSTATE_TARGETS` variable, and builds on the
 specific host the build is running on. This means we can test reproducibility
 builds between different host distributions over time on the Autobuilder.
 
@@ -111,12 +119,8 @@ https://autobuilder.yocto.io/pub/repro-fail/ in the form ``oe-reproducible +
 The project's current reproducibility status can be seen at
 :yocto_home:`/reproducible-build-results/`
 
-You can also check the reproducibility status on supported host distributions:
-
--  CentOS: :yocto_ab:`/typhoon/#/builders/reproducible-centos`
--  Debian: :yocto_ab:`/typhoon/#/builders/reproducible-debian`
--  Fedora: :yocto_ab:`/typhoon/#/builders/reproducible-fedora`
--  Ubuntu: :yocto_ab:`/typhoon/#/builders/reproducible-ubuntu`
+You can also check the reproducibility status on the Autobuilder:
+:yocto_ab:`/valkyrie/#/builders/reproducible`.
 
 ===============================
 Can I test my layer or recipes?

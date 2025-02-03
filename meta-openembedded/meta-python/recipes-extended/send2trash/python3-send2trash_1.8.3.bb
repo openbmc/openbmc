@@ -7,6 +7,7 @@ inherit pypi python_setuptools_build_meta
 SRC_URI[sha256sum] = "b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf"
 
 PYPI_PACKAGE = "Send2Trash"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 RDEPENDS:${PN} += "\
     python3-io \

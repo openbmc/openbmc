@@ -155,12 +155,12 @@ python populate_packages:prepend() {
 PACKAGES =+ "${PN}-tools ${PN}-tests ${PN}-client"
 
 FILES:${PN}-tools = "${bindir}/wispr"
-RDEPENDS:${PN}-tools ="${PN}"
+RDEPENDS:${PN}-tools = "${PN}"
 
 FILES:${PN}-tests = "${bindir}/*-test"
 
 FILES:${PN}-client = "${bindir}/connmanctl"
-RDEPENDS:${PN}-client ="${PN}"
+RDEPENDS:${PN}-client = "${PN}"
 
 FILES:${PN} = "${bindir}/* ${sbindir}/* ${libexecdir}/* ${libdir}/lib*.so.* \
             ${libdir}/connman/plugins \

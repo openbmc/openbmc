@@ -1,18 +1,17 @@
-From f15fbdf1244ca9ce01c5507660a86d685ed88bcf Mon Sep 17 00:00:00 2001
+From 2e64c0c22f630cbc301d385e46021853116f9c75 Mon Sep 17 00:00:00 2001
 From: Sumit Garg <sumit.garg@linaro.org>
 Date: Mon, 21 Mar 2022 15:08:40 +0800
 Subject: [PATCH] Fix library LZ4 lookup.
 
+Upstream-Status: Pending
 Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
-Upstream-Status: Pending
-
  cmake/FindLZ4.cmake | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/cmake/FindLZ4.cmake b/cmake/FindLZ4.cmake
-index eebd859..094241c 100644
+index eebd8596..094241ce 100644
 --- a/cmake/FindLZ4.cmake
 +++ b/cmake/FindLZ4.cmake
 @@ -1,5 +1,10 @@
@@ -28,6 +27,3 @@ index eebd859..094241c 100644
  
  if(LZ4_INCLUDE_DIRS AND EXISTS "${LZ4_INCLUDE_DIRS}/lz4.h")
    file(STRINGS "${LZ4_INCLUDE_DIRS}/lz4.h" LZ4_H REGEX "^#define LZ4_VERSION_[MR]")
--- 
-2.25.1
-

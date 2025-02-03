@@ -288,7 +288,7 @@ def fitimage_emit_subsection_signature(d, fd, sign_images_list):
 def fitimage_emit_section_config(d, fd, dtb, kernelcount, ramdiskcount, setupcount, bootscriptid, compatible, dtbcount):
     sign = d.getVar("FITIMAGE_SIGN")
     conf_default = None
-    conf_prefix = d.getVar('FITIMAGE_CONFIG_PREFIX', True) or ""
+    conf_prefix = d.getVar('FITIMAGE_CONFIG_PREFIX') or ""
 
     bb.note(f"Adding {dtb} section to ITS file")
 
@@ -302,7 +302,7 @@ def fitimage_emit_section_config(d, fd, dtb, kernelcount, ramdiskcount, setupcou
     if bootscriptid:
          conf_desc += ", u-boot script"
     if dtbcount == 1:
-        conf_default = d.getVar('FITIMAGE_DEFAULT_CONFIG', True) or f'{conf_prefix}{dtb}'
+        conf_default = d.getVar('FITIMAGE_DEFAULT_CONFIG') or f'{conf_prefix}{dtb}'
 
     if conf_default:
         fd.write(f'\t\tdefault = "{conf_default}";\n')

@@ -26,6 +26,7 @@
 
 # We need some variables from u-boot-config
 inherit uboot-config
+require conf/image-fitimage.conf
 
 # Enable use of a U-Boot fitImage
 UBOOT_FITIMAGE_ENABLE ?= "0"
@@ -85,9 +86,6 @@ UBOOT_FIT_KEY_SIGN_PKCS ?= "-x509"
 # ex: 1 32bits address, 2 64bits address
 UBOOT_FIT_ADDRESS_CELLS ?= "1"
 
-# This is only necessary for determining the signing configuration
-KERNEL_PN = "${PREFERRED_PROVIDER_virtual/kernel}"
-
 UBOOT_FIT_UBOOT_LOADADDRESS ?= "${UBOOT_LOADADDRESS}"
 UBOOT_FIT_UBOOT_ENTRYPOINT ?= "${UBOOT_ENTRYPOINT}"
 
@@ -96,8 +94,6 @@ python() {
     sign = d.getVar('UBOOT_SIGN_ENABLE') == '1'
     if d.getVar('UBOOT_FITIMAGE_ENABLE') == '1' or sign:
         d.appendVar('DEPENDS', " u-boot-tools-native dtc-native")
-    if sign:
-        d.appendVar('DEPENDS', " " + d.getVar('KERNEL_PN'))
 }
 
 concat_dtb() {
@@ -106,16 +102,26 @@ concat_dtb() {
 
 	if [ -e "${UBOOT_DTB_BINARY}" ]; then
 		# Re-sign the kernel in order to add the keys to our dtb
+		UBOOT_MKIMAGE_MODE="auto-conf"
+		# Signing individual images is not recommended as that
+		# makes fitImage susceptible to mix-and-match attack.
+		if [ "${FIT_SIGN_INDIVIDUAL}" = "1" ] ; then
+			UBOOT_MKIMAGE_MODE="auto"
+		fi
 		${UBOOT_MKIMAGE_SIGN} \
 			${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
-			-F -k "${UBOOT_SIGN_KEYDIR}" \
+			-f $UBOOT_MKIMAGE_MODE \
+			-k "${UBOOT_SIGN_KEYDIR}" \
+			-o "${FIT_HASH_ALG},${FIT_SIGN_ALG}" \
+			-g "${UBOOT_SIGN_IMG_KEYNAME}" \
 			-K "${UBOOT_DTB_BINARY}" \
-			-r ${B}/fitImage-linux \
+			-d /dev/null \
+			-r ${B}/unused.itb \
 			${UBOOT_MKIMAGE_SIGN_ARGS}
 		# Verify the kernel image and u-boot dtb
 		${UBOOT_FIT_CHECK_SIGN} \
 			-k "${UBOOT_DTB_BINARY}" \
-			-f ${B}/fitImage-linux
+			-f ${B}/unused.itb
 		cp ${UBOOT_DTB_BINARY} ${UBOOT_DTB_SIGNED}
 	fi
 
@@ -351,10 +357,6 @@ uboot_assemble_fitimage_helper() {
 }
 
 do_uboot_assemble_fitimage() {
-	if [ "${UBOOT_SIGN_ENABLE}" = "1" ] ; then
-		cp "${STAGING_DIR_HOST}/sysroot-only/fitImage" "${B}/fitImage-linux"
-	fi
-
 	if [ -n "${UBOOT_CONFIG}" ]; then
 		unset i
 		for config in ${UBOOT_MACHINE}; do

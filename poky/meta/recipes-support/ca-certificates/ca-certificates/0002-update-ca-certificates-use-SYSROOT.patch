@@ -1,19 +1,19 @@
-Upstream-Status: Pending
-
-From 724cb153ca0f607fb38b3a8db3ebb2742601cd81 Mon Sep 17 00:00:00 2001
+From cdb53438bae194c1281c31374a901ad7ee460408 Mon Sep 17 00:00:00 2001
 From: Andreas Oberritter <obi@opendreambox.org>
 Date: Tue, 19 Mar 2013 17:14:33 +0100
-Subject: [PATCH 2/2] update-ca-certificates: use $SYSROOT
+Subject: [PATCH] update-ca-certificates: use $SYSROOT
+
+Upstream-Status: Pending
 
 Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
 ---
- sbin/update-ca-certificates |   14 +++++++-------
+ sbin/update-ca-certificates | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)
 
-Index: git/sbin/update-ca-certificates
-===================================================================
---- git.orig/sbin/update-ca-certificates
-+++ git/sbin/update-ca-certificates
+diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
+index 5a0a1da..36cdd9a 100755
+--- a/sbin/update-ca-certificates
++++ b/sbin/update-ca-certificates
 @@ -24,12 +24,12 @@
  verbose=0
  fresh=0

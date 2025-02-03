@@ -1,0 +1,38 @@
+From ee185eda7b7ec9a0c82827fea197fbb73d971f93 Mon Sep 17 00:00:00 2001
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 29 Aug 2024 21:21:50 +0200
+Subject: [PATCH] Platform/StMmRpmb: Fix build
+
+Add some missing library class resolutions relating to changes in the
+core upstream EDK2 repo.
+
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+ .../PlatformStandaloneMmPkg/PlatformStandaloneMmRpmb.dsc       | 3 +++
+ 1 file changed, 3 insertions(+)
+
+Upstream-Status: Backport
+
+diff --git a/Platform/StandaloneMm/PlatformStandaloneMmPkg/PlatformStandaloneMmRpmb.dsc b/Platform/StandaloneMm/PlatformStandaloneMmPkg/PlatformStandaloneMmRpmb.dsc
+index 653029c52f..54c7a63b41 100644
+--- a/Platform/StandaloneMm/PlatformStandaloneMmPkg/PlatformStandaloneMmRpmb.dsc
++++ b/Platform/StandaloneMm/PlatformStandaloneMmPkg/PlatformStandaloneMmRpmb.dsc
+@@ -41,11 +41,14 @@
+   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
+   FvLib|StandaloneMmPkg/Library/FvLib/FvLib.inf
+   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
++  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
++  ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
+   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
+   MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
+   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf
+   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
++  PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
+-- 
+2.43.0
+

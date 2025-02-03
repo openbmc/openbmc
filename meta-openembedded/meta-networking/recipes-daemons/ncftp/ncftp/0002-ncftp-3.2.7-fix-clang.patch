@@ -1,0 +1,73 @@
+Fix compilation with clang-16
+
+aclocal.m4 contains code that no longer compiles: missing headers and missing
+return types.
+
+Reference:
+ https://gitweb.gentoo.org/repo/gentoo.git/tree/net-ftp/ncftp/files/ncftp-3.2.7-fix-clang.patch
+
+Upstream-Status: Inappropriate [unresponsive contact email address]
+
+Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/autoconf_local/aclocal.m4
++++ b/autoconf_local/aclocal.m4
+@@ -3057,6 +3057,7 @@ AC_TRY_LINK([
+ #include <sys/uio.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
++#include <string.h>
+ ],[
+ struct sockaddr_un uaddr;
+ 
+@@ -3285,6 +3286,7 @@ AC_TRY_LINK([
+ #ifdef HAVE_RESOLV_H
+ #	include <resolv.h>
+ #endif
++#include <string.h>
+ ],[
+ 	/* function-body */
+ 	int len;
+@@ -3363,6 +3365,7 @@ else
+ #include <stdio.h>
+ #include <stdlib.h>
+ 		 
++			int
+ 			main(int argc, char **argv)
+ 			{
+ 				/* Note:  don't actually call readline,
+@@ -5144,6 +5147,7 @@ do
+ #ifdef HAVE_STDLIB_H
+ #	include <stdlib.h>
+ #endif
++#include <string.h>
+ 
+ #ifdef HAVE_NCURSES_H
+ #	define NCURSES_OPAQUE 0
+@@ -5175,6 +5179,7 @@ do
+ #endif
+ 
+  
++int
+ main(int argc, char **argv)
+ {
+ 	/* Note:  don't actually call curses, since it may block;
+@@ -6509,7 +6514,6 @@ char *malloc();
+ #endif
+ #endif			/* MG */
+ 
+-int
+ int  main(void)
+ {
+ 	char *data, *data2, *data3;
+@@ -6606,8 +6610,9 @@ else
+ 	AC_CACHE_CHECK(whether setvbuf arguments are reversed,
+ 	  ac_cv_func_setvbuf_reversed,
+ 	[AC_TRY_RUN([#include <stdio.h>
++	$include <stdlib.h>
+ 	/* If setvbuf has the reversed format, exit 0. */
+-	main () {
++	int main (void) {
+ 	  /* This call has the arguments reversed.
+ 	     A reversed system may check and see that the address of main
+ 	     is not _IOLBF, _IONBF, or _IOFBF, and return nonzero.  */

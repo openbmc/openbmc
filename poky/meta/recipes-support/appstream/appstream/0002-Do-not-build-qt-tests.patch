@@ -1,4 +1,4 @@
-From a7721cf4f412fbe18fe15127bea7b1457b99f684 Mon Sep 17 00:00:00 2001
+From 43afdff090c4cbb2d3b4025a38b25a718c8f16b5 Mon Sep 17 00:00:00 2001
 From: Marc Ferland <marc.ferland@sonatest.com>
 Date: Fri, 26 Jul 2024 15:41:00 -0400
 Subject: [PATCH] Do not build qt/tests
@@ -23,10 +23,10 @@ Signed-off-by: Marc Ferland <marc.ferland@sonatest.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/qt/meson.build b/qt/meson.build
-index 1909bcf7..c3ca20fb 100644
+index 7d9ed7d..e319425 100644
 --- a/qt/meson.build
 +++ b/qt/meson.build
-@@ -148,5 +148,3 @@ install_data (
+@@ -150,5 +150,3 @@ install_data (
  
  # end of Qt version loop
  endforeach

@@ -1,4 +1,4 @@
-From fc9790b768971d5b9e9b6d215bc29885a646c335 Mon Sep 17 00:00:00 2001
+From 00b7725977043c628129560dd8ca798c0ecb8791 Mon Sep 17 00:00:00 2001
 From: Louis Rannou <lrannou@baylibre.com>
 Date: Thu, 15 Jun 2023 13:43:55 +0200
 Subject: [PATCH] base-passwd: add the wheel group

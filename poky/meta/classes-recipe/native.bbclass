@@ -119,6 +119,7 @@ SSTATE_SCAN_CMD ?= "${SSTATE_SCAN_CMD_NATIVE}"
 INHIBIT_SYSROOT_STRIP ?= "${@oe.utils.vartrue('DEBUG_BUILD', '1', '', d)}"
 
 python native_virtclass_handler () {
+    import re
     pn = e.data.getVar("PN")
     if not pn.endswith("-native"):
         return
@@ -158,10 +159,20 @@ python native_virtclass_handler () {
                 newdeps.append(dep.replace(pn, bpn) + "-native")
             else:
                 newdeps.append(dep)
-        d.setVar(varname, " ".join(newdeps))
+        output_varname = varname
+        # Handle ${PN}-xxx -> ${BPN}-xxx-native
+        if suffix != "${PN}" and "${PN}" in suffix:
+            output_varname = varname.replace("${PN}", "${BPN}") + "-native"
+            d.renameVar(varname, output_varname)
+        d.setVar(output_varname, " ".join(newdeps))
 
     map_dependencies("DEPENDS", e.data, selfref=False)
-    for pkg in e.data.getVar("PACKAGES", False).split():
+    # We need to handle things like ${@bb.utils.contains('PTEST_ENABLED', '1', '${PN}-ptest', '', d)}
+    # and not pass ${PN}-test since in the native case it would be ignored. This does mean we ignore
+    # anonymous python derived PACKAGES entries.
+    for pkg in re.split(r"\${@(?:{.*?}|.)+?}|\s", d.getVar("PACKAGES", False)):
+        if not pkg:
+            continue
         map_dependencies("RDEPENDS", e.data, pkg)
         map_dependencies("RRECOMMENDS", e.data, pkg)
         map_dependencies("RSUGGESTS", e.data, pkg)

@@ -22,7 +22,7 @@ DEPENDS = " \
     json-glib \
     libhandy \
     libical \
-    libpeas \
+    libpeas-1 \
     libsecret \
     libsoup \
     libstemmer \

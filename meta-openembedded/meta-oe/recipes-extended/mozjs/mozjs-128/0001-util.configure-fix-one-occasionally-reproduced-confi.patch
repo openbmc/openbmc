@@ -1,0 +1,47 @@
+From 683cd23dd269509a1d913adb2b049b84771e0a94 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 11 Nov 2021 16:05:54 +0800
+Subject: [PATCH] util.configure: fix one occasionally reproduced configure
+ failure
+
+error:
+| checking whether the C++ compiler supports -Wno-range-loop-analysis...
+| DEBUG: Creating /tmp/conftest.jr1qrcw3.cpp with content:
+| DEBUG: | int
+| DEBUG: | main(void)
+| DEBUG: | {
+| DEBUG: |
+| DEBUG: | ;
+| DEBUG: | return 0;
+| DEBUG: | }
+| DEBUG: Executing: aarch64-wrs-linux-g++ -mcpu=cortex-a53 -march=armv8-a+crc -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/mozjs/91.1.0-r0/recipe-sysroot /tmp/conftest.jr1qrcw3.cpp -Werror -Wrange-loop-analysis -c
+| DEBUG: The command returned non-zero exit status 1.
+| DEBUG: Its error output was:
+...
+| File "/mozjs/91.1.0-r0/firefox-91.1.0/build/moz.configure/util.configure", line 239, in try_invoke_compiler
+| os.remove(path)
+| FileNotFoundError: [Errno 2] No such file or directory: '/tmp/conftest.jr1qrcw3.cpp'
+
+It should be another process that deleted this file by using
+"rm -rf conftest*" inappropriately
+
+Upstream-Status: Submitted [https://bugzilla.mozilla.org/show_bug.cgi?id=1740667]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ build/moz.configure/util.configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/moz.configure/util.configure b/build/moz.configure/util.configure
+index d93b91fcdd..47ab8b92b9 100644
+--- a/build/moz.configure/util.configure
++++ b/build/moz.configure/util.configure
+@@ -256,7 +256,7 @@ def try_invoke_compiler(
+         "C++": ".cpp",
+     }[language]
+ 
+-    fd, path = mkstemp(prefix="conftest.", suffix=suffix, text=True)
++    fd, path = mkstemp(prefix="try_invoke_compiler_conftest.", suffix=suffix, text=True)
+     try:
+         source = source.encode("ascii", "replace")
+ 

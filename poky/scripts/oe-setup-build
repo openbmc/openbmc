@@ -18,8 +18,7 @@ def makebuildpath(topdir, template):
 
 def discover_templates(layers_file):
     if not os.path.exists(layers_file):
-        print("List of layers {} does not exist; were the layers set up using the setup-layers script?".format(layers_file))
-        return None
+        raise Exception("List of layers {} does not exist; were the layers set up using the setup-layers script or bitbake-setup tool?".format(layers_file))
 
     templates = []
     layers_list = json.load(open(layers_file))["layers"]
@@ -77,8 +76,7 @@ def find_template(template_name, templates):
         for t in templates:
             if t["templatename"] == template_name:
                 return t
-        print("Configuration {} is not one of {}, please try again.".format(template_name, [t["templatename"] for t in templates]))
-        return None
+        raise Exception("Configuration {} is not one of {}, please try again.".format(template_name, [t["templatename"] for t in templates]))
 
 def setup_build_env(args):
     templates = discover_templates(args.layerlist)

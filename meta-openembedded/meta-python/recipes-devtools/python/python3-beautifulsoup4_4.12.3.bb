@@ -10,9 +10,11 @@ inherit pypi python_hatchling
 RDEPENDS:${PN} = "\
     python3-html5lib \
     python3-lxml \
-    python3-soupsieve \
     python3-html \
     python3-logging \
+"
+RDEPENDS:${PN}:append:class-target = " \
+    python3-soupsieve \
 "
 
 BBCLASSEXTEND = "native nativesdk"

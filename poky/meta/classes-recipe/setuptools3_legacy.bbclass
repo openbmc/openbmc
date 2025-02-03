@@ -79,6 +79,6 @@ setuptools3_legacy_do_install[vardepsexclude] = "MACHINE"
 
 EXPORT_FUNCTIONS do_configure do_compile do_install
 
-export LDSHARED="${CCLD} -shared"
+export LDSHARED = "${CCLD} -shared"
 DEPENDS += "python3-setuptools-native"
 

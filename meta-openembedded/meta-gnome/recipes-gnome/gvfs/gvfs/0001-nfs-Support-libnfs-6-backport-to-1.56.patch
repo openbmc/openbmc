@@ -1,0 +1,278 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Jan Alexander Steffens (heftig)" <heftig@archlinux.org>
+Date: Sun, 19 Jan 2025 14:28:25 +0100
+Subject: [PATCH] nfs: Support libnfs 6 (backport to 1.56)
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gvfs/-/commit/50c0845928983830ebe12d1d2ba82a6735cec77b]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ daemon/gvfsbackendnfs.c | 79 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
+
+diff --git a/daemon/gvfsbackendnfs.c b/daemon/gvfsbackendnfs.c
+index c9e9ed60b938..1b66bb040e1d 100644
+--- a/daemon/gvfsbackendnfs.c
++++ b/daemon/gvfsbackendnfs.c
+@@ -407,27 +407,33 @@ read_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
+     {
+       GVfsJobRead *op_job = G_VFS_JOB_READ (job);
+ 
++#ifndef LIBNFS_API_V2
+       memcpy (op_job->buffer, data, err);
++#endif
+       g_vfs_job_read_set_size (op_job, err);
+       g_vfs_job_succeeded (job);
+     }
+   else
+     {
+       g_vfs_job_failed_from_errno (job, -err);
+     }
+ }
+ 
+ static gboolean
+ try_read (GVfsBackend *backend,
+           GVfsJobRead *job,
+           GVfsBackendHandle _handle,
+           char *buffer,
+           gsize bytes_requested)
+ {
+   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
+   struct nfsfh *fh = _handle;
+ 
++#ifdef LIBNFS_API_V2
++  nfs_read_async (op_backend->ctx, fh, buffer, bytes_requested, read_cb, job);
++#else
+   nfs_read_async (op_backend->ctx, fh, bytes_requested, read_cb, job);
++#endif
+   return TRUE;
+ }
+ 
+@@ -755,29 +761,40 @@ try_append_to (GVfsBackend *backend,
+ {
+   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
+ 
++#ifdef LIBNFS_API_V2
++  nfs_open2_async (op_backend->ctx,
++                   filename,
++                   O_CREAT | O_APPEND,
++                   (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
++                   append_cb, job);
++#else
+   nfs_create_async (op_backend->ctx,
+                     filename,
+                     O_APPEND,
+                     (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                     append_cb, job);
++#endif
+   return TRUE;
+ }
+ 
+ /* The following types and functions implement an asynchronous copy which calls
+  * a callback function with a boolean success or failure.  This is used in some
+  * cases for backup files when replacing. */
+ #define COPY_BLKSIZE (64 * 1024)
+ 
+ typedef void (*CopyFileCallback) (gboolean success, void *private_data);
+ 
+ typedef struct
+ {
+   struct nfsfh *srcfh;
+   struct nfsfh *destfh;
+   char *dest;
+   int mode;
+   CopyFileCallback cb;
+   void *private_data;
++#ifdef LIBNFS_API_V2
++  char buffer[COPY_BLKSIZE];
++#endif
+ } CopyHandle;
+ 
+ static void
+@@ -805,56 +822,74 @@ copy_write_cb (int err,
+   CopyHandle *handle = private_data;
+ 
+   if (err > 0)
++#ifdef LIBNFS_API_V2
++    nfs_read_async (ctx, handle->srcfh, handle->buffer, COPY_BLKSIZE, copy_read_cb, handle);
++#else
+     nfs_read_async (ctx, handle->srcfh, COPY_BLKSIZE, copy_read_cb, handle);
++#endif
+   else
+     copy_handle_complete (ctx, handle, FALSE);
+ }
+ 
+ static void
+ copy_read_cb (int err, struct nfs_context *ctx, void *data, void *private_data)
+ {
+   CopyHandle *handle = private_data;
+ 
+   if (err == 0)
+     copy_handle_complete (ctx, handle, TRUE);
+   else if (err > 0)
++#ifdef LIBNFS_API_V2
++    nfs_write_async (ctx, handle->destfh, handle->buffer, err, copy_write_cb, handle);
++#else
+     nfs_write_async (ctx, handle->destfh, err, data, copy_write_cb, handle);
++#endif
+   else
+     copy_handle_complete (ctx, handle, FALSE);
+ }
+ 
+ static void
+ copy_open_dest_cb (int err,
+                    struct nfs_context *ctx,
+                    void *data, void *private_data)
+ {
+   CopyHandle *handle = private_data;
+ 
+   if (err == 0)
+     {
+       handle->destfh = data;
+ 
++#ifdef LIBNFS_API_V2
++      nfs_read_async (ctx, handle->srcfh, handle->buffer, COPY_BLKSIZE, copy_read_cb, handle);
++#else
+       nfs_read_async (ctx, handle->srcfh, COPY_BLKSIZE, copy_read_cb, handle);
++#endif
+     }
+   else
+     {
+       copy_handle_complete (ctx, handle, FALSE);
+     }
+ }
+ 
+ static void
+ copy_open_source_cb (int err,
+                      struct nfs_context *ctx,
+                      void *data, void *private_data)
+ {
+   CopyHandle *handle = private_data;
+ 
+   if (err == 0)
+     {
+       handle->srcfh = data;
++#ifdef LIBNFS_API_V2
++      nfs_open2_async (ctx,
++                       handle->dest, O_CREAT | O_TRUNC, handle->mode & 0777,
++                       copy_open_dest_cb, handle);
++#else
+       nfs_create_async (ctx,
+                         handle->dest, O_TRUNC, handle->mode & 0777,
+                         copy_open_dest_cb, handle);
++#endif
+       g_free (handle->dest);
+     }
+   else
+@@ -935,11 +970,19 @@ replace_backup_chown_cb (int err,
+       GVfsJobOpenForWrite *op_job = G_VFS_JOB_OPEN_FOR_WRITE (job);
+       GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (op_job->backend);
+ 
++#ifdef LIBNFS_API_V2
++      nfs_open2_async (op_backend->ctx,
++                       op_job->filename,
++                       O_CREAT | O_TRUNC,
++                       (op_job->flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
++                       replace_trunc_cb, handle);
++#else
+       nfs_create_async (op_backend->ctx,
+                         op_job->filename,
+                         O_TRUNC,
+                         (op_job->flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                         replace_trunc_cb, handle);
++#endif
+     }
+   else
+     {
+@@ -1019,11 +1062,19 @@ replace_truncate (struct nfs_context *ctx, WriteHandle *handle)
+     }
+   else
+     {
++#ifdef LIBNFS_API_V2
++      nfs_open2_async (ctx,
++                       op_job->filename,
++                       O_CREAT | O_TRUNC,
++                       (op_job->flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
++                       replace_trunc_cb, handle);
++#else
+       nfs_create_async (ctx,
+                         op_job->filename,
+                         O_TRUNC,
+                         (op_job->flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                         replace_trunc_cb, handle);
++#endif
+     }
+ }
+ 
+@@ -1211,11 +1262,19 @@ replace_stat_cb (int err,
+               handle->tempname = g_build_filename (dirname, basename, NULL);
+               g_free (dirname);
+ 
++#ifdef LIBNFS_API_V2
++              nfs_open2_async (ctx,
++                               handle->tempname,
++                               O_CREAT | O_EXCL,
++                               (op_job->flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
++                               replace_temp_cb, handle);
++#else
+               nfs_create_async (ctx,
+                                 handle->tempname,
+                                 O_EXCL,
+                                 (op_job->flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                                 replace_temp_cb, handle);
++#endif
+             }
+           else
+             {
+@@ -1299,11 +1358,19 @@ try_replace (GVfsBackend *backend,
+ {
+   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
+ 
++#ifdef LIBNFS_API_V2
++  nfs_open2_async (op_backend->ctx,
++                   filename,
++                   O_CREAT | O_EXCL,
++                   (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
++                   replace_create_cb, job);
++#else
+   nfs_create_async (op_backend->ctx,
+                     filename,
+                     O_EXCL,
+                     (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                     replace_create_cb, job);
++#endif
+   return TRUE;
+ }
+ 
+@@ -1337,11 +1404,19 @@ try_create (GVfsBackend *backend,
+ {
+   GVfsBackendNfs *op_backend = G_VFS_BACKEND_NFS (backend);
+ 
++#ifdef LIBNFS_API_V2
++  nfs_open2_async (op_backend->ctx,
++                   filename,
++                   O_CREAT | O_EXCL,
++                   (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
++                   create_cb, job);
++#else
+   nfs_create_async (op_backend->ctx,
+                     filename,
+                     O_EXCL,
+                     (flags & G_FILE_CREATE_PRIVATE ? 0600 : 0666) & ~op_backend->umask,
+                     create_cb, job);
++#endif
+   return TRUE;
+ }
+ 
+@@ -1372,7 +1447,11 @@ try_write (GVfsBackend *backend,
+   WriteHandle *handle = _handle;
+   struct nfsfh *fh = handle->fh;
+ 
++#ifdef LIBNFS_API_V2
++  nfs_write_async (op_backend->ctx, fh, buffer, buffer_size, write_cb, job);
++#else
+   nfs_write_async (op_backend->ctx, fh, buffer_size, buffer, write_cb, job);
++#endif
+   return TRUE;
+ }
+ 

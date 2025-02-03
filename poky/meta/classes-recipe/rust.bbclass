@@ -43,9 +43,9 @@ HOST_CFLAGS   ?= "${CFLAGS}"
 HOST_CXXFLAGS ?= "${CXXFLAGS}"
 HOST_CPPFLAGS ?= "${CPPFLAGS}"
 
-rustlib_suffix="${TUNE_ARCH}${TARGET_VENDOR}-${TARGET_OS}/rustlib/${RUST_HOST_SYS}/lib"
+rustlib_suffix = "${TUNE_ARCH}${TARGET_VENDOR}-${TARGET_OS}/rustlib/${RUST_HOST_SYS}/lib"
 # Native sysroot standard library path
-rustlib_src="${prefix}/lib/${rustlib_suffix}"
+rustlib_src = "${prefix}/lib/${rustlib_suffix}"
 # Host sysroot standard library path
-rustlib="${libdir}/${rustlib_suffix}"
-rustlib:class-native="${libdir}/rustlib/${BUILD_SYS}/lib"
+rustlib = "${libdir}/${rustlib_suffix}"
+rustlib:class-native = "${libdir}/rustlib/${BUILD_SYS}/lib"

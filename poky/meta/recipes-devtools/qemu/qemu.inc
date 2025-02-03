@@ -29,17 +29,15 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0006-qemu-Determinism-fixes.patch \
            file://0007-tests-meson.build-use-relative-path-to-refer-to-file.patch \
            file://0008-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
-           file://0009-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
            file://0010-configure-lookup-meson-exutable-from-PATH.patch \
            file://0011-qemu-Ensure-pip-and-the-python-venv-aren-t-used-for-.patch \
            file://0001-sched_attr-Do-not-define-for-glibc-2.41.patch \
-           file://0001-util-util-cpuinfo-riscv.c-fix-riscv64-build-on-musl-.patch \
            file://qemu-guest-agent.init \
            file://qemu-guest-agent.udev \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-SRC_URI[sha256sum] = "7dc0f9da5491ff449500f3310063a36b619f236ee45706fd0846eb37d4bba889"
+SRC_URI[sha256sum] = "f859f0bc65e1f533d040bbe8c92bcfecee5af2c921a6687c652fb44d089bd894"
 
 CVE_STATUS[CVE-2007-0998] = "not-applicable-config: The VNC server can expose host files uder some circumstances. We don't enable it by default."
 

@@ -8,6 +8,7 @@ SRC_URI = "https://github.com/akheron/${BPN}/releases/download/v${PV}/${BP}.tar.
            file://0001-Fix-overwriting-linker-flags.patch \
            file://0001-Honour-multilib-paths.patch \
            file://0001-add-back-JSON_INTEGER_IS_LONG_LONG-for-cmake.patch \
+           file://0001-Only-export-symbols-starting-with-json_-and-jansson_.patch \
            "
 SRC_URI[sha256sum] = "fba956f27c6ae56ce6dfd52fbf9d20254aad42821f74fa52f83957625294afb9"
 

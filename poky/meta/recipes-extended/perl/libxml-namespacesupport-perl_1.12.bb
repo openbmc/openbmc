@@ -23,5 +23,5 @@ inherit cpan ptest-perl
 
 RDEPENDS:${PN}-ptest += "perl-module-test-more"
 
-BBCLASSEXTEND="native nativesdk"
+BBCLASSEXTEND = "native nativesdk"
 

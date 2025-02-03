@@ -119,8 +119,8 @@ Here is a list of supported recipes:
    deployed to a separate partition so that you can boot into it and use
    it to deploy a second image to be tested. You can find more
    information about runtime testing in the
-   ":ref:`dev-manual/runtime-testing:performing automated runtime testing`"
-   section in the Yocto Project Development Tasks Manual.
+   ":ref:`test-manual/runtime-testing:performing automated runtime testing`"
+   section in the Yocto Project Test Environment Manual.
 
 -  ``core-image-testmaster-initramfs``: A RAM-based Initial Root
    Filesystem (:term:`Initramfs`) image tailored for use with the

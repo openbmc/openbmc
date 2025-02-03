@@ -1,4 +1,4 @@
-From 0c97d5eacae4f584313c9251e585bb0246cceffc Mon Sep 17 00:00:00 2001
+From e23bacb04ff77f86e56d6684451e5e93b59f1b0a Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 22 Nov 2024 22:52:31 +0100
 Subject: [PATCH] tests/egl/spec: make egl_ext_surface_compression conditional
@@ -20,7 +20,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  2 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt b/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt
-index d9540bcfde27..01a70164f444 100644
+index d9540bcfd..01a70164f 100644
 --- a/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt
 +++ b/tests/egl/spec/egl_ext_surface_compression/CMakeLists.gles3.txt
 @@ -2,10 +2,12 @@ link_libraries(
@@ -39,7 +39,7 @@ index d9540bcfde27..01a70164f444 100644
  
  # vim: ft=cmake:
 diff --git a/tests/egl/spec/egl_ext_surface_compression/create_surface.c b/tests/egl/spec/egl_ext_surface_compression/create_surface.c
-index e3d55d4331fb..35f13fd007b4 100644
+index e3d55d433..35f13fd00 100644
 --- a/tests/egl/spec/egl_ext_surface_compression/create_surface.c
 +++ b/tests/egl/spec/egl_ext_surface_compression/create_surface.c
 @@ -25,7 +25,6 @@
@@ -50,6 +50,3 @@ index e3d55d4331fb..35f13fd007b4 100644
  #include "../../egl-wayland.h"
  
  static enum piglit_result
--- 
-2.39.5
-

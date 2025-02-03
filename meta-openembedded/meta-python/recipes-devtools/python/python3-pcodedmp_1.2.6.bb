@@ -7,6 +7,6 @@ SRC_URI[sha256sum] = "025f8c809a126f45a082ffa820893e6a8d990d9d7ddb68694b5a9f0a6d
 
 inherit pypi setuptools3
 
-PYPI_PACKAGE="pcodedmp"
+PYPI_PACKAGE = "pcodedmp"
 
 BBCLASSEXTEND = "native nativesdk"

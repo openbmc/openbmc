@@ -69,4 +69,7 @@ do_install:append() {
 FILES:${PN} += "${base_libdir}/security/* ${base_libdir}/ecryptfs/*"
 
 RDEPENDS:${PN} += "cryptsetup"
-RRECOMMENDS:${PN} = "gettext-runtime"
+RRECOMMENDS:${PN} = " \
+    gettext-runtime \
+    kernel-module-ecryptfs \
+"

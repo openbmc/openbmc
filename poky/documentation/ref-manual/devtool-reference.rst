@@ -553,6 +553,26 @@ the packages are already on the target. Consequently, when a runtime
 call is made in the application for a dependent function (e.g. a library
 call), the function cannot be found.
 
+.. warning::
+
+   Runtime dependencies can be explicitly listed in the :term:`RDEPENDS`
+   variable, but may also be the result of a :term:`DEPENDS` assignment in your
+   application's recipe. This is usually the case when your application depends
+   on libraries for compilation: these libraries are listed as build-time
+   dependencies in the :term:`DEPENDS` variable in your application's recipe.
+   However these may also be runtime dependencies if they install shared objects
+   on which your application will dynamically link to at runtime (e.g. shared
+   libraries ending with ``.so``).
+
+   These runtime dependencies are automatically resolved by the
+   :term:`OpenEmbedded Build System` during the packaging phase. Since
+   ``devtool`` ignores packaging dependencies, they will not be installed
+   automatically with ``devtool deploy-target``.
+
+   For more information on how the :term:`OpenEmbedded Build System` handles
+   packaging, see the :ref:`overview-manual/concepts:Automatically Added Runtime
+   Dependencies` section of the Yocto Project Overview and Concepts Manual.
+
 To be sure you have all the dependencies local to the target, you need
 to be sure that the packages are pre-deployed (installed) on the target
 before attempting to run your application.

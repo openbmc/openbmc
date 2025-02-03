@@ -8,14 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=ffeffa59c90c9c4a033c7574f8f3fb75"
 
 SRC_URI[sha256sum] = "5f873c5184c897c8d9d1b05df1e3d01b14910ce69607a117bd3277098a5836ac"
 
-SRC_URI += " \
-        file://run-ptest \
-"
-
-UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/Flask"
-UPSTREAM_CHECK_REGEX = "/Flask/(?P<pver>(\d+[\.\-_]*)+)"
-
-inherit pypi python_setuptools_build_meta ptest
+inherit pypi python_setuptools_build_meta ptest-python-pytest
 
 CLEANBROKEN = "1"
 
@@ -30,10 +23,4 @@ RDEPENDS:${PN} = " \
 
 RDEPENDS:${PN}-ptest += "\
     python3-asgiref \
-    python3-pytest \
-    python3-unittest-automake-output \
 "
-do_install_ptest() {
-        install -d ${D}${PTEST_PATH}/tests
-        cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
-}

@@ -1,3 +1,7 @@
+#
+# Macros used in the documentation
+#
+
 DISTRO : "5.1"
 DISTRO_NAME_NO_CAP : "styhead"
 DISTRO_NAME : "Styhead"
@@ -8,34 +12,7 @@ DISTRO_REL_TAG : "yocto-5.1"
 DOCCONF_VERSION : "dev"
 BITBAKE_SERIES : ""
 YOCTO_DL_URL : "https://downloads.yoctoproject.org"
-YOCTO_AB_URL : "https://autobuilder.yoctoproject.org"
 YOCTO_RELEASE_DL_URL : "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;"
-UBUNTU_HOST_PACKAGES_ESSENTIAL : "gawk wget git diffstat unzip texinfo gcc \
-     build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
-     xz-utils debianutils iputils-ping python3-git python3-jinja2 \
-     python3-subunit zstd liblz4-tool file locales libacl1
-     \n\   $ sudo locale-gen en_US.UTF-8"
-FEDORA_HOST_PACKAGES_ESSENTIAL : "gawk make wget tar bzip2 gzip python3 unzip perl patch \
-     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath \
-     ccache perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue perl-bignum socat \
-     python3-pexpect findutils which file cpio python python3-pip xz python3-GitPython \
-     python3-jinja2 rpcgen perl-FindBin perl-File-Compare \
-     perl-File-Copy perl-locale zstd lz4 hostname glibc-langpack-en libacl"
-OPENSUSE_HOST_PACKAGES_ESSENTIAL : "python gcc gcc-c++ git chrpath make wget python-xml \
-     diffstat makeinfo python-curses patch socat python3 python3-curses tar python3-pip \
-     python3-pexpect xz which python3-Jinja2 rpcgen \
-     zstd lz4 bzip2 gzip hostname libacl1
-     \n\   $ sudo pip3 install GitPython"
-ALMALINUX_HOST_PACKAGES_ESSENTIAL : "-y epel-release
-     \n\   $ sudo yum install dnf-plugins-core
-     \n\   $ sudo dnf config-manager --set-enabled crb
-     \n\   $ sudo dnf makecache
-     \n\   $ sudo dnf install gawk make wget tar bzip2 gzip python3 unzip perl patch \
-     diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath ccache \
-     socat perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python3-pip \
-     python3-GitPython python3-jinja2 python3-pexpect xz which \
-     rpcgen zstd lz4 cpio glibc-langpack-en libacl"
-PIP3_HOST_PACKAGES_DOC : "$ sudo pip3 install sphinx sphinx_rtd_theme pyyaml"
 MIN_PYTHON_VERSION : "3.8.0"
 MIN_TAR_VERSION : "1.28"
 MIN_GIT_VERSION : "1.8.3.1"
@@ -47,3 +24,237 @@ MIN_DISK_SPACE : "90"
 MIN_DISK_SPACE_RM_WORK : "40"
 # RAM (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64) on a 4 core system
 MIN_RAM : "8"
+
+#
+# Dependencies
+#
+
+# Shared between distros
+PIP3_HOST_PACKAGES_DOC: sphinx sphinx_rtd_theme pyyaml
+
+UBUNTU_DEBIAN_HOST_PACKAGES_ESSENTIAL: >-
+  build-essential
+  chrpath
+  cpio
+  debianutils
+  diffstat
+  file
+  gawk
+  gcc
+  git
+  iputils-ping
+  libacl1
+  liblz4-tool
+  locales
+  python3
+  python3-git
+  python3-jinja2
+  python3-pexpect
+  python3-pip
+  python3-subunit
+  socat
+  texinfo
+  unzip
+  wget
+  xz-utils
+  zstd
+
+UBUNTU_DEBIAN_HOST_PACKAGES_DOC: >-
+  git
+  librsvg2-bin
+  locales
+  make
+  python3-saneyaml
+  python3-sphinx-rtd-theme
+  sphinx
+
+UBUNTU_DEBIAN_HOST_PACKAGES_DOC_PDF: >-
+  fonts-freefont-otf
+  latexmk
+  tex-gyre
+  texlive-fonts-extra
+  texlive-fonts-recommended
+  texlive-lang-all
+  texlive-latex-extra
+  texlive-latex-recommended
+  texlive-xetex
+
+FEDORA_HOST_PACKAGES_ESSENTIAL: >-
+  bzip2
+  ccache
+  chrpath
+  cpio
+  cpp
+  diffstat
+  diffutils
+  file
+  findutils
+  gawk
+  gcc
+  gcc-c++
+  git
+  glibc-devel
+  glibc-langpack-en
+  gzip
+  hostname
+  libacl
+  lz4
+  make
+  patch
+  perl
+  perl-Data-Dumper
+  perl-File-Compare
+  perl-File-Copy
+  perl-FindBin
+  perl-Text-ParseWords
+  perl-Thread-Queue
+  perl-bignum
+  perl-locale
+  python
+  python3
+  python3-GitPython
+  python3-jinja2
+  python3-pexpect
+  python3-pip
+  rpcgen
+  socat
+  tar
+  texinfo
+  unzip
+  wget
+  which
+  xz
+  zstd
+
+FEDORA_HOST_PACKAGES_DOC: >-
+  git
+  glibc-locale-source
+  librsvg2-tools
+  make
+  python3-pip
+  which
+
+FEDORA_HOST_PACKAGES_DOC_PDF: >-
+  'texlive-collection-lang*'
+  latexmk
+  texlive-collection-fontsextra
+  texlive-collection-fontsrecommended
+  texlive-collection-latex
+  texlive-collection-latexextra
+  texlive-collection-latexrecommended
+  texlive-collection-xetex
+  texlive-fncychap
+  texlive-gnu-freefont
+  texlive-tex-gyre
+  texlive-xetex
+
+OPENSUSE_HOST_PACKAGES_ESSENTIAL: >-
+  bzip2
+  chrpath
+  diffstat
+  gcc
+  gcc-c++
+  git
+  gzip
+  hostname
+  libacl1
+  lz4
+  make
+  makeinfo
+  patch
+  python
+  python-curses
+  python-xml
+  python3
+  python3-Jinja2
+  python3-curses
+  python3-pexpect
+  python3-pip
+  rpcgen
+  socat
+  tar
+  wget
+  which
+  xz
+  zstd
+
+OPENSUSE_PIP3_HOST_PACKAGES_ESSENTIAL: GitPython
+
+OPENSUSE_HOST_PACKAGES_DOC: >-
+  git
+  glibc-i18ndata
+  make
+  python3-pip
+  rsvg-convert
+  which
+
+OPENSUSE_HOST_PACKAGES_DOC_PDF: >-
+  'texlive-collection-lang*'
+  texlive-collection-fontsextra
+  texlive-collection-fontsrecommended
+  texlive-collection-latex
+  texlive-collection-latexextra
+  texlive-collection-latexrecommended
+  texlive-collection-xetex
+  texlive-fncychap
+  texlive-gnu-freefont
+  texlive-latexmk
+  texlive-tex-gyre
+  texlive-xetex
+
+ALMALINUX_HOST_PACKAGES_ESSENTIAL: >-
+  bzip2
+  ccache
+  chrpath
+  cpio
+  cpp
+  diffstat
+  diffutils
+  gawk
+  gcc
+  gcc-c++
+  git
+  glibc-devel
+  glibc-langpack-en
+  gzip
+  libacl
+  lz4
+  make
+  patch
+  perl
+  perl-Data-Dumper
+  perl-Text-ParseWords
+  perl-Thread-Queue
+  python3
+  python3-GitPython
+  python3-jinja2
+  python3-pexpect
+  python3-pip
+  rpcgen
+  socat
+  tar
+  texinfo
+  unzip
+  wget
+  which
+  xz
+  zstd
+
+ALMALINUX_HOST_PACKAGES_DOC: >-
+  git
+  glibc-locale-source
+  librsvg2-tools
+  make
+  python3-pip
+  which
+
+ALMALINUX_HOST_PACKAGES_DOC_PDF: >-
+  latexmk
+  texlive-collection-fontsrecommended
+  texlive-collection-latex
+  texlive-collection-latexrecommended
+  texlive-collection-xetex
+  texlive-fncychap
+  texlive-gnu-freefont
+  texlive-tex-gyre
+  texlive-xetex

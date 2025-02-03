@@ -1,4 +1,4 @@
-From f069b0a430fe96f3ece2106d34375008833599d3 Mon Sep 17 00:00:00 2001
+From c2916117aa09b7110ab1883e4295330ca7675e88 Mon Sep 17 00:00:00 2001
 From: Nitin A Kamble <nitin.a.kamble@intel.com>
 Date: Fri, 2 Dec 2011 12:20:05 -0800
 Subject: [PATCH] libxt: fix compilatoin with x32 toolchain
@@ -9,21 +9,20 @@ This fixes compilation with x32 toolchain.
 
 Received this patch from H.J. Lu <hjl.tools@gmail.com>
 Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com> 2011/12/1
-
 ---
  include/X11/Xtos.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/X11/Xtos.h b/include/X11/Xtos.h
-index 64b2da8..44f52c2 100644
+index 599dbe2..1686063 100644
 --- a/include/X11/Xtos.h
 +++ b/include/X11/Xtos.h
-@@ -59,7 +59,7 @@ SOFTWARE.
+@@ -63,7 +63,7 @@ SOFTWARE.
      defined(__sparc64__) || \
      defined(__s390x__) || \
      (defined(__hppa__) && defined(__LP64__)) || \
 -    defined(__amd64__) || defined(amd64) || \
-+    ((defined(__amd64__) || defined(amd64)) && defined(__LP64__)) || \
-     defined(__powerpc64__) || \
-     (defined(sgi) && (_MIPS_SZLONG == 64))
++    defined(__amd64__) || defined(amd64) && defined(__LP64__)) || \
+     defined(__powerpc64__))
  #define LONG64
+ #endif

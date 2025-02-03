@@ -1,4 +1,4 @@
-From 42f8019e62f392f5bc09c25e90cc63123eb764fe Mon Sep 17 00:00:00 2001
+From d58bdaca3d5379afcb954bb57c690c7736807ec5 Mon Sep 17 00:00:00 2001
 From: Lucas Kanashiro <kanashiro@debian.org>
 Date: Fri, 1 Nov 2019 15:25:17 -0300
 Subject: [PATCH] Make gemspecs reproducible
@@ -8,17 +8,17 @@ build unreproducible
 
 Upstream-Status: Backport [debian]
 ---
- ext/bigdecimal/bigdecimal.gemspec | 1 +
- ext/fiddle/fiddle.gemspec         | 1 +
- ext/io/console/io-console.gemspec | 1 +
- lib/ipaddr.gemspec                | 1 +
- lib/rdoc/rdoc.gemspec             | 1 +
+ .bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec | 1 +
+ ext/fiddle/fiddle.gemspec                        | 1 +
+ ext/io/console/io-console.gemspec                | 1 +
+ lib/ipaddr.gemspec                               | 1 +
+ lib/rdoc/rdoc.gemspec                            | 1 +
  5 files changed, 5 insertions(+)
 
-diff --git a/ext/bigdecimal/bigdecimal.gemspec b/ext/bigdecimal/bigdecimal.gemspec
-index f9f3b45..b9a469d 100644
---- a/ext/bigdecimal/bigdecimal.gemspec
-+++ b/ext/bigdecimal/bigdecimal.gemspec
+diff --git a/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec b/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec
+index b6ef8fd..596b8bb 100644
+--- a/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec
++++ b/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec
 @@ -14,6 +14,7 @@ Gem::Specification.new do |s|
    s.name          = name
    s.version       = source_version
@@ -28,7 +28,7 @@ index f9f3b45..b9a469d 100644
  
    s.summary       = "Arbitrary-precision decimal floating-point number library."
 diff --git a/ext/fiddle/fiddle.gemspec b/ext/fiddle/fiddle.gemspec
-index 8781093..efdca32 100644
+index 0092f52..f77c224 100644
 --- a/ext/fiddle/fiddle.gemspec
 +++ b/ext/fiddle/fiddle.gemspec
 @@ -8,6 +8,7 @@ end
@@ -40,10 +40,10 @@ index 8781093..efdca32 100644
    spec.email         = ["aaron@tenderlovemaking.com", "hsbt@ruby-lang.org"]
  
 diff --git a/ext/io/console/io-console.gemspec b/ext/io/console/io-console.gemspec
-index d4f5276..8f89611 100644
+index 0a19992..4a80529 100644
 --- a/ext/io/console/io-console.gemspec
 +++ b/ext/io/console/io-console.gemspec
-@@ -4,6 +4,7 @@ _VERSION = "0.7.1"
+@@ -12,6 +12,7 @@ end
  Gem::Specification.new do |s|
    s.name = "io-console"
    s.version = _VERSION
@@ -52,7 +52,7 @@ index d4f5276..8f89611 100644
    s.email = "nobu@ruby-lang.org"
    s.description = "add console capabilities to IO instances."
 diff --git a/lib/ipaddr.gemspec b/lib/ipaddr.gemspec
-index 1f4798e..48743cf 100644
+index 5719f83..fe76260 100644
 --- a/lib/ipaddr.gemspec
 +++ b/lib/ipaddr.gemspec
 @@ -18,6 +18,7 @@ end
@@ -64,7 +64,7 @@ index 1f4798e..48743cf 100644
    spec.email         = ["knu@idaemons.org", "ume@mahoroba.org"]
  
 diff --git a/lib/rdoc/rdoc.gemspec b/lib/rdoc/rdoc.gemspec
-index 93a281c..cc5c155 100644
+index 3144df5..65c313f 100644
 --- a/lib/rdoc/rdoc.gemspec
 +++ b/lib/rdoc/rdoc.gemspec
 @@ -7,6 +7,7 @@ end

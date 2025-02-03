@@ -308,7 +308,7 @@ install the debugging information for the BusyBox package.
 To generate the debug info for the packages in the image, we can add
 ``dbg-pkgs`` to :term:`EXTRA_IMAGE_FEATURES` in ``local.conf``. For example::
 
-   EXTRA_IMAGE_FEATURES = "debug-tweaks tools-profile dbg-pkgs"
+   EXTRA_IMAGE_FEATURES:append = " dbg-pkgs"
 
 Additionally, in order to generate the type of debugging information that perf
 understands, we also need to set :term:`PACKAGE_DEBUG_SPLIT_STYLE`
