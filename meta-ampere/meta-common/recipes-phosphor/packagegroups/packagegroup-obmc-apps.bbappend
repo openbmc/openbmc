@@ -17,9 +17,5 @@ RDEPENDS:${PN}-extras:append = " \
                                "
 
 RDEPENDS:${PN}-inventory:append = " \
-                                   dbus-sensors \
                                    entity-manager \
                                   "
-
-RDEPENDS:${PN}-extras:remove = " phosphor-hwmon"
-VIRTUAL-RUNTIME_obmc-sensors-hwmon ?= "dbus-sensors"
