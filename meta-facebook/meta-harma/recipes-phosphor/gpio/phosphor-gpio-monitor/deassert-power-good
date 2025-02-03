@@ -16,7 +16,6 @@ if [ "$valid_sgpio" -eq 0 ]; then
         xyz.openbmc_project.State.Host \
         RequestedHostTransition s \
         xyz.openbmc_project.State.Host.Transition.On
-    xyz.openbmc_project.State.Host.HostState.Running
 
     systemctl start obmc-led-group-start@power_on.service
 fi
