@@ -147,13 +147,13 @@ set_gpio "stby_power_gd_cpld" "$GPIO_HIGH"
 bind_i2c_muxes
 bind_gpio_expanders
 
-reset_host_usb
-
 set_gpio "HMC_PGOOD" "$GPIO_HIGH"
 set_gpio "EROT_FPGA_RST_L" "$GPIO_HIGH"
 set_gpio "SEC_EROT_FPGA_RST_L" "$GPIO_HIGH"
 set_gpio "HMC_EROT_RST_L" "$GPIO_HIGH"
 set_gpio "SCM_HPM_STBY_RST_N" "$GPIO_HIGH"
+
+reset_host_usb
 
 if ! wait_gpio_value "HMC_READY" "$GPIO_HIGH" 180 1; then
     echo "Error: failed to get HMC_READY as high (1) in 180 sec"
