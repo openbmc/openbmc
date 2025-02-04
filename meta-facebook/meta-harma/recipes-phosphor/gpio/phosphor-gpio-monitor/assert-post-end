@@ -2,6 +2,6 @@
 
 busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby
 
-busctl set-property xyz.openbmc_project.Software.BMC.Updater /xyz/openbmc_project/software/bios_active xyz.openbmc_project.Software.Version Version s "$(jq -r '.sysfw_ver_server0' /var/lib/fb-ipmi-oem/appData.json)"
+busctl set-property xyz.openbmc_project.Software.Manager /xyz/openbmc_project/software/bios_active xyz.openbmc_project.Software.Version Version s "$(jq -r '.sysfw_ver_server0' /var/lib/fb-ipmi-oem/appData.json)"
 
 exit 0
