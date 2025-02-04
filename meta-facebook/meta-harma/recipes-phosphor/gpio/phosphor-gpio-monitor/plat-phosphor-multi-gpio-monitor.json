@@ -128,13 +128,13 @@
         "Continue": true
     },
     {
-        "Name": "cpu0-prochot-alert",
+        "Name": "irq-cpu-hsc-oc-n",
         "ChipId": "2",
         "GpioNum": 178,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@2_cpu0-prochot-alert.service"],
-            "FALLING": ["assert-gpio-log@2_cpu0-prochot-alert.service"]
+            "RISING": ["deassert-gpio-log@2_irq-cpu-hsc-oc-n.service"],
+            "FALLING": ["assert-gpio-log@2_irq-cpu-hsc-oc-n.service"]
         },
         "Continue": true
     },
