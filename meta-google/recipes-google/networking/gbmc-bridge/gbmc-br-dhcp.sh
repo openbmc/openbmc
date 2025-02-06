@@ -44,6 +44,12 @@ if [ "$1" = bound ]; then
   trap 'rm -f $PID_FILE' EXIT
   echo "$$" >&$PID_FD
 
+  # Don't let other DHCP processes start by hogging the pidfile indefinitely
+  # on successful termination.
+  # This intentionally comes after the pidfile hook to replace it, since we
+  # won't need to remove the pidfile if we never terminate.
+  trap '(( $? == 0 )) && sleep infinity' EXIT
+
   # Variable is from the environment via udhcpc6
   # shellcheck disable=SC2154
   echo "DHCPv6(gbmcbr): $ipv6/128" >&2
