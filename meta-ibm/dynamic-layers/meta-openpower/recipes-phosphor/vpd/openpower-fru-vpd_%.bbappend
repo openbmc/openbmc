@@ -5,14 +5,10 @@ DEPENDS:append:p10bmc = " libgpiod"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SYSTEMD_SERVICE:${PN}:append:p10bmc = " ibm-vpd-parser@.service"
-SYSTEMD_SERVICE:${PN}:append:p10bmc = " ibm-isdimm-vpd-parser@.service"
-SYSTEMD_SERVICE:${PN}:append:p10bmc = " ibm-spi-vpd-parser@.service"
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " system-vpd.service"
-SYSTEMD_SERVICE:${PN}:append:p10bmc = " com.ibm.VPD.Manager.service"
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " wait-vpd-parsers.service"
-SYSTEMD_SERVICE:${PN}:remove:p10bmc = " op-vpd-parser.service"
-PACKAGECONFIG:append:p10bmc = " ibm-parser vpd-manager"
+SYSTEMD_SERVICE:${PN}:append:p10bmc = " vpd-manager.service"
+PACKAGECONFIG:append:p10bmc = " ibm_system"
 
 FILES:${PN}:append:p10bmc = " ${datadir}/vpd/*.json"
 
