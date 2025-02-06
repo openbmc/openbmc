@@ -8,15 +8,16 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 check_valid_sgpio
 valid_sgpio=$?
 
-# Set Host Power Status Running
 if [ "$valid_sgpio" -eq 0 ]; then
-    busctl set-property \
-        xyz.openbmc_project.State.Host0 \
+    # Set Host Power Status Running
+    busctl set-property xyz.openbmc_project.State.Host0 \
         /xyz/openbmc_project/state/host0 \
         xyz.openbmc_project.State.Host \
-        RequestedHostTransition s \
-        xyz.openbmc_project.State.Host.Transition.On
+        CurrentHostState s \
+        xyz.openbmc_project.State.Host.HostState.Running
 
+    # Sync power status to On
+    obmcutil poweron
     systemctl start obmc-led-group-start@power_on.service
 fi
 
