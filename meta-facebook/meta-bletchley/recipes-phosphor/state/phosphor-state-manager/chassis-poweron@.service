@@ -6,10 +6,9 @@ Conflicts=chassis-poweroff@%i.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/power-ctrl sled%i ac-on
+ExecStart=/usr/libexec/phosphor-state-manager/chassis-poweron %i
 SyslogIdentifier=power-ctrl
-ExecStartPost=/bin/systemctl start phosphor-discover-system-state@%i.service
 StartLimitBurst=0
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=obmc-chassis-poweron@%i.target

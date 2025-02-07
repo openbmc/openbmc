@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "$1" == "0" ]; then
+    echo "Chassis power always on"
+else
+    echo "Enter sled$1 ac on"
+    /usr/sbin/power-ctrl "sled$1" ac-on
+
+    systemctl start "phosphor-discover-system-state@$1.service" &
+fi
