@@ -9,9 +9,10 @@ do_kernel_configme:append() {
     shortLinuxVersionExt="$(echo ${LINUX_VERSION_EXTENSION} | cut -c1-8)"
 
     if [ "${latestVersion}" != "${LINUX_VERSION_EXTENSION}" ]; then
-        dirtyString="-dirty"
+        dirtyString="-patch"
         echo "CONFIG_LOCALVERSION="\"${shortLinuxVersionExt}${dirtyString}${shortLatestVersion}\" >> ${B}/.config
     else
         echo "CONFIG_LOCALVERSION="\"${shortLinuxVersionExt}\" >> ${B}/.config
     fi
+    echo "CONFIG_LOCALVERSION_AUTO=no" >> ${B}/.config
 }
