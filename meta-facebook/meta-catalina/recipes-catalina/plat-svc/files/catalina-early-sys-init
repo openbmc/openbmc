@@ -2,7 +2,7 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
-config_fan()
+config_fan_max31790()
 {
     # Set fan tack sample count for each tach channel to highest value to avoid
     # wrong fan tach reading.
@@ -36,6 +36,14 @@ config_fan()
         do
             echo 1 > "${file}"
         done
+    fi
+}
+
+config_fan()
+{
+    if [ -d "/sys/bus/i2c/drivers/max31790/18-0021/hwmon" ]; then
+        echo "Configure MAX31790 fan controller"
+        config_fan_max31790
     fi
 }
 
