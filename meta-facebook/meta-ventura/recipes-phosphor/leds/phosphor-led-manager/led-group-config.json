@@ -1,0 +1,738 @@
+{
+    "leds": [
+        {
+            "group" : "bmc_booted",
+            "members" : [
+                {
+                    "Name" : "bmc_heartbeat_amber",
+                    "Action" : "Blink",
+                    "DutyOn" : 50,
+                    "Period" : 1000
+                }
+            ]
+        },
+        {
+            "group": "power_on",
+            "members": [
+                {
+                    "Name": "power_blue",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "fp_id_amber",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250
+                }
+            ]
+        },
+        {
+            "group": "compute1_blue",
+            "members": [
+                {
+                    "Name": "compute1_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute1_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute1_amber",
+            "members": [
+                {
+                    "Name": "compute1_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute1_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute2_blue",
+            "members": [
+                {
+                    "Name": "compute2_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute2_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute2_amber",
+            "members": [
+                {
+                    "Name": "compute2_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute2_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute3_blue",
+            "members": [
+                {
+                    "Name": "compute3_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute3_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute3_amber",
+            "members": [
+                {
+                    "Name": "compute3_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute3_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute4_blue",
+            "members": [
+                {
+                    "Name": "compute4_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute4_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute4_amber",
+            "members": [
+                {
+                    "Name": "compute4_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute4_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute5_blue",
+            "members": [
+                {
+                    "Name": "compute5_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute5_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute5_amber",
+            "members": [
+                {
+                    "Name": "compute5_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute5_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute6_blue",
+            "members": [
+                {
+                    "Name": "compute6_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute6_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute6_amber",
+            "members": [
+                {
+                    "Name": "compute6_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute6_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute7_blue",
+            "members": [
+                {
+                    "Name": "compute7_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute7_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute7_amber",
+            "members": [
+                {
+                    "Name": "compute7_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute7_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute8_blue",
+            "members": [
+                {
+                    "Name": "compute8_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute8_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute8_amber",
+            "members": [
+                {
+                    "Name": "compute8_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute8_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs1_blue",
+            "members": [
+                {
+                    "Name": "nvs1_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs1_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs1_amber",
+            "members": [
+                {
+                    "Name": "nvs1_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs1_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs2_blue",
+            "members": [
+                {
+                    "Name": "nvs2_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs2_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs2_amber",
+            "members": [
+                {
+                    "Name": "nvs2_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs2_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs3_blue",
+            "members": [
+                {
+                    "Name": "nvs3_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs3_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs3_amber",
+            "members": [
+                {
+                    "Name": "nvs3_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs3_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs4_blue",
+            "members": [
+                {
+                    "Name": "nvs4_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs4_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs4_amber",
+            "members": [
+                {
+                    "Name": "nvs4_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs4_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs5_blue",
+            "members": [
+                {
+                    "Name": "nvs5_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs5_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs5_amber",
+            "members": [
+                {
+                    "Name": "nvs5_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs5_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs6_blue",
+            "members": [
+                {
+                    "Name": "nvs6_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs6_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs6_amber",
+            "members": [
+                {
+                    "Name": "nvs6_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs6_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs7_blue",
+            "members": [
+                {
+                    "Name": "nvs7_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs7_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs7_amber",
+            "members": [
+                {
+                    "Name": "nvs7_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs7_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs8_blue",
+            "members": [
+                {
+                    "Name": "nvs8_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs8_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs8_amber",
+            "members": [
+                {
+                    "Name": "nvs8_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs8_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs9_blue",
+            "members": [
+                {
+                    "Name": "nvs9_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs9_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "nvs9_amber",
+            "members": [
+                {
+                    "Name": "nvs9_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "nvs9_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute9_blue",
+            "members": [
+                {
+                    "Name": "compute9_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute9_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute9_amber",
+            "members": [
+                {
+                    "Name": "compute9_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute9_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute10_blue",
+            "members": [
+                {
+                    "Name": "compute10_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute10_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute10_amber",
+            "members": [
+                {
+                    "Name": "compute10_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute10_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute11_blue",
+            "members": [
+                {
+                    "Name": "compute11_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute11_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute11_amber",
+            "members": [
+                {
+                    "Name": "compute11_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute11_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute12_blue",
+            "members": [
+                {
+                    "Name": "compute12_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute12_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute12_amber",
+            "members": [
+                {
+                    "Name": "compute12_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute12_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute13_blue",
+            "members": [
+                {
+                    "Name": "compute13_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute13_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute13_amber",
+            "members": [
+                {
+                    "Name": "compute13_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute13_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute14_blue",
+            "members": [
+                {
+                    "Name": "compute14_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute14_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute14_amber",
+            "members": [
+                {
+                    "Name": "compute14_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute14_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute15_blue",
+            "members": [
+                {
+                    "Name": "compute15_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute15_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute15_amber",
+            "members": [
+                {
+                    "Name": "compute15_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute15_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute16_blue",
+            "members": [
+                {
+                    "Name": "compute16_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute16_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute16_amber",
+            "members": [
+                {
+                    "Name": "compute16_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute16_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute17_blue",
+            "members": [
+                {
+                    "Name": "compute17_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute17_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute17_amber",
+            "members": [
+                {
+                    "Name": "compute17_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute17_led_amber",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute18_blue",
+            "members": [
+                {
+                    "Name": "compute18_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute18_led_blue",
+                    "Action": "On"
+                }
+            ]
+        },
+        {
+            "group": "compute18_amber",
+            "members": [
+                {
+                    "Name": "compute18_led_switch",
+                    "Action": "On"
+                },
+                {
+                    "Name": "compute18_led_amber",
+                    "Action": "On"
+                }
+            ]
+        }
+    ]
+}

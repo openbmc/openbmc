@@ -1,0 +1,87 @@
+#!/bin/bash
+
+
+get_init_tray_sgpio()
+{
+    echo "Ventura Init Tray Sgpio Start init"
+
+    systemctl stop phosphor-multi-gpio-monitor
+
+    local sgpio_value=0
+    local sgpio_index=0
+
+    # Control compute tray i blue light LED group
+    for i in {1..18}
+    do
+        if [ "$i" == "9" ] || [ "$i" == "10" ]; then
+           sgpio_index=$((i*2 + 180));
+           sgpio_index=$(gpioget 2 $sgpio_index)
+        else
+           sgpio_index=$((i*2 + 146));
+           sgpio_value=$(gpioget 2 $sgpio_index)
+        fi
+
+        if [ "$sgpio_value" == "0" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$i""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$i""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+        fi
+    done
+
+    # Control nvs tray j blue light LED group
+    for j in {1..9}
+    do
+        if [ "$j" == "1" ] || [ "$j" == "2" ]; then
+           sgpio_index=$((j*2 + 162));
+           sgpio_index=$(gpioget 2 $sgpio_index)
+        else
+           sgpio_index=$((j*2 + 178));
+           sgpio_value=$(gpioget 2 $sgpio_index)
+        fi
+
+        if [ "$sgpio_value" == "0" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$j""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$j""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+        fi
+    done
+
+    # Control compute tray i amber light LED group
+    for i in {1..18}
+    do
+        if [ "$i" == "9" ] || [ "$i" == "10" ]; then
+           sgpio_index=$((i*2 + 234));
+           sgpio_index=$(gpioget 2 $sgpio_index)
+        else
+           sgpio_index=$((i*2 + 200));
+           sgpio_value=$(gpioget 2 $sgpio_index)
+        fi
+
+        if [ "$sgpio_value" == "0" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$i""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$i""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+        fi
+    done
+
+    # Control nvs tray j amber light LED group
+    for j in {1..9}
+    do
+        if [ "$j" == 1 ] || [ "$j" == 2 ]; then
+           sgpio_index=$((j*2 + 216));
+           sgpio_index=$(gpioget 2 $sgpio_index)
+        else
+           sgpio_index=$((j*2 + 232));
+           sgpio_value=$(gpioget 2 $sgpio_index)
+        fi
+
+        if [ "$sgpio_value" == "0" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$j""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$j""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+        fi
+    done
+
+    systemctl start phosphor-multi-gpio-monitor
+    return 0
+}
+
+get_init_tray_sgpio
+
+exit 0
