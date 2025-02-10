@@ -1,0 +1,1496 @@
+{
+    "leds": [
+        {
+            "group": "bmc_booted",
+            "members": [
+                {
+                    "Name": "power",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_id_dwr_frnt_p",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_id_dwr_back_p",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "power_on",
+            "members": [
+                {
+                    "Name": "power",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dwr",
+            "members": [
+                {
+                    "Name": "led_id_dwr_frnt_p",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_id_dwr_back_p",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_pwr_dwr",
+            "members": [
+                {
+                    "Name": "led_pwr_dwr_frnt",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_pwr_dwr_back",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_cpu0",
+            "members": [
+                {
+                    "Name": "led_id_cpu0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_cpu1",
+            "members": [
+                {
+                    "Name": "led_id_cpu1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_cpu2",
+            "members": [
+                {
+                    "Name": "led_id_cpu2",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_cpu3",
+            "members": [
+                {
+                    "Name": "led_id_cpu3",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd01_power",
+            "members": [
+                {
+                    "Name": "rssd01_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd02_power",
+            "members": [
+                {
+                    "Name": "rssd02_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd03_power",
+            "members": [
+                {
+                    "Name": "rssd03_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd04_power",
+            "members": [
+                {
+                    "Name": "rssd04_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd05_power",
+            "members": [
+                {
+                    "Name": "rssd05_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd06_power",
+            "members": [
+                {
+                    "Name": "rssd06_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd07_power",
+            "members": [
+                {
+                    "Name": "rssd07_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd08_power",
+            "members": [
+                {
+                    "Name": "rssd08_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd09_power",
+            "members": [
+                {
+                    "Name": "rssd09_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd10_power",
+            "members": [
+                {
+                    "Name": "rssd10_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd11_power",
+            "members": [
+                {
+                    "Name": "rssd11_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd12_power",
+            "members": [
+                {
+                    "Name": "rssd12_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd13_power",
+            "members": [
+                {
+                    "Name": "rssd13_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd14_power",
+            "members": [
+                {
+                    "Name": "rssd14_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd15_power",
+            "members": [
+                {
+                    "Name": "rssd15_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd16_power",
+            "members": [
+                {
+                    "Name": "rssd16_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd17_power",
+            "members": [
+                {
+                    "Name": "rssd17_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd18_power",
+            "members": [
+                {
+                    "Name": "rssd18_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd19_power",
+            "members": [
+                {
+                    "Name": "rssd19_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd20_power",
+            "members": [
+                {
+                    "Name": "rssd20_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd21_power",
+            "members": [
+                {
+                    "Name": "rssd21_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd22_power",
+            "members": [
+                {
+                    "Name": "rssd22_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd23_power",
+            "members": [
+                {
+                    "Name": "rssd23_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd24_power",
+            "members": [
+                {
+                    "Name": "rssd24_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd25_power",
+            "members": [
+                {
+                    "Name": "rssd25_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd26_power",
+            "members": [
+                {
+                    "Name": "rssd26_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd27_power",
+            "members": [
+                {
+                    "Name": "rssd27_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd28_power",
+            "members": [
+                {
+                    "Name": "rssd28_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd29_power",
+            "members": [
+                {
+                    "Name": "rssd29_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd30_power",
+            "members": [
+                {
+                    "Name": "rssd30_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd31_power",
+            "members": [
+                {
+                    "Name": "rssd31_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_rssd32_power",
+            "members": [
+                {
+                    "Name": "rssd32_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_m2_ssb_ssd1_power",
+            "members": [
+                {
+                    "Name": "m2_ssb_ssd1_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_m2_ssb_ssd2_power",
+            "members": [
+                {
+                    "Name": "m2_ssb_ssd2_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_a0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_a0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_a1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_a1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_b0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_b0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_b1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_b1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_c0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_c0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_c1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_c1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_d0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_d0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_d1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_d1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_e0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_e0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_e1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_e1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_f0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_f0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_f1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_f1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_g0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_g0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_g1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_g1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_h0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_h0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_h1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_h1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_j0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_j0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_j1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_j1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_k0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_k0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_k1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_k1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_l0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_l0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_l1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_l1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_m0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_m0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_m1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_m1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_n0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_n0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_n1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_n1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_p0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_p0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_p1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_p1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_q0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_q0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_q1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_q1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_r0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_r0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_r1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_r1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_s0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_s0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_s1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_s1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_t0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_t0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_t1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_t1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_u0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_u0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_u1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_u1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_v0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_v0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_v1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_v1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_w0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_w0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_w1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_w1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_x0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_x0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_x1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_x1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_y0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_y0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_y1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_y1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_z0",
+            "members": [
+                {
+                    "Name": "led_id_dimm_z0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_dimm_z1",
+            "members": [
+                {
+                    "Name": "led_id_dimm_z1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd01",
+            "members": [
+                {
+                    "Name": "led_id_rssd01",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd02",
+            "members": [
+                {
+                    "Name": "led_id_rssd02",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd03",
+            "members": [
+                {
+                    "Name": "led_id_rssd03",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd04",
+            "members": [
+                {
+                    "Name": "led_id_rssd04",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd05",
+            "members": [
+                {
+                    "Name": "led_id_rssd05",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd06",
+            "members": [
+                {
+                    "Name": "led_id_rssd06",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd07",
+            "members": [
+                {
+                    "Name": "led_id_rssd07",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd08",
+            "members": [
+                {
+                    "Name": "led_id_rssd08",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd09",
+            "members": [
+                {
+                    "Name": "led_id_rssd09",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd10",
+            "members": [
+                {
+                    "Name": "led_id_rssd10",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd11",
+            "members": [
+                {
+                    "Name": "led_id_rssd11",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd12",
+            "members": [
+                {
+                    "Name": "led_id_rssd12",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd13",
+            "members": [
+                {
+                    "Name": "led_id_rssd13",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd14",
+            "members": [
+                {
+                    "Name": "led_id_rssd14",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd15",
+            "members": [
+                {
+                    "Name": "led_id_rssd15",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd16",
+            "members": [
+                {
+                    "Name": "led_id_rssd16",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd17",
+            "members": [
+                {
+                    "Name": "led_id_rssd17",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd18",
+            "members": [
+                {
+                    "Name": "led_id_rssd18",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd19",
+            "members": [
+                {
+                    "Name": "led_id_rssd19",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd20",
+            "members": [
+                {
+                    "Name": "led_id_rssd20",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd21",
+            "members": [
+                {
+                    "Name": "led_id_rssd21",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd22",
+            "members": [
+                {
+                    "Name": "led_id_rssd22",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd23",
+            "members": [
+                {
+                    "Name": "led_id_rssd23",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd24",
+            "members": [
+                {
+                    "Name": "led_id_rssd24",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd25",
+            "members": [
+                {
+                    "Name": "led_id_rssd25",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd26",
+            "members": [
+                {
+                    "Name": "led_id_rssd26",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd27",
+            "members": [
+                {
+                    "Name": "led_id_rssd27",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd28",
+            "members": [
+                {
+                    "Name": "led_id_rssd28",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd29",
+            "members": [
+                {
+                    "Name": "led_id_rssd29",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd30",
+            "members": [
+                {
+                    "Name": "led_id_rssd30",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd31",
+            "members": [
+                {
+                    "Name": "led_id_rssd31",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_id_rssd32",
+            "members": [
+                {
+                    "Name": "led_id_rssd32",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}

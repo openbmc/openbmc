@@ -1,0 +1,604 @@
+{
+    "leds": [
+        {
+            "group": "bmc_booted",
+            "members": [
+                {
+                    "Name": "platform_power_green",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "power_on",
+            "members": [
+                {
+                    "Name": "platform_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "platform_indicator_blue",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_fault",
+            "members": [
+                {
+                    "Name": "platform_fault_red",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_warning",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "bmc_fault",
+            "members": [
+                {
+                    "Name": "platform_fault_red",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "motherboard_fault",
+            "members": [
+                {
+                    "Name": "platform_fault_red",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "system_fault",
+            "members": [
+                {
+                    "Name": "platform_fault_red",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "cpu0_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "cpu1_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core0_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core1_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core2_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core3_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core4_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core5_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core6_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core7_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core8_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core9_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core10_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core11_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core12_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core13_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core14_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core15_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core16_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core17_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core18_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core19_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core20_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core21_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core22_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core23_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm0_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm1_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm2_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm3_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm4_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm5_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm6_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm7_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm8_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm9_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm10_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm11_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm12_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm13_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm14_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm15_fault",
+            "members": [
+                {
+                    "Name": "platform_alarm_yellow",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}

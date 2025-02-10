@@ -1,0 +1,460 @@
+{
+    "leds": [
+        {
+            "group": "fan0_ok",
+            "members": [
+                {
+                    "Name": "led_fan0_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan0_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 1
+        },
+        {
+            "group": "fan0_fail",
+            "members": [
+                {
+                    "Name": "led_fan0_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan0_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 2
+        },
+        {
+            "group": "fan1_ok",
+            "members": [
+                {
+                    "Name": "led_fan1_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan1_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 10
+        },
+        {
+            "group": "fan1_fail",
+            "members": [
+                {
+                    "Name": "led_fan1_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan1_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 11
+        },
+        {
+            "group": "fan2_ok",
+            "members": [
+                {
+                    "Name": "led_fan2_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan2_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 20
+        },
+        {
+            "group": "fan2_fail",
+            "members": [
+                {
+                    "Name": "led_fan2_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan2_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 21
+        },
+        {
+            "group": "fan3_ok",
+            "members": [
+                {
+                    "Name": "led_fan3_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan3_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 30
+        },
+        {
+            "group": "fan3_fail",
+            "members": [
+                {
+                    "Name": "led_fan3_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan3_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 31
+        },
+        {
+            "group": "fan4_ok",
+            "members": [
+                {
+                    "Name": "led_fan4_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan4_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 40
+        },
+        {
+            "group": "fan4_fail",
+            "members": [
+                {
+                    "Name": "led_fan4_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan4_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 41
+        },
+        {
+            "group": "fan5_ok",
+            "members": [
+                {
+                    "Name": "led_fan5_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan5_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 50
+        },
+        {
+            "group": "fan5_fail",
+            "members": [
+                {
+                    "Name": "led_fan5_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan5_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 51
+        },
+        {
+            "group": "fan6_ok",
+            "members": [
+                {
+                    "Name": "led_fan6_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan6_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 60
+        },
+        {
+            "group": "fan6_fail",
+            "members": [
+                {
+                    "Name": "led_fan6_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan6_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 61
+        },
+        {
+            "group": "fan7_ok",
+            "members": [
+                {
+                    "Name": "led_fan7_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan7_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 70
+        },
+        {
+            "group": "fan7_fail",
+            "members": [
+                {
+                    "Name": "led_fan7_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan7_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 71
+        },
+        {
+            "group": "fan8_ok",
+            "members": [
+                {
+                    "Name": "led_fan8_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan8_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 80
+        },
+        {
+            "group": "fan8_fail",
+            "members": [
+                {
+                    "Name": "led_fan8_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan8_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 81
+        },
+        {
+            "group": "fan9_ok",
+            "members": [
+                {
+                    "Name": "led_fan9_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan9_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 90
+        },
+        {
+            "group": "fan9_fail",
+            "members": [
+                {
+                    "Name": "led_fan9_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan9_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 91
+        },
+        {
+            "group": "fan10_ok",
+            "members": [
+                {
+                    "Name": "led_fan10_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan10_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 100
+        },
+        {
+            "group": "fan10_fail",
+            "members": [
+                {
+                    "Name": "led_fan10_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan10_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 101
+        },
+        {
+            "group": "fan11_ok",
+            "members": [
+                {
+                    "Name": "led_fan11_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan11_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 110
+        },
+        {
+            "group": "fan11_fail",
+            "members": [
+                {
+                    "Name": "led_fan11_blue",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0
+                },
+                {
+                    "Name": "led_fan11_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 111
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "led_identify",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 120
+        },
+        {
+            "group": "enclosure_identify_blink",
+            "members": [
+                {
+                    "Name": "led_identify",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0
+                }
+            ],
+            "Priority": 121
+        }
+    ]
+}

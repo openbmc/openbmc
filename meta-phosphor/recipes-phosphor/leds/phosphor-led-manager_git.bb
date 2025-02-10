@@ -9,12 +9,7 @@ DEPENDS += "nlohmann-json"
 DEPENDS += "phosphor-logging"
 DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "systemd"
-PACKAGECONFIG ??= "\
-    ${@oe.utils.conditional( \
-        'PREFERRED_PROVIDER_virtual/${PN}-config-native', \
-        'phosphor-led-manager-config-example-native', \
-        'use-json', 'use-yaml', d)} \
-"
+PACKAGECONFIG ??= "use-json"
 PACKAGECONFIG[use-json] = "-Duse-json=enabled,,,,,use-yaml"
 PACKAGECONFIG[use-yaml] = "-Duse-json=disabled,,virtual/${PN}-config-native,,,use-json"
 PACKAGECONFIG[use-lamp-test] = "-Duse-lamp-test=enabled, -Duse-lamp-test=disabled"
@@ -53,16 +48,6 @@ inherit meson pkgconfig python3native
 inherit obmc-phosphor-dbus-service obmc-phosphor-systemd
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
-
-do_compile:prepend() {
-    if [ -f "${LED_YAML_PATH}/led.yaml" ]; then
-        cp "${LED_YAML_PATH}/led.yaml" "${S}/led.yaml"
-    elif [ -f "${STAGING_DATADIR_NATIVE}/${PN}/led.yaml" ]; then
-        cp "${STAGING_DATADIR_NATIVE}/${PN}/led.yaml" "${S}/led.yaml"
-    elif [ -f "${UNPACKDIR}/led.yaml" ]; then
-        cp "${UNPACKDIR}/led.yaml" "${S}/led.yaml"
-    fi
-}
 
 RDEPENDS:${PN} += "bash"
 

@@ -4,19 +4,17 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 PROVIDES:append = " virtual/phosphor-led-manager-config-native"
 PR = "r1"
 
-SRC_URI = "file://led.yaml"
+SRC_URI = "file://led.json"
 
 S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
 
 inherit native
 
-# Overwrite the example led layout yaml file prior
+# Overwrite the example led layout json file prior
 # to building the phosphor-led-manager package
 do_install() {
-    SRC=${S}
-    DEST=${D}${datadir}/phosphor-led-manager
-    install -D ${SRC}/led.yaml ${DEST}/led.yaml
+    install -m 0644 ${UNPACKDIR}/led.json ${D}${datadir}/phosphor-led-manager/
 }
 
-FILES:${PN}:append = " ${datadir}/phosphor-led-manager/led.yaml"
+FILES:${PN}:append = " ${datadir}/phosphor-led-manager/led.json"

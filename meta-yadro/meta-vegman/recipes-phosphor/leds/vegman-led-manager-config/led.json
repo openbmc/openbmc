@@ -1,0 +1,196 @@
+{
+    "leds": [
+        {
+            "group": "bmc_booted",
+            "members": []
+        },
+        {
+            "group": "status_ok",
+            "members": [
+                {
+                    "Name": "platform_status_green",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_status_red",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "status_degraded",
+            "members": [
+                {
+                    "Name": "platform_status_green",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_status_red",
+                    "Action": "Blink",
+                    "DutyOn": 25,
+                    "Period": 2000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "status_non_critical",
+            "members": [
+                {
+                    "Name": "platform_status_green",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_status_red",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "status_critical",
+            "members": [
+                {
+                    "Name": "platform_status_green",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_status_red",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "platform_indicator_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify_blink",
+            "members": [
+                {
+                    "Name": "platform_indicator_blue",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "firmware_flashing",
+            "members": [
+                {
+                    "Name": "platform_indicator_blue",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "power_standby",
+            "members": [
+                {
+                    "Name": "platform_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_power_red",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "power_sequence",
+            "members": [
+                {
+                    "Name": "platform_power_green",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_power_red",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "power_on",
+            "members": [
+                {
+                    "Name": "platform_power_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_power_red",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "power_failure",
+            "members": [
+                {
+                    "Name": "platform_power_green",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "platform_power_red",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,560 @@
+{
+    "leds": [
+        {
+            "group": "bmc_booted",
+            "members": [
+                {
+                    "Name": "heartbeat",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "attention",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_fault",
+            "members": [
+                {
+                    "Name": "bmc_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "boot_status_inactive",
+            "members": [
+                {
+                    "Name": "sys_boot_status",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "boot_status_standby",
+            "members": [
+                {
+                    "Name": "sys_boot_status",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_0_locate",
+            "members": [
+                {
+                    "Name": "led_u2_0_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_0_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_1_locate",
+            "members": [
+                {
+                    "Name": "led_u2_1_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_1_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_2_locate",
+            "members": [
+                {
+                    "Name": "led_u2_2_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_2_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_3_locate",
+            "members": [
+                {
+                    "Name": "led_u2_3_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_3_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_4_locate",
+            "members": [
+                {
+                    "Name": "led_u2_4_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_4_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_5_locate",
+            "members": [
+                {
+                    "Name": "led_u2_5_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_5_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_6_locate",
+            "members": [
+                {
+                    "Name": "led_u2_6_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_6_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_7_locate",
+            "members": [
+                {
+                    "Name": "led_u2_7_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_7_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_8_locate",
+            "members": [
+                {
+                    "Name": "led_u2_8_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_8_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_9_locate",
+            "members": [
+                {
+                    "Name": "led_u2_9_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_9_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_10_locate",
+            "members": [
+                {
+                    "Name": "led_u2_10_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_10_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_11_locate",
+            "members": [
+                {
+                    "Name": "led_u2_11_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_11_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_12_locate",
+            "members": [
+                {
+                    "Name": "led_u2_12_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_12_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_13_locate",
+            "members": [
+                {
+                    "Name": "led_u2_13_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_13_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_14_locate",
+            "members": [
+                {
+                    "Name": "led_u2_14_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_14_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_15_locate",
+            "members": [
+                {
+                    "Name": "led_u2_15_locate",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_u2_15_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 250,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_0_fault",
+            "members": [
+                {
+                    "Name": "led_u2_0_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_1_fault",
+            "members": [
+                {
+                    "Name": "led_u2_1_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_2_fault",
+            "members": [
+                {
+                    "Name": "led_u2_2_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_3_fault",
+            "members": [
+                {
+                    "Name": "led_u2_3_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_4_fault",
+            "members": [
+                {
+                    "Name": "led_u2_4_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_5_fault",
+            "members": [
+                {
+                    "Name": "led_u2_5_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_6_fault",
+            "members": [
+                {
+                    "Name": "led_u2_6_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_7_fault",
+            "members": [
+                {
+                    "Name": "led_u2_7_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_8_fault",
+            "members": [
+                {
+                    "Name": "led_u2_8_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_9_fault",
+            "members": [
+                {
+                    "Name": "led_u2_9_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_10_fault",
+            "members": [
+                {
+                    "Name": "led_u2_10_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_11_fault",
+            "members": [
+                {
+                    "Name": "led_u2_11_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_12_fault",
+            "members": [
+                {
+                    "Name": "led_u2_12_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_13_fault",
+            "members": [
+                {
+                    "Name": "led_u2_13_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_14_fault",
+            "members": [
+                {
+                    "Name": "led_u2_14_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "led_u2_15_fault",
+            "members": [
+                {
+                    "Name": "led_u2_15_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}

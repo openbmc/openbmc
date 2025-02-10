@@ -1,0 +1,100 @@
+{
+    "leds": [
+        {
+            "group": "bmc_booted",
+            "members": []
+        },
+        {
+            "group": "power_on",
+            "members": []
+        },
+        {
+            "group": "status_ok",
+            "members": [
+                {
+                    "Name": "status_green",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "status_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "status_degraded",
+            "members": [
+                {
+                    "Name": "status_green",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "status_amber",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "status_non_critical",
+            "members": [
+                {
+                    "Name": "status_green",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "status_amber",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "status_critical",
+            "members": [
+                {
+                    "Name": "status_green",
+                    "Action": "Off",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "status_amber",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "identify",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}

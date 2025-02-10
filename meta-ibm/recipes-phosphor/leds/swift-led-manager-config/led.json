@@ -1,0 +1,48 @@
+{
+    "leds": [
+        {
+            "group": "BmcBooted",
+            "members": []
+        },
+        {
+            "group": "PowerOn",
+            "members": []
+        },
+        {
+            "group": "EnclosureFault",
+            "members": []
+        },
+        {
+            "group": "EnclosureIdentify",
+            "members": []
+        },
+        {
+            "group": "Fan0Fault",
+            "members": []
+        },
+        {
+            "group": "Fan1Fault",
+            "members": []
+        },
+        {
+            "group": "Fan2Fault",
+            "members": []
+        },
+        {
+            "group": "Fan3Fault",
+            "members": []
+        },
+        {
+            "group": "Fan4Fault",
+            "members": []
+        },
+        {
+            "group": "Powersupply0Fault",
+            "members": []
+        },
+        {
+            "group": "Powersupply1Fault",
+            "members": []
+        }
+    ]
+}

@@ -1,0 +1,1385 @@
+{
+    "leds": [
+        {
+            "group": "core21Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core2Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core8Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm14Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "EnclosureIdentify",
+            "members": [
+                {
+                    "Name": "front_id",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_id",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan2Identify",
+            "members": [
+                {
+                    "Name": "fan2",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core9Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core23Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core5Fault",
+            "members": [
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "cpu0Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm11Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm13Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm1Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "gv100card1Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core20Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm2Fault",
+            "members": [
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm3Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan2Fault",
+            "members": [
+                {
+                    "Name": "fan2",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan3Identify",
+            "members": [
+                {
+                    "Name": "rear_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan3",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "bmcFault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core19Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core22Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm0Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm4Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "LampTest",
+            "members": [
+                {
+                    "Name": "cffps1_68",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan2",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan3",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_power",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "rear_id",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_power",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "cffps1_69",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan0",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan1",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_id",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "power_button",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "PowerOn",
+            "members": [
+                {
+                    "Name": "front_power",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "power_button",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "rear_power",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "core11Fault",
+            "members": [
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm7Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm9Fault",
+            "members": [
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "gv100card5Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "BmcBooted",
+            "members": [
+                {
+                    "Name": "rear_power",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "front_power",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                },
+                {
+                    "Name": "power_button",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "core13Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core17Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm5Fault",
+            "members": [
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm8Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "tpmFault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Powersupply0Fault",
+            "members": [
+                {
+                    "Name": "cffps1_69",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core0Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core14Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core15Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core4Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "gv100card0Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "motherboardFault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "occFault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "boxelderFault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core1Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "cpu1Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm15Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core16Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm10Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm12Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "gv100card4Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Powersupply0Identify",
+            "members": [
+                {
+                    "Name": "cffps1_69",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core10Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "gv100card2Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "systemFault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan1Fault",
+            "members": [
+                {
+                    "Name": "fan1",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core12Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core3Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core6Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core7Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm6Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Powersupply1Fault",
+            "members": [
+                {
+                    "Name": "cffps1_68",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Powersupply1Identify",
+            "members": [
+                {
+                    "Name": "cffps1_68",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "core18Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "EnclosureFault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan3Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan3",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan0Fault",
+            "members": [
+                {
+                    "Name": "fan0",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan0Identify",
+            "members": [
+                {
+                    "Name": "fan0",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan1Identify",
+            "members": [
+                {
+                    "Name": "rear_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "fan1",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "front_id",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "gv100card3Fault",
+            "members": [
+                {
+                    "Name": "front_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "rear_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}

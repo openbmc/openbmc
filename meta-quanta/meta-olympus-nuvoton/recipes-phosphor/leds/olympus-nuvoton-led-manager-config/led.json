@@ -1,0 +1,52 @@
+{
+    "leds": [
+        {
+            "group": "BmcBooted",
+            "members": [
+                {
+                    "Name": "heartbeat",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "PowerOn",
+            "members": [
+                {
+                    "Name": "identify",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "EnclosureFault",
+            "members": [
+                {
+                    "Name": "identify",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "EnclosureIdentify",
+            "members": [
+                {
+                    "Name": "identify",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}

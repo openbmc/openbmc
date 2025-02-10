@@ -1,0 +1,403 @@
+{
+    "leds": [
+        {
+            "group": "BmcBooted",
+            "members": []
+        },
+        {
+            "group": "PowerOn",
+            "members": []
+        },
+        {
+            "group": "enclosure_fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "led_identify",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "lamp_test",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
+                    "Priority": "Blink"
+                },
+                {
+                    "Name": "led_identify",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan0Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan1Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan2Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan3Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan4Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan5Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan6Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "Fan7Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "bmcFault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "cpu0Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "cpu1Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm0Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm1Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm2Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm3Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm4Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm5Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm6Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm7Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm8Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm9Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm10Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm11Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm12Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm13Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm14Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "dimm15Fault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "motherboardFault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "systemFault",
+            "members": [
+                {
+                    "Name": "led_fault",
+                    "Action": "On",
+                    "DutyOn": 50,
+                    "Period": 0,
+                    "Priority": "Blink"
+                }
+            ]
+        }
+    ]
+}
