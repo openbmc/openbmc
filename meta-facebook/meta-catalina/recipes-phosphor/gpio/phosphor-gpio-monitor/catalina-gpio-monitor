@@ -52,6 +52,11 @@ do_ID_RST_BTN_BMC_N_change()
 do_CPU_BOOT_DONE_change()
 {
     if [ "$STATE" = "assert" ]; then
+        # Workaround to Disable BIOSFRB2 ipmi watchdog
+        if busctl get-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog CurrentTimerUse | grep -q BIOSFRB2; then
+            busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog Enabled b false
+        fi
+
         busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby
         systemctl start catalina-host-ready.target
     else
