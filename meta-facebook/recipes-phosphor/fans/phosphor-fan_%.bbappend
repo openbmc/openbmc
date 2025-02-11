@@ -27,8 +27,6 @@ do_install:append:fb-withhost() {
     # Store the bitbake variable OBMC_HOST_INSTANCES  inside the script as HOST_INSTANCES variable using sed.
     sed -i -e "s,HOST_INSTANCES_SED_REPLACEMENT_VALUE,${OBMC_HOST_INSTANCES},g" ${UNPACKDIR}/host-poweroff
 
-    install -m 0755 -d ${D}/var/lib/phosphor-fan-presence/sensor-monitor
-
     install -d ${D}${libexecdir}/phosphor-fan-sensor-monitor
     install -m 0755 ${UNPACKDIR}/host-poweroff ${D}${libexecdir}/phosphor-fan-sensor-monitor/
 }
@@ -36,7 +34,6 @@ do_install:append:fb-withhost() {
 pkg_postinst:${PN}-sensor-monitor() {
     mkdir -p $D$systemd_system_unitdir/obmc-chassis-hard-poweroff@0.target.requires
     mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.requires
-    mkdir -p $D/var/lib/phosphor-fan-presence
 
 # It should be create by PSM, should we remove it?
     LINK="$D$systemd_system_unitdir/obmc-chassis-hard-poweroff@0.target.requires/obmc-chassis-poweroff@.target"
