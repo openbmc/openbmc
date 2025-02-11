@@ -4,7 +4,7 @@ Before=phosphor-pid-control.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/ventura-early-sys-init
+ExecStart=/usr/libexec/ventura/ventura-early-sys-init
 SyslogIdentifier=Ventura Early Init
 
 [Install]

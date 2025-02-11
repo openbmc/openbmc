@@ -3,7 +3,7 @@ Description=Ventura Init Tray Sgpio Status
 After=ventura-sys-init.service
 
 [Service]
-ExecStart=/usr/libexec/ventura-init-tray-sgpio-status
+ExecStart=/usr/libexec/ventura/ventura-init-tray-sgpio-status
 SyslogIdentifier=Ventura Init Tray Sgpio Status
 Type=simple
 Restart=on-failure

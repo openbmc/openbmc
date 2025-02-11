@@ -1,0 +1,37 @@
+#!/bin/bash
+
+get_product_version()
+{
+    local FRU_NAME=$1
+    local PRODUCT_VERSION
+    PRODUCT_VERSION=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/board/Ventura_"$FRU_NAME" xyz.openbmc_project.Inventory.Decorator.Revision Version | awk -F\" '{print $2}')
+    echo "$PRODUCT_VERSION"
+}
+
+rmc_board_stage=$(get_product_version RMC)
+
+rmc_source=$(busctl get-property xyz.openbmc_project.FruDevice \
+    /xyz/openbmc_project/FruDevice/Ventura_RMC_"$rmc_board_stage" \
+    xyz.openbmc_project.FruDevice BOARD_INFO_AM4 | awk -F\" '{print $2}')
+
+
+# Due to a conflict in the power monitor IC's I2C address on the 1st and 2nd source RMC,
+# we use the EM configuration to distinguish different sources from the FRU field (Board Custom Data 4).
+# Then, use D-Bus sensors to probe the driver without properties.
+# Directly set the necessary values for the chip here to ensure correct sensor readings.
+if [ "$rmc_source" = "hsc-ltc fsc-max p24vsen-ina gndsen-ina p12vbrick-delta" ]; then
+    echo "The RMC is main source"
+elif [ "$rmc_source" = "hsc-xdp fsc-nct p24vsen-isl gndsen-isl p12vbrick-flex" ]; then
+    # Configure and calibrate the ISL28022 power monitor IC.
+    echo "The RMC is second source"
+    i2cset -f -y 10 0x40 0x00 0xff67 w
+    i2cset -f -y 10 0x40 0x05 0x0080 w
+    i2cset -f -y 10 0x41 0x00 0xff7f w
+    i2cset -f -y 10 0x41 0x05 0x0010 w
+    i2cset -f -y 10 0x43 0x00 0xff7f w
+    i2cset -f -y 10 0x43 0x05 0x0010 w
+    i2cset -f -y 10 0x45 0x00 0xff67 w
+    i2cset -f -y 10 0x45 0x05 0x0080 w
+else
+    echo "Failed to get RMC source ($rmc_board_stage) info..."
+fi

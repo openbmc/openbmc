@@ -1,0 +1,15 @@
+[Unit]
+Description=Ventura Schematic Init
+After=xyz.openbmc_project.EntityManager.service
+After=xyz.openbmc_project.FruDevice.service
+After=phosphor-pid-control.service
+Requires=xyz.openbmc_project.EntityManager.service
+Requires=xyz.openbmc_project.FruDevice.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/ventura/ventura-schematic-init
+SyslogIdentifier=Ventura Schematic Init
+
+[Install]
+WantedBy=multi-user.target
