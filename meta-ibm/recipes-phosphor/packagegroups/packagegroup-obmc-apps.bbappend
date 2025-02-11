@@ -32,6 +32,7 @@ RDEPENDS:${PN}-inventory:remove:huygens = " openpower-occ-control"
 
 RDEPENDS:${PN}-fan-control:append:ibm-ac-server = " fan-watchdog"
 RDEPENDS:${PN}-fan-control:append:p10bmc = " fan-watchdog"
+RDEPENDS:${PN}-fan-control:append:sbp1 = " fan-watchdog phosphor-fan-sensor-monitor"
 
 RDEPENDS:${PN}-extras:append:ibm-ac-server = " ${POWER_SERVICE_PACKAGES_AC_SERVER} witherspoon-power-supply-sync"
 RDEPENDS:${PN}-extras:append:p10bmc = " ${POWER_SERVICE_PACKAGES_P10} dbus-sensors phosphor-virtual-sensor"
@@ -49,4 +50,5 @@ RDEPENDS:${PN}-software:append:system1 = " phosphor-software-manager-side-switch
 RDEPENDS:${PN}-host-state-mgmt:remove:p10bmc = "checkstop-monitor"
 RDEPENDS:${PN}-logging:append = " ${EXTRA_IBM_LOGGING_PKGS}"
 RDEPENDS:${PN}-leds:remove:witherspoon-tacoma = "phosphor-led-manager-faultmonitor"
+RDEPENDS:${PN}-leds:remove:sbp1 = "phosphor-led-manager-faultmonitor"
 RDEPENDS:${PN}-devtools:remove:witherspoon = "rsync"
