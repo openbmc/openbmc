@@ -31,7 +31,7 @@ RDEPENDS:${PN}-inventory:append:witherspoon-tacoma = " entity-manager"
 RDEPENDS:${PN}-inventory:remove:huygens = " openpower-occ-control"
 
 RDEPENDS:${PN}-fan-control:append:ibm-ac-server = " fan-watchdog"
-RDEPENDS:${PN}-fan-control:append:p10bmc = " fan-watchdog phosphor-fan-sensor-monitor"
+RDEPENDS:${PN}-fan-control:append:p10bmc = " fan-watchdog"
 
 RDEPENDS:${PN}-extras:append:ibm-ac-server = " ${POWER_SERVICE_PACKAGES_AC_SERVER} witherspoon-power-supply-sync"
 RDEPENDS:${PN}-extras:append:p10bmc = " ${POWER_SERVICE_PACKAGES_P10} dbus-sensors phosphor-virtual-sensor"

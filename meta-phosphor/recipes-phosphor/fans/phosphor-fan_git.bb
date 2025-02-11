@@ -48,6 +48,9 @@ PACKAGECONFIG[monitor] = "-Dmonitor-service=enabled \
     phosphor-fan-monitor-config \
     , \
 "
+RDEPENDS:${PN}-monitor:append = " \
+    ${@bb.utils.contains('PACKAGECONFIG', 'sensor-monitor', '${PN}-sensor-monitor', '', d)} \
+"
 # --------------------------------------
 # phosphor-cooling-type specific configuration
 PACKAGECONFIG[cooling-type] = "-Dcooling-type-service=enabled,-Dcooling-type-service=disabled,,"
@@ -114,7 +117,10 @@ FILES:${PN}-monitor = "${bindir}/phosphor-fan-monitor"
 # Package the JSON config files installed from the repo
 FILES:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
     '${datadir}/phosphor-fan-presence/monitor/*', '', d)}"
-FILES:${PN}-sensor-monitor += " ${bindir}/sensor-monitor"
+FILES:${PN}-sensor-monitor += " \
+    ${bindir}/sensor-monitor \
+    ${@bb.utils.contains('PACKAGECONFIG', 'json', '${datadir}/phosphor-fan-presence/sensor-monitor/*', '', d)} \
+"
 
 require ${BPN}.inc
 

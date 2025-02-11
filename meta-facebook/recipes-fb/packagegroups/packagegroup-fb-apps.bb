@@ -59,7 +59,6 @@ RDEPENDS:${PN}-system = " \
         entity-manager \
         dbus-sensors \
         phosphor-virtual-sensor \
-        phosphor-fan-sensor-monitor \
         phosphor-gpio-monitor-monitor \
         tzdata-core \
         fb-common-functions \
