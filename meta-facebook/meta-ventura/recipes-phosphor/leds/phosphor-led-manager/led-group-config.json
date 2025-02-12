@@ -7,7 +7,8 @@
                     "Name" : "bmc_heartbeat_amber",
                     "Action" : "Blink",
                     "DutyOn" : 50,
-                    "Period" : 1000
+                    "Period" : 1000,
+                    "Priority": "On"
                 }
             ]
         },
@@ -28,7 +29,8 @@
                     "Name": "fp_id_amber",
                     "Action": "Blink",
                     "DutyOn": 50,
-                    "Period": 250
+                    "Period": 250,
+                    "Priority": "On"
                 }
             ]
         },
@@ -37,11 +39,13 @@
             "members": [
                 {
                     "Name": "compute1_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute1_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -50,11 +54,13 @@
             "members": [
                 {
                     "Name": "compute1_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute1_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -63,11 +69,13 @@
             "members": [
                 {
                     "Name": "compute2_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute2_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -76,11 +84,13 @@
             "members": [
                 {
                     "Name": "compute2_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute2_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -89,11 +99,13 @@
             "members": [
                 {
                     "Name": "compute3_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute3_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -102,11 +114,13 @@
             "members": [
                 {
                     "Name": "compute3_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute3_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -115,11 +129,13 @@
             "members": [
                 {
                     "Name": "compute4_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute4_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -128,11 +144,13 @@
             "members": [
                 {
                     "Name": "compute4_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute4_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -141,11 +159,13 @@
             "members": [
                 {
                     "Name": "compute5_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute5_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -154,11 +174,13 @@
             "members": [
                 {
                     "Name": "compute5_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute5_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -167,11 +189,13 @@
             "members": [
                 {
                     "Name": "compute6_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute6_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -180,11 +204,13 @@
             "members": [
                 {
                     "Name": "compute6_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute6_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -193,11 +219,13 @@
             "members": [
                 {
                     "Name": "compute7_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute7_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -206,11 +234,13 @@
             "members": [
                 {
                     "Name": "compute7_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute7_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -219,11 +249,13 @@
             "members": [
                 {
                     "Name": "compute8_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute8_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -232,11 +264,13 @@
             "members": [
                 {
                     "Name": "compute8_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute8_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -245,11 +279,13 @@
             "members": [
                 {
                     "Name": "nvs1_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs1_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -258,11 +294,13 @@
             "members": [
                 {
                     "Name": "nvs1_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs1_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -271,11 +309,13 @@
             "members": [
                 {
                     "Name": "nvs2_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs2_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -284,11 +324,13 @@
             "members": [
                 {
                     "Name": "nvs2_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs2_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -297,11 +339,13 @@
             "members": [
                 {
                     "Name": "nvs3_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs3_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -310,11 +354,13 @@
             "members": [
                 {
                     "Name": "nvs3_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs3_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -323,11 +369,13 @@
             "members": [
                 {
                     "Name": "nvs4_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs4_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -336,11 +384,13 @@
             "members": [
                 {
                     "Name": "nvs4_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs4_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -349,11 +399,13 @@
             "members": [
                 {
                     "Name": "nvs5_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs5_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -362,11 +414,13 @@
             "members": [
                 {
                     "Name": "nvs5_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs5_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -375,11 +429,13 @@
             "members": [
                 {
                     "Name": "nvs6_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs6_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -388,11 +444,13 @@
             "members": [
                 {
                     "Name": "nvs6_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs6_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -401,11 +459,13 @@
             "members": [
                 {
                     "Name": "nvs7_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs7_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -414,11 +474,13 @@
             "members": [
                 {
                     "Name": "nvs7_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs7_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -427,11 +489,13 @@
             "members": [
                 {
                     "Name": "nvs8_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs8_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -440,11 +504,13 @@
             "members": [
                 {
                     "Name": "nvs8_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs8_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -453,11 +519,13 @@
             "members": [
                 {
                     "Name": "nvs9_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs9_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -466,11 +534,13 @@
             "members": [
                 {
                     "Name": "nvs9_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "nvs9_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -479,11 +549,13 @@
             "members": [
                 {
                     "Name": "compute9_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute9_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -492,11 +564,13 @@
             "members": [
                 {
                     "Name": "compute9_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute9_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -505,11 +579,13 @@
             "members": [
                 {
                     "Name": "compute10_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute10_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -518,11 +594,13 @@
             "members": [
                 {
                     "Name": "compute10_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute10_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -531,11 +609,13 @@
             "members": [
                 {
                     "Name": "compute11_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute11_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -544,11 +624,13 @@
             "members": [
                 {
                     "Name": "compute11_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute11_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -557,11 +639,13 @@
             "members": [
                 {
                     "Name": "compute12_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute12_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -570,11 +654,13 @@
             "members": [
                 {
                     "Name": "compute12_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute12_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -583,11 +669,13 @@
             "members": [
                 {
                     "Name": "compute13_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute13_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -596,11 +684,13 @@
             "members": [
                 {
                     "Name": "compute13_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute13_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -609,11 +699,13 @@
             "members": [
                 {
                     "Name": "compute14_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute14_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -622,11 +714,13 @@
             "members": [
                 {
                     "Name": "compute14_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute14_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -635,11 +729,13 @@
             "members": [
                 {
                     "Name": "compute15_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute15_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -648,11 +744,13 @@
             "members": [
                 {
                     "Name": "compute15_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute15_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -661,11 +759,13 @@
             "members": [
                 {
                     "Name": "compute16_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute16_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -674,11 +774,13 @@
             "members": [
                 {
                     "Name": "compute16_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute16_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -687,11 +789,13 @@
             "members": [
                 {
                     "Name": "compute17_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute17_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -700,11 +804,13 @@
             "members": [
                 {
                     "Name": "compute17_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute17_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -713,11 +819,13 @@
             "members": [
                 {
                     "Name": "compute18_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute18_led_blue",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         },
@@ -726,11 +834,13 @@
             "members": [
                 {
                     "Name": "compute18_led_switch",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 },
                 {
                     "Name": "compute18_led_amber",
-                    "Action": "On"
+                    "Action": "On",
+                    "Priority": "On"
                 }
             ]
         }
