@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Leak Detect Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/log-create xyz.openbmc_project.State.Leak.Detector.LeakDetectedCritical --json "{\"DETECTOR_NAME\": \"/xyz/openbmc_project/state/leak/detector/%i\"}"
+SyslogIdentifier=%i-critical-leak-detect-assert
