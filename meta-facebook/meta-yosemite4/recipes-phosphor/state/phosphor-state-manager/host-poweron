@@ -45,6 +45,7 @@ while [ $count -lt $MAX_RETRY ]; do
     resp=$(pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x01 -m "$EID" | grep "39 00 $")
     # check BIC response with success return code
     if [ -n "$resp" ]; then
+        echo "Host$1 send power on command to bic success"
         break;
     else
         echo "Waiting EID $EID $count"
@@ -68,6 +69,9 @@ get_host_status
 if [ "$host_status" == "$STATE_ON" ]
 then
     echo "Host$1 power on success"
+    msg="Host$1 system DC power is on"
+    echo "${msg}"
+    add_sel "${msg}"
     exit 0;
 else
     msg="Failed to set host$1 power on"

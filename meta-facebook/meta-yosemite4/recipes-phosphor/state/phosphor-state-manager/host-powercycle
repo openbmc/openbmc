@@ -32,6 +32,9 @@ if [ "$host_status" == "$STATE_ON" ]; then
 
     # Set host state to off
     busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
+    msg="Host$CHASSIS_ID system DC power is off"
+    echo "${msg}"
+    add_sel "${msg}"
 
     # Wait for the host to power off
     sleep 10s
@@ -63,6 +66,9 @@ if [ "$host_status" != "$STATE_ON" ]; then
         exit 1
     fi
 
+    msg="Host$CHASSIS_ID system DC power is on"
+    echo "${msg}"
+    add_sel "${msg}"
     # Set host state to on
     busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
 fi

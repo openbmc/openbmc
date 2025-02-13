@@ -57,6 +57,9 @@ get_host_status
 if [ "$host_status" == "$STATE_OFF" ]
 then
     echo "Host$1 power off success"
+    msg="Host$1 system DC power is off"
+    echo "${msg}"
+    add_sel "${msg}"
     exit 0;
 else
     msg="Failed to set host$1 power off"
