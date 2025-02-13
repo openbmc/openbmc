@@ -1,3 +1,7 @@
 owners:
-- thang@os.amperecomputing.com
-- thu@os.amperecomputing.com
+- thubanguyen
+
+openbmc:
+- name: Thu Nguyen
+  email: thu@os.amperecomputing.com
+  discord: thubanguyen
