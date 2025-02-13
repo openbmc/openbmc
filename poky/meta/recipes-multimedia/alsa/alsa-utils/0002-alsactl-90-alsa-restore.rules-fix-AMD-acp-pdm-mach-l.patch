@@ -1,0 +1,35 @@
+From 6f7ce73159c02b726a6f0fe0acff961c95e337a8 Mon Sep 17 00:00:00 2001
+From: Aaron Ma <aaron.ma@canonical.com>
+Date: Wed, 20 Nov 2024 15:55:02 +0800
+Subject: [PATCH 2/2] alsactl: 90-alsa-restore.rules - fix AMD acp-pdm-mach
+ link
+
+The link name of AMD ACP digital microphones driver acp-pdm-mach
+is acp-dmic-codec. Fix it to make UCM initialize it again.
+
+Closes: https://github.com/alsa-project/alsa-utils/pull/281
+Fixes: 8116639 ("alsactl: 90-alsa-restore.rules - add support for AMD ACP digital microphone")
+Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+Upstream-Status: Backport [https://github.com/alsa-project/alsa-utils/commit/6f7ce73159c02b726a6f0fe0acff961c95e337a8]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ alsactl/90-alsa-restore.rules.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/alsactl/90-alsa-restore.rules.in b/alsactl/90-alsa-restore.rules.in
+index dae2ed8ccc8f..5db6080b0dc6 100644
+--- a/alsactl/90-alsa-restore.rules.in
++++ b/alsactl/90-alsa-restore.rules.in
+@@ -14,7 +14,7 @@ DRIVERS=="snd_hda_intel", TEST=="device/pcmC$env{ALSA_CARD_NUMBER}D0p", RUN+="/b
+ TEST=="device/device/acp3x-dmic-capture", GOTO="alsa_hda_analog"
+ TEST=="device/device/acp6x-dmic-capture", GOTO="alsa_hda_analog"
+ TEST=="device/device/acp63-dmic-capture", GOTO="alsa_hda_analog"
+-TEST=="device/device/acp-pdm-dmic", GOTO="alsa_hda_analog"
++TEST=="device/device/acp-dmic-codec", GOTO="alsa_hda_analog"
+ GOTO="alsa_restore_std"
+ 
+ LABEL="alsa_hda_analog"
+-- 
+2.25.1
+

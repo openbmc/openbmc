@@ -1,0 +1,46 @@
+From ce68809d41291f671b440abce41f8f71c95428aa Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 3 Feb 2025 20:06:46 +0100
+Subject: [PATCH] src/core/build_steps/tool.rs: switch off lto for rustdoc
+
+For reasons currently unknown, librustdoc binary ends up with
+non-reproducible .llvm.<number> suffixes in its symbols - but
+not any other binary.
+
+Disabling lto avoids creating these suffixes. More info about the option:
+https://doc.rust-lang.org/rustc/codegen-options/index.html#lto
+
+As seen below, there's a comment in the source tree saying not to tweak the options
+but this only creates a mix of lto and non-lto optimized binary objects from
+various crates, which should be safe to mix.
+
+Upstream-Status: Inappropriate [reported at https://github.com/rust-lang/rust/issues/134589]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/bootstrap/src/core/build_steps/tool.rs | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/bootstrap/src/core/build_steps/tool.rs b/src/bootstrap/src/core/build_steps/tool.rs
+index 087df2f8a..00790affb 100644
+--- a/src/bootstrap/src/core/build_steps/tool.rs
++++ b/src/bootstrap/src/core/build_steps/tool.rs
+@@ -635,7 +635,7 @@ impl Step for Rustdoc {
+         }
+ 
+         // NOTE: Never modify the rustflags here, it breaks the build cache for other tools!
+-        let cargo = prepare_tool_cargo(
++        let mut cargo = prepare_tool_cargo(
+             builder,
+             build_compiler,
+             Mode::ToolRustc,
+@@ -645,6 +645,7 @@ impl Step for Rustdoc {
+             SourceType::InTree,
+             features.as_slice(),
+         );
++        cargo.rustflag("-Clto=off");
+ 
+         let _guard = builder.msg_tool(
+             Kind::Build,
+-- 
+2.39.5
+

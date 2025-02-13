@@ -14,12 +14,17 @@ Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
 
 - fix warning: library search path "/usr/lib/p7zip" is unsafe for cross-compilation
 
+- fix error: include location "/usr/include/android" is unsafe for cross-compilation
+
 Upstream-Status: Pending
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
+ debian/development/etc1tool.mk                 |  1 -
  debian/external/boringssl/libcrypto.mk         |  1 +
+ debian/libnativehelper/libnativehelper.mk      |  1 -
+ debian/system/core/adb.mk                      |  1 -
  debian/system/core/append2simg.mk              |  2 +-
- debian/system/core/fastboot.mk                 |  2 +-
+ debian/system/core/fastboot.mk                 |  3 +--
  debian/system/core/img2simg.mk                 |  2 +-
  debian/system/core/libbacktrace.mk             | 10 ++++------
  debian/system/core/libbase.mk                  |  5 +++--
@@ -30,11 +35,24 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  debian/system/core/libziparchive.mk            |  5 +++--
  debian/system/core/simg2img.mk                 |  2 +-
  debian/system/core/simg2simg.mk                |  2 +-
+ debian/system/extras/libext4_utils.mk          |  1 -
  frameworks/native/libs/adbd_auth/adbd_auth.cpp |  2 ++
  system/core/adb/adb_listeners.cpp              | 12 ++++++------
  system/core/adb/transport_local.cpp            |  2 +-
- 16 files changed, 35 insertions(+), 29 deletions(-)
+ 20 files changed, 35 insertions(+), 34 deletions(-)
 
+diff --git a/debian/development/etc1tool.mk b/debian/development/etc1tool.mk
+index 2d787e98bb86..e03ac5f0048c 100644
+--- a/debian/development/etc1tool.mk
++++ b/debian/development/etc1tool.mk
+@@ -4,7 +4,6 @@ SOURCES = development/tools/etc1tool/etc1tool.cpp
+ 
+ CXXFLAGS += -std=gnu++2a
+ CPPFLAGS += \
+-  -I/usr/include/android \
+   -Idevelopment/include \
+   -Iframeworks/native/opengl/include \
+ 
 diff --git a/debian/external/boringssl/libcrypto.mk b/debian/external/boringssl/libcrypto.mk
 index c0ea54f4..b3a77bfd 100644
 --- a/debian/external/boringssl/libcrypto.mk
@@ -47,6 +65,38 @@ index c0ea54f4..b3a77bfd 100644
    -Iexternal/boringssl/src/crypto \
    -Iexternal/boringssl/src/include \
  
+diff --git a/debian/libnativehelper/libnativehelper.mk b/debian/libnativehelper/libnativehelper.mk
+index 7a0c94a6b7b5..880b2fdf9154 100644
+--- a/debian/libnativehelper/libnativehelper.mk
++++ b/debian/libnativehelper/libnativehelper.mk
+@@ -11,7 +11,6 @@ OBJECTS = $(SOURCES:.cpp=.o)
+ 
+ CXXFLAGS += -std=gnu++2a
+ CPPFLAGS += \
+-  -I/usr/include/android \
+   -Ilibnativehelper/header_only_include \
+   -Ilibnativehelper/include \
+   -Ilibnativehelper/include_jni \
+diff --git a/debian/system/core/adb.mk b/debian/system/core/adb.mk
+index 9769b68ab793..58c9a63bd225 100644
+--- a/debian/system/core/adb.mk
++++ b/debian/system/core/adb.mk
+@@ -19,7 +19,6 @@ CPPFLAGS += \
+   -D_GNU_SOURCE \
+   -DADB_HOST=1 \
+   -DADB_VERSION='"$(DEB_VERSION)"' \
+-  -I/usr/include/android \
+   -Iexternal/boringssl/include \
+   -Isystem/core/adb \
+   -Isystem/core/base/include \
+@@ -28,7 +27,6 @@ CPPFLAGS += \
+ LDFLAGS += \
+   -Ldebian/out/system/core \
+   -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
+-  -fuse-ld=gold \
+   -lbase \
+   -lcutils \
+   -lpthread \
 diff --git a/debian/system/core/append2simg.mk b/debian/system/core/append2simg.mk
 index 1599bdb8..598c751d 100644
 --- a/debian/system/core/append2simg.mk
@@ -64,15 +114,24 @@ diff --git a/debian/system/core/fastboot.mk b/debian/system/core/fastboot.mk
 index d5c9a285..a59ba1a4 100644
 --- a/debian/system/core/fastboot.mk
 +++ b/debian/system/core/fastboot.mk
-@@ -49,7 +49,7 @@ CPPFLAGS += \
+@@ -30,7 +30,6 @@ CXXFLAGS += -std=gnu++2a -fpermissive
+ CPPFLAGS += \
+    -D_FILE_OFFSET_BITS=64 \
+    -DPLATFORM_TOOLS_VERSION='"$(PLATFORM_TOOLS_VERSION)"' \
+-   -I/usr/include/android \
+    -Iexternal/boringssl/include \
+    -Iexternal/avb \
+    -Isystem/core/adb \
+@@ -49,8 +48,7 @@ CPPFLAGS += \
  
  LDFLAGS += \
    -Ldebian/out/system/core \
 -  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
+-  -fuse-ld=gold \
 +  -Wl,-rpath='$$ORIGIN/../lib/android' \
-   -fuse-ld=gold \
    -lbase \
    -lcutils \
+   -lpthread \
 diff --git a/debian/system/core/img2simg.mk b/debian/system/core/img2simg.mk
 index 11adf014..8baf5ba5 100644
 --- a/debian/system/core/img2simg.mk
@@ -291,6 +350,18 @@ index ed53b04c..646ab030 100644
    -lbase \
    -llog \
    -lpthread \
+diff --git a/debian/system/extras/libext4_utils.mk b/debian/system/extras/libext4_utils.mk
+index 264bb95ad36a..99125097c8e3 100644
+--- a/debian/system/extras/libext4_utils.mk
++++ b/debian/system/extras/libext4_utils.mk
+@@ -25,7 +25,6 @@ CPPFLAGS += \
+   -D_LARGEFILE64_SOURCE \
+   -DFEC_NO_KLOG \
+   -DSQUASHFS_NO_KLOG \
+-  -I/usr/include/android \
+   -Isystem/core/base/include \
+   -Isystem/core/libcutils/include \
+   -Isystem/core/libsparse/include \
 diff --git a/frameworks/native/libs/adbd_auth/adbd_auth.cpp b/frameworks/native/libs/adbd_auth/adbd_auth.cpp
 index a9c23110..6ca334ba 100644
 --- a/frameworks/native/libs/adbd_auth/adbd_auth.cpp

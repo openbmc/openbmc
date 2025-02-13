@@ -1,7 +1,7 @@
 # This script is used as a bitbake task to create a new python manifest
 # $ bitbake python -c create_manifest
 #
-# Our goal is to keep python-core as small as posible and add other python
+# Our goal is to keep python-core as small as possible and add other python
 # packages only when the user needs them, hence why we split upstream python
 # into several packages.
 #

@@ -11,10 +11,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 7f137c0..e15f5bc 100644
+index 40e9c0d..8f42d4d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -958,24 +958,24 @@ fi
+@@ -966,24 +966,24 @@ fi
  dnl Priority 1: User specifies the path to installation
  if test "z$NSPR_FOUND" = "zno" -a "z$with_nspr" != "z" -a "z$with_nspr" != "zyes" ; then
      AC_MSG_CHECKING(for nspr library installation in "$with_nspr" folder)
@@ -27,8 +27,8 @@ index 7f137c0..e15f5bc 100644
          NSPR_FOUND="yes"
          AC_MSG_RESULT([yes])
      else
--        AC_MSG_ERROR([not found: "$with_nspr/include/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/lib/$NSPR_LIB_MARKER" files don't exist), typo?])
-+        AC_MSG_ERROR([not found: "$with_nspr/${includedir}/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/${libdir}/$NSPR_LIB_MARKER" files don't exist), typo?])
+-        AC_MSG_ERROR([not found: "$with_nspr/include/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/lib/$NSPR_LIB_MARKER"])
++        AC_MSG_ERROR([not found: "$with_nspr/${includedir}/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/${libdir}/$NSPR_LIB_MARKER"])
      fi
  fi
  if test "z$NSS_FOUND" = "zno" -a "z$with_nss" != "z" -a "z$with_nss" != "zyes" ; then
@@ -42,8 +42,11 @@ index 7f137c0..e15f5bc 100644
          NSS_FOUND="yes"
          AC_MSG_RESULT([yes])
      else
--        AC_MSG_ERROR([not found: "$with_nss/include/$NSS_INCLUDE_MARKER" and/or "$with_nss/lib/$NSS_LIB_MARKER" files don't exist), typo?])
-+        AC_MSG_ERROR([not found: "$with_nss/${includedir}/$NSS_INCLUDE_MARKER" and/or "$with_nss/${libdir}/$NSS_LIB_MARKER" files don't exist), typo?])
+-        AC_MSG_ERROR([not found: "$with_nss/include/$NSS_INCLUDE_MARKER" and/or "$with_nss/lib/$NSS_LIB_MARKER"])
++        AC_MSG_ERROR([not found: "$with_nss/${includedir}/$NSS_INCLUDE_MARKER" and/or "$with_nss/${libdir}/$NSS_LIB_MARKER"])
      fi
  fi
  
+-- 
+2.43.0
+

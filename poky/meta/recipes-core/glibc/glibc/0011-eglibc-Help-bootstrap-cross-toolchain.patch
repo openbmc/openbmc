@@ -1,4 +1,4 @@
-From bd4b95bcc335599e736a3554112f1e912a79542b Mon Sep 17 00:00:00 2001
+From 435b57e8327555b273a52df672b2611050a8c579 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:49:28 +0000
 Subject: [PATCH] eglibc: Help bootstrap cross toolchain
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 include/stubs-bootstrap.h
 
 diff --git a/Makefile b/Makefile
-index c84f266ce7..790c717958 100644
+index 97b4328af8..5c20ed3cff 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -79,9 +79,18 @@ subdir-dirs = include

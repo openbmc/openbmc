@@ -1,7 +1,7 @@
 # DO NOT (entirely) modify this file manually, please read.
 #
 # IMPORTANT NOTE:
-# Please keep in mind that the create_manifest task relies on the fact the the
+# Please keep in mind that the create_manifest task relies on the fact that the
 # target and native Python packages are the same, and it also needs to be executed
 # with a fully working native package (with all the PACKAGECONFIGs enabled and all
 # and all the modules should be working, check log.do_compile), otherwise the script

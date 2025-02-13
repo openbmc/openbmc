@@ -17,13 +17,15 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 LIBSPDM_CFLAGS = "\
-	${TARGET_CFLAGS} \
+	${OECMAKE_C_FLAGS} \
 	-DLIBSPDM_ENABLE_CAPABILITY_EVENT_CAP=0 \
 	-DLIBSPDM_ENABLE_CAPABILITY_MEL_CAP=0 \
 	-DLIBSPDM_ENABLE_CAPABILITY_GET_KEY_PAIR_INFO_CAP=0 \
 	-DLIBSPDM_ENABLE_CAPABILITY_SET_KEY_PAIR_INFO_CAP=0 \
 	-DLIBSPDM_HAL_PASS_SPDM_CONTEXT=1 \
 	"
+
+LIBSPDM_CFLAGS:append:toolchain-gcc = " -fPIE"
 
 def get_spdm_multiarch(bb, d):
     target_arch = d.getVar('TARGET_ARCH')
@@ -53,6 +55,7 @@ EXTRA_OECMAKE += "\
 	-DCOMPILED_LIBSSL_PATH=${libdir} \
 	-DDISABLE_TESTS=1 \
 	-DDISABLE_EDDSA=1 \
+	-DCMAKE_C_FLAGS='${LIBSPDM_CFLAGS}' \
 	"
 
 do_install () {
@@ -73,5 +76,6 @@ FILES:${PN} += "${includedir}/${BPN}/os_stub/spdm_crypt_ext_lib/*.h"
 COMPATIBLE_HOST:powerpc = "null"
 COMPATIBLE_HOST:powerpc64 = "null"
 COMPATIBLE_HOST:mipsarchn32 = "null"
+COMPATIBLE_HOST:mipsarcho32 = "null"
 
 BBCLASSEXTEND = "native nativesdk"

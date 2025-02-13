@@ -5,7 +5,8 @@ SECTION = "console/tools"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=a05663ae6cca874123bf667a60dca8c9"
 
-SRC_URI = "git://github.com/sandstorm-io/capnproto.git;branch=release-${PV};protocol=https"
+SRC_URI = "git://github.com/sandstorm-io/capnproto.git;branch=release-${PV};protocol=https \
+           file://0001-Don-t-check-usr-bin-content-from-cmake.patch"
 SRCREV = "1a0e12c0a3ba1f0dbbad45ddfef555166e0a14fc"
 
 S = "${WORKDIR}/git/c++"

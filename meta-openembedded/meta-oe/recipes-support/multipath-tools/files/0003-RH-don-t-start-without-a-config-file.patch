@@ -1,4 +1,4 @@
-From 06a411b15e131eb4ebc2df95dc10fcff944bead6 Mon Sep 17 00:00:00 2001
+From 2fe1037b8198bd00961d8df48e684296758127d1 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Fri, 23 Nov 2018 17:25:15 +0800
 Subject: [PATCH] RH: don't start without a config file
@@ -28,7 +28,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  5 files changed, 23 insertions(+)
 
 diff --git a/libmultipath/config.c b/libmultipath/config.c
-index 0e3a5cc1..3fbfcc85 100644
+index 8b424d18..d8fafa1f 100644
 --- a/libmultipath/config.c
 +++ b/libmultipath/config.c
 @@ -26,6 +26,7 @@
@@ -39,7 +39,7 @@ index 0e3a5cc1..3fbfcc85 100644
  
  /*
   * We don't support re-initialization after
-@@ -959,6 +960,23 @@ int init_config__ (const char *file, struct config *conf)
+@@ -937,6 +938,23 @@ int init_config__ (const char *file, struct config *conf)
  		}
  		factorize_hwtable(conf->hwtable, builtin_hwtable_size, file);
  		validate_pctable(conf->overrides, 0, file);
@@ -64,7 +64,7 @@ index 0e3a5cc1..3fbfcc85 100644
  
  	conf->processed_main_config = 1;
 diff --git a/libmultipath/config.h b/libmultipath/config.h
-index 94cdf252..534b6142 100644
+index 5b4ebf8c..2302eacc 100644
 --- a/libmultipath/config.h
 +++ b/libmultipath/config.h
 @@ -10,6 +10,7 @@
@@ -101,7 +101,7 @@ index 7bc8806e..315884eb 100644
  .
  .\" ----------------------------------------------------------------------------
 diff --git a/multipathd/multipathd.service.in b/multipathd/multipathd.service.in
-index 646001e6..979e6f12 100644
+index b6a25b31..f78bb91b 100644
 --- a/multipathd/multipathd.service.in
 +++ b/multipathd/multipathd.service.in
 @@ -5,6 +5,7 @@ Before=local-fs-pre.target blk-availability.service shutdown.target
@@ -112,6 +112,3 @@ index 646001e6..979e6f12 100644
  Before=initrd-cleanup.service
  DefaultDependencies=no
  Conflicts=shutdown.target
--- 
-2.25.1
-

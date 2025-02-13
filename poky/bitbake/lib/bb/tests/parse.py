@@ -443,3 +443,23 @@ include \\
                 in_file.write("\n".join(lines))
                 in_file.flush()
             bb.parse.handle(recipename_closed, bb.data.createCopy(self.d))
+
+    special_character_assignment = """
+A+="a"
+A+ = "b"
++ = "c"
+"""
+    ambigous_assignment = """
++= "d"
+"""
+    def test_parse_special_character_assignment(self):
+        f = self.parsehelper(self.special_character_assignment)
+        d = bb.parse.handle(f.name, self.d)['']
+        self.assertEqual(d.getVar("A"), " a")
+        self.assertEqual(d.getVar("A+"), "b")
+        self.assertEqual(d.getVar("+"), "c")
+
+        f = self.parsehelper(self.ambigous_assignment)
+        with self.assertRaises(bb.parse.ParseError) as error:
+            bb.parse.handle(f.name, self.d)
+        self.assertIn("Empty variable name in assignment", str(error.exception))

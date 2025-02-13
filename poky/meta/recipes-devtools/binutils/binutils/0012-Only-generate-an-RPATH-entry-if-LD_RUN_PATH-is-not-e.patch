@@ -1,4 +1,4 @@
-From 508c79dbef580e52b1c47026dfe2fe5ae7be4d56 Mon Sep 17 00:00:00 2001
+From fecc7af84b2735fad82da304fce37f373d2c0f53 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 10 Mar 2022 21:21:33 -0800
 Subject: [PATCH] Only generate an RPATH entry if LD_RUN_PATH is not empty
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index e49c0217ae2..069f2263c81 100644
+index f6f3ac11a76..77442fdc964 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
-@@ -1130,6 +1130,9 @@ ldelf_handle_dt_needed (struct elf_link_hash_table *htab,
+@@ -1134,6 +1134,9 @@ ldelf_handle_dt_needed (struct elf_link_hash_table *htab,
  		  && command_line.rpath == NULL)
  		{
  		  path = (const char *) getenv ("LD_RUN_PATH");
@@ -27,7 +27,7 @@ index e49c0217ae2..069f2263c81 100644
  		  if (path
  		      && ldelf_search_needed (path, &n, force,
  					      is_linux, elfsize))
-@@ -1805,6 +1808,8 @@ ldelf_before_allocation (char *audit, char *depaudit,
+@@ -1811,6 +1814,8 @@ ldelf_before_allocation (char *audit, char *depaudit,
    rpath = command_line.rpath;
    if (rpath == NULL)
      rpath = (const char *) getenv ("LD_RUN_PATH");

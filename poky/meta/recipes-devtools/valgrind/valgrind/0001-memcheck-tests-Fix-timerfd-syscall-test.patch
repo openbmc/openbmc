@@ -1,4 +1,4 @@
-From 5d411fd147d652e9d7bb259f4048693c6e4742aa Mon Sep 17 00:00:00 2001
+From ddf3ac832d85bd9a1266c52ff3ae5ec88c4114db Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 9 Mar 2020 16:30:19 -0700
 Subject: [PATCH] memcheck/tests: Fix timerfd syscall test
@@ -10,14 +10,16 @@ have the implementation or syscall is not defined
 Upstream-Status: Submitted [https://sourceforge.net/p/valgrind/mailman/message/36943897/]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- config.h.in                            |  9 +++++++++
- configure.ac                           |  3 +++
- memcheck/tests/linux/timerfd-syscall.c | 10 ++++++++--
- 5 files changed, 32 insertions(+), 2 deletions(-)
+ config.h.in                            |  3 +++
+ configure.ac                           |  1 +
+ memcheck/tests/linux/timerfd-syscall.c | 14 +++++++++++---
+ 3 files changed, 15 insertions(+), 3 deletions(-)
 
+diff --git a/config.h.in b/config.h.in
+index d2e8b26..f235dec 100644
 --- a/config.h.in
 +++ b/config.h.in
-@@ -424,6 +424,9 @@
+@@ -406,6 +406,9 @@
  /* Define to 1 if you have the <sys/sysnvl.h> header file. */
  #undef HAVE_SYS_SYSNVL_H
  
@@ -27,9 +29,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  /* Define to 1 if you have the <sys/time.h> header file. */
  #undef HAVE_SYS_TIME_H
  
+diff --git a/configure.ac b/configure.ac
+index 75d42c9..b6ec119 100755
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4881,6 +4881,7 @@ AC_CHECK_HEADERS([       \
+@@ -4844,6 +4844,7 @@ AC_CHECK_HEADERS([       \
          sys/syscall.h    \
          sys/sysnvl.h     \
          sys/time.h       \
@@ -37,6 +41,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
          sys/types.h      \
          ])
  
+diff --git a/memcheck/tests/linux/timerfd-syscall.c b/memcheck/tests/linux/timerfd-syscall.c
+index 61d75b5..1ba888a 100644
 --- a/memcheck/tests/linux/timerfd-syscall.c
 +++ b/memcheck/tests/linux/timerfd-syscall.c
 @@ -42,6 +42,9 @@
@@ -80,7 +86,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  
  /* Definitions from include/linux/timerfd.h */
-@@ -124,6 +130,7 @@ void set_timespec(struct timespec *tmr,
+@@ -124,6 +130,7 @@ void set_timespec(struct timespec *tmr, unsigned long long ustime)
    tmr->tv_nsec = (long) (1000ULL * (ustime % 1000000ULL));
  }
  
@@ -88,7 +94,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  int timerfd_create(int clockid, int flags)
  {
    return syscall(__NR_timerfd_create, clockid, flags);
-@@ -139,6 +146,7 @@ int timerfd_gettime(int ufc, struct itim
+@@ -139,6 +146,7 @@ int timerfd_gettime(int ufc, struct itimerspec *otmr)
  {
    return syscall(__NR_timerfd_gettime, ufc, otmr);
  }

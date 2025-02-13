@@ -1,0 +1,45 @@
+From c534091fc6924e76e6d24e861da9cf7272714231 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 21 Jan 2025 11:02:05 +0800
+Subject: [PATCH] uatomic/generic.h: add missing stdlib.h header file for
+ abort()
+
+We encountered the following error when building multipath-tools on
+qemuppc64 platform:
+
+| In file included from /build/tmp/work/ppc64p9le-wrs-linux/multipath-tools/0.10.0/recipe-sysroot/usr/include/urcu/uatomic/ppc.h:228,
+|                  from /build/tmp/work/ppc64p9le-wrs-linux/multipath-tools/0.10.0/recipe-sysroot/usr/include/urcu/uatomic.h:73,
+|                  from lock.h:5,
+|                  from lock.c:1:
+| /build/tmp/work/ppc64p9le-wrs-linux/multipath-tools/0.10.0/recipe-sysroot/usr/include/urcu/uatomic/generic.h: In function '_uatomic_and':
+| /build/tmp/work/ppc64p9le-wrs-linux/multipath-tools/0.10.0/recipe-sysroot/usr/include/urcu/uatomic/generic.h:422:24: error: implicit declaration of function 'abort' [-Wimplicit-function-declaration]
+|   422 |                 oldt = uatomic_read((uint32_t *) addr);
+|       |                        ^~~~~~~~~~~~
+| /build/tmp/work/ppc64p9le-wrs-linux/multipath-tools/0.10.0/recipe-sysroot/usr/include/urcu/uatomic/generic.h:1:1: note: include '<stdlib.h>' or provide a declaration of 'abort'
+|   +++ |+#include <stdlib.h>
+|     1 | // SPDX-FileCopyrightText: 1991-1994 by Xerox Corporation.  All rights reserved.
+| make[1]: *** [../Makefile.inc:155: lock.o] Error 1
+| make[1]: Leaving directory '/build/tmp/work/ppc64p9le-wrs-linux/multipath-tools/0.10.0/git/libmultipath'
+
+Upstream-Status: Submitted [https://github.com/urcu/userspace-rcu/pull/28]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ include/urcu/uatomic/generic.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/urcu/uatomic/generic.h b/include/urcu/uatomic/generic.h
+index 5a81e00..5c8cb6c 100644
+--- a/include/urcu/uatomic/generic.h
++++ b/include/urcu/uatomic/generic.h
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include <stdint.h>
++#include <stdlib.h>
+ #include <urcu/compiler.h>
+ #include <urcu/system.h>
+ 
+-- 
+2.25.1
+

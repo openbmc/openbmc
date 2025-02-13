@@ -1,0 +1,122 @@
+From 60d76dce7b013406412bc9720dbf05fb558ea099 Mon Sep 17 00:00:00 2001
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Tue, 4 Feb 2025 09:24:26 +0100
+Subject: [PATCH] ukify/measure: Revert changes to use SizeOfImage from Linux
+ PE binary
+
+With 19812661f1f65ebe777d1626b5abf6475faababc, we make sure at runtime
+in the stub itself that SizeOfImage from the Linux EFISTUB PE binary is
+taken into account, so there's no need to take this into account in ukify
+itself. By reverting the ukify change, we again ensure that Misc_VirtualSize
+reflects the actual size of the Linux EFISTUB PE binary in the .linux section
+which lots of tooling depends on. It also makes sure we don't measure a bunch
+of extra zeroes in the stub which should fix systemd-pcrlock measurements as
+well.
+
+This effectively reverts 2188c759f97e40b97ebe3e94e82239f36b525b10 and
+0005411352f9bda0d9887c37b9e75a2bce6c1133.
+
+Fixes #35851
+---
+ src/measure/measure.c | 32 --------------------------------
+ src/ukify/ukify.py    | 16 ++--------------
+ 2 files changed, 2 insertions(+), 46 deletions(-)
+
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/38801c91292fde004bec0974ed5602984701e03b]
+
+diff --git a/src/measure/measure.c b/src/measure/measure.c
+index e583444e0bf..2057ce2a0e6 100644
+--- a/src/measure/measure.c
++++ b/src/measure/measure.c
+@@ -544,38 +544,6 @@ static int measure_kernel(PcrState *pcr_states, size_t n) {
+                         m += sz;
+                 }
+ 
+-                if (c == UNIFIED_SECTION_LINUX) {
+-                        _cleanup_free_ PeHeader *pe_header = NULL;
+-
+-                        r = pe_load_headers(fd, /*ret_dos_header=*/ NULL, &pe_header);
+-                        if (r < 0)
+-                                log_warning_errno(r, "Failed to parse kernel image file '%s', ignoring: %m", arg_sections[c]);
+-                        else if (m < pe_header->optional.SizeOfImage) {
+-                                memzero(buffer, BUFFER_SIZE);
+-
+-                                /* Our EFI stub measures VirtualSize bytes of the .linux section into PCR 11.
+-                                 * Notably, VirtualSize can be larger than the section's size on disk. In
+-                                 * that case the extra space is initialized with zeros, so the stub ends up
+-                                 * measuring a bunch of zeros. To accommodate this, we have to measure the
+-                                 * same number of zeros here. We opt to measure extra zeros here instead of
+-                                 * modifying the stub to only measure the number of bytes on disk as we want
+-                                 * newer ukify + systemd-measure to work with older versions of the stub and
+-                                 * as of 6.12 the kernel image's VirtualSize won't be larger than its size on
+-                                 * disk anymore (see https://github.com/systemd/systemd/issues/34578#issuecomment-2382459515).
+-                                 */
+-
+-                                while (m < pe_header->optional.SizeOfImage) {
+-                                        uint64_t sz = MIN(BUFFER_SIZE, pe_header->optional.SizeOfImage - m);
+-
+-                                        for (size_t i = 0; i < n; i++)
+-                                                if (EVP_DigestUpdate(mdctx[i], buffer, sz) != 1)
+-                                                        return log_error_errno(SYNTHETIC_ERRNO(EINVAL), "Failed to run digest.");
+-
+-                                        m += sz;
+-                                }
+-                        }
+-                }
+-
+                 fd = safe_close(fd);
+ 
+                 if (m == 0) /* We skip over empty files, the stub does so too */
+diff --git a/src/ukify/ukify.py b/src/ukify/ukify.py
+index 3f36aa7af6b..08e7622c499 100755
+--- a/src/ukify/ukify.py
++++ b/src/ukify/ukify.py
+@@ -388,7 +388,6 @@ class Section:
+     tmpfile: Optional[IO[Any]] = None
+     measure: bool = False
+     output_mode: Optional[str] = None
+-    virtual_size: Optional[int] = None
+ 
+     @classmethod
+     def create(cls, name: str, contents: Union[str, bytes, Path, None], **kwargs: Any) -> 'Section':
+@@ -918,10 +917,7 @@ def pe_add_sections(uki: UKI, output: str) -> None:
+ 
+         new_section.set_file_offset(offset)
+         new_section.Name = section.name.encode()
+-        if section.virtual_size is not None:
+-            new_section.Misc_VirtualSize = section.virtual_size
+-        else:
+-            new_section.Misc_VirtualSize = len(data)
++        new_section.Misc_VirtualSize = len(data)
+         # Non-stripped stubs might still have an unaligned symbol table at the end, making their size
+         # unaligned, so we make sure to explicitly pad the pointer to new sections to an aligned offset.
+         new_section.PointerToRawData = round_up(len(pe.__data__), pe.OPTIONAL_HEADER.FileAlignment)
+@@ -1166,6 +1162,7 @@ def make_uki(opts: UkifyConfig) -> None:
+         ('.uname',   opts.uname,      True),
+         ('.splash',  opts.splash,     True),
+         ('.pcrpkey', pcrpkey,         True),
++        ('.linux',   linux,           True),
+         ('.initrd',  initrd,          True),
+         ('.ucode',   opts.microcode,  True),
+     ]  # fmt: skip
+@@ -1182,15 +1179,6 @@ def make_uki(opts: UkifyConfig) -> None:
+     for section in opts.sections:
+         uki.add_section(section)
+ 
+-    if linux is not None:
+-        try:
+-            virtual_size = pefile.PE(linux, fast_load=True).OPTIONAL_HEADER.SizeOfImage
+-        except pefile.PEFormatError:
+-            print(f'{linux} is not a valid PE file, not using SizeOfImage.')
+-            virtual_size = None
+-
+-        uki.add_section(Section.create('.linux', linux, measure=True, virtual_size=virtual_size))
+-
+     # Don't add a sbat section to profile PE binaries.
+     if opts.join_profiles or not opts.profile:
+         if linux is not None:
+-- 
+2.43.0
+

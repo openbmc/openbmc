@@ -1,4 +1,4 @@
-From 397884efce0bb7c3f1ff5e1da212e874c7eaf14b Mon Sep 17 00:00:00 2001
+From 6b37e476ee9f7feac837063cd0ca8e634fb76f90 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 6 Mar 2017 23:33:27 -0800
 Subject: [PATCH] sync with OE libtool changes
@@ -26,10 +26,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 28 insertions(+), 6 deletions(-)
 
 diff --git a/ltmain.sh b/ltmain.sh
-index f59eb4aa631..ce97db42ce7 100644
+index 39f0a5bde46..890719f2de0 100644
 --- a/ltmain.sh
 +++ b/ltmain.sh
-@@ -8053,8 +8053,16 @@ EOF
+@@ -8074,8 +8074,16 @@ EOF
  		  esac
  		fi
  	      else
@@ -48,7 +48,7 @@ index f59eb4aa631..ce97db42ce7 100644
  	      fi
  	    elif test -n "$runpath_var"; then
  	      case "$perm_rpath " in
-@@ -8790,8 +8798,16 @@ EOF
+@@ -8811,8 +8819,16 @@ EOF
  	      esac
  	    fi
  	  else
@@ -67,7 +67,7 @@ index f59eb4aa631..ce97db42ce7 100644
  	  fi
  	elif test -n "$runpath_var"; then
  	  case "$perm_rpath " in
-@@ -8841,8 +8857,14 @@ EOF
+@@ -8862,8 +8878,14 @@ EOF
  	      esac
  	    fi
  	  else

@@ -964,7 +964,7 @@ def write_bitbake_spdx(d):
     oe.sbom30.write_jsonld_doc(d, objset, deploy_dir_spdx / "bitbake.spdx.json")
 
 
-def collect_build_package_inputs(d, objset, build, packages):
+def collect_build_package_inputs(d, objset, build, packages, files_by_hash=None):
     import oe.sbom30
 
     providers = oe.spdx_common.collect_package_providers(d)
@@ -980,7 +980,7 @@ def collect_build_package_inputs(d, objset, build, packages):
         pkg_name, pkg_hashfn = providers[name]
 
         # Copy all of the package SPDX files into the Sbom elements
-        pkg_spdx, _ = oe.sbom30.find_root_obj_in_jsonld(
+        pkg_spdx, pkg_objset = oe.sbom30.find_root_obj_in_jsonld(
             d,
             "packages",
             "package-" + pkg_name,
@@ -988,6 +988,10 @@ def collect_build_package_inputs(d, objset, build, packages):
             software_primaryPurpose=oe.spdx30.software_SoftwarePurpose.install,
         )
         build_deps.add(oe.sbom30.get_element_link_id(pkg_spdx))
+
+        if files_by_hash is not None:
+            for h, f in pkg_objset.by_sha256_hash.items():
+                files_by_hash.setdefault(h, set()).update(f)
 
     if missing_providers:
         bb.fatal(
@@ -1008,6 +1012,7 @@ def create_rootfs_spdx(d):
     deploydir = Path(d.getVar("SPDXROOTFSDEPLOY"))
     root_packages_file = Path(d.getVar("SPDX_ROOTFS_PACKAGES"))
     image_basename = d.getVar("IMAGE_BASENAME")
+    image_rootfs = d.getVar("IMAGE_ROOTFS")
     machine = d.getVar("MACHINE")
 
     with root_packages_file.open("r") as f:
@@ -1037,7 +1042,42 @@ def create_rootfs_spdx(d):
         [rootfs],
     )
 
-    collect_build_package_inputs(d, objset, rootfs_build, packages)
+    files_by_hash = {}
+    collect_build_package_inputs(d, objset, rootfs_build, packages, files_by_hash)
+
+    files = set()
+    for dirpath, dirnames, filenames in os.walk(image_rootfs):
+        for fn in filenames:
+            fpath = Path(dirpath) / fn
+            if not fpath.is_file() or fpath.is_symlink():
+                continue
+
+            relpath = str(fpath.relative_to(image_rootfs))
+            h = bb.utils.sha256_file(fpath)
+
+            found = False
+            if h in files_by_hash:
+                for f in files_by_hash[h]:
+                    if isinstance(f, oe.spdx30.software_File) and f.name == relpath:
+                        files.add(oe.sbom30.get_element_link_id(f))
+                        found = True
+                        break
+
+            if not found:
+                files.add(
+                    objset.new_file(
+                        objset.new_spdxid("rootfs-file", relpath),
+                        relpath,
+                        fpath,
+                    )
+                )
+
+    if files:
+        objset.new_relationship(
+            [rootfs],
+            oe.spdx30.RelationshipType.contains,
+            sorted(list(files)),
+        )
 
     oe.sbom30.write_recipe_jsonld_doc(d, objset, "rootfs", deploydir)
 

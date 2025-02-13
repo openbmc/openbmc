@@ -7,11 +7,10 @@ LICENSE = "MIT & MIT"
 
 DEPENDS = "flex-native bison-native"
 
-SRC_URI = "http://xkbcommon.org/download/${BPN}-${PV}.tar.xz"
+SRC_URI = "git://github.com/xkbcommon/libxkbcommon;protocol=https;branch=master"
 
-SRC_URI[sha256sum] = "65782f0a10a4b455af9c6baab7040e2f537520caa2ec2092805cdfd36863b247"
-
-UPSTREAM_CHECK_URI = "http://xkbcommon.org/"
+SRCREV = "7a31e3585edf78be281559377e26d15f8c4bc655"
+S = "${WORKDIR}/git"
 
 inherit meson pkgconfig bash-completion
 

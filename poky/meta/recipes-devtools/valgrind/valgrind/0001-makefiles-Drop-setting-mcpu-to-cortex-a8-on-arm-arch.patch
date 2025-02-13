@@ -1,4 +1,4 @@
-From 715cf122388f3527afa5649cebf9f1522c240693 Mon Sep 17 00:00:00 2001
+From a9292f711375c12c5135b207698e623e297b049b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 20 Apr 2017 10:11:16 -0700
 Subject: [PATCH] makefiles: Drop setting -mcpu to cortex-a8 on arm
@@ -14,14 +14,15 @@ Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=454346]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- Makefile.all.am            |  6 +++---
  helgrind/tests/Makefile.am |  6 +++---
  none/tests/arm/Makefile.am | 18 +++++++++---------
- 3 files changed, 15 insertions(+), 15 deletions(-)
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/helgrind/tests/Makefile.am b/helgrind/tests/Makefile.am
+index d7101ed..670c29f 100755
 --- a/helgrind/tests/Makefile.am
 +++ b/helgrind/tests/Makefile.am
-@@ -223,9 +223,9 @@ if ! VGCONF_PLATFORMS_INCLUDE_X86_DARWIN
+@@ -226,9 +226,9 @@ if ! VGCONF_PLATFORMS_INCLUDE_X86_DARWIN
  endif
  
  if VGCONF_PLATFORMS_INCLUDE_ARM_LINUX
@@ -34,9 +35,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  else
  annotate_hbefore_CFLAGS = $(AM_CFLAGS)
  tc07_hbl1_CFLAGS        = $(AM_CFLAGS)
+diff --git a/none/tests/arm/Makefile.am b/none/tests/arm/Makefile.am
+index 41a5a03..a76981e 100644
 --- a/none/tests/arm/Makefile.am
 +++ b/none/tests/arm/Makefile.am
-@@ -56,10 +56,10 @@ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_N
+@@ -56,10 +56,10 @@ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_NONNULL@
  # need special helping w.r.t -mfpu and -mfloat-abi, though.
  # Also force -O0 since -O takes hundreds of MB of memory 
  # for v6intThumb.c.
@@ -50,7 +53,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  v8crypto_a_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -marm -march=armv8-a
  v8crypto_t_CFLAGS = $(AM_CFLAGS) -g -O0 -mfpu=crypto-neon-fp-armv8 -mthumb -march=armv8-a
-@@ -74,23 +74,23 @@ v8memory_t_CFLAGS = $(AM_CFLAGS) -g -O0
+@@ -74,23 +74,23 @@ v8memory_t_CFLAGS = $(AM_CFLAGS) -g -O0 \
  
  vcvt_fixed_float_VFP_CFLAGS = $(AM_CFLAGS) -g -O0 -mcpu=cortex-a8 -mfpu=neon
  

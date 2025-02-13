@@ -1,4 +1,4 @@
-From 781a21fa9b0d8d8d6df0de45e3c9dc3f3e74be8f Mon Sep 17 00:00:00 2001
+From 459ee39104228a958a0999e1a7d4c43e4e6fe4f0 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 18 Dec 2019 12:29:50 +0100
 Subject: [PATCH] freebl: add a configure option to disable ARM HW crypto
@@ -36,7 +36,7 @@ index 0ebfc92..3ee7623 100644
  ifeq (,$(filter-out WINNT,$(OS_TARGET)))
  ifndef USE_64
 diff --git a/nss/lib/freebl/gcm.c b/nss/lib/freebl/gcm.c
-index d728867..8b4de1d 100644
+index a2f63a6..743158e 100644
 --- a/nss/lib/freebl/gcm.c
 +++ b/nss/lib/freebl/gcm.c
 @@ -18,6 +18,7 @@
@@ -53,8 +53,5 @@ index d728867..8b4de1d 100644
  #endif
 +#endif
  
- /* Forward declarations */
- SECStatus gcm_HashInit_hw(gcmHashContext *ghash);
--- 
-2.25.1
-
+ #if defined(__ARM_NEON) || defined(__ARM_NEON__)
+ #include <arm_neon.h>

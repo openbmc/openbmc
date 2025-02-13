@@ -14,6 +14,7 @@ CVE_PRODUCT = "gnu_mpfr"
 DEPENDS = "gmp autoconf-archive-native"
 
 SRC_URI = "https://www.mpfr.org/mpfr-${PV}/mpfr-${PV}.tar.xz"
+SRC_URI += "file://0001-include-math.h-to-use-predefined-_Float128-definitio.patch"
 SRC_URI[sha256sum] = "277807353a6726978996945af13e52829e3abd7a9a5b7fb2793894e18f1fcbb2"
 
 UPSTREAM_CHECK_URI = "http://www.mpfr.org/mpfr-current/"

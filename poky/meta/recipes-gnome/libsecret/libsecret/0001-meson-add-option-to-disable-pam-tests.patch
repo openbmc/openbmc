@@ -1,4 +1,4 @@
-From b90ecbdb4b91961a77a7cbb3a9b6a57128e2194b Mon Sep 17 00:00:00 2001
+From a9fd7dcddf8bc64646f2945ab564357c23111541 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Tue, 3 Dec 2024 15:58:17 +0100
 Subject: [PATCH] meson: add option to disable pam tests
@@ -12,7 +12,7 @@ Signed-off-by: Markus Volk <f_l_k@t-online.de>
  2 files changed, 24 insertions(+), 21 deletions(-)
 
 diff --git a/meson_options.txt b/meson_options.txt
-index 936eff8..8fa2a4e 100644
+index 936eff8..2ae14f2 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -8,3 +8,4 @@ option('bashcompdir', type: 'string', value: '', description: 'Override default
@@ -75,6 +75,3 @@ index 8413b58..5155329 100644
 +    },
 +  )
 +endif
--- 
-2.47.0
-

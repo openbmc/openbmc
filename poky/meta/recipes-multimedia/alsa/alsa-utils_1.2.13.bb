@@ -25,6 +25,8 @@ PACKAGECONFIG[manpages] = "--enable-xmlto, --disable-xmlto, xmlto-native docbook
 
 # alsa-utils specified in SRC_URI due to alsa-utils-scripts recipe
 SRC_URI = "https://www.alsa-project.org/files/pub/utils/alsa-utils-${PV}.tar.bz2 \
+           file://0001-alsactl-90-alsa-restore.rules-fix-alsa_restore_go-st.patch \
+           file://0002-alsactl-90-alsa-restore.rules-fix-AMD-acp-pdm-mach-l.patch \
            "
 SRC_URI[sha256sum] = "1702a6b1cdf9ba3e996ecbc1ddcf9171e6808f5961d503d0f27e80ee162f1daa"
 

@@ -1,4 +1,4 @@
-From ae0b0897228da4c8815061fe57d9b31c2b742dbc Mon Sep 17 00:00:00 2001
+From 68dcae2527a64a4448334fdfe27c7b6014589aae Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:33:49 +0000
 Subject: [PATCH] eglibc: Forward port cross locale generation support
@@ -23,7 +23,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 locale/catnames.c
 
 diff --git a/locale/Makefile b/locale/Makefile
-index 2810f28605..05f847f9a6 100644
+index 9d9c1a7691..bf271fd0a8 100644
 --- a/locale/Makefile
 +++ b/locale/Makefile
 @@ -30,6 +30,7 @@ headers = \
@@ -87,7 +87,7 @@ index 0000000000..538f3f5edb
 +    [LC_ALL] = sizeof ("LC_ALL") - 1
 +  };
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index f7efc288a5..6ef082eb25 100644
+index 92aef8d58e..ae23b2f7fe 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
 @@ -246,7 +246,7 @@ __libc_tsd_define (extern, locale_t, LOCALE)
@@ -100,7 +100,7 @@ index f7efc288a5..6ef082eb25 100644
  # define NL_CURRENT_INDIRECT	1
  #endif
 diff --git a/locale/programs/charmap-dir.c b/locale/programs/charmap-dir.c
-index 36504f238d..56ee97e61b 100644
+index e635a01ede..10e34a6da9 100644
 --- a/locale/programs/charmap-dir.c
 +++ b/locale/programs/charmap-dir.c
 @@ -18,7 +18,9 @@
@@ -146,7 +146,7 @@ index 36504f238d..56ee97e61b 100644
    return NULL;
  }
 diff --git a/locale/programs/ld-collate.c b/locale/programs/ld-collate.c
-index 5048adbd9f..4232834ead 100644
+index 7de3ba064d..3256427d21 100644
 --- a/locale/programs/ld-collate.c
 +++ b/locale/programs/ld-collate.c
 @@ -352,7 +352,7 @@ new_element (struct locale_collate_t *collate, const char *mbs, size_t mbslen,
@@ -195,7 +195,7 @@ index 5048adbd9f..4232834ead 100644
  			 == runp->wcnext->wcs[runp->nwcs - 1] + 1));
  
 diff --git a/locale/programs/ld-ctype.c b/locale/programs/ld-ctype.c
-index eb6e7e145c..14736d1cac 100644
+index 15fd39c637..d4c5e0c9e7 100644
 --- a/locale/programs/ld-ctype.c
 +++ b/locale/programs/ld-ctype.c
 @@ -914,7 +914,7 @@ ctype_output (struct localedef_t *locale, const struct charmap_t *charmap,
@@ -277,7 +277,7 @@ index eb6e7e145c..14736d1cac 100644
  	      srunp = srunp->next;
  	    }
 diff --git a/locale/programs/ld-time.c b/locale/programs/ld-time.c
-index 1abff3cf53..8a2f2b820a 100644
+index 9529d7945a..554454b9c1 100644
 --- a/locale/programs/ld-time.c
 +++ b/locale/programs/ld-time.c
 @@ -219,8 +219,10 @@ No definition for %s category found"), "LC_TIME");
@@ -346,7 +346,7 @@ index 1abff3cf53..8a2f2b820a 100644
  
  
 diff --git a/locale/programs/linereader.c b/locale/programs/linereader.c
-index 61373d2657..7ec5726377 100644
+index 6f40ecf77a..573d051d0a 100644
 --- a/locale/programs/linereader.c
 +++ b/locale/programs/linereader.c
 @@ -776,7 +776,7 @@ get_string (struct linereader *lr, const struct charmap_t *charmap,
@@ -359,7 +359,7 @@ index 61373d2657..7ec5726377 100644
    lr_buffer_init (&lrb);
  
 diff --git a/locale/programs/localedef.c b/locale/programs/localedef.c
-index 907bb5fb25..3106529043 100644
+index 7b66cd279c..dd0c3f1562 100644
 --- a/locale/programs/localedef.c
 +++ b/locale/programs/localedef.c
 @@ -108,6 +108,7 @@ void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
@@ -405,7 +405,7 @@ index 907bb5fb25..3106529043 100644
        force_output = 1;
        break;
 diff --git a/locale/programs/locfile.c b/locale/programs/locfile.c
-index 6c6ebf2dd6..cc02ab82bf 100644
+index b54fcbbceb..6110c7b369 100644
 --- a/locale/programs/locfile.c
 +++ b/locale/programs/locfile.c
 @@ -543,6 +543,9 @@ compare_files (const char *filename1, const char *filename2, size_t size,
@@ -428,7 +428,7 @@ index 6c6ebf2dd6..cc02ab82bf 100644
  
  /* Record that FILE's next element is the 32-bit integer VALUE.  */
 diff --git a/locale/programs/locfile.h b/locale/programs/locfile.h
-index 3afb0a8d29..46785374e8 100644
+index 9103fade14..ecd878563d 100644
 --- a/locale/programs/locfile.h
 +++ b/locale/programs/locfile.h
 @@ -70,6 +70,8 @@ extern void write_all_categories (struct localedef_t *definitions,
@@ -517,7 +517,7 @@ index 3afb0a8d29..46785374e8 100644
 +
  #endif /* locfile.h */
 diff --git a/locale/setlocale.c b/locale/setlocale.c
-index 7bd27e5398..2f194bad7c 100644
+index c04740ca19..12deadeb24 100644
 --- a/locale/setlocale.c
 +++ b/locale/setlocale.c
 @@ -63,35 +63,6 @@ static char *const _nl_current_used[] =

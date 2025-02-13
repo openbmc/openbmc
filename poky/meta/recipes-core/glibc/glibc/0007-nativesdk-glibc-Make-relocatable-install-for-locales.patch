@@ -1,4 +1,4 @@
-From 88c37776dca4603d6618fd7a12a055a15e2a519e Mon Sep 17 00:00:00 2001
+From 1a57ab6f7d602401396a18b0270498ff9228cf64 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:55:12 -0700
 Subject: [PATCH] nativesdk-glibc: Make relocatable install for locales
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  4 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/locale/findlocale.c b/locale/findlocale.c
-index 43ff7201c1..9684a4249b 100644
+index e5e2bd3974..bdd9b79f83 100644
 --- a/locale/findlocale.c
 +++ b/locale/findlocale.c
 @@ -55,7 +55,7 @@ struct __locale_data *const _nl_C[] attribute_hidden =
@@ -41,7 +41,7 @@ index 43ff7201c1..9684a4249b 100644
    else
      /* We really have to load some data.  First see whether the name is
 diff --git a/locale/loadarchive.c b/locale/loadarchive.c
-index 452e3eb6e3..c7467aec42 100644
+index 058a467cde..af62f3c304 100644
 --- a/locale/loadarchive.c
 +++ b/locale/loadarchive.c
 @@ -42,7 +42,7 @@
@@ -54,7 +54,7 @@ index 452e3eb6e3..c7467aec42 100644
  /* Size of initial mapping window, optimal if large enough to
     cover the header plus the initial locale.  */
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index ed698faef1..f7efc288a5 100644
+index ab1b5e5659..92aef8d58e 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
 @@ -347,7 +347,7 @@ _nl_lookup_word (locale_t l, int category, int item)
@@ -67,7 +67,7 @@ index ed698faef1..f7efc288a5 100644
  /* Load the locale data for CATEGORY from the file specified by *NAME.
     If *NAME is "", use environment variables as specified by POSIX, and
 diff --git a/locale/programs/locale.c b/locale/programs/locale.c
-index c7ee1874e8..8281e32236 100644
+index 7e8832dc3b..7fa484f092 100644
 --- a/locale/programs/locale.c
 +++ b/locale/programs/locale.c
 @@ -631,6 +631,7 @@ nameentcmp (const void *a, const void *b)

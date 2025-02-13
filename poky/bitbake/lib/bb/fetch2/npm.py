@@ -166,7 +166,7 @@ class Npm(FetchMethod):
         # Using the 'downloadfilename' parameter as local filename
         # or the npm package name.
         if "downloadfilename" in ud.parm:
-            ud.localfile = npm_localfile(d.expand(ud.parm["downloadfilename"]))
+            ud.localfile = npm_localfile(ud.parm["downloadfilename"])
         else:
             ud.localfile = npm_localfile(ud.package, ud.version)
 

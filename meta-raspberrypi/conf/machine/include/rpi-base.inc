@@ -80,6 +80,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/w1-gpio.dtbo \
     overlays/w1-gpio-pullup.dtbo \
     overlays/wm8960-soundcard.dtbo \
+    overlays/bcm2712d0.dtbo \
     "
 
 RPI_KERNEL_DEVICETREE ?= " \

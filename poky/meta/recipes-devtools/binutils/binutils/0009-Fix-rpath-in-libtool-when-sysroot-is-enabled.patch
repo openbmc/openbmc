@@ -1,4 +1,4 @@
-From 7f8a2d32fa0951aa2f921a4401ce1cac664db129 Mon Sep 17 00:00:00 2001
+From 1967fbe2cbbb039e3b54666b55f6456325c58e91 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:42:38 +0000
 Subject: [PATCH] Fix rpath in libtool when sysroot is enabled
@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/ltmain.sh b/ltmain.sh
-index 7f7104ffc82..f59eb4aa631 100644
+index 09693d7b99b..39f0a5bde46 100644
 --- a/ltmain.sh
 +++ b/ltmain.sh
-@@ -8035,9 +8035,11 @@ EOF
+@@ -8056,9 +8056,11 @@ EOF
  	  test "$opt_mode" != relink && rpath="$compile_rpath$rpath"
  	  for libdir in $rpath; do
  	    if test -n "$hardcode_libdir_flag_spec"; then
@@ -36,7 +36,7 @@ index 7f7104ffc82..f59eb4aa631 100644
  		if test -z "$hardcode_libdirs"; then
  		  hardcode_libdirs="$libdir"
  		else
-@@ -8770,6 +8772,10 @@ EOF
+@@ -8791,6 +8793,10 @@ EOF
        hardcode_libdirs=
        for libdir in $compile_rpath $finalize_rpath; do
  	if test -n "$hardcode_libdir_flag_spec"; then

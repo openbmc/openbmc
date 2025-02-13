@@ -76,6 +76,10 @@ def git_rev_info(path):
             info['commit_count'] = int(subprocess.check_output(["git", "rev-list", "--count", "HEAD"], cwd=path).decode('utf-8').strip())
         except subprocess.CalledProcessError:
             pass
+        try:
+            info['commit_time'] = int(subprocess.check_output(["git", "show", "--no-patch", "--format=%ct", "HEAD"], cwd=path).decode('utf-8').strip())
+        except subprocess.CalledProcessError:
+            pass
         return info
     try:
         repo = Repo(path, search_parent_directories=True)
@@ -83,6 +87,7 @@ def git_rev_info(path):
         return info
     info['commit'] = repo.head.commit.hexsha
     info['commit_count'] = repo.head.commit.count()
+    info['commit_time'] = repo.head.commit.committed_date
     try:
         info['branch'] = repo.active_branch.name
     except TypeError:

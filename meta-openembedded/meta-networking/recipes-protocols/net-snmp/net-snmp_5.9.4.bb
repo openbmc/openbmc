@@ -273,7 +273,7 @@ RDEPENDS:${PN}-libs += "${PN}-lib-netsnmp \
                         ${PN}-lib-helpers \
                         ${PN}-lib-mibs \
 "
-RDEPENDS:append:${PN}-libs:class-target = " libpci"
+RDEPENDS:${PN}-libs:append:class-target = " libpci"
 RDEPENDS:${PN}-ptest += "perl \
                          perl-module-test \
                          perl-module-file-basename \

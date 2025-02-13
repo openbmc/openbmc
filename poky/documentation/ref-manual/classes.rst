@@ -1048,6 +1048,7 @@ This class supports several variables:
 
 -  :term:`INITRD`: Indicates list of filesystem images to
    concatenate and use as an initial RAM disk (initrd) (optional).
+   Can be specified for each ``LABEL``.
 
 -  :term:`ROOTFS`: Indicates a filesystem image to include
    as the root filesystem (optional).
@@ -1061,12 +1062,27 @@ This class supports several variables:
 -  :term:`APPEND`: An override list of append strings for
    each ``LABEL``.
 
+-  :term:`GRUB_TITLE`: A custom title for each ``LABEL``. If a label does not
+   have a custom title, the label is used as title for the GRUB menu entry.
+
 -  :term:`GRUB_OPTS`: Additional options to add to the
    configuration (optional). Options are delimited using semi-colon
    characters (``;``).
 
 -  :term:`GRUB_TIMEOUT`: Timeout before executing
    the default ``LABEL`` (optional).
+
+Each ``LABEL`` defined in the :term:`LABELS` variable creates a GRUB boot
+entry, and some variables can be defined individually per ``LABEL``. The label
+specific override names are defined as ``grub_LABEL``.
+
+For example, for a label ``factory``, the override name would be
+``grub_factory``. A custom GRUB menu entry titled "Factory Install" with the
+additional parameter ``factory=yes`` can be achieved as follows::
+
+   LABELS:append = " factory"
+   APPEND:grub_factory = "factory=yes"
+   GRUB_TITLE:grub_factory = "Factory Install"
 
 .. _ref-classes-gsettings:
 

@@ -1,4 +1,4 @@
-From 8facc29c3c56e6cf9cfef70986cf73876044a3fb Mon Sep 17 00:00:00 2001
+From 5c0afe3f46d52923dd37845aea1e51be1e54ce19 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 19 Jan 2016 16:42:36 -0800
 Subject: [PATCH] avoid neon for targets which don't support it
@@ -28,6 +28,3 @@ index ae82248..816e139 100644
              /* On arm32, many compilers generate a 64-bit float move
                 using two 32 bit integer registers, which completely
                 defeats this test.  Hence force a 64-bit NEON load and
--- 
-1.9.1
-

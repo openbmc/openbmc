@@ -398,7 +398,9 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-ath12k-wcn7850 \
              ${PN}-ath12k-misc \
              ${PN}-qca \
-             ${PN}-qca-qca61x4 \
+             ${PN}-qca-qca61x4-serial \
+             ${PN}-qca-qca61x4-usb \
+             ${PN}-qca-qca6390 \
              ${PN}-qca-wcn3988 \
              ${PN}-qca-wcn399x \
              ${PN}-qca-wcn6750 \
@@ -590,7 +592,9 @@ LICENSE:${PN}-ath12k = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath12k-qcn9274 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath12k-wcn7850 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath12k-misc = "Firmware-qualcommAthos_ath10k"
-LICENSE:${PN}-qca-qca61x4 = "Firmware-qualcommAthos_ath10k"
+LICENSE:${PN}-qca-qca61x4-serial = "Firmware-qualcommAthos_ath10k"
+LICENSE:${PN}-qca-qca61x4-usb = "Firmware-qualcommAthos_ath10k"
+LICENSE:${PN}-qca-qca6390 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-qca-wcn3988 = "Firmware-qcom"
 LICENSE:${PN}-qca-wcn399x = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-qca-wcn6750 = "Firmware-qualcommAthos_ath10k"
@@ -644,49 +648,17 @@ ALLOW_EMPTY:${PN}-ath12k = "1"
 # firmwares that are not already included in other -ath12k- packages.
 ALLOW_EMPTY:${PN}-ath12k-misc = "1"
 
-FILES:${PN}-qca-qca61x4 = " \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00000201.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00000200.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00000300.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00000302.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_00130300.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_00130302.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_00230302.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_00000200.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_00000201.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_00000300.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_00000302.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_00130300.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_00130302.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_00230302.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_00440302.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_00440302.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_00440302_eu.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_00440302_i2s_eu.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00000302_eu.bin \
+FILES:${PN}-qca-qca61x4-serial = " \
+  ${nonarch_base_libdir}/firmware/qca/nvm_0*.bin \
+  ${nonarch_base_libdir}/firmware/qca/rampatch_0*.bin \
+"
+FILES:${PN}-qca-qca61x4-usb = " \
+  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_*.bin \
+  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_*.bin \
+"
+FILES:${PN}-qca-qca6390 = " \
   ${nonarch_base_libdir}/firmware/qca/htbtfw20.tlv \
   ${nonarch_base_libdir}/firmware/qca/htnv20.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_00130200.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130200.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130200_0104.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130200_0105.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130200_0106.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130200_0107.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130200_0109.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130200_0110.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_00130201.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201_010a.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201_010b.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201_0303.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201_gf.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201_gf_010a.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201_gf_010b.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00130201_gf_0303.bin \
-  ${nonarch_base_libdir}/firmware/qca/rampatch_usb_00190200.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00190200.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00190200_010e.bin \
-  ${nonarch_base_libdir}/firmware/qca/nvm_usb_00190200_0112.bin \
 "
 FILES:${PN}-qca-wcn3988 = " \
   ${nonarch_base_libdir}/firmware/qca/apbtfw10.tlv \
@@ -782,7 +754,9 @@ RDEPENDS:${PN}-ath12k-qcn9274 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-ath12k-wcn7850 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-ath12k-misc += "${PN}-ath10k-license"
 RDEPENDS:${PN}-qca += "${PN}-ath10k-license ${PN}-qcom-license"
-RDEPENDS:${PN}-qca-qca61x4 += "${PN}-ath10k-license"
+RDEPENDS:${PN}-qca-qca61x4-serial += "${PN}-ath10k-license"
+RDEPENDS:${PN}-qca-qca61x4-usb += "${PN}-ath10k-license"
+RDEPENDS:${PN}-qca-qca6390 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-qca-wcn3988 += "${PN}-qcom-license"
 RDEPENDS:${PN}-qca-wcn399x += "${PN}-ath10k-license"
 RDEPENDS:${PN}-qca-wcn6750 += "${PN}-ath10k-license"
@@ -1238,6 +1212,8 @@ FILES:${PN}-rtl8192su = " \
 "
 FILES:${PN}-rtl8723 = " \
   ${nonarch_base_libdir}/firmware/rtlwifi/rtl8723*.bin* \
+  ${nonarch_base_libdir}/firmware/rtw88/rtw8723*.bin* \
+  ${nonarch_base_libdir}/firmware/rtl_bt/rtl8723*.bin* \
 "
 FILES:${PN}-rtl8821 = " \
   ${nonarch_base_libdir}/firmware/rtlwifi/rtl8821*.bin* \

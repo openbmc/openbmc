@@ -1,7 +1,7 @@
-From d1dea3c2bcf1e22baab39e2c0b8ca59db8a5bc37 Mon Sep 17 00:00:00 2001
+From a7437450577c324d6f85a6e9d7b61be76555d49a Mon Sep 17 00:00:00 2001
 From: Randy MacLeod <Randy.MacLeod@windriver.com>
 Date: Mon, 13 May 2019 17:12:21 -0400
-Subject: [PATCH 1/2] valgrind: filter_xml_frames: do not filter /usr
+Subject: [PATCH] valgrind: filter_xml_frames: do not filter /usr
 
 filter_xml_frames is intended to filter system paths under
 '/usr' that vary from platform to platform. In the ptest case
@@ -21,7 +21,7 @@ Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/tests/filter_xml_frames b/tests/filter_xml_frames
-index f1fa3f070..04fbc82de 100755
+index f1fa3f0..04fbc82 100755
 --- a/tests/filter_xml_frames
 +++ b/tests/filter_xml_frames
 @@ -47,7 +47,8 @@ while (my $line = <>)
@@ -34,6 +34,3 @@ index f1fa3f070..04fbc82de 100755
      }
  }
  
--- 
-2.17.0
-

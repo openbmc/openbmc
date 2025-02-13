@@ -14,11 +14,11 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/examples/Makefile b/examples/Makefile
-index 02480c2..cbc2661 100644
+index 0b352bc..de3c217 100644
 --- a/examples/Makefile
 +++ b/examples/Makefile
-@@ -8,9 +8,17 @@ PROGRAMS = \
- 	decrypt1 decrypt2 decrypt3 \
+@@ -12,9 +12,17 @@ PROGRAMS = \
+ 	$(PROGRAMS_DEC) \
  	xmldsigverify
  
 +ifndef CC
@@ -38,5 +38,5 @@ index 02480c2..cbc2661 100644
  all: $(PROGRAMS)
  
 -- 
-2.25.1
+2.43.0
 

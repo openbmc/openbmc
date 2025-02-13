@@ -7,7 +7,7 @@
 import time
 import signal
 
-from oeqa.runtime.case import OERuntimeTestCase
+from oeqa.runtime.case import OERuntimeTestCase, run_network_serialdebug
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.runtime.decorator.package import OEHasPackage
 
@@ -32,6 +32,7 @@ class SSHTest(OERuntimeTestCase):
               time.sleep(5)
               continue
           else:
+              run_network_serialdebug(self.target.runner)
               self.fail("uname failed with \"%s\" (exit code %s)" % (output, status))
         if status != 0:
             self.fail("ssh failed with \"%s\" (exit code %s)" % (output, status))

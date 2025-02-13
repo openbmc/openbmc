@@ -4,4 +4,11 @@
 # Because it needs the docs_src package what is not in Yocto.
 # And the tests are not that useful for Yocto.
 # for test_rich_markup_mode.py see https://github.com/fastapi/typer/pull/859/files/2cfd641d86a591a0d8582dec9292c03e6322a21a
-pytest --automake --ignore tests/test_tutorial --ignore tests/test_completion --deselect tests/test_rich_markup_mode.py::test_rich_markup_mode_rich
+pytest --automake --ignore tests/test_tutorial --ignore tests/test_completion \
+       --deselect tests/test_cli/test_completion_run.py::test_script_completion_run \
+       --deselect tests/test_cli/test_doc.py::test_doc_html_output \
+       --deselect tests/test_cli/test_sub_completion.py::test_script_completion_run \
+       --deselect tests/test_others.py::test_completion_argument \
+       --deselect tests/test_others.py::test_completion_untyped_parameters \
+       --deselect tests/test_others.py::test_completion_untyped_parameters_different_order_correct_names \
+       --deselect tests/test_rich_markup_mode.py::test_rich_markup_mode_rich

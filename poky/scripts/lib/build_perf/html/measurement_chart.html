@@ -26,26 +26,36 @@
     ]
   });
 
+  const commitCountList = rawData.map(([commit, value, time]) => {
+    return commit
+  });
+
+  const commitCountData = rawData.map(([commit, value, time]) => {
+    return updateValue(value)
+  });
+
   // Set chart options
-  const option = {
+  const option_start_time = {
     tooltip: {
       trigger: 'axis',
       enterable: true,
       position: function (point, params, dom, rect, size) {
-        return [point[0]-150, '10%'];
+        return [point[0]+20, '10%'];
       },
       formatter: function (param) {
         const value = param[0].value[1]
         const sample  = rawData.filter(([commit, dataValue]) => updateValue(dataValue) === value)
+        const formattedDate = new Date(sample[0][2] * 1000).toString().replace(/GMT[+-]\d{4}/, '').replace(/\(.*\)/, '(CEST)');
+
         // Add commit hash to the tooltip as a link
         const commitLink = `https://git.yoctoproject.org/poky/commit/?id=${sample[0][3]}`
         if ('{{ measurement.value_type.quantity }}' == 'time') {
           const hours = Math.floor(value/60)
           const minutes = Math.floor(value % 60)
           const seconds = Math.floor((value * 60) % 60)
-          return `<strong>Duration:</strong> ${hours}:${minutes}:${seconds}, <br/> <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>`
+          return `<strong>Duration:</strong> ${hours}:${minutes}:${seconds}, <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>, <br/> <strong>Start time:</strong> ${formattedDate}`
         }
-        return `<strong>Size:</strong> ${value.toFixed(2)} MB, <br/> <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>`
+        return `<strong>Size:</strong> ${value.toFixed(2)} MB, <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>, <br/> <strong>Start time:</strong> ${formattedDate}`
       ;}
     },
     xAxis: {
@@ -79,22 +89,82 @@
     ]
   };
 
+  const option_commit_count = {
+    tooltip: {
+      trigger: 'axis',
+      enterable: true,
+      position: function (point, params, dom, rect, size) {
+        return [point[0]+20, '10%'];
+      },
+      formatter: function (param) {
+        const value = param[0].value
+        const sample  = rawData.filter(([commit, dataValue]) => updateValue(dataValue) === value)
+        const formattedDate = new Date(sample[0][2] * 1000).toString().replace(/GMT[+-]\d{4}/, '').replace(/\(.*\)/, '(CEST)');
+        // Add commit hash to the tooltip as a link
+        const commitLink = `https://git.yoctoproject.org/poky/commit/?id=${sample[0][3]}`
+        if ('{{ measurement.value_type.quantity }}' == 'time') {
+          const hours = Math.floor(value/60)
+          const minutes = Math.floor(value % 60)
+          const seconds = Math.floor((value * 60) % 60)
+          return `<strong>Duration:</strong> ${hours}:${minutes}:${seconds}, <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>, <br/> <strong>Start time:</strong> ${formattedDate}`
+        }
+        return `<strong>Size:</strong> ${value.toFixed(2)} MB, <strong>Commit number:</strong> <a href="${commitLink}" target="_blank" rel="noreferrer noopener">${sample[0][0]}</a>, <br/> <strong>Start time:</strong> ${formattedDate}`
+      ;}
+    },
+    xAxis: {
+      name: 'Commit count',
+      type: 'category',
+      data: commitCountList
+    },
+    yAxis: {
+      name: '{{ measurement.value_type.quantity }}' == 'time' ? 'Duration in minutes' : 'Disk size in MB',
+      type: 'value',
+      min: function(value) {
+        return Math.round(value.min - 0.5);
+      },
+      max: function(value) {
+        return Math.round(value.max + 0.5);
+      }
+    },
+    dataZoom: [
+      {
+        type: 'slider',
+        xAxisIndex: 0,
+        filterMode: 'none'
+      },
+    ],
+    series: [
+      {
+        name: '{{ measurement.value_type.quantity }}',
+        type: 'line',
+        step: 'start',
+        symbol: 'none',
+        data: commitCountData
+      }
+    ]
+  };
+
   // Draw chart
-  const chart_div = document.getElementById('{{ chart_elem_id }}');
-  // Set dark mode
-  let measurement_chart
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      measurement_chart= echarts.init(chart_div, 'dark', {
-      height: 320
+  const draw_chart = (chart_id, option) => {
+    let chart_name
+    const chart_div = document.getElementById(chart_id);
+    // Set dark mode
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        chart_name= echarts.init(chart_div, 'dark', {
+        height: 320
+      });
+    } else {
+        chart_name= echarts.init(chart_div, null, {
+        height: 320
+      });
+    }
+    // Change chart size with browser resize
+    window.addEventListener('resize', function() {
+      chart_name.resize();
     });
-  } else {
-      measurement_chart= echarts.init(chart_div, null, {
-      height: 320
-    });
+    return chart_name.setOption(option);
   }
-  // Change chart size with browser resize
-  window.addEventListener('resize', function() {
-    measurement_chart.resize();
-  });
-  measurement_chart.setOption(option);
+
+  draw_chart('{{ chart_elem_start_time_id }}', option_start_time)
+  draw_chart('{{ chart_elem_commit_count_id }}', option_commit_count)
 </script>

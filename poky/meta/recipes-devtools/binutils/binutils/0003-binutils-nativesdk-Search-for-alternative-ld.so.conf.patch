@@ -1,4 +1,4 @@
-From bbb86582536ba9e4ab0fb4656d4697542172ab78 Mon Sep 17 00:00:00 2001
+From d718e17e1668880a85ff05993f0027d9c9ad6935 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 19 Feb 2020 09:51:16 -0800
 Subject: [PATCH] binutils-nativesdk: Search for alternative ld.so.conf in SDK
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  5 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index 6a9833e5775..b2776d2a1f3 100644
+index ccff9289924..cf2c29e89a3 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -42,7 +42,8 @@ ZLIBINC = @zlibinc@
@@ -43,7 +43,7 @@ index 6a9833e5775..b2776d2a1f3 100644
  NO_WERROR = @NO_WERROR@
  AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CFLAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index 8639e782cdf..19c19088724 100644
+index 3e24bd4deb2..23d4f1f3132 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
 @@ -576,7 +576,8 @@ ZLIB = @zlibdir@ -lz
@@ -57,10 +57,10 @@ index 8639e782cdf..19c19088724 100644
  AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CFLAGS) $(JANSSON_CFLAGS) $(ZSTD_CFLAGS)
  
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index 09691609fc0..e49c0217ae2 100644
+index 4a1aa044e70..f6f3ac11a76 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
-@@ -939,7 +939,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
+@@ -943,7 +943,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
  
        info.path = NULL;
        info.len = info.alloc = 0;
@@ -70,7 +70,7 @@ index 09691609fc0..e49c0217ae2 100644
        if (!ldelf_parse_ld_so_conf (&info, tmppath))
  	{
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 037099b9d37..2f500d73c58 100644
+index f1c5f7035c5..cce4991b25a 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
 @@ -69,6 +69,7 @@ char *program_name;
@@ -82,7 +82,7 @@ index 037099b9d37..2f500d73c58 100644
  /* The canonical representation of ld_sysroot.  */
  char *ld_canon_sysroot;
 diff --git a/ld/ldmain.h b/ld/ldmain.h
-index 0238aed0ebd..2dd00db13b3 100644
+index 0baa3c305c3..899c4b591c6 100644
 --- a/ld/ldmain.h
 +++ b/ld/ldmain.h
 @@ -23,6 +23,7 @@

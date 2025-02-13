@@ -1,4 +1,4 @@
-From 969b2d07ad955fdc117bf2ea30305a5b2e74ea76 Mon Sep 17 00:00:00 2001
+From 4651696a9bac909191d4b2aa8c3b606d716e63e6 Mon Sep 17 00:00:00 2001
 From: Philip Lorenz <philip.lorenz@bmw.de>
 Date: Mon, 3 Jun 2024 13:19:24 +0200
 Subject: [PATCH] CMakeDetermineCompilerABI: Strip -pipe from compile flags

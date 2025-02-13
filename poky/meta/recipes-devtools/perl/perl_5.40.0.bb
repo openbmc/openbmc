@@ -90,7 +90,7 @@ do_configure:class-target() {
 }
 
 do_configure:class-nativesdk() {
-    ./configure --prefix=${prefix} \
+    ./configure --prefix=${prefix} --libdir=${libdir} \
     --target=${TARGET_SYS} \
     -Duseshrplib \
     -Dusethreads \

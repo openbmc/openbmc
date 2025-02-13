@@ -6,7 +6,8 @@ DEPENDS += "libffi python3-pycparser"
 
 SRC_URI[sha256sum] = "1c39c6016c32bc48dd54561950ebd6836e1670f2ae46128f67cf49e789c52824"
 
-SRC_URI += "file://run-ptest"
+SRC_URI += "file://run-ptest \
+            file://0001-Cast-offset-to-size_t-to-avoid-c-11-narrowing-warnin.patch"
 
 inherit pypi python_setuptools_build_meta ptest pkgconfig
 

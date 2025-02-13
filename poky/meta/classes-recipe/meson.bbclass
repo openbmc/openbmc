@@ -22,6 +22,9 @@ MESON_SOURCEPATH = "${S}"
 # The target to build in do_compile. If unset the default targets are built.
 MESON_TARGET ?= ""
 
+# Since 0.60.0 you can specify custom tags to install
+MESON_INSTALL_TAGS ?= ""
+
 def noprefix(var, d):
     return d.getVar(var).replace(d.getVar('prefix') + '/', '', 1)
 
@@ -182,7 +185,10 @@ meson_do_compile() {
 }
 
 meson_do_install() {
-    meson install --destdir ${D} --no-rebuild
+    if [ "x${MESON_INSTALL_TAGS}" != "x" ] ; then
+        meson_install_tags="--tags ${MESON_INSTALL_TAGS}"
+    fi
+    meson install --destdir ${D} --no-rebuild $meson_install_tags
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install

@@ -11,10 +11,10 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/examples/Makefile b/examples/Makefile
-index cbc2661..e882b61 100644
+index de3c217..2e0ab6e 100644
 --- a/examples/Makefile
 +++ b/examples/Makefile
-@@ -12,8 +12,10 @@ ifndef CC
+@@ -16,8 +16,10 @@ ifndef CC
  CC	= gcc
  endif
  
@@ -28,5 +28,5 @@ index cbc2661..e882b61 100644
  DESTDIR = /usr/share/xmlsec1
  install-ptest:
 -- 
-2.25.1
+2.43.0
 

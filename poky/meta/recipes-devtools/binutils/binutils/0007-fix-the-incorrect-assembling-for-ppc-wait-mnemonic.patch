@@ -1,4 +1,4 @@
-From bfc643d4044dccc917549f2db439cff165512b02 Mon Sep 17 00:00:00 2001
+From de07998ce2189c329220a76feb073438c4ec88f5 Mon Sep 17 00:00:00 2001
 From: Zhenhua Luo <zhenhua.luo@nxp.com>
 Date: Sat, 11 Jun 2016 22:08:29 -0500
 Subject: [PATCH] fix the incorrect assembling for ppc wait mnemonic
@@ -14,7 +14,7 @@ Signed-off-by: Zhenhua Luo <zhenhua.luo@nxp.com>
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/opcodes/ppc-opc.c b/opcodes/ppc-opc.c
-index e55bfe846cd..66b37e36e6f 100644
+index aa4484ef9ab..81b6a4c2db9 100644
 --- a/opcodes/ppc-opc.c
 +++ b/opcodes/ppc-opc.c
 @@ -7138,8 +7138,6 @@ const struct powerpc_opcode powerpc_opcodes[] = {

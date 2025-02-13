@@ -1,8 +1,13 @@
-SUMMARY = "Serial terminal support for systemd"
+SUMMARY = "Serial terminal support for systemd (using SERIAL_CONSOLES)"
 HOMEPAGE = "https://www.freedesktop.org/wiki/Software/systemd/"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
+# Note that this recipe explicitly creates a serial-getty@ service for every tty
+# in SERIAL_CONSOLES. This is typically not always needed with systemd as it
+# will probe at boot and generate getty instances for any active consoles as
+# required.  This recipe (enabled via disabling serial-getty-generator in systemd)
+# should only be used if the generator is not appropriate.
 
 SERIAL_CONSOLES ?= "115200;ttyS0"
 SERIAL_TERM ?= "linux"

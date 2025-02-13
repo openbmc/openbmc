@@ -195,7 +195,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
                 if not isinstance(v, oe.spdx30.Hash):
                     continue
 
-                if v.algorithm == oe.spdx30.HashAlgorithm.sha256:
+                if v.algorithm != oe.spdx30.HashAlgorithm.sha256:
                     continue
 
                 self.by_sha256_hash.setdefault(v.hashValue, set()).add(obj)

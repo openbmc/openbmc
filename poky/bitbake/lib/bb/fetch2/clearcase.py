@@ -130,8 +130,6 @@ class ClearCase(FetchMethod):
         self.debug("configspecfile  = %s" % ud.configspecfile)
         self.debug("localfile       = %s" % ud.localfile)
 
-        ud.localfile = os.path.join(d.getVar("DL_DIR"), ud.localfile)
-
     def _build_ccase_command(self, ud, command):
         """
         Build up a commandline based on ud

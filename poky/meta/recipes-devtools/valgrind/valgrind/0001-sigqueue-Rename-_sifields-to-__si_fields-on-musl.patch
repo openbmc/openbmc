@@ -1,7 +1,7 @@
-From 64ad2744acfb4fa40b1c114633a053f87125a203 Mon Sep 17 00:00:00 2001
+From 4dddd9e533847f07327cde9a062fc7cbba9d5584 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 10 Jun 2017 00:46:39 -0700
-Subject: [PATCH 1/6] sigqueue: Rename _sifields to __si_fields on musl
+Subject: [PATCH] sigqueue: Rename _sifields to __si_fields on musl
 
 Upstream-Status: Pending
 
@@ -11,7 +11,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/memcheck/tests/linux/sigqueue.c b/memcheck/tests/linux/sigqueue.c
-index d18bd72..acb7cba 100644
+index 4b6fb0f..d37fe93 100644
 --- a/memcheck/tests/linux/sigqueue.c
 +++ b/memcheck/tests/linux/sigqueue.c
 @@ -8,6 +8,11 @@
@@ -26,6 +26,3 @@ index d18bd72..acb7cba 100644
  int main(int argc, char **argv)
  {
    siginfo_t *si;
--- 
-2.13.1
-

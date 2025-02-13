@@ -1,4 +1,4 @@
-From aea8ba15afba280c9bc5ae22828fae4eed09db41 Mon Sep 17 00:00:00 2001
+From ea68b64a00dd236c6e062a9403bf8a4b2234aaa5 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 15 Jan 2023 00:16:25 -0800
 Subject: [PATCH] Define alignof using _Alignof when using C11 or newer
@@ -25,7 +25,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 10 insertions(+)
 
 diff --git a/libiberty/sha1.c b/libiberty/sha1.c
-index 49e8e0b6c2b..72de5cc8ad6 100644
+index 27ceccc027b..a81332972d1 100644
 --- a/libiberty/sha1.c
 +++ b/libiberty/sha1.c
 @@ -234,7 +234,17 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)

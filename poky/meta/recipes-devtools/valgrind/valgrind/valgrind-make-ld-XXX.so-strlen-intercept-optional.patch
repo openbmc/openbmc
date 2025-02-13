@@ -1,4 +1,4 @@
-From 005bd11809a1ce65e9f2c28e884354a4741650b9 Mon Sep 17 00:00:00 2001
+From 18919d07e531a06c6fba74d4e43f6200f79aaca3 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 13 Dec 2016 11:29:55 +0800
 Subject: [PATCH] make ld-XXX.so strlen intercept optional
@@ -16,9 +16,11 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  coregrind/m_redir.c | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
+diff --git a/coregrind/m_redir.c b/coregrind/m_redir.c
+index f9e8d88..453732e 100644
 --- a/coregrind/m_redir.c
 +++ b/coregrind/m_redir.c
-@@ -1307,7 +1307,18 @@ static void add_hardwired_spec (const  H
+@@ -1315,7 +1315,18 @@ static void add_hardwired_spec (const  HChar* sopatt, const HChar* fnpatt,
     spec->to_addr     = to_addr;
     spec->isWrap      = False;
     spec->isGlobal    = False;

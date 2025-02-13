@@ -49,6 +49,34 @@ def get_arch():
     elif ei_class == 2:
         return 64
 
+def get_dl_arch(dl_path):
+    try:
+        with open(dl_path, "r+b") as f:
+            e_ident =f.read(16)
+    except IOError:
+        exctype, ioex = sys.exc_info()[:2]
+        if ioex.errno == errno.ETXTBSY:
+            print("Could not open %s. File used by another process.\nPlease "\
+                  "make sure you exit all processes that might use any SDK "\
+                  "binaries." % e)
+        else:
+            print("Could not open %s: %s(%d)" % (e, ioex.strerror, ioex.errno))
+        sys.exit(-1)
+
+    ei_mag0,ei_mag1_3,ei_class,ei_data,ei_version = struct.unpack("<B3sBBB9x", e_ident)
+
+    if (ei_mag0 != 0x7f and ei_mag1_3 != "ELF") or ei_class == 0:
+        print("ERROR: unknow %s" % dl_path)
+        sys.exit(-1)
+
+    if ei_class == 1:
+        arch = 32
+    elif ei_class == 2:
+        arch = 64
+
+    return arch
+
+
 def parse_elf_header():
     global e_type, e_machine, e_version, e_entry, e_phoff, e_shoff, e_flags,\
            e_ehsize, e_phentsize, e_phnum, e_shentsize, e_shnum, e_shstrndx
@@ -223,6 +251,8 @@ else:
 
 executables_list = sys.argv[3:]
 
+dl_arch = get_dl_arch(new_dl_path)
+
 errors = False
 for e in executables_list:
     perms = os.stat(e)[stat.ST_MODE]
@@ -247,7 +277,7 @@ for e in executables_list:
     old_size = os.path.getsize(e)
     if old_size >= 64:
         arch = get_arch()
-        if arch:
+        if arch and arch == dl_arch:
             parse_elf_header()
             if not change_interpreter(e):
                 errors = True

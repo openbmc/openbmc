@@ -1,4 +1,4 @@
-From 8e907753625faba3284925983ef8e83f8491aa76 Mon Sep 17 00:00:00 2001
+From 0fba6bce02108b355a291f7dcb9497d0c7291e6b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 10 May 2024 17:44:47 -0700
 Subject: [PATCH] tests/arm: Use -O instead of -O0
@@ -15,12 +15,14 @@ we have enough of it on build host.
 Upstream-Status: Inappropriate [WORKAROUND]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- none/tests/arm/Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ none/tests/arm/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/none/tests/arm/Makefile.am b/none/tests/arm/Makefile.am
+index a76981e..a198f73 100644
 --- a/none/tests/arm/Makefile.am
 +++ b/none/tests/arm/Makefile.am
-@@ -57,9 +57,9 @@ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_N
+@@ -57,9 +57,9 @@ allexec_CFLAGS		= $(AM_CFLAGS) @FLAG_W_NO_NONNULL@
  # Also force -O0 since -O takes hundreds of MB of memory 
  # for v6intThumb.c.
  v6intARM_CFLAGS   = $(AM_CFLAGS) -g -O0 -marm

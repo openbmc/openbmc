@@ -1,4 +1,4 @@
-From 6810358403b2de577d76cab80a4e39da77c5c442 Mon Sep 17 00:00:00 2001
+From a28c1dcdaa74b014ad33a7c04ad3b906cee2770e Mon Sep 17 00:00:00 2001
 From: Pascal Bach <pascal.bach@siemens.com>
 Date: Thu, 4 Oct 2018 14:43:17 +0200
 Subject: [PATCH] cmake: use proper WAYLAND_INCLUDE_DIRS variable

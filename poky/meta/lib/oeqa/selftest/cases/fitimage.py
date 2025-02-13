@@ -12,17 +12,22 @@ import re
 class FitImageTests(OESelftestTestCase):
 
     def _setup_uboot_tools_native(self):
-        """build u-boot-tools-native and return RECIPE_SYSROOT_NATIVE"""
+        """build u-boot-tools-native and return ${RECIPE_SYSROOT_NATIVE}/${bindir}"""
         bitbake("u-boot-tools-native -c addto_recipe_sysroot")
-        return get_bb_var('RECIPE_SYSROOT_NATIVE', 'u-boot-tools-native')
+        vars = get_bb_vars(['RECIPE_SYSROOT_NATIVE', 'bindir'], 'u-boot-tools-native')
+        return os.path.join(vars['RECIPE_SYSROOT_NATIVE'], vars['bindir'])
 
-    def _verify_fit_image_signature(self, uboot_tools_sysroot_native, fitimage_path, dtb_path, conf_name=None):
+    def _run_dumpimage(self, fitimage_path, uboot_tools_bindir):
+        dumpimage_path = os.path.join(uboot_tools_bindir, 'dumpimage')
+        return runCmd('%s -l %s' % (dumpimage_path, fitimage_path))
+
+    def _verify_fit_image_signature(self, uboot_tools_bindir, fitimage_path, dtb_path, conf_name=None):
         """Verify the signature of a fit contfiguration
 
         The fit_check_sign utility from u-boot-tools-native is called.
         uboot-fit_check_sign -f fitImage -k $dtb_name -c conf-$dtb_name
         """
-        fit_check_sign_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'uboot-fit_check_sign')
+        fit_check_sign_path = os.path.join(uboot_tools_bindir, 'uboot-fit_check_sign')
         cmd = '%s -f %s -k %s' % (fit_check_sign_path, fitimage_path, dtb_path)
         if conf_name:
             cmd += ' -c %s' % conf_name
@@ -55,6 +60,32 @@ class FitImageTests(OESelftestTestCase):
                 byte = file.read(1)
         return found_positions
 
+    def _config_add_uboot_env(self, config):
+        """Generate an u-boot environment
+
+        Create a boot.cmd file that is packed into the FitImage as a source-able text file.
+        """
+        fit_uenv_file =  "boot.cmd"
+        test_files_dir = "test-files"
+        fit_uenv_path = os.path.join(self.builddir, test_files_dir, fit_uenv_file)
+
+        config += '# Add an u-boot script to the fitImage' + os.linesep
+        config += 'FIT_UBOOT_ENV = "%s"' % fit_uenv_file + os.linesep
+        config += 'FILESEXTRAPATHS:prepend := "${TOPDIR}/%s:"' % test_files_dir + os.linesep
+        config += 'SRC_URI:append:pn-linux-yocto = " file://${FIT_UBOOT_ENV}"' + os.linesep
+
+        if not os.path.isdir(test_files_dir):
+            os.mkdir(test_files_dir)
+        self.logger.debug("Writing to: %s" % fit_uenv_path)
+        with open(fit_uenv_path, "w") as f:
+            f.write('echo "hello world"')
+
+        return config
+
+    def _verify_fitimage_uboot_env(self, dumpimage_result):
+        """Check if the boot.cmd script is part of the fitImage"""
+        num_scr_images = len(re.findall(r"^ *Image +[0-9]+ +\(bootscr-boot\.cmd\)$", dumpimage_result.output, re.MULTILINE))
+        self.assertEqual(1, num_scr_images, msg="Expected exactly 1 bootscr-boot.cmd image section in the fitImage")
 
     def test_fit_image(self):
         """
@@ -86,6 +117,7 @@ UBOOT_LOADADDRESS = "0x80080000"
 UBOOT_ENTRYPOINT = "0x80080000"
 FIT_DESC = "A model description"
 """
+        config = self._config_add_uboot_env(config)
         self.write_config(config)
 
         # fitImage is created as part of linux recipe
@@ -132,6 +164,10 @@ FIT_DESC = "A model description"
                 "Fields in Image Tree Source File %s did not match, error in finding %s"
                 % (fitimage_its_path, its_field_check[field_index]))
 
+        uboot_tools_bindir = self._setup_uboot_tools_native()
+        dumpimage_result = self._run_dumpimage(fitimage_path, uboot_tools_bindir)
+        self._verify_fitimage_uboot_env(dumpimage_result)
+
 
     def test_sign_fit_image(self):
         """
@@ -166,6 +202,7 @@ FIT_SIGN_INDIVIDUAL = "1"
 UBOOT_MKIMAGE_SIGN_ARGS = "-c '%s'"
 """ % a_comment
 
+        config = self._config_add_uboot_env(config)
         self.write_config(config)
 
         # fitImage is created as part of linux recipe
@@ -223,7 +260,7 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c '%s'"
         reqsigvalues_config = {
             'algo': '"sha256,rsa2048"',
             'key-name-hint': '"cfg-oe-selftest"',
-            'sign-images': '"kernel", "fdt"',
+            'sign-images': '"kernel", "fdt", "bootscr"',
         }
 
         for itspath, values in sigs.items():
@@ -238,12 +275,11 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c '%s'"
                 self.assertEqual(value, reqvalue)
 
         # Dump the image to see if it really got signed
-        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
-        dumpimage_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'dumpimage')
-        result = runCmd('%s -l %s' % (dumpimage_path, fitimage_path))
+        uboot_tools_bindir = self._setup_uboot_tools_native()
+        dumpimage_result = self._run_dumpimage(fitimage_path, uboot_tools_bindir)
         in_signed = None
         signed_sections = {}
-        for line in result.output.splitlines():
+        for line in dumpimage_result.output.splitlines():
             if line.startswith((' Configuration', ' Image')):
                 in_signed = re.search(r'\((.*)\)', line).groups()[0]
             elif re.match('^ *', line) in (' ', ''):
@@ -265,14 +301,17 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c '%s'"
             value = values.get('Sign value', None)
             self.assertEqual(len(value), 512, 'Signature value for section %s not expected length' % signed_section)
 
+        # Check if the u-boot boot.scr script is in the fitImage
+        self._verify_fitimage_uboot_env(dumpimage_result)
+
         # Search for the string passed to mkimage: 1 kernel + 3 DTBs + config per DTB = 7 sections
         # Looks like mkimage supports to add a comment but does not support to read it back.
         found_comments = FitImageTests._find_string_in_bin_file(fitimage_path, a_comment)
-        self.assertEqual(found_comments, 7, "Expected 7 signed and commented section in the fitImage.")
+        self.assertEqual(found_comments, 8, "Expected 8 signed and commented section in the fitImage.")
 
         # Verify the signature for all configurations = DTBs
         for dtb in ['am335x-bone.dtb', 'am335x-boneblack.dtb', 'am335x-bonegreen.dtb']:
-            self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path,
+            self._verify_fit_image_signature(uboot_tools_bindir, fitimage_path,
                                              os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], dtb), 'conf-' + dtb)
 
     def test_uboot_fit_image(self):
@@ -548,12 +587,11 @@ UBOOT_FIT_HASH_ALG = "sha256"
                 self.assertEqual(value, reqvalue)
 
         # Dump the image to see if it really got signed
-        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
-        dumpimage_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'dumpimage')
-        result = runCmd('%s -l %s' % (dumpimage_path, fitimage_path))
+        uboot_tools_bindir = self._setup_uboot_tools_native()
+        dumpimage_result = self._run_dumpimage(fitimage_path, uboot_tools_bindir)
         in_signed = None
         signed_sections = {}
-        for line in result.output.splitlines():
+        for line in dumpimage_result.output.splitlines():
             if line.startswith((' Image')):
                 in_signed = re.search(r'\((.*)\)', line).groups()[0]
             elif re.match(' \w', line):
@@ -577,7 +615,7 @@ UBOOT_FIT_HASH_ALG = "sha256"
         self.assertEqual(found_comments, 2, "Expected 2 signed and commented section in the fitImage.")
 
         # Verify the signature
-        self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path,
+        self._verify_fit_image_signature(uboot_tools_bindir, fitimage_path,
                                          os.path.join(deploy_dir_image, 'u-boot-spl.dtb'))
 
 
@@ -696,12 +734,11 @@ FIT_SIGN_INDIVIDUAL = "1"
                 self.assertEqual(value, reqvalue)
 
         # Dump the image to see if it really got signed
-        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
-        dumpimage_path = os.path.join(uboot_tools_sysroot_native, 'usr', 'bin', 'dumpimage')
-        result = runCmd('%s -l %s' % (dumpimage_path, fitimage_path))
+        uboot_tools_bindir = self._setup_uboot_tools_native()
+        dumpimage_result = self._run_dumpimage(fitimage_path, uboot_tools_bindir)
         in_signed = None
         signed_sections = {}
-        for line in result.output.splitlines():
+        for line in dumpimage_result.output.splitlines():
             if line.startswith((' Image')):
                 in_signed = re.search(r'\((.*)\)', line).groups()[0]
             elif re.match(' \w', line):
@@ -725,7 +762,7 @@ FIT_SIGN_INDIVIDUAL = "1"
         self.assertEqual(found_comments, 2, "Expected 2 signed and commented section in the fitImage.")
 
         # Verify the signature
-        self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path,
+        self._verify_fit_image_signature(uboot_tools_bindir, fitimage_path,
                                          os.path.join(deploy_dir_image, 'u-boot-spl.dtb'))
 
 
@@ -769,6 +806,7 @@ KERNEL_IMAGETYPE_REPLACEMENT = "zImage"
 FIT_KERNEL_COMP_ALG = "none"
 FIT_HASH_ALG = "sha256"
 """
+        config = self._config_add_uboot_env(config)
         self.write_config(config)
 
         # fitImage is created as part of linux recipe
@@ -850,5 +888,9 @@ FIT_HASH_ALG = "sha256"
             self.assertEqual(len(list(filter(rx_sign_line.match, node))), 1, "kernel hash not signed")
 
         # Verify the signature
-        uboot_tools_sysroot_native = self._setup_uboot_tools_native()
-        self._verify_fit_image_signature(uboot_tools_sysroot_native, fitimage_path, os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], 'am335x-bone.dtb'))
+        uboot_tools_bindir = self._setup_uboot_tools_native()
+        self._verify_fit_image_signature(uboot_tools_bindir, fitimage_path, os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], 'am335x-bone.dtb'))
+
+        # Check if the u-boot boot.scr script is in the fitImage
+        dumpimage_result = self._run_dumpimage(fitimage_path, uboot_tools_bindir)
+        self._verify_fitimage_uboot_env(dumpimage_result)

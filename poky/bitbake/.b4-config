@@ -1,0 +1,4 @@
+[b4]
+  send-series-to = bitbake-devel@lists.openembedded.org
+  send-auto-cc-cmd = ./contrib/b4-wrapper-bitbake.py send-auto-cc-cmd
+  prep-pre-flight-checks = disable-needs-checking

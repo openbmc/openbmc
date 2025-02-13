@@ -224,7 +224,17 @@ class SystemdUnit():
             instance = None
             unit = self.unit
 
-        path = self._path_for_unit(unit)
+        if instance_unit_name is not None:
+            try:
+                # Try first with instance unit name. Systemd allows to create instance unit files
+                # e.g. `gnome-shell@wayland.service` which cause template unit file to be ignored
+                # for the instance for which instance unit file is present. In that case, there may
+                # not be any template file at all.
+                path = self._path_for_unit(instance_unit_name)
+            except SystemdUnitNotFoundError:
+                path = self._path_for_unit(unit)
+        else:
+            path = self._path_for_unit(unit)
 
         if path.is_symlink():
             # ignore aliases

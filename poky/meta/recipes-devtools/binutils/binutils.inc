@@ -39,11 +39,11 @@ FILES:${PN}-staticdev += "${libdir}/gprofng/*.a"
 # list and reuse it.
 
 GPROFNGS = " \
-	gp-archive \
-	gp-collect-app \
-	gp-display-html \
-	gp-display-src \
-	gp-display-text \
+	gprofng-archive \
+	gprofng-collect-app \
+	gprofng-display-html \
+	gprofng-display-src \
+	gprofng-display-text \
 	gprofng \
 "
 
@@ -56,12 +56,6 @@ GPROFNG_ALTS:x86 = "${GPROFNGS}"
 GPROFNG_ALTS:x86-64 = "${GPROFNGS}"
 GPROFNG_ALTS:aarch64 = "${GPROFNGS}"
 
-LDGOLD_ALTS ?= "ld.gold dwp"
-LDGOLD_ALTS:riscv64 = ""
-LDGOLD_ALTS:riscv32 = ""
-LDGOLD_ALTS:loongarch64 = ""
-LDGOLD_ALTS:libc-glibc:mipsarch = ""
-
 USE_ALTERNATIVES_FOR = " \
 	addr2line \
 	ar \
@@ -72,7 +66,6 @@ USE_ALTERNATIVES_FOR = " \
 	${GPROFNG_ALTS} \
 	ld \
 	ld.bfd \
-	${LDGOLD_ALTS} \
 	nm \
 	objcopy \
 	objdump \
@@ -104,19 +97,13 @@ EXTRA_OECONF = "--program-prefix=${TARGET_PREFIX} \
                 --disable-libdecnumber \
                 --disable-readline \
                 --disable-sim \
-                ${LDGOLD} \
+                --disable-gold \
                 ${EXTRA_TARGETS} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'multiarch', '--enable-64-bit-bfd', '', d)}"
 
 EXTRA_TARGETS = ""
 EXTRA_TARGETS:x86-64 = " --enable-targets=x86_64-pe,x86_64-pep "
 EXTRA_TARGETS:class-native = ""
-
-LDGOLD:class-native = ""
-LDGOLD:class-crosssdk = ""
-LDGOLD:libc-glibc:mipsarch = ""
-LDGOLD ?= "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', '--enable-gold=default --enable-threads', '--enable-gold --enable-ld=default --enable-threads', d)}"
-
 
 # This is necessary due to a bug in the binutils Makefiles
 # EXTRA_OEMAKE = "configure-build-libiberty all"
@@ -191,6 +178,10 @@ do_install () {
 	for alt in ${USE_ALTERNATIVES_FOR}; do
 		rm -f ${D}${bindir}/$alt
 	done
+	# remove old pre 2.44 release gprofng binary names
+	for f in gp-archive gp-collect-app gp-display-html gp-display-src gp-display-text; do
+		rm -f ${D}${bindir}/$f
+	done
 
 	oe_multilib_header bfd.h
 }
@@ -200,8 +191,3 @@ inherit update-alternatives
 ALTERNATIVE_PRIORITY = "100"
 
 ALTERNATIVE:${PN}:class-target = "${USE_ALTERNATIVES_FOR}"
-
-python () {
-    if bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', True, False, d) and bb.utils.contains_any('TARGET_ARCH', 'riscv32 riscv64 loongarch64', True, False, d):
-        bb.fatal("Gold linker does not _yet_ support RISC-V and LoongArch architecture please remove ld-is-gold from DISTRO_FEATURES")
-}

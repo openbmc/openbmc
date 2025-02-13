@@ -14,16 +14,6 @@ CARGO_SRC_DIR = "src/_bcrypt"
 
 require ${BPN}-crates.inc
 
-RDEPENDS:${PN}-ptest += " \
-	python3-pytest \
-	python3-unittest-automake-output \
-"
-
-do_install_ptest() {
-	install -d ${D}${PTEST_PATH}/tests
-	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
-}
-
 RDEPENDS:${PN}:class-target += "\
     python3-cffi \
     python3-ctypes \

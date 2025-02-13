@@ -1,0 +1,42 @@
+From f90124c73edd050b24961197a4abcf17e53b41a8 Mon Sep 17 00:00:00 2001
+From: Jaroslav Kysela <perex@perex.cz>
+Date: Thu, 14 Nov 2024 09:38:49 +0100
+Subject: [PATCH 1/2] alsactl: 90-alsa-restore.rules - fix alsa_restore_go/std
+
+Fix the label mismatch which was introduced in the transition from the
+temporary test rules.
+
+Closes: https://github.com/alsa-project/alsa-utils/issues/280
+Fixes: 8116639 ("alsactl: 90-alsa-restore.rules - add support for AMD ACP digital microphone")
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+Upstream-Status: Backport [https://github.com/alsa-project/alsa-utils/commit/f90124c73edd050b24961197a4abcf17e53b41a8]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ alsactl/90-alsa-restore.rules.in | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/alsactl/90-alsa-restore.rules.in b/alsactl/90-alsa-restore.rules.in
+index 85f0b15f4856..dae2ed8ccc8f 100644
+--- a/alsactl/90-alsa-restore.rules.in
++++ b/alsactl/90-alsa-restore.rules.in
+@@ -3,6 +3,8 @@
+ ACTION=="add", SUBSYSTEM=="sound", KERNEL=="controlC*", KERNELS!="card*",@extratest@ GOTO="alsa_restore_go"
+ GOTO="alsa_restore_end"
+ 
++LABEL="alsa_restore_go"
++
+ ENV{ALSA_CARD_NUMBER}="$attr{device/number}"
+ 
+ # mark HDA analog card; HDMI/DP card does not have capture devices
+@@ -21,7 +23,7 @@ TEST!="/run/udev/alsa-hda-analog-card", GOTO="alsa_restore_std"
+ IMPORT{program}="/usr/bin/cat /run/udev/alsa-hda-analog-card"
+ ENV{ALSA_CARD_HDA_ANALOG}!="", ENV{ALSA_CARD_NUMBER}="$env{ALSA_CARD_HDA_ANALOG}"
+ 
+-LABEL="alsa_restore_go"
++LABEL="alsa_restore_std"
+ TEST!="@daemonswitch@", RUN+="@sbindir@/alsactl@args@ restore $env{ALSA_CARD_NUMBER}"
+ TEST=="@daemonswitch@", RUN+="@sbindir@/alsactl@args@ nrestore $env{ALSA_CARD_NUMBER}"
+ 
+-- 
+2.25.1
+

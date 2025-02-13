@@ -77,7 +77,7 @@ class SFTP(FetchMethod):
         else:
             ud.basename = os.path.basename(ud.path)
 
-        ud.localfile = d.expand(urllib.parse.unquote(ud.basename))
+        ud.localfile = ud.basename
 
     def download(self, ud, d):
         """Fetch urls"""

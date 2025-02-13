@@ -4,15 +4,19 @@ efficient yet extensible format. Google uses Protocol Buffers for almost \
 all of its internal RPC protocols and file formats."
 HOMEPAGE = "https://github.com/google/protobuf"
 SECTION = "console/tools"
-LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b"
+LICENSE = "BSD-3-Clause & MIT"
+LIC_FILES_CHKSUM = " \
+    file://LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b \
+    file://third_party/lunit/LICENSE;md5=99f08e72434dfa34fe0581d3dfb2d7f4 \
+    file://third_party/utf8_range/LICENSE;md5=d4974d297231477b2ff507c35d61c13c \
+"
 
-DEPENDS = "zlib abseil-cpp"
+DEPENDS = "zlib abseil-cpp jsoncpp"
 DEPENDS:append:class-target = " protobuf-native"
 
 SRCREV = "9d0ec0f92b5b5fdeeda11f9dcecc1872ff378014"
 
-SRC_URI = "gitsm://github.com/protocolbuffers/protobuf.git;branch=25.x;protocol=https \
+SRC_URI = "git://github.com/protocolbuffers/protobuf.git;branch=25.x;protocol=https \
            file://run-ptest \
            file://0001-examples-Makefile-respect-CXX-LDFLAGS-variables-fix-.patch \
            "
@@ -22,6 +26,8 @@ SRC_URI:append:mipsel:toolchain-clang = " file://0001-Fix-build-on-mips-clang.pa
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>.(25\.(\d+)))"
 
 S = "${WORKDIR}/git"
+
+CVE_PRODUCT = "google:protobuf protobuf:protobuf google-protobuf protobuf-cpp"
 
 inherit cmake pkgconfig ptest
 
@@ -37,6 +43,7 @@ EXTRA_OECMAKE += "\
     -Dprotobuf_BUILD_TESTS=OFF \
     -Dprotobuf_BUILD_EXAMPLES=OFF \
     -Dprotobuf_ABSL_PROVIDER="package" \
+    -Dprotobuf_JSONCPP_PROVIDER="package" \
 "
 
 TEST_SRC_DIR = "examples"
@@ -106,8 +113,6 @@ FILES:${PN}-lite = "${libdir}/libprotobuf-lite${SOLIBS}"
 # CMake requires protoc binary to exist in sysroot, even if it has wrong architecture.
 SYSROOT_DIRS += "${bindir}"
 
-RDEPENDS:${PN} = "abseil-cpp"
-RDEPENDS:${PN}-lite = "abseil-cpp"
 RDEPENDS:${PN}-compiler = "${PN}"
 RDEPENDS:${PN}-dev += "${@bb.utils.contains('PACKAGECONFIG', 'compiler', '${PN}-compiler', '', d)}"
 RDEPENDS:${PN}-ptest = "bash ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3-protobuf', '', d)}"
@@ -115,9 +120,3 @@ RDEPENDS:${PN}-ptest = "bash ${@bb.utils.contains('PACKAGECONFIG', 'python', 'py
 MIPS_INSTRUCTION_SET = "mips"
 
 BBCLASSEXTEND = "native nativesdk"
-
-LDFLAGS:append:arm = " -latomic"
-LDFLAGS:append:mips = " -latomic"
-LDFLAGS:append:powerpc = " -latomic"
-LDFLAGS:append:mipsel = " -latomic"
-LDFLAGS:append:riscv32 = " -latomic"

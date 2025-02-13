@@ -94,7 +94,7 @@ python () {
        # recommand to cd into input dir first to avoid archive with buildpath
        d.setVar('SDK_ARCHIVE_CMD', 'cd ${SDK_OUTPUT}/${SDKPATH}; zip -r ${SDK_ZIP_OPTIONS} ${SDKDEPLOYDIR}/${TOOLCHAIN_OUTPUTNAME}.${SDK_ARCHIVE_TYPE} .')
     elif d.getVar('SDK_ARCHIVE_TYPE') == '7zip':
-       d.setVar('SDK_ARCHIVE_DEPENDS', 'p7zip-native')
+       d.setVar('SDK_ARCHIVE_DEPENDS', '7zip-native')
        d.setVar('SDK_ARCHIVE_CMD', 'cd ${SDK_OUTPUT}/${SDKPATH}; 7za a -r ${SDK_7ZIP_OPTIONS} ${SDKDEPLOYDIR}/${TOOLCHAIN_OUTPUTNAME}.${SDK_7ZIP_TYPE} .')
     elif d.getVar('SDK_ARCHIVE_TYPE') == 'tar.zst':
        d.setVar('SDK_ARCHIVE_DEPENDS', 'zstd-native')

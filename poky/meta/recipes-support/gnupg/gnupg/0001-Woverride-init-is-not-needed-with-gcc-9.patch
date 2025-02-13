@@ -1,4 +1,4 @@
-From 69d132c4cca738f148551af24932010fb1029ea1 Mon Sep 17 00:00:00 2001
+From bbf09a439d56ddcae6f641c8f1cf7544e3dd4d6f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 20 Dec 2018 17:37:48 -0800
 Subject: [PATCH] Woverride-init is not needed with gcc 9

@@ -1,6 +1,6 @@
 # Standards for contributing to Yocto Project documentation
 
-This document attemps to standardize the way the Yocto Project
+This document attempts to standardize the way the Yocto Project
 documentation is created.
 
 It is currently a work in progress.

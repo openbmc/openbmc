@@ -1,4 +1,4 @@
-From 30b85a61d665137ed1bca0d3e3d011c72758a192 Mon Sep 17 00:00:00 2001
+From 4035b48b512b5010b1c33aeba8c58cf2705bca83 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 09:55:12 +0800
 Subject: [PATCH] RH: add mpathconf
@@ -29,10 +29,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  create mode 100644 multipath/mpathconf.8
 
 diff --git a/libmultipath/config.c b/libmultipath/config.c
-index 3fbfcc85..fbaaca8c 100644
+index d8fafa1f..cba7994b 100644
 --- a/libmultipath/config.c
 +++ b/libmultipath/config.c
-@@ -962,6 +962,7 @@ int init_config__ (const char *file, struct config *conf)
+@@ -940,6 +940,7 @@ int init_config__ (const char *file, struct config *conf)
  		validate_pctable(conf->overrides, 0, file);
  	} else {
  		condlog(0, "/etc/multipath.conf does not exist, blacklisting all devices.");
@@ -648,6 +648,3 @@ index 00000000..4cd32672
 +.BR service (8),
 +.SH AUTHOR
 +Benjamin Marzinski <bmarzins@redhat.com>
--- 
-2.25.1
-

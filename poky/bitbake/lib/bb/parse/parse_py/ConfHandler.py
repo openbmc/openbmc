@@ -20,7 +20,7 @@ from bb.parse import ParseError, resolve_file, ast, logger, handle
 __config_regexp__  = re.compile( r"""
     ^
     (?P<exp>export\s+)?
-    (?P<var>[a-zA-Z0-9\-_+.${}/~:]+?)
+    (?P<var>[a-zA-Z0-9\-_+.${}/~:]*?)
     (\[(?P<flag>[a-zA-Z0-9\-_+.][a-zA-Z0-9\-_+.@/]*)\])?
 
     \s* (
@@ -166,6 +166,8 @@ def feeder(lineno, s, fn, statements, baseconfig=False, conffile=True):
     m = __config_regexp__.match(s)
     if m:
         groupd = m.groupdict()
+        if groupd['var'] == "":
+            raise ParseError("Empty variable name in assignment: '%s'" % s, fn, lineno);
         ast.handleData(statements, fn, lineno, groupd)
         return
 

@@ -1,4 +1,4 @@
-From 99fc6fe9b66becac3c94068129e84217330a71a6 Mon Sep 17 00:00:00 2001
+From 7fa34af750f113fd600cabcecb79e65b9d04fa15 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 13 Jan 2022 18:26:02 -0800
 Subject: [PATCH] docs: Disable manual validation
@@ -18,9 +18,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  docs/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/docs/Makefile.am b/docs/Makefile.am
+index 6859ee8..d5e4e2f 100644
 --- a/docs/Makefile.am
 +++ b/docs/Makefile.am
-@@ -194,7 +194,7 @@ valid-manpages: $(MANPAGES_XML_FILES)
+@@ -195,7 +195,7 @@ valid-manpages: $(MANPAGES_XML_FILES)
  	  touch $@; \
  	fi
  

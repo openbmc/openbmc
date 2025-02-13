@@ -1,4 +1,4 @@
-From e1d84dc54b0eca3cef1136264dbbceb9ea19524c Mon Sep 17 00:00:00 2001
+From e7cd5ff25b40b807664bdcaf4f865ec769bbc52c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 3 May 2023 21:59:43 -0700
 Subject: [PATCH] tests: Fix narrowing errors seen with clang

@@ -1,4 +1,4 @@
-From 19795af92830251dd03943bda4825def5bf774c4 Mon Sep 17 00:00:00 2001
+From 5395ccff4478d42fab7f2bd6ba7f7188bec09ddf Mon Sep 17 00:00:00 2001
 From: Yash Shinde <Yash.Shinde@windriver.com>
 Date: Fri, 5 Apr 2024 08:24:36 -0700
 Subject: [PATCH] tests: Skip 2 qemu tests that can hang in oe-selftest
@@ -20,18 +20,18 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/sysdeps/unix/sysv/linux/Makefile b/sysdeps/unix/sysv/linux/Makefile
-index ae66590e91..b2f0469273 100644
+index 8a755293b3..22dafcaad1 100644
 --- a/sysdeps/unix/sysv/linux/Makefile
 +++ b/sysdeps/unix/sysv/linux/Makefile
-@@ -223,7 +223,6 @@ tests += \
-   tst-process_mrelease \
-   tst-quota \
+@@ -228,7 +228,6 @@ tests += \
    tst-rlimit-infinity \
+   tst-sched-affinity-inheritance \
+   tst-sched_setattr \
 -  tst-scm_rights \
    tst-sigtimedwait \
    tst-sync_file_range \
-   tst-sysconf-iov_max \
-@@ -234,6 +233,8 @@ tests += \
+   tst-syscall-restart \
+@@ -240,6 +239,8 @@ tests += \
    tst-timerfd \
    tst-ttyname-direct \
    tst-ttyname-namespace \
@@ -40,7 +40,7 @@ index ae66590e91..b2f0469273 100644
    # tests
  
  # process_madvise requires CAP_SYS_ADMIN.
-@@ -271,9 +272,10 @@ tests-time64 += \
+@@ -277,9 +278,10 @@ tests-time64 += \
    tst-ntp_gettimex-time64 \
    tst-ppoll-time64 \
    tst-prctl-time64 \

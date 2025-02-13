@@ -9,7 +9,8 @@
 {% for test in test_data %}
   {% if test.status == 'SUCCESS' %}
     {% for measurement in test.measurements %}
-      {% set chart_elem_id = test.name + '_' + measurement.name + '_chart' %}
+      {% set chart_elem_start_time_id = test.name + '_' + measurement.name + '_chart_start_time' %}
+      {% set chart_elem_commit_count_id = test.name + '_' + measurement.name + '_chart_commit_count' %}
       {% include 'measurement_chart.html' %}
     {% endfor %}
   {% endif %}
@@ -116,6 +117,22 @@ a {
 a:hover {
   color: #8080ff;
 }
+button {
+  background-color: #F3F4F6;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  transition: 0.3s;
+  border-radius: 8px;
+  color: #3A4353;
+}
+button:hover {
+  background-color: #d6d9e0;
+}
+.tab button.active {
+  background-color: #d6d9e0;
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #e9e8fa;
@@ -125,6 +142,16 @@ a:hover {
     --trtopborder: #394150;
     --trborder: #212936;
     --chartborder: #b1b0bf;
+  }
+  button {
+    background-color: #28303E;
+    color: #fff;
+  }
+  button:hover {
+    background-color: #545a69;
+  }
+  .tab button.active {
+    background-color: #545a69;
   }
 }
 </style>
@@ -233,7 +260,18 @@ a:hover {
             <tr>
               <td style="width: 75%">
                 {# Linechart #}
-                <div id="{{ test.name }}_{{ measurement.name }}_chart"></div>
+                <div class="tab {{ test.name }}_{{ measurement.name }}_tablinks">
+                  <button class="tablinks active" onclick="openChart(event, '{{ test.name }}_{{ measurement.name }}_start_time', '{{ test.name }}_{{ measurement.name }}')">Chart with start time</button>
+                  <button class="tablinks" onclick="openChart(event, '{{ test.name }}_{{ measurement.name }}_commit_count', '{{ test.name }}_{{ measurement.name }}')">Chart with commit count</button>
+                </div>
+                <div class="{{ test.name }}_{{ measurement.name }}_tabcontent">
+                  <div id="{{ test.name }}_{{ measurement.name }}_start_time" class="tabcontent" style="display: block;">
+                    <div id="{{ test.name }}_{{ measurement.name }}_chart_start_time"></div>
+                  </div>
+                  <div id="{{ test.name }}_{{ measurement.name }}_commit_count" class="tabcontent" style="display: none;">
+                    <div id="{{ test.name }}_{{ measurement.name }}_chart_commit_count"></div>
+                  </div>
+                </div>
               </td>
               <td>
                 {# Measurement statistics #}
@@ -340,6 +378,31 @@ a:hover {
       <div class="preformatted">{{ test.message }}</div>
     {% endif %}
   {% endfor %}
-</div></body>
-</html>
+</div>
 
+<script>
+function openChart(event, chartType, chartName) {
+  let i, tabcontents, tablinks
+  tabcontents = document.querySelectorAll(`.${chartName}_tabcontent > .tabcontent`);
+  tabcontents.forEach((tabcontent) => {
+    tabcontent.style.display = "none";
+  });
+
+  tablinks = document.querySelectorAll(`.${chartName}_tablinks > .tablinks`);
+  tablinks.forEach((tabLink) => {
+    tabLink.classList.remove('active');
+  });
+
+  const targetTab = document.getElementById(chartType)
+  targetTab.style.display = "block";
+
+  // Call resize on the ECharts instance to redraw the chart
+  const chartContainer = targetTab.querySelector('div')
+  echarts.init(chartContainer).resize();
+
+  event.currentTarget.classList.add('active');
+}
+</script>
+
+</body>
+</html>

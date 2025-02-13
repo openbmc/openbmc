@@ -60,7 +60,6 @@ NETWORKMANAGER_FIREWALL_DEFAULT ??= "nftables"
 EXTRA_OEMESON = "\
     -Difcfg_rh=false \
     -Dtests=yes \
-    -Dnmtui=true \
     -Dudev_dir=${nonarch_base_libdir}/udev \
     -Dlibpsl=false \
     -Dqt=false \

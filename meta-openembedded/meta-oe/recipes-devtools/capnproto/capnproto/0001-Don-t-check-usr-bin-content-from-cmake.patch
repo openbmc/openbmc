@@ -1,0 +1,43 @@
+From 43573472a62ff68ba6b1180d6551ef536471a99f Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Mon, 3 Feb 2025 11:52:01 +0100
+Subject: [PATCH] Don't install files in bindir
+
+This patch prevents the generated binary executables from being
+installed into the /usr/bin folder.
+
+By default, cmake installs these binaries into the /usr/bin folder,
+(e.g. binaries used to generate C++ source from the capnproto definition
+files) however with Yocto, when using the cross-compiled version of this
+application, the /usr/bin folder is not populated in the sysroot.
+The generated cmake file however tries to verify that these binaries
+exist, and since it cannot find them, it fails the build.
+
+But even in case these files would exist, they are not usable on the build
+machine, as these are cross-compiled for the target machine. When another
+recipe it built against the capnproto cmake package, the application can
+link against the cross-compiled libraries as expected, but for code
+generation the capnproto-native package's binaries need to be used.
+
+This patch is only applicable on the cross-compiled version of capnproto.
+
+Upstream-Status: Inappropriate [oe specific: see above message]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ c++/src/capnp/CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/c++/src/capnp/CMakeLists.txt b/c++/src/capnp/CMakeLists.txt
+index 9980fde6..101a7091 100644
+--- a/src/capnp/CMakeLists.txt
++++ b/src/capnp/CMakeLists.txt
+@@ -210,8 +210,6 @@ if(NOT CAPNP_LITE)
+   target_link_libraries(capnpc_capnp capnp kj)
+   set_target_properties(capnpc_capnp PROPERTIES OUTPUT_NAME capnpc-capnp)
+ 
+-  install(TARGETS capnp_tool capnpc_cpp capnpc_capnp ${INSTALL_TARGETS_DEFAULT_ARGS})
+-
+   if(WIN32)
+     # On Windows platforms symlinks are not guaranteed to support. Also different version of CMake handle create_symlink in a different way.
+     # The most portable way in this case just copy the file.

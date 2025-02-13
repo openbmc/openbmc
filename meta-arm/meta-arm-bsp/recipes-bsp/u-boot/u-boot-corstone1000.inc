@@ -68,6 +68,7 @@ SRC_URI:append = " \
     file://0050-fwu-Use-metadata-v2.patch	  \
     ${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000-extsys', \
                          '', 'file://0051-corstone1000-purge-remoteproc-dts-node.patch' , d)} \
+    file://0052-reserve-memory-for-se-comm.patch \
     "
 
 do_configure:append() {

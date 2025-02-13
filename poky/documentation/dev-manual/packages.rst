@@ -819,9 +819,19 @@ to use signed package feeds (repositories) when doing a build.
 Signing RPM Packages
 --------------------
 
-To enable signing RPM packages, you must set up the following
-configurations in either your ``local.config`` or ``distro.config``
-file::
+To enable signing RPM packages, you must modify the ``rpm``
+recipe configuration to include support for OpenPGP signing.
+That may be done either in a ``.bbappend`` for the ``rpm`` recipe::
+
+   PACKAGECONFIG:append = " sequoia"
+
+or in a :term:`Configuration File`::
+
+   PACKAGECONFIG:append:pn-rpm-native = " sequoia"
+   PACKAGECONFIG:append:pn-rpm = " sequoia"
+
+You must also set up the following settings in a
+:term:`Configuration File`::
 
    # Inherit sign_rpm.bbclass to enable signing functionality
    INHERIT += " sign_rpm"

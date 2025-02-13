@@ -1,4 +1,4 @@
-From ccac9ff221fa08dbe330ae75a570da33edaaac4e Mon Sep 17 00:00:00 2001
+From 194e83794369783287956fb12c7f8469e6b7d110 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:42:06 -0700
 Subject: [PATCH] localedef --add-to-archive uses a hard-coded locale path
@@ -18,7 +18,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 25 insertions(+), 10 deletions(-)
 
 diff --git a/locale/programs/locarchive.c b/locale/programs/locarchive.c
-index 8d79a1b6d1..6dc7ecd4e7 100644
+index 2c19f4fd29..b8495848c3 100644
 --- a/locale/programs/locarchive.c
 +++ b/locale/programs/locarchive.c
 @@ -339,12 +339,24 @@ enlarge_archive (struct locarhandle *ah, const struct locarhead *head)

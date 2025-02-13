@@ -1,0 +1,49 @@
+From 6d265b008e3d106b2706645e5a88cd8e2fb98953 Mon Sep 17 00:00:00 2001
+From: Dirk Müller <dirk@dmllr.de>
+Date: Wed, 09 Mar 2022 17:47:23 +0100
+Subject: [PATCH] cmd/link: stop forcing binutils-gold dependency on aarch64
+
+The bfd linker appears to be working just fine at least in version
+2.41 or above. Reject the known broken one instead, which
+avoids an architecture specific linker dependency that
+is cumbersome for distributions.
+
+Fixes #22040.
+
+Change-Id: I9f377e47c22ef20497479c0978c053ed5de46a38
+
+Upstream-Status: Submitted [https://go-review.googlesource.com/c/go/+/391115]
+---
+
+diff --git a/src/cmd/link/internal/ld/lib.go b/src/cmd/link/internal/ld/lib.go
+index 2d8f964..fcf0bc7 100644
+--- a/src/cmd/link/internal/ld/lib.go
++++ b/src/cmd/link/internal/ld/lib.go
+@@ -1670,27 +1670,6 @@
+ 			// Use lld to avoid errors from default linker (issue #38838)
+ 			altLinker = "lld"
+ 		}
+-
+-		if ctxt.Arch.InFamily(sys.ARM64) && buildcfg.GOOS == "linux" {
+-			// On ARM64, the GNU linker will fail with
+-			// -znocopyreloc if it thinks a COPY relocation is
+-			// required. Switch to gold.
+-			// https://sourceware.org/bugzilla/show_bug.cgi?id=19962
+-			// https://go.dev/issue/22040
+-			altLinker = "gold"
+-
+-			// If gold is not installed, gcc will silently switch
+-			// back to ld.bfd. So we parse the version information
+-			// and provide a useful error if gold is missing.
+-			name, args := flagExtld[0], flagExtld[1:]
+-			args = append(args, "-fuse-ld=gold", "-Wl,--version")
+-			cmd := exec.Command(name, args...)
+-			if out, err := cmd.CombinedOutput(); err == nil {
+-				if !bytes.Contains(out, []byte("GNU gold")) {
+-					log.Fatalf("ARM64 external linker must be gold (issue #15696, 22040), but is not: %s", out)
+-				}
+-			}
+-		}
+ 	}
+ 	if ctxt.Arch.Family == sys.ARM64 && buildcfg.GOOS == "freebsd" {
+ 		// Switch to ld.bfd on freebsd/arm64.

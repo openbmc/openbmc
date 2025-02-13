@@ -1,4 +1,4 @@
-From 5d0b54ea2aae600a2c3a2b6ec71acf99290640e7 Mon Sep 17 00:00:00 2001
+From a715a622989ac182d18f6f2ada8201122282d889 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 23 Feb 2022 12:27:06 +0000
 Subject: [PATCH] python3-pip: Don't change shebang

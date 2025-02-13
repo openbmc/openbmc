@@ -1,4 +1,4 @@
-From 78c5fd90a052f95157b3914c708a08b2eeab0154 Mon Sep 17 00:00:00 2001
+From 75b0c46bce7438fd4d4cf3d18c2d83f874793111 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 4 Feb 2020 18:12:15 +0000
 Subject: [PATCH] mc: Fix manpage date indeterminism
@@ -20,7 +20,7 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/doc/man/date-of-man-include.am b/doc/man/date-of-man-include.am
-index 96f9f10..d734c5d 100644
+index ede02e4..19300eb 100644
 --- a/doc/man/date-of-man-include.am
 +++ b/doc/man/date-of-man-include.am
 @@ -1,5 +1,5 @@

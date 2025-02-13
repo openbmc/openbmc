@@ -1,4 +1,4 @@
-From 680ceb8bf43f07884674a08423b8a1c15d1a48b5 Mon Sep 17 00:00:00 2001
+From 9b408439eb042c4fc5cb33c8929dea419bf25b41 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
 Subject: [PATCH] nativesdk-glibc: Allow 64 bit atomics for x86
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/sysdeps/x86/atomic-machine.h b/sysdeps/x86/atomic-machine.h
-index cfd395087b..28a937c468 100644
+index 5452716d22..8c7408feb4 100644
 --- a/sysdeps/x86/atomic-machine.h
 +++ b/sysdeps/x86/atomic-machine.h
 @@ -26,19 +26,14 @@

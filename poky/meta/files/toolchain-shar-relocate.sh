@@ -8,8 +8,8 @@ done
 # fix dynamic loader paths in all ELF SDK binaries
 # allow symlinks to be accessed via the find command too
 native_sysroot=$($SUDO_EXEC cat $env_setup_script |grep 'OECORE_NATIVE_SYSROOT='|cut -d'=' -f2|tr -d '"')
-dl_path=$($SUDO_EXEC find $native_sysroot/lib/ -maxdepth 1 -name "ld-linux*")
-if [ "$dl_path" = "" ] ; then
+dl_paths=$($SUDO_EXEC find $native_sysroot/lib*/ -maxdepth 1 -name "ld-linux*")
+if [ "$dl_paths" = "" ] ; then
 	echo "SDK could not be set up. Relocate script unable to find ld-linux.so. Abort!"
 	exit 1
 fi
@@ -39,7 +39,9 @@ if [ x\${PYTHON} = "x"  ]; then
 	echo "SDK could not be relocated.  No python found."
 	exit 1
 fi
-\${PYTHON} ${env_setup_script%/*}/relocate_sdk.py $target_sdk_dir $dl_path $executable_files
+for dl_path in \$(echo "$dl_paths"); do
+    \${PYTHON} ${env_setup_script%/*}/relocate_sdk.py $target_sdk_dir \$dl_path $executable_files
+done
 EOF
 
 $SUDO_EXEC mv $tdir/relocate_sdk.sh ${env_setup_script%/*}/relocate_sdk.sh

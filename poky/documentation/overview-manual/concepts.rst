@@ -792,7 +792,7 @@ processes patches, see the
 ":ref:`dev-manual/new-recipe:patching code`"
 section in the
 Yocto Project Development Tasks Manual. You can also see the
-":ref:`sdk-manual/extensible:use \`\`devtool modify\`\` to modify the source of an existing component`"
+":ref:`dev-manual/devtool:use \`\`devtool modify\`\` to modify the source of an existing component`"
 section in the Yocto Project Application Development and the Extensible
 Software Development Kit (SDK) manual and the
 ":ref:`kernel-dev/common:using traditional kernel development to patch the kernel`"

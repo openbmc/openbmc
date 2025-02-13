@@ -31,5 +31,5 @@ inherit allarch
 do_compile[noexec] = "1"
 
 do_install() {
-    install -m 755 -D ${S}/${PN}.sh ${D}${bindir}/${PN}
+    install -m 755 -D ${S}/${BPN}.sh ${D}${bindir}/${BPN}
 }

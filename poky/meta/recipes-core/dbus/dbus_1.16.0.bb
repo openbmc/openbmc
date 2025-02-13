@@ -124,6 +124,16 @@ pkg_postinst:dbus() {
 	fi
 }
 
+# dbus uses find_program() to find systemctl, which results in a build path in the
+# user dbus.socket
+EXTRA_OEMESON:append:class-target = " --cross-file=${WORKDIR}/dbus.cross"
+
+do_configure:prepend:class-target() {
+    cat >${WORKDIR}/dbus.cross <<EOF
+[binaries]
+systemctl = '${bindir}/systemctl'
+EOF
+}
 
 do_install:append:class-target() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then

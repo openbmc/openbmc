@@ -30,6 +30,7 @@ FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/GConf \
     ${datadir}/glib-2.0 \
+    ${libdir}/gtk-2.0 \
     ${libdir}/gtk-3.0 \
     ${libdir}/gtk-4.0 \
     ${systemd_user_unitdir} \

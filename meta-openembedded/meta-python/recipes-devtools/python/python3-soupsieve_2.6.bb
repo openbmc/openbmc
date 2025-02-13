@@ -18,6 +18,7 @@ RDEPENDS:${PN}:append:class-target = " \
 
 RDEPENDS:${PN}-ptest += " \
     python3-beautifulsoup4 \
+    python3-typing-extensions \
 "
 
 BBCLASSEXTEND = "native nativesdk"

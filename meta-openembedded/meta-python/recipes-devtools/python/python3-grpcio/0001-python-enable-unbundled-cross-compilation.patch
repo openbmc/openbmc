@@ -1,0 +1,49 @@
+From ff01ac8908a7267503ffbb85efd24755da0502d8 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Wed, 5 Feb 2025 21:06:50 +0100
+Subject: [PATCH] python: enable unbundled cross compilation
+
+System headers are on a sysroot path provided by the toolchain
+options.
+
+Upstream-Status: Pending
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ setup.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 3b6edbe..d3a0d04 100644
+--- a/setup.py
++++ b/setup.py
+@@ -317,25 +317,25 @@ if BUILD_WITH_SYSTEM_OPENSSL:
+         lambda x: "third_party/boringssl" not in x, CORE_C_FILES
+     )
+     CORE_C_FILES = filter(lambda x: "src/boringssl" not in x, CORE_C_FILES)
+-    SSL_INCLUDE = (os.path.join("/usr", "include", "openssl"),)
++    SSL_INCLUDE = ()
+ 
+ if BUILD_WITH_SYSTEM_ZLIB:
+     CORE_C_FILES = filter(lambda x: "third_party/zlib" not in x, CORE_C_FILES)
+-    ZLIB_INCLUDE = (os.path.join("/usr", "include"),)
++    ZLIB_INCLUDE = ()
+ 
+ if BUILD_WITH_SYSTEM_CARES:
+     CORE_C_FILES = filter(lambda x: "third_party/cares" not in x, CORE_C_FILES)
+-    CARES_INCLUDE = (os.path.join("/usr", "include"),)
++    CARES_INCLUDE = ()
+ 
+ if BUILD_WITH_SYSTEM_RE2:
+     CORE_C_FILES = filter(lambda x: "third_party/re2" not in x, CORE_C_FILES)
+-    RE2_INCLUDE = (os.path.join("/usr", "include", "re2"),)
++    RE2_INCLUDE = ()
+ 
+ if BUILD_WITH_SYSTEM_ABSL:
+     CORE_C_FILES = filter(
+         lambda x: "third_party/abseil-cpp" not in x, CORE_C_FILES
+     )
+-    ABSL_INCLUDE = (os.path.join("/usr", "include"),)
++    ABSL_INCLUDE = ()
+ 
+ EXTENSION_INCLUDE_DIRECTORIES = (
+     (PYTHON_STEM,)

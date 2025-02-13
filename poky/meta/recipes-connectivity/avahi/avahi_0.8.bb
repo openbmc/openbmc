@@ -85,7 +85,7 @@ do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/avahi-gobject/.libs:${B}/avahi-common/.libs:${B}/avahi-client/.libs:${B}/avahi-glib/.libs"
 }
 
-RRECOMMENDS:${PN}:append:libc-glibc = " libnss-mdns"
+RRECOMMENDS:${PN}:append:libc-glibc = " avahi-libnss-mdns"
 
 do_install() {
 	autotools_do_install
@@ -157,7 +157,7 @@ DEV_PKG_DEPENDENCY = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPK
 DEV_PKG_DEPENDENCY += "${@["", " libavahi-client (= ${EXTENDPKGV})"][bb.utils.contains('PACKAGECONFIG', 'dbus', 1, 0, d)]}"
 RDEPENDS:${PN}-dnsconfd = "${PN}-daemon"
 
-RRECOMMENDS:avahi-daemon:append:libc-glibc = " libnss-mdns"
+RRECOMMENDS:avahi-daemon:append:libc-glibc = " avahi-libnss-mdns"
 
 CONFFILES:avahi-daemon = "${sysconfdir}/avahi/avahi-daemon.conf"
 

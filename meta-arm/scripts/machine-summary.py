@@ -138,22 +138,20 @@ def harvest_data(machines, recipes):
     return upstreams, versions
 
 # TODO can this be inferred from the list of recipes in the layer
-recipes = ("virtual/kernel",
+recipes = ("boot-wrapper-aarch64",
+           "edk2-firmware",
+           "gator-daemon",
+           "gn",
+           "hafnium",
+           "opencsd",
+           "optee-ftpm",
+           "optee-os",
            "sbsa-acs",
            "scp-firmware",
            "trusted-firmware-a",
            "trusted-firmware-m",
-           "edk2-firmware",
            "u-boot",
-           "optee-os",
-           "optee-ftpm",
-           "hafnium",
-           "boot-wrapper-aarch64",
-           "gator-daemon",
-           "gn",
-           "opencsd",
-           "gcc-aarch64-none-elf-native",
-           "gcc-arm-none-eabi-native")
+           "virtual/kernel")
 
 
 class Format:

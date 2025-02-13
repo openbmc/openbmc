@@ -78,9 +78,9 @@ class Wget(FetchMethod):
         else:
             ud.basename = os.path.basename(ud.path)
 
-        ud.localfile = d.expand(urllib.parse.unquote(ud.basename))
+        ud.localfile = ud.basename
         if not ud.localfile:
-            ud.localfile = d.expand(urllib.parse.unquote(ud.host + ud.path).replace("/", "."))
+            ud.localfile = ud.host + ud.path.replace("/", ".")
 
         self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 100"
 

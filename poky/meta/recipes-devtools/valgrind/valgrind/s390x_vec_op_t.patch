@@ -1,7 +1,7 @@
-From 8154d38bac5cdb3675cfdaf562ab9da01988b263 Mon Sep 17 00:00:00 2001
+From 5dbb49abc08acb9a484bc187c18c433fb821d281 Mon Sep 17 00:00:00 2001
 From: Yi Fan Yu <yifan.yu@windriver.com>
 Date: Wed, 17 Mar 2021 12:16:31 -0400
-Subject: [PATCH 19/20] remove s390x_vec_op_t
+Subject: [PATCH] remove s390x_vec_op_t
 
 s390x_vec_op_t is not needed anywhere, only elements of enum are accessed
 removing it ensures that valgrind can be built with -fno-common option
@@ -17,9 +17,11 @@ Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
  VEX/priv/guest_s390_defs.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/VEX/priv/guest_s390_defs.h b/VEX/priv/guest_s390_defs.h
+index a64d563..fb963e9 100644
 --- a/VEX/priv/guest_s390_defs.h
 +++ b/VEX/priv/guest_s390_defs.h
-@@ -284,7 +284,7 @@ typedef enum {
+@@ -286,7 +286,7 @@ typedef enum {
     S390_VEC_OP_VCLFNL,
     S390_VEC_OP_VCRNF,
     S390_VEC_OP_LAST             // supposed to be the last element in enum

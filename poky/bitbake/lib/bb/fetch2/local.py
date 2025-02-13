@@ -29,11 +29,10 @@ class Local(FetchMethod):
 
     def urldata_init(self, ud, d):
         # We don't set localfile as for this fetcher the file is already local!
-        ud.decodedurl = urllib.parse.unquote(ud.url.split("://")[1].split(";")[0])
-        ud.basename = os.path.basename(ud.decodedurl)
-        ud.basepath = ud.decodedurl
+        ud.basename = os.path.basename(ud.path)
+        ud.basepath = ud.path
         ud.needdonestamp = False
-        if "*" in ud.decodedurl:
+        if "*" in ud.path:
             raise bb.fetch2.ParameterError("file:// urls using globbing are no longer supported. Please place the files in a directory and reference that instead.", ud.url)
         return
 
@@ -48,7 +47,7 @@ class Local(FetchMethod):
         Return the local filename of a given url assuming a successful fetch.
         """
         searched = []
-        path = urldata.decodedurl
+        path = urldata.path
         newpath = path
         if path[0] == "/":
             logger.debug2("Using absolute %s" % (path))

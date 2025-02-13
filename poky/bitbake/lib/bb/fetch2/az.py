@@ -66,11 +66,12 @@ class Az(Wget):
         else:
             azuri = '%s%s%s' % ('https://', ud.host, ud.path)
 
+        dldir = d.getVar("DL_DIR")
         if os.path.exists(ud.localpath):
             # file exists, but we didnt complete it.. trying again.
-            fetchcmd += d.expand(" -c -P ${DL_DIR} '%s'" % azuri)
+            fetchcmd += " -c -P %s '%s'" % (dldir, azuri)
         else:
-            fetchcmd += d.expand(" -P ${DL_DIR} '%s'" % azuri)
+            fetchcmd += " -P %s '%s'" % (dldir, azuri)
 
         try:
             self._runwget(ud, d, fetchcmd, False)

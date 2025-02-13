@@ -226,6 +226,9 @@ New Features / Enhancements in |yocto-ver|
    -  ``package_rpm``: restrict RPM packaging to 4 threads to improve
       the compression speed.
 
+   -  ``sign_rpm``: ``rpm`` needs the ``sequoia`` :term:`PACKAGECONFIG`
+      config set to be able to generate signed packages.
+
 -  LLVM related changes:
 
 -  SPDX-related changes:
@@ -300,6 +303,7 @@ New Features / Enhancements in |yocto-ver|
       -  ``gdk-pixbuf``: ``gif``, ``others``
       -  ``libpam``: ``selinux``
       -  ``libsecret``: ``pam``
+      -  ``rpm``: ``sequoia``
 
 -  Miscellaneous changes:
 

@@ -188,9 +188,3 @@ FILES:${PN}-fstools = "\
 FILES:${PN} += "${libdir}/android ${libdir}/android/*"
 
 BBCLASSEXTEND = "native"
-
-android_tools_enable_devmode() {
-    touch ${IMAGE_ROOTFS}/etc/usb-debugging-enabled
-}
-
-ROOTFS_POSTPROCESS_COMMAND_${PN}-adbd += "${@bb.utils.contains("USB_DEBUGGING_ENABLED", "1", "android_tools_enable_devmode;", "", d)}"

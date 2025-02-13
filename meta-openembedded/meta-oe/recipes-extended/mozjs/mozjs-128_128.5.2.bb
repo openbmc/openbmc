@@ -57,6 +57,7 @@ export HOST_CXXFLAGS = "${BUILD_CXXFLAGS}"
 
 export AS = "${CC}"
 
+export MOZBUILD_STATE_PATH = "${WORKDIR}/mozbuild_state"
 export RUSTFLAGS
 
 JIT ?= ""

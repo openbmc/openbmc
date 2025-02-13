@@ -1,4 +1,4 @@
-From 3ff82dcb844f98dbf67c69f11f6516bc234725a9 Mon Sep 17 00:00:00 2001
+From f5c0021a016116c53d21d8d5902ea92e682658b6 Mon Sep 17 00:00:00 2001
 From: Stacy Gaikovaia <Stacy.Gaikovaia@windriver.com>
 Date: Wed, 16 Sep 2020 13:45:07 -0400
 Subject: [PATCH] memcheck vgtests remove fullpath-after flags
@@ -20,7 +20,7 @@ Signed-off-by: Stacy Gaikovaia <Stacy.Gaikovaia@windriver.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/memcheck/tests/badfree3.vgtest b/memcheck/tests/badfree3.vgtest
-index 3dfc5fd8a..4ee03f00a 100644
+index 3dfc5fd..4ee03f0 100644
 --- a/memcheck/tests/badfree3.vgtest
 +++ b/memcheck/tests/badfree3.vgtest
 @@ -1,3 +1,3 @@
@@ -29,7 +29,7 @@ index 3dfc5fd8a..4ee03f00a 100644
 +vgopts: -q
  stderr_filter_args: badfree.c
 diff --git a/memcheck/tests/varinfo5.vgtest b/memcheck/tests/varinfo5.vgtest
-index 063d00dce..79c4a72a4 100644
+index 063d00d..79c4a72 100644
 --- a/memcheck/tests/varinfo5.vgtest
 +++ b/memcheck/tests/varinfo5.vgtest
 @@ -1,3 +1,3 @@
@@ -37,6 +37,3 @@ index 063d00dce..79c4a72a4 100644
 -vgopts: --fullpath-after=memcheck/  --fullpath-after=coregrind/ --read-var-info=yes --read-inline-info=yes -q
 +vgopts: --read-var-info=yes --read-inline-info=yes -q
  stderr_filter: filter_varinfo3
--- 
-2.25.1
-

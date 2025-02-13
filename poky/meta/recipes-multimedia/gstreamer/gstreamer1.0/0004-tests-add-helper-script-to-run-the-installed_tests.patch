@@ -1,4 +1,4 @@
-From 9bffd7eb9113f6535d8b82ca316e6f133241bd8d Mon Sep 17 00:00:00 2001
+From 39764bd2b9f9da4a07079f76a2f68baf40c143b9 Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 2 May 2021 01:58:01 +0100
 Subject: [PATCH] tests: add helper script to run the installed_tests
@@ -47,7 +47,7 @@ index 6bb346a..fe57935 100644
      test(test_name, exe, env: env, timeout : 3 * 60)
 diff --git a/tests/check/template.sh.in b/tests/check/template.sh.in
 new file mode 100755
-index 0000000..cf7d31b
+index 0000000..f1318fa
 --- /dev/null
 +++ b/tests/check/template.sh.in
 @@ -0,0 +1,9 @@

@@ -67,5 +67,3 @@ Shadow maintainers/development needed
 
 * toaster
 * bitbake
-
-

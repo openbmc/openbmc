@@ -23,6 +23,7 @@ Yocto Project Development Tasks Manual
    speeding-up-build
    libraries
    prebuilt-libraries
+   devtool
    x32-psabi
    gobject-introspection
    external-toolchain

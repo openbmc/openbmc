@@ -45,6 +45,28 @@ See :yocto_wiki:`Products that use the Yocto Project
 Wiki. Don't hesitate to contribute to this page if you know other such
 products.
 
+Why isn't systemd the default init system for OpenEmbedded-Core/Yocto Project or in Poky?
+-----------------------------------------------------------------------------------------
+
+`systemd <https://systemd.io/>`__ is a desktop Linux init system with a specific
+focus that is not entirely aligned with a customisable "embedded" build
+system/environment.
+
+It understandably mandates certain layouts and configurations which may
+or may not align with what the objectives and direction :term:`OpenEmbedded-Core
+(OE-Core)` or Yocto Project want to take. It doesn't support all of our targets.
+For example `musl <https://www.musl-libc.org/>`__ support in systemd is
+problematic.
+
+If it were our default, we would have to align with all their choices
+and this doesn't make sense. It is therefore a configuration option and
+available to anyone where the design goals align. But we are clear it
+is not the only way to handle init.
+
+Our automated testing includes it through the ``poky-altcfg`` :term:`DISTRO` and
+we don't really need it to be the default: it is tested, it works, and people
+can choose to use it.
+
 Building environment
 ====================
 

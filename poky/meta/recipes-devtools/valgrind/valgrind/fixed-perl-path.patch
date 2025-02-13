@@ -1,4 +1,4 @@
-From beaa5b64c60d501fa9cd59fdc563e5f5bccf6882 Mon Sep 17 00:00:00 2001
+From 8258b92d458ffed94d90cb8f43b766e29f364601 Mon Sep 17 00:00:00 2001
 From: Qing He <qing.he@intel.com>
 Date: Tue, 31 Aug 2010 22:51:58 +0800
 Subject: [PATCH] valgrind: fix perl scripts
@@ -17,7 +17,6 @@ a better fix would need:
 Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Maxin B. John <maxin.john@intel.com>
-
 ---
  massif/ms_print.in  | 2 +-
  perf/vg_perf.in     | 2 +-
@@ -45,7 +44,7 @@ index 90ee1d2..c585096 100644
  ##--- Valgrind performance testing script                  vg_perf ---##
  ##--------------------------------------------------------------------##
 diff --git a/tests/vg_regtest.in b/tests/vg_regtest.in
-index 7152765..ad18800 100755
+index 3471322..49e1114 100755
 --- a/tests/vg_regtest.in
 +++ b/tests/vg_regtest.in
 @@ -1,4 +1,4 @@

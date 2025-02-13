@@ -25,7 +25,7 @@ PACKAGECONFIG[taglib] = "-Dtaglib=enabled,-Dtaglib=disabled,taglib"
 PACKAGECONFIG[libgsf] = "-Dlibgsf=enabled,-Dlibgsf=disabled,libgsf"
 PACKAGECONFIG[poppler] = "-Dpoppler=enabled,-Dpoppler=disabled,poppler"
 PACKAGECONFIG[samba] = "-Dsamba=enabled,-Dsamba=disabled,samba"
-PACKAGECONFIG[tests] = "-Dtests=enabled,-Dtests=disabled,"
+PACKAGECONFIG[tests] = "-Dtests=enabled,-Dtests=disabled,googletest"
 
 FILES:${PN} += "${datadir}/metainfo"
 FILES:${PN}-dev += "${libdir}/${BPN}/lib*${SOLIBSDEV}"

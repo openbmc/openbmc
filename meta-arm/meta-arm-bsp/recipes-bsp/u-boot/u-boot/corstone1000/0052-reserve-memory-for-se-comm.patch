@@ -1,0 +1,46 @@
+From 8fdd91630f335b71e55e570a011f07b083c47dd6 Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Mon, 10 Jul 2023 19:00:43 +0100
+Subject: [PATCH] arm-bsp/u-boot: Reserve memory for RSS comm pointer access protocol
+
+This memory was used by OpenAMP to establish communication between
+the Secure Enclave and Trusted Services. After transitioning from
+OpenAMP to RSE_COMMS, this shared memory is now configured for the
+pointer access protocol in RSE_COMMS.
+
+Since this memory may be still used by a user-space application
+in linux as U-Boot is passing an EFI memory map starting from
+0x80000000, this memory range should be reserved as the
+pointer access protocol may be enabled on corstone1000 in the future.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+
+---
+ arch/arm/dts/corstone1000.dtsi | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
+index 0f8ad255ce..a71b89c025 100644
+--- a/arch/arm/dts/corstone1000.dtsi
++++ b/arch/arm/dts/corstone1000.dtsi
+@@ -45,6 +45,17 @@
+ 		lba = <65536>;
+ 	};
+ 
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		smem_mem: smem_region@88000000 {
++			reg = <0x0 0x88000000 0x0 0x100000>;
++			no-map;
++		};
++	};
++
+ 	gic: interrupt-controller@1c000000 {
+ 		compatible = "arm,gic-400";
+ 		#interrupt-cells = <3>;
+-- 
+2.17.1

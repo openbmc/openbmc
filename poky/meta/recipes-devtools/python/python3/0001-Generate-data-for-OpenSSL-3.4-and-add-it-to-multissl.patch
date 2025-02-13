@@ -34,7 +34,7 @@ diff --git a/Modules/_ssl.c b/Modules/_ssl.c
 index b6b5ebf094c..e5b8bf21002 100644
 --- a/Modules/_ssl.c
 +++ b/Modules/_ssl.c
-@@ -122,7 +122,7 @@ static void _PySSLFixErrno(void) {
+@@ -121,7 +121,7 @@ static void _PySSLFixErrno(void) {
  
  /* Include generated data (error codes) */
  #if (OPENSSL_VERSION_NUMBER >= 0x30100000L)

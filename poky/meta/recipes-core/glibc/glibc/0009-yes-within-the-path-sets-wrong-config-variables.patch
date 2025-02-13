@@ -1,4 +1,4 @@
-From cac7bbbc82423697f8d3223222db8b787b63f500 Mon Sep 17 00:00:00 2001
+From 4a1ff3c313645aa425a0a87459c907dad1b9ca4b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
 Subject: [PATCH] 'yes' within the path sets wrong config variables
@@ -20,16 +20,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  sysdeps/arm/configure.ac                               | 4 ++--
  sysdeps/mips/configure                                 | 4 ++--
  sysdeps/mips/configure.ac                              | 4 ++--
- sysdeps/nios2/configure                                | 4 ++--
- sysdeps/nios2/configure.ac                             | 4 ++--
  sysdeps/unix/sysv/linux/mips/configure                 | 4 ++--
  sysdeps/unix/sysv/linux/mips/configure.ac              | 4 ++--
  sysdeps/unix/sysv/linux/powerpc/powerpc64/configure    | 8 ++++----
  sysdeps/unix/sysv/linux/powerpc/powerpc64/configure.ac | 8 ++++----
- 12 files changed, 28 insertions(+), 28 deletions(-)
+ 10 files changed, 24 insertions(+), 24 deletions(-)
  mode change 100644 => 100755 sysdeps/arm/configure
  mode change 100644 => 100755 sysdeps/mips/configure
- mode change 100644 => 100755 sysdeps/nios2/configure
  mode change 100644 => 100755 sysdeps/unix/sysv/linux/mips/configure
  mode change 100644 => 100755 sysdeps/unix/sysv/linux/powerpc/powerpc64/configure
 
@@ -139,42 +136,6 @@ index d3cd780d78..250223d206 100644
  #endif], libc_cv_mips_nan2008=yes, libc_cv_mips_nan2008=no)])
  if test x$libc_cv_mips_nan2008 = xyes; then
    AC_DEFINE(HAVE_MIPS_NAN2008)
-diff --git a/sysdeps/nios2/configure b/sysdeps/nios2/configure
-old mode 100644
-new mode 100755
-index d25684d5ad..5801978aee
---- a/sysdeps/nios2/configure
-+++ b/sysdeps/nios2/configure
-@@ -147,12 +147,12 @@ else case e in #(
-   e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
- /* end confdefs.h.  */
- #ifdef __nios2_big_endian__
--                      yes
-+                      is_nios2_be
-                      #endif
- 
- _ACEOF
- if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
--  $EGREP_TRADITIONAL "yes" >/dev/null 2>&1
-+  $EGREP_TRADITIONAL "is_nios2_be" >/dev/null 2>&1
- then :
-   libc_cv_nios2_be=yes
- else case e in #(
-diff --git a/sysdeps/nios2/configure.ac b/sysdeps/nios2/configure.ac
-index f738e9a7ed..4085851cbc 100644
---- a/sysdeps/nios2/configure.ac
-+++ b/sysdeps/nios2/configure.ac
-@@ -4,8 +4,8 @@ GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
- # Nios II big endian is not yet supported.
- AC_CACHE_CHECK([for big endian],
-   [libc_cv_nios2_be],
--  [AC_EGREP_CPP(yes,[#ifdef __nios2_big_endian__
--                      yes
-+  [AC_EGREP_CPP(is_nios2_be,[#ifdef __nios2_big_endian__
-+                      is_nios2_be
-                      #endif
-   ], libc_cv_nios2_be=yes, libc_cv_nios2_be=no)])
- if test $libc_cv_nios2_be = yes; then
 diff --git a/sysdeps/unix/sysv/linux/mips/configure b/sysdeps/unix/sysv/linux/mips/configure
 old mode 100644
 new mode 100755

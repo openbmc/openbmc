@@ -30,7 +30,7 @@ EXTRA_OECONF = "--enable-static"
 ARM_INSTRUCTION_SET:armv4 = "arm"
 ARM_INSTRUCTION_SET:armv5 = "arm"
 
-LDFLAGS += "-Wl,-z,relro,-z,now ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS += "-Wl,-z,relro,-z,now"
 
 SECURITY_LDFLAGS:append:libc-musl = " -lssp_nonshared"
 CACHED_CONFIGUREVARS:append:libc-musl = " LDFLAGS='${LDFLAGS} -lucontext'"

@@ -1,0 +1,4 @@
+[b4]
+  prep-perpatch-check-cmd = ./scripts/b4-wrapper-poky.py prep-perpatch-check-cmd
+  send-auto-cc-cmd = ./scripts/b4-wrapper-poky.py send-auto-cc-cmd
+  send-auto-to-cmd = ./scripts/b4-wrapper-poky.py send-auto-to-cmd

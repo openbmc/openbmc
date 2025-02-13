@@ -1,4 +1,4 @@
-From e79835037312f8d58c8c555e1ebf5746e09d10cd Mon Sep 17 00:00:00 2001
+From 7d7f6fcd4f4b6664bff75addc92bc7b8a86dc22d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 7 Aug 2020 14:31:16 -0700
 Subject: [PATCH] powerpc: Do not ask compiler for finding arch
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 8 deletions(-)
 
 diff --git a/sysdeps/powerpc/preconfigure b/sysdeps/powerpc/preconfigure
-index 9e5a07ab6d..a308bdd863 100644
+index 48b9c9b65a..7eb260fc78 100644
 --- a/sysdeps/powerpc/preconfigure
 +++ b/sysdeps/powerpc/preconfigure
 @@ -29,10 +29,7 @@ esac

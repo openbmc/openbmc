@@ -382,7 +382,7 @@ These additional changes exist:
    removed at runtime).
 
 -  The
-   :ref:`devtool modify <sdk-manual/extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`
+   :ref:`devtool modify <dev-manual/devtool:use \`\`devtool modify\`\` to modify the source of an existing component>`
    command now defaults to extracting the source since that is most
    commonly expected. The ``-x`` or ``--extract`` options are now no-ops. If
    you wish to provide your own existing source tree, you will now need

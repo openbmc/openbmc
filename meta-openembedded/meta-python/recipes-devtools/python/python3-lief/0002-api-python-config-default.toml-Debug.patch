@@ -12,17 +12,19 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  api/python/config-default.toml | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/api/python/config-default.toml b/api/python/config-default.toml
-index 519bc046..49477864 100644
 --- a/api/python/config-default.toml
 +++ b/api/python/config-default.toml
-@@ -1,5 +1,5 @@
+@@ -1,8 +1,11 @@
  [lief.build]
 -type          = "Release"
-+type          = "Debug"
- cache         = true
+-cache         = true
++type          = "RelWithDebInfo"
++cache         = false
  ninja         = true
  parallel-jobs = 0
--- 
-2.39.5
-
++extra-cmake-opt  = [
++  "-DCMAKE_MODULE_PATH=/cmake/linux/",
++]
+ 
+ [lief.formats]
+ elf     = true

@@ -1,4 +1,4 @@
-From 213a4e5b43369f24d6f07a7c971f3909ec5d26a3 Mon Sep 17 00:00:00 2001
+From f794ec18764a59ad45e242092e2ae6f5e3b19761 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 3 Feb 2024 13:54:16 -0800
 Subject: [PATCH] nativesdk-glibc: Look for host system ld.so.cache as well
@@ -30,10 +30,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 8a89b71016..1ea5415b76 100644
+index f905578a65..d4dd0fbc2a 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -2046,6 +2046,14 @@ _dl_map_object (struct link_map *loader, const char *name,
+@@ -2038,6 +2038,14 @@ _dl_map_object (struct link_map *loader, const char *name,
  			&loader->l_runpath_dirs, &realname, &fb, loader,
  			LA_SER_RUNPATH, &found_other_class);
  
@@ -48,7 +48,7 @@ index 8a89b71016..1ea5415b76 100644
  #ifdef USE_LDCONFIG
        if (fd == -1
  	  && (__glibc_likely ((mode & __RTLD_SECURE) == 0)
-@@ -2104,14 +2112,6 @@ _dl_map_object (struct link_map *loader, const char *name,
+@@ -2096,14 +2104,6 @@ _dl_map_object (struct link_map *loader, const char *name,
  	}
  #endif
  

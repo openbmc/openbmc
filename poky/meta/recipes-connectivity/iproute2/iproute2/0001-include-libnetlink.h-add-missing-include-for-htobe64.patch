@@ -1,4 +1,4 @@
-From 4dc0613e229f6b4a57beb00dde14ef319a2dcad8 Mon Sep 17 00:00:00 2001
+From 5b3a2008631c7ab09252335fad42c2d347b7691d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sat, 24 Aug 2024 15:32:25 +0200
 Subject: [PATCH] include/libnetlink.h: add missing include for htobe64
@@ -11,10 +11,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+)
 
 diff --git a/include/libnetlink.h b/include/libnetlink.h
-index 30f0c2d..77e8181 100644
+index 7074e91..3dbfa42 100644
 --- a/include/libnetlink.h
 +++ b/include/libnetlink.h
-@@ -12,6 +12,7 @@
+@@ -13,6 +13,7 @@
  #include <linux/neighbour.h>
  #include <linux/netconf.h>
  #include <arpa/inet.h>
