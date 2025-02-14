@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Configure kernel hung task settings"
+define KFEATURE_COMPATIBILITY all
+
+kconf non-hardware hung-task.cfg
