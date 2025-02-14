@@ -1,0 +1,7 @@
+[Unit]
+Description=Detect medusa hsc fault on position %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/medusa-hsc-fault %i
+SyslogIdentifier=Medusa hsc fault on position %i

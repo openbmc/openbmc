@@ -355,6 +355,28 @@
         "Continue": true
     },
     {
+        "Name": "FLT_P48V_HSC_0_N",
+        "LineName": "FLT_P48V_HSC_0_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "medusa-hsc-fault@0.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FLT_P48V_HSC_1_N",
+        "LineName": "FLT_P48V_HSC_1_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "medusa-hsc-fault@1.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "INT_SMB_BMC_SLOT1_4_BMC_N",
         "LineName": "INT_SMB_BMC_SLOT1_4_BMC_N",
         "EventMon": "FALLING",

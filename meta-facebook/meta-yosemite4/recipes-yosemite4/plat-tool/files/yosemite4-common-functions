@@ -54,3 +54,40 @@ get_product_version()
     PRODUCT_VERSION=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/board/Yosemite_4_"$FRU_NAME" xyz.openbmc_project.Inventory.Decorator.Revision Version| awk -F\" '{print $2}')
     echo "$PRODUCT_VERSION"
 }
+
+set_sentinel_dome_slot_present_percentage()
+{
+    local sentinel_dome_slot_present_percentage="$1"
+
+    if ! busctl set-property "xyz.openbmc_project.VirtualSensor" \
+            "/xyz/openbmc_project/sensors/utilization/SENTINEL_DOME_SLOT_PRESENT_PERCENTAGE" \
+            "xyz.openbmc_project.Sensor.Value" Value d "$sentinel_dome_slot_present_percentage" 2>&1; then
+        echo "Failed to set SENTINEL_DOME_SLOT_PRESENT_PERCENTAGE to ${sentinel_dome_slot_present_percentage}%."
+        return 1
+    else
+        echo "Successfully set SENTINEL_DOME_SLOT_PRESENT_PERCENTAGE to ${sentinel_dome_slot_present_percentage}%."
+        return 0
+    fi
+}
+
+handle_service_window()
+{
+    local value=0
+    local present_count=0
+    local sentinel_dome_slot_present_percentage
+
+    for i in {1..8}; do
+        value=$(cat /tmp/gpio/PRSNT_SB_SLOT"${i}"_N)
+        if [ "$value" -eq 0 ]; then
+            present_count=$((present_count + 1))
+        fi
+    done
+
+    echo "Slot present count: ${present_count}"
+    sentinel_dome_slot_present_percentage=$(awk "BEGIN {printf \"%.1f\", $present_count * 12.5}")
+    if ! set_sentinel_dome_slot_present_percentage "$sentinel_dome_slot_present_percentage"; then
+        return 1
+    else
+        return 0
+    fi
+}

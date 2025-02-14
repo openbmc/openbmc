@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
 
 set_slot_present()
 {
@@ -31,7 +33,11 @@ slot_plug_in()
 
     echo "Slot ${plugin_slot} plugin."
 
-    exit 0
+    if ! handle_service_window; then
+        exit 1
+    else
+        exit 0
+    fi
 }
 
 slot_plug_in "$1"

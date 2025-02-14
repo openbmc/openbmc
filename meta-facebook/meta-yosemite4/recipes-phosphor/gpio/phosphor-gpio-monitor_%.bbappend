@@ -32,6 +32,8 @@ SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
             file://slot-plug-in \
             file://slot-unplug@.service \
             file://slot-unplug \
+            file://medusa-hsc-fault@.service \
+            file://medusa-hsc-fault \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -55,6 +57,7 @@ SYSTEMD_SERVICE:${PN} += " \
     en-i3c-hub-scan-fru@.service \
     slot-plug-in@.service \
     slot-unplug@.service \
+    medusa-hsc-fault@.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -79,6 +82,7 @@ do_install:append:() {
     install -m 0644 ${UNPACKDIR}/en-i3c-hub-scan-fru@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/slot-plug-in@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/slot-unplug@.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/medusa-hsc-fault@.service ${D}${systemd_system_unitdir}/
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/reconfig-net-interface ${D}${libexecdir}/${PN}/
@@ -92,6 +96,7 @@ do_install:append:() {
     install -m 0755 ${UNPACKDIR}/en-i3c-hub-scan-fru ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/slot-plug-in ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/slot-unplug ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/medusa-hsc-fault ${D}${libexecdir}/${PN}/
     install -d ${D}/${bindir}
     install -m 0755 ${UNPACKDIR}/configure-nic-mctp-endpoint ${D}/${bindir}/
 }

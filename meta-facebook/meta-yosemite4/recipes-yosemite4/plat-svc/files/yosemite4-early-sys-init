@@ -95,6 +95,8 @@ enable_all_fan_input
 # Set all fan PWM to 80%
 set_all_fan_pwm_80_percent
 
+handle_service_window
+
 # Set interface to SD BIC to I3C for BMC
 set_sd_bic_interface_to_i3c
 

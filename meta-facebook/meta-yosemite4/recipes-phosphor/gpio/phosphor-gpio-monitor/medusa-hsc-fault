@@ -1,0 +1,19 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
+medusa_hsc_fault()
+{
+    local hsc_fault_position="$1"
+    local sentinel_dome_slot_present_percentage=50
+
+    echo "Detected HSC fault at position ${hsc_fault_position}, setting fan PWM to 100%."
+
+    if ! set_sentinel_dome_slot_present_percentage "${sentinel_dome_slot_present_percentage}"; then
+        exit 1
+    else
+        exit 0
+    fi
+}
+
+medusa_hsc_fault "$1"
