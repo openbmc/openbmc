@@ -17,7 +17,7 @@
 
 do_flash () {
 	# Check the PNOR partition available
-	HOST_MTD=$(< /proc/mtd grep "pnor-uefi" | sed -n 's/^\(.*\):.*/\1/p')
+	HOST_MTD=$(< /proc/mtd grep '"pnor-uefi"' | sed -n 's/^\(.*\):.*/\1/p')
 	if [ -z "$HOST_MTD" ];
 	then
 		# Check the ASpeed SMC driver bound before
@@ -33,7 +33,7 @@ do_flash () {
 		echo 1e630000.spi > /sys/bus/platform/drivers/spi-aspeed-smc/bind
 		sleep 2
 
-		HOST_MTD=$(< /proc/mtd grep "pnor-uefi" | sed -n 's/^\(.*\):.*/\1/p')
+		HOST_MTD=$(< /proc/mtd grep '"pnor-uefi"' | sed -n 's/^\(.*\):.*/\1/p')
 		if [ -z "$HOST_MTD" ];
 		then
 			echo "Fail to probe Host SPI-NOR device"
