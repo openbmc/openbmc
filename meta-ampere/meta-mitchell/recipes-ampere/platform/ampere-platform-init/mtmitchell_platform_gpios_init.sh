@@ -31,10 +31,7 @@ function post-platform-init() {
     gpioset $(gpiofind host0-sysreset-n)=1
 
     echo "Set default FAN speed to 60%"
-    for filename in /sys/class/hwmon/*/pwm*[1-6]
-    do
-        echo 153 > "$filename"
-    done
+    /usr/sbin/ampere_fanctrl.sh setspeed all 60
 
     # Bind rtc driver
     bind_rtc_driver

@@ -1,5 +1,4 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}/${MACHINE}:"
 
 RDEPENDS:${PN}-monitor += "bash"
 
@@ -11,14 +10,10 @@ SRC_URI:append = " file://events.json \
                   file://zones.json \
                   file://monitor.json \
                   file://presence.json \
-                  file://phosphor-fan-control@.service \
-                  file://phosphor-fan-monitor@.service \
-                  file://ampere_set_fan_max_speed.sh \
+                  file://phosphor-fan-control.conf \
                 "
 
-FILES:${PN}-monitor += " \
-                        ${bindir}/ampere_set_fan_max_speed.sh \
-                       "
+SYSTEMD_OVERRIDE:${PN}-control += "phosphor-fan-control.conf:phosphor-fan-control@0.service.d/phosphor-fan-control.conf"
 
 do_configure:prepend() {
         mkdir -p ${S}/control/config_files/${MACHINE}
@@ -34,12 +29,5 @@ do_configure:prepend() {
         cp ${UNPACKDIR}/presence.json ${S}/presence/config_files/${MACHINE}/config.json
 }
 
-do_install:append() {
-  install -d ${D}${bindir}
-  install -m 0755 ${UNPACKDIR}/ampere_set_fan_max_speed.sh ${D}${bindir}/ampere_set_fan_max_speed.sh
-  install -d ${D}${systemd_system_unitdir}
-  install -m 0644 ${UNPACKDIR}/phosphor-fan-monitor@.service ${D}${systemd_system_unitdir}
-  install -m 0644 ${UNPACKDIR}/phosphor-fan-control@.service ${D}${systemd_system_unitdir}
-}
 
 

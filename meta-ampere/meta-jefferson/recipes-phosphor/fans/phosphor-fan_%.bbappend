@@ -3,23 +3,23 @@ FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 PACKAGECONFIG:append = " json"
 
 SRC_URI:append = " \
-                  file://events.json \
-                  file://fans.json \
-                  file://groups.json \
-                  file://zones.json \
-                  file://monitor.json \
-                  file://presence.json \
-                 "
+                        file://events.json \
+                        file://fans.json \
+                        file://groups.json \
+                        file://zones.json \
+                        file://monitor.json \
+                        file://presence.json \
+                "
 
 COMPAT_NAME = "com.ampere.Hardware.Chassis.Model.MtJefferson"
 
 CONTROL_CONFIGS = "events.json fans.json zones.json groups.json"
 
 do_install:append () {
-    # datadir = /usr/share
-    install -d ${D}${datadir}/phosphor-fan-presence/control/${COMPAT_NAME}
-    install -d ${D}${datadir}/phosphor-fan-presence/monitor/${COMPAT_NAME}
-    install -d ${D}${datadir}/phosphor-fan-presence/presence/${COMPAT_NAME}
+        # datadir = /usr/share
+        install -d ${D}${datadir}/phosphor-fan-presence/control/${COMPAT_NAME}
+        install -d ${D}${datadir}/phosphor-fan-presence/monitor/${COMPAT_NAME}
+        install -d ${D}${datadir}/phosphor-fan-presence/presence/${COMPAT_NAME}
 
     for CONTROL_CONFIG in ${CONTROL_CONFIGS}
     do

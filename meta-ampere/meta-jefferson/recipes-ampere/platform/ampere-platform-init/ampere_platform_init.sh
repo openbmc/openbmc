@@ -43,10 +43,7 @@ function fan_controller_init() {
     echo 8-005c > /sys/bus/i2c/drivers/adt7462/bind
 
     echo "Set default FAN speed to 60%"
-    for filename in /sys/class/hwmon/*/pwm[0-9]
-    do
-        echo 153 > "$filename"
-    done
+    /usr/sbin/ampere_fanctrl.sh setspeed all 60
 }
 
 # Setting default value for device sel and mux
