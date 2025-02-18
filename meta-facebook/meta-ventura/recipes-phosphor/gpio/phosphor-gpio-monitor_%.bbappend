@@ -9,6 +9,7 @@ SERVICE_LIST = "power-good-assert@.service \
                 leak-detect-deassert@.service \
                 rpu-ready-assert@.service \
                 rpu-ready-deassert@.service \
+                rack-level-leak@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
@@ -16,6 +17,7 @@ SERVICE_FILE_FMT = "file://{0}"
 SRC_URI += "file://ventura-phosphor-multi-gpio-monitor.json \
             file://ventura-phosphor-multi-gpio-presence.json \
             file://logging \
+            file://rack-level-leak \
             ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
             "
 
@@ -41,4 +43,5 @@ do_install:append:() {
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/logging ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/rack-level-leak ${D}${libexecdir}/${PN}/
 }

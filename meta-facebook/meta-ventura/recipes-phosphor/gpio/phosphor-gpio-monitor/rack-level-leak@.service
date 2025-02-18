@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Rack Level Leak
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/rack-level-leak
+SyslogIdentifier=%i-rack-level-leak

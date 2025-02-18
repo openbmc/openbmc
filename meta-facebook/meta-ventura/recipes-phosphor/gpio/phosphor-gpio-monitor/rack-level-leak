@@ -1,0 +1,37 @@
+#!/bin/bash
+
+files=(
+    "/var/facebook/rootcanal/rc_digicert_ca.pem"
+    "/mnt/data/etc/x509_highpriv_host.cert"
+    "/mnt/data/etc/x509_highpriv_host.key"
+    "/mnt/data/etc/rackpower_ipaddr"
+    "/mnt/data/etc/rackpower_hostname"
+)
+
+for file in "${files[@]}"; do
+    if [ ! -f "$file" ]; then
+        echo "Error: Missing required file $file"
+        echo "Stop to send the Rack Power Off command"
+        exit 1
+    fi
+done
+
+RACKPOWER_HOSTNAME=$(cat /mnt/data/etc/rackpower_hostname)
+RACKPOWER_IP=$(cat /mnt/data/etc/rackpower_ipaddr)
+
+curl -f -s -o /dev/null \
+     --cacert /var/facebook/rootcanal/rc_digicert_ca.pem \
+     --cert /mnt/data/etc/x509_highpriv_host.cert \
+     --key /mnt/data/etc/x509_highpriv_host.key \
+     -X POST "https://${RACKPOWER_HOSTNAME}/redfish/v1/Chassis/Rack/Actions/Chassis.Reset" \
+     --data '{"ResetType": "ForceOff"}' \
+     --resolve "${RACKPOWER_HOSTNAME}:443:${RACKPOWER_IP}"
+
+CMD_STATUS=$?
+
+if [ $CMD_STATUS -eq 0 ]; then
+    echo "Rack Power Off command sent successfully."
+else
+    echo "Error: Failed($CMD_STATUS) to send Rack Power Off command."
+    exit 1
+fi

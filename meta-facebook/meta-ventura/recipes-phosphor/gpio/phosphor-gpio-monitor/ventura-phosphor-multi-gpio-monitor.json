@@ -599,7 +599,7 @@
         "GpioNum": 202,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray1.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray1.service"],
             "RISING": ["leak-detect-deassert@ComputeTray1.service"]
         },
         "Continue": true
@@ -610,7 +610,7 @@
         "GpioNum": 204,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray2.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray2.service"],
             "RISING": ["leak-detect-deassert@ComputeTray2.service"]
         },
         "Continue": true
@@ -621,7 +621,7 @@
         "GpioNum": 206,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray3.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray3.service"],
             "RISING": ["leak-detect-deassert@ComputeTray3.service"]
         },
         "Continue": true
@@ -632,7 +632,7 @@
         "GpioNum": 208,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray4.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray4.service"],
             "RISING": ["leak-detect-deassert@ComputeTray4.service"]
         },
         "Continue": true
@@ -643,7 +643,7 @@
         "GpioNum": 210,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray5.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray5.service"],
             "RISING": ["leak-detect-deassert@ComputeTray5.service"]
         },
         "Continue": true
@@ -654,7 +654,7 @@
         "GpioNum": 212,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray6.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray6.service"],
             "RISING": ["leak-detect-deassert@ComputeTray6.service"]
         },
         "Continue": true
@@ -665,7 +665,7 @@
         "GpioNum": 214,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray7.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray7.service"],
             "RISING": ["leak-detect-deassert@ComputeTray7.service"]
         },
         "Continue": true
@@ -676,7 +676,7 @@
         "GpioNum": 216,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray8.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray8.service"],
             "RISING": ["leak-detect-deassert@ComputeTray8.service"]
         },
         "Continue": true
@@ -687,7 +687,7 @@
         "GpioNum": 218,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray1.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray1.service"],
             "RISING": ["leak-detect-deassert@SwitchTray1.service"]
         },
         "Continue": true
@@ -698,7 +698,7 @@
         "GpioNum": 220,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray2.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray2.service"],
             "RISING": ["leak-detect-deassert@SwitchTray2.service"]
         },
         "Continue": true
@@ -709,7 +709,7 @@
         "GpioNum": 222,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray11.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray11.service"],
             "RISING": ["leak-detect-deassert@ComputeTray11.service"]
         },
         "Continue": true
@@ -720,7 +720,7 @@
         "GpioNum": 224,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray12.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray12.service"],
             "RISING": ["leak-detect-deassert@ComputeTray12.service"]
         },
         "Continue": true
@@ -731,7 +731,7 @@
         "GpioNum": 226,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray13.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray13.service"],
             "RISING": ["leak-detect-deassert@ComputeTray13.service"]
         },
         "Continue": true
@@ -742,7 +742,7 @@
         "GpioNum": 228,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray14.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray14.service"],
             "RISING": ["leak-detect-deassert@ComputeTray14.service"]
         },
         "Continue": true
@@ -753,7 +753,7 @@
         "GpioNum": 230,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray15.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray15.service"],
             "RISING": ["leak-detect-deassert@ComputeTray15.service"]
         },
         "Continue": true
@@ -764,7 +764,7 @@
         "GpioNum": 232,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray16.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray16.service"],
             "RISING": ["leak-detect-deassert@ComputeTray16.service"]
         },
         "Continue": true
@@ -775,7 +775,7 @@
         "GpioNum": 234,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray17.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray17.service"],
             "RISING": ["leak-detect-deassert@ComputeTray17.service"]
         },
         "Continue": true
@@ -786,7 +786,7 @@
         "GpioNum": 236,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray18.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray18.service"],
             "RISING": ["leak-detect-deassert@ComputeTray18.service"]
         },
         "Continue": true
@@ -797,7 +797,7 @@
         "GpioNum": 238,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray3.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray3.service"],
             "RISING": ["leak-detect-deassert@SwitchTray3.service"]
         },
         "Continue": true
@@ -808,7 +808,7 @@
         "GpioNum": 240,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray4.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray4.service"],
             "RISING": ["leak-detect-deassert@SwitchTray4.service"]
         },
         "Continue": true
@@ -819,7 +819,7 @@
         "GpioNum": 242,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray5.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray5.service"],
             "RISING": ["leak-detect-deassert@SwitchTray5.service"]
         },
         "Continue": true
@@ -830,7 +830,7 @@
         "GpioNum": 244,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray6.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray6.service"],
             "RISING": ["leak-detect-deassert@SwitchTray6.service"]
         },
         "Continue": true
@@ -841,7 +841,7 @@
         "GpioNum": 246,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray7.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray7.service"],
             "RISING": ["leak-detect-deassert@SwitchTray7.service"]
         },
         "Continue": true
@@ -852,7 +852,7 @@
         "GpioNum": 248,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray8.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray8.service"],
             "RISING": ["leak-detect-deassert@SwitchTray8.service"]
         },
         "Continue": true
@@ -863,7 +863,7 @@
         "GpioNum": 250,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@SwitchTray9.service"],
+            "FALLING": ["critical-leak-detect-assert@SwitchTray9.service"],
             "RISING": ["leak-detect-deassert@SwitchTray9.service"]
         },
         "Continue": true
@@ -874,7 +874,7 @@
         "GpioNum": 252,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray9.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray9.service"],
             "RISING": ["leak-detect-deassert@ComputeTray9.service"]
         },
         "Continue": true
@@ -885,7 +885,7 @@
         "GpioNum": 254,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-assert@ComputeTray10.service"],
+            "FALLING": ["critical-leak-detect-assert@ComputeTray10.service"],
             "RISING": ["leak-detect-deassert@ComputeTray10.service"]
         },
         "Continue": true
@@ -897,7 +897,7 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-deassert@RackDripPan.service"],
-            "RISING": ["critical-leak-detect-assert@RackDripPan.service"]
+            "RISING": ["critical-leak-detect-assert@RackDripPan.service", "rack-level-leak@RackDripPan.service"]
         },
         "Continue": true
     },
@@ -908,7 +908,7 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-deassert@RackLeftManifold.service"],
-            "RISING": ["critical-leak-detect-assert@RackLeftManifold.service"]
+            "RISING": ["critical-leak-detect-assert@RackLeftManifold.service", "rack-level-leak@RackLeftManifold.service"]
         },
         "Continue": true
     },
@@ -919,7 +919,7 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-deassert@RackRightManifold.service"],
-            "RISING": ["critical-leak-detect-assert@RackRightManifold.service"]
+            "RISING": ["critical-leak-detect-assert@RackRightManifold.service", "rack-level-leak@RackRightManifold.service"]
         },
         "Continue": true
     },
