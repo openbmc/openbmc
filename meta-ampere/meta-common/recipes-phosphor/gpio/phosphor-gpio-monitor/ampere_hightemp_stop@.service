@@ -1,5 +1,6 @@
 [Unit]
-Description=Ampere Computing LLC HighTempt event
+Description=Ampere Computing LLC HighTemp Deassertion event
+StartLimitIntervalSec=0
 
 [Service]
 Restart=no
