@@ -5,5 +5,5 @@ PACKAGECONFIG = " \
         intelcpusensor \
         ipmbsensor \
         nvmesensor \
-        psuensor \
+        psusensor \
         "
