@@ -1,0 +1,51 @@
+#!/bin/bash
+
+MESSAGE=$1
+
+LEDtray="init"
+LEDstate="init"
+traynum="init"
+Leaktray="init"
+
+LEDtray=$(echo "$MESSAGE" | cut -d '-' -f1)
+
+if [ "$LEDtray" == "compute" ]; then
+   traynum=$(echo "$MESSAGE" | cut -d '-' -f3 | cut -d ' ' -f1)
+   LEDstate=$(echo "$MESSAGE" | cut -d ' ' -f4)
+   if [ "$LEDstate" == "assert" ]; then
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$traynum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$traynum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+   elif [ "$LEDstate" == "deassert" ]; then
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$traynum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+   fi
+elif [ "$LEDtray" == "nvs" ]; then
+   traynum=$(echo "$MESSAGE" | cut -d '-' -f3 | cut -d ' ' -f1)
+   LEDstate=$(echo "$MESSAGE" | cut -d ' ' -f4)
+   if [ "$LEDstate" == "assert" ]; then
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$traynum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$traynum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+   elif [ "$LEDstate" == "deassert" ]; then
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$traynum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+   fi
+elif [ "$LEDtray" == "leak" ]; then
+    Leaktray=$(echo "$MESSAGE" | cut -d '-' -f2)
+    if [ "$Leaktray" == "compute" ]; then
+        traynum=$(echo "$MESSAGE" | cut -d '-' -f4 | cut -d ' ' -f1)
+        LEDstate=$(echo "$MESSAGE" | cut -d ' ' -f4)
+        if [ "$LEDstate" == "assert" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$traynum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$traynum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+        elif [ "$LEDstate" == "deassert" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/compute""$traynum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+        fi
+    elif [ "$Leaktray" == "nvs" ]; then
+        traynum=$(echo "$MESSAGE" | cut -d '-' -f4 | cut -d ' ' -f1)
+        LEDstate=$(echo "$MESSAGE" | cut -d ' ' -f4)
+        if [ "$LEDstate" == "assert" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$traynum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$traynum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+        elif [ "$LEDstate" == "deassert" ]; then
+           busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/nvs""$traynum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+        fi
+    fi
+fi
