@@ -7,7 +7,7 @@ StartLimitBurst=3
 [Service]
 Restart=always
 RestartSec=5
-ExecStart=/usr/sbin/dhcrelay -d --no-pid -l gbmcnicdhcp @UPPERS@
+ExecStart=/usr/sbin/dhcrelay -d --no-pid -l gbmcnicdhcp -u ff02::1:2%%%I
 
 [Install]
 WantedBy=multi-user.target

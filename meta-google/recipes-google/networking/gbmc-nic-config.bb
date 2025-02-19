@@ -13,6 +13,7 @@ SRC_URI += " \
   file://50-gbmc-nic.rules.in \
   file://10-dhcp4.conf \
   file://-bmc-nic.network.in \
+  file://gbmc-nic-dhcrelay.sh.in \
   file://gbmc-nic-neigh.sh.in \
   file://gbmc-nic-ra.sh \
   file://gbmc-nic-ra@.service \
@@ -20,7 +21,7 @@ SRC_URI += " \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrnicdhcp.network'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcnicdhcp.netdev'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcnicdhcp.network'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-nic-dhcrelay.service.in'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-nic-dhcrelay@.service'} \
   "
 S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
@@ -58,11 +59,9 @@ do_install() {
   sed 's,@IFS@,${GBMC_EXT_NICS},g' <${UNPACKDIR}/gbmc-nic-neigh.sh.in \
     >$mondir/gbmc-nic-neigh.sh
 
-  uppers=
   for intf in ${GBMC_EXT_NICS}; do
     sed "s,@IF@,$intf,g" <${UNPACKDIR}/50-gbmc-nic.rules.in >$nftdir/50-gbmc-$intf.rules
     sed "s,@IF@,$intf,g" <${UNPACKDIR}/-bmc-nic.network.in >$netdir/-bmc-$intf.network
-    uppers="$uppers -u ff02::1:2%%$intf"
     ln -sv ../gbmc-nic-ra@.service $wantdir/gbmc-nic-ra@$intf.service
   done
 
@@ -72,10 +71,10 @@ do_install() {
     install -m0644 ${UNPACKDIR}/-bmc-gbmcnicdhcp.network $netdir/
     install -m0644 ${UNPACKDIR}/-bmc-gbmcnicdhcp.netdev $netdir/
     install -m0644 ${UNPACKDIR}/50-gbmc-nic.rules $nftdir/
+    install -m0644 ${UNPACKDIR}/gbmc-nic-dhcrelay@.service $unitdir/
 
-    sed "s,@UPPERS@,$uppers,g" <${UNPACKDIR}/gbmc-nic-dhcrelay.service.in \
-      >$unitdir/gbmc-nic-dhcrelay.service
-    ln -sv ../gbmc-nic-dhcrelay.service $wantdir/
+    sed 's,@IFS@,${GBMC_EXT_NICS},g' <${UNPACKDIR}/gbmc-nic-dhcrelay.sh.in \
+      >$mondir/gbmc-nic-dhcrelay.sh
   fi
 }
 
