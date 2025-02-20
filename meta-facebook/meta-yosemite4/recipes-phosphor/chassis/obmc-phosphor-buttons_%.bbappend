@@ -1,5 +1,8 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
+EXTRA_OEMESON:append = "-Dhost-instances='${OBMC_HOST_INSTANCES}' \
+"
+
 SRC_URI += "file://gpio_defs.json"
 
 do_install:append() {

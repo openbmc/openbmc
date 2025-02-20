@@ -1,12 +1,6 @@
 {
     "gpio_definitions": [
         {
-            "name": "HOST_SELECTOR",
-            "group_gpio_config": [],
-            "max_position": 9,
-            "host_selector_map": {}
-        },
-        {
             "name": "POWER_BUTTON1",
             "pin": "Q0",
             "direction": "both",
