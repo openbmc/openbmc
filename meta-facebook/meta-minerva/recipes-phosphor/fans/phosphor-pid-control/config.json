@@ -127,7 +127,7 @@
             "name": "FCB_3_FAN_10_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_10_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -343,7 +343,7 @@
             "name": "FCB_3_FAN_10_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FCB_3_FAN_10_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_2_FAN_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FCB_3_FAN_PWM",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -481,7 +481,7 @@
             "id": 0,
             "failsafePercent": 85.0,
             "minThermalOutput": 0.0,
-            "cycleTimeBaseMS": 1000,
+            "cycleTimeBaseMS": 2000,
             "updateThermalsTimeMS": 1000,
             "accumulateSetPoint": true,
             "pids": [
@@ -539,7 +539,7 @@
                             "0": 60
                         },
                         "output": {
-                            "0": 20
+                            "0": 50
                         },
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2
@@ -551,7 +551,7 @@
             "id": 1,
             "failsafePercent": 85.0,
             "minThermalOutput": 0.0,
-            "cycleTimeBaseMS": 1000,
+            "cycleTimeBaseMS": 2000,
             "updateThermalsTimeMS": 1000,
             "accumulateSetPoint": true,
             "pids": [
@@ -609,7 +609,7 @@
                             "0": 60
                         },
                         "output": {
-                            "0": 20
+                            "0": 50
                         },
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2
@@ -621,7 +621,7 @@
             "id": 2,
             "failsafePercent": 85.0,
             "minThermalOutput": 0.0,
-            "cycleTimeBaseMS": 1000,
+            "cycleTimeBaseMS": 2000,
             "updateThermalsTimeMS": 1000,
             "accumulateSetPoint": true,
             "pids": [
@@ -679,7 +679,7 @@
                             "0": 60
                         },
                         "output": {
-                            "0": 20
+                            "0": 50
                         },
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2
