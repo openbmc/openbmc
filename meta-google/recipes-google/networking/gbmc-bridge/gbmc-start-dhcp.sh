@@ -15,6 +15,8 @@
 
 systemctl stop gbmc-br-dhcp@'*'
 
+systemctl restart dhcp-done
+
 # stop dhcp term service to prevent race condition
 systemctl is-active --quiet gbmc-br-dhcp-term && systemctl stop gbmc-br-dhcp-term
 
