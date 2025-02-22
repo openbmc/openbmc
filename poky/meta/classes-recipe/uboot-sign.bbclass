@@ -101,27 +101,69 @@ concat_dtb() {
 	binary="$2"
 
 	if [ -e "${UBOOT_DTB_BINARY}" ]; then
-		# Re-sign the kernel in order to add the keys to our dtb
-		UBOOT_MKIMAGE_MODE="auto-conf"
 		# Signing individual images is not recommended as that
 		# makes fitImage susceptible to mix-and-match attack.
+		#
+		# OE FIT_SIGN_INDIVIDUAL is implemented in an unusual manner,
+		# where the resulting signed fitImage contains both signed
+		# images and signed configurations. This is redundant. In
+		# order to prevent mix-and-match attack, it is sufficient
+		# to sign configurations. The FIT_SIGN_INDIVIDUAL = "1"
+		# support is kept to avoid breakage of existing layers, but
+		# it is highly recommended to avoid FIT_SIGN_INDIVIDUAL = "1",
+		# i.e. set FIT_SIGN_INDIVIDUAL = "0" .
 		if [ "${FIT_SIGN_INDIVIDUAL}" = "1" ] ; then
-			UBOOT_MKIMAGE_MODE="auto"
+			# Sign dummy image images in order to
+			# add the image signing keys to our dtb
+			${UBOOT_MKIMAGE_SIGN} \
+				${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
+				-f auto \
+				-k "${UBOOT_SIGN_KEYDIR}" \
+				-o "${FIT_HASH_ALG},${FIT_SIGN_ALG}" \
+				-g "${UBOOT_SIGN_IMG_KEYNAME}" \
+				-K "${UBOOT_DTB_BINARY}" \
+				-d /dev/null \
+				-r ${B}/unused.itb \
+				${UBOOT_MKIMAGE_SIGN_ARGS}
 		fi
+
+		# Sign dummy image configurations in order to
+		# add the configuration signing keys to our dtb
 		${UBOOT_MKIMAGE_SIGN} \
 			${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
-			-f $UBOOT_MKIMAGE_MODE \
+			-f auto-conf \
 			-k "${UBOOT_SIGN_KEYDIR}" \
 			-o "${FIT_HASH_ALG},${FIT_SIGN_ALG}" \
-			-g "${UBOOT_SIGN_IMG_KEYNAME}" \
+			-g "${UBOOT_SIGN_KEYNAME}" \
 			-K "${UBOOT_DTB_BINARY}" \
 			-d /dev/null \
 			-r ${B}/unused.itb \
 			${UBOOT_MKIMAGE_SIGN_ARGS}
-		# Verify the kernel image and u-boot dtb
-		${UBOOT_FIT_CHECK_SIGN} \
-			-k "${UBOOT_DTB_BINARY}" \
-			-f ${B}/unused.itb
+
+		# Verify the dummy fitImage signature against u-boot.dtb
+		# augmented using public key material.
+		#
+		# This only works for FIT_SIGN_INDIVIDUAL = "0", because
+		# mkimage -f auto-conf does not support -F to extend the
+		# existing unused.itb , and instead rewrites unused.itb
+		# from scratch.
+		#
+		# Using two separate unused.itb for mkimage -f auto and
+		# mkimage -f auto-conf invocation above would not help, as
+		# the signature verification process below checks whether
+		# all keys inserted into u-boot.dtb /signature node pass
+		# the verification. Separate unused.itb would each miss one
+		# of the signatures.
+		#
+		# The FIT_SIGN_INDIVIDUAL = "1" support is kept to avoid
+		# breakage of existing layers, but it is highly recommended
+		# to not use FIT_SIGN_INDIVIDUAL = "1", i.e. set
+		# FIT_SIGN_INDIVIDUAL = "0" .
+		if [ "${FIT_SIGN_INDIVIDUAL}" != "1" ] ; then
+			${UBOOT_FIT_CHECK_SIGN} \
+				-k "${UBOOT_DTB_BINARY}" \
+				-f ${B}/unused.itb
+		fi
 		cp ${UBOOT_DTB_BINARY} ${UBOOT_DTB_SIGNED}
 	fi
 
