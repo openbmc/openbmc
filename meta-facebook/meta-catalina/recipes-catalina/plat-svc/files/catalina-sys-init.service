@@ -6,7 +6,7 @@ Before=phosphor-pid-control.service
 Before=xyz.openbmc_project.FruDevice.service
 Before=xyz.openbmc_project.EntityManager.service
 Before=xyz.openbmc_project.fansensor.service
-Before=systemd-networkd.service
+After=systemd-networkd.service
 
 [Service]
 Type=oneshot

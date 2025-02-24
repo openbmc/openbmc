@@ -132,6 +132,20 @@ set_bmc_ready()
     return 0
 }
 
+is_hmc_reachable()
+{
+    local max_retry_count="$1"
+    for retry in $(seq 1 "$max_retry_count")
+    do
+        if ping -c 1 -W 1 172.31.13.251; then
+            echo "HMC is reachable"
+            return 0
+        fi
+        echo "HMC is not reachable, retry count: $retry"
+    done
+    return 1
+}
+
 if ! is_stby_good; then
     set_gpio "SCM_HPM_STBY_RST_N" "$GPIO_LOW"
 fi
@@ -160,7 +174,9 @@ if ! wait_gpio_value "HMC_READY" "$GPIO_HIGH" 180 1; then
     exit 1
 fi
 
-rebind_hmc_usb_network
+if ! is_hmc_reachable 10; then
+    rebind_hmc_usb_network
+fi
 
 if ! wait_gpio_value "FPGA_READY_BMC" "$GPIO_HIGH" 180 1; then
     echo "Error: failed to get FPGA_READY_BMC as high (1) in 180 sec"
