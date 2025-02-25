@@ -1661,13 +1661,6 @@
                     }
                 },
                 {
-                    "ParamName": "hsc_48V1_power",
-                    "Desc": {
-                        "Name": "CALIBRATED_MEDUSA_HSC1_48V_INPUT_PWR_W",
-                        "SensorType": "power"
-                    }
-                },
-                {
                     "ParamName": "hsc_slot1_power",
                     "Desc": {
                         "Name": "CALIBRATED_MEDUSA_MB1_HSC_12V_INPUT_PWR_W",
