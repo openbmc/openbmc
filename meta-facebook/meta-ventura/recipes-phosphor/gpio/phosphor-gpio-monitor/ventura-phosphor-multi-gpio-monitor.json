@@ -387,7 +387,7 @@
     {
         "Name": "PWRGD_NVS_TRAY1_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 184,
+        "GpioNum": 164,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-1.service", "led-blue-assert@nvs-tray-1.service"],
@@ -398,7 +398,7 @@
     {
         "Name": "PWRGD_NVS_TRAY2_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 186,
+        "GpioNum": 166,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-2.service", "led-blue-assert@nvs-tray-2.service"],
@@ -497,7 +497,7 @@
     {
         "Name": "PWRGD_NVS_TRAY3_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 188,
+        "GpioNum": 184,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-3.service", "led-blue-assert@nvs-tray-3.service"],
@@ -508,7 +508,7 @@
     {
         "Name": "PWRGD_NVS_TRAY4_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 190,
+        "GpioNum": 186,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-4.service", "led-blue-assert@nvs-tray-4.service"],
@@ -519,7 +519,7 @@
     {
         "Name": "PWRGD_NVS_TRAY5_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 192,
+        "GpioNum": 188,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-5.service", "led-blue-assert@nvs-tray-5.service"],
@@ -530,7 +530,7 @@
     {
         "Name": "PWRGD_NVS_TRAY6_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 194,
+        "GpioNum": 190,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-6.service", "led-blue-assert@nvs-tray-6.service"],
@@ -541,7 +541,7 @@
     {
         "Name": "PWRGD_NVS_TRAY7_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 196,
+        "GpioNum": 192,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-7.service", "led-blue-assert@nvs-tray-7.service"],
@@ -552,7 +552,7 @@
     {
         "Name": "PWRGD_NVS_TRAY8_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 198,
+        "GpioNum": 194,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-8.service", "led-blue-assert@nvs-tray-8.service"],
@@ -563,7 +563,7 @@
     {
         "Name": "PWRGD_NVS_TRAY9_PWROK_N",
         "ChipId": "2",
-        "GpioNum": 200,
+        "GpioNum": 196,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@nvs-tray-9.service", "led-blue-assert@nvs-tray-9.service"],
@@ -574,7 +574,7 @@
     {
         "Name": "PWRGD_COMPUTE_TRAY9_N",
         "ChipId": "2",
-        "GpioNum": 164,
+        "GpioNum": 198,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@compute-tray-9.service", "led-blue-assert@compute-tray-9.service"],
@@ -585,7 +585,7 @@
     {
         "Name": "PWRGD_COMPUTE_TRAY10_N",
         "ChipId": "2",
-        "GpioNum": 166,
+        "GpioNum": 200,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["power-good-assert@compute-tray-10.service", "led-blue-assert@compute-tray-10.service"],
@@ -684,7 +684,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY1_N",
         "ChipId": "2",
-        "GpioNum": 238,
+        "GpioNum": 218,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray1.service", "led-amber-assert@leak-nvs-tray-1.service"],
@@ -695,7 +695,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY2_N",
         "ChipId": "2",
-        "GpioNum": 240,
+        "GpioNum": 220,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray2.service", "led-amber-assert@leak-nvs-tray-2.service"],
@@ -794,7 +794,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY3_N",
         "ChipId": "2",
-        "GpioNum": 242,
+        "GpioNum": 238,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray3.service", "led-amber-assert@leak-nvs-tray-3.service"],
@@ -805,7 +805,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY4_N",
         "ChipId": "2",
-        "GpioNum": 244,
+        "GpioNum": 240,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray4.service", "led-amber-assert@leak-nvs-tray-4.service"],
@@ -816,7 +816,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY5_N",
         "ChipId": "2",
-        "GpioNum": 246,
+        "GpioNum": 242,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray5.service", "led-amber-assert@leak-nvs-tray-5.service"],
@@ -827,7 +827,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY6_N",
         "ChipId": "2",
-        "GpioNum": 248,
+        "GpioNum": 244,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray6.service", "led-amber-assert@leak-nvs-tray-6.service"],
@@ -838,7 +838,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY7_N",
         "ChipId": "2",
-        "GpioNum": 250,
+        "GpioNum": 246,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray7.service", "led-amber-assert@leak-nvs-tray-7.service"],
@@ -849,7 +849,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY8_N",
         "ChipId": "2",
-        "GpioNum": 252,
+        "GpioNum": 248,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray8.service", "led-amber-assert@leak-nvs-tray-8.service"],
@@ -860,7 +860,7 @@
     {
         "Name": "LEAK_DETECT_NVS_TRAY9_N",
         "ChipId": "2",
-        "GpioNum": 254,
+        "GpioNum": 250,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@SwitchTray9.service", "led-amber-assert@leak-nvs-tray-9.service"],
@@ -871,7 +871,7 @@
     {
         "Name": "LEAK_DETECT_COMPUTE_TRAY9_N",
         "ChipId": "2",
-        "GpioNum": 218,
+        "GpioNum": 252,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@ComputeTray9.service", "led-amber-assert@leak-compute-tray-9.service"],
@@ -882,7 +882,7 @@
     {
         "Name": "LEAK_DETECT_COMPUTE_TRAY10_N",
         "ChipId": "2",
-        "GpioNum": 220,
+        "GpioNum": 254,
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["critical-leak-detect-assert@ComputeTray10.service", "led-amber-assert@leak-compute-tray-10.service"],
