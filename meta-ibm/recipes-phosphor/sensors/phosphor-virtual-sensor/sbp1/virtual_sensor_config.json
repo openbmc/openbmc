@@ -31,7 +31,7 @@
   },
   {
     "Desc": {
-      "Name": "QSFP1 Temperature",
+      "Name": "Board Rear0 Temperature",
       "SensorType": "temperature"
     },
     "Associations": [
@@ -51,17 +51,23 @@
         {
           "ParamName": "T0",
           "Desc": {
-            "Name": "QSFP1_TEMP",
+            "Name": "BoardRear0_TEMP",
             "SensorType": "temperature"
           }
         }
       ]
+    },
+    "Threshold": {
+      "CriticalHigh": 65,
+      "CriticalLow": 5,
+      "WarningHigh": 60,
+      "WarningLow": 10
     },
     "Expression": "ifNan(T0, 0)"
   },
   {
     "Desc": {
-      "Name": "QSFP2 Temperature",
+      "Name": "Board Rear1 Temperature",
       "SensorType": "temperature"
     },
     "Associations": [
@@ -81,17 +87,23 @@
         {
           "ParamName": "T0",
           "Desc": {
-            "Name": "QSFP2_TEMP",
+            "Name": "BoardRear1_TEMP",
             "SensorType": "temperature"
           }
         }
       ]
+    },
+    "Threshold": {
+      "CriticalHigh": 65,
+      "CriticalLow": 5,
+      "WarningHigh": 60,
+      "WarningLow": 10
     },
     "Expression": "ifNan(T0, 0)"
   },
   {
     "Desc": {
-      "Name": "QSFP3 Temperature",
+      "Name": "Board Rear2 Temperature",
       "SensorType": "temperature"
     },
     "Associations": [
@@ -111,17 +123,23 @@
         {
           "ParamName": "T0",
           "Desc": {
-            "Name": "QSFP3_TEMP",
+            "Name": "BoardRear2_TEMP",
             "SensorType": "temperature"
           }
         }
       ]
+    },
+    "Threshold": {
+      "CriticalHigh": 65,
+      "CriticalLow": 5,
+      "WarningHigh": 60,
+      "WarningLow": 10
     },
     "Expression": "ifNan(T0, 0)"
   },
   {
     "Desc": {
-      "Name": "QSFP4 Temperature",
+      "Name": "Board Rear3 Temperature",
       "SensorType": "temperature"
     },
     "Associations": [
@@ -141,11 +159,17 @@
         {
           "ParamName": "T0",
           "Desc": {
-            "Name": "QSFP4_TEMP",
+            "Name": "BoardRear3_TEMP",
             "SensorType": "temperature"
           }
         }
       ]
+    },
+    "Threshold": {
+      "CriticalHigh": 65,
+      "CriticalLow": 5,
+      "WarningHigh": 60,
+      "WarningLow": 10
     },
     "Expression": "ifNan(T0, 0)"
   },
