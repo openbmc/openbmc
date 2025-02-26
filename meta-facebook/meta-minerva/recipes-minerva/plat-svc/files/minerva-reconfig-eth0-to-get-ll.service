@@ -1,0 +1,12 @@
+[Unit]
+Description=Reconfig eth0 to get the IPv6 LL
+Requires=xyz.openbmc_project.Network.service
+After=xyz.openbmc_project.Network.service
+
+[Service]
+ExecStart=/usr/libexec/reconfig-eth0-to-get-ll
+SyslogIdentifier=Minerva reconfig eth0 to get ll
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
