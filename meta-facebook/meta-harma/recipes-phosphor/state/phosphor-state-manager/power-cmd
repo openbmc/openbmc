@@ -33,7 +33,32 @@ force_power_off() {
         set_gpio power-host-control 0
         sleep 6
         set_gpio power-host-control 1
+        sleep 6
+    fi
+
+    # Workaround for AMD force shutdown failure.
+    if [ "$(power_status)" == "on" ]; then
+        set_gpio reset-control 0
         sleep 1
+        set_gpio reset-control 1
+        sleep 3
+
+        set_gpio power-host-control 0
+        sleep 1
+        set_gpio power-host-control 1
+        sleep 1
+
+        for i in $(seq 1 10)
+        do
+            sleep 1
+            if [ "$(power_status)" == "off" ]; then
+               return 0
+            fi
+
+            if [ "$i" -eq 10 ]; then
+               return 1
+            fi
+        done
     fi
 }
 
@@ -46,7 +71,7 @@ graceful_power_off() {
         sleep 1
 
         # wait host power off
-        for i in $(seq 1 10)
+        for i in $(seq 1 20)
         do
             sleep 1
             if [ "$(power_status)" == "off" ]; then

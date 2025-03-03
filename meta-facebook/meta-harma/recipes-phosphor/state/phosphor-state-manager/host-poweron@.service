@@ -17,6 +17,7 @@ Restart=no
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/libexec/phosphor-state-manager/host-poweron %i
+ExecStartPost=/bin/systemctl stop host-graceful-poweroff@%i.service
 
 [Install]
 RequiredBy=obmc-host-startmin@%i.target

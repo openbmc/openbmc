@@ -5,6 +5,16 @@ source /usr/libexec/fb-common-functions
 # shellcheck source=meta-facebook/meta-harma/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
+active=$(systemctl is-active host-poweron@0.service)
+if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+    exit 0
+fi
+
+active=$(systemctl is-active host-powerreset@0.service)
+if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+    exit 0
+fi
+
 check_valid_sgpio
 valid_sgpio=$?
 
@@ -16,9 +26,23 @@ if [ "$valid_sgpio" -eq 0 ]; then
         CurrentHostState s \
         xyz.openbmc_project.State.Host.HostState.Running
 
-    # Sync power status to On
-    obmcutil poweron
     systemctl start obmc-led-group-start@power_on.service
+
+    # Sync power status to "On" for abnormal power-on scenarios.
+    transition=$(busctl get-property \
+        xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition | awk '{print $2}' | tr -d '"')
+
+    if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.On" ] && [ "$(power_status)" == "on" ]; then
+        busctl set-property xyz.openbmc_project.State.Host0 \
+            /xyz/openbmc_project/state/host0 \
+            xyz.openbmc_project.State.Host \
+            RequestedHostTransition s \
+            xyz.openbmc_project.State.Host.Transition.On
+    fi
+
 fi
 
 # The hardware disables the multiplexer in standby
