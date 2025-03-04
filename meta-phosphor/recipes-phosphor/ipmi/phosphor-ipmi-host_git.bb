@@ -6,6 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 RRECOMMENDS:${PN} += "packagegroup-obmc-ipmid-providers-libs"
+RPROVIDES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'transport-null', '', 'virtual-obmc-host-ipmi-hw', d)}"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-ipmiprovider-symlink
@@ -32,6 +33,7 @@ PACKAGECONFIG ??= " \
     libuserlayer \
     softoff \
     ${@bb.utils.contains('OBMC_ORG_YAML_SUBDIRS', 'org/open_power', 'open-power', '', d)} \
+    transport-null \
     "
 PACKAGECONFIG[allowlist] = "-Dipmi-whitelist=enabled,-Dipmi-whitelist=disabled"
 PACKAGECONFIG[boot-flag-safe-mode] = "-Dboot-flag-safe-mode-support=enabled,-Dboot-flag-safe-mode-support=disabled"
@@ -46,6 +48,8 @@ PACKAGECONFIG[sensors-cache] = "-Dsensors-cache=enabled,-Dsensors-cache=disabled
 PACKAGECONFIG[softoff] = "-Dsoftoff=enabled,-Dsoftoff=disabled"
 PACKAGECONFIG[transport-oem] = "-Dtransport-oem=enabled,-Dtransport-oem=disabled"
 PACKAGECONFIG[update-functional-on-fail] = "-Dupdate-functional-on-fail=enabled,-Dupdate-functional-on-fail=disabled"
+PACKAGECONFIG[transport-serial] = "-Dtransport-implementation=serial,,,,,transport-null"
+PACKAGECONFIG[transport-null] = "-Dtransport-implementation=null,,,,,transport-serial"
 
 DEPENDS += "nlohmann-json"
 DEPENDS += "openssl"
@@ -166,6 +170,12 @@ IPMI_HOST_NEEDED_SERVICES = "\
     mapper-wait@-xyz-openbmc_project-control-host{}-power_restore_policy.service \
     mapper-wait@-xyz-openbmc_project-control-host{}-restriction_mode.service \
     "
+
+SERIAL_DEVICE ?= "ttyS0"
+FILES:${PN} += " ${systemd_system_unitdir}/serialbridge@.service"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'transport-serial', \
+                                               'serialbridge@${SERIAL_DEVICE}.service', \
+                                               '', d)}"
 
 do_install:append() {
 
