@@ -1,0 +1,20 @@
+{
+    "gpio_definitions": [
+        {
+            "name": "POWER_BUTTON",
+            "pin": "P0",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "P2",
+            "direction": "both"
+        },
+        {
+            "name": "HOST_SELECTOR",
+            "group_gpio_config": [],
+            "max_position": 1,
+            "host_selector_map": {}
+        }
+    ]
+}
