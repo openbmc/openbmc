@@ -1,0 +1,178 @@
+{
+  "0" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "1" : {
+    "name" : "eth0",
+    "is_valid" : true,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "lan-802.3",
+      "protocol_type" : "ipmb-1.0",
+      "session_supported" : "multi-session",
+      "is_ipmi" : true
+    }
+  },
+  "2" : {
+    "name" : "eth1",
+    "is_valid" : true,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "lan-802.3",
+      "protocol_type" : "ipmb-1.0",
+      "session_supported" : "multi-session",
+      "is_ipmi" : true
+    }
+  },
+  "3" : {
+    "name" : "ipmi_serial",
+    "is_valid" : true,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "serial",
+      "protocol_type" : "tmode",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "4" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "5" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "6" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "7" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "8" : {
+    "name" : "INTRABMC",
+    "is_valid" : true,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "oem",
+      "protocol_type" : "oem",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "9" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "10" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "11" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "12" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "13" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "14" : {
+    "name" : "SELF",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "ipmb",
+      "protocol_type" : "ipmb-1.0",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  },
+  "15" : {
+    "name" : "RESERVED",
+    "is_valid" : false,
+    "active_sessions" : 0,
+    "channel_info" : {
+      "medium_type" : "reserved",
+      "protocol_type" : "na",
+      "session_supported" : "session-less",
+      "is_ipmi" : true
+    }
+  }
+}
