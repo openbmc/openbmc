@@ -5,10 +5,10 @@ EXTRA_OEMESON:append = " \
   -Dnegative-errno-on-fail=false \
 "
 
-ITEMS:append = " thermal-sensor0.conf"
-ITEMS:append = " thermal-sensor1.conf"
-ITEMS:append = " thermal-sensor2.conf"
-ITEMS:append = " thermal-sensor3.conf"
+ITEMS:append = " thermistor-0.conf"
+ITEMS:append = " thermistor-1.conf"
+ITEMS:append = " thermistor-2.conf"
+ITEMS:append = " thermistor-3.conf"
 
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE:${PN}:append = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
