@@ -1,0 +1,3 @@
+# Replace the '-' to '_', since Dbus object/interface names do not allow '-'.
+KERNEL=="ipmi-kcs3", SYMLINK+="ipmi_kcs3"
+KERNEL=="ipmi-kcs4", SYMLINK+="ipmi_kcs4"
