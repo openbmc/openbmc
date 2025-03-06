@@ -36,7 +36,7 @@ chassis-power-cycle() {
 
 aegis-power-cycle() {
   i2cset -y 11 0x21 0x00 0xfe
-  sleep 3
+  sleep 15
   i2cset -y 11 0x21 0x00 0xff
 }
 
