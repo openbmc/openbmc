@@ -47,6 +47,31 @@ config_fan()
     fi
 }
 
+config_ltc4287_hsc()
+{
+    echo "Configure LTC4287 HSC"
+    # Set ADC samples per average to 4096 in MFR_AVG_SEL (D9h) reg
+    i2cset -y -f 20 0x42 0xd9 0x8b || echo "Failed to set MFR_AVG_SEL to HSC1 (20-0042)"
+    i2cset -y -f 20 0x43 0xd9 0x8b || echo "Failed to set MFR_AVG_SEL to HSC2 (20-0043)"
+}
+
+config_xdp710_hsc()
+{
+    echo "Configure XDP710 HSC"
+    # Set telemetry averaging samples to 128 in TELEMETRY_AVG (E9h) reg
+    i2cset -y -f 20 0x13 0xe9 0x01ff w || echo "Failed to set TELEMETRY_AVG to HSC1 (20-0013)"
+    i2cset -y -f 20 0x1c 0xe9 0x01ff w || echo "Failed to set TELEMETRY_AVG to HSC2 (20-001c)"
+}
+
+config_hsc()
+{
+    if [ "$(i2cdetect -y -q 20 0x13 0x13 | grep "10:" | awk '{print $2}')" != "--" ]; then
+        config_xdp710_hsc
+    else
+        config_ltc4287_hsc
+    fi
+}
+
 # Enable standby power and bind i2c components
 /usr/libexec/catalina/standby-power-enable
 
@@ -63,5 +88,8 @@ bind_i2c_device at24 23-0053
 
 # Set fan target and enable all fan input as early as possible
 config_fan
+
+# configure hsc
+config_hsc
 
 exit 0
