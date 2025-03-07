@@ -357,6 +357,54 @@ def decodeurl(url):
     path = uri.path if uri.path else "/"
     return uri.scheme, uri.hostport, path, uri.username, uri.password, uri.params
 
+def decodemirrorurl(url):
+    """Decodes a mirror URL into the tokens (scheme, network location, path,
+    user, password, parameters).
+    """
+    m = re.compile('(?P<type>[^:]*)://((?P<user>[^/;]+)@)?(?P<location>[^;]+)(;(?P<parm>.*))?').match(url)
+    if not m:
+        raise MalformedUrl(url)
+
+    type = m.group('type')
+    location = m.group('location')
+    if not location:
+        raise MalformedUrl(url)
+    user = m.group('user')
+    parm = m.group('parm')
+
+    locidx = location.find('/')
+    if locidx != -1 and type.lower() != 'file':
+        host = location[:locidx]
+        path = location[locidx:]
+    elif type.lower() == 'file':
+        host = ""
+        path = location
+        if user:
+            path = user + '@' + path
+            user = ""
+    else:
+        host = location
+        path = "/"
+    if user:
+        m = re.compile('(?P<user>[^:]+)(:?(?P<pswd>.*))').match(user)
+        if m:
+            user = m.group('user')
+            pswd = m.group('pswd')
+    else:
+        user = ''
+        pswd = ''
+
+    p = collections.OrderedDict()
+    if parm:
+        for s in parm.split(';'):
+            if s:
+                if not '=' in s:
+                    raise MalformedUrl(url, "The URL: '%s' is invalid: parameter %s does not specify a value (missing '=')" % (url, s))
+                s1, s2 = s.split('=', 1)
+                p[s1] = s2
+
+    return type, host, urllib.parse.unquote(path), user, pswd, p
+
 def encodeurl(decoded):
     """Encodes a URL from tokens (scheme, network location, path,
     user, password, parameters).
@@ -391,9 +439,9 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
     if not ud.url or not uri_find or not uri_replace:
         logger.error("uri_replace: passed an undefined value, not replacing")
         return None
-    uri_decoded = list(decodeurl(ud.url))
-    uri_find_decoded = list(decodeurl(uri_find))
-    uri_replace_decoded = list(decodeurl(uri_replace))
+    uri_decoded = list(decodemirrorurl(ud.url))
+    uri_find_decoded = list(decodemirrorurl(uri_find))
+    uri_replace_decoded = list(decodemirrorurl(uri_replace))
     logger.debug2("For url %s comparing %s to %s" % (uri_decoded, uri_find_decoded, uri_replace_decoded))
     result_decoded = ['', '', '', '', '', {}]
     # 0 - type, 1 - host, 2 - path, 3 - user,  4- pswd, 5 - params
