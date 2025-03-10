@@ -6,6 +6,23 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 # Sync Led status to off
 systemctl start obmc-led-group-stop@power_on.service
 
+currentstate=$(busctl get-property \
+    xyz.openbmc_project.State.Host0 \
+    /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host \
+    CurrentHostState | awk '{print $2}' | tr -d '"')
+
+if [ "$currentstate" == "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ]; then
+    exit 0
+fi
+
+# Set Host Power Status Off
+busctl set-property xyz.openbmc_project.State.Host0 \
+    /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host \
+    CurrentHostState s \
+    xyz.openbmc_project.State.Host.HostState.Off
+
 active=$(systemctl is-active host-graceful-poweroff@0.service)
 if [ -z "$active" ] || [ "$active" != "inactive" ]; then
     exit 0
@@ -20,13 +37,6 @@ active=$(systemctl is-active host-powerreset@0.service)
 if [ -z "$active" ] || [ "$active" != "inactive" ]; then
     exit 0
 fi
-
-# Set Host Power Status Off
-busctl set-property xyz.openbmc_project.State.Host0 \
-    /xyz/openbmc_project/state/host0 \
-    xyz.openbmc_project.State.Host \
-    CurrentHostState s \
-    xyz.openbmc_project.State.Host.HostState.Off
 
 sleep 3
 # Sync power state to "off" for abnormal power lose.
