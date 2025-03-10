@@ -58,6 +58,93 @@ do
   echo "$?" > /tmp/gpio/PRSNT_SB_SLOT"${slot}"_N
 done
 
+# Function to calculate BIT(n)
+BIT() {
+    echo $((1 << $1))
+}
+
+# Helper function to write to sysfs registers
+write_to_i3c_hub_reg() {
+    local offset=$1       # Register offset (e.g., 0x12 or 0x51)
+    local value=$2        # Decimal value to write
+    local hub=$3          # Hub (e.g., 0 or 1 for i3c-hub-0-* and i3c-hub-1-*)
+
+    echo "$offset" > /sys/kernel/debug/i3c-hub-"${hub}"-*/reg/offset  # Set the register offset
+    echo "$value" > /sys/kernel/debug/i3c-hub-"${hub}"-*/reg/access  # Write the decimal value
+}
+
+# Invert slot presence GPIO value (i: 0-base)
+invert_slot_prsnt_gpio() {
+    local i=$1
+    local slot_i=$((i + 1))
+    local file_path="/tmp/gpio/PRSNT_SB_SLOT${slot_i}_N"
+
+    # Check if the file exists
+    if [[ -f "$file_path" ]]; then
+        local value
+        value=$(cat "$file_path")
+    else
+        echo "Error: File $file_path does not exist"
+        return 1
+    fi
+
+    # Validate and invert the value
+    local r_gpio_val
+    if [[ "$value" -eq 0 ]]; then
+        r_gpio_val=1
+    elif [[ "$value" -eq 1 ]]; then
+        r_gpio_val=0
+    else
+        echo "Error: Invalid value in $file_path, expected 0 or 1 but got '$value'"
+        return 2
+    fi
+
+    echo "$r_gpio_val"
+}
+
+# Compute and write combined values for hubs
+set_I3C_hub() {
+    for hub in 0 1; do
+        local i3c_mask=0 smbus_mask=0 gpio_mask=0
+        local i3c_val=0 smbus_val=0 gpio_val=0
+
+        if [[ $hub -eq 0 ]]; then
+            local start=0
+            local end=3
+        else
+            local start=4
+            local end=7
+        fi
+
+        for ((i=start; i<=end; i++)); do
+            local slot_gpio_val
+            slot_gpio_val=$(invert_slot_prsnt_gpio $i)
+
+            local bit_pos=$((i - start))  # Adjust bit position to 0-3 for each hub
+            i3c_mask=$((i3c_mask | $(BIT $bit_pos)))
+            smbus_mask=$((smbus_mask | $(BIT $bit_pos)))
+            gpio_mask=$((gpio_mask | $(BIT $bit_pos)))
+
+            if [[ $slot_gpio_val -eq 1 ]]; then
+                i3c_val=$((i3c_val | $(BIT $bit_pos)))
+                smbus_val=$((smbus_val | $(BIT $bit_pos)))
+            fi
+            gpio_val=$((gpio_val | (slot_gpio_val << bit_pos)))
+
+            local combined_mask=$((i3c_mask | smbus_mask | gpio_mask))
+            local combined_val=$((i3c_val | smbus_val | gpio_val))
+        done
+
+        local combined_result=$((combined_val & combined_mask))
+        local i3c_result=$((i3c_val & i3c_mask))
+
+        write_to_i3c_hub_reg 16 105 "$hub"  # Unprotect register
+        write_to_i3c_hub_reg 18 "$combined_result" "$hub"  # Write to reg 0x12 (combined values for hub)
+        write_to_i3c_hub_reg 81 "$i3c_result" "$hub"  # Write to reg 0x51 (i3c values for hub)
+        write_to_i3c_hub_reg 16 0 "$hub"  # Protect register
+    done
+}
+
 # set initial value for GPIO output pins
 set_gpio EN_P5V_USB_CPLD_R    1
 set_gpio EN_NIC0_POWER_BMC_R  1
@@ -99,5 +186,8 @@ handle_service_window
 
 # Set interface to SD BIC to I3C for BMC
 set_sd_bic_interface_to_i3c
+
+# Set I3C hub register
+set_I3C_hub
 
 exit 0
