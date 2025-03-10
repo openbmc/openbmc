@@ -14,7 +14,7 @@
         "LineName": "RUN_POWER_PG",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["assert-run-power-pg.service", "backend-nic-driver-bind.service"],
+            "RISING": ["assert-run-power-pg.service"],
             "FALLING": ["deassert-run-power-pg.service"]
         },
         "Continue": true

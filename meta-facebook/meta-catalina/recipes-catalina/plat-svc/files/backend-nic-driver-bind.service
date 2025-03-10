@@ -1,0 +1,12 @@
+[Unit]
+Description=Bind backend NIC thermal driver
+Before=xyz.openbmc_project.hwmontempsensor.service
+After=catalina-sys-init.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/catalina/backend-nic-driver-bind
+SyslogIdentifier=backend-nic-driver-bind
+
+[Install]
+WantedBy=multi-user.target

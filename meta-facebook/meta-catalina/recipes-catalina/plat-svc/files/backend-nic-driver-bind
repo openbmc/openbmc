@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+BE_NIC_I2C_LIST="\
+24-001f \
+26-001f \
+36-001f \
+38-001f \
+"
+
+ATTEMPT_COUNT=0
+
+while true; do
+    if [ "$(get_gpio "host0-ready")" -ne 1 ]; then
+        sleep 5
+        continue
+    fi
+
+    ATTEMPT_COUNT=$((ATTEMPT_COUNT + 1))
+    ALL_DONE=true
+    echo "Attempt $ATTEMPT_COUNT..."
+
+    for dev in $BE_NIC_I2C_LIST; do
+        DEVICE_PATH="/sys/bus/i2c/drivers/tmp421/$dev"
+        if [ ! -L "$DEVICE_PATH" ]; then
+            if ! echo "$dev" > /sys/bus/i2c/drivers/tmp421/bind 2>/dev/null; then
+                ALL_DONE=false
+            fi
+        else
+            echo "$dev: already bind, skip"
+        fi
+    done
+
+    if [ $ALL_DONE = true ]; then
+        echo "All devices successfully bind"
+        exit 0
+    fi
+
+    sleep 5
+done

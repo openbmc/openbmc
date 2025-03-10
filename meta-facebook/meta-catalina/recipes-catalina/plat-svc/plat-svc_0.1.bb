@@ -11,6 +11,7 @@ RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "fb-common-functions"
 
 SRC_URI += " \
+    file://backend-nic-driver-bind \
     file://catalina-sys-init.service \
     file://catalina-early-sys-init \
     file://standby-power-enable \
@@ -18,12 +19,14 @@ SRC_URI += " \
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " \
+    backend-nic-driver-bind.service \
     catalina-sys-init.service \
     "
 
 do_install() {
     CATALINA_LIBEXECDIR="${D}${libexecdir}/catalina"
     install -d ${CATALINA_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${CATALINA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/catalina-early-sys-init ${CATALINA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/standby-power-enable ${CATALINA_LIBEXECDIR}
 }
