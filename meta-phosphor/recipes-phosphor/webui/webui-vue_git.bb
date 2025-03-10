@@ -29,6 +29,7 @@ inherit python3native
 RDEPENDS:${PN}:append = " bmcweb"
 
 EXTRA_OENPM ?= ""
+NPM_CONFIG_CACHE ?= "${WORKDIR}/npm-cache"
 
 export CXX = "${BUILD_CXX}"
 export CC = "${BUILD_CC}"
@@ -41,6 +42,7 @@ export CXXFLAGS = "${BUILD_CXXFLAGS}"
 # https://git.yoctoproject.org/poky/tree/documentation/migration-guides/migration-3.5.rst#n25
 do_compile[network] = "1"
 do_compile () {
+    export NPM_CONFIG_CACHE="${NPM_CONFIG_CACHE}"
     cd ${S}
     rm -rf node_modules
     npm --loglevel info --proxy=${http_proxy} --https-proxy=${https_proxy} install
