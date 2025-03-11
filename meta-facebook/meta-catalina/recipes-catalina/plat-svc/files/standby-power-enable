@@ -183,6 +183,11 @@ if ! wait_gpio_value "FPGA_READY_BMC" "$GPIO_HIGH" 180 1; then
     exit 1
 fi
 
+if ! wait_gpio_value "SEC_FPGA_READY_BMC" "$GPIO_HIGH" 180 1; then
+    echo "Error: failed to get SEC_FPGA_READY_BMC as high (1) in 180 sec"
+    exit 1
+fi
+
 bind_fru_eeproms
 set_bmc_ready
 
