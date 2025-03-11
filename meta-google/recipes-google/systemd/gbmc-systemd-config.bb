@@ -15,6 +15,7 @@ SRC_URI:append = " \
   file://40-gbmc-sysctl.conf \
   file://40-gbmc-time.conf \
   file://10-gbmc.conf \
+  file://10-reboot-timeout.conf \
   "
 
 FILES:${PN}:append = " \
@@ -25,6 +26,7 @@ FILES:${PN}:append = " \
   ${libdir}/sysctl.d/40-gbmc-forward.conf \
   ${systemd_system_unitdir}/sysinit.target.wants/systemd-time-wait-sync.service \
   ${systemd_system_unitdir}/systemd-time-wait-sync.service.d/10-gbmc.conf \
+  ${systemd_system_unitdir}/reboot.target.d/10-reboot-timeout.conf \
   "
 
 FILES:${PN}:append:dev = " \
@@ -68,6 +70,9 @@ do_install() {
   ln -sv ${systemd_system_unitdir}/systemd-time-wait-sync.service ${D}${systemd_system_unitdir}/sysinit.target.wants/
   mkdir -p ${D}${systemd_system_unitdir}/systemd-time-wait-sync.service.d/
   install -D -m0644 ${UNPACKDIR}/10-gbmc.conf ${D}${systemd_system_unitdir}/systemd-time-wait-sync.service.d/
+
+  install -d -m 0755 ${D}${systemd_system_unitdir}/reboot.target.d/
+  install -D -m0644 ${UNPACKDIR}/10-reboot-timeout.conf ${D}${systemd_system_unitdir}/reboot.target.d/
 }
 
 do_install:append:dev() {
