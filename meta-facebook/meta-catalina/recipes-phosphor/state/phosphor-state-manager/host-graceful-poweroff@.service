@@ -2,7 +2,7 @@
 Description=power off host:%i
 Wants=obmc-host-stop-pre@%i.target
 Before=obmc-host-stop-pre@%i.target
-Conflicts=obmc-host-start@%i.target
+Conflicts=obmc-host-startmin@%i.target
 ConditionPathExists=!/run/openbmc/host@%i-request
 
 [Service]
