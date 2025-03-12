@@ -79,6 +79,9 @@ do_install() {
 }
 
 do_install:append:local() {
-  install -d -m0755 $netdir/-bmc-front.network.d
-  install -m0644 ${WORKDIR}/10-dhcp4.conf $netdir/-bmc-front.network.d/10-dhcp4.conf
+  # For local builds, enable DHCP4 on all external interfaces.
+  for intf in ${GBMC_EXT_NICS}; do
+    install -d -m0755 $netdir/-bmc-$intf.network.d
+    install -m0644 ${WORKDIR}/10-dhcp4.conf $netdir/-bmc-$intf.network.d/10-dhcp4.conf
+  done
 }
