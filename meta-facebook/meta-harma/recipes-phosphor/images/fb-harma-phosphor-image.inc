@@ -25,3 +25,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     obmc-phosphor-buttons-signals \
     obmc-phosphor-buttons-handler \
 "
+
+# Enable USB/IP
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    usbip-tools \
+"
