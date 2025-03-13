@@ -481,7 +481,7 @@
             "id": 0,
             "failsafePercent": 85.0,
             "minThermalOutput": 0.0,
-            "cycleTimeBaseMS": 2000,
+            "CycleIntervalTimeMS": 3000,
             "updateThermalsTimeMS": 1000,
             "accumulateSetPoint": true,
             "pids": [
@@ -539,7 +539,7 @@
                             "0": 60
                         },
                         "output": {
-                            "0": 50
+                            "0": 20
                         },
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2
@@ -551,7 +551,7 @@
             "id": 1,
             "failsafePercent": 85.0,
             "minThermalOutput": 0.0,
-            "cycleTimeBaseMS": 2000,
+            "CycleIntervalTimeMS": 3000,
             "updateThermalsTimeMS": 1000,
             "accumulateSetPoint": true,
             "pids": [
@@ -609,7 +609,7 @@
                             "0": 60
                         },
                         "output": {
-                            "0": 50
+                            "0": 20
                         },
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2
@@ -621,7 +621,7 @@
             "id": 2,
             "failsafePercent": 85.0,
             "minThermalOutput": 0.0,
-            "cycleTimeBaseMS": 2000,
+            "CycleIntervalTimeMS": 3000,
             "updateThermalsTimeMS": 1000,
             "accumulateSetPoint": true,
             "pids": [
@@ -679,7 +679,7 @@
                             "0": 60
                         },
                         "output": {
-                            "0": 50
+                            "0": 20
                         },
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2
