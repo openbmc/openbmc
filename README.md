@@ -21,7 +21,7 @@ for the latest requirements
 #### Ubuntu
 
 ```sh
-sudo apt install git python3-distutils gcc g++ make file wget \
+sudo apt install git gcc g++ make file wget \
     gawk diffstat bzip2 cpio chrpath zstd lz4 bzip2
 ```
 
