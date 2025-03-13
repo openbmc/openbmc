@@ -28,15 +28,59 @@ log_info()
     logging "$1" "xyz.openbmc_project.Logging.Entry.Level.Informational"
 }
 
+get_current_host_state()
+{
+    busctl get-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        CurrentHostState | awk '{print $2}' | tr -d '"'
+}
+
+get_request_host_transition()
+{
+    busctl get-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition | awk '{print $2}' | tr -d '"'
+}
+
+set_request_host_transition()
+{
+    busctl set-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition s "$1"
+}
 
 do_RUN_POWER_PG_change()
 {
     if [ "$STATE" = "assert" ]; then
         set_gpio "PCI_MUX_SEL" "$GPIO_HIGH"
-        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Running
+
+        host_state="$(get_current_host_state)"
+        if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToRunning" ] ||
+           [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Running" ]; then
+            return 0
+        fi
+
+        # Sync power status to "On" for abnormal power-on scenarios.
+        if [ "$(get_gpio "host0-ready")" -eq 1 ] && [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.On" ]; then
+            set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
+        fi
     else
         set_gpio "PCI_MUX_SEL" "$GPIO_LOW"
-        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Off
+
+        host_state="$(get_current_host_state)"
+        if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ] ||
+           [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Off" ]; then
+            return 0
+        fi
+
+        sleep 3
+        # Sync power state to "off" for abnormal power lose.
+        if [ "$(get_gpio "host0-ready")" -eq 0 ] && [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.Off" ]; then
+            set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+        fi
     fi
 }
 
