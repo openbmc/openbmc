@@ -66,7 +66,7 @@ do
 done
 
 # Wait NIC power on
-sleep 5
+sleep 20
 
 # DC power on the corresponding slot
 mfg-tool power-control -p $corresponding_slot1 -a on -s runtime
