@@ -10,12 +10,10 @@ STATE="$2"
 
 logging()
 {
-    MESSAGE="$1"
-    SEVERITY="$2"
     busctl call \
         xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
         xyz.openbmc_project.Logging.Create Create "ssa{ss}" \
-        "$MESSAGE" "$SEVERITY" 0
+        "$1" "$2" 0
 }
 
 log_error()
@@ -334,6 +332,7 @@ case $LINENAME in
         if [ "$STATE" = "assert" ]; then
             do_gpio_assert_log
         elif [ "$STATE" = "deassert" ]; then
+            sleep 0.1
             do_gpio_deassert_log
         fi
 esac
