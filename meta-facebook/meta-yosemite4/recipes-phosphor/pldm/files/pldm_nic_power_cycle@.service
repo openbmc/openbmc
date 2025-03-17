@@ -1,6 +1,0 @@
-[Unit]
-Description=PLDM nic power cycle
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/pldm/pldm_nic_power_cycle %i
