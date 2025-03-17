@@ -9,7 +9,7 @@ SRC_URI:append = " \
     file://plat-80-obmc-console-uart.rules \
     "
 
-OBMC_CONSOLE_TTYS:append = " ttyUSB1 ttyUSB6"
+OBMC_CONSOLE_TTYS:append = " ttyUSB0 ttyUSB1 ttyUSB2 ttyUSB3 ttyUSB4 ttyUSB5 ttyUSB6"
 OBMC_SOL_ROUTING = "uart1:uart4 uart4:uart1 io1:uart2 uart2:io1"
 
 do_install:append() {
