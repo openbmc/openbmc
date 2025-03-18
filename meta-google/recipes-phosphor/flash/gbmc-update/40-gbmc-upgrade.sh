@@ -21,20 +21,87 @@ GBMC_UPGRADE_UNPACK_FILES=()
 # shellcheck disable=SC2034
 GBMC_UPGRADE_HOOKS=(gbmc_upgrade_internal)
 
+# metadata stored in an array
+GBMC_UPGRADE_METADATA=()
+
 if machine="$(source /etc/os-release && echo "$GBMC_TARGET_MACHINE")"; then
   GBMC_UPGRADE_UNPACK_FILES+=("*/firmware-gbmc/$machine")
 else
   echo 'Failed to find GBMC machine type from /etc/os-release' >&2
 fi
 
-gbmc_upgrade_dl_unpack() {
-  if [ -z "${bootfile_url-}" ]; then
-    echo "bootfile_url is empty" >&2
+gbmc_upgrade_metadata_first_match() {
+  local regex="$1"
+
+  for item in "${GBMC_UPGRADE_METADATA[@]}"; do
+    if [[ "$item" =~ $regex ]]; then
+      echo "$item" # Return the whole line match
+      return 0 # Exit the function after the first match
+    fi
+  done
+  return 1 # Return 1 if no match is found
+}
+
+gbmc_upgrade_download() {
+  local timeout=$((SECONDS + deadline))
+  local retry=0
+  local path="$1"
+  local output="$2"
+  local state="fetch_$3"
+  local deadline="${4-600}"
+  # give a chance to retry the curl if it stuck until the maximum timeout
+  local single_deadline=$(( deadline / 3 ))
+  local stime=5
+  update_netboot_status "$state" "Fetching URI: ${bootfile_url}${path}" "START" "$retry"
+  while true; do
+    local st=()
+    if [[ -z "$path" ]]; then
+      curl -LSsk --max-time "${single_deadline}" "$bootfile_url" |
+        tar "${tflags[@]}" --wildcards --warning=none -xC "$tmpdir" "${GBMC_UPGRADE_UNPACK_FILES[@]}" 2>"$tmpdir"/tarerr \
+        && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
+      # Curl failures should continue
+      if (( st[0] == 0 )); then
+        # Tar failures when curl succeeds are hard errors to start over.
+        # shellcheck disable=SC2143
+        if (( st[1] != 0 )) && [[ -n $(grep -v '\(Exiting with failure status\|Not found in archive\|Cannot hard link\)' "$tmpdir"/tarerr) ]]; then
+          update_netboot_status "fetch_tar" "couldn't get TAR file, netboot fail" "FAIL"
+          return 1
+        fi
+        # Success should continue without retry
+        break
+      fi
+    else
+      if curl -LSsk --max-time "${single_deadline}" "${bootfile_url}${path}" -o "${output}"; then
+        # Success should continue without retry
+        update_netboot_status "$state" "Succesfully fetched" "SUCCESS" "$retry"
+        break
+      fi
+    fi
+    if (( SECONDS + stime >= timeout )); then
+      update_netboot_status "$state" "Failed to fetch" "FETCH_FAILED" "$retry"
+      return 1
+    fi
+    sleep $stime
+    update_netboot_status "$state" "Failed to fetch $state, retrying" "RETRYING" "$retry"
+    (( retry = retry + 1 ))
+  done
+  return 0
+}
+
+gbmc_upgrade_dl_metadata() {
+  #download metadata file
+  if ! gbmc_upgrade_download "&metadata=true" "$tmpdir/metadata_file" "meta" 90; then
+    update_netboot_status "netboot" "couldn't get metadata file,  attempting to use v1 install flow" "ONGOING"
     return 1
   fi
+  # shellcheck disable=SC2034
+  mapfile -t GBMC_UPGRADE_METADATA < <(sort "$tmpdir/metadata_file")
+  rm -f "$tmpdir/metadata_file"
+  return 0
+}
 
+gbmc_upgrade_dl_unpack() {
   echo "Fetching $bootfile_url" >&2
-
   # We only support tarballs at the moment, our URLs will always denote
   # this with a URI query param of `format=TAR`.
   local tflags=()
@@ -46,59 +113,33 @@ gbmc_upgrade_dl_unpack() {
     return 1
   fi
 
-  # Ensure some sane output file limit
-  # Currently no BMC image is larger than 64M
-  # We want to allow 2 images and a small amount of metadata (2*64+2)M
-  local max_mb=$((2*64 + 2))
-  ulimit -f $((max_mb * 1024 * 1024 / 512)) || return
-  local deadline=600
-  local timeout=$((SECONDS + deadline))
-  local retry=0
-
-  local stime=5
-  while true; do
-    local st=()
-    # give a chance to retry the curl if it stuck until the maximum timeout
-    single_deadline=$(( deadline / 3 ))
-    update-dhcp-status 'ONGOING' "downloading and unpacking from ${bootfile_url}, retry ${retry}, deadline ${single_deadline} sec"
-    curl -LSsk --max-time ${single_deadline} "$bootfile_url" |
-      tar "${tflags[@]}" --wildcards --warning=none -xC "$tmpdir" "${GBMC_UPGRADE_UNPACK_FILES[@]}" 2>"$tmpdir"/tarerr \
-      && st=("${PIPESTATUS[@]}") || st=("${PIPESTATUS[@]}")
-    # Curl failures should continue
-    if (( st[0] == 0 )); then
-      # Tar failures when curl succeeds are hard errors to start over.
-      # shellcheck disable=SC2143
-      if (( st[1] != 0 )) && [[ -n $(grep -v '\(Exiting with failure status\|Not found in archive\|Cannot hard link\)' "$tmpdir"/tarerr) ]]; then
-        echo 'Unpacking failed' >&2
-        return 1
-      fi
-      # Success should continue without retry
-      break
-    fi
-    if (( SECONDS + stime >= timeout )); then
-      echo 'Timed out fetching image' >&2
-      update-dhcp-status 'ONGOING' "Image fetching timeout, netboot failed"
-      return 1
-    fi
-    (shopt -s nullglob dotglob; rm -rf -- "${tmpdir:?}"/*)
-    sleep $stime
-    (( retry = retry + 1 ))
-  done
+ if ! gbmc_upgrade_download "" "$tmpdir" "tar"; then
+    return 1
+  fi
+  return 0
 }
 
 gbmc_upgrade_hook() {
+  if [ -z "${bootfile_url-}" ]; then
+    update_netboot_status "netboot" "Boot file URL is empty, failure" "FAIL"
+    return 1
+  fi
   local tmpdir
+  local max_mb=$((2*64 + 2))
+  update_netboot_status "upgrade" "Upgrade started" "START"
+  ulimit -f $((max_mb * 1024 * 1024 / 512)) || return
   tmpdir="$(mktemp -d)" || return
-  if ! gbmc_upgrade_dl_unpack; then
-    echo 'upgrade unpack failed' >&2
+  if ! gbmc_upgrade_dl_metadata && ! gbmc_upgrade_dl_unpack; then
     # shellcheck disable=SC2153
     rm -rf -- "$tmpdir" "$GBMC_UPGRADE_SIG" "$GBMC_UPGRADE_IMG"
+    update_netboot_status "upgrade" "Upgrade fail" "FAIL"
     return 1
   fi
   # shellcheck disable=SC2015
   gbmc_br_run_hooks GBMC_UPGRADE_HOOKS || true
   # shellcheck disable=SC2153
   rm -rf -- "$tmpdir" "$GBMC_UPGRADE_SIG" "$GBMC_UPGRADE_IMG"
+  update_netboot_status "upgrade" "Upgrade complete" "SUCCESS"
 }
 
 gbmc_upgrade_fetch() (
