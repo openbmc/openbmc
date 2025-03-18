@@ -12,6 +12,7 @@ SERVICE_LIST = "power-good-assert@.service \
                 ac-power-good-deassert@.service \
                 power-fail-assert@.service \
                 power-fail-deassert@.service \
+                rescan-fru.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"

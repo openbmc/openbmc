@@ -1,0 +1,7 @@
+[Unit]
+Description=Rescan FruDevice for other blades to support power cycle and hot-plug
+
+[Service]
+Type=oneshot
+ExecStart=busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScan
+SyslogIdentifier=rescan-fru-device

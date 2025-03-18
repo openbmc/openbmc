@@ -247,8 +247,8 @@
         "GpioNum": 100,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-1.service"],
-            "RISING": ["power-good-deassert@fcb-1.service"]
+            "FALLING": ["power-good-assert@fcb-1.service", "rescan-fru.service"],
+            "RISING": ["power-good-deassert@fcb-1.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -258,8 +258,8 @@
         "GpioNum": 102,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-2.service"],
-            "RISING": ["power-good-deassert@fcb-2.service"]
+            "FALLING": ["power-good-assert@fcb-2.service", "rescan-fru.service"],
+            "RISING": ["power-good-deassert@fcb-2.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -269,8 +269,8 @@
         "GpioNum": 104,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-3.service"],
-            "RISING": ["power-good-deassert@fcb-3.service"]
+            "FALLING": ["power-good-assert@fcb-3.service", "rescan-fru.service"],
+            "RISING": ["power-good-deassert@fcb-3.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -280,8 +280,8 @@
         "GpioNum": 106,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-4.service"],
-            "RISING": ["power-good-deassert@fcb-4.service"]
+            "FALLING": ["power-good-assert@fcb-4.service", "rescan-fru.service"],
+            "RISING": ["power-good-deassert@fcb-4.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -291,8 +291,8 @@
         "GpioNum": 108,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-6.service"],
-            "RISING": ["power-good-deassert@fcb-6.service"]
+            "FALLING": ["power-good-assert@fcb-6.service", "rescan-fru.service"],
+            "RISING": ["power-good-deassert@fcb-6.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -302,8 +302,8 @@
         "GpioNum": 110,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@fcb-5.service"],
-            "RISING": ["power-good-deassert@fcb-5.service"]
+            "FALLING": ["power-good-assert@fcb-5.service", "rescan-fru.service"],
+            "RISING": ["power-good-deassert@fcb-5.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -555,8 +555,8 @@
         "GpioNum": 156,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-1.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-1.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-1.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-1.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -566,8 +566,8 @@
         "GpioNum": 158,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-2.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-2.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-2.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-2.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -577,8 +577,8 @@
         "GpioNum": 160,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-3.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-3.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-3.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-3.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -588,8 +588,8 @@
         "GpioNum": 162,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-4.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-4.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-4.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-4.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -599,8 +599,8 @@
         "GpioNum": 164,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-5.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-5.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-5.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-5.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -610,8 +610,8 @@
         "GpioNum": 166,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-6.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-6.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-6.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-6.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -621,8 +621,8 @@
         "GpioNum": 168,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-7.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-7.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-7.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-7.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -632,8 +632,8 @@
         "GpioNum": 170,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-8.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-8.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-8.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-8.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -643,8 +643,8 @@
         "GpioNum": 172,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-9.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-9.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-9.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-9.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -654,8 +654,8 @@
         "GpioNum": 174,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-10.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-10.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-10.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-10.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -665,8 +665,8 @@
         "GpioNum": 176,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-11.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-11.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-11.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-11.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -676,8 +676,8 @@
         "GpioNum": 178,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-12.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-12.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-12.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-12.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -687,8 +687,8 @@
         "GpioNum": 180,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-13.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-13.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-13.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-13.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -698,8 +698,8 @@
         "GpioNum": 182,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-14.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-14.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-14.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-14.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -709,8 +709,8 @@
         "GpioNum": 184,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-15.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-15.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-15.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-15.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -720,8 +720,8 @@
         "GpioNum": 186,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@mtia-blade-16.service"],
-            "RISING": ["ac-power-good-deassert@mtia-blade-16.service"]
+            "FALLING": ["ac-power-good-assert@mtia-blade-16.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@mtia-blade-16.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -731,8 +731,8 @@
         "GpioNum": 188,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@network-blade-1.service"],
-            "RISING": ["ac-power-good-deassert@network-blade-1.service"]
+            "FALLING": ["ac-power-good-assert@network-blade-1.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@network-blade-1.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -742,8 +742,8 @@
         "GpioNum": 190,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@network-blade-2.service"],
-            "RISING": ["ac-power-good-deassert@network-blade-2.service"]
+            "FALLING": ["ac-power-good-assert@network-blade-2.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@network-blade-2.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -753,8 +753,8 @@
         "GpioNum": 192,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@network-blade-3.service"],
-            "RISING": ["ac-power-good-deassert@network-blade-3.service"]
+            "FALLING": ["ac-power-good-assert@network-blade-3.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@network-blade-3.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -764,8 +764,8 @@
         "GpioNum": 194,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@network-blade-4.service"],
-            "RISING": ["ac-power-good-deassert@network-blade-4.service"]
+            "FALLING": ["ac-power-good-assert@network-blade-4.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@network-blade-4.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -775,8 +775,8 @@
         "GpioNum": 196,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@network-blade-5.service"],
-            "RISING": ["ac-power-good-deassert@network-blade-5.service"]
+            "FALLING": ["ac-power-good-assert@network-blade-5.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@network-blade-5.service", "rescan-fru.service"]
         },
         "Continue": true
     },
@@ -786,8 +786,8 @@
         "GpioNum": 198,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["ac-power-good-assert@network-blade-6.service"],
-            "RISING": ["ac-power-good-deassert@network-blade-6.service"]
+            "FALLING": ["ac-power-good-assert@network-blade-6.service", "rescan-fru.service"],
+            "RISING": ["ac-power-good-deassert@network-blade-6.service", "rescan-fru.service"]
         },
         "Continue": true
     },
