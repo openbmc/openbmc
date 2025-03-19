@@ -75,14 +75,14 @@ if [ "$1" = bound ]; then
   done
 
   update-dhcp-status 'ONGOING' "Setting hostname ${fqdn} and ip ${ipv6}"
-
-  pfx="$(ip_bytes_to_str pfx_bytes)"
-  gbmc_br_set_ip "$pfx" || exit
-
+  # we need to set hostname first before IP so logging services report using proper name
   if [ -n "${fqdn-}" ]; then
     echo "Using hostname $fqdn" >&2
     hostnamectl set-hostname "$fqdn" || true
   fi
+
+  pfx="$(ip_bytes_to_str pfx_bytes)"
+  gbmc_br_set_ip "$pfx" || exit
 
   gbmc_br_run_hooks GBMC_BR_DHCP_HOOKS || exit
 
