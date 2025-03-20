@@ -29,14 +29,3 @@ do_install:append() {
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/monitor-pldm-sensor ${D}${libexecdir}/${PN}/
 }
-
-# Temporary workaround to address the fd leak issue in phosphor-pid-control
-# which causes a "Too many open files" error (EMFILE) while creating fan zones.
-# This error prevents fan control from operating properly.
-# By setting the LimitNOFILE value to 65536, we aim to mitigate this issue
-# until a permanent solution is implemented.
-# This workaround will be removed once the fd leak issue is resolved.
-do_install:append() {
-    echo "[Service]" >> ${override_file}
-    echo "LimitNOFILE=65536" >> ${override_file}
-}
