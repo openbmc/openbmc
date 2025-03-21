@@ -9,6 +9,8 @@ to_local_admin_mac() {
 
 INTF=$1
 
+sleep 3
+
 networkctl down "$INTF"
 
 # Set interface to local Admin MAC
