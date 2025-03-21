@@ -35,13 +35,20 @@ echo "Bios upgrade started at $(date)"
 echo "Power off host server"
 obmcutil poweroff
 
-sleep 25
-if [ "$(power_status)" != "off" ];
-then
-    echo "Host server didn't power off"
-    echo "Bios upgrade failed"
-    exit 1
-fi
+for i in $(seq 1 60)
+do
+    sleep 1
+    if [ "$(power_status)" == "off" ]; then
+        break
+    fi
+
+    if [ "$i" -eq 60 ]; then
+        echo "Host server didn't power off"
+        echo "Bios upgrade failed"
+        exit 1
+    fi
+done
+
 echo "Host server powered off"
 
 #Flip GPIO to access SPI flash used by host.
