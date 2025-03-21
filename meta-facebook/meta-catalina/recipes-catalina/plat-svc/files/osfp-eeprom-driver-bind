@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+OSFP_EEPROM_I2C="22-0051"
+ATTEMPT_COUNT=0
+
+while true; do
+    if [ "$(get_gpio "host0-ready")" -ne 1 ]; then
+        sleep 5
+        continue
+    fi
+
+    DRIVER_BIND_DONE=true
+    ATTEMPT_COUNT=$((ATTEMPT_COUNT + 1))
+    echo "Attempt $ATTEMPT_COUNT..."
+
+    DEVICE_PATH="/sys/bus/i2c/drivers/at24/$OSFP_EEPROM_I2C"
+    if [ ! -L "$DEVICE_PATH" ]; then
+        if ! echo "$OSFP_EEPROM_I2C" > /sys/bus/i2c/drivers/at24/bind 2>/dev/null; then
+            DRIVER_BIND_DONE=false
+        fi
+    else
+        echo "$OSFP_EEPROM_I2C: already bind, skip"
+    fi
+
+    if [ $DRIVER_BIND_DONE = true ]; then
+        echo "$OSFP_EEPROM_I2C: successfully bind, ReScan FRU"
+        busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScanBus q 22
+        exit 0
+    fi
+    sleep 5
+done

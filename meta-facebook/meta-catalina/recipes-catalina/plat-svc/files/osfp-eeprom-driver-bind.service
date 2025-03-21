@@ -1,0 +1,12 @@
+[Unit]
+Description=Bind OSFP FRU EEPROM driver
+After=catalina-sys-init.service
+After=xyz.openbmc_project.FruDevice.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/catalina/osfp-eeprom-driver-bind
+SyslogIdentifier=osfp-eeprom-driver-bind
+
+[Install]
+WantedBy=multi-user.target
