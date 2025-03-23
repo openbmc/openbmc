@@ -21,21 +21,24 @@ UPGRADE_REBOOT=@UPGRADE_REBOOT@
 COORDINATED_POWERCYCLE=@COORDINATED_POWERCYCLE@
 
 gbmc_psu_hardreset_hook() {
+  update_netboot_status "pwr_check" "Power cycle / reboot netboot hook starting" "START"
   if [ -n "${gbmc_reboot_needed-}" ] && [ -n "${UPGRADE_REBOOT}" ]; then
-    update-dhcp-status 'ONGOING' "upgrade bmc reboot into powercycle"
+    update_netboot_status "pwr_check" "upgrade bmc reboot into powercycle" "ONGOING"
     gbmc_psu_hardreset_needed=1
   fi
   # We don't always need a powercycle, allow skipping
   if [ -z "${gbmc_psu_hardreset_needed-}" ]; then
-    echo "Skipping tray powercycle" >&2
+    update_netboot_status "pwr_check" "No power cycle needed, terminating hook." "SUCCESS"
     return 0
   fi
+  update_netboot_status "pwr_check" "Power cycle needed" "SUCCESS"
 
+  update_netboot_status "pwr_req" "Starting power cycle request" "START"
   if [[ "${COORDINATED_POWERCYCLE}" == "true" ]]; then
-    echo "Requesting powercycle" >&2
+    update_netboot_status "pwr_req" "Requesting powercycle" "SUCCESS"
     update-dhcp-status 'POWERCYCLE' "netboot powercycle" || return
   else
-    echo "Powercycling" >&2
+    update_netboot_status "pwr_req" "Powercycling" "SUCCESS"
     systemctl start gbmc-psu-hardreset.target || return
   fi
 
