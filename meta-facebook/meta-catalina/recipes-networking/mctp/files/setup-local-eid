@@ -1,0 +1,26 @@
+#!/bin/bash
+
+declare -A MCTP_BUS_EID_LIST=(
+  [0,0]=10 [0,1]=90
+  [1,0]=15 [1,1]=91
+  [2,0]=24 [2,1]=92
+  [3,0]=26 [3,1]=93
+  [4,0]=36 [4,1]=94
+  [5,0]=38 [5,1]=95
+)
+
+for i in $(seq 2 5)
+do
+    MCTP_INTF="mctpi2c${MCTP_BUS_EID_LIST[$i,0]}"
+    mctp link set "${MCTP_INTF}" down
+    mctp addr del 8 dev "${MCTP_INTF}"
+done
+
+for i in $(seq 2 5)
+do
+    MCTP_INTF="mctpi2c${MCTP_BUS_EID_LIST[$i,0]}"
+    mctp link set "${MCTP_INTF}" up
+    mctp addr add 8 dev "${MCTP_INTF}"
+done
+
+exit 0
