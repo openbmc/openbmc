@@ -2,6 +2,10 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 inherit obmc-phosphor-dbus-service
 
+FACEBOOK_REMOVED_DBUS_SENSORS:remove = " \
+    external \
+"
+
 PACKAGECONFIG:append = " \
     nvmesensor \
 "
