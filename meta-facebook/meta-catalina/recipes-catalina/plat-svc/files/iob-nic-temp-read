@@ -1,0 +1,191 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+MAX_RETRY=10
+RETRY_DELAY_SEC=1
+
+is_host_on()
+{
+  if [ "$(get_gpio host0-ready)" != "1" ]; then
+    return 1
+  fi
+  return 0
+}
+
+disconnect_all_i2c_mux()
+{
+  i2ctransfer -y -f 0 w1@0x71 0x00; sleep 0.5
+  i2ctransfer -y -f 0 w1@0x75 0x00; sleep 0.5
+}
+
+remove_eid()
+{
+  local eid=$1
+  if mapper get-service "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" 2>/dev/null; then
+    busctl call au.com.codeconstruct.MCTP1 "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" au.com.codeconstruct.MCTP.Endpoint1 Remove
+  fi
+}
+
+remove_backend_nic_eid()
+{
+  remove_eid 92
+  remove_eid 93
+  remove_eid 94
+  remove_eid 95
+}
+
+setup_eid()
+{
+  local mctp_intf=$1
+  local mctp_eid=$2
+
+  local cur_retry=0
+  while [ $cur_retry -lt $MAX_RETRY ]
+  do
+     cur_retry=$((cur_retry+1))
+     if busctl call au.com.codeconstruct.MCTP1 "/au/com/codeconstruct/mctp1/interfaces/${mctp_intf}" au.com.codeconstruct.MCTP.BusOwner1 AssignEndpointStatic ayy 1 0x32 "${mctp_eid}"; then
+         break
+     else
+         echo "Set EID:${mctp_eid} at INTF:${mctp_intf} failed. Retry $cur_retry/$MAX_RETRY"
+         sleep "$RETRY_DELAY_SEC"
+     fi
+  done
+
+  return 0
+}
+
+setup_backend_nic_eid()
+{
+  # Set EID for IOB0_NIC0 and IOB0_NIC1
+  i2ctransfer -y -f 0 w1@0x71 0x01; sleep 0.5
+  setup_eid mctpi2c24 92
+  setup_eid mctpi2c26 93
+  i2ctransfer -y -f 0 w1@0x71 0x00; sleep 0.5
+
+  # Set EID for IOB1_NIC0 and IOB1_NIC1
+  i2ctransfer -y -f 0 w1@0x75 0x01; sleep 0.5
+  setup_eid mctpi2c36 94
+  setup_eid mctpi2c38 95
+  i2ctransfer -y -f 0 w1@0x75 0x00; sleep 0.5
+}
+
+get_numeric_sensor_by_eid()
+{
+  local eid=$1
+  local snr_id=$2
+  local pldmtool_out
+
+  pldmtool_out="$(pldmtool platform GetSensorReading -i "$snr_id" -r 0 -m "$eid")"
+  if echo "$pldmtool_out" | jq 'has("presentReading")' | grep -q true; then
+    echo "$pldmtool_out" | jq '.presentReading'
+    return 0
+  else
+    return 1
+  fi
+}
+
+update_numeric_sensor_value()
+{
+  local eid="$1"
+  local snr_id="$2"
+  local snr_name="$3"
+  local snr_val
+
+  if ! snr_val="$(get_numeric_sensor_by_eid "${eid}" "${snr_id}")"; then
+    echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, snr_id: $snr_id, snr_name: $snr_name"
+    return 1
+  fi
+  busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/temperature/$snr_name" xyz.openbmc_project.Sensor.Value Value d "$snr_val"
+}
+
+poll_numeric_sensor() {
+  local eid="$1"
+  local snr_id="$2"
+  local snr_name="$3"
+
+  if ! is_host_on; then
+    echo "poll_numeric_sensor(): host is off, eid: $eid"
+    return 1
+  fi
+
+  update_numeric_sensor_value "$eid" "$snr_id" "$snr_name"
+  return 0
+}
+
+set_all_external_sensors_invalid()
+{
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB0_NIC0_OSFP_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB0_NIC1_OSFP_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB1_NIC0_OSFP_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB1_NIC1_OSFP_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB0_NIC0_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB0_NIC1_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB1_NIC0_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/IOB1_NIC1_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+}
+
+execute_when_host_off()
+{
+  disconnect_all_i2c_mux
+  remove_backend_nic_eid
+  set_all_external_sensors_invalid
+  LAST_HOST_READY="0"
+}
+
+# Remove exist EID
+remove_backend_nic_eid
+
+# Disconnect I2C MUX
+disconnect_all_i2c_mux
+
+# Get initial host power state
+LAST_HOST_READY="$(get_gpio host0-ready)"
+
+# Setup EID
+if [ "$LAST_HOST_READY" = "1" ]; then
+  sleep 30
+  setup_backend_nic_eid
+fi
+
+while true
+do
+  sleep 1
+  HOST_READY="$(get_gpio host0-ready)"
+
+  if [ "$HOST_READY" != "$LAST_HOST_READY" ]; then
+    if [ "$HOST_READY" = "1" ]; then
+      sleep 30
+      setup_backend_nic_eid
+    else
+      execute_when_host_off
+    fi
+  fi
+  LAST_HOST_READY="$HOST_READY"
+
+  # Skip sensor polling when host power off
+  if [ "$HOST_READY" != "1" ]; then
+    continue
+  fi
+
+  # IOB0
+  i2ctransfer -y -f 0 w1@0x71 0x01; sleep 0.5
+  poll_numeric_sensor 92 8 IOB0_NIC0_OSFP_TEMP_C || { execute_when_host_off; continue; }
+  poll_numeric_sensor 92 1 IOB0_NIC0_TEMP_C || { execute_when_host_off; continue; }
+  poll_numeric_sensor 93 8 IOB0_NIC1_OSFP_TEMP_C || { execute_when_host_off; continue; }
+  poll_numeric_sensor 93 1 IOB0_NIC1_TEMP_C || { execute_when_host_off; continue; }
+  i2ctransfer -y -f 0 w1@0x71 0x00; sleep 0.5
+
+  # IOB1
+  i2ctransfer -y -f 0 w1@0x75 0x01; sleep 0.5
+  poll_numeric_sensor 94 8 IOB1_NIC0_OSFP_TEMP_C || { execute_when_host_off; continue; }
+  poll_numeric_sensor 94 1 IOB1_NIC0_TEMP_C || { execute_when_host_off; continue; }
+  poll_numeric_sensor 95 8 IOB1_NIC1_OSFP_TEMP_C || { execute_when_host_off; continue; }
+  poll_numeric_sensor 95 1 IOB1_NIC1_TEMP_C || { execute_when_host_off; continue; }
+  i2ctransfer -y -f 0 w1@0x75 0x00; sleep 0.5
+
+done
+
+exit 0

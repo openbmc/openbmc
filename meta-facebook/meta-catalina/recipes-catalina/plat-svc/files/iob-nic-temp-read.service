@@ -1,0 +1,13 @@
+[Unit]
+Description=iob-nic-temp-read
+After=xyz.openbmc_project.EntityManager.service
+After=xyz.openbmc_project.externalsensor.service
+After=mctpd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/catalina/iob-nic-temp-read
+SyslogIdentifier=iob-nic-temp-read
+
+[Install]
+WantedBy=multi-user.target

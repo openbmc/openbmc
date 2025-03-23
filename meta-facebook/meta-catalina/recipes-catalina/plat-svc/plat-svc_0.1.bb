@@ -16,6 +16,7 @@ SRC_URI += " \
     file://catalina-early-sys-init \
     file://osfp-eeprom-driver-bind \
     file://standby-power-enable \
+    file://iob-nic-temp-read \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
@@ -23,6 +24,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
     backend-nic-driver-bind.service \
     catalina-sys-init.service \
     osfp-eeprom-driver-bind.service \
+    iob-nic-temp-read.service \
     "
 
 do_install() {
@@ -32,4 +34,5 @@ do_install() {
     install -m 0755 ${UNPACKDIR}/catalina-early-sys-init ${CATALINA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/osfp-eeprom-driver-bind ${CATALINA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/standby-power-enable ${CATALINA_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/iob-nic-temp-read ${CATALINA_LIBEXECDIR}
 }
