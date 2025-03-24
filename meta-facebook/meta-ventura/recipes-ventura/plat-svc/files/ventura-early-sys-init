@@ -26,6 +26,22 @@ power_on_led_init() {
     systemctl start obmc-led-group-start@power_on.service
 }
 
+mdio_LED_setting_for_marvell_chip()
+{
+    ## To configure the SFP+ LED to blink based on Link/Act/Speed
+    # LED 0 & 1 Control for Port 9
+    led_port9=$(mdio 1* 10 0x16)
+
+    # Set the 15th bit to 1 for updating
+    led_port9=$((led_port9 | 0x8000))
+
+    # Clear the 7~4th bits for Port 10 Link/Act/Speed by blinking
+    led_port9=$((led_port9 & ~0x00F0))
+
+    # Write to the register
+    mdio 1* 10 0x16 $led_port9
+}
+
 # Change the i2c path to the eeprom to the 88E6393X
 set_gpio FM_88E6393X_BIN_UPDATE_EN_N 1
 # Sleep 2s
@@ -37,5 +53,6 @@ gpioset 0 "$CHIP_PWRGD"=1
 set_fan_pwm_fixed
 set_bmc_ready
 power_on_led_init
+mdio_LED_setting_for_marvell_chip
 
 exit 0
