@@ -1,6 +1,7 @@
 [Unit]
 Description=Monitor PLDM Sensors
 After=xyz.openbmc_project.FruDevice.service xyz.openbmc_project.PLDM.service
+After=multi-user.target
 
 [Service]
 Type=oneshot

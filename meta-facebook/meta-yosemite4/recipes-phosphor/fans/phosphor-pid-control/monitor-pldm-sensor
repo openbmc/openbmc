@@ -1,100 +1,174 @@
 #!/bin/bash
 
-timeout=200  # Timeout duration
-interval=5   # Interval between each check
+### Configuration variables ###
+timeout=60  # Maximum time to wait in seconds
+interval=2   # Wait time between each retry
 elapsed=0    # Elapsed time counter
 
-# PLDM service and object paths
-PLDM_SERVICE="xyz.openbmc_project.PLDM"
-PLDM_SENSOR_PATH="/xyz/openbmc_project/sensors"
-PLDM_SENSOR_PREFIX="SENTINEL_DOME_SLOT_"
-PLDM_SENSOR_COUNT=8  # Number of Sentinel Dome slots
-
-# EntityManager service and path
+# D-Bus service and path definitions
 ENTITY_MANAGER_SERVICE="xyz.openbmc_project.EntityManager"
 ENTITY_MANAGER_PATH="/xyz/openbmc_project/inventory"
 
-WAILUA_SENSOR_PREFIX="WAILUA_FALLS_SLOT_"
-WAILUA_SENSOR_COUNT=8  # Number of Wailua Falls slots
+PLDM_SERVICE="xyz.openbmc_project.PLDM"
+PLDM_PATH="/xyz/openbmc_project/inventory"
 
-# Function to check if a specific slot exists in EntityManager
-check_slot_exist() {
-    local slot_name=$1
-    if busctl call "$ENTITY_MANAGER_SERVICE" "$ENTITY_MANAGER_PATH" \
-        org.freedesktop.DBus.ObjectManager GetManagedObjects | grep -q "$slot_name"; then
-        echo "$slot_name exists in EntityManager."
+# Slot path prefixes for T2
+ENTITY_MANAGER_SENTINEL_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Sentinel_Dome_T2_Slot_"
+ENTITY_MANAGER_WAILUA_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"
+PLDM_SENTINEL_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/SENTINEL_DOME_SLOT_"
+PLDM_WAILUA_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/WAILUA_FALLS_SLOT_"
+
+# Slot path prefixes for T1
+ENTITY_MANAGER_SENTINEL_T1_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Sentinel_Dome_T1_Slot_"
+PLDM_SENTINEL_T1_PREFIX="/xyz/openbmc_project/inventory/system/board/SENTINEL_DOME_SLOT_"
+
+PLDM_SLOTS=8  # Number of slots for Sentinel Dome and Wailua Falls
+
+# Fetch all objects from a service path
+get_managed_objects() {
+    local service=$1
+    local path=$2
+    busctl call "$service" "$path" org.freedesktop.DBus.ObjectManager GetManagedObjects 2>/dev/null
+}
+
+# Check if a specific object path exists in the cached data
+check_object_path() {
+    local cached_data="$1"
+    local expected_path="$2"
+
+    if echo "$cached_data" | grep -q "$expected_path"; then
         return 0
     else
-        echo "$slot_name does not exist in EntityManager."
         return 1
     fi
 }
 
-# Function to check whether PLDM sensors exist for a specific slot and prefix
-check_pldm_sensors() {
-    local prefix=$1
-    local count=$2
+# Detect the configuration of a specific slot
+detect_slot_configuration() {
+    local entity_manager_data="$1"
+    local slot=$2
 
-    for i in $(seq 1 "$count"); do
-        local sensor="${prefix}${i}"
-        if ! busctl call "$PLDM_SERVICE" "$PLDM_SENSOR_PATH" \
-            org.freedesktop.DBus.ObjectManager GetManagedObjects | grep -q "$sensor"; then
-            echo "Missing PLDM sensor: $sensor"
+    # Check for T2 slot prefix
+    if check_object_path "$entity_manager_data" "${ENTITY_MANAGER_SENTINEL_T2_PREFIX}${slot}"; then
+        echo "T2"
+        return 0
+    fi
+
+    # Check for T1 slot prefix
+    if check_object_path "$entity_manager_data" "${ENTITY_MANAGER_SENTINEL_T1_PREFIX}${slot}"; then
+        echo "T1"
+        return 0
+    fi
+
+    echo "UNKNOWN"
+    return 1
+}
+
+# Check a single slot for its specific configuration
+check_slot() {
+    local slot=$1
+    local entity_manager_data="$2"
+    local pldm_data="$3"
+
+    # Detect the configuration for the current slot
+    configuration=$(detect_slot_configuration "$entity_manager_data" "$slot")
+
+    if [ "$configuration" == "T2" ]; then
+        echo "Checking Sentinel Dome T2 slot $slot..."
+        entity_path="${ENTITY_MANAGER_SENTINEL_T2_PREFIX}${slot}"
+        pldm_path="${PLDM_SENTINEL_T2_PREFIX}${slot}"
+        if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
             return 1
         fi
-    done
 
-    echo "All sensors with prefix $prefix are available."
+        echo "Checking Wailua Falls T2 slot $slot..."
+        entity_path="${ENTITY_MANAGER_WAILUA_T2_PREFIX}${slot}"
+        pldm_path="${PLDM_WAILUA_T2_PREFIX}${slot}"
+        if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+            return 1
+        fi
+    elif [ "$configuration" == "T1" ]; then
+        echo "Checking Sentinel Dome T1 slot $slot..."
+        entity_path="${ENTITY_MANAGER_SENTINEL_T1_PREFIX}${slot}"
+        pldm_path="${PLDM_SENTINEL_T1_PREFIX}${slot}"
+        if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+            return 1
+        fi
+    else
+        echo "Unknown configuration for slot $slot. Skipping..."
+        return 0
+    fi
+
     return 0
 }
 
-# Main loop to check conditions
+# Check a single slot in EntityManager and PLDM
+check_single_slot() {
+    local slot=$1
+    local entity_manager_data="$2"
+    local pldm_data="$3"
+    local entity_path="$4"
+    local pldm_path="$5"
+
+    # Check if the slot exists in EntityManager
+    if check_object_path "$entity_manager_data" "$entity_path"; then
+        echo "EntityManager: Slot $slot exists at $entity_path"
+        # If it exists in EntityManager, check in PLDM
+        if check_object_path "$pldm_data" "$pldm_path"; then
+            echo "PLDM: Slot $slot exists at $pldm_path"
+            return 0
+        else
+            echo "PLDM: Slot $slot missing at $pldm_path"
+            return 1
+        fi
+    else
+        echo "Skipping PLDM check for Slot $slot as it's not present in EntityManager."
+        return 0
+    fi
+}
+
+### Main loop ###
 while [ $elapsed -lt $timeout ]; do
-    all_slots_ok=true  # Initialize the overall status flag
+    echo "Starting a new check round. Elapsed time: ${elapsed}s"
 
-    # Check each Sentinel Dome slot
-    for i in $(seq 1 "$PLDM_SENSOR_COUNT"); do
-        sd_slot="Sentinel_Dome_Slot_${i}"
+    all_checks_ok=true  # Initialize the overall status flag
 
-        # Check if the slot exists in EntityManager
-        if ! check_slot_exist "$sd_slot"; then
-            echo "Skipping ${sd_slot} as it does not exist."
-            continue  # Skip to the next slot
-        fi
+    # Fetch data from EntityManager and PLDM
+    echo "Fetching objects from EntityManager..."
+    entity_manager_objects=$(get_managed_objects "$ENTITY_MANAGER_SERVICE" "$ENTITY_MANAGER_PATH")
+    if [ -z "$entity_manager_objects" ]; then
+        echo "Failed to fetch EntityManager objects. Skipping current round."
+        sleep $interval
+        elapsed=$((elapsed + interval))
+        continue
+    fi
 
-        # If the slot exists, check its sensors
-        if ! check_pldm_sensors "${PLDM_SENSOR_PREFIX}${i}_" 10; then
-            all_slots_ok=false  # Mark as not all slots are OK
-        fi
-    done
+    echo "Fetching objects from PLDM..."
+    pldm_objects=$(get_managed_objects "$PLDM_SERVICE" "$PLDM_PATH")
+    if [ -z "$pldm_objects" ]; then
+        echo "Failed to fetch PLDM objects. Skipping current round."
+        sleep $interval
+        elapsed=$((elapsed + interval))
+        continue
+    fi
 
-    # Check each Wailua Falls slot
-    for i in $(seq 1 "$WAILUA_SENSOR_COUNT"); do
-        wf_slot="Wailua_Falls_Slot_${i}"
-
-        # Check if the slot exists in EntityManager
-        if ! check_slot_exist "$wf_slot"; then
-            echo "Skipping ${wf_slot} as it does not exist."
-            continue  # Skip to the next slot
-        fi
-
-        # If the slot exists, check its sensors
-        if ! check_pldm_sensors "${WAILUA_SENSOR_PREFIX}${i}_" 10; then
-            all_slots_ok=false  # Mark as not all slots are OK
+    # Check each slot individually
+    for slot in $(seq 1 "$PLDM_SLOTS"); do
+        if ! check_slot "$slot" "$entity_manager_objects" "$pldm_objects"; then
+            all_checks_ok=false
         fi
     done
 
-    # If all checks pass
-    if $all_slots_ok; then
-        echo "All required sensors are present (excluding absent slots)."
+    # If all checks pass, exit successfully
+    if $all_checks_ok; then
+        echo "All required object paths are present and valid."
         exit 0
     fi
 
-    # Pause before the next iteration
+    echo "Some object paths are missing. Retrying in ${interval}s..."
     sleep $interval
     elapsed=$((elapsed + interval))
 done
 
-# If we reach here, timeout occurred
-echo "Timeout: Some required sensors were not detected within $timeout seconds."
+echo "Timeout: Some required object paths were not detected within ${timeout} seconds."
 exit 1
