@@ -44,6 +44,7 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * ventura
   * yosemite4
   * yosemite4n
+  * yosemite5
 * fii
   * kudo
   * mori
