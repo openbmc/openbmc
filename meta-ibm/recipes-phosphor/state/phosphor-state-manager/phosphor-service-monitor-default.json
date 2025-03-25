@@ -24,7 +24,7 @@
         "bmc-acf-manager.service",
         "bmc-vmi-ca-manager.service",
         "com.ibm.panel.service",
-        "com.ibm.VPD.Manager.service",
+        "vpd-manager.service",
         "mctp-demux.service",
         "org.open_power.OCC.Control.service",
         "org.open_power.Dump.Manager.service",
