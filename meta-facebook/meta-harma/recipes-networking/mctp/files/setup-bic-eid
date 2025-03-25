@@ -2,6 +2,7 @@
 
 # Set BIC EID
 bic_addr=0x20
+bic_eid=10
 busnum=9
 maxRetries=10
 retryInterval=1
@@ -32,8 +33,20 @@ command="
     ay 1 ${bic_addr}"
 
 if ! retry_command "$command"; then
-    echo "Failed to busctl call after $maxRetries attempts."
+    echo "Failed to learn BIC EID after $maxRetries attempts."
     exit 1
 fi
 echo "BIC EID set to ${bic_addr}"
+
+command="
+    busctl call au.com.codeconstruct.MCTP1 \
+    /au/com/codeconstruct/mctp1/networks/1/endpoints/${bic_eid} \
+    au.com.codeconstruct.MCTP.Endpoint1 SetMTU u 100"
+
+if ! retry_command "$command"; then
+    echo "Failed to set BIC MTU after $maxRetries attempts."
+    exit 1
+fi
+echo "BIC MTU set to 100"
+
 exit 0
