@@ -47,7 +47,7 @@ gbmc_upgrade_download() {
   local retry=0
   local path="$1"
   local output="$2"
-  local state="fetch_$3"
+  local state="$3_fetch"
   local deadline="${4-600}"
   # give a chance to retry the curl if it stuck until the maximum timeout
   local single_deadline=$(( deadline / 3 ))
@@ -101,7 +101,7 @@ gbmc_upgrade_dl_metadata() {
 }
 
 gbmc_upgrade_dl_unpack() {
-  echo "Fetching $bootfile_url" >&2
+  update_netboot_status "upgrade" "Fetching $bootfile_url" "ONGOING"
   # We only support tarballs at the moment, our URLs will always denote
   # this with a URI query param of `format=TAR`.
   local tflags=()
@@ -109,7 +109,7 @@ gbmc_upgrade_dl_unpack() {
     local t="${BASH_REMATCH[1]}"
     [ "$t" = '_GZIP' ] && tflags+=('-z')
   else
-    echo "Unknown upgrade unpack method: $bootfile_url" >&2
+    update_netboot_status "upgrade" "Unknown upgrade unpack method: $bootfile_url" "FAIL"
     return 1
   fi
 
