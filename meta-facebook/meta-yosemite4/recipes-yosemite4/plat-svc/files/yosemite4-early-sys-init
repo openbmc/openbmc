@@ -15,16 +15,16 @@ enable_all_fan_input()
     fi
 }
 
-set_all_fan_pwm_80_percent() {
-    # 255 * 80% = 204
-    pwm_value=204
+set_all_fan_pwm_70_percent() {
+    # 255 * 70% = 178.5
+    pwm_value=178
 
     for pwm_node in /sys/bus/i2c/devices/*/hwmon/*/pwm*
     do
         if [[ ! "$pwm_node" =~ _enable ]]; then
             curr_pwm=$(cat "$pwm_node")
 
-            # Set PWM to 80% if current PWM is higher than 80%.
+            # Set PWM to 70% if current PWM is higher than 70%.
             if [[ "$curr_pwm" -ge "$pwm_value" ]]; then
               echo $pwm_value > "$pwm_node"
             fi
@@ -92,8 +92,8 @@ fi
 # Enable all fan input as early as possible
 enable_all_fan_input
 
-# Set all fan PWM to 80%
-set_all_fan_pwm_80_percent
+# Set all fan PWM to 70%
+set_all_fan_pwm_70_percent
 
 handle_service_window
 
