@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable cgroup support"
+
+kconf kernel cgroup.cfg
