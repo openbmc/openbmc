@@ -18,14 +18,16 @@
 gbmc_reboot_needed=
 
 gbmc_reboot_hook() {
+  update_netboot_status "reboot_check" "reboot hook starting" "START"
   # We don't always need a warm reset, allow skipping
   if [ -z "${gbmc_reboot_needed-}" ]; then
-    echo "Skipping bmc reboot" >&2
+    update_netboot_status "reboot_check" "Skipping bmc reboot" "SUCCESS"
     return 0
   fi
+  update_netboot_status "reboot_check" "Reboot is needed" "SUCCESS"
 
-  update-dhcp-status 'ONGOING' "triggerring bmc reboot"
-
+  update_netboot_status "reboot" "triggerring bmc reboot" "START"
+  update_netboot_status "reboot" "About to reboot" "SUCCESS"
   reboot -f
   exit 0
 }
