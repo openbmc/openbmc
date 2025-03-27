@@ -30,6 +30,46 @@ else
   echo 'Failed to find GBMC machine type from /etc/os-release' >&2
 fi
 
+gbmc_upgrade_get_version(){
+  local version_file
+  if ! version_file=$(gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/${machine}(/[^/]+)*/VERSION$"); then
+    update_netboot_status "upgrade" "Couldn't find version file, trying regex" "ONGOING"
+    # we expect this regex to match something like: packages/firmware-gbmc/MACHINE/some-services/22.47.18.0/image
+    if gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/${machine}(/[^/]+)*/(([0-9]+[.]){3}[0-9]+)/[^/]+$" > /dev/null; then
+      echo "${BASH_REMATCH[2]}"
+      update_netboot_status "upgrade" "Obtained version from metadata filenames." "ONGOING"
+      return 0
+    else
+      update_netboot_status "upgrade" "Failed to get version from metadata filenames" "FAIL"
+      return 1
+    fi
+  fi
+  if ! gbmc_upgrade_download "&selection=${version_file}" "$tmpdir/version_file" "ver"; then
+    return 1
+  fi
+  cat "$tmpdir/version_file"
+  rm -f "$tmpdir/version_file"
+  return 0
+}
+
+gbmc_upgrade_download_image_and_sig(){
+  local image
+  local version=$1
+  if ! image=$(gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/${machine}(/[^/]+)*/${version}/image-gbmc-${machine}$"); then
+     update_netboot_status "upgrade" "Could not find image" "FAIL"
+     return 1
+  fi
+  local sig="$image.sig"
+  # shellcheck disable=SC2153
+  if ! gbmc_upgrade_download "&selection=$image" "${GBMC_UPGRADE_IMG}" "bmc_img"; then
+    return 1
+  fi
+
+  if ! gbmc_upgrade_download "&selection=$sig" "${GBMC_UPGRADE_SIG}" "bmc_sig"; then
+    return 1
+  fi
+}
+
 gbmc_upgrade_metadata_first_match() {
   local regex="$1"
 
@@ -162,7 +202,7 @@ gbmc_upgrade_fetch() (
     echo "$vdir"
     return 0
   fi
-
+  update_netboot_status "upgrade" "Failed to get version from metadata filenames" "FAIL"
   return 1
 )
 
