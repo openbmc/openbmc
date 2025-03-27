@@ -907,8 +907,8 @@
         "GpioNum": 36,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["leak-detect-deassert@RackLeftManifold.service"],
-            "RISING": ["critical-leak-detect-assert@RackLeftManifold.service", "rack-level-leak@RackLeftManifold.service"]
+            "FALLING": ["leak-detect-deassert@RackFloorLeak1.service"],
+            "RISING": ["critical-leak-detect-assert@RackFloorLeak1.service"]
         },
         "Continue": true
     },
@@ -918,8 +918,30 @@
         "GpioNum": 38,
         "EventMon": "BOTH",
         "Targets": {
+            "FALLING": ["leak-detect-deassert@RackFloorLeak2.service"],
+            "RISING": ["critical-leak-detect-assert@RackFloorLeak2.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK3_DETECT",
+        "ChipId": "2",
+        "GpioNum": 8,
+        "EventMon": "BOTH",
+        "Targets": {
             "FALLING": ["leak-detect-deassert@RackRightManifold.service"],
             "RISING": ["critical-leak-detect-assert@RackRightManifold.service", "rack-level-leak@RackRightManifold.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LEAK4_DETECT",
+        "ChipId": "2",
+        "GpioNum": 10,
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["leak-detect-deassert@RackLeftManifold.service"],
+            "RISING": ["critical-leak-detect-assert@RackLeftManifold.service", "rack-level-leak@RackLeftManifold.service"]
         },
         "Continue": true
     },
