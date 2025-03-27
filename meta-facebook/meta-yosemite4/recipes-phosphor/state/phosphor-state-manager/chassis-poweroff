@@ -69,6 +69,9 @@ disable_i3c_hub()
         echo $current_port > "$access_file"
         cat "$access_file"
 
+        echo 81 > "$offset_file"
+        echo $current_port > "$access_file"
+
         echo "Lock i3c hub register."
         echo 16 > "$offset_file"
         echo 0 > "$access_file"
