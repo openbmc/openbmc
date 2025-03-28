@@ -23,52 +23,55 @@ read_mfr_id() {
     local bus=$1
     local addr=$2
     local mfr_id
-    mfr_id=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x99 r4)
-    local vendor="0x41 0x44 0x49"
+    mfr_id=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x99 r5)
+    local vendor="0x46 0x6c 0x65 0x78"
     if [[ $mfr_id == *"$vendor"* ]]; then
-        echo "adi"
+        echo "flex"
     else
-        echo "mps"
+        echo "delta"
     fi
 }
 
-read_12v_hsc() {
+read_power_module() {
     local bus=$1
     local addr=$2
-    local slot_num=$3
+    local pu_num=$3
     local module_vendor
     module_vendor=$(read_mfr_id "$bus" "$addr")
 
     local status_array=()
 
-    # Read STATUS_VOUT (0x7A) if adi type
-    if [ "$module_vendor" == "adi" ]; then
-        STATUS_VOUT=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x7A r1)
-        status_array+=("${slot_num} (0x7A) STATUS_VOUT" "$STATUS_VOUT")
+    # Read STATUS_BYTE (0x78) and STATUS_OTHER (0x7F) if flex type
+    if [ "$module_vendor" == "flex" ]; then
+        STATUS_BYTE=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x78 r1)
+        status_array+=("Power Module ${pu_num} (0x78) STATUS_BYTE" "$STATUS_BYTE")
+
+        STATUS_OTHER=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x7F r1)
+        status_array+=("Power Module ${pu_num} (0x7F) STATUS_OTHER" "$STATUS_OTHER")
     fi
 
     # Read STATUS_WORD (0x79)
     read -r LOW_BYTE HIGH_BYTE <<< "$(i2ctransfer -f -y "$bus" w1@"$addr" 0x79 r2)"
     STATUS_WORD=$((LOW_BYTE | (HIGH_BYTE << 8) ))
     STATUS_WORD=$(dec_to_hex $STATUS_WORD)
-    status_array+=("${slot_num} (0x79) STATUS_WORD" "$STATUS_WORD")
+    status_array+=("Power Module ${pu_num} (0x79) STATUS_WORD" "$STATUS_WORD")
 
     # Read other status registers (1 byte each)
-    for reg in 0x78 0x7B 0x7C 0x7D 0x7E 0x80; do
+    for reg in 0x7A 0x7B 0x7C 0x7D 0x7E 0x80; do
         STATUS=$(i2ctransfer -f -y "$bus" w1@"$addr" $reg r1)
         case $reg in
-            0x78) name="STATUS_BYTE";;
+            0x7A) name="STATUS_VOUT";;
             0x7B) name="STATUS_IOUT";;
             0x7C) name="STATUS_INPUT";;
             0x7D) name="STATUS_TEMPERATURE";;
             0x7E) name="STATUS_CML";;
             0x80) name="STATUS_MFR_SPECIFIC";;
         esac
-        status_array+=("${slot_num} ($reg) ${name}" "$STATUS")
+        status_array+=("Power Module ${pu_num} ($reg) ${name}" "$STATUS")
     done
 
-    # Add event log for HSC
-    MESSAGE="${slot_num} HSC Fault"
+    # Add event log for each power module
+    MESSAGE="Medusa Power Module ${pu_num} Fault"
 
     local num_status=$((${#status_array[@]} / 2))
 
@@ -79,13 +82,22 @@ read_12v_hsc() {
         "${status_array[@]}"
 }
 
-hsc_fault()
+medusa_power_module_fault()
 {
-    local slot_num=$1
-    local bus=$((slot_num - 1))
-
-    # Read HSC module
-    read_12v_hsc $bus 0x40 "SLOT$slot_num"
+    if [ "$1" = "0" ]; then
+        read_power_module 11 0x62 "0"
+    elif [ "$1" = "1" ]; then
+        read_power_module 11 0x64 "1"
+    elif [ "$1" = "2" ]; then
+        read_power_module 11 0x65 "2"
+    elif [ "$1" = "3" ]; then
+        read_power_module 11 0x68 "3"
+    else
+        read_power_module 11 0x62 "0"
+        read_power_module 11 0x64 "1"
+        read_power_module 11 0x65 "2"
+        read_power_module 11 0x68 "3"
+    fi
 }
 
-hsc_fault "$1"
+medusa_power_module_fault "$1"

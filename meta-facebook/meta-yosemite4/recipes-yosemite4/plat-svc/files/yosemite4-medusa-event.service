@@ -1,0 +1,14 @@
+[Unit]
+Description=Yosemite4 Medusa Event
+StopWhenUnneeded=false
+After=xyz.openbmc_project.psusensor.service
+Requires=xyz.openbmc_project.psusensor.service
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/usr/libexec/yosemite4-medusa-event
+SyslogIdentifier=yosemite4-medusa-event
+
+[Install]
+WantedBy=multi-user.target

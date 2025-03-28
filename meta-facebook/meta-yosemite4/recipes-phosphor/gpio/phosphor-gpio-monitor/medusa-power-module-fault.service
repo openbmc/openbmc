@@ -1,0 +1,7 @@
+[Unit]
+Description=Detect medusa power module fault
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/medusa-power-module-fault
+SyslogIdentifier=medusa-power-module-fault

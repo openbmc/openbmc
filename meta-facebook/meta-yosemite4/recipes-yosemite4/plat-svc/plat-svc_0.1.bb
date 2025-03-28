@@ -15,17 +15,21 @@ SRC_URI += " \
     file://yosemite4-early-sys-init \
     file://yosemite4-schematic-init.service \
     file://yosemite4-schematic-init \
+    file://yosemite4-medusa-event.service \
+    file://yosemite4-medusa-event \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " \
     yosemite4-sys-init.service \
     yosemite4-schematic-init.service \
+    yosemite4-medusa-event.service \
     "
 
 do_install() {
     install -d ${D}${libexecdir}
     install -m 0755 ${UNPACKDIR}/yosemite4-early-sys-init ${D}${libexecdir}
     install -m 0755 ${UNPACKDIR}/yosemite4-schematic-init ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/yosemite4-medusa-event ${D}${libexecdir}
 }
 

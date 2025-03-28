@@ -1,0 +1,7 @@
+[Unit]
+Description=Detect medusa power module group%i power good
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/medusa-power-module-pwrgd %i
+SyslogIdentifier=medusa-power-module-pwrgd %i

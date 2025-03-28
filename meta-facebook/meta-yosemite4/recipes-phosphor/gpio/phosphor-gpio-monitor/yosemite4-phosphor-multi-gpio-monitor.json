@@ -377,6 +377,50 @@
         "Continue": true
     },
     {
+        "Name": "OC_P48V_HSC_0_N",
+        "LineName": "OC_P48V_HSC_0_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "medusa-hsc-alert@0.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "OC_P48V_HSC_1_N",
+        "LineName": "OC_P48V_HSC_1_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "medusa-hsc-alert@1.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P12V_AUX_0",
+        "LineName": "PWRGD_P12V_AUX_0",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "medusa-power-module-pwrgd@0.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P12V_AUX_1",
+        "LineName": "PWRGD_P12V_AUX_1",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "medusa-power-module-pwrgd@1.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "INT_SMB_BMC_SLOT1_4_BMC_N",
         "LineName": "INT_SMB_BMC_SLOT1_4_BMC_N",
         "EventMon": "FALLING",
@@ -503,6 +547,17 @@
         "Targets": {
             "FALLING": [
                 "obmc-host-reboot@8.target"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALT_P12V_AUX_N",
+        "LineName": "ALT_P12V_AUX_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "medusa-power-module-fault.service"
+            ]
         },
         "Continue": true
     }

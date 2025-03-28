@@ -1,0 +1,14 @@
+#!/bin/bash
+
+medusa_power_module_pwrgd()
+{
+    local group="$1"
+    MESSAGE="Medusa Power Module $((group*2))&$((group*2+1)) Fault"
+
+    busctl call \
+        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
+        xyz.openbmc_project.Logging.Entry.Level.Error 0
+}
+
+medusa_power_module_pwrgd "$1"

@@ -1,0 +1,7 @@
+[Unit]
+Description=Detect medusa hsc alert on position %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/medusa-hsc-alert %i
+SyslogIdentifier=medusa-hsc-alert%i

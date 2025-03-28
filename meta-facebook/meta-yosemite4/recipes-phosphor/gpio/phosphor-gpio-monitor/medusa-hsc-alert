@@ -1,6 +1,4 @@
 #!/bin/bash
-# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
-source /usr/libexec/yosemite4-common-functions
 
 dec_to_hex() {
     local decimal=$1
@@ -32,7 +30,7 @@ get_medusa_type() {
 read_medusa_hsc_module() {
     local bus=$1
     local addr=$2
-    local hsc_fault_position=$3
+    local hsc_alert_position=$3
     local medusa_type=$4
 
     local status_array=()
@@ -40,14 +38,14 @@ read_medusa_hsc_module() {
     # Read STATUS_CML (0x7E) if XDP710 type
     if [ "$medusa_type" == "XDP710" ]; then
         STATUS_CML=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x7E r1)
-        status_array+=("HSC${hsc_fault_position} (0x7E) STATUS_CML" "$STATUS_CML")
+        status_array+=("HSC${hsc_alert_position} (0x7E) STATUS_CML" "$STATUS_CML")
     fi
 
     # Read STATUS_WORD (0x79)
     read -r LOW_BYTE HIGH_BYTE <<< "$(i2ctransfer -f -y "$bus" w1@"$addr" 0x79 r2)"
     STATUS_WORD=$((LOW_BYTE | (HIGH_BYTE << 8) ))
     STATUS_WORD=$(dec_to_hex $STATUS_WORD)
-    status_array+=("HSC${hsc_fault_position} (0x79) STATUS_WORD" "$STATUS_WORD")
+    status_array+=("HSC${hsc_alert_position} (0x79) STATUS_WORD" "$STATUS_WORD")
 
     # Read other status registers (1 byte each)
     for reg in 0x78 0x7A 0x7B 0x7C 0x7D 0x80; do
@@ -60,11 +58,11 @@ read_medusa_hsc_module() {
             0x7D) name="STATUS_TEMPERATURE";;
             0x80) name="STATUS_MFR_SPECIFIC";;
         esac
-        status_array+=("HSC${hsc_fault_position} ($reg) ${name}" "$STATUS")
+        status_array+=("HSC${hsc_alert_position} ($reg) ${name}" "$STATUS")
     done
 
     # Add event log for Medusa HSC
-    MESSAGE="Medusa 48V HSC${hsc_fault_position} Fault"
+    MESSAGE="Medusa 48V HSC${hsc_alert_position} Alert"
 
     local num_status=$((${#status_array[@]} / 2))
 
@@ -75,9 +73,9 @@ read_medusa_hsc_module() {
         "${status_array[@]}"
 }
 
-medusa_hsc_fault()
+medusa_hsc_alert()
 {
-    local hsc_fault_position="$1"
+    local hsc_alert_position="$1"
     local bus=11
     local hsc_addr=16
     local medusa_type
@@ -86,20 +84,10 @@ medusa_hsc_fault()
     if [ "$medusa_type" = "XDP710" ]; then
         hsc_addr=$((hsc_addr + 1))
     fi
-    hsc_addr=$((hsc_addr + hsc_fault_position * 2))
+    hsc_addr=$((hsc_addr + hsc_alert_position * 2))
 
     # Read Medusa HSC module
-    read_medusa_hsc_module $bus $hsc_addr "$hsc_fault_position" "$medusa_type"
-
-    local sentinel_dome_slot_present_percentage=50
-
-    echo "Detected HSC fault at position ${hsc_fault_position}, setting fan PWM to 100%."
-
-    if ! set_sentinel_dome_slot_present_percentage "${sentinel_dome_slot_present_percentage}"; then
-        exit 1
-    else
-        exit 0
-    fi
+    read_medusa_hsc_module $bus $hsc_addr "$hsc_alert_position" "$medusa_type"
 }
 
-medusa_hsc_fault "$1"
+medusa_hsc_alert "$1"
