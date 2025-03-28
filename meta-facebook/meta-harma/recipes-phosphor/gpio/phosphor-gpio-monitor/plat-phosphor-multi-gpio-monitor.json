@@ -207,5 +207,15 @@
             "FALLING": ["assert-gpio-log@4_fcb0-activate.service", "fan-reload.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "power-asic-good",
+        "ChipId": "2",
+        "GpioNum": 92,
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING": ["fw-versions-ag-vr@0.service"]
+        },
+        "Continue": true
     }
 ]
