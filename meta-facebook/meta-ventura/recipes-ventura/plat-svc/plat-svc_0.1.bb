@@ -17,6 +17,8 @@ SRC_URI += " \
     file://ventura-init-tray-sgpio-status \
     file://ventura-schematic-init \
     file://ventura-schematic-init.service \
+    file://ventura-fan-status-monitor \
+    file://ventura-fan-status-monitor.service \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
@@ -24,6 +26,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
     ventura-sys-init.service \
     ventura-init-tray-sgpio-status.service \
     ventura-schematic-init.service \
+    ventura-fan-status-monitor.service \
     "
 
 do_install() {
@@ -32,4 +35,5 @@ do_install() {
     install -m 0755 ${UNPACKDIR}/ventura-early-sys-init ${VENTURA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/ventura-init-tray-sgpio-status ${VENTURA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/ventura-schematic-init ${VENTURA_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/ventura-fan-status-monitor ${D}${libexecdir}
 }

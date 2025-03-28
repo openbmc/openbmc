@@ -843,6 +843,86 @@
                     "Priority": "On"
                 }
             ]
+        },
+        {
+            "group": "fcb0fan0_blue",
+            "members": [
+                {
+                    "Name": "fan0_ledd2_blue",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan0_amber",
+            "members": [
+                {
+                    "Name": "fan0_ledd2_amber",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan1_blue",
+            "members": [
+                {
+                    "Name": "fan0_ledd1_blue",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan1_amber",
+            "members": [
+                {
+                    "Name": "fan0_ledd1_amber",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "fcb1fan2_blue",
+            "members": [
+                {
+                    "Name": "fan1_ledd2_blue",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "fcb1fan2_amber",
+            "members": [
+                {
+                    "Name": "fan1_ledd2_amber",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "fcb1fan3_blue",
+            "members": [
+                {
+                    "Name": "fan1_ledd1_blue",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "fcb1fan3_amber",
+            "members": [
+                {
+                    "Name": "fan1_ledd1_amber",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
         }
     ]
 }
