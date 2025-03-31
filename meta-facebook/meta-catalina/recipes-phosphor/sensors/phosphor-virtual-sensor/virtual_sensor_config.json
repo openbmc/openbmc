@@ -344,8 +344,7 @@
                         "Name": "PDB_BRICK1_P12V_N2_TEMP_C",
                         "SensorType": "temperature"
                     }
-                }
-                ,
+                },
                 {
                     "ParamName": "BRICK0_AUX_TEMP",
                     "Desc": {
@@ -353,11 +352,10 @@
                         "SensorType": "temperature"
                     }
                 }
-
             ]
         },
         "Expression": [
-            "max(VR_N1_TEMP, VR_N2_TEMP, VR_AUX_TEMP, BRICK0_N1_TEMP, BRICK1_N1_TEMP, BRICK0_N2_TEMP, BRICK1_N2_TEMP, BRICK0_AUX_TEMP)"
+            "max(0, VR_N1_TEMP, VR_N2_TEMP, VR_AUX_TEMP, BRICK0_N1_TEMP, BRICK1_N1_TEMP, BRICK0_N2_TEMP, BRICK1_N2_TEMP, BRICK0_AUX_TEMP)"
         ]
     }
 ]
