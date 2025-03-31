@@ -150,26 +150,26 @@ index ac1a804cf9c..7c687982324 100644
  fn oneshot_multi_thread_recv_close_stress() {
      for _ in 0..stress_factor() {
          let (tx, rx) = channel::<i32>();
-diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/tests.rs
+diff --git a/library/std/src/sync/poison/mutex/tests.rs b/library/std/src/sync/poison/mutex/tests.rs
 index 1786a3c09ff..9dcead7092b 100644
---- a/library/std/src/sync/mutex/tests.rs
-+++ b/library/std/src/sync/mutex/tests.rs
+--- a/library/std/src/sync/poison/mutex/tests.rs
++++ b/library/std/src/sync/poison/mutex/tests.rs
 @@ -82,6 +82,7 @@ fn drop(&mut self) {
  }
 
  #[test]
 +#[ignore]
  fn test_into_inner_poison() {
-     let m = Arc::new(Mutex::new(NonCopy(10)));
-     let m2 = m.clone();
+     let m = new_poisoned_mutex(NonCopy(10));
+
 @@ -106,6 +107,7 @@ fn test_get_mut() {
  }
 
  #[test]
 +#[ignore]
  fn test_get_mut_poison() {
-     let m = Arc::new(Mutex::new(NonCopy(10)));
-     let m2 = m.clone();
+     let mut m = new_poisoned_mutex(NonCopy(10));
+
 @@ -146,6 +148,7 @@ fn test_mutex_arc_condvar() {
  }
 
@@ -194,10 +194,10 @@ index 1786a3c09ff..9dcead7092b 100644
  fn test_mutex_arc_access_in_unwind() {
      let arc = Arc::new(Mutex::new(1));
      let arc2 = arc.clone();
-diff --git a/library/std/src/sync/rwlock/tests.rs b/library/std/src/sync/rwlock/tests.rs
+diff --git a/library/std/src/sync/poison/rwlock/tests.rs b/library/std/src/sync/poison/rwlock/tests.rs
 index 1a9d3d3f12f..0a9cfc48806 100644
---- a/library/std/src/sync/rwlock/tests.rs
-+++ b/library/std/src/sync/rwlock/tests.rs
+--- a/library/std/src/sync/poison/rwlock/tests.rs
++++ b/library/std/src/sync/poison/rwlock/tests.rs
 @@ -47,6 +47,7 @@ fn frob() {
  }
 
@@ -244,16 +244,16 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  #[test]
 +#[ignore]
  fn test_into_inner_poison() {
-     let m = Arc::new(RwLock::new(NonCopy(10)));
-     let m2 = m.clone();
+     let m = new_poisoned_rwlock(NonCopy(10));
+
 @@ -299,6 +305,7 @@ fn test_get_mut() {
  }
 
  #[test]
 +#[ignore]
  fn test_get_mut_poison() {
-     let m = Arc::new(RwLock::new(NonCopy(10)));
-     let m2 = m.clone();
+     let mut m = new_poisoned_rwlock(NonCopy(10));
+
 diff --git a/library/std/src/sys/pal/unix/process/process_unix/tests.rs b/library/std/src/sys/pal/unix/process/process_unix/tests.rs
 index 0a6c6ec19fc..bec257bc630 100644
 --- a/library/std/src/sys/pal/unix/process/process_unix/tests.rs
@@ -329,9 +329,9 @@ diff --git a/library/test/src/tests.rs b/library/test/src/tests.rs
  fn test_time_options_threshold() {
      let unit = TimeThreshold::new(Duration::from_millis(50), Duration::from_millis(100));
      let integration = TimeThreshold::new(Duration::from_millis(500), Duration::from_millis(1000));
-diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/tests.rs
---- a/library/std/src/sync/mutex/tests.rs
-+++ b/library/std/src/sync/mutex/tests.rs
+diff --git a/library/std/src/sync/poison/mutex/tests.rs b/library/std/src/sync/poison/mutex/tests.rs
+--- a/library/std/src/sync/poison/mutex/tests.rs
++++ b/library/std/src/sync/poison/mutex/tests.rs
 @@ -193,6 +193,7 @@
  }
 
@@ -340,9 +340,9 @@ diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/te
  fn test_mutex_arc_poison_mapped() {
      let arc = Arc::new(Mutex::new(1));
      assert!(!arc.is_poisoned());
-diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/tests.rs
---- a/library/std/src/sync/mutex/tests.rs
-+++ b/library/std/src/sync/mutex/tests.rs
+diff --git a/library/std/src/sync/poison/mutex/tests.rs b/library/std/src/sync/poison/mutex/tests.rs
+--- a/library/std/src/sync/poison/mutex/tests.rs
++++ b/library/std/src/sync/poison/mutex/tests.rs
 @@ -272,6 +272,7 @@
  }
 
@@ -351,9 +351,9 @@ diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/te
  fn panic_while_mapping_unlocked_poison() {
      let lock = Mutex::new(());
 
-diff --git a/library/std/src/sync/rwlock/tests.rs b/library/std/src/sync/rwlock/tests.rs
---- a/library/std/src/sync/rwlock/tests.rs
-+++ b/library/std/src/sync/rwlock/tests.rs
+diff --git a/library/std/src/sync/rwlock/tests.rs b/library/std/src/sync/poison/rwlock/tests.rs
+--- a/library/std/src/sync/poison/rwlock/tests.rs
++++ b/library/std/src/sync/poison/rwlock/tests.rs
 @@ -59,6 +59,7 @@ fn test_rw_arc_poison_wr() {
  }
 

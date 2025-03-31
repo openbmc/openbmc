@@ -40,9 +40,9 @@ index 39fa23766b..51d86b4009 100644
 
 -use rustc_data_structures::fx::{FxHashMap, FxHashSet};
 +use rustc_data_structures::fx::FxHashMap;
- use rustc_hir::def_id::CrateNum;
+ use rustc_hir::def_id::{CrateNum, LOCAL_CRATE};
+ use rustc_index::IndexVec;
  use rustc_middle::bug;
- use rustc_middle::middle::dependency_format::{Dependencies, DependencyList, Linkage};
 @@ -161,44 +161,19 @@ fn calculate_type(tcx: TyCtxt<'_>, ty: CrateType) -> DependencyList {
          }
          Linkage::Dynamic | Linkage::IncludedFromDylib => {}
