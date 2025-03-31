@@ -1,0 +1,66 @@
+- name: nic_3 current hardshutdown alarm path group
+  class: group
+  group: path
+  members:
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/NIC3_TEMP_C
+
+- name: nic_3 sensor hardshutdown alarm property
+  class: group
+  group: property
+  type: boolean
+  members:
+      - interface: xyz.openbmc_project.Sensor.Threshold.HardShutdown
+        meta: PROPERTY
+        property: HardShutdownAlarmHigh
+
+- name: nic_3 sensor hardshutdown alarm assert
+  class: watch
+  watch: property
+  paths: nic_3 current hardshutdown alarm path group
+  properties: nic_3 sensor hardshutdown alarm property
+  callback: check if nic_3 sensor hardshutdown threshold assert
+
+- name: check if nic_3 sensor hardshutdown threshold assert
+  class: condition
+  condition: count
+  paths: nic_3 current hardshutdown alarm path group
+  properties: nic_3 sensor hardshutdown alarm property
+  callback: set nic_3 sensor fail
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: true
+
+- name: set_slot_7_power_off_nic_assert
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: obmc-host-shutdown@7.target
+        type: string
+      - value: replace
+        type: string
+
+- name: set_slot_8_power_off_nic_assert
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: obmc-host-shutdown@8.target
+        type: string
+      - value: replace
+        type: string
+
+- name: set nic_3 sensor fail
+  class: callback
+  callback: group
+  members:
+      - set_slot_7_power_off_nic_assert
+      - set_slot_8_power_off_nic_assert

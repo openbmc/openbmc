@@ -1,0 +1,88 @@
+- name: slot_4_hardshutdown_alarm_path_group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_CPU_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_SSD_BOOT_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A0_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A1_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A2_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A3_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A4_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A5_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A6_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A7_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A8_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A9_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A10_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A11_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_A0_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_A1_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_B0_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_B1_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_A0_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_A1_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_B0_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_B1_TEMP_C
+
+- name: slot4 sensor hardshutdown alarm property
+  class: group
+  group: property
+  type: boolean
+  members:
+      - interface: xyz.openbmc_project.Sensor.Threshold.HardShutdown
+        meta: PROPERTY
+        property: HardShutdownAlarmHigh
+
+- name: slot4 sensor hardshutdown alarm assert
+  class: watch
+  watch: property
+  paths: slot_4_hardshutdown_alarm_path_group
+  properties: slot4 sensor hardshutdown alarm property
+  callback: check if slot4 sensor hardshutdown threshold assert
+
+- name: check if slot4 sensor hardshutdown threshold assert
+  class: condition
+  condition: count
+  paths: slot_4_hardshutdown_alarm_path_group
+  properties: slot4 sensor hardshutdown alarm property
+  callback: set_slot_4_power_off
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: true
+
+- name: set_slot_4_power_off
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: obmc-host-shutdown@4.target
+        type: string
+      - value: replace
+        type: string
