@@ -83,7 +83,6 @@ gbmc_upgrade_metadata_first_match() {
 }
 
 gbmc_upgrade_download() {
-  local timeout=$((SECONDS + deadline))
   local retry=0
   local path="$1"
   local output="$2"
@@ -92,6 +91,7 @@ gbmc_upgrade_download() {
   # give a chance to retry the curl if it stuck until the maximum timeout
   local single_deadline=$(( deadline / 3 ))
   local stime=5
+  local timeout=$((SECONDS + deadline))
   update_netboot_status "$state" "Fetching URI: ${bootfile_url}${path}" "START" "$retry"
   while true; do
     local st=()
