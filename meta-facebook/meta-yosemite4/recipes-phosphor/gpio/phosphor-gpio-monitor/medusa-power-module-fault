@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MODULE_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board/MEDUSA_DELTA"
+
 dec_to_hex() {
     local decimal=$1
     local hex=""
@@ -23,12 +25,17 @@ read_mfr_id() {
     local bus=$1
     local addr=$2
     local mfr_id
-    mfr_id=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x99 r5)
-    local vendor="0x46 0x6c 0x65 0x78"
-    if [[ $mfr_id == *"$vendor"* ]]; then
-        echo "flex"
+    if mfr_id=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x99 r5); then
+        local vendor="0x46 0x6c 0x65 0x78"
+        if [[ $mfr_id == *"$vendor"* ]]; then
+            echo "flex"
+        else
+            echo "delta"
+        fi
+        return 0
     else
-        echo "delta"
+        echo "i2ctransfer failed for MFR_ID" >&2
+        return 1 # return 1 on failure
     fi
 }
 
@@ -37,24 +44,42 @@ read_power_module() {
     local addr=$2
     local pu_num=$3
     local module_vendor
-    module_vendor=$(read_mfr_id "$bus" "$addr")
 
-    local status_array=()
+    if ! module_vendor=$(read_mfr_id "$bus" "$addr"); then
+        log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+            "{\"POWER_RAIL\": \"${MODULE_PATH}${pu_num}_12V\", \"FAILURE_DATA\": \"Medusa Power Module ${pu_num} Fault\"}"
+        return # Return if read_mfr_id failed
+    fi
+
+    local failure_data="Medusa Power Module ${pu_num} Fault"
+    local power_rail="${MODULE_PATH}${pu_num}_12V"
 
     # Read STATUS_BYTE (0x78) and STATUS_OTHER (0x7F) if flex type
     if [ "$module_vendor" == "flex" ]; then
         STATUS_BYTE=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x78 r1)
-        status_array+=("Power Module ${pu_num} (0x78) STATUS_BYTE" "$STATUS_BYTE")
+        local description="(0x78) STATUS_BYTE"
+        if [ -n "$failure_data" ]; then
+            failure_data="$failure_data, "
+        fi
+        failure_data+="$description: $STATUS_BYTE"
 
         STATUS_OTHER=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x7F r1)
-        status_array+=("Power Module ${pu_num} (0x7F) STATUS_OTHER" "$STATUS_OTHER")
+        local description="(0x7F) STATUS_OTHER"
+        if [ -n "$failure_data" ]; then
+            failure_data="$failure_data, "
+        fi
+        failure_data+="$description: $STATUS_OTHER"
     fi
 
     # Read STATUS_WORD (0x79)
     read -r LOW_BYTE HIGH_BYTE <<< "$(i2ctransfer -f -y "$bus" w1@"$addr" 0x79 r2)"
     STATUS_WORD=$((LOW_BYTE | (HIGH_BYTE << 8) ))
     STATUS_WORD=$(dec_to_hex $STATUS_WORD)
-    status_array+=("Power Module ${pu_num} (0x79) STATUS_WORD" "$STATUS_WORD")
+    local description="(0x79) STATUS_WORD"
+    if [ -n "$failure_data" ]; then
+        failure_data="$failure_data, "
+    fi
+    failure_data+="$description: $STATUS_WORD"
 
     # Read other status registers (1 byte each)
     for reg in 0x7A 0x7B 0x7C 0x7D 0x7E 0x80; do
@@ -67,19 +92,16 @@ read_power_module() {
             0x7E) name="STATUS_CML";;
             0x80) name="STATUS_MFR_SPECIFIC";;
         esac
-        status_array+=("Power Module ${pu_num} ($reg) ${name}" "$STATUS")
+        description="($reg) $name"
+        if [ -n "$failure_data" ]; then
+            failure_data="$failure_data, "
+        fi
+        failure_data+="$description: $STATUS"
     done
 
-    # Add event log for each power module
-    MESSAGE="Medusa Power Module ${pu_num} Fault"
-
-    local num_status=$((${#status_array[@]} / 2))
-
-    busctl call \
-        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
-        xyz.openbmc_project.Logging.Entry.Level.Error $num_status \
-        "${status_array[@]}"
+    # Send event
+    log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+        "{\"POWER_RAIL\": \"$power_rail\", \"FAILURE_DATA\": \"$failure_data\"}"
 }
 
 medusa_power_module_fault()

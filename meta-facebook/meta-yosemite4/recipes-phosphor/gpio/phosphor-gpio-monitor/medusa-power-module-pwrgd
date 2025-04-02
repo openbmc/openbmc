@@ -2,13 +2,16 @@
 
 medusa_power_module_pwrgd()
 {
-    local group="$1"
-    MESSAGE="Medusa Power Module $((group*2))&$((group*2+1)) Fault"
+    local pu_num="$1"
+    power_rail="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board/MEDUSA_DELTA${pu_num}_12V"
+    failure_data="Medusa Power Module $pu_num Fault"
 
-    busctl call \
-        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
-        xyz.openbmc_project.Logging.Entry.Level.Error 0
+    # Send event
+    log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+        "{\"POWER_RAIL\": \"$power_rail\", \"FAILURE_DATA\": \"$failure_data\"}"
 }
 
-medusa_power_module_pwrgd "$1"
+group="$1"
+
+medusa_power_module_pwrgd "$((group*2))"
+medusa_power_module_pwrgd "$((group*2+1))"

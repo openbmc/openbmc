@@ -1,5 +1,7 @@
 #!/bin/bash
 
+HSC_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board/MEDUSA_HSC"
+
 dec_to_hex() {
     local decimal=$1
     local hex=""
@@ -20,10 +22,11 @@ dec_to_hex() {
 }
 
 get_medusa_type() {
+    local hsc_alert_position="$1"
     local medusa_type
+    local inventory_path="${HSC_PATH}${hsc_alert_position}_48V"
     medusa_type=$(busctl introspect xyz.openbmc_project.EntityManager \
-        /xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board/MEDUSA_HSC0_48V \
-        | grep "\.Type" | awk '{print $4}' | tr -d '"')
+        "$inventory_path" | grep "\.Type" | awk '{print $4}' | tr -d '"')
     echo "$medusa_type"
 }
 
@@ -33,19 +36,28 @@ read_medusa_hsc_module() {
     local hsc_alert_position=$3
     local medusa_type=$4
 
-    local status_array=()
+    local failure_data="Medusa 48V HSC${hsc_alert_position} Alert"
+    local power_rail="${HSC_PATH}${hsc_alert_position}_48V"
 
     # Read STATUS_CML (0x7E) if XDP710 type
     if [ "$medusa_type" == "XDP710" ]; then
         STATUS_CML=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x7E r1)
-        status_array+=("HSC${hsc_alert_position} (0x7E) STATUS_CML" "$STATUS_CML")
+        local description="(0x7E) STATUS_CML"
+        if [ -n "$failure_data" ]; then
+            failure_data="$failure_data, "
+        fi
+        failure_data+="$description: $STATUS_CML"
     fi
 
     # Read STATUS_WORD (0x79)
     read -r LOW_BYTE HIGH_BYTE <<< "$(i2ctransfer -f -y "$bus" w1@"$addr" 0x79 r2)"
     STATUS_WORD=$((LOW_BYTE | (HIGH_BYTE << 8) ))
     STATUS_WORD=$(dec_to_hex $STATUS_WORD)
-    status_array+=("HSC${hsc_alert_position} (0x79) STATUS_WORD" "$STATUS_WORD")
+    local description="(0x79) STATUS_WORD"
+    if [ -n "$failure_data" ]; then
+        failure_data="$failure_data, "
+    fi
+    failure_data+="$description: $STATUS_WORD"
 
     # Read other status registers (1 byte each)
     for reg in 0x78 0x7A 0x7B 0x7C 0x7D 0x80; do
@@ -58,19 +70,16 @@ read_medusa_hsc_module() {
             0x7D) name="STATUS_TEMPERATURE";;
             0x80) name="STATUS_MFR_SPECIFIC";;
         esac
-        status_array+=("HSC${hsc_alert_position} ($reg) ${name}" "$STATUS")
+        description="($reg) $name"
+        if [ -n "$failure_data" ]; then
+            failure_data="$failure_data, "
+        fi
+        failure_data+="$description: $STATUS"
     done
 
-    # Add event log for Medusa HSC
-    MESSAGE="Medusa 48V HSC${hsc_alert_position} Alert"
-
-    local num_status=$((${#status_array[@]} / 2))
-
-    busctl call \
-        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
-        xyz.openbmc_project.Logging.Entry.Level.Error $num_status \
-        "${status_array[@]}"
+    # Send event
+    log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+        "{\"POWER_RAIL\": \"$power_rail\", \"FAILURE_DATA\": \"$failure_data\"}"
 }
 
 medusa_hsc_alert()
@@ -79,7 +88,7 @@ medusa_hsc_alert()
     local bus=11
     local hsc_addr=16
     local medusa_type
-    medusa_type=$(get_medusa_type)
+    medusa_type=$(get_medusa_type "$hsc_alert_position")
 
     if [ "$medusa_type" = "XDP710" ]; then
         hsc_addr=$((hsc_addr + 1))

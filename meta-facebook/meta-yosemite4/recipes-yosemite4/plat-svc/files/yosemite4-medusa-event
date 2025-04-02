@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# The ALERT pin doesn't trigger when HSC or power module loses ENABLE with VCC present,
+# leading to Vout dropping to 0V. Need to record STATUS in this case.
+
 found_match=false
 
 dbus-monitor --system "type='signal',interface='xyz.openbmc_project.Sensor.Threshold.Critical'" |

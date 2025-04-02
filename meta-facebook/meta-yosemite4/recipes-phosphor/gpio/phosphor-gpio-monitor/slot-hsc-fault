@@ -1,5 +1,7 @@
 #!/bin/bash
 
+HSC_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board/MEDUSA_MB"
+
 dec_to_hex() {
     local decimal=$1
     local hex=""
@@ -39,23 +41,33 @@ read_12v_hsc() {
     local module_vendor
     module_vendor=$(read_mfr_id "$bus" "$addr")
 
-    local status_array=()
+    local failure_data="SLOT${slot_num} HSC Fault"
+    local power_rail="${HSC_PATH}${slot_num}_HSC_12V"
 
     # Read STATUS_VOUT (0x7A) if adi type
     if [ "$module_vendor" == "adi" ]; then
         STATUS_VOUT=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x7A r1)
-        status_array+=("${slot_num} (0x7A) STATUS_VOUT" "$STATUS_VOUT")
+        local description="(0x7A) STATUS_VOUT"
+        if [ -n "$failure_data" ]; then
+            failure_data="$failure_data, "
+        fi
+        failure_data+="$description: $STATUS_VOUT"
     fi
 
     # Read STATUS_WORD (0x79)
     read -r LOW_BYTE HIGH_BYTE <<< "$(i2ctransfer -f -y "$bus" w1@"$addr" 0x79 r2)"
     STATUS_WORD=$((LOW_BYTE | (HIGH_BYTE << 8) ))
     STATUS_WORD=$(dec_to_hex $STATUS_WORD)
-    status_array+=("${slot_num} (0x79) STATUS_WORD" "$STATUS_WORD")
+    local description="(0x79) STATUS_WORD"
+    if [ -n "$failure_data" ]; then
+        failure_data="$failure_data, "
+    fi
+    failure_data+="$description: $STATUS_WORD"
 
     # Read other status registers (1 byte each)
     for reg in 0x78 0x7B 0x7C 0x7D 0x7E 0x80; do
         STATUS=$(i2ctransfer -f -y "$bus" w1@"$addr" $reg r1)
+        local name=""
         case $reg in
             0x78) name="STATUS_BYTE";;
             0x7B) name="STATUS_IOUT";;
@@ -64,19 +76,16 @@ read_12v_hsc() {
             0x7E) name="STATUS_CML";;
             0x80) name="STATUS_MFR_SPECIFIC";;
         esac
-        status_array+=("${slot_num} ($reg) ${name}" "$STATUS")
+        description="($reg) $name"
+        if [ -n "$failure_data" ]; then
+            failure_data="$failure_data, "
+        fi
+        failure_data+="$description: $STATUS"
     done
 
-    # Add event log for HSC
-    MESSAGE="${slot_num} HSC Fault"
-
-    local num_status=$((${#status_array[@]} / 2))
-
-    busctl call \
-        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
-        xyz.openbmc_project.Logging.Entry.Level.Error $num_status \
-        "${status_array[@]}"
+    # Send event
+    log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+        "{\"POWER_RAIL\": \"$power_rail\", \"FAILURE_DATA\": \"$failure_data\"}"
 }
 
 hsc_fault()
@@ -85,7 +94,7 @@ hsc_fault()
     local bus=$((slot_num - 1))
 
     # Read HSC module
-    read_12v_hsc $bus 0x40 "SLOT$slot_num"
+    read_12v_hsc $bus 0x40 "$slot_num"
 }
 
 hsc_fault "$1"
