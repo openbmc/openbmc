@@ -5,7 +5,6 @@ inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
-        ${PN}-extras \
         ${PN}-flash \
         ${PN}-system \
         "
@@ -24,5 +23,4 @@ SUMMARY:${PN}-system = "Nvidia System"
 RDEPENDS:${PN}-system = " \
         entity-manager \
         dbus-sensors \
-        ${RDEPENDS_PN_SYSTEM_EXTRAS} \
         "
