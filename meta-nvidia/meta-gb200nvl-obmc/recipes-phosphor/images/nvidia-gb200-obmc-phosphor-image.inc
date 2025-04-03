@@ -1,2 +1,3 @@
-# Intentionally empty at this time
-OBMC_IMAGE_EXTRA_INSTALL:append = ""
+OBMC_IMAGE_EXTRA_INSTALL:append = "\
+    mctp \
+"
