@@ -18,6 +18,7 @@ PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
 PACKAGECONFIG[static-dual-image] = "-Dbmc-static-dual-image=enabled, -Dbmc-static-dual-image=disabled"
 PACKAGECONFIG[software-update-dbus-interface] = "-Dsoftware-update-dbus-interface=enabled, -Dsoftware-update-dbus-interface=disabled"
+PACKAGECONFIG[bios-software-update] = "-Dbios-software-update=enabled, -Dbios-software-update=disabled, libgpiod libpldm"
 PACKAGECONFIG ?= "software-update-dbus-interface"
 
 PV = "1.0+git${SRCPV}"
@@ -32,6 +33,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-sync \
     ${PN}-usb \
     ${PN}-side-switch \
+    ${PN}-bios-software-update \
 "
 # Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
 # handles the rest.
@@ -49,6 +51,7 @@ SYSTEMD_SERVICE:${PN}-side-switch += "${@bb.utils.contains('PACKAGECONFIG', 'sid
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-alt@.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-static-mount-alt.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-prepare-for-sync.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-bios-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', 'xyz.openbmc_project.Software.BIOS.service', '', d)}"
 S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
@@ -93,6 +96,9 @@ FILES:${PN}-usb += "\
     "
 FILES:${PN}-side-switch += "\
     ${bindir}/phosphor-bmc-side-switch \
+    "
+FILES:${PN}-bios-software-update += "\
+    ${bindir}/phosphor-bios-software-update \
     "
 
 require ${BPN}.inc
