@@ -32,6 +32,9 @@ inherit meson pkgconfig
 inherit obmc-phosphor-ipmiprovider-symlink
 inherit systemd
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[offline-failsafe] = "-Doffline-failsafe-pwm=true,-Doffline-failsafe-pwm=false"
+
 EXTRA_OEMESON = " \
   -Dtests=disabled \
   -Dsystemd_target="multi-user.target" \
