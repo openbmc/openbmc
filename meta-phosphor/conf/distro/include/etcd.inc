@@ -1,2 +1,2 @@
 DISTRO_FEATURES += "etcd"
-DISTROOVERRIDES .= "df-etcd"
+DISTROOVERRIDES .= ":df-etcd"
