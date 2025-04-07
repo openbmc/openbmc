@@ -38,5 +38,12 @@ IP_OFFSET=@IP_OFFSET@
 # We want closer NICs to provide a default route if existing.
 ROUTE_METRIC=1000
 
+echo "Waiting for ${RA_IF} configuration" >&2
+
+while ! networkctl list "${RA_IF}" | grep -q "configured"; do
+  sleep 2
+done
+
+echo "${RA_IF} is configured, doing RA" >&2
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-ra.sh
 source /usr/share/gbmc-ra.sh || exit
