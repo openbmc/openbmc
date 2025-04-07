@@ -18,7 +18,7 @@ SRC_URI = "\
         file://nslcd.init \
         file://nslcd.service \
         "
-SRCREV="47fd03bc80d470de881c025ff934325bd7def0b5"
+SRCREV="5f4aacc4a96b452c11e7a1a5625e86d29cb38b1e"
 
 SYSTEMD_SERVICE:${PN} = "nslcd.service"
 
@@ -27,6 +27,7 @@ inherit update-rc.d systemd
 
 EXTRA_OECONF = "\
         --disable-pynslcd \
+        --disable-utils \
         --libdir=${base_libdir} \
         --with-pam-seclib-dir=${base_libdir}/security \
         "
