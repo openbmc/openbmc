@@ -19,6 +19,7 @@ PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=di
 PACKAGECONFIG[static-dual-image] = "-Dbmc-static-dual-image=enabled, -Dbmc-static-dual-image=disabled"
 PACKAGECONFIG[software-update-dbus-interface] = "-Dsoftware-update-dbus-interface=enabled, -Dsoftware-update-dbus-interface=disabled"
 PACKAGECONFIG[bios-software-update] = "-Dbios-software-update=enabled, -Dbios-software-update=disabled, libgpiod libpldm"
+PACKAGECONFIG[i2cvr-software-update] = "-Di2cvr-software-update=enabled, -Di2cvr-software-update=disabled, libpldm libgpiod i2c-tools"
 PACKAGECONFIG ?= "software-update-dbus-interface"
 
 PV = "1.0+git${SRCPV}"
@@ -34,6 +35,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-usb \
     ${PN}-side-switch \
     ${PN}-bios-software-update \
+    ${PN}-i2cvr-software-update \
 "
 # Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
 # handles the rest.
@@ -52,6 +54,7 @@ SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-static-mount-alt.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-prepare-for-sync.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-bios-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', 'xyz.openbmc_project.Software.BIOS.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-i2cvr-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'i2cvr-software-update', 'xyz.openbmc_project.Software.I2CVR.service', '', d)}"
 S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
@@ -99,6 +102,9 @@ FILES:${PN}-side-switch += "\
     "
 FILES:${PN}-bios-software-update += "\
     ${bindir}/phosphor-bios-software-update \
+    "
+FILES:${PN}-i2cvr-software-update += "\
+    ${bindir}/phosphor-i2cvr-software-update \
     "
 
 require ${BPN}.inc
