@@ -15,7 +15,7 @@ OBMC_CHASSIS_INSTANCES = "0 ${OBMC_HOST_INSTANCES}"
 
 OBMC_NIC_INSTANCES = "0 1 2 3"
 
-NCSI_ETH_INTF = "eth0 eth1"
+FB_ETH_INTF = "eth0 eth1"
 
 VIRTUAL-RUNTIME_obmc-host-state-manager = "phosphor-state-manager-host"
 VIRTUAL-RUNTIME_obmc-chassis-state-manager = "phosphor-state-manager-chassis"

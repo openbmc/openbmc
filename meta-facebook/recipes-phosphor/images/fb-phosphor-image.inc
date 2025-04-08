@@ -32,6 +32,9 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-secondary-emmc = " \
 OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-ncsi-nic = " \
     network-wait-ipv6-ll \
     "
+OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-fixed-nic = " \
+    reconfig-interface-duid-ll \
+    "
 
 IMAGE_LINGUAS="en-us"
 

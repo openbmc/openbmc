@@ -1,6 +1,7 @@
 #!/bin/bash
 
-NET_CONFIG_FILE="/etc/systemd/network/00-bmc-eth0.network"
+INTF_NAME="$1"
+NET_CONFIG_FILE="/etc/systemd/network/00-bmc-${INTF_NAME}.network"
 DHCPv6_SETTING_ADD="ClientIdentifier=duid\nIAID=0\nDUIDType=link-layer"
 
 for i in {1..10}; do
@@ -18,7 +19,7 @@ for i in {1..10}; do
     else
         echo "File $NET_CONFIG_FILE not present. Retrying... ($i/10)"
     fi
-    sleep 5s
+    sleep 5
 done
 
 echo "Failed to update $NET_CONFIG_FILE after 10 attempts."
