@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set_gpio()
+{
+    local NET_NAME=$1
+    local OUT_VAL=$2
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "set_gpio: can not find gpio, $NET_NAME"
+        return 1
+    fi
+
+    echo -n "set_gpio: set $NET_NAME = $OUT_VAL"
+    if ! gpioset "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"="$OUT_VAL"; then
+        echo " failed"
+        return 1
+    fi
+
+    echo " success"
+    return 0
+}
+
+get_gpio()
+{
+    local NET_NAME=$1
+    local ret=2
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "get_gpio: can not find gpio, $NET_NAME"
+        return 2
+    fi
+
+    echo -n "get_gpio: get $NET_NAME"
+    if ! ret=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"); then
+        echo " failed"
+        return 2
+    fi
+
+    echo " success"
+    return "${ret}"
+}

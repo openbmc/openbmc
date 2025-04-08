@@ -1,0 +1,13 @@
+[Unit]
+Description=Yosemite5 Early System Init
+Before=phosphor-multi-gpio-monitor.service
+Before=phosphor-pid-control.service
+Before=xyz.openbmc_project.fansensor.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/yosemite5-early-sys-init
+SyslogIdentifier=Yosemite5 Early Init
+
+[Install]
+WantedBy=multi-user.target

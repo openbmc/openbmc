@@ -1,5 +1,10 @@
 # Yosemite5 Image configuration.
 
+# Temporarily add plat-svc for gpio initialization
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    plat-svc \
+"
+
 # Monitor presence gpio status
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \

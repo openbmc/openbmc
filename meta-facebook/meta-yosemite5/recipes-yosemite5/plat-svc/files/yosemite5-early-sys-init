@@ -1,0 +1,40 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
+source /usr/libexec/yosemite5-common-functions
+
+echo "initial value for GPIO output pins"
+# set initial value for GPIO output pins
+
+# A0-A7
+# B0-B7
+set_gpio BMC_READY    1
+# D0-D7
+# E0-E7
+# F0-F7
+# G0-G7
+# H0-H7
+# I0-I7
+# M0-M7
+# N0-N7
+# O0-O7
+# P0-P7
+# Q0-Q7
+# R0-R7
+# S0-S7
+# T0-T7
+# U0-U7
+# V0-V7
+
+# set initial value for IOEXP GPIO output pins
+
+# MB IOEXP
+set_gpio FM_CLKMUX_0_SEL 1
+set_gpio FM_CLKMUX_1_SEL 1
+set_gpio FM_CLKMUX_2_SEL 1
+set_gpio FM_CLKMUX_3_SEL 1
+set_gpio FM_CLKGEN_GPIO4 0
+
+# set BMC ready
+# SGPIO todo
+
+exit 0

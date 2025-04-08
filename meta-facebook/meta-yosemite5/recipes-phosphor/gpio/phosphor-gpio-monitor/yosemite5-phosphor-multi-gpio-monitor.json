@@ -1,0 +1,12 @@
+[
+    {
+        "Name": "ID_RST_BTN_BMC_N",
+        "LineName": "ID_RST_BTN_BMC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["reset_btn@RISING.service"],
+            "FALLING": ["reset_btn@FALLING.service"]
+        },
+        "Continue": true
+    }
+]

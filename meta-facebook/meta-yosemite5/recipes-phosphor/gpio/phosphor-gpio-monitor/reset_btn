@@ -1,0 +1,11 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
+source /usr/libexec/yosemite5-common-functions
+
+input="$1"
+
+if [ "$input" == "RISING" ] ; then
+    set_gpio RST_BMC_RSTBTN_OUT_N       1
+elif [ "$input" == "FALLING" ] ; then
+    set_gpio RST_BMC_RSTBTN_OUT_N       0
+fi
