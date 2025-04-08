@@ -52,7 +52,6 @@ HOST_DEFAULT_TARGETS:append = " \
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-shutdown@{}.target.wants/host-poweroff@{}.service \
     obmc-host-start@{}.target.wants/host-poweron@{}.service \
-    obmc-host-stop@{}.target.wants/phosphor-set-host-transition-to-off@{}.service \
     "
 
 # Host Cycle

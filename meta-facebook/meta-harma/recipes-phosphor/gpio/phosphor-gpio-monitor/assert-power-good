@@ -16,13 +16,6 @@ if [ "$currentstate" == "xyz.openbmc_project.State.Host.HostState.TransitioningT
     exit 0
 fi
 
-# Set Host Power Status Off
-busctl set-property xyz.openbmc_project.State.Host0 \
-    /xyz/openbmc_project/state/host0 \
-    xyz.openbmc_project.State.Host \
-    CurrentHostState s \
-    xyz.openbmc_project.State.Host.HostState.Off
-
 active=$(systemctl is-active host-graceful-poweroff@0.service)
 if [ -z "$active" ] || [ "$active" != "inactive" ]; then
     exit 0
