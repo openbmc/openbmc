@@ -575,6 +575,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
@@ -610,6 +611,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
@@ -645,6 +647,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
@@ -680,6 +683,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
@@ -715,6 +719,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
@@ -750,6 +755,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
@@ -785,6 +791,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
@@ -820,6 +827,7 @@
             ]
         ],
         "Threshold": {
+            "HardShutdownHigh": 150,
             "CriticalHigh": 45
         },
         "Params": {
