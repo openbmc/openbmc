@@ -13,6 +13,29 @@ set_bmc_ready()
     return 0
 }
 
+#Set fixed PWM to 80% before power brick.
+set_fan_pwm_fixed()
+{
+    local mainsource
+    mainsource=$(i2cget -y -f 18 0x20)
+
+    if [[ -n "$mainsource" && "$mainsource" =~ ^0[xX][0-9a-fA-F]+$ ]]; then
+        #Set fixed max31790 PWM to 80%
+        echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm1
+        echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm3
+        echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm4
+        echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0020/hwmon/hwmon*/pwm6
+        sleep 2
+    else
+       #Set fixed nct7363 PWM to 80%
+       echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0023/hwmon/hwmon*/pwm1
+       echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0023/hwmon/hwmon*/pwm5
+       echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0023/hwmon/hwmon*/pwm7
+       echo $((255 * 80/100 )) >/sys/class/i2c-dev/i2c-18/device/18-0023/hwmon/hwmon*/pwm11
+       sleep 2
+    fi
+}
+
 config_fan_max31790()
 {
     # Set fan tack sample count for each tach channel to highest value to avoid
@@ -86,6 +109,7 @@ sleep 2s
 # Temp setting by gpio group and number directly, need to discuss whether need to define in the DTS (long term solution)
 gpioset 0 "$CHIP_PWRGD"=1
 
+set_fan_pwm_fixed
 set_bmc_ready
 power_on_led_init
 mdio_LED_setting_for_marvell_chip
