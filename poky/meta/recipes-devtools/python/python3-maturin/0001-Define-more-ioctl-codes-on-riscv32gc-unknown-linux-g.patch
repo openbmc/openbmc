@@ -1,0 +1,110 @@
+From 4b439b0953573e0383da7e092b1f516ba21f3398 Mon Sep 17 00:00:00 2001
+From: Dan Gohman <dev@sunfishcode.online>
+Date: Sun, 6 Apr 2025 05:22:49 -0700
+Subject: [PATCH] Define Linux ioctl codes on more architectures.
+
+Define ioctl codes including `FICLONE` and `FS_IOC32_GETVERSION` using
+`_IOR` and `_IOW` so that they're automatically supported on all
+architectures, including riscv32gc-unknown-linux-gnu.
+
+Upstream-Status: Backport [https://github.com/rust-lang/libc/pull/4382/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unix/linux_like/linux/arch/generic/mod.rs | 75 ++++---------------
+ 1 file changed, 15 insertions(+), 60 deletions(-)
+
+--- a/src/unix/linux_like/linux/arch/generic/mod.rs
++++ b/src/unix/linux_like/linux/arch/generic/mod.rs
+@@ -1,5 +1,5 @@
+ use crate::prelude::*;
+-use crate::Ioctl;
++use crate::{Ioctl, _IOR, _IOW};
+ 
+ s! {
+     pub struct termios2 {
+@@ -116,21 +116,8 @@ cfg_if! {
+ // pub const SO_PREFER_BUSY_POLL: c_int = 69;
+ // pub const SO_BUSY_POLL_BUDGET: c_int = 70;
+ 
+-cfg_if! {
+-    if #[cfg(any(
+-        target_arch = "x86",
+-        target_arch = "x86_64",
+-        target_arch = "arm",
+-        target_arch = "aarch64",
+-        target_arch = "riscv64",
+-        target_arch = "s390x",
+-        target_arch = "csky",
+-        target_arch = "loongarch64"
+-    ))] {
+-        pub const FICLONE: c_ulong = 0x40049409;
+-        pub const FICLONERANGE: c_ulong = 0x4020940D;
+-    }
+-}
++pub const FICLONE: Ioctl = _IOW::<c_int>(0x94, 9) as Ioctl;
++pub const FICLONERANGE: Ioctl = _IOW::<crate::file_clone_range>(0x94, 13) as Ioctl;
+ 
+ // Defined in unix/linux_like/mod.rs
+ // pub const SCM_TIMESTAMP: c_int = SO_TIMESTAMP;
+@@ -248,49 +235,18 @@ pub const TUNGETVNETBE: Ioctl = 0x800454
+ pub const TUNSETSTEERINGEBPF: Ioctl = 0x800454e0;
+ pub const TUNSETFILTEREBPF: Ioctl = 0x800454e1;
+ 
+-cfg_if! {
+-    // Those type are constructed using the _IOC macro
+-    // DD-SS_SSSS_SSSS_SSSS-TTTT_TTTT-NNNN_NNNN
+-    // where D stands for direction (either None (00), Read (01) or Write (11))
+-    // where S stands for size (int, long, struct...)
+-    // where T stands for type ('f','v','X'...)
+-    // where N stands for NR (NumbeR)
+-    if #[cfg(any(
+-        target_arch = "x86",
+-        target_arch = "arm",
+-        target_arch = "csky"
+-    ))] {
+-        pub const FS_IOC_GETFLAGS: Ioctl = 0x80046601;
+-        pub const FS_IOC_SETFLAGS: Ioctl = 0x40046602;
+-        pub const FS_IOC_GETVERSION: Ioctl = 0x80047601;
+-        pub const FS_IOC_SETVERSION: Ioctl = 0x40047602;
+-        pub const FS_IOC32_GETFLAGS: Ioctl = 0x80046601;
+-        pub const FS_IOC32_SETFLAGS: Ioctl = 0x40046602;
+-        pub const FS_IOC32_GETVERSION: Ioctl = 0x80047601;
+-        pub const FS_IOC32_SETVERSION: Ioctl = 0x40047602;
+-        pub const TUNATTACHFILTER: Ioctl = 0x400854d5;
+-        pub const TUNDETACHFILTER: Ioctl = 0x400854d6;
+-        pub const TUNGETFILTER: Ioctl = 0x800854db;
+-    } else if #[cfg(any(
+-        target_arch = "x86_64",
+-        target_arch = "riscv64",
+-        target_arch = "aarch64",
+-        target_arch = "s390x",
+-        target_arch = "loongarch64"
+-    ))] {
+-        pub const FS_IOC_GETFLAGS: Ioctl = 0x80086601;
+-        pub const FS_IOC_SETFLAGS: Ioctl = 0x40086602;
+-        pub const FS_IOC_GETVERSION: Ioctl = 0x80087601;
+-        pub const FS_IOC_SETVERSION: Ioctl = 0x40087602;
+-        pub const FS_IOC32_GETFLAGS: Ioctl = 0x80046601;
+-        pub const FS_IOC32_SETFLAGS: Ioctl = 0x40046602;
+-        pub const FS_IOC32_GETVERSION: Ioctl = 0x80047601;
+-        pub const FS_IOC32_SETVERSION: Ioctl = 0x40047602;
+-        pub const TUNATTACHFILTER: Ioctl = 0x401054d5;
+-        pub const TUNDETACHFILTER: Ioctl = 0x401054d6;
+-        pub const TUNGETFILTER: Ioctl = 0x801054db;
+-    }
+-}
++pub const FS_IOC_GETFLAGS: Ioctl = _IOR::<c_long>('f' as u32, 1) as Ioctl;
++pub const FS_IOC_SETFLAGS: Ioctl = _IOW::<c_long>('f' as u32, 2) as Ioctl;
++pub const FS_IOC_GETVERSION: Ioctl = _IOR::<c_long>('v' as u32, 1) as Ioctl;
++pub const FS_IOC_SETVERSION: Ioctl = _IOW::<c_long>('v' as u32, 2) as Ioctl;
++pub const FS_IOC32_GETFLAGS: Ioctl = _IOR::<c_int>('f' as u32, 1) as Ioctl;
++pub const FS_IOC32_SETFLAGS: Ioctl = _IOW::<c_int>('f' as u32, 2) as Ioctl;
++pub const FS_IOC32_GETVERSION: Ioctl = _IOR::<c_int>('v' as u32, 1) as Ioctl;
++pub const FS_IOC32_SETVERSION: Ioctl = _IOW::<c_int>('v' as u32, 2) as Ioctl;
++
++pub const TUNATTACHFILTER: Ioctl = _IOW::<crate::sock_fprog>('T' as u32, 213) as Ioctl;
++pub const TUNDETACHFILTER: Ioctl = _IOW::<crate::sock_fprog>('T' as u32, 214) as Ioctl;
++pub const TUNGETFILTER: Ioctl = _IOR::<crate::sock_fprog>('T' as u32, 219) as Ioctl;
+ 
+ cfg_if! {
+     if #[cfg(any(target_arch = "arm", target_arch = "s390x"))] {
