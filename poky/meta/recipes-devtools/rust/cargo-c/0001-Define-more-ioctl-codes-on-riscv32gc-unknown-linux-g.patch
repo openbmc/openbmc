@@ -6,7 +6,7 @@ Subject: [PATCH] Define more ioctl codes on riscv32gc-unknown-linux-gnu
 Define ioctl codes including `FICLONE` and `FS_IOC32_GETVERSION` on
 riscv32gc-unknown-linux-gnu.
 
-Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/4382]
+Upstream-Status: Backport [https://github.com/rust-lang/libc/commit/4b439b0953573e0383da7e092b1f516ba21f3398]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/unix/linux_like/linux/arch/generic/mod.rs | 6 +++++-
