@@ -7,4 +7,4 @@ EXTRA_OEMESON:append = "\
 
 PACKAGECONFIG:append = " insecure-redfish-expand"
 
-MUTUAL_TLS_PARSING="Meta"
+MUTUAL_TLS_PARSING="UserPrincipalName"
