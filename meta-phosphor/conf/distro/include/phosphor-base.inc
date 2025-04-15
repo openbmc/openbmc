@@ -1,7 +1,7 @@
 require conf/distro/include/phosphor-defaults.inc
 
 # Match the distro codename from upstream poky.
-DISTRO_CODENAME ?= "scarthgap"
+DISTRO_CODENAME ?= "styhead"
 
 DISTROOVERRIDES .= ":openbmc-phosphor"
 
@@ -29,17 +29,21 @@ https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
 CONNECTIVITY_CHECK_URIS ?= "https://yoctoproject.org/connectivity.html"
 
 SANITY_TESTED_DISTROS ?= " \
-            poky-4.2 \n \
-            poky-4.3 \n \
-            ubuntu-18.04 \n \
+            poky-5.0 \n \
+            poky-5.1 \n \
             ubuntu-20.04 \n \
             ubuntu-22.04 \n \
-            ubuntu-23.04 \n \
+            ubuntu-24.04 \n \
+            ubuntu-24.10 \n \
             fedora-38 \n \
+            fedora-39 \n \
+            fedora-40 \n \
             centosstream-8 \n \
             debian-11 \n \
             debian-12 \n \
             opensuseleap-15.4 \n \
+            opensuseleap-15.5 \n \
+            opensuseleap-15.6 \n \
             almalinux-8.8 \n \
             almalinux-9.2 \n \
             rocky-9 \n \
