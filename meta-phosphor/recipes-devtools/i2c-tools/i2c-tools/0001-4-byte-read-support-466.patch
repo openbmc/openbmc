@@ -42,9 +42,9 @@ index d315e2f..3a55a95 100644
  	} else if (!strncmp(argv[optind+2], "c", 1)) {
  		size = I2C_SMBUS_BYTE;
  		pec = argv[optind+2][1] == 'p';
-+	} else if (!strncmp(argv[optind+3], "d", 1)) {
++	} else if (!strncmp(argv[optind+2], "d", 1)) {
 +		size = I2C_SMBUS_DWORD;
-+		pec = argv[optind+3][1] == 'p';
++		pec = argv[optind+2][1] == 'p';
  	} else if (!strcmp(argv[optind+2], "i"))
  		size = I2C_SMBUS_I2C_BLOCK_DATA;
  	else {
