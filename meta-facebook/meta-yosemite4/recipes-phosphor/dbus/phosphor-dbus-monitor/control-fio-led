@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+SLOT_BUS=$(($1 - 1))
+ENABLE=$2
+GPIO_CHIP=$(basename "/sys/bus/i2c/devices/$SLOT_BUS-0022/"*gpiochip*)
+
+if [ "$ENABLE" = "true" ]
+then
+    gpio_val=1
+elif [ "$ENABLE" = "false" ]
+then
+    gpio_val=0
+else
+    echo "ENABLE must be true or falea instead of \"$ENABLE\"."
+    exit 255
+fi
+
+if test -z "$SLOT_BUS"
+then
+    echo "Slot number(1st parameter) is required."
+    exit 255
+elif [ "$SLOT_BUS" -gt 7 ] || [ "$SLOT_BUS" -lt 0 ]
+then
+    echo "Slot number must between 1~8."
+    exit 255
+fi
+
+gpioset "$GPIO_CHIP" 9=$gpio_val
+
+exit 0

@@ -1,0 +1,351 @@
+- name: slot 4 critical alarm path group
+  class: group
+  group: path
+  members:
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/SENTINEL_DOME_SLOT_4_MB_PMON_E1S_BOOT_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/SENTINEL_DOME_SLOT_4_MB_PMON_E1S_DATA_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/SENTINEL_DOME_SLOT_4_MB_VR_CPU0_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/SENTINEL_DOME_SLOT_4_MB_VR_CPU1_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/SENTINEL_DOME_SLOT_4_MB_VR_PVDD11_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/SENTINEL_DOME_SLOT_4_MB_VR_PVDDIO_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/SENTINEL_DOME_SLOT_4_MB_VR_SOC_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_PMON_E1S0_P12V_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_PMON_P12V_STBY_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V85_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V8_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_AB_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_CD_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V85_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V8_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_AB_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/current/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_CD_CURR_A
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A0_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A10_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A11_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A1_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A2_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A3_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A4_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A5_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A6_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A7_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A8_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_DIMM_A9_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_CPU_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_PMON_E1S_BOOT_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_PMON_E1S_DATA_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_VR_CPU0_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_VR_CPU1_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_VR_PVDD11_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_VR_PVDDIO_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/SENTINEL_DOME_SLOT_4_MB_VR_SOC_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_PMON_E1S0_P12V_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_PMON_P12V_STBY_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V85_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V8_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_AB_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_CD_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V85_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V8_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_AB_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/power/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_CD_PWR_W
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A0_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A10_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A11_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A1_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A2_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A3_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A4_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A5_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A6_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A7_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A8_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_DIMM_A9_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_CPU_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/CALIBRATED_SENTINEL_DOME_SLOT_4_MB_FIO_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_INLET_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_OUTLET_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_SSD_BOOT_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_SSD_DATA_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_VR_CPU0_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_VR_CPU1_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_VR_PVDD11_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_VR_PVDDIO_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/SENTINEL_DOME_SLOT_4_MB_VR_SOC_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_CXL1_CNTR_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_CXL2_CNTR_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_E1S_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_INLET_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_A0_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_A1_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_B0_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO3_DIMM_B1_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_A0_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_A1_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_B0_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_MCIO4_DIMM_B1_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V85_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V8_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_AB_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_CD_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V85_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V8_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_AB_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/temperature/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_CD_TEMP_C
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_DIMM0_P12V_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_DIMM1_P12V_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_P12V_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_P1V2_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_P1V8_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_P3V3_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_P3V_BAT_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_P5V_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_PVDD11_S3_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_PVDD18_S5_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_PVDD33_S5_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_SIDECAR_DETECT_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_ADC_SLOT_DETECT_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_PMON_E1S_BOOT_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_PMON_E1S_DATA_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_VR_CPU0_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_VR_CPU1_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_VR_PVDD11_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_VR_PVDDIO_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/SENTINEL_DOME_SLOT_4_MB_VR_SOC_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC1_P0V75_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC1_P1V2_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC1_P1V8_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC1_PVPP_AB_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC1_PVPP_CD_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC1_PVTT_AB_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC1_PVTT_CD_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC2_P0V75_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC2_P1V2_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC2_P1V8_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC2_PVPP_AB_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC2_PVPP_CD_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC2_PVTT_AB_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_ASIC2_PVTT_CD_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_E1S0_P3V3_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_P1V2_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_ADC_P3V3_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_PMON_E1S0_P12V_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_PMON_P12V_STBY_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V85_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_P0V8_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_AB_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC1_PVDDQ_CD_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V85_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_P0V8_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_AB_VOLT_V
+      - meta: PATH
+        path: /xyz/openbmc_project/sensors/voltage/WAILUA_FALLS_SLOT_4_WF_VR_ASIC2_PVDDQ_CD_VOLT_V
+- name: slot critical alarm property
+  class: group
+  group: property
+  type: boolean
+  members:
+      - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+        meta: PROPERTY
+        property: CriticalAlarmHigh
+      - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+        meta: PROPERTY
+        property: CriticalAlarmLow
+
+- name: slot 4 critical alarm assert
+  class: watch
+  watch: property
+  paths: slot 4 critical alarm path group
+  properties: slot critical alarm property
+  callback: check if slot critical threshold assert
+
+- name: slot 4 critical alarm deassert
+  class: watch
+  watch: property
+  paths: slot 4 critical alarm path group
+  properties: slot critical alarm property
+  callback: check if slot critical threshold deassert
+
+- name: check if slot critical threshold assert
+  class: condition
+  condition: count
+  paths: slot 4 critical alarm path group
+  properties: slot critical alarm property
+  callback: set slot led fault
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: true
+
+- name: check if slot critical threshold deassert
+  class: condition
+  condition: count
+  paths: slot 4 critical alarm path group
+  properties: slot critical alarm property
+  callback: set slot led good
+  countop: "<"
+  countbound: 1
+  op: "=="
+  bound: true
+
+- name: set slot led fault
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: enable-fio-led@4.service
+        type: string
+      - value: replace
+        type: string
+
+- name: set slot led good
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: disable-fio-led@4.service
+        type: string
+      - value: replace
+        type: string
