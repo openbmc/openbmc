@@ -6,6 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd"
+RDEPENDS:${PN} = "openssl-bin"
 
 inherit meson pkgconfig obmc-phosphor-ipmiprovider-symlink
 
