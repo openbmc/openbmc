@@ -23,6 +23,7 @@ inherit setuptools3
 
 RDEPENDS:${PN} += " \
     ${PYTHON_PN}-inflection \
+    ${PYTHON_PN}-jsonschema \
     ${PYTHON_PN}-mako \
     ${PYTHON_PN}-pyyaml \
     "
