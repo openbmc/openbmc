@@ -59,6 +59,38 @@
             "ignoreDbusMinMax": true
         },
         {
+            "name": "IOB0_NIC0_OSFP_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/IOB0_NIC0_OSFP_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
+            "name": "IOB0_NIC1_OSFP_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/IOB0_NIC1_OSFP_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
+            "name": "IOB1_NIC0_OSFP_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/IOB1_NIC0_OSFP_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
+            "name": "IOB1_NIC1_OSFP_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/IOB1_NIC1_OSFP_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
             "name": "FAN0_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_IL_SPEED_RPM",
@@ -417,6 +449,63 @@
                         "PDB_MAX_VR_TEMP_C"
                     ],
                     "setpoint": 100.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "proportionalCoeff": -3.0,
+                        "integralCoeff": -0.0035,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": -50.0,
+                        "integralLimit_max": 100.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 2,
+                        "checkHysterWithSetpt": true
+                    }
+                },
+                {
+                    "name": "STEPWISE_OSFP",
+                    "type": "stepwise",
+                    "inputs": [
+                        "IOB0_NIC0_OSFP_TEMP_C",
+                        "IOB0_NIC1_OSFP_TEMP_C",
+                        "IOB1_NIC0_OSFP_TEMP_C",
+                        "IOB1_NIC1_OSFP_TEMP_C"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 50,
+                            "1": 55,
+                            "2": 60,
+                            "3": 68
+                        },
+                        "output": {
+                            "0": 40,
+                            "1": 45,
+                            "2": 55,
+                            "3": 90
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 2
+                    }
+                },
+                {
+                    "name": "PID_OSFP",
+                    "type": "temp",
+                    "inputs": [
+                        "IOB0_NIC0_OSFP_TEMP_C",
+                        "IOB0_NIC1_OSFP_TEMP_C",
+                        "IOB1_NIC0_OSFP_TEMP_C",
+                        "IOB1_NIC1_OSFP_TEMP_C"
+                    ],
+                    "setpoint": 65.0,
                     "pid": {
                         "samplePeriod": 1,
                         "proportionalCoeff": -3.0,
