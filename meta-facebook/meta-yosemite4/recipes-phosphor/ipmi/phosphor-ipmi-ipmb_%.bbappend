@@ -3,5 +3,5 @@ IPMB_CHANNELS:yosemite4 = "\
     "
 
 IPMB_REMOTE_ADDR:yosemite4 = "\
-    30 \
+    96 \
     "
