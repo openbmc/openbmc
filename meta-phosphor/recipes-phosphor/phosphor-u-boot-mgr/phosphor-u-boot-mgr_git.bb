@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SRC_URI = "git://github.com/openbmc/phosphor-u-boot-env-mgr.git;branch=master;protocol=https"
 
-SRCREV = "516faacd7f8d224f15cc041cc486290b43cf4911"
+SRCREV = "7e4ddca0a381de1612c95f57ce9ae689acee5b85"
 
 inherit meson systemd pkgconfig
 SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.U_Boot.Environment.Manager.service"
