@@ -7,6 +7,8 @@ slot=$2
 bus=$((24 + slot))
 # Static EID for NIC are 90~93.
 eid=$((90 + slot))
+# NIC version.
+version=""
 
 sleep 2
 
@@ -24,10 +26,33 @@ set_nic_eid() {
     done
 }
 
+set_nic_version() {
+    MAX_RETRIES=3
+    RETRY_COUNT=0
+    while [ "$RETRY_COUNT" -lt "$MAX_RETRIES" ]; do
+        version=$(
+            pldmtool fw_update GetFwParams -m $eid |
+                jq --raw-output \
+                    '.ComponentParameterEntries | .[].ActiveComponentVersionString'
+        )
+
+        if [ -n "$version" ]; then
+            busctl set-property xyz.openbmc_project.Settings "/xyz/openbmc_project/software/chassis/nic$slot" xyz.openbmc_project.Software.Version Version "s" "$version"
+            break
+        else
+            echo "Version is empty, retrying... ($((RETRY_COUNT + 1))/$MAX_RETRIES)"
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            sleep 5
+        fi
+    done
+}
+
 if [ "$action" = "add" ]; then
     echo "Adding MCTP endpoint for slot $slot"
     set_nic_eid
+    set_nic_version
 elif [ "$action" = "remove" ]; then
     echo "Removing MCTP endpoint for slot $slot"
     busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/${eid} au.com.codeconstruct.MCTP.Endpoint1 Remove
+    busctl set-property xyz.openbmc_project.Settings "/xyz/openbmc_project/software/chassis/nic$slot" xyz.openbmc_project.Software.Version Version "s" "$version"
 fi
