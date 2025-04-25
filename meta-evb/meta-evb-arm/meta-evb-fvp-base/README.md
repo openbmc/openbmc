@@ -17,20 +17,25 @@ The management controller communicates with the following components of the serv
                                                                                  |
          +--------------------------+                                  +-------------------------+
          |         Base FVP         |                                  |  Neoverse RD-V3-R1 FVP  |
-         |                          |                                  |                         |
          |                          |                                  |     ______________      |
          |                          |                                  |    |              |     |
-         |             /dev/ttyAMA2 |--------- IPMI over UART ---------|----|      AP      |     |
-         |                          |                                  |    |______________|     |
+    SOL--|------------ /dev/ttyAMA3 |------- Host Serial Console ------|----|              |     |
+         |                          | (terminal_3) (terminal_ns_uart0) |    |              |     |
+         |                          |                                  |    |      AP      |     |
+         |                          |                                  |    |              |     |
+         |             /dev/ttyAMA2 |--------- IPMI over UART ---------|----|              |     |
+         |                          | (terminal_2)        (terminal_3) |    |______________|     |
          |                          |                                  |                         |
          |                          |                                  |                         |
          |                          |             PLDM over            |                         |
          |                          |             MCTP over            +-------+         +-------+
-Redfish--|             /dev/ttyAMA1 |-------------- UART --------------|  MCP  |         |  SCP  |
-         +--------------------------+ (terminal_1)        (terminal_0) +-------+---------+-------+
-                      |                                                    |                |
-               FVP debug console                                           |             debug console
-                 (terminal_0)                                              |             (terminal_uart_scp)
+Redfish--|             /dev/ttyAMA1 |-------------- UART --------------|       |         |       |
+         |                          | (terminal_1)        (terminal_0) |  MCP  |         |  SCP  |
+         | /dev/ttyAMA0             |                                  |       |         |       |
+         +--------------------------+                                  +-------+---------+-------+
+                 |                                                         |                |
+          FVP debug console                                                |             debug console
+          (terminal_0)                                                     |             (terminal_uart_scp)
                                                                      debug console
                                                                      (terminal_uart_mcp)
 ```
@@ -41,6 +46,7 @@ Redfish--|             /dev/ttyAMA1 |-------------- UART --------------|  MCP  |
 - The MCP exposes a temperature sensor which our image then exposes over redfish
     - pldmd should automatically pick up this sensor and expose it on dbus
 - The MCP has a PLDM Event which can be retrieved by pldmd upon using ```pldm event``` command from MCP debug console
+- Host serial console access in BMC (SOL).
 
 ## Setup
 
@@ -86,6 +92,17 @@ Redfish--|             /dev/ttyAMA1 |-------------- UART --------------|  MCP  |
 5. Query Redfish Sensor and Event
    - ```curl --insecure -u root:0penBmc -X GET https://127.0.0.1:4223/redfish/v1/Chassis/PLDM_Device_1/Thermal```
    - ```curl --insecure -u root:0penBmc -X GET https://127.0.0.1:4223/redfish/v1/Systems/system/LogServices/PldmEvent/Entries/```
+
+### SOL Access
+
+1. Connect host console (terminal_ns_uart0) to BMC (terminal_3) with
+   ```socat -x tcp:localhost:5005 tcp:localhost:5067```
+   - The port numbers are just examples. They can be hardcoded in the FVP config. Otherwise, the FVP will assign them dynamically
+   - ```-x``` tells socat to print the bytes being transferred
+2. In BMC debug console execute following command to update host state as running.
+   - ```busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Running```
+3. Log-in to BMC webui (Access via ```https://127.0.0.1:4223```).
+4. In the Overview page click the ```SOL console``` button to access host serial console.
 
 ## Known Issues
 - Because both FVP are running independently, there can be an issue with timeout.
