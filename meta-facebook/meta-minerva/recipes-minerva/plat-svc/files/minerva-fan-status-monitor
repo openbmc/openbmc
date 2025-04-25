@@ -3,17 +3,19 @@
 FAN_STATUS_UNKNOWN="Unknown"
 FAN_STATUS_NORMAL="Normal"
 FAN_STATUS_ABNORMAL="Abnormal"
+FAN_FAIL_REASON=""
 
 create_log()
 {
     local service="xyz.openbmc_project.Logging"
     local object_path="/xyz/openbmc_project/logging"
     local interface="xyz.openbmc_project.Logging.Create"
-    local message="Fan status abnormal"
+    local message="Fan status abnormal: $FAN_FAIL_REASON"
     local severity="xyz.openbmc_project.Logging.Entry.Level.Error"
     local arg="CALLOUT_INVENTORY_PATH"
     local value="/xyz/openbmc_project/inventory/fan"
 
+    echo "Creating log: $message"
     busctl call "$service" "$object_path" "$interface" Create "ssa{ss}" "$message" "$severity" 1 "$arg" "$value"
 }
 
@@ -36,11 +38,6 @@ check_fcb_fan_status()
 {
     local fcb_num=$1
 
-    if ! [[ $fcb_num =~ ^[1-6]$ ]]; then
-        echo "$FAN_STATUS_UNKNOWN"
-        return 1
-    fi
-
     local service="xyz.openbmc_project.FanSensor"
     local interface="xyz.openbmc_project.Sensor.Threshold.Critical"
     local property_list=("CriticalAlarmHigh" "CriticalAlarmLow")
@@ -50,24 +47,27 @@ check_fcb_fan_status()
     do
         local fan_number=$((((fcb_num - 1) * 4) + (index / 2) + 1))
         local io_index=$((index % 2))
-        local object_path="/xyz/openbmc_project/sensors/fan_tach/FCB_${fcb_num}_FAN_${fan_number}_TACH_${in_out[$io_index]}_SPEED_RPM"
+        local sensor_name="FCB_${fcb_num}_FAN_${fan_number}_TACH_${in_out[$io_index]}_SPEED_RPM"
+        local object_path="/xyz/openbmc_project/sensors/fan_tach/$sensor_name"
+
         for property in "${property_list[@]}"; do
             tach_alarm=$(busctl get-property "$service" "$object_path" "$interface" "$property" | cut -d ' ' -f2)
             if [ "$tach_alarm" = "true" ]; then
-                echo "$FAN_STATUS_ABNORMAL"
+                echo "$FAN_STATUS_ABNORMAL|$sensor_name $property alarm"
                 return 0
             fi
         done
+
         # Check FCB whether is AC off
         local operation_interface="xyz.openbmc_project.State.Decorator.OperationalStatus"
         functional=$(busctl get-property "$service" "$object_path" "$operation_interface" Functional | awk '{print $NF}')
         if [ "$functional" = "false" ]; then
-            echo "$FAN_STATUS_ABNORMAL"
+            echo "$FAN_STATUS_ABNORMAL|FCB$fcb_num is not functional. The AC may be off."
             return 0
         fi
     done
 
-    echo "$FAN_STATUS_NORMAL"
+    echo "$FAN_STATUS_NORMAL|"
     return 0
 }
 
@@ -76,21 +76,25 @@ pre_status=$FAN_STATUS_UNKNOWN
 while true
 do
     fan_status=$FAN_STATUS_NORMAL
+    FAN_FAIL_REASON=""
 
     # FCB1 ~ FCB6
     for i in {1..6}
     do
         # Check the presence of each FCB
         presence=$(busctl get-property xyz.openbmc_project.Inventory.Manager \
-                /xyz/openbmc_project/inventory/system/board/Minerva_CMM/FCB_"${i}" \
-                xyz.openbmc_project.Inventory.Item Present | awk '{print $NF}')
+            /xyz/openbmc_project/inventory/system/board/Minerva_CMM/FCB_"${i}" \
+            xyz.openbmc_project.Inventory.Item Present | awk '{print $NF}')
 
         if [ "$presence" != "true" ]; then
             fan_status=$FAN_STATUS_ABNORMAL
+            FAN_FAIL_REASON="FCB$i not present"
             break
         else
             # Check each sensor on the FCB whether alert critical alarm
-            fan_status=$(check_fcb_fan_status "$i")
+            result=$(check_fcb_fan_status "$i")
+            fan_status=$(echo "$result" | cut -d '|' -f1)
+            FAN_FAIL_REASON=$(echo "$result" | cut -d '|' -f2)
             if [ "$fan_status" = "$FAN_STATUS_ABNORMAL" ]; then
                 break
             fi
