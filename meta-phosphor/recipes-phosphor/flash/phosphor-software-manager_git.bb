@@ -20,6 +20,7 @@ PACKAGECONFIG[static-dual-image] = "-Dbmc-static-dual-image=enabled, -Dbmc-stati
 PACKAGECONFIG[software-update-dbus-interface] = "-Dsoftware-update-dbus-interface=enabled, -Dsoftware-update-dbus-interface=disabled"
 PACKAGECONFIG[bios-software-update] = "-Dbios-software-update=enabled, -Dbios-software-update=disabled, libgpiod libpldm"
 PACKAGECONFIG[i2cvr-software-update] = "-Di2cvr-software-update=enabled, -Di2cvr-software-update=disabled, libpldm libgpiod i2c-tools"
+PACKAGECONFIG[eepromdevice-software-update] = "-Deepromdevice-software-update=enabled, -Deepromdevice-software-update=disabled, libgpiod libpldm"
 PACKAGECONFIG ?= "software-update-dbus-interface"
 
 PV = "1.0+git${SRCPV}"
@@ -36,6 +37,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-side-switch \
     ${PN}-bios-software-update \
     ${PN}-i2cvr-software-update \
+    ${PN}-eepromdevice-software-update \
 "
 # Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
 # handles the rest.
@@ -55,6 +57,7 @@ SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-prepare-for-sync.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-bios-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', 'xyz.openbmc_project.Software.BIOS.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-i2cvr-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'i2cvr-software-update', 'xyz.openbmc_project.Software.I2CVR.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-eepromdevice-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'eepromdevice-software-update', 'xyz.openbmc_project.Software.EEPROMDevice.service', '', d)}"
 S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
@@ -111,6 +114,9 @@ FILES:${PN}-bios-software-update += "\
     "
 FILES:${PN}-i2cvr-software-update += "\
     ${libexecdir}/phosphor-code-mgmt/phosphor-i2cvr-software-update \
+    "
+FILES:${PN}-eepromdevice-software-update += "\
+    ${libexecdir}/phosphor-code-mgmt/phosphor-eepromdevice-software-update \
     "
 
 require ${BPN}.inc
