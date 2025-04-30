@@ -1,6 +1,6 @@
 [Unit]
 Description=Ventura Early System Init
-Before=phosphor-pid-control.service
+Before=xyz.openbmc_project.EntityManager.service
 
 [Service]
 Type=oneshot
