@@ -26,14 +26,16 @@
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD_SSD0_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
         },
         {
             "name": "HDDBOARD_SSD2_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD_SSD2_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
         },
         {
             "name": "PDB_P48V_HSC1_TEMP_C",
