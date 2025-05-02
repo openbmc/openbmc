@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# shellcheck disable=SC2043
+for nic in @IFS@; do
+  confdir="/etc/systemd/network/-bmc-${nic}.network.d"
+  mkdir -p "${confdir}"
+  echo "[Network]" > "${confdir}/10-ra-config.conf"
+  echo "IPv6AcceptRA=true" >> "${confdir}/10-ra-config.conf"
+  networkctl reload && networkctl reconfigure "${nic}"
+done
+

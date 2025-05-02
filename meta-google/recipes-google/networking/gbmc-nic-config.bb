@@ -17,6 +17,7 @@ SRC_URI += " \
   file://gbmc-nic-neigh.sh.in \
   file://gbmc-nic-ra.sh \
   file://gbmc-nic-ra@.service \
+  file://gbmc-nic-devlab-config.sh.in \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrnicdhcp.netdev'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrnicdhcp.network'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcnicdhcp.netdev'} \
@@ -31,6 +32,7 @@ FILES:${PN} += " \
   ${sysconfdir}/nftables \
   ${systemd_system_unitdir} \
   ${datadir}/gbmc-ip-monitor \
+  ${bindir}/gbmc-nic-devlab-config.sh \
   "
 
 RDEPENDS:${PN}:append = " \
@@ -84,4 +86,9 @@ do_install:append:local() {
     install -d -m0755 $netdir/-bmc-$intf.network.d
     install -m0644 ${WORKDIR}/10-dhcp4.conf $netdir/-bmc-$intf.network.d/10-dhcp4.conf
   done
+
+  install -d -m0755 ${D}${bindir}
+  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${WORKDIR}/gbmc-nic-devlab-config.sh.in \
+      >${D}${bindir}/gbmc-nic-devlab-config.sh
+  chmod 755 ${D}${bindir}/gbmc-nic-devlab-config.sh
 }
