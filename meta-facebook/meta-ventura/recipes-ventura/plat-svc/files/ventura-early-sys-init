@@ -48,21 +48,20 @@ config_fan_max31790()
     # |------------------------------------------------------------------------|
     # | tach sample count|  1   |  2   |  4   |  8   |  16  |  32              |
     # |------------------------------------------------------------------------|
-    for addr in "0x21" "0x27"
-    do
-        for offset in $(seq 0x08 0x0d)
-        do
-            fan_dynam_val=$(printf "%d" "$(i2cget -y -f 18 "$addr" "$offset")")
-            fan_dynam_val=$((fan_dynam_val | 0xe0))
-            i2cset -y -f 18 "$addr" "$offset" "$fan_dynam_val"
-        done
+    addr=0x20
 
-        # after manual set FanX_Dynamics, needs to rebind driver to ensure
-        # driver get correct setitngs
-        bus_addr="$(printf "18-%04x" $addr)"
-        echo "$bus_addr" > /sys/bus/i2c/drivers/max31790/unbind
-        echo "$bus_addr" > /sys/bus/i2c/drivers/max31790/bind
+    for offset in $(seq 0x08 0x0d)
+    do
+        fan_dynam_val=$(printf "%d" "$(i2cget -y -f 18 "$addr" "$offset")")
+        fan_dynam_val=$((fan_dynam_val | 0xe0))
+        i2cset -y -f 18 "$addr" "$offset" "$fan_dynam_val"
     done
+
+    # after manual set FanX_Dynamics, needs to rebind driver to ensure
+    # driver get correct setitngs
+    bus_addr="$(printf "18-%04x" $addr)"
+    echo "$bus_addr" > /sys/bus/i2c/drivers/max31790/unbind
+    echo "$bus_addr" > /sys/bus/i2c/drivers/max31790/bind
 
     # set fan enable
     if find /sys/bus/i2c/devices/*/hwmon/*/fan*_enable -print -quit 2>/dev/null | grep -q .; then
@@ -75,7 +74,7 @@ config_fan_max31790()
 
 config_fan()
 {
-    if [ -d "/sys/bus/i2c/drivers/max31790/18-0021/hwmon" ]; then
+    if [ -d "/sys/bus/i2c/drivers/max31790/18-0020/hwmon" ]; then
         echo "Configure MAX31790 fan controller"
         config_fan_max31790
     fi
