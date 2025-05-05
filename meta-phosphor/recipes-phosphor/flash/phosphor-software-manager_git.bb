@@ -82,29 +82,35 @@ RPROVIDES:${PN}-version += " \
     virtual-obmc-image-manager \
 "
 
-FILES:${PN}-version += "${bindir}/phosphor-version-software-manager ${exec_prefix}/lib/tmpfiles.d/software.conf ${bindir}/phosphor-software-manager "
-FILES:${PN}-download-mgr += "${bindir}/phosphor-download-manager"
+FILES:${PN}-version += " \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-version-software-manager \
+    ${exec_prefix}/lib/tmpfiles.d/software.conf \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-software-manager \
+    "
+FILES:${PN}-download-mgr += " \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-download-manager \
+    "
 FILES:${PN}-updater += " \
-    ${bindir}/phosphor-image-updater \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-image-updater \
     ${bindir}/obmc-flash-bmc \
     /usr/local \
     "
 FILES:${PN}-sync += " \
-    ${bindir}/phosphor-sync-software-manager \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-sync-software-manager \
     ${sysconfdir}/synclist \
     "
 FILES:${PN}-usb += "\
     ${base_libdir}/udev/rules.d/70-bmc-usb.rules \
-    ${bindir}/phosphor-usb-code-update \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-usb-code-update \
     "
 FILES:${PN}-side-switch += "\
-    ${bindir}/phosphor-bmc-side-switch \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-bmc-side-switch \
     "
 FILES:${PN}-bios-software-update += "\
-    ${bindir}/phosphor-bios-software-update \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-bios-software-update \
     "
 FILES:${PN}-i2cvr-software-update += "\
-    ${bindir}/phosphor-i2cvr-software-update \
+    ${libexecdir}/phosphor-code-mgmt/phosphor-i2cvr-software-update \
     "
 
 require ${BPN}.inc
