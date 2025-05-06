@@ -2,8 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 inherit obmc-phosphor-systemd systemd
 
-SRC_URI += "file://assert-gpio-log@.service \
-            file://assert-post-end \
+SRC_URI += "file://assert-post-end \
             file://assert-post-end.service \
             file://assert-power-good \
             file://assert-power-good.service \
@@ -14,7 +13,6 @@ SRC_URI += "file://assert-gpio-log@.service \
             file://auto-poweroff@.service \
             file://auto-poweron \
             file://auto-poweron@.service \
-            file://deassert-gpio-log@.service \
             file://deassert-post-end \
             file://deassert-post-end.service \
             file://deassert-power-good \
@@ -26,16 +24,28 @@ SRC_URI += "file://assert-gpio-log@.service \
             file://device-reinitial \
             file://device-reinitial@.service \
             file://device-util \
-            file://logging \
+            file://fan-reload \
+            file://fan-reload.service \
+            file://gpios-assert-log@.service \
+            file://gpios-deassert-log@.service \
+            file://gpios-event-logger \
+            file://leak-detect-assert-log@.service \
+            file://leak-detect-deassert-log@.service \
+            file://leak-detect-event-logger \
+            file://logging-util \
             file://multi-gpios-sys-init \
             file://multi-gpios-sys-init.service \
             file://plat-phosphor-multi-gpio-monitor.json \
             file://plat-phosphor-multi-gpio-presence.json \
-            file://fan-reload \
-            file://fan-reload.service \
+            file://power-rail-assert-log@.service \
+            file://power-rail-deassert-log@.service \
+            file://power-rail-event-logger \
+            file://thermaltrip-assert-log@.service \
+            file://thermaltrip-deassert-log@.service \
             file://thermal-event-logger \
-            file://assert-thermtrip.service \
-            file://deassert-thermtrip.service \
+            file://vr-fault-assert-log@.service \
+            file://vr-fault-deassert-log@.service \
+            file://vr-fault-event-logger \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -73,7 +83,13 @@ do_install:append:() {
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
-    install -m 0755 ${UNPACKDIR}/logging ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/gpios-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/leak-detect-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
+
+    install -m 0755 ${UNPACKDIR}/logging-util ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
 
     install -m 0755 ${UNPACKDIR}/assert-reset-button ${D}${libexecdir}/${PN}/

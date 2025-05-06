@@ -4,29 +4,29 @@
 source /usr/libexec/phosphor-gpio-monitor/logging-util
 
 HELP="
-Usage: thermal-event-logger <event> <id_gpio-name>
-<event> is the thermal event to log,
-e.g. DeviceOverOperatingTemperatureFault / DeviceOperatingNormalTemperature.
+Usage: leak-detect-event-logger <event> <id_gpio-name>
+<event> is the leak detect event to log,
+e.g. LeakDetectedCritical / LeakDetectedNormal.
 
 <id_gpio-name> is defined in json file,
-e.g. 2_cpu0-thermtrip-alert.service
+e.g. 0_leakage-detect-alert
 "
 
 # get assert or deassert message
-if [ "$1" == "DeviceOverOperatingTemperatureFault" ]; then
+if [ "$1" == "LeakDetectedCritical" ]; then
   action="assert"
-elif [ "$1" == "DeviceOperatingNormalTemperature" ]; then
+elif [ "$1" == "LeakDetectedNormal" ]; then
   action="deassert"
 fi
 
-MESSAGE=$2
 # get gpio chip ID
+MESSAGE=$2
 number="${MESSAGE%%_*}"
 
 # remove prefix from 0_xxxxxx to xxxxxx
 GPIO_NAME="${MESSAGE#*_}"
-MSG_ID="xyz.openbmc_project.State.Thermal.$1"
-DEVICE_PATH="/xyz/openbmc_project/State/Thermal/host0"
+MSG_ID="xyz.openbmc_project.State.Leak.Detector.$1"
+DEVICE_PATH="/xyz/openbmc_project/state/leak/detector/ComputeBlade"
 STASH_FILE="/run/${GPIO_NAME}.log_entry"
 
 if gpio_logging_valid "$number" "$action" ; then
@@ -35,20 +35,20 @@ if gpio_logging_valid "$number" "$action" ; then
             echo "$HELP"
             ;;
 
-        "DeviceOverOperatingTemperatureFault")
+        "LeakDetectedCritical")
             if [ ! -s "$STASH_FILE" ]; then
                  /usr/bin/log-create "$MSG_ID" --json \
-                     "{ \"DEVICE\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}" \
+                     "{ \"DETECTOR_NAME\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}" \
                      > "${STASH_FILE}"
             fi
             ;;
 
-        "DeviceOperatingNormalTemperature")
+        "LeakDetectedNormal")
             if [ -e "${STASH_FILE}" ]; then
                 log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
             fi
             /usr/bin/log-create "$MSG_ID" --json \
-                "{ \"DEVICE\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}"
+                "{ \"DETECTOR_NAME\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}"
             ;;
     esac
 fi

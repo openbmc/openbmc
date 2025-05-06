@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/gpio/phosphor-gpio-monitor/logging-util
+source /usr/libexec/phosphor-gpio-monitor/logging-util
+
+# get assert or deassert message
+action=$1
+
+# get gpio chip ID
+MESSAGE=$2
+number="${MESSAGE%%_*}"
+
+# remove prefix from 0_xxxx to xxxx
+GPIO_NAME="${MESSAGE#*_}"
+# object path
+MSG_ID="$GPIO_NAME gpio $action"
+
+if gpio_logging_valid "$number" "$action"; then
+    busctl call \
+    xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MSG_ID" \
+    xyz.openbmc_project.Logging.Entry.Level.Error 1 "GPIO" "$GPIO_NAME"
+fi

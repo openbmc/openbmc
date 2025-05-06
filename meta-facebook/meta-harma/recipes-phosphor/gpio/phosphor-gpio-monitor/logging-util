@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+gpio_logging_valid() {
+  # get gpio chip id
+  number=$1
+
+  # get assert or deassert message
+  action=$2
+
+  if [ -z "$number" ] || [ -z "$action" ]; then
+      return 0
+  fi
+
+  check_valid_sgpio
+  valid_sgpio=$?
+
+  if [ "$valid_sgpio" -eq 0 ] || [ "$number" -ne 2 ] || [ "$action" == "assert" ]; then
+      # This delay ensures the BMC does not receive abnormal events
+      # during CMM/MB AC cycling or tray unplugging.
+      # Such actions can cause the CPLD to lose power before the BMC,
+      # leading to abnormal events being received.
+      sleep 2
+      return 0
+  else
+      return 1
+  fi
+}

@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Leak Detect Deassert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/leak-detect-event-logger "LeakDetectedNormal" "%i"
+SyslogIdentifier=%i-leak-detect-deassert
