@@ -1,0 +1,95 @@
+- name: fanboard_fan_rotor_fault_path_group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN0_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN0_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN1_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN1_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN2_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN2_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN3_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN3_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN7_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN7_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_OUTLET_SPEED_RPM
+
+# define fan speed value property
+- name: fan_rotor_fault_property
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+      meta: PROPERTY
+      property: CriticalAlarmLow
+
+# call counts check when fan speed is 0
+- name: fan_rotor_fault_alarm
+  class: watch
+  watch: property
+  paths: fanboard_fan_rotor_fault_path_group
+  properties: fan_rotor_fault_property
+  callback: check_fanboard_rotor_fault_threshold
+
+# check counts of both Fanboard Rotor Fail
+- name: check_fanboard_rotor_fault_threshold
+  class: condition
+  condition: count
+  paths: fanboard_fan_rotor_fault_path_group
+  properties: fan_rotor_fault_property
+  callback: set_all_slots_power_off
+  countop: ">"
+  countbound: 2
+  op: "=="
+  bound: true
+
+- name: set_all_slots_power_off
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: fan-rotor-fail-mechanism.service
+        type: string
+      - value: replace
+        type: string

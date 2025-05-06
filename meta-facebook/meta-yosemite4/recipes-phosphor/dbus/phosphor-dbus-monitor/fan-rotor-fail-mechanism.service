@@ -1,0 +1,6 @@
+[Unit]
+Description=Add an event log for the fan fail mechanism then shut down 8 hosts.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-dbus-monitor/fan-rotor-fail-mechanism
