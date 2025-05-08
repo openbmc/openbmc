@@ -8,11 +8,15 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <thread>
 #include <unordered_map>
+
+#include <config.h>
 
 using namespace std::chrono_literals;
 
@@ -159,21 +163,113 @@ void rebind_i2c(std::string number) {
   std::cerr << std::format("{} bound\n", number);
 }
 
+void set_gpio_raw(int chip_num, int bit_num, int value) {
+  std::string syspath = std::format("gpiochip{}", chip_num);
+  std::cerr << std::format("Setting gpiochip{} bit {} to {}\n", chip_num,
+                           bit_num, value);
+  try {
+    gpiod::chip chip(syspath);
+    gpiod::line line = chip.get_line(bit_num);
+    line.request({app_name, gpiod::line_request::DIRECTION_OUTPUT, 0}, value);
+    std::cerr << std::format("gpiochip{} bit {} set to {}\n", chip_num, bit_num,
+                             value);
+  } catch (const std::system_error &e) {
+    std::cerr << std::format("Error setting gpiochip{} bit {}: {}\n", chip_num,
+                             bit_num, e.what());
+  }
+}
+
+void new_device(unsigned int bus, unsigned int address,
+                std::string_view device_type) {
+  std::string path = std::format("/sys/bus/i2c/devices/i2c-{}/new_device", bus);
+  std::cerr << std::format("attempting to open {}", path);
+  std::ofstream new_device(path);
+  if (!new_device) {
+    std::cerr << "Error: Unable to create I2C device\n";
+    return;
+  }
+  new_device << std::format("{} 0x{:02x}", device_type, address);
+  new_device.close();
+
+  std::cerr << std::format("{} device created at bus {}", device_type, bus);
+}
+
+void wait_for_path_to_exist(std::string_view path,
+                            std::chrono::milliseconds timeout) {
+
+  while (true) {
+    std::error_code ec;
+    bool exists = std::filesystem::exists(path, ec);
+    if (exists) {
+      return;
+    }
+    sleep_milliseconds(1ms);
+    timeout -= 1ms;
+  }
+  std::cerr << std::format("Failed to wait for {} to exist", path);
+}
+
+void init_p2020_gpu_card() {
+  std::cerr << "Initializing GPU card...\n";
+
+  // Init the P2020 gpio expander
+  new_device(14, 0x20, "pca6408");
+
+  // Wait for device to be created
+  auto device_path = "/sys/bus/i2c/devices/14-0020";
+  wait_for_path_to_exist(device_path, 1000ms);
+
+  // Find the GPIO chip number
+  std::string gpio_chip;
+  for (const auto &entry : std::filesystem::directory_iterator(device_path)) {
+    std::string path = entry.path().string();
+    if (path.find("gpiochip") != std::string::npos) {
+      gpio_chip = path.substr(path.find("gpiochip") + std::strlen("gpiochip"));
+      break;
+    }
+  }
+  if (gpio_chip.empty()) {
+    std::cerr << "Error: Could not find GPIO chip number\n";
+    return;
+  }
+
+  std::cerr << "Found GPIO chip: gpiochip" << gpio_chip << "\n";
+  unsigned int gpiochipint = 0;
+  try {
+    gpiochipint = std::stoi(gpio_chip);
+  } catch (const std::exception &e) {
+    std::cout << "Failed to convert gpiochip\n";
+    return;
+  }
+
+  // Set MCU in recovery
+  set_gpio_raw(gpiochipint, 3, 1);
+
+  // Reset MCU
+  set_gpio_raw(gpiochipint, 4, 0);
+  set_gpio_raw(gpiochipint, 4, 1);
+
+  // Switch MUX to MCU
+  set_gpio_raw(gpiochipint, 5, 1);
+}
+
 int main() {
   // Reset USB hubs
   set_gpio("USB_HUB_RESET_L-O", 0, 10000ms);
-  set_gpio("SEC_USB2_HUB_RST_L-O", 0, 10000ms);
+  if (HMC_PRESENT != 1) {
+    set_gpio("SEC_USB2_HUB_RST_L-O", 0, 10000ms);
+  }
 
   sleep_milliseconds(100ms);
 
-  set_gpio("USB_HUB_RESET_L-O", 1);
-  set_gpio("SEC_USB2_HUB_RST_L-O", 1);
-
+  if (HMC_PRESENT != 1) {
+    set_gpio("SEC_USB2_HUB_RST_L-O", 1);
+  }
   //  Write SGPIO_BMC_EN-O=1 to correctly set mux to send SGPIO signals to FPGA
   set_gpio("SGPIO_BMC_EN-O", 1);
 
   // Write the bit for BMC without HMC
-  set_gpio("HMC_BMC_DETECT-O", 1, 30000ms);
+  set_gpio("HMC_BMC_DETECT-O", HMC_PRESENT == 0, 30000ms);
 
   // Set BMC_EROT_FPGA_SPI_MUX_SEL-O = 1 to enable FPGA to access its EROT
   set_gpio("BMC_EROT_FPGA_SPI_MUX_SEL-O", 1);
@@ -221,6 +317,15 @@ int main() {
   set_gpio("GLOBAL_WP_BMC-O", 0);
 
   set_gpio("BMC_READY-O", 1);
+
+  if (INIT_CARD == 1) {
+    init_p2020_gpu_card();
+  }
+
+  set_gpio("USB_HUB_RESET_L-O", 1);
+  if (HMC_PRESENT != 1) {
+    set_gpio("SEC_USB2_HUB_RST_L-O", 1);
+  }
 
   sd_notify(0, "READY=1");
   std::cerr << "Platform init complete\n";

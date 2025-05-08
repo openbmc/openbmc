@@ -1,0 +1,13 @@
+[Unit]
+Description=MCTP Init
+After=mctpd.service
+Before=xyz.openbmc_project.gpusensor.service
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/sbin/mctp_setup.sh
+
+[Install]
+WantedBy=multi-user.target

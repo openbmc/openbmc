@@ -1,0 +1,9 @@
+option('init-p2020',
+       type: 'feature',
+       value: 'disabled',
+       description: 'Enable Init of P2020 add in card on gb200')
+
+option('hmc-present',
+       type: 'feature',
+       value: 'disabled',
+       description: 'Enable HMC support')

@@ -12,10 +12,14 @@ S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
 
 SRC_URI += "\
+    file://meson.options \
     file://meson.build \
     file://platform_init.cpp \
     file://platform_init.service \
 "
+
+EXTRA_OEMESON:append:nv-gpu-pcie-card = " -Dinit-p2020=enabled"
+EXTRA_OEMESON:append:nv-with-hmc = " -Dhmc-present=enabled"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " platform_init.service "

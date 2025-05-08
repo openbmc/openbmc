@@ -1,0 +1,13 @@
+[Unit]
+Description=Start up the Nvidia GPU PCIe card platform
+After=xyz.openbmc_project.FruDevice.service
+Before=mctpd.service
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/sbin/mctp_init.sh
+
+[Install]
+WantedBy=multi-user.target

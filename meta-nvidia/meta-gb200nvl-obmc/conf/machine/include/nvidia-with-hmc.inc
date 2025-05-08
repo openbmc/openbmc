@@ -1,0 +1,1 @@
+MACHINEOVERRIDES =. "nv-with-hmc:"
