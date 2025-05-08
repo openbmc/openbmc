@@ -23,14 +23,24 @@
             ]
         },
         {
-            "group": "enclosure_identify",
+            "group": "enclosure_identify_blink",
             "members": [
                 {
                     "Name": "fp_id_amber",
                     "Action": "Blink",
                     "DutyOn": 50,
                     "Period": 250,
-                    "Priority": "On"
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "fp_id_amber",
+                    "Action": "On",
+                    "Priority": "Blink"
                 }
             ]
         },
