@@ -1,5 +1,25 @@
 #!/bin/sh
 
+format_rwfs()
+{
+    echo "Formatting persistent volume: "
+    cat /run/format-persist
+
+    if ! ubiformat --yes /dev/mtd/rwfs ; then
+        return 1
+    fi
+
+    if ! ubiattach -p /dev/mtd/rwfs ; then
+        return 1
+    fi
+
+    if ! ubimkvol /dev/ubi0 -N rwfs -m ; then
+        return 1
+    fi
+
+    return 0
+}
+
 if [ ! -e /dev/mtd/rwfs ]; then
     exit 1
 fi
@@ -32,21 +52,21 @@ if [ ! -e /run/format-persist ]; then
 fi
 
 if [ -e /run/format-persist ]; then
-    echo "Formatting persistent volume: "
-    cat /run/format-persist
-
-    if ! ubiformat --yes /dev/mtd/rwfs ; then
-        exit 1
-    fi
-
-    if ! ubiattach -p /dev/mtd/rwfs ; then
-        exit 1
-    fi
-
-    if ! ubimkvol /dev/ubi0 -N rwfs -m ; then
+    if ! format_rwfs; then
         exit 1
     fi
 fi
 
 mkdir -p /run/mnt-persist
-mount -t ubifs ubi0:rwfs /run/mnt-persist -o sync,compr=zstd
+
+if ! mount -t ubifs ubi0:rwfs /run/mnt-persist -o sync,compr=zstd; then
+    # mount failed, try formatting
+    ubidetach -p /dev/mtd/rwfs
+    echo "mount-ubi0-rwfs-fail" > /run/format-persist
+    if ! format_rwfs; then
+        exit 1
+    fi
+
+    # mount again after formatting
+    mount -t ubifs ubi0:rwfs /run/mnt-persist -o sync,compr=zstd
+fi
