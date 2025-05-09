@@ -21,9 +21,11 @@ PACKAGECONFIG ??= " \
     intelcpusensor \
     intrusionsensor \
     ipmbsensor \
-    mctpreactor \
     mcutempsensor \
     psusensor \
+    "
+PACKAGECONFIG:append:df-mctp = "\
+    mctpreactor \
     "
 PACKAGECONFIG[adcsensor] = "-Dadc=enabled, -Dadc=disabled"
 PACKAGECONFIG[exitairtempsensor] = "-Dexit-air=enabled, -Dexit-air=disabled"

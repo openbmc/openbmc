@@ -3,7 +3,6 @@ PACKAGECONFIG:remove = " \
     external \
     intrusionsensor \
     ipmbsensor \
-    mctpreactor \
     mcutempsensor \
     nvmesensor \
 "
