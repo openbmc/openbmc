@@ -1,9 +1,9 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:${THISDIR}/${PN}/${MACHINE}:"
 
 SRC_URI:append = " \
-    file://catalina-temporary-software-versions.yml \
+    file://platform-temporary-software-versions.yml \
 "
 
 SETTINGS_BMC_TEMPLATES:append = " \
-    catalina-temporary-software-versions.yml \
+    platform-temporary-software-versions.yml \
 "
