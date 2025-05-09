@@ -10,7 +10,7 @@ After=systemd-networkd.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/catalina/catalina-early-sys-init
+ExecStart=/usr/libexec/plat-svc/platform-early-sys-init
 SyslogIdentifier=Catalina Early Init
 
 [Install]

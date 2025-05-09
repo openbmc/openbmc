@@ -10,29 +10,35 @@ RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "fb-common-functions"
 
-SRC_URI += " \
+SRC_URI:append = " \
     file://backend-nic-driver-bind \
-    file://catalina-sys-init.service \
-    file://catalina-early-sys-init \
-    file://osfp-eeprom-driver-bind \
-    file://standby-power-enable \
+    file://backend-nic-driver-bind.service \
     file://iob-nic-temp-read \
+    file://iob-nic-temp-read.service \
+    file://osfp-eeprom-driver-bind \
+    file://osfp-eeprom-driver-bind.service \
+    file://platform-early-sys-init \
+    file://platform-sys-init.service \
+    file://platform-sys-init.service \
+    file://standby-power-enable \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " \
     backend-nic-driver-bind.service \
-    catalina-sys-init.service \
-    osfp-eeprom-driver-bind.service \
     iob-nic-temp-read.service \
+    osfp-eeprom-driver-bind.service \
+    platform-sys-init.service \
     "
 
 do_install() {
-    CATALINA_LIBEXECDIR="${D}${libexecdir}/catalina"
-    install -d ${CATALINA_LIBEXECDIR}
-    install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${CATALINA_LIBEXECDIR}
-    install -m 0755 ${UNPACKDIR}/catalina-early-sys-init ${CATALINA_LIBEXECDIR}
-    install -m 0755 ${UNPACKDIR}/osfp-eeprom-driver-bind ${CATALINA_LIBEXECDIR}
-    install -m 0755 ${UNPACKDIR}/standby-power-enable ${CATALINA_LIBEXECDIR}
-    install -m 0755 ${UNPACKDIR}/iob-nic-temp-read ${CATALINA_LIBEXECDIR}
+    PLATSVC_LIBEXECDIR="${D}${libexecdir}/plat-svc"
+    install -d ${PLATSVC_LIBEXECDIR}
+
+    install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${PLATSVC_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/iob-nic-temp-read ${PLATSVC_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/osfp-eeprom-driver-bind ${PLATSVC_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/platform-early-sys-init ${PLATSVC_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/standby-power-enable ${PLATSVC_LIBEXECDIR}
+
 }

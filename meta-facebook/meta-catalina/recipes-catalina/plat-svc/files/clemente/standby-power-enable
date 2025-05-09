@@ -1,0 +1,218 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+GPIO_HIGH=1
+GPIO_LOW=0
+
+wait_gpio_value()
+{
+    local net_name=$1
+    local max_retries=$3
+    local delay_secs=$4
+    local expd_val=$2
+
+    local gpio_val=0
+    local trycnt=1
+
+    until [[ $gpio_val -gt 0 || $trycnt -gt $max_retries ]]
+    do
+        gpio_val=$(get_gpio "$net_name")
+        rc=$?
+        if [[ $rc -ne 0 ]]; then
+            err_msg="Unable to read $net_name"
+            echo "$err_msg"
+            return 1
+        fi
+        if [[ $gpio_val -eq $expd_val ]]; then
+            return 0
+        fi
+        sleep "$delay_secs"
+        ((trycnt++))
+    done
+
+    err_msg="wait_gpio_value failed, gpio_val=$gpio_val,  exp_val=$expd_val"
+    echo "$err_msg"
+    return 1
+}
+
+bind_i2c_muxes()
+{
+    # Module 0 I2C Mux
+    # i2c24 - i2c27
+    bind_i2c_device pca954x 0-0071
+    # i2c28 - i2c31
+    bind_i2c_device pca954x 0-0072
+    # i2c32 - i2c35
+    bind_i2c_device pca954x 0-0073
+
+    # Module 1 I2C Mux
+    # i2c36 - i2c39
+    bind_i2c_device pca954x 0-0075
+    # i2c40 - i2c43
+    bind_i2c_device pca954x 0-0076
+    # i2c44 - i2c47
+    bind_i2c_device pca954x 0-0077
+
+    # E1S Board I2C Mux, i2c48 - i2c55
+    bind_i2c_device pca954x 12-0070
+}
+
+bind_hsc_sensors()
+{
+    bind_i2c_device lm25066 1-0012
+    bind_i2c_device lm25066 1-0014
+    bind_i2c_device lm90 1-004a
+}
+
+bind_gpio_expanders()
+{
+    # BMC IOEXP
+    bind_i2c_device pca953x 6-0021
+    # Module 0 IOEXP
+    bind_i2c_device pca953x 2-0020
+    # Module 1 IOEXP
+    bind_i2c_device pca953x 2-0021
+    # HMC IOEXP
+    bind_i2c_device pca953x 2-0027
+    # HMC IOEXP
+    bind_i2c_device pca953x 2-0074
+    # IO Mezz 0 IOEXP
+    bind_i2c_device pca953x 29-0020
+    # IO Mezz 1 IOEXP
+    bind_i2c_device pca953x 41-0021
+}
+
+bind_fru_eeproms()
+{
+    # CBC 0 and 1 FRU
+    bind_i2c_device at24 12-0054
+    bind_i2c_device at24 12-0055
+    # HMC FRU
+    bind_i2c_device at24 13-0057
+    # Module 0 FRU
+    bind_i2c_device at24 13-0050
+    # CBC 2 and 3 FRU
+    bind_i2c_device at24 13-0054
+    bind_i2c_device at24 13-0055
+    # Module 0 Aux
+    bind_i2c_device at24 6-0050
+    bind_i2c_device at24 2-0050
+    # Module 1 Aux
+    bind_i2c_device at24 2-0051
+    # IO Mezz 0 FRU
+    bind_i2c_device at24 29-0050
+    # FIO FRU
+    bind_i2c_device at24 23-0051
+    # IO Mezz 1 FRU
+    bind_i2c_device at24 41-0050
+    # E1S Board FRU
+    bind_i2c_device at24 54-0056
+    # HSC Board FRU
+    bind_i2c_device at24 1-0053
+}
+
+reset_host_usb()
+{
+    set_gpio "USB2_HUB_RST_L-O" "$GPIO_LOW"
+    set_gpio "USB2_HUB4_RST_L-O" "$GPIO_LOW"
+    sleep 1
+    set_gio "USB2_HUB_RST_L" "$GPIO_HIGH"
+    set_gio "USB2_HUB4_RST_L" "$GPIO_HIGH"
+}
+
+rebind_hmc_usb_network()
+{
+    echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/unbind
+    echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/bind
+}
+
+is_stby_good()
+{
+    local gpio_val
+
+    if ! gpio_val=$(get_gpio "STBY_POWER_PG_3V3"); then
+        return 1
+    fi
+
+    if [[ $gpio_val -eq 0 ]]; then
+        return 1
+    fi
+
+    return 0
+}
+
+set_bmc_ready()
+{
+    local bmc_ready="/sys/class/leds/bmc_ready_noled/brightness"
+    local bmc_ready_cpld="/sys/class/leds/bmc_ready_cpld_noled/brightness"
+
+    echo 1 > ${bmc_ready}
+    echo 1 > ${bmc_ready_cpld}
+    return 0
+}
+
+is_hmc_reachable()
+{
+    local max_retry_count="$1"
+    for retry in $(seq 1 "$max_retry_count")
+    do
+        if ping -c 1 -W 1 172.31.13.251; then
+            echo "HMC is reachable"
+            return 0
+        fi
+        echo "HMC is not reachable, retry count: $retry"
+    done
+    return 1
+}
+
+enable_pdb_vr_setting()
+{
+    i2cset -f -y 19 0x60 0xEB 0x0796 w
+    i2cset -f -y 19 0x61 0xEB 0x0796 w
+}
+
+if ! is_stby_good; then
+    set_gpio "SCM_HPM_STBY_RST_N" "$GPIO_LOW"
+fi
+
+set_gpio "SCM_HPM_STBY_EN" "$GPIO_HIGH"
+set_gpio "stby_power_en_cpld" "$GPIO_HIGH"
+if ! wait_gpio_value "STBY_POWER_PG_3V3" "$GPIO_HIGH" 200 0.1; then
+    echo "Error: failed to get STBY_POWER_PG_3V3 as high (1) in 20 sec"
+    exit 1
+fi
+set_gpio "stby_power_gd_cpld" "$GPIO_HIGH"
+
+bind_i2c_muxes
+bind_hsc_sensors
+bind_gpio_expanders
+
+set_gpio "HMC_PGOOD-O" "$GPIO_HIGH"
+set_gpio "EROT_FPGA_RST_L-O" "$GPIO_HIGH"
+set_gpio "HMC_EROT_RST_L-O" "$GPIO_HIGH"
+set_gpio "SCM_HPM_STBY_RST_N" "$GPIO_HIGH"
+
+if ! wait_gpio_value "HMC_READY-I" "$GPIO_HIGH" 180 1; then
+    echo "Error: failed to get HMC_READY-I as high (1) in 180 sec"
+    exit 1
+fi
+
+reset_host_usb
+
+if ! is_hmc_reachable 10; then
+    rebind_hmc_usb_network
+fi
+
+if ! wait_gpio_value "FPGA_READY_BMC-I" "$GPIO_HIGH" 180 1; then
+    echo "Error: failed to get FPGA_READY_BMC-I as high (1) in 180 sec"
+    exit 1
+fi
+
+bind_fru_eeproms
+
+enable_pdb_vr_setting
+
+set_bmc_ready
+
+exit 0
