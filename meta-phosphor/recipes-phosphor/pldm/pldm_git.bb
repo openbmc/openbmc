@@ -17,9 +17,14 @@ DEPENDS += "phosphor-logging"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
+PACKAGE_BEFORE_PN:append = " pldmtool"
+RRECOMMENDS:${PN}:append = "pldmtool"
+
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} += "pldmd.service"
 SYSTEMD_SERVICE:${PN} += "pldmSoftPowerOff.service"
+
+FILES:pldmtool = "${bindir}/pldmtool"
 
 inherit meson pkgconfig
 inherit systemd
