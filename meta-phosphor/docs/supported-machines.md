@@ -36,6 +36,7 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
 * facebook
   * bletchley
   * catalina
+  * clemente
   * harma
   * minerva
   * santabarbara
