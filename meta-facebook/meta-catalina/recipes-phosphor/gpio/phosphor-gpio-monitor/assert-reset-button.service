@@ -3,6 +3,6 @@ Description=Assert ID_RST_BTN_BMC_N
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/catalina-gpio-monitor ID_RST_BTN_BMC_N assert
+ExecStart=/usr/libexec/phosphor-gpio-monitor/platform-gpio-monitor ID_RST_BTN_BMC_N assert
 
 SyslogIdentifier=assert-run-power-pg
