@@ -1,5 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG:append = " \
+FACEBOOK_REMOVED_DBUS_SENSORS:remove= " \
         intelcpusensor \
+        ipmbsensor \
         "
