@@ -1,6 +1,5 @@
 [Unit]
 Description=power on chassis:%i
-Conflicts=chassis-powercycle@%i.service chassis-poweroff@%i.service host-powercycle@%i.service host-poweroff@%i.service host-powerreset@%i.service
 OnFailure=chassis-poweron-failure@%i.service check-i3c-hub@%i.service
 
 [Service]

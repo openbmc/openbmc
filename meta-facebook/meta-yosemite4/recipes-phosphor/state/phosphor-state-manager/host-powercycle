@@ -6,7 +6,7 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 CHASSIS_ID=$1
-
+slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
 CHASSIS_BUS=$((CHASSIS_ID - 1))
 IO_EXP_P0_PWRGD_R_OUT=18
 GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
@@ -21,6 +21,19 @@ get_host_status() {
         exit 1
     fi
 }
+
+msg="Execute host$CHASSIS_ID power cycle"
+echo "${msg}"
+add_sel "${msg}"
+
+exec 300>"$slot_power_control_lock"
+if ! flock -n 300 ; then
+    echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
+    msg="Execute host$CHASSIS_ID power cycle fail, power control is operating"
+    echo "${msg}"
+    add_sel "${msg}"
+    exit 1
+fi
 
 # Get initial host status
 get_host_status
@@ -54,7 +67,7 @@ fi
 if [ "$host_status" != "$STATE_ON" ]; then
     # Set state effecter state: Entity ID 0x0000 for host power control, 0x1 for power on
     pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x01 -m "$EID"
-    sleep 2s
+    sleep 10s
 
     # Get host status again after attempting to power on
     get_host_status

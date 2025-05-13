@@ -5,6 +5,14 @@
 # Provide source directive to shellcheck.
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
+CHASSIS_ID=$1
+slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
+
+exec 300>"$slot_power_control_lock"
+if ! flock -n 300 ; then
+    echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
+    exit 1
+fi
 
 # TODO: check power status before do power reset
 # Set state effecter state: Entity ID 0x0000 for host power control, 0x4 for power reset
@@ -15,5 +23,6 @@ then
     echo "${msg}"
     add_sel "${msg}"
 else
+    sleep 20
     echo "Host$1 is power reset"
 fi

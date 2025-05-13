@@ -11,6 +11,8 @@ source /usr/libexec/yosemite4-common-functions
 #IO 0:7 input port for showing slot 1:8 power status
 #IO 8:16 output port for controlling slot 1:8 power status
 CHASSIS_ID=$1
+slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
+
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 IO_EXP_SLED_CYCLE=12
@@ -86,7 +88,6 @@ disable_i3c_hub()
 
 chassis-power-cycle()
 {
-    CHASSIS_ID=$1
     chassis_power_cycle_lock="/tmp/chassis_power_cycle.lock"
 
     exec 200>"$chassis_power_cycle_lock"
@@ -116,6 +117,8 @@ chassis-power-cycle()
             else
                 echo "Succeed to set slot$CHASSIS_ID power off"
             fi
+            # Set host state to off
+            busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
             # Set chassis power state off
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
             sleep 20
@@ -146,12 +149,16 @@ chassis-power-cycle()
             sleep 2
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
             /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
+            # Set host state to on
+            busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
             msg="Chassis$CHASSIS_ID cycle success"
             echo "${msg}"
             add_sel "${msg}"
             flock -u 200
             exit 0;
         else
+            # Set host state to off
+            busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
             msg="Chassis$CHASSIS_ID cycle failed, Chassis$CHASSIS_ID is power off"
             echo "${msg}"
@@ -179,12 +186,25 @@ sled-cycle()
 
 if [ "$1" == 0 ]
 then
+    msg="Execute sled cycle"
+    echo "${msg}"
+    add_sel "${msg}"
     echo "Starting sled cycle..."
     if ! sled-cycle
     then
         echo "Failed to do sled cycle"
     fi
 else
+    msg="Execute slot$CHASSIS_ID cycle"
+    echo "${msg}"
+    add_sel "${msg}"
+    exec 300>"$slot_power_control_lock"
+    if ! flock -n 300 ; then
+        echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
+        msg="Execute slot$CHASSIS_ID cycle fail, power control is operating"
+        add_sel "${msg}"
+        exit 1
+    fi
     echo "Starting slot$1 cycle"
     chassis-power-cycle "$1"
 fi

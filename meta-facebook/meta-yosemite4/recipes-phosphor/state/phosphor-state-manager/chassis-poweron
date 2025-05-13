@@ -11,6 +11,7 @@ source /usr/libexec/yosemite4-common-functions
 #IO 0:7 input port for showing slot 1:8 power status
 #IO 8:16 output port for controlling slot 1:8 power status
 CHASSIS_ID=$1
+slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
 IO_EXP_P0_PWRGD_R_OUT=18
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
@@ -58,6 +59,19 @@ chassis-power-on()
         exit 0;
     fi
 }
+
+msg="Execute slot$CHASSIS_ID power on"
+echo "${msg}"
+add_sel "${msg}"
+
+exec 300>"$slot_power_control_lock"
+if ! flock -n 300 ; then
+    echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
+    msg="Execute slot$CHASSIS_ID power on fail, power control is operating"
+    echo "${msg}"
+    add_sel "${msg}"
+    exit 1
+fi
 
 if ! chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
     echo "Failed to get chassis status"

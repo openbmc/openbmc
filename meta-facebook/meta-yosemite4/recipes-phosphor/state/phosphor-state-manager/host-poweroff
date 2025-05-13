@@ -5,7 +5,8 @@
 # Provide source directive to shellcheck.
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
-
+CHASSIS_ID=$1
+slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
 CHASSIS_BUS=$(($1 - 1))
 IO_EXP_P0_PWRGD_R_OUT=18
 GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
@@ -18,6 +19,25 @@ get_host_status() {
         exit 1
     fi
 }
+
+msg="Execute host$CHASSIS_ID power off"
+echo "${msg}"
+add_sel "${msg}"
+
+exec 300>"$slot_power_control_lock"
+if ! flock -n 300 ; then
+    echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
+    # Stop obmc-host-stop@{}.target to avoid set power state to Off.
+    /bin/systemctl stop obmc-host-stop@"${CHASSIS_ID}".target
+    /bin/sh -c "busctl set-property $(mapper get-service /xyz/openbmc_project/state/host"${CHASSIS_ID}") \
+        /xyz/openbmc_project/state/host${CHASSIS_ID} \
+        xyz.openbmc_project.State.Host CurrentHostState \
+        s xyz.openbmc_project.State.Host.HostState.Running"
+    msg="Execute host$CHASSIS_ID power off fail, power control is operating"
+    echo "${msg}"
+    add_sel "${msg}"
+    exit 1
+fi
 
 get_host_status
 
