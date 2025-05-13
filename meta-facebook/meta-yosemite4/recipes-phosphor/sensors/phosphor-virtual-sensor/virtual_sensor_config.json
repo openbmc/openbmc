@@ -2039,5 +2039,293 @@
             ]
         },
         "Expression": "hsc_output_curr * hsc_output_voltage"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_1_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_1_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_2_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_2_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_3_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_3_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_4_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_4_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_5_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_5_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_6_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_6_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_7_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_7_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "SENTINEL_DOME_SLOT_8_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "MB_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "SENTINEL_DOME_SLOT_8_MB_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "MB_ADC_P3V3_STBY_VOLT_V == MB_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_1_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_1_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_2_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_2_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_3_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_3_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_4_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_4_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_5_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_5_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_6_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_6_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_7_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_7_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "WAILUA_FALLS_SLOT_8_SENSOR_STATUS",
+          "SensorType": "utilization"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "WF_ADC_P3V3_STBY_VOLT_V",
+              "Desc": {
+                "Name": "WAILUA_FALLS_SLOT_8_WF_ADC_P3V3_STBY_VOLT_V",
+                "SensorType": "voltage"
+              }
+            }
+          ]
+        },
+        "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
     }
 ]
