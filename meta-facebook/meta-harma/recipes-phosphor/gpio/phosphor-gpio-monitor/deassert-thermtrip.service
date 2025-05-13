@@ -1,0 +1,7 @@
+[Unit]
+Description=Thermtrip Deassert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/thermal-event-logger DeviceOperatingNormalTemperature
+SyslogIdentifier=thermtrip-deassert

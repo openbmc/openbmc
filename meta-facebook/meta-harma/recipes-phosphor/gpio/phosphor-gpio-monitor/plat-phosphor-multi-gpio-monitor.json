@@ -166,10 +166,13 @@
         "Name": "cpu0-thermtrip-alert",
         "ChipId": "2",
         "GpioNum": 180,
-        "EventMon": "FALLING",
+        "EventMon": "BOTH",
         "Targets": {
+            "RISING": [
+                "deassert-thermtrip.service"
+            ],
             "FALLING": [
-                "assert-gpio-log@2_cpu0-thermtrip-alert.service"
+                "assert-thermtrip.service"
             ]
         },
         "Continue": true

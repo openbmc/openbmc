@@ -1,0 +1,32 @@
+#!/bin/bash
+
+HELP="
+Usage: thermal-event-logger <event>
+<event> is the thermal event to log, e.g. DeviceOverOperatingTemperatureFault.
+"
+
+GPIO_NAME="cpu0-thermtrip-alert"
+STASH_FILE="/tmp/${GPIO_NAME}.log_entry"
+DEVICE_PATH="/xyz/openbmc_project/state/thermal/host0"
+
+case $1 in
+    "-h")
+        echo "$HELP"
+        ;;
+
+    "DeviceOverOperatingTemperatureFault")
+        /usr/bin/log-create "xyz.openbmc_project.State.Thermal.${1}" --json \
+            "{ \"DEVICE\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}" \
+            > ${STASH_FILE}
+        ;;
+
+    "DeviceOperatingNormalTemperature")
+        if [ -e ${STASH_FILE} ]; then
+            log-resolve -p "$(< ${STASH_FILE})" && rm ${STASH_FILE}
+        fi
+        /usr/bin/log-create "xyz.openbmc_project.State.Thermal.${1}" --json \
+            "{ \"DEVICE\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}"
+        ;;
+esac
+
+exit 0
