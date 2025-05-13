@@ -1,0 +1,7 @@
+[Unit]
+Description=PLDMD Exit Handler
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/pldm/pldmd-exit-handler
+SyslogIdentifier=pldmd-exit-handler

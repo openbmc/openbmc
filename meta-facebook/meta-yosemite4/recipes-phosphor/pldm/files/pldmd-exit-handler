@@ -1,0 +1,30 @@
+#!/bin/sh
+
+ENTITY_MANAGER_SERVICE="xyz.openbmc_project.EntityManager"
+ENTITY_MANAGER_PATH="/xyz/openbmc_project/inventory"
+ENTITY_MANAGER_SENTINEL_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Sentinel_Dome_T2_Slot_"
+
+entity_manager_objects=$(busctl call "$ENTITY_MANAGER_SERVICE" "$ENTITY_MANAGER_PATH" org.freedesktop.DBus.ObjectManager GetManagedObjects 2>/dev/null)
+
+for slot in $(seq 1 8); do
+    SENTINEL="SENTINEL_DOME_SLOT_${slot}_SENSOR_STATUS"
+    WAILUA="WAILUA_FALLS_SLOT_${slot}_SENSOR_STATUS"
+
+    if busctl set-property xyz.openbmc_project.VirtualSensor \
+        /xyz/openbmc_project/sensors/utilization/"${SENTINEL}" \
+        xyz.openbmc_project.Sensor.Value Value d 0; then
+        echo "${SENTINEL} set to 0 OK"
+    else
+        echo "${SENTINEL} set to 0 FAILED"
+    fi
+
+    if echo "$entity_manager_objects" | grep -q "${ENTITY_MANAGER_SENTINEL_T2_PREFIX}${slot}"; then
+        if busctl set-property xyz.openbmc_project.VirtualSensor \
+            /xyz/openbmc_project/sensors/utilization/"${WAILUA}" \
+            xyz.openbmc_project.Sensor.Value Value d 0; then
+            echo "${WAILUA} set to 0 OK"
+        else
+            echo "${WAILUA} set to 0 FAILED"
+        fi
+    fi
+done
