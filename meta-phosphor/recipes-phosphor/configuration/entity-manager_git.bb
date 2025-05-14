@@ -16,9 +16,10 @@ PACKAGECONFIG ??= "ipmi-fru"
 
 PACKAGECONFIG[ipmi-fru] = "-Dfru-device=true, -Dfru-device=false, i2c-tools,"
 PACKAGECONFIG[dts-vpd] = "-Ddevicetree-vpd=true, -Ddevicetree-vpd=false"
-PACKAGECONFIG[validate-json] = "-Dvalidate-json=true, \
-                                -Dvalidate-json=false, \
-                                ${PYTHON_PN}-jsonschema-native"
+PACKAGECONFIG[validate-json] = "\
+    -Dvalidate-json=true, \
+    -Dvalidate-json=false, \
+    ${PYTHON_PN}-jsonschema-native ${PYTHON_PN}-referencing"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/entity-manager.git;branch=master;protocol=https \
