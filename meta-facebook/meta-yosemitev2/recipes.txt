@@ -1,3 +1,0 @@
-recipes-kernel       - The kernel and generic applications/libraries with strong kernel dependencies
-recipes-bsp          - Aspeed BSP with uboot
-recipes-phosphor     - Phosphor OpenBMC applications and configuration
