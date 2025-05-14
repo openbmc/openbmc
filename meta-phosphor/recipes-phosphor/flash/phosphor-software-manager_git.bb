@@ -21,6 +21,7 @@ PACKAGECONFIG[software-update-dbus-interface] = "-Dsoftware-update-dbus-interfac
 PACKAGECONFIG[bios-software-update] = "-Dbios-software-update=enabled, -Dbios-software-update=disabled, libgpiod libpldm"
 PACKAGECONFIG[i2cvr-software-update] = "-Di2cvr-software-update=enabled, -Di2cvr-software-update=disabled, libpldm libgpiod i2c-tools"
 PACKAGECONFIG[eepromdevice-software-update] = "-Deepromdevice-software-update=enabled, -Deepromdevice-software-update=disabled, libgpiod libpldm"
+PACKAGECONFIG[cpld-software-update] = "-Dcpld-software-update=enabled, -Dcpld-software-update=disabled, libpldm i2c-tools"
 PACKAGECONFIG ?= "software-update-dbus-interface"
 
 PV = "1.0+git${SRCPV}"
@@ -38,6 +39,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-bios-software-update \
     ${PN}-i2cvr-software-update \
     ${PN}-eepromdevice-software-update \
+    ${PN}-cpld-software-update \
 "
 # Set SYSTEMD_PACKAGES to empty because we do not want ${PN} and DBUS_PACKAGES
 # handles the rest.
@@ -58,6 +60,7 @@ SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-
 SYSTEMD_SERVICE:${PN}-bios-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', 'xyz.openbmc_project.Software.BIOS.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-i2cvr-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'i2cvr-software-update', 'xyz.openbmc_project.Software.I2CVR.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-eepromdevice-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'eepromdevice-software-update', 'xyz.openbmc_project.Software.EEPROMDevice.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-cpld-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'cpld-software-update', 'xyz.openbmc_project.Software.CPLD.service', '', d)}"
 S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
@@ -85,6 +88,7 @@ RRECOMMENDS:${PN} += "\
     ${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', '${PN}-bios-software-update', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'i2cvr-software-update', '${PN}-i2cvr-software-update', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'eepromdevice-software-update', '${PN}-eepromdevice-software-update', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'cpld-software-update', '${PN}-cpld-software-update', '', d)} \
 "
 
 RPROVIDES:${PN}-version += " \
@@ -123,6 +127,9 @@ FILES:${PN}-i2cvr-software-update += "\
     "
 FILES:${PN}-eepromdevice-software-update += "\
     ${libexecdir}/phosphor-code-mgmt/phosphor-eepromdevice-software-update \
+    "
+FILES:${PN}-cpld-software-update += "\
+    ${libexecdir}/phosphor-code-mgmt/phosphor-cpld-software-update \
     "
 
 require ${BPN}.inc
