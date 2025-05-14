@@ -36,8 +36,11 @@ SYSTEMD_PACKAGES = "${PN}-discover \
 "
 
 # Set the common defaults
-PACKAGECONFIG ??= "only-run-apr-on-power-loss \
-                   only-allow-boot-when-bmc-ready"
+PACKAGECONFIG ??= " \
+    only-run-apr-on-power-loss \
+    only-allow-boot-when-bmc-ready \
+    install-utils \
+    "
 
 # Disable warm reboots of host
 PACKAGECONFIG[no-warm-reboot] = "-Dwarm-reboot=disabled,-Dwarm-reboot=enabled"
@@ -56,6 +59,8 @@ PACKAGECONFIG[host-gpio] = "-Dhost-gpios=enabled,-Dhost-gpios=disabled,gpioplus"
 
 # Check firmware updating before do BMC/Chassis/Host transition
 PACKAGECONFIG[check-fwupdate-before-do-transition] = "-Dcheck-fwupdate-before-do-transition=enabled,-Dcheck-fwupdate-before-do-transition=disabled"
+
+PACKAGECONFIG[install-utils] = "-Dinstall-utils=enabled, -Dinstall-utils=disabled"
 
 # The host-check function will check if the host is running
 # after a BMC reset.
