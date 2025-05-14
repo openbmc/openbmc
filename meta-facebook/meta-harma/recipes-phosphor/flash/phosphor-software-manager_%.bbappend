@@ -4,6 +4,7 @@ SRC_URI += "file://bios-update"
 PACKAGECONFIG:append = " flash_bios"
 PACKAGECONFIG:append = " eepromdevice-software-update"
 PACKAGECONFIG:append = " i2cvr-software-update"
+PACKAGECONFIG:append = " cpld-software-update"
 RDEPENDS:${PN} += "bash"
 
 do_install:append() {
