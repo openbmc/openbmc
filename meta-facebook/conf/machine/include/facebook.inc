@@ -29,4 +29,3 @@ OBMC_ORG_YAML_SUBDIRS:append:facebook = " com/meta"
 # Remove some common features we have no use for.
 DISTRO_FEATURES:remove = "avahi"
 DISTRO_FEATURES:remove = "ldap"
-DISTRO_FEATURES:remove = "slp"

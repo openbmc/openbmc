@@ -107,7 +107,6 @@ DISTRO_FEATURES_DEFAULT = " \
         ipv6 \
         pam \
         security \
-        slp \
         seccomp \
         "
 
