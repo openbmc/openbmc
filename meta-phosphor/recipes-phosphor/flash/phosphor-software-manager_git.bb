@@ -81,6 +81,12 @@ RDEPENDS:${PN}-updater += " \
     ${@bb.utils.contains('PACKAGECONFIG', 'mmc_layout', 'e2fsprogs-e2fsck', '', d)} \
 "
 
+RRECOMMENDS:${PN} += "\
+    ${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', '${PN}-bios-software-update', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'i2cvr-software-update', '${PN}-i2cvr-software-update', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'eepromdevice-software-update', '${PN}-eepromdevice-software-update', '', d)} \
+"
+
 RPROVIDES:${PN}-version += " \
     virtual-obmc-image-manager \
 "
