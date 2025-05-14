@@ -1,9 +1,0 @@
-[Unit]
-Description=power on host:%i
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-state-manager/host-poweron %i
-
-[Install]
-WantedBy=obmc-host-start@%i.target

@@ -1,9 +1,0 @@
-[Unit]
-Description=Sled Cycle
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-state-manager/chassis-powercycle 0
-
-[Install]
-WantedBy=obmc-chassis-powercycle@0.target

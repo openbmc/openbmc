@@ -1,8 +1,0 @@
-[Unit]
-Description=Set currrent host state property slot%i
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/busctl set-property xyz.openbmc_project.State.Host%i /xyz/openbmc_project/state/host%i xyz.openbmc_project.State.Host CurrentHostState s "xyz.openbmc_project.State.Host.HostState.Off"
-SyslogIdentifier=set-current-host-state-slot%i
-

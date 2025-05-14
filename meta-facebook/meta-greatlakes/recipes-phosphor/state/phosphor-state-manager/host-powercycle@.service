@@ -1,9 +1,0 @@
-[Unit]
-Description=Host Power Cycle: %i
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-state-manager/host-powercycle %i
-
-[Install]
-WantedBy=obmc-host-reboot@%i.target

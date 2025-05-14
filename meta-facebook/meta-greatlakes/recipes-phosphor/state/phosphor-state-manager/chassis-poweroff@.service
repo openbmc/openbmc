@@ -1,9 +1,0 @@
-[Unit]
-Description=power off chassis:%i
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-state-manager/chassis-poweroff %i
-
-[Install]
-WantedBy=obmc-chassis-hard-poweroff@%i.target

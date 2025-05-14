@@ -26,9 +26,6 @@ RPROVIDES:${PN}-flash += "virtual-obmc-flash-mgmt"
 RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
 SUMMARY:${PN}-chassis = "Facebook Chassis"
-RDEPENDS:remove:greatlakes:${PN}-chassis = " \
-        x86-power-control \
-        "
 
 SUMMARY:${PN}-extras:tiogapass = "Extra features for tiogapass"
 RDEPENDS:${PN}-extras:tiogapass = "phosphor-nvme"
