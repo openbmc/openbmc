@@ -86,7 +86,9 @@ do_install:append:local() {
     install -d -m0755 $netdir/-bmc-$intf.network.d
     install -m0644 ${WORKDIR}/10-dhcp4.conf $netdir/-bmc-$intf.network.d/10-dhcp4.conf
   done
+}
 
+do_install:append:dev() {
   install -d -m0755 ${D}${bindir}
   sed 's,@IFS@,${GBMC_EXT_NICS},g' <${WORKDIR}/gbmc-nic-devlab-config.sh.in \
       >${D}${bindir}/gbmc-nic-devlab-config.sh
