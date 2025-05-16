@@ -30,6 +30,7 @@ void sleep_milliseconds(std::chrono::milliseconds milliseconds) {
 void set_gpio(const char *line_name, int value,
               std::chrono::milliseconds find_timeout = 0ms) {
   std::cerr << std::format("{} Request to set to {}\n", line_name, value);
+  std::chrono::milliseconds polling_time = 10ms;
   gpiod::line &line = io[line_name];
   if (!line) {
     do {
@@ -37,8 +38,9 @@ void set_gpio(const char *line_name, int value,
       if (!line) {
         std::cerr << std::format("{} not found yet, waiting and retrying\n",
                                  line_name);
-        sleep_milliseconds(100ms);
-        find_timeout -= 100ms;
+
+        sleep_milliseconds(polling_time);
+        find_timeout -= polling_time;
       }
     } while (!line && find_timeout > 0s);
     if (!line && find_timeout <= 0s) {
@@ -175,6 +177,9 @@ int main() {
 
   // Set BMC_EROT_FPGA_SPI_MUX_SEL-O = 1 to enable FPGA to access its EROT
   set_gpio("BMC_EROT_FPGA_SPI_MUX_SEL-O", 1);
+
+  // Enable 12V
+  set_gpio("BMC_12V_CTRL-O", 1, 10000ms);
 
   set_gpio("PWR_BRAKE_L-O", 1);
   set_gpio("SHDN_REQ_L-O", 1);
