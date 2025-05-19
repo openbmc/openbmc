@@ -36,4 +36,6 @@ SUMMARY:${PN}-system = "FVP System"
 RDEPENDS:${PN}-system = " \
         bmcweb \
         webui-vue \
+        phosphor-host-postd \
+        phosphor-post-code-manager \
         "
