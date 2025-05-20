@@ -10,12 +10,12 @@ create_log()
     local service="xyz.openbmc_project.Logging"
     local object_path="/xyz/openbmc_project/logging"
     local interface="xyz.openbmc_project.Logging.Create"
-    local message="Fan status abnormal: $FAN_FAIL_REASON"
+    local message="Fan status LED asserted"
     local severity="xyz.openbmc_project.Logging.Entry.Level.Error"
     local arg="CALLOUT_INVENTORY_PATH"
     local value="/xyz/openbmc_project/inventory/fan"
 
-    echo "Creating log: $message"
+    echo "FAN status LED asserted by $FAN_FAIL_REASON"
     busctl call "$service" "$object_path" "$interface" Create "ssa{ss}" "$message" "$severity" 1 "$arg" "$value"
 }
 
