@@ -68,6 +68,9 @@ do_RUN_POWER_PG_change()
     else
         set_gpio "PCI_MUX_SEL" "$GPIO_LOW"
 
+        # Workaround to disable ipmi watchdog when host off
+        busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog Enabled b false
+
         host_state="$(get_current_host_state)"
         if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ] ||
            [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Off" ]; then
