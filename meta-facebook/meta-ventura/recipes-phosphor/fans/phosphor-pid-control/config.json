@@ -105,13 +105,17 @@
             "accumulateSetPoint": true,
             "pids": [
                 {
-                    "name": "Fan Zore Zone",
+                    "name": "Fan Zero Zone",
                     "type": "fan",
                     "inputs": [
                         "FCB_0_FAN0_TACH_IL_SPEED_RPM",
                         "FCB_0_FAN0_TACH_OL_SPEED_RPM",
                         "FCB_0_FAN1_TACH_IL_SPEED_RPM",
-                        "FCB_0_FAN1_TACH_OL_SPEED_RPM"
+                        "FCB_0_FAN1_TACH_OL_SPEED_RPM",
+                        "FCB_1_FAN2_TACH_IL_SPEED_RPM",
+                        "FCB_1_FAN2_TACH_OL_SPEED_RPM",
+                        "FCB_1_FAN3_TACH_IL_SPEED_RPM",
+                        "FCB_1_FAN3_TACH_OL_SPEED_RPM"
                     ],
                     "setpoint": 0.0,
                     "pid": {
