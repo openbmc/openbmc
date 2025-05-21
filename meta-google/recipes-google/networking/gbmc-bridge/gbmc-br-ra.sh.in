@@ -40,10 +40,21 @@ ROUTE_METRIC=1000
 
 echo "Waiting for ${RA_IF} configuration" >&2
 
-while ! networkctl list "${RA_IF}" | grep -q "configured"; do
+st_check_timeout=60
+st_check_start=$SECONDS
+while (( SECONDS - st_check_start < st_check_timeout )); do
+  if_st=$(networkctl list "${RA_IF}")
+  if [[ "${if_st}" =~ "configured" ]]; then
+    echo "${RA_IF} is configured, doing RA" >&2
+    break;
+  elif [[ "${if_st}" =~ "failed" ]]; then
+    echo "${RA_IF} failed, need reconfiguring" >&2
+    networkctl reload && networkctl reconfigure ${RA_IF}
+  else
+    echo "${RA_IF} still configuring, retry in 2s" >&2
+  fi
   sleep 2
 done
 
-echo "${RA_IF} is configured, doing RA" >&2
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-ra.sh
 source /usr/share/gbmc-ra.sh || exit
