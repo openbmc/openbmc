@@ -26,6 +26,10 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     "
 
+CHASSIS_DEFAULT_TARGETS:append = " \
+    obmc-chassis-powercycle@{}.target.wants/log-chassis-powercycle-sel@{}.service \
+"
+
 SRC_URI:append = " \
     file://chassis-poweroff@.service \
     file://chassis-poweron@.service \
@@ -51,6 +55,8 @@ SRC_URI:append = " \
     file://rescan-cxl-eid \
     file://wait-until-mctp-EID-remove \
     file://check-i3c-hub \
+    file://log-chassis-powercycle-sel \
+    file://log-chassis-powercycle-sel@.service \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -74,6 +80,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/wait-until-mctp-EID-remove ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/rescan-cxl-eid ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/check-i3c-hub ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/log-chassis-powercycle-sel ${D}${libexecdir}/${PN}/
 }
 
 FILES:${PN} += " ${systemd_system_unitdir}/*.service"

@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+CHASSIS_ID=$1
+GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
+IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
+CHASSIS_BUS=$(($1 - 1))
+IO_EXP_P0_PWRGD_R_OUT=18
+GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
+
+#wait for 6 seconds to make sure the host poweron
+sleep 6
+
+get_host_status() {
+    RETRY=20
+    while [ $RETRY -gt 0 ]; do
+        host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")
+
+        if [ "$host_status" = "$STATE_ON" ]; then
+            echo "$host_status"
+            return 0
+        fi
+
+        RETRY=$((RETRY - 1))
+        sleep 1
+    done
+
+    echo "Failed to get host status after retries"
+    exit 1
+}
+
+chassis_gpio_status=$(get_ac_on_status "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+
+host_gpio_status=$(get_host_status)
+
+if [ "$host_gpio_status" = "$STATE_ON" ]; then
+    # Set host state to on
+    busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
+fi
+
+sleep 3
+
+chassis_state=$(busctl get-property "$CHASSIS_BUS_NAME$CHASSIS_ID" \
+    "$CHASSIS_OBJ_PATH$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" | awk '{print $2}' | tr -d '"')
+
+host_state=$(busctl get-property "$HOST_BUS_NAME$CHASSIS_ID" \
+    "$HOST_OBJ_PATH$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" | awk '{print $2}' | tr -d '"')
+
+
+if [[ "$chassis_gpio_status" == "$STATE_ON" && \
+      "$host_gpio_status" == "$STATE_ON" ]]; then
+    msg="Chassis$CHASSIS_ID cycle success"
+    echo "${msg}"
+    add_sel "${msg}"
+    echo "D-Bus: Chassis=$chassis_state, Host=$host_state"
+    echo "GPIO : AC=$chassis_gpio_status, DC=$host_gpio_status"
+    exit 0
+else
+    msg="Chassis$CHASSIS_ID cycle failed"
+
+    if [ "$host_gpio_status" = "$STATE_OFF" ]; then
+        # Set host state to off
+        busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
+        msg="$msg, Host$CHASSIS_ID system DC power is off"
+    fi
+
+    if [ "$chassis_gpio_status" = "$STATE_OFF" ]; then
+        # Set chassis state to off
+        busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
+        msg="$msg, Chassis$CHASSIS_ID power is off"
+    fi
+    echo "${msg}"
+    add_sel "${msg}"
+    echo "D-Bus: Chassis=$chassis_state, Host=$host_state"
+    echo "GPIO : AC=$chassis_gpio_status, DC=$host_gpio_status"
+    exit 1
+
+fi

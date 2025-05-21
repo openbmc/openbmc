@@ -11,7 +11,7 @@ source /usr/libexec/yosemite4-common-functions
 #IO 0:7 input port for showing slot 1:8 power status
 #IO 8:16 output port for controlling slot 1:8 power status
 CHASSIS_ID=$1
-slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
+slot_power_control_lock="/run/slot_power_control_${CHASSIS_ID}.lock"
 
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
@@ -43,11 +43,11 @@ disable_i3c_hub()
     echo "Do 12V cycle disable i3c hub"
     if [ "$target_slot" -lt 5 ]; then
         hub_path="/sys/kernel/debug/i3c-hub-0-*/reg"
-        i3c_hub_lock="/tmp/i3c-hub0.lock"
+        i3c_hub_lock="/run/i3c-hub0.lock"
         echo "Slot$target_slot on i3c hub 0."
     else
         hub_path="/sys/kernel/debug/i3c-hub-1-*/reg"
-        i3c_hub_lock="/tmp/i3c-hub1.lock"
+        i3c_hub_lock="/run/i3c-hub1.lock"
         echo "Slot$target_slot on i3c hub 1."
     fi
 
@@ -88,7 +88,7 @@ disable_i3c_hub()
 
 chassis-power-cycle()
 {
-    chassis_power_cycle_lock="/tmp/chassis_power_cycle.lock"
+    chassis_power_cycle_lock="/run/chassis_power_cycle.lock"
 
     exec 200>"$chassis_power_cycle_lock"
     flock -x 200
@@ -104,18 +104,18 @@ chassis-power-cycle()
                 # inform management CPLD that the slot is 12V off
                 if ! gpio_set "$GPIOCHIP_IO_EXP_SLED_PWR_CTRL" "$IO_EXP_SLOT_12V_STATUS"=0
                 then
-                    echo "Failed to inform management CPLD that slot$1 is 12V off"
+                    echo "Failed to inform management CPLD that chassis$1 is 12V off"
                 fi
             fi
             disable_i3c_hub
             sleep 1
             if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
             then
-                msg="Failed to set slot$CHASSIS_ID power off"
+                msg="Failed to set chassis$CHASSIS_ID power off"
                 echo "${msg}"
                 add_sel "${msg}"
             else
-                echo "Succeed to set slot$CHASSIS_ID power off"
+                echo "Succeed to set chassis$CHASSIS_ID power off"
             fi
             # Set host state to off
             busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
@@ -126,7 +126,7 @@ chassis-power-cycle()
         fi
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
         then
-            msg="Failed to set slot$CHASSIS_ID power on"
+            msg="Failed to set chassis$CHASSIS_ID power on"
             echo "${msg}"
             add_sel "${msg}"
         fi
@@ -141,7 +141,7 @@ chassis-power-cycle()
                 # inform management CPLD that the slot is 12V on
                 if ! gpio_set "$GPIOCHIP_IO_EXP_SLED_PWR_CTRL" "$IO_EXP_SLOT_12V_STATUS"=1
                 then
-                    echo "Failed to inform management CPLD that slot$1 is 12V on"
+                    echo "Failed to inform management CPLD that chassis$1 is 12V on"
                 fi
             fi
 
@@ -149,11 +149,8 @@ chassis-power-cycle()
             sleep 2
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
             /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
-            # Set host state to on
-            busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
-            msg="Chassis$CHASSIS_ID cycle success"
+            msg="Chassis$CHASSIS_ID power is on"
             echo "${msg}"
-            add_sel "${msg}"
             flock -u 200
             exit 0;
         else
@@ -195,16 +192,16 @@ then
         echo "Failed to do sled cycle"
     fi
 else
-    msg="Execute slot$CHASSIS_ID cycle"
+    msg="Execute chassis$CHASSIS_ID cycle"
     echo "${msg}"
     add_sel "${msg}"
     exec 300>"$slot_power_control_lock"
     if ! flock -n 300 ; then
         echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
-        msg="Execute slot$CHASSIS_ID cycle fail, power control is operating"
+        msg="Execute chassis$CHASSIS_ID cycle fail, power control is operating"
         add_sel "${msg}"
         exit 1
     fi
-    echo "Starting slot$1 cycle"
+    echo "Starting chassis$1 cycle"
     chassis-power-cycle "$1"
 fi

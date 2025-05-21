@@ -11,7 +11,7 @@ source /usr/libexec/yosemite4-common-functions
 #IO 0:7 input port for showing slot 1:8 power status
 #IO 8:16 output port for controlling slot 1:8 power status
 CHASSIS_ID=$1
-slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
+slot_power_control_lock="/run/slot_power_control_${CHASSIS_ID}.lock"
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 #IO_EXP_BIC_PWR_CTRL=32
@@ -36,11 +36,11 @@ disable_i3c_hub()
     echo "Do 12V off disable i3c hub"
     if [ "$target_slot" -lt 5 ]; then
         hub_path="/sys/kernel/debug/i3c-hub-0-*/reg"
-        i3c_hub_lock="/tmp/i3c-hub0.lock"
+        i3c_hub_lock="/run/i3c-hub0.lock"
         echo "Slot$target_slot on i3c hub 0."
     else
         hub_path="/sys/kernel/debug/i3c-hub-1-*/reg"
-        i3c_hub_lock="/tmp/i3c-hub1.lock"
+        i3c_hub_lock="/run/i3c-hub1.lock"
         echo "Slot$target_slot on i3c hub 1."
     fi
 
@@ -85,7 +85,7 @@ chassis-power-off()
         disable_i3c_hub
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
         then
-                msg="Failed to set slot$CHASSIS_ID power off"
+                msg="Failed to set chassis$CHASSIS_ID power off"
                 echo "${msg}"
                 add_sel "${msg}"
         fi
@@ -106,14 +106,14 @@ chassis-power-off()
         fi
 }
 
-msg="Execute slot$CHASSIS_ID power off"
+msg="Execute chassis$CHASSIS_ID power off"
 echo "${msg}"
 add_sel "${msg}"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
     echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
-    msg="Execute slot$CHASSIS_ID power off fail, power control is operating"
+    msg="Execute chassis$CHASSIS_ID power off fail, power control is operating"
     echo "${msg}"
     add_sel "${msg}"
     exit 1
@@ -131,7 +131,7 @@ then
                 # inform management CPLD that the slot is 12V off
                 if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL" "$IO_EXP_SLOT_12V_STATUS"=0
                 then
-                        echo "Failed to inform management CPLD that slot$1 is 12V off"
+                        echo "Failed to inform management CPLD that chassis$1 is 12V off"
                 fi
         fi
 

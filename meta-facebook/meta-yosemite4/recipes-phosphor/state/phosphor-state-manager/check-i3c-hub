@@ -25,11 +25,11 @@ check_i3c_hub_status()
 
     if [ "$target_slot" -lt 5 ]; then
         hub_path="/sys/kernel/debug/i3c-hub-0-*/reg"
-        i3c_hub_lock="/tmp/i3c-hub0.lock"
+        i3c_hub_lock="/run/i3c-hub0.lock"
         echo "Slot$target_slot on i3c hub 0."
     else
         hub_path="/sys/kernel/debug/i3c-hub-1-*/reg"
-        i3c_hub_lock="/tmp/i3c-hub1.lock"
+        i3c_hub_lock="/run/i3c-hub1.lock"
         echo "Slot$target_slot on i3c hub 1."
     fi
 

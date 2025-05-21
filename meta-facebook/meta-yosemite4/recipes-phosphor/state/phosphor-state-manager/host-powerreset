@@ -6,11 +6,18 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 CHASSIS_ID=$1
-slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
+slot_power_control_lock="/run/slot_power_control_${CHASSIS_ID}.lock"
+
+msg="Execute host$CHASSIS_ID power reset"
+echo "${msg}"
+add_sel "${msg}"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
     echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
+    msg="Execute host$CHASSIS_ID power reset fail, power control is operating"
+    echo "${msg}"
+    add_sel "${msg}"
     exit 1
 fi
 

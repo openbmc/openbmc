@@ -11,7 +11,7 @@ source /usr/libexec/yosemite4-common-functions
 #IO 0:7 input port for showing slot 1:8 power status
 #IO 8:16 output port for controlling slot 1:8 power status
 CHASSIS_ID=$1
-slot_power_control_lock="/tmp/slot_power_control_${CHASSIS_ID}.lock"
+slot_power_control_lock="/run/slot_power_control_${CHASSIS_ID}.lock"
 IO_EXP_P0_PWRGD_R_OUT=18
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
@@ -28,7 +28,7 @@ chassis-power-on()
 {
     if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
     then
-        msg="Failed to set slot$1 power on"
+        msg="Failed to set chassis$1 power on"
         echo "${msg}"
         add_sel "${msg}"
     fi
@@ -43,7 +43,7 @@ chassis-power-on()
             # inform management CPLD that the slot is 12V on
             if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL" "$IO_EXP_SLOT_12V_STATUS"=1
             then
-                echo "Failed to inform management CPLD that slot$1 is 12V on"
+                echo "Failed to inform management CPLD that chassis$1 is 12V on"
             fi
         fi
 
@@ -60,17 +60,26 @@ chassis-power-on()
     fi
 }
 
-msg="Execute slot$CHASSIS_ID power on"
+msg="Execute chassis$CHASSIS_ID power on"
 echo "${msg}"
 add_sel "${msg}"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
-    echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
-    msg="Execute slot$CHASSIS_ID power on fail, power control is operating"
-    echo "${msg}"
-    add_sel "${msg}"
-    exit 1
+    chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
+    if [ "$chassis_status" == "$STATE_ON" ]; then
+        # Chassis already on (e.g. due to AC on), skip power on, do not record SEL
+        msg="Chassis$1 is already on"
+        echo "${msg}"
+        add_sel "${msg}"
+        exit 0
+    else
+        echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
+        msg="Execute chassis$CHASSIS_ID power on fail, power control is operating"
+        echo "${msg}"
+        add_sel "${msg}"
+        exit 1
+    fi
 fi
 
 if ! chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS"); then
@@ -94,7 +103,9 @@ then
     chassis-power-on
     /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID"
 else
-    echo "Chassis$1 is already on"
+    msg="Chassis$1 is already on"
+    echo "${msg}"
+    add_sel "${msg}"
 fi
 
 host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")

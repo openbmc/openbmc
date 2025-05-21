@@ -1,0 +1,7 @@
+[Unit]
+Description=Log SEL for Chassis Power Cycle %i
+After=chassis-powercycle@%i.service host-poweron@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/log-chassis-powercycle-sel %i
