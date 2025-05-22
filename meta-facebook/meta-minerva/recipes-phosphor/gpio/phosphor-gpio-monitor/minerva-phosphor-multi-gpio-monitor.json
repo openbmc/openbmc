@@ -249,7 +249,8 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@fcb-1.service",
-                "rescan-fru.service"
+                "rescan-fru.service",
+                "fan-reload.service"
             ],
             "RISING": [
                 "power-good-deassert@fcb-1.service",
@@ -266,7 +267,8 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@fcb-2.service",
-                "rescan-fru.service"
+                "rescan-fru.service",
+                "fan-reload.service"
             ],
             "RISING": [
                 "power-good-deassert@fcb-2.service",
@@ -283,7 +285,8 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@fcb-3.service",
-                "rescan-fru.service"
+                "rescan-fru.service",
+                "fan-reload.service"
             ],
             "RISING": [
                 "power-good-deassert@fcb-3.service",
@@ -300,7 +303,8 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@fcb-4.service",
-                "rescan-fru.service"
+                "rescan-fru.service",
+                "fan-reload.service"
             ],
             "RISING": [
                 "power-good-deassert@fcb-4.service",
@@ -317,7 +321,8 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@fcb-6.service",
-                "rescan-fru.service"
+                "rescan-fru.service",
+                "fan-reload.service"
             ],
             "RISING": [
                 "power-good-deassert@fcb-6.service",
@@ -334,7 +339,8 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@fcb-5.service",
-                "rescan-fru.service"
+                "rescan-fru.service",
+                "fan-reload.service"
             ],
             "RISING": [
                 "power-good-deassert@fcb-5.service",

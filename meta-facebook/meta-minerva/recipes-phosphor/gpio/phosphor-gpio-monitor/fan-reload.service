@@ -1,0 +1,8 @@
+[Unit]
+Description=Reload Fan PID service when Deassertion
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/fan-reload
+
+SyslogIdentifier=fan-reload
