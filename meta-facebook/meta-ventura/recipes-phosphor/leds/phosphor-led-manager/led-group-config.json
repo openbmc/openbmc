@@ -1,13 +1,13 @@
 {
     "leds": [
         {
-            "group" : "bmc_booted",
-            "members" : [
+            "group": "bmc_booted",
+            "members": [
                 {
-                    "Name" : "bmc_heartbeat_amber",
-                    "Action" : "Blink",
-                    "DutyOn" : 50,
-                    "Period" : 1000,
+                    "Name": "bmc_heartbeat_amber",
+                    "Action": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000,
                     "Priority": "On"
                 }
             ]

@@ -1,14 +1,14 @@
 {
     "leds": [
         {
-            "group" : "bmc_booted",
-            "members" : [
+            "group": "bmc_booted",
+            "members": [
                 {
-                    "Name" : "bmc_heartbeat_amber",
-                    "Action" : "Blink",
-                    "Priority" : "Blink",
-                    "DutyOn" : 50,
-                    "Period" : 1000
+                    "Name": "bmc_heartbeat_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000
                 }
             ]
         },
@@ -33,7 +33,7 @@
                 {
                     "Name": "fp_id_amber",
                     "Action": "Blink",
-                    "Priority" : "Blink",
+                    "Priority": "Blink",
                     "DutyOn": 50,
                     "Period": 250
                 }
@@ -45,12 +45,12 @@
                 {
                     "Name": "fan_status_led",
                     "Action": "On",
-                    "Priority" : "Blink"
+                    "Priority": "Blink"
                 },
                 {
                     "Name": "fan_fault_led_n",
                     "Action": "On",
-                    "Priority" : "Blink"
+                    "Priority": "Blink"
                 }
             ]
         }

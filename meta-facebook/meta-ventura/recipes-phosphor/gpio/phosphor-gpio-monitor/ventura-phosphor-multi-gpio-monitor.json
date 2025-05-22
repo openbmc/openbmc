@@ -302,8 +302,14 @@
         "GpioNum": 148,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-1.service", "led-blue-assert@compute-tray-1.service"],
-            "RISING": ["power-good-deassert@compute-tray-1.service", "led-blue-deassert@compute-tray-1.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-1.service",
+                "led-blue-assert@compute-tray-1.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-1.service",
+                "led-blue-deassert@compute-tray-1.service"
+            ]
         },
         "Continue": true
     },
@@ -313,8 +319,14 @@
         "GpioNum": 150,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-2.service", "led-blue-assert@compute-tray-2.service"],
-            "RISING": ["power-good-deassert@compute-tray-2.service", "led-blue-deassert@compute-tray-2.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-2.service",
+                "led-blue-assert@compute-tray-2.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-2.service",
+                "led-blue-deassert@compute-tray-2.service"
+            ]
         },
         "Continue": true
     },
@@ -324,8 +336,14 @@
         "GpioNum": 152,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-3.service", "led-blue-assert@compute-tray-3.service"],
-            "RISING": ["power-good-deassert@compute-tray-3.service", "led-blue-deassert@compute-tray-3.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-3.service",
+                "led-blue-assert@compute-tray-3.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-3.service",
+                "led-blue-deassert@compute-tray-3.service"
+            ]
         },
         "Continue": true
     },
@@ -335,8 +353,14 @@
         "GpioNum": 154,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-4.service", "led-blue-assert@compute-tray-4.service"],
-            "RISING": ["power-good-deassert@compute-tray-4.service", "led-blue-deassert@compute-tray-4.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-4.service",
+                "led-blue-assert@compute-tray-4.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-4.service",
+                "led-blue-deassert@compute-tray-4.service"
+            ]
         },
         "Continue": true
     },
@@ -346,8 +370,14 @@
         "GpioNum": 156,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-5.service", "led-blue-assert@compute-tray-5.service"],
-            "RISING": ["power-good-deassert@compute-tray-5.service", "led-blue-deassert@compute-tray-5.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-5.service",
+                "led-blue-assert@compute-tray-5.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-5.service",
+                "led-blue-deassert@compute-tray-5.service"
+            ]
         },
         "Continue": true
     },
@@ -357,8 +387,14 @@
         "GpioNum": 158,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-6.service", "led-blue-assert@compute-tray-6.service"],
-            "RISING": ["power-good-deassert@compute-tray-6.service", "led-blue-deassert@compute-tray-6.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-6.service",
+                "led-blue-assert@compute-tray-6.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-6.service",
+                "led-blue-deassert@compute-tray-6.service"
+            ]
         },
         "Continue": true
     },
@@ -368,8 +404,14 @@
         "GpioNum": 160,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-7.service", "led-blue-assert@compute-tray-7.service"],
-            "RISING": ["power-good-deassert@compute-tray-7.service", "led-blue-deassert@compute-tray-7.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-7.service",
+                "led-blue-assert@compute-tray-7.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-7.service",
+                "led-blue-deassert@compute-tray-7.service"
+            ]
         },
         "Continue": true
     },
@@ -379,8 +421,14 @@
         "GpioNum": 162,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-8.service", "led-blue-assert@compute-tray-8.service"],
-            "RISING": ["power-good-deassert@compute-tray-8.service", "led-blue-deassert@compute-tray-8.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-8.service",
+                "led-blue-assert@compute-tray-8.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-8.service",
+                "led-blue-deassert@compute-tray-8.service"
+            ]
         },
         "Continue": true
     },
@@ -390,8 +438,14 @@
         "GpioNum": 164,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-1.service", "led-blue-assert@nvs-tray-1.service"],
-            "RISING": ["power-good-deassert@nvs-tray-1.service", "led-blue-deassert@nvs-tray-1.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-1.service",
+                "led-blue-assert@nvs-tray-1.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-1.service",
+                "led-blue-deassert@nvs-tray-1.service"
+            ]
         },
         "Continue": true
     },
@@ -401,8 +455,14 @@
         "GpioNum": 166,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-2.service", "led-blue-assert@nvs-tray-2.service"],
-            "RISING": ["power-good-deassert@nvs-tray-2.service", "led-blue-deassert@nvs-tray-2.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-2.service",
+                "led-blue-assert@nvs-tray-2.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-2.service",
+                "led-blue-deassert@nvs-tray-2.service"
+            ]
         },
         "Continue": true
     },
@@ -412,8 +472,14 @@
         "GpioNum": 168,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-11.service", "led-blue-assert@compute-tray-11.service"],
-            "RISING": ["power-good-deassert@compute-tray-11.service", "led-blue-deassert@compute-tray-11.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-11.service",
+                "led-blue-assert@compute-tray-11.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-11.service",
+                "led-blue-deassert@compute-tray-11.service"
+            ]
         },
         "Continue": true
     },
@@ -423,8 +489,14 @@
         "GpioNum": 170,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-12.service", "led-blue-assert@compute-tray-12.service"],
-            "RISING": ["power-good-deassert@compute-tray-12.service", "led-blue-deassert@compute-tray-12.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-12.service",
+                "led-blue-assert@compute-tray-12.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-12.service",
+                "led-blue-deassert@compute-tray-12.service"
+            ]
         },
         "Continue": true
     },
@@ -434,8 +506,14 @@
         "GpioNum": 172,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-13.service", "led-blue-assert@compute-tray-13.service"],
-            "RISING": ["power-good-deassert@compute-tray-13.service", "led-blue-deassert@compute-tray-13.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-13.service",
+                "led-blue-assert@compute-tray-13.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-13.service",
+                "led-blue-deassert@compute-tray-13.service"
+            ]
         },
         "Continue": true
     },
@@ -445,8 +523,14 @@
         "GpioNum": 174,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-14.service", "led-blue-assert@compute-tray-14.service"],
-            "RISING": ["power-good-deassert@compute-tray-14.service", "led-blue-deassert@compute-tray-14.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-14.service",
+                "led-blue-assert@compute-tray-14.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-14.service",
+                "led-blue-deassert@compute-tray-14.service"
+            ]
         },
         "Continue": true
     },
@@ -456,8 +540,14 @@
         "GpioNum": 176,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-15.service", "led-blue-assert@compute-tray-15.service"],
-            "RISING": ["power-good-deassert@compute-tray-15.service", "led-blue-deassert@compute-tray-15.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-15.service",
+                "led-blue-assert@compute-tray-15.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-15.service",
+                "led-blue-deassert@compute-tray-15.service"
+            ]
         },
         "Continue": true
     },
@@ -467,8 +557,14 @@
         "GpioNum": 178,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-16.service", "led-blue-assert@compute-tray-16.service"],
-            "RISING": ["power-good-deassert@compute-tray-16.service", "led-blue-deassert@compute-tray-16.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-16.service",
+                "led-blue-assert@compute-tray-16.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-16.service",
+                "led-blue-deassert@compute-tray-16.service"
+            ]
         },
         "Continue": true
     },
@@ -478,8 +574,14 @@
         "GpioNum": 180,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-17.service", "led-blue-assert@compute-tray-17.service"],
-            "RISING": ["power-good-deassert@compute-tray-17.service", "led-blue-deassert@compute-tray-17.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-17.service",
+                "led-blue-assert@compute-tray-17.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-17.service",
+                "led-blue-deassert@compute-tray-17.service"
+            ]
         },
         "Continue": true
     },
@@ -489,8 +591,14 @@
         "GpioNum": 182,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-18.service", "led-blue-assert@compute-tray-18.service"],
-            "RISING": ["power-good-deassert@compute-tray-18.service", "led-blue-deassert@compute-tray-18.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-18.service",
+                "led-blue-assert@compute-tray-18.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-18.service",
+                "led-blue-deassert@compute-tray-18.service"
+            ]
         },
         "Continue": true
     },
@@ -500,8 +608,14 @@
         "GpioNum": 184,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-3.service", "led-blue-assert@nvs-tray-3.service"],
-            "RISING": ["power-good-deassert@nvs-tray-3.service", "led-blue-deassert@nvs-tray-3.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-3.service",
+                "led-blue-assert@nvs-tray-3.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-3.service",
+                "led-blue-deassert@nvs-tray-3.service"
+            ]
         },
         "Continue": true
     },
@@ -511,8 +625,14 @@
         "GpioNum": 186,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-4.service", "led-blue-assert@nvs-tray-4.service"],
-            "RISING": ["power-good-deassert@nvs-tray-4.service", "led-blue-deassert@nvs-tray-4.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-4.service",
+                "led-blue-assert@nvs-tray-4.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-4.service",
+                "led-blue-deassert@nvs-tray-4.service"
+            ]
         },
         "Continue": true
     },
@@ -522,8 +642,14 @@
         "GpioNum": 188,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-5.service", "led-blue-assert@nvs-tray-5.service"],
-            "RISING": ["power-good-deassert@nvs-tray-5.service", "led-blue-deassert@nvs-tray-5.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-5.service",
+                "led-blue-assert@nvs-tray-5.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-5.service",
+                "led-blue-deassert@nvs-tray-5.service"
+            ]
         },
         "Continue": true
     },
@@ -533,8 +659,14 @@
         "GpioNum": 190,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-6.service", "led-blue-assert@nvs-tray-6.service"],
-            "RISING": ["power-good-deassert@nvs-tray-6.service", "led-blue-deassert@nvs-tray-6.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-6.service",
+                "led-blue-assert@nvs-tray-6.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-6.service",
+                "led-blue-deassert@nvs-tray-6.service"
+            ]
         },
         "Continue": true
     },
@@ -544,8 +676,14 @@
         "GpioNum": 192,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-7.service", "led-blue-assert@nvs-tray-7.service"],
-            "RISING": ["power-good-deassert@nvs-tray-7.service", "led-blue-deassert@nvs-tray-7.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-7.service",
+                "led-blue-assert@nvs-tray-7.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-7.service",
+                "led-blue-deassert@nvs-tray-7.service"
+            ]
         },
         "Continue": true
     },
@@ -555,8 +693,14 @@
         "GpioNum": 194,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-8.service", "led-blue-assert@nvs-tray-8.service"],
-            "RISING": ["power-good-deassert@nvs-tray-8.service", "led-blue-deassert@nvs-tray-8.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-8.service",
+                "led-blue-assert@nvs-tray-8.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-8.service",
+                "led-blue-deassert@nvs-tray-8.service"
+            ]
         },
         "Continue": true
     },
@@ -566,8 +710,14 @@
         "GpioNum": 196,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@nvs-tray-9.service", "led-blue-assert@nvs-tray-9.service"],
-            "RISING": ["power-good-deassert@nvs-tray-9.service", "led-blue-deassert@nvs-tray-9.service"]
+            "FALLING": [
+                "power-good-assert@nvs-tray-9.service",
+                "led-blue-assert@nvs-tray-9.service"
+            ],
+            "RISING": [
+                "power-good-deassert@nvs-tray-9.service",
+                "led-blue-deassert@nvs-tray-9.service"
+            ]
         },
         "Continue": true
     },
@@ -577,8 +727,14 @@
         "GpioNum": 198,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-9.service", "led-blue-assert@compute-tray-9.service"],
-            "RISING": ["power-good-deassert@compute-tray-9.service", "led-blue-deassert@compute-tray-9.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-9.service",
+                "led-blue-assert@compute-tray-9.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-9.service",
+                "led-blue-deassert@compute-tray-9.service"
+            ]
         },
         "Continue": true
     },
@@ -588,8 +744,14 @@
         "GpioNum": 200,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@compute-tray-10.service", "led-blue-assert@compute-tray-10.service"],
-            "RISING": ["power-good-deassert@compute-tray-10.service", "led-blue-deassert@compute-tray-10.service"]
+            "FALLING": [
+                "power-good-assert@compute-tray-10.service",
+                "led-blue-assert@compute-tray-10.service"
+            ],
+            "RISING": [
+                "power-good-deassert@compute-tray-10.service",
+                "led-blue-deassert@compute-tray-10.service"
+            ]
         },
         "Continue": true
     },
@@ -599,8 +761,14 @@
         "GpioNum": 202,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray1.service", "led-amber-assert@leak-compute-tray-1.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray1.service", "led-amber-deassert@leak-compute-tray-1.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray1.service",
+                "led-amber-assert@leak-compute-tray-1.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray1.service",
+                "led-amber-deassert@leak-compute-tray-1.service"
+            ]
         },
         "Continue": true
     },
@@ -610,8 +778,14 @@
         "GpioNum": 204,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray2.service", "led-amber-assert@leak-compute-tray-2.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray2.service", "led-amber-deassert@leak-compute-tray-2.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray2.service",
+                "led-amber-assert@leak-compute-tray-2.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray2.service",
+                "led-amber-deassert@leak-compute-tray-2.service"
+            ]
         },
         "Continue": true
     },
@@ -621,8 +795,14 @@
         "GpioNum": 206,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray3.service", "led-amber-assert@leak-compute-tray-3.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray3.service", "led-amber-deassert@leak-compute-tray-3.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray3.service",
+                "led-amber-assert@leak-compute-tray-3.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray3.service",
+                "led-amber-deassert@leak-compute-tray-3.service"
+            ]
         },
         "Continue": true
     },
@@ -632,8 +812,14 @@
         "GpioNum": 208,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray4.service", "led-amber-assert@leak-compute-tray-4.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray4.service", "led-amber-deassert@leak-compute-tray-4.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray4.service",
+                "led-amber-assert@leak-compute-tray-4.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray4.service",
+                "led-amber-deassert@leak-compute-tray-4.service"
+            ]
         },
         "Continue": true
     },
@@ -643,8 +829,14 @@
         "GpioNum": 210,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray5.service", "led-amber-assert@leak-compute-tray-5.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray5.service", "led-amber-deassert@leak-compute-tray-5.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray5.service",
+                "led-amber-assert@leak-compute-tray-5.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray5.service",
+                "led-amber-deassert@leak-compute-tray-5.service"
+            ]
         },
         "Continue": true
     },
@@ -654,8 +846,14 @@
         "GpioNum": 212,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray6.service", "led-amber-assert@leak-compute-tray-6.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray6.service", "led-amber-deassert@leak-compute-tray-6.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray6.service",
+                "led-amber-assert@leak-compute-tray-6.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray6.service",
+                "led-amber-deassert@leak-compute-tray-6.service"
+            ]
         },
         "Continue": true
     },
@@ -665,8 +863,14 @@
         "GpioNum": 214,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray7.service", "led-amber-assert@leak-compute-tray-7.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray7.service", "led-amber-deassert@leak-compute-tray-7.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray7.service",
+                "led-amber-assert@leak-compute-tray-7.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray7.service",
+                "led-amber-deassert@leak-compute-tray-7.service"
+            ]
         },
         "Continue": true
     },
@@ -676,8 +880,14 @@
         "GpioNum": 216,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray8.service", "led-amber-assert@leak-compute-tray-8.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray8.service", "led-amber-deassert@leak-compute-tray-8.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray8.service",
+                "led-amber-assert@leak-compute-tray-8.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray8.service",
+                "led-amber-deassert@leak-compute-tray-8.service"
+            ]
         },
         "Continue": true
     },
@@ -687,8 +897,14 @@
         "GpioNum": 218,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray1.service", "led-amber-assert@leak-nvs-tray-1.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray1.service", "led-amber-deassert@leak-nvs-tray-1.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray1.service",
+                "led-amber-assert@leak-nvs-tray-1.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray1.service",
+                "led-amber-deassert@leak-nvs-tray-1.service"
+            ]
         },
         "Continue": true
     },
@@ -698,8 +914,14 @@
         "GpioNum": 220,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray2.service", "led-amber-assert@leak-nvs-tray-2.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray2.service", "led-amber-deassert@leak-nvs-tray-2.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray2.service",
+                "led-amber-assert@leak-nvs-tray-2.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray2.service",
+                "led-amber-deassert@leak-nvs-tray-2.service"
+            ]
         },
         "Continue": true
     },
@@ -709,8 +931,14 @@
         "GpioNum": 222,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray11.service", "led-amber-assert@leak-compute-tray-11.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray11.service", "led-amber-deassert@leak-compute-tray-11.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray11.service",
+                "led-amber-assert@leak-compute-tray-11.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray11.service",
+                "led-amber-deassert@leak-compute-tray-11.service"
+            ]
         },
         "Continue": true
     },
@@ -720,8 +948,14 @@
         "GpioNum": 224,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray12.service", "led-amber-assert@leak-compute-tray-12.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray12.service", "led-amber-deassert@leak-compute-tray-12.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray12.service",
+                "led-amber-assert@leak-compute-tray-12.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray12.service",
+                "led-amber-deassert@leak-compute-tray-12.service"
+            ]
         },
         "Continue": true
     },
@@ -731,8 +965,14 @@
         "GpioNum": 226,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray13.service", "led-amber-assert@leak-compute-tray-13.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray13.service", "led-amber-deassert@leak-compute-tray-13.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray13.service",
+                "led-amber-assert@leak-compute-tray-13.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray13.service",
+                "led-amber-deassert@leak-compute-tray-13.service"
+            ]
         },
         "Continue": true
     },
@@ -742,8 +982,14 @@
         "GpioNum": 228,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray14.service", "led-amber-assert@leak-compute-tray-14.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray14.service", "led-amber-deassert@leak-compute-tray-14.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray14.service",
+                "led-amber-assert@leak-compute-tray-14.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray14.service",
+                "led-amber-deassert@leak-compute-tray-14.service"
+            ]
         },
         "Continue": true
     },
@@ -753,8 +999,14 @@
         "GpioNum": 230,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray15.service", "led-amber-assert@leak-compute-tray-15.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray15.service", "led-amber-deassert@leak-compute-tray-15.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray15.service",
+                "led-amber-assert@leak-compute-tray-15.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray15.service",
+                "led-amber-deassert@leak-compute-tray-15.service"
+            ]
         },
         "Continue": true
     },
@@ -764,8 +1016,14 @@
         "GpioNum": 232,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray16.service", "led-amber-assert@leak-compute-tray-16.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray16.service", "led-amber-deassert@leak-compute-tray-16.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray16.service",
+                "led-amber-assert@leak-compute-tray-16.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray16.service",
+                "led-amber-deassert@leak-compute-tray-16.service"
+            ]
         },
         "Continue": true
     },
@@ -775,8 +1033,14 @@
         "GpioNum": 234,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray17.service", "led-amber-assert@leak-compute-tray-17.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray17.service", "led-amber-deassert@leak-compute-tray-17.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray17.service",
+                "led-amber-assert@leak-compute-tray-17.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray17.service",
+                "led-amber-deassert@leak-compute-tray-17.service"
+            ]
         },
         "Continue": true
     },
@@ -786,8 +1050,14 @@
         "GpioNum": 236,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray18.service", "led-amber-assert@leak-compute-tray-18.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray18.service", "led-amber-deassert@leak-compute-tray-18.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray18.service",
+                "led-amber-assert@leak-compute-tray-18.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray18.service",
+                "led-amber-deassert@leak-compute-tray-18.service"
+            ]
         },
         "Continue": true
     },
@@ -797,8 +1067,14 @@
         "GpioNum": 238,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray3.service", "led-amber-assert@leak-nvs-tray-3.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray3.service", "led-amber-deassert@leak-nvs-tray-3.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray3.service",
+                "led-amber-assert@leak-nvs-tray-3.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray3.service",
+                "led-amber-deassert@leak-nvs-tray-3.service"
+            ]
         },
         "Continue": true
     },
@@ -808,8 +1084,14 @@
         "GpioNum": 240,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray4.service", "led-amber-assert@leak-nvs-tray-4.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray4.service", "led-amber-deassert@leak-nvs-tray-4.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray4.service",
+                "led-amber-assert@leak-nvs-tray-4.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray4.service",
+                "led-amber-deassert@leak-nvs-tray-4.service"
+            ]
         },
         "Continue": true
     },
@@ -819,8 +1101,14 @@
         "GpioNum": 242,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray5.service", "led-amber-assert@leak-nvs-tray-5.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray5.service", "led-amber-deassert@leak-nvs-tray-5.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray5.service",
+                "led-amber-assert@leak-nvs-tray-5.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray5.service",
+                "led-amber-deassert@leak-nvs-tray-5.service"
+            ]
         },
         "Continue": true
     },
@@ -830,8 +1118,14 @@
         "GpioNum": 244,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray6.service", "led-amber-assert@leak-nvs-tray-6.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray6.service", "led-amber-deassert@leak-nvs-tray-6.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray6.service",
+                "led-amber-assert@leak-nvs-tray-6.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray6.service",
+                "led-amber-deassert@leak-nvs-tray-6.service"
+            ]
         },
         "Continue": true
     },
@@ -841,8 +1135,14 @@
         "GpioNum": 246,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray7.service", "led-amber-assert@leak-nvs-tray-7.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray7.service", "led-amber-deassert@leak-nvs-tray-7.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray7.service",
+                "led-amber-assert@leak-nvs-tray-7.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray7.service",
+                "led-amber-deassert@leak-nvs-tray-7.service"
+            ]
         },
         "Continue": true
     },
@@ -852,8 +1152,14 @@
         "GpioNum": 248,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray8.service", "led-amber-assert@leak-nvs-tray-8.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray8.service", "led-amber-deassert@leak-nvs-tray-8.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray8.service",
+                "led-amber-assert@leak-nvs-tray-8.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray8.service",
+                "led-amber-deassert@leak-nvs-tray-8.service"
+            ]
         },
         "Continue": true
     },
@@ -863,8 +1169,14 @@
         "GpioNum": 250,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@SwitchTray9.service", "led-amber-assert@leak-nvs-tray-9.service"],
-            "RISING": ["leak-detect-deassert@SwitchTray9.service", "led-amber-deassert@leak-nvs-tray-9.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@SwitchTray9.service",
+                "led-amber-assert@leak-nvs-tray-9.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@SwitchTray9.service",
+                "led-amber-deassert@leak-nvs-tray-9.service"
+            ]
         },
         "Continue": true
     },
@@ -874,8 +1186,14 @@
         "GpioNum": 252,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray9.service", "led-amber-assert@leak-compute-tray-9.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray9.service", "led-amber-deassert@leak-compute-tray-9.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray9.service",
+                "led-amber-assert@leak-compute-tray-9.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray9.service",
+                "led-amber-deassert@leak-compute-tray-9.service"
+            ]
         },
         "Continue": true
     },
@@ -885,8 +1203,14 @@
         "GpioNum": 254,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["critical-leak-detect-assert@ComputeTray10.service", "led-amber-assert@leak-compute-tray-10.service"],
-            "RISING": ["leak-detect-deassert@ComputeTray10.service", "led-amber-deassert@leak-compute-tray-10.service"]
+            "FALLING": [
+                "critical-leak-detect-assert@ComputeTray10.service",
+                "led-amber-assert@leak-compute-tray-10.service"
+            ],
+            "RISING": [
+                "leak-detect-deassert@ComputeTray10.service",
+                "led-amber-deassert@leak-compute-tray-10.service"
+            ]
         },
         "Continue": true
     },
@@ -897,7 +1221,10 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-deassert@RackDripPan.service"],
-            "RISING": ["critical-leak-detect-assert@RackDripPan.service", "rack-level-leak@RackDripPan.service"]
+            "RISING": [
+                "critical-leak-detect-assert@RackDripPan.service",
+                "rack-level-leak@RackDripPan.service"
+            ]
         },
         "Continue": true
     },
@@ -930,7 +1257,10 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-deassert@RackRightManifold.service"],
-            "RISING": ["critical-leak-detect-assert@RackRightManifold.service", "rack-level-leak@RackRightManifold.service"]
+            "RISING": [
+                "critical-leak-detect-assert@RackRightManifold.service",
+                "rack-level-leak@RackRightManifold.service"
+            ]
         },
         "Continue": true
     },
@@ -941,7 +1271,10 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["leak-detect-deassert@RackLeftManifold.service"],
-            "RISING": ["critical-leak-detect-assert@RackLeftManifold.service", "rack-level-leak@RackLeftManifold.service"]
+            "RISING": [
+                "critical-leak-detect-assert@RackLeftManifold.service",
+                "rack-level-leak@RackLeftManifold.service"
+            ]
         },
         "Continue": true
     },

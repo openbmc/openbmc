@@ -287,9 +287,7 @@
                 {
                     "name": "STEPWISE_FIO",
                     "type": "stepwise",
-                    "inputs": [
-                        "VIRTUAL_FIOBOARD_REMOTE_INLET_TEMP_C"
-                    ],
+                    "inputs": ["VIRTUAL_FIOBOARD_REMOTE_INLET_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -315,10 +313,7 @@
                 {
                     "name": "STEPWISE_OCP_NIC",
                     "type": "stepwise",
-                    "inputs": [
-                        "NIC0_TEMP_C",
-                        "NIC1_TEMP_C"
-                    ],
+                    "inputs": ["NIC0_TEMP_C", "NIC1_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -340,10 +335,7 @@
                 {
                     "name": "PID_OCP_NIC",
                     "type": "temp",
-                    "inputs": [
-                        "NIC0_TEMP_C",
-                        "NIC1_TEMP_C"
-                    ],
+                    "inputs": ["NIC0_TEMP_C", "NIC1_TEMP_C"],
                     "setpoint": 85.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -366,10 +358,7 @@
                 {
                     "name": "STEPWISE_HDDBOARD_SSD",
                     "type": "stepwise",
-                    "inputs": [
-                        "HDDBOARD_SSD0_TEMP_C",
-                        "HDDBOARD_SSD2_TEMP_C"
-                    ],
+                    "inputs": ["HDDBOARD_SSD0_TEMP_C", "HDDBOARD_SSD2_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -391,10 +380,7 @@
                 {
                     "name": "PID_HDDBOARD_SSD",
                     "type": "temp",
-                    "inputs": [
-                        "HDDBOARD_SSD0_TEMP_C",
-                        "HDDBOARD_SSD2_TEMP_C"
-                    ],
+                    "inputs": ["HDDBOARD_SSD0_TEMP_C", "HDDBOARD_SSD2_TEMP_C"],
                     "setpoint": 60.0,
                     "pid": {
                         "samplePeriod": 1,

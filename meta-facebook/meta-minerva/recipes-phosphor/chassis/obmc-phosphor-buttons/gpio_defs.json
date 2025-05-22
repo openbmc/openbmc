@@ -12,9 +12,9 @@
         },
         {
             "name": "HOST_SELECTOR",
-            "group_gpio_config" : [],
-            "max_position" : 0,
-            "host_selector_map" : {}
+            "group_gpio_config": [],
+            "max_position": 0,
+            "host_selector_map": {}
         }
     ]
 }

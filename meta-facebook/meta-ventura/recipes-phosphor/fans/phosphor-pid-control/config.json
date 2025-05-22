@@ -138,9 +138,7 @@
                 {
                     "name": "STEPWISE_INLET",
                     "type": "stepwise",
-                    "inputs": [
-                        "SCM_TEMP_C"
-                    ],
+                    "inputs": ["SCM_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -166,9 +164,7 @@
                 {
                     "name": "STEPWISE_BRICK",
                     "type": "stepwise",
-                    "inputs": [
-                        "RMC_BRICK_TEMP_C"
-                    ],
+                    "inputs": ["RMC_BRICK_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -190,9 +186,7 @@
                 {
                     "name": "PID_BRICK",
                     "type": "temp",
-                    "inputs": [
-                        "RMC_BRICK_TEMP_C"
-                    ],
+                    "inputs": ["RMC_BRICK_TEMP_C"],
                     "setpoint": 90.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -256,9 +250,7 @@
                 {
                     "name": "STEPWISE_INLET",
                     "type": "stepwise",
-                    "inputs": [
-                        "SCM_TEMP_C"
-                    ],
+                    "inputs": ["SCM_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -284,9 +276,7 @@
                 {
                     "name": "STEPWISE_BRICK",
                     "type": "stepwise",
-                    "inputs": [
-                        "RMC_BRICK_TEMP_C"
-                    ],
+                    "inputs": ["RMC_BRICK_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -308,9 +298,7 @@
                 {
                     "name": "PID_BRICK",
                     "type": "temp",
-                    "inputs": [
-                        "RMC_BRICK_TEMP_C"
-                    ],
+                    "inputs": ["RMC_BRICK_TEMP_C"],
                     "setpoint": 90.0,
                     "pid": {
                         "samplePeriod": 1,

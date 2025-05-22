@@ -4,14 +4,11 @@
             "Name": "FCB_0_FAN_0_CURR_A",
             "SensorType": "current"
         },
-        "Params":
-        {
-            "DbusParam":
-            [
+        "Params": {
+            "DbusParam": [
                 {
                     "ParamName": "FCB_0_FAN_0_IMON_VOLT_V",
-                    "Desc":
-                    {
+                    "Desc": {
                         "Name": "FCB_0_FAN_0_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }
@@ -25,14 +22,11 @@
             "Name": "FCB_0_FAN_1_CURR_A",
             "SensorType": "current"
         },
-        "Params":
-        {
-            "DbusParam":
-            [
+        "Params": {
+            "DbusParam": [
                 {
                     "ParamName": "FCB_0_FAN_1_IMON_VOLT_V",
-                    "Desc":
-                    {
+                    "Desc": {
                         "Name": "FCB_0_FAN_1_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }
@@ -46,14 +40,11 @@
             "Name": "FCB_1_FAN_2_CURR_A",
             "SensorType": "current"
         },
-        "Params":
-        {
-            "DbusParam":
-            [
+        "Params": {
+            "DbusParam": [
                 {
                     "ParamName": "FCB_1_FAN_2_IMON_VOLT_V",
-                    "Desc":
-                    {
+                    "Desc": {
                         "Name": "FCB_1_FAN_2_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }
@@ -67,14 +58,11 @@
             "Name": "FCB_1_FAN_3_CURR_A",
             "SensorType": "current"
         },
-        "Params":
-        {
-            "DbusParam":
-            [
+        "Params": {
+            "DbusParam": [
                 {
                     "ParamName": "FCB_1_FAN_3_IMON_VOLT_V",
-                    "Desc":
-                    {
+                    "Desc": {
                         "Name": "FCB_1_FAN_3_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }

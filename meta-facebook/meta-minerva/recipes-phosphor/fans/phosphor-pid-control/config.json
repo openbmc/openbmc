@@ -527,10 +527,7 @@
                 {
                     "name": "Stepwise_Upper_Zone_TEMP",
                     "type": "stepwise",
-                    "inputs": [
-                        "FCB_1_TEMP_C",
-                        "FCB_2_TEMP_C"
-                    ],
+                    "inputs": ["FCB_1_TEMP_C", "FCB_2_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -597,10 +594,7 @@
                 {
                     "name": "Stepwise_Middle_Zone_TEMP",
                     "type": "stepwise",
-                    "inputs": [
-                        "FCB_3_TEMP_C",
-                        "FCB_4_TEMP_C"
-                    ],
+                    "inputs": ["FCB_3_TEMP_C", "FCB_4_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
@@ -667,10 +661,7 @@
                 {
                     "name": "Stepwise_Bottom_Zone_TEMP",
                     "type": "stepwise",
-                    "inputs": [
-                        "FCB_5_TEMP_C",
-                        "FCB_6_TEMP_C"
-                    ],
+                    "inputs": ["FCB_5_TEMP_C", "FCB_6_TEMP_C"],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,

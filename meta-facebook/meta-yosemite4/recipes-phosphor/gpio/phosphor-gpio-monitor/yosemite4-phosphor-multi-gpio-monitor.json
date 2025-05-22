@@ -13,7 +13,11 @@
         "LineName": "PWRGD_SLOT1_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@1.service", "en-i3c-hub-scan-fru@1.service", "rescan-wf-bic@1.service"],
+            "RISING": [
+                "probe-slot-device@1.service",
+                "en-i3c-hub-scan-fru@1.service",
+                "rescan-wf-bic@1.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@1.service"]
         },
         "Continue": true
@@ -23,7 +27,11 @@
         "LineName": "PWRGD_SLOT2_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@2.service", "en-i3c-hub-scan-fru@2.service", "rescan-wf-bic@2.service"],
+            "RISING": [
+                "probe-slot-device@2.service",
+                "en-i3c-hub-scan-fru@2.service",
+                "rescan-wf-bic@2.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@2.service"]
         },
         "Continue": true
@@ -33,7 +41,11 @@
         "LineName": "PWRGD_SLOT3_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@3.service", "en-i3c-hub-scan-fru@3.service", "rescan-wf-bic@3.service"],
+            "RISING": [
+                "probe-slot-device@3.service",
+                "en-i3c-hub-scan-fru@3.service",
+                "rescan-wf-bic@3.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@3.service"]
         },
         "Continue": true
@@ -43,7 +55,11 @@
         "LineName": "PWRGD_SLOT4_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@4.service", "en-i3c-hub-scan-fru@4.service", "rescan-wf-bic@4.service"],
+            "RISING": [
+                "probe-slot-device@4.service",
+                "en-i3c-hub-scan-fru@4.service",
+                "rescan-wf-bic@4.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@4.service"]
         },
         "Continue": true
@@ -53,7 +69,11 @@
         "LineName": "PWRGD_SLOT5_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@5.service", "en-i3c-hub-scan-fru@5.service", "rescan-wf-bic@5.service"],
+            "RISING": [
+                "probe-slot-device@5.service",
+                "en-i3c-hub-scan-fru@5.service",
+                "rescan-wf-bic@5.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@5.service"]
         },
         "Continue": true
@@ -63,7 +83,11 @@
         "LineName": "PWRGD_SLOT6_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@6.service", "en-i3c-hub-scan-fru@6.service", "rescan-wf-bic@6.service"],
+            "RISING": [
+                "probe-slot-device@6.service",
+                "en-i3c-hub-scan-fru@6.service",
+                "rescan-wf-bic@6.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@6.service"]
         },
         "Continue": true
@@ -73,7 +97,11 @@
         "LineName": "PWRGD_SLOT7_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@7.service", "en-i3c-hub-scan-fru@7.service", "rescan-wf-bic@7.service"],
+            "RISING": [
+                "probe-slot-device@7.service",
+                "en-i3c-hub-scan-fru@7.service",
+                "rescan-wf-bic@7.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@7.service"]
         },
         "Continue": true
@@ -83,7 +111,11 @@
         "LineName": "PWRGD_SLOT8_STBY",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["probe-slot-device@8.service", "en-i3c-hub-scan-fru@8.service", "rescan-wf-bic@8.service"],
+            "RISING": [
+                "probe-slot-device@8.service",
+                "en-i3c-hub-scan-fru@8.service",
+                "rescan-wf-bic@8.service"
+            ],
             "FALLING": ["rescan-fru-ocp-setting@8.service"]
         },
         "Continue": true
@@ -151,14 +183,8 @@
         "LineName": "PRSNT_SB_SLOT1_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@1.service",
-                "slot-unplug@1.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@1.service",
-                "slot-plug-in@1.service"
-            ]
+            "RISING": ["disable-i3c-hub@1.service", "slot-unplug@1.service"],
+            "FALLING": ["slot-hot-plug@1.service", "slot-plug-in@1.service"]
         },
         "Continue": true
     },
@@ -167,14 +193,8 @@
         "LineName": "PRSNT_SB_SLOT2_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@2.service",
-                "slot-unplug@2.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@2.service",
-                "slot-plug-in@2.service"
-            ]
+            "RISING": ["disable-i3c-hub@2.service", "slot-unplug@2.service"],
+            "FALLING": ["slot-hot-plug@2.service", "slot-plug-in@2.service"]
         },
         "Continue": true
     },
@@ -183,14 +203,8 @@
         "LineName": "PRSNT_SB_SLOT3_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@3.service",
-                "slot-unplug@3.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@3.service",
-                "slot-plug-in@3.service"
-            ]
+            "RISING": ["disable-i3c-hub@3.service", "slot-unplug@3.service"],
+            "FALLING": ["slot-hot-plug@3.service", "slot-plug-in@3.service"]
         },
         "Continue": true
     },
@@ -199,14 +213,8 @@
         "LineName": "PRSNT_SB_SLOT4_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@4.service",
-                "slot-unplug@4.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@4.service",
-                "slot-plug-in@4.service"
-            ]
+            "RISING": ["disable-i3c-hub@4.service", "slot-unplug@4.service"],
+            "FALLING": ["slot-hot-plug@4.service", "slot-plug-in@4.service"]
         },
         "Continue": true
     },
@@ -215,14 +223,8 @@
         "LineName": "PRSNT_SB_SLOT5_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@5.service",
-                "slot-unplug@5.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@5.service",
-                "slot-plug-in@5.service"
-            ]
+            "RISING": ["disable-i3c-hub@5.service", "slot-unplug@5.service"],
+            "FALLING": ["slot-hot-plug@5.service", "slot-plug-in@5.service"]
         },
         "Continue": true
     },
@@ -231,14 +233,8 @@
         "LineName": "PRSNT_SB_SLOT6_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@6.service",
-                "slot-unplug@6.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@6.service",
-                "slot-plug-in@6.service"
-            ]
+            "RISING": ["disable-i3c-hub@6.service", "slot-unplug@6.service"],
+            "FALLING": ["slot-hot-plug@6.service", "slot-plug-in@6.service"]
         },
         "Continue": true
     },
@@ -247,14 +243,8 @@
         "LineName": "PRSNT_SB_SLOT7_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@7.service",
-                "slot-unplug@7.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@7.service",
-                "slot-plug-in@7.service"
-            ]
+            "RISING": ["disable-i3c-hub@7.service", "slot-unplug@7.service"],
+            "FALLING": ["slot-hot-plug@7.service", "slot-plug-in@7.service"]
         },
         "Continue": true
     },
@@ -263,14 +253,8 @@
         "LineName": "PRSNT_SB_SLOT8_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "disable-i3c-hub@8.service",
-                "slot-unplug@8.service"
-            ],
-            "FALLING": [
-                "slot-hot-plug@8.service",
-                "slot-plug-in@8.service"
-            ]
+            "RISING": ["disable-i3c-hub@8.service", "slot-unplug@8.service"],
+            "FALLING": ["slot-hot-plug@8.service", "slot-plug-in@8.service"]
         },
         "Continue": true
     },
@@ -279,8 +263,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT1_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@1.service"]
+            "FALLING": ["slot-hsc-fault@1.service"]
         },
         "Continue": true
     },
@@ -289,8 +272,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT2_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@2.service"]
+            "FALLING": ["slot-hsc-fault@2.service"]
         },
         "Continue": true
     },
@@ -299,8 +281,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT3_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@3.service"]
+            "FALLING": ["slot-hsc-fault@3.service"]
         },
         "Continue": true
     },
@@ -309,8 +290,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT4_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@4.service"]
+            "FALLING": ["slot-hsc-fault@4.service"]
         },
         "Continue": true
     },
@@ -319,8 +299,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT5_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@5.service"]
+            "FALLING": ["slot-hsc-fault@5.service"]
         },
         "Continue": true
     },
@@ -329,8 +308,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT6_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@6.service"]
+            "FALLING": ["slot-hsc-fault@6.service"]
         },
         "Continue": true
     },
@@ -339,8 +317,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT7_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@7.service"]
+            "FALLING": ["slot-hsc-fault@7.service"]
         },
         "Continue": true
     },
@@ -349,8 +326,7 @@
         "LineName": "FLT_HSC_SERVER_SLOT8_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "slot-hsc-fault@8.service"]
+            "FALLING": ["slot-hsc-fault@8.service"]
         },
         "Continue": true
     },
@@ -359,9 +335,7 @@
         "LineName": "FLT_P48V_HSC_0_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "medusa-hsc-fault@0.service"
-            ]
+            "FALLING": ["medusa-hsc-fault@0.service"]
         },
         "Continue": true
     },
@@ -370,9 +344,7 @@
         "LineName": "FLT_P48V_HSC_1_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "medusa-hsc-fault@1.service"
-            ]
+            "FALLING": ["medusa-hsc-fault@1.service"]
         },
         "Continue": true
     },
@@ -381,9 +353,7 @@
         "LineName": "OC_P48V_HSC_0_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "medusa-hsc-alert@0.service"
-            ]
+            "FALLING": ["medusa-hsc-alert@0.service"]
         },
         "Continue": true
     },
@@ -392,9 +362,7 @@
         "LineName": "OC_P48V_HSC_1_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "medusa-hsc-alert@1.service"
-            ]
+            "FALLING": ["medusa-hsc-alert@1.service"]
         },
         "Continue": true
     },
@@ -403,9 +371,7 @@
         "LineName": "PWRGD_P12V_AUX_0",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "medusa-power-module-pwrgd@0.service"
-            ]
+            "FALLING": ["medusa-power-module-pwrgd@0.service"]
         },
         "Continue": true
     },
@@ -414,9 +380,7 @@
         "LineName": "PWRGD_P12V_AUX_1",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "medusa-power-module-pwrgd@1.service"
-            ]
+            "FALLING": ["medusa-power-module-pwrgd@1.service"]
         },
         "Continue": true
     },
@@ -425,8 +389,7 @@
         "LineName": "INT_SMB_BMC_SLOT1_4_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "check-interrupt@slot1-slot4.service"]
+            "FALLING": ["check-interrupt@slot1-slot4.service"]
         },
         "Continue": true
     },
@@ -435,8 +398,7 @@
         "LineName": "INT_SMB_BMC_SLOT5_8_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "check-interrupt@slot5-slot8.service"]
+            "FALLING": ["check-interrupt@slot5-slot8.service"]
         },
         "Continue": true
     },
@@ -445,8 +407,7 @@
         "LineName": "INT_FANBOARD1_IOEXP_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "fan-board-efuse-fault@1.service"]
+            "FALLING": ["fan-board-efuse-fault@1.service"]
         },
         "Continue": true
     },
@@ -455,8 +416,7 @@
         "LineName": "INT_FANBOARD0_IOEXP_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "fan-board-efuse-fault@0.service"]
+            "FALLING": ["fan-board-efuse-fault@0.service"]
         },
         "Continue": true
     },
@@ -465,8 +425,7 @@
         "LineName": "ALT_SMB_BMC_CPLD2_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "nic-power-fault@0.service"]
+            "FALLING": ["nic-power-fault@0.service"]
         },
         "Continue": true
     },
@@ -475,8 +434,7 @@
         "LineName": "FM_RESBTN_SLOT1_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@1.target"]
+            "FALLING": ["obmc-host-reboot@1.target"]
         },
         "Continue": true
     },
@@ -485,8 +443,7 @@
         "LineName": "FM_RESBTN_SLOT2_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@2.target"]
+            "FALLING": ["obmc-host-reboot@2.target"]
         },
         "Continue": true
     },
@@ -495,8 +452,7 @@
         "LineName": "FM_RESBTN_SLOT3_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@3.target"]
+            "FALLING": ["obmc-host-reboot@3.target"]
         },
         "Continue": true
     },
@@ -505,8 +461,7 @@
         "LineName": "FM_RESBTN_SLOT4_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@4.target"]
+            "FALLING": ["obmc-host-reboot@4.target"]
         },
         "Continue": true
     },
@@ -515,8 +470,7 @@
         "LineName": "FM_RESBTN_SLOT5_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@5.target"]
+            "FALLING": ["obmc-host-reboot@5.target"]
         },
         "Continue": true
     },
@@ -525,8 +479,7 @@
         "LineName": "FM_RESBTN_SLOT6_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@6.target"]
+            "FALLING": ["obmc-host-reboot@6.target"]
         },
         "Continue": true
     },
@@ -535,8 +488,7 @@
         "LineName": "FM_RESBTN_SLOT7_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@7.target"]
+            "FALLING": ["obmc-host-reboot@7.target"]
         },
         "Continue": true
     },
@@ -545,8 +497,7 @@
         "LineName": "FM_RESBTN_SLOT8_BMC_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "obmc-host-reboot@8.target"]
+            "FALLING": ["obmc-host-reboot@8.target"]
         },
         "Continue": true
     },
@@ -555,9 +506,7 @@
         "LineName": "ALT_P12V_AUX_N",
         "EventMon": "FALLING",
         "Targets": {
-            "FALLING": [
-                "medusa-power-module-fault.service"
-            ]
+            "FALLING": ["medusa-power-module-fault.service"]
         },
         "Continue": true
     }

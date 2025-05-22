@@ -1,13 +1,11 @@
 {
-    "BootBlockAndHeader_no_tip.xml":
-    {
+    "BootBlockAndHeader_no_tip.xml": {
         "FIU0_CLK_DIVIDER": "0",
         "FIU1_CLK_DIVIDER": "0",
         "FIU3_CLK_DIVIDER": "0",
         "BAUD_RATE": "57600"
     },
-    "BootBlockAndHeader.xml":
-    {
+    "BootBlockAndHeader.xml": {
         "BAUD_RATE": "57600"
     }
 }
