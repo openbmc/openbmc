@@ -13,7 +13,7 @@ version=""
 sleep 2
 
 set_nic_eid() {
-    MAX_RETRIES=3
+    MAX_RETRIES=60
     RETRY_COUNT=0
     while [ "$RETRY_COUNT" -lt "$MAX_RETRIES" ]; do
         busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/interfaces/"mctpi2c${bus}" au.com.codeconstruct.MCTP.BusOwner1 AssignEndpointStatic ayy 1 0x32 "$eid"
@@ -23,6 +23,7 @@ set_nic_eid() {
         fi
         echo "Retry setting EID ${eid}"
         RETRY_COUNT=$((RETRY_COUNT + 1))
+        sleep 1
     done
 }
 
